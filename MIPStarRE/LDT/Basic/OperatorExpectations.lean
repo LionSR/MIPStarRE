@@ -28,7 +28,7 @@ theorem ev_sub {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-! ### Algebraic lemmas for operator expectation values -/
 
-/-- `ev` commutes with real scalar multiplication. -/
+/-- `ev` commutes with complex scalar multiplication by a real number. -/
 theorem ev_scale {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (c : Error) (X : MIPStarRE.Quantum.Op ι) :
     ev ψ ((c : ℂ) • X) = c * ev ψ X := by
@@ -37,6 +37,17 @@ theorem ev_scale {ι : Type*} [Fintype ι] [DecidableEq ι]
     from by rw [mul_smul_comm]]
   rw [MIPStarRE.Quantum.normalizedTrace_smul]
   simp [Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im]
+
+/-- `ev` commutes with the real scalar action on operators.
+
+This is the real-scalar form of `ev_scale`; it is convenient when expanding
+operator averages, whose weights act by the real scalar action before being
+coerced to complex matrix scalars. -/
+theorem ev_real_smul {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (c : Error) (X : MIPStarRE.Quantum.Op ι) :
+    ev ψ (c • X) = c * ev ψ X := by
+  rw [RCLike.real_smul_eq_coe_smul (K := ℂ)]
+  simpa using ev_scale ψ c X
 
 /-- Trace cyclicity: `τ(ρ · XY) = τ(Y · ρX)`. -/
 theorem ev_trace_cyclic {ι : Type*} [Fintype ι] [DecidableEq ι]

@@ -431,6 +431,58 @@ theorem rightTensor_finset_sum {α : Type*}
       rw [Finset.sum_insert ha, Finset.sum_insert ha, ih]
       simp [rightTensor, Matrix.kronecker_add]
 
+/-- A complex scalar on the left register factors out of a bipartite tensor product.
+
+This is the tensor-placement version of bilinearity of `opTensor`: placing
+`c • A` on the left and multiplying by the right placement of `B` equals the
+same scalar multiplying `leftTensor A * rightTensor B`. -/
+theorem leftTensor_mul_rightTensor_smul_left
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (c : Error) (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
+    leftTensor (ι₂ := ι₂) ((c : ℂ) • A) * rightTensor (ι₁ := ι₁) B =
+      (c : ℂ) • (leftTensor (ι₂ := ι₂) A * rightTensor (ι₁ := ι₁) B) := by
+  rw [leftTensor_mul_rightTensor_eq_opTensor, leftTensor_mul_rightTensor_eq_opTensor]
+  simpa [opTensor] using Matrix.smul_kronecker (c : ℂ) A B
+
+/-- A complex scalar on the right register factors out of a bipartite tensor product.
+
+This is the tensor-placement version of bilinearity of `opTensor`: placing
+`c • B` on the right and multiplying by the left placement of `A` equals the
+same scalar multiplying `leftTensor A * rightTensor B`. -/
+theorem leftTensor_mul_rightTensor_smul_right
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (c : Error) (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
+    leftTensor (ι₂ := ι₂) A * rightTensor (ι₁ := ι₁) ((c : ℂ) • B) =
+      (c : ℂ) • (leftTensor (ι₂ := ι₂) A * rightTensor (ι₁ := ι₁) B) := by
+  rw [leftTensor_mul_rightTensor_eq_opTensor, leftTensor_mul_rightTensor_eq_opTensor]
+  simpa [opTensor] using Matrix.kronecker_smul (c : ℂ) A B
+
+/-- A real scalar on the left register factors out of a bipartite tensor product.
+
+This restates `leftTensor_mul_rightTensor_smul_left` for the real scalar action
+used by `averageOperatorOverDistribution`, coercing the real scalar to `ℂ` on
+the tensor product. -/
+theorem leftTensor_mul_rightTensor_real_smul_left
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (c : Error) (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
+    leftTensor (ι₂ := ι₂) (c • A) * rightTensor (ι₁ := ι₁) B =
+      (c : ℂ) • (leftTensor (ι₂ := ι₂) A * rightTensor (ι₁ := ι₁) B) := by
+  rw [RCLike.real_smul_eq_coe_smul (K := ℂ)]
+  exact leftTensor_mul_rightTensor_smul_left c A B
+
+/-- A real scalar on the right register factors out of a bipartite tensor product.
+
+This restates `leftTensor_mul_rightTensor_smul_right` for the real scalar action
+used by `averageOperatorOverDistribution`, coercing the real scalar to `ℂ` on
+the tensor product. -/
+theorem leftTensor_mul_rightTensor_real_smul_right
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (c : Error) (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
+    leftTensor (ι₂ := ι₂) A * rightTensor (ι₁ := ι₁) (c • B) =
+      (c : ℂ) • (leftTensor (ι₂ := ι₂) A * rightTensor (ι₁ := ι₁) B) := by
+  rw [RCLike.real_smul_eq_coe_smul (K := ℂ)]
+  exact leftTensor_mul_rightTensor_smul_right c A B
+
 /-- Left tensor placement preserves positivity. -/
 theorem leftTensor_nonneg
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]

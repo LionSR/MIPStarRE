@@ -231,6 +231,13 @@ private lemma evaluatedPointFamily_total_eq_G_total
   simp [evaluatedPointFamily, IdxPolyFamily.evaluatedAtNextPoint, evaluateAt,
     postprocess_total, hG]
 
+/-- Postprocessing a sandwiched product by its second coordinate sums over the
+outer outcome.
+
+For the sandwiched submeasurement with outcomes `(a, b)` and effect
+`A_a B_b A_a`, the `Prod.snd` postprocessing has outcome `b` equal to
+`∑ a, A_a B_b A_a`.  This is the finite-fiber identity used to recognize the
+`gCommStabilityR` averaged sandwich. -/
 private lemma postprocess_sandwichByOuter_prod_snd_outcome
     {α β : Type*} [Fintype α] [Fintype β]
     (A : SubMeas α ι) (B : SubMeas β ι) (b : β) :
@@ -264,40 +271,14 @@ private lemma postprocess_sandwichByOuter_prod_snd_outcome
           intro a _ a' _ h
           exact congrArg Prod.fst h
 
-private lemma leftTensor_mul_rightTensor_smul_left
-    (c : Error) (A B : MIPStarRE.Quantum.Op ι) :
-    leftTensor (ι₂ := ι) ((c : ℂ) • A) * rightTensor (ι₁ := ι) B =
-      (c : ℂ) • (leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) B) := by
-  rw [leftTensor_mul_rightTensor_eq_opTensor, leftTensor_mul_rightTensor_eq_opTensor]
-  simpa [opTensor] using Matrix.smul_kronecker (c : ℂ) A B
+/-- Pull two finite averages into a bipartite expectation with averaged operators.
 
-private lemma leftTensor_mul_rightTensor_smul_right
-    (c : Error) (A B : MIPStarRE.Quantum.Op ι) :
-    leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) ((c : ℂ) • B) =
-      (c : ℂ) • (leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) B) := by
-  rw [leftTensor_mul_rightTensor_eq_opTensor, leftTensor_mul_rightTensor_eq_opTensor]
-  simpa [opTensor] using Matrix.kronecker_smul (c : ℂ) A B
-
-private lemma leftTensor_mul_rightTensor_real_smul_left
-    (c : Error) (A B : MIPStarRE.Quantum.Op ι) :
-    leftTensor (ι₂ := ι) (c • A) * rightTensor (ι₁ := ι) B =
-      (c : ℂ) • (leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) B) := by
-  rw [RCLike.real_smul_eq_coe_smul (K := ℂ)]
-  exact leftTensor_mul_rightTensor_smul_left c A B
-
-private lemma leftTensor_mul_rightTensor_real_smul_right
-    (c : Error) (A B : MIPStarRE.Quantum.Op ι) :
-    leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) (c • B) =
-      (c : ℂ) • (leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) B) := by
-  rw [RCLike.real_smul_eq_coe_smul (K := ℂ)]
-  exact leftTensor_mul_rightTensor_smul_right c A B
-
-private lemma ev_real_smul
-    (ψ : QuantumState (ι × ι)) (c : Error) (X : MIPStarRE.Quantum.Op (ι × ι)) :
-    ev ψ (c • X) = c * ev ψ X := by
-  rw [RCLike.real_smul_eq_coe_smul (K := ℂ)]
-  simpa using ev_scale ψ c X
-
+For a fixed polynomial outcome `g`, the left register is averaged over `𝒟Q`
+while the right register is averaged over `𝒟V`.  The identity rewrites the
+nested scalar average of
+`ev ψ (leftTensor (F q g a * R) * rightTensor (P g v))` into the expectation of
+`leftTensor ((E_q ∑_a F q g a) * R) * rightTensor (E_v P g v)`, preserving the
+outer sum over `g`. -/
 private lemma avgOver_avgOver_phaseTwo_linear
     {Q V Γ Aidx : Type*} [Fintype Γ] [Fintype Aidx]
     (𝒟Q : Distribution Q) (𝒟V : Distribution V)
@@ -352,6 +333,12 @@ private lemma avgOver_avgOver_phaseTwo_linear
             leftTensor_mul_rightTensor_real_smul_left, leftTensor_mul_rightTensor_real_smul_right,
             mul_assoc, mul_comm]
 
+/-- Expand a finite sum in the middle factor of a left-register sandwich.
+
+Linearity of matrix multiplication, left tensor placement, multiplication by a
+fixed right-register operator, and `ev` turns
+`A (∑ x, B_x) C R ⊗ D` into the corresponding sum of expectations
+`∑ x, A B_x C R ⊗ D`. -/
 private lemma ev_leftTensor_mul_middle_finset_sum
     {α : Type*} (s : Finset α)
     (ψ : QuantumState (ι × ι))
@@ -391,10 +378,20 @@ private lemma ev_leftTensor_mul_middle_finset_sum
               rightTensor (ι₁ := ι) D) := by
           rw [ev_finset_sum]
 
-set_option maxHeartbeats 2000000 in
--- The pointwise phase-2 fiber collapse expands a postprocessed slice outcome inside
--- a sandwiched tensor expectation; the explicit finite-sum linearity proof is
--- heartbeat-heavy but keeps the #714 marginalization residual transparent.
+set_option maxHeartbeats 210000 in
+-- The explicit finite-fiber/tensor-linearity proof is just above the default
+-- heartbeat budget, but avoids hiding the #714 residual in one large `simp`.
+/-- Reindex the pointwise phase-2 question defect by polynomial outcomes.
+
+When the sampled second point is `appendPoint v y`, the postprocessed slice
+outcome `(evaluatedSliceSecondFactor ...).outcome b` is the sum of
+`G^y_g` over the fiber `g v = b`.  Expanding this fiber inside the sandwiched
+left-register expression and summing over `b` collapses the defect to a
+polynomial-indexed sum whose right-register outcome is `A^{v,y}_{g(v)}`.
+
+The proof is heartbeat-heavy because it keeps the finite-fiber and tensor
+linearity steps explicit rather than hiding the #714 marginalization residual in
+one large `simp`. -/
 private lemma evaluatedSlicePhaseTwoQuestionDefect_append_eq_sum_poly
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
