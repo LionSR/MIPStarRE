@@ -277,6 +277,31 @@ class AuditHeuristicTests(unittest.TestCase):
             expanded_result = run_audit([mod], root=root, include_forall=True)
             self.assertEqual(len(expanded_result.review_findings), 1)
 
+    def test_skips_arrow_producers_by_default(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = self._write_fake(
+                root,
+                """\
+                theorem arrowProducerWrapper
+                    (hrec :
+                      Point params →
+                        ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
+                          ConsRel strategy.state (uniformDistribution (Point params))
+                            (polynomialEvaluationFamily params G.toSubMeas)
+                            error ∧ error ≤ mainInductionError params k eps delta gamma) :
+                    ∃ G : Measurement (Polynomial params) ι,
+                      ConsRel strategy.state (uniformDistribution (Point params))
+                        (polynomialEvaluationFamily params G.toSubMeas)
+                        (mainInductionError params.next k eps delta gamma) := by
+                  sorry
+                """,
+            )
+            default_result = run_audit([mod], root=root)
+            self.assertEqual(default_result.findings, ())
+            expanded_result = run_audit([mod], root=root, include_forall=True)
+            self.assertEqual(len(expanded_result.review_findings), 1)
+
 
 class MainTests(unittest.TestCase):
     def test_ci_fails_for_unapproved_review_finding(self) -> None:

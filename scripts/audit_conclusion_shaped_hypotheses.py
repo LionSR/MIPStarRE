@@ -350,7 +350,12 @@ def _contains_existential(text: str) -> bool:
 
 
 def _contains_forall(text: str) -> bool:
-    return "∀" in text or bool(re.search(r"\bforall\b", text))
+    return (
+        "∀" in text
+        or bool(re.search(r"\bforall\b", text))
+        or ("→" in text and _contains_existential(text.split("→", 1)[1]))
+        or ("->" in text and _contains_existential(text.split("->", 1)[1]))
+    )
 
 
 def salient_tokens(text: str) -> set[str]:
