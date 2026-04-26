@@ -33,7 +33,7 @@ _DECL_RE = re.compile(
     r"(?m)^\s*(?:@\[[^\]]*\]\s+)*"
     r"(?:(?:private|protected|noncomputable|unsafe)\s+)*"
     r"(?:@\[[^\]]*\]\s+)*"
-    r"(theorem|lemma)\s+([^\s:({[]+)\b"
+    r"(theorem|lemma)\s+([^\s:({\[]+)(?=\s|$|[:({\[])"
 )
 _TOKEN_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_.'?]*")
 _BINDER_NAME_RE = re.compile(r"[^\s:,]+")
@@ -134,6 +134,21 @@ def _advance_depth(ch: str, stack: list[str]) -> None:
         stack.append(ch)
     elif ch in _CLOSE_TO_OPEN and stack and stack[-1] == _CLOSE_TO_OPEN[ch]:
         stack.pop()
+
+
+def _identifier_char(ch: str) -> bool:
+    """Return whether ``ch`` can continue a Lean identifier-like token."""
+    return ch.isalnum() or ch in "_?'"
+
+
+def _starts_keyword(text: str, pos: int, keyword: str) -> bool:
+    """Return whether ``keyword`` starts at ``pos`` as a standalone token."""
+    if not text.startswith(keyword, pos):
+        return False
+    before_ok = pos == 0 or not _identifier_char(text[pos - 1])
+    after = pos + len(keyword)
+    after_ok = after >= len(text) or not _identifier_char(text[after])
+    return before_ok and after_ok
 
 
 def _skip_block_comment(text: str, start: int) -> int | None:
@@ -245,6 +260,7 @@ def _mask_lean_non_code(text: str) -> str:
 def _find_header_end(text: str, start: int) -> int | None:
     """Return the offset of the top-level ``:=`` ending a declaration header."""
     stack: list[str] = []
+    pending_let_assignment = False
     i = start
     while i < len(text) - 1:
         ch = text[i]
@@ -264,7 +280,21 @@ def _find_header_end(text: str, start: int) -> int | None:
         if string_end is not None:
             i = string_end
             continue
+        let_keyword_len = None
+        if not stack:
+            if _starts_keyword(text, i, "letI"):
+                let_keyword_len = 4
+            elif _starts_keyword(text, i, "let"):
+                let_keyword_len = 3
+        if let_keyword_len is not None:
+            pending_let_assignment = True
+            i += let_keyword_len
+            continue
         if not stack and text.startswith(":=", i):
+            if pending_let_assignment:
+                pending_let_assignment = False
+                i += 2
+                continue
             return i
         _advance_depth(ch, stack)
         i += 1

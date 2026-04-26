@@ -35,7 +35,7 @@ python3 scripts/audit_conclusion_shaped_hypotheses.py --ci
 
 Result:
 
-- scanned Lean theorem/lemma declarations: 1493;
+- scanned Lean theorem/lemma declarations: 1489;
 - review findings: 0;
 - allowed witness adapters: 1.
 

@@ -126,6 +126,64 @@ class ParseDeclarationTests(unittest.TestCase):
             self.assertEqual(len(result.review_findings), 1)
             self.assertEqual(result.review_findings[0].decl, "degreeOf_eval₂_C_X_le_natDegree")
 
+    def test_header_parser_keeps_prime_and_question_suffixes(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "Fake.lean"
+            mod.parent.mkdir()
+            mod.write_text(
+                textwrap.dedent(
+                    """\
+                    theorem evilOfWitness'
+                        (h : ∃ G : Measurement, ConsRel G) :
+                        ∃ G : Measurement, ConsRel G := by
+                      sorry
+
+                    theorem maybeBad?
+                        (h : ∃ G : Measurement, ConsRel G) :
+                        ∃ G : Measurement, ConsRel G := by
+                      sorry
+                    """
+                ),
+                encoding="utf-8",
+            )
+            decls = parse_declarations(mod, root=root)
+            self.assertEqual(
+                [decl.name for decl in decls],
+                ["evilOfWitness'", "maybeBad?"],
+            )
+            result = run_audit([mod], root=root, min_common=2)
+            self.assertEqual(
+                [finding.decl for finding in result.review_findings],
+                ["evilOfWitness'", "maybeBad?"],
+            )
+            self.assertEqual(result.allowed_findings, ())
+
+    def test_header_parser_skips_top_level_let_assignments_in_conclusion(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "Fake.lean"
+            mod.parent.mkdir()
+            mod.write_text(
+                textwrap.dedent(
+                    """\
+                    theorem letConclusionBad
+                        (h : ∃ G : Measurement, ConsRel G) :
+                        let x : Nat := 0;
+                        ∃ G : Measurement, ConsRel G := by
+                      sorry
+                    """
+                ),
+                encoding="utf-8",
+            )
+            decls = parse_declarations(mod, root=root)
+            self.assertEqual([decl.name for decl in decls], ["letConclusionBad"])
+            self.assertIn("let x : Nat := 0", decls[0].conclusion)
+            self.assertIn("∃ G", decls[0].conclusion)
+            result = run_audit([mod], root=root, min_common=2)
+            self.assertEqual(len(result.review_findings), 1)
+            self.assertEqual(result.review_findings[0].decl, "letConclusionBad")
+
     def test_header_parser_ignores_comment_colons_before_conclusion(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
