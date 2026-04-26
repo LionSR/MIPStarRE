@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.MainInductionStep.Theorems
 import MIPStarRE.LDT.Preliminaries.ComparisonProjective
+import MIPStarRE.LDT.Preliminaries.Triangles
 import MIPStarRE.LDT.Test.ErrorCascade
 import MIPStarRE.LDT.Test.SchwartzZippelStep
 import MIPStarRE.LDT.Test.StrategyFailures
@@ -707,6 +708,55 @@ theorem zeta3_div_two_le_mainFormalError {params : Parameters} {eps : Error} {k 
 
 end MainFormalCascadeScalars
 
+/-- Evaluate a polynomial-valued complete measurement at every point.
+
+The public `polynomialEvaluationFamily` forgets completeness because most later
+statements only need submeasurements.  The triangle inequality used in the
+main-formal assembly is stated for complete measurements, so this local helper
+keeps the same postprocessing while retaining the proof that totals remain `1`. -/
+private noncomputable def polynomialEvaluationMeasurementFamily
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (params : Parameters) [FieldModel params.q]
+    (G : Measurement (Polynomial params) ι) :
+    IdxMeas (Point params) (Fq params) ι :=
+  fun u =>
+    { toSubMeas := evaluateAt params u G.toSubMeas
+      total_eq_one := by
+        simpa [evaluateAt, postprocess_total] using G.total_eq_one }
+
+/-- Paper lines 84--117 after applying the Section 6 polynomial measurement and
+unsymmetrizing it.
+
+The fields are the two `2σ` consistency estimates obtained from the role-register
+block extraction, corresponding to `eq:cons-a` and `eq:cons-b` in
+`references/ldt-paper/inductive_step.tex` lines 97--109.  The theorem
+`toPreProjectiveSelfConsistency` below combines these with the original
+point-measurement agreement from the test to prove paper line 116 by
+`prop:simeq-triangle-inequality`. -/
+structure MainFormalCascadeUnsymmetrizedPOVMTargets
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (scalars : MainFormalCascadeScalars params eps k) where
+  /-- The POVM denoted $G^{\mathrm A}$ after unsymmetrizing the Section 6 measurement. -/
+  leftPOVM : Measurement (Polynomial params) ι
+  /-- The POVM denoted $G^{\mathrm B}$ after unsymmetrizing the Section 6 measurement. -/
+  rightPOVM : Measurement (Polynomial params) ι
+  /-- Paper `eq:cons-a`: $G^{\mathrm A}_{[g(u)=a]}\otimes I
+  \simeq_{2\sigma} I\otimes A^{\mathrm B,u}_a$. -/
+  leftPOVMPointBConsistency :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params leftPOVM.toSubMeas)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+      (2 * scalars.sigma)
+  /-- Paper `eq:cons-b`: $A^{\mathrm A,u}_a\otimes I
+  \simeq_{2\sigma} I\otimes G^{\mathrm B}_{[g(u)=a]}$. -/
+  pointARightPOVMConsistency :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (polynomialEvaluationFamily params rightPOVM.toSubMeas)
+      (2 * scalars.sigma)
+
 /-- The geometry/transport part of the remaining Section 3 assembly at the exact
 cascade errors.
 
@@ -834,6 +884,73 @@ theorem fullSelfConsistency {params : Parameters} [FieldModel params.q]
 
 end MainFormalCascadePreProjectiveSelfConsistency
 
+namespace MainFormalCascadeUnsymmetrizedPOVMTargets
+
+/-- Paper line 116 from the two unsymmetrized consistency estimates and the
+original point-measurement agreement.
+
+This is the `prop:simeq-triangle-inequality` step in
+`references/ldt-paper/inductive_step.tex` lines 110--117.  The two fields of
+`MainFormalCascadeUnsymmetrizedPOVMTargets` provide the `2σ` links
+`eq:cons-a`/`eq:cons-b`; `ProjStrat.point_agreement_le_three_mul` provides the
+middle `3ε` agreement from the low-individual-degree test. -/
+noncomputable def toPreProjectiveSelfConsistency
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (targets : MainFormalCascadeUnsymmetrizedPOVMTargets params strategy eps k scalars)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
+    MainFormalCascadePreProjectiveSelfConsistency params strategy eps k scalars where
+  leftPOVM := targets.leftPOVM
+  rightPOVM := targets.rightPOVM
+  evaluatedSelfConsistency := by
+    let leftEval : IdxMeas (Point params) (Fq params) ι :=
+      polynomialEvaluationMeasurementFamily params targets.leftPOVM
+    let rightEval : IdxMeas (Point params) (Fq params) ι :=
+      polynomialEvaluationMeasurementFamily params targets.rightPOVM
+    let pointA : IdxMeas (Point params) (Fq params) ι :=
+      IdxProjMeas.toIdxMeas strategy.pointMeasurementA
+    let pointB : IdxMeas (Point params) (Fq params) ι :=
+      IdxProjMeas.toIdxMeas strategy.pointMeasurementB
+    have hleft :
+        ConsRel strategy.state (uniformDistribution (Point params))
+          (IdxMeas.toIdxSubMeas leftEval)
+          (IdxMeas.toIdxSubMeas pointB)
+          (2 * scalars.sigma) := by
+      change ConsRel strategy.state (uniformDistribution (Point params))
+        (polynomialEvaluationFamily params targets.leftPOVM.toSubMeas)
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+        (2 * scalars.sigma)
+      exact targets.leftPOVMPointBConsistency
+    have hpoint :
+        ConsRel strategy.state (uniformDistribution (Point params))
+          (IdxMeas.toIdxSubMeas pointA)
+          (IdxMeas.toIdxSubMeas pointB)
+          (3 * eps) := by
+      exact ⟨ProjStrat.point_agreement_le_three_mul hpass⟩
+    have hright :
+        ConsRel strategy.state (uniformDistribution (Point params))
+          (IdxMeas.toIdxSubMeas pointA)
+          (IdxMeas.toIdxSubMeas rightEval)
+          (2 * scalars.sigma) := by
+      change ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+        (polynomialEvaluationFamily params targets.rightPOVM.toSubMeas)
+        (2 * scalars.sigma)
+      exact targets.pointARightPOVMConsistency
+    have htriangle :=
+      Preliminaries.simeqTriangleInequality strategy.state
+        (uniformDistribution (Point params)) strategy.isNormalized
+        (uniformDistribution_weight_sum_le_one (Point params))
+        leftEval pointB pointA rightEval
+        (2 * scalars.sigma) (3 * eps) (2 * scalars.sigma)
+        hleft hpoint hright
+    simpa [leftEval, rightEval, pointA, pointB, polynomialEvaluationMeasurementFamily]
+      using htriangle
+
+end MainFormalCascadeUnsymmetrizedPOVMTargets
+
 /-- The remaining projective-stage transport package for `mainFormal`.
 
 Compared with `MainFormalCascadeTransportTargets`, this package has already
@@ -927,6 +1044,79 @@ noncomputable def toTransportTargets {params : Parameters} [FieldModel params.q]
       using hcons
 
 end MainFormalCascadeProjectiveStageTargets
+
+/-- Paper-faithful residual for the projective assembly after the line-116
+triangle step has been factored out.
+
+This package asks for the unsymmetrized `G^A,G^B` POVMs with their two `2σ`
+links (`inductive_step.tex` lines 97--109), then records the still-open
+projectivization/completion and point-transport outputs from lines 135--185:
+the line-156 `≈_{ζ₃}` bridge and the two native `ζ₄` point-consistency goals.
+The theorem `toProjectiveStageTargets` proves the line-116 pre-projective
+self-consistency from these fields and the low-individual-degree pass hypothesis. -/
+structure MainFormalCascadeProjectiveAssemblyResidual
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (scalars : MainFormalCascadeScalars params eps k) where
+  /-- Unsymmetrized POVMs and the two paper `2σ` consistency estimates. -/
+  unsymmetrized :
+    MainFormalCascadeUnsymmetrizedPOVMTargets params strategy eps k scalars
+  /-- The projective measurement denoted $Q^{\mathrm A}$ in the paper. -/
+  leftMeasurement : ProjMeas (Polynomial params) ι
+  /-- The projective measurement denoted $Q^{\mathrm B}$ in the paper. -/
+  rightMeasurement : ProjMeas (Polynomial params) ι
+  /-- Native form of `eq:one-goal` at the paper-defined `ζ₄`. -/
+  pointAConsistency :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (polynomialEvaluationFamily params rightMeasurement.toSubMeas)
+      scalars.zeta4
+  /-- Native form of `eq:another-goal` at the paper-defined `ζ₄`. -/
+  pointBConsistency :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params leftMeasurement.toSubMeas)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+      scalars.zeta4
+  /-- Paper line 156, produced by orthogonalization, completion,
+  `prop:simeq-to-approx`, and the `≈_δ` triangle inequality. -/
+  line156Approx :
+    ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily unsymmetrized.leftPOVM.toSubMeas)
+      (constSubMeasFamily unsymmetrized.rightPOVM.toSubMeas)
+      scalars.zeta1 →
+    Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily leftMeasurement.toSubMeas)
+      (constSubMeasFamily rightMeasurement.toSubMeas)
+      scalars.zeta3
+
+namespace MainFormalCascadeProjectiveAssemblyResidual
+
+/-- Assemble the previous projective-stage target from the finer residual package.
+
+The proved work here is exactly paper lines 110--117: the two unsymmetrized `2σ`
+links and the original `3ε` point agreement are combined by
+`prop:simeq-triangle-inequality` to produce the evaluated pre-projective
+self-consistency consumed by Step 5. -/
+noncomputable def toProjectiveStageTargets
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (residual : MainFormalCascadeProjectiveAssemblyResidual params strategy eps k scalars)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
+    MainFormalCascadeProjectiveStageTargets params strategy eps k scalars where
+  preSelfConsistency :=
+    residual.unsymmetrized.toPreProjectiveSelfConsistency hpass
+  leftMeasurement := residual.leftMeasurement
+  rightMeasurement := residual.rightMeasurement
+  pointAConsistency := residual.pointAConsistency
+  pointBConsistency := residual.pointBConsistency
+  line156Approx := by
+    intro hpre
+    exact residual.line156Approx hpre
+
+end MainFormalCascadeProjectiveAssemblyResidual
 
 namespace MainFormalCascadeTransportTargets
 
@@ -1117,24 +1307,28 @@ theorem mainFormal
   -- * vacuous branch: `mainFormal_trivial_witness`.
   --
   -- The remaining paper-faithful target is now narrowed past the Step 5
-  -- Schwartz--Zippel handoff to the projective-stage package
-  -- `MainFormalCascadeProjectiveStageTargets`. The scalar cascade side
+  -- Schwartz--Zippel handoff and the line-116 triangle step to the finer
+  -- projective assembly residual
+  -- `MainFormalCascadeProjectiveAssemblyResidual`. The scalar cascade side
   -- conditions are discharged below: if `mainFormalError ≥ 1`, the theorem is
   -- vacuous; otherwise the pass condition gives `0 ≤ ε`, while
   -- `mainFormalError < 1` rules out `ε > 1` and `d > q`. Producing the
-  -- projective-stage package still depends on the active upstream residuals: the
-  -- role unsymmetrization bridge (#424), the full-slice transport chain (#601),
-  -- the remaining `fromHToG` pasting bridge (#707), the reverse
-  -- `overAllOutcomes` aggregation (#672), and the ProcessedG scalar follow-ups
-  -- #714, #715, #732, and #759.
+  -- projective assembly residual still depends on the active upstream residuals:
+  -- the role unsymmetrization bridge (#424), projectivization/completion (#426),
+  -- the full-slice transport chain (#601), the remaining `fromHToG` pasting
+  -- bridge (#707), the reverse `overAllOutcomes` aggregation (#672), and the
+  -- ProcessedG scalar follow-ups #714, #715, #732, and #759.
   by_cases herr : 1 ≤ mainFormalError params k eps
   · exact mainFormal_trivial_witness params strategy eps k herr
   · have hepsNN : 0 ≤ eps := ProjStrat.eps_nonneg_of_passes hpass
     let scalars : MainFormalCascadeScalars params eps k :=
       MainFormalCascadeScalars.ofNontrivialMainFormal hepsNN hk0 herr
-    have projectiveTargets :
-        MainFormalCascadeProjectiveStageTargets params strategy eps k scalars := by
+    have projectiveResidual :
+        MainFormalCascadeProjectiveAssemblyResidual params strategy eps k scalars := by
       sorry
+    have projectiveTargets :
+        MainFormalCascadeProjectiveStageTargets params strategy eps k scalars :=
+      projectiveResidual.toProjectiveStageTargets hpass
     exact MainFormalNativeTargets.toMainFormal
       (projectiveTargets.toTransportTargets.toCascadeTargets.toNativeTargets)
 
