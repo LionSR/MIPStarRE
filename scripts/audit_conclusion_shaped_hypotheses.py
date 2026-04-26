@@ -186,6 +186,8 @@ def _raw_string_hash_count(text: str, start: int) -> int | None:
     """Return the number of hashes in a Lean raw string starting at ``start``."""
     if start >= len(text) or text[start] != "r":
         return None
+    if start > 0 and _identifier_char(text[start - 1]):
+        return None
     i = start + 1
     while i < len(text) and text[i] == "#":
         i += 1

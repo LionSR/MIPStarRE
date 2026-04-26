@@ -370,6 +370,16 @@ class ParseDeclarationTests(unittest.TestCase):
             result = run_audit([mod], root=root, min_common=2)
             self.assertEqual(result.findings, ())
 
+    def test_raw_string_detection_requires_identifier_boundary(self) -> None:
+        self.assertIsNone(audit._raw_string_hash_count('ar"not raw"', 1))
+        self.assertIsNone(audit._skip_raw_string_literal('ar#"not raw"#', 1))
+        self.assertIsNone(audit._skip_string_like('ar"not raw"', 1))
+        self.assertIsNone(audit._skip_string_like('ar#"not raw"#', 1))
+        self.assertEqual(audit._raw_string_hash_count('r"raw"', 0), 0)
+        self.assertEqual(audit._skip_raw_string_literal('r"raw"', 0), len('r"raw"'))
+        self.assertEqual(audit._raw_string_hash_count('r#"raw"#', 0), 1)
+        self.assertEqual(audit._skip_raw_string_literal('r#"raw"#', 0), len('r#"raw"#'))
+
     def test_header_parser_ignores_raw_string_literal_declarations(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -378,8 +388,15 @@ class ParseDeclarationTests(unittest.TestCase):
             mod.write_text(
                 textwrap.dedent(
                     """\
-                    def snippet := r#"
+                    def snippet := r"
                     theorem rawStringBad
+                        (h : ∃ G : Measurement, ConsRel G) :
+                        ∃ G : Measurement, ConsRel G := by
+                      sorry
+                    "
+
+                    def hashSnippet := r#"
+                    theorem rawHashStringBad
                         (h : ∃ G : Measurement, ConsRel G) :
                         ∃ G : Measurement, ConsRel G := by
                       sorry
