@@ -669,24 +669,6 @@ private lemma overAllOutcomes_distinct_bad_line_mass_le_hBConsistencyError
       params strategy family eps delta gamma zeta k hd
       heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hline
 
-
-/-- Averaging over two finite distributions commutes.  This local Fubini helper is
-used to match the paper's order of expectations after inserting the vertical-line
-measurement. -/
-private lemma avgOver_commute
-    {α β : Type*} (𝒟α : Distribution α) (𝒟β : Distribution β)
-    (F : α → β → Error) :
-    avgOver 𝒟α (fun a => avgOver 𝒟β (F a)) =
-      avgOver 𝒟β (fun b => avgOver 𝒟α (fun a => F a b)) := by
-  unfold avgOver
-  simp_rw [Finset.mul_sum]
-  rw [Finset.sum_comm]
-  refine Finset.sum_congr rfl ?_
-  intro b _
-  refine Finset.sum_congr rfl ?_
-  intro a _
-  ring
-
 /-- The vertical-line measurement is a genuine measurement, so its total is `1`.
 This is the formal counterpart of the line `because B is a measurement` at
 `ld-pasting.tex` lines 1178--1180. -/
@@ -1014,7 +996,7 @@ private lemma overAllOutcomes_distinct_nonglobal_mass_le_bad_line_mass_add_lineC
                           params strategy family u xs
       _ = avgOver (uniformDistribution (Point params)) (fun u =>
             avgOver (distinctTupleDistribution params k) (fun xs => inserted u xs)) := by
-            exact avgOver_commute (distinctTupleDistribution params k)
+            exact avgOver_comm (distinctTupleDistribution params k)
               (uniformDistribution (Point params)) (fun xs u => inserted u xs)
   rw [hrewrite]
   calc
@@ -1335,7 +1317,7 @@ private lemma overAllOutcomes_distinct_lineConsistent_indicator_mass_le_mdq
     dsimp [δ]
     positivity
   unfold overAllOutcomesDistinctLineConsistentIndicatorMass
-  rw [avgOver_commute (uniformDistribution (Point params))
+  rw [avgOver_comm (uniformDistribution (Point params))
     (distinctTupleDistribution params k)
     (fun u xs => overAllOutcomesLineConsistentIndicatorLocal params strategy family u xs)]
   calc
