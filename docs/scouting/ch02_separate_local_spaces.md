@@ -3,6 +3,10 @@
 Date: 2026-04-23
 Issue: #560
 
+> **Historical snapshot.** This note records the Session 26 scouting state on
+> 2026-04-23. The coordination audit below names the then-open PR queue; use
+> the live GitHub PR list, not those PR numbers, for current collision checks.
+
 ## Scope read
 
 Paper:
@@ -24,12 +28,12 @@ Lean:
 - `MIPStarRE/LDT/MainInductionStep/Statements.lean`
 - `MIPStarRE/LDT/MainInductionStep/Theorems.lean`
 
-Coordination audit:
+Coordination audit (2026-04-23 snapshot):
 
-- Open PR #641 touches `MIPStarRE/LDT/Test/StrategyFailures.lean`
-- Open PRs #646 and #649 touch `MIPStarRE/LDT/Test/MainTheorem.lean`
-- Open PRs #645 and #649 touch `MIPStarRE/LDT/MainInductionStep/*`
-- Open PRs #609 and #620 touch `MIPStarRE/LDT/Commutativity/*`
+- Then-open PR #641 touched `MIPStarRE/LDT/Test/StrategyFailures.lean`
+- Then-open PRs #646 and #649 touched `MIPStarRE/LDT/Test/MainTheorem.lean`
+- Then-open PRs #645 and #649 touched `MIPStarRE/LDT/MainInductionStep/*`
+- Then-open PRs #609 and #620 touched `MIPStarRE/LDT/Commutativity/*`
 
 ## Executive summary
 
@@ -45,13 +49,14 @@ It is embedded in a broader same-space architecture:
 1. `swapDensity` and `PermInvState` are defined only on `ι × ι`.
 2. `SymStrat` and `ProjStrat` both use a single local index type `ι`.
 3. Role-register symmetrization targets `SymStrat params (Role × ι)`.
-4. Section 8 (`CommutativityPoints/*`) and Section 10 (`MainInductionStep/*`) consume the same-space `SymStrat` API downstream.
+4. Section 8 (`CommutativityPoints/*`) and Section 10 (`MainInductionStep/*`)
+   consume the same-space `SymStrat` API downstream.
 
-Because the active open PR set currently overlaps the paper-facing `ProjStrat`
-consumers (`StrategyFailures.lean`, `MainTheorem.lean`) and the deepest
-symmetrized downstream (`MainInductionStep/*`, `Commutativity/*`), an end-to-end
-refactor is not safe to land in this session without colliding with in-flight
-work. The safe outcome for Session 26 is therefore **scouting only**.
+Because that open PR set overlapped the paper-facing `ProjStrat` consumers
+(`StrategyFailures.lean`, `MainTheorem.lean`) and the deepest symmetrized
+downstream (`MainInductionStep/*`, `Commutativity/*`), an end-to-end refactor
+was not safe to land in Session 26 without colliding with in-flight work. The
+safe outcome for that session was therefore **scouting only**.
 
 ## Paper / Lean mismatch
 
@@ -208,21 +213,22 @@ A two-space projective strategy can be introduced without touching
 same-space `SymStrat` API remains intact and the paper-faithful two-space
 container lives alongside it. Once the goal becomes to make `mainFormal`
 paper-faithful at its outermost strategy argument, the refactor inevitably
-reaches the current bridge and therefore the open-PR files below.
+reaches the current bridge and therefore the then-open PR files below.
 
-## Open-PR overlap audit
+## Historical open-PR overlap audit
 
-This session was explicitly constrained not to touch active open-PR files.
-Relevant overlaps are:
+The Session 26 pass was explicitly constrained not to touch the then-active
+open-PR files. Relevant overlaps were:
 
-- PR #641 modifies `MIPStarRE/LDT/Test/StrategyFailures.lean`
-- PR #646 modifies `MIPStarRE/LDT/Test/MainTheorem.lean`
-- PR #649 modifies `MIPStarRE/LDT/Test/MainTheorem.lean` and `MIPStarRE/LDT/MainInductionStep/Theorems.lean`
-- PR #645 modifies `MIPStarRE/LDT/MainInductionStep/*`
-- PRs #609 and #620 modify `MIPStarRE/LDT/Commutativity/*`
+- PR #641 modified `MIPStarRE/LDT/Test/StrategyFailures.lean`
+- PR #646 modified `MIPStarRE/LDT/Test/MainTheorem.lean`
+- PR #649 modified `MIPStarRE/LDT/Test/MainTheorem.lean` and
+  `MIPStarRE/LDT/MainInductionStep/Theorems.lean`
+- PR #645 modified `MIPStarRE/LDT/MainInductionStep/*`
+- PRs #609 and #620 modified `MIPStarRE/LDT/Commutativity/*`
 
 Therefore, the files most likely to be touched by a paper-faithful `ProjStrat`
-refactor are precisely the files that are currently unsafe to edit.
+refactor were precisely the files that were unsafe to edit in that session.
 
 ## Minimal API surface for a future refactor
 
@@ -256,8 +262,8 @@ like `SameSpaceProjStrat`.
 - Add `BiProjStrat params ιA ιB` in `StrategyCore.lean` (or a sibling file).
 - Add the obvious forgetful map from current same-space `ProjStrat params ι` to
   `BiProjStrat params ι ι`.
-- Do **not** yet change `StrategyFailures.lean` or `MainTheorem.lean` while the
-  current PR stack is open.
+- Do **not** yet change `StrategyFailures.lean` or `MainTheorem.lean` while that
+  Session 26 PR stack is open.
 
 ### Stage 2: build a true direct-sum role symmetrization
 
@@ -276,7 +282,7 @@ Only after that can one define a paper-faithful bridge
 
 ### Stage 3: migrate paper-facing theorem statements
 
-After the PR stack clears, update:
+After the relevant downstream PR stack clears, update:
 
 - `StrategyFailures.lowIndividualDegreeFailureProbability`
 - `ProjStrat.PassesLowIndividualDegreeTest`
@@ -288,9 +294,9 @@ At that point `blueprint/src/chapter/ch02_test.tex` can restore `\leanok` for
 
 ## Recommendation
 
-Do **not** attempt the full refactor on top of the current open PR set.
+Do **not** attempt the full refactor on top of that historical open PR set.
 
-Recommended next implementation branch after the stacked PRs merge:
+Recommended next implementation branch after the then-stacked PRs merge:
 
 1. introduce `BiProjStrat` only;
 2. prove a direct-sum symmetrization bridge in fresh non-overlapping files;
