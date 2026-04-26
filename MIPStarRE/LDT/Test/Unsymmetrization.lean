@@ -38,26 +38,22 @@ noncomputable def extractRoleBlock {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 @[simp] theorem extractRoleBlock_zero {ι : Type*} [Fintype ι] [DecidableEq ι]
     (r : Role) :
-    extractRoleBlock (ι := ι) r 0 = 0 := by
-  ext i j
+    extractRoleBlock (ι := ι) r 0 = 0 :=
   rfl
 
 @[simp] theorem extractRoleBlock_add {ι : Type*} [Fintype ι] [DecidableEq ι]
     (r : Role) (X Y : MIPStarRE.Quantum.Op (Role × ι)) :
-    extractRoleBlock r (X + Y) = extractRoleBlock r X + extractRoleBlock r Y := by
-  ext i j
+    extractRoleBlock r (X + Y) = extractRoleBlock r X + extractRoleBlock r Y :=
   rfl
 
 @[simp] theorem extractRoleBlock_sub {ι : Type*} [Fintype ι] [DecidableEq ι]
     (r : Role) (X Y : MIPStarRE.Quantum.Op (Role × ι)) :
-    extractRoleBlock r (X - Y) = extractRoleBlock r X - extractRoleBlock r Y := by
-  ext i j
+    extractRoleBlock r (X - Y) = extractRoleBlock r X - extractRoleBlock r Y :=
   rfl
 
 @[simp] theorem extractRoleBlock_smul {ι : Type*} [Fintype ι] [DecidableEq ι]
     (r : Role) (c : ℂ) (Y : MIPStarRE.Quantum.Op (Role × ι)) :
-    extractRoleBlock r (c • Y) = c • extractRoleBlock r Y := by
-  ext i j
+    extractRoleBlock r (c • Y) = c • extractRoleBlock r Y :=
   rfl
 
 @[simp] theorem extractRoleBlock_finset_sum {α ι : Type*}
@@ -93,9 +89,7 @@ theorem extractRoleBlock_le {ι : Type*} [Fintype ι] [DecidableEq ι]
     (r : Role) {X Y : MIPStarRE.Quantum.Op (Role × ι)} (hXY : X ≤ Y) :
     extractRoleBlock r X ≤ extractRoleBlock r Y := by
   rw [Matrix.le_iff] at hXY ⊢
-  simpa [extractRoleBlock_sub] using
-    (Matrix.nonneg_iff_posSemidef.mp (Matrix.nonneg_iff_posSemidef.mpr hXY)).submatrix
-      (fun i : ι => (r, i))
+  simpa [extractRoleBlock_sub] using hXY.submatrix (fun i : ι => (r, i))
 
 namespace SubMeas
 

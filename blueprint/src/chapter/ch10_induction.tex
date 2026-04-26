@@ -360,10 +360,14 @@
 \end{proof}
 
 \begin{remark}[Lean measurement-unsymmetrization bridge]\label{rem:main-formal-unsymmetrization-bridge}
-	\lean{MIPStarRE.LDT.extractRoleBlock, MIPStarRE.LDT.SubMeas.extractRole, MIPStarRE.LDT.Measurement.extractRole}
+	\lean{MIPStarRE.LDT.extractRoleBlock, MIPStarRE.LDT.extractRoleBlock_apply, MIPStarRE.LDT.extractRoleBlock_zero, MIPStarRE.LDT.extractRoleBlock_add, MIPStarRE.LDT.extractRoleBlock_sub, MIPStarRE.LDT.extractRoleBlock_smul}
+	\lean{MIPStarRE.LDT.extractRoleBlock_finset_sum, MIPStarRE.LDT.extractRoleBlock_univ_sum, MIPStarRE.LDT.extractRoleBlock_one, MIPStarRE.LDT.extractRoleBlock_nonneg, MIPStarRE.LDT.extractRoleBlock_le}
+	\lean{MIPStarRE.LDT.SubMeas.extractRole, MIPStarRE.LDT.SubMeas.extractRole_outcome, MIPStarRE.LDT.SubMeas.extractRole_total, MIPStarRE.LDT.SubMeas.extractRole_postprocess}
+	\lean{MIPStarRE.LDT.Measurement.extractRole, MIPStarRE.LDT.Measurement.extractRole_toSubMeas, MIPStarRE.LDT.Measurement.extractRole_outcome}
 	\lean{MIPStarRE.LDT.extractRoleAMeasurement, MIPStarRE.LDT.extractRoleBMeasurement, MIPStarRE.LDT.unsymmetrizedLeftPOVM, MIPStarRE.LDT.unsymmetrizedRightPOVM}
-	\lean{MIPStarRE.LDT.strategySymmetrization_point_extractRole_A, MIPStarRE.LDT.strategySymmetrization_point_extractRole_B, MIPStarRE.LDT.polynomialEvaluationFamily_measurement_extractRole}
-	\lean{MIPStarRE.LDT.UnsymmetrizationBridgePackage}
+	\lean{MIPStarRE.LDT.extractRoleBlock_roleCond_same, MIPStarRE.LDT.extractRoleBlock_roleCond_A_B, MIPStarRE.LDT.extractRoleBlock_roleCond_B_A}
+	\lean{MIPStarRE.LDT.extractRole_symmetrizedIdxProjMeas_A, MIPStarRE.LDT.extractRole_symmetrizedIdxProjMeas_B, MIPStarRE.LDT.strategySymmetrization_point_extractRole_A, MIPStarRE.LDT.strategySymmetrization_point_extractRole_B}
+	\lean{MIPStarRE.LDT.polynomialEvaluationFamily_extractRole, MIPStarRE.LDT.polynomialEvaluationFamily_measurement_extractRole, MIPStarRE.LDT.UnsymmetrizationBridgePackage}
 	\uses{lem:main-formal-successor-handoff, lem:symmetrization-bridge, thm:main-formal}
 	Lean now isolates the Step~3 extraction from \texttt{inductive\_step.tex}
 	lines 84--108.  The principal-block map \texttt{extractRoleBlock} turns a
