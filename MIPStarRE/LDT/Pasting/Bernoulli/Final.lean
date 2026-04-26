@@ -319,7 +319,8 @@ theorem ldPastingNCompleteness_of_tailLowerBound
     intro j hj
     exact commuteGHalfSandwich params strategy.state family gamma zeta
       j hj hzeta_le hfacts
-  have hFrom := fromHToG params strategy strategy.state family gamma zeta hfacts hhalf k
+  have hFrom := fromHToG params strategy strategy.state family gamma zeta
+    hgamma_nonneg hzeta_nonneg hzeta_le hfacts hhalf k
   have happrox_le :
       overAllOutcomesError params eps delta gamma zeta k +
           fromHToGError params gamma zeta k ≤ ν := by

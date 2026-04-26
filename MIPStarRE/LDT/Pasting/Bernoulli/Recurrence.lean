@@ -952,9 +952,6 @@ private structure FromHToGPaperTelescopeFacts
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error) (k : ℕ) : Prop where
-  gamma_nonneg : 0 ≤ gamma
-  zeta_nonneg : 0 ≤ zeta
-  zeta_le_one : zeta ≤ 1
   stageMassBridge :
     |fromHToGStageMass params ψbi family k 0 -
         fromHToGStageMass params ψbi family k k| ≤
@@ -987,7 +984,9 @@ upstream ingredients cited in the blueprint: `cor:G-hat-facts` for the
 `lem:commute-g-half-sandwich` for every suffix length appearing in the two
 `\sqrt{ν₄}` commutation moves.  The conclusion package records the displayed
 scalar expectation inequalities from the paper, rather than a stronger `≈_δ`
-statement between the already-averaged recurrence families. -/
+statement between the already-averaged recurrence families.  The scalar side
+conditions are threaded explicitly because the paper's absorption line for
+`γ^(1/32)` and `ζ^(1/32)` assumes these are normalized error parameters. -/
 lemma fromHToG
     (params : Parameters)
     [FieldModel params.q]
@@ -995,6 +994,8 @@ lemma fromHToG
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
+    (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
+    (hzeta_le_one : zeta ≤ 1)
     (hfacts : GHatFactsStatement params ψbi family gamma zeta)
     (hhalf : ∀ j : ℕ, 2 ≤ j →
       CommuteGHalfSandwichStatement params ψbi family gamma zeta j)
@@ -1019,10 +1020,10 @@ lemma fromHToG
           `hhalf (k - ℓ)`; the final exact branch split is now recorded by
           `hstageExact.tailWeightRecurrence` below;
        2. fill `FromHToGPaperTelescopeFacts` by proving the aggregate stage-mass
-          bridge with the paper-total error `fromHToGPaperTotalError` and by
-          supplying the standard scalar side conditions.  The scalar absorption
-          from that paper-total error into `fromHToGError` is now proved above by
-          `fromHToGPaperTotalError_le`; the diagnostic
+          bridge with the paper-total error `fromHToGPaperTotalError`.  The
+          scalar side conditions are explicit hypotheses of `fromHToG`, and the
+          absorption from that paper-total error into `fromHToGError` is now
+          proved above by `fromHToGPaperTotalError_le`; the diagnostic
           `fromHToG_errorAbsorption_not_purely_scalar` explains why the older
           `k * fromHToGRecurrenceError` leaf was too coarse.
 
@@ -1060,9 +1061,7 @@ lemma fromHToG
     simpa [hstage0, hstagek] using hresidual.paperTelescope.stageMassBridge
   exact le_trans hpaperMass <|
     fromHToGPaperTotalError_le params gamma zeta k
-      hresidual.paperTelescope.gamma_nonneg
-      hresidual.paperTelescope.zeta_nonneg
-      hresidual.paperTelescope.zeta_le_one
+      hgamma_nonneg hzeta_nonneg hzeta_le_one
 
 /-- The scalar Bernoulli tail polynomial lifted through continuous functional
 calculus is exactly the matrix Bernoulli tail operator. -/
