@@ -645,32 +645,70 @@ def _clean_semantic_text(text: str) -> str:
     return _mask_lean_non_code(text)
 
 
+def _leading_let_body_start(text: str, start: int) -> int | None:
+    """Return the probable body offset after a leading top-level ``let``.
+
+    The audit only needs this to avoid treating arrows in the assignment value as
+    producer arrows.  Semicolon-style lets give an exact body boundary; for the
+    layout-style wrappers used in this project, fall back to the first
+    top-level forall after the assignment marker.
+    """
+    if _starts_keyword(text, start, "letI"):
+        keyword_len = 4
+    elif _starts_keyword(text, start, "let"):
+        keyword_len = 3
+    else:
+        return None
+
+    after_keyword = start + keyword_len
+    assign_rel = _find_top_level_token(text[after_keyword:], ":=")
+    if assign_rel is None:
+        return None
+    after_assign = after_keyword + assign_rel + len(":=")
+
+    semicolon_rel = _find_top_level_char(text[after_assign:], ";")
+    if semicolon_rel is not None:
+        return after_assign + semicolon_rel + len(";")
+
+    forall_rel = _find_top_level_forall(text[after_assign:])
+    if forall_rel is not None:
+        return after_assign + forall_rel
+
+    return len(text)
+
+
 def _contains_forall(text: str) -> bool:
     """Return whether ``text`` is a producer context skipped in default mode.
 
-    Only a leading/top-level ``∀`` / ``forall`` binder, or a top-level arrow
-    whose codomain contains an existential, counts as a producer.  Quantifiers
-    nested inside conjuncts or other subexpressions should not suppress A1
-    findings for a separate top-level existential hypothesis.
+    Only a leading/top-level ``∀`` / ``forall`` binder, or a top-level arrow in
+    the binder's main proposition whose codomain contains an existential, counts
+    as a producer.  Arrows inside a leading ``let`` assignment value are ignored.
     """
     text = _clean_semantic_text(text)
     first = _first_code_pos(text)
-    forall_pos = _find_top_level_forall(text)
-    if first is not None and forall_pos is not None:
-        starts_with_forall = forall_pos == first
-        starts_with_let = (
-            _starts_keyword(text, first, "let")
-            or _starts_keyword(text, first, "letI")
-        )
-        if starts_with_forall or starts_with_let:
-            return _contains_existential(text[forall_pos:])
+    if first is None:
+        return False
 
-    unicode_arrow = _find_top_level_token(text, "→")
+    search_start = first
+    let_body_start = _leading_let_body_start(text, first)
+    if let_body_start is not None:
+        search_start = let_body_start
+
+    body_text = text[search_start:]
+    body_first = _first_code_pos(body_text)
+    if body_first is None:
+        return False
+
+    forall_pos = _find_top_level_forall(body_text)
+    if forall_pos is not None and forall_pos == body_first:
+        return _contains_existential(body_text[forall_pos:])
+
+    unicode_arrow = _find_top_level_token(body_text, "→")
     if unicode_arrow is not None:
-        return _contains_existential(text[unicode_arrow + len("→"):])
-    ascii_arrow = _find_top_level_token(text, "->")
+        return _contains_existential(body_text[unicode_arrow + len("→"):])
+    ascii_arrow = _find_top_level_token(body_text, "->")
     if ascii_arrow is not None:
-        return _contains_existential(text[ascii_arrow + len("->"):])
+        return _contains_existential(body_text[ascii_arrow + len("->"):])
     return False
 
 
