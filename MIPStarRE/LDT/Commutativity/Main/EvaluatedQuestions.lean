@@ -115,8 +115,8 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
       --   proved y-tail `md/q + √ζ`, for a total of `2md/q + 4√ζ`.
       -- * `fullSlice_closenessOfIP_CAB_hEval_sqrt`: the direct evaluated-side
       --   route gives `|evalABA − evalABAB| ≤ √ν`.
-      -- Summing gives `|fullABA − fullABAB| ≤ 6√ζ + 3(md/q) + √ν`,
-      -- and multiplying by `2` produces `12√ζ + 6(md/q) + 2√ν`.
+      -- Summing gives `|fullABA − fullABAB| ≤ 8√ζ + 2(md/q) + √ν`,
+      -- and multiplying by `2` produces `16√ζ + 4(md/q) + 2√ν`.
       have hExpand :=
         fullSliceCommutation_qSDDOp_avg_eq params strategy family
       have hMargX :=

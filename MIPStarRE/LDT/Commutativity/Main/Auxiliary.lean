@@ -435,9 +435,9 @@ private structure FullSliceScalarMarginalizeYFirstClosenessResidual
 
 /-- Remaining first `closenessOfIP` witness for the `y` prefix.
 
-This is now the only y-prefix proof gap left in this file.  It corresponds to
-paper `commutativity-G.tex` line 359, not to `eq:gcom4`, `eq:gcom4-diff`, the
-line-360 scalar-to-tensor bridge, or the y-marginalization lines 369--385. -/
+This packages the paper `commutativity-G.tex` line-359 bridge.  The earlier
+`eq:gcom4`/`eq:gcom4-diff` prefix, the line-360 scalar-to-tensor bridge, and the
+y-marginalization tail are proved separately and composed below. -/
 private noncomputable def fullSliceScalarMarginalizeYFirstClosenessResidual
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
