@@ -1,5 +1,7 @@
 import MIPStarRE.LDT.MainInductionStep.Theorems
+import MIPStarRE.LDT.Preliminaries.ComparisonProjective
 import MIPStarRE.LDT.Test.ErrorCascade
+import MIPStarRE.LDT.Test.SchwartzZippelStep
 import MIPStarRE.LDT.Test.StrategyFailures
 import MIPStarRE.LDT.Test.SymmetrizationBridge
 
@@ -779,6 +781,153 @@ structure MainFormalCascadeTransportTargets
       (constSubMeasFamily rightMeasurement.toSubMeas)
       (scalars.zeta3 / 2)
 
+/-- The pre-projectivization Step 5 handoff for `mainFormal`.
+
+This package stops at paper line 116, before the Schwartz--Zippel expansion.  The
+field `evaluatedSelfConsistency` is the evaluated consistency estimate
+
+`G^A_[g(u)=a] \otimes I \simeq_{2σ + 2√(3ε+2σ)} I \otimes G^B_[g(u)=a]`.
+
+The theorem `fullSelfConsistency` below applies the already-formalized Step 5
+Schwartz--Zippel bridge (`inductive_step.tex` lines 119--133) to obtain the
+full-polynomial consistency estimate at exactly `ζ₁`. -/
+structure MainFormalCascadePreProjectiveSelfConsistency
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (scalars : MainFormalCascadeScalars params eps k) where
+  /-- The POVM denoted $G^{\mathrm A}$ in the paper, before projectivization. -/
+  leftPOVM : Measurement (Polynomial params) ι
+  /-- The POVM denoted $G^{\mathrm B}$ in the paper, before projectivization. -/
+  rightPOVM : Measurement (Polynomial params) ι
+  /-- Paper line 116, before the Step 5 Schwartz--Zippel loss `md/q`. -/
+  evaluatedSelfConsistency :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params leftPOVM.toSubMeas)
+      (polynomialEvaluationFamily params rightPOVM.toSubMeas)
+      (2 * scalars.sigma + 2 * Real.sqrt (3 * eps + 2 * scalars.sigma))
+
+namespace MainFormalCascadePreProjectiveSelfConsistency
+
+/-- Step 5 of `mainFormal`: evaluated consistency plus Schwartz--Zippel gives
+full-polynomial consistency at the paper-defined error `ζ₁`.
+
+This is the Lean counterpart of `inductive_step.tex` lines 119--133.  The
+algebraic expansion and the `md/q` collision bound are both already proved in
+`MIPStarRE.LDT.Test.SchwartzZippelStep`; this theorem only specializes that API
+to the cascade notation used by the final assembly. -/
+theorem fullSelfConsistency {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (pre : MainFormalCascadePreProjectiveSelfConsistency params strategy eps k scalars) :
+    ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily pre.leftPOVM.toSubMeas)
+      (constSubMeasFamily pre.rightPOVM.toSubMeas)
+      scalars.zeta1 := by
+  simpa [MainFormalCascadeScalars.zeta1, cascadeZeta1, Nat.cast_mul, add_assoc,
+    add_left_comm, add_comm] using
+    (mainFormalStep5_selfConsistency_ofExpansionResidual params strategy.state
+      strategy.isNormalized pre.leftPOVM.toSubMeas pre.rightPOVM.toSubMeas
+      (2 * scalars.sigma + 2 * Real.sqrt (3 * eps + 2 * scalars.sigma))
+      pre.evaluatedSelfConsistency)
+
+end MainFormalCascadePreProjectiveSelfConsistency
+
+/-- The remaining projective-stage transport package for `mainFormal`.
+
+Compared with `MainFormalCascadeTransportTargets`, this package has already
+split off the Step 5 Schwartz--Zippel handoff.  It asks for the line-156
+projective approximation as a bridge out of the proved pre-projective
+self-consistency at `ζ₁`; the conversion from that `≈_{ζ₃}` statement to the
+native `eq:third-goal` consistency statement is proved by
+`toTransportTargets` using the projective converse of `prop:simeq-to-approx`.
+The two point-consistency targets remain explicit residual fields at the paper's
+`ζ₄`, corresponding to `eq:one-goal` and `eq:another-goal`. -/
+structure MainFormalCascadeProjectiveStageTargets
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (scalars : MainFormalCascadeScalars params eps k) where
+  /-- Pre-projective `G^A,G^B` data through the Step 5 evaluated estimate. -/
+  preSelfConsistency :
+    MainFormalCascadePreProjectiveSelfConsistency params strategy eps k scalars
+  /-- The projective measurement denoted $Q^{\mathrm A}$ in the paper. -/
+  leftMeasurement : ProjMeas (Polynomial params) ι
+  /-- The projective measurement denoted $Q^{\mathrm B}$ in the paper. -/
+  rightMeasurement : ProjMeas (Polynomial params) ι
+  /-- Native form of `eq:one-goal` at the paper-defined `ζ₄`. -/
+  pointAConsistency :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (polynomialEvaluationFamily params rightMeasurement.toSubMeas)
+      scalars.zeta4
+  /-- Native form of `eq:another-goal` at the paper-defined `ζ₄`. -/
+  pointBConsistency :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params leftMeasurement.toSubMeas)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+      scalars.zeta4
+  /-- Paper line 156, produced from the Step 5 full-polynomial consistency at `ζ₁`
+  and the projectivization/completion approximation chain. -/
+  line156Approx :
+    ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily preSelfConsistency.leftPOVM.toSubMeas)
+      (constSubMeasFamily preSelfConsistency.rightPOVM.toSubMeas)
+      scalars.zeta1 →
+    Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily leftMeasurement.toSubMeas)
+      (constSubMeasFamily rightMeasurement.toSubMeas)
+      scalars.zeta3
+
+namespace MainFormalCascadeProjectiveStageTargets
+
+/-- Convert the line-156 projective approximation package into the transport-only
+cascade targets.
+
+The only mathematical step performed here is the projective converse of
+`prop:simeq-to-approx`: for projective measurements, an `≈_{ζ₃}` relation gives
+`≃_{ζ₃/2}`, which is exactly paper `eq:third-goal` (lines 159--162). -/
+noncomputable def toTransportTargets {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (targets : MainFormalCascadeProjectiveStageTargets params strategy eps k scalars) :
+    MainFormalCascadeTransportTargets params strategy eps k scalars where
+  leftMeasurement := targets.leftMeasurement
+  rightMeasurement := targets.rightMeasurement
+  pointAConsistency := targets.pointAConsistency
+  pointBConsistency := targets.pointBConsistency
+  selfConsistency := by
+    let leftConst : IdxProjMeas Unit (Polynomial params) ι := fun _ => targets.leftMeasurement
+    let rightConst : IdxProjMeas Unit (Polynomial params) ι := fun _ => targets.rightMeasurement
+    have hpre := targets.preSelfConsistency.fullSelfConsistency
+    have happroxLine := targets.line156Approx hpre
+    have happroxAtZeta :
+        Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
+          (IdxProjMeas.toIdxSubMeas leftConst)
+          (IdxProjMeas.toIdxSubMeas rightConst)
+          scalars.zeta3 := by
+      change Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily targets.leftMeasurement.toSubMeas)
+        (constSubMeasFamily targets.rightMeasurement.toSubMeas)
+        scalars.zeta3
+      exact happroxLine
+    have happrox :
+        Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
+          (IdxProjMeas.toIdxSubMeas leftConst)
+          (IdxProjMeas.toIdxSubMeas rightConst)
+          (2 * (scalars.zeta3 / 2)) := by
+      convert happroxAtZeta using 1
+      ring
+    have hcons :=
+      Preliminaries.approxToSimeq strategy.state (uniformDistribution Unit)
+        leftConst rightConst (scalars.zeta3 / 2) happrox
+    simpa [leftConst, rightConst, constSubMeasFamily, IdxProjMeas.toIdxSubMeas]
+      using hcons
+
+end MainFormalCascadeProjectiveStageTargets
+
 namespace MainFormalCascadeTransportTargets
 
 /-- Add the already-discharged scalar package back to the transport-only targets. -/
@@ -967,26 +1116,27 @@ theorem mainFormal
   --   `mainFormalSuccessorMainInductionPublicWrapper`, and
   -- * vacuous branch: `mainFormal_trivial_witness`.
   --
-  -- The remaining paper-faithful target is now narrowed to the non-vacuous
-  -- transport-only package `MainFormalCascadeTransportTargets`. The scalar
-  -- cascade side conditions are discharged below: if `mainFormalError ≥ 1`, the
-  -- theorem is vacuous; otherwise the pass condition gives `0 ≤ ε`, while
-  -- `mainFormalError < 1` rules out `ε > 1` and `d > q`. Producing the transport
-  -- package still depends on the active upstream residuals: the role
-  -- unsymmetrization bridge (#424), the full-slice transport chain (#601), the
-  -- remaining `fromHToG` pasting bridge (#707), the reverse `overAllOutcomes`
-  -- aggregation (#672), and the ProcessedG scalar follow-ups #714, #715, #732,
-  -- and #759.
+  -- The remaining paper-faithful target is now narrowed past the Step 5
+  -- Schwartz--Zippel handoff to the projective-stage package
+  -- `MainFormalCascadeProjectiveStageTargets`. The scalar cascade side
+  -- conditions are discharged below: if `mainFormalError ≥ 1`, the theorem is
+  -- vacuous; otherwise the pass condition gives `0 ≤ ε`, while
+  -- `mainFormalError < 1` rules out `ε > 1` and `d > q`. Producing the
+  -- projective-stage package still depends on the active upstream residuals: the
+  -- role unsymmetrization bridge (#424), the full-slice transport chain (#601),
+  -- the remaining `fromHToG` pasting bridge (#707), the reverse
+  -- `overAllOutcomes` aggregation (#672), and the ProcessedG scalar follow-ups
+  -- #714, #715, #732, and #759.
   by_cases herr : 1 ≤ mainFormalError params k eps
   · exact mainFormal_trivial_witness params strategy eps k herr
   · have hepsNN : 0 ≤ eps := ProjStrat.eps_nonneg_of_passes hpass
     let scalars : MainFormalCascadeScalars params eps k :=
       MainFormalCascadeScalars.ofNontrivialMainFormal hepsNN hk0 herr
-    have transportTargets :
-        MainFormalCascadeTransportTargets params strategy eps k scalars := by
+    have projectiveTargets :
+        MainFormalCascadeProjectiveStageTargets params strategy eps k scalars := by
       sorry
     exact MainFormalNativeTargets.toMainFormal
-      (transportTargets.toCascadeTargets.toNativeTargets)
+      (projectiveTargets.toTransportTargets.toCascadeTargets.toNativeTargets)
 
 end Test
 
