@@ -1,6 +1,5 @@
 import MIPStarRE.LDT.Basic.SubMeasurementFamilies
-import MIPStarRE.LDT.MakingMeasurementsProjective.Theorems
-import MIPStarRE.LDT.Test.Strategy
+import MIPStarRE.LDT.Test.StrategyCore
 
 /-!
 # Section 6 — Definitions

@@ -313,6 +313,78 @@ structure PassesLowIndividualDegreeTest {params : Parameters}
     (strategy : ProjStrat params ι) (eps : Error) : Prop where
   soundnessHypothesis : strategy.lowIndividualDegreeFailureProbability ≤ eps
 
+/-- The axis-parallel role-average branch of the full test is nonnegative. -/
+theorem axisParallelRoleAverage_nonneg {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) :
+    0 ≤ strategy.axisParallelRoleAverage := by
+  dsimp [ProjStrat.axisParallelRoleAverage]
+  apply div_nonneg
+  · linarith [bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (AxisParallelTestSample params))
+        (axisParallelLineAnswerFamily strategy.leftAsSymmetric)
+        (axisParallelPointAnswerFamily strategy.rightAsSymmetric),
+      bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (AxisParallelTestSample params))
+        (axisParallelPointAnswerFamily strategy.leftAsSymmetric)
+        (axisParallelLineAnswerFamily strategy.rightAsSymmetric)]
+  · norm_num
+
+/-- The diagonal role-average branch of the full test is nonnegative. -/
+theorem diagonalRoleAverage_nonneg {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) :
+    0 ≤ strategy.diagonalRoleAverage := by
+  dsimp [ProjStrat.diagonalRoleAverage]
+  refine mul_nonneg ?_ ?_
+  · positivity
+  · refine Finset.sum_nonneg ?_
+    intro j _
+    apply div_nonneg
+    · linarith [bipartiteConsError_nonneg strategy.state
+          (uniformDistribution (RestrictedDiagonalSample params j))
+          (diagonalLineAnswerFamily strategy.leftAsSymmetric j)
+          (diagonalPointAnswerFamily strategy.rightAsSymmetric j),
+        bipartiteConsError_nonneg strategy.state
+          (uniformDistribution (RestrictedDiagonalSample params j))
+          (diagonalPointAnswerFamily strategy.leftAsSymmetric j)
+          (diagonalLineAnswerFamily strategy.rightAsSymmetric j)]
+    · norm_num
+
+/-- The full low-individual-degree failure probability is nonnegative. -/
+theorem lowIndividualDegreeFailureProbability_nonneg {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) :
+    0 ≤ strategy.lowIndividualDegreeFailureProbability := by
+  let pointAgreement : Error :=
+    bipartiteConsError strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  let axisParallelBranch : Error := strategy.axisParallelRoleAverage
+  let diagonalBranch : Error := strategy.diagonalRoleAverage
+  have hpoint_nonneg : 0 ≤ pointAgreement := by
+    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  have haxis_nonneg : 0 ≤ axisParallelBranch := by
+    simpa [axisParallelBranch] using axisParallelRoleAverage_nonneg strategy
+  have hdiag_nonneg : 0 ≤ diagonalBranch := by
+    simpa [diagonalBranch] using diagonalRoleAverage_nonneg strategy
+  have hsum : 0 ≤ axisParallelBranch + pointAgreement + diagonalBranch := by
+    linarith
+  have hmain : 0 ≤ (axisParallelBranch + pointAgreement + diagonalBranch) / 3 :=
+    div_nonneg hsum (by norm_num : (0 : Error) ≤ 3)
+  simpa [pointAgreement, axisParallelBranch, diagonalBranch,
+    ProjStrat.lowIndividualDegreeFailureProbability] using hmain
+
+/-- Any passing witness forces the error parameter to be nonnegative. -/
+theorem eps_nonneg_of_passes {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error}
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
+    0 ≤ eps :=
+  (lowIndividualDegreeFailureProbability_nonneg strategy).trans hpass.soundnessHypothesis
+
 /-- Passing the full test bounds the cross-prover point-agreement branch by
 `3 * eps`, exactly because that branch is one of the three nonnegative terms
 averaged in `lowIndividualDegreeFailureProbability`. -/
@@ -334,33 +406,9 @@ theorem point_agreement_le_three_mul {params : Parameters}
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
   have haxis_nonneg : 0 ≤ axisParallelBranch := by
-    dsimp [axisParallelBranch]
-    apply div_nonneg
-    · linarith [bipartiteConsError_nonneg strategy.state
-          (uniformDistribution (AxisParallelTestSample params))
-          (axisParallelLineAnswerFamily strategy.leftAsSymmetric)
-          (axisParallelPointAnswerFamily strategy.rightAsSymmetric),
-        bipartiteConsError_nonneg strategy.state
-          (uniformDistribution (AxisParallelTestSample params))
-          (axisParallelPointAnswerFamily strategy.leftAsSymmetric)
-          (axisParallelLineAnswerFamily strategy.rightAsSymmetric)]
-    · norm_num
+    simpa [axisParallelBranch] using axisParallelRoleAverage_nonneg strategy
   have hdiag_nonneg : 0 ≤ diagonalBranch := by
-    dsimp [diagonalBranch]
-    refine mul_nonneg ?_ ?_
-    · positivity
-    · refine Finset.sum_nonneg ?_
-      intro j _
-      apply div_nonneg
-      · linarith [bipartiteConsError_nonneg strategy.state
-            (uniformDistribution (RestrictedDiagonalSample params j))
-            (diagonalLineAnswerFamily strategy.leftAsSymmetric j)
-            (diagonalPointAnswerFamily strategy.rightAsSymmetric j),
-          bipartiteConsError_nonneg strategy.state
-            (uniformDistribution (RestrictedDiagonalSample params j))
-            (diagonalPointAnswerFamily strategy.leftAsSymmetric j)
-            (diagonalLineAnswerFamily strategy.rightAsSymmetric j)]
-      · norm_num
+    simpa [diagonalBranch] using diagonalRoleAverage_nonneg strategy
   have hmain : (axisParallelBranch + pointAgreement + diagonalBranch) / 3 ≤ eps := by
     simpa [axisParallelBranch, pointAgreement, diagonalBranch,
       ProjStrat.lowIndividualDegreeFailureProbability,

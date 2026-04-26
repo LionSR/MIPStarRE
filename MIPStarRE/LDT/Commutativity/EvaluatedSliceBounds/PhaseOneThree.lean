@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Commutativity.Scaffold.Products
+import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
 /-!
 # Section 11 commutativity: evaluated-slice bounds for phases 1 and 3

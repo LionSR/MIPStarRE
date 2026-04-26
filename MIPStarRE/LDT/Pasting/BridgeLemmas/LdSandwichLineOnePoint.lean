@@ -178,6 +178,30 @@ private def gHatTupleOutcomeLastFrontEquiv
         simp only [hne, ↓reduceDIte, Fin.cons_succ]
         exact congrArg gs (Fin.ext rfl)
 
+/-- Split a completed-slice outcome tuple into the first `n` coordinates and the last one. -/
+private def gHatTupleOutcomePrefixLastEquiv
+    (params : Parameters) [FieldModel params.q] (n : ℕ) :
+    GHatTupleOutcome params (n + 1) ≃ GHatTupleOutcome params n × GHatOutcome params where
+  toFun gs := (fun j => gs ⟨j.1, by omega⟩, gs ⟨n, Nat.lt_succ_self n⟩)
+  invFun p := fun j =>
+    if hj : j.1 < n then p.1 ⟨j.1, hj⟩ else p.2
+  left_inv := by
+    intro gs
+    funext j
+    by_cases hj : j.1 < n
+    · simp [hj]
+    · have hjeq : j.1 = n := by omega
+      have hfin : j = ⟨n, Nat.lt_succ_self n⟩ := Fin.ext hjeq
+      subst j
+      simp
+  right_inv := by
+    rintro ⟨gs, g⟩
+    simp only [Prod.mk.injEq]
+    constructor
+    · funext j
+      simp [j.2]
+    · simp
+
 private noncomputable def ldSandwichLineOnePointRightEndpointMeasurement
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -1130,6 +1154,92 @@ private lemma gHatHalfProduct_prefix_mul_last
       simp [gHatHalfProductOutcomeOperator, pointTupleTail, gHatTupleOutcomeTail, mul_assoc]
       congr
 
+/-- Split the ordered half-product into its first `n` coordinates and the last slice. -/
+private lemma gHatHalfProductOutcomeOperator_prefix_last
+    (params : Parameters)
+    [FieldModel params.q]
+    (family : IdxPolyFamily params ι) :
+    ∀ n (xs : PointTuple params (n + 1)) (gs : GHatTupleOutcome params (n + 1)),
+      gHatHalfProductOutcomeOperator params family (n + 1) xs gs =
+        gHatHalfProductOutcomeOperator params family n
+            (fun j => xs ⟨j.1, by omega⟩)
+            (fun j => gs ⟨j.1, by omega⟩) *
+          (gHatIdxMeas params family (xs ⟨n, Nat.lt_succ_self n⟩)).outcome
+            (gs ⟨n, Nat.lt_succ_self n⟩)
+  | 0, xs, gs => by
+      simp [gHatHalfProductOutcomeOperator]
+  | n + 1, xs, gs => by
+      simpa using gHatHalfProduct_prefix_mul_last params family n xs gs
+
+/-- Summing the last completed-slice sandwich coordinate deletes that coordinate.
+
+This formalizes the measurement-completeness step in `ld-pasting.tex`
+lines 934--941 for a single trailing coordinate. -/
+private lemma gHatSandwich_sum_last_eq_prefix
+    (params : Parameters)
+    [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (n : ℕ) (xs : PointTuple params (n + 1))
+    (gsPrefix : GHatTupleOutcome params n) :
+    (∑ g : GHatOutcome params,
+      let half := gHatHalfProductOutcomeOperator params family (n + 1) xs
+        ((gHatTupleOutcomePrefixLastEquiv params n).symm (gsPrefix, g))
+      half * halfᴴ) =
+      gHatHalfProductOutcomeOperator params family n
+        (fun j => xs ⟨j.1, by omega⟩) gsPrefix *
+        (gHatHalfProductOutcomeOperator params family n
+          (fun j => xs ⟨j.1, by omega⟩) gsPrefix)ᴴ := by
+  let P : MIPStarRE.Quantum.Op ι :=
+    gHatHalfProductOutcomeOperator params family n
+      (fun j => xs ⟨j.1, by omega⟩) gsPrefix
+  let G : GHatOutcome params → MIPStarRE.Quantum.Op ι := fun g =>
+    (gHatIdxMeas params family (xs ⟨n, Nat.lt_succ_self n⟩)).outcome g
+  have hsumG : (∑ g : GHatOutcome params, G g) = 1 := by
+    dsimp [G]
+    rw [(gHatIdxMeas params family (xs ⟨n, Nat.lt_succ_self n⟩)).sum_eq_total]
+    simp [gHatIdxMeas, completeSubMeas]
+  have hsumGG : (∑ g : GHatOutcome params, G g * (G g)ᴴ) = 1 := by
+    calc
+      (∑ g : GHatOutcome params, G g * (G g)ᴴ)
+          = ∑ g : GHatOutcome params, G g := by
+            refine Finset.sum_congr rfl ?_
+            intro g _hg
+            have hherm : (G g)ᴴ = G g := by
+              simpa [G] using
+                (gHatIdxMeas params family (xs ⟨n, Nat.lt_succ_self n⟩)).outcome_hermitian g
+            have hproj : G g * G g = G g := by
+              simpa [G] using
+                gHatIdxMeas_proj params family (xs ⟨n, Nat.lt_succ_self n⟩) g
+            simp [hherm, hproj]
+      _ = 1 := hsumG
+  have hinner : (∑ g : GHatOutcome params, (P * G g) * (P * G g)ᴴ) = P * Pᴴ := by
+    calc
+      (∑ g : GHatOutcome params, (P * G g) * (P * G g)ᴴ)
+          = ∑ g : GHatOutcome params, P * (G g * (G g)ᴴ) * Pᴴ := by
+            refine Finset.sum_congr rfl ?_
+            intro g _hg
+            simp [Matrix.conjTranspose_mul, mul_assoc]
+      _ = P * (∑ g : GHatOutcome params, G g * (G g)ᴴ) * Pᴴ := by
+            rw [← Finset.sum_mul, ← Matrix.mul_sum]
+      _ = P * Pᴴ := by
+            simp [hsumGG]
+  calc
+    (∑ g : GHatOutcome params,
+      let half := gHatHalfProductOutcomeOperator params family (n + 1) xs
+        ((gHatTupleOutcomePrefixLastEquiv params n).symm (gsPrefix, g))
+      half * halfᴴ)
+        = ∑ g : GHatOutcome params, (P * G g) * (P * G g)ᴴ := by
+          refine Finset.sum_congr rfl ?_
+          intro g _hg
+          simp [P, G, gHatTupleOutcomePrefixLastEquiv,
+            gHatHalfProductOutcomeOperator_prefix_last]
+    _ = P * Pᴴ := hinner
+    _ = gHatHalfProductOutcomeOperator params family n
+          (fun j => xs ⟨j.1, by omega⟩) gsPrefix *
+        (gHatHalfProductOutcomeOperator params family n
+          (fun j => xs ⟨j.1, by omega⟩) gsPrefix)ᴴ := by
+        rfl
+
 /-- Rotating the last coordinate to the front matches the cyclic half-product. -/
 private lemma gHatRotatedHalfProduct_lastFront_eq_halfProduct
     (params : Parameters)
@@ -1294,6 +1404,228 @@ private lemma ldSandwichLineOnePointPrefixMovedFamily_outcome_some
       params family (Fin.cons (q.2 ⟨i, hi⟩) (fun j => q.2 ⟨j.1, by omega⟩))
       0 q.1 a
 
+/-- The full one-point left family has no `none` outcome: the selected coordinate is
+restricted to genuine completed polynomials before postprocessing by evaluation. -/
+private lemma ldSandwichLineOnePointLeftFamily_outcome_none_eq_zero
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k i : ℕ} (hi : i < k)
+    (q : SandwichedLineQuestion params k) :
+    ((ldSandwichLineOnePointLeftFamily params strategy family k i) q).outcome none = 0 := by
+  simp [ldSandwichLineOnePointLeftFamily, postprocess, restrictSubMeas, hi,
+    Finset.sum_filter]
+  apply Finset.sum_eq_zero
+  intro gs _hgs
+  cases hgs_i : gs ⟨i, hi⟩ with
+  | none =>
+      simp
+  | some g =>
+      simp
+
+/-- The prefix-only one-point left family has no `none` outcome. -/
+private lemma ldSandwichLineOnePointPrefixOriginalFamily_outcome_none_eq_zero
+    (params : Parameters)
+    [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    {k i : ℕ} (hi : i < k)
+    (q : SandwichedLineQuestion params k) :
+    (ldSandwichLineOnePointPrefixOriginalFamily params family hi q).outcome none = 0 := by
+  simp [ldSandwichLineOnePointPrefixOriginalFamily, postprocess, restrictSubMeas,
+    Finset.sum_filter]
+  apply Finset.sum_eq_zero
+  intro gs _hgs
+  by_cases hsome : (gs ⟨i, Nat.lt_succ_self i⟩).isSome = true
+  · rcases Option.isSome_iff_exists.mp hsome with ⟨g, hg⟩
+    simp [hg]
+  · simp [hsome]
+
+/-- Delete one trailing sandwiched-line coordinate from the full one-point left
+family, for a genuine field outcome.
+
+This is the one-coordinate version of paper `ld-pasting.tex` lines 934--941:
+summing over an extraneous completed-slice outcome collapses that measurement to
+`I`, leaving the shorter sandwich. -/
+private lemma ldSandwichLineOnePointLeftFamily_drop_last_outcome_some
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {n i : ℕ} (hi : i < n)
+    (q : SandwichedLineQuestion params (n + 1))
+    (a : Fq params) :
+    ((ldSandwichLineOnePointLeftFamily params strategy family (n + 1) i) q).outcome
+        (some a) =
+      ((ldSandwichLineOnePointLeftFamily params strategy family n i)
+        (q.1, fun j => q.2 ⟨j.1, by omega⟩)).outcome (some a) := by
+  let qPrefix : SandwichedLineQuestion params n := (q.1, fun j => q.2 ⟨j.1, by omega⟩)
+  have hiFull : i < n + 1 := by omega
+  rw [ldSandwichLineOnePointLeftFamily_outcome_some params strategy family hiFull q a]
+  rw [ldSandwichLineOnePointLeftFamily_outcome_some params strategy family hi qPrefix a]
+  let e := gHatTupleOutcomePrefixLastEquiv params n
+  have hsplit :
+      (∑ gs : GHatTupleOutcome params (n + 1),
+        if Option.map (fun g : Polynomial params => g q.1) (gs ⟨i, hiFull⟩) = some a then
+          let half := gHatHalfProductOutcomeOperator params family (n + 1) q.2 gs
+          half * halfᴴ
+        else
+          0) =
+      ∑ p : GHatTupleOutcome params n × GHatOutcome params,
+        if Option.map (fun g : Polynomial params => g q.1) (p.1 ⟨i, hi⟩) = some a then
+          let half := gHatHalfProductOutcomeOperator params family (n + 1) q.2 (e.symm p)
+          half * halfᴴ
+        else
+          0 := by
+    exact Fintype.sum_equiv e
+      (fun gs : GHatTupleOutcome params (n + 1) =>
+        if Option.map (fun g : Polynomial params => g q.1) (gs ⟨i, hiFull⟩) = some a then
+          let half := gHatHalfProductOutcomeOperator params family (n + 1) q.2 gs
+          half * halfᴴ
+        else
+          0)
+      (fun p : GHatTupleOutcome params n × GHatOutcome params =>
+        if Option.map (fun g : Polynomial params => g q.1) (p.1 ⟨i, hi⟩) = some a then
+          let half := gHatHalfProductOutcomeOperator params family (n + 1) q.2 (e.symm p)
+          half * halfᴴ
+        else
+          0)
+      (by
+        intro gs
+        change
+          (if Option.map (fun g : Polynomial params => g q.1) (gs ⟨i, hiFull⟩) = some a then
+            let half := gHatHalfProductOutcomeOperator params family (n + 1) q.2 gs
+            half * halfᴴ
+          else
+            0) =
+          (if Option.map (fun g : Polynomial params => g q.1) ((e gs).1 ⟨i, hi⟩) = some a then
+            let half := gHatHalfProductOutcomeOperator params family (n + 1) q.2 (e.symm (e gs))
+            half * halfᴴ
+          else
+            0)
+        have hleft : e.symm (e gs) = gs := by
+          exact e.left_inv gs
+        rw [hleft]
+        simp [e, gHatTupleOutcomePrefixLastEquiv])
+  calc
+    (∑ gs : GHatTupleOutcome params (n + 1),
+        if Option.map (fun g : Polynomial params => g q.1) (gs ⟨i, hiFull⟩) = some a then
+          let half := gHatHalfProductOutcomeOperator params family (n + 1) q.2 gs
+          half * halfᴴ
+        else
+          0)
+        = ∑ p : GHatTupleOutcome params n × GHatOutcome params,
+            if Option.map (fun g : Polynomial params => g q.1) (p.1 ⟨i, hi⟩) = some a then
+              let half := gHatHalfProductOutcomeOperator params family (n + 1) q.2 (e.symm p)
+              half * halfᴴ
+            else
+              0 := hsplit
+    _ = ∑ gsPrefix : GHatTupleOutcome params n,
+          ∑ g : GHatOutcome params,
+            if Option.map (fun g' : Polynomial params => g' q.1) (gsPrefix ⟨i, hi⟩) = some a then
+              let half := gHatHalfProductOutcomeOperator params family (n + 1) q.2
+                (e.symm (gsPrefix, g))
+              half * halfᴴ
+            else
+              0 := by
+          rw [← Finset.univ_product_univ, Finset.sum_product]
+    _ = ∑ gsPrefix : GHatTupleOutcome params n,
+          if Option.map (fun g : Polynomial params => g q.1) (gsPrefix ⟨i, hi⟩) = some a then
+            let half := gHatHalfProductOutcomeOperator params family n qPrefix.2 gsPrefix
+            half * halfᴴ
+          else
+            0 := by
+          refine Finset.sum_congr rfl ?_
+          intro gsPrefix _hgs
+          by_cases hmatch : Option.map (fun g : Polynomial params => g q.1)
+              (gsPrefix ⟨i, hi⟩) = some a
+          · calc
+              (∑ g : GHatOutcome params,
+                if Option.map (fun g' : Polynomial params => g' q.1)
+                    (gsPrefix ⟨i, hi⟩) = some a then
+                  let half := gHatHalfProductOutcomeOperator params family (n + 1) q.2
+                    (e.symm (gsPrefix, g))
+                  half * halfᴴ
+                else
+                  0)
+                  = ∑ g : GHatOutcome params,
+                      let half := gHatHalfProductOutcomeOperator params family (n + 1) q.2
+                        (e.symm (gsPrefix, g))
+                      half * halfᴴ := by
+                    simp [hmatch]
+              _ = gHatHalfProductOutcomeOperator params family n qPrefix.2 gsPrefix *
+                    (gHatHalfProductOutcomeOperator params family n qPrefix.2 gsPrefix)ᴴ := by
+                    simpa [qPrefix, e] using
+                      gHatSandwich_sum_last_eq_prefix params family n q.2 gsPrefix
+              _ = if Option.map (fun g : Polynomial params => g q.1)
+                    (gsPrefix ⟨i, hi⟩) = some a then
+                    let half := gHatHalfProductOutcomeOperator params family n qPrefix.2 gsPrefix
+                    half * halfᴴ
+                  else
+                    0 := by
+                    simp [hmatch]
+          · simp [hmatch]
+
+/-- Deleting all coordinates after `i` from the full one-point left family leaves
+exactly the prefix family used in the Cauchy--Schwarz transport.
+
+This closes the paper's exact marginalization step `ld-pasting.tex` lines
+932--953; the remaining analytic residual starts after this deletion. -/
+private lemma ldSandwichLineOnePointLeftFamily_eq_prefixOriginal
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) :
+    ∀ {k i : ℕ} (hi : i < k),
+      ldSandwichLineOnePointLeftFamily params strategy family k i =
+        ldSandwichLineOnePointPrefixOriginalFamily params family hi
+  | 0, i, hi => by cases hi
+  | n + 1, i, hi => by
+      by_cases hlast : i = n
+      · subst i
+        simpa using ldSandwichLineOnePointLeftFamily_self_eq_prefixOriginal
+          params strategy family n
+      · have hiPrefix : i < n := by omega
+        have ih := ldSandwichLineOnePointLeftFamily_eq_prefixOriginal
+          (params := params) (strategy := strategy) (family := family) hiPrefix
+        funext q
+        let qPrefix : SandwichedLineQuestion params n :=
+          (q.1, fun j => q.2 ⟨j.1, by omega⟩)
+        have hpref :
+            ldSandwichLineOnePointPrefixOriginalFamily params family hiPrefix qPrefix =
+              ldSandwichLineOnePointPrefixOriginalFamily params family hi q := by
+          simp [ldSandwichLineOnePointPrefixOriginalFamily, qPrefix]
+        have hout : ∀ o : Option (Fq params),
+            ((ldSandwichLineOnePointLeftFamily params strategy family (n + 1) i) q).outcome o =
+              (ldSandwichLineOnePointPrefixOriginalFamily params family hi q).outcome o := by
+          intro o
+          cases o with
+          | none =>
+              rw [ldSandwichLineOnePointLeftFamily_outcome_none_eq_zero
+                params strategy family hi q]
+              rw [ldSandwichLineOnePointPrefixOriginalFamily_outcome_none_eq_zero
+                params family hi q]
+          | some a =>
+              calc
+                ((ldSandwichLineOnePointLeftFamily params strategy family (n + 1) i) q).outcome
+                    (some a)
+                    = ((ldSandwichLineOnePointLeftFamily params strategy family n i)
+                        qPrefix).outcome (some a) :=
+                      ldSandwichLineOnePointLeftFamily_drop_last_outcome_some
+                        params strategy family hiPrefix q a
+                _ = (ldSandwichLineOnePointPrefixOriginalFamily params family hiPrefix
+                        qPrefix).outcome (some a) := by
+                      rw [congrFun ih qPrefix]
+                _ = (ldSandwichLineOnePointPrefixOriginalFamily params family hi q).outcome
+                        (some a) := by
+                      rw [hpref]
+        apply SubMeas.ext
+        · exact hout
+        · rw [← ((ldSandwichLineOnePointLeftFamily params strategy family (n + 1) i)
+            q).sum_eq_total]
+          rw [← (ldSandwichLineOnePointPrefixOriginalFamily params family hi q).sum_eq_total]
+          exact Finset.sum_congr rfl fun o _ho => hout o
+
 /-- Unpack the raw prefix commutation package into the `qSDDCore` bound expected by
 `closenessOfIP` and `closenessOfIPAdjoint`. -/
 private lemma ldSandwichLineOnePointPrefixMoved_rawCommutation_qSDDCore_bound
@@ -1325,7 +1657,7 @@ private lemma ldSandwichLineOnePointPrefixMoved_rawCommutation_qSDDCore_bound
 
 This package keeps the final residual smaller than the original `ConsRel` branch:
 the raw commutation bound is already unpacked, the option-valued match mass has
-no `none` contribution, and the full/prefix/raw endpoint outcome expansions are
+no `none` contribution, and the prefix/raw endpoint outcome expansions are
 available as hypotheses. -/
 private structure LdSandwichLineOnePointResidualFacts
     (params : Parameters) [FieldModel params.q]
@@ -1347,24 +1679,15 @@ private structure LdSandwichLineOnePointResidualFacts
   matchExpand :
     ∀ q : SandwichedLineQuestion params k,
       qBipartiteMatchMass strategy.state
-        ((ldSandwichLineOnePointLeftFamily params strategy family k i) q)
+        ((ldSandwichLineOnePointPrefixOriginalFamily params family hi) q)
         ((ldSandwichLineOnePointRightFamily params strategy family k i) q) =
         ∑ a : Fq params,
           ev strategy.state
             (opTensor
-              (((ldSandwichLineOnePointLeftFamily params strategy family k i) q).outcome
+              (((ldSandwichLineOnePointPrefixOriginalFamily params family hi) q).outcome
                 (some a))
               (((ldSandwichLineOnePointRightFamily params strategy family k i) q).outcome
                 (some a)))
-  leftSome :
-    ∀ (q : SandwichedLineQuestion params k) (a : Fq params),
-      ((ldSandwichLineOnePointLeftFamily params strategy family k i) q).outcome (some a) =
-        ∑ gs : GHatTupleOutcome params k,
-          if Option.map (fun g : Polynomial params => g q.1) (gs ⟨i, hi⟩) = some a then
-            let half := gHatHalfProductOutcomeOperator params family k q.2 gs
-            half * halfᴴ
-          else
-            0
   prefixOriginalSome :
     ∀ (q : SandwichedLineQuestion params k) (a : Fq params),
       (ldSandwichLineOnePointPrefixOriginalFamily params family hi q).outcome (some a) =
@@ -1407,10 +1730,10 @@ private structure LdSandwichLineOnePointResidualFacts
 `lem:ld-sandwich-line-one-point`.
 
 This is the match-mass lower-bound step after unfolding `ConsRel`: it bounds the
-averaged off-diagonal defect for the original one-point family.  The helper now
-consumes `LdSandwichLineOnePointResidualFacts`, so all endpoint packaging,
-raw-family reindexing, and match-mass expansion facts are outside the remaining
-Cauchy--Schwarz/marginalization gap. -/
+averaged off-diagonal defect for the prefix-marginalized one-point family.  The
+helper now consumes `LdSandwichLineOnePointResidualFacts`, so all endpoint
+packaging, raw-family reindexing, exact tail deletion, and match-mass expansion
+facts are outside the remaining Cauchy--Schwarz gap. -/
 private lemma ldSandwichLineOnePoint_matchMass_lower_bound
     (params : Parameters)
     [FieldModel params.q]
@@ -1432,19 +1755,20 @@ private lemma ldSandwichLineOnePoint_matchMass_lower_bound
         (zeta + Real.sqrt (8 * (params.m : Error) * min eps 1 + 4 * min delta 1))) :
     bipartiteConsError strategy.state
       (uniformDistribution (SandwichedLineQuestion params k))
-      (ldSandwichLineOnePointLeftFamily params strategy family k i)
+      (ldSandwichLineOnePointPrefixOriginalFamily params family hi)
       (ldSandwichLineOnePointRightFamily params strategy family k i)
       ≤ ldSandwichLineOnePointError params eps delta gamma zeta k := by
   /- TODO(#705): fill the remaining Cauchy--Schwarz/marginalization proof.
-  Paper: `ld-pasting.tex` lines 945--1024.  The residual starts after the
-  raw commutation package has been unpacked (`facts.rawCore`), the option-valued
-  match mass has been reduced to `some` outcomes (`facts.matchExpand`), and the
-  full/prefix families plus raw endpoints have explicit outcome formulas
-  (`facts.leftSome`, `facts.prefixOriginalSome`, `facts.movedSome`,
+  Paper: `ld-pasting.tex` lines 954--1024.  The exact deletion of the
+  right-hand tail coordinates from lines 932--953 is now isolated in
+  `ldSandwichLineOnePointLeftFamily_eq_prefixOriginal`; this residual starts
+  after that marginalization.  The raw commutation package has been unpacked
+  (`facts.rawCore`), the option-valued match mass has been reduced to `some`
+  outcomes (`facts.matchExpand`), and the prefix plus raw endpoints have explicit
+  outcome formulas (`facts.prefixOriginalSome`, `facts.movedSome`,
   `facts.rawLeftEndpoint`, `facts.rawRightEndpoint`).  What remains is to combine
-  these formulas with the two Cauchy--Schwarz transports, delete the right-hand
-  tail coordinates, collapse the prefix sandwich to `I`, and apply
-  `hmovedEndpoint`.
+  these formulas with the two Cauchy--Schwarz transports, collapse the prefix
+  sandwich to `I`, and apply `hmovedEndpoint`.
   -/
   sorry
 
@@ -1485,13 +1809,10 @@ private lemma ldSandwichLineOnePoint_nonzero_prefix_transport
   have hmatchExpand :=
     fun q : SandwichedLineQuestion params k =>
       qBipartiteMatchMass_option_right_none_zero strategy.state
-        ((ldSandwichLineOnePointLeftFamily params strategy family k i) q)
+        ((ldSandwichLineOnePointPrefixOriginalFamily params family hi) q)
         ((ldSandwichLineOnePointRightFamily params strategy family k i) q)
         (ldSandwichLineOnePointRightFamily_outcome_none_eq_zero
           params strategy family hi q)
-  have hleftSome :=
-    fun (q : SandwichedLineQuestion params k) (a : Fq params) =>
-      ldSandwichLineOnePointLeftFamily_outcome_some params strategy family hi q a
   have hprefixOriginalSome :=
     fun (q : SandwichedLineQuestion params k) (a : Fq params) =>
       ldSandwichLineOnePointPrefixOriginalFamily_outcome_some params family hi q a
@@ -1509,14 +1830,16 @@ private lemma ldSandwichLineOnePoint_nonzero_prefix_transport
   have facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi :=
     { rawCore := hrawCore
       matchExpand := hmatchExpand
-      leftSome := hleftSome
       prefixOriginalSome := hprefixOriginalSome
       movedSome := hmovedSome
       rawLeftEndpoint := hrawLeftEndpoint
       rawRightEndpoint := hrawRightEndpoint }
-  exact ⟨ldSandwichLineOnePoint_matchMass_lower_bound
+  have hprefixBound := ldSandwichLineOnePoint_matchMass_lower_bound
     params strategy eps delta gamma zeta hgamma_le hzeta_le hdq_le family hself hbound
-    hi hi0 facts hmovedEndpoint⟩
+    hi hi0 facts hmovedEndpoint
+  exact ⟨by
+    simpa [ldSandwichLineOnePointLeftFamily_eq_prefixOriginal params strategy family hi]
+      using hprefixBound⟩
 
 /-- Bridge: Cauchy-Schwarz sandwich elimination for one-point consistency.
 

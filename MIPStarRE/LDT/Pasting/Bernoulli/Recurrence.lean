@@ -727,24 +727,195 @@ private structure FromHToGAdjacentStageFacts
           fromHToGStageMass params ψbi family k (ℓ + 1)| ≤
         fromHToGRecurrenceError params gamma zeta k
 
-/-- The scalar arithmetic absorption still needed after telescoping the adjacent
-`fromHToG` recurrence steps. -/
-private structure FromHToGErrorAbsorptionFacts
-    (params : Parameters) (gamma zeta : Error) (k : ℕ) : Prop where
-  recurrenceError_le :
-    (k : Error) * fromHToGRecurrenceError params gamma zeta k ≤
-      fromHToGError params gamma zeta k
+set_option maxHeartbeats 800000 in
+-- The scalar proof expands several `rpow` square identities and a nonlinear
+-- square comparison mirroring `ld-pasting.tex:1372--1375`.
+/-- The paper's scalar absorption line for `lem:from-H-to-G`.
 
-/-- The arithmetic absorption is not a parameter-free theorem of the displayed
-error *definitions alone*.
+Under the side conditions needed for the `√(2ζ)` term (`γ, ζ ≥ 0` and
+`ζ ≤ 1`), the paper-total error from
+`references/ldt-paper/ld-pasting.tex:1372--1375` is bounded by the displayed
+`fromHToGError`.  The proof follows the paper arithmetic: bound
+`√(2ζ)` by `2 ζ^(1/32)`, bound `√426` by `21`, and use
+`√(γ^(1/16)+ζ^(1/16)+(d/q)^(1/16)) ≤ γ^(1/32)+ζ^(1/32)+(d/q)^(1/32)`. -/
+private lemma fromHToGPaperTotalError_le
+    (params : Parameters) (gamma zeta : Error) (k : ℕ)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hzeta_nonneg : 0 ≤ zeta) (hzeta_le_one : zeta ≤ 1) :
+    fromHToGPaperTotalError params gamma zeta k ≤
+      fromHToGError params gamma zeta k := by
+  have hm_nonneg : 0 ≤ (params.m : Error) := by positivity
+  have hm_ge_one : (1 : Error) ≤ (params.m : Error) := by
+    exact_mod_cast Nat.succ_le_of_lt params.hm
+  have hk_nonneg : 0 ≤ (k : Error) := by positivity
+  have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
+    positivity
+  let sixteenthSum : Error :=
+    Real.rpow gamma (1 / (16 : Error)) +
+      Real.rpow zeta (1 / (16 : Error)) +
+      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error))
+  let thirtysecondSum : Error :=
+    Real.rpow gamma (1 / (32 : Error)) +
+      Real.rpow zeta (1 / (32 : Error)) +
+      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error))
+  have hgamma32_nonneg : 0 ≤ Real.rpow gamma (1 / (32 : Error)) :=
+    Real.rpow_nonneg hgamma_nonneg _
+  have hzeta32_nonneg : 0 ≤ Real.rpow zeta (1 / (32 : Error)) :=
+    Real.rpow_nonneg hzeta_nonneg _
+  have hratio32_nonneg :
+      0 ≤ Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)) :=
+    Real.rpow_nonneg hratio_nonneg _
+  have hthirtysecond_nonneg : 0 ≤ thirtysecondSum := by
+    dsimp [thirtysecondSum]
+    positivity
+  have hsixteenth_nonneg : 0 ≤ sixteenthSum := by
+    dsimp [sixteenthSum]
+    positivity
+  have hgamma32_sq :
+      (Real.rpow gamma (1 / (32 : Error))) ^ (2 : ℕ) =
+        Real.rpow gamma (1 / (16 : Error)) := by
+    calc
+      (Real.rpow gamma (1 / (32 : Error))) ^ (2 : ℕ)
+          = (Real.rpow gamma (1 / (32 : Error))) ^ (2 : Error) := by norm_num
+      _ = Real.rpow gamma ((1 / (32 : Error)) * (2 : Error)) := by
+            symm
+            exact Real.rpow_mul hgamma_nonneg _ _
+      _ = Real.rpow gamma (1 / (16 : Error)) := by norm_num
+  have hzeta32_sq :
+      (Real.rpow zeta (1 / (32 : Error))) ^ (2 : ℕ) =
+        Real.rpow zeta (1 / (16 : Error)) := by
+    calc
+      (Real.rpow zeta (1 / (32 : Error))) ^ (2 : ℕ)
+          = (Real.rpow zeta (1 / (32 : Error))) ^ (2 : Error) := by norm_num
+      _ = Real.rpow zeta ((1 / (32 : Error)) * (2 : Error)) := by
+            symm
+            exact Real.rpow_mul hzeta_nonneg _ _
+      _ = Real.rpow zeta (1 / (16 : Error)) := by norm_num
+  have hratio32_sq :
+      (Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error))) ^ (2 : ℕ) =
+        Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error)) := by
+    calc
+      (Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error))) ^
+          (2 : ℕ)
+          = (Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error))) ^
+              (2 : Error) := by norm_num
+      _ = Real.rpow (((params.d : Error) / (params.q : Error)))
+            ((1 / (32 : Error)) * (2 : Error)) := by
+            symm
+            exact Real.rpow_mul hratio_nonneg _ _
+      _ = Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error)) := by
+            norm_num
+  have hsixteenth_le_thirtysecond_sq : sixteenthSum ≤ thirtysecondSum ^ (2 : ℕ) := by
+    let a : Error := Real.rpow gamma (1 / (32 : Error))
+    let b : Error := Real.rpow zeta (1 / (32 : Error))
+    let c : Error := Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error))
+    have ha_nonneg : 0 ≤ a := by dsimp [a]; positivity
+    have hb_nonneg : 0 ≤ b := by dsimp [b]; positivity
+    have hc_nonneg : 0 ≤ c := by dsimp [c]; positivity
+    have hsq : a ^ (2 : ℕ) + b ^ (2 : ℕ) + c ^ (2 : ℕ) ≤ (a + b + c) ^ (2 : ℕ) := by
+      nlinarith [ha_nonneg, hb_nonneg, hc_nonneg]
+    rw [hgamma32_sq, hzeta32_sq, hratio32_sq] at hsq
+    simpa [a, b, c, sixteenthSum, thirtysecondSum] using hsq
+  have hzeta_le_sixteenth : zeta ≤ Real.rpow zeta (1 / (16 : Error)) := by
+    have hpow : (1 / (16 : Error)) ≤ (1 : Error) := by norm_num
+    simpa using Real.rpow_le_rpow_of_exponent_ge' hzeta_nonneg hzeta_le_one (by norm_num) hpow
+  have hsqrt_two_zeta :
+      Real.sqrt (2 * zeta) ≤ 2 * Real.rpow zeta (1 / (32 : Error)) := by
+    have hzeta16_nonneg : 0 ≤ Real.rpow zeta (1 / (16 : Error)) :=
+      Real.rpow_nonneg hzeta_nonneg _
+    have hzeta32_sq' :
+        (Real.rpow zeta (1 / (32 : Error))) ^ (2 : ℕ) =
+          Real.rpow zeta (1 / (16 : Error)) := hzeta32_sq
+    refine (Real.sqrt_le_iff).2 ?_
+    constructor
+    · positivity
+    · calc
+        2 * zeta ≤ 4 * Real.rpow zeta (1 / (16 : Error)) := by
+          nlinarith [hzeta_le_sixteenth, hzeta16_nonneg]
+        _ = (2 * Real.rpow zeta (1 / (32 : Error))) ^ (2 : ℕ) := by
+          rw [mul_pow, hzeta32_sq']
+          norm_num
+  have hzeta32_le_sum : Real.rpow zeta (1 / (32 : Error)) ≤ thirtysecondSum := by
+    have htail : 0 ≤ Real.rpow gamma (1 / (32 : Error)) +
+        Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)) := by
+      exact add_nonneg hgamma32_nonneg hratio32_nonneg
+    dsimp [thirtysecondSum]
+    rw [show gamma ^ (1 / (32 : Error)) + zeta ^ (1 / (32 : Error)) +
+        (((params.d : Error) / (params.q : Error))) ^ (1 / (32 : Error)) =
+        zeta ^ (1 / (32 : Error)) +
+          (gamma ^ (1 / (32 : Error)) +
+            (((params.d : Error) / (params.q : Error))) ^ (1 / (32 : Error))) by ring]
+    exact (le_add_of_nonneg_right htail :
+      Real.rpow zeta (1 / (32 : Error)) ≤ Real.rpow zeta (1 / (32 : Error)) +
+        (Real.rpow gamma (1 / (32 : Error)) +
+          Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error))))
+  have hfirst :
+      (k : Error) * (2 * Real.sqrt (2 * zeta)) ≤
+        4 * (k : Error) * (params.m : Error) * thirtysecondSum := by
+    calc
+      (k : Error) * (2 * Real.sqrt (2 * zeta))
+          ≤ (k : Error) * (2 * (2 * Real.rpow zeta (1 / (32 : Error)))) := by
+            gcongr
+      _ = 4 * (k : Error) * Real.rpow zeta (1 / (32 : Error)) := by ring
+      _ ≤ 4 * (k : Error) * ((params.m : Error) * thirtysecondSum) := by
+            have hzeta32_le_msum :
+                Real.rpow zeta (1 / (32 : Error)) ≤
+                  (params.m : Error) * thirtysecondSum := by
+              calc
+                Real.rpow zeta (1 / (32 : Error)) ≤ thirtysecondSum := hzeta32_le_sum
+                _ = 1 * thirtysecondSum := by ring
+                _ ≤ (params.m : Error) * thirtysecondSum := by
+                      exact mul_le_mul_of_nonneg_right hm_ge_one hthirtysecond_nonneg
+            gcongr
+      _ = 4 * (k : Error) * (params.m : Error) * thirtysecondSum := by ring
+  have hcomm_sqrt :
+      Real.sqrt (commuteGHalfSandwichError params gamma zeta k) ≤
+        21 * (k : Error) * (params.m : Error) * thirtysecondSum := by
+    have hright_nonneg : 0 ≤ 21 * (k : Error) * (params.m : Error) * thirtysecondSum := by
+      positivity
+    refine (Real.sqrt_le_iff).2 ?_
+    constructor
+    · exact hright_nonneg
+    · have hm_sq_ge : (params.m : Error) ≤ (params.m : Error) ^ (2 : ℕ) := by
+        nlinarith [hm_ge_one]
+      calc
+        commuteGHalfSandwichError params gamma zeta k
+            = 426 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * sixteenthSum := by
+              simp [commuteGHalfSandwichError, sixteenthSum]
+        _ ≤ 441 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) *
+              (thirtysecondSum ^ (2 : ℕ)) := by
+              gcongr
+              norm_num
+        _ ≤ 441 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (2 : ℕ)) *
+              (thirtysecondSum ^ (2 : ℕ)) := by
+              gcongr
+        _ = (21 * (k : Error) * (params.m : Error) * thirtysecondSum) ^ (2 : ℕ) := by
+              ring
+  have hsecond :
+      2 * Real.sqrt (commuteGHalfSandwichError params gamma zeta k) ≤
+        42 * (k : Error) * (params.m : Error) * thirtysecondSum := by
+    nlinarith [hcomm_sqrt]
+  calc
+    fromHToGPaperTotalError params gamma zeta k
+        = (k : Error) * (2 * Real.sqrt (2 * zeta)) +
+            2 * Real.sqrt (commuteGHalfSandwichError params gamma zeta k) := by
+          simp [fromHToGPaperTotalError, Real.sqrt_eq_rpow]
+    _ ≤ 4 * (k : Error) * (params.m : Error) * thirtysecondSum +
+          42 * (k : Error) * (params.m : Error) * thirtysecondSum := by
+          exact add_le_add hfirst hsecond
+    _ = fromHToGError params gamma zeta k := by
+          simp [fromHToGError, thirtysecondSum]
+          ring
+
+
+/-- The former uniform-step arithmetic absorption is not a parameter-free theorem
+of the displayed error *definitions alone*.
 
 For example, with `m = 1`, `q = 2`, `d = 0`, `γ = 1`, `ζ = 0`, and `k = 2`,
 the left-hand side is `4 * sqrt (426 * 2^2)`, which is already larger than the
-right-hand side `46 * 2`.  Thus the remaining scalar field below is deliberately
-kept as a separate residual from the adjacent-stage operator bridge: closing it
-requires either sharper recurrence bookkeeping (matching the paper's line
-`references/ldt-paper/ld-pasting.tex:1372--1375`) or extra hypotheses, not a
-standalone monotonicity lemma over the current definitions. -/
+right-hand side `46 * 2`.  The residual below therefore tracks the paper-total
+stage bridge directly, rather than pretending that `k * fromHToGRecurrenceError`
+can be absorbed as a standalone scalar leaf. -/
 private lemma fromHToG_errorAbsorption_not_purely_scalar :
     ¬ (∀ (params : Parameters) (gamma zeta : Error) (k : ℕ),
       (k : Error) * fromHToGRecurrenceError params gamma zeta k ≤
@@ -767,16 +938,37 @@ private lemma fromHToG_errorAbsorption_not_purely_scalar :
     nlinarith
   exact not_le_of_gt hgt hbad
 
+/-- The sharpened scalar/telescope residual for the final `fromHToG` endpoint.
+
+The adjacent-step recurrence still supplies the public `recurrenceStep` field.
+For the final Bernoulli-polynomial comparison, however, the paper does not use
+`k * fromHToGRecurrenceError`; it uses the aggregate paper-total error above.
+This package records the exact remaining bridge at the stage-mass level,
+together with the side conditions needed by the proved scalar absorption lemma
+`fromHToGPaperTotalError_le`. -/
+private structure FromHToGPaperTelescopeFacts
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error) (k : ℕ) : Prop where
+  gamma_nonneg : 0 ≤ gamma
+  zeta_nonneg : 0 ≤ zeta
+  zeta_le_one : zeta ≤ 1
+  stageMassBridge :
+    |fromHToGStageMass params ψbi family k 0 -
+        fromHToGStageMass params ψbi family k k| ≤
+      fromHToGPaperTotalError params gamma zeta k
+
 /-- The residual, paper-specific facts still needed for `fromHToG`.
 
-This deliberately does not duplicate the public theorem: the telescope from these
-facts to `FromHToGStatement.bernoulliPolynomialRewrite` is already proved by
-`fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints`.  The terminal stage
-`k` is identified exactly by `fromHToGStageMass_terminal_eq`, stage `0` is
-identified exactly by `fromHToGStageMass_zero_eq`, and the exact `S`-recurrence
-bookkeeping is recorded in `FromHToGAdjacentStageExactFacts`; what remains is
-split into two private subpackages: the adjacent-stage analytic bridge and the
-separate arithmetic absorption diagnosed above. -/
+The terminal stage `k` is identified exactly by
+`fromHToGStageMass_terminal_eq`, stage `0` is identified exactly by
+`fromHToGStageMass_zero_eq`, and the exact `S`-recurrence bookkeeping is
+recorded in `FromHToGAdjacentStageExactFacts`.  What remains is split into two
+private subpackages: the adjacent-stage analytic bridge (used for the public
+`recurrenceStep` field) and a paper-total stage bridge whose scalar absorption
+is proved by `fromHToGPaperTotalError_le`. -/
 private structure FromHToGResidualStageFacts
     (params : Parameters)
     [FieldModel params.q]
@@ -785,7 +977,7 @@ private structure FromHToGResidualStageFacts
     (gamma zeta : Error) (k : ℕ) : Prop where
   stageExact : FromHToGAdjacentStageExactFacts params ψbi family
   adjacent : FromHToGAdjacentStageFacts params ψbi family gamma zeta k
-  arithmetic : FromHToGErrorAbsorptionFacts params gamma zeta k
+  paperTelescope : FromHToGPaperTelescopeFacts params ψbi family gamma zeta k
 
 /-- `lem:from-H-to-G`.
 
@@ -819,35 +1011,38 @@ lemma fromHToG
          (roughly lines 979–1233 in the current source).
 
        What remains to formalize after this file's exact `S`-recurrence and
-       telescope reductions:
+       endpoint reductions:
        1. fill `FromHToGAdjacentStageFacts` by proving each adjacent-stage
           recurrence step via the paper's move-right / commute / move-right chain,
           using two `easyApproxFromApproxDelta` / `closenessOfIP` moves from
           `hfacts.completedSelfConsistency` and two suffix-commutation moves from
           `hhalf (k - ℓ)`; the final exact branch split is now recorded by
           `hstageExact.tailWeightRecurrence` below;
-       2. fill `FromHToGErrorAbsorptionFacts` by resolving the separate displayed
-          arithmetic comparison `k * fromHToGRecurrenceError ≤ fromHToGError`.
-          The lemma `fromHToG_errorAbsorption_not_purely_scalar` above records why
-          this is not just a standalone scalar monotonicity proof from the current
-          error definitions.
+       2. fill `FromHToGPaperTelescopeFacts` by proving the aggregate stage-mass
+          bridge with the paper-total error `fromHToGPaperTotalError` and by
+          supplying the standard scalar side conditions.  The scalar absorption
+          from that paper-total error into `fromHToGError` is now proved above by
+          `fromHToGPaperTotalError_le`; the diagnostic
+          `fromHToG_errorAbsorption_not_purely_scalar` explains why the older
+          `k * fromHToGRecurrenceError` leaf was too coarse.
 
        The former endpoint residuals are closed above: stage `0` by
        `fromHToGStageMass_zero_eq`, and terminal stage `k` by
        `fromHToGStageMass_terminal_eq`.
 
-       The generic telescoping step from these facts to
-       `bernoulliPolynomialRewrite` is now proved above in
-       `fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints`.
+       The older uniform-step telescoping helper
+       `fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints` remains available,
+       but the final field below now follows the paper-total scalar route rather
+       than the too-coarse `k * fromHToGRecurrenceError` absorption.
     -/
     let hstageExact : FromHToGAdjacentStageExactFacts params ψbi family :=
       fromHToGAdjacentStageExactFacts_of_weights params ψbi family
     have hremaining :
         FromHToGAdjacentStageFacts params ψbi family gamma zeta k ∧
-          FromHToGErrorAbsorptionFacts params gamma zeta k := by
+          FromHToGPaperTelescopeFacts params ψbi family gamma zeta k := by
       -- Keep the paper inputs and exact branch bookkeeping visible at the residual
       -- proof site: future work should use them for the two self-consistency
-      -- moves, the two suffix-commutation moves, and the final exact collapse.
+      -- moves, the two suffix-commutation moves, and the paper-total telescope.
       have _ := hfacts.completedSelfConsistency
       have _ := hhalf
       have _ := hstageExact.completeBranchAverage
@@ -856,12 +1051,18 @@ lemma fromHToG
       sorry
     exact ⟨hstageExact, hremaining.1, hremaining.2⟩
   refine ⟨hresidual.adjacent.recurrenceStep, ?_⟩
-  exact fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints
-    params strategy ψbi family gamma zeta k
-    hresidual.adjacent.recurrenceStep
-    (fromHToGStageMass_zero_eq params strategy ψbi family k)
-    (fromHToGStageMass_terminal_eq params ψbi family k)
-    hresidual.arithmetic.recurrenceError_le
+  have hstage0 := fromHToGStageMass_zero_eq params strategy ψbi family k
+  have hstagek := fromHToGStageMass_terminal_eq params ψbi family k
+  have hpaperMass :
+      |fromHToGAllOutcomesMass params strategy ψbi family k -
+          fromHToGBernoulliTailMass params ψbi family k| ≤
+        fromHToGPaperTotalError params gamma zeta k := by
+    simpa [hstage0, hstagek] using hresidual.paperTelescope.stageMassBridge
+  exact le_trans hpaperMass <|
+    fromHToGPaperTotalError_le params gamma zeta k
+      hresidual.paperTelescope.gamma_nonneg
+      hresidual.paperTelescope.zeta_nonneg
+      hresidual.paperTelescope.zeta_le_one
 
 /-- The scalar Bernoulli tail polynomial lifted through continuous functional
 calculus is exactly the matrix Bernoulli tail operator. -/

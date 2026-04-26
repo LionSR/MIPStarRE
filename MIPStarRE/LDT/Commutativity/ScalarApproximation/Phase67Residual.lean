@@ -140,7 +140,16 @@ endpoint.
 
 By `evaluatedSlicePhaseFiveRemoved_sumBabTerm_avg`, the absolute-value endpoint
 residual is equivalent to controlling the nonnegative missing mass from inserting
-the right-register first-coordinate outcome. -/
+the right-register first-coordinate outcome.
+
+This named residual is deliberately stronger than what postprocessed
+self-consistency alone can justify.  If the self-consistency error `zeta` were
+zero, replacing the right-register outcome by the corresponding left-register
+projector would still leave the positive term `(1 - A) * B * A * B * (1 - A)` for
+two noncommuting projectors `A` and `B` (for example, the qubit projectors onto
+`|0⟩` and `|+⟩` on a maximally entangled state).  Closing this residual therefore
+requires either a commutativity/`gamma` input or a scalar-chain orientation whose
+endpoints match the paper's reverse `eq:add-an-a` step. -/
 def evaluatedSlicePhase67FirstReverseGapResidual
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)

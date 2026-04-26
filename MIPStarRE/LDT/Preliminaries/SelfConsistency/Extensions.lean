@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Local
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.Core
+import MIPStarRE.LDT.Test.StrategyFailures
 
 /-!
 # Self-consistency: strategy-level extensions

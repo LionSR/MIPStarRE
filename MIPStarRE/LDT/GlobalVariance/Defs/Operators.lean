@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.GlobalVariance.Defs.Core
+import MIPStarRE.LDT.Test.StrategyCore
 
 namespace MIPStarRE.LDT.GlobalVariance
 

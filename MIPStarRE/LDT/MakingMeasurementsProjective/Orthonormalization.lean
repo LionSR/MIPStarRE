@@ -1,7 +1,6 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
-import MIPStarRE.LDT.Basic.SubMeasurement
+import MIPStarRE.LDT.Basic.MeasurementLift
 import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
 /-!

@@ -2070,6 +2070,56 @@ lemma avgOver_uniform_badMass_le_k_mul_ldSandwichLineOnePointError
     _ = (k : Error) * ldSandwichLineOnePointError params eps delta gamma zeta k := by
           simp
 
+/-- Aggregate the one-point line comparison statements over all inserted vertical
+lines and absorb the distinct-tuple loss into the displayed `hBConsistency`
+error.
+
+This is the reusable bad-mass aggregation from `ld-pasting.tex` lines
+1186--1202 (also used in the proof of `lem:h-b-consistency`). -/
+lemma avgOver_distinct_badMass_le_hBConsistencyError
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (eps delta gamma zeta : Error) (k : ℕ)
+    (hd : 0 < params.d)
+    (heps_nonneg : 0 ≤ eps)
+    (hdelta_nonneg : 0 ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hzeta_nonneg : 0 ≤ zeta)
+    (hline : ∀ i : ℕ, i < k →
+      LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i) :
+    avgOver (uniformDistribution (Point params)) (fun u =>
+        avgOver (distinctTupleDistribution params k) (fun xs =>
+          hBConsistencyBadMass params strategy family u xs)) ≤
+      hBConsistencyError params eps delta gamma zeta k := by
+  calc
+    avgOver (uniformDistribution (Point params)) (fun u =>
+        avgOver (distinctTupleDistribution params k) (fun xs =>
+          hBConsistencyBadMass params strategy family u xs))
+      ≤ avgOver (uniformDistribution (Point params)) (fun u =>
+          avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
+            hBConsistencyBadMass params strategy family u xs) +
+          ((k : Error) ^ (2 : ℕ)) / (params.q : Error)) := by
+          exact avgOver_mono _ _ _ (fun u =>
+            avgOver_distinct_badMass_le_avgOver_uniform_badMass_add_dnoteq
+              params strategy family u)
+    _ = avgOver (uniformDistribution (Point params)) (fun u =>
+          avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
+            hBConsistencyBadMass params strategy family u xs)) +
+        ((k : Error) ^ (2 : ℕ)) / (params.q : Error) := by
+          rw [avgOver_add]
+          simpa using avgOver_uniform_const (α := Point params)
+            (((k : Error) ^ (2 : ℕ)) / (params.q : Error))
+    _ ≤ (k : Error) * ldSandwichLineOnePointError params eps delta gamma zeta k +
+          ((k : Error) ^ (2 : ℕ)) / (params.q : Error) := by
+          gcongr
+          exact avgOver_uniform_badMass_le_k_mul_ldSandwichLineOnePointError
+            params strategy family eps delta gamma zeta k hline
+    _ ≤ hBConsistencyError params eps delta gamma zeta k := by
+          exact hBConsistency_error_bound params eps delta gamma zeta k hd
+            heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
+
 /- private lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get
     (params : Parameters) [FieldModel params.q]
     {k : ℕ} (xs : PointTuple params k)

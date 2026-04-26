@@ -1,7 +1,7 @@
-import MIPStarRE.LDT.Basic.Parameters
-import MIPStarRE.LDT.Basic.Operator
+import MIPStarRE.LDT.Basic.ParametersFiniteAnswers
+import MIPStarRE.LDT.Basic.OperatorExpectations
 import MIPStarRE.LDT.Basic.Distribution
-import MIPStarRE.LDT.Basic.SubMeasurement
+import MIPStarRE.LDT.Basic.SubMeasurementFamilies
 import MIPStarRE.LDT.Basic.OpFamily
 
 /-!

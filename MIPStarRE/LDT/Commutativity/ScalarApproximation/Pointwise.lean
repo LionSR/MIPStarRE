@@ -1,4 +1,7 @@
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
+import MIPStarRE.LDT.CommutativityPoints.Approximation
+import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
+import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.Core
 
 /-!
 # Section 11 commutativity: pointwise scalar approximation

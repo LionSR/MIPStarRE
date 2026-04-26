@@ -12,8 +12,6 @@ Truncated type sums and their one-step recurrence.
 namespace MIPStarRE.LDT.Pasting
 
 open MIPStarRE.LDT
-open MIPStarRE.LDT.ExpansionHypercubeGraph
-open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]

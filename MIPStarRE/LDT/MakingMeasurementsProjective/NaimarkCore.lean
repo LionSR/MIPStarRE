@@ -1,6 +1,5 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
 set_option linter.style.setOption false

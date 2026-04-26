@@ -2,7 +2,7 @@ import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChain
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Phase67Residual
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Consequences
-import MIPStarRE.LDT.Commutativity.GCommStability
+import MIPStarRE.LDT.Commutativity.GCommStability.Scalar
 
 /-!
 # Processed `G` scalar approximation

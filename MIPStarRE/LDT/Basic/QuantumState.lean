@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Basic.Parameters
+import MIPStarRE.LDT.Basic.ParametersBase
 import MIPStarRE.Quantum.FiniteMatrix
 
 /-!

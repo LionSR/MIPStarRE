@@ -301,10 +301,10 @@
 \section{Proof of the main formal theorem}
 
 \begin{lemma}[Role-register symmetrization bridge]\label{lem:symmetrization-bridge}
-	\lean{MIPStarRE.LDT.ProjStrat.strategySymmetrization, MIPStarRE.LDT.ProjStrat.strategySymmetrization_isGood_three_mul, MIPStarRE.LDT.ProjStrat.strategySymmetrization_isNormalized}
+	\lean{MIPStarRE.LDT.ProjStrat.strategySymmetrization, MIPStarRE.LDT.ProjStrat.strategySymmetrization_isGood_three_mul, MIPStarRE.LDT.ProjStrat.strategySymmetrization_isNormalized, MIPStarRE.LDT.ProjStrat.StrategySymmetrizationPackage, MIPStarRE.LDT.ProjStrat.StrategySymmetrizationPackage.strategySymmetrization_isGood, MIPStarRE.LDT.ProjStrat.StrategySymmetrizationPackage.strategySymmetrization_isNormalized, MIPStarRE.LDT.ProjStrat.strategySymmetrizationPackage}
 	\leanok
 	\uses{def:projective-strategy, def:symmetric-projective-strategy, def:good-strategy}
-	Let $(\psi,A^{\mathrm A},B^{\mathrm A},L^{\mathrm A},A^{\mathrm B},B^{\mathrm B},L^{\mathrm B})$ be a projective strategy passing the $(m,q,d)$ low individual degree test with probability at least $1-\eps$. Introducing a two-dimensional role register on each side and taking $(\psi_{\mathrm{sym}}, A_{\mathrm{sym}}, B_{\mathrm{sym}}, L_{\mathrm{sym}})$ as in paper Section~3 yields a symmetric projective strategy that is $(3\eps,3\eps,3\eps)$-good.
+	Let $(\psi,A^{\mathrm A},B^{\mathrm A},L^{\mathrm A},A^{\mathrm B},B^{\mathrm B},L^{\mathrm B})$ be a projective strategy passing the $(m,q,d)$ low individual degree test with probability at least $1-\eps$. Introducing a two-dimensional role register on each side and taking $(\psi_{\mathrm{sym}}, A_{\mathrm{sym}}, B_{\mathrm{sym}}, L_{\mathrm{sym}})$ as in paper Section~3 yields a symmetric projective strategy that is $(3\eps,3\eps,3\eps)$-good. The Lean package records this symmetrized strategy together with its goodness and normalization proofs for later use by the proof of Theorem~\ref{thm:main-formal}.
 \end{lemma}
 \begin{proof}
 	\leanok
@@ -480,6 +480,38 @@
 	This is the direct packaging of Theorem~\ref{thm:sigma-bound-main-formal} and Theorem~\ref{thm:zeta-bounds-main-formal}. The Lean declaration uses the explicit equalities naming $\sigma,\zeta_1,\zeta_2,\zeta_3$ as the corresponding cascade expressions.
 \end{proof}
 
+\begin{remark}[Lean Step 5 expansion theorem]\label{rem:main-formal-step5-sz-residual}
+	\lean{MIPStarRE.LDT.Preliminaries.polynomialCollision_sandwichTensor_le_mdq}
+	\lean{MIPStarRE.LDT.Preliminaries.polynomialCollisionMass}
+	\lean{MIPStarRE.LDT.Preliminaries.polynomialCollisionMass_le_mdq}
+	\lean{MIPStarRE.LDT.Test.MainFormalStep5ExpansionResidual}
+	\lean{MIPStarRE.LDT.Test.mainFormalStep5_expansionResidual}
+	\lean{MIPStarRE.LDT.Test.mainFormalStep5_selfConsistency_ofExpansionResidual}
+	\uses{lem:schwartz-zippel-individual, thm:main-formal}
+	For the Step~5 passage below, Lean now names the weighted polynomial-collision
+	mass, proves its $md/q$ bound by specializing the existing tensor
+	Schwartz--Zippel helper, and proves the algebraic expansion/reindexing
+	statement comparing the evaluated consistency defect with the full-polynomial
+	defect plus that collision mass. The wrapper for Step~5 therefore no longer
+	takes the expansion statement as an external hypothesis.
+\end{remark}
+
+\begin{remark}[Lean residual packages for the main-formal assembly]\label{rem:main-formal-lean-residual-packages}
+\uses{thm:error-cascade-main-formal, thm:main-formal-envelope-basics}
+The following Lean declarations are bookkeeping infrastructure for the final
+assembly residual:
+\lean{MIPStarRE.LDT.ProjStrat.axisParallelRoleAverage_nonneg, MIPStarRE.LDT.ProjStrat.diagonalRoleAverage_nonneg}
+\lean{MIPStarRE.LDT.ProjStrat.lowIndividualDegreeFailureProbability_nonneg, MIPStarRE.LDT.ProjStrat.eps_nonneg_of_passes, MIPStarRE.LDT.ProjStrat.point_agreement_le_three_mul}
+\lean{MIPStarRE.LDT.Test.mainFormalError_ge_one_of_one_le_envelope, MIPStarRE.LDT.Test.mainFormalError_ge_one_of_one_lt_eps, MIPStarRE.LDT.Test.mainFormalError_ge_one_of_q_lt_d}
+\lean{MIPStarRE.LDT.Test.mainFormalInductionNu_bound, MIPStarRE.LDT.Test.cascadeHypotheses_of_not_mainFormalError_ge_one}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeScalars.ofCascadeHypotheses, MIPStarRE.LDT.Test.MainFormalCascadeScalars.ofNontrivialMainFormal}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeTransportTargets, MIPStarRE.LDT.Test.MainFormalCascadeTransportTargets.toCascadeTargets, MIPStarRE.LDT.Test.MainFormalCascadeTargets.toNativeTargets}
+They split off the vacuous branch where the theorem error is at least $1$,
+derive the Step~8 scalar hypotheses in the non-vacuous branch, and leave
+only the transport-only construction of \texttt{MainFormalCascadeTransportTargets}.
+No proof-level completeness tag is claimed here while \texttt{mainFormal} still
+contains that transport residual.
+\end{remark}
 \begin{proof}
 	\proves{thm:main-formal}
 	\uses{thm:main-induction, lem:symmetrization-bridge, lem:orthonormalization-main-lemma, prop:completing-to-measurement, prop:simeq-triangle-inequality, prop:simeq-data-processing, prop:simeq-to-approx, prop:triangle-sub, prop:triangle-inequality-for-approx_delta, lem:schwartz-zippel-individual, def:main-formal-envelope, def:main-formal-error-cascade, thm:sigma-bound-main-formal, thm:zeta-bounds-main-formal}
@@ -548,6 +580,13 @@
 	\[
 		\zeta_1 = 2\sigma + 2\sqrt{3\eps+2\sigma} + \frac{md}{q}.
 	\]
+	The Lean Step~5 wrapper
+	\lean{MIPStarRE.LDT.Test.MainFormalStep5ExpansionResidual}
+	\lean{MIPStarRE.LDT.Test.mainFormalStep5_expansionResidual}
+	\lean{MIPStarRE.LDT.Test.mainFormalStep5_selfConsistency_ofExpansionResidual}
+	formalizes this expansion/reindexing step and combines it with the checked
+	Schwartz--Zippel tensor bound
+	\lean{MIPStarRE.LDT.Preliminaries.polynomialCollisionMass_le_mdq}.
 
 	Apply Lemma~\ref{lem:orthonormalization-main-lemma} to \ref{eq:G-self-consistency}. This gives projective submeasurements $P^{\mathrm A},P^{\mathrm B} \in \polysub{m}{q}{d}$ with
 	\[
@@ -607,11 +646,11 @@
 		I \ot A_a^{\mathrm B,u} \simeq_{\zeta_4} Q_{[g(u)=a]}^{\mathrm A} \ot I.
 	\end{equation}
 
-	The Lean residual package
-	\lean{MIPStarRE.LDT.Test.MainFormalNativeTargets} records exactly these three
-	native targets at errors $\zeta_4$, $\zeta_4$, and $\zeta_3/2$;
-	\lean{MIPStarRE.LDT.Test.MainFormalNativeTargets.toMainFormal} is only the
-	final weakening from those native targets to the theorem's common error envelope.
+	Remark~\ref{rem:main-formal-lean-residual-packages} records the Lean residual
+	packages that separate the scalar cascade from the remaining transport work.
+	The scalar side discharges the paper's line~71--73 coarsening and the Step~8
+	hypotheses in the non-vacuous branch; the remaining residual is the
+	transport-only construction at errors $\zeta_4$, $\zeta_4$, and $\zeta_3/2$.
 
 	With $E$ as in Definition~\ref{def:main-formal-envelope}, the quantities $\sigma,\zeta_1,\zeta_2,\zeta_3,\zeta_4$ form the cascade of Definition~\ref{def:main-formal-error-cascade}. Theorem~\ref{thm:sigma-bound-main-formal} and Theorem~\ref{thm:zeta-bounds-main-formal} package the final inflation to the scale $100000k^2m^4 E$. The underlying paper estimates are:
 	\[

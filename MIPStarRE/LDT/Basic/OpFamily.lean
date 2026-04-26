@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Basic.SubMeasurement
+import MIPStarRE.LDT.Basic.SubMeasurementFamilies
 
 /-!
 # Raw operator families for the low individual degree test

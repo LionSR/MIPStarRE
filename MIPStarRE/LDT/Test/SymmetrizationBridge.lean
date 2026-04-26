@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Test.Strategy
+import MIPStarRE.LDT.Test.StrategyRoleAverage
 
 /-!
 # Section 3 — `ProjStrat → SymStrat` symmetrization bridge
@@ -35,6 +35,10 @@ This bridge module exposes the two facts required to start the proof of
 * `ProjStrat.strategySymmetrization_isNormalized` — normalization of the
   symmetrized state, inherited from the `isNormalized` field already
   bundled into `ProjStrat`.
+* `ProjStrat.StrategySymmetrizationPackage` and
+  `ProjStrat.strategySymmetrizationPackage` — a named Step 1 package carrying
+  the symmetrized strategy together with the two facts above, ready for the
+  later `mainFormal` assembly.
 
 ## References
 
@@ -114,6 +118,70 @@ theorem strategySymmetrization_isNormalized {params : Parameters}
     (strategy : ProjStrat params ι) :
     (strategy.strategySymmetrization).state.IsNormalized :=
   strategy.classicalRoleSymmStrategy_isNormalized
+
+/-- Named data package for Step 1 of `thm:main-formal`.
+
+Paper lines 32--66 of `references/ldt-paper/inductive_step.tex` first turn a
+not-necessarily-symmetric projective strategy that passes the low individual
+degree test with error `ε` into the role-register symmetrized strategy, then
+record that this symmetric strategy is `(3ε,3ε,3ε)`-good and normalized. This
+structure packages exactly that handoff.
+
+It is intentionally a data-carrying `structure`, rather than a theorem returning
+a proposition: downstream steps need the symmetrized `SymStrat` itself, not only
+the proof that the transparent alias `strategy.strategySymmetrization` is good.
+The equality field keeps the package definitionally tied to the public alias, so
+callers can either work with the named `symStrategy` field or rewrite back to
+`strategy.strategySymmetrization`. -/
+structure StrategySymmetrizationPackage (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error) where
+  /-- The paper's role-register symmetrized strategy. -/
+  symStrategy : SymStrat params (Role × ι)
+  /-- The named strategy is exactly the public transparent symmetrization alias. -/
+  symStrategy_eq_strategySymmetrization : symStrategy = strategy.strategySymmetrization
+  /-- Paper lines 33 and 66: the symmetrized strategy is `(3ε,3ε,3ε)`-good. -/
+  isGood : symStrategy.IsGood (3 * eps) (3 * eps) (3 * eps)
+  /-- The role-register symmetrized state remains normalized. -/
+  isNormalized : symStrategy.state.IsNormalized
+
+namespace StrategySymmetrizationPackage
+
+/-- Recover the usual Step 1 goodness statement from the named package. -/
+theorem strategySymmetrization_isGood {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error}
+    (pkg : StrategySymmetrizationPackage params strategy eps) :
+    (strategy.strategySymmetrization).IsGood (3 * eps) (3 * eps) (3 * eps) := by
+  simpa [pkg.symStrategy_eq_strategySymmetrization] using pkg.isGood
+
+/-- Recover normalization of `strategy.strategySymmetrization` from the package. -/
+theorem strategySymmetrization_isNormalized {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error}
+    (pkg : StrategySymmetrizationPackage params strategy eps) :
+    (strategy.strategySymmetrization).state.IsNormalized := by
+  simpa [pkg.symStrategy_eq_strategySymmetrization] using pkg.isNormalized
+
+end StrategySymmetrizationPackage
+
+/-- Construct the Step 1 package from the low individual degree test hypothesis.
+
+This is the paper-faithful bridge needed by the final `mainFormal` assembly: the
+only input is the original strategy's test-passing assumption, and the output is
+the role-register symmetrized strategy together with its `(3ε,3ε,3ε)` goodness and
+normalization proofs. -/
+noncomputable def strategySymmetrizationPackage {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) {eps : Error}
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
+    StrategySymmetrizationPackage params strategy eps where
+  symStrategy := strategy.strategySymmetrization
+  symStrategy_eq_strategySymmetrization := rfl
+  isGood :=
+    strategySymmetrization_isGood_three_mul
+      (strategy := strategy) (eps := eps) hpass
+  isNormalized := strategySymmetrization_isNormalized strategy
 
 end ProjStrat
 

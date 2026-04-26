@@ -24,7 +24,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 /-- Distinct outcomes of a projective submeasurement are orthogonal. -/
-private lemma projSubMeas_outcome_orthogonal
+lemma projSubMeas_outcome_orthogonal
     {α : Type*} [Fintype α]
     (P : ProjSubMeas α ι) (a b : α) (hab : a ≠ b) :
     P.outcome a * P.outcome b = 0 := by
@@ -78,7 +78,7 @@ private lemma projSubMeas_outcome_orthogonal
     _ = 0 := by rw [hPbPa_eq_zero]; simp
 
 /-- Postprocessing a projective submeasurement preserves outcome projectivity. -/
-private lemma postprocess_proj_outcome
+lemma postprocess_proj_outcome
     {α β : Type*} [Fintype α] [Fintype β]
     (P : ProjSubMeas α ι) (f : α → β) (b : β) :
     (postprocess P.toSubMeas f).outcome b * (postprocess P.toSubMeas f).outcome b =

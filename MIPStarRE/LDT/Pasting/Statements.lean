@@ -1,3 +1,5 @@
+import MIPStarRE.LDT.Commutativity.Scaffold.Core
+import MIPStarRE.LDT.MainInductionStep.Defs
 import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
 
 /-!
@@ -115,6 +117,19 @@ noncomputable def fromHToGError (params : Parameters)
     (Real.rpow gamma (1 / (32 : Error)) +
       Real.rpow zeta (1 / (32 : Error)) +
       Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)))
+
+/-- Paper-total scalar error before the final absorption in `lem:from-H-to-G`.
+
+This is the expression at `references/ldt-paper/ld-pasting.tex:1372--1373`:
+there are `k` copies of the `2√(2ζ)` self-consistency loss, but only one
+accumulated `2√ν₄` contribution, where the displayed `ν₄` already contains the
+factor `k^2`.  It is intentionally separate from the uniform per-step helper
+`fromHToGRecurrenceError`, whose `ν₄` term cannot be multiplied by `k` and then
+absorbed into `fromHToGError` as a standalone scalar theorem. -/
+noncomputable def fromHToGPaperTotalError (params : Parameters)
+    (gamma zeta : Error) (k : ℕ) : Error :=
+  (k : Error) * (2 * Real.rpow (2 * zeta) (1 / (2 : Error))) +
+    2 * Real.rpow (commuteGHalfSandwichError params gamma zeta k) (1 / (2 : Error))
 
 /-- The per-step recurrence loss from the proof of `lem:from-H-to-G`. -/
 noncomputable def fromHToGRecurrenceError (params : Parameters)

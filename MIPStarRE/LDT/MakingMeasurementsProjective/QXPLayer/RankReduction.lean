@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.Core
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.TruncationCombinatorics
+import MIPStarRE.LDT.Preliminaries.CompletionTransfer
 import MIPStarRE.Quantum.ProjectorONB
 import Mathlib.Analysis.Matrix.Spectrum
 
