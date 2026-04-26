@@ -148,7 +148,7 @@ structure StrategySymmetrizationPackage (params : Parameters) [FieldModel params
 namespace StrategySymmetrizationPackage
 
 /-- Recover the usual Step 1 goodness statement from the named package. -/
-theorem isGood_strategySymmetrization {params : Parameters} [FieldModel params.q]
+theorem strategySymmetrization_isGood {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : ProjStrat params ι} {eps : Error}
     (pkg : StrategySymmetrizationPackage params strategy eps) :
@@ -156,7 +156,7 @@ theorem isGood_strategySymmetrization {params : Parameters} [FieldModel params.q
   simpa [pkg.symStrategy_eq_strategySymmetrization] using pkg.isGood
 
 /-- Recover normalization of `strategy.strategySymmetrization` from the package. -/
-theorem isNormalized_strategySymmetrization {params : Parameters}
+theorem strategySymmetrization_isNormalized {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : ProjStrat params ι} {eps : Error}
     (pkg : StrategySymmetrizationPackage params strategy eps) :
