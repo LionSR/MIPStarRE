@@ -1654,7 +1654,7 @@ private lemma ldSandwichLineOnePointPrefixMoved_rawCommutation_qSDDCore_bound
       ≤ commuteGHalfSandwichError params gamma zeta (i + 1) := by
   simpa [sddErrorOp, qSDDOp] using hprefixRaw.squaredDistanceBound
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 400000 in
 /-- Scalar absorption for the post-tail-deletion one-point estimate.
 
 This is the arithmetic at `references/ldt-paper/ld-pasting.tex:1028--1033`,
@@ -1952,7 +1952,16 @@ private lemma ldSandwichLineOnePoint_prefix_cauchySchwarz_transport
   refactor the only remaining unproved statement is the analytic comparison
   above.  The exact tail deletion (`ld-pasting.tex:932--953`), option-valued
   match expansion, raw endpoint reindexing, and scalar absorption are all proved
-  outside this residual. -/
+  outside this residual.
+
+  Expected inputs for the eventual fill: use `facts.rawCore` for the
+  `lem:commute-g-half-sandwich` square-distance terms at lines 980--986 and
+  1007--1010; prove the two "second square-root ≤ 1" obligations from
+  `strategy.isNormalized` plus the submeasurement/measurement bounds for the
+  right family and completed-slice sandwiches; then use the prefix-completeness
+  collapse from lines 1011--1024.  If the packaged `rawCore` is not enough, add
+  the needed source hypotheses directly to this residual lemma rather than
+  re-widening `ldSandwichLineOnePoint_matchMass_lower_bound`. -/
   sorry
 
 /-- Scalar residual for the nonzero-coordinate branch of
