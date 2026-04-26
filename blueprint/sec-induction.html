@@ -1985,7 +1985,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>  The following Lean declarations are bookkeeping infrastructure for the final assembly residual:       They split off the vacuous branch where the theorem error is at least \(1\), derive the Step&#160;8 scalar hypotheses in the non-vacuous branch, and leave only the transport-only construction of <span class="ttfamily">MainFormalCascadeTransportTargets</span>. No proof-level completeness tag is claimed here while <span class="ttfamily">mainFormal</span> still contains that transport residual. </p>
+  <p>  The following Lean declarations are bookkeeping infrastructure for the final assembly residual:         They split off the vacuous branch where the theorem error is at least \(1\), derive the Step&#160;8 scalar hypotheses in the non-vacuous branch, use the proved Step&#160;5 Schwartz–Zippel wrapper to convert evaluated pre-projective consistency to full-polynomial consistency at \(\zeta _1\), and leave only the projective-stage construction of <span class="ttfamily">MainFormalCascadeProjectiveStageTargets</span>. That residual still contains the two \(\zeta _4\) point-consistency goals and the line-156 \(\approx _{\zeta _3}\) projectivization bridge; Lean then converts the latter to <span class="ttfamily">MainFormalCascadeTransportTargets</span> using the projective converse of <span class="ttfamily">simeq-to-approx</span>. No proof-level completeness tag is claimed here while <span class="ttfamily">mainFormal</span> still contains that projective-stage residual. </p>
 
   </div>
 </div>
@@ -2130,7 +2130,7 @@
   <span class="equation_label">12</span>
 </p>
 </div>
-<p>Remark&#160;<a href="sec-induction.html#rem:main-formal-lean-residual-packages">10.20</a> records the Lean residual packages that separate the scalar cascade from the remaining transport work. The scalar side discharges the paper’s line&#160;71–73 coarsening and the Step&#160;8 hypotheses in the non-vacuous branch; the remaining residual is the transport-only construction at errors \(\zeta _4\), \(\zeta _4\), and \(\zeta _3/2\). </p>
+<p>Remark&#160;<a href="sec-induction.html#rem:main-formal-lean-residual-packages">10.20</a> records the Lean residual packages that separate the scalar cascade and the Step&#160;5 Schwartz–Zippel handoff from the remaining projective-stage transport work. The scalar side discharges the paper’s line&#160;71–73 coarsening and the Step&#160;8 hypotheses in the non-vacuous branch; the Step&#160;5 wrapper now turns the evaluated estimate at line&#160;116 into full-polynomial consistency at \(\zeta _1\). The remaining residual is the projective-stage construction: the two \(\zeta _4\) point-consistency goals and the line-156 \(\approx _{\zeta _3}\) bridge whose projective converse gives the \(\zeta _3/2\) self-consistency target. </p>
 <p>With \(E\) as in Definition&#160;<a href="sec-induction.html#def:main-formal-envelope">10.13</a>, the quantities \(\sigma ,\zeta _1,\zeta _2,\zeta _3,\zeta _4\) form the cascade of Definition&#160;<a href="sec-induction.html#def:main-formal-error-cascade">10.15</a>. Theorem&#160;<a href="sec-induction.html#thm:sigma-bound-main-formal">10.16</a> and Theorem&#160;<a href="sec-induction.html#thm:zeta-bounds-main-formal">10.17</a> package the final inflation to the scale \(100000k^2m^4 E\). The underlying paper estimates are: </p>
 <div class="displaymath" id="a0000000605">
   \[  \sigma \le 10000k^2m^4\left(\varepsilon ^{1/1024}+(d/q)^{1/1024}+e^{-k/(80000m^2)}\right).  \]
