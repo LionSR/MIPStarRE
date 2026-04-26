@@ -563,10 +563,15 @@ scaffolding, and should be labelled and tracked as such (don't tag with
 
 Mechanical detection is possible for many of these patterns:
 
-- **A1 (conclusion-shaped hypothesis).** When [#438] lands (`\leanok` ↔
-  `sorryAx` drift), extend it with a heuristic: for each `\leanok`-tagged
-  declaration, parse the hypothesis list; if any hypothesis's type (modulo
-  `∃`/`∀`/`∧`) contains a prefix of the conclusion structure, warn.
+- **A1 (conclusion-shaped hypothesis).** Use
+  `python3 scripts/audit_conclusion_shaped_hypotheses.py --ci` as the current
+  report-only tripwire for the PR [#491] inline-existential mutation. It parses
+  theorem/lemma headers and warns when an explicit existential hypothesis shares
+  the conclusion's salient structure, while printing witness-adapter helpers
+  separately. When [#438] lands (`\leanok` ↔ `sorryAx` drift), extend the same
+  idea to all `\leanok`-tagged declarations: parse the hypothesis list; if any
+  hypothesis's type (modulo `∃`/`∀`/`∧`) contains a prefix of the conclusion
+  structure, warn.
 - **A2 (definitional sleight).** Grep for `theorem <Name>.* := rfl` where
   `<Name>` has a blueprint `\lean{}` cross-reference. The only allowed cases
   are ones annotated with `@[paper_bookkeeping]` (proposed attribute) or in

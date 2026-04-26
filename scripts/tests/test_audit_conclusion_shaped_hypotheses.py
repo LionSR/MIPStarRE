@@ -1,0 +1,185 @@
+#!/usr/bin/env python3
+"""Regression tests for scripts/audit_conclusion_shaped_hypotheses.py."""
+
+from __future__ import annotations
+
+import io
+import sys
+import tempfile
+import textwrap
+import unittest
+from contextlib import redirect_stdout
+from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(SCRIPT_DIR))
+
+import audit_conclusion_shaped_hypotheses as audit  # noqa: E402
+from audit_conclusion_shaped_hypotheses import (  # noqa: E402
+    parse_declarations,
+    run_audit,
+    salient_tokens,
+)
+
+
+class ParseDeclarationTests(unittest.TestCase):
+    def test_header_parser_ignores_let_assignment_inside_binder(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "Fake.lean"
+            mod.parent.mkdir()
+            mod.write_text(
+                textwrap.dedent(
+                    """\
+                    theorem wrapper
+                        (params : Parameters)
+                        (hrec :
+                          let local : Package := mkPackage params
+                          ∀ x, ∃ G : Measurement, ConsRel G local)
+                        : ∃ H : Measurement, ConsRel H params := by
+                      sorry
+                    """
+                )
+            )
+            decls = parse_declarations(mod, root=root)
+            self.assertEqual([decl.name for decl in decls], ["wrapper"])
+            self.assertIn("∃ H", decls[0].conclusion)
+            self.assertEqual(decls[0].binders[1].name, "hrec")
+
+
+class AuditHeuristicTests(unittest.TestCase):
+    def _write_fake(self, root: Path, body: str) -> Path:
+        mod = root / "MIPStarRE" / "Fake.lean"
+        mod.parent.mkdir(exist_ok=True)
+        mod.write_text(textwrap.dedent(body))
+        return mod
+
+    def test_salient_tokens_keep_math_identifiers(self) -> None:
+        tokens = salient_tokens(
+            "∃ G : Measurement (Polynomial params) ι, "
+            "ConsRel strategy.state (uniformDistribution (Point params)) "
+            "(polynomialEvaluationFamily params G.toSubMeas) "
+            "(mainInductionError params k eps delta gamma)"
+        )
+        self.assertIn("ConsRel", tokens)
+        self.assertIn("Measurement", tokens)
+        self.assertIn("mainInductionError", tokens)
+        self.assertNotIn("params", tokens)
+
+    def test_flags_inline_conclusion_shaped_existential(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = self._write_fake(
+                root,
+                """\
+                theorem mainInduction
+                    (params : Parameters)
+                    (hwitness :
+                      ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
+                        ConsRel strategy.state (uniformDistribution (Point params))
+                          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+                          (polynomialEvaluationFamily params G.toSubMeas)
+                          error ∧
+                        error ≤ mainInductionError params k eps delta gamma) :
+                    ∃ G : Measurement (Polynomial params) ι,
+                      ConsRel strategy.state (uniformDistribution (Point params))
+                        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+                        (polynomialEvaluationFamily params G.toSubMeas)
+                        (mainInductionError params k eps delta gamma) := by
+                  sorry
+                """,
+            )
+            result = run_audit([mod], root=root)
+            self.assertEqual(len(result.review_findings), 1)
+            finding = result.review_findings[0]
+            self.assertEqual(finding.decl, "mainInduction")
+            self.assertEqual(finding.binder, "hwitness")
+            self.assertFalse(finding.allowed_helper)
+
+    def test_witness_adapter_name_is_allowed_but_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = self._write_fake(
+                root,
+                """\
+                theorem mainInductionOfWitness
+                    (hwitness :
+                      ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
+                        ConsRel strategy.state (uniformDistribution (Point params))
+                          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+                          (polynomialEvaluationFamily params G.toSubMeas)
+                          error ∧
+                        error ≤ mainInductionError params k eps delta gamma) :
+                    ∃ G : Measurement (Polynomial params) ι,
+                      ConsRel strategy.state (uniformDistribution (Point params))
+                        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+                        (polynomialEvaluationFamily params G.toSubMeas)
+                        (mainInductionError params k eps delta gamma) := by
+                  sorry
+                """,
+            )
+            result = run_audit([mod], root=root)
+            self.assertEqual(len(result.review_findings), 0)
+            self.assertEqual(len(result.allowed_findings), 1)
+            self.assertTrue(result.allowed_findings[0].allowed_helper)
+
+    def test_skips_forall_producers_by_default(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = self._write_fake(
+                root,
+                """\
+                theorem recursiveWrapper
+                    (hrec :
+                      ∀ x,
+                        ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
+                          ConsRel strategy.state (uniformDistribution (Point params))
+                            (polynomialEvaluationFamily params G.toSubMeas)
+                            error ∧ error ≤ mainInductionError params k eps delta gamma) :
+                    ∃ G : Measurement (Polynomial params) ι,
+                      ConsRel strategy.state (uniformDistribution (Point params))
+                        (polynomialEvaluationFamily params G.toSubMeas)
+                        (mainInductionError params.next k eps delta gamma) := by
+                  sorry
+                """,
+            )
+            default_result = run_audit([mod], root=root)
+            self.assertEqual(default_result.findings, ())
+            expanded_result = run_audit([mod], root=root, include_forall=True)
+            self.assertEqual(len(expanded_result.review_findings), 1)
+
+
+class MainTests(unittest.TestCase):
+    def test_ci_fails_for_unapproved_review_finding(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "Fake.lean"
+            mod.parent.mkdir()
+            mod.write_text(
+                "theorem bad (h : ∃ G : Measurement, ConsRel G) : "
+                "∃ G : Measurement, ConsRel G := by sorry\n"
+            )
+            with redirect_stdout(io.StringIO()):
+                code = audit.main([
+                    str(mod), "--root", str(root), "--min-common", "2", "--ci"
+                ])
+            self.assertEqual(code, 1)
+
+    def test_ci_passes_for_allowed_witness_adapter(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "Fake.lean"
+            mod.parent.mkdir()
+            mod.write_text(
+                "theorem okOfWitness (h : ∃ G : Measurement, ConsRel G) : "
+                "∃ G : Measurement, ConsRel G := by sorry\n"
+            )
+            with redirect_stdout(io.StringIO()):
+                code = audit.main([
+                    str(mod), "--root", str(root), "--min-common", "2", "--ci"
+                ])
+            self.assertEqual(code, 0)
+
+
+if __name__ == "__main__":
+    unittest.main()
