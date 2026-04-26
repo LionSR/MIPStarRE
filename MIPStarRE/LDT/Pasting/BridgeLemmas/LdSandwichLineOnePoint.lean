@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.Core
 import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich
 
 /-!
@@ -1816,7 +1815,7 @@ private lemma ldSandwichLineOnePoint_endpoint_comm_error_le
     have hjT_to_kT : (j : Error) * (params.m : Error) * T ≤
         (k : Error) * (params.m : Error) * T := by
       have hmT_nonneg : 0 ≤ (params.m : Error) * T := by positivity
-      nlinarith [mul_le_mul_of_nonneg_right hk_ge_j hmT_nonneg]
+      simpa [mul_assoc] using mul_le_mul_of_nonneg_right hk_ge_j hmT_nonneg
     calc
       2 * Real.sqrt (commuteGHalfSandwichError params gamma zeta j)
           ≤ 2 * (21 * (j : Error) * (params.m : Error) * T) := by
