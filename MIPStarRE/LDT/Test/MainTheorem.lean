@@ -744,14 +744,14 @@ structure MainFormalCascadeUnsymmetrizedPOVMTargets
   rightPOVM : Measurement (Polynomial params) ι
   /-- Paper `eq:cons-a`: $G^{\mathrm A}_{[g(u)=a]}\otimes I
   \simeq_{2\sigma} I\otimes A^{\mathrm B,u}_a$. -/
-  leftPOVM_pointBConsistency :
+  leftPOVMPointBConsistency :
     ConsRel strategy.state (uniformDistribution (Point params))
       (polynomialEvaluationFamily params leftPOVM.toSubMeas)
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
       (2 * scalars.sigma)
   /-- Paper `eq:cons-b`: $A^{\mathrm A,u}_a\otimes I
   \simeq_{2\sigma} I\otimes G^{\mathrm B}_{[g(u)=a]}$. -/
-  pointA_rightPOVMConsistency :
+  pointARightPOVMConsistency :
     ConsRel strategy.state (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
       (polynomialEvaluationFamily params rightPOVM.toSubMeas)
@@ -922,7 +922,7 @@ noncomputable def toPreProjectiveSelfConsistency
         (polynomialEvaluationFamily params targets.leftPOVM.toSubMeas)
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
         (2 * scalars.sigma)
-      exact targets.leftPOVM_pointBConsistency
+      exact targets.leftPOVMPointBConsistency
     have hpoint :
         ConsRel strategy.state (uniformDistribution (Point params))
           (IdxMeas.toIdxSubMeas pointA)
@@ -938,7 +938,7 @@ noncomputable def toPreProjectiveSelfConsistency
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
         (polynomialEvaluationFamily params targets.rightPOVM.toSubMeas)
         (2 * scalars.sigma)
-      exact targets.pointA_rightPOVMConsistency
+      exact targets.pointARightPOVMConsistency
     have htriangle :=
       Preliminaries.simeqTriangleInequality strategy.state
         (uniformDistribution (Point params)) strategy.isNormalized
