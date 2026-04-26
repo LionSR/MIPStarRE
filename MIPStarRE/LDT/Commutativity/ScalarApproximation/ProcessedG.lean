@@ -1835,10 +1835,17 @@ private lemma evaluatedSlice_scalar_chain_bound
         |avgOver 𝒟 avgBAB - avgOver 𝒟 phase5Removed| ≤ 2 * Real.sqrt zeta := by
       have hphase67_gap :
           evaluatedSlicePhase67FirstReverseGapResidual params strategy family zeta := by
-        -- TODO(#759/#732): prove the live BAB-side first-coordinate reverse
-        -- `eq:add-an-a` missing-mass estimate.  The opposite inequality is now
+        -- TODO(#759): this is the isolated BAB-side first-coordinate reverse
+        -- `eq:add-an-a` missing-mass estimate; see also #732.  The opposite inequality is now
         -- formalized by `evaluatedSlicePhaseFiveRemoved_sumBabTerm_avg`, so this
         -- residual is strictly one-sided rather than an absolute-value endpoint.
+        -- A zeta-only proof should not be forced here: with perfect
+        -- postprocessed self-consistency, replacing the right-register outcome by
+        -- the corresponding left-register projector leaves a nonzero
+        -- `(1 - A) * B * A * B * (1 - A)` term for noncommuting projectors.  The
+        -- remaining proof must use a commutativity/gamma input or reorient the
+        -- scalar chain so that the reverse `eq:add-an-a` endpoints match the
+        -- paper.
         sorry
       have hphase67_endpoint :
           evaluatedSlicePhase67FirstReverseEndpointResidual params strategy family zeta :=
