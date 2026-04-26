@@ -132,57 +132,54 @@ lemma fullSlice_scalar_marginalize_x
     (sqrtz := Real.sqrt zeta)
     tri.full_bridge tri.tensor_marginalize tri.evaluated_bridge
 
-/-- Tensor-triangle witnesses for the `y`-marginalization scalar wrapper.
+/-- Triangle inequality with explicit bounds for an intermediate point. -/
+private lemma abs_sub_le_of_two_step
+    {a b c e₁ e₂ : Error}
+    (hab : |a - b| ≤ e₁) (hbc : |b - c| ≤ e₂) :
+    |a - c| ≤ e₁ + e₂ :=
+  (abs_sub_le a b c).trans (add_le_add hab hbc)
 
-This is the y-side analogue of
-`FullSliceScalarMarginalizeXTensorTriangle`.  The #750 staged tensor
-marginalization from `xEvaluatedFullSliceABABtensorAvg` to
-`evaluatedSliceABABtensorAvg` is now exported, but it cannot fill this structure
-as written: the preceding full-scalar-to-x-evaluated-tensor chain also contains
-an `md/q` Schwartz-Zippel loss, while `full_bridge` only permits a `√ζ` loss.
-The residual is therefore intentionally left uninstantiated until the y-side
-budget/structure is restated paper-faithfully. -/
-private structure FullSliceScalarMarginalizeYTensorTriangle
+/-- Residual for the still-unproved prefix of the y-side second-term chain.
+
+The target is now paper-faithful: starting from the full scalar quartic
+`fullSliceABABAvg`, lines 332--360 first move through the `BAB ⊗ A` tensor form,
+spend the x-side Schwartz-Zippel loss, and then use two `closenessOfIP` bridges
+to reach the mixed endpoint `xEvaluatedFullSliceABABtensorAvg`.  This costs
+`md/q + 3√ζ`; the y-tail after this endpoint is exported by `Transport.FullSlice`. -/
+private structure FullSliceScalarMarginalizeYPrefixResidual
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (zeta : Error) where
-  fullTensor : Error
-  evaluatedTensor : Error
-  full_bridge :
-    |fullSliceABABAvg params strategy family - fullTensor| ≤ Real.sqrt zeta
-  tensor_marginalize :
-    |fullTensor - evaluatedTensor| ≤
-      (↑params.m : Error) * ↑params.d / ↑params.q
-  evaluated_bridge :
-    |evaluatedSliceABABAvg params strategy family - evaluatedTensor| ≤ Real.sqrt zeta
+  prefix_bound :
+    |fullSliceABABAvg params strategy family -
+        xEvaluatedFullSliceABABtensorAvg params strategy family| ≤
+      (↑params.m : Error) * ↑params.d / ↑params.q + 3 * Real.sqrt zeta
 
-/-- Residual witness construction for the `y` side.
+/-- Remaining prefix witness for the `y` side.
 
-The tempting assignment
-`fullTensor := xEvaluatedFullSliceABABtensorAvg` is deliberately *not* used:
-paper `commutativity-G.tex` lines 332--360 show that reaching that endpoint from
-`fullSliceABABAvg` costs `md/q + 3√ζ`, not the `√ζ` allowed by the
-`full_bridge` field.  Thus PR #750's y tensor marginalization is useful future
-API, but the current scalar wrapper remains a whole residual until its
-intermediate structure/budget is widened. -/
-private noncomputable def fullSliceScalarMarginalizeYTensorTriangleResidual
+This is the only y-side proof gap left in this file after exposing the proved
+#750 tail.  It corresponds to paper `commutativity-G.tex` lines 332--360, not to
+the y-marginalization line 369--385. -/
+private noncomputable def fullSliceScalarMarginalizeYPrefixResidual
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (zeta : Error)
     (hnorm : strategy.state.IsNormalized)
     (hself : family.StronglySelfConsistent strategy.state zeta) :
-    FullSliceScalarMarginalizeYTensorTriangle params strategy family zeta := by
-  -- The current field types leave no honest way to use
-  -- `fullSliceABAB_tensor_marginalize_y` directly: the preceding x-stage already
-  -- spends a Schwartz-Zippel `md/q` loss.  Keep the endpoint choices open rather
-  -- than committing the residual to a false `√ζ` bridge.
+    FullSliceScalarMarginalizeYPrefixResidual params strategy family zeta := by
+  -- The exported #750 y-tail starts only at `xEvaluatedFullSliceABABtensorAvg`.
+  -- The prefix still needs the paper's x-stage tensor/scalar assembly:
+  -- `√ζ` for `eq:gcom4`, `md/q` for `eq:gcom4-diff`, and two further `√ζ`
+  -- bridges in lines 356--360.
   sorry
 
-/-- Paper `eq:evaluate-gcom-at-points-part-dos`
-(`commutativity-G.tex` lines 369-385), in the scalar public API chosen by #713.
+/-- Paper-faithful second-term transport bound.
 
-Schwartz-Zippel marginalization on the `y` variable after the scalar↔tensor
-bridges costs at most `(params.m · params.d) / params.q + 2√ζ`. -/
+The first prefix (paper lines 332--360) costs `md/q + 3√ζ`; the proved y-tail
+uses y-Schwartz--Zippel marginalization (paper lines 369--385) plus the `√ζ`
+scalar↔tensor bridge that is the doubly-evaluated analogue of paper line 360,
+for a total `md/q + √ζ`. Thus the whole scalar second-term comparison costs
+`2·md/q + 4√ζ`. -/
 lemma fullSlice_scalar_marginalize_y
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
@@ -191,18 +188,21 @@ lemma fullSlice_scalar_marginalize_y
     (hself : family.StronglySelfConsistent strategy.state zeta) :
     |fullSliceABABAvg params strategy family -
         evaluatedSliceABABAvg params strategy family| ≤
-      (↑params.m : Error) * ↑params.d / ↑params.q + 2 * Real.sqrt zeta := by
-  let tri :=
-    fullSliceScalarMarginalizeYTensorTriangleResidual
+      (2 * ((↑params.m : Error) * ↑params.d / ↑params.q) + 4 * Real.sqrt zeta) := by
+  let yPrefix :=
+    fullSliceScalarMarginalizeYPrefixResidual
       params strategy family zeta hnorm hself
-  exact abs_sub_le_of_tensor_triangle
-    (fullScalar := fullSliceABABAvg params strategy family)
-    (evalScalar := evaluatedSliceABABAvg params strategy family)
-    (fullTensor := tri.fullTensor)
-    (evalTensor := tri.evaluatedTensor)
-    (mdq := (↑params.m : Error) * ↑params.d / ↑params.q)
-    (sqrtz := Real.sqrt zeta)
-    tri.full_bridge tri.tensor_marginalize tri.evaluated_bridge
+  have htail :=
+    xEvaluatedFullSliceABABtensor_to_evaluatedSliceABABAvg
+      params strategy family zeta hnorm hself
+  have h := abs_sub_le_of_two_step yPrefix.prefix_bound htail
+  calc
+    |fullSliceABABAvg params strategy family -
+        evaluatedSliceABABAvg params strategy family|
+      ≤ ((↑params.m : Error) * ↑params.d / ↑params.q + 3 * Real.sqrt zeta) +
+          ((↑params.m : Error) * ↑params.d / ↑params.q + Real.sqrt zeta) := h
+    _ = 2 * ((↑params.m : Error) * ↑params.d / ↑params.q) +
+          4 * Real.sqrt zeta := by ring
 
 /-- Local alias for the evaluated-slice `ABA ⊗ B` endpoint.
 

@@ -465,7 +465,7 @@ This is the y-side intermediate in paper `eq:evaluate-gcom-at-points-part-dos`:
 the first/`x` family has already been postprocessed at `u`, while the second/`y`
 family still ranges over full polynomial outcomes.  The y-side tensor
 marginalization lemma below compares this to `evaluatedSliceABABtensorAvg`. -/
-private noncomputable def xEvaluatedFullSliceABABtensorAvg
+noncomputable def xEvaluatedFullSliceABABtensorAvg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
   avgOver (uniformDistribution (Point params × FullSliceQuestion params))
@@ -2295,6 +2295,39 @@ private lemma evaluatedSliceABAB_scalar_to_ABABtensor
               ev strategy.state (C q b a * B q b))| := by
             rw [hScalar, hTensor]
     _ ≤ Real.sqrt zeta := hclose
+
+/-- Proved y-tail from the mixed `ABA ⊗ B` tensor endpoint to the evaluated
+scalar quartic.
+
+This packages the paper steps after the x-stage has already reached
+`xEvaluatedFullSliceABABtensorAvg`: y-Schwartz-Zippel marginalization
+(`commutativity-G.tex` lines 369--385) followed by the `√ζ`
+`closenessOfIP` move that swaps a trailing `G^y_{[h(v)=b]}` between the
+scalar quartic and the `ABA ⊗ B` tensor -- the doubly-evaluated analogue
+of paper line 360, exposed via `evaluatedSliceABAB_scalar_to_ABABtensor`. -/
+lemma xEvaluatedFullSliceABABtensor_to_evaluatedSliceABABAvg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hself : family.StronglySelfConsistent strategy.state zeta) :
+    |xEvaluatedFullSliceABABtensorAvg params strategy family -
+        evaluatedSliceABABAvg params strategy family| ≤
+      (↑params.m : Error) * ↑params.d / ↑params.q + Real.sqrt zeta := by
+  have hyTensor :=
+    fullSliceABAB_tensor_marginalize_y params strategy family hnorm
+  have hevalBridge :=
+    evaluatedSliceABAB_scalar_to_ABABtensor params strategy family zeta hnorm hself
+  have hevalBridge' :
+      |evaluatedSliceABABtensorAvg params strategy family -
+          evaluatedSliceABABAvg params strategy family| ≤ Real.sqrt zeta := by
+    rwa [abs_sub_comm] at hevalBridge
+  have htri :=
+    abs_sub_le
+      (xEvaluatedFullSliceABABtensorAvg params strategy family)
+      (evaluatedSliceABABtensorAvg params strategy family)
+      (evaluatedSliceABABAvg params strategy family)
+  linarith
 
 /-- Paper `eq:gcomterms` (`commutativity-G.tex` lines 286-290).
 
