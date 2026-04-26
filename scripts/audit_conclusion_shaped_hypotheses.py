@@ -207,8 +207,74 @@ def _skip_raw_string_literal(text: str, start: int) -> int | None:
     return end + len(closing)
 
 
+def _is_interpolated_string_start(text: str, start: int) -> bool:
+    """Return whether ``start`` begins a Lean interpolated string prefix."""
+    if start > 0 and _identifier_char(text[start - 1]):
+        return False
+    return any(text.startswith(prefix, start) for prefix in ("s!\"", "m!\"", "f!\""))
+
+
+def _skip_interpolation_expr(text: str, start: int) -> int | None:
+    """Return the offset after an interpolated-string ``{...}`` expression."""
+    depth = 1
+    i = start + 1
+    while i < len(text):
+        if text.startswith("--", i):
+            newline = text.find("\n", i + 2)
+            if newline == -1:
+                return None
+            i = newline + 1
+            continue
+        if text.startswith("/-", i):
+            end = _skip_block_comment(text, i)
+            if end is None:
+                return None
+            i = end
+            continue
+        string_end = _skip_string_like(text, i)
+        if string_end is not None:
+            i = string_end
+            continue
+        if text[i] == "{":
+            depth += 1
+            i += 1
+            continue
+        if text[i] == "}":
+            depth -= 1
+            i += 1
+            if depth == 0:
+                return i
+            continue
+        i += 1
+    return None
+
+
+def _skip_interpolated_string_literal(text: str, start: int) -> int | None:
+    """Return the offset after a Lean interpolated string literal."""
+    if not _is_interpolated_string_start(text, start):
+        return None
+    i = start + 3
+    while i < len(text):
+        if text[i] == "\\":
+            i += 2
+            continue
+        if text[i] == "{":
+            end = _skip_interpolation_expr(text, i)
+            if end is None:
+                return None
+            i = end
+            continue
+        if text[i] == '"':
+            return i + 1
+        i += 1
+    return None
+
+
 def _skip_string_like(text: str, start: int) -> int | None:
-    """Return the offset after a regular or raw Lean string starting at ``start``."""
+    """Return the offset after a regular, raw, or interpolated Lean string."""
+    interpolated_end = _skip_interpolated_string_literal(text, start)
+    if interpolated_end is not None:
+        return interpolated_end
     raw_end = _skip_raw_string_literal(text, start)
     if raw_end is not None:
         return raw_end

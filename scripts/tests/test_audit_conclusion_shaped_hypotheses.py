@@ -346,6 +346,56 @@ class ParseDeclarationTests(unittest.TestCase):
             result = run_audit([mod], root=root, min_common=2)
             self.assertEqual(result.findings, ())
 
+    def test_header_parser_ignores_interpolated_string_declarations(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "Fake.lean"
+            mod.parent.mkdir()
+            mod.write_text(
+                textwrap.dedent(
+                    """\
+                    def snippet := s!"prefix {"
+                    theorem interpolatedStringBad
+                        (h : ∃ G : Measurement, ConsRel G) :
+                        ∃ G : Measurement, ConsRel G := by
+                      sorry
+                    "} suffix"
+
+                    theorem realDecl : True := by
+                      trivial
+                    """
+                ),
+                encoding="utf-8",
+            )
+            decls = parse_declarations(mod, root=root)
+            self.assertEqual([decl.name for decl in decls], ["realDecl"])
+            result = run_audit([mod], root=root, min_common=2)
+            self.assertEqual(result.findings, ())
+
+    def test_header_parser_resynchronizes_after_interpolated_string(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "Fake.lean"
+            mod.parent.mkdir()
+            mod.write_text(
+                textwrap.dedent(
+                    """\
+                    def snippet := s!"prefix {"nested {braces} and quoted theorem text"} suffix"
+
+                    theorem realBad
+                        (h : ∃ G : Measurement, ConsRel G) :
+                        ∃ G : Measurement, ConsRel G := by
+                      sorry
+                    """
+                ),
+                encoding="utf-8",
+            )
+            decls = parse_declarations(mod, root=root)
+            self.assertEqual([decl.name for decl in decls], ["realBad"])
+            result = run_audit([mod], root=root, min_common=2)
+            self.assertEqual(len(result.review_findings), 1)
+            self.assertEqual(result.review_findings[0].decl, "realBad")
+
     def test_binder_extraction_ignores_comments_and_strings(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
