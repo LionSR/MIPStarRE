@@ -556,7 +556,7 @@ theorem mainFormalError_ge_one_of_one_lt_eps
     Real.exp_nonneg _
   have henv : 1 ≤ mainFormalEnvelope params k eps := by
     unfold mainFormalEnvelope
-    nlinarith
+    linarith
   exact mainFormalError_ge_one_of_one_le_envelope params k eps hk0 henv
 
 /-- If `d > q`, then the final error envelope has already saturated past `1`.
@@ -579,7 +579,7 @@ theorem mainFormalError_ge_one_of_q_lt_d
     Real.exp_nonneg _
   have henv : 1 ≤ mainFormalEnvelope params k eps := by
     unfold mainFormalEnvelope
-    nlinarith
+    linarith
   exact mainFormalError_ge_one_of_one_le_envelope params k eps hk0 henv
 
 /-- In the non-vacuous branch of `mainFormal`, the standing scalar hypotheses of
@@ -745,9 +745,11 @@ structure MainFormalCascadeTargets
 cascade has been discharged.
 
 Compared with `MainFormalCascadeTargets`, this package is parameterized by an
-already-constructed `MainFormalCascadeScalars`. It therefore records only the
-unsymmetrization, Schwartz--Zippel, and projectivization targets from
-`inductive_step.tex` lines 84--185. -/
+already-constructed `MainFormalCascadeScalars`. The field shapes intentionally
+mirror the transport fields of `MainFormalCascadeTargets`, so downstream changes
+to the native `ConsRel` targets should keep the two records synchronized. It
+therefore records only the unsymmetrization, Schwartz--Zippel, and
+projectivization targets from `inductive_step.tex` lines 84--185. -/
 structure MainFormalCascadeTransportTargets
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
