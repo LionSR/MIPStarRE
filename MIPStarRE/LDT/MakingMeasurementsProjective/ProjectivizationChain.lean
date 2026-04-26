@@ -1,6 +1,8 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
 import MIPStarRE.LDT.Preliminaries.Completion
 import MIPStarRE.LDT.Preliminaries.CompletionTransfer
+import MIPStarRE.LDT.Preliminaries.DistanceBounds
+import MIPStarRE.LDT.Preliminaries.Triangles
 
 /-!
 # Section 10 — Step 6 (orthonormalize-and-complete chain)
@@ -83,6 +85,8 @@ absorbed form as a downstream calculation.
   (orthonormalization theorem).
 -/
 
+open scoped BigOperators MatrixOrder Matrix ComplexOrder
+
 namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 open MIPStarRE.LDT
@@ -108,6 +112,104 @@ noncomputable def orthonormalizeAndCompleteError (ζ : Error) : Error :=
   2 * orthonormalizationError ζ +
     4 * Real.sqrt (orthonormalizationError ζ) +
     2 * ζ
+
+/-! ### Line-156 triangle handoff -/
+
+/-- Residual handoff for the projectivization part of Step 6.
+
+The fields are exactly the hypotheses needed after the orthonormalization and
+completion constructions have produced projective measurements `Q_A,Q_B` close to
+the pre-projective measurements `G_A,G_B`.  The theorem
+`ProjectivizationLine156Handoff.line156Approx` below turns this package into the
+paper's line-156 approximation. -/
+structure ProjectivizationLine156Handoff
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι))
+    (G_A G_B : Measurement Outcome ι) (Q_A Q_B : ProjMeas Outcome ι)
+    (ζ₁ ζ₂ : Error) : Prop where
+  /-- Paper line 131, obtained before projectivization. -/
+  preProjectiveConsistency :
+    ConsRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily G_A.toSubMeas)
+      (constSubMeasFamily G_B.toSubMeas) ζ₁
+  /-- Left-register completion closeness, paper line 146 (`eq:G-with-Q-A`). -/
+  leftCompletionCloseness :
+    SDDRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily G_A.toSubMeas.liftLeft)
+      (constSubMeasFamily Q_A.toSubMeas.liftLeft) ζ₂
+  /-- Right-register completion closeness, paper line 147. -/
+  rightCompletionCloseness :
+    SDDRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily G_B.toSubMeas.liftRight)
+      (constSubMeasFamily Q_B.toSubMeas.liftRight) ζ₂
+
+namespace ProjectivizationLine156Handoff
+
+/-- Step 6 line-156 handoff.
+
+From line-131 consistency `G_A ⊗ I ≃_{ζ₁} I ⊗ G_B`,
+`prop:simeq-to-approx` gives `G_A ⊗ I ≈_{2ζ₁} I ⊗ G_B`.  Combining this with
+the two completion closeness estimates by the **three-step** squared-distance
+triangle gives
+
+`Q_A ⊗ I ≈_{3(ζ₂ + 2ζ₁ + ζ₂)} I ⊗ Q_B`,
+
+which is exactly the paper's `ζ₃ = 6ζ₁ + 6ζ₂`
+(`inductive_step.tex:154--158`). -/
+theorem line156Approx {Outcome : Type*} {ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState (ι × ι)}
+    {G_A G_B : Measurement Outcome ι} {Q_A Q_B : ProjMeas Outcome ι}
+    {ζ₁ ζ₂ : Error}
+    (handoff : ProjectivizationLine156Handoff ψ G_A G_B Q_A Q_B ζ₁ ζ₂) :
+    MIPStarRE.LDT.Preliminaries.BipartiteSDDRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily Q_A.toSubMeas)
+      (constSubMeasFamily Q_B.toSubMeas)
+      (6 * ζ₁ + 6 * ζ₂) := by
+  let GLeft : IdxMeas Unit Outcome ι := fun _ => G_A
+  let GRight : IdxMeas Unit Outcome ι := fun _ => G_B
+  have hpreMeas : ConsRel ψ (uniformDistribution Unit)
+      (IdxMeas.toIdxSubMeas GLeft) (IdxMeas.toIdxSubMeas GRight) ζ₁ := by
+    simpa [GLeft, GRight, constSubMeasFamily, IdxMeas.toIdxSubMeas] using
+      handoff.preProjectiveConsistency
+  have hGBip :=
+    MIPStarRE.LDT.Preliminaries.simeqToApprox ψ (uniformDistribution Unit)
+      GLeft GRight ζ₁ hpreMeas
+  have hmid : SDDRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily G_A.toSubMeas.liftLeft)
+      (constSubMeasFamily G_B.toSubMeas.liftRight)
+      (2 * ζ₁) := by
+    constructor
+    simpa [GLeft, GRight, constSubMeasFamily, IdxMeas.toIdxSubMeas,
+      IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using
+      hGBip.leftRightSquaredDistanceBound
+  have hleftSymm : SDDRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily Q_A.toSubMeas.liftLeft)
+      (constSubMeasFamily G_A.toSubMeas.liftLeft) ζ₂ := by
+    exact MIPStarRE.LDT.Preliminaries.sddRel_symm ψ (uniformDistribution Unit)
+      (constSubMeasFamily G_A.toSubMeas.liftLeft)
+      (constSubMeasFamily Q_A.toSubMeas.liftLeft) ζ₂
+      handoff.leftCompletionCloseness
+  have htri := MIPStarRE.LDT.Preliminaries.stateDependentDistanceRel_triangle_three ψ
+    (uniformDistribution Unit)
+    (constSubMeasFamily Q_A.toSubMeas.liftLeft)
+    (constSubMeasFamily G_A.toSubMeas.liftLeft)
+    (constSubMeasFamily G_B.toSubMeas.liftRight)
+    (constSubMeasFamily Q_B.toSubMeas.liftRight)
+    ζ₂ (2 * ζ₁) ζ₂ hleftSymm hmid handoff.rightCompletionCloseness
+  constructor
+  change sddError ψ (uniformDistribution Unit)
+      (constSubMeasFamily Q_A.toSubMeas.liftLeft)
+      (constSubMeasFamily Q_B.toSubMeas.liftRight) ≤ 6 * ζ₁ + 6 * ζ₂
+  calc
+    sddError ψ (uniformDistribution Unit)
+        (constSubMeasFamily Q_A.toSubMeas.liftLeft)
+        (constSubMeasFamily Q_B.toSubMeas.liftRight)
+        ≤ 3 * (ζ₂ + 2 * ζ₁ + ζ₂) := htri.squaredDistanceBound
+    _ = 6 * ζ₁ + 6 * ζ₂ := by ring
+
+end ProjectivizationLine156Handoff
 
 /-! ### Output package -/
 

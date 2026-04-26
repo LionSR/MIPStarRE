@@ -438,6 +438,16 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 	Expand $(A_1-A_{k+1})\ket{\psi}$ as a telescoping sum and apply Lemma~\ref{prop:triangle-inequality-for-vectors-squared}.
 \end{proof}
 
+\begin{remark}[Lean finite-step triangle helpers]\label{rem:lean-finite-step-triangle-helpers}
+	\lean{MIPStarRE.LDT.ev_diff_triangle, MIPStarRE.LDT.normalizedTrace_triangle_three, MIPStarRE.LDT.ev_diff_triangle_three}
+	\lean{MIPStarRE.LDT.Preliminaries.questionSDD_triangle, MIPStarRE.LDT.Preliminaries.questionSDD_triangle_three, MIPStarRE.LDT.Preliminaries.stateDependentDistanceRel_triangle, MIPStarRE.LDT.Preliminaries.stateDependentDistanceRel_triangle_three}
+	The general operator-family theorem above is complemented in Lean by reusable
+	binary and three-step helper lemmas for operator expectations, `qSDD`, and
+	`SDDRel`.  The three-step `SDDRel` helper is the specialization used in the
+	Step~6 projectivization chain in Theorem~\ref{thm:main-formal}; this remark is
+	only a cross-reference and makes no separate proof-level completeness claim.
+\end{remark}
+
 \begin{lemma}[Triangle inequality for $\simeq_\delta$]\label{prop:simeq-triangle-inequality}
 	\lean{MIPStarRE.LDT.Preliminaries.simeqTriangleInequality}
 	\leanok
