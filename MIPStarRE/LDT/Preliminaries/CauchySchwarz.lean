@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Preliminaries.Theorems
+import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.InnerProduct
 
 /-!
 # Cauchy–Schwarz Inequalities for Approximate Measurements

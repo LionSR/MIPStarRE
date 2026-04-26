@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichMain.Completeness
+import MIPStarRE.LDT.Test.StrategyCore
 
 /-!
 # Preliminary comparison theorems: bipartite self-consistency (core)

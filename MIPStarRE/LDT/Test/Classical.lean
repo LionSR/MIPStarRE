@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Test.Strategy
+import MIPStarRE.LDT.Test.StrategyCore
 
 /-!
 # Section 3 — Classical two-prover strategies

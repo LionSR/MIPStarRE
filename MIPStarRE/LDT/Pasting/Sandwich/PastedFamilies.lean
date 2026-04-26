@@ -1,5 +1,7 @@
 import MIPStarRE.LDT.Basic.SubMeasurementFamilies
+import MIPStarRE.LDT.CommutativityPoints.Approximation
 import MIPStarRE.LDT.Pasting.Sandwich.GHatSandwich
+import MIPStarRE.LDT.Preliminaries.Defs
 import MIPStarRE.LDT.Test.StrategyFailures
 
 /-!

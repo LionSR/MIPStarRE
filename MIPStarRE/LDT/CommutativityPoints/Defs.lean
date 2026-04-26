@@ -1,4 +1,7 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems
+import MIPStarRE.LDT.Basic.OpFamily
+import MIPStarRE.LDT.Basic.SubMeasurementFamilies
+import MIPStarRE.LDT.GlobalVariance.Defs.Core
+import MIPStarRE.LDT.Test.StrategyCore
 
 set_option linter.style.setOption false
 set_option linter.flexible false

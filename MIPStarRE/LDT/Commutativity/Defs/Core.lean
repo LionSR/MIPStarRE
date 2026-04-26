@@ -1,4 +1,5 @@
-import MIPStarRE.LDT.CommutativityPoints.Theorem
+import MIPStarRE.LDT.CommutativityPoints.Defs
+import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
 
 /-!
 # Section 11 commutativity: core definitions

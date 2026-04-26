@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Basic.Distribution
+import MIPStarRE.LDT.Basic.OperatorExpectations
 import MIPStarRE.LDT.Basic.SubMeasurementCore
 
 /-!

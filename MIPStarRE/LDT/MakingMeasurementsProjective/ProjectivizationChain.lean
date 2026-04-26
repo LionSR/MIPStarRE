@@ -1,5 +1,6 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.Theorems
+import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
 import MIPStarRE.LDT.Preliminaries.Completion
+import MIPStarRE.LDT.Preliminaries.CompletionTransfer
 
 /-!
 # Section 10 — Step 6 (orthonormalize-and-complete chain)

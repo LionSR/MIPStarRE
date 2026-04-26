@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Commutativity.GCommStability.OverlapTwo
+import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.Core
 
 /-!
 # Section 11 commutativity: transport via evaluation specialization

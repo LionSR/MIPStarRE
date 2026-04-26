@@ -1,7 +1,7 @@
 import MIPStarRE.LDT.Pasting.Statements
 import MIPStarRE.LDT.MainInductionStep.Statements
-import MIPStarRE.LDT.Preliminaries.Theorems
-import MIPStarRE.LDT.Preliminaries.SelfConsistency
+import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
+import MIPStarRE.LDT.Preliminaries.Triangles
 
 set_option linter.style.setOption false
 set_option linter.flexible false

@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Pasting.Defs.Families
+import MIPStarRE.LDT.CommutativityPoints.Defs
 
 /-!
 # Section 12 — Sandwich constructions: switcheroo families
@@ -9,7 +10,6 @@ Switcheroo, complete-part, and half-product operator families.
 namespace MIPStarRE.LDT.Pasting
 
 open MIPStarRE.LDT
-open MIPStarRE.LDT.ExpansionHypercubeGraph
 open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

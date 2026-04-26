@@ -1,8 +1,10 @@
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Results
+import MIPStarRE.LDT.Preliminaries.ComparisonCore
 import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 import MIPStarRE.LDT.GlobalVariance.MatrixRealization
 import MIPStarRE.LDT.GlobalVariance.Theorems.Averaging
 import MIPStarRE.LDT.GlobalVariance.Theorems.Statements
+import MIPStarRE.LDT.Test.StrategyFailures
 
 namespace MIPStarRE.LDT.GlobalVariance
 

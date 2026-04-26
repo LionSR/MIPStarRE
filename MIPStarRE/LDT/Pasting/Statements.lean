@@ -1,3 +1,5 @@
+import MIPStarRE.LDT.Commutativity.Scaffold.Core
+import MIPStarRE.LDT.MainInductionStep.Defs
 import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
 
 /-!

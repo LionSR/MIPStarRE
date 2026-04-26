@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceBounds.PhaseTwo
+import MIPStarRE.LDT.CommutativityPoints.BridgeTheorems.DropBridges
 
 /-!
 # Section 11 commutativity: evaluated-slice commutation (phases 4 and 5)

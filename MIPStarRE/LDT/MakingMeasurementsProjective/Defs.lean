@@ -1,5 +1,6 @@
-import MIPStarRE.LDT.Preliminaries.Theorems
-import MIPStarRE.Quantum
+import MIPStarRE.LDT.Basic.QuantumState
+import MIPStarRE.LDT.Basic.SubMeasurementCore
+import MIPStarRE.Quantum.Measurement
 
 /-!
 # Section 5 — Making measurements projective: definitions
