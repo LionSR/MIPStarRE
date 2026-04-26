@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.MainInductionStep
 import MIPStarRE.LDT.Test.ErrorCascade
+import MIPStarRE.LDT.Test.StrategyFailures
 import MIPStarRE.LDT.Test.SymmetrizationBridge
 
 /-!
