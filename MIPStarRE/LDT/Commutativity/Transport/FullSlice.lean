@@ -1469,6 +1469,106 @@ lemma normalizationCondition_sandwich_bound
     postprocess] using
     (normalizationConditionSquareFamily P Q).total_le_one
 
+/-- Distinct outcomes of a projective submeasurement are orthogonal.
+
+This local helper is the submeasurement analogue of `ProjMeas.outcome_orthogonal`.
+It is used only to package evaluated/postprocessed polynomial outcomes as a
+projective submeasurement for the line-360 `closenessOfIP` bridge below. -/
+private theorem projSubMeas_outcome_orthogonal
+    {α : Type*} [Fintype α] (P : ProjSubMeas α ι) (a b : α) (hab : a ≠ b) :
+    P.outcome a * P.outcome b = 0 := by
+  classical
+  set Pa := P.outcome a
+  set Pb := P.outcome b
+  have hPa_herm : Paᴴ = Pa := P.outcome_hermitian a
+  have hPb_herm : Pbᴴ = Pb := P.outcome_hermitian b
+  have hPb_le : Pb ≤ 1 - Pa := by
+    have hsum : Pa + Pb ≤ ∑ i, P.outcome i := by
+      calc
+        Pa + Pb = ∑ i ∈ ({a, b} : Finset α), P.outcome i := by
+            simp [Pa, Pb, hab]
+        _ ≤ ∑ i, P.outcome i :=
+            Finset.sum_le_sum_of_subset_of_nonneg
+              (Finset.subset_univ _)
+              (fun i _ _ => P.toSubMeas.outcome_pos i)
+    have hsum_one : Pa + Pb ≤ 1 := by
+      calc
+        Pa + Pb ≤ ∑ i, P.outcome i := hsum
+        _ = P.total := P.toSubMeas.sum_eq_total
+        _ ≤ 1 := P.toSubMeas.total_le_one
+    calc
+      Pb = Pa + Pb - Pa := by abel
+      _ ≤ 1 - Pa := sub_le_sub_right hsum_one Pa
+  have hPaPbPa_nonneg : 0 ≤ Pa * Pb * Pa :=
+    MIPStarRE.Quantum.sandwich_nonneg (P.toSubMeas.outcome_pos b) hPa_herm
+  have hPa_idem : Pa * (1 - Pa) * Pa = 0 := by
+    calc
+      Pa * (1 - Pa) * Pa = (Pa * 1 - Pa * Pa) * Pa := by rw [mul_sub]
+      _ = 0 := by simp [Pa, P.proj a]
+  have hPaPbPa_eq_zero : Pa * Pb * Pa = 0 := by
+    apply le_antisymm
+    · calc
+        Pa * Pb * Pa ≤ Pa * (1 - Pa) * Pa :=
+          MIPStarRE.Quantum.sandwich_mono hPa_herm hPb_le
+        _ = 0 := hPa_idem
+    · exact hPaPbPa_nonneg
+  have hPbPa_eq_zero : Pb * Pa = 0 := by
+    apply Matrix.conjTranspose_mul_self_eq_zero.mp
+    calc
+      (Pb * Pa)ᴴ * (Pb * Pa) = (Paᴴ * Pbᴴ) * (Pb * Pa) := by
+          simp [Matrix.conjTranspose_mul]
+      _ = Pa * (Pb * Pb) * Pa := by
+          simp [hPa_herm, hPb_herm, mul_assoc]
+      _ = Pa * Pb * Pa := by
+          simp [Pb, P.proj b]
+      _ = 0 := hPaPbPa_eq_zero
+  calc
+    Pa * Pb = (Pb * Pa)ᴴ := by
+        simp [Matrix.conjTranspose_mul, hPa_herm, hPb_herm]
+    _ = 0 := by rw [hPbPa_eq_zero]; simp
+
+/-- Postprocessing preserves projective submeasurements.
+
+Kept file-local to avoid touching the basic submeasurement API while collaborator
+PR #794 is active in `Basic/SubMeasurementFamilies.lean`. -/
+private noncomputable def projSubMeasPostprocess
+    {α β : Type*} [Fintype α] [Fintype β]
+    (P : ProjSubMeas α ι) (f : α → β) : ProjSubMeas β ι where
+  toSubMeas := postprocess P.toSubMeas f
+  proj := by
+    classical
+    intro b
+    let fiber : Finset α := Finset.univ.filter fun a => f a = b
+    calc
+      (postprocess P.toSubMeas f).outcome b *
+          (postprocess P.toSubMeas f).outcome b
+        = (∑ a ∈ fiber, P.outcome a) * (∑ a' ∈ fiber, P.outcome a') := by
+            simp [postprocess, fiber]
+      _ = ∑ a ∈ fiber, ∑ a' ∈ fiber, P.outcome a * P.outcome a' := by
+            rw [Finset.sum_mul]
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            rw [Finset.mul_sum]
+      _ = ∑ a ∈ fiber, P.outcome a := by
+            refine Finset.sum_congr rfl ?_
+            intro a ha
+            rw [Finset.sum_eq_single a]
+            · simp [P.proj]
+            · intro a' ha' hne_symm
+              have hne : a ≠ a' := fun h' => hne_symm h'.symm
+              simp [projSubMeas_outcome_orthogonal P a a' hne]
+            · intro hnot
+              exact (hnot ha).elim
+      _ = (postprocess P.toSubMeas f).outcome b := by
+            simp [postprocess, fiber]
+
+/-- Evaluate a polynomial-indexed projective submeasurement at a point, retaining
+projectivity of the postprocessed outcomes. -/
+private noncomputable def evaluateAtProjSubMeas
+    (params : Parameters) [FieldModel params.q] (u : Point params)
+    (P : ProjSubMeas (Polynomial params) ι) : ProjSubMeas (Fq params) ι :=
+  projSubMeasPostprocess P (fun g => g u)
+
 /-- Tensor-lifted form of `normalizationCondition_sandwich_bound`, used as the
 `C`-normalization hypothesis in `closenessOfIP`.
 
@@ -2110,6 +2210,162 @@ private lemma fullSliceABAB_scalar_to_ABABtensor
           avgOver 𝒟
             (fun xy => ∑ h : Polynomial params, ∑ g : Polynomial params,
               ev strategy.state (C xy h g * B xy h))| := by
+            rw [hScalar, hTensor]
+    _ ≤ Real.sqrt zeta := hclose
+
+/-- X-evaluated/full-y scalar-to-tensor bridge for paper line 360.
+
+After the x-side Schwartz--Zippel step, the first family has already been
+postprocessed at `u`, while the y-family is still full-polynomial.  This lemma
+proves the second `closenessOfIP` move in `commutativity-G.tex` lines 356--360:
+move the trailing `G^y_h` in
+`G^x_[g(u)=a] G^y_h G^x_[g(u)=a] G^y_h ⊗ I` to the right register, yielding
+`G^x_[g(u)=a] G^y_h G^x_[g(u)=a] ⊗ G^y_h`.
+
+The preceding line-359 bridge from the `BAB ⊗ A` tensor endpoint to this scalar
+endpoint remains separate because it follows a different `closenessOfIP` leg. -/
+lemma xEvaluatedFullSliceABABAvg_to_xEvaluatedFullSliceABABtensorAvg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hself : family.StronglySelfConsistent strategy.state zeta) :
+    |xEvaluatedFullSliceABABAvg params strategy family -
+        xEvaluatedFullSliceABABtensorAvg params strategy family| ≤ Real.sqrt zeta := by
+  let 𝒟 : Distribution (Point params × FullSliceQuestion params) :=
+    uniformDistribution (Point params × FullSliceQuestion params)
+  let A : Point params × FullSliceQuestion params → Polynomial params →
+      MIPStarRE.Quantum.Op (ι × ι) :=
+    fun ux h => leftTensor (ι₂ := ι) ((family.meas ux.2.2).toSubMeas.outcome h)
+  let B : Point params × FullSliceQuestion params → Polynomial params →
+      MIPStarRE.Quantum.Op (ι × ι) :=
+    fun ux h => rightTensor (ι₁ := ι) ((family.meas ux.2.2).toSubMeas.outcome h)
+  let C : Point params × FullSliceQuestion params → Polynomial params → Fq params →
+      MIPStarRE.Quantum.Op (ι × ι) :=
+    fun ux h a =>
+      leftTensor (ι₂ := ι)
+        ((evaluateAt params ux.1 ((family.meas ux.2.1).toSubMeas)).outcome a *
+          (family.meas ux.2.2).toSubMeas.outcome h *
+          (evaluateAt params ux.1 ((family.meas ux.2.1).toSubMeas)).outcome a)
+  have h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1 := by
+    simpa [𝒟] using uniformDistribution_weight_sum_le_one
+      (Point params × FullSliceQuestion params)
+  have hAB : avgOver 𝒟 (fun ux => qSDDCore strategy.state (A ux) (B ux)) ≤ zeta := by
+    have hsnd :=
+      avgOver_uniform_snd (α := Point params) (β := FullSliceQuestion params)
+        (f := fun xy =>
+          qSDDCore strategy.state
+            (fun h : Polynomial params =>
+              leftTensor (ι₂ := ι) ((family.meas xy.2).toSubMeas.outcome h))
+            (fun h : Polynomial params =>
+              rightTensor (ι₁ := ι) ((family.meas xy.2).toSubMeas.outcome h)))
+    calc
+      avgOver 𝒟 (fun ux => qSDDCore strategy.state (A ux) (B ux))
+        = avgOver (uniformDistribution (FullSliceQuestion params))
+            (fun xy =>
+              qSDDCore strategy.state
+                (fun h : Polynomial params =>
+                  leftTensor (ι₂ := ι) ((family.meas xy.2).toSubMeas.outcome h))
+                (fun h : Polynomial params =>
+                  rightTensor (ι₁ := ι) ((family.meas xy.2).toSubMeas.outcome h))) := by
+            simpa [𝒟, A, B] using hsnd
+      _ ≤ zeta := fullSlice_selfConsistency_snd_bound params strategy family zeta hself
+  have hC :
+      ∀ ux,
+        ∑ h : Polynomial params,
+            (∑ a : Fq params, C ux h a) * (∑ a : Fq params, C ux h a)ᴴ ≤ 1 := by
+    intro ux
+    let P : SubMeas (Polynomial params) ι := fullSliceSecondFactor params family ux.2
+    let Q : ProjSubMeas (Fq params) ι :=
+      evaluateAtProjSubMeas params ux.1 (fullSliceFirstProj params family ux.2)
+    simpa [C, P, Q, evaluateAtProjSubMeas, projSubMeasPostprocess, evaluateAt,
+      fullSliceFirstProj, fullSliceSecondFactor] using
+      (leftTensor_normalizationCondition_sandwich_bound (P := P) (Q := Q))
+  have hclose :=
+    MIPStarRE.LDT.Preliminaries.closenessOfIP
+      strategy.state hnorm 𝒟 h𝒟 A B C zeta hAB hC
+  have hScalar :
+      avgOver 𝒟
+          (fun ux => ∑ h : Polynomial params, ∑ a : Fq params,
+            ev strategy.state (C ux h a * A ux h)) =
+        xEvaluatedFullSliceABABAvg params strategy family := by
+    unfold xEvaluatedFullSliceABABAvg
+    apply avgOver_congr
+    rintro ⟨u, xy⟩
+    calc
+      ∑ h : Polynomial params, ∑ a : Fq params,
+          ev strategy.state (C (u, xy) h a * A (u, xy) h)
+        = ∑ a : Fq params, ∑ h : Polynomial params,
+            ev strategy.state
+              (leftTensor (ι₂ := ι)
+                ((evaluateAt params u ((family.meas xy.1).toSubMeas)).outcome a *
+                  (family.meas xy.2).toSubMeas.outcome h *
+                  (evaluateAt params u ((family.meas xy.1).toSubMeas)).outcome a *
+                  (family.meas xy.2).toSubMeas.outcome h)) := by
+            rw [Finset.sum_comm]
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            refine Finset.sum_congr rfl ?_
+            intro h _
+            simp [C, A, leftTensor_mul_leftTensor, mul_assoc]
+      _ = ∑ ah : Fq params × Polynomial params,
+            ev strategy.state
+              (leftTensor (ι₂ := ι)
+                ((evaluateAt params u ((family.meas xy.1).toSubMeas)).outcome ah.1 *
+                  (family.meas xy.2).toSubMeas.outcome ah.2 *
+                  (evaluateAt params u ((family.meas xy.1).toSubMeas)).outcome ah.1 *
+                  (family.meas xy.2).toSubMeas.outcome ah.2)) := by
+            exact (Fintype.sum_prod_type' (f := fun a : Fq params =>
+              fun h : Polynomial params =>
+                ev strategy.state
+                  (leftTensor (ι₂ := ι)
+                    ((evaluateAt params u ((family.meas xy.1).toSubMeas)).outcome a *
+                      (family.meas xy.2).toSubMeas.outcome h *
+                      (evaluateAt params u ((family.meas xy.1).toSubMeas)).outcome a *
+                      (family.meas xy.2).toSubMeas.outcome h)))).symm
+  have hTensor :
+      avgOver 𝒟
+          (fun ux => ∑ h : Polynomial params, ∑ a : Fq params,
+            ev strategy.state (C ux h a * B ux h)) =
+        xEvaluatedFullSliceABABtensorAvg params strategy family := by
+    unfold xEvaluatedFullSliceABABtensorAvg
+    apply avgOver_congr
+    rintro ⟨u, xy⟩
+    calc
+      ∑ h : Polynomial params, ∑ a : Fq params,
+          ev strategy.state (C (u, xy) h a * B (u, xy) h)
+        = ∑ a : Fq params, ∑ h : Polynomial params,
+            ev strategy.state
+              (leftTensor (ι₂ := ι)
+                  ((evaluateAt params u ((family.meas xy.1).toSubMeas)).outcome a *
+                    (family.meas xy.2).toSubMeas.outcome h *
+                    (evaluateAt params u ((family.meas xy.1).toSubMeas)).outcome a) *
+                rightTensor (ι₁ := ι) ((family.meas xy.2).toSubMeas.outcome h)) := by
+            rw [Finset.sum_comm]
+      _ = ∑ ah : Fq params × Polynomial params,
+            ev strategy.state
+              (leftTensor (ι₂ := ι)
+                  ((evaluateAt params u ((family.meas xy.1).toSubMeas)).outcome ah.1 *
+                    (family.meas xy.2).toSubMeas.outcome ah.2 *
+                    (evaluateAt params u ((family.meas xy.1).toSubMeas)).outcome ah.1) *
+                rightTensor (ι₁ := ι) ((family.meas xy.2).toSubMeas.outcome ah.2)) := by
+            exact (Fintype.sum_prod_type' (f := fun a : Fq params =>
+              fun h : Polynomial params =>
+                ev strategy.state
+                  (leftTensor (ι₂ := ι)
+                      ((evaluateAt params u ((family.meas xy.1).toSubMeas)).outcome a *
+                        (family.meas xy.2).toSubMeas.outcome h *
+                        (evaluateAt params u ((family.meas xy.1).toSubMeas)).outcome a) *
+                    rightTensor (ι₁ := ι) ((family.meas xy.2).toSubMeas.outcome h)))).symm
+  calc
+    |xEvaluatedFullSliceABABAvg params strategy family -
+        xEvaluatedFullSliceABABtensorAvg params strategy family|
+      = |avgOver 𝒟
+            (fun ux => ∑ h : Polynomial params, ∑ a : Fq params,
+              ev strategy.state (C ux h a * A ux h)) -
+          avgOver 𝒟
+            (fun ux => ∑ h : Polynomial params, ∑ a : Fq params,
+              ev strategy.state (C ux h a * B ux h))| := by
             rw [hScalar, hTensor]
     _ ≤ Real.sqrt zeta := hclose
 

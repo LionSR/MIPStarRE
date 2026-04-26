@@ -139,18 +139,19 @@ private lemma abs_sub_le_of_two_step
     |a - c| ≤ e₁ + e₂ :=
   (abs_sub_le a b c).trans (add_le_add hab hbc)
 
-/-- Residual for the two still-unproved `closenessOfIP` legs in the y-side
+/-- Residual for the remaining first `closenessOfIP` leg in the y-side
 second-term prefix.
 
-The earlier prefix steps from `commutativity-G.tex` lines 332--354 are now proved
-in `fullSliceABAB_to_xEvaluatedSliceBABAtensorAvg`: `eq:gcom4` costs `√ζ` and
-`eq:gcom4-diff` costs `md/q`.  This residual starts at the resulting
-x-evaluated `BAB ⊗ A` tensor endpoint and covers only paper lines 356--360,
-where two further `closenessOfIP` applications pass through the scalar endpoint
-in the display from `eq:evaluate-gcom-at-points` to
-`eq:don't-understand-the-numbering-system` and reach the mixed `ABA ⊗ B`
-endpoint. -/
-private structure FullSliceScalarMarginalizeYClosenessResidual
+The earlier prefix steps from `commutativity-G.tex` lines 332--354 are proved in
+`fullSliceABAB_to_xEvaluatedSliceBABAtensorAvg`: `eq:gcom4` costs `√ζ` and
+`eq:gcom4-diff` costs `md/q`.  The second line-360 `closenessOfIP` bridge from
+`xEvaluatedFullSliceABABAvg` to `xEvaluatedFullSliceABABtensorAvg` is now proved
+in `xEvaluatedFullSliceABABAvg_to_xEvaluatedFullSliceABABtensorAvg`.
+
+Thus this residual is only the first paper line-359 bridge from the
+x-evaluated `BAB ⊗ A` tensor endpoint to the scalar endpoint in the display from
+`eq:evaluate-gcom-at-points` to `eq:don't-understand-the-numbering-system`. -/
+private structure FullSliceScalarMarginalizeYFirstClosenessResidual
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (zeta : Error) where
@@ -158,36 +159,35 @@ private structure FullSliceScalarMarginalizeYClosenessResidual
     |xEvaluatedSliceBABAtensorAvg params strategy family -
         xEvaluatedFullSliceABABAvg params strategy family| ≤
       Real.sqrt zeta
-  second_closeness :
-    |xEvaluatedFullSliceABABAvg params strategy family -
-        xEvaluatedFullSliceABABtensorAvg params strategy family| ≤
-      Real.sqrt zeta
 
-/-- Remaining two-leg `closenessOfIP` witness for the `y` prefix.
+/-- Remaining first `closenessOfIP` witness for the `y` prefix.
 
 This is now the only y-prefix proof gap left in this file.  It corresponds to
-paper `commutativity-G.tex` lines 356--360, not to `eq:gcom4`,
-`eq:gcom4-diff`, or to the y-marginalization lines 369--385. -/
-private noncomputable def fullSliceScalarMarginalizeYClosenessResidual
+paper `commutativity-G.tex` line 359, not to `eq:gcom4`, `eq:gcom4-diff`, the
+line-360 scalar-to-tensor bridge, or the y-marginalization lines 369--385. -/
+private noncomputable def fullSliceScalarMarginalizeYFirstClosenessResidual
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (zeta : Error)
     (hnorm : strategy.state.IsNormalized)
     (hself : family.StronglySelfConsistent strategy.state zeta) :
-    FullSliceScalarMarginalizeYClosenessResidual params strategy family zeta := by
+    FullSliceScalarMarginalizeYFirstClosenessResidual params strategy family zeta := by
   -- `fullSliceABAB_to_xEvaluatedSliceBABAtensorAvg` proves the `√ζ + md/q`
-  -- portion of the prefix.  The residual is now exactly the two paper
-  -- `closenessOfIP` moves in lines 356--360.
+  -- prefix before this point, and
+  -- `xEvaluatedFullSliceABABAvg_to_xEvaluatedFullSliceABABtensorAvg` proves the
+  -- following line-360 bridge.  The residual is now exactly the first
+  -- `closenessOfIP` move at paper line 359.
   sorry
 
 /-- Paper-faithful second-term transport bound.
 
 The proved x-prefix (`eq:gcom4` plus `eq:gcom4-diff`, paper lines 332--354)
-costs `md/q + √ζ`; the remaining two `closenessOfIP` legs in lines 356--360
-cost `2√ζ`; and the proved y-tail uses y-Schwartz--Zippel marginalization
-(paper lines 369--385) plus the `√ζ` scalar↔tensor bridge that is the
-doubly-evaluated analogue of paper line 360. Thus the whole scalar second-term
-comparison costs `2·md/q + 4√ζ`. -/
+costs `md/q + √ζ`; the remaining line-359 `closenessOfIP` residual costs `√ζ`;
+the line-360 scalar↔tensor bridge is proved in
+`xEvaluatedFullSliceABABAvg_to_xEvaluatedFullSliceABABtensorAvg` and costs
+another `√ζ`; and the proved y-tail uses y-Schwartz--Zippel marginalization
+(paper lines 369--385) plus the `√ζ` doubly-evaluated scalar↔tensor bridge. Thus
+the whole scalar second-term comparison costs `2·md/q + 4√ζ`. -/
 lemma fullSlice_scalar_marginalize_y
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
@@ -198,7 +198,7 @@ lemma fullSlice_scalar_marginalize_y
         evaluatedSliceABABAvg params strategy family| ≤
       (2 * ((↑params.m : Error) * ↑params.d / ↑params.q) + 4 * Real.sqrt zeta) := by
   let yClose :=
-    fullSliceScalarMarginalizeYClosenessResidual
+    fullSliceScalarMarginalizeYFirstClosenessResidual
       params strategy family zeta hnorm hself
   have hxPrefix :=
     fullSliceABAB_to_xEvaluatedSliceBABAtensorAvg
@@ -206,7 +206,10 @@ lemma fullSlice_scalar_marginalize_y
   have htail :=
     xEvaluatedFullSliceABABtensor_to_evaluatedSliceABABAvg
       params strategy family zeta hnorm hself
-  have hclose := abs_sub_le_of_two_step yClose.first_closeness yClose.second_closeness
+  have hsecond :=
+    xEvaluatedFullSliceABABAvg_to_xEvaluatedFullSliceABABtensorAvg
+      params strategy family zeta hnorm hself
+  have hclose := abs_sub_le_of_two_step yClose.first_closeness hsecond
   have hclose_bound :
       |xEvaluatedSliceBABAtensorAvg params strategy family -
           xEvaluatedFullSliceABABtensorAvg params strategy family| ≤
