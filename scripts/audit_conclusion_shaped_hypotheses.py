@@ -645,13 +645,40 @@ def _clean_semantic_text(text: str) -> str:
     return _mask_lean_non_code(text)
 
 
+def _line_column(text: str, pos: int) -> int:
+    """Return the zero-based column of ``pos`` in ``text``."""
+    return pos - (text.rfind("\n", 0, pos) + 1)
+
+
+def _looks_like_layout_let_body_start(text: str, assign_end: int, body_pos: int) -> bool:
+    """Heuristic guard for layout-style ``let`` body starts.
+
+    Without a semicolon, Lean's real layout parser determines where the
+    assignment value ends.  The audit avoids false negatives by accepting only
+    the common wrapper layout where at least one visibly more-indented assignment
+    line precedes a fresh-line body candidate; otherwise we do not default-skip.
+    """
+    candidate_line_start = text.rfind("\n", 0, body_pos) + 1
+    if candidate_line_start == 0:
+        return False
+    if text[candidate_line_start:body_pos].strip():
+        return False
+
+    candidate_col = _line_column(text, body_pos)
+    prior_indents: list[int] = []
+    for raw_line in text[assign_end:candidate_line_start].splitlines():
+        if raw_line.strip():
+            prior_indents.append(len(raw_line) - len(raw_line.lstrip()))
+    return bool(prior_indents) and candidate_col < min(prior_indents)
+
+
 def _leading_let_body_start(text: str, start: int) -> int | None:
     """Return the probable body offset after a leading top-level ``let``.
 
-    The audit only needs this to avoid treating arrows in the assignment value as
-    producer arrows.  Semicolon-style lets give an exact body boundary; for the
-    layout-style wrappers used in this project, fall back to the first
-    top-level forall after the assignment marker.
+    Semicolon-style lets give an exact body boundary.  For layout-style lets,
+    only accept a fresh-line body candidate whose indentation makes it look like
+    the body rather than part of the assignment value; otherwise return the end
+    of the text so default mode audits instead of skipping.
     """
     if _starts_keyword(text, start, "letI"):
         keyword_len = 4
@@ -670,9 +697,15 @@ def _leading_let_body_start(text: str, start: int) -> int | None:
     if semicolon_rel is not None:
         return after_assign + semicolon_rel + len(";")
 
-    forall_rel = _find_top_level_forall(text[after_assign:])
-    if forall_rel is not None:
-        return after_assign + forall_rel
+    search_start = after_assign
+    while search_start < len(text):
+        forall_rel = _find_top_level_forall(text[search_start:])
+        if forall_rel is None:
+            break
+        forall_pos = search_start + forall_rel
+        if _looks_like_layout_let_body_start(text, after_assign, forall_pos):
+            return forall_pos
+        search_start = forall_pos + 1
 
     return len(text)
 

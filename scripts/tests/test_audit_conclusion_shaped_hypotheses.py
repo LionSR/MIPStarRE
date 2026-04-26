@@ -632,6 +632,7 @@ class AuditHeuristicTests(unittest.TestCase):
                 theorem letArrowStillBad
                     (hrec :
                       let f : Type := Nat → Nat;
+                      let p : Prop := forall n : Nat, n = n;
                       ∃ G : Measurement, ConsRel G) :
                     ∃ G : Measurement, ConsRel G := by
                   sorry
@@ -641,6 +642,27 @@ class AuditHeuristicTests(unittest.TestCase):
             self.assertEqual(len(result.review_findings), 1)
             self.assertEqual(result.review_findings[0].decl, "letArrowStillBad")
 
+    def test_layout_let_forall_assignment_does_not_skip_existential(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = self._write_fake(
+                root,
+                """\
+                theorem layoutLetForallAssignmentStillBad
+                    (hrec :
+                      let p : Prop := forall n : Nat, n = n
+                      ∃ G : Measurement, ConsRel G) :
+                    ∃ G : Measurement, ConsRel G := by
+                  sorry
+                """,
+            )
+            result = run_audit([mod], root=root, min_common=2)
+            self.assertEqual(len(result.review_findings), 1)
+            self.assertEqual(
+                result.review_findings[0].decl,
+                "layoutLetForallAssignmentStillBad",
+            )
+
     def test_let_forall_producer_skips_by_default(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -649,7 +671,8 @@ class AuditHeuristicTests(unittest.TestCase):
                 """\
                 theorem letForallProducerWrapper
                     (hrec :
-                      let local : Nat := 0;
+                      let local : Nat :=
+                        0
                       ∀ x, ∃ G : Measurement, ConsRel G) :
                     ∃ G : Measurement, ConsRel G := by
                   sorry
