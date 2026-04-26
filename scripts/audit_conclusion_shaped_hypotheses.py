@@ -30,9 +30,8 @@ from typing import Iterable, Sequence
 
 
 _DECL_RE = re.compile(
-    r"(?m)^\s*(?:@\[[^\]]*\]\s+)*"
+    r"(?m)^\s*"
     r"(?:(?:private|protected|noncomputable|unsafe|nonrec)\s+)*"
-    r"(?:@\[[^\]]*\]\s+)*"
     r"(theorem|lemma)\s+([^\s:({\[]+)(?=\s|$|[:({\[])"
 )
 _TOKEN_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_.'?]*")
@@ -323,6 +322,43 @@ def _mask_lean_non_code(text: str) -> str:
     return "".join(chunks)
 
 
+def _skip_attribute_block(text: str, start: int) -> int | None:
+    """Return the offset after a Lean ``@[...]`` attribute block.
+
+    ``text`` is expected to have comments and strings already masked, so nested
+    brackets in strings/comments cannot affect the bracket depth here.
+    """
+    if not text.startswith("@[", start):
+        return None
+    depth = 1
+    i = start + 2
+    while i < len(text):
+        if text[i] == "[":
+            depth += 1
+        elif text[i] == "]":
+            depth -= 1
+            if depth == 0:
+                return i + 1
+        i += 1
+    return None
+
+
+def _mask_lean_attributes(text: str) -> str:
+    """Mask Lean attribute blocks before declaration-start matching."""
+    chunks: list[str] = []
+    i = 0
+    while i < len(text):
+        if text.startswith("@[", i):
+            end = _skip_attribute_block(text, i)
+            if end is not None:
+                chunks.append(_spaces_preserving_newlines(text[i:end]))
+                i = end
+                continue
+        chunks.append(text[i])
+        i += 1
+    return "".join(chunks)
+
+
 def _find_header_end(text: str, start: int) -> int | None:
     """Return the offset of the top-level ``:=`` ending a declaration header."""
     stack: list[str] = []
@@ -555,7 +591,7 @@ def parse_declarations(path: Path, *, root: Path | None = None) -> list[LeanDecl
     else:
         rel = str(path)
     out: list[LeanDecl] = []
-    match_text = _mask_lean_non_code(text)
+    match_text = _mask_lean_attributes(_mask_lean_non_code(text))
     for match in _DECL_RE.finditer(match_text):
         header_end = _find_header_end(text, match.end())
         if header_end is None:

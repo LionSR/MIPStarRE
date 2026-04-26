@@ -80,6 +80,28 @@ class ParseDeclarationTests(unittest.TestCase):
                 ["attributedBad", "attributedPrivateBad"],
             )
 
+    def test_header_parser_accepts_nested_bracket_attributes(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "Fake.lean"
+            mod.parent.mkdir()
+            mod.write_text(
+                textwrap.dedent(
+                    """\
+                    @[aesop safe (rule_sets := [Foo])] theorem nestedAttributeBad
+                        (h : ∃ G : Measurement, ConsRel G) :
+                        ∃ G : Measurement, ConsRel G := by
+                      sorry
+                    """
+                ),
+                encoding="utf-8",
+            )
+            decls = parse_declarations(mod, root=root)
+            self.assertEqual([decl.name for decl in decls], ["nestedAttributeBad"])
+            result = run_audit([mod], root=root, min_common=2)
+            self.assertEqual(len(result.review_findings), 1)
+            self.assertEqual(result.review_findings[0].decl, "nestedAttributeBad")
+
     def test_header_parser_accepts_nonrec_modifiers(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
