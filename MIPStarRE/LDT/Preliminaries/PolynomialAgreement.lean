@@ -370,4 +370,46 @@ lemma polynomialCollision_sandwichTensor_le_mdq
     _ = (params.m * params.d : Error) / params.q := by
           simp [δ]
 
+open Classical in
+/-- The off-diagonal polynomial-collision mass used in `mainFormal` Step 5.
+
+This is the weighted collision term in `inductive_step.tex` lines 122--127:
+for every distinct pair of full polynomial outcomes `(g, h)`, the coefficient is
+`Pr_u[g(u) = h(u)]`, and the quantum weight is the fixed cross-register mass
+`⟨ψ | G^A_g ⊗ G^B_h | ψ⟩`. -/
+noncomputable def polynomialCollisionMass
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (params : Parameters) [FieldModel params.q]
+    (ψ : QuantumState (ι × ι))
+    (Left Right : SubMeas (Polynomial params) ι) : Error :=
+  ∑ gg : Polynomial params × Polynomial params,
+    (if gg.1 = gg.2 then 0 else
+      avgOver (uniformDistribution (Point params))
+        (fun u => if gg.1 u = gg.2 u then (1 : Error) else 0)) *
+      ev ψ (opTensor (Left.outcome gg.1) (Right.outcome gg.2))
+
+open Classical in
+/-- `mainFormal` Step 5's tensor-valued Schwartz--Zippel loss.
+
+This is the specialization of `polynomialCollision_sandwichTensor_le_mdq` with
+no outer sandwich. It supplies exactly the paper's line-126 estimate for the
+collision term after the evaluated self-consistency defect has been expanded. -/
+lemma polynomialCollisionMass_le_mdq
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (params : Parameters) [FieldModel params.q]
+    (ψ : QuantumState (ι × ι)) (hnorm : ψ.IsNormalized)
+    (Left Right : SubMeas (Polynomial params) ι) :
+    polynomialCollisionMass params ψ Left Right ≤
+      (params.m * params.d : Error) / params.q := by
+  let One : SubMeas Unit ι :=
+    { outcome := fun _ => (1 : MIPStarRE.Quantum.Op ι)
+      total := 1
+      outcome_pos := by intro _; exact zero_le_one
+      sum_eq_total := by simp
+      total_le_one := le_rfl }
+  have h := polynomialCollision_sandwichTensor_le_mdq
+    (params := params) (ψ := ψ) (hnorm := hnorm)
+    (Outer := One) (Inner := Left) (Right := Right)
+  simpa [polynomialCollisionMass, One, leftTensor_mul_rightTensor_eq_opTensor] using h
+
 end MIPStarRE.LDT.Preliminaries
