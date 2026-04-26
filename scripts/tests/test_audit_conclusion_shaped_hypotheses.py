@@ -134,6 +134,34 @@ class ParseDeclarationTests(unittest.TestCase):
                 ["nonrecTheoremBad", "nonrecLemmaBad"],
             )
 
+    def test_header_parser_accepts_strict_implicit_binders(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "Fake.lean"
+            mod.parent.mkdir()
+            mod.write_text(
+                textwrap.dedent(
+                    """\
+                    theorem strictImplicitBad
+                        {ordinary : Nat}
+                        ⦃h : ∃ G : Measurement, ConsRel G⦄ :
+                        ∃ G : Measurement, ConsRel G := by
+                      sorry
+                    """
+                ),
+                encoding="utf-8",
+            )
+            decls = parse_declarations(mod, root=root)
+            self.assertEqual([decl.name for decl in decls], ["strictImplicitBad"])
+            self.assertEqual(
+                [binder.name for binder in decls[0].binders],
+                ["ordinary", "h"],
+            )
+            result = run_audit([mod], root=root, min_common=2)
+            self.assertEqual(len(result.review_findings), 1)
+            self.assertEqual(result.review_findings[0].decl, "strictImplicitBad")
+            self.assertEqual(result.review_findings[0].binder, "h")
+
     def test_header_parser_accepts_multiline_attributes(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

@@ -58,7 +58,7 @@ _TOKEN_STOPLIST = frozenset({
     "DecidableEq", "Error", "FieldModel", "Fintype", "Nat", "Unit",
 })
 
-_OPEN_TO_CLOSE = {"(": ")", "{": "}", "[": "]"}
+_OPEN_TO_CLOSE = {"(": ")", "{": "}", "[": "]", "⦃": "⦄"}
 _CLOSE_TO_OPEN = {v: k for k, v in _OPEN_TO_CLOSE.items()}
 
 
@@ -555,7 +555,7 @@ def _extract_binders(prefix: str, *, file_text: str, file_start: int) -> tuple[B
         if string_end is not None:
             i = string_end
             continue
-        if prefix[i] not in "({[":
+        if prefix[i] not in "({[⦃":
             i += 1
             continue
         end = _find_matching_group(prefix, i)
