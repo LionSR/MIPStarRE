@@ -506,18 +506,22 @@ assembly residual:
 \lean{MIPStarRE.LDT.Test.mainFormalInductionNu_bound, MIPStarRE.LDT.Test.cascadeHypotheses_of_not_mainFormalError_ge_one}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeScalars.ofCascadeHypotheses, MIPStarRE.LDT.Test.MainFormalCascadeScalars.ofNontrivialMainFormal}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadePreProjectiveSelfConsistency, MIPStarRE.LDT.Test.MainFormalCascadePreProjectiveSelfConsistency.fullSelfConsistency}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeUnsymmetrizedPOVMTargets, MIPStarRE.LDT.Test.MainFormalCascadeUnsymmetrizedPOVMTargets.toPreProjectiveSelfConsistency}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveStageTargets, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveStageTargets.toTransportTargets}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveAssemblyResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveAssemblyResidual.toProjectiveStageTargets}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeTransportTargets, MIPStarRE.LDT.Test.MainFormalCascadeTransportTargets.toCascadeTargets, MIPStarRE.LDT.Test.MainFormalCascadeTargets.toNativeTargets}
 They split off the vacuous branch where the theorem error is at least $1$,
 derive the Step~8 scalar hypotheses in the non-vacuous branch, use the proved
 Step~5 Schwartz--Zippel wrapper to convert evaluated pre-projective consistency
-to full-polynomial consistency at $\zeta_1$, and leave only the projective-stage
-construction of \texttt{MainFormalCascadeProjectiveStageTargets}.  That residual
-still contains the two $\zeta_4$ point-consistency goals and the line-156
-$\approx_{\zeta_3}$ projectivization bridge; Lean then converts the latter to
+to full-polynomial consistency at $\zeta_1$, and now also prove the paper
+line-116 triangle step from the two unsymmetrized $2\sigma$ links plus the
+original $3\eps$ point agreement.  The remaining residual is the finer
+\texttt{MainFormalCascadeProjectiveAssemblyResidual}: it still contains the two
+$\zeta_4$ point-consistency goals and the line-156 $\approx_{\zeta_3}$
+projectivization bridge. Lean then converts the latter to
 \texttt{MainFormalCascadeTransportTargets} using the projective converse of
 \texttt{simeq-to-approx}. No proof-level completeness tag is claimed here while
-\texttt{mainFormal} still contains that projective-stage residual.
+\texttt{mainFormal} still contains that projective assembly residual.
 \end{remark}
 \begin{proof}
 	\proves{thm:main-formal}
