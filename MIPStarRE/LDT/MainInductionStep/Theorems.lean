@@ -3,11 +3,11 @@ import Mathlib.Analysis.MeanInequalitiesPow
 import MIPStarRE.LDT.Basic.LinePolynomialEmbedding
 import MIPStarRE.LDT.MainInductionStep.Statements
 import MIPStarRE.LDT.Test.StrategyFailures
-import MIPStarRE.LDT.CommutativityPoints.Theorem
-import MIPStarRE.LDT.Commutativity.Theorems
-import MIPStarRE.LDT.Pasting.Theorems
+import MIPStarRE.LDT.CommutativityPoints.Approximation
+import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
+import MIPStarRE.LDT.Pasting.Bernoulli.Final
 -- Used by `selfImprovementInInductionSection`.
-import MIPStarRE.LDT.SelfImprovement.Theorems
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results
 
 /-!
 # Section 6 — Theorems

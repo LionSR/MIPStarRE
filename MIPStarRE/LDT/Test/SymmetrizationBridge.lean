@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Test.Strategy
+import MIPStarRE.LDT.Test.StrategyRoleAverage
 
 /-!
 # Section 3 — `ProjStrat → SymStrat` symmetrization bridge

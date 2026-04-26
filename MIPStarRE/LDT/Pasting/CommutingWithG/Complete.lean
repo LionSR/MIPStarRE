@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Pasting.SwitcherooCompletion.CompletePart
+import MIPStarRE.LDT.Preliminaries.CompletionTransfer
 
 /-!
 # Section 12 pasting: commuting-with-G complete part

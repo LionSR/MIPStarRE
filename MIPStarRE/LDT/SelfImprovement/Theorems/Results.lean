@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.GlobalVariance.Theorems.Results
+import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 

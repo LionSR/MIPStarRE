@@ -1,8 +1,8 @@
 import MIPStarRE.LDT.Commutativity.Defs.Normalization
-import MIPStarRE.LDT.CommutativityPoints.Theorem
+import MIPStarRE.LDT.CommutativityPoints.Defs
 import MIPStarRE.LDT.Preliminaries.Polynomials
-import MIPStarRE.LDT.Preliminaries.SelfConsistency
-import MIPStarRE.LDT.Test.Strategy
+import MIPStarRE.LDT.Preliminaries.Defs
+import MIPStarRE.LDT.Test.StrategyFailures
 
 /-!
 # Section 11 commutativity: scaffold core

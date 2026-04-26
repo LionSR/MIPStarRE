@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Pasting.Defs.Interpolation
+import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
 
 /-!
 # Section 12 — Definitions: consistency and families
@@ -9,8 +10,6 @@ Global-consistency predicates and the completed-slice family wrappers.
 namespace MIPStarRE.LDT.Pasting
 
 open MIPStarRE.LDT
-open MIPStarRE.LDT.ExpansionHypercubeGraph
-open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]

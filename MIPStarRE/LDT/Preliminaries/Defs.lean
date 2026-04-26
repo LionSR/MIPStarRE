@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Test.Strategy
+import MIPStarRE.LDT.Test.Defs
 
 /-!
 # Preliminary definition packages

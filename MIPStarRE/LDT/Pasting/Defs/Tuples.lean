@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Commutativity.Theorems
+import MIPStarRE.LDT.Basic.ParametersFiniteAnswers
+import MIPStarRE.LDT.Basic.SubMeasurementFamilies
+import MIPStarRE.LDT.Basic.OpFamily
 import Mathlib.LinearAlgebra.Lagrange
 
 /-!
@@ -10,8 +12,6 @@ Tuple distributions, type abbreviations, and basic operator helpers.
 namespace MIPStarRE.LDT.Pasting
 
 open MIPStarRE.LDT
-open MIPStarRE.LDT.ExpansionHypercubeGraph
-open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]

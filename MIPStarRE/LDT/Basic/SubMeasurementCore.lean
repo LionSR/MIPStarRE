@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Basic.Operator
+import MIPStarRE.LDT.Basic.QuantumState
 
 /-!
 # Core submeasurement structures for the low individual degree test
