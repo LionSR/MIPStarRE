@@ -1915,7 +1915,69 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>       For the Step&#160;5 passage below, Lean now names the weighted polynomial-collision mass and proves its \(md/q\) bound by specializing the existing tensor Schwartz–Zippel helper. The only remaining Step&#160;5 residual is the explicit expansion/reindexing statement that compares the evaluated consistency defect with the full-polynomial defect plus that collision mass. </p>
+  <p>       For the Step&#160;5 passage below, Lean now names the weighted polynomial-collision mass and proves its \(md/q\) bound by specializing the existing tensor Schwartz–Zippel helper. The only remaining Step&#160;5 residual is the explicit expansion/reindexing statement that compares the evaluated consistency defect with the full-polynomial defect plus that collision mass. TODOThis is a bridge/residual interface, not a completed proof of the Step&#160;5 passage. </p>
+
+  </div>
+</div>
+<div class="remark_thmwrapper theorem-style-remark" id="rem:main-formal-lean-residual-packages">
+  <div class="remark_thmheading">
+    <span class="remark_thmcaption">
+    Remark
+    </span>
+    <span class="remark_thmlabel">10.20</span>
+    <span class="remark_thmtitle">Lean residual packages for the main-formal assembly</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-induction.html#rem:main-formal-lean-residual-packages">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-induction.html#thm:error-cascade-main-formal">Theorem 10.18</a></li>
+          
+          <li><a href="sec-induction.html#thm:main-formal-envelope-basics">Theorem 10.14</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="remark_thmcontent">
+  <p>  The following Lean declarations are bookkeeping infrastructure for the final assembly residual:       They split off the vacuous branch where the theorem error is at least \(1\), derive the Step&#160;8 scalar hypotheses in the non-vacuous branch, and leave only the transport-only construction of <span class="ttfamily">MainFormalCascadeTransportTargets</span>. No proof-level completeness tag is claimed here while <span class="ttfamily">mainFormal</span> still contains that transport residual. </p>
 
   </div>
 </div>
@@ -2060,7 +2122,7 @@
   <span class="equation_label">12</span>
 </p>
 </div>
-<p>The Lean residual packages now separate the scalar cascade from the remaining transport work. The scalar interface    records the paper’s line&#160;71–73 coarsening of the symmetrized main-induction \(\nu \), while  records the three native transport targets at the resulting errors \(\zeta _4\), \(\zeta _4\), and \(\zeta _3/2\).  is only the Step&#160;8 weakening into , and  is only the final weakening from those native targets to the theorem’s common error envelope. </p>
+<p>Remark&#160;<a href="sec-induction.html#rem:main-formal-lean-residual-packages">10.20</a> records the Lean residual packages that separate the scalar cascade from the remaining transport work. The scalar side discharges the paper’s line&#160;71–73 coarsening and the Step&#160;8 hypotheses in the non-vacuous branch; the remaining residual is the transport-only construction at errors \(\zeta _4\), \(\zeta _4\), and \(\zeta _3/2\). </p>
 <p>With \(E\) as in Definition&#160;<a href="sec-induction.html#def:main-formal-envelope">10.13</a>, the quantities \(\sigma ,\zeta _1,\zeta _2,\zeta _3,\zeta _4\) form the cascade of Definition&#160;<a href="sec-induction.html#def:main-formal-error-cascade">10.15</a>. Theorem&#160;<a href="sec-induction.html#thm:sigma-bound-main-formal">10.16</a> and Theorem&#160;<a href="sec-induction.html#thm:zeta-bounds-main-formal">10.17</a> package the final inflation to the scale \(100000k^2m^4 E\). The underlying paper estimates are: </p>
 <div class="displaymath" id="a0000000605">
   \[  \sigma \le 10000k^2m^4\left(\varepsilon ^{1/1024}+(d/q)^{1/1024}+e^{-k/(80000m^2)}\right).  \]
