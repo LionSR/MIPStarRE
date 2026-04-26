@@ -607,9 +607,19 @@
 		I \ot A_a^{\mathrm B,u} \simeq_{\zeta_4} Q_{[g(u)=a]}^{\mathrm A} \ot I.
 	\end{equation}
 
-	The Lean residual package
-	\lean{MIPStarRE.LDT.Test.MainFormalNativeTargets} records exactly these three
-	native targets at errors $\zeta_4$, $\zeta_4$, and $\zeta_3/2$;
+	The Lean residual packages now separate the scalar cascade from the
+	remaining transport work.  The scalar interface
+	\lean{MIPStarRE.LDT.Test.mainFormalInductionNu}
+	\lean{MIPStarRE.LDT.Test.mainFormalInductionNu_bound}
+	\lean{MIPStarRE.LDT.Test.MainFormalCascadeScalars}
+	records the paper's line~71--73 coarsening of the symmetrized main-induction
+	$\nu$, while
+	\lean{MIPStarRE.LDT.Test.MainFormalCascadeTargets}
+	records the three native transport targets at the resulting errors
+	$\zeta_4$, $\zeta_4$, and $\zeta_3/2$.
+	\lean{MIPStarRE.LDT.Test.MainFormalCascadeTargets.toNativeTargets}
+	is only the Step~8 weakening into
+	\lean{MIPStarRE.LDT.Test.MainFormalNativeTargets}, and
 	\lean{MIPStarRE.LDT.Test.MainFormalNativeTargets.toMainFormal} is only the
 	final weakening from those native targets to the theorem's common error envelope.
 
