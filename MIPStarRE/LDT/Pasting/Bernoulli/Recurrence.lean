@@ -94,7 +94,7 @@ private noncomputable def gHatTypeFinsetEquiv (k : ℕ) :
   toFun τ := Finset.univ.filter fun i => τ i
   invFun s := fun i => i ∈ s
   left_inv τ := by
-    funext i
+    ext i
     simp
   right_inv s := by
     ext i
@@ -102,10 +102,7 @@ private noncomputable def gHatTypeFinsetEquiv (k : ℕ) :
 
 private lemma fromHToG_gHatTypeWeight_of_finset {k : ℕ} (s : Finset (Fin k)) :
     gHatTypeWeight (fun i : Fin k => i ∈ s) = s.card := by
-  unfold gHatTypeWeight
-  congr 1
-  ext i
-  simp
+  simp [gHatTypeWeight]
 
 private lemma fromHToG_gHatTypeOperator_of_finset
     (G : MIPStarRE.Quantum.Op ι) {k : ℕ} (s : Finset (Fin k)) :
@@ -226,6 +223,48 @@ private lemma fromHToG_averageOperator_uniform_const_one
   rw [averageOperatorOverDistribution_const]
   rw [uniformDistribution_weight_sum_eq_one, one_smul]
 
+/-- The completed branch of `\widehat G` averages to the operator `G` used in the
+Bernoulli recurrence, matching `references/ldt-paper/ld-pasting.tex:1408--1415`
+for the `τ_ℓ = 1` case. -/
+private lemma fromHToG_completePart_average_total_eq
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) :
+    averageOperatorOverDistribution (uniformDistribution (Fq params))
+      (fun x => (completePartSubMeas params family x).total) =
+        family.averagedSubMeas.total := by
+  unfold averageOperatorOverDistribution IdxPolyFamily.averagedSubMeas
+  simp [completePartSubMeas_total]
+
+/-- The incomplete branch of `\widehat G` averages to `I - G`, matching
+`references/ldt-paper/ld-pasting.tex:1408--1415` for the `τ_ℓ = 0` case. -/
+private lemma fromHToG_incompletePart_average_total_eq
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) :
+    averageOperatorOverDistribution (uniformDistribution (Fq params))
+      (fun x => (incompletePartSubMeas params family x).total) =
+        1 - family.averagedSubMeas.total := by
+  classical
+  calc
+    averageOperatorOverDistribution (uniformDistribution (Fq params))
+        (fun x => (incompletePartSubMeas params family x).total)
+      = ∑ x ∈ (uniformDistribution (Fq params)).support,
+          ((uniformDistribution (Fq params)).weight x • (1 : MIPStarRE.Quantum.Op ι) -
+            (uniformDistribution (Fq params)).weight x •
+              (completePartSubMeas params family x).total) := by
+          unfold averageOperatorOverDistribution incompletePartSubMeas
+          refine Finset.sum_congr rfl ?_
+          intro x _hx
+          simp [smul_sub]
+    _ = averageOperatorOverDistribution (uniformDistribution (Fq params))
+          (fun _ : Fq params => (1 : MIPStarRE.Quantum.Op ι)) -
+        averageOperatorOverDistribution (uniformDistribution (Fq params))
+          (fun x => (completePartSubMeas params family x).total) := by
+          unfold averageOperatorOverDistribution
+          rw [Finset.sum_sub_distrib]
+    _ = 1 - family.averagedSubMeas.total := by
+          rw [fromHToG_averageOperator_uniform_const_one]
+          rw [fromHToG_completePart_average_total_eq]
+
 /-- A zero-length type restriction of the sandwiched family has total identity.
 This isolates the `tailLen = 0` collapse of `outcomesByType`, `restrictSubMeas`,
 and the empty half-sandwich product. -/
@@ -301,12 +340,7 @@ private lemma fromHToG_outcomesByType_iff_type_eq
     {params : Parameters} [FieldModel params.q] {k : ℕ}
     (gs : GHatTupleOutcome params k) (τ : GHatType k) :
     gs ∈ outcomesByType τ ↔ gHatTupleType gs = τ := by
-  constructor
-  · intro h
-    funext i
-    exact h i
-  · intro h i
-    exact congrFun h i
+  simp [outcomesByType, gHatTupleType, funext_iff]
 
 /-- Interpolation eligibility depends only on the Boolean type of a completed-slice
 tuple. -/
@@ -395,8 +429,8 @@ private lemma fromHToG_averagedSandwichByType_total_eq_type_sum
             gHatTupleType gs = τ,
             (gHatSandwichFamily params family k xs).outcome gs) := by
   classical
-  unfold averagedSandwichByTypeSubMeas averageIdxSubMeas averageOperatorOverDistribution
-  simp only
+  simp only [averagedSandwichByTypeSubMeas, averageIdxSubMeas,
+    averageOperatorOverDistribution]
   refine Finset.sum_congr rfl ?_
   intro xs _hxs
   congr 1
@@ -414,8 +448,8 @@ private lemma fromHToG_averagedEligibleSandwich_total_eq_type_sum
           (averagedSandwichByTypeSubMeas params family k τ).total
         else 0 := by
   classical
-  unfold averagedEligibleSandwichSubMeas averageIdxSubMeas averageOperatorOverDistribution
-  simp only
+  simp only [averagedEligibleSandwichSubMeas, averageIdxSubMeas,
+    averageOperatorOverDistribution]
   calc
     (∑ a ∈ (uniformDistribution (PointTuple params k)).support,
         (uniformDistribution (PointTuple params k)).weight a •
@@ -526,6 +560,29 @@ private lemma fromHToGStageMass_zero_eq
                   (averagedSandwichByTypeSubMeas params family k τ).total
                 else 0))
 
+/-- Tail-level version of the exact `S`-recurrence used at the end of the
+adjacent-stage bridge.  After the analytic move-right / commute / move-right
+steps, the remaining paper expression collapses to the next Lean stage by
+expanding the recurrence weight as
+`S_{τ_{>ℓ}} = S_{1 :: τ_{>ℓ}} G + S_{0 :: τ_{>ℓ}} (I-G)`; this lemma records
+that exact bookkeeping at the scalar mass level. -/
+private lemma fromHToGTailStageMass_succ_weight_recurrence
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (prefixLen : ℕ) {tailLen : ℕ} (τtail : GHatType tailLen) :
+    fromHToGTailStageMass params ψbi family (prefixLen + 1) τtail =
+      ev ψbi (leftTensor (ι₂ := ι)
+        ((averagedSandwichByTypeSubMeas params family tailLen τtail).total *
+          (fromHToGRecurrenceWeight params family prefixLen
+              (prependTypeBit true τtail) * family.averagedSubMeas.total +
+            fromHToGRecurrenceWeight params family prefixLen
+              (prependTypeBit false τtail) * (1 - family.averagedSubMeas.total)))) := by
+  unfold fromHToGTailStageMass fromHToGTailStageFamily
+  simp only [IdxOpFamily.liftLeft, OpFamily.leftPlacedOpFamily]
+  rw [fromHToGRecurrenceWeight_succ]
+
 /-- Telescoping for a scalar chain indexed by natural numbers.
 
 This is the purely real-analysis part of the last step in `lem:from-H-to-G`:
@@ -571,9 +628,9 @@ private lemma fromHToGStageMass_telescope
     (fun ℓ => fromHToGStageMass params ψbi family k ℓ)
     (fromHToGRecurrenceError params gamma zeta k) k hstep
 
-/-- Reduce the final scalar `fromHToG` conclusion to the three paper-local
-bridge facts: identify the Lean stage `0`, identify the Lean stage `k`, and
-absorb the telescoped adjacent-stage loss into the displayed error term. -/
+/-- Reduce the final scalar `fromHToG` conclusion to the paper-local stage facts:
+the adjacent-stage recurrence, the Lean stage `0` and stage `k` endpoint
+identifications, and the scalar absorption into the displayed error term. -/
 private lemma fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints
     (params : Parameters)
     [FieldModel params.q]
@@ -606,12 +663,58 @@ private lemma fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints
     simpa [hstage0, hstagek] using htelescope
   exact le_trans hmass herror
 
+/-- Exact bookkeeping at the end of the adjacent-stage bridge.
+
+This isolates the paper's `S`-recurrence step
+`references/ldt-paper/ld-pasting.tex:1417--1425` and its use in the final
+collapse at lines `1657--1661`: once the analytic move-right / commute /
+move-right approximations have reached the branch-split expression, the
+recurrence weight is exactly the next-stage weight. -/
+private structure FromHToGAdjacentStageExactFacts
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) : Prop where
+  completeBranchAverage :
+    averageOperatorOverDistribution (uniformDistribution (Fq params))
+      (fun x => (completePartSubMeas params family x).total) =
+        family.averagedSubMeas.total
+  incompleteBranchAverage :
+    averageOperatorOverDistribution (uniformDistribution (Fq params))
+      (fun x => (incompletePartSubMeas params family x).total) =
+        1 - family.averagedSubMeas.total
+  tailWeightRecurrence :
+    ∀ (prefixLen : ℕ) {tailLen : ℕ} (τtail : GHatType tailLen),
+      fromHToGTailStageMass params ψbi family (prefixLen + 1) τtail =
+        ev ψbi (leftTensor (ι₂ := ι)
+          ((averagedSandwichByTypeSubMeas params family tailLen τtail).total *
+            (fromHToGRecurrenceWeight params family prefixLen
+                (prependTypeBit true τtail) * family.averagedSubMeas.total +
+              fromHToGRecurrenceWeight params family prefixLen
+                (prependTypeBit false τtail) * (1 - family.averagedSubMeas.total))))
+
+/-- Package the exact `S`-recurrence bookkeeping facts already proved in this
+file. -/
+private lemma fromHToGAdjacentStageExactFacts_of_weights
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) :
+    FromHToGAdjacentStageExactFacts params ψbi family where
+  completeBranchAverage :=
+    fromHToG_completePart_average_total_eq params family
+  incompleteBranchAverage :=
+    fromHToG_incompletePart_average_total_eq params family
+  tailWeightRecurrence :=
+    fromHToGTailStageMass_succ_weight_recurrence params ψbi family
+
 /-- The remaining adjacent-stage operator/scalar bridge for `fromHToG`.
 
-The endpoint identifications and generic telescope are already proved above;
-this package isolates the substantive paper step: one adjacent-stage move using
-`cor:G-hat-facts`, `lem:commute-g-half-sandwich`, and the exact recurrence for
-`fromHToGRecurrenceWeight`. -/
+The endpoint identifications, generic telescope, and exact `S`-recurrence
+bookkeeping are already proved above; this package now isolates the substantive
+analytic paper step: one adjacent-stage move using the two `\sqrt{2ζ}` moves
+from `cor:G-hat-facts` and the two `\sqrt{ν₄}` commutation moves from
+`lem:commute-g-half-sandwich`. -/
 private structure FromHToGAdjacentStageFacts
     (params : Parameters)
     [FieldModel params.q]
@@ -669,16 +772,18 @@ private lemma fromHToG_errorAbsorption_not_purely_scalar :
 This deliberately does not duplicate the public theorem: the telescope from these
 facts to `FromHToGStatement.bernoulliPolynomialRewrite` is already proved by
 `fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints`.  The terminal stage
-`k` is identified exactly by `fromHToGStageMass_terminal_eq`, and stage `0` is
-identified exactly by `fromHToGStageMass_zero_eq`; what remains is split into two
-private subpackages: the adjacent-stage operator/scalar bridge and the separate
-arithmetic absorption diagnosed above. -/
+`k` is identified exactly by `fromHToGStageMass_terminal_eq`, stage `0` is
+identified exactly by `fromHToGStageMass_zero_eq`, and the exact `S`-recurrence
+bookkeeping is recorded in `FromHToGAdjacentStageExactFacts`; what remains is
+split into two private subpackages: the adjacent-stage analytic bridge and the
+separate arithmetic absorption diagnosed above. -/
 private structure FromHToGResidualStageFacts
     (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error) (k : ℕ) : Prop where
+  stageExact : FromHToGAdjacentStageExactFacts params ψbi family
   adjacent : FromHToGAdjacentStageFacts params ψbi family gamma zeta k
   arithmetic : FromHToGErrorAbsorptionFacts params gamma zeta k
 
@@ -713,13 +818,14 @@ lemma fromHToG
        * `blueprint/src/chapter/ch09_pasting.tex`, proof of `lem:from-H-to-G`
          (roughly lines 979–1233 in the current source).
 
-       What remains to formalize after this file's telescope reduction:
+       What remains to formalize after this file's exact `S`-recurrence and
+       telescope reductions:
        1. fill `FromHToGAdjacentStageFacts` by proving each adjacent-stage
           recurrence step via the paper's move-right / commute / move-right chain,
           using two `easyApproxFromApproxDelta` / `closenessOfIP` moves from
-          `hfacts.completedSelfConsistency`, then two suffix-commutation moves from
-          `hhalf (k - ℓ)`, and finally the exact branch split via
-          `fromHToGRecurrenceWeight_succ`;
+          `hfacts.completedSelfConsistency` and two suffix-commutation moves from
+          `hhalf (k - ℓ)`; the final exact branch split is now recorded by
+          `hstageExact.tailWeightRecurrence` below;
        2. fill `FromHToGErrorAbsorptionFacts` by resolving the separate displayed
           arithmetic comparison `k * fromHToGRecurrenceError ≤ fromHToGError`.
           The lemma `fromHToG_errorAbsorption_not_purely_scalar` above records why
@@ -734,11 +840,21 @@ lemma fromHToG
        `bernoulliPolynomialRewrite` is now proved above in
        `fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints`.
     -/
-    -- Keep the two paper inputs visible at the residual proof site: future work
-    -- should use them for the self-consistency and suffix-commutation moves above.
-    have _ := hfacts.completedSelfConsistency
-    have _ := hhalf
-    sorry
+    let hstageExact : FromHToGAdjacentStageExactFacts params ψbi family :=
+      fromHToGAdjacentStageExactFacts_of_weights params ψbi family
+    have hremaining :
+        FromHToGAdjacentStageFacts params ψbi family gamma zeta k ∧
+          FromHToGErrorAbsorptionFacts params gamma zeta k := by
+      -- Keep the paper inputs and exact branch bookkeeping visible at the residual
+      -- proof site: future work should use them for the two self-consistency
+      -- moves, the two suffix-commutation moves, and the final exact collapse.
+      have _ := hfacts.completedSelfConsistency
+      have _ := hhalf
+      have _ := hstageExact.completeBranchAverage
+      have _ := hstageExact.incompleteBranchAverage
+      have _ := hstageExact.tailWeightRecurrence
+      sorry
+    exact ⟨hstageExact, hremaining.1, hremaining.2⟩
   refine ⟨hresidual.adjacent.recurrenceStep, ?_⟩
   exact fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints
     params strategy ψbi family gamma zeta k

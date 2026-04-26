@@ -263,9 +263,11 @@
 	% Lean-local gap: `comMain`'s axiom closure currently includes `sorryAx`
 	% via `commDataProcessedG` (remaining local sorrys at
 	% `Commutativity/ScalarApproximation/ProcessedG.lean:1360` for the phase-2
-	% reindexing residual and `ProcessedG.lean:1491` for the phase-6/7 first-reverse
-	% endpoint), plus `Commutativity/Main/Auxiliary.lean:103, 167`. Add the
-	% blueprint-ok marker once those are closed.
+	% reindexing residual and `ProcessedG.lean:1494` for the phase-6/7 first-reverse
+	% endpoint), plus the `Commutativity/Main/Auxiliary.lean` residuals
+	% `fullSliceScalarMarginalizeXTensorTriangleResidual` and
+	% `fullSliceScalarMarginalizeYPrefixResidual`. Add the blueprint-ok marker once
+	% those are closed.
 	\uses{def:good-strategy, def:polymeasurements, def:approx_delta, def:strong-self-consistency}
 	Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test.
 	Let $\{G^x\}_{x \in \F_q}$ denote a set of projective sub-measurements in $\polysub{m}{q}{d}$ with the following properties:

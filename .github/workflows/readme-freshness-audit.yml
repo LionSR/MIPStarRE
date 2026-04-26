@@ -1,0 +1,89 @@
+name: README freshness audit
+
+on:
+  schedule:
+    # Report-only README freshness sweep, after the Monday maintenance audits.
+    - cron: "30 9 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: readme-freshness-audit
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Run README freshness audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run report-only audit
+        run: |
+          # This workflow is report-only: it emits a summary and artifact for
+          # maintainers, but never edits README.md or opens pull requests.
+          python3 scripts/audit_readme_freshness.py \
+            --format json \
+            --output "$RUNNER_TEMP/readme-freshness-audit.json"
+          python3 scripts/audit_readme_freshness.py \
+            --output "$RUNNER_TEMP/readme-freshness-audit.txt"
+
+      - name: Summarize audit result
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          report_path = Path(os.environ["RUNNER_TEMP"]) / "readme-freshness-audit.json"
+          report = json.loads(report_path.read_text())
+          summary_path = Path(os.environ["GITHUB_STEP_SUMMARY"])
+
+          with summary_path.open("a", encoding="utf-8") as summary:
+              summary.write("## README freshness audit\n\n")
+              summary.write(
+                  "This scheduled workflow is report-only. It checks `README.md` "
+                  "for local path references, the documented `MIPStarRE/LDT/` "
+                  "submodule count, and hard-coded Lean/Mathlib versions.\n\n"
+              )
+              summary.write(f"- Flagged stale content: {report['flagged']}\n")
+              summary.write(f"- Local paths checked: {len(report['path_references'])}\n")
+              summary.write(f"- Missing paths: {len(report['missing_paths'])}\n")
+              ldt = report["ldt_submodule_count"]
+              summary.write(
+                  f"- LDT submodule count: actual={ldt['actual']}, "
+                  f"mismatches={len(ldt['mismatches'])}\n"
+              )
+              toolchain = report["toolchain"]
+              summary.write(
+                  f"- Version mentions: hard-coded={len(toolchain['hardcoded_mentions'])}, "
+                  f"mismatches={len(toolchain['mismatches'])}\n"
+              )
+              if report["flagged"]:
+                  summary.write(
+                      "\nThe workflow does not auto-edit the README. Open a focused "
+                      "documentation PR after reviewing the artifact.\n\n"
+                  )
+                  summary.write("```text\n")
+                  summary.write(
+                      (Path(os.environ["RUNNER_TEMP"]) / "readme-freshness-audit.txt").read_text()
+                  )
+                  summary.write("```\n")
+          PY
+
+      - name: Upload README freshness report
+        uses: actions/upload-artifact@v4
+        with:
+          name: readme-freshness-audit-report
+          path: |
+            ${{ runner.temp }}/readme-freshness-audit.json
+            ${{ runner.temp }}/readme-freshness-audit.txt
+          if-no-files-found: error

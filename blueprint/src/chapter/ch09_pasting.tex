@@ -6,9 +6,10 @@
 \begin{theorem}[Pasting]\label{thm:ld-pasting}
 	\lean{MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection, MIPStarRE.LDT.Pasting.ldPasting}
 	% Lean-local gap: `Pasting.ldPasting` (and its induction-section wrapper)
-	% transitively depends on `ldPastingNCompleteness`, whose proof still has
-	% `sorry` at `Pasting/Bernoulli/Final.lean:247`. Restore the blueprint-ok marker once
-	% that Bernoulli-tail bound is closed (issue #673).
+	% still transitively depends on upstream completeness residuals in
+	% `Pasting/BridgeLemmas/OverAllOutcomes.lean` and
+	% `Pasting/Bernoulli/Recurrence.lean` (`fromHToG`); the former
+	% `Pasting/Bernoulli/Final.lean` Bernoulli-tail gap is closed.
 	\uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
 	Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test. Let $\{G^x\}_{x \in \F_q}$ be projective submeasurements in $\polysub{m}{q}{d}$ with the following properties:
 	\begin{enumerate}
@@ -157,9 +158,9 @@ where
 
 \begin{lemma}[Pasted submeasurement]\label{lem:ld-pasting-sub-measurement}
 	\lean{MIPStarRE.LDT.Pasting.ldPastingSubMeas}
-	% Lean-local gap: `ldPastingSubMeas` shares the
-	% `ldPastingNCompleteness`-via-`Final.lean:247` sorry chain as
-	% `ldPasting`, so its axiom closure still contains `sorryAx`.
+	% Lean-local gap: `ldPastingSubMeas` shares the remaining upstream
+	% `ldPastingNCompleteness` dependency chain through `overAllOutcomes` and
+	% `fromHToG`, so its axiom closure still contains `sorryAx`.
 	\uses{def:ld-pasting-context, def:polymeasurements, def:simeq,
 	      def:pasted-measurement}
 	In the standing pasting context of Definition~\ref{def:ld-pasting-context},
@@ -820,8 +821,10 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 
 \begin{lemma}[Summing over all outcomes]\label{lem:over-all-outcomes}
 	\lean{MIPStarRE.LDT.Pasting.overAllOutcomes}
-	% Lean-local gap: `overAllOutcomes` currently has `sorry` as its entire
-	% proof body (`Pasting/BridgeLemmas/OverAllOutcomes.lean:64`).
+	% Lean-local gap: the public wrapper is reduced to the private residual
+	% `overAllOutcomes_distinct_nonglobal_mass_bound` in
+	% `Pasting/BridgeLemmas/OverAllOutcomes.lean`, matching the paper's
+	% nonglobal-indicator aggregation at `ld-pasting.tex` lines 1174--1275.
 	\uses{def:outcomes-by-type, prop:ld-dnoteq, lem:ld-sandwich-line-one-point, lem:schwartz-zippel-individual}
 	If $x_1,\dots,x_k$ are sampled independently and uniformly from $\F_q$, then
 	\[

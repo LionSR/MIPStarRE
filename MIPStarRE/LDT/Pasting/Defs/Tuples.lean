@@ -143,6 +143,24 @@ noncomputable def bernoulliTailOperator (k degree : ℕ)
   ∑ r ∈ Finset.Icc (degree + 1) k,
     (Nat.choose k r : ℂ) • (X ^ r * (1 - X) ^ (k - r))
 
+/-- The Bernoulli-tail polynomial commutes with left tensor placement. -/
+theorem bernoulliTailOperator_leftTensor (A : MIPStarRE.Quantum.Op ι)
+    (k degree : ℕ) :
+    bernoulliTailOperator k degree (leftTensor (ι₂ := ι) A) =
+      leftTensor (ι₂ := ι) (bernoulliTailOperator k degree A) := by
+  unfold bernoulliTailOperator
+  rw [← leftTensor_finset_sum (ι₂ := ι) (Finset.Icc (degree + 1) k)
+    (fun r => (Nat.choose k r : ℂ) • (A ^ r * (1 - A) ^ (k - r)))]
+  refine Finset.sum_congr rfl ?_
+  intro r _hr
+  rw [leftTensor_pow]
+  rw [show (1 : MIPStarRE.Quantum.Op (ι × ι)) - leftTensor (ι₂ := ι) A =
+      leftTensor (ι₂ := ι) (1 - A) by
+        rw [← leftTensor_one (ι₁ := ι) (ι₂ := ι), leftTensor_sub]]
+  rw [leftTensor_pow, leftTensor_mul_leftTensor]
+  exact leftTensor_smul (ι₁ := ι) (ι₂ := ι) (Nat.choose k r : ℂ)
+    (A ^ r * (1 - A) ^ (k - r))
+
 /-- Multiply each outcome operator by a total operator on the right. -/
 noncomputable def multiplyByTotalOnRight {α β : Type*} [Fintype α] [Fintype β]
     (A : SubMeas α ι) (B : SubMeas β ι) :

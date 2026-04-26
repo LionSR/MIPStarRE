@@ -313,15 +313,15 @@ def MainFormalSuccessorSelfImprovementProducer (params : Parameters)
 
 Assume the ambient projective strategy lives over `params.next`. Step 1 already
 turns `hpass` into the `(3 * eps, 3 * eps, 3 * eps)`-good role-register
-symmetrization `strategy.strategySymmetrization`. What still remains to apply
-`MainInductionStep.mainInductionPublicWrapper` are exactly the public Section 6
-inputs tracked by issues #631 and #632:
+symmetrization `strategy.strategySymmetrization`. The public Section 6 wrapper
+expects:
 1. weighted restricted-axis and restricted-diagonal bounds,
 2. recursive slice witnesses for the restricted strategies, and
 3. a restricted-strategy self-improvement producer.
 
-Bundling them into a single named boundary package gives the successor branch
-of `mainFormal` one honest issue-#634 interface, rather than four independent
+The helper lemmas below now discharge the weighted fields from `hpass`; bundling
+all fields into a single named package still gives the successor branch of
+`mainFormal` one honest issue-#634 interface, rather than four independent
 hypothesis holes. -/
 structure MainFormalSuccessorBoundary (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -337,6 +337,184 @@ structure MainFormalSuccessorBoundary (params : Parameters)
   selfImprovementProducer :
     MainFormalSuccessorSelfImprovementProducer params strategy eps hpass k
       axisWeightedBound diagonalWeightedBound
+
+/-- The public restricted-probabilities theorem supplies the successor-case
+weighted axis-parallel input for the role-register symmetrization used by
+`mainFormal`. -/
+theorem mainFormalSuccessorAxisWeightedBound_ofPass
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
+    MainFormalSuccessorAxisWeightedBound params strategy eps :=
+  MainInductionStep.weighted_axisParallel_bound params
+    strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps)
+    (ProjStrat.strategySymmetrization_isGood_three_mul
+      (strategy := strategy) (eps := eps) hpass)
+
+/-- The public restricted-probabilities theorem supplies the successor-case
+weighted diagonal-line input for the role-register symmetrization used by
+`mainFormal`. -/
+theorem mainFormalSuccessorDiagonalWeightedBound_ofPass
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
+    MainFormalSuccessorDiagonalWeightedBound params strategy eps :=
+  MainInductionStep.weighted_diagonal_bound params
+    strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps)
+    (ProjStrat.strategySymmetrization_isGood_three_mul
+      (strategy := strategy) (eps := eps) hpass)
+
+/-- Build the successor boundary once the two still-external slice-recursion and
+restricted-strategy self-improvement inputs are supplied. The weighted
+restricted-probability fields are now discharged from `hpass` by the public
+Section 6 weighted-bound lemmas. -/
+def mainFormalSuccessorBoundary_ofRecursiveSelfImprovement
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (hrec : MainFormalSuccessorRecursiveSlices params strategy eps hpass k
+      (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
+      (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass))
+    (hself : MainFormalSuccessorSelfImprovementProducer params strategy eps hpass k
+      (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
+      (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass)) :
+    MainFormalSuccessorBoundary params strategy eps hpass k :=
+  let axisBound := mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass
+  let diagonalBound :=
+    mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass
+  { axisWeightedBound := axisBound
+    diagonalWeightedBound := diagonalBound
+    recursiveSlices := hrec
+    selfImprovementProducer := hself }
+
+/-- Successor-case Section 6 handoff for `mainFormal`.
+
+This is the actual invocation of
+`MainInductionStep.mainInductionPublicWrapper` on the role-register
+symmetrization. It proves that, once the `MainFormalSuccessorBoundary` data are
+available and the Section 6 side condition `400 * m * d ≤ k` holds, the public
+wrapper returns the global polynomial measurement used by the later
+unsymmetrization / Schwartz--Zippel / projectivization cascade.
+
+Universe note: the explicit `[FieldModel.{0} params.q]` matches the Section 6
+wrapper's universe; the eventual `mainFormal` residual closure must transport or
+instantiate this same base-universe field model when choosing predecessor
+parameters. -/
+theorem mainFormalSuccessorMainInductionPublicWrapper
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (hd : 0 < params.d)
+    (boundary : MainFormalSuccessorBoundary params strategy eps hpass k)
+    (hk_pos : 1 ≤ k)
+    (hk : 400 * params.m * params.d ≤ k) :
+    ∃ G : Measurement (Polynomial params.next) (Role × ι),
+      ConsRel (strategy.strategySymmetrization).state
+        (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas (strategy.strategySymmetrization).pointMeasurement)
+        (polynomialEvaluationFamily params.next G.toSubMeas)
+        (MainInductionStep.mainInductionError params.next k
+          (3 * eps) (3 * eps) (3 * eps)) :=
+  MainInductionStep.mainInductionPublicWrapper params
+    (strategy := strategy.strategySymmetrization)
+    (eps := 3 * eps) (delta := 3 * eps) (gamma := 3 * eps) (k := k)
+    (ProjStrat.strategySymmetrization_isGood_three_mul
+      (strategy := strategy) (eps := eps) hpass)
+    hd
+    boundary.axisWeightedBound
+    boundary.diagonalWeightedBound
+    boundary.recursiveSlices
+    boundary.selfImprovementProducer
+    hk_pos hk
+
+/-- Paper-native final targets for the remaining `mainFormal` assembly.
+
+This structure deliberately stops before the final error-envelope weakening. Its
+three consistency fields are exactly the native conclusions reached in
+`references/ldt-paper/inductive_step.tex`:
+
+* `eq:one-goal` (lines 175--181):
+  $A^{\mathrm A,u}_a \otimes I \simeq_{\zeta_4}
+    I \otimes Q^{\mathrm B}_{[g(u)=a]}$;
+* `eq:another-goal` (lines 182--185):
+  $I \otimes A^{\mathrm B,u}_a \simeq_{\zeta_4}
+    Q^{\mathrm A}_{[g(u)=a]} \otimes I$;
+* `eq:third-goal` (lines 160--162):
+  $Q^{\mathrm A}_g \otimes I \simeq_{\zeta_3/2} I \otimes Q^{\mathrm B}_g$.
+
+The two bound fields record the already-formalized Step 8 absorption of
+`\zeta_4` and `\zeta_3/2` into `mainFormalError`. Constructing this package from
+Section 6 and the unsymmetrization / Schwartz--Zippel / projectivization chain is
+the live residual; the projection theorem below is only the final paper-faithful
+packaging step. -/
+structure MainFormalNativeTargets
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ) where
+  /-- The projective measurement denoted $Q^{\mathrm A}$ in the paper. -/
+  leftMeasurement : ProjMeas (Polynomial params) ι
+  /-- The projective measurement denoted $Q^{\mathrm B}$ in the paper. -/
+  rightMeasurement : ProjMeas (Polynomial params) ι
+  /-- The paper's self-consistency error `\zeta_3`. -/
+  zeta3 : Error
+  /-- The paper's two point-consistency error `\zeta_4`. -/
+  zeta4 : Error
+  /-- Native form of `eq:one-goal`, before weakening to `mainFormalError`. -/
+  pointAConsistency :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (polynomialEvaluationFamily params rightMeasurement.toSubMeas)
+      zeta4
+  /-- Native form of `eq:another-goal`, before weakening to `mainFormalError`. -/
+  pointBConsistency :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params leftMeasurement.toSubMeas)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+      zeta4
+  /-- Native form of `eq:third-goal`, before its point-evaluation data processing. -/
+  selfConsistency :
+    ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily leftMeasurement.toSubMeas)
+      (constSubMeasFamily rightMeasurement.toSubMeas)
+      (zeta3 / 2)
+  /-- Step 8 scalar absorption for the two point-consistency targets. -/
+  pointErrorLe : zeta4 ≤ mainFormalError params k eps
+  /-- Step 8 scalar absorption for the self-consistency target. -/
+  selfErrorLe : zeta3 / 2 ≤ mainFormalError params k eps
+
+namespace MainFormalNativeTargets
+
+/-- Final packaging step for `thm:main-formal` once the paper-native targets have
+been constructed. This only weakens the native `\zeta_4` and `\zeta_3/2` bounds to
+`mainFormalError` using `ConsRel.mono`; all substantive transport work is in the
+construction of `MainFormalNativeTargets`. -/
+theorem toMainFormal {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    (targets : MainFormalNativeTargets params strategy eps k) :
+    ∃ G_A G_B : ProjMeas (Polynomial params) ι,
+      ConsRel strategy.state (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+          (polynomialEvaluationFamily params G_B.toSubMeas)
+          (mainFormalError params k eps) ∧
+        ConsRel strategy.state (uniformDistribution (Point params))
+          (polynomialEvaluationFamily params G_A.toSubMeas)
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+          (mainFormalError params k eps) ∧
+        ConsRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily G_A.toSubMeas)
+          (constSubMeasFamily G_B.toSubMeas)
+          (mainFormalError params k eps) := by
+  refine ⟨targets.leftMeasurement, targets.rightMeasurement, ?_, ?_, ?_⟩
+  · exact ConsRel.mono targets.pointErrorLe targets.pointAConsistency
+  · exact ConsRel.mono targets.pointErrorLe targets.pointBConsistency
+  · exact ConsRel.mono targets.selfErrorLe targets.selfConsistency
+
+end MainFormalNativeTargets
 
 /--
 `thm:main-formal` from `test_definition.tex`.
@@ -387,27 +565,29 @@ theorem mainFormal
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  -- TODO(#634): The remaining proof still case-splits on the `k`-bound
-  -- boundary made explicit above.
-  -- * `hlarge : 400 * params.m * params.d ≤ k` branch: Step 1 symmetrization
-  --   (`strategySymmetrization_*`) and the final scalar envelope
-  --   (`errorCascade_le_mainFormalError`) are already formalized. Section 6 now
-  --   exposes the public induction-step boundary theorem
-  --   `mainInductionPublicWrapper`, so the remaining induction-side gap is to
-  --   package the symmetrized strategy inputs into the weighted
-  --   restricted-probability bounds, recursive slice witnesses, and
-  --   restricted-strategy self-improvement producer that theorem expects. After
-  --   that, this file still needs the paper's unsymmetrization,
-  --   Schwartz-Zippel, and final orthonormalization/projectivization transport
-  --   into the three displayed `ConsRel` conclusions; those last three
-  --   transports will apply `errorCascade_le_mainFormalError` directly at the
-  --   point-A consistency, point-B consistency, and self-consistency usage
-  --   sites.
-  -- * `hsmall : k < 400 * params.m * params.d` branch: combine the cascade
-  --   bounds with `params.m * params.d ≤ k` and `0 < k` to conclude
-  --   `1 ≤ mainFormalError params k eps`, then invoke
-  --   `mainFormal_trivial_witness`.
-  sorry
+  -- TODO(#422): The induction-side handoffs needed by the final
+  -- `mainFormal` assembly are standalone checked declarations:
+  -- * base branch: `strategySymmetrization_mainInductionBaseCase`,
+  -- * weighted successor boundary fields:
+  --   `mainFormalSuccessorAxisWeightedBound_ofPass` and
+  --   `mainFormalSuccessorDiagonalWeightedBound_ofPass`,
+  -- * successor Section 6 wrapper call:
+  --   `mainFormalSuccessorMainInductionPublicWrapper`, and
+  -- * vacuous branch: `mainFormal_trivial_witness`.
+  --
+  -- The remaining paper-faithful target is now named by
+  -- `MainFormalNativeTargets`: construct the projective measurements
+  -- `Q^A,Q^B` and the native `ζ₄`, `ζ₄`, and `ζ₃/2` consistency bounds from
+  -- `inductive_step.tex` lines 159--185, then use the Step 8 absorption fields
+  -- to weaken them to `mainFormalError`. Producing that package still depends on
+  -- the active upstream transport and pasting residuals: the role
+  -- unsymmetrization bridge (#424), the full-slice transport chain (#601), the
+  -- remaining `fromHToG` pasting bridge (#707), the reverse `overAllOutcomes`
+  -- aggregation (#672), and the ProcessedG scalar residual follow-ups #714,
+  -- #715, #732, and #759.
+  have targets : MainFormalNativeTargets params strategy eps k := by
+    sorry
+  exact MainFormalNativeTargets.toMainFormal targets
 
 end Test
 
