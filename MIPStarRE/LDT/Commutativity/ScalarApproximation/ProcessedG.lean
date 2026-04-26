@@ -12,6 +12,27 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+/-- Swap two nested uniform averages. -/
+private lemma avgOver_uniform_comm
+    {α β : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [Fintype β] [DecidableEq β] [Nonempty β]
+    (f : α → β → Error) :
+    avgOver (uniformDistribution α) (fun a => avgOver (uniformDistribution β) (f a)) =
+      avgOver (uniformDistribution β) (fun b => avgOver (uniformDistribution α)
+        (fun a => f a b)) := by
+  calc
+    avgOver (uniformDistribution α) (fun a => avgOver (uniformDistribution β) (f a))
+        = avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2) := by
+          exact (avgOver_uniform_prod (α := α) (β := β) (f := f)).symm
+    _ = avgOver (uniformDistribution (β × α)) (fun ba => f ba.2 ba.1) := by
+          simpa using
+            (avgOver_uniform_equiv (e := Equiv.prodComm α β)
+              (f := fun ab : α × β => f ab.1 ab.2))
+    _ = avgOver (uniformDistribution β) (fun b => avgOver (uniformDistribution α)
+          (fun a => f a b)) := by
+          exact avgOver_uniform_prod (α := β) (β := α) (f := fun b a => f a b)
+
 private lemma avgOver_uniform_pointNext_decompose
     (params : Parameters) [FieldModel params.q]
     (f : Point params.next → Error) :
@@ -582,6 +603,659 @@ private lemma evaluatedSlice_phaseFive_stability_defect_bound
   simpa [evaluatedSlicePhaseFiveStabilityDefect] using
     (gCommStabilityTwo_scalar params strategy zeta hnorm family G hG hbound)
 
+/-- The still-unmarginalized phase-5 defect at an evaluated-slice question.
+
+This is the phase-5 analogue of `evaluatedSlicePhaseTwoQuestionDefect`: after
+expanding `totalSandwichFamily`, the difference between the inserted `G^x.total`
+summand and the removed summand is the negative of this defect. -/
+private noncomputable def evaluatedSlicePhaseFiveQuestionDefect
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (q : EvaluatedSliceQuestion params) : Error :=
+  ∑ a : Fq params, ∑ b : Fq params,
+    ev strategy.state
+      (leftTensor (ι₂ := ι)
+          ((((evaluatedSliceSecondFactor params family q).outcome b) *
+            ((evaluatedSliceFirstFactor params family q).outcome a) *
+            ((evaluatedSliceSecondFactor params family q).outcome b)) *
+            (1 - (G (pointHeight params q.1)).total)) *
+        rightTensor (ι₁ := ι) ((evaluatedSlicePointMeas params strategy q.1).outcome a))
+
+/-- Pointwise algebra for the phase-5 subtraction.
+
+After expanding `totalSandwichFamily`, the inserted summand has an extra
+`G^x.total` factor on the left register.  This rewrites the difference with the
+removed summand as the negative phase-5 question defect. -/
+private lemma evaluatedSlice_phaseFive_term_diff
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (q : EvaluatedSliceQuestion params)
+    (a b : Fq params) :
+    ev strategy.state
+        (leftTensor (ι₂ := ι)
+            (((evaluatedSliceSecondFactor params family q).outcome b) *
+              ((evaluatedSliceFirstFactor params family q).outcome a) *
+              ((evaluatedSliceSecondFactor params family q).outcome b)) *
+          ((MIPStarRE.LDT.Preliminaries.totalSandwichFamily
+            (evaluatedPointFamily params family)
+            (evaluatedSlicePointMeas params strategy) q.1).outcome a)) -
+      ev strategy.state
+        (leftTensor (ι₂ := ι)
+            (((evaluatedSliceSecondFactor params family q).outcome b) *
+              ((evaluatedSliceFirstFactor params family q).outcome a) *
+              ((evaluatedSliceSecondFactor params family q).outcome b)) *
+          rightTensor (ι₁ := ι) ((evaluatedSlicePointMeas params strategy q.1).outcome a)) =
+    - ev strategy.state
+        (leftTensor (ι₂ := ι)
+            ((((evaluatedSliceSecondFactor params family q).outcome b) *
+              ((evaluatedSliceFirstFactor params family q).outcome a) *
+              ((evaluatedSliceSecondFactor params family q).outcome b)) *
+              (1 - (G (pointHeight params q.1)).total)) *
+          rightTensor (ι₁ := ι) ((evaluatedSlicePointMeas params strategy q.1).outcome a)) := by
+  have htotal := evaluatedPointFamily_total_eq_G_total params family G hG q.1
+  let S : MIPStarRE.Quantum.Op ι :=
+    ((evaluatedSliceSecondFactor params family q).outcome b) *
+      ((evaluatedSliceFirstFactor params family q).outcome a) *
+      ((evaluatedSliceSecondFactor params family q).outcome b)
+  let T : MIPStarRE.Quantum.Op ι := (G (pointHeight params q.1)).total
+  let P : MIPStarRE.Quantum.Op ι := (evaluatedSlicePointMeas params strategy q.1).outcome a
+  change
+    ev strategy.state
+        (leftTensor (ι₂ := ι) S *
+          ((MIPStarRE.LDT.Preliminaries.totalSandwichFamily
+            (evaluatedPointFamily params family)
+            (evaluatedSlicePointMeas params strategy) q.1).outcome a)) -
+      ev strategy.state
+        (leftTensor (ι₂ := ι) S * rightTensor (ι₁ := ι) P) =
+    - ev strategy.state
+        (leftTensor (ι₂ := ι) (S * (1 - T)) * rightTensor (ι₁ := ι) P)
+  rw [show ((MIPStarRE.LDT.Preliminaries.totalSandwichFamily
+            (evaluatedPointFamily params family)
+            (evaluatedSlicePointMeas params strategy) q.1).outcome a) =
+        leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) P by
+          simp [MIPStarRE.LDT.Preliminaries.totalSandwichFamily, htotal, T, P]]
+  rw [← ev_sub]
+  have hop :
+      leftTensor (ι₂ := ι) S * (leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) P) -
+          leftTensor (ι₂ := ι) S * rightTensor (ι₁ := ι) P =
+        -(leftTensor (ι₂ := ι) (S * (1 - T)) * rightTensor (ι₁ := ι) P) := by
+    calc
+      leftTensor (ι₂ := ι) S * (leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) P) -
+          leftTensor (ι₂ := ι) S * rightTensor (ι₁ := ι) P
+        = (leftTensor (ι₂ := ι) S * leftTensor (ι₂ := ι) T) *
+            rightTensor (ι₁ := ι) P -
+            leftTensor (ι₂ := ι) S * rightTensor (ι₁ := ι) P := by
+              rw [mul_assoc]
+      _ = leftTensor (ι₂ := ι) (S * T) * rightTensor (ι₁ := ι) P -
+            leftTensor (ι₂ := ι) S * rightTensor (ι₁ := ι) P := by
+              rw [leftTensor_mul_leftTensor]
+      _ = opTensor (S * T) P - opTensor S P := by
+              rw [leftTensor_mul_rightTensor_eq_opTensor,
+                leftTensor_mul_rightTensor_eq_opTensor]
+      _ = opTensor (S * T - S) P := by
+              rw [MIPStarRE.LDT.opTensor_sub_left]
+      _ = opTensor (-(S * (1 - T))) P := by
+              have hs : S * T - S = -(S * (1 - T)) := by noncomm_ring
+              rw [hs]
+      _ = -(leftTensor (ι₂ := ι) (S * (1 - T)) * rightTensor (ι₁ := ι) P) := by
+              have hneg : opTensor (-(S * (1 - T))) P = -(opTensor (S * (1 - T)) P) := by
+                simpa [opTensor] using
+                  (Matrix.smul_kronecker (-1 : ℂ) (S * (1 - T)) P)
+              rw [hneg]
+              rw [leftTensor_mul_rightTensor_eq_opTensor]
+  rw [hop]
+  simpa using
+    (ev_scale strategy.state (-1)
+      (leftTensor (ι₂ := ι) (S * (1 - T)) * rightTensor (ι₁ := ι) P))
+
+/-- Average the pointwise phase-5 algebra over evaluated-slice questions. -/
+private lemma evaluatedSlice_phaseFive_avg_diff_eq_neg_questionDefect
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas) :
+    let 𝒟 := uniformDistribution (EvaluatedSliceQuestion params)
+    let inserted : EvaluatedSliceQuestion params → Error := fun q =>
+      ∑ a : Fq params, ∑ b : Fq params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+              (((evaluatedSliceSecondFactor params family q).outcome b) *
+                ((evaluatedSliceFirstFactor params family q).outcome a) *
+                ((evaluatedSliceSecondFactor params family q).outcome b)) *
+            ((MIPStarRE.LDT.Preliminaries.totalSandwichFamily
+              (evaluatedPointFamily params family)
+              (evaluatedSlicePointMeas params strategy) q.1).outcome a))
+    let removed : EvaluatedSliceQuestion params → Error :=
+      evaluatedSlicePhaseFiveRemoved params strategy family
+    avgOver 𝒟 inserted - avgOver 𝒟 removed =
+      -avgOver 𝒟 (evaluatedSlicePhaseFiveQuestionDefect params strategy family G) := by
+  dsimp
+  calc
+    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (fun q : EvaluatedSliceQuestion params =>
+          ∑ a : Fq params, ∑ b : Fq params,
+            ev strategy.state
+              (leftTensor (ι₂ := ι)
+                  (((evaluatedSliceSecondFactor params family q).outcome b) *
+                    ((evaluatedSliceFirstFactor params family q).outcome a) *
+                    ((evaluatedSliceSecondFactor params family q).outcome b)) *
+                ((MIPStarRE.LDT.Preliminaries.totalSandwichFamily
+                  (evaluatedPointFamily params family)
+                  (evaluatedSlicePointMeas params strategy) q.1).outcome a))) -
+      avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (evaluatedSlicePhaseFiveRemoved params strategy family)
+        = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+            (fun q : EvaluatedSliceQuestion params =>
+              (∑ a : Fq params, ∑ b : Fq params,
+                ev strategy.state
+                  (leftTensor (ι₂ := ι)
+                      (((evaluatedSliceSecondFactor params family q).outcome b) *
+                        ((evaluatedSliceFirstFactor params family q).outcome a) *
+                        ((evaluatedSliceSecondFactor params family q).outcome b)) *
+                    ((MIPStarRE.LDT.Preliminaries.totalSandwichFamily
+                      (evaluatedPointFamily params family)
+                      (evaluatedSlicePointMeas params strategy) q.1).outcome a))) -
+              evaluatedSlicePhaseFiveRemoved params strategy family q) := by
+            simp [avgOver, Finset.sum_sub_distrib, mul_sub]
+    _ = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (fun q => -evaluatedSlicePhaseFiveQuestionDefect params strategy family G q) := by
+            apply avgOver_congr
+            intro q
+            calc
+              (∑ a : Fq params, ∑ b : Fq params,
+                ev strategy.state
+                  (leftTensor (ι₂ := ι)
+                      (((evaluatedSliceSecondFactor params family q).outcome b) *
+                        ((evaluatedSliceFirstFactor params family q).outcome a) *
+                        ((evaluatedSliceSecondFactor params family q).outcome b)) *
+                    ((MIPStarRE.LDT.Preliminaries.totalSandwichFamily
+                      (evaluatedPointFamily params family)
+                      (evaluatedSlicePointMeas params strategy) q.1).outcome a))) -
+                evaluatedSlicePhaseFiveRemoved params strategy family q
+                = ∑ a : Fq params, ∑ b : Fq params,
+                    (ev strategy.state
+                      (leftTensor (ι₂ := ι)
+                          (((evaluatedSliceSecondFactor params family q).outcome b) *
+                            ((evaluatedSliceFirstFactor params family q).outcome a) *
+                            ((evaluatedSliceSecondFactor params family q).outcome b)) *
+                        ((MIPStarRE.LDT.Preliminaries.totalSandwichFamily
+                          (evaluatedPointFamily params family)
+                          (evaluatedSlicePointMeas params strategy) q.1).outcome a)) -
+                    ev strategy.state
+                      (leftTensor (ι₂ := ι)
+                          (((evaluatedSliceSecondFactor params family q).outcome b) *
+                            ((evaluatedSliceFirstFactor params family q).outcome a) *
+                            ((evaluatedSliceSecondFactor params family q).outcome b)) *
+                        rightTensor (ι₁ := ι)
+                          ((evaluatedSlicePointMeas params strategy q.1).outcome a))) := by
+                    simp [evaluatedSlicePhaseFiveRemoved, Finset.sum_sub_distrib]
+              _ = ∑ a : Fq params, ∑ b : Fq params,
+                    -ev strategy.state
+                      (leftTensor (ι₂ := ι)
+                          ((((evaluatedSliceSecondFactor params family q).outcome b) *
+                            ((evaluatedSliceFirstFactor params family q).outcome a) *
+                            ((evaluatedSliceSecondFactor params family q).outcome b)) *
+                            (1 - (G (pointHeight params q.1)).total)) *
+                        rightTensor (ι₁ := ι)
+                          ((evaluatedSlicePointMeas params strategy q.1).outcome a)) := by
+                    refine Finset.sum_congr rfl ?_
+                    intro a _
+                    refine Finset.sum_congr rfl ?_
+                    intro b _
+                    exact evaluatedSlice_phaseFive_term_diff params strategy family G hG q a b
+              _ = -evaluatedSlicePhaseFiveQuestionDefect params strategy family G q := by
+                    simp [evaluatedSlicePhaseFiveQuestionDefect]
+    _ = -avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+          (evaluatedSlicePhaseFiveQuestionDefect params strategy family G) := by
+            simp [avgOver]
+
+/-- Collapse the postprocessing fiber appearing in the phase-5 reindexing step.
+
+For a fixed tail point `u`, the evaluated outcome `a` indexes exactly the fiber
+`{g | g u = a}`.  Linearity of tensor placement and expectation lets us expand
+the left-register postprocessed sum before applying `Finset.sum_fiberwise`. -/
+private lemma phaseFive_fiber_sum_ev
+    (params : Parameters) [FieldModel params.q]
+    (ψ : QuantumState (ι × ι))
+    (u : Point params)
+    (B T : MIPStarRE.Quantum.Op ι)
+    (Gx : SubMeas (Polynomial params) ι)
+    (P : Fq params → MIPStarRE.Quantum.Op ι) :
+    (∑ a : Fq params,
+      ev ψ
+        (leftTensor (ι₂ := ι)
+            (((B * (∑ g ∈ Finset.univ.filter
+                    (fun g : Polynomial params => g u = a), Gx.outcome g) * B) * T)) *
+          rightTensor (ι₁ := ι) (P a))) =
+      ∑ g : Polynomial params,
+        ev ψ
+          (leftTensor (ι₂ := ι) (((B * Gx.outcome g * B) * T)) *
+            rightTensor (ι₁ := ι) (P (g u))) := by
+  classical
+  calc
+    ∑ a : Fq params,
+        ev ψ
+          (leftTensor (ι₂ := ι)
+              (((B * (∑ g ∈ Finset.univ.filter
+                      (fun g : Polynomial params => g u = a), Gx.outcome g) * B) * T)) *
+            rightTensor (ι₁ := ι) (P a))
+      = ∑ a : Fq params,
+          ∑ g ∈ Finset.univ.filter (fun g : Polynomial params => g u = a),
+            ev ψ
+              (leftTensor (ι₂ := ι) (((B * Gx.outcome g * B) * T)) *
+                rightTensor (ι₁ := ι) (P a)) := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          rw [← ev_finset_sum ψ
+            (Finset.univ.filter (fun g : Polynomial params => g u = a))]
+          congr 1
+          calc
+            leftTensor (ι₂ := ι)
+                  (((B * (∑ g ∈ Finset.univ.filter
+                      (fun g : Polynomial params => g u = a), Gx.outcome g) * B) * T)) *
+                    rightTensor (ι₁ := ι) (P a)
+              = leftTensor (ι₂ := ι)
+                  (∑ g ∈ Finset.univ.filter (fun g : Polynomial params => g u = a),
+                    ((B * Gx.outcome g * B) * T)) *
+                    rightTensor (ι₁ := ι) (P a) := by
+                    congr 1
+                    congr 1
+                    symm
+                    calc
+                      ∑ g ∈ Finset.univ.filter (fun g : Polynomial params => g u = a),
+                          ((B * Gx.outcome g * B) * T)
+                        = (∑ g ∈ Finset.univ.filter
+                            (fun g : Polynomial params => g u = a),
+                            B * Gx.outcome g * B) * T := by
+                            rw [Finset.sum_mul]
+                      _ = ((∑ g ∈ Finset.univ.filter
+                            (fun g : Polynomial params => g u = a),
+                            B * Gx.outcome g) * B) * T := by
+                            congr 1
+                            rw [Finset.sum_mul]
+                      _ = (((B * (∑ g ∈ Finset.univ.filter
+                            (fun g : Polynomial params => g u = a),
+                            Gx.outcome g)) * B) * T) := by
+                            rw [Matrix.mul_sum]
+            _ = (∑ g ∈ Finset.univ.filter (fun g : Polynomial params => g u = a),
+                  leftTensor (ι₂ := ι) (((B * Gx.outcome g * B) * T))) *
+                    rightTensor (ι₁ := ι) (P a) := by
+                    rw [leftTensor_finset_sum (ι₂ := ι)
+                      (Finset.univ.filter (fun g : Polynomial params => g u = a))]
+            _ = (∑ g ∈ Finset.univ.filter (fun g : Polynomial params => g u = a),
+                leftTensor (ι₂ := ι) (((B * Gx.outcome g * B) * T)) *
+                  rightTensor (ι₁ := ι) (P a)) := by
+                    rw [Finset.sum_mul]
+    _ = ∑ a : Fq params,
+          ∑ g ∈ Finset.univ.filter (fun g : Polynomial params => g u = a),
+            ev ψ
+              (leftTensor (ι₂ := ι) (((B * Gx.outcome g * B) * T)) *
+                rightTensor (ι₁ := ι) (P (g u))) := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          refine Finset.sum_congr rfl ?_
+          intro g hg
+          have hgu : g u = a := (Finset.mem_filter.mp hg).2
+          simp [hgu]
+    _ = ∑ g : Polynomial params,
+          ev ψ
+            (leftTensor (ι₂ := ι) (((B * Gx.outcome g * B) * T)) *
+              rightTensor (ι₁ := ι) (P (g u))) := by
+          simpa using
+            (Finset.sum_fiberwise Finset.univ (fun g : Polynomial params => g u)
+              (fun g : Polynomial params =>
+                ev ψ
+                  (leftTensor (ι₂ := ι) (((B * Gx.outcome g * B) * T)) *
+                    rightTensor (ι₁ := ι) (P (g u)))))
+
+/-- Evaluating the slice family at an appended point is postprocessing the slice
+measurement by the fiber `{g | g u = a}`. -/
+private lemma evaluatedPointFamily_appendPoint_outcome
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (x : Fq params) (u : Point params) (a : Fq params) :
+    (evaluatedPointFamily params family (appendPoint params u x)).outcome a =
+      ∑ g ∈ Finset.univ.filter (fun g : Polynomial params => g u = a),
+        (G x).outcome g := by
+  simp [evaluatedPointFamily, IdxPolyFamily.evaluatedAtNextPoint, evaluateAt,
+    postprocess, hG, truncatePoint_appendPoint, pointHeight_appendPoint]
+
+/-- Postprocessing the sandwich `B_b G_g B_b` by the polynomial coordinate sums
+over the evaluated outcome `b`. -/
+private lemma postprocess_sandwichByOuterSubMeas_snd_outcome
+    (params : Parameters) [FieldModel params.q]
+    (B : SubMeas (Fq params) ι)
+    (Gx : SubMeas (Polynomial params) ι)
+    (g : Polynomial params) :
+    (postprocess (sandwichByOuterSubMeas B Gx) Prod.snd).outcome g =
+      ∑ b : Fq params, B.outcome b * Gx.outcome g * B.outcome b := by
+  classical
+  simp [postprocess, sandwichByOuterSubMeas, Finset.sum_filter, Fintype.sum_prod_type]
+
+private lemma opTensor_smul_left_error
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (c : Error) (A : MIPStarRE.Quantum.Op ιA) (B : MIPStarRE.Quantum.Op ιB) :
+    opTensor (c • A) B = c • opTensor A B := by
+  ext x y
+  simp [opTensor, mul_comm, mul_left_comm]
+
+private lemma opTensor_smul_right_error
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (c : Error) (A : MIPStarRE.Quantum.Op ιA) (B : MIPStarRE.Quantum.Op ιB) :
+    opTensor A (c • B) = c • opTensor A B := by
+  ext x y
+  simp [opTensor, mul_comm, mul_left_comm]
+
+private lemma ev_smul_error {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (c : Error) (X : MIPStarRE.Quantum.Op ι) :
+    ev ψ (c • X) = c * ev ψ X := by
+  simpa using ev_scale ψ c X
+
+private lemma opTensor_add_left_local
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (A B : MIPStarRE.Quantum.Op ιA) (C : MIPStarRE.Quantum.Op ιB) :
+    opTensor (A + B) C = opTensor A C + opTensor B C := by
+  ext x y
+  simp [opTensor, add_mul]
+
+private lemma opTensor_add_right_local
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (A : MIPStarRE.Quantum.Op ιA) (B C : MIPStarRE.Quantum.Op ιB) :
+    opTensor A (B + C) = opTensor A B + opTensor A C := by
+  ext x y
+  simp [opTensor, mul_add]
+
+private lemma opTensor_sum_left_finset
+    {α ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (s : Finset α) (f : α → MIPStarRE.Quantum.Op ιA) (B : MIPStarRE.Quantum.Op ιB) :
+    opTensor (∑ a ∈ s, f a) B = ∑ a ∈ s, opTensor (f a) B := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => simp [opTensor]
+  | @insert a s ha ih =>
+      rw [Finset.sum_insert ha, Finset.sum_insert ha, opTensor_add_left_local, ih]
+
+private lemma opTensor_sum_right_finset
+    {α ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (A : MIPStarRE.Quantum.Op ιA) (s : Finset α) (f : α → MIPStarRE.Quantum.Op ιB) :
+    opTensor A (∑ a ∈ s, f a) = ∑ a ∈ s, opTensor A (f a) := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => simp [opTensor]
+  | @insert a s ha ih =>
+      rw [Finset.sum_insert ha, Finset.sum_insert ha, opTensor_add_right_local, ih]
+
+private lemma opTensor_sum_left_univ
+    {α ιA ιB : Type*} [Fintype α]
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (f : α → MIPStarRE.Quantum.Op ιA) (B : MIPStarRE.Quantum.Op ιB) :
+    opTensor (∑ a : α, f a) B = ∑ a : α, opTensor (f a) B := by
+  classical
+  simpa using opTensor_sum_left_finset (s := (Finset.univ : Finset α)) (f := f) (B := B)
+
+private lemma opTensor_sum_right_univ
+    {α ιA ιB : Type*} [Fintype α]
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (A : MIPStarRE.Quantum.Op ιA) (f : α → MIPStarRE.Quantum.Op ιB) :
+    opTensor A (∑ a : α, f a) = ∑ a : α, opTensor A (f a) := by
+  classical
+  simpa using opTensor_sum_right_finset (A := A) (s := (Finset.univ : Finset α)) (f := f)
+
+/-- Move the first finite sum past the third while keeping the second and fourth fixed. -/
+private lemma phaseFive_sum_comm_four
+    {α β γ δ : Type*} [Fintype α] [Fintype β] [Fintype γ] [Fintype δ]
+    (f : γ → β → α → δ → Error) :
+    (∑ g : γ, ∑ u : β, ∑ a : α, ∑ b : δ, f g u a b) =
+      ∑ a : α, ∑ u : β, ∑ g : γ, ∑ b : δ, f g u a b := by
+  calc
+    (∑ g : γ, ∑ u : β, ∑ a : α, ∑ b : δ, f g u a b)
+        = ∑ g : γ, ∑ a : α, ∑ u : β, ∑ b : δ, f g u a b := by
+          refine Finset.sum_congr rfl ?_
+          intro g _
+          rw [Finset.sum_comm]
+    _ = ∑ a : α, ∑ g : γ, ∑ u : β, ∑ b : δ, f g u a b := by
+          rw [Finset.sum_comm]
+    _ = ∑ a : α, ∑ u : β, ∑ g : γ, ∑ b : δ, f g u a b := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          rw [Finset.sum_comm]
+
+/-- Expand expectation against uniformly averaged left and right tensor factors. -/
+private lemma phaseFive_bilinear_expand
+    {α β γ δ : Type*} [Fintype α] [Fintype β] [Fintype γ] [Fintype δ]
+    (ψ : QuantumState (ι × ι)) (c d : Error)
+    (L : α → γ → δ → MIPStarRE.Quantum.Op ι)
+    (R : β → γ → MIPStarRE.Quantum.Op ι) :
+    (∑ g : γ,
+      ev ψ (leftTensor (ι₂ := ι) (∑ a : α, c • ∑ b : δ, L a g b) *
+        rightTensor (ι₁ := ι) (∑ u : β, d • R u g))) =
+      ∑ g : γ, ∑ u : β, ∑ a : α, ∑ b : δ,
+        c * (d * ev ψ (leftTensor (ι₂ := ι) (L a g b) *
+          rightTensor (ι₁ := ι) (R u g))) := by
+  simp [opTensor_sum_left_univ, opTensor_sum_right_univ, opTensor_smul_left_error,
+    opTensor_smul_right_error, opTensor_mul, one_mul, mul_one, ev_sum, ev_smul_error,
+    Finset.smul_sum, smul_smul, Finset.sum_mul, Finset.mul_sum, mul_assoc]
+  ring_nf
+
+/-- Expand the question-level phase-5 defect after decomposing the first point as `(u, x)`. -/
+private lemma evaluatedSlicePhaseFiveQuestionDefect_appendPoint_expansion
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas)
+    (x : Fq params) (u : Point params) (vy : Point params.next) :
+    evaluatedSlicePhaseFiveQuestionDefect params strategy family G (appendPoint params u x, vy) =
+      ∑ g : Polynomial params, ∑ b : Fq params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+              ((((evaluatedPointFamily params family vy).outcome b) *
+                (G x).outcome g *
+                ((evaluatedPointFamily params family vy).outcome b)) *
+                (1 - (G x).total)) *
+            rightTensor (ι₁ := ι)
+              ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome
+                (g u))) := by
+  classical
+  calc
+    evaluatedSlicePhaseFiveQuestionDefect params strategy family G (appendPoint params u x, vy)
+        = ∑ b : Fq params, ∑ g : Polynomial params,
+            ev strategy.state
+              (leftTensor (ι₂ := ι)
+                  ((((evaluatedPointFamily params family vy).outcome b) *
+                    (G x).outcome g *
+                    ((evaluatedPointFamily params family vy).outcome b)) *
+                    (1 - (G x).total)) *
+                rightTensor (ι₁ := ι)
+                  ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome
+                    (g u))) := by
+          simp [evaluatedSlicePhaseFiveQuestionDefect, evaluatedSliceFirstFactor,
+            evaluatedSliceSecondFactor, evaluatedSlicePointMeas, pointHeight_appendPoint,
+            evaluatedPointFamily_appendPoint_outcome, hG]
+          rw [Finset.sum_comm]
+          refine Finset.sum_congr rfl ?_
+          intro b _
+          have hfiber :=
+            phaseFive_fiber_sum_ev (ι := ι) params strategy.state u
+              ((evaluatedPointFamily params family vy).outcome b)
+              (1 - (family.meas x).toSubMeas.total)
+              ((family.meas x).toSubMeas)
+              (fun a : Fq params =>
+                (strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome a)
+          simpa using hfiber
+    _ = ∑ g : Polynomial params, ∑ b : Fq params,
+            ev strategy.state
+              (leftTensor (ι₂ := ι)
+                  ((((evaluatedPointFamily params family vy).outcome b) *
+                    (G x).outcome g *
+                    ((evaluatedPointFamily params family vy).outcome b)) *
+                    (1 - (G x).total)) *
+                rightTensor (ι₁ := ι)
+                  ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome
+                    (g u))) := by
+          rw [Finset.sum_comm]
+
+/-- Expand the stability defect into the same `(vy, u, g, b)` normal form. -/
+private lemma evaluatedSlicePhaseFiveStabilityDefect_expansion_at
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (x : Fq params) :
+    evaluatedSlicePhaseFiveStabilityDefect params strategy family G x =
+      avgOver (uniformDistribution (Point params.next)) (fun vy =>
+        avgOver (uniformDistribution (Point params)) (fun u =>
+          ∑ g : Polynomial params, ∑ b : Fq params,
+            ev strategy.state
+              (leftTensor (ι₂ := ι)
+                  ((((evaluatedPointFamily params family vy).outcome b) *
+                    (G x).outcome g *
+                    ((evaluatedPointFamily params family vy).outcome b)) *
+                    (1 - (G x).total)) *
+                rightTensor (ι₁ := ι)
+                  ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome
+                    (g u))))) := by
+  classical
+  let cV : Error := 1 / (Fintype.card (Point params.next) : Error)
+  let cU : Error := 1 / (Fintype.card (Point params) : Error)
+  let L : Point params.next → Polynomial params → Fq params → MIPStarRE.Quantum.Op ι :=
+    fun vy g b =>
+      (((evaluatedPointFamily params family vy).outcome b) * (G x).outcome g *
+        ((evaluatedPointFamily params family vy).outcome b)) * (1 - (G x).total)
+  let R : Point params → Polynomial params → MIPStarRE.Quantum.Op ι :=
+    fun u g => (strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome (g u)
+  calc
+    evaluatedSlicePhaseFiveStabilityDefect params strategy family G x
+        = ∑ g : Polynomial params,
+            ev strategy.state
+              (leftTensor (ι₂ := ι)
+                  (∑ vy : Point params.next, cV • ∑ b : Fq params, L vy g b) *
+                rightTensor (ι₁ := ι) (∑ u : Point params, cU • R u g)) := by
+          simp [evaluatedSlicePhaseFiveStabilityDefect, gCommStabilityTwoR,
+            averageIdxSubMeas, averageOperatorOverDistribution,
+            postprocess_sandwichByOuterSubMeas_snd_outcome,
+            IdxPolyFamily.averagedSlicePointEvaluationOperator, cV, cU, L, R,
+            uniformDistribution, Finset.sum_mul, mul_assoc]
+    _ = ∑ g : Polynomial params, ∑ u : Point params, ∑ vy : Point params.next,
+          ∑ b : Fq params,
+            cV * (cU * ev strategy.state
+              (leftTensor (ι₂ := ι) (L vy g b) * rightTensor (ι₁ := ι) (R u g))) := by
+          exact phaseFive_bilinear_expand (ι := ι) strategy.state cV cU L R
+    _ = ∑ vy : Point params.next, ∑ u : Point params, ∑ g : Polynomial params,
+          ∑ b : Fq params,
+            cV * (cU * ev strategy.state
+              (leftTensor (ι₂ := ι) (L vy g b) * rightTensor (ι₁ := ι) (R u g))) := by
+          exact phaseFive_sum_comm_four (α := Point params.next) (β := Point params)
+            (γ := Polynomial params) (δ := Fq params)
+            (fun g u vy b => cV * (cU * ev strategy.state
+              (leftTensor (ι₂ := ι) (L vy g b) * rightTensor (ι₁ := ι) (R u g))))
+    _ = avgOver (uniformDistribution (Point params.next)) (fun vy =>
+        avgOver (uniformDistribution (Point params)) (fun u =>
+          ∑ g : Polynomial params, ∑ b : Fq params,
+            ev strategy.state
+              (leftTensor (ι₂ := ι)
+                  ((((evaluatedPointFamily params family vy).outcome b) *
+                    (G x).outcome g *
+                    ((evaluatedPointFamily params family vy).outcome b)) *
+                    (1 - (G x).total)) *
+                rightTensor (ι₁ := ι)
+                  ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome
+                    (g u))))) := by
+          simp [avgOver, uniformDistribution, cV, cU, L, R, Finset.mul_sum, mul_assoc]
+
+/-- Exact finite reindexing residual for the phase-5 scalar bridge. -/
+private lemma evaluatedSlice_phaseFive_reindex_to_stability_defect
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (G : Fq params → SubMeas (Polynomial params) ι)
+    (hG : ∀ x, G x = (family.meas x).toSubMeas) :
+    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (evaluatedSlicePhaseFiveQuestionDefect params strategy family G) =
+      avgOver (uniformDistribution (Fq params))
+        (evaluatedSlicePhaseFiveStabilityDefect params strategy family G) := by
+  classical
+  calc
+    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (evaluatedSlicePhaseFiveQuestionDefect params strategy family G)
+        = avgOver (uniformDistribution (Point params.next)) (fun ux =>
+            avgOver (uniformDistribution (Point params.next)) (fun vy =>
+              evaluatedSlicePhaseFiveQuestionDefect params strategy family G (ux, vy))) := by
+          simpa using
+            (avgOver_uniform_prod (α := Point params.next) (β := Point params.next)
+              (f := fun ux vy =>
+                evaluatedSlicePhaseFiveQuestionDefect params strategy family G (ux, vy)))
+    _ = avgOver (uniformDistribution (Fq params)) (fun x =>
+          avgOver (uniformDistribution (Point params)) (fun u =>
+            avgOver (uniformDistribution (Point params.next)) (fun vy =>
+              evaluatedSlicePhaseFiveQuestionDefect params strategy family G
+                (appendPoint params u x, vy)))) := by
+          rw [avgOver_uniform_pointNext_decompose params]
+    _ = avgOver (uniformDistribution (Fq params)) (fun x =>
+          avgOver (uniformDistribution (Point params)) (fun u =>
+            avgOver (uniformDistribution (Point params.next)) (fun vy =>
+              ∑ g : Polynomial params, ∑ b : Fq params,
+                ev strategy.state
+                  (leftTensor (ι₂ := ι)
+                      ((((evaluatedPointFamily params family vy).outcome b) *
+                        (G x).outcome g *
+                        ((evaluatedPointFamily params family vy).outcome b)) *
+                        (1 - (G x).total)) *
+                    rightTensor (ι₁ := ι)
+                      ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome
+                        (g u)))))) := by
+          apply avgOver_congr
+          intro x
+          apply avgOver_congr
+          intro u
+          apply avgOver_congr
+          intro vy
+          exact evaluatedSlicePhaseFiveQuestionDefect_appendPoint_expansion
+            params strategy family G hG x u vy
+    _ = avgOver (uniformDistribution (Fq params)) (fun x =>
+          avgOver (uniformDistribution (Point params.next)) (fun vy =>
+            avgOver (uniformDistribution (Point params)) (fun u =>
+              ∑ g : Polynomial params, ∑ b : Fq params,
+                ev strategy.state
+                  (leftTensor (ι₂ := ι)
+                      ((((evaluatedPointFamily params family vy).outcome b) *
+                        (G x).outcome g *
+                        ((evaluatedPointFamily params family vy).outcome b)) *
+                        (1 - (G x).total)) *
+                    rightTensor (ι₁ := ι)
+                      ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome
+                        (g u)))))) := by
+          apply avgOver_congr
+          intro x
+          exact avgOver_uniform_comm (α := Point params) (β := Point params.next)
+            (fun u vy =>
+              ∑ g : Polynomial params, ∑ b : Fq params,
+                ev strategy.state
+                  (leftTensor (ι₂ := ι)
+                      ((((evaluatedPointFamily params family vy).outcome b) *
+                        (G x).outcome g *
+                        ((evaluatedPointFamily params family vy).outcome b)) *
+                        (1 - (G x).total)) *
+                    rightTensor (ι₁ := ι)
+                      ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome
+                        (g u))))
+    _ = avgOver (uniformDistribution (Fq params))
+          (evaluatedSlicePhaseFiveStabilityDefect params strategy family G) := by
+          apply avgOver_congr
+          intro x
+          exact (evaluatedSlicePhaseFiveStabilityDefect_expansion_at
+            params strategy family G x).symm
+
 /- Scalar approximation chain for the evaluated-slice commutation.
 
 This is the core of the paper's proof of `lem:comm-data-processed-g`
@@ -799,10 +1473,10 @@ private lemma evaluatedSlice_scalar_chain_bound
         params strategy zeta _hnorm family hcombined_fst
   -- Phase 5: remove the trailing `G^x` from the BABA-side inserted term via
   -- the direct boundedness estimate `gCommStabilityTwo_scalar`.
-  -- The analytic part is now closed by `evaluatedSlice_phaseFive_stability_defect_bound`;
-  -- the remaining #715 work is the exact finite reindexing/sign equality from
+  -- The analytic part is closed by `evaluatedSlice_phaseFive_stability_defect_bound`;
+  -- the exact sign identity and finite reindexing rewrite
   -- `avgOver 𝒟 (phase3Inserted - phase5Removed)` to the negative of
-  -- `evaluatedSlicePhaseFiveStabilityDefect`.  Concretely, this residual expands
+  -- `evaluatedSlicePhaseFiveStabilityDefect`.  Concretely, the reindexing expands
   -- `totalSandwichFamily`, decomposes each `Point params.next` as `(u,x)`, uses the
   -- postprocessing-fiber identity `∑_a ∑_{g : g(u)=a} = ∑_g`, and accounts for
   -- `B A B * (G^x - 1) = - B A B * (1 - G^x)`.  This keeps the phase-4
@@ -810,12 +1484,42 @@ private lemma evaluatedSlice_scalar_chain_bound
   -- boundedness step.
   have hphase5 :
       |avgOver 𝒟 phase3Inserted - avgOver 𝒟 phase5Removed| ≤ Real.sqrt zeta := by
-    have _hdefect :=
+    have hdefect :=
       evaluatedSlice_phaseFive_stability_defect_bound
         params strategy zeta _hnorm family G _hG _hbound
-    -- TODO(#715): prove the finite reindexing/sign equality described above and
-    -- finish by applying `_hdefect`.
-    sorry
+    have hsign :
+        avgOver 𝒟 phase3Inserted - avgOver 𝒟 phase5Removed =
+          -avgOver 𝒟 (evaluatedSlicePhaseFiveQuestionDefect params strategy family G) := by
+      simpa [𝒟, phase3Inserted, phase5Removed] using
+        evaluatedSlice_phaseFive_avg_diff_eq_neg_questionDefect
+          params strategy family G _hG
+    have hbridge :
+        avgOver 𝒟 (evaluatedSlicePhaseFiveQuestionDefect params strategy family G) =
+          avgOver (uniformDistribution (Fq params))
+            (evaluatedSlicePhaseFiveStabilityDefect params strategy family G) := by
+      simpa [𝒟] using
+        evaluatedSlice_phaseFive_reindex_to_stability_defect
+          params strategy family G _hG
+    have hrewrite :
+        avgOver 𝒟 phase3Inserted - avgOver 𝒟 phase5Removed =
+          -avgOver (uniformDistribution (Fq params))
+            (evaluatedSlicePhaseFiveStabilityDefect params strategy family G) := by
+      calc
+        avgOver 𝒟 phase3Inserted - avgOver 𝒟 phase5Removed
+            = -avgOver 𝒟
+                (evaluatedSlicePhaseFiveQuestionDefect params strategy family G) := hsign
+        _ = -avgOver (uniformDistribution (Fq params))
+                (evaluatedSlicePhaseFiveStabilityDefect params strategy family G) := by
+              rw [hbridge]
+    calc
+      |avgOver 𝒟 phase3Inserted - avgOver 𝒟 phase5Removed|
+          = |-(avgOver (uniformDistribution (Fq params))
+              (evaluatedSlicePhaseFiveStabilityDefect params strategy family G))| := by
+              rw [hrewrite]
+      _ = |avgOver (uniformDistribution (Fq params))
+              (evaluatedSlicePhaseFiveStabilityDefect params strategy family G)| := by
+              rw [abs_neg]
+      _ ≤ Real.sqrt zeta := hdefect
   -- Phases 8/9: postprocessed self-consistency transports `BAB` to `ABA`.
   have htail :
       |avgOver 𝒟 avgBAB - avgOver 𝒟 avgABA| ≤ 2 * Real.sqrt zeta := by
