@@ -444,7 +444,7 @@ postprocessing only the first/full-`x` polynomial outcome by a sampled point
 `u : Point params`; the second/`y` polynomial outcome remains full.  The
 x-side tensor marginalization lemma below identifies its difference from the
 full tensor average with `fullSliceBABAxCollisionFactored`. -/
-private noncomputable def xEvaluatedSliceBABAtensorAvg
+noncomputable def xEvaluatedSliceBABAtensorAvg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
   avgOver (uniformDistribution (FullSliceQuestion params))
@@ -458,6 +458,25 @@ private noncomputable def xEvaluatedSliceBABAtensorAvg
             ev strategy.state
               (leftTensor (ι₂ := ι) (B.outcome h * A.outcome a * B.outcome h) *
                 rightTensor (ι₁ := ι) (A.outcome a))))
+
+/-- X-evaluated, y-full ABAB scalar average.
+
+This is the scalar endpoint in the display from `eq:evaluate-gcom-at-points` to
+`eq:don't-understand-the-numbering-system`: the `x` polynomial outcome has been
+postprocessed at `u`, but the second `closenessOfIP` move has not yet transferred
+the trailing `G^y_h` to the right register. -/
+noncomputable def xEvaluatedFullSliceABABAvg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
+  avgOver (uniformDistribution (Point params × FullSliceQuestion params))
+    (fun ux =>
+      let A : SubMeas (Fq params) ι :=
+        evaluateAt params ux.1 ((family.meas ux.2.1).toSubMeas)
+      let B : SubMeas (Polynomial params) ι := (family.meas ux.2.2).toSubMeas
+      ∑ ah : Fq params × Polynomial params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+            (A.outcome ah.1 * B.outcome ah.2 * A.outcome ah.1 * B.outcome ah.2)))
 
 /-- X-evaluated, y-full `ABA ⊗ B` tensor average.
 
@@ -2295,6 +2314,39 @@ private lemma evaluatedSliceABAB_scalar_to_ABABtensor
               ev strategy.state (C q b a * B q b))| := by
             rw [hScalar, hTensor]
     _ ≤ Real.sqrt zeta := hclose
+
+/-- Proved x-prefix from the full scalar quartic to the x-evaluated `BAB ⊗ A`
+tensor endpoint.
+
+This packages the first two paper steps for the second term in
+`commutativity-G.tex` lines 332--354: the `eq:gcom4` scalar-to-`BAB ⊗ A`
+bridge costs `√ζ`, and the `eq:gcom4-diff` Schwartz--Zippel
+postprocessing of the `x` polynomial outcome costs `md/q`. The remaining
+paper lines 356--360 are intentionally not included here; they are the two
+`closenessOfIP` legs from `xEvaluatedSliceBABAtensorAvg` to
+`xEvaluatedFullSliceABABtensorAvg`. -/
+lemma fullSliceABAB_to_xEvaluatedSliceBABAtensorAvg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hself : family.StronglySelfConsistent strategy.state zeta) :
+    |fullSliceABABAvg params strategy family -
+        xEvaluatedSliceBABAtensorAvg params strategy family| ≤
+      (↑params.m : Error) * ↑params.d / ↑params.q + Real.sqrt zeta := by
+  have hbridge := fullSliceABAB_scalar_to_BABAtensor params strategy family zeta hnorm hself
+  have hx := fullSliceBABA_tensor_marginalize_x params strategy family hnorm
+  have hx' :
+      |fullSliceBABAtensorAvg params strategy family -
+          xEvaluatedSliceBABAtensorAvg params strategy family| ≤
+        (↑params.m : Error) * ↑params.d / ↑params.q := by
+    simpa [Nat.cast_mul] using hx
+  have htri :=
+    abs_sub_le
+      (fullSliceABABAvg params strategy family)
+      (fullSliceBABAtensorAvg params strategy family)
+      (xEvaluatedSliceBABAtensorAvg params strategy family)
+  linarith
 
 /-- Proved y-tail from the mixed `ABA ⊗ B` tensor endpoint to the evaluated
 scalar quartic.
