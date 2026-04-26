@@ -211,7 +211,7 @@
 <h1 id="sec:self-improvement">7.1 Non-projective Output</h1>
 
 <p>A large part of this chapter is devoted to proving Lemma&#160;<a href="chap-self-improvement.html#lem:self-improvement-helper">7.1</a>, which is a slightly weaker form of the projective self-improvement theorem proved in Section&#160;<a href="chap-self-improvement.html#sec:self-improvement-projective">7.2</a>. The key difference is that the output family&#160;\(H\) is only required to be a submeasurement, rather than a projective submeasurement. Once this non-projective statement is available, Theorem&#160;<a href="chap-projective.html#thm:orthonormalization">4.2</a> upgrades&#160;\(H\) to a projective family without losing control of the four quantitative conclusions. </p>
-<p>Compared with the projective theorem, the helper lemma packages strong self-consistency using the explicit inequality from Definition&#160;<a href="sec-prelims.html#def:strong-self-consistency">3.33</a>, keeps the boundedness conclusion in terms of an auxiliary operator&#160;\(Z\), and produces a much smaller error parameter. </p>
+<p>Compared with the projective theorem, the helper lemma packages strong self-consistency using the explicit inequality from Definition&#160;<a href="sec-prelims.html#def:strong-self-consistency">3.34</a>, keeps the boundedness conclusion in terms of an auxiliary operator&#160;\(Z\), and produces a much smaller error parameter. </p>
 <div class="lemma_thmwrapper theorem-style-plain" id="lem:self-improvement-helper">
   <div class="lemma_thmheading">
     <span class="lemma_thmcaption">
@@ -246,7 +246,7 @@
           
           <li><a href="sec-prelims.html#def:simeq">Definition 3.16</a></li>
           
-          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.33</a></li>
+          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.34</a></li>
           
           <li><a href="chap-self-improvement.html#lem:sdp">Lemma 7.2</a></li>
           
@@ -876,19 +876,19 @@
           
           <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
           
-          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.33</a></li>
+          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.34</a></li>
           
           <li><a href="chap-self-improvement.html#lem:self-improvement-helper">Lemma 7.1</a></li>
           
           <li><a href="chap-projective.html#thm:orthonormalization">Theorem 4.2</a></li>
           
-          <li><a href="sec-prelims.html#prop:self-consistency-implies-data-processing">Lemma 3.38</a></li>
+          <li><a href="sec-prelims.html#prop:self-consistency-implies-data-processing">Lemma 3.39</a></li>
           
-          <li><a href="sec-prelims.html#prop:completeness-transfer-self-consistent-A">Lemma 3.37</a></li>
+          <li><a href="sec-prelims.html#prop:completeness-transfer-self-consistent-A">Lemma 3.38</a></li>
           
           <li><a href="sec-prelims.html#prop:triangle-sub">Lemma 3.20</a></li>
           
-          <li><a href="sec-prelims.html#prop:two-notions-of-self-consistency">Lemma 3.35</a></li>
+          <li><a href="sec-prelims.html#prop:two-notions-of-self-consistency">Lemma 3.36</a></li>
           
           <li><a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">Lemma 3.27</a></li>
           
@@ -994,7 +994,7 @@
 <div class="displaymath" id="a0000000337">
   \[  \widehat{\zeta }_{\mathrm{ortho}} = 100 \widehat{\zeta }^{1/4}.  \]
 </div>
-<p> In addition, Lemma&#160;<a href="sec-prelims.html#prop:self-consistency-implies-data-processing">3.38</a> implies that </p>
+<p> In addition, Lemma&#160;<a href="sec-prelims.html#prop:self-consistency-implies-data-processing">3.39</a> implies that </p>
 <div class="equation" id="eq:approx-data-processed">
 <p>
   <div class="equation_content">
@@ -1008,7 +1008,7 @@
   \[  \widehat{\zeta }_{\mathrm{dataprocess}} = 8 \widehat{\zeta } + 8 \sqrt{\widehat{\zeta }_{\mathrm{ortho}}}.  \]
 </div>
 <p>The four conclusions are transferred one by one. </p>
-<p><em>Proof of <a href="chap-self-improvement.html#item:self-improvement-projective-completeness">1</a>.</em> Lemma&#160;<a href="sec-prelims.html#prop:completeness-transfer-self-consistent-A">3.37</a> implies </p>
+<p><em>Proof of <a href="chap-self-improvement.html#item:self-improvement-projective-completeness">1</a>.</em> Lemma&#160;<a href="sec-prelims.html#prop:completeness-transfer-self-consistent-A">3.38</a> implies </p>
 <div class="displaymath" id="a0000000339">
   \[  \langle \psi  \rvert  H \otimes I \lvert \psi  \rangle  \geq \langle \psi  \rvert  \widehat{H} \otimes I \lvert \psi  \rangle  - \widehat{\zeta } - 2\sqrt{\widehat{\zeta }_{\mathrm{ortho}}} \geq (1-\nu ) - 2\widehat{\zeta } - 2\sqrt{\widehat{\zeta }_{\mathrm{ortho}}},  \]
 </div>
@@ -1017,7 +1017,7 @@
 <div class="displaymath" id="a0000000340">
   \[  A^u_a \otimes I \simeq _{\widehat{\zeta } + \sqrt{\widehat{\zeta }_{\mathrm{dataprocess}}}} I \otimes H_{[h(u) = a]}.  \]
 </div>
-<p><em>Proof of <a href="chap-self-improvement.html#item:self-improvement-projective-self">3</a>.</em> Lemma&#160;<a href="sec-prelims.html#prop:two-notions-of-self-consistency">3.35</a> implies </p>
+<p><em>Proof of <a href="chap-self-improvement.html#item:self-improvement-projective-self">3</a>.</em> Lemma&#160;<a href="sec-prelims.html#prop:two-notions-of-self-consistency">3.36</a> implies </p>
 <div class="displaymath" id="a0000000341">
   \[  \widehat{H}_h \otimes I \approx _{2\widehat{\zeta }} I \otimes \widehat{H}_h.  \]
 </div>

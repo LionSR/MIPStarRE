@@ -452,13 +452,13 @@
           
           <li><a href="chap-self-improvement.html#thm:self-improvement">Theorem 7.4</a></li>
           
-          <li><a href="sec-prelims.html#prop:completing-to-measurement">Lemma 3.41</a></li>
+          <li><a href="sec-prelims.html#prop:completing-to-measurement">Lemma 3.42</a></li>
           
-          <li><a href="sec-prelims.html#prop:simeq-data-processing">Lemma 3.29</a></li>
+          <li><a href="sec-prelims.html#prop:simeq-data-processing">Lemma 3.30</a></li>
           
           <li><a href="sec-prelims.html#prop:triangle-sub">Lemma 3.20</a></li>
           
-          <li><a href="sec-prelims.html#prop:two-notions-of-self-consistency">Lemma 3.35</a></li>
+          <li><a href="sec-prelims.html#prop:two-notions-of-self-consistency">Lemma 3.36</a></li>
           
         </ul>
     
@@ -539,7 +539,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> Complete \(G\) to a measurement by adjoining an extra outcome \(\bot \). Apply Theorem&#160;<a href="chap-self-improvement.html#thm:self-improvement">7.4</a> to the completed measurement, then discard the \(\bot \) outcome. By Lemma&#160;<a href="sec-prelims.html#prop:completing-to-measurement">3.41</a>, the completeness, consistency, strong self-consistency, and boundedness estimates transfer back to the original polynomial outcomes with an additive error from the missing mass \(\langle \psi  \rvert  (I - \sum _g G_g) \otimes I \lvert \psi  \rangle \). Since the output is projective, Lemma&#160;<a href="sec-prelims.html#prop:two-notions-of-self-consistency">3.35</a> converts the strong self-consistency statement to the usual bipartite formulation. </p>
+  <p> Complete \(G\) to a measurement by adjoining an extra outcome \(\bot \). Apply Theorem&#160;<a href="chap-self-improvement.html#thm:self-improvement">7.4</a> to the completed measurement, then discard the \(\bot \) outcome. By Lemma&#160;<a href="sec-prelims.html#prop:completing-to-measurement">3.42</a>, the completeness, consistency, strong self-consistency, and boundedness estimates transfer back to the original polynomial outcomes with an additive error from the missing mass \(\langle \psi  \rvert  (I - \sum _g G_g) \otimes I \lvert \psi  \rangle \). Since the output is projective, Lemma&#160;<a href="sec-prelims.html#prop:two-notions-of-self-consistency">3.36</a> converts the strong self-consistency statement to the usual bipartite formulation. </p>
 
   </div>
 </div>
@@ -2049,7 +2049,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>  The following Lean declarations are bookkeeping infrastructure for the final assembly residual:           They split off the vacuous branch where the theorem error is at least \(1\), derive the Step&#160;8 scalar hypotheses in the non-vacuous branch, use the proved Step&#160;5 Schwartz–Zippel wrapper to convert evaluated pre-projective consistency to full-polynomial consistency at \(\zeta _1\), and now also prove the paper line-116 triangle step from the two unsymmetrized \(2\sigma \) links plus the original \(3\varepsilon \) point agreement. The remaining residual is the finer <span class="ttfamily">MainFormalCascadeProjectiveAssemblyResidual</span>: it still contains the two \(\zeta _4\) point-consistency goals and the line-156 \(\approx _{\zeta _3}\) projectivization bridge. Lean then converts the latter to <span class="ttfamily">MainFormalCascadeTransportTargets</span> using the projective converse of <span class="ttfamily">simeq-to-approx</span>. No proof-level completeness tag is claimed here while <span class="ttfamily">mainFormal</span> still contains that projective assembly residual. </p>
+  <p>  The following Lean declarations are bookkeeping infrastructure for the final assembly residual:             They split off the vacuous branch where the theorem error is at least \(1\), derive the Step&#160;8 scalar hypotheses in the non-vacuous branch, use the proved Step&#160;5 Schwartz–Zippel wrapper to convert evaluated pre-projective consistency to full-polynomial consistency at \(\zeta _1\), prove the paper line-116 triangle step from the two unsymmetrized \(2\sigma \) links plus the original \(3\varepsilon \) point agreement, and reduce the line-156 \(\approx _{\zeta _3}\) projectivization bridge to the named Step&#160;6 handoff package: pre-projective consistency plus left/right completion closeness at \(\zeta _2\). The remaining residual is the finer <span class="ttfamily">MainFormalCascadeProjectiveAssemblyResidual</span>: it still contains the two \(\zeta _4\) point-consistency goals and construction of that handoff data. Lean then converts the resulting projective self-consistency to <span class="ttfamily">MainFormalCascadeTransportTargets</span> using the projective converse of <span class="ttfamily">simeq-to-approx</span>. No proof-level completeness tag is claimed here while <span class="ttfamily">mainFormal</span> still contains that projective assembly residual. </p>
 
   </div>
 </div>
@@ -2099,7 +2099,7 @@
 <div class="displaymath" id="a0000000595">
   \[  A_a^{\mathrm A,u} \otimes I \simeq _{3\varepsilon } I \otimes A_a^{\mathrm B,u}.  \]
 </div>
-<p> Therefore Lemma&#160;<a href="sec-prelims.html#prop:simeq-triangle-inequality">3.28</a> yields </p>
+<p> Therefore Lemma&#160;<a href="sec-prelims.html#prop:simeq-triangle-inequality">3.29</a> yields </p>
 <div class="displaymath" id="a0000000596">
   \[  G_{[g(u)=a]}^{\mathrm A} \otimes I \simeq _{2\sigma + 2\sqrt{3\varepsilon +2\sigma }} I \otimes G_{[g(u)=a]}^{\mathrm B}.  \]
 </div>
@@ -2121,7 +2121,7 @@
 <div class="displaymath" id="a0000000598">
   \[  G_g^{\mathrm A} \otimes I \approx _{100\zeta _1^{1/4}} P_g^{\mathrm A} \otimes I, \qquad I \otimes G_g^{\mathrm B} \approx _{100\zeta _1^{1/4}} I \otimes P_g^{\mathrm B}.  \]
 </div>
-<p> Completing them by Lemma&#160;<a href="sec-prelims.html#prop:completing-to-measurement">3.41</a> yields projective measurements \(Q^{\mathrm A},Q^{\mathrm B} \in \mathrm{PolyMeas}(m,q,d)\) such that </p>
+<p> Completing them by Lemma&#160;<a href="sec-prelims.html#prop:completing-to-measurement">3.42</a> yields projective measurements \(Q^{\mathrm A},Q^{\mathrm B} \in \mathrm{PolyMeas}(m,q,d)\) such that </p>
 <div class="displaymath" id="eq:G-with-Q-A">
   \begin{align}  G_g^{\mathrm A} \otimes I &  \approx _{\zeta _2} Q_g^{\mathrm A} \otimes I, \label{eq:G-with-Q-A} \\ I \otimes G_g^{\mathrm B} &  \approx _{\zeta _2} I \otimes Q_g^{\mathrm B}, \notag \end{align}
 </div>
@@ -2172,7 +2172,7 @@
   <span class="equation_label">10</span>
 </p>
 </div>
-<p> Applying Lemma&#160;<a href="sec-prelims.html#prop:simeq-triangle-inequality">3.28</a> to <a href="sec-induction.html#eq:cons-b">5</a>, <a href="sec-induction.html#eq:ok-almost-there-ok">10</a>, and <a href="sec-induction.html#eq:just-data-processed-the-heck-outta-this">9</a> yields </p>
+<p> Applying Lemma&#160;<a href="sec-prelims.html#prop:simeq-triangle-inequality">3.29</a> to <a href="sec-induction.html#eq:cons-b">5</a>, <a href="sec-induction.html#eq:ok-almost-there-ok">10</a>, and <a href="sec-induction.html#eq:just-data-processed-the-heck-outta-this">9</a> yields </p>
 <div class="equation" id="eq:one-goal">
 <p>
   <div class="equation_content">
