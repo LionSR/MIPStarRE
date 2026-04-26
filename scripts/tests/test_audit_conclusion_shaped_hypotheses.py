@@ -184,6 +184,32 @@ class ParseDeclarationTests(unittest.TestCase):
             result = run_audit([mod], root=root, min_common=2)
             self.assertEqual(result.findings, ())
 
+    def test_binder_extraction_ignores_comments_and_strings(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "Fake.lean"
+            mod.parent.mkdir()
+            mod.write_text(
+                textwrap.dedent(
+                    """\
+                    theorem commentedBinder
+                        -- fake binder opener: (hbad : ∃ G : Measurement, ConsRel G)
+                        /- fake bracket ] and opener ( in a nested /- comment -/ block -/
+                        (h : ∃ G : Measurement, ConsRel G)
+                        (s : String := "fake closer ) and [ opener") :
+                        ∃ G : Measurement, ConsRel G := by
+                      sorry
+                    """
+                ),
+                encoding="utf-8",
+            )
+            decls = parse_declarations(mod, root=root)
+            self.assertEqual([decl.name for decl in decls], ["commentedBinder"])
+            self.assertEqual([binder.name for binder in decls[0].binders], ["h", "s"])
+            result = run_audit([mod], root=root, min_common=2)
+            self.assertEqual(len(result.review_findings), 1)
+            self.assertEqual(result.review_findings[0].binder, "h")
+
 
 class AuditHeuristicTests(unittest.TestCase):
     def _write_fake(self, root: Path, body: str) -> Path:
