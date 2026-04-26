@@ -80,6 +80,31 @@ class ParseDeclarationTests(unittest.TestCase):
                 ["attributedBad", "attributedPrivateBad"],
             )
 
+    def test_header_parser_ignores_comment_colons_before_conclusion(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "Fake.lean"
+            mod.parent.mkdir()
+            mod.write_text(
+                textwrap.dedent(
+                    """\
+                    theorem commentColonBad
+                        (h : ∃ G : Measurement, ConsRel G)
+                        -- note: this comment colon is not the theorem separator
+                        /- block: comments can contain colons too -/
+                        : ∃ G : Measurement, ConsRel G := by
+                      sorry
+                    """
+                ),
+                encoding="utf-8",
+            )
+            decls = parse_declarations(mod, root=root)
+            self.assertEqual([decl.name for decl in decls], ["commentColonBad"])
+            self.assertIn("∃ G", decls[0].conclusion)
+            result = run_audit([mod], root=root, min_common=2)
+            self.assertEqual(len(result.review_findings), 1)
+            self.assertEqual(result.review_findings[0].decl, "commentColonBad")
+
 
 class AuditHeuristicTests(unittest.TestCase):
     def _write_fake(self, root: Path, body: str) -> Path:
