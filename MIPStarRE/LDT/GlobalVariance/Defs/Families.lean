@@ -234,8 +234,9 @@ noncomputable def generalizeBCollisionResidual (params : Parameters)
 This is the paper's `expansion.tex`, lines 286--288, after replacing an
 incident line question `(ℓ,u)` by a line `ℓ` and affine parameter `t` with
 `u = ℓ(t)`, but before commuting the finite average over `t` past the finite
-sum over line answers `f`.  Issue #753 is reduced to proving that
-`generalizeBCollisionResidual` is equal to this seed expansion. -/
+sum over line answers `f`.  The equality from the original collision residual to
+this seed expansion is proved in
+`generalizeBCollisionResidual_eq_seedCollisionExpansion`. -/
 noncomputable def generalizeBSeedCollisionExpansion (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
