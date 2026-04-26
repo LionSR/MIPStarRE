@@ -30,9 +30,9 @@ from typing import Iterable, Sequence
 
 
 _DECL_RE = re.compile(
-    r"(?m)^\s*(?:@\[[^\]\n]*\]\s+)*"
+    r"(?m)^\s*(?:@\[[^\]]*\]\s+)*"
     r"(?:(?:private|protected|noncomputable|unsafe)\s+)*"
-    r"(?:@\[[^\]\n]*\]\s+)*"
+    r"(?:@\[[^\]]*\]\s+)*"
     r"(theorem|lemma)\s+([A-Za-z_][A-Za-z0-9_.'?]*)\b"
 )
 _TOKEN_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_.'?]*")
@@ -168,6 +168,40 @@ def _skip_string_literal(text: str, start: int) -> int:
     return i
 
 
+def _raw_string_hash_count(text: str, start: int) -> int | None:
+    """Return the number of hashes in a Lean raw string starting at ``start``."""
+    if start >= len(text) or text[start] != "r":
+        return None
+    i = start + 1
+    while i < len(text) and text[i] == "#":
+        i += 1
+    if i < len(text) and text[i] == '"':
+        return i - start - 1
+    return None
+
+
+def _skip_raw_string_literal(text: str, start: int) -> int | None:
+    """Return the offset after a Lean raw string literal starting at ``start``."""
+    hash_count = _raw_string_hash_count(text, start)
+    if hash_count is None:
+        return None
+    closing = '"' + ("#" * hash_count)
+    end = text.find(closing, start + 2 + hash_count)
+    if end == -1:
+        return None
+    return end + len(closing)
+
+
+def _skip_string_like(text: str, start: int) -> int | None:
+    """Return the offset after a regular or raw Lean string starting at ``start``."""
+    raw_end = _skip_raw_string_literal(text, start)
+    if raw_end is not None:
+        return raw_end
+    if start < len(text) and text[start] == '"':
+        return _skip_string_literal(text, start)
+    return None
+
+
 def _spaces_preserving_newlines(fragment: str) -> str:
     """Replace non-newline characters by spaces, preserving offsets and lines."""
     return "".join("\n" if ch == "\n" else " " for ch in fragment)
@@ -184,10 +218,10 @@ def _mask_lean_non_code(text: str) -> str:
     chunks: list[str] = []
     i = 0
     while i < len(text):
-        if text[i] == '"':
-            end = _skip_string_literal(text, i)
-            chunks.append(_spaces_preserving_newlines(text[i:end]))
-            i = end
+        string_end = _skip_string_like(text, i)
+        if string_end is not None:
+            chunks.append(_spaces_preserving_newlines(text[i:string_end]))
+            i = string_end
             continue
         if text.startswith("--", i):
             newline = text.find("\n", i + 2)
@@ -226,8 +260,9 @@ def _find_header_end(text: str, start: int) -> int | None:
                 return None
             i = end
             continue
-        if ch == '"':
-            i = _skip_string_literal(text, i)
+        string_end = _skip_string_like(text, i)
+        if string_end is not None:
+            i = string_end
             continue
         if not stack and text.startswith(":=", i):
             return i
@@ -259,8 +294,9 @@ def _find_top_level_char(text: str, target: str) -> int | None:
                 return None
             i = end
             continue
-        if ch == '"':
-            i = _skip_string_literal(text, i)
+        string_end = _skip_string_like(text, i)
+        if string_end is not None:
+            i = string_end
             continue
         if ch == target and not stack:
             return i
@@ -287,8 +323,9 @@ def _find_top_level_token(text: str, token: str) -> int | None:
                 return None
             i = end
             continue
-        if ch == '"':
-            i = _skip_string_literal(text, i)
+        string_end = _skip_string_like(text, i)
+        if string_end is not None:
+            i = string_end
             continue
         if not stack and text.startswith(token, i):
             return i
@@ -320,8 +357,9 @@ def _find_matching_group(text: str, start: int) -> int | None:
                 return None
             i = end
             continue
-        if ch == '"':
-            i = _skip_string_literal(text, i)
+        string_end = _skip_string_like(text, i)
+        if string_end is not None:
+            i = string_end
             continue
         if ch in _OPEN_TO_CLOSE:
             stack.append(ch)
@@ -350,8 +388,9 @@ def _extract_binders(prefix: str, *, file_text: str, file_start: int) -> tuple[B
                 break
             i = end_comment
             continue
-        if prefix[i] == '"':
-            i = _skip_string_literal(prefix, i)
+        string_end = _skip_string_like(prefix, i)
+        if string_end is not None:
+            i = string_end
             continue
         if prefix[i] not in "({[":
             i += 1

@@ -80,6 +80,30 @@ class ParseDeclarationTests(unittest.TestCase):
                 ["attributedBad", "attributedPrivateBad"],
             )
 
+    def test_header_parser_accepts_multiline_attributes(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "Fake.lean"
+            mod.parent.mkdir()
+            mod.write_text(
+                textwrap.dedent(
+                    """\
+                    @[simp,
+                      aesop safe]
+                    theorem multilineAttributedBad
+                        (h : ∃ G : Measurement, ConsRel G) :
+                        ∃ G : Measurement, ConsRel G := by
+                      sorry
+                    """
+                ),
+                encoding="utf-8",
+            )
+            decls = parse_declarations(mod, root=root)
+            self.assertEqual([decl.name for decl in decls], ["multilineAttributedBad"])
+            result = run_audit([mod], root=root, min_common=2)
+            self.assertEqual(len(result.review_findings), 1)
+            self.assertEqual(result.review_findings[0].decl, "multilineAttributedBad")
+
     def test_header_parser_ignores_comment_colons_before_conclusion(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -172,6 +196,32 @@ class ParseDeclarationTests(unittest.TestCase):
                         ∃ G : Measurement, ConsRel G := by
                       sorry
                     "
+
+                    theorem realDecl : True := by
+                      trivial
+                    """
+                ),
+                encoding="utf-8",
+            )
+            decls = parse_declarations(mod, root=root)
+            self.assertEqual([decl.name for decl in decls], ["realDecl"])
+            result = run_audit([mod], root=root, min_common=2)
+            self.assertEqual(result.findings, ())
+
+    def test_header_parser_ignores_raw_string_literal_declarations(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "Fake.lean"
+            mod.parent.mkdir()
+            mod.write_text(
+                textwrap.dedent(
+                    """\
+                    def snippet := r#"
+                    theorem rawStringBad
+                        (h : ∃ G : Measurement, ConsRel G) :
+                        ∃ G : Measurement, ConsRel G := by
+                      sorry
+                    "#
 
                     theorem realDecl : True := by
                       trivial
