@@ -74,21 +74,23 @@ variable {ιB : Type*} [Fintype ιB] [DecidableEq ιB]
 
 /-! ### Paper test branches for two-space strategies -/
 
-/-- Alice's point answers in the axis-parallel branch: the point prover receives
-`u`, the base point of the sampled line, and answers with `A^{A,u}`. -/
+/-- Alice's point answers in the axis-parallel branch: Alice receives `u`,
+the base point of the sampled line, and answers with `A^{A,u}`. -/
 noncomputable def axisParallelPointAnswerFamilyA
     (strategy : BiProjStrat params ιA ιB) :
     IdxSubMeas (AxisParallelTestSample params) (Fq params) ιA :=
   fun s => (strategy.pointMeasurementA s.1).toSubMeas
 
-/-- Bob's point answers in the axis-parallel branch. -/
+/-- Bob's point answers in the axis-parallel branch: Bob receives `u`,
+the base point of the sampled line, and answers with `A^{B,u}`. -/
 noncomputable def axisParallelPointAnswerFamilyB
     (strategy : BiProjStrat params ιA ιB) :
     IdxSubMeas (AxisParallelTestSample params) (Fq params) ιB :=
   fun s => (strategy.pointMeasurementB s.1).toSubMeas
 
-/-- Alice's line answers in the axis-parallel branch, postprocessed to the value
-at the sampled base point. -/
+/-- Alice's axis-parallel-line answers: Alice receives `ℓ`, answers with
+`B^{A,ℓ}`, and the verifier postprocesses to the value at the sampled base
+point. -/
 noncomputable def axisParallelLineAnswerFamilyA
     (strategy : BiProjStrat params ιA ιB) :
     IdxSubMeas (AxisParallelTestSample params) (Fq params) ιA :=
@@ -99,8 +101,9 @@ noncomputable def axisParallelLineAnswerFamilyA
       ((strategy.axisParallelMeasurementA ℓ).toSubMeas)
       (· zeroCoord)
 
-/-- Bob's line answers in the axis-parallel branch, postprocessed to the value
-at the sampled base point. -/
+/-- Bob's axis-parallel-line answers: Bob receives `ℓ`, answers with
+`B^{B,ℓ}`, and the verifier postprocesses to the value at the sampled base
+point. -/
 noncomputable def axisParallelLineAnswerFamilyB
     (strategy : BiProjStrat params ιA ιB) :
     IdxSubMeas (AxisParallelTestSample params) (Fq params) ιB :=
@@ -111,20 +114,23 @@ noncomputable def axisParallelLineAnswerFamilyB
       ((strategy.axisParallelMeasurementB ℓ).toSubMeas)
       (· zeroCoord)
 
-/-- Alice's point answers in the restricted diagonal branch. -/
+/-- Alice's point answers in the restricted diagonal branch: Alice receives the
+sampled base point `u` and answers with `A^{A,u}`. -/
 noncomputable def diagonalPointAnswerFamilyA
     (strategy : BiProjStrat params ιA ιB) (j : Fin params.m) :
     IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ιA :=
   fun s => (strategy.pointMeasurementA s.1).toSubMeas
 
-/-- Bob's point answers in the restricted diagonal branch. -/
+/-- Bob's point answers in the restricted diagonal branch: Bob receives the
+sampled base point `u` and answers with `A^{B,u}`. -/
 noncomputable def diagonalPointAnswerFamilyB
     (strategy : BiProjStrat params ιA ιB) (j : Fin params.m) :
     IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ιB :=
   fun s => (strategy.pointMeasurementB s.1).toSubMeas
 
-/-- Alice's diagonal-line answers in the restricted diagonal branch,
-postprocessed to the value at the sampled base point. -/
+/-- Alice's restricted diagonal-line answers: Alice receives `ℓ`, answers with
+`L^{A,ℓ}`, and the verifier postprocesses to the value at the sampled base
+point. -/
 noncomputable def diagonalLineAnswerFamilyA
     (strategy : BiProjStrat params ιA ιB) (j : Fin params.m) :
     IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ιA :=
@@ -136,8 +142,9 @@ noncomputable def diagonalLineAnswerFamilyA
       ((strategy.diagonalMeasurementA ℓ).toSubMeas)
       (· zeroCoord)
 
-/-- Bob's diagonal-line answers in the restricted diagonal branch,
-postprocessed to the value at the sampled base point. -/
+/-- Bob's restricted diagonal-line answers: Bob receives `ℓ`, answers with
+`L^{B,ℓ}`, and the verifier postprocesses to the value at the sampled base
+point. -/
 noncomputable def diagonalLineAnswerFamilyB
     (strategy : BiProjStrat params ιA ιB) (j : Fin params.m) :
     IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ιB :=
