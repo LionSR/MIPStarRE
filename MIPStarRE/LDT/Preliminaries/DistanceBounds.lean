@@ -40,6 +40,36 @@ lemma questionSDD_triangle {Outcome : Type*}
     rw [← Finset.mul_sum, ← Finset.sum_add_distrib]
   linarith
 
+/-- Atomic mathematical fact: the three-step triangle inequality for `qSDD`.
+
+This is the `k = 3` instance of `prop:triangle-inequality-for-approx_delta`,
+with the sharp paper constant `3 * (δ₁ + δ₂ + δ₃)`. -/
+lemma questionSDD_triangle_three {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι) (A B C D : SubMeas Outcome ι) :
+    qSDD ψ A D ≤ 3 * (qSDD ψ A B + qSDD ψ B C + qSDD ψ C D) := by
+  let ev' (X Y : MIPStarRE.Quantum.Op ι) := ev ψ ((X - Y)ᴴ * (X - Y))
+  have pointwise_outcome : ∀ a, ev' (A.outcome a) (D.outcome a) ≤
+      3 * (ev' (A.outcome a) (B.outcome a) +
+        ev' (B.outcome a) (C.outcome a) +
+        ev' (C.outcome a) (D.outcome a)) :=
+    fun a => ev_diff_triangle_three ψ _ _ _ _
+  unfold qSDD qSDDCore
+  have h1 : ∑ a : Outcome, ev' (A.outcome a) (D.outcome a) ≤
+      ∑ a : Outcome, 3 * (ev' (A.outcome a) (B.outcome a) +
+        ev' (B.outcome a) (C.outcome a) +
+        ev' (C.outcome a) (D.outcome a)) :=
+    Finset.sum_le_sum (fun a _ => pointwise_outcome a)
+  have h2 : ∑ a : Outcome, 3 * (ev' (A.outcome a) (B.outcome a) +
+        ev' (B.outcome a) (C.outcome a) +
+        ev' (C.outcome a) (D.outcome a)) =
+      3 * (∑ a : Outcome, ev' (A.outcome a) (B.outcome a) +
+        ∑ a : Outcome, ev' (B.outcome a) (C.outcome a) +
+        ∑ a : Outcome, ev' (C.outcome a) (D.outcome a)) := by
+    rw [← Finset.sum_add_distrib, ← Finset.sum_add_distrib, ← Finset.mul_sum]
+  exact le_trans h1 (le_of_eq h2)
+
 /-- Triangle inequality for state-dependent distance. -/
 lemma stateDependentDistanceRel_triangle
     {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -72,6 +102,34 @@ lemma stateDependentDistanceRel_triangle
     _ ≤ 2 * (δ₁ + δ₂) := by
         apply mul_le_mul_of_nonneg_left _ (by norm_num)
         exact add_le_add h₁ h₂
+
+/-- Three-step triangle inequality for state-dependent distance. -/
+lemma stateDependentDistanceRel_triangle_three {Question Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι] [Fintype Outcome]
+    (ψ : QuantumState ι) (𝒟 : Distribution Question)
+    (A B C D : IdxSubMeas Question Outcome ι) (δ₁ δ₂ δ₃ : Error) :
+    SDDRel ψ 𝒟 A B δ₁ →
+    SDDRel ψ 𝒟 B C δ₂ →
+    SDDRel ψ 𝒟 C D δ₃ →
+    SDDRel ψ 𝒟 A D (3 * (δ₁ + δ₂ + δ₃)) := by
+  intro hAB hBC hCD
+  constructor
+  calc
+    sddError ψ 𝒟 A D
+        = avgOver 𝒟 (fun q => qSDD ψ (A q) (D q)) := rfl
+    _ ≤ avgOver 𝒟 (fun q =>
+          3 * (qSDD ψ (A q) (B q) + qSDD ψ (B q) (C q) +
+            qSDD ψ (C q) (D q))) := by
+          apply avgOver_mono
+          exact fun _ => questionSDD_triangle_three ψ _ _ _ _
+    _ = 3 * (sddError ψ 𝒟 A B + sddError ψ 𝒟 B C +
+          sddError ψ 𝒟 C D) := by
+          simp [sddError, avgOver_const_mul, avgOver_add, add_assoc]
+    _ ≤ 3 * (δ₁ + δ₂ + δ₃) := by
+          have hAB' := hAB.squaredDistanceBound
+          have hBC' := hBC.squaredDistanceBound
+          have hCD' := hCD.squaredDistanceBound
+          linarith
 
 /-- Monotonicity: if `SDDRel` holds for `δ`, it holds for any `δ' ≥ δ`. -/
 lemma stateDependentDistanceRel_mono

@@ -1,10 +1,8 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
-import MIPStarRE.LDT.Preliminaries.ComparisonCore
 import MIPStarRE.LDT.Preliminaries.Completion
 import MIPStarRE.LDT.Preliminaries.CompletionTransfer
+import MIPStarRE.LDT.Preliminaries.DistanceBounds
 import MIPStarRE.LDT.Preliminaries.Triangles
-
-open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 /-!
 # Section 10 — Step 6 (orthonormalize-and-complete chain)
@@ -87,6 +85,8 @@ absorbed form as a downstream calculation.
   (orthonormalization theorem).
 -/
 
+open scoped BigOperators MatrixOrder Matrix ComplexOrder
+
 namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 open MIPStarRE.LDT
@@ -115,135 +115,6 @@ noncomputable def orthonormalizeAndCompleteError (ζ : Error) : Error :=
 
 /-! ### Line-156 triangle handoff -/
 
-/-- Three-vector version of the normalized-trace triangle inequality.
-
-This is the algebra behind the paper's Step 6 use of
-`prop:triangle-inequality-for-approx_delta` at `inductive_step.tex:154--158`: if
-`X - W` is decomposed as three successive differences, the squared norm is
-bounded by `3` times the sum of the three squared norms. -/
-private theorem normalizedTrace_triangle_three {n : Type*} [Fintype n]
-    (ρ D₁ D₂ D₃ : Matrix n n ℂ) (hρ : ρ.PosSemidef) :
-    Complex.re (MIPStarRE.Quantum.normalizedTrace
-        (ρ * (((D₁ + D₂ + D₃)ᴴ) * (D₁ + D₂ + D₃)))) ≤
-      3 * (Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₁ᴴ * D₁))) +
-        Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₂ᴴ * D₂))) +
-        Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₃ᴴ * D₃)))) := by
-  let S := ((D₁ + D₂ + D₃)ᴴ) * (D₁ + D₂ + D₃)
-  let E12 := (D₁ - D₂)ᴴ * (D₁ - D₂)
-  let E13 := (D₁ - D₃)ᴴ * (D₁ - D₃)
-  let E23 := (D₂ - D₃)ᴴ * (D₂ - D₃)
-  let Base := D₁ᴴ * D₁ + D₂ᴴ * D₂ + D₃ᴴ * D₃
-  have h_para : S + (E12 + E13 + E23) = Base + Base + Base := by
-    simp only [S, E12, E13, E23, Base, Matrix.conjTranspose_add,
-      Matrix.conjTranspose_sub, add_mul, mul_add, sub_mul, mul_sub]
-    abel
-  have h_trace_id :
-      MIPStarRE.Quantum.normalizedTrace (ρ * S) +
-          (MIPStarRE.Quantum.normalizedTrace (ρ * E12) +
-            MIPStarRE.Quantum.normalizedTrace (ρ * E13) +
-            MIPStarRE.Quantum.normalizedTrace (ρ * E23)) =
-        MIPStarRE.Quantum.normalizedTrace (ρ * Base) +
-          MIPStarRE.Quantum.normalizedTrace (ρ * Base) +
-          MIPStarRE.Quantum.normalizedTrace (ρ * Base) := by
-    calc
-      MIPStarRE.Quantum.normalizedTrace (ρ * S) +
-          (MIPStarRE.Quantum.normalizedTrace (ρ * E12) +
-            MIPStarRE.Quantum.normalizedTrace (ρ * E13) +
-            MIPStarRE.Quantum.normalizedTrace (ρ * E23))
-          = MIPStarRE.Quantum.normalizedTrace
-              (ρ * (S + (E12 + E13 + E23))) := by
-              simp [Matrix.mul_add, MIPStarRE.Quantum.normalizedTrace_add, add_assoc]
-      _ = MIPStarRE.Quantum.normalizedTrace (ρ * (Base + Base + Base)) := by
-              rw [h_para]
-      _ = MIPStarRE.Quantum.normalizedTrace (ρ * Base) +
-            MIPStarRE.Quantum.normalizedTrace (ρ * Base) +
-            MIPStarRE.Quantum.normalizedTrace (ρ * Base) := by
-              simp [Matrix.mul_add, MIPStarRE.Quantum.normalizedTrace_add, add_assoc]
-  have h_re_id := congrArg Complex.re h_trace_id
-  simp only [Complex.add_re] at h_re_id
-  have h_base :
-      Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * Base)) =
-        Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₁ᴴ * D₁))) +
-        Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₂ᴴ * D₂))) +
-        Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₃ᴴ * D₃))) := by
-    simp [Base, Matrix.mul_add, MIPStarRE.Quantum.normalizedTrace_add,
-      Complex.add_re, add_assoc]
-  have h12 := MIPStarRE.LDT.normalizedTrace_diff_sq_nonneg ρ D₁ D₂ hρ
-  have h13 := MIPStarRE.LDT.normalizedTrace_diff_sq_nonneg ρ D₁ D₃ hρ
-  have h23 := MIPStarRE.LDT.normalizedTrace_diff_sq_nonneg ρ D₂ D₃ hρ
-  rw [h_base] at h_re_id
-  linarith
-
-/-- Three-step operator triangle inequality for squared state-dependent distance. -/
-private theorem ev_diff_triangle_three {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι) (X Y Z W : MIPStarRE.Quantum.Op ι) :
-    ev ψ ((X - W)ᴴ * (X - W)) ≤
-      3 * (ev ψ ((X - Y)ᴴ * (X - Y)) +
-        ev ψ ((Y - Z)ᴴ * (Y - Z)) +
-        ev ψ ((Z - W)ᴴ * (Z - W))) := by
-  simp only [ev]
-  have hdecomp : X - W = (X - Y) + (Y - Z) + (Z - W) := by abel
-  rw [hdecomp]
-  exact normalizedTrace_triangle_three ψ.density (X - Y) (Y - Z) (Z - W)
-    (Matrix.nonneg_iff_posSemidef.mp ψ.density_psd)
-
-/-- Questionwise three-step triangle inequality for `qSDD`. -/
-private lemma qSDD_triangle_three {Outcome : Type*} {ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι) (A B C D : SubMeas Outcome ι) :
-    qSDD ψ A D ≤ 3 * (qSDD ψ A B + qSDD ψ B C + qSDD ψ C D) := by
-  unfold qSDD qSDDCore
-  calc
-    ∑ a, ev ψ (((A.outcome a - D.outcome a)ᴴ) *
-        (A.outcome a - D.outcome a))
-        ≤ ∑ a, 3 * (ev ψ (((A.outcome a - B.outcome a)ᴴ) *
-            (A.outcome a - B.outcome a)) +
-            ev ψ (((B.outcome a - C.outcome a)ᴴ) *
-              (B.outcome a - C.outcome a)) +
-            ev ψ (((C.outcome a - D.outcome a)ᴴ) *
-              (C.outcome a - D.outcome a))) := by
-          exact Finset.sum_le_sum fun a _ =>
-            ev_diff_triangle_three ψ (A.outcome a) (B.outcome a)
-              (C.outcome a) (D.outcome a)
-    _ = 3 * (∑ a, ev ψ (((A.outcome a - B.outcome a)ᴴ) *
-          (A.outcome a - B.outcome a)) +
-          ∑ a, ev ψ (((B.outcome a - C.outcome a)ᴴ) *
-            (B.outcome a - C.outcome a)) +
-          ∑ a, ev ψ (((C.outcome a - D.outcome a)ᴴ) *
-            (C.outcome a - D.outcome a))) := by
-          rw [← Finset.sum_add_distrib, ← Finset.sum_add_distrib, ← Finset.mul_sum]
-
-/-- Three-step triangle inequality for `SDDRel`, with the paper's `3` factor. -/
-private lemma sddRel_triangle_three {Question Outcome : Type*} {ι : Type*}
-    [Fintype ι] [DecidableEq ι] [Fintype Outcome]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
-    (A B C D : IdxSubMeas Question Outcome ι) (δ₁ δ₂ δ₃ : Error) :
-    SDDRel ψ 𝒟 A B δ₁ → SDDRel ψ 𝒟 B C δ₂ → SDDRel ψ 𝒟 C D δ₃ →
-      SDDRel ψ 𝒟 A D (3 * (δ₁ + δ₂ + δ₃)) := by
-  intro hAB hBC hCD
-  constructor
-  have hpoint : ∀ q, qSDD ψ (A q) (D q) ≤
-      3 * (qSDD ψ (A q) (B q) + qSDD ψ (B q) (C q) +
-        qSDD ψ (C q) (D q)) := by
-    intro q
-    exact qSDD_triangle_three ψ (A q) (B q) (C q) (D q)
-  calc
-    sddError ψ 𝒟 A D
-        = avgOver 𝒟 (fun q => qSDD ψ (A q) (D q)) := rfl
-    _ ≤ avgOver 𝒟 (fun q =>
-          3 * (qSDD ψ (A q) (B q) + qSDD ψ (B q) (C q) +
-            qSDD ψ (C q) (D q))) := by
-          exact avgOver_mono 𝒟 _ _ hpoint
-    _ = 3 * (sddError ψ 𝒟 A B + sddError ψ 𝒟 B C +
-          sddError ψ 𝒟 C D) := by
-          simp [sddError, avgOver_const_mul, avgOver_add, add_assoc]
-    _ ≤ 3 * (δ₁ + δ₂ + δ₃) := by
-          have hAB' := hAB.squaredDistanceBound
-          have hBC' := hBC.squaredDistanceBound
-          have hCD' := hCD.squaredDistanceBound
-          nlinarith
-
-set_option linter.unusedFintypeInType false in
 /-- Residual handoff for the projectivization part of Step 6.
 
 The fields are exactly the hypotheses needed after the orthonormalization and
@@ -253,7 +124,7 @@ the pre-projective measurements `G_A,G_B`.  The theorem
 paper's line-156 approximation. -/
 structure ProjectivizationLine156Handoff
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
+    [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
     (G_A G_B : Measurement Outcome ι) (Q_A Q_B : ProjMeas Outcome ι)
     (ζ₁ ζ₂ : Error) : Prop where
@@ -275,7 +146,6 @@ structure ProjectivizationLine156Handoff
 
 namespace ProjectivizationLine156Handoff
 
-set_option linter.unusedFintypeInType false in
 /-- Step 6 line-156 handoff.
 
 From line-131 consistency `G_A ⊗ I ≃_{ζ₁} I ⊗ G_B`,
@@ -288,7 +158,7 @@ triangle gives
 which is exactly the paper's `ζ₃ = 6ζ₁ + 6ζ₂`
 (`inductive_step.tex:154--158`). -/
 theorem line156Approx {Outcome : Type*} {ι : Type*}
-    [Fintype Outcome] [DecidableEq Outcome] [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     {ψ : QuantumState (ι × ι)}
     {G_A G_B : Measurement Outcome ι} {Q_A Q_B : ProjMeas Outcome ι}
     {ζ₁ ζ₂ : Error}
@@ -321,7 +191,8 @@ theorem line156Approx {Outcome : Type*} {ι : Type*}
       (constSubMeasFamily G_A.toSubMeas.liftLeft)
       (constSubMeasFamily Q_A.toSubMeas.liftLeft) ζ₂
       handoff.leftCompletionCloseness
-  have htri := sddRel_triangle_three ψ (uniformDistribution Unit)
+  have htri := MIPStarRE.LDT.Preliminaries.stateDependentDistanceRel_triangle_three ψ
+    (uniformDistribution Unit)
     (constSubMeasFamily Q_A.toSubMeas.liftLeft)
     (constSubMeasFamily G_A.toSubMeas.liftLeft)
     (constSubMeasFamily G_B.toSubMeas.liftRight)

@@ -174,6 +174,78 @@ theorem ev_diff_triangle {ι : Type*} [Fintype ι] [DecidableEq ι]
   exact normalizedTrace_triangle ψ.density (X - Y) (Y - Z)
     (Matrix.nonneg_iff_posSemidef.mp ψ.density_psd)
 
+/-- Three-vector version of the normalized-trace triangle inequality.
+
+If a difference is decomposed as three successive differences, its squared norm
+is bounded by `3` times the sum of the three squared norms. This is the `k = 3`
+case of the paper's `prop:triangle-inequality-for-vectors-squared`, and it is
+used by the Step 6 projectivization chain in `inductive_step.tex:154--158`. -/
+theorem normalizedTrace_triangle_three {n : Type*} [Fintype n]
+    (ρ D₁ D₂ D₃ : Matrix n n ℂ) (hρ : ρ.PosSemidef) :
+    Complex.re (MIPStarRE.Quantum.normalizedTrace
+        (ρ * (((D₁ + D₂ + D₃)ᴴ) * (D₁ + D₂ + D₃)))) ≤
+      3 * (Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₁ᴴ * D₁))) +
+        Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₂ᴴ * D₂))) +
+        Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₃ᴴ * D₃)))) := by
+  let S := ((D₁ + D₂ + D₃)ᴴ) * (D₁ + D₂ + D₃)
+  let E12 := (D₁ - D₂)ᴴ * (D₁ - D₂)
+  let E13 := (D₁ - D₃)ᴴ * (D₁ - D₃)
+  let E23 := (D₂ - D₃)ᴴ * (D₂ - D₃)
+  let Base := D₁ᴴ * D₁ + D₂ᴴ * D₂ + D₃ᴴ * D₃
+  have h_para : S + (E12 + E13 + E23) = Base + Base + Base := by
+    simp only [S, E12, E13, E23, Base, Matrix.conjTranspose_add,
+      Matrix.conjTranspose_sub, add_mul, mul_add, sub_mul, mul_sub]
+    abel
+  have h_trace_id :
+      MIPStarRE.Quantum.normalizedTrace (ρ * S) +
+          (MIPStarRE.Quantum.normalizedTrace (ρ * E12) +
+            MIPStarRE.Quantum.normalizedTrace (ρ * E13) +
+            MIPStarRE.Quantum.normalizedTrace (ρ * E23)) =
+        MIPStarRE.Quantum.normalizedTrace (ρ * Base) +
+          MIPStarRE.Quantum.normalizedTrace (ρ * Base) +
+          MIPStarRE.Quantum.normalizedTrace (ρ * Base) := by
+    calc
+      MIPStarRE.Quantum.normalizedTrace (ρ * S) +
+          (MIPStarRE.Quantum.normalizedTrace (ρ * E12) +
+            MIPStarRE.Quantum.normalizedTrace (ρ * E13) +
+            MIPStarRE.Quantum.normalizedTrace (ρ * E23))
+          = MIPStarRE.Quantum.normalizedTrace
+              (ρ * (S + (E12 + E13 + E23))) := by
+              simp [Matrix.mul_add, MIPStarRE.Quantum.normalizedTrace_add, add_assoc]
+      _ = MIPStarRE.Quantum.normalizedTrace (ρ * (Base + Base + Base)) := by
+              rw [h_para]
+      _ = MIPStarRE.Quantum.normalizedTrace (ρ * Base) +
+            MIPStarRE.Quantum.normalizedTrace (ρ * Base) +
+            MIPStarRE.Quantum.normalizedTrace (ρ * Base) := by
+              simp [Matrix.mul_add, MIPStarRE.Quantum.normalizedTrace_add, add_assoc]
+  have h_re_id := congrArg Complex.re h_trace_id
+  simp only [Complex.add_re] at h_re_id
+  have h_base :
+      Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * Base)) =
+        Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₁ᴴ * D₁))) +
+        Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₂ᴴ * D₂))) +
+        Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * (D₃ᴴ * D₃))) := by
+    simp [Base, Matrix.mul_add, MIPStarRE.Quantum.normalizedTrace_add,
+      Complex.add_re, add_assoc]
+  have h12 := normalizedTrace_diff_sq_nonneg ρ D₁ D₂ hρ
+  have h13 := normalizedTrace_diff_sq_nonneg ρ D₁ D₃ hρ
+  have h23 := normalizedTrace_diff_sq_nonneg ρ D₂ D₃ hρ
+  rw [h_base] at h_re_id
+  linarith
+
+/-- Three-step operator triangle inequality for squared differences. -/
+theorem ev_diff_triangle_three {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (X Y Z W : MIPStarRE.Quantum.Op ι) :
+    ev ψ ((X - W)ᴴ * (X - W)) ≤
+      3 * (ev ψ ((X - Y)ᴴ * (X - Y)) +
+        ev ψ ((Y - Z)ᴴ * (Y - Z)) +
+        ev ψ ((Z - W)ᴴ * (Z - W))) := by
+  simp only [ev]
+  have hdecomp : X - W = (X - Y) + (Y - Z) + (Z - W) := by abel
+  rw [hdecomp]
+  exact normalizedTrace_triangle_three ψ.density (X - Y) (Y - Z) (Z - W)
+    (Matrix.nonneg_iff_posSemidef.mp ψ.density_psd)
+
 /-! ### Infrastructure for bridge lemma proofs -/
 
 /-- `ev` distributes over finite sums. -/
