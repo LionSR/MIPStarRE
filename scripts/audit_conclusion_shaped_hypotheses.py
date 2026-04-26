@@ -710,6 +710,28 @@ def _leading_let_body_start(text: str, start: int) -> int | None:
     return len(text)
 
 
+def _strip_leading_let_wrappers(text: str, start: int) -> int:
+    """Strip all reliably bounded leading ``let`` / ``letI`` wrappers.
+
+    Semicolon-delimited lets are reliable and can be peeled repeatedly.  An
+    unreliable layout-style let returns ``len(text)``, causing caller-side
+    producer detection to return false rather than risk a false-negative skip.
+    """
+    current = start
+    while current < len(text):
+        suffix_first = _first_code_pos(text[current:])
+        if suffix_first is None:
+            return len(text)
+        current += suffix_first
+        body_start = _leading_let_body_start(text, current)
+        if body_start is None:
+            return current
+        if body_start <= current:
+            return current
+        current = body_start
+    return current
+
+
 def _contains_forall(text: str) -> bool:
     """Return whether ``text`` is a producer context skipped in default mode.
 
@@ -722,10 +744,7 @@ def _contains_forall(text: str) -> bool:
     if first is None:
         return False
 
-    search_start = first
-    let_body_start = _leading_let_body_start(text, first)
-    if let_body_start is not None:
-        search_start = let_body_start
+    search_start = _strip_leading_let_wrappers(text, first)
 
     body_text = text[search_start:]
     body_first = _first_code_pos(body_text)

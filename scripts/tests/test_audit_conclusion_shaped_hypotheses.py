@@ -685,6 +685,28 @@ class AuditHeuristicTests(unittest.TestCase):
             )
             self.assertEqual(len(expanded_result.review_findings), 1)
 
+    def test_multiple_semicolon_lets_before_forall_producer_skip_by_default(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = self._write_fake(
+                root,
+                """\
+                theorem multiLetForallProducerWrapper
+                    (hrec :
+                      let a : Nat := 0;
+                      let b : Nat := 1;
+                      ∀ x, ∃ G : Measurement, ConsRel G) :
+                    ∃ G : Measurement, ConsRel G := by
+                  sorry
+                """,
+            )
+            default_result = run_audit([mod], root=root, min_common=2)
+            self.assertEqual(default_result.findings, ())
+            expanded_result = run_audit(
+                [mod], root=root, min_common=2, include_forall=True
+            )
+            self.assertEqual(len(expanded_result.review_findings), 1)
+
     def test_skips_forall_producers_by_default(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
