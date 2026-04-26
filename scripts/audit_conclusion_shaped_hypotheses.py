@@ -172,11 +172,39 @@ def _find_header_end(text: str, start: int) -> int | None:
 
 
 def _find_top_level_char(text: str, target: str) -> int | None:
-    """Return the first top-level occurrence of ``target`` in ``text``."""
+    """Return the first top-level occurrence of ``target`` in ``text``.
+
+    Lean comments may contain explanatory colons before the actual theorem
+    conclusion separator.  Ignore line comments, block comments, and string
+    literals so those colons do not corrupt the header split.
+    """
     stack: list[str] = []
     i = 0
     while i < len(text):
         ch = text[i]
+        if ch == "-" and i + 1 < len(text) and text[i + 1] == "-":
+            newline = text.find("\n", i + 2)
+            if newline == -1:
+                return None
+            i = newline + 1
+            continue
+        if ch == "/" and i + 1 < len(text) and text[i + 1] == "-":
+            end = text.find("-/", i + 2)
+            if end == -1:
+                return None
+            i = end + 2
+            continue
+        if ch == '"':
+            i += 1
+            while i < len(text):
+                if text[i] == "\\":
+                    i += 2
+                    continue
+                if text[i] == '"':
+                    i += 1
+                    break
+                i += 1
+            continue
         if ch == target and not stack:
             return i
         _advance_depth(ch, stack)
