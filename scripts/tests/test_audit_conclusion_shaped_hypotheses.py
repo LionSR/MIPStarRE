@@ -749,6 +749,30 @@ class AuditHeuristicTests(unittest.TestCase):
             expanded_result = run_audit([mod], root=root, include_forall=True)
             self.assertEqual(len(expanded_result.review_findings), 1)
 
+    def test_existential_body_arrow_does_not_skip_hypothesis(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = self._write_fake(
+                root,
+                """\
+                theorem existentialBodyArrowStillBad
+                    (hrec :
+                      ∃ x : Nat, x = x → ∃ G : Measurement, ConsRel G) :
+                    ∃ G : Measurement, ConsRel G := by
+                  sorry
+                """,
+            )
+            default_result = run_audit([mod], root=root, min_common=2)
+            self.assertEqual(len(default_result.review_findings), 1)
+            self.assertEqual(
+                default_result.review_findings[0].decl,
+                "existentialBodyArrowStillBad",
+            )
+            expanded_result = run_audit(
+                [mod], root=root, min_common=2, include_forall=True
+            )
+            self.assertEqual(len(expanded_result.review_findings), 1)
+
     def test_skips_arrow_producers_by_default(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

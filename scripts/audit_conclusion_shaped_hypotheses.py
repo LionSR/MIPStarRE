@@ -499,6 +499,37 @@ def _find_top_level_forall(text: str) -> int | None:
     return None
 
 
+def _find_top_level_existential(text: str) -> int | None:
+    """Return the first top-level ``∃`` / ``Exists`` token in ``text``."""
+    stack: list[str] = []
+    i = 0
+    while i < len(text):
+        ch = text[i]
+        if ch == "-" and i + 1 < len(text) and text[i + 1] == "-":
+            newline = text.find("\n", i + 2)
+            if newline == -1:
+                return None
+            i = newline + 1
+            continue
+        if ch == "/" and i + 1 < len(text) and text[i + 1] == "-":
+            end = _skip_block_comment(text, i)
+            if end is None:
+                return None
+            i = end
+            continue
+        string_end = _skip_string_like(text, i)
+        if string_end is not None:
+            i = string_end
+            continue
+        if not stack and (
+            text.startswith("∃", i) or _starts_keyword(text, i, "Exists")
+        ):
+            return i
+        _advance_depth(ch, stack)
+        i += 1
+    return None
+
+
 def _find_matching_group(text: str, start: int) -> int | None:
     """Return the closing offset for the group opened at ``start``.
 
@@ -757,11 +788,17 @@ def _contains_forall(text: str) -> bool:
     if forall_pos is not None and forall_pos == body_first:
         return _contains_existential(body_text[forall_pos:])
 
+    top_exists = _find_top_level_existential(body_text)
+
     unicode_arrow = _find_top_level_token(body_text, "→")
     if unicode_arrow is not None:
+        if top_exists is not None and top_exists < unicode_arrow:
+            return False
         return _contains_existential(body_text[unicode_arrow + len("→"):])
     ascii_arrow = _find_top_level_token(body_text, "->")
     if ascii_arrow is not None:
+        if top_exists is not None and top_exists < ascii_arrow:
+            return False
         return _contains_existential(body_text[ascii_arrow + len("->"):])
     return False
 
