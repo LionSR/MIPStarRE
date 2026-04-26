@@ -28,6 +28,10 @@ with the full-polynomial consistency defect
 
 `∑_{g ≠ h} ⟨ψ| G^A_g ⊗ G^B_h |ψ⟩`.
 
+The paper reuses `g` as the bound name in the Alice and Bob sums; Lean writes
+these independently-bound polynomial outcomes as `g` and `h` to make the
+independence explicit.
+
 After expanding the postprocessed outcomes and separating the colliding pairs
 `g(u)=h(u)`, the only extra term is the collision mass bounded by
 Schwartz--Zippel in `Preliminaries.polynomialCollisionMass_le_mdq`.  This
