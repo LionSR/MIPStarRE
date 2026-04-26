@@ -622,9 +622,10 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 
 \begin{lemma}[Consistency of the sandwiched measurement with one line value]\label{lem:ld-sandwich-line-one-point}
 	\lean{MIPStarRE.LDT.Pasting.ldSandwichLineOnePoint}
-	% Lean-local gap: `ldSandwichLineOnePoint` is now reduced to the private
-	% residual `ldSandwichLineOnePoint_prefix_cauchySchwarz_transport`, which
-	% isolates the two Cauchy--Schwarz moves and prefix collapse from
+	% Lean-local gap: `ldSandwichLineOnePoint` is now reduced past the
+	% outer `max 0` consistency wrapper to the private linear residual
+	% `ldSandwichLineOnePoint_prefix_linearDefect_cauchySchwarz_bound`,
+	% which isolates the two Cauchy--Schwarz moves and prefix collapse from
 	% `ld-pasting.tex:954--1024`.
 	\uses{lem:commute-g-half-sandwich, lem:ld-gbcon}
 	For any $1 \le i \le k$,

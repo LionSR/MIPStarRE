@@ -65,7 +65,8 @@ theorem triangleInequalityForVectorsSquared
 
 /-! ### Elementary max bound -/
 
-private lemma max_zero_add_le (x y : Error) :
+/-- Adding `y` inside `max 0` changes the value by at most `|y|`. -/
+lemma max_zero_add_le (x y : Error) :
     max 0 (x + y) ≤ max 0 x + |y| := by
   by_cases hxy : x + y < 0
   · rw [max_eq_left_of_lt hxy]
