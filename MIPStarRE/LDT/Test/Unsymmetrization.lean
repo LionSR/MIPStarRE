@@ -465,7 +465,7 @@ theorem qBipartiteConsDefect_extractRoleB_le_two_symm {Outcome ι : Type*}
   have h := qBipartiteConsDefect_roleSymmetrizedMeasurement_left ψ MA MB G
   have hnonneg : 0 ≤ qBipartiteConsDefect ψ (G.extractRole Role.A).toSubMeas MB.toSubMeas :=
     qBipartiteConsDefect_nonneg ψ (G.extractRole Role.A).toSubMeas MB.toSubMeas
-  nlinarith
+  linarith
 
 /-- The other questionwise factor-two consequence of the unsymmetrization identity. -/
 theorem qBipartiteConsDefect_extractRoleA_le_two_symm {Outcome ι : Type*}
@@ -478,7 +478,7 @@ theorem qBipartiteConsDefect_extractRoleA_le_two_symm {Outcome ι : Type*}
   have h := qBipartiteConsDefect_roleSymmetrizedMeasurement_left ψ MA MB G
   have hnonneg : 0 ≤ qBipartiteConsDefect ψ MA.toSubMeas (G.extractRole Role.B).toSubMeas :=
     qBipartiteConsDefect_nonneg ψ MA.toSubMeas (G.extractRole Role.B).toSubMeas
-  nlinarith
+  linarith
 
 /-- Named residual package for the Step 3 measurement-unsymmetrization bridge.
 

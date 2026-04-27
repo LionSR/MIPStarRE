@@ -760,14 +760,16 @@ lemma ev_classicalRoleSymmState_rolePair_BB {ι : Type*}
     rolePairCond_BA_mul_BB]
   simp
 
+-- The `Role.A` block of the left tensor only sees the `Role.B` principal block
+-- of the right tensor against the classically role-symmetrized state.
 set_option linter.flexible false in
-set_option linter.unnecessarySimpa false in
-lemma ev_classicalRoleSymmState_opTensor_roleCond_A {ι : Type*}
+private lemma ev_classicalRoleSymmState_opTensor_roleCond_A_ignore {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (ψ : QuantumState (ι × ι))
     (X : MIPStarRE.Quantum.Op ι) (Y : MIPStarRE.Quantum.Op (Role × ι)) :
     ev (classicalRoleSymmState ψ) (opTensor (roleCond Role.A X) Y) =
-      (1 / 2 : Error) * ev ψ (opTensor X (roleBlock Role.B Y)) := by
+      ev (classicalRoleSymmState ψ)
+        (opTensor (roleCond Role.A X) (roleCond Role.B (roleBlock Role.B Y))) := by
   unfold ev classicalRoleSymmState MIPStarRE.Quantum.normalizedTrace Matrix.trace
   simp_rw [Fintype.sum_prod_type]
   simp [rolePairCond, rolePairPayloadEquiv, rolePairProj, roleCond, roleBlock,
@@ -782,40 +784,48 @@ lemma ev_classicalRoleSymmState_opTensor_roleCond_A {ι : Type*}
   simp_rw [hRoleSum]
   have hcardRole : Fintype.card Role = 2 := by decide
   simp [hcardRole]
-  simp_rw [mul_assoc]
-  simp_rw [← Finset.mul_sum]
-  ring_nf
-  simpa using
-    (Complex.re_mul_ofReal
-      ((∑ x, ∑ x_1, ∑ x_2, ∑ x_3,
-        ψ.density (x, x_1) (x_2, x_3) * X x_2 x * Y (Role.B, x_3) (Role.B, x_1)) *
-          (↑(Fintype.card ι))⁻¹ ^ 2) (1 / 2 : Error))
 
+lemma ev_classicalRoleSymmState_opTensor_roleCond_A {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (ψ : QuantumState (ι × ι))
+    (X : MIPStarRE.Quantum.Op ι) (Y : MIPStarRE.Quantum.Op (Role × ι)) :
+    ev (classicalRoleSymmState ψ) (opTensor (roleCond Role.A X) Y) =
+      (1 / 2 : Error) * ev ψ (opTensor X (roleBlock Role.B Y)) := by
+  rw [ev_classicalRoleSymmState_opTensor_roleCond_A_ignore]
+  rw [opTensor_roleCond_AB]
+  exact ev_classicalRoleSymmState_rolePair_AB ψ (opTensor X (roleBlock Role.B Y))
+
+-- The `Role.B` block of the left tensor only sees the `Role.A` principal block
+-- of the right tensor against the classically role-symmetrized state.
 set_option linter.flexible false in
+private lemma ev_classicalRoleSymmState_opTensor_roleCond_B_ignore {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (ψ : QuantumState (ι × ι))
+    (X : MIPStarRE.Quantum.Op ι) (Y : MIPStarRE.Quantum.Op (Role × ι)) :
+    ev (classicalRoleSymmState ψ) (opTensor (roleCond Role.B X) Y) =
+      ev (classicalRoleSymmState ψ)
+        (opTensor (roleCond Role.B X) (roleCond Role.A (roleBlock Role.A Y))) := by
+  unfold ev classicalRoleSymmState MIPStarRE.Quantum.normalizedTrace Matrix.trace
+  simp_rw [Fintype.sum_prod_type]
+  simp [rolePairCond, rolePairPayloadEquiv, rolePairProj, roleCond, roleBlock,
+    roleProj, opTensor, Matrix.mul_apply, Matrix.single]
+  simp_rw [Fintype.sum_prod_type]
+  have hRoleSum : ∀ f : Role → ℂ, (∑ r : Role, f r) = f Role.A + f Role.B := by
+    intro f
+    rw [Fintype.sum_eq_add Role.A Role.B (by decide)
+      (by
+        intro r hr
+        cases r <;> simp at hr)]
+  simp_rw [hRoleSum]
+  simp
+
 lemma ev_classicalRoleSymmState_opTensor_roleCond_B {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (ψ : QuantumState (ι × ι))
     (X : MIPStarRE.Quantum.Op ι) (Y : MIPStarRE.Quantum.Op (Role × ι)) :
     ev (classicalRoleSymmState ψ) (opTensor (roleCond Role.B X) Y) =
       (1 / 2 : Error) * ev ψ (opTensor (roleBlock Role.A Y) X) := by
-  have hignore :
-      ev (classicalRoleSymmState ψ) (opTensor (roleCond Role.B X) Y) =
-        ev (classicalRoleSymmState ψ)
-          (opTensor (roleCond Role.B X) (roleCond Role.A (roleBlock Role.A Y))) := by
-    unfold ev classicalRoleSymmState MIPStarRE.Quantum.normalizedTrace Matrix.trace
-    simp_rw [Fintype.sum_prod_type]
-    simp [rolePairCond, rolePairPayloadEquiv, rolePairProj, roleCond, roleBlock,
-      roleProj, opTensor, Matrix.mul_apply, Matrix.single]
-    simp_rw [Fintype.sum_prod_type]
-    have hRoleSum : ∀ f : Role → ℂ, (∑ r : Role, f r) = f Role.A + f Role.B := by
-      intro f
-      rw [Fintype.sum_eq_add Role.A Role.B (by decide)
-        (by
-          intro r hr
-          cases r <;> simp at hr)]
-    simp_rw [hRoleSum]
-    simp
-  rw [hignore]
+  rw [ev_classicalRoleSymmState_opTensor_roleCond_B_ignore]
   rw [opTensor_roleCond_BA]
   rw [ev_classicalRoleSymmState_rolePair_BA]
   rw [ev_swapQuantumState, swapDensity_opTensor]
