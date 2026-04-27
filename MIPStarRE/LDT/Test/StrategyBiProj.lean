@@ -34,6 +34,7 @@ This module is the first low-risk step of the staged refactor outlined in
 
 namespace MIPStarRE.LDT
 
+-- `Matrix` supplies the `ᴴ` notation; matrix constants below remain qualified.
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 /-- Paper-faithful two-space projective strategy data.
@@ -182,10 +183,10 @@ theorem payloadBlock_nonneg {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA]
   rcases hA with ⟨C, hC⟩
   rcases hB with ⟨D, hD⟩
   refine ⟨payloadBlock C D, ?_⟩
-  change A = Cᴴ * C at hC
-  change B = Dᴴ * D at hD
-  change payloadBlock A B = (payloadBlock C D)ᴴ * payloadBlock C D
-  rw [payloadBlock_conjTranspose, payloadBlock_mul, ← hC, ← hD]
+  have hC' : A = Cᴴ * C := hC
+  have hD' : B = Dᴴ * D := hD
+  show payloadBlock A B = (payloadBlock C D)ᴴ * payloadBlock C D
+  rw [payloadBlock_conjTranspose, payloadBlock_mul, ← hC', ← hD']
 
 /-- The trace of a direct-sum payload block is the sum of the block traces.
 
@@ -261,16 +262,14 @@ noncomputable def roleBlock {ιA ιB : Type*}
   classical
   unfold roleBlock
   let e := Equiv.prodComm (SymmPayload ιA ιB) Role
-  rw [show Matrix.reindex e e (Matrix.blockDiagonal (roleBlockFamily A₁ B₁)) *
-        Matrix.reindex e e (Matrix.blockDiagonal (roleBlockFamily A₂ B₂)) =
-      Matrix.reindex e e
-        (Matrix.blockDiagonal (roleBlockFamily A₁ B₁) *
-          Matrix.blockDiagonal (roleBlockFamily A₂ B₂)) by
-        exact (Matrix.reindexAlgEquiv_mul ℂ ℂ e
-          (Matrix.blockDiagonal (roleBlockFamily A₁ B₁))
-          (Matrix.blockDiagonal (roleBlockFamily A₂ B₂))).symm]
-  rw [← Matrix.blockDiagonal_mul]
-  congr
+  show (Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal (roleBlockFamily A₁ B₁)) *
+      (Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal (roleBlockFamily A₂ B₂)) =
+    (Matrix.reindexAlgEquiv ℂ ℂ e)
+      (Matrix.blockDiagonal (roleBlockFamily (A₁ * A₂) (B₁ * B₂)))
+  rw [← Matrix.reindexAlgEquiv_mul (R := ℂ) (A := ℂ) e
+    (Matrix.blockDiagonal (roleBlockFamily A₁ B₁))
+    (Matrix.blockDiagonal (roleBlockFamily A₂ B₂)), ← Matrix.blockDiagonal_mul]
+  congr 2
   ext r
   cases r <;> rfl
 
@@ -283,10 +282,10 @@ theorem roleBlock_nonneg {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA]
   rcases hA with ⟨C, hC⟩
   rcases hB with ⟨D, hD⟩
   refine ⟨roleBlock C D, ?_⟩
-  change A = Cᴴ * C at hC
-  change B = Dᴴ * D at hD
-  change roleBlock A B = (roleBlock C D)ᴴ * roleBlock C D
-  rw [roleBlock_conjTranspose, roleBlock_mul, ← hC, ← hD]
+  have hC' : A = Cᴴ * C := hC
+  have hD' : B = Dᴴ * D := hD
+  show roleBlock A B = (roleBlock C D)ᴴ * roleBlock C D
+  rw [roleBlock_conjTranspose, roleBlock_mul, ← hC', ← hD']
 
 /-- The trace of a role-blocked operator is the sum of its two role-sector
 traces. This wraps Mathlib's `Matrix.trace_blockDiagonal` across the
