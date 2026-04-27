@@ -2230,9 +2230,11 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_abs_bounds
     (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi) :
     LdSandwichLineOnePointOutcomeSumCSAbsBounds params strategy family gamma zeta hi := by
   /- TODO(#835): instantiate `closenessOfIPAdjoint` and `closenessOfIP` in the
-  absolute-value form above, preserving the two `√ν₄` constants.  The hypotheses
-  `hi0` and `facts.rawCore` / endpoint fields supply the nonempty-prefix and raw
-  half-product data needed for those instantiations. -/
+  absolute-value form above, preserving the two `√ν₄` constants.  The strategy
+  normalization, `uniformDistribution_weight_sum_le_one`, and the measurement
+  completeness/unit-side bounds discharge the generic hypotheses of those
+  preliminaries; `hi0` and `facts.rawCore` / endpoint fields supply the
+  nonempty-prefix and raw half-product data needed for the instantiations. -/
   sorry
 
 /-- One-sided route for the two off-diagonal Cauchy--Schwarz moves in
@@ -2251,25 +2253,22 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_route
     {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0)
     (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi) :
     LdSandwichLineOnePointOutcomeSumCSRoute params strategy family gamma zeta hi := by
-  let source := ldSandwichLineOnePoint_prefix_sourceOutcomeSum params strategy family hi
-  let afterFirst :=
-    ldSandwichLineOnePoint_prefix_afterFirstCSOutcomeSum params strategy family hi
-  let moved := ldSandwichLineOnePoint_prefix_movedOutcomeSum params strategy family hi
-  let gap := Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1))
   have hbounds :=
     ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_abs_bounds
       params strategy family gamma zeta hi hi0 facts
   refine ⟨?_, ?_⟩
-  · have hgap : source - afterFirst ≤ gap :=
-      le_trans (le_abs_self (source - afterFirst)) (by
-        simpa [source, afterFirst, gap] using hbounds.firstAbs)
-    have hroute : source ≤ afterFirst + gap := by linarith
-    simpa [source, afterFirst, gap] using hroute
-  · have hgap : afterFirst - moved ≤ gap :=
-      le_trans (le_abs_self (afterFirst - moved)) (by
-        simpa [afterFirst, moved, gap] using hbounds.secondAbs)
-    have hroute : afterFirst ≤ moved + gap := by linarith
-    simpa [afterFirst, moved, gap] using hroute
+  · have hgap :
+        ldSandwichLineOnePoint_prefix_sourceOutcomeSum params strategy family hi -
+            ldSandwichLineOnePoint_prefix_afterFirstCSOutcomeSum params strategy family hi ≤
+          Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1)) :=
+      le_trans (le_abs_self _) hbounds.firstAbs
+    linarith
+  · have hgap :
+        ldSandwichLineOnePoint_prefix_afterFirstCSOutcomeSum params strategy family hi -
+            ldSandwichLineOnePoint_prefix_movedOutcomeSum params strategy family hi ≤
+          Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1)) :=
+      le_trans (le_abs_self _) hbounds.secondAbs
+    linarith
 
 /-- The remaining expanded off-diagonal scalar transport in
 `lem:ld-sandwich-line-one-point`.
