@@ -110,9 +110,9 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
       -- * `fullSlice_scalar_marginalize_x`: the first-term switch-sandwich
       --   wrapper costs `4√ζ`.
       -- * `fullSlice_scalar_marginalize_y`: the paper-faithful second-term
-      --   wrapper now splits into the proved x-prefix `md/q + √ζ`, the remaining
-      --   line-359 residual `√ζ`, the proved line-360 bridge `√ζ`, and the
-      --   proved y-tail `md/q + √ζ`, for a total of `2md/q + 4√ζ`.
+      --   wrapper splits into the proved x-prefix `md/q + √ζ`, the proved
+      --   line-359 bridge `√ζ`, the proved line-360 bridge `√ζ`, and the proved
+      --   y-tail `md/q + √ζ`, for a total of `2md/q + 4√ζ`.
       -- * `fullSlice_closenessOfIP_CAB_hEval_sqrt`: the direct evaluated-side
       --   route gives `|evalABA − evalABAB| ≤ √ν`.
       -- Summing gives `|fullABA − fullABAB| ≤ 8√ζ + 2(md/q) + √ν`,

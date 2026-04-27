@@ -260,14 +260,7 @@
 
 \begin{theorem}[Commutativity of~$G$]\label{thm:com-main}
 	\lean{MIPStarRE.LDT.Commutativity.comMain}
-	% Lean-local gap: `comMain`'s axiom closure currently includes `sorryAx`
-	% via `commDataProcessedG` (remaining local sorrys at
-	% `Commutativity/ScalarApproximation/ProcessedG.lean:1360` for the phase-2
-	% reindexing residual and `ProcessedG.lean:1494` for the phase-6/7 first-reverse
-	% endpoint), plus the `Commutativity/Main/Auxiliary.lean` residuals
-	% `fullSliceScalarMarginalizeXTensorTriangleResidual` and
-	% `fullSliceScalarMarginalizeYFirstClosenessResidual`. Add the blueprint-ok marker
-	% once those are closed.
+	\leanok
 	\uses{def:good-strategy, def:polymeasurements, def:approx_delta, def:strong-self-consistency}
 	Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test.
 	Let $\{G^x\}_{x \in \F_q}$ denote a set of projective sub-measurements in $\polysub{m}{q}{d}$ with the following properties:
@@ -302,6 +295,7 @@
 	\]
 \end{theorem}
 \begin{proof}
+	\leanok
 	\uses{lem:comm-data-processed-g, lem:normalization-condition, prop:switch-sandwich, prop:closeness-of-ip, prop:triangle-inequality-for-vectors-squared, lem:schwartz-zippel-individual}
 	If at least one of $\gamma$, $\zeta$, or $d/q$ is at least~$1$, then $\nu \ge 30$ and the estimate is trivial from \ref{prop:triangle-inequality-for-vectors-squared}. We therefore assume $\gamma,\zeta,d/q \le 1$.
 
