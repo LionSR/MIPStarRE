@@ -1,0 +1,20 @@
+\begin{thebibliography}{JNV+20}
+
+\bibitem[JNV+20]{Ji2020LowIndividualDegree}
+Zhengfeng Ji, Anand Natarajan, Thomas Vidick, John Wright, and Henry Yuen.
+\newblock Quantum soundness of the classical low individual degree test.
+\newblock arXiv:2009.12982, 2020.
+
+\bibitem[Sch80]{Sch80}
+Jacob~T. Schwartz.
+\newblock Fast probabilistic algorithms for verification of polynomial
+  identities.
+\newblock {\em Journal of the ACM}, 27(4):701--717, 1980.
+
+\bibitem[Zip79]{Zip79}
+Richard Zippel.
+\newblock Probabilistic algorithms for sparse polynomials.
+\newblock In {\em Proceedings of the 2nd International Symposium on Symbolic
+  and Algebraic Manipulation}, pages 216--226, 1979.
+
+\end{thebibliography}
