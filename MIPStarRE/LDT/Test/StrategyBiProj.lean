@@ -148,44 +148,14 @@ noncomputable def payloadBlockB {ιA ιB : Type*}
     (i j : ιB) : payloadBlock A B (Sum.inr i) (Sum.inr j) = B i j :=
   rfl
 
-@[simp] theorem payloadBlockA_inl_inl {ιA ιB : Type*}
-    (A : MIPStarRE.Quantum.Op ιA) (i j : ιA) :
-    payloadBlockA (ιB := ιB) A (Sum.inl i) (Sum.inl j) = A i j :=
+@[simp] theorem payloadBlockA_eq {ιA ιB : Type*}
+    (A : MIPStarRE.Quantum.Op ιA) :
+    payloadBlockA (ιB := ιB) A = payloadBlock A 0 :=
   rfl
 
-@[simp] theorem payloadBlockA_inl_inr {ιA ιB : Type*}
-    (A : MIPStarRE.Quantum.Op ιA) (i : ιA) (j : ιB) :
-    payloadBlockA (ιB := ιB) A (Sum.inl i) (Sum.inr j) = 0 :=
-  rfl
-
-@[simp] theorem payloadBlockA_inr_inl {ιA ιB : Type*}
-    (A : MIPStarRE.Quantum.Op ιA) (i : ιB) (j : ιA) :
-    payloadBlockA (ιB := ιB) A (Sum.inr i) (Sum.inl j) = 0 :=
-  rfl
-
-@[simp] theorem payloadBlockA_inr_inr {ιA ιB : Type*}
-    (A : MIPStarRE.Quantum.Op ιA) (i j : ιB) :
-    payloadBlockA (ιB := ιB) A (Sum.inr i) (Sum.inr j) = 0 :=
-  rfl
-
-@[simp] theorem payloadBlockB_inl_inl {ιA ιB : Type*}
-    (B : MIPStarRE.Quantum.Op ιB) (i j : ιA) :
-    payloadBlockB (ιA := ιA) B (Sum.inl i) (Sum.inl j) = 0 :=
-  rfl
-
-@[simp] theorem payloadBlockB_inl_inr {ιA ιB : Type*}
-    (B : MIPStarRE.Quantum.Op ιB) (i : ιA) (j : ιB) :
-    payloadBlockB (ιA := ιA) B (Sum.inl i) (Sum.inr j) = 0 :=
-  rfl
-
-@[simp] theorem payloadBlockB_inr_inl {ιA ιB : Type*}
-    (B : MIPStarRE.Quantum.Op ιB) (i : ιB) (j : ιA) :
-    payloadBlockB (ιA := ιA) B (Sum.inr i) (Sum.inl j) = 0 :=
-  rfl
-
-@[simp] theorem payloadBlockB_inr_inr {ιA ιB : Type*}
-    (B : MIPStarRE.Quantum.Op ιB) (i j : ιB) :
-    payloadBlockB (ιA := ιA) B (Sum.inr i) (Sum.inr j) = B i j :=
+@[simp] theorem payloadBlockB_eq {ιA ιB : Type*}
+    (B : MIPStarRE.Quantum.Op ιB) :
+    payloadBlockB (ιA := ιA) B = payloadBlock 0 B :=
   rfl
 
 @[simp] theorem payloadBlock_one {ιA ιB : Type*}
@@ -201,23 +171,7 @@ theorem trace_payloadBlock {ιA ιB : Type*} [Fintype ιA] [Fintype ιB]
     (A : MIPStarRE.Quantum.Op ιA) (B : MIPStarRE.Quantum.Op ιB) :
     Matrix.trace (payloadBlock A B) = Matrix.trace A + Matrix.trace B := by
   classical
-  unfold payloadBlock Matrix.trace
-  rw [Fintype.sum_sum_type]
-  simp
-
-/-- Reindexing rows and columns by the same equivalence preserves the matrix trace.
-
-This small generic helper is used below to move between `payload × Role` (the
-native shape of `Matrix.blockDiagonal`) and `Role × payload` (the strategy-local
-carrier shape). -/
-theorem trace_reindex_equiv {α β : Type*} [Fintype α] [Fintype β]
-    (e : α ≃ β) (M : Matrix α α ℂ) :
-    Matrix.trace (Matrix.reindex e e M) = Matrix.trace M := by
-  classical
-  unfold Matrix.trace
-  simp_rw [Matrix.diag_apply, Matrix.reindex_apply]
-  rw [← e.symm.sum_comp (fun i : α => M i i)]
-  rfl
+  simp [payloadBlock, Matrix.trace, Fintype.sum_sum_type]
 
 private def roleBlockFamily {ιA ιB : Type*}
     (A B : MIPStarRE.Quantum.Op (SymmPayload ιA ιB)) :
@@ -276,13 +230,14 @@ theorem trace_roleBlock {ιA ιB : Type*} [Fintype ιA] [Fintype ιB]
     (A B : MIPStarRE.Quantum.Op (SymmPayload ιA ιB)) :
     Matrix.trace (roleBlock A B) = Matrix.trace A + Matrix.trace B := by
   classical
-  unfold roleBlock
-  rw [trace_reindex_equiv]
+  rw [show Matrix.trace (roleBlock A B) =
+      Matrix.trace (Matrix.blockDiagonal (roleBlockFamily A B)) by
+        unfold roleBlock
+        rw [Matrix.trace_reindex]]
   rw [Matrix.trace_blockDiagonal]
-  have hRole : (Finset.univ : Finset Role) = {Role.A, Role.B} := by
-    ext r
-    cases r <;> simp
-  rw [hRole]
+  change Finset.sum ({Role.A, Role.B} : Finset Role)
+      (fun r => Matrix.trace (roleBlockFamily A B r)) =
+    Matrix.trace A + Matrix.trace B
   simp [roleBlockFamily]
 
 variable {params : Parameters} [FieldModel params.q]
