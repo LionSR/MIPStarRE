@@ -3,7 +3,8 @@
 ## Verdict
 
 Issue #760 is stale as a correctness/faithfulness blocker on current `main`
-(`0d804c9c`).  The current `evaluatedSlice_scalar_chain_bound` no longer uses the
+after PR #858 (`refactor(LDT/Commutativity): package phase67 reverse bridge`).
+The current `evaluatedSlice_scalar_chain_bound` no longer uses the
 old exact-swap/BABA shortcut described in the issue body.  Its final assembly
 follows the paper route through the point-measurement commutation step and pays
 both `6 * sqrt (gamma * (m + 1))` losses explicitly.
@@ -24,9 +25,9 @@ The relevant paper passage is
 | 86 | Insert the first-coordinate point measurement after `eq:gcom9`, costing `2√ζ`. | `hphase3paper` in `ProcessedG.lean:1528-1586`. |
 | 87 | Commute the two point measurements on the right, costing `6√(γ(m+1))`. | `hphase4paper` in `ProcessedG.lean:1587-1686`, via `evaluatedSlice_phaseFour_pointSwap_right_bound`. |
 | 90-96 | Remove the trailing `G^x`, with claim cost `√ζ + 6√(γ(m+1))`. | `hphase5paper` in `ProcessedG.lean:1687-1842`. |
-| 99-104 | Reverse the two `eq:add-an-a` insertions, costing `2√ζ + 2√ζ`. | `hphase6first` and `hphase7second` in `ProcessedG.lean:1843-1856`. |
-| 117-119 | Apply postprocessed self-consistency twice, costing `√ζ + √ζ`. | `htail8` and `htail9` in `ProcessedG.lean:1857-1868`. |
-| 124-130 | Sum the ten losses and relax to `48m(√γ + √ζ)`. | `hassemble` in `ProcessedG.lean:1869-1987`. |
+| 99-104 | Reverse the two `eq:add-an-a` insertions, costing `2√ζ + 2√ζ`. | `hphase67paper` in `ProcessedG.lean`, via `evaluatedSlice_phaseSixSeven_reverse_bound`. |
+| 117-119 | Apply postprocessed self-consistency twice, costing `√ζ + √ζ`. | `htail8` and `htail9` in `ProcessedG.lean`. |
+| 124-130 | Sum the ten losses and relax to `48m(√γ + √ζ)`. | `hassemble` in `ProcessedG.lean`. |
 
 ## Current Lean route
 
@@ -95,15 +96,14 @@ These observations are not correctness blockers for #760:
   collapsed phase-five stability defect (`evaluatedSlicePhaseFiveStabilityDefect`
   and its question-level reindexing).  The final `hphase5paper` block uses the
   newer `PaperChainPhaseFive` raw-defect route instead.
-- `Phase67Residual.lean` documents the older BAB-side endpoint residual.  Some of
-  its prose says the endpoint is used by `evaluatedSlice_scalar_chain_bound`,
-  which is no longer true for the final paper-faithful assembly.
-- `avgBABA` is still bound in `ProcessedG.lean:1266-1268` but is not used in the
-  final chain.
+- `Phase67Residual.lean` documents the older BAB-side endpoint residual.  Its
+  prose now labels that endpoint as historical; the final paper-faithful assembly
+  uses `evaluatedSlicePhaseFivePaperRemoved` and
+  `evaluatedSlice_phaseSixSeven_reverse_bound` instead.
+- The unused `avgBABA` binding noted in the original audit has been removed.
 
-A follow-up simplifier pass could remove or reclassify these leftovers after
-checking import dependencies.  I did not change Lean code in this audit to avoid
-mixing proof-code cleanup with the faithfulness verdict.
+A follow-up simplifier pass could remove or reclassify the remaining private
+phase-five scaffold after checking import dependencies.
 
 ## Recommended issue action
 

@@ -1263,9 +1263,6 @@ private lemma evaluatedSlice_scalar_chain_bound
   let avgABA : EvaluatedSliceQuestion params → Error := fun q =>
     ∑ ab : EvaluatedSliceOutcome params,
       evaluatedSliceABATerm params strategy family q ab
-  let avgBABA : EvaluatedSliceQuestion params → Error := fun q =>
-    ∑ ab : EvaluatedSliceOutcome params,
-      evaluatedSliceBABATerm params strategy family q ab
   let avgBAB : EvaluatedSliceQuestion params → Error := fun q =>
     ∑ ab : EvaluatedSliceOutcome params,
       evaluatedSliceBABTerm params strategy family q ab
