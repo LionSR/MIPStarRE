@@ -539,6 +539,7 @@ assembly residual:
 \lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndCompleteError, MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndComplete}
 \lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff.line156Approx}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.projectiveEvaluationConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.pointAConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.pointBConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.toProjectiveAssemblyResidual}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveLine169HandoffResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveLine169HandoffResidual.toProjectiveHandoffResidual}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeTransportTargets, MIPStarRE.LDT.Test.MainFormalCascadeTransportTargets.toCascadeTargets, MIPStarRE.LDT.Test.MainFormalCascadeTargets.toNativeTargets}
 They split off the vacuous branch where the theorem error is at least $1$,
 derive the Step~8 scalar hypotheses in the non-vacuous branch, package the
@@ -549,26 +550,28 @@ to convert evaluated pre-projective consistency to full-polynomial consistency
 at $\zeta_1$, prove the paper line-116 triangle step, and reduce the line-156
 $\approx_{\zeta_3}$ projectivization bridge to the named Step~6 handoff package:
 pre-projective consistency plus left/right completion closeness at $\zeta_2$.
-Lean also derives the evaluated line-164 projective consistency by data
-processing and proves the two native $\zeta_4$ point goals from the line-172
-style $\zeta_1$ links via \texttt{simeq-triangle-inequality}.  The remaining
-residual is the finer \texttt{MainFormalCascadeProjectiveHandoffResidual}: it
-still asks for the projectivization handoff fields and the two evaluated
-$\zeta_1$ point-transport links.
+Lean also derives the evaluated line-164 projective consistency, data-processes
+the two polynomial line-169 $\zeta_1$ links to the evaluated line-172 links, and
+proves the two native $\zeta_4$ point goals via
+\texttt{simeq-triangle-inequality}.  The remaining residual is the finer
+\texttt{MainFormalCascadeProjectiveLine169HandoffResidual}: it still asks for
+the projectivization handoff fields and the two polynomial-level $\zeta_1$
+transport links from paper line~169 and its role-reversed analogue.
 
-The latter line-172 fields are deliberately left as residual data.  As stated in
+Those line-169 fields are deliberately left as residual data.  As stated in
 \texttt{preliminaries.tex}, \texttt{prop:triangle-sub} gives a
 $\delta+\sqrt{\epsilon}$ loss, so applying it directly to
 $G^{\mathrm A}\simeq_{\zeta_1}G^{\mathrm B}$ and
 $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
-$Q^{\mathrm A}\simeq_{\zeta_1+\sqrt{\zeta_2}}G^{\mathrm B}$, not the printed
-line-172 $\zeta_1$ estimate.  The generic corrected route would degrade the final
+$Q^{\mathrm A}\simeq_{\zeta_1+\sqrt{\zeta_2}}G^{\mathrm B}$, not the
+printed $\zeta_1$ estimate.  The generic corrected route would degrade the final
 point error to scale $t^{1/65536}$, outside the current
 \texttt{mainFormalError} envelope.  Closing the residual while preserving the
 paper constants therefore requires a stronger construction-level
 projectivization/correlation-preservation theorem, not just the generic
 \texttt{triangle-sub} lemma. No proof-level completeness tag is claimed here
-while \texttt{mainFormal} still contains that handoff residual.
+while \texttt{mainFormal} still contains that line-169 residual.
+
 \end{remark}
 \begin{proof}
 	\proves{thm:main-formal}
@@ -709,10 +712,12 @@ while \texttt{mainFormal} still contains that handoff residual.
 	handoff from the remaining projective-stage transport work.  The scalar side
 	discharges the paper's line~71--73 coarsening and the Step~8 hypotheses in the
 	non-vacuous branch; the Step~5 wrapper now turns the evaluated estimate at
-	line~116 into full-polynomial consistency at $\zeta_1$.  The remaining residual
-	is the projective-stage construction: the two $\zeta_4$ point-consistency goals
-	and the line-156 $\approx_{\zeta_3}$ bridge whose projective converse gives the
-	$\zeta_3/2$ self-consistency target.
+	line~116 into full-polynomial consistency at $\zeta_1$.  The remaining Lean
+	residual is the polynomial line-169 construction: supply the actual
+	role-register measurement, the factor-two unsymmetrization bridge, the
+	projectivization handoff, and the two polynomial-level $\zeta_1$ links.  Lean
+	then data-processes those links to line~172 and derives the two $\zeta_4$
+	point goals and the $\zeta_3/2$ self-consistency target.
 
 	With $E$ as in Definition~\ref{def:main-formal-envelope}, the quantities $\sigma,\zeta_1,\zeta_2,\zeta_3,\zeta_4$ form the cascade of Definition~\ref{def:main-formal-error-cascade}. Theorem~\ref{thm:sigma-bound-main-formal} and Theorem~\ref{thm:zeta-bounds-main-formal} package the final inflation to the scale $100000k^2m^4 E$. The underlying paper estimates are:
 	\[
