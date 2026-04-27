@@ -197,18 +197,6 @@ private lemma gCommStabilityTwo_scalar_pointwise_bound
   have hsecond :
       ∑ g : Polynomial params, ev strategy.state ((Y g)ᴴ * Y g) ≤
         hbound.storedResidual G x := by
-    have hop_mono_right :
-        ∀ {A : MIPStarRE.Quantum.Op ι} {B₁ B₂ : MIPStarRE.Quantum.Op ι},
-          0 ≤ A → B₁ ≤ B₂ → opTensor A B₁ ≤ opTensor A B₂ := by
-      intro A B₁ B₂ hA hB
-      change Matrix.kronecker A B₁ ≤ Matrix.kronecker A B₂
-      letI : Finite ι := Finite.of_fintype ι
-      change (Matrix.kronecker A B₂ - Matrix.kronecker A B₁).PosSemidef
-      have hpsd : Matrix.PosSemidef (Matrix.kronecker A (B₂ - B₁)) := by
-        exact Matrix.nonneg_iff_posSemidef.mp <|
-          MIPStarRE.Quantum.kronecker_nonneg hA (sub_nonneg.mpr hB)
-      rw [MIPStarRE.Quantum.kronecker_sub_right]
-      exact hpsd
     have hsum_eq :
         ∑ g : Polynomial params,
             ev strategy.state
@@ -276,7 +264,7 @@ private lemma gCommStabilityTwo_scalar_pointwise_bound
               exact ev_mono strategy.state _ _ <| by
                 rw [leftTensor_mul_rightTensor_eq_opTensor,
                   leftTensor_mul_rightTensor_eq_opTensor]
-                exact hop_mono_right
+                exact opTensor_mono_right_of_nonneg
                   (MIPStarRE.Quantum.sandwich_nonneg (R.outcome_pos g) hTc_herm)
                   (averagedSlicePointEvaluationOperator_sq_le_self params strategy x g)
       _ ≤ ∑ g : Polynomial params,
@@ -288,7 +276,7 @@ private lemma gCommStabilityTwo_scalar_pointwise_bound
               exact ev_mono strategy.state _ _ <| by
                 rw [leftTensor_mul_rightTensor_eq_opTensor,
                   leftTensor_mul_rightTensor_eq_opTensor]
-                exact hop_mono_right
+                exact opTensor_mono_right_of_nonneg
                   (MIPStarRE.Quantum.sandwich_nonneg (R.outcome_pos g) hTc_herm)
                   (hbound.averagedPoint_le_witness x g)
       _ = ev strategy.state
@@ -314,8 +302,6 @@ private lemma gCommStabilityTwo_scalar_pointwise_bound
       _ = hbound.storedResidual G x := by
             rfl
   have hcs := MIPStarRE.LDT.Preliminaries.sum_ev_mul_le_sqrt strategy.state X Y
-  have hres_nonneg : 0 ≤ hbound.storedResidual G x :=
-    storedResidual_nonneg params strategy family G zeta hbound x
   have hXY :
       ∀ g : Polynomial params,
         X g * Y g = leftTensor (ι₂ := ι) (R.outcome g * (1 - T)) *

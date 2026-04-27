@@ -17,6 +17,19 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+lemma opTensor_mono_right_of_nonneg
+    {A B₁ B₂ : MIPStarRE.Quantum.Op ι} :
+    0 ≤ A → B₁ ≤ B₂ → opTensor A B₁ ≤ opTensor A B₂ := by
+  intro hA hB
+  change Matrix.kronecker A B₁ ≤ Matrix.kronecker A B₂
+  letI : Finite ι := Finite.of_fintype ι
+  change (Matrix.kronecker A B₂ - Matrix.kronecker A B₁).PosSemidef
+  have hpsd : Matrix.PosSemidef (Matrix.kronecker A (B₂ - B₁)) := by
+    exact Matrix.nonneg_iff_posSemidef.mp <|
+      MIPStarRE.Quantum.kronecker_nonneg hA (sub_nonneg.mpr hB)
+  rw [MIPStarRE.Quantum.kronecker_sub_right]
+  exact hpsd
+
 lemma averagedSlicePointEvaluationOperator_nonneg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -47,8 +60,6 @@ lemma averagedSlicePointEvaluationOperator_le_one
           (uniformDistribution (Point params)).weight u) • (1 : MIPStarRE.Quantum.Op ι) := by
           rw [Finset.sum_smul]
     _ = 1 := by
-          have hcard : ((Fintype.card (Point params) : Error)) ≠ 0 := by
-            exact_mod_cast Fintype.card_ne_zero
           simp [uniformDistribution]
 
 lemma averagedSlicePointEvaluationOperator_hermitian
