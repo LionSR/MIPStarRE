@@ -48,15 +48,27 @@ open MIPStarRE.LDT
 /-! ### Finite Hilbert space infrastructure -/
 
 /-- A finite-dimensional Hilbert space represented by a finite index type. -/
-structure FiniteHilbertSpace where
-  carrier : Type*
+structure FiniteHilbertSpace.{u} where
+  carrier : Type u
   instFintype : Fintype carrier
   instDecidableEq : DecidableEq carrier
   instNonempty : Nonempty carrier
 
-attribute [instance] FiniteHilbertSpace.instFintype
-attribute [instance] FiniteHilbertSpace.instDecidableEq
-attribute [instance] FiniteHilbertSpace.instNonempty
+namespace FiniteHilbertSpace
+
+/-- The carrier of a finite Hilbert space is finite. -/
+@[reducible] instance instFintypeCarrier (H : FiniteHilbertSpace) : Fintype H.carrier :=
+  H.instFintype
+
+/-- The carrier of a finite Hilbert space has decidable equality. -/
+@[reducible] instance instDecidableEqCarrier (H : FiniteHilbertSpace) : DecidableEq H.carrier :=
+  H.instDecidableEq
+
+/-- The carrier of a finite Hilbert space is nonempty. -/
+instance instNonemptyCarrier (H : FiniteHilbertSpace) : Nonempty H.carrier :=
+  H.instNonempty
+
+end FiniteHilbertSpace
 
 /-- Concrete operators on a finite Hilbert space. -/
 abbrev MatrixOperator (H : FiniteHilbertSpace) :=
@@ -188,11 +200,13 @@ structure OneMeasNaimarkData (α : Type*) [Fintype α] [DecidableEq α]
 This carries separate `originalSpace` and `liftedSpace`, with the lifted
 space being larger. The witness includes projective measurements on the
 lifted space and the key probability preservation identities. -/
-structure MatrixNaimarkWitness (QuestionA OutcomeA QuestionB OutcomeB : Type*)
+structure MatrixNaimarkWitness.{uQA, uOA, uQB, uOB, uOrig, uLift}
+    (QuestionA : Type uQA) (OutcomeA : Type uOA)
+    (QuestionB : Type uQB) (OutcomeB : Type uOB)
     [Fintype OutcomeA] [DecidableEq OutcomeA]
     [Fintype OutcomeB] [DecidableEq OutcomeB] where
-  originalSpace : FiniteHilbertSpace
-  liftedSpace : FiniteHilbertSpace
+  originalSpace : FiniteHilbertSpace.{uOrig}
+  liftedSpace : FiniteHilbertSpace.{uLift}
   originalState : DensityMatrixState originalSpace
   liftedState : DensityMatrixState liftedSpace
   originalLeft : QuestionA → MatrixSubmeasurement OutcomeA originalSpace
@@ -313,10 +327,10 @@ noncomputable def roundingToProjectiveError (ζ : Error) : Error :=
 /-! ### Almost-projective and rounding witnesses -/
 
 /-- Matrix-level witness for the almost-projective stage. -/
-structure MatrixAlmostProjectiveWitness {Outcome : Type*}
+structure MatrixAlmostProjectiveWitness.{uOutcome, uSpace} {Outcome : Type uOutcome}
     [Fintype Outcome] [DecidableEq Outcome]
     (ζ : Error) where
-  space : FiniteHilbertSpace
+  space : FiniteHilbertSpace.{uSpace}
   state : DensityMatrixState space
   measurement : MatrixMeasurement Outcome space
   overlapDecomposition :
@@ -327,10 +341,10 @@ structure MatrixAlmostProjectiveWitness {Outcome : Type*}
       matrixIdempotenceDefect measurement a ≤ ζ
 
 /-- Matrix-level witness for the rounding-to-projective stage. -/
-structure MatrixRoundedProjectiveWitness {Outcome : Type*}
+structure MatrixRoundedProjectiveWitness.{uOutcome, uSpace} {Outcome : Type uOutcome}
     [Fintype Outcome] [DecidableEq Outcome]
     (ζ : Error) where
-  space : FiniteHilbertSpace
+  space : FiniteHilbertSpace.{uSpace}
   state : DensityMatrixState space
   source : MatrixMeasurement Outcome space
   target : MatrixSubmeasurement Outcome space
@@ -359,9 +373,9 @@ structure MatrixSpectralTruncationWitness {d : Type*}
 Each effect `A_a` is independently spectrally truncated to a projection `P_a`.
 The resulting family is not necessarily a measurement (the projections may not sum
 to the identity), but the τ-distance per outcome is controlled. -/
-structure MatrixSpectralTruncationMeasurementWitness {Outcome : Type*}
+structure MatrixSpectralTruncationMeasurementWitness.{uOutcome, uSpace} {Outcome : Type uOutcome}
     [Fintype Outcome] [DecidableEq Outcome] (ζ : Error) where
-  space : FiniteHilbertSpace
+  space : FiniteHilbertSpace.{uSpace}
   source : MatrixMeasurement Outcome space
   target : Outcome → MIPStarRE.Quantum.Op space.carrier
   perOutcomeTruncation :

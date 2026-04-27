@@ -3,6 +3,7 @@ import Mathlib.Analysis.Matrix.Spectrum
 
 set_option linter.unusedDecidableInType false
 set_option linter.unusedSectionVars false
+set_option backward.isDefEq.respectTransparency false
 
 /-!
 # Projector Range Orthonormal Bases

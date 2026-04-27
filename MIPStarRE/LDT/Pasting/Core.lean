@@ -188,6 +188,7 @@ private lemma ldGbconAxisLineMeasurement_eq_verticalLineMeasurement
               (AxisParallelLine.rebaseAt ℓ (pointHeight params u))).toSubMeas)
             (· zeroCoord)).outcome a := by
               simp [ldGbconAxisLineMeasurement, ldGbcon_rebased_vertical_line, ℓ]
+              rfl
       _ = (postprocess ((strategy.axisParallelMeasurement ℓ).toSubMeas)
             (fun f => f (pointHeight params u))).outcome a := by
               exact AxisParallelCovariantMeasurement.reparamInvariant
@@ -404,8 +405,19 @@ theorem pointVerticalLineSdd
           (8 * (params.m : Error) * eps + 4 * delta) ?_ hpoint_to_axis_raw
         ring_nf
         exact le_rfl
-  simpa [ldGbconVerticalLineMeasurement,
-    ldGbconAxisLineMeasurement_eq_verticalLineMeasurement params strategy] using hpoint_to_axis
+  have hLift := congrArg (fun M => IdxSubMeas.liftRight M)
+    (ldGbconAxisLineMeasurement_eq_verticalLineMeasurement params strategy)
+  change SDDRel strategy.state (uniformDistribution (Point params.next))
+    (IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
+    ((fun M => IdxSubMeas.liftRight M)
+      (IdxMeas.toIdxSubMeas (ldGbconVerticalLineMeasurement params strategy)))
+    (8 * (params.m : Error) * eps + 4 * delta)
+  change SDDRel strategy.state (uniformDistribution (Point params.next))
+    (IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
+    ((fun M => IdxSubMeas.liftRight M)
+      (IdxMeas.toIdxSubMeas (ldGbconAxisLineMeasurement params strategy)))
+    (8 * (params.m : Error) * eps + 4 * delta) at hpoint_to_axis
+  exact hLift ▸ hpoint_to_axis
 
 /-- `lem:ld-gbcon`.
 
@@ -1193,7 +1205,13 @@ theorem gBotSelfConsistency
                                 ((leftTensor (ι₂ := ι) T)ᴴ - (rightTensor (ι₁ := ι) T)ᴴ) *
                                   (leftTensor (ι₂ := ι) T - rightTensor (ι₁ := ι) T) := by
                             noncomm_ring
-                          simpa [sub_eq_add_neg] using congrArg (ev ψbi) hswap
+                          trans ev ψbi
+                            (((rightTensor (ι₁ := ι) T)ᴴ - (leftTensor (ι₂ := ι) T)ᴴ) *
+                              (rightTensor (ι₁ := ι) T - leftTensor (ι₂ := ι) T))
+                          · congr 1
+                            simp [sub_eq_add_neg, Matrix.conjTranspose_add, Matrix.conjTranspose_smul]
+                            noncomm_ring
+                          · simpa [Matrix.conjTranspose_sub] using congrArg (ev ψbi) hswap
               _ =
                   qSDD ψbi
                     ((completePartLeftFamily params family) x)

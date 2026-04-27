@@ -1233,7 +1233,7 @@ lemma generalizeBReversePointwiseBound
                 rw [hconjDiff]
               _ = (-(Xᴴ - Yᴴ)) * (-(X - Y)) := by rw [hdiff]
               _ = (Xᴴ - Yᴴ) * (X - Y) := by
-                  rw [neg_mul, mul_neg, neg_neg]
+                  exact neg_mul_neg (Xᴴ - Yᴴ) (X - Y)
           calc
             ev ψbi (((Y - X)ᴴ) * (Y - X)) =
                 ev ψbi ((Yᴴ - Xᴴ) * (Y - X)) := by simp

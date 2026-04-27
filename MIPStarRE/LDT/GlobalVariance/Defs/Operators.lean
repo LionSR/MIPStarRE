@@ -38,7 +38,7 @@ noncomputable def weightedPolynomialState (params : Parameters) [FieldModel para
         W).nonneg }
 
 /-- The concrete operator `A^u_{g(u)}` for a fixed polynomial `g`. -/
-def pointConditionedOutcomeOperatorAtPolynomial (params : Parameters) [FieldModel params.q]
+noncomputable def pointConditionedOutcomeOperatorAtPolynomial (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (g : Polynomial params) (u : Point params) : MIPStarRE.Quantum.Op ι :=
   (strategy.pointMeasurement u).toSubMeas.outcome (g u)

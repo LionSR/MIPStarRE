@@ -6,6 +6,7 @@ import Mathlib.Analysis.Matrix.Spectrum
 
 set_option linter.style.setOption false
 set_option linter.unusedDecidableInType false
+set_option backward.isDefEq.respectTransparency false
 
 /-!
 # Section 5 — Q/X/XHat/P rank reduction

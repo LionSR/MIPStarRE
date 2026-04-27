@@ -305,6 +305,7 @@ theorem rawVerticalLineAnswerFamily_eq_lifted
                   strategy.axisParallelMeasurement) _ _ _
       _ = (liftedVerticalLineAnswerFamily params strategy u).outcome a := by
               simp [liftedVerticalLineAnswerFamily, verticalLineMeasurementFamily, verticalLine]
+              rfl
   · calc
       (rawVerticalLineAnswerFamily params strategy u).total
           = (strategy.axisParallelMeasurement
@@ -321,6 +322,7 @@ theorem rawVerticalLineAnswerFamily_eq_lifted
               rfl
       _ = (liftedVerticalLineAnswerFamily params strategy u).total := by
               simp [liftedVerticalLineAnswerFamily, verticalLineMeasurementFamily, verticalLine]
+              rfl
 
 /-- Explicit value extracted from the `i`-th genuine slice outcome at the test point.
 
