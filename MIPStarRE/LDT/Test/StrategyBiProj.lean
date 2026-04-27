@@ -34,7 +34,7 @@ This module is the first low-risk step of the staged refactor outlined in
 
 namespace MIPStarRE.LDT
 
-open scoped BigOperators
+open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 /-- Paper-faithful two-space projective strategy data.
 
@@ -163,6 +163,30 @@ noncomputable def payloadBlockB {ιA ιB : Type*}
     payloadBlock (1 : MIPStarRE.Quantum.Op ιA) (1 : MIPStarRE.Quantum.Op ιB) = 1 := by
   simp [payloadBlock]
 
+@[simp] theorem payloadBlock_conjTranspose {ιA ιB : Type*}
+    (A : MIPStarRE.Quantum.Op ιA) (B : MIPStarRE.Quantum.Op ιB) :
+    (payloadBlock A B)ᴴ = payloadBlock Aᴴ Bᴴ := by
+  simp [payloadBlock, Matrix.fromBlocks_conjTranspose]
+
+@[simp] theorem payloadBlock_mul {ιA ιB : Type*} [Fintype ιA] [Fintype ιB]
+    (A₁ A₂ : MIPStarRE.Quantum.Op ιA) (B₁ B₂ : MIPStarRE.Quantum.Op ιB) :
+    payloadBlock A₁ B₁ * payloadBlock A₂ B₂ = payloadBlock (A₁ * A₂) (B₁ * B₂) := by
+  simp [payloadBlock, Matrix.fromBlocks_multiply]
+
+/-- A direct sum of positive semidefinite payload operators is positive semidefinite. -/
+theorem payloadBlock_nonneg {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA]
+    [Fintype ιB] [DecidableEq ιB]
+    {A : MIPStarRE.Quantum.Op ιA} {B : MIPStarRE.Quantum.Op ιB}
+    (hA : 0 ≤ A) (hB : 0 ≤ B) : 0 ≤ payloadBlock A B := by
+  rw [CStarAlgebra.nonneg_iff_eq_star_mul_self] at hA hB ⊢
+  rcases hA with ⟨C, hC⟩
+  rcases hB with ⟨D, hD⟩
+  refine ⟨payloadBlock C D, ?_⟩
+  change A = Cᴴ * C at hC
+  change B = Dᴴ * D at hD
+  change payloadBlock A B = (payloadBlock C D)ᴴ * payloadBlock C D
+  rw [payloadBlock_conjTranspose, payloadBlock_mul, ← hC, ← hD]
+
 /-- The trace of a direct-sum payload block is the sum of the block traces.
 
 This is the `Matrix.fromBlocks` specialization of the block-diagonal trace
@@ -222,6 +246,47 @@ noncomputable def roleBlock {ιA ιB : Type*}
   rcases x with ⟨rx, ix⟩
   rcases y with ⟨ry, iy⟩
   cases rx <;> cases ry <;> simp [Matrix.one_apply]
+
+@[simp] theorem roleBlock_conjTranspose {ιA ιB : Type*}
+    (A B : MIPStarRE.Quantum.Op (SymmPayload ιA ιB)) :
+    (roleBlock A B)ᴴ = roleBlock Aᴴ Bᴴ := by
+  ext x y
+  rcases x with ⟨rx, ix⟩
+  rcases y with ⟨ry, iy⟩
+  cases rx <;> cases ry <;> simp
+
+@[simp] theorem roleBlock_mul {ιA ιB : Type*} [Fintype ιA] [Fintype ιB]
+    (A₁ A₂ B₁ B₂ : MIPStarRE.Quantum.Op (SymmPayload ιA ιB)) :
+    roleBlock A₁ B₁ * roleBlock A₂ B₂ = roleBlock (A₁ * A₂) (B₁ * B₂) := by
+  classical
+  unfold roleBlock
+  let e := Equiv.prodComm (SymmPayload ιA ιB) Role
+  rw [show Matrix.reindex e e (Matrix.blockDiagonal (roleBlockFamily A₁ B₁)) *
+        Matrix.reindex e e (Matrix.blockDiagonal (roleBlockFamily A₂ B₂)) =
+      Matrix.reindex e e
+        (Matrix.blockDiagonal (roleBlockFamily A₁ B₁) *
+          Matrix.blockDiagonal (roleBlockFamily A₂ B₂)) by
+        exact (Matrix.reindexAlgEquiv_mul ℂ ℂ e
+          (Matrix.blockDiagonal (roleBlockFamily A₁ B₁))
+          (Matrix.blockDiagonal (roleBlockFamily A₂ B₂))).symm]
+  rw [← Matrix.blockDiagonal_mul]
+  congr
+  ext r
+  cases r <;> rfl
+
+/-- A role block of positive semidefinite payload operators is positive semidefinite. -/
+theorem roleBlock_nonneg {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA]
+    [Fintype ιB] [DecidableEq ιB]
+    {A B : MIPStarRE.Quantum.Op (SymmPayload ιA ιB)}
+    (hA : 0 ≤ A) (hB : 0 ≤ B) : 0 ≤ roleBlock A B := by
+  rw [CStarAlgebra.nonneg_iff_eq_star_mul_self] at hA hB ⊢
+  rcases hA with ⟨C, hC⟩
+  rcases hB with ⟨D, hD⟩
+  refine ⟨roleBlock C D, ?_⟩
+  change A = Cᴴ * C at hC
+  change B = Dᴴ * D at hD
+  change roleBlock A B = (roleBlock C D)ᴴ * roleBlock C D
+  rw [roleBlock_conjTranspose, roleBlock_mul, ← hC, ← hD]
 
 /-- The trace of a role-blocked operator is the sum of its two role-sector
 traces. This wraps Mathlib's `Matrix.trace_blockDiagonal` across the
