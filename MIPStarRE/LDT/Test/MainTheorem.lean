@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain
 import MIPStarRE.LDT.MainInductionStep.Theorems
 import MIPStarRE.LDT.Preliminaries.ComparisonProjective
 import MIPStarRE.LDT.Preliminaries.Triangles
@@ -5,6 +6,7 @@ import MIPStarRE.LDT.Test.ErrorCascade
 import MIPStarRE.LDT.Test.SchwartzZippelStep
 import MIPStarRE.LDT.Test.StrategyFailures
 import MIPStarRE.LDT.Test.SymmetrizationBridge
+import MIPStarRE.LDT.Test.Unsymmetrization
 
 /-!
 # Section 3 — Main theorem
@@ -762,9 +764,9 @@ cascade errors.
 
 Compared with `MainFormalNativeTargets`, this package removes the final Step 8
 weakening obligations: the point and self-consistency errors are fixed to the
-paper's cascade quantities derived from `MainFormalCascadeScalars`. Constructing
-this package is still the substantive unsymmetrization, Schwartz--Zippel, and
-projectivization work of `inductive_step.tex` lines 84--185. -/
+paper's cascade quantities derived from `MainFormalCascadeScalars`.  The
+completion residual below now factors the construction further through the
+landed unsymmetrization and line-156 projectivization APIs. -/
 structure MainFormalCascadeTargets
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -800,9 +802,9 @@ cascade has been discharged.
 Compared with `MainFormalCascadeTargets`, this package is parameterized by an
 already-constructed `MainFormalCascadeScalars`. The field shapes intentionally
 mirror the transport fields of `MainFormalCascadeTargets`, so downstream changes
-to the native `ConsRel` targets should keep the two records synchronized. It
-therefore records only the unsymmetrization, Schwartz--Zippel, and
-projectivization targets from `inductive_step.tex` lines 84--185. -/
+to the native `ConsRel` targets should keep the two records synchronized.  It is
+the transport-only target reached after the Step 5 and line-156 conversion
+lemmas have been applied. -/
 structure MainFormalCascadeTransportTargets
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -885,6 +887,27 @@ theorem fullSelfConsistency {params : Parameters} [FieldModel params.q]
 end MainFormalCascadePreProjectiveSelfConsistency
 
 namespace MainFormalCascadeUnsymmetrizedPOVMTargets
+
+/-- Build the line-97--109 unsymmetrized POVM targets from the dedicated
+role-register unsymmetrization bridge.
+
+The bridge package stores the Section 6 role-register measurement `G` together
+with the two factor-two consistency links obtained by extracting its Alice and
+Bob role blocks.  This constructor exposes those extracted blocks in the
+`MainFormalCascadeUnsymmetrizedPOVMTargets` shape consumed by the line-116
+triangle step. -/
+noncomputable def ofUnsymmetrizationBridge
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (G : Measurement (Polynomial params) (Role × ι))
+    (bridge : UnsymmetrizationBridgePackage params strategy G scalars.sigma) :
+    MainFormalCascadeUnsymmetrizedPOVMTargets params strategy eps k scalars where
+  leftPOVM := unsymmetrizedLeftPOVM G
+  rightPOVM := unsymmetrizedRightPOVM G
+  leftPOVMPointBConsistency := bridge.pointBConsistency
+  pointARightPOVMConsistency := bridge.pointAConsistency
 
 /-- Paper line 116 from the two unsymmetrized consistency estimates and the
 original point-measurement agreement.
@@ -1045,15 +1068,63 @@ noncomputable def toTransportTargets {params : Parameters} [FieldModel params.q]
 
 end MainFormalCascadeProjectiveStageTargets
 
-/-- Paper-faithful residual for the projective assembly after the line-116
-triangle step has been factored out.
+/-- Narrow residual for the completion and point-transport part of `mainFormal`.
 
-This package asks for the unsymmetrized `G^A,G^B` POVMs with their two `2σ`
-links (`inductive_step.tex` lines 97--109), then records the still-open
-projectivization/completion and point-transport outputs from lines 135--185:
-the line-156 `≈_{ζ₃}` bridge and the two native `ζ₄` point-consistency goals.
-The theorem `toProjectiveStageTargets` proves the line-116 pre-projective
-self-consistency from these fields and the low-individual-degree pass hypothesis. -/
+This is the current live target after wiring in two landed APIs: the
+role-register unsymmetrization bridge supplies the two factor-two links for the
+extracted POVMs, and `ProjectivizationLine156Handoff.line156Approx` supplies the
+line-156 `≈_{ζ₃}` relation from pre-projective consistency plus the two `ζ₂`
+completion closeness estimates.  The remaining fields therefore choose the
+role-register measurement, the final projective measurements, the two native
+point-consistency targets, and the two completion closeness estimates. -/
+structure MainFormalCascadeProjectiveCompletionResidual
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (scalars : MainFormalCascadeScalars params eps k) where
+  /-- The role-register polynomial measurement returned by Section 6. -/
+  G : Measurement (Polynomial params) (Role × ι)
+  /-- The checked Step 3 unsymmetrization package for `G`. -/
+  bridge : UnsymmetrizationBridgePackage params strategy G scalars.sigma
+  /-- The projective measurement denoted $Q^{\mathrm A}$ in the paper. -/
+  leftMeasurement : ProjMeas (Polynomial params) ι
+  /-- The projective measurement denoted $Q^{\mathrm B}$ in the paper. -/
+  rightMeasurement : ProjMeas (Polynomial params) ι
+  /-- Native form of `eq:one-goal` at the paper-defined `ζ₄`. -/
+  pointAConsistency :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (polynomialEvaluationFamily params rightMeasurement.toSubMeas)
+      scalars.zeta4
+  /-- Native form of `eq:another-goal` at the paper-defined `ζ₄`. -/
+  pointBConsistency :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params leftMeasurement.toSubMeas)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+      scalars.zeta4
+  /-- Left-register completion closeness at the paper-defined `ζ₂`. -/
+  leftCompletionCloseness :
+    SDDRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily (unsymmetrizedLeftPOVM G).toSubMeas.liftLeft)
+      (constSubMeasFamily leftMeasurement.toSubMeas.liftLeft)
+      scalars.zeta2
+  /-- Right-register completion closeness at the paper-defined `ζ₂`. -/
+  rightCompletionCloseness :
+    SDDRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily (unsymmetrizedRightPOVM G).toSubMeas.liftRight)
+      (constSubMeasFamily rightMeasurement.toSubMeas.liftRight)
+      scalars.zeta2
+
+/-- Intermediate projective-assembly package after the line-116 triangle step has
+been factored out.
+
+This record is the input shape consumed by `toProjectiveStageTargets`: it stores
+the unsymmetrized `G^A,G^B` POVMs, the two native `ζ₄` point-consistency goals,
+and a line-156 `≈_{ζ₃}` bridge out of the Step 5 full-polynomial consistency.
+The finer `MainFormalCascadeProjectiveCompletionResidual` constructs this shape
+from the dedicated unsymmetrization bridge and the line-156 projective handoff
+API, so the live `mainFormal` residual no longer treats those conversions as
+opaque obligations. -/
 structure MainFormalCascadeProjectiveAssemblyResidual
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -1118,6 +1189,50 @@ noncomputable def toProjectiveStageTargets
 
 end MainFormalCascadeProjectiveAssemblyResidual
 
+namespace MainFormalCascadeProjectiveCompletionResidual
+
+/-- Convert the completion-and-point residual into the coarser projective assembly
+residual.
+
+The construction is purely connective tissue.  It first exposes the two
+unsymmetrized POVMs through `ofUnsymmetrizationBridge`, and then applies the
+checked `ProjectivizationLine156Handoff.line156Approx` theorem to the
+pre-projective consistency input, the two completion closeness fields, and the
+projective measurements chosen by the residual. -/
+noncomputable def toProjectiveAssemblyResidual
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (residual :
+      MainFormalCascadeProjectiveCompletionResidual params strategy eps k scalars) :
+    MainFormalCascadeProjectiveAssemblyResidual params strategy eps k scalars where
+  unsymmetrized :=
+    MainFormalCascadeUnsymmetrizedPOVMTargets.ofUnsymmetrizationBridge
+      (G := residual.G) residual.bridge
+  leftMeasurement := residual.leftMeasurement
+  rightMeasurement := residual.rightMeasurement
+  pointAConsistency := residual.pointAConsistency
+  pointBConsistency := residual.pointBConsistency
+  line156Approx := by
+    intro hpre
+    let handoff :
+        MakingMeasurementsProjective.ProjectivizationLine156Handoff strategy.state
+          (unsymmetrizedLeftPOVM residual.G)
+          (unsymmetrizedRightPOVM residual.G)
+          residual.leftMeasurement residual.rightMeasurement
+          scalars.zeta1 scalars.zeta2 :=
+      { preProjectiveConsistency := by
+          simpa [MainFormalCascadeUnsymmetrizedPOVMTargets.ofUnsymmetrizationBridge]
+            using hpre
+        leftCompletionCloseness := residual.leftCompletionCloseness
+        rightCompletionCloseness := residual.rightCompletionCloseness }
+    have hline :=
+      MakingMeasurementsProjective.ProjectivizationLine156Handoff.line156Approx handoff
+    simpa [MainFormalCascadeScalars.zeta3, cascadeZeta3] using hline
+
+end MainFormalCascadeProjectiveCompletionResidual
+
 namespace MainFormalCascadeTransportTargets
 
 /-- Add the already-discharged scalar package back to the transport-only targets. -/
@@ -1153,9 +1268,9 @@ three consistency fields are exactly the native conclusions reached in
 
 The two bound fields record the already-formalized Step 8 absorption of
 `\zeta_4` and `\zeta_3/2` into `mainFormalError`. Constructing this package from
-Section 6 and the unsymmetrization / Schwartz--Zippel / projectivization chain is
-the live residual; the projection theorem below is only the final paper-faithful
-packaging step. -/
+Section 6 and the remaining completion/point-transport package is the live
+residual; the projection theorem below is only the final paper-faithful packaging
+step. -/
 structure MainFormalNativeTargets
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -1306,26 +1421,29 @@ theorem mainFormal
   --   `mainFormalSuccessorMainInductionPublicWrapper`, and
   -- * vacuous branch: `mainFormal_trivial_witness`.
   --
-  -- The remaining paper-faithful target is now narrowed past the Step 5
-  -- Schwartz--Zippel handoff and the line-116 triangle step to the finer
-  -- projective assembly residual
-  -- `MainFormalCascadeProjectiveAssemblyResidual`. The scalar cascade side
+  -- The remaining paper-faithful target is now narrowed past the role-register
+  -- unsymmetrization bridge, the Step 5 Schwartz--Zippel handoff, the line-116
+  -- triangle step, and the line-156 projective approximation conversion to the
+  -- completion/point-transport residual
+  -- `MainFormalCascadeProjectiveCompletionResidual`. The scalar cascade side
   -- conditions are discharged below: if `mainFormalError ≥ 1`, the theorem is
   -- vacuous; otherwise the pass condition gives `0 ≤ ε`, while
   -- `mainFormalError < 1` rules out `ε > 1` and `d > q`. Producing the
-  -- projective assembly residual still depends on the active upstream residuals:
-  -- the role unsymmetrization bridge (#424), projectivization/completion (#426),
-  -- the full-slice transport chain (#601), the remaining `fromHToG` pasting
-  -- bridge (#707), the reverse `overAllOutcomes` aggregation (#672), and the
-  -- ProcessedG scalar follow-ups #714, #715, #732, and #759.
+  -- completion residual still depends on the active upstream residuals: the
+  -- full-slice transport chain (#601), the remaining `fromHToG` pasting bridge
+  -- (#707), the reverse `overAllOutcomes` aggregation (#672), and the ProcessedG
+  -- scalar follow-ups #714, #715, #732, and #759.
   by_cases herr : 1 ≤ mainFormalError params k eps
   · exact mainFormal_trivial_witness params strategy eps k herr
   · have hepsNN : 0 ≤ eps := ProjStrat.eps_nonneg_of_passes hpass
     let scalars : MainFormalCascadeScalars params eps k :=
       MainFormalCascadeScalars.ofNontrivialMainFormal hepsNN hk0 herr
-    have projectiveResidual :
-        MainFormalCascadeProjectiveAssemblyResidual params strategy eps k scalars := by
+    have completionResidual :
+        MainFormalCascadeProjectiveCompletionResidual params strategy eps k scalars := by
       sorry
+    let projectiveResidual :
+        MainFormalCascadeProjectiveAssemblyResidual params strategy eps k scalars :=
+      completionResidual.toProjectiveAssemblyResidual
     have projectiveTargets :
         MainFormalCascadeProjectiveStageTargets params strategy eps k scalars :=
       projectiveResidual.toProjectiveStageTargets hpass
