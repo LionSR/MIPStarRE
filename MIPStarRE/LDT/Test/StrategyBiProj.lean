@@ -166,6 +166,17 @@ noncomputable def payloadBlockB {ιA ιB : Type*}
     payloadBlock (1 : MIPStarRE.Quantum.Op ιA) (1 : MIPStarRE.Quantum.Op ιB) = 1 := by
   simp [payloadBlock]
 
+@[simp] theorem payloadBlock_zero {ιA ιB : Type*} :
+    payloadBlock (0 : MIPStarRE.Quantum.Op ιA) (0 : MIPStarRE.Quantum.Op ιB) = 0 := by
+  simp [payloadBlock]
+
+/-- Direct-sum payload blocks are additive in the two diagonal blocks. -/
+@[simp] theorem payloadBlock_add {ιA ιB : Type*}
+    (A₁ A₂ : MIPStarRE.Quantum.Op ιA) (B₁ B₂ : MIPStarRE.Quantum.Op ιB) :
+    payloadBlock (A₁ + A₂) (B₁ + B₂) = payloadBlock A₁ B₁ + payloadBlock A₂ B₂ := by
+  symm
+  simp [payloadBlock, Matrix.fromBlocks_add]
+
 @[simp] theorem payloadBlock_conjTranspose {ιA ιB : Type*}
     (A : MIPStarRE.Quantum.Op ιA) (B : MIPStarRE.Quantum.Op ιB) :
     (payloadBlock A B)ᴴ = payloadBlock Aᴴ Bᴴ := by
@@ -211,11 +222,10 @@ theorem payloadBlock_finset_sum {α ιA ιB : Type*} (s : Finset α)
       payloadBlock (∑ a ∈ s, A a) (∑ a ∈ s, B a) := by
   classical
   induction s using Finset.induction_on with
-  | empty => simp [payloadBlock]
+  | empty => simp
   | insert a s ha ih =>
       rw [Finset.sum_insert ha, Finset.sum_insert ha, Finset.sum_insert ha, ih]
-      ext i j
-      cases i <;> cases j <;> simp [payloadBlock]
+      rw [← payloadBlock_add]
 
 private def roleBlockFamily {ιA ιB : Type*}
     (A B : MIPStarRE.Quantum.Op (SymmPayload ιA ιB)) :
@@ -266,6 +276,22 @@ noncomputable def roleBlock {ιA ιB : Type*}
   rcases x with ⟨rx, ix⟩
   rcases y with ⟨ry, iy⟩
   cases rx <;> cases ry <;> simp [Matrix.one_apply]
+
+@[simp] theorem roleBlock_zero {ιA ιB : Type*} :
+    roleBlock (0 : MIPStarRE.Quantum.Op (SymmPayload ιA ιB)) 0 = 0 := by
+  ext x y
+  rcases x with ⟨rx, ix⟩
+  rcases y with ⟨ry, iy⟩
+  cases rx <;> cases ry <;> simp
+
+/-- Role-register blocks are additive in their two role sectors. -/
+@[simp] theorem roleBlock_add {ιA ιB : Type*}
+    (A₁ A₂ B₁ B₂ : MIPStarRE.Quantum.Op (SymmPayload ιA ιB)) :
+    roleBlock (A₁ + A₂) (B₁ + B₂) = roleBlock A₁ B₁ + roleBlock A₂ B₂ := by
+  ext x y
+  rcases x with ⟨rx, ix⟩
+  rcases y with ⟨ry, iy⟩
+  cases rx <;> cases ry <;> simp
 
 @[simp] theorem roleBlock_conjTranspose {ιA ιB : Type*}
     (A B : MIPStarRE.Quantum.Op (SymmPayload ιA ιB)) :
@@ -333,17 +359,10 @@ theorem roleBlock_finset_sum {α ιA ιB : Type*} (s : Finset α)
       roleBlock (∑ a ∈ s, A a) (∑ a ∈ s, B a) := by
   classical
   induction s using Finset.induction_on with
-  | empty =>
-      ext x y
-      rcases x with ⟨rx, ix⟩
-      rcases y with ⟨ry, iy⟩
-      cases rx <;> cases ry <;> simp
+  | empty => simp
   | insert a s ha ih =>
       rw [Finset.sum_insert ha, Finset.sum_insert ha, Finset.sum_insert ha, ih]
-      ext x y
-      rcases x with ⟨rx, ix⟩
-      rcases y with ⟨ry, iy⟩
-      cases rx <;> cases ry <;> simp
+      rw [← roleBlock_add]
 
 /-! ### Complete block-measurement constructors -/
 
@@ -352,24 +371,22 @@ measurements on the `Sum.inl` and `Sum.inr` payload sectors respectively. -/
 noncomputable def payloadBlockMeasurement {Outcome ιA ιB : Type*}
     [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (MA : Measurement Outcome ιA) (MB : Measurement Outcome ιB) :
-    Measurement Outcome (SymmPayload ιA ιB) where
-  toSubMeas :=
-    { outcome := fun a => payloadBlock (MA.outcome a) (MB.outcome a)
-      total := 1
-      outcome_pos := by
-        intro a
-        exact payloadBlock_nonneg (MA.outcome_pos a) (MB.outcome_pos a)
-      sum_eq_total := by
-        calc
-          ∑ a, payloadBlock (MA.outcome a) (MB.outcome a)
-              = payloadBlock (∑ a, MA.outcome a) (∑ a, MB.outcome a) := by
-                simpa using payloadBlock_finset_sum (Finset.univ)
-                  (fun a => MA.outcome a) (fun a => MB.outcome a)
-          _ = 1 := by
-                rw [MA.sum_eq, MB.sum_eq]
-                simp
-      total_le_one := le_rfl }
-  total_eq_one := rfl
+    Measurement Outcome (SymmPayload ιA ιB) :=
+  ({ outcome := fun a => payloadBlock (MA.outcome a) (MB.outcome a)
+     total := payloadBlock MA.total MB.total
+     outcome_pos := fun a => payloadBlock_nonneg (MA.outcome_pos a) (MB.outcome_pos a)
+     sum_eq_total := by
+       calc
+         ∑ a, payloadBlock (MA.outcome a) (MB.outcome a)
+             = payloadBlock (∑ a, MA.outcome a) (∑ a, MB.outcome a) := by
+               simpa using payloadBlock_finset_sum (Finset.univ)
+                 (fun a => MA.outcome a) (fun a => MB.outcome a)
+         _ = payloadBlock MA.total MB.total := by
+               rw [MA.sum_eq_total, MB.sum_eq_total]
+     total_le_one := by
+       simp [MA.total_eq_one, MB.total_eq_one] } :
+    SubMeas Outcome (SymmPayload ιA ιB)).toMeasurement (by
+      simp [MA.total_eq_one, MB.total_eq_one])
 
 @[simp] theorem payloadBlockMeasurement_outcome {Outcome ιA ιB : Type*}
     [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -381,8 +398,8 @@ noncomputable def payloadBlockMeasurement {Outcome ιA ιB : Type*}
 @[simp] theorem payloadBlockMeasurement_total {Outcome ιA ιB : Type*}
     [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (MA : Measurement Outcome ιA) (MB : Measurement Outcome ιB) :
-    (payloadBlockMeasurement MA MB).total = 1 :=
-  rfl
+    (payloadBlockMeasurement MA MB).total = 1 := by
+  simp [payloadBlockMeasurement, MA.total_eq_one, MB.total_eq_one]
 
 /-- Direct-sum payload projective measurement obtained by block-diagonalizing two
 projective measurements with the same outcome type. -/
@@ -407,24 +424,22 @@ measurements in the `Role.A` and `Role.B` sectors. -/
 noncomputable def roleBlockMeasurement {Outcome ιA ιB : Type*}
     [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (MA MB : Measurement Outcome (SymmPayload ιA ιB)) :
-    Measurement Outcome (SymmLocal ιA ιB) where
-  toSubMeas :=
-    { outcome := fun a => roleBlock (MA.outcome a) (MB.outcome a)
-      total := 1
-      outcome_pos := by
-        intro a
-        exact roleBlock_nonneg (MA.outcome_pos a) (MB.outcome_pos a)
-      sum_eq_total := by
-        calc
-          ∑ a, roleBlock (MA.outcome a) (MB.outcome a)
-              = roleBlock (∑ a, MA.outcome a) (∑ a, MB.outcome a) := by
-                simpa using roleBlock_finset_sum (Finset.univ)
-                  (fun a => MA.outcome a) (fun a => MB.outcome a)
-          _ = 1 := by
-                rw [MA.sum_eq, MB.sum_eq]
-                simp
-      total_le_one := le_rfl }
-  total_eq_one := rfl
+    Measurement Outcome (SymmLocal ιA ιB) :=
+  ({ outcome := fun a => roleBlock (MA.outcome a) (MB.outcome a)
+     total := roleBlock MA.total MB.total
+     outcome_pos := fun a => roleBlock_nonneg (MA.outcome_pos a) (MB.outcome_pos a)
+     sum_eq_total := by
+       calc
+         ∑ a, roleBlock (MA.outcome a) (MB.outcome a)
+             = roleBlock (∑ a, MA.outcome a) (∑ a, MB.outcome a) := by
+               simpa using roleBlock_finset_sum (Finset.univ)
+                 (fun a => MA.outcome a) (fun a => MB.outcome a)
+         _ = roleBlock MA.total MB.total := by
+               rw [MA.sum_eq_total, MB.sum_eq_total]
+     total_le_one := by
+       simp [MA.total_eq_one, MB.total_eq_one] } :
+    SubMeas Outcome (SymmLocal ιA ιB)).toMeasurement (by
+      simp [MA.total_eq_one, MB.total_eq_one])
 
 @[simp] theorem roleBlockMeasurement_outcome {Outcome ιA ιB : Type*}
     [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -435,8 +450,8 @@ noncomputable def roleBlockMeasurement {Outcome ιA ιB : Type*}
 @[simp] theorem roleBlockMeasurement_total {Outcome ιA ιB : Type*}
     [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (MA MB : Measurement Outcome (SymmPayload ιA ιB)) :
-    (roleBlockMeasurement MA MB).total = 1 :=
-  rfl
+    (roleBlockMeasurement MA MB).total = 1 := by
+  simp [roleBlockMeasurement, MA.total_eq_one, MB.total_eq_one]
 
 /-- Role-register projective measurement obtained by block-diagonalizing two
 complete payload projective measurements. -/
