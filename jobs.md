@@ -227,13 +227,11 @@ Last updated: 2026-04-23
 ## Active Commutativity Wave
 - **Owner**: OpenCode
 - **Scope**: `MIPStarRE/LDT/Commutativity/*.lean`
-- **Live executable sorrys in scope**: 7
-- **Current live targets**:
-  - `Commutativity/ScalarApproximation/ProcessedG.lean`: `evaluatedSlice_scalar_chain_bound` (temporarily split into local phase placeholders `hphase2`, `hphase4`, `hphase5`, `hphase67`, `hassemble` on branch `fix-processedg-sorries`)
-  - `Commutativity/Main/Auxiliary.lean`: `fullSlice_scalar_marginalize_x`
-  - `Commutativity/Main/Auxiliary.lean`: `fullSlice_scalar_marginalize_y`
-  - `Commutativity/Main/Auxiliary.lean`: `fullSlice_closenessOfIP_CAB_hEval`
-- **Status**: IN PROGRESS
+- **Live executable placeholders in scope**: 0
+- **Current live targets**: none in `MIPStarRE/LDT/Commutativity`; current main after
+  PR #831 contains the no-placeholder scalar chain in
+  `Commutativity/ScalarApproximation/ProcessedG.lean`.
+- **Status**: CLEANUP / REVIEW
 - **Dependency chain**:
   - `MIPStarRE.LDT.Commutativity.normalizationCondition_sandwich_bound`
   - `MIPStarRE.LDT.Commutativity.fullSliceCommutation_qSDDOp_avg_eq`
@@ -245,55 +243,32 @@ Last updated: 2026-04-23
   - `MIPStarRE.LDT.Commutativity.commDataProcessedG`
   - `MIPStarRE.LDT.Commutativity.comMain`
 - **Priority order**:
-  1. discharge the two transport lemmas already covered by existing normalization / swap infrastructure
-  2. assemble `evaluatedSlice_scalar_chain_bound` from the existing phase lemmas
-  3. prove the two Schwartz-Zippel marginalization lemmas in `Main.lean`
-  4. close the evaluated-side `closenessOfIP` chain in `Main.lean`
-  5. update `blueprint/src/chapter/ch08_commutativity.tex`
-  6. verify no `sorry`s remain in `MIPStarRE/LDT/Commutativity`
-  7. run `lake build`
+  1. keep the no-placeholder commutativity modules compiling through review
+  2. synchronize the Section 11 blueprint/docs once the proof-facing PRs settle
+  3. run `lake build` before merging downstream theorem or documentation waves
 - **Checklist**:
-  - [x] Survey all `sorry`s in `MIPStarRE/LDT/Commutativity`
+  - [x] Survey all executable placeholders in `MIPStarRE/LDT/Commutativity`
   - [x] Read `docs/proof-hints.md`
   - [x] Read the matching paper section in `references/ldt-paper/commutativity-G.tex`
   - [x] Read the matching blueprint section in `blueprint/src/chapter/ch08_commutativity.tex`
-  - [x] Refresh the live `sorry` inventory for the split module layout
+  - [x] Refresh the live placeholder inventory for the split module layout
   - [x] Prove `normalizationCondition_sandwich_bound`
   - [x] Prove `fullSliceCommutation_qSDDOp_avg_eq`
-  - [ ] Prove `evaluatedSlice_scalar_chain_bound`
-  - [ ] Prove `fullSlice_scalar_marginalize_x`
-  - [ ] Prove `fullSlice_scalar_marginalize_y`
-  - [ ] Prove `fullSlice_closenessOfIP_CAB_hEval`
-  - [ ] Verify no `sorry`s remain in `MIPStarRE/LDT/Commutativity`
-  - [ ] Add `\leanok` / `\uses` updates in `ch08_commutativity.tex`
+  - [x] Prove `evaluatedSlice_scalar_chain_bound`
+  - [x] Prove `fullSlice_scalar_marginalize_x`
+  - [x] Prove `fullSlice_scalar_marginalize_y`
+  - [x] Prove `fullSlice_closenessOfIP_CAB_hEval`
+  - [x] Verify no executable placeholders remain in `MIPStarRE/LDT/Commutativity`
+  - [ ] Add/update `\leanok` / `\uses` tags in `ch08_commutativity.tex` as needed
   - [ ] Run `lake build`
-- **Completed on this pass**:
-  - started branch `fix-processedg-sorries` for the remaining `ProcessedG.lean` scalar-chain proof
-  - created `outline-fix-processedg-sorries.md` with the copied `commutativity-G.tex` fragment, the phase-by-phase informal reasoning, and the Lean formalization plan
-  - replaced the single terminal `sorry` in `Commutativity/ScalarApproximation/ProcessedG.lean` by a phase-structured scaffold: local averages (`avgABAB`, `avgABA`, `avgBABA`, `avgBAB`), the `consSubMeas`-derived first/second-coordinate controls, explicit phase-1 and phase-3 inserted terms, and temporary local placeholder subgoals `hphase2`, `hphase4`, `hphase5`, `hphase67`, and `hassemble`
-  - verified `lake env lean MIPStarRE/LDT/Commutativity/ScalarApproximation/ProcessedG.lean` still elaborates, now with the temporary scaffold `sorry`s only
-  - re-surveyed the split commutativity module and confirmed the live `sorry`s now sit in `Main/Auxiliary.lean` and the temporarily scaffolded `ScalarApproximation/ProcessedG.lean` rather than the old monolithic `Theorems.lean`
-  - read `docs/proof-hints.md`, `references/ldt-paper/commutativity-G.tex`, and `blueprint/src/chapter/ch08_commutativity.tex` against the current Lean layout
-  - confirmed the lowest-risk first moves are to reuse the existing normalization-condition API from `Commutativity/Defs.lean` and to mirror the already-proved evaluated-slice swap argument for the full-slice `qSDDOp` identity
-  - confirmed `evaluatedSlice_scalar_chain_bound` is now a proof-assembly task: the phase-1, phase-3, phase-4, phase-5, phase-8/9, and stability scalar-gap helpers already exist and compile
-  - proved `normalizationCondition_sandwich_bound` directly from the existing `normalizationConditionSquareFamily` API in `Commutativity/Defs.lean`
-  - proved `fullSliceCommutation_qSDDOp_avg_eq` by expanding the full-slice `qSDDOp`, reindexing the joint `(question, outcome)` average by the simultaneous swap equivalence, and collapsing the averaged `BAB/BABA` terms to `ABA/ABAB`
-  - exposed `Commutativity.fullPolynomial_agreement_avg_le_mdq` from `Scaffold.lean` so the remaining `md/q` transport lemmas can reuse the existing Schwartz-Zippel package once their statements line up with the paper argument
-  - verified `lake env lean MIPStarRE/LDT/Commutativity/Transport.lean`
-- **Concrete blocker**:
-- **Current refactor direction**:
-  - the actual mismatch is deeper and now understood precisely: `IdxPolyFamily.Bounded.sliceBoundedness` is stored in the swapped orientation `Z^x ⊗ (I - G^x)`, while the paper's claims `clm:g-comm-stability` and `clm:g-comm-stability2` require `(I - G^x) ⊗ Z^x`. The overlap-only `SDDOpRel` theorems were added to work around that mismatch, but they are too weak for the scalar chain because `closenessOfIP` would introduce an extra square root.
-  - the fix in progress is therefore to make the boundedness interface paper-faithful inside the Lean code, expose the phase-1/3/4/5 helper lemmas currently marked `private`, and then prove the scalar phase-2 / phase-5 bounds directly by the paper's Cauchy-Schwarz + witness-domination argument.
-  - completed so far in this refactor:
-    - changed `IdxPolyFamily.Bounded.sliceBoundedness` to the paper orientation `(I - G^x) ⊗ Z^x`
-    - updated `gCommStabilityBoundedResidual` and its documentation to match that orientation
-    - exposed `evaluatedSlicePointMeas`, `evaluatedSlice_phaseOne_insert_bound`, `evaluatedSlice_phaseThree_insert_bound`, `evaluatedSlice_phaseTwo_scalar_rewrite`, `evaluatedSlice_phaseFour_pointSwap_bound`, and `evaluatedSlice_phaseFive_scalar_rewrite`
-    - added public single-register symmetry helpers `qMatchMass_symm`, `qConsDefect_symm`, `consRel_symm`, and `evaluatedPointFamily_pointConsistency_swapped`
-    - added operator/order helpers and paper-proof scaffolding in `GCommStability.lean`: `averageIdxSubMeas`, `gCommStabilityR`, `gCommStabilityR_sqrt_mul_self`, `gCommStabilityR_first_factor_le_one`, averaged-point PSD / boundedness lemmas, and a first draft of the direct scalar `clm:g-comm-stability` proof
-  - remaining work in this refactor:
-    - finish the direct pointwise scalar Cauchy-Schwarz proof in `GCommStability.lean`
-    - move the scalar-chain theorem / `commDataProcessedG` assembly onto the new paper-faithful scalar lemmas
-    - then return to the three `Main.lean` transport sorries with the stronger evaluated-side theorem available
+- **Completed on the current cleanup pass**:
+  - confirmed the commutativity subtree has no executable proof placeholders on current main
+  - deleted the stale repo-root `ProcessedG` proof outline; the source paper text remains in
+    `references/ldt-paper/commutativity-G.tex`
+  - removed unused private `ProcessedG.lean` stability-gap scaffolding
+  - kept `avgOver_uniform_pointNext_decompose`, which is now a shared helper used by both
+    `ProcessedG.lean` and `PaperChainPhaseFive.lean`
+  - refreshed this ledger so it no longer lists obsolete local scalar-chain placeholder names
 
 ## Active Pasting Wave
 - **Owner**: OpenCode
