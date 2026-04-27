@@ -535,26 +535,31 @@ assembly residual:
 \lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff.line156Approx}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.projectiveEvaluationConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.pointAConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.pointBConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.toProjectiveAssemblyResidual}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveLine169HandoffResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveLine169HandoffResidual.toProjectiveHandoffResidual}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.ofLine169HandoffResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.toUnsymmetrizedPOVMTargets, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.toPreProjectiveSelfConsistency}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.projectivizationLine156Handoff, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.line156Approx, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.projectiveEvaluationConsistency}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.pointAConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.pointBConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.toProjectiveStageTargets}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeTransportTargets, MIPStarRE.LDT.Test.MainFormalCascadeTransportTargets.toCascadeTargets, MIPStarRE.LDT.Test.MainFormalCascadeTargets.toNativeTargets}
 They split off the vacuous branch where the theorem error is at least $1$,
 derive the Step~8 scalar hypotheses in the non-vacuous branch, use the proved
 Step~5 Schwartz--Zippel wrapper to convert evaluated pre-projective consistency
 to full-polynomial consistency at $\zeta_1$, prove the paper line-116 triangle
 step from the two unsymmetrized $2\sigma$ links plus the original $3\eps$ point
-agreement, and reduce the line-156 $\approx_{\zeta_3}$ projectivization bridge
-to the named Step~6 handoff package: pre-projective consistency plus left/right
-completion closeness at $\zeta_2$.  Lean also derives the evaluated line-164
-projective consistency, data-processes the two polynomial line-169 $\zeta_1$
-links to the evaluated line-172 links, and proves the two native $\zeta_4$ point
-goals via \texttt{simeq-triangle-inequality}.  The remaining residual is the
-finer \texttt{MainFormalCascadeProjectiveLine169HandoffResidual}: it asks for the
-actual role-register measurement, the factor-two unsymmetrization bridge, the
-projectivization handoff fields, and the two polynomial-level $\zeta_1$
-transport links from paper line~169 and its role-reversed analogue. Lean then
-converts the resulting projective self-consistency to
-\texttt{MainFormalCascadeTransportTargets} using the projective converse of
-\texttt{simeq-to-approx}. No proof-level completeness tag is claimed here while
-\texttt{mainFormal} still contains that line-169 residual.
+agreement, and derive the evaluated line-164 projective consistency from a
+freshly reconstructed line-156 $\approx_{\zeta_3}$ projectivization bridge.
+Lean also data-processes the two polynomial line-169 $\zeta_1$ links to the
+evaluated line-172 links and proves the two native $\zeta_4$ point goals via
+\texttt{simeq-triangle-inequality}.  The remaining active residual is now the
+finer \texttt{MainFormalCascadeProjectiveCompletionLine169Residual}: it asks for
+the actual role-register measurement, the two factor-two role-block estimates,
+the left/right completion-closeness estimates at $\zeta_2$, and the two exact
+polynomial-level $\zeta_1$ transport links from paper line~169 and its
+role-reversed analogue. It no longer asks for the unused Section~6 consistency
+field inside \texttt{UnsymmetrizationBridgePackage} or for the duplicated
+pre-projective consistency field inside the Step~6 handoff; both are rebuilt from
+these fields and \texttt{hpass}. Lean then converts the resulting projective
+self-consistency to \texttt{MainFormalCascadeTransportTargets} using the
+projective converse of \texttt{simeq-to-approx}. No proof-level completeness tag
+is claimed here while \texttt{mainFormal} still contains that residual.
 \end{remark}
 \begin{proof}
 	\proves{thm:main-formal}
@@ -696,10 +701,12 @@ converts the resulting projective self-consistency to
 	discharges the paper's line~71--73 coarsening and the Step~8 hypotheses in the
 	non-vacuous branch; the Step~5 wrapper now turns the evaluated estimate at
 	line~116 into full-polynomial consistency at $\zeta_1$.  The remaining Lean
-	residual is the polynomial line-169 construction: supply the actual
-	role-register measurement, the factor-two unsymmetrization bridge, the
-	projectivization handoff, and the two polynomial-level $\zeta_1$ links.  Lean
-	then data-processes those links to line~172 and derives the two $\zeta_4$
+	residual is the completion-and-line-169 construction: supply the actual
+	role-register measurement, the two factor-two role-block estimates, the
+	left/right completion-closeness estimates at $\zeta_2$, and the two exact
+	polynomial-level $\zeta_1$ links.  Lean reconstructs the duplicated Step~6
+	pre-projective consistency field from these inputs and \texttt{hpass}, then
+	data-processes the line-169 links to line~172 and derives the two $\zeta_4$
 	point goals and the $\zeta_3/2$ self-consistency target.
 
 	With $E$ as in Definition~\ref{def:main-formal-envelope}, the quantities $\sigma,\zeta_1,\zeta_2,\zeta_3,\zeta_4$ form the cascade of Definition~\ref{def:main-formal-error-cascade}. Theorem~\ref{thm:sigma-bound-main-formal} and Theorem~\ref{thm:zeta-bounds-main-formal} package the final inflation to the scale $100000k^2m^4 E$. The underlying paper estimates are:
