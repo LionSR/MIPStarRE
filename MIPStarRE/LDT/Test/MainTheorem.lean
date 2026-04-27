@@ -838,29 +838,32 @@ structure MainFormalRolePackageResidual
     (strategy : ProjStrat params ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ) where
   /-- Raw Section 6 role-register measurement before rewriting its error to `σ`. -/
-  section6Witness :
-    ∃ G : Measurement (Polynomial params) (Role × ι),
-      ConsRel (strategy.strategySymmetrization).state
-        (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeas (strategy.strategySymmetrization).pointMeasurement)
-        (polynomialEvaluationFamily params G.toSubMeas)
-        (MainInductionStep.mainInductionError params k
-          (3 * eps) (3 * eps) (3 * eps))
+  roleMeasurement : Measurement (Polynomial params) (Role × ι)
+  /-- Raw Section 6 consistency estimate before rewriting its error to `σ`. -/
+  section6Consistency :
+    ConsRel (strategy.strategySymmetrization).state
+      (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas (strategy.strategySymmetrization).pointMeasurement)
+      (polynomialEvaluationFamily params roleMeasurement.toSubMeas)
+      (MainInductionStep.mainInductionError params k
+        (3 * eps) (3 * eps) (3 * eps))
 
 namespace MainFormalRolePackageResidual
 
 /-- Convert the isolated Section 6 role-package residual into the package consumed
 by unsymmetrization. -/
-theorem toRoleMeasurementPackage
+def toRoleMeasurementPackage
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     (residual : MainFormalRolePackageResidual params strategy eps hpass k)
     (scalars : MainFormalCascadeScalars params eps k) :
-    Nonempty (MainFormalRoleMeasurementPackage params strategy eps k scalars) :=
-  MainFormalRoleMeasurementPackage.ofMainInductionWitness params strategy eps k scalars
-    residual.section6Witness
+    MainFormalRoleMeasurementPackage params strategy eps k scalars where
+  roleMeasurement := residual.roleMeasurement
+  symConsistency := by
+    simpa [MainFormalCascadeScalars.sigma, mainFormalCascadeSigma_eq_mainInductionError]
+      using residual.section6Consistency
 
 /-- Base-case constructor for the isolated role-package residual. -/
 theorem ofBaseCase
@@ -869,9 +872,10 @@ theorem ofBaseCase
     (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (hm1 : params.m = 1) :
-    Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) :=
-  ⟨{ section6Witness :=
-      strategySymmetrization_mainInductionBaseCase params strategy eps hpass k hm1 }⟩
+    Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) := by
+  rcases strategySymmetrization_mainInductionBaseCase params strategy eps hpass k hm1 with
+    ⟨G, hG⟩
+  exact ⟨{ roleMeasurement := G, section6Consistency := hG }⟩
 
 /-- Successor constructor for the isolated role-package residual in the syntactic
 `params.next` case.
@@ -888,16 +892,14 @@ theorem ofSuccessorBoundary
     (hd : 0 < params.d)
     (boundary : MainFormalSuccessorBoundary params strategy eps hpass k)
     (hk_pos : 1 ≤ k) (hk_large : 400 * params.m * params.d ≤ k) :
-    Nonempty (MainFormalRolePackageResidual params.next strategy eps hpass k) :=
-  ⟨{ section6Witness :=
-      mainFormalSuccessorMainInductionPublicWrapper params strategy eps hpass k hd boundary
-        hk_pos hk_large }⟩
+    Nonempty (MainFormalRolePackageResidual params.next strategy eps hpass k) := by
+  rcases mainFormalSuccessorMainInductionPublicWrapper params strategy eps hpass k hd boundary
+      hk_pos hk_large with ⟨G, hG⟩
+  exact ⟨{ roleMeasurement := G, section6Consistency := hG }⟩
 
-/-- Choose the role-register measurement package produced by a role-package
-residual.  This noncomputable selector is used only to type the subsequent
-post-role residual fields; the checked theorem above is the mathematical
-content. -/
-noncomputable def rolePackage
+/-- Build the role-register measurement package produced by a concrete
+role-package residual. -/
+def rolePackage
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
@@ -905,7 +907,7 @@ noncomputable def rolePackage
     (residual : MainFormalRolePackageResidual params strategy eps hpass k)
     (scalars : MainFormalCascadeScalars params eps k) :
     MainFormalRoleMeasurementPackage params strategy eps k scalars :=
-  Classical.choice (residual.toRoleMeasurementPackage scalars)
+  residual.toRoleMeasurementPackage scalars
 
 end MainFormalRolePackageResidual
 
@@ -994,6 +996,9 @@ theorem toRolePackageResidual
     Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) := by
   rcases residual with ⟨⟨pred, hnext⟩, boundary, hd, hk_pos, hk_large⟩
   subst params
+  -- Keep this transported predecessor instance explicit: although
+  -- `pred.next.q` unfolds to `pred.q`, downstream transported strategies remember
+  -- the chosen instance, so relying on fresh synthesis creates non-defeq terms.
   letI : FieldModel pred.q :=
     fieldModelOfSuccessorDecomposition (params := pred.next) ⟨pred, rfl⟩
   let transportedStrategy : ProjStrat pred.next ι :=
@@ -1006,9 +1011,9 @@ theorem toRolePackageResidual
     simpa [transportedStrategy, transportedPass] using boundary
   rcases MainFormalRolePackageResidual.ofSuccessorBoundary pred transportedStrategy eps k
       transportedPass hd boundary' hk_pos hk_large with ⟨roleResidual⟩
-  refine ⟨{ section6Witness := ?_ }⟩
+  refine ⟨{ roleMeasurement := roleResidual.roleMeasurement, section6Consistency := ?_ }⟩
   simpa [transportedStrategy, projStratTransportSuccessor, fieldModelOfSuccessorDecomposition]
-    using roleResidual.section6Witness
+    using roleResidual.section6Consistency
 
 /-- Constructor for the common syntactic-successor case. -/
 def ofSyntacticSuccessor
@@ -1064,27 +1069,6 @@ theorem toRolePackageResidual
       exact MainFormalRolePackageResidual.ofBaseCase params strategy eps k hpass hm1
   | successor successorResidual =>
       exact successorResidual.toRolePackageResidual
-
-/-- Select the isolated Section 6 role residual produced by branch-level data. -/
-noncomputable def roleResidual
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
-    {hpass : strategy.PassesLowIndividualDegreeTest eps}
-    (residual : MainFormalRolePackageBranchResidual params strategy eps hpass k) :
-    MainFormalRolePackageResidual params strategy eps hpass k :=
-  Classical.choice residual.toRolePackageResidual
-
-/-- Select the role-register measurement package produced by branch-level data. -/
-noncomputable def rolePackage
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
-    {hpass : strategy.PassesLowIndividualDegreeTest eps}
-    (residual : MainFormalRolePackageBranchResidual params strategy eps hpass k)
-    (scalars : MainFormalCascadeScalars params eps k) :
-    MainFormalRoleMeasurementPackage params strategy eps k scalars :=
-  (residual.roleResidual).rolePackage scalars
 
 end MainFormalRolePackageBranchResidual
 
@@ -2460,17 +2444,24 @@ structure MainFormalCascadeRolePackageResidualCompletionLine169Residual
     (strategy : ProjStrat params ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k) where
-  /-- Branch-level Section 6 data producing the role-register package. -/
+  /-- Branch-level Section 6 data explaining how the role package is produced. -/
   roleBranchResidual : MainFormalRolePackageBranchResidual params strategy eps hpass k
+  /-- The explicit isolated Section 6 residual.  Keeping this field concrete avoids
+  hiding the role-register measurement behind `Classical.choice`. -/
+  roleResidual : MainFormalRolePackageResidual params strategy eps hpass k
   /-- The remaining projectivization/completion and line-169 data after role production. -/
   postRoleResidual :
     MainFormalPostRolePackageCompletionLine169Residual params strategy eps k scalars
-      (roleBranchResidual.rolePackage scalars)
+      (roleResidual.rolePackage scalars)
 
 namespace MainFormalCascadeRolePackageResidualCompletionLine169Residual
 
 /-- Convert the split role-residual/post-role package back to the role-packaged
-completion-line169 residual consumed by the existing downstream wrappers. -/
+completion-line169 residual consumed by the existing downstream wrappers.
+
+The conversion uses the explicit `roleResidual` field, rather than choosing one
+from the branch residual's `Nonempty` conversion, so the role-register
+measurement remains visible to the post-role residual. -/
 noncomputable def toRolePackagedCompletionLine169Residual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -2711,6 +2702,8 @@ theorem mainFormal
         MainFormalCascadeRolePackageResidualCompletionLine169Residual
           (params := params) (strategy := strategy) (eps := eps)
           (hpass := hpass) (k := k) (scalars := scalars) := by
+      -- TODO(#427): construct the branch-level role package, completion witnesses,
+      -- and exact polynomial line-169 transport links.
       sorry
     have rolePackagedCompletionLine169Residual :
         MainFormalCascadeRolePackagedCompletionLine169Residual params strategy eps k scalars :=

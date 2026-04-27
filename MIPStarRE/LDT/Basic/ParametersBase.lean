@@ -145,8 +145,7 @@ theorem previous_next_eq (params : Parameters) (hm : 1 < params.m) :
     (previous params hm).next = params := by
   cases params with
   | mk m q d hm0 hq hqPrimePower =>
-      have hm' : 1 < m := by simpa using hm
-      have hsub : m - 1 + 1 = m := Nat.sub_add_cancel (le_of_lt hm')
+      have hsub : m - 1 + 1 = m := Nat.sub_add_cancel (le_of_lt hm)
       simp [previous, Parameters.next, hsub]
 
 /-- A bundled predecessor for a parameter set known to be a successor dimension. -/
@@ -166,9 +165,8 @@ def successorDecompositionOfOneLtM (params : Parameters) (hm : 1 < params.m) :
 /-- A positive dimension that is not the base dimension is strictly larger than
 one. -/
 theorem one_lt_m_of_ne_one (params : Parameters) (hm_ne_one : params.m ≠ 1) :
-    1 < params.m := by
-  have hone_le : 1 ≤ params.m := Nat.succ_le_of_lt params.hm
-  exact lt_of_le_of_ne hone_le (Ne.symm hm_ne_one)
+    1 < params.m :=
+  lt_of_le_of_ne params.hm (Ne.symm hm_ne_one)
 
 /-- Non-base parameters have a bundled predecessor decomposition. -/
 def successorDecompositionOfNeOne (params : Parameters) (hm_ne_one : params.m ≠ 1) :
