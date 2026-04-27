@@ -178,6 +178,37 @@ class FieldModel (q : ℕ) where
 
 attribute [instance] FieldModel.instField FieldModel.instFintype FieldModel.instDecidableEq
 
+namespace FieldModel
+
+/-- The carrier bundled in a `FieldModel q` has exactly `q` elements, matching the
+paper's finite-field convention `|F_q| = q` (`preliminaries.tex`, lines 17--19). -/
+@[simp] theorem card (q : ℕ) [FieldModel q] :
+    Fintype.card (FieldModel.K q) = q := by
+  simpa using Fintype.card_congr (FieldModel.equiv (q := q))
+
+/-- A bundled field model has a nonempty finite carrier. -/
+theorem cardPos (q : ℕ) [FieldModel q] :
+    0 < Fintype.card (FieldModel.K q) :=
+  Fintype.card_pos_iff.mpr ⟨0⟩
+
+/-- The finite cardinality of a bundled field model is nonzero. -/
+theorem cardNeZero (q : ℕ) [FieldModel q] :
+    Fintype.card (FieldModel.K q) ≠ 0 :=
+  Nat.ne_of_gt (cardPos q)
+
+/-- Positivity of a bundled field model's cardinality after casting to the repository's
+real-valued error scalar type. -/
+theorem cardCastPos (q : ℕ) [FieldModel q] :
+    0 < (Fintype.card (FieldModel.K q) : Error) :=
+  Nat.cast_pos.mpr (cardPos q)
+
+/-- The real-valued cardinality denominator attached to a bundled field model is nonzero. -/
+theorem cardCastNeZero (q : ℕ) [FieldModel q] :
+    (Fintype.card (FieldModel.K q) : Error) ≠ 0 :=
+  ne_of_gt (cardCastPos q)
+
+end FieldModel
+
 /-- Build the honest field model from prime-power data. -/
 noncomputable def PrimePowerFieldSpec.toFieldModel (params : Parameters)
     (spec : PrimePowerFieldSpec params) : FieldModel params.q := by
@@ -219,9 +250,33 @@ abbrev PolynomialModel (params : Parameters) [FieldModel params.q] :=
 abbrev LinePolynomialModel (params : Parameters) [FieldModel params.q] :=
   _root_.Polynomial (Scalar params)
 
+/-- The chosen scalar model for the paper's `F_q` has exactly `q` elements
+(`preliminaries.tex`, lines 17--19 and 89--93). -/
 @[simp] theorem scalar_card (params : Parameters) [FieldModel params.q] :
     Fintype.card (Scalar params) = params.q := by
-  simpa [Scalar, Fq] using Fintype.card_congr (FieldModel.equiv (q := params.q))
+  simp [Scalar]
+
+/-- The scalar model has at least two elements, because the paper's field size `q`
+is a positive prime power (`preliminaries.tex`, lines 17--19 and 89--93). -/
+theorem twoLeScalarCard (params : Parameters) [FieldModel params.q] :
+    2 ≤ Fintype.card (Scalar params) := by
+  simpa [scalar_card] using params.two_le_q
+
+/-- The scalar model has positive finite cardinality. -/
+theorem scalarCardPos (params : Parameters) [FieldModel params.q] :
+    0 < Fintype.card (Scalar params) :=
+  lt_of_lt_of_le Nat.zero_lt_two (twoLeScalarCard params)
+
+/-- Positivity of the scalar model's cardinality after casting to the repository's
+real-valued error scalar type. -/
+theorem scalarCardCastPos (params : Parameters) [FieldModel params.q] :
+    0 < (Fintype.card (Scalar params) : Error) :=
+  Nat.cast_pos.mpr (scalarCardPos params)
+
+/-- The real-valued scalar-cardinality denominator is nonzero. -/
+theorem scalarCardCastNeZero (params : Parameters) [FieldModel params.q] :
+    (Fintype.card (Scalar params) : Error) ≠ 0 :=
+  ne_of_gt (scalarCardCastPos params)
 
 /-- Interpret a coded coordinate in `Fin q` as a scalar in the chosen field model. -/
 def decodeScalar {params : Parameters} [FieldModel params.q] (x : Fq params) : Scalar params :=
@@ -239,6 +294,18 @@ def encodeScalar {params : Parameters} [FieldModel params.q] (x : Scalar params)
     (x : Scalar params) :
     decodeScalar (encodeScalar x) = x := by
   simp [encodeScalar, decodeScalar]
+
+/-- Decoding from the coded `Fin q` carrier into the chosen scalar field is injective. -/
+theorem decodeScalarInjective {params : Parameters} [FieldModel params.q] :
+    Function.Injective (decodeScalar (params := params)) := by
+  intro x y hxy
+  simpa using congrArg encodeScalar hxy
+
+/-- Encoding scalar-field elements back to the coded `Fin q` carrier is injective. -/
+theorem encodeScalarInjective {params : Parameters} [FieldModel params.q] :
+    Function.Injective (encodeScalar (params := params)) := by
+  intro x y hxy
+  simpa using congrArg decodeScalar hxy
 
 /-- The zero coordinate. -/
 def zeroCoord {params : Parameters} [FieldModel params.q] : Fq params :=
