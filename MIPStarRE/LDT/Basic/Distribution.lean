@@ -42,20 +42,29 @@ theorem Distribution.totalWeight_nonneg {α : Type*} (𝒟 : Distribution α) :
   unfold Distribution.totalWeight
   exact Finset.sum_nonneg fun a _ => 𝒟.nonnegative a
 
-/-- On a finite ambient type, summing weights over all ambient values gives the same
-mass as summing over the stored support.
+/-- On a finite ambient type, a summand that vanishes outside a distribution's
+explicit support has the same total sum over all ambient values as over that support.
 
-This is a project-local adapter around Mathlib's `Finset.sum_subset`: Mathlib supplies
-the finite-sum theorem, while this lemma packages the `Distribution.outsideSupport`
-invariant so paper expressions over the whole question set can be rewritten to the
-repository's explicit-support representation. -/
+This is a project-local explicit-support adapter around Mathlib's `Finset.sum_subset`:
+Mathlib supplies the finite-sum theorem, while this lemma packages the common shape used
+when paper expressions sum over a whole question set but the repository stores a smaller
+`Distribution.support`.  It is not intended to replace Mathlib probability theory. -/
+theorem Distribution.sum_univ_eq_sum_support {α β : Type*} [Fintype α]
+    [AddCommMonoid β] (𝒟 : Distribution α) (f : α → β)
+    (hf : ∀ a, a ∉ 𝒟.support → f a = 0) :
+    (∑ a : α, f a) = ∑ a ∈ 𝒟.support, f a := by
+  classical
+  simpa using
+    (Finset.sum_subset (Finset.subset_univ 𝒟.support)
+      (fun a _ ha => hf a ha)).symm
+
+/-- On a finite ambient type, summing weights over all ambient values gives the same
+mass as summing over the stored support. -/
 theorem Distribution.weight_sum_univ_eq_totalWeight {α : Type*} [Fintype α]
     (𝒟 : Distribution α) :
     (∑ a : α, 𝒟.weight a) = 𝒟.totalWeight := by
-  classical
   simpa [Distribution.totalWeight] using
-    (Finset.sum_subset (Finset.subset_univ 𝒟.support)
-      (fun a _ ha => 𝒟.outsideSupport a ha)).symm
+    Distribution.sum_univ_eq_sum_support 𝒟 𝒟.weight 𝒟.outsideSupport
 
 namespace Distribution.IsProbability
 
@@ -122,15 +131,14 @@ Proofs use Mathlib's `Finset.sum` API: `Finset.sum_le_sum`, `Finset.sum_add_dist
 /-- On a finite ambient type, `avgOver` can be read as a weighted sum over all ambient
 values because `Distribution.weight` is zero outside the stored support.
 
-This is a thin adapter from Mathlib's `Finset.sum_subset` to the repository-local
-`Distribution`/`avgOver` API; it is not a replacement for Mathlib probability theory. -/
+This is a thin adapter from the repository-local `Distribution.sum_univ_eq_sum_support`
+lemma to the `avgOver` API; it is not a replacement for Mathlib probability theory. -/
 theorem avgOver_eq_sum_univ {α : Type*} [Fintype α]
     (𝒟 : Distribution α) (f : α → Error) :
     avgOver 𝒟 f = ∑ a : α, 𝒟.weight a * f a := by
-  classical
   simpa [avgOver] using
-    Finset.sum_subset (Finset.subset_univ 𝒟.support)
-      (fun a _ ha => by rw [𝒟.outsideSupport a ha, zero_mul])
+    (Distribution.sum_univ_eq_sum_support 𝒟 (fun a => 𝒟.weight a * f a)
+      (fun a ha => by simp [𝒟.outsideSupport a ha])).symm
 
 /-- Averaging the zero function gives zero. -/
 theorem avgOver_zero {α : Type*} (𝒟 : Distribution α) :
@@ -251,16 +259,16 @@ theorem avgOver_const_of_isProbability {α : Type*} (𝒟 : Distribution α)
 /-- On a finite ambient type, operator averages may be unfolded as weighted sums over
 all ambient values, with the outside-support weights contributing zero.
 
-Mathlib provides the finite-sum identity; this lemma is the project-local adapter for
-`Distribution.outsideSupport` and `averageOperatorOverDistribution` over `Quantum.Op`. -/
+This is the `Quantum.Op` specialization of the project-local explicit-support adapter
+`Distribution.sum_univ_eq_sum_support`; it is not a replacement for Mathlib probability
+theory. -/
 theorem averageOperatorOverDistribution_eq_sum_univ {α : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι] [Fintype α]
     (𝒟 : Distribution α) (A : α → MIPStarRE.Quantum.Op ι) :
     averageOperatorOverDistribution 𝒟 A = ∑ a : α, 𝒟.weight a • A a := by
-  classical
   simpa [averageOperatorOverDistribution] using
-    Finset.sum_subset (Finset.subset_univ 𝒟.support)
-      (fun a _ ha => by rw [𝒟.outsideSupport a ha, zero_smul])
+    (Distribution.sum_univ_eq_sum_support 𝒟 (fun a => 𝒟.weight a • A a)
+      (fun a ha => by simp [𝒟.outsideSupport a ha])).symm
 
 /-- The weighted operator average of the zero-valued family is zero.
 This is a thin wrapper around `Finset.sum` simplification for
