@@ -24,7 +24,7 @@ active or externally owned:
 
 ## Current largest Lean files
 
-Line counts were recomputed by counting physical lines in every `MIPStarRE/**/*.lean` file.
+Line counts were recomputed with `wc -l` over every `MIPStarRE/**/*.lean` file, so they count newline terminators.  Some GitHub views may display one extra physical row for files without a final newline; this report keeps the script-friendly `wc -l` convention used by the audit command.
 The table below is a current snapshot, not a promise that every row should be split immediately.
 Rows marked "skip now" overlap current ownership constraints or active proof work.
 
