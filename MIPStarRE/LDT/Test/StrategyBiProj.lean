@@ -173,8 +173,7 @@ noncomputable def payloadBlockB {ιA ιB : Type*}
 /-- Direct-sum payload blocks are additive in the two diagonal blocks. -/
 @[simp] theorem payloadBlock_add {ιA ιB : Type*}
     (A₁ A₂ : MIPStarRE.Quantum.Op ιA) (B₁ B₂ : MIPStarRE.Quantum.Op ιB) :
-    payloadBlock (A₁ + A₂) (B₁ + B₂) = payloadBlock A₁ B₁ + payloadBlock A₂ B₂ := by
-  symm
+    payloadBlock A₁ B₁ + payloadBlock A₂ B₂ = payloadBlock (A₁ + A₂) (B₁ + B₂) := by
   simp [payloadBlock, Matrix.fromBlocks_add]
 
 @[simp] theorem payloadBlock_conjTranspose {ιA ιB : Type*}
@@ -225,7 +224,7 @@ theorem payloadBlock_finset_sum {α ιA ιB : Type*} (s : Finset α)
   | empty => simp
   | insert a s ha ih =>
       rw [Finset.sum_insert ha, Finset.sum_insert ha, Finset.sum_insert ha, ih]
-      rw [← payloadBlock_add]
+      rw [payloadBlock_add]
 
 private def roleBlockFamily {ιA ιB : Type*}
     (A B : MIPStarRE.Quantum.Op (SymmPayload ιA ιB)) :
@@ -287,7 +286,7 @@ noncomputable def roleBlock {ιA ιB : Type*}
 /-- Role-register blocks are additive in their two role sectors. -/
 @[simp] theorem roleBlock_add {ιA ιB : Type*}
     (A₁ A₂ B₁ B₂ : MIPStarRE.Quantum.Op (SymmPayload ιA ιB)) :
-    roleBlock (A₁ + A₂) (B₁ + B₂) = roleBlock A₁ B₁ + roleBlock A₂ B₂ := by
+    roleBlock A₁ B₁ + roleBlock A₂ B₂ = roleBlock (A₁ + A₂) (B₁ + B₂) := by
   ext x y
   rcases x with ⟨rx, ix⟩
   rcases y with ⟨ry, iy⟩
@@ -362,7 +361,7 @@ theorem roleBlock_finset_sum {α ιA ιB : Type*} (s : Finset α)
   | empty => simp
   | insert a s ha ih =>
       rw [Finset.sum_insert ha, Finset.sum_insert ha, Finset.sum_insert ha, ih]
-      rw [← roleBlock_add]
+      rw [roleBlock_add]
 
 /-! ### Complete block-measurement constructors -/
 
