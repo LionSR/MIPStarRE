@@ -451,7 +451,16 @@ private lemma evaluatedSlicePhaseFivePaperSwappedDefect_appendPoint_expansion
                       (g u)))) := by
           rw [Finset.sum_comm]
 
-/-- Exact reindexing of the swapped paper defect to the raw scalar stability defect. -/
+/-- Exact reindexing of the swapped paper defect to the raw scalar stability defect.
+
+This is the phase-five coordinate audit point from issue #628.  The proof
+intentionally decomposes the **first** evaluated-slice coordinate
+`q.1 = appendPoint params u x`, because the defect reads
+`pointHeight params q.1` and the first-coordinate point outcome
+`evaluatedSlicePointMeas params strategy q.1`.  There is no `gamma` parameter in
+this reindexing lemma: the only `gamma` loss in phase five is the separate
+right-register point-measurement swap paid by `hphase5paper` in
+`ProcessedG.lean`. -/
 lemma evaluatedSlice_phaseFivePaper_reindex_to_raw_defect
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
