@@ -1074,8 +1074,9 @@ This is the current live target after wiring in two landed APIs: the
 role-register unsymmetrization bridge supplies the two factor-two links for the
 extracted POVMs, and `ProjectivizationLine156Handoff.line156Approx` supplies the
 line-156 `≈_{ζ₃}` relation from pre-projective consistency plus the two `ζ₂`
-completion closeness estimates.  The remaining fields therefore choose the
-role-register measurement, the final projective measurements, the two native
+completion closeness estimates.  Here "completion residual" denotes the
+completion-plus-point-transport package: the remaining fields therefore choose
+the role-register measurement, the final projective measurements, the two native
 point-consistency targets, and the two completion closeness estimates. -/
 structure MainFormalCascadeProjectiveCompletionResidual
     (params : Parameters) [FieldModel params.q]
@@ -1229,7 +1230,10 @@ noncomputable def toProjectiveAssemblyResidual
         rightCompletionCloseness := residual.rightCompletionCloseness }
     have hline :=
       MakingMeasurementsProjective.ProjectivizationLine156Handoff.line156Approx handoff
-    simpa [MainFormalCascadeScalars.zeta3, cascadeZeta3] using hline
+    have hzeta3 : scalars.zeta3 = 6 * scalars.zeta1 + 6 * scalars.zeta2 := by
+      rfl
+    rw [hzeta3]
+    exact hline
 
 end MainFormalCascadeProjectiveCompletionResidual
 
@@ -1441,7 +1445,7 @@ theorem mainFormal
     have completionResidual :
         MainFormalCascadeProjectiveCompletionResidual params strategy eps k scalars := by
       sorry
-    let projectiveResidual :
+    have projectiveResidual :
         MainFormalCascadeProjectiveAssemblyResidual params strategy eps k scalars :=
       completionResidual.toProjectiveAssemblyResidual
     have projectiveTargets :
