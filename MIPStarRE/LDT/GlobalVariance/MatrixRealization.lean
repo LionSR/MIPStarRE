@@ -93,7 +93,8 @@ noncomputable def matrixWeightedPolynomialState (params : Parameters) [FieldMode
       ((Matrix.nonneg_iff_posSemidef.mp model.state.positive).mul_mul_conjTranspose_same W).nonneg }
 
 /-- The local operator `A^u_{g(u)}`. -/
-noncomputable def matrixPointConditionedOutcomeOperatorAtPolynomial (params : Parameters) [FieldModel params.q]
+noncomputable def matrixPointConditionedOutcomeOperatorAtPolynomial (params : Parameters)
+    [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params) (u : Point params) : MatrixOperator model.space :=
   (model.pointMeasurement u).effect (g u)
