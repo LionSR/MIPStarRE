@@ -29,7 +29,7 @@ block from `inductive_step.tex` lines 86--90. -/
 noncomputable def extractRoleBlock {ι : Type*} [Fintype ι] [DecidableEq ι]
     (r : Role) (Y : MIPStarRE.Quantum.Op (Role × ι)) :
     MIPStarRE.Quantum.Op ι :=
-  Y.submatrix (fun i => (r, i)) (fun i => (r, i))
+  roleBlock r Y
 
 @[simp] theorem extractRoleBlock_apply {ι : Type*} [Fintype ι] [DecidableEq ι]
     (r : Role) (Y : MIPStarRE.Quantum.Op (Role × ι)) (i j : ι) :
@@ -162,6 +162,51 @@ noncomputable def extractRole {α ι : Type*} [Fintype α] [Fintype ι] [Decidab
 
 end Measurement
 
+/-- Block-diagonal role-register measurement built from an Alice-block and a Bob-block POVM.
+
+This is the measurement-level analogue of `symmetrizedIdxProjMeas`: the `Role.A`
+sector carries `MA`, and the `Role.B` sector carries `MB`. -/
+noncomputable def roleSymmetrizedMeasurement {Outcome ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
+    (MA MB : Measurement Outcome ι) : Measurement Outcome (Role × ι) where
+  toSubMeas :=
+    { outcome := fun a => roleCond Role.A (MA.outcome a) + roleCond Role.B (MB.outcome a)
+      total := 1
+      outcome_pos := by
+        intro a
+        exact add_nonneg
+          (roleCond_nonneg Role.A (MA.outcome_pos a))
+          (roleCond_nonneg Role.B (MB.outcome_pos a))
+      sum_eq_total := by
+        calc
+          ∑ a, (roleCond Role.A (MA.outcome a) + roleCond Role.B (MB.outcome a))
+              = ∑ a, roleCond Role.A (MA.outcome a) +
+                  ∑ a, roleCond Role.B (MB.outcome a) := by
+                    rw [Finset.sum_add_distrib]
+          _ = roleCond Role.A (∑ a, MA.outcome a) +
+                roleCond Role.B (∑ a, MB.outcome a) := by
+                  rw [roleCond_finset_sum Role.A Finset.univ MA.outcome]
+                  rw [roleCond_finset_sum Role.B Finset.univ MB.outcome]
+          _ = roleCond Role.A (1 : MIPStarRE.Quantum.Op ι) +
+                roleCond Role.B 1 := by
+                  rw [MA.sum_eq, MB.sum_eq]
+          _ = 1 := roleCond_one_sum
+      total_le_one := le_rfl }
+  total_eq_one := rfl
+
+@[simp] theorem roleSymmetrizedMeasurement_outcome {Outcome ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
+    (MA MB : Measurement Outcome ι) (a : Outcome) :
+    (roleSymmetrizedMeasurement MA MB).outcome a =
+      roleCond Role.A (MA.outcome a) + roleCond Role.B (MB.outcome a) :=
+  rfl
+
+@[simp] theorem roleSymmetrizedMeasurement_total {Outcome ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
+    (MA MB : Measurement Outcome ι) :
+    (roleSymmetrizedMeasurement MA MB).total = 1 :=
+  rfl
+
 /-- Extract the polynomial POVM that acts as the original Alice prover from a
 role-register main-induction output. -/
 noncomputable def extractRoleAMeasurement {params : Parameters} [FieldModel params.q]
@@ -183,21 +228,21 @@ noncomputable def extractRoleBMeasurement {params : Parameters} [FieldModel para
     (r : Role) (X : MIPStarRE.Quantum.Op ι) :
     extractRoleBlock r (roleCond r X) = X := by
   ext i j
-  cases r <;> simp [extractRoleBlock, roleCond, roleProj, opTensor]
+  cases r <;> simp [extractRoleBlock, roleBlock, roleCond, roleProj, opTensor]
 
 @[simp] theorem extractRoleBlock_roleCond_A_B {ι : Type*}
     [Fintype ι] [DecidableEq ι]
     (X : MIPStarRE.Quantum.Op ι) :
     extractRoleBlock Role.A (roleCond Role.B X) = 0 := by
   ext i j
-  simp [extractRoleBlock, roleCond, roleProj, opTensor]
+  simp [extractRoleBlock, roleBlock, roleCond, roleProj, opTensor]
 
 @[simp] theorem extractRoleBlock_roleCond_B_A {ι : Type*}
     [Fintype ι] [DecidableEq ι]
     (X : MIPStarRE.Quantum.Op ι) :
     extractRoleBlock Role.B (roleCond Role.A X) = 0 := by
   ext i j
-  simp [extractRoleBlock, roleCond, roleProj, opTensor]
+  simp [extractRoleBlock, roleBlock, roleCond, roleProj, opTensor]
 
 /-- Extracting the `A` block from a block-diagonal role symmetrization recovers the
 left input family. -/
@@ -283,6 +328,158 @@ noncomputable abbrev unsymmetrizedRightPOVM {params : Parameters} [FieldModel pa
     Measurement (Polynomial params) ι :=
   extractRoleBMeasurement G
 
+/-- For complete measurements, the bipartite consistency defect is the total
+expectation minus the matching mass. -/
+theorem qBipartiteConsDefect_of_measurements {Outcome : Type*} {ιA ιB : Type*}
+    [Fintype Outcome]
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (ψ : QuantumState (ιA × ιB))
+    (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) :
+    qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas =
+      ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) -
+        qBipartiteMatchMass ψ A.toSubMeas B.toSubMeas := by
+  have hmatch_le :
+      qBipartiteMatchMass ψ A.toSubMeas B.toSubMeas ≤
+        ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) := by
+    calc
+      qBipartiteMatchMass ψ A.toSubMeas B.toSubMeas
+        = ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (B.outcome a)) := by
+            rfl
+      _ ≤ ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ιB) (A.outcome a)) := by
+            refine Finset.sum_le_sum ?_
+            intro a _
+            exact ev_mono ψ _ _ <|
+              opTensor_le_leftTensor (ι₂ := ιB)
+                (A.outcome_pos a) (Measurement.outcome_le_one B a)
+      _ = ev ψ (leftTensor (ι₂ := ιB) A.total) := by
+            rw [← ev_sum ψ (fun a : Outcome => leftTensor (ι₂ := ιB) (A.outcome a))]
+            rw [leftTensor_finset_sum (ι₂ := ιB) Finset.univ A.outcome, A.sum_eq_total]
+      _ = ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) := by
+            simp [A.total_eq_one, leftTensor]
+  unfold qBipartiteConsDefect
+  rw [show ev ψ (opTensor A.toSubMeas.total B.toSubMeas.total) =
+      ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) by
+    simp [A.total_eq_one, B.total_eq_one, opTensor]]
+  rw [max_eq_right (sub_nonneg.mpr hmatch_le)]
+
+/-- Matching mass against an arbitrary role-register measurement only sees its
+principal role blocks. -/
+theorem qBipartiteMatchMass_roleSymmetrizedMeasurement_left {Outcome ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (ψ : QuantumState (ι × ι))
+    (MA MB : Measurement Outcome ι) (G : Measurement Outcome (Role × ι)) :
+    qBipartiteMatchMass (classicalRoleSymmState ψ)
+        (roleSymmetrizedMeasurement MA MB).toSubMeas G.toSubMeas =
+      (qBipartiteMatchMass ψ MA.toSubMeas (G.extractRole Role.B).toSubMeas +
+        qBipartiteMatchMass ψ (G.extractRole Role.A).toSubMeas MB.toSubMeas) / 2 := by
+  have houtcome : ∀ a : Outcome,
+      ev (classicalRoleSymmState ψ)
+          (opTensor ((roleSymmetrizedMeasurement MA MB).outcome a) (G.outcome a)) =
+        (1 / 2 : Error) * ev ψ (opTensor (MA.outcome a) ((G.extractRole Role.B).outcome a)) +
+          (1 / 2 : Error) * ev ψ (opTensor ((G.extractRole Role.A).outcome a) (MB.outcome a)) := by
+    intro a
+    calc
+      ev (classicalRoleSymmState ψ)
+          (opTensor ((roleSymmetrizedMeasurement MA MB).outcome a) (G.outcome a))
+        = ev (classicalRoleSymmState ψ)
+            (opTensor (roleCond Role.A (MA.outcome a)) (G.outcome a) +
+              opTensor (roleCond Role.B (MB.outcome a)) (G.outcome a)) := by
+              congr 1
+              ext i j
+              simp [opTensor, add_mul]
+      _ = ev (classicalRoleSymmState ψ)
+            (opTensor (roleCond Role.A (MA.outcome a)) (G.outcome a)) +
+          ev (classicalRoleSymmState ψ)
+            (opTensor (roleCond Role.B (MB.outcome a)) (G.outcome a)) := by
+              rw [ev_add]
+      _ = (1 / 2 : Error) * ev ψ (opTensor (MA.outcome a) ((G.extractRole Role.B).outcome a)) +
+          (1 / 2 : Error) * ev ψ (opTensor ((G.extractRole Role.A).outcome a) (MB.outcome a)) := by
+            rw [ev_classicalRoleSymmState_opTensor_roleCond_A]
+            rw [ev_classicalRoleSymmState_opTensor_roleCond_B]
+            rfl
+  unfold qBipartiteMatchMass
+  calc
+    ∑ a : Outcome,
+        ev (classicalRoleSymmState ψ)
+          (opTensor ((roleSymmetrizedMeasurement MA MB).outcome a) (G.outcome a))
+      = ∑ a : Outcome,
+          ((1 / 2 : Error) *
+              ev ψ (opTensor (MA.outcome a) ((G.extractRole Role.B).outcome a)) +
+            (1 / 2 : Error) *
+              ev ψ (opTensor ((G.extractRole Role.A).outcome a) (MB.outcome a))) := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          exact houtcome a
+    _ = (1 / 2 : Error) * ∑ a : Outcome,
+          ev ψ (opTensor (MA.outcome a) ((G.extractRole Role.B).outcome a)) +
+        (1 / 2 : Error) * ∑ a : Outcome,
+          ev ψ (opTensor ((G.extractRole Role.A).outcome a) (MB.outcome a)) := by
+          rw [Finset.sum_add_distrib, ← Finset.mul_sum, ← Finset.mul_sum]
+    _ = (qBipartiteMatchMass ψ MA.toSubMeas (G.extractRole Role.B).toSubMeas +
+          qBipartiteMatchMass ψ (G.extractRole Role.A).toSubMeas MB.toSubMeas) / 2 := by
+          simp [qBipartiteMatchMass]
+          ring
+
+/-- Questionwise unsymmetrization identity: the role-register consistency defect is
+the average of the two unsymmetrized defects. -/
+theorem qBipartiteConsDefect_roleSymmetrizedMeasurement_left {Outcome ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (ψ : QuantumState (ι × ι))
+    (MA MB : Measurement Outcome ι) (G : Measurement Outcome (Role × ι)) :
+    qBipartiteConsDefect (classicalRoleSymmState ψ)
+        (roleSymmetrizedMeasurement MA MB).toSubMeas G.toSubMeas =
+      (qBipartiteConsDefect ψ MA.toSubMeas (G.extractRole Role.B).toSubMeas +
+        qBipartiteConsDefect ψ (G.extractRole Role.A).toSubMeas MB.toSubMeas) / 2 := by
+  calc
+    qBipartiteConsDefect (classicalRoleSymmState ψ)
+        (roleSymmetrizedMeasurement MA MB).toSubMeas G.toSubMeas
+      = ev (classicalRoleSymmState ψ)
+          (1 : MIPStarRE.Quantum.Op ((Role × ι) × (Role × ι))) -
+        qBipartiteMatchMass (classicalRoleSymmState ψ)
+          (roleSymmetrizedMeasurement MA MB).toSubMeas G.toSubMeas := by
+          exact qBipartiteConsDefect_of_measurements (classicalRoleSymmState ψ)
+            (roleSymmetrizedMeasurement MA MB) G
+    _ = ev ψ (1 : MIPStarRE.Quantum.Op (ι × ι)) -
+        (qBipartiteMatchMass ψ MA.toSubMeas (G.extractRole Role.B).toSubMeas +
+          qBipartiteMatchMass ψ (G.extractRole Role.A).toSubMeas MB.toSubMeas) / 2 := by
+          rw [ev_classicalRoleSymmState_one]
+          rw [qBipartiteMatchMass_roleSymmetrizedMeasurement_left]
+    _ = ((ev ψ (1 : MIPStarRE.Quantum.Op (ι × ι)) -
+            qBipartiteMatchMass ψ MA.toSubMeas (G.extractRole Role.B).toSubMeas) +
+          (ev ψ (1 : MIPStarRE.Quantum.Op (ι × ι)) -
+            qBipartiteMatchMass ψ (G.extractRole Role.A).toSubMeas MB.toSubMeas)) / 2 := by
+          ring
+    _ = (qBipartiteConsDefect ψ MA.toSubMeas (G.extractRole Role.B).toSubMeas +
+          qBipartiteConsDefect ψ (G.extractRole Role.A).toSubMeas MB.toSubMeas) / 2 := by
+          rw [← qBipartiteConsDefect_of_measurements ψ MA (G.extractRole Role.B)]
+          rw [← qBipartiteConsDefect_of_measurements ψ (G.extractRole Role.A) MB]
+
+/-- One questionwise factor-two consequence of the unsymmetrization identity. -/
+theorem qBipartiteConsDefect_extractRoleB_le_two_symm {Outcome ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (ψ : QuantumState (ι × ι))
+    (MA MB : Measurement Outcome ι) (G : Measurement Outcome (Role × ι)) :
+    qBipartiteConsDefect ψ MA.toSubMeas (G.extractRole Role.B).toSubMeas ≤
+      2 * qBipartiteConsDefect (classicalRoleSymmState ψ)
+        (roleSymmetrizedMeasurement MA MB).toSubMeas G.toSubMeas := by
+  have h := qBipartiteConsDefect_roleSymmetrizedMeasurement_left ψ MA MB G
+  have hnonneg : 0 ≤ qBipartiteConsDefect ψ (G.extractRole Role.A).toSubMeas MB.toSubMeas :=
+    qBipartiteConsDefect_nonneg ψ (G.extractRole Role.A).toSubMeas MB.toSubMeas
+  nlinarith
+
+/-- The other questionwise factor-two consequence of the unsymmetrization identity. -/
+theorem qBipartiteConsDefect_extractRoleA_le_two_symm {Outcome ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (ψ : QuantumState (ι × ι))
+    (MA MB : Measurement Outcome ι) (G : Measurement Outcome (Role × ι)) :
+    qBipartiteConsDefect ψ (G.extractRole Role.A).toSubMeas MB.toSubMeas ≤
+      2 * qBipartiteConsDefect (classicalRoleSymmState ψ)
+        (roleSymmetrizedMeasurement MA MB).toSubMeas G.toSubMeas := by
+  have h := qBipartiteConsDefect_roleSymmetrizedMeasurement_left ψ MA MB G
+  have hnonneg : 0 ≤ qBipartiteConsDefect ψ MA.toSubMeas (G.extractRole Role.B).toSubMeas :=
+    qBipartiteConsDefect_nonneg ψ MA.toSubMeas (G.extractRole Role.B).toSubMeas
+  nlinarith
+
 /-- Named residual package for the Step 3 measurement-unsymmetrization bridge.
 
 The extracted POVMs are not additional fields: they are definitionally
@@ -316,5 +513,108 @@ structure UnsymmetrizationBridgePackage (params : Parameters) [FieldModel params
       (polynomialEvaluationFamily params (unsymmetrizedLeftPOVM G).toSubMeas)
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
       (2 * sigma)
+
+namespace UnsymmetrizationBridgePackage
+
+/-- Construct the Step 3 unsymmetrization package from the role-register
+symmetrized consistency estimate.
+
+The proof is the formal version of the paper's factor-two argument: for each
+queried point, the role-register consistency defect is the average of the two
+principal-block defects, so each block defect is at most twice the symmetrized
+one. Averaging over the point distribution gives `eq:cons-a` and `eq:cons-b`. -/
+theorem ofSymConsistency (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι)
+    (G : Measurement (Polynomial params) (Role × ι)) (sigma : Error)
+    (h : ConsRel (strategy.strategySymmetrization).state
+      (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas (strategy.strategySymmetrization).pointMeasurement)
+      (polynomialEvaluationFamily params G.toSubMeas)
+      sigma) :
+    UnsymmetrizationBridgePackage params strategy G sigma := by
+  haveI : Nonempty ι := strategy.isNormalized.nonempty.map Prod.fst
+  refine
+    { symConsistency := h
+      pointAConsistency := ?_
+      pointBConsistency := ?_ }
+  · constructor
+    unfold bipartiteConsError
+    calc
+      avgOver (uniformDistribution (Point params))
+          (fun u =>
+            qBipartiteConsDefect strategy.state
+              ((IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA) u)
+              ((polynomialEvaluationFamily params (unsymmetrizedRightPOVM G).toSubMeas) u))
+        ≤ avgOver (uniformDistribution (Point params))
+          (fun u =>
+            2 * qBipartiteConsDefect (strategy.strategySymmetrization).state
+              ((IdxProjMeas.toIdxSubMeas (strategy.strategySymmetrization).pointMeasurement) u)
+              ((polynomialEvaluationFamily params G.toSubMeas) u)) := by
+            refine avgOver_mono _ _ _ ?_
+            intro u
+            let Gu : Measurement (Fq params) (Role × ι) :=
+              { toSubMeas := (polynomialEvaluationFamily params G.toSubMeas) u
+                total_eq_one := by
+                  simpa [polynomialEvaluationFamily, evaluateAt, postprocess_total] using
+                    G.total_eq_one }
+            have hpoint := qBipartiteConsDefect_extractRoleB_le_two_symm strategy.state
+              (strategy.pointMeasurementA u).toMeasurement
+              (strategy.pointMeasurementB u).toMeasurement Gu
+            simpa [Gu, ProjStrat.strategySymmetrization, ProjStrat.classicalRoleSymmStrategy,
+              ProjStrat.symmetrizedPointMeasurement, roleSymmetrizedMeasurement,
+              symmetrizedIdxProjMeas, IdxProjMeas.toIdxSubMeas,
+              unsymmetrizedRightPOVM, extractRoleBMeasurement,
+              polynomialEvaluationFamily_extractRole,
+              polynomialEvaluationFamily_measurement_extractRole]
+              using hpoint
+      _ = 2 * avgOver (uniformDistribution (Point params))
+          (fun u =>
+            qBipartiteConsDefect (strategy.strategySymmetrization).state
+              ((IdxProjMeas.toIdxSubMeas (strategy.strategySymmetrization).pointMeasurement) u)
+              ((polynomialEvaluationFamily params G.toSubMeas) u)) := by
+            rw [avgOver_const_mul]
+      _ ≤ 2 * sigma := by
+            exact mul_le_mul_of_nonneg_left h.offDiagonalBound (by norm_num)
+  · constructor
+    unfold bipartiteConsError
+    calc
+      avgOver (uniformDistribution (Point params))
+          (fun u =>
+            qBipartiteConsDefect strategy.state
+              ((polynomialEvaluationFamily params (unsymmetrizedLeftPOVM G).toSubMeas) u)
+              ((IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB) u))
+        ≤ avgOver (uniformDistribution (Point params))
+          (fun u =>
+            2 * qBipartiteConsDefect (strategy.strategySymmetrization).state
+              ((IdxProjMeas.toIdxSubMeas (strategy.strategySymmetrization).pointMeasurement) u)
+              ((polynomialEvaluationFamily params G.toSubMeas) u)) := by
+            refine avgOver_mono _ _ _ ?_
+            intro u
+            let Gu : Measurement (Fq params) (Role × ι) :=
+              { toSubMeas := (polynomialEvaluationFamily params G.toSubMeas) u
+                total_eq_one := by
+                  simpa [polynomialEvaluationFamily, evaluateAt, postprocess_total] using
+                    G.total_eq_one }
+            have hpoint := qBipartiteConsDefect_extractRoleA_le_two_symm strategy.state
+              (strategy.pointMeasurementA u).toMeasurement
+              (strategy.pointMeasurementB u).toMeasurement Gu
+            simpa [Gu, ProjStrat.strategySymmetrization, ProjStrat.classicalRoleSymmStrategy,
+              ProjStrat.symmetrizedPointMeasurement, roleSymmetrizedMeasurement,
+              symmetrizedIdxProjMeas, IdxProjMeas.toIdxSubMeas,
+              unsymmetrizedLeftPOVM, extractRoleAMeasurement,
+              polynomialEvaluationFamily_extractRole,
+              polynomialEvaluationFamily_measurement_extractRole]
+              using hpoint
+      _ = 2 * avgOver (uniformDistribution (Point params))
+          (fun u =>
+            qBipartiteConsDefect (strategy.strategySymmetrization).state
+              ((IdxProjMeas.toIdxSubMeas (strategy.strategySymmetrization).pointMeasurement) u)
+              ((polynomialEvaluationFamily params G.toSubMeas) u)) := by
+            rw [avgOver_const_mul]
+      _ ≤ 2 * sigma := by
+            exact mul_le_mul_of_nonneg_left h.offDiagonalBound (by norm_num)
+
+end UnsymmetrizationBridgePackage
 
 end MIPStarRE.LDT

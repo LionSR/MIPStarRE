@@ -800,32 +800,22 @@ theorem ofSuccessorBoundary
     (mainFormalSuccessorMainInductionPublicWrapper params strategy eps hpass k hd boundary
       hk_pos hk_large)
 
-/-- Build the formal unsymmetrization bridge once the two factor-two estimates
-have been supplied separately.
+/-- Build the formal unsymmetrization bridge from the role-register Section 6
+measurement package.
 
-This is the intended downstream handoff: the role-register measurement and its
-symmetrized consistency come from `MainFormalRoleMeasurementPackage`, while the
-substantive Step 3 work is isolated to the two point-consistency estimates. -/
+The lower-level Step 3 theorem
+`UnsymmetrizationBridgePackage.ofSymConsistency` proves the two factor-two
+principal-block estimates directly from the symmetrized consistency field, so no
+extra point-consistency hypotheses are needed here. -/
 def toUnsymmetrizationBridge
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
-    (pkg : MainFormalRoleMeasurementPackage params strategy eps k scalars)
-    (pointAConsistency :
-      ConsRel strategy.state (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-        (polynomialEvaluationFamily params (unsymmetrizedRightPOVM pkg.roleMeasurement).toSubMeas)
-        (2 * scalars.sigma))
-    (pointBConsistency :
-      ConsRel strategy.state (uniformDistribution (Point params))
-        (polynomialEvaluationFamily params (unsymmetrizedLeftPOVM pkg.roleMeasurement).toSubMeas)
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-        (2 * scalars.sigma)) :
-    UnsymmetrizationBridgePackage params strategy pkg.roleMeasurement scalars.sigma where
-  symConsistency := pkg.symConsistency
-  pointAConsistency := pointAConsistency
-  pointBConsistency := pointBConsistency
+    (pkg : MainFormalRoleMeasurementPackage params strategy eps k scalars) :
+    UnsymmetrizationBridgePackage params strategy pkg.roleMeasurement scalars.sigma :=
+  UnsymmetrizationBridgePackage.ofSymConsistency params strategy pkg.roleMeasurement
+    scalars.sigma pkg.symConsistency
 
 end MainFormalRoleMeasurementPackage
 

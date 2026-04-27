@@ -58,6 +58,12 @@ noncomputable def roleCond {ι : Type*} [Fintype ι] [DecidableEq ι]
     MIPStarRE.Quantum.Op (Role × ι) :=
   opTensor (roleProj r) X
 
+/-- Principal role block of an operator on the role-register local space. -/
+noncomputable def roleBlock {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (r : Role) (Y : MIPStarRE.Quantum.Op (Role × ι)) :
+    MIPStarRE.Quantum.Op ι :=
+  Y.submatrix (fun i => (r, i)) (fun i => (r, i))
+
 lemma roleCond_nonneg {ι : Type*} [Fintype ι] [DecidableEq ι]
     (r : Role) {X : MIPStarRE.Quantum.Op ι} (hX : 0 ≤ X) :
     0 ≤ roleCond r X :=
@@ -424,6 +430,28 @@ theorem classicalRoleSymmState_isNormalized {ι : Type*} [Fintype ι] [Decidable
   rw [normalizedTrace_swapDensity, hψ]
   norm_num
 
+/-- The role-register symmetrized state has the same total expectation as the
+original state. -/
+theorem ev_classicalRoleSymmState_one {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (ψ : QuantumState (ι × ι)) :
+    ev (classicalRoleSymmState ψ) (1 : MIPStarRE.Quantum.Op ((Role × ι) × (Role × ι))) =
+      ev ψ (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
+  unfold ev classicalRoleSymmState
+  rw [mul_one, MIPStarRE.Quantum.normalizedTrace_add]
+  have hAB :
+      MIPStarRE.Quantum.normalizedTrace
+          ((2 : Error) • rolePairCond Role.A Role.B ψ.density) =
+        (1 / 2 : ℂ) * MIPStarRE.Quantum.normalizedTrace ψ.density :=
+    normalizedTrace_two_smul_rolePairCond Role.A Role.B ψ.density
+  have hBA :
+      MIPStarRE.Quantum.normalizedTrace
+          ((2 : Error) • rolePairCond Role.B Role.A (swapDensity ψ.density)) =
+        (1 / 2 : ℂ) * MIPStarRE.Quantum.normalizedTrace (swapDensity ψ.density) :=
+    normalizedTrace_two_smul_rolePairCond Role.B Role.A (swapDensity ψ.density)
+  rw [hAB, hBA, normalizedTrace_swapDensity, mul_one]
+  ring_nf
+
 private lemma opTensor_add_left {ι₁ ι₂ : Type*}
     [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     (A B : MIPStarRE.Quantum.Op ι₁) (C : MIPStarRE.Quantum.Op ι₂) :
@@ -731,6 +759,66 @@ lemma ev_classicalRoleSymmState_rolePair_BB {ι : Type*}
     rolePairCond_AB_mul_BB,
     rolePairCond_BA_mul_BB]
   simp
+
+set_option linter.flexible false in
+set_option linter.unnecessarySimpa false in
+lemma ev_classicalRoleSymmState_opTensor_roleCond_A {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (ψ : QuantumState (ι × ι))
+    (X : MIPStarRE.Quantum.Op ι) (Y : MIPStarRE.Quantum.Op (Role × ι)) :
+    ev (classicalRoleSymmState ψ) (opTensor (roleCond Role.A X) Y) =
+      (1 / 2 : Error) * ev ψ (opTensor X (roleBlock Role.B Y)) := by
+  unfold ev classicalRoleSymmState MIPStarRE.Quantum.normalizedTrace Matrix.trace
+  simp_rw [Fintype.sum_prod_type]
+  simp [rolePairCond, rolePairPayloadEquiv, rolePairProj, roleCond, roleBlock,
+    roleProj, opTensor, Matrix.mul_apply, Matrix.single]
+  simp_rw [Fintype.sum_prod_type]
+  have hRoleSum : ∀ f : Role → ℂ, (∑ r : Role, f r) = f Role.A + f Role.B := by
+    intro f
+    rw [Fintype.sum_eq_add Role.A Role.B (by decide)
+      (by
+        intro r hr
+        cases r <;> simp at hr)]
+  simp_rw [hRoleSum]
+  have hcardRole : Fintype.card Role = 2 := by decide
+  simp [hcardRole]
+  simp_rw [mul_assoc]
+  simp_rw [← Finset.mul_sum]
+  ring_nf
+  simpa using
+    (Complex.re_mul_ofReal
+      ((∑ x, ∑ x_1, ∑ x_2, ∑ x_3,
+        ψ.density (x, x_1) (x_2, x_3) * X x_2 x * Y (Role.B, x_3) (Role.B, x_1)) *
+          (↑(Fintype.card ι))⁻¹ ^ 2) (1 / 2 : Error))
+
+set_option linter.flexible false in
+lemma ev_classicalRoleSymmState_opTensor_roleCond_B {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (ψ : QuantumState (ι × ι))
+    (X : MIPStarRE.Quantum.Op ι) (Y : MIPStarRE.Quantum.Op (Role × ι)) :
+    ev (classicalRoleSymmState ψ) (opTensor (roleCond Role.B X) Y) =
+      (1 / 2 : Error) * ev ψ (opTensor (roleBlock Role.A Y) X) := by
+  have hignore :
+      ev (classicalRoleSymmState ψ) (opTensor (roleCond Role.B X) Y) =
+        ev (classicalRoleSymmState ψ)
+          (opTensor (roleCond Role.B X) (roleCond Role.A (roleBlock Role.A Y))) := by
+    unfold ev classicalRoleSymmState MIPStarRE.Quantum.normalizedTrace Matrix.trace
+    simp_rw [Fintype.sum_prod_type]
+    simp [rolePairCond, rolePairPayloadEquiv, rolePairProj, roleCond, roleBlock,
+      roleProj, opTensor, Matrix.mul_apply, Matrix.single]
+    simp_rw [Fintype.sum_prod_type]
+    have hRoleSum : ∀ f : Role → ℂ, (∑ r : Role, f r) = f Role.A + f Role.B := by
+      intro f
+      rw [Fintype.sum_eq_add Role.A Role.B (by decide)
+        (by
+          intro r hr
+          cases r <;> simp at hr)]
+    simp_rw [hRoleSum]
+    simp
+  rw [hignore]
+  rw [opTensor_roleCond_BA]
+  rw [ev_classicalRoleSymmState_rolePair_BA]
+  rw [ev_swapQuantumState, swapDensity_opTensor]
 
 /-- Block-diagonal symmetrization of two projective-measurement families over the
 paper's role register. -/
