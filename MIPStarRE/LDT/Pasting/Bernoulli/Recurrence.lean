@@ -1610,6 +1610,184 @@ private lemma fromHToG_sum_product {α β : Type*} [Fintype α] [Fintype β]
     (∑ a : α, ∑ b : β, F a b) = ∑ p : α × β, F p.1 p.2 := by
   rw [← Finset.univ_product_univ, Finset.sum_product]
 
+private lemma fromHToG_avgOver_sub {Question : Type*}
+    (𝒟 : Distribution Question) (f g : Question → Error) :
+    avgOver 𝒟 f - avgOver 𝒟 g = avgOver 𝒟 (fun q => f q - g q) := by
+  unfold avgOver
+  calc
+    ∑ q ∈ 𝒟.support, 𝒟.weight q * f q - ∑ q ∈ 𝒟.support, 𝒟.weight q * g q
+      = ∑ q ∈ 𝒟.support, (𝒟.weight q * f q - 𝒟.weight q * g q) := by
+          rw [Finset.sum_sub_distrib]
+    _ = ∑ q ∈ 𝒟.support, 𝒟.weight q * (f q - g q) := by
+          refine Finset.sum_congr rfl ?_
+          intro q _hq
+          ring
+
+private lemma fromHToG_ev_adjoint_eq
+    (ψ : QuantumState (ι × ι)) (X : MIPStarRE.Quantum.Op (ι × ι)) :
+    ev ψ Xᴴ = ev ψ X := by
+  have hρ : ψ.densityᴴ = ψ.density :=
+    (Matrix.nonneg_iff_posSemidef.mp ψ.density_psd).isHermitian.eq
+  have htrace :
+      MIPStarRE.Quantum.normalizedTrace (ψ.density * Xᴴ) =
+        star (MIPStarRE.Quantum.normalizedTrace (ψ.density * X)) := by
+    calc
+      MIPStarRE.Quantum.normalizedTrace (ψ.density * Xᴴ)
+        = MIPStarRE.Quantum.normalizedTrace ((X * ψ.density)ᴴ) := by
+            rw [Matrix.conjTranspose_mul, hρ]
+      _ = star (MIPStarRE.Quantum.normalizedTrace (X * ψ.density)) := by
+            unfold MIPStarRE.Quantum.normalizedTrace
+            simpa [star_div₀, star_natCast] using
+              congrArg (fun z : ℂ => z / (Fintype.card (ι × ι) : ℂ))
+                (Matrix.trace_conjTranspose (X * ψ.density))
+      _ = star (MIPStarRE.Quantum.normalizedTrace (ψ.density * X)) := by
+            rw [MIPStarRE.Quantum.normalizedTrace_mul_comm]
+  simpa [ev, Complex.star_def, Complex.conj_re] using congrArg Complex.re htrace
+
+/-- Averaged-context variant of `closenessOfIP`: the contraction side condition is
+only required after averaging over the question distribution. -/
+private lemma fromHToG_closenessOfIP_avgContext
+    {Question OutcomeA OutcomeB : Type*}
+    [Fintype OutcomeA] [Fintype OutcomeB]
+    (ψ : QuantumState (ι × ι)) (_hψ : ψ.IsNormalized)
+    (𝒟 : Distribution Question)
+    (_h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1)
+    (A B : Question → OutcomeA → MIPStarRE.Quantum.Op (ι × ι))
+    (C : Question → OutcomeA → OutcomeB → MIPStarRE.Quantum.Op (ι × ι))
+    (γ : Error)
+    (hAB : avgOver 𝒟 (fun q => qSDDCore ψ (A q) (B q)) ≤ γ)
+    (hC : avgOver 𝒟 (fun q =>
+      ∑ a : OutcomeA, ev ψ ((∑ b : OutcomeB, C q a b) * (∑ b : OutcomeB, C q a b)ᴴ)) ≤ 1) :
+    |avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * A q a)) -
+        avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * B q a))| ≤
+      Real.sqrt γ := by
+  let Csum : Question → OutcomeA → MIPStarRE.Quantum.Op (ι × ι) :=
+    fun q a => ∑ b : OutcomeB, C q a b
+  let D : Question → OutcomeA → MIPStarRE.Quantum.Op (ι × ι) :=
+    fun q a => A q a - B q a
+  let t : Question → OutcomeA → Error := fun q a => ev ψ (Csum q a * D q a)
+  let x : Question → OutcomeA → Error := fun q a => ev ψ (Csum q a * (Csum q a)ᴴ)
+  let y : Question → OutcomeA → Error := fun q a => ev ψ ((D q a)ᴴ * D q a)
+  have ht : ∀ q a, |t q a| ≤ Real.sqrt (x q a) * Real.sqrt (y q a) := by
+    intro q a
+    exact ev_abs_mul_le_sqrt ψ (Csum q a) (D q a)
+  have hx : ∀ q a, 0 ≤ x q a := by
+    intro q a
+    simpa [x] using ev_adjoint_self_nonneg ψ ((Csum q a)ᴴ)
+  have hy : ∀ q a, 0 ≤ y q a := by
+    intro q a
+    exact ev_adjoint_self_nonneg ψ (D q a)
+  have hweighted := MIPStarRE.LDT.Preliminaries.weightedFinsetCauchySchwarz 𝒟 t x y ht hx hy
+  have hgap :
+      avgOver 𝒟 (fun q => ∑ a : OutcomeA, t q a) =
+        avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * A q a)) -
+          avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * B q a)) := by
+    have hgap_q : ∀ q,
+        ∑ a : OutcomeA, t q a =
+          (∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * A q a)) -
+            ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * B q a) := by
+      intro q
+      have hleft :
+          ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * A q a) =
+            ∑ a : OutcomeA, ev ψ (Csum q a * A q a) := by
+        refine Finset.sum_congr rfl ?_
+        intro a _ha
+        dsimp [Csum]
+        rw [← ev_sum ψ (fun b : OutcomeB => C q a b * A q a), Finset.sum_mul]
+      have hright :
+          ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * B q a) =
+            ∑ a : OutcomeA, ev ψ (Csum q a * B q a) := by
+        refine Finset.sum_congr rfl ?_
+        intro a _ha
+        dsimp [Csum]
+        rw [← ev_sum ψ (fun b : OutcomeB => C q a b * B q a), Finset.sum_mul]
+      rw [hleft, hright, ← Finset.sum_sub_distrib]
+      refine Finset.sum_congr rfl ?_
+      intro a _ha
+      dsimp [t, D]
+      rw [(ev_sub ψ (_ * _) (_ * _)).symm]
+      simp [mul_sub]
+    calc
+      avgOver 𝒟 (fun q => ∑ a : OutcomeA, t q a)
+        = avgOver 𝒟 (fun q =>
+            (∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * A q a)) -
+              ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * B q a)) := by
+                refine avgOver_congr _ _ _ ?_
+                intro q
+                exact hgap_q q
+      _ = avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * A q a)) -
+            avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * B q a)) := by
+                symm
+                exact fromHToG_avgOver_sub 𝒟 _ _
+  have hy_eq :
+      avgOver 𝒟 (fun q => ∑ a : OutcomeA, y q a) =
+        avgOver 𝒟 (fun q => qSDDCore ψ (A q) (B q)) := by
+    refine avgOver_congr _ _ _ ?_
+    intro q
+    simp [y, D, qSDDCore]
+  have hx_nonneg : 0 ≤ avgOver 𝒟 (fun q => ∑ a : OutcomeA, x q a) := by
+    refine avgOver_nonneg 𝒟 _ ?_
+    intro q
+    exact Finset.sum_nonneg (fun a _ha => hx q a)
+  calc
+    |avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * A q a)) -
+        avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * B q a))|
+      = |avgOver 𝒟 (fun q => ∑ a : OutcomeA, t q a)| := by
+          rw [hgap]
+    _ ≤ Real.sqrt (avgOver 𝒟 (fun q => ∑ a : OutcomeA, x q a)) *
+          Real.sqrt (avgOver 𝒟 (fun q => ∑ a : OutcomeA, y q a)) := hweighted
+    _ ≤ 1 * Real.sqrt (avgOver 𝒟 (fun q => ∑ a : OutcomeA, y q a)) := by
+          exact mul_le_mul_of_nonneg_right (by simpa using Real.sqrt_le_sqrt hC) (Real.sqrt_nonneg _)
+    _ = Real.sqrt (avgOver 𝒟 (fun q => ∑ a : OutcomeA, y q a)) := by ring
+    _ = Real.sqrt (avgOver 𝒟 (fun q => qSDDCore ψ (A q) (B q))) := by rw [hy_eq]
+    _ ≤ Real.sqrt γ := by
+          simpa using Real.sqrt_le_sqrt hAB
+
+/-- Averaged-context variant of `closenessOfIPAdjoint`. -/
+private lemma fromHToG_closenessOfIPAdjoint_avgContext
+    {Question OutcomeA OutcomeB : Type*}
+    [Fintype OutcomeA] [Fintype OutcomeB]
+    (ψ : QuantumState (ι × ι)) (_hψ : ψ.IsNormalized)
+    (𝒟 : Distribution Question)
+    (_h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1)
+    (A B : Question → OutcomeA → MIPStarRE.Quantum.Op (ι × ι))
+    (C : Question → OutcomeA → OutcomeB → MIPStarRE.Quantum.Op (ι × ι))
+    (γ : Error)
+    (hAB : avgOver 𝒟 (fun q => qSDDCore ψ (fun a => (A q a)ᴴ) (fun a => (B q a)ᴴ)) ≤ γ)
+    (hC : avgOver 𝒟 (fun q =>
+      ∑ a : OutcomeA, ev ψ ((∑ b : OutcomeB, C q a b)ᴴ * (∑ b : OutcomeB, C q a b))) ≤ 1) :
+    |avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (A q a * C q a b)) -
+        avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (B q a * C q a b))| ≤
+      Real.sqrt γ := by
+  have hleft :=
+    fromHToG_closenessOfIP_avgContext ψ _hψ 𝒟 _h𝒟
+      (fun q a => (A q a)ᴴ)
+      (fun q a => (B q a)ᴴ)
+      (fun q a b => (C q a b)ᴴ)
+      γ hAB (by
+        simpa [Matrix.conjTranspose_sum] using hC)
+  have hA :
+      avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ ((C q a b)ᴴ * (A q a)ᴴ)) =
+        avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (A q a * C q a b)) := by
+    refine avgOver_congr _ _ _ ?_
+    intro q
+    refine Finset.sum_congr rfl ?_
+    intro a _ha
+    refine Finset.sum_congr rfl ?_
+    intro b _hb
+    simpa [Matrix.conjTranspose_mul] using fromHToG_ev_adjoint_eq ψ (A q a * C q a b)
+  have hB :
+      avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ ((C q a b)ᴴ * (B q a)ᴴ)) =
+        avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (B q a * C q a b)) := by
+    refine avgOver_congr _ _ _ ?_
+    intro q
+    refine Finset.sum_congr rfl ?_
+    intro a _ha
+    refine Finset.sum_congr rfl ?_
+    intro b _hb
+    simpa [Matrix.conjTranspose_mul] using fromHToG_ev_adjoint_eq ψ (B q a * C q a b)
+  simpa [hA, hB] using hleft
+
 /-- Rewrite a nested Boolean/type sum as a sum over the product index. -/
 private lemma fromHToG_bool_type_sum_product {α : Type*} [Fintype α]
     (F : Bool → α → Error) :
@@ -3831,16 +4009,6 @@ private lemma fromHToGAdjacentStage_paperMoveChain
       fromHToGRecurrenceError params gamma zeta k := by
   let A : Error := fromHToGStageMass params ψbi family k ℓ
   let E : Error := fromHToGStageMass params ψbi family k (ℓ + 1)
-  have hsplit := fromHToGStageMass_split_succ params ψbi family hℓ
-  have _ := hnorm
-  have _ := hgamma_nonneg
-  have _ := hzeta_nonneg
-  have _ := hfacts.completedSelfConsistency
-  have _ := hhalf
-  have _ := hstageExact.completeBranchAverage
-  have _ := hstageExact.incompleteBranchAverage
-  have _ := hstageExact.tailWeightRecurrence
-  have _ := hsplit
   let M₁ : Error := fromHToGAdjacentStageM1 params ψbi family k ℓ
   let M₂ : Error := fromHToGAdjacentStageM2 params ψbi family k ℓ
   let M₃ : Error := fromHToGAdjacentStageM3 params ψbi family k ℓ
@@ -3885,7 +4053,163 @@ private lemma fromHToGAdjacentStage_paperMoveChain
         `eq:call-again-later-part-tres` is exactly the `Ĥ ⊗ S²` term, so this
         should be discharged by rewriting `A0` as a suffix `Ĥ`, using
         `eq:S-bound`, and then applying submeasurement boundedness. -/
-        sorry
+        intro q
+        let tailBlock : GHatOutcome params → MIPStarRE.Quantum.Op (ι × ι) := fun g =>
+          ∑ gs : GHatTupleOutcome params n,
+            let S := fromHToGRecurrenceWeight params family ℓ
+              (prependTypeBit g.isSome (gHatTupleType gs))
+            let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+            leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) S
+        have htail_expand : ∀ g : GHatOutcome params,
+            ∑ gs : GHatTupleOutcome params n, C q g gs =
+              leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome g) * tailBlock g := by
+          intro g
+          dsimp [tailBlock, C]
+          rw [Finset.mul_sum]
+          refine Finset.sum_congr rfl ?_
+          intro gs _hgs
+          calc
+            leftTensor
+                ((gHatIdxMeas params family q.1).outcome g *
+                  gHatHalfProductOutcomeOperator params family n q.2 gs *
+                    (gHatHalfProductOutcomeOperator params family n q.2 gs)ᴴ) *
+                rightTensor
+                  (fromHToGRecurrenceWeight params family ℓ
+                    (prependTypeBit g.isSome (gHatTupleType gs)))
+              = leftTensor
+                  ((gHatIdxMeas params family q.1).outcome g *
+                    (gHatHalfProductOutcomeOperator params family n q.2 gs *
+                      (gHatHalfProductOutcomeOperator params family n q.2 gs)ᴴ)) *
+                rightTensor
+                  (fromHToGRecurrenceWeight params family ℓ
+                    (prependTypeBit g.isSome (gHatTupleType gs))) := by
+                        simp [mul_assoc]
+            _ = (leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome g) *
+                  leftTensor (ι₂ := ι)
+                    (gHatHalfProductOutcomeOperator params family n q.2 gs *
+                      (gHatHalfProductOutcomeOperator params family n q.2 gs)ᴴ)) *
+                  rightTensor
+                    (fromHToGRecurrenceWeight params family ℓ
+                      (prependTypeBit g.isSome (gHatTupleType gs))) := by
+                        rw [← leftTensor_mul_leftTensor]
+            _ = leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome g) *
+                  (leftTensor (ι₂ := ι)
+                      (gHatHalfProductOutcomeOperator params family n q.2 gs *
+                        (gHatHalfProductOutcomeOperator params family n q.2 gs)ᴴ) *
+                    rightTensor
+                      (fromHToGRecurrenceWeight params family ℓ
+                        (prependTypeBit g.isSome (gHatTupleType gs)))) := by
+                          simp [mul_assoc]
+        have htail_pos : ∀ g : GHatOutcome params, 0 ≤ tailBlock g := by
+          intro g
+          dsimp [tailBlock]
+          refine Finset.sum_nonneg ?_
+          intro gs _hgs
+          let S := fromHToGRecurrenceWeight params family ℓ
+            (prependTypeBit g.isSome (gHatTupleType gs))
+          let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+          have hTT_pos : 0 ≤ T * Tᴴ := by
+            have hpos : 0 ≤ (Tᴴ)ᴴ * Tᴴ :=
+              (CStarAlgebra.nonneg_iff_eq_star_mul_self).2 ⟨Tᴴ, rfl⟩
+            simpa using hpos
+          have hS_pos : 0 ≤ S :=
+            fromHToGRecurrenceWeight_nonneg params family ℓ (prependTypeBit g.isSome (gHatTupleType gs))
+          rw [leftTensor_mul_rightTensor_eq_opTensor]
+          exact MIPStarRE.Quantum.kronecker_nonneg hTT_pos hS_pos
+        have htail_le_one : ∀ g : GHatOutcome params, tailBlock g ≤ 1 := by
+          intro g
+          let sandTerm : GHatTupleOutcome params n → MIPStarRE.Quantum.Op (ι × ι) := fun gs =>
+            let S := fromHToGRecurrenceWeight params family ℓ
+              (prependTypeBit g.isSome (gHatTupleType gs))
+            let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+            leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) S
+          let sandLeft : GHatTupleOutcome params n → MIPStarRE.Quantum.Op (ι × ι) := fun gs =>
+            let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+            leftTensor (ι₂ := ι) (T * Tᴴ)
+          calc
+            tailBlock g = ∑ gs : GHatTupleOutcome params n, sandTerm gs := by
+              simp [tailBlock, sandTerm]
+            _ ≤ ∑ gs : GHatTupleOutcome params n, sandLeft gs := by
+                    refine Finset.sum_le_sum ?_
+                    intro gs _hgs
+                    let S := fromHToGRecurrenceWeight params family ℓ
+                      (prependTypeBit g.isSome (gHatTupleType gs))
+                    let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+                    have hTT_pos : 0 ≤ T * Tᴴ := by
+                      have hpos : 0 ≤ (Tᴴ)ᴴ * Tᴴ :=
+                        (CStarAlgebra.nonneg_iff_eq_star_mul_self).2 ⟨Tᴴ, rfl⟩
+                      simpa using hpos
+                    have hS_le : S ≤ 1 :=
+                      fromHToGRecurrenceWeight_le_one params family ℓ
+                        (prependTypeBit g.isSome (gHatTupleType gs))
+                    dsimp [sandTerm, sandLeft]
+                    rw [leftTensor_mul_rightTensor_eq_opTensor]
+                    simpa [sandTerm, sandLeft, T, leftTensor, opTensor] using
+                      fromHToG_opTensor_mono_right_of_nonneg (A := T * Tᴴ) hTT_pos hS_le
+            _ = leftTensor (ι₂ := ι)
+                  (∑ gs : GHatTupleOutcome params n,
+                    let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+                    T * Tᴴ) := by
+                      simp [sandLeft, leftTensor_finset_sum]
+            _ = 1 := by
+                  have hsum :
+                      (∑ gs : GHatTupleOutcome params n,
+                        let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+                        T * Tᴴ) = 1 := by
+                    simpa [gHatSandwichFamily] using
+                      fromHToG_gHatSandwichFamily_sum_eq_one params family n q.2
+                  rw [hsum]
+                  simp [leftTensor]
+        have htail_sq_le_self : ∀ g : GHatOutcome params, tailBlock g * tailBlock g ≤ tailBlock g := by
+          intro g
+          exact MIPStarRE.Quantum.sq_le_self (htail_pos g) (htail_le_one g)
+        have hterm_le : ∀ g : GHatOutcome params,
+            (∑ gs : GHatTupleOutcome params n, C q g gs) *
+                (∑ gs : GHatTupleOutcome params n, C q g gs)ᴴ ≤
+              leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome g) := by
+          intro g
+          let U := (gHatIdxMeas params family q.1).outcome g
+          have hU_herm : (leftTensor (ι₂ := ι) U)ᴴ = leftTensor (ι₂ := ι) U := by
+            simpa [U, leftTensor, opTensor, fromHToG_gHatIdxMeas_outcome_isHermitian params family q.1 g] using
+              (conjTranspose_opTensor U (1 : MIPStarRE.Quantum.Op ι))
+          have hU_pos : 0 ≤ leftTensor (ι₂ := ι) U := by
+            exact leftTensor_nonneg (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome_pos g)
+          have hU_le : leftTensor (ι₂ := ι) U ≤ 1 := by
+            exact leftTensor_le_one (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome_le_one g)
+          calc
+            (∑ gs : GHatTupleOutcome params n, C q g gs) *
+                (∑ gs : GHatTupleOutcome params n, C q g gs)ᴴ
+              = leftTensor (ι₂ := ι) U * (tailBlock g * tailBlock g) * leftTensor (ι₂ := ι) U := by
+                  rw [htail_expand g, Matrix.conjTranspose_mul, hU_herm]
+                  have htail_herm : (tailBlock g)ᴴ = tailBlock g := by
+                    exact (Matrix.nonneg_iff_posSemidef.mp (htail_pos g)).isHermitian.eq
+                  rw [htail_herm]
+                  simp [mul_assoc, U]
+            _ ≤ leftTensor (ι₂ := ι) U * tailBlock g * leftTensor (ι₂ := ι) U := by
+                  exact MIPStarRE.Quantum.sandwich_mono hU_herm (htail_sq_le_self g)
+            _ ≤ leftTensor (ι₂ := ι) U * 1 * leftTensor (ι₂ := ι) U := by
+                  exact MIPStarRE.Quantum.sandwich_mono hU_herm (htail_le_one g)
+            _ ≤ leftTensor (ι₂ := ι) U := by
+                  calc
+                    leftTensor (ι₂ := ι) U * 1 * leftTensor (ι₂ := ι) U
+                      = leftTensor (ι₂ := ι) U * leftTensor (ι₂ := ι) U := by simp
+                    _ ≤ leftTensor (ι₂ := ι) U := by
+                      simpa [leftTensor_mul_leftTensor] using MIPStarRE.Quantum.sq_le_self hU_pos hU_le
+        calc
+          ∑ g : GHatOutcome params,
+              (∑ gs : GHatTupleOutcome params n, C q g gs) *
+                (∑ gs : GHatTupleOutcome params n, C q g gs)ᴴ
+            ≤ ∑ g : GHatOutcome params,
+                leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome g) := by
+                  exact Finset.sum_le_sum (fun g _hg => hterm_le g)
+          _ = leftTensor (ι₂ := ι)
+                (∑ g : GHatOutcome params, (gHatIdxMeas params family q.1).outcome g) := by
+                  rw [← leftTensor_finset_sum (ι₂ := ι) Finset.univ
+                    (fun g : GHatOutcome params => (gHatIdxMeas params family q.1).outcome g)]
+          _ = 1 := by
+                rw [(gHatIdxMeas params family q.1).sum_eq_total]
+                rw [(gHatIdxMeas params family q.1).total_eq_one]
+                simp [leftTensor]
       have hA0M1_cauchySchwarz := MIPStarRE.LDT.Preliminaries.closenessOfIP ψbi hnorm
         (uniformDistribution (Fq params × PointTuple params n))
         (uniformDistribution_weight_sum_le_one (Fq params × PointTuple params n))
