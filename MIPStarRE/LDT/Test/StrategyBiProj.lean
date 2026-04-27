@@ -17,6 +17,9 @@ This module is the first low-risk step of the staged refactor outlined in
 * a forgetful embedding `ProjStrat.toBiProjStrat` reinterprets the current
   same-space strategy as the `ιA = ιB = ι` special case, with projection
   simp lemmas for downstream staged migrations;
+* direct-sum role-payload helpers prepare the later heterogeneous
+  symmetrization target `Role × (ιA ⊕ ιB)` from
+  `inductive_step.tex:40-59`, without retargeting existing consumers;
 * the two-space branch-level failure probability mirrors the paper's
   low-individual-degree test without changing downstream same-space consumers;
 * no downstream consumer (`SymStrat`, `StrategyFailures`, `MainTheorem`) is
@@ -68,6 +71,219 @@ structure BiProjStrat (params : Parameters) [FieldModel params.q]
   diagonalMeasurementB : DiagonalCovariantMeasurement params ιB
 
 namespace BiProjStrat
+
+/-! ### Direct-sum role-payload helpers -/
+
+/-- Direct-sum payload carrier for the future heterogeneous role symmetrization.
+
+For a two-space strategy with Alice carrier `ιA` and Bob carrier `ιB`, the later
+symmetrized local space will use this tagged payload so that Alice's operators
+occupy the `Sum.inl` block and Bob's operators occupy the `Sum.inr` block. -/
+abbrev SymmPayload (ιA ιB : Type*) := Sum ιA ιB
+
+/-- Local carrier planned for the heterogeneous symmetrization bridge: a role bit
+and a direct-sum payload. This is the direct-sum analogue of the current
+same-space target `Role × ι` in `StrategyRole.lean`. -/
+abbrev SymmLocal (ιA ιB : Type*) := Role × SymmPayload ιA ιB
+
+/-- Reassociate role bits and direct-sum payloads.
+
+This is the public heterogeneous analogue of the same-space role-payload
+reassociation used internally by `StrategyRole.lean`. It prepares the target
+shape for reindexing block states on
+`(Role × (ιA ⊕ ιB)) × (Role × (ιA ⊕ ιB))`. -/
+def rolePairPayloadEquiv (ιA ιB : Type*) :
+    ((Role × Role) × (SymmPayload ιA ιB × SymmPayload ιA ιB)) ≃
+      (SymmLocal ιA ιB × SymmLocal ιA ιB) where
+  toFun x := ((x.1.1, x.2.1), (x.1.2, x.2.2))
+  invFun x := ((x.1.1, x.2.1), (x.1.2, x.2.2))
+  left_inv := by
+    intro x
+    rcases x with ⟨⟨rL, rR⟩, ⟨iL, iR⟩⟩
+    rfl
+  right_inv := by
+    intro x
+    rcases x with ⟨⟨rL, iL⟩, ⟨rR, iR⟩⟩
+    rfl
+
+/-- Block-diagonal payload operator on `ιA ⊕ ιB`, with Alice's block in the
+`Sum.inl` sector and Bob's block in the `Sum.inr` sector.
+
+This is the matrix-level direct sum that will underlie symmetrized measurements
+such as
+`|0⟩⟨0| ⊗ A^A + |1⟩⟨1| ⊗ A^B` from
+`references/ldt-paper/inductive_step.tex:55-59`. -/
+noncomputable def payloadBlock {ιA ιB : Type*}
+    (A : MIPStarRE.Quantum.Op ιA) (B : MIPStarRE.Quantum.Op ιB) :
+    MIPStarRE.Quantum.Op (SymmPayload ιA ιB) :=
+  Matrix.fromBlocks A 0 0 B
+
+/-- Embed an Alice-local operator into the Alice payload block of `ιA ⊕ ιB`. -/
+noncomputable def payloadBlockA {ιA ιB : Type*}
+    (A : MIPStarRE.Quantum.Op ιA) : MIPStarRE.Quantum.Op (SymmPayload ιA ιB) :=
+  payloadBlock A 0
+
+/-- Embed a Bob-local operator into the Bob payload block of `ιA ⊕ ιB`. -/
+noncomputable def payloadBlockB {ιA ιB : Type*}
+    (B : MIPStarRE.Quantum.Op ιB) : MIPStarRE.Quantum.Op (SymmPayload ιA ιB) :=
+  payloadBlock 0 B
+
+@[simp] theorem payloadBlock_inl_inl {ιA ιB : Type*}
+    (A : MIPStarRE.Quantum.Op ιA) (B : MIPStarRE.Quantum.Op ιB)
+    (i j : ιA) : payloadBlock A B (Sum.inl i) (Sum.inl j) = A i j :=
+  rfl
+
+@[simp] theorem payloadBlock_inl_inr {ιA ιB : Type*}
+    (A : MIPStarRE.Quantum.Op ιA) (B : MIPStarRE.Quantum.Op ιB)
+    (i : ιA) (j : ιB) : payloadBlock A B (Sum.inl i) (Sum.inr j) = 0 :=
+  rfl
+
+@[simp] theorem payloadBlock_inr_inl {ιA ιB : Type*}
+    (A : MIPStarRE.Quantum.Op ιA) (B : MIPStarRE.Quantum.Op ιB)
+    (i : ιB) (j : ιA) : payloadBlock A B (Sum.inr i) (Sum.inl j) = 0 :=
+  rfl
+
+@[simp] theorem payloadBlock_inr_inr {ιA ιB : Type*}
+    (A : MIPStarRE.Quantum.Op ιA) (B : MIPStarRE.Quantum.Op ιB)
+    (i j : ιB) : payloadBlock A B (Sum.inr i) (Sum.inr j) = B i j :=
+  rfl
+
+@[simp] theorem payloadBlockA_inl_inl {ιA ιB : Type*}
+    (A : MIPStarRE.Quantum.Op ιA) (i j : ιA) :
+    payloadBlockA (ιB := ιB) A (Sum.inl i) (Sum.inl j) = A i j :=
+  rfl
+
+@[simp] theorem payloadBlockA_inl_inr {ιA ιB : Type*}
+    (A : MIPStarRE.Quantum.Op ιA) (i : ιA) (j : ιB) :
+    payloadBlockA (ιB := ιB) A (Sum.inl i) (Sum.inr j) = 0 :=
+  rfl
+
+@[simp] theorem payloadBlockA_inr_inl {ιA ιB : Type*}
+    (A : MIPStarRE.Quantum.Op ιA) (i : ιB) (j : ιA) :
+    payloadBlockA (ιB := ιB) A (Sum.inr i) (Sum.inl j) = 0 :=
+  rfl
+
+@[simp] theorem payloadBlockA_inr_inr {ιA ιB : Type*}
+    (A : MIPStarRE.Quantum.Op ιA) (i j : ιB) :
+    payloadBlockA (ιB := ιB) A (Sum.inr i) (Sum.inr j) = 0 :=
+  rfl
+
+@[simp] theorem payloadBlockB_inl_inl {ιA ιB : Type*}
+    (B : MIPStarRE.Quantum.Op ιB) (i j : ιA) :
+    payloadBlockB (ιA := ιA) B (Sum.inl i) (Sum.inl j) = 0 :=
+  rfl
+
+@[simp] theorem payloadBlockB_inl_inr {ιA ιB : Type*}
+    (B : MIPStarRE.Quantum.Op ιB) (i : ιA) (j : ιB) :
+    payloadBlockB (ιA := ιA) B (Sum.inl i) (Sum.inr j) = 0 :=
+  rfl
+
+@[simp] theorem payloadBlockB_inr_inl {ιA ιB : Type*}
+    (B : MIPStarRE.Quantum.Op ιB) (i : ιB) (j : ιA) :
+    payloadBlockB (ιA := ιA) B (Sum.inr i) (Sum.inl j) = 0 :=
+  rfl
+
+@[simp] theorem payloadBlockB_inr_inr {ιA ιB : Type*}
+    (B : MIPStarRE.Quantum.Op ιB) (i j : ιB) :
+    payloadBlockB (ιA := ιA) B (Sum.inr i) (Sum.inr j) = B i j :=
+  rfl
+
+@[simp] theorem payloadBlock_one {ιA ιB : Type*}
+    [DecidableEq ιA] [DecidableEq ιB] :
+    payloadBlock (1 : MIPStarRE.Quantum.Op ιA) (1 : MIPStarRE.Quantum.Op ιB) = 1 := by
+  simp [payloadBlock]
+
+/-- The trace of a direct-sum payload block is the sum of the block traces.
+
+This is the `Matrix.fromBlocks` specialization of the block-diagonal trace
+calculation needed later for the normalized symmetrized state. -/
+theorem trace_payloadBlock {ιA ιB : Type*} [Fintype ιA] [Fintype ιB]
+    (A : MIPStarRE.Quantum.Op ιA) (B : MIPStarRE.Quantum.Op ιB) :
+    Matrix.trace (payloadBlock A B) = Matrix.trace A + Matrix.trace B := by
+  classical
+  unfold payloadBlock Matrix.trace
+  rw [Fintype.sum_sum_type]
+  simp
+
+/-- Reindexing rows and columns by the same equivalence preserves the matrix trace.
+
+This small generic helper is used below to move between `payload × Role` (the
+native shape of `Matrix.blockDiagonal`) and `Role × payload` (the strategy-local
+carrier shape). -/
+theorem trace_reindex_equiv {α β : Type*} [Fintype α] [Fintype β]
+    (e : α ≃ β) (M : Matrix α α ℂ) :
+    Matrix.trace (Matrix.reindex e e M) = Matrix.trace M := by
+  classical
+  unfold Matrix.trace
+  simp_rw [Matrix.diag_apply, Matrix.reindex_apply]
+  rw [← e.symm.sum_comp (fun i : α => M i i)]
+  rfl
+
+private def roleBlockFamily {ιA ιB : Type*}
+    (A B : MIPStarRE.Quantum.Op (SymmPayload ιA ιB)) :
+    Role → MIPStarRE.Quantum.Op (SymmPayload ιA ιB)
+  | Role.A => A
+  | Role.B => B
+
+/-- Role-blocked operator on `Role × (ιA ⊕ ιB)`.
+
+The first block is used when the role register is `Role.A`; the second block is
+used when the role register is `Role.B`. This is the direct-sum scaffold for the
+paper's symmetrized measurements in `inductive_step.tex:55-59`. -/
+noncomputable def roleBlock {ιA ιB : Type*}
+    (A B : MIPStarRE.Quantum.Op (SymmPayload ιA ιB)) :
+    MIPStarRE.Quantum.Op (SymmLocal ιA ιB) :=
+  Matrix.reindex (Equiv.prodComm (SymmPayload ιA ιB) Role)
+    (Equiv.prodComm (SymmPayload ιA ιB) Role)
+    (Matrix.blockDiagonal (roleBlockFamily A B))
+
+@[simp] theorem roleBlock_A {ιA ιB : Type*}
+    (A B : MIPStarRE.Quantum.Op (SymmPayload ιA ιB))
+    (i j : SymmPayload ιA ιB) :
+    roleBlock A B (Role.A, i) (Role.A, j) = A i j :=
+  rfl
+
+@[simp] theorem roleBlock_B {ιA ιB : Type*}
+    (A B : MIPStarRE.Quantum.Op (SymmPayload ιA ιB))
+    (i j : SymmPayload ιA ιB) :
+    roleBlock A B (Role.B, i) (Role.B, j) = B i j :=
+  rfl
+
+@[simp] theorem roleBlock_AB {ιA ιB : Type*}
+    (A B : MIPStarRE.Quantum.Op (SymmPayload ιA ιB))
+    (i j : SymmPayload ιA ιB) :
+    roleBlock A B (Role.A, i) (Role.B, j) = 0 :=
+  rfl
+
+@[simp] theorem roleBlock_BA {ιA ιB : Type*}
+    (A B : MIPStarRE.Quantum.Op (SymmPayload ιA ιB))
+    (i j : SymmPayload ιA ιB) :
+    roleBlock A B (Role.B, i) (Role.A, j) = 0 :=
+  rfl
+
+@[simp] theorem roleBlock_one {ιA ιB : Type*}
+    [DecidableEq ιA] [DecidableEq ιB] :
+    roleBlock (1 : MIPStarRE.Quantum.Op (SymmPayload ιA ιB)) 1 = 1 := by
+  ext x y
+  rcases x with ⟨rx, ix⟩
+  rcases y with ⟨ry, iy⟩
+  cases rx <;> cases ry <;> simp [Matrix.one_apply]
+
+/-- The trace of a role-blocked operator is the sum of its two role-sector
+traces. This wraps Mathlib's `Matrix.trace_blockDiagonal` across the
+`Role × payload`/`payload × Role` reindexing used by `roleBlock`. -/
+theorem trace_roleBlock {ιA ιB : Type*} [Fintype ιA] [Fintype ιB]
+    (A B : MIPStarRE.Quantum.Op (SymmPayload ιA ιB)) :
+    Matrix.trace (roleBlock A B) = Matrix.trace A + Matrix.trace B := by
+  classical
+  unfold roleBlock
+  rw [trace_reindex_equiv]
+  rw [Matrix.trace_blockDiagonal]
+  have hRole : (Finset.univ : Finset Role) = {Role.A, Role.B} := by
+    ext r
+    cases r <;> simp
+  rw [hRole]
+  simp [roleBlockFamily]
 
 variable {params : Parameters} [FieldModel params.q]
 variable {ιA : Type*} [Fintype ιA] [DecidableEq ιA]
