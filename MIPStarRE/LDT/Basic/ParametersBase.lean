@@ -296,13 +296,13 @@ def encodeScalar {params : Parameters} [FieldModel params.q] (x : Scalar params)
   simp [encodeScalar, decodeScalar]
 
 /-- Decoding from the coded `Fin q` carrier into the chosen scalar field is injective. -/
-theorem decodeScalarInjective {params : Parameters} [FieldModel params.q] :
+theorem decodeScalar_injective {params : Parameters} [FieldModel params.q] :
     Function.Injective (decodeScalar (params := params)) := by
   intro x y hxy
   simpa using congrArg encodeScalar hxy
 
 /-- Encoding scalar-field elements back to the coded `Fin q` carrier is injective. -/
-theorem encodeScalarInjective {params : Parameters} [FieldModel params.q] :
+theorem encodeScalar_injective {params : Parameters} [FieldModel params.q] :
     Function.Injective (encodeScalar (params := params)) := by
   intro x y hxy
   simpa using congrArg decodeScalar hxy
