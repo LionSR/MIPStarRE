@@ -983,7 +983,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\]
 	where
 	\[
-		\nu_8 = 46km\left(\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}\right).
+		\nu_8 = 46k^2m\left(\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}\right).
 	\]
 \end{lemma}
 \begin{proof}
@@ -1025,9 +1025,12 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\[
 		k(2\sqrt{2\zeta}+2\sqrt{\nu_4})
 		\le
-		46km\left(\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}\right)
+		46k^2m\left(\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}\right)
 		= \nu_8.
 	\]
+	This corrects the displayed arithmetic in the paper: the iterated adjacent
+	estimate contributes $k$ copies of the $2\sqrt{\nu_4}$ term, and the
+	definition of $\nu_4$ already contains a factor $k^2$.
 
 	To prove \ref{eq:i-think-this-is-what-i'm-supposed-to-prove}, define for each $1\le \ell \le k+1$ and each tail type $\tau_{\ge \ell}$,
 	\begin{equation}\label{eq:S-def}

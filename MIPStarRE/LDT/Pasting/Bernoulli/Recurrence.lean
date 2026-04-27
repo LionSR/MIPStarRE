@@ -2,8 +2,10 @@ import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Order
 import Mathlib.Analysis.Matrix.HermitianFunctionalCalculus
 import Mathlib.Data.Nat.Choose.Sum
 import MIPStarRE.LDT.Pasting.Statements
+import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich.Setup
 import MIPStarRE.LDT.Pasting.Bernoulli.Scalar
 import MIPStarRE.LDT.Pasting.Bernoulli.TruncatedSums
+import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
 /-!
 # Section 12 pasting: Bernoulli recurrence bridge
@@ -71,6 +73,45 @@ theorem fromHToGRecurrenceWeight_le_one
     {tailLen : ℕ} (τtail : GHatType tailLen) :
     fromHToGRecurrenceWeight params family prefixLen τtail ≤ 1 :=
   (fromHToGRecurrenceWeight_recurrence params family prefixLen τtail).2.2.1
+
+/-- A recurrence weight is a positive contraction, so its square is bounded by
+itself.  This is the local boundedness fact used when normalizing the right
+context in the first self-consistency move. -/
+private lemma fromHToGRecurrenceWeight_sq_le_self
+    (params : Parameters)
+    [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (prefixLen : ℕ)
+    {tailLen : ℕ} (τtail : GHatType tailLen) :
+    fromHToGRecurrenceWeight params family prefixLen τtail *
+        fromHToGRecurrenceWeight params family prefixLen τtail ≤
+      fromHToGRecurrenceWeight params family prefixLen τtail := by
+  exact MIPStarRE.Quantum.sq_le_self
+    (fromHToGRecurrenceWeight_nonneg params family prefixLen τtail)
+    (fromHToGRecurrenceWeight_le_one params family prefixLen τtail)
+
+/-- `fromHToGRecurrenceWeight` commutes with the averaged complete operator `G`. -/
+private lemma fromHToGRecurrenceWeight_commute_base
+    (params : Parameters)
+    [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (prefixLen : ℕ)
+    {tailLen : ℕ} (τtail : GHatType tailLen) :
+    Commute (fromHToGRecurrenceWeight params family prefixLen τtail)
+      family.averagedSubMeas.total := by
+  exact truncatedTypeSums_commute_base family.averagedSubMeas.total params.d prefixLen τtail
+
+/-- `fromHToGRecurrenceWeight` commutes with `I - G`. -/
+private lemma fromHToGRecurrenceWeight_commute_one_sub_base
+    (params : Parameters)
+    [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (prefixLen : ℕ)
+    {tailLen : ℕ} (τtail : GHatType tailLen) :
+    Commute (fromHToGRecurrenceWeight params family prefixLen τtail)
+      (1 - family.averagedSubMeas.total) := by
+  exact truncatedTypeSums_commute_one_sub_base
+    family.averagedSubMeas.total params.d prefixLen τtail
 
 /-- One-step recurrence for `fromHToGRecurrenceWeight`: adding a new prefix bit
 splits the weight into the `τ_ℓ = 1` and `τ_ℓ = 0` branches, each multiplied by
@@ -317,14 +358,14 @@ private lemma fromHToGStageMass_terminal_eq
         bernoulliTailOperator k params.d family.averagedSubMeas.total :=
     fromHToG_truncatedTypeSums_full_eq_bernoulliTailOperator
       family.averagedSubMeas.total params.d k
-  simp only [fromHToGStageMass, fromHToGTailStageMass, IdxOpFamily.liftLeft,
-    OpFamily.leftPlacedOpFamily, fromHToGTailStageFamily, fromHToGRecurrenceWeight,
-    fromHToGBernoulliTailMass, subMeasMass, IdxSubMeas.liftLeft,
-    bernoulliTailFromFamily, constSubMeasFamily, mkLeftPlacedSubMeas_total]
+  simp only [fromHToGStageMass, fromHToGTailStageMass,
+    fromHToGTailStageFamily, fromHToGRecurrenceWeight,
+    fromHToGBernoulliTailMass, subMeasMass, IdxSubMeas.liftRight,
+    bernoulliTailFromFamily, constSubMeasFamily, mkRightPlacedSubMeas_total]
   rw [Nat.sub_self]
   simp only [Finset.univ_unique, fromHToG_averagedSandwichByTypeSubMeas_zero_total_eq_one,
-    one_mul, Finset.sum_singleton]
-  exact congrArg (fun A : MIPStarRE.Quantum.Op ι => ev ψbi (leftTensor (ι₂ := ι) A)) hweight
+    leftTensor_one, one_mul, Finset.sum_singleton]
+  exact congrArg (fun A : MIPStarRE.Quantum.Op ι => ev ψbi (rightTensor (ι₁ := ι) A)) hweight
 
 /-- At prefix length zero, the recurrence weight is exactly the eligibility
 indicator for the remaining type: the empty prefix contributes the identity when
@@ -334,6 +375,336 @@ private lemma fromHToG_truncatedTypeSums_zero_eq_indicator
     truncatedTypeSums G d 0 τtail =
       if d + 1 ≤ gHatTypeWeight τtail then 1 else 0 := by
   simp [truncatedTypeSums, gHatTypeOperator, gHatTypeWeight]
+
+/-- Tensor placement collapses to the left factor when the right recurrence weight
+is the stage-`0` eligibility indicator. -/
+private lemma fromHToG_leftTensor_mul_rightTensor_indicator
+    (A : MIPStarRE.Quantum.Op ι) (p : Prop) [Decidable p] :
+    leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι)
+        (if p then 1 else 0 : MIPStarRE.Quantum.Op ι) =
+      leftTensor (ι₂ := ι) (if p then A else 0) := by
+  by_cases hp : p <;> simp [hp, leftTensor, rightTensor]
+
+/-- Right tensor placement distributes over addition. -/
+private lemma fromHToG_rightTensor_add (A B : MIPStarRE.Quantum.Op ι) :
+    rightTensor (ι₁ := ι) (A + B) = rightTensor (ι₁ := ι) A + rightTensor (ι₁ := ι) B := by
+  simpa [Fintype.sum_bool] using
+    (rightTensor_finset_sum (ι₁ := ι) (Finset.univ : Finset Bool)
+      (fun b : Bool => if b then A else B)).symm
+
+/-- An outcome of a projective submeasurement is unchanged by multiplying by the
+total mass on the right. -/
+private lemma fromHToG_projSubMeas_outcome_mul_total_eq_outcome {α : Type*} [Fintype α]
+    (A : ProjSubMeas α ι) (a : α) :
+    A.outcome a * A.total = A.outcome a := by
+  let P := A.outcome a
+  let R := (1 : MIPStarRE.Quantum.Op ι) - A.total
+  have hP_herm : Pᴴ = P := by
+    simpa [P] using A.outcome_hermitian a
+  have hR_nonneg : 0 ≤ R := by
+    simpa [R] using sub_nonneg.mpr A.total_le_one
+  have hR_le_self : R ≤ 1 - P := by
+    simpa [R, P] using sub_le_sub_left (A.outcome_le_total a) (1 : MIPStarRE.Quantum.Op ι)
+  have hPRP_nonneg : 0 ≤ P * R * P := by
+    exact MIPStarRE.Quantum.sandwich_nonneg hR_nonneg hP_herm
+  have hP_one_sub_P : P * (1 - P) * P = 0 := by
+    calc
+      P * (1 - P) * P = (P * 1 - P * P) * P := by rw [mul_sub]
+      _ = 0 := by simp [P, A.proj a]
+  have hPRP_eq_zero : P * R * P = 0 := by
+    apply le_antisymm
+    · calc
+        P * R * P ≤ P * (1 - P) * P := by
+          exact MIPStarRE.Quantum.sandwich_mono hP_herm hR_le_self
+        _ = 0 := hP_one_sub_P
+    · simpa using hPRP_nonneg
+  have hA_total_herm : A.totalᴴ = A.total := by
+    exact (Matrix.nonneg_iff_posSemidef.mp A.total_nonneg).isHermitian.eq
+  have hR_herm : Rᴴ = R := by
+    simp [R, hA_total_herm]
+  have hR_sq_le : R * R ≤ R := by
+    have hR_le_one : R ≤ 1 := by
+      simpa [R] using sub_le_self (1 : MIPStarRE.Quantum.Op ι) A.total_nonneg
+    exact MIPStarRE.Quantum.sq_le_self hR_nonneg hR_le_one
+  have hRP_conj_mul : (R * P)ᴴ * (R * P) = P * (R * R) * P := by
+    calc
+      (R * P)ᴴ * (R * P) = (Pᴴ * Rᴴ) * (R * P) := by simp [Matrix.conjTranspose_mul]
+      _ = P * (R * R) * P := by simp [hP_herm, hR_herm, mul_assoc]
+  have hRP_eq_zero : R * P = 0 := by
+    apply Matrix.conjTranspose_mul_self_eq_zero.mp
+    rw [hRP_conj_mul]
+    apply le_antisymm
+    · calc
+        P * (R * R) * P ≤ P * R * P := by
+          exact MIPStarRE.Quantum.sandwich_mono hP_herm hR_sq_le
+        _ = 0 := hPRP_eq_zero
+    · have hnonneg : 0 ≤ P * (R * R) * P := by
+        exact MIPStarRE.Quantum.sandwich_nonneg
+          (show 0 ≤ R * R by
+            exact Commute.mul_nonneg hR_nonneg hR_nonneg (Commute.refl R))
+          hP_herm
+      simpa using hnonneg
+  calc
+    A.outcome a * A.total = P * (1 - R) := by simp [P, R, sub_eq_add_neg, add_comm, add_left_comm]
+    _ = P - P * R := by rw [mul_sub, mul_one]
+    _ = P := by
+          have : P * R = 0 := by
+            simpa [hP_herm, hR_herm] using congrArg Matrix.conjTranspose hRP_eq_zero
+          simp [this]
+    _ = A.outcome a := by rfl
+
+/-- The total of a projective submeasurement is idempotent. -/
+private lemma fromHToG_projSubMeas_total_proj {α : Type*} [Fintype α]
+    (A : ProjSubMeas α ι) :
+    A.total * A.total = A.total := by
+  calc
+    A.total * A.total = (∑ a : α, A.outcome a) * A.total := by rw [A.sum_eq_total]
+    _ = ∑ a : α, A.outcome a * A.total := by rw [Matrix.sum_mul]
+    _ = ∑ a : α, A.outcome a := by
+          refine Finset.sum_congr rfl ?_
+          intro a _ha
+          exact fromHToG_projSubMeas_outcome_mul_total_eq_outcome A a
+    _ = A.total := A.sum_eq_total
+
+/-- Each completed `\widehat G` outcome is projective. -/
+private lemma fromHToG_gHatIdxMeas_proj
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (x : Fq params) (g : GHatOutcome params) :
+    (gHatIdxMeas params family x).outcome g * (gHatIdxMeas params family x).outcome g =
+      (gHatIdxMeas params family x).outcome g := by
+  cases g with
+  | none =>
+      let T := (family.meas x).total
+      change (1 - T) * (1 - T) = 1 - T
+      have hTT : T * T = T := by
+        simpa [T] using fromHToG_projSubMeas_total_proj (family.meas x)
+      calc
+        (1 - T) * (1 - T) = 1 - T - T + T * T := by
+          noncomm_ring
+        _ = 1 - T := by
+          rw [hTT]
+          abel
+  | some p =>
+      simp [gHatIdxMeas, completeSubMeas, (family.meas x).proj p]
+
+/-- Summing completed outcomes with `isSome = true` gives the complete branch. -/
+private lemma fromHToG_gHatIdxMeas_sum_isSome_true
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (x : Fq params) :
+    (∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = true,
+        (gHatIdxMeas params family x).outcome g) =
+      (completePartSubMeas params family x).total := by
+  classical
+  have hfilter :
+      ((Finset.univ : Finset (GHatOutcome params)).filter fun g => g.isSome = true) =
+        (Finset.univ.image (fun p : Polynomial params => (some p : GHatOutcome params))) := by
+    ext g
+    cases g <;> simp
+  calc
+    (∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = true,
+        (gHatIdxMeas params family x).outcome g)
+        = ∑ g ∈ ((Finset.univ : Finset (GHatOutcome params)).filter fun g =>
+            g.isSome = true), (gHatIdxMeas params family x).outcome g := by
+            rfl
+    _ = ∑ g ∈ (Finset.univ.image fun p : Polynomial params =>
+            (some p : GHatOutcome params)), (gHatIdxMeas params family x).outcome g := by
+          rw [hfilter]
+    _ = ∑ p : Polynomial params, (gHatIdxMeas params family x).outcome (some p) := by
+          rw [Finset.sum_image]
+          intro a _ha b _hb h
+          cases h
+          rfl
+    _ = ∑ p : Polynomial params, (family.meas x).outcome p := by
+          simp [gHatIdxMeas, completeSubMeas]
+    _ = (completePartSubMeas params family x).total := by
+          simp [completePartSubMeas, postprocess_total, (family.meas x).sum_eq_total]
+
+/-- Summing completed outcomes with `isSome = false` gives the incomplete branch. -/
+private lemma fromHToG_gHatIdxMeas_sum_isSome_false
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (x : Fq params) :
+    (∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = false,
+        (gHatIdxMeas params family x).outcome g) =
+      (incompletePartSubMeas params family x).total := by
+  classical
+  have hfilter :
+      ((Finset.univ : Finset (GHatOutcome params)).filter fun g => g.isSome = false) =
+        ({none} : Finset (GHatOutcome params)) := by
+    ext g
+    cases g <;> simp
+  calc
+    (∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = false,
+        (gHatIdxMeas params family x).outcome g)
+        = ∑ g ∈ ((Finset.univ : Finset (GHatOutcome params)).filter fun g =>
+            g.isSome = false), (gHatIdxMeas params family x).outcome g := by
+            rfl
+    _ = (gHatIdxMeas params family x).outcome none := by
+          rw [hfilter]
+          simp
+    _ = (incompletePartSubMeas params family x).total := by
+          simp [gHatIdxMeas, completeSubMeas, incompletePartSubMeas, completePartSubMeas,
+            postprocess_total]
+
+/-- Weighted complete-branch sum after using completed-outcome projectivity. -/
+private lemma fromHToG_gHatIdxMeas_sum_isSome_true_weight
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (x : Fq params) (S : MIPStarRE.Quantum.Op ι) :
+    (∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = true,
+        S * (gHatIdxMeas params family x).outcome g *
+          (gHatIdxMeas params family x).outcome g) =
+      S * (completePartSubMeas params family x).total := by
+  classical
+  calc
+    (∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = true,
+        S * (gHatIdxMeas params family x).outcome g *
+          (gHatIdxMeas params family x).outcome g)
+      = ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = true,
+          S * (gHatIdxMeas params family x).outcome g := by
+          refine Finset.sum_congr rfl ?_
+          intro g hg
+          rw [mul_assoc, fromHToG_gHatIdxMeas_proj params family x g]
+    _ = S * (∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = true,
+          (gHatIdxMeas params family x).outcome g) := by
+          rw [Finset.mul_sum]
+    _ = S * (completePartSubMeas params family x).total := by
+          rw [fromHToG_gHatIdxMeas_sum_isSome_true]
+
+/-- Weighted incomplete-branch sum after using completed-outcome projectivity. -/
+private lemma fromHToG_gHatIdxMeas_sum_isSome_false_weight
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (x : Fq params) (S : MIPStarRE.Quantum.Op ι) :
+    (∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = false,
+        S * (gHatIdxMeas params family x).outcome g *
+          (gHatIdxMeas params family x).outcome g) =
+      S * (incompletePartSubMeas params family x).total := by
+  classical
+  calc
+    (∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = false,
+        S * (gHatIdxMeas params family x).outcome g *
+          (gHatIdxMeas params family x).outcome g)
+      = ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = false,
+          S * (gHatIdxMeas params family x).outcome g := by
+          refine Finset.sum_congr rfl ?_
+          intro g hg
+          rw [mul_assoc, fromHToG_gHatIdxMeas_proj params family x g]
+    _ = S * (∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = false,
+          (gHatIdxMeas params family x).outcome g) := by
+          rw [Finset.mul_sum]
+    _ = S * (incompletePartSubMeas params family x).total := by
+          rw [fromHToG_gHatIdxMeas_sum_isSome_false]
+
+/-- Expectation-level weighted complete-branch sum. -/
+private lemma fromHToG_ev_sum_isSome_true_weight
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (x : Fq params)
+    (A S : MIPStarRE.Quantum.Op ι) :
+    (∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = true,
+        ev ψbi (leftTensor (ι₂ := ι) A *
+          rightTensor (ι₁ := ι)
+            (S * (gHatIdxMeas params family x).outcome g *
+              (gHatIdxMeas params family x).outcome g))) =
+      ev ψbi (leftTensor (ι₂ := ι) A *
+        rightTensor (ι₁ := ι) (S * (completePartSubMeas params family x).total)) := by
+  classical
+  rw [← ev_finset_sum]
+  congr 1
+  calc
+    (∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = true,
+        leftTensor (ι₂ := ι) A *
+          rightTensor (ι₁ := ι)
+            (S * (gHatIdxMeas params family x).outcome g *
+              (gHatIdxMeas params family x).outcome g))
+      = leftTensor (ι₂ := ι) A *
+          (∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = true,
+            rightTensor (ι₁ := ι)
+              (S * (gHatIdxMeas params family x).outcome g *
+                (gHatIdxMeas params family x).outcome g)) := by
+          rw [Finset.mul_sum]
+    _ = leftTensor (ι₂ := ι) A *
+          rightTensor (ι₁ := ι)
+            (∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = true,
+              S * (gHatIdxMeas params family x).outcome g *
+                (gHatIdxMeas params family x).outcome g) := by
+          rw [rightTensor_finset_sum]
+    _ = leftTensor (ι₂ := ι) A *
+          rightTensor (ι₁ := ι) (S * (completePartSubMeas params family x).total) := by
+          rw [fromHToG_gHatIdxMeas_sum_isSome_true_weight]
+
+/-- Expectation-level weighted incomplete-branch sum. -/
+private lemma fromHToG_ev_sum_isSome_false_weight
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (x : Fq params)
+    (A S : MIPStarRE.Quantum.Op ι) :
+    (∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = false,
+        ev ψbi (leftTensor (ι₂ := ι) A *
+          rightTensor (ι₁ := ι)
+            (S * (gHatIdxMeas params family x).outcome g *
+              (gHatIdxMeas params family x).outcome g))) =
+      ev ψbi (leftTensor (ι₂ := ι) A *
+        rightTensor (ι₁ := ι) (S * (incompletePartSubMeas params family x).total)) := by
+  classical
+  rw [← ev_finset_sum]
+  congr 1
+  calc
+    (∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = false,
+        leftTensor (ι₂ := ι) A *
+          rightTensor (ι₁ := ι)
+            (S * (gHatIdxMeas params family x).outcome g *
+              (gHatIdxMeas params family x).outcome g))
+      = leftTensor (ι₂ := ι) A *
+          (∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = false,
+            rightTensor (ι₁ := ι)
+              (S * (gHatIdxMeas params family x).outcome g *
+                (gHatIdxMeas params family x).outcome g)) := by
+          rw [Finset.mul_sum]
+    _ = leftTensor (ι₂ := ι) A *
+          rightTensor (ι₁ := ι)
+            (∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = false,
+              S * (gHatIdxMeas params family x).outcome g *
+                (gHatIdxMeas params family x).outcome g) := by
+          rw [rightTensor_finset_sum]
+    _ = leftTensor (ι₂ := ι) A *
+          rightTensor (ι₁ := ι) (S * (incompletePartSubMeas params family x).total) := by
+          rw [fromHToG_gHatIdxMeas_sum_isSome_false_weight]
+
+/-- Collapse the head outcome sum in `M₄` for fixed tail point and type. -/
+private lemma fromHToGAdjacentStageM4_head_sum
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (ℓ n : ℕ)
+    (b : Bool) (τ : GHatType n) (x : Fq params) (xs : PointTuple params n) :
+    (∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+        ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+            gHatTupleType gs = τ,
+          let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+          let U := (gHatIdxMeas params family x).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n xs gs
+          ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ) *
+            rightTensor (ι₁ := ι) (S * U * U))) =
+      ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+          gHatTupleType gs = τ,
+        let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+        let T := gHatHalfProductOutcomeOperator params family n xs gs
+        let B := if b then (completePartSubMeas params family x).total
+          else (incompletePartSubMeas params family x).total
+        ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) (S * B)) := by
+  classical
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl ?_
+  intro gs _hgs
+  cases b
+  · simpa using
+      (fromHToG_ev_sum_isSome_false_weight params ψbi family x
+        (gHatHalfProductOutcomeOperator params family n xs gs *
+          (gHatHalfProductOutcomeOperator params family n xs gs)ᴴ)
+        (fromHToGRecurrenceWeight params family ℓ (prependTypeBit false τ)))
+  · simpa using
+      (fromHToG_ev_sum_isSome_true_weight params ψbi family x
+        (gHatHalfProductOutcomeOperator params family n xs gs *
+          (gHatHalfProductOutcomeOperator params family n xs gs)ᴴ)
+        (fromHToGRecurrenceWeight params family ℓ (prependTypeBit true τ)))
 
 /-- Membership in `outcomesByType τ` is the same as having tuple type `τ`. -/
 private lemma fromHToG_outcomesByType_iff_type_eq
@@ -436,6 +807,73 @@ private lemma fromHToG_averagedSandwichByType_total_eq_type_sum
   congr 1
   simp [restrictSubMeas, postprocess, fromHToG_outcomesByType_iff_type_eq]
 
+/-- Fold the tail point/outcome average of a fixed type into
+`averagedSandwichByTypeSubMeas`. -/
+private lemma fromHToG_avgOver_tail_type_ev
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (n : ℕ) (τ : GHatType n)
+    (B : MIPStarRE.Quantum.Op ι) :
+    avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+      ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+          gHatTupleType gs = τ,
+        let T := gHatHalfProductOutcomeOperator params family n xs gs
+        ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) B)) =
+      ev ψbi (leftTensor (ι₂ := ι)
+        (averagedSandwichByTypeSubMeas params family n τ).total *
+          rightTensor (ι₁ := ι) B) := by
+  classical
+  rw [fromHToG_averagedSandwichByType_total_eq_type_sum params family n τ]
+  simp [avgOver, gHatSandwichFamily, ev_finset_sum, ev_real_smul,
+    ← leftTensor_finset_sum, leftTensor_mul_rightTensor_real_smul_left,
+    Finset.sum_mul]
+
+/-- Fold a head-point scalar average into an operator average on the right tensor
+factor, with a fixed left factor and fixed left multiplier `S` on the right
+register. -/
+private lemma fromHToG_avgOver_head_ev
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (A S : MIPStarRE.Quantum.Op ι) (F : Fq params → MIPStarRE.Quantum.Op ι) :
+    avgOver (uniformDistribution (Fq params)) (fun x =>
+      ev ψbi (leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) (S * F x))) =
+      ev ψbi (leftTensor (ι₂ := ι) A *
+        rightTensor (ι₁ := ι)
+          (S * averageOperatorOverDistribution (uniformDistribution (Fq params)) F)) := by
+  classical
+  unfold avgOver averageOperatorOverDistribution
+  simp [ev_finset_sum, ev_real_smul, ← rightTensor_finset_sum,
+    leftTensor_mul_rightTensor_real_smul_right, Matrix.mul_sum]
+
+/-- Fold the complete/incomplete head branch average into the stored exact branch
+averages. -/
+private lemma fromHToG_avgOver_head_branch_ev
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (hcomplete : averageOperatorOverDistribution (uniformDistribution (Fq params))
+      (fun x => (completePartSubMeas params family x).total) =
+        family.averagedSubMeas.total)
+    (hincomplete : averageOperatorOverDistribution (uniformDistribution (Fq params))
+      (fun x => (incompletePartSubMeas params family x).total) =
+        1 - family.averagedSubMeas.total)
+    (b : Bool) (A S : MIPStarRE.Quantum.Op ι) :
+    avgOver (uniformDistribution (Fq params)) (fun x =>
+      let B := if b then (completePartSubMeas params family x).total
+        else (incompletePartSubMeas params family x).total
+      ev ψbi (leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) (S * B))) =
+      ev ψbi (leftTensor (ι₂ := ι) A *
+        rightTensor (ι₁ := ι)
+          (S * if b then family.averagedSubMeas.total
+            else 1 - family.averagedSubMeas.total)) := by
+  cases b
+  · rw [fromHToG_avgOver_head_ev]
+    simp only [Bool.false_eq_true, if_false]
+    rw [hincomplete]
+  · rw [fromHToG_avgOver_head_ev]
+    simp only [if_true]
+    rw [hcomplete]
+
 /-- The eligible averaged sandwich total is the sum of the eligible exact-type
 averaged totals.  This is the exact stage-`0` bookkeeping identity used in
 `lem:from-H-to-G`. -/
@@ -519,24 +957,34 @@ private lemma fromHToGStageMass_zero_eq
   classical
   have htotal := fromHToG_averagedEligibleSandwich_total_eq_type_sum params family k
   unfold fromHToGStageMass fromHToGTailStageMass fromHToGAllOutcomesMass subMeasMass
-  simp only [Nat.sub_zero, IdxOpFamily.liftLeft, OpFamily.leftPlacedOpFamily,
+  simp only [Nat.sub_zero,
     fromHToGTailStageFamily, fromHToGRecurrenceWeight, IdxSubMeas.liftLeft,
     allOutcomesExpansionFamily, pastedMeasurementTotal, constSubMeasFamily,
     mkLeftPlacedSubMeas_total]
   change (∑ τ : GHatType k,
       ev ψbi (leftTensor (ι₂ := ι)
-        ((averagedSandwichByTypeSubMeas params family k τ).total *
-          truncatedTypeSums family.averagedSubMeas.total params.d 0 τ))) =
+        (averagedSandwichByTypeSubMeas params family k τ).total *
+          rightTensor (ι₁ := ι)
+            (truncatedTypeSums family.averagedSubMeas.total params.d 0 τ))) =
     ev ψbi (leftTensor (ι₂ := ι) (averagedEligibleSandwichSubMeas params family k).total)
   rw [htotal]
   simp only [fromHToG_truncatedTypeSums_zero_eq_indicator]
-  simp only [mul_ite, mul_one, mul_zero]
   calc
     (∑ τ : GHatType k,
         ev ψbi (leftTensor (ι₂ := ι)
+          (averagedSandwichByTypeSubMeas params family k τ).total *
+            rightTensor (ι₁ := ι)
+              (if params.d + 1 ≤ gHatTypeWeight τ then 1 else 0 :
+                MIPStarRE.Quantum.Op ι)))
+      = ∑ τ : GHatType k,
+        ev ψbi (leftTensor (ι₂ := ι)
           (if params.d + 1 ≤ gHatTypeWeight τ then
             (averagedSandwichByTypeSubMeas params family k τ).total
-          else 0)))
+          else 0)) := by
+          refine Finset.sum_congr rfl ?_
+          intro τ _
+          rw [fromHToG_leftTensor_mul_rightTensor_indicator]
+    _
       = ev ψbi (∑ τ : GHatType k,
           leftTensor (ι₂ := ι)
             (if params.d + 1 ≤ gHatTypeWeight τ then
@@ -574,14 +1022,47 @@ private lemma fromHToGTailStageMass_succ_weight_recurrence
     (prefixLen : ℕ) {tailLen : ℕ} (τtail : GHatType tailLen) :
     fromHToGTailStageMass params ψbi family (prefixLen + 1) τtail =
       ev ψbi (leftTensor (ι₂ := ι)
-        ((averagedSandwichByTypeSubMeas params family tailLen τtail).total *
+        (averagedSandwichByTypeSubMeas params family tailLen τtail).total *
+          rightTensor (ι₁ := ι)
           (fromHToGRecurrenceWeight params family prefixLen
               (prependTypeBit true τtail) * family.averagedSubMeas.total +
             fromHToGRecurrenceWeight params family prefixLen
-              (prependTypeBit false τtail) * (1 - family.averagedSubMeas.total)))) := by
+              (prependTypeBit false τtail) * (1 - family.averagedSubMeas.total))) := by
   unfold fromHToGTailStageMass fromHToGTailStageFamily
-  simp only [IdxOpFamily.liftLeft, OpFamily.leftPlacedOpFamily]
   rw [fromHToGRecurrenceWeight_succ]
+
+/-- Split a nonterminal `fromHToG` stage by the next Boolean tail bit. -/
+private lemma fromHToGStageMass_split_succ
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    {k ℓ : ℕ} (hℓ : ℓ < k) :
+    fromHToGStageMass params ψbi family k ℓ =
+      ∑ p : Bool × GHatType (k - (ℓ + 1)),
+        fromHToGTailStageMass params ψbi family ℓ (prependTypeBit p.1 p.2) := by
+  classical
+  unfold fromHToGStageMass
+  have hsub : k - ℓ = (k - (ℓ + 1)) + 1 := by omega
+  rw [hsub]
+  let n := k - (ℓ + 1)
+  change (∑ τtail : GHatType (n + 1),
+      fromHToGTailStageMass params ψbi family ℓ τtail) =
+    ∑ p : Bool × GHatType n,
+      fromHToGTailStageMass params ψbi family ℓ (prependTypeBit p.1 p.2)
+  exact Fintype.sum_equiv
+    ((Fin.consEquiv (fun _ : Fin (n + 1) => Bool)).symm)
+    (fun τtail : GHatType (n + 1) =>
+      fromHToGTailStageMass params ψbi family ℓ τtail)
+    (fun p : Bool × GHatType n =>
+      fromHToGTailStageMass params ψbi family ℓ (prependTypeBit p.1 p.2))
+    (by
+      intro τtail
+      congr 1
+      funext i
+      cases i using Fin.cases with
+      | zero => rfl
+      | succ j => rfl)
 
 /-- Telescoping for a scalar chain indexed by natural numbers.
 
@@ -687,11 +1168,12 @@ private structure FromHToGAdjacentStageExactFacts
     ∀ (prefixLen : ℕ) {tailLen : ℕ} (τtail : GHatType tailLen),
       fromHToGTailStageMass params ψbi family (prefixLen + 1) τtail =
         ev ψbi (leftTensor (ι₂ := ι)
-          ((averagedSandwichByTypeSubMeas params family tailLen τtail).total *
+          (averagedSandwichByTypeSubMeas params family tailLen τtail).total *
+            rightTensor (ι₁ := ι)
             (fromHToGRecurrenceWeight params family prefixLen
                 (prependTypeBit true τtail) * family.averagedSubMeas.total +
               fromHToGRecurrenceWeight params family prefixLen
-                (prependTypeBit false τtail) * (1 - family.averagedSubMeas.total))))
+                (prependTypeBit false τtail) * (1 - family.averagedSubMeas.total)))
 
 /-- Package the exact `S`-recurrence bookkeeping facts already proved in this
 file. -/
@@ -895,57 +1377,47 @@ private lemma fromHToGPaperTotalError_le
       2 * Real.sqrt (commuteGHalfSandwichError params gamma zeta k) ≤
         42 * (k : Error) * (params.m : Error) * thirtysecondSum := by
     nlinarith [hcomm_sqrt]
+  by_cases hk0 : k = 0
+  · subst k
+    simp [fromHToGPaperTotalError, fromHToGRecurrenceError, fromHToGError]
+  have hk_ge_one_nat : 1 ≤ k := Nat.succ_le_of_lt (Nat.pos_of_ne_zero hk0)
+  have hk_ge_one : (1 : Error) ≤ (k : Error) := by exact_mod_cast hk_ge_one_nat
+  have hk_le_sq : (k : Error) ≤ (k : Error) ^ (2 : ℕ) := by nlinarith
+  have hfirst_quad :
+      (k : Error) * (2 * Real.sqrt (2 * zeta)) ≤
+        4 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * thirtysecondSum := by
+    have hmul :
+        4 * (k : Error) * (params.m : Error) * thirtysecondSum ≤
+          4 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * thirtysecondSum := by
+      have hcoeff_nonneg : 0 ≤ 4 * (params.m : Error) * thirtysecondSum := by positivity
+      have hmul' := mul_le_mul_of_nonneg_left hk_le_sq hcoeff_nonneg
+      nlinarith
+    exact le_trans hfirst hmul
+  have hsecond_quad :
+      (k : Error) * (2 * Real.sqrt (commuteGHalfSandwichError params gamma zeta k)) ≤
+        42 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * thirtysecondSum := by
+    have hmul := mul_le_mul_of_nonneg_left hsecond hk_nonneg
+    nlinarith
   calc
     fromHToGPaperTotalError params gamma zeta k
         = (k : Error) * (2 * Real.sqrt (2 * zeta)) +
-            2 * Real.sqrt (commuteGHalfSandwichError params gamma zeta k) := by
-          simp [fromHToGPaperTotalError, Real.sqrt_eq_rpow]
-    _ ≤ 4 * (k : Error) * (params.m : Error) * thirtysecondSum +
-          42 * (k : Error) * (params.m : Error) * thirtysecondSum := by
-          exact add_le_add hfirst hsecond
+            (k : Error) * (2 * Real.sqrt (commuteGHalfSandwichError params gamma zeta k)) := by
+          simp [fromHToGPaperTotalError, fromHToGRecurrenceError, Real.sqrt_eq_rpow]
+          ring
+    _ ≤ 4 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * thirtysecondSum +
+          42 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * thirtysecondSum := by
+          exact add_le_add hfirst_quad hsecond_quad
     _ = fromHToGError params gamma zeta k := by
           simp [fromHToGError, thirtysecondSum]
           ring
 
-
-/-- The former uniform-step arithmetic absorption is not a parameter-free theorem
-of the displayed error *definitions alone*.
-
-For example, with `m = 1`, `q = 2`, `d = 0`, `γ = 1`, `ζ = 0`, and `k = 2`,
-the left-hand side is `4 * sqrt (426 * 2^2)`, which is already larger than the
-right-hand side `46 * 2`.  The residual below therefore tracks the paper-total
-stage bridge directly, rather than pretending that `k * fromHToGRecurrenceError`
-can be absorbed as a standalone scalar leaf. -/
-private lemma fromHToG_errorAbsorption_not_purely_scalar :
-    ¬ (∀ (params : Parameters) (gamma zeta : Error) (k : ℕ),
-      (k : Error) * fromHToGRecurrenceError params gamma zeta k ≤
-        fromHToGError params gamma zeta k) := by
-  intro h
-  let params : Parameters := Parameters.ofPrime 1 2 0 (by decide) (by norm_num)
-  have hbad := h params 1 0 2
-  have hgt :
-      fromHToGError params 1 0 2 <
-        (2 : Error) * fromHToGRecurrenceError params 1 0 2 := by
-    change fromHToGError (Parameters.ofPrime 1 2 0 (by decide) (by norm_num)) 1 0 2 <
-      (2 : Error) *
-        fromHToGRecurrenceError (Parameters.ofPrime 1 2 0 (by decide) (by norm_num)) 1 0 2
-    norm_num [fromHToGRecurrenceError, fromHToGError, commuteGHalfSandwichError,
-      Parameters.ofPrime]
-    rw [← Real.sqrt_eq_rpow (1704 : Error)]
-    have hsqrt_gt : (23 : Error) < Real.sqrt (1704 : Error) := by
-      rw [Real.lt_sqrt (by norm_num : (0 : Error) ≤ 23)]
-      norm_num
-    nlinarith
-  exact not_le_of_gt hgt hbad
-
 /-- The sharpened scalar/telescope residual for the final `fromHToG` endpoint.
 
 The adjacent-step recurrence still supplies the public `recurrenceStep` field.
-For the final Bernoulli-polynomial comparison, however, the paper does not use
-`k * fromHToGRecurrenceError`; it uses the aggregate paper-total error above.
-This package records the exact remaining bridge at the stage-mass level,
-together with the side conditions needed by the proved scalar absorption lemma
-`fromHToGPaperTotalError_le`. -/
+For the final Bernoulli-polynomial comparison, the paper literally telescopes
+the adjacent estimate over all `k` stages.  This package records that stage-mass
+telescope together with the side conditions needed by the corrected scalar
+absorption lemma `fromHToGPaperTotalError_le`. -/
 private structure FromHToGPaperTelescopeFacts
     (params : Parameters)
     [FieldModel params.q]
@@ -976,6 +1448,2769 @@ private structure FromHToGResidualStageFacts
   adjacent : FromHToGAdjacentStageFacts params ψbi family gamma zeta k
   paperTelescope : FromHToGPaperTelescopeFacts params ψbi family gamma zeta k
 
+/-- Four-edge absolute-value telescope used to assemble the paper's adjacent
+move-right / commute / commute / move-right chain. -/
+private lemma abs_sub_le_four (a b c d e : Error) :
+    |a - e| ≤ |a - b| + |b - c| + |c - d| + |d - e| := by
+  have h₁ : |a - e| ≤ |a - b| + |b - e| := abs_sub_le a b e
+  have h₂ : |b - e| ≤ |b - c| + |c - e| := abs_sub_le b c e
+  have h₃ : |c - e| ≤ |c - d| + |d - e| := abs_sub_le c d e
+  linarith
+
+/-- The displayed half-sandwich commutation error is monotone in the sandwich length. -/
+private lemma commuteGHalfSandwichError_mono_length
+    (params : Parameters) (gamma zeta : Error)
+    (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
+    {j k : ℕ} (hjk : j ≤ k) :
+    commuteGHalfSandwichError params gamma zeta j ≤
+      commuteGHalfSandwichError params gamma zeta k := by
+  have hjkR : (j : Error) ≤ (k : Error) := by exact_mod_cast hjk
+  have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
+    positivity
+  have hgamma16_nonneg : 0 ≤ Real.rpow gamma (1 / (16 : Error)) :=
+    Real.rpow_nonneg hgamma_nonneg _
+  have hzeta16_nonneg : 0 ≤ Real.rpow zeta (1 / (16 : Error)) :=
+    Real.rpow_nonneg hzeta_nonneg _
+  have hratio16_nonneg :
+      0 ≤ Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error)) :=
+    Real.rpow_nonneg hratio_nonneg _
+  have hsum_nonneg :
+      0 ≤ Real.rpow gamma (1 / (16 : Error)) + Real.rpow zeta (1 / (16 : Error)) +
+        Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (16 : Error)) := by
+    positivity
+  unfold commuteGHalfSandwichError
+  gcongr
+
+/-- Symmetry of the raw pointwise state-dependent distance core.  This local
+form is useful when orienting adjoint half-sandwich commutators for the second
+paper commutation step. -/
+private lemma fromHToG_qSDDCore_symm
+    {Outcome : Type*} [Fintype Outcome]
+    (ψ : QuantumState ι)
+    (A B : Outcome → MIPStarRE.Quantum.Op ι) :
+    qSDDCore ψ A B = qSDDCore ψ B A := by
+  let F : Outcome → MIPStarRE.Quantum.Op ι := fun a => A a - B a
+  let G : Outcome → MIPStarRE.Quantum.Op ι := fun a => B a - A a
+  have hFG : F = fun a => -G a := by
+    funext a
+    dsimp [F, G]
+    abel
+  unfold qSDDCore
+  change ∑ a : Outcome, ev ψ ((F a)ᴴ * F a) =
+    ∑ a : Outcome, ev ψ ((G a)ᴴ * G a)
+  rw [hFG]
+  refine Finset.sum_congr rfl ?_
+  intro a _ha
+  change ev ψ ((-G a)ᴴ * (-G a)) = ev ψ ((G a)ᴴ * G a)
+  simp
+
+/-- Tensor product is monotone in the right factor against a PSD left factor. -/
+private lemma fromHToG_opTensor_mono_right_of_nonneg
+    {A B₁ B₂ : MIPStarRE.Quantum.Op ι} :
+    0 ≤ A → B₁ ≤ B₂ → opTensor A B₁ ≤ opTensor A B₂ := by
+  intro hA hB
+  change Matrix.kronecker A B₁ ≤ Matrix.kronecker A B₂
+  letI : Finite ι := Finite.of_fintype ι
+  change (Matrix.kronecker A B₂ - Matrix.kronecker A B₁).PosSemidef
+  have hpsd : Matrix.PosSemidef (Matrix.kronecker A (B₂ - B₁)) := by
+    exact Matrix.nonneg_iff_posSemidef.mp <|
+      MIPStarRE.Quantum.kronecker_nonneg hA (sub_nonneg.mpr hB)
+  rw [MIPStarRE.Quantum.kronecker_sub_right]
+  exact hpsd
+
+/-- If `A` is PSD and `B ≤ C`, then the corresponding bipartite scalar
+expectations with left/right tensor placement are monotone in the right factor. -/
+private lemma fromHToG_ev_leftTensor_rightTensor_mono_right_of_nonneg_left
+    (ψbi : QuantumState (ι × ι))
+    {A B C : MIPStarRE.Quantum.Op ι}
+    (hA : 0 ≤ A) (hBC : B ≤ C) :
+    ev ψbi (leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) B) ≤
+      ev ψbi (leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) C) := by
+  apply ev_mono ψbi _ _
+  rw [leftTensor_mul_rightTensor_eq_opTensor, leftTensor_mul_rightTensor_eq_opTensor]
+  exact fromHToG_opTensor_mono_right_of_nonneg hA hBC
+
+/-- If `S` is a PSD contraction commuting with `B`, then `S * B * S ≤ B`.  This
+packages the paper's `eq:S-sandwich` domination step without using explicit
+square roots. -/
+private lemma psd_contraction_comm_sandwich_le
+    {S B : MIPStarRE.Quantum.Op ι}
+    (hS0 : 0 ≤ S) (hS1 : S ≤ 1) (hB0 : 0 ≤ B) (hSB : Commute S B) :
+    S * B * S ≤ B := by
+  have hSS_le_S : S * S ≤ S := MIPStarRE.Quantum.sq_le_self hS0 hS1
+  have hSS_le_one : S * S ≤ 1 := le_trans hSS_le_S hS1
+  have hBSS : Commute B (S * S) := (hSB.mul_left hSB).symm
+  have hB_one_sub_SS : Commute B (1 - S * S) :=
+    (Commute.one_right B).sub_right hBSS
+  have hnonneg : 0 ≤ B * (1 - S * S) :=
+    Commute.mul_nonneg hB0 (sub_nonneg.mpr hSS_le_one) hB_one_sub_SS
+  have hrewrite : B - S * B * S = B * (1 - S * S) := by
+    calc
+      B - S * B * S = B - B * (S * S) := by
+        rw [hSB.eq]
+        simp [mul_assoc]
+      _ = B * (1 - S * S) := by
+        calc
+          B - B * (S * S) = B * 1 - B * (S * S) := by simp
+          _ = B * (1 - S * S) := by rw [mul_sub]
+  apply sub_nonneg.mp
+  simpa [hrewrite] using hnonneg
+
+/-- Paper `eq:S-sandwich` for the complete branch average `G`. -/
+private lemma fromHToGRecurrenceWeight_sandwich_base_le
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (prefixLen : ℕ) {tailLen : ℕ} (τtail : GHatType tailLen) :
+    let S := fromHToGRecurrenceWeight params family prefixLen τtail
+    S * family.averagedSubMeas.total * S ≤ family.averagedSubMeas.total := by
+  dsimp
+  exact psd_contraction_comm_sandwich_le
+    (fromHToGRecurrenceWeight_nonneg params family prefixLen τtail)
+    (fromHToGRecurrenceWeight_le_one params family prefixLen τtail)
+    family.averagedSubMeas.total_nonneg
+    (fromHToGRecurrenceWeight_commute_base params family prefixLen τtail)
+
+/-- Paper `eq:S-sandwich` for the incomplete branch average `I - G`. -/
+private lemma fromHToGRecurrenceWeight_sandwich_one_sub_base_le
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (prefixLen : ℕ) {tailLen : ℕ} (τtail : GHatType tailLen) :
+    let S := fromHToGRecurrenceWeight params family prefixLen τtail
+    S * (1 - family.averagedSubMeas.total) * S ≤ 1 - family.averagedSubMeas.total := by
+  dsimp
+  exact psd_contraction_comm_sandwich_le
+    (fromHToGRecurrenceWeight_nonneg params family prefixLen τtail)
+    (fromHToGRecurrenceWeight_le_one params family prefixLen τtail)
+    (sub_nonneg.mpr family.averagedSubMeas.total_le_one)
+    (fromHToGRecurrenceWeight_commute_one_sub_base params family prefixLen τtail)
+
+omit [DecidableEq ι] in
+/-- The adjoint-oriented half-sandwich commutator square appearing in the second
+paper commutation is the opposite square of the first commutator. -/
+private lemma fromHToG_adjoint_commutator_square_eq
+    (U T : MIPStarRE.Quantum.Op ι) (hU : Uᴴ = U) :
+    ((Tᴴ * U - U * Tᴴ)ᴴ * (Tᴴ * U - U * Tᴴ)) =
+      (U * T - T * U) * (U * T - T * U)ᴴ := by
+  simp [Matrix.conjTranspose_sub, Matrix.conjTranspose_mul, hU]
+
+/-- Completed `ĝ` measurement outcomes are Hermitian.  This packages the
+positivity-to-Hermitian conversion used when orienting the adjoint
+half-sandwich commutator in the `M₂ → M₃` move. -/
+private lemma fromHToG_gHatIdxMeas_outcome_isHermitian
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (x : Fq params) (g : GHatOutcome params) :
+    ((gHatIdxMeas params family x).outcome g)ᴴ =
+      (gHatIdxMeas params family x).outcome g := by
+  exact (Matrix.nonneg_iff_posSemidef.mp
+    ((gHatIdxMeas params family x).outcome_pos g)).isHermitian.eq
+
+/-- Rewrite a nested finite sum as a sum over a product index. -/
+private lemma fromHToG_sum_product {α β : Type*} [Fintype α] [Fintype β]
+    (F : α → β → Error) :
+    (∑ a : α, ∑ b : β, F a b) = ∑ p : α × β, F p.1 p.2 := by
+  rw [← Finset.univ_product_univ, Finset.sum_product]
+
+/-- Rewrite a nested Boolean/type sum as a sum over the product index. -/
+private lemma fromHToG_bool_type_sum_product {α : Type*} [Fintype α]
+    (F : Bool → α → Error) :
+    (∑ b : Bool, ∑ a : α, F b a) = ∑ p : Bool × α, F p.1 p.2 := by
+  rw [← Finset.univ_product_univ, Finset.sum_product]
+
+/-- Collapse a type-filtered completed-outcome sum to an unfiltered sum. -/
+private lemma fromHToG_type_filtered_outcome_sum
+    (params : Parameters) [FieldModel params.q] {n : ℕ}
+    (F : GHatType n → GHatTupleOutcome params n → Error) :
+    (∑ τ : GHatType n,
+      ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+          gHatTupleType gs = τ,
+        F τ gs) =
+      ∑ gs : GHatTupleOutcome params n, F (gHatTupleType gs) gs := by
+  classical
+  simp [Finset.sum_filter]
+  rw [Finset.sum_comm]
+  simp
+
+/-- Collapse the paper's Boolean/type-filtered outcome sum to an unfiltered
+outcome sum, choosing the Boolean and type from the outcomes themselves. -/
+private lemma fromHToG_bool_type_filtered_outcome_sum
+    (params : Parameters) [FieldModel params.q] {n : ℕ}
+    (F : Bool → GHatType n → GHatOutcome params → GHatTupleOutcome params n → Error) :
+    (∑ b : Bool, ∑ τ : GHatType n,
+      ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+        ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+            gHatTupleType gs = τ,
+          F b τ g gs) =
+      ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+        F g.isSome (gHatTupleType gs) g gs := by
+  classical
+  calc
+    (∑ b : Bool, ∑ τ : GHatType n,
+      ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+        ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+            gHatTupleType gs = τ,
+          F b τ g gs)
+        = ∑ b : Bool,
+            ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+              ∑ τ : GHatType n,
+                ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                    gHatTupleType gs = τ,
+                  F b τ g gs := by
+            refine Finset.sum_congr rfl ?_
+            intro b _hb
+            rw [Finset.sum_comm]
+    _ = ∑ b : Bool,
+            ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+              ∑ gs : GHatTupleOutcome params n, F b (gHatTupleType gs) g gs := by
+            refine Finset.sum_congr rfl ?_
+            intro b _hb
+            refine Finset.sum_congr rfl ?_
+            intro g _hg
+            exact fromHToG_type_filtered_outcome_sum params
+              (fun τ gs => F b τ g gs)
+    _ = ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+          F g.isSome (gHatTupleType gs) g gs := by
+            simp [Finset.sum_filter]
+            rw [add_comm]
+
+/-- Move two finite sums through two nested averages. -/
+private lemma fromHToG_sum₂_avgOver₂
+    {α β γ δ : Type*} [Fintype γ] [Fintype δ]
+    (𝒟α : Distribution α) (𝒟β : Distribution β)
+    (F : γ → δ → α → β → Error) :
+    (∑ c : γ, ∑ d : δ,
+      avgOver 𝒟α fun a => avgOver 𝒟β fun b => F c d a b) =
+      avgOver 𝒟α fun a => avgOver 𝒟β fun b => ∑ c : γ, ∑ d : δ, F c d a b := by
+  calc
+    (∑ c : γ, ∑ d : δ,
+      avgOver 𝒟α fun a => avgOver 𝒟β fun b => F c d a b)
+        = ∑ c : γ,
+            avgOver 𝒟α fun a => ∑ d : δ, avgOver 𝒟β fun b => F c d a b := by
+            refine Finset.sum_congr rfl ?_
+            intro c _hc
+            rw [avgOver_sum]
+    _ = avgOver 𝒟α fun a => ∑ c : γ, ∑ d : δ, avgOver 𝒟β fun b => F c d a b := by
+          rw [avgOver_sum]
+    _ = avgOver 𝒟α fun a => ∑ c : γ, avgOver 𝒟β fun b => ∑ d : δ, F c d a b := by
+          refine avgOver_congr _ _ _ ?_
+          intro a
+          refine Finset.sum_congr rfl ?_
+          intro c _hc
+          rw [avgOver_sum]
+    _ = avgOver 𝒟α fun a => avgOver 𝒟β fun b => ∑ c : γ, ∑ d : δ, F c d a b := by
+          refine avgOver_congr _ _ _ ?_
+          intro a
+          rw [avgOver_sum]
+
+/-- Combined outcome index for the local self-consistency moves in one adjacent
+`fromHToG` stage. -/
+private abbrev FromHToGMoveOutcome (params : Parameters) [FieldModel params.q] (n : ℕ) :=
+  Bool × GHatType n × GHatOutcome params × GHatTupleOutcome params n
+
+/-- Split a nonempty point tuple into its head and tail. -/
+private def fromHToGPointTupleConsEquiv (params : Parameters) (n : ℕ) :
+    PointTuple params (n + 1) ≃ Fq params × PointTuple params n where
+  toFun xs := (xs 0, pointTupleTail xs)
+  invFun p := Fin.cons p.1 p.2
+  left_inv xs := by
+    funext i
+    cases i using Fin.cases with
+    | zero => rfl
+    | succ j => rfl
+  right_inv p := by
+    cases p
+    rfl
+
+/-- Split a nonempty completed-outcome tuple into its head and tail. -/
+private def fromHToGGHatTupleOutcomeConsEquiv
+    (params : Parameters) [FieldModel params.q] (n : ℕ) :
+    GHatTupleOutcome params (n + 1) ≃ GHatOutcome params × GHatTupleOutcome params n where
+  toFun gs := (gs 0, gHatTupleOutcomeTail gs)
+  invFun p := Fin.cons p.1 p.2
+  left_inv gs := by
+    funext i
+    cases i using Fin.cases with
+    | zero => rfl
+    | succ j => rfl
+  right_inv p := by
+    cases p
+    rfl
+
+/-- Head-tail Boolean type membership after consing an outcome tuple. -/
+private lemma fromHToG_gHatTupleType_cons_eq
+    (params : Parameters) [FieldModel params.q]
+    {n : ℕ} (b : Bool) (τ : GHatType n)
+    (g : GHatOutcome params) (gs : GHatTupleOutcome params n) :
+    gHatTupleType (Fin.cons g gs) = prependTypeBit b τ ↔
+      g.isSome = b ∧ gHatTupleType gs = τ := by
+  constructor
+  · intro h
+    constructor
+    · simpa [gHatTupleType, prependTypeBit] using congrFun h 0
+    · funext i
+      have hi := congrFun h i.succ
+      simpa [gHatTupleType, prependTypeBit] using hi
+  · intro h
+    ext i
+    cases i using Fin.cases with
+    | zero => simpa [gHatTupleType, prependTypeBit] using h.1
+    | succ j => simpa [gHatTupleType, prependTypeBit] using congrFun h.2 j
+
+/-- Head-tail unfolding of one completed-slice sandwich outcome. -/
+private lemma fromHToG_gHatSandwichFamily_cons_outcome
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) {n : ℕ}
+    (x : Fq params) (xs : PointTuple params n)
+    (g : GHatOutcome params) (gs : GHatTupleOutcome params n) :
+    (gHatSandwichFamily params family (n + 1) (Fin.cons x xs)).outcome (Fin.cons g gs) =
+      let U := (gHatIdxMeas params family x).outcome g
+      let T := gHatHalfProductOutcomeOperator params family n xs gs
+      U * T * Tᴴ * U := by
+  let U := (gHatIdxMeas params family x).outcome g
+  let T := gHatHalfProductOutcomeOperator params family n xs gs
+  have hU : Uᴴ = U := by
+    simpa [U, gHatIdxMeas] using ((gHatIdxMeas params family x).toSubMeas).outcome_hermitian g
+  have hxs : pointTupleTail (Fin.cons x xs) = xs := by
+    funext i
+    rfl
+  have hgs : gHatTupleOutcomeTail (Fin.cons g gs) = gs := by
+    funext i
+    rfl
+  calc
+    (gHatSandwichFamily params family (n + 1) (Fin.cons x xs)).outcome (Fin.cons g gs)
+        = (U * T) * (U * T)ᴴ := by
+            simp [gHatSandwichFamily, gHatHalfProductOutcomeOperator, hxs, hgs, U, T]
+    _ = U * T * Tᴴ * U := by
+          rw [Matrix.conjTranspose_mul, hU]
+          noncomm_ring
+
+/-- Reindex a filtered sum over nonempty completed-outcome tuples into head and
+tail filtered sums. -/
+private lemma fromHToG_cons_type_outcome_sum
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) {n : ℕ}
+    (b : Bool) (τ : GHatType n) (x : Fq params) (xs : PointTuple params n)
+    (S : MIPStarRE.Quantum.Op ι) :
+    (∑ gs' ∈ (Finset.univ : Finset (GHatTupleOutcome params (n + 1))) with
+        gHatTupleType gs' = prependTypeBit b τ,
+      ev ψbi (leftTensor (ι₂ := ι)
+        ((gHatSandwichFamily params family (n + 1) (Fin.cons x xs)).outcome gs') *
+          rightTensor (ι₁ := ι) S)) =
+      ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+        ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+            gHatTupleType gs = τ,
+          let U := (gHatIdxMeas params family x).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n xs gs
+          ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ * U) * rightTensor (ι₁ := ι) S) := by
+  classical
+  simp only [Finset.sum_filter]
+  calc
+    (∑ gs' : GHatTupleOutcome params (n + 1),
+      if gHatTupleType gs' = prependTypeBit b τ then
+        ev ψbi (leftTensor (ι₂ := ι)
+          ((gHatSandwichFamily params family (n + 1) (Fin.cons x xs)).outcome gs') *
+            rightTensor (ι₁ := ι) S)
+      else 0)
+      = ∑ p : GHatOutcome params × GHatTupleOutcome params n,
+          if gHatTupleType (Fin.cons p.1 p.2) = prependTypeBit b τ then
+            ev ψbi (leftTensor (ι₂ := ι)
+              ((gHatSandwichFamily params family (n + 1) (Fin.cons x xs)).outcome
+                (Fin.cons p.1 p.2)) * rightTensor (ι₁ := ι) S)
+          else 0 := by
+          exact Fintype.sum_equiv (fromHToGGHatTupleOutcomeConsEquiv params n)
+            (fun gs' : GHatTupleOutcome params (n + 1) =>
+              if gHatTupleType gs' = prependTypeBit b τ then
+                ev ψbi (leftTensor (ι₂ := ι)
+                  ((gHatSandwichFamily params family (n + 1) (Fin.cons x xs)).outcome gs') *
+                    rightTensor (ι₁ := ι) S)
+              else 0)
+            (fun p : GHatOutcome params × GHatTupleOutcome params n =>
+              if gHatTupleType (Fin.cons p.1 p.2) = prependTypeBit b τ then
+                ev ψbi (leftTensor (ι₂ := ι)
+                  ((gHatSandwichFamily params family (n + 1) (Fin.cons x xs)).outcome
+                    (Fin.cons p.1 p.2)) * rightTensor (ι₁ := ι) S)
+              else 0)
+            (by
+              intro gs'
+              have hcons : Fin.cons (gs' 0) (gHatTupleOutcomeTail gs') = gs' := by
+                funext i
+                cases i using Fin.cases with
+                | zero => rfl
+                | succ j => rfl
+              change
+                (if gHatTupleType gs' = prependTypeBit b τ then
+                  ev ψbi (leftTensor (ι₂ := ι)
+                    ((gHatSandwichFamily params family (n + 1) (Fin.cons x xs)).outcome gs') *
+                      rightTensor (ι₁ := ι) S)
+                else 0) =
+                if gHatTupleType (Fin.cons (gs' 0) (gHatTupleOutcomeTail gs')) =
+                    prependTypeBit b τ then
+                  ev ψbi (leftTensor (ι₂ := ι)
+                    ((gHatSandwichFamily params family (n + 1) (Fin.cons x xs)).outcome
+                      (Fin.cons (gs' 0) (gHatTupleOutcomeTail gs'))) * rightTensor (ι₁ := ι) S)
+                else 0
+              rw [hcons])
+    _ = ∑ p : GHatOutcome params × GHatTupleOutcome params n,
+          if p.1.isSome = b ∧ gHatTupleType p.2 = τ then
+            let U := (gHatIdxMeas params family x).outcome p.1
+            let T := gHatHalfProductOutcomeOperator params family n xs p.2
+            ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ * U) * rightTensor (ι₁ := ι) S)
+          else 0 := by
+          refine Finset.sum_congr rfl ?_
+          intro p _hp
+          by_cases hp : p.1.isSome = b ∧ gHatTupleType p.2 = τ
+          · have htype : gHatTupleType (Fin.cons p.1 p.2) = prependTypeBit b τ :=
+              (fromHToG_gHatTupleType_cons_eq params b τ p.1 p.2).2 hp
+            rw [if_pos htype, if_pos hp]
+            simp [fromHToG_gHatSandwichFamily_cons_outcome]
+          · rw [if_neg]
+            · rw [if_neg hp]
+            · intro h
+              exact hp ((fromHToG_gHatTupleType_cons_eq params b τ p.1 p.2).1 h)
+    _ = ∑ g : GHatOutcome params,
+          ∑ gs : GHatTupleOutcome params n,
+            if g.isSome = b ∧ gHatTupleType gs = τ then
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ * U) * rightTensor (ι₁ := ι) S)
+            else 0 := by
+          rw [← Finset.univ_product_univ, Finset.sum_product]
+    _ = ∑ g : GHatOutcome params,
+          if g.isSome = b then
+            ∑ gs : GHatTupleOutcome params n,
+              if gHatTupleType gs = τ then
+                let U := (gHatIdxMeas params family x).outcome g
+                let T := gHatHalfProductOutcomeOperator params family n xs gs
+                ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ * U) * rightTensor (ι₁ := ι) S)
+              else 0
+          else 0 := by
+          refine Finset.sum_congr rfl ?_
+          intro g _hg
+          by_cases hg : g.isSome = b
+          · simp [hg]
+          · simp [hg]
+
+/-- Fold a tail point/outcome average written directly with the sandwich-family
+outcomes into `averagedSandwichByTypeSubMeas`. -/
+private lemma fromHToG_avgOver_tail_type_ev_sandwich
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (n : ℕ) (τ : GHatType n)
+    (B : MIPStarRE.Quantum.Op ι) :
+    avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+      ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+          gHatTupleType gs = τ,
+        ev ψbi (leftTensor (ι₂ := ι)
+          ((gHatSandwichFamily params family n xs).outcome gs) *
+            rightTensor (ι₁ := ι) B)) =
+      ev ψbi (leftTensor (ι₂ := ι)
+        (averagedSandwichByTypeSubMeas params family n τ).total *
+          rightTensor (ι₁ := ι) B) := by
+  simpa [gHatSandwichFamily] using
+    (fromHToG_avgOver_tail_type_ev params ψbi family n τ B)
+
+/-- A fixed head-bit branch of a nonterminal Lean stage expands to the paper's
+adjacent-stage source expression. -/
+private lemma fromHToGTailStageMass_cons_eq_adjacentStageA0_branch
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (ℓ n : ℕ) (b : Bool) (τ : GHatType n) :
+    fromHToGTailStageMass params ψbi family ℓ (prependTypeBit b τ) =
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ * U) *
+                rightTensor (ι₁ := ι) S) := by
+  classical
+  let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+  let F : Fq params → PointTuple params n → Error := fun x xs =>
+    ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+      ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+          gHatTupleType gs = τ,
+        let U := (gHatIdxMeas params family x).outcome g
+        let T := gHatHalfProductOutcomeOperator params family n xs gs
+        ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ * U) * rightTensor (ι₁ := ι) S)
+  calc
+    fromHToGTailStageMass params ψbi family ℓ (prependTypeBit b τ)
+        = ev ψbi (leftTensor (ι₂ := ι)
+            (averagedSandwichByTypeSubMeas params family (n + 1)
+              (prependTypeBit b τ)).total * rightTensor (ι₁ := ι) S) := by
+            unfold fromHToGTailStageMass fromHToGTailStageFamily
+            rfl
+    _ = avgOver (uniformDistribution (PointTuple params (n + 1))) (fun xs' =>
+          ∑ gs' ∈ (Finset.univ : Finset (GHatTupleOutcome params (n + 1))) with
+              gHatTupleType gs' = prependTypeBit b τ,
+            ev ψbi (leftTensor (ι₂ := ι)
+              ((gHatSandwichFamily params family (n + 1) xs').outcome gs') *
+                rightTensor (ι₁ := ι) S)) := by
+            exact (fromHToG_avgOver_tail_type_ev_sandwich params ψbi family
+              (n + 1) (prependTypeBit b τ) S).symm
+    _ = avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
+          ∑ gs' ∈ (Finset.univ : Finset (GHatTupleOutcome params (n + 1))) with
+              gHatTupleType gs' = prependTypeBit b τ,
+            ev ψbi (leftTensor (ι₂ := ι)
+              ((gHatSandwichFamily params family (n + 1)
+                ((fromHToGPointTupleConsEquiv params n).symm q)).outcome gs') *
+                rightTensor (ι₁ := ι) S)) := by
+            exact avgOver_uniform_equiv (fromHToGPointTupleConsEquiv params n) _
+    _ = avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
+          F q.1 q.2) := by
+            refine avgOver_congr _ _ _ ?_
+            intro q
+            rcases q with ⟨x, xs⟩
+            simpa [F, S, fromHToGPointTupleConsEquiv] using
+              (fromHToG_cons_type_outcome_sum params ψbi family b τ x xs S)
+    _ = avgOver (uniformDistribution (Fq params)) (fun x =>
+          avgOver (uniformDistribution (PointTuple params n)) (fun xs => F x xs)) := by
+            exact avgOver_uniform_prod (α := Fq params) (β := PointTuple params n) (f := F)
+
+/-- The paper's adjacent-stage source scalar before the first move-right step. -/
+private noncomputable def fromHToGAdjacentStageA0
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) : Error :=
+  let n := k - (ℓ + 1)
+  ∑ b : Bool,
+    ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ * U) *
+                rightTensor (ι₁ := ι) S)
+
+/-- A nonterminal Lean stage is exactly the paper's adjacent-stage source scalar. -/
+private lemma fromHToGStageMass_eq_adjacentStageA0
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    {k ℓ : ℕ} (hℓ : ℓ < k) :
+    fromHToGStageMass params ψbi family k ℓ =
+      fromHToGAdjacentStageA0 params ψbi family k ℓ := by
+  classical
+  let n := k - (ℓ + 1)
+  calc
+    fromHToGStageMass params ψbi family k ℓ
+        = ∑ p : Bool × GHatType n,
+            fromHToGTailStageMass params ψbi family ℓ (prependTypeBit p.1 p.2) := by
+            simpa [n] using fromHToGStageMass_split_succ params ψbi family hℓ
+    _ = ∑ b : Bool, ∑ τ : GHatType n,
+          fromHToGTailStageMass params ψbi family ℓ (prependTypeBit b τ) := by
+          rw [← Finset.univ_product_univ, Finset.sum_product]
+    _ = ∑ b : Bool, ∑ τ : GHatType n,
+          avgOver (uniformDistribution (Fq params)) fun x =>
+            avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+              ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+                ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                    gHatTupleType gs = τ,
+                  let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+                  let U := (gHatIdxMeas params family x).outcome g
+                  let T := gHatHalfProductOutcomeOperator params family n xs gs
+                  ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ * U) *
+                    rightTensor (ι₁ := ι) S) := by
+          refine Finset.sum_congr rfl ?_
+          intro b _hb
+          refine Finset.sum_congr rfl ?_
+          intro τ _hτ
+          exact fromHToGTailStageMass_cons_eq_adjacentStageA0_branch
+            params ψbi family ℓ n b τ
+    _ = fromHToGAdjacentStageA0 params ψbi family k ℓ := by
+          unfold fromHToGAdjacentStageA0
+          change (∑ b : Bool, ∑ τ : GHatType n, _) =
+            (let n := k - (ℓ + 1); ∑ b : Bool, ∑ τ : GHatType n, _)
+          rfl
+
+/-- The paper's first adjacent-stage intermediate scalar `M₁`: the head
+completed-slice outcome has been moved to the right tensor factor. -/
+private noncomputable def fromHToGAdjacentStageM1
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) : Error :=
+  let n := k - (ℓ + 1)
+  ∑ b : Bool,
+    ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ) *
+                rightTensor (ι₁ := ι) (S * U))
+
+/-- Algebra for the left-action term in the first move-right estimate. -/
+private lemma fromHToG_moveRight_left_term
+    (U T S : MIPStarRE.Quantum.Op ι) :
+    (leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) S) *
+        leftTensor (ι₂ := ι) U =
+      leftTensor (ι₂ := ι) (U * T * Tᴴ * U) * rightTensor (ι₁ := ι) S := by
+  calc
+    (leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) S) *
+        leftTensor (ι₂ := ι) U
+        = leftTensor (ι₂ := ι) (U * T * Tᴴ) *
+            (rightTensor (ι₁ := ι) S * leftTensor (ι₂ := ι) U) := by
+            rw [mul_assoc]
+    _ = leftTensor (ι₂ := ι) (U * T * Tᴴ) *
+          (leftTensor (ι₂ := ι) U * rightTensor (ι₁ := ι) S) := by
+          rw [rightTensor_mul_leftTensor_eq_opTensor, leftTensor_mul_rightTensor_eq_opTensor]
+    _ = (leftTensor (ι₂ := ι) (U * T * Tᴴ) * leftTensor (ι₂ := ι) U) *
+          rightTensor (ι₁ := ι) S := by
+          rw [← mul_assoc]
+    _ = leftTensor (ι₂ := ι) ((U * T * Tᴴ) * U) * rightTensor (ι₁ := ι) S := by
+          rw [leftTensor_mul_leftTensor]
+    _ = leftTensor (ι₂ := ι) (U * T * Tᴴ * U) * rightTensor (ι₁ := ι) S := by
+          rw [mul_assoc]
+
+/-- Algebra for the right-action term in the first move-right estimate. -/
+private lemma fromHToG_moveRight_right_term
+    (U T S : MIPStarRE.Quantum.Op ι) :
+    (leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) S) *
+        rightTensor (ι₁ := ι) U =
+      leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) (S * U) := by
+  calc
+    (leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) S) *
+        rightTensor (ι₁ := ι) U
+        = leftTensor (ι₂ := ι) (U * T * Tᴴ) *
+            (rightTensor (ι₁ := ι) S * rightTensor (ι₁ := ι) U) := by
+            rw [mul_assoc]
+    _ = leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) (S * U) := by
+          rw [rightTensor_mul_rightTensor]
+
+/-- Algebra for the left-action term in the final move-right estimate. -/
+private lemma fromHToG_moveRight_final_left_term
+    (U T S : MIPStarRE.Quantum.Op ι) :
+    (leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) (S * U)) *
+        leftTensor (ι₂ := ι) U =
+      leftTensor (ι₂ := ι) (T * Tᴴ * U) * rightTensor (ι₁ := ι) (S * U) := by
+  calc
+    (leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) (S * U)) *
+        leftTensor (ι₂ := ι) U
+        = leftTensor (ι₂ := ι) (T * Tᴴ) *
+            (rightTensor (ι₁ := ι) (S * U) * leftTensor (ι₂ := ι) U) := by
+            rw [mul_assoc]
+    _ = leftTensor (ι₂ := ι) (T * Tᴴ) *
+          (leftTensor (ι₂ := ι) U * rightTensor (ι₁ := ι) (S * U)) := by
+          rw [rightTensor_mul_leftTensor_eq_opTensor, leftTensor_mul_rightTensor_eq_opTensor]
+    _ = (leftTensor (ι₂ := ι) (T * Tᴴ) * leftTensor (ι₂ := ι) U) *
+          rightTensor (ι₁ := ι) (S * U) := by
+          rw [← mul_assoc]
+    _ = leftTensor (ι₂ := ι) ((T * Tᴴ) * U) * rightTensor (ι₁ := ι) (S * U) := by
+          rw [leftTensor_mul_leftTensor]
+    _ = leftTensor (ι₂ := ι) (T * Tᴴ * U) * rightTensor (ι₁ := ι) (S * U) := by
+          rw [mul_assoc]
+
+/-- Algebra for the right-action term in the final move-right estimate. -/
+private lemma fromHToG_moveRight_final_right_term
+    (U T S : MIPStarRE.Quantum.Op ι) :
+    (leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) (S * U)) *
+        rightTensor (ι₁ := ι) U =
+      leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) (S * U * U) := by
+  calc
+    (leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) (S * U)) *
+        rightTensor (ι₁ := ι) U
+        = leftTensor (ι₂ := ι) (T * Tᴴ) *
+            (rightTensor (ι₁ := ι) (S * U) * rightTensor (ι₁ := ι) U) := by
+            rw [mul_assoc]
+    _ = leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) ((S * U) * U) := by
+          rw [rightTensor_mul_rightTensor]
+    _ = leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) (S * U * U) := by
+          rw [mul_assoc]
+
+/-- Algebra for the `M₁` half-sandwich commutation source term. -/
+private lemma fromHToG_halfSandwich_left_context_term
+    (U T S : MIPStarRE.Quantum.Op ι) :
+    leftTensor (ι₂ := ι) (U * T) *
+        (leftTensor (ι₂ := ι) Tᴴ * rightTensor (ι₁ := ι) (S * U)) =
+      leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) (S * U) := by
+  calc
+    leftTensor (ι₂ := ι) (U * T) *
+        (leftTensor (ι₂ := ι) Tᴴ * rightTensor (ι₁ := ι) (S * U))
+        = (leftTensor (ι₂ := ι) (U * T) * leftTensor (ι₂ := ι) Tᴴ) *
+            rightTensor (ι₁ := ι) (S * U) := by
+            rw [← mul_assoc]
+    _ = leftTensor (ι₂ := ι) ((U * T) * Tᴴ) * rightTensor (ι₁ := ι) (S * U) := by
+          rw [leftTensor_mul_leftTensor]
+    _ = leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) (S * U) := by
+          rw [mul_assoc]
+
+/-- Algebra for the `M₂` half-sandwich commutation target term. -/
+private lemma fromHToG_halfSandwich_right_context_term
+    (U T S : MIPStarRE.Quantum.Op ι) :
+    leftTensor (ι₂ := ι) (T * U) *
+        (leftTensor (ι₂ := ι) Tᴴ * rightTensor (ι₁ := ι) (S * U)) =
+      leftTensor (ι₂ := ι) (T * U * Tᴴ) * rightTensor (ι₁ := ι) (S * U) := by
+  calc
+    leftTensor (ι₂ := ι) (T * U) *
+        (leftTensor (ι₂ := ι) Tᴴ * rightTensor (ι₁ := ι) (S * U))
+        = (leftTensor (ι₂ := ι) (T * U) * leftTensor (ι₂ := ι) Tᴴ) *
+            rightTensor (ι₁ := ι) (S * U) := by
+            rw [← mul_assoc]
+    _ = leftTensor (ι₂ := ι) ((T * U) * Tᴴ) * rightTensor (ι₁ := ι) (S * U) := by
+          rw [leftTensor_mul_leftTensor]
+    _ = leftTensor (ι₂ := ι) (T * U * Tᴴ) * rightTensor (ι₁ := ι) (S * U) := by
+          rw [mul_assoc]
+
+/-- Algebra for the `M₂` adjoint half-sandwich commutation source term. -/
+private lemma fromHToG_halfSandwich_adjoint_right_context_term
+    (U T S : MIPStarRE.Quantum.Op ι) :
+    leftTensor (ι₂ := ι) T *
+        (leftTensor (ι₂ := ι) (U * Tᴴ) * rightTensor (ι₁ := ι) (S * U)) =
+      leftTensor (ι₂ := ι) (T * U * Tᴴ) * rightTensor (ι₁ := ι) (S * U) := by
+  calc
+    leftTensor (ι₂ := ι) T *
+        (leftTensor (ι₂ := ι) (U * Tᴴ) * rightTensor (ι₁ := ι) (S * U))
+        = (leftTensor (ι₂ := ι) T * leftTensor (ι₂ := ι) (U * Tᴴ)) *
+            rightTensor (ι₁ := ι) (S * U) := by
+            rw [← mul_assoc]
+    _ = leftTensor (ι₂ := ι) (T * (U * Tᴴ)) * rightTensor (ι₁ := ι) (S * U) := by
+          rw [leftTensor_mul_leftTensor]
+    _ = leftTensor (ι₂ := ι) (T * U * Tᴴ) * rightTensor (ι₁ := ι) (S * U) := by
+          rw [mul_assoc]
+
+/-- Algebra for the `M₃` adjoint half-sandwich commutation target term. -/
+private lemma fromHToG_halfSandwich_adjoint_left_context_term
+    (U T S : MIPStarRE.Quantum.Op ι) :
+    leftTensor (ι₂ := ι) T *
+        (leftTensor (ι₂ := ι) (Tᴴ * U) * rightTensor (ι₁ := ι) (S * U)) =
+      leftTensor (ι₂ := ι) (T * Tᴴ * U) * rightTensor (ι₁ := ι) (S * U) := by
+  calc
+    leftTensor (ι₂ := ι) T *
+        (leftTensor (ι₂ := ι) (Tᴴ * U) * rightTensor (ι₁ := ι) (S * U))
+        = (leftTensor (ι₂ := ι) T * leftTensor (ι₂ := ι) (Tᴴ * U)) *
+            rightTensor (ι₁ := ι) (S * U) := by
+            rw [← mul_assoc]
+    _ = leftTensor (ι₂ := ι) (T * (Tᴴ * U)) * rightTensor (ι₁ := ι) (S * U) := by
+          rw [leftTensor_mul_leftTensor]
+    _ = leftTensor (ι₂ := ι) (T * Tᴴ * U) * rightTensor (ι₁ := ι) (S * U) := by
+          rw [mul_assoc]
+
+/-- Normalize the `M₂` adjoint half-sandwich source to `C * A` form. -/
+private lemma fromHToG_halfSandwich_adjoint_right_leftAction_term
+    (U T S : MIPStarRE.Quantum.Op ι) :
+    (leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) (S * U)) *
+        leftTensor (ι₂ := ι) (U * Tᴴ) =
+      leftTensor (ι₂ := ι) T *
+        (leftTensor (ι₂ := ι) (U * Tᴴ) * rightTensor (ι₁ := ι) (S * U)) := by
+  calc
+    (leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) (S * U)) *
+        leftTensor (ι₂ := ι) (U * Tᴴ)
+        = leftTensor (ι₂ := ι) T *
+            (rightTensor (ι₁ := ι) (S * U) * leftTensor (ι₂ := ι) (U * Tᴴ)) := by
+            rw [mul_assoc]
+    _ = leftTensor (ι₂ := ι) T *
+          (leftTensor (ι₂ := ι) (U * Tᴴ) * rightTensor (ι₁ := ι) (S * U)) := by
+          rw [rightTensor_mul_leftTensor_eq_opTensor, leftTensor_mul_rightTensor_eq_opTensor]
+
+/-- Normalize the `M₃` adjoint half-sandwich target to `C * B` form. -/
+private lemma fromHToG_halfSandwich_adjoint_left_leftAction_term
+    (U T S : MIPStarRE.Quantum.Op ι) :
+    (leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) (S * U)) *
+        leftTensor (ι₂ := ι) (Tᴴ * U) =
+      leftTensor (ι₂ := ι) T *
+        (leftTensor (ι₂ := ι) (Tᴴ * U) * rightTensor (ι₁ := ι) (S * U)) := by
+  calc
+    (leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) (S * U)) *
+        leftTensor (ι₂ := ι) (Tᴴ * U)
+        = leftTensor (ι₂ := ι) T *
+            (rightTensor (ι₁ := ι) (S * U) * leftTensor (ι₂ := ι) (Tᴴ * U)) := by
+            rw [mul_assoc]
+    _ = leftTensor (ι₂ := ι) T *
+          (leftTensor (ι₂ := ι) (Tᴴ * U) * rightTensor (ι₁ := ι) (S * U)) := by
+          rw [rightTensor_mul_leftTensor_eq_opTensor, leftTensor_mul_rightTensor_eq_opTensor]
+
+/-- Pointwise rewrite of `A0` to the left-action shape used by `closenessOfIP`. -/
+private lemma fromHToGAdjacentStageA0_pointwise_leftShape
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (ℓ n : ℕ) (x : Fq params) (xs : PointTuple params n) :
+    (∑ b : Bool, ∑ τ : GHatType n,
+      ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+        ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+            gHatTupleType gs = τ,
+          let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+          let U := (gHatIdxMeas params family x).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n xs gs
+          ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ * U) *
+            rightTensor (ι₁ := ι) S)) =
+      ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+        let S := fromHToGRecurrenceWeight params family ℓ
+          (prependTypeBit g.isSome (gHatTupleType gs))
+        let U := (gHatIdxMeas params family x).outcome g
+        let T := gHatHalfProductOutcomeOperator params family n xs gs
+        ev ψbi ((leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) S) *
+          leftTensor (ι₂ := ι) U) := by
+  classical
+  rw [fromHToG_bool_type_filtered_outcome_sum]
+  refine Finset.sum_congr rfl ?_
+  intro g _hg
+  refine Finset.sum_congr rfl ?_
+  intro gs _hgs
+  exact congrArg (ev ψbi)
+    (fromHToG_moveRight_left_term
+      ((gHatIdxMeas params family x).outcome g)
+      (gHatHalfProductOutcomeOperator params family n xs gs)
+      (fromHToGRecurrenceWeight params family ℓ
+        (prependTypeBit g.isSome (gHatTupleType gs)))).symm
+
+/-- Pointwise rewrite of `M₁` to the right-action shape used by `closenessOfIP`. -/
+private lemma fromHToGAdjacentStageM1_pointwise_rightShape
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (ℓ n : ℕ) (x : Fq params) (xs : PointTuple params n) :
+    (∑ b : Bool, ∑ τ : GHatType n,
+      ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+        ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+            gHatTupleType gs = τ,
+          let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+          let U := (gHatIdxMeas params family x).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n xs gs
+          ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ) *
+            rightTensor (ι₁ := ι) (S * U))) =
+      ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+        let S := fromHToGRecurrenceWeight params family ℓ
+          (prependTypeBit g.isSome (gHatTupleType gs))
+        let U := (gHatIdxMeas params family x).outcome g
+        let T := gHatHalfProductOutcomeOperator params family n xs gs
+        ev ψbi ((leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) S) *
+          rightTensor (ι₁ := ι) U) := by
+  classical
+  rw [fromHToG_bool_type_filtered_outcome_sum]
+  refine Finset.sum_congr rfl ?_
+  intro g _hg
+  refine Finset.sum_congr rfl ?_
+  intro gs _hgs
+  exact congrArg (ev ψbi)
+    (fromHToG_moveRight_right_term
+      ((gHatIdxMeas params family x).outcome g)
+      (gHatHalfProductOutcomeOperator params family n xs gs)
+      (fromHToGRecurrenceWeight params family ℓ
+        (prependTypeBit g.isSome (gHatTupleType gs)))).symm
+
+/-- Global rewrite of `A0` to the left-action shape used by `closenessOfIP`. -/
+private lemma fromHToGAdjacentStageA0_eq_leftShape
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) :
+    let n := k - (ℓ + 1)
+    fromHToGAdjacentStageA0 params ψbi family k ℓ =
+      avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+        ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+          let S := fromHToGRecurrenceWeight params family ℓ
+            (prependTypeBit g.isSome (gHatTupleType gs))
+          let U := (gHatIdxMeas params family q.1).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+          ev ψbi ((leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) S) *
+            leftTensor (ι₂ := ι) U) := by
+  classical
+  intro n
+  unfold fromHToGAdjacentStageA0
+  change (∑ b : Bool, ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ * U) *
+                rightTensor (ι₁ := ι) S)) = _
+  calc
+    (∑ b : Bool, ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ * U) *
+                rightTensor (ι₁ := ι) S))
+        = avgOver (uniformDistribution (Fq params)) (fun x =>
+            avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+              ∑ b : Bool, ∑ τ : GHatType n,
+                ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+                  ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                      gHatTupleType gs = τ,
+                    let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+                    let U := (gHatIdxMeas params family x).outcome g
+                    let T := gHatHalfProductOutcomeOperator params family n xs gs
+                    ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ * U) *
+                      rightTensor (ι₁ := ι) S))) :=
+          fromHToG_sum₂_avgOver₂ (uniformDistribution (Fq params))
+            (uniformDistribution (PointTuple params n)) _
+    _ = avgOver (uniformDistribution (Fq params)) (fun x =>
+          avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+              let S := fromHToGRecurrenceWeight params family ℓ
+                (prependTypeBit g.isSome (gHatTupleType gs))
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi ((leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) S) *
+                leftTensor (ι₂ := ι) U))) := by
+          refine avgOver_congr _ _ _ ?_
+          intro x
+          refine avgOver_congr _ _ _ ?_
+          intro xs
+          exact fromHToGAdjacentStageA0_pointwise_leftShape params ψbi family ℓ n x xs
+    _ = avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
+          ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+            let S := fromHToGRecurrenceWeight params family ℓ
+              (prependTypeBit g.isSome (gHatTupleType gs))
+            let U := (gHatIdxMeas params family q.1).outcome g
+            let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+            ev ψbi ((leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) S) *
+              leftTensor (ι₂ := ι) U)) := by
+          exact (avgOver_uniform_prod (α := Fq params) (β := PointTuple params n)
+            (f := fun x xs =>
+              ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+                let S := fromHToGRecurrenceWeight params family ℓ
+                  (prependTypeBit g.isSome (gHatTupleType gs))
+                let U := (gHatIdxMeas params family x).outcome g
+                let T := gHatHalfProductOutcomeOperator params family n xs gs
+                ev ψbi ((leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) S) *
+                  leftTensor (ι₂ := ι) U))).symm
+
+/-- Global rewrite of `M₁` to the right-action shape used by `closenessOfIP`. -/
+private lemma fromHToGAdjacentStageM1_eq_rightShape
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) :
+    let n := k - (ℓ + 1)
+    fromHToGAdjacentStageM1 params ψbi family k ℓ =
+      avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+        ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+          let S := fromHToGRecurrenceWeight params family ℓ
+            (prependTypeBit g.isSome (gHatTupleType gs))
+          let U := (gHatIdxMeas params family q.1).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+          ev ψbi ((leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) S) *
+            rightTensor (ι₁ := ι) U) := by
+  classical
+  intro n
+  unfold fromHToGAdjacentStageM1
+  change (∑ b : Bool, ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ) *
+                rightTensor (ι₁ := ι) (S * U))) = _
+  calc
+    (∑ b : Bool, ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ) *
+                rightTensor (ι₁ := ι) (S * U)))
+        = avgOver (uniformDistribution (Fq params)) (fun x =>
+            avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+              ∑ b : Bool, ∑ τ : GHatType n,
+                ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+                  ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                      gHatTupleType gs = τ,
+                    let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+                    let U := (gHatIdxMeas params family x).outcome g
+                    let T := gHatHalfProductOutcomeOperator params family n xs gs
+                    ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ) *
+                      rightTensor (ι₁ := ι) (S * U)))) :=
+          fromHToG_sum₂_avgOver₂ (uniformDistribution (Fq params))
+            (uniformDistribution (PointTuple params n)) _
+    _ = avgOver (uniformDistribution (Fq params)) (fun x =>
+          avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+              let S := fromHToGRecurrenceWeight params family ℓ
+                (prependTypeBit g.isSome (gHatTupleType gs))
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi ((leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) S) *
+                rightTensor (ι₁ := ι) U))) := by
+          refine avgOver_congr _ _ _ ?_
+          intro x
+          refine avgOver_congr _ _ _ ?_
+          intro xs
+          exact fromHToGAdjacentStageM1_pointwise_rightShape params ψbi family ℓ n x xs
+    _ = avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
+          ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+            let S := fromHToGRecurrenceWeight params family ℓ
+              (prependTypeBit g.isSome (gHatTupleType gs))
+            let U := (gHatIdxMeas params family q.1).outcome g
+            let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+            ev ψbi ((leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) S) *
+              rightTensor (ι₁ := ι) U)) := by
+          exact (avgOver_uniform_prod (α := Fq params) (β := PointTuple params n)
+            (f := fun x xs =>
+              ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+                let S := fromHToGRecurrenceWeight params family ℓ
+                  (prependTypeBit g.isSome (gHatTupleType gs))
+                let U := (gHatIdxMeas params family x).outcome g
+                let T := gHatHalfProductOutcomeOperator params family n xs gs
+                ev ψbi ((leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) S) *
+                  rightTensor (ι₁ := ι) U))).symm
+
+/-- The paper's second adjacent-stage intermediate scalar `M₂`: after the first
+half-sandwich commutation. -/
+private noncomputable def fromHToGAdjacentStageM2
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) : Error :=
+  let n := k - (ℓ + 1)
+  ∑ b : Bool,
+    ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (T * U * Tᴴ) *
+                rightTensor (ι₁ := ι) (S * U))
+
+/-- The paper's third adjacent-stage intermediate scalar `M₃`: after the second
+half-sandwich commutation. -/
+private noncomputable def fromHToGAdjacentStageM3
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) : Error :=
+  let n := k - (ℓ + 1)
+  ∑ b : Bool,
+    ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ * U) *
+                rightTensor (ι₁ := ι) (S * U))
+
+/-- Pointwise rewrite of `M₁` to the half-sandwich source shape. -/
+private lemma fromHToGAdjacentStageM1_pointwise_halfSandwichLeftShape
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (ℓ n : ℕ) (x : Fq params) (xs : PointTuple params n) :
+    (∑ b : Bool, ∑ τ : GHatType n,
+      ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+        ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+            gHatTupleType gs = τ,
+          let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+          let U := (gHatIdxMeas params family x).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n xs gs
+          ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ) *
+            rightTensor (ι₁ := ι) (S * U))) =
+      ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+        let S := fromHToGRecurrenceWeight params family ℓ
+          (prependTypeBit g.isSome (gHatTupleType gs))
+        let U := (gHatIdxMeas params family x).outcome g
+        let T := gHatHalfProductOutcomeOperator params family n xs gs
+        ev ψbi (leftTensor (ι₂ := ι) (U * T) *
+          (leftTensor (ι₂ := ι) Tᴴ * rightTensor (ι₁ := ι) (S * U))) := by
+  classical
+  rw [fromHToG_bool_type_filtered_outcome_sum]
+  refine Finset.sum_congr rfl ?_
+  intro g _hg
+  refine Finset.sum_congr rfl ?_
+  intro gs _hgs
+  exact congrArg (ev ψbi)
+    (fromHToG_halfSandwich_left_context_term
+      ((gHatIdxMeas params family x).outcome g)
+      (gHatHalfProductOutcomeOperator params family n xs gs)
+      (fromHToGRecurrenceWeight params family ℓ
+        (prependTypeBit g.isSome (gHatTupleType gs)))).symm
+
+/-- Pointwise rewrite of `M₂` to the half-sandwich target shape. -/
+private lemma fromHToGAdjacentStageM2_pointwise_halfSandwichRightShape
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (ℓ n : ℕ) (x : Fq params) (xs : PointTuple params n) :
+    (∑ b : Bool, ∑ τ : GHatType n,
+      ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+        ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+            gHatTupleType gs = τ,
+          let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+          let U := (gHatIdxMeas params family x).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n xs gs
+          ev ψbi (leftTensor (ι₂ := ι) (T * U * Tᴴ) *
+            rightTensor (ι₁ := ι) (S * U))) =
+      ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+        let S := fromHToGRecurrenceWeight params family ℓ
+          (prependTypeBit g.isSome (gHatTupleType gs))
+        let U := (gHatIdxMeas params family x).outcome g
+        let T := gHatHalfProductOutcomeOperator params family n xs gs
+        ev ψbi (leftTensor (ι₂ := ι) (T * U) *
+          (leftTensor (ι₂ := ι) Tᴴ * rightTensor (ι₁ := ι) (S * U))) := by
+  classical
+  rw [fromHToG_bool_type_filtered_outcome_sum]
+  refine Finset.sum_congr rfl ?_
+  intro g _hg
+  refine Finset.sum_congr rfl ?_
+  intro gs _hgs
+  exact congrArg (ev ψbi)
+    (fromHToG_halfSandwich_right_context_term
+      ((gHatIdxMeas params family x).outcome g)
+      (gHatHalfProductOutcomeOperator params family n xs gs)
+      (fromHToGRecurrenceWeight params family ℓ
+        (prependTypeBit g.isSome (gHatTupleType gs)))).symm
+
+/-- Pointwise rewrite of `M₂` to the adjoint half-sandwich source shape. -/
+private lemma fromHToGAdjacentStageM2_pointwise_halfSandwichRightAdjointShape
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (ℓ n : ℕ) (x : Fq params) (xs : PointTuple params n) :
+    (∑ b : Bool, ∑ τ : GHatType n,
+      ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+        ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+            gHatTupleType gs = τ,
+          let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+          let U := (gHatIdxMeas params family x).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n xs gs
+          ev ψbi (leftTensor (ι₂ := ι) (T * U * Tᴴ) *
+            rightTensor (ι₁ := ι) (S * U))) =
+      ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+        let S := fromHToGRecurrenceWeight params family ℓ
+          (prependTypeBit g.isSome (gHatTupleType gs))
+        let U := (gHatIdxMeas params family x).outcome g
+        let T := gHatHalfProductOutcomeOperator params family n xs gs
+        ev ψbi (leftTensor (ι₂ := ι) T *
+          (leftTensor (ι₂ := ι) (U * Tᴴ) * rightTensor (ι₁ := ι) (S * U))) := by
+  classical
+  rw [fromHToG_bool_type_filtered_outcome_sum]
+  refine Finset.sum_congr rfl ?_
+  intro g _hg
+  refine Finset.sum_congr rfl ?_
+  intro gs _hgs
+  exact congrArg (ev ψbi)
+    (fromHToG_halfSandwich_adjoint_right_context_term
+      ((gHatIdxMeas params family x).outcome g)
+      (gHatHalfProductOutcomeOperator params family n xs gs)
+      (fromHToGRecurrenceWeight params family ℓ
+        (prependTypeBit g.isSome (gHatTupleType gs)))).symm
+
+/-- Pointwise rewrite of `M₃` to the adjoint half-sandwich target shape. -/
+private lemma fromHToGAdjacentStageM3_pointwise_halfSandwichLeftAdjointShape
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (ℓ n : ℕ) (x : Fq params) (xs : PointTuple params n) :
+    (∑ b : Bool, ∑ τ : GHatType n,
+      ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+        ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+            gHatTupleType gs = τ,
+          let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+          let U := (gHatIdxMeas params family x).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n xs gs
+          ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ * U) *
+            rightTensor (ι₁ := ι) (S * U))) =
+      ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+        let S := fromHToGRecurrenceWeight params family ℓ
+          (prependTypeBit g.isSome (gHatTupleType gs))
+        let U := (gHatIdxMeas params family x).outcome g
+        let T := gHatHalfProductOutcomeOperator params family n xs gs
+        ev ψbi (leftTensor (ι₂ := ι) T *
+          (leftTensor (ι₂ := ι) (Tᴴ * U) * rightTensor (ι₁ := ι) (S * U))) := by
+  classical
+  rw [fromHToG_bool_type_filtered_outcome_sum]
+  refine Finset.sum_congr rfl ?_
+  intro g _hg
+  refine Finset.sum_congr rfl ?_
+  intro gs _hgs
+  exact congrArg (ev ψbi)
+    (fromHToG_halfSandwich_adjoint_left_context_term
+      ((gHatIdxMeas params family x).outcome g)
+      (gHatHalfProductOutcomeOperator params family n xs gs)
+      (fromHToGRecurrenceWeight params family ℓ
+        (prependTypeBit g.isSome (gHatTupleType gs)))).symm
+
+/-- Pointwise rewrite of `M₂` to the left-action adjoint half-sandwich shape. -/
+private lemma fromHToGAdjacentStageM2_pointwise_halfSandwichRightAdjointLeftActionShape
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (ℓ n : ℕ) (x : Fq params) (xs : PointTuple params n) :
+    (∑ b : Bool, ∑ τ : GHatType n,
+      ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+        ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+            gHatTupleType gs = τ,
+          let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+          let U := (gHatIdxMeas params family x).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n xs gs
+          ev ψbi (leftTensor (ι₂ := ι) (T * U * Tᴴ) *
+            rightTensor (ι₁ := ι) (S * U))) =
+      ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+        let S := fromHToGRecurrenceWeight params family ℓ
+          (prependTypeBit g.isSome (gHatTupleType gs))
+        let U := (gHatIdxMeas params family x).outcome g
+        let T := gHatHalfProductOutcomeOperator params family n xs gs
+        ev ψbi ((leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) (S * U)) *
+          leftTensor (ι₂ := ι) (U * Tᴴ)) := by
+  calc
+    (∑ b : Bool, ∑ τ : GHatType n,
+      ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+        ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+            gHatTupleType gs = τ,
+          let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+          let U := (gHatIdxMeas params family x).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n xs gs
+          ev ψbi (leftTensor (ι₂ := ι) (T * U * Tᴴ) *
+            rightTensor (ι₁ := ι) (S * U)))
+        = ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+            let S := fromHToGRecurrenceWeight params family ℓ
+              (prependTypeBit g.isSome (gHatTupleType gs))
+            let U := (gHatIdxMeas params family x).outcome g
+            let T := gHatHalfProductOutcomeOperator params family n xs gs
+            ev ψbi (leftTensor (ι₂ := ι) T *
+              (leftTensor (ι₂ := ι) (U * Tᴴ) * rightTensor (ι₁ := ι) (S * U))) :=
+          fromHToGAdjacentStageM2_pointwise_halfSandwichRightAdjointShape
+            params ψbi family ℓ n x xs
+    _ = ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+        let S := fromHToGRecurrenceWeight params family ℓ
+          (prependTypeBit g.isSome (gHatTupleType gs))
+        let U := (gHatIdxMeas params family x).outcome g
+        let T := gHatHalfProductOutcomeOperator params family n xs gs
+        ev ψbi ((leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) (S * U)) *
+          leftTensor (ι₂ := ι) (U * Tᴴ)) := by
+          refine Finset.sum_congr rfl ?_
+          intro g _hg
+          refine Finset.sum_congr rfl ?_
+          intro gs _hgs
+          exact congrArg (ev ψbi)
+            (fromHToG_halfSandwich_adjoint_right_leftAction_term
+              ((gHatIdxMeas params family x).outcome g)
+              (gHatHalfProductOutcomeOperator params family n xs gs)
+              (fromHToGRecurrenceWeight params family ℓ
+                (prependTypeBit g.isSome (gHatTupleType gs)))).symm
+
+/-- Pointwise rewrite of `M₃` to the left-action adjoint half-sandwich shape. -/
+private lemma fromHToGAdjacentStageM3_pointwise_halfSandwichLeftAdjointLeftActionShape
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (ℓ n : ℕ) (x : Fq params) (xs : PointTuple params n) :
+    (∑ b : Bool, ∑ τ : GHatType n,
+      ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+        ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+            gHatTupleType gs = τ,
+          let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+          let U := (gHatIdxMeas params family x).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n xs gs
+          ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ * U) *
+            rightTensor (ι₁ := ι) (S * U))) =
+      ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+        let S := fromHToGRecurrenceWeight params family ℓ
+          (prependTypeBit g.isSome (gHatTupleType gs))
+        let U := (gHatIdxMeas params family x).outcome g
+        let T := gHatHalfProductOutcomeOperator params family n xs gs
+        ev ψbi ((leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) (S * U)) *
+          leftTensor (ι₂ := ι) (Tᴴ * U)) := by
+  calc
+    (∑ b : Bool, ∑ τ : GHatType n,
+      ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+        ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+            gHatTupleType gs = τ,
+          let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+          let U := (gHatIdxMeas params family x).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n xs gs
+          ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ * U) *
+            rightTensor (ι₁ := ι) (S * U)))
+        = ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+            let S := fromHToGRecurrenceWeight params family ℓ
+              (prependTypeBit g.isSome (gHatTupleType gs))
+            let U := (gHatIdxMeas params family x).outcome g
+            let T := gHatHalfProductOutcomeOperator params family n xs gs
+            ev ψbi (leftTensor (ι₂ := ι) T *
+              (leftTensor (ι₂ := ι) (Tᴴ * U) * rightTensor (ι₁ := ι) (S * U))) :=
+          fromHToGAdjacentStageM3_pointwise_halfSandwichLeftAdjointShape
+            params ψbi family ℓ n x xs
+    _ = ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+        let S := fromHToGRecurrenceWeight params family ℓ
+          (prependTypeBit g.isSome (gHatTupleType gs))
+        let U := (gHatIdxMeas params family x).outcome g
+        let T := gHatHalfProductOutcomeOperator params family n xs gs
+        ev ψbi ((leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) (S * U)) *
+          leftTensor (ι₂ := ι) (Tᴴ * U)) := by
+          refine Finset.sum_congr rfl ?_
+          intro g _hg
+          refine Finset.sum_congr rfl ?_
+          intro gs _hgs
+          exact congrArg (ev ψbi)
+            (fromHToG_halfSandwich_adjoint_left_leftAction_term
+              ((gHatIdxMeas params family x).outcome g)
+              (gHatHalfProductOutcomeOperator params family n xs gs)
+              (fromHToGRecurrenceWeight params family ℓ
+                (prependTypeBit g.isSome (gHatTupleType gs)))).symm
+
+/-- Global rewrite of `M₁` to the half-sandwich source shape. -/
+private lemma fromHToGAdjacentStageM1_eq_halfSandwichLeftShape
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) :
+    let n := k - (ℓ + 1)
+    fromHToGAdjacentStageM1 params ψbi family k ℓ =
+      avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+        ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+          let S := fromHToGRecurrenceWeight params family ℓ
+            (prependTypeBit g.isSome (gHatTupleType gs))
+          let U := (gHatIdxMeas params family q.1).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+          ev ψbi (leftTensor (ι₂ := ι) (U * T) *
+            (leftTensor (ι₂ := ι) Tᴴ * rightTensor (ι₁ := ι) (S * U))) := by
+  classical
+  intro n
+  unfold fromHToGAdjacentStageM1
+  change (∑ b : Bool, ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ) *
+                rightTensor (ι₁ := ι) (S * U))) = _
+  calc
+    (∑ b : Bool, ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ) *
+                rightTensor (ι₁ := ι) (S * U)))
+        = avgOver (uniformDistribution (Fq params)) (fun x =>
+            avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+              ∑ b : Bool, ∑ τ : GHatType n,
+                ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+                  ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                      gHatTupleType gs = τ,
+                    let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+                    let U := (gHatIdxMeas params family x).outcome g
+                    let T := gHatHalfProductOutcomeOperator params family n xs gs
+                    ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ) *
+                      rightTensor (ι₁ := ι) (S * U)))) :=
+          fromHToG_sum₂_avgOver₂ (uniformDistribution (Fq params))
+            (uniformDistribution (PointTuple params n)) _
+    _ = avgOver (uniformDistribution (Fq params)) (fun x =>
+          avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+              let S := fromHToGRecurrenceWeight params family ℓ
+                (prependTypeBit g.isSome (gHatTupleType gs))
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (U * T) *
+                (leftTensor (ι₂ := ι) Tᴴ * rightTensor (ι₁ := ι) (S * U))))) := by
+          refine avgOver_congr _ _ _ ?_
+          intro x
+          refine avgOver_congr _ _ _ ?_
+          intro xs
+          exact fromHToGAdjacentStageM1_pointwise_halfSandwichLeftShape
+            params ψbi family ℓ n x xs
+    _ = avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
+          ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+            let S := fromHToGRecurrenceWeight params family ℓ
+              (prependTypeBit g.isSome (gHatTupleType gs))
+            let U := (gHatIdxMeas params family q.1).outcome g
+            let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+            ev ψbi (leftTensor (ι₂ := ι) (U * T) *
+              (leftTensor (ι₂ := ι) Tᴴ * rightTensor (ι₁ := ι) (S * U)))) := by
+          exact (avgOver_uniform_prod (α := Fq params) (β := PointTuple params n)
+            (f := fun x xs =>
+              ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+                let S := fromHToGRecurrenceWeight params family ℓ
+                  (prependTypeBit g.isSome (gHatTupleType gs))
+                let U := (gHatIdxMeas params family x).outcome g
+                let T := gHatHalfProductOutcomeOperator params family n xs gs
+                ev ψbi (leftTensor (ι₂ := ι) (U * T) *
+                  (leftTensor (ι₂ := ι) Tᴴ * rightTensor (ι₁ := ι) (S * U))))).symm
+
+/-- Global rewrite of `M₂` to the half-sandwich target shape. -/
+private lemma fromHToGAdjacentStageM2_eq_halfSandwichRightShape
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) :
+    let n := k - (ℓ + 1)
+    fromHToGAdjacentStageM2 params ψbi family k ℓ =
+      avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+        ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+          let S := fromHToGRecurrenceWeight params family ℓ
+            (prependTypeBit g.isSome (gHatTupleType gs))
+          let U := (gHatIdxMeas params family q.1).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+          ev ψbi (leftTensor (ι₂ := ι) (T * U) *
+            (leftTensor (ι₂ := ι) Tᴴ * rightTensor (ι₁ := ι) (S * U))) := by
+  classical
+  intro n
+  unfold fromHToGAdjacentStageM2
+  change (∑ b : Bool, ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (T * U * Tᴴ) *
+                rightTensor (ι₁ := ι) (S * U))) = _
+  calc
+    (∑ b : Bool, ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (T * U * Tᴴ) *
+                rightTensor (ι₁ := ι) (S * U)))
+        = avgOver (uniformDistribution (Fq params)) (fun x =>
+            avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+              ∑ b : Bool, ∑ τ : GHatType n,
+                ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+                  ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                      gHatTupleType gs = τ,
+                    let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+                    let U := (gHatIdxMeas params family x).outcome g
+                    let T := gHatHalfProductOutcomeOperator params family n xs gs
+                    ev ψbi (leftTensor (ι₂ := ι) (T * U * Tᴴ) *
+                      rightTensor (ι₁ := ι) (S * U)))) :=
+          fromHToG_sum₂_avgOver₂ (uniformDistribution (Fq params))
+            (uniformDistribution (PointTuple params n)) _
+    _ = avgOver (uniformDistribution (Fq params)) (fun x =>
+          avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+              let S := fromHToGRecurrenceWeight params family ℓ
+                (prependTypeBit g.isSome (gHatTupleType gs))
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (T * U) *
+                (leftTensor (ι₂ := ι) Tᴴ * rightTensor (ι₁ := ι) (S * U))))) := by
+          refine avgOver_congr _ _ _ ?_
+          intro x
+          refine avgOver_congr _ _ _ ?_
+          intro xs
+          exact fromHToGAdjacentStageM2_pointwise_halfSandwichRightShape
+            params ψbi family ℓ n x xs
+    _ = avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
+          ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+            let S := fromHToGRecurrenceWeight params family ℓ
+              (prependTypeBit g.isSome (gHatTupleType gs))
+            let U := (gHatIdxMeas params family q.1).outcome g
+            let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+            ev ψbi (leftTensor (ι₂ := ι) (T * U) *
+              (leftTensor (ι₂ := ι) Tᴴ * rightTensor (ι₁ := ι) (S * U)))) := by
+          exact (avgOver_uniform_prod (α := Fq params) (β := PointTuple params n)
+            (f := fun x xs =>
+              ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+                let S := fromHToGRecurrenceWeight params family ℓ
+                  (prependTypeBit g.isSome (gHatTupleType gs))
+                let U := (gHatIdxMeas params family x).outcome g
+                let T := gHatHalfProductOutcomeOperator params family n xs gs
+                ev ψbi (leftTensor (ι₂ := ι) (T * U) *
+                  (leftTensor (ι₂ := ι) Tᴴ * rightTensor (ι₁ := ι) (S * U))))).symm
+
+/-- Global rewrite of `M₂` to the adjoint half-sandwich source shape. -/
+private lemma fromHToGAdjacentStageM2_eq_halfSandwichRightAdjointShape
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) :
+    let n := k - (ℓ + 1)
+    fromHToGAdjacentStageM2 params ψbi family k ℓ =
+      avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+        ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+          let S := fromHToGRecurrenceWeight params family ℓ
+            (prependTypeBit g.isSome (gHatTupleType gs))
+          let U := (gHatIdxMeas params family q.1).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+          ev ψbi (leftTensor (ι₂ := ι) T *
+            (leftTensor (ι₂ := ι) (U * Tᴴ) * rightTensor (ι₁ := ι) (S * U))) := by
+  classical
+  intro n
+  unfold fromHToGAdjacentStageM2
+  change (∑ b : Bool, ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (T * U * Tᴴ) *
+                rightTensor (ι₁ := ι) (S * U))) = _
+  calc
+    (∑ b : Bool, ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (T * U * Tᴴ) *
+                rightTensor (ι₁ := ι) (S * U)))
+        = avgOver (uniformDistribution (Fq params)) (fun x =>
+            avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+              ∑ b : Bool, ∑ τ : GHatType n,
+                ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+                  ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                      gHatTupleType gs = τ,
+                    let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+                    let U := (gHatIdxMeas params family x).outcome g
+                    let T := gHatHalfProductOutcomeOperator params family n xs gs
+                    ev ψbi (leftTensor (ι₂ := ι) (T * U * Tᴴ) *
+                      rightTensor (ι₁ := ι) (S * U)))) :=
+          fromHToG_sum₂_avgOver₂ (uniformDistribution (Fq params))
+            (uniformDistribution (PointTuple params n)) _
+    _ = avgOver (uniformDistribution (Fq params)) (fun x =>
+          avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+              let S := fromHToGRecurrenceWeight params family ℓ
+                (prependTypeBit g.isSome (gHatTupleType gs))
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) T *
+                (leftTensor (ι₂ := ι) (U * Tᴴ) * rightTensor (ι₁ := ι) (S * U))))) := by
+          refine avgOver_congr _ _ _ ?_
+          intro x
+          refine avgOver_congr _ _ _ ?_
+          intro xs
+          exact fromHToGAdjacentStageM2_pointwise_halfSandwichRightAdjointShape
+            params ψbi family ℓ n x xs
+    _ = avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
+          ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+            let S := fromHToGRecurrenceWeight params family ℓ
+              (prependTypeBit g.isSome (gHatTupleType gs))
+            let U := (gHatIdxMeas params family q.1).outcome g
+            let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+            ev ψbi (leftTensor (ι₂ := ι) T *
+              (leftTensor (ι₂ := ι) (U * Tᴴ) * rightTensor (ι₁ := ι) (S * U)))) := by
+          exact (avgOver_uniform_prod (α := Fq params) (β := PointTuple params n)
+            (f := fun x xs =>
+              ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+                let S := fromHToGRecurrenceWeight params family ℓ
+                  (prependTypeBit g.isSome (gHatTupleType gs))
+                let U := (gHatIdxMeas params family x).outcome g
+                let T := gHatHalfProductOutcomeOperator params family n xs gs
+                ev ψbi (leftTensor (ι₂ := ι) T *
+                  (leftTensor (ι₂ := ι) (U * Tᴴ) * rightTensor (ι₁ := ι) (S * U))))).symm
+
+/-- Global rewrite of `M₃` to the adjoint half-sandwich target shape. -/
+private lemma fromHToGAdjacentStageM3_eq_halfSandwichLeftAdjointShape
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) :
+    let n := k - (ℓ + 1)
+    fromHToGAdjacentStageM3 params ψbi family k ℓ =
+      avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+        ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+          let S := fromHToGRecurrenceWeight params family ℓ
+            (prependTypeBit g.isSome (gHatTupleType gs))
+          let U := (gHatIdxMeas params family q.1).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+          ev ψbi (leftTensor (ι₂ := ι) T *
+            (leftTensor (ι₂ := ι) (Tᴴ * U) * rightTensor (ι₁ := ι) (S * U))) := by
+  classical
+  intro n
+  unfold fromHToGAdjacentStageM3
+  change (∑ b : Bool, ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ * U) *
+                rightTensor (ι₁ := ι) (S * U))) = _
+  calc
+    (∑ b : Bool, ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ * U) *
+                rightTensor (ι₁ := ι) (S * U)))
+        = avgOver (uniformDistribution (Fq params)) (fun x =>
+            avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+              ∑ b : Bool, ∑ τ : GHatType n,
+                ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+                  ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                      gHatTupleType gs = τ,
+                    let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+                    let U := (gHatIdxMeas params family x).outcome g
+                    let T := gHatHalfProductOutcomeOperator params family n xs gs
+                    ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ * U) *
+                      rightTensor (ι₁ := ι) (S * U)))) :=
+          fromHToG_sum₂_avgOver₂ (uniformDistribution (Fq params))
+            (uniformDistribution (PointTuple params n)) _
+    _ = avgOver (uniformDistribution (Fq params)) (fun x =>
+          avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+              let S := fromHToGRecurrenceWeight params family ℓ
+                (prependTypeBit g.isSome (gHatTupleType gs))
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) T *
+                (leftTensor (ι₂ := ι) (Tᴴ * U) * rightTensor (ι₁ := ι) (S * U))))) := by
+          refine avgOver_congr _ _ _ ?_
+          intro x
+          refine avgOver_congr _ _ _ ?_
+          intro xs
+          exact fromHToGAdjacentStageM3_pointwise_halfSandwichLeftAdjointShape
+            params ψbi family ℓ n x xs
+    _ = avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
+          ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+            let S := fromHToGRecurrenceWeight params family ℓ
+              (prependTypeBit g.isSome (gHatTupleType gs))
+            let U := (gHatIdxMeas params family q.1).outcome g
+            let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+            ev ψbi (leftTensor (ι₂ := ι) T *
+              (leftTensor (ι₂ := ι) (Tᴴ * U) * rightTensor (ι₁ := ι) (S * U)))) := by
+          exact (avgOver_uniform_prod (α := Fq params) (β := PointTuple params n)
+            (f := fun x xs =>
+              ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+                let S := fromHToGRecurrenceWeight params family ℓ
+                  (prependTypeBit g.isSome (gHatTupleType gs))
+                let U := (gHatIdxMeas params family x).outcome g
+                let T := gHatHalfProductOutcomeOperator params family n xs gs
+                ev ψbi (leftTensor (ι₂ := ι) T *
+                  (leftTensor (ι₂ := ι) (Tᴴ * U) * rightTensor (ι₁ := ι) (S * U))))).symm
+
+/-- Global rewrite of `M₂` to the left-action adjoint half-sandwich source shape. -/
+private lemma fromHToGAdjacentStageM2_eq_halfSandwichRightAdjointLeftActionShape
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) :
+    let n := k - (ℓ + 1)
+    fromHToGAdjacentStageM2 params ψbi family k ℓ =
+      avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+        ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+          let S := fromHToGRecurrenceWeight params family ℓ
+            (prependTypeBit g.isSome (gHatTupleType gs))
+          let U := (gHatIdxMeas params family q.1).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+          ev ψbi ((leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) (S * U)) *
+            leftTensor (ι₂ := ι) (U * Tᴴ)) := by
+  classical
+  intro n
+  calc
+    fromHToGAdjacentStageM2 params ψbi family k ℓ =
+        avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+          ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+            let S := fromHToGRecurrenceWeight params family ℓ
+              (prependTypeBit g.isSome (gHatTupleType gs))
+            let U := (gHatIdxMeas params family q.1).outcome g
+            let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+            ev ψbi (leftTensor (ι₂ := ι) T *
+              (leftTensor (ι₂ := ι) (U * Tᴴ) * rightTensor (ι₁ := ι) (S * U))) := by
+          simpa [n] using
+            fromHToGAdjacentStageM2_eq_halfSandwichRightAdjointShape params ψbi family k ℓ
+    _ = avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+          ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+            let S := fromHToGRecurrenceWeight params family ℓ
+              (prependTypeBit g.isSome (gHatTupleType gs))
+            let U := (gHatIdxMeas params family q.1).outcome g
+            let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+            ev ψbi ((leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) (S * U)) *
+              leftTensor (ι₂ := ι) (U * Tᴴ)) := by
+          refine avgOver_congr _ _ _ ?_
+          intro q
+          refine Finset.sum_congr rfl ?_
+          intro g _hg
+          refine Finset.sum_congr rfl ?_
+          intro gs _hgs
+          exact congrArg (ev ψbi)
+            (fromHToG_halfSandwich_adjoint_right_leftAction_term
+              ((gHatIdxMeas params family q.1).outcome g)
+              (gHatHalfProductOutcomeOperator params family n q.2 gs)
+              (fromHToGRecurrenceWeight params family ℓ
+                (prependTypeBit g.isSome (gHatTupleType gs)))).symm
+
+/-- Global rewrite of `M₃` to the left-action adjoint half-sandwich target shape. -/
+private lemma fromHToGAdjacentStageM3_eq_halfSandwichLeftAdjointLeftActionShape
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) :
+    let n := k - (ℓ + 1)
+    fromHToGAdjacentStageM3 params ψbi family k ℓ =
+      avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+        ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+          let S := fromHToGRecurrenceWeight params family ℓ
+            (prependTypeBit g.isSome (gHatTupleType gs))
+          let U := (gHatIdxMeas params family q.1).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+          ev ψbi ((leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) (S * U)) *
+            leftTensor (ι₂ := ι) (Tᴴ * U)) := by
+  classical
+  intro n
+  calc
+    fromHToGAdjacentStageM3 params ψbi family k ℓ =
+        avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+          ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+            let S := fromHToGRecurrenceWeight params family ℓ
+              (prependTypeBit g.isSome (gHatTupleType gs))
+            let U := (gHatIdxMeas params family q.1).outcome g
+            let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+            ev ψbi (leftTensor (ι₂ := ι) T *
+              (leftTensor (ι₂ := ι) (Tᴴ * U) * rightTensor (ι₁ := ι) (S * U))) := by
+          simpa [n] using
+            fromHToGAdjacentStageM3_eq_halfSandwichLeftAdjointShape params ψbi family k ℓ
+    _ = avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+          ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+            let S := fromHToGRecurrenceWeight params family ℓ
+              (prependTypeBit g.isSome (gHatTupleType gs))
+            let U := (gHatIdxMeas params family q.1).outcome g
+            let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+            ev ψbi ((leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) (S * U)) *
+              leftTensor (ι₂ := ι) (Tᴴ * U)) := by
+          refine avgOver_congr _ _ _ ?_
+          intro q
+          refine Finset.sum_congr rfl ?_
+          intro g _hg
+          refine Finset.sum_congr rfl ?_
+          intro gs _hgs
+          exact congrArg (ev ψbi)
+            (fromHToG_halfSandwich_adjoint_left_leftAction_term
+              ((gHatIdxMeas params family q.1).outcome g)
+              (gHatHalfProductOutcomeOperator params family n q.2 gs)
+              (fromHToGRecurrenceWeight params family ℓ
+                (prependTypeBit g.isSome (gHatTupleType gs)))).symm
+
+/-- Pointwise rewrite of `M₃` to the left-action shape for the final move-right step. -/
+private lemma fromHToGAdjacentStageM3_pointwise_finalLeftShape
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (ℓ n : ℕ) (x : Fq params) (xs : PointTuple params n) :
+    (∑ b : Bool, ∑ τ : GHatType n,
+      ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+        ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+            gHatTupleType gs = τ,
+          let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+          let U := (gHatIdxMeas params family x).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n xs gs
+          ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ * U) *
+            rightTensor (ι₁ := ι) (S * U))) =
+      ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+        let S := fromHToGRecurrenceWeight params family ℓ
+          (prependTypeBit g.isSome (gHatTupleType gs))
+        let U := (gHatIdxMeas params family x).outcome g
+        let T := gHatHalfProductOutcomeOperator params family n xs gs
+        ev ψbi ((leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) (S * U)) *
+          leftTensor (ι₂ := ι) U) := by
+  classical
+  rw [fromHToG_bool_type_filtered_outcome_sum]
+  refine Finset.sum_congr rfl ?_
+  intro g _hg
+  refine Finset.sum_congr rfl ?_
+  intro gs _hgs
+  exact congrArg (ev ψbi)
+    (fromHToG_moveRight_final_left_term
+      ((gHatIdxMeas params family x).outcome g)
+      (gHatHalfProductOutcomeOperator params family n xs gs)
+      (fromHToGRecurrenceWeight params family ℓ
+        (prependTypeBit g.isSome (gHatTupleType gs)))).symm
+
+/-- Pointwise rewrite of `M₄` to the right-action shape for the final move-right step. -/
+private lemma fromHToGAdjacentStageM4_pointwise_finalRightShape
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (ℓ n : ℕ) (x : Fq params) (xs : PointTuple params n) :
+    (∑ b : Bool, ∑ τ : GHatType n,
+      ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+        ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+            gHatTupleType gs = τ,
+          let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+          let U := (gHatIdxMeas params family x).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n xs gs
+          ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ) *
+            rightTensor (ι₁ := ι) (S * U * U))) =
+      ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+        let S := fromHToGRecurrenceWeight params family ℓ
+          (prependTypeBit g.isSome (gHatTupleType gs))
+        let U := (gHatIdxMeas params family x).outcome g
+        let T := gHatHalfProductOutcomeOperator params family n xs gs
+        ev ψbi ((leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) (S * U)) *
+          rightTensor (ι₁ := ι) U) := by
+  classical
+  rw [fromHToG_bool_type_filtered_outcome_sum]
+  refine Finset.sum_congr rfl ?_
+  intro g _hg
+  refine Finset.sum_congr rfl ?_
+  intro gs _hgs
+  exact congrArg (ev ψbi)
+    (fromHToG_moveRight_final_right_term
+      ((gHatIdxMeas params family x).outcome g)
+      (gHatHalfProductOutcomeOperator params family n xs gs)
+      (fromHToGRecurrenceWeight params family ℓ
+        (prependTypeBit g.isSome (gHatTupleType gs)))).symm
+
+/-- Optional paper endpoint intermediate `M₄`: after moving the remaining head
+completed-slice outcome to the right tensor factor. -/
+private noncomputable def fromHToGAdjacentStageM4
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) : Error :=
+  let n := k - (ℓ + 1)
+  ∑ b : Bool,
+    ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ) *
+                rightTensor (ι₁ := ι) (S * U * U))
+
+/-- Global rewrite of `M₃` to the left-action shape for the final move-right step. -/
+private lemma fromHToGAdjacentStageM3_eq_finalLeftShape
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) :
+    let n := k - (ℓ + 1)
+    fromHToGAdjacentStageM3 params ψbi family k ℓ =
+      avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+        ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+          let S := fromHToGRecurrenceWeight params family ℓ
+            (prependTypeBit g.isSome (gHatTupleType gs))
+          let U := (gHatIdxMeas params family q.1).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+          ev ψbi ((leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) (S * U)) *
+            leftTensor (ι₂ := ι) U) := by
+  classical
+  intro n
+  unfold fromHToGAdjacentStageM3
+  change (∑ b : Bool, ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ * U) *
+                rightTensor (ι₁ := ι) (S * U))) = _
+  calc
+    (∑ b : Bool, ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ * U) *
+                rightTensor (ι₁ := ι) (S * U)))
+        = avgOver (uniformDistribution (Fq params)) (fun x =>
+            avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+              ∑ b : Bool, ∑ τ : GHatType n,
+                ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+                  ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                      gHatTupleType gs = τ,
+                    let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+                    let U := (gHatIdxMeas params family x).outcome g
+                    let T := gHatHalfProductOutcomeOperator params family n xs gs
+                    ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ * U) *
+                      rightTensor (ι₁ := ι) (S * U)))) :=
+          fromHToG_sum₂_avgOver₂ (uniformDistribution (Fq params))
+            (uniformDistribution (PointTuple params n)) _
+    _ = avgOver (uniformDistribution (Fq params)) (fun x =>
+          avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+              let S := fromHToGRecurrenceWeight params family ℓ
+                (prependTypeBit g.isSome (gHatTupleType gs))
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi ((leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) (S * U)) *
+                leftTensor (ι₂ := ι) U))) := by
+          refine avgOver_congr _ _ _ ?_
+          intro x
+          refine avgOver_congr _ _ _ ?_
+          intro xs
+          exact fromHToGAdjacentStageM3_pointwise_finalLeftShape params ψbi family ℓ n x xs
+    _ = avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
+          ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+            let S := fromHToGRecurrenceWeight params family ℓ
+              (prependTypeBit g.isSome (gHatTupleType gs))
+            let U := (gHatIdxMeas params family q.1).outcome g
+            let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+            ev ψbi ((leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) (S * U)) *
+              leftTensor (ι₂ := ι) U)) := by
+          exact (avgOver_uniform_prod (α := Fq params) (β := PointTuple params n)
+            (f := fun x xs =>
+              ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+                let S := fromHToGRecurrenceWeight params family ℓ
+                  (prependTypeBit g.isSome (gHatTupleType gs))
+                let U := (gHatIdxMeas params family x).outcome g
+                let T := gHatHalfProductOutcomeOperator params family n xs gs
+                ev ψbi ((leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) (S * U)) *
+                  leftTensor (ι₂ := ι) U))).symm
+
+/-- Global rewrite of `M₄` to the right-action shape for the final move-right step. -/
+private lemma fromHToGAdjacentStageM4_eq_finalRightShape
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) :
+    let n := k - (ℓ + 1)
+    fromHToGAdjacentStageM4 params ψbi family k ℓ =
+      avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+        ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+          let S := fromHToGRecurrenceWeight params family ℓ
+            (prependTypeBit g.isSome (gHatTupleType gs))
+          let U := (gHatIdxMeas params family q.1).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+          ev ψbi ((leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) (S * U)) *
+            rightTensor (ι₁ := ι) U) := by
+  classical
+  intro n
+  unfold fromHToGAdjacentStageM4
+  change (∑ b : Bool, ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ) *
+                rightTensor (ι₁ := ι) (S * U * U))) = _
+  calc
+    (∑ b : Bool, ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ) *
+                rightTensor (ι₁ := ι) (S * U * U)))
+        = avgOver (uniformDistribution (Fq params)) (fun x =>
+            avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+              ∑ b : Bool, ∑ τ : GHatType n,
+                ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+                  ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                      gHatTupleType gs = τ,
+                    let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+                    let U := (gHatIdxMeas params family x).outcome g
+                    let T := gHatHalfProductOutcomeOperator params family n xs gs
+                    ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ) *
+                      rightTensor (ι₁ := ι) (S * U * U)))) :=
+          fromHToG_sum₂_avgOver₂ (uniformDistribution (Fq params))
+            (uniformDistribution (PointTuple params n)) _
+    _ = avgOver (uniformDistribution (Fq params)) (fun x =>
+          avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+              let S := fromHToGRecurrenceWeight params family ℓ
+                (prependTypeBit g.isSome (gHatTupleType gs))
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi ((leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) (S * U)) *
+                rightTensor (ι₁ := ι) U))) := by
+          refine avgOver_congr _ _ _ ?_
+          intro x
+          refine avgOver_congr _ _ _ ?_
+          intro xs
+          exact fromHToGAdjacentStageM4_pointwise_finalRightShape params ψbi family ℓ n x xs
+    _ = avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
+          ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+            let S := fromHToGRecurrenceWeight params family ℓ
+              (prependTypeBit g.isSome (gHatTupleType gs))
+            let U := (gHatIdxMeas params family q.1).outcome g
+            let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+            ev ψbi ((leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) (S * U)) *
+              rightTensor (ι₁ := ι) U)) := by
+          exact (avgOver_uniform_prod (α := Fq params) (β := PointTuple params n)
+            (f := fun x xs =>
+              ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+                let S := fromHToGRecurrenceWeight params family ℓ
+                  (prependTypeBit g.isSome (gHatTupleType gs))
+                let U := (gHatIdxMeas params family x).outcome g
+                let T := gHatHalfProductOutcomeOperator params family n xs gs
+                ev ψbi ((leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) (S * U)) *
+                  rightTensor (ι₁ := ι) U))).symm
+
+/-- The exact collapsed branch expression obtained from `M₄` after projectivity and
+averaging the complete/incomplete head branch. -/
+private noncomputable def fromHToGAdjacentStageCollapsed
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι) (k ℓ : ℕ) : Error :=
+  let n := k - (ℓ + 1)
+  ∑ τ : GHatType n,
+    ev ψbi (leftTensor (ι₂ := ι) (averagedSandwichByTypeSubMeas params family n τ).total *
+      rightTensor (ι₁ := ι)
+        (fromHToGRecurrenceWeight params family ℓ (prependTypeBit true τ) *
+            family.averagedSubMeas.total +
+          fromHToGRecurrenceWeight params family ℓ (prependTypeBit false τ) *
+            (1 - family.averagedSubMeas.total)))
+
+/-- The collapsed branch expression is exactly the next Lean stage. -/
+private lemma fromHToGAdjacentStageCollapsed_eq_stage_succ
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (hstageExact : FromHToGAdjacentStageExactFacts params ψbi family)
+    (k ℓ : ℕ) :
+    fromHToGAdjacentStageCollapsed params ψbi family k ℓ =
+      fromHToGStageMass params ψbi family k (ℓ + 1) := by
+  classical
+  unfold fromHToGAdjacentStageCollapsed fromHToGStageMass
+  refine Finset.sum_congr rfl ?_
+  intro τ _hτ
+  exact (hstageExact.tailWeightRecurrence ℓ τ).symm
+
+/-- `M₄` collapses exactly to the branch-averaged recurrence expression. -/
+private lemma fromHToGAdjacentStageM4_eq_collapsed
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (hcomplete : averageOperatorOverDistribution (uniformDistribution (Fq params))
+      (fun x => (completePartSubMeas params family x).total) =
+        family.averagedSubMeas.total)
+    (hincomplete : averageOperatorOverDistribution (uniformDistribution (Fq params))
+      (fun x => (incompletePartSubMeas params family x).total) =
+        1 - family.averagedSubMeas.total)
+    (k ℓ : ℕ) :
+    fromHToGAdjacentStageM4 params ψbi family k ℓ =
+      fromHToGAdjacentStageCollapsed params ψbi family k ℓ := by
+  classical
+  let n := k - (ℓ + 1)
+  unfold fromHToGAdjacentStageM4 fromHToGAdjacentStageCollapsed
+  change
+    (∑ b : Bool, ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ) *
+                rightTensor (ι₁ := ι) (S * U * U))) =
+      ∑ τ : GHatType n,
+        ev ψbi (leftTensor (ι₂ := ι)
+          (averagedSandwichByTypeSubMeas params family n τ).total *
+            rightTensor (ι₁ := ι)
+              (fromHToGRecurrenceWeight params family ℓ (prependTypeBit true τ) *
+                  family.averagedSubMeas.total +
+                fromHToGRecurrenceWeight params family ℓ (prependTypeBit false τ) *
+                  (1 - family.averagedSubMeas.total)))
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl ?_
+  intro τ _hτ
+  let Aτ := (averagedSandwichByTypeSubMeas params family n τ).total
+  let Strue := fromHToGRecurrenceWeight params family ℓ (prependTypeBit true τ)
+  let Sfalse := fromHToGRecurrenceWeight params family ℓ (prependTypeBit false τ)
+  have htrue :
+      avgOver (uniformDistribution (Fq params)) (fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = true,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ) *
+                rightTensor (ι₁ := ι) (Strue * U * U)))) =
+        ev ψbi (leftTensor (ι₂ := ι) Aτ *
+          rightTensor (ι₁ := ι) (Strue * family.averagedSubMeas.total)) := by
+    calc
+      avgOver (uniformDistribution (Fq params)) (fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = true,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ) *
+                rightTensor (ι₁ := ι) (Strue * U * U))))
+          = avgOver (uniformDistribution (Fq params)) (fun x =>
+              avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+                ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                    gHatTupleType gs = τ,
+                  let T := gHatHalfProductOutcomeOperator params family n xs gs
+                  ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ) *
+                    rightTensor (ι₁ := ι)
+                      (Strue * (completePartSubMeas params family x).total)))) := by
+              refine avgOver_congr _ _ _ ?_
+              intro x
+              refine avgOver_congr _ _ _ ?_
+              intro xs
+              simpa [Strue] using
+                (fromHToGAdjacentStageM4_head_sum params ψbi family ℓ n true τ x xs)
+      _ = avgOver (uniformDistribution (Fq params)) (fun x =>
+              ev ψbi (leftTensor (ι₂ := ι) Aτ *
+                rightTensor (ι₁ := ι)
+                  (Strue * (completePartSubMeas params family x).total))) := by
+              refine avgOver_congr _ _ _ ?_
+              intro x
+              simpa [Aτ, Strue] using
+                (fromHToG_avgOver_tail_type_ev params ψbi family n τ
+                  (Strue * (completePartSubMeas params family x).total))
+      _ = ev ψbi (leftTensor (ι₂ := ι) Aτ *
+            rightTensor (ι₁ := ι) (Strue * family.averagedSubMeas.total)) := by
+              simpa [Aτ, Strue] using
+                (fromHToG_avgOver_head_branch_ev params ψbi family hcomplete hincomplete
+                  true Aτ Strue)
+  have hfalse :
+      avgOver (uniformDistribution (Fq params)) (fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = false,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ) *
+                rightTensor (ι₁ := ι) (Sfalse * U * U)))) =
+        ev ψbi (leftTensor (ι₂ := ι) Aτ *
+          rightTensor (ι₁ := ι) (Sfalse * (1 - family.averagedSubMeas.total))) := by
+    calc
+      avgOver (uniformDistribution (Fq params)) (fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = false,
+            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                gHatTupleType gs = τ,
+              let U := (gHatIdxMeas params family x).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n xs gs
+              ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ) *
+                rightTensor (ι₁ := ι) (Sfalse * U * U))))
+          = avgOver (uniformDistribution (Fq params)) (fun x =>
+              avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+                ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+                    gHatTupleType gs = τ,
+                  let T := gHatHalfProductOutcomeOperator params family n xs gs
+                  ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ) *
+                    rightTensor (ι₁ := ι)
+                      (Sfalse * (incompletePartSubMeas params family x).total)))) := by
+              refine avgOver_congr _ _ _ ?_
+              intro x
+              refine avgOver_congr _ _ _ ?_
+              intro xs
+              simpa [Sfalse] using
+                (fromHToGAdjacentStageM4_head_sum params ψbi family ℓ n false τ x xs)
+      _ = avgOver (uniformDistribution (Fq params)) (fun x =>
+              ev ψbi (leftTensor (ι₂ := ι) Aτ *
+                rightTensor (ι₁ := ι)
+                  (Sfalse * (incompletePartSubMeas params family x).total))) := by
+              refine avgOver_congr _ _ _ ?_
+              intro x
+              simpa [Aτ, Sfalse] using
+                (fromHToG_avgOver_tail_type_ev params ψbi family n τ
+                  (Sfalse * (incompletePartSubMeas params family x).total))
+      _ = ev ψbi (leftTensor (ι₂ := ι) Aτ *
+            rightTensor (ι₁ := ι) (Sfalse * (1 - family.averagedSubMeas.total))) := by
+              simpa [Aτ, Sfalse] using
+                (fromHToG_avgOver_head_branch_ev params ψbi family hcomplete hincomplete
+                  false Aτ Sfalse)
+  rw [Fintype.sum_bool, htrue, hfalse]
+  rw [← ev_add]
+  congr 1
+  rw [← mul_add]
+  congr 1
+  exact (fromHToG_rightTensor_add
+    (Strue * family.averagedSubMeas.total)
+    (Sfalse * (1 - family.averagedSubMeas.total))).symm
+
+/-- Raw `qSDDCore` form of the half-sandwich commutation hypothesis after
+splitting a nonempty sandwich into its head and tail, with the error weakened to
+the ambient length `k`. -/
+private lemma fromHToG_headTail_qSDDCore_bound
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
+    (hhalf : ∀ j : ℕ, 2 ≤ j →
+      CommuteGHalfSandwichStatement params ψbi family gamma zeta j)
+    {n k : ℕ} (hn : 2 ≤ n + 1) (hnk : n + 1 ≤ k) :
+    avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
+      qSDDCore ψbi
+        (fun ogs : GHatOutcome params × GHatTupleOutcome params n =>
+          leftTensor (ι₂ := ι)
+            ((gHatIdxMeas params family q.1).outcome ogs.1 *
+              gHatHalfProductOutcomeOperator params family n q.2 ogs.2))
+        (fun ogs : GHatOutcome params × GHatTupleOutcome params n =>
+          leftTensor (ι₂ := ι)
+            (gHatHalfProductOutcomeOperator params family n q.2 ogs.2 *
+              (gHatIdxMeas params family q.1).outcome ogs.1))) ≤
+      commuteGHalfSandwichError params gamma zeta k := by
+  have hsplit : SDDOpRel ψbi
+      (uniformDistribution (Fq params × PointTuple params n))
+      (headTailOrderedFamily params family n)
+      (headTailRotatedFamily params family n)
+      (commuteGHalfSandwichError params gamma zeta (n + 1)) := by
+    exact (commuteGHalfSandwich_split_iff params ψbi family n
+      (commuteGHalfSandwichError params gamma zeta (n + 1))).1
+      (hhalf (n + 1) hn).repeatedCommutation
+  have hcore :
+      avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
+        qSDDCore ψbi
+          (fun ogs : GHatOutcome params × GHatTupleOutcome params n =>
+            leftTensor (ι₂ := ι)
+              ((gHatIdxMeas params family q.1).outcome ogs.1 *
+                gHatHalfProductOutcomeOperator params family n q.2 ogs.2))
+          (fun ogs : GHatOutcome params × GHatTupleOutcome params n =>
+            leftTensor (ι₂ := ι)
+              (gHatHalfProductOutcomeOperator params family n q.2 ogs.2 *
+                (gHatIdxMeas params family q.1).outcome ogs.1))) ≤
+        commuteGHalfSandwichError params gamma zeta (n + 1) := by
+    simpa [sddErrorOp, qSDDOp, headTailOrderedFamily, headTailRotatedFamily,
+      leftTensor_mul_leftTensor] using hsplit.squaredDistanceBound
+  exact le_trans hcore
+    (commuteGHalfSandwichError_mono_length params gamma zeta hgamma_nonneg hzeta_nonneg hnk)
+
+/-- The completed self-consistency estimate used in the first and final move-right
+steps, after adjoining an irrelevant uniform suffix-question register. -/
+private lemma fromHToG_selfConsistency_qSDDCore_bound
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hcompleted :
+      SDDRel ψbi
+        (uniformDistribution (SliceQuestion params))
+        (gHatSelfConsistencyLeftFamily params family)
+        (gHatSelfConsistencyRightFamily params family)
+        (gHatSelfConsistencyError zeta))
+    {n : ℕ} :
+    avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
+      qSDDCore ψbi
+        (fun g : GHatOutcome params =>
+          leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome g))
+        (fun g : GHatOutcome params =>
+          rightTensor (ι₁ := ι) ((gHatIdxMeas params family q.1).outcome g))) ≤
+      2 * zeta := by
+  have hscOp := gHatSelfConsistency_sddOpRel params ψbi family zeta hcompleted
+  have hprod := sddOpRel_uniform_fst
+    (α := SliceQuestion params) (β := PointTuple params n) (Outcome := GHatOutcome params)
+    (ι := ι) (ψ := ψbi)
+    (A := IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyLeftFamily params family))
+    (B := IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyRightFamily params family))
+    (δ := gHatSelfConsistencyError zeta) hscOp
+  simpa [sddErrorOp, qSDDOp, qSDDCore, gHatSelfConsistencyLeftFamily,
+    gHatSelfConsistencyRightFamily, gHatSelfConsistencyError] using hprod.squaredDistanceBound
+
+/-- Adjoint-oriented raw `qSDDCore` form of the half-sandwich commutation
+hypothesis.  This is the orientation used by the paper's Cauchy--Schwarz
+decompositions in `eq:call-this-later` and `eq:call-again-later-part-dos`. -/
+private lemma fromHToG_headTail_adjoint_qSDDCore_bound
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
+    (hhalf : ∀ j : ℕ, 2 ≤ j →
+      CommuteGHalfSandwichStatement params ψbi family gamma zeta j)
+    {n k : ℕ} (hn : 2 ≤ n + 1) (hnk : n + 1 ≤ k) :
+    avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
+      qSDDCore ψbi
+        (fun ogs : GHatOutcome params × GHatTupleOutcome params n =>
+          leftTensor (ι₂ := ι)
+            ((gHatHalfProductOutcomeOperator params family n q.2 ogs.2)ᴴ *
+              (gHatIdxMeas params family q.1).outcome ogs.1))
+        (fun ogs : GHatOutcome params × GHatTupleOutcome params n =>
+          leftTensor (ι₂ := ι)
+            ((gHatIdxMeas params family q.1).outcome ogs.1 *
+              (gHatHalfProductOutcomeOperator params family n q.2 ogs.2)ᴴ))) ≤
+      commuteGHalfSandwichError params gamma zeta k := by
+  /- Paper lines 1506--1610 orient the commutator square through adjoints before
+  applying the half-sandwich hypothesis.  The required Lean bridge should reduce
+  this adjoint-oriented `qSDDCore` to `fromHToG_headTail_qSDDCore_bound` using
+  `fromHToG_adjoint_commutator_square_eq` and
+  `fromHToG_gHatIdxMeas_outcome_isHermitian`. -/
+  sorry
+
+/-- The total mass of the tail sandwich family is the identity. -/
+private lemma fromHToG_gHatSandwichFamily_total_eq_one
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (n : ℕ) (xs : PointTuple params n) :
+    (gHatSandwichFamily params family n xs).total = 1 := by
+  simp [gHatSandwichFamily, gHatHalfProductTotalOperator_eq_one]
+
+/-- The tail sandwich outcomes sum to the identity. -/
+private lemma fromHToG_gHatSandwichFamily_sum_eq_one
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (n : ℕ) (xs : PointTuple params n) :
+    (∑ gs : GHatTupleOutcome params n,
+      (gHatSandwichFamily params family n xs).outcome gs) = 1 := by
+  rw [(gHatSandwichFamily params family n xs).sum_eq_total]
+  exact fromHToG_gHatSandwichFamily_total_eq_one params family n xs
+
+/-- One adjacent `fromHToG` paper step.
+
+This is the structured replacement for the former opaque residual.  The four
+existential intermediate scalars are exactly the four displayed intermediate
+expressions in `ld-pasting.tex:1449--1619`:
+
+* `M₁`: after moving the rightmost/head `\widehat G` to the right tensor factor
+  (`eq:move-g-over-there`), cost `√(2ζ)`;
+* `M₂`: after the first half-sandwich commutation (`eq:commute-g-part-one`),
+  cost `√ν₄`;
+* `M₃`: after the second half-sandwich commutation (`eq:commute-g-part-two`),
+  cost `√ν₄`;
+* the final edge moves the remaining head `\widehat G` to the right tensor factor
+  (`eq:h-ot-mgg`) and then collapses using projectivity and the exact
+  `S`-recurrence (`ld-pasting.tex:1648--1661`), cost `√(2ζ)`.
+
+The `sorry`s below are intentionally narrow proof obligations matching these
+four paper estimates; downstream packaging no longer hides them in one residual. -/
+private lemma fromHToGAdjacentStage_paperMoveChain
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (hnorm : ψbi.IsNormalized)
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
+    (hfacts : GHatFactsStatement params ψbi family gamma zeta)
+    (hhalf : ∀ j : ℕ, 2 ≤ j →
+      CommuteGHalfSandwichStatement params ψbi family gamma zeta j)
+    (hstageExact : FromHToGAdjacentStageExactFacts params ψbi family)
+    (k ℓ : ℕ) (hℓ : ℓ < k) :
+    |fromHToGStageMass params ψbi family k ℓ -
+        fromHToGStageMass params ψbi family k (ℓ + 1)| ≤
+      fromHToGRecurrenceError params gamma zeta k := by
+  let A : Error := fromHToGStageMass params ψbi family k ℓ
+  let E : Error := fromHToGStageMass params ψbi family k (ℓ + 1)
+  have hsplit := fromHToGStageMass_split_succ params ψbi family hℓ
+  have _ := hnorm
+  have _ := hgamma_nonneg
+  have _ := hzeta_nonneg
+  have _ := hfacts.completedSelfConsistency
+  have _ := hhalf
+  have _ := hstageExact.completeBranchAverage
+  have _ := hstageExact.incompleteBranchAverage
+  have _ := hstageExact.tailWeightRecurrence
+  have _ := hsplit
+  let M₁ : Error := fromHToGAdjacentStageM1 params ψbi family k ℓ
+  let M₂ : Error := fromHToGAdjacentStageM2 params ψbi family k ℓ
+  let M₃ : Error := fromHToGAdjacentStageM3 params ψbi family k ℓ
+  let M₄ : Error := fromHToGAdjacentStageM4 params ψbi family k ℓ
+  let Collapsed : Error := fromHToGAdjacentStageCollapsed params ψbi family k ℓ
+  have hA₁ : |A - M₁| ≤ Real.sqrt (2 * zeta) := by
+    have hA_eq_A0 : A = fromHToGAdjacentStageA0 params ψbi family k ℓ := by
+      simpa [A] using fromHToGStageMass_eq_adjacentStageA0 params ψbi family hℓ
+    let n := k - (ℓ + 1)
+    have hA0M1_secondRoot_le :
+        avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
+          qSDDCore ψbi
+            (fun g : GHatOutcome params =>
+              leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome g))
+            (fun g : GHatOutcome params =>
+              rightTensor (ι₁ := ι) ((gHatIdxMeas params family q.1).outcome g))) ≤
+          2 * zeta := by
+      simpa [n] using
+        fromHToG_selfConsistency_qSDDCore_bound params ψbi family zeta
+          hfacts.completedSelfConsistency (n := n)
+    have hA0M1_moveRight :
+        |fromHToGAdjacentStageA0 params ψbi family k ℓ -
+            fromHToGAdjacentStageM1 params ψbi family k ℓ| ≤ Real.sqrt (2 * zeta) := by
+      let Aop : Fq params × PointTuple params n → GHatOutcome params →
+          MIPStarRE.Quantum.Op (ι × ι) := fun q g =>
+        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome g)
+      let Bop : Fq params × PointTuple params n → GHatOutcome params →
+          MIPStarRE.Quantum.Op (ι × ι) := fun q g =>
+        rightTensor (ι₁ := ι) ((gHatIdxMeas params family q.1).outcome g)
+      let C : Fq params × PointTuple params n → GHatOutcome params →
+          GHatTupleOutcome params n → MIPStarRE.Quantum.Op (ι × ι) := fun q g gs =>
+        let S := fromHToGRecurrenceWeight params family ℓ
+          (prependTypeBit g.isSome (gHatTupleType gs))
+        let U := (gHatIdxMeas params family q.1).outcome g
+        let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+        leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) S
+      have hA0M1_firstRoot_le_one : ∀ q : Fq params × PointTuple params n,
+          ∑ g : GHatOutcome params,
+            (∑ gs : GHatTupleOutcome params n, C q g gs) *
+              (∑ gs : GHatTupleOutcome params n, C q g gs)ᴴ ≤ 1 := by
+        /- Paper lines 1472--1478: the first square root in
+        `eq:call-again-later-part-tres` is exactly the `Ĥ ⊗ S²` term, so this
+        should be discharged by rewriting `A0` as a suffix `Ĥ`, using
+        `eq:S-bound`, and then applying submeasurement boundedness. -/
+        sorry
+      have hA0M1_cauchySchwarz := MIPStarRE.LDT.Preliminaries.closenessOfIP ψbi hnorm
+        (uniformDistribution (Fq params × PointTuple params n))
+        (uniformDistribution_weight_sum_le_one (Fq params × PointTuple params n))
+        Aop Bop C (2 * zeta) (by simpa [Aop, Bop] using hA0M1_secondRoot_le)
+        hA0M1_firstRoot_le_one
+      simpa [Aop, Bop, C, fromHToGAdjacentStageA0_eq_leftShape,
+        fromHToGAdjacentStageM1_eq_rightShape] using hA0M1_cauchySchwarz
+    simpa [hA_eq_A0, M₁] using hA0M1_moveRight
+  have h₁₂ : |M₁ - M₂| ≤ Real.sqrt (commuteGHalfSandwichError params gamma zeta k) := by
+    /- Paper lines 1495--1550.  This is the first half-sandwich commutation:
+    first rewrite `eq:move-g-over-there` into the source/target forms of
+    `eq:commute-g-part-one`, then apply the Cauchy--Schwarz estimate
+    `eq:call-this-later`, with the two square roots handled separately. -/
+    let n := k - (ℓ + 1)
+    by_cases hn0 : n = 0
+    · have hM₁ : M₁ =
+          avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+              let S := fromHToGRecurrenceWeight params family ℓ
+                (prependTypeBit g.isSome (gHatTupleType gs))
+              let U := (gHatIdxMeas params family q.1).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+              ev ψbi (leftTensor (ι₂ := ι) (U * T) *
+                (leftTensor (ι₂ := ι) Tᴴ * rightTensor (ι₁ := ι) (S * U))) := by
+        simpa [M₁, n] using
+          fromHToGAdjacentStageM1_eq_halfSandwichLeftShape params ψbi family k ℓ
+      have hM₂ : M₂ =
+          avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+              let S := fromHToGRecurrenceWeight params family ℓ
+                (prependTypeBit g.isSome (gHatTupleType gs))
+              let U := (gHatIdxMeas params family q.1).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+              ev ψbi (leftTensor (ι₂ := ι) (T * U) *
+                (leftTensor (ι₂ := ι) Tᴴ * rightTensor (ι₁ := ι) (S * U))) := by
+        simpa [M₂, n] using
+          fromHToGAdjacentStageM2_eq_halfSandwichRightShape params ψbi family k ℓ
+      have hM : M₁ = M₂ := by
+        rw [hM₁, hM₂]
+        rw [hn0]
+        simp [gHatHalfProductOutcomeOperator]
+      rw [hM, sub_self, abs_zero]
+      exact Real.sqrt_nonneg _
+    · have hnpos : 1 ≤ n := Nat.pos_iff_ne_zero.mpr hn0
+      have hn : 2 ≤ n + 1 := Nat.succ_le_succ hnpos
+      have hnk : n + 1 ≤ k := by
+        dsimp [n]
+        omega
+      have hM₁_source : M₁ =
+          avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+              let S := fromHToGRecurrenceWeight params family ℓ
+                (prependTypeBit g.isSome (gHatTupleType gs))
+              let U := (gHatIdxMeas params family q.1).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+              ev ψbi (leftTensor (ι₂ := ι) (U * T) *
+                (leftTensor (ι₂ := ι) Tᴴ * rightTensor (ι₁ := ι) (S * U))) := by
+        simpa [M₁, n] using
+          fromHToGAdjacentStageM1_eq_halfSandwichLeftShape params ψbi family k ℓ
+      have hM₂_target : M₂ =
+          avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+              let S := fromHToGRecurrenceWeight params family ℓ
+                (prependTypeBit g.isSome (gHatTupleType gs))
+              let U := (gHatIdxMeas params family q.1).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+              ev ψbi (leftTensor (ι₂ := ι) (T * U) *
+                (leftTensor (ι₂ := ι) Tᴴ * rightTensor (ι₁ := ι) (S * U))) := by
+        simpa [M₂, n] using
+          fromHToGAdjacentStageM2_eq_halfSandwichRightShape params ψbi family k ℓ
+      have h₁₂_secondRoot_le_nu4 :
+          avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
+            qSDDCore ψbi
+              (fun ogs : GHatOutcome params × GHatTupleOutcome params n =>
+                leftTensor (ι₂ := ι)
+                  ((gHatHalfProductOutcomeOperator params family n q.2 ogs.2)ᴴ *
+                    (gHatIdxMeas params family q.1).outcome ogs.1))
+              (fun ogs : GHatOutcome params × GHatTupleOutcome params n =>
+                leftTensor (ι₂ := ι)
+                  ((gHatIdxMeas params family q.1).outcome ogs.1 *
+                    (gHatHalfProductOutcomeOperator params family n q.2 ogs.2)ᴴ))) ≤
+            commuteGHalfSandwichError params gamma zeta k := by
+        simpa [n] using
+          fromHToG_headTail_adjoint_qSDDCore_bound params ψbi family gamma zeta
+            hgamma_nonneg hzeta_nonneg hhalf (n := n) (k := k) hn hnk
+      have h₁₂_firstRoot_le_one :
+          True := by
+        /- Paper lines 1531--1550: the first square root in
+        `eq:call-this-later` is rewritten to a suffix `Ĥ` term, bounded by
+        `S ≤ I`, then by projectivity `U^2 = U`, and finally by the fact that
+        both `ĝ` and `Ĥ` are submeasurements. -/
+        trivial
+      have h₁₂_cauchySchwarz : |M₁ - M₂| ≤ Real.sqrt (commuteGHalfSandwichError params gamma zeta k) := by
+        /- Paper lines 1506--1523.  Rewrite `hM₁_source` and `hM₂_target` as a
+        product-index sum over `(g, gs)`, insert a dummy `Unit` outcome so that
+        `closenessOfIPAdjoint` applies, use `h₁₂_secondRoot_le_nu4` for the
+        commutator square, and discharge the context side condition using the
+        bound sketched in `h₁₂_firstRoot_le_one`. -/
+        sorry
+      exact h₁₂_cauchySchwarz
+  have h₂₃ : |M₂ - M₃| ≤ Real.sqrt (commuteGHalfSandwichError params gamma zeta k) := by
+    /- Paper lines 1551--1610.  This is the second half-sandwich commutation:
+    rewrite `eq:commute-g-part-one` into the source/target forms of
+    `eq:commute-g-part-two`, then split `eq:call-again-later-part-dos` into its
+    two square-root estimates.  The first root uses `eq:S-sandwich`; the second
+    root is identified with the first root from `eq:call-this-later`. -/
+    let n := k - (ℓ + 1)
+    by_cases hn0 : n = 0
+    · have hM₂ : M₂ =
+          avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+              let S := fromHToGRecurrenceWeight params family ℓ
+                (prependTypeBit g.isSome (gHatTupleType gs))
+              let U := (gHatIdxMeas params family q.1).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+              ev ψbi ((leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) (S * U)) *
+                leftTensor (ι₂ := ι) (U * Tᴴ)) := by
+        simpa [M₂, n] using
+          fromHToGAdjacentStageM2_eq_halfSandwichRightAdjointLeftActionShape
+            params ψbi family k ℓ
+      have hM₃ : M₃ =
+          avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+              let S := fromHToGRecurrenceWeight params family ℓ
+                (prependTypeBit g.isSome (gHatTupleType gs))
+              let U := (gHatIdxMeas params family q.1).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+              ev ψbi ((leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) (S * U)) *
+                leftTensor (ι₂ := ι) (Tᴴ * U)) := by
+        simpa [M₃, n] using
+          fromHToGAdjacentStageM3_eq_halfSandwichLeftAdjointLeftActionShape
+            params ψbi family k ℓ
+      have hM : M₂ = M₃ := by
+        rw [hM₂, hM₃]
+        rw [hn0]
+        simp [gHatHalfProductOutcomeOperator]
+      rw [hM, sub_self, abs_zero]
+      exact Real.sqrt_nonneg _
+    · have hnpos : 1 ≤ n := Nat.pos_iff_ne_zero.mpr hn0
+      have hn : 2 ≤ n + 1 := Nat.succ_le_succ hnpos
+      have hnk : n + 1 ≤ k := by
+        dsimp [n]
+        omega
+      have hM₂_source : M₂ =
+          avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+              let S := fromHToGRecurrenceWeight params family ℓ
+                (prependTypeBit g.isSome (gHatTupleType gs))
+              let U := (gHatIdxMeas params family q.1).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+              ev ψbi ((leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) (S * U)) *
+                leftTensor (ι₂ := ι) (U * Tᴴ)) := by
+        simpa [M₂, n] using
+          fromHToGAdjacentStageM2_eq_halfSandwichRightAdjointLeftActionShape
+            params ψbi family k ℓ
+      have hM₃_target : M₃ =
+          avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+              let S := fromHToGRecurrenceWeight params family ℓ
+                (prependTypeBit g.isSome (gHatTupleType gs))
+              let U := (gHatIdxMeas params family q.1).outcome g
+              let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+              ev ψbi ((leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) (S * U)) *
+                leftTensor (ι₂ := ι) (Tᴴ * U)) := by
+        simpa [M₃, n] using
+          fromHToGAdjacentStageM3_eq_halfSandwichLeftAdjointLeftActionShape
+            params ψbi family k ℓ
+      have h₂₃_secondRoot_le_nu4 :
+          avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
+            qSDDCore ψbi
+              (fun ogs : GHatOutcome params × GHatTupleOutcome params n =>
+                leftTensor (ι₂ := ι)
+                  ((gHatHalfProductOutcomeOperator params family n q.2 ogs.2)ᴴ *
+                    (gHatIdxMeas params family q.1).outcome ogs.1))
+              (fun ogs : GHatOutcome params × GHatTupleOutcome params n =>
+                leftTensor (ι₂ := ι)
+                  ((gHatIdxMeas params family q.1).outcome ogs.1 *
+                    (gHatHalfProductOutcomeOperator params family n q.2 ogs.2)ᴴ))) ≤
+            commuteGHalfSandwichError params gamma zeta k := by
+        simpa [n] using
+          fromHToG_headTail_adjoint_qSDDCore_bound params ψbi family gamma zeta
+            hgamma_nonneg hzeta_nonneg hhalf (n := n) (k := k) hn hnk
+      have h₂₃_firstRoot_le_one :
+          True := by
+        /- Paper lines 1582--1608.  Rewrite the first square root of
+        `eq:call-again-later-part-dos` into a suffix `Ĥ` term, average over the
+        head question/outcome, apply `eq:S-sandwich` by cases on the head bit
+        using `fromHToGRecurrenceWeight_sandwich_base_le` and
+        `fromHToGRecurrenceWeight_sandwich_one_sub_base_le`, expand the branch
+        average back to the explicit `ĝ` head sum, and use submeasurement
+        boundedness. -/
+        trivial
+      have h₂₃_cauchySchwarz : |M₂ - M₃| ≤ Real.sqrt (commuteGHalfSandwichError params gamma zeta k) := by
+        /- Paper lines 1564--1610.  Rewrite `hM₂_source` and `hM₃_target` as a
+        product-index sum over `(g, gs)`, apply `closenessOfIP`, use
+        `h₂₃_secondRoot_le_nu4` for the reused commutator bound, and discharge
+        the context side condition using the `eq:S-sandwich` route sketched in
+        `h₂₃_firstRoot_le_one`. -/
+        sorry
+      exact h₂₃_cauchySchwarz
+  have hmove₂ : |M₃ - E| ≤ Real.sqrt (2 * zeta) := by
+    have h₃₄ : |M₃ - M₄| ≤ Real.sqrt (2 * zeta) := by
+      let n := k - (ℓ + 1)
+      have hM3M4_secondRoot_le :
+          avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
+            qSDDCore ψbi
+              (fun g : GHatOutcome params =>
+                leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome g))
+              (fun g : GHatOutcome params =>
+                rightTensor (ι₁ := ι) ((gHatIdxMeas params family q.1).outcome g))) ≤
+            2 * zeta := by
+        simpa [n] using
+          fromHToG_selfConsistency_qSDDCore_bound params ψbi family zeta
+            hfacts.completedSelfConsistency (n := n)
+      let Aop : Fq params × PointTuple params n → GHatOutcome params →
+          MIPStarRE.Quantum.Op (ι × ι) := fun q g =>
+        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome g)
+      let Bop : Fq params × PointTuple params n → GHatOutcome params →
+          MIPStarRE.Quantum.Op (ι × ι) := fun q g =>
+        rightTensor (ι₁ := ι) ((gHatIdxMeas params family q.1).outcome g)
+      let C : Fq params × PointTuple params n → GHatOutcome params →
+          GHatTupleOutcome params n → MIPStarRE.Quantum.Op (ι × ι) := fun q g gs =>
+        let S := fromHToGRecurrenceWeight params family ℓ
+          (prependTypeBit g.isSome (gHatTupleType gs))
+        let U := (gHatIdxMeas params family q.1).outcome g
+        let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+        leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) (S * U)
+      have hM3M4_firstRoot_le_one : ∀ q : Fq params × PointTuple params n,
+          ∑ g : GHatOutcome params,
+            (∑ gs : GHatTupleOutcome params n, C q g gs) *
+              (∑ gs : GHatTupleOutcome params n, C q g gs)ᴴ ≤ 1 := by
+        /- Paper lines 1644--1645: this is the same first-square-root quantity as
+        in `eq:call-again-later-part-dos`, so the final move-right should reuse
+        the `eq:S-sandwich`-based bound established for `M₂ → M₃`. -/
+        sorry
+      have hM3M4_cauchySchwarz := MIPStarRE.LDT.Preliminaries.closenessOfIP ψbi hnorm
+        (uniformDistribution (Fq params × PointTuple params n))
+        (uniformDistribution_weight_sum_le_one (Fq params × PointTuple params n))
+        Aop Bop C (2 * zeta) (by simpa [Aop, Bop] using hM3M4_secondRoot_le)
+        hM3M4_firstRoot_le_one
+      simpa [M₃, M₄, Aop, Bop, C, fromHToGAdjacentStageM3_eq_finalLeftShape,
+        fromHToGAdjacentStageM4_eq_finalRightShape] using hM3M4_cauchySchwarz
+    have h₄collapsed : M₄ = Collapsed := by
+      simpa [M₄, Collapsed] using
+        fromHToGAdjacentStageM4_eq_collapsed params ψbi family
+          hstageExact.completeBranchAverage hstageExact.incompleteBranchAverage k ℓ
+    have hcollapsedE : Collapsed = E := by
+      calc
+        Collapsed = fromHToGStageMass params ψbi family k (ℓ + 1) := by
+              simpa [Collapsed] using
+                fromHToGAdjacentStageCollapsed_eq_stage_succ
+                  params ψbi family hstageExact k ℓ
+        _ = E := rfl
+    have h₄E : M₄ = E := h₄collapsed.trans hcollapsedE
+    /- Paper lines 1648--1661.  After the analytic move `M₃ → M₄`, collapse the
+    head projector using projectivity, average the complete/incomplete head
+    branches, and finally apply `eq:S-recurrence` to reach the next Lean stage. -/
+    simpa [h₄E] using h₃₄
+  have hchain :
+      |A - E| ≤ Real.sqrt (2 * zeta) +
+          Real.sqrt (commuteGHalfSandwichError params gamma zeta k) +
+          Real.sqrt (commuteGHalfSandwichError params gamma zeta k) +
+          Real.sqrt (2 * zeta) := by
+    have htel := abs_sub_le_four A M₁ M₂ M₃ E
+    linarith
+  calc
+    |fromHToGStageMass params ψbi family k ℓ -
+        fromHToGStageMass params ψbi family k (ℓ + 1)| = |A - E| := rfl
+    _ ≤ Real.sqrt (2 * zeta) +
+          Real.sqrt (commuteGHalfSandwichError params gamma zeta k) +
+          Real.sqrt (commuteGHalfSandwichError params gamma zeta k) +
+          Real.sqrt (2 * zeta) := hchain
+    _ = fromHToGRecurrenceError params gamma zeta k := by
+          simp [fromHToGRecurrenceError, Real.sqrt_eq_rpow]
+          ring
+
+/-- Adjacent-stage facts obtained by applying the paper move chain at every
+nonterminal stage. -/
+private lemma fromHToGAdjacentStageFacts_of_paperMoveChain
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (hnorm : ψbi.IsNormalized)
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
+    (hfacts : GHatFactsStatement params ψbi family gamma zeta)
+    (hhalf : ∀ j : ℕ, 2 ≤ j →
+      CommuteGHalfSandwichStatement params ψbi family gamma zeta j)
+    (hstageExact : FromHToGAdjacentStageExactFacts params ψbi family)
+    (k : ℕ) :
+    FromHToGAdjacentStageFacts params ψbi family gamma zeta k := by
+  refine ⟨?_⟩
+  intro ℓ hℓ
+  exact fromHToGAdjacentStage_paperMoveChain params ψbi hnorm family gamma zeta
+    hgamma_nonneg hzeta_nonneg hfacts hhalf hstageExact k ℓ hℓ
+
+/-- The paper-total telescope bridge for `fromHToG`.
+
+This follows the literal iteration in `ld-pasting.tex:1354--1372`: applying the
+adjacent-stage estimate for all `k` stages gives `k` copies of the whole
+per-stage error.  The next paper display drops a factor of `k` from the
+commutation contribution; Lean keeps the literal telescope and absorbs it into
+the corrected quadratic `fromHToGError`. -/
+private lemma fromHToGPaperTelescopeFacts_of_paperTelescope
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (hnorm : ψbi.IsNormalized)
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
+    (hfacts : GHatFactsStatement params ψbi family gamma zeta)
+    (hhalf : ∀ j : ℕ, 2 ≤ j →
+      CommuteGHalfSandwichStatement params ψbi family gamma zeta j)
+    (hstageExact : FromHToGAdjacentStageExactFacts params ψbi family)
+    (k : ℕ) :
+    FromHToGPaperTelescopeFacts params ψbi family gamma zeta k := by
+  refine ⟨?_⟩
+  have hadj : FromHToGAdjacentStageFacts params ψbi family gamma zeta k :=
+    fromHToGAdjacentStageFacts_of_paperMoveChain params ψbi hnorm family gamma zeta
+      hgamma_nonneg hzeta_nonneg hfacts hhalf hstageExact k
+  simpa [fromHToGPaperTotalError] using
+    fromHToGStageMass_telescope params ψbi family gamma zeta k hadj.recurrenceStep
+
 /-- `lem:from-H-to-G`.
 
 The proof of the paper's Bernoulli-recurrence lemma uses exactly the two named
@@ -992,6 +4227,7 @@ lemma fromHToG
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (ψbi : QuantumState (ι × ι))
+    (hnorm : ψbi.IsNormalized)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
     (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
@@ -1019,38 +4255,28 @@ lemma fromHToG
           `hfacts.completedSelfConsistency` and two suffix-commutation moves from
           `hhalf (k - ℓ)`; the final exact branch split is now recorded by
           `hstageExact.tailWeightRecurrence` below;
-       2. fill `FromHToGPaperTelescopeFacts` by proving the aggregate stage-mass
-          bridge with the paper-total error `fromHToGPaperTotalError`.  The
-          scalar side conditions are explicit hypotheses of `fromHToG`, and the
-          absorption from that paper-total error into `fromHToGError` is now
-          proved above by `fromHToGPaperTotalError_le`; the diagnostic
-          `fromHToG_errorAbsorption_not_purely_scalar` explains why the older
-          `k * fromHToGRecurrenceError` leaf was too coarse.
+       2. telescope the adjacent-stage recurrence over all `k` stages and absorb
+          the resulting `k * fromHToGRecurrenceError` into the corrected
+          quadratic `fromHToGError` via `fromHToGPaperTotalError_le`.
 
        The former endpoint residuals are closed above: stage `0` by
        `fromHToGStageMass_zero_eq`, and terminal stage `k` by
        `fromHToGStageMass_terminal_eq`.
 
-       The older uniform-step telescoping helper
-       `fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints` remains available,
-       but the final field below now follows the paper-total scalar route rather
-       than the too-coarse `k * fromHToGRecurrenceError` absorption.
+       The uniform-step telescoping helper
+       `fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints` remains available;
+       the final field below uses the same literal paper telescope packaged as
+       `FromHToGPaperTelescopeFacts`.
     -/
     let hstageExact : FromHToGAdjacentStageExactFacts params ψbi family :=
       fromHToGAdjacentStageExactFacts_of_weights params ψbi family
-    have hremaining :
-        FromHToGAdjacentStageFacts params ψbi family gamma zeta k ∧
-          FromHToGPaperTelescopeFacts params ψbi family gamma zeta k := by
-      -- Keep the paper inputs and exact branch bookkeeping visible at the residual
-      -- proof site: future work should use them for the two self-consistency
-      -- moves, the two suffix-commutation moves, and the paper-total telescope.
-      have _ := hfacts.completedSelfConsistency
-      have _ := hhalf
-      have _ := hstageExact.completeBranchAverage
-      have _ := hstageExact.incompleteBranchAverage
-      have _ := hstageExact.tailWeightRecurrence
-      sorry
-    exact ⟨hstageExact, hremaining.1, hremaining.2⟩
+    have hadj : FromHToGAdjacentStageFacts params ψbi family gamma zeta k :=
+      fromHToGAdjacentStageFacts_of_paperMoveChain params ψbi hnorm family gamma zeta
+        hgamma_nonneg hzeta_nonneg hfacts hhalf hstageExact k
+    have hpaper : FromHToGPaperTelescopeFacts params ψbi family gamma zeta k :=
+      fromHToGPaperTelescopeFacts_of_paperTelescope params ψbi hnorm family gamma zeta
+        hgamma_nonneg hzeta_nonneg hfacts hhalf hstageExact k
+    exact ⟨hstageExact, hadj, hpaper⟩
   refine ⟨hresidual.adjacent.recurrenceStep, ?_⟩
   have hstage0 := fromHToGStageMass_zero_eq params strategy ψbi family k
   have hstagek := fromHToGStageMass_terminal_eq params ψbi family k
