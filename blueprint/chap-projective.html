@@ -239,7 +239,7 @@
           
           <li><a href="sec-prelims.html#def:submeasurement">Definition 3.10</a></li>
           
-          <li><a href="chap-projective.html#lem:naimark-helper">Lemma 4.3</a></li>
+          <li><a href="chap-projective.html#lem:naimark-helper">Lemma 4.4</a></li>
           
         </ul>
     
@@ -287,12 +287,12 @@
   </div>
   <div class="proof_content">
   
-<p>For each question \(x\), choose a local auxiliary state \(\lvert \mathsf{aux}_{\mathrm A,x} \rangle \) of dimension one larger than the number of outcomes of \(A^x\), and apply Lemma&#160;<a href="chap-projective.html#lem:naimark-helper">4.3</a> to obtain a projective sub-measurement \(\widetilde A^x\). Do the same for each question \(y\) on Bob’s side, obtaining auxiliary states \(\lvert \mathsf{aux}_{\mathrm B,y} \rangle \) and projective sub-measurements \(\widetilde B^y\). </p>
+<p>For each question \(x\), choose a local auxiliary state \(\lvert \mathsf{aux}_{\mathrm A,x} \rangle \) of dimension one larger than the number of outcomes of \(A^x\), and apply Lemma&#160;<a href="chap-projective.html#lem:naimark-helper">4.4</a> to obtain a projective sub-measurement \(\widetilde A^x\). Do the same for each question \(y\) on Bob’s side, obtaining auxiliary states \(\lvert \mathsf{aux}_{\mathrm B,y} \rangle \) and projective sub-measurements \(\widetilde B^y\). </p>
 <p>Let </p>
 <div class="displaymath" id="a0000000124">
   \[  \lvert \mathsf{aux} \rangle  = \Big(\bigotimes _x \lvert \mathsf{aux}_{\mathrm A,x} \rangle \Big) \otimes \Big(\bigotimes _y \lvert \mathsf{aux}_{\mathrm B,y} \rangle \Big), \qquad \lvert \widehat{\psi } \rangle  = \lvert \psi  \rangle  \otimes \lvert \mathsf{aux} \rangle ,  \]
 </div>
-<p> and let \(\widehat A^x_a\) and \(\widehat B^y_b\) be obtained by letting \(\widetilde A^x_a\) or \(\widetilde B^y_b\) act on the relevant auxiliary factor and the identity act on every other auxiliary factor. Because the auxiliary state is a product state and the two dilations act on disjoint tensor factors, the correlation for fixed \((x,y)\) reduces to the compression identity from Lemma&#160;<a href="chap-projective.html#lem:naimark-helper">4.3</a> on the \(x\)- and \(y\)-registers. Hence </p>
+<p> and let \(\widehat A^x_a\) and \(\widehat B^y_b\) be obtained by letting \(\widetilde A^x_a\) or \(\widetilde B^y_b\) act on the relevant auxiliary factor and the identity act on every other auxiliary factor. Because the auxiliary state is a product state and the two dilations act on disjoint tensor factors, the correlation for fixed \((x,y)\) reduces to the compression identity from Lemma&#160;<a href="chap-projective.html#lem:naimark-helper">4.4</a> on the \(x\)- and \(y\)-registers. Hence </p>
 <div class="displaymath" id="a0000000125">
   \[  \langle \widehat{\psi } \rvert  \widehat A^x_a \otimes \widehat B^y_b \lvert \widehat{\psi } \rangle  = \langle \psi  \rvert  A^x_a \otimes B^y_b \lvert \psi  \rangle .  \]
 </div>
@@ -335,7 +335,7 @@
           
           <li><a href="sec-prelims.html#prop:other-two-notions-of-self-consistency">Lemma 3.35</a></li>
           
-          <li><a href="chap-projective.html#lem:orthonormalization-main-lemma">Lemma 4.5</a></li>
+          <li><a href="chap-projective.html#lem:orthonormalization-main-lemma">Lemma 4.6</a></li>
           
         </ul>
     
@@ -377,6 +377,68 @@
 
   </div>
 </div>
+<div class="remark_thmwrapper theorem-style-remark" id="rem:lean-right-register-completion-helpers">
+  <div class="remark_thmheading">
+    <span class="remark_thmcaption">
+    Remark
+    </span>
+    <span class="remark_thmlabel">4.3</span>
+    <span class="remark_thmtitle">Lean right-register completion helpers</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#rem:lean-right-register-completion-helpers">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap-projective.html#thm:orthonormalization">Theorem 4.2</a></li>
+          
+          <li><a href="sec-prelims.html#prop:completing-to-measurement">Lemma 3.42</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="remark_thmcontent">
+  <p>    The inductive-step application of the orthogonalization lemma uses completion on both tensor factors. Lean records the analytic completion statement on the left register; the shared preliminary helper compares right- and left-tensor placements at the raw <span class="ttfamily">qSDDCore</span> level. Its submeasurement and indexed wrappers transport state-dependent distance to the right register under the permutation-invariance hypothesis on the state. The remaining two declarations package this transport with the orthonormalize-and-complete output so that the line-156 projectivization handoff can later be produced from the two completed measurements without restating the tensor-factor bookkeeping. </p>
+
+  </div>
+</div>
 <h2 id="sec:naimark">4.0.1 Naimark dilation</h2>
 
 <div class="lemma_thmwrapper theorem-style-plain" id="lem:naimark-helper">
@@ -384,7 +446,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.3</span>
+    <span class="lemma_thmlabel">4.4</span>
     <div class="thm_header_extras">
 
         </div>
@@ -462,7 +524,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">4.4</span>
+    <span class="remark_thmlabel">4.5</span>
     <span class="remark_thmtitle">Naimark dilation does not preserve \(\approx _\delta \)</span>
     <div class="thm_header_extras">
 
@@ -481,7 +543,7 @@
   \[  A_0 = A_1 = B_0 = B_1 = \tfrac {1}{2} I.  \]
 </div>
 <p> For each outcome \(a \in \{ 0,1\} \), the operators \(A_a \otimes I\) and \(I \otimes B_a\) are both equal to \(\tfrac {1}{2} I \otimes I\), so \(A_a \otimes I \approx _0 I \otimes B_a\) on the state \(\lvert \psi  \rangle \). </p>
-<p>Now apply the Naimark construction with a qubit auxiliary space on each side and auxiliary state \(\lvert + \rangle  = \tfrac {1}{\sqrt2}(\lvert 0 \rangle +\lvert 1 \rangle )\). Since \(A\) and \(B\) are genuine measurements rather than sub-measurements, the extra \(\lvert \bot  \rangle \) direction from <a href="chap-projective.html#lem:naimark-helper">4.3</a> is unnecessary in this example. The unitary from <a href="chap-projective.html#lem:naimark-helper">4.3</a> can then be taken to be the identity, so the dilated measurements are </p>
+<p>Now apply the Naimark construction with a qubit auxiliary space on each side and auxiliary state \(\lvert + \rangle  = \tfrac {1}{\sqrt2}(\lvert 0 \rangle +\lvert 1 \rangle )\). Since \(A\) and \(B\) are genuine measurements rather than sub-measurements, the extra \(\lvert \bot  \rangle \) direction from <a href="chap-projective.html#lem:naimark-helper">4.4</a> is unnecessary in this example. The unitary from <a href="chap-projective.html#lem:naimark-helper">4.4</a> can then be taken to be the identity, so the dilated measurements are </p>
 <div class="displaymath" id="a0000000137">
   \[  \widehat A_a = I \otimes \lvert a \rangle \langle a \rvert , \qquad \widehat B_a = I \otimes \lvert a \rangle \langle a \rvert .  \]
 </div>
@@ -500,7 +562,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.5</span>
+    <span class="lemma_thmlabel">4.6</span>
     <span class="lemma_thmtitle">Orthogonalization lemma for measurements</span>
     <div class="thm_header_extras">
 
@@ -531,35 +593,35 @@
           
           <li><a href="sec-prelims.html#prop:simeq-for-measurements">Lemma 3.18</a></li>
           
-          <li><a href="chap-projective.html#lem:projective-non-measurement">Lemma 4.9</a></li>
+          <li><a href="chap-projective.html#lem:projective-non-measurement">Lemma 4.10</a></li>
           
-          <li><a href="chap-projective.html#lem:projective-low-rank-sum">Lemma 4.11</a></li>
+          <li><a href="chap-projective.html#lem:projective-low-rank-sum">Lemma 4.12</a></li>
           
-          <li><a href="chap-projective.html#lem:Q-completeness">Lemma 4.12</a></li>
+          <li><a href="chap-projective.html#lem:Q-completeness">Lemma 4.13</a></li>
           
-          <li><a href="chap-projective.html#lem:sqrt-Q-completeness">Lemma 4.13</a></li>
+          <li><a href="chap-projective.html#lem:sqrt-Q-completeness">Lemma 4.14</a></li>
           
-          <li><a href="chap-projective.html#lem:q-almost-projective">Lemma 4.14</a></li>
+          <li><a href="chap-projective.html#lem:q-almost-projective">Lemma 4.15</a></li>
           
-          <li><a href="chap-projective.html#lem:xa-t">Lemma 4.19</a></li>
+          <li><a href="chap-projective.html#lem:xa-t">Lemma 4.20</a></li>
           
-          <li><a href="chap-projective.html#lem:qa-restated">Lemma 4.20</a></li>
+          <li><a href="chap-projective.html#lem:qa-restated">Lemma 4.21</a></li>
           
-          <li><a href="chap-projective.html#lem:X-squared">Lemma 4.21</a></li>
+          <li><a href="chap-projective.html#lem:X-squared">Lemma 4.22</a></li>
           
-          <li><a href="chap-projective.html#lem:X-expression-to-Q-expression">Lemma 4.22</a></li>
+          <li><a href="chap-projective.html#lem:X-expression-to-Q-expression">Lemma 4.23</a></li>
           
-          <li><a href="chap-projective.html#lem:pa-restated">Lemma 4.23</a></li>
+          <li><a href="chap-projective.html#lem:pa-restated">Lemma 4.24</a></li>
           
-          <li><a href="chap-projective.html#lem:X-hat-squared">Lemma 4.24</a></li>
+          <li><a href="chap-projective.html#lem:X-hat-squared">Lemma 4.25</a></li>
           
-          <li><a href="chap-projective.html#lem:X-times-X-hat">Lemma 4.25</a></li>
+          <li><a href="chap-projective.html#lem:X-times-X-hat">Lemma 4.26</a></li>
           
-          <li><a href="chap-projective.html#lem:squared-difference">Lemma 4.26</a></li>
+          <li><a href="chap-projective.html#lem:squared-difference">Lemma 4.27</a></li>
           
-          <li><a href="chap-projective.html#lem:P-projectivity">Lemma 4.27</a></li>
+          <li><a href="chap-projective.html#lem:P-projectivity">Lemma 4.28</a></li>
           
-          <li><a href="chap-projective.html#lem:P-Q-approx">Lemma 4.28</a></li>
+          <li><a href="chap-projective.html#lem:P-Q-approx">Lemma 4.29</a></li>
           
           <li><a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">Lemma 3.27</a></li>
           
@@ -608,7 +670,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.6</span>
+    <span class="lemma_thmlabel">4.7</span>
     <span class="lemma_thmtitle">Local orthogonalization lemma for a measurement</span>
     <div class="thm_header_extras">
 
@@ -639,7 +701,7 @@
           
           <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
           
-          <li><a href="chap-projective.html#lem:orthonormalization-main-lemma">Lemma 4.5</a></li>
+          <li><a href="chap-projective.html#lem:orthonormalization-main-lemma">Lemma 4.6</a></li>
           
         </ul>
     
@@ -689,7 +751,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> Since \(A\) is a measurement, \(\sum _a A_a = I\), so bipartite strong self-consistency of \(A\) with itself is equivalent to bipartite consistency of \(A\) with itself. Feed this consistency hypothesis, together with the spectral-truncation and locality-preserving repair witnesses, into the measurement variant of <a href="chap-projective.html#lem:orthonormalization-main-lemma">4.5</a> with \(B = A\). The repair witness chooses the repaired family of the form \(P_a \otimes I\), so the conclusion descends to a local projective sub-measurement \(P = \{ P_a\} \) on the space of \(A\) with error bound \(84\zeta ^{1/4}\). </p>
+  <p> Since \(A\) is a measurement, \(\sum _a A_a = I\), so bipartite strong self-consistency of \(A\) with itself is equivalent to bipartite consistency of \(A\) with itself. Feed this consistency hypothesis, together with the spectral-truncation and locality-preserving repair witnesses, into the measurement variant of <a href="chap-projective.html#lem:orthonormalization-main-lemma">4.6</a> with \(B = A\). The repair witness chooses the repaired family of the form \(P_a \otimes I\), so the conclusion descends to a local projective sub-measurement \(P = \{ P_a\} \) on the space of \(A\) with error bound \(84\zeta ^{1/4}\). </p>
 
   </div>
 </div>
@@ -698,7 +760,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">4.7</span>
+    <span class="theorem_thmlabel">4.8</span>
     <span class="theorem_thmtitle">Orthogonalization for a measurement</span>
     <div class="thm_header_extras">
 
@@ -729,7 +791,7 @@
           
           <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
           
-          <li><a href="chap-projective.html#lem:orthonormalization-main-lemma-local">Lemma 4.6</a></li>
+          <li><a href="chap-projective.html#lem:orthonormalization-main-lemma-local">Lemma 4.7</a></li>
           
         </ul>
     
@@ -775,14 +837,14 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> Apply <a href="chap-projective.html#lem:orthonormalization-main-lemma-local">4.6</a> and weaken the error using \(84 \leq 100\) and \(\zeta ^{1/4} \geq 0\). No completion step is needed because \(A\) is already a measurement. </p>
+  <p> Apply <a href="chap-projective.html#lem:orthonormalization-main-lemma-local">4.7</a> and weaken the error using \(84 \leq 100\) and \(\zeta ^{1/4} \geq 0\). No completion step is needed because \(A\) is already a measurement. </p>
 
   </div>
 </div>
 <div class="proof_wrapper" id="a0000000126">
   <div class="proof_heading">
     <span class="proof_caption">
-    Proof of <a href="chap-projective.html#thm:orthonormalization">4.2</a> assuming <a href="chap-projective.html#lem:orthonormalization-main-lemma">4.5</a>
+    Proof of <a href="chap-projective.html#thm:orthonormalization">4.2</a> assuming <a href="chap-projective.html#lem:orthonormalization-main-lemma">4.6</a>
     </span>
     <span class="expand-proof">▶</span>
   </div>
@@ -804,7 +866,7 @@
 <div class="displaymath" id="a0000000150">
   \[  \widehat A_a \otimes I \simeq _{2\zeta } I \otimes \widehat A_a.  \]
 </div>
-<p> Apply <a href="chap-projective.html#lem:orthonormalization-main-lemma">4.5</a> to obtain a projective sub-measurement \(\widehat P\) such that </p>
+<p> Apply <a href="chap-projective.html#lem:orthonormalization-main-lemma">4.6</a> to obtain a projective sub-measurement \(\widehat P\) such that </p>
 <div class="displaymath" id="a0000000151">
   \[  \widehat A_a \otimes I \approx _{84(2\zeta )^{1/4}} \widehat P_a \otimes I.  \]
 </div>
@@ -819,7 +881,7 @@
 <div class="proof_wrapper" id="a0000000139">
   <div class="proof_heading">
     <span class="proof_caption">
-    Proof of <a href="chap-projective.html#lem:orthonormalization-main-lemma">4.5</a>
+    Proof of <a href="chap-projective.html#lem:orthonormalization-main-lemma">4.6</a>
     </span>
     <span class="expand-proof">▶</span>
   </div>
@@ -859,7 +921,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.8</span>
+    <span class="lemma_thmlabel">4.9</span>
     <div class="thm_header_extras">
 
     
@@ -927,7 +989,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.9</span>
+    <span class="lemma_thmlabel">4.10</span>
     <span class="lemma_thmtitle">Rounding to projectors</span>
     <div class="thm_header_extras">
 
@@ -999,7 +1061,7 @@
 <div class="displaymath" id="a0000000164">
   \[  R_a = \mathsf{trunc}_\delta (A_a) = \sum _i \mathsf{trunc}_\delta (\lambda _{a,i}) \lvert u_{a,i} \rangle \langle u_{a,i} \rvert .  \]
 </div>
-<p> By <a href="chap-projective.html#lem:trunc-inequality">4.8</a>, </p>
+<p> By <a href="chap-projective.html#lem:trunc-inequality">4.9</a>, </p>
 <div class="displaymath" id="a0000000165">
   \[  (A_a-R_a)^2 \leq \frac{1}{\delta }(A_a-(A_a)^2).  \]
 </div>
@@ -1025,7 +1087,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.10</span>
+    <span class="lemma_thmlabel">4.11</span>
     <span class="lemma_thmtitle">Combinatorial averaging for the \(r {\gt} d\) branch</span>
     <div class="thm_header_extras">
 
@@ -1086,7 +1148,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.11</span>
+    <span class="lemma_thmlabel">4.12</span>
     <span class="lemma_thmtitle">Rank reduction</span>
     <div class="thm_header_extras">
 
@@ -1147,7 +1209,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>  Let \(\{ R_a\} \) be given by <a href="chap-projective.html#lem:projective-non-measurement">4.9</a>. Write \(r_a=\mathrm{rank}(R_a)\) and \(r=\sum _a r_a\). If \(r \leq d\), take \(Q_a=R_a\). Otherwise, </p>
+  <p>  Let \(\{ R_a\} \) be given by <a href="chap-projective.html#lem:projective-non-measurement">4.10</a>. Write \(r_a=\mathrm{rank}(R_a)\) and \(r=\sum _a r_a\). If \(r \leq d\), take \(Q_a=R_a\). Otherwise, </p>
 <div class="equation" id="eq:bound-on-r">
 <p>
   <div class="equation_content">
@@ -1208,20 +1270,20 @@
 <div class="displaymath" id="a0000000181">
   \[  \sum _a \Vert (R_a-Q_a)\otimes I \lvert \psi  \rangle \Vert ^2 = \sum _{(a,i)\in \mathsf{Small}} o_{a,i} \leq 4\sqrt{\zeta }  \]
 </div>
-<p> by <a href="chap-projective.html#eq:small-overlaps">7</a>. Therefore \(R_a \otimes I \approx _{4\sqrt{\zeta }} Q_a \otimes I\). Combining this with <a href="chap-projective.html#lem:projective-non-measurement">4.9</a> and the triangle inequality for \(\approx _\delta \) gives </p>
+<p> by <a href="chap-projective.html#eq:small-overlaps">7</a>. Therefore \(R_a \otimes I \approx _{4\sqrt{\zeta }} Q_a \otimes I\). Combining this with <a href="chap-projective.html#lem:projective-non-measurement">4.10</a> and the triangle inequality for \(\approx _\delta \) gives </p>
 <div class="displaymath" id="a0000000182">
   \[  A_a \otimes I \approx _{12\sqrt{\zeta }} Q_a \otimes I.  \]
 </div>
 
   </div>
 </div>
-<p>Henceforth let \(Q=\{ Q_a\} \) be the family given by <a href="chap-projective.html#lem:projective-low-rank-sum">4.11</a>. </p>
+<p>Henceforth let \(Q=\{ Q_a\} \) be the family given by <a href="chap-projective.html#lem:projective-low-rank-sum">4.12</a>. </p>
 <div class="lemma_thmwrapper theorem-style-plain" id="lem:Q-completeness">
   <div class="lemma_thmheading">
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.12</span>
+    <span class="lemma_thmlabel">4.13</span>
     <span class="lemma_thmtitle">Completeness of&#160;\(Q\)</span>
     <div class="thm_header_extras">
 
@@ -1287,7 +1349,7 @@
 <div class="displaymath" id="a0000000185">
   \[  \sum _a \langle \psi  \rvert  (Q_a)^2 \otimes I \lvert \psi  \rangle  \leq 1+2\sqrt{\zeta } \quad \text{and}\quad \sum _a \langle \psi  \rvert  (Q_a-A_a)^2 \otimes I \lvert \psi  \rangle  \leq 12\sqrt{\zeta }  \]
 </div>
-<p> from <a href="chap-projective.html#lem:projective-low-rank-sum">4.11</a>. A second Cauchy–Schwarz estimate yields </p>
+<p> from <a href="chap-projective.html#lem:projective-low-rank-sum">4.12</a>. A second Cauchy–Schwarz estimate yields </p>
 <div class="equation" id="eq:another-Q-for-A">
 <p>
   <div class="equation_content">
@@ -1309,7 +1371,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.13</span>
+    <span class="lemma_thmlabel">4.14</span>
     <span class="lemma_thmtitle">Completeness of&#160;\(\sqrt{Q}\)</span>
     <div class="thm_header_extras">
 
@@ -1362,7 +1424,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> Diagonalize \(Q=\sum _i \nu _i \lvert u_i \rangle \langle u_i \rvert \). Because \(Q \leq (1+2\sqrt{\zeta })I\) by <a href="chap-projective.html#lem:projective-low-rank-sum">4.11</a>, each \(\nu _i\) is at most \(1+2\sqrt{\zeta }\). Therefore </p>
+  <p> Diagonalize \(Q=\sum _i \nu _i \lvert u_i \rangle \langle u_i \rvert \). Because \(Q \leq (1+2\sqrt{\zeta })I\) by <a href="chap-projective.html#lem:projective-low-rank-sum">4.12</a>, each \(\nu _i\) is at most \(1+2\sqrt{\zeta }\). Therefore </p>
 <div class="displaymath" id="a0000000189">
   \[  \sqrt{Q} = \sum _i \sqrt{\nu _i}\lvert u_i \rangle \langle u_i \rvert  \geq \frac{1}{\sqrt{1+2\sqrt{\zeta }}} Q.  \]
 </div>
@@ -1370,7 +1432,7 @@
 <div class="displaymath" id="a0000000190">
   \[  \frac{1}{\sqrt{1+2\sqrt{\zeta }}} \geq 1-\sqrt{\zeta }  \]
 </div>
-<p> gives \(\sqrt{Q} \geq (1-\sqrt{\zeta })Q\). Hence <a href="chap-projective.html#lem:Q-completeness">4.12</a> implies </p>
+<p> gives \(\sqrt{Q} \geq (1-\sqrt{\zeta })Q\). Hence <a href="chap-projective.html#lem:Q-completeness">4.13</a> implies </p>
 <div class="displaymath" id="a0000000191">
   \[  \langle \psi  \rvert  \sqrt{Q} \otimes I \lvert \psi  \rangle  \geq (1-\sqrt{\zeta })(1-11\zeta ^{1/4}) \geq 1-12\zeta ^{1/4}.  \]
 </div>
@@ -1382,7 +1444,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.14</span>
+    <span class="lemma_thmlabel">4.15</span>
     <span class="lemma_thmtitle">\(Q\) is almost projective</span>
     <div class="thm_header_extras">
 
@@ -1435,7 +1497,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> Since \(Q \leq (1+2\sqrt{\zeta })I\) by <a href="chap-projective.html#lem:projective-low-rank-sum">4.11</a>, </p>
+  <p> Since \(Q \leq (1+2\sqrt{\zeta })I\) by <a href="chap-projective.html#lem:projective-low-rank-sum">4.12</a>, </p>
 <div class="displaymath" id="a0000000194">
   \begin{align*}  \sum _a Q_a \cdot Q \cdot Q_a - \sum _a Q_a &  \leq (1+2\sqrt{\zeta }) \sum _a Q_a \cdot I \cdot Q_a - \sum _a Q_a \\ &  = (1+2\sqrt{\zeta })Q - Q \\ &  = 2\sqrt{\zeta }\, Q \\ &  \leq 2\sqrt{\zeta }(1+2\sqrt{\zeta })I \\ &  \leq 4\sqrt{\zeta }\, I, \end{align*}
 </div>
@@ -1448,7 +1510,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">4.15</span>
+    <span class="definition_thmlabel">4.16</span>
     <span class="definition_thmtitle">Matrix decomposition of&#160;\(Q_a\)</span>
     <div class="thm_header_extras">
 
@@ -1472,7 +1534,7 @@
         
         <ul class="uses">
           
-          <li><a href="chap-projective.html#lem:projective-low-rank-sum">Lemma 4.11</a></li>
+          <li><a href="chap-projective.html#lem:projective-low-rank-sum">Lemma 4.12</a></li>
           
         </ul>
     
@@ -1537,7 +1599,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">4.16</span>
+    <span class="definition_thmlabel">4.17</span>
     <span class="definition_thmtitle">SVD of&#160;\(X\)</span>
     <div class="thm_header_extras">
 
@@ -1561,7 +1623,7 @@
         
         <ul class="uses">
           
-          <li><a href="chap-projective.html#def:matrix-decomposition-Q">Definition 4.15</a></li>
+          <li><a href="chap-projective.html#def:matrix-decomposition-Q">Definition 4.16</a></li>
           
         </ul>
     
@@ -1605,7 +1667,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">4.17</span>
+    <span class="remark_thmlabel">4.18</span>
     <div class="thm_header_extras">
 
         </div>
@@ -1631,7 +1693,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">4.18</span>
+    <span class="definition_thmlabel">4.19</span>
     <span class="definition_thmtitle">Definition of&#160;\(P\)</span>
     <div class="thm_header_extras">
 
@@ -1655,9 +1717,9 @@
         
         <ul class="uses">
           
-          <li><a href="chap-projective.html#def:matrix-decomposition-Q">Definition 4.15</a></li>
+          <li><a href="chap-projective.html#def:matrix-decomposition-Q">Definition 4.16</a></li>
           
-          <li><a href="chap-projective.html#def:svd-of-X">Definition 4.16</a></li>
+          <li><a href="chap-projective.html#def:svd-of-X">Definition 4.17</a></li>
           
         </ul>
     
@@ -1704,7 +1766,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.19</span>
+    <span class="lemma_thmlabel">4.20</span>
     <div class="thm_header_extras">
 
         </div>
@@ -1766,7 +1828,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.20</span>
+    <span class="lemma_thmlabel">4.21</span>
     <span class="lemma_thmtitle">\(Q_a\) restated</span>
     <div class="thm_header_extras">
 
@@ -1817,7 +1879,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The identity \(X_a^\dagger X_a = Q_a\) follows by expanding the basis sums. The remaining equalities come from <a href="chap-projective.html#lem:xa-t">4.19</a> and the projectivity of \(T\): </p>
+  <p> The identity \(X_a^\dagger X_a = Q_a\) follows by expanding the basis sums. The remaining equalities come from <a href="chap-projective.html#lem:xa-t">4.20</a> and the projectivity of \(T\): </p>
 <div class="displaymath" id="a0000000208">
   \[  X_a^\dagger \cdot X_a = (X^\dagger \cdot T_a)(T_a \cdot X) = X^\dagger \cdot T_a \cdot X = X_a^\dagger \cdot X.  \]
 </div>
@@ -1829,7 +1891,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.21</span>
+    <span class="lemma_thmlabel">4.22</span>
     <span class="lemma_thmtitle">\(X\) squared</span>
     <div class="thm_header_extras">
 
@@ -1880,7 +1942,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> Use that \(T\) is a measurement and then <a href="chap-projective.html#lem:qa-restated">4.20</a>: </p>
+  <p> Use that \(T\) is a measurement and then <a href="chap-projective.html#lem:qa-restated">4.21</a>: </p>
 <div class="displaymath" id="a0000000211">
   \[  X^\dagger \cdot X = \sum _a X^\dagger \cdot T_a \cdot X = \sum _a Q_a = Q.  \]
 </div>
@@ -1893,7 +1955,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.22</span>
+    <span class="lemma_thmlabel">4.23</span>
     <div class="thm_header_extras">
 
         </div>
@@ -1943,7 +2005,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> Expand the square and apply <a href="chap-projective.html#lem:X-squared">4.21</a> and <a href="chap-projective.html#lem:qa-restated">4.20</a> term by term: </p>
+  <p> Expand the square and apply <a href="chap-projective.html#lem:X-squared">4.22</a> and <a href="chap-projective.html#lem:qa-restated">4.21</a> term by term: </p>
 <div class="displaymath" id="a0000000214">
   \[  X_a^\dagger (X \cdot X^\dagger \cdot X \cdot X^\dagger ) X_a = Q_a \cdot Q \cdot Q_a,  \]
 </div>
@@ -1964,7 +2026,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.23</span>
+    <span class="lemma_thmlabel">4.24</span>
     <span class="lemma_thmtitle">\(P_a\) restated</span>
     <div class="thm_header_extras">
 
@@ -2027,7 +2089,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.24</span>
+    <span class="lemma_thmlabel">4.25</span>
     <span class="lemma_thmtitle">\(\widehat{X}\) squared</span>
     <div class="thm_header_extras">
 
@@ -2087,7 +2149,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.25</span>
+    <span class="lemma_thmlabel">4.26</span>
     <span class="lemma_thmtitle">\(X\) times \(\widehat{X}\)</span>
     <div class="thm_header_extras">
 
@@ -2138,7 +2200,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The paper obtains this from the SVD formula for \(X\) and the definition of \(\widehat X\). The Lean proof records this as the primitive mixed-product identity in ‘QXPLayerData‘, which is exactly the part needed in <a href="chap-projective.html#lem:squared-difference">4.26</a> and <a href="chap-projective.html#lem:P-Q-approx">4.28</a>. The companion paper identity for \(X\widehat X^\dagger \) is not stored explicitly. </p>
+  <p> The paper obtains this from the SVD formula for \(X\) and the definition of \(\widehat X\). The Lean proof records this as the primitive mixed-product identity in ‘QXPLayerData‘, which is exactly the part needed in <a href="chap-projective.html#lem:squared-difference">4.27</a> and <a href="chap-projective.html#lem:P-Q-approx">4.29</a>. The companion paper identity for \(X\widehat X^\dagger \) is not stored explicitly. </p>
 
   </div>
 </div>
@@ -2147,7 +2209,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.26</span>
+    <span class="lemma_thmlabel">4.27</span>
     <span class="lemma_thmtitle">Squared difference</span>
     <div class="thm_header_extras">
 
@@ -2207,7 +2269,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.27</span>
+    <span class="lemma_thmlabel">4.28</span>
     <span class="lemma_thmtitle">Projectivity of&#160;\(P\)</span>
     <div class="thm_header_extras">
 
@@ -2259,7 +2321,7 @@
 <div class="displaymath" id="a0000000227">
   \begin{align*}  P_a \cdot P_b &  = (\widehat{X}^\dagger \cdot T_a \cdot \widehat{X}) (\widehat{X}^\dagger \cdot T_b \cdot \widehat{X}) \\ &  = \widehat{X}^\dagger \cdot T_a \cdot I_{m \times m} \cdot T_b \cdot \widehat{X} \\ &  = \widehat{X}^\dagger \cdot T_a \cdot \widehat{X} \cdot \mathbf{1}\! \left[[\right]a=b] \\ &  = P_a \cdot \mathbf{1}\! \left[[\right]a=b], \end{align*}
 </div>
-<p> where the second line uses <a href="chap-projective.html#lem:X-hat-squared">4.24</a>, the third uses that \(T\) is projective, and the last uses <a href="chap-projective.html#lem:pa-restated">4.23</a>. Summing over \(a\) shows \(\sum _a P_a \leq I\), so \(P\) is a projective sub-measurement. </p>
+<p> where the second line uses <a href="chap-projective.html#lem:X-hat-squared">4.25</a>, the third uses that \(T\) is projective, and the last uses <a href="chap-projective.html#lem:pa-restated">4.24</a>. Summing over \(a\) shows \(\sum _a P_a \leq I\), so \(P\) is a projective sub-measurement. </p>
 
   </div>
 </div>
@@ -2268,7 +2330,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.28</span>
+    <span class="lemma_thmlabel">4.29</span>
     <span class="lemma_thmtitle">\(P\) is close to&#160;\(Q\)</span>
     <div class="thm_header_extras">
 
@@ -2328,7 +2390,7 @@
   <span class="equation_label">11</span>
 </p>
 </div>
-<p> using the projectivity of \(Q\) and \(P\). The first term is at most \(1+2\sqrt{\zeta }\) by <a href="chap-projective.html#lem:projective-low-rank-sum">4.11</a>, and the second is at most \(1\) because \(P\) is a sub-measurement. </p>
+<p> using the projectivity of \(Q\) and \(P\). The first term is at most \(1+2\sqrt{\zeta }\) by <a href="chap-projective.html#lem:projective-low-rank-sum">4.12</a>, and the second is at most \(1\) because \(P\) is a sub-measurement. </p>
 <p>For the last two terms, </p>
 <div class="equation" id="eq:complex-conjugates">
 <p>
@@ -2338,7 +2400,7 @@
   <span class="equation_label">12</span>
 </p>
 </div>
-<p> By <a href="chap-projective.html#lem:qa-restated">4.20</a>, </p>
+<p> By <a href="chap-projective.html#lem:qa-restated">4.21</a>, </p>
 <div class="displaymath" id="a0000000230">
   \[  \sum _a \langle \psi  \rvert  Q_aP_a \otimes I \lvert \psi  \rangle  = \sum _a \langle \psi  \rvert  (X_a^\dagger \cdot X \cdot P_a) \otimes I \lvert \psi  \rangle .  \]
 </div>
@@ -2359,12 +2421,12 @@
 <div class="displaymath" id="a0000000232">
   \[  \sum _a \langle \psi  \rvert  \big(X_a^\dagger \cdot (X-\widehat X)(X-\widehat X)^\dagger \cdot X_a\big)\otimes I \lvert \psi  \rangle ,  \]
 </div>
-<p> times the square root of \(\sum _a \langle \psi  \rvert (P_a)^2 \otimes I \lvert \psi  \rangle  \leq 1\). The first factor is at most \(4\sqrt{\zeta }\) by <a href="chap-projective.html#lem:squared-difference">4.26</a>, <a href="chap-projective.html#lem:X-expression-to-Q-expression">4.22</a>, and <a href="chap-projective.html#lem:q-almost-projective">4.14</a>, so the total error is at most \(2\zeta ^{1/4}\). </p>
+<p> times the square root of \(\sum _a \langle \psi  \rvert (P_a)^2 \otimes I \lvert \psi  \rangle  \leq 1\). The first factor is at most \(4\sqrt{\zeta }\) by <a href="chap-projective.html#lem:squared-difference">4.27</a>, <a href="chap-projective.html#lem:X-expression-to-Q-expression">4.23</a>, and <a href="chap-projective.html#lem:q-almost-projective">4.15</a>, so the total error is at most \(2\zeta ^{1/4}\). </p>
 <p>The right-hand side of <a href="chap-projective.html#eq:add-a-hat">13</a> is real, because </p>
 <div class="displaymath" id="a0000000233">
   \[  \sum _a \langle \psi  \rvert  (X_a^\dagger \cdot \widehat{X} \cdot P_a)\otimes I \lvert \psi  \rangle  = \langle \psi  \rvert  (X^\dagger \cdot \widehat{X}) \otimes I \lvert \psi  \rangle  = \langle \psi  \rvert  \sqrt{Q} \otimes I \lvert \psi  \rangle ,  \]
 </div>
-<p> where the first equality uses <a href="chap-projective.html#lem:xa-t">4.19</a>, <a href="chap-projective.html#lem:pa-restated">4.23</a>, and <a href="chap-projective.html#lem:X-hat-squared">4.24</a> and that \(T\) is a measurement, and the second uses <a href="chap-projective.html#lem:X-times-X-hat">4.25</a>. Hence <a href="chap-projective.html#lem:sqrt-Q-completeness">4.13</a> and <a href="chap-projective.html#eq:add-a-hat">13</a> imply </p>
+<p> where the first equality uses <a href="chap-projective.html#lem:xa-t">4.20</a>, <a href="chap-projective.html#lem:pa-restated">4.24</a>, and <a href="chap-projective.html#lem:X-hat-squared">4.25</a> and that \(T\) is a measurement, and the second uses <a href="chap-projective.html#lem:X-times-X-hat">4.26</a>. Hence <a href="chap-projective.html#lem:sqrt-Q-completeness">4.14</a> and <a href="chap-projective.html#eq:add-a-hat">13</a> imply </p>
 <div class="displaymath" id="a0000000234">
   \[  \mathfrak {R}\Big(\sum _a \langle \psi  \rvert  Q_aP_a \otimes I \lvert \psi  \rangle \Big) \geq 1-14\zeta ^{1/4}.  \]
 </div>
@@ -2375,11 +2437,11 @@
 
   </div>
 </div>
-<p>Finally, <a href="chap-projective.html#lem:projective-low-rank-sum">4.11</a> gives </p>
+<p>Finally, <a href="chap-projective.html#lem:projective-low-rank-sum">4.12</a> gives </p>
 <div class="displaymath" id="a0000000236">
   \[  A_a \otimes I \approx _{12\sqrt{\zeta }} Q_a \otimes I,  \]
 </div>
-<p> and <a href="chap-projective.html#lem:P-Q-approx">4.28</a> gives </p>
+<p> and <a href="chap-projective.html#lem:P-Q-approx">4.29</a> gives </p>
 <div class="displaymath" id="a0000000237">
   \[  Q_a \otimes I \approx _{30\zeta ^{1/4}} P_a \otimes I.  \]
 </div>
