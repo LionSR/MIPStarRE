@@ -1244,18 +1244,6 @@ lemma generalizeBReversePointwiseBound
 
 /-! ## Good-strategy interfaces for the local-variance transport chain -/
 
-private lemma pointSelfConsistencyFromGood
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    {eps delta gamma : Error}
-    (hgood : strategy.IsGood eps delta gamma) :
-    BipartiteSSCRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta := by
-  exact ⟨by
-    simpa [SymStrat.selfConsistencyFailureProbability] using
-      hgood.selfConsistencyTest⟩
-
 /-- The `2δ` self-consistency interface for the point event
 `A^u_{g(u)}`.
 
@@ -1281,7 +1269,12 @@ lemma pointConditionedEventSelfConsistency
         (fun u : Point params =>
           pointConditionedEventSubMeasAtPolynomial params strategy g u))
       (2 * delta) := by
-  have hssc := pointSelfConsistencyFromGood params strategy hgood
+  have hssc :
+      BipartiteSSCRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta := by
+    refine ⟨?_⟩
+    simpa [SymStrat.selfConsistencyFailureProbability] using
+      hgood.selfConsistencyTest
   simpa [pointConditionedEventSubMeasAtPolynomial] using
     (twoNotionsOfSelfConsistencyAfterEvaluation
       strategy.state strategy.permInvState
@@ -1290,19 +1283,6 @@ lemma pointConditionedEventSelfConsistency
       delta
       (fun u a => if a = g u then some () else none)
       hssc)
-
-private lemma axisParallelConsistencyFromGood
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    {eps delta gamma : Error}
-    (hgood : strategy.IsGood eps delta gamma) :
-    ConsRel strategy.state (uniformDistribution (AxisParallelTestSample params))
-      (axisParallelPointAnswerFamily strategy)
-      (axisParallelLineAnswerFamily strategy) eps := by
-  exact ⟨by
-    simpa [SymStrat.axisParallelFailureProbability] using
-      hgood.axisParallelTest⟩
 
 /-- The `ε` consistency interface for the point-line event at the base point of
 an axis-parallel test sample.
@@ -1328,7 +1308,13 @@ lemma axisParallelBaseEventConsistency
         postprocess (axisParallelLineAnswerFamily strategy s)
           (fun a : Fq params => if a = g s.1 then some () else none))
       eps := by
-  have haxis := axisParallelConsistencyFromGood params strategy hgood
+  have haxis :
+      ConsRel strategy.state (uniformDistribution (AxisParallelTestSample params))
+        (axisParallelPointAnswerFamily strategy)
+        (axisParallelLineAnswerFamily strategy) eps := by
+    refine ⟨?_⟩
+    simpa [SymStrat.axisParallelFailureProbability] using
+      hgood.axisParallelTest
   simpa [axisParallelPointAnswerFamily, pointConditionedEventSubMeasAtPolynomial] using
     (consRelDataProcessing_questionDependent
       strategy.state (uniformDistribution (AxisParallelTestSample params))
@@ -1390,9 +1376,9 @@ lemma axisParallelBaseEventApproximation
         (IdxMeas.toIdxSubMeas lineMeas) (2 * eps) :=
     simeqToApprox strategy.state (uniformDistribution (AxisParallelTestSample params))
       pointMeas lineMeas eps hcons'
-  exact ⟨by
-    simpa [pointMeas, lineMeas, pointEvent, lineEvent, BipartiteSDDRel] using
-      happrox.leftRightSquaredDistanceBound⟩
+  refine ⟨?_⟩
+  simpa [pointMeas, lineMeas, pointEvent, lineEvent] using
+    happrox.leftRightSquaredDistanceBound
 
 /-- The post-triangle six-step transport error is absorbed by the paper's
 `24(ε + δ + md/q)` slack from `lem:local-variance-of-points`.

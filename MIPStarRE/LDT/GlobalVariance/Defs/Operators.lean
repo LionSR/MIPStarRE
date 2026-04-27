@@ -69,14 +69,7 @@ noncomputable def pointConditionedEventSubMeasAtPolynomial (params : Parameters)
   simp only [postprocess]
   refine Finset.sum_eq_single (g u) ?_ ?_
   · intro a ha hne
-    have heq : (if a = g u then some () else none : Option Unit) = some () := by
-      simpa using ha
-    by_cases h : a = g u
-    · exact False.elim (hne h)
-    · have hnone : (if a = g u then some () else none : Option Unit) = none := by
-        simp [h]
-      rw [hnone] at heq
-      cases heq
+    simp [hne] at ha
   · simp
 
 /-- The paper's weighted operator `A^u_{g(u)} ⊗ (G_g)^{1/2}`
