@@ -710,6 +710,115 @@ theorem zeta3_div_two_le_mainFormalError {params : Parameters} {eps : Error} {k 
 
 end MainFormalCascadeScalars
 
+/-- Section 6 role-register output used by the `mainFormal` assembly.
+
+The main-induction call is applied to `strategy.strategySymmetrization`, whose
+local Hilbert space is indexed by `Role × ι`.  This package records exactly the
+piece of that call needed by the later unsymmetrization step: a polynomial POVM
+on the role register together with its symmetrized point-consistency estimate at
+the cascade scalar `σ`.  It deliberately does not assert the factor-two
+unsymmetrized estimates; those remain the separate content of
+`UnsymmetrizationBridgePackage`. -/
+structure MainFormalRoleMeasurementPackage
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (scalars : MainFormalCascadeScalars params eps k) where
+  /-- The role-register polynomial POVM produced by Section 6. -/
+  roleMeasurement : Measurement (Polynomial params) (Role × ι)
+  /-- The Section 6 consistency estimate, rewritten to the Section 3 scalar `σ`. -/
+  symConsistency :
+    ConsRel (strategy.strategySymmetrization).state
+      (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas (strategy.strategySymmetrization).pointMeasurement)
+      (polynomialEvaluationFamily params roleMeasurement.toSubMeas)
+      scalars.sigma
+
+namespace MainFormalRoleMeasurementPackage
+
+/-- Repackage a raw Section 6 main-induction witness as a
+`MainFormalRoleMeasurementPackage`.
+
+The only proof step is scalar bookkeeping: `scalars.sigma` is definitionally
+`cascadeSigma params k (mainFormalInductionNu params k eps)`, and
+`mainFormalCascadeSigma_eq_mainInductionError` identifies that quantity with the
+`MainInductionStep.mainInductionError` returned by the Section 6 theorem at the
+symmetrized errors `(3ε,3ε,3ε)`. -/
+theorem ofMainInductionWitness
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (scalars : MainFormalCascadeScalars params eps k)
+    (hsection6 :
+      ∃ G : Measurement (Polynomial params) (Role × ι),
+        ConsRel (strategy.strategySymmetrization).state
+          (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas (strategy.strategySymmetrization).pointMeasurement)
+          (polynomialEvaluationFamily params G.toSubMeas)
+          (MainInductionStep.mainInductionError params k
+            (3 * eps) (3 * eps) (3 * eps))) :
+    Nonempty (MainFormalRoleMeasurementPackage params strategy eps k scalars) := by
+  rcases hsection6 with ⟨G, hG⟩
+  refine ⟨{ roleMeasurement := G, symConsistency := ?_ }⟩
+  simpa [MainFormalCascadeScalars.sigma, mainFormalCascadeSigma_eq_mainInductionError]
+    using hG
+
+/-- Base-case constructor for the role-register Section 6 package.
+
+When `params.m = 1`, the checked `strategySymmetrization_mainInductionBaseCase`
+produces the raw Section 6 measurement on the role-register symmetrization; this
+constructor rewrites its error to the `σ` used by the Section 3 cascade. -/
+theorem ofBaseCase
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (scalars : MainFormalCascadeScalars params eps k)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hm1 : params.m = 1) :
+    Nonempty (MainFormalRoleMeasurementPackage params strategy eps k scalars) :=
+  ofMainInductionWitness params strategy eps k scalars
+    (strategySymmetrization_mainInductionBaseCase params strategy eps hpass k hm1)
+
+/-- Successor-case constructor for the role-register Section 6 package.
+
+In the large-dimension branch, the public successor wrapper applies to the
+role-register symmetrization once the honest `MainFormalSuccessorBoundary` data
+and the Section 6 side condition `400 * params.m * params.d ≤ k` are available.
+This lemma exposes the resulting global polynomial measurement in the exact
+`σ`-normalized form consumed by the later unsymmetrization bridge. -/
+theorem ofSuccessorBoundary
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error) (k : ℕ)
+    (scalars : MainFormalCascadeScalars params.next eps k)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hd : 0 < params.d)
+    (boundary : MainFormalSuccessorBoundary params strategy eps hpass k)
+    (hk_pos : 1 ≤ k) (hk_large : 400 * params.m * params.d ≤ k) :
+    Nonempty (MainFormalRoleMeasurementPackage params.next strategy eps k scalars) :=
+  ofMainInductionWitness params.next strategy eps k scalars
+    (mainFormalSuccessorMainInductionPublicWrapper params strategy eps hpass k hd boundary
+      hk_pos hk_large)
+
+/-- Build the formal unsymmetrization bridge from the role-register Section 6
+measurement package.
+
+The lower-level Step 3 theorem
+`UnsymmetrizationBridgePackage.ofSymConsistency` proves the two factor-two
+principal-block estimates directly from the symmetrized consistency field, so no
+extra point-consistency hypotheses are needed here. -/
+def toUnsymmetrizationBridge
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (pkg : MainFormalRoleMeasurementPackage params strategy eps k scalars) :
+    UnsymmetrizationBridgePackage params strategy pkg.roleMeasurement scalars.sigma :=
+  UnsymmetrizationBridgePackage.ofSymConsistency params strategy pkg.roleMeasurement
+    scalars.sigma pkg.symConsistency
+
+end MainFormalRoleMeasurementPackage
+
 /-- Evaluate a polynomial-valued complete measurement at every point.
 
 The public `polynomialEvaluationFamily` forgets completeness because most later
@@ -2113,12 +2222,18 @@ theorem mainFormal
   -- side conditions are discharged below: if `mainFormalError ≥ 1`, the theorem
   -- is vacuous; otherwise the pass condition gives `0 ≤ ε`, while
   -- `mainFormalError < 1` rules out `ε > 1` and `d > q`. Producing the remaining
-  -- residual still depends on the active upstream residuals: the factor-two role
-  -- unsymmetrization estimates (#424), projectivization/completion closeness and
-  -- polynomial `ζ₁` transport links (#426), the full-slice transport chain (#601),
-  -- the remaining `fromHToG` pasting bridge (#707), the reverse `overAllOutcomes`
+  -- residual still depends on the active upstream residuals: role-register
+  -- measurement production, projectivization/completion closeness and polynomial
+  -- `ζ₁` transport links (#426), the full-slice transport chain (#601), the
+  -- remaining `fromHToG` pasting bridge (#707), the reverse `overAllOutcomes`
   -- aggregation (#672), and the ProcessedG scalar follow-ups #714, #715, #732,
-  -- and #759.
+  -- and #759.  The reusable Step 3 factor-two unsymmetrization estimates are now
+  -- checked by `UnsymmetrizationBridgePackage.ofSymConsistency`, once a
+  -- `MainFormalRoleMeasurementPackage` is available.  The line-169 transport
+  -- fields remain explicit because generic `triangleSub` gives
+  -- `ζ₁ + sqrt ζ₂`, not the printed `ζ₁`; preserving the paper envelope needs a
+  -- stronger projectivization/correlation-preservation input.
+
   by_cases herr : 1 ≤ mainFormalError params k eps
   · exact mainFormal_trivial_witness params strategy eps k herr
   · have hepsNN : 0 ≤ eps := ProjStrat.eps_nonneg_of_passes hpass

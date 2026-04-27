@@ -526,7 +526,12 @@ assembly residual:
 \lean{MIPStarRE.LDT.ProjStrat.lowIndividualDegreeFailureProbability_nonneg, MIPStarRE.LDT.ProjStrat.eps_nonneg_of_passes, MIPStarRE.LDT.ProjStrat.point_agreement_le_three_mul}
 \lean{MIPStarRE.LDT.Test.mainFormalError_ge_one_of_one_le_envelope, MIPStarRE.LDT.Test.mainFormalError_ge_one_of_one_lt_eps, MIPStarRE.LDT.Test.mainFormalError_ge_one_of_q_lt_d}
 \lean{MIPStarRE.LDT.Test.mainFormalInductionNu_bound, MIPStarRE.LDT.Test.cascadeHypotheses_of_not_mainFormalError_ge_one}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeScalars.ofCascadeHypotheses, MIPStarRE.LDT.Test.MainFormalCascadeScalars.ofNontrivialMainFormal}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeScalars.ofCascadeHypotheses, MIPStarRE.LDT.Test.MainFormalCascadeScalars.ofNontrivialMainFormal, MIPStarRE.LDT.Test.MainFormalCascadeScalars.zeta3_div_two_le_mainFormalError}
+\lean{MIPStarRE.LDT.Test.MainFormalRoleMeasurementPackage, MIPStarRE.LDT.Test.MainFormalRoleMeasurementPackage.ofMainInductionWitness, MIPStarRE.LDT.Test.MainFormalRoleMeasurementPackage.ofBaseCase, MIPStarRE.LDT.Test.MainFormalRoleMeasurementPackage.ofSuccessorBoundary, MIPStarRE.LDT.Test.MainFormalRoleMeasurementPackage.toUnsymmetrizationBridge}
+\lean{MIPStarRE.LDT.roleCond, MIPStarRE.LDT.roleBlock, MIPStarRE.LDT.opTensor_roleCond_sum, MIPStarRE.LDT.ev_classicalRoleSymmState_one, MIPStarRE.LDT.ev_classicalRoleSymmState_rolePair_AB, MIPStarRE.LDT.ev_classicalRoleSymmState_rolePair_BA, MIPStarRE.LDT.ev_classicalRoleSymmState_rolePair_AA, MIPStarRE.LDT.ev_classicalRoleSymmState_rolePair_BB, MIPStarRE.LDT.ev_classicalRoleSymmState_opTensor_roleCond_A, MIPStarRE.LDT.ev_classicalRoleSymmState_opTensor_roleCond_B}
+\lean{MIPStarRE.LDT.classicalRoleSymmState_isNormalized, MIPStarRE.LDT.roleSymmetrizedMeasurement, MIPStarRE.LDT.roleSymmetrizedMeasurement_outcome, MIPStarRE.LDT.roleSymmetrizedMeasurement_total}
+\lean{MIPStarRE.LDT.qBipartiteConsDefect_of_measurements, MIPStarRE.LDT.qBipartiteMatchMass_roleSymmetrizedMeasurement_left, MIPStarRE.LDT.qBipartiteConsDefect_roleSymmetrizedMeasurement_left}
+\lean{MIPStarRE.LDT.qBipartiteConsDefect_extractRoleB_le_two_symm, MIPStarRE.LDT.qBipartiteConsDefect_extractRoleA_le_two_symm, MIPStarRE.LDT.UnsymmetrizationBridgePackage.ofSymConsistency}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadePreProjectiveSelfConsistency, MIPStarRE.LDT.Test.MainFormalCascadePreProjectiveSelfConsistency.fullSelfConsistency}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeUnsymmetrizedPOVMTargets, MIPStarRE.LDT.Test.MainFormalCascadeUnsymmetrizedPOVMTargets.ofUnsymmetrizationBridge, MIPStarRE.LDT.Test.MainFormalCascadeUnsymmetrizedPOVMTargets.toPreProjectiveSelfConsistency}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveStageTargets, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveStageTargets.toTransportTargets}
@@ -540,14 +545,17 @@ assembly residual:
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.pointAConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.pointBConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.toProjectiveStageTargets}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeTransportTargets, MIPStarRE.LDT.Test.MainFormalCascadeTransportTargets.toCascadeTargets, MIPStarRE.LDT.Test.MainFormalCascadeTargets.toNativeTargets}
 They split off the vacuous branch where the theorem error is at least $1$,
-derive the Step~8 scalar hypotheses in the non-vacuous branch, use the proved
-Step~5 Schwartz--Zippel wrapper to convert evaluated pre-projective consistency
+derive the Step~8 scalar hypotheses in the non-vacuous branch, package the
+role-register Section~6 measurement at error $\sigma$, and now prove the two
+factor-two unsymmetrization links from the symmetrized consistency estimate once
+that role package is available.  The subsequent checked wrappers use the proved
+Step~5 Schwartz--Zippel theorem to convert evaluated pre-projective consistency
 to full-polynomial consistency at $\zeta_1$, prove the paper line-116 triangle
-step from the two unsymmetrized $2\sigma$ links plus the original $3\eps$ point
-agreement, and derive the evaluated line-164 projective consistency from a
-freshly reconstructed line-156 $\approx_{\zeta_3}$ projectivization bridge.
-Lean also data-processes the two polynomial line-169 $\zeta_1$ links to the
-evaluated line-172 links and proves the two native $\zeta_4$ point goals via
+step, and reconstruct the line-156 $\approx_{\zeta_3}$ projectivization bridge
+from pre-projective consistency plus left/right completion closeness at
+$\zeta_2$.  Lean also derives the evaluated line-164 projective consistency,
+data-processes the two polynomial line-169 $\zeta_1$ links to the evaluated
+line-172 links, and proves the two native $\zeta_4$ point goals via
 \texttt{simeq-triangle-inequality}.  The remaining active residual is now the
 finer \texttt{MainFormalCascadeProjectiveCompletionLine169Residual}: it asks for
 the actual role-register measurement, the two factor-two role-block estimates,
@@ -558,8 +566,22 @@ field inside \texttt{UnsymmetrizationBridgePackage} or for the duplicated
 pre-projective consistency field inside the Step~6 handoff; both are rebuilt from
 these fields and \texttt{hpass}. Lean then converts the resulting projective
 self-consistency to \texttt{MainFormalCascadeTransportTargets} using the
-projective converse of \texttt{simeq-to-approx}. No proof-level completeness tag
-is claimed here while \texttt{mainFormal} still contains that residual.
+projective converse of \texttt{simeq-to-approx}.
+
+The line-169 transport fields are deliberately left as residual data.  As stated
+in \texttt{preliminaries.tex}, \texttt{prop:triangle-sub} gives a
+$\delta+\sqrt{\epsilon}$ loss, so applying it directly to
+$G^{\mathrm A}\simeq_{\zeta_1}G^{\mathrm B}$ and
+$G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
+$Q^{\mathrm A}\simeq_{\zeta_1+\sqrt{\zeta_2}}G^{\mathrm B}$, not the printed
+$\zeta_1$ estimate.  The generic corrected route would degrade the final point
+error to scale $t^{1/65536}$, outside the current \texttt{mainFormalError}
+envelope.  Closing the residual while preserving the paper constants therefore
+requires a stronger construction-level projectivization/correlation-preservation
+theorem, not just the generic \texttt{triangle-sub} lemma. No proof-level
+completeness tag is claimed here while \texttt{mainFormal} still contains that
+completion-line-169 residual.
+
 \end{remark}
 \begin{proof}
 	\proves{thm:main-formal}

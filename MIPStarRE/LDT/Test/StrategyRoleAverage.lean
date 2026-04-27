@@ -13,56 +13,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace ProjStrat
 
-private lemma ev_classicalRoleSymmState_one {ι : Type*}
-    [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    (ψ : QuantumState (ι × ι)) :
-    ev (classicalRoleSymmState ψ) (1 : MIPStarRE.Quantum.Op ((Role × ι) × (Role × ι))) =
-      ev ψ (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
-  unfold ev classicalRoleSymmState
-  rw [mul_one, MIPStarRE.Quantum.normalizedTrace_add]
-  have hAB :
-      MIPStarRE.Quantum.normalizedTrace
-          ((2 : Error) • rolePairCond Role.A Role.B ψ.density) =
-        (1 / 2 : ℂ) * MIPStarRE.Quantum.normalizedTrace ψ.density :=
-    normalizedTrace_two_smul_rolePairCond Role.A Role.B ψ.density
-  have hBA :
-      MIPStarRE.Quantum.normalizedTrace
-          ((2 : Error) • rolePairCond Role.B Role.A (swapDensity ψ.density)) =
-        (1 / 2 : ℂ) * MIPStarRE.Quantum.normalizedTrace (swapDensity ψ.density) :=
-    normalizedTrace_two_smul_rolePairCond Role.B Role.A (swapDensity ψ.density)
-  rw [hAB, hBA, normalizedTrace_swapDensity, mul_one]
-  ring_nf
-
-private noncomputable def symmetrizedMeas
-    {Outcome : Type*} {ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
-    (MA MB : Measurement Outcome ι) : Measurement Outcome (Role × ι) where
-  toSubMeas :=
-    { outcome := fun a =>
-        roleCond Role.A (MA.outcome a) + roleCond Role.B (MB.outcome a)
-      total := 1
-      outcome_pos := by
-        intro a
-        exact add_nonneg
-          (roleCond_nonneg Role.A (MA.outcome_pos a))
-          (roleCond_nonneg Role.B (MB.outcome_pos a))
-      sum_eq_total := by
-        calc
-          ∑ a, (roleCond Role.A (MA.outcome a) + roleCond Role.B (MB.outcome a))
-              = ∑ a, roleCond Role.A (MA.outcome a) +
-                  ∑ a, roleCond Role.B (MB.outcome a) := by
-                    rw [Finset.sum_add_distrib]
-          _ = roleCond Role.A (∑ a, MA.outcome a) +
-                roleCond Role.B (∑ a, MB.outcome a) := by
-                  rw [roleCond_finset_sum Role.A Finset.univ MA.outcome]
-                  rw [roleCond_finset_sum Role.B Finset.univ MB.outcome]
-          _ = roleCond Role.A (1 : MIPStarRE.Quantum.Op ι) +
-                roleCond Role.B 1 := by
-                  rw [MA.sum_eq, MB.sum_eq]
-          _ = 1 := roleCond_one_sum
-      total_le_one := le_rfl }
-  total_eq_one := rfl
-
 private noncomputable def axisParallelLineAnswerMeasurement
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -102,51 +52,18 @@ private noncomputable def diagonalLineAnswerMeasurement
   simp [symmetrizedIdxProjMeas, postprocess, roleCond_finset_sum,
     Finset.sum_add_distrib]
 
-private lemma qBipartiteConsDefect_of_measurements
-    {Outcome : Type*} {ιA ιB : Type*}
-    [Fintype Outcome]
-    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (ψ : QuantumState (ιA × ιB))
-    (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) :
-    qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas =
-      ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) -
-        qBipartiteMatchMass ψ A.toSubMeas B.toSubMeas := by
-  have hmatch_le :
-      qBipartiteMatchMass ψ A.toSubMeas B.toSubMeas ≤
-        ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) := by
-    calc
-      qBipartiteMatchMass ψ A.toSubMeas B.toSubMeas
-        = ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (B.outcome a)) := by
-            rfl
-      _ ≤ ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ιB) (A.outcome a)) := by
-            refine Finset.sum_le_sum ?_
-            intro a _
-            exact ev_mono ψ _ _ <|
-              opTensor_le_leftTensor (ι₂ := ιB)
-                (A.outcome_pos a) (Measurement.outcome_le_one B a)
-      _ = ev ψ (leftTensor (ι₂ := ιB) A.total) := by
-            rw [← ev_sum ψ (fun a : Outcome => leftTensor (ι₂ := ιB) (A.outcome a))]
-            rw [leftTensor_finset_sum (ι₂ := ιB) Finset.univ A.outcome, A.sum_eq_total]
-      _ = ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) := by
-            simp [A.total_eq_one, leftTensor]
-  unfold qBipartiteConsDefect
-  rw [show ev ψ (opTensor A.toSubMeas.total B.toSubMeas.total) =
-      ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) by
-    simp [A.total_eq_one, B.total_eq_one, opTensor]]
-  rw [max_eq_right (sub_nonneg.mpr hmatch_le)]
-
-private lemma qBipartiteMatchMass_symmetrizedMeas_eq_average
+private lemma qBipartiteMatchMass_roleSymmetrizedMeasurement_eq_average
     {Outcome : Type*} {ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (ψ : QuantumState (ι × ι))
     (MA MB NA NB : Measurement Outcome ι) :
     qBipartiteMatchMass (classicalRoleSymmState ψ)
-        (symmetrizedMeas MA MB).toSubMeas
-        (symmetrizedMeas NA NB).toSubMeas =
+        (MIPStarRE.LDT.roleSymmetrizedMeasurement MA MB).toSubMeas
+        (MIPStarRE.LDT.roleSymmetrizedMeasurement NA NB).toSubMeas =
       (qBipartiteMatchMass ψ MA.toSubMeas NB.toSubMeas +
         qBipartiteMatchMass ψ NA.toSubMeas MB.toSubMeas) / 2 := by
-  let SL := (symmetrizedMeas MA MB).toSubMeas
-  let SR := (symmetrizedMeas NA NB).toSubMeas
+  let SL := (MIPStarRE.LDT.roleSymmetrizedMeasurement MA MB).toSubMeas
+  let SR := (MIPStarRE.LDT.roleSymmetrizedMeasurement NA NB).toSubMeas
   have houtcome :
       ∀ a : Outcome,
         ev (classicalRoleSymmState ψ) (opTensor (SL.outcome a) (SR.outcome a)) =
@@ -219,36 +136,37 @@ private lemma qBipartiteMatchMass_symmetrizedMeas_eq_average
             simp [qBipartiteMatchMass]
             ring
 
-private lemma qBipartiteConsDefect_symmetrizedMeas_eq_average
+private lemma qBipartiteConsDefect_roleSymmetrizedMeasurement_eq_average
     {Outcome : Type*} {ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (ψ : QuantumState (ι × ι))
     (MA MB NA NB : Measurement Outcome ι) :
     qBipartiteConsDefect (classicalRoleSymmState ψ)
-        (symmetrizedMeas MA MB).toSubMeas
-        (symmetrizedMeas NA NB).toSubMeas =
+        (MIPStarRE.LDT.roleSymmetrizedMeasurement MA MB).toSubMeas
+        (MIPStarRE.LDT.roleSymmetrizedMeasurement NA NB).toSubMeas =
       (qBipartiteConsDefect ψ MA.toSubMeas NB.toSubMeas +
         qBipartiteConsDefect ψ NA.toSubMeas MB.toSubMeas) / 2 := by
   calc
     qBipartiteConsDefect (classicalRoleSymmState ψ)
-        (symmetrizedMeas MA MB).toSubMeas
-        (symmetrizedMeas NA NB).toSubMeas
+        (MIPStarRE.LDT.roleSymmetrizedMeasurement MA MB).toSubMeas
+        (MIPStarRE.LDT.roleSymmetrizedMeasurement NA NB).toSubMeas
       = ev (classicalRoleSymmState ψ)
           (1 : MIPStarRE.Quantum.Op ((Role × ι) × (Role × ι))) -
         qBipartiteMatchMass (classicalRoleSymmState ψ)
-          (symmetrizedMeas MA MB).toSubMeas
-          (symmetrizedMeas NA NB).toSubMeas := by
+          (MIPStarRE.LDT.roleSymmetrizedMeasurement MA MB).toSubMeas
+          (MIPStarRE.LDT.roleSymmetrizedMeasurement NA NB).toSubMeas := by
             exact qBipartiteConsDefect_of_measurements (classicalRoleSymmState ψ)
-              (symmetrizedMeas MA MB) (symmetrizedMeas NA NB)
+              (MIPStarRE.LDT.roleSymmetrizedMeasurement MA MB)
+              (MIPStarRE.LDT.roleSymmetrizedMeasurement NA NB)
     _ = ev ψ (1 : MIPStarRE.Quantum.Op (ι × ι)) -
           qBipartiteMatchMass (classicalRoleSymmState ψ)
-            (symmetrizedMeas MA MB).toSubMeas
-            (symmetrizedMeas NA NB).toSubMeas := by
+            (MIPStarRE.LDT.roleSymmetrizedMeasurement MA MB).toSubMeas
+            (MIPStarRE.LDT.roleSymmetrizedMeasurement NA NB).toSubMeas := by
               rw [ev_classicalRoleSymmState_one]
     _ = ev ψ (1 : MIPStarRE.Quantum.Op (ι × ι)) -
           ((qBipartiteMatchMass ψ MA.toSubMeas NB.toSubMeas +
             qBipartiteMatchMass ψ NA.toSubMeas MB.toSubMeas) / 2) := by
-              rw [qBipartiteMatchMass_symmetrizedMeas_eq_average]
+              rw [qBipartiteMatchMass_roleSymmetrizedMeasurement_eq_average]
     _ = ((ev ψ (1 : MIPStarRE.Quantum.Op (ι × ι)) -
             qBipartiteMatchMass ψ MA.toSubMeas NB.toSubMeas) +
           (ev ψ (1 : MIPStarRE.Quantum.Op (ι × ι)) -
@@ -284,10 +202,10 @@ private lemma axisParallel_symm_sample_eq_average
     ProjStrat.symmetrizedAxisParallelMeasurement,
     ProjStrat.leftAsSymmetric, ProjStrat.rightAsSymmetric,
     axisParallelPointAnswerFamily, axisParallelLineAnswerFamily,
-    axisParallelLineAnswerMeasurement, symmetrizedMeas,
+    axisParallelLineAnswerMeasurement, MIPStarRE.LDT.roleSymmetrizedMeasurement,
     postprocess_total, postprocess_symmetrizedIdxProjMeas_outcome,
     PA, PB, LA, LB, add_comm] using
-    qBipartiteConsDefect_symmetrizedMeas_eq_average strategy.state
+    qBipartiteConsDefect_roleSymmetrizedMeasurement_eq_average strategy.state
       PA.toMeasurement PB.toMeasurement LA LB
 
 set_option maxHeartbeats 1000000 in
@@ -316,10 +234,10 @@ private lemma diagonal_symm_sample_eq_average
     ProjStrat.symmetrizedDiagonalMeasurement,
     ProjStrat.leftAsSymmetric, ProjStrat.rightAsSymmetric,
     diagonalPointAnswerFamily, diagonalLineAnswerFamily,
-    diagonalLineAnswerMeasurement, symmetrizedMeas,
+    diagonalLineAnswerMeasurement, MIPStarRE.LDT.roleSymmetrizedMeasurement,
     postprocess_total, postprocess_symmetrizedIdxProjMeas_outcome,
     PA, PB, LA, LB, add_comm] using
-    qBipartiteConsDefect_symmetrizedMeas_eq_average strategy.state
+    qBipartiteConsDefect_roleSymmetrizedMeasurement_eq_average strategy.state
       PA.toMeasurement PB.toMeasurement LA LB
 
 /- The paper's role-register symmetrized strategy exactly averages the two
