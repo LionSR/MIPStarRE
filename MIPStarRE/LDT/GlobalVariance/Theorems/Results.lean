@@ -1,6 +1,7 @@
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Results
 import MIPStarRE.LDT.Preliminaries.ComparisonCore
 import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
+import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
 import MIPStarRE.LDT.GlobalVariance.MatrixRealization
 import MIPStarRE.LDT.GlobalVariance.Theorems.Averaging
 import MIPStarRE.LDT.GlobalVariance.Theorems.Statements
@@ -1240,6 +1241,158 @@ lemma generalizeBReversePointwiseBound
                 exact congrArg (ev ψbi) hsqExpanded
             _ = ev ψbi (((X - Y)ᴴ) * (X - Y)) := by simp
     _ ≤ generalizeBError params := hgen.pointwiseNormBound g
+
+/-! ## Good-strategy interfaces for the local-variance transport chain -/
+
+private lemma pointSelfConsistencyFromGood
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    {eps delta gamma : Error}
+    (hgood : strategy.IsGood eps delta gamma) :
+    BipartiteSSCRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta := by
+  exact ⟨by
+    simpa [SymStrat.selfConsistencyFailureProbability] using
+      hgood.selfConsistencyTest⟩
+
+/-- The `2δ` self-consistency interface for the point event
+`A^u_{g(u)}`.
+
+This is the evaluated, two-outcome version of the first/last moves in
+`lem:local-variance-of-points` (`expansion.tex`, lines 305--306 and 310--311):
+postprocess the point measurement by the event `a = g(u)`, then apply
+`prop:two-notions-of-self-consistency-after-evaluation` to the good-strategy
+self-consistency branch. The remaining six-step proof still has to pull this
+point-distribution estimate to the hypercube-edge sampling and weight it by
+`(G_g)^{1/2}` via `prop:cab-approx-delta`. -/
+lemma pointConditionedEventSelfConsistency
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (g : Polynomial params) :
+    SDDRel strategy.state (uniformDistribution (Point params))
+      (IdxSubMeas.liftLeft
+        (fun u : Point params =>
+          pointConditionedEventSubMeasAtPolynomial params strategy g u))
+      (IdxSubMeas.liftRight
+        (fun u : Point params =>
+          pointConditionedEventSubMeasAtPolynomial params strategy g u))
+      (2 * delta) := by
+  have hssc := pointSelfConsistencyFromGood params strategy hgood
+  simpa [pointConditionedEventSubMeasAtPolynomial] using
+    (twoNotionsOfSelfConsistencyAfterEvaluation
+      strategy.state strategy.permInvState
+      (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      delta
+      (fun u a => if a = g u then some () else none)
+      hssc)
+
+private lemma axisParallelConsistencyFromGood
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    {eps delta gamma : Error}
+    (hgood : strategy.IsGood eps delta gamma) :
+    ConsRel strategy.state (uniformDistribution (AxisParallelTestSample params))
+      (axisParallelPointAnswerFamily strategy)
+      (axisParallelLineAnswerFamily strategy) eps := by
+  exact ⟨by
+    simpa [SymStrat.axisParallelFailureProbability] using
+      hgood.axisParallelTest⟩
+
+/-- The `ε` consistency interface for the point-line event at the base point of
+an axis-parallel test sample.
+
+For a sample `(u,i)`, the point side is the event `A^u_{g(u)}` and the line side
+is the line-answer event obtained by evaluating the line polynomial at the base
+parameter and testing equality with `g(u)`. This is the consistency input that
+feeds the `2ε` approximation step at `expansion.tex`, line 307; the later
+edge-transport proof still has to reindex from the base-point test sampling to
+an arbitrary incident pair `(ℓ,u)` (using axis-line rebasing covariance) and then
+apply `prop:simeq-to-approx`/`prop:cab-approx-delta`. -/
+lemma axisParallelBaseEventConsistency
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (g : Polynomial params) :
+    ConsRel strategy.state (uniformDistribution (AxisParallelTestSample params))
+      (fun s : AxisParallelTestSample params =>
+        pointConditionedEventSubMeasAtPolynomial params strategy g s.1)
+      (fun s : AxisParallelTestSample params =>
+        postprocess (axisParallelLineAnswerFamily strategy s)
+          (fun a : Fq params => if a = g s.1 then some () else none))
+      eps := by
+  have haxis := axisParallelConsistencyFromGood params strategy hgood
+  simpa [axisParallelPointAnswerFamily, pointConditionedEventSubMeasAtPolynomial] using
+    (consRelDataProcessing_questionDependent
+      strategy.state (uniformDistribution (AxisParallelTestSample params))
+      (axisParallelPointAnswerFamily strategy)
+      (axisParallelLineAnswerFamily strategy)
+      eps
+      (fun s a => if a = g s.1 then some () else none)
+      haxis)
+
+/-- The corresponding `2ε` approximation interface obtained from
+`axisParallelBaseEventConsistency` by `prop:simeq-to-approx`.
+
+This is the base-point form of the second move in the six-step chain.  The
+remaining edge-transport assembly must still reindex it along the line-sampling
+presentation where `v ∼ ℓ`, and then apply the square-root weighting used in the
+operators `B^ℓ_[f(u)=g(u)] ⊗ (G_g)^{1/2}`. -/
+lemma axisParallelBaseEventApproximation
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (g : Polynomial params) :
+    SDDRel strategy.state (uniformDistribution (AxisParallelTestSample params))
+      (IdxSubMeas.liftLeft
+        (fun s : AxisParallelTestSample params =>
+          pointConditionedEventSubMeasAtPolynomial params strategy g s.1))
+      (IdxSubMeas.liftRight
+        (fun s : AxisParallelTestSample params =>
+          postprocess (axisParallelLineAnswerFamily strategy s)
+            (fun a : Fq params => if a = g s.1 then some () else none)))
+      (2 * eps) := by
+  let pointEvent : IdxSubMeas (AxisParallelTestSample params) (Option Unit) ι :=
+    fun s => pointConditionedEventSubMeasAtPolynomial params strategy g s.1
+  let lineEvent : IdxSubMeas (AxisParallelTestSample params) (Option Unit) ι :=
+    fun s => postprocess (axisParallelLineAnswerFamily strategy s)
+      (fun a : Fq params => if a = g s.1 then some () else none)
+  have hpoint_complete : ∀ s, (pointEvent s).total = 1 := by
+    intro s
+    simp [pointEvent, pointConditionedEventSubMeasAtPolynomial,
+      postprocess_total, (strategy.pointMeasurement s.1).total_eq_one]
+  have hline_complete : ∀ s, (lineEvent s).total = 1 := by
+    intro s
+    simp [lineEvent, axisParallelLineAnswerFamily, postprocess_total,
+      (strategy.axisParallelMeasurement { base := s.1, direction := s.2 }).total_eq_one]
+  let pointMeas : IdxMeas (AxisParallelTestSample params) (Option Unit) ι :=
+    fun s => (pointEvent s).toMeasurement (hpoint_complete s)
+  let lineMeas : IdxMeas (AxisParallelTestSample params) (Option Unit) ι :=
+    fun s => (lineEvent s).toMeasurement (hline_complete s)
+  have hcons := axisParallelBaseEventConsistency params strategy eps delta gamma hgood g
+  have hcons' :
+      ConsRel strategy.state (uniformDistribution (AxisParallelTestSample params))
+        (IdxMeas.toIdxSubMeas pointMeas)
+        (IdxMeas.toIdxSubMeas lineMeas) eps := by
+    simpa [pointMeas, lineMeas, pointEvent, lineEvent] using hcons
+  have happrox :
+      BipartiteSDDRel strategy.state (uniformDistribution (AxisParallelTestSample params))
+        (IdxMeas.toIdxSubMeas pointMeas)
+        (IdxMeas.toIdxSubMeas lineMeas) (2 * eps) :=
+    simeqToApprox strategy.state (uniformDistribution (AxisParallelTestSample params))
+      pointMeas lineMeas eps hcons'
+  exact ⟨by
+    simpa [pointMeas, lineMeas, pointEvent, lineEvent, BipartiteSDDRel] using
+      happrox.leftRightSquaredDistanceBound⟩
 
 /-- The post-triangle six-step transport error is absorbed by the paper's
 `24(ε + δ + md/q)` slack from `lem:local-variance-of-points`.

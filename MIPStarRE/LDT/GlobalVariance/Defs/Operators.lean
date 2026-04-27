@@ -43,6 +43,42 @@ def pointConditionedOutcomeOperatorAtPolynomial (params : Parameters) [FieldMode
     (g : Polynomial params) (u : Point params) : MIPStarRE.Quantum.Op ι :=
   (strategy.pointMeasurement u).toSubMeas.outcome (g u)
 
+/-- The two-outcome point event selecting the answer `g(u)`.
+
+This is the submeasurement form of the point operator used in the first and last
+steps of `lem:local-variance-of-points` (`expansion.tex`, lines 305 and 311).
+Its `some ()` outcome is exactly `A^u_{g(u)}`; the `none` outcome is the
+complementary point-answer mass. -/
+noncomputable def pointConditionedEventSubMeasAtPolynomial (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (g : Polynomial params) (u : Point params) : SubMeas (Option Unit) ι :=
+  postprocess ((strategy.pointMeasurement u).toSubMeas)
+    (fun a : Fq params => if a = g u then some () else none)
+
+/-- The selected outcome of `pointConditionedEventSubMeasAtPolynomial` is
+`A^u_{g(u)}`. -/
+@[simp] lemma pointConditionedEventSubMeasAtPolynomial_some (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (g : Polynomial params) (u : Point params) :
+    (pointConditionedEventSubMeasAtPolynomial params strategy g u).outcome (some ()) =
+      pointConditionedOutcomeOperatorAtPolynomial params strategy g u := by
+  classical
+  unfold pointConditionedEventSubMeasAtPolynomial pointConditionedOutcomeOperatorAtPolynomial
+  simp only [postprocess]
+  refine Finset.sum_eq_single (g u) ?_ ?_
+  · intro a ha hne
+    have heq : (if a = g u then some () else none : Option Unit) = some () := by
+      simpa using ha
+    by_cases h : a = g u
+    · exact False.elim (hne h)
+    · have hnone : (if a = g u then some () else none : Option Unit) = none := by
+        simp [h]
+      rw [hnone] at heq
+      cases heq
+  · simp
+
 /-- The paper's weighted operator `A^u_{g(u)} ⊗ (G_g)^{1/2}`
 on the bipartite space `d * d`. -/
 noncomputable def weightedPointConditionedOperatorAtPolynomial (params : Parameters)
