@@ -63,7 +63,11 @@ def avgOver {α : Type*} (𝒟 : Distribution α) (f : α → Error) : Error :=
   ∑ a ∈ 𝒟.support, 𝒟.weight a * f a
 
 /-- Weighted sum of operators over a distribution's finite support, using the same
-`support`/`weight` data as the scalar `avgOver`. -/
+`support`/`weight` data as the scalar `avgOver`.
+
+This is a project-local adapter around Mathlib finite sums for the LDT
+`Distribution` representation and `Quantum.Op` scalar action, not a replacement for
+Mathlib's probability theory APIs. -/
 noncomputable def averageOperatorOverDistribution {α : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (𝒟 : Distribution α) (f : α → MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
@@ -204,6 +208,34 @@ theorem avgOver_const_of_isProbability {α : Type*} (𝒟 : Distribution α)
       = ∑ a ∈ 𝒟.support, 𝒟.weight a * c := by simp [avgOver]
     _ = (∑ a ∈ 𝒟.support, 𝒟.weight a) * c := by rw [← Finset.sum_mul]
     _ = c := by rw [h𝒟.weight_sum_eq_one, one_mul]
+
+/-- The weighted operator average of the zero-valued family is zero.
+This is a thin wrapper around `Finset.sum` simplification for
+`averageOperatorOverDistribution`. -/
+theorem averageOperatorOverDistribution_zero {α : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (𝒟 : Distribution α) :
+    averageOperatorOverDistribution 𝒟 (fun _ : α => (0 : MIPStarRE.Quantum.Op ι)) = 0 := by
+  simp [averageOperatorOverDistribution]
+
+/-- If two operator-valued families agree pointwise, their averages agree. -/
+theorem averageOperatorOverDistribution_congr {α : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (𝒟 : Distribution α) (A B : α → MIPStarRE.Quantum.Op ι)
+    (h : ∀ a, A a = B a) :
+    averageOperatorOverDistribution 𝒟 A = averageOperatorOverDistribution 𝒟 B := by
+  exact Finset.sum_congr rfl fun a _ => by rw [h a]
+
+/-- Operator averages only depend on the family values on the explicit support.
+This support-restricted form is useful when the support carries an invariant not
+available for all ambient values. -/
+theorem averageOperatorOverDistribution_congr_on_support {α : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (𝒟 : Distribution α) (A B : α → MIPStarRE.Quantum.Op ι)
+    (h : ∀ a, a ∈ 𝒟.support → A a = B a) :
+    averageOperatorOverDistribution 𝒟 A = averageOperatorOverDistribution 𝒟 B := by
+  simp only [averageOperatorOverDistribution]
+  exact Finset.sum_congr rfl fun a ha => by rw [h a ha]
 
 namespace Distribution.IsProbability
 
