@@ -15,6 +15,8 @@ open MIPStarRE.LDT.ExpansionHypercubeGraph
 open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
+namespace GCommStability.Scalar
+
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 lemma opTensor_mono_right_of_nonneg
@@ -100,5 +102,7 @@ lemma storedResidual_nonneg
     MIPStarRE.Quantum.kronecker_nonneg
       (sub_nonneg.mpr (G x).total_le_one)
       (hbound.bounded.sliceOpPSD x)
+
+end GCommStability.Scalar
 
 end MIPStarRE.LDT.Commutativity
