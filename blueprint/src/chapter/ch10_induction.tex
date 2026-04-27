@@ -528,8 +528,11 @@ assembly residual:
 \lean{MIPStarRE.LDT.Test.mainFormalInductionNu_bound, MIPStarRE.LDT.Test.cascadeHypotheses_of_not_mainFormalError_ge_one}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeScalars.ofCascadeHypotheses, MIPStarRE.LDT.Test.MainFormalCascadeScalars.ofNontrivialMainFormal}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadePreProjectiveSelfConsistency, MIPStarRE.LDT.Test.MainFormalCascadePreProjectiveSelfConsistency.fullSelfConsistency}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeUnsymmetrizedPOVMTargets, MIPStarRE.LDT.Test.MainFormalCascadeUnsymmetrizedPOVMTargets.ofUnsymmetrizationBridge, MIPStarRE.LDT.Test.MainFormalCascadeUnsymmetrizedPOVMTargets.toPreProjectiveSelfConsistency}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionResidual.toProjectiveAssemblyResidual}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeUnsymmetrizedPOVMTargets}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeUnsymmetrizedPOVMTargets.ofUnsymmetrizationBridge}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeUnsymmetrizedPOVMTargets.toPreProjectiveSelfConsistency}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionResidual}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionResidual.toProjectiveAssemblyResidual}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveStageTargets, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveStageTargets.toTransportTargets}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveAssemblyResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveAssemblyResidual.toProjectiveStageTargets}
 \lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndCompleteError, MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndComplete}
@@ -544,12 +547,13 @@ agreement, and reduce the line-156 $\approx_{\zeta_3}$ projectivization bridge
 to the named Step~6 handoff package: pre-projective consistency plus left/right
 completion closeness at $\zeta_2$.  The remaining residual is the finer
 \texttt{MainFormalCascadeProjectiveCompletionResidual}: it still contains the
-two $\zeta_4$ point-consistency goals and the completion closeness data needed
-by the named line-156 handoff. Lean then converts the resulting projective
-self-consistency to \texttt{MainFormalCascadeTransportTargets} using the
-projective converse of \texttt{simeq-to-approx}. No proof-level completeness tag
-is claimed here while \texttt{mainFormal} still contains that completion and
-point-transport residual.
+role-register measurement $G$, its unsymmetrization bridge, the two completed
+projective measurements, the two $\zeta_4$ point-consistency goals, and the
+$\zeta_2$ completion closeness data needed by the named line-156 handoff. Lean
+then converts the resulting projective self-consistency to
+\texttt{MainFormalCascadeTransportTargets} using the projective converse of
+\texttt{simeq-to-approx}. No proof-level completeness tag is claimed here while
+\texttt{mainFormal} still contains that completion and point-transport residual.
 \end{remark}
 \begin{proof}
 	\proves{thm:main-formal}
