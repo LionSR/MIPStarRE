@@ -2088,18 +2088,19 @@ noncomputable def toCompletionLine169Residual
     {scalars : MainFormalCascadeScalars params eps k}
     (residual : MainFormalCascadeRolePackagedCompletionLine169Residual
       params strategy eps k scalars) :
-    MainFormalCascadeProjectiveCompletionLine169Residual params strategy eps k scalars where
-  roleMeasurement := residual.rolePackage.roleMeasurement
-  pointARightPOVMConsistency := residual.rolePackage.toUnsymmetrizationBridge.pointAConsistency
-  leftPOVMPointBConsistency := residual.rolePackage.toUnsymmetrizationBridge.pointBConsistency
-  leftMeasurement := residual.leftMeasurement
-  rightMeasurement := residual.rightMeasurement
-  leftCompletionCloseness := residual.leftCompletionCloseness
-  rightCompletionCloseness := residual.rightCompletionCloseness
-  leftProjectiveRightPOVMPolynomialConsistency :=
-    residual.leftProjectiveRightPOVMPolynomialConsistency
-  rightProjectiveLeftPOVMPolynomialConsistency :=
-    residual.rightProjectiveLeftPOVMPolynomialConsistency
+    MainFormalCascadeProjectiveCompletionLine169Residual params strategy eps k scalars :=
+  let bridge := residual.rolePackage.toUnsymmetrizationBridge
+  { roleMeasurement := residual.rolePackage.roleMeasurement
+    pointARightPOVMConsistency := bridge.pointAConsistency
+    leftPOVMPointBConsistency := bridge.pointBConsistency
+    leftMeasurement := residual.leftMeasurement
+    rightMeasurement := residual.rightMeasurement
+    leftCompletionCloseness := residual.leftCompletionCloseness
+    rightCompletionCloseness := residual.rightCompletionCloseness
+    leftProjectiveRightPOVMPolynomialConsistency :=
+      residual.leftProjectiveRightPOVMPolynomialConsistency
+    rightProjectiveLeftPOVMPolynomialConsistency :=
+      residual.rightProjectiveLeftPOVMPolynomialConsistency }
 
 end MainFormalCascadeRolePackagedCompletionLine169Residual
 
