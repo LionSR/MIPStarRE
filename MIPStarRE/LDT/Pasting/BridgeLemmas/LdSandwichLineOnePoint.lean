@@ -2199,9 +2199,10 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_route
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
-    {k i : ℕ} (hi : i < k) (_hi0 : i ≠ 0)
+    {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0)
     (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi) :
     LdSandwichLineOnePointOutcomeSumCSRoute params strategy family gamma zeta hi := by
+  have _ := hi0
   /- TODO(#835): prove the two field-wise CS moves without changing constants.
   Use `facts.rawCore`, `facts.rawLeftEndpoint`, and `facts.rawRightEndpoint` to
   identify the raw half-products, then discharge the unit side conditions from
@@ -2224,7 +2225,7 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_bound
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
-    {k i : ℕ} (hi : i < k) (_hi0 : i ≠ 0)
+    {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0)
     (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi) :
     avgOver (uniformDistribution (SandwichedLineQuestion params k)) (fun q =>
       ∑ a : Fq params,
@@ -2246,7 +2247,7 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_bound
       2 * Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1)) := by
   have hroute :=
     ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_route
-      params strategy family gamma zeta hi _hi0 facts
+      params strategy family gamma zeta hi hi0 facts
   have htwo :
       ldSandwichLineOnePoint_prefix_sourceOutcomeSum params strategy family hi ≤
         ldSandwichLineOnePoint_prefix_movedOutcomeSum params strategy family hi +
