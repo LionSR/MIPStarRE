@@ -113,6 +113,53 @@ noncomputable def orthonormalizeAndCompleteError (ζ : Error) : Error :=
     4 * Real.sqrt (orthonormalizationError ζ) +
     2 * ζ
 
+/-! ### Permutation-invariant right-register transport -/
+
+/-- On a permutation-invariant bipartite state, the state-dependent distance between
+right-lifted local submeasurements equals the distance between their left lifts.
+
+This is the Step 6 bookkeeping needed for the Bob-side completion estimate in
+`inductive_step.tex` lines 140--147: `orthonormalizeAndComplete` naturally
+returns a left-register bound, and the paper also uses the corresponding
+right-register bound for $I \otimes G^{\mathrm B}$ and $I \otimes Q^{\mathrm B}$.
+This is the submeasurement specialization of
+`Preliminaries.qSDDCore_rightTensor_eq_leftTensor_of_permInv`. -/
+lemma qSDD_liftRight_eq_liftLeft_of_permInv
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    {ψ : QuantumState (ι × ι)}
+    (hperm : PermInvState ψ)
+    (A B : SubMeas Outcome ι) :
+    qSDD ψ A.liftRight B.liftRight = qSDD ψ A.liftLeft B.liftLeft := by
+  simpa [qSDD, SubMeas.liftRight, SubMeas.liftLeft] using
+    MIPStarRE.LDT.Preliminaries.qSDDCore_rightTensor_eq_leftTensor_of_permInv
+      (ψ := ψ) hperm A.outcome B.outcome
+
+/-- Transport an `SDDRel` bound from left lifts to right lifts on a
+permutation-invariant bipartite state. -/
+lemma sddRel_liftRight_of_liftLeft_permInv
+    {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    {ψ : QuantumState (ι × ι)}
+    (hperm : PermInvState ψ)
+    (𝒟 : Distribution Question)
+    (A B : IdxSubMeas Question Outcome ι) (δ : Error) :
+    SDDRel ψ 𝒟 (IdxSubMeas.liftLeft A) (IdxSubMeas.liftLeft B) δ →
+      SDDRel ψ 𝒟 (IdxSubMeas.liftRight A) (IdxSubMeas.liftRight B) δ := by
+  intro h
+  have hsddeq :
+      sddError ψ 𝒟 (IdxSubMeas.liftRight A) (IdxSubMeas.liftRight B) =
+        sddError ψ 𝒟 (IdxSubMeas.liftLeft A) (IdxSubMeas.liftLeft B) := by
+    unfold sddError avgOver
+    refine Finset.sum_congr rfl ?_
+    intro q _
+    change 𝒟.weight q * qSDD ψ (A q).liftRight (B q).liftRight =
+      𝒟.weight q * qSDD ψ (A q).liftLeft (B q).liftLeft
+    rw [qSDD_liftRight_eq_liftLeft_of_permInv (ψ := ψ) hperm (A q) (B q)]
+  constructor
+  rw [hsddeq]
+  exact h.squaredDistanceBound
+
 /-! ### Line-156 triangle handoff -/
 
 /-- Residual handoff for the projectivization part of Step 6.
@@ -258,6 +305,80 @@ structure OrthonormalizeAndCompleteStatement
       (constSubMeasFamily A.toSubMeas.liftLeft)
       (constSubMeasFamily Q.toSubMeas.liftLeft)
       (orthonormalizeAndCompleteError ζ)
+
+namespace OrthonormalizeAndCompleteStatement
+
+/-- Bob/right-register form of the completion closeness in
+`OrthonormalizeAndCompleteStatement`.
+
+The main chain theorem records the left-register estimate because the analytic
+completion lemma is stated on left lifts. On a permutation-invariant state, the
+same squared-distance bound holds after placing both local measurements on the
+right register, giving the paper's line-147 estimate for
+$I \otimes G^{\mathrm B}$ and $I \otimes Q^{\mathrm B}$. -/
+theorem completedCloseness_liftRight
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    {ψ : QuantumState (ι × ι)}
+    (hperm : PermInvState ψ)
+    {A : Measurement Outcome ι} {P : ProjSubMeas Outcome ι}
+    {Q : ProjMeas Outcome ι} {a0 : Outcome} {ζ : Error}
+    (stmt : OrthonormalizeAndCompleteStatement ψ A P Q a0 ζ) :
+    SDDRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A.toSubMeas.liftRight)
+      (constSubMeasFamily Q.toSubMeas.liftRight)
+      (orthonormalizeAndCompleteError ζ) :=
+  sddRel_liftRight_of_liftLeft_permInv hperm (uniformDistribution Unit)
+    (constSubMeasFamily A.toSubMeas) (constSubMeasFamily Q.toSubMeas)
+    (orthonormalizeAndCompleteError ζ) stmt.completedCloseness
+
+end OrthonormalizeAndCompleteStatement
+
+namespace ProjectivizationLine156Handoff
+
+/-- Build the line-156 projectivization handoff from the two
+orthonormalize-and-complete statements.
+
+This packages the exact Step 6 producer obligations for the current
+`mainFormal` residual outside `Test/MainTheorem.lean`: a pre-projective
+consistency proof, the Alice-side completion statement, and the Bob-side
+completion statement. The Bob-side statement is transported from left lifts to
+right lifts using permutation invariance, matching `inductive_step.tex` lines
+146--147. The final argument allows callers to widen the literal composed
+completion error to whichever scalar envelope they are using for `ζ₂`. -/
+theorem ofOrthonormalizeAndCompleteStatements
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    {ψ : QuantumState (ι × ι)}
+    (hperm : PermInvState ψ)
+    {G_A G_B : Measurement Outcome ι}
+    {P_A P_B : ProjSubMeas Outcome ι}
+    {Q_A Q_B : ProjMeas Outcome ι}
+    {a_A a_B : Outcome} {ζ ζ₁ ζ₂ : Error}
+    (hpre : ConsRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily G_A.toSubMeas)
+      (constSubMeasFamily G_B.toSubMeas) ζ₁)
+    (leftStmt : OrthonormalizeAndCompleteStatement ψ G_A P_A Q_A a_A ζ)
+    (rightStmt : OrthonormalizeAndCompleteStatement ψ G_B P_B Q_B a_B ζ)
+    (hζ : orthonormalizeAndCompleteError ζ ≤ ζ₂) :
+    ProjectivizationLine156Handoff ψ G_A G_B Q_A Q_B ζ₁ ζ₂ := by
+  refine
+    { preProjectiveConsistency := hpre
+      leftCompletionCloseness := ?_
+      rightCompletionCloseness := ?_ }
+  · exact MIPStarRE.LDT.Preliminaries.stateDependentDistanceRel_mono ψ
+      (uniformDistribution Unit)
+      (constSubMeasFamily G_A.toSubMeas.liftLeft)
+      (constSubMeasFamily Q_A.toSubMeas.liftLeft)
+      (orthonormalizeAndCompleteError ζ) ζ₂ hζ leftStmt.completedCloseness
+  · exact MIPStarRE.LDT.Preliminaries.stateDependentDistanceRel_mono ψ
+      (uniformDistribution Unit)
+      (constSubMeasFamily G_B.toSubMeas.liftRight)
+      (constSubMeasFamily Q_B.toSubMeas.liftRight)
+      (orthonormalizeAndCompleteError ζ) ζ₂ hζ
+      (rightStmt.completedCloseness_liftRight hperm)
+
+end ProjectivizationLine156Handoff
 
 /-! ### Main theorem -/
 
