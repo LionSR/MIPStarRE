@@ -22,6 +22,24 @@ project's quantum layer and the LDT development formalizing `references/ldt-pape
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
+namespace Matrix
+
+/-! ### Trace bookkeeping -/
+
+/-- Reindexing rows and columns by the same equivalence preserves matrix trace.
+
+This generic matrix lemma is used when moving between equivalent finite index
+presentations of the same operator. -/
+theorem trace_reindex {α β R : Type*} [Fintype α] [Fintype β]
+    [AddCommMonoid R] (e : α ≃ β) (M : Matrix α α R) :
+    Matrix.trace (Matrix.reindex e e M) = Matrix.trace M := by
+  classical
+  simp only [Matrix.trace, Matrix.diag_apply, Matrix.reindex_apply]
+  rw [← e.symm.sum_comp (fun i : α => M i i)]
+  rfl
+
+end Matrix
+
 namespace MIPStarRE.Quantum
 
 /-! ### Basic operator type -/
