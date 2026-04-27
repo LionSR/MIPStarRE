@@ -171,6 +171,37 @@ theorem Measurement.sum_eq {α : Type*} {ι : Type*}
     ∑ a, M.outcome a = 1 := by
   rw [M.sum_eq_total, M.total_eq_one]
 
+/-- A submeasurement is complete exactly when its outcome operators sum to `1`. -/
+theorem SubMeas.sum_eq_one_iff_total_eq_one {α : Type*} {ι : Type*}
+    [Fintype α] [Fintype ι] [DecidableEq ι]
+    (A : SubMeas α ι) :
+    (∑ a, A.outcome a = 1) ↔ A.total = 1 := by
+  simp [A.sum_eq_total]
+
+/-- Promote a complete submeasurement to a measurement.
+
+This is the explicit bridge from the paper's sub-measurement convention
+`∑ a, A_a ≤ I` to the POVM convention `∑ a, A_a = I`: callers must supply the
+completion proof rather than relying on a degenerate default. -/
+def SubMeas.toMeasurement {α : Type*} {ι : Type*}
+    [Fintype α] [Fintype ι] [DecidableEq ι]
+    (A : SubMeas α ι) (hcomplete : A.total = 1) :
+    Measurement α ι where
+  toSubMeas := A
+  total_eq_one := hcomplete
+
+@[simp] theorem SubMeas.toMeasurement_toSubMeas {α : Type*} {ι : Type*}
+    [Fintype α] [Fintype ι] [DecidableEq ι]
+    (A : SubMeas α ι) (hcomplete : A.total = 1) :
+    (A.toMeasurement hcomplete).toSubMeas = A :=
+  rfl
+
+@[simp] theorem SubMeas.toMeasurement_outcome {α : Type*} {ι : Type*}
+    [Fintype α] [Fintype ι] [DecidableEq ι]
+    (A : SubMeas α ι) (hcomplete : A.total = 1) (a : α) :
+    (A.toMeasurement hcomplete).outcome a = A.outcome a :=
+  rfl
+
 /-- Every submeasurement outcome is bounded by the total operator. -/
 theorem SubMeas.outcome_le_total {α : Type*} {ι : Type*}
     [Fintype α] [Fintype ι] [DecidableEq ι]
