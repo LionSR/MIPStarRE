@@ -63,7 +63,11 @@ def avgOver {α : Type*} (𝒟 : Distribution α) (f : α → Error) : Error :=
   ∑ a ∈ 𝒟.support, 𝒟.weight a * f a
 
 /-- Weighted sum of operators over a distribution's finite support, using the same
-`support`/`weight` data as the scalar `avgOver`. -/
+`support`/`weight` data as the scalar `avgOver`.
+
+This is a project-local adapter around Mathlib finite sums for the LDT
+`Distribution` representation and `Quantum.Op` scalar action, not a replacement for
+Mathlib's probability theory APIs. -/
 noncomputable def averageOperatorOverDistribution {α : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (𝒟 : Distribution α) (f : α → MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
@@ -205,7 +209,9 @@ theorem avgOver_const_of_isProbability {α : Type*} (𝒟 : Distribution α)
     _ = (∑ a ∈ 𝒟.support, 𝒟.weight a) * c := by rw [← Finset.sum_mul]
     _ = c := by rw [h𝒟.weight_sum_eq_one, one_mul]
 
-/-- The weighted operator average of the zero-valued family is zero. -/
+/-- The weighted operator average of the zero-valued family is zero.
+This is a thin wrapper around `Finset.sum` simplification for
+`averageOperatorOverDistribution`. -/
 theorem averageOperatorOverDistribution_zero {α : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (𝒟 : Distribution α) :
@@ -222,8 +228,11 @@ theorem averageOperatorOverDistribution_congr_on_support {α : Type*}
   exact Finset.sum_congr rfl fun a ha => by rw [h a ha]
 
 /-- Averaging a constant operator against a probability distribution returns that operator.
-This operator-valued analogue of `avgOver_const_of_isProbability` keeps the
-finite-support probability invariant explicit rather than unfolding it at every use. -/
+
+This operator-valued analogue of `avgOver_const_of_isProbability` is only an
+adapter for the project-local `Distribution` API: the proof delegates to Mathlib's
+finite-sum and scalar-action lemmas, while keeping the finite-support probability
+invariant explicit for downstream rewrites. -/
 theorem averageOperatorOverDistribution_const_of_isProbability {α : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (𝒟 : Distribution α) (h𝒟 : 𝒟.IsProbability) (A : MIPStarRE.Quantum.Op ι) :
