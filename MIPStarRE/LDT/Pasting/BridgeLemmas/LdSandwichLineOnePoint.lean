@@ -2183,16 +2183,65 @@ private structure LdSandwichLineOnePointOutcomeSumCSRoute
       ldSandwichLineOnePoint_prefix_movedOutcomeSum params strategy family hi +
         Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1))
 
-/-- Narrow residual for the two off-diagonal Cauchy--Schwarz moves in
+/-- Absolute-value form of the two off-diagonal Cauchy--Schwarz moves.
+
+This is the direct output shape of `Preliminaries.closenessOfIPAdjoint` and
+`Preliminaries.closenessOfIP`: each field compares the two adjacent scalar
+averages from `ld-pasting.tex:964--1010` with error `√ν₄`.  The one-sided route
+used downstream is only an arithmetic consequence of these absolute-value
+bounds. -/
+private structure LdSandwichLineOnePointOutcomeSumCSAbsBounds
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    {k i : ℕ} (hi : i < k) : Prop where
+  /-- First CS move in the exact absolute-value form of `prop:closeness-of-ip`,
+  paper lines `964--986` and label `eq:gonna-need-a-bigger-cauchy-schwarz`. -/
+  firstAbs :
+    |ldSandwichLineOnePoint_prefix_sourceOutcomeSum params strategy family hi -
+      ldSandwichLineOnePoint_prefix_afterFirstCSOutcomeSum params strategy family hi| ≤
+      Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1))
+  /-- Second CS move in the exact absolute-value form of `prop:closeness-of-ip`,
+  paper lines `987--1010` and label `eq:even-bigger-CS`. -/
+  secondAbs :
+    |ldSandwichLineOnePoint_prefix_afterFirstCSOutcomeSum params strategy family hi -
+      ldSandwichLineOnePoint_prefix_movedOutcomeSum params strategy family hi| ≤
+      Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1))
+
+/-- Narrow residual for the two off-diagonal Cauchy--Schwarz moves in their
+absolute-value `closenessOfIP` output shape.
+
+All surrounding linear-defect, option-outcome, endpoint-collapse, and downstream
+one-sided arithmetic bookkeeping is proved.  The remaining analytic task is to
+instantiate `Preliminaries.closenessOfIPAdjoint` for the first field and
+`Preliminaries.closenessOfIP` for the second field, using `facts.rawCore` as the
+`lem:commute-g-half-sandwich` square-distance term (`ld-pasting.tex:980--986` and
+`1007--1010`) and the measurement/submeasurement bounds for the unit side of
+Cauchy--Schwarz. -/
+private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_abs_bounds
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0)
+    (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi) :
+    LdSandwichLineOnePointOutcomeSumCSAbsBounds params strategy family gamma zeta hi := by
+  /- TODO(#835): instantiate `closenessOfIPAdjoint` and `closenessOfIP` in the
+  absolute-value form above, preserving the two `√ν₄` constants.  The hypotheses
+  `hi0` and `facts.rawCore` / endpoint fields supply the nonempty-prefix and raw
+  half-product data needed for those instantiations. -/
+  sorry
+
+/-- One-sided route for the two off-diagonal Cauchy--Schwarz moves in
 `ld-pasting.tex:964--1010`.
 
-This is now below all linear-defect, option-outcome, and endpoint-collapse
-bookkeeping.  The intended proof is to instantiate
-`Preliminaries.closenessOfIPAdjoint` for `firstCauchySchwarz` and
-`Preliminaries.closenessOfIP` for `secondCauchySchwarz`, using `facts.rawCore` as
-the `lem:commute-g-half-sandwich` square-distance term (`ld-pasting.tex:980--986`
-and `1007--1010`) and the measurement/submeasurement bounds for the unit side of
-Cauchy--Schwarz. -/
+The substantive analytic residual is the absolute-value package
+`ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_abs_bounds`; this lemma
+only converts those two `closenessOfIP`-style bounds into the one-sided
+inequalities consumed by the downstream scalar transport. -/
 private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_route
     (params : Parameters)
     [FieldModel params.q]
@@ -2202,14 +2251,25 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_route
     {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0)
     (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi) :
     LdSandwichLineOnePointOutcomeSumCSRoute params strategy family gamma zeta hi := by
-  -- Keep the nonzero-coordinate hypothesis explicit for the eventual CS proof.
-  have _hi0_for_future_proof : i ≠ 0 := hi0
-  /- TODO(#835): prove the two field-wise CS moves without changing constants.
-  Use `facts.rawCore`, `facts.rawLeftEndpoint`, and `facts.rawRightEndpoint` to
-  identify the raw half-products, then discharge the unit side conditions from
-  the measurement bounds on `gHatSandwichFamily` and
-  `ldSandwichLineOnePointRightFamily`. -/
-  sorry
+  let source := ldSandwichLineOnePoint_prefix_sourceOutcomeSum params strategy family hi
+  let afterFirst :=
+    ldSandwichLineOnePoint_prefix_afterFirstCSOutcomeSum params strategy family hi
+  let moved := ldSandwichLineOnePoint_prefix_movedOutcomeSum params strategy family hi
+  let gap := Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1))
+  have hbounds :=
+    ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_abs_bounds
+      params strategy family gamma zeta hi hi0 facts
+  refine ⟨?_, ?_⟩
+  · have hgap : source - afterFirst ≤ gap :=
+      le_trans (le_abs_self (source - afterFirst)) (by
+        simpa [source, afterFirst, gap] using hbounds.firstAbs)
+    have hroute : source ≤ afterFirst + gap := by linarith
+    simpa [source, afterFirst, gap] using hroute
+  · have hgap : afterFirst - moved ≤ gap :=
+      le_trans (le_abs_self (afterFirst - moved)) (by
+        simpa [afterFirst, moved, gap] using hbounds.secondAbs)
+    have hroute : afterFirst ≤ moved + gap := by linarith
+    simpa [afterFirst, moved, gap] using hroute
 
 /-- The remaining expanded off-diagonal scalar transport in
 `lem:ld-sandwich-line-one-point`.
