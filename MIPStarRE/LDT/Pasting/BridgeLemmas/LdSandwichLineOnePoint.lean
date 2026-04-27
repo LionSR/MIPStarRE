@@ -20,6 +20,41 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+/-- The conjugate transpose of a left tensor is the left tensor of the conjugate transpose. -/
+private lemma leftTensor_conjTranspose
+    (A : MIPStarRE.Quantum.Op ι) :
+    (leftTensor (ι₂ := ι) A)ᴴ = leftTensor (ι₂ := ι) Aᴴ := by
+  simp [leftTensor, Matrix.conjTranspose_kronecker]
+
+/-- Multiplying a left tensor into a full tensor only affects the left factor. -/
+private lemma leftTensor_mul_opTensor
+    (A B C : MIPStarRE.Quantum.Op ι) :
+    leftTensor (ι₂ := ι) A * opTensor B C = opTensor (A * B) C := by
+  calc
+    leftTensor (ι₂ := ι) A * opTensor B C
+        = leftTensor (ι₂ := ι) A * (leftTensor (ι₂ := ι) B * rightTensor (ι₁ := ι) C) := by
+          rw [leftTensor_mul_rightTensor_eq_opTensor]
+    _ = (leftTensor (ι₂ := ι) A * leftTensor (ι₂ := ι) B) * rightTensor (ι₁ := ι) C := by
+          rw [Matrix.mul_assoc]
+    _ = leftTensor (ι₂ := ι) (A * B) * rightTensor (ι₁ := ι) C := by
+          rw [leftTensor_mul_leftTensor]
+    _ = opTensor (A * B) C := by
+          rw [leftTensor_mul_rightTensor_eq_opTensor]
+
+/-- Multiplying a full tensor by a left tensor only affects the left factor. -/
+private lemma opTensor_mul_leftTensor
+    (A B C : MIPStarRE.Quantum.Op ι) :
+    opTensor A C * leftTensor (ι₂ := ι) B = opTensor (A * B) C := by
+  calc
+    opTensor A C * leftTensor (ι₂ := ι) B
+        = (leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) C) * leftTensor (ι₂ := ι) B := by
+          rw [leftTensor_mul_rightTensor_eq_opTensor]
+    _ = leftTensor (ι₂ := ι) A * (rightTensor (ι₁ := ι) C * leftTensor (ι₂ := ι) B) := by
+          rw [Matrix.mul_assoc]
+    _ = leftTensor (ι₂ := ι) A * opTensor B C := by
+          rw [rightTensor_mul_leftTensor_eq_opTensor]
+    _ = opTensor (A * B) C := leftTensor_mul_opTensor A B C
+
 /-- Turn a postprocessed submeasurement from a measurement into a measurement. -/
 private noncomputable def postprocessMeasurement
     {α β : Type*} {ι : Type*}
@@ -2336,14 +2371,17 @@ private noncomputable def ldSandwichLineOnePointCS_secondTargetRaw
 /-- Exact low-level inputs needed to turn the generic `closenessOfIP*` lemmas into
 `ld-pasting.tex:964--1010` for the line-one-point bridge.
 
-This package is now the single live residual: it separates the generic CS theorem
-instantiation (proved below) from the remaining paper-specific obligations:
+This package separates the generic CS theorem instantiation (proved below) from
+the paper-specific inputs:
 
 * the adjoint-oriented raw square-distance bound corresponding to the first square
   root in lines 974--985 and reused in lines 1005--1010;
 * the two unit-side measurement-completeness bounds from lines 986 and 1008;
 * the algebraic regrouping/reindexing that identifies the raw CS scalars with the
-  existing source, intermediate, and moved outcome sums. -/
+  existing source, intermediate, and moved outcome sums.
+
+The assembly lemma below now proves the unit bounds and regrouping equalities;
+the remaining live residual is the adjoint-oriented raw-core bridge. -/
 private structure LdSandwichLineOnePointCSInputFacts
     (params : Parameters)
     [FieldModel params.q]
@@ -2380,7 +2418,38 @@ private structure LdSandwichLineOnePointCSInputFacts
     ldSandwichLineOnePoint_prefix_movedOutcomeSum params strategy family hi =
       ldSandwichLineOnePointCS_secondTargetRaw params strategy family hi
 
-/-- Remaining paper-specific input package for the line-one-point CS instantiation. -/
+/-- The remaining orientation bridge for the paper's `eq:add-in-the-bot` input.
+
+The existing `LdSandwichLineOnePointResidualFacts.rawCore` exposes the project
+`qSDDCore` orientation for the raw half-products, i.e. the $D^\dagger D$ square
+of the commutator.  The two generic `closenessOfIP*` applications below need the
+adjoint-oriented $D D^\dagger$ square-distance term that appears in
+`ld-pasting.tex:980--985` and is reused at lines `1005--1010`.  This lemma is
+therefore the only paper-specific input that remains after the generic CS
+plumbing and the measurement-completeness/unit bounds are discharged. -/
+private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_adjointRawCore
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0)
+    (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi) :
+    avgOver (uniformDistribution (SandwichedLineQuestion params k))
+      (fun q => qSDDCore strategy.state
+        (fun gs : GHatTupleOutcome params (i + 1) =>
+          (ldSandwichLineOnePointCS_Aord params family hi q gs)ᴴ)
+        (fun gs : GHatTupleOutcome params (i + 1) =>
+          (ldSandwichLineOnePointCS_Arot params family hi q gs)ᴴ)) ≤
+      commuteGHalfSandwichError params gamma zeta (i + 1) := by
+  /- TODO(#835): build an adjointed `commuteGHalfSandwich` / `qSDDCore`
+  orientation bridge.  The paper uses the $D D^\dagger$ orientation for
+  `D = \widehat G_{<i}\widehat G_i - \widehat G_i\widehat G_{<i}` in
+  `eq:add-in-the-bot`, while `facts.rawCore` currently gives the project
+  convention $D^\dagger D`. -/
+  sorry
+
+/-- Assemble the line-one-point CS input package from the single adjoint raw-core bridge. -/
 private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_inputFacts
     (params : Parameters)
     [FieldModel params.q]
@@ -2390,22 +2459,396 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_inputFacts
     {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0)
     (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi) :
     LdSandwichLineOnePointCSInputFacts params strategy family gamma zeta hi := by
-  /- TODO(#835): prove the low-level inputs listed in
-  `LdSandwichLineOnePointCSInputFacts` from `facts.rawCore`,
-  `facts.rawLeftEndpoint`, `facts.rawRightEndpoint`, `facts.prefixOriginalSome`,
-  `facts.movedSome`, and the measurement-completeness bounds for
-  `gHatSandwichFamily` and `ldSandwichLineOnePointRightFamily`.  The adjoint raw
-  square-distance field is the paper's `eq:add-in-the-bot` orientation; the unit
-  fields are lines 986 and 1008 of `references/ldt-paper/ld-pasting.tex`. -/
-  sorry
+  refine ⟨
+    ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_adjointRawCore
+      params strategy family gamma zeta hi hi0 facts,
+    ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · intro q
+    classical
+    calc
+      ∑ gs : GHatTupleOutcome params (i + 1),
+          (∑ u : Unit, ldSandwichLineOnePointCS_Cfirst params strategy family hi q gs u)ᴴ *
+            (∑ u : Unit, ldSandwichLineOnePointCS_Cfirst params strategy family hi q gs u)
+          ≤ ∑ gs : GHatTupleOutcome params (i + 1),
+              leftTensor (ι₂ := ι)
+                (ldSandwichLineOnePointCS_orderedHalf params family hi q gs *
+                  (ldSandwichLineOnePointCS_orderedHalf params family hi q gs)ᴴ) := by
+            refine Finset.sum_le_sum ?_
+            intro gs _hgs
+            let O : MIPStarRE.Quantum.Op ι :=
+              ldSandwichLineOnePointCS_orderedHalf params family hi q gs
+            let R : MIPStarRE.Quantum.Op ι :=
+              ldSandwichLineOnePointCS_rightComplement params strategy family q gs
+            have hRle : Rᴴ * R ≤ 1 := by
+              dsimp [R, ldSandwichLineOnePointCS_rightComplement]
+              split
+              · simp
+              · rename_i a _ha
+                let B : MIPStarRE.Quantum.Op ι :=
+                  ((ldSandwichLineOnePointRightFamily params strategy family k i) q).outcome
+                    (some a)
+                have hBpos : 0 ≤ B := by
+                  simpa [B] using
+                    ((ldSandwichLineOnePointRightFamily params strategy family k i) q).outcome_pos
+                      (some a)
+                have hBle : B ≤ 1 := by
+                  simpa [B] using
+                    SubMeas.outcome_le_one
+                      ((ldSandwichLineOnePointRightFamily params strategy family k i) q)
+                      (some a)
+                have hRpos : 0 ≤ (1 : MIPStarRE.Quantum.Op ι) - B := sub_nonneg.mpr hBle
+                have hRle_one : (1 : MIPStarRE.Quantum.Op ι) - B ≤ 1 := by
+                  simpa [sub_eq_add_neg] using sub_le_self (1 : MIPStarRE.Quantum.Op ι) hBpos
+                have hRherm : ((1 : MIPStarRE.Quantum.Op ι) - B)ᴴ = 1 - B := by
+                  simp [B, SubMeas.outcome_hermitian]
+                calc
+                  ((1 : MIPStarRE.Quantum.Op ι) - B)ᴴ * (1 - B)
+                      = (1 - B) * (1 - B) := by rw [hRherm]
+                  _ ≤ 1 - B := MIPStarRE.Quantum.sq_le_self hRpos hRle_one
+                  _ ≤ 1 := hRle_one
+            have hOpos : 0 ≤ O * Oᴴ := by
+              simpa [O] using (Matrix.posSemidef_self_mul_conjTranspose O).nonneg
+            calc
+              (∑ u : Unit, ldSandwichLineOnePointCS_Cfirst params strategy family hi q gs u)ᴴ *
+                  (∑ u : Unit, ldSandwichLineOnePointCS_Cfirst params strategy family hi q gs u)
+                  = opTensor (O * Oᴴ) (Rᴴ * R) := by
+                    simp [O, R, ldSandwichLineOnePointCS_Cfirst, opTensor_mul,
+                      conjTranspose_opTensor]
+              _ ≤ leftTensor (ι₂ := ι) (O * Oᴴ) := opTensor_le_leftTensor hOpos hRle
+              _ = leftTensor (ι₂ := ι)
+                    (ldSandwichLineOnePointCS_orderedHalf params family hi q gs *
+                      (ldSandwichLineOnePointCS_orderedHalf params family hi q gs)ᴴ) := by
+                    rfl
+      _ = 1 := by
+            calc
+              ∑ gs : GHatTupleOutcome params (i + 1),
+                  leftTensor (ι₂ := ι)
+                    (ldSandwichLineOnePointCS_orderedHalf params family hi q gs *
+                      (ldSandwichLineOnePointCS_orderedHalf params family hi q gs)ᴴ)
+                  = leftTensor (ι₂ := ι)
+                      (∑ gs : GHatTupleOutcome params (i + 1),
+                        ldSandwichLineOnePointCS_orderedHalf params family hi q gs *
+                          (ldSandwichLineOnePointCS_orderedHalf params family hi q gs)ᴴ) := by
+                    rw [← leftTensor_finset_sum (ι₂ := ι) Finset.univ]
+              _ = leftTensor (ι₂ := ι) (1 : MIPStarRE.Quantum.Op ι) := by
+                    congr 1
+                    have hsum :=
+                      (gHatSandwichFamily params family (i + 1)
+                        (fun j => q.2 ⟨j.1, by omega⟩)).sum_eq_total
+                    simpa [gHatSandwichFamily, ldSandwichLineOnePointCS_orderedHalf,
+                      gHatHalfProductTotalOperator_eq_one] using hsum
+              _ = 1 := by simp [leftTensor]
+  · intro q
+    classical
+    calc
+      ∑ gs : GHatTupleOutcome params (i + 1),
+          (∑ u : Unit, ldSandwichLineOnePointCS_Csecond params strategy family hi q gs u) *
+            (∑ u : Unit, ldSandwichLineOnePointCS_Csecond params strategy family hi q gs u)ᴴ
+          ≤ ∑ gs : GHatTupleOutcome params (i + 1),
+              leftTensor (ι₂ := ι)
+                (ldSandwichLineOnePointCS_rotatedHalf params family hi q gs *
+                  (ldSandwichLineOnePointCS_rotatedHalf params family hi q gs)ᴴ) := by
+            refine Finset.sum_le_sum ?_
+            intro gs _hgs
+            let O : MIPStarRE.Quantum.Op ι :=
+              ldSandwichLineOnePointCS_rotatedHalf params family hi q gs
+            let R : MIPStarRE.Quantum.Op ι :=
+              ldSandwichLineOnePointCS_rightComplement params strategy family q gs
+            have hRle : R * Rᴴ ≤ 1 := by
+              dsimp [R, ldSandwichLineOnePointCS_rightComplement]
+              split
+              · simp
+              · rename_i a _ha
+                let B : MIPStarRE.Quantum.Op ι :=
+                  ((ldSandwichLineOnePointRightFamily params strategy family k i) q).outcome
+                    (some a)
+                have hBpos : 0 ≤ B := by
+                  simpa [B] using
+                    ((ldSandwichLineOnePointRightFamily params strategy family k i) q).outcome_pos
+                      (some a)
+                have hBle : B ≤ 1 := by
+                  simpa [B] using
+                    SubMeas.outcome_le_one
+                      ((ldSandwichLineOnePointRightFamily params strategy family k i) q)
+                      (some a)
+                have hRpos : 0 ≤ (1 : MIPStarRE.Quantum.Op ι) - B := sub_nonneg.mpr hBle
+                have hRle_one : (1 : MIPStarRE.Quantum.Op ι) - B ≤ 1 := by
+                  simpa [sub_eq_add_neg] using sub_le_self (1 : MIPStarRE.Quantum.Op ι) hBpos
+                have hRherm : ((1 : MIPStarRE.Quantum.Op ι) - B)ᴴ = 1 - B := by
+                  simp [B, SubMeas.outcome_hermitian]
+                calc
+                  ((1 : MIPStarRE.Quantum.Op ι) - B) * ((1 : MIPStarRE.Quantum.Op ι) - B)ᴴ
+                      = (1 - B) * (1 - B) := by rw [hRherm]
+                  _ ≤ 1 - B := MIPStarRE.Quantum.sq_le_self hRpos hRle_one
+                  _ ≤ 1 := hRle_one
+            have hOpos : 0 ≤ O * Oᴴ := by
+              simpa [O] using (Matrix.posSemidef_self_mul_conjTranspose O).nonneg
+            calc
+              (∑ u : Unit, ldSandwichLineOnePointCS_Csecond params strategy family hi q gs u) *
+                  (∑ u : Unit, ldSandwichLineOnePointCS_Csecond params strategy family hi q gs u)ᴴ
+                  = opTensor (O * Oᴴ) (R * Rᴴ) := by
+                    simp [O, R, ldSandwichLineOnePointCS_Csecond, opTensor_mul,
+                      conjTranspose_opTensor]
+              _ ≤ leftTensor (ι₂ := ι) (O * Oᴴ) := opTensor_le_leftTensor hOpos hRle
+              _ = leftTensor (ι₂ := ι)
+                    (ldSandwichLineOnePointCS_rotatedHalf params family hi q gs *
+                      (ldSandwichLineOnePointCS_rotatedHalf params family hi q gs)ᴴ) := by
+                    rfl
+      _ = 1 := by
+            calc
+              ∑ gs : GHatTupleOutcome params (i + 1),
+                  leftTensor (ι₂ := ι)
+                    (ldSandwichLineOnePointCS_rotatedHalf params family hi q gs *
+                      (ldSandwichLineOnePointCS_rotatedHalf params family hi q gs)ᴴ)
+                  = leftTensor (ι₂ := ι)
+                      (∑ gs : GHatTupleOutcome params (i + 1),
+                        ldSandwichLineOnePointCS_rotatedHalf params family hi q gs *
+                          (ldSandwichLineOnePointCS_rotatedHalf params family hi q gs)ᴴ) := by
+                    rw [← leftTensor_finset_sum (ι₂ := ι) Finset.univ]
+              _ = leftTensor (ι₂ := ι) (1 : MIPStarRE.Quantum.Op ι) := by
+                    congr 1
+                    let xs : PointTuple params (i + 1) :=
+                      (pointTupleLastFrontEquiv params i) (fun j => q.2 ⟨j.1, by omega⟩)
+                    have hperm :
+                        (∑ gs : GHatTupleOutcome params (i + 1),
+                          ldSandwichLineOnePointCS_rotatedHalf params family hi q gs *
+                            (ldSandwichLineOnePointCS_rotatedHalf params family hi q gs)ᴴ) =
+                        ∑ gs : GHatTupleOutcome params (i + 1),
+                          gHatHalfProductOutcomeOperator params family (i + 1) xs gs *
+                            (gHatHalfProductOutcomeOperator params family (i + 1) xs gs)ᴴ := by
+                      exact Fintype.sum_equiv (gHatTupleOutcomeLastFrontEquiv params i)
+                        (fun gs : GHatTupleOutcome params (i + 1) =>
+                          ldSandwichLineOnePointCS_rotatedHalf params family hi q gs *
+                            (ldSandwichLineOnePointCS_rotatedHalf params family hi q gs)ᴴ)
+                        (fun gs : GHatTupleOutcome params (i + 1) =>
+                          gHatHalfProductOutcomeOperator params family (i + 1) xs gs *
+                            (gHatHalfProductOutcomeOperator params family (i + 1) xs gs)ᴴ)
+                        (by
+                          intro gs
+                          simp [xs, ldSandwichLineOnePointCS_rotatedHalf])
+                    have hsum := (gHatSandwichFamily params family (i + 1) xs).sum_eq_total
+                    rw [hperm]
+                    simpa [gHatSandwichFamily, gHatHalfProductTotalOperator_eq_one] using hsum
+              _ = 1 := by simp [leftTensor]
+  · unfold ldSandwichLineOnePoint_prefix_sourceOutcomeSum
+      ldSandwichLineOnePointCS_firstSourceRaw
+    apply avgOver_congr
+    intro q
+    classical
+    let evalOutcome : GHatTupleOutcome params (i + 1) → Option (Fq params) := fun gs =>
+      Option.map (fun g : Polynomial params => g q.1)
+        (gs ⟨i, Nat.lt_succ_self i⟩)
+    let O : GHatTupleOutcome params (i + 1) → MIPStarRE.Quantum.Op ι := fun gs =>
+      ldSandwichLineOnePointCS_orderedHalf params family hi q gs
+    let R : Fq params → MIPStarRE.Quantum.Op ι := fun a =>
+      1 - ((ldSandwichLineOnePointRightFamily params strategy family k i) q).outcome (some a)
+    calc
+      ∑ a : Fq params,
+          ev strategy.state
+            (opTensor ((ldSandwichLineOnePointPrefixOriginalFamily params family hi q).outcome (some a))
+              (1 - (ldSandwichLineOnePointRightFamily params strategy family k i q).outcome (some a)))
+          = ∑ a : Fq params,
+              ev strategy.state
+                (opTensor
+                  (∑ gs : GHatTupleOutcome params (i + 1),
+                    if evalOutcome gs = some a then O gs * (O gs)ᴴ else 0)
+                  (R a)) := by
+                simp [evalOutcome, O, R, facts.prefixOriginalSome q,
+                  ldSandwichLineOnePointCS_orderedHalf]
+      _ = ∑ a : Fq params, ∑ gs : GHatTupleOutcome params (i + 1),
+              ev strategy.state
+                (opTensor (if evalOutcome gs = some a then O gs * (O gs)ᴴ else 0) (R a)) := by
+            refine Finset.sum_congr rfl ?_
+            intro a _ha
+            rw [opTensor_sum_left_univ, ev_sum]
+      _ = ∑ gs : GHatTupleOutcome params (i + 1), ∑ a : Fq params,
+              ev strategy.state
+                (opTensor (if evalOutcome gs = some a then O gs * (O gs)ᴴ else 0) (R a)) := by
+            rw [Finset.sum_comm]
+      _ = ∑ gs : GHatTupleOutcome params (i + 1),
+              ev strategy.state
+                (opTensor (O gs * (O gs)ᴴ)
+                  (ldSandwichLineOnePointCS_rightComplement params strategy family q gs)) := by
+            refine Finset.sum_congr rfl ?_
+            intro gs _hgs
+            cases hgs : evalOutcome gs with
+            | none =>
+                simp [evalOutcome, R, ldSandwichLineOnePointCS_rightComplement, hgs,
+                  opTensor, ev_zero]
+            | some a0 =>
+                rw [Finset.sum_eq_single a0]
+                · simp [evalOutcome, R, ldSandwichLineOnePointCS_rightComplement, hgs]
+                · intro b _hb hb_ne
+                  simp [Ne.symm hb_ne, opTensor, ev_zero]
+                · intro hnot
+                  simp at hnot
+      _ = ∑ gs : GHatTupleOutcome params (i + 1), ∑ u : Unit,
+              ev strategy.state
+                (ldSandwichLineOnePointCS_Aord params family hi q gs *
+                  ldSandwichLineOnePointCS_Cfirst params strategy family hi q gs u) := by
+            refine Finset.sum_congr rfl ?_
+            intro gs _hgs
+            rw [Fintype.sum_unique]
+            change ev strategy.state
+                (opTensor (O gs * (O gs)ᴴ)
+                  (ldSandwichLineOnePointCS_rightComplement params strategy family q gs)) =
+              ev strategy.state
+                (opTensor (O gs) (1 : MIPStarRE.Quantum.Op ι) *
+                  opTensor ((O gs)ᴴ)
+                    (ldSandwichLineOnePointCS_rightComplement params strategy family q gs))
+            rw [opTensor_mul]
+            simp
+  · unfold ldSandwichLineOnePoint_prefix_afterFirstCSOutcomeSum
+      ldSandwichLineOnePointCS_firstTargetRaw
+    apply avgOver_congr
+    intro q
+    classical
+    let evalOutcome : GHatTupleOutcome params (i + 1) → Option (Fq params) := fun gs =>
+      Option.map (fun g : Polynomial params => g q.1)
+        (gs ⟨i, Nat.lt_succ_self i⟩)
+    let O : GHatTupleOutcome params (i + 1) → MIPStarRE.Quantum.Op ι := fun gs =>
+      ldSandwichLineOnePointCS_orderedHalf params family hi q gs
+    let P : GHatTupleOutcome params (i + 1) → MIPStarRE.Quantum.Op ι := fun gs =>
+      ldSandwichLineOnePointCS_rotatedHalf params family hi q gs
+    refine Finset.sum_congr rfl ?_
+    intro gs _hgs
+    cases hgs : evalOutcome gs with
+    | none =>
+        simp [evalOutcome, ldSandwichLineOnePointCS_Arot,
+          ldSandwichLineOnePointCS_Cfirst, ldSandwichLineOnePointCS_orderedHalf,
+          ldSandwichLineOnePointCS_rotatedHalf,
+          ldSandwichLineOnePointCS_rightComplement, hgs, opTensor, ev_zero]
+    | some a =>
+        rw [Fintype.sum_unique]
+        simp [evalOutcome, hgs, ldSandwichLineOnePointCS_Arot,
+          ldSandwichLineOnePointCS_Cfirst, ldSandwichLineOnePointCS_orderedHalf,
+          ldSandwichLineOnePointCS_rotatedHalf,
+          ldSandwichLineOnePointCS_rightComplement, leftTensor_mul_opTensor]
+  · unfold ldSandwichLineOnePoint_prefix_afterFirstCSOutcomeSum
+      ldSandwichLineOnePointCS_secondSourceRaw
+    apply avgOver_congr
+    intro q
+    classical
+    let evalOutcome : GHatTupleOutcome params (i + 1) → Option (Fq params) := fun gs =>
+      Option.map (fun g : Polynomial params => g q.1)
+        (gs ⟨i, Nat.lt_succ_self i⟩)
+    refine Finset.sum_congr rfl ?_
+    intro gs _hgs
+    cases hgs : evalOutcome gs with
+    | none =>
+        simp [evalOutcome, ldSandwichLineOnePointCS_Aord,
+          ldSandwichLineOnePointCS_Csecond,
+          ldSandwichLineOnePointCS_rightComplement, hgs, opTensor, ev_zero]
+    | some a =>
+        rw [Fintype.sum_unique]
+        simp [evalOutcome, hgs, ldSandwichLineOnePointCS_Aord,
+          ldSandwichLineOnePointCS_Csecond, ldSandwichLineOnePointCS_orderedHalf,
+          ldSandwichLineOnePointCS_rotatedHalf,
+          ldSandwichLineOnePointCS_rightComplement, leftTensor_conjTranspose,
+          opTensor_mul_leftTensor]
+  · unfold ldSandwichLineOnePoint_prefix_movedOutcomeSum
+      ldSandwichLineOnePointCS_secondTargetRaw
+    apply avgOver_congr
+    intro q
+    classical
+    let e : GHatTupleOutcome params (i + 1) ≃ GHatTupleOutcome params (i + 1) :=
+      gHatTupleOutcomeLastFrontEquiv params i
+    let xsMoved : PointTuple params (i + 1) :=
+      Fin.cons (q.2 ⟨i, hi⟩) (fun j => q.2 ⟨j.1, by omega⟩)
+    let movedEval : GHatTupleOutcome params (i + 1) → Option (Fq params) := fun gs =>
+      Option.map (fun g : Polynomial params => g q.1) (gs 0)
+    let movedHalf : GHatTupleOutcome params (i + 1) → MIPStarRE.Quantum.Op ι := fun gs =>
+      gHatHalfProductOutcomeOperator params family (i + 1) xsMoved gs
+    let R : Fq params → MIPStarRE.Quantum.Op ι := fun a =>
+      1 - ((ldSandwichLineOnePointRightFamily params strategy family k i) q).outcome (some a)
+    calc
+      ∑ a : Fq params,
+          ev strategy.state
+            (opTensor ((ldSandwichLineOnePointPrefixMovedFamily params family hi q).outcome (some a))
+              (1 - (ldSandwichLineOnePointRightFamily params strategy family k i q).outcome (some a)))
+          = ∑ a : Fq params,
+              ev strategy.state
+                (opTensor
+                  (∑ gs : GHatTupleOutcome params (i + 1),
+                    if movedEval gs = some a then movedHalf gs * (movedHalf gs)ᴴ else 0)
+                  (R a)) := by
+                simp [movedEval, movedHalf, xsMoved, R, facts.movedSome q]
+      _ = ∑ a : Fq params, ∑ gs : GHatTupleOutcome params (i + 1),
+              ev strategy.state
+                (opTensor (if movedEval gs = some a then movedHalf gs * (movedHalf gs)ᴴ else 0)
+                  (R a)) := by
+            refine Finset.sum_congr rfl ?_
+            intro a _ha
+            rw [opTensor_sum_left_univ, ev_sum]
+      _ = ∑ gs : GHatTupleOutcome params (i + 1), ∑ a : Fq params,
+              ev strategy.state
+                (opTensor (if movedEval gs = some a then movedHalf gs * (movedHalf gs)ᴴ else 0)
+                  (R a)) := by
+            rw [Finset.sum_comm]
+      _ = ∑ gs : GHatTupleOutcome params (i + 1),
+              ev strategy.state
+                (opTensor (movedHalf gs * (movedHalf gs)ᴴ)
+                  (match movedEval gs with
+                   | none => 0
+                   | some a => R a)) := by
+            refine Finset.sum_congr rfl ?_
+            intro gs _hgs
+            cases hgs : movedEval gs with
+            | none =>
+                simp [R, opTensor, ev_zero]
+            | some a0 =>
+                rw [Finset.sum_eq_single a0]
+                · simp [R]
+                · intro b _hb hb_ne
+                  simp [Ne.symm hb_ne, opTensor, ev_zero]
+                · intro hnot
+                  simp at hnot
+      _ = ∑ gs : GHatTupleOutcome params (i + 1),
+              ev strategy.state
+                (opTensor
+                  (ldSandwichLineOnePointCS_rotatedHalf params family hi q gs *
+                    (ldSandwichLineOnePointCS_rotatedHalf params family hi q gs)ᴴ)
+                  (ldSandwichLineOnePointCS_rightComplement params strategy family q gs)) := by
+            symm
+            exact Fintype.sum_equiv e
+              (fun gs : GHatTupleOutcome params (i + 1) =>
+                ev strategy.state
+                  (opTensor
+                    (ldSandwichLineOnePointCS_rotatedHalf params family hi q gs *
+                      (ldSandwichLineOnePointCS_rotatedHalf params family hi q gs)ᴴ)
+                    (ldSandwichLineOnePointCS_rightComplement params strategy family q gs)))
+              (fun gs : GHatTupleOutcome params (i + 1) =>
+                ev strategy.state
+                  (opTensor (movedHalf gs * (movedHalf gs)ᴴ)
+                    (match movedEval gs with
+                     | none => 0
+                     | some a => R a)))
+              (by
+                intro gs
+                simp [e, movedHalf, movedEval, xsMoved, R,
+                  ldSandwichLineOnePointCS_rotatedHalf,
+                  ldSandwichLineOnePointCS_rightComplement,
+                  gHatTupleOutcomeLastFrontEquiv, pointTupleLastFrontEquiv])
+      _ = ∑ gs : GHatTupleOutcome params (i + 1), ∑ u : Unit,
+              ev strategy.state
+                (ldSandwichLineOnePointCS_Csecond params strategy family hi q gs u *
+                  (ldSandwichLineOnePointCS_Arot params family hi q gs)ᴴ) := by
+            refine Finset.sum_congr rfl ?_
+            intro gs _hgs
+            rw [Fintype.sum_unique]
+            simp [ldSandwichLineOnePointCS_Arot, ldSandwichLineOnePointCS_Csecond,
+              ldSandwichLineOnePointCS_rotatedHalf,
+              ldSandwichLineOnePointCS_rightComplement, leftTensor_conjTranspose,
+              opTensor_mul_leftTensor]
 
 /-- Narrow residual for the two off-diagonal Cauchy--Schwarz moves in their
 absolute-value `closenessOfIP` output shape.
 
 The generic applications of `Preliminaries.closenessOfIPAdjoint` and
-`Preliminaries.closenessOfIP` are now proved here.  The only remaining work is the
-paper-specific input package
-`ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_inputFacts`. -/
+`Preliminaries.closenessOfIP` are now proved here.  The input package now proves
+the measurement-completeness/unit bounds and scalar regrouping equalities; the
+only remaining work is the adjoint raw-core orientation bridge
+`ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_adjointRawCore`. -/
 private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_abs_bounds
     (params : Parameters)
     [FieldModel params.q]
