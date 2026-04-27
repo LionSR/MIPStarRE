@@ -15,7 +15,8 @@ This module is the first low-risk step of the staged refactor outlined in
 * the two-space container does **not** carry `PermInvState` or `densityFixed`,
   since there is no canonical SWAP when `ιA ≠ ιB`;
 * a forgetful embedding `ProjStrat.toBiProjStrat` reinterprets the current
-  same-space strategy as the `ιA = ιB = ι` special case;
+  same-space strategy as the `ιA = ιB = ι` special case, with projection
+  simp lemmas for downstream staged migrations;
 * the two-space branch-level failure probability mirrors the paper's
   low-individual-degree test without changing downstream same-space consumers;
 * no downstream consumer (`SymStrat`, `StrategyFailures`, `MainTheorem`) is
@@ -258,6 +259,58 @@ def toBiProjStrat {params : Parameters} [FieldModel params.q]
   pointMeasurementB := strategy.pointMeasurementB
   axisParallelMeasurementB := strategy.axisParallelMeasurementB
   diagonalMeasurementB := strategy.diagonalMeasurementB
+
+/-! Projection lemmas keep the same-space embedding transparent for later
+staged retargeting work. They are deliberately definitional: Stage 1 adds no
+new symmetrization or direct-sum transport. -/
+
+@[simp] theorem toBiProjStrat_state {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) :
+    strategy.toBiProjStrat.state = strategy.state :=
+  rfl
+
+@[simp] theorem toBiProjStrat_isNormalized {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) :
+    strategy.toBiProjStrat.isNormalized = strategy.isNormalized :=
+  rfl
+
+@[simp] theorem toBiProjStrat_pointMeasurementA {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) :
+    strategy.toBiProjStrat.pointMeasurementA = strategy.pointMeasurementA :=
+  rfl
+
+@[simp] theorem toBiProjStrat_axisParallelMeasurementA {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) :
+    strategy.toBiProjStrat.axisParallelMeasurementA = strategy.axisParallelMeasurementA :=
+  rfl
+
+@[simp] theorem toBiProjStrat_diagonalMeasurementA {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) :
+    strategy.toBiProjStrat.diagonalMeasurementA = strategy.diagonalMeasurementA :=
+  rfl
+
+@[simp] theorem toBiProjStrat_pointMeasurementB {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) :
+    strategy.toBiProjStrat.pointMeasurementB = strategy.pointMeasurementB :=
+  rfl
+
+@[simp] theorem toBiProjStrat_axisParallelMeasurementB {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) :
+    strategy.toBiProjStrat.axisParallelMeasurementB = strategy.axisParallelMeasurementB :=
+  rfl
+
+@[simp] theorem toBiProjStrat_diagonalMeasurementB {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) :
+    strategy.toBiProjStrat.diagonalMeasurementB = strategy.diagonalMeasurementB :=
+  rfl
 
 end ProjStrat
 
