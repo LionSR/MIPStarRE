@@ -767,7 +767,7 @@ theorem ofMainInductionWitness
 
 When `params.m = 1`, the checked `strategySymmetrization_mainInductionBaseCase`
 produces the raw Section 6 measurement on the role-register symmetrization; this
-lemma rewrites its error to the `σ` used by the Section 3 cascade. -/
+this constructor rewrites its error to the `σ` used by the Section 3 cascade. -/
 theorem ofBaseCase
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -1783,12 +1783,16 @@ theorem mainFormal
   -- conditions are discharged below: if `mainFormalError ≥ 1`, the theorem is
   -- vacuous; otherwise the pass condition gives `0 ≤ ε`, while
   -- `mainFormalError < 1` rules out `ε > 1` and `d > q`. Producing the handoff
-  -- residual still depends on the active upstream residuals: the factor-two
-  -- role unsymmetrization bridge (#424), projectivization/completion closeness
-  -- and line-172 transport links (#426), the full-slice transport chain (#601),
-  -- the remaining `fromHToG` pasting bridge (#707), the reverse `overAllOutcomes`
-  -- aggregation (#672), and the ProcessedG scalar follow-ups #714, #715, #732,
-  -- and #759.
+  -- residual still depends on the active upstream residuals: projectivization/
+  -- completion witnesses, the line-172 transport links (#426), the full-slice
+  -- transport chain (#601), the remaining `fromHToG` pasting bridge (#707), the
+  -- reverse `overAllOutcomes` aggregation (#672), and the ProcessedG scalar
+  -- follow-ups #714, #715, #732, and #759.  The Step 3 factor-two
+  -- unsymmetrization bridge is now checked by
+  -- `UnsymmetrizationBridgePackage.ofSymConsistency`.  The line-172 fields are
+  -- still explicit because the generic `triangleSub` theorem gives
+  -- `ζ₁ + sqrt ζ₂`, not the printed `ζ₁`; preserving the paper envelope needs a
+  -- stronger projectivization/correlation-preservation input.
   by_cases herr : 1 ≤ mainFormalError params k eps
   · exact mainFormal_trivial_witness params strategy eps k herr
   · have hepsNN : 0 ≤ eps := ProjStrat.eps_nonneg_of_passes hpass
