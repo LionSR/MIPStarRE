@@ -218,7 +218,17 @@ theorem averageOperatorOverDistribution_zero {α : Type*}
     averageOperatorOverDistribution 𝒟 (fun _ : α => (0 : MIPStarRE.Quantum.Op ι)) = 0 := by
   simp [averageOperatorOverDistribution]
 
-/-- Operator averages only depend on the family values on the explicit support. -/
+/-- If two operator-valued families agree pointwise, their averages agree. -/
+theorem averageOperatorOverDistribution_congr {α : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (𝒟 : Distribution α) (A B : α → MIPStarRE.Quantum.Op ι)
+    (h : ∀ a, A a = B a) :
+    averageOperatorOverDistribution 𝒟 A = averageOperatorOverDistribution 𝒟 B := by
+  exact Finset.sum_congr rfl fun a _ => by rw [h a]
+
+/-- Operator averages only depend on the family values on the explicit support.
+This support-restricted form is useful when the support carries an invariant not
+available for all ambient values. -/
 theorem averageOperatorOverDistribution_congr_on_support {α : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (𝒟 : Distribution α) (A B : α → MIPStarRE.Quantum.Op ι)
@@ -226,22 +236,6 @@ theorem averageOperatorOverDistribution_congr_on_support {α : Type*}
     averageOperatorOverDistribution 𝒟 A = averageOperatorOverDistribution 𝒟 B := by
   simp only [averageOperatorOverDistribution]
   exact Finset.sum_congr rfl fun a ha => by rw [h a ha]
-
-/-- Averaging a constant operator against a probability distribution returns that operator.
-
-This operator-valued analogue of `avgOver_const_of_isProbability` is only an
-adapter for the project-local `Distribution` API: the proof delegates to Mathlib's
-finite-sum and scalar-action lemmas, while keeping the finite-support probability
-invariant explicit for downstream rewrites. -/
-theorem averageOperatorOverDistribution_const_of_isProbability {α : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (𝒟 : Distribution α) (h𝒟 : 𝒟.IsProbability) (A : MIPStarRE.Quantum.Op ι) :
-    averageOperatorOverDistribution 𝒟 (fun _ : α => A) = A := by
-  calc
-    averageOperatorOverDistribution 𝒟 (fun _ : α => A)
-        = (∑ a ∈ 𝒟.support, 𝒟.weight a) • A := by
-          simp [averageOperatorOverDistribution, Finset.sum_smul]
-    _ = A := by rw [h𝒟.weight_sum_eq_one, one_smul]
 
 namespace Distribution.IsProbability
 
@@ -319,14 +313,6 @@ theorem avgOver_const {α : Type*} (𝒟 : ProbabilityDistribution α) (c : Erro
     avgOver (𝒟 : Distribution α) (fun _ : α => c) = c :=
   avgOver_const_of_isProbability (𝒟 : Distribution α) 𝒟.2 c
 
-/-- Averaging a constant operator against a bundled probability distribution returns that
-operator. -/
-theorem averageOperator_const {α : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (𝒟 : ProbabilityDistribution α) (A : MIPStarRE.Quantum.Op ι) :
-    averageOperatorOverDistribution (𝒟 : Distribution α) (fun _ : α => A) = A :=
-  averageOperatorOverDistribution_const_of_isProbability (𝒟 : Distribution α) 𝒟.2 A
-
 end ProbabilityDistribution
 
 /-- The weights of a uniform distribution sum to exactly `1`. -/
@@ -360,15 +346,6 @@ theorem avgOver_uniform_const {α : Type*}
     avgOver (uniformDistribution α) (fun _ : α => c) = c := by
   simpa [uniformProbabilityDistribution] using
     (ProbabilityDistribution.avgOver_const (uniformProbabilityDistribution α) c)
-
-/-- Averaging a constant operator against the uniform distribution on a nonempty finite type
-returns that operator. -/
-theorem averageOperatorOverDistribution_uniform_const {α : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype α] [DecidableEq α] [Nonempty α] (A : MIPStarRE.Quantum.Op ι) :
-    averageOperatorOverDistribution (uniformDistribution α) (fun _ : α => A) = A := by
-  simpa [uniformProbabilityDistribution] using
-    (ProbabilityDistribution.averageOperator_const (uniformProbabilityDistribution α) A)
 
 /-- A uniform average is bounded by any nonnegative pointwise upper bound. -/
 theorem avgOver_uniform_le_of_pointwise_le {α : Type*}
