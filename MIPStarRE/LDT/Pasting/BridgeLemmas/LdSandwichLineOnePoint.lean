@@ -1325,6 +1325,23 @@ private lemma ldSandwichLineOnePointRightFamily_total_eq_one
   simpa [ldSandwichLineOnePointRightFamily, verticalLineMeasurementFamily, hi,
     postprocess_total, ℓ] using (strategy.axisParallelMeasurement ℓ).total_eq_one
 
+/-- The rotated prefix-only one-point left family has no `none` outcome. -/
+private lemma ldSandwichLineOnePointPrefixMovedFamily_outcome_none_eq_zero
+    (params : Parameters)
+    [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    {k i : ℕ} (hi : i < k)
+    (q : SandwichedLineQuestion params k) :
+    (ldSandwichLineOnePointPrefixMovedFamily params family hi q).outcome none = 0 := by
+  simp [ldSandwichLineOnePointPrefixMovedFamily, postprocess, restrictSubMeas,
+    Finset.sum_filter]
+  apply Finset.sum_eq_zero
+  intro gs _hgs
+  by_cases hsome : (gs 0).isSome = true
+  · rcases Option.isSome_iff_exists.mp hsome with ⟨g, hg⟩
+    simp [hg]
+  · simp [hsome]
+
 /-- Generic outcome expansion for evaluating a restricted completed-slice sandwich
 family at a concrete field value. -/
 private lemma gHatSandwichFamily_restrict_eval_outcome_some
@@ -1939,6 +1956,58 @@ private noncomputable def qBipartiteLinearConsDefect {Outcome : Type*}
     (A : SubMeas Outcome ιA) (B : SubMeas Outcome ιB) : Error :=
   ev ψ (opTensor A.total B.total) - qBipartiteMatchMass ψ A B
 
+/-- For option-valued families with no `none` mass, the linear bipartite
+consistency defect is the paper's sum against the complementary right outcome.
+
+This is the bookkeeping step that rewrites
+`⟨ψ|A_total ⊗ B_total|ψ⟩ - Σ_o ⟨ψ|A_o ⊗ B_o|ψ⟩` as
+`Σ_a ⟨ψ|A_a ⊗ (I - B_a)|ψ⟩` when Bob's family is a measurement and both
+`none` outcomes vanish. -/
+private lemma qBipartiteLinearConsDefect_option_eq_sum_some_complement
+    {α ιA ιB : Type*}
+    [Fintype α] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (ψ : QuantumState (ιA × ιB))
+    (A : SubMeas (Option α) ιA) (B : SubMeas (Option α) ιB)
+    (hBtotal : B.total = 1)
+    (hAnone : A.outcome none = 0) (hBnone : B.outcome none = 0) :
+    qBipartiteLinearConsDefect ψ A B =
+      ∑ a : α, ev ψ (opTensor (A.outcome (some a)) (1 - B.outcome (some a))) := by
+  classical
+  have htotal_sum :
+      ev ψ (opTensor A.total B.total) =
+        ∑ o : Option α, ev ψ (opTensor (A.outcome o) (1 : MIPStarRE.Quantum.Op ιB)) := by
+    calc
+      ev ψ (opTensor A.total B.total)
+          = ev ψ (opTensor A.total (1 : MIPStarRE.Quantum.Op ιB)) := by
+            rw [hBtotal]
+      _ = ev ψ (opTensor (∑ o : Option α, A.outcome o)
+            (1 : MIPStarRE.Quantum.Op ιB)) := by
+            rw [A.sum_eq_total]
+      _ = ev ψ (∑ o : Option α,
+            opTensor (A.outcome o) (1 : MIPStarRE.Quantum.Op ιB)) := by
+            rw [opTensor_sum_left_univ]
+      _ = ∑ o : Option α, ev ψ (opTensor (A.outcome o)
+            (1 : MIPStarRE.Quantum.Op ιB)) := by
+            rw [ev_sum]
+  have hdiff_sum :
+      ev ψ (opTensor A.total B.total) - qBipartiteMatchMass ψ A B =
+        ∑ o : Option α, ev ψ (opTensor (A.outcome o) (1 - B.outcome o)) := by
+    rw [htotal_sum]
+    unfold qBipartiteMatchMass
+    rw [← Finset.sum_sub_distrib]
+    refine Finset.sum_congr rfl ?_
+    intro o _ho
+    rw [← ev_sub]
+    congr 1
+    simpa [opTensor] using (MIPStarRE.Quantum.kronecker_sub_right
+      (A := A.outcome o)
+      (B₁ := (1 : MIPStarRE.Quantum.Op ιB))
+      (B₂ := B.outcome o))
+  unfold qBipartiteLinearConsDefect
+  rw [hdiff_sum]
+  rw [Fintype.sum_option]
+  simp [hAnone, hBnone, opTensor, ev_zero]
+
 /-- The linear consistency defect is nonnegative when the right-hand family is a
 measurement.  This lets the paper's averaged linear estimate feed the `max 0`
 `qBipartiteConsDefect` wrapper without needing a pointwise absolute-value gap. -/
@@ -2012,31 +2081,70 @@ private lemma bipartiteConsError_le_of_linearDefect_average_bound
           simpa [qBipartiteConsDefect, qBipartiteLinearConsDefect]
             using (max_eq_right hnonneg).symm
 
-/-- The remaining averaged linear post-deletion analytic transport in
+/-- The remaining expanded off-diagonal scalar transport in
 `lem:ld-sandwich-line-one-point`.
 
-This is exactly the two Cauchy--Schwarz moves and prefix collapse from
-`references/ldt-paper/ld-pasting.tex:954--1024`, after the outer
-`max 0` wrapper has been discharged by
-`bipartiteConsError_le_of_linearDefect_average_bound`: starting with the original
-prefix family from lines 954--963, move the selected slice across the prefix
-using `lem:commute-g-half-sandwich` (lines 964--1010), collapse
-`Σ_{g_{<i}} G_{g_{<i}}G_{g_{<i}}† = I` (lines 1011--1024), and leave the
-single-slice endpoint defect measured by the moved-prefix family.  All exact
-endpoint expansions and the raw `qSDDCore` bound are supplied by
-`LdSandwichLineOnePointResidualFacts`; the arithmetic absorption into `ν₅` is
-proved separately in `ldSandwichLineOnePoint_endpoint_comm_error_le`.
-
-Unlike the previous local residual, this statement matches the paper's averaged
-Cauchy--Schwarz estimate directly: it compares averaged linear defects, rather
-than requiring an average of pointwise absolute-value gaps. -/
-private lemma ldSandwichLineOnePoint_prefix_linearDefect_average_cauchySchwarz_bound
+This is the exact scalar form of `ld-pasting.tex:954--1024` after the linear
+consistency defect has been expanded as
+`Σ_a ⟨ψ|A_a ⊗ (I - B_a)|ψ⟩`.  The only remaining analytic content is the
+paper's two averaged Cauchy--Schwarz moves plus the prefix-completeness collapse;
+the surrounding `qBipartiteLinearConsDefect` bookkeeping is proved in
+`ldSandwichLineOnePoint_prefix_linearDefect_average_cauchySchwarz_bound`. -/
+private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_bound
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
     {k i : ℕ} (hi : i < k) (_hi0 : i ≠ 0)
+    (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi) :
+    avgOver (uniformDistribution (SandwichedLineQuestion params k)) (fun q =>
+      ∑ a : Fq params,
+        ev strategy.state
+          (opTensor
+            (((ldSandwichLineOnePointPrefixOriginalFamily params family hi) q).outcome
+              (some a))
+            (1 - ((ldSandwichLineOnePointRightFamily params strategy family k i) q).outcome
+              (some a))))
+      ≤
+    avgOver (uniformDistribution (SandwichedLineQuestion params k)) (fun q =>
+      ∑ a : Fq params,
+        ev strategy.state
+          (opTensor
+            (((ldSandwichLineOnePointPrefixMovedFamily params family hi) q).outcome
+              (some a))
+            (1 - ((ldSandwichLineOnePointRightFamily params strategy family k i) q).outcome
+              (some a)))) +
+      2 * Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1)) := by
+  /- TODO(#810): prove the paper's expanded two-CS estimate.  This is now
+  strictly below the linear-defect layer: use `facts.prefixOriginalSome`,
+  `facts.movedSome`, `facts.rawLeftEndpoint`, `facts.rawRightEndpoint`, and
+  `facts.rawCore` to perform the two applications of `Preliminaries.closenessOfIP` /
+  `Preliminaries.closenessOfIPAdjoint` corresponding to
+  `ld-pasting.tex:964--1010`, then close the prefix collapse from
+  `ld-pasting.tex:1011--1024`. -/
+  sorry
+
+/-- Linear-defect wrapper for the expanded off-diagonal post-deletion transport in
+`lem:ld-sandwich-line-one-point`.
+
+The paper's two Cauchy--Schwarz moves and prefix collapse from
+`references/ldt-paper/ld-pasting.tex:954--1024` act on the expanded scalar
+expression `Σ_a ⟨ψ|A_a ⊗ (I - B_a)|ψ⟩`.  This lemma proves the exact
+bookkeeping reduction from the averaged linear consistency defects to that
+expanded residual, using the measurement-valued right family and the fact that
+both option-valued families have zero `none` mass.  The remaining analytic gap is
+therefore the private helper
+`ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_bound`; the arithmetic
+absorption into `ν₅` is proved separately in
+`ldSandwichLineOnePoint_endpoint_comm_error_le`. -/
+private lemma ldSandwichLineOnePoint_prefix_linearDefect_average_cauchySchwarz_bound
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0)
     (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi) :
     avgOver (uniformDistribution (SandwichedLineQuestion params k)) (fun q =>
       qBipartiteLinearConsDefect strategy.state
@@ -2048,25 +2156,59 @@ private lemma ldSandwichLineOnePoint_prefix_linearDefect_average_cauchySchwarz_b
         ((ldSandwichLineOnePointPrefixMovedFamily params family hi) q)
         ((ldSandwichLineOnePointRightFamily params strategy family k i) q)) +
       2 * Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1)) := by
-  /- TODO(#810): prove the paper's two averaged Cauchy--Schwarz transports and
-  prefix collapse for the linear defect.  This residual now matches
-  `ld-pasting.tex:954--1024` more directly than the prior average-of-pointwise-
-  absolute-gap formulation: the proved wrapper
-  `bipartiteConsError_le_of_linearDefect_average_bound` removes `max 0` using
-  the measurement-valued right family, so the remaining obligation is the
-  paper's averaged scalar comparison.
-
-  The exact tail deletion (`ld-pasting.tex:932--953`), option-valued match
-  expansion, raw endpoint reindexing, and scalar absorption are all proved
-  outside this residual.
-
-  Expected inputs for the eventual fill: use `facts.rawCore` for the
-  `lem:commute-g-half-sandwich` square-distance terms at lines 980--986 and
-  1007--1010; prove the two "second square-root ≤ 1" obligations from
-  `strategy.isNormalized` plus the submeasurement/measurement bounds for the
-  right family and completed-slice sandwiches; then use the prefix-completeness
-  collapse from lines 1011--1024. -/
-  sorry
+  let 𝒟 : Distribution (SandwichedLineQuestion params k) :=
+    uniformDistribution (SandwichedLineQuestion params k)
+  let A₀ : IdxSubMeas (SandwichedLineQuestion params k) (Option (Fq params)) ι :=
+    ldSandwichLineOnePointPrefixOriginalFamily params family hi
+  let A₁ : IdxSubMeas (SandwichedLineQuestion params k) (Option (Fq params)) ι :=
+    ldSandwichLineOnePointPrefixMovedFamily params family hi
+  let C : IdxSubMeas (SandwichedLineQuestion params k) (Option (Fq params)) ι :=
+    ldSandwichLineOnePointRightFamily params strategy family k i
+  have hsource :
+      avgOver 𝒟 (fun q => qBipartiteLinearConsDefect strategy.state (A₀ q) (C q)) =
+        avgOver 𝒟 (fun q =>
+          ∑ a : Fq params,
+            ev strategy.state (opTensor ((A₀ q).outcome (some a))
+              (1 - (C q).outcome (some a)))) := by
+    apply avgOver_congr
+    intro q
+    exact qBipartiteLinearConsDefect_option_eq_sum_some_complement
+      strategy.state (A₀ q) (C q)
+      (ldSandwichLineOnePointRightFamily_total_eq_one params strategy family hi q)
+      (ldSandwichLineOnePointPrefixOriginalFamily_outcome_none_eq_zero params family hi q)
+      (ldSandwichLineOnePointRightFamily_outcome_none_eq_zero params strategy family hi q)
+  have hmoved :
+      avgOver 𝒟 (fun q => qBipartiteLinearConsDefect strategy.state (A₁ q) (C q)) =
+        avgOver 𝒟 (fun q =>
+          ∑ a : Fq params,
+            ev strategy.state (opTensor ((A₁ q).outcome (some a))
+              (1 - (C q).outcome (some a)))) := by
+    apply avgOver_congr
+    intro q
+    exact qBipartiteLinearConsDefect_option_eq_sum_some_complement
+      strategy.state (A₁ q) (C q)
+      (ldSandwichLineOnePointRightFamily_total_eq_one params strategy family hi q)
+      (ldSandwichLineOnePointPrefixMovedFamily_outcome_none_eq_zero params family hi q)
+      (ldSandwichLineOnePointRightFamily_outcome_none_eq_zero params strategy family hi q)
+  have hexpanded :=
+    ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_bound
+      params strategy family gamma zeta hi hi0 facts
+  simpa [𝒟, A₀, A₁, C] using
+    (calc
+      avgOver 𝒟 (fun q => qBipartiteLinearConsDefect strategy.state (A₀ q) (C q))
+          = avgOver 𝒟 (fun q =>
+              ∑ a : Fq params,
+                ev strategy.state (opTensor ((A₀ q).outcome (some a))
+                  (1 - (C q).outcome (some a)))) := hsource
+      _ ≤ avgOver 𝒟 (fun q =>
+              ∑ a : Fq params,
+                ev strategy.state (opTensor ((A₁ q).outcome (some a))
+                  (1 - (C q).outcome (some a)))) +
+            2 * Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1)) := by
+              simpa [𝒟, A₀, A₁, C] using hexpanded
+      _ = avgOver 𝒟 (fun q => qBipartiteLinearConsDefect strategy.state (A₁ q) (C q)) +
+            2 * Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1)) := by
+              rw [← hmoved])
 
 /-- The post-deletion analytic transport in `lem:ld-sandwich-line-one-point`.
 
