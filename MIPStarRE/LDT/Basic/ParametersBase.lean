@@ -260,7 +260,7 @@ abbrev LinePolynomialModel (params : Parameters) [FieldModel params.q] :=
 is a positive prime power (`preliminaries.tex`, lines 17--19 and 89--93). -/
 theorem two_le_scalar_card (params : Parameters) [FieldModel params.q] :
     2 ≤ Fintype.card (Scalar params) := by
-  simpa [scalar_card] using params.two_le_q
+  simpa using params.two_le_q
 
 /-- The scalar model has positive finite cardinality. -/
 theorem scalar_card_pos (params : Parameters) [FieldModel params.q] :
@@ -297,15 +297,13 @@ def encodeScalar {params : Parameters} [FieldModel params.q] (x : Scalar params)
 
 /-- Decoding from the coded `Fin q` carrier into the chosen scalar field is injective. -/
 theorem decodeScalar_injective {params : Parameters} [FieldModel params.q] :
-    Function.Injective (decodeScalar (params := params)) := by
-  intro x y hxy
-  simpa using congrArg encodeScalar hxy
+    Function.Injective (decodeScalar (params := params)) :=
+  (FieldModel.equiv (q := params.q)).symm.injective
 
 /-- Encoding scalar-field elements back to the coded `Fin q` carrier is injective. -/
 theorem encodeScalar_injective {params : Parameters} [FieldModel params.q] :
-    Function.Injective (encodeScalar (params := params)) := by
-  intro x y hxy
-  simpa using congrArg decodeScalar hxy
+    Function.Injective (encodeScalar (params := params)) :=
+  (FieldModel.equiv (q := params.q)).injective
 
 /-- The zero coordinate. -/
 def zeroCoord {params : Parameters} [FieldModel params.q] : Fq params :=
