@@ -31,10 +31,11 @@ The relevant paper passage is
 ## Current Lean route
 
 The scalar-chain docstring in `ProcessedG.lean:1194-1213` lists exactly the ten
-paper losses:
+paper losses, with the paper's phase-five claim split into its point-commutation
+and boundedness components:
 
 ```text
-2√ζ, √ζ, 2√ζ, 6√(γ(m+1)), 6√(γ(m+1)) + √ζ,
+2√ζ, √ζ, 2√ζ, 6√(γ(m+1)), 6√(γ(m+1)), √ζ,
 2√ζ, 2√ζ, √ζ, √ζ.
 ```
 
