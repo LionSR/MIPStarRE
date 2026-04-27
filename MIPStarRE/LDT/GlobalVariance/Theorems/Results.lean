@@ -1190,6 +1190,30 @@ lemma generalizeBFromLineCollisionExpansion
   exact generalizeBCollisionResidual_le_of_lineExpansion_eq
     params strategy G g (hreindex g)
 
+private lemma ev_adjoint_sub_swap
+    {κ : Type*} [Fintype κ] [DecidableEq κ]
+    (ψ : QuantumState κ) (X Y : MIPStarRE.Quantum.Op κ) :
+    ev ψ (((Y - X)ᴴ) * (Y - X)) =
+      ev ψ (((X - Y)ᴴ) * (X - Y)) := by
+  have hdiff : Y - X = -(X - Y) := by
+    simp
+  have hconjDiff : Yᴴ - Xᴴ = -(Xᴴ - Yᴴ) := by
+    abel
+  have hsqExpanded : (Yᴴ - Xᴴ) * (Y - X) = (Xᴴ - Yᴴ) * (X - Y) := by
+    calc
+      (Yᴴ - Xᴴ) * (Y - X) = (-(Xᴴ - Yᴴ)) * (Y - X) := by
+        rw [hconjDiff]
+      _ = (-(Xᴴ - Yᴴ)) * (-(X - Y)) := by rw [hdiff]
+      _ = (Xᴴ - Yᴴ) * (X - Y) := by
+        rw [neg_mul, mul_neg, neg_neg]
+  calc
+    ev ψ (((Y - X)ᴴ) * (Y - X)) = ev ψ ((Yᴴ - Xᴴ) * (Y - X)) := by
+      simp
+    _ = ev ψ ((Xᴴ - Yᴴ) * (X - Y)) := by
+      exact congrArg (ev ψ) hsqExpanded
+    _ = ev ψ (((X - Y)ᴴ) * (X - Y)) := by
+      simp
+
 /-- The reverse `lem:generalize-b` step used at
 `references/ldt-paper/expansion.tex`, line 309.
 
@@ -1223,24 +1247,7 @@ lemma generalizeBReversePointwiseBound
           dsimp only
           let X := weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu
           let Y := weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu
-          have hdiff : Y - X = -(X - Y) := by
-            simp [X, Y]
-          have hconjDiff : Yᴴ - Xᴴ = -(Xᴴ - Yᴴ) := by
-            abel
-          have hsqExpanded : (Yᴴ - Xᴴ) * (Y - X) = (Xᴴ - Yᴴ) * (X - Y) := by
-            calc
-              (Yᴴ - Xᴴ) * (Y - X) =
-                  (-(Xᴴ - Yᴴ)) * (Y - X) := by
-                rw [hconjDiff]
-              _ = (-(Xᴴ - Yᴴ)) * (-(X - Y)) := by rw [hdiff]
-              _ = (Xᴴ - Yᴴ) * (X - Y) := by
-                  rw [neg_mul, mul_neg, neg_neg]
-          calc
-            ev ψbi (((Y - X)ᴴ) * (Y - X)) =
-                ev ψbi ((Yᴴ - Xᴴ) * (Y - X)) := by simp
-            _ = ev ψbi ((Xᴴ - Yᴴ) * (X - Y)) := by
-                exact congrArg (ev ψbi) hsqExpanded
-            _ = ev ψbi (((X - Y)ᴴ) * (X - Y)) := by simp
+          exact ev_adjoint_sub_swap ψbi X Y
     _ ≤ generalizeBError params := hgen.pointwiseNormBound g
 
 /-- The first marginal of the rerandomized hypercube-edge distribution is uniform.
@@ -1483,30 +1490,6 @@ lemma pointConditionedEventSelfConsistency_weighted_leftEdge
               ev strategy.state (Dᴴ * D))
     _ ≤ 2 * delta := pointConditionedEventSelfConsistency_weighted_point
       params strategy eps delta gamma hgood G g
-
-private lemma ev_adjoint_sub_swap
-    {κ : Type*} [Fintype κ] [DecidableEq κ]
-    (ψ : QuantumState κ) (X Y : MIPStarRE.Quantum.Op κ) :
-    ev ψ (((Y - X)ᴴ) * (Y - X)) =
-      ev ψ (((X - Y)ᴴ) * (X - Y)) := by
-  have hdiff : Y - X = -(X - Y) := by
-    simp
-  have hconjDiff : Yᴴ - Xᴴ = -(Xᴴ - Yᴴ) := by
-    abel
-  have hsqExpanded : (Yᴴ - Xᴴ) * (Y - X) = (Xᴴ - Yᴴ) * (X - Y) := by
-    calc
-      (Yᴴ - Xᴴ) * (Y - X) = (-(Xᴴ - Yᴴ)) * (Y - X) := by
-        rw [hconjDiff]
-      _ = (-(Xᴴ - Yᴴ)) * (-(X - Y)) := by rw [hdiff]
-      _ = (Xᴴ - Yᴴ) * (X - Y) := by
-        rw [neg_mul, mul_neg, neg_neg]
-  calc
-    ev ψ (((Y - X)ᴴ) * (Y - X)) = ev ψ ((Yᴴ - Xᴴ) * (Y - X)) := by
-      simp
-    _ = ev ψ ((Xᴴ - Yᴴ) * (X - Y)) := by
-      exact congrArg (ev ψ) hsqExpanded
-    _ = ev ψ (((X - Y)ᴴ) * (X - Y)) := by
-      simp
 
 /-- The final weighted self-consistency move on the target endpoint of the
 hypercube edge distribution.
