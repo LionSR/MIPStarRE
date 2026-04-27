@@ -42,6 +42,21 @@ theorem Distribution.totalWeight_nonneg {α : Type*} (𝒟 : Distribution α) :
   unfold Distribution.totalWeight
   exact Finset.sum_nonneg fun a _ => 𝒟.nonnegative a
 
+/-- On a finite ambient type, summing weights over all ambient values gives the same
+mass as summing over the stored support.
+
+This is a project-local adapter around Mathlib's `Finset.sum_subset`: Mathlib supplies
+the finite-sum theorem, while this lemma packages the `Distribution.outsideSupport`
+invariant so paper expressions over the whole question set can be rewritten to the
+repository's explicit-support representation. -/
+theorem Distribution.weight_sum_univ_eq_totalWeight {α : Type*} [Fintype α]
+    (𝒟 : Distribution α) :
+    (∑ a : α, 𝒟.weight a) = 𝒟.totalWeight := by
+  classical
+  simpa [Distribution.totalWeight] using
+    (Finset.sum_subset (Finset.subset_univ 𝒟.support)
+      (fun a _ ha => 𝒟.outsideSupport a ha)).symm
+
 namespace Distribution.IsProbability
 
 /-- Unpack the equality form of the probability invariant. -/
@@ -49,6 +64,17 @@ theorem weight_sum_eq_one {α : Type*}
     {𝒟 : Distribution α} (h𝒟 : 𝒟.IsProbability) :
     ∑ a ∈ 𝒟.support, 𝒟.weight a = 1 := by
   simpa [Distribution.IsProbability, Distribution.totalWeight] using h𝒟
+
+/-- On a finite ambient type, a probabilistic `Distribution` has total weight `1` even
+when its weights are summed over the whole ambient type.
+
+This packages the explicit-support bookkeeping in `Distribution` for downstream Lean
+statements that follow the paper's notation `𝔼_{x ∼ 𝒟}` over the question set rather
+than over a stored support finset. -/
+theorem weight_sum_univ_eq_one {α : Type*} [Fintype α]
+    {𝒟 : Distribution α} (h𝒟 : 𝒟.IsProbability) :
+    (∑ a : α, 𝒟.weight a) = 1 :=
+  (Distribution.weight_sum_univ_eq_totalWeight 𝒟).trans h𝒟
 
 /-- A probability distribution has total weight at most `1`. -/
 theorem weight_sum_le_one {α : Type*}
@@ -92,6 +118,19 @@ noncomputable def totalVariationDistance {α : Type*} [DecidableEq α]
 
 Proofs use Mathlib's `Finset.sum` API: `Finset.sum_le_sum`, `Finset.sum_add_distrib`,
 `Finset.mul_sum`, and `Finset.sum_congr`. -/
+
+/-- On a finite ambient type, `avgOver` can be read as a weighted sum over all ambient
+values because `Distribution.weight` is zero outside the stored support.
+
+This is a thin adapter from Mathlib's `Finset.sum_subset` to the repository-local
+`Distribution`/`avgOver` API; it is not a replacement for Mathlib probability theory. -/
+theorem avgOver_eq_sum_univ {α : Type*} [Fintype α]
+    (𝒟 : Distribution α) (f : α → Error) :
+    avgOver 𝒟 f = ∑ a : α, 𝒟.weight a * f a := by
+  classical
+  simpa [avgOver] using
+    Finset.sum_subset (Finset.subset_univ 𝒟.support)
+      (fun a _ ha => by rw [𝒟.outsideSupport a ha, zero_mul])
 
 /-- Averaging the zero function gives zero. -/
 theorem avgOver_zero {α : Type*} (𝒟 : Distribution α) :
@@ -209,6 +248,20 @@ theorem avgOver_const_of_isProbability {α : Type*} (𝒟 : Distribution α)
     _ = (∑ a ∈ 𝒟.support, 𝒟.weight a) * c := by rw [← Finset.sum_mul]
     _ = c := by rw [h𝒟.weight_sum_eq_one, one_mul]
 
+/-- On a finite ambient type, operator averages may be unfolded as weighted sums over
+all ambient values, with the outside-support weights contributing zero.
+
+Mathlib provides the finite-sum identity; this lemma is the project-local adapter for
+`Distribution.outsideSupport` and `averageOperatorOverDistribution` over `Quantum.Op`. -/
+theorem averageOperatorOverDistribution_eq_sum_univ {α : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι] [Fintype α]
+    (𝒟 : Distribution α) (A : α → MIPStarRE.Quantum.Op ι) :
+    averageOperatorOverDistribution 𝒟 A = ∑ a : α, 𝒟.weight a • A a := by
+  classical
+  simpa [averageOperatorOverDistribution] using
+    Finset.sum_subset (Finset.subset_univ 𝒟.support)
+      (fun a _ ha => by rw [𝒟.outsideSupport a ha, zero_smul])
+
 /-- The weighted operator average of the zero-valued family is zero.
 This is a thin wrapper around `Finset.sum` simplification for
 `averageOperatorOverDistribution`. -/
@@ -297,6 +350,13 @@ theorem weight_sum_eq_one {α : Type*} (𝒟 : ProbabilityDistribution α) :
     ∑ a ∈ (𝒟 : Distribution α).support, (𝒟 : Distribution α).weight a = 1 := by
   have h𝒟 : (𝒟 : Distribution α).IsProbability := 𝒟.2
   exact h𝒟.weight_sum_eq_one
+
+/-- On a finite ambient type, the weights of a bundled probability distribution sum to
+`1` over all ambient values, not just over the stored support. -/
+theorem weight_sum_univ_eq_one {α : Type*} [Fintype α]
+    (𝒟 : ProbabilityDistribution α) :
+    (∑ a : α, (𝒟 : Distribution α).weight a) = 1 :=
+  Distribution.IsProbability.weight_sum_univ_eq_one 𝒟.2
 
 /-- A bundled probability distribution has total weight at most `1`. -/
 theorem weight_sum_le_one {α : Type*} (𝒟 : ProbabilityDistribution α) :
