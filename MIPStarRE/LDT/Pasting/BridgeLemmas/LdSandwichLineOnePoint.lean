@@ -915,7 +915,12 @@ private noncomputable def ldSandwichLineOnePointPrefixMovedFamily
         (fun gs => (gs 0).isSome = true))
       (fun gs => Option.map (fun g : Polynomial params => g q.1) (gs 0))
 
-/-- Rotating the selected coordinate to the front reduces the prefix family to `ldGbcon`. -/
+/-- Rotating the selected coordinate to the front reduces the prefix family to `ldGbcon`.
+
+This is the prefix-completeness collapse and endpoint identification used after
+`references/ldt-paper/ld-pasting.tex:1011--1024`: once the selected coordinate is
+first, summing the remaining prefix sandwich leaves the one-point endpoint
+measurement. -/
 private lemma ldSandwichLineOnePointPrefixMoved_eq_endpoint
     (params : Parameters)
     [FieldModel params.q]
@@ -2081,6 +2086,129 @@ private lemma bipartiteConsError_le_of_linearDefect_average_bound
           simpa [qBipartiteConsDefect, qBipartiteLinearConsDefect]
             using (max_eq_right hnonneg).symm
 
+/-- The original expanded off-diagonal scalar in `ld-pasting.tex:960--963`.
+
+This is the source side after deleting extraneous tail coordinates and expanding
+the linear consistency defect as `Σ_a ⟨ψ|A_a ⊗ (I-B_a)|ψ⟩`. -/
+private noncomputable def ldSandwichLineOnePoint_prefix_sourceOutcomeSum
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k i : ℕ} (hi : i < k) : Error :=
+  avgOver (uniformDistribution (SandwichedLineQuestion params k)) (fun q =>
+    ∑ a : Fq params,
+      ev strategy.state
+        (opTensor
+          (((ldSandwichLineOnePointPrefixOriginalFamily params family hi) q).outcome
+            (some a))
+          (1 - ((ldSandwichLineOnePointRightFamily params strategy family k i) q).outcome
+            (some a))))
+
+/-- The intermediate scalar after the first Cauchy--Schwarz move
+`ld-pasting.tex:964--986` (`eq:gonna-need-a-bigger-cauchy-schwarz`).
+
+For an original-order prefix outcome `gs`, `orderedHalf` is
+`G^{x_<i}_{g_<i} G^{x_i}_{g_i}` while `rotatedHalf` is
+`G^{x_i}_{g_i} G^{x_<i}_{g_<i}`.  The first CS move replaces only the left half
+of the sandwich, leaving `orderedHalf†` on the right. -/
+private noncomputable def ldSandwichLineOnePoint_prefix_afterFirstCSOutcomeSum
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k i : ℕ} (hi : i < k) : Error :=
+  avgOver (uniformDistribution (SandwichedLineQuestion params k)) (fun q =>
+    ∑ gs : GHatTupleOutcome params (i + 1),
+      match Option.map (fun g : Polynomial params => g q.1)
+          (gs ⟨i, Nat.lt_succ_self i⟩) with
+      | none => 0
+      | some a =>
+          let orderedHalf := gHatHalfProductOutcomeOperator params family (i + 1)
+            (fun j => q.2 ⟨j.1, by omega⟩) gs
+          let rotatedHalf := gHatHalfProductOutcomeOperator params family (i + 1)
+            ((pointTupleLastFrontEquiv params i) (fun j => q.2 ⟨j.1, by omega⟩))
+            ((gHatTupleOutcomeLastFrontEquiv params i) gs)
+          ev strategy.state
+            (opTensor (rotatedHalf * orderedHalfᴴ)
+              (1 - ((ldSandwichLineOnePointRightFamily params strategy family k i) q).outcome
+                (some a))))
+
+/-- The target expanded off-diagonal scalar after the two CS moves.
+
+This is the moved-prefix side.  The separate endpoint/prefix-completeness
+collapse to `ldGbcon` is the already-proved
+`ldSandwichLineOnePointPrefixMoved_eq_endpoint`, corresponding to
+`ld-pasting.tex:1011--1024`. -/
+private noncomputable def ldSandwichLineOnePoint_prefix_movedOutcomeSum
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k i : ℕ} (hi : i < k) : Error :=
+  avgOver (uniformDistribution (SandwichedLineQuestion params k)) (fun q =>
+    ∑ a : Fq params,
+      ev strategy.state
+        (opTensor
+          (((ldSandwichLineOnePointPrefixMovedFamily params family hi) q).outcome
+            (some a))
+          (1 - ((ldSandwichLineOnePointRightFamily params strategy family k i) q).outcome
+            (some a))))
+
+/-- Paper-faithful split of the remaining off-diagonal CS route.
+
+The fields isolate the two uses of `Preliminaries.closenessOfIP` /
+`Preliminaries.closenessOfIPAdjoint` in `ld-pasting.tex:964--1010`.  The endpoint
+collapse after these fields is already packaged by
+`ldSandwichLineOnePointPrefixMoved_eq_endpoint` (`ld-pasting.tex:1011--1024`). -/
+private structure LdSandwichLineOnePointOutcomeSumCSRoute
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    {k i : ℕ} (hi : i < k) : Prop where
+  /-- First CS move, paper lines `964--986` and label
+  `eq:gonna-need-a-bigger-cauchy-schwarz`: move the selected `G` to the left of
+  the prefix in the left half of the sandwich. -/
+  firstCauchySchwarz :
+    ldSandwichLineOnePoint_prefix_sourceOutcomeSum params strategy family hi ≤
+      ldSandwichLineOnePoint_prefix_afterFirstCSOutcomeSum params strategy family hi +
+        Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1))
+  /-- Second CS move, paper lines `987--1010` and label `eq:even-bigger-CS`:
+  move the selected `G` through the adjoint/right half, reaching the moved-prefix
+  scalar. -/
+  secondCauchySchwarz :
+    ldSandwichLineOnePoint_prefix_afterFirstCSOutcomeSum params strategy family hi ≤
+      ldSandwichLineOnePoint_prefix_movedOutcomeSum params strategy family hi +
+        Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1))
+
+/-- Narrow residual for the two off-diagonal Cauchy--Schwarz moves in
+`ld-pasting.tex:964--1010`.
+
+This is now below all linear-defect, option-outcome, and endpoint-collapse
+bookkeeping.  The intended proof is to instantiate
+`Preliminaries.closenessOfIPAdjoint` for `firstCauchySchwarz` and
+`Preliminaries.closenessOfIP` for `secondCauchySchwarz`, using `facts.rawCore` as
+the `lem:commute-g-half-sandwich` square-distance term (`ld-pasting.tex:980--986`
+and `1007--1010`) and the measurement/submeasurement bounds for the unit side of
+Cauchy--Schwarz. -/
+private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_route
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    {k i : ℕ} (hi : i < k) (_hi0 : i ≠ 0)
+    (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi) :
+    LdSandwichLineOnePointOutcomeSumCSRoute params strategy family gamma zeta hi := by
+  /- TODO(#835): prove the two field-wise CS moves without changing constants.
+  Use `facts.rawCore`, `facts.rawLeftEndpoint`, and `facts.rawRightEndpoint` to
+  identify the raw half-products, then discharge the unit side conditions from
+  the measurement bounds on `gHatSandwichFamily` and
+  `ldSandwichLineOnePointRightFamily`. -/
+  sorry
+
 /-- The remaining expanded off-diagonal scalar transport in
 `lem:ld-sandwich-line-one-point`.
 
@@ -2116,14 +2244,27 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_bound
             (1 - ((ldSandwichLineOnePointRightFamily params strategy family k i) q).outcome
               (some a)))) +
       2 * Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1)) := by
-  /- TODO(#810): prove the paper's expanded two-CS estimate.  This is now
-  strictly below the linear-defect layer: use `facts.prefixOriginalSome`,
-  `facts.movedSome`, `facts.rawLeftEndpoint`, `facts.rawRightEndpoint`, and
-  `facts.rawCore` to perform the two applications of `Preliminaries.closenessOfIP` /
-  `Preliminaries.closenessOfIPAdjoint` corresponding to
-  `ld-pasting.tex:964--1010`, then close the prefix collapse from
-  `ld-pasting.tex:1011--1024`. -/
-  sorry
+  have hroute :=
+    ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_route
+      params strategy family gamma zeta hi _hi0 facts
+  have htwo :
+      ldSandwichLineOnePoint_prefix_sourceOutcomeSum params strategy family hi ≤
+        ldSandwichLineOnePoint_prefix_movedOutcomeSum params strategy family hi +
+          2 * Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1)) := by
+    calc
+      ldSandwichLineOnePoint_prefix_sourceOutcomeSum params strategy family hi
+          ≤ ldSandwichLineOnePoint_prefix_afterFirstCSOutcomeSum params strategy family hi +
+              Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1)) :=
+            hroute.firstCauchySchwarz
+      _ ≤ (ldSandwichLineOnePoint_prefix_movedOutcomeSum params strategy family hi +
+              Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1))) +
+            Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1)) := by
+            exact add_le_add hroute.secondCauchySchwarz (le_refl _)
+      _ = ldSandwichLineOnePoint_prefix_movedOutcomeSum params strategy family hi +
+            2 * Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1)) := by
+            ring
+  simpa [ldSandwichLineOnePoint_prefix_sourceOutcomeSum,
+    ldSandwichLineOnePoint_prefix_movedOutcomeSum] using htwo
 
 /-- Linear-defect wrapper for the expanded off-diagonal post-deletion transport in
 `lem:ld-sandwich-line-one-point`.
@@ -2134,8 +2275,8 @@ expression `Σ_a ⟨ψ|A_a ⊗ (I - B_a)|ψ⟩`.  This lemma proves the exact
 bookkeeping reduction from the averaged linear consistency defects to that
 expanded residual, using the measurement-valued right family and the fact that
 both option-valued families have zero `none` mass.  The remaining analytic gap is
-therefore the private helper
-`ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_bound`; the arithmetic
+therefore the split CS package
+`ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_route`; the arithmetic
 absorption into `ν₅` is proved separately in
 `ldSandwichLineOnePoint_endpoint_comm_error_le`. -/
 private lemma ldSandwichLineOnePoint_prefix_linearDefect_average_cauchySchwarz_bound
