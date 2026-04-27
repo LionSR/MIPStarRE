@@ -158,12 +158,15 @@ Whenever the envelope `mainFormalError params k eps` has already saturated past
 `thm:main-induction` in `references/ldt-paper/inductive_step.tex`) that the
 bound it is proving is vacuous whenever the error scale is at least `1`.
 
-In the `mainFormal` assembly this wrapper handles every vacuous envelope branch:
-in particular, the non-paper scalar regimes `ε > 1` or `d > q`, and the future
-small-`k` branch `params.m * params.d ≤ k < 400 * params.m * params.d` once the
-Section 6 / Pasting-side wrapper is threaded into the proof. The complementary
-non-vacuous branch `mainFormalError params k eps < 1` supplies the scalar
-hypotheses needed by the Step 8 cascade.
+In the `mainFormal` assembly this wrapper handles the branches where the public
+envelope has already reached `1`, including the non-paper scalar regimes
+`ε > 1` or `d > q`.  The intermediate range
+`params.m * params.d ≤ k < 400 * params.m * params.d` is not claimed to be
+vacuous here: without an additional checked scalar saturation lemma, the
+non-vacuous branch keeps the large-`k` Section 6 side condition as explicit
+role-package residual data.  The complementary non-vacuous branch
+`mainFormalError params k eps < 1` supplies the scalar hypotheses needed by the
+Step 8 cascade.
 
 Witness choice: we pick an arbitrary `ProjMeas` via `default` — the proof only
 needs the generic bound `bipartiteConsError ≤ 1`, not any specific
@@ -818,6 +821,93 @@ def toUnsymmetrizationBridge
     scalars.sigma pkg.symConsistency
 
 end MainFormalRoleMeasurementPackage
+
+/-- Residual Section 6 role-package witness for `mainFormal`.
+
+This isolates the first field of the former role-packaged completion residual:
+it asks only for the raw Section 6 role-register polynomial measurement and its
+symmetrized consistency estimate at the pre-cascade main-induction error.  The
+constructors below show how the already-checked base case and the syntactic
+successor wrapper produce this residual.  For an arbitrary current parameter
+bundle, the inverse predecessor transport needed to apply the successor wrapper
+remains explicit upstream work; no vacuity of the intermediate range
+`params.m * params.d ≤ k < 400 * params.m * params.d` is claimed here. -/
+structure MainFormalRolePackageResidual
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ) where
+  /-- Raw Section 6 role-register measurement before rewriting its error to `σ`. -/
+  section6Witness :
+    ∃ G : Measurement (Polynomial params) (Role × ι),
+      ConsRel (strategy.strategySymmetrization).state
+        (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas (strategy.strategySymmetrization).pointMeasurement)
+        (polynomialEvaluationFamily params G.toSubMeas)
+        (MainInductionStep.mainInductionError params k
+          (3 * eps) (3 * eps) (3 * eps))
+
+namespace MainFormalRolePackageResidual
+
+/-- Convert the isolated Section 6 role-package residual into the package consumed
+by unsymmetrization. -/
+theorem toRoleMeasurementPackage
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    (residual : MainFormalRolePackageResidual params strategy eps hpass k)
+    (scalars : MainFormalCascadeScalars params eps k) :
+    Nonempty (MainFormalRoleMeasurementPackage params strategy eps k scalars) :=
+  MainFormalRoleMeasurementPackage.ofMainInductionWitness params strategy eps k scalars
+    residual.section6Witness
+
+/-- Base-case constructor for the isolated role-package residual. -/
+theorem ofBaseCase
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hm1 : params.m = 1) :
+    Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) :=
+  ⟨{ section6Witness :=
+      strategySymmetrization_mainInductionBaseCase params strategy eps hpass k hm1 }⟩
+
+/-- Successor constructor for the isolated role-package residual in the syntactic
+`params.next` case.
+
+This exposes the exact remaining Section 6 data for the large-`k` branch:
+`MainFormalSuccessorBoundary` plus the side condition
+`400 * params.m * params.d ≤ k`.  Turning an arbitrary non-base `params` into this
+syntactic successor form still requires a separate predecessor-transport theorem. -/
+theorem ofSuccessorBoundary
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error) (k : ℕ)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hd : 0 < params.d)
+    (boundary : MainFormalSuccessorBoundary params strategy eps hpass k)
+    (hk_pos : 1 ≤ k) (hk_large : 400 * params.m * params.d ≤ k) :
+    Nonempty (MainFormalRolePackageResidual params.next strategy eps hpass k) :=
+  ⟨{ section6Witness :=
+      mainFormalSuccessorMainInductionPublicWrapper params strategy eps hpass k hd boundary
+        hk_pos hk_large }⟩
+
+/-- Choose the role-register measurement package produced by a role-package
+residual.  This noncomputable selector is used only to type the subsequent
+post-role residual fields; the checked theorem above is the mathematical
+content. -/
+noncomputable def rolePackage
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    (residual : MainFormalRolePackageResidual params strategy eps hpass k)
+    (scalars : MainFormalCascadeScalars params eps k) :
+    MainFormalRoleMeasurementPackage params strategy eps k scalars :=
+  Classical.choice (residual.toRoleMeasurementPackage scalars)
+
+end MainFormalRolePackageResidual
 
 /-- Evaluate a polynomial-valued complete measurement at every point.
 
@@ -2104,6 +2194,115 @@ noncomputable def toCompletionLine169Residual
 
 end MainFormalCascadeRolePackagedCompletionLine169Residual
 
+/-- Projectivization/completion and line-169 residual after a concrete role package
+has already been produced.
+
+This is the post-role part of
+`MainFormalCascadeRolePackagedCompletionLine169Residual`: the role-register
+measurement is no longer a field, so the remaining data are exactly the two
+completed projective measurements, their completion closeness to the
+unsymmetrized POVMs, and the two polynomial line-169 transport estimates. -/
+structure MainFormalPostRolePackageCompletionLine169Residual
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (scalars : MainFormalCascadeScalars params eps k)
+    (rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars) where
+  /-- The completed projective measurement denoted $Q^{\mathrm A}$. -/
+  leftMeasurement : ProjMeas (Polynomial params) ι
+  /-- The completed projective measurement denoted $Q^{\mathrm B}$. -/
+  rightMeasurement : ProjMeas (Polynomial params) ι
+  /-- Left-register completion closeness, paper line 146 (`eq:G-with-Q-A`). -/
+  leftCompletionCloseness :
+    SDDRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas.liftLeft)
+      (constSubMeasFamily leftMeasurement.toSubMeas.liftLeft)
+      scalars.zeta2
+  /-- Right-register completion closeness, paper line 147. -/
+  rightCompletionCloseness :
+    SDDRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas.liftRight)
+      (constSubMeasFamily rightMeasurement.toSubMeas.liftRight)
+      scalars.zeta2
+  /-- Paper line 169, before the data-processing step at lines 171--173. -/
+  leftProjectiveRightPOVMPolynomialConsistency :
+    ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily leftMeasurement.toSubMeas)
+      (constSubMeasFamily
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+      scalars.zeta1
+  /-- Bob-role mirror of paper line 169, before point-evaluation data processing. -/
+  rightProjectiveLeftPOVMPolynomialConsistency :
+    ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily rightMeasurement.toSubMeas)
+      (constSubMeasFamily
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+      scalars.zeta1
+
+namespace MainFormalPostRolePackageCompletionLine169Residual
+
+/-- Reinsert the already-produced role package into the older role-packaged
+completion-line169 residual. -/
+noncomputable def toRolePackagedCompletionLine169Residual
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
+    (residual : MainFormalPostRolePackageCompletionLine169Residual
+      params strategy eps k scalars rolePackage) :
+    MainFormalCascadeRolePackagedCompletionLine169Residual params strategy eps k scalars where
+  rolePackage := rolePackage
+  leftMeasurement := residual.leftMeasurement
+  rightMeasurement := residual.rightMeasurement
+  leftCompletionCloseness := residual.leftCompletionCloseness
+  rightCompletionCloseness := residual.rightCompletionCloseness
+  leftProjectiveRightPOVMPolynomialConsistency :=
+    residual.leftProjectiveRightPOVMPolynomialConsistency
+  rightProjectiveLeftPOVMPolynomialConsistency :=
+    residual.rightProjectiveLeftPOVMPolynomialConsistency
+
+end MainFormalPostRolePackageCompletionLine169Residual
+
+/-- Combined live residual after isolating role-package production.
+
+The first field is the checked Section 6 role-package residual; the second field
+contains only the projectivization/completion and line-169 data for the role
+package selected from that residual.  Thus the live `mainFormal` hole no longer
+asks for an arbitrary `MainFormalRoleMeasurementPackage` as an independent
+field. -/
+structure MainFormalCascadeRolePackageResidualCompletionLine169Residual
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (scalars : MainFormalCascadeScalars params eps k) where
+  /-- The isolated Section 6 residual producing the role-register package. -/
+  roleResidual : MainFormalRolePackageResidual params strategy eps hpass k
+  /-- The remaining projectivization/completion and line-169 data after role production. -/
+  postRoleResidual :
+    MainFormalPostRolePackageCompletionLine169Residual params strategy eps k scalars
+      (roleResidual.rolePackage scalars)
+
+namespace MainFormalCascadeRolePackageResidualCompletionLine169Residual
+
+/-- Convert the split role-residual/post-role package back to the role-packaged
+completion-line169 residual consumed by the existing downstream wrappers. -/
+noncomputable def toRolePackagedCompletionLine169Residual
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (residual : MainFormalCascadeRolePackageResidualCompletionLine169Residual
+      params strategy eps hpass k scalars) :
+    MainFormalCascadeRolePackagedCompletionLine169Residual params strategy eps k scalars :=
+  residual.postRoleResidual.toRolePackagedCompletionLine169Residual
+
+end MainFormalCascadeRolePackageResidualCompletionLine169Residual
+
 namespace MainFormalCascadeTransportTargets
 
 /-- Add the already-discharged scalar package back to the transport-only targets. -/
@@ -2243,20 +2442,22 @@ The bipartite tensor placement follows the paper:
 The `k`-bound boundary matches the paper (`references/ldt-paper/test_definition.tex:183`):
 the public hypothesis is `params.m * params.d ≤ k`, not the stronger
 `400 * params.m * params.d ≤ k` used by the Section 6 / Pasting-side wrappers.
-After first separating off the vacuous envelope branch, the planned assembly
-case-splits on `k`:
+After first separating off the vacuous envelope branch, the checked role-package
+infrastructure now exposes two honest Section 6 producers:
 
-* Regime `400 * params.m * params.d ≤ k`: invoke the public Section 6
-  wrapper `MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper`,
-  using the base-case handoff
-  `strategySymmetrization_mainInductionBaseCase` and the successor-boundary
-  package `MainFormalSuccessorBoundary`, to discharge the three transport
-  targets through the paper's cascade.
-* Regime `params.m * params.d ≤ k < 400 * params.m * params.d`: the final
-  envelope `mainFormalError params k eps` saturates past `1` (in the spirit of
-  the paper's standard trivial-case observation in the proof of
-  `thm:main-induction`), and `mainFormal_trivial_witness` supplies the witness
-  directly.
+* the base handoff `strategySymmetrization_mainInductionBaseCase`, packaged as
+  `MainFormalRolePackageResidual.ofBaseCase`, and
+* the syntactic successor handoff
+  `MainFormalRolePackageResidual.ofSuccessorBoundary`, which consumes
+  `MainFormalSuccessorBoundary` together with the Section 6 side condition
+  `400 * params.m * params.d ≤ k`.
+
+For an arbitrary current parameter bundle, the inverse predecessor transport
+needed to enter the syntactic successor theorem is not yet formalized.  Likewise,
+no checked lemma here proves that the intermediate range
+`params.m * params.d ≤ k < 400 * params.m * params.d` is automatically vacuous; the
+live residual therefore keeps role-package production isolated instead of
+claiming that small-`k` saturation has been solved.
 
 Fixes #137, #239.
 -/
@@ -2297,18 +2498,18 @@ theorem mainFormal
   -- pre-projective consistency field inside the projectivization handoff, the
   -- unused Section 6 consistency field inside the unsymmetrization package, the
   -- line-171--173 data-processing step for the `ζ₁` links, and the final `ζ₄`
-  -- point-triangle assembly to the finer role-packaged completion-and-line-169
-  -- residual `MainFormalCascadeRolePackagedCompletionLine169Residual`. The scalar
+  -- point-triangle assembly to the finer split residual
+  -- `MainFormalCascadeRolePackageResidualCompletionLine169Residual`. The scalar
   -- cascade side conditions are discharged below: if `mainFormalError ≥ 1`, the
   -- theorem is vacuous; otherwise the pass condition gives `0 ≤ ε`, while
   -- `mainFormalError < 1` rules out `ε > 1` and `d > q`. Producing the remaining
-  -- residual still depends on the active upstream residuals: role-register
-  -- measurement production, projectivization/completion closeness and polynomial
+  -- residual still depends on active upstream work: the isolated Section 6
+  -- role-package residual, projectivization/completion closeness and polynomial
   -- `ζ₁` transport links (#426), the full-slice transport chain (#601), the
   -- remaining `fromHToG` pasting bridge (#707), the reverse `overAllOutcomes`
   -- aggregation (#672), and the ProcessedG scalar follow-ups #714, #715, #732,
   -- and #759.  Once the role package is available, the factor-two
-  -- unsymmetrization estimates are now checked by
+  -- unsymmetrization estimates are checked by
   -- `UnsymmetrizationBridgePackage.ofSymConsistency`.  The line-169 transport
   -- fields remain explicit because generic `triangleSub` gives
   -- `ζ₁ + sqrt ζ₂`, not the printed `ζ₁`; preserving the paper envelope needs a
@@ -2319,9 +2520,13 @@ theorem mainFormal
   · have hepsNN : 0 ≤ eps := ProjStrat.eps_nonneg_of_passes hpass
     let scalars : MainFormalCascadeScalars params eps k :=
       MainFormalCascadeScalars.ofNontrivialMainFormal hepsNN hk0 herr
-    have rolePackagedCompletionLine169Residual :
-        MainFormalCascadeRolePackagedCompletionLine169Residual params strategy eps k scalars := by
+    have rolePackageResidualCompletionLine169Residual :
+        MainFormalCascadeRolePackageResidualCompletionLine169Residual
+          params strategy eps hpass k scalars := by
       sorry
+    have rolePackagedCompletionLine169Residual :
+        MainFormalCascadeRolePackagedCompletionLine169Residual params strategy eps k scalars :=
+      rolePackageResidualCompletionLine169Residual.toRolePackagedCompletionLine169Residual
     have completionLine169Residual :
         MainFormalCascadeProjectiveCompletionLine169Residual params strategy eps k scalars :=
       rolePackagedCompletionLine169Residual.toCompletionLine169Residual
