@@ -162,51 +162,6 @@ noncomputable def extractRole {α ι : Type*} [Fintype α] [Fintype ι] [Decidab
 
 end Measurement
 
-/-- Block-diagonal role-register measurement built from an Alice-block and a Bob-block POVM.
-
-This is the measurement-level analogue of `symmetrizedIdxProjMeas`: the `Role.A`
-sector carries `MA`, and the `Role.B` sector carries `MB`. -/
-noncomputable def roleSymmetrizedMeasurement {Outcome ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
-    (MA MB : Measurement Outcome ι) : Measurement Outcome (Role × ι) where
-  toSubMeas :=
-    { outcome := fun a => roleCond Role.A (MA.outcome a) + roleCond Role.B (MB.outcome a)
-      total := 1
-      outcome_pos := by
-        intro a
-        exact add_nonneg
-          (roleCond_nonneg Role.A (MA.outcome_pos a))
-          (roleCond_nonneg Role.B (MB.outcome_pos a))
-      sum_eq_total := by
-        calc
-          ∑ a, (roleCond Role.A (MA.outcome a) + roleCond Role.B (MB.outcome a))
-              = ∑ a, roleCond Role.A (MA.outcome a) +
-                  ∑ a, roleCond Role.B (MB.outcome a) := by
-                    rw [Finset.sum_add_distrib]
-          _ = roleCond Role.A (∑ a, MA.outcome a) +
-                roleCond Role.B (∑ a, MB.outcome a) := by
-                  rw [roleCond_finset_sum Role.A Finset.univ MA.outcome]
-                  rw [roleCond_finset_sum Role.B Finset.univ MB.outcome]
-          _ = roleCond Role.A (1 : MIPStarRE.Quantum.Op ι) +
-                roleCond Role.B 1 := by
-                  rw [MA.sum_eq, MB.sum_eq]
-          _ = 1 := roleCond_one_sum
-      total_le_one := le_rfl }
-  total_eq_one := rfl
-
-@[simp] theorem roleSymmetrizedMeasurement_outcome {Outcome ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
-    (MA MB : Measurement Outcome ι) (a : Outcome) :
-    (roleSymmetrizedMeasurement MA MB).outcome a =
-      roleCond Role.A (MA.outcome a) + roleCond Role.B (MB.outcome a) :=
-  rfl
-
-@[simp] theorem roleSymmetrizedMeasurement_total {Outcome ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
-    (MA MB : Measurement Outcome ι) :
-    (roleSymmetrizedMeasurement MA MB).total = 1 :=
-  rfl
-
 /-- Extract the polynomial POVM that acts as the original Alice prover from a
 role-register main-induction output. -/
 noncomputable def extractRoleAMeasurement {params : Parameters} [FieldModel params.q]
@@ -327,40 +282,6 @@ noncomputable abbrev unsymmetrizedRightPOVM {params : Parameters} [FieldModel pa
     (G : Measurement (Polynomial params) (Role × ι)) :
     Measurement (Polynomial params) ι :=
   extractRoleBMeasurement G
-
-/-- For complete measurements, the bipartite consistency defect is the total
-expectation minus the matching mass. -/
-theorem qBipartiteConsDefect_of_measurements {Outcome : Type*} {ιA ιB : Type*}
-    [Fintype Outcome]
-    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (ψ : QuantumState (ιA × ιB))
-    (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) :
-    qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas =
-      ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) -
-        qBipartiteMatchMass ψ A.toSubMeas B.toSubMeas := by
-  have hmatch_le :
-      qBipartiteMatchMass ψ A.toSubMeas B.toSubMeas ≤
-        ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) := by
-    calc
-      qBipartiteMatchMass ψ A.toSubMeas B.toSubMeas
-        = ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (B.outcome a)) := by
-            rfl
-      _ ≤ ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ιB) (A.outcome a)) := by
-            refine Finset.sum_le_sum ?_
-            intro a _
-            exact ev_mono ψ _ _ <|
-              opTensor_le_leftTensor (ι₂ := ιB)
-                (A.outcome_pos a) (Measurement.outcome_le_one B a)
-      _ = ev ψ (leftTensor (ι₂ := ιB) A.total) := by
-            rw [← ev_sum ψ (fun a : Outcome => leftTensor (ι₂ := ιB) (A.outcome a))]
-            rw [leftTensor_finset_sum (ι₂ := ιB) Finset.univ A.outcome, A.sum_eq_total]
-      _ = ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) := by
-            simp [A.total_eq_one, leftTensor]
-  unfold qBipartiteConsDefect
-  rw [show ev ψ (opTensor A.toSubMeas.total B.toSubMeas.total) =
-      ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) by
-    simp [A.total_eq_one, B.total_eq_one, opTensor]]
-  rw [max_eq_right (sub_nonneg.mpr hmatch_le)]
 
 /-- Matching mass against an arbitrary role-register measurement only sees its
 principal role blocks. -/
