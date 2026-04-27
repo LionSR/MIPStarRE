@@ -158,12 +158,15 @@ Whenever the envelope `mainFormalError params k eps` has already saturated past
 `thm:main-induction` in `references/ldt-paper/inductive_step.tex`) that the
 bound it is proving is vacuous whenever the error scale is at least `1`.
 
-In the `mainFormal` assembly this wrapper handles every vacuous envelope branch:
-in particular, the non-paper scalar regimes `ε > 1` or `d > q`, and the future
-small-`k` branch `params.m * params.d ≤ k < 400 * params.m * params.d` once the
-Section 6 / Pasting-side wrapper is threaded into the proof. The complementary
-non-vacuous branch `mainFormalError params k eps < 1` supplies the scalar
-hypotheses needed by the Step 8 cascade.
+In the `mainFormal` assembly this wrapper handles the branches where the public
+envelope has already reached `1`, including the non-paper scalar regimes
+`ε > 1` or `d > q`.  The intermediate range
+`params.m * params.d ≤ k < 400 * params.m * params.d` is not claimed to be
+vacuous here: without an additional checked scalar saturation lemma, the
+non-vacuous branch keeps the large-`k` Section 6 side condition as explicit
+role-package residual data.  The complementary non-vacuous branch
+`mainFormalError params k eps < 1` supplies the scalar hypotheses needed by the
+Step 8 cascade.
 
 Witness choice: we pick an arbitrary `ProjMeas` via `default` — the proof only
 needs the generic bound `bipartiteConsError ≤ 1`, not any specific
@@ -818,6 +821,256 @@ def toUnsymmetrizationBridge
     scalars.sigma pkg.symConsistency
 
 end MainFormalRoleMeasurementPackage
+
+/-- Residual Section 6 role-package witness for `mainFormal`.
+
+This isolates the first field of the former role-packaged completion residual:
+it asks only for the raw Section 6 role-register polynomial measurement and its
+symmetrized consistency estimate at the pre-cascade main-induction error.  The
+constructors below show how the already-checked base case and the syntactic
+successor wrapper produce this residual.  For an arbitrary current parameter
+bundle, the inverse predecessor transport needed to apply the successor wrapper
+remains explicit upstream work; no vacuity of the intermediate range
+`params.m * params.d ≤ k < 400 * params.m * params.d` is claimed here. -/
+structure MainFormalRolePackageResidual
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ) where
+  /-- Raw Section 6 role-register measurement before rewriting its error to `σ`. -/
+  roleMeasurement : Measurement (Polynomial params) (Role × ι)
+  /-- Raw Section 6 consistency estimate before rewriting its error to `σ`. -/
+  section6Consistency :
+    ConsRel (strategy.strategySymmetrization).state
+      (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas (strategy.strategySymmetrization).pointMeasurement)
+      (polynomialEvaluationFamily params roleMeasurement.toSubMeas)
+      (MainInductionStep.mainInductionError params k
+        (3 * eps) (3 * eps) (3 * eps))
+
+namespace MainFormalRolePackageResidual
+
+/-- Convert the isolated Section 6 role-package residual into the package consumed
+by unsymmetrization. -/
+def toRoleMeasurementPackage
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    (residual : MainFormalRolePackageResidual params strategy eps hpass k)
+    (scalars : MainFormalCascadeScalars params eps k) :
+    MainFormalRoleMeasurementPackage params strategy eps k scalars where
+  roleMeasurement := residual.roleMeasurement
+  symConsistency := by
+    simpa [MainFormalCascadeScalars.sigma, mainFormalCascadeSigma_eq_mainInductionError]
+      using residual.section6Consistency
+
+/-- Base-case constructor for the isolated role-package residual. -/
+theorem ofBaseCase
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hm1 : params.m = 1) :
+    Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) := by
+  rcases strategySymmetrization_mainInductionBaseCase params strategy eps hpass k hm1 with
+    ⟨G, hG⟩
+  exact ⟨{ roleMeasurement := G, section6Consistency := hG }⟩
+
+/-- Successor constructor for the isolated role-package residual in the syntactic
+`params.next` case.
+
+This exposes the exact remaining Section 6 data for the large-`k` branch:
+`MainFormalSuccessorBoundary` plus the side condition
+`400 * params.m * params.d ≤ k`.  Turning an arbitrary non-base `params` into this
+syntactic successor form still requires a separate predecessor-transport theorem. -/
+theorem ofSuccessorBoundary
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error) (k : ℕ)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hd : 0 < params.d)
+    (boundary : MainFormalSuccessorBoundary params strategy eps hpass k)
+    (hk_pos : 1 ≤ k) (hk_large : 400 * params.m * params.d ≤ k) :
+    Nonempty (MainFormalRolePackageResidual params.next strategy eps hpass k) := by
+  rcases mainFormalSuccessorMainInductionPublicWrapper params strategy eps hpass k hd boundary
+      hk_pos hk_large with ⟨G, hG⟩
+  exact ⟨{ roleMeasurement := G, section6Consistency := hG }⟩
+
+/-- Build the role-register measurement package produced by a concrete
+role-package residual. -/
+def rolePackage
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    (residual : MainFormalRolePackageResidual params strategy eps hpass k)
+    (scalars : MainFormalCascadeScalars params eps k) :
+    MainFormalRoleMeasurementPackage params strategy eps k scalars :=
+  residual.toRoleMeasurementPackage scalars
+
+end MainFormalRolePackageResidual
+
+/-- Reuse the current field model on the predecessor of a successor decomposition.
+
+If `successor.pred.next = params`, then `successor.pred.q = params.q`; this helper
+chooses the predecessor field model by transporting the ambient one along that
+cardinality equality. -/
+noncomputable def fieldModelOfSuccessorDecomposition
+    {params : Parameters} [FieldModel params.q]
+    (successor : Parameters.SuccessorDecomposition params) :
+    FieldModel successor.pred.q := by
+  classical
+  have hq : successor.pred.q = params.q := by
+    have h := congrArg Parameters.q successor.next_eq
+    simpa [Parameters.next] using h
+  rw [hq]
+  infer_instance
+
+/-- View a strategy over `params` as a strategy over the syntactic successor in a
+bundled predecessor decomposition.  The field model on the predecessor is chosen
+by `fieldModelOfSuccessorDecomposition`, so the transported successor strategy
+uses the same scalar model as the original strategy. -/
+noncomputable def projStratTransportSuccessor
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι)
+    (successor : Parameters.SuccessorDecomposition params) :
+    letI : FieldModel successor.pred.q := fieldModelOfSuccessorDecomposition successor
+    ProjStrat successor.pred.next ι := by
+  classical
+  rcases successor with ⟨pred, hnext⟩
+  subst params
+  exact strategy
+
+/-- Transport the low-individual-degree passing proof across a bundled predecessor
+identity. -/
+theorem passesLowIndividualDegreeTest_transportSuccessor
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error}
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (successor : Parameters.SuccessorDecomposition params) :
+    letI : FieldModel successor.pred.q := fieldModelOfSuccessorDecomposition successor
+    (projStratTransportSuccessor strategy successor).PassesLowIndividualDegreeTest eps := by
+  rcases successor with ⟨pred, hnext⟩
+  subst params
+  simpa [projStratTransportSuccessor, fieldModelOfSuccessorDecomposition] using hpass
+
+/-- Successor-branch data for producing the Section 6 role package.
+
+This is narrower than an arbitrary `MainFormalRolePackageResidual`: it contains an
+explicit predecessor `pred` with `pred.next = params`, the successor-boundary data
+for the transported strategy over `pred.next`, and the Section 6 large-`k` side
+condition for that predecessor. -/
+structure MainFormalRolePackageSuccessorResidual
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ) where
+  /-- A predecessor whose successor is the current parameter bundle. -/
+  successor : Parameters.SuccessorDecomposition params
+  /-- The bundled successor-boundary inputs for the transported strategy. -/
+  boundary :
+    letI : FieldModel successor.pred.q := fieldModelOfSuccessorDecomposition successor
+    MainFormalSuccessorBoundary successor.pred
+      (projStratTransportSuccessor strategy successor) eps
+      (passesLowIndividualDegreeTest_transportSuccessor hpass successor) k
+  /-- Positivity of the predecessor degree parameter, needed by the Section 6 wrapper. -/
+  dimensionPositive : 0 < successor.pred.d
+  /-- The positive-`k` side condition used by the Section 6 wrapper. -/
+  kPositive : 1 ≤ k
+  /-- The Section 6 large-`k` side condition for the predecessor dimension. -/
+  largeK : 400 * successor.pred.m * successor.pred.d ≤ k
+
+namespace MainFormalRolePackageSuccessorResidual
+
+/-- Convert explicit successor-branch data into the isolated Section 6 role
+package residual. -/
+theorem toRolePackageResidual
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    (residual : MainFormalRolePackageSuccessorResidual params strategy eps hpass k) :
+    Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) := by
+  rcases residual with ⟨⟨pred, hnext⟩, boundary, hd, hk_pos, hk_large⟩
+  subst params
+  -- Keep this transported predecessor instance explicit: although
+  -- `pred.next.q` unfolds to `pred.q`, downstream transported strategies remember
+  -- the chosen instance, so relying on fresh synthesis creates non-defeq terms.
+  letI : FieldModel pred.q :=
+    fieldModelOfSuccessorDecomposition (params := pred.next) ⟨pred, rfl⟩
+  let transportedStrategy : ProjStrat pred.next ι :=
+    projStratTransportSuccessor strategy ⟨pred, rfl⟩
+  have transportedPass : transportedStrategy.PassesLowIndividualDegreeTest eps := by
+    simpa [transportedStrategy] using
+      (passesLowIndividualDegreeTest_transportSuccessor hpass ⟨pred, rfl⟩)
+  have boundary' :
+      MainFormalSuccessorBoundary pred transportedStrategy eps transportedPass k := by
+    simpa [transportedStrategy, transportedPass] using boundary
+  rcases MainFormalRolePackageResidual.ofSuccessorBoundary pred transportedStrategy eps k
+      transportedPass hd boundary' hk_pos hk_large with ⟨roleResidual⟩
+  refine ⟨{ roleMeasurement := roleResidual.roleMeasurement, section6Consistency := ?_ }⟩
+  simpa [transportedStrategy, projStratTransportSuccessor, fieldModelOfSuccessorDecomposition]
+    using roleResidual.section6Consistency
+
+/-- Constructor for the common syntactic-successor case. -/
+def ofSyntacticSuccessor
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error) (k : ℕ)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hd : 0 < params.d)
+    (boundary : MainFormalSuccessorBoundary params strategy eps hpass k)
+    (hk_pos : 1 ≤ k) (hk_large : 400 * params.m * params.d ≤ k) :
+    MainFormalRolePackageSuccessorResidual params.next strategy eps hpass k where
+  successor := ⟨params, rfl⟩
+  boundary := by
+    simpa using boundary
+  dimensionPositive := hd
+  kPositive := hk_pos
+  largeK := hk_large
+
+end MainFormalRolePackageSuccessorResidual
+
+/-- Branch-level residual for producing the Section 6 role package.
+
+The two constructors expose the real alternatives in the current proof state:
+base dimension, or a successor dimension together with explicit predecessor
+transport, successor-boundary data, and the large-`k` side condition. -/
+inductive MainFormalRolePackageBranchResidual
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ) : Type _ where
+  /-- Base dimension, handled by the checked base-case handoff. -/
+  | base (hm1 : params.m = 1) :
+      MainFormalRolePackageBranchResidual params strategy eps hpass k
+  /-- Successor dimension with explicit predecessor and successor-boundary data. -/
+  | successor
+      (successorResidual :
+        MainFormalRolePackageSuccessorResidual params strategy eps hpass k) :
+      MainFormalRolePackageBranchResidual params strategy eps hpass k
+
+namespace MainFormalRolePackageBranchResidual
+
+/-- Convert the branch-level role residual into the isolated Section 6 role-package
+residual consumed by the downstream assembly. -/
+theorem toRolePackageResidual
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    (residual : MainFormalRolePackageBranchResidual params strategy eps hpass k) :
+    Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) := by
+  cases residual with
+  | base hm1 =>
+      exact MainFormalRolePackageResidual.ofBaseCase params strategy eps k hpass hm1
+  | successor successorResidual =>
+      exact successorResidual.toRolePackageResidual
+
+end MainFormalRolePackageBranchResidual
 
 /-- Evaluate a polynomial-valued complete measurement at every point.
 
@@ -2104,6 +2357,124 @@ noncomputable def toCompletionLine169Residual
 
 end MainFormalCascadeRolePackagedCompletionLine169Residual
 
+/-- Projectivization/completion and line-169 residual after a concrete role package
+has already been produced.
+
+This is the post-role part of
+`MainFormalCascadeRolePackagedCompletionLine169Residual`: the role-register
+measurement is no longer a field, so the remaining data are exactly the two
+completed projective measurements, their completion closeness to the
+unsymmetrized POVMs, and the two polynomial line-169 transport estimates. -/
+structure MainFormalPostRolePackageCompletionLine169Residual
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (scalars : MainFormalCascadeScalars params eps k)
+    (rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars) where
+  /-- The completed projective measurement denoted $Q^{\mathrm A}$. -/
+  leftMeasurement : ProjMeas (Polynomial params) ι
+  /-- The completed projective measurement denoted $Q^{\mathrm B}$. -/
+  rightMeasurement : ProjMeas (Polynomial params) ι
+  /-- Left-register completion closeness, paper line 146 (`eq:G-with-Q-A`). -/
+  leftCompletionCloseness :
+    SDDRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas.liftLeft)
+      (constSubMeasFamily leftMeasurement.toSubMeas.liftLeft)
+      scalars.zeta2
+  /-- Right-register completion closeness, paper line 147. -/
+  rightCompletionCloseness :
+    SDDRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas.liftRight)
+      (constSubMeasFamily rightMeasurement.toSubMeas.liftRight)
+      scalars.zeta2
+  /-- Paper line 169, before the data-processing step at lines 171--173. -/
+  leftProjectiveRightPOVMPolynomialConsistency :
+    ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily leftMeasurement.toSubMeas)
+      (constSubMeasFamily
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+      scalars.zeta1
+  /-- Bob-role mirror of paper line 169, before point-evaluation data processing. -/
+  rightProjectiveLeftPOVMPolynomialConsistency :
+    ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily rightMeasurement.toSubMeas)
+      (constSubMeasFamily
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+      scalars.zeta1
+
+namespace MainFormalPostRolePackageCompletionLine169Residual
+
+/-- Reinsert the already-produced role package into the older role-packaged
+completion-line169 residual. -/
+noncomputable def toRolePackagedCompletionLine169Residual
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
+    (residual : MainFormalPostRolePackageCompletionLine169Residual
+      params strategy eps k scalars rolePackage) :
+    MainFormalCascadeRolePackagedCompletionLine169Residual params strategy eps k scalars where
+  rolePackage := rolePackage
+  leftMeasurement := residual.leftMeasurement
+  rightMeasurement := residual.rightMeasurement
+  leftCompletionCloseness := residual.leftCompletionCloseness
+  rightCompletionCloseness := residual.rightCompletionCloseness
+  leftProjectiveRightPOVMPolynomialConsistency :=
+    residual.leftProjectiveRightPOVMPolynomialConsistency
+  rightProjectiveLeftPOVMPolynomialConsistency :=
+    residual.rightProjectiveLeftPOVMPolynomialConsistency
+
+end MainFormalPostRolePackageCompletionLine169Residual
+
+/-- Combined live residual after isolating branch-level role-package production.
+
+The first field records the actual Section 6 role-production branch: either the
+checked base case, or explicit predecessor transport together with the successor
+boundary and large-`k` side condition.  The second field contains only the
+projectivization/completion and line-169 data for the role package selected from
+that branch-level residual.  Thus the live `mainFormal` hole no longer asks for
+an arbitrary `MainFormalRoleMeasurementPackage` or an arbitrary raw Section 6
+witness as an independent field. -/
+structure MainFormalCascadeRolePackageResidualCompletionLine169Residual
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (scalars : MainFormalCascadeScalars params eps k) where
+  /-- Branch-level Section 6 data explaining how the role package is produced. -/
+  roleBranchResidual : MainFormalRolePackageBranchResidual params strategy eps hpass k
+  /-- The explicit isolated Section 6 residual.  Keeping this field concrete avoids
+  hiding the role-register measurement behind `Classical.choice`. -/
+  roleResidual : MainFormalRolePackageResidual params strategy eps hpass k
+  /-- The remaining projectivization/completion and line-169 data after role production. -/
+  postRoleResidual :
+    MainFormalPostRolePackageCompletionLine169Residual params strategy eps k scalars
+      (roleResidual.rolePackage scalars)
+
+namespace MainFormalCascadeRolePackageResidualCompletionLine169Residual
+
+/-- Convert the split role-residual/post-role package back to the role-packaged
+completion-line169 residual consumed by the existing downstream wrappers.
+
+The conversion uses the explicit `roleResidual` field, rather than choosing one
+from the branch residual's `Nonempty` conversion, so the role-register
+measurement remains visible to the post-role residual. -/
+noncomputable def toRolePackagedCompletionLine169Residual
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (residual : MainFormalCascadeRolePackageResidualCompletionLine169Residual
+      params strategy eps hpass k scalars) :
+    MainFormalCascadeRolePackagedCompletionLine169Residual params strategy eps k scalars :=
+  residual.postRoleResidual.toRolePackagedCompletionLine169Residual
+
+end MainFormalCascadeRolePackageResidualCompletionLine169Residual
+
 namespace MainFormalCascadeTransportTargets
 
 /-- Add the already-discharged scalar package back to the transport-only targets. -/
@@ -2243,25 +2614,32 @@ The bipartite tensor placement follows the paper:
 The `k`-bound boundary matches the paper (`references/ldt-paper/test_definition.tex:183`):
 the public hypothesis is `params.m * params.d ≤ k`, not the stronger
 `400 * params.m * params.d ≤ k` used by the Section 6 / Pasting-side wrappers.
-After first separating off the vacuous envelope branch, the planned assembly
-case-splits on `k`:
+After first separating off the vacuous envelope branch, the checked role-package
+infrastructure now exposes the base producer and a branch-level successor
+producer:
 
-* Regime `400 * params.m * params.d ≤ k`: invoke the public Section 6
-  wrapper `MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper`,
-  using the base-case handoff
-  `strategySymmetrization_mainInductionBaseCase` and the successor-boundary
-  package `MainFormalSuccessorBoundary`, to discharge the three transport
-  targets through the paper's cascade.
-* Regime `params.m * params.d ≤ k < 400 * params.m * params.d`: the final
-  envelope `mainFormalError params k eps` saturates past `1` (in the spirit of
-  the paper's standard trivial-case observation in the proof of
-  `thm:main-induction`), and `mainFormal_trivial_witness` supplies the witness
-  directly.
+* the base handoff `strategySymmetrization_mainInductionBaseCase`, packaged as
+  `MainFormalRolePackageBranchResidual.base`, and
+* the predecessor/successor handoff
+  `MainFormalRolePackageBranchResidual.successor`, which carries a bundled
+  `Parameters.SuccessorDecomposition`, transported passing strategy, bundled
+  `MainFormalSuccessorBoundary`, and the Section 6 side condition
+  `400 * pred.m * pred.d ≤ k`.
+
+For an arbitrary current parameter bundle, the predecessor decomposition itself is
+now formalized by `Parameters.successorDecompositionOfNeOne`; what remains
+external is producing the successor-boundary data and proving either the large-`k`
+side condition for the predecessor or a correct saturation lemma for the
+intermediate range.  No checked lemma here proves that
+`params.m * params.d ≤ k < 400 * pred.m * pred.d` is automatically vacuous.
+
+Universe note: the Lean statement uses `[FieldModel.{0} params.q]`, matching the
+base-universe field-model assumption of the public Section 6 successor wrapper.
 
 Fixes #137, #239.
 -/
 theorem mainFormal
-    (params : Parameters) [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι)
     (eps : Error)
     (hd : 0 < params.d)
@@ -2297,18 +2675,19 @@ theorem mainFormal
   -- pre-projective consistency field inside the projectivization handoff, the
   -- unused Section 6 consistency field inside the unsymmetrization package, the
   -- line-171--173 data-processing step for the `ζ₁` links, and the final `ζ₄`
-  -- point-triangle assembly to the finer role-packaged completion-and-line-169
-  -- residual `MainFormalCascadeRolePackagedCompletionLine169Residual`. The scalar
+  -- point-triangle assembly to the finer split residual
+  -- `MainFormalCascadeRolePackageResidualCompletionLine169Residual`. The scalar
   -- cascade side conditions are discharged below: if `mainFormalError ≥ 1`, the
   -- theorem is vacuous; otherwise the pass condition gives `0 ≤ ε`, while
   -- `mainFormalError < 1` rules out `ε > 1` and `d > q`. Producing the remaining
-  -- residual still depends on the active upstream residuals: role-register
-  -- measurement production, projectivization/completion closeness and polynomial
+  -- residual still depends on active upstream work: the branch-level Section 6
+  -- role-package producer (successor-boundary data plus the large-`k` or
+  -- small-`k` split), projectivization/completion closeness and polynomial
   -- `ζ₁` transport links (#426), the full-slice transport chain (#601), the
   -- remaining `fromHToG` pasting bridge (#707), the reverse `overAllOutcomes`
   -- aggregation (#672), and the ProcessedG scalar follow-ups #714, #715, #732,
   -- and #759.  Once the role package is available, the factor-two
-  -- unsymmetrization estimates are now checked by
+  -- unsymmetrization estimates are checked by
   -- `UnsymmetrizationBridgePackage.ofSymConsistency`.  The line-169 transport
   -- fields remain explicit because generic `triangleSub` gives
   -- `ζ₁ + sqrt ζ₂`, not the printed `ζ₁`; preserving the paper envelope needs a
@@ -2319,9 +2698,16 @@ theorem mainFormal
   · have hepsNN : 0 ≤ eps := ProjStrat.eps_nonneg_of_passes hpass
     let scalars : MainFormalCascadeScalars params eps k :=
       MainFormalCascadeScalars.ofNontrivialMainFormal hepsNN hk0 herr
-    have rolePackagedCompletionLine169Residual :
-        MainFormalCascadeRolePackagedCompletionLine169Residual params strategy eps k scalars := by
+    have rolePackageResidualCompletionLine169Residual :
+        MainFormalCascadeRolePackageResidualCompletionLine169Residual
+          (params := params) (strategy := strategy) (eps := eps)
+          (hpass := hpass) (k := k) (scalars := scalars) := by
+      -- TODO(#427): construct the branch-level role package, completion witnesses,
+      -- and exact polynomial line-169 transport links.
       sorry
+    have rolePackagedCompletionLine169Residual :
+        MainFormalCascadeRolePackagedCompletionLine169Residual params strategy eps k scalars :=
+      rolePackageResidualCompletionLine169Residual.toRolePackagedCompletionLine169Residual
     have completionLine169Residual :
         MainFormalCascadeProjectiveCompletionLine169Residual params strategy eps k scalars :=
       rolePackagedCompletionLine169Residual.toCompletionLine169Residual
