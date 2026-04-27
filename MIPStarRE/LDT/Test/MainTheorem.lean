@@ -2024,6 +2024,85 @@ noncomputable def toProjectiveStageTargets
 
 end MainFormalCascadeProjectiveCompletionLine169Residual
 
+/-- Residual after consuming the checked role-register Section 6 package.
+
+This package is narrower than `MainFormalCascadeProjectiveCompletionLine169Residual`:
+the role-register measurement and both factor-two unsymmetrization estimates are
+no longer independent fields.  They are supplied by
+`MainFormalRoleMeasurementPackage`, whose symmetrized consistency field feeds the
+proved constructor `UnsymmetrizationBridgePackage.ofSymConsistency`.  The
+remaining fields are therefore exactly the projectivization/completion data and
+the two polynomial line-169 transport links. -/
+structure MainFormalCascadeRolePackagedCompletionLine169Residual
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (scalars : MainFormalCascadeScalars params eps k) where
+  /-- The role-register Section 6 output at the cascade scalar `σ`. -/
+  rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars
+  /-- The completed projective measurement denoted $Q^{\mathrm A}$. -/
+  leftMeasurement : ProjMeas (Polynomial params) ι
+  /-- The completed projective measurement denoted $Q^{\mathrm B}$. -/
+  rightMeasurement : ProjMeas (Polynomial params) ι
+  /-- Left-register completion closeness, paper line 146 (`eq:G-with-Q-A`). -/
+  leftCompletionCloseness :
+    SDDRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas.liftLeft)
+      (constSubMeasFamily leftMeasurement.toSubMeas.liftLeft)
+      scalars.zeta2
+  /-- Right-register completion closeness, paper line 147. -/
+  rightCompletionCloseness :
+    SDDRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas.liftRight)
+      (constSubMeasFamily rightMeasurement.toSubMeas.liftRight)
+      scalars.zeta2
+  /-- Paper line 169, before the data-processing step at lines 171--173:
+  $Q^{\mathrm A}_g\otimes I \simeq_{\zeta_1} I\otimes G^{\mathrm B}_g$. -/
+  leftProjectiveRightPOVMPolynomialConsistency :
+    ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily leftMeasurement.toSubMeas)
+      (constSubMeasFamily
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+      scalars.zeta1
+  /-- Bob-role mirror of paper line 169, before point-evaluation data processing. -/
+  rightProjectiveLeftPOVMPolynomialConsistency :
+    ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily rightMeasurement.toSubMeas)
+      (constSubMeasFamily
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+      scalars.zeta1
+
+namespace MainFormalCascadeRolePackagedCompletionLine169Residual
+
+/-- Convert the role-packaged residual to the previous completion-line169 shape.
+
+The only work is to expand `MainFormalRoleMeasurementPackage` into the
+role-register measurement and the two Step 3 factor-two estimates using the
+checked unsymmetrization constructor. -/
+noncomputable def toCompletionLine169Residual
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (residual : MainFormalCascadeRolePackagedCompletionLine169Residual
+      params strategy eps k scalars) :
+    MainFormalCascadeProjectiveCompletionLine169Residual params strategy eps k scalars where
+  roleMeasurement := residual.rolePackage.roleMeasurement
+  pointARightPOVMConsistency := residual.rolePackage.toUnsymmetrizationBridge.pointAConsistency
+  leftPOVMPointBConsistency := residual.rolePackage.toUnsymmetrizationBridge.pointBConsistency
+  leftMeasurement := residual.leftMeasurement
+  rightMeasurement := residual.rightMeasurement
+  leftCompletionCloseness := residual.leftCompletionCloseness
+  rightCompletionCloseness := residual.rightCompletionCloseness
+  leftProjectiveRightPOVMPolynomialConsistency :=
+    residual.leftProjectiveRightPOVMPolynomialConsistency
+  rightProjectiveLeftPOVMPolynomialConsistency :=
+    residual.rightProjectiveLeftPOVMPolynomialConsistency
+
+end MainFormalCascadeRolePackagedCompletionLine169Residual
+
 namespace MainFormalCascadeTransportTargets
 
 /-- Add the already-discharged scalar package back to the transport-only targets. -/
@@ -2217,19 +2296,19 @@ theorem mainFormal
   -- pre-projective consistency field inside the projectivization handoff, the
   -- unused Section 6 consistency field inside the unsymmetrization package, the
   -- line-171--173 data-processing step for the `ζ₁` links, and the final `ζ₄`
-  -- point-triangle assembly to the finer completion-and-line-169 residual
-  -- `MainFormalCascadeProjectiveCompletionLine169Residual`. The scalar cascade
-  -- side conditions are discharged below: if `mainFormalError ≥ 1`, the theorem
-  -- is vacuous; otherwise the pass condition gives `0 ≤ ε`, while
+  -- point-triangle assembly to the finer role-packaged completion-and-line-169
+  -- residual `MainFormalCascadeRolePackagedCompletionLine169Residual`. The scalar
+  -- cascade side conditions are discharged below: if `mainFormalError ≥ 1`, the
+  -- theorem is vacuous; otherwise the pass condition gives `0 ≤ ε`, while
   -- `mainFormalError < 1` rules out `ε > 1` and `d > q`. Producing the remaining
   -- residual still depends on the active upstream residuals: role-register
   -- measurement production, projectivization/completion closeness and polynomial
   -- `ζ₁` transport links (#426), the full-slice transport chain (#601), the
   -- remaining `fromHToG` pasting bridge (#707), the reverse `overAllOutcomes`
   -- aggregation (#672), and the ProcessedG scalar follow-ups #714, #715, #732,
-  -- and #759.  The reusable Step 3 factor-two unsymmetrization estimates are now
-  -- checked by `UnsymmetrizationBridgePackage.ofSymConsistency`, once a
-  -- `MainFormalRoleMeasurementPackage` is available.  The line-169 transport
+  -- and #759.  Once the role package is available, the factor-two
+  -- unsymmetrization estimates are now checked by
+  -- `UnsymmetrizationBridgePackage.ofSymConsistency`.  The line-169 transport
   -- fields remain explicit because generic `triangleSub` gives
   -- `ζ₁ + sqrt ζ₂`, not the printed `ζ₁`; preserving the paper envelope needs a
   -- stronger projectivization/correlation-preservation input.
@@ -2239,9 +2318,12 @@ theorem mainFormal
   · have hepsNN : 0 ≤ eps := ProjStrat.eps_nonneg_of_passes hpass
     let scalars : MainFormalCascadeScalars params eps k :=
       MainFormalCascadeScalars.ofNontrivialMainFormal hepsNN hk0 herr
-    have completionLine169Residual :
-        MainFormalCascadeProjectiveCompletionLine169Residual params strategy eps k scalars := by
+    have rolePackagedCompletionLine169Residual :
+        MainFormalCascadeRolePackagedCompletionLine169Residual params strategy eps k scalars := by
       sorry
+    have completionLine169Residual :
+        MainFormalCascadeProjectiveCompletionLine169Residual params strategy eps k scalars :=
+      rolePackagedCompletionLine169Residual.toCompletionLine169Residual
     have projectiveTargets :
         MainFormalCascadeProjectiveStageTargets params strategy eps k scalars :=
       completionLine169Residual.toProjectiveStageTargets hpass
