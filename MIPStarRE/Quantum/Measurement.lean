@@ -74,7 +74,7 @@ noncomputable def postprocess [DecidableEq α] [DecidableEq β]
           = ∑ a, M.effect a := Finset.sum_fiberwise Finset.univ f M.effect
       _ ≤ 1 := M.sum_le_one
 
-@[simp] theorem total_eq_sum (M : Submeasurement α d) :
+theorem total_eq_sum (M : Submeasurement α d) :
     M.total = ∑ a, M.effect a :=
   rfl
 
@@ -82,6 +82,18 @@ noncomputable def postprocess [DecidableEq α] [DecidableEq β]
 theorem total_le_one (M : Submeasurement α d) :
     M.total ≤ 1 := by
   simpa [total] using M.sum_le_one
+
+/-- Postprocessing preserves the sum of all effects. -/
+theorem postprocess_sum_eq [DecidableEq α] [DecidableEq β]
+    (M : Submeasurement α d) (f : α → β) :
+    ∑ a, M.effect a = ∑ b, (M.postprocess f).effect b :=
+  (Finset.sum_fiberwise Finset.univ f M.effect).symm
+
+/-- Postprocessing preserves the named total operator. -/
+theorem postprocess_total [DecidableEq α] [DecidableEq β]
+    (M : Submeasurement α d) (f : α → β) :
+    (M.postprocess f).total = M.total := by
+  simpa [total] using (M.postprocess_sum_eq f).symm
 
 end Submeasurement
 
@@ -97,7 +109,7 @@ This constructor keeps the equality proof as the primary hypothesis and derives
 the inherited submeasurement inequality automatically.  It is useful at paper
 sites that are explicitly POVMs rather than relaxed sub-POVMs.
 -/
-def of_sum_eq_one (effect : α → Op d) (pos : ∀ a, 0 ≤ effect a)
+def ofSumEqOne (effect : α → Op d) (pos : ∀ a, 0 ≤ effect a)
     (sum_eq_one : ∑ a, effect a = 1) : Measurement α d where
   effect := effect
   pos := pos
@@ -106,8 +118,8 @@ def of_sum_eq_one (effect : α → Op d) (pos : ∀ a, 0 ≤ effect a)
 
 /-- The named total of a complete measurement is the identity. -/
 theorem total_eq_one (M : Measurement α d) :
-    M.toSubmeasurement.total = 1 := by
-  rw [Submeasurement.total, M.sum_eq_one]
+    M.total = 1 :=
+  M.sum_eq_one
 
 /--
 Postprocess a complete measurement by relabeling outcomes.

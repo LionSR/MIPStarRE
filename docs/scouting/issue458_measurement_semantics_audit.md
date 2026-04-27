@@ -47,11 +47,13 @@ This confirms the previously merged unsafe-zero-default cleanup is still intact.
 This PR adds small proved bridge lemmas rather than changing structure semantics:
 
 - `MIPStarRE.LDT.SubMeas.sum_eq_one_iff_total_eq_one`
-- `MIPStarRE.LDT.SubMeas.to_measurement`
+- `MIPStarRE.LDT.SubMeas.toMeasurement`
 - simp lemmas for the promoted measurement's underlying submeasurement/outcomes
 - `MIPStarRE.Quantum.Submeasurement.total_eq_sum`
 - `MIPStarRE.Quantum.Submeasurement.total_le_one`
-- `MIPStarRE.Quantum.Measurement.of_sum_eq_one`
+- `MIPStarRE.Quantum.Submeasurement.postprocess_sum_eq`
+- `MIPStarRE.Quantum.Submeasurement.postprocess_total`
+- `MIPStarRE.Quantum.Measurement.ofSumEqOne`
 - `MIPStarRE.Quantum.Measurement.total_eq_one`
 - `MIPStarRE.Quantum.Measurement.postprocess`
 
