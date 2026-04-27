@@ -3,8 +3,11 @@ import MIPStarRE.LDT.Commutativity.EvaluatedSliceBounds.PhaseOneThree
 /-!
 # Section 11 commutativity: phase-67 scalar residual
 
-Named endpoint definitions for the remaining first-coordinate reverse
-`eq:add-an-a` obligation in the scalar approximation proof.
+Named endpoint definitions for the earlier BAB-side first-coordinate reverse
+`eq:add-an-a` residual.  The closed paper-faithful scalar chain now routes
+through `PaperChainReverse.evaluatedSlice_phaseSixSeven_reverse_bound`; this
+module is kept as a record of the stricter tensor-first/point-measurement
+endpoint that was split off while auditing issue #732.
 
 ## References
 
