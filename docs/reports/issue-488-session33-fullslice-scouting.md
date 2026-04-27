@@ -11,8 +11,10 @@ No Lean files were edited.
 ## Current largest Lean files
 
 Line counts were recomputed with a Python line count over `MIPStarRE/**/*.lean` on the
-session33 branch based at `4b9b48ba`.  Rows marked "skip now" overlap active proof work or
-externally owned Pasting files.
+session33 branch based at `4b9b48ba`.  As in the other #488 reports, note that
+`wc -l` counts trailing newline characters, so its output can differ by one from
+editor or script counts that count logical lines.  Rows marked "skip now" overlap active
+proof work or externally owned Pasting files.
 
 | LOC | File | Status for a #488 follow-up |
 |---:|---|---|
