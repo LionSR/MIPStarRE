@@ -2202,7 +2202,8 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_route
     {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0)
     (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi) :
     LdSandwichLineOnePointOutcomeSumCSRoute params strategy family gamma zeta hi := by
-  have _ := hi0
+  -- Keep the nonzero-coordinate hypothesis explicit for the eventual CS proof.
+  have _hi0_for_future_proof : i ≠ 0 := hi0
   /- TODO(#835): prove the two field-wise CS moves without changing constants.
   Use `facts.rawCore`, `facts.rawLeftEndpoint`, and `facts.rawRightEndpoint` to
   identify the raw half-products, then discharge the unit side conditions from
@@ -2260,7 +2261,9 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_bound
       _ ≤ (ldSandwichLineOnePoint_prefix_movedOutcomeSum params strategy family hi +
               Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1))) +
             Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1)) := by
-            exact add_le_add hroute.secondCauchySchwarz (le_refl _)
+            simpa [add_comm, add_left_comm, add_assoc] using
+              add_le_add_right hroute.secondCauchySchwarz
+                (Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1)))
       _ = ldSandwichLineOnePoint_prefix_movedOutcomeSum params strategy family hi +
             2 * Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1)) := by
             ring
