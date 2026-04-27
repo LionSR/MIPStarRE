@@ -71,6 +71,22 @@
 	\]
 \end{theorem}
 
+\begin{remark}[Lean right-register completion helpers]\label{rem:lean-right-register-completion-helpers}
+	\uses{thm:orthonormalization, prop:completing-to-measurement}
+	\lean{MIPStarRE.LDT.Preliminaries.qSDDCore_rightTensor_eq_leftTensor_of_permInv, MIPStarRE.LDT.MakingMeasurementsProjective.qSDD_liftRight_eq_liftLeft_of_permInv, MIPStarRE.LDT.MakingMeasurementsProjective.sddRel_liftRight_of_liftLeft_permInv}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement.completedCloseness_liftRight, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff.ofOrthonormalizeAndCompleteStatements}
+	The inductive-step application of the orthogonalization lemma uses
+	completion on both tensor factors.  Lean records the analytic completion
+	statement on the left register; the shared preliminary helper compares
+	right- and left-tensor placements at the raw \texttt{qSDDCore} level.  Its
+	submeasurement and indexed wrappers transport state-dependent distance to the
+	right register under the permutation-invariance hypothesis on the state.  The
+	remaining two declarations package this transport with the
+	orthonormalize-and-complete output so that the line-156 projectivization
+	handoff can later be produced from the two completed measurements without
+	restating the tensor-factor bookkeeping.
+\end{remark}
+
 \subsection{Naimark dilation}\label{sec:naimark}
 
 \begin{lemma}\label{lem:naimark-helper}
