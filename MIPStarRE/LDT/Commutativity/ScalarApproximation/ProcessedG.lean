@@ -1377,8 +1377,6 @@ private lemma evaluatedSlice_scalar_chain_bound
   let phase5PaperRemoved : EvaluatedSliceQuestion params → Error :=
     evaluatedSlicePhaseFivePaperRemoved params strategy family
   -- Paper lines 101--119 endpoints for the reverse insertions and tail.
-  let phase6FirstRemoved : EvaluatedSliceQuestion params → Error :=
-    evaluatedSlicePhaseSixFirstRemoved params strategy family
   let phase7GonnaCite : EvaluatedSliceQuestion params → Error :=
     evaluatedSlicePhaseSevenGonnaCite params strategy family
   let phase8TailRight : EvaluatedSliceQuestion params → Error :=
@@ -1840,20 +1838,13 @@ private lemma evaluatedSlice_scalar_chain_bound
       _ = |avgOver 𝒟 orderedDefect| := by rw [abs_neg]
       _ ≤ Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) :=
               hordered_abs
-  -- Paper lines 99--102: reverse the first `eq:add-an-a` insertion.
-  have hphase6first :
-      |avgOver 𝒟 phase5PaperRemoved - avgOver 𝒟 phase6FirstRemoved| ≤
-        2 * Real.sqrt zeta := by
-    simpa [𝒟, phase5PaperRemoved, phase6FirstRemoved] using
-      evaluatedSlice_phaseSix_first_reverse_bound
-        params strategy zeta _hnorm family hcombined_fst
-  -- Paper lines 103--104: reverse the second `eq:add-an-a` insertion.
-  have hphase7second :
-      |avgOver 𝒟 phase6FirstRemoved - avgOver 𝒟 phase7GonnaCite| ≤
-        2 * Real.sqrt zeta := by
-    simpa [𝒟, phase6FirstRemoved, phase7GonnaCite] using
-      evaluatedSlice_phaseSeven_second_reverse_bound
-        params strategy zeta _hnorm family hcombined_snd
+  -- Paper lines 99--104: reverse the two `eq:add-an-a` insertions.
+  have hphase67paper :
+      |avgOver 𝒟 phase5PaperRemoved - avgOver 𝒟 phase7GonnaCite| ≤
+        4 * Real.sqrt zeta := by
+    simpa [𝒟, phase5PaperRemoved, phase7GonnaCite] using
+      evaluatedSlice_phaseSixSeven_reverse_bound
+        params strategy zeta _hnorm family hcombined_fst hcombined_snd
   -- Paper line 117--118: first postprocessed self-consistency tail move.
   have htail8 :
       |avgOver 𝒟 phase7GonnaCite - avgOver 𝒟 phase8TailRight| ≤ Real.sqrt zeta := by
@@ -1904,17 +1895,11 @@ private lemma evaluatedSlice_scalar_chain_bound
           (abs_sub_comm (avgOver 𝒟 phase5PaperRemoved)
             (avgOver 𝒟 phase4PaperSwapped)).symm ▸ hphase5paper
         exact le_trans (le_abs_self _) h
-      have h56 : avgOver 𝒟 phase6FirstRemoved - avgOver 𝒟 phase5PaperRemoved ≤
-          2 * Real.sqrt zeta := by
-        have h :=
-          (abs_sub_comm (avgOver 𝒟 phase6FirstRemoved)
-            (avgOver 𝒟 phase5PaperRemoved)).symm ▸ hphase6first
-        exact le_trans (le_abs_self _) h
-      have h67 : avgOver 𝒟 phase7GonnaCite - avgOver 𝒟 phase6FirstRemoved ≤
-          2 * Real.sqrt zeta := by
+      have h57 : avgOver 𝒟 phase7GonnaCite - avgOver 𝒟 phase5PaperRemoved ≤
+          4 * Real.sqrt zeta := by
         have h :=
           (abs_sub_comm (avgOver 𝒟 phase7GonnaCite)
-            (avgOver 𝒟 phase6FirstRemoved)).symm ▸ hphase7second
+            (avgOver 𝒟 phase5PaperRemoved)).symm ▸ hphase67paper
         exact le_trans (le_abs_self _) h
       have h78 : avgOver 𝒟 phase8TailRight - avgOver 𝒟 phase7GonnaCite ≤
           Real.sqrt zeta := by
