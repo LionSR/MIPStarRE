@@ -2210,16 +2210,202 @@ private structure LdSandwichLineOnePointOutcomeSumCSAbsBounds
       ldSandwichLineOnePoint_prefix_movedOutcomeSum params strategy family hi| ≤
       Real.sqrt (commuteGHalfSandwichError params gamma zeta (i + 1))
 
+/-- Ordered half-product appearing in the line-one-point CS step. -/
+private noncomputable def ldSandwichLineOnePointCS_orderedHalf
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    {k i : ℕ} (hi : i < k)
+    (q : SandwichedLineQuestion params k)
+    (gs : GHatTupleOutcome params (i + 1)) : MIPStarRE.Quantum.Op ι :=
+  gHatHalfProductOutcomeOperator params family (i + 1)
+    (fun j => q.2 ⟨j.1, by omega⟩) gs
+
+/-- Rotated half-product appearing after moving the selected slice to the front. -/
+private noncomputable def ldSandwichLineOnePointCS_rotatedHalf
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    {k i : ℕ} (hi : i < k)
+    (q : SandwichedLineQuestion params k)
+    (gs : GHatTupleOutcome params (i + 1)) : MIPStarRE.Quantum.Op ι :=
+  gHatHalfProductOutcomeOperator params family (i + 1)
+    ((pointTupleLastFrontEquiv params i) (fun j => q.2 ⟨j.1, by omega⟩))
+    ((gHatTupleOutcomeLastFrontEquiv params i) gs)
+
+/-- Right-hand complement selected by the completed polynomial outcome. -/
+private noncomputable def ldSandwichLineOnePointCS_rightComplement
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k i : ℕ}
+    (q : SandwichedLineQuestion params k)
+    (gs : GHatTupleOutcome params (i + 1)) : MIPStarRE.Quantum.Op ι :=
+  match Option.map (fun g : Polynomial params => g q.1)
+      (gs ⟨i, Nat.lt_succ_self i⟩) with
+  | none => 0
+  | some a =>
+      1 - ((ldSandwichLineOnePointRightFamily params strategy family k i) q).outcome (some a)
+
+/-- Raw ordered left tensor family used in the generic CS proposition. -/
+private noncomputable def ldSandwichLineOnePointCS_Aord
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    {k i : ℕ} (hi : i < k) :
+    SandwichedLineQuestion params k → GHatTupleOutcome params (i + 1) →
+      MIPStarRE.Quantum.Op (ι × ι) := fun q gs =>
+  leftTensor (ι₂ := ι) (ldSandwichLineOnePointCS_orderedHalf params family hi q gs)
+
+/-- Raw rotated left tensor family used in the generic CS proposition. -/
+private noncomputable def ldSandwichLineOnePointCS_Arot
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    {k i : ℕ} (hi : i < k) :
+    SandwichedLineQuestion params k → GHatTupleOutcome params (i + 1) →
+      MIPStarRE.Quantum.Op (ι × ι) := fun q gs =>
+  leftTensor (ι₂ := ι) (ldSandwichLineOnePointCS_rotatedHalf params family hi q gs)
+
+/-- The $C$ family for the first, right-action CS move. -/
+private noncomputable def ldSandwichLineOnePointCS_Cfirst
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k i : ℕ} (hi : i < k) :
+    SandwichedLineQuestion params k → GHatTupleOutcome params (i + 1) → Unit →
+      MIPStarRE.Quantum.Op (ι × ι) := fun q gs _ =>
+  opTensor (ldSandwichLineOnePointCS_orderedHalf params family hi q gs)ᴴ
+    (ldSandwichLineOnePointCS_rightComplement params strategy family q gs)
+
+/-- The $C$ family for the second, left-action CS move. -/
+private noncomputable def ldSandwichLineOnePointCS_Csecond
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k i : ℕ} (hi : i < k) :
+    SandwichedLineQuestion params k → GHatTupleOutcome params (i + 1) → Unit →
+      MIPStarRE.Quantum.Op (ι × ι) := fun q gs _ =>
+  opTensor (ldSandwichLineOnePointCS_rotatedHalf params family hi q gs)
+    (ldSandwichLineOnePointCS_rightComplement params strategy family q gs)
+
+/-- Raw scalar on the source side of the first CS application. -/
+private noncomputable def ldSandwichLineOnePointCS_firstSourceRaw
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k i : ℕ} (hi : i < k) : Error :=
+  avgOver (uniformDistribution (SandwichedLineQuestion params k)) (fun q =>
+    ∑ gs : GHatTupleOutcome params (i + 1), ∑ u : Unit,
+      ev strategy.state
+        (ldSandwichLineOnePointCS_Aord params family hi q gs *
+          ldSandwichLineOnePointCS_Cfirst params strategy family hi q gs u))
+
+/-- Raw scalar on the target side of the first CS application. -/
+private noncomputable def ldSandwichLineOnePointCS_firstTargetRaw
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k i : ℕ} (hi : i < k) : Error :=
+  avgOver (uniformDistribution (SandwichedLineQuestion params k)) (fun q =>
+    ∑ gs : GHatTupleOutcome params (i + 1), ∑ u : Unit,
+      ev strategy.state
+        (ldSandwichLineOnePointCS_Arot params family hi q gs *
+          ldSandwichLineOnePointCS_Cfirst params strategy family hi q gs u))
+
+/-- Raw scalar on the source side of the second CS application. -/
+private noncomputable def ldSandwichLineOnePointCS_secondSourceRaw
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k i : ℕ} (hi : i < k) : Error :=
+  avgOver (uniformDistribution (SandwichedLineQuestion params k)) (fun q =>
+    ∑ gs : GHatTupleOutcome params (i + 1), ∑ u : Unit,
+      ev strategy.state
+        (ldSandwichLineOnePointCS_Csecond params strategy family hi q gs u *
+          (ldSandwichLineOnePointCS_Aord params family hi q gs)ᴴ))
+
+/-- Raw scalar on the target side of the second CS application. -/
+private noncomputable def ldSandwichLineOnePointCS_secondTargetRaw
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    {k i : ℕ} (hi : i < k) : Error :=
+  avgOver (uniformDistribution (SandwichedLineQuestion params k)) (fun q =>
+    ∑ gs : GHatTupleOutcome params (i + 1), ∑ u : Unit,
+      ev strategy.state
+        (ldSandwichLineOnePointCS_Csecond params strategy family hi q gs u *
+          (ldSandwichLineOnePointCS_Arot params family hi q gs)ᴴ))
+
+/-- Exact low-level inputs needed to turn the generic `closenessOfIP*` lemmas into
+`ld-pasting.tex:964--1010` for the line-one-point bridge.
+
+This package is now the single live residual: it separates the generic CS theorem
+instantiation (proved below) from the remaining paper-specific obligations:
+
+* the adjoint-oriented raw square-distance bound corresponding to the first square
+  root in lines 974--985 and reused in lines 1005--1010;
+* the two unit-side measurement-completeness bounds from lines 986 and 1008;
+* the algebraic regrouping/reindexing that identifies the raw CS scalars with the
+  existing source, intermediate, and moved outcome sums. -/
+private structure LdSandwichLineOnePointCSInputFacts
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    {k i : ℕ} (hi : i < k) : Prop where
+  adjointRawCore :
+    avgOver (uniformDistribution (SandwichedLineQuestion params k))
+      (fun q => qSDDCore strategy.state
+        (fun gs : GHatTupleOutcome params (i + 1) =>
+          (ldSandwichLineOnePointCS_Aord params family hi q gs)ᴴ)
+        (fun gs : GHatTupleOutcome params (i + 1) =>
+          (ldSandwichLineOnePointCS_Arot params family hi q gs)ᴴ)) ≤
+      commuteGHalfSandwichError params gamma zeta (i + 1)
+  firstUnitBound :
+    ∀ q, ∑ gs : GHatTupleOutcome params (i + 1),
+      (∑ u : Unit, ldSandwichLineOnePointCS_Cfirst params strategy family hi q gs u)ᴴ *
+        (∑ u : Unit, ldSandwichLineOnePointCS_Cfirst params strategy family hi q gs u) ≤ 1
+  secondUnitBound :
+    ∀ q, ∑ gs : GHatTupleOutcome params (i + 1),
+      (∑ u : Unit, ldSandwichLineOnePointCS_Csecond params strategy family hi q gs u) *
+        (∑ u : Unit, ldSandwichLineOnePointCS_Csecond params strategy family hi q gs u)ᴴ ≤ 1
+  source_eq_firstSourceRaw :
+    ldSandwichLineOnePoint_prefix_sourceOutcomeSum params strategy family hi =
+      ldSandwichLineOnePointCS_firstSourceRaw params strategy family hi
+  afterFirst_eq_firstTargetRaw :
+    ldSandwichLineOnePoint_prefix_afterFirstCSOutcomeSum params strategy family hi =
+      ldSandwichLineOnePointCS_firstTargetRaw params strategy family hi
+  afterFirst_eq_secondSourceRaw :
+    ldSandwichLineOnePoint_prefix_afterFirstCSOutcomeSum params strategy family hi =
+      ldSandwichLineOnePointCS_secondSourceRaw params strategy family hi
+  moved_eq_secondTargetRaw :
+    ldSandwichLineOnePoint_prefix_movedOutcomeSum params strategy family hi =
+      ldSandwichLineOnePointCS_secondTargetRaw params strategy family hi
+
+/-- Remaining paper-specific input package for the line-one-point CS instantiation. -/
+private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_inputFacts
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0)
+    (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi) :
+    LdSandwichLineOnePointCSInputFacts params strategy family gamma zeta hi := by
+  /- TODO(#835): prove the low-level inputs listed in
+  `LdSandwichLineOnePointCSInputFacts` from `facts.rawCore`,
+  `facts.rawLeftEndpoint`, `facts.rawRightEndpoint`, `facts.prefixOriginalSome`,
+  `facts.movedSome`, and the measurement-completeness bounds for
+  `gHatSandwichFamily` and `ldSandwichLineOnePointRightFamily`.  The adjoint raw
+  square-distance field is the paper's `eq:add-in-the-bot` orientation; the unit
+  fields are lines 986 and 1008 of `references/ldt-paper/ld-pasting.tex`. -/
+  sorry
+
 /-- Narrow residual for the two off-diagonal Cauchy--Schwarz moves in their
 absolute-value `closenessOfIP` output shape.
 
-All surrounding linear-defect, option-outcome, endpoint-collapse, and downstream
-one-sided arithmetic bookkeeping is proved.  The remaining analytic task is to
-instantiate `Preliminaries.closenessOfIPAdjoint` for the first field and
-`Preliminaries.closenessOfIP` for the second field, using `facts.rawCore` as the
-`lem:commute-g-half-sandwich` square-distance term (`ld-pasting.tex:980--986` and
-`1007--1010`) and the measurement/submeasurement bounds for the unit side of
-Cauchy--Schwarz. -/
+The generic applications of `Preliminaries.closenessOfIPAdjoint` and
+`Preliminaries.closenessOfIP` are now proved here.  The only remaining work is the
+paper-specific input package
+`ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_inputFacts`. -/
 private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_abs_bounds
     (params : Parameters)
     [FieldModel params.q]
@@ -2229,13 +2415,42 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_abs_bounds
     {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0)
     (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi) :
     LdSandwichLineOnePointOutcomeSumCSAbsBounds params strategy family gamma zeta hi := by
-  /- TODO(#835): instantiate `closenessOfIPAdjoint` and `closenessOfIP` in the
-  absolute-value form above, preserving the two `√ν₄` constants.  The strategy
-  normalization, `uniformDistribution_weight_sum_le_one`, and the measurement
-  completeness/unit-side bounds discharge the generic hypotheses of those
-  preliminaries; `hi0` and `facts.rawCore` / endpoint fields supply the
-  nonempty-prefix and raw half-product data needed for the instantiations. -/
-  sorry
+  let 𝒟 : Distribution (SandwichedLineQuestion params k) :=
+    uniformDistribution (SandwichedLineQuestion params k)
+  have h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1 := by
+    simpa [𝒟] using uniformDistribution_weight_sum_le_one (SandwichedLineQuestion params k)
+  have inputFacts :=
+    ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_inputFacts
+      params strategy family gamma zeta hi hi0 facts
+  refine ⟨?_, ?_⟩
+  · have hfirst :=
+      Preliminaries.closenessOfIPAdjoint
+        strategy.state strategy.isNormalized 𝒟 h𝒟
+        (ldSandwichLineOnePointCS_Aord params family hi)
+        (ldSandwichLineOnePointCS_Arot params family hi)
+        (ldSandwichLineOnePointCS_Cfirst params strategy family hi)
+        (commuteGHalfSandwichError params gamma zeta (i + 1))
+        (by simpa [𝒟] using inputFacts.adjointRawCore)
+        inputFacts.firstUnitBound
+    rw [inputFacts.source_eq_firstSourceRaw, inputFacts.afterFirst_eq_firstTargetRaw]
+    simpa [ldSandwichLineOnePointCS_firstSourceRaw,
+      ldSandwichLineOnePointCS_firstTargetRaw, 𝒟] using hfirst
+  · have hsecond :=
+      Preliminaries.closenessOfIP
+        strategy.state strategy.isNormalized 𝒟 h𝒟
+        (fun (q : SandwichedLineQuestion params k)
+            (gs : GHatTupleOutcome params (i + 1)) =>
+          (ldSandwichLineOnePointCS_Aord params family hi q gs)ᴴ)
+        (fun (q : SandwichedLineQuestion params k)
+            (gs : GHatTupleOutcome params (i + 1)) =>
+          (ldSandwichLineOnePointCS_Arot params family hi q gs)ᴴ)
+        (ldSandwichLineOnePointCS_Csecond params strategy family hi)
+        (commuteGHalfSandwichError params gamma zeta (i + 1))
+        (by simpa [𝒟] using inputFacts.adjointRawCore)
+        inputFacts.secondUnitBound
+    rw [inputFacts.afterFirst_eq_secondSourceRaw, inputFacts.moved_eq_secondTargetRaw]
+    simpa [ldSandwichLineOnePointCS_secondSourceRaw,
+      ldSandwichLineOnePointCS_secondTargetRaw, 𝒟] using hsecond
 
 /-- One-sided route for the two off-diagonal Cauchy--Schwarz moves in
 `ld-pasting.tex:964--1010`.
