@@ -1,5 +1,5 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain
 import MIPStarRE.LDT.MainInductionStep.Theorems
+import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain
 import MIPStarRE.LDT.Preliminaries.ComparisonProjective
 import MIPStarRE.LDT.Preliminaries.Triangles
 import MIPStarRE.LDT.Test.ErrorCascade
@@ -759,14 +759,38 @@ structure MainFormalCascadeUnsymmetrizedPOVMTargets
       (polynomialEvaluationFamily params rightPOVM.toSubMeas)
       (2 * scalars.sigma)
 
+namespace MainFormalCascadeUnsymmetrizedPOVMTargets
+
+/-- Build the line-97--109 unsymmetrized POVM target package from the standalone
+Step 3 bridge package.
+
+The extracted POVMs are definitionally the principal role blocks
+`unsymmetrizedLeftPOVM G` and `unsymmetrizedRightPOVM G` supplied by
+`MIPStarRE.LDT.Test.Unsymmetrization`; the two consistency fields are exactly the
+factor-two estimates recorded in `UnsymmetrizationBridgePackage`. -/
+noncomputable def ofUnsymmetrizationBridge
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (G : Measurement (Polynomial params) (Role × ι))
+    (bridge : UnsymmetrizationBridgePackage params strategy G scalars.sigma) :
+    MainFormalCascadeUnsymmetrizedPOVMTargets params strategy eps k scalars where
+  leftPOVM := unsymmetrizedLeftPOVM G
+  rightPOVM := unsymmetrizedRightPOVM G
+  leftPOVMPointBConsistency := bridge.pointBConsistency
+  pointARightPOVMConsistency := bridge.pointAConsistency
+
+end MainFormalCascadeUnsymmetrizedPOVMTargets
+
 /-- The geometry/transport part of the remaining Section 3 assembly at the exact
 cascade errors.
 
 Compared with `MainFormalNativeTargets`, this package removes the final Step 8
 weakening obligations: the point and self-consistency errors are fixed to the
-paper's cascade quantities derived from `MainFormalCascadeScalars`.  The
-completion residual below now factors the construction further through the
-landed unsymmetrization and line-156 projectivization APIs. -/
+paper's cascade quantities derived from `MainFormalCascadeScalars`. Constructing
+this package is still the substantive unsymmetrization, Schwartz--Zippel, and
+projectivization work of `inductive_step.tex` lines 84--185. -/
 structure MainFormalCascadeTargets
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -802,9 +826,9 @@ cascade has been discharged.
 Compared with `MainFormalCascadeTargets`, this package is parameterized by an
 already-constructed `MainFormalCascadeScalars`. The field shapes intentionally
 mirror the transport fields of `MainFormalCascadeTargets`, so downstream changes
-to the native `ConsRel` targets should keep the two records synchronized.  It is
-the transport-only target reached after the Step 5 and line-156 conversion
-lemmas have been applied. -/
+to the native `ConsRel` targets should keep the two records synchronized. It
+therefore records only the unsymmetrization, Schwartz--Zippel, and
+projectivization targets from `inductive_step.tex` lines 84--185. -/
 structure MainFormalCascadeTransportTargets
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -887,27 +911,6 @@ theorem fullSelfConsistency {params : Parameters} [FieldModel params.q]
 end MainFormalCascadePreProjectiveSelfConsistency
 
 namespace MainFormalCascadeUnsymmetrizedPOVMTargets
-
-/-- Build the line-97--109 unsymmetrized POVM targets from the dedicated
-role-register unsymmetrization bridge.
-
-The bridge package stores the Section 6 role-register measurement `G` together
-with the two factor-two consistency links obtained by extracting its Alice and
-Bob role blocks.  This constructor exposes those extracted blocks in the
-`MainFormalCascadeUnsymmetrizedPOVMTargets` shape consumed by the line-116
-triangle step. -/
-noncomputable def ofUnsymmetrizationBridge
-    {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
-    {scalars : MainFormalCascadeScalars params eps k}
-    (G : Measurement (Polynomial params) (Role × ι))
-    (bridge : UnsymmetrizationBridgePackage params strategy G scalars.sigma) :
-    MainFormalCascadeUnsymmetrizedPOVMTargets params strategy eps k scalars where
-  leftPOVM := unsymmetrizedLeftPOVM G
-  rightPOVM := unsymmetrizedRightPOVM G
-  leftPOVMPointBConsistency := bridge.pointBConsistency
-  pointARightPOVMConsistency := bridge.pointAConsistency
 
 /-- Paper line 116 from the two unsymmetrized consistency estimates and the
 original point-measurement agreement.
@@ -1068,64 +1071,15 @@ noncomputable def toTransportTargets {params : Parameters} [FieldModel params.q]
 
 end MainFormalCascadeProjectiveStageTargets
 
-/-- Narrow residual for the completion and point-transport part of `mainFormal`.
+/-- Paper-faithful residual for the projective assembly after the line-116
+triangle step has been factored out.
 
-This is the current live target after wiring in two landed APIs: the
-role-register unsymmetrization bridge supplies the two factor-two links for the
-extracted POVMs, and `ProjectivizationLine156Handoff.line156Approx` supplies the
-line-156 `≈_{ζ₃}` relation from pre-projective consistency plus the two `ζ₂`
-completion closeness estimates.  Here "completion residual" denotes the
-completion-plus-point-transport package: the remaining fields therefore choose
-the role-register measurement, the final projective measurements, the two native
-point-consistency targets, and the two completion closeness estimates. -/
-structure MainFormalCascadeProjectiveCompletionResidual
-    (params : Parameters) [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
-    (scalars : MainFormalCascadeScalars params eps k) where
-  /-- The role-register polynomial measurement returned by Section 6. -/
-  G : Measurement (Polynomial params) (Role × ι)
-  /-- The checked Step 3 unsymmetrization package for `G`. -/
-  bridge : UnsymmetrizationBridgePackage params strategy G scalars.sigma
-  /-- The projective measurement denoted $Q^{\mathrm A}$ in the paper. -/
-  leftMeasurement : ProjMeas (Polynomial params) ι
-  /-- The projective measurement denoted $Q^{\mathrm B}$ in the paper. -/
-  rightMeasurement : ProjMeas (Polynomial params) ι
-  /-- Native form of `eq:one-goal` at the paper-defined `ζ₄`. -/
-  pointAConsistency :
-    ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      (polynomialEvaluationFamily params rightMeasurement.toSubMeas)
-      scalars.zeta4
-  /-- Native form of `eq:another-goal` at the paper-defined `ζ₄`. -/
-  pointBConsistency :
-    ConsRel strategy.state (uniformDistribution (Point params))
-      (polynomialEvaluationFamily params leftMeasurement.toSubMeas)
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-      scalars.zeta4
-  /-- Left-register completion closeness at the paper-defined `ζ₂`. -/
-  leftCompletionCloseness :
-    SDDRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily (unsymmetrizedLeftPOVM G).toSubMeas.liftLeft)
-      (constSubMeasFamily leftMeasurement.toSubMeas.liftLeft)
-      scalars.zeta2
-  /-- Right-register completion closeness at the paper-defined `ζ₂`. -/
-  rightCompletionCloseness :
-    SDDRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily (unsymmetrizedRightPOVM G).toSubMeas.liftRight)
-      (constSubMeasFamily rightMeasurement.toSubMeas.liftRight)
-      scalars.zeta2
-
-/-- Intermediate projective-assembly package after the line-116 triangle step has
-been factored out.
-
-This record is the input shape consumed by `toProjectiveStageTargets`: it stores
-the unsymmetrized `G^A,G^B` POVMs, the two native `ζ₄` point-consistency goals,
-and a line-156 `≈_{ζ₃}` bridge out of the Step 5 full-polynomial consistency.
-The finer `MainFormalCascadeProjectiveCompletionResidual` constructs this shape
-from the dedicated unsymmetrization bridge and the line-156 projective handoff
-API, so the live `mainFormal` residual no longer treats those conversions as
-opaque obligations. -/
+This package asks for the unsymmetrized `G^A,G^B` POVMs with their two `2σ`
+links (`inductive_step.tex` lines 97--109), then records the still-open
+projectivization/completion and point-transport outputs from lines 135--185:
+the line-156 `≈_{ζ₃}` bridge and the two native `ζ₄` point-consistency goals.
+The theorem `toProjectiveStageTargets` proves the line-116 pre-projective
+self-consistency from these fields and the low-individual-degree pass hypothesis. -/
 structure MainFormalCascadeProjectiveAssemblyResidual
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -1190,52 +1144,339 @@ noncomputable def toProjectiveStageTargets
 
 end MainFormalCascadeProjectiveAssemblyResidual
 
-namespace MainFormalCascadeProjectiveCompletionResidual
+/-- A constant full-polynomial consistency statement postprocesses to pointwise
+polynomial evaluation with the same error.
 
-/-- Convert the completion-and-point residual into the coarser projective assembly
-residual.
+This is the data-processing move used after paper line 156: once
+`Q^A_g \otimes I \simeq I \otimes Q^B_g` is available over the single
+polynomial question, evaluating both polynomial outcomes at a point `u` preserves
+consistency over the uniform point distribution. -/
+private theorem consRel_constPolynomialEvaluation
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState (ι × ι))
+    (A B : Measurement (Polynomial params) ι) {δ : Error}
+    (h : ConsRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A.toSubMeas)
+      (constSubMeasFamily B.toSubMeas) δ) :
+    ConsRel ψ (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params A.toSubMeas)
+      (polynomialEvaluationFamily params B.toSubMeas) δ := by
+  classical
+  let Aconst : IdxSubMeas (Point params) (Polynomial params) ι := fun _ => A.toSubMeas
+  let Bconst : IdxSubMeas (Point params) (Polynomial params) ι := fun _ => B.toSubMeas
+  have hconstPoint :
+      ConsRel ψ (uniformDistribution (Point params)) Aconst Bconst δ := by
+    rcases h with ⟨hbound⟩
+    constructor
+    have hpoint_avg :
+        avgOver (uniformDistribution (Point params))
+            (fun _ : Point params => qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas) =
+          qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas := by
+      haveI : Nonempty (Point params) := by infer_instance
+      simpa using
+        (avgOver_uniform_const (α := Point params)
+          (qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas))
+    have hunit_eq :
+        bipartiteConsError ψ (uniformDistribution Unit)
+            (constSubMeasFamily A.toSubMeas) (constSubMeasFamily B.toSubMeas) =
+          qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas := by
+      have hunit_avg :
+          avgOver (uniformDistribution Unit)
+              (fun _ : Unit => qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas) =
+            qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas := by
+        simpa using
+          (avgOver_uniform_const (α := Unit)
+            (qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas))
+      simpa [bipartiteConsError, constSubMeasFamily] using hunit_avg
+    calc
+      bipartiteConsError ψ (uniformDistribution (Point params)) Aconst Bconst
+          = avgOver (uniformDistribution (Point params))
+              (fun _ : Point params => qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas) := by
+            rfl
+      _ = qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas := hpoint_avg
+      _ = bipartiteConsError ψ (uniformDistribution Unit)
+            (constSubMeasFamily A.toSubMeas) (constSubMeasFamily B.toSubMeas) :=
+            hunit_eq.symm
+      _ ≤ δ := hbound
+  have hprocessed :=
+    Preliminaries.consRelDataProcessing_questionDependent ψ
+      (uniformDistribution (Point params)) Aconst Bconst δ (fun u g => g u) hconstPoint
+  simpa [Aconst, Bconst, polynomialEvaluationFamily, evaluateAt] using hprocessed
 
-The construction is purely connective tissue.  It first exposes the two
-unsymmetrized POVMs through `ofUnsymmetrizationBridge`, and then applies the
-checked `ProjectivizationLine156Handoff.line156Approx` theorem to the
-pre-projective consistency input, the two completion closeness fields, and the
-projective measurements chosen by the residual. -/
+/-- Turn a line-156 projective approximation into the evaluated consistency used
+in the final point-consistency triangles.
+
+The proof first applies the projective converse of `prop:simeq-to-approx` at the
+polynomial level, then uses question-dependent data processing to evaluate both
+projective polynomial measurements at each point. -/
+private theorem projectiveEvaluationConsistency_ofLine156
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState (ι × ι)}
+    (Q_A Q_B : ProjMeas (Polynomial params) ι) {ζ₃ : Error}
+    (hline : Preliminaries.BipartiteSDDRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily Q_A.toSubMeas)
+      (constSubMeasFamily Q_B.toSubMeas) ζ₃) :
+    ConsRel ψ (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params Q_A.toSubMeas)
+      (polynomialEvaluationFamily params Q_B.toSubMeas) (ζ₃ / 2) := by
+  let leftConst : IdxProjMeas Unit (Polynomial params) ι := fun _ => Q_A
+  let rightConst : IdxProjMeas Unit (Polynomial params) ι := fun _ => Q_B
+  have happrox :
+      Preliminaries.BipartiteSDDRel ψ (uniformDistribution Unit)
+        (IdxProjMeas.toIdxSubMeas leftConst)
+        (IdxProjMeas.toIdxSubMeas rightConst) (2 * (ζ₃ / 2)) := by
+    change Preliminaries.BipartiteSDDRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily Q_A.toSubMeas) (constSubMeasFamily Q_B.toSubMeas)
+      (2 * (ζ₃ / 2))
+    convert hline using 1
+    ring
+  have hcons :=
+    Preliminaries.approxToSimeq ψ (uniformDistribution Unit)
+      leftConst rightConst (ζ₃ / 2) happrox
+  simpa [leftConst, rightConst, constSubMeasFamily, IdxProjMeas.toIdxSubMeas]
+    using consRel_constPolynomialEvaluation ψ Q_A.toMeasurement Q_B.toMeasurement hcons
+
+/-- Residual after wiring the merged Step 3 and line-156 projectivization packages.
+
+This package is narrower than `MainFormalCascadeProjectiveAssemblyResidual`:
+
+* the unsymmetrized POVMs must be the actual role blocks of a role-register
+  measurement `G`, with the two factor-two bounds supplied by
+  `UnsymmetrizationBridgePackage`;
+* the line-156 approximation must come from
+  `MakingMeasurementsProjective.ProjectivizationLine156Handoff`;
+* the remaining point-transport work is isolated to the two line-172 style
+  evaluated `ζ₁` links from the completed projective measurements back to the
+  pre-projective role blocks.  The two native `ζ₄` point goals are then proved
+  below by the paper's `prop:simeq-triangle-inequality` route. -/
+structure MainFormalCascadeProjectiveHandoffResidual
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (scalars : MainFormalCascadeScalars params eps k) where
+  /-- The role-register polynomial POVM produced by the Section 6 induction call. -/
+  roleMeasurement : Measurement (Polynomial params) (Role × ι)
+  /-- Step 3: role-block extraction plus the two factor-two estimates. -/
+  unsymmetrization :
+    UnsymmetrizationBridgePackage params strategy roleMeasurement scalars.sigma
+  /-- The completed projective measurement denoted $Q^{\mathrm A}$. -/
+  leftMeasurement : ProjMeas (Polynomial params) ι
+  /-- The completed projective measurement denoted $Q^{\mathrm B}$. -/
+  rightMeasurement : ProjMeas (Polynomial params) ι
+  /-- Step 6 line-156 handoff from pre-projective consistency and completion closeness. -/
+  projectivization :
+    MakingMeasurementsProjective.ProjectivizationLine156Handoff strategy.state
+      (unsymmetrizedLeftPOVM roleMeasurement) (unsymmetrizedRightPOVM roleMeasurement)
+      leftMeasurement rightMeasurement scalars.zeta1 scalars.zeta2
+  /-- Paper line 172: after evaluating at a point,
+  $Q^{\mathrm A}_{[g(u)=a]}\otimes I \simeq_{\zeta_1}
+  I\otimes G^{\mathrm B}_{[g(u)=a]}$. -/
+  leftProjectiveRightPOVMConsistency :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params leftMeasurement.toSubMeas)
+      (polynomialEvaluationFamily params (unsymmetrizedRightPOVM roleMeasurement).toSubMeas)
+      scalars.zeta1
+  /-- The Bob-role analogue of paper line 172, used for `eq:another-goal`. -/
+  rightProjectiveLeftPOVMConsistency :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params rightMeasurement.toSubMeas)
+      (polynomialEvaluationFamily params (unsymmetrizedLeftPOVM roleMeasurement).toSubMeas)
+      scalars.zeta1
+
+namespace MainFormalCascadeProjectiveHandoffResidual
+
+/-- Evaluated version of the projective self-consistency from the line-156 handoff. -/
+theorem projectiveEvaluationConsistency
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (residual : MainFormalCascadeProjectiveHandoffResidual params strategy eps k scalars) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params residual.leftMeasurement.toSubMeas)
+      (polynomialEvaluationFamily params residual.rightMeasurement.toSubMeas)
+      (scalars.zeta3 / 2) := by
+  have hlineRaw :=
+    MakingMeasurementsProjective.ProjectivizationLine156Handoff.line156Approx
+      residual.projectivization
+  have hline :
+      Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily residual.leftMeasurement.toSubMeas)
+        (constSubMeasFamily residual.rightMeasurement.toSubMeas) scalars.zeta3 := by
+    simpa [MainFormalCascadeScalars.zeta3, cascadeZeta3] using hlineRaw
+  exact projectiveEvaluationConsistency_ofLine156
+    residual.leftMeasurement residual.rightMeasurement hline
+
+/-- Derive paper `eq:one-goal` from `eq:cons-b`, line 172, and evaluated line 164. -/
+theorem pointAConsistency
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (residual : MainFormalCascadeProjectiveHandoffResidual params strategy eps k scalars) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (polynomialEvaluationFamily params residual.rightMeasurement.toSubMeas)
+      scalars.zeta4 := by
+  let pointA : IdxMeas (Point params) (Fq params) ι :=
+    IdxProjMeas.toIdxMeas strategy.pointMeasurementA
+  let rightG : IdxMeas (Point params) (Fq params) ι :=
+    polynomialEvaluationMeasurementFamily params
+      (unsymmetrizedRightPOVM residual.roleMeasurement)
+  let leftQ : IdxMeas (Point params) (Fq params) ι :=
+    polynomialEvaluationMeasurementFamily params residual.leftMeasurement.toMeasurement
+  let rightQ : IdxMeas (Point params) (Fq params) ι :=
+    polynomialEvaluationMeasurementFamily params residual.rightMeasurement.toMeasurement
+  have hAB : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxMeas.toIdxSubMeas pointA) (IdxMeas.toIdxSubMeas rightG)
+      (2 * scalars.sigma) := by
+    change ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (polynomialEvaluationFamily params
+        (unsymmetrizedRightPOVM residual.roleMeasurement).toSubMeas)
+      (2 * scalars.sigma)
+    exact residual.unsymmetrization.pointAConsistency
+  have hCB : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxMeas.toIdxSubMeas leftQ) (IdxMeas.toIdxSubMeas rightG)
+      scalars.zeta1 := by
+    change ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params residual.leftMeasurement.toSubMeas)
+      (polynomialEvaluationFamily params
+        (unsymmetrizedRightPOVM residual.roleMeasurement).toSubMeas)
+      scalars.zeta1
+    exact residual.leftProjectiveRightPOVMConsistency
+  have hCD : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxMeas.toIdxSubMeas leftQ) (IdxMeas.toIdxSubMeas rightQ)
+      (scalars.zeta3 / 2) := by
+    change ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params residual.leftMeasurement.toSubMeas)
+      (polynomialEvaluationFamily params residual.rightMeasurement.toSubMeas)
+      (scalars.zeta3 / 2)
+    exact residual.projectiveEvaluationConsistency
+  have htriangle :=
+    Preliminaries.simeqTriangleInequality strategy.state
+      (uniformDistribution (Point params)) strategy.isNormalized
+      (uniformDistribution_weight_sum_le_one (Point params))
+      pointA rightG leftQ rightQ
+      (2 * scalars.sigma) scalars.zeta1 (scalars.zeta3 / 2)
+      hAB hCB hCD
+  simpa [pointA, rightG, leftQ, rightQ, polynomialEvaluationMeasurementFamily,
+    MainFormalCascadeScalars.zeta4, cascadeZeta4] using htriangle
+
+/-- Derive paper `eq:another-goal` by the Bob-role mirror of the `eq:one-goal`
+triangle, using swap symmetry to orient the intermediate consistency relations. -/
+theorem pointBConsistency
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (residual : MainFormalCascadeProjectiveHandoffResidual params strategy eps k scalars) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params residual.leftMeasurement.toSubMeas)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+      scalars.zeta4 := by
+  let pointB : IdxMeas (Point params) (Fq params) ι :=
+    IdxProjMeas.toIdxMeas strategy.pointMeasurementB
+  let leftG : IdxMeas (Point params) (Fq params) ι :=
+    polynomialEvaluationMeasurementFamily params
+      (unsymmetrizedLeftPOVM residual.roleMeasurement)
+  let rightQ : IdxMeas (Point params) (Fq params) ι :=
+    polynomialEvaluationMeasurementFamily params residual.rightMeasurement.toMeasurement
+  let leftQ : IdxMeas (Point params) (Fq params) ι :=
+    polynomialEvaluationMeasurementFamily params residual.leftMeasurement.toMeasurement
+  have hLeftGPointB : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxMeas.toIdxSubMeas leftG) (IdxMeas.toIdxSubMeas pointB)
+      (2 * scalars.sigma) := by
+    change ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params
+        (unsymmetrizedLeftPOVM residual.roleMeasurement).toSubMeas)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+      (2 * scalars.sigma)
+    exact residual.unsymmetrization.pointBConsistency
+  have hAB : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxMeas.toIdxSubMeas pointB) (IdxMeas.toIdxSubMeas leftG)
+      (2 * scalars.sigma) := by
+    exact consRel_symm_of_density_fixed strategy.state strategy.densityFixed
+      (uniformDistribution (Point params)) (IdxMeas.toIdxSubMeas leftG)
+      (IdxMeas.toIdxSubMeas pointB) (2 * scalars.sigma) hLeftGPointB
+  have hCB : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxMeas.toIdxSubMeas rightQ) (IdxMeas.toIdxSubMeas leftG)
+      scalars.zeta1 := by
+    change ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params residual.rightMeasurement.toSubMeas)
+      (polynomialEvaluationFamily params
+        (unsymmetrizedLeftPOVM residual.roleMeasurement).toSubMeas)
+      scalars.zeta1
+    exact residual.rightProjectiveLeftPOVMConsistency
+  have hLeftQRightQ : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxMeas.toIdxSubMeas leftQ) (IdxMeas.toIdxSubMeas rightQ)
+      (scalars.zeta3 / 2) := by
+    change ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params residual.leftMeasurement.toSubMeas)
+      (polynomialEvaluationFamily params residual.rightMeasurement.toSubMeas)
+      (scalars.zeta3 / 2)
+    exact residual.projectiveEvaluationConsistency
+  have hCD : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxMeas.toIdxSubMeas rightQ) (IdxMeas.toIdxSubMeas leftQ)
+      (scalars.zeta3 / 2) := by
+    exact consRel_symm_of_density_fixed strategy.state strategy.densityFixed
+      (uniformDistribution (Point params)) (IdxMeas.toIdxSubMeas leftQ)
+      (IdxMeas.toIdxSubMeas rightQ) (scalars.zeta3 / 2) hLeftQRightQ
+  have htriangle : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxMeas.toIdxSubMeas pointB) (IdxMeas.toIdxSubMeas leftQ)
+      scalars.zeta4 := by
+    have hraw :=
+      Preliminaries.simeqTriangleInequality strategy.state
+        (uniformDistribution (Point params)) strategy.isNormalized
+        (uniformDistribution_weight_sum_le_one (Point params))
+        pointB leftG rightQ leftQ
+        (2 * scalars.sigma) scalars.zeta1 (scalars.zeta3 / 2)
+        hAB hCB hCD
+    simpa [MainFormalCascadeScalars.zeta4, cascadeZeta4] using hraw
+  have htarget :=
+    consRel_symm_of_density_fixed strategy.state strategy.densityFixed
+      (uniformDistribution (Point params)) (IdxMeas.toIdxSubMeas pointB)
+      (IdxMeas.toIdxSubMeas leftQ) scalars.zeta4 htriangle
+  simpa [pointB, leftG, rightQ, leftQ, polynomialEvaluationMeasurementFamily] using htarget
+
+/-- Assemble the previous projective-assembly residual from the narrower handoff
+residual using the checked Step 3, line-156, and point-triangle wrappers above. -/
 noncomputable def toProjectiveAssemblyResidual
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
-    (residual :
-      MainFormalCascadeProjectiveCompletionResidual params strategy eps k scalars) :
+    (residual : MainFormalCascadeProjectiveHandoffResidual params strategy eps k scalars) :
     MainFormalCascadeProjectiveAssemblyResidual params strategy eps k scalars where
   unsymmetrized :=
     MainFormalCascadeUnsymmetrizedPOVMTargets.ofUnsymmetrizationBridge
-      (G := residual.G) residual.bridge
+      residual.roleMeasurement residual.unsymmetrization
   leftMeasurement := residual.leftMeasurement
   rightMeasurement := residual.rightMeasurement
   pointAConsistency := residual.pointAConsistency
   pointBConsistency := residual.pointBConsistency
   line156Approx := by
     intro hpre
-    let handoff :
-        MakingMeasurementsProjective.ProjectivizationLine156Handoff strategy.state
-          (unsymmetrizedLeftPOVM residual.G)
-          (unsymmetrizedRightPOVM residual.G)
-          residual.leftMeasurement residual.rightMeasurement
-          scalars.zeta1 scalars.zeta2 :=
-      { preProjectiveConsistency := by
-          simpa [MainFormalCascadeUnsymmetrizedPOVMTargets.ofUnsymmetrizationBridge]
-            using hpre
-        leftCompletionCloseness := residual.leftCompletionCloseness
-        rightCompletionCloseness := residual.rightCompletionCloseness }
+    have hpre' : ConsRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily (unsymmetrizedLeftPOVM residual.roleMeasurement).toSubMeas)
+        (constSubMeasFamily (unsymmetrizedRightPOVM residual.roleMeasurement).toSubMeas)
+        scalars.zeta1 := by
+      simpa [MainFormalCascadeUnsymmetrizedPOVMTargets.ofUnsymmetrizationBridge]
+        using hpre
+    let handoff : MakingMeasurementsProjective.ProjectivizationLine156Handoff
+        strategy.state (unsymmetrizedLeftPOVM residual.roleMeasurement)
+        (unsymmetrizedRightPOVM residual.roleMeasurement)
+        residual.leftMeasurement residual.rightMeasurement scalars.zeta1 scalars.zeta2 :=
+      { preProjectiveConsistency := hpre'
+        leftCompletionCloseness := residual.projectivization.leftCompletionCloseness
+        rightCompletionCloseness := residual.projectivization.rightCompletionCloseness }
     have hline :=
       MakingMeasurementsProjective.ProjectivizationLine156Handoff.line156Approx handoff
-    have hzeta3 : scalars.zeta3 = 6 * scalars.zeta1 + 6 * scalars.zeta2 := by
-      rfl
-    rw [hzeta3]
-    exact hline
+    simpa [MainFormalCascadeScalars.zeta3, cascadeZeta3] using hline
 
-end MainFormalCascadeProjectiveCompletionResidual
+end MainFormalCascadeProjectiveHandoffResidual
 
 namespace MainFormalCascadeTransportTargets
 
@@ -1272,9 +1513,9 @@ three consistency fields are exactly the native conclusions reached in
 
 The two bound fields record the already-formalized Step 8 absorption of
 `\zeta_4` and `\zeta_3/2` into `mainFormalError`. Constructing this package from
-Section 6 and the remaining completion/point-transport package is the live
-residual; the projection theorem below is only the final paper-faithful packaging
-step. -/
+Section 6 and the unsymmetrization / Schwartz--Zippel / projectivization chain is
+the live residual; the projection theorem below is only the final paper-faithful
+packaging step. -/
 structure MainFormalNativeTargets
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -1425,29 +1666,31 @@ theorem mainFormal
   --   `mainFormalSuccessorMainInductionPublicWrapper`, and
   -- * vacuous branch: `mainFormal_trivial_witness`.
   --
-  -- The remaining paper-faithful target is now narrowed past the role-register
-  -- unsymmetrization bridge, the Step 5 Schwartz--Zippel handoff, the line-116
-  -- triangle step, and the line-156 projective approximation conversion to the
-  -- completion/point-transport residual
-  -- `MainFormalCascadeProjectiveCompletionResidual`. The scalar cascade side
+  -- The remaining paper-faithful target is now narrowed past the Step 5
+  -- Schwartz--Zippel handoff, the line-116 triangle step, the Step 3 role-block
+  -- extraction package, the line-156 projectivization handoff, and the final
+  -- `ζ₄` point-triangle assembly to the finer handoff residual
+  -- `MainFormalCascadeProjectiveHandoffResidual`. The scalar cascade side
   -- conditions are discharged below: if `mainFormalError ≥ 1`, the theorem is
   -- vacuous; otherwise the pass condition gives `0 ≤ ε`, while
-  -- `mainFormalError < 1` rules out `ε > 1` and `d > q`. Producing the
-  -- completion residual still depends on the active upstream residuals: the
-  -- full-slice transport chain (#601), the remaining `fromHToG` pasting bridge
-  -- (#707), the reverse `overAllOutcomes` aggregation (#672), and the ProcessedG
-  -- scalar follow-ups #714, #715, #732, and #759.
+  -- `mainFormalError < 1` rules out `ε > 1` and `d > q`. Producing the handoff
+  -- residual still depends on the active upstream residuals: the factor-two
+  -- role unsymmetrization bridge (#424), projectivization/completion closeness
+  -- and line-172 transport links (#426), the full-slice transport chain (#601),
+  -- the remaining `fromHToG` pasting bridge (#707), the reverse `overAllOutcomes`
+  -- aggregation (#672), and the ProcessedG scalar follow-ups #714, #715, #732,
+  -- and #759.
   by_cases herr : 1 ≤ mainFormalError params k eps
   · exact mainFormal_trivial_witness params strategy eps k herr
   · have hepsNN : 0 ≤ eps := ProjStrat.eps_nonneg_of_passes hpass
     let scalars : MainFormalCascadeScalars params eps k :=
       MainFormalCascadeScalars.ofNontrivialMainFormal hepsNN hk0 herr
-    have completionResidual :
-        MainFormalCascadeProjectiveCompletionResidual params strategy eps k scalars := by
+    have projectiveHandoffResidual :
+        MainFormalCascadeProjectiveHandoffResidual params strategy eps k scalars := by
       sorry
     have projectiveResidual :
         MainFormalCascadeProjectiveAssemblyResidual params strategy eps k scalars :=
-      completionResidual.toProjectiveAssemblyResidual
+      projectiveHandoffResidual.toProjectiveAssemblyResidual
     have projectiveTargets :
         MainFormalCascadeProjectiveStageTargets params strategy eps k scalars :=
       projectiveResidual.toProjectiveStageTargets hpass

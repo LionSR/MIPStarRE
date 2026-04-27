@@ -528,15 +528,12 @@ assembly residual:
 \lean{MIPStarRE.LDT.Test.mainFormalInductionNu_bound, MIPStarRE.LDT.Test.cascadeHypotheses_of_not_mainFormalError_ge_one}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeScalars.ofCascadeHypotheses, MIPStarRE.LDT.Test.MainFormalCascadeScalars.ofNontrivialMainFormal}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadePreProjectiveSelfConsistency, MIPStarRE.LDT.Test.MainFormalCascadePreProjectiveSelfConsistency.fullSelfConsistency}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeUnsymmetrizedPOVMTargets}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeUnsymmetrizedPOVMTargets.ofUnsymmetrizationBridge}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeUnsymmetrizedPOVMTargets.toPreProjectiveSelfConsistency}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionResidual}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionResidual.toProjectiveAssemblyResidual}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeUnsymmetrizedPOVMTargets, MIPStarRE.LDT.Test.MainFormalCascadeUnsymmetrizedPOVMTargets.ofUnsymmetrizationBridge, MIPStarRE.LDT.Test.MainFormalCascadeUnsymmetrizedPOVMTargets.toPreProjectiveSelfConsistency}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveStageTargets, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveStageTargets.toTransportTargets}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveAssemblyResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveAssemblyResidual.toProjectiveStageTargets}
 \lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndCompleteError, MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndComplete}
 \lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff.line156Approx}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.projectiveEvaluationConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.pointAConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.pointBConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.toProjectiveAssemblyResidual}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeTransportTargets, MIPStarRE.LDT.Test.MainFormalCascadeTransportTargets.toCascadeTargets, MIPStarRE.LDT.Test.MainFormalCascadeTargets.toNativeTargets}
 They split off the vacuous branch where the theorem error is at least $1$,
 derive the Step~8 scalar hypotheses in the non-vacuous branch, use the proved
@@ -545,15 +542,17 @@ to full-polynomial consistency at $\zeta_1$, prove the paper line-116 triangle
 step from the two unsymmetrized $2\sigma$ links plus the original $3\eps$ point
 agreement, and reduce the line-156 $\approx_{\zeta_3}$ projectivization bridge
 to the named Step~6 handoff package: pre-projective consistency plus left/right
-completion closeness at $\zeta_2$.  The remaining residual is the finer
-\texttt{MainFormalCascadeProjectiveCompletionResidual}: it still contains the
-role-register measurement $G$, its unsymmetrization bridge, the two completed
-projective measurements, the two $\zeta_4$ point-consistency goals, and the
-$\zeta_2$ completion closeness data needed by the named line-156 handoff. Lean
-then converts the resulting projective self-consistency to
+completion closeness at $\zeta_2$.  Lean also derives the evaluated line-164
+projective consistency by data processing and proves the two native $\zeta_4$
+point goals from the line-172 style $\zeta_1$ links via
+\texttt{simeq-triangle-inequality}.  The remaining residual is the finer
+\texttt{MainFormalCascadeProjectiveHandoffResidual}: it asks for the actual
+role-register measurement, the factor-two unsymmetrization bridge, the
+projectivization handoff fields, and the two evaluated $\zeta_1$ point-transport
+links. Lean then converts the resulting projective self-consistency to
 \texttt{MainFormalCascadeTransportTargets} using the projective converse of
 \texttt{simeq-to-approx}. No proof-level completeness tag is claimed here while
-\texttt{mainFormal} still contains that completion and point-transport residual.
+\texttt{mainFormal} still contains that handoff residual.
 \end{remark}
 \begin{proof}
 	\proves{thm:main-formal}
