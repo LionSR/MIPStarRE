@@ -33,9 +33,7 @@ private lemma leftTensor_outcome_conjTranspose_self
     (A : SubMeas Outcome ιA) (a : Outcome) :
     (leftTensor (ι₂ := ιB) (A.outcome a))ᴴ =
       leftTensor (ι₂ := ιB) (A.outcome a) := by
-  simpa [leftTensor, SubMeas.outcome_hermitian] using
-    (Matrix.conjTranspose_kronecker
-      (A.outcome a) (1 : MIPStarRE.Quantum.Op ιB))
+  rw [leftTensor_conjTranspose, A.outcome_hermitian]
 
 /-- The conjugate transpose of `rightTensor` of a Hermitian outcome is itself. -/
 private lemma rightTensor_outcome_conjTranspose_self
@@ -44,9 +42,7 @@ private lemma rightTensor_outcome_conjTranspose_self
     (B : SubMeas Outcome ιB) (a : Outcome) :
     (rightTensor (ι₁ := ιA) (B.outcome a))ᴴ =
       rightTensor (ι₁ := ιA) (B.outcome a) := by
-  simpa [rightTensor, SubMeas.outcome_hermitian] using
-    (Matrix.conjTranspose_kronecker
-      (1 : MIPStarRE.Quantum.Op ιA) (B.outcome a))
+  rw [rightTensor_conjTranspose, B.outcome_hermitian]
 
 /-- `leftTensor (A_a) * (leftTensor (A_a))ᴴ = leftTensor (A_a * A_a)` for Hermitian outcomes. -/
 private lemma leftTensor_outcome_mul_conjTranspose_eq

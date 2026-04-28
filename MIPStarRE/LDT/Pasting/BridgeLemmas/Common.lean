@@ -23,12 +23,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- The conjugate transpose of a left tensor is the left tensor of the conjugate transpose. -/
-lemma leftTensor_conjTranspose
-    (A : MIPStarRE.Quantum.Op ι) :
-    (leftTensor (ι₂ := ι) A)ᴴ = leftTensor (ι₂ := ι) Aᴴ := by
-  simp [leftTensor, Matrix.conjTranspose_kronecker]
-
 /-- Multiplying a left tensor into a full tensor only affects the left factor. -/
 lemma leftTensor_mul_opTensor
     (A B C : MIPStarRE.Quantum.Op ι) :
