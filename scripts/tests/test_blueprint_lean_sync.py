@@ -282,6 +282,8 @@ class CollectLeanDeclsTests(unittest.TestCase):
                     def afterInterpolatedStringToken : Nat := 1
                     def messageInterpolatedStringToken : MessageData := m!"{"/-"}"
                     def afterMessageInterpolatedStringToken : Nat := 2
+                    def nestedInterpolatedStringToken : String := s!"{s!"{1}"} /-"
+                    def afterNestedInterpolatedStringToken : Nat := 3
                     def escapedInterpolationBraceToken : String := s!"{{/-}}"
                     def charLiterals : List Char := ['/', '-']
                     def primedName' : Nat := 0
@@ -309,6 +311,8 @@ class CollectLeanDeclsTests(unittest.TestCase):
             self.assertIn("Foo.afterInterpolatedStringToken", by_name)
             self.assertIn("Foo.messageInterpolatedStringToken", by_name)
             self.assertIn("Foo.afterMessageInterpolatedStringToken", by_name)
+            self.assertIn("Foo.nestedInterpolatedStringToken", by_name)
+            self.assertIn("Foo.afterNestedInterpolatedStringToken", by_name)
             self.assertIn("Foo.escapedInterpolationBraceToken", by_name)
             self.assertIn("Foo.charLiterals", by_name)
             self.assertIn("Foo.primedName'", by_name)
