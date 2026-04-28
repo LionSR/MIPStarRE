@@ -80,24 +80,56 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
     """Strip Lean line and block comments while preserving line numbers."""
     stripped: list[str] = []
     block_depth = 0
+    in_string = False
+    in_char = False
+    escaped = False
 
     for line in text.splitlines():
         out: list[str] = []
         i = 0
         while i < len(line):
-            if block_depth == 0 and line.startswith("--", i):
-                break
-            if line.startswith("/-", i):
-                block_depth += 1
-                i += 2
-                continue
+            char = line[i]
+
             if block_depth > 0:
+                if line.startswith("/-", i):
+                    block_depth += 1
+                    i += 2
+                    continue
                 if line.startswith("-/", i):
                     block_depth -= 1
                     i += 2
                 else:
                     i += 1
                 continue
+
+            if in_string or in_char:
+                out.append(char)
+                if escaped:
+                    escaped = False
+                elif char == "\\":
+                    escaped = True
+                elif in_string and char == '"':
+                    in_string = False
+                elif in_char and char == "'":
+                    in_char = False
+                i += 1
+                continue
+
+            if line.startswith("--", i):
+                break
+            if line.startswith("/-", i):
+                block_depth += 1
+                i += 2
+                continue
+
+            if char == '"':
+                in_string = True
+                escaped = False
+            elif char == "'":
+                prev = out[-1] if out else ""
+                if not (prev.isalnum() or prev in "_'"):
+                    in_char = True
+                    escaped = False
             out.append(line[i])
             i += 1
         stripped.append("".join(out))

@@ -277,6 +277,11 @@ class CollectLeanDeclsTests(unittest.TestCase):
 
                     -- def lineCommented : Nat := 0
 
+                    def stringBlockCommentToken : String := "/-"
+                    def stringLineCommentToken : String := "--"
+                    def charLiterals : List Char := ['/', '-']
+                    def primedName' : Nat := 0
+
                     private lemma privateHelper : True := by
                       trivial
 
@@ -294,6 +299,10 @@ class CollectLeanDeclsTests(unittest.TestCase):
 
             self.assertNotIn("Foo.commentedOut", by_name)
             self.assertNotIn("Foo.lineCommented", by_name)
+            self.assertIn("Foo.stringBlockCommentToken", by_name)
+            self.assertIn("Foo.stringLineCommentToken", by_name)
+            self.assertIn("Foo.charLiterals", by_name)
+            self.assertIn("Foo.primedName'", by_name)
             self.assertTrue(by_name["Foo.privateHelper"].is_private)
             self.assertFalse(by_name["Foo.publicTheorem"].is_private)
 
