@@ -258,6 +258,189 @@ theorem line156Approx {Outcome : Type*} {ι : Type*}
 
 end ProjectivizationLine156Handoff
 
+/-! ### Line-169 match-mass monotonicity -/
+
+/-- Match-mass monotonicity invariant needed for the paper's line-169
+projectivization transport.
+
+The ordinary Step 6 handoff records only state-dependent-distance closeness
+`G_A ≈ Q_A` and `G_B ≈ Q_B`.  Combining those fields with
+`prop:triangle-sub` gives a `ζ₁ + sqrt ζ₂` consistency loss, as witnessed by
+`ProjectivizationLine156Handoff.leftConsistency_with_triangleSub_loss` and
+`ProjectivizationLine156Handoff.rightConsistency_with_triangleSub_loss` below.
+The paper-tight line-169 estimate at exactly `ζ₁` therefore needs a stronger
+construction-level invariant: replacing `G_A` by `Q_A`, and symmetrically
+replacing `G_B` by `Q_B`, must not decrease the diagonal match mass against the
+opposite pre-projective measurement.
+
+This structure records that invariant in its primitive match-mass form, rather
+than restating the downstream `ConsRel` conclusion.  A future projectivization
+constructor can produce this package from additional repair/completion data;
+theorems in the namespace turn it into the exact line-169 consistency links. -/
+structure ProjectivizationMatchMassMonotonicity
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι))
+    (G_A G_B : Measurement Outcome ι) (Q_A Q_B : ProjMeas Outcome ι) : Prop where
+  /-- Alice-side match-mass monotonicity:
+  `Q_A` preserves at least as much correlation with `G_B` as `G_A` did. -/
+  leftMatchMassPreservation :
+    qBipartiteMatchMass ψ Q_A.toSubMeas G_B.toSubMeas ≥
+      qBipartiteMatchMass ψ G_A.toSubMeas G_B.toSubMeas
+  /-- Bob-side match-mass monotonicity, in the role-reversed orientation used by
+  the line-169 mirror. -/
+  rightMatchMassPreservation :
+    qBipartiteMatchMass ψ Q_B.toSubMeas G_A.toSubMeas ≥
+      qBipartiteMatchMass ψ G_B.toSubMeas G_A.toSubMeas
+
+namespace ProjectivizationMatchMassMonotonicity
+
+/-- Exact Alice-side line-169 consistency from match-mass preservation.
+
+For complete measurements the total-overlap term in `qBipartiteConsDefect` is
+unchanged when `G_A` is replaced by `Q_A`; the match-mass inequality therefore
+can only decrease the consistency defect. -/
+theorem leftConsistency {Outcome : Type*} {ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState (ι × ι)}
+    {G_A G_B : Measurement Outcome ι} {Q_A Q_B : ProjMeas Outcome ι}
+    (preservation : ProjectivizationMatchMassMonotonicity ψ G_A G_B Q_A Q_B)
+    {ζ : Error}
+    (hpre : ConsRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily G_A.toSubMeas)
+      (constSubMeasFamily G_B.toSubMeas) ζ) :
+    ConsRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily Q_A.toSubMeas)
+      (constSubMeasFamily G_B.toSubMeas) ζ := by
+  rcases hpre with ⟨hpre⟩
+  have hdefect :
+      qBipartiteConsDefect ψ Q_A.toSubMeas G_B.toSubMeas ≤
+        qBipartiteConsDefect ψ G_A.toSubMeas G_B.toSubMeas := by
+    unfold qBipartiteConsDefect
+    have htotal : ev ψ (opTensor Q_A.toSubMeas.total G_B.toSubMeas.total) =
+        ev ψ (opTensor G_A.toSubMeas.total G_B.toSubMeas.total) := by
+      simp [Q_A.total_eq_one, G_A.total_eq_one]
+    have hinner :
+        ev ψ (opTensor Q_A.toSubMeas.total G_B.toSubMeas.total) -
+            qBipartiteMatchMass ψ Q_A.toSubMeas G_B.toSubMeas ≤
+          ev ψ (opTensor G_A.toSubMeas.total G_B.toSubMeas.total) -
+            qBipartiteMatchMass ψ G_A.toSubMeas G_B.toSubMeas := by
+      rw [htotal]
+      linarith [preservation.leftMatchMassPreservation]
+    exact max_le_max le_rfl hinner
+  have hpre' : qBipartiteConsDefect ψ G_A.toSubMeas G_B.toSubMeas ≤ ζ := by
+    simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily]
+      using hpre
+  constructor
+  simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily]
+    using hdefect.trans hpre'
+
+/-- Exact Bob-side line-169 consistency from the role-reversed match-mass
+preservation invariant. -/
+theorem rightConsistency {Outcome : Type*} {ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState (ι × ι)}
+    {G_A G_B : Measurement Outcome ι} {Q_A Q_B : ProjMeas Outcome ι}
+    (preservation : ProjectivizationMatchMassMonotonicity ψ G_A G_B Q_A Q_B)
+    {ζ : Error}
+    (hpre : ConsRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily G_B.toSubMeas)
+      (constSubMeasFamily G_A.toSubMeas) ζ) :
+    ConsRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily Q_B.toSubMeas)
+      (constSubMeasFamily G_A.toSubMeas) ζ := by
+  rcases hpre with ⟨hpre⟩
+  have hdefect :
+      qBipartiteConsDefect ψ Q_B.toSubMeas G_A.toSubMeas ≤
+        qBipartiteConsDefect ψ G_B.toSubMeas G_A.toSubMeas := by
+    unfold qBipartiteConsDefect
+    have htotal : ev ψ (opTensor Q_B.toSubMeas.total G_A.toSubMeas.total) =
+        ev ψ (opTensor G_B.toSubMeas.total G_A.toSubMeas.total) := by
+      simp [Q_B.total_eq_one, G_B.total_eq_one]
+    have hinner :
+        ev ψ (opTensor Q_B.toSubMeas.total G_A.toSubMeas.total) -
+            qBipartiteMatchMass ψ Q_B.toSubMeas G_A.toSubMeas ≤
+          ev ψ (opTensor G_B.toSubMeas.total G_A.toSubMeas.total) -
+            qBipartiteMatchMass ψ G_B.toSubMeas G_A.toSubMeas := by
+      rw [htotal]
+      linarith [preservation.rightMatchMassPreservation]
+    exact max_le_max le_rfl hinner
+  have hpre' : qBipartiteConsDefect ψ G_B.toSubMeas G_A.toSubMeas ≤ ζ := by
+    simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily]
+      using hpre
+  constructor
+  simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily]
+    using hdefect.trans hpre'
+
+end ProjectivizationMatchMassMonotonicity
+
+namespace ProjectivizationLine156Handoff
+
+/-- The honest Alice-side line-169 statement derivable from the existing Step 6
+handoff alone has the generic `triangleSub` loss `ζ₁ + sqrt ζ₂`.
+
+This theorem is useful as a checked comparison point for the projectivization
+blocker: it shows exactly what the current SDD-closeness API provides without
+the stronger match-mass preservation invariant above. -/
+theorem leftConsistency_with_triangleSub_loss {Outcome : Type*} {ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState (ι × ι)} (hψ : ψ.IsNormalized)
+    {G_A G_B : Measurement Outcome ι} {Q_A Q_B : ProjMeas Outcome ι}
+    {ζ₁ ζ₂ : Error}
+    (handoff : ProjectivizationLine156Handoff ψ G_A G_B Q_A Q_B ζ₁ ζ₂) :
+    ConsRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily Q_A.toSubMeas)
+      (constSubMeasFamily G_B.toSubMeas)
+      (ζ₁ + Real.sqrt ζ₂) := by
+  let GLeft : IdxMeas Unit Outcome ι := fun _ => G_A
+  let GRight : IdxMeas Unit Outcome ι := fun _ => G_B
+  let QLeft : IdxMeas Unit Outcome ι := fun _ => Q_A.toMeasurement
+  have hAC : ConsRel ψ (uniformDistribution Unit)
+      (IdxMeas.toIdxSubMeas GLeft) (IdxMeas.toIdxSubMeas GRight) ζ₁ := by
+    simpa [GLeft, GRight, constSubMeasFamily, IdxMeas.toIdxSubMeas]
+      using handoff.preProjectiveConsistency
+  have hAB : SDDRel ψ (uniformDistribution Unit)
+      (IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas GLeft))
+      (IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas QLeft)) ζ₂ := by
+    simpa [GLeft, QLeft, constSubMeasFamily, IdxMeas.toIdxSubMeas,
+      IdxSubMeas.liftLeft] using handoff.leftCompletionCloseness
+  have h := MIPStarRE.LDT.Preliminaries.triangleSub ψ (uniformDistribution Unit) hψ
+      (uniformDistribution_weight_sum_le_one Unit) GLeft QLeft
+      (IdxMeas.toIdxSubMeas GRight) ζ₁ ζ₂ hAC hAB
+  simpa [GLeft, GRight, QLeft, constSubMeasFamily, IdxMeas.toIdxSubMeas] using h
+
+/-- The honest Bob-side line-169 transport available from the existing Step 6
+handoff alone, before applying any permutation-symmetry flip, also incurs the
+`ζ₁ + sqrt ζ₂` `triangleSub` loss. -/
+theorem rightConsistency_with_triangleSub_loss {Outcome : Type*} {ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState (ι × ι)} (hψ : ψ.IsNormalized)
+    {G_A G_B : Measurement Outcome ι} {Q_A Q_B : ProjMeas Outcome ι}
+    {ζ₁ ζ₂ : Error}
+    (handoff : ProjectivizationLine156Handoff ψ G_A G_B Q_A Q_B ζ₁ ζ₂) :
+    ConsRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily G_A.toSubMeas)
+      (constSubMeasFamily Q_B.toSubMeas)
+      (ζ₁ + Real.sqrt ζ₂) := by
+  let GLeft : IdxMeas Unit Outcome ι := fun _ => G_A
+  let GRight : IdxMeas Unit Outcome ι := fun _ => G_B
+  let QRight : IdxMeas Unit Outcome ι := fun _ => Q_B.toMeasurement
+  have hAB : ConsRel ψ (uniformDistribution Unit)
+      (IdxMeas.toIdxSubMeas GLeft) (IdxMeas.toIdxSubMeas GRight) ζ₁ := by
+    simpa [GLeft, GRight, constSubMeasFamily, IdxMeas.toIdxSubMeas]
+      using handoff.preProjectiveConsistency
+  have hBD : SDDRel ψ (uniformDistribution Unit)
+      (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas GRight))
+      (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas QRight)) ζ₂ := by
+    simpa [GRight, QRight, constSubMeasFamily, IdxMeas.toIdxSubMeas,
+      IdxSubMeas.liftRight] using handoff.rightCompletionCloseness
+  have h := MIPStarRE.LDT.Preliminaries.triangleSub_right ψ (uniformDistribution Unit) hψ
+      (uniformDistribution_weight_sum_le_one Unit) (IdxMeas.toIdxSubMeas GLeft)
+      GRight QRight ζ₁ ζ₂ hAB hBD
+  simpa [GLeft, GRight, QRight, constSubMeasFamily, IdxMeas.toIdxSubMeas] using h
+
+end ProjectivizationLine156Handoff
+
 /-! ### Output package -/
 
 set_option linter.unusedFintypeInType false in
