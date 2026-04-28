@@ -1320,7 +1320,7 @@ lemma postprocess_restrictSubMeas_outcome
       ∑ a : α, if p a ∧ f a = b then A.outcome a else 0 := by
   classical
   ext i j
-  simp [postprocess, restrictSubMeas, Matrix.sum_apply, Finset.sum_filter]
+  simp only [postprocess, restrictSubMeas, Matrix.sum_apply, Finset.sum_filter]
   refine Finset.sum_congr rfl ?_
   intro c _
   by_cases hf : f c = b <;> by_cases hp : p c <;>
@@ -2013,7 +2013,7 @@ lemma avgOver_distinct_pasted_defect_le_badMass
   refine Finset.sum_le_sum ?_
   intro xs hxs
   have hinj : Function.Injective xs := (Finset.mem_filter.mp hxs).2
-  simp [hxs]
+  simp only [hxs, one_div, ite_true]
   exact mul_le_mul_of_nonneg_left
     (pastedInterpolation_verticalLine_defect_le_badMass params strategy family u xs hinj)
     (by positivity)

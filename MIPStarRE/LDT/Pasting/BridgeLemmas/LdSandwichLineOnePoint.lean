@@ -2612,8 +2612,10 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_inputFacts
     calc
       ∑ a : Fq params,
           ev strategy.state
-            (opTensor ((ldSandwichLineOnePointPrefixOriginalFamily params family hi q).outcome (some a))
-              (1 - (ldSandwichLineOnePointRightFamily params strategy family k i q).outcome (some a)))
+            (opTensor
+              ((ldSandwichLineOnePointPrefixOriginalFamily params family hi q).outcome (some a))
+              (1 -
+                (ldSandwichLineOnePointRightFamily params strategy family k i q).outcome (some a)))
           = ∑ a : Fq params,
               ev strategy.state
                 (opTensor
@@ -2707,8 +2709,7 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_inputFacts
         simp [evalOutcome, hgs, ldSandwichLineOnePointCS_Aord,
           ldSandwichLineOnePointCS_Csecond, ldSandwichLineOnePointCS_orderedHalf,
           ldSandwichLineOnePointCS_rotatedHalf,
-          ldSandwichLineOnePointCS_rightComplement, leftTensor_conjTranspose,
-          opTensor_mul_leftTensor]
+          ldSandwichLineOnePointCS_rightComplement, opTensor_mul_leftTensor]
   · unfold ldSandwichLineOnePoint_prefix_movedOutcomeSum
       ldSandwichLineOnePointCS_secondTargetRaw
     apply avgOver_congr
@@ -2727,8 +2728,10 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_inputFacts
     calc
       ∑ a : Fq params,
           ev strategy.state
-            (opTensor ((ldSandwichLineOnePointPrefixMovedFamily params family hi q).outcome (some a))
-              (1 - (ldSandwichLineOnePointRightFamily params strategy family k i q).outcome (some a)))
+            (opTensor
+              ((ldSandwichLineOnePointPrefixMovedFamily params family hi q).outcome (some a))
+              (1 -
+                (ldSandwichLineOnePointRightFamily params strategy family k i q).outcome (some a)))
           = ∑ a : Fq params,
               ev strategy.state
                 (opTensor
@@ -2801,8 +2804,7 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_inputFacts
             rw [Fintype.sum_unique]
             simp [ldSandwichLineOnePointCS_Arot, ldSandwichLineOnePointCS_Csecond,
               ldSandwichLineOnePointCS_rotatedHalf,
-              ldSandwichLineOnePointCS_rightComplement, leftTensor_conjTranspose,
-              opTensor_mul_leftTensor]
+              ldSandwichLineOnePointCS_rightComplement, opTensor_mul_leftTensor]
 
 /-- Narrow residual for the two off-diagonal Cauchy--Schwarz moves in their
 absolute-value `closenessOfIP` output shape.
