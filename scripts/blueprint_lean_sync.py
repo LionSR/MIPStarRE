@@ -63,26 +63,6 @@ _TEX_ENV_END_RE = re.compile(
 _TEX_PROOF_BEGIN_RE = re.compile(r"\\begin\{proof\}")
 _TEX_PROOF_END_RE = re.compile(r"\\end\{proof\}")
 
-_INTERNAL_SUPPORT_PATH_FRAGMENTS = (
-    "/BridgeLemmas/",
-    "/SwitcherooContraction",
-    "/ContextWrappers",
-    "/Test/StrategyBiProj.lean",
-    "/Pasting/Core.lean",
-)
-_INTERNAL_SUPPORT_NAME_PREFIXES = (
-    "avgRestricted",
-    "assemble",
-)
-_INTERNAL_SUPPORT_SHORT_NAMES = (
-    "PastingPackage.output",
-    "PerSliceInductionPackage.ofRecursion",
-    "RestrictedProbabilitiesStatement.ofWeightedBounds",
-    "SelfImprovementPackage.ofSelfImprovementInInductionSection",
-    "SliceRestrictionPackage.ofRestrictedProbabilities",
-)
-
-
 def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
     """Strip Lean line and block comments while preserving line numbers."""
     stripped: list[str] = []
@@ -666,23 +646,6 @@ def _decl_blueprint_spellings(decl: LeanDecl) -> set[str]:
     return names
 
 
-def _is_internal_support_decl(decl: LeanDecl) -> bool:
-    """Return whether a declaration should be skipped by reverse blueprint linting.
-
-    The reverse check is meant to catch public mathematical declarations whose
-    statement should be reflected in the blueprint. It should not force
-    blueprint entries for local proof infrastructure, even when those helpers
-    are public Lean declarations because another file imports them.
-    """
-    if decl.is_private:
-        return True
-    if decl.short_name in _INTERNAL_SUPPORT_SHORT_NAMES:
-        return True
-    if any(fragment in decl.file for fragment in _INTERNAL_SUPPORT_PATH_FRAGMENTS):
-        return True
-    return decl.short_name.startswith(_INTERNAL_SUPPORT_NAME_PREFIXES)
-
-
 def find_changed_decls_missing_from_blueprint(
     root: Path,
     *,
@@ -716,7 +679,7 @@ def find_changed_decls_missing_from_blueprint(
             continue
 
         for decl in collect_file_lean_decls(abs_path, lean_root):
-            if _is_internal_support_decl(decl):
+            if decl.is_private:
                 continue
             if decl.kind not in _TRACKED_REVERSE_DECL_KINDS:
                 continue
