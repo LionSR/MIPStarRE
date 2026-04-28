@@ -702,27 +702,10 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 		A_a \ot I \approx_{2\delta + 4\sqrt\delta + 2\zeta} C_a \ot I.
 	\]
 \end{lemma}
-
-% prop:cool-prop from the paper is the same result as lem:self-consistency-same-side-square above.
-% We keep the label for cross-reference fidelity.
-\begin{theorem}\label{prop:cool-prop}
-	\lean{MIPStarRE.LDT.Preliminaries.bipartiteSSCSquaredMass}
-	\leanok
-	\uses{lem:self-consistency-same-side-square}
-	This is the same statement as Lemma~\ref{lem:self-consistency-same-side-square}: for a $\zeta$-strongly self-consistent submeasurement $A$,
-	\[
-		\sum_a \bra{\psi} (A_a)^2 \ot I \ket{\psi} \geq \sum_a \bra{\psi} A_a \ot I \ket{\psi} -\zeta.
-	\]
-\end{theorem}
-\begin{proof}
-	\leanok
-	\uses{lem:self-consistency-same-side-square}
-	Immediate from Lemma~\ref{lem:self-consistency-same-side-square}.
-\end{proof}
-
 \begin{proof}[Proof of \ref{prop:completing-to-measurement}]
 	\proves{prop:completing-to-measurement}
 	\leanok
+	\uses{prop:triangle-inequality-for-vectors-squared, prop:easy-approx-from-approx-delta, prop:cool-prop}
 	By Lemma~\ref{prop:triangle-inequality-for-vectors-squared},
 	\[
 		\sum_a \lVert(A_a-C_a)\ot I \ket{\psi} \rVert^2
@@ -749,4 +732,21 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 		\lVert(I-B) \ot I \ket{\psi}\rVert^2 \le 2\sqrt\delta + \zeta.
 	\]
 	Substituting this into the first bound proves the claim.
+\end{proof}
+
+% prop:cool-prop from the paper is the same result as lem:self-consistency-same-side-square above.
+% We keep the label for cross-reference fidelity.
+\begin{theorem}\label{prop:cool-prop}
+	\lean{MIPStarRE.LDT.Preliminaries.bipartiteSSCSquaredMass}
+	\leanok
+	\uses{lem:self-consistency-same-side-square}
+	This is the same statement as Lemma~\ref{lem:self-consistency-same-side-square}: for a $\zeta$-strongly self-consistent submeasurement $A$,
+	\[
+		\sum_a \bra{\psi} (A_a)^2 \ot I \ket{\psi} \geq \sum_a \bra{\psi} A_a \ot I \ket{\psi} -\zeta.
+	\]
+\end{theorem}
+\begin{proof}
+	\leanok
+	\uses{lem:self-consistency-same-side-square}
+	Immediate from Lemma~\ref{lem:self-consistency-same-side-square}.
 \end{proof}
