@@ -3925,7 +3925,9 @@ private lemma fromHToG_selfConsistency_qSDDCore_bound
     (B := IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyRightFamily params family))
     (δ := gHatSelfConsistencyError zeta) hscOp
   simpa [sddErrorOp, qSDDOp, qSDDCore, gHatSelfConsistencyLeftFamily,
-    gHatSelfConsistencyRightFamily, gHatSelfConsistencyError] using hprod.squaredDistanceBound
+    gHatSelfConsistencyRightFamily, gHatSelfConsistencyError, IdxSubMeas.toIdxOpFamily,
+    SubMeas.toOpFamily, leftPlacedSubMeas, rightPlacedSubMeas] using
+    hprod.squaredDistanceBound
 
 /-- Adjoint-oriented raw `qSDDCore` form of the half-sandwich commutation
 hypothesis.  This is the orientation used by the paper's Cauchy--Schwarz
