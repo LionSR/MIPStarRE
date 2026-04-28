@@ -19,6 +19,7 @@ from blueprint_lean_sync import (  # noqa: E402
     LeanDecl,
     SyncReport,
     _chapter_stats,
+    _is_internal_support_decl,
     _leanok_placement,
     _line_has_leanok_marker,
     _strip_tex_comment,
@@ -295,6 +296,44 @@ class CollectLeanDeclsTests(unittest.TestCase):
             self.assertNotIn("Foo.lineCommented", by_name)
             self.assertTrue(by_name["Foo.privateHelper"].is_private)
             self.assertFalse(by_name["Foo.publicTheorem"].is_private)
+
+    def test_internal_support_decls_are_not_blueprint_facing(self) -> None:
+        self.assertTrue(
+            _is_internal_support_decl(
+                LeanDecl(
+                    file="MIPStarRE/LDT/Pasting/BridgeLemmas/Common.lean",
+                    line=10,
+                    fqn="MIPStarRE.LDT.Pasting.helper",
+                    kind="lemma",
+                    short_name="helper",
+                    end_line=12,
+                )
+            )
+        )
+        self.assertTrue(
+            _is_internal_support_decl(
+                LeanDecl(
+                    file="MIPStarRE/LDT/MainInductionStep/Theorems.lean",
+                    line=10,
+                    fqn="MIPStarRE.LDT.MainInductionStep.Statement.ofWeightedBounds",
+                    kind="lemma",
+                    short_name="Statement.ofWeightedBounds",
+                    end_line=12,
+                )
+            )
+        )
+        self.assertFalse(
+            _is_internal_support_decl(
+                LeanDecl(
+                    file="MIPStarRE/LDT/CommutativityPoints/SharedHelpers/SharedLine.lean",
+                    line=10,
+                    fqn="MIPStarRE.LDT.CommutativityPoints.pointPairSharedDiagonalLineDistribution",
+                    kind="def",
+                    short_name="pointPairSharedDiagonalLineDistribution",
+                    end_line=12,
+                )
+            )
+        )
 
 
 class LeanokPlacementReportingTests(unittest.TestCase):
