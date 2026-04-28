@@ -95,6 +95,46 @@ if [ "$WITH_DOCS" = true ]; then
   fi
   rm -rf "$WORK_DIR/site/docs"
   cp -r "$REPO_ROOT/docbuild/.lake/build/doc" "$WORK_DIR/site/docs"
+elif [ "$BADGES_ONLY" != true ] && [ ! -f "$WORK_DIR/site/docs/index.html" ]; then
+  echo "==> Creating API docs placeholder..."
+  rm -rf "$WORK_DIR/site/docs"
+  mkdir -p "$WORK_DIR/site/docs"
+  cat > "$WORK_DIR/site/docs/index.html" <<'HTML'
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MIPStarRE API documentation</title>
+  <style>
+    body {
+      color: #24292f;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+      margin: 0;
+      padding: 3rem 1.5rem;
+    }
+    main {
+      margin: 0 auto;
+      max-width: 42rem;
+    }
+    a {
+      color: #0969da;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>MIPStarRE API documentation</h1>
+    <p>
+      The generated Lean API documentation has not been deployed yet.
+      It is published by the full documentation workflow after docgen succeeds.
+    </p>
+    <p><a href="../">Return to the project homepage</a></p>
+  </main>
+</body>
+</html>
+HTML
 fi
 
 # Commit and push
@@ -108,6 +148,9 @@ else
   git config user.email "$(git -C "$REPO_ROOT" config user.email || echo 'deploy@local')"
 fi
 git add -A
+if [ -f blueprint.pdf ]; then
+  git add -f blueprint.pdf
+fi
 if git diff --cached --quiet; then
   echo "No changes to deploy."
 else

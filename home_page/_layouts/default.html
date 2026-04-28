@@ -11,7 +11,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#157878">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  {% if jekyll.environment == "production" %}
+  <link rel="stylesheet"
+    href="{{ site.github.repository_name | append: '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
+  {% else %}
   <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
+  {% endif %}
   {% include head-custom.html %}
 </head>
 
@@ -36,7 +41,7 @@
     <footer class="site-footer">
       {% if site.github.is_project_page %}
       <span class="site-footer-owner"><a href="{{ site.github.repository_url }}">{{ site.github.repository_name }}</a>
-        is maintained by ... (to be filled).</span>
+        is maintained by Sirui Lu.</span>
       {% endif %}
       <span class="site-footer-credits">Last updated: <time datetime="{{ site.time | date_to_xmlschema }}">{{ site.time | date: "%B %d, %Y" }}</time></span>
     </footer>
