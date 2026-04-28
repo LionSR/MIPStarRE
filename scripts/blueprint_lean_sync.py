@@ -70,6 +70,9 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
     in_string = False
     in_char = False
     escaped = False
+    in_interpolation = False
+    interpolation_depth = 0
+    string_interpolated = False
 
     for line in text.splitlines():
         out: list[str] = []
@@ -90,15 +93,40 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
                 continue
 
             if in_string or in_char:
+                if in_string and string_interpolated and (
+                    line.startswith("{{", i) or line.startswith("}}", i)
+                ):
+                    out.extend(line[i : i + 2])
+                    i += 2
+                    continue
                 out.append(char)
                 if escaped:
                     escaped = False
                 elif char == "\\":
                     escaped = True
+                elif in_string and string_interpolated and char == "{":
+                    in_string = False
+                    in_interpolation = True
+                    interpolation_depth = 1
                 elif in_string and char == '"':
                     in_string = False
+                    string_interpolated = False
                 elif in_char and char == "'":
                     in_char = False
+                i += 1
+                continue
+
+            if in_interpolation and char in "{}":
+                out.append(char)
+                if char == "{":
+                    interpolation_depth += 1
+                else:
+                    interpolation_depth -= 1
+                    if interpolation_depth == 0:
+                        in_interpolation = False
+                        in_string = True
+                        string_interpolated = True
+                        escaped = False
                 i += 1
                 continue
 
@@ -112,6 +140,7 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
             if char == '"':
                 in_string = True
                 escaped = False
+                string_interpolated = len(out) >= 2 and out[-2:] == ["s", "!"]
             elif char == "'":
                 prev = out[-1] if out else ""
                 if not (prev.isalnum() or prev in "_'"):

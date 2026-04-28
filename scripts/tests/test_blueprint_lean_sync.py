@@ -278,6 +278,9 @@ class CollectLeanDeclsTests(unittest.TestCase):
 
                     def stringBlockCommentToken : String := "/-"
                     def stringLineCommentToken : String := "--"
+                    def interpolatedStringToken : String := s!"{"/-"}"
+                    def afterInterpolatedStringToken : Nat := 1
+                    def escapedInterpolationBraceToken : String := s!"{{/-}}"
                     def charLiterals : List Char := ['/', '-']
                     def primedName' : Nat := 0
 
@@ -300,6 +303,9 @@ class CollectLeanDeclsTests(unittest.TestCase):
             self.assertNotIn("Foo.lineCommented", by_name)
             self.assertIn("Foo.stringBlockCommentToken", by_name)
             self.assertIn("Foo.stringLineCommentToken", by_name)
+            self.assertIn("Foo.interpolatedStringToken", by_name)
+            self.assertIn("Foo.afterInterpolatedStringToken", by_name)
+            self.assertIn("Foo.escapedInterpolationBraceToken", by_name)
             self.assertIn("Foo.charLiterals", by_name)
             self.assertIn("Foo.primedName'", by_name)
             self.assertTrue(by_name["Foo.privateHelper"].is_private)
