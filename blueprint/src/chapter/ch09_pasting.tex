@@ -494,11 +494,13 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\]
 \end{proof}
 \begin{remark}\label{rem:commutativity-switcheroo-permInv}
-	The Lean formalization \lean{MIPStarRE.LDT.Pasting.commutativitySwitcheroo} takes an
-	additional hypothesis \texttt{PermInvState ψbi}, the permutation-invariance of the
-	strategy state under the players' swap. In the paper this is implicit in the symmetric
-	two-prover strategy, and it is used to identify $\bra{\psi} G \ot M \ket{\psi}$ with
-	$\bra{\psi} M \ot G \ket{\psi}$ at the center of the triangle-inequality chain.
+	The Lean formalization \lean{MIPStarRE.LDT.Pasting.commutativitySwitcheroo} takes
+	the normalized-state hypothesis together with the density-level swap identity
+	\(\mathrm{swapDensity}(\psi_{\mathrm{bi}})=\psi_{\mathrm{bi}}\), which is the
+	density-fix field supplied by the repository's permutation-invariance structure. In
+	the paper this is implicit in the symmetric two-prover strategy, and it is used to
+	identify $\bra{\psi} G \ot M \ket{\psi}$ with $\bra{\psi} M \ot G \ket{\psi}$ at
+	the center of the triangle-inequality chain.
 \end{remark}
 
 \begin{corollary}[Commutativity of the complete part]\label{cor:commuting-with-G-complete}
