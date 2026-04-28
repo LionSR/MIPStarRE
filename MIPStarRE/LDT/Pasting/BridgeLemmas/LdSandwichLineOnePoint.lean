@@ -178,6 +178,88 @@ private def gHatTupleOutcomeLastFrontEquiv
         simp only [hne, ↓reduceDIte, Fin.cons_succ]
         exact congrArg gs (Fin.ext rfl)
 
+/-- Move the last coordinate to the front and reverse the preceding prefix. -/
+private def pointTupleLastReverseEquiv
+    (params : Parameters) (i : ℕ) :
+    PointTuple params (i + 1) ≃ PointTuple params (i + 1) where
+  toFun xs := Fin.cons (xs ⟨i, Nat.lt_succ_self i⟩)
+    (fun j => xs ⟨i - 1 - j.1, by omega⟩)
+  invFun xs := fun j =>
+    if hji : j.1 = i then
+      xs 0
+    else
+      xs ⟨i - j.1, by omega⟩
+  left_inv := by
+    intro xs
+    funext j
+    by_cases hji : j.1 = i
+    · have hj : j = ⟨i, Nat.lt_succ_self i⟩ := Fin.ext hji
+      subst j
+      simp
+    · simp only [hji, ↓reduceDIte]
+      have hjlt : j.1 < i := by omega
+      rw [show (⟨i - (j : ℕ), by omega⟩ : Fin (i + 1)) =
+          Fin.succ ⟨i - 1 - (j : ℕ), by omega⟩ by
+        ext
+        change i - (j : ℕ) = i - 1 - (j : ℕ) + 1
+        omega]
+      simp only [Fin.cons_succ]
+      have hle : (j : ℕ) ≤ i - 1 := by omega
+      exact congrArg xs (Fin.ext (Nat.sub_sub_self hle))
+  right_inv := by
+    intro xs
+    funext j
+    cases j using Fin.cases with
+    | zero => simp
+    | succ j =>
+        have hne : ¬ i - 1 - j.1 = i := by omega
+        simp only [Fin.cons_succ, hne, ↓reduceDIte]
+        have hle : (j : ℕ) ≤ i - 1 := by omega
+        exact congrArg xs (Fin.ext (by
+          change i - (i - 1 - (j : ℕ)) = (j : ℕ) + 1
+          omega))
+
+/-- Move the last completed-slice outcome to the front and reverse the preceding prefix. -/
+private def gHatTupleOutcomeLastReverseEquiv
+    (params : Parameters) [FieldModel params.q] (i : ℕ) :
+    GHatTupleOutcome params (i + 1) ≃ GHatTupleOutcome params (i + 1) where
+  toFun gs := Fin.cons (gs ⟨i, Nat.lt_succ_self i⟩)
+    (fun j => gs ⟨i - 1 - j.1, by omega⟩)
+  invFun gs := fun j =>
+    if hji : j.1 = i then
+      gs 0
+    else
+      gs ⟨i - j.1, by omega⟩
+  left_inv := by
+    intro gs
+    funext j
+    by_cases hji : j.1 = i
+    · have hj : j = ⟨i, Nat.lt_succ_self i⟩ := Fin.ext hji
+      subst j
+      simp
+    · simp only [hji, ↓reduceDIte]
+      have hjlt : j.1 < i := by omega
+      rw [show (⟨i - (j : ℕ), by omega⟩ : Fin (i + 1)) =
+          Fin.succ ⟨i - 1 - (j : ℕ), by omega⟩ by
+        ext
+        change i - (j : ℕ) = i - 1 - (j : ℕ) + 1
+        omega]
+      simp only [Fin.cons_succ]
+      have hle : (j : ℕ) ≤ i - 1 := by omega
+      exact congrArg gs (Fin.ext (Nat.sub_sub_self hle))
+  right_inv := by
+    intro gs
+    funext j
+    cases j using Fin.cases with
+    | zero => simp
+    | succ j =>
+        have hne : ¬ i - 1 - j.1 = i := by omega
+        simp only [Fin.cons_succ, hne, ↓reduceDIte]
+        have hle : (j : ℕ) ≤ i - 1 := by omega
+        exact congrArg gs (Fin.ext (by
+          change i - (i - 1 - (j : ℕ)) = (j : ℕ) + 1
+          omega))
+
 /-- Split a completed-slice outcome tuple into the first `n` coordinates and the last one. -/
 private def gHatTupleOutcomePrefixLastEquiv
     (params : Parameters) [FieldModel params.q] (n : ℕ) :
@@ -1268,6 +1350,157 @@ private lemma gHatRotatedHalfProduct_lastFront_eq_halfProduct
         gHatRotatedHalfProductOutcomeOperator]
       exact hprefix.symm
 
+/-- Reversing the prefix after moving the last coordinate to the front gives the adjoint product. -/
+private lemma gHatHalfProduct_lastReverse_eq_conjTranspose
+    (params : Parameters)
+    [FieldModel params.q]
+    (family : IdxPolyFamily params ι) :
+    ∀ i (xs : PointTuple params (i + 1)) (gs : GHatTupleOutcome params (i + 1)),
+      gHatHalfProductOutcomeOperator params family (i + 1)
+          ((pointTupleLastReverseEquiv params i) xs)
+          ((gHatTupleOutcomeLastReverseEquiv params i) gs) =
+        (gHatHalfProductOutcomeOperator params family (i + 1) xs gs)ᴴ := by
+  intro i
+  induction i with
+  | zero =>
+      intro xs gs
+      have hhead :
+          ((gHatIdxMeas params family (xs 0)).outcome (gs 0))ᴴ =
+            (gHatIdxMeas params family (xs 0)).outcome (gs 0) := by
+        exact (gHatIdxMeas params family (xs 0)).outcome_hermitian (gs 0)
+      simp [pointTupleLastReverseEquiv, gHatTupleOutcomeLastReverseEquiv,
+        gHatHalfProductOutcomeOperator, hhead]
+  | succ i ih =>
+      intro xs gs
+      let xsPrefix : PointTuple params (i + 1) := fun j => xs ⟨j.1, by omega⟩
+      let gsPrefix : GHatTupleOutcome params (i + 1) := fun j => gs ⟨j.1, by omega⟩
+      have htail :
+          pointTupleTail ((pointTupleLastReverseEquiv params (i + 1)) xs) =
+            (pointTupleLastReverseEquiv params i) xsPrefix := by
+        funext j
+        cases j using Fin.cases with
+        | zero =>
+            simp [pointTupleTail, pointTupleLastReverseEquiv, xsPrefix]
+        | succ j =>
+            simp [pointTupleTail, pointTupleLastReverseEquiv, xsPrefix]
+            exact congrArg xs (Fin.ext (by
+              change i - ((j : ℕ) + 1) = i - 1 - (j : ℕ)
+              omega))
+      have hgtail :
+          gHatTupleOutcomeTail ((gHatTupleOutcomeLastReverseEquiv params (i + 1)) gs) =
+            (gHatTupleOutcomeLastReverseEquiv params i) gsPrefix := by
+        funext j
+        cases j using Fin.cases with
+        | zero =>
+            simp [gHatTupleOutcomeTail, gHatTupleOutcomeLastReverseEquiv, gsPrefix]
+        | succ j =>
+            simp [gHatTupleOutcomeTail, gHatTupleOutcomeLastReverseEquiv, gsPrefix]
+            exact congrArg gs (Fin.ext (by
+              change i - ((j : ℕ) + 1) = i - 1 - (j : ℕ)
+              omega))
+      have hlast :
+          ((gHatIdxMeas params family (xs ⟨i + 1, by omega⟩)).outcome
+              (gs ⟨i + 1, by omega⟩))ᴴ =
+            (gHatIdxMeas params family (xs ⟨i + 1, by omega⟩)).outcome
+              (gs ⟨i + 1, by omega⟩) := by
+        exact (gHatIdxMeas params family (xs ⟨i + 1, by omega⟩)).outcome_hermitian
+          (gs ⟨i + 1, by omega⟩)
+      have hprefix :=
+        gHatHalfProductOutcomeOperator_prefix_last params family (i + 1) xs gs
+      rw [gHatHalfProductOutcomeOperator]
+      rw [htail, hgtail]
+      rw [ih xsPrefix gsPrefix]
+      rw [hprefix]
+      rw [Matrix.conjTranspose_mul, hlast]
+      simp [pointTupleLastReverseEquiv, gHatTupleOutcomeLastReverseEquiv,
+        xsPrefix, gsPrefix, mul_assoc]
+
+/-- The rotated product on the last-reversed tuple is the adjoint of the last-front product. -/
+private lemma gHatRotatedHalfProduct_lastReverse_eq_conjTranspose_lastFront
+    (params : Parameters)
+    [FieldModel params.q]
+    (family : IdxPolyFamily params ι) :
+    ∀ i (xs : PointTuple params (i + 1)) (gs : GHatTupleOutcome params (i + 1)),
+      gHatRotatedHalfProductOutcomeOperator params family (i + 1)
+          ((pointTupleLastReverseEquiv params i) xs)
+          ((gHatTupleOutcomeLastReverseEquiv params i) gs) =
+        (gHatHalfProductOutcomeOperator params family (i + 1)
+          ((pointTupleLastFrontEquiv params i) xs)
+          ((gHatTupleOutcomeLastFrontEquiv params i) gs))ᴴ := by
+  intro i
+  cases i with
+  | zero =>
+      intro xs gs
+      have hhead :
+          ((gHatIdxMeas params family (xs 0)).outcome (gs 0))ᴴ =
+            (gHatIdxMeas params family (xs 0)).outcome (gs 0) := by
+        exact (gHatIdxMeas params family (xs 0)).outcome_hermitian (gs 0)
+      simp [pointTupleLastReverseEquiv, gHatTupleOutcomeLastReverseEquiv,
+        pointTupleLastFrontEquiv, gHatTupleOutcomeLastFrontEquiv,
+        gHatRotatedHalfProductOutcomeOperator, gHatHalfProductOutcomeOperator, hhead]
+  | succ i =>
+      intro xs gs
+      let xsPrefix : PointTuple params (i + 1) := fun j => xs ⟨j.1, by omega⟩
+      let gsPrefix : GHatTupleOutcome params (i + 1) := fun j => gs ⟨j.1, by omega⟩
+      have htail :
+          pointTupleTail ((pointTupleLastReverseEquiv params (i + 1)) xs) =
+            (pointTupleLastReverseEquiv params i) xsPrefix := by
+        funext j
+        cases j using Fin.cases with
+        | zero =>
+            simp [pointTupleTail, pointTupleLastReverseEquiv, xsPrefix]
+        | succ j =>
+            simp [pointTupleTail, pointTupleLastReverseEquiv, xsPrefix]
+            exact congrArg xs (Fin.ext (by
+              change i - ((j : ℕ) + 1) = i - 1 - (j : ℕ)
+              omega))
+      have hgtail :
+          gHatTupleOutcomeTail ((gHatTupleOutcomeLastReverseEquiv params (i + 1)) gs) =
+            (gHatTupleOutcomeLastReverseEquiv params i) gsPrefix := by
+        funext j
+        cases j using Fin.cases with
+        | zero =>
+            simp [gHatTupleOutcomeTail, gHatTupleOutcomeLastReverseEquiv, gsPrefix]
+        | succ j =>
+            simp [gHatTupleOutcomeTail, gHatTupleOutcomeLastReverseEquiv, gsPrefix]
+            exact congrArg gs (Fin.ext (by
+              change i - ((j : ℕ) + 1) = i - 1 - (j : ℕ)
+              omega))
+      have hprefixAdj :=
+        gHatHalfProduct_lastReverse_eq_conjTranspose params family i xsPrefix gsPrefix
+      have hhead :
+          ((gHatIdxMeas params family (xs ⟨i + 1, by omega⟩)).outcome
+              (gs ⟨i + 1, by omega⟩))ᴴ =
+            (gHatIdxMeas params family (xs ⟨i + 1, by omega⟩)).outcome
+              (gs ⟨i + 1, by omega⟩) := by
+        exact (gHatIdxMeas params family (xs ⟨i + 1, by omega⟩)).outcome_hermitian
+          (gs ⟨i + 1, by omega⟩)
+      have hfront :
+          gHatHalfProductOutcomeOperator params family (i + 1 + 1)
+              ((pointTupleLastFrontEquiv params (i + 1)) xs)
+              ((gHatTupleOutcomeLastFrontEquiv params (i + 1)) gs) =
+            (gHatIdxMeas params family (xs ⟨i + 1, by omega⟩)).outcome
+                (gs ⟨i + 1, by omega⟩) *
+              gHatHalfProductOutcomeOperator params family (i + 1) xsPrefix gsPrefix := by
+        have hfrontTail :
+            pointTupleTail ((pointTupleLastFrontEquiv params (i + 1)) xs) =
+              xsPrefix := by
+          funext j
+          simp [pointTupleTail, pointTupleLastFrontEquiv, xsPrefix]
+        have hfrontGTail :
+            gHatTupleOutcomeTail ((gHatTupleOutcomeLastFrontEquiv params (i + 1)) gs) =
+              gsPrefix := by
+          funext j
+          simp [gHatTupleOutcomeTail, gHatTupleOutcomeLastFrontEquiv, gsPrefix]
+        rw [gHatHalfProductOutcomeOperator]
+        rw [hfrontTail, hfrontGTail]
+        simp [pointTupleLastFrontEquiv, gHatTupleOutcomeLastFrontEquiv]
+      rw [gHatRotatedHalfProductOutcomeOperator]
+      rw [htail, hgtail]
+      rw [hprefixAdj]
+      rw [hfront, Matrix.conjTranspose_mul, hhead]
+      rfl
+
 /-- The reindexed rotated raw right outcome is the original prefix half-product. -/
 private lemma ldSandwichLineOnePointPrefixMovedRawRightOriginalOutcome_eq_prefixHalf
     (params : Parameters)
@@ -1880,79 +2113,6 @@ private lemma ldSandwichLineOnePoint_endpoint_comm_error_le
           simp [ldSandwichLineOnePointError, S, E, D, Γ, Z, R]
           ring
 
-/-- Proven reductions feeding the remaining scalar one-point match-mass bound.
-
-This package keeps the final residual smaller than the original `ConsRel` branch:
-the raw commutation bound is already unpacked, the option-valued match mass has
-no `none` contribution, and the prefix/raw endpoint outcome expansions are
-available as hypotheses. -/
-private structure LdSandwichLineOnePointResidualFacts
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (gamma zeta : Error)
-    {k i : ℕ} (hi : i < k) : Prop where
-  rawCore :
-    avgOver (uniformDistribution (SandwichedLineQuestion params k))
-      (fun q =>
-        qSDDCore strategy.state
-          (fun gs =>
-            (ldSandwichLineOnePointPrefixMovedRawLeftOriginalOutcomeFamily
-              params family hi q).outcome gs)
-          (fun gs =>
-            (ldSandwichLineOnePointPrefixMovedRawRightOriginalOutcomeFamily
-              params family hi q).outcome gs))
-      ≤ commuteGHalfSandwichError params gamma zeta (i + 1)
-  matchExpand :
-    ∀ q : SandwichedLineQuestion params k,
-      qBipartiteMatchMass strategy.state
-        ((ldSandwichLineOnePointPrefixOriginalFamily params family hi) q)
-        ((ldSandwichLineOnePointRightFamily params strategy family k i) q) =
-        ∑ a : Fq params,
-          ev strategy.state
-            (opTensor
-              (((ldSandwichLineOnePointPrefixOriginalFamily params family hi) q).outcome
-                (some a))
-              (((ldSandwichLineOnePointRightFamily params strategy family k i) q).outcome
-                (some a)))
-  prefixOriginalSome :
-    ∀ (q : SandwichedLineQuestion params k) (a : Fq params),
-      (ldSandwichLineOnePointPrefixOriginalFamily params family hi q).outcome (some a) =
-        ∑ gs : GHatTupleOutcome params (i + 1),
-          if Option.map (fun g : Polynomial params => g q.1)
-              (gs ⟨i, Nat.lt_succ_self i⟩) = some a then
-            let half := gHatHalfProductOutcomeOperator params family (i + 1)
-              (fun j => q.2 ⟨j.1, by omega⟩) gs
-            half * halfᴴ
-          else
-            0
-  movedSome :
-    ∀ (q : SandwichedLineQuestion params k) (a : Fq params),
-      (ldSandwichLineOnePointPrefixMovedFamily params family hi q).outcome (some a) =
-        ∑ gs : GHatTupleOutcome params (i + 1),
-          if Option.map (fun g : Polynomial params => g q.1) (gs 0) = some a then
-            let xsTail : PointTuple params i := fun j => q.2 ⟨j.1, by omega⟩
-            let xs : PointTuple params (i + 1) := Fin.cons (q.2 ⟨i, hi⟩) xsTail
-            let half := gHatHalfProductOutcomeOperator params family (i + 1) xs gs
-            half * halfᴴ
-          else
-            0
-  rawLeftEndpoint :
-    ∀ (q : SandwichedLineQuestion params k) (gs : GHatTupleOutcome params (i + 1)),
-      (ldSandwichLineOnePointPrefixMovedRawLeftOriginalOutcomeFamily
-          params family hi q).outcome gs =
-        leftTensor (ι₂ := ι)
-          (gHatHalfProductOutcomeOperator params family (i + 1)
-            ((pointTupleLastFrontEquiv params i) (fun j => q.2 ⟨j.1, by omega⟩))
-            ((gHatTupleOutcomeLastFrontEquiv params i) gs))
-  rawRightEndpoint :
-    ∀ (q : SandwichedLineQuestion params k) (gs : GHatTupleOutcome params (i + 1)),
-      (ldSandwichLineOnePointPrefixMovedRawRightOriginalOutcomeFamily
-          params family hi q).outcome gs =
-        leftTensor (ι₂ := ι)
-          (gHatHalfProductOutcomeOperator params family (i + 1)
-            (fun j => q.2 ⟨j.1, by omega⟩) gs)
-
 /-- The linear (pre-`max`) form of the bipartite consistency defect. -/
 private noncomputable def qBipartiteLinearConsDefect {Outcome : Type*}
     {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -2263,6 +2423,214 @@ private noncomputable def ldSandwichLineOnePointCS_Arot
       MIPStarRE.Quantum.Op (ι × ι) := fun q gs =>
   leftTensor (ι₂ := ι) (ldSandwichLineOnePointCS_rotatedHalf params family hi q gs)
 
+/-- The adjoint of the ordered raw CS family, as an indexed operator family. -/
+private noncomputable def ldSandwichLineOnePointCS_AordAdjointFamily
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    {k i : ℕ} (hi : i < k) :
+    IdxOpFamily (SandwichedLineQuestion params k)
+      (GHatTupleOutcome params (i + 1)) (ι × ι) :=
+  fun q =>
+    { outcome := fun gs =>
+        (ldSandwichLineOnePointCS_Aord params family hi q gs)ᴴ
+      total := 0 }
+
+/-- The adjoint of the rotated raw CS family, as an indexed operator family. -/
+private noncomputable def ldSandwichLineOnePointCS_ArotAdjointFamily
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    {k i : ℕ} (hi : i < k) :
+    IdxOpFamily (SandwichedLineQuestion params k)
+      (GHatTupleOutcome params (i + 1)) (ι × ι) :=
+  fun q =>
+    { outcome := fun gs =>
+        (ldSandwichLineOnePointCS_Arot params family hi q gs)ᴴ
+      total := 0 }
+
+/-- Raw left family for the adjoint-oriented CS input, indexed by original outcomes. -/
+private noncomputable def ldSandwichLineOnePointAdjointRawLeftFamily
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    {k i : ℕ} (_hi : i < k) :
+    IdxOpFamily (SandwichedLineQuestion params k) (GHatTupleOutcome params (i + 1)) (ι × ι) :=
+  fun q =>
+    { outcome := fun gs =>
+        (gHatHalfSandwichLeft params family (i + 1)
+          ((pointTupleLastReverseEquiv params i) (fun j => q.2 ⟨j.1, by omega⟩))).outcome
+          ((gHatTupleOutcomeLastReverseEquiv params i) gs)
+      total := (gHatHalfSandwichLeft params family (i + 1)
+        ((pointTupleLastReverseEquiv params i) (fun j => q.2 ⟨j.1, by omega⟩))).total }
+
+/-- Raw right family for the adjoint-oriented CS input, indexed by original outcomes. -/
+private noncomputable def ldSandwichLineOnePointAdjointRawRightFamily
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    {k i : ℕ} (_hi : i < k) :
+    IdxOpFamily (SandwichedLineQuestion params k) (GHatTupleOutcome params (i + 1)) (ι × ι) :=
+  fun q =>
+    { outcome := fun gs =>
+        (gHatHalfSandwichRight params family (i + 1)
+          ((pointTupleLastReverseEquiv params i) (fun j => q.2 ⟨j.1, by omega⟩))).outcome
+          ((gHatTupleOutcomeLastReverseEquiv params i) gs)
+      total := (gHatHalfSandwichRight params family (i + 1)
+        ((pointTupleLastReverseEquiv params i) (fun j => q.2 ⟨j.1, by omega⟩))).total }
+
+/-- Raw commutation after last-reverse reindexing, lifted to sandwiched-line questions. -/
+private lemma ldSandwichLineOnePoint_adjointRawCommutation_originalOutcome
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψ : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    (hcomm : ∀ j : ℕ, 2 ≤ j →
+      CommuteGHalfSandwichStatement params ψ family gamma zeta j)
+    {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0) :
+    SDDOpRel ψ
+      (uniformDistribution (SandwichedLineQuestion params k))
+      (ldSandwichLineOnePointAdjointRawLeftFamily params family hi)
+      (ldSandwichLineOnePointAdjointRawRightFamily params family hi)
+      (commuteGHalfSandwichError params gamma zeta (i + 1)) := by
+  let Rest := Point params × ({j : Fin k // i < j.1} → Fq params)
+  let A : IdxOpFamily (PointTuple params (i + 1))
+      (GHatTupleOutcome params (i + 1)) (ι × ι) :=
+    fun xs =>
+      gHatHalfSandwichLeft params family (i + 1)
+        ((pointTupleLastReverseEquiv params i) xs)
+  let B : IdxOpFamily (PointTuple params (i + 1))
+      (GHatTupleOutcome params (i + 1)) (ι × ι) :=
+    fun xs =>
+      gHatHalfSandwichRight params family (i + 1)
+        ((pointTupleLastReverseEquiv params i) xs)
+  have hraw := ldSandwichLineOnePointPrefixMoved_rawCommutation
+    params ψ family gamma zeta hcomm hi0
+  have hprefix : SDDOpRel ψ
+      (uniformDistribution (PointTuple params (i + 1))) A B
+      (commuteGHalfSandwichError params gamma zeta (i + 1)) := by
+    simpa [A, B] using
+      (sddOpRel_uniform_equiv (pointTupleLastReverseEquiv params i).symm ψ
+        (gHatHalfSandwichLeft params family (i + 1))
+        (gHatHalfSandwichRight params family (i + 1))
+        (commuteGHalfSandwichError params gamma zeta (i + 1))).1 hraw
+  have hprod : SDDOpRel ψ
+      (uniformDistribution (PointTuple params (i + 1) × Rest))
+      (fun qr => A qr.1)
+      (fun qr => B qr.1)
+      (commuteGHalfSandwichError params gamma zeta (i + 1)) :=
+    sddOpRel_uniform_fst ψ A B
+      (commuteGHalfSandwichError params gamma zeta (i + 1)) hprefix
+  have hfull : SDDOpRel ψ
+      (uniformDistribution (SandwichedLineQuestion params k))
+      (fun q => A ((sandwichedLineQuestionPrefixFstEquiv params hi q).1))
+      (fun q => B ((sandwichedLineQuestionPrefixFstEquiv params hi q).1))
+      (commuteGHalfSandwichError params gamma zeta (i + 1)) := by
+    exact (sddOpRel_uniform_equiv (sandwichedLineQuestionPrefixFstEquiv params hi).symm ψ
+      (fun qr => A qr.1)
+      (fun qr => B qr.1)
+      (commuteGHalfSandwichError params gamma zeta (i + 1))).1 hprod
+  have hout := CommutativityPoints.sddOpRel_reindex
+    (gHatTupleOutcomeLastReverseEquiv params i).symm
+    ψ
+    (uniformDistribution (SandwichedLineQuestion params k))
+    (fun q => A ((sandwichedLineQuestionPrefixFstEquiv params hi q).1))
+    (fun q => B ((sandwichedLineQuestionPrefixFstEquiv params hi q).1))
+    (commuteGHalfSandwichError params gamma zeta (i + 1))
+    hfull
+  exact CommutativityPoints.sddOpRel_congr_outcome ψ
+    (uniformDistribution (SandwichedLineQuestion params k))
+    _ _
+    (ldSandwichLineOnePointAdjointRawLeftFamily params family hi)
+    (ldSandwichLineOnePointAdjointRawRightFamily params family hi)
+    (commuteGHalfSandwichError params gamma zeta (i + 1))
+    (by
+      intro q gs
+      have hprefix :
+          ((sandwichedLineQuestionPrefixFstEquiv params hi q).1) =
+            (fun j : Fin (i + 1) => q.2 ⟨j.1, by omega⟩) := by
+        funext j
+        simp [sandwichedLineQuestionPrefixFstEquiv,
+          sandwichedLineQuestionPrefixEquiv, prodPrefixReassocEquiv]
+      simp [A, ldSandwichLineOnePointAdjointRawLeftFamily,
+        hprefix])
+    (by
+      intro q gs
+      have hprefix :
+          ((sandwichedLineQuestionPrefixFstEquiv params hi q).1) =
+            (fun j : Fin (i + 1) => q.2 ⟨j.1, by omega⟩) := by
+        funext j
+        simp [sandwichedLineQuestionPrefixFstEquiv,
+          sandwichedLineQuestionPrefixEquiv, prodPrefixReassocEquiv]
+      simp [B, ldSandwichLineOnePointAdjointRawRightFamily,
+        hprefix])
+    hout
+
+/-- The adjoint raw family agrees with the ordered CS family. -/
+private lemma ldSandwichLineOnePointAdjointRawLeftFamily_eq_CS_Aord_adjoint
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    {k i : ℕ} (hi : i < k)
+    (q : SandwichedLineQuestion params k)
+    (gs : GHatTupleOutcome params (i + 1)) :
+    (ldSandwichLineOnePointAdjointRawLeftFamily params family hi q).outcome gs =
+      (ldSandwichLineOnePointCS_Aord params family hi q gs)ᴴ := by
+  simp [ldSandwichLineOnePointAdjointRawLeftFamily, gHatHalfSandwichLeft,
+    OpFamily.leftPlacedOpFamily, ldSandwichLineOnePointCS_Aord,
+    ldSandwichLineOnePointCS_orderedHalf, leftTensor_conjTranspose,
+    gHatHalfProduct_lastReverse_eq_conjTranspose]
+
+/-- The adjoint raw family agrees with the rotated CS family. -/
+private lemma ldSandwichLineOnePointAdjointRawRightFamily_eq_CS_Arot_adjoint
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    {k i : ℕ} (hi : i < k)
+    (q : SandwichedLineQuestion params k)
+    (gs : GHatTupleOutcome params (i + 1)) :
+    (ldSandwichLineOnePointAdjointRawRightFamily params family hi q).outcome gs =
+      (ldSandwichLineOnePointCS_Arot params family hi q gs)ᴴ := by
+  simp [ldSandwichLineOnePointAdjointRawRightFamily, gHatHalfSandwichRight,
+    OpFamily.leftPlacedOpFamily, ldSandwichLineOnePointCS_Arot,
+    ldSandwichLineOnePointCS_rotatedHalf, leftTensor_conjTranspose,
+    gHatRotatedHalfProduct_lastReverse_eq_conjTranspose_lastFront]
+
+/-- The adjoint-oriented raw-core bound needed by the line-one-point CS step. -/
+private lemma ldSandwichLineOnePoint_adjointRawCommutation_qSDDCore_bound
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    (hcomm : ∀ j : ℕ, 2 ≤ j →
+      CommuteGHalfSandwichStatement params strategy.state family gamma zeta j)
+    {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0) :
+    avgOver (uniformDistribution (SandwichedLineQuestion params k))
+      (fun q => qSDDCore strategy.state
+        (fun gs : GHatTupleOutcome params (i + 1) =>
+          (ldSandwichLineOnePointCS_Aord params family hi q gs)ᴴ)
+        (fun gs : GHatTupleOutcome params (i + 1) =>
+          (ldSandwichLineOnePointCS_Arot params family hi q gs)ᴴ)) ≤
+      commuteGHalfSandwichError params gamma zeta (i + 1) := by
+  have hraw := ldSandwichLineOnePoint_adjointRawCommutation_originalOutcome
+    params strategy.state family gamma zeta hcomm hi hi0
+  have hcongr := CommutativityPoints.sddOpRel_congr_outcome strategy.state
+    (uniformDistribution (SandwichedLineQuestion params k))
+    (ldSandwichLineOnePointAdjointRawLeftFamily params family hi)
+    (ldSandwichLineOnePointAdjointRawRightFamily params family hi)
+    (ldSandwichLineOnePointCS_AordAdjointFamily params family hi)
+    (ldSandwichLineOnePointCS_ArotAdjointFamily params family hi)
+    (commuteGHalfSandwichError params gamma zeta (i + 1))
+    (by
+      intro q gs
+      simpa [ldSandwichLineOnePointCS_AordAdjointFamily] using
+        ldSandwichLineOnePointAdjointRawLeftFamily_eq_CS_Aord_adjoint
+          params family hi q gs)
+    (by
+      intro q gs
+      simpa [ldSandwichLineOnePointCS_ArotAdjointFamily] using
+        ldSandwichLineOnePointAdjointRawRightFamily_eq_CS_Arot_adjoint
+          params family hi q gs)
+    hraw
+  simpa [sddErrorOp, qSDDOp, ldSandwichLineOnePointCS_AordAdjointFamily,
+    ldSandwichLineOnePointCS_ArotAdjointFamily] using hcongr.squaredDistanceBound
+
 /-- The $C$ family for the first, right-action CS move. -/
 private noncomputable def ldSandwichLineOnePointCS_Cfirst
     (params : Parameters) [FieldModel params.q]
@@ -2383,6 +2751,87 @@ private structure LdSandwichLineOnePointCSInputFacts
     ldSandwichLineOnePoint_prefix_movedOutcomeSum params strategy family hi =
       ldSandwichLineOnePointCS_secondTargetRaw params strategy family hi
 
+/-- Proven reductions feeding the remaining scalar one-point match-mass bound.
+
+This package keeps the final residual smaller than the original `ConsRel` branch:
+the raw commutation bound is already unpacked, the option-valued match mass has
+no `none` contribution, and the prefix/raw endpoint outcome expansions are
+available as hypotheses. -/
+private structure LdSandwichLineOnePointResidualFacts
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    {k i : ℕ} (hi : i < k) : Prop where
+  rawCore :
+    avgOver (uniformDistribution (SandwichedLineQuestion params k))
+      (fun q =>
+        qSDDCore strategy.state
+          (fun gs =>
+            (ldSandwichLineOnePointPrefixMovedRawLeftOriginalOutcomeFamily
+              params family hi q).outcome gs)
+          (fun gs =>
+            (ldSandwichLineOnePointPrefixMovedRawRightOriginalOutcomeFamily
+              params family hi q).outcome gs))
+      ≤ commuteGHalfSandwichError params gamma zeta (i + 1)
+  adjointRawCore :
+    avgOver (uniformDistribution (SandwichedLineQuestion params k))
+      (fun q => qSDDCore strategy.state
+        (fun gs : GHatTupleOutcome params (i + 1) =>
+          (ldSandwichLineOnePointCS_Aord params family hi q gs)ᴴ)
+        (fun gs : GHatTupleOutcome params (i + 1) =>
+          (ldSandwichLineOnePointCS_Arot params family hi q gs)ᴴ)) ≤
+      commuteGHalfSandwichError params gamma zeta (i + 1)
+  matchExpand :
+    ∀ q : SandwichedLineQuestion params k,
+      qBipartiteMatchMass strategy.state
+        ((ldSandwichLineOnePointPrefixOriginalFamily params family hi) q)
+        ((ldSandwichLineOnePointRightFamily params strategy family k i) q) =
+        ∑ a : Fq params,
+          ev strategy.state
+            (opTensor
+              (((ldSandwichLineOnePointPrefixOriginalFamily params family hi) q).outcome
+                (some a))
+              (((ldSandwichLineOnePointRightFamily params strategy family k i) q).outcome
+                (some a)))
+  prefixOriginalSome :
+    ∀ (q : SandwichedLineQuestion params k) (a : Fq params),
+      (ldSandwichLineOnePointPrefixOriginalFamily params family hi q).outcome (some a) =
+        ∑ gs : GHatTupleOutcome params (i + 1),
+          if Option.map (fun g : Polynomial params => g q.1)
+              (gs ⟨i, Nat.lt_succ_self i⟩) = some a then
+            let half := gHatHalfProductOutcomeOperator params family (i + 1)
+              (fun j => q.2 ⟨j.1, by omega⟩) gs
+            half * halfᴴ
+          else
+            0
+  movedSome :
+    ∀ (q : SandwichedLineQuestion params k) (a : Fq params),
+      (ldSandwichLineOnePointPrefixMovedFamily params family hi q).outcome (some a) =
+        ∑ gs : GHatTupleOutcome params (i + 1),
+          if Option.map (fun g : Polynomial params => g q.1) (gs 0) = some a then
+            let xsTail : PointTuple params i := fun j => q.2 ⟨j.1, by omega⟩
+            let xs : PointTuple params (i + 1) := Fin.cons (q.2 ⟨i, hi⟩) xsTail
+            let half := gHatHalfProductOutcomeOperator params family (i + 1) xs gs
+            half * halfᴴ
+          else
+            0
+  rawLeftEndpoint :
+    ∀ (q : SandwichedLineQuestion params k) (gs : GHatTupleOutcome params (i + 1)),
+      (ldSandwichLineOnePointPrefixMovedRawLeftOriginalOutcomeFamily
+          params family hi q).outcome gs =
+        leftTensor (ι₂ := ι)
+          (gHatHalfProductOutcomeOperator params family (i + 1)
+            ((pointTupleLastFrontEquiv params i) (fun j => q.2 ⟨j.1, by omega⟩))
+            ((gHatTupleOutcomeLastFrontEquiv params i) gs))
+  rawRightEndpoint :
+    ∀ (q : SandwichedLineQuestion params k) (gs : GHatTupleOutcome params (i + 1)),
+      (ldSandwichLineOnePointPrefixMovedRawRightOriginalOutcomeFamily
+          params family hi q).outcome gs =
+        leftTensor (ι₂ := ι)
+          (gHatHalfProductOutcomeOperator params family (i + 1)
+            (fun j => q.2 ⟨j.1, by omega⟩) gs)
+
 /-- The remaining orientation bridge for the paper's `eq:add-in-the-bot` input.
 
 The existing `LdSandwichLineOnePointResidualFacts.rawCore` exposes the project
@@ -2407,12 +2856,7 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_adjointRawC
         (fun gs : GHatTupleOutcome params (i + 1) =>
           (ldSandwichLineOnePointCS_Arot params family hi q gs)ᴴ)) ≤
       commuteGHalfSandwichError params gamma zeta (i + 1) := by
-  /- TODO(#835): build an adjointed `commuteGHalfSandwich` / `qSDDCore`
-  orientation bridge.  The paper uses the $D D^\dagger$ orientation for
-  `D = \widehat G_{<i}\widehat G_i - \widehat G_i\widehat G_{<i}` in
-  `eq:add-in-the-bot`, while `facts.rawCore` currently gives the project
-  convention $D^\dagger D`. -/
-  sorry
+  exact facts.adjointRawCore
 
 /-- Assemble the line-one-point CS input package from the single adjoint raw-core bridge. -/
 private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_inputFacts
@@ -3157,6 +3601,9 @@ private lemma ldSandwichLineOnePoint_nonzero_prefix_transport
     (hzeta_le : zeta ≤ 1)
     (family : IdxPolyFamily params ι)
     {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0)
+    (hcomm : ∀ j : ℕ, 2 ≤ j →
+      CommuteGHalfSandwichStatement params strategy.state family
+        gamma zeta j)
     (hprefixRaw :
       SDDOpRel strategy.state
         (uniformDistribution (SandwichedLineQuestion params k))
@@ -3177,6 +3624,9 @@ private lemma ldSandwichLineOnePoint_nonzero_prefix_transport
   have hrawCore :=
     ldSandwichLineOnePointPrefixMoved_rawCommutation_qSDDCore_bound
       params strategy family gamma zeta hi hprefixRaw
+  have hadjointRawCore :=
+    ldSandwichLineOnePoint_adjointRawCommutation_qSDDCore_bound
+      params strategy family gamma zeta hcomm hi hi0
   have hmatchExpand :=
     fun q : SandwichedLineQuestion params k =>
       qBipartiteMatchMass_option_right_none_zero strategy.state
@@ -3200,6 +3650,7 @@ private lemma ldSandwichLineOnePoint_nonzero_prefix_transport
         params family hi q gs
   have facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi :=
     { rawCore := hrawCore
+      adjointRawCore := hadjointRawCore
       matchExpand := hmatchExpand
       prefixOriginalSome := hprefixOriginalSome
       movedSome := hmovedSome
@@ -3338,7 +3789,7 @@ private lemma ldSandwichLineOnePoint_core
     exact ldSandwichLineOnePoint_nonzero_prefix_transport
       params strategy eps delta gamma zeta
       heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hzeta_le
-      family hi hi0 hprefixRaw hmovedEndpoint'
+      family hi hi0 hcomm hprefixRaw hmovedEndpoint'
 
 /-- `lem:ld-sandwich-line-one-point`. -/
 lemma ldSandwichLineOnePoint
