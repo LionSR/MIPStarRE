@@ -382,12 +382,8 @@ private lemma pointConditioned_leftTensor_sq
           pointConditionedOutcomeOperatorAtPolynomial params strategy g v))ᴴ =
         leftTensor (ι₂ := ι)
           ((pointConditionedOutcomeOperatorAtPolynomial params strategy g u -
-            pointConditionedOutcomeOperatorAtPolynomial params strategy g v)ᴴ) := by
-    simpa [leftTensor] using
-      (conjTranspose_opTensor
-        (pointConditionedOutcomeOperatorAtPolynomial params strategy g u -
-          pointConditionedOutcomeOperatorAtPolynomial params strategy g v)
-        (1 : MIPStarRE.Quantum.Op ι))
+            pointConditionedOutcomeOperatorAtPolynomial params strategy g v)ᴴ) :=
+    leftTensor_conjTranspose _
   rw [hct]
   rw [leftTensor_mul_leftTensor]
 
