@@ -911,32 +911,33 @@ def rolePackage
 
 end MainFormalRolePackageResidual
 
-/-- Reuse the current field model on the predecessor of a successor decomposition.
+/-- Reuse the current base-universe field model on the predecessor of a
+successor decomposition.
 
 If `successor.pred.next = params`, then `successor.pred.q = params.q`; this helper
-chooses the predecessor field model by transporting the ambient one along that
-cardinality equality. -/
+transports the ambient base-universe field model along that cardinality equality.
+The explicit equality cast keeps the transport visible to callers, rather than
+hiding it behind a tactic-mode `rw; infer_instance` definition. -/
 noncomputable def fieldModelOfSuccessorDecomposition
-    {params : Parameters} [FieldModel params.q]
+    {params : Parameters} [FieldModel.{0} params.q]
     (successor : Parameters.SuccessorDecomposition params) :
-    FieldModel successor.pred.q := by
-  classical
-  have hq : successor.pred.q = params.q := by
-    have h := congrArg Parameters.q successor.next_eq
-    simpa [Parameters.next] using h
-  rw [hq]
-  infer_instance
+    FieldModel.{0} successor.pred.q :=
+  let h : successor.pred.q = params.q := by
+    have hnext := congrArg Parameters.q successor.next_eq
+    simpa [Parameters.next] using hnext
+  h ▸ inferInstance
 
 /-- View a strategy over `params` as a strategy over the syntactic successor in a
-bundled predecessor decomposition.  The field model on the predecessor is chosen
-by `fieldModelOfSuccessorDecomposition`, so the transported successor strategy
-uses the same scalar model as the original strategy. -/
+bundled predecessor decomposition.
+
+This helper is intentionally aligned with the base-universe field-model API used
+by the current Section 6 public successor wrapper. -/
 noncomputable def projStratTransportSuccessor
-    {params : Parameters} [FieldModel params.q]
+    {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι)
     (successor : Parameters.SuccessorDecomposition params) :
-    letI : FieldModel successor.pred.q := fieldModelOfSuccessorDecomposition successor
+    letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
     ProjStrat successor.pred.next ι := by
   classical
   rcases successor with ⟨pred, hnext⟩
@@ -944,14 +945,15 @@ noncomputable def projStratTransportSuccessor
   exact strategy
 
 /-- Transport the low-individual-degree passing proof across a bundled predecessor
-identity. -/
+identity, using the same base-universe field-model transport as
+`projStratTransportSuccessor`. -/
 theorem passesLowIndividualDegreeTest_transportSuccessor
-    {params : Parameters} [FieldModel params.q]
+    {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : ProjStrat params ι} {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (successor : Parameters.SuccessorDecomposition params) :
-    letI : FieldModel successor.pred.q := fieldModelOfSuccessorDecomposition successor
+    letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
     (projStratTransportSuccessor strategy successor).PassesLowIndividualDegreeTest eps := by
   rcases successor with ⟨pred, hnext⟩
   subst params
@@ -972,7 +974,7 @@ structure MainFormalRolePackageSuccessorResidual
   successor : Parameters.SuccessorDecomposition params
   /-- The bundled successor-boundary inputs for the transported strategy. -/
   boundary :
-    letI : FieldModel successor.pred.q := fieldModelOfSuccessorDecomposition successor
+    letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
     MainFormalSuccessorBoundary successor.pred
       (projStratTransportSuccessor strategy successor) eps
       (passesLowIndividualDegreeTest_transportSuccessor hpass successor) k
@@ -996,10 +998,10 @@ theorem toRolePackageResidual
     Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) := by
   rcases residual with ⟨⟨pred, hnext⟩, boundary, hd, hk_pos, hk_large⟩
   subst params
-  -- Keep this transported predecessor instance explicit: although
-  -- `pred.next.q` unfolds to `pred.q`, downstream transported strategies remember
-  -- the chosen instance, so relying on fresh synthesis creates non-defeq terms.
-  letI : FieldModel pred.q :=
+  -- Keep the transported predecessor instance explicit: `boundary` was stored
+  -- under `fieldModelOfSuccessorDecomposition`, and the synthesized canonical
+  -- `FieldModel.{0} pred.q` is not definitionally the same instance.
+  letI : FieldModel.{0} pred.q :=
     fieldModelOfSuccessorDecomposition (params := pred.next) ⟨pred, rfl⟩
   let transportedStrategy : ProjStrat pred.next ι :=
     projStratTransportSuccessor strategy ⟨pred, rfl⟩
@@ -2525,23 +2527,23 @@ noncomputable def toPostRolePackageCompletionLine169Residual
 
 end MainFormalPostRolePackageLeftCompletionLine169Residual
 
-/-- Combined live residual after isolating branch-level role-package production.
+/-- Combined live residual after isolating concrete role-package production.
 
-The first field records the actual Section 6 role-production branch: either the
-checked base case, or explicit predecessor transport together with the successor
-boundary and large-`k` side condition.  The second field contains only the
-projectivization/completion and line-169 data for the role package selected from
-that branch-level residual.  Thus the live `mainFormal` hole no longer asks for
-an arbitrary `MainFormalRoleMeasurementPackage` or an arbitrary raw Section 6
-witness as an independent field. -/
+The first field is the actual Section 6 role residual: it carries the concrete
+role-register measurement and its symmetrized consistency proof.  The second
+field contains only the projectivization/completion and line-169 data for the role
+package obtained from that concrete residual.  Thus the live `mainFormal` hole no
+longer asks for an arbitrary `MainFormalRoleMeasurementPackage`, an arbitrary raw
+Section 6 witness, or a decorative branch witness not tied to the concrete
+measurement.  The branch-level base/successor constructors remain available on
+`MainFormalRolePackageResidual` and `MainFormalRolePackageBranchResidual` as the
+intended ways to supply this field. -/
 structure MainFormalCascadeRolePackageResidualCompletionLine169Residual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k) where
-  /-- Branch-level Section 6 data explaining how the role package is produced. -/
-  roleBranchResidual : MainFormalRolePackageBranchResidual params strategy eps hpass k
   /-- The explicit isolated Section 6 residual.  Keeping this field concrete avoids
   hiding the role-register measurement behind `Classical.choice`. -/
   roleResidual : MainFormalRolePackageResidual params strategy eps hpass k
@@ -2555,8 +2557,7 @@ namespace MainFormalCascadeRolePackageResidualCompletionLine169Residual
 /-- Convert the split role-residual/post-role package back to the role-packaged
 completion-line169 residual consumed by the existing downstream wrappers.
 
-The conversion uses the explicit `roleResidual` field, rather than choosing one
-from the branch residual's `Nonempty` conversion, so the role-register
+The conversion uses the explicit `roleResidual` field, so the role-register
 measurement remains visible to the post-role residual. -/
 noncomputable def toRolePackagedCompletionLine169Residual
     {params : Parameters} [FieldModel.{0} params.q]
@@ -2571,7 +2572,7 @@ noncomputable def toRolePackagedCompletionLine169Residual
 
 end MainFormalCascadeRolePackageResidualCompletionLine169Residual
 
-/-- Combined live residual after isolating branch-level role-package production
+/-- Combined live residual after isolating concrete role-package production
 and the #869 Bob-side completion transport.
 
 Compared with `MainFormalCascadeRolePackageResidualCompletionLine169Residual`, this
@@ -2579,16 +2580,14 @@ package no longer asks the live hole to provide the right-register completion
 closeness directly.  Instead the post-role field records the left-register
 Bob-side completion estimate returned by the orthonormalize-and-complete chain,
 and the conversion below transports it to the right register using permutation
-invariance of the strategy state.  The role-production branch and the exact
-paper line-169 `ζ₁` links remain explicit. -/
+invariance of the strategy state.  The concrete role residual and the exact paper
+line-169 `ζ₁` links remain explicit. -/
 structure MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k) where
-  /-- Branch-level Section 6 data explaining how the role package is produced. -/
-  roleBranchResidual : MainFormalRolePackageBranchResidual params strategy eps hpass k
   /-- The explicit isolated Section 6 residual.  Keeping this field concrete avoids
   hiding the role-register measurement behind `Classical.choice`. -/
   roleResidual : MainFormalRolePackageResidual params strategy eps hpass k
@@ -2613,7 +2612,6 @@ noncomputable def toRolePackageResidualCompletionLine169Residual
       params strategy eps hpass k scalars) :
     MainFormalCascadeRolePackageResidualCompletionLine169Residual
       params strategy eps hpass k scalars where
-  roleBranchResidual := residual.roleBranchResidual
   roleResidual := residual.roleResidual
   postRoleResidual :=
     residual.postRoleResidual.toPostRolePackageCompletionLine169Residual
@@ -2780,6 +2778,9 @@ intermediate range.  No checked lemma here proves that
 
 Universe note: the Lean statement uses `[FieldModel.{0} params.q]`, matching the
 base-universe field-model assumption of the public Section 6 successor wrapper.
+This is a current Lean API limitation, not a paper constraint; once the Section 6
+wrapper is universe-polymorphic, this public theorem should be generalized as
+well.
 
 Fixes #137, #239.
 -/
@@ -2826,15 +2827,16 @@ theorem mainFormal
   -- cascade side conditions are discharged below: if `mainFormalError ≥ 1`, the
   -- theorem is vacuous; otherwise the pass condition gives `0 ≤ ε`, while
   -- `mainFormalError < 1` rules out `ε > 1` and `d > q`. Producing the remaining
-  -- residual still depends on active upstream work: the branch-level Section 6
-  -- role-package producer (successor-boundary data plus the large-`k` or
-  -- small-`k` split), the left-register completion estimates returned by the
-  -- orthonormalize-and-complete chain, and the polynomial `ζ₁` transport links
-  -- (#426), the full-slice transport chain (#601), the remaining `fromHToG`
-  -- pasting bridge (#707), the reverse `overAllOutcomes` aggregation (#672), and
-  -- the ProcessedG scalar follow-ups #714, #715, #732, and #759.  Once the role
-  -- package is available, the factor-two unsymmetrization estimates are checked
-  -- by `UnsymmetrizationBridgePackage.ofSymConsistency`; the Bob-side completion
+  -- residual still depends on active upstream work: a concrete Section 6 role
+  -- residual supplied through the base/successor constructors (successor-boundary
+  -- data plus the large-`k` or small-`k` split), the left-register completion
+  -- estimates returned by the orthonormalize-and-complete chain, and the
+  -- polynomial `ζ₁` transport links (#426), the full-slice transport chain
+  -- (#601), the remaining `fromHToG` pasting bridge (#707), the reverse
+  -- `overAllOutcomes` aggregation (#672), and the ProcessedG scalar follow-ups
+  -- #714, #715, #732, and #759.  Once the role package is available, the
+  -- factor-two unsymmetrization estimates are checked by
+  -- `UnsymmetrizationBridgePackage.ofSymConsistency`; the Bob-side completion
   -- estimate is transported from the left register to the right register by the
   -- #869 permutation-invariant helper.  The line-169 transport fields remain
   -- explicit because generic `triangleSub` gives `ζ₁ + sqrt ζ₂`, not the printed
@@ -2850,8 +2852,9 @@ theorem mainFormal
         MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual
           (params := params) (strategy := strategy) (eps := eps)
           (hpass := hpass) (k := k) (scalars := scalars) := by
-      -- TODO(#427): construct the branch-level role package, left-register
-      -- completion witnesses, and exact polynomial line-169 transport links.
+      -- TODO(#427): construct the concrete Section 6 role residual,
+      -- left-register completion witnesses, and exact polynomial line-169
+      -- transport links.
       sorry
     have rolePackageResidualCompletionLine169Residual :
         MainFormalCascadeRolePackageResidualCompletionLine169Residual
