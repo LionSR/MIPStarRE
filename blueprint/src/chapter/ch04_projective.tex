@@ -87,10 +87,10 @@
 	restating the tensor-factor bookkeeping.
 \end{remark}
 
-\begin{remark}[Lean line-169 projectivization correlation interface]\label{rem:lean-line169-projectivization-correlation}
+\begin{remark}[Lean line-169 projectivization match-mass interface]\label{rem:lean-line169-projectivization-match-mass}
 	\uses{thm:orthonormalization, prop:completing-to-measurement, prop:triangle-sub}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169CorrelationPreservation}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169CorrelationPreservation.leftConsistency, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169CorrelationPreservation.rightConsistency}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.leftConsistency, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.rightConsistency}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff.leftConsistency_with_triangleSub_loss, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff.rightConsistency_with_triangleSub_loss}
 	Lean exposes the quantitative obstruction at the projectivization handoff used
 	in the inductive step.  The existing line-156 handoff gives only the generic
@@ -106,13 +106,13 @@
 	The paper-tight line-169 estimate at exactly $\zeta_1$ therefore requires
 	more than state-dependent-distance closeness.  Lean records the missing
 	construction-level invariant as
-	\texttt{ProjectivizationLine169CorrelationPreservation}: replacing
+	\texttt{ProjectivizationMatchMassMonotonicity}: replacing
 	$G^{\mathrm A}$ by the completed projective measurement $Q^{\mathrm A}$, and
 	role-reversing on Bob's side, must not decrease the diagonal match mass against
 	the opposite pre-projective measurement.  Its two consistency theorems prove
 	that this primitive match-mass monotonicity is sufficient to recover the exact
 	line-169 \texttt{ConsRel} links.  No constructor for this invariant is asserted
-	here; supplying it remains the upstream projectivization/correlation-preservation
+	here; supplying it remains the upstream projectivization/match-mass monotonicity
 	work needed by the main-formal residual.
 \end{remark}
 

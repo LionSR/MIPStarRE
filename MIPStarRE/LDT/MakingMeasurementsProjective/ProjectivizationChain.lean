@@ -258,9 +258,9 @@ theorem line156Approx {Outcome : Type*} {ι : Type*}
 
 end ProjectivizationLine156Handoff
 
-/-! ### Line-169 correlation preservation -/
+/-! ### Line-169 match-mass monotonicity -/
 
-/-- Match-mass preservation invariant needed for the paper's line-169
+/-- Match-mass monotonicity invariant needed for the paper's line-169
 projectivization transport.
 
 The ordinary Step 6 handoff records only state-dependent-distance closeness
@@ -277,7 +277,7 @@ This structure records that invariant in its primitive match-mass form, rather
 than restating the downstream `ConsRel` conclusion.  A future projectivization
 constructor can produce this package from additional repair/completion data;
 theorems in the namespace turn it into the exact line-169 consistency links. -/
-structure ProjectivizationLine169CorrelationPreservation
+structure ProjectivizationMatchMassMonotonicity
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
@@ -293,7 +293,7 @@ structure ProjectivizationLine169CorrelationPreservation
     qBipartiteMatchMass ψ Q_B.toSubMeas G_A.toSubMeas ≥
       qBipartiteMatchMass ψ G_B.toSubMeas G_A.toSubMeas
 
-namespace ProjectivizationLine169CorrelationPreservation
+namespace ProjectivizationMatchMassMonotonicity
 
 /-- Exact Alice-side line-169 consistency from match-mass preservation.
 
@@ -304,7 +304,7 @@ theorem leftConsistency {Outcome : Type*} {ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     {ψ : QuantumState (ι × ι)}
     {G_A G_B : Measurement Outcome ι} {Q_A Q_B : ProjMeas Outcome ι}
-    (preservation : ProjectivizationLine169CorrelationPreservation ψ G_A G_B Q_A Q_B)
+    (preservation : ProjectivizationMatchMassMonotonicity ψ G_A G_B Q_A Q_B)
     {ζ : Error}
     (hpre : ConsRel ψ (uniformDistribution Unit)
       (constSubMeasFamily G_A.toSubMeas)
@@ -341,7 +341,7 @@ theorem rightConsistency {Outcome : Type*} {ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     {ψ : QuantumState (ι × ι)}
     {G_A G_B : Measurement Outcome ι} {Q_A Q_B : ProjMeas Outcome ι}
-    (preservation : ProjectivizationLine169CorrelationPreservation ψ G_A G_B Q_A Q_B)
+    (preservation : ProjectivizationMatchMassMonotonicity ψ G_A G_B Q_A Q_B)
     {ζ : Error}
     (hpre : ConsRel ψ (uniformDistribution Unit)
       (constSubMeasFamily G_B.toSubMeas)
@@ -372,7 +372,7 @@ theorem rightConsistency {Outcome : Type*} {ι : Type*}
   simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily]
     using hdefect.trans hpre'
 
-end ProjectivizationLine169CorrelationPreservation
+end ProjectivizationMatchMassMonotonicity
 
 namespace ProjectivizationLine156Handoff
 
