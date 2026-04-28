@@ -26,7 +26,7 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 lemma leftTensor_conjTranspose
     (A : MIPStarRE.Quantum.Op ι) :
     (leftTensor (ι₂ := ι) A)ᴴ = leftTensor (ι₂ := ι) Aᴴ := by
-  simp [leftTensor, Matrix.conjTranspose_kronecker]
+  exact MIPStarRE.LDT.leftTensor_conjTranspose A
 
 /-- Multiplying a left tensor into a full tensor only affects the left factor. -/
 lemma leftTensor_mul_opTensor

@@ -62,10 +62,7 @@ private lemma fullSliceProductLeft_qSDDOp_zero_le_one
           have hleftH :
               (leftTensor (ι₂ := ι) (A.outcome gh.1 * B.outcome gh.2))ᴴ =
                 leftTensor (ι₂ := ι) ((A.outcome gh.1 * B.outcome gh.2)ᴴ) := by
-            simpa [leftTensor] using
-              (Matrix.conjTranspose_kronecker
-                (A.outcome gh.1 * B.outcome gh.2)
-                (1 : MIPStarRE.Quantum.Op ι))
+            simp
           have hmul :
               (((A.outcome gh.1 * B.outcome gh.2)ᴴ) *
                 (A.outcome gh.1 * B.outcome gh.2)) =
@@ -163,10 +160,7 @@ private lemma zero_qSDDOp_fullSliceProductRight_le_one
           have hleftH :
               (leftTensor (ι₂ := ι) (B.outcome gh.2 * A.outcome gh.1))ᴴ =
                 leftTensor (ι₂ := ι) ((B.outcome gh.2 * A.outcome gh.1)ᴴ) := by
-            simpa [leftTensor] using
-              (Matrix.conjTranspose_kronecker
-                (B.outcome gh.2 * A.outcome gh.1)
-                (1 : MIPStarRE.Quantum.Op ι))
+            simp
           have hmul :
               (((B.outcome gh.2 * A.outcome gh.1)ᴴ) *
                 (B.outcome gh.2 * A.outcome gh.1)) =
@@ -1950,7 +1944,7 @@ private lemma xEvaluated_selfConsistency_snd_adjoint_bound
           intro h _
           have hY : ((family.meas xy.2).outcome h)ᴴ = (family.meas xy.2).outcome h :=
             (family.meas xy.2).outcome_hermitian h
-          simp [leftTensor, rightTensor, Matrix.conjTranspose_kronecker, hY]
+          simp [hY]
     _ ≤ zeta := hfull
 
 /-- Pull a finite outcome sum into a uniform average over the product space. -/
@@ -2750,7 +2744,7 @@ lemma xEvaluatedSliceBABAtensor_to_xEvaluatedFullSliceABABAvg
             apply Finset.sum_congr rfl
             intro a _
             have hX : ((X ux).outcome a)ᴴ = (X ux).outcome a := (X ux).outcome_hermitian a
-            simp [A, B, leftTensor, rightTensor, Matrix.conjTranspose_kronecker, hX]
+            simp [A, B, hX]
       _ ≤ zeta := by
             simpa [𝒟, A, B, X] using
               xEvaluated_selfConsistency_fst_bound params strategy family zeta hself

@@ -329,7 +329,7 @@ private lemma weightedPolynomialState_ev_leftTensor
     calc
       Wᴴ * L * W =
           rightTensor (ι₁ := ι) Sᴴ * leftTensor (ι₂ := ι) X * rightTensor (ι₁ := ι) S := by
-        simp [W, L, rightTensor, Matrix.conjTranspose_kronecker]
+        simp [W, L]
       _ = opTensor X Sᴴ * rightTensor (ι₁ := ι) S := by
         rw [rightTensor_mul_leftTensor_eq_opTensor]
       _ = (leftTensor (ι₂ := ι) X * rightTensor (ι₁ := ι) Sᴴ) *
@@ -1429,7 +1429,7 @@ private lemma rightPolynomialWeightSqrt_contraction
       1 := by
   let S : MIPStarRE.Quantum.Op ι := polynomialWeightSqrtOperator params G g
   have hct : (rightTensor (ι₁ := ι) S)ᴴ = rightTensor (ι₁ := ι) Sᴴ := by
-    simp [rightTensor, Matrix.conjTranspose_kronecker]
+    simp
   calc
     (rightTensor (ι₁ := ι) S)ᴴ * rightTensor (ι₁ := ι) S =
         rightTensor (ι₁ := ι) (Sᴴ * S) := by

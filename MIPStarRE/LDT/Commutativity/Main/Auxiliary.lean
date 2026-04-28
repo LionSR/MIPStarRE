@@ -790,10 +790,7 @@ private lemma evaluatedSliceProductLeft_qSDDOp_zero_le_one
           have hleftH :
               (leftTensor (ι₂ := ι) (A.outcome a * B.outcome b))ᴴ =
                 leftTensor (ι₂ := ι) ((A.outcome a * B.outcome b)ᴴ) := by
-            simpa [leftTensor] using
-              (Matrix.conjTranspose_kronecker
-                (A.outcome a * B.outcome b)
-                (1 : MIPStarRE.Quantum.Op ι))
+            simp
           have hmul :
               (((A.outcome a * B.outcome b)ᴴ) *
                 (A.outcome a * B.outcome b)) =
@@ -891,10 +888,7 @@ private lemma zero_qSDDOp_evaluatedSliceProductRight_le_one
           have hleftH :
               (leftTensor (ι₂ := ι) (B.outcome b * A.outcome a))ᴴ =
                 leftTensor (ι₂ := ι) ((B.outcome b * A.outcome a)ᴴ) := by
-            simpa [leftTensor] using
-              (Matrix.conjTranspose_kronecker
-                (B.outcome b * A.outcome a)
-                (1 : MIPStarRE.Quantum.Op ι))
+            simp
           have hmul :
               (((B.outcome b * A.outcome a)ᴴ) *
                 (B.outcome b * A.outcome a)) =
