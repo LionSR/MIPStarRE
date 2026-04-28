@@ -2705,7 +2705,7 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_inputFacts
         simp [evalOutcome, hgs, ldSandwichLineOnePointCS_Aord,
           ldSandwichLineOnePointCS_Csecond, ldSandwichLineOnePointCS_orderedHalf,
           ldSandwichLineOnePointCS_rotatedHalf,
-          ldSandwichLineOnePointCS_rightComplement, leftTensor_conjTranspose,
+          ldSandwichLineOnePointCS_rightComplement,
           opTensor_mul_leftTensor]
   · unfold ldSandwichLineOnePoint_prefix_movedOutcomeSum
       ldSandwichLineOnePointCS_secondTargetRaw
@@ -2799,7 +2799,7 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_inputFacts
             rw [Fintype.sum_unique]
             simp [ldSandwichLineOnePointCS_Arot, ldSandwichLineOnePointCS_Csecond,
               ldSandwichLineOnePointCS_rotatedHalf,
-              ldSandwichLineOnePointCS_rightComplement, leftTensor_conjTranspose,
+              ldSandwichLineOnePointCS_rightComplement,
               opTensor_mul_leftTensor]
 
 /-- Narrow residual for the two off-diagonal Cauchy--Schwarz moves in their
