@@ -72,6 +72,7 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
     escaped = False
     in_interpolation = False
     interpolation_depth = 0
+    interpolation_stack: list[int] = []
     string_interpolated = False
 
     for line in text.splitlines():
@@ -106,6 +107,8 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
                     escaped = True
                 elif in_string and string_interpolated and char == "{":
                     in_string = False
+                    if in_interpolation:
+                        interpolation_stack.append(interpolation_depth)
                     in_interpolation = True
                     interpolation_depth = 1
                 elif in_string and char == '"':
@@ -123,10 +126,13 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
                 else:
                     interpolation_depth -= 1
                     if interpolation_depth == 0:
-                        in_interpolation = False
                         in_string = True
                         string_interpolated = True
                         escaped = False
+                        if interpolation_stack:
+                            interpolation_depth = interpolation_stack.pop()
+                        else:
+                            in_interpolation = False
                 i += 1
                 continue
 
