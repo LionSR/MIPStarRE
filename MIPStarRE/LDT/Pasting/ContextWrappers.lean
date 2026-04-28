@@ -179,8 +179,8 @@ lemma fromHToG_of_context
     have hzeta_nonneg : 0 ≤ ctx.zeta :=
       IdxPolyFamily.zeta_nonneg_of_consistentWithPoints
         ctx.strategy ctx.family ctx.consistent
-    exact fromHToG params ctx.strategy ctx.strategy.state ctx.family ctx.gamma
-      ctx.zeta hgamma_nonneg hzeta_nonneg ctx.zeta_le_one hfacts hhalf ctx.k
+    exact fromHToG params ctx.strategy ctx.strategy.state ctx.strategy.isNormalized ctx.family
+      ctx.gamma ctx.zeta hgamma_nonneg hzeta_nonneg ctx.zeta_le_one hfacts hhalf ctx.k
 
 /-- `cor:commuting-with-G-complete` restated against the standing pasting
 context.

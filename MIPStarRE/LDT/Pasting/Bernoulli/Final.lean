@@ -19,13 +19,27 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+/-- On a swap-invariant bipartite state, left and right placements of the same
+operator have the same expectation. -/
+private lemma ev_leftTensor_eq_rightTensor_of_density_fixed
+    (ψ : QuantumState (ι × ι))
+    (hfix : swapDensity ψ.density = ψ.density)
+    (A : MIPStarRE.Quantum.Op ι) :
+    ev ψ (leftTensor (ι₂ := ι) A) = ev ψ (rightTensor (ι₁ := ι) A) := by
+  calc
+    ev ψ (leftTensor (ι₂ := ι) A) = ev ψ (opTensor A (1 : MIPStarRE.Quantum.Op ι)) := by
+      simp [leftTensor, opTensor]
+    _ = ev ψ (opTensor (1 : MIPStarRE.Quantum.Op ι) A) := by
+      exact ev_opTensor_swap_of_density_fixed ψ hfix A (1 : MIPStarRE.Quantum.Op ι)
+    _ = ev ψ (rightTensor (ι₁ := ι) A) := by
+      simp [rightTensor, opTensor]
+
 /-- Arithmetic helper for `cor:ld-pasting-N-completeness`: absorb the
 `overAllOutcomes` and `fromHToG` scalar losses into
 `ldPastingInInductionNu`.
 
-The proof uses that the `fromHToGError` tail sum is a sub-sum of the full
-`overAllOutcomesError` sum, that `1 ≤ k` implies `k ≤ k^2`, and the slack
-`46 + 46 ≤ 100`. -/
+The proof uses that the corrected `fromHToGError` tail sum is a sub-sum of the
+full `overAllOutcomesError` sum and the slack `46 + 46 ≤ 100`. -/
 private lemma overAllOutcomesError_add_fromHToGError_le_ldPastingNu
     (params : Parameters)
     [FieldModel params.q]
@@ -48,8 +62,6 @@ private lemma overAllOutcomesError_add_fromHToGError_le_ldPastingNu
   let dqTerm : Error := Real.rpow ratio (1 / (32 : Error))
   let fullSum : Error := epsTerm + deltaTerm + gammaTerm + zetaTerm + dqTerm
   let tailSum : Error := gammaTerm + zetaTerm + dqTerm
-  -- This is the `1 ≤ k` input that the downstream `nlinarith` call uses to
-  -- trade the linear `k` term for `k^2`.
   have hkE_one : (1 : Error) ≤ kE := by
     dsimp [kE]
     exact_mod_cast hk_pos
@@ -82,17 +94,13 @@ private lemma overAllOutcomesError_add_fromHToGError_le_ldPastingNu
   calc
     overAllOutcomesError params eps delta gamma zeta k +
         fromHToGError params gamma zeta k
-      = 46 * (kE ^ (2 : ℕ)) * mE * fullSum + 46 * kE * mE * tailSum := by
+      = 46 * (kE ^ (2 : ℕ)) * mE * fullSum +
+          46 * (kE ^ (2 : ℕ)) * mE * tailSum := by
           simp [overAllOutcomesError, fromHToGError, kE, mE, fullSum, tailSum,
             epsTerm, deltaTerm, gammaTerm, zetaTerm, dqTerm, ratio]
-    _ ≤ 46 * (kE ^ (2 : ℕ)) * mE * fullSum + 46 * kE * mE * fullSum := by
+    _ ≤ 46 * (kE ^ (2 : ℕ)) * mE * fullSum +
+          46 * (kE ^ (2 : ℕ)) * mE * fullSum := by
           gcongr
-    _ ≤ 46 * (kE ^ (2 : ℕ)) * mE * fullSum + 46 * (kE ^ (2 : ℕ)) * mE * fullSum := by
-          have hk_sq : kE ≤ kE ^ (2 : ℕ) := by
-            nlinarith
-          have hscale_nonneg : 0 ≤ 46 * mE * fullSum := by
-            positivity
-          nlinarith
     _ ≤ 100 * (kE ^ (2 : ℕ)) * mE * fullSum := by
           have hterm_nonneg : 0 ≤ (kE ^ (2 : ℕ)) * mE * fullSum := by
             positivity
@@ -168,7 +176,8 @@ private lemma ldPasting_chernoff_size (params : Parameters) (k : ℕ)
 This is the previously residual Bernoulli-tail lower-bound step in
 `cor:ld-pasting-N-completeness`: the matrix Chernoff lemma is applied on the left
 register to `G ⊗ I`, then `bernoulliTailOperator_leftTensor` identifies its
-conclusion with `fromHToGBernoulliTailMass`. -/
+conclusion and swap-invariance transfers it to the paper-shaped right-register
+`fromHToGBernoulliTailMass`. -/
 private lemma fromHToGBernoulliTailMass_lower_bound
     (params : Parameters)
     [FieldModel params.q]
@@ -216,8 +225,17 @@ private lemma fromHToGBernoulliTailMass_lower_bound
            sum_eq_total := by simp
            total_le_one := hchern.tail_le_one } : SubMeas Unit (ι × ι)) =
         fromHToGBernoulliTailMass params strategy.state family k := by
+    have hswap :
+        ev strategy.state
+            (leftTensor (ι₂ := ι)
+              (bernoulliTailOperator k params.d family.averagedSubMeas.total)) =
+          ev strategy.state
+            (rightTensor (ι₁ := ι)
+              (bernoulliTailOperator k params.d family.averagedSubMeas.total)) :=
+      ev_leftTensor_eq_rightTensor_of_density_fixed strategy.state strategy.densityFixed _
     simp [fromHToGBernoulliTailMass, bernoulliTailFromFamily, subMeasMass,
-      IdxSubMeas.liftLeft, constSubMeasFamily, X, G, bernoulliTailOperator_leftTensor]
+      IdxSubMeas.liftRight, constSubMeasFamily, X, G, bernoulliTailOperator_leftTensor,
+      hswap]
   have htailMass :
       1 - kappa / (1 - 1 / (200 * (params.m : Error))) -
           Real.exp (-(((1 / (200 * (params.m : Error))) ^ (2 : ℕ)) * (k : Error)) / 2) ≤
@@ -319,7 +337,7 @@ theorem ldPastingNCompleteness_of_tailLowerBound
     intro j hj
     exact commuteGHalfSandwich params strategy.state family gamma zeta
       j hj hzeta_le hfacts
-  have hFrom := fromHToG params strategy strategy.state family gamma zeta
+  have hFrom := fromHToG params strategy strategy.state strategy.isNormalized family gamma zeta
     hgamma_nonneg hzeta_nonneg hzeta_le hfacts hhalf k
   have happrox_le :
       overAllOutcomesError params eps delta gamma zeta k +
