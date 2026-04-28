@@ -20,41 +20,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- The conjugate transpose of a left tensor is the left tensor of the conjugate transpose. -/
-private lemma leftTensor_conjTranspose
-    (A : MIPStarRE.Quantum.Op ι) :
-    (leftTensor (ι₂ := ι) A)ᴴ = leftTensor (ι₂ := ι) Aᴴ := by
-  simp [leftTensor, Matrix.conjTranspose_kronecker]
-
-/-- Multiplying a left tensor into a full tensor only affects the left factor. -/
-private lemma leftTensor_mul_opTensor
-    (A B C : MIPStarRE.Quantum.Op ι) :
-    leftTensor (ι₂ := ι) A * opTensor B C = opTensor (A * B) C := by
-  calc
-    leftTensor (ι₂ := ι) A * opTensor B C
-        = leftTensor (ι₂ := ι) A * (leftTensor (ι₂ := ι) B * rightTensor (ι₁ := ι) C) := by
-          rw [leftTensor_mul_rightTensor_eq_opTensor]
-    _ = (leftTensor (ι₂ := ι) A * leftTensor (ι₂ := ι) B) * rightTensor (ι₁ := ι) C := by
-          rw [Matrix.mul_assoc]
-    _ = leftTensor (ι₂ := ι) (A * B) * rightTensor (ι₁ := ι) C := by
-          rw [leftTensor_mul_leftTensor]
-    _ = opTensor (A * B) C := by
-          rw [leftTensor_mul_rightTensor_eq_opTensor]
-
-/-- Multiplying a full tensor by a left tensor only affects the left factor. -/
-private lemma opTensor_mul_leftTensor
-    (A B C : MIPStarRE.Quantum.Op ι) :
-    opTensor A C * leftTensor (ι₂ := ι) B = opTensor (A * B) C := by
-  calc
-    opTensor A C * leftTensor (ι₂ := ι) B
-        = (leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) C) * leftTensor (ι₂ := ι) B := by
-          rw [leftTensor_mul_rightTensor_eq_opTensor]
-    _ = leftTensor (ι₂ := ι) A * (rightTensor (ι₁ := ι) C * leftTensor (ι₂ := ι) B) := by
-          rw [Matrix.mul_assoc]
-    _ = leftTensor (ι₂ := ι) A * opTensor B C := by
-          rw [rightTensor_mul_leftTensor_eq_opTensor]
-    _ = opTensor (A * B) C := leftTensor_mul_opTensor A B C
-
 /-- Turn a postprocessed submeasurement from a measurement into a measurement. -/
 private noncomputable def postprocessMeasurement
     {α β : Type*} {ι : Type*}
@@ -2706,10 +2671,6 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_inputFacts
     let evalOutcome : GHatTupleOutcome params (i + 1) → Option (Fq params) := fun gs =>
       Option.map (fun g : Polynomial params => g q.1)
         (gs ⟨i, Nat.lt_succ_self i⟩)
-    let O : GHatTupleOutcome params (i + 1) → MIPStarRE.Quantum.Op ι := fun gs =>
-      ldSandwichLineOnePointCS_orderedHalf params family hi q gs
-    let P : GHatTupleOutcome params (i + 1) → MIPStarRE.Quantum.Op ι := fun gs =>
-      ldSandwichLineOnePointCS_rotatedHalf params family hi q gs
     refine Finset.sum_congr rfl ?_
     intro gs _hgs
     cases hgs : evalOutcome gs with
