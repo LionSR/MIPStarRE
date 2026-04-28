@@ -622,15 +622,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 
 \begin{lemma}[Consistency of the sandwiched measurement with one line value]\label{lem:ld-sandwich-line-one-point}
 	\lean{MIPStarRE.LDT.Pasting.ldSandwichLineOnePoint}
-	% Lean-local gap: `ldSandwichLineOnePoint` is now reduced past the
-	% outer `max 0` consistency wrapper, the linear-defect expansion, and the
-	% generic off-diagonal Cauchy--Schwarz bounds to the paper-specific input
-	% package `ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_inputFacts`.
-	% This package covers `ld-pasting.tex:954--1024`: the first square-distance
-	% estimate in the paper's $D D^\dagger$ orientation (`eq:add-in-the-bot`),
-	% while the available commutator estimate is in the $D^\dagger D$ orientation,
-	% together with the two unit-side completeness bounds and the scalar
-	% regrouping/reindexing equalities.
+	\leanok
 	\uses{lem:commute-g-half-sandwich, lem:ld-gbcon}
 	For any $1 \le i \le k$,
 	\[
@@ -644,6 +636,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	Summing out the coordinates to the right of $i$ gives
 	\begin{equation}\label{eq:delete-extraneous-coordinates}
 		\begin{aligned}

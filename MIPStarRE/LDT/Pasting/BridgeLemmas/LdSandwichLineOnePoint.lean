@@ -2832,15 +2832,15 @@ private structure LdSandwichLineOnePointResidualFacts
           (gHatHalfProductOutcomeOperator params family (i + 1)
             (fun j => q.2 ⟨j.1, by omega⟩) gs)
 
-/-- The remaining orientation bridge for the paper's `eq:add-in-the-bot` input.
+/-- The adjoint orientation bridge for the paper's `eq:add-in-the-bot` input.
 
 The existing `LdSandwichLineOnePointResidualFacts.rawCore` exposes the project
 `qSDDCore` orientation for the raw half-products, i.e. the $D^\dagger D$ square
 of the commutator.  The two generic `closenessOfIP*` applications below need the
 adjoint-oriented $D D^\dagger$ square-distance term that appears in
-`ld-pasting.tex:980--985` and is reused at lines `1005--1010`.  This lemma is
-therefore the only paper-specific input that remains after the generic CS
-plumbing and the measurement-completeness/unit bounds are discharged. -/
+`ld-pasting.tex:980--985` and is reused at lines `1005--1010`.  The residual
+facts package now carries that proved adjoint raw-core bound, so this lemma
+selects the orientation needed by the generic CS input package. -/
 private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_adjointRawCore
     (params : Parameters)
     [FieldModel params.q]
