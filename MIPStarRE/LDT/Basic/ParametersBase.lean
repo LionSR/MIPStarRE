@@ -383,6 +383,13 @@ def subCoord {params : Parameters} [FieldModel params.q] (x y : Fq params) : Fq 
   rw [decode_encodeScalar]
   simp [sub_eq_add_neg]
 
+@[simp] theorem subCoord_addCoord_right {params : Parameters} [FieldModel params.q]
+    (x y : Fq params) :
+    subCoord (addCoord x y) y = x := by
+  unfold subCoord addCoord
+  rw [decode_encodeScalar]
+  simp [sub_eq_add_neg]
+
 /-- Coordinate multiplication transported through the `Fin q` coding. -/
 def mulCoord {params : Parameters} [FieldModel params.q] (x y : Fq params) : Fq params :=
   encodeScalar (decodeScalar x * decodeScalar y)
