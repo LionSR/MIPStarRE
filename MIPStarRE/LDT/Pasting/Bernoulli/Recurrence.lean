@@ -5286,7 +5286,8 @@ private lemma fromHToGAdjacentStage_paperMoveChain
                         rw [(gHatIdxMeas params family q.1).sum_eq_total]
                         rw [(gHatIdxMeas params family q.1).total_eq_one]
                         simp [rightTensor]
-      have h₁₂_cauchySchwarz : |M₁ - M₂| ≤ Real.sqrt (commuteGHalfSandwichError params gamma zeta k) := by
+      have h₁₂_cauchySchwarz :
+          |M₁ - M₂| ≤ Real.sqrt (commuteGHalfSandwichError params gamma zeta k) := by
         /- Paper lines 1506--1523.  Rewrite `hM₁_source` and `hM₂_target` as a
         product-index sum over `(g, gs)`, insert a dummy `Unit` outcome so that
         `closenessOfIPAdjoint` applies, use `h₁₂_secondRoot_le_nu4` for the
@@ -5462,7 +5463,8 @@ private lemma fromHToGAdjacentStage_paperMoveChain
                   (leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) (S * U))ᴴ)) ≤ 1 := by
         exact fromHToG_SUS_context_avg_le_one params ψbi hnorm family
           hstageExact.completeBranchAverage hstageExact.incompleteBranchAverage ℓ n
-      have h₂₃_cauchySchwarz : |M₂ - M₃| ≤ Real.sqrt (commuteGHalfSandwichError params gamma zeta k) := by
+      have h₂₃_cauchySchwarz :
+          |M₂ - M₃| ≤ Real.sqrt (commuteGHalfSandwichError params gamma zeta k) := by
         let Aop : Fq params × PointTuple params n →
             GHatOutcome params × GHatTupleOutcome params n →
             MIPStarRE.Quantum.Op (ι × ι) := fun q ogs =>
