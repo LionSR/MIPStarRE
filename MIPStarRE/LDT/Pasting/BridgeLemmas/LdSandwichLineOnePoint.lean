@@ -1,5 +1,8 @@
 import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich
 
+-- Lean 4.29's stricter transparency affects legacy postprocess/evaluation rewrites in this bridge.
+set_option backward.isDefEq.respectTransparency false
+
 /-!
 # Section 12 pasting: line one-point bridge
 

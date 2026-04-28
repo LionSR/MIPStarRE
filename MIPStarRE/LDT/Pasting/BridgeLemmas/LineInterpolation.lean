@@ -1,5 +1,8 @@
 import MIPStarRE.LDT.Pasting.BridgeLemmas.Common
 
+-- Lean 4.29's stricter transparency affects several legacy `rw`/`simp` proofs in this bridge file.
+set_option backward.isDefEq.respectTransparency false
+
 /-!
 # Section 12 pasting: line interpolation bridge helpers
 

@@ -228,9 +228,19 @@ class FieldModel (q : ℕ) where
   instDecidableEq : DecidableEq K
   equiv : K ≃ Fin q
 
-attribute [instance] FieldModel.instField FieldModel.instFintype FieldModel.instDecidableEq
-
 namespace FieldModel
+
+/-- The bundled carrier inherits the field structure from a `FieldModel`. -/
+@[reducible] instance instFieldK (q : ℕ) [model : FieldModel q] : Field (K q) :=
+  model.instField
+
+/-- The bundled carrier inherits the finite type structure from a `FieldModel`. -/
+@[reducible] instance instFintypeK (q : ℕ) [model : FieldModel q] : Fintype (K q) :=
+  model.instFintype
+
+/-- The bundled carrier inherits decidable equality from a `FieldModel`. -/
+@[reducible] instance instDecidableEqK (q : ℕ) [model : FieldModel q] : DecidableEq (K q) :=
+  model.instDecidableEq
 
 /-- The carrier bundled in a `FieldModel q` has exactly `q` elements, matching the
 paper's finite-field convention `|F_q| = q` (`preliminaries.tex`, lines 17--19). -/
@@ -262,6 +272,7 @@ theorem card_cast_ne_zero (q : ℕ) [FieldModel q] :
 end FieldModel
 
 /-- Build the honest field model from prime-power data. -/
+@[reducible]
 noncomputable def PrimePowerFieldSpec.toFieldModel (params : Parameters)
     (spec : PrimePowerFieldSpec params) : FieldModel params.q := by
   classical
@@ -448,12 +459,12 @@ def decodePoint {params : Parameters} [FieldModel params.q] (u : Point params) :
   fun i => decodeScalar (u i)
 
 /-- Evaluate a multivariate polynomial over the chosen field model on a coded point. -/
-def evalPolynomialModel (params : Parameters) [FieldModel params.q]
+noncomputable def evalPolynomialModel (params : Parameters) [FieldModel params.q]
     (p : PolynomialModel params) (u : Point params) : Fq params :=
   encodeScalar (MvPolynomial.eval (decodePoint u) p)
 
 /-- Evaluate a univariate polynomial over the chosen field model on a coded point. -/
-def evalLinePolynomialModel (params : Parameters) [FieldModel params.q]
+noncomputable def evalLinePolynomialModel (params : Parameters) [FieldModel params.q]
     (p : LinePolynomialModel params) (t : Fq params) : Fq params :=
   encodeScalar (_root_.Polynomial.eval (decodeScalar t) p)
 

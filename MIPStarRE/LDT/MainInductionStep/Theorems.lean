@@ -9,6 +9,9 @@ import MIPStarRE.LDT.Pasting.Bernoulli.Final
 -- Used by `selfImprovementInInductionSection`.
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results
 
+-- Lean 4.29's stricter transparency affects legacy postprocess/evaluation rewrites in this file.
+set_option backward.isDefEq.respectTransparency false
+
 /-!
 # Section 6 — Theorems
 

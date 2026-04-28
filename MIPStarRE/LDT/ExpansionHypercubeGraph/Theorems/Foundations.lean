@@ -9,7 +9,9 @@ open MIPStarRE.LDT
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+universe uι u
+
+variable {ι : Type uι} [Fintype ι] [DecidableEq ι]
 
 /-! ## Statement packages and matrix realization bridge -/
 
@@ -26,8 +28,8 @@ structure GlobalRewriteStatement (params : Parameters)
     ∃ decomp : GlobalVarianceDecomposition params A,
       globalVariance params A ψ = globalVarianceTraceForm params A ψ decomp
 
-private def ambientHilbertSpaceOf (ι : Type*) [Fintype ι] [DecidableEq ι] [Nonempty ι] :
-    FiniteHilbertSpace where
+private def ambientHilbertSpaceOf (ι : Type u) [Fintype ι] [DecidableEq ι] [Nonempty ι] :
+    FiniteHilbertSpace.{u} where
   carrier := ι
   instFintype := inferInstance
   instDecidableEq := inferInstance
@@ -36,7 +38,7 @@ private def ambientHilbertSpaceOf (ι : Type*) [Fintype ι] [DecidableEq ι] [No
 /-- Reinterpret an abstract operator family and state as a concrete matrix realization. -/
 def abstractMatrixModel (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) [Nonempty ι] :
-    MatrixOperatorFamilyRealization params where
+    MatrixOperatorFamilyRealization.{uι} params where
   space := ambientHilbertSpaceOf ι
   state :=
     { matrix := ψ.density
@@ -265,7 +267,10 @@ lemma globalVarianceTraceForm_eq_orthogonalClosedForm (params : Parameters)
                 by_cases huv : u = v
                 · subst huv
                   simp [model, abstractMatrixModel, matrixExpectation, ev]
+                  rfl
                 · simp [huv, model, abstractMatrixModel, matrixExpectation]
+                  intro huv'
+                  exact (huv huv').elim
         _ = ∑ u, ev ψ ((decomp.orthogonalComponent u)ᴴ *
               decomp.orthogonalComponent u) := by
               simp

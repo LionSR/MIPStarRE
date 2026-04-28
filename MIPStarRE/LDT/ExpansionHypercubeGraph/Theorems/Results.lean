@@ -152,6 +152,7 @@ private lemma globalWitness_smul (params : Parameters)
           (((c • matrixTensorOperator (orthogonalModeProjectorMatrix params) model.state.matrix) *
             matrixCombinedColumnOperator params model)) := by
               simp [matrixTensorOperator, Matrix.smul_kronecker]
+              rfl
     _ = c •
           ((matrixCombinedColumnOperator params model)ᴴ *
             (matrixTensorOperator (orthogonalModeProjectorMatrix params) model.state.matrix *

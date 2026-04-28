@@ -1,6 +1,9 @@
 import MIPStarRE.LDT.Commutativity.Main.Results
 import MIPStarRE.LDT.Pasting.BridgeLemmas.HBConsistency
 
+-- Lean 4.29's stricter transparency affects legacy postprocess rewrites in this bridge.
+set_option backward.isDefEq.respectTransparency false
+
 /-!
 # Section 12 pasting: H-A consistency
 

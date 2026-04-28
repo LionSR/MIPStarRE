@@ -22,6 +22,8 @@ open MIPStarRE.LDT.MakingMeasurementsProjective
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
+universe uSpace
+
 variable (params : Parameters) [FieldModel params.q]
 
 /-! ## Matrix realizations -/
@@ -35,7 +37,7 @@ matches the paper's convention that point and line operators act on the left
 register and polynomial weights act on the right register. -/
 structure MatrixVarianceTransferRealization (params : Parameters) [FieldModel params.q] where
   /-- The local finite-dimensional Hilbert space carrying the point/line measurements. -/
-  space : FiniteHilbertSpace
+  space : FiniteHilbertSpace.{uSpace}
   /-- The ambient bipartite positive matrix state. -/
   state : PositiveMatrixState (tensorHilbertSpace space space)
   /-- The point measurement family `u ↦ A^u`. -/
@@ -91,7 +93,8 @@ noncomputable def matrixWeightedPolynomialState (params : Parameters) [FieldMode
       ((Matrix.nonneg_iff_posSemidef.mp model.state.positive).mul_mul_conjTranspose_same W).nonneg }
 
 /-- The local operator `A^u_{g(u)}`. -/
-def matrixPointConditionedOutcomeOperatorAtPolynomial (params : Parameters) [FieldModel params.q]
+noncomputable def matrixPointConditionedOutcomeOperatorAtPolynomial (params : Parameters)
+    [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params) (u : Point params) : MatrixOperator model.space :=
   (model.pointMeasurement u).effect (g u)
