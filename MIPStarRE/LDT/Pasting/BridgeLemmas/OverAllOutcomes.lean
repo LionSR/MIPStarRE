@@ -1,8 +1,5 @@
 import MIPStarRE.LDT.Pasting.BridgeLemmas.HAConsistency
 
--- Lean 4.29's stricter transparency affects legacy scalar/calc rewrites in this bridge.
-set_option backward.isDefEq.respectTransparency false
-
 /-!
 # Section 12 pasting: over all outcomes
 

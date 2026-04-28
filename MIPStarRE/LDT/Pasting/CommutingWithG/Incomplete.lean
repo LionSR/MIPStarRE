@@ -84,15 +84,7 @@ theorem commutingWithGIncomplete
                       ((completePartPointProductLeft params family q).outcome g -
                         (completePartPointProductRight params family q).outcome g) := by
                 noncomm_ring
-              trans ev ψbi
-                ((((completePartPointProductRight params family q).outcome g)ᴴ -
-                    ((completePartPointProductLeft params family q).outcome g)ᴴ) *
-                  ((completePartPointProductRight params family q).outcome g -
-                    (completePartPointProductLeft params family q).outcome g))
-              · congr 1
-                simp [sub_eq_add_neg, Matrix.conjTranspose_add]
-                noncomm_ring
-              · simpa [Matrix.conjTranspose_sub] using congrArg (ev ψbi) hswap
+              simpa [sub_eq_add_neg] using congrArg (ev ψbi) hswap
       _ ≤ commutingWithGIncompleteError params gamma zeta := by
           simpa [commutingWithGIncompleteError] using hcomplete_bound
   · rcases hcomm.completePartCommutation with ⟨hcomplete_bound⟩

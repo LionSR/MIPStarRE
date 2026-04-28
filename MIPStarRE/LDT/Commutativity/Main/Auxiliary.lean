@@ -160,7 +160,6 @@ private lemma avgOver_slice_total_left_sandwich_eq
         (((uniformDistribution (Fq params)).weight y : Error) : ℂ) •
           (A * (family.meas y).total * A) := by
     simp [mul_assoc]
-    rfl
   rw [hmatrix]
   rw [← leftTensor_smul (ι₂ := ι)
     (((uniformDistribution (Fq params)).weight y : Error) : ℂ)
@@ -916,12 +915,7 @@ private lemma zero_qSDDOp_evaluatedSliceProductRight_le_one
                   (0 - leftTensor (ι₂ := ι) (B.outcome b * A.outcome a)))
               = ev strategy.state
                   (((leftTensor (ι₂ := ι) (B.outcome b * A.outcome a))ᴴ) *
-                    leftTensor (ι₂ := ι) (B.outcome b * A.outcome a)) := by
-                    simp
-                    congr 1
-                    exact neg_neg
-                      (((leftTensor (ι₂ := ι) (B.outcome b * A.outcome a))ᴴ) *
-                        leftTensor (ι₂ := ι) (B.outcome b * A.outcome a))
+                    leftTensor (ι₂ := ι) (B.outcome b * A.outcome a)) := by simp
             _ = ev strategy.state
                   (leftTensor (ι₂ := ι)
                     (((B.outcome b * A.outcome a)ᴴ) *

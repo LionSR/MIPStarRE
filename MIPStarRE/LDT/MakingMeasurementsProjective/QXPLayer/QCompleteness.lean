@@ -338,39 +338,35 @@ private lemma one_sub_spectralTruncationError_smul_le_sqrt
   have hc_cast : (c : ℂ) = (((1 : Error) - ε) : ℂ) := by
     simp [c]
   rw [← hc_cast]
-  have hnn : (c : NNReal) • Q ≤ CFC.sqrt Q := by
-    rw [CFC.sqrt_eq_cfc]
-    have hleft : cfc (fun x : NNReal => c * x) Q = (c : NNReal) • Q := by
-      rw [cfc_const_mul_id (R := NNReal) c Q (ha := hQ_nonneg)]
-      rfl
-    rw [← hleft]
-    rw [cfc_nnreal_le_iff _ _ _ (SpectrumRestricts.nnreal_of_nonneg hQ_nonneg)
-      (ha := hQ_nonneg)]
-    intro x hx
-    have hxb : (x : Error) ≤ 1 + 2 * ε := by
-      have := hspec_le x hx
-      exact_mod_cast this
-    have hx_nonneg : 0 ≤ (x : Error) := by exact_mod_cast x.2
-    have hsq :
-        ((c : Error) * (x : Error)) ^ (2 : Nat) ≤
-          (Real.sqrt (x : Error)) ^ (2 : Nat) := by
-      rw [Real.sq_sqrt hx_nonneg]
-      have hc_val : (c : Error) = 1 - ε := rfl
-      rw [hc_val]
-      have hx_sq_le :
-          (x : Error) ^ (2 : Nat) ≤ (1 + 2 * ε) * (x : Error) := by
-        nlinarith [mul_le_mul_of_nonneg_right hxb hx_nonneg]
-      have hcoeff : (1 - ε) ^ (2 : Nat) * (1 + 2 * ε) ≤ 1 := by
-        nlinarith [sq_nonneg ε, hε_nonneg, hε_half]
-      have hmain :
-          (1 - ε) ^ (2 : Nat) * ((x : Error) ^ (2 : Nat)) ≤ (x : Error) := by
-        nlinarith [mul_le_mul_of_nonneg_left hx_sq_le (sq_nonneg (1 - ε)),
-          mul_le_mul_of_nonneg_right hcoeff hx_nonneg]
-      nlinarith
-    have hreal : (c : Error) * (x : Error) ≤ Real.sqrt (x : Error) := by
-      exact le_of_sq_le_sq hsq (Real.sqrt_nonneg _)
-    exact NNReal.coe_le_coe.mp (by simpa [NNReal.coe_mul] using hreal)
-  simpa [nnreal_smul_matrix_eq_complex Q c] using hnn
+  rw [nnreal_smul_matrix_eq_complex Q c]
+  rw [CFC.sqrt_eq_cfc]
+  rw [← cfc_const_mul_id (R := NNReal) c Q (ha := hQ_nonneg)]
+  rw [cfc_nnreal_le_iff _ _ _ (SpectrumRestricts.nnreal_of_nonneg hQ_nonneg)
+    (ha := hQ_nonneg)]
+  intro x hx
+  have hxb : (x : Error) ≤ 1 + 2 * ε := by
+    have := hspec_le x hx
+    exact_mod_cast this
+  have hx_nonneg : 0 ≤ (x : Error) := by exact_mod_cast x.2
+  have hsq :
+      ((c : Error) * (x : Error)) ^ (2 : Nat) ≤
+        (Real.sqrt (x : Error)) ^ (2 : Nat) := by
+    rw [Real.sq_sqrt hx_nonneg]
+    have hc_val : (c : Error) = 1 - ε := rfl
+    rw [hc_val]
+    have hx_sq_le :
+        (x : Error) ^ (2 : Nat) ≤ (1 + 2 * ε) * (x : Error) := by
+      nlinarith [mul_le_mul_of_nonneg_right hxb hx_nonneg]
+    have hcoeff : (1 - ε) ^ (2 : Nat) * (1 + 2 * ε) ≤ 1 := by
+      nlinarith [sq_nonneg ε, hε_nonneg, hε_half]
+    have hmain :
+        (1 - ε) ^ (2 : Nat) * ((x : Error) ^ (2 : Nat)) ≤ (x : Error) := by
+      nlinarith [mul_le_mul_of_nonneg_left hx_sq_le (sq_nonneg (1 - ε)),
+        mul_le_mul_of_nonneg_right hcoeff hx_nonneg]
+    nlinarith
+  have hreal : (c : Error) * (x : Error) ≤ Real.sqrt (x : Error) := by
+    exact le_of_sq_le_sq hsq (Real.sqrt_nonneg _)
+  exact NNReal.coe_le_coe.mp (by simpa [NNReal.coe_mul] using hreal)
 
 /-- **Completeness of `sqrt Q`** (`lem:sqrt-Q-completeness`).
 

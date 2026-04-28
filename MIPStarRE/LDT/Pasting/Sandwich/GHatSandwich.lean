@@ -66,9 +66,7 @@ private lemma projSubMeas_outcome_mul_total_eq_outcome {α : Type*} [Fintype α]
           hP_herm
       simpa using hnonneg
   calc
-    A.outcome a * A.total = P * (1 - R) := by
-      simp [P, R, sub_eq_add_neg, add_comm, add_left_comm]
-      exact (neg_neg (A.outcome a * A.total)).symm
+    A.outcome a * A.total = P * (1 - R) := by simp [P, R, sub_eq_add_neg, add_comm, add_left_comm]
     _ = P - P * R := by rw [mul_sub, mul_one]
     _ = P := by
           have : P * R = 0 := by

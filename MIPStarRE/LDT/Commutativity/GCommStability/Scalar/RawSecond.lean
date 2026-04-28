@@ -55,25 +55,9 @@ private lemma avgOver_right_linear
         ev ψ (leftTensor (ι₂ := ι) (L g a) *
           rightTensor (ι₁ := ι)
             (P a * averageOperatorOverDistribution 𝒟U (fun u => Q u g))) := by
-        simp [T, averageOperatorOverDistribution, ev_finset_sum,
+        simp [T, averageOperatorOverDistribution, ev_finset_sum, ev_real_smul,
           ← rightTensor_finset_sum, leftTensor_mul_rightTensor_real_smul_right,
-          Matrix.mul_sum]
-        refine Finset.sum_congr rfl ?_
-        intro g _
-        refine Finset.sum_congr rfl ?_
-        intro a _
-        refine Finset.sum_congr rfl ?_
-        intro u _
-        have h := ev_real_smul ψ (𝒟U.weight u)
-          (leftTensor (ι₂ := ι) (L g a) * rightTensor (ι₁ := ι) (P a * Q u g))
-        calc
-          ev ψ (leftTensor (ι₂ := ι) (L g a) * rightTensor (ι₁ := ι) (P a * Q u g)) *
-              𝒟U.weight u
-              = 𝒟U.weight u *
-                ev ψ (leftTensor (ι₂ := ι) (L g a) * rightTensor (ι₁ := ι) (P a * Q u g)) := by
-                  ring
-          _ = ev ψ (𝒟U.weight u •
-                (leftTensor (ι₂ := ι) (L g a) * rightTensor (ι₁ := ι) (P a * Q u g))) := h.symm
+          Matrix.mul_sum, mul_comm]
 
 private lemma sum_ev_leftTensor_mul_rightTensor_const
     {α : Type*} (s : Finset α)

@@ -213,9 +213,7 @@ theorem gHatFacts
       refine Finset.sum_congr rfl ?_
       intro a _
       change ev ψbi ((-G a)ᴴ * (-G a)) = ev ψbi ((G a)ᴴ * G a)
-      congr 1
-      rw [Matrix.conjTranspose_neg]
-      exact neg_mul_neg ((G a)ᴴ) (G a)
+      simp
     have hswapIncompleteBound :
         sddErrorOp ψbi
           (uniformDistribution (SlicePairQuestion params))

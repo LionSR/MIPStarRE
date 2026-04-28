@@ -240,8 +240,6 @@ private lemma consSubMeas_sandwichControl
                   -(X a) := by
               simp [X]
             simp [hneg, hXh]
-            congr 1
-            exact neg_neg (X a * X a)
           · have htotal :
                 ∑ a : Outcome,
                     ev ψ

@@ -39,11 +39,11 @@ structure AxisLinePolynomial (params : Parameters) [FieldModel params.q] where
 namespace AxisLinePolynomial
 
 /-- Evaluation of an axis-line answer on the line parameter. -/
-noncomputable def toFun {params : Parameters} [FieldModel params.q]
-    (f : AxisLinePolynomial params) : Fq params → Fq params :=
+def toFun {params : Parameters} [FieldModel params.q] (f : AxisLinePolynomial params) :
+    Fq params → Fq params :=
   evalLinePolynomialModel params f.poly
 
-noncomputable instance {params : Parameters} [FieldModel params.q] :
+instance {params : Parameters} [FieldModel params.q] :
     CoeFun (AxisLinePolynomial params) (fun _ => Fq params → Fq params) :=
   ⟨AxisLinePolynomial.toFun⟩
 
@@ -165,11 +165,11 @@ structure DiagonalLinePolynomial (params : Parameters) [FieldModel params.q] whe
 namespace DiagonalLinePolynomial
 
 /-- Evaluation of a diagonal-line answer on the line parameter. -/
-noncomputable def toFun {params : Parameters} [FieldModel params.q]
-    (f : DiagonalLinePolynomial params) : Fq params → Fq params :=
+def toFun {params : Parameters} [FieldModel params.q] (f : DiagonalLinePolynomial params) :
+    Fq params → Fq params :=
   evalLinePolynomialModel params f.poly
 
-noncomputable instance {params : Parameters} [FieldModel params.q] :
+instance {params : Parameters} [FieldModel params.q] :
     CoeFun (DiagonalLinePolynomial params) (fun _ => Fq params → Fq params) :=
   ⟨DiagonalLinePolynomial.toFun⟩
 

@@ -263,14 +263,14 @@ noncomputable def fullSliceProductRight (params : Parameters) [FieldModel params
         (fullSliceSecondFactor params family q)
 
 /-- Evaluate a pair of full-slice outcomes at the sampled points `((u,x),(v,y))`. -/
-noncomputable def evaluateFullSliceOutcomeAtQuestion (params : Parameters) [FieldModel params.q]
+def evaluateFullSliceOutcomeAtQuestion (params : Parameters) [FieldModel params.q]
     (q : EvaluatedSliceQuestion params) :
     FullSliceOutcome params → EvaluatedSliceOutcome params :=
   fun gh =>
     (gh.1 (truncatePoint params q.1), gh.2 (truncatePoint params q.2))
 
 /-- Evaluate a `G^y`-stability outcome at the sampled second point `v`. -/
-noncomputable def evaluateStabilityOneOutcomeAtQuestion (params : Parameters) [FieldModel params.q]
+def evaluateStabilityOneOutcomeAtQuestion (params : Parameters) [FieldModel params.q]
     (q : EvaluatedSliceQuestion params) :
     StabilityOneOutcome params → EvaluatedSliceOutcome params :=
   fun ah =>
@@ -281,7 +281,7 @@ noncomputable def evaluateStabilityOneOutcomeAtQuestion (params : Parameters) [F
 The first coordinate stays as the full polynomial `g` until this final
 evaluation step, while the second coordinate is already the measured value `b`.
 This matches the one-vs-two indexing used in the paper's two stability steps. -/
-noncomputable def evaluateStabilityTwoOutcomeAtQuestion (params : Parameters) [FieldModel params.q]
+def evaluateStabilityTwoOutcomeAtQuestion (params : Parameters) [FieldModel params.q]
     (q : EvaluatedSliceQuestion params) :
     StabilityTwoOutcome params → EvaluatedSliceOutcome params :=
   fun gb =>

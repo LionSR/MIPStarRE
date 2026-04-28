@@ -156,7 +156,6 @@ private lemma postprocess_sandwichByOuter_prod_snd_outcome
           intro a _ a' _ h
           exact congrArg Prod.fst h
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Pull two finite averages into a bipartite expectation with averaged operators.
 
 For a fixed polynomial outcome `g`, the left register is averaged over `𝒟Q`

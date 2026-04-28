@@ -187,12 +187,7 @@ private lemma zero_qSDDOp_fullSliceProductRight_le_one
                   (0 - leftTensor (ι₂ := ι) (B.outcome gh.2 * A.outcome gh.1)))
               = ev strategy.state
                   (((leftTensor (ι₂ := ι) (B.outcome gh.2 * A.outcome gh.1))ᴴ) *
-                    leftTensor (ι₂ := ι) (B.outcome gh.2 * A.outcome gh.1)) := by
-                    simp
-                    congr 1
-                    exact neg_neg
-                      (((leftTensor (ι₂ := ι) (B.outcome gh.2 * A.outcome gh.1))ᴴ) *
-                        leftTensor (ι₂ := ι) (B.outcome gh.2 * A.outcome gh.1))
+                    leftTensor (ι₂ := ι) (B.outcome gh.2 * A.outcome gh.1)) := by simp
             _ = ev strategy.state
                   (leftTensor (ι₂ := ι)
                     (((B.outcome gh.2 * A.outcome gh.1)ᴴ) *

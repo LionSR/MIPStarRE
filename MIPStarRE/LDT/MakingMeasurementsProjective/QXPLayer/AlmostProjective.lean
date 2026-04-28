@@ -84,29 +84,16 @@ lemma qAlmostProjective {Outcome : Type*}
     _ = (2 * ε) • QTotal data := by
           rw [hRank.sum_eq_total]
           simp [sub_eq_add_neg, add_smul]
-          simpa [Complex.ofReal_mul] using
-            (Complex.coe_smul (2 * ε) (QTotal data))
+          rw [← Complex.coe_smul]
+          norm_num [Complex.ofReal_mul]
     _ ≤ (2 * ε) • ((((1 : Error) + 2 * ε) : ℂ) • (1 : MIPStarRE.Quantum.Op ι)) := hscaled_total
     _ = ((2 * ε) * ((1 : Error) + 2 * ε)) • (1 : MIPStarRE.Quantum.Op ι) := by
-          calc
-            (2 * ε) • ((((1 : Error) + 2 * ε) : ℂ) • (1 : MIPStarRE.Quantum.Op ι))
-                = (((2 * ε : Error) : ℂ) •
-                    ((((1 : Error) + 2 * ε) : ℂ) • (1 : MIPStarRE.Quantum.Op ι))) := by
-                    exact (Complex.coe_smul (2 * ε)
-                      ((((1 : Error) + 2 * ε) : ℂ) • (1 : MIPStarRE.Quantum.Op ι))).symm
-            _ = (((2 * ε : Error) : ℂ) * (((1 : Error) + 2 * ε) : ℂ)) •
-                  (1 : MIPStarRE.Quantum.Op ι) := by
-                    rw [smul_smul]
-            _ = (((2 * ε) * ((1 : Error) + 2 * ε) : Error) : ℂ) •
-                  (1 : MIPStarRE.Quantum.Op ι) := by
-                    simp [Complex.ofReal_mul, mul_assoc]
-            _ = ((2 * ε) * ((1 : Error) + 2 * ε)) • (1 : MIPStarRE.Quantum.Op ι) := by
-                    exact Complex.coe_smul ((2 * ε) * ((1 : Error) + 2 * ε))
-                      (1 : MIPStarRE.Quantum.Op ι)
+          rw [← Complex.coe_smul, smul_smul, ← Complex.coe_smul]
+          simp [Complex.ofReal_mul, mul_assoc]
     _ ≤ ((4 : Error) * ε) • (1 : MIPStarRE.Quantum.Op ι) := hcoeff_op
     _ = (((4 : Error) * spectralTruncationError ζ) : ℂ) • (1 : MIPStarRE.Quantum.Op ι) := by
-          simpa [ε, Complex.ofReal_mul] using
-            (Complex.coe_smul ((4 : Error) * ε) (1 : MIPStarRE.Quantum.Op ι)).symm
+          rw [← Complex.coe_smul]
+          simp [ε, Complex.ofReal_mul]
 
 
 end

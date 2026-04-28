@@ -373,7 +373,6 @@ point. -/
   simp only [restrictDiagonalMeasurement, ProjMeas.postprocess_toSubMeas,
     SubMeas.postprocess_comp]
   simp [diagonalValueRepresentative_apply]
-  rfl
 
 /-- The intermediate `ν` from `thm:main-induction`. -/
 noncomputable def mainInductionNu (params : Parameters) (k : ℕ)

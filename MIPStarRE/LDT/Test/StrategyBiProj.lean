@@ -341,13 +341,7 @@ theorem trace_roleBlock {ιA ιB : Type*} [Fintype ιA] [Fintype ιB]
   rw [show Matrix.trace (roleBlock A B) =
       Matrix.trace (Matrix.blockDiagonal (roleBlockFamily A B)) by
         unfold roleBlock
-        let e := Equiv.prodComm (SymmPayload ιA ιB) Role
-        change Matrix.trace (Matrix.reindex e e (Matrix.blockDiagonal (roleBlockFamily A B))) =
-          Matrix.trace (Matrix.blockDiagonal (roleBlockFamily A B))
-        simpa [Matrix.trace] using
-          (Equiv.sum_comp e.symm
-            (fun x : SymmPayload ιA ιB × Role =>
-              (Matrix.blockDiagonal (roleBlockFamily A B)) x x))]
+        rw [Matrix.trace_reindex]]
   rw [Matrix.trace_blockDiagonal]
   change Finset.sum ({Role.A, Role.B} : Finset Role)
       (fun r => Matrix.trace (roleBlockFamily A B r)) =

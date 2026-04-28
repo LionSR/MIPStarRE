@@ -37,9 +37,7 @@ private lemma qSDDOp_symm
   refine Finset.sum_congr rfl ?_
   intro a _
   change ev ψ ((-G a)ᴴ * (-G a)) = ev ψ ((G a)ᴴ * G a)
-  congr 1
-  rw [Matrix.conjTranspose_neg]
-  exact neg_mul_neg ((G a)ᴴ) (G a)
+  simp
 
 lemma sddOpRel_symm
     {Question Outcome : Type*}

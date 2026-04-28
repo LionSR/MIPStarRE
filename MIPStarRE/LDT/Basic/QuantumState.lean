@@ -353,8 +353,8 @@ theorem opTensor_smul_right_local
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     (c : Error) (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
     opTensor A ((c : ℂ) • B) = (c : ℂ) • opTensor A B := by
-  simpa [opTensor] using
-    (Matrix.kronecker_smul (R := ℂ) (r := (c : ℂ)) A B)
+  ext x y
+  simp [opTensor, mul_comm, mul_left_comm]
 
 /-- `opTensor` is additive in the left factor. -/
 theorem opTensor_add_left_local

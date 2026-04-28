@@ -97,9 +97,6 @@ theorem sandwich_mono {M P Q : Op d} (hMH : Mᴴ = M) (hPQ : P ≤ Q) :
     simpa [mul_sub, sub_mul] using
       sandwich_nonneg (M := M) (P := Q - P) (sub_nonneg.mpr hPQ) hMH
 
--- Lean 4.29's stricter transparency blocks the nonunital CFC instance search path used by
--- `Commute.mul_nonneg` for matrix algebras, so keep the compatibility option local to this lemma.
-set_option backward.isDefEq.respectTransparency false in
 /-- An operator between `0` and `1` dominates its square. -/
 theorem sq_le_self [DecidableEq d] {X : Op d} (hX : 0 ≤ X) (hXle : X ≤ 1) :
     X * X ≤ X := by

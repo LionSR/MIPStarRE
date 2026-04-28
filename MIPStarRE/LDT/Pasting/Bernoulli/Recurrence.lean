@@ -722,7 +722,6 @@ private lemma fromHToG_interpolationEligible_iff_type_weight
       params.d + 1 ≤ gHatTypeWeight (gHatTupleType gs) := by
   simp [InterpolationEligible, gHatTupleHammingWeight, gHatTupleSupport,
     gHatTypeWeight, gHatTupleType]
-  rfl
 
 /-- Split the eligible sandwich total into a sum over exact Boolean outcome types. -/
 private lemma fromHToG_interpolationEligibleSandwich_total_eq_type_sum

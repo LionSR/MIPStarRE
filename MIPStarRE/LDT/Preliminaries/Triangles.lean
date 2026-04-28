@@ -37,9 +37,7 @@ lemma qSDD_symm
   intro a _
   change
     ev ψ ((-G a)ᴴ * (-G a)) = ev ψ ((G a)ᴴ * G a)
-  congr 1
-  rw [Matrix.conjTranspose_neg]
-  exact neg_mul_neg ((G a)ᴴ) (G a)
+  simp
 
 /-- Symmetry of the state-dependent distance relation. -/
 lemma sddRel_symm

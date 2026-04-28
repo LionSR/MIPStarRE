@@ -26,7 +26,7 @@ structure MatrixSdpRealization (params : Parameters) [FieldModel params.q] where
   pointMeasurement : Point params → MatrixSubmeasurement (Fq params) space
 
 /-- The concrete operator `A^u_{g(u)}` entering the SDP average. -/
-noncomputable def matrixAveragedPointOperatorContribution (params : Parameters)
+def matrixAveragedPointOperatorContribution (params : Parameters)
     [FieldModel params.q]
     (model : MatrixSdpRealization params)
     (g : Polynomial params) (u : Point params) : MatrixOperator model.space :=

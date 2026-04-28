@@ -2,7 +2,6 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkCore
 
 set_option linter.style.setOption false
 set_option linter.unnecessarySimpa false
-set_option backward.isDefEq.respectTransparency false
 
 /-!
 # Section 5 — one-measurement Naimark
