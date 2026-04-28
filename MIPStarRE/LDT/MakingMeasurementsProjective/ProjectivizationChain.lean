@@ -276,7 +276,7 @@ opposite pre-projective measurement.
 This structure records that invariant in its primitive match-mass form, rather
 than restating the downstream `ConsRel` conclusion.  A future projectivization
 constructor can produce this package from additional repair/completion data;
-the theorems in the namespace turn it into the exact line-169 consistency links. -/
+theorems in the namespace turn it into the exact line-169 consistency links. -/
 structure ProjectivizationLine169CorrelationPreservation
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
