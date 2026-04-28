@@ -287,23 +287,6 @@ structure SelfImprovementFinalFields (params : Parameters) [FieldModel params.q]
       (leftTensor (ι₂ := ι) Z)
       (selfImprovementError params eps delta)
 
-/-- The remaining GlobalVariance pointwise estimate consumed by the reduced
-`selfImprovementHelper` wrapper.
-
-The local-variance and independent-points global-variance consequences are now
-formalized algebraic reductions from this edgewise norm bound.  The bound is
-recorded with the post-triangle six-step transport-chain error
-`localVarianceTransportChainError`, i.e. `6 * (4ε + 4δ + 2md/q)`; the public
-`24(ε + δ + md/q)` statement is recovered by
-`GlobalVariance.localVarianceOfPointsFromTransportChainBound` and
-`GlobalVariance.globalVarianceOfPointsFromTransportChainBound`. -/
-abbrev GlobalVarianceProofInputs (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι) (eps delta : Error) : Prop :=
-  ∀ T : Measurement (Polynomial params) ι,
-    ∀ g : Polynomial params,
-      localVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g ≤
-        localVarianceTransportChainError params eps delta
-
 /-- The helper-stage strong self-consistency input still missing from the
 reduced wrapper chain. -/
 abbrev HelperStrongSelfConsistencyInput (params : Parameters) [FieldModel params.q]

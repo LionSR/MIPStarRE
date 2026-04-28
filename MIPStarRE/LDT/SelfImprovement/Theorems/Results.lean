@@ -107,17 +107,14 @@ lemma addInU
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (T : Measurement (Polynomial params) ι)
-    (hlocalChain :
-      ∀ g : Polynomial params,
-        localVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g ≤
-          localVarianceTransportChainError params eps delta) :
+    (T : Measurement (Polynomial params) ι) :
     AddInUStatement params strategy T eps delta := by
   refine
     { varianceBound := ?_ }
   let hglobalVariance :=
     globalVarianceOfPointsFromTransportChainBound params strategy eps delta gamma hgood
-      T.toSubMeas hlocalChain
+      T.toSubMeas
+      (localVarianceTransportChainBound params strategy eps delta gamma hgood T.toSubMeas)
   simpa [selfImprovementVarianceError] using
     hglobalVariance.averagedGlobalVarianceBound
 
@@ -136,7 +133,6 @@ lemma selfImprovementHelper
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (_nu : Error)
-    (hglobalVarianceProofInputs : GlobalVarianceProofInputs params strategy eps delta)
     -- Kept for API compatibility with the full helper statement, where future
     -- proof obligations will depend on the incoming polynomial measurement.
     (_G : Measurement (Polynomial params) ι) :
@@ -157,11 +153,7 @@ lemma selfImprovementHelper
       positiveSemidefiniteWitness := hsdp.dualPositive
       dualDominatesAveragedPoint := hsdp.dualFeasible }
   · simpa [T] using hsdp
-  · have hlocalChain := hglobalVarianceProofInputs T
-    -- This is the remaining surfaced GlobalVariance analytic obligation. The
-    -- algebraic local-to-global reduction is now formalized in
-    -- `globalVarianceOfPointsFromTransportChainBound`.
-    exact addInU params strategy eps delta gamma hgood T hlocalChain
+  · exact addInU params strategy eps delta gamma hgood T
 
 set_option maxHeartbeats 800000 in
 /-- `thm:self-improvement`.
@@ -175,7 +167,6 @@ theorem selfImprovement
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hglobalVarianceProofInputs : GlobalVarianceProofInputs params strategy eps delta)
     (hhelperStrongSelfConsistency :
       HelperStrongSelfConsistencyInput params strategy eps delta)
     (horthonormalization : OrthonormalizationInput params strategy eps delta)
@@ -185,7 +176,7 @@ theorem selfImprovement
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu := by
   rcases selfImprovementHelper params strategy eps delta gamma hgood nu
-      hglobalVarianceProofInputs G with
+      G with
     ⟨T, Hhat, Z, hhelper⟩
   have hssc :
       BipartiteSSCRel strategy.state (uniformDistribution Unit)
@@ -273,7 +264,6 @@ theorem selfImprovementFromSubMeas
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hglobalVarianceProofInputs : GlobalVarianceProofInputs params strategy eps delta)
     (hhelperStrongSelfConsistency :
       HelperStrongSelfConsistencyInput params strategy eps delta)
     (horthonormalization : OrthonormalizationInput params strategy eps delta)
@@ -286,7 +276,7 @@ theorem selfImprovementFromSubMeas
       SelfImprovementSubMeasConclusion params strategy G H Z
         eps delta gamma nu := by
   rcases selfImprovement params strategy eps delta gamma nu
-      hglobalVarianceProofInputs hhelperStrongSelfConsistency
+      hhelperStrongSelfConsistency
       horthonormalization hfinalFields hgood Gmeas
       with ⟨H, Z, hH⟩
   refine ⟨H, Z, ?_⟩
