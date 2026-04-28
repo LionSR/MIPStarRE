@@ -553,8 +553,11 @@ assembly residual:
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.pointAConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.pointBConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.toProjectiveStageTargets}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeRolePackagedCompletionLine169Residual, MIPStarRE.LDT.Test.MainFormalCascadeRolePackagedCompletionLine169Residual.toCompletionLine169Residual}
 \lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageCompletionLine169Residual, MIPStarRE.LDT.Test.MainFormalPostRolePackageCompletionLine169Residual.toRolePackagedCompletionLine169Residual}
+\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageLeftCompletionLine169Residual, MIPStarRE.LDT.Test.MainFormalPostRolePackageLeftCompletionLine169Residual.toPostRolePackageCompletionLine169Residual}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualCompletionLine169Residual, MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualCompletionLine169Residual.toRolePackagedCompletionLine169Residual}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual, MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual.toRolePackageResidualCompletionLine169Residual}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeTransportTargets, MIPStarRE.LDT.Test.MainFormalCascadeTransportTargets.toCascadeTargets, MIPStarRE.LDT.Test.MainFormalCascadeTargets.toNativeTargets}
+\lean{MIPStarRE.LDT.Test.MainFormalNativeTargets, MIPStarRE.LDT.Test.MainFormalNativeTargets.toMainFormal}
 They split off the vacuous branch where the theorem error is at least $1$,
 derive the Step~8 scalar hypotheses in the non-vacuous branch, and isolate the
 role-register Section~6 measurement behind a concrete role-package residual.
@@ -578,19 +581,21 @@ projectivization bridge from pre-projective consistency plus left/right
 completion closeness at $\zeta_2$.  Lean also derives the evaluated line-164
 projective consistency, data-processes the two polynomial line-169 $\zeta_1$
 links to the evaluated line-172 links, and proves the two native $\zeta_4$ point
-goals via \texttt{simeq-triangle-inequality}.  The remaining active residual is
-now the split
-\texttt{MainFormalCascadeRolePackageResidualCompletionLine169Residual}: its first
-field is the concrete Section~6 role residual, and its post-role field asks
-only for left/right completion-closeness estimates at $\zeta_2$ and the two exact
+goals via \texttt{simeq-triangle-inequality}.  After the #869 right-register
+completion transport, the remaining active residual is now the split
+\texttt{MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual}: its
+first field is the concrete Section~6 role residual, and its post-role field asks
+only for Alice's line-146 completion closeness, Bob's left-register completion
+closeness as returned by orthonormalize-and-complete, and the two exact
 polynomial-level $\zeta_1$ transport links from paper line~169 and its
-role-reversed analogue. It no longer asks for an arbitrary role package or an
-arbitrary raw Section~6 witness as an independent field.  It also no longer asks
-for the two factor-two role-block estimates, the unused Section~6 consistency
-field inside \texttt{UnsymmetrizationBridgePackage}, or the duplicated
-pre-projective consistency field inside the Step~6 handoff; those are rebuilt
-from the concrete role residual, the selected role package, and \texttt{hpass}.
-Lean then converts
+role-reversed analogue.  Lean transports the Bob-side left-register completion
+estimate to the line-147 right-register form before applying the older wrappers.
+It no longer asks for an arbitrary role package or an arbitrary raw Section~6
+witness as an independent field.  It also no longer asks for the two factor-two
+role-block estimates, the unused Section~6 consistency field inside
+\texttt{UnsymmetrizationBridgePackage}, or the duplicated pre-projective
+consistency field inside the Step~6 handoff; those are rebuilt from the concrete
+role residual, the selected role package, and \texttt{hpass}.  Lean then converts
 the resulting projective self-consistency to
 \texttt{MainFormalCascadeTransportTargets} using the projective converse of
 \texttt{simeq-to-approx}.
@@ -751,12 +756,13 @@ completion-line-169 residual.
 	non-vacuous branch; the Step~5 wrapper now turns the evaluated estimate at
 	line~116 into full-polynomial consistency at $\zeta_1$.  The remaining Lean
 	residual is the completion-and-line-169 construction: supply the actual
-	role-register measurement, the two factor-two role-block estimates, the
-	left/right completion-closeness estimates at $\zeta_2$, and the two exact
-	polynomial-level $\zeta_1$ links.  Lean reconstructs the duplicated Step~6
-	pre-projective consistency field from these inputs and \texttt{hpass}, then
-	data-processes the line-169 links to line~172 and derives the two $\zeta_4$
-	point goals and the $\zeta_3/2$ self-consistency target.
+	role-register measurement, Alice's line-146 completion estimate, Bob's
+	left-register completion estimate, and the two exact polynomial-level
+	$\zeta_1$ links.  Lean transports the Bob-side completion estimate to the
+	line-147 right-register form, reconstructs the duplicated Step~6 pre-projective
+	consistency field from these inputs and \texttt{hpass}, then data-processes the
+	line-169 links to line~172 and derives the two $\zeta_4$ point goals and the
+	$\zeta_3/2$ self-consistency target.
 
 	With $E$ as in Definition~\ref{def:main-formal-envelope}, the quantities $\sigma,\zeta_1,\zeta_2,\zeta_3,\zeta_4$ form the cascade of Definition~\ref{def:main-formal-error-cascade}. Theorem~\ref{thm:sigma-bound-main-formal} and Theorem~\ref{thm:zeta-bounds-main-formal} package the final inflation to the scale $100000k^2m^4 E$. The underlying paper estimates are:
 	\[
