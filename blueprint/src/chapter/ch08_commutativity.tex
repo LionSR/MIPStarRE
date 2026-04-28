@@ -43,6 +43,7 @@
 
 \begin{lemma}[Commutativity of~$G$ after evaluation]\label{lem:comm-data-processed-g}
 	\lean{MIPStarRE.LDT.Commutativity.commDataProcessedG}
+	\leanok
 	\uses{def:good-strategy, def:polymeasurements, def:approx_delta, def:strong-self-consistency, clm:g-comm-stability, clm:g-comm-stability2}
 	Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test.
 	Let $\{G^x\} \in \polysub{m}{q}{d}$ be a collection of projective sub-measurements indexed by $x \in \F_q$ with the following properties:
@@ -77,6 +78,7 @@
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	\uses{prop:cons-sub-meas, prop:closeness-of-ip, prop:post-processing-preserves, prop:two-notions-of-self-consistency, prop:two-notions-of-self-consistency-after-evaluation, thm:commutativity-points}
 	Write $G_a^{u,x}=G^x_{[g(u)=a]}$. Expanding the commutator square gives
 	\begin{align}

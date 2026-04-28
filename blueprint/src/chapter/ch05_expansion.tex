@@ -90,9 +90,9 @@
 \end{proof}
 
 \begin{lemma}[Eigenvectors of the hypercube graph]\label{prop:eigenvectors}
-	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.eigenvectors_orthonormality,
-	      MIPStarRE.LDT.ExpansionHypercubeGraph.eigenvectors_card,
-	      MIPStarRE.LDT.ExpansionHypercubeGraph.eigenvectors}
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.eigenvectors_orthonormality}
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.eigenvectors_card}
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.eigenvectors}
 	\leanok
 	\uses{def:adjacency-laplacian, lem:character-average-vector, lem:character-average-scalar}
 	For each $\alpha \in \F_q^m$, define
@@ -156,9 +156,9 @@
 \end{proof}
 
 \begin{lemma}[Spectral gap of the Laplacian]\label{cor:laplacian-spectral-gap}
-	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianEigenvalue_eq,
-	      MIPStarRE.LDT.ExpansionHypercubeGraph.hypercubeSpectralGap_le_laplacianEigenvalue,
-	      MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianEigenvalue_of_weight_one}
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianEigenvalue_eq}
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.hypercubeSpectralGap_le_laplacianEigenvalue}
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianEigenvalue_of_weight_one}
 	\leanok
 	\uses{prop:eigenvectors}
 	If $\lambda_1 \le \lambda_2 \le \cdots \le \lambda_{q^m}$ are the eigenvalues of $L$, then
