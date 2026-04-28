@@ -303,9 +303,15 @@ Every PR touching Lean code should be reviewed against these criteria:
    Module files should have a header comment with `## References` citing the
    relevant arXiv paper(s).
 
-8. **Blueprint sync** -- If the PR formalizes a statement from the blueprint,
-   add `\lean{LeanDeclName}` and `\leanok` tags to the corresponding
-   `blueprint/src/chapter/*.tex` file.
+8. **Blueprint sync and paper origin** -- If the PR formalizes a statement
+   from the blueprint, add `\lean{LeanDeclName}` and `\leanok` tags to the
+   corresponding `blueprint/src/chapter/*.tex` file. If the PR adds a public
+   auxiliary lemma that is not a named statement in the original paper, record
+   that explicitly: the Lean docstring should call it a formalization-only
+   auxiliary lemma and the blueprint should either omit it as private/internal
+   infrastructure or include it as a clearly subordinate support node connected
+   by `\uses{...}`. See
+   [blueprint_style_guide.md](blueprint_style_guide.md#recording-formalization-only-lemmas).
 
 9. **Scaffolding integrity** -- If the PR introduces or modifies scaffolded
    definitions (types, theorem statements with `sorry` proofs), verify that
