@@ -87,6 +87,35 @@
 	restating the tensor-factor bookkeeping.
 \end{remark}
 
+\begin{remark}[Lean line-169 projectivization correlation interface]\label{rem:lean-line169-projectivization-correlation}
+	\uses{thm:orthonormalization, prop:completing-to-measurement, prop:triangle-sub}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169CorrelationPreservation}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169CorrelationPreservation.leftConsistency, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169CorrelationPreservation.rightConsistency}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff.leftConsistency_with_triangleSub_loss, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff.rightConsistency_with_triangleSub_loss}
+	Lean exposes the quantitative obstruction at the projectivization handoff used
+	in the inductive step.  The existing line-156 handoff gives only the generic
+	consequence of Proposition~\ref{prop:triangle-sub}: from
+	$G^{\mathrm A}\simeq_{\zeta_1}G^{\mathrm B}$ and
+	$G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ one obtains
+	$Q^{\mathrm A}\simeq_{\zeta_1+\sqrt{\zeta_2}}G^{\mathrm B}$, and similarly
+	on the other tensor factor.  The declarations
+	\texttt{leftConsistency\_with\_triangleSub\_loss} and
+	\texttt{rightConsistency\_with\_triangleSub\_loss} are checked wrappers for
+	this honest square-root-loss route.
+
+	The paper-tight line-169 estimate at exactly $\zeta_1$ therefore requires
+	more than state-dependent-distance closeness.  Lean records the missing
+	construction-level invariant as
+	\texttt{ProjectivizationLine169CorrelationPreservation}: replacing
+	$G^{\mathrm A}$ by the completed projective measurement $Q^{\mathrm A}$, and
+	role-reversing on Bob's side, must not decrease the diagonal match mass against
+	the opposite pre-projective measurement.  Its two consistency theorems prove
+	that this primitive match-mass monotonicity is sufficient to recover the exact
+	line-169 \texttt{ConsRel} links.  No constructor for this invariant is asserted
+	here; supplying it remains the upstream projectivization/correlation-preservation
+	work needed by the main-formal residual.
+\end{remark}
+
 \subsection{Naimark dilation}\label{sec:naimark}
 
 \begin{lemma}\label{lem:naimark-helper}
