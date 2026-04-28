@@ -2,6 +2,62 @@
 \label{chap:pasting}
 \label{sec:ld-pasting}
 
+\begin{remark}[Lean implementation support for pasting]\label{rem:pasting-lean-support}
+	The following Lean declarations are implementation support for the pasting
+	proof. They record probability normalizations, sandwich-commutation
+	bookkeeping, line-interpolation estimates, and switcheroo-contraction helpers.
+	\lean{MIPStarRE.LDT.Pasting.postprocess_hRestrictionToVerticalLine_eq_evaluateAt}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_core}
+	\lean{MIPStarRE.LDT.Pasting.gHatTupleOutcomeConsEquiv'}
+	\lean{MIPStarRE.LDT.Pasting.gHatHalfSandwichLeft_split_outcome}
+	\lean{MIPStarRE.LDT.Pasting.gHatHalfSandwichLeft_split_total}
+	\lean{MIPStarRE.LDT.Pasting.gHatHalfSandwichRight_split_outcome}
+	\lean{MIPStarRE.LDT.Pasting.gHatHalfSandwichRight_split_total}
+	\lean{MIPStarRE.LDT.Pasting.gHatHalfProduct_sum_adjoint_mul_le_one}
+	\lean{MIPStarRE.LDT.Pasting.gHatReverseHalfProduct_sum_adjoint_mul_le_one}
+	\lean{MIPStarRE.LDT.Pasting.thirdSliceFrontEquiv}
+	\lean{MIPStarRE.LDT.Pasting.gHatSelfConsistency_sddOpRel_quadThird}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_step_commute}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_prefixFirstSliceLeft_move}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_moveSource_eq_split}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_move_recursive_zero}
+	\lean{MIPStarRE.LDT.Pasting.splitQuestionEquivOne}
+	\lean{MIPStarRE.LDT.Pasting.splitOutcomeEquivOne}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_split_one_iff}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_core_two}
+	\lean{MIPStarRE.LDT.Pasting.thirdSliceFrontOutcomeEquiv}
+	\lean{MIPStarRE.LDT.Pasting.leftTensor_rightTensor_sum_adjoint_mul_le_one}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_moveStepMid_toTarget}
+	\lean{MIPStarRE.LDT.Pasting.restrictToAxisParallelLine_apply}
+	\lean{MIPStarRE.LDT.Pasting.interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem}
+	\lean{MIPStarRE.LDT.Pasting.evaluateAt_averageIdxSubMeas}
+	\lean{MIPStarRE.LDT.Pasting.hRestrictionToVerticalLine_averageIdxSubMeas}
+	\lean{MIPStarRE.LDT.Pasting.tupleInterpolatedVerticalLine_ne_gives_exists_some_eval_mismatch}
+	\lean{MIPStarRE.LDT.Pasting.interpolationEligibleSandwich_mismatch_sum_mono}
+	\lean{MIPStarRE.LDT.Pasting.interpolationEligibleSandwich_exists_mismatch_sum_le_sum}
+	\lean{MIPStarRE.LDT.Pasting.qBipartiteConsDefect_postprocess_eq_singleOutcome}
+	\lean{MIPStarRE.LDT.Pasting.qBipartiteConsDefect_eq_sum_singleOutcome}
+	\lean{MIPStarRE.LDT.Pasting.ldSandwichLineOnePointRightMeasurement_outcome_some_eq_sum}
+	\lean{MIPStarRE.LDT.Pasting.hBConsistencyCoordMass_le_linePointDefect}
+	\lean{MIPStarRE.LDT.Pasting.hBConsistencyBadMass_le_one}
+	\lean{MIPStarRE.LDT.Pasting.postprocess_restrictSubMeas_outcome}
+	\lean{MIPStarRE.LDT.Pasting.pastedInterpolation_verticalLine_defect_le_badMass}
+	\lean{MIPStarRE.LDT.Pasting.avgOver_distinct_bounded_le_avgOver_uniform_add_tv}
+	\lean{MIPStarRE.LDT.Pasting.qBipartiteMatchMass_averageIdxSubMeas_left}
+	\lean{MIPStarRE.LDT.Pasting.ev_opTensor_total_averageIdxSubMeas_left}
+	\lean{MIPStarRE.LDT.Pasting.qBipartiteConsDefect_averageIdxSubMeas_left_le}
+	\lean{MIPStarRE.LDT.Pasting.hBConsistency_fixed_u_defect_le_avgOver_distinct}
+	\lean{MIPStarRE.LDT.Pasting.one_div_q_le_rpow_degreeRatio}
+	\lean{MIPStarRE.LDT.Pasting.avgOver_uniform_badMass_le_k_mul_ldSandwichLineOnePointError}
+	\lean{MIPStarRE.LDT.Pasting.avgOver_distinct_badMass_le_hBConsistencyError}
+	\lean{MIPStarRE.LDT.Pasting.qBipartiteConsDefect_eq_false_mass_of_bool_right_true}
+	\lean{MIPStarRE.LDT.Pasting.hAConsistency_submeas_of_context}
+	\lean{MIPStarRE.LDT.Pasting.fromHToG_of_context}
+	\lean{MIPStarRE.LDT.Pasting.qSDD_completePart_le_slice}
+	\lean{MIPStarRE.LDT.Pasting.switcherooAggregateFourthTerm_once_commuted_contraction_left}
+	\lean{MIPStarRE.LDT.Pasting.switcherooAggregateFourthTerm_once_commuted_contraction_right}
+\end{remark}
+
 
 \begin{theorem}[Pasting]\label{thm:ld-pasting}
 	\lean{MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection, MIPStarRE.LDT.Pasting.ldPasting}

@@ -64,6 +64,35 @@ _TEX_PROOF_BEGIN_RE = re.compile(r"\\begin\{proof\}")
 _TEX_PROOF_END_RE = re.compile(r"\\end\{proof\}")
 
 
+def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
+    """Strip Lean line and block comments while preserving line numbers."""
+    stripped: list[str] = []
+    block_depth = 0
+
+    for line in text.splitlines():
+        out: list[str] = []
+        i = 0
+        while i < len(line):
+            if block_depth == 0 and line.startswith("--", i):
+                break
+            if line.startswith("/-", i):
+                block_depth += 1
+                i += 2
+                continue
+            if block_depth > 0:
+                if line.startswith("-/", i):
+                    block_depth -= 1
+                    i += 2
+                else:
+                    i += 1
+                continue
+            out.append(line[i])
+            i += 1
+        stripped.append("".join(out))
+
+    return stripped
+
+
 def _strip_tex_comment(line: str) -> str:
     r"""Return the active TeX prefix before the first unescaped ``%``.
 
@@ -146,6 +175,7 @@ class LeanDecl:
     kind: str
     short_name: str
     end_line: int
+    is_private: bool = False
 
 
 @dataclass
@@ -210,7 +240,7 @@ def _set_proof_has_leanok(entries: list[BlueprintEntry], start: int, end: int) -
 def collect_file_lean_decls(lean_file: Path, lean_root: Path) -> list[LeanDecl]:
     """Parse one Lean file and return its declarations with approximate spans."""
     text = lean_file.read_text(errors="replace")
-    lines = text.splitlines()
+    lines = _strip_lean_comments_preserve_lines(text)
     rel = str(lean_file.relative_to(lean_root.parent))
 
     # Track namespace and section stacks separately, plus a combined
@@ -291,6 +321,7 @@ def collect_file_lean_decls(lean_file: Path, lean_root: Path) -> list[LeanDecl]:
         if m:
             kind = m.group(1)
             short_name = m.group(2)
+            modifiers = line[:m.start(1)].split()
             prefix = ".".join(ns_stack) + "." if ns_stack else ""
             fqn = prefix + short_name
             decls.append(
@@ -301,6 +332,7 @@ def collect_file_lean_decls(lean_file: Path, lean_root: Path) -> list[LeanDecl]:
                     kind=kind,
                     short_name=short_name,
                     end_line=len(lines),
+                    is_private="private" in modifiers,
                 )
             )
 
@@ -317,6 +349,8 @@ def collect_lean_decls(lean_root: Path) -> dict[str, LeanDecl]:
 
     for lean_file in sorted(lean_root.rglob("*.lean")):
         for decl in collect_file_lean_decls(lean_file, lean_root):
+            if decl.is_private:
+                continue
             decls[decl.fqn] = decl
             # Also store without namespace prefix if the name already contains
             # dots (e.g. `Foo.bar` at top level), so both spellings match.
@@ -614,6 +648,8 @@ def find_changed_decls_missing_from_blueprint(
             continue
 
         for decl in collect_file_lean_decls(abs_path, lean_root):
+            if decl.is_private:
+                continue
             if decl.kind not in _TRACKED_REVERSE_DECL_KINDS:
                 continue
             if not any(decl.line <= line <= decl.end_line for line in changed_lines):

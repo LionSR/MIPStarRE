@@ -48,6 +48,14 @@
 	A general projective strategy for the $(m,q,d)$ low individual degree test consists of a bipartite state $\ket{\psi} \in \mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$ together with point, axis-parallel line, and diagonal-line projective measurements for each prover separately. We write these measurements as $A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}$ on the first prover and $A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B}$ on the second.
 \end{definition}
 
+\begin{remark}[Bipartite strategy implementation lemmas]\label{rem:biproj-strategy-lean-support}
+	The following Lean declarations record nonnegativity and scalar-block
+	bookkeeping for the two-space projective-strategy API.
+	\lean{MIPStarRE.LDT.BiProjStrat.payloadBlock_nonneg}
+	\lean{MIPStarRE.LDT.BiProjStrat.roleBlock_mul}
+	\lean{MIPStarRE.LDT.BiProjStrat.roleBlock_nonneg}
+\end{remark}
+
 \begin{remark}\label{rem:strategy-convention}
 	Throughout this work, the term strategy refers to a projective strategy, and the term symmetric strategy refers to a symmetric projective strategy.
 \end{remark}

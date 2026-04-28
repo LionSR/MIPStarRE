@@ -139,6 +139,17 @@
 	This is exactly Theorem~\ref{thm:ld-pasting}, restated in the induction chapter because it is the pasting input used in the proof of Theorem~\ref{thm:main-induction}.
 \end{proof}
 
+\begin{remark}[Lean implementation support for the induction step]\label{rem:main-induction-lean-support}
+	The following Lean declarations are implementation support for restricted
+	probability estimates, error-bound bookkeeping, and assembly of the induction
+	step packages.
+	\lean{MIPStarRE.LDT.MainInductionStep.avgRestrictedAxisError}
+	\lean{MIPStarRE.LDT.MainInductionStep.avgRestrictedSelfError}
+	\lean{MIPStarRE.LDT.MainInductionStep.avgRestrictedDiagError}
+	\lean{MIPStarRE.LDT.MainInductionStep.RestrictedProbabilitiesStatement.ofWeightedBounds}
+	\lean{MIPStarRE.LDT.MainInductionStep.assemblePastingPackage}
+\end{remark}
+
 \begin{lemma}[Base case of main induction]\label{lem:main-induction-base}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase}
 	\leanok
