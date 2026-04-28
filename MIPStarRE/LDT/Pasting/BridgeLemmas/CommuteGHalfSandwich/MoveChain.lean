@@ -48,8 +48,7 @@ private noncomputable def commuteGHalfSandwich_recursiveSourceFamily
       (ι × ι) :=
   fun q =>
     { outcome := fun ogs =>
-        leftTensor (ι₂ := ι)
-                          ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
           (headTailOrderedFamily params family r (q.1, q.2.2)).outcome (ogs.1, ogs.2.2)
       total := 0 }
 
@@ -61,8 +60,7 @@ private noncomputable def commuteGHalfSandwich_recursiveTargetFamily
       (ι × ι) :=
   fun q =>
     { outcome := fun ogs =>
-        leftTensor (ι₂ := ι)
-                          ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
           (headTailRotatedFamily params family r (q.1, q.2.2)).outcome (ogs.1, ogs.2.2)
       total := 0 }
 
@@ -273,7 +271,7 @@ private lemma commuteGHalfSandwich_prefixSecondSliceLeft
                       (leftTensor (ι₂ := ι)
                         ((gHatIdxMeas params family q.2.1).outcome gy))ᴴ =
                         leftTensor (ι₂ := ι)
-                          (((gHatIdxMeas params family q.2.1).outcome gy)ᴴ) by
+                        (((gHatIdxMeas params family q.2.1).outcome gy)ᴴ) by
                     simpa [leftTensor, opTensor] using
                       (conjTranspose_opTensor ((gHatIdxMeas params family q.2.1).outcome gy)
                         (1 : MIPStarRE.Quantum.Op ι))]
@@ -406,8 +404,7 @@ private noncomputable def commuteGHalfSandwich_prefixSecondSliceLeftFamily
       (ι × ι) :=
   fun q =>
     { outcome := fun ogs =>
-        leftTensor (ι₂ := ι)
-                          ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
           (F (q.1, q.2.2)).outcome (ogs.1, ogs.2.2)
       total :=
         leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).total) *
@@ -469,7 +466,8 @@ private lemma commuteGHalfSandwich_prefixSecondSliceLeftLift
                       (leftTensor (ι₂ := ι)
                         ((gHatIdxMeas params family q.2.1).outcome gy))ᴴ =
                         leftTensor (ι₂ := ι)
-                          (((gHatIdxMeas params family q.2.1).outcome gy)ᴴ) by
+                          (show MIPStarRE.Quantum.Op ι from
+                            ((gHatIdxMeas params family q.2.1).outcome gy)ᴴ) by
                     simpa [leftTensor, opTensor] using
                       (conjTranspose_opTensor ((gHatIdxMeas params family q.2.1).outcome gy)
                         (1 : MIPStarRE.Quantum.Op ι))]
@@ -628,8 +626,7 @@ private noncomputable def commuteGHalfSandwich_secondSliceLiftFamily
       (ι × ι) :=
   fun q =>
     { outcome := fun ogs =>
-        leftTensor (ι₂ := ι)
-                          ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
           (F (q.1, q.2.2 0, pointTupleTail q.2.2)).outcome
             (ogs.1, ogs.2.2 0, gHatTupleOutcomeTail ogs.2.2)
       total :=
@@ -785,7 +782,7 @@ private lemma commuteGHalfSandwich_moveChainLift
                       (leftTensor (ι₂ := ι)
                         ((gHatIdxMeas params family q.1).outcome g₁))ᴴ =
                         leftTensor (ι₂ := ι)
-                          (((gHatIdxMeas params family q.1).outcome g₁)ᴴ) by
+                        (((gHatIdxMeas params family q.1).outcome g₁)ᴴ) by
                     simpa [leftTensor, opTensor] using
                       (conjTranspose_opTensor ((gHatIdxMeas params family q.1).outcome g₁)
                         (1 : MIPStarRE.Quantum.Op ι))]
@@ -1221,8 +1218,7 @@ private lemma commuteGHalfSandwich_moveBackChainFamily_last
     calc
       (commuteGHalfSandwich_secondSliceLiftFamily params family r
         ((commuteGHalfSandwich_moveChainFamily params family r) 0) q).outcome ogs
-        = leftTensor (ι₂ := ι)
-                          ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+        = leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
             (commuteGHalfSandwich_moveSourceFamily params family r q').outcome ogs' := by
               simpa [commuteGHalfSandwich_secondSliceLiftFamily, q', ogs'] using
                 congrArg
@@ -1410,15 +1406,13 @@ private lemma commuteGHalfSandwich_commute_to_moveBackChainFamily_zero
               (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs := by
         calc
           (commuteGHalfSandwich_moveBackChainFamily params family r 0 q).outcome ogs
-            = leftTensor (ι₂ := ι)
-                          ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+            = leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
                 (commuteGHalfSandwich_moveFamily params family r q').outcome ogs' := by
                   simpa [commuteGHalfSandwich_moveBackChainFamily, q', ogs'] using
                     congrArg
                       (fun X =>
-                        leftTensor (ι₂ := ι)
-                          ((gHatIdxMeas params family q.2.1).outcome ogs.2.1)
-                            * X)
+                        let G := (gHatIdxMeas params family q.2.1).outcome ogs.2.1
+                        leftTensor (ι₂ := ι) G * X)
                       (commuteGHalfSandwich_moveChainFamily_last params family r q' ogs')
           _ = (commuteGHalfSandwich_secondSliceLiftFamily params family r
                 (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs := by
@@ -1450,8 +1444,7 @@ private lemma commuteGHalfSandwich_moveBackChainFamily_zero_eq_secondSliceLift_m
     (ogs.1, ogs.2.2 0, gHatTupleOutcomeTail ogs.2.2)
   calc
     (commuteGHalfSandwich_moveBackChainFamily params family r 0 q).outcome ogs
-      = leftTensor (ι₂ := ι)
-                          ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+      = leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
           (commuteGHalfSandwich_moveFamily params family r q').outcome ogs' := by
             simpa [commuteGHalfSandwich_moveBackChainFamily, q', ogs'] using
               congrArg
@@ -1696,23 +1689,24 @@ private lemma commuteGHalfSandwich_postMoveFlatFamily_last_active
         _ = (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
               (commuteGHalfSandwich_splitSuccLiftFamily params r
                 (commuteGHalfSandwich_recursiveTargetFamily params family r)) q).outcome ogs := by
-                change leftTensor (ι₂ := ι)
-                          ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+                change
+                  leftTensor (ι₂ := ι)
+                      ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
                     ((commuteGHalfSandwich_postMoveFlatFamily params family r
                         ⟨2 * (r + 1) - 1, by
-                          have hlt : 2 * (r + 1) - 1 < commuteGHalfSandwich_postMoveFlatLength r
-                              + 1 := by
+                          have hlt :
+                              2 * (r + 1) - 1 < commuteGHalfSandwich_postMoveFlatLength r + 1 := by
                             rw [commuteGHalfSandwich_postMoveFlatLength_eq]
                             omega
                           exact hlt⟩ q'').outcome ogs'') =
-                  leftTensor (ι₂ := ι)
-                          ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
-                    ((commuteGHalfSandwich_recursiveTargetFamily params family r q'').outcome
-                      ogs'')
+                    leftTensor (ι₂ := ι)
+                        ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+                      ((commuteGHalfSandwich_recursiveTargetFamily params family r q'').outcome
+                        ogs'')
                 exact congrArg
                   (fun X =>
-                    leftTensor (ι₂ := ι)
-                      ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) * X)
+                    let G := (gHatIdxMeas params family q.2.1).outcome ogs.2.1
+                    leftTensor (ι₂ := ι) G * X)
                   hsmall'
         _ = (commuteGHalfSandwich_recursiveTargetFamily params family (r + 1) q).outcome ogs := by
               exact (commuteGHalfSandwich_prefixSecondSliceLeft_splitSuccLift_eq_secondSliceLift
@@ -1919,8 +1913,8 @@ private lemma commuteGHalfSandwich_postMoveFlatStep
                           q').outcome ogs') = _
                     exact congrArg
                       (fun X =>
-                        leftTensor (ι₂ := ι)
-                          ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) * X)
+                        let G := (gHatIdxMeas params family q.2.1).outcome ogs.2.1
+                        leftTensor (ι₂ := ι) G * X)
                       hzero_active
             calc
               ((commuteGHalfSandwich_postMoveFlatFamily params family (r + 1))

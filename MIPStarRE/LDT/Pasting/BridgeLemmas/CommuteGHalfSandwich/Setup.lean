@@ -1536,21 +1536,22 @@ lemma commuteGHalfSandwich_core_two
       (headTailOrderedFamily params family 1)
       (headTailRotatedFamily params family 1)
       (gHatCommutationError params gamma zeta) :=
-    (commuteGHalfSandwich_split_one_iff params ψbi family (
-        gHatCommutationError params gamma zeta)).2 hcom
+    (commuteGHalfSandwich_split_one_iff params ψbi family
+      (gHatCommutationError params gamma zeta)).2 hcom
   have hpoint : SDDOpRel ψbi
       (uniformDistribution (PointTuple params 2))
       (gHatHalfSandwichLeft params family 2)
       (gHatHalfSandwichRight params family 2)
       (gHatCommutationError params gamma zeta) :=
-    (commuteGHalfSandwich_split_iff params ψbi family 1 (
-        gHatCommutationError params gamma zeta)).2 hsplit
+    (commuteGHalfSandwich_split_iff params ψbi family 1
+      (gHatCommutationError params gamma zeta)).2 hsplit
   rcases hcom with ⟨hν3⟩
   have hν3_nonneg : 0 ≤ gHatCommutationError params gamma zeta := by
     exact le_trans
       (avgOver_nonneg (uniformDistribution (SlicePairQuestion params))
-        (fun q => qSDDOp ψbi (gHatPairProductLeft params family q) (
-            gHatPairProductRight params family q))
+        (fun q =>
+          qSDDOp ψbi (gHatPairProductLeft params family q)
+            (gHatPairProductRight params family q))
         (fun q => Preliminaries.qSDDOp_nonneg ψbi _ _))
       hν3
   have hS_nonneg :
