@@ -350,7 +350,10 @@
 	the bundled successor boundary, the Section~6 side condition
 	$400\,m d \le k$, and the matching base-universe field-model instance, it
 	returns the symmetrized global polynomial measurement that the later
-	unsymmetrization and completion transports consume.
+	unsymmetrization and completion transports consume.  The base-universe
+	field-model restriction is a current Lean API limitation inherited from the
+	Section~6 wrapper, not a paper constraint; it should be relaxed once that
+	wrapper is made universe-polymorphic.
 \end{proposition}
 \begin{proof}
 	It is the direct application of
@@ -554,7 +557,7 @@ assembly residual:
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeTransportTargets, MIPStarRE.LDT.Test.MainFormalCascadeTransportTargets.toCascadeTargets, MIPStarRE.LDT.Test.MainFormalCascadeTargets.toNativeTargets}
 They split off the vacuous branch where the theorem error is at least $1$,
 derive the Step~8 scalar hypotheses in the non-vacuous branch, and isolate the
-role-register Section~6 measurement behind branch-level role-package data.
+role-register Section~6 measurement behind a concrete role-package residual.
 Lean now records that every non-base parameter bundle has a predecessor via
 \texttt{Parameters.successorDecompositionOfNeOne}, transports the strategy and
 passing proof across that predecessor equality, and packages the two role-production
@@ -562,7 +565,10 @@ branches as \texttt{MainFormalRolePackageBranchResidual}: the checked base hando
 or an explicit successor branch carrying \texttt{MainFormalSuccessorBoundary} and
 the large-$k$ side condition $400m_{\mathrm{pred}}d\le k$.  Producing that
 successor-boundary package, or proving a correct small-$k$ saturation lemma for
-the intermediate range, remains upstream work.  Once the role package is obtained,
+the intermediate range, remains upstream work.  The live completion residual
+carries the concrete role residual rather than a separate decorative branch
+witness; the branch residual types remain the documented base/successor supply
+paths.  Once the role package is obtained,
 Lean proves the two factor-two unsymmetrization links from
 its symmetrized consistency estimate.  The subsequent checked wrappers use the
 proved Step~5 Schwartz--Zippel theorem to convert evaluated pre-projective
@@ -575,7 +581,7 @@ links to the evaluated line-172 links, and proves the two native $\zeta_4$ point
 goals via \texttt{simeq-triangle-inequality}.  The remaining active residual is
 now the split
 \texttt{MainFormalCascadeRolePackageResidualCompletionLine169Residual}: its first
-field is the branch-level Section~6 role residual, and its post-role field asks
+field is the concrete Section~6 role residual, and its post-role field asks
 only for left/right completion-closeness estimates at $\zeta_2$ and the two exact
 polynomial-level $\zeta_1$ transport links from paper line~169 and its
 role-reversed analogue. It no longer asks for an arbitrary role package or an
@@ -583,7 +589,7 @@ arbitrary raw Section~6 witness as an independent field.  It also no longer asks
 for the two factor-two role-block estimates, the unused Section~6 consistency
 field inside \texttt{UnsymmetrizationBridgePackage}, or the duplicated
 pre-projective consistency field inside the Step~6 handoff; those are rebuilt
-from the branch-level role residual, the selected role package, and \texttt{hpass}.
+from the concrete role residual, the selected role package, and \texttt{hpass}.
 Lean then converts
 the resulting projective self-consistency to
 \texttt{MainFormalCascadeTransportTargets} using the projective converse of
