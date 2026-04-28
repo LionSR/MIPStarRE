@@ -1000,7 +1000,7 @@ theorem toRolePackageResidual
   subst params
   -- Keep the transported predecessor instance explicit: `boundary` was stored
   -- under `fieldModelOfSuccessorDecomposition`, and the synthesized canonical
-  -- `FieldModel pred.q` is not definitionally the same instance.
+  -- `FieldModel.{0} pred.q` is not definitionally the same instance.
   letI : FieldModel.{0} pred.q :=
     fieldModelOfSuccessorDecomposition (params := pred.next) ⟨pred, rfl⟩
   let transportedStrategy : ProjStrat pred.next ι :=
