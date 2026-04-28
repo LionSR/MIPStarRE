@@ -2119,12 +2119,7 @@ private noncomputable def addCoordLeftEquiv (params : Parameters) [FieldModel pa
   invFun := fun y => subCoord y c
   left_inv := by
     intro x
-    change subCoord (addCoord c x) c = x
-    apply decodeScalar_injective
-    unfold addCoord subCoord
-    rw [decode_encodeScalar]
-    simp only [decode_encodeScalar]
-    ring_nf
+    simp [addCoord, subCoord, decode_encodeScalar]
   right_inv := by
     intro y
     exact addCoord_subCoord_right y c

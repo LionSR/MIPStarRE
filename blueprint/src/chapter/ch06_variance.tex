@@ -22,7 +22,7 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 \end{proof}
 
 \begin{lemma}[Local variance of the points measurements]\label{lem:local-variance-of-points}
-	\lean{MIPStarRE.LDT.GlobalVariance.localVarianceOfPoints, MIPStarRE.LDT.GlobalVariance.localVarianceTransportChainError, MIPStarRE.LDT.GlobalVariance.localVarianceTransportChainError_le_localVarianceOfPointsError, MIPStarRE.LDT.GlobalVariance.localVarianceOfPointsFromTransportChainBound, MIPStarRE.LDT.GlobalVariance.globalVarianceOfPointsFromTransportChainBound}
+	\lean{MIPStarRE.LDT.GlobalVariance.localVarianceOfPoints, MIPStarRE.LDT.GlobalVariance.localVarianceTransportChainError, MIPStarRE.LDT.GlobalVariance.localVarianceTransportChainError_le_localVarianceOfPointsError, MIPStarRE.LDT.GlobalVariance.localVarianceTransportChainBound, MIPStarRE.LDT.GlobalVariance.localVarianceOfPointsFromTransportChainBound, MIPStarRE.LDT.GlobalVariance.globalVarianceOfPointsFromTransportChainBound}
 	\leanok
 	\uses{lem:good-strategy-characterization, prop:simeq-to-approx, lem:generalize-b, prop:triangle-inequality-for-approx_delta}
 	Let $G \in \polysub{m}{q}{d}$. On the hypercube edge distribution $(u,v) \sim C$,
@@ -33,7 +33,7 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 		\label{eq:local-variance-of-points-equation}
 	\end{equation}
 \end{lemma}
-\begin{proof}
+\begin{proof}\leanok
 	\uses{prop:simeq-to-approx, prop:cab-approx-delta, lem:generalize-b, lem:good-strategy-characterization, prop:triangle-inequality-for-approx_delta}
 	Fix $g$ and keep the weight $(G_g)^{1/2}$ on the second tensor factor throughout. On the vector $(I\ot (G_g)^{1/2})\ket{\psi}$ one has the six-step chain
 	\[
