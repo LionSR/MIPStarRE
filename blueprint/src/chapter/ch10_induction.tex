@@ -42,6 +42,21 @@
 	The self-consistency test restricts exactly to the slice at height $x$. For the axis-parallel and diagonal-line tests, conditioning on the sampled line not being parallel to the last coordinate identifies the test with the corresponding restricted game.
 \end{proof}
 
+\begin{definition}[Average restricted errors]\label{def:average-restricted-errors}
+	\lean{MIPStarRE.LDT.MainInductionStep.averageRestrictedAxisParallelError, MIPStarRE.LDT.MainInductionStep.averageRestrictedSelfConsistencyError, MIPStarRE.LDT.MainInductionStep.averageRestrictedDiagonalError}
+	\uses{def:restricted-strategy}
+	The average restricted errors are the expectations over $x \in \F_q$ of the
+	axis-parallel, self-consistency, and restricted diagonal-line failure
+	probabilities of the $x$-restricted strategies.
+\end{definition}
+
+\begin{lemma}[Weighted restricted-probability bounds]\label{lem:weighted-restricted-probability-bounds}
+	\lean{MIPStarRE.LDT.MainInductionStep.RestrictedProbabilitiesStatement.ofWeightedBounds}
+	\uses{lem:restricted-probabilities, def:average-restricted-errors}
+	The weighted bounds from Lemma~\ref{lem:restricted-probabilities} imply the
+	restricted-probability data used in the successor step.
+\end{lemma}
+
 \section{The inductive construction}
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement-in-induction-section}
@@ -139,6 +154,13 @@
 	This is exactly Theorem~\ref{thm:ld-pasting}, restated in the induction chapter because it is the pasting input used in the proof of Theorem~\ref{thm:main-induction}.
 \end{proof}
 
+\begin{definition}[Pasting data for the successor step]\label{def:successor-pasting-data}
+	\lean{MIPStarRE.LDT.MainInductionStep.assemblePastingPackage}
+	\uses{lem:weighted-restricted-probability-bounds, thm:ld-pasting-in-induction-section}
+	The successor step forms the pasting input by combining the restricted
+	probability estimates with the slice-wise self-improvement data.
+\end{definition}
+
 \begin{lemma}[Base case of main induction]\label{lem:main-induction-base}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase}
 	\leanok
@@ -170,7 +192,7 @@
   \]
 \end{theorem}
 \begin{proof}
-	\uses{lem:restricted-probabilities, lem:main-induction-base, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section}
+	\uses{lem:restricted-probabilities, lem:weighted-restricted-probability-bounds, lem:main-induction-base, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section, def:successor-pasting-data}
 	In Lean, the base case and the internal successor-step assembly are now formalized through
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase, MIPStarRE.LDT.MainInductionStep.mainInductionFromPackages, MIPStarRE.LDT.MainInductionStep.mainInductionByRecursionOnM}
 	together with the bookkeeping packages

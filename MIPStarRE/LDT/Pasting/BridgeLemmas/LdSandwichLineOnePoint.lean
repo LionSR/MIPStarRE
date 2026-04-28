@@ -58,7 +58,8 @@ private noncomputable def sandwichedLineQuestionSplitAtEquiv
         ((Equiv.funSplitAt i (Fq params)).left_inv xs)
   right_inv := by
     rintro ⟨⟨u, x⟩, xs⟩
-    simp [Equiv.funSplitAt]
+    simp only [ne_eq, Equiv.funSplitAt_symm_apply, ↓reduceDIte, Subtype.coe_eta, dite_eq_ite,
+      Prod.mk.injEq, true_and]
     funext j
     simp [j.2]
 
@@ -1691,6 +1692,7 @@ private lemma ldSandwichLineOnePointPrefixMoved_rawCommutation_qSDDCore_bound
   simpa [sddErrorOp, qSDDOp] using hprefixRaw.squaredDistanceBound
 
 set_option maxHeartbeats 400000 in
+-- This arithmetic absorption proof expands several nested error estimates from the paper.
 /-- Scalar absorption for the post-tail-deletion one-point estimate.
 
 This is the arithmetic at `references/ldt-paper/ld-pasting.tex:1028--1033`,
@@ -2610,8 +2612,10 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_inputFacts
     calc
       ∑ a : Fq params,
           ev strategy.state
-            (opTensor ((ldSandwichLineOnePointPrefixOriginalFamily params family hi q).outcome (some a))
-              (1 - (ldSandwichLineOnePointRightFamily params strategy family k i q).outcome (some a)))
+            (opTensor
+              ((ldSandwichLineOnePointPrefixOriginalFamily params family hi q).outcome (some a))
+              (1 -
+                (ldSandwichLineOnePointRightFamily params strategy family k i q).outcome (some a)))
           = ∑ a : Fq params,
               ev strategy.state
                 (opTensor
@@ -2705,8 +2709,7 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_inputFacts
         simp [evalOutcome, hgs, ldSandwichLineOnePointCS_Aord,
           ldSandwichLineOnePointCS_Csecond, ldSandwichLineOnePointCS_orderedHalf,
           ldSandwichLineOnePointCS_rotatedHalf,
-          ldSandwichLineOnePointCS_rightComplement, leftTensor_conjTranspose,
-          opTensor_mul_leftTensor]
+          ldSandwichLineOnePointCS_rightComplement, opTensor_mul_leftTensor]
   · unfold ldSandwichLineOnePoint_prefix_movedOutcomeSum
       ldSandwichLineOnePointCS_secondTargetRaw
     apply avgOver_congr
@@ -2725,8 +2728,10 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_inputFacts
     calc
       ∑ a : Fq params,
           ev strategy.state
-            (opTensor ((ldSandwichLineOnePointPrefixMovedFamily params family hi q).outcome (some a))
-              (1 - (ldSandwichLineOnePointRightFamily params strategy family k i q).outcome (some a)))
+            (opTensor
+              ((ldSandwichLineOnePointPrefixMovedFamily params family hi q).outcome (some a))
+              (1 -
+                (ldSandwichLineOnePointRightFamily params strategy family k i q).outcome (some a)))
           = ∑ a : Fq params,
               ev strategy.state
                 (opTensor
@@ -2799,8 +2804,7 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_inputFacts
             rw [Fintype.sum_unique]
             simp [ldSandwichLineOnePointCS_Arot, ldSandwichLineOnePointCS_Csecond,
               ldSandwichLineOnePointCS_rotatedHalf,
-              ldSandwichLineOnePointCS_rightComplement, leftTensor_conjTranspose,
-              opTensor_mul_leftTensor]
+              ldSandwichLineOnePointCS_rightComplement, opTensor_mul_leftTensor]
 
 /-- Narrow residual for the two off-diagonal Cauchy--Schwarz moves in their
 absolute-value `closenessOfIP` output shape.

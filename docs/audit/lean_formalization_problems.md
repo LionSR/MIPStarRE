@@ -330,7 +330,7 @@ Resolution:
 Lean code:
 
 ```lean
-averageRestrictedDiagonalError params profile ≤
+avgRestrictedDiagError params profile ≤
   sliceConditioningLoss params * gamma
 ```
 

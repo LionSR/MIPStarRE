@@ -5,7 +5,8 @@ import MIPStarRE.LDT.Basic.LowDegreePolynomial
 /-!
 # Section 12 pasting: bridge common helpers
 
-Shared postprocessing, symmetry, distribution, boundedness, and arithmetic helpers for the Section 12 bridge lemmas.
+Shared postprocessing, symmetry, distribution, boundedness, and arithmetic helpers for the Section
+12 bridge lemmas.
 
 ## References
 
@@ -157,7 +158,8 @@ lemma postprocess_hRestrictionToVerticalLine_eq_evaluateAt
             _ = h u := by simp [hbase]
   unfold evaluateAt
   refine congrArg (postprocess H) (funext fun h => ?_)
-  show (Polynomial.restrictToAxisParallelLine params.next h verticalLine) (pointHeight params u) = h u
+  change (Polynomial.restrictToAxisParallelLine params.next h verticalLine) (pointHeight params u)
+      = h u
   exact congrFun hfun h
 
 

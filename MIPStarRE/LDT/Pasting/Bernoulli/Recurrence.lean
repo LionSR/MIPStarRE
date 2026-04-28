@@ -1738,7 +1738,8 @@ private lemma fromHToG_closenessOfIP_avgContext
           Real.sqrt (avgOver 𝒟 (fun q => ∑ a : OutcomeA, y q a)) := hweighted
     _ ≤ 1 * Real.sqrt (avgOver 𝒟 (fun q => ∑ a : OutcomeA, y q a)) := by
           exact mul_le_mul_of_nonneg_right
-            (by simpa using Real.sqrt_le_sqrt hC) (Real.sqrt_nonneg _)
+            (by simpa using Real.sqrt_le_sqrt hC)
+            (Real.sqrt_nonneg _)
     _ = Real.sqrt (avgOver 𝒟 (fun q => ∑ a : OutcomeA, y q a)) := by ring
     _ = Real.sqrt (avgOver 𝒟 (fun q => qSDDCore ψ (A q) (B q))) := by rw [hy_eq]
     _ ≤ Real.sqrt γ := by
@@ -1805,7 +1806,7 @@ private lemma fromHToG_type_filtered_outcome_sum
         F τ gs) =
       ∑ gs : GHatTupleOutcome params n, F (gHatTupleType gs) gs := by
   classical
-  simp [Finset.sum_filter]
+  simp only [Finset.sum_filter]
   rw [Finset.sum_comm]
   simp
 
@@ -1848,8 +1849,11 @@ private lemma fromHToG_bool_type_filtered_outcome_sum
               (fun τ gs => F b τ g gs)
     _ = ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
           F g.isSome (gHatTupleType gs) g gs := by
-            simp [Finset.sum_filter]
-            rw [add_comm]
+            simp only [Finset.sum_filter]
+            rw [Finset.sum_comm]
+            refine Finset.sum_congr rfl ?_
+            intro g _hg
+            cases g <;> simp
 
 /-- Move two finite sums through two nested averages. -/
 private lemma fromHToG_sum₂_avgOver₂
@@ -4124,8 +4128,8 @@ private lemma fromHToGAdjacentStage_paperMoveChain
                       fromHToG_gHatSandwichFamily_sum_eq_one params family n q.2
                   rw [hsum]
                   simp [leftTensor]
-        have htail_sq_le_self : ∀ g : GHatOutcome params,
-            tailBlock g * tailBlock g ≤ tailBlock g := by
+        have htail_sq_le_self :
+            ∀ g : GHatOutcome params, tailBlock g * tailBlock g ≤ tailBlock g := by
           intro g
           exact MIPStarRE.Quantum.sq_le_self (htail_pos g) (htail_le_one g)
         have hterm_le : ∀ g : GHatOutcome params,

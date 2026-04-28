@@ -308,7 +308,7 @@ private lemma binomial_lowerTail_eq
               refine Finset.sum_eq_zero ?_
               intro r hr
               have hklt : k < r := (Finset.mem_Ico.mp hr).1
-              simp [f]
+              change (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r)) = 0
               rw [Nat.choose_eq_zero_of_lt hklt]
               simp
             have hsplit :=
@@ -435,7 +435,7 @@ private lemma scalarBernoulliLowerTail_add_scalarBernoulliTail
       refine Finset.sum_eq_zero ?_
       intro r hr
       have hklt : k < r := (Finset.mem_Ico.mp hr).1
-      simp [f]
+      change (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r)) = 0
       rw [Nat.choose_eq_zero_of_lt hklt]
       simp
     have hsplit :=

@@ -3,9 +3,6 @@ import MIPStarRE.LDT.Preliminaries.ComparisonCore
 import MIPStarRE.LDT.Preliminaries.Defs
 import MIPStarRE.LDT.Test.StrategyFailures
 
-set_option linter.style.setOption false
-set_option linter.unnecessarySimpa false
-
 /-!
 # Section 10 — commutativity points approximation layer
 

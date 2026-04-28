@@ -57,7 +57,7 @@ private lemma hBConsistencyError_le_overAllOutcomesError
       overAllOutcomesError params eps delta gamma zeta k := by
   have hsum_nonneg := oneThirtySecondErrorSum_nonneg params eps delta gamma zeta
     heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
-  simp [hBConsistencyError, overAllOutcomesError]
+  simp only [hBConsistencyError, overAllOutcomesError]
   gcongr
   norm_num
 
@@ -389,7 +389,7 @@ private lemma overAllOutcomesPastedMass_eq_avg_distinct_global
         subMeasMass strategy.state
           ((restrictSubMeas (interpolationEligibleSandwichFamily params family k xs)
             (IsGloballyConsistent params xs)).liftLeft)) := by
-  simp [overAllOutcomesPastedMass, constructedPastedSubMeas, pastedInterpolationFamily,
+  simp only [overAllOutcomesPastedMass, constructedPastedSubMeas, pastedInterpolationFamily,
     subMeasMass, SubMeas.liftLeft, averageIdxSubMeas, avgOver, postprocess_total]
   exact ev_leftTensor_weighted_sum strategy.state (distinctTupleDistribution params k)
     (fun xs =>
@@ -405,10 +405,9 @@ private lemma overAllOutcomesExpansionMass_eq_avg_uniform_eligible
       avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
         subMeasMass strategy.state
           ((interpolationEligibleSandwichFamily params family k xs).liftLeft)) := by
-  simp [overAllOutcomesExpansionMass, allOutcomesExpansionFamily,
+  simp only [overAllOutcomesExpansionMass, allOutcomesExpansionFamily,
     averagedEligibleSandwichSubMeas, pastedMeasurementTotal, constSubMeasFamily,
-    subMeasMass, SubMeas.liftLeft, IdxSubMeas.liftLeft, averageIdxSubMeas, avgOver,
-    postprocess_total]
+    subMeasMass, SubMeas.liftLeft, IdxSubMeas.liftLeft, averageIdxSubMeas, avgOver]
   exact ev_leftTensor_weighted_sum strategy.state (uniformDistribution (PointTuple params k))
     (fun xs => (interpolationEligibleSandwichFamily params family k xs).total)
 
