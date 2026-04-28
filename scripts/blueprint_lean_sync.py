@@ -140,7 +140,12 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
             if char == '"':
                 in_string = True
                 escaped = False
-                string_interpolated = len(out) >= 2 and out[-2:] == ["s", "!"]
+                string_interpolated = (
+                    len(out) >= 2
+                    and out[-1] == "!"
+                    and out[-2] in {"s", "m", "f"}
+                    and (len(out) == 2 or not (out[-3].isalnum() or out[-3] in "_'"))
+                )
             elif char == "'":
                 prev = out[-1] if out else ""
                 if not (prev.isalnum() or prev in "_'"):
