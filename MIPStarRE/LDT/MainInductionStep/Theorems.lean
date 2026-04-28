@@ -1926,7 +1926,7 @@ theorem mainInductionFromPackages
         hH.pointConsistency, by simpa [kappa, zeta] using hpaste.error_le⟩
   exact mainInductionOfWitness params.next strategy eps delta gamma k hwitness
 
-private lemma restrictedAxisParallelFailureProbability_nonneg
+private lemma restrictedAxisProb_nonneg
     (params : Parameters) [FieldModel params.q]
     (strategy : RestrictedSymStrat params ι) :
     0 ≤ strategy.axisParallelFailureProbability := by
@@ -1944,11 +1944,11 @@ private lemma restricted_axis_nonneg
     ∀ x, 0 ≤ profile.axisParallel x := by
   intro x
   exact le_trans
-    (restrictedAxisParallelFailureProbability_nonneg params
+    (restrictedAxisProb_nonneg params
       (xRestrictedStrategy params strategy x))
     (profile.restrictedGood x).axisParallelTest
 
-private lemma restrictedSelfConsistencyFailureProbability_nonneg
+private lemma restrictedSelfConsistencyProb_nonneg
     (params : Parameters) [FieldModel params.q]
     (strategy : RestrictedSymStrat params ι) :
     0 ≤ strategy.selfConsistencyFailureProbability := by
@@ -1965,11 +1965,11 @@ private lemma restricted_self_nonneg
     ∀ x, 0 ≤ profile.selfConsistency x := by
   intro x
   exact le_trans
-    (restrictedSelfConsistencyFailureProbability_nonneg params
+    (restrictedSelfConsistencyProb_nonneg params
       (xRestrictedStrategy params strategy x))
     (profile.restrictedGood x).selfConsistencyTest
 
-private lemma restrictedDiagonalFailureProbability_nonneg
+private lemma restrictedDiagonalProb_nonneg
     (params : Parameters) [FieldModel params.q]
     (strategy : RestrictedSymStrat params ι) :
     0 ≤ strategy.diagonalFailureProbability := by
@@ -1991,7 +1991,7 @@ private lemma restricted_diag_nonneg
     ∀ x, 0 ≤ profile.diagonal x := by
   intro x
   exact le_trans
-    (restrictedDiagonalFailureProbability_nonneg params
+    (restrictedDiagonalProb_nonneg params
       (xRestrictedStrategy params strategy x))
     (profile.restrictedGood x).diagonalLineTest
 
@@ -2768,10 +2768,9 @@ private lemma family_pointConsistencyError_eq_avg
           simp [g, IdxPolyFamily.evaluatedAtNextPoint, polynomialEvaluationFamily,
             IdxProjMeas.toIdxSubMeas]
 
+set_option maxHeartbeats 1000000 in
 -- The averaged slice-to-pasting assembly generates several large nonlinear
 -- arithmetic goals in the final telescoping estimate.
-set_option maxHeartbeats 1000000 in
--- Expands several averaged slice estimates before the final nonlinear arithmetic step.
 /-- The remaining averaged step from per-slice self-improvement data to the
 pasting hypotheses.
 
