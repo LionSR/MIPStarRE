@@ -324,9 +324,33 @@ class CollectLeanDeclsTests(unittest.TestCase):
                 LeanDecl(
                     file="MIPStarRE/LDT/MainInductionStep/Theorems.lean",
                     line=10,
-                    fqn="MIPStarRE.LDT.MainInductionStep.Statement.ofWeightedBounds",
+                    fqn="MIPStarRE.LDT.MainInductionStep.RestrictedProbabilitiesStatement.ofWeightedBounds",
                     kind="lemma",
-                    short_name="Statement.ofWeightedBounds",
+                    short_name="RestrictedProbabilitiesStatement.ofWeightedBounds",
+                    end_line=12,
+                )
+            )
+        )
+        self.assertFalse(
+            _is_internal_support_decl(
+                LeanDecl(
+                    file="MIPStarRE/LDT/Basic/Parameters.lean",
+                    line=10,
+                    fqn="MIPStarRE.LDT.Parameters.next",
+                    kind="def",
+                    short_name="Parameters.next",
+                    end_line=12,
+                )
+            )
+        )
+        self.assertFalse(
+            _is_internal_support_decl(
+                LeanDecl(
+                    file="MIPStarRE/LDT/Basic/Role.lean",
+                    line=10,
+                    fqn="MIPStarRE.LDT.Role.other",
+                    kind="def",
+                    short_name="Role.other",
                     end_line=12,
                 )
             )

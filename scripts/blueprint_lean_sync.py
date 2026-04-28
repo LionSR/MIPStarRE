@@ -74,6 +74,13 @@ _INTERNAL_SUPPORT_NAME_PREFIXES = (
     "avgRestricted",
     "assemble",
 )
+_INTERNAL_SUPPORT_SHORT_NAMES = (
+    "PastingPackage.output",
+    "PerSliceInductionPackage.ofRecursion",
+    "RestrictedProbabilitiesStatement.ofWeightedBounds",
+    "SelfImprovementPackage.ofSelfImprovementInInductionSection",
+    "SliceRestrictionPackage.ofRestrictedProbabilities",
+)
 
 
 def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
@@ -669,7 +676,7 @@ def _is_internal_support_decl(decl: LeanDecl) -> bool:
     """
     if decl.is_private:
         return True
-    if "." in decl.short_name:
+    if decl.short_name in _INTERNAL_SUPPORT_SHORT_NAMES:
         return True
     if any(fragment in decl.file for fragment in _INTERNAL_SUPPORT_PATH_FRAGMENTS):
         return True
