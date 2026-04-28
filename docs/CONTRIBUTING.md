@@ -285,30 +285,35 @@ Every PR touching Lean code should be reviewed against these criteria:
    and documentation standards in [doc.md](doc.md). See [pr-review.md](pr-review.md)
    for the full Mathlib review guide.
 
-3. **Type safety** -- No universe mismatches, coercion problems, or unresolved
+3. **Linter hygiene** -- Linter-warning cleanup must fix warnings, not mask
+   them with broad `set_option linter.<name> false` blocks. See
+   [style.md](style.md#linter-warnings) for the project rule and the narrow
+   exception policy.
+
+4. **Type safety** -- No universe mismatches, coercion problems, or unresolved
    metavariables.
 
-4. **Performance** -- Avoid expensive tactics on large types (e.g., `decide` on
+5. **Performance** -- Avoid expensive tactics on large types (e.g., `decide` on
    `Fin 1000`). Watch for timeout-prone proof terms.
 
-5. **Modularity** -- Are new lemmas general enough to be reused? Could any be
+6. **Modularity** -- Are new lemmas general enough to be reused? Could any be
    upstreamed to Mathlib?
 
-6. **Documentation** -- Every new `def` and major `theorem` must have a docstring.
+7. **Documentation** -- Every new `def` and major `theorem` must have a docstring.
    Module files should have a header comment with `## References` citing the
    relevant arXiv paper(s).
 
-7. **Blueprint sync** -- If the PR formalizes a statement from the blueprint,
+8. **Blueprint sync** -- If the PR formalizes a statement from the blueprint,
    add `\lean{LeanDeclName}` and `\leanok` tags to the corresponding
    `blueprint/src/chapter/*.tex` file.
 
-8. **Scaffolding integrity** -- If the PR introduces or modifies scaffolded
+9. **Scaffolding integrity** -- If the PR introduces or modifies scaffolded
    definitions (types, theorem statements with `sorry` proofs), verify that
    the types and API surface align with Mathlib. Scaffolding that uses custom
    types incompatible with Mathlib blocks future proof work. See
    [PROOF_INTEGRITY.md](PROOF_INTEGRITY.md) for details.
 
-9. **Proof-evasion anti-patterns** -- Review against
+10. **Proof-evasion anti-patterns** -- Review against
    [anti_patterns.md](anti_patterns.md), which catalogues subtler failure
    modes that pass the `PROOF_INTEGRITY.md` blocker checks but still fail
    to prove the claimed mathematics: conclusion-shaped hypotheses (A1),
