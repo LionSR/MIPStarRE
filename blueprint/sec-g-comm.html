@@ -209,12 +209,56 @@
 
 <h1 id="sec:commutativity-points">8.1 Commutativity of the point measurements</h1>
 
+<div class="definition_thmwrapper theorem-style-definition" id="def:point-pair-shared-diagonal-line-distribution">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">8.1</span>
+    <span class="definition_thmtitle">Shared diagonal-line sample</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-g-comm.html#def:point-pair-shared-diagonal-line-distribution">#</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.CommutativityPoints.pointPairSharedDiagonalLineDistribution" class="lean_decl">MIPStarRE.LDT.CommutativityPoints.pointPairSharedDiagonalLineDistribution</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>  Sample a uniformly random ordered point pair \((u,v)\) and a uniformly random parameter \(t \in \mathbb {F}_q\). Package this data as the diagonal line whose direction is \(v-u\) and whose parametrization visits \(u\) at \(t\) and \(v\) at \(t+1\). </p>
+
+  </div>
+</div>
 <div class="theorem_thmwrapper theorem-style-plain" id="thm:commutativity-points">
   <div class="theorem_thmheading">
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">8.1</span>
+    <span class="theorem_thmlabel">8.2</span>
     <span class="theorem_thmtitle">Commutativity of the point measurements</span>
     <div class="thm_header_extras">
 
@@ -241,11 +285,13 @@
         
         <ul class="uses">
           
-          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.7</a></li>
+          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.8</a></li>
           
           <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
           
-          <li><a href="sec-the-test.html#def:restricted-diagonal-lines-test">Definition 2.10</a></li>
+          <li><a href="sec-g-comm.html#def:point-pair-shared-diagonal-line-distribution">Definition 8.1</a></li>
+          
+          <li><a href="sec-the-test.html#def:restricted-diagonal-lines-test">Definition 2.11</a></li>
           
           <li><a href="sec-prelims.html#lem:good-strategy-characterization">Lemma 3.17</a></li>
           
@@ -297,7 +343,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> By Definition&#160;<a href="sec-the-test.html#def:restricted-diagonal-lines-test">2.10</a>, the strategy passes the \(m\)-restricted diagonal lines test with probability \(1-\gamma m\). Hence </p>
+  <p> By Definition&#160;<a href="sec-the-test.html#def:restricted-diagonal-lines-test">2.11</a>, the strategy passes the \(m\)-restricted diagonal lines test with probability \(1-\gamma m\). Hence </p>
 <div class="displaymath" id="a0000000351">
   \[  A_a^u \otimes I \simeq _{\gamma m} I \otimes L^\ell _{[f(u)=a]}  \]
 </div>
@@ -325,7 +371,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">8.2</span>
+    <span class="lemma_thmlabel">8.3</span>
     <span class="lemma_thmtitle">Commutativity of&#160;\(G\) after evaluation</span>
     <div class="thm_header_extras">
 
@@ -352,7 +398,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.7</a></li>
+          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.8</a></li>
           
           <li><a href="sec-prelims.html#def:polymeasurements">Definition 3.11</a></li>
           
@@ -360,9 +406,9 @@
           
           <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.34</a></li>
           
-          <li><a href="sec-g-comm.html#clm:g-comm-stability">Lemma 8.3</a></li>
+          <li><a href="sec-g-comm.html#clm:g-comm-stability">Lemma 8.4</a></li>
           
-          <li><a href="sec-g-comm.html#clm:g-comm-stability2">Lemma 8.4</a></li>
+          <li><a href="sec-g-comm.html#clm:g-comm-stability2">Lemma 8.5</a></li>
           
           <li><a href="sec-prelims.html#prop:cons-sub-meas">Lemma 3.31</a></li>
           
@@ -374,7 +420,7 @@
           
           <li><a href="sec-prelims.html#prop:two-notions-of-self-consistency-after-evaluation">Lemma 3.37</a></li>
           
-          <li><a href="sec-g-comm.html#thm:commutativity-points">Theorem 8.1</a></li>
+          <li><a href="sec-g-comm.html#thm:commutativity-points">Theorem 8.2</a></li>
           
         </ul>
     
@@ -476,7 +522,7 @@
   <span class="equation_label">6</span>
 </p>
 </div>
-<p> which is <a href="sec-g-comm.html#clm:g-comm-stability">8.3</a>. Applying <a href="sec-g-comm.html#eq:add-an-a">4</a> once more and then <a href="sec-g-comm.html#thm:commutativity-points">8.1</a>, we obtain </p>
+<p> which is <a href="sec-g-comm.html#clm:g-comm-stability">8.4</a>. Applying <a href="sec-g-comm.html#eq:add-an-a">4</a> once more and then <a href="sec-g-comm.html#thm:commutativity-points">8.2</a>, we obtain </p>
 <div class="displaymath" id="a0000000363">
   \begin{align}  \eqref{eq:gcom9} &  \approx _{2\sqrt{\zeta }} \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  G_a^{u,x} G_b^{v,y} G^x \otimes A_a^{u,x} A_b^{v,y} \lvert \psi  \rangle \nonumber \\ &  \approx _{6\sqrt{\gamma (m+1)}} \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  G_a^{u,x} G_b^{v,y} G^x \otimes A_b^{v,y} A_a^{u,x} \lvert \psi  \rangle . \label{eq:dunno-what-i-should-call-this} \end{align}
 </div>
@@ -489,7 +535,7 @@
   <span class="equation_label">8</span>
 </p>
 </div>
-<p> which is <a href="sec-g-comm.html#clm:g-comm-stability2">8.4</a>. Using <a href="sec-g-comm.html#eq:add-an-a">4</a> twice more and <a href="sec-prelims.html#prop:closeness-of-ip">3.23</a>, </p>
+<p> which is <a href="sec-g-comm.html#clm:g-comm-stability2">8.5</a>. Using <a href="sec-g-comm.html#eq:add-an-a">4</a> twice more and <a href="sec-prelims.html#prop:closeness-of-ip">3.23</a>, </p>
 <div class="displaymath" id="a0000000364">
   \begin{align}  \eqref{eq:gcom10} &  \approx _{2\sqrt{\zeta }} \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  G_a^{u,x} G_b^{v,y} \otimes A_b^{v,y} \lvert \psi  \rangle \nonumber \\ &  \approx _{2\sqrt{\zeta }} \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  G_a^{u,x} G_b^{v,y} G_b^{v,y} \otimes I \lvert \psi  \rangle . \label{eq:gonna-cite-this-in-just-a-bit} \end{align}
 </div>
@@ -519,7 +565,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">8.3</span>
+    <span class="lemma_thmlabel">8.4</span>
     <div class="thm_header_extras">
 
     
@@ -618,7 +664,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">8.4</span>
+    <span class="lemma_thmlabel">8.5</span>
     <div class="thm_header_extras">
 
     
@@ -646,7 +692,7 @@
           
           <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
           
-          <li><a href="sec-g-comm.html#thm:commutativity-points">Theorem 8.1</a></li>
+          <li><a href="sec-g-comm.html#thm:commutativity-points">Theorem 8.2</a></li>
           
         </ul>
     
@@ -702,7 +748,7 @@
 <div class="displaymath" id="a0000000373">
   \begin{align} &  \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  G_a^{u,x} G_b^{v,y} (I-G^x) \otimes A_a^{u,x} A_b^{v,y} \lvert \psi  \rangle \nonumber \\ \approx _{6\sqrt{\gamma (m+1)}} &  \mathbb {E}_{u,v,x,y} \sum _{a,b} \langle \psi  \rvert  G_a^{u,x} G_b^{v,y} (I-G^x) \otimes A_b^{v,y} A_a^{u,x} \lvert \psi  \rangle , \label{eq:just-got-commuted} \end{align}
 </div>
-<p> where <a href="sec-g-comm.html#thm:commutativity-points">8.1</a> commutes the point measurements on the right register. Expanding \(G_a^{u,x}=\sum _{g:g(u)=a} G_g^x\), we rewrite </p>
+<p> where <a href="sec-g-comm.html#thm:commutativity-points">8.2</a> commutes the point measurements on the right register. Expanding \(G_a^{u,x}=\sum _{g:g(u)=a} G_g^x\), we rewrite </p>
 <div class="displaymath" id="eq:g-comm-stab7">
   \begin{align}  \eqref{eq:just-got-commuted} &  = \mathbb {E}_{u,v,x,y} \sum _{g,b} \langle \psi  \rvert  G_g^x G_b^{v,y} (I-G^x) \otimes A_b^{v,y} A_{g(u)}^{u,x} \lvert \psi  \rangle . \label{eq:g-comm-stab7} \end{align}
 </div>
@@ -721,7 +767,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">8.5</span>
+    <span class="lemma_thmlabel">8.6</span>
     <span class="lemma_thmtitle">Normalization condition for a sandwiched family</span>
     <div class="thm_header_extras">
 
@@ -803,7 +849,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">8.6</span>
+    <span class="theorem_thmlabel">8.7</span>
     <span class="theorem_thmtitle">Commutativity of&#160;\(G\)</span>
     <div class="thm_header_extras">
 
@@ -830,7 +876,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.7</a></li>
+          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.8</a></li>
           
           <li><a href="sec-prelims.html#def:polymeasurements">Definition 3.11</a></li>
           
@@ -838,9 +884,9 @@
           
           <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.34</a></li>
           
-          <li><a href="sec-g-comm.html#lem:comm-data-processed-g">Lemma 8.2</a></li>
+          <li><a href="sec-g-comm.html#lem:comm-data-processed-g">Lemma 8.3</a></li>
           
-          <li><a href="sec-g-comm.html#lem:normalization-condition">Lemma 8.5</a></li>
+          <li><a href="sec-g-comm.html#lem:normalization-condition">Lemma 8.6</a></li>
           
           <li><a href="sec-prelims.html#prop:switch-sandwich">Lemma 3.32</a></li>
           
@@ -925,7 +971,7 @@
 <div class="displaymath" id="a0000000384">
   \begin{align} &  \mathbb {E}_{x,y} \sum _{g,h} \langle \psi  \rvert  \bigl(G_g^x G_h^y - G_h^y G_g^x\bigr)^\dagger \bigl(G_g^x G_h^y - G_h^y G_g^x\bigr) \otimes I \lvert \psi  \rangle \nonumber \\ &  = 2 \mathbb {E}_{x,y} \sum _{g,h} \langle \psi  \rvert  G_g^x G_h^y G_g^x \otimes I \lvert \psi  \rangle  - 2 \mathbb {E}_{x,y} \sum _{g,h} \langle \psi  \rvert  G_g^x G_h^y G_g^x G_h^y \otimes I \lvert \psi  \rangle . \label{eq:gcomterms} \end{align}
 </div>
-<p> The first term is close to \(\langle \psi  \rvert  G \otimes G \lvert \psi  \rangle \), where \(G=\mathbb {E}_x G^x\), by <a href="sec-prelims.html#prop:switch-sandwich">3.32</a> and <a href="sec-g-comm.html#item:commuting-self-consistency">2</a>. For the second term, <a href="sec-prelims.html#prop:closeness-of-ip">3.23</a> and <a href="sec-g-comm.html#lem:normalization-condition">8.5</a> yield </p>
+<p> The first term is close to \(\langle \psi  \rvert  G \otimes G \lvert \psi  \rangle \), where \(G=\mathbb {E}_x G^x\), by <a href="sec-prelims.html#prop:switch-sandwich">3.32</a> and <a href="sec-g-comm.html#item:commuting-self-consistency">2</a>. For the second term, <a href="sec-prelims.html#prop:closeness-of-ip">3.23</a> and <a href="sec-g-comm.html#lem:normalization-condition">8.6</a> yield </p>
 <div class="equation" id="eq:gcom4">
 <p>
   <div class="equation_content">
@@ -970,12 +1016,12 @@
 <div class="displaymath" id="a0000000388">
   \[  \nu _{\mathrm{evaluation}} = 48m\bigl(\gamma ^{1/2}+\zeta ^{1/2}\bigr),  \]
 </div>
-<p> the error from <a href="sec-g-comm.html#lem:comm-data-processed-g">8.2</a>. Apply <a href="sec-g-comm.html#lem:comm-data-processed-g">8.2</a> to commute the evaluated families in <a href="sec-g-comm.html#eq:evaluate-gcom-at-points-part-dos">20</a>; after one more use of <a href="sec-prelims.html#prop:closeness-of-ip">3.23</a> with <a href="sec-g-comm.html#item:commuting-self-consistency">2</a>, the resulting quantity is \(\langle \psi  \rvert  G \otimes G \lvert \psi  \rangle \). Thus the second term in <a href="sec-g-comm.html#eq:gcomterms">15</a> is also close to \(\langle \psi  \rvert  G \otimes G \lvert \psi  \rangle \). </p>
+<p> the error from <a href="sec-g-comm.html#lem:comm-data-processed-g">8.3</a>. Apply <a href="sec-g-comm.html#lem:comm-data-processed-g">8.3</a> to commute the evaluated families in <a href="sec-g-comm.html#eq:evaluate-gcom-at-points-part-dos">20</a>; after one more use of <a href="sec-prelims.html#prop:closeness-of-ip">3.23</a> with <a href="sec-g-comm.html#item:commuting-self-consistency">2</a>, the resulting quantity is \(\langle \psi  \rvert  G \otimes G \lvert \psi  \rangle \). Thus the second term in <a href="sec-g-comm.html#eq:gcomterms">15</a> is also close to \(\langle \psi  \rvert  G \otimes G \lvert \psi  \rangle \). </p>
 <p>Combining the first-term estimate, <a href="sec-g-comm.html#eq:gcom4">16</a>, the two Schwartz–Zippel losses, the two intermediate \(\sqrt{\zeta }\) losses, and the evaluated commutation error \(\nu _{\mathrm{evaluation}}^{1/2}\) gives </p>
 <div class="displaymath" id="a0000000389">
   \[  30m\left(\gamma ^{1/4}+\zeta ^{1/4}+(d/q)^{1/4}\right),  \]
 </div>
-<p> where the constant \(30m\) accounts for the \(10m\) Schwartz–Zippel evaluation losses plus \(20m\) from the \(\approx \)-chain in the first and second terms. This proves <a href="sec-g-comm.html#thm:com-main">8.6</a>. </p>
+<p> where the constant \(30m\) accounts for the \(10m\) Schwartz–Zippel evaluation losses plus \(20m\) from the \(\approx \)-chain in the first and second terms. This proves <a href="sec-g-comm.html#thm:com-main">8.7</a>. </p>
 
   </div>
 </div>
