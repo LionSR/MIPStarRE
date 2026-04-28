@@ -1,0 +1,208 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../../.././style.css"></link><link rel="icon" href="../../../.././favicon.svg"></link><link rel="mask-icon" href="../../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../../.././/declarations/declaration-data.bmp" as="image"></link><title>Mathlib.Algebra.Order.Module.OrderedSMul</title><script defer="true" src="../../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../../.././";</script><script>const MODULE_NAME="Mathlib.Algebra.Order.Module.OrderedSMul";</script><script type="module" src="../../../.././jump-src.js"></script><script type="module" src="../../../.././search.js"></script><script type="module" src="../../../.././expand-nav.js"></script><script type="module" src="../../../.././how-about.js"></script><script type="module" src="../../../.././instances.js"></script><script type="module" src="../../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">Mathlib</span>.<span class="name">Algebra</span>.<span class="name">Order</span>.<span class="name">Module</span>.<span class="name">OrderedSMul</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/leanprover-community/mathlib4/blob/8f9d9cff6bd728b17a24e163c9402775d9e6a365/Mathlib/Algebra/Order/Module/OrderedSMul.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../../.././Init.html">Init</a></li><li><a href="../../../.././Mathlib/Algebra/Field/Defs.html">Mathlib.Algebra.Field.Defs</a></li><li><a href="../../../.././Mathlib/Algebra/Group/Action/Basic.html">Mathlib.Algebra.Group.Action.Basic</a></li><li><a href="../../../.././Mathlib/Algebra/GroupWithZero/Action/Pi.html">Mathlib.Algebra.GroupWithZero.Action.Pi</a></li><li><a href="../../../.././Mathlib/Algebra/GroupWithZero/Action/Prod.html">Mathlib.Algebra.GroupWithZero.Action.Prod</a></li><li><a href="../../../.././Mathlib/Algebra/Order/Module/Defs.html">Mathlib.Algebra.Order.Module.Defs</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-Mathlib.Algebra.Order.Module.OrderedSMul" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#OrderedSMul"><span class="name">OrderedSMul</span></a></div><div class="nav_link"><a class="break_within" href="#OrderedSMul.toPosSMulStrictMono"><span class="name">OrderedSMul</span>.<span class="name">toPosSMulStrictMono</span></a></div><div class="nav_link"><a class="break_within" href="#OrderedSMul.toPosSMulReflectLT"><span class="name">OrderedSMul</span>.<span class="name">toPosSMulReflectLT</span></a></div><div class="nav_link"><a class="break_within" href="#OrderDual.instOrderedSMul"><span class="name">OrderDual</span>.<span class="name">instOrderedSMul</span></a></div><div class="nav_link"><a class="break_within" href="#OrderedSMul.mk''"><span class="name">OrderedSMul</span>.<span class="name">mk''</span></a></div><div class="nav_link"><a class="break_within" href="#Nat.orderedSMul"><span class="name">Nat</span>.<span class="name">orderedSMul</span></a></div><div class="nav_link"><a class="break_within" href="#Int.orderedSMul"><span class="name">Int</span>.<span class="name">orderedSMul</span></a></div><div class="nav_link"><a class="break_within" href="#LinearOrderedSemiring.toOrderedSMul"><span class="name">LinearOrderedSemiring</span>.<span class="name">toOrderedSMul</span></a></div><div class="nav_link"><a class="break_within" href="#OrderedSMul.mk'"><span class="name">OrderedSMul</span>.<span class="name">mk'</span></a></div><div class="nav_link"><a class="break_within" href="#instOrderedSMulProd"><span class="name">instOrderedSMulProd</span></a></div><div class="nav_link"><a class="break_within" href="#Pi.orderedSMul"><span class="name">Pi</span>.<span class="name">orderedSMul</span></a></div></nav><main>
+<div class="mod_doc"><h1 id="Ordered-scalar-product" class="markdown-heading">Ordered scalar product <a class="hover-link" href="#Ordered-scalar-product">#</a></h1><p>In this file we define</p><ul><li><code><a href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul">OrderedSMul</a> R M</code> : an ordered additive commutative monoid <code>M</code> is an <code><a href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul">OrderedSMul</a></code>
+over an <code>OrderedSemiring</code> <code>R</code> if the scalar product respects the order relation on the
+monoid and on the ring. There is a correspondence between this structure and convex cones,
+which is proven in <code><a href="../../../.././Mathlib/Analysis/Convex/Cone.html">Mathlib/Analysis/Convex/Cone.lean</a></code>.</li></ul><h2 id="Implementation-notes" class="markdown-heading">Implementation notes <a class="hover-link" href="#Implementation-notes">#</a></h2><ul><li>We choose to define <code><a href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul">OrderedSMul</a></code> as a <code>Prop</code>-valued mixin, so that it can be
+used for actions, modules, and algebras
+(the axioms for an &quot;ordered algebra&quot; are exactly that the algebra is ordered as a module).</li><li>To get ordered modules and ordered vector spaces, it suffices to replace the
+<code>OrderedAddCommMonoid</code> and the <code>OrderedSemiring</code> as desired.</li></ul><h2 id="TODO" class="markdown-heading">TODO <a class="hover-link" href="#TODO">#</a></h2><p>This file is now mostly useless. We should try deleting <code><a href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul">OrderedSMul</a></code></p><h2 id="References" class="markdown-heading">References <a class="hover-link" href="#References">#</a></h2><ul><li><a href="https://en.wikipedia.org/wiki/Ordered_vector_space">https://en.wikipedia.org/wiki/Ordered_vector_space</a></li></ul><h2 id="Tags" class="markdown-heading">Tags <a class="hover-link" href="#Tags">#</a></h2><p>ordered module, ordered scalar, ordered smul, ordered action, ordered vector space</p></div><div class="decl" id="OrderedSMul"><div class="class"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/8f9d9cff6bd728b17a24e163c9402775d9e6a365/Mathlib/Algebra/Order/Module/OrderedSMul.lean#L48-L60">source</a></div><div class="attributes">@[deprecated IsStrictOrderedModule (since := &quot;2025-08-25&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">class</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul"><span class="name">OrderedSMul</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">M</span> : <a href="../../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/GroupWithZero/Action/Defs.html#SMulWithZero">SMulWithZero</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><a href="../../../.././foundational_types.html">Prop</a></div></div><p>The ordered scalar product property is when an ordered additive commutative monoid
+with a partial order has a scalar multiplication which is compatible with the order. Note that this
+is different from <code>IsOrderedSMul</code>, which uses <code>≤</code>, has no semiring assumption, and has no positivity
+constraint on the defining conditions.</p><ul class="structure_fields" id="OrderedSMul.mk"><li id="OrderedSMul.smul_lt_smul_of_pos" class="structure_field"><div class="structure_field_info">smul_lt_smul_of_pos<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">b</span> : <span class="fn">M</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">c</span> : <span class="fn">R</span>}</span></span>
+</span> : <span class="fn"><span class="fn">a</span> <a href="../../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn">b</span> → <span class="fn"><span class="fn">0</span> <a href="../../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn">c</span> → <span class="fn">c</span> <a href="../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">a</span> <a href="../../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn">c</span> <a href="../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">b</span></span></span></div><div class="structure_field_doc"><p>Scalar multiplication by positive elements preserves the order.</p></div></li><li id="OrderedSMul.lt_of_smul_lt_smul_of_pos" class="structure_field"><div class="structure_field_info">lt_of_smul_lt_smul_of_pos<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">b</span> : <span class="fn">M</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">c</span> : <span class="fn">R</span>}</span></span>
+</span> : <span class="fn"><span class="fn">c</span> <a href="../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">a</span> <a href="../../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn">c</span> <a href="../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">b</span> → <span class="fn"><span class="fn">0</span> <a href="../../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn">c</span> → <span class="fn">a</span> <a href="../../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn">b</span></span></span></div><div class="structure_field_doc"><p>If <code>c • a &lt; c • b</code> for some positive <code>c</code>, then <code>a &lt; b</code>.</p></div></li></ul><details class="instances"><summary>Instances</summary><ul id="instances-list-OrderedSMul" class="instances-list"></ul></details></div></div><div class="decl" id="OrderedSMul.toPosSMulStrictMono"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/8f9d9cff6bd728b17a24e163c9402775d9e6a365/Mathlib/Algebra/Order/Module/OrderedSMul.lean#L69-L70">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul.toPosSMulStrictMono"><span class="name">OrderedSMul</span>.<span class="name">toPosSMulStrictMono</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/GroupWithZero/Action/Defs.html#SMulWithZero">SMulWithZero</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul">OrderedSMul</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Algebra/Order/Module/Defs.html#PosSMulStrictMono">PosSMulStrictMono</a> <span class="fn">R</span> <span class="fn">M</span></span></div></div></div></div><div class="decl" id="OrderedSMul.toPosSMulReflectLT"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/8f9d9cff6bd728b17a24e163c9402775d9e6a365/Mathlib/Algebra/Order/Module/OrderedSMul.lean#L72-L73">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul.toPosSMulReflectLT"><span class="name">OrderedSMul</span>.<span class="name">toPosSMulReflectLT</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/GroupWithZero/Action/Defs.html#SMulWithZero">SMulWithZero</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul">OrderedSMul</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Algebra/Order/Module/Defs.html#PosSMulReflectLT">PosSMulReflectLT</a> <span class="fn">R</span> <span class="fn">M</span></span></div></div></div></div><div class="decl" id="OrderDual.instOrderedSMul"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/8f9d9cff6bd728b17a24e163c9402775d9e6a365/Mathlib/Algebra/Order/Module/OrderedSMul.lean#L75-L77">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderDual.instOrderedSMul"><span class="name">OrderDual</span>.<span class="name">instOrderedSMul</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/GroupWithZero/Action/Defs.html#SMulWithZero">SMulWithZero</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul">OrderedSMul</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul">OrderedSMul</a> <span class="fn">R</span> <span class="fn">M</span><a href="../../../.././Mathlib/Order/OrderDual.html#OrderDual">ᵒᵈ</a></span></div></div></div></div><div class="decl" id="OrderedSMul.mk''"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/8f9d9cff6bd728b17a24e163c9402775d9e6a365/Mathlib/Algebra/Order/Module/OrderedSMul.lean#L82-L88">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul.mk''"><span class="name">OrderedSMul</span>.<span class="name">mk''</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/GroupWithZero/Action/Defs.html#SMulWithZero">SMulWithZero</a> <span class="fn">𝕜</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn">∀ ⦃<span class="fn">c</span> : <span class="fn">𝕜</span>⦄, <span class="fn"><span class="fn">0</span> <a href="../../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn">c</span> → <span class="fn"><a href="../../../.././Mathlib/Order/Monotone/Defs.html#StrictMono">StrictMono</a> <span class="fn">fun (<span class="fn">a</span> : <span class="fn">M</span>) =&gt; <span class="fn">c</span> <a href="../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">a</span></span></span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul">OrderedSMul</a> <span class="fn">𝕜</span> <span class="fn">M</span></span></div></div><p>To prove that a linear ordered monoid is an ordered module, it suffices to verify only the first
+axiom of <code><a href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul">OrderedSMul</a></code>.</p></div></div><div class="decl" id="Nat.orderedSMul"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/8f9d9cff6bd728b17a24e163c9402775d9e6a365/Mathlib/Algebra/Order/Module/OrderedSMul.lean#L91-L99">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#Nat.orderedSMul"><span class="name">Nat</span>.<span class="name">orderedSMul</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Order/Monoid/Defs.html#IsOrderedCancelAddMonoid">IsOrderedCancelAddMonoid</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul">OrderedSMul</a> <a href="../../../.././Init/Prelude.html#Nat">ℕ</a> <span class="fn">M</span></span></div></div></div></div><div class="decl" id="Int.orderedSMul"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/8f9d9cff6bd728b17a24e163c9402775d9e6a365/Mathlib/Algebra/Order/Module/OrderedSMul.lean#L102-L108">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#Int.orderedSMul"><span class="name">Int</span>.<span class="name">orderedSMul</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Order/Monoid/Defs.html#IsOrderedAddMonoid">IsOrderedAddMonoid</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul">OrderedSMul</a> <a href="../../../.././Init/Data/Int/Basic.html#Int">ℤ</a> <span class="fn">M</span></span></div></div></div></div><div class="decl" id="LinearOrderedSemiring.toOrderedSMul"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/8f9d9cff6bd728b17a24e163c9402775d9e6a365/Mathlib/Algebra/Order/Module/OrderedSMul.lean#L114-L115">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#LinearOrderedSemiring.toOrderedSMul"><span class="name">LinearOrderedSemiring</span>.<span class="name">toOrderedSMul</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsStrictOrderedRing">IsStrictOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul">OrderedSMul</a> <span class="fn">R</span> <span class="fn">R</span></span></div></div></div></div><div class="decl" id="OrderedSMul.mk'"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/8f9d9cff6bd728b17a24e163c9402775d9e6a365/Mathlib/Algebra/Order/Module/OrderedSMul.lean#L127-L139">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul.mk'"><span class="name">OrderedSMul</span>.<span class="name">mk'</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Field/Defs.html#Semifield">Semifield</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsStrictOrderedRing">IsStrictOrderedRing</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Order/GroupWithZero/Unbundled/Defs.html#PosMulReflectLT">PosMulReflectLT</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/GroupWithZero/Action/Defs.html#MulActionWithZero">MulActionWithZero</a> <span class="fn">𝕜</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn">∀ ⦃<span class="fn">a </span><span class="fn">b</span> : <span class="fn">M</span>⦄ ⦃<span class="fn">c</span> : <span class="fn">𝕜</span>⦄, <span class="fn"><span class="fn">a</span> <a href="../../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn">b</span> → <span class="fn"><span class="fn">0</span> <a href="../../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn">c</span> → <span class="fn">c</span> <a href="../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">a</span> <a href="../../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">c</span> <a href="../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">b</span></span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul">OrderedSMul</a> <span class="fn">𝕜</span> <span class="fn">M</span></span></div></div><p>To prove that a vector space over a linear ordered field is ordered, it suffices to verify only
+the first axiom of <code><a href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul">OrderedSMul</a></code>.</p></div></div><div class="decl" id="instOrderedSMulProd"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/8f9d9cff6bd728b17a24e163c9402775d9e6a365/Mathlib/Algebra/Order/Module/OrderedSMul.lean#L142-L144">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#instOrderedSMulProd"><span class="name">instOrderedSMulProd</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">N</span> : <a href="../../../.././foundational_types.html">Type</a> u_5}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Field/Defs.html#Semifield">Semifield</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsStrictOrderedRing">IsStrictOrderedRing</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Order/GroupWithZero/Unbundled/Defs.html#PosMulReflectLT">PosMulReflectLT</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">N</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">N</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/GroupWithZero/Action/Defs.html#MulActionWithZero">MulActionWithZero</a> <span class="fn">𝕜</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/GroupWithZero/Action/Defs.html#MulActionWithZero">MulActionWithZero</a> <span class="fn">𝕜</span> <span class="fn">N</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul">OrderedSMul</a> <span class="fn">𝕜</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul">OrderedSMul</a> <span class="fn">𝕜</span> <span class="fn">N</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul">OrderedSMul</a> <span class="fn">𝕜</span> (<span class="fn">M</span> <a href="../../../.././Init/Prelude.html#Prod">×</a> <span class="fn">N</span>)</span></div></div></div></div><div class="decl" id="Pi.orderedSMul"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/8f9d9cff6bd728b17a24e163c9402775d9e6a365/Mathlib/Algebra/Order/Module/OrderedSMul.lean#L147-L149">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#Pi.orderedSMul"><span class="name">Pi</span>.<span class="name">orderedSMul</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Field/Defs.html#Semifield">Semifield</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsStrictOrderedRing">IsStrictOrderedRing</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Order/GroupWithZero/Unbundled/Defs.html#PosMulReflectLT">PosMulReflectLT</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <span class="fn"><span class="fn">ι</span> → <a href="../../../.././foundational_types.html">Type</a> u_6</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">ι</span>) → <span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">(<span class="fn">M</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">ι</span>) → <span class="fn"><a href="../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">(<span class="fn">M</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">(<span class="fn">i</span> : <span class="fn">ι</span>) → <span class="fn"><a href="../../../.././Mathlib/Algebra/GroupWithZero/Action/Defs.html#MulActionWithZero">MulActionWithZero</a> <span class="fn">𝕜</span> <span class="fn">(<span class="fn">M</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">∀ (<span class="fn">i</span> : <span class="fn">ι</span>), <span class="fn"><a href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul">OrderedSMul</a> <span class="fn">𝕜</span> <span class="fn">(<span class="fn">M</span> <span class="fn">i</span>)</span></span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Algebra/Order/Module/OrderedSMul.html#OrderedSMul">OrderedSMul</a> <span class="fn">𝕜</span> <span class="fn">((<span class="fn">i</span> : <span class="fn">ι</span>) → <span class="fn"><span class="fn">M</span> <span class="fn">i</span></span>)</span></span></div></div></div></div></main>
+<nav class="nav"><iframe src="../../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+  MathJax = { 
+    tex: {
+		    inlineMath: [['$','$'], ['\\(','\\)']]
+	} }
+</script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+<meta name="generator" content="plasTeX" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The low individual degree test</title>
+<link rel="next" href="chap-preliminaries.html" title="Preliminaries" />
+<link rel="prev" href="chap-overview.html" title="Overview" />
+<link rel="up" href="index.html" title="Blueprint for arXiv:2009.12982Quantum Soundness of the Classical Low Individual Degree Test" />
+<link rel="stylesheet" href="styles/theme-white.css" />
+<link rel="stylesheet" href="styles/amsthm.css" />
+<link rel="stylesheet" href="styles/showmore.css" />
+<link rel="stylesheet" href="styles/blueprint.css" />
+<link rel="stylesheet" href="styles/extra_styles.css" />
+</head>
+
+<body>
+<header>
+<svg  id="toc-toggle" class="icon icon-list-numbered "><use xlink:href="symbol-defs.svg#icon-list-numbered"></use></svg>
+<h1 id="doc_title"><a href="index.html">Blueprint for arXiv:2009.12982<br /><i class="itshape">Quantum Soundness of the Classical Low Individual Degree Test</i></a></h1>
+</header>
+
+<div class="wrapper">
+<nav class="toc">
+<ul class="sub-toc-0">
+<li class="">
+  <a href="chap-overview.html"><span class="toc_ref">1</span> <span class="toc_entry">Overview</span></a>
+ </li>
+<li class=" active current">
+  <a href="chap-test.html"><span class="toc_ref">2</span> <span class="toc_entry">The low individual degree test</span></a>
+  <span class="expand-toc">▼</span>
+  <ul class="sub-toc-1 active">
+     <li class="">
+  <a href="chap-test.html#a0000000004"><span class="toc_ref">2.1</span> <span class="toc_entry">The game and its strategies</span></a>
+ </li>
+<li class="">
+  <a href="chap-test.html#a0000000005"><span class="toc_ref">2.2</span> <span class="toc_entry">Formal soundness target</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="chap-preliminaries.html"><span class="toc_ref">3</span> <span class="toc_entry">Preliminaries</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="chap-preliminaries.html#a0000000006"><span class="toc_ref">3.1</span> <span class="toc_entry">Polynomials and measurements</span></a>
+ </li>
+<li class="">
+  <a href="chap-preliminaries.html#a0000000007"><span class="toc_ref">3.2</span> <span class="toc_entry">Consistency and state-dependent distance</span></a>
+ </li>
+<li class="">
+  <a href="chap-preliminaries.html#a0000000008"><span class="toc_ref">3.3</span> <span class="toc_entry">Strong self-consistency</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="chap-projective.html"><span class="toc_ref">4</span> <span class="toc_entry">Making measurements projective</span></a>
+ </li>
+<li class="">
+  <a href="chap-expansion.html"><span class="toc_ref">5</span> <span class="toc_entry">Expansion in the hypercube graph</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="chap-expansion.html#a0000000009"><span class="toc_ref">5.1</span> <span class="toc_entry">The graph and its spectrum</span></a>
+ </li>
+<li class="">
+  <a href="chap-expansion.html#a0000000010"><span class="toc_ref">5.2</span> <span class="toc_entry">Local and global variance</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="chap-variance.html"><span class="toc_ref">6</span> <span class="toc_entry">Global variance of the points measurements</span></a>
+ </li>
+<li class="">
+  <a href="chap-self-improvement.html"><span class="toc_ref">7</span> <span class="toc_entry">Self-improvement</span></a>
+ </li>
+<li class="">
+  <a href="chap-commutativity.html"><span class="toc_ref">8</span> <span class="toc_entry">Commutativity</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="chap-commutativity.html#a0000000011"><span class="toc_ref">8.1</span> <span class="toc_entry">Commutativity of the point measurements</span></a>
+ </li>
+<li class="">
+  <a href="chap-commutativity.html#a0000000012"><span class="toc_ref">8.2</span> <span class="toc_entry">Commutativity of the slice measurements</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="chap-pasting.html"><span class="toc_ref">9</span> <span class="toc_entry">Pasting</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="chap-pasting.html#a0000000013"><span class="toc_ref">9.1</span> <span class="toc_entry">Preliminary bookkeeping</span></a>
+ </li>
+<li class="">
+  <a href="chap-pasting.html#a0000000014"><span class="toc_ref">9.2</span> <span class="toc_entry">The completed slice measurements</span></a>
+ </li>
+<li class="">
+  <a href="chap-pasting.html#a0000000015"><span class="toc_ref">9.3</span> <span class="toc_entry">Consistency of the sandwich with the line measurement</span></a>
+ </li>
+<li class="">
+  <a href="chap-pasting.html#a0000000016"><span class="toc_ref">9.4</span> <span class="toc_entry">Completeness of the pasted measurement</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="chap-induction.html"><span class="toc_ref">10</span> <span class="toc_entry">The main induction step</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-1">
+     <li class="">
+  <a href="chap-induction.html#a0000000017"><span class="toc_ref">10.1</span> <span class="toc_entry">Restricting to one slice</span></a>
+ </li>
+<li class="">
+  <a href="chap-induction.html#a0000000018"><span class="toc_ref">10.2</span> <span class="toc_entry">The inductive construction</span></a>
+ </li>
+<li class="">
+  <a href="chap-induction.html#a0000000019"><span class="toc_ref">10.3</span> <span class="toc_entry">Proof of the main formal theorem</span></a>
+ </li>
+
+  </ul>
+ </li>
+<li class="">
+  <a href="sect0001.html"><span class="toc_ref">11</span> <span class="toc_entry">Bibliography</span></a>
+ </li>
+<li ><a href="dep_graph_document.html">Dependency graph</a></li>
+</ul>
+</nav>
+
+<div class="content">
+<div class="content-wrapper">
+
+
+<div class="main-text">
+<h1 id="chap:test">2 The low individual degree test</h1>
+
+<h1 id="a0000000004">2.1 The game and its strategies</h1>
+<div class="definition_thmwrapper theorem-style-definition" id="def:low-individual-degree-test">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">2.1</span>
+    <span class="definition_thmtitle">Low individual degree test</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-test.html#def:low-individual-degree-test">#</a>
+    
+    
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p> Fix integers \(m,d \ge 0\) and a prime power \(q\). The \((m,q,d)\) low individual degree test has three equally likely subtests. In the axis-parallel lines test, choose a uniformly random role \(r \in \{ \mathrm A,\mathrm B\} \), a uniformly random point \(u \in \mathbb {F}_q^m\), and a uniformly random coordinate \(i \in \{ 1,\dots ,m\} \). Let \(\ell =\{ u+t e_i : t \in \mathbb {F}_q\} \). Player \(r\) receives \(\ell \) and returns a degree-\(d\) univariate polynomial \(f\colon \ell \to \mathbb {F}_q\); Player \(\bar r\) receives \(u\) and returns a field element \(a \in \mathbb {F}_q\). The verifier accepts when \(f(u)=a\). In the self-consistency test, both provers receive the same uniformly random point \(u \in \mathbb {F}_q^m\) and must return the same field element. In the diagonal lines test, choose a uniformly random role \(r \in \{ \mathrm A,\mathrm B\} \), a uniformly random point \(u \in \mathbb {F}_q^m\), a uniformly random index \(i \in \{ 1,\dots ,m\} \), and a uniformly random direction vector \(v \in \mathbb {F}_q^m\) whose last \(m-i\) coordinates are \(0\). Let \(\ell =\{ u+t v : t \in \mathbb {F}_q\} \). Player \(r\) receives \(\ell \) and returns a degree-\(md\) univariate polynomial \(f\colon \ell \to \mathbb {F}_q\); Player \(\bar r\) receives \(u\) and returns a field element \(a \in \mathbb {F}_q\). The verifier accepts when \(f(u)=a\). </p>
+
+  </div>
+</div>
+<div class="definition_thmwrapper theorem-style-definition" id="def:symmetric-projective-strategy">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">2.2</span>
+    <span class="definition_thmtitle">Symmetric projective strategy</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-test.html#def:symmetric-projective-strategy">#</a>
+    
+    
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p> A symmetric projective strategy for the \((m,q,d)\) low individual degree test consists of a permutation-invariant bipartite state \(\lvert \psi  \rangle  \in \mathcal H \otimes \mathcal H\), a projective point measurement \(A^u=\{ A^u_a\} _{a \in \mathbb {F}_q}\) for each \(u \in \mathbb {F}_q^m\), a projective axis-parallel line measurement \(B^\ell =\{ B^\ell _f\} \) for each axis-parallel line \(\ell \), and a projective diagonal-line measurement \(L^\ell =\{ L^\ell _f\} \) for each line \(\ell \). </p>
+
+  </div>
+</div>
+<div class="definition_thmwrapper theorem-style-definition" id="def:projective-strategy">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">2.3</span>
+    <span class="definition_thmtitle">General projective strategy</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-test.html#def:projective-strategy">#</a>
+    
+    
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p> A general projective strategy for the \((m,q,d)\) low individual degree test consists of a bipartite state \(\lvert \psi  \rangle  \in \mathcal H_{\mathrm A} \otimes \mathcal H_{\mathrm B}\) together with point, axis-parallel line, and diagonal-line projective measurements for each prover separately. We write these measurements as \(A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}\) on the first prover and \(A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B}\) on the second. </p>
+
+  </div>
+</div>
+<div class="definition_thmwrapper theorem-style-definition" id="def:good-strategy">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">2.4</span>
+    <span class="definition_thmtitle">Good strategy</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-test.html#def:good-strategy">#</a>
+    
+    
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p> A strategy is \((\varepsilon ,\delta ,\gamma )\)-good if it passes the axis-parallel lines test with probability at least \(1-\varepsilon \), the self-consistency test with probability at least \(1-\delta \), and the diagonal lines test with probability at least \(1-\gamma \). </p>
+
+  </div>
+</div>
+<h1 id="a0000000005">2.2 Formal soundness target</h1>
+<div class="theorem_thmwrapper theorem-style-plain" id="thm:main-formal">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">2.5</span>
+    <span class="theorem_thmtitle">Quantum soundness of the low individual degree test</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-test.html#thm:main-formal">#</a>
+    
+    <a class="icon proof" href="chap-induction.html#a0000000020"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap-test.html#def:projective-strategy">Definition 2.3</a></li>
+          
+          <li><a href="chap-induction.html#thm:main-induction">Theorem 10.5</a></li>
+          
+          <li><a href="chap-projective.html#lem:orthonormalization-main-lemma">Lemma 4.2</a></li>
+          
+          <li><a href="chap-preliminaries.html#prop:completing-to-measurement">Lemma 3.29</a></li>
+          
+          <li><a href="chap-preliminaries.html#prop:simeq-triangle-inequality">Lemma 3.16</a></li>
+          
+          <li><a href="chap-preliminaries.html#prop:simeq-data-processing">Lemma 3.17</a></li>
+          
+          <li><a href="chap-preliminaries.html#prop:simeq-to-approx">Lemma 3.12</a></li>
+          
+          <li><a href="chap-preliminaries.html#prop:triangle-sub">Lemma 3.11</a></li>
+          
+          <li><a href="chap-preliminaries.html#lem:schwartz-zippel-individual">Lemma 3.2</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Test.mainFormal" class="lean_decl">MIPStarRE.LDT.Test.mainFormal</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>   Let \((\psi , A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})\) be a projective strategy that passes the \((m,q,d)\) low individual degree test with probability at least \(1-\varepsilon \). Let \(k \ge md\) and set </p>
+<div class="displaymath" id="a0000000021">
+  \[  \nu = 100000 k^2 m^4\left(\varepsilon ^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\right).  \]
+</div>
+<p> Then there exist projective measurements \(G^{\mathrm A}\) and \(G^{\mathrm B}\) indexed by functions in \(\mathcal{P}(m,q,d)\) such that </p>
+<ol class="enumerate">
+  <li><p>on average over \(u \sim \mathbb {F}_q^m\), </p>
+<div class="displaymath" id="a0000000022">
+  \[  A^{\mathrm A,u}_a \otimes I \simeq _{\nu } I \otimes G^{\mathrm B}_{[g(u)=a]}, \qquad I \otimes A^{\mathrm B,u}_a \simeq _{\nu } G^{\mathrm A}_{[g(u)=a]} \otimes I;  \]
+</div>
+</li>
+  <li><p>the two global measurements are self-consistent in the sense that </p>
+<div class="displaymath" id="a0000000023">
+  \[  G^{\mathrm A}_g \otimes I \simeq _{\nu } I \otimes G^{\mathrm B}_g.  \]
+</div>
+</li>
+</ol>
+
+  </div>
+</div>
+
+</div> <!--main-text -->
+</div> <!-- content-wrapper -->
+</div> <!-- content -->
+</div> <!-- wrapper -->
+
+<nav class="prev_up_next">
+  <svg  id="showmore-minus" class="icon icon-eye-minus showmore"><use xlink:href="symbol-defs.svg#icon-eye-minus"></use></svg>
+
+  <svg  id="showmore-plus" class="icon icon-eye-plus showmore"><use xlink:href="symbol-defs.svg#icon-eye-plus"></use></svg>
+
+  <a href="chap-overview.html" title="Overview"><svg  class="icon icon-arrow-left "><use xlink:href="symbol-defs.svg#icon-arrow-left"></use></svg>
+</a>
+  <a href="index.html" title="Blueprint for arXiv:2009.12982Quantum Soundness of the Classical Low Individual Degree Test"><svg  class="icon icon-arrow-up "><use xlink:href="symbol-defs.svg#icon-arrow-up"></use></svg>
+</a>
+  <a href="chap-preliminaries.html" title="Preliminaries"><svg  class="icon icon-arrow-right "><use xlink:href="symbol-defs.svg#icon-arrow-right"></use></svg>
+</a>
+</nav>
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/plastex.js"></script>
+<script type="text/javascript" src="js/svgxuse.js"></script>
+<script type="text/javascript" src="js/js.cookie.min.js"></script>
+<script type="text/javascript" src="js/showmore.js"></script>
+</body>
+</html>
