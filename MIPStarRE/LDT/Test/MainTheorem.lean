@@ -2429,6 +2429,102 @@ noncomputable def toRolePackagedCompletionLine169Residual
 
 end MainFormalPostRolePackageCompletionLine169Residual
 
+/-- Post-role residual whose Bob-side completion estimate is still in the
+left-register form returned by the orthonormalize-and-complete chain.
+
+This is the paper Step 6 boundary just before applying the permutation-invariant
+right-register transport from #869.  The Alice completion field already matches
+`inductive_step.tex` line 146.  For Bob, the analytic completion theorem naturally
+returns the left-lifted estimate for `G^B` and `Q^B`; the conversion below uses
+`MakingMeasurementsProjective.sddRel_liftRight_of_liftLeft_permInv` to recover
+the line-147 right-register estimate.  The remaining line-169 fields are left
+unchanged, since the paper-tight `ζ₁` transport links are still the active
+upstream obstruction. -/
+structure MainFormalPostRolePackageLeftCompletionLine169Residual
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (scalars : MainFormalCascadeScalars params eps k)
+    (rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars) where
+  /-- The completed projective measurement denoted $Q^{\mathrm A}$. -/
+  leftMeasurement : ProjMeas (Polynomial params) ι
+  /-- The completed projective measurement denoted $Q^{\mathrm B}$. -/
+  rightMeasurement : ProjMeas (Polynomial params) ι
+  /-- Left-register completion closeness, paper line 146 (`eq:G-with-Q-A`). -/
+  leftCompletionCloseness :
+    SDDRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas.liftLeft)
+      (constSubMeasFamily leftMeasurement.toSubMeas.liftLeft)
+      scalars.zeta2
+  /-- Bob-side completion closeness in the left-register form returned by the
+  orthonormalize-and-complete chain, before #869 transports it to line 147. -/
+  rightCompletionClosenessLeft :
+    SDDRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas.liftLeft)
+      (constSubMeasFamily rightMeasurement.toSubMeas.liftLeft)
+      scalars.zeta2
+  /-- Paper line 169, before the data-processing step at lines 171--173. -/
+  leftProjectiveRightPOVMPolynomialConsistency :
+    ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily leftMeasurement.toSubMeas)
+      (constSubMeasFamily
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+      scalars.zeta1
+  /-- Bob-role mirror of paper line 169, before point-evaluation data processing. -/
+  rightProjectiveLeftPOVMPolynomialConsistency :
+    ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily rightMeasurement.toSubMeas)
+      (constSubMeasFamily
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+      scalars.zeta1
+
+namespace MainFormalPostRolePackageLeftCompletionLine169Residual
+
+/-- Transport the Bob-side completion estimate from the left-register form to the
+right-register form and recover the previous post-role residual.
+
+This is the local `mainFormal` consumer of the right-register completion helper
+added in #869. -/
+noncomputable def toPostRolePackageCompletionLine169Residual
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
+    (residual : MainFormalPostRolePackageLeftCompletionLine169Residual
+      params strategy eps k scalars rolePackage) :
+    MainFormalPostRolePackageCompletionLine169Residual
+      params strategy eps k scalars rolePackage where
+  leftMeasurement := residual.leftMeasurement
+  rightMeasurement := residual.rightMeasurement
+  leftCompletionCloseness := residual.leftCompletionCloseness
+  rightCompletionCloseness := by
+    have hleft : SDDRel strategy.state (uniformDistribution Unit)
+        (IdxSubMeas.liftLeft
+          (constSubMeasFamily
+            (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas))
+        (IdxSubMeas.liftLeft
+          (constSubMeasFamily residual.rightMeasurement.toSubMeas))
+        scalars.zeta2 := by
+      simpa [IdxSubMeas.liftLeft, constSubMeasFamily] using
+        residual.rightCompletionClosenessLeft
+    have hright :=
+      MakingMeasurementsProjective.sddRel_liftRight_of_liftLeft_permInv
+        strategy.permInvState (uniformDistribution Unit)
+        (constSubMeasFamily
+          (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+        (constSubMeasFamily residual.rightMeasurement.toSubMeas)
+        scalars.zeta2 hleft
+    simpa [IdxSubMeas.liftRight, constSubMeasFamily] using hright
+  leftProjectiveRightPOVMPolynomialConsistency :=
+    residual.leftProjectiveRightPOVMPolynomialConsistency
+  rightProjectiveLeftPOVMPolynomialConsistency :=
+    residual.rightProjectiveLeftPOVMPolynomialConsistency
+
+end MainFormalPostRolePackageLeftCompletionLine169Residual
+
 /-- Combined live residual after isolating branch-level role-package production.
 
 The first field records the actual Section 6 role-production branch: either the
@@ -2474,6 +2570,55 @@ noncomputable def toRolePackagedCompletionLine169Residual
   residual.postRoleResidual.toRolePackagedCompletionLine169Residual
 
 end MainFormalCascadeRolePackageResidualCompletionLine169Residual
+
+/-- Combined live residual after isolating branch-level role-package production
+and the #869 Bob-side completion transport.
+
+Compared with `MainFormalCascadeRolePackageResidualCompletionLine169Residual`, this
+package no longer asks the live hole to provide the right-register completion
+closeness directly.  Instead the post-role field records the left-register
+Bob-side completion estimate returned by the orthonormalize-and-complete chain,
+and the conversion below transports it to the right register using permutation
+invariance of the strategy state.  The role-production branch and the exact
+paper line-169 `ζ₁` links remain explicit. -/
+structure MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (scalars : MainFormalCascadeScalars params eps k) where
+  /-- Branch-level Section 6 data explaining how the role package is produced. -/
+  roleBranchResidual : MainFormalRolePackageBranchResidual params strategy eps hpass k
+  /-- The explicit isolated Section 6 residual.  Keeping this field concrete avoids
+  hiding the role-register measurement behind `Classical.choice`. -/
+  roleResidual : MainFormalRolePackageResidual params strategy eps hpass k
+  /-- The remaining projectivization/completion and line-169 data after role production,
+  with Bob-side completion still left-lifted. -/
+  postRoleResidual :
+    MainFormalPostRolePackageLeftCompletionLine169Residual params strategy eps k scalars
+      (roleResidual.rolePackage scalars)
+
+namespace MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual
+
+/-- Convert the left-completion residual to the previous role-residual completion
+line-169 shape by applying the #869 right-register transport to the Bob-side
+completion estimate. -/
+noncomputable def toRolePackageResidualCompletionLine169Residual
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (residual : MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual
+      params strategy eps hpass k scalars) :
+    MainFormalCascadeRolePackageResidualCompletionLine169Residual
+      params strategy eps hpass k scalars where
+  roleBranchResidual := residual.roleBranchResidual
+  roleResidual := residual.roleResidual
+  postRoleResidual :=
+    residual.postRoleResidual.toPostRolePackageCompletionLine169Residual
+
+end MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual
 
 namespace MainFormalCascadeTransportTargets
 
@@ -2676,35 +2821,44 @@ theorem mainFormal
   -- unused Section 6 consistency field inside the unsymmetrization package, the
   -- line-171--173 data-processing step for the `ζ₁` links, and the final `ζ₄`
   -- point-triangle assembly to the finer split residual
-  -- `MainFormalCascadeRolePackageResidualCompletionLine169Residual`. The scalar
+  -- `MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual`, which
+  -- additionally consumes the #869 right-register completion transport. The scalar
   -- cascade side conditions are discharged below: if `mainFormalError ≥ 1`, the
   -- theorem is vacuous; otherwise the pass condition gives `0 ≤ ε`, while
   -- `mainFormalError < 1` rules out `ε > 1` and `d > q`. Producing the remaining
   -- residual still depends on active upstream work: the branch-level Section 6
   -- role-package producer (successor-boundary data plus the large-`k` or
-  -- small-`k` split), projectivization/completion closeness and polynomial
-  -- `ζ₁` transport links (#426), the full-slice transport chain (#601), the
-  -- remaining `fromHToG` pasting bridge (#707), the reverse `overAllOutcomes`
-  -- aggregation (#672), and the ProcessedG scalar follow-ups #714, #715, #732,
-  -- and #759.  Once the role package is available, the factor-two
-  -- unsymmetrization estimates are checked by
-  -- `UnsymmetrizationBridgePackage.ofSymConsistency`.  The line-169 transport
-  -- fields remain explicit because generic `triangleSub` gives
-  -- `ζ₁ + sqrt ζ₂`, not the printed `ζ₁`; preserving the paper envelope needs a
-  -- stronger projectivization/correlation-preservation input.
+  -- small-`k` split), the left-register completion estimates returned by the
+  -- orthonormalize-and-complete chain, and the polynomial `ζ₁` transport links
+  -- (#426), the full-slice transport chain (#601), the remaining `fromHToG`
+  -- pasting bridge (#707), the reverse `overAllOutcomes` aggregation (#672), and
+  -- the ProcessedG scalar follow-ups #714, #715, #732, and #759.  Once the role
+  -- package is available, the factor-two unsymmetrization estimates are checked
+  -- by `UnsymmetrizationBridgePackage.ofSymConsistency`; the Bob-side completion
+  -- estimate is transported from the left register to the right register by the
+  -- #869 permutation-invariant helper.  The line-169 transport fields remain
+  -- explicit because generic `triangleSub` gives `ζ₁ + sqrt ζ₂`, not the printed
+  -- `ζ₁`; preserving the paper envelope needs a stronger
+  -- projectivization/correlation-preservation input.
 
   by_cases herr : 1 ≤ mainFormalError params k eps
   · exact mainFormal_trivial_witness params strategy eps k herr
   · have hepsNN : 0 ≤ eps := ProjStrat.eps_nonneg_of_passes hpass
     let scalars : MainFormalCascadeScalars params eps k :=
       MainFormalCascadeScalars.ofNontrivialMainFormal hepsNN hk0 herr
+    have rolePackageResidualLeftCompletionLine169Residual :
+        MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual
+          (params := params) (strategy := strategy) (eps := eps)
+          (hpass := hpass) (k := k) (scalars := scalars) := by
+      -- TODO(#427): construct the branch-level role package, left-register
+      -- completion witnesses, and exact polynomial line-169 transport links.
+      sorry
     have rolePackageResidualCompletionLine169Residual :
         MainFormalCascadeRolePackageResidualCompletionLine169Residual
           (params := params) (strategy := strategy) (eps := eps)
-          (hpass := hpass) (k := k) (scalars := scalars) := by
-      -- TODO(#427): construct the branch-level role package, completion witnesses,
-      -- and exact polynomial line-169 transport links.
-      sorry
+          (hpass := hpass) (k := k) (scalars := scalars) :=
+      rolePackageResidualLeftCompletionLine169Residual
+        |>.toRolePackageResidualCompletionLine169Residual
     have rolePackagedCompletionLine169Residual :
         MainFormalCascadeRolePackagedCompletionLine169Residual params strategy eps k scalars :=
       rolePackageResidualCompletionLine169Residual.toRolePackagedCompletionLine169Residual
