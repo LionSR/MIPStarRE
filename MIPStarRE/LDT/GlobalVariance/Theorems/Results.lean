@@ -1315,7 +1315,7 @@ lemma generalizeBReversePointwiseBound
           let X := weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu
           let Y := weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu
           exact ev_adjoint_sub_swap ψbi X Y
-      _ ≤ generalizeBError params := hgen.pointwiseNormBound g
+    _ ≤ generalizeBError params := hgen.pointwiseNormBound g
 
 /-- The first marginal of the rerandomized hypercube-edge distribution is uniform.
 This is the finite-distribution form of the sampling statement in
