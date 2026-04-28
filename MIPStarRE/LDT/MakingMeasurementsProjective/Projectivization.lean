@@ -89,7 +89,8 @@ private lemma abs_sum_ev_opTensor_le_sqrt_mul_sqrt
     leftTensor_outcome_mul_conjTranspose_eq (ιB := ιB) A a
   have hY := fun a : Outcome =>
     rightTensor_outcome_conjTranspose_mul_eq (ιA := ιA) B a
-  simpa [leftTensor_mul_rightTensor_eq_opTensor, hX, hY] using
+  simpa [leftTensor_mul_rightTensor_eq_opTensor, hX, hY,
+      -leftTensor_conjTranspose, -rightTensor_conjTranspose] using
     MIPStarRE.LDT.Preliminaries.sum_ev_mul_le_sqrt ψ
       (fun a => leftTensor (ι₂ := ιB) (A.outcome a))
       (fun a => rightTensor (ι₁ := ιA) (B.outcome a))

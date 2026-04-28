@@ -43,6 +43,50 @@ lemma sddError_self {Question Outcome : Type*}
   rw [this]
   exact avgOver_zero 𝒟
 
+/-- On a permutation-invariant bipartite state, the `qSDDCore` distance between
+right-tensor placements of two local operator families equals the corresponding
+left-tensor distance.
+
+This is a shared tensor-placement helper for Bob/right-register variants of
+`≈_δ` arguments.  The proof expands each squared-difference term and applies
+`PermInvState.swap_ev` to `(A_a-B_a)^†(A_a-B_a)`. -/
+lemma qSDDCore_rightTensor_eq_leftTensor_of_permInv
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    {ψ : QuantumState (ι × ι)}
+    (hperm : PermInvState ψ)
+    (A B : Outcome → MIPStarRE.Quantum.Op ι) :
+    qSDDCore ψ
+      (fun a => rightTensor (ι₁ := ι) (A a))
+      (fun a => rightTensor (ι₁ := ι) (B a)) =
+    qSDDCore ψ
+      (fun a => leftTensor (ι₂ := ι) (A a))
+      (fun a => leftTensor (ι₂ := ι) (B a)) := by
+  unfold qSDDCore
+  refine Finset.sum_congr rfl ?_
+  intro a _
+  let D : MIPStarRE.Quantum.Op ι := A a - B a
+  have hright_diff :
+      rightTensor (ι₁ := ι) (A a) - rightTensor (ι₁ := ι) (B a) =
+        rightTensor (ι₁ := ι) D := by
+    simpa [rightTensor, opTensor, D] using
+      (MIPStarRE.Quantum.kronecker_sub_right
+        (A := (1 : MIPStarRE.Quantum.Op ι))
+        (B₁ := A a) (B₂ := B a))
+  have hleft_diff :
+      leftTensor (ι₂ := ι) (A a) - leftTensor (ι₂ := ι) (B a) =
+        leftTensor (ι₂ := ι) D := by
+    simpa [D] using leftTensor_sub (ι₁ := ι) (ι₂ := ι) (A a) (B a)
+  rw [hright_diff, hleft_diff]
+  calc
+    ev ψ ((rightTensor (ι₁ := ι) D)ᴴ * rightTensor (ι₁ := ι) D)
+        = ev ψ (rightTensor (ι₁ := ι) (Dᴴ * D)) := by
+          rw [rightTensor_conjTranspose, rightTensor_mul_rightTensor]
+    _ = ev ψ (leftTensor (ι₂ := ι) (Dᴴ * D)) := by
+          rw [← hperm.swap_ev (Dᴴ * D)]
+    _ = ev ψ ((leftTensor (ι₂ := ι) D)ᴴ * leftTensor (ι₂ := ι) D) := by
+          rw [leftTensor_conjTranspose, leftTensor_mul_leftTensor]
+
 /-- `sscError` is nonneg since it averages `max 0 (...)` terms. -/
 lemma sscError_nonneg {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]

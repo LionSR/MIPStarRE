@@ -84,6 +84,18 @@ noncomputable def weightedPointConditionedOperatorAtPolynomial (params : Paramet
     (pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
     (polynomialWeightSqrtOperator params G g)
 
+/-- The right-register intermediate `I ⊗ (G_g)^{1/2} A^u_{g(u)}`
+from the first and last self-consistency moves of
+`lem:local-variance-of-points` (`expansion.tex`, lines 306 and 310). -/
+noncomputable def weightedPointConditionedRightOperatorAtPolynomial (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι)
+    (g : Polynomial params) (u : Point params) : MIPStarRE.Quantum.Op (ι × ι) :=
+  rightTensor (ι₁ := ι)
+    (polynomialWeightSqrtOperator params G g *
+      pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
+
 /-- The local variance of `A(g)` on the weighted state `|ψ_g⟩`.
 Operators are lifted to the left tensor factor of the bipartite state. -/
 noncomputable def pointConditionedLocalVarianceAtPolynomial (params : Parameters)

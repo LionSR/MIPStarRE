@@ -118,6 +118,51 @@ private lemma gHatTypeOperator_fin_cons_false
       gHatTypeOperator G τ * (1 - G) := by
   simpa [finCons_eq_prependTypeBit] using gHatTypeOperator_prepend_false G τ
 
+/-- Each Boolean-type monomial commutes with the base operator `G`. -/
+lemma gHatTypeOperator_commute_base
+    (G : MIPStarRE.Quantum.Op ι) {k : ℕ} (τ : GHatType k) :
+    Commute (gHatTypeOperator G τ) G := by
+  have hcomm : Commute G (1 - G) := (Commute.one_right G).sub_right (Commute.refl G)
+  have hleft : Commute (G ^ gHatTypeWeight τ) G := (Commute.refl G).pow_left _
+  have hright : Commute ((1 - G) ^ (k - gHatTypeWeight τ)) G := hcomm.symm.pow_left _
+  unfold gHatTypeOperator
+  exact hleft.mul_left hright
+
+/-- Each Boolean-type monomial commutes with the complementary base operator `1 - G`. -/
+lemma gHatTypeOperator_commute_one_sub_base
+    (G : MIPStarRE.Quantum.Op ι) {k : ℕ} (τ : GHatType k) :
+    Commute (gHatTypeOperator G τ) (1 - G) := by
+  have hcomm : Commute G (1 - G) := (Commute.one_right G).sub_right (Commute.refl G)
+  have hleft : Commute (G ^ gHatTypeWeight τ) (1 - G) := hcomm.pow_left _
+  have hright : Commute ((1 - G) ^ (k - gHatTypeWeight τ)) (1 - G) :=
+    (Commute.refl (1 - G)).pow_left _
+  unfold gHatTypeOperator
+  exact hleft.mul_left hright
+
+/-- The truncated type sum commutes with the base operator `G`. -/
+lemma truncatedTypeSums_commute_base
+    (G : MIPStarRE.Quantum.Op ι) (d prefixLen : ℕ)
+    {tailLen : ℕ} (τtail : GHatType tailLen) :
+    Commute (truncatedTypeSums G d prefixLen τtail) G := by
+  unfold truncatedTypeSums
+  refine Commute.sum_left Finset.univ _ G ?_
+  intro τprefix _
+  by_cases h : d + 1 ≤ gHatTypeWeight τprefix + gHatTypeWeight τtail
+  · simpa [h] using gHatTypeOperator_commute_base G τprefix
+  · simp [h]
+
+/-- The truncated type sum commutes with the complementary base operator `1 - G`. -/
+lemma truncatedTypeSums_commute_one_sub_base
+    (G : MIPStarRE.Quantum.Op ι) (d prefixLen : ℕ)
+    {tailLen : ℕ} (τtail : GHatType tailLen) :
+    Commute (truncatedTypeSums G d prefixLen τtail) (1 - G) := by
+  unfold truncatedTypeSums
+  refine Commute.sum_left Finset.univ _ (1 - G) ?_
+  intro τprefix _
+  by_cases h : d + 1 ≤ gHatTypeWeight τprefix + gHatTypeWeight τtail
+  · simpa [h] using gHatTypeOperator_commute_one_sub_base G τprefix
+  · simp [h]
+
 /-- The full sum of type operators equals the identity.
 
 This is the commuting binomial expansion

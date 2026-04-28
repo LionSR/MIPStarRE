@@ -110,32 +110,33 @@ noncomputable def overAllOutcomesError (params : Parameters)
       Real.rpow zeta (1 / (32 : Error)) +
       Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)))
 
-/-- Displayed error term for `lem:from-H-to-G`. -/
+/-- Corrected error term for `lem:from-H-to-G`.
+
+The paper states a linear-in-`k` `ν₈`, but its proof first accumulates
+`k · (2√(2ζ) + 2√ν₄(k))`; since `ν₄(k)` already contains `k²`, the commutation
+contribution is quadratic in `k`.  The Lean statement follows the proof's
+literal telescope and uses the corrected quadratic bound. -/
 noncomputable def fromHToGError (params : Parameters)
     (gamma zeta : Error) (k : ℕ) : Error :=
-  46 * (k : Error) * (params.m : Error) *
+  46 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) *
     (Real.rpow gamma (1 / (32 : Error)) +
       Real.rpow zeta (1 / (32 : Error)) +
       Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)))
-
-/-- Paper-total scalar error before the final absorption in `lem:from-H-to-G`.
-
-This is the expression at `references/ldt-paper/ld-pasting.tex:1372--1373`:
-there are `k` copies of the `2√(2ζ)` self-consistency loss, but only one
-accumulated `2√ν₄` contribution, where the displayed `ν₄` already contains the
-factor `k^2`.  It is intentionally separate from the uniform per-step helper
-`fromHToGRecurrenceError`, whose `ν₄` term cannot be multiplied by `k` and then
-absorbed into `fromHToGError` as a standalone scalar theorem. -/
-noncomputable def fromHToGPaperTotalError (params : Parameters)
-    (gamma zeta : Error) (k : ℕ) : Error :=
-  (k : Error) * (2 * Real.rpow (2 * zeta) (1 / (2 : Error))) +
-    2 * Real.rpow (commuteGHalfSandwichError params gamma zeta k) (1 / (2 : Error))
 
 /-- The per-step recurrence loss from the proof of `lem:from-H-to-G`. -/
 noncomputable def fromHToGRecurrenceError (params : Parameters)
     (gamma zeta : Error) (k : ℕ) : Error :=
   2 * Real.rpow (2 * zeta) (1 / (2 : Error)) +
     2 * Real.rpow (commuteGHalfSandwichError params gamma zeta k) (1 / (2 : Error))
+
+/-- Literal telescope error from `references/ldt-paper/ld-pasting.tex:1372`.
+
+The following paper line drops a factor of `k` from the commutation contribution;
+Lean keeps the iterated adjacent-step bound and absorbs it into the corrected
+quadratic `fromHToGError`. -/
+noncomputable def fromHToGPaperTotalError (params : Parameters)
+    (gamma zeta : Error) (k : ℕ) : Error :=
+  (k : Error) * fromHToGRecurrenceError params gamma zeta k
 
 /-- Analytic conclusion for `thm:ld-pasting` once a witness `H` has been fixed.
 
@@ -403,8 +404,7 @@ noncomputable def fromHToGTailStageMass (params : Parameters)
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (prefixLen : ℕ) {tailLen : ℕ} (τtail : GHatType tailLen) : Error :=
-  ev ψbi (((IdxOpFamily.liftLeft
-    (fromHToGTailStageFamily params family prefixLen τtail)) ()).total)
+  ev ψbi (((fromHToGTailStageFamily params family prefixLen τtail) ()).total)
 
 /-- Scalar expectation of the full Lean stage-`ℓ` quantity from `lem:from-H-to-G`.
 
@@ -439,7 +439,7 @@ noncomputable def fromHToGBernoulliTailMass (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι) (k : ℕ) : Error :=
-  subMeasMass ψbi ((IdxSubMeas.liftLeft
+  subMeasMass ψbi ((IdxSubMeas.liftRight
     (bernoulliTailFromFamily params family k)) ())
 
 /-- Output package for `lem:from-H-to-G`.

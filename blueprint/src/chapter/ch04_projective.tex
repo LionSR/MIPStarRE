@@ -4,7 +4,7 @@
 % ORPHAN: standalone background theorem; the current downstream blueprint proofs do not call the Naimark dilation node.
 \begin{theorem}[Naimark dilation]\label{thm:naimark}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimark}
-	\leanok
+	% The current Lean declaration records questionwise local dilations, not the full tensor-product correlation statement, so no \leanok is claimed.
 	\uses{def:submeasurement}
 	Let $\ket{\psi}$ be a state in $\mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$.
 	Let $A = \{A^x_a\}$ be a sub-measurement acting on $\mathcal H_{\mathrm A}$
@@ -71,6 +71,52 @@
 	\]
 \end{theorem}
 
+\begin{remark}[Lean right-register completion helpers]\label{rem:lean-right-register-completion-helpers}
+	\uses{thm:orthonormalization, prop:completing-to-measurement}
+	\lean{MIPStarRE.LDT.Preliminaries.qSDDCore_rightTensor_eq_leftTensor_of_permInv, MIPStarRE.LDT.MakingMeasurementsProjective.qSDD_liftRight_eq_liftLeft_of_permInv, MIPStarRE.LDT.MakingMeasurementsProjective.sddRel_liftRight_of_liftLeft_permInv}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement.completedCloseness_liftRight, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff.ofOrthonormalizeAndCompleteStatements}
+	The inductive-step application of the orthogonalization lemma uses
+	completion on both tensor factors.  The formal development records the
+	analytic completion statement on the left register; the shared preliminary
+	helper compares right- and left-tensor placements at the level of the
+	underlying state-dependent-distance form.  Its submeasurement and indexed
+	wrappers transport state-dependent distance to the right register under the
+	permutation-invariance hypothesis on the state.  The remaining two
+	declarations package this transport with the orthonormalize-and-complete
+	output so that the line-156 projectivization handoff can later be produced
+	from the two completed measurements without restating the tensor-factor
+	bookkeeping.
+\end{remark}
+
+\begin{remark}[Lean line-169 projectivization match-mass interface]\label{rem:lean-line169-projectivization-match-mass}
+	\uses{thm:orthonormalization, prop:completing-to-measurement, prop:triangle-sub}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.leftConsistency, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.rightConsistency}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff.leftConsistency_with_triangleSub_loss, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff.rightConsistency_with_triangleSub_loss}
+	Lean exposes the quantitative obstruction at the projectivization handoff used
+	in the inductive step.  The existing line-156 handoff gives only the generic
+	consequence of Proposition~\ref{prop:triangle-sub}: from
+	$G^{\mathrm A}\simeq_{\zeta_1}G^{\mathrm B}$ and
+	$G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ one obtains
+	$Q^{\mathrm A}\simeq_{\zeta_1+\sqrt{\zeta_2}}G^{\mathrm B}$, and similarly
+	on the other tensor factor.  The declarations
+	\texttt{leftConsistency\_with\_triangleSub\_loss} and
+	\texttt{rightConsistency\_with\_triangleSub\_loss} are checked wrappers for
+	this honest square-root-loss route.
+
+	The paper-tight line-169 estimate at exactly $\zeta_1$ therefore requires
+	more than state-dependent-distance closeness.  Lean records the missing
+	construction-level invariant as
+	\texttt{ProjectivizationMatchMassMonotonicity}: replacing
+	$G^{\mathrm A}$ by the completed projective measurement $Q^{\mathrm A}$, and
+	role-reversing on Bob's side, must not decrease the diagonal match mass against
+	the opposite pre-projective measurement.  Its two consistency theorems prove
+	that this primitive match-mass monotonicity is sufficient to recover the exact
+	line-169 \texttt{ConsRel} links.  No constructor for this invariant is asserted
+	here; supplying it remains the upstream projectivization/match-mass monotonicity
+	work needed by the main-formal residual.
+\end{remark}
+
 \subsection{Naimark dilation}\label{sec:naimark}
 
 \begin{lemma}\label{lem:naimark-helper}
@@ -84,6 +130,7 @@
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	Consider an orthonormal basis for $\C^{k+1}$ consisting of vectors $\ket{a}$ for $a \in \mathcal A$ and the vector $\ket{\bot}$. Let $U$ be any unitary such that for each vector $\ket{\phi}$,
 	\[
 		U \cdot (\ket{\phi} \ot \ket{\mathsf{aux}})
@@ -214,7 +261,6 @@
 
 \begin{proof}[Proof of \ref{thm:orthonormalization} assuming \ref{lem:orthonormalization-main-lemma}]
 	\proves{thm:orthonormalization}
-	\leanok
 	\uses{prop:other-two-notions-of-self-consistency, lem:orthonormalization-main-lemma}
 
 	Let $A = \{A_a\}$ be a sub-measurement with outcomes in $\mathcal A$. Write $A=\sum_a A_a$. The strong self-consistency assumption implies
@@ -359,10 +405,10 @@
 	\end{proof}
 
 	\begin{lemma}[Combinatorial averaging for the $r > d$ branch]\label{lem:small-overlap-averaging}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.exists_large_subset_ordered,
-			MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.card_mul_sum_small_le,
-			MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.card_univ_mul_sum_compl_le,
-			MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.sum_small_le_four_sqrt}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.exists_large_subset_ordered}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.card_mul_sum_small_le}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.card_univ_mul_sum_compl_le}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.sum_small_le_four_sqrt}
 		\leanok
 		Let $f : \alpha \to \mathbb{R}$ be a function on a finite index set $\alpha$ with
 		$|\alpha| = r$, and let $L \subseteq \alpha$ with $|L| = d$ and $d < r$. Write
@@ -623,11 +669,11 @@
 		\[
 			X = U \cdot \Sigma_{m \times d} \cdot V^\dagger.
 		\]
-		The Lean interface deliberately records only the downstream consequences of this choice:
+		The formalization records only the downstream consequences of this choice:
 		the matrices $X$ and $\widehat X$, the identities $X^\dagger X=Q$,
 		$\widehat X\widehat X^\dagger=I$, and $X^\dagger\widehat X=\sqrt Q$, together
 		with the $Q_a=X^\dagger T_aX$ restatement.  No explicit rectangular complex-SVD
-		matrices $U,V,\Sigma$ are stored in `QXPLayerData`.
+		matrices $U,V,\Sigma$ are needed.
 	\end{definition}
 
 	\begin{remark}\label{rem:motivation-for-P}
@@ -649,8 +695,8 @@
 		\[
 			\widehat{X} = U \cdot I_{m \times d} \cdot V^\dagger.
 		\]
-		In Lean, $\widehat X$ is the matrix component `xHat` of the reduced
-		`QXPLayerData` package. For each $a$, define
+		We take $\widehat X$ to be the reduced matrix supplied by the data package.
+		For each $a$, define
 		\[
 			\widehat{X}_a = T_a \cdot \widehat{X},
 			\qquad
@@ -660,6 +706,7 @@
 
 	\begin{lemma}\label{lem:xa-t}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xa_t}
+		\leanok
 		For each $a$,
 		\[
 			X_a = T_a \cdot X.
@@ -764,6 +811,7 @@
 
 	\begin{lemma}[$P_a$ restated]\label{lem:pa-restated}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.paRestated}
+		\leanok
 		For each $a$,
 		\begin{equation*}
 			P_a = \widehat{X}^\dagger \cdot T_a \cdot \widehat{X} = \widehat{X}_a^\dagger \cdot \widehat{X}.
@@ -795,8 +843,8 @@
 	\begin{proof}
 		The paper proves this by multiplying out
 		$\widehat{X}=U\cdot I_{m\times d}\cdot V^\dagger$ and using the unitarity of
-		$U$ and $V$.  In Lean, the coisometry identity is one of the primitive
-		consequences recorded in the reduced `QXPLayerData` package.
+		$U$ and $V$.  We record this coisometry identity as one of the primitive
+		consequences of the reduced data package.
 	\end{proof}
 
 	\begin{lemma}[$X$ times $\widehat{X}$]\label{lem:X-times-X-hat}
@@ -809,10 +857,10 @@
 	\begin{proof}
 		\uses{lem:X-squared}
 		The paper obtains this from the SVD formula for $X$ and the definition of
-		$\widehat X$.  The Lean proof records this as the primitive mixed-product
-		identity in `QXPLayerData`, which is exactly the part needed in
+		$\widehat X$.  We record the mixed-product identity as a primitive consequence
+		of the reduced data package, which is exactly the part needed in
 		\ref{lem:squared-difference} and \ref{lem:P-Q-approx}.  The companion paper
-		identity for $X\widehat X^\dagger$ is not stored explicitly.
+		identity for $X\widehat X^\dagger$ is not used downstream.
 	\end{proof}
 
 	\begin{lemma}[Squared difference]\label{lem:squared-difference}
@@ -825,7 +873,7 @@
 	\begin{proof}
 		\uses{lem:X-squared, lem:X-hat-squared, lem:X-times-X-hat}
 		The paper diagonalizes the positive operator $X\widehat X^\dagger$ using the
-		SVD notation.  The Lean proof avoids storing that SVD explicitly: set
+		SVD notation.  The formal proof avoids storing that SVD explicitly: set
 		$Y=X\widehat X^\dagger$.  The primitive identities imply that $Y$ is
 		hermitian, nonnegative, and satisfies $Y^2=XX^\dagger$.  Hence
 		$(X-\widehat X)(X-\widehat X)^\dagger=(Y-I)^2$, and positivity of $Y$ gives
@@ -864,9 +912,9 @@
 	\end{lemma}
 	\begin{proof}
 		\uses{lem:projective-low-rank-sum, lem:q-almost-projective, lem:sqrt-Q-completeness, lem:xa-t, lem:qa-restated, lem:X-expression-to-Q-expression, lem:pa-restated, lem:X-hat-squared, lem:X-times-X-hat, lem:squared-difference, lem:P-projectivity}
-		The Lean proof follows this argument directly from the primitive
-		$X/\widehat X/P$ identities; the $30\zeta^{1/4}$ estimate is no longer stored
-		as a field of `QXPLayerData`.
+		The formal proof follows this argument directly from the primitive
+		$X$, $\widehat X$, and $P$ identities; the $30\zeta^{1/4}$ estimate is
+		derived here rather than stored as part of the data package.
 		The quantity to bound is
 		\begin{equation}\label{eq:P-Q-thing-to-bound}
 			\sum_a \bra{\psi} (Q_a-P_a)^2 \ot I \ket{\psi}

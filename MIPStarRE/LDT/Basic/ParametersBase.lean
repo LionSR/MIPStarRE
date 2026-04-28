@@ -123,6 +123,58 @@ def Parameters.next (params : Parameters) : Parameters :=
     hq := params.hq
     hqPrimePower := params.hqPrimePower }
 
+namespace Parameters
+
+/-- The predecessor parameters obtained by removing the last coordinate from a
+non-base ambient dimension.
+
+This is the inverse construction to `Parameters.next` on the data fields.  The
+proof fields are inherited from the original parameter bundle, so the inverse is
+propositional rather than definitional. -/
+def previous (params : Parameters) (hm : 1 < params.m) : Parameters :=
+  { m := params.m - 1
+    q := params.q
+    d := params.d
+    hm := Nat.sub_pos_of_lt hm
+    hq := params.hq
+    hqPrimePower := params.hqPrimePower }
+
+/-- Removing the last coordinate and then applying `Parameters.next` recovers the
+original non-base parameters. -/
+theorem previous_next_eq (params : Parameters) (hm : 1 < params.m) :
+    (previous params hm).next = params := by
+  cases params with
+  | mk m q d hm0 hq hqPrimePower =>
+      have hsub : m - 1 + 1 = m := Nat.sub_add_cancel (le_of_lt hm)
+      simp [previous, Parameters.next, hsub]
+
+/-- A bundled predecessor for a parameter set known to be a successor dimension. -/
+structure SuccessorDecomposition (params : Parameters) where
+  /-- The predecessor parameter bundle. -/
+  pred : Parameters
+  /-- The predecessor's successor is the original parameter bundle. -/
+  next_eq : pred.next = params
+
+/-- Every parameter bundle of dimension strictly larger than one has a bundled
+predecessor whose successor is propositionally equal to the original bundle. -/
+def successorDecompositionOfOneLtM (params : Parameters) (hm : 1 < params.m) :
+    SuccessorDecomposition params where
+  pred := previous params hm
+  next_eq := previous_next_eq params hm
+
+/-- A positive dimension that is not the base dimension is strictly larger than
+one. -/
+theorem one_lt_m_of_ne_one (params : Parameters) (hm_ne_one : params.m ≠ 1) :
+    1 < params.m :=
+  lt_of_le_of_ne params.hm (Ne.symm hm_ne_one)
+
+/-- Non-base parameters have a bundled predecessor decomposition. -/
+def successorDecompositionOfNeOne (params : Parameters) (hm_ne_one : params.m ≠ 1) :
+    SuccessorDecomposition params :=
+  successorDecompositionOfOneLtM params (one_lt_m_of_ne_one params hm_ne_one)
+
+end Parameters
+
 instance {params : Parameters} : NeZero params.q :=
   ⟨Nat.ne_of_gt params.hq⟩
 
@@ -339,6 +391,13 @@ def subCoord {params : Parameters} [FieldModel params.q] (x y : Fq params) : Fq 
     (x y : Fq params) :
     addCoord (subCoord x y) y = x := by
   unfold addCoord subCoord
+  rw [decode_encodeScalar]
+  simp [sub_eq_add_neg]
+
+@[simp] theorem subCoord_addCoord_right {params : Parameters} [FieldModel params.q]
+    (x y : Fq params) :
+    subCoord (addCoord x y) y = x := by
+  unfold subCoord addCoord
   rw [decode_encodeScalar]
   simp [sub_eq_add_neg]
 

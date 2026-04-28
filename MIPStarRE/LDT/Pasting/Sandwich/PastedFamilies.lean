@@ -452,11 +452,12 @@ $$ -/
 noncomputable def fromHToGTailStageFamily (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (prefixLen : ℕ)
     {tailLen : ℕ} (τtail : GHatType tailLen) :
-    IdxOpFamily Unit Unit ι :=
+    IdxOpFamily Unit Unit (ι × ι) :=
   fun _ =>
     let base := averagedSandwichByTypeSubMeas params family tailLen τtail
     let weight := fromHToGRecurrenceWeight params family prefixLen τtail
-    { outcome := fun _ => base.total * weight
-      total := base.total * weight }
+    { outcome := fun _ =>
+        leftTensor (ι₂ := ι) base.total * rightTensor (ι₁ := ι) weight
+      total := leftTensor (ι₂ := ι) base.total * rightTensor (ι₁ := ι) weight }
 
 end MIPStarRE.LDT.Pasting
