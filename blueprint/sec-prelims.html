@@ -3366,6 +3366,12 @@
           
           <li><a href="sec-prelims.html#prop:cool-prop">Theorem 3.43</a></li>
           
+          <li><a href="sec-prelims.html#prop:triangle-inequality-for-vectors-squared">Lemma 3.26</a></li>
+          
+          <li><a href="sec-prelims.html#prop:easy-approx-from-approx-delta">Theorem 3.24</a></li>
+          
+          <li><a href="sec-prelims.html#prop:cool-prop">Theorem 3.43</a></li>
+          
         </ul>
     
       </div>
@@ -3402,6 +3408,38 @@
 
   </div>
 </div>
+<div class="proof_wrapper" id="a0000000114">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof of <a href="sec-prelims.html#prop:completing-to-measurement">3.42</a>
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>   By Lemma&#160;<a href="sec-prelims.html#prop:triangle-inequality-for-vectors-squared">3.26</a>, </p>
+<div class="displaymath" id="a0000000116">
+  \[  \sum _a \lVert (A_a-C_a)\otimes I \lvert \psi  \rangle  \rVert ^2 \leq 2\delta + 2 \cdot \lVert (I-B)\otimes I \lvert \psi  \rangle \rVert ^2.  \]
+</div>
+<p> It remains to bound the residual term. Since \(0 \le I-B \le I\), </p>
+<div class="displaymath" id="eq:to-return-later-whatevs">
+  \begin{align}  \lVert (I-B) \otimes I \lvert \psi  \rangle \rVert ^2 &  \leq 1 -\sum _a \langle \psi  \rvert  B_a^2 \otimes I \lvert \psi  \rangle . \label{eq:to-return-later-whatevs} \end{align}
+</div>
+<p> By Proposition&#160;<a href="sec-prelims.html#prop:easy-approx-from-approx-delta">3.24</a>, </p>
+<div class="displaymath" id="a0000000117">
+  \[  \sum _a \langle \psi  \rvert  B_a^2 \otimes I \lvert \psi  \rangle  \approx _{\sqrt{\delta }} \sum _a \langle \psi  \rvert  (A_a B_a)\otimes I \lvert \psi  \rangle  \approx _{\sqrt{\delta }} \sum _a \langle \psi  \rvert  A_a^2\otimes I \lvert \psi  \rangle .  \]
+</div>
+<p> Proposition&#160;<a href="sec-prelims.html#prop:cool-prop">3.43</a> gives </p>
+<div class="displaymath" id="a0000000118">
+  \[  \sum _a \langle \psi  \rvert  A_a^2\otimes I \lvert \psi  \rangle  \geq \langle \psi  \rvert  A \otimes I \lvert \psi  \rangle  - \zeta = 1-\zeta .  \]
+</div>
+<p> Hence <a href="sec-prelims.html#eq:to-return-later-whatevs" class="eqref">15</a> implies </p>
+<div class="displaymath" id="a0000000119">
+  \[  \lVert (I-B) \otimes I \lvert \psi  \rangle \rVert ^2 \le 2\sqrt\delta + \zeta .  \]
+</div>
+<p> Substituting this into the first bound proves the claim. </p>
+
+  </div>
+</div>
 <div class="theorem_thmwrapper theorem-style-plain" id="prop:cool-prop">
   <div class="theorem_thmheading">
     <span class="theorem_thmcaption">
@@ -3417,7 +3455,7 @@
 
     <a class="icon proof" href="sec-prelims.html#prop:cool-prop">#</a>
     
-    <a class="icon proof" href="sec-prelims.html#a0000000116"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-prelims.html#a0000000120"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -3467,13 +3505,13 @@
   </div>
   <div class="theorem_thmcontent">
   <p>   This is the same statement as Lemma&#160;<a href="sec-prelims.html#lem:self-consistency-same-side-square">3.40</a>: for a \(\zeta \)-strongly self-consistent submeasurement \(A\), </p>
-<div class="displaymath" id="a0000000117">
+<div class="displaymath" id="a0000000121">
   \[  \sum _a \langle \psi  \rvert  (A_a)^2 \otimes I \lvert \psi  \rangle  \geq \sum _a \langle \psi  \rvert  A_a \otimes I \lvert \psi  \rangle  -\zeta .  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000116">
+<div class="proof_wrapper" id="a0000000120">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -3482,38 +3520,6 @@
   </div>
   <div class="proof_content">
   <p> Immediate from Lemma&#160;<a href="sec-prelims.html#lem:self-consistency-same-side-square">3.40</a>. </p>
-
-  </div>
-</div>
-<div class="proof_wrapper" id="a0000000114">
-  <div class="proof_heading">
-    <span class="proof_caption">
-    Proof of <a href="sec-prelims.html#prop:completing-to-measurement">3.42</a>
-    </span>
-    <span class="expand-proof">▶</span>
-  </div>
-  <div class="proof_content">
-  <p>  By Lemma&#160;<a href="sec-prelims.html#prop:triangle-inequality-for-vectors-squared">3.26</a>, </p>
-<div class="displaymath" id="a0000000118">
-  \[  \sum _a \lVert (A_a-C_a)\otimes I \lvert \psi  \rangle  \rVert ^2 \leq 2\delta + 2 \cdot \lVert (I-B)\otimes I \lvert \psi  \rangle \rVert ^2.  \]
-</div>
-<p> It remains to bound the residual term. Since \(0 \le I-B \le I\), </p>
-<div class="displaymath" id="eq:to-return-later-whatevs">
-  \begin{align}  \lVert (I-B) \otimes I \lvert \psi  \rangle \rVert ^2 &  \leq 1 -\sum _a \langle \psi  \rvert  B_a^2 \otimes I \lvert \psi  \rangle . \label{eq:to-return-later-whatevs} \end{align}
-</div>
-<p> By Proposition&#160;<a href="sec-prelims.html#prop:easy-approx-from-approx-delta">3.24</a>, </p>
-<div class="displaymath" id="a0000000119">
-  \[  \sum _a \langle \psi  \rvert  B_a^2 \otimes I \lvert \psi  \rangle  \approx _{\sqrt{\delta }} \sum _a \langle \psi  \rvert  (A_a B_a)\otimes I \lvert \psi  \rangle  \approx _{\sqrt{\delta }} \sum _a \langle \psi  \rvert  A_a^2\otimes I \lvert \psi  \rangle .  \]
-</div>
-<p> Proposition&#160;<a href="sec-prelims.html#prop:cool-prop">3.43</a> gives </p>
-<div class="displaymath" id="a0000000120">
-  \[  \sum _a \langle \psi  \rvert  A_a^2\otimes I \lvert \psi  \rangle  \geq \langle \psi  \rvert  A \otimes I \lvert \psi  \rangle  - \zeta = 1-\zeta .  \]
-</div>
-<p> Hence <a href="sec-prelims.html#eq:to-return-later-whatevs" class="eqref">15</a> implies </p>
-<div class="displaymath" id="a0000000121">
-  \[  \lVert (I-B) \otimes I \lvert \psi  \rangle \rVert ^2 \le 2\sqrt\delta + \zeta .  \]
-</div>
-<p> Substituting this into the first bound proves the claim. </p>
 
   </div>
 </div>

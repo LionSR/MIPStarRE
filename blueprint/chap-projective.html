@@ -435,7 +435,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>    The inductive-step application of the orthogonalization lemma uses completion on both tensor factors. Lean records the analytic completion statement on the left register; the shared preliminary helper compares right- and left-tensor placements at the raw <span class="ttfamily">qSDDCore</span> level. Its submeasurement and indexed wrappers transport state-dependent distance to the right register under the permutation-invariance hypothesis on the state. The remaining two declarations package this transport with the orthonormalize-and-complete output so that the line-156 projectivization handoff can later be produced from the two completed measurements without restating the tensor-factor bookkeeping. </p>
+  <p>    The inductive-step application of the orthogonalization lemma uses completion on both tensor factors. The formal development records the analytic completion statement on the left register; the shared preliminary helper compares right- and left-tensor placements at the level of the underlying state-dependent-distance form. Its submeasurement and indexed wrappers transport state-dependent distance to the right register under the permutation-invariance hypothesis on the state. The remaining two declarations package this transport with the orthonormalize-and-complete output so that the line-156 projectivization handoff can later be produced from the two completed measurements without restating the tensor-factor bookkeeping. </p>
 
   </div>
 </div>
@@ -514,6 +514,8 @@
     <span class="lemma_thmlabel">4.5</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
@@ -1176,12 +1178,6 @@
         
         <ul class="uses">
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.exists_large_subset_ordered" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.exists_large_subset_ordered</a></li>
-          
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.card_mul_sum_small_le" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.card_mul_sum_small_le</a></li>
-          
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.card_univ_mul_sum_compl_le" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.card_univ_mul_sum_compl_le</a></li>
-          
           <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.sum_small_le_four_sqrt" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.sum_small_le_four_sqrt</a></li>
           
         </ul>
@@ -1193,7 +1189,7 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>  Let \(f : \alpha \to \mathbb {R}\) be a function on a finite index set \(\alpha \) with \(|\alpha | = r\), and let \(L \subseteq \alpha \) with \(|L| = d\) and \(d {\lt} r\). Write \(S = L^\complement \) and assume \(f(s) \leq f(l)\) for every \(s \in S\) and \(l \in L\). Then the pairwise double-counting inequality </p>
+  <p>     Let \(f : \alpha \to \mathbb {R}\) be a function on a finite index set \(\alpha \) with \(|\alpha | = r\), and let \(L \subseteq \alpha \) with \(|L| = d\) and \(d {\lt} r\). Write \(S = L^\complement \) and assume \(f(s) \leq f(l)\) for every \(s \in S\) and \(l \in L\). Then the pairwise double-counting inequality </p>
 <div class="displaymath" id="a0000000169">
   \[  |L|\,  \sum _{s \in S} f(s) \leq |S|\,  \sum _{l \in L} f(l)  \]
 </div>
@@ -1723,7 +1719,7 @@
 <div class="displaymath" id="a0000000199">
   \[  X = U \cdot \Sigma _{m \times d} \cdot V^\dagger .  \]
 </div>
-<p> The Lean interface deliberately records only the downstream consequences of this choice: the matrices \(X\) and \(\widehat X\), the identities \(X^\dagger X=Q\), \(\widehat X\widehat X^\dagger =I\), and \(X^\dagger \widehat X=\sqrt Q\), together with the \(Q_a=X^\dagger T_aX\) restatement. No explicit rectangular complex-SVD matrices \(U,V,\Sigma \) are stored in ‘QXPLayerData‘. </p>
+<p> The formalization records only the downstream consequences of this choice: the matrices \(X\) and \(\widehat X\), the identities \(X^\dagger X=Q\), \(\widehat X\widehat X^\dagger =I\), and \(X^\dagger \widehat X=\sqrt Q\), together with the \(Q_a=X^\dagger T_aX\) restatement. No explicit rectangular complex-SVD matrices \(U,V,\Sigma \) are needed. </p>
 
   </div>
 </div>
@@ -1819,7 +1815,7 @@
 <div class="displaymath" id="a0000000201">
   \[  \widehat{X} = U \cdot I_{m \times d} \cdot V^\dagger .  \]
 </div>
-<p> In Lean, \(\widehat X\) is the matrix component ‘xHat‘ of the reduced ‘QXPLayerData‘ package. For each \(a\), define </p>
+<p> We take \(\widehat X\) to be the reduced matrix supplied by the data package. For each \(a\), define </p>
 <div class="displaymath" id="a0000000202">
   \[  \widehat{X}_a = T_a \cdot \widehat{X}, \qquad P_a = \widehat{X}_a^\dagger \cdot \widehat{X}_a.  \]
 </div>
@@ -2205,7 +2201,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>The paper proves this by multiplying out \(\widehat{X}=U\cdot I_{m\times d}\cdot V^\dagger \) and using the unitarity of \(U\) and \(V\). In Lean, the coisometry identity is one of the primitive consequences recorded in the reduced ‘QXPLayerData‘ package. </p>
+  <p>The paper proves this by multiplying out \(\widehat{X}=U\cdot I_{m\times d}\cdot V^\dagger \) and using the unitarity of \(U\) and \(V\). We record this coisometry identity as one of the primitive consequences of the reduced data package. </p>
 
   </div>
 </div>
@@ -2265,7 +2261,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The paper obtains this from the SVD formula for \(X\) and the definition of \(\widehat X\). The Lean proof records this as the primitive mixed-product identity in ‘QXPLayerData‘, which is exactly the part needed in <a href="chap-projective.html#lem:squared-difference">4.28</a> and <a href="chap-projective.html#lem:P-Q-approx">4.30</a>. The companion paper identity for \(X\widehat X^\dagger \) is not stored explicitly. </p>
+  <p> The paper obtains this from the SVD formula for \(X\) and the definition of \(\widehat X\). We record the mixed-product identity as a primitive consequence of the reduced data package, which is exactly the part needed in <a href="chap-projective.html#lem:squared-difference">4.28</a> and <a href="chap-projective.html#lem:P-Q-approx">4.30</a>. The companion paper identity for \(X\widehat X^\dagger \) is not used downstream. </p>
 
   </div>
 </div>
@@ -2325,7 +2321,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The paper diagonalizes the positive operator \(X\widehat X^\dagger \) using the SVD notation. The Lean proof avoids storing that SVD explicitly: set \(Y=X\widehat X^\dagger \). The primitive identities imply that \(Y\) is hermitian, nonnegative, and satisfies \(Y^2=XX^\dagger \). Hence \((X-\widehat X)(X-\widehat X)^\dagger =(Y-I)^2\), and positivity of \(Y\) gives \((Y-I)^2\leq (Y^2-I)^2=(XX^\dagger -I)^2\). </p>
+  <p> The paper diagonalizes the positive operator \(X\widehat X^\dagger \) using the SVD notation. The formal proof avoids storing that SVD explicitly: set \(Y=X\widehat X^\dagger \). The primitive identities imply that \(Y\) is hermitian, nonnegative, and satisfies \(Y^2=XX^\dagger \). Hence \((X-\widehat X)(X-\widehat X)^\dagger =(Y-I)^2\), and positivity of \(Y\) gives \((Y-I)^2\leq (Y^2-I)^2=(XX^\dagger -I)^2\). </p>
 
   </div>
 </div>
@@ -2446,7 +2442,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The Lean proof follows this argument directly from the primitive \(X/\widehat X/P\) identities; the \(30\zeta ^{1/4}\) estimate is no longer stored as a field of ‘QXPLayerData‘. The quantity to bound is </p>
+  <p> The formal proof follows this argument directly from the primitive \(X\), \(\widehat X\), and \(P\) identities; the \(30\zeta ^{1/4}\) estimate is derived here rather than stored as part of the data package. The quantity to bound is </p>
 <div class="equation" id="eq:P-Q-thing-to-bound">
 <p>
   <div class="equation_content">
