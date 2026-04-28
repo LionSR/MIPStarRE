@@ -967,7 +967,9 @@ private lemma switcherooAggregateLeftFrontRaw_close_firstSplitRaw
         (∑ go : Polynomial params × Outcome,
             (∑ u : Unit, C q go u)ᴴ * (∑ u : Unit, C q go u)) ≤ 1 := by
     intro q
-    simpa [C] using switcherooAggregateLeftFront_contraction params family M q
+    simpa [C, switcherooPointProductLeft, orderedProductOpFamily,
+        OpFamily.leftPlacedOpFamily] using
+      switcherooAggregateLeftFront_contraction params family M q
   have hleft :
       avgOver 𝒟q (fun q =>
           ∑ a : Polynomial params × Outcome,

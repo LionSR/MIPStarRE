@@ -453,7 +453,9 @@ lemma switcherooLeftFront_close_firstSplitCore
         (∑ go : Polynomial params × Outcome,
             (∑ u : Unit, C q go u)ᴴ * (∑ u : Unit, C q go u)) ≤ 1 := by
     intro q
-    simpa [C] using switcherooAggregateLeftFront_contraction params family M q
+    simpa [C, switcherooPointProductLeft, orderedProductOpFamily,
+        OpFamily.leftPlacedOpFamily] using
+      switcherooAggregateLeftFront_contraction params family M q
   have hclose :=
     Preliminaries.closenessOfInnerProduct_right ψbi hnorm 𝒟q h𝒟q A B C chi hAB hC
   have hleft :

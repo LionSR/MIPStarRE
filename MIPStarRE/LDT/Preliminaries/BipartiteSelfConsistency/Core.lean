@@ -81,19 +81,11 @@ lemma qSDDCore_rightTensor_eq_leftTensor_of_permInv
   calc
     ev ψ ((rightTensor (ι₁ := ι) D)ᴴ * rightTensor (ι₁ := ι) D)
         = ev ψ (rightTensor (ι₁ := ι) (Dᴴ * D)) := by
-          rw [show (rightTensor (ι₁ := ι) D)ᴴ = rightTensor (ι₁ := ι) Dᴴ by
-            simpa [rightTensor, opTensor] using
-              (conjTranspose_opTensor (ι₁ := ι) (ι₂ := ι)
-                (1 : MIPStarRE.Quantum.Op ι) D)]
-          rw [rightTensor_mul_rightTensor]
+          rw [rightTensor_conjTranspose, rightTensor_mul_rightTensor]
     _ = ev ψ (leftTensor (ι₂ := ι) (Dᴴ * D)) := by
           rw [← hperm.swap_ev (Dᴴ * D)]
     _ = ev ψ ((leftTensor (ι₂ := ι) D)ᴴ * leftTensor (ι₂ := ι) D) := by
-          rw [show (leftTensor (ι₂ := ι) D)ᴴ = leftTensor (ι₂ := ι) Dᴴ by
-            simpa [leftTensor, opTensor] using
-              (conjTranspose_opTensor (ι₁ := ι) (ι₂ := ι) D
-                (1 : MIPStarRE.Quantum.Op ι))]
-          rw [leftTensor_mul_leftTensor]
+          rw [leftTensor_conjTranspose, leftTensor_mul_leftTensor]
 
 /-- `sscError` is nonneg since it averages `max 0 (...)` terms. -/
 lemma sscError_nonneg {Question Outcome : Type*}
