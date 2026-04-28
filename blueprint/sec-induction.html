@@ -361,7 +361,7 @@
           
           <li><a href="sec-induction.html#def:restricted-strategy">Definition 10.2</a></li>
           
-          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.7</a></li>
+          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.8</a></li>
           
         </ul>
     
@@ -411,13 +411,143 @@
 
   </div>
 </div>
+<div class="definition_thmwrapper theorem-style-definition" id="def:average-restricted-errors">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">10.4</span>
+    <span class="definition_thmtitle">Average restricted errors</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-induction.html#def:average-restricted-errors">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-induction.html#def:restricted-strategy">Definition 10.2</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.averageRestrictedAxisParallelError" class="lean_decl">MIPStarRE.LDT.MainInductionStep.averageRestrictedAxisParallelError</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.averageRestrictedSelfConsistencyError" class="lean_decl">MIPStarRE.LDT.MainInductionStep.averageRestrictedSelfConsistencyError</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.averageRestrictedDiagonalError" class="lean_decl">MIPStarRE.LDT.MainInductionStep.averageRestrictedDiagonalError</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>   The average restricted errors are the expectations over \(x \in \mathbb {F}_q\) of the axis-parallel, self-consistency, and restricted diagonal-line failure probabilities of the \(x\)-restricted strategies. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:weighted-restricted-probability-bounds">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">10.5</span>
+    <span class="lemma_thmtitle">Weighted restricted-probability bounds</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-induction.html#lem:weighted-restricted-probability-bounds">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-induction.html#lem:restricted-probabilities">Lemma 10.3</a></li>
+          
+          <li><a href="sec-induction.html#def:average-restricted-errors">Definition 10.4</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.RestrictedProbabilitiesStatement.ofWeightedBounds" class="lean_decl">MIPStarRE.LDT.MainInductionStep.RestrictedProbabilitiesStatement.ofWeightedBounds</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   The weighted bounds from Lemma&#160;<a href="sec-induction.html#lem:restricted-probabilities">10.3</a> imply the restricted-probability data used in the successor step. </p>
+
+  </div>
+</div>
 <h1 id="a0000000023">10.2 The inductive construction</h1>
 <div class="theorem_thmwrapper theorem-style-plain" id="thm:self-improvement-in-induction-section">
   <div class="theorem_thmheading">
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">10.4</span>
+    <span class="theorem_thmlabel">10.6</span>
     <span class="theorem_thmtitle">Self-improvement</span>
     <div class="thm_header_extras">
 
@@ -442,7 +572,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.7</a></li>
+          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.8</a></li>
           
           <li><a href="sec-prelims.html#def:polymeasurements">Definition 3.11</a></li>
           
@@ -548,7 +678,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">10.5</span>
+    <span class="theorem_thmlabel">10.7</span>
     <span class="theorem_thmtitle">Pasting</span>
     <div class="thm_header_extras">
 
@@ -573,7 +703,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.7</a></li>
+          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.8</a></li>
           
           <li><a href="sec-prelims.html#def:polymeasurements">Definition 3.11</a></li>
           
@@ -666,7 +796,71 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> This is exactly Theorem&#160;<a href="sec-ld-pasting.html#thm:ld-pasting">9.1</a>, restated in the induction chapter because it is the pasting input used in the proof of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.7</a>. </p>
+  <p> This is exactly Theorem&#160;<a href="sec-ld-pasting.html#thm:ld-pasting">9.1</a>, restated in the induction chapter because it is the pasting input used in the proof of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.10</a>. </p>
+
+  </div>
+</div>
+<div class="definition_thmwrapper theorem-style-definition" id="def:successor-pasting-data">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">10.8</span>
+    <span class="definition_thmtitle">Pasting data for the successor step</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-induction.html#def:successor-pasting-data">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-induction.html#lem:weighted-restricted-probability-bounds">Lemma 10.5</a></li>
+          
+          <li><a href="sec-induction.html#thm:ld-pasting-in-induction-section">Theorem 10.7</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.assemblePastingPackage" class="lean_decl">MIPStarRE.LDT.MainInductionStep.assemblePastingPackage</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>   The successor step forms the pasting input by combining the restricted probability estimates with the slice-wise self-improvement data. </p>
 
   </div>
 </div>
@@ -675,7 +869,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">10.6</span>
+    <span class="lemma_thmlabel">10.9</span>
     <span class="lemma_thmtitle">Base case of main induction</span>
     <div class="thm_header_extras">
 
@@ -702,7 +896,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.7</a></li>
+          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.8</a></li>
           
           <li><a href="sec-prelims.html#def:polymeasurements">Definition 3.11</a></li>
           
@@ -737,11 +931,11 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>   Under the hypotheses of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.7</a> with \(m=1\), there exists a measurement \(G \in \mathrm{PolyMeas}(1,q,d)\) such that, on average over \(u \sim \mathbb {F}_q\), </p>
+  <p>   Under the hypotheses of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.10</a> with \(m=1\), there exists a measurement \(G \in \mathrm{PolyMeas}(1,q,d)\) such that, on average over \(u \sim \mathbb {F}_q\), </p>
 <div class="displaymath" id="a0000000542">
   \[  A_a^u \otimes I \simeq _\varepsilon I \otimes G_{[g(u)=a]},  \]
 </div>
-<p> which is stronger than the bound required by Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.7</a> for \(m=1\). </p>
+<p> which is stronger than the bound required by Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.10</a> for \(m=1\). </p>
 
   </div>
 </div>
@@ -762,7 +956,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">10.7</span>
+    <span class="theorem_thmlabel">10.10</span>
     <span class="theorem_thmtitle">Main induction</span>
     <div class="thm_header_extras">
 
@@ -787,21 +981,25 @@
         
         <ul class="uses">
           
-          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.7</a></li>
+          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.8</a></li>
           
           <li><a href="sec-prelims.html#def:polymeasurements">Definition 3.11</a></li>
           
           <li><a href="sec-prelims.html#def:simeq">Definition 3.16</a></li>
           
-          <li><a href="sec-induction.html#lem:main-induction-base">Lemma 10.6</a></li>
+          <li><a href="sec-induction.html#lem:main-induction-base">Lemma 10.9</a></li>
           
           <li><a href="sec-induction.html#lem:restricted-probabilities">Lemma 10.3</a></li>
           
-          <li><a href="sec-induction.html#lem:main-induction-base">Lemma 10.6</a></li>
+          <li><a href="sec-induction.html#lem:weighted-restricted-probability-bounds">Lemma 10.5</a></li>
           
-          <li><a href="sec-induction.html#thm:self-improvement-in-induction-section">Theorem 10.4</a></li>
+          <li><a href="sec-induction.html#lem:main-induction-base">Lemma 10.9</a></li>
           
-          <li><a href="sec-induction.html#thm:ld-pasting-in-induction-section">Theorem 10.5</a></li>
+          <li><a href="sec-induction.html#thm:self-improvement-in-induction-section">Theorem 10.6</a></li>
+          
+          <li><a href="sec-induction.html#thm:ld-pasting-in-induction-section">Theorem 10.7</a></li>
+          
+          <li><a href="sec-induction.html#def:successor-pasting-data">Definition 10.8</a></li>
           
         </ul>
     
@@ -837,7 +1035,7 @@
   </div>
   <div class="proof_content">
   <p> In Lean, the base case and the internal successor-step assembly are now formalized through  together with the bookkeeping packages  that mirror the four paper stages \(\text{restrict} \to \text{induct} \to \text{self-improve} \to \text{paste}\). The weighted restricted-probability boundary is now public via , and the final public successor-step wrapper is formalized as . The remaining gap, tracked by issues #630 and #632, is to produce the restricted-strategy self-improvement input needed to instantiate that wrapper directly from higher-level applications, so the displayed theorem is not yet marked . We may assume \(\varepsilon ,\delta ,\gamma ,d/q \le 1\), since otherwise \(\nu \ge 1\) and the bound is trivial. </p>
-<p>The proof is by induction on \(m\). The base case \(m=1\) is Lemma&#160;<a href="sec-induction.html#lem:main-induction-base">10.6</a>. </p>
+<p>The proof is by induction on \(m\). The base case \(m=1\) is Lemma&#160;<a href="sec-induction.html#lem:main-induction-base">10.9</a>. </p>
 <p>For the step from \(m\) to \(m+1\), let \((\psi ,A,B,L)\) be an \((\varepsilon ,\delta ,\gamma )\)-good symmetric strategy for the \((m+1,q,d)\) test, and let \(k \ge (m+1)d\). For each \(x \in \mathbb {F}_q\), let \((\psi ,A^x,B^x,L^x)\) be the \(x\)-restricted strategy, with failure parameters \(\varepsilon _x,\delta _x,\gamma _x\). Apply the induction hypothesis to each restricted strategy with the same integer \(k\) and define </p>
 <div class="displaymath" id="a0000000547">
   \[  \nu _x = 1000k^2m^2\left(\varepsilon _x^{1/1024}+\delta _x^{1/1024}+\gamma _x^{1/1024}+(d/q)^{1/1024}\right), \qquad \sigma _x = m^2\left(\nu _x + e^{-k/(80000m^2)}\right).  \]
@@ -850,7 +1048,7 @@
 <div class="displaymath" id="a0000000549">
   \[  \zeta _x = 3000m\left(\varepsilon _x^{1/32}+\delta _x^{1/32}+(d/q)^{1/32}\right).  \]
 </div>
-<p> Theorem&#160;<a href="sec-induction.html#thm:self-improvement-in-induction-section">10.4</a> produces a projective submeasurement \(\widehat G^x \in \mathrm{PolySub}(m,q,d)\) such that, for each \(x\): </p>
+<p> Theorem&#160;<a href="sec-induction.html#thm:self-improvement-in-induction-section">10.6</a> produces a projective submeasurement \(\widehat G^x \in \mathrm{PolySub}(m,q,d)\) such that, for each \(x\): </p>
 <ol class="enumerate">
   <li><p>if \(\widehat G^x=\sum _g \widehat G_g^x\), then </p>
 <div class="displaymath" id="a0000000550">
@@ -896,7 +1094,7 @@
 <div class="displaymath" id="a0000000559">
   \begin{align}  \zeta &  = 3000(m+1)\left(\varepsilon ^{1/32}+\delta ^{1/32}+(d/q)^{1/32}\right) \notag \\ &  \le 1000k^2(m+1)^2\left(\varepsilon ^{1/32}+\delta ^{1/32}+(d/q)^{1/32}\right) \notag \\ &  \le 1000k^2(m+1)^2\left(\varepsilon ^{1/1024}+\delta ^{1/1024}+\gamma ^{1/1024}+(d/q)^{1/1024}\right) \notag \\ &  = \nu . \label{eq:zeta-smaller-than-nu} \end{align}
 </div>
-<p>The averaged slice family \(\{ \widehat G^x\} _{x \in \mathbb {F}_q}\) therefore satisfies the four hypotheses of Theorem&#160;<a href="sec-induction.html#thm:ld-pasting-in-induction-section">10.5</a> with completeness parameter \(\kappa =\sigma +\zeta \). To verify the new \(\nu \) bound in that theorem, observe that \((3000)^{1/32} \le 2\), so </p>
+<p>The averaged slice family \(\{ \widehat G^x\} _{x \in \mathbb {F}_q}\) therefore satisfies the four hypotheses of Theorem&#160;<a href="sec-induction.html#thm:ld-pasting-in-induction-section">10.7</a> with completeness parameter \(\kappa =\sigma +\zeta \). To verify the new \(\nu \) bound in that theorem, observe that \((3000)^{1/32} \le 2\), so </p>
 <div class="displaymath" id="a0000000560">
   \[  \zeta ^{1/32} \le 2(m+1)\left(\varepsilon ^{1/1024}+\delta ^{1/1024}+(d/q)^{1/1024}\right),  \]
 </div>
@@ -904,7 +1102,7 @@
 <div class="displaymath" id="a0000000561">
   \begin{align*} &  100k^2m\left(\varepsilon ^{1/32}+\delta ^{1/32}+\gamma ^{1/32}+\zeta ^{1/32}+(d/q)^{1/32}\right) \\ &  \le 1000k^2(m+1)^2\left(\varepsilon ^{1/1024}+\delta ^{1/1024}+\gamma ^{1/1024}+(d/q)^{1/1024}\right) \\ &  = \nu . \end{align*}
 </div>
-<p> Therefore Theorem&#160;<a href="sec-induction.html#thm:ld-pasting-in-induction-section">10.5</a> gives a pasted measurement \(H \in \mathrm{PolyMeas}(m+1,q,d)\) such that, on average over \(u \sim \mathbb {F}_q^{m+1}\), </p>
+<p> Therefore Theorem&#160;<a href="sec-induction.html#thm:ld-pasting-in-induction-section">10.7</a> gives a pasted measurement \(H \in \mathrm{PolyMeas}(m+1,q,d)\) such that, on average over \(u \sim \mathbb {F}_q^{m+1}\), </p>
 <div class="displaymath" id="a0000000562">
   \[  A_a^u \otimes I \simeq _{\sigma ^*} I \otimes H_{[h(u)=a]},  \]
 </div>
@@ -933,7 +1131,7 @@
     <span class="proposition_thmcaption">
     Proposition
     </span>
-    <span class="proposition_thmlabel">10.8</span>
+    <span class="proposition_thmlabel">10.11</span>
     <span class="proposition_thmtitle">Public Lean wrapper for the successor-step assembly</span>
     <div class="thm_header_extras">
 
@@ -960,11 +1158,11 @@
           
           <li><a href="sec-induction.html#lem:restricted-probabilities">Lemma 10.3</a></li>
           
-          <li><a href="sec-induction.html#thm:self-improvement-in-induction-section">Theorem 10.4</a></li>
+          <li><a href="sec-induction.html#thm:self-improvement-in-induction-section">Theorem 10.6</a></li>
           
-          <li><a href="sec-induction.html#thm:ld-pasting-in-induction-section">Theorem 10.5</a></li>
+          <li><a href="sec-induction.html#thm:ld-pasting-in-induction-section">Theorem 10.7</a></li>
           
-          <li><a href="sec-induction.html#thm:main-induction">Theorem 10.7</a></li>
+          <li><a href="sec-induction.html#thm:main-induction">Theorem 10.10</a></li>
           
           <li><a href="sec-induction.html#lem:restricted-probabilities">Lemma 10.3</a></li>
           
@@ -999,7 +1197,7 @@
         </div>
   </div>
   <div class="proposition_thmcontent">
-  <p>   This Lean-only wrapper packages the five explicit successor-step ingredients used in the proof of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.7</a>: the weighted slice bounds feeding Lemma&#160;<a href="sec-induction.html#lem:restricted-probabilities">10.3</a>, the extracted slice-restriction package, the per-slice recursive witnesses, the producer for the corresponding self-improvement package, and the recursion-to-pasting assembly. Under those hypotheses it returns a measurement \(G \in \mathrm{PolyMeas}(m+1,q,d)\) satisfying the same consistency conclusion as Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.7</a>, but without exposing the intermediate bookkeeping packages at the public boundary. </p>
+  <p>   This Lean-only wrapper packages the five explicit successor-step ingredients used in the proof of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.10</a>: the weighted slice bounds feeding Lemma&#160;<a href="sec-induction.html#lem:restricted-probabilities">10.3</a>, the extracted slice-restriction package, the per-slice recursive witnesses, the producer for the corresponding self-improvement package, and the recursion-to-pasting assembly. Under those hypotheses it returns a measurement \(G \in \mathrm{PolyMeas}(m+1,q,d)\) satisfying the same consistency conclusion as Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.10</a>, but without exposing the intermediate bookkeeping packages at the public boundary. </p>
 
   </div>
 </div>
@@ -1021,7 +1219,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">10.9</span>
+    <span class="lemma_thmlabel">10.12</span>
     <span class="lemma_thmtitle">Role-register symmetrization bridge</span>
     <div class="thm_header_extras">
 
@@ -1052,11 +1250,11 @@
           
           <li><a href="sec-the-test.html#def:symmetric-projective-strategy">Definition 2.4</a></li>
           
-          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.7</a></li>
+          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.8</a></li>
           
           <li><a href="sec-the-test.html#def:projective-strategy">Definition 2.5</a></li>
           
-          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.7</a></li>
+          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.8</a></li>
           
         </ul>
     
@@ -1099,7 +1297,7 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>   Let \((\psi ,A^{\mathrm A},B^{\mathrm A},L^{\mathrm A},A^{\mathrm B},B^{\mathrm B},L^{\mathrm B})\) be a projective strategy passing the \((m,q,d)\) low individual degree test with probability at least \(1-\varepsilon \). Introducing a two-dimensional role register on each side and taking \((\psi _{\mathrm{sym}}, A_{\mathrm{sym}}, B_{\mathrm{sym}}, L_{\mathrm{sym}})\) as in paper Section&#160;3 yields a symmetric projective strategy that is \((3\varepsilon ,3\varepsilon ,3\varepsilon )\)-good. The Lean package records this symmetrized strategy together with its goodness and normalization proofs for later use by the proof of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.11</a>. </p>
+  <p>   Let \((\psi ,A^{\mathrm A},B^{\mathrm A},L^{\mathrm A},A^{\mathrm B},B^{\mathrm B},L^{\mathrm B})\) be a projective strategy passing the \((m,q,d)\) low individual degree test with probability at least \(1-\varepsilon \). Introducing a two-dimensional role register on each side and taking \((\psi _{\mathrm{sym}}, A_{\mathrm{sym}}, B_{\mathrm{sym}}, L_{\mathrm{sym}})\) as in paper Section&#160;3 yields a symmetric projective strategy that is \((3\varepsilon ,3\varepsilon ,3\varepsilon )\)-good. The Lean package records this symmetrized strategy together with its goodness and normalization proofs for later use by the proof of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>. </p>
 
   </div>
 </div>
@@ -1120,7 +1318,7 @@
     <span class="proposition_thmcaption">
     Proposition
     </span>
-    <span class="proposition_thmlabel">10.10</span>
+    <span class="proposition_thmlabel">10.13</span>
     <span class="proposition_thmtitle">Lean base-case handoff for the Section 3 proof</span>
     <div class="thm_header_extras">
 
@@ -1147,9 +1345,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#lem:symmetrization-bridge">Lemma 10.9</a></li>
+          <li><a href="sec-induction.html#lem:symmetrization-bridge">Lemma 10.12</a></li>
           
-          <li><a href="sec-induction.html#thm:main-induction">Theorem 10.7</a></li>
+          <li><a href="sec-induction.html#thm:main-induction">Theorem 10.10</a></li>
           
         </ul>
     
@@ -1180,7 +1378,7 @@
         </div>
   </div>
   <div class="proposition_thmcontent">
-  <p>   If \(m=1\), then for every \(k\) the role-register symmetrization of a projective strategy passing the low individual degree test with error \(\varepsilon \) admits a measurement \(G\) satisfying the base-case conclusion of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.7</a> with parameters \((3\varepsilon ,3\varepsilon ,3\varepsilon )\). </p>
+  <p>   If \(m=1\), then for every \(k\) the role-register symmetrization of a projective strategy passing the low individual degree test with error \(\varepsilon \) admits a measurement \(G\) satisfying the base-case conclusion of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.10</a> with parameters \((3\varepsilon ,3\varepsilon ,3\varepsilon )\). </p>
 
   </div>
 </div>
@@ -1192,7 +1390,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>This is a Lean-only wrapper: combine Lemma&#160;<a href="sec-induction.html#lem:symmetrization-bridge">10.9</a> with the \(m=1\) clause of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.7</a>, formalized as . </p>
+  <p>This is a Lean-only wrapper: combine Lemma&#160;<a href="sec-induction.html#lem:symmetrization-bridge">10.12</a> with the \(m=1\) clause of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.10</a>, formalized as . </p>
 
   </div>
 </div>
@@ -1201,7 +1399,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">10.11</span>
+    <span class="definition_thmlabel">10.14</span>
     <span class="definition_thmtitle">Lean successor-boundary aliases for the Section 3 proof</span>
     <div class="thm_header_extras">
 
@@ -1225,9 +1423,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#lem:symmetrization-bridge">Lemma 10.9</a></li>
+          <li><a href="sec-induction.html#lem:symmetrization-bridge">Lemma 10.12</a></li>
           
-          <li><a href="sec-induction.html#thm:main-induction-public-wrapper">Proposition 10.8</a></li>
+          <li><a href="sec-induction.html#thm:main-induction-public-wrapper">Proposition 10.11</a></li>
           
         </ul>
     
@@ -1274,7 +1472,7 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>   These Lean-only aliases name the successor-case data that Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.11</a> uses to invoke Proposition&#160;<a href="sec-induction.html#thm:main-induction-public-wrapper">10.8</a>. The public weighted-bound helper lemmas discharge the weighted restricted-axis and restricted-diagonal fields from the symmetrized passing strategy; the remaining external inputs are the recursive slice witnesses, the restricted-strategy self-improvement producer, and their bundled boundary package. </p>
+  <p>   These Lean-only aliases name the successor-case data that Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a> uses to invoke Proposition&#160;<a href="sec-induction.html#thm:main-induction-public-wrapper">10.11</a>. The public weighted-bound helper lemmas discharge the weighted restricted-axis and restricted-diagonal fields from the symmetrized passing strategy; the remaining external inputs are the recursive slice witnesses, the restricted-strategy self-improvement producer, and their bundled boundary package. </p>
 
   </div>
 </div>
@@ -1283,7 +1481,7 @@
     <span class="proposition_thmcaption">
     Proposition
     </span>
-    <span class="proposition_thmlabel">10.12</span>
+    <span class="proposition_thmlabel">10.15</span>
     <span class="proposition_thmtitle">Lean successor handoff for the Section 3 proof</span>
     <div class="thm_header_extras">
 
@@ -1308,11 +1506,11 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#def:main-formal-successor-boundary">Definition 10.11</a></li>
+          <li><a href="sec-induction.html#def:main-formal-successor-boundary">Definition 10.14</a></li>
           
-          <li><a href="sec-induction.html#lem:symmetrization-bridge">Lemma 10.9</a></li>
+          <li><a href="sec-induction.html#lem:symmetrization-bridge">Lemma 10.12</a></li>
           
-          <li><a href="sec-induction.html#thm:main-induction-public-wrapper">Proposition 10.8</a></li>
+          <li><a href="sec-induction.html#thm:main-induction-public-wrapper">Proposition 10.11</a></li>
           
         </ul>
     
@@ -1343,7 +1541,7 @@
         </div>
   </div>
   <div class="proposition_thmcontent">
-  <p>   This Lean-only specialization applies Proposition&#160;<a href="sec-induction.html#thm:main-induction-public-wrapper">10.8</a> to the role-register symmetrization used in Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.11</a>. Given the bundled successor boundary, the Section&#160;6 side condition \(400\, m d \le k\), and the matching base-universe field-model instance, it returns the symmetrized global polynomial measurement that the later unsymmetrization and completion transports consume. The base-universe field-model restriction is a current Lean API limitation inherited from the Section&#160;6 wrapper, not a paper constraint; it should be relaxed once that wrapper is made universe-polymorphic. </p>
+  <p>   This Lean-only specialization applies Proposition&#160;<a href="sec-induction.html#thm:main-induction-public-wrapper">10.11</a> to the role-register symmetrization used in Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>. Given the bundled successor boundary, the Section&#160;6 side condition \(400\, m d \le k\), and the matching base-universe field-model instance, it returns the symmetrized global polynomial measurement that the later unsymmetrization and completion transports consume. The base-universe field-model restriction is a current Lean API limitation inherited from the Section&#160;6 wrapper, not a paper constraint; it should be relaxed once that wrapper is made universe-polymorphic. </p>
 
   </div>
 </div>
@@ -1355,7 +1553,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>It is the direct application of  after instantiating Lemma&#160;<a href="sec-induction.html#lem:symmetrization-bridge">10.9</a> at \((3\varepsilon ,3\varepsilon ,3\varepsilon )\) and unpacking the bundled successor-boundary fields. </p>
+  <p>It is the direct application of  after instantiating Lemma&#160;<a href="sec-induction.html#lem:symmetrization-bridge">10.12</a> at \((3\varepsilon ,3\varepsilon ,3\varepsilon )\) and unpacking the bundled successor-boundary fields. </p>
 
   </div>
 </div>
@@ -1364,7 +1562,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">10.13</span>
+    <span class="remark_thmlabel">10.16</span>
     <span class="remark_thmtitle">Lean measurement-unsymmetrization bridge</span>
     <div class="thm_header_extras">
 
@@ -1386,11 +1584,11 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#lem:main-formal-successor-handoff">Proposition 10.12</a></li>
+          <li><a href="sec-induction.html#lem:main-formal-successor-handoff">Proposition 10.15</a></li>
           
-          <li><a href="sec-induction.html#lem:symmetrization-bridge">Lemma 10.9</a></li>
+          <li><a href="sec-induction.html#lem:symmetrization-bridge">Lemma 10.12</a></li>
           
-          <li><a href="sec-the-test.html#thm:main-formal">Theorem 2.11</a></li>
+          <li><a href="sec-the-test.html#thm:main-formal">Theorem 2.12</a></li>
           
         </ul>
     
@@ -1428,7 +1626,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">10.14</span>
+    <span class="definition_thmlabel">10.17</span>
     <span class="definition_thmtitle">Final error envelope</span>
     <div class="thm_header_extras">
 
@@ -1475,7 +1673,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">10.15</span>
+    <span class="theorem_thmlabel">10.18</span>
     <span class="theorem_thmtitle">Basic facts about the final error envelope</span>
     <div class="thm_header_extras">
 
@@ -1502,7 +1700,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.14</a></li>
+          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.17</a></li>
           
         </ul>
     
@@ -1560,7 +1758,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">10.16</span>
+    <span class="definition_thmlabel">10.19</span>
     <span class="definition_thmtitle">Cascade parameters and standing hypotheses</span>
     <div class="thm_header_extras">
 
@@ -1584,7 +1782,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.14</a></li>
+          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.17</a></li>
           
         </ul>
     
@@ -1640,7 +1838,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">10.17</span>
+    <span class="theorem_thmlabel">10.20</span>
     <span class="theorem_thmtitle">Bound for the first cascade term</span>
     <div class="thm_header_extras">
 
@@ -1667,9 +1865,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.14</a></li>
+          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.17</a></li>
           
-          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.16</a></li>
+          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.19</a></li>
           
         </ul>
     
@@ -1728,7 +1926,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">10.18</span>
+    <span class="theorem_thmlabel">10.21</span>
     <span class="theorem_thmtitle">Cascade bounds for the later cascade terms</span>
     <div class="thm_header_extras">
 
@@ -1755,11 +1953,11 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.14</a></li>
+          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.17</a></li>
           
-          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.16</a></li>
+          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.19</a></li>
           
-          <li><a href="sec-induction.html#thm:sigma-bound-main-formal">Theorem 10.17</a></li>
+          <li><a href="sec-induction.html#thm:sigma-bound-main-formal">Theorem 10.20</a></li>
           
         </ul>
     
@@ -1834,7 +2032,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">10.19</span>
+    <span class="theorem_thmlabel">10.22</span>
     <span class="theorem_thmtitle">Consolidated error cascade</span>
     <div class="thm_header_extras">
 
@@ -1861,13 +2059,13 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.14</a></li>
+          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.17</a></li>
           
-          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.16</a></li>
+          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.19</a></li>
           
-          <li><a href="sec-induction.html#thm:sigma-bound-main-formal">Theorem 10.17</a></li>
+          <li><a href="sec-induction.html#thm:sigma-bound-main-formal">Theorem 10.20</a></li>
           
-          <li><a href="sec-induction.html#thm:zeta-bounds-main-formal">Theorem 10.18</a></li>
+          <li><a href="sec-induction.html#thm:zeta-bounds-main-formal">Theorem 10.21</a></li>
           
         </ul>
     
@@ -1925,7 +2123,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>This is the direct packaging of Theorem&#160;<a href="sec-induction.html#thm:sigma-bound-main-formal">10.17</a> and Theorem&#160;<a href="sec-induction.html#thm:zeta-bounds-main-formal">10.18</a>. The Lean declaration uses the explicit equalities naming \(\sigma ,\zeta _1,\zeta _2,\zeta _3\) as the corresponding cascade expressions. </p>
+  <p>This is the direct packaging of Theorem&#160;<a href="sec-induction.html#thm:sigma-bound-main-formal">10.20</a> and Theorem&#160;<a href="sec-induction.html#thm:zeta-bounds-main-formal">10.21</a>. The Lean declaration uses the explicit equalities naming \(\sigma ,\zeta _1,\zeta _2,\zeta _3\) as the corresponding cascade expressions. </p>
 
   </div>
 </div>
@@ -1934,7 +2132,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">10.20</span>
+    <span class="remark_thmlabel">10.23</span>
     <span class="remark_thmtitle">Lean Step 5 expansion theorem</span>
     <div class="thm_header_extras">
 
@@ -1958,7 +2156,7 @@
           
           <li><a href="sec-prelims.html#lem:schwartz-zippel-individual">Lemma 3.7</a></li>
           
-          <li><a href="sec-the-test.html#thm:main-formal">Theorem 2.11</a></li>
+          <li><a href="sec-the-test.html#thm:main-formal">Theorem 2.12</a></li>
           
         </ul>
     
@@ -1996,7 +2194,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">10.21</span>
+    <span class="remark_thmlabel">10.24</span>
     <span class="remark_thmtitle">Lean residual packages for the main-formal assembly</span>
     <div class="thm_header_extras">
 
@@ -2018,9 +2216,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#thm:error-cascade-main-formal">Theorem 10.19</a></li>
+          <li><a href="sec-induction.html#thm:error-cascade-main-formal">Theorem 10.22</a></li>
           
-          <li><a href="sec-induction.html#thm:main-formal-envelope-basics">Theorem 10.15</a></li>
+          <li><a href="sec-induction.html#thm:main-formal-envelope-basics">Theorem 10.18</a></li>
           
         </ul>
     
@@ -2079,7 +2277,7 @@
 <div class="displaymath" id="a0000000593">
   \[  \nu = 10000k^2m^2\left(\varepsilon ^{1/1024}+(d/q)^{1/1024}\right), \qquad \sigma = m^2\left(\nu +e^{-k/(80000m^2)}\right).  \]
 </div>
-<p> Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.7</a> applied to the symmetrized strategy produces a measurement \(G=\{ G_g\}  \in \mathrm{PolyMeas}(m,q,d)\) such that </p>
+<p> Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.10</a> applied to the symmetrized strategy produces a measurement \(G=\{ G_g\}  \in \mathrm{PolyMeas}(m,q,d)\) such that </p>
 <div class="equation" id="eq:just-applied-induction">
 <p>
   <div class="equation_content">
@@ -2195,8 +2393,8 @@
   <span class="equation_label">12</span>
 </p>
 </div>
-<p>Remark&#160;<a href="sec-induction.html#rem:main-formal-lean-residual-packages">10.21</a> records the Lean residual packages that separate the scalar cascade and the Step&#160;5 Schwartz–Zippel handoff from the remaining projective-stage transport work. The scalar side discharges the paper’s line&#160;71–73 coarsening and the Step&#160;8 hypotheses in the non-vacuous branch; the Step&#160;5 wrapper now turns the evaluated estimate at line&#160;116 into full-polynomial consistency at \(\zeta _1\). The remaining Lean residual is the completion-and-line-169 construction: supply the actual role-register measurement, Alice’s line-146 completion estimate, Bob’s left-register completion estimate, and the two exact polynomial-level \(\zeta _1\) links. Lean transports the Bob-side completion estimate to the line-147 right-register form, reconstructs the duplicated Step&#160;6 pre-projective consistency field from these inputs and <span class="ttfamily">hpass</span>, then data-processes the line-169 links to line&#160;172 and derives the two \(\zeta _4\) point goals and the \(\zeta _3/2\) self-consistency target. </p>
-<p>With \(E\) as in Definition&#160;<a href="sec-induction.html#def:main-formal-envelope">10.14</a>, the quantities \(\sigma ,\zeta _1,\zeta _2,\zeta _3,\zeta _4\) form the cascade of Definition&#160;<a href="sec-induction.html#def:main-formal-error-cascade">10.16</a>. Theorem&#160;<a href="sec-induction.html#thm:sigma-bound-main-formal">10.17</a> and Theorem&#160;<a href="sec-induction.html#thm:zeta-bounds-main-formal">10.18</a> package the final inflation to the scale \(100000k^2m^4 E\). The underlying paper estimates are: </p>
+<p>Remark&#160;<a href="sec-induction.html#rem:main-formal-lean-residual-packages">10.24</a> records the Lean residual packages that separate the scalar cascade and the Step&#160;5 Schwartz–Zippel handoff from the remaining projective-stage transport work. The scalar side discharges the paper’s line&#160;71–73 coarsening and the Step&#160;8 hypotheses in the non-vacuous branch; the Step&#160;5 wrapper now turns the evaluated estimate at line&#160;116 into full-polynomial consistency at \(\zeta _1\). The remaining Lean residual is the completion-and-line-169 construction: supply the actual role-register measurement, Alice’s line-146 completion estimate, Bob’s left-register completion estimate, and the two exact polynomial-level \(\zeta _1\) links. Lean transports the Bob-side completion estimate to the line-147 right-register form, reconstructs the duplicated Step&#160;6 pre-projective consistency field from these inputs and <span class="ttfamily">hpass</span>, then data-processes the line-169 links to line&#160;172 and derives the two \(\zeta _4\) point goals and the \(\zeta _3/2\) self-consistency target. </p>
+<p>With \(E\) as in Definition&#160;<a href="sec-induction.html#def:main-formal-envelope">10.17</a>, the quantities \(\sigma ,\zeta _1,\zeta _2,\zeta _3,\zeta _4\) form the cascade of Definition&#160;<a href="sec-induction.html#def:main-formal-error-cascade">10.19</a>. Theorem&#160;<a href="sec-induction.html#thm:sigma-bound-main-formal">10.20</a> and Theorem&#160;<a href="sec-induction.html#thm:zeta-bounds-main-formal">10.21</a> package the final inflation to the scale \(100000k^2m^4 E\). The underlying paper estimates are: </p>
 <div class="displaymath" id="a0000000605">
   \[  \sigma \le 10000k^2m^4\left(\varepsilon ^{1/1024}+(d/q)^{1/1024}+e^{-k/(80000m^2)}\right).  \]
 </div>
