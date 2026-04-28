@@ -1757,20 +1757,20 @@ lemma RestrictedProbabilitiesStatement.ofWeightedBounds
         exact ⟨le_rfl, le_rfl, le_rfl⟩ }
   have haxis_weighted_avg :
       sliceTransverseDirectionWeight params *
-          avgRestrictedAxisError params profile ≤ eps := by
-    simpa [profile, avgRestrictedAxisError, avgOver_const_mul] using
+          averageRestrictedAxisParallelError params profile ≤ eps := by
+    simpa [profile, averageRestrictedAxisParallelError, avgOver_const_mul] using
       haxisWeightedBound
   have hdiag_weighted_avg :
       sliceTransverseDirectionWeight params *
-          avgRestrictedDiagError params profile ≤ gamma := by
-    simpa [profile, avgRestrictedDiagError, avgOver_const_mul] using
+          averageRestrictedDiagonalError params profile ≤ gamma := by
+    simpa [profile, averageRestrictedDiagonalError, avgOver_const_mul] using
       hdiagonalWeightedBound
   refine ⟨profile, ?_⟩
   refine ⟨weighted_bound_to_average params haxis_weighted_avg, ?_, ?_⟩
   · calc
-      avgRestrictedSelfError params profile
+      averageRestrictedSelfConsistencyError params profile
         = strategy.selfConsistencyFailureProbability := by
-            simpa [profile, avgRestrictedSelfError] using
+            simpa [profile, averageRestrictedSelfConsistencyError] using
               selfConsistencyRestrictedAverage_eq params strategy
       _ ≤ delta := hgood.selfConsistencyTest
   · exact weighted_bound_to_average params hdiag_weighted_avg
@@ -2016,38 +2016,38 @@ private lemma average_sliceSelfImprovementError_le
   have haxis_avg :
       avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.axisParallel x) (1 / (32 : Error))) ≤
         Real.rpow
-          (avgRestrictedAxisError params hrestrict.profile)
+          (averageRestrictedAxisParallelError params hrestrict.profile)
           (1 / (32 : Error)) := by
-    simpa [avgRestrictedAxisError, 𝒟] using
+    simpa [averageRestrictedAxisParallelError, 𝒟] using
       avgOver_uniform_rpow_one_div_le_rpow_avg
         (α := Fq params) (f := hrestrict.profile.axisParallel) (n := 32) (by norm_num)
         (restricted_axis_nonneg params hrestrict.profile)
   have hself_avg :
       avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.selfConsistency x) (1 / (32 : Error))) ≤
         Real.rpow
-          (avgRestrictedSelfError params hrestrict.profile)
+          (averageRestrictedSelfConsistencyError params hrestrict.profile)
           (1 / (32 : Error)) := by
-    simpa [avgRestrictedSelfError, 𝒟] using
+    simpa [averageRestrictedSelfConsistencyError, 𝒟] using
       avgOver_uniform_rpow_one_div_le_rpow_avg
         (α := Fq params) (f := hrestrict.profile.selfConsistency) (n := 32) (by norm_num)
         (restricted_self_nonneg params hrestrict.profile)
   have hm_le_next : (params.m : Error) ≤ (params.next.m : Error) := by
     exact_mod_cast Nat.le_succ params.m
-  have haxis_nonneg : 0 ≤ avgRestrictedAxisError params hrestrict.profile := by
-    simpa [avgRestrictedAxisError, 𝒟] using
+  have haxis_nonneg : 0 ≤ averageRestrictedAxisParallelError params hrestrict.profile := by
+    simpa [averageRestrictedAxisParallelError, 𝒟] using
       avgOver_nonneg 𝒟 hrestrict.profile.axisParallel
         (restricted_axis_nonneg params hrestrict.profile)
-  have hself_nonneg : 0 ≤ avgRestrictedSelfError params hrestrict.profile := by
-    simpa [avgRestrictedSelfError, 𝒟] using
+  have hself_nonneg : 0 ≤ averageRestrictedSelfConsistencyError params hrestrict.profile := by
+    simpa [averageRestrictedSelfConsistencyError, 𝒟] using
       avgOver_nonneg 𝒟 hrestrict.profile.selfConsistency
         (restricted_self_nonneg params hrestrict.profile)
   have haxis_rpow_le :
-      Real.rpow (avgRestrictedAxisError params hrestrict.profile) (1 / (32 : Error)) ≤
+      Real.rpow (averageRestrictedAxisParallelError params hrestrict.profile) (1 / (32 : Error)) ≤
         Real.rpow (sliceConditioningLoss params * eps) (1 / (32 : Error)) := by
     exact Real.rpow_le_rpow haxis_nonneg hrestrict.axisAverageBound (by positivity)
   have hself_rpow_le :
       Real.rpow
-          (avgRestrictedSelfError params hrestrict.profile)
+          (averageRestrictedSelfConsistencyError params hrestrict.profile)
           (1 / (32 : Error)) ≤
         Real.rpow delta (1 / (32 : Error)) := by
     exact Real.rpow_le_rpow hself_nonneg hrestrict.selfAverageBound (by positivity)
@@ -2135,25 +2135,27 @@ private lemma average_sliceMainInductionNu_le
   have haxis_avg :
       avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.axisParallel x) (1 / (1024 : Error))) ≤
         Real.rpow
-          (avgRestrictedAxisError params hrestrict.profile)
+          (averageRestrictedAxisParallelError params hrestrict.profile)
           (1 / (1024 : Error)) := by
-    simpa [avgRestrictedAxisError, 𝒟] using
+    simpa [averageRestrictedAxisParallelError, 𝒟] using
       avgOver_uniform_rpow_one_div_le_rpow_avg
         (α := Fq params) (f := hrestrict.profile.axisParallel) (n := 1024) (by norm_num)
         (restricted_axis_nonneg params hrestrict.profile)
   have hself_avg :
       avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.selfConsistency x) (1 / (1024 : Error))) ≤
         Real.rpow
-          (avgRestrictedSelfError params hrestrict.profile)
+          (averageRestrictedSelfConsistencyError params hrestrict.profile)
           (1 / (1024 : Error)) := by
-    simpa [avgRestrictedSelfError, 𝒟] using
+    simpa [averageRestrictedSelfConsistencyError, 𝒟] using
       avgOver_uniform_rpow_one_div_le_rpow_avg
         (α := Fq params) (f := hrestrict.profile.selfConsistency) (n := 1024) (by norm_num)
         (restricted_self_nonneg params hrestrict.profile)
   have hdiag_avg :
       avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.diagonal x) (1 / (1024 : Error))) ≤
-        Real.rpow (avgRestrictedDiagError params hrestrict.profile) (1 / (1024 : Error)) := by
-    simpa [avgRestrictedDiagError, 𝒟] using
+        Real.rpow
+          (averageRestrictedDiagonalError params hrestrict.profile)
+          (1 / (1024 : Error)) := by
+    simpa [averageRestrictedDiagonalError, 𝒟] using
       avgOver_uniform_rpow_one_div_le_rpow_avg
         (α := Fq params) (f := hrestrict.profile.diagonal) (n := 1024) (by norm_num)
         (restricted_diag_nonneg params hrestrict.profile)
@@ -2161,30 +2163,32 @@ private lemma average_sliceMainInductionNu_le
     have hm_le_next : (params.m : Error) ≤ (params.next.m : Error) := by
       exact_mod_cast Nat.le_succ params.m
     nlinarith
-  have haxis_nonneg : 0 ≤ avgRestrictedAxisError params hrestrict.profile := by
-    simpa [avgRestrictedAxisError, 𝒟] using
+  have haxis_nonneg : 0 ≤ averageRestrictedAxisParallelError params hrestrict.profile := by
+    simpa [averageRestrictedAxisParallelError, 𝒟] using
       avgOver_nonneg 𝒟 hrestrict.profile.axisParallel
         (restricted_axis_nonneg params hrestrict.profile)
-  have hself_nonneg : 0 ≤ avgRestrictedSelfError params hrestrict.profile := by
-    simpa [avgRestrictedSelfError, 𝒟] using
+  have hself_nonneg : 0 ≤ averageRestrictedSelfConsistencyError params hrestrict.profile := by
+    simpa [averageRestrictedSelfConsistencyError, 𝒟] using
       avgOver_nonneg 𝒟 hrestrict.profile.selfConsistency
         (restricted_self_nonneg params hrestrict.profile)
-  have hdiag_nonneg : 0 ≤ avgRestrictedDiagError params hrestrict.profile := by
-    simpa [avgRestrictedDiagError, 𝒟] using
+  have hdiag_nonneg : 0 ≤ averageRestrictedDiagonalError params hrestrict.profile := by
+    simpa [averageRestrictedDiagonalError, 𝒟] using
       avgOver_nonneg 𝒟 hrestrict.profile.diagonal
         (restricted_diag_nonneg params hrestrict.profile)
   have haxis_rpow_le :
-      Real.rpow (avgRestrictedAxisError params hrestrict.profile) (1 / (1024 : Error)) ≤
+      Real.rpow
+          (averageRestrictedAxisParallelError params hrestrict.profile)
+          (1 / (1024 : Error)) ≤
         Real.rpow (sliceConditioningLoss params * eps) (1 / (1024 : Error)) := by
     exact Real.rpow_le_rpow haxis_nonneg hrestrict.axisAverageBound (by positivity)
   have hself_rpow_le :
       Real.rpow
-          (avgRestrictedSelfError params hrestrict.profile)
+          (averageRestrictedSelfConsistencyError params hrestrict.profile)
           (1 / (1024 : Error)) ≤
         Real.rpow delta (1 / (1024 : Error)) := by
     exact Real.rpow_le_rpow hself_nonneg hrestrict.selfAverageBound (by positivity)
   have hdiag_rpow_le :
-      Real.rpow (avgRestrictedDiagError params hrestrict.profile) (1 / (1024 : Error)) ≤
+      Real.rpow (averageRestrictedDiagonalError params hrestrict.profile) (1 / (1024 : Error)) ≤
         Real.rpow (sliceConditioningLoss params * gamma) (1 / (1024 : Error)) := by
     exact Real.rpow_le_rpow hdiag_nonneg hrestrict.diagonalAverageBound (by positivity)
   have haxis_term :
