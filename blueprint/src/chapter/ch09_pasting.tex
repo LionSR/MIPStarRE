@@ -215,6 +215,7 @@ where
 	\]
 \end{proposition}
 \begin{proof}
+	\leanok
 	The total variation distance is exactly the probability mass of the collision
 	event for a uniformly random tuple, because the distinct-tuple distribution is
 	the uniform distribution conditioned on landing in $\mathsf{Distinct}_k$. A
@@ -358,6 +359,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	Because $G$ is projective, \ref{prop:two-notions-of-self-consistency} identifies the assumed strong self-consistency of the outcome-level family with
 	\begin{equation}\label{eq:ld-g-self-consistency}
 		\E_x \sum_g \bra{\psi} G_g^x \ot G_g^x \ket{\psi}
@@ -385,6 +387,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\]
 \end{corollary}
 \begin{proof}
+	\leanok
 	Since $G_\bot^x = I-G^x$,
 	\[
 		G_\bot^x \ot I - I \ot G_\bot^x = I \ot G^x - G^x \ot I,
@@ -419,13 +422,6 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 		G^x M_o^y \ot I \approx_{6\sqrt{\zeta}+6\sqrt{\omega}+4\sqrt{\chi}} M_o^y G^x \ot I.
 	\]
 \end{lemma}
-\begin{remark}\label{rem:commutativity-switcheroo-permInv}
-	The Lean formalization \lean{MIPStarRE.LDT.Pasting.commutativitySwitcheroo} takes an
-	additional hypothesis \texttt{PermInvState ψbi}, the permutation-invariance of the
-	strategy state under the players' swap. In the paper this is implicit in the symmetric
-	two-prover strategy, and it is used to identify $\bra{\psi} G \ot M \ket{\psi}$ with
-	$\bra{\psi} M \ot G \ket{\psi}$ at the center of the triangle-inequality chain.
-\end{remark}
 \begin{proof}
 	\leanok
 	Let $M = \E_y \sum_o M_o^y$. The error to bound is
@@ -520,6 +516,13 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 		6\sqrt{\zeta}+6\sqrt{\omega}+4\sqrt{\chi}.
 	\]
 \end{proof}
+\begin{remark}\label{rem:commutativity-switcheroo-permInv}
+	The Lean formalization \lean{MIPStarRE.LDT.Pasting.commutativitySwitcheroo} takes an
+	additional hypothesis \texttt{PermInvState ψbi}, the permutation-invariance of the
+	strategy state under the players' swap. In the paper this is implicit in the symmetric
+	two-prover strategy, and it is used to identify $\bra{\psi} G \ot M \ket{\psi}$ with
+	$\bra{\psi} M \ot G \ket{\psi}$ at the center of the triangle-inequality chain.
+\end{remark}
 
 \begin{corollary}[Commutativity of the complete part]\label{cor:commuting-with-G-complete}
 	\lean{MIPStarRE.LDT.Pasting.commutingWithGComplete}
@@ -539,6 +542,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\]
 \end{corollary}
 \begin{proof}
+	\leanok
 	By \ref{eq:quote-com-main},
 	\begin{equation}\label{eq:com-main-copy}
 		G_g^x G_h^y \ot I \approx_{\nu_{\mathrm{com}}} G_h^y G_g^x \ot I.
@@ -574,6 +578,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\]
 \end{corollary}
 \begin{proof}
+	\leanok
 	The identities
 	\[
 		G_g^x G_\bot^y - G_\bot^y G_g^x = G^y G_g^x - G_g^x G^y
@@ -602,6 +607,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\]
 \end{corollary}
 \begin{proof}
+	\leanok
 	For \ref{eq:gselfconall}, split the outcome set into the genuine outcomes and $\bot$:
 	\[
 		\E_x \sum_g \|(\widehat G_g^x \ot I - I \ot \widehat G_g^x)\ket{\psi}\|^2
@@ -658,6 +664,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	Repeatedly move the leftmost factor across the remaining product, using \ref{eq:gselfconall} and \ref{eq:gcomall} at each step and summing the resulting errors with \ref{prop:triangle-inequality-for-approx_delta}. The paper's calculation gives
 	\[
 		3k\bigl(4k\zeta + k\nu_3\bigr)
@@ -781,6 +788,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	The inconsistency with $B^u$ expands as
 	\begin{align}
 		    & \E_u \sum_{f\ne f'} \bra{\psi} H_{[h|_u=f']} \ot B_f^u \ket{\psi}\nonumber                                   \\
