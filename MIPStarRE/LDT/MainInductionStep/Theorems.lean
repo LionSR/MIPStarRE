@@ -1926,7 +1926,7 @@ theorem mainInductionFromPackages
         hH.pointConsistency, by simpa [kappa, zeta] using hpaste.error_le⟩
   exact mainInductionOfWitness params.next strategy eps delta gamma k hwitness
 
-private lemma restrictedAxisProb_nonneg
+private lemma restrictedAxisParallelFailureProbability_nonneg
     (params : Parameters) [FieldModel params.q]
     (strategy : RestrictedSymStrat params ι) :
     0 ≤ strategy.axisParallelFailureProbability := by
@@ -1944,10 +1944,11 @@ private lemma restricted_axis_nonneg
     ∀ x, 0 ≤ profile.axisParallel x := by
   intro x
   exact le_trans
-    (restrictedAxisProb_nonneg params (xRestrictedStrategy params strategy x))
+    (restrictedAxisParallelFailureProbability_nonneg params
+      (xRestrictedStrategy params strategy x))
     (profile.restrictedGood x).axisParallelTest
 
-private lemma restrictedSelfProb_nonneg
+private lemma restrictedSelfConsistencyFailureProbability_nonneg
     (params : Parameters) [FieldModel params.q]
     (strategy : RestrictedSymStrat params ι) :
     0 ≤ strategy.selfConsistencyFailureProbability := by
@@ -1964,11 +1965,11 @@ private lemma restricted_self_nonneg
     ∀ x, 0 ≤ profile.selfConsistency x := by
   intro x
   exact le_trans
-    (restrictedSelfProb_nonneg params
+    (restrictedSelfConsistencyFailureProbability_nonneg params
       (xRestrictedStrategy params strategy x))
     (profile.restrictedGood x).selfConsistencyTest
 
-private lemma restrictedDiagProb_nonneg
+private lemma restrictedDiagonalFailureProbability_nonneg
     (params : Parameters) [FieldModel params.q]
     (strategy : RestrictedSymStrat params ι) :
     0 ≤ strategy.diagonalFailureProbability := by
@@ -1990,7 +1991,8 @@ private lemma restricted_diag_nonneg
     ∀ x, 0 ≤ profile.diagonal x := by
   intro x
   exact le_trans
-    (restrictedDiagProb_nonneg params (xRestrictedStrategy params strategy x))
+    (restrictedDiagonalFailureProbability_nonneg params
+      (xRestrictedStrategy params strategy x))
     (profile.restrictedGood x).diagonalLineTest
 
 /-- Averaging the slice self-improvement errors gives the paper's displayed
