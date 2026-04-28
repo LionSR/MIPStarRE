@@ -1737,7 +1737,8 @@ private lemma fromHToG_closenessOfIP_avgContext
     _ ≤ Real.sqrt (avgOver 𝒟 (fun q => ∑ a : OutcomeA, x q a)) *
           Real.sqrt (avgOver 𝒟 (fun q => ∑ a : OutcomeA, y q a)) := hweighted
     _ ≤ 1 * Real.sqrt (avgOver 𝒟 (fun q => ∑ a : OutcomeA, y q a)) := by
-          exact mul_le_mul_of_nonneg_right (by simpa using Real.sqrt_le_sqrt hC) (Real.sqrt_nonneg _)
+          exact mul_le_mul_of_nonneg_right
+            (by simpa using Real.sqrt_le_sqrt hC) (Real.sqrt_nonneg _)
     _ = Real.sqrt (avgOver 𝒟 (fun q => ∑ a : OutcomeA, y q a)) := by ring
     _ = Real.sqrt (avgOver 𝒟 (fun q => qSDDCore ψ (A q) (B q))) := by rw [hy_eq]
     _ ≤ Real.sqrt γ := by
@@ -3848,54 +3849,6 @@ private lemma fromHToGAdjacentStageM4_eq_collapsed
     (Strue * family.averagedSubMeas.total)
     (Sfalse * (1 - family.averagedSubMeas.total))).symm
 
-/-- Raw `qSDDCore` form of the half-sandwich commutation hypothesis after
-splitting a nonempty sandwich into its head and tail, with the error weakened to
-the ambient length `k`. -/
-private lemma fromHToG_headTail_qSDDCore_bound
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (gamma zeta : Error)
-    (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
-    (hhalf : ∀ j : ℕ, 2 ≤ j →
-      CommuteGHalfSandwichStatement params ψbi family gamma zeta j)
-    {n k : ℕ} (hn : 2 ≤ n + 1) (hnk : n + 1 ≤ k) :
-    avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
-      qSDDCore ψbi
-        (fun ogs : GHatOutcome params × GHatTupleOutcome params n =>
-          leftTensor (ι₂ := ι)
-            ((gHatIdxMeas params family q.1).outcome ogs.1 *
-              gHatHalfProductOutcomeOperator params family n q.2 ogs.2))
-        (fun ogs : GHatOutcome params × GHatTupleOutcome params n =>
-          leftTensor (ι₂ := ι)
-            (gHatHalfProductOutcomeOperator params family n q.2 ogs.2 *
-              (gHatIdxMeas params family q.1).outcome ogs.1))) ≤
-      commuteGHalfSandwichError params gamma zeta k := by
-  have hsplit : SDDOpRel ψbi
-      (uniformDistribution (Fq params × PointTuple params n))
-      (headTailOrderedFamily params family n)
-      (headTailRotatedFamily params family n)
-      (commuteGHalfSandwichError params gamma zeta (n + 1)) := by
-    exact (commuteGHalfSandwich_split_iff params ψbi family n
-      (commuteGHalfSandwichError params gamma zeta (n + 1))).1
-      (hhalf (n + 1) hn).repeatedCommutation
-  have hcore :
-      avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
-        qSDDCore ψbi
-          (fun ogs : GHatOutcome params × GHatTupleOutcome params n =>
-            leftTensor (ι₂ := ι)
-              ((gHatIdxMeas params family q.1).outcome ogs.1 *
-                gHatHalfProductOutcomeOperator params family n q.2 ogs.2))
-          (fun ogs : GHatOutcome params × GHatTupleOutcome params n =>
-            leftTensor (ι₂ := ι)
-              (gHatHalfProductOutcomeOperator params family n q.2 ogs.2 *
-                (gHatIdxMeas params family q.1).outcome ogs.1))) ≤
-        commuteGHalfSandwichError params gamma zeta (n + 1) := by
-    simpa [sddErrorOp, qSDDOp, headTailOrderedFamily, headTailRotatedFamily,
-      leftTensor_mul_leftTensor] using hsplit.squaredDistanceBound
-  exact le_trans hcore
-    (commuteGHalfSandwichError_mono_length params gamma zeta hgamma_nonneg hzeta_nonneg hnk)
-
 /-- The completed self-consistency estimate used in the first and final move-right
 steps, after adjoining an irrelevant uniform suffix-question register. -/
 private lemma fromHToG_selfConsistency_qSDDCore_bound
@@ -3924,40 +3877,10 @@ private lemma fromHToG_selfConsistency_qSDDCore_bound
     (A := IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyLeftFamily params family))
     (B := IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyRightFamily params family))
     (δ := gHatSelfConsistencyError zeta) hscOp
-  simpa [sddErrorOp, qSDDOp, qSDDCore, gHatSelfConsistencyLeftFamily,
-    gHatSelfConsistencyRightFamily, gHatSelfConsistencyError, IdxSubMeas.toIdxOpFamily,
-    SubMeas.toOpFamily, leftPlacedSubMeas, rightPlacedSubMeas] using
-    hprod.squaredDistanceBound
-
-/-- Adjoint-oriented raw `qSDDCore` form of the half-sandwich commutation
-hypothesis.  This is the orientation used by the paper's Cauchy--Schwarz
-decompositions in `eq:call-this-later` and `eq:call-again-later-part-dos`. -/
-private lemma fromHToG_headTail_adjoint_qSDDCore_bound
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (gamma zeta : Error)
-    (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
-    (hhalf : ∀ j : ℕ, 2 ≤ j →
-      CommuteGHalfSandwichStatement params ψbi family gamma zeta j)
-    {n k : ℕ} (hn : 2 ≤ n + 1) (hnk : n + 1 ≤ k) :
-    avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
-      qSDDCore ψbi
-        (fun ogs : GHatOutcome params × GHatTupleOutcome params n =>
-          leftTensor (ι₂ := ι)
-            ((gHatHalfProductOutcomeOperator params family n q.2 ogs.2)ᴴ *
-              (gHatIdxMeas params family q.1).outcome ogs.1))
-        (fun ogs : GHatOutcome params × GHatTupleOutcome params n =>
-          leftTensor (ι₂ := ι)
-            ((gHatIdxMeas params family q.1).outcome ogs.1 *
-              (gHatHalfProductOutcomeOperator params family n q.2 ogs.2)ᴴ))) ≤
-      commuteGHalfSandwichError params gamma zeta k := by
-  /- Paper lines 1506--1610 orient the commutator square through adjoints before
-  applying the half-sandwich hypothesis.  The required Lean bridge should reduce
-  this adjoint-oriented `qSDDCore` to `fromHToG_headTail_qSDDCore_bound` using
-  `fromHToG_adjoint_commutator_square_eq` and
-  `fromHToG_gHatIdxMeas_outcome_isHermitian`. -/
-  sorry
+  simpa [sddErrorOp, qSDDOp, qSDDCore, IdxSubMeas.toIdxOpFamily,
+    SubMeas.toOpFamily, gHatSelfConsistencyLeftFamily,
+    gHatSelfConsistencyRightFamily, gHatSelfConsistencyError,
+    leftPlacedSubMeas, rightPlacedSubMeas] using hprod.squaredDistanceBound
 
 /-- The total mass of the tail sandwich family is the identity. -/
 private lemma fromHToG_gHatSandwichFamily_total_eq_one
@@ -3975,6 +3898,44 @@ private lemma fromHToG_gHatSandwichFamily_sum_eq_one
   rw [(gHatSandwichFamily params family n xs).sum_eq_total]
   exact fromHToG_gHatSandwichFamily_total_eq_one params family n xs
 
+/-- The remaining paper-line analytic edge estimates for one adjacent `fromHToG` move.
+
+The exact stage endpoints, branch averages, and the first move-right side
+condition are proved in this file.  This residual isolates the still-open
+Cauchy--Schwarz estimates from `ld-pasting.tex:1506--1645`: the two
+half-sandwich commutations `M₁ → M₂` and `M₂ → M₃`, and the final
+move-right edge `M₃ → M₄`. -/
+private structure FromHToGMoveChainAnalyticFacts
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error) (k : ℕ) : Prop where
+  m1_m2 :
+    ∀ ℓ : ℕ, ℓ < k →
+      |fromHToGAdjacentStageM1 params ψbi family k ℓ -
+          fromHToGAdjacentStageM2 params ψbi family k ℓ| ≤
+        Real.sqrt (commuteGHalfSandwichError params gamma zeta k)
+  m2_m3 :
+    ∀ ℓ : ℕ, ℓ < k →
+      |fromHToGAdjacentStageM2 params ψbi family k ℓ -
+          fromHToGAdjacentStageM3 params ψbi family k ℓ| ≤
+        Real.sqrt (commuteGHalfSandwichError params gamma zeta k)
+  m3_m4_firstRoot :
+    ∀ ℓ : ℕ, ℓ < k →
+      let n := k - (ℓ + 1)
+      let C : Fq params × PointTuple params n → GHatOutcome params →
+          GHatTupleOutcome params n → MIPStarRE.Quantum.Op (ι × ι) := fun q g gs =>
+        let S := fromHToGRecurrenceWeight params family ℓ
+          (prependTypeBit g.isSome (gHatTupleType gs))
+        let U := (gHatIdxMeas params family q.1).outcome g
+        let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+        leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) (S * U)
+      ∀ q : Fq params × PointTuple params n,
+        ∑ g : GHatOutcome params,
+          (∑ gs : GHatTupleOutcome params n, C q g gs) *
+            (∑ gs : GHatTupleOutcome params n, C q g gs)ᴴ ≤ 1
+
 /-- One adjacent `fromHToG` paper step.
 
 This is the structured replacement for the former opaque residual.  The four
@@ -3991,8 +3952,9 @@ expressions in `ld-pasting.tex:1449--1619`:
   (`eq:h-ot-mgg`) and then collapses using projectivity and the exact
   `S`-recurrence (`ld-pasting.tex:1648--1661`), cost `√(2ζ)`.
 
-The `sorry`s below are intentionally narrow proof obligations matching these
-four paper estimates; downstream packaging no longer hides them in one residual. -/
+The three still-open analytic edge estimates are now bundled in
+`FromHToGMoveChainAnalyticFacts`; the proof below handles the surrounding exact
+bookkeeping and scalar telescope. -/
 private lemma fromHToGAdjacentStage_paperMoveChain
     (params : Parameters)
     [FieldModel params.q]
@@ -4000,12 +3962,11 @@ private lemma fromHToGAdjacentStage_paperMoveChain
     (hnorm : ψbi.IsNormalized)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
-    (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
     (hfacts : GHatFactsStatement params ψbi family gamma zeta)
-    (hhalf : ∀ j : ℕ, 2 ≤ j →
-      CommuteGHalfSandwichStatement params ψbi family gamma zeta j)
     (hstageExact : FromHToGAdjacentStageExactFacts params ψbi family)
-    (k ℓ : ℕ) (hℓ : ℓ < k) :
+    (k : ℕ)
+    (hanalytic : FromHToGMoveChainAnalyticFacts params ψbi family gamma zeta k)
+    (ℓ : ℕ) (hℓ : ℓ < k) :
     |fromHToGStageMass params ψbi family k ℓ -
         fromHToGStageMass params ψbi family k (ℓ + 1)| ≤
       fromHToGRecurrenceError params gamma zeta k := by
@@ -4115,7 +4076,8 @@ private lemma fromHToGAdjacentStage_paperMoveChain
               (CStarAlgebra.nonneg_iff_eq_star_mul_self).2 ⟨Tᴴ, rfl⟩
             simpa using hpos
           have hS_pos : 0 ≤ S :=
-            fromHToGRecurrenceWeight_nonneg params family ℓ (prependTypeBit g.isSome (gHatTupleType gs))
+            fromHToGRecurrenceWeight_nonneg params family ℓ
+              (prependTypeBit g.isSome (gHatTupleType gs))
           rw [leftTensor_mul_rightTensor_eq_opTensor]
           exact MIPStarRE.Quantum.kronecker_nonneg hTT_pos hS_pos
         have htail_le_one : ∀ g : GHatOutcome params, tailBlock g ≤ 1 := by
@@ -4162,7 +4124,8 @@ private lemma fromHToGAdjacentStage_paperMoveChain
                       fromHToG_gHatSandwichFamily_sum_eq_one params family n q.2
                   rw [hsum]
                   simp [leftTensor]
-        have htail_sq_le_self : ∀ g : GHatOutcome params, tailBlock g * tailBlock g ≤ tailBlock g := by
+        have htail_sq_le_self : ∀ g : GHatOutcome params,
+            tailBlock g * tailBlock g ≤ tailBlock g := by
           intro g
           exact MIPStarRE.Quantum.sq_le_self (htail_pos g) (htail_le_one g)
         have hterm_le : ∀ g : GHatOutcome params,
@@ -4172,7 +4135,8 @@ private lemma fromHToGAdjacentStage_paperMoveChain
           intro g
           let U := (gHatIdxMeas params family q.1).outcome g
           have hU_herm : (leftTensor (ι₂ := ι) U)ᴴ = leftTensor (ι₂ := ι) U := by
-            simpa [U, leftTensor, opTensor, fromHToG_gHatIdxMeas_outcome_isHermitian params family q.1 g] using
+            simpa [U, leftTensor, opTensor,
+              fromHToG_gHatIdxMeas_outcome_isHermitian params family q.1 g] using
               (conjTranspose_opTensor U (1 : MIPStarRE.Quantum.Op ι))
           have hU_pos : 0 ≤ leftTensor (ι₂ := ι) U := by
             exact leftTensor_nonneg (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome_pos g)
@@ -4196,7 +4160,8 @@ private lemma fromHToGAdjacentStage_paperMoveChain
                     leftTensor (ι₂ := ι) U * 1 * leftTensor (ι₂ := ι) U
                       = leftTensor (ι₂ := ι) U * leftTensor (ι₂ := ι) U := by simp
                     _ ≤ leftTensor (ι₂ := ι) U := by
-                      simpa [leftTensor_mul_leftTensor] using MIPStarRE.Quantum.sq_le_self hU_pos hU_le
+                      simpa [leftTensor_mul_leftTensor] using
+                        MIPStarRE.Quantum.sq_le_self hU_pos hU_le
         calc
           ∑ g : GHatOutcome params,
               (∑ gs : GHatTupleOutcome params n, C q g gs) *
@@ -4221,197 +4186,15 @@ private lemma fromHToGAdjacentStage_paperMoveChain
         fromHToGAdjacentStageM1_eq_rightShape] using hA0M1_cauchySchwarz
     simpa [hA_eq_A0, M₁] using hA0M1_moveRight
   have h₁₂ : |M₁ - M₂| ≤ Real.sqrt (commuteGHalfSandwichError params gamma zeta k) := by
-    /- Paper lines 1495--1550.  This is the first half-sandwich commutation:
-    first rewrite `eq:move-g-over-there` into the source/target forms of
-    `eq:commute-g-part-one`, then apply the Cauchy--Schwarz estimate
-    `eq:call-this-later`, with the two square roots handled separately. -/
-    let n := k - (ℓ + 1)
-    by_cases hn0 : n = 0
-    · have hM₁ : M₁ =
-          avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
-            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
-              let S := fromHToGRecurrenceWeight params family ℓ
-                (prependTypeBit g.isSome (gHatTupleType gs))
-              let U := (gHatIdxMeas params family q.1).outcome g
-              let T := gHatHalfProductOutcomeOperator params family n q.2 gs
-              ev ψbi (leftTensor (ι₂ := ι) (U * T) *
-                (leftTensor (ι₂ := ι) Tᴴ * rightTensor (ι₁ := ι) (S * U))) := by
-        simpa [M₁, n] using
-          fromHToGAdjacentStageM1_eq_halfSandwichLeftShape params ψbi family k ℓ
-      have hM₂ : M₂ =
-          avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
-            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
-              let S := fromHToGRecurrenceWeight params family ℓ
-                (prependTypeBit g.isSome (gHatTupleType gs))
-              let U := (gHatIdxMeas params family q.1).outcome g
-              let T := gHatHalfProductOutcomeOperator params family n q.2 gs
-              ev ψbi (leftTensor (ι₂ := ι) (T * U) *
-                (leftTensor (ι₂ := ι) Tᴴ * rightTensor (ι₁ := ι) (S * U))) := by
-        simpa [M₂, n] using
-          fromHToGAdjacentStageM2_eq_halfSandwichRightShape params ψbi family k ℓ
-      have hM : M₁ = M₂ := by
-        rw [hM₁, hM₂]
-        rw [hn0]
-        simp [gHatHalfProductOutcomeOperator]
-      rw [hM, sub_self, abs_zero]
-      exact Real.sqrt_nonneg _
-    · have hnpos : 1 ≤ n := Nat.pos_iff_ne_zero.mpr hn0
-      have hn : 2 ≤ n + 1 := Nat.succ_le_succ hnpos
-      have hnk : n + 1 ≤ k := by
-        dsimp [n]
-        omega
-      have hM₁_source : M₁ =
-          avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
-            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
-              let S := fromHToGRecurrenceWeight params family ℓ
-                (prependTypeBit g.isSome (gHatTupleType gs))
-              let U := (gHatIdxMeas params family q.1).outcome g
-              let T := gHatHalfProductOutcomeOperator params family n q.2 gs
-              ev ψbi (leftTensor (ι₂ := ι) (U * T) *
-                (leftTensor (ι₂ := ι) Tᴴ * rightTensor (ι₁ := ι) (S * U))) := by
-        simpa [M₁, n] using
-          fromHToGAdjacentStageM1_eq_halfSandwichLeftShape params ψbi family k ℓ
-      have hM₂_target : M₂ =
-          avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
-            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
-              let S := fromHToGRecurrenceWeight params family ℓ
-                (prependTypeBit g.isSome (gHatTupleType gs))
-              let U := (gHatIdxMeas params family q.1).outcome g
-              let T := gHatHalfProductOutcomeOperator params family n q.2 gs
-              ev ψbi (leftTensor (ι₂ := ι) (T * U) *
-                (leftTensor (ι₂ := ι) Tᴴ * rightTensor (ι₁ := ι) (S * U))) := by
-        simpa [M₂, n] using
-          fromHToGAdjacentStageM2_eq_halfSandwichRightShape params ψbi family k ℓ
-      have h₁₂_secondRoot_le_nu4 :
-          avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
-            qSDDCore ψbi
-              (fun ogs : GHatOutcome params × GHatTupleOutcome params n =>
-                leftTensor (ι₂ := ι)
-                  ((gHatHalfProductOutcomeOperator params family n q.2 ogs.2)ᴴ *
-                    (gHatIdxMeas params family q.1).outcome ogs.1))
-              (fun ogs : GHatOutcome params × GHatTupleOutcome params n =>
-                leftTensor (ι₂ := ι)
-                  ((gHatIdxMeas params family q.1).outcome ogs.1 *
-                    (gHatHalfProductOutcomeOperator params family n q.2 ogs.2)ᴴ))) ≤
-            commuteGHalfSandwichError params gamma zeta k := by
-        simpa [n] using
-          fromHToG_headTail_adjoint_qSDDCore_bound params ψbi family gamma zeta
-            hgamma_nonneg hzeta_nonneg hhalf (n := n) (k := k) hn hnk
-      have h₁₂_firstRoot_le_one :
-          True := by
-        /- Paper lines 1531--1550: the first square root in
-        `eq:call-this-later` is rewritten to a suffix `Ĥ` term, bounded by
-        `S ≤ I`, then by projectivity `U^2 = U`, and finally by the fact that
-        both `ĝ` and `Ĥ` are submeasurements. -/
-        trivial
-      have h₁₂_cauchySchwarz : |M₁ - M₂| ≤ Real.sqrt (commuteGHalfSandwichError params gamma zeta k) := by
-        /- Paper lines 1506--1523.  Rewrite `hM₁_source` and `hM₂_target` as a
-        product-index sum over `(g, gs)`, insert a dummy `Unit` outcome so that
-        `closenessOfIPAdjoint` applies, use `h₁₂_secondRoot_le_nu4` for the
-        commutator square, and discharge the context side condition using the
-        bound sketched in `h₁₂_firstRoot_le_one`. -/
-        sorry
-      exact h₁₂_cauchySchwarz
+    change |fromHToGAdjacentStageM1 params ψbi family k ℓ -
+        fromHToGAdjacentStageM2 params ψbi family k ℓ| ≤
+      Real.sqrt (commuteGHalfSandwichError params gamma zeta k)
+    exact hanalytic.m1_m2 ℓ hℓ
   have h₂₃ : |M₂ - M₃| ≤ Real.sqrt (commuteGHalfSandwichError params gamma zeta k) := by
-    /- Paper lines 1551--1610.  This is the second half-sandwich commutation:
-    rewrite `eq:commute-g-part-one` into the source/target forms of
-    `eq:commute-g-part-two`, then split `eq:call-again-later-part-dos` into its
-    two square-root estimates.  The first root uses `eq:S-sandwich`; the second
-    root is identified with the first root from `eq:call-this-later`. -/
-    let n := k - (ℓ + 1)
-    by_cases hn0 : n = 0
-    · have hM₂ : M₂ =
-          avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
-            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
-              let S := fromHToGRecurrenceWeight params family ℓ
-                (prependTypeBit g.isSome (gHatTupleType gs))
-              let U := (gHatIdxMeas params family q.1).outcome g
-              let T := gHatHalfProductOutcomeOperator params family n q.2 gs
-              ev ψbi ((leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) (S * U)) *
-                leftTensor (ι₂ := ι) (U * Tᴴ)) := by
-        simpa [M₂, n] using
-          fromHToGAdjacentStageM2_eq_halfSandwichRightAdjointLeftActionShape
-            params ψbi family k ℓ
-      have hM₃ : M₃ =
-          avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
-            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
-              let S := fromHToGRecurrenceWeight params family ℓ
-                (prependTypeBit g.isSome (gHatTupleType gs))
-              let U := (gHatIdxMeas params family q.1).outcome g
-              let T := gHatHalfProductOutcomeOperator params family n q.2 gs
-              ev ψbi ((leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) (S * U)) *
-                leftTensor (ι₂ := ι) (Tᴴ * U)) := by
-        simpa [M₃, n] using
-          fromHToGAdjacentStageM3_eq_halfSandwichLeftAdjointLeftActionShape
-            params ψbi family k ℓ
-      have hM : M₂ = M₃ := by
-        rw [hM₂, hM₃]
-        rw [hn0]
-        simp [gHatHalfProductOutcomeOperator]
-      rw [hM, sub_self, abs_zero]
-      exact Real.sqrt_nonneg _
-    · have hnpos : 1 ≤ n := Nat.pos_iff_ne_zero.mpr hn0
-      have hn : 2 ≤ n + 1 := Nat.succ_le_succ hnpos
-      have hnk : n + 1 ≤ k := by
-        dsimp [n]
-        omega
-      have hM₂_source : M₂ =
-          avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
-            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
-              let S := fromHToGRecurrenceWeight params family ℓ
-                (prependTypeBit g.isSome (gHatTupleType gs))
-              let U := (gHatIdxMeas params family q.1).outcome g
-              let T := gHatHalfProductOutcomeOperator params family n q.2 gs
-              ev ψbi ((leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) (S * U)) *
-                leftTensor (ι₂ := ι) (U * Tᴴ)) := by
-        simpa [M₂, n] using
-          fromHToGAdjacentStageM2_eq_halfSandwichRightAdjointLeftActionShape
-            params ψbi family k ℓ
-      have hM₃_target : M₃ =
-          avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
-            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
-              let S := fromHToGRecurrenceWeight params family ℓ
-                (prependTypeBit g.isSome (gHatTupleType gs))
-              let U := (gHatIdxMeas params family q.1).outcome g
-              let T := gHatHalfProductOutcomeOperator params family n q.2 gs
-              ev ψbi ((leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) (S * U)) *
-                leftTensor (ι₂ := ι) (Tᴴ * U)) := by
-        simpa [M₃, n] using
-          fromHToGAdjacentStageM3_eq_halfSandwichLeftAdjointLeftActionShape
-            params ψbi family k ℓ
-      have h₂₃_secondRoot_le_nu4 :
-          avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
-            qSDDCore ψbi
-              (fun ogs : GHatOutcome params × GHatTupleOutcome params n =>
-                leftTensor (ι₂ := ι)
-                  ((gHatHalfProductOutcomeOperator params family n q.2 ogs.2)ᴴ *
-                    (gHatIdxMeas params family q.1).outcome ogs.1))
-              (fun ogs : GHatOutcome params × GHatTupleOutcome params n =>
-                leftTensor (ι₂ := ι)
-                  ((gHatIdxMeas params family q.1).outcome ogs.1 *
-                    (gHatHalfProductOutcomeOperator params family n q.2 ogs.2)ᴴ))) ≤
-            commuteGHalfSandwichError params gamma zeta k := by
-        simpa [n] using
-          fromHToG_headTail_adjoint_qSDDCore_bound params ψbi family gamma zeta
-            hgamma_nonneg hzeta_nonneg hhalf (n := n) (k := k) hn hnk
-      have h₂₃_firstRoot_le_one :
-          True := by
-        /- Paper lines 1582--1608.  Rewrite the first square root of
-        `eq:call-again-later-part-dos` into a suffix `Ĥ` term, average over the
-        head question/outcome, apply `eq:S-sandwich` by cases on the head bit
-        using `fromHToGRecurrenceWeight_sandwich_base_le` and
-        `fromHToGRecurrenceWeight_sandwich_one_sub_base_le`, expand the branch
-        average back to the explicit `ĝ` head sum, and use submeasurement
-        boundedness. -/
-        trivial
-      have h₂₃_cauchySchwarz : |M₂ - M₃| ≤ Real.sqrt (commuteGHalfSandwichError params gamma zeta k) := by
-        /- Paper lines 1564--1610.  Rewrite `hM₂_source` and `hM₃_target` as a
-        product-index sum over `(g, gs)`, apply `closenessOfIP`, use
-        `h₂₃_secondRoot_le_nu4` for the reused commutator bound, and discharge
-        the context side condition using the `eq:S-sandwich` route sketched in
-        `h₂₃_firstRoot_le_one`. -/
-        sorry
-      exact h₂₃_cauchySchwarz
+    change |fromHToGAdjacentStageM2 params ψbi family k ℓ -
+        fromHToGAdjacentStageM3 params ψbi family k ℓ| ≤
+      Real.sqrt (commuteGHalfSandwichError params gamma zeta k)
+    exact hanalytic.m2_m3 ℓ hℓ
   have hmove₂ : |M₃ - E| ≤ Real.sqrt (2 * zeta) := by
     have h₃₄ : |M₃ - M₄| ≤ Real.sqrt (2 * zeta) := by
       let n := k - (ℓ + 1)
@@ -4443,10 +4226,8 @@ private lemma fromHToGAdjacentStage_paperMoveChain
           ∑ g : GHatOutcome params,
             (∑ gs : GHatTupleOutcome params n, C q g gs) *
               (∑ gs : GHatTupleOutcome params n, C q g gs)ᴴ ≤ 1 := by
-        /- Paper lines 1644--1645: this is the same first-square-root quantity as
-        in `eq:call-again-later-part-dos`, so the final move-right should reuse
-        the `eq:S-sandwich`-based bound established for `M₂ → M₃`. -/
-        sorry
+        intro q
+        simpa [C, n] using hanalytic.m3_m4_firstRoot ℓ hℓ q
       have hM3M4_cauchySchwarz := MIPStarRE.LDT.Preliminaries.closenessOfIP ψbi hnorm
         (uniformDistribution (Fq params × PointTuple params n))
         (uniformDistribution_weight_sum_le_one (Fq params × PointTuple params n))
@@ -4497,17 +4278,15 @@ private lemma fromHToGAdjacentStageFacts_of_paperMoveChain
     (hnorm : ψbi.IsNormalized)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
-    (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
     (hfacts : GHatFactsStatement params ψbi family gamma zeta)
-    (hhalf : ∀ j : ℕ, 2 ≤ j →
-      CommuteGHalfSandwichStatement params ψbi family gamma zeta j)
     (hstageExact : FromHToGAdjacentStageExactFacts params ψbi family)
-    (k : ℕ) :
+    (k : ℕ)
+    (hanalytic : FromHToGMoveChainAnalyticFacts params ψbi family gamma zeta k) :
     FromHToGAdjacentStageFacts params ψbi family gamma zeta k := by
   refine ⟨?_⟩
   intro ℓ hℓ
   exact fromHToGAdjacentStage_paperMoveChain params ψbi hnorm family gamma zeta
-    hgamma_nonneg hzeta_nonneg hfacts hhalf hstageExact k ℓ hℓ
+    hfacts hstageExact k hanalytic ℓ hℓ
 
 /-- The paper-total telescope bridge for `fromHToG`.
 
@@ -4523,17 +4302,15 @@ private lemma fromHToGPaperTelescopeFacts_of_paperTelescope
     (hnorm : ψbi.IsNormalized)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
-    (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
     (hfacts : GHatFactsStatement params ψbi family gamma zeta)
-    (hhalf : ∀ j : ℕ, 2 ≤ j →
-      CommuteGHalfSandwichStatement params ψbi family gamma zeta j)
     (hstageExact : FromHToGAdjacentStageExactFacts params ψbi family)
-    (k : ℕ) :
+    (k : ℕ)
+    (hanalytic : FromHToGMoveChainAnalyticFacts params ψbi family gamma zeta k) :
     FromHToGPaperTelescopeFacts params ψbi family gamma zeta k := by
   refine ⟨?_⟩
   have hadj : FromHToGAdjacentStageFacts params ψbi family gamma zeta k :=
     fromHToGAdjacentStageFacts_of_paperMoveChain params ψbi hnorm family gamma zeta
-      hgamma_nonneg hzeta_nonneg hfacts hhalf hstageExact k
+      hfacts hstageExact k hanalytic
   simpa [fromHToGPaperTotalError] using
     fromHToGStageMass_telescope params ψbi family gamma zeta k hadj.recurrenceStep
 
@@ -4559,6 +4336,8 @@ lemma fromHToG
     (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
     (hzeta_le_one : zeta ≤ 1)
     (hfacts : GHatFactsStatement params ψbi family gamma zeta)
+    -- TODO(#811/#707): this is the future anchor for the `m1_m2` / `m2_m3`
+    -- fields of the residual `FromHToGMoveChainAnalyticFacts` below.
     (hhalf : ∀ j : ℕ, 2 ≤ j →
       CommuteGHalfSandwichStatement params ψbi family gamma zeta j)
     (k : ℕ) :
@@ -4596,12 +4375,20 @@ lemma fromHToG
     -/
     let hstageExact : FromHToGAdjacentStageExactFacts params ψbi family :=
       fromHToGAdjacentStageExactFacts_of_weights params ψbi family
+    have hanalytic :
+        FromHToGMoveChainAnalyticFacts params ψbi family gamma zeta k := by
+      /- Remaining analytic paper estimates after this file's exact bookkeeping.
+      These are precisely the three open Cauchy--Schwarz edges from
+      `ld-pasting.tex:1506--1645`: `M₁ → M₂`, `M₂ → M₃`, and `M₃ → M₄`. -/
+      -- TODO(#811/#707/#673/#110): close the three paper-faithful analytic
+      -- edge estimates bundled by `FromHToGMoveChainAnalyticFacts`.
+      sorry
     have hadj : FromHToGAdjacentStageFacts params ψbi family gamma zeta k :=
       fromHToGAdjacentStageFacts_of_paperMoveChain params ψbi hnorm family gamma zeta
-        hgamma_nonneg hzeta_nonneg hfacts hhalf hstageExact k
+        hfacts hstageExact k hanalytic
     have hpaper : FromHToGPaperTelescopeFacts params ψbi family gamma zeta k :=
       fromHToGPaperTelescopeFacts_of_paperTelescope params ψbi hnorm family gamma zeta
-        hgamma_nonneg hzeta_nonneg hfacts hhalf hstageExact k
+        hfacts hstageExact k hanalytic
     exact ⟨hstageExact, hadj, hpaper⟩
   refine ⟨hresidual.adjacent.recurrenceStep, ?_⟩
   have hstage0 := fromHToGStageMass_zero_eq params strategy ψbi family k
