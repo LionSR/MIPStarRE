@@ -1843,7 +1843,6 @@ private lemma commuteGHalfSandwich_postMoveFlatStep
                 ogs =
                 (commuteGHalfSandwich_commuteFamily params family (r + 1) q).outcome ogs := by
           intro q ogs
-          have hi1 : i.1 + 1 = 1 := by omega
           simp [commuteGHalfSandwich_postMoveFlatFamily, hi0]
         simpa [commuteGHalfSandwich_postMoveFlatError, hi0] using
           (CommutativityPoints.sddOpRel_congr_outcome ψbi

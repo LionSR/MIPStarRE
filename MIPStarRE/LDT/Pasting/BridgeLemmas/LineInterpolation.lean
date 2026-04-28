@@ -2078,14 +2078,14 @@ lemma avgOver_uniform_badMass_le_k_mul_ldSandwichLineOnePointError
             avgOver (uniformDistribution (PointTuple params k)) (fun xs => defect i (u, xs))) := by
           apply avgOver_congr
           intro u
-          exact avgOver_sum_fin (uniformDistribution (PointTuple params k)) k (fun xs i
-              => defect i (u, xs))
+          exact avgOver_sum_fin (uniformDistribution (PointTuple params k)) k
+            (fun xs i => defect i (u, xs))
     _ = ∑ i : Fin k,
           avgOver (uniformDistribution (Point params)) (fun u =>
             avgOver (uniformDistribution (PointTuple params k)) (fun xs => defect i (u, xs))) := by
-          exact (avgOver_sum_fin (uniformDistribution (Point params)) k
-            (fun u i => avgOver (uniformDistribution (PointTuple params k)) (fun xs => defect i (u,
-                xs))))
+          exact avgOver_sum_fin (uniformDistribution (Point params)) k
+            (fun u i => avgOver (uniformDistribution (PointTuple params k))
+              (fun xs => defect i (u, xs)))
     _ = ∑ i : Fin k,
           avgOver (uniformDistribution (SandwichedLineQuestion params k))
             (fun q => defect i q) := by

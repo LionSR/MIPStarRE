@@ -5,11 +5,19 @@
 \section{Commutativity of the point measurements}
 \label{sec:commutativity-points}
 
-\begin{theorem}[Commutativity of the point measurements]\label{thm:commutativity-points}
-	\lean{MIPStarRE.LDT.CommutativityPoints.commutativityPoints}
+\begin{definition}[Shared diagonal-line sample]\label{def:point-pair-shared-diagonal-line-distribution}
 	\lean{MIPStarRE.LDT.CommutativityPoints.pointPairSharedDiagonalLineDistribution}
 	\leanok
-	\uses{def:good-strategy, def:approx_delta}
+	Sample a uniformly random ordered point pair $(u,v)$ and a uniformly random
+	parameter $t \in \F_q$. Package this data as the diagonal line whose direction
+	is $v-u$ and whose parametrization visits $u$ at $t$ and $v$ at $t+1$.
+\end{definition}
+
+\begin{theorem}[Commutativity of the point measurements]\label{thm:commutativity-points}
+	\lean{MIPStarRE.LDT.CommutativityPoints.commutativityPoints}
+	\leanok
+	\uses{def:good-strategy, def:approx_delta,
+	      def:point-pair-shared-diagonal-line-distribution}
 	Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test.
 	On average over independent and uniformly random $u,v \sim \F_q^m$,
 	\[
