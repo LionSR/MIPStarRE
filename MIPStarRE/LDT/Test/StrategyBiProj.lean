@@ -187,17 +187,19 @@ noncomputable def payloadBlockB {ιA ιB : Type*}
   simp [payloadBlock, Matrix.fromBlocks_multiply]
 
 /-- A direct sum of positive semidefinite payload operators is positive semidefinite. -/
-theorem payloadBlock_nonneg {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA]
-    [Fintype ιB] [DecidableEq ιB]
+theorem payloadBlock_nonneg {ιA ιB : Type*} [Finite ιA] [Finite ιB]
     {A : MIPStarRE.Quantum.Op ιA} {B : MIPStarRE.Quantum.Op ιB}
     (hA : 0 ≤ A) (hB : 0 ≤ B) : 0 ≤ payloadBlock A B := by
+  classical
+  letI := Fintype.ofFinite ιA
+  letI := Fintype.ofFinite ιB
   rw [CStarAlgebra.nonneg_iff_eq_star_mul_self] at hA hB ⊢
   rcases hA with ⟨C, hC⟩
   rcases hB with ⟨D, hD⟩
   refine ⟨payloadBlock C D, ?_⟩
   have hC' : A = Cᴴ * C := hC
   have hD' : B = Dᴴ * D := hD
-  show payloadBlock A B = (payloadBlock C D)ᴴ * payloadBlock C D
+  change payloadBlock A B = (payloadBlock C D)ᴴ * payloadBlock C D
   rw [payloadBlock_conjTranspose, payloadBlock_mul, ← hC', ← hD']
 
 /-- The trace of a direct-sum payload block is the sum of the block traces.
@@ -306,7 +308,7 @@ noncomputable def roleBlock {ιA ιB : Type*}
   classical
   unfold roleBlock
   let e := Equiv.prodComm (SymmPayload ιA ιB) Role
-  show (Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal (roleBlockFamily A₁ B₁)) *
+  change (Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal (roleBlockFamily A₁ B₁)) *
       (Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal (roleBlockFamily A₂ B₂)) =
     (Matrix.reindexAlgEquiv ℂ ℂ e)
       (Matrix.blockDiagonal (roleBlockFamily (A₁ * A₂) (B₁ * B₂)))
@@ -318,17 +320,19 @@ noncomputable def roleBlock {ιA ιB : Type*}
   cases r <;> rfl
 
 /-- A role block of positive semidefinite payload operators is positive semidefinite. -/
-theorem roleBlock_nonneg {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA]
-    [Fintype ιB] [DecidableEq ιB]
+theorem roleBlock_nonneg {ιA ιB : Type*} [Finite ιA] [Finite ιB]
     {A B : MIPStarRE.Quantum.Op (SymmPayload ιA ιB)}
     (hA : 0 ≤ A) (hB : 0 ≤ B) : 0 ≤ roleBlock A B := by
+  classical
+  letI := Fintype.ofFinite ιA
+  letI := Fintype.ofFinite ιB
   rw [CStarAlgebra.nonneg_iff_eq_star_mul_self] at hA hB ⊢
   rcases hA with ⟨C, hC⟩
   rcases hB with ⟨D, hD⟩
   refine ⟨roleBlock C D, ?_⟩
   have hC' : A = Cᴴ * C := hC
   have hD' : B = Dᴴ * D := hD
-  show roleBlock A B = (roleBlock C D)ᴴ * roleBlock C D
+  change roleBlock A B = (roleBlock C D)ᴴ * roleBlock C D
   rw [roleBlock_conjTranspose, roleBlock_mul, ← hC', ← hD']
 
 /-- The trace of a role-blocked operator is the sum of its two role-sector

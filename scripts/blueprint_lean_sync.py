@@ -63,6 +63,95 @@ _TEX_ENV_END_RE = re.compile(
 _TEX_PROOF_BEGIN_RE = re.compile(r"\\begin\{proof\}")
 _TEX_PROOF_END_RE = re.compile(r"\\end\{proof\}")
 
+def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
+    """Strip Lean line and block comments while preserving line numbers."""
+    stripped: list[str] = []
+    block_depth = 0
+    in_string = False
+    in_char = False
+    escaped = False
+    in_interpolation = False
+    interpolation_depth = 0
+    string_interpolated = False
+
+    for line in text.splitlines():
+        out: list[str] = []
+        i = 0
+        while i < len(line):
+            char = line[i]
+
+            if block_depth > 0:
+                if line.startswith("/-", i):
+                    block_depth += 1
+                    i += 2
+                    continue
+                if line.startswith("-/", i):
+                    block_depth -= 1
+                    i += 2
+                else:
+                    i += 1
+                continue
+
+            if in_string or in_char:
+                if in_string and string_interpolated and (
+                    line.startswith("{{", i) or line.startswith("}}", i)
+                ):
+                    out.extend(line[i : i + 2])
+                    i += 2
+                    continue
+                out.append(char)
+                if escaped:
+                    escaped = False
+                elif char == "\\":
+                    escaped = True
+                elif in_string and string_interpolated and char == "{":
+                    in_string = False
+                    in_interpolation = True
+                    interpolation_depth = 1
+                elif in_string and char == '"':
+                    in_string = False
+                    string_interpolated = False
+                elif in_char and char == "'":
+                    in_char = False
+                i += 1
+                continue
+
+            if in_interpolation and char in "{}":
+                out.append(char)
+                if char == "{":
+                    interpolation_depth += 1
+                else:
+                    interpolation_depth -= 1
+                    if interpolation_depth == 0:
+                        in_interpolation = False
+                        in_string = True
+                        string_interpolated = True
+                        escaped = False
+                i += 1
+                continue
+
+            if line.startswith("--", i):
+                break
+            if line.startswith("/-", i):
+                block_depth += 1
+                i += 2
+                continue
+
+            if char == '"':
+                in_string = True
+                escaped = False
+                string_interpolated = len(out) >= 2 and out[-2:] == ["s", "!"]
+            elif char == "'":
+                prev = out[-1] if out else ""
+                if not (prev.isalnum() or prev in "_'"):
+                    in_char = True
+                    escaped = False
+            out.append(line[i])
+            i += 1
+        stripped.append("".join(out))
+
+    return stripped
+
 
 def _strip_tex_comment(line: str) -> str:
     r"""Return the active TeX prefix before the first unescaped ``%``.
@@ -146,6 +235,7 @@ class LeanDecl:
     kind: str
     short_name: str
     end_line: int
+    is_private: bool = False
 
 
 @dataclass
@@ -210,7 +300,7 @@ def _set_proof_has_leanok(entries: list[BlueprintEntry], start: int, end: int) -
 def collect_file_lean_decls(lean_file: Path, lean_root: Path) -> list[LeanDecl]:
     """Parse one Lean file and return its declarations with approximate spans."""
     text = lean_file.read_text(errors="replace")
-    lines = text.splitlines()
+    lines = _strip_lean_comments_preserve_lines(text)
     rel = str(lean_file.relative_to(lean_root.parent))
 
     # Track namespace and section stacks separately, plus a combined
@@ -291,6 +381,7 @@ def collect_file_lean_decls(lean_file: Path, lean_root: Path) -> list[LeanDecl]:
         if m:
             kind = m.group(1)
             short_name = m.group(2)
+            modifiers = line[:m.start(1)].split()
             prefix = ".".join(ns_stack) + "." if ns_stack else ""
             fqn = prefix + short_name
             decls.append(
@@ -301,6 +392,7 @@ def collect_file_lean_decls(lean_file: Path, lean_root: Path) -> list[LeanDecl]:
                     kind=kind,
                     short_name=short_name,
                     end_line=len(lines),
+                    is_private="private" in modifiers,
                 )
             )
 
@@ -317,6 +409,8 @@ def collect_lean_decls(lean_root: Path) -> dict[str, LeanDecl]:
 
     for lean_file in sorted(lean_root.rglob("*.lean")):
         for decl in collect_file_lean_decls(lean_file, lean_root):
+            if decl.is_private:
+                continue
             decls[decl.fqn] = decl
             # Also store without namespace prefix if the name already contains
             # dots (e.g. `Foo.bar` at top level), so both spellings match.
@@ -614,6 +708,8 @@ def find_changed_decls_missing_from_blueprint(
             continue
 
         for decl in collect_file_lean_decls(abs_path, lean_root):
+            if decl.is_private:
+                continue
             if decl.kind not in _TRACKED_REVERSE_DECL_KINDS:
                 continue
             if not any(decl.line <= line <= decl.end_line for line in changed_lines):

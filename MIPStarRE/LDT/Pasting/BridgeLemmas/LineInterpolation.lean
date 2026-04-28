@@ -3,7 +3,8 @@ import MIPStarRE.LDT.Pasting.BridgeLemmas.Common
 /-!
 # Section 12 pasting: line interpolation bridge helpers
 
-Interpolation-support, bad-line, bad-mass, and distribution-comparison helpers used by the line-consistency chain.
+Interpolation-support, bad-line, bad-mass, and distribution-comparison helpers used by the line-
+consistency chain.
 
 ## References
 
@@ -135,10 +136,10 @@ lemma restrictToAxisParallelLine_apply
     funext i
     by_cases hi : i = ℓ.direction
     · subst hi
-      simpa [AxisParallelLine.pointAt, Polynomial.axisCoordinatePolynomial,
+      simp [AxisParallelLine.pointAt, Polynomial.axisCoordinatePolynomial,
         addCoord, decodePoint, decode_encodeScalar, _root_.Polynomial.eval_add,
         _root_.Polynomial.eval_C, _root_.Polynomial.eval_X]
-    · simpa [AxisParallelLine.pointAt, Polynomial.axisCoordinatePolynomial,
+    · simp [AxisParallelLine.pointAt, Polynomial.axisCoordinatePolynomial,
         hi, decodePoint, _root_.Polynomial.eval_C]
   have hconst :
       (Polynomial.evalRingHom (decodeScalar t)).comp _root_.Polynomial.C = RingHom.id _ := by
@@ -251,7 +252,8 @@ lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem
   rw [map_sum, Finset.sum_eq_single ⟨i, hi⟩]
   · simp_rw [map_mul]
     have hslice :
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i))
           (MvPolynomial.rename (embedCoord params) (extractSlicePoly gs i (hσsubset hi)).poly) =
           (extractSlicePoly gs i (hσsubset hi)).poly := by
       rw [MvPolynomial.eval₂Hom_rename, MvPolynomial.eval₂Hom_C_eq_bind₁]
@@ -263,7 +265,8 @@ lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem
       rw [hmap, MvPolynomial.bind₁_X_left]
       rfl
     have hLi :
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i))
           ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
             (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i))) = 1 := by
       calc
@@ -323,7 +326,7 @@ lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem
                 (fun x : Scalar params => (MvPolynomial.C x : PolynomialModel params))
                 (Lagrange.eval_basis_self hvinj hi)
     rw [hLi, hslice]
-    simpa [extractSlicePoly]
+    simp [extractSlicePoly]
   · intro j hj hji
     have hji' : j.1 ≠ i := by
       intro hEq
@@ -331,7 +334,8 @@ lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem
       exact Subtype.ext hEq
     simp_rw [map_mul]
     have hslice :
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i))
           (MvPolynomial.rename (embedCoord params) (extractSlicePoly gs j.1 (hσsubset j.2)).poly) =
           (extractSlicePoly gs j.1 (hσsubset j.2)).poly := by
       rw [MvPolynomial.eval₂Hom_rename, MvPolynomial.eval₂Hom_C_eq_bind₁]
@@ -343,7 +347,8 @@ lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem
       rw [hmap, MvPolynomial.bind₁_X_left]
       rfl
     have hLi :
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i))
           ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
             (Lagrange.basis σ (fun j' : Fin k => decodeScalar (xs j')) j.1))) = 0 := by
       calc
@@ -412,7 +417,7 @@ lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem
     rw [hLi, hslice]
     simp
   · intro hnot
-    exact (hnot (by simpa : ((⟨i, hi⟩ : {x // x ∈ σ}) ∈ σ.attach))).elim
+    exact (hnot (by simp : ((⟨i, hi⟩ : {x // x ∈ σ}) ∈ σ.attach))).elim
 
 lemma interpolateCompletedSlices_restrictAtHeight_eq_get_of_mem_supportSubset
     (params : Parameters) [FieldModel params.q]
@@ -451,7 +456,7 @@ noncomputable def tupleInterpolatedVerticalLine
 
 lemma evaluateAt_averageIdxSubMeas
     (params : Parameters) [FieldModel params.q]
-    {Question : Type*} [DecidableEq Question]
+    {Question : Type*}
     (u : Point params)
     (𝒟 : Distribution Question)
     (A : IdxSubMeas Question (Polynomial params) ι)
@@ -467,7 +472,7 @@ lemma evaluateAt_averageIdxSubMeas
 
 lemma hRestrictionToVerticalLine_averageIdxSubMeas
     (params : Parameters) [FieldModel params.q]
-    {Question : Type*} [DecidableEq Question]
+    {Question : Type*}
     (u : Point params)
     (𝒟 : Distribution Question)
     (A : IdxSubMeas Question (Polynomial params.next) ι)
@@ -593,7 +598,7 @@ lemma tupleInterpolatedVerticalLine_ne_gives_exists_some_eval_mismatch
     (hxs : Function.Injective xs)
     (gs : GHatTupleOutcome params k)
     (hEligible : InterpolationEligible params gs)
-    (hGlobal : IsGloballyConsistent params xs gs)
+    (_hGlobal : IsGloballyConsistent params xs gs)
     (f : AxisLinePolynomial params.next)
     (hne : tupleInterpolatedVerticalLine params u xs gs ≠ f) :
     ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i) := by
@@ -639,7 +644,8 @@ lemma interpolationEligibleSandwich_mismatch_sum_mono
     (hxs : Function.Injective xs)
     (f : AxisLinePolynomial params.next) :
     ∑ gs : GHatTupleOutcome params k,
-        (if IsGloballyConsistent params xs gs ∧ tupleInterpolatedVerticalLine params u xs gs ≠ f then
+        (if IsGloballyConsistent params xs gs
+            ∧ tupleInterpolatedVerticalLine params u xs gs ≠ f then
           (interpolationEligibleSandwichFamily params family k xs).outcome gs
         else 0)
       ≤
@@ -658,9 +664,10 @@ lemma interpolationEligibleSandwich_mismatch_sum_mono
         have hright :
             ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i) :=
           ⟨i, hiSome, hm⟩
-        simp [hglob, hneq, hEligible, hright]
+        simp [hglob, hneq, hright]
       · simp [interpolationEligibleSandwichFamily, restrictSubMeas, hEligible, hglob, hneq]
-    · by_cases hright : ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i)
+    · by_cases hright : ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true,
+        ((gs i).get hiSome) u ≠ f (xs i)
       · have hnonneg : 0 ≤ (interpolationEligibleSandwichFamily params family k xs).outcome gs :=
           (interpolationEligibleSandwichFamily params family k xs).outcome_pos gs
         simp [hglob, hneq, hright, hnonneg]
@@ -710,18 +717,21 @@ lemma interpolationEligibleSandwich_exists_mismatch_sum_le_sum
                 if P j then (interpolationEligibleSandwichFamily params family k xs).outcome gs
                 else (0 : MIPStarRE.Quantum.Op ι)
               change
-                (if ∃ i : Fin k, P i then (interpolationEligibleSandwichFamily params family k xs).outcome gs
+                (if ∃ i : Fin k, P i then (
+                    interpolationEligibleSandwichFamily params family k xs).outcome gs
                   else (0 : MIPStarRE.Quantum.Op ι)) ≤
                 ∑ j : Fin k, T j
               have hT_nonneg : ∀ j : Fin k, 0 ≤ T j := by
                 intro j
                 by_cases hP : P j <;>
-                  simp [T, hP, (interpolationEligibleSandwichFamily params family k xs).outcome_pos gs]
+                  simp [T, hP, (interpolationEligibleSandwichFamily params family k
+                    xs).outcome_pos gs]
               by_cases hExists : ∃ i : Fin k, P i
               · rcases hExists with ⟨i, hi⟩
                 have hExists' : ∃ i : Fin k, P i := ⟨i, hi⟩
                 have hsingle :
-                    (interpolationEligibleSandwichFamily params family k xs).outcome gs ≤ ∑ j : Fin k, T j := by
+                    (interpolationEligibleSandwichFamily params family k xs).outcome gs
+                        ≤ ∑ j : Fin k, T j := by
                   calc
                     (interpolationEligibleSandwichFamily params family k xs).outcome gs = T i := by
                       simp [T, hi]
@@ -829,7 +839,9 @@ lemma qBipartiteConsDefect_postprocess_eq_singleOutcome
     (A B : SubMeas Outcome ι) (a0 : Outcome) :
     qBipartiteConsDefect ψ (postprocess A (fun a => decide (a = a0)))
       (singleOutcomeRightSubMeas B a0) =
-        ev ψ (opTensor ((postprocess A (fun a => decide (a = a0))).outcome false) (B.outcome a0)) := by
+        ev ψ
+          (opTensor ((postprocess A (fun a => decide (a = a0))).outcome false)
+            (B.outcome a0)) := by
   refine qBipartiteConsDefect_eq_false_mass_of_bool_right_true_local ψ
     (postprocess A (fun a => decide (a = a0))) (singleOutcomeRightSubMeas B a0) ?_ ?_
   · rfl
@@ -902,7 +914,8 @@ lemma qBipartiteConsDefect_eq_sum_singleOutcome
               (singleOutcomeRightSubMeas B.toSubMeas a0) +
               ev ψ (opTensor (A.outcome a0) (B.outcome a0)))) -
             ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (B.outcome a)) := by
-              refine congrArg (fun t => t - ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (B.outcome a))) ?_
+              refine congrArg (fun t => t - ∑ a : Outcome,
+                  ev ψ (opTensor (A.outcome a) (B.outcome a))) ?_
               exact Finset.sum_congr rfl fun a _ => hsingle_term a
       _ = ∑ a0 : Outcome,
             qBipartiteConsDefect ψ (postprocess A (fun a => decide (a = a0)))
@@ -964,7 +977,9 @@ lemma ldSandwichLineOnePointRightMeasurement_outcome_some_eq_sum
     {k : ℕ} (i : Fin k) (q : SandwichedLineQuestion params k) (a : Fq params) :
     (ldSandwichLineOnePointRightMeasurement params strategy family i q).outcome (some a) =
       ∑ f : AxisLinePolynomial params.next,
-        if f (q.2 i) = a then (verticalLineMeasurementFamily params strategy q.1).outcome f else 0 := by
+        if f (q.2 i) = a then
+          (verticalLineMeasurementFamily params strategy q.1).outcome f
+        else 0 := by
   simp [ldSandwichLineOnePointRightMeasurement, ldSandwichLineOnePointRightFamily,
     postprocess, i.2, Finset.sum_filter]
 
@@ -1077,7 +1092,8 @@ lemma hBConsistencyCoordMass_le_linePointDefect
             ∑ a : Fq params,
               if f (xs i) = a then
                 ev strategy.state
-                  (opTensor (leftFalse a) ((verticalLineMeasurementFamily params strategy u).outcome f))
+                  (opTensor (leftFalse a) (
+                    (verticalLineMeasurementFamily params strategy u).outcome f))
               else (0 : Error) := by
               refine Finset.sum_congr rfl ?_
               intro f _
@@ -1085,25 +1101,20 @@ lemma hBConsistencyCoordMass_le_linePointDefect
                   (∑ a : Fq params,
                     if f (xs i) = a then
                       ev strategy.state
-                        (opTensor (leftFalse a) ((verticalLineMeasurementFamily params strategy u).outcome f))
+                        (opTensor (leftFalse a) (
+                          (verticalLineMeasurementFamily params strategy u).outcome f))
                     else (0 : Error)) =
                   ev strategy.state
-                    (opTensor (leftFalse (f (xs i))) ((verticalLineMeasurementFamily params strategy u).outcome f)) := by
-                simpa using (show
-                  (∑ a : Fq params,
-                    if f (xs i) = a then
-                      ev strategy.state
-                        (opTensor (leftFalse a) ((verticalLineMeasurementFamily params strategy u).outcome f))
-                    else (0 : Error)) =
-                  ev strategy.state
-                    (opTensor (leftFalse (f (xs i))) ((verticalLineMeasurementFamily params strategy u).outcome f)) by
-                    simp)
-              simpa using hsingle.symm
+                    (opTensor (leftFalse (f (xs i))) (
+                      (verticalLineMeasurementFamily params strategy u).outcome f)) := by
+                simp
+              exact hsingle.symm
       _ = ∑ a : Fq params,
             ∑ f : AxisLinePolynomial params.next,
               if f (xs i) = a then
                 ev strategy.state
-                  (opTensor (leftFalse a) ((verticalLineMeasurementFamily params strategy u).outcome f))
+                  (opTensor (leftFalse a) (
+                    (verticalLineMeasurementFamily params strategy u).outcome f))
               else (0 : Error) := by
               rw [Finset.sum_comm]
       _ = ∑ a : Fq params,
@@ -1115,7 +1126,8 @@ lemma hBConsistencyCoordMass_le_linePointDefect
                   (∑ f : AxisLinePolynomial params.next,
                     if f (xs i) = a then
                       ev strategy.state
-                        (opTensor (leftFalse a) ((verticalLineMeasurementFamily params strategy u).outcome f))
+                        (opTensor (leftFalse a) (
+                          (verticalLineMeasurementFamily params strategy u).outcome f))
                     else (0 : Error))
                     = ∑ f : AxisLinePolynomial params.next,
                         ev strategy.state
@@ -1160,7 +1172,8 @@ lemma hBConsistencyCoordMass_le_linePointDefect
             refine Finset.sum_congr rfl ?_
             intro a _
             symm
-            exact qBipartiteConsDefect_postprocess_eq_singleOutcome strategy.state A Bm.toSubMeas (some a)
+            exact qBipartiteConsDefect_postprocess_eq_singleOutcome strategy.state A
+                Bm.toSubMeas (some a)
     _ ≤ qBipartiteConsDefect strategy.state A Bm.toSubMeas := by
             rw [qBipartiteConsDefect_eq_sum_singleOutcome (B := Bm), Fintype.sum_option]
             have hnone_nonneg :
@@ -1261,7 +1274,8 @@ lemma hBConsistencyBadMass_le_one
             unfold L
             refine Finset.sum_le_sum ?_
             intro gs _
-            by_cases hbad : ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i)
+            by_cases hbad : ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true,
+                ((gs i).get hiSome) u ≠ f (xs i)
             · simp [hbad]
             · simp [hbad, (interpolationEligibleSandwichFamily params family k xs).outcome_pos gs]
       _ = T := by
@@ -1269,7 +1283,8 @@ lemma hBConsistencyBadMass_le_one
   have hsum_le :
       hBConsistencyBadMass params strategy family u xs ≤
         ∑ f : AxisLinePolynomial params.next,
-          ev strategy.state (opTensor T ((verticalLineMeasurementFamily params strategy u).outcome f)) := by
+          ev strategy.state (opTensor T (
+              (verticalLineMeasurementFamily params strategy u).outcome f)) := by
     unfold hBConsistencyBadMass
     refine Finset.sum_le_sum ?_
     intro f _
@@ -1283,13 +1298,15 @@ lemma hBConsistencyBadMass_le_one
   calc
     hBConsistencyBadMass params strategy family u xs
       ≤ ∑ f : AxisLinePolynomial params.next,
-          ev strategy.state (opTensor T ((verticalLineMeasurementFamily params strategy u).outcome f)) := hsum_le
+          ev strategy.state (opTensor T (
+              (verticalLineMeasurementFamily params strategy u).outcome f)) := hsum_le
     _ = ev strategy.state (opTensor T (verticalLineMeasurementFamily params strategy u).total) := by
           rw [← ev_finset_sum, ← opTensor_sum_right_local]
           rw [(verticalLineMeasurementFamily params strategy u).sum_eq_total]
     _ = ev strategy.state (opTensor T (1 : MIPStarRE.Quantum.Op ι)) := by rw [htotal_eq_one]
     _ ≤ 1 := by
-          have hTle : T ≤ 1 := by simpa [T] using (interpolationEligibleSandwichFamily params family k xs).total_le_one
+          have hTle : T ≤ 1 := by simpa [T] using (
+              interpolationEligibleSandwichFamily params family k xs).total_le_one
           have hop : opTensor T (1 : MIPStarRE.Quantum.Op ι) ≤ 1 := by
             simpa [leftTensor] using leftTensor_le_one (ι₂ := ι) (A := T) hTle
           simpa [ev_one_of_isNormalized strategy.state strategy.isNormalized] using
@@ -1303,12 +1320,11 @@ lemma postprocess_restrictSubMeas_outcome
       ∑ a : α, if p a ∧ f a = b then A.outcome a else 0 := by
   classical
   ext i j
-  simp [postprocess, restrictSubMeas, Matrix.sum_apply, Finset.sum_filter, and_left_comm,
-    and_assoc]
+  simp only [postprocess, restrictSubMeas, Matrix.sum_apply, Finset.sum_filter]
   refine Finset.sum_congr rfl ?_
   intro c _
   by_cases hf : f c = b <;> by_cases hp : p c <;>
-    simp [hf, hp, and_left_comm, and_assoc]
+    simp [hf, hp]
 
 lemma pastedInterpolation_verticalLine_defect_le_badMass
     (params : Parameters) [FieldModel params.q]
@@ -1333,19 +1349,22 @@ lemma pastedInterpolation_verticalLine_defect_le_badMass
   exact Finset.sum_le_sum (fun f _ => by
     calc
       qBipartiteConsDefect strategy.state
-          (postprocess (hRestrictionToVerticalLine params (pastedInterpolationFamily params family k xs) u)
+          (postprocess (hRestrictionToVerticalLine params (
+              pastedInterpolationFamily params family k xs) u)
             (fun h => decide (h = f)))
           (singleOutcomeRightSubMeas Bm.toSubMeas f)
         = ev strategy.state
             (opTensor
-              ((postprocess (hRestrictionToVerticalLine params (pastedInterpolationFamily params family k xs) u)
+              ((postprocess (hRestrictionToVerticalLine params (
+                  pastedInterpolationFamily params family k xs) u)
                 (fun h => decide (h = f))).outcome false)
               (Bm.outcome f)) := by
                 rw [qBipartiteConsDefect_postprocess_eq_singleOutcome]
       _ = ev strategy.state
             (opTensor
               (∑ gs : GHatTupleOutcome params k,
-                if IsGloballyConsistent params xs gs ∧ tupleInterpolatedVerticalLine params u xs gs ≠ f then
+                if IsGloballyConsistent params xs gs
+                    ∧ tupleInterpolatedVerticalLine params u xs gs ≠ f then
                   (interpolationEligibleSandwichFamily params family k xs).outcome gs
                 else 0)
               (Bm.outcome f)) := by
@@ -1505,7 +1524,8 @@ lemma avgOver_distinct_bounded_le_avgOver_uniform_add_tv
             - (distinctTupleDistribution params k).weight xs|
         = ∑ xs ∈ support, ((1 / (support.card : Error)) - (1 / ((params.q : Error) ^ k))) := by
             exact Finset.sum_congr rfl hconst
-      _ = (support.card : Error) * ((1 / (support.card : Error)) - (1 / ((params.q : Error) ^ k))) := by
+      _ = (support.card : Error) *
+          ((1 / (support.card : Error)) - (1 / ((params.q : Error) ^ k))) := by
             rw [Finset.sum_const, nsmul_eq_mul]
       _ = 1 - (support.card : Error) / ((params.q : Error) ^ k) := by
             field_simp [hsupport_card_ne, hqpow_ne]
@@ -1551,7 +1571,8 @@ lemma avgOver_distinct_bounded_le_avgOver_uniform_add_tv
   have hsupport_term :
       avgOver (distinctTupleDistribution params k) F ≤
         ∑ xs ∈ support, (uniformDistribution (PointTuple params k)).weight xs * F xs +
-          totalVariationDistance (uniformDistribution (PointTuple params k)) (distinctTupleDistribution params k) := by
+          totalVariationDistance (uniformDistribution (PointTuple params k)) (
+              distinctTupleDistribution params k) := by
     calc
       avgOver (distinctTupleDistribution params k) F
         = ∑ xs ∈ support, (distinctTupleDistribution params k).weight xs * F xs := by
@@ -1607,7 +1628,8 @@ lemma avgOver_distinct_bounded_le_avgOver_uniform_add_tv
                 (distinctTupleDistribution params k).weight xs| := by
             rw [Finset.sum_add_distrib]
       _ = ∑ xs ∈ support, (uniformDistribution (PointTuple params k)).weight xs * F xs +
-            totalVariationDistance (uniformDistribution (PointTuple params k)) (distinctTupleDistribution params k) := by
+            totalVariationDistance (uniformDistribution (PointTuple params k)) (
+                distinctTupleDistribution params k) := by
             rw [hgood, htv_eq]
   have hsupport_le_uniform :
       ∑ xs ∈ support, (uniformDistribution (PointTuple params k)).weight xs * F xs ≤
@@ -1626,9 +1648,11 @@ lemma avgOver_distinct_bounded_le_avgOver_uniform_add_tv
   calc
     avgOver (distinctTupleDistribution params k) F
       ≤ ∑ xs ∈ support, (uniformDistribution (PointTuple params k)).weight xs * F xs +
-          totalVariationDistance (uniformDistribution (PointTuple params k)) (distinctTupleDistribution params k) := hsupport_term
+          totalVariationDistance (uniformDistribution (PointTuple params k)) (
+              distinctTupleDistribution params k) := hsupport_term
     _ ≤ avgOver (uniformDistribution (PointTuple params k)) F +
-          totalVariationDistance (uniformDistribution (PointTuple params k)) (distinctTupleDistribution params k) := by
+          totalVariationDistance (uniformDistribution (PointTuple params k)) (
+              distinctTupleDistribution params k) := by
             linarith [hsupport_le_uniform]
 
 lemma avgOver_distinct_bounded_le_avgOver_uniform_add_tv_of_any_k
@@ -1728,7 +1752,7 @@ lemma max_zero_avgOver_le_avgOver_max_zero
 
 lemma qBipartiteMatchMass_averageIdxSubMeas_left
     {Question Outcome : Type*}
-    [DecidableEq Question] [Fintype Outcome]
+    [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
     (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι)
@@ -1772,7 +1796,7 @@ lemma qBipartiteMatchMass_averageIdxSubMeas_left
 
 lemma ev_opTensor_total_averageIdxSubMeas_left
     {Question Outcome : Type*}
-    [DecidableEq Question] [Fintype Outcome]
+    [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
     (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι)
@@ -1792,7 +1816,7 @@ lemma ev_opTensor_total_averageIdxSubMeas_left
 
 lemma qBipartiteConsDefect_averageIdxSubMeas_left_le
     {Question Outcome : Type*}
-    [DecidableEq Question] [Fintype Outcome]
+    [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
     (𝒟 : Distribution Question)
     (A : IdxSubMeas Question Outcome ι)
@@ -1829,7 +1853,8 @@ lemma hBConsistency_fixed_u_defect_le_avgOver_distinct
       hRestrictionToVerticalLine params (constructedPastedSubMeas params family k) u =
         averageIdxSubMeas
           (distinctTupleDistribution params k)
-          (fun xs => hRestrictionToVerticalLine params (pastedInterpolationFamily params family k xs) u)
+          (fun xs => hRestrictionToVerticalLine params (
+              pastedInterpolationFamily params family k xs) u)
           (distinctTupleDistribution_weight_sum_le_one params k) := by
     simpa [constructedPastedSubMeas] using
       hRestrictionToVerticalLine_averageIdxSubMeas (params := params) u
@@ -1877,7 +1902,8 @@ lemma one_div_q_le_rpow_degreeRatio
   by_cases hx_le_one : x ≤ 1
   · have hx_le_rpow : x ≤ Real.rpow x (1 / (32 : Error)) := by
       simpa [Real.rpow_one] using
-        (Real.rpow_le_rpow_of_exponent_ge' hx_nonneg hx_le_one (by norm_num : 0 ≤ (1 / (32 : Error)))
+        (Real.rpow_le_rpow_of_exponent_ge' hx_nonneg hx_le_one (by norm_num : 0
+            ≤ (1 / (32 : Error)))
           (by norm_num : (1 / (32 : Error)) ≤ (1 : Error)))
     exact le_trans hqx hx_le_rpow
   · have h1_le_x : (1 : Error) ≤ x := le_of_not_ge hx_le_one
@@ -1888,7 +1914,8 @@ lemma one_div_q_le_rpow_degreeRatio
       nlinarith
     have h1_le_rpow : (1 : Error) ≤ Real.rpow x (1 / (32 : Error)) := by
       simpa [Real.rpow_one] using
-        (Real.rpow_le_rpow (show 0 ≤ (1 : Error) by positivity) h1_le_x (show 0 ≤ (1 / (32 : Error)) by positivity))
+        (Real.rpow_le_rpow (show 0 ≤ (1 : Error) by positivity) h1_le_x (show 0
+            ≤ (1 / (32 : Error)) by positivity))
     exact le_trans hq_le_one h1_le_rpow
 
 lemma dnoteq_term_le_hBConsistency_extra
@@ -1986,7 +2013,7 @@ lemma avgOver_distinct_pasted_defect_le_badMass
   refine Finset.sum_le_sum ?_
   intro xs hxs
   have hinj : Function.Injective xs := (Finset.mem_filter.mp hxs).2
-  simp [hxs]
+  simp only [hxs, one_div, ite_true]
   exact mul_le_mul_of_nonneg_left
     (pastedInterpolation_verticalLine_defect_le_badMass params strategy family u xs hinj)
     (by positivity)
@@ -2051,14 +2078,17 @@ lemma avgOver_uniform_badMass_le_k_mul_ldSandwichLineOnePointError
             avgOver (uniformDistribution (PointTuple params k)) (fun xs => defect i (u, xs))) := by
           apply avgOver_congr
           intro u
-          exact avgOver_sum_fin (uniformDistribution (PointTuple params k)) k (fun xs i => defect i (u, xs))
+          exact avgOver_sum_fin (uniformDistribution (PointTuple params k)) k
+            (fun xs i => defect i (u, xs))
     _ = ∑ i : Fin k,
           avgOver (uniformDistribution (Point params)) (fun u =>
             avgOver (uniformDistribution (PointTuple params k)) (fun xs => defect i (u, xs))) := by
-          exact (avgOver_sum_fin (uniformDistribution (Point params)) k
-            (fun u i => avgOver (uniformDistribution (PointTuple params k)) (fun xs => defect i (u, xs))))
+          exact avgOver_sum_fin (uniformDistribution (Point params)) k
+            (fun u i => avgOver (uniformDistribution (PointTuple params k))
+              (fun xs => defect i (u, xs)))
     _ = ∑ i : Fin k,
-          avgOver (uniformDistribution (SandwichedLineQuestion params k)) (fun q => defect i q) := by
+          avgOver (uniformDistribution (SandwichedLineQuestion params k))
+            (fun q => defect i q) := by
           refine Finset.sum_congr rfl ?_
           intro i _
           simpa [SandwichedLineQuestion] using
@@ -2160,7 +2190,8 @@ lemma avgOver_distinct_badMass_le_hBConsistencyError
   rw [Finset.sum_eq_single i]
   · simp_rw [map_mul]
     have hslice :
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+        params (xs i))
           (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs i))) =
           extractSliceOr0 (gs i) := by
             rw [MvPolynomial.eval₂Hom_rename, MvPolynomial.eval₂Hom_C_eq_bind₁]
@@ -2172,7 +2203,8 @@ lemma avgOver_distinct_badMass_le_hBConsistencyError
             rw [hmap, MvPolynomial.bind₁_X_left]
             rfl
     have hLi :
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+        params (xs i))
           ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
             (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i))) = 1 := by
             calc
@@ -2215,11 +2247,16 @@ lemma avgOver_distinct_badMass_le_hBConsistencyError
                                     (fun x =>
                                       _root_.Polynomial.eval₂
                                         ((MvPolynomial.eval₂Hom MvPolynomial.C
-                                            (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
+                                            (Polynomial.restrictAtHeightCoordinateMap
+                                              params (xs i))).comp
                                           MvPolynomial.C)
-                                        x (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i))
+                                        x (Lagrange.basis σ
+                                        (fun j : Fin k =>
+                                        decodeScalar (xs j))
+                                        i))
                                     hx
-                        _ = _root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.C (decodeScalar (xs i)))
+                        _ = _root_.Polynomial.eval₂ MvPolynomial.C
+                        (MvPolynomial.C (decodeScalar (xs i)))
                               (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i) := by
                                 simpa [MvPolynomial.eval₂Hom] using congrArg
                                   (fun F =>
@@ -2241,7 +2278,8 @@ lemma avgOver_distinct_badMass_le_hBConsistencyError
   · intro j hj hji
     simp_rw [map_mul]
     have hslice :
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+        params (xs i))
           (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs j))) =
           extractSliceOr0 (gs j) := by
             rw [MvPolynomial.eval₂Hom_rename, MvPolynomial.eval₂Hom_C_eq_bind₁]
@@ -2253,7 +2291,8 @@ lemma avgOver_distinct_badMass_le_hBConsistencyError
             rw [hmap, MvPolynomial.bind₁_X_left]
             rfl
     have hLi :
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+        params (xs i))
           ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
             (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) j))) = 0 := by
             calc
@@ -2296,11 +2335,16 @@ lemma avgOver_distinct_badMass_le_hBConsistencyError
                                     (fun x =>
                                       _root_.Polynomial.eval₂
                                         ((MvPolynomial.eval₂Hom MvPolynomial.C
-                                            (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
+                                            (Polynomial.restrictAtHeightCoordinateMap
+                                              params (xs i))).comp
                                           MvPolynomial.C)
-                                        x (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) j))
+                                        x (Lagrange.basis σ
+                                        (fun j : Fin k =>
+                                        decodeScalar (xs j))
+                                        j))
                                     hx
-                        _ = _root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.C (decodeScalar (xs i)))
+                        _ = _root_.Polynomial.eval₂ MvPolynomial.C
+                        (MvPolynomial.C (decodeScalar (xs i)))
                               (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) j) := by
                                 simpa [MvPolynomial.eval₂Hom] using congrArg
                                   (fun F =>
@@ -2450,7 +2494,8 @@ lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
   rw [Finset.sum_eq_single i]
   · simp_rw [map_mul]
     have hslice :
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+        params (xs i))
           (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs i))) =
           extractSliceOr0 (gs i) := by
       have h0 := MvPolynomial.eval₂Hom_rename
@@ -2467,7 +2512,8 @@ lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
       rw [hmap, MvPolynomial.bind₁_X_left] at h0
       simpa using h0
     have hLi :
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+        params (xs i))
           ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
             (Lagrange.basis σ v i))) = 1 := by
       have h0 := (_root_.Polynomial.hom_eval₂
@@ -2478,7 +2524,8 @@ lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
         (x := MvPolynomial.X (lastCoord params)))
       rw [hcomp, hx, _root_.Polynomial.eval₂_at_apply] at h0
       calc
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+        params (xs i))
             ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
               (Lagrange.basis σ v i)))
           = MvPolynomial.C ((Lagrange.basis σ v i).eval (v i)) := by
@@ -2497,7 +2544,8 @@ lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
   · intro j hj hji
     simp_rw [map_mul]
     have hslice :
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+        params (xs i))
           (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs j))) =
           extractSliceOr0 (gs j) := by
       have h0 := MvPolynomial.eval₂Hom_rename
@@ -2514,7 +2562,8 @@ lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
       rw [hmap, MvPolynomial.bind₁_X_left] at h0
       simpa using h0
     have hLi :
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+        params (xs i))
           ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
             (Lagrange.basis σ v j))) = 0 := by
       have h0 := (_root_.Polynomial.hom_eval₂
@@ -2525,7 +2574,8 @@ lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
         (x := MvPolynomial.X (lastCoord params)))
       rw [hcomp, hx, _root_.Polynomial.eval₂_at_apply] at h0
       calc
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+        params (xs i))
             ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
               (Lagrange.basis σ v j)))
           = MvPolynomial.C ((Lagrange.basis σ v j).eval (v i)) := by
@@ -2560,7 +2610,8 @@ lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
     simpa [v] using congrArg encodeScalar hab
   have hcomp :
       ((MvPolynomial.eval₂Hom MvPolynomial.C
-          (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp MvPolynomial.C) = MvPolynomial.C := by
+          (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp MvPolynomial.C) =
+          MvPolynomial.C := by
     ext r
     simp
   have hx :
@@ -2578,14 +2629,16 @@ lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
   rw [Finset.sum_eq_single i]
   · simp_rw [map_mul]
     have hslice :
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+        params (xs i))
           (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs i))) =
           extractSliceOr0 (gs i) := by
       rw [MvPolynomial.eval₂Hom_rename]
       simpa [Function.comp, Polynomial.restrictAtHeightCoordinateMap, embedCoord] using
         (MvPolynomial.eval₂_eta (extractSliceOr0 (gs i)))
     have hLi :
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+        params (xs i))
           ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
             (Lagrange.basis σ v i))) = 1 := by
       have h0 := (_root_.Polynomial.hom_eval₂
@@ -2598,7 +2651,8 @@ lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
       have h1 := (_root_.Polynomial.eval₂_hom (p := Lagrange.basis σ v i)
         (f := MvPolynomial.C) (x := v i))
       calc
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+        params (xs i))
             ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
               (Lagrange.basis σ v i)))
           = MvPolynomial.C ((Lagrange.basis σ v i).eval (v i)) := by
@@ -2612,14 +2666,16 @@ lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
   · intro j hj hji
     simp_rw [map_mul]
     have hslice :
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+        params (xs i))
           (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs j))) =
           extractSliceOr0 (gs j) := by
       rw [MvPolynomial.eval₂Hom_rename]
       simpa [Function.comp, Polynomial.restrictAtHeightCoordinateMap, embedCoord] using
         (MvPolynomial.eval₂_eta (extractSliceOr0 (gs j)))
     have hLi :
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+        params (xs i))
           ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
             (Lagrange.basis σ v j))) = 0 := by
       have h0 := (_root_.Polynomial.hom_eval₂
@@ -2630,7 +2686,8 @@ lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
         (x := MvPolynomial.X (lastCoord params)))
       rw [hcomp, hx] at h0
       calc
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+        params (xs i))
             ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
               (Lagrange.basis σ v j)))
           = MvPolynomial.C ((Lagrange.basis σ v j).eval (v i)) := by
@@ -2684,7 +2741,8 @@ lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
   rw [Finset.sum_eq_single i]
   · simp_rw [map_mul]
     have hslice :
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+        params (xs i))
           (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs i))) =
           extractSliceOr0 (gs i) := by
       rw [MvPolynomial.eval₂Hom_rename, MvPolynomial.eval₂Hom_C_eq_bind₁]
@@ -2696,7 +2754,8 @@ lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
       rw [hmap, MvPolynomial.bind₁_X_left]
       rfl
     have hLi :
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+        params (xs i))
           ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
             (Lagrange.basis σ v i))) = 1 := by
       have h0 := (_root_.Polynomial.hom_eval₂
@@ -2706,13 +2765,15 @@ lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
           (Polynomial.restrictAtHeightCoordinateMap params (xs i)))
         (x := MvPolynomial.X (lastCoord params)))
       have h0' :
-          MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+          params (xs i))
               ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
                 (Lagrange.basis σ v i))) =
             MvPolynomial.C ((Lagrange.basis σ v i).eval (v i)) := by
         simpa [hcomp, hx, _root_.Polynomial.eval₂_at_apply] using h0
       calc
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+        params (xs i))
             ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
               (Lagrange.basis σ v i)))
           = MvPolynomial.C ((Lagrange.basis σ v i).eval (v i)) := by
@@ -2725,7 +2786,8 @@ lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
   · intro j hj hji
     simp_rw [map_mul]
     have hslice :
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+        params (xs i))
           (MvPolynomial.rename (embedCoord params) (extractSliceOr0 (gs j))) =
           extractSliceOr0 (gs j) := by
       rw [MvPolynomial.eval₂Hom_rename, MvPolynomial.eval₂Hom_C_eq_bind₁]
@@ -2737,7 +2799,8 @@ lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
       rw [hmap, MvPolynomial.bind₁_X_left]
       rfl
     have hLi :
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+        params (xs i))
           ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
             (Lagrange.basis σ v j))) = 0 := by
       have h0 := (_root_.Polynomial.hom_eval₂
@@ -2747,13 +2810,15 @@ lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
           (Polynomial.restrictAtHeightCoordinateMap params (xs i)))
         (x := MvPolynomial.X (lastCoord params)))
       have h0' :
-          MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+          MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+          params (xs i))
               ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
                 (Lagrange.basis σ v j))) =
             MvPolynomial.C ((Lagrange.basis σ v j).eval (v i)) := by
         simpa [hcomp, hx, _root_.Polynomial.eval₂_at_apply] using h0
       calc
-        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap
+        params (xs i))
             ((_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
               (Lagrange.basis σ v j)))
           = MvPolynomial.C ((Lagrange.basis σ v j).eval (v i)) := by
