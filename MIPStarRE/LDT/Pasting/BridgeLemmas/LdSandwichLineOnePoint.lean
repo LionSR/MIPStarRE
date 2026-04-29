@@ -3824,5 +3824,4 @@ lemma ldSandwichLineOnePoint
   exact ⟨ldSandwichLineOnePoint_core params strategy eps delta gamma zeta
     hgood hzeta_le family hcons hcomm k i hi⟩
 
-
 end MIPStarRE.LDT.Pasting

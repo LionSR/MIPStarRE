@@ -214,8 +214,7 @@ private lemma sampledDiagonalLineConsistency
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :
     ConsRel strategy.state
-      (uniformDistribution
-        (RestrictedDiagonalSample params (lastRestrictionIndex params)))
+      (uniformDistribution (RestrictedDiagonalSample params (lastRestrictionIndex params)))
       (diagonalPointAnswerFamily strategy (lastRestrictionIndex params))
       (rawDiagonalLineAnswerFamily params strategy (lastRestrictionIndex params))
       (restrictedDiagonalLinesConsistencyError
@@ -267,8 +266,7 @@ private lemma sampledDiagonalLineApproximation
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma) :
     SDDRel strategy.state
-      (uniformDistribution
-        (RestrictedDiagonalSample params (lastRestrictionIndex params)))
+      (uniformDistribution (RestrictedDiagonalSample params (lastRestrictionIndex params)))
       (IdxSubMeas.liftLeft
         (diagonalPointAnswerFamily strategy (lastRestrictionIndex params)))
       (IdxSubMeas.liftRight
@@ -342,8 +340,7 @@ lemma sampledDiagonalLineApproximation_pointWithDiagonalLine
   have hreindex :
       avgOver (pointWithDiagonalLineDistribution params) f =
         avgOver
-          (uniformDistribution
-            (RestrictedDiagonalSample params j × Fq params))
+          (uniformDistribution (RestrictedDiagonalSample params j × Fq params))
           (fun st => f (e st)) := by
     symm
     simpa [pointWithDiagonalLineDistribution, f] using
@@ -354,8 +351,7 @@ lemma sampledDiagonalLineApproximation_pointWithDiagonalLine
       ((IdxSubMeas.liftRight (rawDiagonalLineAnswerFamily params strategy j)) s)
   have hignore :
       avgOver
-          (uniformDistribution
-            (RestrictedDiagonalSample params j × Fq params))
+          (uniformDistribution (RestrictedDiagonalSample params j × Fq params))
           (fun st => g st.1) =
         avgOver (uniformDistribution (RestrictedDiagonalSample params j)) g := by
     exact avgOver_uniform_fst g
@@ -368,12 +364,10 @@ lemma sampledDiagonalLineApproximation_pointWithDiagonalLine
       = avgOver (pointWithDiagonalLineDistribution params) f := by
           rfl
     _ = avgOver
-          (uniformDistribution
-            (RestrictedDiagonalSample params j × Fq params))
+          (uniformDistribution (RestrictedDiagonalSample params j × Fq params))
           (fun st => f (e st)) := hreindex
     _ = avgOver
-          (uniformDistribution
-            (RestrictedDiagonalSample params j × Fq params))
+          (uniformDistribution (RestrictedDiagonalSample params j × Fq params))
           (fun st =>
             qSDD strategy.state
               ((IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy j)) st.1)
@@ -466,6 +460,5 @@ lemma sampledDiagonalLineApproximation_pointWithDiagonalLine
           (IdxSubMeas.liftRight (rawDiagonalLineAnswerFamily params strategy j)) := by
             rfl
     _ ≤ pointDiagonalLineApproxError params gamma := hbase
-
 
 end MIPStarRE.LDT.CommutativityPoints

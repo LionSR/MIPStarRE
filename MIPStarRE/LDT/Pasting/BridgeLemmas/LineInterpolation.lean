@@ -172,7 +172,7 @@ lemma restrictToVerticalLine_eval_eq_restrictAtHeight_eval
     (x : Fq params) :
     (Polynomial.restrictToAxisParallelLine params.next h
         ({ base := appendPoint params u zeroCoord
-         , direction := lastCoord params } : AxisParallelLine params.next)) x =
+           direction := lastCoord params } : AxisParallelLine params.next)) x =
       (Polynomial.restrictAtHeight params h x) u := by
   let coord := Polynomial.restrictAtHeightCoordinateMap params x
   have hconst :
@@ -193,7 +193,7 @@ lemma restrictToVerticalLine_eval_eq_restrictAtHeight_eval
   calc
     (Polynomial.restrictToAxisParallelLine params.next h
         ({ base := appendPoint params u zeroCoord
-         , direction := lastCoord params } : AxisParallelLine params.next)) x
+           direction := lastCoord params } : AxisParallelLine params.next)) x
       = h (appendPoint params u x) := by
           rw [restrictToAxisParallelLine_apply]
           exact congrArg (fun y => h y) (verticalLine_pointAt_appendPoint params u x)
@@ -2898,6 +2898,5 @@ lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
     simp [hrename, hLi]
   · intro hnot
     exact (hnot hi).elim -/
-
 
 end MIPStarRE.LDT.Pasting

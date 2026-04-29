@@ -1199,5 +1199,4 @@ theorem gBotSelfConsistency
                             leftPlacedSubMeas, rightPlacedSubMeas, T, hcomplete_outcome_T]
     _ ≤ zeta := hcomplete_total
 
-
 end MIPStarRE.LDT.Pasting

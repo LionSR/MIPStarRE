@@ -40,7 +40,7 @@ private theorem sharedDiagonalLineQuestionOfPointPair_sampledPointPair
     rw [← encode_decodeScalar (v i)]
     congr 1
     ring_nf
-    exact decode_encodeScalar (params := params) (decodeScalar (v i))
+    simp
 
 private theorem sharedDiagonalLineQuestionOfPointPair_of_line
     (params : Parameters)
@@ -70,7 +70,7 @@ private theorem sharedDiagonalLineQuestionOfPointPair_of_line
         rw [← encode_decodeScalar (base i)]
         congr 1
         ring_nf
-        exact decode_encodeScalar (params := params) (decodeScalar (base i))
+        simp
       · funext i
         suffices h :
             encodeScalar
@@ -82,7 +82,7 @@ private theorem sharedDiagonalLineQuestionOfPointPair_of_line
         rw [← encode_decodeScalar (direction i)]
         congr 1
         ring_nf
-        exact decode_encodeScalar (params := params) (decodeScalar (direction i))
+        simp
 
 private theorem sharedDiagonalLineQuestionOfPointPair_injective
     (params : Parameters)
@@ -437,7 +437,5 @@ lemma sampledDiagonalLineApproximation_ignore_second
           (IdxSubMeas.liftRight (sampledDiagonalLineEvaluation params strategy)) := by
             rfl
     _ ≤ pointDiagonalLineApproxError params gamma := happrox
-
-
 
 end MIPStarRE.LDT.CommutativityPoints

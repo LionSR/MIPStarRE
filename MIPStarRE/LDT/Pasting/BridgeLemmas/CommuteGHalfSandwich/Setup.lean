@@ -632,8 +632,8 @@ lemma gHatSelfConsistency_sddOpRel_quadThird
       (gHatSelfConsistencyRightFamily params family)
       (gHatSelfConsistencyError zeta)) :
     SDDOpRel ψbi
-      (uniformDistribution
-        (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (uniformDistribution (SliceQuestion params × SliceQuestion params ×
+        SliceQuestion params × PointTuple params r))
       (fun q => (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyLeftFamily params family)) q.2.2.1)
       (fun q => (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyRightFamily params family)) q.2.2.1)
       (gHatSelfConsistencyError zeta) := by
@@ -1151,16 +1151,15 @@ lemma commuteGHalfSandwich_prefixFirstSliceLeft_move
       (commuteGHalfSandwich_moveFamily params family r)
       δ) :
     SDDOpRel ψbi
-      (uniformDistribution
-        (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r))
+      (uniformDistribution (SliceQuestion params × SliceQuestion params ×
+        SliceQuestion params × PointTuple params r))
       (commuteGHalfSandwich_moveStepSourceFamily params family r)
       (commuteGHalfSandwich_moveStepMidFamily params family r)
       δ := by
   have hABfst :
       SDDOpRel ψbi
-        (uniformDistribution
-          ((SliceQuestion params × SliceQuestion params × PointTuple params r) ×
-              SliceQuestion params))
+        (uniformDistribution ((SliceQuestion params × SliceQuestion params ×
+          PointTuple params r) × SliceQuestion params))
         (fun q => commuteGHalfSandwich_moveSourceFamily params family r q.1)
         (fun q => commuteGHalfSandwich_moveFamily params family r q.1)
         δ :=
@@ -1170,9 +1169,8 @@ lemma commuteGHalfSandwich_prefixFirstSliceLeft_move
       δ hAB
   have hABquad :
       SDDOpRel ψbi
-        (uniformDistribution
-          (SliceQuestion params × SliceQuestion params × SliceQuestion params ×
-              PointTuple params r))
+        (uniformDistribution (SliceQuestion params × SliceQuestion params ×
+          SliceQuestion params × PointTuple params r))
         (fun q => commuteGHalfSandwich_moveSourceFamily params family r (q.2.1, q.2.2.1, q.2.2.2))
         (fun q => commuteGHalfSandwich_moveFamily params family r (q.2.1, q.2.2.1, q.2.2.2))
         δ :=
@@ -1884,6 +1882,5 @@ lemma commuteGHalfSandwich_moveStepMid_toTarget
                         rw [rightTensor_mul_rightTensor]
     )
     hreindex
-
 
 end MIPStarRE.LDT.Pasting

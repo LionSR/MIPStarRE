@@ -41,7 +41,6 @@ noncomputable def switcherooAggregateFirstTerm
         (leftTensor (ι₂ := ι)
           ((M q.2).outcome o * (completePartSubMeas params family q.1).total * (M q.2).outcome o))
 
-
 /-- Rewrite the first positive switcheroo term as a left-sandwich average. -/
 lemma switcherooAggregateFirstTerm_eq_leftSandwich
     {Outcome : Type*} [Fintype Outcome]

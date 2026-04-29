@@ -55,6 +55,4 @@ lemma fromHToG
     fromHToGPaperTotalError_le params gamma zeta k
       hgamma_nonneg hzeta_nonneg hzeta_le_one
 
-
-
 end MIPStarRE.LDT.Pasting
