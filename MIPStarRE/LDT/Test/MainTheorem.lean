@@ -158,13 +158,12 @@ Whenever the envelope `mainFormalError params k eps` has already saturated past
 `thm:main-induction` in `references/ldt-paper/inductive_step.tex`) that the
 bound it is proving is vacuous whenever the error scale is at least `1`.
 
-In the `mainFormal` assembly this wrapper handles the branches where the public
-envelope has already reached `1`, including the non-paper scalar regimes
-`ε > 1` or `d > q`.  The intermediate range
-`params.m * params.d ≤ k < 400 * params.m * params.d` is not claimed to be
-vacuous here: without an additional checked scalar saturation lemma, the
-non-vacuous branch keeps the large-`k` Section 6 side condition as explicit
-role-package residual data.  The complementary non-vacuous branch
+In the `mainFormal` assembly this wrapper handles only branches where the
+public envelope has already reached `1`, including the non-paper scalar regimes
+`ε > 1` or `d > q`. It is not a replacement for the large-`k` hypothesis needed
+by the Section 6 / Pasting path: the public theorem statement now exposes that
+side condition directly, while this lemma remains the generic saturated-error
+fallback. The complementary non-vacuous branch
 `mainFormalError params k eps < 1` supplies the scalar hypotheses needed by the
 Step 8 cascade.
 
@@ -828,10 +827,10 @@ This isolates the first field of the former role-packaged completion residual:
 it asks only for the raw Section 6 role-register polynomial measurement and its
 symmetrized consistency estimate at the pre-cascade main-induction error.  The
 constructors below show how the already-checked base case and the syntactic
-successor wrapper produce this residual.  For an arbitrary current parameter
+successor wrapper produce this residual. For an arbitrary current parameter
 bundle, the inverse predecessor transport needed to apply the successor wrapper
-remains explicit upstream work; no vacuity of the intermediate range
-`params.m * params.d ≤ k < 400 * params.m * params.d` is claimed here. -/
+remains explicit upstream work; the public large-`k` hypothesis is supplied to
+the successor-branch conversion instead of being hidden in this residual. -/
 structure MainFormalRolePackageResidual
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -962,9 +961,10 @@ theorem passesLowIndividualDegreeTest_transportSuccessor
 /-- Successor-branch data for producing the Section 6 role package.
 
 This is narrower than an arbitrary `MainFormalRolePackageResidual`: it contains an
-explicit predecessor `pred` with `pred.next = params`, the successor-boundary data
-for the transported strategy over `pred.next`, and the Section 6 large-`k` side
-condition for that predecessor. -/
+explicit predecessor `pred` with `pred.next = params` and the successor-boundary
+data for the transported strategy over `pred.next`. The Section 6 large-`k`
+side condition is supplied directly to the conversion from the public theorem's
+current-dimension hypothesis and then weakened to the predecessor dimension. -/
 structure MainFormalRolePackageSuccessorResidual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -982,22 +982,26 @@ structure MainFormalRolePackageSuccessorResidual
   dimensionPositive : 0 < successor.pred.d
   /-- The positive-`k` side condition used by the Section 6 wrapper. -/
   kPositive : 1 ≤ k
-  /-- The Section 6 large-`k` side condition for the predecessor dimension. -/
-  largeK : 400 * successor.pred.m * successor.pred.d ≤ k
 
 namespace MainFormalRolePackageSuccessorResidual
 
 /-- Convert explicit successor-branch data into the isolated Section 6 role
-package residual. -/
+package residual, using the public current-dimension large-`k` hypothesis. -/
 theorem toRolePackageResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
-    (residual : MainFormalRolePackageSuccessorResidual params strategy eps hpass k) :
+    (residual : MainFormalRolePackageSuccessorResidual params strategy eps hpass k)
+    (hk_large : 400 * params.m * params.d ≤ k) :
     Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) := by
-  rcases residual with ⟨⟨pred, hnext⟩, boundary, hd, hk_pos, hk_large⟩
+  rcases residual with ⟨⟨pred, hnext⟩, boundary, hd, hk_pos⟩
   subst params
+  have hk_pred : 400 * pred.m * pred.d ≤ k := by
+    have hm_le : pred.m ≤ pred.m + 1 := Nat.le_succ pred.m
+    have hmono : 400 * pred.m * pred.d ≤ 400 * (pred.m + 1) * pred.d :=
+      Nat.mul_le_mul_right pred.d (Nat.mul_le_mul_left 400 hm_le)
+    exact le_trans hmono (by simpa [Parameters.next] using hk_large)
   -- Keep the transported predecessor instance explicit: `boundary` was stored
   -- under `fieldModelOfSuccessorDecomposition`, and the synthesized canonical
   -- `FieldModel.{0} pred.q` is not definitionally the same instance.
@@ -1012,7 +1016,7 @@ theorem toRolePackageResidual
       MainFormalSuccessorBoundary pred transportedStrategy eps transportedPass k := by
     simpa [transportedStrategy, transportedPass] using boundary
   rcases MainFormalRolePackageResidual.ofSuccessorBoundary pred transportedStrategy eps k
-      transportedPass hd boundary' hk_pos hk_large with ⟨roleResidual⟩
+      transportedPass hd boundary' hk_pos hk_pred with ⟨roleResidual⟩
   refine ⟨{ roleMeasurement := roleResidual.roleMeasurement, section6Consistency := ?_ }⟩
   simpa [transportedStrategy, projStratTransportSuccessor, fieldModelOfSuccessorDecomposition]
     using roleResidual.section6Consistency
@@ -1025,14 +1029,13 @@ def ofSyntacticSuccessor
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (hd : 0 < params.d)
     (boundary : MainFormalSuccessorBoundary params strategy eps hpass k)
-    (hk_pos : 1 ≤ k) (hk_large : 400 * params.m * params.d ≤ k) :
+    (hk_pos : 1 ≤ k) :
     MainFormalRolePackageSuccessorResidual params.next strategy eps hpass k where
   successor := ⟨params, rfl⟩
   boundary := by
     simpa using boundary
   dimensionPositive := hd
   kPositive := hk_pos
-  largeK := hk_large
 
 end MainFormalRolePackageSuccessorResidual
 
@@ -1040,7 +1043,9 @@ end MainFormalRolePackageSuccessorResidual
 
 The two constructors expose the real alternatives in the current proof state:
 base dimension, or a successor dimension together with explicit predecessor
-transport, successor-boundary data, and the large-`k` side condition. -/
+transport and successor-boundary data. The large-`k` condition is supplied once,
+from the public theorem hypothesis, when converting the branch to a concrete
+role-package residual. -/
 inductive MainFormalRolePackageBranchResidual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -1064,13 +1069,14 @@ theorem toRolePackageResidual
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
-    (residual : MainFormalRolePackageBranchResidual params strategy eps hpass k) :
+    (residual : MainFormalRolePackageBranchResidual params strategy eps hpass k)
+    (hk_large : 400 * params.m * params.d ≤ k) :
     Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) := by
   cases residual with
   | base hm1 =>
       exact MainFormalRolePackageResidual.ofBaseCase params strategy eps k hpass hm1
   | successor successorResidual =>
-      exact successorResidual.toRolePackageResidual
+      exact successorResidual.toRolePackageResidual hk_large
 
 end MainFormalRolePackageBranchResidual
 
@@ -2535,9 +2541,10 @@ field contains only the projectivization/completion and line-169 data for the ro
 package obtained from that concrete residual.  Thus the live `mainFormal` hole no
 longer asks for an arbitrary `MainFormalRoleMeasurementPackage`, an arbitrary raw
 Section 6 witness, or a decorative branch witness not tied to the concrete
-measurement.  The branch-level base/successor constructors remain available on
+measurement. The branch-level base/successor constructors remain available on
 `MainFormalRolePackageResidual` and `MainFormalRolePackageBranchResidual` as the
-intended ways to supply this field. -/
+intended ways to supply this field; their branch conversion consumes the public
+large-`k` hypothesis directly rather than storing it as residual data. -/
 structure MainFormalCascadeRolePackageResidualCompletionLine169Residual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -2754,10 +2761,13 @@ The bipartite tensor placement follows the paper:
 - **1b**: `I ⊗ A^B_u ≈_ν G^A_{[g(u)=a]} ⊗ I` — G_A on **left**, A^B on **right**
 - **2**: `G^A_g ⊗ I ≈_ν I ⊗ G^B_g` — G_B on **right**
 
-The `k`-bound boundary matches the paper (`references/ldt-paper/test_definition.tex:183`):
-the public hypothesis is `params.m * params.d ≤ k`, not the stronger
-`400 * params.m * params.d ≤ k` used by the Section 6 / Pasting-side wrappers.
-After first separating off the vacuous envelope branch, the checked role-package
+The `k`-bound boundary records the statement fix from issue #906: the paper's
+successor proof applies the Section 6 / Pasting-side wrappers, whose checked
+side condition is `400 * params.m * params.d ≤ k`. The public theorem therefore
+exposes this stronger hypothesis instead of trying to derive it from the paper's
+printed `params.m * params.d ≤ k` assumption.
+
+After first separating off the saturated-error branch, the checked role-package
 infrastructure now exposes the base producer and a branch-level successor
 producer:
 
@@ -2766,15 +2776,15 @@ producer:
 * the predecessor/successor handoff
   `MainFormalRolePackageBranchResidual.successor`, which carries a bundled
   `Parameters.SuccessorDecomposition`, transported passing strategy, bundled
-  `MainFormalSuccessorBoundary`, and the Section 6 side condition
-  `400 * pred.m * pred.d ≤ k`.
+  `MainFormalSuccessorBoundary`. The branch conversion receives the public
+  current-dimension large-`k` hypothesis and weakens it to the predecessor
+  side condition `400 * pred.m * pred.d ≤ k`.
 
 For an arbitrary current parameter bundle, the predecessor decomposition itself is
 now formalized by `Parameters.successorDecompositionOfNeOne`; what remains
-external is producing the successor-boundary data and proving either the large-`k`
-side condition for the predecessor or a correct saturation lemma for the
-intermediate range.  No checked lemma here proves that
-`params.m * params.d ≤ k < 400 * pred.m * pred.d` is automatically vacuous.
+external is producing the successor-boundary data and the later completion /
+line-169 residuals. No checked lemma here claims that the former intermediate
+range `params.m * params.d ≤ k < 400 * params.m * params.d` is vacuous.
 
 Universe note: the Lean statement uses `[FieldModel.{0} params.q]`, matching the
 base-universe field-model assumption of the public Section 6 successor wrapper.
@@ -2782,7 +2792,7 @@ This is a current Lean API limitation, not a paper constraint; once the Section 
 wrapper is universe-polymorphic, this public theorem should be generalized as
 well.
 
-Fixes #137, #239.
+Fixes #137, #239, #906.
 -/
 theorem mainFormal
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -2791,7 +2801,7 @@ theorem mainFormal
     (hd : 0 < params.d)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
-    (hk : params.m * params.d ≤ k)
+    (hk : 400 * params.m * params.d ≤ k)
     (hk0 : 0 < k) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
@@ -2829,7 +2839,8 @@ theorem mainFormal
   -- `mainFormalError < 1` rules out `ε > 1` and `d > q`. Producing the remaining
   -- residual still depends on active upstream work: a concrete Section 6 role
   -- residual supplied through the base/successor constructors (successor-boundary
-  -- data plus the large-`k` or small-`k` split), the left-register completion
+  -- data with the public large-`k` hypothesis supplied directly), the
+  -- left-register completion
   -- estimates returned by the orthonormalize-and-complete chain, and the
   -- polynomial `ζ₁` transport links (#426), the full-slice transport chain
   -- (#601), the remaining `fromHToG` pasting bridge (#707), the reverse

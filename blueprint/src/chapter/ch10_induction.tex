@@ -178,7 +178,7 @@
 
 \begin{theorem}[Main induction]\label{thm:main-induction}
 	\uses{def:good-strategy, def:polymeasurements, def:simeq, lem:main-induction-base}
-  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge md$ and set
+  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge 400\,md$ and set
   \[
     \nu = 1000k^2m^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right)
   \]
@@ -202,7 +202,7 @@
 
 	The proof is by induction on $m$. The base case $m=1$ is Lemma~\ref{lem:main-induction-base}.
 
-	For the step from $m$ to $m+1$, let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ test, and let $k \ge (m+1)d$. For each $x \in \F_q$, let $(\psi,A^x,B^x,L^x)$ be the $x$-restricted strategy, with failure parameters $\eps_x,\delta_x,\gamma_x$. Apply the induction hypothesis to each restricted strategy with the same integer $k$ and define
+	For the step from $m$ to $m+1$, let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ test, and let $k \ge 400(m+1)d$. For each $x \in \F_q$, let $(\psi,A^x,B^x,L^x)$ be the $x$-restricted strategy, with failure parameters $\eps_x,\delta_x,\gamma_x$. Apply the induction hypothesis to each restricted strategy with the same integer $k$ and define
 	\[
 		\nu_x = 1000k^2m^2\left(\eps_x^{1/1024}+\delta_x^{1/1024}+\gamma_x^{1/1024}+(d/q)^{1/1024}\right),
 		\qquad
@@ -587,11 +587,12 @@ Lean now records that every non-base parameter bundle has a predecessor via
 \texttt{Parameters.successorDecompositionOfNeOne}, transports the strategy and
 passing proof across that predecessor equality, and packages the two role-production
 branches as \texttt{MainFormalRolePackageBranchResidual}: the checked base handoff
-or an explicit successor branch carrying \texttt{MainFormalSuccessorBoundary} and
-the large-$k$ side condition $400m_{\mathrm{pred}}d\le k$.  Producing that
-successor-boundary package, or proving a correct small-$k$ saturation lemma for
-the intermediate range, remains upstream work.  The live completion residual
-carries the concrete role residual rather than a separate decorative branch
+or an explicit successor branch carrying \texttt{MainFormalSuccessorBoundary}.  The
+public large-$k$ hypothesis supplies the Section~6 side condition
+$400m_{\mathrm{pred}}d\le k$; the remaining role work is the
+successor-boundary package, the completion handoff, and the line-169 transport
+data.  The live completion residual carries the concrete role residual rather
+than a separate decorative branch
 witness; the branch residual types remain the documented base/successor supply
 paths.  Once the role package is obtained,
 Lean proves the two factor-two unsymmetrization links from

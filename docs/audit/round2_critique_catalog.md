@@ -18,10 +18,12 @@
 
 ## Batch 2 — Lean §3/4/6 (184bafce9fd7)
 ### S0: 3 comments
-- mainFormalError and k≥md match source ✅
+- mainFormalError and k≥md matched the printed source at the time; superseded by
+  issue #906, which records that the proof needs the stronger k≥400md condition.
 - simeqDataProcessing restored to IndexedSubMeasurement ✅
 - CompletingToMeasurementStatement error bound correct ✅
-- mainInductionNu/Error/k≥md/k≥400md verified ✅
+- mainInductionNu/Error arithmetic was verified; the k-bound audit is superseded
+  by issue #906.
 
 ### S4 (wrong or missing key hypothesis): 7 comments
 1. **Section3Test / Fq carrier**: Still `Fin q` not actual GaloisField; `PrimePowerFieldSpec` not threaded into definitions.
