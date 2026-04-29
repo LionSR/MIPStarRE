@@ -15,6 +15,8 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+from tex_utils import strip_tex_comment
+
 
 BLUEPRINT_EXTENSIONS = {".tex", ".sty", ".cls"}
 FORBIDDEN_CLEVEREF = re.compile(r"cleveref|\\[cC]ref")
@@ -28,23 +30,6 @@ class Finding:
     line: int
     column: int
     fragment: str
-
-
-def strip_tex_comment(line: str) -> str:
-    """Return the active part of a TeX source line before the first comment."""
-
-    index = 0
-    while index < len(line):
-        if line[index] == "%":
-            backslashes = 0
-            j = index - 1
-            while j >= 0 and line[j] == "\\":
-                backslashes += 1
-                j -= 1
-            if backslashes % 2 == 0:
-                return line[:index]
-        index += 1
-    return line
 
 
 def iter_source_files(root: Path) -> list[Path]:
