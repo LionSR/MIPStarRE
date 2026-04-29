@@ -14,6 +14,7 @@ on:
       - 'blueprint/src/**'
       - 'scripts/check_blueprint_latex.py'
       - 'scripts/tests/test_check_blueprint_latex.py'
+      - 'scripts/tex_utils.py'
       - 'scripts/blueprint_lean_sync.py'
   pull_request:
     types: [opened, synchronize, reopened]
@@ -27,6 +28,7 @@ on:
       - 'blueprint/src/**'
       - 'scripts/check_blueprint_latex.py'
       - 'scripts/tests/test_check_blueprint_latex.py'
+      - 'scripts/tex_utils.py'
       - 'scripts/blueprint_lean_sync.py'
 
 concurrency:
