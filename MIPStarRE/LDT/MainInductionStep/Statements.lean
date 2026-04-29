@@ -2,13 +2,13 @@ import MIPStarRE.LDT.MainInductionStep.Defs
 import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
 
 /-!
-# Section 6 — Statement Packages
+# Section 6 — Induction Step Data
 
-This file packages the intermediate conclusion structures and bookkeeping
-statements used in the induction step. It contains conclusion packages for the
+This file records the intermediate conclusion structures and bookkeeping
+statements used in the induction step. It contains the conclusions of the
 induction-level self-improvement and pasting theorems, together with restricted
-failure profiles and the stage packages for the paper's
-`restrict → induct → self-improve → paste` assembly.
+failure profiles and the stage data for the paper's slice restriction,
+slice-wise induction, self-improvement, and pasting assembly.
 
 ## References
 
@@ -23,7 +23,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Output package for the induction-level self-improvement theorem.
+/-- Conclusion of the induction-level self-improvement theorem.
 
 The strategy's state is bipartite (`QuantumState (ι × ι)`). Fields that
 involve bipartite-lifted operators use `leftPlacedSubMeas` /
@@ -65,7 +65,7 @@ structure SelfImprovementInInductionSectionConclusion (params : Parameters)
     ∀ h : Polynomial params,
       IdxPolyFamily.averagedPointEvaluationOperator strategy h ≤ Z
 
-/-- Output package for the section-local pasting theorem. -/
+/-- Conclusion of the section-local pasting theorem. -/
 structure LdPastingInInductionSectionConclusion (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -118,18 +118,9 @@ noncomputable def averageRestrictedDiagonalError (params : Parameters)
     (profile : RestrictedFailureProfile params strategy) : Error :=
   avgOver (uniformDistribution (Fq params)) profile.diagonal
 
-/-- Source-style boundedness input for the induction-level pasting theorem.
+/-- Bookkeeping data for the restricted-probabilities lemma.
 
-Alias of the shared Section 11/12 boundedness package. -/
-abbrev PastingBoundednessInput (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι) (zeta : Error) : Prop :=
-  IdxPolyFamily.SliceBoundednessInput strategy family zeta
-
-/-- Bookkeeping package for the restricted-probabilities lemma.
-
-This packages a slice-wise error profile together with the three averaged bounds
+This records a slice-wise error profile together with the three averaged bounds
 that appear in the paper: the axis-parallel and diagonal branches both incur the
 same conditioning loss `((m + 1) / m)`, while the self-consistency branch
 restricts exactly. -/
@@ -146,7 +137,7 @@ structure RestrictedProbabilitiesStatement (params : Parameters)
         averageRestrictedDiagonalError params profile ≤
           sliceConditioningLoss params * gamma
 
-/-- Bookkeeping package for the slice-restriction step of `thm:main-induction`.
+/-- Bookkeeping data for the slice-restriction step of `thm:main-induction`.
 
 This records an explicit restricted failure profile together with the averaged
 bounds extracted from `lem:restricted-probabilities`. -/
@@ -170,7 +161,7 @@ structure SliceRestrictionPackage (params : Parameters)
 
 /-- Explicit per-slice output of the inductive hypothesis.
 
-This is the recursion-entry package: given a slice restriction package, a proof of
+This is the recursion-entry data: given slice-restriction data, a proof of
 `thm:main-induction` in dimension `m` is expected to produce a measurement `G^x`
 for every slice height `x`. -/
 structure PerSliceInductionPackage (params : Parameters)
@@ -213,10 +204,11 @@ noncomputable def sliceSelfImprovementError (params : Parameters)
 
 /-- Slice-wise output of the induction-level self-improvement stage.
 
-Because `xRestrictedStrategy` is a section-local wrapper rather than literally a
-`SymStrat params` interface—it does not carry the ambient `permInvState`
-witness, the diagonal reparametrization-invariance field, or the downstream
-role-symmetrization API—this package records directly the four paper-faithful
+Because `xRestrictedStrategy` is a section-local restricted strategy rather than
+literally a `SymStrat params` interface—it does not carry the ambient
+`permInvState` witness, the diagonal reparametrization-invariance field, or the
+downstream role-symmetrization API—this data records directly the four
+paper-faithful
 properties that will later be averaged into the pasting inputs. -/
 structure SelfImprovementPackage (params : Parameters)
     [FieldModel params.q]
@@ -248,7 +240,7 @@ structure SelfImprovementPackage (params : Parameters)
       BipartiteSSCRel strategy.state (uniformDistribution Unit)
         (constSubMeasFamily (sliceProj x).toSubMeas)
         (sliceSelfImprovementError params restrictionPkg x)
-  /-- Slice-wise left/right closeness needed for the averaged self-consistency package. -/
+  /-- Slice-wise left/right closeness needed for the averaged self-consistency input. -/
   selfCloseness :
     ∀ x,
       SDDRel strategy.state (uniformDistribution Unit)
@@ -323,10 +315,10 @@ end SelfImprovementPackage
 
 /-- Averaged pasting inputs distilled from the per-slice self-improvement data.
 
-This packages exactly the hypotheses needed to invoke
+This records exactly the hypotheses needed to invoke
 `thm:ld-pasting-in-induction-section` after the slice-wise self-improvement
 outputs have been averaged. -/
-structure PastingPackage (params : Parameters)
+structure AveragedPastingInput (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error) (k : ℕ)
@@ -352,7 +344,7 @@ structure PastingPackage (params : Parameters)
   /-- Averaged strong self-consistency of the slice family. -/
   selfConsistent : selfPkg.family.StronglySelfConsistent strategy.state zeta
   /-- Averaged boundedness input for the pasting theorem. -/
-  bounded : PastingBoundednessInput params strategy selfPkg.family zeta
+  bounded : IdxPolyFamily.SliceBoundednessInput strategy selfPkg.family zeta
   /-- Error telescoping from the induction-section pasting bound to the next-stage target. -/
   error_le :
     ldPastingInInductionError params k eps delta gamma kappa zeta ≤

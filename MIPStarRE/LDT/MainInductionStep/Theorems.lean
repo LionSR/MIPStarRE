@@ -245,7 +245,7 @@ theorem ldPastingInInductionSection
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : PastingBoundednessInput params strategy family zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
     (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
@@ -1850,9 +1850,8 @@ noncomputable def PerSliceInductionPackage.ofRecursion
       pointConsistency := fun x => (hslice x).1
       error_le := fun x => (hslice x).2 }
 
-/-- Invoke `thm:ld-pasting-in-induction-section` from an averaged pasting
-package. -/
-theorem PastingPackage.output
+/-- Invoke `thm:ld-pasting-in-induction-section` from averaged pasting input. -/
+theorem AveragedPastingInput.output
     (params : Parameters)
     [FieldModel.{0} params.q]
     (strategy : SymStrat params.next ι)
@@ -1863,7 +1862,7 @@ theorem PastingPackage.output
       PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k}
     {selfPkg :
       SelfImprovementPackage params strategy eps delta gamma k restrictionPkg inductionPkg}
-    (pkg : PastingPackage params strategy eps delta gamma k selfPkg)
+    (pkg : AveragedPastingInput params strategy eps delta gamma k selfPkg)
     (hgood : strategy.IsGood eps delta gamma)
     (hd : 0 < params.d)
     (hk_pos : 1 ≤ k)
@@ -1876,7 +1875,7 @@ theorem PastingPackage.output
       hgood pkg.gamma_le_one pkg.zeta_le_one pkg.dq_le_q hd
       selfPkg.family pkg.complete pkg.consistent pkg.selfConsistent pkg.bounded k hk_pos hk
 
-/-- Compose the four paper-faithful induction-step packages
+/-- Compose the four paper-faithful induction-step inputs
 `restrict → induct → self-improve → paste` into the main-induction conclusion in
 one higher dimension. -/
 theorem mainInductionFromPackages
@@ -1890,7 +1889,7 @@ theorem mainInductionFromPackages
     (hrestrict : SliceRestrictionPackage params strategy eps delta gamma)
     (hinduction : PerSliceInductionPackage params strategy eps delta gamma hrestrict k)
     (hself : SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
-    (hpaste : PastingPackage params strategy eps delta gamma k hself)
+    (hpaste : AveragedPastingInput params strategy eps delta gamma k hself)
     (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
@@ -2379,7 +2378,7 @@ private lemma selfImprovementInInductionError_le_mainInductionNu
 induction-side `ldPastingInInductionNu` constructed from `ζ =
 selfImprovementInInductionError` is bounded by `(1/5) · ν` where `ν =
 mainInductionNu`. This bound discharges the first factor of the telescoping
-derivation inside `assemblePastingPackage.error_le`. -/
+derivation inside `assembleAveragedPastingInput.error_le`. -/
 private lemma ldPastingInInductionNu_le_fifth_mainInductionNu
     (params : Parameters)
     [FieldModel params.q]
@@ -2771,7 +2770,7 @@ pasting hypotheses.
 
 This is where the paper's `E_x[σ_x]`, `E_x[ζ_x]`, and
 `σ* ≤ mainInductionError` bookkeeping will eventually live. -/
-noncomputable def assemblePastingPackage
+noncomputable def assembleAveragedPastingInput
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -2786,7 +2785,7 @@ noncomputable def assemblePastingPackage
     (hinduction : PerSliceInductionPackage params strategy eps delta gamma hrestrict k)
     (hself : SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
     (_hk : 400 * params.m * params.d ≤ k) :
-    PastingPackage params strategy eps delta gamma k hself := by
+    AveragedPastingInput params strategy eps delta gamma k hself := by
   classical
   let 𝒟 : Distribution (Fq params) := uniformDistribution (Fq params)
   let zeta : Error := selfImprovementInInductionError params.next eps delta gamma
@@ -3355,7 +3354,7 @@ theorem mainInductionByRecursionOnM
           hgood hsmall heps_le_one hdelta_le_one hdq_le_q
       linarith
     let hpaste :=
-      assemblePastingPackage params strategy eps delta gamma k
+      assembleAveragedPastingInput params strategy eps delta gamma k
         hgood hsmall hgamma_le hzeta_le hdq_le_q hrestrict hinduction hself hk
     exact
       mainInductionFromPackages params strategy eps delta gamma k

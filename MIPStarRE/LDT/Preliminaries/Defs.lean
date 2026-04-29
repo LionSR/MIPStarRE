@@ -299,7 +299,7 @@ noncomputable def completeAtOutcome {Outcome : Type*}
 
 The theorem `completingToMeasurement` separately records that the chosen witness
 is the canonical completion `completeAtOutcome B a0`, so this structure stores
-only the paper-facing closeness statement. -/
+only the closeness statement from the paper. -/
 structure CompletingToMeasStmt {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι))

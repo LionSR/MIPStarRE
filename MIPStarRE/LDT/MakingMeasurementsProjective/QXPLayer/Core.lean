@@ -66,7 +66,7 @@ def Ta {Outcome : Type*} [Fintype Outcome]
     MIPStarRE.Quantum.Op data.auxSpace.carrier :=
   data.t.outcome a
 
-/-- Witness package for the paper's `lem:projective-non-measurement`.
+/-- Witness structure for the paper's `lem:projective-non-measurement`.
 
 A value `RoundingToProjectorsWitness ψ A ζ R` is the honest output consumed by
 this QXP rank-reduction layer: a chosen rounded family `R_a` together with the
@@ -89,7 +89,7 @@ structure RoundingToProjectorsWitness {Outcome : Type*}
     R.total ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
       (1 : MIPStarRE.Quantum.Op ι)
 
-/-- Witness package for `lem:projective-low-rank-sum`. -/
+/-- Witness structure for `lem:projective-low-rank-sum`. -/
 structure RankReductionWitness {Outcome : Type*}
     [Fintype Outcome]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -174,7 +174,7 @@ noncomputable def PFamily {Outcome : Type*} [Fintype Outcome]
 /-- Paper label `def:matrix-decomposition-Q`.
 
 The Lean formalization stores the chosen decomposition data for `Q_a` in the
-`QLayerData` package. -/
+`QLayerData` structure. -/
 abbrev matrixDecompositionQ (Outcome : Type*) [Fintype Outcome]
     (ι : Type*) [Fintype ι] [DecidableEq ι] :=
   QLayerData Outcome ι
@@ -183,7 +183,7 @@ abbrev matrixDecompositionQ (Outcome : Type*) [Fintype Outcome]
 
 The paper describes this stage via an SVD of `X`; the Lean API records the
 constructive `X/XHat/P` identities needed downstream, avoiding an explicit
-rectangular complex-SVD package. -/
+rectangular complex-SVD structure. -/
 abbrev svdOfX (Outcome : Type*) [Fintype Outcome]
     (ι : Type*) [Fintype ι] [DecidableEq ι] :=
   QXPLayerData Outcome ι

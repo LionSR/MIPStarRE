@@ -241,7 +241,7 @@ for Bob. -/
 abbrev NaimarkLiftedIndex (ι : Type*) (QuestionA OutcomeA QuestionB OutcomeB : Type*) :=
   ι × (QuestionA → Option OutcomeA) × (QuestionB → Option OutcomeB)
 
-/-- Output package for the paper's Naimark dilation theorem.
+/-- Output data for the paper's Naimark dilation theorem.
 
 Given submeasurements on space `ι`, this carries the questionwise
 one-measurement Naimark dilations used as the local building blocks for the
@@ -341,9 +341,9 @@ structure MatrixRoundedProjectiveWitness {Outcome : Type*}
     ∀ a : Outcome,
       matrixOutcomeTauDistance source.toSubmeasurement target a ≤ ζ
 
-/-! ### Spectral truncation witnesses -/
+/-! ### Truncation witnesses -/
 
-/-- Matrix-level witness for spectral truncation of a single effect.
+/-- Matrix-level witness for truncating a single effect to a projection.
 
 This captures the passage from an almost-projective operator to a genuine projection
 by truncating the spectrum at `1/2`. The key bound is that the τ-distance between
@@ -354,7 +354,7 @@ structure MatrixSpectralTruncationWitness {d : Type*}
   target : MIPStarRE.Quantum.Op d
   truncation : MIPStarRE.Quantum.SpectralTruncation source target
 
-/-- Matrix-level witness for the full spectral-truncation rounding of a measurement.
+/-- Matrix-level witness for rounding every effect of a measurement to a projection.
 
 Each effect `A_a` is independently spectrally truncated to a projection `P_a`.
 The resulting family is not necessarily a measurement (the projections may not sum

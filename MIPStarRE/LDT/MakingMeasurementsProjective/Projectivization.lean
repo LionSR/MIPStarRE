@@ -4,13 +4,13 @@ import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Completion
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
 /-!
-# Section 5 — Projectivization Core
+# Section 5 — Rounding To Projectors Core
 
-Internal projectivization lemmas for the orthonormalization pipeline.
+Internal lemmas for the orthogonalization and rounding-to-projectors chain.
 
 This file extracts the consistency-to-almost-projective and spectral/rounding
 steps so that `QXPLayer.lean` can depend on them without importing the full
-Section 5 theorem wrapper file.
+Section 5 theorem file.
 
 ## References
 
@@ -376,10 +376,10 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
             nlinarith [hζ_nonneg]
   · exact sourceAlmostProjective_of_ssc ψ A_lifted _ hsscBound
 
-/-- Spectral truncation of an almost-projective measurement.
+/-- Truncation step for an almost-projective measurement.
 
 The still-unformalized spectral construction is exposed here as an explicit
-hypothesis rather than a dedicated bridge-package structure. The normalization
+hypothesis rather than a dedicated bridge structure. The normalization
 hypothesis remains explicit because the `√ζ`-scale error bound is
 state-dependent. -/
 def spectralTruncateAlmostProjective {Outcome : Type*}
@@ -396,7 +396,7 @@ def spectralTruncateAlmostProjective {Outcome : Type*}
 /-- Adjust truncated projections to form a genuine projective
 submeasurement, controlling the per-outcome distance.
 
-The raw rounded family is exposed by `SpectralTruncationStatement`; the late
+The rounded family is exposed by `SpectralTruncationStatement`; the late
 repair from that family to a genuine projective submeasurement is now an
 explicit theorem hypothesis. -/
 lemma adjustTruncatedProjections {Outcome : Type*}
@@ -411,7 +411,7 @@ lemma adjustTruncatedProjections {Outcome : Type*}
   intro hSpectral hrepair
   exact hrepair hSpectral
 
-/-- Compose spectral truncation and adjustment to round an
+/-- Compose truncation and adjustment to round an
 almost-projective measurement to a projective submeasurement. -/
 lemma roundAlmostProjMeas {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]

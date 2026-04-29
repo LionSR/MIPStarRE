@@ -28,8 +28,8 @@ When working on the active track, consult these locations in this order:
 
 Supporting notes:
 
-- `docs/audit/20260320_ldt_source_map.md` — source-file / theorem-ownership map
-- `docs/audit/20260320_ldt_blueprint_dependency_review.md` — dated dependency-review snapshot (context, not canonical)
+- `audits/2026-03-20_ldt-source-map.md` — source-file / theorem-ownership map
+- `audits/2026-03-20_ldt-blueprint-dependency-review.md` — dated dependency-review snapshot (context, not canonical)
 
 The blueprint is organized by **theorem ownership and proof dependency**, not by raw TeX input order.
 
@@ -63,7 +63,7 @@ Top-level directories:
 - `blueprint/legacy/` — preserved 2111 blueprint snapshots
 - `references/ldt-paper/` — in-repo TeX source for the LDT paper
 - `docs/` — contributor guides, style, naming, proof integrity, CI notes
-- `docs/audit/` — dated chapter-by-chapter dependency-scouting reports
+- `audits/` — dated chapter-by-chapter dependency-scouting reports
 
 ## Recommended proof-filling order
 
@@ -106,16 +106,24 @@ leanblueprint web    # HTML output
 
 Start with [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) for PR/issue conventions and the review checklist. Key references:
 
+Mathlib-derived references:
+
+| File | Purpose |
+|------|---------|
+| `docs/style.md` | Mathlib code style (line length, indentation, tactic formatting) |
+| `docs/naming.md` | Mathlib naming conventions (70+ rules, symbol dictionary) |
+| `docs/doc.md` | Mathlib documentation standards (module headers, docstrings) |
+| `docs/pr-review.md` | Mathlib PR review guide |
+
+MIPStarRE-local references:
+
 | File | Purpose |
 |------|---------|
 | `docs/CONTRIBUTING.md` | PR format, issue templates, label taxonomy, review checklist |
 | `docs/PROOF_INTEGRITY.md` | Blocker / warning patterns for proof correctness |
-| `docs/style.md` | Mathlib code style (line length, indentation, tactic formatting) |
-| `docs/naming.md` | Mathlib naming conventions (70+ rules, symbol dictionary) |
-| `docs/doc.md` | Documentation standards (module headers, docstrings) |
+| `docs/mathematical_language.md` | Project-local mathematical language rules for Lean names and documentation |
 | `docs/blueprint_style_guide.md` | Blueprint notation and section conventions |
-| `docs/pr-review.md` | Detailed PR review guidelines |
 | `docs/ci-automation.md` | CI/CD workflow details |
-| `docs/audit/` | Chapter-by-chapter Mathlib dependency scouting reports |
+| `audits/` | Chapter-by-chapter Mathlib dependency scouting reports |
 
 When adding or completing a declaration, update the corresponding blueprint entry in `blueprint/src/chapter/`: add `\lean{DeclName}` and `\leanok` for new results, or `\leanok` on `\begin{proof}` for newly proven results.

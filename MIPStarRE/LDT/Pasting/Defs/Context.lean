@@ -45,7 +45,7 @@ pasting bridge lemmas:
 * the pasting iteration count `k ≥ 400md`, including the `1 ≤ k`
   positivity needed by the Bernoulli tail recurrence.
 
-The derived paper-level error abbreviations `ν` and `σ` are provided via
+The derived error abbreviations `ν` and `σ` from the paper are provided via
 `LdPastingContext.nu` / `LdPastingContext.sigma`.
 -/
 structure LdPastingContext (params : Parameters) [FieldModel params.q]

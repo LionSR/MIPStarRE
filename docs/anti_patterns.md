@@ -457,9 +457,9 @@ A5 is what happens when that step is skipped.
 
 ### Audit cross-reference
 
-`docs/audit/` contains chapter-by-chapter Mathlib dependency scouting
+`audits/` contains chapter-by-chapter Mathlib dependency scouting
 reports. If a section of the code review says "this could use Mathlib
-lemma X", it belongs in a specific `docs/audit/*.md` file for that chapter.
+lemma X", it belongs in a specific `audits/*.md` file for that chapter.
 
 ---
 
@@ -504,7 +504,7 @@ Grep for these suffixes: `*Statement`, `*Witness`, `*Claim`,
 
 - Is there a theorem anywhere that **produces** a value of this type?
 - If not, is the absence explained in a docstring / tracking issue /
-  `docs/audit/` entry?
+  `audits/` entry?
 - Does the paper depend on an external theorem of this shape?
 
 If any answer is "no", the structure is an unacceptable smuggle.
@@ -582,7 +582,7 @@ Mechanical detection is possible for many of these patterns:
 - **A4 (default witnesses).** Grep `:= default`, `refine ⟨default`, `exact
   ⟨default`, `Classical.arbitrary` inside proof bodies (not typeclass
   definitions). Cross-reference to [#449]'s witness ledger.
-- **A5 (Mathlib bypass).** No reliable CI check, but `docs/audit/` reports
+- **A5 (Mathlib bypass).** No reliable CI check, but `audits/` reports
   catch it during per-chapter audits.
 - **A6 (external smuggles).** Every new `structure *Statement` without a
   producing theorem should be required to carry a `/-- Grounded by: #NNN

@@ -38,12 +38,12 @@
 	% Lean-local gap: the paper permits separate local Hilbert spaces $\mathcal H_{\mathrm A}$
 	% and $\mathcal H_{\mathrm B}$, whereas the same-space `ProjStrat` forces a common
 	% finite index type. The staged refactor tracked by Issue #560 / scouting doc
-	% `docs/scouting/ch02_separate_local_spaces.md` proceeds in three stages:
+	% `audits/2026-04-23_ch02-separate-local-spaces-scouting.md` proceeds in three stages:
 	% Stage 1 (#676 and the #669 follow-up) introduces the paper-faithful container
 	% `BiProjStrat ιA ιB`, the forgetful embedding `ProjStrat.toBiProjStrat`, and
 	% the two-space low-individual-degree failure predicate; Stage 2 builds a true
 	% direct-sum role symmetrization to replace the same-space `Role × ι` target;
-	% Stage 3 migrates paper-facing statements (`SymStrat`, `mainFormal`) to the
+	% Stage 3 migrates theorem statements from the paper (`SymStrat`, `mainFormal`) to the
 	% two-space API.
 	A general projective strategy for the $(m,q,d)$ low individual degree test consists of a bipartite state $\ket{\psi} \in \mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$ together with point, axis-parallel line, and diagonal-line projective measurements for each prover separately. We write these measurements as $A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}$ on the first prover and $A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B}$ on the second.
 \end{definition}

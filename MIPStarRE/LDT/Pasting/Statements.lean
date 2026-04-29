@@ -142,7 +142,7 @@ noncomputable def fromHToGPaperTotalError (params : Parameters)
 
 The theorem `ldPasting` separately records that the chosen witness is the
 canonical construction `constructedPastedMeasurement params family k`, so this
-structure stores only the paper-facing quantitative conclusion. -/
+structure stores only the quantitative conclusion from the paper. -/
 structure LdPastingConclusion (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)

@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Pasting.SwitcherooCompletion.Switcheroo
+import MIPStarRE.LDT.Pasting.SwitcherooCompletion
 
 /-!
 # Section 12 pasting: complete-part reductions

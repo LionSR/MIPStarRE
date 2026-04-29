@@ -1,6 +1,5 @@
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Defs.Core
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Defs.Fourier
-import MIPStarRE.LDT.ExpansionHypercubeGraph.Defs.Characters
 import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Foundations
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Matrix
@@ -10,9 +9,9 @@ import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Results
 # LDT/ExpansionHypercubeGraph — barrel
 
 This module re-exports the ExpansionHypercubeGraph development:
-- `Defs/Core` for the hypercube parameters, operators, and statement packages
-- `Defs/Fourier` for the Fourier basis and `GlobalVarianceDecomposition`
-- `Defs/Characters` for additive-character identities
+- `Defs/Core` for the hypercube parameters, operators, and statement structures
+- `Defs/Fourier` for the Fourier basis, additive-character identities, and
+  `GlobalVarianceDecomposition`
 - `MatrixRealization` for the concrete adjacency and Laplacian matrices
 - `Theorems/Foundations` for foundation-level trace and decomposition lemmas
 - `Theorems/Matrix` for the matrix-realization statements

@@ -155,7 +155,7 @@
 \end{proof}
 
 \begin{definition}[Pasting data for the successor step]\label{def:successor-pasting-data}
-	\lean{MIPStarRE.LDT.MainInductionStep.assemblePastingPackage}
+	\lean{MIPStarRE.LDT.MainInductionStep.AveragedPastingInput.output, MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingInput}
 	\uses{lem:weighted-restricted-probability-bounds, thm:ld-pasting-in-induction-section}
 	The successor step forms the pasting input by combining the restricted
 	probability estimates with the slice-wise self-improvement data.
@@ -195,8 +195,8 @@
 	\uses{lem:restricted-probabilities, lem:weighted-restricted-probability-bounds, lem:main-induction-base, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section, def:successor-pasting-data}
 	In Lean, the base case and the internal successor-step assembly are now formalized through
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase, MIPStarRE.LDT.MainInductionStep.mainInductionFromPackages, MIPStarRE.LDT.MainInductionStep.mainInductionByRecursionOnM}
-	together with the bookkeeping packages
-	\lean{MIPStarRE.LDT.MainInductionStep.SliceRestrictionPackage, MIPStarRE.LDT.MainInductionStep.PerSliceInductionPackage, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage, MIPStarRE.LDT.MainInductionStep.PastingPackage}
+	together with the stage data
+	\lean{MIPStarRE.LDT.MainInductionStep.SliceRestrictionPackage, MIPStarRE.LDT.MainInductionStep.PerSliceInductionPackage, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage, MIPStarRE.LDT.MainInductionStep.AveragedPastingInput}
 	that mirror the four paper stages $\text{restrict} \to \text{induct} \to \text{self-improve} \to \text{paste}$. The weighted restricted-probability boundary is now public via \lean{MIPStarRE.LDT.MainInductionStep.weighted_axisParallel_bound, MIPStarRE.LDT.MainInductionStep.weighted_diagonal_bound, MIPStarRE.LDT.MainInductionStep.restrictedProbabilities}, and the final public successor-step wrapper is formalized as \lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper}. The remaining gap, tracked by issues \#630 and \#632, is to produce the restricted-strategy self-improvement input needed to instantiate that wrapper directly from higher-level applications, so the displayed theorem is not yet marked \leanok.
 	We may assume $\eps,\delta,\gamma,d/q \le 1$, since otherwise $\nu \ge 1$ and the bound is trivial.
 
@@ -313,11 +313,11 @@
 \begin{proposition}[Public Lean wrapper for the successor-step assembly]\label{thm:main-induction-public-wrapper}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicRestrictionPackage, MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper}
 	\uses{lem:restricted-probabilities, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section, thm:main-induction}
-	This Lean-only wrapper packages the five explicit successor-step ingredients used in the proof of Theorem~\ref{thm:main-induction}: the weighted slice bounds feeding Lemma~\ref{lem:restricted-probabilities}, the extracted slice-restriction package, the per-slice recursive witnesses, the producer for the corresponding self-improvement package, and the recursion-to-pasting assembly. Under those hypotheses it returns a measurement $G \in \polymeas{m+1}{q}{d}$ satisfying the same consistency conclusion as Theorem~\ref{thm:main-induction}, but without exposing the intermediate bookkeeping packages at the public boundary.
+	This Lean-only theorem records the five explicit successor-step ingredients used in the proof of Theorem~\ref{thm:main-induction}: the weighted slice bounds feeding Lemma~\ref{lem:restricted-probabilities}, the extracted slice-restriction data, the per-slice recursive witnesses, the producer for the corresponding self-improvement data, and the recursion-to-pasting assembly. Under those hypotheses it returns a measurement $G \in \polymeas{m+1}{q}{d}$ satisfying the same consistency conclusion as Theorem~\ref{thm:main-induction}, but without exposing the intermediate stage data at the public boundary.
 \end{proposition}
 \begin{proof}
 	\uses{lem:restricted-probabilities}
-	This is a Lean-only assembly corollary. One first applies Lemma~\ref{lem:restricted-probabilities} to the weighted slice bounds in order to extract the restricted failure profile, packages the recursive slice witnesses, invokes the explicit self-improvement producer on that slice data, and then applies \lean{MIPStarRE.LDT.MainInductionStep.mainInductionByRecursionOnM}, which already returns the displayed error parameter directly.
+	This is a Lean-only assembly corollary. One first applies Lemma~\ref{lem:restricted-probabilities} to the weighted slice bounds in order to extract the restricted failure profile, records the recursive slice witnesses, invokes the explicit self-improvement producer on that slice data, and then applies \lean{MIPStarRE.LDT.MainInductionStep.mainInductionByRecursionOnM}, which already returns the displayed error parameter directly.
 \end{proof}
 
 \section{Proof of the main formal theorem}
