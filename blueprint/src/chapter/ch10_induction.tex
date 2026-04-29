@@ -576,6 +576,7 @@ assembly residual:
 \lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndCompleteError, MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndComplete, MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndCompleteError_le_absorbedZeta2}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeScalars.orthonormalizeAndCompleteError_zeta1_le_zeta2}
 \lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff.line156Approx}
+\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.completeAtOutcomeProj_left_matchMass_ge, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_completeAtOutcomeProj}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.projectiveEvaluationConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.pointAConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.pointBConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.toProjectiveAssemblyResidual}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveLine169HandoffResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveLine169HandoffResidual.toProjectiveHandoffResidual}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.ofLine169HandoffResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.toUnsymmetrizedPOVMTargets, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.toPreProjectiveSelfConsistency}
@@ -616,10 +617,13 @@ completion transport, the remaining active residual is now the split
 \texttt{MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual}: its
 first field is the concrete Section~6 role residual, and its post-role field asks
 only for Alice's line-146 completion closeness, Bob's left-register completion
-closeness as returned by orthonormalize-and-complete, and the two exact
-polynomial-level $\zeta_1$ transport links from paper line~169 and its
-role-reversed analogue.  Lean transports the Bob-side left-register completion
-estimate to the line-147 right-register form before applying the older wrappers.
+closeness as returned by orthonormalize-and-complete, and the construction-level
+match-mass monotonicity invariant needed for the exact polynomial-level
+$\zeta_1$ transport links from paper line~169 and its role-reversed analogue.
+Lean reconstructs pre-projective full-polynomial consistency from the role
+residual and then uses the match-mass invariant to derive the two line-169 links;
+it also transports the Bob-side left-register completion estimate to the line-147
+right-register form before applying the older wrappers.
 It no longer asks for an arbitrary role package or an arbitrary raw Section~6
 witness as an independent field.  It also no longer asks for the two factor-two
 role-block estimates, the unused Section~6 consistency field inside
@@ -630,8 +634,9 @@ the resulting projective self-consistency to
 \texttt{MainFormalCascadeTransportTargets} using the projective converse of
 \texttt{simeq-to-approx}.
 
-The line-169 transport fields are deliberately left as residual data.  As stated
-in \texttt{preliminaries.tex}, \texttt{prop:triangle-sub} gives a
+The exact line-169 transport fields are now derived from the stored match-mass
+monotonicity invariant rather than being independent residual data.  As stated in
+\texttt{preliminaries.tex}, \texttt{prop:triangle-sub} gives a
 $\delta+\sqrt{\epsilon}$ loss, so applying it directly to
 $G^{\mathrm A}\simeq_{\zeta_1}G^{\mathrm B}$ and
 $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
@@ -639,10 +644,10 @@ $Q^{\mathrm A}\simeq_{\zeta_1+\sqrt{\zeta_2}}G^{\mathrm B}$, not the printed
 $\zeta_1$ estimate.  The generic corrected route would degrade the final point
 error to scale $t^{1/65536}$, outside the current \texttt{mainFormalError}
 envelope.  Closing the residual while preserving the paper constants therefore
-requires a stronger construction-level projectivization/correlation-preservation
-theorem, not just the generic \texttt{triangle-sub} lemma. No proof-level
-completeness tag is claimed here while \texttt{mainFormal} still contains that
-completion-line-169 residual.
+still requires the remaining construction-level projectivization/correlation-
+preservation theorem for the repaired submeasurements, not just the generic
+\texttt{triangle-sub} lemma. No proof-level completeness tag is claimed here while
+\texttt{mainFormal} still contains that completion-line-169 residual.
 
 \end{remark}
 \begin{proof}
