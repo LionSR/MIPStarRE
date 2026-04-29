@@ -153,6 +153,45 @@ theorem postprocess_transport {α β γ : Type*} {ι : Type*}
             symm
             simp [postprocess, Finset.sum_filter]
 
+/-- Naturality of postprocessing with respect to transport along equivalences on
+both the source and target outcome alphabets. -/
+theorem postprocess_transport_equiv {α β γ δ : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype γ] [Fintype δ]
+    [Fintype ι] [DecidableEq ι]
+    (eα : α ≃ β) (eγ : γ ≃ δ) (A : SubMeas α ι)
+    (f : α → γ) (g : β → δ)
+    (h : ∀ a, g (eα a) = eγ (f a)) :
+    postprocess (transport eα A) g = transport eγ (postprocess A f) := by
+  classical
+  refine SubMeas.ext ?_ rfl
+  intro d
+  have hsum :
+      (∑ b : β, if g b = d then A.outcome (eα.symm b) else 0) =
+        ∑ a : α, if g (eα a) = d then A.outcome a else 0 := by
+    simpa using
+      (Equiv.sum_comp eα
+        (fun b : β => if g b = d then A.outcome (eα.symm b) else 0)).symm
+  calc
+    (postprocess (transport eα A) g).outcome d
+        = ∑ b : β, if g b = d then A.outcome (eα.symm b) else 0 := by
+            simp [postprocess, transport, Finset.sum_filter]
+    _ = ∑ a : α, if g (eα a) = d then A.outcome a else 0 := hsum
+    _ = ∑ a : α, if eγ (f a) = d then A.outcome a else 0 := by
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            rw [h a]
+    _ = ∑ a : α, if f a = eγ.symm d then A.outcome a else 0 := by
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            by_cases ha : f a = eγ.symm d
+            · simp [ha]
+            · have hne : eγ (f a) ≠ d := by
+                intro hfd
+                exact ha (by simpa using congrArg eγ.symm hfd)
+              simp [ha, hne]
+    _ = (transport eγ (postprocess A f)).outcome d := by
+            simp [postprocess, transport, Finset.sum_filter]
+
 /-- Postprocessing is functorial: postprocessing by `f` and then by `g`
 agrees with a single postprocessing by the composite `g ∘ f`. -/
 @[simp] theorem postprocess_comp {α β γ : Type*} {ι : Type*}

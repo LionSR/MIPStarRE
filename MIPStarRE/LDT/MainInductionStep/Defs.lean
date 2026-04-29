@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Basic.SubMeasurementFamilies
+import MIPStarRE.LDT.Basic.LinePolynomials
 import MIPStarRE.LDT.Test.StrategyCore
 
 /-!
@@ -308,6 +309,94 @@ noncomputable def restrictDiagonalMeasurement (params : Parameters)
         (strategy.diagonalMeasurement (DiagonalLine.appendAtHeight params ℓ x))
         (fun f : DiagonalLinePolynomial params.next => f zeroCoord))
       (diagonalValueRepresentative params)
+
+/-- Restrict a diagonal-line measurement to the slice at height `x`, using the
+paper-level function-answer alphabet.
+
+Unlike `restrictDiagonalMeasurement`, this keeps the whole line answer function
+rather than only the value at `zeroCoord`.  The map is total because
+`DiagonalLineAnswer` has no degree-bound subtype proof to preserve. -/
+noncomputable def restrictDiagonalAnswerMeasurement (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (x : Fq params) :
+    IdxProjMeas (DiagonalLine params) (DiagonalLineAnswer params) ι :=
+  fun ℓ =>
+    ProjMeas.postprocess
+      (strategy.diagonalMeasurement (DiagonalLine.appendAtHeight params ℓ x))
+      (fun f : DiagonalLinePolynomial params.next =>
+        DiagonalLineAnswer.restrictAtHeight params f.toAnswer x)
+
+/-- Transport covariance for the function-valued restricted diagonal-line
+measurement. -/
+private theorem restrictDiagonalAnswerMeasurement_transportInvariant (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (x : Fq params) :
+    DiagonalAnswerMeasurementTransportInvariant params
+      (restrictDiagonalAnswerMeasurement params strategy x) := by
+  intro ℓ t
+  apply ProjMeas.ext
+  intro a
+  have htransport :=
+    MIPStarRE.LDT.DiagonalCovariantMeasurement.transportInvariant
+      strategy.diagonalMeasurement (DiagonalLine.appendAtHeight params ℓ x) t
+  let A := (strategy.diagonalMeasurement (DiagonalLine.appendAtHeight params ℓ x)).toSubMeas
+  let ePoly := DiagonalLinePolynomial.reparamAtEquiv (params := params.next) t
+  let eAns := DiagonalLineAnswer.reparamAtEquiv (params := params) t
+  let f : DiagonalLinePolynomial params.next → DiagonalLineAnswer params :=
+    fun g => DiagonalLineAnswer.restrictAtHeight params g.toAnswer x
+  have hcomm : ∀ g, f (ePoly g) = eAns (f g) := by
+    intro g
+    funext s
+    dsimp [f, ePoly, eAns, DiagonalLinePolynomial.reparamAtEquiv,
+      DiagonalLineAnswer.reparamAtEquiv, DiagonalLinePolynomial.toAnswer,
+      DiagonalLineAnswer.restrictAtHeight, DiagonalLineAnswer.reparamAt]
+    exact DiagonalLinePolynomial.reparamAt_apply g t s
+  have hpost : postprocess (SubMeas.transport ePoly A) f =
+      SubMeas.transport eAns (postprocess A f) :=
+    SubMeas.postprocess_transport_equiv ePoly eAns A f f hcomm
+  exact congrArg (fun M : SubMeas (DiagonalLineAnswer params) ι => M.outcome a) <| by
+    simpa [restrictDiagonalAnswerMeasurement, DiagonalLine.transportMeasurement,
+      ProjMeas.transport, Measurement.transport, A, ePoly, eAns, f,
+      DiagonalLine.appendAtHeight_rebaseAt, htransport] using hpost
+
+/-- The paper-faithful `x`-restricted strategy with function-valued diagonal-line
+answers.
+
+This is the slice strategy used in `inductive_step.tex`, lines 436--455.  It is
+kept parallel to the current `xRestrictedStrategy`, whose diagonal field uses the
+legacy degree-bounded answer alphabet and therefore only preserves the sampled
+base-point readout. -/
+noncomputable def xRestrictedAnswerSymStrat (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (x : Fq params) : AnswerSymStrat params ι where
+  state := strategy.state
+  permInvState := strategy.permInvState
+  densityFixed := strategy.densityFixed
+  isNormalized := strategy.isNormalized
+  pointMeasurement := fun u => strategy.pointMeasurement (appendPoint params u x)
+  axisParallelMeasurement :=
+    { toIdxProjMeas := restrictAxisParallelMeasurement params strategy x
+      transportInvariant :=
+        restrictAxisParallelMeasurement_transportInvariant params strategy x }
+  diagonalMeasurement :=
+    { toIdxProjMeas := restrictDiagonalAnswerMeasurement params strategy x
+      transportInvariant :=
+        restrictDiagonalAnswerMeasurement_transportInvariant params strategy x }
+
+/-- The function-answer restricted strategy reuses the ambient bipartite state. -/
+@[simp] theorem xRestrictedAnswerSymStrat_state (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (x : Fq params) :
+    (xRestrictedAnswerSymStrat params strategy x).state = strategy.state :=
+  rfl
+
+/-- The function-answer restricted strategy reindexes point questions by appending
+the slice height. -/
+@[simp] theorem xRestrictedAnswerSymStrat_pointMeasurement_apply (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (x : Fq params) (u : Point params) :
+    (xRestrictedAnswerSymStrat params strategy x).pointMeasurement u =
+      strategy.pointMeasurement (appendPoint params u x) :=
+  rfl
 
 /-- The `x`-restricted strategy from the proof of the main induction theorem. -/
 noncomputable def xRestrictedStrategy (params : Parameters) [FieldModel params.q]

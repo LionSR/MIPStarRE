@@ -222,6 +222,49 @@ theorem reparamInvariant {params : Parameters} [FieldModel params.q]
 
 end DiagonalCovariantMeasurement
 
+/-- Transport covariance for diagonal-line measurements whose answers are the
+paper-level line functions. -/
+def DiagonalAnswerMeasurementTransportInvariant (params : Parameters)
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (M : IdxProjMeas (DiagonalLine params) (DiagonalLineAnswer params) ι) : Prop :=
+  ∀ (ℓ : DiagonalLine params) (t : Fq params),
+    M (DiagonalLine.rebaseAt ℓ t) =
+      ProjMeas.transport (DiagonalLineAnswer.reparamAtEquiv t) (M ℓ)
+
+/-- Diagonal-line measurements with paper-level function answers, bundled with
+transport-level rebasing covariance.
+
+This parallel API is intended for the paper-faithful restriction redesign: unlike
+`DiagonalLinePolynomial`, the function-answer alphabet admits a total slice
+append/restrict equivalence. -/
+structure DiagonalAnswerCovariantMeasurement (params : Parameters)
+    [FieldModel params.q] (ι : Type*) [Fintype ι] [DecidableEq ι] where
+  toIdxProjMeas :
+    IdxProjMeas (DiagonalLine params) (DiagonalLineAnswer params) ι
+  transportInvariant :
+    DiagonalAnswerMeasurementTransportInvariant params toIdxProjMeas
+
+instance {params : Parameters} [FieldModel params.q] {ι : Type*}
+    [Fintype ι] [DecidableEq ι] :
+    CoeFun (DiagonalAnswerCovariantMeasurement params ι)
+      (fun _ => DiagonalLine params → ProjMeas (DiagonalLineAnswer params) ι) where
+  coe M := M.toIdxProjMeas
+
+/-- Paper-level symmetric strategy data whose diagonal-line answers are functions.
+
+This parallel structure is the target shape for the restriction redesign in
+Section 6: restricting an ambient diagonal line to a slice is total for function
+answers, unlike the current degree-bounded `DiagonalLinePolynomial` alphabet. -/
+structure AnswerSymStrat (params : Parameters) [FieldModel params.q]
+    (ι : Type*) [Fintype ι] [DecidableEq ι] where
+  state : QuantumState (ι × ι)
+  permInvState : PermInvState state
+  densityFixed : swapDensity state.density = state.density
+  isNormalized : state.IsNormalized
+  pointMeasurement : IdxProjMeas (Point params) (Fq params) ι
+  axisParallelMeasurement : AxisParallelCovariantMeasurement params ι
+  diagonalMeasurement : DiagonalAnswerCovariantMeasurement params ι
+
 /-- Paper-local symmetric strategy data.
 
 The line-measurement fields are bundled as transport-covariant wrappers:
