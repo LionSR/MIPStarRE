@@ -13,6 +13,7 @@ on:
       - '.github/workflows/lint-blueprint.yml'
       - 'blueprint/src/**'
       - 'scripts/check_blueprint_latex.py'
+      - 'scripts/tests/test_check_blueprint_latex.py'
       - 'scripts/blueprint_lean_sync.py'
   pull_request:
     types: [opened, synchronize, reopened]
@@ -25,6 +26,7 @@ on:
       - '.github/workflows/lint-blueprint.yml'
       - 'blueprint/src/**'
       - 'scripts/check_blueprint_latex.py'
+      - 'scripts/tests/test_check_blueprint_latex.py'
       - 'scripts/blueprint_lean_sync.py'
 
 concurrency:
@@ -51,6 +53,9 @@ jobs:
         run: |
           pip install leanblueprint
           pip install plastex
+
+      - name: Test blueprint LaTeX convention checker
+        run: python3 -m unittest scripts.tests.test_check_blueprint_latex
 
       - name: Check blueprint LaTeX conventions
         run: python3 scripts/check_blueprint_latex.py --root blueprint/src
