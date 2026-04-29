@@ -32,6 +32,28 @@ easier to read, especially on a small screen or in a small window.
 If you are editing with VS Code, there is a visual marker which
 will indicate a 100 character limit.
 
+### Linter warnings
+
+Do not mask linter warnings instead of fixing them. A cleanup PR should not add
+broad `set_option linter.<name> false` blocks, and especially not file-wide
+blocks, just to make the build output quieter. Linters exist to expose real
+maintenance problems; hiding them makes later proof work and review harder.
+
+Fix the warning at its source whenever possible:
+
+- wrap long lines rather than disabling `linter.style.longLine`;
+- remove or narrow unused variables, section variables, and unused typeclass
+  assumptions rather than disabling the corresponding unused-* linter;
+- remove unused `simp` arguments rather than disabling `linter.unusedSimpArgs`;
+- rewrite proof terms or state the simplified goal explicitly rather than
+  silencing `linter.flexible`.
+
+If a linter warning is a genuine false positive or a temporary porting
+exception, use the narrowest possible scope, preferably
+`set_option linter.<name> false in <decl>`, and add a short nearby explanation.
+Such exceptions should be rare and reviewable. Never use linter suppression as
+the main mechanism for a linter-warning cleanup PR.
+
 ### Header and imports
 
 The file header should contain copyright information, a list of all

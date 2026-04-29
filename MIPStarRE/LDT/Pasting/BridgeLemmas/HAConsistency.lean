@@ -4,7 +4,8 @@ import MIPStarRE.LDT.Pasting.BridgeLemmas.HBConsistency
 /-!
 # Section 12 pasting: H-A consistency
 
-Vertical-line to point-consistency bridge and completed-measurement wrapper for `cor:h-a-consistency`.
+Vertical-line to point-consistency bridge and completed-measurement wrapper for
+`cor:h-a-consistency`.
 
 ## References
 
@@ -131,23 +132,22 @@ lines 1098–1117.
 Steps:
 1. Restrict `hHB.lineConsistency` to a single point on the line
 2. Apply `triangleSub` with the `A-B` consistency bound from `hgood`
-3. Error bound: `ν₆ + √(8mε + 4δ) ≤ 47k²m(...) ≤ 100k²m(...)` -/
+3. Error bound: `ν₆ + √(8mε + 4δ) ≤ 47k²m(...) ≤ 100k²m(...)`.
+
+The completion and large-`k` hypotheses are carried by the downstream
+completed-measurement wrapper; this submeasurement core only uses the positive
+`k` regime and the already-packaged `HBConsistencyStatement`. -/
 private lemma hAConsistency_submeas_core
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
-    (eps delta gamma kappa zeta : Error)
+    (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (hgamma_nonneg : 0 ≤ gamma)
     (hzeta_nonneg : 0 ≤ zeta)
-    (hgamma_le : gamma ≤ 1)
-    (hzeta_le : zeta ≤ 1)
-    (hdq_le : params.d ≤ params.q)
-    (hcomplete : family.Complete strategy.state kappa)
     (k : ℕ)
     (hk_pos : 1 ≤ k)
-    (hk : 400 * params.m * params.d ≤ k)
     (hHB : HBConsistencyStatement params strategy family
         eps delta gamma zeta k) :
     ConsRel strategy.state (uniformDistribution (Point params.next))
@@ -294,20 +294,18 @@ theorem hAConsistency_submeas
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (eps delta gamma kappa zeta : Error)
+    (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (hgamma_le : gamma ≤ 1)
     (hzeta_le : zeta ≤ 1)
     (hdq_le : params.d ≤ params.q)
     (hd : 0 < params.d)
     (family : IdxPolyFamily params ι)
-    (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
-    (hk_pos : 1 ≤ k)
-    (hk : 400 * params.m * params.d ≤ k) :
+    (hk_pos : 1 ≤ k) :
     ConsRel strategy.state (uniformDistribution (Point params.next))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params.next
@@ -372,8 +370,7 @@ theorem hAConsistency_submeas
         family.evaluatedAtNextPoint)
       hcons.pointConsistency.offDiagonalBound
   exact hAConsistency_submeas_core params strategy family
-    eps delta gamma kappa zeta hgood hgamma_nonneg hzeta_nonneg hgamma_le hzeta_le hdq_le
-    hcomplete k hk_pos hk hHB
+    eps delta gamma zeta hgood hgamma_nonneg hzeta_nonneg k hk_pos hHB
 
 /-- Completed-measurement version of `cor:h-a-consistency`.
 

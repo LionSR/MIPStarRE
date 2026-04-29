@@ -263,6 +263,8 @@ private lemma fromHToGBernoulliTailMass_lower_bound
     rw [ldPasting_chernoff_exponent_eq]
   linarith
 
+set_option maxHeartbeats 500000 in
+-- The downstream completeness theorem elaborates the full `fromHToG` bridge facts.
 /-- `cor:ld-pasting-N-completeness` once the Bernoulli-tail lower bound is
 supplied explicitly.
 
@@ -427,9 +429,9 @@ lemma ldPastingSubMeas
         LdPastingSubMeasConclusion params strategy family H eps delta gamma kappa zeta k := by
   refine ⟨constructedPastedSubMeas params family k, rfl, ?_⟩
   have hconsistency :=
-    hAConsistency_submeas params strategy eps delta gamma kappa zeta
+    hAConsistency_submeas params strategy eps delta gamma zeta
       hgood hgamma_le hzeta_le hdq_le hd
-      family hcomplete hcons hself hbound k hk_pos hk
+      family hcons hself hbound k hk_pos
   have hcompleteness :=
     ldPastingNCompleteness params strategy eps delta gamma kappa zeta
       hgood hgamma_le hzeta_le hdq_le hd
@@ -463,9 +465,9 @@ theorem ldPasting
         LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
   refine ⟨constructedPastedMeasurement params family k, rfl, ?_⟩
   have hsubmeasConsistency :=
-    hAConsistency_submeas params strategy eps delta gamma kappa zeta
+    hAConsistency_submeas params strategy eps delta gamma zeta
       hgood hgamma_le hzeta_le hdq_le hd
-      family hcomplete hcons hself hbound k hk_pos hk
+      family hcons hself hbound k hk_pos
   have hcompleteness :=
     ldPastingNCompleteness params strategy eps delta gamma kappa zeta
       hgood hgamma_le hzeta_le hdq_le hd

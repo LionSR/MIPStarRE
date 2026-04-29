@@ -1,8 +1,5 @@
 import MIPStarRE.LDT.Pasting.CommutingWithG.Incomplete
 
-set_option linter.style.setOption false
-set_option linter.unusedSimpArgs false
-
 /-!
 # Section 12 pasting: G-hat facts
 
@@ -160,7 +157,7 @@ theorem gHatFacts
             simp [gHatSelfConsistencyLeftFamily, gHatSelfConsistencyRightFamily,
               gHatIdxMeas, completeSubMeas, incompletePartLeftFamily,
               incompletePartRightFamily, incompletePartSubMeas, leftPlacedSubMeas,
-              rightPlacedSubMeas, SubMeas.liftLeft, SubMeas.liftRight,
+              rightPlacedSubMeas,
               IdxSubMeas.liftLeft, IdxSubMeas.liftRight, IdxProjSubMeas.toIdxSubMeas,
               add_comm]
       _ =

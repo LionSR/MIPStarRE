@@ -478,9 +478,11 @@ private lemma m_mul_sliceConditioningLoss_rpow_le_next_m_mul_rpow
     have hnum_ge : (params.m : Error) ≤ ((params.m + 1 : ℕ) : Error) := by
       exact_mod_cast Nat.le_succ params.m
     exact (one_le_div₀ hm_pos).2 hnum_ge
-  have hloss_rpow_le : Real.rpow (sliceConditioningLoss params) c ≤ sliceConditioningLoss params := by
+  have hloss_rpow_le :
+      Real.rpow (sliceConditioningLoss params) c ≤ sliceConditioningLoss params := by
     calc
-      Real.rpow (sliceConditioningLoss params) c ≤ Real.rpow (sliceConditioningLoss params) 1 := by
+      Real.rpow (sliceConditioningLoss params) c
+          ≤ Real.rpow (sliceConditioningLoss params) 1 := by
             exact Real.rpow_le_rpow_of_exponent_le hloss_ge_one hc_le_one
       _ = sliceConditioningLoss params := by simp
   calc
@@ -555,7 +557,8 @@ private lemma mainInductionNu_lt_one_of_mainInductionError_lt_one
     have hexp_nonneg :
         0 ≤ Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))) := by
       positivity
-    have hnu_le : mainInductionNu params k eps delta gamma ≤ mainInductionError params k eps delta gamma := by
+    have hnu_le : mainInductionNu params k eps delta gamma
+        ≤ mainInductionError params k eps delta gamma := by
       calc
         mainInductionNu params k eps delta gamma
           ≤ ((params.m : Error) ^ (2 : ℕ)) * mainInductionNu params k eps delta gamma := by
@@ -946,7 +949,8 @@ private lemma eps_le_one_of_selfImprovementInInductionError_le_one
     have hcoef_nonneg : 0 ≤ 3000 * (params.next.m : Error) := by
       positivity
     have hmul := mul_le_mul_of_nonneg_left hsummono hcoef_nonneg
-    simpa [selfImprovementInInductionError, Parameters.next, mul_assoc, mul_left_comm, mul_comm] using hmul
+    simpa [selfImprovementInInductionError, Parameters.next, mul_assoc, mul_left_comm,
+        mul_comm] using hmul
   exact
     le_one_of_selfImprovementInInductionError_le_one_of_scaled_bound
       params hzeta_le heps_scaled_le
@@ -984,7 +988,8 @@ private lemma delta_le_one_of_selfImprovementInInductionError_le_one
     have hcoef_nonneg : 0 ≤ 3000 * (params.next.m : Error) := by
       positivity
     have hmul := mul_le_mul_of_nonneg_left hsummono hcoef_nonneg
-    simpa [selfImprovementInInductionError, Parameters.next, mul_assoc, mul_left_comm, mul_comm] using hmul
+    simpa [selfImprovementInInductionError, Parameters.next, mul_assoc, mul_left_comm,
+        mul_comm] using hmul
   exact
     le_one_of_selfImprovementInInductionError_le_one_of_scaled_bound
       params hzeta_le hdelta_scaled_le
@@ -1064,12 +1069,14 @@ private lemma restrictAxisParallelMeasurement_toSubMeas_eq_transport
     (ℓ : AxisParallelLine params) :
     (restrictAxisParallelMeasurement params strategy x ℓ).toSubMeas =
       SubMeas.transport (axisLinePolynomialEquiv params x).symm
-        ((strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas) := by
+        ((strategy.axisParallelMeasurement
+          (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas) := by
   refine SubMeas.ext ?_ ?_
   · intro f
     rfl
   · simpa [SubMeas.transport,
-      (strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)).total_eq_one] using
+      (strategy.axisParallelMeasurement
+        (AxisParallelLine.appendAtHeight params ℓ x)).total_eq_one] using
       (restrictAxisParallelMeasurement params strategy x ℓ).total_eq_one
 
 private lemma restrictAxisParallelMeasurement_postprocess_zero
@@ -1101,8 +1108,10 @@ private lemma restrictedAxisSampleError_eq
     (u : Point params)
     (i : Fin params.m) :
     qBipartiteConsDefect strategy.state
-      (RestrictedSymStrat.axisParallelPointAnswerFamily (xRestrictedStrategy params strategy x) (u, i))
-      (RestrictedSymStrat.axisParallelLineAnswerFamily (xRestrictedStrategy params strategy x) (u, i)) =
+      (RestrictedSymStrat.axisParallelPointAnswerFamily
+        (xRestrictedStrategy params strategy x) (u, i))
+      (RestrictedSymStrat.axisParallelLineAnswerFamily
+        (xRestrictedStrategy params strategy x) (u, i)) =
     qBipartiteConsDefect strategy.state
       (axisParallelPointAnswerFamily strategy (appendPoint params u x, embedCoord params i))
       (axisParallelLineAnswerFamily strategy (appendPoint params u x, embedCoord params i)) := by
@@ -1128,8 +1137,10 @@ private noncomputable def sliceAxisDirectionError
     (i : Fin params.m) : Error :=
   avgOver (uniformDistribution (Point params)) fun u =>
     qBipartiteConsDefect strategy.state
-      (RestrictedSymStrat.axisParallelPointAnswerFamily (xRestrictedStrategy params strategy x) (u, i))
-      (RestrictedSymStrat.axisParallelLineAnswerFamily (xRestrictedStrategy params strategy x) (u, i))
+      (RestrictedSymStrat.axisParallelPointAnswerFamily
+        (xRestrictedStrategy params strategy x) (u, i))
+      (RestrictedSymStrat.axisParallelLineAnswerFamily
+        (xRestrictedStrategy params strategy x) (u, i))
 
 /-- Per-direction axis-parallel consistency defect of the ambient `(m+1)`-dimensional
 strategy at direction `i`, averaged over the ambient point space `Point params.next`. -/
@@ -1360,7 +1371,9 @@ private lemma weighted_embedded_average_le_full_average
     classical
     calc
       ∑ i : Fin params.m, f (embedCoord params i)
-        = Finset.sum (((Finset.univ : Finset (Fin params.m)).image (embedCoord params))) (fun j => f j) := by
+        = Finset.sum
+            (((Finset.univ : Finset (Fin params.m)).image (embedCoord params)))
+            (fun j => f j) := by
             symm
             refine Finset.sum_image ?_
             intro a _ b _ hab
@@ -1376,7 +1389,8 @@ private lemma weighted_embedded_average_le_full_average
           ∑ i : Fin params.m, (1 / (params.m : Error)) * f (embedCoord params i) := by
             simp [avgOver, uniformDistribution, Fintype.card_fin]
     _ = ∑ i : Fin params.m,
-          (sliceTransverseDirectionWeight params * (1 / (params.m : Error))) * f (embedCoord params i) := by
+          (sliceTransverseDirectionWeight params * (1 / (params.m : Error)))
+              * f (embedCoord params i) := by
             rw [Finset.mul_sum]
             refine Finset.sum_congr rfl ?_
             intro i _
@@ -1413,11 +1427,15 @@ private lemma restrictedDiagonalSampleError_eq
     (j : Fin params.m)
     (s : RestrictedDiagonalSample params j) :
     qBipartiteConsDefect strategy.state
-      (RestrictedSymStrat.restrictedDiagonalPointAnswerFamily (xRestrictedStrategy params strategy x) j s)
-      (RestrictedSymStrat.restrictedDiagonalLineAnswerFamily (xRestrictedStrategy params strategy x) j s) =
+      (RestrictedSymStrat.restrictedDiagonalPointAnswerFamily
+        (xRestrictedStrategy params strategy x) j s)
+      (RestrictedSymStrat.restrictedDiagonalLineAnswerFamily
+        (xRestrictedStrategy params strategy x) j s) =
     qBipartiteConsDefect strategy.state
-      (diagonalPointAnswerFamily strategy (embedCoord params j) (appendPoint params s.1 x, s.2))
-      (diagonalLineAnswerFamily strategy (embedCoord params j) (appendPoint params s.1 x, s.2)) := by
+      (diagonalPointAnswerFamily strategy (embedCoord params j)
+        (appendPoint params s.1 x, s.2))
+      (diagonalLineAnswerFamily strategy (embedCoord params j)
+        (appendPoint params s.1 x, s.2)) := by
   have hdir :
       appendPoint params (extendRestrictedDirection j s.2) zeroCoord =
         extendRestrictedDirection (params := params.next) (embedCoord params j) s.2 := by
@@ -1436,7 +1454,8 @@ private lemma restrictedDiagonalSampleError_eq
       DiagonalLine.appendAtHeight params
           { base := s.1, direction := extendRestrictedDirection j s.2 } x =
         ({ base := appendPoint params s.1 x,
-           direction := extendRestrictedDirection (params := params.next) (embedCoord params j) s.2 } :
+           direction :=
+             extendRestrictedDirection (params := params.next) (embedCoord params j) s.2 } :
           DiagonalLine params.next) := by
     simp [DiagonalLine.appendAtHeight, hdir]
   simp [RestrictedSymStrat.restrictedDiagonalPointAnswerFamily,
@@ -1454,8 +1473,10 @@ private noncomputable def diagonalSliceIndexError
     (j : Fin params.m) : Error :=
   bipartiteConsError strategy.state
     (uniformDistribution (RestrictedDiagonalSample params j))
-    (RestrictedSymStrat.restrictedDiagonalPointAnswerFamily (xRestrictedStrategy params strategy x) j)
-    (RestrictedSymStrat.restrictedDiagonalLineAnswerFamily (xRestrictedStrategy params strategy x) j)
+    (RestrictedSymStrat.restrictedDiagonalPointAnswerFamily
+      (xRestrictedStrategy params strategy x) j)
+    (RestrictedSymStrat.restrictedDiagonalLineAnswerFamily
+      (xRestrictedStrategy params strategy x) j)
 
 /-- Per-index diagonal-line consistency defect of the ambient `(m+1)`-dimensional
 strategy at index `j`, averaged over the ambient restricted diagonal sample space. -/
@@ -1511,7 +1532,9 @@ private lemma diagonalSliceIndexErrorAverage_eq_diagonalIndexError
               (avgOver_uniform_prod (α := Fq params)
                 (β := RestrictedDiagonalSample params j)
                 (f := fun x s => g (appendPoint params s.1 x, s.2))).symm
-    _ = avgOver (uniformDistribution (RestrictedDiagonalSample params.next (embedCoord params j))) g := by
+    _ = avgOver
+          (uniformDistribution (RestrictedDiagonalSample params.next (embedCoord params j)))
+          g := by
             simpa using
               (CommutativityPoints.avgOver_uniform_equiv
                 (e := pointAppendProdEquiv params (Fin (j.val + 1) → Fq params))
@@ -1575,14 +1598,18 @@ private lemma averageRestrictedDiagonalFailure_eq_embeddedDiagonalIndices
                     ∑ j : Fin params.m,
                       bipartiteConsError strategy.state
                         (uniformDistribution (RestrictedDiagonalSample params j))
-                        ((xRestrictedStrategy params strategy x).restrictedDiagonalPointAnswerFamily j)
-                        ((xRestrictedStrategy params strategy x).restrictedDiagonalLineAnswerFamily j)
+                        ((xRestrictedStrategy params strategy
+                          x).restrictedDiagonalPointAnswerFamily j)
+                        ((xRestrictedStrategy params strategy
+                          x).restrictedDiagonalLineAnswerFamily j)
                   = ∑ j : Fin params.m,
                       (1 / (params.m : Error)) *
                         bipartiteConsError strategy.state
                           (uniformDistribution (RestrictedDiagonalSample params j))
-                          ((xRestrictedStrategy params strategy x).restrictedDiagonalPointAnswerFamily j)
-                          ((xRestrictedStrategy params strategy x).restrictedDiagonalLineAnswerFamily j) := by
+                          ((xRestrictedStrategy params strategy
+                            x).restrictedDiagonalPointAnswerFamily j)
+                          ((xRestrictedStrategy params strategy
+                            x).restrictedDiagonalLineAnswerFamily j) := by
                               rw [Finset.mul_sum]
                 _ = avgOver (uniformDistribution (Fin params.m))
                       (fun j => diagonalSliceIndexError params strategy x j) := by
@@ -1899,7 +1926,7 @@ theorem mainInductionFromPackages
         hH.pointConsistency, by simpa [kappa, zeta] using hpaste.error_le⟩
   exact mainInductionOfWitness params.next strategy eps delta gamma k hwitness
 
-private lemma restrictedAxisParallelFailureProbability_nonneg
+private lemma restrictedAxisParallelProb_nonneg
     (params : Parameters) [FieldModel params.q]
     (strategy : RestrictedSymStrat params ι) :
     0 ≤ strategy.axisParallelFailureProbability := by
@@ -1917,10 +1944,11 @@ private lemma restricted_axis_nonneg
     ∀ x, 0 ≤ profile.axisParallel x := by
   intro x
   exact le_trans
-    (restrictedAxisParallelFailureProbability_nonneg params (xRestrictedStrategy params strategy x))
+    (restrictedAxisParallelProb_nonneg params
+      (xRestrictedStrategy params strategy x))
     (profile.restrictedGood x).axisParallelTest
 
-private lemma restrictedSelfConsistencyFailureProbability_nonneg
+private lemma restrictedSelfConsistencyProb_nonneg
     (params : Parameters) [FieldModel params.q]
     (strategy : RestrictedSymStrat params ι) :
     0 ≤ strategy.selfConsistencyFailureProbability := by
@@ -1937,10 +1965,11 @@ private lemma restricted_self_nonneg
     ∀ x, 0 ≤ profile.selfConsistency x := by
   intro x
   exact le_trans
-    (restrictedSelfConsistencyFailureProbability_nonneg params (xRestrictedStrategy params strategy x))
+    (restrictedSelfConsistencyProb_nonneg params
+      (xRestrictedStrategy params strategy x))
     (profile.restrictedGood x).selfConsistencyTest
 
-private lemma restrictedDiagonalFailureProbability_nonneg
+private lemma restrictedDiagonalProb_nonneg
     (params : Parameters) [FieldModel params.q]
     (strategy : RestrictedSymStrat params ι) :
     0 ≤ strategy.diagonalFailureProbability := by
@@ -1962,7 +1991,8 @@ private lemma restricted_diag_nonneg
     ∀ x, 0 ≤ profile.diagonal x := by
   intro x
   exact le_trans
-    (restrictedDiagonalFailureProbability_nonneg params (xRestrictedStrategy params strategy x))
+    (restrictedDiagonalProb_nonneg params
+      (xRestrictedStrategy params strategy x))
     (profile.restrictedGood x).diagonalLineTest
 
 /-- Averaging the slice self-improvement errors gives the paper's displayed
@@ -1985,14 +2015,18 @@ private lemma average_sliceSelfImprovementError_le
     positivity
   have haxis_avg :
       avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.axisParallel x) (1 / (32 : Error))) ≤
-        Real.rpow (averageRestrictedAxisParallelError params hrestrict.profile) (1 / (32 : Error)) := by
+        Real.rpow
+          (averageRestrictedAxisParallelError params hrestrict.profile)
+          (1 / (32 : Error)) := by
     simpa [averageRestrictedAxisParallelError, 𝒟] using
       avgOver_uniform_rpow_one_div_le_rpow_avg
         (α := Fq params) (f := hrestrict.profile.axisParallel) (n := 32) (by norm_num)
         (restricted_axis_nonneg params hrestrict.profile)
   have hself_avg :
       avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.selfConsistency x) (1 / (32 : Error))) ≤
-        Real.rpow (averageRestrictedSelfConsistencyError params hrestrict.profile) (1 / (32 : Error)) := by
+        Real.rpow
+          (averageRestrictedSelfConsistencyError params hrestrict.profile)
+          (1 / (32 : Error)) := by
     simpa [averageRestrictedSelfConsistencyError, 𝒟] using
       avgOver_uniform_rpow_one_div_le_rpow_avg
         (α := Fq params) (f := hrestrict.profile.selfConsistency) (n := 32) (by norm_num)
@@ -2012,7 +2046,9 @@ private lemma average_sliceSelfImprovementError_le
         Real.rpow (sliceConditioningLoss params * eps) (1 / (32 : Error)) := by
     exact Real.rpow_le_rpow haxis_nonneg hrestrict.axisAverageBound (by positivity)
   have hself_rpow_le :
-      Real.rpow (averageRestrictedSelfConsistencyError params hrestrict.profile) (1 / (32 : Error)) ≤
+      Real.rpow
+          (averageRestrictedSelfConsistencyError params hrestrict.profile)
+          (1 / (32 : Error)) ≤
         Real.rpow delta (1 / (32 : Error)) := by
     exact Real.rpow_le_rpow hself_nonneg hrestrict.selfAverageBound (by positivity)
   have haxis_term :
@@ -2020,7 +2056,8 @@ private lemma average_sliceSelfImprovementError_le
           avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.axisParallel x) (1 / (32 : Error))) ≤
         (params.next.m : Error) * Real.rpow eps (1 / (32 : Error)) := by
     have htmp :=
-      mul_le_mul_of_nonneg_left (le_trans haxis_avg haxis_rpow_le) (by positivity : 0 ≤ (params.m : Error))
+      mul_le_mul_of_nonneg_left (le_trans haxis_avg haxis_rpow_le) (by positivity : 0
+          ≤ (params.m : Error))
     exact le_trans htmp
       (m_mul_sliceConditioningLoss_rpow_le_next_m_mul_rpow params heps_nonneg (by positivity)
         (by norm_num : (1 / (32 : Error)) ≤ 1))
@@ -2030,20 +2067,23 @@ private lemma average_sliceSelfImprovementError_le
         (params.next.m : Error) * Real.rpow delta (1 / (32 : Error)) := by
     have htmp :
         (params.m : Error) *
-            avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.selfConsistency x) (1 / (32 : Error))) ≤
+            avgOver 𝒟
+              (fun x => Real.rpow (hrestrict.profile.selfConsistency x) (1 / (32 : Error))) ≤
           (params.m : Error) * Real.rpow delta (1 / (32 : Error)) := by
       exact mul_le_mul_of_nonneg_left (le_trans hself_avg hself_rpow_le) (by positivity)
     exact le_trans htmp <|
       mul_le_mul_of_nonneg_right hm_le_next (Real.rpow_nonneg hdelta_nonneg _)
   have hratio_term :
-      (params.m : Error) * Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)) ≤
+      (params.m : Error) *
+          Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)) ≤
         (params.next.m : Error) *
           Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)) := by
     exact mul_le_mul_of_nonneg_right hm_le_next (Real.rpow_nonneg hratio_nonneg _)
   have hinner :
       (params.m : Error) *
           (avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.axisParallel x) (1 / (32 : Error))) +
-            avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.selfConsistency x) (1 / (32 : Error))) +
+            avgOver 𝒟
+              (fun x => Real.rpow (hrestrict.profile.selfConsistency x) (1 / (32 : Error))) +
             Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error))) ≤
         (params.next.m : Error) *
           (Real.rpow eps (1 / (32 : Error)) +
@@ -2055,7 +2095,8 @@ private lemma average_sliceSelfImprovementError_le
     avgOver 𝒟 (fun x => sliceSelfImprovementError params hrestrict x)
       = 3000 * (params.m : Error) *
           (avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.axisParallel x) (1 / (32 : Error))) +
-            avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.selfConsistency x) (1 / (32 : Error))) +
+            avgOver 𝒟
+              (fun x => Real.rpow (hrestrict.profile.selfConsistency x) (1 / (32 : Error))) +
             Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error))) := by
           simp [sliceSelfImprovementError, selfImprovementInInductionError, avgOver_add,
             avgOver_const_mul, avgOver_uniform_const, 𝒟]
@@ -2093,21 +2134,27 @@ private lemma average_sliceMainInductionNu_le
     positivity
   have haxis_avg :
       avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.axisParallel x) (1 / (1024 : Error))) ≤
-        Real.rpow (averageRestrictedAxisParallelError params hrestrict.profile) (1 / (1024 : Error)) := by
+        Real.rpow
+          (averageRestrictedAxisParallelError params hrestrict.profile)
+          (1 / (1024 : Error)) := by
     simpa [averageRestrictedAxisParallelError, 𝒟] using
       avgOver_uniform_rpow_one_div_le_rpow_avg
         (α := Fq params) (f := hrestrict.profile.axisParallel) (n := 1024) (by norm_num)
         (restricted_axis_nonneg params hrestrict.profile)
   have hself_avg :
       avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.selfConsistency x) (1 / (1024 : Error))) ≤
-        Real.rpow (averageRestrictedSelfConsistencyError params hrestrict.profile) (1 / (1024 : Error)) := by
+        Real.rpow
+          (averageRestrictedSelfConsistencyError params hrestrict.profile)
+          (1 / (1024 : Error)) := by
     simpa [averageRestrictedSelfConsistencyError, 𝒟] using
       avgOver_uniform_rpow_one_div_le_rpow_avg
         (α := Fq params) (f := hrestrict.profile.selfConsistency) (n := 1024) (by norm_num)
         (restricted_self_nonneg params hrestrict.profile)
   have hdiag_avg :
       avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.diagonal x) (1 / (1024 : Error))) ≤
-        Real.rpow (averageRestrictedDiagonalError params hrestrict.profile) (1 / (1024 : Error)) := by
+        Real.rpow
+          (averageRestrictedDiagonalError params hrestrict.profile)
+          (1 / (1024 : Error)) := by
     simpa [averageRestrictedDiagonalError, 𝒟] using
       avgOver_uniform_rpow_one_div_le_rpow_avg
         (α := Fq params) (f := hrestrict.profile.diagonal) (n := 1024) (by norm_num)
@@ -2129,11 +2176,15 @@ private lemma average_sliceMainInductionNu_le
       avgOver_nonneg 𝒟 hrestrict.profile.diagonal
         (restricted_diag_nonneg params hrestrict.profile)
   have haxis_rpow_le :
-      Real.rpow (averageRestrictedAxisParallelError params hrestrict.profile) (1 / (1024 : Error)) ≤
+      Real.rpow
+          (averageRestrictedAxisParallelError params hrestrict.profile)
+          (1 / (1024 : Error)) ≤
         Real.rpow (sliceConditioningLoss params * eps) (1 / (1024 : Error)) := by
     exact Real.rpow_le_rpow haxis_nonneg hrestrict.axisAverageBound (by positivity)
   have hself_rpow_le :
-      Real.rpow (averageRestrictedSelfConsistencyError params hrestrict.profile) (1 / (1024 : Error)) ≤
+      Real.rpow
+          (averageRestrictedSelfConsistencyError params hrestrict.profile)
+          (1 / (1024 : Error)) ≤
         Real.rpow delta (1 / (1024 : Error)) := by
     exact Real.rpow_le_rpow hself_nonneg hrestrict.selfAverageBound (by positivity)
   have hdiag_rpow_le :
@@ -2151,11 +2202,13 @@ private lemma average_sliceMainInductionNu_le
         (by norm_num : (1 / (1024 : Error)) ≤ 1))
   have hself_term :
       ((params.m : Error) ^ (2 : ℕ)) *
-          avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.selfConsistency x) (1 / (1024 : Error))) ≤
+          avgOver 𝒟
+            (fun x => Real.rpow (hrestrict.profile.selfConsistency x) (1 / (1024 : Error))) ≤
         ((params.next.m : Error) ^ (2 : ℕ)) * Real.rpow delta (1 / (1024 : Error)) := by
     have htmp :
         ((params.m : Error) ^ (2 : ℕ)) *
-            avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.selfConsistency x) (1 / (1024 : Error))) ≤
+            avgOver 𝒟
+              (fun x => Real.rpow (hrestrict.profile.selfConsistency x) (1 / (1024 : Error))) ≤
           ((params.m : Error) ^ (2 : ℕ)) * Real.rpow delta (1 / (1024 : Error)) := by
       exact mul_le_mul_of_nonneg_left (le_trans hself_avg hself_rpow_le) (by positivity)
     exact le_trans htmp <|
@@ -2178,8 +2231,10 @@ private lemma average_sliceMainInductionNu_le
   have hinner :
       ((params.m : Error) ^ (2 : ℕ)) *
           (avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.axisParallel x) (1 / (1024 : Error))) +
-            avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.selfConsistency x) (1 / (1024 : Error))) +
-            avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.diagonal x) (1 / (1024 : Error))) +
+            avgOver 𝒟
+              (fun x => Real.rpow (hrestrict.profile.selfConsistency x) (1 / (1024 : Error))) +
+            avgOver 𝒟
+              (fun x => Real.rpow (hrestrict.profile.diagonal x) (1 / (1024 : Error))) +
             Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error))) ≤
         ((params.next.m : Error) ^ (2 : ℕ)) *
           (Real.rpow eps (1 / (1024 : Error)) +
@@ -2187,15 +2242,18 @@ private lemma average_sliceMainInductionNu_le
             Real.rpow gamma (1 / (1024 : Error)) +
             Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error))) := by
     nlinarith [haxis_term, hself_term, hdiag_term, hratio_term]
-  have hinner' := mul_le_mul_of_nonneg_left hinner (by positivity : 0 ≤ 1000 * ((k : Error) ^ (2 : ℕ)))
+  have hinner' := mul_le_mul_of_nonneg_left hinner (by positivity : 0 ≤ 1000
+      * ((k : Error) ^ (2 : ℕ)))
   calc
     avgOver 𝒟 (fun x =>
         mainInductionNu params k (hrestrict.profile.axisParallel x)
           (hrestrict.profile.selfConsistency x) (hrestrict.profile.diagonal x))
       = 1000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (2 : ℕ)) *
           (avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.axisParallel x) (1 / (1024 : Error))) +
-            avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.selfConsistency x) (1 / (1024 : Error))) +
-            avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.diagonal x) (1 / (1024 : Error))) +
+            avgOver 𝒟
+              (fun x => Real.rpow (hrestrict.profile.selfConsistency x) (1 / (1024 : Error))) +
+            avgOver 𝒟
+              (fun x => Real.rpow (hrestrict.profile.diagonal x) (1 / (1024 : Error))) +
             Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error))) := by
           simp [mainInductionNu, avgOver_add, avgOver_const_mul, avgOver_uniform_const, 𝒟]
     _ ≤ 1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) *
@@ -2299,7 +2357,9 @@ private lemma selfImprovementInInductionError_le_mainInductionNu
                     Real.rpow delta (1 / (1024 : Error)) +
                     Real.rpow (((params.d : Error) / (params.q : Error)))
                       (1 / (1024 : Error)) := by
-            exact add_nonneg (add_nonneg (Real.rpow_nonneg heps_nonneg _) (Real.rpow_nonneg hdelta_nonneg _))
+            exact add_nonneg
+              (add_nonneg (Real.rpow_nonneg heps_nonneg _)
+                (Real.rpow_nonneg hdelta_nonneg _))
               (Real.rpow_nonneg hratio_nonneg _)
           exact mul_le_mul_of_nonneg_right hcoef hsum_nonneg
     _ ≤ mainInductionNu params.next k eps delta gamma := by
@@ -2416,7 +2476,8 @@ private lemma ldPastingInInductionNu_le_fifth_mainInductionNu
               (1 / (32 : Error)) ≤
             Real.rpow (Real.rpow eps (1 / (32 : Error))) (1 / (32 : Error)) +
               Real.rpow (Real.rpow delta (1 / (32 : Error))) (1 / (32 : Error)) := by
-        exact Real.rpow_add_le_add_rpow (Real.rpow_nonneg heps_nonneg _) (Real.rpow_nonneg hdelta_nonneg _)
+        exact Real.rpow_add_le_add_rpow (Real.rpow_nonneg heps_nonneg _)
+          (Real.rpow_nonneg hdelta_nonneg _)
           (by positivity) (by norm_num : (1 / (32 : Error)) ≤ 1)
       have hsum123 :
           Real.rpow
@@ -2564,12 +2625,16 @@ private lemma ldPastingInInductionNu_le_fifth_mainInductionNu
           have hzeta_nonneg : 0 ≤ zeta := by
             dsimp [zeta]
             have hratio32_nonneg' :
-                0 ≤ Real.rpow (((params.next.d : Error) / (params.next.q : Error))) (1 / (32 : Error)) :=
+                0 ≤ Real.rpow
+                  (((params.next.d : Error) / (params.next.q : Error)))
+                  (1 / (32 : Error)) :=
               Real.rpow_nonneg hratio_nonneg (1 / (32 : Error))
             have hsum_nonneg' :
                 0 ≤ Real.rpow eps (1 / (32 : Error)) +
                       Real.rpow delta (1 / (32 : Error)) +
-                      Real.rpow (((params.next.d : Error) / (params.next.q : Error))) (1 / (32 : Error)) := by
+                      Real.rpow
+                        (((params.next.d : Error) / (params.next.q : Error)))
+                        (1 / (32 : Error)) := by
               exact add_nonneg (add_nonneg heps32_nonneg hdelta32_nonneg) hratio32_nonneg'
             unfold selfImprovementInInductionError
             exact mul_nonneg (by positivity) hsum_nonneg'
@@ -2615,7 +2680,8 @@ private lemma family_averagedMass_eq_avg
     ev strategy.state
         (leftTensor (ι₂ := ι)
           (∑ x : Fq params,
-            ((1 / (Fintype.card (Fq params) : Error)) : Error) • (hself.sliceProj x).toSubMeas.total)) =
+            ((1 / (Fintype.card (Fq params) : Error)) : Error) •
+              (hself.sliceProj x).toSubMeas.total)) =
       ∑ x : Fq params,
         (1 / (Fintype.card (Fq params) : Error)) *
           ev strategy.state (leftTensor (ι₂ := ι) ((hself.sliceProj x).toSubMeas.total))
@@ -2627,7 +2693,8 @@ private lemma family_averagedMass_eq_avg
   intro x hx
   have hsmul :
       leftTensor (ι₂ := ι)
-          (((1 / (Fintype.card (Fq params) : Error)) : Error) • (hself.sliceProj x).toSubMeas.total) =
+          (((1 / (Fintype.card (Fq params) : Error)) : Error) •
+            (hself.sliceProj x).toSubMeas.total) =
         ((1 / (Fintype.card (Fq params) : Error)) : Error) •
           leftTensor (ι₂ := ι) ((hself.sliceProj x).toSubMeas.total) := by
     ext i j
@@ -2684,7 +2751,8 @@ private lemma family_pointConsistencyError_eq_avg
               (e := Equiv.prodComm (Point params) (Fq params))
               (f := fun ux : Point params × Fq params => g (appendPoint params ux.1 ux.2)))
     _ = avgOver (uniformDistribution (Fq params))
-          (fun x => avgOver (uniformDistribution (Point params)) (fun u => g (appendPoint params u x))) := by
+          (fun x => avgOver (uniformDistribution (Point params))
+            (fun u => g (appendPoint params u x))) := by
           simpa using
             (avgOver_uniform_prod (f := fun x u => g (appendPoint params u x)))
     _ = avgOver (uniformDistribution (Fq params))
@@ -2700,9 +2768,9 @@ private lemma family_pointConsistencyError_eq_avg
           simp [g, IdxPolyFamily.evaluatedAtNextPoint, polynomialEvaluationFamily,
             IdxProjMeas.toIdxSubMeas]
 
+set_option maxHeartbeats 1000000 in
 -- The averaged slice-to-pasting assembly generates several large nonlinear
 -- arithmetic goals in the final telescoping estimate.
-set_option maxHeartbeats 1000000 in
 /-- The remaining averaged step from per-slice self-improvement data to the
 pasting hypotheses.
 
@@ -2751,7 +2819,8 @@ noncomputable def assemblePastingPackage
                 (fun x => subMeasMass strategy.state ((hself.sliceProj x).toSubMeas.liftLeft)) := by
           have hconst1 : avgOver 𝒟 (fun _ : Fq params => (1 : Error)) = 1 := by
             simpa [𝒟] using (avgOver_uniform_const (α := Fq params) (1 : Error))
-          have hnegErr : avgOver 𝒟 (fun a => -hinduction.sliceError a) = -avgOver 𝒟 hinduction.sliceError := by
+          have hnegErr : avgOver 𝒟 (fun a => -hinduction.sliceError a)
+              = -avgOver 𝒟 hinduction.sliceError := by
             simpa [avgOver_const_mul] using (avgOver_const_mul 𝒟 (-1) hinduction.sliceError)
           have hnegZeta :
               avgOver 𝒟 (fun a => -sliceSelfImprovementError params hrestrict a) =
@@ -2760,7 +2829,8 @@ noncomputable def assemblePastingPackage
               (avgOver_const_mul 𝒟 (-1) (fun a => sliceSelfImprovementError params hrestrict a))
           calc
             1 - kappa = avgOver 𝒟
-                (fun x => (1 - hinduction.sliceError x) - sliceSelfImprovementError params hrestrict x) := by
+                (fun x => (1 - hinduction.sliceError x) - sliceSelfImprovementError params
+                    hrestrict x) := by
                   dsimp [kappa]
                   rw [show (fun x => (1 - hinduction.sliceError x) -
                         sliceSelfImprovementError params hrestrict x) =
@@ -2787,7 +2857,8 @@ noncomputable def assemblePastingPackage
             = avgOver 𝒟
                 (fun x =>
                   bipartiteConsError strategy.state (uniformDistribution (Point params))
-                    (IdxProjMeas.toIdxSubMeas (xRestrictedStrategy params strategy x).pointMeasurement)
+                    (IdxProjMeas.toIdxSubMeas
+                      (xRestrictedStrategy params strategy x).pointMeasurement)
                     (polynomialEvaluationFamily params (hself.sliceProj x).toSubMeas)) :=
                 family_pointConsistencyError_eq_avg params strategy hself
           _ ≤ avgOver 𝒟 (fun x => sliceSelfImprovementError params hrestrict x) := by

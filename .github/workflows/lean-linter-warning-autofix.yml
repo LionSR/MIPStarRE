@@ -52,7 +52,7 @@ jobs:
         uses: ./.github/actions/setup-lean
 
       - name: Set up Python for warning summary
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 

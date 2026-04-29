@@ -1,8 +1,5 @@
 import MIPStarRE.LDT.Pasting.Defs.Tuples
 
-set_option linter.style.setOption false
-set_option linter.unnecessarySimpa false
-
 /-!
 # Section 12 pasting: Bernoulli truncated sums
 
@@ -224,11 +221,12 @@ private lemma full_gHatType_sum_eq_one
                 gHatTypeOperator G τprefix) * (1 - G) := by
                 rw [Finset.sum_mul, Finset.sum_mul]
         _ = 1 * G + 1 * (1 - G) := by
-              simpa [full_gHatType_sum_eq_one G prefixLen]
+              simp [full_gHatType_sum_eq_one G prefixLen]
         _ = 1 := by
               have hcancel : G + (1 - G) = (1 : MIPStarRE.Quantum.Op ι) := by
                 abel
-              simpa [one_mul] using hcancel
+              rw [one_mul, one_mul]
+              exact hcancel
 
 /-- `lem:truncated-type-sum-recurrence`.
 
@@ -370,7 +368,7 @@ theorem truncatedTypeSumRecurrence
                   (d + 1 ≤ gHatTypeWeight (Fin.cons false τprefix) + gHatTypeWeight τtail) ↔
                     (d + 1 ≤ gHatTypeWeight τprefix +
                       gHatTypeWeight (prependTypeBit false τtail)) := by
-                simpa [gHatTypeWeight_fin_cons_false, gHatTypeWeight_prepend_false]
+                simp [gHatTypeWeight_fin_cons_false, gHatTypeWeight_prepend_false]
               by_cases h : d + 1 ≤ gHatTypeWeight τprefix +
                   gHatTypeWeight (prependTypeBit false τtail)
               · have h' :

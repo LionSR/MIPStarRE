@@ -195,10 +195,13 @@ report shows a focused cleanup worth attempting.
 **Follow-up convention**: If the report shows non-trivial cleanup, open a normal
 cleanup PR with the `auto-fix-claude`, `cleanup`, `formalization`, `2009.12982`,
 `ci`, and `infrastructure` labels as appropriate. Any automated or manual
-follow-up must preserve the Lean file-order convention: `set_option` directives
-go after the module docstring and before the imports/body that depend on them.
-The sweep is strictly for linter/unused-instance hygiene, not proof changes or
-`sorry` removal.
+follow-up must fix warnings rather than hide them behind broad
+`set_option linter.<name> false` blocks; see
+[`docs/style.md#linter-warnings`](style.md#linter-warnings). If a genuine false
+positive needs a temporary exception, keep the `set_option` declaration-local,
+place it after the imports and module docstring, and explain why it is not a
+fixable warning. The sweep is strictly for linter/unused-instance hygiene, not
+proof changes or `sorry` removal.
 
 ### Lean Linter-Warning Auto-Fix (`lean-linter-warning-autofix.yml`)
 
@@ -241,7 +244,10 @@ so untrusted PR contexts cannot access the write token or Claude secret.
 any Lean cleanup is paper-faithful before merge; the workflow guards prevent
 obvious integrity failures but do not replace mathematical review. If a warning
 would require a substantive proof rewrite or theorem-statement change, leave it
-for a human-authored proof PR instead of the linter auto-fix wrapper.
+for a human-authored proof PR instead of the linter auto-fix wrapper. Reject
+auto-fix output that merely disables linters instead of removing the reported
+warning, except for a narrow, explained false-positive suppression on a single
+declaration.
 
 **Scheduled write-mode policy**: Unattended scheduled PR creation is disabled.
 Do not add a `schedule:` trigger to `.github/workflows/lean-linter-warning-autofix.yml`,

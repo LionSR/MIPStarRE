@@ -172,7 +172,7 @@ lemma polynomialAgreement_avg_le_mdq
     _ ≤ ((((params.m * params.d : ℕ) : ℚ≥0) / Fintype.card (Scalar params)) : Error) := by
           exact_mod_cast hsz
     _ = (params.m * params.d : Error) / params.q := by
-          simp [scalar_card, div_eq_mul_inv]
+          simp [div_eq_mul_inv]
 
 /-- Reindex evaluation equality for degree-`d` line polynomials from coded
 `Fq params` parameters to the scalar field used by Mathlib's univariate

@@ -24,6 +24,7 @@ from blueprint_lean_sync import (  # noqa: E402
     _strip_tex_comment,
     _write_json_report,
     collect_blueprint_entries,
+    collect_file_lean_decls,
     find_orphan_leanok_tags,
 )
 
@@ -254,6 +255,69 @@ class CollectBlueprintEntriesTests(unittest.TestCase):
         self.assertFalse(outer.proof_has_leanok)
         self.assertTrue(inner.has_leanok)
         self.assertTrue(inner.proof_has_leanok)
+
+
+class CollectLeanDeclsTests(unittest.TestCase):
+    def test_collect_file_lean_decls_ignores_comments_and_marks_private(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            lean_root = root / "MIPStarRE"
+            lean_root.mkdir()
+            lean_file = lean_root / "Fake.lean"
+            lean_file.write_text(
+                textwrap.dedent(
+                    """
+                    namespace Foo
+
+                    /-
+                    lemma commentedOut : True := by
+                      trivial
+                    -/
+
+                    -- def lineCommented : Nat := 0
+
+                    def stringBlockCommentToken : String := "/-"
+                    def stringLineCommentToken : String := "--"
+                    def interpolatedStringToken : String := s!"{"/-"}"
+                    def afterInterpolatedStringToken : Nat := 1
+                    def messageInterpolatedStringToken : MessageData := m!"{"/-"}"
+                    def afterMessageInterpolatedStringToken : Nat := 2
+                    def nestedInterpolatedStringToken : String := s!"{s!"{1}"} /-"
+                    def afterNestedInterpolatedStringToken : Nat := 3
+                    def escapedInterpolationBraceToken : String := s!"{{/-}}"
+                    def charLiterals : List Char := ['/', '-']
+                    def primedName' : Nat := 0
+
+                    private lemma privateHelper : True := by
+                      trivial
+
+                    theorem publicTheorem : True := by
+                      trivial
+
+                    end Foo
+                    """
+                ).strip()
+                + "\n"
+            )
+
+            decls = collect_file_lean_decls(lean_file, lean_root)
+            by_name = {decl.fqn: decl for decl in decls}
+
+            self.assertNotIn("Foo.commentedOut", by_name)
+            self.assertNotIn("Foo.lineCommented", by_name)
+            self.assertIn("Foo.stringBlockCommentToken", by_name)
+            self.assertIn("Foo.stringLineCommentToken", by_name)
+            self.assertIn("Foo.interpolatedStringToken", by_name)
+            self.assertIn("Foo.afterInterpolatedStringToken", by_name)
+            self.assertIn("Foo.messageInterpolatedStringToken", by_name)
+            self.assertIn("Foo.afterMessageInterpolatedStringToken", by_name)
+            self.assertIn("Foo.nestedInterpolatedStringToken", by_name)
+            self.assertIn("Foo.afterNestedInterpolatedStringToken", by_name)
+            self.assertIn("Foo.escapedInterpolationBraceToken", by_name)
+            self.assertIn("Foo.charLiterals", by_name)
+            self.assertIn("Foo.primedName'", by_name)
+            self.assertTrue(by_name["Foo.privateHelper"].is_private)
+            self.assertFalse(by_name["Foo.publicTheorem"].is_private)
 
 
 class LeanokPlacementReportingTests(unittest.TestCase):

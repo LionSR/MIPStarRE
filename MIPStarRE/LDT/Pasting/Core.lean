@@ -3,13 +3,6 @@ import MIPStarRE.LDT.MainInductionStep.Statements
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
 import MIPStarRE.LDT.Preliminaries.Triangles
 
-set_option linter.style.setOption false
-set_option linter.flexible false
-set_option linter.unnecessarySimpa false
-set_option linter.unusedDecidableInType false
-set_option linter.unusedFintypeInType false
-set_option linter.unusedSectionVars false
-
 /-!
 # Section 12 pasting: core setup
 
@@ -26,6 +19,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+omit [Fintype ι] [DecidableEq ι] in
 private lemma ldGbcon_swapDensity_eq_reindex
     (X : MIPStarRE.Quantum.Op (ι × ι)) :
     swapDensity X = Matrix.reindex (Equiv.prodComm ι ι) (Equiv.prodComm ι ι) X := by
@@ -34,9 +28,11 @@ private lemma ldGbcon_swapDensity_eq_reindex
   rcases y with ⟨j₁, j₂⟩
   rfl
 
+omit [DecidableEq ι] in
 private lemma ldGbcon_swapDensity_mul
     (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
     swapDensity (X * Y) = swapDensity X * swapDensity Y := by
+  classical
   simpa [ldGbcon_swapDensity_eq_reindex] using
     (Matrix.reindexAlgEquiv_mul ℂ ℂ (Equiv.prodComm ι ι) X Y)
 
@@ -972,7 +968,7 @@ lemma qSDD_completePart_le_slice
       _ = ev ψbi (leftTensor (ι₂ := ι) T) +
             ev ψbi (rightTensor (ι₁ := ι) T) -
             2 * ev ψbi (opTensor T T) := by
-            simpa [hTT]
+            simp [hTT]
   have horig :
       qSDD ψbi (((family.meas x).toSubMeas).liftLeft)
           (((family.meas x).toSubMeas).liftRight) =
@@ -1052,7 +1048,7 @@ lemma qSDD_completePart_le_slice
                 _ = ev ψbi (leftTensor (ι₂ := ι) (P.outcome g)) +
                       ev ψbi (rightTensor (ι₁ := ι) (P.outcome g)) -
                       2 * ev ψbi (opTensor (P.outcome g) (P.outcome g)) := by
-                          simpa [P.proj g]
+                          simp [P.proj g]
       _ = (∑ g : Polynomial params,
               (ev ψbi (leftTensor (ι₂ := ι) (P.outcome g)) +
                 ev ψbi (rightTensor (ι₁ := ι) (P.outcome g)))) -

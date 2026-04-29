@@ -24,10 +24,10 @@ private lemma switcherooAggregateLeftFront_contraction
     (M : IdxProjSubMeas (Fq params) Outcome ι)
     (q : SlicePairQuestion params) :
     (∑ go : Polynomial params × Outcome,
-        (∑ u : Unit,
+        (∑ _u : Unit,
             leftTensor (ι₂ := ι)
               (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2))ᴴ *
-          (∑ u : Unit,
+          (∑ _u : Unit,
             leftTensor (ι₂ := ι)
               (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2))) ≤ 1 := by
   calc
@@ -164,6 +164,7 @@ private lemma switcherooAggregateLeftFront_contraction
                       hmid_le (show (0 : MIPStarRE.Quantum.Op ι) ≤ 1 by exact zero_le_one))
             _ = 1 := by simp [leftTensor]
 
+omit [Fintype ι] [DecidableEq ι] in
 private lemma switcheroo_swapDensity_eq_reindex
     (X : MIPStarRE.Quantum.Op (ι × ι)) :
     swapDensity X = Matrix.reindex (Equiv.prodComm ι ι) (Equiv.prodComm ι ι) X := by
@@ -172,6 +173,7 @@ private lemma switcheroo_swapDensity_eq_reindex
   rcases y with ⟨j₁, j₂⟩
   rfl
 
+omit [DecidableEq ι] in
 private lemma switcheroo_swapDensity_mul
     (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
     swapDensity (X * Y) = swapDensity X * swapDensity Y := by
@@ -531,7 +533,7 @@ private lemma switcherooAggregateLeftFrontRawLocal_point
     (M : IdxProjSubMeas (Fq params) Outcome ι)
     (q : SlicePairQuestion params) :
     (∑ go : Polynomial params × Outcome,
-        ∑ u : Unit,
+        ∑ _u : Unit,
           ev ψbi
             ((switcherooPointProductLeft params family M q).outcome go *
               leftTensor (ι₂ := ι)
@@ -557,7 +559,7 @@ private lemma switcherooAggregateFirstSplitRawLocal_point
     (M : IdxProjSubMeas (Fq params) Outcome ι)
     (q : SlicePairQuestion params) :
     (∑ go : Polynomial params × Outcome,
-        ∑ u : Unit,
+        ∑ _u : Unit,
           ev ψbi
             ((switcherooPointProductRight params family M q).outcome go *
               leftTensor (ι₂ := ι)
