@@ -5,7 +5,8 @@ import MIPStarRE.LDT.Basic.LowDegreePolynomial
 /-!
 # Section 12 pasting: bridge common helpers
 
-Shared postprocessing, symmetry, distribution, boundedness, and arithmetic helpers for the Section 12 bridge lemmas.
+Shared postprocessing, symmetry, distribution, boundedness, and arithmetic helpers for the Section
+12 bridge lemmas.
 
 ## References
 
@@ -22,6 +23,35 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+/-- Multiplying a left tensor into a full tensor only affects the left factor. -/
+lemma leftTensor_mul_opTensor
+    (A B C : MIPStarRE.Quantum.Op ι) :
+    leftTensor (ι₂ := ι) A * opTensor B C = opTensor (A * B) C := by
+  calc
+    leftTensor (ι₂ := ι) A * opTensor B C
+        = leftTensor (ι₂ := ι) A * (leftTensor (ι₂ := ι) B * rightTensor (ι₁ := ι) C) := by
+          rw [leftTensor_mul_rightTensor_eq_opTensor]
+    _ = (leftTensor (ι₂ := ι) A * leftTensor (ι₂ := ι) B) * rightTensor (ι₁ := ι) C := by
+          rw [Matrix.mul_assoc]
+    _ = leftTensor (ι₂ := ι) (A * B) * rightTensor (ι₁ := ι) C := by
+          rw [leftTensor_mul_leftTensor]
+    _ = opTensor (A * B) C := by
+          rw [leftTensor_mul_rightTensor_eq_opTensor]
+
+/-- Multiplying a full tensor by a left tensor only affects the left factor. -/
+lemma opTensor_mul_leftTensor
+    (A B C : MIPStarRE.Quantum.Op ι) :
+    opTensor A C * leftTensor (ι₂ := ι) B = opTensor (A * B) C := by
+  calc
+    opTensor A C * leftTensor (ι₂ := ι) B
+        = (leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) C) * leftTensor (ι₂ := ι) B := by
+          rw [leftTensor_mul_rightTensor_eq_opTensor]
+    _ = leftTensor (ι₂ := ι) A * (rightTensor (ι₁ := ι) C * leftTensor (ι₂ := ι) B) := by
+          rw [Matrix.mul_assoc]
+    _ = leftTensor (ι₂ := ι) A * opTensor B C := by
+          rw [rightTensor_mul_leftTensor_eq_opTensor]
+    _ = opTensor (A * B) C := leftTensor_mul_opTensor A B C
+
 lemma postprocess_postprocess
     {α β γ : Type*} [Fintype α] [Fintype β] [Fintype γ]
     (A : SubMeas α ι) (f : α → β) (g : β → γ) :
@@ -29,8 +59,7 @@ lemma postprocess_postprocess
   classical
   refine SubMeas.ext ?_ ?_
   · intro c
-    simp [postprocess, Function.comp, Finset.sum_filter, Finset.sum_comm,
-      eq_comm, and_left_comm, and_assoc]
+    simp [postprocess, Function.comp, Finset.sum_filter, Finset.sum_comm, eq_comm]
   · simp [postprocess_total]
 
 lemma postprocess_hRestrictionToVerticalLine_eq_evaluateAt
@@ -60,10 +89,10 @@ lemma postprocess_hRestrictionToVerticalLine_eq_evaluateAt
       funext i
       by_cases hi : i = ℓ.direction
       · subst hi
-        simpa [AxisParallelLine.pointAt, Polynomial.axisCoordinatePolynomial,
+        simp [AxisParallelLine.pointAt, Polynomial.axisCoordinatePolynomial,
           addCoord, decodePoint, decode_encodeScalar, _root_.Polynomial.eval_add,
           _root_.Polynomial.eval_C, _root_.Polynomial.eval_X]
-      · simpa [AxisParallelLine.pointAt, Polynomial.axisCoordinatePolynomial,
+      · simp [AxisParallelLine.pointAt, Polynomial.axisCoordinatePolynomial,
           hi, decodePoint, _root_.Polynomial.eval_C]
     have hconst :
         (Polynomial.evalRingHom (decodeScalar t)).comp _root_.Polynomial.C = RingHom.id _ := by
@@ -120,10 +149,11 @@ lemma postprocess_hRestrictionToVerticalLine_eq_evaluateAt
                 (pointHeight params u)
               = h (AxisParallelLine.pointAt verticalLine (pointHeight params u)) :=
                   hrestrict_apply h verticalLine (pointHeight params u)
-            _ = h u := by simpa [hbase]
+            _ = h u := by simp [hbase]
   unfold evaluateAt
   refine congrArg (postprocess H) (funext fun h => ?_)
-  show (Polynomial.restrictToAxisParallelLine params.next h verticalLine) (pointHeight params u) = h u
+  change (Polynomial.restrictToAxisParallelLine params.next h verticalLine) (pointHeight params u)
+      = h u
   exact congrFun hfun h
 
 

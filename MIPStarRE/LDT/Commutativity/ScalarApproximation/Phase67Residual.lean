@@ -3,8 +3,12 @@ import MIPStarRE.LDT.Commutativity.EvaluatedSliceBounds.PhaseOneThree
 /-!
 # Section 11 commutativity: phase-67 scalar residual
 
-Named endpoint definitions for the remaining first-coordinate reverse
-`eq:add-an-a` obligation in the scalar approximation proof.
+Named endpoint definitions for the earlier BAB-side first-coordinate reverse
+`eq:add-an-a` residual.  The closed paper-faithful scalar chain now routes
+through
+`MIPStarRE.LDT.Commutativity.evaluatedSlice_phaseSixSeven_reverse_bound`; this
+module is kept as a record of the stricter tensor-first/point-measurement
+endpoint that was split off while auditing issue #732.
 
 ## References
 
@@ -21,12 +25,15 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- The phase-5 removed scalar endpoint in the evaluated-slice scalar chain.
+/-- Historical BAB-side phase-5 removed scalar endpoint.
 
-This is the `phase5Removed` term used in `evaluatedSlice_scalar_chain_bound`:
-for each evaluated-slice question `q=(u,v)`, it averages the BAB-side sandwich
-`G_b^{v,y} G_a^{u,x} G_b^{v,y}` on the left register against the first point
-measurement outcome `A_a^{u,x}` on the right register. -/
+This was the pre-#858 `phase5Removed` endpoint from the older scalar-chain
+scaffold.  The current `evaluatedSlice_scalar_chain_bound` uses the paper
+endpoint `evaluatedSlicePhaseFivePaperRemoved` from `PaperChainPhaseFive`
+instead.  For each evaluated-slice question `q=(u,v)`, this historical endpoint
+averages the BAB-side sandwich `G_b^{v,y} G_a^{u,x} G_b^{v,y}` on the left
+register against the first point measurement outcome `A_a^{u,x}` on the right
+register. -/
 noncomputable def evaluatedSlicePhaseFiveRemoved
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -84,8 +91,8 @@ private lemma evaluatedSlicePhaseFiveRemoved_term_le_babTerm
 /-- Pointwise monotonicity of the phase-5-removed endpoint.
 
 The inserted right-register point outcome can only decrease the `BAB` scalar
-summand.  Thus the remaining phase-67 bridge is a one-sided missing-mass bound,
-not a two-sided algebraic identification. -/
+summand.  Thus this historical phase-67 endpoint is a one-sided missing-mass
+bound, not a two-sided algebraic identification. -/
 lemma evaluatedSlicePhaseFiveRemoved_le_sumBabTerm_pointwise
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -120,9 +127,10 @@ lemma evaluatedSlicePhaseFiveRemoved_le_sumBabTerm_pointwise
 
 /-- Averaged monotonicity of the phase-5-removed endpoint.
 
-This proves the easy half of the reverse-insertion endpoint: after inserting the
-right-register first-coordinate outcome, the scalar is no larger.  The live
-analytic task is therefore only to upper-bound the nonnegative gap. -/
+This proves the easy half of the historical BAB-side reverse-insertion endpoint:
+after inserting the right-register first-coordinate outcome, the scalar is no
+larger.  If one pursues that endpoint, the analytic task is to upper-bound the
+nonnegative gap. -/
 lemma evaluatedSlicePhaseFiveRemoved_sumBabTerm_avg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -162,7 +170,7 @@ def evaluatedSlicePhase67FirstReverseGapResidual
     avgOver 𝒟 (evaluatedSlicePhaseFiveRemoved params strategy family) ≤
     2 * Real.sqrt zeta
 
-/-- The honest remaining first-coordinate reverse `eq:add-an-a` residual.
+/-- The historical first-coordinate reverse `eq:add-an-a` residual.
 
 Formal scalar shape:
 `|avgBAB - evaluatedSlicePhaseFiveRemoved| ≤ 2 * Real.sqrt zeta`, where

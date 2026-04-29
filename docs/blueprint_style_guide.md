@@ -67,6 +67,31 @@ The blueprint reads as a **mathematical document**, not software documentation. 
 - **Proof `\uses`**: list only what the proof *actually calls*. Don't list definitions unless the proof unfolds that definition.
 - **Never self-reference**: a proof's `\uses` must NOT include the label of the theorem it proves.
 
+## Recording Formalization-Only Lemmas
+Some Lean lemmas are genuine proof infrastructure rather than named statements
+from the original papers. These must be traceable without making the blueprint
+look as if the paper stated them.
+
+- If a declaration directly formalizes a paper or blueprint statement, record
+  it as usual with `\lean{...}` on that statement and cite the relevant source.
+- If a public declaration is an auxiliary lemma introduced only for the Lean
+  proof, make that status explicit. Its Lean docstring should say that it is a
+  formalization-only auxiliary lemma and should name the nearby paper equation,
+  line range, or blueprint result it supports.
+- If such an auxiliary declaration is important enough to be referenced from
+  the blueprint, give it a clearly subordinate blueprint node, for example
+  `[Formalization support for ...]`, and state in the first sentence that the
+  lemma is not a named statement of the paper but isolates a step used in the
+  Lean proof.
+- Connect auxiliary nodes to the paper-facing result with `\uses{...}` from
+  the proof that actually calls them. Do not add them only to silence a sync
+  warning; the dependency edge should explain where the auxiliary result is
+  used.
+- Do not mark an auxiliary node with proof-level `\leanok` unless its Lean proof
+  is complete and `#print axioms` has no `sorryAx`. Statement-level `\leanok`
+  is acceptable only when the Lean statement is intentionally recorded but the
+  proof remains tracked as incomplete.
+
 ## Blueprint Structure
 - `content.tex` is a router: `\input{chapter/ch01_intro}` etc.
 - Each chapter is a separate file in `chapter/`

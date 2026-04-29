@@ -43,6 +43,35 @@ def pointConditionedOutcomeOperatorAtPolynomial (params : Parameters) [FieldMode
     (g : Polynomial params) (u : Point params) : MIPStarRE.Quantum.Op ι :=
   (strategy.pointMeasurement u).toSubMeas.outcome (g u)
 
+/-- The two-outcome point event selecting the answer `g(u)`.
+
+This is the submeasurement form of the point operator used in the first and last
+steps of `lem:local-variance-of-points` (`expansion.tex`, lines 305 and 311).
+Its `some ()` outcome is exactly `A^u_{g(u)}`; the `none` outcome is the
+complementary point-answer mass. -/
+noncomputable def pointConditionedEventSubMeasAtPolynomial (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (g : Polynomial params) (u : Point params) : SubMeas (Option Unit) ι :=
+  postprocess ((strategy.pointMeasurement u).toSubMeas)
+    (fun a : Fq params => if a = g u then some () else none)
+
+/-- The selected outcome of `pointConditionedEventSubMeasAtPolynomial` is
+`A^u_{g(u)}`. -/
+@[simp] lemma pointConditionedEventSubMeasAtPolynomial_some (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (g : Polynomial params) (u : Point params) :
+    (pointConditionedEventSubMeasAtPolynomial params strategy g u).outcome (some ()) =
+      pointConditionedOutcomeOperatorAtPolynomial params strategy g u := by
+  classical
+  unfold pointConditionedEventSubMeasAtPolynomial pointConditionedOutcomeOperatorAtPolynomial
+  simp only [postprocess]
+  refine Finset.sum_eq_single (g u) ?_ ?_
+  · intro a ha hne
+    simp [hne] at ha
+  · simp
+
 /-- The paper's weighted operator `A^u_{g(u)} ⊗ (G_g)^{1/2}`
 on the bipartite space `d * d`. -/
 noncomputable def weightedPointConditionedOperatorAtPolynomial (params : Parameters)
@@ -53,6 +82,18 @@ noncomputable def weightedPointConditionedOperatorAtPolynomial (params : Paramet
   opTensor
     (pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
     (polynomialWeightSqrtOperator params G g)
+
+/-- The right-register intermediate `I ⊗ (G_g)^{1/2} A^u_{g(u)}`
+from the first and last self-consistency moves of
+`lem:local-variance-of-points` (`expansion.tex`, lines 306 and 310). -/
+noncomputable def weightedPointConditionedRightOperatorAtPolynomial (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι)
+    (g : Polynomial params) (u : Point params) : MIPStarRE.Quantum.Op (ι × ι) :=
+  rightTensor (ι₁ := ι)
+    (polynomialWeightSqrtOperator params G g *
+      pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
 
 /-- The local variance of `A(g)` on the weighted state `|ψ_g⟩`.
 Operators are lifted to the left tensor factor of the bipartite state. -/

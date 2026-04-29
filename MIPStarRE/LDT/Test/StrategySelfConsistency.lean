@@ -13,26 +13,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace ProjStrat
 
-private lemma ev_classicalRoleSymmState_one {ι : Type*}
-    [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    (ψ : QuantumState (ι × ι)) :
-    ev (classicalRoleSymmState ψ) (1 : MIPStarRE.Quantum.Op ((Role × ι) × (Role × ι))) =
-      ev ψ (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
-  unfold ev classicalRoleSymmState
-  rw [mul_one, MIPStarRE.Quantum.normalizedTrace_add]
-  have hAB :
-      MIPStarRE.Quantum.normalizedTrace
-          ((2 : Error) • rolePairCond Role.A Role.B ψ.density) =
-        (1 / 2 : ℂ) * MIPStarRE.Quantum.normalizedTrace ψ.density :=
-    normalizedTrace_two_smul_rolePairCond Role.A Role.B ψ.density
-  have hBA :
-      MIPStarRE.Quantum.normalizedTrace
-          ((2 : Error) • rolePairCond Role.B Role.A (swapDensity ψ.density)) =
-        (1 / 2 : ℂ) * MIPStarRE.Quantum.normalizedTrace (swapDensity ψ.density) :=
-    normalizedTrace_two_smul_rolePairCond Role.B Role.A (swapDensity ψ.density)
-  rw [hAB, hBA, normalizedTrace_swapDensity, mul_one]
-  ring_nf
-
 private lemma qBipartiteSSCDefect_symmetrizedPoint_eq_qBipartiteConsDefect
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]

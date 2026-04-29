@@ -290,6 +290,24 @@ theorem conjTranspose_opTensor
     (opTensor A B)ᴴ = opTensor Aᴴ Bᴴ :=
   Matrix.conjTranspose_kronecker A B
 
+/-- Conjugate transpose commutes with left tensor placement. -/
+@[simp]
+theorem leftTensor_conjTranspose
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (A : MIPStarRE.Quantum.Op ι₁) :
+    (leftTensor (ι₂ := ι₂) A)ᴴ = leftTensor (ι₂ := ι₂) Aᴴ := by
+  simpa [leftTensor, opTensor] using
+    (conjTranspose_opTensor (ι₁ := ι₁) (ι₂ := ι₂) A (1 : MIPStarRE.Quantum.Op ι₂))
+
+/-- Conjugate transpose commutes with right tensor placement. -/
+@[simp]
+theorem rightTensor_conjTranspose
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (B : MIPStarRE.Quantum.Op ι₂) :
+    (rightTensor (ι₁ := ι₁) B)ᴴ = rightTensor (ι₁ := ι₁) Bᴴ := by
+  simpa [rightTensor, opTensor] using
+    (conjTranspose_opTensor (ι₁ := ι₁) (ι₂ := ι₂) (1 : MIPStarRE.Quantum.Op ι₁) B)
+
 /-- `opTensor` distributes over multiplication. -/
 theorem opTensor_mul
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]

@@ -37,8 +37,8 @@ Error: `2√ζ + √ζ`.
 swap via `commutativityPoints`, then apply the boundedness part of
 `clm:g-comm-stability2` to remove trailing `G^x`.  The paper states
 `clm:g-comm-stability2` with an additional internal `6√(γ(m+1))` point-swap
-loss; the local `hphase5` step below keeps that contribution split off and
-uses only the `√ζ` boundedness estimate.
+loss; the local `hphase5paper` step below keeps the paper's combined
+`√ζ + 6√(γ(m+1))` contribution explicit.
 Error: `2√ζ + 6√(γ(m+1)) + √ζ + 6√(γ(m+1))`.
 
 **Phase 3** (eq:gcom10 → eq:gonna-cite-this-in-just-a-bit): reverse the
@@ -50,66 +50,6 @@ self-consistency twice.
 Error: `√ζ + √ζ`.
 
 Total: `12√ζ + 12√(γ(m+1))`. Then `2 * total ≤ 48m(√γ + √ζ)`. -/
-
-/-- Unfold the phase-2 stability relation into the scalar defect term used in
-`eq:gcom9`.  This is copied locally from the overlap proof so that the scalar
-chain can cite the averaged inequality directly. -/
-private lemma evaluatedSlice_phaseTwo_stability_gap
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (zeta : Error)
-    (hstab : SDDOpRel strategy.state
-      (uniformDistribution (EvaluatedSliceQuestion params))
-      (commDataProcessedGStabilityOneLeft params strategy family G)
-      (commDataProcessedGStabilityOneRight params strategy family G)
-      (Real.sqrt zeta)) :
-    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-      (fun q =>
-        ∑ ah : StabilityOneOutcome params,
-          ev strategy.state
-            ((leftTensor (ι₂ := ι)
-                ((1 - (G (pointHeight params q.2)).total) *
-                  (((evaluatedSliceSandwichRaw params strategy family q).outcome
-                    (ah.1, ah.2 (truncatePoint params q.2)))ᴴ *
-                    (evaluatedSliceSandwichRaw params strategy family q).outcome
-                      (ah.1, ah.2 (truncatePoint params q.2))) *
-                  (1 - (G (pointHeight params q.2)).total))) *
-              rightTensor (ι₁ := ι) ((G (pointHeight params q.2)).outcome ah.2))) ≤
-      Real.sqrt zeta := by
-  rcases hstab with ⟨hstab⟩
-  calc
-    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-        (fun q =>
-          ∑ ah : StabilityOneOutcome params,
-            ev strategy.state
-              ((leftTensor (ι₂ := ι)
-                  ((1 - (G (pointHeight params q.2)).total) *
-                    (((evaluatedSliceSandwichRaw params strategy family q).outcome
-                      (ah.1, ah.2 (truncatePoint params q.2)))ᴴ *
-                      (evaluatedSliceSandwichRaw params strategy family q).outcome
-                        (ah.1, ah.2 (truncatePoint params q.2))) *
-                    (1 - (G (pointHeight params q.2)).total))) *
-                rightTensor (ι₁ := ι) ((G (pointHeight params q.2)).outcome ah.2)))
-      = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-          (fun q =>
-            qSDDOp strategy.state
-              (commDataProcessedGStabilityOneLeft params strategy family G q)
-              (commDataProcessedGStabilityOneRight params strategy family G q)) := by
-            apply avgOver_congr
-            intro q
-            symm
-            exact
-              commDataProcessedGStabilityOne_qSDDOp_expand
-                params strategy family G hG q
-    _ = sddErrorOp strategy.state
-          (uniformDistribution (EvaluatedSliceQuestion params))
-          (commDataProcessedGStabilityOneLeft params strategy family G)
-          (commDataProcessedGStabilityOneRight params strategy family G) := by
-            rfl
-    _ ≤ Real.sqrt zeta := hstab
 
 /-- The scalar defect controlled by `gCommStability_scalar` after averaging out
 all evaluated-slice variables except the second slice height `y`.
@@ -620,7 +560,7 @@ phase-2 defect averages to the one-dimensional scalar defect bounded by
 `gCommStability_scalar`.  Proving it amounts to the marginalization/fiber
 bookkeeping outlined in the docstring of
 `evaluatedSlice_phaseTwo_stability_defect_bound`, with
-`avgOver_uniform_pointNext_decompose` as the intended first marginalization step. -/
+`avgOver_uniform_pointNext_decompose` as the first marginalization step. -/
 private def evaluatedSlicePhaseTwoReindexingResidual
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -630,73 +570,6 @@ private def evaluatedSlicePhaseTwoReindexingResidual
       (evaluatedSlicePhaseTwoQuestionDefect params strategy family G) =
     avgOver (uniformDistribution (Fq params))
       (evaluatedSlicePhaseTwoStabilityDefect params strategy family G)
-
-/-- Unfold the phase-5 stability relation into the scalar defect term used in
-`eq:gcom10`. -/
-private lemma evaluatedSlice_phaseFive_stability_gap
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (gamma zeta : Error)
-    (hstab : SDDOpRel strategy.state
-      (uniformDistribution (EvaluatedSliceQuestion params))
-      (commDataProcessedGStabilityTwoLeft params strategy family G)
-      (commDataProcessedGStabilityTwoRight params strategy family G)
-      (Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)))) :
-    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-      (fun q =>
-        ∑ gb : StabilityTwoOutcome params,
-          ev strategy.state
-            ((leftTensor (ι₂ := ι)
-                ((1 - (G (pointHeight params q.1)).total) *
-                  (((orderedProductOpFamily
-                      (evaluatedSliceFirstFactor params family q)
-                      (evaluatedSliceSecondFactor params family q)).outcome
-                      (gb.1 (truncatePoint params q.1), gb.2))ᴴ *
-                    (orderedProductOpFamily
-                      (evaluatedSliceFirstFactor params family q)
-                      (evaluatedSliceSecondFactor params family q)).outcome
-                      (gb.1 (truncatePoint params q.1), gb.2)) *
-                  (1 - (G (pointHeight params q.1)).total))) *
-              rightTensor (ι₁ := ι) ((G (pointHeight params q.1)).outcome gb.1))) ≤
-      Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
-  rcases hstab with ⟨hstab⟩
-  calc
-    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-        (fun q =>
-          ∑ gb : StabilityTwoOutcome params,
-            ev strategy.state
-              ((leftTensor (ι₂ := ι)
-                  ((1 - (G (pointHeight params q.1)).total) *
-                    (((orderedProductOpFamily
-                        (evaluatedSliceFirstFactor params family q)
-                        (evaluatedSliceSecondFactor params family q)).outcome
-                        (gb.1 (truncatePoint params q.1), gb.2))ᴴ *
-                      (orderedProductOpFamily
-                        (evaluatedSliceFirstFactor params family q)
-                        (evaluatedSliceSecondFactor params family q)).outcome
-                        (gb.1 (truncatePoint params q.1), gb.2)) *
-                    (1 - (G (pointHeight params q.1)).total))) *
-                rightTensor (ι₁ := ι) ((G (pointHeight params q.1)).outcome gb.1)))
-      = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-          (fun q =>
-            qSDDOp strategy.state
-              (commDataProcessedGStabilityTwoLeft params strategy family G q)
-              (commDataProcessedGStabilityTwoRight params strategy family G q)) := by
-            apply avgOver_congr
-            intro q
-            symm
-            exact
-              commDataProcessedGStabilityTwo_qSDDOp_expand
-                params strategy family G hG q
-    _ = sddErrorOp strategy.state
-          (uniformDistribution (EvaluatedSliceQuestion params))
-          (commDataProcessedGStabilityTwoLeft params strategy family G)
-          (commDataProcessedGStabilityTwoRight params strategy family G) := by
-            rfl
-    _ ≤ Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := hstab
 
 /-- The scalar defect controlled by `gCommStabilityTwo_scalar` after averaging out
 all evaluated-slice variables except the slice height `x`.
@@ -1333,7 +1206,7 @@ Starting from `E[∑ ABAB]`, the proof applies ten approximation steps:
 5a. `≈_{6√(γ(m+1))}`: the point-measurement swap contribution internal
     to the paper's `clm:g-comm-stability2` accounting
 5b. `≈_{√ζ}`: remove trailing `G^x` by the boundedness part of
-    `gCommStabilityTwo_scalar` (this is the local `hphase5` step below)
+    `gCommStabilityTwo_scalar` (this is the scalar part of `hphase5paper` below)
 6–7. `≈_{2√ζ + 2√ζ}`: reverse the `eq:add-an-a` insertions
 8–9. `≈_{√ζ + √ζ}`: apply postprocessed self-consistency twice
 
@@ -1390,9 +1263,6 @@ private lemma evaluatedSlice_scalar_chain_bound
   let avgABA : EvaluatedSliceQuestion params → Error := fun q =>
     ∑ ab : EvaluatedSliceOutcome params,
       evaluatedSliceABATerm params strategy family q ab
-  let avgBABA : EvaluatedSliceQuestion params → Error := fun q =>
-    ∑ ab : EvaluatedSliceOutcome params,
-      evaluatedSliceBABATerm params strategy family q ab
   let avgBAB : EvaluatedSliceQuestion params → Error := fun q =>
     ∑ ab : EvaluatedSliceOutcome params,
       evaluatedSliceBABTerm params strategy family q ab
@@ -1504,8 +1374,6 @@ private lemma evaluatedSlice_scalar_chain_bound
   let phase5PaperRemoved : EvaluatedSliceQuestion params → Error :=
     evaluatedSlicePhaseFivePaperRemoved params strategy family
   -- Paper lines 101--119 endpoints for the reverse insertions and tail.
-  let phase6FirstRemoved : EvaluatedSliceQuestion params → Error :=
-    evaluatedSlicePhaseSixFirstRemoved params strategy family
   let phase7GonnaCite : EvaluatedSliceQuestion params → Error :=
     evaluatedSlicePhaseSevenGonnaCite params strategy family
   let phase8TailRight : EvaluatedSliceQuestion params → Error :=
@@ -1967,20 +1835,13 @@ private lemma evaluatedSlice_scalar_chain_bound
       _ = |avgOver 𝒟 orderedDefect| := by rw [abs_neg]
       _ ≤ Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) :=
               hordered_abs
-  -- Paper lines 99--102: reverse the first `eq:add-an-a` insertion.
-  have hphase6first :
-      |avgOver 𝒟 phase5PaperRemoved - avgOver 𝒟 phase6FirstRemoved| ≤
-        2 * Real.sqrt zeta := by
-    simpa [𝒟, phase5PaperRemoved, phase6FirstRemoved] using
-      evaluatedSlice_phaseSix_first_reverse_bound
-        params strategy zeta _hnorm family hcombined_fst
-  -- Paper lines 103--104: reverse the second `eq:add-an-a` insertion.
-  have hphase7second :
-      |avgOver 𝒟 phase6FirstRemoved - avgOver 𝒟 phase7GonnaCite| ≤
-        2 * Real.sqrt zeta := by
-    simpa [𝒟, phase6FirstRemoved, phase7GonnaCite] using
-      evaluatedSlice_phaseSeven_second_reverse_bound
-        params strategy zeta _hnorm family hcombined_snd
+  -- Paper lines 99--104: reverse the two `eq:add-an-a` insertions.
+  have hphase67paper :
+      |avgOver 𝒟 phase5PaperRemoved - avgOver 𝒟 phase7GonnaCite| ≤
+        4 * Real.sqrt zeta := by
+    simpa [𝒟, phase5PaperRemoved, phase7GonnaCite] using
+      evaluatedSlice_phaseSixSeven_reverse_bound
+        params strategy zeta _hnorm family hcombined_fst hcombined_snd
   -- Paper line 117--118: first postprocessed self-consistency tail move.
   have htail8 :
       |avgOver 𝒟 phase7GonnaCite - avgOver 𝒟 phase8TailRight| ≤ Real.sqrt zeta := by
@@ -2031,17 +1892,11 @@ private lemma evaluatedSlice_scalar_chain_bound
           (abs_sub_comm (avgOver 𝒟 phase5PaperRemoved)
             (avgOver 𝒟 phase4PaperSwapped)).symm ▸ hphase5paper
         exact le_trans (le_abs_self _) h
-      have h56 : avgOver 𝒟 phase6FirstRemoved - avgOver 𝒟 phase5PaperRemoved ≤
-          2 * Real.sqrt zeta := by
-        have h :=
-          (abs_sub_comm (avgOver 𝒟 phase6FirstRemoved)
-            (avgOver 𝒟 phase5PaperRemoved)).symm ▸ hphase6first
-        exact le_trans (le_abs_self _) h
-      have h67 : avgOver 𝒟 phase7GonnaCite - avgOver 𝒟 phase6FirstRemoved ≤
-          2 * Real.sqrt zeta := by
+      have h57 : avgOver 𝒟 phase7GonnaCite - avgOver 𝒟 phase5PaperRemoved ≤
+          4 * Real.sqrt zeta := by
         have h :=
           (abs_sub_comm (avgOver 𝒟 phase7GonnaCite)
-            (avgOver 𝒟 phase6FirstRemoved)).symm ▸ hphase7second
+            (avgOver 𝒟 phase5PaperRemoved)).symm ▸ hphase67paper
         exact le_trans (le_abs_self _) h
       have h78 : avgOver 𝒟 phase8TailRight - avgOver 𝒟 phase7GonnaCite ≤
           Real.sqrt zeta := by

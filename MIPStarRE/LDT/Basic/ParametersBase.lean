@@ -123,6 +123,58 @@ def Parameters.next (params : Parameters) : Parameters :=
     hq := params.hq
     hqPrimePower := params.hqPrimePower }
 
+namespace Parameters
+
+/-- The predecessor parameters obtained by removing the last coordinate from a
+non-base ambient dimension.
+
+This is the inverse construction to `Parameters.next` on the data fields.  The
+proof fields are inherited from the original parameter bundle, so the inverse is
+propositional rather than definitional. -/
+def previous (params : Parameters) (hm : 1 < params.m) : Parameters :=
+  { m := params.m - 1
+    q := params.q
+    d := params.d
+    hm := Nat.sub_pos_of_lt hm
+    hq := params.hq
+    hqPrimePower := params.hqPrimePower }
+
+/-- Removing the last coordinate and then applying `Parameters.next` recovers the
+original non-base parameters. -/
+theorem previous_next_eq (params : Parameters) (hm : 1 < params.m) :
+    (previous params hm).next = params := by
+  cases params with
+  | mk m q d hm0 hq hqPrimePower =>
+      have hsub : m - 1 + 1 = m := Nat.sub_add_cancel (le_of_lt hm)
+      simp [previous, Parameters.next, hsub]
+
+/-- A bundled predecessor for a parameter set known to be a successor dimension. -/
+structure SuccessorDecomposition (params : Parameters) where
+  /-- The predecessor parameter bundle. -/
+  pred : Parameters
+  /-- The predecessor's successor is the original parameter bundle. -/
+  next_eq : pred.next = params
+
+/-- Every parameter bundle of dimension strictly larger than one has a bundled
+predecessor whose successor is propositionally equal to the original bundle. -/
+def successorDecompositionOfOneLtM (params : Parameters) (hm : 1 < params.m) :
+    SuccessorDecomposition params where
+  pred := previous params hm
+  next_eq := previous_next_eq params hm
+
+/-- A positive dimension that is not the base dimension is strictly larger than
+one. -/
+theorem one_lt_m_of_ne_one (params : Parameters) (hm_ne_one : params.m ≠ 1) :
+    1 < params.m :=
+  lt_of_le_of_ne params.hm (Ne.symm hm_ne_one)
+
+/-- Non-base parameters have a bundled predecessor decomposition. -/
+def successorDecompositionOfNeOne (params : Parameters) (hm_ne_one : params.m ≠ 1) :
+    SuccessorDecomposition params :=
+  successorDecompositionOfOneLtM params (one_lt_m_of_ne_one params hm_ne_one)
+
+end Parameters
+
 instance {params : Parameters} : NeZero params.q :=
   ⟨Nat.ne_of_gt params.hq⟩
 
@@ -178,6 +230,37 @@ class FieldModel (q : ℕ) where
 
 attribute [instance] FieldModel.instField FieldModel.instFintype FieldModel.instDecidableEq
 
+namespace FieldModel
+
+/-- The carrier bundled in a `FieldModel q` has exactly `q` elements, matching the
+paper's finite-field convention `|F_q| = q` (`preliminaries.tex`, lines 17--19). -/
+@[simp] theorem card (q : ℕ) [FieldModel q] :
+    Fintype.card (FieldModel.K q) = q := by
+  simpa using Fintype.card_congr (FieldModel.equiv (q := q))
+
+/-- A bundled field model has a nonempty finite carrier. -/
+theorem card_pos (q : ℕ) [FieldModel q] :
+    0 < Fintype.card (FieldModel.K q) :=
+  Fintype.card_pos_iff.mpr ⟨0⟩
+
+/-- The finite cardinality of a bundled field model is nonzero. -/
+theorem card_ne_zero (q : ℕ) [FieldModel q] :
+    Fintype.card (FieldModel.K q) ≠ 0 :=
+  Nat.ne_of_gt (card_pos q)
+
+/-- Positivity of a bundled field model's cardinality after casting to the repository's
+real-valued error scalar type. -/
+theorem card_cast_pos (q : ℕ) [FieldModel q] :
+    0 < (Fintype.card (FieldModel.K q) : Error) :=
+  Nat.cast_pos.mpr (card_pos q)
+
+/-- The real-valued cardinality denominator attached to a bundled field model is nonzero. -/
+theorem card_cast_ne_zero (q : ℕ) [FieldModel q] :
+    (Fintype.card (FieldModel.K q) : Error) ≠ 0 :=
+  ne_of_gt (card_cast_pos q)
+
+end FieldModel
+
 /-- Build the honest field model from prime-power data. -/
 noncomputable def PrimePowerFieldSpec.toFieldModel (params : Parameters)
     (spec : PrimePowerFieldSpec params) : FieldModel params.q := by
@@ -219,9 +302,33 @@ abbrev PolynomialModel (params : Parameters) [FieldModel params.q] :=
 abbrev LinePolynomialModel (params : Parameters) [FieldModel params.q] :=
   _root_.Polynomial (Scalar params)
 
+/-- The chosen scalar model for the paper's `F_q` has exactly `q` elements
+(`preliminaries.tex`, lines 17--19 and 89--93). -/
 @[simp] theorem scalar_card (params : Parameters) [FieldModel params.q] :
     Fintype.card (Scalar params) = params.q := by
-  simpa [Scalar, Fq] using Fintype.card_congr (FieldModel.equiv (q := params.q))
+  simp [Scalar]
+
+/-- The scalar model has at least two elements, because the paper's field size `q`
+is a positive prime power (`preliminaries.tex`, lines 17--19 and 89--93). -/
+theorem two_le_scalar_card (params : Parameters) [FieldModel params.q] :
+    2 ≤ Fintype.card (Scalar params) := by
+  simpa using params.two_le_q
+
+/-- The scalar model has positive finite cardinality. -/
+theorem scalar_card_pos (params : Parameters) [FieldModel params.q] :
+    0 < Fintype.card (Scalar params) :=
+  lt_of_lt_of_le Nat.zero_lt_two (two_le_scalar_card params)
+
+/-- Positivity of the scalar model's cardinality after casting to the repository's
+real-valued error scalar type. -/
+theorem scalar_card_cast_pos (params : Parameters) [FieldModel params.q] :
+    0 < (Fintype.card (Scalar params) : Error) :=
+  Nat.cast_pos.mpr (scalar_card_pos params)
+
+/-- The real-valued scalar-cardinality denominator is nonzero. -/
+theorem scalar_card_cast_ne_zero (params : Parameters) [FieldModel params.q] :
+    (Fintype.card (Scalar params) : Error) ≠ 0 :=
+  ne_of_gt (scalar_card_cast_pos params)
 
 /-- Interpret a coded coordinate in `Fin q` as a scalar in the chosen field model. -/
 def decodeScalar {params : Parameters} [FieldModel params.q] (x : Fq params) : Scalar params :=
@@ -239,6 +346,16 @@ def encodeScalar {params : Parameters} [FieldModel params.q] (x : Scalar params)
     (x : Scalar params) :
     decodeScalar (encodeScalar x) = x := by
   simp [encodeScalar, decodeScalar]
+
+/-- Decoding from the coded `Fin q` carrier into the chosen scalar field is injective. -/
+theorem decodeScalar_injective {params : Parameters} [FieldModel params.q] :
+    Function.Injective (decodeScalar (params := params)) :=
+  (FieldModel.equiv (q := params.q)).symm.injective
+
+/-- Encoding scalar-field elements back to the coded `Fin q` carrier is injective. -/
+theorem encodeScalar_injective {params : Parameters} [FieldModel params.q] :
+    Function.Injective (encodeScalar (params := params)) :=
+  (FieldModel.equiv (q := params.q)).injective
 
 /-- The zero coordinate. -/
 def zeroCoord {params : Parameters} [FieldModel params.q] : Fq params :=
@@ -263,6 +380,13 @@ def subCoord {params : Parameters} [FieldModel params.q] (x y : Fq params) : Fq 
     (x y : Fq params) :
     addCoord (subCoord x y) y = x := by
   unfold addCoord subCoord
+  rw [decode_encodeScalar]
+  simp [sub_eq_add_neg]
+
+@[simp] theorem subCoord_addCoord_right {params : Parameters} [FieldModel params.q]
+    (x y : Fq params) :
+    subCoord (addCoord x y) y = x := by
+  unfold subCoord addCoord
   rw [decode_encodeScalar]
   simp [sub_eq_add_neg]
 

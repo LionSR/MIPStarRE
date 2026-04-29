@@ -26,6 +26,7 @@
 *.fls
 *.fdb_latexmk
 *.bbl
+!blueprint/src/web.bbl
 *.blg
 *.out
 *.toc

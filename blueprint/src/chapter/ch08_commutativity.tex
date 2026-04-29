@@ -5,10 +5,19 @@
 \section{Commutativity of the point measurements}
 \label{sec:commutativity-points}
 
+\begin{definition}[Shared diagonal-line sample]\label{def:point-pair-shared-diagonal-line-distribution}
+	\lean{MIPStarRE.LDT.CommutativityPoints.pointPairSharedDiagonalLineDistribution}
+	\leanok
+	Sample a uniformly random ordered point pair $(u,v)$ and a uniformly random
+	parameter $t \in \F_q$. Package this data as the diagonal line whose direction
+	is $v-u$ and whose parametrization visits $u$ at $t$ and $v$ at $t+1$.
+\end{definition}
+
 \begin{theorem}[Commutativity of the point measurements]\label{thm:commutativity-points}
 	\lean{MIPStarRE.LDT.CommutativityPoints.commutativityPoints}
 	\leanok
-	\uses{def:good-strategy, def:approx_delta}
+	\uses{def:good-strategy, def:approx_delta,
+	      def:point-pair-shared-diagonal-line-distribution}
 	Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test.
 	On average over independent and uniformly random $u,v \sim \F_q^m$,
 	\[
@@ -43,6 +52,7 @@
 
 \begin{lemma}[Commutativity of~$G$ after evaluation]\label{lem:comm-data-processed-g}
 	\lean{MIPStarRE.LDT.Commutativity.commDataProcessedG}
+	\leanok
 	\uses{def:good-strategy, def:polymeasurements, def:approx_delta, def:strong-self-consistency, clm:g-comm-stability, clm:g-comm-stability2}
 	Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test.
 	Let $\{G^x\} \in \polysub{m}{q}{d}$ be a collection of projective sub-measurements indexed by $x \in \F_q$ with the following properties:
@@ -77,6 +87,7 @@
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	\uses{prop:cons-sub-meas, prop:closeness-of-ip, prop:post-processing-preserves, prop:two-notions-of-self-consistency, prop:two-notions-of-self-consistency-after-evaluation, thm:commutativity-points}
 	Write $G_a^{u,x}=G^x_{[g(u)=a]}$. Expanding the commutator square gives
 	\begin{align}
@@ -260,14 +271,7 @@
 
 \begin{theorem}[Commutativity of~$G$]\label{thm:com-main}
 	\lean{MIPStarRE.LDT.Commutativity.comMain}
-	% Lean-local gap: `comMain`'s axiom closure currently includes `sorryAx`
-	% via `commDataProcessedG` (remaining local sorrys at
-	% `Commutativity/ScalarApproximation/ProcessedG.lean:1360` for the phase-2
-	% reindexing residual and `ProcessedG.lean:1494` for the phase-6/7 first-reverse
-	% endpoint), plus the `Commutativity/Main/Auxiliary.lean` residuals
-	% `fullSliceScalarMarginalizeXTensorTriangleResidual` and
-	% `fullSliceScalarMarginalizeYFirstClosenessResidual`. Add the blueprint-ok marker
-	% once those are closed.
+	\leanok
 	\uses{def:good-strategy, def:polymeasurements, def:approx_delta, def:strong-self-consistency}
 	Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test.
 	Let $\{G^x\}_{x \in \F_q}$ denote a set of projective sub-measurements in $\polysub{m}{q}{d}$ with the following properties:
@@ -302,6 +306,7 @@
 	\]
 \end{theorem}
 \begin{proof}
+	\leanok
 	\uses{lem:comm-data-processed-g, lem:normalization-condition, prop:switch-sandwich, prop:closeness-of-ip, prop:triangle-inequality-for-vectors-squared, lem:schwartz-zippel-individual}
 	If at least one of $\gamma$, $\zeta$, or $d/q$ is at least~$1$, then $\nu \ge 30$ and the estimate is trivial from \ref{prop:triangle-inequality-for-vectors-squared}. We therefore assume $\gamma,\zeta,d/q \le 1$.
 

@@ -168,7 +168,7 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 \end{definition}
 
 \begin{proposition}[Post-processing preserves measurements]\label{prop:post-processing-preserves}
-	\lean{MIPStarRE.LDT.Preliminaries.postprocessPreservesMeasurements}
+	\lean{MIPStarRE.LDT.Preliminaries.postprocessPreservesMeasurements, MIPStarRE.Quantum.Submeasurement.postprocess_sum_eq, MIPStarRE.Quantum.Measurement.postprocess}
 	\leanok
 	\uses{def:post-processing, def:submeasurement}
 	Let $A=\{A_a\}_{a \in \mathcal A}$ be a family of operators and let
@@ -438,6 +438,16 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 	Expand $(A_1-A_{k+1})\ket{\psi}$ as a telescoping sum and apply Lemma~\ref{prop:triangle-inequality-for-vectors-squared}.
 \end{proof}
 
+\begin{remark}[Lean finite-step triangle helpers]\label{rem:lean-finite-step-triangle-helpers}
+	\lean{MIPStarRE.LDT.ev_diff_triangle, MIPStarRE.LDT.normalizedTrace_triangle_three, MIPStarRE.LDT.ev_diff_triangle_three}
+	\lean{MIPStarRE.LDT.Preliminaries.questionSDD_triangle, MIPStarRE.LDT.Preliminaries.questionSDD_triangle_three, MIPStarRE.LDT.Preliminaries.stateDependentDistanceRel_triangle, MIPStarRE.LDT.Preliminaries.stateDependentDistanceRel_triangle_three}
+	The general operator-family theorem above is complemented in Lean by reusable
+	binary and three-step helper lemmas for operator expectations, `qSDD`, and
+	`SDDRel`.  The three-step `SDDRel` helper is the specialization used in the
+	Step~6 projectivization chain in Theorem~\ref{thm:main-formal}; this remark is
+	only a cross-reference and makes no separate proof-level completeness claim.
+\end{remark}
+
 \begin{lemma}[Triangle inequality for $\simeq_\delta$]\label{prop:simeq-triangle-inequality}
 	\lean{MIPStarRE.LDT.Preliminaries.simeqTriangleInequality}
 	\leanok
@@ -692,27 +702,10 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 		A_a \ot I \approx_{2\delta + 4\sqrt\delta + 2\zeta} C_a \ot I.
 	\]
 \end{lemma}
-
-% prop:cool-prop from the paper is the same result as lem:self-consistency-same-side-square above.
-% We keep the label for cross-reference fidelity.
-\begin{theorem}\label{prop:cool-prop}
-	\lean{MIPStarRE.LDT.Preliminaries.bipartiteSSCSquaredMass}
-	\leanok
-	\uses{lem:self-consistency-same-side-square}
-	This is the same statement as Lemma~\ref{lem:self-consistency-same-side-square}: for a $\zeta$-strongly self-consistent submeasurement $A$,
-	\[
-		\sum_a \bra{\psi} (A_a)^2 \ot I \ket{\psi} \geq \sum_a \bra{\psi} A_a \ot I \ket{\psi} -\zeta.
-	\]
-\end{theorem}
-\begin{proof}
-	\leanok
-	\uses{lem:self-consistency-same-side-square}
-	Immediate from Lemma~\ref{lem:self-consistency-same-side-square}.
-\end{proof}
-
 \begin{proof}[Proof of \ref{prop:completing-to-measurement}]
 	\proves{prop:completing-to-measurement}
 	\leanok
+	\uses{prop:triangle-inequality-for-vectors-squared, prop:easy-approx-from-approx-delta, prop:cool-prop}
 	By Lemma~\ref{prop:triangle-inequality-for-vectors-squared},
 	\[
 		\sum_a \lVert(A_a-C_a)\ot I \ket{\psi} \rVert^2
@@ -739,4 +732,21 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 		\lVert(I-B) \ot I \ket{\psi}\rVert^2 \le 2\sqrt\delta + \zeta.
 	\]
 	Substituting this into the first bound proves the claim.
+\end{proof}
+
+% prop:cool-prop from the paper is the same result as lem:self-consistency-same-side-square above.
+% We keep the label for cross-reference fidelity.
+\begin{theorem}\label{prop:cool-prop}
+	\lean{MIPStarRE.LDT.Preliminaries.bipartiteSSCSquaredMass}
+	\leanok
+	\uses{lem:self-consistency-same-side-square}
+	This is the same statement as Lemma~\ref{lem:self-consistency-same-side-square}: for a $\zeta$-strongly self-consistent submeasurement $A$,
+	\[
+		\sum_a \bra{\psi} (A_a)^2 \ot I \ket{\psi} \geq \sum_a \bra{\psi} A_a \ot I \ket{\psi} -\zeta.
+	\]
+\end{theorem}
+\begin{proof}
+	\leanok
+	\uses{lem:self-consistency-same-side-square}
+	Immediate from Lemma~\ref{lem:self-consistency-same-side-square}.
 \end{proof}

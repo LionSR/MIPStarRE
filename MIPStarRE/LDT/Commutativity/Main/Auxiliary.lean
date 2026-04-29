@@ -412,7 +412,7 @@ lemma fullSlice_scalar_marginalize_x
       ≤ 2 * Real.sqrt zeta + 2 * Real.sqrt zeta := htri
     _ = 4 * Real.sqrt zeta := by ring
 
-/-- Residual for the remaining first `closenessOfIP` leg in the y-side
+/-- Proved package for the first `closenessOfIP` leg in the y-side
 second-term prefix.
 
 The earlier prefix steps from `commutativity-G.tex` lines 332--354 are proved in
@@ -421,10 +421,10 @@ The earlier prefix steps from `commutativity-G.tex` lines 332--354 are proved in
 `xEvaluatedFullSliceABABAvg` to `xEvaluatedFullSliceABABtensorAvg` is now proved
 in `xEvaluatedFullSliceABABAvg_to_xEvaluatedFullSliceABABtensorAvg`.
 
-Thus this residual is only the first paper line-359 bridge from the
+Thus this package records the first paper line-359 bridge from the
 x-evaluated `BAB ⊗ A` tensor endpoint to the scalar endpoint in the display from
 `eq:evaluate-gcom-at-points` to `eq:don't-understand-the-numbering-system`. -/
-private structure FullSliceScalarMarginalizeYFirstClosenessResidual
+private structure FullSliceScalarMarginalizeYFirstCloseness
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (zeta : Error) where
@@ -433,25 +433,25 @@ private structure FullSliceScalarMarginalizeYFirstClosenessResidual
         xEvaluatedFullSliceABABAvg params strategy family| ≤
       Real.sqrt zeta
 
-/-- Remaining first `closenessOfIP` witness for the `y` prefix.
+/-- First `closenessOfIP` witness for the `y` prefix.
 
-This packages the paper `commutativity-G.tex` line-359 bridge.  The earlier
-`eq:gcom4`/`eq:gcom4-diff` prefix, the line-360 scalar-to-tensor bridge, and the
-y-marginalization tail are proved separately and composed below. -/
-private noncomputable def fullSliceScalarMarginalizeYFirstClosenessResidual
+This packages the proved paper `commutativity-G.tex` line-359 bridge.  The
+earlier `eq:gcom4`/`eq:gcom4-diff` prefix, the line-360 scalar-to-tensor bridge,
+and the y-marginalization tail are proved separately and composed below. -/
+private noncomputable def fullSliceScalarMarginalizeYFirstCloseness
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
     (zeta : Error)
     (hnorm : strategy.state.IsNormalized)
     (hself : family.StronglySelfConsistent strategy.state zeta) :
-    FullSliceScalarMarginalizeYFirstClosenessResidual params strategy family zeta := by
+    FullSliceScalarMarginalizeYFirstCloseness params strategy family zeta := by
   exact ⟨xEvaluatedSliceBABAtensor_to_xEvaluatedFullSliceABABAvg
     params strategy family zeta hnorm hself⟩
 
 /-- Paper-faithful second-term transport bound.
 
 The proved x-prefix (`eq:gcom4` plus `eq:gcom4-diff`, paper lines 332--354)
-costs `md/q + √ζ`; the remaining line-359 `closenessOfIP` residual costs `√ζ`;
+costs `md/q + √ζ`; the proved line-359 `closenessOfIP` bridge costs `√ζ`;
 the line-360 scalar↔tensor bridge is proved in
 `xEvaluatedFullSliceABABAvg_to_xEvaluatedFullSliceABABtensorAvg` and costs
 another `√ζ`; and the proved y-tail uses y-Schwartz--Zippel marginalization
@@ -467,7 +467,7 @@ lemma fullSlice_scalar_marginalize_y
         evaluatedSliceABABAvg params strategy family| ≤
       (2 * ((↑params.m : Error) * ↑params.d / ↑params.q) + 4 * Real.sqrt zeta) := by
   let yClose :=
-    fullSliceScalarMarginalizeYFirstClosenessResidual
+    fullSliceScalarMarginalizeYFirstCloseness
       params strategy family zeta hnorm hself
   have hxPrefix :=
     fullSliceABAB_to_xEvaluatedSliceBABAtensorAvg
@@ -790,10 +790,7 @@ private lemma evaluatedSliceProductLeft_qSDDOp_zero_le_one
           have hleftH :
               (leftTensor (ι₂ := ι) (A.outcome a * B.outcome b))ᴴ =
                 leftTensor (ι₂ := ι) ((A.outcome a * B.outcome b)ᴴ) := by
-            simpa [leftTensor] using
-              (Matrix.conjTranspose_kronecker
-                (A.outcome a * B.outcome b)
-                (1 : MIPStarRE.Quantum.Op ι))
+            simp
           have hmul :
               (((A.outcome a * B.outcome b)ᴴ) *
                 (A.outcome a * B.outcome b)) =
@@ -891,10 +888,7 @@ private lemma zero_qSDDOp_evaluatedSliceProductRight_le_one
           have hleftH :
               (leftTensor (ι₂ := ι) (B.outcome b * A.outcome a))ᴴ =
                 leftTensor (ι₂ := ι) ((B.outcome b * A.outcome a)ᴴ) := by
-            simpa [leftTensor] using
-              (Matrix.conjTranspose_kronecker
-                (B.outcome b * A.outcome a)
-                (1 : MIPStarRE.Quantum.Op ι))
+            simp
           have hmul :
               (((B.outcome b * A.outcome a)ᴴ) *
                 (B.outcome b * A.outcome a)) =
