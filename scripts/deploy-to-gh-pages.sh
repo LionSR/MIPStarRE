@@ -157,6 +157,8 @@ git add -A
 if [ -f blueprint.pdf ]; then
   # `*.pdf` is gitignored repo-wide; force-stage the freshly built blueprint.
   git add -f blueprint.pdf
+else
+  echo "==> Skipping blueprint.pdf staging; file not present in Pages worktree."
 fi
 if git diff --cached --quiet; then
   echo "No changes to deploy."
