@@ -92,9 +92,8 @@ If no updates are needed, call `noop` with a short explanation of what you check
 - Preserve existing style and structure of the modified docs.
 - Keep the PR scoped to documentation synchronization only.
 - If information is missing to make a safe update, call `missing-data`.
-- When describing mathematics, avoid local shorthand such as "workstream",
-  "phase", or "cleanup" unless the theorem, lemma, definition, or proof
-  obligation has first been stated precisely.
+- When describing mathematics, state the theorem, lemma, definition, or proof
+  obligation first; scheduling or repository-maintenance details may follow.
 
 **Important**: If no action is needed after completing your analysis, you **MUST** call the `noop` safe-output tool with a brief explanation. Failing to call any safe-output tool is the most common cause of safe-output workflow failures.
 

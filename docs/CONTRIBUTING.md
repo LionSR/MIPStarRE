@@ -289,7 +289,7 @@ label set.
 |-------------------|-------------------------------------------------------|
 | `auto-fix-claude` | Automation-managed issue queue for Claude follow-ups  |
 | `codex`           | Automation-managed issue or PR bookkeeping            |
-| `standup`         | Daily standup summary issues                          |
+| `standup`         | Daily mathematical progress issues                    |
 
 ### Standard GitHub labels
 
@@ -441,7 +441,7 @@ The following workflows run automatically:
 | **Docs & Blueprint Sync** (`docs-blueprint-sync.md`) | Daily (weekdays) + manual dispatch | Detects stale documentation and opens a sync PR if needed |
 | **README Freshness Audit** (`readme-freshness-audit.yml`) | Weekly + manual dispatch | Report-only audit for README local paths, LDT submodule count, and hard-coded Lean/Mathlib versions |
 | **Lean Audit** (`lean-audit.yml`) | On demand | Audits Lean code for style and correctness |
-| **PR Cleanup** (`pr-cleanup.yml`) | PR opened from `claude/*` or `codex/*` branches | Normalizes title to `type(scope): desc`, restructures body to the PR template, preserves mathematical source citations from the linked issue, copies labels, adds `Addresses #N`, and comments on the issue |
+| **PR Mathematical Description** (`pr-cleanup.yml`) | PR opened from `claude/*` or `codex/*` branches | Normalizes title to `type(scope): desc`, rewrites the PR body as a self-contained mathematical note, preserves source citations from the linked issue, copies labels, adds `Addresses #N`, and comments on the issue |
 | **Mathlib Scout** (`mathlib-scout.yml`) | Formalization issue opened/labeled | Scouts Mathlib for relevant lemmas and posts a scouting report |
 
 ### What CI checks before merge

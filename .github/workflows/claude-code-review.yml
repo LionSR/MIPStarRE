@@ -110,11 +110,11 @@ jobs:
               Use clear language: "This must be fixed before merge" or "Requires changes".
 
             For each issue found, post an inline comment on the relevant line using the GitHub CLI.
-            At the end, post a summary comment on the PR with your overall assessment.
-            In that summary, describe mathematical concerns by naming the theorem, lemma,
+            At the end, post a PR comment with your overall assessment.
+            In that assessment, describe mathematical concerns by naming the theorem, lemma,
             definition, or proof obligation. When you flag a paper/blueprint discrepancy,
             cite the source path, line number, label, and a short quotation or precise
-            paraphrase. Do not describe mathematics only as a task, phase, blocker, or cleanup.
+            paraphrase. State the theorem, lemma, definition, or proof obligation directly.
 
             **Reading existing feedback:**
             Before posting new comments, read ALL existing feedback on this PR using the GitHub MCP tools:

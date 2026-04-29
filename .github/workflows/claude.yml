@@ -124,12 +124,12 @@ jobs:
           PR_BODY+=$'- Addresses #'"${ISSUE_NUMBER}"$'. See the linked issue for the paper or blueprint source\n'
           PR_BODY+=$'  path, line number, theorem label, and precise statement.\n\n'
           PR_BODY+=$'### Description\n'
-          PR_BODY+=$'- Implements the Lean changes prepared on `'"${BRANCH}"$'`.\n'
+          PR_BODY+=$'- Contains the Lean changes prepared on `'"${BRANCH}"$'`.\n'
           PR_BODY+=$'- The PR description should preserve the theorem labels and mathematical source\n'
           PR_BODY+=$'  citations from the linked issue.\n\n'
           PR_BODY+=$'### Testing\n'
           PR_BODY+=$'- Lean verification is expected in CI and should be stated explicitly by the author\n'
-          PR_BODY+=$'  or cleanup workflow.\n\n'
+          PR_BODY+=$'  or PR-description alignment check.\n\n'
           PR_BODY+=$'---\n'
           PR_BODY+=$'Addresses #'"${ISSUE_NUMBER}"
 

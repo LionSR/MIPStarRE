@@ -9,7 +9,7 @@ on:
   # Every review submission (including comment-only) triggered a full
   # checkout + Claude Code invocation, even though the job filter skipped
   # comment-only reviews. The value (posting "approved" / "changes requested"
-  # notes on tracking issues via Playbook C) did not justify the cost.
+  # notes on tracking issues via the PR-opened case) did not justify the cost.
   # Re-enable if lightweight tracking of review states is needed.
 
 # Per-event concurrency: each PR/issue gets its own queue to avoid
@@ -125,22 +125,22 @@ jobs:
               (keeps issue open), `Closes #N`, `Fixes #N` (auto-closes issue)
             - **Branch name**: `claude/issue-N-*`, `codex/issue-N-*`
 
-            ### Other Workflows (Avoid Duplication)
+            ### Other GitHub Actions (Avoid Duplication)
 
-            - **PR Cleanup** (`pr-cleanup.yml`): When a PR opens from a
+            - **PR Mathematical Description** (`pr-cleanup.yml`): When a PR opens from a
               `claude/*` or `codex/*` branch, it already comments on the
               linked issue ("PR #X has been opened…"). Do NOT duplicate
               that comment for those branches.
             - **Claude Code Review** (`claude-code-review.yml`): Handles
-              code quality. You handle tracking metadata only.
-            - **Daily Standup / CI Auto-Fix**: Separate workflows. Treat
+              code quality. You handle sub-issue relationships and linked-issue comments only.
+            - **Daily Mathematical Progress / CI Auto-Fix**: Separate GitHub Actions. Treat
               their events as normal activity.
 
             ---
 
             ## Key Rules
 
-            These rules apply across all playbooks:
+            These rules apply across all event cases:
 
             1. **Native sub-issue state is the progress source.** Do not edit
                issue-body checkboxes for tracking status. GitHub computes
@@ -163,16 +163,16 @@ jobs:
                or commenting on formalization issues, name the theorem, lemma,
                definition, or proof obligation directly. If available, include
                the paper or blueprint path, line number, label, and a short
-               quotation or precise paraphrase. Do not describe mathematics
-               only as a task, phase, workflow item, blocker, or cleanup.
+               quotation or precise paraphrase. Do not replace the mathematical
+               statement with local scheduling shorthand.
 
             ---
 
-            ## Playbooks
+            ## Event Cases
 
-            Based on the event, follow the appropriate playbook below.
+            Based on the event, follow the appropriate case below.
 
-            ### Playbook A: Issue Closed as Completed
+            ### Case A: Issue Closed as Completed
 
             **When**: `issues` / `closed` with state_reason `completed`
 
@@ -191,7 +191,7 @@ jobs:
 
             ---
 
-            ### Playbook A2: Issue Reopened
+            ### Case A2: Issue Reopened
 
             **When**: `issues` / `reopened`
 
@@ -212,12 +212,12 @@ jobs:
 
             ---
 
-            ### Playbook B: PR Merged
+            ### Case B: PR Merged
 
             **When**: `pull_request` / `closed` with `merged == true`
 
-            Do two things: **B1** (update tracking) and **B2** (scan for
-            follow-ups).
+            Do two things: **B1** (record progress in the parent issue) and **B2**
+            (look for newly stated mathematical obligations).
 
             #### B1 — Notify tracking issues and linked issues
 
@@ -231,7 +231,7 @@ jobs:
             4. **Comment on each tracking issue** (check recent comments
                first to avoid duplicates — Key Rules §3) with a summary:
                the PR title, what it accomplished, current sub-issue progress,
-               and a follow-up suggestion. Example:
+               and a suggestion for the next theorem or proof obligation. Example:
                "PR #X (*title*) merged. <what was proved or corrected>. [X/Y sub-issues
                complete]
 
@@ -240,7 +240,7 @@ jobs:
                PR used `Addresses` or `Partially addresses`). Check recent
                comments first to avoid duplicates (Key Rules §3). Summarize
                what the PR accomplished and what remains. Include a
-               follow-up suggestion for what to tackle next on that issue.
+               suggestion for the next theorem or proof obligation on that issue.
                Example:
                "PR #X (*title*) has been merged. <what was proved or corrected>.
                Remaining mathematical obligation: <what is left>.
@@ -248,13 +248,13 @@ jobs:
                **Suggested next theorem or proof obligation:** <concrete action for this issue>"
 
             Do NOT comment on issues that will be auto-closed by the PR
-            (`Closes`/`Fixes`) — the auto-close fires Playbook A, which
+            (`Closes`/`Fixes`) — the auto-close fires Case A, which
             handles both the sub-issue progress comment and the tracking
             comment.
 
             **Remember**: Do not edit issue-body checkboxes (Key Rules §1).
 
-            #### B2 — Scan for follow-ups
+            #### B2 — Find Newly Stated Mathematical Obligations
 
             1. Read the PR body, comments, and review threads via MCP tools.
             2. Get the diff: prefer `mcp__github__pull_request_read` with
@@ -263,15 +263,15 @@ jobs:
             3. Scan the diff for new `sorry` markers (Lean proof obligations)
                and new TODO/FIXME/HACK/XXX/WORKAROUND comments.
 
-            **Prioritize human reviewer feedback** over bot suggestions.
-            Bot accounts typically have `[bot]` in their username or are
+            **Prioritize human reviewer feedback** over automated suggestions.
+            Automated accounts typically have `[bot]` in their username or are
             known services (dependabot, renovate, copilot, cursor, codex).
 
             Look for:
             - Human reviewer feedback acknowledged but deferred (highest priority)
             - New `sorry` markers in `.lean` files
-            - Explicit deferred scope ("out of scope", "follow-up",
-              "separate PR", "later", "Phase 2")
+            - Explicitly deferred mathematical obligations ("out of scope",
+              "separate PR", "later")
             - New TODO/FIXME/HACK comments (not pre-existing)
             - Missing `\lean{}` / `\leanok` blueprint tags in `.tex` files
             - Unresolved review threads
@@ -281,9 +281,9 @@ jobs:
             - Pre-existing TODOs/sorrys not introduced by the PR
             - Nitpick-level review comments (style, naming)
             - Speculative future work not discussed in the PR
-            - Bot suggestions already addressed or dismissed
+            - Automated suggestions already addressed or dismissed
 
-            For each genuine follow-up, create an issue:
+            For each genuine mathematical obligation, create an issue:
             - **Title**: Short, imperative, mathematically precise
               (e.g., "Discharge sorry in TransferMatrix.injective_iff")
             - **Body**:
@@ -304,25 +304,25 @@ jobs:
               - <Related issues, review comments, paper theorem labels, or arXiv refs>
               ```
             - **Labels**: `follow-up` plus relevant area/paper/topic labels
-              copied from the PR. Add `formalization` for sorry follow-ups,
+              copied from the PR. Add `formalization` for remaining proof obligations,
               `blueprint-sync` for missing tags, `bug` for correctness issues.
 
             Then attach each new issue to the relevant **open** tracking issue
             as a native GitHub sub-issue. If the API/tool surface available in
             this run cannot attach sub-issues, leave a comment naming the new
-            follow-up and stating that it still needs to be attached manually.
+            mathematical obligation and stating that it still needs to be attached manually.
             - Comment (check recent comments first — Key Rules §3):
-              "Added follow-up issues from #<PR>: #<issue1>, …
+              "Added mathematical obligation issues from #<PR>: #<issue1>, …
               [X/Y sub-issues complete]"
-            - If multiple follow-ups were created, suggest which one to
+            - If multiple issues were created, suggest which one to
               tackle first (see §5, tracking-issue variant).
 
             **Be conservative.** Only create issues for genuine, actionable
-            follow-ups. When in doubt, skip. False positives create noise.
+            mathematical obligations. When in doubt, skip. False positives create noise.
 
             ---
 
-            ### Playbook C: PR Opened
+            ### Case C: PR Opened
 
             **When**: `pull_request` / `opened`
 
@@ -332,24 +332,24 @@ jobs:
             2. Find **open** tracking issues (label `tracking`) referencing
                that issue or the PR.
             3. Only act if meaningful AND not already handled by another
-               workflow. All comments go on the **tracking issue**:
+               GitHub Action. All comments go on the **tracking issue**:
                - **PR opened** — only for branches that do NOT start with
-                 `claude/` or `codex/` (PR Cleanup already handles those):
+                 `claude/` or `codex/` (PR Mathematical Description already handles those):
                  "PR #<PR> opened to address #<issue>."
             4. Skip everything else silently.
 
             ---
 
-            ## §5 — Follow-up Suggestions
+            ## §5 — Suggestions for the Next Mathematical Obligation
 
-            When a playbook asks you to "suggest next steps", generate a
+            When a case asks you to suggest the next step, generate a
             brief, actionable recommendation. Think beyond the immediate
             next proof obligation — consider what this completion proves or supplies downstream,
             how it fits into the broader formalization roadmap, and whether
             preparatory work (scouting, blueprint review) would de-risk
             the next step.
 
-            ### Tracking-issue variant (Playbooks A, A2, B1, B2)
+            ### Tracking-issue variant (Cases A, A2, B1, B2)
 
             1. Read the tracking issue's native sub-issues to find open child
                issues. If unavailable, fall back to issue references in the
@@ -374,7 +374,7 @@ jobs:
                the suggested statement would provide for later theorem labels
                or tracking issues.
 
-            ### Linked-issue variant (Playbooks A2, B1 step 5)
+            ### Linked-issue variant (Cases A2, B1 step 5)
 
             For a specific issue (not the tracking issue), suggest the
             concrete next action based on available context:
@@ -397,7 +397,7 @@ jobs:
             - **Mathlib scouting**: If the recommended issue involves
               heavy Mathlib dependencies and does not already have a
               Mathlib scouting report in its comments, suggest running
-              one (the Mathlib Scout workflow triggers on issues with
+              one (the Mathlib Scout GitHub Action triggers on issues with
               the `formalization` label). Rescouting may also be
               warranted when Mathlib has been bumped since the last
               report — new lemmas may simplify the approach.
@@ -430,14 +430,14 @@ jobs:
 
             ---
 
-            ## Final Report
+            ## Final Record
 
-            After executing a playbook, summarize what you did:
-            - Which playbook you followed
+            After executing a case, record what you did:
+            - Which case you followed
             - What tracking issues were updated (with sub-issue progress counts)
             - What linked issues were commented on
-            - What follow-up issues were created (if any)
-            - What was suggested as next steps
+            - What mathematical obligation issues were created (if any)
+            - What theorem, lemma, definition, or proof obligation was suggested next
             - What the resulting completed/total sub-issue counts were
             - Whether any comments were skipped to avoid duplication
             - Or note that no action was needed
