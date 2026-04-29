@@ -67,8 +67,6 @@ theorem selfImprovementInInductionSection
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hglobalVarianceProofInputs :
-      SelfImprovement.GlobalVarianceProofInputs params strategy eps delta)
     (hhelperStrongSelfConsistency :
       SelfImprovement.HelperStrongSelfConsistencyInput params strategy eps delta)
     (horthonormalization :
@@ -85,7 +83,7 @@ theorem selfImprovementInInductionSection
       SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
   rcases SelfImprovement.selfImprovementFromSubMeas
       params strategy eps delta gamma nu
-      hglobalVarianceProofInputs hhelperStrongSelfConsistency
+      hhelperStrongSelfConsistency
       horthonormalization hfinalFields
       hgood G Gmeas hbridge with
     ⟨H, Z, hH⟩
