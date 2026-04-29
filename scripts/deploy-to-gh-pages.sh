@@ -63,6 +63,8 @@ if [ "$BADGES_ONLY" != true ]; then
   # Copy fresh PDF if available; leave existing PDF untouched otherwise
   if [ -f "$REPO_ROOT/blueprint/print/print.pdf" ]; then
     cp "$REPO_ROOT/blueprint/print/print.pdf" "$WORK_DIR/site/blueprint.pdf"
+  else
+    echo "==> Skipping blueprint.pdf; blueprint/print/print.pdf not found."
   fi
 
   # Update homepage (remove all homepage files first, then copy fresh)
@@ -96,10 +98,11 @@ if [ "$WITH_DOCS" = true ]; then
   rm -rf "$WORK_DIR/site/docs"
   cp -r "$REPO_ROOT/docbuild/.lake/build/doc" "$WORK_DIR/site/docs"
 elif [ "$BADGES_ONLY" != true ] && [ ! -f "$WORK_DIR/site/docs/index.html" ]; then
-  echo "==> Creating API docs placeholder..."
-  rm -rf "$WORK_DIR/site/docs"
-  mkdir -p "$WORK_DIR/site/docs"
-  cat > "$WORK_DIR/site/docs/index.html" <<'HTML'
+  if [ ! -d "$WORK_DIR/site/docs" ] \
+      || [ -z "$(find "$WORK_DIR/site/docs" -mindepth 1 -print -quit)" ]; then
+    echo "==> Creating API docs placeholder..."
+    mkdir -p "$WORK_DIR/site/docs"
+    cat > "$WORK_DIR/site/docs/index.html" <<'HTML'
 <!doctype html>
 <html lang="en">
 <head>
@@ -135,6 +138,9 @@ elif [ "$BADGES_ONLY" != true ] && [ ! -f "$WORK_DIR/site/docs/index.html" ]; th
 </body>
 </html>
 HTML
+  else
+    echo "==> Preserving existing API docs directory without index.html."
+  fi
 fi
 
 # Commit and push
@@ -149,6 +155,7 @@ else
 fi
 git add -A
 if [ -f blueprint.pdf ]; then
+  # `*.pdf` is gitignored repo-wide; force-stage the freshly built blueprint.
   git add -f blueprint.pdf
 fi
 if git diff --cached --quiet; then

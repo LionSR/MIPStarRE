@@ -51,11 +51,21 @@ jobs:
       - name: Build blueprint
         working-directory: blueprint
         run: |
-          leanblueprint pdf
           tmp_output_file="$(mktemp)"
 
           set +o pipefail
-          leanblueprint web 2>&1 | tee "$tmp_output_file"
+          {
+            leanblueprint pdf
+            pdf_status=$?
+            if [ "$pdf_status" -ne 0 ]; then
+              exit "$pdf_status"
+            fi
+            if [ ! -s print/print.pdf ]; then
+              echo "::error::leanblueprint pdf produced no output"
+              exit 1
+            fi
+            leanblueprint web
+          } 2>&1 | tee "$tmp_output_file"
           cmd_status=${PIPESTATUS[0]}
           set -o pipefail
 
