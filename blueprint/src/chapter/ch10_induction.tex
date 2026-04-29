@@ -178,7 +178,7 @@
 
 \begin{theorem}[Main induction]\label{thm:main-induction}
 	\uses{def:good-strategy, def:polymeasurements, def:simeq, lem:main-induction-base}
-  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge md$ and set
+  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge 400\,md$ and set
   \[
     \nu = 1000k^2m^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right)
   \]
@@ -202,7 +202,7 @@
 
 	The proof is by induction on $m$. The base case $m=1$ is Lemma~\ref{lem:main-induction-base}.
 
-	For the step from $m$ to $m+1$, let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ test, and let $k \ge (m+1)d$. For each $x \in \F_q$, let $(\psi,A^x,B^x,L^x)$ be the $x$-restricted strategy, with failure parameters $\eps_x,\delta_x,\gamma_x$. Apply the induction hypothesis to each restricted strategy with the same integer $k$ and define
+	For the step from $m$ to $m+1$, let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ test, and let $k \ge 400(m+1)d$. For each $x \in \F_q$, let $(\psi,A^x,B^x,L^x)$ be the $x$-restricted strategy, with failure parameters $\eps_x,\delta_x,\gamma_x$. Apply the induction hypothesis to each restricted strategy with the same integer $k$ and define
 	\[
 		\nu_x = 1000k^2m^2\left(\eps_x^{1/1024}+\delta_x^{1/1024}+\gamma_x^{1/1024}+(d/q)^{1/1024}\right),
 		\qquad
@@ -576,6 +576,7 @@ assembly residual:
 \lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndCompleteError, MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndComplete, MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndCompleteError_le_absorbedZeta2}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeScalars.orthonormalizeAndCompleteError_zeta1_le_zeta2}
 \lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff.line156Approx}
+\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.completeAtOutcomeProj_left_matchMass_ge, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_completeAtOutcomeProj}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.projectiveEvaluationConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.pointAConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.pointBConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.toProjectiveAssemblyResidual}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveLine169HandoffResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveLine169HandoffResidual.toProjectiveHandoffResidual}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.ofLine169HandoffResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.toUnsymmetrizedPOVMTargets, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.toPreProjectiveSelfConsistency}
@@ -595,11 +596,12 @@ Lean now records that every non-base parameter bundle has a predecessor via
 \texttt{Parameters.successorDecompositionOfNeOne}, transports the strategy and
 passing proof across that predecessor equality, and packages the two role-production
 branches as \texttt{MainFormalRolePackageBranchResidual}: the checked base handoff
-or an explicit successor branch carrying \texttt{MainFormalSuccessorBoundary} and
-the large-$k$ side condition $400m_{\mathrm{pred}}d\le k$.  Producing that
-successor-boundary package, or proving a correct small-$k$ saturation lemma for
-the intermediate range, remains upstream work.  The live completion residual
-carries the concrete role residual rather than a separate decorative branch
+or an explicit successor branch carrying \texttt{MainFormalSuccessorBoundary}.  The
+public large-$k$ hypothesis supplies the Section~6 side condition
+$400m_{\mathrm{pred}}d\le k$; the remaining role work is the
+successor-boundary package, the completion handoff, and the line-169 transport
+data.  The live completion residual carries the concrete role residual rather
+than a separate decorative branch
 witness; the branch residual types remain the documented base/successor supply
 paths.  Once the role package is obtained,
 Lean proves the two factor-two unsymmetrization links from
@@ -611,15 +613,18 @@ projectivization bridge from pre-projective consistency plus left/right
 completion closeness at $\zeta_2$.  Lean also derives the evaluated line-164
 projective consistency, data-processes the two polynomial line-169 $\zeta_1$
 links to the evaluated line-172 links, and proves the two native $\zeta_4$ point
-goals via \texttt{simeq-triangle-inequality}.  After the #869 right-register
+goals via \texttt{simeq-triangle-inequality}.  After the \#869 right-register
 completion transport, the remaining active residual is now the split
 \texttt{MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual}: its
 first field is the concrete Section~6 role residual, and its post-role field asks
 only for Alice's line-146 completion closeness, Bob's left-register completion
-closeness as returned by orthonormalize-and-complete, and the two exact
-polynomial-level $\zeta_1$ transport links from paper line~169 and its
-role-reversed analogue.  Lean transports the Bob-side left-register completion
-estimate to the line-147 right-register form before applying the older wrappers.
+closeness as returned by orthonormalize-and-complete, and the construction-level
+match-mass monotonicity invariant needed for the exact polynomial-level
+$\zeta_1$ transport links from paper line~169 and its role-reversed analogue.
+Lean reconstructs pre-projective full-polynomial consistency from the role
+residual and then uses the match-mass invariant to derive the two line-169 links;
+it also transports the Bob-side left-register completion estimate to the line-147
+right-register form before applying the older wrappers.
 It no longer asks for an arbitrary role package or an arbitrary raw Section~6
 witness as an independent field.  It also no longer asks for the two factor-two
 role-block estimates, the unused Section~6 consistency field inside
@@ -630,8 +635,9 @@ the resulting projective self-consistency to
 \texttt{MainFormalCascadeTransportTargets} using the projective converse of
 \texttt{simeq-to-approx}.
 
-The line-169 transport fields are deliberately left as residual data.  As stated
-in \texttt{preliminaries.tex}, \texttt{prop:triangle-sub} gives a
+The exact line-169 transport fields are now derived from the stored match-mass
+monotonicity invariant rather than being independent residual data.  As stated in
+\texttt{preliminaries.tex}, \texttt{prop:triangle-sub} gives a
 $\delta+\sqrt{\epsilon}$ loss, so applying it directly to
 $G^{\mathrm A}\simeq_{\zeta_1}G^{\mathrm B}$ and
 $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
@@ -639,10 +645,10 @@ $Q^{\mathrm A}\simeq_{\zeta_1+\sqrt{\zeta_2}}G^{\mathrm B}$, not the printed
 $\zeta_1$ estimate.  The generic corrected route would degrade the final point
 error to scale $t^{1/65536}$, outside the current \texttt{mainFormalError}
 envelope.  Closing the residual while preserving the paper constants therefore
-requires a stronger construction-level projectivization/correlation-preservation
-theorem, not just the generic \texttt{triangle-sub} lemma. No proof-level
-completeness tag is claimed here while \texttt{mainFormal} still contains that
-completion-line-169 residual.
+still requires the remaining construction-level projectivization/correlation-
+preservation theorem for the repaired submeasurements, not just the generic
+\texttt{triangle-sub} lemma. No proof-level completeness tag is claimed here while
+\texttt{mainFormal} still contains that completion-line-169 residual.
 
 \end{remark}
 \begin{proof}

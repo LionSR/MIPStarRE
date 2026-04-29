@@ -337,6 +337,59 @@ structure ProjectivizationMatchMassMonotonicity
 
 namespace ProjectivizationMatchMassMonotonicity
 
+/-- Completing a projective submeasurement at one outcome can only increase its
+diagonal match mass against a fixed right-side submeasurement.
+
+The completed measurement is obtained by adding the positive residual
+`1 - P.total` to a single outcome.  The corresponding extra contribution to
+`qBipartiteMatchMass` is therefore nonnegative. -/
+theorem completeAtOutcomeProj_left_matchMass_ge {Outcome : Type*} {ιA ιB : Type*}
+    [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (ψ : QuantumState (ιA × ιB)) (P : ProjSubMeas Outcome ιA)
+    (B : SubMeas Outcome ιB) (a0 : Outcome) :
+    qBipartiteMatchMass ψ (completeAtOutcomeProj P a0).toSubMeas B ≥
+      qBipartiteMatchMass ψ P.toSubMeas B := by
+  classical
+  unfold qBipartiteMatchMass
+  refine Finset.sum_le_sum ?_
+  intro a _
+  by_cases ha : a = a0
+  · subst a
+    have hres_nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ιA) - P.toSubMeas.total :=
+      sub_nonneg.mpr P.toSubMeas.total_le_one
+    have hextra_nonneg :
+        0 ≤ ev ψ (opTensor ((1 : MIPStarRE.Quantum.Op ιA) - P.toSubMeas.total)
+          (B.outcome a0)) :=
+      ev_nonneg_of_psd ψ _ <| opTensor_nonneg hres_nonneg (B.outcome_pos a0)
+    simp [completeAtOutcome, opTensor_add_left_local, ev_add]
+    linarith
+  · simp [completeAtOutcome, ha]
+
+/-- Constructor for the line-169 match-mass invariant after the canonical
+completion step.
+
+It reduces the completed-measurement invariant to the corresponding monotonicity
+facts for the projective submeasurements produced by orthonormalization.  The
+completion residual contributes only nonnegative diagonal mass, so the exact
+line-169 `ζ₁` links can later be recovered from these primitive inequalities. -/
+theorem of_completeAtOutcomeProj {Outcome : Type*} {ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState (ι × ι)} {G_A G_B : Measurement Outcome ι}
+    (P_A P_B : ProjSubMeas Outcome ι) (a_A a_B : Outcome)
+    (hleft : qBipartiteMatchMass ψ P_A.toSubMeas G_B.toSubMeas ≥
+      qBipartiteMatchMass ψ G_A.toSubMeas G_B.toSubMeas)
+    (hright : qBipartiteMatchMass ψ P_B.toSubMeas G_A.toSubMeas ≥
+      qBipartiteMatchMass ψ G_B.toSubMeas G_A.toSubMeas) :
+    ProjectivizationMatchMassMonotonicity ψ G_A G_B
+      (completeAtOutcomeProj P_A a_A) (completeAtOutcomeProj P_B a_B) := by
+  refine
+    { leftMatchMassPreservation := ?_
+      rightMatchMassPreservation := ?_ }
+  · exact hleft.trans <|
+      completeAtOutcomeProj_left_matchMass_ge ψ P_A G_B.toSubMeas a_A
+  · exact hright.trans <|
+      completeAtOutcomeProj_left_matchMass_ge ψ P_B G_A.toSubMeas a_B
+
 /-- Exact Alice-side line-169 consistency from match-mass preservation.
 
 For complete measurements the total-overlap term in `qBipartiteConsDefect` is

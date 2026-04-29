@@ -1,8 +1,5 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkCore
 
-set_option linter.style.setOption false
-set_option linter.unnecessarySimpa false
-
 /-!
 # Section 5 — one-measurement Naimark
 
@@ -78,8 +75,7 @@ private lemma partialIsometry_to_unitary
         Matrix.toEuclideanLin (A * B) =
           (Matrix.toEuclideanLin A).comp (Matrix.toEuclideanLin B) := by
     intro A B
-    simpa [Matrix.toEuclideanLin] using
-      (Matrix.toLpLin_mul_same (p := (2 : ENNReal)) A B)
+    simp [Matrix.toEuclideanLin, Matrix.toLpLin_mul_same (p := (2 : ENNReal)) A B]
   have toEuclideanLin_conjTranspose_mul_self :
       ∀ A : MIPStarRE.Quantum.Op n,
         Matrix.toEuclideanLin (Aᴴ * A) =
@@ -313,7 +309,7 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
     particular a submeasurement.
     -/
     have hauxDecomp : ∑ oa : Option α, auxProj oa = auxProj none + ∑ a : α, auxProj (some a) := by
-      simpa using (Fintype.sum_option (f := auxProj))
+      exact Fintype.sum_option (f := auxProj)
     have hsplit :
         ∑ oa : Option α, Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj oa) =
           Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj none) +

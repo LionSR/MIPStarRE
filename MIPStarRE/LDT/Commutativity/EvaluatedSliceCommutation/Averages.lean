@@ -1,8 +1,5 @@
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.PhaseFourFive
 
-set_option linter.style.setOption false
-set_option linter.unnecessarySimpa false
-
 /-!
 # Section 11 commutativity: evaluated-slice averaged expansion
 
@@ -82,7 +79,7 @@ private lemma evaluatedSliceCommutation_qSDDOp_avg_expand
           = LB * LA * LA * LB - LB * LA * LB * LA - LA * LB * LA * LB + LA * LB * LB * LA := by
               noncomm_ring
       _ = LB * LA * LB - LB * LA * LB * LA - LA * LB * LA * LB + LA * LB * LA := by
-            simpa [mul_assoc, hLA_proj, hLB_proj]
+            simp [mul_assoc, hLA_proj, hLB_proj]
       _ = LB * LA * LB + LA * LB * LA - LB * LA * LB * LA - LA * LB * LA * LB := by
             abel
   calc
@@ -182,7 +179,7 @@ private lemma fullSliceCommutation_qSDDOp_avg_expand
               LA * LB * LB * LA := by
               noncomm_ring
       _ = LB * LA * LB - LB * LA * LB * LA - LA * LB * LA * LB + LA * LB * LA := by
-            simpa [mul_assoc, hLA_proj, hLB_proj]
+            simp [mul_assoc, hLA_proj, hLB_proj]
       _ = LB * LA * LB + LA * LB * LA - LB * LA * LB * LA - LA * LB * LA * LB := by
             abel
   calc
@@ -267,7 +264,7 @@ lemma evaluatedSliceCommutation_avg_swap_terms
                       intro ab _
                       rcases q with ⟨u, v⟩
                       rcases ab with ⟨a, b⟩
-                      simpa [eQ, eA, evaluatedSliceBABTerm, evaluatedSliceABATerm]
+                      simp [eQ, eA, evaluatedSliceBABTerm, evaluatedSliceABATerm]
       _ = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
             (fun q => ∑ ab : EvaluatedSliceOutcome params,
               evaluatedSliceABATerm params strategy family q ab) := by
@@ -300,7 +297,7 @@ lemma evaluatedSliceCommutation_avg_swap_terms
                       intro ab _
                       rcases q with ⟨u, v⟩
                       rcases ab with ⟨a, b⟩
-                      simpa [eQ, eA, evaluatedSliceBABATerm, evaluatedSliceABABTerm]
+                      simp [eQ, eA, evaluatedSliceBABATerm, evaluatedSliceABABTerm]
       _ = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
             (fun q => ∑ ab : EvaluatedSliceOutcome params,
               evaluatedSliceABABTerm params strategy family q ab) := by
