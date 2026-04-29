@@ -2124,20 +2124,6 @@ private noncomputable def addCoordLeftEquiv (params : Parameters) [FieldModel pa
     intro y
     exact addCoord_subCoord_right y c
 
-private lemma axisParallelLinePointParamEquiv_symm_pointAt
-    (params : Parameters) [FieldModel params.q]
-    (st : AxisParallelTestSample params × Fq params) (t : Fq params) :
-    ((axisParallelLinePointParamEquiv params).symm st).1.pointAt t =
-      Function.update st.1.1 st.1.2 (addCoord (subCoord (st.1.1 st.1.2) st.2) t) := by
-  cases st with
-  | mk s t0 =>
-      cases s with
-      | mk u direction =>
-          ext j
-          by_cases hj : j = direction <;>
-            simp [axisParallelLinePointParamEquiv, AxisParallelLine.pointAt, hj,
-              Function.update]
-
 private lemma transportQuestionEquiv_symm_pair
     (params : Parameters) [FieldModel params.q]
     (stx : (AxisParallelTestSample params × Fq params) × Fq params) :
