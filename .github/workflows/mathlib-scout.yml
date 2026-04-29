@@ -63,6 +63,9 @@ jobs:
 
             Instructions:
             1. Read the issue to understand what mathematical result needs to be formalized.
+               Record whether the issue cites a paper or blueprint path, line number,
+               theorem label, and short quotation or precise paraphrase. If those are
+               missing, say so explicitly in the report.
             2. Scout Mathlib thoroughly:
                a. Grep Mathlib source files (under .lake/packages/mathlib/) for related
                   definitions, theorems, and lemmas. Search by mathematical keywords,
@@ -78,6 +81,12 @@ jobs:
 
                ## Mathlib Scouting Report
 
+               ### Mathematical source
+               - Paper or blueprint citation from the issue, if present: path, line,
+                 label, and short quotation or precise paraphrase.
+               - If absent: "The issue does not yet cite a paper or blueprint path,
+                 line number, theorem label, and source paraphrase."
+
                ### Relevant Mathlib definitions
                - `Namespace.Definition` — brief description (from `Mathlib/Path/File.lean`)
 
@@ -88,7 +97,7 @@ jobs:
                - `Namespace.def` — brief description (from `MIPStarRE/Path/File.lean`)
 
                ### Suggested approach
-               Brief recommendation on how to structure the proof using the above.
+               Brief recommendation on how to formalize the stated mathematical proof using the above.
 
                ### Gaps to fill
                - Things not yet in Mathlib or MIPStarRE that will need new definitions/lemmas.
@@ -98,4 +107,4 @@ jobs:
           claude_args: |
             --model claude-opus-4-7
             --allowedTools "Read,Glob,Grep,Bash(lean *),Bash(lake env),mcp__github__add_issue_comment,mcp__github__issue_read"
-            --append-system-prompt "This is a Lean 4 / Mathlib formalization project for quantum complexity theory (MIP* = RE, low-degree tests). Your ONLY task is to scout Mathlib and the existing codebase for relevant lemmas and post a scouting report. Do NOT write code or create files. Be thorough — search multiple keywords and naming conventions. Mathlib sources are under .lake/packages/mathlib/Mathlib/."
+            --append-system-prompt "This is a Lean 4 / Mathlib formalization project for quantum complexity theory (MIP* = RE, low-degree tests). Your only responsibility is to scout Mathlib and the existing codebase for relevant lemmas and post a scouting report. Do NOT write code or create files. Include a Mathematical source section with paper or blueprint path, line, label, and short quotation or precise paraphrase when present in the issue. Be thorough — search multiple keywords and naming conventions. Mathlib sources are under .lake/packages/mathlib/Mathlib/."

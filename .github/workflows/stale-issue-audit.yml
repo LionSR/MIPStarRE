@@ -82,6 +82,7 @@ jobs:
             echo "- Issues flagged stale: ${{ steps.summarize.outputs.flagged }}"
             echo
             echo "The workflow is report-only; maintainers must review the flags manually."
+            echo "When updating an issue, keep its mathematical source citation precise: paper or blueprint path, line, label, and a short quotation or precise paraphrase."
             echo "See docs/stale_issue_audit.md for the triage policy."
             echo
             echo '```text'

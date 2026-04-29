@@ -1,49 +1,54 @@
 name: Tracking Issue
-description: Create a tracking issue to monitor progress across multiple issues and PRs
+description: Create an umbrella issue for a mathematical chapter, theorem family, or proof stage
 labels: ["tracking"]
 body:
   - type: markdown
     attributes:
       value: |
         ## Tracking Issue
-        Use this template to create an issue that tracks progress across multiple related issues and PRs.
+        Use this template for a group of related mathematical statements or proof obligations.
         Attach each tracked issue as a GitHub sub-issue after creating the
-        parent. The body can keep a readable index, but markdown checkboxes and
+        parent. The body can keep a prose index, but markdown checkboxes and
         retired tasklist fences do not create native sub-issue relationships.
 
   - type: input
     id: area
     attributes:
-      label: Area
-      description: Which area of the project does this track?
-      placeholder: e.g., LDT, Quantum, TensorCode, Infrastructure
+      label: Mathematical area
+      description: Which chapter, theorem family, or construction does this issue organize?
+      placeholder: "e.g., Chapter 9 pasting, Section 7 self-improvement, projective measurements"
     validations:
       required: true
 
   - type: textarea
     id: description
     attributes:
-      label: Description
-      description: Describe the goal this tracking issue covers
-      placeholder: What is the overall objective?
+      label: Mathematical objective
+      description: State the theorem family or proof stage, with paper or blueprint locations and labels.
+      placeholder: |
+        Organizes the formalization of the sandwich-chain estimates in Chapter 9.
+        Sources:
+        - `references/ldt-paper/ld-pasting.tex:210`, label `lem:sandwich-chain`.
+          Paraphrase: ...
+        - `blueprint/src/chapter/ch09_pasting.tex:98`, label `lem:sandwich-chain`.
     validations:
       required: true
 
   - type: textarea
-    id: tasks
+    id: sub_issues
     attributes:
-      label: Sub-Issue Index
+      label: GitHub sub-issues
       description: |
         List issue references that should be attached as GitHub sub-issues.
         After creation, add them through the issue sidebar or the sub-issues API.
-        This field is a readable index only.
+        This field is a prose index only; it is not a Markdown tasklist.
       value: |
-        ### Tasks
+        ### Sub-issues to attach
         - #
         - #
         - #
       placeholder: |
-        ### Tasks
+        ### Sub-issues to attach
         - #42
         - #43
     validations:
@@ -52,8 +57,8 @@ body:
   - type: textarea
     id: notes
     attributes:
-      label: Additional Notes
-      description: Any extra context, dependencies, or milestones
-      placeholder: Optional notes
+      label: Mathematical notes
+      description: Dependencies, theorem labels, source locations, or order constraints.
+      placeholder: "Optional notes; cite paper or blueprint locations when possible."
     validations:
       required: false

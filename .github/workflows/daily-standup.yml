@@ -167,9 +167,9 @@ jobs:
             and attentive to the logical dependencies between results. When discussing
             proofs, note the key lemmas invoked, the mathematical content of what was
             shown, and any `sorry` eliminations (which represent open proof obligations
-            finally discharged). Distinguish between scaffolding (imports, refactors,
-            API lemmas) and substantive mathematical progress (new theorems, completed
-            proofs, resolved conjectures).
+            finally discharged). Distinguish supporting declarations, imports, and file
+            organization from substantive mathematical progress: new theorem statements,
+            completed proofs, or corrected correspondence with the paper or blueprint.
 
             Today's date: ${{ steps.date.outputs.today }}
             Activity window: last ${{ fromJSON(steps.activity.outputs.result).hoursBack }} hours (since ${{ fromJSON(steps.activity.outputs.result).since }})
@@ -219,11 +219,11 @@ jobs:
             - Which `sorry` obligations were discharged, and what was the proof strategy?
             - Note the key Mathlib lemmas or tactics that made proofs go through
             - Identify any new definitions, structures, or type classes introduced
-            - Reference the relevant mathematical context (e.g., "proved a key
-              soundness lemma, completing Lemma 3.2 of the blueprint")
+            - Cite paper or blueprint locations when possible: file path, line number,
+              theorem label, and a short quotation or precise paraphrase
 
-            ## Proof Engineering & Refactors
-            - API lemmas, simp lemmas, or coercions added to smooth future work
+            ## Supporting Lemmas & File Organization
+            - Auxiliary lemmas, simp lemmas, or coercions added to support later proofs
             - Import restructuring, namespace changes, or Mathlib alignment
             - Performance improvements (proof term simplification, reducing heartbeats)
 
@@ -238,7 +238,7 @@ jobs:
             - Mathematical questions arising from the formalization
             - Decisions on proof strategy that need input (e.g., "should we formalize
               the spectral theorem via Mathlib's eigenvalue API or build directly?")
-            - Dependencies between open tasks
+            - Dependencies between open theorem statements, lemmas, and proof obligations
 
             ## Activity Summary
             - PRs merged / opened / in review
@@ -251,11 +251,17 @@ jobs:
               mathematicians and formalization experts
             - Use proper mathematical terminology precisely
             - Reference PR/issue numbers (e.g., #123) and file paths where relevant
+            - When describing a formalization issue, include the mathematical source:
+              paper or blueprint path, line number, label, and a short quotation or
+              precise paraphrase if available from the issue or changed files
             - If there was no activity, state so briefly
-            - Prioritize mathematical substance over engineering details
+            - Prioritize mathematical substance over repository maintenance details
             - Demand clarity: every claim should be specific and verifiable. Do not
               write vague summaries like "progress was made on the project". Instead,
               state exactly which lemma was proved, what it says, and why it matters.
+            - Do not describe mathematics using software-process metaphors or local
+              shorthand such as "workstream", "blocked item", "surface", or "seam".
+              State the theorem, lemma, definition, or proof obligation directly.
             - Write the issue as a self-contained document. The reader has no context
               about how you investigated — they only see the final summary. Do not
               include your reasoning process, tool calls, or analysis steps. Present

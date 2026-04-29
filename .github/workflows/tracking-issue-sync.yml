@@ -52,7 +52,7 @@ jobs:
             --allowedTools "mcp__github__*,Bash(git diff *),Bash(git log *),Bash(git show *)"
 
           prompt: |
-            You are the issue tracker agent for the MIPStarRE repository — a Lean 4 /
+            You maintain issue-tracking prose for the MIPStarRE repository — a Lean 4 /
             Mathlib formalization project for quantum complexity theory (MIP* = RE,
             low-degree tests). A GitHub event just occurred. Determine what happened
             and take the appropriate actions.
@@ -94,7 +94,7 @@ jobs:
             **native GitHub sub-issues** for progress tracking:
 
             ```markdown
-            ### Tasks
+            ### Sub-issues to attach
             - #101
             - #102
             ```
@@ -111,7 +111,7 @@ jobs:
             **Area / work type**: `formalization`, `infrastructure`, `documentation`,
               `cleanup`, `refactor`, `ci`
             **Paper**: `2009.12982`
-            **Chapter / workstream**: `ldt-basic`, `preliminaries`, `commutativity`,
+            **Chapter / theorem-family labels**: `ldt-basic`, `preliminaries`, `commutativity`,
               `pasting`, `main-induction`, `proof`, `proof-infra`,
               `sorry-elimination`, `statement-fix`, `mismatch`, `blueprint`,
               `blueprint-sync`
@@ -129,8 +129,8 @@ jobs:
 
             - **PR Cleanup** (`pr-cleanup.yml`): When a PR opens from a
               `claude/*` or `codex/*` branch, it already comments on the
-              linked issue ("🤖 PR #X has been opened…"). Do NOT duplicate
-              that comment for AI-generated PRs.
+              linked issue ("PR #X has been opened…"). Do NOT duplicate
+              that comment for those branches.
             - **Claude Code Review** (`claude-code-review.yml`): Handles
               code quality. You handle tracking metadata only.
             - **Daily Standup / CI Auto-Fix**: Separate workflows. Treat
@@ -159,6 +159,13 @@ jobs:
                — e.g., a PR with `Addresses #N` but no tracking issue
                should still get the linked-issue progress comment.
 
+            5. **Use mathematical language in generated prose.** When creating
+               or commenting on formalization issues, name the theorem, lemma,
+               definition, or proof obligation directly. If available, include
+               the paper or blueprint path, line number, label, and a short
+               quotation or precise paraphrase. Do not describe mathematics
+               only as a task, phase, workflow item, blocker, or cleanup.
+
             ---
 
             ## Playbooks
@@ -177,10 +184,10 @@ jobs:
             3. Suggest next steps (see §5 below).
             4. Comment on the tracking issue (check recent comments first
                to avoid duplicates — Key Rules §3):
-               "✅ #N (*title*) has been resolved.
+               "Issue #N (*title*) has been resolved.
                [X/Y sub-issues complete]
 
-               **Suggested next:** <one-line recommendation from §5>"
+               **Suggested next theorem or proof obligation:** <one-line recommendation from §5>"
 
             ---
 
@@ -198,10 +205,10 @@ jobs:
                to happen to re-resolve it (see §5, linked-issue variant).
             4. Comment on the tracking issue (check recent comments first
                to avoid duplicates — Key Rules §3):
-               "🔄 #N (*title*) has been reopened.
+               "Issue #N (*title*) has been reopened.
                [X/Y sub-issues complete]
 
-               **Suggested next:** <why it was reopened + what to do>"
+               **Suggested next theorem or proof obligation:** <why it was reopened + what to do>"
 
             ---
 
@@ -225,20 +232,20 @@ jobs:
                first to avoid duplicates — Key Rules §3) with a summary:
                the PR title, what it accomplished, current sub-issue progress,
                and a follow-up suggestion. Example:
-               "📦 PR #X (*title*) merged. <what was done>. [X/Y sub-issues
+               "PR #X (*title*) merged. <what was proved or corrected>. [X/Y sub-issues
                complete]
 
-               **Suggested next:** <one-line recommendation from §5>"
+               **Suggested next theorem or proof obligation:** <one-line recommendation from §5>"
             5. **Comment on each linked issue that stays open** (i.e., the
                PR used `Addresses` or `Partially addresses`). Check recent
                comments first to avoid duplicates (Key Rules §3). Summarize
                what the PR accomplished and what remains. Include a
                follow-up suggestion for what to tackle next on that issue.
                Example:
-               "📦 PR #X (*title*) has been merged. <what was done>.
-               Remaining: <what's left>.
+               "PR #X (*title*) has been merged. <what was proved or corrected>.
+               Remaining mathematical obligation: <what is left>.
 
-               **Suggested next step:** <concrete action for this issue>"
+               **Suggested next theorem or proof obligation:** <concrete action for this issue>"
 
             Do NOT comment on issues that will be auto-closed by the PR
             (`Closes`/`Fixes`) — the auto-close fires Playbook A, which
@@ -281,16 +288,20 @@ jobs:
               (e.g., "Discharge sorry in TransferMatrix.injective_iff")
             - **Body**:
               ```markdown
-              ## Context
-              Follow-up from #<PR> (<PR title>).
-              <Why this work is needed>
+              ## Mathematical statement
+              <The theorem, lemma, definition, or proof obligation, stated precisely.>
 
-              ## Details
-              <What needs to be done — specific declarations, files, proofs>
+              ## Source
+              - Paper or blueprint: `<path>:<line>`, label `<label>`.
+                Quote or precise paraphrase: <short quotation or precise paraphrase>.
+              - Lean target: `<DeclarationName>` in `<MIPStarRE/...>.lean`, if known.
+
+              ## Present Lean status
+              <Specific declarations, files, sorry sites, or blueprint tags involved.>
 
               ## References
               - PR: #<PR>
-              - <Related issues, review comments, or arXiv refs>
+              - <Related issues, review comments, paper theorem labels, or arXiv refs>
               ```
             - **Labels**: `follow-up` plus relevant area/paper/topic labels
               copied from the PR. Add `formalization` for sorry follow-ups,
@@ -301,7 +312,7 @@ jobs:
             this run cannot attach sub-issues, leave a comment naming the new
             follow-up and stating that it still needs to be attached manually.
             - Comment (check recent comments first — Key Rules §3):
-              "📋 Added follow-up issues from #<PR>: #<issue1>, …
+              "Added follow-up issues from #<PR>: #<issue1>, …
               [X/Y sub-issues complete]"
             - If multiple follow-ups were created, suggest which one to
               tackle first (see §5, tracking-issue variant).
@@ -324,7 +335,7 @@ jobs:
                workflow. All comments go on the **tracking issue**:
                - **PR opened** — only for branches that do NOT start with
                  `claude/` or `codex/` (PR Cleanup already handles those):
-                 "🔄 #<PR> opened to address #<issue>"
+                 "PR #<PR> opened to address #<issue>."
             4. Skip everything else silently.
 
             ---
@@ -333,7 +344,7 @@ jobs:
 
             When a playbook asks you to "suggest next steps", generate a
             brief, actionable recommendation. Think beyond the immediate
-            next task — consider what this completion unblocks downstream,
+            next proof obligation — consider what this completion proves or supplies downstream,
             how it fits into the broader formalization roadmap, and whether
             preparatory work (scouting, blueprint review) would de-risk
             the next step.
@@ -348,20 +359,20 @@ jobs:
                notes. If that's sufficient, use it. Otherwise, read the open
                child issues to check their **dependencies** ("Depends
                on", "Blocked by", or references to other open issues).
-            3. Recommend a task whose dependencies are all resolved
+            3. Recommend a theorem, lemma, definition, or proof obligation whose dependencies are all resolved
                (closed, or already completed as native sub-issues). If multiple
-               tasks are unblocked, prefer:
-               - Tasks explicitly marked as high-priority or foundational
-               - Tasks that unblock the most other tasks
-               - Tasks with lower estimated difficulty
-            4. If **no tasks are unblocked** (all have open dependencies),
+               issues are unblocked, prefer:
+               - Statements explicitly marked as foundational
+               - Statements that provide hypotheses for the most later results
+               - Statements with a clear paper or blueprint proof route
+            4. If **no issues are unblocked** (all have open dependencies),
                say so and recommend the dependency that should be tackled
                first.
-            5. If **all tasks are complete**, suggest closing the tracking
+            5. If **all sub-issues are complete**, suggest closing the tracking
                issue.
             6. Note downstream impact: briefly mention what completing
-               the suggested task would unblock (other tasks, other
-               tracking issues, or milestones in the broader project).
+               the suggested statement would provide for later theorem labels
+               or tracking issues.
 
             ### Linked-issue variant (Playbooks A2, B1 step 5)
 
@@ -379,7 +390,7 @@ jobs:
 
             ### Scouting and source review
 
-            For tasks that are mathematically complex or involve new
+            For issues that are mathematically complex or involve new
             Mathlib API surface, suggest preparatory scouting before
             diving into the proof:
 
@@ -390,7 +401,7 @@ jobs:
               the `formalization` label). Rescouting may also be
               warranted when Mathlib has been bumped since the last
               report — new lemmas may simplify the approach.
-            - **Blueprint / paper review**: If the task formalizes a
+            - **Blueprint / paper review**: If the issue formalizes a
               specific theorem or section from a paper, suggest
               reviewing the corresponding blueprint LaTeX source
               (`blueprint/src/chapter/*.tex`) to check the proof
@@ -399,8 +410,8 @@ jobs:
               reveals dependencies or intermediate lemmas that are
               not yet tracked as issues.
 
-            Skip scouting suggestions for straightforward tasks
-            (cleanup, simple sorry discharges with known proof paths,
+            Skip scouting suggestions for straightforward issues
+            (simple sorry discharges with known proof paths,
             infrastructure work).
 
             ### Format
@@ -410,9 +421,9 @@ jobs:
             downstream note and scouting hint only when warranted.
 
             Example:
-            "**Suggested next:** #138 (*Discharge sorry in
+            "**Suggested next theorem or proof obligation:** #138 (*Discharge sorry in
             SelfImprovement.lean*) — all dependencies resolved and
-            it is the last task in this area; completing it would let
+            it is the last open proof obligation in this theorem family; completing it would let
             the parent tracking issue close. Consider a Mathlib
             rescouting report first in case the relevant API has
             landed since the last Mathlib bump."

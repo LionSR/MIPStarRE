@@ -1,4 +1,4 @@
-name: PR Cleanup (AI-generated)
+name: PR Cleanup
 
 on:
   pull_request:
@@ -41,14 +41,15 @@ jobs:
               .replace(/```/g, '\u200B`\u200B`\u200B`');
             core.setOutput('body', sanitized);
 
-      - name: Clean up AI-generated PR
+      - name: Clean up PR metadata
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           allowed_bots: 'claude,chatgpt-codex-connector'
           prompt: |
-            You are a PR-cleanup bot. Your job is to bring AI-generated pull requests
-            into compliance with this project's conventions. Do NOT touch code — only
+            You normalize pull request metadata for this repository. Your job is to bring
+            pull requests opened from `claude/*` or `codex/*` branches into compliance
+            with this project's conventions. Do NOT touch code — only
             update PR metadata (title, body, labels) and comment on the linked issue.
 
             ─── CONTEXT ───
@@ -143,12 +144,15 @@ jobs:
 
             ```
             ### Motivation
-            <!-- Why this change is needed (1--3 bullets). -->
+            <!-- Why this mathematical or documentation change is needed. Cite the issue and,
+            when applicable, the paper/blueprint file, line, and theorem label. -->
 
-            - <extract from original body, issue description, or infer from context>
+            - <extract from original body and linked issue; include paper/blueprint
+              path, line, label, and short quotation or precise paraphrase when present>
 
             ### Description
-            <!-- What was changed: files added/modified, definitions introduced, lemmas proved. -->
+            <!-- State precisely what changed: definitions introduced, lemmas/theorems proved,
+            blueprint labels updated, and any deliberate difference from the paper statement. -->
 
             - <extract from original body — list files, definitions, theorems>
             - <mention any remaining sorrys with justification if applicable>
@@ -176,7 +180,11 @@ jobs:
             - Fold `## Summary` / `## Test plan` content into the matching template
               sections, then remove those non-standard headings.
             - When filling in Motivation, reference the linked issue context if
-              available (e.g., "Continues formalization of Chapter 2 results, see #140").
+              available. For formalization issues, preserve or add the mathematical
+              source citation from the issue: paper or blueprint path, line, label,
+              and a short quotation or precise paraphrase. Do not describe the
+              mathematics only as a "task", "follow-up", "phase", "blocker", or
+              "cleanup"; state the theorem, lemma, definition, or proof obligation.
 
             ─── STEP 5: APPLY LABELS ───
             Collect labels to apply (see docs/CONTRIBUTING.md §4 for full taxonomy):
@@ -206,19 +214,19 @@ jobs:
             ─── STEP 7: TAG THE ISSUE ───
             If an issue was found, post a comment on it:
               ```
-              gh issue comment <N> --repo <REPO> --body "🤖 PR #<PR_NUMBER> has been opened to address this issue.
+              gh issue comment <N> --repo <REPO> --body "PR #<PR_NUMBER> has been opened to address this issue.
 
               **Branch:** \`<BRANCH>\`
               **Title:** <new title>
 
-              <one-line summary of what the PR does>"
+              <one-line mathematical summary of what the PR proves, states, or corrects>"
               ```
 
             ─── OUTPUT ───
             After completing all steps, post a PR comment summarizing what was changed:
               ```
               gh pr comment <NUMBER> --repo <REPO> --body "$(cat <<'CEOF'
-              🧹 **PR Cleanup Bot**
+              **PR metadata normalized**
 
               | Field | Before | After |
               |-------|--------|-------|

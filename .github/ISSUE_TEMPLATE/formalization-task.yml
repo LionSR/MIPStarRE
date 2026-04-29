@@ -1,22 +1,27 @@
-name: Formalization Task
-description: A specific theorem, definition, or lemma to formalize in Lean
+name: Formalization Issue
+description: A specific mathematical statement to formalize in Lean
 labels: ["formalization"]
 body:
   - type: input
     id: statement
     attributes:
-      label: Mathematical statement
-      description: Name and source of the result to formalize
-      placeholder: "e.g., Thm 5.1: quantum soundness of the low individual degree test"
+      label: Precise mathematical statement
+      description: Name the theorem, lemma, definition, or construction and state its content.
+      placeholder: "e.g., Theorem 5.1: quantum soundness of the low individual degree test, with the hypotheses on q, n, d, and the strategy stated explicitly."
     validations:
       required: true
 
-  - type: input
-    id: reference
+  - type: textarea
+    id: source_location
     attributes:
-      label: Reference
-      description: Paper or textbook citation
-      placeholder: "e.g., arXiv:2009.12982 Theorem 5.1"
+      label: Mathematical source
+      description: |
+        Cite the source with file path, line number, label, and a short quotation or precise paraphrase.
+      placeholder: |
+        - Paper: `references/ldt-paper/self_improvement.tex:123`, label `thm:self-improvement`.
+          Paraphrase: If the strategy is sufficiently consistent on lines and points, the rounded
+          polynomial strategy improves the low-degree-test error by ...
+        - Blueprint: `blueprint/src/chapter/ch07_self_improvement.tex:45`, label `thm:self-improvement`.
     validations:
       required: true
 
@@ -24,7 +29,7 @@ body:
     id: lean_target
     attributes:
       label: Target Lean declaration
-      description: Expected Lean name and file path
+      description: Expected Lean name and file path.
       placeholder: "e.g., LDT.mainInductionStep in MIPStarRE/LDT/MainInductionStep.lean"
     validations:
       required: false
@@ -32,20 +37,21 @@ body:
   - type: textarea
     id: dependencies
     attributes:
-      label: Dependencies
-      description: Existing Lean declarations or issues this depends on
+      label: Mathematical dependencies
+      description: Theorems, definitions, blueprint labels, or GitHub sub-issues needed first.
       placeholder: |
-        - `LDT.selfImprovement` (exists)
-        - #42 (pasting lemma, in progress)
+        - Blueprint label `prop:simeq-for-measurements`.
+        - Lean declaration `MIPStarRE.LDT.Preliminaries.simEq_for_measurements`.
+        - GitHub sub-issue #42, proving the pasting lemma used in the paper proof.
     validations:
       required: false
 
   - type: textarea
     id: sketch
     attributes:
-      label: Proof sketch / approach
-      description: Brief outline of the formalization strategy
-      placeholder: Optional
+      label: Proof plan
+      description: Explain the mathematical argument to be formalized, including any deviations from the paper or blueprint.
+      placeholder: "Optional, but include theorem labels and declarations when known."
     validations:
       required: false
 
@@ -53,7 +59,7 @@ body:
     id: tracking
     attributes:
       label: Tracking issue
-      description: Parent tracking issue if applicable
+      description: Parent tracking issue, if this issue should be attached as a GitHub sub-issue.
       placeholder: "e.g., #10"
     validations:
       required: false

@@ -1,10 +1,12 @@
 ### Motivation
-<!-- Why this change is needed (1--3 bullets). -->
+<!-- Why this mathematical or documentation change is needed. Cite the issue and,
+when applicable, the paper/blueprint file, line, and theorem label. -->
 
 -
 
 ### Description
-<!-- What was changed: files added/modified, definitions introduced, lemmas proved. -->
+<!-- State precisely what changed: definitions introduced, lemmas/theorems proved,
+blueprint labels updated, and any deliberate difference from the paper statement. -->
 
 -
 

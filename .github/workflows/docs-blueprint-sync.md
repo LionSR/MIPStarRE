@@ -77,9 +77,12 @@ Use `MIPStarRE/` and recent git history as the source of truth for current imple
 
 When you make updates, create a PR that includes:
 
-- A concise summary of what was out of sync
-- Which documentation/blueprint files were updated
-- Why those updates were needed based on recent code changes
+- Motivation: what mathematical statement, theorem label, file path, or
+  documentation claim was out of sync.
+- Description: which documentation or blueprint files were updated, with paper
+  or blueprint labels when the edit concerns mathematics.
+- Testing: what checks or source comparisons were performed.
+- Why those updates were needed based on recent code changes.
 
 If no updates are needed, call `noop` with a short explanation of what you checked.
 
@@ -89,6 +92,9 @@ If no updates are needed, call `noop` with a short explanation of what you check
 - Preserve existing style and structure of the modified docs.
 - Keep the PR scoped to documentation synchronization only.
 - If information is missing to make a safe update, call `missing-data`.
+- When describing mathematics, avoid local shorthand such as "workstream",
+  "phase", or "cleanup" unless the theorem, lemma, definition, or proof
+  obligation has first been stated precisely.
 
 **Important**: If no action is needed after completing your analysis, you **MUST** call the `noop` safe-output tool with a brief explanation. Failing to call any safe-output tool is the most common cause of safe-output workflow failures.
 
