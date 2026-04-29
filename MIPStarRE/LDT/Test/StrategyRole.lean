@@ -466,6 +466,14 @@ private lemma opTensor_add_right {ι₁ ι₂ : Type*}
   ext i j
   simp [opTensor, mul_add]
 
+private lemma normalizedTrace_error_smul {ι : Type*} [Fintype ι]
+    (c : Error) (A : MIPStarRE.Quantum.Op ι) :
+    MIPStarRE.Quantum.normalizedTrace (c • A) =
+      (c : ℂ) * MIPStarRE.Quantum.normalizedTrace A := by
+  change MIPStarRE.Quantum.normalizedTrace ((c : ℂ) • A) =
+    (c : ℂ) * MIPStarRE.Quantum.normalizedTrace A
+  rw [MIPStarRE.Quantum.normalizedTrace_smul]
+
 noncomputable def swapQuantumState {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState (ι × ι)) : QuantumState (ι × ι) where
   density := swapDensity ψ.density
@@ -764,6 +772,105 @@ private lemma opTensor_roleCond_BB {ι : Type*} [Fintype ι] [DecidableEq ι]
       rolePairCond Role.B Role.B (opTensor X Y) := by
   simpa using opTensor_roleCond Role.B Role.B X Y
 
+-- Formal version of the role-register calculation in
+-- `references/ldt-paper/inductive_step.tex`, lines 45--66.  The symmetrized
+-- state is supported only on the `A/B` and `B/A` role sectors, while the
+-- symmetrized measurements are block diagonal in the standard role basis.
+-- Consequently, after taking the normalized trace, an `A/B` sector sees only
+-- the left `A` block and right `B` principal block, and the role-reversed sector
+-- gives the analogous statement.  These are trace identities, not operator
+-- identities: arbitrary off-diagonal role blocks of `Y` need not vanish, but
+-- they do not contribute to the paper's expectation calculation.
+set_option linter.flexible false in
+private lemma normalizedTrace_rolePairCond_AB_mul_left_roleCond_A {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (D : MIPStarRE.Quantum.Op (ι × ι))
+    (X : MIPStarRE.Quantum.Op ι) (Y : MIPStarRE.Quantum.Op (Role × ι)) :
+    MIPStarRE.Quantum.normalizedTrace
+        (rolePairCond Role.A Role.B D * opTensor (roleCond Role.A X) Y) =
+      MIPStarRE.Quantum.normalizedTrace
+        (rolePairCond Role.A Role.B D *
+          opTensor (roleCond Role.A X) (roleCond Role.B (roleBlock Role.B Y))) := by
+  unfold MIPStarRE.Quantum.normalizedTrace Matrix.trace
+  simp_rw [Fintype.sum_prod_type]
+  simp [rolePairCond, rolePairPayloadEquiv, rolePairProj, roleCond, roleBlock,
+    roleProj, opTensor, Matrix.mul_apply, Matrix.single]
+  simp_rw [Fintype.sum_prod_type]
+  have hRoleSum : ∀ f : Role → ℂ, (∑ r : Role, f r) = f Role.A + f Role.B := by
+    intro f
+    rw [Fintype.sum_eq_add Role.A Role.B (by decide)
+      (by
+        intro r hr
+        cases r <;> simp at hr)]
+  simp_rw [hRoleSum]
+  simp
+
+set_option linter.flexible false in
+private lemma normalizedTrace_rolePairCond_BA_mul_left_roleCond_A {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (D : MIPStarRE.Quantum.Op (ι × ι))
+    (X : MIPStarRE.Quantum.Op ι) (Y : MIPStarRE.Quantum.Op (Role × ι)) :
+    MIPStarRE.Quantum.normalizedTrace
+        (rolePairCond Role.B Role.A D * opTensor (roleCond Role.A X) Y) = 0 := by
+  unfold MIPStarRE.Quantum.normalizedTrace Matrix.trace
+  simp_rw [Fintype.sum_prod_type]
+  simp [rolePairCond, rolePairPayloadEquiv, rolePairProj, roleCond,
+    roleProj, opTensor, Matrix.mul_apply, Matrix.single]
+  simp_rw [Fintype.sum_prod_type]
+  have hRoleSum : ∀ f : Role → ℂ, (∑ r : Role, f r) = f Role.A + f Role.B := by
+    intro f
+    rw [Fintype.sum_eq_add Role.A Role.B (by decide)
+      (by
+        intro r hr
+        cases r <;> simp at hr)]
+  simp_rw [hRoleSum]
+  simp
+
+set_option linter.flexible false in
+private lemma normalizedTrace_rolePairCond_BA_mul_left_roleCond_B {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (D : MIPStarRE.Quantum.Op (ι × ι))
+    (X : MIPStarRE.Quantum.Op ι) (Y : MIPStarRE.Quantum.Op (Role × ι)) :
+    MIPStarRE.Quantum.normalizedTrace
+        (rolePairCond Role.B Role.A D * opTensor (roleCond Role.B X) Y) =
+      MIPStarRE.Quantum.normalizedTrace
+        (rolePairCond Role.B Role.A D *
+          opTensor (roleCond Role.B X) (roleCond Role.A (roleBlock Role.A Y))) := by
+  unfold MIPStarRE.Quantum.normalizedTrace Matrix.trace
+  simp_rw [Fintype.sum_prod_type]
+  simp [rolePairCond, rolePairPayloadEquiv, rolePairProj, roleCond, roleBlock,
+    roleProj, opTensor, Matrix.mul_apply, Matrix.single]
+  simp_rw [Fintype.sum_prod_type]
+  have hRoleSum : ∀ f : Role → ℂ, (∑ r : Role, f r) = f Role.A + f Role.B := by
+    intro f
+    rw [Fintype.sum_eq_add Role.A Role.B (by decide)
+      (by
+        intro r hr
+        cases r <;> simp at hr)]
+  simp_rw [hRoleSum]
+  simp
+
+set_option linter.flexible false in
+private lemma normalizedTrace_rolePairCond_AB_mul_left_roleCond_B {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (D : MIPStarRE.Quantum.Op (ι × ι))
+    (X : MIPStarRE.Quantum.Op ι) (Y : MIPStarRE.Quantum.Op (Role × ι)) :
+    MIPStarRE.Quantum.normalizedTrace
+        (rolePairCond Role.A Role.B D * opTensor (roleCond Role.B X) Y) = 0 := by
+  unfold MIPStarRE.Quantum.normalizedTrace Matrix.trace
+  simp_rw [Fintype.sum_prod_type]
+  simp [rolePairCond, rolePairPayloadEquiv, rolePairProj, roleCond,
+    roleProj, opTensor, Matrix.mul_apply, Matrix.single]
+  simp_rw [Fintype.sum_prod_type]
+  have hRoleSum : ∀ f : Role → ℂ, (∑ r : Role, f r) = f Role.A + f Role.B := by
+    intro f
+    rw [Fintype.sum_eq_add Role.A Role.B (by decide)
+      (by
+        intro r hr
+        cases r <;> simp at hr)]
+  simp_rw [hRoleSum]
+  simp
+
 lemma opTensor_roleCond_sum {ι : Type*} [Fintype ι] [DecidableEq ι]
     (XA XB YA YB : MIPStarRE.Quantum.Op ι) :
     opTensor (roleCond Role.A XA + roleCond Role.B XB)
@@ -849,20 +956,15 @@ private lemma ev_classicalRoleSymmState_opTensor_roleCond_A_ignore {ι : Type*}
     ev (classicalRoleSymmState ψ) (opTensor (roleCond Role.A X) Y) =
       ev (classicalRoleSymmState ψ)
         (opTensor (roleCond Role.A X) (roleCond Role.B (roleBlock Role.B Y))) := by
-  unfold ev classicalRoleSymmState MIPStarRE.Quantum.normalizedTrace Matrix.trace
-  simp_rw [Fintype.sum_prod_type]
-  simp [rolePairCond, rolePairPayloadEquiv, rolePairProj, roleCond, roleBlock,
-    roleProj, opTensor, Matrix.mul_apply, Matrix.single]
-  simp_rw [Fintype.sum_prod_type]
-  have hRoleSum : ∀ f : Role → ℂ, (∑ r : Role, f r) = f Role.A + f Role.B := by
-    intro f
-    rw [Fintype.sum_eq_add Role.A Role.B (by decide)
-      (by
-        intro r hr
-        cases r <;> simp at hr)]
-  simp_rw [hRoleSum]
-  have hcardRole : Fintype.card Role = 2 := by decide
-  simp [hcardRole]
+  unfold ev classicalRoleSymmState
+  rw [add_mul, add_mul, MIPStarRE.Quantum.normalizedTrace_add,
+    MIPStarRE.Quantum.normalizedTrace_add, smul_mul_assoc, smul_mul_assoc,
+    smul_mul_assoc, smul_mul_assoc]
+  simp_rw [normalizedTrace_error_smul]
+  rw [normalizedTrace_rolePairCond_AB_mul_left_roleCond_A,
+    normalizedTrace_rolePairCond_BA_mul_left_roleCond_A,
+    opTensor_roleCond_AB, rolePairCond_BA_mul_AB]
+  simp [MIPStarRE.Quantum.normalizedTrace_zero]
 
 lemma ev_classicalRoleSymmState_opTensor_roleCond_A {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Nonempty ι]
@@ -884,19 +986,15 @@ private lemma ev_classicalRoleSymmState_opTensor_roleCond_B_ignore {ι : Type*}
     ev (classicalRoleSymmState ψ) (opTensor (roleCond Role.B X) Y) =
       ev (classicalRoleSymmState ψ)
         (opTensor (roleCond Role.B X) (roleCond Role.A (roleBlock Role.A Y))) := by
-  unfold ev classicalRoleSymmState MIPStarRE.Quantum.normalizedTrace Matrix.trace
-  simp_rw [Fintype.sum_prod_type]
-  simp [rolePairCond, rolePairPayloadEquiv, rolePairProj, roleCond, roleBlock,
-    roleProj, opTensor, Matrix.mul_apply, Matrix.single]
-  simp_rw [Fintype.sum_prod_type]
-  have hRoleSum : ∀ f : Role → ℂ, (∑ r : Role, f r) = f Role.A + f Role.B := by
-    intro f
-    rw [Fintype.sum_eq_add Role.A Role.B (by decide)
-      (by
-        intro r hr
-        cases r <;> simp at hr)]
-  simp_rw [hRoleSum]
-  simp
+  unfold ev classicalRoleSymmState
+  rw [add_mul, add_mul, MIPStarRE.Quantum.normalizedTrace_add,
+    MIPStarRE.Quantum.normalizedTrace_add, smul_mul_assoc, smul_mul_assoc,
+    smul_mul_assoc, smul_mul_assoc]
+  simp_rw [normalizedTrace_error_smul]
+  rw [normalizedTrace_rolePairCond_AB_mul_left_roleCond_B,
+    normalizedTrace_rolePairCond_BA_mul_left_roleCond_B,
+    opTensor_roleCond_BA, rolePairCond_AB_mul_BA]
+  simp [MIPStarRE.Quantum.normalizedTrace_zero]
 
 lemma ev_classicalRoleSymmState_opTensor_roleCond_B {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Nonempty ι]
