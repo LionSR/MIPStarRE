@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report a broken proof, type error, sorry regression, or CI failure
+description: Report a broken proof, type error, sorry regression, statement mismatch, or CI failure
 labels: ["bug"]
 body:
   - type: input
@@ -15,7 +15,7 @@ body:
     id: description
     attributes:
       label: Description
-      description: What is broken? Include error messages or sorry locations.
+      description: What is broken? Include error messages, sorry locations, or the mathematical mismatch.
       placeholder: |
         `lake build` fails with:
         ```
@@ -25,10 +25,22 @@ body:
       required: true
 
   - type: textarea
+    id: source_location
+    attributes:
+      label: Mathematical source, if relevant
+      description: Cite the paper or blueprint path, line number, label, and a short quotation or precise paraphrase when the bug concerns a mathematical statement.
+      placeholder: |
+        - `references/ldt-paper/preliminaries.tex:88`, label `lem:...`.
+          Paraphrase: ...
+        - `blueprint/src/chapter/ch03_preliminaries.tex:120`, label `prop:...`.
+    validations:
+      required: false
+
+  - type: textarea
     id: expected
     attributes:
       label: Expected behavior
-      description: What should happen instead?
+      description: What should the Lean statement, proof, or build do instead?
     validations:
       required: false
 

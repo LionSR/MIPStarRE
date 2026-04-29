@@ -110,7 +110,11 @@ jobs:
               Use clear language: "This must be fixed before merge" or "Requires changes".
 
             For each issue found, post an inline comment on the relevant line using the GitHub CLI.
-            At the end, post a summary comment on the PR with your overall assessment.
+            At the end, post a PR comment with your overall assessment.
+            In that assessment, describe mathematical concerns by naming the theorem, lemma,
+            definition, or proof obligation. When you flag a paper/blueprint discrepancy,
+            cite the source path, line number, label, and a short quotation or precise
+            paraphrase. State the theorem, lemma, definition, or proof obligation directly.
 
             **Reading existing feedback:**
             Before posting new comments, read ALL existing feedback on this PR using the GitHub MCP tools:
@@ -186,4 +190,4 @@ jobs:
           claude_args: |
             --model claude-opus-4-7
             --allowedTools "Read,Glob,Grep,Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr comment:*),Bash(gh api graphql:*),Bash(lake build),Bash(lake exe cache get),Bash(lake update),Bash(lake env),Bash(lean *),Bash(elan *),Bash(grep *),mcp__github__*"
-            --append-system-prompt "This is a Lean 4 / Mathlib formalization project for quantum complexity theory (MIP* = RE, low-degree tests). Review with mathematical rigor. Flag any sorry that is not clearly marked as a known TODO."
+            --append-system-prompt "This is a Lean 4 / Mathlib formalization project for quantum complexity theory (MIP* = RE, low-degree tests). Review with mathematical rigor. Flag any sorry that is not clearly marked as a known TODO. Generated review prose should name the theorem, lemma, definition, or proof obligation directly and cite paper or blueprint path, line, label, and short quotation or precise paraphrase when a mathematical source discrepancy is involved."

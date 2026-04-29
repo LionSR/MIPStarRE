@@ -1,4 +1,4 @@
-name: PR Cleanup (AI-generated)
+name: PR Mathematical Description
 
 on:
   pull_request:
@@ -41,15 +41,16 @@ jobs:
               .replace(/```/g, '\u200B`\u200B`\u200B`');
             core.setOutput('body', sanitized);
 
-      - name: Clean up AI-generated PR
+      - name: Align PR description with mathematical source
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           allowed_bots: 'claude,chatgpt-codex-connector'
           prompt: |
-            You are a PR-cleanup bot. Your job is to bring AI-generated pull requests
-            into compliance with this project's conventions. Do NOT touch code — only
-            update PR metadata (title, body, labels) and comment on the linked issue.
+            You align pull request titles, descriptions, labels, and linked-issue comments
+            with this repository's mathematical conventions. For pull requests opened from
+            `claude/*` or `codex/*` branches, leave the code untouched and write the PR
+            description as a self-contained mathematical note.
 
             ─── CONTEXT ───
             PR_NUMBER:  ${{ github.event.pull_request.number }}
@@ -71,7 +72,7 @@ jobs:
               - `docs/pr-review.md` — review checklist (what reviewers expect)
 
             These files are checked out in the workspace. Read them before proceeding
-            so your cleanup is fully aligned with project standards.
+            so the resulting title, body, labels, and issue comment match project standards.
 
             ─── STEP 1: EXTRACT ISSUE NUMBER ───
             Find the linked issue number. Be thorough — check ALL of these sources:
@@ -83,8 +84,8 @@ jobs:
               d. Commit messages: run `gh pr view ${{ github.event.pull_request.number }}
                  --repo ${{ github.repository }} --json commits` and scan each
                  commit message for `#N` references
-              e. Codex task links: if the body contains a Codex Task URL, check
-                 if the Codex branch name or task description references an issue
+              e. Codex branch links: if the body contains a Codex URL, check
+                 if the Codex branch name or description references an issue
               f. File-based heuristic: if no issue found yet, run
                  `gh pr view ${{ github.event.pull_request.number }} --repo ${{ github.repository }} --json files`
                  to see which files changed, then search open issues whose body
@@ -109,7 +110,7 @@ jobs:
               fix      — Bug fix (broken proof, wrong identifier, etc.)
               refactor — Restructuring without changing API surface
               docs     — Documentation or blueprint changes only
-              style    — Formatting, naming, or docstring cleanup only
+              style    — Formatting, naming, or docstring-only changes
               ci       — CI/CD workflow changes
               chore    — Dependency bumps, linting, toolchain updates
 
@@ -126,7 +127,7 @@ jobs:
               • Bug fixes, broken proofs, wrong identifiers → fix
               • Blueprint-only `.tex` changes → docs(blueprint) or fix(blueprint)
                 depending on whether it's new content or fixing mismatches
-              • Pure formatting / naming / docstring cleanup → style
+              • Pure formatting / naming / docstring-only changes → style
               • Restructuring → refactor
               • CI changes → ci
               • Dependency bumps → chore
@@ -143,12 +144,15 @@ jobs:
 
             ```
             ### Motivation
-            <!-- Why this change is needed (1--3 bullets). -->
+            <!-- Why this mathematical or documentation change is needed. Cite the issue and,
+            when applicable, the paper/blueprint file, line, and theorem label. -->
 
-            - <extract from original body, issue description, or infer from context>
+            - <extract from original body and linked issue; include paper/blueprint
+              path, line, label, and short quotation or precise paraphrase when present>
 
             ### Description
-            <!-- What was changed: files added/modified, definitions introduced, lemmas proved. -->
+            <!-- State precisely what changed: definitions introduced, lemmas/theorems proved,
+            blueprint labels updated, and any deliberate difference from the paper statement. -->
 
             - <extract from original body — list files, definitions, theorems>
             - <mention any remaining sorrys with justification if applicable>
@@ -173,10 +177,13 @@ jobs:
               verbatim after the `Addresses` line (separated by blank lines).
             - Remove any "Generated with [Claude Code]" lines — redundant with the
               branch name.
-            - Fold `## Summary` / `## Test plan` content into the matching template
+            - Fold `## Summary` / `## Test plan` content from the original PR into the matching template
               sections, then remove those non-standard headings.
             - When filling in Motivation, reference the linked issue context if
-              available (e.g., "Continues formalization of Chapter 2 results, see #140").
+              available. For formalization issues, preserve or add the mathematical
+              source citation from the issue: paper or blueprint path, line, label,
+              and a short quotation or precise paraphrase. State the theorem, lemma,
+              definition, or proof obligation directly.
 
             ─── STEP 5: APPLY LABELS ───
             Collect labels to apply (see docs/CONTRIBUTING.md §4 for full taxonomy):
@@ -206,26 +213,25 @@ jobs:
             ─── STEP 7: TAG THE ISSUE ───
             If an issue was found, post a comment on it:
               ```
-              gh issue comment <N> --repo <REPO> --body "🤖 PR #<PR_NUMBER> has been opened to address this issue.
+              gh issue comment <N> --repo <REPO> --body "PR #<PR_NUMBER> has been opened to address this issue.
 
               **Branch:** \`<BRANCH>\`
               **Title:** <new title>
 
-              <one-line summary of what the PR does>"
+              <one-line mathematical summary of what the PR proves, states, or corrects>"
               ```
 
             ─── OUTPUT ───
-            After completing all steps, post a PR comment summarizing what was changed:
+            After completing all steps, post a PR comment recording the mathematical
+            description now present on the pull request:
               ```
               gh pr comment <NUMBER> --repo <REPO> --body "$(cat <<'CEOF'
-              🧹 **PR Cleanup Bot**
+              **Mathematical PR description**
 
-              | Field | Before | After |
-              |-------|--------|-------|
-              | **Title** | `<old>` | `<new>` (or: unchanged) |
-              | **Body** | restructured / already compliant |
-              | **Labels** | added: `<list>` |
-              | **Issue** | linked to #<N> / no issue found |
+              - Title: `<new title>` (or: unchanged)
+              - Source issue: #<N> / no issue found
+              - Mathematical source cited in the body: yes/no
+              - Labels added: `<list>`
 
               _Conventions: [CONTRIBUTING.md](../blob/main/docs/CONTRIBUTING.md)_
               CEOF

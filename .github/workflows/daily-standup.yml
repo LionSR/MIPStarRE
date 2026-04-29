@@ -1,9 +1,9 @@
-name: Daily Standup Summary
+name: Daily Mathematical Progress
 
 on:
   schedule:
     - cron: "0 8 * * 1-5"  # Weekdays at 08:00 UTC
-  workflow_dispatch:         # Manual trigger for on-demand summaries
+  workflow_dispatch:         # Manual trigger for on-demand progress notes
 
 concurrency:
   group: daily-standup
@@ -150,13 +150,13 @@ jobs:
               reviewComments: reviewComments.slice(0, 30)
             };
 
-      - name: Generate standup summary with Claude
+      - name: Generate daily mathematical progress note
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
             You are a pure mathematician and Lean 4 formalization expert writing a daily
-            standup summary for the MIPStarRE repository (${{ github.repository }}).
+            mathematical progress note for the MIPStarRE repository (${{ github.repository }}).
 
             MIPStarRE is a Lean 4 / Mathlib formalization project for quantum complexity
             theory (MIP* = RE, low-degree tests), grounded in rigorous mathematical
@@ -167,9 +167,9 @@ jobs:
             and attentive to the logical dependencies between results. When discussing
             proofs, note the key lemmas invoked, the mathematical content of what was
             shown, and any `sorry` eliminations (which represent open proof obligations
-            finally discharged). Distinguish between scaffolding (imports, refactors,
-            API lemmas) and substantive mathematical progress (new theorems, completed
-            proofs, resolved conjectures).
+            finally discharged). Distinguish supporting declarations, imports, and file
+            organization from substantive mathematical progress: new theorem statements,
+            completed proofs, or corrected correspondence with the paper or blueprint.
 
             Today's date: ${{ steps.date.outputs.today }}
             Activity window: last ${{ fromJSON(steps.activity.outputs.result).hoursBack }} hours (since ${{ fromJSON(steps.activity.outputs.result).since }})
@@ -196,19 +196,19 @@ jobs:
 
             === INSTRUCTIONS ===
 
-            Analyze the activity above and produce a standup summary. For additional
+            Analyze the activity above and produce a daily mathematical progress note. For additional
             context, read the actual Lean source files changed (use Read/Glob/Grep) to
             understand the mathematical content of proofs, not just commit messages.
             Use git log and git diff for the activity window above to see what changed in detail.
 
             Before creating any issue, use the mcp__github__search_issues tool to check
-            whether a standup issue for today's date already exists (search for
-            "Daily Standup — ${{ steps.date.outputs.today }}" with the "standup" label).
+            whether a daily mathematical progress issue for today's date already exists (search for
+            "Daily Mathematical Progress — ${{ steps.date.outputs.today }}" with the "standup" label).
             If such an issue exists, DO NOT create a new one — instead, use
             mcp__github__add_issue_comment to update the existing issue.
 
             If no such issue exists, use mcp__github__issue_write to create a GitHub
-            issue with the title: "Daily Standup — ${{ steps.date.outputs.today }}" and
+            issue with the title: "Daily Mathematical Progress — ${{ steps.date.outputs.today }}" and
             label it "standup". Use mcp__github__get_label to check if the label exists
             first, and use Bash(gh label create *) to create it if needed.
 
@@ -219,11 +219,11 @@ jobs:
             - Which `sorry` obligations were discharged, and what was the proof strategy?
             - Note the key Mathlib lemmas or tactics that made proofs go through
             - Identify any new definitions, structures, or type classes introduced
-            - Reference the relevant mathematical context (e.g., "proved a key
-              soundness lemma, completing Lemma 3.2 of the blueprint")
+            - Cite paper or blueprint locations when possible: file path, line number,
+              theorem label, and a short quotation or precise paraphrase
 
-            ## Proof Engineering & Refactors
-            - API lemmas, simp lemmas, or coercions added to smooth future work
+            ## Supporting Lemmas & File Organization
+            - Auxiliary lemmas, simp lemmas, or coercions added to support later proofs
             - Import restructuring, namespace changes, or Mathlib alignment
             - Performance improvements (proof term simplification, reducing heartbeats)
 
@@ -238,9 +238,9 @@ jobs:
             - Mathematical questions arising from the formalization
             - Decisions on proof strategy that need input (e.g., "should we formalize
               the spectral theorem via Mathlib's eigenvalue API or build directly?")
-            - Dependencies between open tasks
+            - Dependencies between open theorem statements, lemmas, and proof obligations
 
-            ## Activity Summary
+            ## Repository Record
             - PRs merged / opened / in review
             - Issues closed / opened
             - Commits to main
@@ -251,13 +251,18 @@ jobs:
               mathematicians and formalization experts
             - Use proper mathematical terminology precisely
             - Reference PR/issue numbers (e.g., #123) and file paths where relevant
+            - When describing a formalization issue, include the mathematical source:
+              paper or blueprint path, line number, label, and a short quotation or
+              precise paraphrase if available from the issue or changed files
             - If there was no activity, state so briefly
-            - Prioritize mathematical substance over engineering details
+            - Prioritize mathematical substance over repository maintenance details
             - Demand clarity: every claim should be specific and verifiable. Do not
               write vague summaries like "progress was made on the project". Instead,
               state exactly which lemma was proved, what it says, and why it matters.
+            - Do not describe mathematics using software-process metaphors or local
+              shorthand for theorem statements, lemmas, definitions, or proof obligations.
             - Write the issue as a self-contained document. The reader has no context
-              about how you investigated — they only see the final summary. Do not
+              about how you investigated — they only see the final note. Do not
               include your reasoning process, tool calls, or analysis steps. Present
               only polished conclusions.
 

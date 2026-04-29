@@ -137,10 +137,12 @@ grep -n "sorry" MIPStarRE/path/to/file.lean
 
 When you make updates, create a PR that includes:
 
-- A summary table of sync issues found and how each was resolved
-- Which `.tex` files were modified
-- Whether `lean_decls` was regenerated (it is gitignored; CI generates it)
-- The current formalization progress (from the sync checker output)
+- Motivation: which paper or blueprint statement needed synchronization, with
+  `.tex` file path, line number, theorem label, and Lean declaration name.
+- Description: a summary table of sync issues found and how each was resolved.
+- Testing: the exact sync checker command run and whether `lean_decls` was
+  regenerated (it is gitignored; CI generates it).
+- The current formalization status from the sync checker output.
 
 ## Safety and quality constraints
 
@@ -149,6 +151,8 @@ When you make updates, create a PR that includes:
 - When unsure about a rename, prefer leaving the annotation as-is and noting it in the PR description rather than guessing.
 - If too many issues exist to safely resolve in one PR, fix the clear cases and note the ambiguous ones.
 - If information is missing to make a safe update, call `missing-data`.
+- Do not describe a blueprint mismatch only as drift or cleanup. Name the
+  theorem, lemma, definition, or proof obligation and cite the blueprint label.
 
 **Important**: If no action is needed after completing your analysis, you **MUST** call the `noop` safe-output tool with a brief explanation. Failing to call any safe-output tool is the most common cause of safe-output workflow failures.
 
