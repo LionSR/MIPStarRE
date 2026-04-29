@@ -1670,5 +1670,4 @@ private lemma firstSwitcherooError_le_commutingWithGCompleteError
           simp [commutingWithGCompleteError, sixteenthSum]
           ring
 
-
 end MIPStarRE.LDT.Pasting

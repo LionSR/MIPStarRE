@@ -254,5 +254,4 @@ lemma orderedLiftToLineBridge
               exact diagonalLineProductOrdered_outcome params strategy q a b)
     hcab
 
-
 end MIPStarRE.LDT.CommutativityPoints

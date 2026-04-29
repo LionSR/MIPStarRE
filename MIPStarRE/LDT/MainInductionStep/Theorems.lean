@@ -393,7 +393,6 @@ private lemma min_eps_one_le_mainInductionError_of_m_eq_one
       _ = mainInductionError params k eps delta gamma := by
             simp [mainInductionError, mainInductionNu, hm1]
 
-
 /-- Throwaway polynomial measurement used only as a witness in the vacuous
 `mainInductionError ≥ 1` fallback branch of `mainInductionByRecursionOnM`.
 All mass is concentrated on `default : Polynomial params`. -/
@@ -991,7 +990,6 @@ private lemma delta_le_one_of_selfImprovementInInductionError_le_one
   exact
     le_one_of_selfImprovementInInductionError_le_one_of_scaled_bound
       params hzeta_le hdelta_scaled_le
-
 
 /-! ## Restricted-probability bookkeeping -/
 
@@ -1784,7 +1782,6 @@ lemma restrictedProbabilities
   exact RestrictedProbabilitiesStatement.ofWeightedBounds params strategy eps delta gamma hgood
     (weighted_axisParallel_bound params strategy eps delta gamma hgood)
     (weighted_diagonal_bound params strategy eps delta gamma hgood)
-
 
 /-! ## Package constructors and skeletal assembly -/
 

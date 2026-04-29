@@ -1,13 +1,13 @@
 import MIPStarRE.LDT.Pasting.SwitcherooSetup.Terms
 
-set_option linter.style.setOption false
-set_option linter.unusedSimpArgs false
-
 /-!
 # Section 12 pasting: switcheroo split contraction
 
 The split-form contraction and first mixed-term transfer.
 -/
+
+set_option linter.style.setOption false
+set_option linter.unusedSimpArgs false
 
 namespace MIPStarRE.LDT.Pasting
 

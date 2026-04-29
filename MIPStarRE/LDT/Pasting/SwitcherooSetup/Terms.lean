@@ -1,13 +1,13 @@
 import MIPStarRE.LDT.Pasting.SwitcherooSetup.Centers
 
-set_option linter.style.setOption false
-set_option linter.unusedSimpArgs false
-
 /-!
 # Section 12 pasting: switcheroo aggregate terms
 
 The remaining switcheroo aggregate terms and split formulas.
 -/
+
+set_option linter.style.setOption false
+set_option linter.unusedSimpArgs false
 
 namespace MIPStarRE.LDT.Pasting
 

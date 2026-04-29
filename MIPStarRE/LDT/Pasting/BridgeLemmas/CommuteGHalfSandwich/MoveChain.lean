@@ -5,11 +5,11 @@ import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich.Setup
 
 Recursive move, commute, move-back, and flat-chain construction for the half-sandwich bridge.
 
-The generic branch uses the paper's single flat chain.  For `r = k - 2`, the first
+The generic branch uses the paper's single flat chain. For `r = k - 2`, the first
 `r` edges move the leading `Ĝ` across the tail by self-consistency, and the
 post-move suffix contributes `2r + 1` further edges: one outer pairwise
 commutation, `r` recursively lifted commutations, and `r` move-back
-self-consistency edges.  Thus the composed chain has `3r + 1 = 3k - 5` edges
+self-consistency edges. Thus the composed chain has `3r + 1 = 3k - 5` edges
 and total elementary error `4r * ζ + (r + 1) * ν₃`, matching the bookkeeping in
 `lem:commute-g-half-sandwich`.
 
@@ -232,8 +232,7 @@ private lemma commuteGHalfSandwich_prefixSecondSliceLeft
       δ := by
   have hABfst :
       SDDOpRel ψbi
-        (uniformDistribution
-          ((SliceQuestion params × PointTuple params r) × SliceQuestion params))
+        (uniformDistribution ((SliceQuestion params × PointTuple params r) × SliceQuestion params))
         (fun q => headTailOrderedFamily params family r q.1)
         (fun q => headTailRotatedFamily params family r q.1)
         δ :=
@@ -430,8 +429,7 @@ private lemma commuteGHalfSandwich_prefixSecondSliceLeftLift
       δ := by
   have hABfst :
       SDDOpRel ψbi
-        (uniformDistribution
-          ((SliceQuestion params × PointTuple params r) × SliceQuestion params))
+        (uniformDistribution ((SliceQuestion params × PointTuple params r) × SliceQuestion params))
         (fun q => A q.1)
         (fun q => B q.1)
         δ :=
@@ -745,9 +743,7 @@ private lemma commuteGHalfSandwich_moveChainLift
       δ := by
   have hABfst :
       SDDOpRel ψbi
-        (uniformDistribution
-          (((MoveQ params r)) ×
-              SliceQuestion params))
+        (uniformDistribution (MoveQ params r × SliceQuestion params))
         (fun q => A q.1)
         (fun q => B q.1)
         δ :=
@@ -1359,9 +1355,7 @@ private lemma commuteGHalfSandwich_commute_to_moveBackChainFamily_zero
       (gHatSelfConsistencyError zeta) := by
   have htargetMid :
       SDDOpRel ψbi
-        (uniformDistribution
-          (SliceQuestion params × SliceQuestion params × SliceQuestion params ×
-              PointTuple params r))
+        (uniformDistribution (MoveTailQ params r))
         (commuteGHalfSandwich_moveStepTargetFamily params family r)
         (commuteGHalfSandwich_moveStepMidFamily params family r)
         (gHatSelfConsistencyError zeta) :=
@@ -2239,7 +2233,7 @@ private lemma commuteGHalfSandwich_flatChainStep
 /-- Bridge: the staged move-commute-move chain for `commuteGHalfSandwich`.
 
 Constructs the sequence of `3k - 4` intermediate bipartite operator families
-joined by `3k - 5` elementary edges.  These edges repeatedly move `Ĝ₁` through
+joined by `3k - 5` elementary edges. These edges repeatedly move `Ĝ₁` through
 the product `Ĝ₁ · Ĝ₂ · ⋯ · Ĝₖ` using self-consistency (move to right tensor,
 error `2ζ`) and pairwise commutation (swap past neighbor, error `ν₃`), then
 compose them in one call to `sddOpRel_chain`, avoiding the exponential loss from
@@ -2411,6 +2405,5 @@ lemma commuteGHalfSandwich_core
       hpoint
       (le_trans hraw_bound
         (commuteGHalfSandwich_error_bound params gamma zeta k hzeta_nonneg hzeta_le))
-
 
 end MIPStarRE.LDT.Pasting

@@ -1,13 +1,13 @@
 import MIPStarRE.LDT.Pasting.SwitcherooContraction.Split
 
-set_option linter.style.setOption false
-set_option linter.unusedSimpArgs false
-
 /-!
 # Section 12 pasting: switcheroo commuted contraction
 
 The once-commuted contraction steps and the split-by-`g` rewrite.
 -/
+
+set_option linter.style.setOption false
+set_option linter.unusedSimpArgs false
 
 namespace MIPStarRE.LDT.Pasting
 
@@ -169,7 +169,6 @@ lemma switcherooAggregateFourthTerm_once_commuted_contraction_right
                   (opTensor_mono_left (ι₂ := ι) (B := (1 : MIPStarRE.Quantum.Op ι))
                     hmid_le (show (0 : MIPStarRE.Quantum.Op ι) ≤ 1 by exact zero_le_one))
             _ = 1 := by simp [leftTensor]
-
 
 /-- Collapse the split-by-`g` raw expression back to the first positive
 switcheroo term. -/

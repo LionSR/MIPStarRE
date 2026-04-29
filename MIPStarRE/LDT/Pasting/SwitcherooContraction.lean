@@ -588,7 +588,6 @@ lemma switcherooAggregateFourthTerm_once_commuted_contraction_right
                     hmid_le (show (0 : MIPStarRE.Quantum.Op ι) ≤ 1 by exact zero_le_one))
             _ = 1 := by simp [leftTensor]
 
-
 /-- Collapse the split-by-`g` raw expression back to the first positive
 switcheroo term. -/
 lemma switcherooAggregateFirstTerm_eq_split_by_g
@@ -849,6 +848,5 @@ lemma switcherooAggregateFourthTerm_mixed_close_left_front_raw
       switcherooAggregateFourthTerm_once_commuted_contraction_right params family M q
   simpa [𝒟q, A, B, C] using
     (Preliminaries.closenessOfInnerProduct_right ψbi hnorm 𝒟q h𝒟q A B C zeta hAB hC)
-
 
 end MIPStarRE.LDT.Pasting

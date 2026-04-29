@@ -156,7 +156,6 @@ lemma postprocess_hRestrictionToVerticalLine_eq_evaluateAt
       = h u
   exact congrFun hfun h
 
-
 lemma consRel_uniform_fst
     {α β Outcome : Type*} [Fintype α] [DecidableEq α] [Nonempty α]
     [Fintype β] [DecidableEq β] [Nonempty β] [Fintype Outcome]
@@ -561,6 +560,5 @@ lemma hAConsistency_error_le_nu_of_pos
           nlinarith
     _ = MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta := by
           simp [MainInductionStep.ldPastingInInductionNu, S]
-
 
 end MIPStarRE.LDT.Pasting
