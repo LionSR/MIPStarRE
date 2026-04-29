@@ -370,7 +370,7 @@ def render_text_report(reports: list[IssueReport], only_flagged: bool) -> str:
         f"issues scanned        : {total}",
         f"issues with citations : {len(scanned)}",
         f"issues flagged stale  : {len(flagged)}",
-        "triage note          : keep mathematical source citations precise",
+        "triage note           : keep mathematical source citations precise",
         "                       (paper/blueprint path, line, label, and",
         "                       short quotation or precise paraphrase)",
         "",

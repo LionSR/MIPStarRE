@@ -112,7 +112,7 @@ Stale-issue audit report
 issues scanned        : 147
 issues with citations : 92
 issues flagged stale  : 6
-triage note          : keep mathematical source citations precise
+triage note           : keep mathematical source citations precise
                        (paper/blueprint path, line, label, and
                        short quotation or precise paraphrase)
 
