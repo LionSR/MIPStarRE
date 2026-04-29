@@ -20,10 +20,13 @@ common envelope inside the Lean proofs.
 
 Each cascade-step lemma has three components:
 
-* The **cascade variable** (`cascadeSigma`, `cascadeZeta1`, …), a
-  paper-faithful definition of the intermediate quantity.
-* The **tight cascade bound** (`cascadeZeta1_bound`, …), deriving the paper's
-  native estimate directly from the cascade definition.
+* The **cascade variable** (`cascadeSigma`, `cascadeZeta1`, …), a formal
+  definition of the intermediate quantity.  `cascadeZeta2` widens the paper's
+  printed coefficient `40` to `42` to absorb the residual completion term from
+  `prop:completing-to-measurement`.
+* The **tight cascade bound** (`cascadeZeta1_bound`, …), deriving the native
+  estimate directly from the cascade definition (paper-native except for the
+  formal `ζ₂` widening above).
 * The **absorbing bound** (`sigma_bound`, `zeta1_bound`, …), coarsening the
   tight estimate to the final `mainFormalError` envelope.
 
@@ -83,9 +86,14 @@ noncomputable def cascadeZeta1 (params : Parameters) (eps σ : Error) : Error :=
   2 * σ + 2 * Real.sqrt (3 * eps + 2 * σ) +
     (params.m : Error) * (params.d : Error) / (params.q : Error)
 
-/-- Paper quantity `ζ₂ = 200·ζ₁^(1/4) + 40·ζ₁^(1/8)` (see `inductive_step.tex:149`). -/
+/-- Formal Step 6 quantity
+`ζ₂ = 200·ζ₁^(1/4) + 42·ζ₁^(1/8)`.
+
+The paper prints coefficient `40` in `inductive_step.tex:149`; the extra `2`
+absorbs the residual `+ 2ζ₁` term from completing an orthonormalized
+submeasurement when `0 ≤ ζ₁ ≤ 1`. -/
 noncomputable def cascadeZeta2 (ζ₁ : Error) : Error :=
-  200 * Real.rpow ζ₁ (1 / (4 : Error)) + 40 * Real.rpow ζ₁ (1 / (8 : Error))
+  200 * Real.rpow ζ₁ (1 / (4 : Error)) + 42 * Real.rpow ζ₁ (1 / (8 : Error))
 
 /-- Paper quantity `ζ₃ = 6·ζ₁ + 6·ζ₂` (see `inductive_step.tex:158`). -/
 noncomputable def cascadeZeta3 (ζ₁ ζ₂ : Error) : Error :=
@@ -1066,7 +1074,7 @@ private theorem cascadeZeta2_bound {params : Parameters} {k : ℕ} {eps : Error}
       (Real.rpow eps (1 / (1024 : Error)) +
         Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (1024 : Error)))) :
     cascadeZeta2 (cascadeZeta1 params eps (cascadeSigma params k ν)) ≤
-      2560 * (k : Error) * (params.m : Error) *
+      2568 * (k : Error) * (params.m : Error) *
         stepEnvelope params k eps (16384 : Error) (1280000 : Error) := by
   set Z1 : Error := cascadeZeta1 params eps (cascadeSigma params k ν)
   set k2 : Error := (k : Error) ^ (2 : ℕ)
@@ -1111,14 +1119,15 @@ private theorem cascadeZeta2_bound {params : Parameters} {k : ℕ} {eps : Error}
       (hD := by simpa [E2048, E16384] using stepEnvelope_rpow_eighth_le (h := h))
   unfold cascadeZeta2
   calc
-    200 * Real.rpow Z1 (1 / (4 : Error)) + 40 * Real.rpow Z1 (1 / (8 : Error))
+    200 * Real.rpow Z1 (1 / (4 : Error)) + 42 * Real.rpow Z1 (1 / (8 : Error))
       ≤ 200 * (12 * (k : Error) * (params.m : Error) * E16384) +
-          40 * (4 * (k : Error) * (params.m : Error) * E16384) := by
+          42 * (4 * (k : Error) * (params.m : Error) * E16384) := by
             nlinarith [hQuarterRoot', hEighthRoot]
-    _ = 2560 * (k : Error) * (params.m : Error) * E16384 := by ring
+    _ = 2568 * (k : Error) * (params.m : Error) * E16384 := by ring
 
-/-- **Paper lines 205–212.** The concrete `ζ₂` built from `ζ₁ = cascadeZeta1 params eps σ`
-and `σ = cascadeSigma params k ν` is absorbed by `mainFormalError`. -/
+/-- **Paper lines 205–212, with the formal `ζ₂` widening.** The concrete `ζ₂`
+built from `ζ₁ = cascadeZeta1 params eps σ` and `σ = cascadeSigma params k ν`
+is absorbed by `mainFormalError`. -/
 theorem zeta2_bound {params : Parameters} {k : ℕ} {eps : Error}
     (h : CascadeHypotheses params k eps) {ν σ ζ₁ : Error} (hνNN : 0 ≤ ν)
     (hν : ν ≤ 10000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (2 : ℕ)) *
@@ -1141,25 +1150,25 @@ theorem zeta2_bound {params : Parameters} {k : ℕ} {eps : Error}
   have hkm_le : (k : Error) * (params.m : Error) ≤
       ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) :=
     mul_le_mul hk_le hm_le hm_nn (by positivity)
-  have hCoeffNN : 0 ≤ 2560 * (k : Error) * (params.m : Error) := by positivity
+  have hCoeffNN : 0 ≤ 2568 * (k : Error) * (params.m : Error) := by positivity
   have hk2m4_nn : (0 : Error) ≤
       ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) := by positivity
   refine hζ₂.trans ?_
   calc
-    2560 * (k : Error) * (params.m : Error) *
+    2568 * (k : Error) * (params.m : Error) *
         stepEnvelope params k eps (16384 : Error) (1280000 : Error)
-      ≤ 2560 * (k : Error) * (params.m : Error) * mainFormalEnvelope params k eps :=
+      ≤ 2568 * (k : Error) * (params.m : Error) * mainFormalEnvelope params k eps :=
         mul_le_mul_of_nonneg_left hTightEnvelope hCoeffNN
-    _ = (2560 * ((k : Error) * (params.m : Error))) *
+    _ = (2568 * ((k : Error) * (params.m : Error))) *
           mainFormalEnvelope params k eps := by ring
-    _ ≤ (2560 * (((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)))) *
+    _ ≤ (2568 * (((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)))) *
           mainFormalEnvelope params k eps :=
         mul_le_mul_of_nonneg_right
           (mul_le_mul_of_nonneg_left hkm_le (by norm_num)) hENN
     _ ≤ (100000 * (((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)))) *
           mainFormalEnvelope params k eps :=
         mul_le_mul_of_nonneg_right
-          (mul_le_mul_of_nonneg_right (by norm_num : (2560 : Error) ≤ 100000) hk2m4_nn) hENN
+          (mul_le_mul_of_nonneg_right (by norm_num : (2568 : Error) ≤ 100000) hk2m4_nn) hENN
     _ = 100000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
           mainFormalEnvelope params k eps := by ring
 
@@ -1191,12 +1200,12 @@ private theorem cascadeZeta3_bound {params : Parameters} {k : ℕ} {eps : Error}
       Z1 ≤ 20204 * k2 * m4 * E2048 := hZ1
       _ ≤ 20204 * k2 * m4 * E16384 :=
         mul_le_mul_of_nonneg_left hE2048 (by positivity)
-  have hZ2 : Z2 ≤ 2560 * (k : Error) * (params.m : Error) * E16384 := by
+  have hZ2 : Z2 ≤ 2568 * (k : Error) * (params.m : Error) * E16384 := by
     simpa [Z1, Z2, E16384] using cascadeZeta2_bound (h := h) (ν := ν) hνNN hν
   have hE16384NN : 0 ≤ E16384 := by
     simpa [E16384] using
       stepEnvelope_nonneg (h := h) (n := (16384 : Error)) (N := (1280000 : Error))
-  have hZ2' : Z2 ≤ 2560 * k2 * m4 * E16384 := by
+  have hZ2' : Z2 ≤ 2568 * k2 * m4 * E16384 := by
     have hkm_le : (k : Error) * (params.m : Error) ≤ k2 * m4 := by
       calc
         (k : Error) * (params.m : Error)
@@ -1204,23 +1213,23 @@ private theorem cascadeZeta3_bound {params : Parameters} {k : ℕ} {eps : Error}
             exact mul_le_mul_of_nonneg_left h.m_le_m4 (by positivity)
         _ ≤ k2 * m4 := by
             exact mul_le_mul_of_nonneg_right h.k_le_k2 (by positivity)
-    have hScale : 2560 * ((k : Error) * (params.m : Error)) ≤ 2560 * (k2 * m4) := by
-      exact mul_le_mul_of_nonneg_left hkm_le (by norm_num : (0 : Error) ≤ 2560)
-    have hScale' : 2560 * (k : Error) * (params.m : Error) ≤ 2560 * (k2 * m4) := by
+    have hScale : 2568 * ((k : Error) * (params.m : Error)) ≤ 2568 * (k2 * m4) := by
+      exact mul_le_mul_of_nonneg_left hkm_le (by norm_num : (0 : Error) ≤ 2568)
+    have hScale' : 2568 * (k : Error) * (params.m : Error) ≤ 2568 * (k2 * m4) := by
       simpa [mul_assoc] using hScale
     calc
-      Z2 ≤ 2560 * (k : Error) * (params.m : Error) * E16384 := hZ2
-      _ ≤ (2560 * (k2 * m4)) * E16384 := by
+      Z2 ≤ 2568 * (k : Error) * (params.m : Error) * E16384 := hZ2
+      _ ≤ (2568 * (k2 * m4)) * E16384 := by
         exact mul_le_mul_of_nonneg_right hScale' hE16384NN
-      _ = 2560 * k2 * m4 * E16384 := by ring
+      _ = 2568 * k2 * m4 * E16384 := by ring
   have hSum : 6 * Z1 + 6 * Z2 ≤ 150000 * k2 * m4 * E16384 := by
-    have hCoeff : (136584 : Error) * k2 * m4 ≤ 150000 * k2 * m4 := by
+    have hCoeff : (136632 : Error) * k2 * m4 ≤ 150000 * k2 * m4 := by
       have hk2m4NN : 0 ≤ k2 * m4 := by positivity
       nlinarith [hk2m4NN]
     calc
-      6 * Z1 + 6 * Z2 ≤ 6 * (20204 * k2 * m4 * E16384) + 6 * (2560 * k2 * m4 * E16384) := by
+      6 * Z1 + 6 * Z2 ≤ 6 * (20204 * k2 * m4 * E16384) + 6 * (2568 * k2 * m4 * E16384) := by
         nlinarith [hZ1', hZ2']
-      _ = (136584 : Error) * k2 * m4 * E16384 := by ring
+      _ = (136632 : Error) * k2 * m4 * E16384 := by ring
       _ ≤ (150000 * k2 * m4) * E16384 := by
         exact mul_le_mul_of_nonneg_right hCoeff hE16384NN
       _ = 150000 * k2 * m4 * E16384 := by ring

@@ -46,15 +46,16 @@ projective-packaging lemma:
    (`MIPStarRE.LDT.Preliminaries.completeAtOutcomeProj`) — upgrades the same
    completed measurement to a `ProjMeas` without changing its underlying POVM.
 
-The composition gives the `ζ₂` of the paper (`inductive_step.tex`, line 149):
+The composition gives the literal completion scalar
+(`inductive_step.tex`, line 149 plus `prop:completing-to-measurement`):
 
     ζ₂ = 2 · (100·ζ^{1/4}) + 4 · √(100·ζ^{1/4}) + 2·ζ
        = 200·ζ^{1/4} + 40·ζ^{1/8} + 2·ζ.
 
-The paper drops the `2·ζ` term in the closed-form `ζ₂ = 200·ζ^{1/4} + 40·ζ^{1/8}`
-(it is absorbed when the global error is computed downstream); we keep the
-literal output of the two lemmas for proof integrity, and leave the tighter
-absorbed form as a downstream calculation.
+The paper prints the closed-form `ζ₂ = 200·ζ^{1/4} + 40·ζ^{1/8}`.  The Lean
+cascade uses the slightly widened absorbed scalar
+`200·ζ^{1/4} + 42·ζ^{1/8}` downstream, since in the non-vacuous regime
+`0 ≤ ζ ≤ 1` gives `2·ζ ≤ 2·ζ^{1/8}`.
 
 ## Status
 
@@ -105,13 +106,54 @@ closeness conclusion of `prop:completing-to-measurement`
        = 200·ζ^{1/4} + 40·ζ^{1/8} + 2·ζ`.
 
 This is the literal error returned by composing the two existing lemmas.
-The paper's `ζ₂ = 200·ζ^{1/4} + 40·ζ^{1/8}` (`inductive_step.tex`, line 149)
-absorbs the residual `2·ζ` term into a downstream calculation; the
-absorbed form is not needed for the present chain statement. -/
+The paper's printed `ζ₂ = 200·ζ^{1/4} + 40·ζ^{1/8}` (`inductive_step.tex`,
+line 149) drops the residual `2·ζ` term; the formal cascade absorbs it into
+the widened scalar `200·ζ^{1/4} + 42·ζ^{1/8}`. -/
 noncomputable def orthonormalizeAndCompleteError (ζ : Error) : Error :=
   2 * orthonormalizationError ζ +
     4 * Real.sqrt (orthonormalizationError ζ) +
     2 * ζ
+
+/-- Square-root simplification for the orthonormalization error. -/
+private theorem sqrt_orthonormalizationError_eq {ζ : Error} (hζ0 : 0 ≤ ζ) :
+    Real.sqrt (orthonormalizationError ζ) = 10 * Real.rpow ζ (1 / (8 : Error)) := by
+  have hsqrt100 : Real.sqrt (100 : Error) = 10 := by
+    rw [← Real.sqrt_sq (show (0 : Error) ≤ 10 by norm_num)]
+    norm_num
+  have hsqrtRpow : Real.sqrt (Real.rpow ζ (1 / (4 : Error))) =
+      Real.rpow ζ (1 / (8 : Error)) := by
+    rw [Real.sqrt_eq_rpow]
+    calc
+      Real.rpow (Real.rpow ζ (1 / (4 : Error))) (1 / (2 : Error))
+          = Real.rpow ζ ((1 / (4 : Error)) * (1 / (2 : Error))) := by
+              simpa using
+                (Real.rpow_mul hζ0 (1 / (4 : Error)) (1 / (2 : Error))).symm
+      _ = Real.rpow ζ (1 / (8 : Error)) := by norm_num
+  unfold orthonormalizationError
+  calc
+    Real.sqrt (100 * Real.rpow ζ (1 / (4 : Error)))
+        = Real.sqrt (100 : Error) *
+            Real.sqrt (Real.rpow ζ (1 / (4 : Error))) := by
+            rw [Real.sqrt_mul (by norm_num : 0 ≤ (100 : Error))]
+    _ = 10 * Real.rpow ζ (1 / (8 : Error)) := by
+        rw [hsqrt100, hsqrtRpow]
+
+/-- The formal cascade scalar with coefficient `42` absorbs the literal
+orthonormalize-and-complete error in the non-vacuous unit regime. -/
+theorem orthonormalizeAndCompleteError_le_absorbedZeta2 {ζ : Error}
+    (hζ0 : 0 ≤ ζ) (hζ1 : ζ ≤ 1) :
+    orthonormalizeAndCompleteError ζ ≤
+      200 * Real.rpow ζ (1 / (4 : Error)) +
+        42 * Real.rpow ζ (1 / (8 : Error)) := by
+  have hζ_le_eighth : ζ ≤ Real.rpow ζ (1 / (8 : Error)) := by
+    simpa using
+      (Real.rpow_le_rpow_of_exponent_ge' hζ0 hζ1
+        (show 0 ≤ 1 / (8 : Error) by positivity)
+        (by norm_num : 1 / (8 : Error) ≤ (1 : Error)))
+  unfold orthonormalizeAndCompleteError
+  rw [sqrt_orthonormalizationError_eq hζ0]
+  unfold orthonormalizationError
+  nlinarith [hζ_le_eighth]
 
 /-! ### Permutation-invariant right-register transport -/
 

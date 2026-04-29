@@ -667,7 +667,9 @@ noncomputable def zeta1 {params : Parameters} {eps : Error} {k : ℕ}
     (scalars : MainFormalCascadeScalars params eps k) : Error :=
   cascadeZeta1 params eps scalars.sigma
 
-/-- The paper's `ζ₂ = 200ζ₁^(1/4) + 40ζ₁^(1/8)`. -/
+/-- The formal Step 6 scalar
+`ζ₂ = 200ζ₁^(1/4) + 42ζ₁^(1/8)`, widening the paper's printed coefficient
+`40` to absorb the residual completion term. -/
 noncomputable def zeta2 {params : Parameters} {eps : Error} {k : ℕ}
     (scalars : MainFormalCascadeScalars params eps k) : Error :=
   cascadeZeta2 scalars.zeta1
@@ -696,6 +698,53 @@ private theorem cascadeBounds {params : Parameters} {eps : Error} {k : ℕ}
     (ζ₂ := scalars.zeta2) (ζ₃ := scalars.zeta3)
     scalars.cascadeHypotheses scalars.inductionNu_nonneg scalars.inductionNu_bound
     rfl rfl rfl rfl
+
+/-- Nonnegativity of the native cascade `σ`. -/
+theorem sigma_nonneg {params : Parameters} {eps : Error} {k : ℕ}
+    (scalars : MainFormalCascadeScalars params eps k) :
+    0 ≤ scalars.sigma := by
+  unfold sigma cascadeSigma
+  positivity [scalars.inductionNu_nonneg]
+
+/-- Nonnegativity of the native cascade `ζ₁`. -/
+theorem zeta1_nonneg {params : Parameters} {eps : Error} {k : ℕ}
+    (scalars : MainFormalCascadeScalars params eps k) :
+    0 ≤ scalars.zeta1 := by
+  have hσ : 0 ≤ scalars.sigma := sigma_nonneg scalars
+  have hdq : 0 ≤ (params.d : Error) / (params.q : Error) :=
+    scalars.cascadeHypotheses.dqNN
+  unfold zeta1 cascadeZeta1
+  positivity [hσ, scalars.cascadeHypotheses.hepsNN, hdq]
+
+/-- Step 8 absorption for the native `ζ₁` target. -/
+theorem zeta1_le_mainFormalError {params : Parameters} {eps : Error} {k : ℕ}
+    (scalars : MainFormalCascadeScalars params eps k) :
+    scalars.zeta1 ≤ mainFormalError params k eps :=
+  (cascadeBounds scalars).2.1
+
+/-- In the non-vacuous branch, the cascade scalar `ζ₁` lies in the unit interval. -/
+theorem zeta1_le_one_of_not_mainFormalError_ge_one
+    {params : Parameters} {eps : Error} {k : ℕ}
+    (scalars : MainFormalCascadeScalars params eps k)
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps) :
+    scalars.zeta1 ≤ 1 := by
+  exact le_of_lt <|
+    (zeta1_le_mainFormalError scalars).trans_lt (lt_of_not_ge hsmall)
+
+/-- The formal `ζ₂` scalar absorbs the literal Step 6 orthonormalize-and-complete
+error in the non-vacuous branch. -/
+theorem orthonormalizeAndCompleteError_zeta1_le_zeta2
+    {params : Parameters} {eps : Error} {k : ℕ}
+    (scalars : MainFormalCascadeScalars params eps k)
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps) :
+    MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1 ≤
+      scalars.zeta2 := by
+  have hζ0 : 0 ≤ scalars.zeta1 := zeta1_nonneg scalars
+  have hζ1 : scalars.zeta1 ≤ 1 :=
+    zeta1_le_one_of_not_mainFormalError_ge_one scalars hsmall
+  simpa [zeta2, cascadeZeta2] using
+    MakingMeasurementsProjective.orthonormalizeAndCompleteError_le_absorbedZeta2
+      (ζ := scalars.zeta1) hζ0 hζ1
 
 /-- Step 8 absorption for the native `ζ₄` point-consistency targets. -/
 theorem zeta4_le_mainFormalError {params : Parameters} {eps : Error} {k : ℕ}
@@ -2700,7 +2749,7 @@ structure MainFormalNativeTargets
 
 namespace MainFormalNativeTargets
 
-/-- Final packaging step for `thm:main-formal` once the paper-native targets have
+/-- Final packaging step for `thm:main-formal` once the formal native targets have
 been constructed. This only weakens the native `\zeta_4` and `\zeta_3/2` bounds to
 `mainFormalError` using `ConsRel.mono`; all substantive transport work is in the
 construction of `MainFormalNativeTargets`. -/
@@ -2733,9 +2782,10 @@ namespace MainFormalCascadeTargets
 /-- Convert exact cascade-error targets into `MainFormalNativeTargets` by applying
 the already-formalized Step 8 scalar absorption lemmas.
 
-This is still only packaging: the assumptions are exactly the paper-native
-`eq:one-goal`, `eq:another-goal`, and `eq:third-goal` statements at the cascade
-errors from `inductive_step.tex` lines 159--185. -/
+This is still only packaging: the assumptions are the `eq:one-goal`,
+`eq:another-goal`, and `eq:third-goal` statements at the formal cascade errors
+from `inductive_step.tex` lines 159--185, with the Step 6 `ζ₂` scalar widened
+as documented in `ErrorCascade.lean`. -/
 noncomputable def toNativeTargets {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}

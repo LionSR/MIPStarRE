@@ -440,12 +440,15 @@
 		\zeta_1 = 2\sigma + 2\sqrt{3\eps+2\sigma} + md/q,
 	\]
 	\[
-		\zeta_2 = 200\zeta_1^{1/4} + 40\zeta_1^{1/8},
+		\zeta_2 = 200\zeta_1^{1/4} + 42\zeta_1^{1/8},
 		\qquad
 		\zeta_3 = 6\zeta_1 + 6\zeta_2,
 		\qquad
 		\zeta_4 = 2\sigma + 2\sqrt{\zeta_1+\zeta_3/2}.
 	\]
+	The coefficient $42$ is the Lean cascade scalar; it widens the paper's printed
+	coefficient $40$ so that the completion theorem's residual $2\zeta_1$ is
+	absorbed while preserving the final error envelope.
 \end{definition}
 
 \begin{theorem}[Bound for the first cascade term]\label{thm:sigma-bound-main-formal}
@@ -479,7 +482,7 @@
 	\[
 		\zeta_1 = 2\sigma + 2\sqrt{3\eps + 2\sigma} + md/q,
 		\qquad
-		\zeta_2 = 200\zeta_1^{1/4} + 40\zeta_1^{1/8},
+		\zeta_2 = 200\zeta_1^{1/4} + 42\zeta_1^{1/8},
 	\]
 	\[
 		\zeta_3 = 6\zeta_1 + 6\zeta_2,
@@ -495,7 +498,11 @@
 \end{theorem}
 \begin{proof}
 	\leanok
-	The Lean declarations first derive the paper-native bounds for $\zeta_1,\dots,\zeta_4$ from the cascade definitions using square-root and $rpow$ monotonicity, and then coarsen those bounds to the common envelope $E$. The $\zeta_2$ proof additionally uses $k \le k^2$, $m \le m^4$, and the nonnegativity of the earlier cascade variables.
+	The Lean declarations first derive the native bounds for $\zeta_1,\dots,\zeta_4$
+	from the cascade definitions using square-root and $rpow$ monotonicity, with
+	$\zeta_2$ using the widened coefficient $42$, and then coarsen those bounds to
+	the common envelope $E$. The $\zeta_2$ proof additionally uses $k \le k^2$,
+	$m \le m^4$, and the nonnegativity of the earlier cascade variables.
 \end{proof}
 
 \begin{theorem}[Consolidated error cascade]\label{thm:error-cascade-main-formal}
@@ -566,7 +573,8 @@ assembly residual:
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeUnsymmetrizedPOVMTargets, MIPStarRE.LDT.Test.MainFormalCascadeUnsymmetrizedPOVMTargets.ofUnsymmetrizationBridge, MIPStarRE.LDT.Test.MainFormalCascadeUnsymmetrizedPOVMTargets.toPreProjectiveSelfConsistency}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveStageTargets, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveStageTargets.toTransportTargets}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveAssemblyResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveAssemblyResidual.toProjectiveStageTargets}
-\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndCompleteError, MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndComplete}
+\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndCompleteError, MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndComplete, MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndCompleteError_le_absorbedZeta2}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeScalars.orthonormalizeAndCompleteError_zeta1_le_zeta2}
 \lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff.line156Approx}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.projectiveEvaluationConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.pointAConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.pointBConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.toProjectiveAssemblyResidual}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveLine169HandoffResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveLine169HandoffResidual.toProjectiveHandoffResidual}
@@ -604,7 +612,7 @@ projectivization bridge from pre-projective consistency plus left/right
 completion closeness at $\zeta_2$.  Lean also derives the evaluated line-164
 projective consistency, data-processes the two polynomial line-169 $\zeta_1$
 links to the evaluated line-172 links, and proves the two native $\zeta_4$ point
-goals via \texttt{simeq-triangle-inequality}.  After the #869 right-register
+goals via \texttt{simeq-triangle-inequality}.  After the \#869 right-register
 completion transport, the remaining active residual is now the split
 \texttt{MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual}: its
 first field is the concrete Section~6 role residual, and its post-role field asks
@@ -727,8 +735,13 @@ completion-line-169 residual.
 	\end{align}
 	where
 	\[
-		\zeta_2 = 200\zeta_1^{1/4} + 40\zeta_1^{1/8}.
+		\zeta_2 = 200\zeta_1^{1/4} + 42\zeta_1^{1/8}.
 	\]
+	The paper prints the coefficient $40$ in this display.  The formal Lean
+	cascade uses the widened coefficient $42$ to absorb the literal completion
+	error $2\cdot(100\zeta_1^{1/4})+4\sqrt{100\zeta_1^{1/4}}+2\zeta_1$:
+	under the non-vacuous scalar regime $0 \le \zeta_1 \le 1$, the residual term
+	$2\zeta_1$ is bounded by $2\zeta_1^{1/8}$.
 
 	By \ref{eq:G-self-consistency} and Lemma~\ref{prop:simeq-to-approx},
 	\[
@@ -787,7 +800,7 @@ completion-line-169 residual.
 	line-169 links to line~172 and derives the two $\zeta_4$ point goals and the
 	$\zeta_3/2$ self-consistency target.
 
-	With $E$ as in Definition~\ref{def:main-formal-envelope}, the quantities $\sigma,\zeta_1,\zeta_2,\zeta_3,\zeta_4$ form the cascade of Definition~\ref{def:main-formal-error-cascade}. Theorem~\ref{thm:sigma-bound-main-formal} and Theorem~\ref{thm:zeta-bounds-main-formal} package the final inflation to the scale $100000k^2m^4 E$. The underlying paper estimates are:
+	With $E$ as in Definition~\ref{def:main-formal-envelope}, the quantities $\sigma,\zeta_1,\zeta_2,\zeta_3,\zeta_4$ form the cascade of Definition~\ref{def:main-formal-error-cascade}. Theorem~\ref{thm:sigma-bound-main-formal} and Theorem~\ref{thm:zeta-bounds-main-formal} package the final inflation to the scale $100000k^2m^4 E$. The underlying estimates, with the formal widened $\zeta_2$, are:
 	\[
 		\sigma \le 10000k^2m^4\left(\eps^{1/1024}+(d/q)^{1/1024}+e^{-k/(80000m^2)}\right).
 	\]
@@ -797,7 +810,7 @@ completion-line-169 residual.
 	\]
 	and
 	\[
-		\zeta_2 \le 2560km\left(\eps^{1/16384}+(d/q)^{1/16384}+e^{-k/(1280000m^2)}\right).
+		\zeta_2 \le 2568km\left(\eps^{1/16384}+(d/q)^{1/16384}+e^{-k/(1280000m^2)}\right).
 	\]
 	Consequently,
 	\[
