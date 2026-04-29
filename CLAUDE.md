@@ -29,7 +29,7 @@ leanblueprint web    # HTML output
 lake exe checkdecls
 ```
 
-**Toolchain**: Lean 4.28.0 + Mathlib v4.28.0 (pinned in `lean-toolchain` and `lakefile.toml`).
+**Toolchain**: Lean 4.29.1 + Mathlib v4.29.1 (pinned in `lean-toolchain` and `lakefile.toml`).
 
 ## Architecture
 
