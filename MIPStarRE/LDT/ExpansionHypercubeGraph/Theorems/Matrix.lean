@@ -12,9 +12,6 @@ realization model.
 - arXiv:2009.12982, Section 7 (expansion of the hypercube graph).
 -/
 
-set_option linter.style.setOption false
-set_option linter.unnecessarySimpa false
-
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph
 
 open MIPStarRE.LDT
@@ -72,9 +69,8 @@ private lemma orthogonalModeProjector_re_sum (params : Parameters)
             intro v hv
             by_cases huv : u = v <;> simp [huv]
         _ = Complex.re (z u u) := by
-              simpa using
-                (Finset.sum_ite_eq (s := (Finset.univ : Finset (Point params)))
-                  (a := u) (b := fun v => Complex.re (z u v)))
+              rw [Finset.sum_ite_eq]
+              simp
   have hconst :
       ∑ u, ∑ v, Complex.re (((hypercubeVertexCount params : ℂ)⁻¹ * z u v)) =
         (hypercubeVertexCount params : Error)⁻¹ * ∑ u, ∑ v, Complex.re (z u v) := by
@@ -433,13 +429,8 @@ lemma matrixLocalVarianceTraceForm_eq_closedForm (params : Parameters)
                           · simp [huv]
                   _ = (hypercubeVertexCount params : Error)⁻¹ *
                         ev (matrixModelState model) ((model.family u)ᴴ * model.family u) := by
-                        simpa using
-                          (Finset.sum_ite_eq
-                            (s := (Finset.univ : Finset (Point params)))
-                          (a := u)
-                          (b := fun v =>
-                            (hypercubeVertexCount params : Error)⁻¹ *
-                              ev (matrixModelState model) ((model.family u)ᴴ * model.family u)))
+                        rw [Finset.sum_ite_eq]
+                        simp
       _ = (hypercubeVertexCount params : Error)⁻¹ *
             ∑ u, ev (matrixModelState model) ((model.family u)ᴴ * model.family u) := by
             simpa using

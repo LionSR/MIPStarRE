@@ -6,10 +6,6 @@ import MIPStarRE.LDT.Pasting.Core
 Initial switcheroo infrastructure and aggregate expansion helpers.
 -/
 
-set_option linter.style.setOption false
-set_option linter.unusedDecidableInType false
-set_option linter.unusedSimpArgs false
-
 namespace MIPStarRE.LDT.Pasting
 
 open MIPStarRE.LDT
@@ -92,7 +88,7 @@ lemma switcherooCompletePartSelfConsistency_pairBound
           (IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas family.meas))
           (IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas)) := by
             simp [sddError, qSDD, qSDDCore, IdxSubMeas.liftLeft, IdxSubMeas.liftRight,
-              IdxProjSubMeas.toIdxSubMeas, SubMeas.liftLeft, SubMeas.liftRight]
+              IdxProjSubMeas.toIdxSubMeas]
     _ ≤ zeta := hselfG.completePartSelfConsistency.squaredDistanceBound
 
 /-- Read the switcheroo point-product commutation hypothesis as an average
@@ -153,9 +149,10 @@ private lemma avgOver_abs_le_of_bound
     _ = c := by ring
 
 lemma avgOver_abs_le_avgOver_abs
-    {α : Type*} [DecidableEq α]
+    {α : Type*}
     (𝒟 : Distribution α) (f : α → Error) :
     |avgOver 𝒟 f| ≤ avgOver 𝒟 (fun a => |f a|) := by
+  classical
   unfold avgOver
   calc
     |∑ a ∈ 𝒟.support, 𝒟.weight a * f a|

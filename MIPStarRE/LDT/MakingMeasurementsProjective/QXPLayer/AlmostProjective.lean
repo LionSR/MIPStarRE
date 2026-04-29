@@ -6,9 +6,6 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.QCompleteness
 Almost-projective estimates for the rank-reduced `Q` family.
 -/
 
-set_option linter.style.setOption false
-set_option linter.flexible false
-
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT.MakingMeasurementsProjective
@@ -83,7 +80,7 @@ lemma qAlmostProjective {Outcome : Type*}
     _ ≤ (((1 : Error) + 2 * ε) : ℂ) • (∑ a, Qa data a) - ∑ a, Qa data a := hsub_le
     _ = (2 * ε) • QTotal data := by
           rw [hRank.sum_eq_total]
-          simp [sub_eq_add_neg, add_smul]
+          rw [add_smul, Complex.ofReal_one, one_smul, add_sub_cancel_left]
           rw [← Complex.coe_smul]
           norm_num [Complex.ofReal_mul]
     _ ≤ (2 * ε) • ((((1 : Error) + 2 * ε) : ℂ) • (1 : MIPStarRE.Quantum.Op ι)) := hscaled_total

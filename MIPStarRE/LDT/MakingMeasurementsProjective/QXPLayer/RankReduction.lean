@@ -11,9 +11,6 @@ Almost-projectivity, scalar truncation, and rank-reduction lemmas for the
 paper's `Q/X/XHat/P` intermediate layer.
 -/
 
-set_option linter.style.setOption false
-set_option linter.unusedDecidableInType false
-
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT.MakingMeasurementsProjective
@@ -381,7 +378,7 @@ lemma sigmaFinCard_le_of_sum_le {Outcome : Type*} [Fintype Outcome]
 /-- Concrete auxiliary-space producer from a direct total-rank bound. -/
 lemma projectiveLowRankSum_auxData_of_rank_bound {Outcome : Type uOutcome}
     [Fintype Outcome] [Nonempty Outcome]
-    {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    {ι : Type uι} [Fintype ι] [Nonempty ι]
     (m : Outcome → ℕ)
     (hm : ∑ a, m a ≤ Fintype.card ι) :
     ∃ auxSpace : FiniteHilbertSpace.{uι}, ∃ t : ProjMeas Outcome auxSpace.carrier,
