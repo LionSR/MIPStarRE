@@ -2488,9 +2488,10 @@ right-register transport from #869.  The Alice completion field already matches
 `inductive_step.tex` line 146.  For Bob, the analytic completion theorem naturally
 returns the left-lifted estimate for `G^B` and `Q^B`; the conversion below uses
 `MakingMeasurementsProjective.sddRel_liftRight_of_liftLeft_permInv` to recover
-the line-147 right-register estimate.  The remaining line-169 fields are left
-unchanged, since the paper-tight `ζ₁` transport links are still the active
-upstream obstruction. -/
+the line-147 right-register estimate.  The exact line-169 `ζ₁` links are not
+stored directly here: this residual carries the construction-level match-mass
+monotonicity invariant, and the outer conversion combines it with the
+reconstructed pre-projective consistency proof to derive line 169. -/
 structure MainFormalPostRolePackageLeftCompletionLine169Residual
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -2516,20 +2517,13 @@ structure MainFormalPostRolePackageLeftCompletionLine169Residual
         (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas.liftLeft)
       (constSubMeasFamily rightMeasurement.toSubMeas.liftLeft)
       scalars.zeta2
-  /-- Paper line 169, before the data-processing step at lines 171--173. -/
-  leftProjectiveRightPOVMPolynomialConsistency :
-    ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily leftMeasurement.toSubMeas)
-      (constSubMeasFamily
-        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
-      scalars.zeta1
-  /-- Bob-role mirror of paper line 169, before point-evaluation data processing. -/
-  rightProjectiveLeftPOVMPolynomialConsistency :
-    ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily rightMeasurement.toSubMeas)
-      (constSubMeasFamily
-        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
-      scalars.zeta1
+  /-- Construction-level invariant that yields the exact paper line-169 `ζ₁`
+  transports once combined with the pre-projective `G^A/G^B` consistency proof. -/
+  line169MatchMassMonotonicity :
+    MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity strategy.state
+      (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
+      (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
+      leftMeasurement rightMeasurement
 
 namespace MainFormalPostRolePackageLeftCompletionLine169Residual
 
@@ -2545,7 +2539,13 @@ noncomputable def toPostRolePackageCompletionLine169Residual
     {scalars : MainFormalCascadeScalars params eps k}
     {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
     (residual : MainFormalPostRolePackageLeftCompletionLine169Residual
-      params strategy eps k scalars rolePackage) :
+      params strategy eps k scalars rolePackage)
+    (hpre : ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+      (constSubMeasFamily
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+      scalars.zeta1) :
     MainFormalPostRolePackageCompletionLine169Residual
       params strategy eps k scalars rolePackage where
   leftMeasurement := residual.leftMeasurement
@@ -2570,9 +2570,25 @@ noncomputable def toPostRolePackageCompletionLine169Residual
         scalars.zeta2 hleft
     simpa [IdxSubMeas.liftRight, constSubMeasFamily] using hright
   leftProjectiveRightPOVMPolynomialConsistency :=
-    residual.leftProjectiveRightPOVMPolynomialConsistency
-  rightProjectiveLeftPOVMPolynomialConsistency :=
-    residual.rightProjectiveLeftPOVMPolynomialConsistency
+    MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.leftConsistency
+      residual.line169MatchMassMonotonicity hpre
+  rightProjectiveLeftPOVMPolynomialConsistency := by
+    have hpre_symm : ConsRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily
+          (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+        (constSubMeasFamily
+          (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+        scalars.zeta1 :=
+      consRel_symm_of_density_fixed strategy.state strategy.densityFixed
+        (uniformDistribution Unit)
+        (constSubMeasFamily
+          (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+        (constSubMeasFamily
+          (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+        scalars.zeta1 hpre
+    exact
+      MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.rightConsistency
+        residual.line169MatchMassMonotonicity hpre_symm
 
 end MainFormalPostRolePackageLeftCompletionLine169Residual
 
@@ -2629,8 +2645,9 @@ package no longer asks the live hole to provide the right-register completion
 closeness directly.  Instead the post-role field records the left-register
 Bob-side completion estimate returned by the orthonormalize-and-complete chain,
 and the conversion below transports it to the right register using permutation
-invariance of the strategy state.  The concrete role residual and the exact paper
-line-169 `ζ₁` links remain explicit. -/
+invariance of the strategy state.  The concrete role residual and the
+construction-level match-mass invariant for the exact paper line-169 `ζ₁` links
+remain explicit. -/
 structure MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -2662,8 +2679,21 @@ noncomputable def toRolePackageResidualCompletionLine169Residual
     MainFormalCascadeRolePackageResidualCompletionLine169Residual
       params strategy eps hpass k scalars where
   roleResidual := residual.roleResidual
-  postRoleResidual :=
-    residual.postRoleResidual.toPostRolePackageCompletionLine169Residual
+  postRoleResidual := by
+    let rolePackage := residual.roleResidual.rolePackage scalars
+    have hpre : ConsRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily
+          (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+        (constSubMeasFamily
+          (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+        scalars.zeta1 := by
+      let bridge := rolePackage.toUnsymmetrizationBridge
+      let targets : MainFormalCascadeUnsymmetrizedPOVMTargets params strategy eps k scalars :=
+        MainFormalCascadeUnsymmetrizedPOVMTargets.ofUnsymmetrizationBridge
+          rolePackage.roleMeasurement bridge
+      let pre := targets.toPreProjectiveSelfConsistency hpass
+      simpa [pre] using pre.fullSelfConsistency
+    exact residual.postRoleResidual.toPostRolePackageCompletionLine169Residual hpre
 
 end MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual
 
@@ -2881,17 +2911,17 @@ theorem mainFormal
   -- residual supplied through the base/successor constructors (successor-boundary
   -- data plus the large-`k` or small-`k` split), the left-register completion
   -- estimates returned by the orthonormalize-and-complete chain, and the
-  -- polynomial `ζ₁` transport links (#426), the full-slice transport chain
+  -- line-169 match-mass monotonicity input (#426), the full-slice transport chain
   -- (#601), the remaining `fromHToG` pasting bridge (#707), the reverse
   -- `overAllOutcomes` aggregation (#672), and the ProcessedG scalar follow-ups
   -- #714, #715, #732, and #759.  Once the role package is available, the
   -- factor-two unsymmetrization estimates are checked by
   -- `UnsymmetrizationBridgePackage.ofSymConsistency`; the Bob-side completion
   -- estimate is transported from the left register to the right register by the
-  -- #869 permutation-invariant helper.  The line-169 transport fields remain
-  -- explicit because generic `triangleSub` gives `ζ₁ + sqrt ζ₂`, not the printed
-  -- `ζ₁`; preserving the paper envelope needs a stronger
-  -- projectivization/correlation-preservation input.
+  -- #869 permutation-invariant helper.  The line-169 transport fields are derived
+  -- from the stored match-mass monotonicity invariant and the reconstructed
+  -- pre-projective consistency proof, avoiding the generic `triangleSub` route
+  -- whose loss is `ζ₁ + sqrt ζ₂` rather than the printed `ζ₁`.
 
   by_cases herr : 1 ≤ mainFormalError params k eps
   · exact mainFormal_trivial_witness params strategy eps k herr
@@ -2903,8 +2933,8 @@ theorem mainFormal
           (params := params) (strategy := strategy) (eps := eps)
           (hpass := hpass) (k := k) (scalars := scalars) := by
       -- TODO(#427): construct the concrete Section 6 role residual,
-      -- left-register completion witnesses, and exact polynomial line-169
-      -- transport links.
+      -- left-register completion witnesses, and the construction-level
+      -- match-mass monotonicity input for exact polynomial line 169.
       sorry
     have rolePackageResidualCompletionLine169Residual :
         MainFormalCascadeRolePackageResidualCompletionLine169Residual
