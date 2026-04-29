@@ -885,7 +885,7 @@
         </div>
   </div>
   <div class="theorem_thmcontent">
-  <p>   Let \((\psi , A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})\) be a projective strategy that passes the \((m,q,d)\) low individual degree test with probability at least \(1-\varepsilon \). Assume \(d {\gt} 0\). Let \(k {\gt} 0\) with \(k \ge md\) and set </p>
+  <p>   Let \((\psi , A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})\) be a projective strategy that passes the \((m,q,d)\) low individual degree test with probability at least \(1-\varepsilon \). Assume \(d {\gt} 0\). Let \(k {\gt} 0\) with \(k \ge 400\, md\) and set </p>
 <div class="displaymath" id="a0000000029">
   \[  \nu = 100000 k^2 m^4\left(\varepsilon ^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\right).  \]
 </div>
@@ -968,18 +968,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>   The public hypothesis \(k \ge md\) is paper-faithful and intentionally weaker than the \(k \ge 400\, md\) hypothesis used by the Section&#160;6 / pasting-side wrappers (see the statement of Theorem&#160;<a href="sec-ld-pasting.html#thm:ld-pasting">9.1</a> in Chapter&#160;7 of <span class="cite">
-	[
-	<a href="sect0001.html#Ji2020LowIndividualDegree" >JNV\(^{+}\)20</a>
-	]
-</span>). The Lean assembly of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a> reconciles the two by a case split on \(k\): </p>
-<ul class="itemize">
-  <li><p>In the regime \(400\, md \le k\), the induction and pasting wrappers apply directly and the paper’s cascade of error bounds is absorbed by \(\nu = \nu _{\mathrm{main}}\) through Theorem&#160;<a href="sec-induction.html#thm:error-cascade-main-formal">10.22</a>. </p>
-</li>
-  <li><p>In the regime \(md \le k {\lt} 400\, md\), the bound \(1 \le \nu _{\mathrm{main}}\) already holds (the paper’s standard observation from the proof of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.10</a>, where \(\nu \ge 1\) makes the conclusion vacuous), and a trivial projective measurement witnesses the three \(\simeq _\nu \) statements. The Lean helper <span class="ttfamily">mainFormal_trivial_witness</span> records this regime as a standalone lemma so the <span class="ttfamily">mainFormal</span> proof can invoke it without re-deriving the triviality at each call site. </p>
-</li>
-</ul>
-<p> Consequently, no arithmetic lemma deriving \(400\, md \le k\) from \(md \le k\) is ever introduced; the boundary is handled by the case split above. </p>
+  <p>   The paper statement uses the weaker hypothesis \(k \ge md\), but the proof invokes the Section&#160;6 pasting theorem with side condition \(k \ge 400\, md\). This side condition is not implied by \(k \ge md\). The Lean and blueprint public statement therefore records the stronger large-\(k\) assumption required by the pasting step rather than hiding the side-condition gap. The helper <span class="ttfamily">mainFormal_trivial_witness</span> remains only for already-saturated branches where \(\nu \ge 1\) makes the three \(\simeq _\nu \) conclusions vacuous; it is not a replacement for a proof in the interval \(md \le k {\lt} 400\, md\). </p>
 
   </div>
 </div>
