@@ -107,7 +107,7 @@
 \begin{theorem}[Quantum soundness of the low individual degree test]\label{thm:main-formal}
 	\lean{MIPStarRE.LDT.Test.mainFormal}
 	\uses{def:low-individual-degree-test, def:projective-strategy, def:polymeasurements, def:simeq}
-	Let $(\psi, A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})$ be a projective strategy that passes the $(m,q,d)$ low individual degree test with probability at least $1-\eps$. Assume $d > 0$. Let $k > 0$ with $k \ge md$ and set
+	Let $(\psi, A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})$ be a projective strategy that passes the $(m,q,d)$ low individual degree test with probability at least $1-\eps$. Assume $d > 0$. Let $k > 0$ with $k \ge 400\,md$ and set
 	\[
 		\nu = 100000 k^2 m^4\left(\eps^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\right).
 	\]
@@ -130,26 +130,12 @@
 	\lean{MIPStarRE.LDT.Test.mainFormal_trivial_witness}
 	\leanok
 	\uses{thm:main-formal, thm:error-cascade-main-formal, def:projective-strategy, def:simeq}
-	The public hypothesis $k \ge md$ is paper-faithful and intentionally
-	weaker than the $k \ge 400\,md$ hypothesis used by the Section~6 /
-	pasting-side wrappers (see the statement of Theorem~\ref{thm:ld-pasting} in
-	Chapter~7 of \cite{Ji2020LowIndividualDegree}). The Lean assembly of
-	Theorem~\ref{thm:main-formal} reconciles the two by a case split on $k$:
-	\begin{itemize}
-		\item In the regime $400\,md \le k$, the induction and pasting wrappers
-		      apply directly and the paper's cascade of error bounds is
-		      absorbed by $\nu = \mainFormalError$ through
-		      Theorem~\ref{thm:error-cascade-main-formal}.
-		\item In the regime $md \le k < 400\,md$, the bound
-		      $1 \le \mainFormalError$ already holds (the paper's standard
-		      observation from the proof of Theorem~\ref{thm:main-induction}, where
-		      $\nu \ge 1$ makes the conclusion vacuous), and a trivial
-		      projective measurement witnesses the three $\simeq_\nu$
-		      statements. The Lean helper
-		      \texttt{mainFormal\_trivial\_witness} records this
-		      regime as a standalone lemma so the \texttt{mainFormal} proof can
-		      invoke it without re-deriving the triviality at each call site.
-	\end{itemize}
-	Consequently, no arithmetic lemma deriving $400\,md \le k$ from $md \le k$
-	is ever introduced; the boundary is handled by the case split above.
+	The paper statement uses the weaker hypothesis $k \ge md$, but the proof
+	invokes the Section~6 pasting theorem with side condition $k \ge 400\,md$.
+	This side condition is not implied by $k \ge md$. The Lean and blueprint
+	public statement therefore records the stronger large-$k$ assumption required
+	by the pasting step rather than hiding the side-condition gap. The helper
+	\texttt{mainFormal\_trivial\_witness} remains only for already-saturated
+	branches where $\nu \ge 1$ makes the three $\simeq_\nu$ conclusions vacuous;
+	it is not a replacement for a proof in the interval $md \le k < 400\,md$.
 \end{remark}

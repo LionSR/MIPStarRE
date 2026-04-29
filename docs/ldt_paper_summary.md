@@ -805,12 +805,17 @@ Key Lean theorem names:
 **Key statements**
 
 - Main induction theorem:
-  if `(psi,A,B,L)` is `(epsilon,delta,gamma)`-good for `(m,q,d)` and `k >= md`, then there exists
+  the paper states that if `(psi,A,B,L)` is `(epsilon,delta,gamma)`-good for
+  `(m,q,d)` and `k >= md`, then there exists
   `G in PolyMeas(m,q,d)` such that
   `A^u_a \ot I \simeq_sigma I \ot G_[g(u)=a]`,
   where
   `sigma = m^2 (nu + exp(-k/(80000 m^2)))`,
   `nu = 1000 k^2 m^2 (epsilon^(1/1024)+delta^(1/1024)+gamma^(1/1024)+(d/q)^(1/1024))`.
+  Issue #906 records that the proof later invokes pasting with the stronger
+  side condition `k >= 400md`; the current blueprint/Lean public statement uses
+  this stronger formal hypothesis rather than treating the intermediate range as
+  proved.
 
 - Section-level self-improvement theorem:
   restates the chapter-9 projective self-improvement theorem in the induction notation.
@@ -887,4 +892,3 @@ Key Lean theorem names:
    operator monotonicity/positivity in sandwich arguments,
    Schwartz–Zippel applications for removing evaluation,
    and the matrix-valued Chernoff/Bernoulli tail estimate in pasting.
-

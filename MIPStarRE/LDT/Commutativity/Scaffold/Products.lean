@@ -1,8 +1,5 @@
 import MIPStarRE.LDT.Commutativity.Scaffold.Symmetry
 
-set_option linter.style.setOption false
-set_option linter.unnecessarySimpa false
-
 /-!
 # Section 11 commutativity: scaffold product lemmas
 
@@ -172,7 +169,7 @@ lemma commDataProcessedGStabilityOne_qSDDOp_expand
   have hW_herm : Wᴴ = W := by
     exact
       (Matrix.nonneg_iff_posSemidef.mp <| by
-        simpa [W] using CFC.sqrt_nonneg ((G (pointHeight params q.2)).outcome ah.2)
+        simp [W]
       ).isHermitian.eq
   have hW_adj_mul : Wᴴ * W = (G (pointHeight params q.2)).outcome ah.2 := by
     simpa [hW_herm] using hW_sq
@@ -320,7 +317,7 @@ lemma commDataProcessedGStabilityTwo_qSDDOp_expand
   have hW_herm : Wᴴ = W := by
     exact
       (Matrix.nonneg_iff_posSemidef.mp <| by
-        simpa [W] using CFC.sqrt_nonneg ((G (pointHeight params q.1)).outcome gb.1)
+        simp [W]
       ).isHermitian.eq
   have hW_adj_mul : Wᴴ * W = (G (pointHeight params q.1)).outcome gb.1 := by
     simpa [hW_herm] using hW_sq

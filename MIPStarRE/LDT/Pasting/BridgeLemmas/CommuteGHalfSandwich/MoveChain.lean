@@ -1571,7 +1571,7 @@ private lemma commuteGHalfSandwich_commuteFamily_zero_eq_recursiveTarget
   simp [commuteGHalfSandwich_commuteFamily, commuteGHalfSandwich_recursiveTargetFamily,
     headTailRotatedFamily, gHatHalfProductOutcomeOperator, gHatReverseHalfProductOutcomeOperator,
     rightTensor_one,
-     leftTensor_mul_leftTensor]
+    leftTensor_mul_leftTensor]
 
 private lemma commuteGHalfSandwich_postMoveFlatLength_eq
     (r : ℕ) :
@@ -1633,8 +1633,8 @@ private lemma commuteGHalfSandwich_postMoveFlatFamily_last_active
   | 0, q, ogs => by
       simp [commuteGHalfSandwich_postMoveFlatFamily, commuteGHalfSandwich_postMoveFlatLength,
         commuteGHalfSandwich_recursiveTargetFamily, headTailRotatedFamily,
-         gHatHalfProductOutcomeOperator,
-         leftTensor_mul_leftTensor]
+        gHatHalfProductOutcomeOperator,
+        leftTensor_mul_leftTensor]
   | r + 1, q, ogs => by
       let q' : SliceQuestion params × PointTuple params (r + 1) := (q.1, q.2.2)
       let ogs' : GHatOutcome params × GHatTupleOutcome params (r + 1) := (ogs.1, ogs.2.2)

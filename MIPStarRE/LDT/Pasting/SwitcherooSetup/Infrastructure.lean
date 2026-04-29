@@ -149,9 +149,10 @@ private lemma avgOver_abs_le_of_bound
     _ = c := by ring
 
 lemma avgOver_abs_le_avgOver_abs
-    {α : Type*} [DecidableEq α]
+    {α : Type*}
     (𝒟 : Distribution α) (f : α → Error) :
     |avgOver 𝒟 f| ≤ avgOver 𝒟 (fun a => |f a|) := by
+  classical
   unfold avgOver
   calc
     |∑ a ∈ 𝒟.support, 𝒟.weight a * f a|

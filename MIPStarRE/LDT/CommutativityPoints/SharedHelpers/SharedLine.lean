@@ -30,8 +30,13 @@ private theorem sharedDiagonalLineQuestionOfPointPair_sampledPointPair
     simp [sampledPointPairFromSharedDiagonalQuestion, sharedDiagonalLineQuestionOfPointPair,
       DiagonalLine.pointAt, addPoint, smulPoint, addCoord, subCoord, mulCoord]
   · funext i
-    simp [sampledPointPairFromSharedDiagonalQuestion, sharedDiagonalLineQuestionOfPointPair,
-      DiagonalLine.pointAt, addPoint, smulPoint, addCoord, subCoord, mulCoord]
+    suffices h :
+        encodeScalar
+            (decodeScalar (u i) - decodeScalar t * (decodeScalar (v i) - decodeScalar (u i)) +
+              (decodeScalar t + 1) * (decodeScalar (v i) - decodeScalar (u i))) =
+          v i by
+      simpa [sampledPointPairFromSharedDiagonalQuestion, sharedDiagonalLineQuestionOfPointPair,
+        DiagonalLine.pointAt, addPoint, smulPoint, addCoord, subCoord, mulCoord] using h
     rw [← encode_decodeScalar (v i)]
     congr 1
     ring_nf
@@ -53,15 +58,27 @@ private theorem sharedDiagonalLineQuestionOfPointPair_of_line
         ({ base := base, direction := direction }, (t, addCoord t (encodeScalar 1)))
       congr
       · funext i
-        simp [DiagonalLine.pointAt,
-          addPoint, smulPoint, addCoord, subCoord, mulCoord]
+        suffices h :
+            encodeScalar
+                (decodeScalar (base i) + decodeScalar t * decodeScalar (direction i) -
+                  decodeScalar t *
+                    ((decodeScalar t + 1) * decodeScalar (direction i) -
+                      decodeScalar t * decodeScalar (direction i))) =
+              base i by
+          simpa [DiagonalLine.pointAt, addPoint, smulPoint, addCoord, subCoord,
+            mulCoord] using h
         rw [← encode_decodeScalar (base i)]
         congr 1
         ring_nf
         simp
       · funext i
-        simp [DiagonalLine.pointAt,
-          addPoint, smulPoint, addCoord, subCoord, mulCoord]
+        suffices h :
+            encodeScalar
+                ((decodeScalar t + 1) * decodeScalar (direction i) -
+                  decodeScalar t * decodeScalar (direction i)) =
+              direction i by
+          simpa [DiagonalLine.pointAt, addPoint, smulPoint, addCoord, subCoord,
+            mulCoord] using h
         rw [← encode_decodeScalar (direction i)]
         congr 1
         ring_nf
@@ -263,9 +280,15 @@ lemma pointDiagonalLineMixedProductRight_outcome
         ((strategy.pointMeasurement (q.1.pointAt q.2.2)).outcome b)
         ((sampledDiagonalLineEvaluation params strategy (q.1, q.2.1)).outcome a) := by
   classical
-  simp [pointDiagonalLineMixedProductRight, tensorProductSubMeas, sampledDiagonalLineEvaluation,
-    postprocess, Prod.swap, IdxSubMeas.toIdxOpFamily, SubMeas.toOpFamily,
-    leftTensor_mul_rightTensor_eq_opTensor]
+  suffices h :
+      ∑ ab : Fq params × Fq params with ab.2 = a ∧ ab.1 = b,
+        opTensor ((strategy.pointMeasurement (q.1.pointAt q.2.2)).outcome ab.1)
+          ((sampledDiagonalLineEvaluation params strategy (q.1, q.2.1)).outcome ab.2) =
+      opTensor ((strategy.pointMeasurement (q.1.pointAt q.2.2)).outcome b)
+        ((sampledDiagonalLineEvaluation params strategy (q.1, q.2.1)).outcome a) by
+    simpa [pointDiagonalLineMixedProductRight, tensorProductSubMeas,
+      postprocess, Prod.swap, IdxSubMeas.toIdxOpFamily, SubMeas.toOpFamily,
+      leftTensor_mul_rightTensor_eq_opTensor] using h
   have hfilter :
       (Finset.univ.filter (fun ab : Fq params × Fq params => ab.2 = a ∧ ab.1 = b)) =
         {(b, a)} := by
