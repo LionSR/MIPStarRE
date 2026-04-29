@@ -3,9 +3,6 @@ import MIPStarRE.LDT.MainInductionStep.Defs
 import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkCore
 import MIPStarRE.LDT.Preliminaries.Defs
 
-set_option linter.style.setOption false
-set_option linter.unusedFintypeInType false
-
 /-!
 # Section 9 — Definitions
 
@@ -17,6 +14,9 @@ constructions and error terms.
 
 - `references/ldt-paper/self_improvement.tex`
 -/
+
+set_option linter.style.setOption false
+set_option linter.unusedFintypeInType false
 
 namespace MIPStarRE.LDT.SelfImprovement
 

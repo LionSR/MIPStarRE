@@ -2,18 +2,18 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
-set_option linter.style.setOption false
-set_option linter.flexible false
-set_option linter.unusedDecidableInType false
-set_option linter.unusedFintypeInType false
-set_option linter.unusedSimpArgs false
-
 /-!
 # Section 5 — Naimark core
 
 Core projector and compression lemmas for the one-measurement Naimark
 dilation construction.
 -/
+
+set_option linter.style.setOption false
+set_option linter.flexible false
+set_option linter.unusedDecidableInType false
+set_option linter.unusedFintypeInType false
+set_option linter.unusedSimpArgs false
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

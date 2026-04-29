@@ -1,8 +1,5 @@
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Foundations
 
-set_option linter.style.setOption false
-set_option linter.unnecessarySimpa false
-
 /-!
 # Section 7 hypercube graph: matrix-realization theorems
 
@@ -14,6 +11,9 @@ realization model.
 
 - arXiv:2009.12982, Section 7 (expansion of the hypercube graph).
 -/
+
+set_option linter.style.setOption false
+set_option linter.unnecessarySimpa false
 
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph
 

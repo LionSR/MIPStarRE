@@ -1,13 +1,13 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.QCompleteness
 
-set_option linter.style.setOption false
-set_option linter.flexible false
-
 /-!
 # Section 5 — Q/X/XHat/P almost-projectivity
 
 Almost-projective estimates for the rank-reduced `Q` family.
 -/
+
+set_option linter.style.setOption false
+set_option linter.flexible false
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

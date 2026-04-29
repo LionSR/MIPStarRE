@@ -4,15 +4,15 @@ import MIPStarRE.LDT.Preliminaries.CompletionTransfer
 import MIPStarRE.Quantum.ProjectorONB
 import Mathlib.Analysis.Matrix.Spectrum
 
-set_option linter.style.setOption false
-set_option linter.unusedDecidableInType false
-
 /-!
 # Section 5 — Q/X/XHat/P rank reduction
 
 Almost-projectivity, scalar truncation, and rank-reduction lemmas for the
 paper's `Q/X/XHat/P` intermediate layer.
 -/
+
+set_option linter.style.setOption false
+set_option linter.unusedDecidableInType false
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

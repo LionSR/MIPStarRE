@@ -1,8 +1,5 @@
 import MIPStarRE.LDT.Commutativity.Scaffold.Symmetry
 
-set_option linter.style.setOption false
-set_option linter.unnecessarySimpa false
-
 /-!
 # Section 11 commutativity: scaffold product lemmas
 
@@ -14,6 +11,9 @@ Section 11 commutativity argument.
 
 - arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
 -/
+
+set_option linter.style.setOption false
+set_option linter.unnecessarySimpa false
 
 namespace MIPStarRE.LDT.Commutativity
 

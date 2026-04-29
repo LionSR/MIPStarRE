@@ -1,9 +1,5 @@
 import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.Core
 
-set_option linter.style.setOption false
-set_option linter.flexible false
-set_option linter.unnecessarySimpa false
-
 /-!
 # Section 10 commutativity points: shared-line helpers
 
@@ -14,6 +10,10 @@ questions, used by both the lift and drop bridges.
 
 - arXiv:2009.12982, Section 10 (commutativity of the point measurements).
 -/
+
+set_option linter.style.setOption false
+set_option linter.flexible false
+set_option linter.unnecessarySimpa false
 
 namespace MIPStarRE.LDT.CommutativityPoints
 

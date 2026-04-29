@@ -1,13 +1,13 @@
 import MIPStarRE.LDT.Pasting.SwitcherooContraction.Split
 
-set_option linter.style.setOption false
-set_option linter.unusedSimpArgs false
-
 /-!
 # Section 12 pasting: switcheroo commuted contraction
 
 The once-commuted contraction steps and the split-by-`g` rewrite.
 -/
+
+set_option linter.style.setOption false
+set_option linter.unusedSimpArgs false
 
 namespace MIPStarRE.LDT.Pasting
 
