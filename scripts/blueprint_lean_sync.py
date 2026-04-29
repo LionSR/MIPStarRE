@@ -26,6 +26,8 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from tex_utils import strip_tex_comment as _strip_tex_comment
+
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -162,31 +164,6 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
         stripped.append("".join(out))
 
     return stripped
-
-
-def _strip_tex_comment(line: str) -> str:
-    r"""Return the active TeX prefix before the first unescaped ``%``.
-
-    TeX comments start at an unescaped percent sign. A percent sign preceded
-    by an odd-length run of backslashes is the literal ``\%`` token and must
-    not truncate the line; an even-length run leaves the ``%`` unescaped (for
-    example ``\\%`` starts a comment after a line-break command). Keeping this
-    logic central prevents explanatory comments such as ``% restore \leanok``
-    from being mistaken for active blueprint markers while preserving normal
-    line-number accounting in the caller.
-    """
-
-    for idx, char in enumerate(line):
-        if char != "%":
-            continue
-        backslashes = 0
-        j = idx - 1
-        while j >= 0 and line[j] == "\\":
-            backslashes += 1
-            j -= 1
-        if backslashes % 2 == 0:
-            return line[:idx]
-    return line
 
 
 def _line_has_leanok_marker(line: str) -> bool:
