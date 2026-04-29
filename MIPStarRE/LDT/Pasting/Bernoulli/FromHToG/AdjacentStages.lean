@@ -1,9 +1,10 @@
 import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.MoveLemmas
 
 /-!
-# Section 12 pasting: from-H-to-G AdjacentStages
+# Section 12 pasting: from-H-to-G adjacent-stage scalars
 
-Auxiliary declarations for the `fromHToG` recurrence bridge.
+Definitions for the adjacent paper chain `M₁ → M₂ → M₃ → M₄` and the exact
+rewrites connecting its endpoints to the Lean stage masses.
 -/
 
 namespace MIPStarRE.LDT.Pasting
@@ -1336,8 +1337,8 @@ lemma fromHToGAdjacentStageM4_pointwise_finalRightShape
       (fromHToGRecurrenceWeight params family ℓ
         (prependTypeBit g.isSome (gHatTupleType gs)))).symm
 
-/-- Optional paper endpoint intermediate `M₄`: after moving the remaining head
-completed-slice outcome to the right tensor factor. -/
+/-- The paper endpoint intermediate `M₄`: the head completed-slice outcome has
+moved to the right tensor factor. -/
 noncomputable def fromHToGAdjacentStageM4
     (params : Parameters)
     [FieldModel params.q]

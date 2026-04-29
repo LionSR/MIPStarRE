@@ -34,12 +34,6 @@ lemma fromHToG
     FromHToGStatement params strategy ψbi family gamma zeta k := by
   have hresidual :
       FromHToGResidualStageFacts params ψbi family gamma zeta k := by
-    /- Paper / blueprint anchor:
-       * `references/ldt-paper/ld-pasting.tex`, proof of `lem:from-H-to-G`;
-       * `blueprint/src/chapter/ch09_pasting.tex`, proof of `lem:from-H-to-G`.
-
-       The extracted files package the exact `S`-recurrence, adjacent-stage paper
-       move chain, and telescope into the residual facts consumed here. -/
     let hstageExact : FromHToGAdjacentStageExactFacts params ψbi family :=
       fromHToGAdjacentStageExactFacts_of_weights params ψbi family
     have hadj : FromHToGAdjacentStageFacts params ψbi family gamma zeta k :=

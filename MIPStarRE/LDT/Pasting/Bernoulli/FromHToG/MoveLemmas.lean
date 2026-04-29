@@ -1,9 +1,9 @@
 import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core
 
 /-!
-# Section 12 pasting: from-H-to-G MoveLemmas
+# Section 12 pasting: from-H-to-G move lemmas
 
-Auxiliary declarations for the `fromHToG` recurrence bridge.
+Tensor, positivity, and Cauchy--Schwarz helper lemmas for the adjacent paper chain.
 -/
 
 namespace MIPStarRE.LDT.Pasting
