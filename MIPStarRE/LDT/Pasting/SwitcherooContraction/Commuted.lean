@@ -1,8 +1,5 @@
 import MIPStarRE.LDT.Pasting.SwitcherooContraction.Split
 
-set_option linter.style.setOption false
-set_option linter.unusedSimpArgs false
-
 /-!
 # Section 12 pasting: switcheroo commuted contraction
 
@@ -88,7 +85,7 @@ lemma switcherooAggregateFourthTerm_once_commuted_contraction_right
             simp [mul_assoc, Matrix.mul_sum, Finset.sum_mul]
       _ = Mo o * G * Mo o := by
             rw [(family.meas q.1).sum_eq_total]
-            simp [G, completePartSubMeas, postprocess_total]
+            simp [G]
   have hmid_le : ∑ o : Outcome, Mo o * G * Mo o ≤ 1 := by
     exact projSubMeas_sandwich_sum_le_one (M q.2) G hGle
   have hsingle :

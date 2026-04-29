@@ -1,8 +1,5 @@
 import MIPStarRE.LDT.Pasting.SwitcherooSetup.Centers
 
-set_option linter.style.setOption false
-set_option linter.unusedSimpArgs false
-
 /-!
 # Section 12 pasting: switcheroo aggregate terms
 
@@ -153,7 +150,7 @@ lemma switcherooAggregateFourthTerm_eq_split
             refine Finset.sum_congr rfl ?_
             intro o _
             rw [(family.meas q.1).sum_eq_total]
-            simp [G, completePartSubMeas, postprocess_total]
+            simp [G]
     _ = ∑ o : Outcome,
           ∑ g : Polynomial params,
             ev ψbi

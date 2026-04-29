@@ -1,8 +1,5 @@
 import MIPStarRE.LDT.Pasting.SwitcherooSetup.Terms
 
-set_option linter.style.setOption false
-set_option linter.unusedSimpArgs false
-
 /-!
 # Section 12 pasting: switcheroo split contraction
 
@@ -113,7 +110,7 @@ private lemma switcherooAggregateFourthTerm_split_contraction
                     simp [mul_assoc, Matrix.mul_sum, Finset.sum_mul]
               _ = G * Mo o * G * Mo o * G := by
                     rw [(family.meas q.1).sum_eq_total]
-                    simp [G, completePartSubMeas, postprocess_total]
+                    simp [G]
       _ = leftTensor (ι₂ := ι) (G * (∑ o : Outcome, Mo o * G * Mo o) * G) := by
             congr 1
             simp [mul_assoc, Matrix.mul_sum, Finset.sum_mul]
@@ -124,7 +121,7 @@ private lemma switcherooAggregateFourthTerm_split_contraction
     calc
       G * (∑ o : Outcome, Mo o * G * Mo o) * G ≤ G * 1 * G := by
         exact MIPStarRE.Quantum.sandwich_mono hGherm hmid_le
-      _ = G := by simp [hGsq, mul_assoc]
+      _ = G := by simp [hGsq]
   calc
     (∑ go : Polynomial params × Outcome,
         (leftTensor (ι₂ := ι)
@@ -308,11 +305,11 @@ private lemma switcherooAggregateFourthTerm_once_commuted_contraction_left
             · rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ
                 (fun o : Outcome => G * Mo o * Gq g * Mo o)]
               congr 1
-              simp [X, mul_assoc, Matrix.mul_sum, Finset.sum_mul]
+              simp [X, mul_assoc, Matrix.mul_sum]
             · rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ
                 (fun o : Outcome => G * Mo o * Gq g * Mo o)]
               congr 1
-              simp [X, mul_assoc, Matrix.mul_sum, Finset.sum_mul]
+              simp [X, mul_assoc, Matrix.mul_sum]
       _ = leftTensor (ι₂ := ι) (G * X g) * leftTensor (ι₂ := ι) ((G * X g)ᴴ) := by
             congr 2
             simpa [leftTensor, opTensor] using
@@ -341,7 +338,7 @@ private lemma switcherooAggregateFourthTerm_once_commuted_contraction_left
             simp [mul_assoc, Matrix.mul_sum, Finset.sum_mul]
       _ = Mo o * G * Mo o := by
             rw [(family.meas q.1).sum_eq_total]
-            simp [G, completePartSubMeas, postprocess_total]
+            simp [G]
   have hmid_le : ∑ o : Outcome, Mo o * G * Mo o ≤ 1 := by
     exact projSubMeas_sandwich_sum_le_one (M q.2) G (by simpa [G] using
       (completePartSubMeas params family q.1).total_le_one)
@@ -349,7 +346,7 @@ private lemma switcherooAggregateFourthTerm_once_commuted_contraction_left
     calc
       G * (∑ g : Polynomial params, X g) * G ≤ G * 1 * G := by
         exact MIPStarRE.Quantum.sandwich_mono hGherm (by simpa [hsumX] using hmid_le)
-      _ = G := by simp [hGsq, mul_assoc]
+      _ = G := by simp [hGsq]
   calc
     (∑ g : Polynomial params,
         (∑ o : Outcome,

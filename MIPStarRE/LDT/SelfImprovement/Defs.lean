@@ -3,9 +3,6 @@ import MIPStarRE.LDT.MainInductionStep.Defs
 import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkCore
 import MIPStarRE.LDT.Preliminaries.Defs
 
-set_option linter.style.setOption false
-set_option linter.unusedFintypeInType false
-
 /-!
 # Section 9 — Definitions
 
@@ -42,6 +39,7 @@ noncomputable def sdpStrictPrimalWeight (params : Parameters)
     [FieldModel params.q] : Error :=
   1 / (2 * (Fintype.card (Polynomial params) : Error))
 
+omit [Fintype ι] in
 private theorem sdpStrictPrimalConstantSum (params : Parameters)
     [FieldModel params.q] :
     ∑ _ : Polynomial params, sdpStrictPrimalWeight params •
@@ -116,14 +114,16 @@ noncomputable def sdpStrictDualWitness : MIPStarRE.Quantum.Op ι :=
   (2 : Error) • (1 : MIPStarRE.Quantum.Op ι)
 
 /-- The paper's strict-feasible dual witness `2I` is positive semidefinite. -/
-@[simp] theorem sdpStrictDualWitness_nonneg :
+@[simp] theorem sdpStrictDualWitness_nonneg {ι : Type*} [Finite ι] [DecidableEq ι] :
     0 ≤ (sdpStrictDualWitness (ι := ι)) := by
+  letI := Fintype.ofFinite ι
   unfold sdpStrictDualWitness
   exact smul_nonneg (by norm_num) (op_one_nonneg (d := ι))
 
 /-- The paper's strict-feasible dual witness dominates the identity: `I ≤ 2I`. -/
-theorem one_le_sdpStrictDualWitness :
+theorem one_le_sdpStrictDualWitness {ι : Type*} [Finite ι] [DecidableEq ι] :
     (1 : MIPStarRE.Quantum.Op ι) ≤ sdpStrictDualWitness (ι := ι) := by
+  letI := Fintype.ofFinite ι
   simpa [sdpStrictDualWitness] using
     (smul_le_smul_of_nonneg_right
       (show (1 : Error) ≤ 2 by norm_num)

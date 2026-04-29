@@ -2,12 +2,6 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
-set_option linter.style.setOption false
-set_option linter.flexible false
-set_option linter.unusedDecidableInType false
-set_option linter.unusedFintypeInType false
-set_option linter.unusedSimpArgs false
-
 /-!
 # Section 5 — Naimark core
 
@@ -35,7 +29,7 @@ lemma optionBasisProj_isProj {α : Type*} [Fintype α] [DecidableEq α]
   · simp
 
 /-- The rank-one projector onto an `Option` basis vector is positive semidefinite. -/
-lemma optionBasisProj_nonneg {α : Type*} [Fintype α] [DecidableEq α]
+lemma optionBasisProj_nonneg {α : Type*} [Finite α] [DecidableEq α]
     (oa : Option α) :
     0 ≤ (Matrix.single oa oa (1 : ℂ) : MIPStarRE.Quantum.Op (Option α)) := by
   refine Matrix.nonneg_iff_posSemidef.mpr ?_
@@ -51,24 +45,24 @@ lemma optionBasisProj_sum_eq_one {α : Type*} [Fintype α] [DecidableEq α] :
     cases i with
     | none =>
         rw [Fintype.sum_option]
-        simp [Matrix.one_apply, Matrix.sum_apply, Matrix.single_apply]
+        simp [Matrix.sum_apply]
     | some a =>
         rw [Fintype.sum_option]
-        simp [Matrix.one_apply, Matrix.sum_apply, Matrix.single_apply]
+        simp [Matrix.sum_apply, Matrix.single_apply]
   · rw [Fintype.sum_option]
     cases i with
     | none =>
         cases j with
         | none => cases hij rfl
         | some b =>
-            simp [Matrix.sum_apply, Matrix.single_apply]
+            simp [Matrix.sum_apply]
     | some a =>
         cases j with
         | none =>
-            simp [Matrix.sum_apply, Matrix.single_apply]
+            simp [Matrix.sum_apply]
         | some b =>
             have hab : a ≠ b := fun h => hij (congrArg some h)
-            simp [Matrix.sum_apply, Matrix.single_apply, Matrix.one_apply, hab]
+            simp [Matrix.sum_apply, Matrix.single_apply, hab]
 
 /-- The identity operator is projective. -/
 lemma op_one_isProj {d : Type*} [Fintype d] [DecidableEq d] :
@@ -78,13 +72,13 @@ lemma op_one_isProj {d : Type*} [Fintype d] [DecidableEq d] :
   simp [Matrix.one_apply, eq_comm]
 
 /-- The identity operator is positive semidefinite. -/
-lemma op_one_nonneg {d : Type*} [Fintype d] [DecidableEq d] :
+lemma op_one_nonneg {d : Type*} [DecidableEq d] :
     0 ≤ (1 : MIPStarRE.Quantum.Op d) := by
   exact Matrix.PosSemidef.one.nonneg
 
 /-- Kronecker products of projectors are projective. -/
 lemma isProj_kronecker {d₁ d₂ : Type*}
-    [Fintype d₁] [DecidableEq d₁] [Fintype d₂] [DecidableEq d₂]
+    [Fintype d₁] [Fintype d₂]
     {A : MIPStarRE.Quantum.Op d₁} {B : MIPStarRE.Quantum.Op d₂}
     (hA : MIPStarRE.Quantum.IsProj A) (hB : MIPStarRE.Quantum.IsProj B) :
     MIPStarRE.Quantum.IsProj (Matrix.kronecker A B) := by
@@ -255,13 +249,19 @@ lemma oneMeasNaimarkOutcomeProj_mul_column
                 oneMeasNaimarkColumn M z (j, none)))]
       by_cases h : a' = a
       · subst a'
-        simp [oneMeasNaimarkOutcomeProj, oneMeasNaimarkColumn, oneMeasNaimarkAuxTransition,
-          Matrix.kronecker, Matrix.one_apply]
-        rw [Finset.sum_eq_single a]
-        · simp
-        · intro x _ hxa
-          have hax : a ≠ x := fun h => hxa h.symm
-          simp [hax]
+        simp only [Fintype.sum_option, Matrix.kronecker, Matrix.kroneckerMap_apply,
+          Matrix.single_apply_same, mul_one, oneMeasNaimarkOutcomeProj,
+          oneMeasNaimarkColumn, oneMeasNaimarkAuxTransition, Matrix.one_apply]
+        rw [Finset.sum_eq_single i]
+        · rw [Finset.sum_eq_single a]
+          · simp
+          · intro x _ hxa
+            have hax : a ≠ x := fun h => hxa h.symm
+            simp [hax]
+          · simp
+        · intro x _ hxi
+          have hix : i ≠ x := fun h => hxi h.symm
+          simp [hix]
         · simp
       · simp [oneMeasNaimarkOutcomeProj, oneMeasNaimarkColumn, oneMeasNaimarkAuxTransition,
           Matrix.kronecker, show a ≠ a' by exact fun h' => h h'.symm]

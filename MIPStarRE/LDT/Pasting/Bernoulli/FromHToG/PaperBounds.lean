@@ -625,7 +625,7 @@ lemma fromHToG_avgOver_head_ev_sandwich
     _ = ev ψbi (leftTensor (ι₂ := ι) A *
           rightTensor (ι₁ := ι)
             (S * averageOperatorOverDistribution (uniformDistribution (Fq params)) F * S)) := by
-            simpa [havg, mul_assoc]
+            simp [havg, mul_assoc]
 
 /-- Fold the complete/incomplete head branch average with an `S · B · S`
 sandwich into the stored exact branch averages. -/
@@ -927,8 +927,8 @@ lemma fromHToG_SUS_context_avg_le_one
       _ ≤ ev ψbi (leftTensor (ι₂ := ι) Aτ *
             rightTensor (ι₁ := ι)
               (if b then family.averagedSubMeas.total else 1 - family.averagedSubMeas.total)) := by
-              have hAτ_nonneg : 0 ≤ Aτ :=
-                by simpa [Aτ] using
+              have hAτ_nonneg : 0 ≤ Aτ := by
+                simpa [Aτ] using
                   (averagedSandwichByTypeSubMeas params family n τ).total_nonneg
               cases b
               · simpa [S] using

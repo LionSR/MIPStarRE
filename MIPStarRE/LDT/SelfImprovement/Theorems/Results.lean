@@ -3,9 +3,11 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 
-set_option linter.style.setOption false
-set_option linter.style.longLine false
-set_option linter.style.maxHeartbeats false
+/-!
+# Section 9 — Self-improvement theorem wrappers
+
+Reduced theorem wrappers for the self-improvement pipeline.
+-/
 
 namespace MIPStarRE.LDT.SelfImprovement
 
@@ -57,7 +59,8 @@ private lemma sddRel_uniform_const
     (ψ : QuantumState κ)
     (A B : SubMeas Outcome κ) (δ : Error) :
     SDDRel ψ (uniformDistribution Unit) (constSubMeasFamily A) (constSubMeasFamily B) δ →
-      SDDRel ψ (uniformDistribution Question) (fun _ : Question => A) (fun _ : Question => B) δ := by
+      SDDRel ψ (uniformDistribution Question)
+        (fun _ : Question => A) (fun _ : Question => B) δ := by
   intro hsdd
   rcases hsdd with ⟨hsdd⟩
   constructor
@@ -155,7 +158,6 @@ lemma selfImprovementHelper
   · simpa [T] using hsdp
   · exact addInU params strategy eps delta gamma hgood T
 
-set_option maxHeartbeats 800000 in
 /-- `thm:self-improvement`.
 
 The remaining Section 5/8/9 obligations are exposed as explicit theorem
@@ -254,7 +256,6 @@ theorem selfImprovement
       projectiveResidualBound := hfinal.projectiveResidualBound
       bounded := hfinal.bounded }
 
-set_option maxHeartbeats 800000 in
 /--
 Bridge from the measurement-input version in `self_improvement.tex` to the
 submeasurement-input version used in `inductive_step.tex`.
