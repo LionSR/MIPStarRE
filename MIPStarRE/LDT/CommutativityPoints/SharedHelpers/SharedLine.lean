@@ -11,10 +11,6 @@ questions, used by both the lift and drop bridges.
 - arXiv:2009.12982, Section 10 (commutativity of the point measurements).
 -/
 
-set_option linter.style.setOption false
-set_option linter.flexible false
-set_option linter.unnecessarySimpa false
-
 namespace MIPStarRE.LDT.CommutativityPoints
 
 open MIPStarRE.LDT.GlobalVariance (PointPairQuestion)
@@ -39,7 +35,7 @@ private theorem sharedDiagonalLineQuestionOfPointPair_sampledPointPair
     rw [← encode_decodeScalar (v i)]
     congr 1
     ring_nf
-    simpa using (decode_encodeScalar (params := params) (decodeScalar (v i)))
+    simp
 
 private theorem sharedDiagonalLineQuestionOfPointPair_of_line
     (params : Parameters)
@@ -62,14 +58,14 @@ private theorem sharedDiagonalLineQuestionOfPointPair_of_line
         rw [← encode_decodeScalar (base i)]
         congr 1
         ring_nf
-        simpa using (decode_encodeScalar (params := params) (decodeScalar (base i)))
+        simp
       · funext i
         simp [DiagonalLine.pointAt,
           addPoint, smulPoint, addCoord, subCoord, mulCoord]
         rw [← encode_decodeScalar (direction i)]
         congr 1
         ring_nf
-        simpa using (decode_encodeScalar (params := params) (decodeScalar (direction i)))
+        simp
 
 private theorem sharedDiagonalLineQuestionOfPointPair_injective
     (params : Parameters)
