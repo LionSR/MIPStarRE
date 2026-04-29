@@ -4,8 +4,8 @@ import MIPStarRE.LDT.Pasting.BridgeLemmas.HBConsistency
 /-!
 # Section 12 pasting: H-A consistency
 
-Vertical-line to point-consistency bridge and completed-measurement wrapper for `cor:h-a-
-consistency`.
+Vertical-line to point-consistency bridge and completed-measurement wrapper for
+`cor:h-a-consistency`.
 
 ## References
 

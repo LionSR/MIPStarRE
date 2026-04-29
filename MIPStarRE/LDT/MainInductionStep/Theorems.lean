@@ -1926,7 +1926,7 @@ theorem mainInductionFromPackages
         hH.pointConsistency, by simpa [kappa, zeta] using hpaste.error_le⟩
   exact mainInductionOfWitness params.next strategy eps delta gamma k hwitness
 
-private lemma restrictedAxisProb_nonneg
+private lemma restrictedAxisParallelProb_nonneg
     (params : Parameters) [FieldModel params.q]
     (strategy : RestrictedSymStrat params ι) :
     0 ≤ strategy.axisParallelFailureProbability := by
@@ -1944,7 +1944,7 @@ private lemma restricted_axis_nonneg
     ∀ x, 0 ≤ profile.axisParallel x := by
   intro x
   exact le_trans
-    (restrictedAxisProb_nonneg params
+    (restrictedAxisParallelProb_nonneg params
       (xRestrictedStrategy params strategy x))
     (profile.restrictedGood x).axisParallelTest
 
