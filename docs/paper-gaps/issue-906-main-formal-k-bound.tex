@@ -1,0 +1,130 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\setlength{\emergencystretch}{2em}
+
+\input{docs/paper-gaps/command}
+
+\title{The Large-\texorpdfstring{$k$}{k} Side Condition in the Main Induction}
+\author{}
+\date{2026-04-29}
+
+\begin{document}
+\maketitle
+
+\section{The assertion}
+
+This note concerns the \(k\)-hypothesis in the main induction theorem of
+\cite[Section~\emph{The main induction step}]{Ji2020LowIndividualDegree}, and
+its use in the proof of the main formal soundness theorem.
+\footnote{The original discrepancy was recorded in
+\href{https://github.com/LionSR/MIPStarRE/issues/906}{GitHub issue \#906} and
+implemented in
+\href{https://github.com/LionSR/MIPStarRE/pull/912}{GitHub pull request \#912}.
+The documentation issue for this note is
+\href{https://github.com/LionSR/MIPStarRE/issues/928}{GitHub issue \#928}.  In
+the TeX source consulted here, the main induction theorem is in
+\path{references/ldt-paper/inductive_step.tex}, lines 7--18; the successor step
+is in the same file, lines 429--568; and the pasting theorem used there is in
+lines 299--330.}
+Here \(m\) is the number of variables, \(q\) is the field size, \(d\) is the
+individual degree bound, and \(k\) is the sampling parameter in the consistency
+estimates.  The integer \(k\) is carried unchanged through the induction on
+\(m\).
+
+In the theorem as stated, an \((\varepsilon,\delta,\gamma)\)-good symmetric
+strategy for the \((m,q,d)\) low individual degree test is assumed to satisfy
+only
+\begin{equation*}
+  k\ge md.
+  \tag{\path{thm:main-induction}}
+\end{equation*}
+Under this hypothesis, the theorem produces a polynomial measurement
+\(G\in\operatorname{PolyMeas}(m,q,d)\) satisfying the advertised consistency
+estimate.  The same \(k\)-condition is then inherited by the stated main formal
+soundness theorem after the reduction from a general two-prover strategy to a
+symmetric one.
+
+\section{The use of pasting}
+
+The successor step proves the induction theorem in dimension \(m+1\) assuming
+the theorem in dimension \(m\).  In that step the ambient strategy is a strategy
+for the \((m+1,q,d)\) test, and the proof assumes
+\begin{equation*}
+  k\ge (m+1)d.
+  \tag{\path{sec:proof-of-main-induction}}
+\end{equation*}
+This is sufficient to apply the induction hypothesis to each \(x\)-restricted
+strategy, since the restricted strategies have dimension \(m\), and
+\((m+1)d\ge md\).
+
+After the restricted measurements have been improved to projective
+submeasurements, the proof pastes them into a measurement in dimension \(m+1\).
+The pasting theorem invoked at this point has its own size hypothesis.  In the
+notation of the successor step, it requires
+\begin{equation*}
+  k\ge 400md.
+  \tag{\path{thm:ld-pasting-in-induction-section}}
+\end{equation*}
+This condition is not a consequence of \(k\ge (m+1)d\).  For instance, when
+\(m=1\) and \(d>0\), the latter allows \(k=2d\), whereas the pasting theorem
+requires \(k\ge 400d\).  Thus the argument as written does not justify the
+successor step throughout the interval in which \(k\ge (m+1)d\) but
+\(k<400md\).
+
+Equivalently, the missing implication is
+\[
+  k\ge (m+1)d
+  \quad\Longrightarrow\quad
+  k\ge 400md,
+\]
+which is false for the relevant range of parameters.  The issue is therefore a
+missing side condition, not a notational convention or a peculiarity of the
+formal language.
+
+\section{The corrected hypothesis}
+
+The repair made in the blueprint and in the checked statements is to state
+explicitly the hypothesis used by the proof.  The main induction theorem is
+therefore stated with \(k\ge 400md\), and in the successor step from \(m\) to
+\(m+1\) one assumes \(k\ge 400(m+1)d\).  This immediately supplies the pasting
+hypothesis \(k\ge 400md\) needed for the restricted dimension.
+
+The main formal theorem is adjusted in the same way: its hypothesis on \(k\) is
+\(k\ge 400md\), rather than \(k\ge md\).  This is a strengthening of the
+statement, not a new derivation from the original hypothesis.  The interval
+\(md\le k<400md\) is not treated as automatically vacuous.  A trivial
+construction is used only when the final error parameter is already at least
+\(1\), in which case the consistency conclusion is saturated.
+\footnote{After pull request \#912, the relevant blueprint statements are
+\path{blueprint/src/chapter/ch02_test.tex}, lines 107--140, and
+\path{blueprint/src/chapter/ch10_induction.tex}, lines 179--205.  The Lean
+public theorem \path{MIPStarRE.LDT.Test.mainFormal} assumes \(400\,md\le k\);
+the pasting theorem is \path{MIPStarRE.LDT.Pasting.Bernoulli.ldPasting}, with
+the corresponding large-\(k\) hypothesis.  The final assembly in
+\path{MIPStarRE/LDT/Test/MainTheorem.lean} still contains an unrelated
+unfinished proof; that unfinished proof is not the side-condition discrepancy
+described in this note.}
+
+\section{Conclusion}
+
+The verdict is that
+\href{https://github.com/LionSR/MIPStarRE/issues/906}{issue \#906} records a
+genuine theorem-level side-condition gap in the stated proof.  The hypothesis
+\(k\ge md\), or in the successor step \(k\ge (m+1)d\), does not imply the
+large-\(k\) hypothesis required by the pasting theorem.  Pull request
+\href{https://github.com/LionSR/MIPStarRE/pull/912}{\#912} repaired the formal
+and blueprint statements by requiring \(k\ge 400md\) in the theorem statement.
+
+This correction does not assert that the original theorem is false for
+\(md\le k<400md\).  It says that the proof route through the stated pasting
+theorem does not establish that range.  A proof of the smaller-\(k\) range would
+require an additional argument, such as a genuine saturation lemma for that
+interval or a pasting theorem with a correspondingly weaker size hypothesis.
+
+\bibliographystyle{alpha}
+\bibliography{docs/paper-gaps/references}
+
+\end{document}
