@@ -1,9 +1,10 @@
 import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.AdjacentStages
 
 /-!
-# Section 12 pasting: from-H-to-G PaperBounds
+# Section 12 pasting: from-H-to-G collapsed bounds
 
-Auxiliary declarations for the `fromHToG` recurrence bridge.
+Collapses the paper endpoint `M₄` to the next Lean stage and records the scalar
+bounds used by the final telescope.
 -/
 
 namespace MIPStarRE.LDT.Pasting

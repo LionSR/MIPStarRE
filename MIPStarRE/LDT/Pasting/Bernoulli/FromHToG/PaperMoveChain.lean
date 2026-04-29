@@ -1,9 +1,10 @@
 import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.PaperBounds
 
 /-!
-# Section 12 pasting: from-H-to-G PaperMoveChain
+# Section 12 pasting: from-H-to-G paper move chain
 
-Auxiliary declarations for the `fromHToG` recurrence bridge.
+Combines the paper moves `M₁ → M₂ → M₃ → M₄ → Collapsed` into the adjacent-stage
+recurrence and final stage-mass telescope.
 -/
 
 namespace MIPStarRE.LDT.Pasting
@@ -957,11 +958,10 @@ lemma fromHToGAdjacentStageFacts_of_paperMoveChain
 
 /-- The paper-total telescope bridge for `fromHToG`.
 
-This follows the literal iteration in `ld-pasting.tex:1354--1372`: applying the
-adjacent-stage estimate for all `k` stages gives `k` copies of the whole
-per-stage error.  The next paper display drops a factor of `k` from the
-commutation contribution; Lean keeps the literal telescope and absorbs it into
-the corrected quadratic `fromHToGError`. -/
+This follows the iteration in `ld-pasting.tex:1354--1372`: applying the adjacent-stage
+estimate over all `k` stages gives `k` copies of the per-stage error.  Lean records
+that literal telescope before the final scalar bound `fromHToGPaperTotalError_le`
+absorbs it into `fromHToGError`. -/
 lemma fromHToGPaperTelescopeFacts_of_paperTelescope
     (params : Parameters)
     [FieldModel params.q]

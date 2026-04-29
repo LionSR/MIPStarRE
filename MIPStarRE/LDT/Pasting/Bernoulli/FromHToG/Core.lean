@@ -233,10 +233,9 @@ lemma fromHToG_averagedSandwichByTypeSubMeas_zero_total_eq_one
     exact fromHToG_emptyRestrictedSandwichTotal_eq_one params family xs τ]
   exact fromHToG_averageOperator_uniform_const_one (PointTuple params 0)
 
-/-- Terminal endpoint identification for the Lean `fromHToG` stage mass.  This
-closes the former residual field `stageK_eq`: at stage `k`, the tail is empty,
-the suffix sandwich contributes identity, and the recurrence weight is the
-Bernoulli-tail operator. -/
+/-- Terminal endpoint identification for the Lean `fromHToG` stage mass: at stage `k`,
+the tail is empty, the suffix sandwich contributes identity, and the recurrence weight
+is the Bernoulli-tail operator. -/
 lemma fromHToGStageMass_terminal_eq
     (params : Parameters)
     [FieldModel params.q]
@@ -966,7 +965,7 @@ lemma fromHToGStageMass_split_succ
 This is the purely real-analysis part of the last step in `lem:from-H-to-G`:
 if each adjacent stage changes by at most `e`, then the first and last stages are
 within `k * e`.  The lemma is independent of the operator-valued Bernoulli
-recurrence, so it can be reused once the remaining stage bridge is supplied. -/
+recurrence. -/
 lemma abs_telescope_nat (f : ℕ → Error) (e : Error) :
     ∀ k : ℕ,
       (∀ ℓ : ℕ, ℓ < k → |f ℓ - f (ℓ + 1)| ≤ e) →
@@ -1087,13 +1086,11 @@ lemma fromHToGAdjacentStageExactFacts_of_weights
   tailWeightRecurrence :=
     fromHToGTailStageMass_succ_weight_recurrence params ψbi family
 
-/-- The remaining adjacent-stage operator/scalar bridge for `fromHToG`.
+/-- The adjacent-stage operator/scalar bridge for `fromHToG`.
 
-The endpoint identifications, generic telescope, and exact `S`-recurrence
-bookkeeping are already proved above; this package now isolates the substantive
-analytic paper step: one adjacent-stage move using the two `\sqrt{2ζ}` moves
-from `cor:G-hat-facts` and the two `\sqrt{ν₄}` commutation moves from
-`lem:commute-g-half-sandwich`. -/
+This package supplies one adjacent-stage move in the paper chain using the two
+`\sqrt{2ζ}` moves from `cor:G-hat-facts` and the two `\sqrt{ν₄}` commutation
+moves from `lem:commute-g-half-sandwich`. -/
 structure FromHToGAdjacentStageFacts
     (params : Parameters)
     [FieldModel params.q]
@@ -1308,13 +1305,11 @@ lemma fromHToGPaperTotalError_le
           simp [fromHToGError, thirtysecondSum]
           ring
 
-/-- The sharpened scalar/telescope residual for the final `fromHToG` endpoint.
+/-- The scalar telescope bridge for the final `fromHToG` endpoint.
 
-The adjacent-step recurrence still supplies the public `recurrenceStep` field.
-For the final Bernoulli-polynomial comparison, the paper literally telescopes
-the adjacent estimate over all `k` stages.  This package records that stage-mass
-telescope together with the side conditions needed by the corrected scalar
-absorption lemma `fromHToGPaperTotalError_le`. -/
+The final Bernoulli-polynomial comparison telescopes the adjacent estimate over all `k`
+stages.  This package records the resulting stage-mass bridge with the paper-total
+error term. -/
 structure FromHToGPaperTelescopeFacts
     (params : Parameters)
     [FieldModel params.q]
@@ -1326,15 +1321,11 @@ structure FromHToGPaperTelescopeFacts
         fromHToGStageMass params ψbi family k k| ≤
       fromHToGPaperTotalError params gamma zeta k
 
-/-- The residual, paper-specific facts still needed for `fromHToG`.
+/-- Paper-local fact bundle assembled by the public `fromHToG` wrapper.
 
-The terminal stage `k` is identified exactly by
-`fromHToGStageMass_terminal_eq`, stage `0` is identified exactly by
-`fromHToGStageMass_zero_eq`, and the exact `S`-recurrence bookkeeping is
-recorded in `FromHToGAdjacentStageExactFacts`.  What remains is split into two
-private subpackages: the adjacent-stage analytic bridge (used for the public
-`recurrenceStep` field) and a paper-total stage bridge whose scalar absorption
-is proved by `fromHToGPaperTotalError_le`. -/
+It combines the exact `S`-recurrence bookkeeping, the adjacent-stage analytic bridge
+used for `recurrenceStep`, and the paper-total stage bridge used for the final
+Bernoulli-polynomial comparison. -/
 structure FromHToGResidualStageFacts
     (params : Parameters)
     [FieldModel params.q]
