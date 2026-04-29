@@ -309,25 +309,44 @@ Every PR touching Lean code should be reviewed against these criteria:
    and documentation standards in [doc.md](doc.md). See [pr-review.md](pr-review.md)
    for the full Mathlib review guide.
 
-3. **Linter hygiene** -- Linter-warning cleanup must fix warnings, not mask
+3. **Paper terminology** -- Public Lean names, module docstrings, declaration
+   docstrings, and documentation-visible comments should use terminology from
+   the paper and blueprint, not implementation history. See
+   [mathematical_language.md](mathematical_language.md) for the project-local
+   language rule for Lean documentation and public names. Reviewers should flag
+   names that encode historical formalization status rather than mathematical
+   content. When an old public identifier cannot be renamed in the current PR,
+   record the required migration in the issue, PR description, or an audit file
+   under [audits/](../audits/).
+   New and substantively updated audit files should follow the term norm and
+   format in
+   [audits/2026-04-29_audit-document-format.md](../audits/2026-04-29_audit-document-format.md).
+   Do not add an empty pass-through abbreviation merely to introduce a second
+   public name.
+   Review-fix PRs must read the relevant audit files under [audits/](../audits/)
+   before changing names or prose. If an audit marks a naming migration or
+   historical-formalization term as in scope for the fix, addressing it or
+   explicitly updating the audit trail is a merge blocker.
+
+4. **Linter hygiene** -- Linter-warning cleanup must fix warnings, not mask
    them with broad `set_option linter.<name> false` blocks. See
    [style.md](style.md#linter-warnings) for the project rule and the narrow
    exception policy.
 
-4. **Type safety** -- No universe mismatches, coercion problems, or unresolved
+5. **Type safety** -- No universe mismatches, coercion problems, or unresolved
    metavariables.
 
-5. **Performance** -- Avoid expensive tactics on large types (e.g., `decide` on
+6. **Performance** -- Avoid expensive tactics on large types (e.g., `decide` on
    `Fin 1000`). Watch for timeout-prone proof terms.
 
-6. **Modularity** -- Are new lemmas general enough to be reused? Could any be
+7. **Modularity** -- Are new lemmas general enough to be reused? Could any be
    upstreamed to Mathlib?
 
-7. **Documentation** -- Every new `def` and major `theorem` must have a docstring.
+8. **Documentation** -- Every new `def` and major `theorem` must have a docstring.
    Module files should have a header comment with `## References` citing the
    relevant arXiv paper(s).
 
-8. **Blueprint sync and paper origin** -- If the PR formalizes a statement
+9. **Blueprint sync and paper origin** -- If the PR formalizes a statement
    from the blueprint, add `\lean{LeanDeclName}` and `\leanok` tags to the
    corresponding `blueprint/src/chapter/*.tex` file. If the PR adds a public
    auxiliary lemma that is not a named statement in the original paper, record
@@ -339,13 +358,13 @@ Every PR touching Lean code should be reviewed against these criteria:
    PR descriptions and follow-up issues should cite the corresponding paper or
    blueprint path, line, label, and a short quotation or precise paraphrase.
 
-9. **Scaffolding integrity** -- If the PR introduces or modifies scaffolded
+10. **Scaffolding integrity** -- If the PR introduces or modifies scaffolded
    definitions (types, theorem statements with `sorry` proofs), verify that
    the types and API surface align with Mathlib. Scaffolding that uses custom
    types incompatible with Mathlib blocks future proof work. See
    [PROOF_INTEGRITY.md](PROOF_INTEGRITY.md) for details.
 
-10. **Proof-evasion anti-patterns** -- Review against
+11. **Proof-evasion anti-patterns** -- Review against
    [anti_patterns.md](anti_patterns.md), which catalogues subtler failure
    modes that pass the `PROOF_INTEGRITY.md` blocker checks but still fail
    to prove the claimed mathematics: conclusion-shaped hypotheses (A1),
@@ -382,12 +401,23 @@ This project follows Mathlib conventions with project-specific additions.
 
 ### Reference guides
 
+Mathlib-derived references:
+
 - **Documentation style**: [doc.md](doc.md) -- module headers, docstrings,
   LaTeX in comments, sectioning comments.
 - **Naming conventions**: [naming.md](naming.md) -- capitalization rules,
   symbol-to-name dictionary, variable conventions.
 - **Review guide**: [pr-review.md](pr-review.md) -- detailed examples of
   style, documentation, location, and improvement considerations.
+
+MIPStarRE-local references:
+
+- **Mathematical language**: [mathematical_language.md](mathematical_language.md)
+  -- project-local terminology rules for Lean names and documentation.
+- **Proof integrity**: [PROOF_INTEGRITY.md](PROOF_INTEGRITY.md) -- blocker and
+  warning patterns for proof correctness.
+- **Blueprint style**: [blueprint_style_guide.md](blueprint_style_guide.md) --
+  notation and section conventions for the active blueprint.
 
 ### Project-specific conventions
 

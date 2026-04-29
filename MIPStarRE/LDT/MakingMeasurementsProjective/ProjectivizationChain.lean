@@ -7,11 +7,11 @@ import MIPStarRE.LDT.Preliminaries.Triangles
 /-!
 # Section 10 — Step 6 (orthonormalize-and-complete chain)
 
-This file formalises **Step 6** of the eight-step pipeline used in the proof of
-the main inductive step (`mainFormal`). In the paper, Step 6 is the
-"projectivization chain" (`inductive_step.tex` lines 130–149) whose ultimate
-goal is to produce projective measurements `Q^A`, `Q^B` close to `G^A`, `G^B`.
-That chain has two analytic substeps:
+This file formalises **Step 6** of the eight-step proof of the main inductive
+step (`mainFormal`). In the paper, Step 6 is the orthonormalization and
+completion argument (`inductive_step.tex` lines 130–149) whose ultimate goal is
+to produce projective measurements `Q^A`, `Q^B` close to `G^A`, `G^B`. That
+argument has two analytic substeps:
 
 1. **Orthonormalization** (`thm:orthonormalization`, cross-referenced from
    Section 5).
@@ -20,7 +20,7 @@ That chain has two analytic substeps:
 The completed measurement is then canonically projective: if
 `P : ProjSubMeas Outcome ι`, then `P.total` is itself a projection and the
 residual effect `I - Σ_a P_a = 1 - P.total` is orthogonal to the repaired
-outcome. This file packages that observation so that Step 6 now directly
+outcome. This file records that observation so that Step 6 now directly
 returns a `ProjMeas` witness.
 
 The main theorem is therefore still named `orthonormalizeAndComplete`, because
@@ -60,7 +60,7 @@ cascade uses the slightly widened absorbed scalar
 ## Status
 
 - The orthonormalization step is mediated by
-  `OrthonormalizationInput`, which now packages only the spectral-truncation
+  `OrthonormalizationInput`, which now carries only the truncation
   and locality-preserving repair witnesses for the option-completed
   measurement used in the paper's reduction.
 - The completion step uses the **fully-formalized** `completingToMeasurement`
@@ -204,12 +204,12 @@ lemma sddRel_liftRight_of_liftLeft_permInv
 
 /-! ### Line-156 triangle handoff -/
 
-/-- Residual handoff for the projectivization part of Step 6.
+/-- Residual data for the projective-measurement part of Step 6.
 
 The fields are exactly the hypotheses needed after the orthonormalization and
 completion constructions have produced projective measurements `Q_A,Q_B` close to
 the pre-projective measurements `G_A,G_B`.  The theorem
-`ProjectivizationLine156Handoff.line156Approx` below turns this package into the
+`ProjectivizationLine156Handoff.line156Approx` below turns this data into the
 paper's line-156 approximation. -/
 structure ProjectivizationLine156Handoff
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -217,7 +217,7 @@ structure ProjectivizationLine156Handoff
     (ψ : QuantumState (ι × ι))
     (G_A G_B : Measurement Outcome ι) (Q_A Q_B : ProjMeas Outcome ι)
     (ζ₁ ζ₂ : Error) : Prop where
-  /-- Paper line 131, obtained before projectivization. -/
+  /-- Paper line 131, obtained before the projective measurements are produced. -/
   preProjectiveConsistency :
     ConsRel ψ (uniformDistribution Unit)
       (constSubMeasFamily G_A.toSubMeas)
@@ -302,8 +302,7 @@ end ProjectivizationLine156Handoff
 
 /-! ### Line-169 match-mass monotonicity -/
 
-/-- Match-mass monotonicity invariant needed for the paper's line-169
-projectivization transport.
+/-- Match-mass monotonicity invariant needed for the paper's line-169 replacement step.
 
 The ordinary Step 6 handoff records only state-dependent-distance closeness
 `G_A ≈ Q_A` and `G_B ≈ Q_B`.  Combining those fields with
@@ -316,8 +315,8 @@ replacing `G_B` by `Q_B`, must not decrease the diagonal match mass against the
 opposite pre-projective measurement.
 
 This structure records that invariant in its primitive match-mass form, rather
-than restating the downstream `ConsRel` conclusion.  A future projectivization
-constructor can produce this package from additional repair/completion data;
+than restating the downstream `ConsRel` conclusion.  A future constructor can
+produce this data from additional repair/completion facts;
 theorems in the namespace turn it into the exact line-169 consistency links. -/
 structure ProjectivizationMatchMassMonotonicity
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -474,7 +473,7 @@ namespace ProjectivizationLine156Handoff
 /-- The honest Alice-side line-169 statement derivable from the existing Step 6
 handoff alone has the generic `triangleSub` loss `ζ₁ + sqrt ζ₂`.
 
-This theorem is useful as a checked comparison point for the projectivization
+This theorem is useful as a checked comparison point for the Step 6
 blocker: it shows exactly what the current SDD-closeness API provides without
 the stronger match-mass preservation invariant above. -/
 theorem leftConsistency_with_triangleSub_loss {Outcome : Type*} {ι : Type*}
@@ -536,10 +535,10 @@ theorem rightConsistency_with_triangleSub_loss {Outcome : Type*} {ι : Type*}
 
 end ProjectivizationLine156Handoff
 
-/-! ### Output package -/
+/-! ### Output data -/
 
 set_option linter.unusedFintypeInType false in
-/-- Output package for the orthonormalization + completion chain (Step 6 of
+/-- Output data for the orthonormalization + completion chain (Step 6 of
 the inductive step).
 
 The chain takes a measurement `A : Measurement Outcome ι` together with a
@@ -614,10 +613,10 @@ end OrthonormalizeAndCompleteStatement
 
 namespace ProjectivizationLine156Handoff
 
-/-- Build the line-156 projectivization handoff from the two
+/-- Build the line-156 Step 6 residual data from the two
 orthonormalize-and-complete statements.
 
-This packages the exact Step 6 producer obligations for the current
+This records the exact Step 6 producer obligations for the current
 `mainFormal` residual outside `Test/MainTheorem.lean`: a pre-projective
 consistency proof, the Alice-side completion statement, and the Bob-side
 completion statement. The Bob-side statement is transported from left lifts to
@@ -670,7 +669,7 @@ Given:
   (paper: `inductive_step.tex` line 130, `eq:G-self-consistency`);
 * a distinguished outcome `a₀ : Outcome` to absorb the residual mass during
   completion (paper: line 143, `prop:completing-to-measurement`);
-* the orthonormalization bridge package carrying the spectral-truncation and
+* the orthonormalization bridge data carrying the truncation and
   locality-preserving repair witnesses for the option-completed measurement,
 
 we obtain a projective sub-measurement `P` together with a projective

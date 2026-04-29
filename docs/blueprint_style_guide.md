@@ -83,7 +83,7 @@ look as if the paper stated them.
   `[Formalization support for ...]`, and state in the first sentence that the
   lemma is not a named statement of the paper but isolates a step used in the
   Lean proof.
-- Connect auxiliary nodes to the paper-facing result with `\uses{...}` from
+- Connect auxiliary nodes to the corresponding result from the paper with `\uses{...}` from
   the proof that actually calls them. Do not add them only to silence a sync
   warning; the dependency edge should explain where the auxiliary result is
   used.

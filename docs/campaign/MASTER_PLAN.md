@@ -197,21 +197,21 @@ Prove existing sorry sites using the expanded infrastructure.
 
 ## Scouting Reports
 
-### Gap scouting (campaign planning)
-- `docs/scouting/gap_ch03_preliminaries.md`
-- `docs/scouting/gap_ch04_orthonormalization.md`
-- `docs/scouting/gap_ch05_ch06_expansion_variance.md`
-- `docs/scouting/gap_ch07_self_improvement.md`
-- `docs/scouting/gap_ch08_commutativity.md`
-- `docs/scouting/gap_ch09_pasting.md`
-- `docs/scouting/gap_ch10_ch02_induction_test.md`
-- `docs/scouting/gap_multilinearity.md` (no action needed — root TeX file)
+### Gap analysis for proof planning
+- `audits/2026-04-05_ch03-preliminaries-gap-analysis.md`
+- `audits/2026-04-04_ch04-orthonormalization-gap-analysis.md`
+- `audits/2026-04-05_ch05-ch06-expansion-variance-gap-analysis.md`
+- `audits/2026-04-05_ch07-self-improvement-gap-analysis.md`
+- `audits/2026-04-04_ch08-commutativity-gap-analysis.md`
+- `audits/2026-04-05_ch09-pasting-gap-analysis.md`
+- `audits/2026-04-04_ch10-ch02-induction-test-gap-analysis.md`
+- `audits/2026-04-04_multilinearity-source-scouting.md` (no action needed — root TeX file)
 
 ### Mathlib + faithfulness scouting (Streams A–E, pre-implementation)
 | Stream | Mathlib scouting | Faithfulness scouting | Lean PR | Status |
 |--------|------------------|-----------------------|---------|--------|
-| A: Finite fields + Fourier | `stream_a_finite_fields.md` | `stream_a_faithfulness.md` | #181 (merged) | **Done** — recs adopted in #220 refactor |
-| B: Schwartz-Zippel + Polys | `stream_b_polynomials.md` | `stream_b_faithfulness.md` | #182 (merged) | **Done** — uses Mathlib SZ directly |
-| C: Cauchy-Schwarz props | `stream_c_cauchy_schwarz.md` | `stream_c_faithfulness.md` | #183 (merged) | **Done** — ev_cauchy_schwarz + overlap-gap API |
-| D: Triangle inequalities | `stream_d_triangles.md` | `stream_d_faithfulness.md` | #184 (merged) | **Done** — 1 proved, 2 sorry stubs |
-| E: Self-consistency exts | `stream_e_self_consistency.md` | `stream_e_faithfulness.md` | #185 (merged) | **Done** — 5 sorry stubs with proof roadmaps |
+| A: Finite fields + Fourier | `audits/2026-04-04_stream-a-finite-fields-scouting.md` | `audits/2026-04-04_stream-a-faithfulness-scouting.md` | #181 (merged) | **Done** — recs adopted in #220 refactor |
+| B: Schwartz-Zippel + Polys | `audits/2026-04-05_stream-b-polynomials-scouting.md` | `audits/2026-04-04_stream-b-faithfulness-scouting.md` | #182 (merged) | **Done** — uses Mathlib SZ directly |
+| C: Cauchy-Schwarz props | `audits/2026-04-04_stream-c-cauchy-schwarz-scouting.md` | `audits/2026-04-04_stream-c-faithfulness-scouting.md` | #183 (merged) | **Done** — ev_cauchy_schwarz + overlap-gap API |
+| D: Triangle inequalities | `audits/2026-04-05_stream-d-triangles-scouting.md` | `audits/2026-04-04_stream-d-faithfulness-scouting.md` | #184 (merged) | **Done** — 1 proved, 2 sorry stubs |
+| E: Self-consistency exts | `audits/2026-04-05_stream-e-self-consistency-scouting.md` | `audits/2026-04-05_stream-e-faithfulness-scouting.md` | #185 (merged) | **Done** — 5 sorry stubs with proof roadmaps |

@@ -61,7 +61,6 @@ import MIPStarRE.LDT.MainInductionStep.Statements
 import MIPStarRE.LDT.MainInductionStep.Theorems
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Defs.Core
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Defs.Fourier
-import MIPStarRE.LDT.ExpansionHypercubeGraph.Defs.Characters
 import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Foundations
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Matrix
@@ -121,7 +120,7 @@ import MIPStarRE.LDT.Pasting.SwitcherooContraction.Commuted
 import MIPStarRE.LDT.Pasting.SwitcherooContraction.Raw
 import MIPStarRE.LDT.Pasting.SwitcherooCompletion.Expansion
 import MIPStarRE.LDT.Pasting.SwitcherooCompletion.SecondTerm
-import MIPStarRE.LDT.Pasting.SwitcherooCompletion.Switcheroo
+import MIPStarRE.LDT.Pasting.SwitcherooCompletion
 import MIPStarRE.LDT.Pasting.SwitcherooCompletion.CompletePart
 import MIPStarRE.LDT.Pasting.CommutingWithG
 import MIPStarRE.LDT.Pasting.GHatFacts

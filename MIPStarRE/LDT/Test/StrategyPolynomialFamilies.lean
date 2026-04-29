@@ -24,7 +24,7 @@ honest witness/target pair.
 
 Callers without access to an ambient strategy can use `ofSliceMeas`, which takes
 `Z^x := ∑_g G^x_g` and `dominationTarget x g := G^x_g`. Callers with access to a
-symmetric strategy should prefer the paper-facing constructor `ofSymStrat`,
+symmetric strategy should prefer the constructor `ofSymStrat`,
 which derives both fields from the strategy itself. -/
 structure IdxPolyFamily (params : Parameters) [FieldModel params.q]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where

@@ -85,7 +85,7 @@ The public surface is mostly scalar endpoints plus a few bridge lemmas.
 - Tensor endpoints, consumed by `Main/Auxiliary.lean`:
   `evaluatedSliceABABtensorAvg`, `xEvaluatedSliceBABAtensorAvg`,
   `xEvaluatedFullSliceABABAvg`, and `xEvaluatedFullSliceABABtensorAvg`.
-- The paper-facing normalization lemma `normalizationCondition_sandwich_bound` has
+- The normalization lemma from the paper, `normalizationCondition_sandwich_bound`, has
   no outside references today, but should remain public.
 - Bridge lemmas, mostly consumed by `Main/Auxiliary.lean`:
   `xEvaluatedFullSliceABABAvg_to_xEvaluatedFullSliceABABtensorAvg`,

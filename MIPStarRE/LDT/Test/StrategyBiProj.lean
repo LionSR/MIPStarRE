@@ -10,18 +10,19 @@ allows Alice and Bob to use different local Hilbert spaces, whereas the current
 `ProjStrat` forces both provers onto a common local index type `ι`.
 
 This module is the first low-risk step of the staged refactor outlined in
-`docs/scouting/ch02_separate_local_spaces.md`:
+`audits/2026-04-23_ch02-separate-local-spaces-scouting.md`:
 
 * the two-space container does **not** carry `PermInvState` or `densityFixed`,
   since there is no canonical SWAP when `ιA ≠ ιB`;
 * a forgetful embedding `ProjStrat.toBiProjStrat` reinterprets the current
   same-space strategy as the `ιA = ιB = ι` special case, with projection
   simp lemmas for downstream staged migrations;
-* direct-sum role-payload helpers prepare the later heterogeneous
-  symmetrization target `Role × (ιA ⊕ ιB)` from
+* direct-sum role-register helpers prepare the later heterogeneous
+  symmetrization local space `Role × (ιA ⊕ ιB)` from
   `inductive_step.tex:40-59`, without retargeting existing consumers;
-* complete payload/role block measurement constructors package the block
-  algebra for later heterogeneous symmetrized measurements;
+* block-diagonal measurement constructors establish the algebra needed to place
+  Alice and Bob measurements in the corresponding direct-sum and role-register
+  summands;
 * the two-space branch-level failure probability mirrors the paper's
   low-individual-degree test without changing downstream same-space consumers;
 * no downstream consumer (`SymStrat`, `StrategyFailures`, `MainTheorem`) is
@@ -31,7 +32,7 @@ This module is the first low-risk step of the staged refactor outlined in
 
 * `references/ldt-paper/test_definition.tex`, `def:general-projective-strategy`
 * `blueprint/src/chapter/ch02_test.tex`
-* `docs/scouting/ch02_separate_local_spaces.md`
+* `audits/2026-04-23_ch02-separate-local-spaces-scouting.md`
 -/
 
 namespace MIPStarRE.LDT
@@ -75,23 +76,23 @@ structure BiProjStrat (params : Parameters) [FieldModel params.q]
 
 namespace BiProjStrat
 
-/-! ### Direct-sum role-payload helpers -/
+/-! ### Direct-sum role-register helpers -/
 
-/-- Direct-sum payload carrier for the future heterogeneous role symmetrization.
+/-- Direct-sum carrier for the future heterogeneous role symmetrization.
 
 For a two-space strategy with Alice carrier `ιA` and Bob carrier `ιB`, the later
-symmetrized local space will use this tagged payload so that Alice's operators
+symmetrized local space will use this tagged direct sum so that Alice's operators
 occupy the `Sum.inl` block and Bob's operators occupy the `Sum.inr` block. -/
 abbrev SymmPayload (ιA ιB : Type*) := Sum ιA ιB
 
 /-- Local carrier planned for the heterogeneous symmetrization bridge: a role bit
-and a direct-sum payload. This is the direct-sum analogue of the current
+and a direct-sum carrier. This is the direct-sum analogue of the current
 same-space target `Role × ι` in `StrategyRole.lean`. -/
 abbrev SymmLocal (ιA ιB : Type*) := Role × SymmPayload ιA ιB
 
-/-- Reassociate role bits and direct-sum payloads.
+/-- Reassociate role bits and direct-sum carriers.
 
-This is the public heterogeneous analogue of the same-space role-payload
+This is the public heterogeneous analogue of the same-space role-register
 reassociation used internally by `StrategyRole.lean`. It prepares the target
 shape for reindexing block states on
 `(Role × (ιA ⊕ ιB)) × (Role × (ιA ⊕ ιB))`. -/
@@ -109,7 +110,7 @@ def rolePairPayloadEquiv (ιA ιB : Type*) :
     rcases x with ⟨⟨rL, iL⟩, ⟨rR, iR⟩⟩
     rfl
 
-/-- Block-diagonal payload operator on `ιA ⊕ ιB`, with Alice's block in the
+/-- Block-diagonal operator on `ιA ⊕ ιB`, with Alice's block in the
 `Sum.inl` sector and Bob's block in the `Sum.inr` sector.
 
 This is the matrix-level direct sum that will underlie symmetrized measurements
@@ -121,12 +122,12 @@ noncomputable def payloadBlock {ιA ιB : Type*}
     MIPStarRE.Quantum.Op (SymmPayload ιA ιB) :=
   Matrix.fromBlocks A 0 0 B
 
-/-- Embed an Alice-local operator into the Alice payload block of `ιA ⊕ ιB`. -/
+/-- Embed an Alice-local operator into the Alice summand of `ιA ⊕ ιB`. -/
 noncomputable def payloadBlockA {ιA ιB : Type*}
     (A : MIPStarRE.Quantum.Op ιA) : MIPStarRE.Quantum.Op (SymmPayload ιA ιB) :=
   payloadBlock A 0
 
-/-- Embed a Bob-local operator into the Bob payload block of `ιA ⊕ ιB`. -/
+/-- Embed a Bob-local operator into the Bob summand of `ιA ⊕ ιB`. -/
 noncomputable def payloadBlockB {ιA ιB : Type*}
     (B : MIPStarRE.Quantum.Op ιB) : MIPStarRE.Quantum.Op (SymmPayload ιA ιB) :=
   payloadBlock 0 B
@@ -170,7 +171,7 @@ noncomputable def payloadBlockB {ιA ιB : Type*}
     payloadBlock (0 : MIPStarRE.Quantum.Op ιA) (0 : MIPStarRE.Quantum.Op ιB) = 0 := by
   simp [payloadBlock]
 
-/-- Direct-sum payload blocks are additive in the two diagonal blocks. -/
+/-- Direct-sum blocks are additive in the two diagonal blocks. -/
 @[simp] theorem payloadBlock_add {ιA ιB : Type*}
     (A₁ A₂ : MIPStarRE.Quantum.Op ιA) (B₁ B₂ : MIPStarRE.Quantum.Op ιB) :
     payloadBlock A₁ B₁ + payloadBlock A₂ B₂ = payloadBlock (A₁ + A₂) (B₁ + B₂) := by
@@ -186,7 +187,7 @@ noncomputable def payloadBlockB {ιA ιB : Type*}
     payloadBlock A₁ B₁ * payloadBlock A₂ B₂ = payloadBlock (A₁ * A₂) (B₁ * B₂) := by
   simp [payloadBlock, Matrix.fromBlocks_multiply]
 
-/-- A direct sum of positive semidefinite payload operators is positive semidefinite. -/
+/-- A direct sum of positive semidefinite operators is positive semidefinite. -/
 theorem payloadBlock_nonneg {ιA ιB : Type*} [Finite ιA] [Finite ιB]
     {A : MIPStarRE.Quantum.Op ιA} {B : MIPStarRE.Quantum.Op ιB}
     (hA : 0 ≤ A) (hB : 0 ≤ B) : 0 ≤ payloadBlock A B := by
@@ -202,7 +203,7 @@ theorem payloadBlock_nonneg {ιA ιB : Type*} [Finite ιA] [Finite ιB]
   change payloadBlock A B = (payloadBlock C D)ᴴ * payloadBlock C D
   rw [payloadBlock_conjTranspose, payloadBlock_mul, ← hC', ← hD']
 
-/-- The trace of a direct-sum payload block is the sum of the block traces.
+/-- The trace of a direct-sum block is the sum of the block traces.
 
 This is the `Matrix.fromBlocks` specialization of the block-diagonal trace
 calculation needed later for the normalized symmetrized state. -/
@@ -212,9 +213,9 @@ theorem trace_payloadBlock {ιA ιB : Type*} [Fintype ιA] [Fintype ιB]
   classical
   simp [payloadBlock, Matrix.trace, Fintype.sum_sum_type]
 
-/-- Finite sums commute through direct-sum payload blocks.
+/-- Finite sums commute through direct-sum blocks.
 
-This is the completeness calculation for block-diagonal payload measurements: if
+This is the completeness calculation for block-diagonal measurements: if
 Alice's and Bob's effects each sum to their local totals, then the direct-sum
 effects sum to the direct sum of those totals. -/
 theorem payloadBlock_finset_sum {α ιA ιB : Type*} (s : Finset α)
@@ -319,7 +320,7 @@ noncomputable def roleBlock {ιA ιB : Type*}
   ext r
   cases r <;> rfl
 
-/-- A role block of positive semidefinite payload operators is positive semidefinite. -/
+/-- A role block of positive semidefinite operators is positive semidefinite. -/
 theorem roleBlock_nonneg {ιA ιB : Type*} [Finite ιA] [Finite ιB]
     {A B : MIPStarRE.Quantum.Op (SymmPayload ιA ιB)}
     (hA : 0 ≤ A) (hB : 0 ≤ B) : 0 ≤ roleBlock A B := by
@@ -337,7 +338,7 @@ theorem roleBlock_nonneg {ιA ιB : Type*} [Finite ιA] [Finite ιB]
 
 /-- The trace of a role-blocked operator is the sum of its two role-sector
 traces. This wraps Mathlib's `Matrix.trace_blockDiagonal` across the
-`Role × payload`/`payload × Role` reindexing used by `roleBlock`. -/
+`Role × (ιA ⊕ ιB)` / `(ιA ⊕ ιB) × Role` reindexing used by `roleBlock`. -/
 theorem trace_roleBlock {ιA ιB : Type*} [Fintype ιA] [Fintype ιB]
     (A B : MIPStarRE.Quantum.Op (SymmPayload ιA ιB)) :
     Matrix.trace (roleBlock A B) = Matrix.trace A + Matrix.trace B := by
@@ -369,8 +370,8 @@ theorem roleBlock_finset_sum {α ιA ιB : Type*} (s : Finset α)
 
 /-! ### Complete block-measurement constructors -/
 
-/-- Direct-sum payload measurement obtained by placing Alice's and Bob's complete
-measurements on the `Sum.inl` and `Sum.inr` payload sectors respectively. -/
+/-- Direct-sum measurement obtained by placing Alice's and Bob's complete
+measurements on the `Sum.inl` and `Sum.inr` sectors respectively. -/
 noncomputable def payloadBlockMeasurement {Outcome ιA ιB : Type*}
     [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (MA : Measurement Outcome ιA) (MB : Measurement Outcome ιB) :
@@ -404,7 +405,7 @@ noncomputable def payloadBlockMeasurement {Outcome ιA ιB : Type*}
     (payloadBlockMeasurement MA MB).total = 1 := by
   simp [payloadBlockMeasurement, MA.total_eq_one, MB.total_eq_one]
 
-/-- Direct-sum payload projective measurement obtained by block-diagonalizing two
+/-- Direct-sum projective measurement obtained by block-diagonalizing two
 projective measurements with the same outcome type. -/
 noncomputable def payloadBlockProjMeas {Outcome ιA ιB : Type*}
     [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -422,7 +423,7 @@ noncomputable def payloadBlockProjMeas {Outcome ιA ιB : Type*}
       payloadBlock (MA.outcome a) (MB.outcome a) :=
   rfl
 
-/-- Role-register measurement obtained by placing two complete payload
+/-- Role-register measurement obtained by placing two complete direct-sum
 measurements in the `Role.A` and `Role.B` sectors. -/
 noncomputable def roleBlockMeasurement {Outcome ιA ιB : Type*}
     [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -457,7 +458,7 @@ noncomputable def roleBlockMeasurement {Outcome ιA ιB : Type*}
   simp [roleBlockMeasurement, MA.total_eq_one, MB.total_eq_one]
 
 /-- Role-register projective measurement obtained by block-diagonalizing two
-complete payload projective measurements. -/
+complete direct-sum projective measurements. -/
 noncomputable def roleBlockProjMeas {Outcome ιA ιB : Type*}
     [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (MA MB : ProjMeas Outcome (SymmPayload ιA ιB)) :

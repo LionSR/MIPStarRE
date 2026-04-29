@@ -59,7 +59,7 @@ Each LDT submodule typically has `Defs.lean` and `Theorems.lean` files. Root imp
 1. `references/ldt-paper/` — TeX source of the paper (the ground truth for mathematical content)
 2. `blueprint/src/chapter/` — active LaTeX blueprint with Lean cross-references (`\lean{}`, `\leanok`)
 3. `MIPStarRE/` — Lean scaffold matching the blueprint
-4. `docs/20260320_ldt_source_map.md` — theorem ownership map
+4. `audits/2026-03-20_ldt-source-map.md` — theorem ownership map
 
 **Always read the paper source** (`references/ldt-paper/*.tex`) before formalizing or proving a statement. The paper contains the precise mathematical definitions, theorem statements, and proof strategies that the Lean code must faithfully represent. Cross-reference with the blueprint to understand what has already been formalized.
 
@@ -102,18 +102,26 @@ Before merging, all of these are **blockers** (see `docs/PROOF_INTEGRITY.md`):
 
 ## Documentation References
 
+Mathlib-derived references:
+
+| File | Purpose |
+|------|---------|
+| `docs/style.md` | Mathlib code style (line length, indentation, tactic formatting) |
+| `docs/naming.md` | Mathlib naming conventions (70+ rules, symbol dictionary) |
+| `docs/doc.md` | Mathlib documentation standards (module headers, docstrings) |
+| `docs/pr-review.md` | Mathlib PR review guide |
+
+MIPStarRE-local references:
+
 | File | Purpose |
 |------|---------|
 | `docs/CONTRIBUTING.md` | PR format, issue templates, label taxonomy, review checklist |
 | `docs/PROOF_INTEGRITY.md` | Blocker/warning patterns for proof correctness |
-| `docs/style.md` | Mathlib code style (line length, indentation, tactic formatting) |
-| `docs/naming.md` | Mathlib naming conventions (70+ rules, symbol dictionary) |
-| `docs/doc.md` | Documentation standards (module headers, docstrings) |
-| `docs/pr-review.md` | Detailed PR review guidelines |
+| `docs/mathematical_language.md` | Project-local mathematical language rules for Lean names and documentation |
 | `docs/pr_review_management.md` | Review thread workflow and bot integration |
 | `docs/blueprint_style_guide.md` | LaTeX blueprint notation and section conventions |
 | `docs/ci-automation.md` | CI/CD workflow details (Claude, Codex, GitHub Actions) |
-| `docs/audit/` | Chapter-by-chapter Mathlib dependency scouting reports |
+| `audits/` | Chapter-by-chapter Mathlib dependency scouting reports |
 
 Consult the relevant doc before contributing to that area. The `docs/CONTRIBUTING.md` file is the primary entry point.
 
@@ -134,4 +142,4 @@ The project depends heavily on Mathlib for finite-dimensional complex matrices, 
 - Scout Mathlib first (`exact?`, `apply?`, `#find?`, grep Mathlib source)
 - Reuse existing Mathlib lemmas rather than reproving
 - Prefer Mathlib types over custom definitions
-- See `docs/audit/` for chapter-by-chapter Mathlib dependency analysis
+- See `audits/` for chapter-by-chapter Mathlib dependency analysis
