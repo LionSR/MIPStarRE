@@ -1,7 +1,6 @@
 ---
 title: Strict 2111 effort estimate
 date: 2026-03-08
-author: AI research assistant
 purpose: >
   Estimates the proof effort for a strict arXiv:2111.08131 formalization and
   records the expected dependency and theorem-statement workload.
@@ -206,7 +205,7 @@ The strict project still lacks the following major abstractions.
 1. **Ambient operator-algebra layer**
    - a concrete Lean representation of the paper’s von Neumann algebra setting,
    - a `NormalTracialState`-like structure,
-   - a paper-level `\tau`-norm and 1-norm layer,
+   - a `\tau`-norm and 1-norm layer matching the paper,
    - abstract use of `IsStarProjection` rather than local matrix-only `IsProj`.
 
 2. **Abstract measurement calculus**

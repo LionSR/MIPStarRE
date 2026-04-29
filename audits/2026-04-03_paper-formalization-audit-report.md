@@ -1,7 +1,6 @@
 ---
 title: Paper versus formalization audit report
 date: 2026-04-03
-author: AI research assistant
 purpose: >
   Compares the LDT paper against the Lean and blueprint formalization and
   records mismatches requiring statement or proof-surface repair.

@@ -1,7 +1,6 @@
 ---
 title: Strict 2111 roadmap
 date: 2026-03-08
-author: AI research assistant
 purpose: >
   Gives a staged roadmap for the archived strict arXiv:2111.08131 track,
   including prerequisites, milestones, and expected Lean infrastructure.

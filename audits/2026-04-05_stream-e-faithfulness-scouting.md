@@ -1,9 +1,9 @@
 ---
 title: "Stream E faithfulness scouting"
 date: 2026-04-05
-author: AI research assistant
 purpose: >
-  Faithfulness scouting for self-consistency extension propositions and their paper-level hypotheses.
+  Faithfulness scouting for self-consistency extension propositions and their
+  hypotheses as stated in the paper.
 status: snapshot
 track: paper2009ldt
 kind: scouting-report

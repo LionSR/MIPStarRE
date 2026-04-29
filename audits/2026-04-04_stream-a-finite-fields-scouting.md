@@ -1,7 +1,6 @@
 ---
 title: "Stream A finite-fields scouting"
 date: 2026-04-04
-author: AI research assistant
 purpose: >
   Mathlib scouting for finite fields, finite-field traces, additive characters, and Fourier orthogonality.
 status: snapshot

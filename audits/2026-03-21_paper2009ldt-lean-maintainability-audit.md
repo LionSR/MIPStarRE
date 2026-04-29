@@ -1,7 +1,6 @@
 ---
 title: Paper2009LDT Lean maintainability audit
 date: 2026-03-21
-author: AI research assistant
 purpose: >
   Audits the Lean maintainability of the arXiv:2009.12982 LDT track and
   records structural risks for later proof development.

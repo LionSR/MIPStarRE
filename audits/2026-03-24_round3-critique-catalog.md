@@ -1,7 +1,6 @@
 ---
 title: Round 3 critique catalog
 date: 2026-03-24
-author: AI research assistant
 purpose: >
   Catalogs the third round of LDT formalization critiques and records the
   proof, statement, and organization risks identified in that round.

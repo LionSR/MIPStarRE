@@ -1,7 +1,6 @@
 ---
 title: "Lean 4.29/4.30 upgrade scout"
 date: 2026-04-27
-author: AI research assistant
 purpose: >
   Scouting note for possible Lean and Mathlib upgrades, including expected benefits and proof-repair risks.
 status: snapshot

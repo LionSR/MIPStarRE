@@ -1,7 +1,6 @@
 ---
 title: Infrastructure and build audit
 date: 2026-04-05
-author: AI research assistant
 purpose: >
   Reviews build, repository, and shared Lean infrastructure for the LDT track
   and records operational risks for later contributors.

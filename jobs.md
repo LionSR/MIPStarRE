@@ -132,7 +132,7 @@ Last updated: 2026-04-23
   - verified `lake env lean MIPStarRE/LDT/MainInductionStep/Defs.lean`
   - verified `lake env lean MIPStarRE/LDT/Test/MainTheorem.lean`
   - traced the remaining `Test.mainFormal` path far enough to isolate two
-    paper-level structural gaps:
+    gaps between the paper statements and the current Lean structure:
     1. `CommutativityPoints.sampledDiagonalLineApproximation_pointWithDiagonalLine`
        still ranges over raw `DiagonalLine × Fq` questions and needs a canonical
        geometric-line question model on the commutativity path as well
@@ -421,7 +421,7 @@ Last updated: 2026-04-23
   - current concrete blocker: the remaining fourth-term chain needs one more `closenessOfInnerProduct_right` step plus the final `χ` step. The obstacle is not a missing statement now, but proof-engineering complexity: the right-action witness must be chosen so that `hC` reuses the existing left contraction, and the resulting expressions must be rewritten to the target scalar without triggering Lean heartbeat timeouts on large tensor/adjoint normal forms
   - best next step once resuming: prove the second `√ζ` step with a tightly controlled `closenessOfInnerProduct_right` proof that uses an adjointed witness to recycle `switcherooAggregateFourthTerm_once_commuted_contraction_left`, then package the final `√χ` step and exact collapse to `switcherooAggregateFirstTerm`; only after that mirror the argument for the third term to `switcherooAggregateTargetSwapped`
   - re-surveyed the target and confirmed there are currently 12 executable `sorry`s in `Pasting/Theorems.lean`
-  - identified a paper-level statement mismatch in the pasted consistency chain: the current Lean scaffolding states the pasted submeasurement consistency at the final induction error `σ`, but the paper/blueprint give the intermediate `ν` before completion and only add the missing-mass term when passing to the completed measurement
+  - identified a mismatch with the statement in the paper for the pasted consistency chain: the current Lean scaffolding states the pasted submeasurement consistency at the final induction error `σ`, but the paper/blueprint give the intermediate `ν` before completion and only add the missing-mass term when passing to the completed measurement
   - repaired that interface mismatch so `LdPastingSubMeasConclusion` and `hAConsistency_submeas` now carry the paper's intermediate `ν`, while `hAConsistency_completed` is the separate completion step to the final induction error `σ`
   - proved `hAConsistency_completed` by showing evaluation commutes with `completeAtOutcome`, bounding completion's extra off-diagonal mass by the residual total mass, and then using the completeness lower bound to absorb that residual into the final `σ`
   - re-verified `lake env lean MIPStarRE/LDT/Pasting/Theorems.lean`; the file now typechecks with 12 remaining local `sorry`s

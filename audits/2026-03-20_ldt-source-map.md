@@ -1,7 +1,6 @@
 ---
 title: LDT source map
 date: 2026-03-20
-author: AI research assistant
 purpose: >
   Maps the LDT paper sources to blueprint chapters and Lean ownership points
   so contributors can locate theorem statements and proof obligations.

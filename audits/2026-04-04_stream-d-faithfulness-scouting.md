@@ -1,7 +1,6 @@
 ---
 title: "Stream D faithfulness scouting"
 date: 2026-04-04
-author: AI research assistant
 purpose: >
   Faithfulness scouting for the triangle-inequality propositions in the preliminaries.
 status: snapshot
@@ -26,7 +25,8 @@ This note compares the exact paper statements in `references/ldt-paper/prelimina
 - `prop:simeq-triangle-inequality` should be a theorem on four measurements with three `ConsRel` hypotheses and one `ConsRel` conclusion.
   Sidewise, `A, C` live on the left and `B, D` live on the right after tensor placement.
 - `prop:triangle-inequality-for-approx_delta` is stated in the paper for arbitrary matrix families, so the most faithful Lean version is over `IdxOpFamily` / `SDDOpRel`.
-  The current private `stateDependentDistanceRel_triangle` is the right two-step submeasurement specialization, but not the exact paper-level type.
+  The current private `stateDependentDistanceRel_triangle` is the right two-step
+  submeasurement specialization, but not the exact type used in the paper.
 - `prop:triangle-inequality-for-vectors-squared` should stay a pure normed-space lemma.
   It should not be restated in terms of `ev` or operator norms.
 
@@ -139,7 +139,7 @@ Paper statement:
 
 Faithfulness point:
 
-- The paper-level relation here is best matched by the raw-family API:
+- The relation in the paper is best matched by the raw-family API:
   `OpFamily`, `IdxOpFamily`, `qSDDOp`, `SDDOpRel`.
 - The existing private theorem
   `stateDependentDistanceRel_triangle`

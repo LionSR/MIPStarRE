@@ -1,7 +1,6 @@
 ---
 title: Lean formalization audit
 date: 2026-04-05
-author: AI research assistant
 purpose: >
   Records paper-to-Lean formalization problems, placeholder definitions, and
   statement mismatches that require proof-integrity follow-up.

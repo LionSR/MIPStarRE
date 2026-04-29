@@ -1,7 +1,6 @@
 ---
 title: "Issue 458 measurement-semantics audit"
 date: 2026-04-27
-author: AI research assistant
 purpose: >
   Audit of measurement and submeasurement semantics for issue #458, comparing the paper definitions with Lean structures.
 status: snapshot

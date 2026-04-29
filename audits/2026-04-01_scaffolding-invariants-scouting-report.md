@@ -1,7 +1,6 @@
 ---
 title: Semantic invariants scouting report
 date: 2026-04-01
-author: AI research assistant
 purpose: >
   Scouts semantic invariants in existing scaffolding and records which
   theorem statements need stronger data or invariant bundling.

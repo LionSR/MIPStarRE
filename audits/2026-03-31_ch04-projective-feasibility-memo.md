@@ -1,7 +1,6 @@
 ---
 title: Chapter 4 projective-feasibility memo
 date: 2026-03-31
-author: AI research assistant
 purpose: >
   Assesses the feasibility of formalizing Chapter 4 projective-measurement
   steps and records the decision points for projective infrastructure.

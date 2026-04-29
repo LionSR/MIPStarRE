@@ -1,7 +1,6 @@
 ---
 title: "Chapter 8 commutativity gap analysis"
 date: 2026-04-04
-author: AI research assistant
 purpose: >
   Gap analysis for the point and slice commutativity chapters across paper, blueprint, and Lean code.
 status: snapshot

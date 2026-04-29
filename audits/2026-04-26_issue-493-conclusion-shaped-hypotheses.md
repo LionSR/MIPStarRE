@@ -1,7 +1,6 @@
 ---
 title: Conclusion-shaped hypothesis audit
 date: 2026-04-26
-author: AI research assistant
 purpose: >
   Audits issue #493 conclusion-shaped hypotheses and records where proof
   assumptions must be replaced by genuine mathematical inputs.

@@ -1,7 +1,6 @@
 ---
 title: Round 2 critique catalog
 date: 2026-03-23
-author: AI research assistant
 purpose: >
   Catalogs the second round of LDT formalization critiques and records which
   findings require follow-up in Lean, blueprint, or documentation.

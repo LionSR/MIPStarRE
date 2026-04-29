@@ -1,7 +1,6 @@
 ---
 title: "Stream C faithfulness scouting"
 date: 2026-04-04
-author: AI research assistant
 purpose: >
   Faithfulness scouting for Cauchy-Schwarz propositions against the paper's operator-family statements.
 status: snapshot

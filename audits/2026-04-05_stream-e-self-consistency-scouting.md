@@ -1,7 +1,6 @@
 ---
 title: "Stream E self-consistency API scouting"
 date: 2026-04-05
-author: AI research assistant
 purpose: >
   Mathlib and local API scouting for self-consistency extension propositions.
 status: snapshot

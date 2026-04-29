@@ -1,7 +1,6 @@
 ---
 title: Chapter 3 Mathlib scouting report
 date: 2026-03-31
-author: AI research assistant
 purpose: >
   Scouts Mathlib support for Chapter 3 of the LDT track and records reusable
   finite-type, probability, and strategy infrastructure.
@@ -106,7 +105,9 @@ These give exactly the finite additive-character sum vanishing/non-vanishing pri
 - `ev_diff_triangle`
 - `normalizedTrace_triangle`
 
-These are the correct quantitative shape but still need a public paper-level theorem for the specific `simeq/approx` transfer statement.
+These are the correct quantitative shape but still need a public theorem
+matching the paper's formulation of the specific `simeq/approx` transfer
+statement.
 
 ---
 

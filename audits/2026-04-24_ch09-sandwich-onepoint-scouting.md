@@ -1,7 +1,6 @@
 ---
 title: "Chapter 9 sandwich one-point scouting"
 date: 2026-04-24
-author: AI research assistant
 purpose: >
   Scouting note for the one-point sandwich lemma in the low-degree pasting chapter.
 status: snapshot

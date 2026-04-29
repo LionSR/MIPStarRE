@@ -1,7 +1,6 @@
 ---
 title: Audit document format
 date: 2026-04-29
-author: AI research assistant
 purpose: >
   Defines the audit-file naming, YAML front matter, terminology, and review
   use conventions for MIPStarRE audit documents.
@@ -28,7 +27,6 @@ Every audit should begin with YAML front matter in this shape:
 ---
 title: "Short human-readable title"
 date: YYYY-MM-DD
-author: AI research assistant
 purpose: >
   One or two sentences explaining what the audit records and how it should be
   used by later readers.

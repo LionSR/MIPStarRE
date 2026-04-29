@@ -1,7 +1,6 @@
 ---
 title: "Chapters 5 and 6 expansion/variance gap analysis"
 date: 2026-04-05
-author: AI research assistant
 purpose: >
   Gap analysis for the expansion-hypercube and global-variance chapters across paper, blueprint, and Lean code.
 status: snapshot

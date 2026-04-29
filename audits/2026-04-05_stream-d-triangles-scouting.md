@@ -1,7 +1,6 @@
 ---
 title: "Stream D triangle API scouting"
 date: 2026-04-05
-author: AI research assistant
 purpose: >
   Mathlib and local API scouting for triangle inequalities and state-dependent distance estimates.
 status: snapshot

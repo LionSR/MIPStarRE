@@ -1,7 +1,6 @@
 ---
 title: "Chapter 3 preliminaries gap analysis"
 date: 2026-04-05
-author: AI research assistant
 purpose: >
   Gap analysis comparing the preliminaries chapter in the LDT paper, blueprint, and Lean code.
 status: snapshot

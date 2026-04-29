@@ -1,7 +1,6 @@
 ---
 title: Round 3 critique context
 date: 2026-03-24
-author: AI research assistant
 purpose: >
   Preserves the context for the third critique round so later readers can
   interpret the cataloged findings and their source assumptions.

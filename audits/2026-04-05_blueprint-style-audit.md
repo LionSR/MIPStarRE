@@ -1,7 +1,6 @@
 ---
 title: Blueprint style audit
 date: 2026-04-05
-author: AI research assistant
 purpose: >
   Audits blueprint style and records notation, reference, and exposition
   cleanup needed for the active LDT blueprint.

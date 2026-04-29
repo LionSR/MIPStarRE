@@ -1,7 +1,6 @@
 ---
 title: Pasting formalization roadblocks
 date: 2026-04-23
-author: AI research assistant
 purpose: >
   Records the pasting formalization roadblocks from issue #569 and separates
   mathematical gaps from API or proof-engineering repair tasks.

@@ -1,7 +1,6 @@
 ---
 title: Faithfulness audit
 date: 2026-04-05
-author: AI research assistant
 purpose: >
   Audits faithfulness of the LDT formalization to the paper and records
   statement-level mismatches requiring mathematical review.

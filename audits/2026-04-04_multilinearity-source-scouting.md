@@ -1,7 +1,6 @@
 ---
 title: "Multilinearity source scouting"
 date: 2026-04-04
-author: AI research assistant
 purpose: >
   Scouting note explaining the role of the multilinearity TeX driver in the mirrored LDT paper source.
 status: snapshot

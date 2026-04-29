@@ -1,7 +1,6 @@
 ---
 title: "Chapter 9 pasting gap analysis"
 date: 2026-04-05
-author: AI research assistant
 purpose: >
   Gap analysis for the low-degree pasting chapter and its Lean and blueprint interfaces.
 status: snapshot

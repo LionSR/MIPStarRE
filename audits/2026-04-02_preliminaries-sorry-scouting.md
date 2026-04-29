@@ -1,7 +1,6 @@
 ---
 title: "Preliminaries sorry-site scouting"
 date: 2026-04-02
-author: AI research assistant
 purpose: >
   Scouting report for preliminaries sorry sites and their paper proof strategies.
 status: snapshot

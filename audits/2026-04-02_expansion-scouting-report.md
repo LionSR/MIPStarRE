@@ -1,7 +1,6 @@
 ---
 title: "Expansion theorem scouting report"
 date: 2026-04-02
-author: AI research assistant
 purpose: >
   Historical scouting report for expansion theorem proof obligations and Mathlib dependencies.
 status: snapshot

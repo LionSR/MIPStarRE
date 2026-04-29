@@ -1,7 +1,6 @@
 ---
 title: Blueprint maintainability audit
 date: 2026-03-21
-author: AI research assistant
 purpose: >
   Audits blueprint maintainability issues and records structural cleanup
   tasks for theorem dependencies, labels, and reader navigation.

@@ -1,7 +1,6 @@
 ---
 title: "Stream B faithfulness scouting"
 date: 2026-04-04
-author: AI research assistant
 purpose: >
   Faithfulness scouting for Schwartz-Zippel and polynomial statements in the LDT preliminaries.
 status: snapshot

@@ -1,7 +1,6 @@
 ---
 title: LDT blueprint maintainability audit
 date: 2026-03-21
-author: AI research assistant
 purpose: >
   Reviews the active LDT blueprint for maintainability, with emphasis on
   chapter organization, dependency edges, and Lean cross-reference hygiene.

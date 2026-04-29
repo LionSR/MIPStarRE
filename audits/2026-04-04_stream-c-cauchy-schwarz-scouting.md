@@ -1,7 +1,6 @@
 ---
 title: "Stream C Cauchy-Schwarz scouting"
 date: 2026-04-04
-author: AI research assistant
 purpose: >
   Scouting note for Cauchy-Schwarz propositions and their local and Mathlib proof ingredients.
 status: snapshot

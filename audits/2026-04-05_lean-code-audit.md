@@ -1,7 +1,6 @@
 ---
 title: Lean code audit
 date: 2026-04-05
-author: AI research assistant
 purpose: >
   Audits Lean code organization and proof surfaces in the LDT track, recording
   code-level cleanup and API risks for future repair PRs.

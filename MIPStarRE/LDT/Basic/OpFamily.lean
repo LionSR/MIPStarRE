@@ -3,7 +3,7 @@ import MIPStarRE.LDT.Basic.SubMeasurementFamilies
 /-!
 # Raw operator families for the low individual degree test
 
-This file introduces the paper-level notion of an indexed family of operators
+This file introduces the notion of an indexed family of operators used in the paper
 without positivity or boundedness requirements. These are used for `≈_δ`
 chains whose intermediate objects are arbitrary matrix families rather than
 honest submeasurements.

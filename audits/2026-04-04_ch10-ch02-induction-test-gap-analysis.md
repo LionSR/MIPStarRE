@@ -1,7 +1,6 @@
 ---
 title: "Chapter 10 and Chapter 2 induction/test gap analysis"
 date: 2026-04-04
-author: AI research assistant
 purpose: >
   Gap analysis for the induction step and test-definition chapters across paper, blueprint, and Lean code.
 status: snapshot

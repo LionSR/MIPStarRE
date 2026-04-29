@@ -1,7 +1,6 @@
 ---
 title: "Issue 906 main-formal k-bound audit"
 date: 2026-04-29
-author: AI research assistant
 purpose: >
   Records the large-k side-condition gap in the paper statement of the main
   formal low individual degree theorem and the corresponding formal statement

@@ -1,7 +1,6 @@
 ---
 title: Mathematical naming audit
 date: 2026-04-29
-author: AI research assistant
 purpose: >
   Records the naming and documentation-language audit for the LDT Lean
   formalization, including remaining API migrations and review rules.

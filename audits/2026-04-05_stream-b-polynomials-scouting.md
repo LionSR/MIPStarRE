@@ -1,7 +1,6 @@
 ---
 title: "Stream B polynomial API scouting"
 date: 2026-04-05
-author: AI research assistant
 purpose: >
   Mathlib scouting for multivariate-polynomial and Schwartz-Zippel APIs relevant to the LDT polynomial statements.
 status: snapshot

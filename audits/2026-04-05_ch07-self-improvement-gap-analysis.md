@@ -1,7 +1,6 @@
 ---
 title: "Chapter 7 self-improvement gap analysis"
 date: 2026-04-05
-author: AI research assistant
 purpose: >
   Gap analysis for the self-improvement chapter and its Lean statement/proof surface.
 status: snapshot

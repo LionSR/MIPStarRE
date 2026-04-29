@@ -1,7 +1,6 @@
 ---
 title: "Chapter 4 orthonormalization gap analysis"
 date: 2026-04-04
-author: AI research assistant
 purpose: >
   Gap analysis for the orthonormalization and making-measurements-projective chapter.
 status: snapshot

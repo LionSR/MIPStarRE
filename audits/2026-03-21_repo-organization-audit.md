@@ -1,7 +1,6 @@
 ---
 title: Repository organization audit
 date: 2026-03-21
-author: AI research assistant
 purpose: >
   Reviews repository organization for the active LDT track and records where
   files, guides, or source maps should be moved or clarified.

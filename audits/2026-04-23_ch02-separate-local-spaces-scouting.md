@@ -1,7 +1,6 @@
 ---
 title: "Separate Alice/Bob local spaces scouting"
 date: 2026-04-23
-author: AI research assistant
 purpose: >
   Scouting note for separating Alice and Bob local Hilbert spaces in Chapter 2 strategy definitions and downstream consumers.
 status: snapshot

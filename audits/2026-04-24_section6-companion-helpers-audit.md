@@ -1,7 +1,6 @@
 ---
 title: "Section 6 companion helpers audit"
 date: 2026-04-24
-author: AI research assistant
 purpose: >
   Audit of public companion helpers around the Section 6 main-induction interface.
 status: snapshot

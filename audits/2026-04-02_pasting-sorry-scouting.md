@@ -1,7 +1,6 @@
 ---
 title: "Pasting sorry-site scouting"
 date: 2026-04-02
-author: AI research assistant
 purpose: >
   Scouting report for sorry sites in the low-degree pasting theorem layer.
 status: snapshot

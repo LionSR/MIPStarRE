@@ -1,7 +1,6 @@
 ---
 title: Pasting and self-improvement deep audit
 date: 2026-04-05
-author: AI research assistant
 purpose: >
   Audits the pasting and self-improvement chapters in depth and records the
   main Lean and blueprint risks around those proof interfaces.

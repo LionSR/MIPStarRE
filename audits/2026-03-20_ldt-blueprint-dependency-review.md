@@ -1,7 +1,6 @@
 ---
 title: LDT blueprint dependency review
 date: 2026-03-20
-author: AI research assistant
 purpose: >
   Reviews the LDT blueprint dependency structure and records stale or
   resolved dependency notes that later readers should treat as a snapshot.

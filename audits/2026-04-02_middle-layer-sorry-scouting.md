@@ -1,7 +1,6 @@
 ---
 title: "Middle-layer sorry-site scouting"
 date: 2026-04-02
-author: AI research assistant
 purpose: >
   Scouting report for middle-layer sorry sites and independent proof starting points.
 status: snapshot

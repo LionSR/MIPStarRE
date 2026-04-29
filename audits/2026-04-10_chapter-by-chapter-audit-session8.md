@@ -1,7 +1,6 @@
 ---
 title: Chapter-by-chapter audit, session 8
 date: 2026-04-10
-author: AI research assistant
 purpose: >
   Records the session-8 chapter-by-chapter LDT audit and preserves the status
   of each chapter's Lean, blueprint, and proof-obligation surface.

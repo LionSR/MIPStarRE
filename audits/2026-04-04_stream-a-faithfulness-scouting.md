@@ -1,7 +1,6 @@
 ---
 title: "Stream A faithfulness scouting"
 date: 2026-04-04
-author: AI research assistant
 purpose: >
   Faithfulness scouting for finite fields and Fourier objects in the preliminaries and expansion layers.
 status: snapshot

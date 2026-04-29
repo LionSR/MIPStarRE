@@ -1,7 +1,6 @@
 ---
 title: "Orthonormalization theorem scouting report"
 date: 2026-04-02
-author: AI research assistant
 purpose: >
   Historical scouting report for orthonormalization proof obligations and matrix-proof infrastructure.
 status: snapshot

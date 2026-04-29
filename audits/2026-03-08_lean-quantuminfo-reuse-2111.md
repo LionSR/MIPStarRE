@@ -1,7 +1,6 @@
 ---
 title: Lean-QuantumInfo reuse audit for strict 2111
 date: 2026-03-08
-author: AI research assistant
 purpose: >
   Assesses whether Lean-QuantumInfo can support the archived strict
   arXiv:2111.08131 formalization track and records reuse constraints.
