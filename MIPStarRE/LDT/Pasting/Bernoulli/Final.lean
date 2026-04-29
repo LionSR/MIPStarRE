@@ -263,6 +263,8 @@ private lemma fromHToGBernoulliTailMass_lower_bound
     rw [ldPasting_chernoff_exponent_eq]
   linarith
 
+set_option maxHeartbeats 500000 in
+-- The downstream completeness theorem elaborates the full `fromHToG` bridge facts.
 /-- `cor:ld-pasting-N-completeness` once the Bernoulli-tail lower bound is
 supplied explicitly.
 

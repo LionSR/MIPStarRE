@@ -1044,9 +1044,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 
 \begin{lemma}[From the pasted sum to a polynomial in $G$]\label{lem:from-H-to-G}
 	\lean{MIPStarRE.LDT.Pasting.fromHToG}
-	% Lean-local gap: `fromHToG`'s entire proof body is `sorry`
-	% (`Pasting/Bernoulli/Recurrence.lean:132`); the recurrence telescope
-	% is open per issue #673.
+	\leanok
 	\uses{cor:G-hat-facts, lem:q-sdd-complete-part-slice-bound, lem:commute-g-half-sandwich, def:pasted-measurement, def:truncated-type-sums, lem:truncated-type-sum-recurrence}
 	Let $\ket{\psi_{\mathrm{bi}}}$ be a bipartite state on $\iota \otimes \iota$.  If
 	$x_1,\dots,x_k$ are sampled independently and uniformly from $\F_q$, then
