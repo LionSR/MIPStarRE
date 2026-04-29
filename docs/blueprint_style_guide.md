@@ -12,6 +12,21 @@ The blueprint is a **bridge between the mathematics and the Lean formalization**
 6. **Don't invent terminology or notation.** Don't create ad-hoc notation when standard notation exists. Don't name things that the literature doesn't name.
 7. **Match Lean's theorem/lemma/def exactly.** If Lean says `theorem X`, use `\begin{theorem}`. If Lean says `lemma X`, use `\begin{lemma}`. `\begin{proposition}` is allowed in blueprint prose when it improves mathematical readability, but still map it to an actual Lean `theorem`/`lemma` declaration via `\lean{...}`. Label prefix: `thm:` for theorem, `lem:` for lemma, `def:` for definition, `prop:` for proposition.
 
+### Remark On Mathematical Prose
+
+Blueprint entries should read as mathematical exposition, not as progress
+reports. The mathematical argument should determine the order of the prose:
+introduce the notation, state the assertion, give the proof or calculation, and
+then record Lean references through the usual blueprint tags. Lean declarations,
+file paths, and proof-status information should not become the visible structure
+of the paragraph. When referring to a source article, cite it bibliographically
+rather than relying on an uncited reference to the article.
+
+Use displayed formulae when the formula benefits from visual separation, and
+keep short scalar definitions or elementary inequalities inline when the
+sentence reads better that way. As in ordinary mathematical writing, displayed
+formulae should be punctuated as part of the sentences in which they occur.
+
 ## Proof Sketches Must Match Lean
 This is the most important rule. Every proof in the blueprint must faithfully describe what the Lean proof does:
 

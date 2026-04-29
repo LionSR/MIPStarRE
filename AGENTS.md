@@ -281,6 +281,17 @@ Required:
 When formalizing a statement from the blueprint, add corresponding `\lean{...}` and
 `\leanok` tags in the relevant `blueprint/src/chapter/*.tex` file.
 
+For paper-gap notes and other documentation of discrepancies between the cited
+paper, the blueprint, and Lean, follow `docs/paper-gaps/policy.tex`.  In
+particular, such notes should be mathematical prose for third-party readers:
+introduce notation, state the cited assertion, isolate the calculation or
+logical obstruction, compare with the blueprint and Lean statement, and give a
+clear verdict.  If Lean uses a Mathlib result or construction not present in the
+cited argument, explain that replacement pedagogically before naming the formal
+declaration.  If the cited assertion is false and a counterexample is available,
+explain the counterexample in prose and use any Lean declaration only as
+verification.
+
 ## Proof Engineering
 
 Search before proving:
