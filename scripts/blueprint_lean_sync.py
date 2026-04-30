@@ -76,6 +76,8 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
     interpolation_depth = 0
     interpolation_stack: list[int] = []
     string_interpolated = False
+    in_raw_string = False
+    raw_hash_count = 0
 
     for line in text.splitlines():
         out: list[str] = []
@@ -102,6 +104,23 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
                     out.extend(line[i : i + 2])
                     i += 2
                     continue
+
+                # Raw-string terminator: ``"`` followed by exactly
+                # ``raw_hash_count`` ``#`` characters closes the literal.
+                # Any other ``"`` inside a raw string is ordinary content.
+                if in_raw_string and char == '"':
+                    out.append(char)
+                    i += 1
+                    count = 0
+                    while i < len(line) and line[i] == "#":
+                        out.append("#")
+                        count += 1
+                        i += 1
+                    if count == raw_hash_count:
+                        in_string = False
+                        in_raw_string = False
+                    continue
+
                 out.append(char)
                 if escaped:
                     escaped = False
@@ -146,6 +165,24 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
                 continue
 
             if char == '"':
+                # Detect raw-string prefix ``r`` optionally followed by one
+                # or more ``#`` characters (Lean 4 raw-string syntax).
+                hash_run = 0
+                j = len(out) - 1
+                while j >= 0 and out[j] == "#":
+                    hash_run += 1
+                    j -= 1
+                if j >= 0 and out[j] == "r":
+                    prev = out[j - 1] if j > 0 else ""
+                    if not (prev.isalnum() or prev in "_'"):
+                        in_string = True
+                        in_raw_string = True
+                        raw_hash_count = hash_run
+                        escaped = False
+                        string_interpolated = False
+                        out.append(line[i])
+                        i += 1
+                        continue
                 in_string = True
                 escaped = False
                 string_interpolated = (
