@@ -61,7 +61,10 @@ WORKFLOW_REQUIRED_PATHS = {
     },
 }
 
-_PATHS_KEY_RE = re.compile(r"^(?P<indent>\s*)paths:\s*$")
+_PATHS_KEY_RE = re.compile(
+    r"^(?P<indent>\s*)paths:\s*"
+    r"(?:(?P<anchor>&[A-Za-z0-9_-]+)|(?P<alias>\*[A-Za-z0-9_-]+))?\s*$"
+)
 _PATH_ENTRY_RE = re.compile(
     r"^(?P<indent>\s*)-\s+['\"]?(?P<path>[^'\"\n]+)['\"]?\s*$"
 )
@@ -71,9 +74,21 @@ def path_filter_blocks(text: str) -> list[set[str]]:
     """Extract only entries inside GitHub Actions ``paths:`` filters."""
 
     blocks: list[set[str]] = []
+    anchors: dict[str, set[str]] = {}
     in_paths = False
     paths_indent = 0
     current_block: set[str] = set()
+    current_anchor: str | None = None
+
+    def finish_current_block() -> None:
+        nonlocal current_anchor, current_block, in_paths
+        block = set(current_block)
+        blocks.append(block)
+        if current_anchor is not None:
+            anchors[current_anchor] = block
+        current_anchor = None
+        current_block = set()
+        in_paths = False
 
     for raw_line in text.splitlines():
         while True:
@@ -83,9 +98,7 @@ def path_filter_blocks(text: str) -> list[set[str]]:
                     break
                 indent = len(raw_line) - len(raw_line.lstrip(" "))
                 if indent <= paths_indent:
-                    blocks.append(current_block)
-                    in_paths = False
-                    current_block = set()
+                    finish_current_block()
                     # Reconsider this same line: it might start another paths block.
                     continue
                 if match := _PATH_ENTRY_RE.match(raw_line):
@@ -93,13 +106,18 @@ def path_filter_blocks(text: str) -> list[set[str]]:
                 break
 
             if match := _PATHS_KEY_RE.match(raw_line):
-                in_paths = True
-                paths_indent = len(match.group("indent"))
-                current_block = set()
+                if alias := match.group("alias"):
+                    blocks.append(set(anchors.get(alias.removeprefix("*"), set())))
+                else:
+                    in_paths = True
+                    paths_indent = len(match.group("indent"))
+                    current_block = set()
+                    anchor = match.group("anchor")
+                    current_anchor = anchor.removeprefix("&") if anchor else None
             break
 
     if in_paths:
-        blocks.append(current_block)
+        finish_current_block()
     return blocks
 
 
@@ -140,6 +158,20 @@ class BlueprintScriptSurfaceTests(unittest.TestCase):
         """
 
         self.assertEqual(path_filter_blocks(text), [{"scripts/tex_utils.py"}])
+
+    def test_path_filter_parser_resolves_yaml_anchor_aliases(self) -> None:
+        text = """
+        on:
+          push:
+            paths: &blueprint_paths
+              - 'scripts/blueprint_lean_sync.py'
+              - 'scripts/tex_utils.py'
+          pull_request:
+            paths: *blueprint_paths
+        """
+
+        expected = {"scripts/blueprint_lean_sync.py", "scripts/tex_utils.py"}
+        self.assertEqual(path_filter_blocks(text), [expected, expected])
 
     def test_workflow_path_filters_cover_surface(self) -> None:
         for workflow, required_paths in WORKFLOW_REQUIRED_PATHS.items():
