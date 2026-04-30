@@ -66,7 +66,6 @@ private theorem degreeOf_rename_embedCoord_last (params : Parameters) [FieldMode
   simp only [embedCoord, lastCoord, Fin.ext_iff] at hb
   omega
 
-
 /-- Each Lagrange basis polynomial has degree at most one less than the size of the
 interpolation support, without requiring distinct interpolation nodes. -/
 private theorem natDegree_lagrangeBasis_le_card_sub_one {K ρ : Type*} [Field K] [DecidableEq ρ]

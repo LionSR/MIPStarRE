@@ -35,15 +35,19 @@ Examples:
 
 ### Body template
 
-Every PR body must contain three sections:
+Every PR body must contain three sections. For mathematical changes, the body
+should be readable by someone who has not seen the associated conversation:
+cite the paper or blueprint location, give the theorem label when one exists,
+and state the mathematical assertion precisely.
 
 ```markdown
 ### Motivation
-- Why this change is needed (1--3 bullets).
+- Why this mathematical or documentation change is needed.
+- Cite the issue and, when applicable, the paper/blueprint file, line, and label.
 
 ### Description
-- What was changed: files added/modified, definitions introduced, lemmas proved.
-- Use bullet points.
+- State precisely what changed: definitions introduced, lemmas/theorems proved,
+  blueprint labels updated, and any deliberate difference from the paper statement.
 
 ### Testing
 - What was verified and how.
@@ -77,9 +81,9 @@ Three issue templates are available in `.github/ISSUE_TEMPLATE/`:
 
 | Template | When to use |
 |----------|-------------|
-| **Formalization Task** | A specific theorem, definition, or lemma to formalize |
-| **Bug Report** | Broken proof, type error, sorry regression, CI failure |
-| **Tracking Issue** | Umbrella issue tracking a group of sub-issues |
+| **Formalization Issue** | A specific theorem, definition, construction, or lemma to formalize |
+| **Bug Report** | Broken proof, type error, sorry regression, statement mismatch, or CI failure |
+| **Tracking Issue** | Umbrella issue for a chapter, theorem family, or proof stage, using GitHub sub-issues |
 
 ### Formalization issues
 
@@ -94,7 +98,7 @@ characters, and `]` breaks part of the PR automation stack. See
 [`pr_review_management.md`](pr_review_management.md) for the rationale.
 
 For formalization issues, usually start with `formalization` + `2009.12982`,
-then add the most specific live chapter/workstream labels that apply (for
+then add the most specific live chapter or theorem-family labels that apply (for
 example `ldt-basic`, `preliminaries`, `commutativity`, `pasting`,
 `main-induction`, `proof`, `proof-infra`, `statement-fix`,
 `sorry-elimination`, `mismatch`, `follow-up`, `blueprint`, or
@@ -102,14 +106,30 @@ example `ldt-basic`, `preliminaries`, `commutativity`, `pasting`,
 `documentation`, `ci`, `cleanup`, and/or `refactor` instead of
 `formalization`.
 
+Every formalization issue must give enough mathematical source information to
+make the issue self-contained:
+
+- Paper source: a path under `references/ldt-paper/`, line number, theorem or
+  equation label when available, and a short quotation or precise paraphrase.
+- Blueprint source: a path under `blueprint/src/chapter/`, line number, label,
+  and the matching `\lean{...}` status when relevant.
+- Lean target: the expected declaration name and file path, if already known.
+- Dependencies: theorem labels, existing Lean declarations, and GitHub
+  sub-issues that must precede the statement.
+
+Do not describe a mathematical issue only as a "cleanup", "follow-up", "blocked
+item", or "Phase N" problem. State the theorem, lemma, definition, or mismatch
+in mathematical terms first; repository labels and scheduling details come
+afterward.
+
 ### Multi-part work
 
-For work spanning multiple PRs, use the `Area K/N: title` pattern and create
-an umbrella **tracking issue**:
+For a chapter or theorem family spanning several PRs, use a title pattern that
+names the mathematical region and create an umbrella **tracking issue**:
 
 ```
-LDT 1/5: Preliminaries and basic definitions
-LDT 2/5: Self-improvement step
+Chapter 7 1/5: Self-improvement hypotheses
+Chapter 7 2/5: Self-improvement conclusion
 ...
 ```
 
@@ -119,7 +139,7 @@ issue body can keep a short human-readable index, but markdown checkboxes and
 retired fenced tasklist blocks do not create native sub-issue relationships:
 
 ```markdown
-### Tasks
+### Sub-issues to attach
 - #101
 - #102
 - #103
@@ -134,7 +154,9 @@ the index.
 
 Use the **Tracking Issue** template (`.github/ISSUE_TEMPLATE/tracking-issue.yml`).
 Label with `tracking`; add `chapter-tracking` for the long-lived chapter
-overview trackers. The `tracking-issue-sync` workflow will automatically:
+overview trackers. A tracking issue should begin by naming the mathematical
+objective and citing the paper or blueprint labels that the child issues cover.
+The `tracking-issue-sync` workflow will automatically:
 
 - Rely on GitHub's native sub-issue progress instead of editing body checkboxes.
 - Post progress comments on linked issues when PRs merge.
@@ -178,9 +200,11 @@ locally.
 ### Stale-issue audits
 
 Issues that cite specific `sorry` sites, file/line locations, or declaration
-names drift out of date as `main` moves. Before kicking off a proof-closing
-round (or periodically as maintenance), run the audit script to list
-open issues whose citations no longer resolve:
+names drift out of date as `main` moves. Keep those citations precise rather
+than replacing them with vague prose: update paths, line numbers, theorem labels,
+and short source paraphrases when the source moves. Before starting a new
+proof-closing round (or periodically as maintenance), run the audit script to
+list open issues whose citations no longer resolve:
 
 ```bash
 gh issue list --repo LionSR/MIPStarRE --state open --limit 500 \
@@ -210,7 +234,7 @@ uploads an artifact only when citations are flagged. See
 This section mirrors the labels that currently exist in the GitHub repository.
 If this file and `gh label list` diverge, treat GitHub as the source of truth
 and update this guide in the same PR. Most formalization issues combine
-`formalization` + `2009.12982` with one or more chapter/workstream labels.
+`formalization` + `2009.12982` with one or more chapter or theorem-family labels.
 Documentation- or tooling-only issues usually skip the paper label. Do **not**
 apply legacy labels such as `self-improvement`, `expansion-graph`,
 `quantum-foundations`, or `automation`: those names are not part of the live
@@ -220,14 +244,14 @@ label set.
 
 | Label            | Description                                                |
 |------------------|------------------------------------------------------------|
-| `formalization`  | Lean formalization task                                    |
+| `formalization`  | Lean formalization of a mathematical statement             |
 | `documentation`  | Documentation-only work                                    |
 | `infrastructure` | Foundational definitions, shared APIs, or supporting layers |
 | `cleanup`        | Small cleanup, consistency, or style fix                   |
 | `refactor`       | Structural change without intended behavior change         |
 | `ci`             | CI/CD workflow or repository automation change             |
 
-### Chapter / workstream labels
+### Chapter / theorem-family labels
 
 | Label               | Description                                                     |
 |---------------------|-----------------------------------------------------------------|
@@ -237,12 +261,12 @@ label set.
 | `pasting`           | Pasting chapter and downstream chains                           |
 | `main-induction`    | Main induction step                                             |
 | `proof`             | Issue is primarily about proving an existing result             |
-| `proof-infra`       | Intermediate lemmas or scaffolding that mainly support proofs   |
+| `proof-infra`       | Intermediate lemmas or definitions that mainly support proofs   |
 | `sorry-elimination` | Explicitly aimed at discharging remaining `sorry` sites         |
 | `statement-fix`     | Paper-to-Lean statement correction / weakening / realignment    |
 | `mismatch`          | Explicit paper-code mismatch audit or repair                    |
 | `blueprint`         | Blueprint authoring or blueprint-expansion work                 |
-| `blueprint-sync`    | Blueprint ↔ Lean synchronization task                           |
+| `blueprint-sync`    | Blueprint ↔ Lean synchronization issue                          |
 
 ### Paper labels
 
@@ -254,9 +278,9 @@ label set.
 
 | Label              | Description                                           |
 |--------------------|-------------------------------------------------------|
-| `tracking`         | Umbrella tracking issue                               |
+| `tracking`         | Umbrella issue using GitHub sub-issues                 |
 | `chapter-tracking` | Long-lived chapter progress tracker                   |
-| `follow-up`        | Deferred or newly discovered work split out of a PR   |
+| `follow-up`        | A mathematical obligation split out of a PR            |
 | `campaign-5`       | Historical label for the session-5 campaign issues    |
 
 ### Automation / operational labels
@@ -265,7 +289,7 @@ label set.
 |-------------------|-------------------------------------------------------|
 | `auto-fix-claude` | Automation-managed issue queue for Claude follow-ups  |
 | `codex`           | Automation-managed issue or PR bookkeeping            |
-| `standup`         | Daily standup summary issues                          |
+| `standup`         | Daily mathematical progress issues                    |
 
 ### Standard GitHub labels
 
@@ -285,25 +309,44 @@ Every PR touching Lean code should be reviewed against these criteria:
    and documentation standards in [doc.md](doc.md). See [pr-review.md](pr-review.md)
    for the full Mathlib review guide.
 
-3. **Linter hygiene** -- Linter-warning cleanup must fix warnings, not mask
+3. **Paper terminology** -- Public Lean names, module docstrings, declaration
+   docstrings, and documentation-visible comments should use terminology from
+   the paper and blueprint, not implementation history. See
+   [mathematical_language.md](mathematical_language.md) for the project-local
+   language rule for Lean documentation and public names. Reviewers should flag
+   names that encode historical formalization status rather than mathematical
+   content. When an old public identifier cannot be renamed in the current PR,
+   record the required migration in the issue, PR description, or an audit file
+   under [audits/](../audits/).
+   New and substantively updated audit files should follow the term norm and
+   format in
+   [audits/2026-04-29_audit-document-format.md](../audits/2026-04-29_audit-document-format.md).
+   Do not add an empty pass-through abbreviation merely to introduce a second
+   public name.
+   Review-fix PRs must read the relevant audit files under [audits/](../audits/)
+   before changing names or prose. If an audit marks a naming migration or
+   historical-formalization term as in scope for the fix, addressing it or
+   explicitly updating the audit trail is a merge blocker.
+
+4. **Linter hygiene** -- Linter-warning cleanup must fix warnings, not mask
    them with broad `set_option linter.<name> false` blocks. See
    [style.md](style.md#linter-warnings) for the project rule and the narrow
    exception policy.
 
-4. **Type safety** -- No universe mismatches, coercion problems, or unresolved
+5. **Type safety** -- No universe mismatches, coercion problems, or unresolved
    metavariables.
 
-5. **Performance** -- Avoid expensive tactics on large types (e.g., `decide` on
+6. **Performance** -- Avoid expensive tactics on large types (e.g., `decide` on
    `Fin 1000`). Watch for timeout-prone proof terms.
 
-6. **Modularity** -- Are new lemmas general enough to be reused? Could any be
+7. **Modularity** -- Are new lemmas general enough to be reused? Could any be
    upstreamed to Mathlib?
 
-7. **Documentation** -- Every new `def` and major `theorem` must have a docstring.
+8. **Documentation** -- Every new `def` and major `theorem` must have a docstring.
    Module files should have a header comment with `## References` citing the
    relevant arXiv paper(s).
 
-8. **Blueprint sync and paper origin** -- If the PR formalizes a statement
+9. **Blueprint sync and paper origin** -- If the PR formalizes a statement
    from the blueprint, add `\lean{LeanDeclName}` and `\leanok` tags to the
    corresponding `blueprint/src/chapter/*.tex` file. If the PR adds a public
    auxiliary lemma that is not a named statement in the original paper, record
@@ -312,14 +355,16 @@ Every PR touching Lean code should be reviewed against these criteria:
    infrastructure or include it as a clearly subordinate support node connected
    by `\uses{...}`. See
    [blueprint_style_guide.md](blueprint_style_guide.md#recording-formalization-only-lemmas).
+   PR descriptions and follow-up issues should cite the corresponding paper or
+   blueprint path, line, label, and a short quotation or precise paraphrase.
 
-9. **Scaffolding integrity** -- If the PR introduces or modifies scaffolded
+10. **Scaffolding integrity** -- If the PR introduces or modifies scaffolded
    definitions (types, theorem statements with `sorry` proofs), verify that
    the types and API surface align with Mathlib. Scaffolding that uses custom
    types incompatible with Mathlib blocks future proof work. See
    [PROOF_INTEGRITY.md](PROOF_INTEGRITY.md) for details.
 
-10. **Proof-evasion anti-patterns** -- Review against
+11. **Proof-evasion anti-patterns** -- Review against
    [anti_patterns.md](anti_patterns.md), which catalogues subtler failure
    modes that pass the `PROOF_INTEGRITY.md` blocker checks but still fail
    to prove the claimed mathematics: conclusion-shaped hypotheses (A1),
@@ -356,12 +401,23 @@ This project follows Mathlib conventions with project-specific additions.
 
 ### Reference guides
 
+Mathlib-derived references:
+
 - **Documentation style**: [doc.md](doc.md) -- module headers, docstrings,
   LaTeX in comments, sectioning comments.
 - **Naming conventions**: [naming.md](naming.md) -- capitalization rules,
   symbol-to-name dictionary, variable conventions.
 - **Review guide**: [pr-review.md](pr-review.md) -- detailed examples of
   style, documentation, location, and improvement considerations.
+
+MIPStarRE-local references:
+
+- **Mathematical language**: [mathematical_language.md](mathematical_language.md)
+  -- project-local terminology rules for Lean names and documentation.
+- **Proof integrity**: [PROOF_INTEGRITY.md](PROOF_INTEGRITY.md) -- blocker and
+  warning patterns for proof correctness.
+- **Blueprint style**: [blueprint_style_guide.md](blueprint_style_guide.md) --
+  notation and section conventions for the active blueprint.
 
 ### Project-specific conventions
 
@@ -409,13 +465,13 @@ The following workflows run automatically:
 | Workflow | Trigger | What it does |
 |----------|---------|-------------|
 | **Lean CI** (`lean_action_ci.yml`) | Push to `main`, PRs touching `.lean`/`lakefile.toml`/`lean-toolchain` | Runs `lake build` with Mathlib cache |
-| **Claude Code Review** (`claude-code-review.yml`) | PR opened/synced/reopened touching `.lean`, `.tex`, `lakefile.toml`, `lean-toolchain` | Automated review for sorrys, Mathlib style, type safety, performance, modularity, documentation |
-| **Issue Tracker** (`tracking-issue-sync.yml`) | Issue closed/reopened; PR merged/opened | Uses native sub-issue progress for tracking status, posts progress comments on linked issues when PRs merge, scans merged PRs for genuine deferred work, and creates `follow-up` issues when needed |
+| **Claude Code Review** (`claude-code-review.yml`) | PR opened/synced/ready-for-review/reopened touching Lean files, blueprint `.tex` files, `docs/paper-gaps/`, `lakefile.toml`, or `lean-toolchain` | Automated review for proof integrity, Mathlib style, type safety, performance, modularity, mathematical exposition, and documentation |
+| **Issue Tracker** (`tracking-issue-sync.yml`) | Issue closed/reopened; PR merged/opened | Uses native sub-issue progress for tracking status, posts progress comments on linked issues when PRs merge, scans merged PRs for genuine deferred mathematical obligations, and creates `follow-up` issues when needed |
 | **Blueprint Lint** (`lint-blueprint.yml`) | PRs touching blueprint files | Validates LaTeX blueprint for broken labels and references |
 | **Docs & Blueprint Sync** (`docs-blueprint-sync.md`) | Daily (weekdays) + manual dispatch | Detects stale documentation and opens a sync PR if needed |
 | **README Freshness Audit** (`readme-freshness-audit.yml`) | Weekly + manual dispatch | Report-only audit for README local paths, LDT submodule count, and hard-coded Lean/Mathlib versions |
 | **Lean Audit** (`lean-audit.yml`) | On demand | Audits Lean code for style and correctness |
-| **PR Cleanup** (`pr-cleanup.yml`) | AI-generated PR opened (`claude/*` or `codex/*` branches) | Normalizes title to `type(scope): desc`, restructures body to PR template, copies labels from linked issue, adds `Addresses #N` reference, comments on the issue |
+| **PR Mathematical Description** (`pr-cleanup.yml`) | PR opened from `claude/*` or `codex/*` branches | Normalizes title to `type(scope): desc`, rewrites the PR body as a self-contained mathematical note, preserves source citations from the linked issue, copies labels, adds `Addresses #N`, and comments on the issue |
 | **Mathlib Scout** (`mathlib-scout.yml`) | Formalization issue opened/labeled | Scouts Mathlib for relevant lemmas and posts a scouting report |
 
 ### What CI checks before merge

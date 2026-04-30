@@ -225,7 +225,7 @@ theorem strategySymmetrization_mainInductionBaseCase
       (ProjStrat.strategySymmetrization_isGood_three_mul
         (strategy := strategy) (eps := eps) hpass)
 
-/-- Weighted restricted-axis input expected by the Section 6 successor wrapper
+/-- Weighted restricted-axis input expected by the Section 6 successor step
 on the role-register symmetrization. -/
 def MainFormalSuccessorAxisWeightedBound (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -236,13 +236,14 @@ def MainFormalSuccessorAxisWeightedBound (params : Parameters)
         strategy.strategySymmetrization x).axisParallelFailureProbability) ≤
     3 * eps
 
-/-- Weighted restricted-diagonal input expected by the Section 6 successor
-wrapper on the role-register symmetrization.
+/-- Weighted restricted-diagonal input expected by the Section 6 successor step
+on the role-register symmetrization.
 
-Per `lem:restricted-probabilities` (see `docs/audit/lean_code_audit.md`) the
-paper's slice argument uses the same transverse-direction factor `m / (m + 1)`
-for both the axis-parallel and diagonal branches. `restrictedProbabilities`
-therefore expects `sliceTransverseDirectionWeight` on both weighted bounds. -/
+Per `lem:restricted-probabilities` (see
+`audits/2026-04-05_lean-code-audit.md`) the paper's slice argument uses the
+same transverse-direction factor `m / (m + 1)` for both the axis-parallel and
+diagonal branches. `restrictedProbabilities` therefore expects
+`sliceTransverseDirectionWeight` on both weighted bounds. -/
 def MainFormalSuccessorDiagonalWeightedBound (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params.next ι) (eps : Error) : Prop :=
@@ -940,10 +941,10 @@ theorem zeta3_div_two_le_mainFormalError {params : Parameters} {eps : Error} {k 
 
 end MainFormalCascadeScalars
 
-/-- Section 6 role-register output used by the `mainFormal` assembly.
+/-- Section 6 role-register induction output used by the `mainFormal` assembly.
 
 The main-induction call is applied to `strategy.strategySymmetrization`, whose
-local Hilbert space is indexed by `Role × ι`.  This package records exactly the
+local Hilbert space is indexed by `Role × ι`. This structure records exactly the
 piece of that call needed by the later unsymmetrization step: a polynomial POVM
 on the role register together with its symmetrized point-consistency estimate at
 the cascade scalar `σ`.  It deliberately does not assert the factor-two
@@ -966,7 +967,7 @@ structure MainFormalRoleMeasurementPackage
 
 namespace MainFormalRoleMeasurementPackage
 
-/-- Repackage a raw Section 6 main-induction witness as a
+/-- View a Section 6 main-induction witness as a
 `MainFormalRoleMeasurementPackage`.
 
 The only proof step is scalar bookkeeping: `scalars.sigma` is definitionally
@@ -993,10 +994,10 @@ theorem ofMainInductionWitness
   simpa [MainFormalCascadeScalars.sigma, mainFormalCascadeSigma_eq_mainInductionError]
     using hG
 
-/-- Base-case constructor for the role-register Section 6 package.
+/-- Base-case constructor for the role-register Section 6 induction output.
 
 When `params.m = 1`, the checked `strategySymmetrization_mainInductionBaseCase`
-produces the raw Section 6 measurement on the role-register symmetrization; this
+produces the Section 6 measurement on the role-register symmetrization; this
 constructor rewrites its error to the `σ` used by the Section 3 cascade. -/
 theorem ofBaseCase
     (params : Parameters) [FieldModel params.q]
@@ -1009,7 +1010,7 @@ theorem ofBaseCase
   ofMainInductionWitness params strategy eps k scalars
     (strategySymmetrization_mainInductionBaseCase params strategy eps hpass k hm1)
 
-/-- Successor-case constructor for the role-register Section 6 package.
+/-- Successor-case constructor for the role-register Section 6 induction output.
 
 In the large-dimension branch, the public successor wrapper applies to the
 role-register symmetrization once the honest `MainFormalSuccessorBoundary` data
@@ -1031,7 +1032,7 @@ theorem ofSuccessorBoundary
       hk_pos hk_large)
 
 /-- Build the formal unsymmetrization bridge from the role-register Section 6
-measurement package.
+measurement output.
 
 The lower-level Step 3 theorem
 `UnsymmetrizationBridgePackage.ofSymConsistency` proves the two factor-two
@@ -1049,10 +1050,10 @@ def toUnsymmetrizationBridge
 
 end MainFormalRoleMeasurementPackage
 
-/-- Residual Section 6 role-package witness for `mainFormal`.
+/-- Residual Section 6 role-register induction witness for `mainFormal`.
 
-This isolates the first field of the former role-packaged completion residual:
-it asks only for the raw Section 6 role-register polynomial measurement and its
+This isolates the first field of the former role-register completion residual:
+it asks only for the Section 6 role-register polynomial measurement and its
 symmetrized consistency estimate at the pre-cascade main-induction error.  The
 constructors below show how the already-checked base case and the syntactic
 successor wrapper produce this residual. For an arbitrary current parameter
@@ -1064,9 +1065,9 @@ structure MainFormalRolePackageResidual
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : ProjStrat params ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ) where
-  /-- Raw Section 6 role-register measurement before rewriting its error to `σ`. -/
+  /-- Section 6 role-register measurement before rewriting its error to `σ`. -/
   roleMeasurement : Measurement (Polynomial params) (Role × ι)
-  /-- Raw Section 6 consistency estimate before rewriting its error to `σ`. -/
+  /-- Section 6 consistency estimate before rewriting its error to `σ`. -/
   section6Consistency :
     ConsRel (strategy.strategySymmetrization).state
       (uniformDistribution (Point params))
@@ -1096,7 +1097,7 @@ theorem ofMainInductionWitness
   rcases hsection6 with ⟨G, hG⟩
   exact ⟨{ roleMeasurement := G, section6Consistency := hG }⟩
 
-/-- Convert the isolated Section 6 role-package residual into the package consumed
+/-- Convert the isolated Section 6 role-register residual into the output consumed
 by unsymmetrization. -/
 def toRoleMeasurementPackage
     {params : Parameters} [FieldModel params.q]
@@ -1111,7 +1112,7 @@ def toRoleMeasurementPackage
     simpa [MainFormalCascadeScalars.sigma, mainFormalCascadeSigma_eq_mainInductionError]
       using residual.section6Consistency
 
-/-- Base-case constructor for the isolated role-package residual. -/
+/-- Base-case constructor for the isolated role-register residual. -/
 theorem ofBaseCase
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -1122,7 +1123,7 @@ theorem ofBaseCase
   exact ofMainInductionWitness params strategy eps k hpass
     (strategySymmetrization_mainInductionBaseCase params strategy eps hpass k hm1)
 
-/-- Successor constructor for the isolated role-package residual in the syntactic
+/-- Successor constructor for the isolated role-register residual in the syntactic
 `params.next` case.
 
 This exposes the exact remaining Section 6 data for the large-`k` branch:

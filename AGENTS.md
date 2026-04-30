@@ -14,6 +14,23 @@ paper:
 
 Read the paper source before formalizing or changing theorem statements.
 
+## Mathematical Exposition
+
+Write repository prose for mathematicians and mathematical physicists. Prefer a
+clear, precise, and unhurried expository style: introduce the object under
+discussion, state the mathematical relation being used, distinguish hypotheses
+from conclusions, and avoid informal process language when a standard
+mathematical phrase is available.
+
+When writing docstrings, audit notes, PR descriptions, or blueprint-adjacent
+comments, use terminology from the standard mathematical literature, the LDT
+paper, and the local formalization. Do not invent slang or private shorthand for
+mathematical objects. In particular, avoid names or prose that reflect a
+local encoding choice, implementation history, or the agent's working process
+when the reference paper or standard literature has an established term.
+The goal is prose that a third-party reader can understand without having read
+the agent conversation that produced the change.
+
 ## Agent Rule Sources
 
 Checked in this repository snapshot:
@@ -30,6 +47,7 @@ Use this file together with:
 - `docs/style.md`
 - `docs/naming.md`
 - `docs/doc.md`
+- `docs/mathematical_language.md`
 
 ## Repository Layout
 
@@ -37,7 +55,8 @@ Use this file together with:
 - `MIPStarRE/LDT/`: active low-degree-test development
 - `blueprint/src/`: active LaTeX blueprint
 - `references/ldt-paper/`: mirrored TeX paper sources
-- `docs/`: contribution, style, audit, and planning documents
+- `docs/`: contribution, style, naming, proof-integrity, and project guidance
+- `audits/`: dated audit reports, scouting notes, and repair plans
 - `scripts/Checkdecls.lean`: declaration checker executable
 
 ## Toolchain
@@ -239,6 +258,9 @@ Project-preferred variable names:
 
 Use American English spelling in declaration names.
 
+For Lean names and prose that describe mathematical objects, theorem
+statements, or proof steps, also follow `docs/mathematical_language.md`.
+
 ## Types And Signatures
 
 - Give explicit types for declaration arguments
@@ -253,9 +275,22 @@ Required:
 
 - docstrings on every `def`, `structure`, `class`, and significant `theorem`
 - module docstrings for every file
+- mathematical prose in Lean docstrings and comments should follow
+  `docs/mathematical_language.md`
 
 When formalizing a statement from the blueprint, add corresponding `\lean{...}` and
 `\leanok` tags in the relevant `blueprint/src/chapter/*.tex` file.
+
+For paper-gap notes and other documentation of discrepancies between the cited
+paper, the blueprint, and Lean, follow `docs/paper-gaps/policy.tex`.  In
+particular, such notes should be mathematical prose for third-party readers:
+introduce notation, state the cited assertion, isolate the calculation or
+logical obstruction, compare with the blueprint and Lean statement, and give a
+clear verdict.  If Lean uses a Mathlib result or construction not present in the
+cited argument, explain that replacement pedagogically before naming the formal
+declaration.  If the cited assertion is false and a counterexample is available,
+explain the counterexample in prose and use any Lean declaration only as
+verification.
 
 ## Proof Engineering
 

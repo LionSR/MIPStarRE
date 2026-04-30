@@ -128,5 +128,4 @@ lemma hBConsistency
   exact ⟨hBConsistency_core params strategy eps delta gamma zeta
     hgood hd family hcons hself hbound k hline⟩
 
-
 end MIPStarRE.LDT.Pasting

@@ -12,6 +12,9 @@ on:
       - '.github/actions/setup-lean/**'
       - '.github/workflows/lint-blueprint.yml'
       - 'blueprint/src/**'
+      - 'scripts/check_blueprint_latex.py'
+      - 'scripts/tests/**'
+      - 'scripts/tex_utils.py'
       - 'scripts/blueprint_lean_sync.py'
   pull_request:
     types: [opened, synchronize, reopened]
@@ -23,6 +26,9 @@ on:
       - '.github/actions/setup-lean/**'
       - '.github/workflows/lint-blueprint.yml'
       - 'blueprint/src/**'
+      - 'scripts/check_blueprint_latex.py'
+      - 'scripts/tests/**'
+      - 'scripts/tex_utils.py'
       - 'scripts/blueprint_lean_sync.py'
 
 concurrency:
@@ -49,6 +55,12 @@ jobs:
         run: |
           pip install leanblueprint
           pip install plastex
+
+      - name: Test blueprint Python helpers
+        run: python3 -m unittest discover -s scripts/tests -p 'test_*.py'
+
+      - name: Check blueprint LaTeX conventions
+        run: python3 scripts/check_blueprint_latex.py --root blueprint/src
 
       - name: Run leanblueprint web and check for errors
         working-directory: blueprint

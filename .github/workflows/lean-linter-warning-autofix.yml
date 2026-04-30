@@ -149,11 +149,11 @@ jobs:
             Warning report text: `${{ runner.temp }}/lean-linter-warning-autofix.txt`
             Warning count: `${{ steps.warnings.outputs.warning_count }}`
 
-            Task:
+            Instructions:
             1. Read the warning report files above and fix only the Lean linter/unused-instance warnings they list.
             2. Keep the diff minimal. Do not touch LaTeX, blueprint files, documentation, generated files, or unrelated Lean code.
             3. Do not change theorem statements, mathematical definitions, proof strategy, or paper-facing constants. Do not remove or add `sorry`, `admit`, `axiom`, `unsafe`, `native_decide`, `unsafeCast`, `unsafeCoerce`, `lcProof`, `ofReduceBool`, or `ofReduceNat`.
-            4. When adding `set_option linter.<name> false`, put it after the module docstring and before imports/body that depend on it. Prefer local proof cleanup over new global suppressions when that is obviously safe.
+            4. When adding `set_option linter.<name> false`, put it after the module docstring and before imports/body that depend on it. Prefer local proof revision over new global suppressions when that is obviously safe.
             5. Validate touched Lean files when practical; if validation is too broad or slow, leave a clear note in the final message.
             6. Do not commit or push. Leave any edits in the working tree. Later workflow steps will check the diff, commit, push, and open a PR only if the diff is non-empty and passes guards.
 
@@ -279,23 +279,33 @@ jobs:
           set -euo pipefail
           body_file="$RUNNER_TEMP/lean-linter-warning-autofix-pr-body.md"
           {
-            echo "Addresses #723"
+            echo "### Motivation"
+            echo "- Addresses #723 by cleaning Lean linter warnings without changing the mathematical statements."
+            echo "- This PR is not intended to introduce or alter any paper theorem, blueprint theorem label, or Lean theorem statement."
             echo
-            echo "This PR was created by the guarded Lean linter-warning auto-fix workflow."
+            echo "### Description"
+            echo "- Applies linter-only Lean changes produced after the guarded Lean linter-warning check."
+            echo "- Maintainers should verify that the diff leaves all paper-facing definitions, theorem statements, and proof obligations unchanged."
             echo
-            echo "## Safety notes"
-            echo "- Triggered manually from \`$BASE_REF\`; create-PR mode is guarded to \`base_ref=main\`, and this workflow does not run on pull_request contexts."
-            echo "- The workflow skipped PR creation unless the initial build succeeded, warnings were present, and Claude produced a non-empty Lean-only diff."
+            echo "### Testing"
+            echo "- The check reran \`lake build -q --log-level=info\` before opening this PR."
+            echo
+            echo "### Safety notes"
+            echo "- Triggered manually from \`$BASE_REF\`; create-PR mode is guarded to \`base_ref=main\`, and this check does not run on pull_request contexts."
+            echo "- PR creation was skipped unless the initial build succeeded, warnings were present, and the resulting diff was non-empty and Lean-only."
             echo "- The diff guard rejects untracked files, deleted files, non-Lean file changes, and additions of forbidden proof-integrity tokens such as \`sorry\`, \`admit\`, \`axiom\`, \`unsafe\`, \`native_decide\`, \`unsafeCast\`, \`unsafeCoerce\`, \`lcProof\`, \`ofReduceBool\`, or \`ofReduceNat\`."
-            echo "- Maintainers must still review the resulting cleanup for paper-faithfulness before merge."
+            echo "- Maintainers must still review the resulting linter-only diff for paper-faithfulness before merge."
             echo
-            echo "## Warning report"
+            echo "### Warning report"
             echo
             echo "Warnings found before auto-fix: $WARNING_COUNT"
             echo
             echo '```text'
             sed -n '1,120p' "$REPORT_TXT"
             echo '```'
+            echo
+            echo "---"
+            echo "Addresses #723"
           } > "$body_file"
 
           pr_url=$(gh pr create \

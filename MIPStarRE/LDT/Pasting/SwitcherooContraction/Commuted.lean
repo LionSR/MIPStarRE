@@ -167,7 +167,6 @@ lemma switcherooAggregateFourthTerm_once_commuted_contraction_right
                     hmid_le (show (0 : MIPStarRE.Quantum.Op ι) ≤ 1 by exact zero_le_one))
             _ = 1 := by simp [leftTensor]
 
-
 /-- Collapse the split-by-`g` raw expression back to the first positive
 switcheroo term. -/
 lemma switcherooAggregateFirstTerm_eq_split_by_g

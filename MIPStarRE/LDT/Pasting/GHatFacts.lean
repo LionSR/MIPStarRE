@@ -520,5 +520,4 @@ theorem gHatFacts
                     simp [gHatCommutationError, sixteenthSum]
                     ring
 
-
 end MIPStarRE.LDT.Pasting

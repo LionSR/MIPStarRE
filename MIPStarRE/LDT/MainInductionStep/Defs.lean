@@ -144,8 +144,7 @@ noncomputable def diagonalFailureProbability
   (1 / (params.m : Error)) *
     ∑ j : Fin params.m,
       bipartiteConsError strategy.state
-        (uniformDistribution
-          (RestrictedDiagonalSample params j))
+        (uniformDistribution (RestrictedDiagonalSample params j))
         (restrictedDiagonalPointAnswerFamily strategy j)
         (restrictedDiagonalLineAnswerFamily strategy j)
 

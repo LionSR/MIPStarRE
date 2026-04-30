@@ -222,5 +222,4 @@ lemma liftRight_mul_rightPlaced_outcome
     _ = rightTensor (A.outcome a * B.outcome b) := by
           rw [rightTensor_mul_rightTensor]
 
-
 end MIPStarRE.LDT.CommutativityPoints

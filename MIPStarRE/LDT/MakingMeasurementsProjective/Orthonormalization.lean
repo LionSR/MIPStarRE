@@ -6,7 +6,7 @@ import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 /-!
 # Section 5 — Orthonormalization
 
-The orthonormalization wrapper theorem and bookkeeping lemmas from Section 5.
+The orthonormalization theorem and scalar bookkeeping lemmas from Section 5.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -15,7 +15,7 @@ namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 open MIPStarRE.LDT
 
-/-! ### Local helpers for the submeasurement wrapper -/
+/-! ### Local helpers for submeasurements -/
 
 /-- The zero family is a projective submeasurement. This supplies the trivial
 large-`ζ` branch of `orthonormalization`, where the target error bound is already
@@ -344,14 +344,14 @@ private lemma orthonormalizationError_ge_one_of_half_lt (ζ : Error)
     nlinarith
   exact (by norm_num : (1 : Error) ≤ 50).trans h50_le
 
-/-- Error bookkeeping for the wrapper around `consistencyToAlmostProjective`
+/-- Error bookkeeping for the composition of `consistencyToAlmostProjective`
 and `roundAlmostProjMeas`. -/
 private lemma orthonormalizationMainLemma_error_bound (ζ : Error)
     (hζ : 0 ≤ ζ) (hζ1 : ζ ≤ 1) :
     roundingToProjectiveError (consistencyToAlmostProjectiveError ζ) ≤
       orthonormalizationMainLemmaError ζ := by
   /-
-  The wrapper theorem below is structurally just the composition of
+  The theorem below is structurally just the composition of
   `consistencyToAlmostProjective` and `roundAlmostProjMeas`.
   The remaining bookkeeping is the scalar inequality comparing the composed
   rounding bound with the named `orthonormalizationMainLemmaError`.
@@ -386,8 +386,8 @@ private lemma orthonormalizationMainLemma_error_bound (ζ : Error)
       simpa using hcoeff.trans_eq (by norm_num : (12 : Error) * 7 = 84)
 
 /-- The scalar weakening `84·ζ^{1/4} ≤ 100·ζ^{1/4}` from the local
-orthonormalization bound to the paper's wrapper error. Factored out as a named
-lemma because the same bookkeeping reappears in any top-level wrapper that
+orthonormalization bound to the paper's error term. Factored out as a named
+lemma because the same bookkeeping reappears in any top-level theorem that
 derives `orthonormalization` from `orthonormalizationMeasurement` via
 submeasurement completion. -/
 lemma orthonormalizationMainLemmaError_le_orthonormalizationError
@@ -399,8 +399,8 @@ lemma orthonormalizationMainLemmaError_le_orthonormalizationError
 
 /-- `lem:orthonormalization-main-lemma`.
 
-The still-unformalized spectral truncation and late repair are exposed here as
-explicit theorem hypotheses rather than dedicated bridge-package structures. -/
+The still-unformalized truncation and late repair are exposed here as explicit
+theorem hypotheses rather than dedicated bridge structures. -/
 lemma orthonormalizationMainLemma {Outcome : Type*}
     {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -669,7 +669,7 @@ set_option linter.unusedFintypeInType false in
 The explicit permutation-invariance and normalized-state hypotheses match the
 paper. Once the lifted/local mismatch is discharged by
 `orthonormalizationMainLemma_local`, the only remaining external inputs are the
-spectral truncation and locality-preserving repair witnesses for the
+truncation and locality-preserving repair witnesses for the
 option-completed measurement `optionCompletion A`. -/
 theorem orthonormalization {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]

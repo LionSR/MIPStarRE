@@ -35,5 +35,4 @@ lemma commuteGHalfSandwich
   exact ⟨commuteGHalfSandwich_core params ψbi family gamma zeta k hk
     hzeta_le hfacts.completedSelfConsistency hfacts.completedCommutation⟩
 
-
 end MIPStarRE.LDT.Pasting

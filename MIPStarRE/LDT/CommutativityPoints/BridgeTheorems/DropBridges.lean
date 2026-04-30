@@ -395,6 +395,4 @@ theorem commutativityPoints
             rfl
     _ ≤ commutativityPointsError params gamma := hshared'
 
-
-
 end MIPStarRE.LDT.CommutativityPoints

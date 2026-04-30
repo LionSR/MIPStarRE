@@ -17,7 +17,7 @@ open MIPStarRE.LDT
 /-- **Naimark dilation theorem** (Theorem 5.1, `thm:naimark`).
 
 For each question on each side, apply `oneMeasNaimark` to the corresponding
-submeasurement. This packages the local projective dilations and their
+submeasurement. This records the local projective dilations and their
 single-measurement expectation-preservation identities; the full tensor-product
 assembly is left for a future strengthening of the statement layer. -/
 private lemma exists_fullNaimarkData
@@ -73,8 +73,8 @@ private lemma exists_fullNaimarkData
   · intro y ρ b
     simpa [rightData, hright y] using (rightData y).expectation_preservation ρ b
 
-/-- Package the questionwise one-measurement dilations on both sides into the
-paper's full Naimark statement package. -/
+/-- Assemble the questionwise one-measurement dilations on both sides into the
+paper's full Naimark statement. -/
 theorem naimark {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     {ι : Type*}
     [Fintype QuestionA] [DecidableEq QuestionA]

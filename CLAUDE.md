@@ -59,13 +59,27 @@ Each LDT submodule typically has `Defs.lean` and `Theorems.lean` files. Root imp
 1. `references/ldt-paper/` — TeX source of the paper (the ground truth for mathematical content)
 2. `blueprint/src/chapter/` — active LaTeX blueprint with Lean cross-references (`\lean{}`, `\leanok`)
 3. `MIPStarRE/` — Lean scaffold matching the blueprint
-4. `docs/20260320_ldt_source_map.md` — theorem ownership map
+4. `audits/2026-03-20_ldt-source-map.md` — theorem ownership map
 
 **Always read the paper source** (`references/ldt-paper/*.tex`) before formalizing or proving a statement. The paper contains the precise mathematical definitions, theorem statements, and proof strategies that the Lean code must faithfully represent. Cross-reference with the blueprint to understand what has already been formalized.
 
 **When stuck on a sorry site or proof**, go back to the original paper TeX source. The paper proofs contain the exact mathematical argument, intermediate steps, and inequalities needed. If you cannot close a sorry, read the corresponding section in `references/ldt-paper/*.tex` — the answer is almost always there. Do not guess or try random tactics without first understanding the paper's proof strategy.
 
 When formalizing a statement from the blueprint, add `\lean{LeanDeclName}` and `\leanok` tags to the corresponding `blueprint/src/chapter/*.tex` file.
+
+## Mathematical Documentation Style
+
+For paper-gap notes and other documentation of discrepancies between the cited
+paper, the blueprint, and Lean, follow `docs/paper-gaps/policy.tex`.  In
+particular, such notes should be mathematical prose for mathematicians and
+mathematical physicists who have not read the issue discussion: introduce
+notation, state the cited assertion, isolate the calculation or logical
+obstruction, compare with the blueprint and Lean statement, and give a clear
+verdict.  If Lean uses a Mathlib result or construction not present in the cited
+argument, explain that replacement pedagogically before naming the formal
+declaration.  If the cited assertion is false and a counterexample is available,
+explain the counterexample in prose and use any Lean declaration only as
+verification.
 
 ## Proof-Filling Order
 
@@ -102,18 +116,26 @@ Before merging, all of these are **blockers** (see `docs/PROOF_INTEGRITY.md`):
 
 ## Documentation References
 
+Mathlib-derived references:
+
+| File | Purpose |
+|------|---------|
+| `docs/style.md` | Mathlib code style (line length, indentation, tactic formatting) |
+| `docs/naming.md` | Mathlib naming conventions (70+ rules, symbol dictionary) |
+| `docs/doc.md` | Mathlib documentation standards (module headers, docstrings) |
+| `docs/pr-review.md` | Mathlib PR review guide |
+
+MIPStarRE-local references:
+
 | File | Purpose |
 |------|---------|
 | `docs/CONTRIBUTING.md` | PR format, issue templates, label taxonomy, review checklist |
 | `docs/PROOF_INTEGRITY.md` | Blocker/warning patterns for proof correctness |
-| `docs/style.md` | Mathlib code style (line length, indentation, tactic formatting) |
-| `docs/naming.md` | Mathlib naming conventions (70+ rules, symbol dictionary) |
-| `docs/doc.md` | Documentation standards (module headers, docstrings) |
-| `docs/pr-review.md` | Detailed PR review guidelines |
+| `docs/mathematical_language.md` | Project-local mathematical language rules for Lean names and documentation |
 | `docs/pr_review_management.md` | Review thread workflow and bot integration |
 | `docs/blueprint_style_guide.md` | LaTeX blueprint notation and section conventions |
 | `docs/ci-automation.md` | CI/CD workflow details (Claude, Codex, GitHub Actions) |
-| `docs/audit/` | Chapter-by-chapter Mathlib dependency scouting reports |
+| `audits/` | Chapter-by-chapter Mathlib dependency scouting reports |
 
 Consult the relevant doc before contributing to that area. The `docs/CONTRIBUTING.md` file is the primary entry point.
 
@@ -134,4 +156,4 @@ The project depends heavily on Mathlib for finite-dimensional complex matrices, 
 - Scout Mathlib first (`exact?`, `apply?`, `#find?`, grep Mathlib source)
 - Reuse existing Mathlib lemmas rather than reproving
 - Prefer Mathlib types over custom definitions
-- See `docs/audit/` for chapter-by-chapter Mathlib dependency analysis
+- See `audits/` for chapter-by-chapter Mathlib dependency analysis

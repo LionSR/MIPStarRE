@@ -735,7 +735,6 @@ private noncomputable def overAllOutcomesDistinctLineConsistentNonglobalMass
     avgOver (distinctTupleDistribution params k) (fun xs =>
       overAllOutcomesLineConsistentNonglobalLocal params strategy family u xs))
 
-
 /-- Local consistency-indicator mass after summing out the inserted vertical-line
 measurement.
 
@@ -845,7 +844,6 @@ private lemma nonglobal_insertedMass_le_badLineMass_add_lineConsistentLocal
       · simp [hglobal, hbad]
       · simp [hglobal, hbad]
   · exact (verticalLineMeasurementFamily params strategy u).outcome_pos f
-
 
 /-- The explicit line-answer version of the line-consistent residual is bounded by
 its consistency-indicator version, after summing out the vertical-line
@@ -1019,7 +1017,6 @@ private lemma overAllOutcomes_distinct_nonglobal_mass_le_bad_line_mass_add_lineC
           overAllOutcomesDistinctLineConsistentNonglobalMass params strategy family k := by
           rw [avgOver_add]
           rfl
-
 
 /-- A line answer matching every supported completed slice agrees with the vertical
 line induced by the interpolant chosen from the interpolation support.
@@ -1546,6 +1543,5 @@ lemma overAllOutcomes
   exact overAllOutcomes_of_reverse_mass_bound params strategy family
     eps delta gamma zeta k hd heps_nonneg hdelta_nonneg hgamma_nonneg
     hzeta_nonneg hreverse
-
 
 end MIPStarRE.LDT.Pasting

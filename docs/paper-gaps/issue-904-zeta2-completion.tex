@@ -1,0 +1,181 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+
+\input{docs/paper-gaps/command}
+
+\title{Issue 904: The Missing Completion Term in the Definition of
+\texorpdfstring{$\zeta_2$}{zeta2}}
+\author{}
+\date{2026-04-29}
+
+\newcommand{\dd}{\delta}
+\newcommand{\zz}{\zeta}
+
+\begin{document}
+\maketitle
+
+\section{The estimate for the completion step}
+
+This note concerns the scalar in the completion estimate in
+\cite[Section~\emph{The main induction step}]{Ji2020LowIndividualDegree}.
+\footnote{The issue record is
+\href{https://github.com/LionSR/MIPStarRE/issues/904}{GitHub issue \#904}; the
+corresponding repair is
+\href{https://github.com/LionSR/MIPStarRE/pull/909}{GitHub pull request \#909}.
+In the TeX source consulted here, the estimate occurs in
+\path{references/ldt-paper/inductive_step.tex}, lines 135--149.}
+We write \(X\approx_\eta Y\) for the state-dependent squared-distance relation,
+with respect to the shared state \(\psi\) fixed in the surrounding induction
+argument, and with error parameter \(\eta\).  The symbol \(I\) denotes the
+identity operator on the tensor factor which is not being measured.
+
+At this point in the induction, \(G^{\mathrm A}\) and \(G^{\mathrm B}\) are the
+polynomial-outcome measurements before projectivization.  Their
+self-consistency error, obtained in the preceding part of the induction, is
+denoted by \(\zeta_1\).  Applying the orthogonalization lemma for measurements to
+this self-consistency estimate gives, for each polynomial outcome \(g\),
+\begin{align*}
+  G^{\mathrm A}_g \otimes I
+    &\approx_{100\zeta_1^{1/4}}
+  P^{\mathrm A}_g \otimes I,
+    \tag{\path{lem:orthonormalization-main-lemma}}\\
+  I \otimes G^{\mathrm B}_g
+    &\approx_{100\zeta_1^{1/4}}
+  I \otimes P^{\mathrm B}_g.
+    \tag{\path{eq:G-self-consistency}}
+\end{align*}
+Here \(P^{\mathrm A}\) and \(P^{\mathrm B}\) are projective submeasurements.  The
+next step is to complete
+these submeasurements to projective measurements \(Q^{\mathrm A}\) and
+\(Q^{\mathrm B}\).  The value assigned there to the new error parameter is
+\(\zeta_2=200\zeta_1^{1/4}+40\zeta_1^{1/8}\), and the asserted estimate is
+\begin{align*}
+  G^{\mathrm A}_g \otimes I
+    &\approx_{\zeta_2}
+  Q^{\mathrm A}_g \otimes I,\\
+  I \otimes G^{\mathrm B}_g
+    &\approx_{\zeta_2}
+  I \otimes Q^{\mathrm B}_g.
+    \tag{\path{eq:G-with-Q-A}}
+\end{align*}
+
+\section{The completion calculation}
+
+The needed completion result is the completion proposition in
+\cite[Section~\emph{Preliminaries}]{Ji2020LowIndividualDegree}.
+\footnote{In the TeX source consulted here, this proposition occurs in
+\path{references/ldt-paper/preliminaries.tex}, lines 1101--1111, and has source label
+\path{prop:completing-to-measurement}.}
+In the special case needed here, \(A=\{A_a\}\) is a measurement, \(B=\{B_a\}\)
+is a submeasurement, and \(C=\{C_a\}\) is obtained from \(B\) by adding the
+missing mass \(I-\sum_a B_a\) to one distinguished outcome.  The proposition
+says that if
+\[
+  A_a\otimes I \approx_{\dd} B_a\otimes I
+\]
+and the measurement \(A\) has self-consistency error \(\zz\), then
+\[
+  A_a\otimes I
+    \approx_{2\dd+4\sqrt{\dd}+2\zz}
+  C_a\otimes I.
+\]
+
+For the projectivization step, \(A\) is the \(G\)-measurement, \(B\) is the
+projective submeasurement \(P\), and \(C\) is the completed measurement \(Q\).
+Thus \(\dd=100\zeta_1^{1/4}\), while the self-consistency parameter entering
+the completion proposition is \(\zz=\zeta_1\).  Substitution gives
+\begin{align*}
+  2\dd+4\sqrt{\dd}+2\zz
+    &=
+  2(100\zeta_1^{1/4})
+    +4\sqrt{100\zeta_1^{1/4}}
+    +2\zeta_1\\
+    &=
+  200\zeta_1^{1/4}
+    +40\zeta_1^{1/8}
+    +2\zeta_1 .
+\end{align*}
+Thus the scalar \(\zeta_2\) used in the completion estimate omits the final term
+\(2\zeta_1\).  This term is not a matter of notation: it is the contribution of
+the self-consistency error in the completion proposition.
+
+\section{Absorbing the missing term}
+
+In the non-vacuous branch of the cascade, the standing small-error hypotheses
+give \(0\leq\zeta_1\leq 1\).  In this range the omitted term is harmless at the
+scale already being used.  Indeed \(x\leq x^{1/8}\) for \(0\leq x\leq 1\), and
+hence \(2\zeta_1\leq 2\zeta_1^{1/8}\).  The literal completion error is
+therefore bounded by \(200\zeta_1^{1/4}+42\zeta_1^{1/8}\).
+
+Equivalently, the formal development keeps the exact composed error
+\(2(100\zeta^{1/4})+4\sqrt{100\zeta^{1/4}}+2\zeta\) and proves, for
+\(0\leq \zeta\leq 1\), the bound
+\[
+  2(100\zeta^{1/4})+4\sqrt{100\zeta^{1/4}}+2\zeta
+  \leq 200\zeta^{1/4}+42\zeta^{1/8}.
+\]
+Applying this with \(\zeta=\zeta_1\) gives the estimate needed for the
+completion step.\footnote{The corresponding Lean declarations are
+\path{orthonormalizeAndCompleteError_le_absorbedZeta2},
+\path{cascadeZeta2}, and
+\path{orthonormalizeAndCompleteError_zeta1_le_zeta2}.  They are implemented in
+\path{MIPStarRE/LDT/MakingMeasurementsProjective/ProjectivizationChain.lean} and
+\path{MIPStarRE/LDT/Test/ErrorCascade.lean}.}
+
+Thus the scalar denoted \(\zeta_2\) in the corrected cascade used in the formal
+proof is
+\(\zeta_2=200\zeta_1^{1/4}+42\zeta_1^{1/8}\), rather than the scalar with
+coefficient \(40\) in the completion estimate.
+
+\section{Relation with the blueprint and Lean}
+
+The blueprint follows the corrected scalar
+\cite[Chapter~\emph{The main induction step}]{MIPStarREBlueprint}.  Its cascade
+definition uses
+\(\zeta_2=200\zeta_1^{1/4}+42\zeta_1^{1/8}\), and explains that the coefficient
+\(42\) absorbs the residual term \(2\zeta_1\).\footnote{In the blueprint source,
+this is in \path{blueprint/src/chapter/ch10_induction.tex}, lines 433--451, with
+source label \path{def:main-formal-error-cascade}.}
+Later in the same chapter, the informal proof of the projectivization step again
+identifies the literal completion error as
+\[
+  2(100\zeta_1^{1/4})+4\sqrt{100\zeta_1^{1/4}}+2\zeta_1.
+\]
+Thus the blueprint agrees with the checked scalar calculation, rather than with
+the coefficient \(40\) in
+\cite[Section~\emph{The main induction step}]{Ji2020LowIndividualDegree}.
+
+The scalar correction is checked in the projectivization chain and in the final
+scalar cascade.  These two parts of the development contain the literal
+completion error, the absorption into the coefficient \(42\), and the downstream
+cascade bounds.
+
+The unfinished proof of the final theorem is not part of this scalar
+calculation.\footnote{At the date of this note, that unrelated unfinished proof is in
+\path{MIPStarRE/LDT/Test/MainTheorem.lean}.}  The calculation in
+\href{https://github.com/LionSR/MIPStarRE/issues/904}{issue \#904} has been
+isolated and accounted for in the checked scalar and
+projectivization lemmas.
+
+\section{Conclusion}
+
+The verdict is that
+\href{https://github.com/LionSR/MIPStarRE/issues/904}{issue \#904} records a
+real arithmetic omission in an intermediate error parameter, but not an
+obstruction arising from this scalar calculation to the final soundness estimate.
+
+The formula for \(\zeta_2\) used in the completion estimate lacks the term
+\(2\zeta_1\) arising from the completion proposition.  The corrected scalar
+\(200\zeta_1^{1/4}+42\zeta_1^{1/8}\) absorbs this term in the regime
+\(0\leq\zeta_1\leq 1\), and is still bounded by the error parameter appearing
+in the final soundness theorem.  The discrepancy is therefore a quantitative
+error in an intermediate scalar, not by itself an obstruction to the final
+theorem.
+
+\bibliographystyle{alpha}
+\bibliography{docs/paper-gaps/references}
+
+\end{document}

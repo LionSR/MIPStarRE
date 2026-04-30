@@ -1,4 +1,4 @@
-# Stale-issue audit for theorem / sorry trackers
+# Stale-issue audit for theorem and proof-obligation issues
 
 This document describes the periodic triage workflow for open formalization
 issues in this repo, and how to run
@@ -17,6 +17,11 @@ Issue #301 is a worked example — it stayed open long after its named
 blockers (`spectralTruncateAlmostProjective`, `orthonormalization`) had
 been resolved on `main`, and PR #647 had to do a retroactive cleanup pass.
 This audit script exists so humans can catch that drift earlier.
+
+New formalization issues should therefore cite the mathematical source at the
+time they are opened: paper or blueprint path, line number, theorem label, and a
+short quotation or precise paraphrase. The audit checks repository citations; it
+does not replace this mathematical source citation.
 
 ## What the script does
 
@@ -107,6 +112,9 @@ Stale-issue audit report
 issues scanned        : 147
 issues with citations : 92
 issues flagged stale  : 6
+triage note           : keep mathematical source citations precise
+                       (paper/blueprint path, line, label, and
+                       short quotation or precise paraphrase)
 
 #301 — Audit: Ch5 MMP — prove spectralTruncateAlmostProjective + …
 ------
@@ -122,13 +130,14 @@ and suitable for downstream automation.
 ## Recommended cadence and follow-up
 
 1. Let the scheduled GitHub Actions workflow run weekly, and also run the
-   audit manually before kicking off a new proof-closing round (monthly
+   audit manually before starting a new proof-closing round (monthly
    or before a campaign, whichever is sooner).
 2. For each flagged issue, open it and decide:
    - close it as resolved, optionally with a comment like
      `resolved in #...` or `stale on current main; close after audit`;
    - update the body so the cited file/line/declaration matches current
-     `main`;
+     `main`, and keep the paper or blueprint path, line, label, and source
+     paraphrase accurate;
    - leave it open if the flag is a false positive (e.g. a backticked
      word that happens to look like an identifier).
 3. Do **not** let the script close issues automatically.  Flags are a

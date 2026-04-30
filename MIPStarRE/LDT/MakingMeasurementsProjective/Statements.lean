@@ -5,8 +5,9 @@ import MIPStarRE.LDT.Test.Defs
 /-!
 # Section 5 — Statements
 
-Statement packages for Naimark dilation, one-measurement Naimark,
-orthonormalization, and projectivization.
+Statements for Naimark dilation, one-measurement Naimark, the
+orthogonalization lemma, rounding to projectors, rank reduction, and completing
+to measurement.
 
 ## Naimark dilation statements
 
@@ -38,9 +39,9 @@ def OneMeasNaimarkLemma (α : Type*) [Fintype α] [DecidableEq α]
 
 /-! ### Full Naimark dilation statement -/
 
-/-- Statement package carried by `NaimarkData`.
+/-- Statement carried by `NaimarkData`.
 
-This packages the questionwise one-measurement Naimark dilations used in the
+This records the questionwise one-measurement Naimark dilations used in the
 full theorem: each `A x` and `B y` is equipped with a local projective dilation
 preserving all single-outcome expectations. The full tensor-product assembly is
 tracked separately. -/
@@ -74,7 +75,7 @@ structure NaimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type*}
 
 /-! ### Orthonormalization statements -/
 
-/-- Output package for the intermediate almost-projective step. -/
+/-- Conclusion of the intermediate almost-projective step. -/
 structure AlmostProjMeasStatement {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -90,16 +91,17 @@ structure AlmostProjMeasStatement {Outcome : Type*}
   sourceAlmostProjective :
     ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ
 
-/-- Output package for the spectral-truncation step. -/
+/-- Conclusion of the truncation-function step in the proof of rounding to
+projectors. -/
 structure SpectralTruncationStatement {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) where
-  /-- The raw family obtained by spectral truncation of each effect. -/
+  /-- The operator family obtained by applying the truncation function to each effect. -/
   roundedFamily : OpFamily Outcome ι
   /-- Each truncated effect is a projection. -/
   projective : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (roundedFamily.outcome a)
-  /-- The raw truncated family stays close to the input measurement in
+  /-- The truncated family stays close to the input measurement in
   state-dependent operator distance. -/
   closeness :
     SDDOpRel ψ (uniformDistribution Unit)
@@ -113,7 +115,7 @@ structure SpectralTruncationStatement {Outcome : Type*}
     roundedFamily.total ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
       (1 : MIPStarRE.Quantum.Op ι)
 
-/-- Explicit input exposing the paper's spectral truncation stage. -/
+/-- Explicit input exposing the paper's truncation-function stage. -/
 abbrev SpectralTruncationInput {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -122,7 +124,7 @@ abbrev SpectralTruncationInput {Outcome : Type*}
     (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ) →
       SpectralTruncationStatement ψ A ζ
 
-/-- Output package for the rounding-to-projective step. -/
+/-- Conclusion of the rounding-to-projective step. -/
 structure RoundedProjMeasStatement {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -199,13 +201,13 @@ noncomputable def optionCompletion {Outcome : Type*}
     (A : SubMeas Outcome ι) (a : Outcome) :
     (optionCompletion A).outcome (some a) = A.outcome a := rfl
 
-/-- Explicit input exposing only the remaining spectral-truncation and
+/-- Explicit input exposing only the remaining truncation-function and
 locality-preserving repair witnesses needed for the submeasurement version of
 `thm:orthonormalization`.
 
 The lifted/local descent is now formalized by
 `orthonormalizationMainLemma_local`; the only still-opaque inputs are the
-spectral truncation and late repair steps for the option-completed measurement
+truncation-function and late repair steps for the option-completed measurement
 `optionCompletion A`. Both fields live at error
 `consistencyToAlmostProjectiveError (2 * ζ)` because completing a
 `ζ`-strongly-self-consistent submeasurement to a measurement doubles the defect,
@@ -214,7 +216,7 @@ structure OrthonormalizationInput {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) (ζ : Error) where
-  /-- Spectral truncation on the option-completed measurement. -/
+  /-- Truncation-function step on the option-completed measurement. -/
   spectral :
     let Ahat : Measurement (Option Outcome) ι := optionCompletion A
     SpectralTruncationInput ψ (leftLiftedMeasurement (ιB := ι) Ahat)

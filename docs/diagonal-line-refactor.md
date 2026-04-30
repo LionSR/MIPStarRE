@@ -94,7 +94,7 @@ In particular:
   `axisParallelReparamInvariant*` / `diagonalReparamInvariant*` fields.
 - `AxisParallelLine` and `DiagonalLine` are treated in parallel under the same
   transport-covariant pattern.
-- `SymStrat.IsGood` now contains exactly the three paper-facing goodness bounds:
+- `SymStrat.IsGood` now contains exactly the three goodness bounds from the paper:
   `axisParallelTest`, `selfConsistencyTest`, and `diagonalLineTest`.
 - The Lean entry point `commutativityPoints` now has the intended paper-faithful
   hypothesis shape: the rebasing covariance is structural data inside the

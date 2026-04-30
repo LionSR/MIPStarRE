@@ -29,7 +29,7 @@ so the later `Q/X/XHat/P` layer can depend on it directly.
 
 `B` is a `ProjMeas` (not `Measurement`) because the proof relies on
 `Bₐ² = Bₐ` (projectivity) to collapse `diagB` to `totalMass`.
-In the paper's orthonormalization pipeline, `B` is always the
+In the paper's orthonormalization proof, `B` is always the
 projective reference measurement obtained from Naimark dilation
 (Theorem 5.1), so this is the natural type. -/
 lemma aLooksProjective {Outcome : Type*}
@@ -174,20 +174,20 @@ lemma truncationInequality (δ x : Error) :
       mul_nonneg (mul_nonneg (le_of_lt hδ) hx)
         (by linarith : (0 : ℝ) ≤ 1 - x)]
 
-/-- The spectral truncation error is nonnegative on nonnegative input. -/
+/-- The truncation error is nonnegative on nonnegative input. -/
 lemma spectralTruncationError_nonneg {ζ : Error} (hζ : 0 ≤ ζ) :
     0 ≤ spectralTruncationError ζ := by
   dsimp [spectralTruncationError]
   exact Real.rpow_nonneg hζ _
 
-/-- The spectral truncation error is `√ζ`. -/
+/-- The truncation error is `√ζ`. -/
 lemma spectralTruncationError_eq_sqrt (ζ : Error) :
     spectralTruncationError ζ = Real.sqrt ζ := by
   simp [spectralTruncationError, Real.sqrt_eq_rpow]
 
 /-- **Rounding to projectors** (`lem:projective-non-measurement`).
 
-This declaration now records the honest paper-facing statement consumed by the
+This declaration now records the honest statement from the paper consumed by the
 QXP rank-reduction layer: a chosen family `R_a` equipped with
 `RoundingToProjectorsWitness ψ A ζ R`. The abbrev gives that statement a stable
 Lean name for the blueprint and for later API cleanup, while downstream local
@@ -425,7 +425,7 @@ lemma projectiveLowRankSum_auxData_of_projectors {Outcome : Type uOutcome}
 projector submeasurement `∑_a R_a ≤ I`.
 
 This exact-projector branch is currently kept for the blueprint cross-reference
-to the paper-facing `r ≤ d` packaging; the public theorem routes through
+to the paper's `r ≤ d` statement; the public theorem routes through
 `projectiveLowRankSum_of_rank_bound` after #726. -/
 lemma projectiveLowRankSum_of_projectors {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
@@ -448,7 +448,7 @@ lemma projectiveLowRankSum_of_projectors {Outcome : Type uOutcome}
       q := R
       t := t }
   refine ⟨data, ?_⟩
-  refine ⟨?_, ?_, ?_, source_almost_projective, ?_, ?_, hAuxDim⟩
+  refine ⟨?_, ?_, ?_, source_almost_projective, ?_, ?_, ?_, ?_⟩
   · intro a
     exact hR.projective a
   · intro a
@@ -468,6 +468,9 @@ lemma projectiveLowRankSum_of_projectors {Outcome : Type uOutcome}
       QTotal data = R.total := rfl
       _ ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
           (1 : MIPStarRE.Quantum.Op ι) := hR.total_le
+  · simpa [Qa, data] using sum_rank_le_card_of_projectors_le_one
+      (R := R.outcome) (hproj := hR.projective) hsum_le_one
+  · simpa [data] using hAuxDim
 
 /-- Concrete rank-reduction producer once the rounded projectors already have
 total rank at most the ambient dimension. This is the `r ≤ d` branch of the
@@ -494,7 +497,7 @@ lemma projectiveLowRankSum_of_rank_bound {Outcome : Type uOutcome}
       q := R
       t := t }
   refine ⟨data, ?_⟩
-  refine ⟨?_, ?_, ?_, source_almost_projective, ?_, ?_, hAuxDim⟩
+  refine ⟨?_, ?_, ?_, source_almost_projective, ?_, ?_, ?_, ?_⟩
   · intro a
     exact hR.projective a
   · intro a
@@ -514,6 +517,8 @@ lemma projectiveLowRankSum_of_rank_bound {Outcome : Type uOutcome}
       QTotal data = R.total := rfl
       _ ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
           (1 : MIPStarRE.Quantum.Op ι) := hR.total_le
+  · simpa [Qa, data] using hrank
+  · simpa [data] using hAuxDim
 
 /-- Sum the rank-one spectral overlaps of all rounded projectors back into
 `ev ψ (∑_a R_a)`.  This isolates the dependent-sigma rewrite used in the
@@ -546,7 +551,7 @@ private lemma projectiveLowRankSum_truncationOverlap_eq_ev_sum {Outcome : Type u
           rw [ev_sum]
 
 /-- Evaluate the scalar total bound from the rounding witness on a normalized
-state, rewriting the spectral truncation error as `√ζ`. -/
+state, rewriting the truncation error as `√ζ`. -/
 private lemma projectiveLowRankSum_eval_totalBound {ι : Type uι}
     [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (hψ : ψ.IsNormalized) (ζ : Error) :
@@ -779,7 +784,7 @@ lemma projectiveLowRankSum_truncate {Outcome : Type uOutcome}
         q := Q
         t := t }
     refine ⟨data, ?_⟩
-    refine ⟨?_, ?_, ?_, source_almost_projective, ?_, ?_, hAuxDim⟩
+    refine ⟨?_, ?_, ?_, source_almost_projective, ?_, ?_, ?_, ?_⟩
     · intro a
       simpa [Q, Qa, data] using (onb a).subprojector_isProj (fiber a)
     · intro a
@@ -790,6 +795,8 @@ lemma projectiveLowRankSum_truncate {Outcome : Type uOutcome}
     · simp [Qa, QTotal, data, Q]
     · simpa [data] using hAQ
     · simpa [QTotal, data] using hQtotal_le
+    · simpa [Qa, data] using hrankQ
+    · simpa [data] using hAuxDim
 
 /-- **Degenerate empty-outcome branch** for `lem:projective-low-rank-sum`.
 
@@ -830,7 +837,7 @@ concrete witness of the statement `projectiveNonMeasurement ψ A ζ`. In the
 paper (orthonormalization.tex), Lem 5.5 begins exactly from the family `R_a`
 supplied by `lem:projective-non-measurement`, so the downstream QXP layer now
 threads that witness directly instead of passing through a separate bridge
-package.
+structure.
 
 The auxiliary space `ℂ^m` and the projective measurement
 `T_a = ∑_i |a,i⟩⟨a,i|` come from the subsequent

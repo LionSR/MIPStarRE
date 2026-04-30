@@ -1,5 +1,17 @@
 import MIPStarRE.LDT.SelfImprovement.Defs
 
+/-!
+# Section 9 self-improvement statements
+
+This file records the SDP, `addInU`, and orthonormalization interfaces used in
+the current formalization of the self-improvement theorem.
+
+## References
+
+- `blueprint/src/chapter/ch07_self_improvement.tex`
+- `references/ldt-paper/self_improvement.tex`
+-/
+
 namespace MIPStarRE.LDT.SelfImprovement
 
 open MIPStarRE.LDT
@@ -10,14 +22,14 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-! ## Operator and output packages -/
+/-! ## Operators and conclusions -/
 
-/-- A reduced SDP witness for the currently formalized self-improvement pipeline.
+/-- A reduced SDP witness for the currently formalized self-improvement argument.
 
 The paper's `lem:sdp` eventually supplies strong duality, complementary
 slackness, and a concrete matrix-level optimal witness. The current Lean
-pipeline only consumes the weaker facts recorded here: the primal witness is a
-full measurement (`T.total = 1`), the dual witness is PSD, and it dominates
+development only consumes the weaker facts recorded here: the primal witness is
+a full measurement (`T.total = 1`), the dual witness is PSD, and it dominates
 every averaged point operator. -/
 structure SdpOptimalPair (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -29,7 +41,7 @@ structure SdpOptimalPair (params : Parameters) [FieldModel params.q]
     ∀ g : Polynomial params,
       0 ≤ sdpDualSlackOperator params strategy Z g
 
-/-- Reduced output package for the currently formalized fragment of `lem:sdp`. -/
+/-- Reduced conclusion for the currently formalized fragment of `lem:sdp`. -/
 structure SdpStatement (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) : Prop where
   witness :
@@ -153,11 +165,11 @@ noncomputable def projectiveBoundednessGap (params : Parameters)
   ev strategy.state
     (projectiveResidualOperator params H Z)
 
-/-- Reduced output package for the currently formalized fragment of `lem:add-in-u`.
+/-- Reduced conclusion for the currently formalized fragment of `lem:add-in-u`.
 
 The paper statement quantifies over an auxiliary submeasurement `M`, the
 averaged family `H`, and a selection rule `S`, and proves a transfer inequality
-between two expectations. The current Lean pipeline only uses the downstream
+between two expectations. The current Lean development only uses the downstream
 global-variance corollary, which depends only on the SDP measurement `T` and
 the error parameters, so those unused inputs are omitted here. -/
 structure AddInUStatement (params : Parameters)
@@ -169,16 +181,17 @@ structure AddInUStatement (params : Parameters)
     pointConditionedGlobalVariance params strategy T.toSubMeas ≤
       selfImprovementVarianceError params eps delta
 
-/-- Reduced output package for the SDP + `addInU` stage of `lem:self-improvement-helper`.
+/-- Reduced conclusion for the SDP and `addInU` stage of
+`lem:self-improvement-helper`.
 
 This structure intentionally records only the guarantees produced directly by the
-current `sdp` + `addInU` pipeline: the SDP witness, the averaged construction of
+current `sdp` and `addInU` arguments: the SDP witness, the averaged construction of
 `H`, the reduced `addInU` variance bound, and the PSD / dual-feasibility facts
 for `Z`.
 
-The paper and blueprint package four additional helper-lemma guarantees
+The paper and blueprint state four additional helper-lemma guarantees
 (`completeness`, `pointConsistency`, strong self-consistency, and boundedness).
-Those do not yet come from this pipeline alone, so they are not fields here;
+Those do not yet come from these arguments alone, so they are not fields here;
 they should be supplied later by separate bridge lemmas that consume this reduced
 conclusion. -/
 structure SelfImprovementHelperConclusion (params : Parameters) [FieldModel params.q]
@@ -197,7 +210,7 @@ structure SelfImprovementHelperConclusion (params : Parameters) [FieldModel para
     ∀ g : Polynomial params,
       0 ≤ sdpDualSlackOperator params strategy Z g
 
-/-- Output package for `thm:self-improvement`. -/
+/-- Conclusion of `thm:self-improvement`. -/
 structure SelfImprovementConclusion (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (G : Measurement (Polynomial params) ι)
@@ -243,7 +256,7 @@ structure SelfImprovementConclusion (params : Parameters) [FieldModel params.q]
       (leftTensor (ι₂ := ι) Z)
       (selfImprovementError params eps delta)
 
-/-- Output package for the explicit bridge from measurement to submeasurement input. -/
+/-- Conclusion for the explicit bridge from measurement to submeasurement input. -/
 structure SelfImprovementSubMeasConclusion (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)
@@ -255,9 +268,9 @@ structure SelfImprovementSubMeasConclusion (params : Parameters) [FieldModel par
       SelfImprovementConclusion params strategy Gmeas H Z eps delta gamma nu
 
 /-- The final Section 9 fields not produced directly by the current
-`selfImprovementHelper` + `orthonormalization` pipeline.
+`selfImprovementHelper` and `orthonormalization` arguments.
 
-TODO: replace this temporary bridge package with the actual Section 9 transport
+TODO: replace this temporary bridge data with the actual Section 9 transport
 lemmas once the helper-stage strong self-consistency, data-processing, and
 boundedness/completeness arguments are formalized. -/
 structure SelfImprovementFinalFields (params : Parameters) [FieldModel params.q]
@@ -288,7 +301,7 @@ structure SelfImprovementFinalFields (params : Parameters) [FieldModel params.q]
       (selfImprovementError params eps delta)
 
 /-- The helper-stage strong self-consistency input still missing from the
-reduced wrapper chain. -/
+reduced theorem chain. -/
 abbrev HelperStrongSelfConsistencyInput (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (eps delta : Error) : Prop :=
   ∀ {T : Measurement (Polynomial params) ι}
@@ -299,7 +312,7 @@ abbrev HelperStrongSelfConsistencyInput (params : Parameters) [FieldModel params
         (constSubMeasFamily Hhat)
         (selfImprovementHelperError params eps delta)
 
-/-- The final orthonormalization input still required by the reduced wrapper
+/-- The final orthonormalization input still required by the reduced theorem
 chain.
 
 The top-level orthonormalization theorem is now proved from the paper's
@@ -316,7 +329,7 @@ abbrev OrthonormalizationInput (params : Parameters) [FieldModel params.q]
       (selfImprovementHelperError params eps delta)
 
 /-- The remaining Section 9 output fields still not produced directly by the
-reduced helper and orthonormalization wrappers. -/
+reduced helper and orthonormalization theorems. -/
 abbrev FinalFieldsInput (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (eps delta nu : Error) : Prop :=
   ∀ {T : Measurement (Polynomial params) ι}

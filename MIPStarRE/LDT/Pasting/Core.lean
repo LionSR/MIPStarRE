@@ -6,7 +6,7 @@ import MIPStarRE.LDT.Preliminaries.Triangles
 /-!
 # Section 12 pasting: core setup
 
-Initial pasting lemmas and consistency wrappers extracted from
+Initial pasting lemmas and consistency consequences extracted from
 `MIPStarRE.LDT.Pasting.Theorems`.
 -/
 
@@ -1198,6 +1198,5 @@ theorem gBotSelfConsistency
                             completePartRightFamily, completePartSubMeas,
                             leftPlacedSubMeas, rightPlacedSubMeas, T, hcomplete_outcome_T]
     _ ≤ zeta := hcomplete_total
-
 
 end MIPStarRE.LDT.Pasting

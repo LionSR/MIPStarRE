@@ -496,5 +496,4 @@ theorem hAConsistency_completed
   exact ⟨by
     simpa [hcompletedEval] using le_trans hcompleted.offDiagonalBound hsigma.le⟩
 
-
 end MIPStarRE.LDT.Pasting
