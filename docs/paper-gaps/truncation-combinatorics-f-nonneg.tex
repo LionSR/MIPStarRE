@@ -1,0 +1,116 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\setlength{\emergencystretch}{2em}
+
+\input{docs/paper-gaps/command}
+
+\title{The Nonnegativity Hypothesis in the Small-Overlaps Bound}
+\author{}
+\date{2026-04-30}
+
+\newcommand{\Small}{\mathsf{Small}}
+
+\begin{document}
+\maketitle
+
+\section{The assertion}
+
+This note concerns the bound on the sum over small overlaps in the rank-reduction
+step of the orthogonalization lemma,
+\cite[Section~\emph{Orthogonalization lemma}]{Ji2020LowIndividualDegree}.
+\footnote{The discrepancy recorded here was identified in
+\href{https://github.com/LionSR/MIPStarRE/issues/938}{GitHub issue \#938}.
+In the TeX source consulted here, the estimate occurs in
+\path{references/ldt-paper/orthonormalization.tex}, lines 606--612.}
+We use the notation of the cited source:
+the overlaps $o_{a,i}$ are defined by
+\[
+  o_{a,i} = \bra{\psi} (\ket{v_{a,i}}\bra{v_{a,i}} \ot I) \ket{\psi},
+\]
+where $\ket{\psi}$ is the state and each $\ket{v_{a,i}}$ is a unit vector from
+the range of a projector. The total number of overlap pairs is $r$, the set
+$\Small$ is the complement of the $d$ largest overlaps, and $\zeta$ is the
+self-consistency error parameter with $0\le \zeta\le 1/4$.
+
+At this point the paper asserts the estimate
+\begin{align}
+  \sum_{(a,i)\in\Small} o_{a,i}
+    &\le 4\sqrt{\zeta},
+      \tag{\path{eq:small-overlaps}}
+\end{align}
+using the auxiliary bounds
+\[
+  |\Small| \le 2\sqrt\zeta \cdot r,
+  \qquad
+  \sum_{a,i} o_{a,i} \le 1+2\sqrt\zeta,
+\]
+together with the fact that every overlap in $\Small$ is at most every overlap
+outside $\Small$. The proof of the auxiliary bounds uses the overlaps
+themselves; they are manifestly non-negative because each is an expectation of a
+positive operator against a state.
+
+\section{The abstraction in Lean}
+
+The formal development extracts the combinatorial content of the estimate and
+proves it for an arbitrary real-valued function, without assuming nonnegativity.
+\footnote{The formal lemma is
+\leanid{sum\_small\_le\_four\_sqrt} in
+\path{MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/TruncationCombinatorics.lean},
+lines 163--174. It is accompanied by two auxiliary lemmas
+\leanid{card\_mul\_sum\_small\_le} (lines 100--119) and
+\leanid{card\_univ\_mul\_sum\_compl\_le} (lines 125--148).}
+
+In the statement of the lemma, the overlaps are replaced by a function
+$f\colon \alpha\to \R$ on a finite set $\alpha$. The subset $L\subseteq\alpha$
+plays the role of the large overlaps (the complement of $\Small$), and the
+hypotheses are
+\begin{itemize}
+  \item $|L|=d$,  $d < |\alpha|$,  and
+        $|\alpha| \le (1+2\sqrt\zeta)\,d$;
+  \item every value on the complement $L^{\mathsf c}$ is at most every value on
+        $L$ (the ordering hypothesis);
+  \item $\sum_{x\in\alpha} f(x) \le 1+2\sqrt\zeta$ (the total estimate);
+  \item $0\le \zeta\le 1/4$.
+\end{itemize}
+The conclusion is
+\[
+  \sum_{s\in L^{\mathsf c}} f(s) \le 4\sqrt\zeta.
+\]
+The proof does not need the hypothesis that every $f(x)$ is non-negative. It
+uses only the ordering hypothesis, the total estimate, and the cardinality
+relations; the sign of $f$ plays no role in the calculation.
+
+\section{Comparison}
+
+In the paper, the function $o_{a,i}$ is non-negative by construction, so the
+implicit hypothesis $o_{a,i}\ge 0$ is automatically satisfied and the estimate
+is valid. The formal lemma is therefore strictly stronger than what the paper
+states: it has \emph{fewer} hypotheses (it drops the nonnegativity condition) and
+derives the same conclusion.
+
+The difference does not affect soundness. The formal proof of the
+orthogonalization lemma instantiates the combinatorial lemma with the actual
+overlaps $o_{a,i}$, which are indeed non-negative. In that instantiation the
+ordering and total-estimate hypotheses are verified from the properties of the
+overlaps, and the lemma then supplies the needed bound on the sum over the small
+entries.
+
+\section{Conclusion}
+
+There is no mathematical discrepancy. The formal lemma is a conservative
+strengthening of the argument in the paper. The paper's proof of the
+small-overlaps bound uses only the ordering hypothesis, the total estimate, and
+the cardinality relations; it never invokes the nonnegativity of the overlaps
+except through their definition. The formal development makes this explicit by
+removing the nonnegativity condition from the statement. In the application
+within the orthogonalization lemma, the stronger statement is specialized back to
+the non-negative overlaps, so the formal soundness argument remains faithful to
+the paper.
+
+\bibliographystyle{alpha}
+\bibliography{docs/paper-gaps/references}
+
+\end{document}
