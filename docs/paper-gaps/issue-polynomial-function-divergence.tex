@@ -1,8 +1,9 @@
-\documentclass{article}
+\documentclass[11pt]{article}
 
 \usepackage{amsmath,amssymb}
 \usepackage{xurl}
 \usepackage[hidelinks]{hyperref}
+\setlength{\emergencystretch}{2em}
 
 \input{docs/paper-gaps/command}
 
@@ -21,75 +22,75 @@ not Function Types}
 \section{The paper's definition}
 
 In \cite{Ji2020LowIndividualDegree}, an $m$-variate polynomial over
-$\mathbb{F}_q$ is defined as a \emph{function} $g:\mathbb{F}_q^m \to
-\mathbb{F}_q$ of the form
+$\mathbb{F}_q$ is defined as a \emph{function}
+$g:\mathbb{F}_q^m \to \mathbb{F}_q$ of the form
 \[
   g(x_1,\dots,x_m) = \sum_{i_1,\dots,i_m}
     c_{i_1,\dots,i_m} \cdot x_1^{i_1}\cdots x_m^{i_m},
 \]
-with coefficients $c_{i_1,\dots,i_m} \in \mathbb{F}_q$.
-\footnote{\path{references/ldt-paper/introduction.tex}, line~3.}
+with coefficients $c_{i_1,\dots,i_m} \in
+\mathbb{F}_q$.\footnote{See \path{references/ldt-paper/introduction.tex},
+line~3.}
 Individual degree $d$ means $i_1,\dots,i_m \le d$ for every nonzero
 coefficient. The set
 \[
   \polyfunc{m}{q}{d}
   \subset \{ \mathbb{F}_q^m \to \mathbb{F}_q \}
 \]
-is then the set of functions that admit such a representation.
-\footnote{\path{references/ldt-paper/preliminaries.tex}, lines 92--93.}
+is then the set of functions that admit such a
+representation.\footnote{See
+\path{references/ldt-paper/preliminaries.tex}, lines~92--93.}
 This is the standard convention in theoretical computer science:
 ``polynomial'' means a function that can be written as an algebraic
 polynomial.
 
 \section{The Lean formalization}
 
-The Lean development defines the predicate
-\path{HasLowIndividualDegree}\footnote{In
-\path{MIPStarRE/LDT/Basic/LinePolynomials.lean}, line~20.}
-as follows:
+The formal development defines a low-individual-degree
+predicate\footnote{The declaration \texttt{HasLowIndividualDegree}
+appears in \path{MIPStarRE/LDT/Basic/LinePolynomials.lean},
+line~20.} as follows:
 \[
-  \text{\texttt{HasLowIndividualDegree}}(g) := 
+  \text{\texttt{HasLowIndividualDegree}}(g) :=
   \exists\, p : \texttt{PolynomialModel}, 
-    (\forall i,  \operatorname{degreeOf}_i(p) \le d)
-    \wedge 
+    (\forall i,\ \operatorname{degreeOf}_i(p) \le d)
+    \wedge
     g = \operatorname{eval}(p).
 \]
-Here \texttt{PolynomialModel}\footnote{In
-\path{MIPStarRE/LDT/Basic/ParametersBase.lean}, line~300:
-\texttt{PolynomialModel} is an abbreviation for
-\texttt{MvPolynomial (Fin m) (Scalar params)}, that is, Mathlib's
-algebraic multivariate polynomial type over the chosen finite field.}
-is Mathlib's algebraic polynomial type \texttt{MvPolynomial} over the
-finite field, and $\operatorname{eval}$ is its coefficient-wise
-evaluation map to a function $\mathbb{F}_q^m \to \mathbb{F}_q$.
-Thus the predicate asserts exactly the paper's condition: the function
-$g$ has an algebraic polynomial representative of the right degree.
+Here the polynomial model is Mathlib's algebraic polynomial type over
+the chosen finite field,\footnote{The abbreviation
+\texttt{PolynomialModel} expands to
+\texttt{MvPolynomial (Fin m) (Scalar params)} in
+\path{MIPStarRE/LDT/Basic/ParametersBase.lean}, line~300.}
+and $\operatorname{eval}$ is its coefficient-wise evaluation map to a
+function $\mathbb{F}_q^m \to \mathbb{F}_q$. Thus the predicate asserts
+exactly the paper's condition: the function $g$ has an algebraic
+polynomial representative of the right degree.
 
 The earlier blueprint used a function-type representation for
 $\polyfunc{m}{q}{d}$, treating low-degree polynomials as a subtype of
 the function space. That representation has been corrected to the
 $\exists$ predicate above, which matches the paper's definition
 exactly.\footnote{The blueprint correction is visible in
-\path{blueprint/src/chapter/ch02\_test.tex} and
-\path{blueprint/src/chapter/ch03\_preliminaries.tex} where
-$\polyfunc{m}{q}{d}$ is the set of functions representable as an
+\path{blueprint/src/chapter/ch02_test.tex} and
+\path{blueprint/src/chapter/ch03_preliminaries.tex}, where
+$\polyfunc{m}{q}{d}$ is now the set of functions representable as an
 algebraic polynomial of individual degree $\le d$.}
 
 \section{Why algebraic polynomials?}
 
-The paper's proofs (and the Lean formalization) require algebraic
-polynomials for the Schwartz--Zippel lemma
-(\texttt{lem:schwartz-zippel-total-degree} in the paper). The Schwartz--Zippel lemma in Mathlib
-(\texttt{MvPolynomial.schwartzZippel}) operates on algebraic
-polynomials, not on arbitrary functions. Therefore the
-\path{HasLowIndividualDegree} predicate is the natural bridge: it
-takes a function~$g$ and extracts the algebraic polynomial~$p$ that
-witnesses its low individual degree, enabling the application of
-Schwartz--Zippel.
+The paper's proofs (and the formalization) require algebraic
+polynomials for the Schwartz--Zippel lemma.\footnote{Labelled
+\texttt{lem:schwartz-zippel-total-degree} in the paper, and available
+in Mathlib as \texttt{MvPolynomial.schwartzZippel}.}
+The Mathlib statement operates on algebraic polynomials, not on
+arbitrary functions. The low-individual-degree predicate is therefore
+the natural bridge: it takes a function~$g$ and extracts the algebraic
+polynomial~$p$ that witnesses its low individual degree, enabling the
+application of Schwartz--Zippel.
 
-The measurement families $G$, $A$, $B$, $L$ in the Lean code carry
-outcomes indexed by \emph{polynomials} (the type
-\texttt{Polynomial params}), and the evaluation maps
+The measurement families $G$, $A$, $B$, $L$ in the formalization carry
+outcomes indexed by \emph{polynomials}, and the evaluation maps
 $g \mapsto G_{g}$ respect the algebraic polynomial structure.
 This design closely follows the paper, where measurement outcomes are
 indexed by $g \in \polyfunc{m}{q}{d}$ and the Schwartz--Zippel step
@@ -97,13 +98,13 @@ uses algebraic properties of the polynomials.
 
 \section{Conclusion}
 
-The verdict is that the function-versus-algebraic-polynomial question
-does not represent a divergence. The paper defines polynomials as
-functions with a polynomial representative. The Lean code defines
-\path{HasLowIndividualDegree} as the existence of an algebraic
-polynomial representative. The two are mathematically equivalent.
-The earlier blueprint, which used function types directly, has been
-corrected to the $\exists$ predicate, eliminating the only discrepancy.
+\noindent\textbf{Verdict:} no divergence. The paper defines polynomials
+as functions with a polynomial representative; the formalization
+defines the low-individual-degree predicate as the existence of an
+algebraic polynomial representative. The two are mathematically
+equivalent. The earlier blueprint, which used function types directly,
+has been corrected to the $\exists$ predicate, eliminating the only
+discrepancy.
 
 \bibliographystyle{alpha}
 \bibliography{docs/paper-gaps/references}

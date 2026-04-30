@@ -1,8 +1,9 @@
-\documentclass{article}
+\documentclass[11pt]{article}
 
 \usepackage{amsmath,amssymb}
 \usepackage{xurl}
 \usepackage[hidelinks]{hyperref}
+\setlength{\emergencystretch}{2em}
 
 \input{docs/paper-gaps/command}
 
@@ -15,8 +16,8 @@
 \newcommand{\BAB}{\textit{BAB}}
 \newcommand{\closenessOfIP}{\text{closenessOfIP}}
 
-\title{Issue 760: The Ten-Step Scalar Chain in
-\texorpdfstring{$\mathtt{commDataProcessedG}$}{commDataProcessedG}}
+\title{Issue 760: The Ten-Step Scalar Chain in the Processed-$G$
+Commutativity Lemma}
 \author{}
 \date{\today}
 
@@ -25,15 +26,17 @@
 
 \section{The assertion}
 
-This note examines the evaluated-slice commutativity proof for
-Lemma~\texttt{lem:comm-data-processed-g}\footnote{The paper label is
-\path{lem:comm-data-processed-g} in
-\path{references/ldt-paper/commutativity-G.tex}, lines 16--47.}
-in \cite{Ji2020LowIndividualDegree}.
-The lemma states that, under the three hypotheses
-(consistency with $A$, strong self-consistency, and boundedness),
-the $G$ measurements approximately commute after evaluation for
-distinct point pairs. The conclusion is
+This note examines the evaluated-slice commutativity lemma for the
+processed $G$ measurements\footnote{The lemma carries the label
+\texttt{lem:comm-data-processed-g} in
+\path{references/ldt-paper/commutativity-G.tex}, lines~16--47, and is
+tracked in
+\href{https://github.com/LionSR/MIPStarRE/issues/760}{GitHub issue
+\#760}.}
+in \cite{Ji2020LowIndividualDegree}. The lemma states that, under the
+three hypotheses of consistency with $A$, strong self-consistency, and
+boundedness, the $G$ measurements approximately commute after
+evaluation for distinct point pairs. The conclusion is
 \begin{equation}\label{eq:processed-conclusion}
   \mathbb{E}_{\bu,\bv,\bx,\by} \sum_{a,b}
     \|(G^{\bx}_{[g(\bu)=a]} G^{\by}_{[h(\bv)=b]}
@@ -42,61 +45,63 @@ distinct point pairs. The conclusion is
   \leq
   \nu ,\qquad
   \nu = 48m (\sqrt{\gamma} + \sqrt{\zeta}).
-  \tag{\texttt{eq:processed-conclusion}}
 \end{equation}
 
 \section{The ten-step chain}
 
-The paper's proof (commutativity-G.tex, lines~48--130) expands the
-commutator square and isolates the $\ABAB$ term. The path from
-$\mathbb{E}[\sum \ABAB]$ to $\mathbb{E}[\sum \ABA]$ passes through
-ten approximation steps:
+The paper's proof expands the commutator square and isolates the
+$\ABAB$ term. The path from $\mathbb{E}[\sum \ABAB]$ to
+$\mathbb{E}[\sum \ABA]$ passes through ten approximation steps:
 \begin{enumerate}
   \item Apply $\closenessOfIP$ with $A = G^{\bu,\bx}_a \otimes I$ and
-    $B = I \otimes A^{\bu,\bx}_a$ (cost $2\sqrt{\zeta}$);
-  \item Swap $A^{\bv,\by}_b$ onto the right register
-    (cost $\sqrt{\zeta}$, \texttt{clm:g-comm-stability});
-  \item Insert Bob's second measurement via $\closenessOfIP$
-    (cost $2\sqrt{\zeta}$);
-  \item Apply point commutativity
-    (cost $6\sqrt{\gamma(m+1)}$, \texttt{thm:commutativity-points});
-  \item Remove the right-register $G^{\bx}$ total
-    (cost $\sqrt{\zeta} + 6\sqrt{\gamma(m+1)}$,
-     \texttt{clm:g-comm-stability2});
+    $B = I \otimes A^{\bu,\bx}_a$, at cost $2\sqrt{\zeta}$.
+  \item Swap $A^{\bv,\by}_b$ onto the right register, at cost
+    $\sqrt{\zeta}$.\footnote{Justified by the auxiliary claim
+    \texttt{clm:g-comm-stability} in the cited paper.}
+  \item Insert Bob's second measurement via $\closenessOfIP$, at cost
+    $2\sqrt{\zeta}$.
+  \item Apply point commutativity, at cost
+    $6\sqrt{\gamma(m+1)}$.\footnote{The point-commutativity theorem,
+    labelled \texttt{thm:commutativity-points}.}
+  \item Remove the right-register $G^{\bx}$ total, at cost
+    $\sqrt{\zeta} + 6\sqrt{\gamma(m+1)}$.\footnote{Justified by
+    \texttt{clm:g-comm-stability2}.}
   \item Reverse the $\closenessOfIP$ insertion of $A$ on the left
-    register (cost $4\sqrt{\zeta}$, steps~6--7 of the paper);
-  \item Post-process $G$ measurement outcomes
-    (cost $\sqrt{\zeta}$, eq:\texttt{new-fact-that-i-derived});
-  \item Reverse the second-coordinate post-processing
-    (cost $\sqrt{\zeta}$, eq:\texttt{new-fact-that-i-derived});
+    register, at cost $4\sqrt{\zeta}$ (steps~6--7 of the paper).
+  \item Post-process $G$ measurement outcomes, at cost
+    $\sqrt{\zeta}$.\footnote{Justified by an auxiliary fact derived
+    in the formalization.}
+  \item Reverse the second-coordinate post-processing, at cost
+    $\sqrt{\zeta}$.
 \end{enumerate}
 The individual error terms sum to
 $12\sqrt{\zeta} + 12\sqrt{\gamma(m+1)}$.
-Multiplying by~$2$ (from the commutator-square expansion
-eq:\texttt{eq:gcom8}) and simplifying $12\sqrt{m+1} \leq 24m$
-gives $\nu = 48m(\sqrt{\gamma}+\sqrt{\zeta})$.
+Multiplying by~$2$ (from the commutator-square expansion) and
+simplifying $12\sqrt{m+1} \leq 24m$ gives
+$\nu = 48m(\sqrt{\gamma}+\sqrt{\zeta})$.
 
 \section{The Lean formalization}
 
-The Lean lemma \texttt{commDataProcessedG}\footnote{The full path is
+The formal lemma replicates the same ten-step
+chain.\footnote{The declaration is
 \path{MIPStarRE.LDT.Commutativity.commDataProcessedG}, implemented in
 \path{MIPStarRE/LDT/Commutativity/ScalarApproximation/ProcessedG.lean},
-lines 1972--2004. The error parameter is
-\path{commDataProcessedGError} defined in
-\path{MIPStarRE/LDT/Commutativity/Scaffold/Core.lean} as
+lines~1972--2004; the error parameter
+\texttt{commDataProcessedGError}, defined in
+\path{MIPStarRE/LDT/Commutativity/Scaffold/Core.lean}, evaluates to
 $48\,m\,(\gamma^{1/2} + \zeta^{1/2})$.}
-replicates the same ten-step chain. Each paper step is recorded as a
-named \texttt{hphase} block and the final assembly (\texttt{hassemble})
-adds them with the factor~$2$ from the commutator-square expansion.
-The total matches the paper exactly.
+Each paper step is recorded as a named phase block, and the final
+assembly adds them with the factor~$2$ from the commutator-square
+expansion. The total matches the paper exactly.
 
 The one substep that deserves explicit mention is the transition from
-the $\BAB$ term to the $\ABA$ term. In the paper (line~395) this
-is justified by the projectivity of~$G$, which makes
+the $\BAB$ term to the $\ABA$ term. In the paper this is justified by
+the projectivity of~$G$, which makes
 $\mathbb{E}[\sum G^{\bx}_{[g(\bu)=a]} G^{\by}_{[h(\bv)=b]}]
 = \mathbb{E}[\sum G^{\by}_{[h(\bv)=b]} G^{\bx}_{[g(\bu)=a]}]$,
-an exact equality. The Lean proof uses the lemma
-\path{evaluatedSliceCommutation\_avg\_swap\_terms}\footnote{In
+an exact equality. The formal proof uses the corresponding swap
+lemma\footnote{The lemma
+\texttt{evaluatedSliceCommutation\_avg\_swap\_terms} in
 \path{MIPStarRE/LDT/Commutativity/EvaluatedSliceCommutation/Averages.lean},
 line~217.}
 which proves
@@ -107,13 +112,11 @@ paper's step.
 
 \section{Conclusion}
 
-The verdict is that
-\href{https://github.com/LionSR/MIPStarRE/issues/760}{issue \#760}
-records no mathematical divergence. The Lean ten-step chain follows
-the paper's proof step-by-step, uses the same lemmas
-(\texttt{closenessOfIP}, \texttt{commutativityPoints},
-\texttt{gCommStability}), and achieves the same total error bound
-$48m(\sqrt{\gamma}+\sqrt{\zeta})$. The swap identity
+\noindent\textbf{Verdict:} no mathematical divergence. The Lean
+ten-step chain follows the paper's proof step-by-step, uses the same
+auxiliary lemmas (closeness of inner products, point commutativity,
+and $G$-commutativity stability), and achieves the same total error
+bound $48m(\sqrt{\gamma}+\sqrt{\zeta})$. The swap identity
 $\operatorname{avgBAB} = \operatorname{avgABA}$ is an exact equality in
 both the paper and the formalization. This note therefore documents a
 successful alignment, not a gap.
