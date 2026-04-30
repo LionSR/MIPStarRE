@@ -1,11 +1,26 @@
 import MIPStarRE.LDT.GlobalVariance.Theorems.TransportChain
+
 namespace MIPStarRE.LDT.GlobalVariance
+
 open MIPStarRE.LDT
 open MIPStarRE.LDT.Preliminaries
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
+
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+/-! # Main variance theorem wrappers and matrix-level counterparts
+
+This module contains the high-level theorem wrappers for
+`lem:local-variance-of-points`, `lem:global-variance-of-points`, and
+their matrix-level counterparts. These combine the algebraic identities,
+collision expansions, and transport estimates from the preceding modules
+into the final statement packages used by downstream consumers.
+
+## Matrix statement wrappers
+-/
+
 private lemma matrixGeneralizeB_of_pointwise
     (params : Parameters)
     [FieldModel params.q]

@@ -1,11 +1,23 @@
 import MIPStarRE.LDT.GlobalVariance.Theorems.CollisionExpansion
+
 namespace MIPStarRE.LDT.GlobalVariance
+
 open MIPStarRE.LDT
 open MIPStarRE.LDT.Preliminaries
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
+
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+/-! # Good-strategy self-consistency transport
+
+This module contains the good-strategy interfaces that establish the
+`2δ` and `2ε` approximation steps for the six-step local-variance
+transport chain in `lem:local-variance-of-points`
+(`expansion.tex`, lines 300--311).
+-/
+
 lemma ev_adjoint_sub_swap
     {κ : Type*} [Fintype κ] [DecidableEq κ]
     (ψ : QuantumState κ) (X Y : MIPStarRE.Quantum.Op κ) :

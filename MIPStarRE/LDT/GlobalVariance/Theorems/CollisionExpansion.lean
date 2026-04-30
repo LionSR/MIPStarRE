@@ -1,12 +1,21 @@
 import MIPStarRE.LDT.GlobalVariance.Theorems.AlgebraicIdentity
+
 namespace MIPStarRE.LDT.GlobalVariance
+
 open MIPStarRE.LDT
 open MIPStarRE.LDT.Preliminaries
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
+
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
-/-! ## Abstract theorem wrappers -/
+
+/-! # Collision expansion and Schwartz-Zippel bounds
+
+This module contains the `generalizeB` theorem wrappers, finite reparametrization
+and distribution bookkeeping, and the Schwartz-Zippel collision expansion that
+bounds the line-collision residual.
+-/
 
 private lemma generalizeB_of_pointwise
     (params : Parameters)
