@@ -20,7 +20,7 @@
 \section{The primal feasible set in the paper}
 
 This note concerns the semidefinite program used in the self-improvement
-argument of \cite[Section~\emph{A semidefinite program}]{Ji2020LowIndividualDegree}.
+argument of \cite[Subsection~\emph{A semidefinite program}]{Ji2020LowIndividualDegree}.
 \footnote{The mismatch was recorded in
 \href{https://github.com/LionSR/MIPStarRE/issues/196}{GitHub issue \#196} and
 repaired in
@@ -127,6 +127,14 @@ paper's uniform strict-feasibility witness.}
 That completion is a downstream packaging step. It is not the primal feasible
 set of the SDP.
 
+The informal blueprint already agrees with the paper on this point: its SDP
+lemma states the primal with $\sum_g T_g\le I$, and only afterwards states the
+existence of an optimal pair whose total is $I$. The resolved mismatch was
+therefore confined to the formal encoding, not a three-way disagreement with the
+blueprint.
+\footnote{See \path{blueprint/src/chapter/ch07_self_improvement.tex}, lines
+281--304.}
+
 At the statement layer, the reduced SDP wrapper exposes the primal witness as a
 submeasurement: \path{SdpStatement.witness} quantifies over
 $T$ of type \path{SubMeas}. The associated witness record still contains a
@@ -141,8 +149,11 @@ coercing it back to a submeasurement; see
 The matrix-level realization follows the same convention: primal variables are
 matrix submeasurements, while the optimal-witness record stores the additional
 identity-total conclusion.
-\footnote{See \path{MatrixSdpOptimalWitness} in
-\path{MIPStarRE/LDT/SelfImprovement/MatrixRealization.lean}, lines 42--96.}
+\footnote{The matrix-level primal-side declarations
+\path{matrixSdpPrimalContributionOperator}, \path{matrixSdpPrimalObjective},
+\path{matrixSdpComplementarySlacknessDefect}, and \path{MatrixSdpOptimalWitness}
+are in \path{MIPStarRE/LDT/SelfImprovement/MatrixRealization.lean}, lines
+42--96; the witness structure itself is in lines 81--96.}
 
 \section{Conclusion}
 
