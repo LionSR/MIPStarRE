@@ -34,7 +34,7 @@ find MIPStarRE -name '*.lean' -type f -print0 | xargs -0 wc -l | sort -nr | head
 Sorry inventory:
 
 ```bash
-git grep -n '\bsorry\b' -- '*.lean'
+git grep -n -w 'sorry' -- '*.lean'
 ```
 
 Direct-import/dependent inventory:
@@ -208,7 +208,7 @@ Validation for the future PR:
 lake env lean MIPStarRE/LDT/Commutativity/Transport/FullSlice.lean
 lake env lean MIPStarRE/LDT/Commutativity/Main/Auxiliary.lean
 lake env lean MIPStarRE/LDT/Commutativity/Theorems.lean
-git grep -nE '\b(sorry|axiom|unsafe_axiom|admit)\b' -- '*.lean'
+git grep -n -w -e sorry -e axiom -e unsafe_axiom -e admit -- '*.lean'
 ```
 
 ### P2: `GlobalVariance/Theorems/Results.lean`
@@ -237,7 +237,7 @@ Validation for the future PR:
 ```bash
 lake env lean MIPStarRE/LDT/GlobalVariance/Theorems/Results.lean
 lake env lean MIPStarRE/LDT/SelfImprovement/Theorems/Results.lean
-git grep -nE '\b(sorry|axiom|unsafe_axiom|admit)\b' -- '*.lean'
+git grep -n -w -e sorry -e axiom -e unsafe_axiom -e admit -- '*.lean'
 ```
 
 ### P3: `Pasting/BridgeLemmas/LineInterpolation.lean`
@@ -267,7 +267,7 @@ Validation for the future PR:
 ```bash
 lake env lean MIPStarRE/LDT/Pasting/BridgeLemmas/LineInterpolation.lean
 lake env lean MIPStarRE/LDT/Pasting/BridgeLemmas/HBConsistency.lean
-git grep -nE '\b(sorry|axiom|unsafe_axiom|admit)\b' -- '*.lean'
+git grep -n -w -e sorry -e axiom -e unsafe_axiom -e admit -- '*.lean'
 ```
 
 ## Deferred high-LOC files
@@ -371,7 +371,7 @@ For each Lean split PR:
 5. Run the proof-integrity grep:
 
    ```bash
-   git grep -nE '\b(sorry|axiom|unsafe_axiom|admit)\b' -- '*.lean'
+   git grep -n -w -e sorry -e axiom -e unsafe_axiom -e admit -- '*.lean'
    ```
 
 6. If any moved public theorem is critical, run a small `#print axioms` scratch check before pushing.
