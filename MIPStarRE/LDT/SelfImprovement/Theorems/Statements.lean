@@ -349,7 +349,7 @@ abbrev FinalFieldsInput (params : Parameters) [FieldModel params.q]
 
 /-! ## Self-improvement bridge inputs
 
-These structures package the remaining unproven assumptions of the current
+This structure packages the remaining unproven assumptions of the current
 `selfImprovement` theorem, so that the `mainFormal` chain can name a single
 bridge-package hypothesis rather than three independent `Prop` fields. -/
 

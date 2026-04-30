@@ -3993,7 +3993,7 @@ theorem mainFormal
   -- theorem is vacuous; otherwise the pass condition gives `0 ≤ ε`, while
   -- `mainFormalError < 1` rules out `ε > 1` and `d > q`.
   --
-  -- After issue #931 (this PR) and PR #950 (OrthonormalizationMatchMassPreservation):
+  -- After this PR (progress toward #931) and PR #950 (OrthonormalizationMatchMassPreservation):
   -- the match-mass monotonicity structure
   -- `MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation`
   -- and the lift theorem `of_submeasurement_match_mass_and_completion` are now

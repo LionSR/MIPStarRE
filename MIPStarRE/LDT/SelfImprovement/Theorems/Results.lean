@@ -291,7 +291,7 @@ theorem selfImprovementFromSubMeas
 
 /-- `SelfImprovementBridgeInputs` + `IsGood` is sufficient to call
 `selfImprovement` and obtain the full `SelfImprovementConclusion`. -/
-theorem selfImprovement_fromBridgeInputs
+theorem selfImprovementFromBridgeInputs
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
