@@ -28,7 +28,7 @@ This repository uses [Claude Code](https://docs.anthropic.com/en/docs/claude-cod
 
 ## What Problem Does This Solve?
 
-When working on Lean 4 proofs and blueprint documentation, a typical PR cycle looks like:
+When working on Lean 4 proofs, blueprint documentation, and paper-gap notes, a typical PR cycle looks like:
 
 1. Push code
 2. CI fails (build error, incomplete proof, blueprint compilation error)
@@ -51,7 +51,7 @@ When you push to a PR branch, several things happen in parallel:
   You push to a PR branch
   │
   │  ┌──────────────────────────────────────────────────────────────┐
-  │  │ Runs on every PR push to Lean/blueprint files                │
+  │  │ Runs on every PR push to Lean, blueprint, or paper-gap files │
   ├──┤                                                              │
   │  │  Claude Code Review (claude-code-review.yml)                 │
   │  │  Reviews code for correctness, style, and completeness.      │
@@ -136,9 +136,9 @@ Here is exactly what happens:
 
 ### Claude Code Review (`claude-code-review.yml`)
 
-**What it does**: Automatically reviews PR changes for proof correctness, Mathlib style, type safety, performance, and documentation.
+**What it does**: Automatically reviews PR changes for proof correctness, Mathlib style, type safety, performance, mathematical exposition, and documentation.
 
-**When it runs**: On every `pull_request` event (`opened`, `synchronize`, `ready_for_review`, `reopened`) that touches Lean source files (`MIPStarRE/**/*.lean`, `MIPStarRE.lean`, `lakefile.toml`, `lean-toolchain`) or blueprint files (`blueprint/src/**/*.tex`).
+**When it runs**: On every `pull_request` event (`opened`, `synchronize`, `ready_for_review`, `reopened`) that touches Lean source files (`MIPStarRE/**/*.lean`, `MIPStarRE.lean`, `lakefile.toml`, `lean-toolchain`), blueprint files (`blueprint/src/**/*.tex`), or paper-gap notes and bibliographies (`docs/paper-gaps/**/*.tex`, `docs/paper-gaps/**/*.bib`).
 
 **What it checks**:
 - Are there any `sorry`s introduced?
@@ -147,6 +147,7 @@ Here is exactly what happens:
 - Could any proofs cause timeouts or use unnecessarily expensive tactics?
 - Are new lemmas general enough to upstream to Mathlib?
 - Do new definitions and theorems have docstrings?
+- Do paper-gap notes give a self-contained mathematical account, faithful citations, comparison with the blueprint and Lean statement when relevant, and a clear verdict?
 
 **Thread management**: When triggered by a new push (`synchronize`), the review checks its own previous comments. If a previous bot comment has been addressed by the new commits, it resolves that thread automatically. It never resolves threads authored by humans.
 
@@ -317,7 +318,7 @@ python3 scripts/audit_readme_freshness.py --root . --readme README.md
 
 **What it does**: After a Claude Code Review completes, this workflow reads the review comments and asks Claude to fix each issue. This creates the fixed-point loop described above.
 
-**When it runs**: After the "Claude Code Review (Lean)" workflow completes successfully, **only if** the PR has the `auto-fix-claude` label.
+**When it runs**: After the "Claude Code Review" workflow completes successfully, **only if** the PR has the `auto-fix-claude` label.
 
 **What Claude does**:
 - Reads inline review comments and the review summary from the latest cycle

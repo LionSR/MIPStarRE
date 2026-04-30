@@ -8,7 +8,7 @@ name: Auto Fix (Lean)
 
 on:
   workflow_run:
-    workflows: ["Lean Action CI", "Lint blueprint", "Claude Code Review (Lean)"]
+    workflows: ["Lean Action CI", "Lint blueprint", "Claude Code Review"]
     types:
       - completed
   # GitHub Actions cannot filter pull_request:labeled by label name here.
@@ -40,7 +40,7 @@ jobs:
        github.event.workflow_run.pull_requests[0] &&
        github.event.workflow_run.head_repository.full_name == github.repository &&
        (github.event.workflow_run.conclusion == 'failure' ||
-        github.event.workflow_run.name == 'Claude Code Review (Lean)')) ||
+        github.event.workflow_run.name == 'Claude Code Review')) ||
       (github.event_name == 'pull_request' && github.event.label.name == 'auto-fix-claude' &&
        github.event.pull_request.state == 'open' &&
        github.event.pull_request.head.repo.full_name == github.repository)
@@ -83,7 +83,7 @@ jobs:
               } else if (wr.name === 'Lint blueprint' && wr.conclusion === 'failure') {
                 core.setOutput('run_blueprint_fix', 'true');
                 core.setOutput('blueprint_run_id', String(wr.id));
-              } else if (wr.name === 'Claude Code Review (Lean)' && wr.conclusion === 'success') {
+              } else if (wr.name === 'Claude Code Review' && wr.conclusion === 'success') {
                 // Review fix requires the "auto-fix-claude" label
                 const { data: pr } = await github.rest.pulls.get({
                   owner: context.repo.owner,
@@ -479,14 +479,18 @@ jobs:
                - Add missing docstrings where requested.
                - Fix type mismatches or tactic failures.
                - Improve proof structure as suggested.
+               - Revise paper-gap notes so that they satisfy `docs/paper-gaps/policy.tex`.
             6. Your goal is to fully close every incomplete lemma/theorem, not just address surface-level comments. Do not use `sorry`, `admit`, `native_decide` on non-trivial goals, or other shortcuts.
-            7. Run `lake build` to verify your fixes compile with zero errors and zero `sorry`s.
+            7. Run `lake build` when the fix changes Lean files. For paper-gap-only fixes,
+               verify the edited LaTeX document when this is practical, and otherwise state
+               why no Lean build was needed.
             8. When your fixes add or complete (remove sorry from) theorems, lemmas, or definitions, update the corresponding blueprint entry in `blueprint/src/chapter/` — add `\lean{DeclarationName}` and `\leanok` tags for new results, or add `\leanok` to `\begin{proof}` for newly proven results.
             9. Make minimal, targeted fixes. Do not refactor unrelated code.
             10. Commit and push your fix to the current branch. Prefix commit messages with `[claude-review-fix]`.
             11. After pushing, use the GitHub MCP tools to post a comment on the PR with:
                - A summary of which review items were addressed, stated in mathematical
-                 language when the review concerns a theorem, lemma, definition, or proof.
+                 language when the review concerns a theorem, lemma, definition, proof,
+                 or paper-gap assertion.
                - Paper or blueprint path, line, label, and short quotation or precise
                  paraphrase for any changed mathematical statement, when available.
                - If you used or discovered Mathlib lemmas during the fix, include a **Mathlib Audit**
@@ -502,9 +506,10 @@ jobs:
             - Modularity: keep new lemmas general; do not duplicate existing Mathlib results.
             - Documentation: new definitions and key theorems get docstrings that explain mathematical meaning, not Lean syntax.
             - Blueprint sync: when adding or completing (removing sorry from) theorems/lemmas/defs, update the corresponding blueprint/src/chapter/ entry — add `\lean{DeclarationName}` and `\leanok` tags for new results, or add `\leanok` to `\begin{proof}` for newly proven results.
+            - Paper-gap notes: changed notes under docs/paper-gaps/ must follow `docs/paper-gaps/policy.tex`; they should introduce notation, state the cited assertion, isolate the mathematical obstruction, compare with the blueprint and Lean statement when relevant, and give a precise verdict for third-party mathematical readers.
             If you cannot satisfy a BLOCKER category, STOP and post a PR comment explaining the obstacle instead of pushing a half-fix.
 
           claude_args: |
             --model claude-opus-4-7
             --allowedTools "Edit,Write,Read,Glob,Grep,Bash(lake build),Bash(lake exe cache get),Bash(lake update),Bash(lake env),Bash(lean *),Bash(elan *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git diff *),Bash(git status),Bash(gh pr *),Bash(gh api *),mcp__github__*"
-            --append-system-prompt "This is a Lean 4 / Mathlib repository. Fix only the issues raised in the review. Prefer minimal diffs. Hold your fix to the same 8-category quality bar used by Claude Code Review (proof integrity, proof correctness, Mathlib style, type safety, performance, modularity, documentation, blueprint sync). See docs/PROOF_INTEGRITY.md for the full integrity ruleset. Use your judgment on when Mathlib scouting is warranted — it is essential when closing sorrys or rewriting proofs, but unnecessary for naming fixes, docstrings, or style changes. When scouting IS needed, use exact?, apply?, rw?, simp?, and grep Mathlib source files. Reuse Mathlib lemmas rather than reproving from scratch. If a mathematical result looks wrong, too strong, or suspiciously general, scout the LaTeX sources in references/ where the original theorems and proofs are stored — read the relevant sections, compare hypotheses and conclusions, and cite the specific paper/section when flagging a discrepancy. Generated PR comments should name the theorem, lemma, definition, or proof obligation directly and cite paper or blueprint path, line, label, and short quotation or precise paraphrase when available. You MUST fully close every lemma and theorem — never leave sorry, admit, native_decide on non-trivial goals, or any placeholder. Validate all changes with lake build before committing. Use GitHub MCP tools (mcp__github__*) to comment on the PR."
+            --append-system-prompt "This is a Lean 4 / Mathlib repository. Fix only the issues raised in the review. Prefer minimal diffs. Hold your fix to the same quality bar used by Claude Code Review (proof integrity, proof correctness, Mathlib style, type safety, performance, modularity, documentation, blueprint sync, and paper-gap notes). See docs/PROOF_INTEGRITY.md for the full integrity ruleset and docs/paper-gaps/policy.tex for paper-gap note standards. Use your judgment on when Mathlib scouting is warranted — it is essential when closing sorrys or rewriting proofs, but unnecessary for naming fixes, docstrings, style changes, or paper-gap prose unless a formal statement is involved. When scouting IS needed, use exact?, apply?, rw?, simp?, and grep Mathlib source files. Reuse Mathlib lemmas rather than reproving from scratch. If a mathematical result looks wrong, too strong, or suspiciously general, scout the LaTeX sources in references/ where the original theorems and proofs are stored — read the relevant sections, compare hypotheses and conclusions, and cite the specific paper/section when flagging a discrepancy. Generated PR comments should name the theorem, lemma, definition, proof obligation, or paper-gap assertion directly and cite paper or blueprint path, line, label, and short quotation or precise paraphrase when available. You MUST fully close every lemma and theorem — never leave sorry, admit, native_decide on non-trivial goals, or any placeholder. Validate Lean changes with lake build before committing. Use GitHub MCP tools (mcp__github__*) to comment on the PR."
