@@ -508,24 +508,52 @@ structure IsGood {params : Parameters}
 
 end AnswerSymStrat
 
-/-- Paper-local (not necessarily symmetric) projective strategy data.
+/-- Paper-faithful two-space projective strategy data.
 
-Carries `isNormalized` so that symmetrization constructors
-(`leftAsSymmetric`, `rightAsSymmetric`, `classicalRoleSymmStrategy`)
-can discharge the matching `SymStrat.isNormalized` field without
-threading an extra hypothesis. -/
+This matches the paper's `def:general-projective-strategy`
+(`test_definition.tex`, lines 98--115): Alice's and Bob's measurements act on
+separate local carriers `ιA` and `ιB`, and the bipartite state lives on
+`ιA × ιB` without a built-in swap symmetry.
+
+The `isNormalized` field records that the bipartite state's density operator
+has normalized trace `1`. -/
 structure ProjStrat (params : Parameters) [FieldModel params.q]
-    (ι : Type*) [Fintype ι] [DecidableEq ι] where
-  state : QuantumState (ι × ι)  -- bipartite state on ℋ ⊗ ℋ
-  permInvState : PermInvState state
-  densityFixed : swapDensity state.density = state.density
+    (ιA : Type*) [Fintype ιA] [DecidableEq ιA]
+    (ιB : Type*) [Fintype ιB] [DecidableEq ιB] where
+  /-- Bipartite state on the tensor product of Alice's and Bob's local carriers. -/
+  state : QuantumState (ιA × ιB)
+  /-- The bipartite state's density operator is trace-normalized. -/
   isNormalized : state.IsNormalized
-  pointMeasurementA : IdxProjMeas (Point params) (Fq params) ι
-  axisParallelMeasurementA : AxisParallelCovariantMeasurement params ι
-  diagonalMeasurementA : DiagonalCovariantMeasurement params ι
-  pointMeasurementB : IdxProjMeas (Point params) (Fq params) ι
-  axisParallelMeasurementB : AxisParallelCovariantMeasurement params ι
-  diagonalMeasurementB : DiagonalCovariantMeasurement params ι
+  /-- Alice's point-measurement family, acting on `ιA`. -/
+  pointMeasurementA : IdxProjMeas (Point params) (Fq params) ιA
+  /-- Alice's axis-parallel-line measurement family, acting on `ιA`. -/
+  axisParallelMeasurementA : AxisParallelCovariantMeasurement params ιA
+  /-- Alice's diagonal-line measurement family, acting on `ιA`. -/
+  diagonalMeasurementA : DiagonalCovariantMeasurement params ιA
+  /-- Bob's point-measurement family, acting on `ιB`. -/
+  pointMeasurementB : IdxProjMeas (Point params) (Fq params) ιB
+  /-- Bob's axis-parallel-line measurement family, acting on `ιB`. -/
+  axisParallelMeasurementB : AxisParallelCovariantMeasurement params ιB
+  /-- Bob's diagonal-line measurement family, acting on `ιB`. -/
+  diagonalMeasurementB : DiagonalCovariantMeasurement params ιB
 
+/-- Same-space projective strategy with built-in permutation invariance.
+
+Extends the general two-space `ProjStrat` (where `ιA = ιB = ι`) with the
+swap-symmetry data (`permInvState`, `densityFixed`) needed by the role-register
+symmetrization pipeline (`leftAsSymmetric`, `rightAsSymmetric`,
+`classicalRoleSymmStrategy`).
+
+This is the symmetrizable special case that the current symmetrization
+infrastructure (`StrategyRole`, `SymmetrizationBridge`) targets. The paper's
+`def:projective-strategy` is the general `ProjStrat` without symmetry
+assumptions; `SameSpaceProjStrat` adds those assumptions for the same-space
+sub-pipeline used by `mainFormal`. -/
+structure SameSpaceProjStrat (params : Parameters) [FieldModel params.q]
+    (ι : Type*) [Fintype ι] [DecidableEq ι] extends ProjStrat params ι ι where
+  /-- The density operator is invariant under swapping tensor factors. -/
+  permInvState : PermInvState state
+  /-- Cached swap equality for `simp`. -/
+  densityFixed : swapDensity state.density = state.density
 
 end MIPStarRE.LDT
