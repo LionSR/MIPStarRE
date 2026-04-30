@@ -291,4 +291,131 @@ def restrictAtHeight (params : Parameters) [FieldModel params.q]
 
 end DiagonalLinePolynomial
 
+/-! ## Paper-level diagonal-line answers -/
+
+/-- Paper-level diagonal-line answers as functions on the line parameter.
+
+The existing `DiagonalLinePolynomial` alphabet records a degree bound on the
+univariate line polynomial.  For the slice restriction in
+`inductive_step.tex`, lines 436--455, the paper uses the underlying line
+function: restricting a slice-preserving ambient line is total at the function
+level, while it is not total on the current degree-bounded polynomial subtype. -/
+abbrev DiagonalLineAnswer (params : Parameters) := Fq params → Fq params
+
+namespace DiagonalLineAnswer
+
+/-- Reparametrize a paper-level diagonal-line answer by translating the line parameter. -/
+def reparamAt {params : Parameters} [FieldModel params.q]
+    (f : DiagonalLineAnswer params) (t : Fq params) : DiagonalLineAnswer params :=
+  fun s => f (addCoord t s)
+
+@[simp] theorem reparamAt_apply {params : Parameters} [FieldModel params.q]
+    (f : DiagonalLineAnswer params) (t s : Fq params) :
+    reparamAt f t s = f (addCoord t s) :=
+  rfl
+
+@[simp] theorem reparamAt_zero {params : Parameters} [FieldModel params.q]
+    (f : DiagonalLineAnswer params) :
+    reparamAt f zeroCoord = f := by
+  funext s
+  simp [reparamAt, addCoord, zeroCoord]
+
+theorem reparamAt_reparamAt {params : Parameters} [FieldModel params.q]
+    (f : DiagonalLineAnswer params) (t s : Fq params) :
+    reparamAt (reparamAt f t) s = reparamAt f (addCoord t s) := by
+  funext r
+  simp [reparamAt, addCoord, add_left_comm, add_comm]
+
+/-- Reparametrization by translation is an equivalence on paper-level line answers. -/
+def reparamAtEquiv {params : Parameters} [FieldModel params.q]
+    (t : Fq params) : DiagonalLineAnswer params ≃ DiagonalLineAnswer params where
+  toFun := fun f => reparamAt f t
+  invFun := fun f => reparamAt f (subCoord zeroCoord t)
+  left_inv := by
+    intro f
+    simpa using reparamAt_reparamAt f t (subCoord zeroCoord t)
+  right_inv := by
+    intro f
+    simpa using reparamAt_reparamAt f (subCoord zeroCoord t) t
+
+/-- Extend a paper-level diagonal-line answer to the slice at height `x`. -/
+def appendAtHeight (params : Parameters) (f : DiagonalLineAnswer params)
+    (_x : Fq params) : DiagonalLineAnswer params.next :=
+  fun t => f t
+
+/-- Restrict a paper-level ambient diagonal-line answer to the slice at height `x`. -/
+def restrictAtHeight (params : Parameters) (f : DiagonalLineAnswer params.next)
+    (_x : Fq params) : DiagonalLineAnswer params :=
+  fun t => f t
+
+@[simp] theorem appendAtHeight_apply (params : Parameters)
+    (f : DiagonalLineAnswer params) (x : Fq params) (t : Fq params.next) :
+    appendAtHeight params f x t = f t :=
+  rfl
+
+@[simp] theorem restrictAtHeight_apply (params : Parameters)
+    (f : DiagonalLineAnswer params.next) (x : Fq params) (t : Fq params) :
+    restrictAtHeight params f x t = f t :=
+  rfl
+
+/-- Slice extension is an equivalence for paper-level diagonal-line answers. -/
+def appendAtHeightEquiv (params : Parameters) (x : Fq params) :
+    DiagonalLineAnswer params ≃ DiagonalLineAnswer params.next where
+  toFun := fun f => appendAtHeight params f x
+  invFun := fun f => restrictAtHeight params f x
+  left_inv := by
+    intro f
+    funext t
+    rfl
+  right_inv := by
+    intro f
+    funext t
+    rfl
+
+@[simp] theorem appendAtHeight_reparamAt {params : Parameters} [FieldModel params.q]
+    (f : DiagonalLineAnswer params) (t x : Fq params) :
+    appendAtHeight params (reparamAt f t) x =
+      reparamAt (appendAtHeight params f x) t := by
+  funext s
+  rfl
+
+@[simp] theorem reparamAtEquiv_symm_appendAtHeight
+    {params : Parameters} [FieldModel params.q]
+    (f : DiagonalLineAnswer params) (t x : Fq params) :
+    ((reparamAtEquiv (params := params.next) t).symm
+        (appendAtHeight params f x)) =
+      appendAtHeight params (((reparamAtEquiv (params := params) t).symm) f) x := by
+  funext s
+  rfl
+
+end DiagonalLineAnswer
+
+namespace DiagonalLinePolynomial
+
+/-- Forget the degree witness and view a diagonal-line polynomial as its paper-level
+line answer function. -/
+def toAnswer {params : Parameters} [FieldModel params.q]
+    (f : DiagonalLinePolynomial params) : DiagonalLineAnswer params :=
+  fun t => f t
+
+@[simp] theorem toAnswer_apply {params : Parameters} [FieldModel params.q]
+    (f : DiagonalLinePolynomial params) (t : Fq params) :
+    f.toAnswer t = f t :=
+  rfl
+
+@[simp] theorem toAnswer_reparamAt {params : Parameters} [FieldModel params.q]
+    (f : DiagonalLinePolynomial params) (t : Fq params) :
+    (reparamAt f t).toAnswer = DiagonalLineAnswer.reparamAt f.toAnswer t := by
+  funext s
+  simp [toAnswer, DiagonalLineAnswer.reparamAt]
+
+@[simp] theorem toAnswer_appendAtHeight {params : Parameters} [FieldModel params.q]
+    (f : DiagonalLinePolynomial params) (x : Fq params) :
+    (appendAtHeight params f x).toAnswer =
+      DiagonalLineAnswer.appendAtHeight params f.toAnswer x := by
+  funext t
+  rfl
+
+end DiagonalLinePolynomial
+
 end MIPStarRE.LDT

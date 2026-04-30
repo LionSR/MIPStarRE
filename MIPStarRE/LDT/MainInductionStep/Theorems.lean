@@ -228,6 +228,80 @@ noncomputable def SelfImprovementPackage.ofSelfImprovementInInductionSection
       bounded := fun x => (hslice_props x).2.2.2.2.1
       dominatesAveragePointOperator := fun x h => (hslice_props x).2.2.2.2.2 h }
 
+/-- Package the slice-wise outputs feeding the answer-valued restricted-strategy
+self-improvement stage into the bookkeeping object expected by answer-valued
+Section 6 assembly. -/
+noncomputable def AnswerSelfImprovementPackage.ofSelfImprovementInInductionSection
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma)
+    (inductionPkg :
+      AnswerPerSliceInductionPackage params strategy eps delta gamma restrictionPkg k)
+    (hslice :
+      ∀ x,
+        ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+          CompletenessAtLeast strategy.state H.toSubMeas.liftLeft
+            ((1 - inductionPkg.sliceError x) -
+              answerSliceSelfImprovementError params restrictionPkg x) ∧
+          ConsRel strategy.state (uniformDistribution (Point params))
+            (IdxProjMeas.toIdxSubMeas
+              (xRestrictedAnswerSymStrat params strategy x).pointMeasurement)
+            (polynomialEvaluationFamily params H.toSubMeas)
+            (answerSliceSelfImprovementError params restrictionPkg x) ∧
+          BipartiteSSCRel strategy.state (uniformDistribution Unit)
+            (constSubMeasFamily H.toSubMeas)
+            (answerSliceSelfImprovementError params restrictionPkg x) ∧
+          SDDRel strategy.state (uniformDistribution Unit)
+            (constSubMeasFamily (leftPlacedSubMeas (ιB := ι) H.toSubMeas))
+            (constSubMeasFamily (rightPlacedSubMeas (ιA := ι) H.toSubMeas))
+            (answerSliceSelfImprovementError params restrictionPkg x) ∧
+          tensorFailureExpectation strategy.state Z H.toSubMeas ≤
+            answerSliceSelfImprovementError params restrictionPkg x ∧
+          (∀ h : Polynomial params,
+            IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x h ≤ Z)) :
+    AnswerSelfImprovementPackage params strategy eps delta gamma k restrictionPkg inductionPkg := by
+  classical
+  let sliceProj : Fq params → ProjSubMeas (Polynomial params) ι :=
+    fun x => Classical.choose (hslice x)
+  let sliceWitness : Fq params → MIPStarRE.Quantum.Op ι :=
+    fun x => Classical.choose (Classical.choose_spec (hslice x))
+  have hslice_props :
+      ∀ x,
+        CompletenessAtLeast strategy.state (sliceProj x).toSubMeas.liftLeft
+          ((1 - inductionPkg.sliceError x) -
+            answerSliceSelfImprovementError params restrictionPkg x) ∧
+        ConsRel strategy.state (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas
+            (xRestrictedAnswerSymStrat params strategy x).pointMeasurement)
+          (polynomialEvaluationFamily params (sliceProj x).toSubMeas)
+          (answerSliceSelfImprovementError params restrictionPkg x) ∧
+        BipartiteSSCRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily (sliceProj x).toSubMeas)
+          (answerSliceSelfImprovementError params restrictionPkg x) ∧
+        SDDRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily (leftPlacedSubMeas (ιB := ι) (sliceProj x).toSubMeas))
+          (constSubMeasFamily (rightPlacedSubMeas (ιA := ι) (sliceProj x).toSubMeas))
+          (answerSliceSelfImprovementError params restrictionPkg x) ∧
+        tensorFailureExpectation strategy.state (sliceWitness x) (sliceProj x).toSubMeas ≤
+          answerSliceSelfImprovementError params restrictionPkg x ∧
+        (∀ h : Polynomial params,
+          IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x h ≤ sliceWitness x) := by
+    intro x
+    simpa [sliceProj, sliceWitness] using
+      (Classical.choose_spec (Classical.choose_spec (hslice x)))
+  exact
+    { sliceProj := sliceProj
+      sliceWitness := sliceWitness
+      completeness := fun x => (hslice_props x).1
+      pointConsistency := fun x => (hslice_props x).2.1
+      strongSelfConsistency := fun x => (hslice_props x).2.2.1
+      selfCloseness := fun x => (hslice_props x).2.2.2.1
+      bounded := fun x => (hslice_props x).2.2.2.2.1
+      dominatesAveragePointOperator := fun x h => (hslice_props x).2.2.2.2.2 h }
+
 /-- `thm:ld-pasting-in-induction-section`. -/
 -- NOTE: `FieldModel.{0}` is needed to match the universe at which
 -- `Pasting.ldPasting` was elaborated. See PR #288 discussion.
@@ -1783,6 +1857,164 @@ lemma restrictedProbabilities
     (weighted_axisParallel_bound params strategy eps delta gamma hgood)
     (weighted_diagonal_bound params strategy eps delta gamma hgood)
 
+/-- The answer-valued slice has the same axis-parallel failure probability as the
+legacy restricted slice. -/
+private lemma answerRestricted_axisParallelFailureProbability_eq
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (x : Fq params) :
+    (xRestrictedAnswerSymStrat params strategy x).axisParallelFailureProbability =
+      (xRestrictedStrategy params strategy x).axisParallelFailureProbability := by
+  rfl
+
+/-- The answer-valued slice has the same self-consistency failure probability as
+the legacy restricted slice. -/
+private lemma answerRestricted_selfConsistencyFailureProbability_eq
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (x : Fq params) :
+    (xRestrictedAnswerSymStrat params strategy x).selfConsistencyFailureProbability =
+      (xRestrictedStrategy params strategy x).selfConsistencyFailureProbability := by
+  rfl
+
+/-- The answer-valued slice has the same verifier-visible diagonal failure
+probability as the legacy restricted slice after evaluating line answers at the
+base point. -/
+private lemma answerRestricted_diagonalFailureProbability_eq
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (x : Fq params) :
+    (xRestrictedAnswerSymStrat params strategy x).diagonalFailureProbability =
+      (xRestrictedStrategy params strategy x).diagonalFailureProbability := by
+  unfold AnswerSymStrat.diagonalFailureProbability RestrictedSymStrat.diagonalFailureProbability
+  apply congrArg (fun s => (1 / (params.m : Error)) * s)
+  refine Finset.sum_congr rfl ?_
+  intro j _hj
+  apply congrArg
+  funext s
+  let ℓ : DiagonalLine params :=
+    { base := s.1, direction := extendRestrictedDirection j s.2 }
+  change
+    postprocess ((restrictDiagonalAnswerMeasurement params strategy x ℓ).toSubMeas)
+        (fun f : DiagonalLineAnswer params => f zeroCoord) =
+      postprocess ((restrictDiagonalMeasurement params strategy x ℓ).toSubMeas)
+        (fun f : DiagonalLinePolynomial params => f zeroCoord)
+  rw [restrictDiagonalAnswerMeasurement_postprocess_zero,
+    restrictDiagonalMeasurement_postprocess_zero]
+
+/-- The weighted average of the answer-valued restricted axis-parallel slice errors
+is bounded by the ambient axis-parallel test error. -/
+lemma answer_weighted_axisParallel_bound
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma) :
+    avgOver (uniformDistribution (Fq params))
+        (fun x => sliceTransverseDirectionWeight params *
+          (xRestrictedAnswerSymStrat params strategy x).axisParallelFailureProbability) ≤ eps := by
+  calc
+    avgOver (uniformDistribution (Fq params))
+        (fun x => sliceTransverseDirectionWeight params *
+          (xRestrictedAnswerSymStrat params strategy x).axisParallelFailureProbability)
+      = avgOver (uniformDistribution (Fq params))
+          (fun x => sliceTransverseDirectionWeight params *
+            (xRestrictedStrategy params strategy x).axisParallelFailureProbability) := by
+            refine avgOver_congr _ _ _ ?_
+            intro x
+            rw [answerRestricted_axisParallelFailureProbability_eq]
+    _ ≤ eps := weighted_axisParallel_bound params strategy eps delta gamma hgood
+
+/-- The weighted average of the answer-valued restricted diagonal slice errors is
+bounded by the ambient diagonal-line test error. -/
+lemma answer_weighted_diagonal_bound
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma) :
+    avgOver (uniformDistribution (Fq params))
+        (fun x => sliceTransverseDirectionWeight params *
+          (xRestrictedAnswerSymStrat params strategy x).diagonalFailureProbability) ≤ gamma := by
+  calc
+    avgOver (uniformDistribution (Fq params))
+        (fun x => sliceTransverseDirectionWeight params *
+          (xRestrictedAnswerSymStrat params strategy x).diagonalFailureProbability)
+      = avgOver (uniformDistribution (Fq params))
+          (fun x => sliceTransverseDirectionWeight params *
+            (xRestrictedStrategy params strategy x).diagonalFailureProbability) := by
+            refine avgOver_congr _ _ _ ?_
+            intro x
+            rw [answerRestricted_diagonalFailureProbability_eq]
+    _ ≤ gamma := weighted_diagonal_bound params strategy eps delta gamma hgood
+
+/-- Package answer-valued weighted restricted axis/diagonal bounds into the public
+answer-valued restricted-probabilities statement. -/
+lemma AnswerRestrictedProbabilitiesStatement.ofWeightedBounds
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (haxisWeightedBound :
+      avgOver (uniformDistribution (Fq params))
+          (fun x => sliceTransverseDirectionWeight params *
+            (xRestrictedAnswerSymStrat params strategy x).axisParallelFailureProbability) ≤ eps)
+    (hdiagonalWeightedBound :
+      avgOver (uniformDistribution (Fq params))
+          (fun x => sliceTransverseDirectionWeight params *
+            (xRestrictedAnswerSymStrat params strategy x).diagonalFailureProbability) ≤ gamma) :
+    AnswerRestrictedProbabilitiesStatement params strategy eps delta gamma := by
+  let profile : AnswerRestrictedFailureProfile params strategy :=
+    { axisParallel := fun x =>
+        (xRestrictedAnswerSymStrat params strategy x).axisParallelFailureProbability
+      selfConsistency := fun x =>
+        (xRestrictedAnswerSymStrat params strategy x).selfConsistencyFailureProbability
+      diagonal := fun x =>
+        (xRestrictedAnswerSymStrat params strategy x).diagonalFailureProbability
+      restrictedGood := by
+        intro x
+        exact ⟨le_rfl, le_rfl, le_rfl⟩ }
+  have haxis_weighted_avg :
+      sliceTransverseDirectionWeight params *
+          averageAnswerRestrictedAxisParallelError params profile ≤ eps := by
+    simpa [profile, averageAnswerRestrictedAxisParallelError, avgOver_const_mul] using
+      haxisWeightedBound
+  have hdiag_weighted_avg :
+      sliceTransverseDirectionWeight params *
+          averageAnswerRestrictedDiagonalError params profile ≤ gamma := by
+    simpa [profile, averageAnswerRestrictedDiagonalError, avgOver_const_mul] using
+      hdiagonalWeightedBound
+  refine ⟨profile, ?_⟩
+  refine ⟨weighted_bound_to_average params haxis_weighted_avg, ?_, ?_⟩
+  · calc
+      averageAnswerRestrictedSelfConsistencyError params profile
+        = avgOver (uniformDistribution (Fq params))
+            (fun x =>
+              (xRestrictedStrategy params strategy x).selfConsistencyFailureProbability) := by
+            refine avgOver_congr _ _ _ ?_
+            intro x
+            simp [profile,
+              answerRestricted_selfConsistencyFailureProbability_eq]
+      _ = strategy.selfConsistencyFailureProbability := by
+            exact selfConsistencyRestrictedAverage_eq params strategy
+      _ ≤ delta := hgood.selfConsistencyTest
+  · exact weighted_bound_to_average params hdiag_weighted_avg
+
+/-- Answer-valued version of `lem:restricted-probabilities`. -/
+lemma answerRestrictedProbabilities
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma) :
+    AnswerRestrictedProbabilitiesStatement params strategy eps delta gamma := by
+  exact AnswerRestrictedProbabilitiesStatement.ofWeightedBounds
+    params strategy eps delta gamma hgood
+    (answer_weighted_axisParallel_bound params strategy eps delta gamma hgood)
+    (answer_weighted_diagonal_bound params strategy eps delta gamma hgood)
+
+
 /-! ## Package constructors and skeletal assembly -/
 
 /-- Extract a concrete slice-restriction package from
@@ -1803,6 +2035,62 @@ noncomputable def SliceRestrictionPackage.ofRestrictedProbabilities
       axisAverageBound := haxisAverage
       selfAverageBound := hselfAverage
       diagonalAverageBound := hdiagonalAverage }
+
+/-- Extract a concrete answer-valued slice-restriction package from the
+answer-valued restricted-probabilities bookkeeping statement. -/
+noncomputable def AnswerSliceRestrictionPackage.ofRestrictedProbabilities
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (hrestricted : AnswerRestrictedProbabilitiesStatement params strategy eps delta gamma) :
+    AnswerSliceRestrictionPackage params strategy eps delta gamma := by
+  classical
+  let profile := Classical.choose hrestricted.profileExists
+  let hprofile := Classical.choose_spec hrestricted.profileExists
+  rcases hprofile with ⟨haxisAverage, hselfAverage, hdiagonalAverage⟩
+  exact
+    { profile := profile
+      axisAverageBound := haxisAverage
+      selfAverageBound := hselfAverage
+      diagonalAverageBound := hdiagonalAverage }
+
+/-- Forget the answer-valued diagonal alphabet after recording the verifier-visible
+failure probabilities.  The three tests agree with the legacy restricted strategy
+at the sampled answer level. -/
+noncomputable def SliceRestrictionPackage.ofAnswer
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (answerPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma) :
+    SliceRestrictionPackage params strategy eps delta gamma where
+  profile :=
+    { axisParallel := answerPkg.profile.axisParallel
+      selfConsistency := answerPkg.profile.selfConsistency
+      diagonal := answerPkg.profile.diagonal
+      restrictedGood := by
+        intro x
+        have hgood := answerPkg.profile.restrictedGood x
+        exact
+          { axisParallelTest := by
+              simpa [answerRestricted_axisParallelFailureProbability_eq params strategy x]
+                using hgood.axisParallelTest
+            selfConsistencyTest := by
+              simpa [answerRestricted_selfConsistencyFailureProbability_eq params strategy x]
+                using hgood.selfConsistencyTest
+            diagonalLineTest := by
+              simpa [answerRestricted_diagonalFailureProbability_eq params strategy x]
+                using hgood.diagonalLineTest } }
+  axisAverageBound := by
+    simpa [averageRestrictedAxisParallelError, averageAnswerRestrictedAxisParallelError]
+      using answerPkg.axisAverageBound
+  selfAverageBound := by
+    simpa [averageRestrictedSelfConsistencyError, averageAnswerRestrictedSelfConsistencyError]
+      using answerPkg.selfAverageBound
+  diagonalAverageBound := by
+    simpa [averageRestrictedDiagonalError, averageAnswerRestrictedDiagonalError]
+      using answerPkg.diagonalAverageBound
 
 /-- Turn the recursive family of slice-wise induction witnesses into explicit
 slice data `x ↦ (σ_x, G^x)`. -/
@@ -1849,6 +2137,146 @@ noncomputable def PerSliceInductionPackage.ofRecursion
       sliceMeasurement := sliceMeasurement
       pointConsistency := fun x => (hslice x).1
       error_le := fun x => (hslice x).2 }
+
+/-- Turn answer-valued recursive slice-wise induction witnesses into explicit
+slice data `x ↦ (σ_x, G^x)`. -/
+noncomputable def AnswerPerSliceInductionPackage.ofRecursion
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma)
+    (hrec :
+      ∀ x,
+        ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
+          ConsRel strategy.state (uniformDistribution (Point params))
+            (IdxProjMeas.toIdxSubMeas
+              (xRestrictedAnswerSymStrat params strategy x).pointMeasurement)
+            (polynomialEvaluationFamily params G.toSubMeas)
+            error ∧
+          error ≤
+            mainInductionError params k
+              (restrictionPkg.profile.axisParallel x)
+              (restrictionPkg.profile.selfConsistency x)
+              (restrictionPkg.profile.diagonal x)) :
+    AnswerPerSliceInductionPackage params strategy eps delta gamma restrictionPkg k := by
+  classical
+  let sliceError : Fq params → Error := fun x => Classical.choose (hrec x)
+  let sliceMeasurement : Fq params → Measurement (Polynomial params) ι :=
+    fun x => Classical.choose (Classical.choose_spec (hrec x))
+  let hslice :
+      ∀ x,
+        ConsRel strategy.state (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas
+            (xRestrictedAnswerSymStrat params strategy x).pointMeasurement)
+          (polynomialEvaluationFamily params (sliceMeasurement x).toSubMeas)
+          (sliceError x) ∧
+        sliceError x ≤
+          mainInductionError params k
+            (restrictionPkg.profile.axisParallel x)
+            (restrictionPkg.profile.selfConsistency x)
+            (restrictionPkg.profile.diagonal x) := by
+    intro x
+    simpa [sliceError, sliceMeasurement] using
+      (Classical.choose_spec (Classical.choose_spec (hrec x)))
+  exact
+    { sliceError := sliceError
+      sliceMeasurement := sliceMeasurement
+      pointConsistency := fun x => (hslice x).1
+      error_le := fun x => (hslice x).2 }
+
+/-- View an answer-valued per-slice induction package as a legacy package after
+forgetting the answer-valued restriction boundary. -/
+noncomputable def PerSliceInductionPackage.ofAnswer
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma)
+    (answerInduction :
+      AnswerPerSliceInductionPackage params strategy eps delta gamma restrictionPkg k) :
+    PerSliceInductionPackage params strategy eps delta gamma
+      (SliceRestrictionPackage.ofAnswer params strategy eps delta gamma restrictionPkg) k where
+  sliceError := answerInduction.sliceError
+  sliceMeasurement := answerInduction.sliceMeasurement
+  pointConsistency := by
+    intro x
+    simpa using answerInduction.pointConsistency x
+  error_le := by
+    intro x
+    simpa [SliceRestrictionPackage.ofAnswer] using answerInduction.error_le x
+
+/-- View a legacy per-slice induction package over an answer-forgotten restriction
+package as an answer-valued package. -/
+noncomputable def AnswerPerSliceInductionPackage.ofLegacy
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma)
+    (legacyInduction :
+      PerSliceInductionPackage params strategy eps delta gamma
+        (SliceRestrictionPackage.ofAnswer params strategy eps delta gamma restrictionPkg) k) :
+    AnswerPerSliceInductionPackage params strategy eps delta gamma restrictionPkg k where
+  sliceError := legacyInduction.sliceError
+  sliceMeasurement := legacyInduction.sliceMeasurement
+  pointConsistency := by
+    intro x
+    simpa using legacyInduction.pointConsistency x
+  error_le := by
+    intro x
+    simpa [SliceRestrictionPackage.ofAnswer] using legacyInduction.error_le x
+
+/-- Forget an answer-valued self-improvement package when the target legacy
+induction package is the one used by the legacy assembly. -/
+noncomputable def SelfImprovementPackage.ofAnswerForLegacy
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma)
+    (legacyInduction :
+      PerSliceInductionPackage params strategy eps delta gamma
+        (SliceRestrictionPackage.ofAnswer params strategy eps delta gamma restrictionPkg) k)
+    (answerSelf :
+      AnswerSelfImprovementPackage params strategy eps delta gamma k restrictionPkg
+        (AnswerPerSliceInductionPackage.ofLegacy params strategy eps delta gamma k
+          restrictionPkg legacyInduction)) :
+    SelfImprovementPackage params strategy eps delta gamma k
+      (SliceRestrictionPackage.ofAnswer params strategy eps delta gamma restrictionPkg)
+      legacyInduction where
+  sliceProj := answerSelf.sliceProj
+  sliceWitness := answerSelf.sliceWitness
+  completeness := by
+    intro x
+    simpa [AnswerPerSliceInductionPackage.ofLegacy, SliceRestrictionPackage.ofAnswer,
+      sliceSelfImprovementError, answerSliceSelfImprovementError]
+      using answerSelf.completeness x
+  pointConsistency := by
+    intro x
+    simpa [AnswerPerSliceInductionPackage.ofLegacy, SliceRestrictionPackage.ofAnswer,
+      sliceSelfImprovementError, answerSliceSelfImprovementError]
+      using answerSelf.pointConsistency x
+  strongSelfConsistency := by
+    intro x
+    simpa [SliceRestrictionPackage.ofAnswer, sliceSelfImprovementError,
+      answerSliceSelfImprovementError]
+      using answerSelf.strongSelfConsistency x
+  selfCloseness := by
+    intro x
+    simpa [SliceRestrictionPackage.ofAnswer, sliceSelfImprovementError,
+      answerSliceSelfImprovementError]
+      using answerSelf.selfCloseness x
+  bounded := by
+    intro x
+    simpa [SliceRestrictionPackage.ofAnswer, sliceSelfImprovementError,
+      answerSliceSelfImprovementError]
+      using answerSelf.bounded x
+  dominatesAveragePointOperator := answerSelf.dominatesAveragePointOperator
 
 /-- Invoke `thm:ld-pasting-in-induction-section` from averaged pasting input. -/
 theorem AveragedPastingInput.output
@@ -3479,6 +3907,178 @@ theorem mainInductionPublicWrapper
     exact hselfProducer hinduction
   exact
     mainInductionByRecursionOnM params strategy eps delta gamma k hgood hd hrestrict hrec'
+      hselfProducer' hk_pos hk
+
+/-- Answer-valued successor-step recursion entry point.
+
+This wrapper keeps the paper-facing restricted strategy interface
+`xRestrictedAnswerSymStrat`, then explicitly forgets that extra diagonal answer
+structure to reuse the checked legacy assembly. -/
+theorem answerMainInductionByRecursionOnM
+    (params : Parameters)
+    [FieldModel.{0} params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hd : 0 < params.d)
+    (hrestrict : AnswerSliceRestrictionPackage params strategy eps delta gamma)
+    (hrec :
+      ∀ x,
+        ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
+          ConsRel strategy.state (uniformDistribution (Point params))
+            (IdxProjMeas.toIdxSubMeas
+              (xRestrictedAnswerSymStrat params strategy x).pointMeasurement)
+            (polynomialEvaluationFamily params G.toSubMeas)
+            error ∧
+          error ≤
+            mainInductionError params k
+              (hrestrict.profile.axisParallel x)
+              (hrestrict.profile.selfConsistency x)
+              (hrestrict.profile.diagonal x))
+    (hselfProducer :
+      ∀ hinduction :
+        AnswerPerSliceInductionPackage params strategy eps delta gamma hrestrict k,
+        AnswerSelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
+    (hk_pos : 1 ≤ k)
+    (hk : 400 * params.m * params.d ≤ k) :
+    ∃ G : Measurement (Polynomial params.next) ι,
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next G.toSubMeas)
+        (mainInductionError params.next k eps delta gamma) := by
+  let legacyRestrict : SliceRestrictionPackage params strategy eps delta gamma :=
+    SliceRestrictionPackage.ofAnswer params strategy eps delta gamma hrestrict
+  have hrec' :
+      ∀ x,
+        ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
+          ConsRel strategy.state (uniformDistribution (Point params))
+            (IdxProjMeas.toIdxSubMeas (xRestrictedStrategy params strategy x).pointMeasurement)
+            (polynomialEvaluationFamily params G.toSubMeas)
+            error ∧
+          error ≤
+            mainInductionError params k
+              (legacyRestrict.profile.axisParallel x)
+              (legacyRestrict.profile.selfConsistency x)
+              (legacyRestrict.profile.diagonal x) := by
+    intro x
+    rcases hrec x with ⟨error, G, hcons, herror⟩
+    refine ⟨error, G, ?_, ?_⟩
+    · simpa using hcons
+    · simpa [legacyRestrict, SliceRestrictionPackage.ofAnswer] using herror
+  have hselfProducer' :
+      ∀ hinduction : PerSliceInductionPackage params strategy eps delta gamma legacyRestrict k,
+        SelfImprovementPackage params strategy eps delta gamma k legacyRestrict hinduction := by
+    intro hinduction
+    let answerInduction :
+        AnswerPerSliceInductionPackage params strategy eps delta gamma hrestrict k :=
+      AnswerPerSliceInductionPackage.ofLegacy params strategy eps delta gamma k hrestrict hinduction
+    let answerSelf :
+        AnswerSelfImprovementPackage params strategy eps delta gamma k hrestrict answerInduction :=
+      hselfProducer answerInduction
+    exact
+      SelfImprovementPackage.ofAnswerForLegacy params strategy eps delta gamma k hrestrict
+        hinduction answerSelf
+  exact
+    mainInductionByRecursionOnM params strategy eps delta gamma k hgood hd legacyRestrict hrec'
+      hselfProducer' hk_pos hk
+
+/-- Answer-valued restricted-probabilities package built from explicit weighted
+answer-valued slice bounds. -/
+noncomputable def answerMainInductionPublicRestrictionPackage
+    (params : Parameters)
+    [FieldModel.{0} params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (haxisWeightedBound :
+      avgOver (uniformDistribution (Fq params))
+          (fun x => sliceTransverseDirectionWeight params *
+            (xRestrictedAnswerSymStrat params strategy x).axisParallelFailureProbability) ≤ eps)
+    (hdiagonalWeightedBound :
+      avgOver (uniformDistribution (Fq params))
+          (fun x => sliceTransverseDirectionWeight params *
+            (xRestrictedAnswerSymStrat params strategy x).diagonalFailureProbability) ≤ gamma) :
+    AnswerSliceRestrictionPackage params strategy eps delta gamma :=
+  AnswerSliceRestrictionPackage.ofRestrictedProbabilities params strategy eps delta gamma
+    (AnswerRestrictedProbabilitiesStatement.ofWeightedBounds params strategy eps delta gamma
+      hgood haxisWeightedBound hdiagonalWeightedBound)
+
+/-- Answer-valued public successor-step wrapper for `thm:main-induction`.
+
+The external recursive and self-improvement inputs are stated against
+`xRestrictedAnswerSymStrat`; internally, the verified legacy pasting assembly is
+reused via explicit answer-to-legacy package bridges. -/
+theorem answerMainInductionPublicWrapper
+    (params : Parameters)
+    [FieldModel.{0} params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hd : 0 < params.d)
+    (haxisWeightedBound :
+      avgOver (uniformDistribution (Fq params))
+          (fun x => sliceTransverseDirectionWeight params *
+            (xRestrictedAnswerSymStrat params strategy x).axisParallelFailureProbability) ≤ eps)
+    (hdiagonalWeightedBound :
+      avgOver (uniformDistribution (Fq params))
+          (fun x => sliceTransverseDirectionWeight params *
+            (xRestrictedAnswerSymStrat params strategy x).diagonalFailureProbability) ≤ gamma)
+    (hrec :
+      let hrestrict : AnswerSliceRestrictionPackage params strategy eps delta gamma :=
+        answerMainInductionPublicRestrictionPackage params strategy eps delta gamma
+          hgood haxisWeightedBound hdiagonalWeightedBound
+      ∀ x,
+        ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
+          ConsRel strategy.state (uniformDistribution (Point params))
+            (IdxProjMeas.toIdxSubMeas
+              (xRestrictedAnswerSymStrat params strategy x).pointMeasurement)
+            (polynomialEvaluationFamily params G.toSubMeas)
+            error ∧
+          error ≤
+            mainInductionError params k
+              (hrestrict.profile.axisParallel x)
+              (hrestrict.profile.selfConsistency x)
+              (hrestrict.profile.diagonal x))
+    (hselfProducer :
+      let hrestrict : AnswerSliceRestrictionPackage params strategy eps delta gamma :=
+        answerMainInductionPublicRestrictionPackage params strategy eps delta gamma
+          hgood haxisWeightedBound hdiagonalWeightedBound
+      ∀ hinduction : AnswerPerSliceInductionPackage params strategy eps delta gamma hrestrict k,
+        AnswerSelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
+    (hk_pos : 1 ≤ k)
+    (hk : 400 * params.m * params.d ≤ k) :
+    ∃ G : Measurement (Polynomial params.next) ι,
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next G.toSubMeas)
+        (mainInductionError params.next k eps delta gamma) := by
+  let hrestrict : AnswerSliceRestrictionPackage params strategy eps delta gamma :=
+    answerMainInductionPublicRestrictionPackage params strategy eps delta gamma
+      hgood haxisWeightedBound hdiagonalWeightedBound
+  have hrec' :
+      ∀ x,
+        ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
+          ConsRel strategy.state (uniformDistribution (Point params))
+            (IdxProjMeas.toIdxSubMeas
+              (xRestrictedAnswerSymStrat params strategy x).pointMeasurement)
+            (polynomialEvaluationFamily params G.toSubMeas)
+            error ∧
+          error ≤
+            mainInductionError params k
+              (hrestrict.profile.axisParallel x)
+              (hrestrict.profile.selfConsistency x)
+              (hrestrict.profile.diagonal x) := by
+    intro x
+    exact hrec x
+  have hselfProducer' :
+      ∀ hinduction : AnswerPerSliceInductionPackage params strategy eps delta gamma hrestrict k,
+        AnswerSelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction := by
+    intro hinduction
+    exact hselfProducer hinduction
+  exact
+    answerMainInductionByRecursionOnM params strategy eps delta gamma k hgood hd hrestrict hrec'
       hselfProducer' hk_pos hk
 
 end MIPStarRE.LDT.MainInductionStep
