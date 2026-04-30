@@ -449,7 +449,7 @@ Before writing a new lemma, spend one minute on:
 If Mathlib has it, use it. If it doesn't, consider whether the missing
 lemma should be upstreamed (file an issue against Mathlib, or at least a
 TODO pointing at the gap). The project already has this mandate — see the
-"Mathlib Integration" section of [`CLAUDE.md`](../CLAUDE.md):
+"Mathlib Integration" section of [`AGENTS.md`](../AGENTS.md):
 
 > Scout Mathlib first (`exact?`, `apply?`, `#find?`, grep Mathlib source)
 

@@ -1,109 +1,85 @@
 # AGENTS.md
 
-## Purpose
+Instructions for coding agents working in `MIPStarRE`. This is the **single
+source of truth** for agent conventions. Claude Code agents should also read
+`CLAUDE.md` for Claude-specific notes.
 
-Instructions for coding agents working in `MIPStarRE`.
+## Project Overview
 
-This repository is a Lean 4 + Mathlib formalization project for mathematics around
-`MIP* = RE`. The active formalization track is the low individual degree test (LDT)
-paper:
+This repository is a Lean 4 + Mathlib formalization project for mathematics
+around $MIP^* = RE$ (arXiv:2009.12982). The active formalization track is the
+**low individual degree test (LDT)** paper — *Quantum soundness of the
+classical low individual degree test*.
 
-- `references/ldt-paper/` is the mathematical source of truth
-- `blueprint/src/` is the active blueprint
-- `MIPStarRE/` is the Lean codebase
+Key locations:
 
-Read the paper source before formalizing or changing theorem statements.
+- `references/ldt-paper/` — in-repo TeX source mirror; the mathematical
+  ground truth
+- `blueprint/src/` — active LaTeX blueprint with Lean cross-references
+  (`\lean{}`, `\leanok`)
+- `MIPStarRE/` — Lean codebase matching the blueprint
+- `audits/` — dated audit reports, scouting notes, and repair plans
 
-## Mathematical Exposition
+A legacy 2111 tensor track exists under `blueprint/legacy/` — do not modify it.
 
-Write repository prose for mathematicians and mathematical physicists. Prefer a
-clear, precise, and unhurried expository style: introduce the object under
-discussion, state the mathematical relation being used, distinguish hypotheses
-from conclusions, and avoid informal process language when a standard
-mathematical phrase is available.
+**Canonical source hierarchy** (use in this order):
 
-When writing docstrings, audit notes, PR descriptions, or blueprint-adjacent
-comments, use terminology from the standard mathematical literature, the LDT
-paper, and the local formalization. Do not invent slang or private shorthand for
-mathematical objects. In particular, avoid names or prose that reflect a
-local encoding choice, implementation history, or the agent's working process
-when the reference paper or standard literature has an established term.
-The goal is prose that a third-party reader can understand without having read
-the agent conversation that produced the change.
+1. `references/ldt-paper/` — TeX source of the paper
+2. `blueprint/src/chapter/` — active LaTeX blueprint
+3. `MIPStarRE/` — Lean scaffold
 
-## Agent Rule Sources
-
-Checked in this repository snapshot:
-
-- No `.cursorrules`
-- No `.cursor/rules/`
-- No `.github/copilot-instructions.md`
-
-Use this file together with:
-
-- `CLAUDE.md`
-- `docs/CONTRIBUTING.md`
-- `docs/PROOF_INTEGRITY.md`
-- `docs/style.md`
-- `docs/naming.md`
-- `docs/doc.md`
-- `docs/mathematical_language.md`
+Always read the paper source before formalizing or proving a statement. The
+paper contains the precise mathematical definitions, theorem statements, and
+proof strategies that the Lean code must faithfully represent. When stuck on a
+sorry site or proof, go back to the original paper TeX source — the answer is
+almost always there. Do not guess or try random tactics without first
+understanding the paper's proof strategy.
 
 ## Repository Layout
 
-- `MIPStarRE/Quantum/`: reusable matrix and measurement infrastructure
-- `MIPStarRE/LDT/`: active low-degree-test development
-- `blueprint/src/`: active LaTeX blueprint
-- `references/ldt-paper/`: mirrored TeX paper sources
-- `docs/`: contribution, style, naming, proof-integrity, and project guidance
-- `audits/`: dated audit reports, scouting notes, and repair plans
-- `scripts/Checkdecls.lean`: declaration checker executable
+```
+MIPStarRE/
+├── Quantum/               # Reusable matrix / measurement infrastructure
+│   ├── FiniteMatrix.lean  # Op d, normalizedTrace, tauNormSq, IsProj, ...
+│   └── Measurement.lean   # POVM, measurement types
+└── LDT/                   # Low individual degree test (13 submodules)
+    ├── Basic/             # Parameters, operators, distributions, submeasurements
+    ├── Test/              # Test definitions & main theorem
+    ├── Preliminaries/
+    ├── MakingMeasurementsProjective/
+    ├── MainInductionStep/
+    ├── ExpansionHypercubeGraph/
+    ├── GlobalVariance/
+    ├── SelfImprovement/
+    ├── CommutativityPoints/
+    ├── Commutativity/
+    └── Pasting/
+```
 
-## Toolchain
+Each LDT submodule typically has `Defs.lean` and `Theorems.lean`. Root imports
+flow: `MIPStarRE.lean` → `Quantum` + `LDT` → all submodules.
 
-- Lean: `v4.28.0` from `lean-toolchain`
-- Mathlib: `v4.28.0` from `lakefile.toml`
-
-Important `lakefile.toml` options:
-
-- `relaxedAutoImplicit = false`
-- `pp.unicode.fun = true`
-- `weak.linter.mathlibStandardSet = true`
-- `maxSynthPendingDepth = 3`
-
-Because `relaxedAutoImplicit = false`, declare all variables explicitly.
-
-## Build And Check Commands
+## Quick Start — Build and Check Commands
 
 Run commands from the repository root unless noted otherwise.
 
-### Initial setup
+### First-time setup
 
 ```bash
 lake exe cache get
 lake build
 ```
 
-### Full project build
+### Full project build (CI-equivalent)
 
 ```bash
 lake build
 ```
 
-This is the main CI-equivalent Lean check.
-
-### Fast single-file check
+### Fast single-file type-check (default iteration loop)
 
 ```bash
 lake env lean MIPStarRE/LDT/SelfImprovement/Defs.lean
-```
-
-Use this as the default "single test" loop while editing Lean files.
-
-General form:
-
-```bash
-lake env lean path/to/File.lean
 ```
 
 ### Check for proof holes in one file
@@ -118,7 +94,7 @@ rg -n "sorry|axiom" MIPStarRE/LDT/SelfImprovement/Defs.lean || true
 rg -n "sorry|axiom" MIPStarRE
 ```
 
-### Declaration-checker executable
+### Declaration checker
 
 ```bash
 lake exe checkdecls blueprint/lean_decls
@@ -128,44 +104,25 @@ Use this when blueprint declaration lists need to match Lean declarations.
 
 ### Blueprint build
 
-From the repo root:
-
 ```bash
-leanblueprint pdf
-leanblueprint web
+leanblueprint pdf    # PDF output
+leanblueprint web    # HTML output (use as default for quick checks)
 ```
 
 In CI, blueprint linting effectively runs `leanblueprint web` from `blueprint/`.
 
-### When editing only blueprint files
+### What counts as a single test
 
-Prefer:
+This repository does not have a conventional unit-test suite. The closest
+single-test commands are:
 
-```bash
-leanblueprint web
-```
+- **Lean work**: `lake env lean path/to/File.lean` and
+  `rg -n "sorry|axiom" path/to/File.lean || true`
+- **Blueprint work**: `leanblueprint web`
+- **Whole-repo verification**: `lake build` and
+  `lake exe checkdecls blueprint/lean_decls`
 
-Use `pdf` only when you need the rendered PDF output.
-
-## What Counts As A Single Test Here
-
-This repository does not have a conventional unit-test suite.
-
-For Lean work, the closest single-test commands are:
-
-1. `lake env lean path/to/File.lean`
-2. `rg -n "sorry|axiom" path/to/File.lean || true`
-
-For blueprint-only work:
-
-1. `leanblueprint web`
-
-For whole-repo verification:
-
-1. `lake build`
-2. `lake exe checkdecls blueprint/lean_decls` when declaration sync matters
-
-## Recommended Validation Sequence
+### Recommended validation sequence
 
 For a Lean file change:
 
@@ -178,198 +135,333 @@ For blueprint changes:
 1. Run `leanblueprint web`
 2. If declaration links changed, run `lake exe checkdecls blueprint/lean_decls`
 
-## Source-Of-Truth Order
+## Toolchain
 
-When formalizing mathematics, use this order:
+- **Lean**: v4.28.0 (from `lean-toolchain`)
+- **Mathlib**: v4.28.0 (from `lakefile.toml`)
 
-1. `references/ldt-paper/`
-2. `blueprint/src/chapter/`
-3. `MIPStarRE/`
+Important `lakefile.toml` options:
 
-Do not invent theorem statements from existing scaffold alone if the paper or blueprint
-gives a more precise statement.
+- `relaxedAutoImplicit = false` — declare all variables explicitly
+- `pp.unicode.fun = true`
+- `weak.linter.mathlibStandardSet = true`
+- `maxSynthPendingDepth = 3`
 
 ## Proof-Filling Order
 
-The project guidance says to work in dependency order:
+Sections must be filled in this dependency order:
 
-1. Sections 3-4
-2. Section 5
-3. Sections 7-8
-4. Section 9
-5. Sections 10-11
-6. Section 12
-7. Section 6
+1. Sections 3–4: test setup and preliminaries
+2. Section 5: making measurements projective
+3. Sections 7–8: expansion and global variance
+4. Section 9: self-improvement
+5. Sections 10–11: commutativity
+6. Section 12: pasting
+7. Section 6: main induction wrapper
 
 Do not start from the final theorem and guess intermediate facts.
 
-## Imports
+## Code Conventions
+
+### Imports
 
 - Keep imports at the top of the file
 - One import per line
 - Follow existing local import style
 - Prefer the smallest correct import set, but do not churn imports unnecessarily
-- Preserve barrel-file structure such as `MIPStarRE.lean` and `MIPStarRE/LDT.lean`
+- Preserve barrel-file structure: `MIPStarRE.lean`, `MIPStarRE/LDT.lean`
+- Before adding a new import, check whether the needed declaration already
+  comes from an existing local barrel import
 
-Before adding a new import, check whether the needed declaration already comes from an
-existing local barrel import.
+### File structure
 
-## File Structure
-
-Every `.lean` file should have:
+Every `.lean` file must have:
 
 1. imports
-2. a module docstring starting with `/-!`
+2. a module docstring starting with `/-!` (title, main definitions, references)
 3. namespace / opens / variables
 4. declarations
 
-Project-specific expectation from `CLAUDE.md`:
+### Formatting
 
-- every `.lean` file needs a module docstring with a title and references section
+- **Line length**: max 100 characters
+- **Spacing**: spaces around `:` and `:=`
+- **`by` placement**: at end of the preceding line (`... := by`), never on its
+  own line
+- **Indentation**: 2 spaces for proof body; 4 spaces for continuation of
+  theorem statement
+- **Top-level commands**: flush-left
+- Avoid orphaned parentheses. Prefer readable multiline formatting over dense
+  tactic blocks.
 
-## Formatting
+### Naming conventions
 
-- Maximum line length: 100 characters
-- Use spaces around `:` and `:=`
-- Put `by` at the end of the preceding line, not on a line by itself
-- Indent theorem proof bodies by 2 spaces
-- Indent continued theorem statements by 4 spaces
-- Keep top-level commands flush-left
-- Avoid orphaned parentheses
-- Prefer readable multiline formatting over dense tactic blocks
+Follow Mathlib naming plus project-local conventions:
 
-## Naming Conventions
-
-Follow Mathlib naming plus project-local conventions.
-
-Mathlib naming:
-
-- theorems / proofs / proposition-valued terms: `snake_case`
-- structures / inductives / classes / Prop names / Type names: `UpperCamelCase`
-- functions / non-Prop terms: `lowerCamelCase`
+- Theorems / proofs / proposition-valued terms: `snake_case`
+- Structures / inductives / classes / Prop names / Type names: `UpperCamelCase`
+- Functions / non-Prop terms: `lowerCamelCase`
+- Use American English spelling in declaration names
 
 Project-preferred variable names:
 
-- `q` for alphabet size
-- `n`, `m` for dimensions
-- `σ` for strategies
-- `P` for projective measurements
-- `G` for graphs or slice measurements
+- `q` — alphabet size / finite field order
+- `n`, `m` — dimensions
+- `σ` — strategies
+- `P` — projective measurements
+- `G` — graphs (hypercube expansion)
 
-Use American English spelling in declaration names.
+For full details, see `docs/naming.md` and `docs/style.md`.
 
-For Lean names and prose that describe mathematical objects, theorem
-statements, or proof steps, also follow `docs/mathematical_language.md`.
-
-## Types And Signatures
+### Types and signatures
 
 - Give explicit types for declaration arguments
 - Give explicit return types for definitions
-- Do not rely on auto-implicit variables
-- Prefer existing project structures and Mathlib-compatible types over ad hoc wrappers
+- Do not rely on auto-implicit variables (forbidden by `relaxedAutoImplicit`)
+- Prefer existing project structures and Mathlib-compatible types over ad hoc
+  wrappers
 - Be skeptical of scaffolding that compiles but cannot support real proofs later
 
-## Documentation
+### Documentation
 
 Required:
 
-- docstrings on every `def`, `structure`, `class`, and significant `theorem`
-- module docstrings for every file
-- mathematical prose in Lean docstrings and comments should follow
+- **Module docstrings** for every file — `/-! # Title ... ## References ... -/`
+- **Docstrings** on every `def`, `structure`, `class`, and significant `theorem`
+- Mathematical prose in Lean docstrings and comments should follow
   `docs/mathematical_language.md`
 
-When formalizing a statement from the blueprint, add corresponding `\lean{...}` and
-`\leanok` tags in the relevant `blueprint/src/chapter/*.tex` file.
-
-For paper-gap notes and other documentation of discrepancies between the cited
-paper, the blueprint, and Lean, follow `docs/paper-gaps/policy.tex`.  In
-particular, such notes should be mathematical prose for third-party readers:
-introduce notation, state the cited assertion, isolate the calculation or
-logical obstruction, compare with the blueprint and Lean statement, and give a
-clear verdict.  If Lean uses a Mathlib result or construction not present in the
-cited argument, explain that replacement pedagogically before naming the formal
-declaration.  If the cited assertion is false and a counterexample is available,
-explain the counterexample in prose and use any Lean declaration only as
-verification.
+When formalizing a statement from the blueprint, add corresponding `\lean{...}`
+and `\leanok` tags in the relevant `blueprint/src/chapter/*.tex` file.
 
 ## Proof Engineering
 
-Search before proving:
+### Search before proving
 
-- prefer existing Mathlib lemmas
-- reuse local API from `Quantum/` and `LDT/Basic/`
-- use file-local helper lemmas only when they genuinely reduce duplication
+- Prefer existing Mathlib lemmas
+- Reuse local API from `Quantum/` and `LDT/Basic/`
+- Use file-local helper lemmas only when they genuinely reduce duplication
+- Scout Mathlib first: `exact?`, `apply?`, `#find?`, grep Mathlib source
+- See `audits/` for chapter-by-chapter Mathlib dependency analysis
 
-Prefer the validation ladder:
+### Mathlib integration
+
+The project depends heavily on Mathlib for finite-dimensional complex matrices,
+Hermitian/PSD operators, and spectral theory. When proving lemmas:
+
+- Reuse existing Mathlib lemmas rather than reproving
+- Prefer Mathlib types over custom definitions
+- Do not re-declare standard Mathlib lemmas (e.g., custom matrix transpose
+  lemmas when `Matrix.transpose_*` exists)
+
+### Validation ladder
 
 1. `lake env lean path/to/File.lean`
 2. `lake build`
 
 Do not jump straight to full builds for every small edit.
 
-## Error Handling And Integrity Rules
-
-Before merge, these are blockers:
-
-- `sorry`
-- `admit`
-- unjustified `axiom`
-- `unsafeCast`
-- `unsafeCoerce`
-- `lcProof`
-- `ofReduceBool`
-- `ofReduceNat`
-- circular reasoning
-- scaffolding that cannot support real Mathlib-grounded proofs
-
-Also avoid leaving behind:
-
-- `exact?`
-- `apply?`
-- `library_search`
-- `dbg_trace`
-- `#check`, `#eval`, `#print` in proof files unless intentionally retained
-
-See `docs/PROOF_INTEGRITY.md`.
-
-## Lean-Specific Advice
+### Lean-specific advice
 
 - Prefer small, composable lemmas over giant fragile proofs
-- Reuse `SubMeas`, `Measurement`, tensor-placement, PSD, and trace lemmas already in the repo
+- Reuse `SubMeas`, `Measurement`, tensor-placement, PSD, and trace lemmas
+  already in the repo
 - Check `docs/api_surface.md` for useful obligation-closing lemmas
 - If changing statements, confirm against paper and blueprint first
 - Never add axioms or weaken statements without explicit justification
 
-## Blueprint And Documentation Work
+## Mathematical Documentation Style
 
-If you modify blueprint material:
+Write repository prose for mathematicians and mathematical physicists. Prefer a
+clear, precise, and unhurried expository style: introduce the object under
+discussion, state the mathematical relation being used, distinguish hypotheses
+from conclusions, and avoid informal process language when a standard
+mathematical phrase is available.
 
-- keep chapter structure under `blueprint/src/chapter/`
-- ensure `leanblueprint web` succeeds
-- keep Lean declaration references valid
-- sync theorem labels with Lean names
+When writing docstrings, audit notes, PR descriptions, or blueprint-adjacent
+comments, use terminology from the standard mathematical literature, the LDT
+paper, and the local formalization. Do not invent slang or private shorthand for
+mathematical objects. The goal is prose that a third-party reader can understand
+without having read the agent conversation that produced the change.
 
-## PR And Commit Conventions
+### Paper-gap notes
 
-- PR title format: `type(scope): short description`
-- Types: `feat`, `fix`, `refactor`, `docs`, `ci`, `chore`
-- Scope: shortened module path like `LDT/SelfImprovement`
-- Commit subject: imperative mood, under 72 characters
+For documentation of discrepancies between the cited paper, the blueprint, and
+Lean, follow `docs/paper-gaps/policy.tex`. In particular, such notes should be
+mathematical prose for mathematicians and mathematical physicists who have not
+read the issue discussion: introduce notation, state the cited assertion,
+isolate the calculation or logical obstruction, compare with the blueprint and
+Lean statement, and give a clear verdict. If Lean uses a Mathlib result or
+construction not present in the cited argument, explain that replacement
+pedagogically before naming the formal declaration. If the cited assertion is
+false and a counterexample is available, explain the counterexample in prose and
+use any Lean declaration only as verification.
 
-## Practical Defaults For Agents
+## Proof Integrity
+
+### Blockers (must be resolved before merge)
+
+See `docs/PROOF_INTEGRITY.md` for the full catalog.
+
+**Direct proof holes**: `sorry`, `admit`
+
+**Kernel / type system bypasses**: `native_decide`, `unsafeCast`, `unsafeCoerce`,
+`lcProof`, `ofReduceBool`, `ofReduceNat`
+
+**Axiom smuggling**: unjustified `axiom` declarations
+
+**Circular reasoning**: proofs that assume the statement being proved as a local
+hypothesis, or helper lemmas that essentially restate the main goal.
+
+**Castle-in-the-air (ungrounded proofs)**: custom re-declarations of standard
+Mathlib lemmas; `axiom` or `sorry`-based helpers for facts already in Mathlib;
+chains of custom lemmas that never bottom out in Mathlib or Lean core.
+
+**Scaffolding that blocks real formalization**: definitions or theorem statements
+that do not faithfully represent the actual mathematics, making them impossible
+to connect to real Mathlib-based proofs. Ask: *Can a real proof be built on top
+of this?*
+
+### Warnings
+
+Placeholder tactics (`exact?`, `apply?`, `library_search`) should be replaced
+with concrete results. Debug artifacts (`dbg_trace`, `#check`, `#eval`,
+`#print`) should be removed from proof files. See `docs/PROOF_INTEGRITY.md` for
+the full warning catalog.
+
+### Anti-patterns
+
+Subtler proof-evasion patterns that pass kernel-level checks yet still fail to
+prove the claimed mathematics are catalogued in `docs/anti_patterns.md`:
+conclusion-shaped hypotheses, definitional sleight-of-hand, zero-fallback
+branches, trivial default witnesses, Mathlib-bypass castles, and external
+`*Statement` smuggles. Reviewers should consult this file alongside
+`docs/PROOF_INTEGRITY.md`.
+
+## PR and Commit Conventions
+
+### PR title format
+
+```
+type(scope): short description
+```
+
+| Type       | When to use                                      |
+|------------|--------------------------------------------------|
+| `feat`     | New definition, lemma, theorem, or module         |
+| `fix`      | Bug fix (broken proof, wrong identifier, etc.)    |
+| `refactor` | Restructuring without changing API surface        |
+| `docs`     | Documentation or blueprint changes only           |
+| `style`    | Formatting, naming, or docstring cleanup only     |
+| `ci`       | CI/CD workflow changes                            |
+| `chore`    | Dependency bumps, linting, toolchain updates      |
+
+**Scope** is a shortened module path: `LDT/SelfImprovement`, `Quantum`,
+`blueprint`, etc. Omit the `MIPStarRE/` prefix.
+
+### PR body template
+
+Every PR body must contain three sections:
+
+```markdown
+### Motivation
+- Why this change is needed. Cite the issue and paper/blueprint location.
+
+### Description
+- State precisely what changed.
+
+### Testing
+- What was verified and how (e.g., `lake build`, `rg -n "sorry|axiom"`).
+
+---
+Addresses #N
+```
+
+Use `Addresses #N` (keeps the issue open) or `Closes #N` (auto-closes on merge).
+
+### Commit messages
+
+- **Imperative mood** in the subject line ("Add", not "Added")
+- Subject under 72 characters
+- When squash-merging, the commit message should match the PR title format
+
+## Review Process
+
+Every PR touching Lean code should be reviewed against these criteria:
+
+1. **Proof correctness** — No unexplained `sorry`. No `axiom` unless discussed.
+2. **Mathlib style** — Follow `docs/naming.md` and `docs/doc.md`.
+3. **Paper terminology** — Public Lean names and documentation should use
+   terminology from the paper and blueprint. See `docs/mathematical_language.md`.
+4. **Linter hygiene** — Fix warnings, don't mask them with broad
+   `set_option linter.<name> false` blocks.
+5. **Type safety** — No universe mismatches, coercion problems.
+6. **Performance** — Avoid expensive tactics on large types.
+7. **Modularity** — Are new lemmas general enough to be reused?
+8. **Documentation** — Every new `def` and major `theorem` must have a docstring.
+9. **Blueprint sync and paper origin** — Add `\lean{}` and `\leanok` tags for
+   formalized statements. Record formalization-only auxiliary lemmas explicitly.
+10. **Scaffolding integrity** — Verify scaffolding aligns with Mathlib.
+11. **Proof-evasion anti-patterns** — Review against `docs/anti_patterns.md`.
+
+For full details, see `docs/CONTRIBUTING.md` and `docs/pr-review.md`.
+
+## Blueprint and Documentation Work
+
+If modifying blueprint material:
+
+- Keep chapter structure under `blueprint/src/chapter/`
+- Ensure `leanblueprint web` succeeds
+- Keep Lean declaration references valid
+- Sync theorem labels with Lean names
+- Add `\lean{LeanDeclName}` and `\leanok` tags for formalized statements
+
+For blueprint style conventions, see `docs/blueprint_style_guide.md`.
+
+## Agent Rule Sources
+
+Checked in this repository snapshot:
+
+- No `.cursorrules`
+- No `.cursor/rules/`
+- No `.github/copilot-instructions.md`
+
+Use this file together with:
+
+| File | Purpose |
+|------|---------|
+| `CLAUDE.md` | Claude Code-specific notes (minimal pointer to this file) |
+| `docs/CONTRIBUTING.md` | PR format, issue templates, label taxonomy, review checklist |
+| `docs/PROOF_INTEGRITY.md` | Blocker / warning patterns for proof correctness |
+| `docs/anti_patterns.md` | Subtler proof-evasion patterns |
+| `docs/style.md` | Mathlib code style (line length, indentation, tactic formatting) |
+| `docs/naming.md` | Mathlib naming conventions |
+| `docs/doc.md` | Mathlib documentation standards |
+| `docs/mathematical_language.md` | Project-local terminology rules |
+| `docs/blueprint_style_guide.md` | Blueprint notation and section conventions |
+| `docs/api_surface.md` | Useful obligation-closing lemmas for `SubMeas` |
+| `docs/paper-gaps/policy.tex` | Paper-gap documentation conventions |
+| `docs/ci-automation.md` | CI/CD workflow details |
+| `docs/pr-review.md` | Mathlib PR review guide |
+| `docs/pr_review_management.md` | Review thread workflow and bot integration |
+| `audits/` | Chapter-by-chapter scouting reports |
+| Pinned memories (external agent tooling) | Agent session memory maintained by the agent runtime; not a directory in the repository checkout. Pinned memories contain accumulated project lessons |
+
+## Practical Defaults for Agents
 
 When editing Lean code:
 
-1. read the paper source
-2. read the target Lean file and nearby supporting files
-3. type-check the single file
-4. scan for `sorry|axiom`
-5. run `lake build` only when the local change is stable
+1. Read the paper source
+2. Read the target Lean file and nearby supporting files
+3. Type-check the single file
+4. Scan for `sorry|axiom`
+5. Run `lake build` only when the local change is stable
 
 When editing blueprint files:
 
-1. read the matching paper source and chapter file
-2. update Lean links carefully
-3. run `leanblueprint web`
+1. Read the matching paper source and chapter file
+2. Update Lean links carefully
+3. Run `leanblueprint web`
 
-Prefer minimal, dependency-aware changes that preserve the project's theorem structure.
+Prefer minimal, dependency-aware changes that preserve the project's theorem
+structure.
