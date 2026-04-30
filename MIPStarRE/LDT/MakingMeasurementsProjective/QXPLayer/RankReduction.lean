@@ -448,7 +448,7 @@ lemma projectiveLowRankSum_of_projectors {Outcome : Type uOutcome}
       q := R
       t := t }
   refine ⟨data, ?_⟩
-  refine ⟨?_, ?_, ?_, source_almost_projective, ?_, ?_, hAuxDim⟩
+  refine ⟨?_, ?_, ?_, source_almost_projective, ?_, ?_, ?_, ?_⟩
   · intro a
     exact hR.projective a
   · intro a
@@ -468,6 +468,9 @@ lemma projectiveLowRankSum_of_projectors {Outcome : Type uOutcome}
       QTotal data = R.total := rfl
       _ ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
           (1 : MIPStarRE.Quantum.Op ι) := hR.total_le
+  · simpa [Qa, data] using sum_rank_le_card_of_projectors_le_one
+      (R := R.outcome) (hproj := hR.projective) hsum_le_one
+  · simpa [data] using hAuxDim
 
 /-- Concrete rank-reduction producer once the rounded projectors already have
 total rank at most the ambient dimension. This is the `r ≤ d` branch of the
@@ -494,7 +497,7 @@ lemma projectiveLowRankSum_of_rank_bound {Outcome : Type uOutcome}
       q := R
       t := t }
   refine ⟨data, ?_⟩
-  refine ⟨?_, ?_, ?_, source_almost_projective, ?_, ?_, hAuxDim⟩
+  refine ⟨?_, ?_, ?_, source_almost_projective, ?_, ?_, ?_, ?_⟩
   · intro a
     exact hR.projective a
   · intro a
@@ -514,6 +517,8 @@ lemma projectiveLowRankSum_of_rank_bound {Outcome : Type uOutcome}
       QTotal data = R.total := rfl
       _ ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
           (1 : MIPStarRE.Quantum.Op ι) := hR.total_le
+  · simpa [Qa, data] using hrank
+  · simpa [data] using hAuxDim
 
 /-- Sum the rank-one spectral overlaps of all rounded projectors back into
 `ev ψ (∑_a R_a)`.  This isolates the dependent-sigma rewrite used in the
@@ -779,7 +784,7 @@ lemma projectiveLowRankSum_truncate {Outcome : Type uOutcome}
         q := Q
         t := t }
     refine ⟨data, ?_⟩
-    refine ⟨?_, ?_, ?_, source_almost_projective, ?_, ?_, hAuxDim⟩
+    refine ⟨?_, ?_, ?_, source_almost_projective, ?_, ?_, ?_, ?_⟩
     · intro a
       simpa [Q, Qa, data] using (onb a).subprojector_isProj (fiber a)
     · intro a
@@ -790,6 +795,8 @@ lemma projectiveLowRankSum_truncate {Outcome : Type uOutcome}
     · simp [Qa, QTotal, data, Q]
     · simpa [data] using hAQ
     · simpa [QTotal, data] using hQtotal_le
+    · simpa [Qa, data] using hrankQ
+    · simpa [data] using hAuxDim
 
 /-- **Degenerate empty-outcome branch** for `lem:projective-low-rank-sum`.
 
