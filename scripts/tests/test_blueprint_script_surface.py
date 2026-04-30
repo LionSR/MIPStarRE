@@ -62,8 +62,9 @@ WORKFLOW_REQUIRED_PATHS = {
 }
 
 _PATHS_KEY_RE = re.compile(
-    r"^(?P<indent>\s*)paths:\s*"
-    r"(?:(?P<anchor>&[A-Za-z0-9_-]+)|(?P<alias>\*[A-Za-z0-9_-]+))?"
+    r"^(?P<indent>\s*)(?:paths|'paths'|\"paths\"):\s*"
+    r"(?:(?P<anchor>&[A-Za-z0-9_-]+)\s*)?"
+    r"(?:(?P<alias>\*[A-Za-z0-9_-]+)|(?P<flow>\[[^\n]*\]))?"
     r"\s*(?:#.*)?$"
 )
 _PATH_ENTRY_RE = re.compile(
@@ -71,7 +72,7 @@ _PATH_ENTRY_RE = re.compile(
     r"(?P<scalar>(?:'[^'\n]*'|\"[^\"\n]*\"|[^#\n]*?))"
     r"(?:\s+#.*)?\s*$"
 )
-_ON_KEY_RE = re.compile(r"^(?P<indent>\s*)on:\s*(?:#.*)?$")
+_ON_KEY_RE = re.compile(r"^(?P<indent>\s*)(?:on|'on'|\"on\"):\s*(?:#.*)?$")
 _YAML_KEY_RE = re.compile(r"^(?P<indent>\s*)[^:#]+:\s*.*$")
 
 
@@ -80,6 +81,34 @@ def _unquote_path_scalar(scalar: str) -> str:
     if len(scalar) >= 2 and scalar[0] == scalar[-1] and scalar[0] in {"'", '"'}:
         return scalar[1:-1]
     return scalar
+
+
+def _flow_path_scalars(flow: str) -> set[str]:
+    """Parse a simple YAML flow-style path list such as ``['a', \"b\"]``."""
+
+    entries: list[str] = []
+    current: list[str] = []
+    quote: str | None = None
+    for char in flow.strip()[1:-1]:
+        if quote is not None:
+            current.append(char)
+            if char == quote:
+                quote = None
+        elif char in {"'", '"'}:
+            quote = char
+            current.append(char)
+        elif char == ",":
+            entries.append("".join(current))
+            current = []
+        else:
+            current.append(char)
+    entries.append("".join(current))
+
+    return {
+        path
+        for entry in entries
+        if (path := _unquote_path_scalar(entry))
+    }
 
 
 def path_filter_blocks(text: str) -> list[set[str]]:
@@ -108,14 +137,20 @@ def path_filter_blocks(text: str) -> list[set[str]]:
 
     def start_paths_block(match: re.Match[str]) -> None:
         nonlocal current_anchor, current_block, in_paths, paths_indent
+        anchor = match.group("anchor")
+        anchor_name = anchor.removeprefix("&") if anchor else None
         if alias := match.group("alias"):
             blocks.append(set(anchors.get(alias.removeprefix("*"), set())))
+        elif flow := match.group("flow"):
+            block = _flow_path_scalars(flow)
+            blocks.append(block)
+            if anchor_name is not None:
+                anchors[anchor_name] = block
         else:
             in_paths = True
             paths_indent = len(match.group("indent"))
             current_block = set()
-            anchor = match.group("anchor")
-            current_anchor = anchor.removeprefix("&") if anchor else None
+            current_anchor = anchor_name
 
     for raw_line in text.splitlines():
         while True:
@@ -259,6 +294,18 @@ class BlueprintScriptSurfaceTests(unittest.TestCase):
             "scripts/tex_utils.py",
             "scripts/tests/**",
         }
+        self.assertEqual(path_filter_blocks(text), [expected, expected])
+
+    def test_path_filter_parser_accepts_flow_style_lists_and_quoted_on(self) -> None:
+        text = """
+        "on":
+          push:
+            paths: &blueprint_paths ['scripts/blueprint_lean_sync.py', scripts/tests/**]
+          pull_request:
+            paths: *blueprint_paths
+        """
+
+        expected = {"scripts/blueprint_lean_sync.py", "scripts/tests/**"}
         self.assertEqual(path_filter_blocks(text), [expected, expected])
 
     def test_workflow_path_filters_cover_surface(self) -> None:
