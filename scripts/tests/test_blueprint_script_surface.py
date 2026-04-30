@@ -63,11 +63,21 @@ WORKFLOW_REQUIRED_PATHS = {
 
 _PATHS_KEY_RE = re.compile(
     r"^(?P<indent>\s*)paths:\s*"
-    r"(?:(?P<anchor>&[A-Za-z0-9_-]+)|(?P<alias>\*[A-Za-z0-9_-]+))?\s*$"
+    r"(?:(?P<anchor>&[A-Za-z0-9_-]+)|(?P<alias>\*[A-Za-z0-9_-]+))?"
+    r"\s*(?:#.*)?$"
 )
 _PATH_ENTRY_RE = re.compile(
-    r"^(?P<indent>\s*)-\s+['\"]?(?P<path>[^'\"\n]+)['\"]?\s*$"
+    r"^(?P<indent>\s*)-\s+"
+    r"(?P<scalar>(?:'[^'\n]*'|\"[^\"\n]*\"|[^#\n]*?))"
+    r"(?:\s+#.*)?\s*$"
 )
+
+
+def _unquote_path_scalar(scalar: str) -> str:
+    scalar = scalar.strip()
+    if len(scalar) >= 2 and scalar[0] == scalar[-1] and scalar[0] in {"'", '"'}:
+        return scalar[1:-1]
+    return scalar
 
 
 def path_filter_blocks(text: str) -> list[set[str]]:
@@ -102,7 +112,7 @@ def path_filter_blocks(text: str) -> list[set[str]]:
                     # Reconsider this same line: it might start another paths block.
                     continue
                 if match := _PATH_ENTRY_RE.match(raw_line):
-                    current_block.add(match.group("path").strip())
+                    current_block.add(_unquote_path_scalar(match.group("scalar")))
                 break
 
             if match := _PATHS_KEY_RE.match(raw_line):
@@ -171,6 +181,25 @@ class BlueprintScriptSurfaceTests(unittest.TestCase):
         """
 
         expected = {"scripts/blueprint_lean_sync.py", "scripts/tex_utils.py"}
+        self.assertEqual(path_filter_blocks(text), [expected, expected])
+
+    def test_path_filter_parser_accepts_yaml_comments(self) -> None:
+        text = """
+        on:
+          push:
+            paths: &blueprint_paths  # shared trigger list
+              - 'scripts/blueprint_lean_sync.py'  # sync helper
+              - "scripts/tex_utils.py"  # shared helper
+              - scripts/tests/**  # helper tests
+          pull_request:
+            paths: *blueprint_paths  # reuse push paths
+        """
+
+        expected = {
+            "scripts/blueprint_lean_sync.py",
+            "scripts/tex_utils.py",
+            "scripts/tests/**",
+        }
         self.assertEqual(path_filter_blocks(text), [expected, expected])
 
     def test_workflow_path_filters_cover_surface(self) -> None:
