@@ -78,6 +78,7 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
     string_interpolated = False
     in_raw_string = False
     raw_hash_count = 0
+    _just_closed_comment = False
 
     for line in text.splitlines():
         out: list[str] = []
@@ -92,6 +93,8 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
                     continue
                 if line.startswith("-/", i):
                     block_depth -= 1
+                    if block_depth == 0:
+                        _just_closed_comment = True
                     i += 2
                 else:
                     i += 1
@@ -176,7 +179,7 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
                 while j >= 0 and out[j] == "#":
                     hash_run += 1
                     j -= 1
-                if j >= 0 and out[j] == "r":
+                if not _just_closed_comment and j >= 0 and out[j] == "r":
                     prev = out[j - 1] if j > 0 else ""
                     if not (prev.isalnum() or prev in {"_", "'"}):
                         in_string = True
@@ -200,6 +203,8 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
                 if not (prev.isalnum() or prev in {"_", "'"}):
                     in_char = True
                     escaped = False
+            if not char.isspace():
+                _just_closed_comment = False
             out.append(line[i])
             i += 1
         stripped.append("".join(out))
