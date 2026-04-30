@@ -1,0 +1,185 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\setlength{\emergencystretch}{2em}
+
+\input{docs/paper-gaps/command}
+
+\title{Issue 196: The SDP Primal Constraint Is a Submeasurement Constraint}
+\author{}
+\date{2026-04-30}
+
+\newcommand{\Tr}{\operatorname{Tr}}
+\newcommand{\cP}{\mathcal P}
+
+\begin{document}
+\maketitle
+
+\section{The primal feasible set in the paper}
+
+This note concerns the semidefinite program used in the self-improvement
+argument of \cite[Subsection~\emph{A semidefinite program}]{Ji2020LowIndividualDegree}.
+\footnote{The mismatch was recorded in
+\href{https://github.com/LionSR/MIPStarRE/issues/196}{GitHub issue \#196} and
+repaired in
+\href{https://github.com/LionSR/MIPStarRE/pull/251}{GitHub pull request \#251}.
+The documentation issue for this note is
+\href{https://github.com/LionSR/MIPStarRE/issues/935}{GitHub issue \#935}. In
+the TeX source consulted here, the primal SDP is in
+\path{references/ldt-paper/self_improvement.tex}, lines 64--74; the SDP lemma is
+in lines 82--88; and the Slater witness is in lines 168--176.}
+Let $\cP$ be the finite set of degree-bounded polynomials, and set
+\[
+  A_g = \mathbb E_{u\in \mathbb F_q^m} A^u_{g(u)}
+  \qquad (g\in\cP).
+\]
+The primal SDP in the paper is
+\begin{align}
+  \sup_{\{T_g\}_{g\in\cP}}
+    &\quad \sum_{g\in\cP} \Tr(T_g A_g) \tag{\texttt{eq:primal-objective}}\\
+  \text{subject to}
+    &\quad T_g\ge 0 \qquad(g\in\cP), \notag\\
+    &\quad \sum_{g\in\cP} T_g\le I. \notag
+\end{align}
+Thus a feasible primal variable is a submeasurement: a family of positive
+semidefinite effects whose total mass is bounded above by the identity. It is
+not, at this point, required to be a measurement.
+
+The same lemma later asserts the existence of an optimal primal-dual pair
+$(\{T_g\},Z)$ for which
+\[
+  \sum_{g\in\cP} T_g=I,
+  \qquad
+  T_g Z=T_g A_g \quad(g\in\cP).
+  \tag{\texttt{lem:sdp}}
+\]
+This equality is a conclusion about a chosen optimal solution. It is not the
+feasibility constraint of the primal SDP.
+
+\section{Why equality is a stronger formulation}
+
+Replacing $\sum_g T_g\le I$ by $\sum_g T_g=I$ changes the feasible set. The
+change is proper. If $M=|\cP|$, the paper's strict primal witness is
+\[
+  T_g=\frac{1}{2M}I \qquad(g\in\cP).
+\]
+Its total mass is
+\[
+  \sum_{g\in\cP} T_g=\frac12 I,
+\]
+so it is feasible for the paper's SDP and satisfies the inequality strictly, but
+it is not feasible for the equality-constrained SDP.
+
+This point matters for the proof. The family above is the strict-feasibility
+witness used to invoke Slater's condition. It is deliberately not saturated:
+the missing mass is represented in the canonical SDP by the additional slack
+block $X_{M+1,M+1}$. Complementary slackness then forces this slack block to
+vanish at an optimal solution, which yields $\sum_g T_g=I$ for the selected
+optimum. If equality is imposed at the start, this derivation is replaced by an
+assumption and the strict feasible point used in the paper is excluded.
+
+Thus the equality formulation is not a harmless restatement of the displayed
+primal program. It is a smaller SDP. It may still contain saturated optima, but
+that saturation is exactly part of what the paper proves from the submeasurement
+program.
+
+\section{The current formal encoding}
+
+The current development has a public paper-local type for submeasurements: a
+family $T=\{T_g\}$ with $T_g\ge 0$, total
+$\sum_g T_g$, and proof that this total is at most $I$. A measurement is the
+special case where the total is exactly $I$.
+\footnote{These are the declarations
+\path{MIPStarRE.LDT.SubMeas} and \path{MIPStarRE.LDT.Measurement} in
+\path{MIPStarRE/LDT/Basic/SubMeasurementCore.lean}, lines 13--28.}
+The self-improvement SDP definitions now use the submeasurement type for the
+primal variable. In particular, the primal contribution, primal objective, and
+complementary-slackness equation all take $T$ to be a submeasurement, not a
+measurement.
+\footnote{See
+\path{MIPStarRE.LDT.SelfImprovement.sdpPrimalContributionOperator},
+\path{sdpPrimalObjectiveOperator}, \path{sdpPrimalObjective}, and
+\path{sdpComplementarySlacknessEquation} in
+\path{MIPStarRE/LDT/SelfImprovement/Defs.lean}, lines 139--184. The same file
+also defines the sandwiched family \path{sandwichedPolynomialSubMeasAt} and the
+averaged family \path{averagedSandwichedPolynomialSubMeas} with
+$T$ a submeasurement, in lines 198--333.}
+The proof that the sandwiched family is a submeasurement uses the inequality
+$\sum_g T_g\le I$: after grouping the summands by the value of $h(u)$, the
+filtered sum is bounded by the total mass of $T$, and hence by $I$.
+
+The strict primal witness from the paper is represented before completion as a
+submeasurement. The declaration \path{sdpStrictPrimalSubMeas} has outcomes
+$T_g=(2|\cP|)^{-1}I$, and the theorem
+\path{sdpStrictPrimalSubMeas_total} proves that its total is $\frac12 I$.
+\footnote{These are in
+\path{MIPStarRE/LDT/SelfImprovement/Defs.lean}, lines 37--97.}
+This is the formal counterpart of the paper's Slater witness. The declaration
+\path{sdpPrimalWitness} then completes this submeasurement at the zero polynomial
+when a later reduced wrapper needs an honest measurement.
+\footnote{The completion wrapper is
+\path{MIPStarRE.LDT.SelfImprovement.sdpPrimalWitness} in
+\path{MIPStarRE/LDT/SelfImprovement/Defs.lean}, lines 99--110. The surrounding
+comment records that the completed zero-polynomial outcome is no longer the
+paper's uniform strict-feasibility witness.}
+That completion is a downstream packaging step. It is not the primal feasible
+set of the SDP.
+
+The informal blueprint already agrees with the paper on this point: its SDP
+lemma states the primal with $\sum_g T_g\le I$, and only afterwards states the
+existence of an optimal pair whose total is $I$. The resolved mismatch was
+therefore confined to the formal encoding, not a three-way disagreement with the
+blueprint.
+\footnote{See \path{blueprint/src/chapter/ch07_self_improvement.tex}, lines
+281--304.}
+
+At the statement layer, the reduced SDP wrapper exposes the primal witness as a
+submeasurement: \path{SdpStatement.witness} quantifies over
+$T$ of type \path{SubMeas}. The associated witness record still contains a
+field \path{primalTotalOperator} asserting $T$'s total is $I$, but this is the
+paper's saturated-optimum conclusion, not a definition of primal feasibility.
+\footnote{See \path{MIPStarRE.LDT.SelfImprovement.SdpOptimalPair} and
+\path{MIPStarRE.LDT.SelfImprovement.SdpStatement} in
+\path{MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean}, lines 27--49. The
+current proof of the reduced lemma \path{sdp} returns the completed witness by
+coercing it back to a submeasurement; see
+\path{MIPStarRE/LDT/SelfImprovement/Theorems/Results.lean}, lines 74--99.}
+The matrix-level realization follows the same convention: primal variables are
+matrix submeasurements, while the optimal-witness record stores the additional
+identity-total conclusion.
+\footnote{The matrix-level primal-side declarations
+\path{matrixSdpPrimalContributionOperator}, \path{matrixSdpPrimalObjective},
+\path{matrixSdpComplementarySlacknessDefect}, and \path{MatrixSdpOptimalWitness}
+are in \path{MIPStarRE/LDT/SelfImprovement/MatrixRealization.lean}, lines
+42--96; the witness structure itself is in lines 81--96.}
+
+\section{Conclusion}
+
+The verdict is that
+\href{https://github.com/LionSR/MIPStarRE/issues/196}{issue \#196} recorded a
+genuine mismatch. The paper's primal SDP is over submeasurements satisfying
+$\sum_g T_g\le I$. The earlier equality-based formal encoding treated the
+primal variable as a measurement and thereby excluded the paper's strict-feasible
+Slater witness $T_g=(2|\cP|)^{-1}I$.
+
+The mismatch is now resolved at the SDP-interface level. The formal objective,
+complementary-slackness relation, strict primal witness, sandwiched-family
+construction, and reduced SDP statement all expose the primal variable as a
+submeasurement. Where the current reduced proof later completes a particular
+submeasurement to a measurement, that completion is explicit and is separated
+from the paper's strict-feasible SDP witness.
+
+There remains one scope caveat. The present \Lean{} theorem named
+\path{sdp} is a reduced wrapper for the facts currently consumed by the
+self-improvement pipeline; it does not yet formalize the full canonical SDP
+duality argument, Slater theorem, or complementary slackness theorem from the
+paper. If that full argument is later formalized, it should keep the
+submeasurement feasible set until the point where the paper derives the
+saturated optimal witness $\sum_g T_g=I$.
+
+\bibliographystyle{alpha}
+\bibliography{docs/paper-gaps/references}
+
+\end{document}
