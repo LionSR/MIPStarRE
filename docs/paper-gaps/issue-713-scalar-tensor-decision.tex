@@ -7,7 +7,7 @@
 
 \input{docs/paper-gaps/command}
 
-\title{Issue 713: The Scalar/Tensor Bridge in the Full-Slice
+\title{The Scalar/Tensor Bridge in the Full-Slice
 \texorpdfstring{$ABAB$}{ABAB} Transport}
 \author{}
 \date{\today}
@@ -72,10 +72,10 @@ $\zeta$ (hence $\sqrt{\zeta}$ under the $\closenessOfIP$ square root).
 
 \section{The formal scalar endpoint}
 
-In the $\Lean{}$ formalization the top-level $\ABAB$ averages are
+In the formalization the top-level $\ABAB$ averages are
 defined as \emph{scalar} expectations on a single
-register.\footnote{The declarations are \texttt{fullSliceABABAvg} and
-\texttt{evaluatedSliceABABAvg} in
+register.\footnote{The two declarations are named
+\texttt{fullSliceABABAvg} and \texttt{evaluatedSliceABABAvg}, in
 \path{MIPStarRE/LDT/Commutativity/Transport/FullSlice.lean}.}
 Concretely, the full-slice average is
 \[
@@ -100,21 +100,24 @@ scalar: they average $\operatorname{tr}(\rho_{\psi}\, (X \otimes I))$.
 The paper's $\closenessOfIP$ call in~\eqref{eq:gcom4} produces a
 \emph{tensor} endpoint $\BAB \otimes G$, not a scalar~$\BAB \otimes I$.
 To connect the formal scalar endpoints to this tensor endpoint, the
-$\Lean{}$ development inserts a scalar-to-tensor bridge.\footnote{The
-bridge lemma is
+formalization inserts a scalar-to-tensor bridge.\footnote{The bridge
+lemma carries the name
 \texttt{xEvaluatedFullSliceABABAvg\_to\_xEvaluatedFullSliceABABtensorAvg}
-in \path{MIPStarRE/LDT/Commutativity/Main/Auxiliary.lean}.}
+and is located in
+\path{MIPStarRE/LDT/Commutativity/Main/Auxiliary.lean}.}
 This bridge replaces $I$ on the right register with $G^{\bx}_g$ (or
 $G^{\by}_{[h(\bv)=b]}$) and is itself an application of
 $\closenessOfIP$, costing an additional~$\sqrt{\zeta}$.
 
-The full transport lemma\footnote{The declaration
-\texttt{fullSlice\_scalar\_marginalize\_y} in the same file.}
+Write $A^{\ABAB}_{\text{full}}$ and $A^{\ABAB}_{\text{eval}}$ for the
+two scalar averages displayed above. The full transport
+lemma\footnote{The corresponding declaration is
+\texttt{fullSlice\_scalar\_marginalize\_y} in the same file.} then
 assembles the chain:
 \begin{align*}
   \bigl|
-    \mathtt{fullSliceABABAvg}
-    - \mathtt{evaluatedSliceABABAvg}
+    A^{\ABAB}_{\text{full}}
+    - A^{\ABAB}_{\text{eval}}
   \bigr|
   &\leq
   \underbrace{\frac{md}{q} + \sqrt{\zeta}}_{\text{paper prefix}}
@@ -140,11 +143,11 @@ $2md/q + 4\sqrt{\zeta}$ is still bounded by $2md/q + 2\sqrt{\zeta}$
 when $\zeta$ is replaced by a $4$-times-larger parameter, which does
 not change the asymptotic exponent in the final soundness cascade.
 
-In the $\Lean{}$ public API, all four scalar averages are exposed
-with the augmented bounds, while the tensor-form intermediates are
-kept private, consistent with the decision to keep the public API
-purely scalar.\footnote{The public scalar averages are
-\texttt{fullSliceABAAvg}, \texttt{evaluatedSliceABAAvg},
+In the public interface of the formalization, all four scalar
+averages are exposed with the augmented bounds, while the tensor-form
+intermediates are kept private, consistent with the decision to keep
+the public interface purely scalar.\footnote{The public scalar
+averages are \texttt{fullSliceABAAvg}, \texttt{evaluatedSliceABAAvg},
 \texttt{fullSliceABABAvg}, and \texttt{evaluatedSliceABABAvg}; the
 tensor intermediates are \texttt{xEvaluatedSliceBABAtensorAvg} and
 \texttt{xEvaluatedFullSliceABABtensorAvg}.}
@@ -152,9 +155,9 @@ tensor intermediates are \texttt{xEvaluatedSliceBABAtensorAvg} and
 \section{Conclusion}
 
 \noindent\textbf{Verdict:} a genuine quantitative overhead, but no
-mathematical discrepancy. The $\Lean{}$ formalization pays an extra
-$2\sqrt{\zeta}$ to cross between the scalar public API and the tensor
-form required by $\closenessOfIP$. This overhead is accounted for in
+mathematical discrepancy. The formalization pays an extra
+$2\sqrt{\zeta}$ to cross between the scalar public interface and the
+tensor form required by $\closenessOfIP$. This overhead is accounted for in
 the stated error bounds and does not obstruct the final soundness
 estimate. The divergence is present in every lemma that transports a
 scalar $\ABAB$ average through a tensor $\closenessOfIP$ step, and it

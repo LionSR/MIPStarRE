@@ -44,27 +44,28 @@ This is the standard convention in theoretical computer science:
 ``polynomial'' means a function that can be written as an algebraic
 polynomial.
 
-\section{The Lean formalization}
+\section{The formal definition}
 
-The formal development defines a low-individual-degree
-predicate\footnote{The declaration \texttt{HasLowIndividualDegree}
-appears in \path{MIPStarRE/LDT/Basic/LinePolynomials.lean},
-line~20.} as follows:
+The formalization defines a low-individual-degree
+predicate\footnote{The declaration is named
+\texttt{HasLowIndividualDegree} and appears in
+\path{MIPStarRE/LDT/Basic/LinePolynomials.lean}, line~20.} on a
+function $g : \mathbb{F}_q^m \to \mathbb{F}_q$ as follows:
 \[
-  \text{\texttt{HasLowIndividualDegree}}(g) :=
-  \exists\, p : \texttt{PolynomialModel}, 
-    (\forall i,\ \operatorname{degreeOf}_i(p) \le d)
-    \wedge
+  \operatorname{LowDeg}_d(g) \;:=\;
+  \exists\, p \in \mathbb{F}_q[x_1,\dots,x_m],\;
+    \bigl(\forall i,\ \deg_{x_i}(p) \le d\bigr)
+    \;\wedge\;
     g = \operatorname{eval}(p).
 \]
-Here the polynomial model is Mathlib's algebraic polynomial type over
-the chosen finite field,\footnote{The abbreviation
-\texttt{PolynomialModel} expands to
+Here $p$ ranges over the algebraic polynomial ring over the chosen
+finite field,\footnote{This is the abbreviation
+\texttt{PolynomialModel}, which expands to
 \texttt{MvPolynomial (Fin m) (Scalar params)} in
 \path{MIPStarRE/LDT/Basic/ParametersBase.lean}, line~300.}
 and $\operatorname{eval}$ is its coefficient-wise evaluation map to a
 function $\mathbb{F}_q^m \to \mathbb{F}_q$. Thus the predicate asserts
-exactly the paper's condition: the function $g$ has an algebraic
+exactly the paper's condition: the function $g$ admits an algebraic
 polynomial representative of the right degree.
 
 The earlier blueprint used a function-type representation for
