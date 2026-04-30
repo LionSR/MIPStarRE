@@ -1,0 +1,166 @@
+\documentclass{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+
+\input{docs/paper-gaps/command}
+
+\title{Issue 713: The Scalar/Tensor Bridge in the Full-Slice
+\texorpdfstring{$ABAB$}{ABAB} Transport}
+\author{}
+\date{\today}
+
+\newcommand{\ABAB}{\textit{ABAB}}
+\newcommand{\BAB}{\textit{BAB}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\by}{\mathbf{y}}
+\newcommand{\bu}{\mathbf{u}}
+\newcommand{\bv}{\mathbf{v}}
+\newcommand{\closenessOfIP}{\text{closenessOfIP}}
+
+\begin{document}
+\maketitle
+
+\section{The assertion}
+
+This note concerns the transport from the full-slice $\ABAB$ term to the
+evaluated-slice $\ABAB$ term in the proof of commutativity of~$G$ in
+\cite[Section~\emph{Commutativity of~$G$}]{Ji2020LowIndividualDegree}.
+\footnote{The discrepancy is tracked in
+\href{https://github.com/LionSR/MIPStarRE/issues/713}{GitHub issue \#713}.
+In the paper~\TeX{} source consulted here, the transport appears in
+\path{references/ldt-paper/commutativity-G.tex}, lines 332--401;
+the corresponding Lean file is
+\path{MIPStarRE/LDT/Commutativity/Main/Auxiliary.lean}.}
+The context is the proof of the commutativity of~$G$
+(\texttt{thm:com-main}), where the
+commutativity difference is expanded as
+\begin{equation}\label{eq:gcomterms}
+  \mathbb{E}_{\bx,\by} \sum_{g,h}
+    \langle \psi |
+      G^{\bx}_g G^{\by}_h G^{\bx}_g \otimes I
+    | \psi \rangle
+  - 
+  \mathbb{E}_{\bx,\by} \sum_{g,h}
+    \langle \psi |
+      G^{\bx}_g G^{\by}_h G^{\bx}_g G^{\by}_h \otimes I
+    | \psi \rangle.
+  \tag{\texttt{eq:gcomterms}}
+\end{equation}
+The second term is called the $\ABAB$ term. The proof compares
+this term in the full-slice and evaluated-slice regimes.
+
+At line~335 the paper writes the $\closenessOfIP$ step
+\begin{equation}\label{eq:gcom4}
+  \mathbb{E}_{\bx,\by} \sum_{g,h}
+    \langle \psi |
+      G^{\bx}_g G^{\by}_h G^{\bx}_g G^{\by}_h \otimes I
+    | \psi \rangle
+  \approx_{\sqrt{\zeta}} 
+  \mathbb{E}_{\bx,\by} \sum_{g,h}
+    \langle \psi |
+      G^{\by}_h G^{\bx}_g G^{\by}_h \otimes G^{\bx}_g
+    | \psi \rangle.
+  \tag{\texttt{eq:gcom4}}
+\end{equation}
+The right-hand side has the form $\BAB \otimes G$ and is manifestly
+positive semidefinite as a tensor product of operators. The
+$\closenessOfIP$ proposition is applied with $A = G^{\bx}_g \otimes I$,
+$B = I \otimes G^{\bx}_g$, and $C = G^{\by}_h G^{\bx}_g G^{\by}_h$;
+the closeness between $A$ and $B$ follows from self-consistency at cost
+$\zeta$ (hence $\sqrt{\zeta}$ under the $\closenessOfIP$ square root).
+
+\section{The formal scalar endpoint}
+
+In the $\Lean{}$ formalization the top-level $\ABAB$ averages are
+defined as \emph{scalar} expectations on a single register.
+\footnote{The declarations are \path{fullSliceABABAvg} and
+\path{evaluatedSliceABABAvg} in
+\path{MIPStarRE/LDT/Commutativity/Transport/FullSlice.lean}.}
+Concretely,
+\begin{align*}
+  \mathtt{fullSliceABABAvg} &=
+    \mathbb{E}_{\bx,\by} \sum_{g,h}
+      \operatorname{ev}_{\psi}\bigl(    \operatorname{leftTensor}(G^{\bx}_g G^{\by}_h G^{\bx}_g G^{\by}_h)
+      \bigr) ,\\
+  \mathtt{evaluatedSliceABABAvg} &=
+    \mathbb{E}_{\bu,\bv,\bx,\by} \sum_{a,b}
+      \operatorname{ev}_{\psi}\bigl(    \operatorname{leftTensor}(      G^{\bx}_{[g(\bu)=a]} G^{\by}_{[h(\bv)=b]}
+          G^{\bx}_{[g(\bu)=a]} G^{\by}_{[h(\bv)=b]}
+        )
+      \bigr).
+\end{align*}
+In the evaluation $\operatorname{ev}_\psi$, a $\operatorname{leftTensor}$
+is just an abbreviation for $X \otimes I$. Thus both endpoints are
+scalar: they average $\operatorname{tr}(\rho_{\psi}\, (X \otimes I))$.
+
+\section{The scalar/tensor bridge}
+
+The paper's $\closenessOfIP$ call in \eqref{eq:gcom4} produces a
+\emph{tensor} endpoint $\BAB \otimes G$, not a scalar~$\BAB \otimes I$.
+To connect the formal scalar endpoints to this tensor endpoint, the
+$\Lean{}$ development inserts a scalar-to-tensor bridge.
+\footnote{The bridge lemma is
+\path{xEvaluatedFullSliceABABAvg\_to\_xEvaluatedFullSliceABABtensorAvg}
+in \path{MIPStarRE/LDT/Commutativity/Main/Auxiliary.lean}.}
+This bridge replaces $I$ on the right register with $G^{\bx}_g$ (or
+$G^{\by}_{[h(\bv)=b]}$) and is itself an application of
+$\closenessOfIP$, costing an additional~$\sqrt{\zeta}$.
+
+The full transport lemma
+\path{fullSlice\_scalar\_marginalize\_y} assembles the chain:
+\begin{align*}
+  \bigl|
+    \mathtt{fullSliceABABAvg}
+    - \mathtt{evaluatedSliceABABAvg}
+  \bigr|
+  &\leq
+  \underbrace{\frac{md}{q} + \sqrt{\zeta}}_{\text{paper prefix}}
+  + 
+  \underbrace{2\sqrt{\zeta}}_{\text{scalar/tensor bridge}}
+  + 
+  \underbrace{\frac{md}{q} + \sqrt{\zeta}}_{\text{paper tail}} \\
+  &= 2\cdot\frac{md}{q} + 4\sqrt{\zeta}.
+\end{align*}
+Without the scalar/tensor bridge, the bound would be
+$2md/q + 2\sqrt{\zeta}$, matching the paper's implicit transport cost
+before the commutativity-bridge step. The extra $2\sqrt{\zeta}$
+reflects the price of applying $\closenessOfIP$ twice more to shuttle
+between scalar and tensor endpoints.
+
+\section{Impact on the final estimate}
+
+The factor $2\sqrt{\zeta}$ is absorbed into the existing error budget.
+The paper's total transport error without scalar/tensor overhead is
+$2md/q + 2\sqrt{\zeta}$ for the $\ABAB$ term (one-way, before the
+factor~$2$ from~\eqref{eq:gcomterms}). The augmented error
+$2md/q + 4\sqrt{\zeta}$ is still bounded by $2md/q + 2\sqrt{\zeta}$
+when $\zeta$ is replaced by a $4$-times-larger parameter, which does
+not change the asymptotic exponent in the final soundness cascade.
+
+In the $\Lean{}$ public API, all four scalar averages
+(\path{fullSliceABAAvg}, \path{evaluatedSliceABAAvg},
+\path{fullSliceABABAvg}, \path{evaluatedSliceABABAvg}) are exposed
+with the augmented bounds. The tensor-form intermediates
+\path{xEvaluatedSliceBABAtensorAvg} and
+\path{xEvaluatedFullSliceABABtensorAvg} are private lemmas, consistent
+with the decision to keep the public API purely scalar.
+
+\section{Conclusion}
+
+The verdict is that
+\href{https://github.com/LionSR/MIPStarRE/issues/713}{issue \#713}
+records a genuine quantitative overhead: the $\Lean{}$ formalization
+pays an extra $2\sqrt{\zeta}$ to cross between the scalar public API
+and the tensor form required by $\closenessOfIP$. This overhead is
+accounted for in the stated error bounds and does not obstruct the
+final soundness estimate. The divergence is present in every lemma
+that transports a scalar $\ABAB$ average through a tensor
+$\closenessOfIP$ step, and it is a consequence of a deliberate design
+choice to keep the public API in scalar form.
+
+\bibliographystyle{alpha}
+\bibliography{docs/paper-gaps/references}
+
+\end{document}
