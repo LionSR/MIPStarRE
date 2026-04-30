@@ -1,3 +1,39 @@
 % Shared commands for notes in docs/paper-gaps/.
+% All notation matches the LDT paper's wright.sty + multilinearity.tex.
+% DO NOT define a command here differently from wright.sty.
 
 \newcommand{\Lean}{\textsc{Lean}}
+\newcommand{\leanid}[1]{\textsf{#1}}
+\newcommand{\ghissue}[1]{\href{https://github.com/LionSR/MIPStarRE/issues/#1}{GitHub issue \##1}}
+\newcommand{\ghpr}[1]{\href{https://github.com/LionSR/MIPStarRE/pull/#1}{GitHub PR \##1}}
+
+% --- Notation matching wright.sty exactly ---
+% \F, \N, \C, \R, \tr, \ot, \eps, \E, \bx, \bu, \bv, \by
+% are all defined identically to wright.sty.
+
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\tr}{\mathrm{tr}}          % wright.sty line 56
+\newcommand{\eps}{\epsilon}            % wright.sty line 99
+\newcommand{\ot}{\otimes}             % wright.sty line 114
+\newcommand{\E}{\mathop{\bf E\/}}     % wright.sty line 44
+
+% bold random variables (wright.sty uses \boldsymbol, lines 183-187)
+\newcommand{\bu}{\boldsymbol{u}}
+\newcommand{\bv}{\boldsymbol{v}}
+\newcommand{\bx}{{\boldsymbol{x}}}
+\newcommand{\by}{\boldsymbol{y}}
+
+% bra-ket (wright.sty loads braket package)
+\usepackage{braket}
+
+% --- Polynomial spaces matching multilinearity.tex exactly ---
+\newcommand{\polyfunc}[3]{\mathcal{P}(#1, #2, #3)}
+\newcommand{\polymeas}[3]{\mathrm{PolyMeas}(#1, #2, #3)}
+\newcommand{\polysub}[3]{\mathrm{PolySub}(#1, #2, #3)}
+
+% Approximation relations (paper uses \approx_\eps and \simeq_\zeta)
+\newcommand{\approxeps}{\approx_{\varepsilon}}
+\newcommand{\simgeq}{\simeq_{\zeta}}
