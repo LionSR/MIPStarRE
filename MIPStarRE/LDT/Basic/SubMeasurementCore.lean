@@ -27,6 +27,19 @@ structure Measurement (α : Type*) (ι : Type*) [Fintype α] [Fintype ι] [Decid
     extends SubMeas α ι where
   total_eq_one : total = 1
 
+/-- ⚠️ DEGENERATE — Construct a trivial measurement where only the distinguished
+outcome `a₀` is the identity and all other outcomes are zero.
+
+This is a valid POVM but highly degenerate: it is only used in vacuous
+fallback branches of the proof where the error bound is ≥ 1 (see
+`Test/MainTheorem.lean:mainFormal_trivial_witness` and
+`MainInductionStep/Theorems.lean:trivialPolynomialMeasurement`).
+
+Prefer calling this function explicitly (with a chosen outcome) rather than
+relying on the ambient `Inhabited` instance, which picks an arbitrary
+`default : α`.  The `Inhabited` instance is provided for backward compatibility
+with the exclusion-zone files listed above and may be removed once those
+call-sites are migrated. -/
 noncomputable def Measurement.trivialDistinguishedOutcome
     {α : Type*} {ι : Type*}
     [Fintype α] [Fintype ι] [DecidableEq ι]
@@ -63,6 +76,17 @@ structure ProjMeas (α : Type*) (ι : Type*) [Fintype α] [Fintype ι] [Decidabl
     extends Measurement α ι where
   proj : ∀ a, outcome a * outcome a = outcome a
 
+/-- ⚠️ DEGENERATE — Construct a trivial projective measurement where only the
+distinguished outcome `a₀` is the identity and all other outcomes are zero.
+
+This is a valid projective POVM but highly degenerate: see the discussion at
+`Measurement.trivialDistinguishedOutcome`.  Prefer calling this function
+explicitly (with a chosen outcome) rather than relying on the ambient
+`Inhabited` instance.
+
+The ambient `Inhabited (ProjMeas α ι)` instance is provided for backward
+compatibility with exclusion-zone files and should be removed once those
+call-sites are migrated. -/
 noncomputable def ProjMeas.trivialDistinguishedOutcome
     {α : Type*} {ι : Type*}
     [Fintype α] [Fintype ι] [DecidableEq ι]
