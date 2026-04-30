@@ -445,7 +445,7 @@ Use this file together with:
 | `docs/pr-review.md` | Mathlib PR review guide |
 | `docs/pr_review_management.md` | Review thread workflow and bot integration |
 | `audits/` | Chapter-by-chapter scouting reports |
-| `/memories/` | Agent session memory — pinned memories contain accumulated lessons |
+| Pinned memories (external agent tooling) | Agent session memory maintained by the agent runtime; not a directory in the repository checkout. Pinned memories contain accumulated project lessons |
 
 ## Practical Defaults for Agents
 

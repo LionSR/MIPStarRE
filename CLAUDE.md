@@ -18,9 +18,11 @@ integrity rules, PR workflow, and documentation standards.
   prose for third-party readers, not implementation notes.
 - Prefer existing Mathlib lemmas over reproving. Scout Mathlib with `exact?`,
   `apply?`, or grep before writing custom proofs.
-- The pinned memories under `/memories/` contain accumulated project lessons
-  (worktree patterns, CFC.sqrt workarounds, review workflow, paper-faithfulness
-  rules). Consult `mipstar_lessons_learned.md` and `campaign5_workflow_lessons.md`.
+- Claude/tooling may expose pinned memories in an external `/memories/` store
+  (not a directory in the repository checkout). If available, consult
+  `mipstar_lessons_learned.md` and `campaign5_workflow_lessons.md` for
+  accumulated project lessons (worktree patterns, CFC.sqrt workarounds,
+  review workflow, paper-faithfulness rules).
 
 ## Quick Build Commands
 
