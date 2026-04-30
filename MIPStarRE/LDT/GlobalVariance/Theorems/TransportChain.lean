@@ -561,4 +561,27 @@ lemma localVarianceTransportChainBound
   rw [← avgOver_transport_pointPair params f]
   exact localVarianceTransportLinePairBound params strategy eps delta gamma hgood G g
 
+/-- The post-triangle six-step transport error is absorbed by the paper's
+`24(ε + δ + md/q)` slack from `lem:local-variance-of-points`.
+
+This is only the scalar arithmetic after applying
+`prop:triangle-inequality-for-approx_delta` with `k = 6` to the estimates at
+`references/ldt-paper/expansion.tex`, lines 305--311; it does not assert the
+transport estimates themselves. -/
+lemma localVarianceTransportChainError_le_localVarianceOfPointsError
+    (params : Parameters)
+    [FieldModel params.q]
+    {eps delta gamma : Error}
+    (strategy : SymStrat params ι)
+    (hgood : strategy.IsGood eps delta gamma) :
+    localVarianceTransportChainError params eps delta ≤
+      localVarianceOfPointsError params eps delta := by
+  have heps_nonneg := eps_nonneg_of_isGood params strategy hgood
+  have hdelta_nonneg := delta_nonneg_of_isGood params strategy hgood
+  have hgen_nonneg : 0 ≤ generalizeBError params := by
+    dsimp [generalizeBError]
+    positivity
+  dsimp [localVarianceTransportChainError, localVarianceOfPointsError]
+  linarith
+
 end MIPStarRE.LDT.GlobalVariance
