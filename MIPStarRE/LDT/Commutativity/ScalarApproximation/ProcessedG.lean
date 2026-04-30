@@ -8,8 +8,19 @@ import MIPStarRE.LDT.Commutativity.GCommStability.Scalar
 # Processed `G` scalar approximation
 
 This file assembles the paper-faithful evaluated-slice scalar chain used in the proof of
-`lem:comm-data-processed-g`.  The heavier endpoint and normalization lemmas are imported from
+`lem:comm-data-processed-g` (`references/ldt-paper/commutativity-G.tex`, lines 72–131).
+The heavier endpoint and normalization lemmas are imported from
 `ScalarApproximation.PaperChain` so this final assembly can reuse cached proofs.
+
+**Proof strategy:** The proof follows the paper's exact route of ten approximation steps
+using `closenessOfIP`, `commutativityPoints`, `gCommStability_scalar`, and
+`gCommStabilityTwo_scalar`.  Every `≈_{ε}` step in the paper corresponds to a
+named `hphase` block below, and the final error budget `48m(√γ + √ζ)` matches
+the paper's displayed computation at line 129.  The only presentation difference
+is that the Lean chain terminates at the `BAB` average and then applies the
+*exact* swap-symmetry identity `avgBAB = avgABA` (see
+`EvaluatedSliceCommutation/Averages.lean`) rather than directly chaining to `ABA`;
+this is an equality, not an approximation, and does not affect the error budget.
 -/
 
 namespace MIPStarRE.LDT.Commutativity
@@ -37,8 +48,9 @@ Error: `2√ζ + √ζ`.
 swap via `commutativityPoints`, then apply the boundedness part of
 `clm:g-comm-stability2` to remove trailing `G^x`.  The paper states
 `clm:g-comm-stability2` with an additional internal `6√(γ(m+1))` point-swap
-loss; the local `hphase5paper` step below keeps the paper's combined
-`√ζ + 6√(γ(m+1))` contribution explicit.
+loss (the constant 6 comes from `Real.sqrt(32) ≤ 6` in
+`evaluatedSlice_phaseFour_pointSwap_right_bound`); the local `hphase5paper`
+step below keeps the paper's combined `√ζ + 6√(γ(m+1))` contribution explicit.
 Error: `2√ζ + 6√(γ(m+1)) + √ζ + 6√(γ(m+1))`.
 
 **Phase 3** (eq:gcom10 → eq:gonna-cite-this-in-just-a-bit): reverse the
@@ -46,7 +58,8 @@ Error: `2√ζ + 6√(γ(m+1)) + √ζ + 6√(γ(m+1))`.
 Error: `2√ζ + 2√ζ`.
 
 **Phase 4** (eq:gonna-cite-this-in-just-a-bit → BAB = ABA): apply postprocessed
-self-consistency twice.
+self-consistency twice, arriving at the `BAB` average, then use the exact
+swap-symmetry identity `avgBAB = avgABA` (see `evaluatedSliceCommutation_avg_swap_terms`).
 Error: `√ζ + √ζ`.
 
 Total: `12√ζ + 12√(γ(m+1))`. Then `2 * total ≤ 48m(√γ + √ζ)`. -/
@@ -1580,6 +1593,9 @@ private lemma evaluatedSlice_scalar_chain_bound
             rw [Real.sqrt_mul (show 0 ≤ (4 : Error) by positivity)]
             norm_num
   -- Paper line 87: commute the two right-register point measurements.
+  -- The `6√(γ(m+1))` bound comes from `commutativityPoints` via `closenessOfIP`:
+  -- the SDDOpRel error is `32·γ·(m+1)`, applying `closenessOfIP` gives
+  -- `√(32·γ·(m+1))`, and `√32 ≤ 6` rounds up to match the paper's constant.
   have hphase4paper :
       |avgOver 𝒟 phase3PaperInserted - avgOver 𝒟 phase4PaperSwapped| ≤
         6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
@@ -1680,6 +1696,12 @@ private lemma evaluatedSlice_scalar_chain_bound
       _ ≤ 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
               simpa [𝒟, C] using hswap
   -- Paper phase five: remove the trailing `G^x` total from the line-87 endpoint.
+  -- The `√ζ + 6√(γ(m+1))` bound decomposes as:
+  --   - `√ζ` from `gCommStabilityTwo_raw_scalar` (the boundedness part of
+  --     `clm:g-comm-stability2`, corresponding to the paper's line 93 `≈_{√ζ}`)
+  --   - `6√(γ(m+1))` from swapping the right-register point measurements
+  --     inside the phase-5 defect (same `commutativityPoints` →
+  --     `closenessOfIP` → `√32 ≤ 6` chain as Phase 4).
   -- The ordered defect is first swapped on the right register, then reindexed to
   -- `gCommStabilityTwoRawScalarDefect`, whose average is controlled by the new
   -- raw scalar stability theorem.
@@ -1855,8 +1877,15 @@ private lemma evaluatedSlice_scalar_chain_bound
       evaluatedSlice_phaseNine_tail_bound
         params strategy zeta _hnorm family hpostSSC_snd
   -- ── Final assembly (hassemble) ────────────────────────────────────────────
-  -- Follow the paper chain from the `ABAB` term to the `BAB` term, then use the
-  -- exact evaluated-slice swap identity `avgABA = avgBAB`.
+  -- The paper chain (commutativity-G.tex, lines 72–119) converts `ABAB` to `ABA`
+  -- through ten approximation steps.  In the Lean development, the chain
+  -- terminates at `BAB` after Phase 4, then we apply the exact swap-symmetry
+  -- identity `avgBAB = avgABA`.  This identity is an equality, not an
+  -- approximation: the uniform average over evaluated-slice questions is
+  -- invariant under swapping the question coordinates `(q₁,q₂)↦(q₂,q₁)`, and
+  -- the corresponding relabeling of outcomes `(a,b)↦(b,a)` transforms the
+  -- `BAB` term into the `ABA` term.  See
+  -- `EvaluatedSliceCommutation/Averages.lean` for the proof.
   have hassemble :
       2 * (avgOver 𝒟 avgABA - avgOver 𝒟 avgABAB) ≤
         commDataProcessedGError params gamma zeta := by
