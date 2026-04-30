@@ -1,3 +1,28 @@
 % Shared commands for notes in docs/paper-gaps/.
+% Notation follows the LDT paper (references/ldt-paper/).
 
 \newcommand{\Lean}{\textsc{Lean}}
+\newcommand{\leanid}[1]{\textsf{#1}}
+\newcommand{\ghissue}[1]{\href{https://github.com/LionSR/MIPStarRE/issues/#1}{GitHub issue \##1}}
+\newcommand{\ghpr}[1]{\href{https://github.com/LionSR/MIPStarRE/pull/#1}{GitHub PR \##1}}
+
+% --- Paper-compatible notation ---
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\ot}{\otimes}
+\newcommand{\E}{\mathop{\bf E\/}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\by}{\mathbf{y}}
+\newcommand{\bu}{\mathbf{u}}
+\newcommand{\bv}{\mathbf{v}}
+
+% Approximation relation (paper uses \approx_\eps and \simeq_\zeta)
+\newcommand{\approxeps}{\approx_{\varepsilon}}
+\newcommand{\simgeq}{\simeq_{\zeta}}
+
+% Polynomial spaces (paper uses \polyfunc, \polysub, \polymeas)
+\newcommand{\polyfunc}[3]{\operatorname{Poly}(#1,#2,#3)}
+\newcommand{\polysub}[3]{\operatorname{PolySub}(#1,#2,#3)}
+\newcommand{\polymeas}[3]{\operatorname{PolyMeas}(#1,#2,#3)}
