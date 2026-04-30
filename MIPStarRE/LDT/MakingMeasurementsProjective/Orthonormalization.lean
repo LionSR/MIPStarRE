@@ -584,11 +584,11 @@ lemma orthonormalizationMeasurement {Outcome : Type*}
   rcases hP with ⟨hP⟩
   exact ⟨hP.trans (orthonormalizationMainLemmaError_le_orthonormalizationError ζ hζ)⟩
 
-/-- Explicit witness construction for `OrthonormalizationInput`.
+/-- Package explicit witnesses into `OrthonormalizationInput`.
 
-This packages the two remaining unformalized pieces — the spectral-truncation
-witness for the option-completed measurement and the locality-preserving repair
-witness — into the single bridge structure consumed by `thm:orthonormalization`.
+This takes the supplied spectral-truncation witness for the option-completed
+measurement and the locality-preserving repair witness and packages them into
+the single bridge structure consumed by `thm:orthonormalization`.
 Both fields live at error `consistencyToAlmostProjectiveError (2 * ζ)` because
 completing a `ζ`-strongly-self-consistent submeasurement to a measurement
 doubles the defect, exactly as in the paper's `1 − 2ζ` lower bound for the
@@ -596,16 +596,13 @@ completed family. -/
 def orthonormalizationInput_mk {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) (ζ : Error)
-    (hspectral : let Ahat : Measurement (Option Outcome) ι := optionCompletion A
-      SpectralTruncationInput ψ (leftLiftedMeasurement (ιB := ι) Ahat)
-        (consistencyToAlmostProjectiveError (2 * ζ)))
-    (hrepair : let Ahat : Measurement (Option Outcome) ι := optionCompletion A
-      LeftLiftedProjectivizationRepairInput ψ Ahat
-        (consistencyToAlmostProjectiveError (2 * ζ))) :
+    (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) (ζ : Error) :
+    let Ahat : Measurement (Option Outcome) ι := optionCompletion A
+    let δ : Error := consistencyToAlmostProjectiveError (2 * ζ)
+    SpectralTruncationInput ψ (leftLiftedMeasurement (ιB := ι) Ahat) δ →
+    LeftLiftedProjectivizationRepairInput ψ Ahat δ →
     OrthonormalizationInput ψ A ζ :=
-  { spectral := hspectral
-    repair := hrepair }
+  fun hspectral hrepair => { spectral := hspectral, repair := hrepair }
 
 set_option linter.unusedFintypeInType false in
 /-- `thm:orthonormalization`.
