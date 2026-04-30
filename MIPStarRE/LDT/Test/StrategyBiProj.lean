@@ -174,7 +174,8 @@ noncomputable def bobLocalDirectSumBlock {ιA ιB : Type*}
 /-- Direct-sum blocks are additive in the two diagonal blocks. -/
 @[simp] theorem localDirectSumBlock_add {ιA ιB : Type*}
     (A₁ A₂ : MIPStarRE.Quantum.Op ιA) (B₁ B₂ : MIPStarRE.Quantum.Op ιB) :
-    localDirectSumBlock A₁ B₁ + localDirectSumBlock A₂ B₂ = localDirectSumBlock (A₁ + A₂) (B₁ + B₂) := by
+    localDirectSumBlock A₁ B₁ + localDirectSumBlock A₂ B₂ =
+      localDirectSumBlock (A₁ + A₂) (B₁ + B₂) := by
   simp [localDirectSumBlock, Matrix.fromBlocks_add]
 
 @[simp] theorem localDirectSumBlock_conjTranspose {ιA ιB : Type*}
@@ -184,7 +185,8 @@ noncomputable def bobLocalDirectSumBlock {ιA ιB : Type*}
 
 @[simp] theorem localDirectSumBlock_mul {ιA ιB : Type*} [Fintype ιA] [Fintype ιB]
     (A₁ A₂ : MIPStarRE.Quantum.Op ιA) (B₁ B₂ : MIPStarRE.Quantum.Op ιB) :
-    localDirectSumBlock A₁ B₁ * localDirectSumBlock A₂ B₂ = localDirectSumBlock (A₁ * A₂) (B₁ * B₂) := by
+    localDirectSumBlock A₁ B₁ * localDirectSumBlock A₂ B₂ =
+      localDirectSumBlock (A₁ * A₂) (B₁ * B₂) := by
   simp [localDirectSumBlock, Matrix.fromBlocks_multiply]
 
 /-- A direct sum of positive semidefinite operators is positive semidefinite. -/
