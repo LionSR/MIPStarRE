@@ -71,6 +71,8 @@ _PATH_ENTRY_RE = re.compile(
     r"(?P<scalar>(?:'[^'\n]*'|\"[^\"\n]*\"|[^#\n]*?))"
     r"(?:\s+#.*)?\s*$"
 )
+_ON_KEY_RE = re.compile(r"^(?P<indent>\s*)on:\s*(?:#.*)?$")
+_YAML_KEY_RE = re.compile(r"^(?P<indent>\s*)[^:#]+:\s*.*$")
 
 
 def _unquote_path_scalar(scalar: str) -> str:
@@ -81,10 +83,14 @@ def _unquote_path_scalar(scalar: str) -> str:
 
 
 def path_filter_blocks(text: str) -> list[set[str]]:
-    """Extract only entries inside GitHub Actions ``paths:`` filters."""
+    """Extract entries from GitHub Actions trigger ``paths:`` filters."""
 
     blocks: list[set[str]] = []
     anchors: dict[str, set[str]] = {}
+    in_on = False
+    on_indent = 0
+    event_indent: int | None = None
+    event_child_indent: int | None = None
     in_paths = False
     paths_indent = 0
     current_block: set[str] = set()
@@ -100,30 +106,66 @@ def path_filter_blocks(text: str) -> list[set[str]]:
         current_block = set()
         in_paths = False
 
+    def start_paths_block(match: re.Match[str]) -> None:
+        nonlocal current_anchor, current_block, in_paths, paths_indent
+        if alias := match.group("alias"):
+            blocks.append(set(anchors.get(alias.removeprefix("*"), set())))
+        else:
+            in_paths = True
+            paths_indent = len(match.group("indent"))
+            current_block = set()
+            anchor = match.group("anchor")
+            current_anchor = anchor.removeprefix("&") if anchor else None
+
     for raw_line in text.splitlines():
         while True:
+            stripped = raw_line.strip()
+            if not stripped or stripped.startswith("#"):
+                break
+            indent = len(raw_line) - len(raw_line.lstrip(" "))
+
             if in_paths:
-                stripped = raw_line.strip()
-                if not stripped or stripped.startswith("#"):
-                    break
-                indent = len(raw_line) - len(raw_line.lstrip(" "))
                 if indent <= paths_indent:
                     finish_current_block()
                     # Reconsider this same line: it might start another paths block.
                     continue
                 if match := _PATH_ENTRY_RE.match(raw_line):
-                    current_block.add(_unquote_path_scalar(match.group("scalar")))
+                    path = _unquote_path_scalar(match.group("scalar"))
+                    if path:
+                        current_block.add(path)
                 break
 
-            if match := _PATHS_KEY_RE.match(raw_line):
-                if alias := match.group("alias"):
-                    blocks.append(set(anchors.get(alias.removeprefix("*"), set())))
-                else:
-                    in_paths = True
-                    paths_indent = len(match.group("indent"))
-                    current_block = set()
-                    anchor = match.group("anchor")
-                    current_anchor = anchor.removeprefix("&") if anchor else None
+            if in_on:
+                if indent <= on_indent:
+                    in_on = False
+                    event_indent = None
+                    event_child_indent = None
+                    # Reconsider this same line: it might start another top-level block.
+                    continue
+
+                if match := _PATHS_KEY_RE.match(raw_line):
+                    path_key_indent = len(match.group("indent"))
+                    if event_indent is not None and (
+                        event_child_indent is None or path_key_indent == event_child_indent
+                    ):
+                        event_child_indent = path_key_indent
+                        start_paths_block(match)
+                    break
+
+                if match := _YAML_KEY_RE.match(raw_line):
+                    key_indent = len(match.group("indent"))
+                    if event_indent is None or key_indent <= event_indent:
+                        event_indent = key_indent
+                        event_child_indent = None
+                    elif event_child_indent is None:
+                        event_child_indent = key_indent
+                break
+
+            if match := _ON_KEY_RE.match(raw_line):
+                in_on = True
+                on_indent = len(match.group("indent"))
+                event_indent = None
+                event_child_indent = None
             break
 
     if in_paths:
@@ -165,6 +207,23 @@ class BlueprintScriptSurfaceTests(unittest.TestCase):
             steps:
               - uses: actions/checkout@v6
               - run: python3 scripts/blueprint_lean_sync.py --root . --ci
+        """
+
+        self.assertEqual(path_filter_blocks(text), [{"scripts/tex_utils.py"}])
+
+    def test_path_filter_parser_ignores_non_trigger_paths_keys(self) -> None:
+        text = """
+        on:
+          pull_request:
+            paths:
+              - 'scripts/tex_utils.py'
+        jobs:
+          test:
+            steps:
+              - uses: actions/cache@v5
+                with:
+                  paths:
+                    - '.lake/build'
         """
 
         self.assertEqual(path_filter_blocks(text), [{"scripts/tex_utils.py"}])
