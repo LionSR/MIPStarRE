@@ -7,6 +7,12 @@ import MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG
 Top-level `thm:com-main` statement, lifting evaluated commutation back to
 full-slice commutation via the two-step Schwartz–Zippel marginalization.
 
+The two-step lift uses a hybrid scalar/tensor architecture (Option 3):
+the public conclusion is an `SDDOpRel` on operator families, composed from
+scalar transport lemmas whose proofs internally use tensor-form intermediates
+for the PSD Schwartz–Zippel argument.
+See `docs/decisions/713-scalar-tensor-decision.md`.
+
 ## References
 
 - arXiv:2009.12982, Section 11 (`thm:com-main`).
