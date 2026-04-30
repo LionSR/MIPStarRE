@@ -437,5 +437,3 @@ lemma matrixGlobalVarianceOfPoints
   exact hpoint g
 
 end MIPStarRE.LDT.GlobalVariance
-
-end MIPStarRE.LDT.GlobalVariance

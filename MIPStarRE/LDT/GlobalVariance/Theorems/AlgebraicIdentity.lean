@@ -523,5 +523,6 @@ lemma globalVarianceDeviationAtPolynomial_le_m_localVarianceDeviationAtPolynomia
         ring
     _ = (params.m : Error) *
           localVarianceDeviationAtPolynomial params strategy strategy.state G g := by
+        rw [hlocal]
 
 end MIPStarRE.LDT.GlobalVariance
