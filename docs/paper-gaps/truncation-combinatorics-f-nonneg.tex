@@ -98,6 +98,20 @@ ordering and total-estimate hypotheses are verified from the properties of the
 overlaps, and the lemma then supplies the needed bound on the sum over the small
 entries.
 
+
+\section{Relation with the blueprint}
+
+The blueprint states this lemma as
+\path{lem:small-overlap-averaging} in
+\cite[Chapter~\emph{Making measurements projective}]{MIPStarREBlueprint}.
+\footnote{In the blueprint source consulted here, this is in
+\path{blueprint/src/chapter/ch04_projective.tex}, lines 93--106.}
+It takes $f:\alpha\to \R$ to be an arbitrary real-valued function and does not
+require $f\ge 0$; the hypotheses are exactly the ordering hypothesis, the total
+estimate, the size constraints, and $0\le\zeta\le 1/4$.  The blueprint therefore
+matches the Lean statement rather than the paper, and the discrepancy with the
+paper is already resolved at the blueprint level.
+
 \section{Conclusion}
 
 There is no mathematical discrepancy. The formal lemma is a conservative
