@@ -32,7 +32,7 @@ rename. The concrete API migration is tracked by follow-up issue #961.
 
 ## Source of Truth
 
-The paper terminology is concentrated in two places.
+The paper terminology is concentrated in four relevant passages across two source files.
 
 1. `references/ldt-paper/test_definition.tex:3-8` defines a role as an element
    of `\{\mathrm A, \mathrm B\}` and uses Player A / Player B terminology.
