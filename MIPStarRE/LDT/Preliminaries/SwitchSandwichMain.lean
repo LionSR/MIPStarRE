@@ -23,6 +23,6 @@ where:
 * `middleSandwichExpectation` = `leftTensor(B) * rightTensor(A_a)` = `B ⊗ A_a`
 * `rightSandwichExpectation`  = `leftTensor(B * A_a)` = `B A_a ⊗ I`
 
-The hypothesis `BipartiteSDDRel ψ 𝒟 (toSubMeas A) (toSubMeas A) δ` encodes
+The hypothesis `BipartiteSDDRel ψ 𝒟 (IdxProjSubMeas.toIdxSubMeas A) (IdxProjSubMeas.toIdxSubMeas A) δ` encodes
 `A_a^x ⊗ I ≈_δ I ⊗ A_a^x` — exactly the paper's `eq:Aapproxd`.
 -/
