@@ -519,45 +519,16 @@ theorem of_submeasurement_match_mass_and_completion
     ProjectivizationMatchMassMonotonicity ψ G_A G_B Q_A Q_B := by
   rcases hleftPreservation with ⟨hleft⟩
   rcases hrightPreservation with ⟨hright⟩
-  have hQAsub : Q_A.toSubMeas = (completeAtOutcome P_A.toSubMeas a_A).toSubMeas := by
-    calc
-      Q_A.toSubMeas = Q_A.toMeasurement.toSubMeas := rfl
-      _ = (completeAtOutcome P_A.toSubMeas a_A).toSubMeas := by rw [hQALeft]
-  have hQBsub : Q_B.toSubMeas = (completeAtOutcome P_B.toSubMeas a_B).toSubMeas := by
-    calc
-      Q_B.toSubMeas = Q_B.toMeasurement.toSubMeas := rfl
-      _ = (completeAtOutcome P_B.toSubMeas a_B).toSubMeas := by rw [hQBRight]
-  have hcompAsub :
-      (completeAtOutcomeProj P_A a_A).toSubMeas =
-        (completeAtOutcome P_A.toSubMeas a_A).toSubMeas := rfl
-  have hcompBsub :
-      (completeAtOutcomeProj P_B a_B).toSubMeas =
-        (completeAtOutcome P_B.toSubMeas a_B).toSubMeas := rfl
-  refine
-    { leftMatchMassPreservation := ?_
-      rightMatchMassPreservation := ?_ }
-  · calc
-      qBipartiteMatchMass ψ Q_A.toSubMeas G_B.toSubMeas
-          = qBipartiteMatchMass ψ
-              (completeAtOutcome P_A.toSubMeas a_A).toSubMeas
-              G_B.toSubMeas := by rw [hQAsub]
-      _ = qBipartiteMatchMass ψ
-              (completeAtOutcomeProj P_A a_A).toSubMeas
-              G_B.toSubMeas := by rw [hcompAsub]
-      _ ≥ qBipartiteMatchMass ψ P_A.toSubMeas G_B.toSubMeas :=
-            completeAtOutcomeProj_left_matchMass_ge ψ P_A G_B.toSubMeas a_A
-      _ ≥ qBipartiteMatchMass ψ G_A.toSubMeas G_B.toSubMeas := hleft
-  · calc
-      qBipartiteMatchMass ψ Q_B.toSubMeas G_A.toSubMeas
-          = qBipartiteMatchMass ψ
-              (completeAtOutcome P_B.toSubMeas a_B).toSubMeas
-              G_A.toSubMeas := by rw [hQBsub]
-      _ = qBipartiteMatchMass ψ
-              (completeAtOutcomeProj P_B a_B).toSubMeas
-              G_A.toSubMeas := by rw [hcompBsub]
-      _ ≥ qBipartiteMatchMass ψ P_B.toSubMeas G_A.toSubMeas :=
-            completeAtOutcomeProj_left_matchMass_ge ψ P_B G_A.toSubMeas a_B
-      _ ≥ qBipartiteMatchMass ψ G_B.toSubMeas G_A.toSubMeas := hright
+  have hQALeftProj : Q_A = completeAtOutcomeProj P_A a_A :=
+    ProjMeas.ext (fun a => by
+      simpa [completeAtOutcomeProj, completeAtOutcome] using
+        congrArg (fun (M : Measurement Outcome ι) => M.outcome a) hQALeft)
+  have hQBRightProj : Q_B = completeAtOutcomeProj P_B a_B :=
+    ProjMeas.ext (fun a => by
+      simpa [completeAtOutcomeProj, completeAtOutcome] using
+        congrArg (fun (M : Measurement Outcome ι) => M.outcome a) hQBRight)
+  rw [hQALeftProj, hQBRightProj]
+  exact of_completeAtOutcomeProj P_A P_B a_A a_B hleft hright
 
 end ProjectivizationMatchMassMonotonicity
 
