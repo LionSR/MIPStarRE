@@ -98,20 +98,16 @@ noncomputable def ProjMeas.trivialDistinguishedOutcome
       (if a = a₀ then (1 : MIPStarRE.Quantum.Op ι) else 0) := by
     intro a
     by_cases h : a = a₀ <;> simp [h]
+  have h_outcome (a : α) :
+      (Measurement.trivialDistinguishedOutcome a₀).outcome a =
+        if a = a₀ then (1 : MIPStarRE.Quantum.Op ι) else 0 := by
+    simp [Measurement.trivialDistinguishedOutcome]
   refine
-    { toMeasurement := {
-        toSubMeas := {
-          outcome := fun a => if a = a₀ then 1 else 0
-          total := 1
-          outcome_pos := by
-            intro a
-            by_cases h : a = a₀ <;> simp [h]
-          sum_eq_total := by
-            simp
-          total_le_one := le_rfl
-        }
-        total_eq_one := rfl }
-      proj := hproj }
+    { toMeasurement := Measurement.trivialDistinguishedOutcome a₀
+      proj := by
+        intro a
+        rw [h_outcome a]
+        exact hproj a }
 
 noncomputable instance {α : Type*} {ι : Type*}
     [Inhabited α] [Fintype α] [Fintype ι] [DecidableEq ι] :
