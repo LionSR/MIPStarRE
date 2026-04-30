@@ -466,6 +466,97 @@ theorem rightConsistency {Outcome : Type*} {ι : Type*}
   simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily]
     using hdefect.trans hpre'
 
+/-- Match-mass preservation input for the orthonormalization step.
+
+Asserts that the projective submeasurement `P` produced by orthonormalization
+preserves at least as much bipartite correlation with a fixed partner
+measurement `B` as the original measurement `G` did.  This is a
+construction-level property of the specific orthonormalization used; it is NOT
+a consequence of `SDDRel` closeness alone.  It is packaged here as a named
+`Prop` structure so that the `mainFormal` residual can receive it as a single
+field and the downstream `leftConsistency` / `rightConsistency` theorems can
+recover the exact paper line-169 `ζ₁` consistency links. -/
+structure OrthonormalizationMatchMassPreservation
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState (ι × ι))
+    (G : Measurement Outcome ι) (P : ProjSubMeas Outcome ι)
+    (B : Measurement Outcome ι) : Prop where
+  /-- The projective submeasurement `P` has at least as much diagonal match mass
+  with `B` as the original `G` did. -/
+  matchMassPreservation :
+    qBipartiteMatchMass ψ P.toSubMeas B.toSubMeas ≥
+      qBipartiteMatchMass ψ G.toSubMeas B.toSubMeas
+
+end ProjectivizationMatchMassMonotonicity
+
+namespace ProjectivizationMatchMassMonotonicity
+
+/-- Construct `ProjectivizationMatchMassMonotonicity` from match-mass preservation
+for the intermediate projective submeasurements produced by orthonormalization.
+
+This is the **P-level producer** that unblocks the exact paper line-169 `ζ₁`
+consistency links in `mainFormal`.  Given match-mass inequalities for the
+projective submeasurements `P_A`, `P_B` and the fact that the completed
+projective measurements `Q_A`, `Q_B` are the canonical completions of `P_A`,
+`P_B`, this lifts the preservation through the completion step.
+
+Together with `leftConsistency` and `rightConsistency`, this fills the
+`line169MatchMassMonotonicity` field of
+`MainFormalPostRolePackageLeftCompletionLine169Residual`. -/
+theorem of_submeasurement_match_mass_and_completion
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    {ψ : QuantumState (ι × ι)} {G_A G_B : Measurement Outcome ι}
+    (P_A P_B : ProjSubMeas Outcome ι) (a_A a_B : Outcome)
+    (Q_A Q_B : ProjMeas Outcome ι)
+    (hQALeft : Q_A.toMeasurement = completeAtOutcome P_A.toSubMeas a_A)
+    (hQBRight : Q_B.toMeasurement = completeAtOutcome P_B.toSubMeas a_B)
+    (hleftPreservation : OrthonormalizationMatchMassPreservation ψ G_A P_A G_B)
+    (hrightPreservation : OrthonormalizationMatchMassPreservation ψ G_B P_B G_A) :
+    ProjectivizationMatchMassMonotonicity ψ G_A G_B Q_A Q_B := by
+  rcases hleftPreservation with ⟨hleft⟩
+  rcases hrightPreservation with ⟨hright⟩
+  have hQAsub : Q_A.toSubMeas = (completeAtOutcome P_A.toSubMeas a_A).toSubMeas := by
+    calc
+      Q_A.toSubMeas = Q_A.toMeasurement.toSubMeas := rfl
+      _ = (completeAtOutcome P_A.toSubMeas a_A).toSubMeas := by rw [hQALeft]
+  have hQBsub : Q_B.toSubMeas = (completeAtOutcome P_B.toSubMeas a_B).toSubMeas := by
+    calc
+      Q_B.toSubMeas = Q_B.toMeasurement.toSubMeas := rfl
+      _ = (completeAtOutcome P_B.toSubMeas a_B).toSubMeas := by rw [hQBRight]
+  have hcompAsub :
+      (completeAtOutcomeProj P_A a_A).toSubMeas =
+        (completeAtOutcome P_A.toSubMeas a_A).toSubMeas := rfl
+  have hcompBsub :
+      (completeAtOutcomeProj P_B a_B).toSubMeas =
+        (completeAtOutcome P_B.toSubMeas a_B).toSubMeas := rfl
+  refine
+    { leftMatchMassPreservation := ?_
+      rightMatchMassPreservation := ?_ }
+  · calc
+      qBipartiteMatchMass ψ Q_A.toSubMeas G_B.toSubMeas
+          = qBipartiteMatchMass ψ
+              (completeAtOutcome P_A.toSubMeas a_A).toSubMeas
+              G_B.toSubMeas := by rw [hQAsub]
+      _ = qBipartiteMatchMass ψ
+              (completeAtOutcomeProj P_A a_A).toSubMeas
+              G_B.toSubMeas := by rw [hcompAsub]
+      _ ≥ qBipartiteMatchMass ψ P_A.toSubMeas G_B.toSubMeas :=
+            completeAtOutcomeProj_left_matchMass_ge ψ P_A G_B.toSubMeas a_A
+      _ ≥ qBipartiteMatchMass ψ G_A.toSubMeas G_B.toSubMeas := hleft
+  · calc
+      qBipartiteMatchMass ψ Q_B.toSubMeas G_A.toSubMeas
+          = qBipartiteMatchMass ψ
+              (completeAtOutcome P_B.toSubMeas a_B).toSubMeas
+              G_A.toSubMeas := by rw [hQBsub]
+      _ = qBipartiteMatchMass ψ
+              (completeAtOutcomeProj P_B a_B).toSubMeas
+              G_A.toSubMeas := by rw [hcompBsub]
+      _ ≥ qBipartiteMatchMass ψ P_B.toSubMeas G_A.toSubMeas :=
+            completeAtOutcomeProj_left_matchMass_ge ψ P_B G_A.toSubMeas a_B
+      _ ≥ qBipartiteMatchMass ψ G_B.toSubMeas G_A.toSubMeas := hright
+
 end ProjectivizationMatchMassMonotonicity
 
 namespace ProjectivizationLine156Handoff
