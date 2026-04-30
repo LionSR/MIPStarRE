@@ -103,8 +103,10 @@ lemma completePartAggregateCommutation_as_total
                   (switcherooAggregateRight_completePart_outcome params family q)
     _ ≤ gamma := hcomm
 
-set_option maxHeartbeats 1000000 in
--- Many sqrt/rpow manipulations for `12 * sqrt zeta + 4 * sqrt (ν_com) ≤ ν₂`.
+set_option maxHeartbeats 1000000 in -- large sqrt/rpow proof, see issue #894
+/-- Many sqrt/rpow manipulations for `12 * sqrt zeta + 4 * sqrt (ν_com) ≤ ν₂`.
+This shows that the first-switcheroo error (the `commutativitySwitcherooError`)
+is bounded above by the complete-part commuting-with-G error. -/
 lemma firstSwitcherooError_le_commutingWithGCompleteError
     (params : Parameters) [FieldModel params.q]
     (gamma zeta : Error)
