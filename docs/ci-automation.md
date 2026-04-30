@@ -15,7 +15,7 @@ This repository uses [Claude Code](https://docs.anthropic.com/en/docs/claude-cod
   - [Lean Linter-Warning Auto-Fix](#lean-linter-warning-auto-fix-lean-linter-warning-autofixyml)
   - [README Freshness Audit](#readme-freshness-audit-readme-freshness-audityml)
   - [Blueprint Auto-Fix](#blueprint-auto-fix-blueprint-auto-fixyml)
-  - [Review Comment Auto-Fix](#review-comment-auto-fix-pr-review-auto-fixyml)
+  - [Review Comment Auto-Fix](#review-comment-auto-fix-auto-fixyml)
   - [Claude Mention Handler](#claude-mention-handler-claudeyml)
   - [Shared CI Auto-Fix Template](#shared-ci-auto-fix-template-_ci-auto-fix-sharedyml)
 - [Safety Mechanisms](#safety-mechanisms)
@@ -62,7 +62,7 @@ When you push to a PR branch, several things happen in parallel:
   │              │ On success, if PR has the "auto-fix-claude" label:
   │              ▼
   │  ┌──────────────────────────────────────────────────────────────┐
-  │  │  Review Comment Auto-Fix (pr-review-auto-fix.yml)            │
+  │  │  Review Comment Auto-Fix (auto-fix.yml)                      │
   │  │  Reads the review comments, fixes the issues, pushes.        │
   │  │  The push triggers a new review (above), creating a loop     │
   │  │  that repeats until no comments remain or the cap is hit.    │
@@ -120,7 +120,8 @@ Here is exactly what happens:
 
 1. You push code to a PR branch.
 2. **Claude Code Review** runs and posts inline comments (e.g., "this proof uses `sorry`", "naming doesn't follow Mathlib conventions").
-3. If the PR has the `auto-fix-claude` label, **pr-review-auto-fix** triggers. It:
+3. If the PR has the `auto-fix-claude` label, the review-fix job in
+   **auto-fix.yml** triggers. It:
    - Reads all unresolved, non-outdated review threads on the PR
    - Passes them to Claude, which fixes each issue
    - Runs `lake build` to verify the fix compiles
@@ -314,7 +315,7 @@ python3 scripts/audit_readme_freshness.py --root . --readme README.md
 
 ---
 
-### Review Comment Auto-Fix (`pr-review-auto-fix.yml`)
+### Review Comment Auto-Fix (`auto-fix.yml`)
 
 **What it does**: After a Claude Code Review completes, this workflow reads the review comments and asks Claude to fix each issue. This creates the fixed-point loop described above.
 
@@ -370,7 +371,8 @@ Both CI-fix and review-fix commits count toward **the same shared budget of 5**.
 
 ### Concurrency Groups
 
-All auto-fix workflows (`ci-failure-auto-fix`, `blueprint-auto-fix`, `pr-review-auto-fix`) share the same concurrency group: `bot-fix-<branch-name>`. This means:
+All auto-fix jobs in `auto-fix.yml` share the same concurrency group:
+`bot-fix-<branch-name>`. This means:
 - Only one auto-fix workflow runs per branch at a time
 - If a new fix triggers while one is running, the old one is cancelled
 - CI-fix, blueprint-fix, and review-fix never run simultaneously on the same branch
@@ -381,7 +383,11 @@ All `workflow_run`-triggered workflows check that the PR comes from the same rep
 
 ### Label Gate
 
-The review-fix loop (`pr-review-auto-fix.yml`) only runs on PRs that have the `auto-fix-claude` label. This gives you explicit opt-in control over which PRs enter the automated fix cycle. CI-failure and blueprint fixes run unconditionally because they are lower risk (they only fix what CI already flagged as broken).
+The review-fix loop in `auto-fix.yml` only runs on PRs that have the
+`auto-fix-claude` label. This gives you explicit opt-in control over which PRs
+enter the automated fix cycle. CI-failure and blueprint fixes run
+unconditionally because they are lower risk (they only fix what CI already
+flagged as broken).
 
 ### Prompt Injection Mitigation
 
@@ -415,7 +421,7 @@ CI-failure and blueprint auto-fix workflows run automatically on every PR. No se
 
 1. Add the `auto-fix-claude` label to your PR
 2. Push your code
-3. Claude Code Review will run, then pr-review-auto-fix will read the comments and push fixes
+3. Claude Code Review will run, then the review-fix job in `auto-fix.yml` will read the comments and push fixes
 4. The cycle repeats until the review finds no issues or 5 iterations are reached
 5. Remove the label at any time to stop the loop
 
@@ -470,13 +476,15 @@ not available on `pull_request` events.
 
 The maximum consecutive bot-fix commits is set to `5` via the `MAX_BOT_FIX_ITERATIONS` environment variable in two files:
 - `.github/workflows/_ci-auto-fix-shared.yml`
-- `.github/workflows/pr-review-auto-fix.yml`
+- `.github/workflows/auto-fix.yml`
 
 If you change this value, **update both files**. They are cross-referenced via comments to remind you.
 
 ### Label name
 
-The review-fix loop is gated on the `auto-fix-claude` label. To change the label name, update the `grep` pattern in `.github/workflows/pr-review-auto-fix.yml` (search for `auto-fix-claude`).
+The review-fix loop is gated on the `auto-fix-claude` label. To change the
+label name, update `.github/workflows/auto-fix.yml` (search for
+`auto-fix-claude`).
 
 ### Model
 
