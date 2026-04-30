@@ -1,7 +1,7 @@
 import MIPStarRE.LDT.Test.StrategyRoleAverage
 
 /-!
-# Section 3 — `ProjStrat → SymStrat` symmetrization bridge
+# Section 3 — `SameSpaceProjStrat → SymStrat` symmetrization bridge
 
 This file packages the classical role-register symmetrization of
 `references/ldt-paper/test_definition.tex` and
@@ -22,21 +22,21 @@ the two role assignments.
 This bridge module exposes the two facts required to start the proof of
 `thm:main-formal`:
 
-* `ProjStrat.strategySymmetrization` — public alias for
+* `SameSpaceProjStrat.strategySymmetrization` — public alias for
   `classicalRoleSymmStrategy`, giving a role-register symmetrized
-  `SymStrat params (Role × ι)` from any `ProjStrat params ι`.
-* `ProjStrat.strategySymmetrization_isGood_three_mul` — the paper's
+  `SymStrat params (Role × ι)` from any `SameSpaceProjStrat params ι`.
+* `SameSpaceProjStrat.strategySymmetrization_isGood_three_mul` — the paper's
   goodness preservation: if the original strategy passes the
   `(m,q,d)`-low individual degree test with error `ε`, the symmetrized
   strategy is `(3ε, 3ε, 3ε)`-good.  This matches paper line 33,
   `(ψ,A^A,B^A,L^A,A^B,B^B,L^B) is a (3ε,3ε,3ε)-good strategy`,
   combined with the observation that symmetrization preserves goodness
   exactly.
-* `ProjStrat.strategySymmetrization_isNormalized` — normalization of the
+* `SameSpaceProjStrat.strategySymmetrization_isNormalized` — normalization of the
   symmetrized state, inherited from the `isNormalized` field already
-  bundled into `ProjStrat`.
-* `ProjStrat.StrategySymmetrizationPackage` and
-  `ProjStrat.strategySymmetrizationPackage` — a named Step 1 package carrying
+  bundled into `SameSpaceProjStrat`.
+* `SameSpaceProjStrat.StrategySymmetrizationPackage` and
+  `SameSpaceProjStrat.strategySymmetrizationPackage` — a named Step 1 package carrying
   the symmetrized strategy together with the two facts above, ready for the
   later `mainFormal` assembly.
 
@@ -50,12 +50,12 @@ This bridge module exposes the two facts required to start the proof of
 
 namespace MIPStarRE.LDT
 
-namespace ProjStrat
+namespace SameSpaceProjStrat
 
 /-- Classical role-register symmetrization of a general projective strategy.
 
-Public alias for `ProjStrat.classicalRoleSymmStrategy`, wrapping a
-`ProjStrat params ι` as a symmetric strategy
+Public alias for `SameSpaceProjStrat.classicalRoleSymmStrategy`, wrapping a
+`SameSpaceProjStrat params ι` as a symmetric strategy
 `SymStrat params (Role × ι)` via the Lean construction
 `classicalRoleSymmState` from `MIPStarRE.LDT.Test.StrategyRole`.  Each
 player's local Hilbert space is extended by a two-dimensional role
@@ -75,7 +75,7 @@ about `classicalRoleSymmStrategy` without having to thread an extra
 unfolding step. -/
 noncomputable abbrev strategySymmetrization {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) :
+    (strategy : SameSpaceProjStrat params ι) :
     SymStrat params (Role × ι) :=
   strategy.classicalRoleSymmStrategy
 
@@ -94,13 +94,13 @@ already implied by `strategy.isNormalized` (an empty carrier would force
 `normalizedTrace = 0`, contradicting normalization), so we synthesise it
 locally.  This makes the bridge strictly more ergonomic than the
 underlying `classicalRoleSymmStrategy_is_good_three_mul` for callers such
-as `mainFormal` that only have a bare `strategy : ProjStrat params ι`.
+as `mainFormal` that only have a bare `strategy : SameSpaceProjStrat params ι`.
 
 This is the public form of `classicalRoleSymmStrategy_is_good_three_mul`
 and is the core bridge lemma consumed by Step 1 of `mainFormal`. -/
 theorem strategySymmetrization_isGood_three_mul {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
     (strategy.strategySymmetrization).IsGood (3 * eps) (3 * eps) (3 * eps) :=
   haveI : Nonempty ι := strategy.isNormalized.nonempty.map Prod.fst
@@ -110,12 +110,12 @@ theorem strategySymmetrization_isGood_three_mul {params : Parameters}
 
 The symmetrized state inherits trace normalization from the original bipartite
 state.  Normalization is already bundled as the `isNormalized` field of
-`ProjStrat`, so no additional hypothesis is required here.  Together with
+`SameSpaceProjStrat`, so no additional hypothesis is required here.  Together with
 `strategySymmetrization_isGood_three_mul` this is everything Step 1 of
 `mainFormal` needs to hand off to `thm:main-induction`. -/
 theorem strategySymmetrization_isNormalized {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) :
+    (strategy : SameSpaceProjStrat params ι) :
     (strategy.strategySymmetrization).state.IsNormalized :=
   strategy.classicalRoleSymmStrategy_isNormalized
 
@@ -135,7 +135,7 @@ callers can either work with the named `symStrategy` field or rewrite back to
 `strategy.strategySymmetrization`. -/
 structure StrategySymmetrizationPackage (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) where
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) where
   /-- The paper's role-register symmetrized strategy. -/
   symStrategy : SymStrat params (Role × ι)
   /-- The named strategy is exactly the public transparent symmetrization alias. -/
@@ -150,7 +150,7 @@ namespace StrategySymmetrizationPackage
 /-- Recover the usual Step 1 goodness statement from the named package. -/
 theorem strategySymmetrization_isGood {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error}
     (pkg : StrategySymmetrizationPackage params strategy eps) :
     (strategy.strategySymmetrization).IsGood (3 * eps) (3 * eps) (3 * eps) := by
   simpa [pkg.symStrategy_eq_strategySymmetrization] using pkg.isGood
@@ -158,7 +158,7 @@ theorem strategySymmetrization_isGood {params : Parameters} [FieldModel params.q
 /-- Recover normalization of `strategy.strategySymmetrization` from the package. -/
 theorem strategySymmetrization_isNormalized {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error}
     (pkg : StrategySymmetrizationPackage params strategy eps) :
     (strategy.strategySymmetrization).state.IsNormalized := by
   simpa [pkg.symStrategy_eq_strategySymmetrization] using pkg.isNormalized
@@ -173,7 +173,7 @@ the role-register symmetrized strategy together with its `(3ε,3ε,3ε)` goodnes
 normalization proofs. -/
 noncomputable def strategySymmetrizationPackage {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) {eps : Error}
+    (strategy : SameSpaceProjStrat params ι) {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
     StrategySymmetrizationPackage params strategy eps where
   symStrategy := strategy.strategySymmetrization
@@ -183,6 +183,6 @@ noncomputable def strategySymmetrizationPackage {params : Parameters}
       (strategy := strategy) (eps := eps) hpass
   isNormalized := strategySymmetrization_isNormalized strategy
 
-end ProjStrat
+end SameSpaceProjStrat
 
 end MIPStarRE.LDT

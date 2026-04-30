@@ -1116,20 +1116,20 @@ private theorem symmetrizedDiagonalTransportInvariant
   simp [DiagonalLine.transportMeasurement, ProjMeas.transport,
     Measurement.transport, SubMeas.transport, symmetrizedIdxProjMeas, hA, hB]
 
-namespace ProjStrat
+namespace SameSpaceProjStrat
 
 /-- The paper's symmetrized point measurement, obtained by putting Alice's and
 Bob's point measurements on disjoint role sectors. -/
 noncomputable def symmetrizedPointMeasurement {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) :
+    (strategy : SameSpaceProjStrat params ι) :
     IdxProjMeas (Point params) (Fq params) (Role × ι) :=
   symmetrizedIdxProjMeas strategy.pointMeasurementA strategy.pointMeasurementB
 
 /-- The paper's symmetrized axis-parallel line measurement. -/
 noncomputable def symmetrizedAxisParallelMeasurement {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) :
+    (strategy : SameSpaceProjStrat params ι) :
     IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) (Role × ι) :=
   symmetrizedIdxProjMeas strategy.axisParallelMeasurementA
     strategy.axisParallelMeasurementB
@@ -1137,7 +1137,7 @@ noncomputable def symmetrizedAxisParallelMeasurement {params : Parameters}
 /-- The paper's symmetrized diagonal-line measurement. -/
 noncomputable def symmetrizedDiagonalMeasurement {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) :
+    (strategy : SameSpaceProjStrat params ι) :
     IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) (Role × ι) :=
   symmetrizedIdxProjMeas strategy.diagonalMeasurementA strategy.diagonalMeasurementB
 
@@ -1149,7 +1149,7 @@ would force `normalizedTrace = 0 / 0 = 0`, contradicting the normalization
 hypothesis bundled with the strategy. -/
 noncomputable def classicalRoleSymmStrategy {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) :
+    (strategy : SameSpaceProjStrat params ι) :
     SymStrat params (Role × ι) :=
   haveI : Nonempty ι := strategy.isNormalized.nonempty.map Prod.fst
   { state := classicalRoleSymmState strategy.state
@@ -1174,10 +1174,10 @@ noncomputable def classicalRoleSymmStrategy {params : Parameters}
 /-- The classical role-register symmetrized strategy preserves normalization. -/
 theorem classicalRoleSymmStrategy_isNormalized {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) :
+    (strategy : SameSpaceProjStrat params ι) :
     (strategy.classicalRoleSymmStrategy).state.IsNormalized :=
   strategy.classicalRoleSymmStrategy.isNormalized
 
-end ProjStrat
+end SameSpaceProjStrat
 
 end MIPStarRE.LDT

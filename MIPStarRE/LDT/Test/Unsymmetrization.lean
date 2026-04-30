@@ -229,24 +229,24 @@ theorem extractRole_symmetrizedIdxProjMeas_B {Question Outcome ι : Type*}
 original Alice point measurement. -/
 theorem strategySymmetrization_point_extractRole_A {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (u : Point params) :
+    (strategy : SameSpaceProjStrat params ι) (u : Point params) :
     (((strategy.strategySymmetrization).pointMeasurement u).toMeasurement.extractRole
         Role.A).toSubMeas =
       (strategy.pointMeasurementA u).toSubMeas := by
-  simpa [ProjStrat.strategySymmetrization, ProjStrat.classicalRoleSymmStrategy,
-    ProjStrat.symmetrizedPointMeasurement] using
+  simpa [SameSpaceProjStrat.strategySymmetrization, SameSpaceProjStrat.classicalRoleSymmStrategy,
+    SameSpaceProjStrat.symmetrizedPointMeasurement] using
     extractRole_symmetrizedIdxProjMeas_A strategy.pointMeasurementA strategy.pointMeasurementB u
 
 /-- Extracting the `B` block of the symmetrized point measurement recovers the
 original Bob point measurement. -/
 theorem strategySymmetrization_point_extractRole_B {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (u : Point params) :
+    (strategy : SameSpaceProjStrat params ι) (u : Point params) :
     (((strategy.strategySymmetrization).pointMeasurement u).toMeasurement.extractRole
         Role.B).toSubMeas =
       (strategy.pointMeasurementB u).toSubMeas := by
-  simpa [ProjStrat.strategySymmetrization, ProjStrat.classicalRoleSymmStrategy,
-    ProjStrat.symmetrizedPointMeasurement] using
+  simpa [SameSpaceProjStrat.strategySymmetrization, SameSpaceProjStrat.classicalRoleSymmStrategy,
+    SameSpaceProjStrat.symmetrizedPointMeasurement] using
     extractRole_symmetrizedIdxProjMeas_B strategy.pointMeasurementA strategy.pointMeasurementB u
 
 /-- Evaluating a polynomial submeasurement after role extraction agrees with
@@ -412,7 +412,7 @@ package lets the final `mainFormal` assembly depend on a precise Step 3 residual
 instead of a conclusion-shaped whole-theorem assumption. -/
 structure UnsymmetrizationBridgePackage (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι)
+    (strategy : SameSpaceProjStrat params ι)
     (G : Measurement (Polynomial params) (Role × ι)) (sigma : Error) : Prop where
   /-- The main-induction consistency input on the role-register symmetrized strategy. -/
   symConsistency :
@@ -446,7 +446,7 @@ principal-block defects, so each block defect is at most twice the symmetrized
 one. Averaging over the point distribution gives `eq:cons-a` and `eq:cons-b`. -/
 theorem ofSymConsistency (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι)
+    (strategy : SameSpaceProjStrat params ι)
     (G : Measurement (Polynomial params) (Role × ι)) (sigma : Error)
     (h : ConsRel (strategy.strategySymmetrization).state
       (uniformDistribution (Point params))
@@ -482,8 +482,8 @@ theorem ofSymConsistency (params : Parameters) [FieldModel params.q]
             have hpoint := qBipartiteConsDefect_extractRoleB_le_two_symm strategy.state
               (strategy.pointMeasurementA u).toMeasurement
               (strategy.pointMeasurementB u).toMeasurement Gu
-            simpa [Gu, ProjStrat.strategySymmetrization, ProjStrat.classicalRoleSymmStrategy,
-              ProjStrat.symmetrizedPointMeasurement, roleSymmetrizedMeasurement,
+            simpa [Gu, SameSpaceProjStrat.strategySymmetrization, SameSpaceProjStrat.classicalRoleSymmStrategy,
+              SameSpaceProjStrat.symmetrizedPointMeasurement, roleSymmetrizedMeasurement,
               symmetrizedIdxProjMeas, IdxProjMeas.toIdxSubMeas,
               unsymmetrizedRightPOVM, extractRoleBMeasurement,
               polynomialEvaluationFamily_extractRole,
@@ -520,8 +520,8 @@ theorem ofSymConsistency (params : Parameters) [FieldModel params.q]
             have hpoint := qBipartiteConsDefect_extractRoleA_le_two_symm strategy.state
               (strategy.pointMeasurementA u).toMeasurement
               (strategy.pointMeasurementB u).toMeasurement Gu
-            simpa [Gu, ProjStrat.strategySymmetrization, ProjStrat.classicalRoleSymmStrategy,
-              ProjStrat.symmetrizedPointMeasurement, roleSymmetrizedMeasurement,
+            simpa [Gu, SameSpaceProjStrat.strategySymmetrization, SameSpaceProjStrat.classicalRoleSymmStrategy,
+              SameSpaceProjStrat.symmetrizedPointMeasurement, roleSymmetrizedMeasurement,
               symmetrizedIdxProjMeas, IdxProjMeas.toIdxSubMeas,
               unsymmetrizedLeftPOVM, extractRoleAMeasurement,
               polynomialEvaluationFamily_extractRole,

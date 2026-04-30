@@ -11,7 +11,7 @@ namespace MIPStarRE.LDT
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-namespace ProjStrat
+namespace SameSpaceProjStrat
 
 private noncomputable def axisParallelLineAnswerMeasurement
     {params : Parameters} [FieldModel params.q]
@@ -182,7 +182,7 @@ set_option maxHeartbeats 1000000 in
 private lemma axisParallel_symm_sample_eq_average
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    (strategy : ProjStrat params ι) (s : AxisParallelTestSample params) :
+    (strategy : SameSpaceProjStrat params ι) (s : AxisParallelTestSample params) :
     qBipartiteConsDefect (strategy.classicalRoleSymmStrategy.state)
         (axisParallelPointAnswerFamily strategy.classicalRoleSymmStrategy s)
         (axisParallelLineAnswerFamily strategy.classicalRoleSymmStrategy s) =
@@ -197,10 +197,10 @@ private lemma axisParallel_symm_sample_eq_average
   let LA := axisParallelLineAnswerMeasurement strategy.axisParallelMeasurementA s
   let LB := axisParallelLineAnswerMeasurement strategy.axisParallelMeasurementB s
   simpa [qBipartiteConsDefect, qBipartiteMatchMass,
-    ProjStrat.classicalRoleSymmStrategy,
-    ProjStrat.symmetrizedPointMeasurement,
-    ProjStrat.symmetrizedAxisParallelMeasurement,
-    ProjStrat.leftAsSymmetric, ProjStrat.rightAsSymmetric,
+    SameSpaceProjStrat.classicalRoleSymmStrategy,
+    SameSpaceProjStrat.symmetrizedPointMeasurement,
+    SameSpaceProjStrat.symmetrizedAxisParallelMeasurement,
+    SameSpaceProjStrat.leftAsSymmetric, SameSpaceProjStrat.rightAsSymmetric,
     axisParallelPointAnswerFamily, axisParallelLineAnswerFamily,
     axisParallelLineAnswerMeasurement, MIPStarRE.LDT.roleSymmetrizedMeasurement,
     postprocess_total, postprocess_symmetrizedIdxProjMeas_outcome,
@@ -213,7 +213,7 @@ set_option maxHeartbeats 1000000 in
 private lemma diagonal_symm_sample_eq_average
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    (strategy : ProjStrat params ι)
+    (strategy : SameSpaceProjStrat params ι)
     (j : Fin params.m) (s : RestrictedDiagonalSample params j) :
     qBipartiteConsDefect (strategy.classicalRoleSymmStrategy.state)
         (diagonalPointAnswerFamily strategy.classicalRoleSymmStrategy j s)
@@ -229,10 +229,10 @@ private lemma diagonal_symm_sample_eq_average
   let LA := diagonalLineAnswerMeasurement strategy.diagonalMeasurementA j s
   let LB := diagonalLineAnswerMeasurement strategy.diagonalMeasurementB j s
   simpa [qBipartiteConsDefect, qBipartiteMatchMass,
-    ProjStrat.classicalRoleSymmStrategy,
-    ProjStrat.symmetrizedPointMeasurement,
-    ProjStrat.symmetrizedDiagonalMeasurement,
-    ProjStrat.leftAsSymmetric, ProjStrat.rightAsSymmetric,
+    SameSpaceProjStrat.classicalRoleSymmStrategy,
+    SameSpaceProjStrat.symmetrizedPointMeasurement,
+    SameSpaceProjStrat.symmetrizedDiagonalMeasurement,
+    SameSpaceProjStrat.leftAsSymmetric, SameSpaceProjStrat.rightAsSymmetric,
     diagonalPointAnswerFamily, diagonalLineAnswerFamily,
     diagonalLineAnswerMeasurement, MIPStarRE.LDT.roleSymmetrizedMeasurement,
     postprocess_total, postprocess_symmetrizedIdxProjMeas_outcome,
@@ -245,7 +245,7 @@ axis-parallel role choices from the original general strategy. -/
 theorem classicalRoleSymmStrategy_axisParallel_eq_roleAverage
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    (strategy : ProjStrat params ι) :
+    (strategy : SameSpaceProjStrat params ι) :
     (strategy.classicalRoleSymmStrategy).axisParallelFailureProbability =
       strategy.axisParallelRoleAverage := by
   let left := strategy.leftAsSymmetric
@@ -294,7 +294,7 @@ diagonal-line role choices from the original general strategy. -/
 theorem classicalRoleSymmStrategy_diagonal_eq_roleAverage
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    (strategy : ProjStrat params ι) :
+    (strategy : SameSpaceProjStrat params ι) :
     (strategy.classicalRoleSymmStrategy).diagonalFailureProbability =
       strategy.diagonalRoleAverage := by
   let left := strategy.leftAsSymmetric
@@ -358,7 +358,7 @@ theorem classicalRoleSymmStrategy_diagonal_eq_roleAverage
 exactly as in the paper's reduction from general to symmetric strategies. -/
 theorem classicalRoleSymmStrategy_is_good_three_mul {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    {strategy : ProjStrat params ι} {eps : Error}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
     (strategy.classicalRoleSymmStrategy).IsGood (3 * eps) (3 * eps) (3 * eps) := by
   let pointAgreement : Error :=
@@ -401,9 +401,9 @@ theorem classicalRoleSymmStrategy_is_good_three_mul {params : Parameters}
       · norm_num
   have hmain : (axisParallelBranch + pointAgreement + diagonalBranch) / 3 ≤ eps := by
     simpa [axisParallelBranch, pointAgreement, diagonalBranch,
-      ProjStrat.lowIndividualDegreeFailureProbability,
-      ProjStrat.axisParallelRoleAverage, ProjStrat.diagonalRoleAverage,
-      ProjStrat.leftAsSymmetric, ProjStrat.rightAsSymmetric,
+      SameSpaceProjStrat.lowIndividualDegreeFailureProbability,
+      SameSpaceProjStrat.axisParallelRoleAverage, SameSpaceProjStrat.diagonalRoleAverage,
+      SameSpaceProjStrat.leftAsSymmetric, SameSpaceProjStrat.rightAsSymmetric,
       SymStrat.axisParallelFailureProbability, SymStrat.diagonalFailureProbability] using
       hpass.soundnessHypothesis
   have haxis : axisParallelBranch ≤ 3 * eps := by
@@ -417,6 +417,6 @@ theorem classicalRoleSymmStrategy_is_good_three_mul {params : Parameters}
   · rw [classicalRoleSymmStrategy_diagonal_eq_roleAverage strategy]
     exact hdiag
 
-end ProjStrat
+end SameSpaceProjStrat
 
 end MIPStarRE.LDT
