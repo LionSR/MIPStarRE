@@ -27,24 +27,28 @@ structure Measurement (α : Type*) (ι : Type*) [Fintype α] [Fintype ι] [Decid
     extends SubMeas α ι where
   total_eq_one : total = 1
 
+noncomputable def Measurement.trivialDistinguishedOutcome
+    {α : Type*} {ι : Type*}
+    [Fintype α] [Fintype ι] [DecidableEq ι]
+    (a₀ : α) : Measurement α ι := by
+  classical
+  refine
+    { toSubMeas := {
+        outcome := fun a => if a = a₀ then 1 else 0
+        total := 1
+        outcome_pos := by
+          intro a
+          by_cases h : a = a₀ <;> simp [h]
+        sum_eq_total := by
+          simp
+        total_le_one := le_rfl
+      }
+      total_eq_one := rfl }
+
 noncomputable instance {α : Type*} {ι : Type*}
     [Inhabited α] [Fintype α] [Fintype ι] [DecidableEq ι] :
     Inhabited (Measurement α ι) where
-  default := by
-    classical
-    refine
-      { toSubMeas := {
-          outcome := fun a => if a = default then 1 else 0
-          total := 1
-          outcome_pos := by
-            intro a
-            by_cases h : a = default <;> simp [h]
-          sum_eq_total := by
-            simp
-          total_le_one := by
-            exact le_rfl
-        }
-        total_eq_one := rfl }
+  default := Measurement.trivialDistinguishedOutcome (default : α)
 
 /-- A paper-local projective submeasurement (each effect is idempotent).
 
@@ -59,20 +63,36 @@ structure ProjMeas (α : Type*) (ι : Type*) [Fintype α] [Fintype ι] [Decidabl
     extends Measurement α ι where
   proj : ∀ a, outcome a * outcome a = outcome a
 
+noncomputable def ProjMeas.trivialDistinguishedOutcome
+    {α : Type*} {ι : Type*}
+    [Fintype α] [Fintype ι] [DecidableEq ι]
+    (a₀ : α) : ProjMeas α ι := by
+  classical
+  have hproj : ∀ a : α,
+      (if a = a₀ then (1 : MIPStarRE.Quantum.Op ι) else 0) *
+        (if a = a₀ then (1 : MIPStarRE.Quantum.Op ι) else 0) =
+      (if a = a₀ then (1 : MIPStarRE.Quantum.Op ι) else 0) := by
+    intro a
+    by_cases h : a = a₀ <;> simp [h]
+  refine
+    { toMeasurement := {
+        toSubMeas := {
+          outcome := fun a => if a = a₀ then 1 else 0
+          total := 1
+          outcome_pos := by
+            intro a
+            by_cases h : a = a₀ <;> simp [h]
+          sum_eq_total := by
+            simp
+          total_le_one := le_rfl
+        }
+        total_eq_one := rfl }
+      proj := hproj }
+
 noncomputable instance {α : Type*} {ι : Type*}
     [Inhabited α] [Fintype α] [Fintype ι] [DecidableEq ι] :
     Inhabited (ProjMeas α ι) where
-  default := by
-    classical
-    refine
-      { toMeasurement := (default : Measurement α ι)
-        proj := ?_ }
-    intro a
-    change
-      (if a = default then (1 : MIPStarRE.Quantum.Op ι) else 0) *
-          (if a = default then (1 : MIPStarRE.Quantum.Op ι) else 0) =
-        (if a = default then (1 : MIPStarRE.Quantum.Op ι) else 0)
-    by_cases h : a = default <;> simp [h]
+  default := ProjMeas.trivialDistinguishedOutcome (default : α)
 
 /-! ### Derived properties -/
 
