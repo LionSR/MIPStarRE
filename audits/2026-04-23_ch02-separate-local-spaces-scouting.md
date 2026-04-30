@@ -143,15 +143,15 @@ same-space symmetric strategy.
 `MIPStarRE/LDT/Test/StrategyRole.lean:55-58`, `102-126`, `233-245`, `864-913`:
 
 - `roleCond` maps an operator on `ι` to one on `Role × ι`
-- `rolePairPayloadEquiv` reindexes `((Role × Role) × (ι × ι))`
+- `roleRegisterPairLocalEquiv` reindexes `((Role × Role) × (ι × ι))`
   into `((Role × ι) × (Role × ι))`
 - `classicalRoleSymmState` places the original and swapped states into the
-  `A/B` and `B/A` role sectors of a space built from the **same payload** `ι`
+  `A/B` and `B/A` role sectors of a space built from the **same local carrier** `ι`
 - `classicalRoleSymmStrategy` packages the result as `SymStrat params (Role × ι)`
 
 This is exactly the issue description's warning: the current symmetrization is a
 same-index block-diagonal construction, not a general direct-sum construction for
-possibly different payloads.
+possibly different local carriers.
 
 ### 4. Public bridge fixes the same-space target in the API
 
