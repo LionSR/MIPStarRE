@@ -2849,6 +2849,110 @@ noncomputable def ofCompleteAtOutcomeStatements
     MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_completeAtOutcomeProj
       P_A P_B a_A a_B hleftMass hrightMass
 
+/-- Produce the post-role residual by running the orthonormalize-and-complete chain
+on the two unsymmetrized role-block POVMs.
+
+This wrapper removes the need for callers to prepackage the two
+`OrthonormalizeAndCompleteStatement`s.  The remaining analytic inputs are exactly
+the strong self-consistency hypotheses and the explicit orthonormalization bridge
+data required by `orthonormalizeAndComplete`.  The two match-mass hypotheses are
+phrased over the produced projective submeasurements, so the exact line-169
+`ζ₁` transport still remains construction-level data rather than a generic
+`triangleSub` consequence.
+
+The result is stated as `Nonempty`, rather than as a direct `def`, because
+`orthonormalizeAndComplete` is an existential theorem in `Prop`; eliminating that
+existential to construct a data-valued residual would require choice. -/
+theorem nonempty_ofOrthonormalizeAndCompleteInputs
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
+    (a_A a_B : Polynomial params)
+    (leftSelfConsistency :
+      BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily
+          (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+        scalars.zeta1)
+    (rightSelfConsistency :
+      BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily
+          (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+        scalars.zeta1)
+    (leftBridge :
+      MakingMeasurementsProjective.OrthonormalizationInput strategy.state
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas scalars.zeta1)
+    (rightBridge :
+      MakingMeasurementsProjective.OrthonormalizationInput strategy.state
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas scalars.zeta1)
+    (hleftMass :
+      ∀ P_A : ProjSubMeas (Polynomial params) ι,
+        MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement strategy.state
+          (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
+          P_A (Preliminaries.completeAtOutcomeProj P_A a_A) a_A scalars.zeta1 →
+        qBipartiteMatchMass strategy.state P_A.toSubMeas
+            (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas ≥
+          qBipartiteMatchMass strategy.state
+            (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas
+            (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+    (hrightMass :
+      ∀ P_B : ProjSubMeas (Polynomial params) ι,
+        MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement strategy.state
+          (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
+          P_B (Preliminaries.completeAtOutcomeProj P_B a_B) a_B scalars.zeta1 →
+        qBipartiteMatchMass strategy.state P_B.toSubMeas
+            (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas ≥
+          qBipartiteMatchMass strategy.state
+            (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas
+            (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas) :
+    Nonempty (MainFormalPostRolePackageLeftCompletionLine169Residual
+      params strategy eps k scalars rolePackage) := by
+  classical
+  obtain ⟨P_A, Q_A, hQ_A, leftStmtRaw⟩ :=
+    MakingMeasurementsProjective.orthonormalizeAndComplete
+      (Outcome := Polynomial params) (ι := ι)
+      strategy.state strategy.isNormalized strategy.permInvState
+      (unsymmetrizedLeftPOVM rolePackage.roleMeasurement) a_A scalars.zeta1
+      leftSelfConsistency leftBridge
+  obtain ⟨P_B, Q_B, hQ_B, rightStmtRaw⟩ :=
+    MakingMeasurementsProjective.orthonormalizeAndComplete
+      (Outcome := Polynomial params) (ι := ι)
+      strategy.state strategy.isNormalized strategy.permInvState
+      (unsymmetrizedRightPOVM rolePackage.roleMeasurement) a_B scalars.zeta1
+      rightSelfConsistency rightBridge
+  have hQ_A_canon : Q_A = Preliminaries.completeAtOutcomeProj P_A a_A := by
+    have hQ_A_meas : Q_A.toMeasurement =
+        (Preliminaries.completeAtOutcomeProj P_A a_A).toMeasurement := by
+      simpa using hQ_A
+    apply ProjMeas.ext
+    intro g
+    have h := congrArg
+      (fun Q : Measurement (Polynomial params) ι => Q.outcome g) hQ_A_meas
+    simpa using h
+  have hQ_B_canon : Q_B = Preliminaries.completeAtOutcomeProj P_B a_B := by
+    have hQ_B_meas : Q_B.toMeasurement =
+        (Preliminaries.completeAtOutcomeProj P_B a_B).toMeasurement := by
+      simpa using hQ_B
+    apply ProjMeas.ext
+    intro g
+    have h := congrArg
+      (fun Q : Measurement (Polynomial params) ι => Q.outcome g) hQ_B_meas
+    simpa using h
+  have leftStmt :
+      MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement strategy.state
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
+        P_A (Preliminaries.completeAtOutcomeProj P_A a_A) a_A scalars.zeta1 := by
+    simpa [hQ_A_canon] using leftStmtRaw
+  have rightStmt :
+      MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement strategy.state
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
+        P_B (Preliminaries.completeAtOutcomeProj P_B a_B) a_B scalars.zeta1 := by
+    simpa [hQ_B_canon] using rightStmtRaw
+  exact ⟨ofCompleteAtOutcomeStatements hsmall P_A P_B a_A a_B
+    leftStmt rightStmt (hleftMass P_A leftStmt) (hrightMass P_B rightStmt)⟩
+
 /-- Transport the Bob-side completion estimate from the left-register form to the
 right-register form and recover the previous post-role residual.
 
@@ -3031,6 +3135,70 @@ noncomputable def ofRoleResidualAndCompleteAtOutcomeStatements
     MainFormalPostRolePackageLeftCompletionLine169Residual.ofCompleteAtOutcomeStatements
       hsmall P_A P_B a_A a_B leftStmt rightStmt hleftMass hrightMass
 
+open MainFormalPostRolePackageLeftCompletionLine169Residual in
+/-- Combine a concrete Section 6 role residual with orthonormalize-and-complete
+inputs for the two unsymmetrized role blocks.
+
+Like the post-role producer it calls, this is a `Nonempty` theorem rather than a
+data-valued constructor: the two completed projective measurements are obtained
+from the existential `orthonormalizeAndComplete` theorem without hiding that
+choice behind a definition. -/
+theorem nonempty_ofRoleResidualAndOrthonormalizeAndCompleteInputs
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
+    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
+    (a_A a_B : Polynomial params)
+    (leftSelfConsistency :
+      BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily
+          (unsymmetrizedLeftPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
+        scalars.zeta1)
+    (rightSelfConsistency :
+      BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily
+          (unsymmetrizedRightPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
+        scalars.zeta1)
+    (leftBridge :
+      MakingMeasurementsProjective.OrthonormalizationInput strategy.state
+        (unsymmetrizedLeftPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas
+        scalars.zeta1)
+    (rightBridge :
+      MakingMeasurementsProjective.OrthonormalizationInput strategy.state
+        (unsymmetrizedRightPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas
+        scalars.zeta1)
+    (hleftMass :
+      ∀ P_A : ProjSubMeas (Polynomial params) ι,
+        MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement strategy.state
+          (unsymmetrizedLeftPOVM (roleResidual.rolePackage scalars).roleMeasurement)
+          P_A (Preliminaries.completeAtOutcomeProj P_A a_A) a_A scalars.zeta1 →
+        qBipartiteMatchMass strategy.state P_A.toSubMeas
+            (unsymmetrizedRightPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas ≥
+          qBipartiteMatchMass strategy.state
+            (unsymmetrizedLeftPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas
+            (unsymmetrizedRightPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
+    (hrightMass :
+      ∀ P_B : ProjSubMeas (Polynomial params) ι,
+        MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement strategy.state
+          (unsymmetrizedRightPOVM (roleResidual.rolePackage scalars).roleMeasurement)
+          P_B (Preliminaries.completeAtOutcomeProj P_B a_B) a_B scalars.zeta1 →
+        qBipartiteMatchMass strategy.state P_B.toSubMeas
+            (unsymmetrizedLeftPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas ≥
+          qBipartiteMatchMass strategy.state
+            (unsymmetrizedRightPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas
+            (unsymmetrizedLeftPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas) :
+    Nonempty (MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual
+      params strategy eps hpass k scalars) := by
+  rcases
+    nonempty_ofOrthonormalizeAndCompleteInputs
+        (rolePackage := roleResidual.rolePackage scalars)
+        hsmall a_A a_B leftSelfConsistency rightSelfConsistency leftBridge rightBridge
+        hleftMass hrightMass with ⟨postRoleResidual⟩
+  exact ⟨{ roleResidual := roleResidual, postRoleResidual := postRoleResidual }⟩
+
 /-- Convert the left-completion residual to the previous role-residual completion
 line-169 shape by applying the #869 right-register transport to the Bob-side
 completion estimate. -/
@@ -3062,6 +3230,100 @@ noncomputable def toRolePackageResidualCompletionLine169Residual
     exact residual.postRoleResidual.toPostRolePackageCompletionLine169Residual hpre
 
 end MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual
+
+/-- Live residual after role production and before eliminating the existential
+outputs of the orthonormalize-and-complete theorem.
+
+This is the paper Step 6 input boundary: a concrete Section 6 role residual, the
+distinguished completion outcomes, strong self-consistency for the two
+unsymmetrized POVMs, the explicit orthonormalization bridge data, and the
+construction-level match-mass monotonicity facts for the projective
+submeasurements produced by orthonormalization.  The completed projective
+measurements themselves are intentionally not fields; they are obtained in the
+conversion theorem below by eliminating the `orthonormalizeAndComplete`
+existentials while the ambient goal is still a proposition. -/
+structure MainFormalCascadeRolePackageResidualOrthonormalizeAndCompleteInputResidual
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (scalars : MainFormalCascadeScalars params eps k) where
+  /-- The explicit isolated Section 6 residual. -/
+  roleResidual : MainFormalRolePackageResidual params strategy eps hpass k
+  /-- Alice-side distinguished outcome that receives the completion residual. -/
+  a_A : Polynomial params
+  /-- Bob-side distinguished outcome that receives the completion residual. -/
+  a_B : Polynomial params
+  /-- Strong self-consistency for the Alice-role unsymmetrized POVM. -/
+  leftSelfConsistency :
+    BipartiteSSCRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily
+        (unsymmetrizedLeftPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
+      scalars.zeta1
+  /-- Strong self-consistency for the Bob-role unsymmetrized POVM. -/
+  rightSelfConsistency :
+    BipartiteSSCRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily
+        (unsymmetrizedRightPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
+      scalars.zeta1
+  /-- Alice-side orthonormalization bridge input. -/
+  leftBridge :
+    MakingMeasurementsProjective.OrthonormalizationInput strategy.state
+      (unsymmetrizedLeftPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas
+      scalars.zeta1
+  /-- Bob-side orthonormalization bridge input. -/
+  rightBridge :
+    MakingMeasurementsProjective.OrthonormalizationInput strategy.state
+      (unsymmetrizedRightPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas
+      scalars.zeta1
+  /-- Alice-side construction-level match-mass monotonicity for the projective
+  submeasurement produced by orthonormalization. -/
+  leftMatchMass :
+    ∀ P_A : ProjSubMeas (Polynomial params) ι,
+      MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement strategy.state
+        (unsymmetrizedLeftPOVM (roleResidual.rolePackage scalars).roleMeasurement)
+        P_A (Preliminaries.completeAtOutcomeProj P_A a_A) a_A scalars.zeta1 →
+      qBipartiteMatchMass strategy.state P_A.toSubMeas
+          (unsymmetrizedRightPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas ≥
+        qBipartiteMatchMass strategy.state
+          (unsymmetrizedLeftPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas
+          (unsymmetrizedRightPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas
+  /-- Bob-side construction-level match-mass monotonicity for the projective
+  submeasurement produced by orthonormalization. -/
+  rightMatchMass :
+    ∀ P_B : ProjSubMeas (Polynomial params) ι,
+      MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement strategy.state
+        (unsymmetrizedRightPOVM (roleResidual.rolePackage scalars).roleMeasurement)
+        P_B (Preliminaries.completeAtOutcomeProj P_B a_B) a_B scalars.zeta1 →
+      qBipartiteMatchMass strategy.state P_B.toSubMeas
+          (unsymmetrizedLeftPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas ≥
+        qBipartiteMatchMass strategy.state
+          (unsymmetrizedRightPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas
+          (unsymmetrizedLeftPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas
+
+namespace MainFormalCascadeRolePackageResidualOrthonormalizeAndCompleteInputResidual
+
+open MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual in
+/-- Run orthonormalize-and-complete on the two role-block POVMs and recover the
+left-completion line-169 residual. -/
+theorem nonempty_leftCompletionLine169Residual
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (residual :
+      MainFormalCascadeRolePackageResidualOrthonormalizeAndCompleteInputResidual
+        params strategy eps hpass k scalars)
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps) :
+    Nonempty (MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual
+      params strategy eps hpass k scalars) :=
+  nonempty_ofRoleResidualAndOrthonormalizeAndCompleteInputs
+      hsmall residual.roleResidual residual.a_A residual.a_B
+      residual.leftSelfConsistency residual.rightSelfConsistency
+      residual.leftBridge residual.rightBridge residual.leftMatchMass residual.rightMatchMass
+
+end MainFormalCascadeRolePackageResidualOrthonormalizeAndCompleteInputResidual
 
 namespace MainFormalCascadeTransportTargets
 
@@ -3270,18 +3532,20 @@ theorem mainFormal
   -- pre-projective consistency field inside the projectivization handoff, the
   -- unused Section 6 consistency field inside the unsymmetrization package, the
   -- line-171--173 data-processing step for the `ζ₁` links, and the final `ζ₄`
-  -- point-triangle assembly to the finer split residual
-  -- `MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual`, which
-  -- additionally consumes the #869 right-register completion transport. The scalar
-  -- cascade side conditions are discharged below: if `mainFormalError ≥ 1`, the
-  -- theorem is vacuous; otherwise the pass condition gives `0 ≤ ε`, while
-  -- `mainFormalError < 1` rules out `ε > 1` and `d > q`. Producing the remaining
-  -- residual still depends on active upstream work: a concrete Section 6 role
-  -- residual supplied through the base/successor constructors (successor-boundary
-  -- data with the public large-`k` hypothesis supplied directly), the
-  -- left-register completion
-  -- estimates returned by the orthonormalize-and-complete chain, and the
-  -- line-169 match-mass monotonicity input (#426), the full-slice transport chain
+  -- point-triangle assembly to the OAC-input residual
+  -- `MainFormalCascadeRolePackageResidualOrthonormalizeAndCompleteInputResidual`.
+  -- The conversion below runs orthonormalize-and-complete, canonicalizes its
+  -- completed projective measurements, consumes the #869 right-register completion
+  -- transport, and derives the exact line-169 `ζ₁` links from match-mass
+  -- monotonicity. The scalar cascade side conditions are discharged below: if
+  -- `mainFormalError ≥ 1`, the theorem is vacuous; otherwise the pass condition
+  -- gives `0 ≤ ε`, while `mainFormalError < 1` rules out `ε > 1` and `d > q`.
+  -- Producing the remaining residual still depends on active upstream work: a
+  -- concrete Section 6 role residual supplied through the base/successor
+  -- constructors (successor-boundary data with the public large-`k` hypothesis
+  -- supplied directly), the strong self-consistency and orthonormalization bridge
+  -- inputs for the two unsymmetrized role blocks, and the line-169 match-mass
+  -- monotonicity input (#426), the full-slice transport chain
   -- (#601), the remaining `fromHToG` pasting bridge (#707), the reverse
   -- `overAllOutcomes` aggregation (#672), and the ProcessedG scalar follow-ups
   -- #714, #715, #732, and #759.  Once the role package is available, the
@@ -3298,14 +3562,18 @@ theorem mainFormal
   · have hepsNN : 0 ≤ eps := ProjStrat.eps_nonneg_of_passes hpass
     let scalars : MainFormalCascadeScalars params eps k :=
       MainFormalCascadeScalars.ofNontrivialMainFormal hepsNN hk0 herr
-    have rolePackageResidualLeftCompletionLine169Residual :
-        MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual
+    have rolePackageResidualOrthonormalizeAndCompleteInputResidual :
+        MainFormalCascadeRolePackageResidualOrthonormalizeAndCompleteInputResidual
           (params := params) (strategy := strategy) (eps := eps)
           (hpass := hpass) (k := k) (scalars := scalars) := by
       -- TODO(#427): construct the concrete Section 6 role residual,
-      -- left-register completion witnesses, and the construction-level
-      -- match-mass monotonicity input for exact polynomial line 169.
+      -- strong self-consistency / orthonormalization bridge inputs for the two
+      -- unsymmetrized role blocks, and the construction-level match-mass
+      -- monotonicity input for exact polynomial line 169.
       sorry
+    rcases rolePackageResidualOrthonormalizeAndCompleteInputResidual
+        |>.nonempty_leftCompletionLine169Residual herr with
+      ⟨rolePackageResidualLeftCompletionLine169Residual⟩
     have rolePackageResidualCompletionLine169Residual :
         MainFormalCascadeRolePackageResidualCompletionLine169Residual
           (params := params) (strategy := strategy) (eps := eps)
