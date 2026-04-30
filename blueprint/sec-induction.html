@@ -849,7 +849,9 @@
         
         <ul class="uses">
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.assemblePastingPackage" class="lean_decl">MIPStarRE.LDT.MainInductionStep.assemblePastingPackage</a></li>
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.AveragedPastingInput.output" class="lean_decl">MIPStarRE.LDT.MainInductionStep.AveragedPastingInput.output</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingInput" class="lean_decl">MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingInput</a></li>
           
         </ul>
     
@@ -1034,7 +1036,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> In Lean, the base case and the internal successor-step assembly are now formalized through  together with the bookkeeping packages  that mirror the four paper stages \(\text{restrict} \to \text{induct} \to \text{self-improve} \to \text{paste}\). The weighted restricted-probability boundary is now public via , and the final public successor-step wrapper is formalized as . The remaining gap, tracked by issues #630 and #632, is to produce the restricted-strategy self-improvement input needed to instantiate that wrapper directly from higher-level applications, so the displayed theorem is not yet marked . We may assume \(\varepsilon ,\delta ,\gamma ,d/q \le 1\), since otherwise \(\nu \ge 1\) and the bound is trivial. </p>
+  <p> In Lean, the base case and the internal successor-step assembly are now formalized through  together with the stage data  that mirror the four paper stages \(\text{restrict} \to \text{induct} \to \text{self-improve} \to \text{paste}\). The weighted restricted-probability boundary is now public via , and the final public successor-step wrapper is formalized as . The remaining gap, tracked by issues #630 and #632, is to produce the restricted-strategy self-improvement input needed to instantiate that wrapper directly from higher-level applications, so the displayed theorem is not yet marked . We may assume \(\varepsilon ,\delta ,\gamma ,d/q \le 1\), since otherwise \(\nu \ge 1\) and the bound is trivial. </p>
 <p>The proof is by induction on \(m\). The base case \(m=1\) is Lemma&#160;<a href="sec-induction.html#lem:main-induction-base">10.9</a>. </p>
 <p>For the step from \(m\) to \(m+1\), let \((\psi ,A,B,L)\) be an \((\varepsilon ,\delta ,\gamma )\)-good symmetric strategy for the \((m+1,q,d)\) test, and let \(k \ge 400(m+1)d\). For each \(x \in \mathbb {F}_q\), let \((\psi ,A^x,B^x,L^x)\) be the \(x\)-restricted strategy, with failure parameters \(\varepsilon _x,\delta _x,\gamma _x\). Apply the induction hypothesis to each restricted strategy with the same integer \(k\) and define </p>
 <div class="displaymath" id="a0000000547">
@@ -1197,7 +1199,7 @@
         </div>
   </div>
   <div class="proposition_thmcontent">
-  <p>   This Lean-only wrapper packages the five explicit successor-step ingredients used in the proof of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.10</a>: the weighted slice bounds feeding Lemma&#160;<a href="sec-induction.html#lem:restricted-probabilities">10.3</a>, the extracted slice-restriction package, the per-slice recursive witnesses, the producer for the corresponding self-improvement package, and the recursion-to-pasting assembly. Under those hypotheses it returns a measurement \(G \in \mathrm{PolyMeas}(m+1,q,d)\) satisfying the same consistency conclusion as Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.10</a>, but without exposing the intermediate bookkeeping packages at the public boundary. </p>
+  <p>   This Lean-only theorem records the five explicit successor-step ingredients used in the proof of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.10</a>: the weighted slice bounds feeding Lemma&#160;<a href="sec-induction.html#lem:restricted-probabilities">10.3</a>, the extracted slice-restriction data, the per-slice recursive witnesses, the producer for the corresponding self-improvement data, and the recursion-to-pasting assembly. Under those hypotheses it returns a measurement \(G \in \mathrm{PolyMeas}(m+1,q,d)\) satisfying the same consistency conclusion as Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.10</a>, but without exposing the intermediate stage data at the public boundary. </p>
 
   </div>
 </div>
@@ -1209,7 +1211,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> This is a Lean-only assembly corollary. One first applies Lemma&#160;<a href="sec-induction.html#lem:restricted-probabilities">10.3</a> to the weighted slice bounds in order to extract the restricted failure profile, packages the recursive slice witnesses, invokes the explicit self-improvement producer on that slice data, and then applies , which already returns the displayed error parameter directly. </p>
+  <p> This is a Lean-only assembly corollary. One first applies Lemma&#160;<a href="sec-induction.html#lem:restricted-probabilities">10.3</a> to the weighted slice bounds in order to extract the restricted failure profile, records the recursive slice witnesses, invokes the explicit self-improvement producer on that slice data, and then applies , which already returns the displayed error parameter directly. </p>
 
   </div>
 </div>
