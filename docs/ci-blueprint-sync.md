@@ -108,6 +108,9 @@ a `\leanok`-tagged theorem with `sorry`, rerun, and confirm you see an
 
 ## Related tooling
 
+* [`docs/blueprint-script-coverage.md`](blueprint-script-coverage.md) — the
+  documented support surface for blueprint Python helpers, including their
+  unit-test coverage and workflow path-filter policy.
 * [`scripts/blueprint_lean_sync.py`](../scripts/blueprint_lean_sync.py) — the
   older name-level (grep-based) sync checker. It reports missing or stale
   entries in `blueprint/lean_decls` and decls referenced by name that don't
