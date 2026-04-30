@@ -37,6 +37,10 @@ Sorry inventory:
 git grep -n -w 'sorry' -- '*.lean'
 ```
 
+All proof-integrity greps in the recommendations use `git grep -w` word matching rather
+than extended-regex `\b` boundaries, since `\b` is not a portable word-boundary
+operator for `git grep -E`.
+
 Direct-import/dependent inventory:
 
 ```bash
