@@ -1,0 +1,108 @@
+\documentclass{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+
+\input{docs/paper-gaps/command}
+
+\title{Polynomials as algebraic objects versus functions over finite fields}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{The assertion}
+
+This note concerns the definition of low-individual-degree polynomials
+used throughout the low individual degree test
+\cite{Ji2020LowIndividualDegree}. The paper defines
+$\polyfunc{m}{q}{d}$ as the set of polynomials in $\F_q^m$ with
+individual degree at most $d$ (\texttt{preliminaries.tex},
+lines~89--94). The Lean formalization has two related concepts:
+\begin{itemize}
+  \item \texttt{Polynomial params}, a structure wrapping a multivariate
+    polynomial (in \texttt{MvPolynomial}) together with a proof that each
+    variable's degree is at most $d$;\footnote{\texttt{MIPStarRE/LDT/Basic/LowDegreePolynomial.lean},
+      line~13.}
+  \item \texttt{HasLowIndividualDegree params g}, a predicate on a function
+    $g : \Point \to \Fq$ asserting the existence of a polynomial
+    representative with individual degree at most $d$.\footnote{\texttt{MIPStarRE/LDT/Basic/LinePolynomials.lean}, line~20.}
+\end{itemize}
+The measurement outcome space \texttt{IdxPolyFamily} uses
+\texttt{Polynomial params} as the outcome type, i.e., the measurement
+outcomes are indexed by algebraic polynomials, not by functions.
+
+\section{The point at issue}
+
+Over a finite field $\F_q$, distinct polynomials can induce the same
+function $\F_q^m \to \F_q$. For example, $x^q$ and $x$ are equal as
+functions on $\F_q$, but are distinct as algebraic polynomials. If the
+outcome space of a measurement were defined as the set of \emph{functions}
+of low individual degree, then two outcome labels that represent the same
+function would be forced to merge. If it is defined as the set of
+\emph{polynomials}, then two distinct polynomial representatives of the
+same function are kept separate as measurement outcomes.
+
+The Schwartz--Zippel lemma in the paper (Corollary~2 of
+\Cref{lem:schwartz-zippel-total-degree}) states: for distinct
+$g, h \in \polyfunc{m}{q}{d}$,
+\[
+  \Pr_{\bu \sim \F_q^m}[g(\bu) = h(\bu)] \le \frac{md}{q}.
+\]
+This bound applies to distinct \emph{polynomials} (algebraic objects),
+not just distinct functions; it follows from the fact that the difference
+$g - h$ is a nonzero polynomial of total degree at most $md$, to which
+the Schwartz--Zippel lemma for polynomials is applied.
+
+The Lean formalization uses \texttt{Polynomial params}, whose underlying
+type is \texttt{MvPolynomial (Fin params.m) (Scalar params)}. Two
+distinct \texttt{MvPolynomial} values that induce the same function on
+$\F_q^m$ are stored as distinct outcome labels. The
+Schwartz--Zippel bound still applies because the collision probability
+of two distinct polynomial objects at a random point is bounded by
+$md/q$, exactly as in the paper.
+
+The \texttt{HasLowIndividualDegree} predicate is defined on functions,
+but it is used only as a classification tool, not as the outcome space.
+Where the paper says ``$g \in \polyfunc{m}{q}{d}$'', the Lean code either
+has a \texttt{Polynomial params} value (for indexing measurement outcomes)
+or a \texttt{HasLowIndividualDegree} hypothesis (for asserting that a
+function comes from a low-degree polynomial). The two notions are linked
+by the lemma \texttt{Polynomial.hasLowIndividualDegree}, which extracts
+the function from the stored polynomial.
+
+\section{The blueprint discrepancy (resolved)}
+
+A preliminary version of the blueprint defined $\polyfunc{m}{q}{d}$ as a
+set of functions $\F_q^m \to \F_q$ represented by polynomials. The
+faithfulness audit of 2026-04-05 identified this as a real mathematical
+shift, because it would quotient by functional equivalence.\footnote{\texttt{audits/2026-04-05\_faithfulness-audit.md}, lines~33--45.}
+The blueprint has since been corrected to read:\footnote{\texttt{blueprint/src/chapter/ch03\_preliminaries.tex}, line~77.}
+``we identify elements of $\polyfunc{m}{q}{d}$ with their polynomial
+representatives, not their functional equivalence classes.''
+
+The Lean formalization itself never adopted the function-quotient view.
+The outcome space has always been algebraic polynomials, matching the
+paper's intended definition and the corrected blueprint.
+
+\section{Conclusion}
+
+The Lean formalization uses algebraic polynomials as the measurement
+outcome space, which is faithful to the paper. The
+\texttt{HasLowIndividualDegree} predicate on functions is a convenience
+for stating that a point-evaluated outcome came from a low-degree
+polynomial, and does not change the underlying object. The
+Schwartz--Zippel applications are sound because they are applied to
+distinct polynomial objects, not to distinct functions.
+
+\noindent\textbf{Verdict:} no discrepancy, after the blueprint correction.
+The earlier blueprint formulation was a notational misstatement that
+has been resolved; the Lean formalization has always been faithful on
+this point.
+
+\bibliographystyle{alpha}
+\bibliography{docs/paper-gaps/references}
+
+\end{document}
