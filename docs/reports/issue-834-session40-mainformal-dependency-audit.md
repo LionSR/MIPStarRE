@@ -151,9 +151,11 @@ constant and would not fit the current `mainFormalError` envelope.
 I regenerated the ignored blueprint web output with `leanblueprint web` in order to
 inspect `blueprint/web/dep_graph_document.html`.
 
-- The modal for `thm:main-formal` is at `blueprint/web/dep_graph_document.html:5778-5811`.
-  It displays the strengthened Lean/blueprint statement with `k ≥ 400 md` and links
-  to `MIPStarRE.LDT.Test.mainFormal`.
+- To locate the generated modal reproducibly, search
+  `blueprint/web/dep_graph_document.html` for `thm:main-formal` or
+  `main-formal` after running `leanblueprint web`. The modal displays the
+  strengthened Lean/blueprint statement with `k ≥ 400 md` and links to
+  `MIPStarRE.LDT.Test.mainFormal`.
 - The generated graph has incoming edges
   - `prop:simeq-triangle-inequality -> thm:main-formal`,
   - `thm:main-induction -> thm:main-formal`,
