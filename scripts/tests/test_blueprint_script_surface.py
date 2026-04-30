@@ -61,24 +61,58 @@ WORKFLOW_REQUIRED_PATHS = {
     },
 }
 
-_PATH_LINE_RE = re.compile(r"^\s*-\s+['\"]?([^'\"\n]+)['\"]?\s*$")
+_PATHS_KEY_RE = re.compile(r"^(?P<indent>\s*)paths:\s*$")
+_PATH_ENTRY_RE = re.compile(
+    r"^(?P<indent>\s*)-\s+['\"]?(?P<path>[^'\"\n]+)['\"]?\s*$"
+)
 
 
-def workflow_paths(path: str) -> set[str]:
-    """Extract literal path-filter entries from a GitHub Actions workflow."""
+def path_filter_blocks(text: str) -> list[set[str]]:
+    """Extract only entries inside GitHub Actions ``paths:`` filters."""
 
-    text = (PROJECT_ROOT / path).read_text(encoding="utf-8")
-    return {
-        match.group(1)
-        for line in text.splitlines()
-        if (match := _PATH_LINE_RE.match(line))
-    }
+    blocks: list[set[str]] = []
+    in_paths = False
+    paths_indent = 0
+    current_block: set[str] = set()
+
+    for raw_line in text.splitlines():
+        while True:
+            if in_paths:
+                stripped = raw_line.strip()
+                if not stripped or stripped.startswith("#"):
+                    break
+                indent = len(raw_line) - len(raw_line.lstrip(" "))
+                if indent <= paths_indent:
+                    blocks.append(current_block)
+                    in_paths = False
+                    current_block = set()
+                    # Reconsider this same line: it might start another paths block.
+                    continue
+                if match := _PATH_ENTRY_RE.match(raw_line):
+                    current_block.add(match.group("path").strip())
+                break
+
+            if match := _PATHS_KEY_RE.match(raw_line):
+                in_paths = True
+                paths_indent = len(match.group("indent"))
+                current_block = set()
+            break
+
+    if in_paths:
+        blocks.append(current_block)
+    return blocks
+
+
+def workflow_path_filter_blocks(path: str) -> list[set[str]]:
+    """Extract path-filter blocks from a GitHub Actions workflow file."""
+
+    return path_filter_blocks((PROJECT_ROOT / path).read_text(encoding="utf-8"))
 
 
 class BlueprintScriptSurfaceTests(unittest.TestCase):
     def test_blueprint_named_scripts_are_classified(self) -> None:
         candidates = {
-            str(path.relative_to(PROJECT_ROOT))
+            path.relative_to(PROJECT_ROOT).as_posix()
             for path in (PROJECT_ROOT / "scripts").glob("*.py")
             if "blueprint" in path.name or path.name == "tex_utils.py"
         }
@@ -92,13 +126,29 @@ class BlueprintScriptSurfaceTests(unittest.TestCase):
                 for test_path in metadata["tests"]:
                     self.assertTrue((PROJECT_ROOT / test_path).is_file(), test_path)
 
+    def test_path_filter_parser_ignores_non_trigger_lists(self) -> None:
+        text = """
+        on:
+          pull_request:
+            paths:
+              - 'scripts/tex_utils.py'
+        jobs:
+          test:
+            steps:
+              - uses: actions/checkout@v6
+              - run: python3 scripts/blueprint_lean_sync.py --root . --ci
+        """
+
+        self.assertEqual(path_filter_blocks(text), [{"scripts/tex_utils.py"}])
+
     def test_workflow_path_filters_cover_surface(self) -> None:
         for workflow, required_paths in WORKFLOW_REQUIRED_PATHS.items():
             with self.subTest(workflow=workflow):
-                self.assertTrue(
-                    required_paths <= workflow_paths(workflow),
-                    required_paths - workflow_paths(workflow),
-                )
+                path_blocks = workflow_path_filter_blocks(workflow)
+                self.assertGreater(len(path_blocks), 0)
+                for path_block in path_blocks:
+                    missing_paths = required_paths - path_block
+                    self.assertFalse(missing_paths, missing_paths)
 
     def test_surface_doc_mentions_every_script_and_workflow(self) -> None:
         doc = (PROJECT_ROOT / "docs" / "blueprint-script-coverage.md").read_text(
