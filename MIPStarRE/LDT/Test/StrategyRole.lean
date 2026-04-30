@@ -105,8 +105,8 @@ lemma roleCond_finset_sum {α ι : Type*}
   rcases j with ⟨rj, ij⟩
   cases ri <;> cases rj <;> simp [roleCond, roleProj, opTensor, Matrix.one_apply]
 
-/-- Reassociate the role and payload indices for the role-register symmetrization. -/
-private def rolePairPayloadEquiv (ι : Type*) :
+/-- Reassociate the role and local-space indices for the role-register symmetrization. -/
+private def roleRegisterPairLocalEquiv (ι : Type*) :
     ((Role × Role) × (ι × ι)) ≃ ((Role × ι) × (Role × ι)) where
   toFun x := ((x.1.1, x.2.1), (x.1.2, x.2.2))
   invFun x := ((x.1.1, x.2.1), (x.1.2, x.2.2))
@@ -123,12 +123,12 @@ private def rolePairPayloadEquiv (ι : Type*) :
 noncomputable def rolePairProj (rL rR : Role) : MIPStarRE.Quantum.Op (Role × Role) :=
   opTensor (roleProj rL) (roleProj rR)
 
-/-- Reindex a bipartite payload operator into the `(Role × ι)` local spaces and
+/-- Reindex a bipartite local-space operator into the `(Role × ι)` local spaces and
 restrict it to the selected role sector. -/
 noncomputable def rolePairCond {ι : Type*} [Fintype ι] [DecidableEq ι]
     (rL rR : Role) (X : MIPStarRE.Quantum.Op (ι × ι)) :
     MIPStarRE.Quantum.Op ((Role × ι) × (Role × ι)) :=
-  Matrix.reindex (rolePairPayloadEquiv ι) (rolePairPayloadEquiv ι)
+  Matrix.reindex (roleRegisterPairLocalEquiv ι) (roleRegisterPairLocalEquiv ι)
     (opTensor (rolePairProj rL rR) X)
 
 private lemma reindex_nonneg {α β : Type*} [Finite α] [Finite β]
@@ -148,7 +148,7 @@ private lemma rolePairProj_nonneg (rL rR : Role) : 0 ≤ rolePairProj rL rR :=
 private lemma rolePairCond_nonneg {ι : Type*} [Fintype ι] [DecidableEq ι]
     (rL rR : Role) {X : MIPStarRE.Quantum.Op (ι × ι)} (hX : 0 ≤ X) :
     0 ≤ rolePairCond rL rR X :=
-  reindex_nonneg (rolePairPayloadEquiv ι)
+  reindex_nonneg (roleRegisterPairLocalEquiv ι)
     (opTensor_nonneg (rolePairProj_nonneg rL rR) hX)
 
 private lemma swapDensity_eq_reindex {ι : Type*}
@@ -229,7 +229,7 @@ private lemma swapDensity_nonneg {ι : Type*} [Finite ι]
   rcases x with ⟨⟨sL, iL⟩, ⟨sR, iR⟩⟩
   rcases y with ⟨⟨tL, jL⟩, ⟨tR, jR⟩⟩
   cases rL <;> cases rR <;> cases sL <;> cases sR <;> cases tL <;> cases tR <;>
-    simp [swapDensity, rolePairCond, rolePairProj, roleProj, opTensor, rolePairPayloadEquiv]
+    simp [swapDensity, rolePairCond, rolePairProj, roleProj, opTensor, roleRegisterPairLocalEquiv]
 
 /-- Classical role-register symmetrization of a bipartite state.
 
@@ -332,7 +332,7 @@ private lemma normalizedTrace_rolePairCond {ι : Type*} [Fintype ι] [DecidableE
     MIPStarRE.Quantum.normalizedTrace (rolePairCond rL rR X)
       = MIPStarRE.Quantum.normalizedTrace (opTensor (rolePairProj rL rR) X) := by
           rw [rolePairCond]
-          exact normalizedTrace_reindex (rolePairPayloadEquiv ι) _
+          exact normalizedTrace_reindex (roleRegisterPairLocalEquiv ι) _
     _ = MIPStarRE.Quantum.normalizedTrace (rolePairProj rL rR) *
           MIPStarRE.Quantum.normalizedTrace X := by
             simpa using normalizedTrace_opTensor (rolePairProj rL rR) X
@@ -593,18 +593,18 @@ private lemma rolePairProj_BA_mul_BB :
 private lemma rolePairCond_mul {ι : Type*} [Fintype ι] [DecidableEq ι]
     (rL₁ rR₁ rL₂ rR₂ : Role) (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
     rolePairCond rL₁ rR₁ X * rolePairCond rL₂ rR₂ Y =
-      Matrix.reindex (rolePairPayloadEquiv ι) (rolePairPayloadEquiv ι)
+      Matrix.reindex (roleRegisterPairLocalEquiv ι) (roleRegisterPairLocalEquiv ι)
         (opTensor (rolePairProj rL₁ rR₁ * rolePairProj rL₂ rR₂) (X * Y)) := by
   calc
     rolePairCond rL₁ rR₁ X * rolePairCond rL₂ rR₂ Y
-      = Matrix.reindex (rolePairPayloadEquiv ι) (rolePairPayloadEquiv ι)
+      = Matrix.reindex (roleRegisterPairLocalEquiv ι) (roleRegisterPairLocalEquiv ι)
           ((opTensor (rolePairProj rL₁ rR₁) X) *
             (opTensor (rolePairProj rL₂ rR₂) Y)) := by
               exact
-                (Matrix.reindexAlgEquiv_mul ℂ ℂ (rolePairPayloadEquiv ι)
+                (Matrix.reindexAlgEquiv_mul ℂ ℂ (roleRegisterPairLocalEquiv ι)
                   (opTensor (rolePairProj rL₁ rR₁) X)
                   (opTensor (rolePairProj rL₂ rR₂) Y)).symm
-    _ = Matrix.reindex (rolePairPayloadEquiv ι) (rolePairPayloadEquiv ι)
+    _ = Matrix.reindex (roleRegisterPairLocalEquiv ι) (roleRegisterPairLocalEquiv ι)
           (opTensor (rolePairProj rL₁ rR₁ * rolePairProj rL₂ rR₂) (X * Y)) := by
             rw [opTensor_mul]
 
@@ -659,7 +659,7 @@ private lemma opTensor_roleCond {ι : Type*} [Fintype ι] [DecidableEq ι]
   rcases x with ⟨⟨sL, iL⟩, ⟨sR, iR⟩⟩
   rcases y with ⟨⟨tL, jL⟩, ⟨tR, jR⟩⟩
   cases rL <;> cases rR <;> cases sL <;> cases sR <;> cases tL <;> cases tR <;>
-    simp [roleCond, rolePairCond, rolePairProj, roleProj, opTensor, rolePairPayloadEquiv]
+    simp [roleCond, rolePairCond, rolePairProj, roleProj, opTensor, roleRegisterPairLocalEquiv]
 
 /-- Block-diagonal role-register measurement built from an Alice-block and a Bob-block POVM.
 
@@ -851,7 +851,7 @@ private lemma ev_classicalRoleSymmState_opTensor_roleCond_A_ignore {ι : Type*}
         (opTensor (roleCond Role.A X) (roleCond Role.B (roleBlock Role.B Y))) := by
   unfold ev classicalRoleSymmState MIPStarRE.Quantum.normalizedTrace Matrix.trace
   simp_rw [Fintype.sum_prod_type]
-  simp [rolePairCond, rolePairPayloadEquiv, rolePairProj, roleCond, roleBlock,
+  simp [rolePairCond, roleRegisterPairLocalEquiv, rolePairProj, roleCond, roleBlock,
     roleProj, opTensor, Matrix.mul_apply, Matrix.single]
   simp_rw [Fintype.sum_prod_type]
   have hRoleSum : ∀ f : Role → ℂ, (∑ r : Role, f r) = f Role.A + f Role.B := by
@@ -886,7 +886,7 @@ private lemma ev_classicalRoleSymmState_opTensor_roleCond_B_ignore {ι : Type*}
         (opTensor (roleCond Role.B X) (roleCond Role.A (roleBlock Role.A Y))) := by
   unfold ev classicalRoleSymmState MIPStarRE.Quantum.normalizedTrace Matrix.trace
   simp_rw [Fintype.sum_prod_type]
-  simp [rolePairCond, rolePairPayloadEquiv, rolePairProj, roleCond, roleBlock,
+  simp [rolePairCond, roleRegisterPairLocalEquiv, rolePairProj, roleCond, roleBlock,
     roleProj, opTensor, Matrix.mul_apply, Matrix.single]
   simp_rw [Fintype.sum_prod_type]
   have hRoleSum : ∀ f : Role → ℂ, (∑ r : Role, f r) = f Role.A + f Role.B := by
