@@ -11,7 +11,7 @@ for $G$) requires comparing full-polynomial measurement families with their
 evaluated-at-points counterparts.  The paper's proof (commutativity-G.tex,
 lines~332–401) uses three kinds of mathematical object:
 
-1. **Scalar quarkic expectations** like
+1. **Scalar quartic expectations** like
    $\mathbb{E}_{\mathbf{x},\mathbf{y}} \sum_{g,h}
      \langle\psi|\, G^{\mathbf{x}}_g G^{\mathbf{y}}_h G^{\mathbf{x}}_g G^{\mathbf{y}}_h
      \otimes I \,|\psi\rangle$.
@@ -98,8 +98,8 @@ soundness cascade).
 `Transport/FullSlice.lean` for collision marginalization alone, plus ~700 lines
 in `Main/Auxiliary.lean` for the bridge chain).  A contributor reading only the
 public lemmas may be surprised that the proof pays an extra `2√ζ` beyond what the
-paper's inline computation suggests; this overhead is documented in
-[docs/paper-gaps/issue-713-scalar-tensor-decision.tex](../paper-gaps/issue-713-scalar-tensor-decision.tex).
+paper's inline computation suggests; the overhead breakdown is given in the
+"Architecture Map: Scalar↔Tensor Bridge Chain" section above.
 
 ## Decision
 
@@ -160,8 +160,7 @@ cubic endpoints are compared to a common `G ⊗ G` switch-sandwich center, costi
    bridge lemmas with explicit `√ζ` error terms.
 
 3. **The extra `2√ζ` overhead** in the second-term transport (`4√ζ` total, rather
-   than the paper's `2√ζ`) is a consequence of this architecture and is explained
-   in detail in `docs/paper-gaps/issue-713-scalar-tensor-decision.tex`.
+   than the paper's `2√ζ`) is a consequence of this architecture.
 
 4. **Do not expose private tensor intermediates** as public API without updating
    this decision record.  Any change that makes a tensor-form average public
@@ -172,7 +171,6 @@ cubic endpoints are compared to a common `G ⊗ G` switch-sandwich center, costi
 ## Cross-References
 
 - Paper: `references/ldt-paper/commutativity-G.tex`, lines 332–401
-- Paper-gap note: `docs/paper-gaps/issue-713-scalar-tensor-decision.tex`
 - Source: `MIPStarRE/LDT/Commutativity/Transport/FullSlice.lean`
 - Source: `MIPStarRE/LDT/Commutativity/Main/Auxiliary.lean`
 - Source: `MIPStarRE/LDT/Commutativity/Main/EvaluatedQuestions.lean`
