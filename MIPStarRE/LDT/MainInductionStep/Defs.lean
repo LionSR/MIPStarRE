@@ -359,10 +359,11 @@ private theorem restrictDiagonalAnswerMeasurement_transportInvariant (params : P
       ProjMeas.transport, Measurement.transport, A, ePoly, eAns, f,
       DiagonalLine.appendAtHeight_rebaseAt, htransport] using hpost
 
-/-- The paper-faithful `x`-restricted strategy with function-valued diagonal-line
+/-- The `x`-restricted strategy with function-valued diagonal-line
 answers.
 
-This is the slice strategy used in `inductive_step.tex`, lines 436--455.  It is
+This matches the slice-restriction interface in `inductive_step.tex`, lines
+436--455. It is
 kept parallel to the current `xRestrictedStrategy`, whose diagonal field uses the
 legacy degree-bounded answer alphabet and therefore only preserves the sampled
 base-point readout. -/
@@ -396,6 +397,39 @@ the slice height. -/
     (strategy : SymStrat params.next ι) (x : Fq params) (u : Point params) :
     (xRestrictedAnswerSymStrat params strategy x).pointMeasurement u =
       strategy.pointMeasurement (appendPoint params u x) :=
+  rfl
+
+/-- The function-answer restricted strategy reuses the parent normalization witness. -/
+@[simp] theorem xRestrictedAnswerSymStrat_isNormalized (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (x : Fq params) :
+    (xRestrictedAnswerSymStrat params strategy x).isNormalized = strategy.isNormalized :=
+  rfl
+
+/-- The function-answer restricted diagonal measurement is the answer-valued
+restriction of the ambient diagonal measurement. -/
+@[simp] theorem xRestrictedAnswerSymStrat_diagonalMeasurement_apply (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (x : Fq params) (ℓ : DiagonalLine params) :
+    (xRestrictedAnswerSymStrat params strategy x).diagonalMeasurement ℓ =
+      restrictDiagonalAnswerMeasurement params strategy x ℓ :=
+  rfl
+
+/-- Evaluating the answer-valued restricted diagonal measurement at the base point
+recovers the ambient slice-preserving diagonal readout. -/
+@[simp] theorem restrictDiagonalAnswerMeasurement_postprocess_zero (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (x : Fq params)
+    (ℓ : DiagonalLine params) :
+    postprocess ((restrictDiagonalAnswerMeasurement params strategy x ℓ).toSubMeas)
+        (fun f : DiagonalLineAnswer params => f zeroCoord) =
+      postprocess
+        ((strategy.diagonalMeasurement
+          (DiagonalLine.appendAtHeight params ℓ x)).toSubMeas)
+        (fun f : DiagonalLinePolynomial params.next => f zeroCoord) := by
+  simp [restrictDiagonalAnswerMeasurement, ProjMeas.postprocess_toSubMeas,
+    SubMeas.postprocess_comp, DiagonalLinePolynomial.toAnswer,
+    DiagonalLineAnswer.restrictAtHeight]
   rfl
 
 /-- The `x`-restricted strategy from the proof of the main induction theorem. -/

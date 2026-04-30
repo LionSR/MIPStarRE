@@ -411,6 +411,103 @@ noncomputable def diagonalLineAnswerFamily
       ((strategy.diagonalMeasurement ℓ).toSubMeas)
       (· zeroCoord)
 
+namespace AnswerSymStrat
+
+/-- Sampled point answers in the axis-parallel lines test for an answer-valued
+symmetric strategy. -/
+noncomputable def axisParallelPointAnswerFamily
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : AnswerSymStrat params ι) :
+    IdxSubMeas (AxisParallelTestSample params) (Fq params) ι :=
+  fun s => (strategy.pointMeasurement s.1).toSubMeas
+
+/-- Sampled line answers in the axis-parallel lines test for an answer-valued
+symmetric strategy, evaluated at the base point. -/
+noncomputable def axisParallelLineAnswerFamily
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : AnswerSymStrat params ι) :
+    IdxSubMeas (AxisParallelTestSample params) (Fq params) ι :=
+  fun s =>
+    let ℓ : AxisParallelLine params :=
+      { base := s.1, direction := s.2 }
+    postprocess
+      ((strategy.axisParallelMeasurement ℓ).toSubMeas)
+      (· zeroCoord)
+
+/-- Sampled point answers in the restricted diagonal test for an answer-valued
+symmetric strategy. -/
+noncomputable def diagonalPointAnswerFamily
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : AnswerSymStrat params ι)
+    (j : Fin params.m) :
+    IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ι :=
+  fun s => (strategy.pointMeasurement s.1).toSubMeas
+
+/-- Sampled diagonal-line answers in the restricted diagonal test for an
+answer-valued symmetric strategy, evaluated at the base point. -/
+noncomputable def diagonalLineAnswerFamily
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : AnswerSymStrat params ι)
+    (j : Fin params.m) :
+    IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ι :=
+  fun s =>
+    let v := extendRestrictedDirection j s.2
+    let ℓ : DiagonalLine params :=
+      { base := s.1, direction := v }
+    postprocess
+      ((strategy.diagonalMeasurement ℓ).toSubMeas)
+      (· zeroCoord)
+
+/-- Axis-parallel failure surrogate for an answer-valued symmetric strategy. -/
+noncomputable def axisParallelFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : AnswerSymStrat params ι) : Error :=
+  bipartiteConsError strategy.state
+    (uniformDistribution (AxisParallelTestSample params))
+    (axisParallelPointAnswerFamily strategy)
+    (axisParallelLineAnswerFamily strategy)
+
+/-- Self-consistency failure surrogate for an answer-valued symmetric strategy. -/
+noncomputable def selfConsistencyFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : AnswerSymStrat params ι) : Error :=
+  bipartiteSSCError strategy.state
+    (uniformDistribution (Point params))
+    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+
+/-- Diagonal-line failure surrogate for an answer-valued symmetric strategy. -/
+noncomputable def diagonalFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : AnswerSymStrat params ι) : Error :=
+  (1 / (params.m : Error)) *
+    ∑ j : Fin params.m,
+      bipartiteConsError strategy.state
+        (uniformDistribution (RestrictedDiagonalSample params j))
+        (diagonalPointAnswerFamily strategy j)
+        (diagonalLineAnswerFamily strategy j)
+
+/-- Goodness data for an answer-valued symmetric strategy. -/
+structure IsGood {params : Parameters}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [FieldModel params.q]
+    (strategy : AnswerSymStrat params ι)
+    (eps delta gamma : Error) : Prop where
+  /-- The axis-parallel test fails with probability at most `eps`. -/
+  axisParallelTest : strategy.axisParallelFailureProbability ≤ eps
+  /-- The self-consistency test fails with probability at most `delta`. -/
+  selfConsistencyTest : strategy.selfConsistencyFailureProbability ≤ delta
+  /-- The diagonal-line test fails with probability at most `gamma`. -/
+  diagonalLineTest : strategy.diagonalFailureProbability ≤ gamma
+
+end AnswerSymStrat
+
 /-- Paper-local (not necessarily symmetric) projective strategy data.
 
 Carries `isNormalized` so that symmetrization constructors

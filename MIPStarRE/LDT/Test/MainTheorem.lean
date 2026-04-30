@@ -436,6 +436,184 @@ theorem mainFormalSuccessorMainInductionPublicWrapper
     boundary.selfImprovementProducer
     hk_pos hk
 
+/-- Answer-valued successor-case weighted restricted-axis input for the
+role-register symmetrization used by `mainFormal`. -/
+def MainFormalSuccessorAnswerAxisWeightedBound (params : Parameters)
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error) : Prop :=
+  avgOver (uniformDistribution (Fq params))
+    (fun x => MainInductionStep.sliceTransverseDirectionWeight params *
+      (MainInductionStep.xRestrictedAnswerSymStrat params
+        strategy.strategySymmetrization x).axisParallelFailureProbability) ≤
+    3 * eps
+
+/-- Answer-valued successor-case weighted restricted-diagonal input for the
+role-register symmetrization used by `mainFormal`. -/
+def MainFormalSuccessorAnswerDiagonalWeightedBound (params : Parameters)
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error) : Prop :=
+  avgOver (uniformDistribution (Fq params))
+    (fun x => MainInductionStep.sliceTransverseDirectionWeight params *
+      (MainInductionStep.xRestrictedAnswerSymStrat params
+        strategy.strategySymmetrization x).diagonalFailureProbability) ≤
+    3 * eps
+
+/-- The answer-valued restricted-probability package on the role-register
+symmetrization used in the successor branch of `mainFormal`. -/
+noncomputable def mainFormalSuccessorAnswerRestrictionPackage
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (haxisWeightedBound : MainFormalSuccessorAnswerAxisWeightedBound params strategy eps)
+    (hdiagonalWeightedBound :
+      MainFormalSuccessorAnswerDiagonalWeightedBound params strategy eps) :
+    MainInductionStep.AnswerSliceRestrictionPackage params
+      strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) :=
+  MainInductionStep.answerMainInductionPublicRestrictionPackage
+    params strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps)
+    (ProjStrat.strategySymmetrization_isGood_three_mul
+      (strategy := strategy) (eps := eps) hpass)
+    haxisWeightedBound hdiagonalWeightedBound
+
+/-- Successor-case recursive slice witnesses for answer-valued restricted
+strategies. -/
+def MainFormalSuccessorAnswerRecursiveSlices (params : Parameters)
+    [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (haxisWeightedBound : MainFormalSuccessorAnswerAxisWeightedBound params strategy eps)
+    (hdiagonalWeightedBound :
+      MainFormalSuccessorAnswerDiagonalWeightedBound params strategy eps) : Prop :=
+  let hrestrict :=
+    mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
+      haxisWeightedBound hdiagonalWeightedBound
+  ∀ x,
+    ∃ error : Error, ∃ G : Measurement (Polynomial params) (Role × ι),
+      ConsRel (strategy.strategySymmetrization).state
+        (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas
+          (MainInductionStep.xRestrictedAnswerSymStrat params
+            strategy.strategySymmetrization x).pointMeasurement)
+        (polynomialEvaluationFamily params G.toSubMeas)
+        error ∧
+      error ≤
+        MainInductionStep.mainInductionError params k
+          (hrestrict.profile.axisParallel x)
+          (hrestrict.profile.selfConsistency x)
+          (hrestrict.profile.diagonal x)
+
+/-- Successor-case answer-valued restricted-strategy self-improvement producer. -/
+def MainFormalSuccessorAnswerSelfImprovementProducer (params : Parameters)
+    [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (haxisWeightedBound : MainFormalSuccessorAnswerAxisWeightedBound params strategy eps)
+    (hdiagonalWeightedBound :
+      MainFormalSuccessorAnswerDiagonalWeightedBound params strategy eps) : Type _ :=
+  let hrestrict :=
+    mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
+      haxisWeightedBound hdiagonalWeightedBound
+  ∀ hinduction :
+    MainInductionStep.AnswerPerSliceInductionPackage params
+      strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) hrestrict k,
+    MainInductionStep.AnswerSelfImprovementPackage params
+      strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
+      hrestrict hinduction
+
+/-- Answer-valued successor-case Section 6 boundary inputs for `mainFormal`. -/
+structure MainFormalSuccessorAnswerBoundary (params : Parameters)
+    [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ) where
+  axisWeightedBound :
+    MainFormalSuccessorAnswerAxisWeightedBound params strategy eps
+  diagonalWeightedBound :
+    MainFormalSuccessorAnswerDiagonalWeightedBound params strategy eps
+  recursiveSlices :
+    MainFormalSuccessorAnswerRecursiveSlices params strategy eps hpass k
+      axisWeightedBound diagonalWeightedBound
+  selfImprovementProducer :
+    MainFormalSuccessorAnswerSelfImprovementProducer params strategy eps hpass k
+      axisWeightedBound diagonalWeightedBound
+
+/-- The answer-valued restricted-probabilities theorem supplies the successor-case
+weighted axis-parallel input. -/
+theorem mainFormalSuccessorAnswerAxisWeightedBound_ofPass
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
+    MainFormalSuccessorAnswerAxisWeightedBound params strategy eps :=
+  MainInductionStep.answer_weighted_axisParallel_bound params
+    strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps)
+    (ProjStrat.strategySymmetrization_isGood_three_mul
+      (strategy := strategy) (eps := eps) hpass)
+
+/-- The answer-valued restricted-probabilities theorem supplies the successor-case
+weighted diagonal-line input. -/
+theorem mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
+    MainFormalSuccessorAnswerDiagonalWeightedBound params strategy eps :=
+  MainInductionStep.answer_weighted_diagonal_bound params
+    strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps)
+    (ProjStrat.strategySymmetrization_isGood_three_mul
+      (strategy := strategy) (eps := eps) hpass)
+
+/-- Build the answer-valued successor boundary once the two still-external slice
+recursion and restricted-strategy self-improvement inputs are supplied. -/
+def mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (hrec : MainFormalSuccessorAnswerRecursiveSlices params strategy eps hpass k
+      (mainFormalSuccessorAnswerAxisWeightedBound_ofPass params strategy eps hpass)
+      (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass params strategy eps hpass))
+    (hself : MainFormalSuccessorAnswerSelfImprovementProducer params strategy eps hpass k
+      (mainFormalSuccessorAnswerAxisWeightedBound_ofPass params strategy eps hpass)
+      (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass params strategy eps hpass)) :
+    MainFormalSuccessorAnswerBoundary params strategy eps hpass k :=
+  let axisBound := mainFormalSuccessorAnswerAxisWeightedBound_ofPass params strategy eps hpass
+  let diagonalBound :=
+    mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass params strategy eps hpass
+  { axisWeightedBound := axisBound
+    diagonalWeightedBound := diagonalBound
+    recursiveSlices := hrec
+    selfImprovementProducer := hself }
+
+/-- Answer-valued successor-case Section 6 handoff for `mainFormal`. -/
+theorem mainFormalSuccessorAnswerMainInductionPublicWrapper
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (hd : 0 < params.d)
+    (boundary : MainFormalSuccessorAnswerBoundary params strategy eps hpass k)
+    (hk_pos : 1 ≤ k)
+    (hk : 400 * params.m * params.d ≤ k) :
+    ∃ G : Measurement (Polynomial params.next) (Role × ι),
+      ConsRel (strategy.strategySymmetrization).state
+        (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas (strategy.strategySymmetrization).pointMeasurement)
+        (polynomialEvaluationFamily params.next G.toSubMeas)
+        (MainInductionStep.mainInductionError params.next k
+          (3 * eps) (3 * eps) (3 * eps)) :=
+  MainInductionStep.answerMainInductionPublicWrapper params
+    (strategy := strategy.strategySymmetrization)
+    (eps := 3 * eps) (delta := 3 * eps) (gamma := 3 * eps) (k := k)
+    (ProjStrat.strategySymmetrization_isGood_three_mul
+      (strategy := strategy) (eps := eps) hpass)
+    hd
+    boundary.axisWeightedBound
+    boundary.diagonalWeightedBound
+    boundary.recursiveSlices
+    boundary.selfImprovementProducer
+    hk_pos hk
+
 /-- The Section 3 specialization of the main-induction `ν` after Step 1
 symmetrization.
 
@@ -1087,6 +1265,78 @@ def ofSyntacticSuccessor
   kPositive := hk_pos
 
 end MainFormalRolePackageSuccessorResidual
+
+/-- Answer-valued successor-branch data for producing the Section 6 role package. -/
+structure MainFormalRolePackageAnswerSuccessorResidual
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ) where
+  /-- A predecessor whose successor is the current parameter bundle. -/
+  successor : Parameters.SuccessorDecomposition params
+  /-- The bundled answer-valued successor-boundary inputs for the transported strategy. -/
+  boundary :
+    letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
+    MainFormalSuccessorAnswerBoundary successor.pred
+      (projStratTransportSuccessor strategy successor) eps
+      (passesLowIndividualDegreeTest_transportSuccessor hpass successor) k
+  /-- Positivity of the predecessor degree parameter, needed by the Section 6 wrapper. -/
+  dimensionPositive : 0 < successor.pred.d
+  /-- The positive-`k` side condition used by the Section 6 wrapper. -/
+  kPositive : 1 ≤ k
+
+namespace MainFormalRolePackageAnswerSuccessorResidual
+
+/-- Convert explicit answer-valued successor-branch data into the isolated Section 6
+role-package residual, using the public current-dimension large-`k` hypothesis. -/
+theorem toRolePackageResidual
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    (residual : MainFormalRolePackageAnswerSuccessorResidual params strategy eps hpass k)
+    (hk_large : 400 * params.m * params.d ≤ k) :
+    Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) := by
+  rcases residual with ⟨⟨pred, hnext⟩, boundary, hd, hk_pos⟩
+  subst params
+  have hk_pred : 400 * pred.m * pred.d ≤ k := by
+    have hm_le : pred.m ≤ pred.m + 1 := Nat.le_succ pred.m
+    have hmono : 400 * pred.m * pred.d ≤ 400 * (pred.m + 1) * pred.d :=
+      Nat.mul_le_mul_right pred.d (Nat.mul_le_mul_left 400 hm_le)
+    exact le_trans hmono (by simpa [Parameters.next] using hk_large)
+  letI : FieldModel.{0} pred.q :=
+    fieldModelOfSuccessorDecomposition (params := pred.next) ⟨pred, rfl⟩
+  let transportedStrategy : ProjStrat pred.next ι :=
+    projStratTransportSuccessor strategy ⟨pred, rfl⟩
+  have transportedPass : transportedStrategy.PassesLowIndividualDegreeTest eps := by
+    simpa [transportedStrategy] using
+      (passesLowIndividualDegreeTest_transportSuccessor hpass ⟨pred, rfl⟩)
+  have boundary' :
+      MainFormalSuccessorAnswerBoundary pred transportedStrategy eps transportedPass k := by
+    simpa [transportedStrategy, transportedPass] using boundary
+  rcases mainFormalSuccessorAnswerMainInductionPublicWrapper pred transportedStrategy eps
+      transportedPass k hd boundary' hk_pos hk_pred with ⟨G, hG⟩
+  refine ⟨{ roleMeasurement := G, section6Consistency := ?_ }⟩
+  simpa [transportedStrategy, projStratTransportSuccessor, fieldModelOfSuccessorDecomposition]
+    using hG
+
+/-- Constructor for the common syntactic-successor answer-valued case. -/
+def ofSyntacticSuccessor
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : ProjStrat params.next ι) (eps : Error) (k : ℕ)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hd : 0 < params.d)
+    (boundary : MainFormalSuccessorAnswerBoundary params strategy eps hpass k)
+    (hk_pos : 1 ≤ k) :
+    MainFormalRolePackageAnswerSuccessorResidual params.next strategy eps hpass k where
+  successor := ⟨params, rfl⟩
+  boundary := by
+    simpa using boundary
+  dimensionPositive := hd
+  kPositive := hk_pos
+
+end MainFormalRolePackageAnswerSuccessorResidual
 
 /-- Branch-level residual for producing the Section 6 role package.
 
