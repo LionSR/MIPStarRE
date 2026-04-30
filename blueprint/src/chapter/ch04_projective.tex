@@ -369,6 +369,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:trunc-inequality}
 		Write the eigendecomposition of $A_a$ as
 		\[
@@ -432,6 +433,11 @@
 			\sum_{s \in S} f(s) \leq 4\sqrt{\zeta}.
 		\]
 	\end{lemma}
+		\begin{proof}
+			\leanok
+			The four declarations are formalization-only combinatorial support lemmas, each proved by elementary finite-set double-counting and rearrangement.  Together they establish the pairwise inequality and the final bound $\sum_{s \in S} f(s) \leq 4\sqrt{\zeta}$ under the stated hypotheses on $r$, $d$, and $\zeta$.
+		\end{proof}
+
 
 	\begin{lemma}[Rank reduction]\label{lem:projective-low-rank-sum}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum}
@@ -718,6 +724,7 @@
 		\]
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		Multiply the definition of $X$ by $T_a$ on the left and use that $T_a$ selects exactly the basis vectors $\ket{a,i}$:
 		\[
 			T_a \cdot X
@@ -740,6 +747,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:xa-t}
 		The identity $X_a^\dagger X_a = Q_a$ follows by expanding the basis sums. The remaining equalities come from \ref{lem:xa-t} and the projectivity of $T$:
 		\[
@@ -761,6 +769,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:qa-restated}
 		Use that $T$ is a measurement and then \ref{lem:qa-restated}:
 		\[
@@ -788,6 +797,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:X-squared, lem:qa-restated}
 		Expand the square and apply \ref{lem:X-squared} and \ref{lem:qa-restated} term by term:
 		\[
@@ -823,6 +833,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{def:projective-P}
 		Since $T$ is projective,
 		\[
@@ -846,6 +857,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		The paper proves this by multiplying out
 		$\widehat{X}=U\cdot I_{m\times d}\cdot V^\dagger$ and using the unitarity of
 		$U$ and $V$.  We record this coisometry identity as one of the primitive
@@ -860,6 +872,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:X-squared}
 		The paper obtains this from the SVD formula for $X$ and the definition of
 		$\widehat X$.  We record the mixed-product identity as a primitive consequence
@@ -876,6 +889,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:X-squared, lem:X-hat-squared, lem:X-times-X-hat}
 		The paper diagonalizes the positive operator $X\widehat X^\dagger$ using the
 		SVD notation.  The formal proof avoids storing that SVD explicitly: set
@@ -891,6 +905,7 @@
 		$P = \{P_a\}$ forms a projective sub-measurement.
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:pa-restated, lem:X-hat-squared}
 		For outcomes $a,b$,
 		\begin{align*}
@@ -916,6 +931,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:projective-low-rank-sum, lem:q-almost-projective, lem:sqrt-Q-completeness, lem:xa-t, lem:qa-restated, lem:X-expression-to-Q-expression, lem:pa-restated, lem:X-hat-squared, lem:X-times-X-hat, lem:squared-difference, lem:P-projectivity}
 		The formal proof follows this argument directly from the primitive
 		$X$, $\widehat X$, and $P$ identities; the $30\zeta^{1/4}$ estimate is

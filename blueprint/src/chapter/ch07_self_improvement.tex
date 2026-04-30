@@ -59,6 +59,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \end{enumerate}
 \end{lemma}
 \begin{proof}
+	\leanok
   \uses{lem:sdp, lem:add-in-u, lem:global-variance-of-points, prop:simeq-to-approx, prop:simeq-for-measurements}
   Let $T=\{T_g\}$ and $Z$ be the optimal solutions to the SDPs~\eqref{eq:primal-objective} and~\eqref{eq:dual-objective} given by Lemma~\ref{lem:sdp}. Then $T$ is a measurement, and
   \begin{align}
@@ -304,6 +305,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \end{equation}
 \end{lemma}
 \begin{proof}
+	\leanok
   Rewrite~\eqref{eq:primal-objective} in canonical block form. Let $r$ be the dimension of the space on which~$A$ acts, let $M = |\polyfunc{m}{q}{d}|$, and fix an ordering $g_1,\ldots,g_M$ of the polynomials. Consider
   \begin{align}
     \sup &\quad \Tr(C^\dagger X) \label{eq:primal-canonical}\\
@@ -375,6 +377,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \]
 \end{lemma}
 \begin{proof}
+	\leanok
   We begin by expanding
   \begin{align}
     \E_{u} \sum_{(o, h) \in S_{u}} \bra{\psi} M^{u}_o \ot H_h \ket{\psi}
@@ -527,6 +530,7 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \end{enumerate}
 \end{theorem}
 \begin{proof}
+	\leanok
   \uses{lem:self-improvement-helper, thm:orthonormalization,
     prop:self-consistency-implies-data-processing,
     prop:completeness-transfer-self-consistent-A, prop:triangle-sub,
