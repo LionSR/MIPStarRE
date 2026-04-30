@@ -14,7 +14,7 @@ The heavier endpoint and normalization lemmas are imported from
 
 **Proof strategy:** The proof follows the paper's exact route of ten approximation steps
 using `closenessOfIP`, `commutativityPoints`, `gCommStability_scalar`, and
-`gCommStabilityTwo_scalar`.  Every `≈_{ε}` step in the paper corresponds to a
+`gCommStabilityTwo_raw_scalar`.  Every `≈_{ε}` step in the paper corresponds to a
 named `hphase` block below, and the final error budget `48m(√γ + √ζ)` matches
 the paper's displayed computation at line 129.  The only presentation difference
 is that the Lean chain terminates at the `BAB` average and then applies the
@@ -1219,7 +1219,7 @@ Starting from `E[∑ ABAB]`, the proof applies ten approximation steps:
 5a. `≈_{6√(γ(m+1))}`: the point-measurement swap contribution internal
     to the paper's `clm:g-comm-stability2` accounting
 5b. `≈_{√ζ}`: remove trailing `G^x` by the boundedness part of
-    `gCommStabilityTwo_scalar` (this is the scalar part of `hphase5paper` below)
+    `gCommStabilityTwo_raw_scalar` (this is the scalar part of `hphase5paper` below)
 6–7. `≈_{2√ζ + 2√ζ}`: reverse the `eq:add-an-a` insertions
 8–9. `≈_{√ζ + √ζ}`: apply postprocessed self-consistency twice
 
