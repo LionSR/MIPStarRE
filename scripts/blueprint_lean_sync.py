@@ -111,14 +111,18 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
                 if in_raw_string and char == '"':
                     out.append(char)
                     i += 1
-                    count = 0
-                    while i < len(line) and line[i] == "#":
-                        out.append("#")
-                        count += 1
-                        i += 1
-                    if count == raw_hash_count:
+                    if raw_hash_count == 0:
                         in_string = False
                         in_raw_string = False
+                    else:
+                        count = 0
+                        while i < len(line) and line[i] == "#":
+                            out.append("#")
+                            count += 1
+                            i += 1
+                        if count == raw_hash_count:
+                            in_string = False
+                            in_raw_string = False
                     continue
 
                 out.append(char)
@@ -174,7 +178,7 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
                     j -= 1
                 if j >= 0 and out[j] == "r":
                     prev = out[j - 1] if j > 0 else ""
-                    if not (prev.isalnum() or prev in "_'"):
+                    if not (prev.isalnum() or prev in {"_", "'"}):
                         in_string = True
                         in_raw_string = True
                         raw_hash_count = hash_run
@@ -193,7 +197,7 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
                 )
             elif char == "'":
                 prev = out[-1] if out else ""
-                if not (prev.isalnum() or prev in "_'"):
+                if not (prev.isalnum() or prev in {"_", "'"}):
                     in_char = True
                     escaped = False
             out.append(line[i])
