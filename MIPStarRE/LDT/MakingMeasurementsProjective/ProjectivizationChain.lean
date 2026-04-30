@@ -466,6 +466,8 @@ theorem rightConsistency {Outcome : Type*} {ι : Type*}
   simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily]
     using hdefect.trans hpre'
 
+end ProjectivizationMatchMassMonotonicity
+
 /-- Match-mass preservation input for the orthonormalization step.
 
 Asserts that the projective submeasurement `P` produced by orthonormalization
@@ -478,7 +480,7 @@ field and the downstream `leftConsistency` / `rightConsistency` theorems can
 recover the exact paper line-169 `ζ₁` consistency links. -/
 structure OrthonormalizationMatchMassPreservation
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
+    [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
     (G : Measurement Outcome ι) (P : ProjSubMeas Outcome ι)
     (B : Measurement Outcome ι) : Prop where
@@ -487,8 +489,6 @@ structure OrthonormalizationMatchMassPreservation
   matchMassPreservation :
     qBipartiteMatchMass ψ P.toSubMeas B.toSubMeas ≥
       qBipartiteMatchMass ψ G.toSubMeas B.toSubMeas
-
-end ProjectivizationMatchMassMonotonicity
 
 namespace ProjectivizationMatchMassMonotonicity
 
@@ -506,7 +506,7 @@ Together with `leftConsistency` and `rightConsistency`, this fills the
 `MainFormalPostRolePackageLeftCompletionLine169Residual`. -/
 theorem of_submeasurement_match_mass_and_completion
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
+    [Fintype Outcome]
     {ψ : QuantumState (ι × ι)} {G_A G_B : Measurement Outcome ι}
     (P_A P_B : ProjSubMeas Outcome ι) (a_A a_B : Outcome)
     (Q_A Q_B : ProjMeas Outcome ι)
