@@ -2783,6 +2783,72 @@ structure MainFormalPostRolePackageLeftCompletionLine169Residual
 
 namespace MainFormalPostRolePackageLeftCompletionLine169Residual
 
+/-- Build the post-role residual from two orthonormalize-and-complete statements
+whose completed measurements are the canonical completions of the produced
+projective submeasurements.
+
+The remaining non-analytic inputs are exactly the construction-level match-mass
+monotonicity inequalities for the orthonormalized submeasurements; completion then
+preserves those inequalities by positivity. -/
+noncomputable def ofCompleteAtOutcomeStatements
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
+    (P_A P_B : ProjSubMeas (Polynomial params) ι)
+    (a_A a_B : Polynomial params)
+    (leftStmt :
+      MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement strategy.state
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
+        P_A (Preliminaries.completeAtOutcomeProj P_A a_A) a_A scalars.zeta1)
+    (rightStmt :
+      MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement strategy.state
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
+        P_B (Preliminaries.completeAtOutcomeProj P_B a_B) a_B scalars.zeta1)
+    (hleftMass :
+      qBipartiteMatchMass strategy.state P_A.toSubMeas
+          (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas ≥
+        qBipartiteMatchMass strategy.state
+          (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas
+          (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+    (hrightMass :
+      qBipartiteMatchMass strategy.state P_B.toSubMeas
+          (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas ≥
+        qBipartiteMatchMass strategy.state
+          (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas
+          (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas) :
+    MainFormalPostRolePackageLeftCompletionLine169Residual
+      params strategy eps k scalars rolePackage where
+  leftMeasurement := Preliminaries.completeAtOutcomeProj P_A a_A
+  rightMeasurement := Preliminaries.completeAtOutcomeProj P_B a_B
+  leftCompletionCloseness := by
+    exact MIPStarRE.LDT.Preliminaries.stateDependentDistanceRel_mono strategy.state
+      (uniformDistribution Unit)
+      (constSubMeasFamily
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas.liftLeft)
+      (constSubMeasFamily (Preliminaries.completeAtOutcomeProj P_A a_A).toSubMeas.liftLeft)
+      (MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1)
+      scalars.zeta2
+      (MainFormalCascadeScalars.orthonormalizeAndCompleteError_zeta1_le_zeta2
+        scalars hsmall)
+      leftStmt.completedCloseness
+  rightCompletionClosenessLeft := by
+    exact MIPStarRE.LDT.Preliminaries.stateDependentDistanceRel_mono strategy.state
+      (uniformDistribution Unit)
+      (constSubMeasFamily
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas.liftLeft)
+      (constSubMeasFamily (Preliminaries.completeAtOutcomeProj P_B a_B).toSubMeas.liftLeft)
+      (MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1)
+      scalars.zeta2
+      (MainFormalCascadeScalars.orthonormalizeAndCompleteError_zeta1_le_zeta2
+        scalars hsmall)
+      rightStmt.completedCloseness
+  line169MatchMassMonotonicity :=
+    MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_completeAtOutcomeProj
+      P_A P_B a_A a_B hleftMass hrightMass
+
 /-- Transport the Bob-side completion estimate from the left-register form to the
 right-register form and recover the previous post-role residual.
 
@@ -2921,6 +2987,49 @@ structure MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual
       (roleResidual.rolePackage scalars)
 
 namespace MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual
+
+/-- Combine a concrete Section 6 role residual with the checked post-role
+orthonormalize-and-complete constructor.
+
+This is the direct constructor for the current live residual once role production,
+completion statements, and the construction-level line-169 match-mass monotonicity
+inputs are available. -/
+noncomputable def ofRoleResidualAndCompleteAtOutcomeStatements
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
+    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
+    (P_A P_B : ProjSubMeas (Polynomial params) ι)
+    (a_A a_B : Polynomial params)
+    (leftStmt :
+      MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement strategy.state
+        (unsymmetrizedLeftPOVM (roleResidual.rolePackage scalars).roleMeasurement)
+        P_A (Preliminaries.completeAtOutcomeProj P_A a_A) a_A scalars.zeta1)
+    (rightStmt :
+      MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement strategy.state
+        (unsymmetrizedRightPOVM (roleResidual.rolePackage scalars).roleMeasurement)
+        P_B (Preliminaries.completeAtOutcomeProj P_B a_B) a_B scalars.zeta1)
+    (hleftMass :
+      qBipartiteMatchMass strategy.state P_A.toSubMeas
+          (unsymmetrizedRightPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas ≥
+        qBipartiteMatchMass strategy.state
+          (unsymmetrizedLeftPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas
+          (unsymmetrizedRightPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
+    (hrightMass :
+      qBipartiteMatchMass strategy.state P_B.toSubMeas
+          (unsymmetrizedLeftPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas ≥
+        qBipartiteMatchMass strategy.state
+          (unsymmetrizedRightPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas
+          (unsymmetrizedLeftPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas) :
+    MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual
+      params strategy eps hpass k scalars where
+  roleResidual := roleResidual
+  postRoleResidual :=
+    MainFormalPostRolePackageLeftCompletionLine169Residual.ofCompleteAtOutcomeStatements
+      hsmall P_A P_B a_A a_B leftStmt rightStmt hleftMass hrightMass
 
 /-- Convert the left-completion residual to the previous role-residual completion
 line-169 shape by applying the #869 right-register transport to the Bob-side
