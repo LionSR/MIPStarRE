@@ -13,7 +13,7 @@ probability distributions:
 - `PMF` in `Mathlib.Probability.ProbabilityMassFunction.Basic`;
 - `PMF.ofFinset`, `PMF.ofFintype`, `PMF.normalize`, `PMF.map`, and `PMF.bind`
   in `Mathlib.Probability.ProbabilityMassFunction.Constructions` and
-  `Monad`;
+  `Mathlib.Probability.ProbabilityMassFunction.Monad`;
 - `PMF.uniformOfFinset` and `PMF.uniformOfFintype` in
   `Mathlib.Probability.Distributions.Uniform`;
 - `PMF.toMeasure`, `PMF.toMeasure.isProbabilityMeasure`, and
@@ -57,7 +57,7 @@ Relevant declarations found in the checkout:
 | `PMF.ofFinset` | `Mathlib.Probability.ProbabilityMassFunction.Constructions` | Builds a `PMF` from a finitely supported weight function and a `Finset` support. |
 | `PMF.ofFintype` | `Mathlib.Probability.ProbabilityMassFunction.Constructions` | Builds a `PMF` from weights on a finite type. |
 | `PMF.normalize` | `Mathlib.Probability.ProbabilityMassFunction.Constructions` | Normalizes a nonzero finite/countable mass function. |
-| `PMF.map`, `PMF.bind` | `Mathlib.Probability.ProbabilityMassFunction.Constructions` / `Monad` | Push-forward and monadic sampling. |
+| `PMF.map`, `PMF.bind` | `Mathlib.Probability.ProbabilityMassFunction.Constructions` / `Mathlib.Probability.ProbabilityMassFunction.Monad` | Push-forward and monadic sampling. |
 | `PMF.uniformOfFinset`, `PMF.uniformOfFintype` | `Mathlib.Probability.Distributions.Uniform` | Uniform finite distributions. |
 | `PMF.integral_eq_sum`, `PMF.integral_eq_tsum` | `Mathlib.Probability.ProbabilityMassFunction.Integrals` | Expectations as finite or countable weighted sums. |
 
