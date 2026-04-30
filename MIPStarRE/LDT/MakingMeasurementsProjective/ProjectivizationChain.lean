@@ -92,7 +92,8 @@ namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 open MIPStarRE.LDT
 open MIPStarRE.LDT.Preliminaries
-  (completeAtOutcome completeAtOutcomeProj completingToMeasurement)
+  (completeAtOutcome completeAtOutcomeProj completeAtOutcomeProj_toMeasurement
+    completingToMeasurement)
 
 /-! ### Error functions -/
 
@@ -521,12 +522,14 @@ theorem of_submeasurement_match_mass_and_completion
   rcases hrightPreservation with ⟨hright⟩
   have hQALeftProj : Q_A = completeAtOutcomeProj P_A a_A :=
     ProjMeas.ext (fun a => by
-      simpa [completeAtOutcomeProj, completeAtOutcome] using
-        congrArg (fun (M : Measurement Outcome ι) => M.outcome a) hQALeft)
+      have hQmeas : Q_A.toMeasurement = (completeAtOutcomeProj P_A a_A).toMeasurement := by
+        simpa [completeAtOutcomeProj_toMeasurement] using hQALeft
+      simpa using congrArg (fun (M : Measurement Outcome ι) => M.outcome a) hQmeas)
   have hQBRightProj : Q_B = completeAtOutcomeProj P_B a_B :=
     ProjMeas.ext (fun a => by
-      simpa [completeAtOutcomeProj, completeAtOutcome] using
-        congrArg (fun (M : Measurement Outcome ι) => M.outcome a) hQBRight)
+      have hQmeas : Q_B.toMeasurement = (completeAtOutcomeProj P_B a_B).toMeasurement := by
+        simpa [completeAtOutcomeProj_toMeasurement] using hQBRight
+      simpa using congrArg (fun (M : Measurement Outcome ι) => M.outcome a) hQmeas)
   rw [hQALeftProj, hQBRightProj]
   exact of_completeAtOutcomeProj P_A P_B a_A a_B hleft hright
 
