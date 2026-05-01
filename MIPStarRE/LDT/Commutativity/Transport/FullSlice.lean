@@ -10,9 +10,11 @@ Barrel module re-exporting the full-slice transport sub-modules:
 
 - `Averages`: zero-family definition, scalar/tensor averages, data indices
 - `ZeroBounds`: zero-family SDDOpRel bounds
-- `Machinery`: sandwich-tensor expansion, collision residuals,
-  marginalization, normalization conditions, self-consistency
-- `Bridges`: scalar-to-tensor closenessOfIP bridges, main result
+- `Machinery.Marginalization`: sandwich-tensor expansion, collision residuals,
+  and marginalization bounds
+- `Machinery.Normalization`: normalization conditions and self-consistency bounds
+- `Bridges.QSDD`: `qSDDOp` averaging assembly and scalar commutation identity
+- `Bridges.Closeness`: scalar-to-tensor `closenessOfIP` bridges
 
 Architecture: The public API is scalar (e.g. `fullSliceABAAvg`,
 `evaluatedSliceABABAvg`).  Internal tensor-form intermediates (e.g.
@@ -20,6 +22,9 @@ Architecture: The public API is scalar (e.g. `fullSliceABAAvg`,
 `closenessOfIP` arguments.  The scalar↔tensor bridge chain lives in
 `Main/Auxiliary.lean`.  See `docs/decisions/713-scalar-tensor-decision.md`
 for the Option 3 (hybrid) decision record.
+
+Ex-private definitions are tensor-form machinery per architecture decision
+#713; downstream code should use the scalar public API.
 
 ## References
 
