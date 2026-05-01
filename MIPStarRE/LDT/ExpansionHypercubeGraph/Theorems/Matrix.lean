@@ -466,13 +466,93 @@ lemma rerandomizeCoordWeight_symm (params : Parameters) (u v : Point params) :
   simpa using congrArg (fun n : ℕ => (n : Error)) h_card_eq
 
 /-- `prop:laplacian-rewrite`: the Laplacian equals the edge-difference form
-`(1/2) · E_{(u,v)∼C} (|u⟩-|v⟩)(⟨u|-⟨v|)`.
-
-Proof using symmetry of edge weights (`rerandomizeCoordWeight_symm`) and
-row/column sum properties. -/
+`(1/2) · E_{(u,v)∼C} (|u⟩-|v⟩)(⟨u|-⟨v|)`, proved entrywise using the symmetry
+and row/column-sum properties of the edge distribution. -/
 theorem laplacian_eq_edgeDifferenceForm (params : Parameters) :
     matrixLaplacianOperator params = laplacianDifferenceForm params := by
-  sorry
+  ext a b
+  simp [laplacianDifferenceForm, matrixLaplacianOperator, Matrix.sub_apply, Matrix.one_apply,
+    Matrix.smul_apply, Pi.smul_apply, smul_eq_mul,
+    matrixAdjacencyOperator, hypercubeAdjacencyWeight_eq_rerandomizeCoordWeight]
+  have h_expand (u v : Point params) :
+      ((if a = u then (1 : ℂ) else 0) - (if a = v then (1 : ℂ) else 0)) *
+      ((if u = b then (1 : ℂ) else 0) - (if v = b then (1 : ℂ) else 0)) =
+      (if a = u ∧ u = b then (1 : ℂ) else 0) -
+      (if a = u ∧ v = b then (1 : ℂ) else 0) -
+      (if a = v ∧ u = b then (1 : ℂ) else 0) +
+      (if a = v ∧ v = b then (1 : ℂ) else 0) := by
+    by_cases ha_u : a = u <;> by_cases ha_v : a = v <;>
+    by_cases hu_b : u = b <;> by_cases hv_b : v = b <;> simp [ha_u, ha_v, hu_b, hv_b] <;> ring
+  calc
+    (1/2 : ℂ) * (∑ uv : Point params × Point params,
+      ((rerandomizeCoordWeight params uv.1 uv.2 : ℂ)) *
+        (((if a = uv.1 then (1 : ℂ) else 0) - (if a = uv.2 then (1 : ℂ) else 0)) *
+         ((if uv.1 = b then (1 : ℂ) else 0) - (if uv.2 = b then (1 : ℂ) else 0))))
+    _ = (1/2 : ℂ) * (∑ uv : Point params × Point params,
+            ((rerandomizeCoordWeight params uv.1 uv.2 : ℂ)) *
+              ((if a = uv.1 ∧ uv.1 = b then (1 : ℂ) else 0) -
+               (if a = uv.1 ∧ uv.2 = b then (1 : ℂ) else 0) -
+               (if a = uv.2 ∧ uv.1 = b then (1 : ℂ) else 0) +
+               (if a = uv.2 ∧ uv.2 = b then (1 : ℂ) else 0))) := by
+      refine congrArg (fun f => (1/2 : ℂ) * f) (Finset.sum_congr rfl ?_)
+      rintro ⟨u, v⟩ _
+      rw [h_expand u v]
+    _ = (1/2 : ℂ) * ((∑ uv : Point params × Point params, ((rerandomizeCoordWeight params uv.1 uv.2 : ℂ)) *
+              (if a = uv.1 ∧ uv.1 = b then (1 : ℂ) else 0)) -
+        (∑ uv : Point params × Point params, ((rerandomizeCoordWeight params uv.1 uv.2 : ℂ)) *
+              (if a = uv.1 ∧ uv.2 = b then (1 : ℂ) else 0)) -
+        (∑ uv : Point params × Point params, ((rerandomizeCoordWeight params uv.1 uv.2 : ℂ)) *
+              (if a = uv.2 ∧ uv.1 = b then (1 : ℂ) else 0)) +
+        (∑ uv : Point params × Point params, ((rerandomizeCoordWeight params uv.1 uv.2 : ℂ)) *
+              (if a = uv.2 ∧ uv.2 = b then (1 : ℂ) else 0))) := by
+      simp [Finset.sum_add_distrib, Finset.sum_sub_distrib]
+    _ = (1/2 : ℂ) * (
+        ((if a = b then ∑ v : Point params, (rerandomizeCoordWeight params a v : ℂ) else 0)) -
+        ((rerandomizeCoordWeight params a b : ℂ)) -
+        ((rerandomizeCoordWeight params b a : ℂ)) +
+        ((if a = b then ∑ u : Point params, (rerandomizeCoordWeight params u a : ℂ) else 0))) := by
+      congr 1
+      · rw [Fintype.sum_prod_type]
+        simp_rw [mul_ite, mul_zero, mul_one, ite_mul, zero_mul, one_mul]
+        simp [eq_comm]
+      · rw [Fintype.sum_prod_type]; simp [eq_comm]
+      · rw [Fintype.sum_prod_type]; simp [eq_comm]
+      · rw [Fintype.sum_prod_type]
+        simp_rw [mul_ite, mul_zero, mul_one, ite_mul, zero_mul, one_mul]
+        simp [eq_comm]
+    _ = (1/2 : ℂ) * (
+        ((if a = b then ((hypercubeVertexCount params : Error)⁻¹ : ℂ) else 0)) -
+        ((rerandomizeCoordWeight params a b : ℂ)) -
+        ((rerandomizeCoordWeight params b a : ℂ)) +
+        ((if a = b then ((hypercubeVertexCount params : Error)⁻¹ : ℂ) else 0))) := by
+      congr 1
+      · by_cases hab : a = b
+        · subst hab
+          have hrow := rerandomizeCoordWeight_rowSum params a
+          simpa [Complex.ofReal_div, Complex.ofReal_inv, Complex.ofReal_natCast] using
+            congrArg (fun x : Error => (x : ℂ)) hrow
+        · simp [hab]
+      · rfl
+      · rfl
+      · by_cases hab : a = b
+        · subst hab
+          have hcol := rerandomizeCoordWeight_colSum params a
+          simpa [Complex.ofReal_div, Complex.ofReal_inv, Complex.ofReal_natCast] using
+            congrArg (fun x : Error => (x : ℂ)) hcol
+        · simp [hab]
+    _ = (1/2 : ℂ) * (
+        ((if a = b then (2 : ℂ) * ((hypercubeVertexCount params : Error)⁻¹ : ℂ) else 0)) -
+        (2 : ℂ) * (rerandomizeCoordWeight params a b : ℂ)) := by
+      have hsymm : (rerandomizeCoordWeight params b a : ℂ) =
+          (rerandomizeCoordWeight params a b : ℂ) := by
+        simpa using congrArg (fun x : Error => (x : ℂ)) (rerandomizeCoordWeight_symm params a b)
+      rw [hsymm]
+      by_cases hab : a = b
+      · subst hab; ring
+      · simp [hab]
+    _ = ((if a = b then ((hypercubeVertexCount params : Error)⁻¹ : ℂ) else 0)) -
+        (rerandomizeCoordWeight params a b : ℂ) := by
+      ring
 
 /-- Closed form for the matrix local-variance trace expression. -/
 lemma matrixLocalVarianceTraceForm_eq_closedForm (params : Parameters)
