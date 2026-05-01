@@ -174,9 +174,10 @@ theorem gHatFacts
       _ ≤ zeta + zeta := add_le_add hcomplete_bound hincomplete_bound
       _ = gHatSelfConsistencyError zeta := by
             simp [gHatSelfConsistencyError, two_mul]
-  · -- TODO(#199): `completedCommutation`: split gHat pair-product over
-    -- `GHatOutcome × GHatOutcome` into complete + incomplete quadrants
-    -- and bound by `gHatCommutationError`.
+  · -- Historical note (#199): `completedCommutation` is proved by splitting
+    -- the gHat pair-product over `GHatOutcome × GHatOutcome` into complete,
+    -- incomplete, swapped, and total quadrants, then bounding the sum by
+    -- `gHatCommutationError`.
     -- Paper reference: `cor:G-hat-facts` in `ld-pasting.tex`.
     let swappedIncompletePointLeft :
         IdxOpFamily (SlicePairQuestion params) (Polynomial params) (ι × ι) :=
@@ -304,9 +305,9 @@ theorem gHatFacts
               incompleteQuadrant q +
               swappedQuadrant q +
               totalQuadrant q := by
-      -- TODO(#199): isolate the explicit `Option × Option` sum rewrite into a reusable lemma.
-      -- The rest of the proof below already handles the scalar bounds once this decomposition
-      -- is available.
+      -- Historical note (#199): the explicit `Option × Option` sum rewrite is
+      -- now isolated in `qSDDCore_option_pair_decompose`; the local work below
+      -- specializes that reusable decomposition to the four quadrants.
       intro q
       rcases q with ⟨x, y⟩
       let completeLeft :

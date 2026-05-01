@@ -4090,8 +4090,8 @@ theorem mainFormal
         Nonempty (MainFormalCascadeRolePackageResidualStep6WitnessResidual
           (params := params) (strategy := strategy) (eps := eps)
           (hpass := hpass) (k := k) (scalars := scalars)) := by
-      -- TODO(#427, #931): The `mainFormal` hole composes three inputs into a
-      -- `MainFormalCascadeRolePackageResidualStep6WitnessResidual` via
+      -- TODO(#931, #834, #422): The `mainFormal` residual composes three inputs
+      -- into a `MainFormalCascadeRolePackageResidualStep6WitnessResidual` via
       -- `nonempty_ofRoleResidualAndLine130Inputs`:
       --
       -- 1. A `MainFormalRolePackageResidual` (Section 6 role package),
