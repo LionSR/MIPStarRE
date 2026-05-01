@@ -4465,12 +4465,11 @@ structure MainFormalStep6Hypotheses
         (unsymmetrizedLeftPOVM
           (roleResidual.rolePackage scalars).roleMeasurement)
 
-/-- Fill the base branch (`m = 1`) of `mainFormal` using the bundled
-analytic hypotheses.
+/-- Assemble the Step 6 witness residual from the bundled analytic hypotheses.
 
-This theorem takes an explicit `roleResidual` (obtainable via
-`MainFormalRolePackageResidual.ofBaseCase` together with `hm1`) and the
-`MainFormalStep6Hypotheses` bridge, then assembles the
+This theorem takes an explicit `roleResidual` (obtainable from either
+`MainFormalRolePackageResidual.ofBaseCase` or the successor-branch
+handoff) and the `MainFormalStep6Hypotheses` bridge, then assembles the
 Step 6 witness residual through
 `MainFormalCascadeRolePackageResidualStep6WitnessResidual.nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs`.
 
@@ -4481,7 +4480,6 @@ theorem baseStep6WitnessResidual
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
-    (_hm1 : params.m = 1)
     (hsmall : ¬ 1 ≤ mainFormalError params k eps)
     (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
     (bridge : MainFormalStep6Hypotheses params strategy eps k
@@ -4543,7 +4541,10 @@ theorem mainFormal
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
     (hk : 400 * params.m * params.d ≤ k)
-    (hk0 : 0 < k) :
+    (hk0 : 0 < k)
+    (hbaseBridge : (scalars : MainFormalCascadeScalars params eps k) →
+      ∀ (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k),
+      MainFormalStep6Hypotheses params strategy eps k hpass scalars roleResidual) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
@@ -4625,17 +4626,12 @@ theorem mainFormal
         Nonempty (MainFormalCascadeRolePackageResidualStep6WitnessResidual
           (params := params) (strategy := strategy) (eps := eps)
           (hpass := hpass) (k := k) (scalars := scalars)) := by
-      -- TODO(#422, #1009): `MainFormalStep6Hypotheses` bundles the
-      -- still-external analytic hypotheses (spectral truncation, repair,
-      -- BipartiteSSCRel, match-mass preservation) for the base case.
-      have hbaseBridge : ∀ (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k),
-        MainFormalStep6Hypotheses params strategy eps k hpass scalars roleResidual := sorry
       by_cases hm1 : params.m = 1
-      · -- Base case (m = 1): role residual from checked handoff, bridge from
-        -- `hbaseBridge` above.  This branch contains no `sorry`.
+      · -- Base case (m = 1): role residual from checked handoff,
+        -- bridge from the external `hbaseBridge` hypothesis.
         rcases MainFormalRolePackageResidual.ofBaseCase params strategy eps k hpass hm1 with
           ⟨roleResidual⟩
-        exact baseStep6WitnessResidual hm1 herr roleResidual (hbaseBridge roleResidual)
+        exact baseStep6WitnessResidual herr roleResidual (hbaseBridge scalars roleResidual)
       · -- Successor case (m > 1): needs recursive slices and self-improvement.
         -- TODO(#931, #834, #422): construct `MainFormalSuccessorRecursiveSlices`
         -- and `MainFormalSuccessorSelfImprovementProducer`.
