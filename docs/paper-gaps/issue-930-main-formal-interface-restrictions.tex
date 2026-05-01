@@ -1,0 +1,95 @@
+\documentclass{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\setlength{\emergencystretch}{2em}
+
+\input{command}
+
+\title{The Restricted Interface of the Main Formal Soundness Theorem}
+\author{}
+\date{2026-05-01}
+
+\begin{document}
+\maketitle
+
+\section{The assertion}
+
+The main formal soundness theorem in \cite[Section~\emph{The test}]{Ji2020LowIndividualDegree}
+starts from a general projective strategy for the $(m,q,d)$ low individual degree
+test. In the paper, such a strategy consists of a bipartite state on
+$\mathcal H_{\mathrm A}\otimes\mathcal H_{\mathrm B}$ and separate projective
+measurement families for the two provers. The two local Hilbert spaces are not
+assumed to be the same, and the starting state is not assumed to be symmetric.
+The test definition takes $m$ and $d$ to be non-negative integers, and the
+main theorem as printed does not impose a separate hypothesis $d>0$.\footnote{This
+note is part of the retrospective audit in \ghissue{930}. The paper passages are
+\path{references/ldt-paper/test_definition.tex}, lines~10--14, 98--115, and
+180--202, together with the reduction in
+\path{references/ldt-paper/inductive_step.tex}, lines~26--66. The previously
+documented large-$k$ correction is separate; see
+\path{docs/paper-gaps/issue-906-main-formal-k-bound.tex}.}
+
+After stating the theorem for this general strategy, the paper symmetrizes it by
+adding a two-dimensional role register on each side. In the proof, the paper
+first treats the case in which the two local Hilbert spaces have the same
+dimension and says that the construction extends to different dimensions. Even
+in that simplified proof setting, however, the original state is not assumed to
+be swap-invariant. The symmetrized state is a sum of two role sectors: one sector
+carries the original state, and the other sector carries the state with the
+tensor factors interchanged. The purpose of this step is precisely to pass from
+a not-necessarily-symmetric general strategy to a symmetric strategy to which the
+main induction theorem can be applied.
+
+\section{The formal interface}
+
+The present formal development now contains a paper-faithful two-space container
+for general projective strategies, but the public main-formal interface has not
+yet been generalized to it. The current theorem is stated for the same-space
+special case in which both provers use a common local carrier and the starting
+bipartite state is equipped with swap-invariance data. The role-register
+symmetrization bridge used by the theorem has the same restricted input shape:
+it builds the symmetrized strategy only from this same-space, already
+swap-compatible strategy object.\footnote{The two-space strategy container is
+\leanid{MIPStarRE.LDT.ProjStrat}; the same-space special case is
+\leanid{MIPStarRE.LDT.SameSpaceProjStrat}. Pull request \ghpr{958} closed
+\ghissue{560} by making \leanid{ProjStrat} two-space, but
+\leanid{MIPStarRE.LDT.Test.mainFormal} in
+\doclink{MIPStarRE/LDT/Test/MainTheorem.lean} and the Step~1 bridge
+\leanid{MIPStarRE.LDT.SameSpaceProjStrat.strategySymmetrization} in
+\doclink{MIPStarRE/LDT/Test/SymmetrizationBridge.lean} still take
+\leanid{SameSpaceProjStrat}.}
+
+Thus the formal theorem is not presently a theorem about every projective
+strategy in the sense of the paper. A general strategy on
+$\mathcal H_{\mathrm A}\otimes\mathcal H_{\mathrm B}$ with different local
+spaces, or with a nonsymmetric starting state, is an input to the paper theorem
+but not an input to the current public formal statement. To reach the paper
+statement, the role-register construction must be carried out directly for the
+two-space strategy container, producing a symmetric strategy on the appropriate
+direct-sum role space without first assuming a common local carrier or
+swap-invariance of the original state.
+
+The formal theorem also assumes $d>0$. This is another statement-level
+restriction absent from the printed theorem. It is harmless for the nontrivial
+regime used by the current proof route, but it does not by itself establish the
+constant-degree case $d=0$ covered by the paper's non-negative-degree wording.
+A paper-exact public wrapper would need either to remove this hypothesis from
+the formal pipeline or to add a separate argument for $d=0$.
+
+\section{Conclusion}
+
+The discrepancy is a formal-interface restriction, not a flaw in the paper's
+strategy-reduction argument. The paper theorem starts from an arbitrary general
+projective strategy and then symmetrizes it. The current formal statement starts
+from a narrower same-space, swap-compatible strategy object, and it also assumes
+positive degree. These restrictions should remain visible until the Step~1
+symmetrization bridge and the main-formal theorem are generalized to the
+paper-faithful two-space strategy interface, or until separate wrappers prove
+that the omitted cases reduce to the formal statement.
+
+\bibliographystyle{alpha}
+\bibliography{references}
+
+\end{document}
