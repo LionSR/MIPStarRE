@@ -78,10 +78,12 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
     string_interpolated = False
     in_raw_string = False
     raw_hash_count = 0
-    _just_closed_comment = False
-
     for line in text.splitlines():
         out: list[str] = []
+        # Block comments are Lean whitespace.  Remember where the most recent
+        # block comment boundary occurred in the emitted line so a removed
+        # comment cannot join an earlier ``r###`` prefix to a later quote.
+        last_comment_boundary_out_len: int | None = None
         i = 0
         while i < len(line):
             char = line[i]
@@ -93,8 +95,8 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
                     continue
                 if line.startswith("-/", i):
                     block_depth -= 1
-                    if block_depth == 0:
-                        _just_closed_comment = True
+                    if block_depth == 0 and last_comment_boundary_out_len is None:
+                        last_comment_boundary_out_len = len(out)
                     i += 2
                 else:
                     i += 1
@@ -167,6 +169,7 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
             if line.startswith("--", i):
                 break
             if line.startswith("/-", i):
+                last_comment_boundary_out_len = len(out)
                 block_depth += 1
                 i += 2
                 continue
@@ -179,7 +182,11 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
                 while j >= 0 and out[j] == "#":
                     hash_run += 1
                     j -= 1
-                if not _just_closed_comment and j >= 0 and out[j] == "r":
+                comment_between_prefix_and_quote = (
+                    last_comment_boundary_out_len is not None
+                    and j < last_comment_boundary_out_len
+                )
+                if not comment_between_prefix_and_quote and j >= 0 and out[j] == "r":
                     prev = out[j - 1] if j > 0 else ""
                     if not (prev.isalnum() or prev in {"_", "'"}):
                         in_string = True
@@ -203,8 +210,6 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
                 if not (prev.isalnum() or prev in {"_", "'"}):
                     in_char = True
                     escaped = False
-            if not char.isspace():
-                _just_closed_comment = False
             out.append(line[i])
             i += 1
         stripped.append("".join(out))
