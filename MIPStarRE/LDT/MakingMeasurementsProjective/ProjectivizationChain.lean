@@ -92,7 +92,8 @@ namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 open MIPStarRE.LDT
 open MIPStarRE.LDT.Preliminaries
-  (completeAtOutcome completeAtOutcomeProj completingToMeasurement)
+  (completeAtOutcome completeAtOutcomeProj completeAtOutcomeProj_toMeasurement
+    completingToMeasurement)
 
 /-! ### Error functions -/
 
@@ -465,6 +466,72 @@ theorem rightConsistency {Outcome : Type*} {ι : Type*}
   constructor
   simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily]
     using hdefect.trans hpre'
+
+end ProjectivizationMatchMassMonotonicity
+
+/-! ### Orthonormalization match-mass preservation -/
+
+/-- Match-mass preservation input for the orthonormalization step.
+
+Asserts that the projective submeasurement `P` produced by orthonormalization
+preserves at least as much bipartite correlation with a fixed partner
+measurement `B` as the original measurement `G` did.  This is a
+construction-level property of the specific orthonormalization used; it is NOT
+a consequence of `SDDRel` closeness alone.  This structure is a hypothesis
+container: it is itself unproved and must be supplied by the orthonormalization
+construction.  It is packaged here as a named `Prop` structure so that the
+`mainFormal` residual can receive it as a single field and the downstream
+`leftConsistency` / `rightConsistency` theorems can recover the exact paper
+line-169 `ζ₁` consistency links. -/
+structure OrthonormalizationMatchMassPreservation
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι))
+    (G : Measurement Outcome ι) (P : ProjSubMeas Outcome ι)
+    (B : Measurement Outcome ι) : Prop where
+  /-- The projective submeasurement `P` has at least as much diagonal match mass
+  with `B` as the original `G` did. -/
+  matchMassPreservation :
+    qBipartiteMatchMass ψ P.toSubMeas B.toSubMeas ≥
+      qBipartiteMatchMass ψ G.toSubMeas B.toSubMeas
+
+namespace ProjectivizationMatchMassMonotonicity
+
+/-- Construct `ProjectivizationMatchMassMonotonicity` from match-mass preservation
+for the intermediate projective submeasurements produced by orthonormalization.
+
+This is the **P-level producer** that unblocks the exact paper line-169 `ζ₁`
+consistency links in `mainFormal`.  Given match-mass inequalities for the
+projective submeasurements `P_A`, `P_B` and the fact that the completed
+projective measurements `Q_A`, `Q_B` are the canonical completions of `P_A`,
+`P_B`, this lifts the preservation through the completion step.
+
+Together with `leftConsistency` and `rightConsistency`, this fills the
+`line169MatchMassMonotonicity` field of
+`MainFormalPostRolePackageLeftCompletionLine169Residual`. -/
+theorem of_submeasurement_match_mass_and_completion
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    {ψ : QuantumState (ι × ι)} {G_A G_B : Measurement Outcome ι}
+    (P_A P_B : ProjSubMeas Outcome ι) (a_A a_B : Outcome)
+    (Q_A Q_B : ProjMeas Outcome ι)
+    (hQALeft : Q_A.toMeasurement = completeAtOutcome P_A.toSubMeas a_A)
+    (hQBRight : Q_B.toMeasurement = completeAtOutcome P_B.toSubMeas a_B)
+    (hleftPreservation : OrthonormalizationMatchMassPreservation ψ G_A P_A G_B)
+    (hrightPreservation : OrthonormalizationMatchMassPreservation ψ G_B P_B G_A) :
+    ProjectivizationMatchMassMonotonicity ψ G_A G_B Q_A Q_B := by
+  rcases hleftPreservation with ⟨hleft⟩
+  rcases hrightPreservation with ⟨hright⟩
+  have hQALeftProj : Q_A = completeAtOutcomeProj P_A a_A :=
+    ProjMeas.ext fun a =>
+      congrArg (fun (M : Measurement Outcome ι) => M.outcome a)
+        (hQALeft.trans (completeAtOutcomeProj_toMeasurement P_A a_A).symm)
+  have hQBRightProj : Q_B = completeAtOutcomeProj P_B a_B :=
+    ProjMeas.ext fun a =>
+      congrArg (fun (M : Measurement Outcome ι) => M.outcome a)
+        (hQBRight.trans (completeAtOutcomeProj_toMeasurement P_B a_B).symm)
+  rw [hQALeftProj, hQBRightProj]
+  exact of_completeAtOutcomeProj P_A P_B a_A a_B hleft hright
 
 end ProjectivizationMatchMassMonotonicity
 

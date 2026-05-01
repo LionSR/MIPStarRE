@@ -3991,22 +3991,44 @@ theorem mainFormal
   -- `MainFormalCascadeRolePackageResidualStep6WitnessResidual`.  The scalar
   -- cascade side conditions are discharged below: if `mainFormalError ≥ 1`, the
   -- theorem is vacuous; otherwise the pass condition gives `0 ≤ ε`, while
-  -- `mainFormalError < 1` rules out `ε > 1` and `d > q`. Producing the remaining
-  -- residual still depends on active upstream work: a concrete Section 6 role
-  -- residual supplied through the base/successor constructors (successor-boundary
-  -- data with the public large-`k` hypothesis supplied directly), the line-130
-  -- orthonormalization inputs, the completion closeness for the chosen Step 6
-  -- witnesses, and the line-169 match-mass monotonicity input (#426), the
-  -- full-slice transport chain (#601), the remaining `fromHToG` pasting bridge
-  -- (#707), the reverse `overAllOutcomes` aggregation (#672), and the
-  -- ProcessedG scalar follow-ups #714, #715, #732, and #759.  Once the role
-  -- package is available, the factor-two unsymmetrization estimates are checked by
-  -- `UnsymmetrizationBridgePackage.ofSymConsistency`; the Bob-side completion
-  -- estimate is transported from the left register to the right register by the
-  -- #869 permutation-invariant helper.  The line-169 transport fields are derived
-  -- from the stored match-mass monotonicity invariant and the reconstructed
-  -- pre-projective consistency proof, avoiding the generic `triangleSub` route
-  -- whose loss is `ζ₁ + sqrt ζ₂` rather than the printed `ζ₁`.
+  -- `mainFormalError < 1` rules out `ε > 1` and `d > q`.
+  --
+  -- After this PR (progress toward #931):
+  -- the match-mass monotonicity structure
+  -- `MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation`
+  -- and the lift theorem `of_submeasurement_match_mass_and_completion` are now
+  -- available.  The self-improvement assumptions are packaged as
+  -- `SelfImprovement.SelfImprovementBridgeInputs`.  The remaining `mainFormal` hole
+  -- (the `sorry` below) still needs:
+  --
+  -- 1. **Section 6 role residual** via base/successor branch:
+  --    - `MainFormalRolePackageBranchResidual` constructed from either
+  --      `base` (if `params.m = 1`) or `successor` (otherwise),
+  --    - `MainFormalSuccessorRecursiveSlices` (recursive induction witnesses,
+  --      currently external),
+  --    - `MainFormalSuccessorSelfImprovementProducer` (per-slice self-improvement
+  --      package producer, connecting `SelfImprovement.selfImprovement`
+  --      to `MainInductionStep.SelfImprovementPackage`).
+  --
+  -- 2. **Line-130 orthonormalization inputs**:
+  --    - `MainFormalPostRolePackageLine130OrthonormalizationInput`:
+  --      spectral-truncation and locality-preserving repair witnesses
+  --      for both unsymmetrized POVMs.
+  --
+  -- 3. **Completion closeness** for the two POVMs, derived through
+  --    `completingToMeasurement`.  Needs `BipartiteSSCRel` for the
+  --    unsymmetrized POVMs (external).
+  --
+  -- 4. **Match-mass preservation** values (type
+  --    `MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation`)
+  --    for both sides.  With these, `of_submeasurement_match_mass_and_completion`
+  --    produces the `ProjectivizationMatchMassMonotonicity` needed by
+  --    `leftConsistency` / `rightConsistency` for the exact paper `ζ₁` links.
+  --
+  -- The full downstream cascade from the role package through the projective
+  -- targets is already checked; once the residual above is supplied, the
+  -- remaining proof is trivial.  Item 4 replaces the older generic `triangleSub`
+  -- route whose loss was `ζ₁ + sqrt ζ₂` rather than the printed `ζ₁`.
 
   by_cases herr : 1 ≤ mainFormalError params k eps
   · exact mainFormal_trivial_witness params strategy eps k herr
@@ -4017,10 +4039,30 @@ theorem mainFormal
         Nonempty (MainFormalCascadeRolePackageResidualStep6WitnessResidual
           (params := params) (strategy := strategy) (eps := eps)
           (hpass := hpass) (k := k) (scalars := scalars)) := by
-      -- TODO(#427): construct the concrete Section 6 role residual, apply the
-      -- line-130 cross-consistency orthonormalization inputs, and supply the
-      -- remaining completion-closeness and match-mass monotonicity inputs for
-      -- exact polynomial line 169.
+      -- TODO(#427, #931): The `mainFormal` hole composes three inputs into a
+      -- `MainFormalCascadeRolePackageResidualStep6WitnessResidual` via
+      -- `nonempty_ofRoleResidualAndLine130Inputs`:
+      --
+      -- 1. A `MainFormalRolePackageResidual` (Section 6 role package),
+      --    obtainable via `MainFormalRolePackageBranchResidual.toRolePackageResidual`
+      --    from a base (m=1) or successor `MainFormalRolePackageBranchResidual`.
+      --    The successor branch still needs `MainFormalSuccessorRecursiveSlices`
+      --    and `MainFormalSuccessorSelfImprovementProducer`.
+      --
+      -- 2. A `MainFormalPostRolePackageLine130OrthonormalizationInput`:
+      --    spectral-truncation and locality-preserving repair witnesses for
+      --    both unsymmetrized POVMs.
+      --
+      -- 3. A `completionProducer` (function from orthonormalization residual
+      --    to completion residual).  This needs:
+      --    - `BipartiteSSCRel` for the unsymmetrized POVMs (strong self-consistency),
+      --    - `OrthonormalizationMatchMassPreservation` values for both sides
+      --      (match-mass monotonicity through orthonormalization),
+      --    - distinguished outcomes `a_A`, `a_B`,
+      --    - completion closeness proofs via `completingToMeasurement`.
+      --    With these, `of_submeasurement_match_mass_and_completion` lifts the
+      --    match-mass preservation to `ProjectivizationMatchMassMonotonicity`,
+      --    and `leftConsistency` / `rightConsistency` give the exact paper `ζ₁`.
       sorry
     rcases hstep6WitnessResidual with ⟨step6WitnessResidual⟩
     let rolePackage := step6WitnessResidual.roleResidual.rolePackage scalars

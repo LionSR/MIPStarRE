@@ -347,4 +347,34 @@ abbrev FinalFieldsInput (params : Parameters) [FieldModel params.q]
         (selfImprovementDataProcessingError params eps delta) →
       SelfImprovementFinalFields params strategy H Z eps delta nu
 
+/-! ## Self-improvement bridge inputs
+
+This structure packages the remaining unproven assumptions of the current
+`selfImprovement` theorem, so that the `mainFormal` chain can name a single
+bridge-package hypothesis rather than three independent `Prop` fields. -/
+
+/-- The three remaining Section 9 assumptions needed by the `selfImprovement` theorem.
+
+These are the helper-stage strong self-consistency, the orthonormalization
+bridge input, and the final-fields transport. Grouping them into a named
+structure is the first step toward issue #931: once all three fields are proved,
+replacing this package with a `theorem` (zero-field) closes the remaining
+self-improvement input gap. -/
+structure SelfImprovementBridgeInputs (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι) (eps delta nu : Error) where
+  /-- Helper-stage strong self-consistency: the averaged `Hhat` is
+  strongly self-consistent at level `selfImprovementHelperError`. -/
+  helperStrongSelfConsistency :
+    HelperStrongSelfConsistencyInput params strategy eps delta
+  /-- Orthonormalization bridge: the strongly self-consistent `Hhat`
+  admits the spectral-truncation and locality-preserving repair witnesses
+  required by the orthonormalization theorem. -/
+  orthonormalization :
+    OrthonormalizationInput params strategy eps delta
+  /-- Final-fields transport: the remaining completeness, point-consistency,
+  self-closeness, projective-residual, and boundedness conclusions are
+  derivable from the helper+orthonormalization+data-processing outputs. -/
+  finalFields :
+    FinalFieldsInput params strategy eps delta nu
+
 end MIPStarRE.LDT.SelfImprovement
