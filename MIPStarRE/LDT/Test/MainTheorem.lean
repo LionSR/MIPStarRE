@@ -3722,6 +3722,195 @@ noncomputable def ofLine130OrthonormalizationAndCompletion
 
 end MainFormalPostRolePackageStep6WitnessResidual
 
+/-- Explicit completion witnesses for a fixed line-130 orthonormalization residual.
+
+This is the data-valued version of the remaining Step 6 completion producer: it
+records the distinguished completion outcomes, the two completed-closeness
+statements, and the construction-level orthonormalization match-mass preservation
+facts for the chosen line-130 projective submeasurements.  The self-consistency
+hypotheses used by `completingToMeasurement` are not stored here after the
+completed-closeness fields have been produced; see
+`nonempty_ofCompletingToMeasurementInputs` below for the proposition-valued
+constructor that derives these fields from `BipartiteSSCRel`. -/
+structure MainFormalPostRolePackageLine130CompletionInput
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
+    (scalars : MainFormalCascadeScalars params eps k)
+    (rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars)
+    (orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
+      params strategy eps k scalars rolePackage) where
+  /-- Alice-side distinguished outcome receiving the completion residual. -/
+  a_A : Polynomial params
+  /-- Bob-side distinguished outcome receiving the completion residual. -/
+  a_B : Polynomial params
+  /-- Alice-side completed-closeness proof for the line-130 projective submeasurement. -/
+  leftCompletedCloseness :
+    SDDRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas.liftLeft)
+      (constSubMeasFamily
+        (Preliminaries.completeAtOutcomeProj orthResidual.P_A a_A).toSubMeas.liftLeft)
+      (MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1)
+  /-- Bob-side completed-closeness proof in the left-register form returned by
+  `completingToMeasurement`. -/
+  rightCompletedCloseness :
+    SDDRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas.liftLeft)
+      (constSubMeasFamily
+        (Preliminaries.completeAtOutcomeProj orthResidual.P_B a_B).toSubMeas.liftLeft)
+      (MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1)
+  /-- Alice-side match-mass preservation for the line-130 orthonormalized
+  submeasurement against Bob's unsymmetrized POVM. -/
+  leftMatchMassPreservation :
+    MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
+      (unsymmetrizedLeftPOVM rolePackage.roleMeasurement) orthResidual.P_A
+      (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
+  /-- Bob-side match-mass preservation, in the role-reversed orientation used by
+  the mirror line-169 link. -/
+  rightMatchMassPreservation :
+    MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
+      (unsymmetrizedRightPOVM rolePackage.roleMeasurement) orthResidual.P_B
+      (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
+
+namespace MainFormalPostRolePackageLine130CompletionInput
+
+/-- Convert explicit line-130 completion witnesses into the residual shape
+consumed by the live Step 6 assembly.
+
+This is the checked data-valued constructor for the old generic
+`completionProducer`: callers may supply a function returning this input for each
+line-130 orthonormalization residual and then use `toCompletionResidual` as the
+producer. -/
+noncomputable def toCompletionResidual
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
+    {orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
+      params strategy eps k scalars rolePackage}
+    (input : MainFormalPostRolePackageLine130CompletionInput
+      params strategy eps k scalars rolePackage orthResidual) :
+    MainFormalPostRolePackageLine130CompletionResidual
+      params strategy eps k scalars rolePackage where
+  orthResidual := orthResidual
+  a_A := input.a_A
+  a_B := input.a_B
+  leftCompletedCloseness := input.leftCompletedCloseness
+  rightCompletedCloseness := input.rightCompletedCloseness
+  leftMatchMass := input.leftMatchMassPreservation.matchMassPreservation
+  rightMatchMass := input.rightMatchMassPreservation.matchMassPreservation
+
+/-- The completed measurements obtained from a completion input satisfy the
+construction-level match-mass monotonicity invariant used for the exact paper
+line-169 `ζ₁` links.
+
+This exposes the role of
+`ProjectivizationMatchMassMonotonicity.of_submeasurement_match_mass_and_completion`
+for callers that reason directly with completed projective measurements, while
+`toCompletionResidual` keeps the older residual's P-level match-mass fields. -/
+theorem toProjectivizationMatchMassMonotonicity
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
+    {orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
+      params strategy eps k scalars rolePackage}
+    (input : MainFormalPostRolePackageLine130CompletionInput
+      params strategy eps k scalars rolePackage orthResidual) :
+    MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity strategy.state
+      (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
+      (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
+      (Preliminaries.completeAtOutcomeProj orthResidual.P_A input.a_A)
+      (Preliminaries.completeAtOutcomeProj orthResidual.P_B input.a_B) :=
+  MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_submeasurement_match_mass_and_completion
+      orthResidual.P_A orthResidual.P_B input.a_A input.a_B
+      (Preliminaries.completeAtOutcomeProj orthResidual.P_A input.a_A)
+      (Preliminaries.completeAtOutcomeProj orthResidual.P_B input.a_B)
+      rfl rfl input.leftMatchMassPreservation input.rightMatchMassPreservation
+
+/-- Produce explicit completion witnesses from the analytic completion theorem.
+
+The only analytic hypotheses are exactly the two strong self-consistency facts
+for the unsymmetrized role POVMs.  The line-130 orthonormalization residual
+provides the `A ≈ P` closeness input to `completingToMeasurement`; the returned
+completed-closeness statements are repackaged for the canonical projective
+completions `completeAtOutcomeProj`. -/
+theorem nonempty_ofCompletingToMeasurementInputs
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
+    (orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
+      params strategy eps k scalars rolePackage)
+    (a_A a_B : Polynomial params)
+    (leftSelfConsistency :
+      BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily
+          (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+        scalars.zeta1)
+    (rightSelfConsistency :
+      BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily
+          (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+        scalars.zeta1)
+    (leftMatchMassPreservation :
+      MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement) orthResidual.P_A
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement))
+    (rightMatchMassPreservation :
+      MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement) orthResidual.P_B
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)) :
+    Nonempty (MainFormalPostRolePackageLine130CompletionInput
+      params strategy eps k scalars rolePackage orthResidual) := by
+  classical
+  obtain ⟨C_A, hC_A, hC_Astmt⟩ :=
+    Preliminaries.completingToMeasurement
+      (Outcome := Polynomial params) (ι := ι) strategy.state strategy.permInvState
+      strategy.isNormalized (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
+      orthResidual.P_A.toSubMeas a_A
+      (MakingMeasurementsProjective.orthonormalizationError scalars.zeta1)
+      scalars.zeta1 leftSelfConsistency orthResidual.leftCloseness
+  obtain ⟨C_B, hC_B, hC_Bstmt⟩ :=
+    Preliminaries.completingToMeasurement
+      (Outcome := Polynomial params) (ι := ι) strategy.state strategy.permInvState
+      strategy.isNormalized (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
+      orthResidual.P_B.toSubMeas a_B
+      (MakingMeasurementsProjective.orthonormalizationError scalars.zeta1)
+      scalars.zeta1 rightSelfConsistency orthResidual.rightCloseness
+  have leftCompletedCloseness :
+      SDDRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily
+          (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas.liftLeft)
+        (constSubMeasFamily
+          (Preliminaries.completeAtOutcomeProj orthResidual.P_A a_A).toSubMeas.liftLeft)
+        (MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1) := by
+    simpa [MakingMeasurementsProjective.orthonormalizeAndCompleteError, hC_A] using
+      hC_Astmt.closenessAfterCompletion
+  have rightCompletedCloseness :
+      SDDRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily
+          (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas.liftLeft)
+        (constSubMeasFamily
+          (Preliminaries.completeAtOutcomeProj orthResidual.P_B a_B).toSubMeas.liftLeft)
+        (MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1) := by
+    simpa [MakingMeasurementsProjective.orthonormalizeAndCompleteError, hC_B] using
+      hC_Bstmt.closenessAfterCompletion
+  exact ⟨{
+    a_A := a_A
+    a_B := a_B
+    leftCompletedCloseness := leftCompletedCloseness
+    rightCompletedCloseness := rightCompletedCloseness
+    leftMatchMassPreservation := leftMatchMassPreservation
+    rightMatchMassPreservation := rightMatchMassPreservation }⟩
+
+end MainFormalPostRolePackageLine130CompletionInput
+
 namespace MainFormalPostRolePackageLine130CompletionResidual
 
 /-- Forget only the provenance wrapper after constructing the fixed Step 6
@@ -3809,6 +3998,100 @@ theorem nonempty_ofRoleResidualAndLine130Inputs
   rcases MainFormalPostRolePackageLine130OrthonormalizationResidual.nonempty_ofLine130Inputs
       hsmall hpre input with ⟨orthResidual⟩
   exact nonempty_ofRoleResidualAndCompletion roleResidual ⟨completionProducer orthResidual⟩
+
+/-- Assemble the final live residual using explicit completion inputs rather than
+an opaque `completionProducer`.
+
+A caller supplies, for each line-130 orthonormalization residual produced from
+the bridge inputs, the concrete distinguished outcomes, completed-closeness
+proofs, and orthonormalization match-mass preservation facts packaged as
+`MainFormalPostRolePackageLine130CompletionInput`.  This theorem converts that
+package into the old producer shape by `toCompletionResidual`. -/
+theorem nonempty_ofRoleResidualAndLine130InputsAndCompletionInputs
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
+    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
+    (input : MainFormalPostRolePackageLine130OrthonormalizationInput
+      params strategy eps k scalars (roleResidual.rolePackage scalars))
+    (completionInputProducer :
+      ∀ orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
+          params strategy eps k scalars (roleResidual.rolePackage scalars),
+        MainFormalPostRolePackageLine130CompletionInput
+          params strategy eps k scalars (roleResidual.rolePackage scalars) orthResidual) :
+    Nonempty (MainFormalCascadeRolePackageResidualStep6WitnessResidual
+      params strategy eps hpass k scalars) :=
+  nonempty_ofRoleResidualAndLine130Inputs hsmall roleResidual input fun orthResidual =>
+    (completionInputProducer orthResidual).toCompletionResidual
+
+/-- Assemble the final live residual from the exact analytic completion witnesses.
+
+This is the paper-shaped replacement for the generic `completionProducer`: after
+line 130 produces `P^A` and `P^B`, the caller provides
+* distinguished completion outcomes `a_A`, `a_B`,
+* strong self-consistency for the two unsymmetrized role POVMs, and
+* orthonormalization match-mass preservation for the two produced
+  submeasurements.
+
+The proof invokes `completingToMeasurement` to derive the two completed-closeness
+fields and then packages them through
+`MainFormalPostRolePackageLine130CompletionInput.toCompletionResidual`. -/
+theorem nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
+    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
+    (input : MainFormalPostRolePackageLine130OrthonormalizationInput
+      params strategy eps k scalars (roleResidual.rolePackage scalars))
+    (a_A a_B : Polynomial params)
+    (leftSelfConsistency :
+      BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily
+          (unsymmetrizedLeftPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
+        scalars.zeta1)
+    (rightSelfConsistency :
+      BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily
+          (unsymmetrizedRightPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
+        scalars.zeta1)
+    (leftMatchMassPreservation :
+      ∀ orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
+          params strategy eps k scalars (roleResidual.rolePackage scalars),
+        MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
+          (unsymmetrizedLeftPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement)
+          orthResidual.P_A
+          (unsymmetrizedRightPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement))
+    (rightMatchMassPreservation :
+      ∀ orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
+          params strategy eps k scalars (roleResidual.rolePackage scalars),
+        MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
+          (unsymmetrizedRightPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement)
+          orthResidual.P_B
+          (unsymmetrizedLeftPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement)) :
+    Nonempty (MainFormalCascadeRolePackageResidualStep6WitnessResidual
+      params strategy eps hpass k scalars) := by
+  have hpre := roleResidual.line130Consistency scalars
+  rcases MainFormalPostRolePackageLine130OrthonormalizationResidual.nonempty_ofLine130Inputs
+      hsmall hpre input with ⟨orthResidual⟩
+  rcases MainFormalPostRolePackageLine130CompletionInput.nonempty_ofCompletingToMeasurementInputs
+      orthResidual a_A a_B
+        leftSelfConsistency rightSelfConsistency
+        (leftMatchMassPreservation orthResidual)
+        (rightMatchMassPreservation orthResidual) with ⟨completionInput⟩
+  exact nonempty_ofRoleResidualAndCompletion roleResidual
+    ⟨completionInput.toCompletionResidual⟩
 
 /-- Convert the combined residual to the left-completion residual after the paper
 line-130 consistency has been derived separately. -/
@@ -4044,13 +4327,14 @@ theorem mainFormal
   -- theorem is vacuous; otherwise the pass condition gives `0 ≤ ε`, while
   -- `mainFormalError < 1` rules out `ε > 1` and `d > q`.
   --
-  -- After this PR (progress toward #931):
-  -- the match-mass monotonicity structure
-  -- `MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation`
-  -- and the lift theorem `of_submeasurement_match_mass_and_completion` are now
-  -- available.  The self-improvement assumptions are packaged as
+  -- The match-mass monotonicity structure
+  -- `MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation`, the
+  -- lift theorem `of_submeasurement_match_mass_and_completion`, and the
+  -- line-130 completion wrapper
+  -- `nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs`
+  -- are now available.  The self-improvement assumptions are packaged as
   -- `SelfImprovement.SelfImprovementBridgeInputs`.  The remaining `mainFormal` hole
-  -- (the `sorry` below) still needs:
+  -- still needs:
   --
   -- 1. **Section 6 role residual** via base/successor branch:
   --    - `MainFormalRolePackageBranchResidual` constructed from either
@@ -4104,16 +4388,16 @@ theorem mainFormal
       --    spectral-truncation and locality-preserving repair witnesses for
       --    both unsymmetrized POVMs.
       --
-      -- 3. A `completionProducer` (function from orthonormalization residual
-      --    to completion residual).  This needs:
+      -- 3. Completion inputs for the line-130 residual.  The generic
+      --    `completionProducer` has a checked wrapper:
+      --    `nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs`.
+      --    It needs:
       --    - `BipartiteSSCRel` for the unsymmetrized POVMs (strong self-consistency),
       --    - `OrthonormalizationMatchMassPreservation` values for both sides
-      --      (match-mass monotonicity through orthonormalization),
-      --    - distinguished outcomes `a_A`, `a_B`,
-      --    - completion closeness proofs via `completingToMeasurement`.
-      --    With these, `of_submeasurement_match_mass_and_completion` lifts the
-      --    match-mass preservation to `ProjectivizationMatchMassMonotonicity`,
-      --    and `leftConsistency` / `rightConsistency` give the exact paper `ζ₁`.
+      --      (match-mass monotonicity through orthonormalization), and
+      --    - distinguished outcomes `a_A`, `a_B`.
+      --    The wrapper invokes `completingToMeasurement` for the completion
+      --    closeness fields and packages the exact paper `ζ₁` line-169 links.
       sorry
     rcases hstep6WitnessResidual with ⟨step6WitnessResidual⟩
     let rolePackage := step6WitnessResidual.roleResidual.rolePackage scalars
