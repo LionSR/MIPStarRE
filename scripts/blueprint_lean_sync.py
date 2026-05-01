@@ -76,9 +76,14 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
     interpolation_depth = 0
     interpolation_stack: list[int] = []
     string_interpolated = False
-
+    in_raw_string = False
+    raw_hash_count = 0
     for line in text.splitlines():
         out: list[str] = []
+        # Block comments are Lean whitespace.  Remember where the most recent
+        # block comment boundary occurred in the emitted line so a removed
+        # comment cannot join an earlier ``r###`` prefix to a later quote.
+        last_comment_boundary_out_len: int | None = None
         i = 0
         while i < len(line):
             char = line[i]
@@ -90,6 +95,8 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
                     continue
                 if line.startswith("-/", i):
                     block_depth -= 1
+                    if block_depth == 0 and last_comment_boundary_out_len is None:
+                        last_comment_boundary_out_len = len(out)
                     i += 2
                 else:
                     i += 1
@@ -102,6 +109,27 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
                     out.extend(line[i : i + 2])
                     i += 2
                     continue
+
+                # Raw-string terminator: ``"`` followed by exactly
+                # ``raw_hash_count`` ``#`` characters closes the literal.
+                # Any other ``"`` inside a raw string is ordinary content.
+                if in_raw_string and char == '"':
+                    out.append(char)
+                    i += 1
+                    if raw_hash_count == 0:
+                        in_string = False
+                        in_raw_string = False
+                    else:
+                        count = 0
+                        while i < len(line) and line[i] == "#":
+                            out.append("#")
+                            count += 1
+                            i += 1
+                        if count == raw_hash_count:
+                            in_string = False
+                            in_raw_string = False
+                    continue
+
                 out.append(char)
                 if escaped:
                     escaped = False
@@ -141,11 +169,34 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
             if line.startswith("--", i):
                 break
             if line.startswith("/-", i):
+                last_comment_boundary_out_len = len(out)
                 block_depth += 1
                 i += 2
                 continue
 
             if char == '"':
+                # Detect raw-string prefix ``r`` optionally followed by one
+                # or more ``#`` characters (Lean 4 raw-string syntax).
+                hash_run = 0
+                j = len(out) - 1
+                while j >= 0 and out[j] == "#":
+                    hash_run += 1
+                    j -= 1
+                comment_between_prefix_and_quote = (
+                    last_comment_boundary_out_len is not None
+                    and j < last_comment_boundary_out_len
+                )
+                if not comment_between_prefix_and_quote and j >= 0 and out[j] == "r":
+                    prev = out[j - 1] if j > 0 else ""
+                    if not (prev.isalnum() or prev in {"_", "'"}):
+                        in_string = True
+                        in_raw_string = True
+                        raw_hash_count = hash_run
+                        escaped = False
+                        string_interpolated = False
+                        out.append(line[i])
+                        i += 1
+                        continue
                 in_string = True
                 escaped = False
                 string_interpolated = (
@@ -156,7 +207,7 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
                 )
             elif char == "'":
                 prev = out[-1] if out else ""
-                if not (prev.isalnum() or prev in "_'"):
+                if not (prev.isalnum() or prev in {"_", "'"}):
                     in_char = True
                     escaped = False
             out.append(line[i])

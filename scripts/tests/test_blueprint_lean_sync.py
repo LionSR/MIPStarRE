@@ -287,6 +287,18 @@ class CollectLeanDeclsTests(unittest.TestCase):
                     def escapedInterpolationBraceToken : String := s!"{{/-}}"
                     def charLiterals : List Char := ['/', '-']
                     def primedName' : Nat := 0
+                    def rawStringBlockCommentToken : String := r#""/-""#
+                    def afterRawStringBlockCommentToken : Nat := 4
+                    def rawStringMultiHashBlockCommentToken : String := r##""/-##"/-##"##
+                    def afterRawStringMultiHashBlockCommentToken : Nat := 5
+                    def plainRawStringBlockCommentToken : String := r" /- "
+                    def afterPlainRawStringBlockCommentToken : Nat := 6
+                    def plainRawStringBeforeHashToken : String := r" /- "#eval 7
+                    def afterPlainRawStringBeforeHashToken : Nat := 7
+                    def commentBoundaryBeforeHashQuote : String := r/- not raw -/#"ordinary" /- comment starts
+                    def hiddenIfBoundaryIgnored : Nat := 999
+                    -/
+                    def afterCommentBoundaryBeforeHashQuote : Nat := 8
 
                     private lemma privateHelper : True := by
                       trivial
@@ -316,6 +328,17 @@ class CollectLeanDeclsTests(unittest.TestCase):
             self.assertIn("Foo.escapedInterpolationBraceToken", by_name)
             self.assertIn("Foo.charLiterals", by_name)
             self.assertIn("Foo.primedName'", by_name)
+            self.assertIn("Foo.rawStringBlockCommentToken", by_name)
+            self.assertIn("Foo.afterRawStringBlockCommentToken", by_name)
+            self.assertIn("Foo.rawStringMultiHashBlockCommentToken", by_name)
+            self.assertIn("Foo.afterRawStringMultiHashBlockCommentToken", by_name)
+            self.assertIn("Foo.plainRawStringBlockCommentToken", by_name)
+            self.assertIn("Foo.afterPlainRawStringBlockCommentToken", by_name)
+            self.assertIn("Foo.plainRawStringBeforeHashToken", by_name)
+            self.assertIn("Foo.afterPlainRawStringBeforeHashToken", by_name)
+            self.assertIn("Foo.commentBoundaryBeforeHashQuote", by_name)
+            self.assertNotIn("Foo.hiddenIfBoundaryIgnored", by_name)
+            self.assertIn("Foo.afterCommentBoundaryBeforeHashQuote", by_name)
             self.assertTrue(by_name["Foo.privateHelper"].is_private)
             self.assertFalse(by_name["Foo.publicTheorem"].is_private)
 
