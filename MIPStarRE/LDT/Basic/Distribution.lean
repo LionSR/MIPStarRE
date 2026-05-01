@@ -577,5 +577,4 @@ theorem avgOver_uniform_prod_le_snd {α β : Type*}
           exact avgOver_mono _ _ _ h
     _ = avgOver (uniformDistribution β) g := avgOver_uniform_snd g
 
-
 end MIPStarRE.LDT
