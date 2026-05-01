@@ -682,6 +682,8 @@
     <span class="theorem_thmtitle">Pasting</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
@@ -1176,15 +1178,15 @@
 <div class="displaymath" id="a0000000567">
   \[  \sigma ^* = (\sigma +\zeta )\left(1+\frac{1}{100m}\right) + 2\nu + e^{-k/(80000m^2)}.  \]
 </div>
-<p> It remains to compare \(\sigma ^*\) with the next-stage target: </p>
+<p> It remains to compare \(\sigma ^*\) with the next-stage target. The pasting parameter in Theorem&#160;<a href="sec-induction.html#thm:ld-pasting-in-induction-section">10.7</a> is bounded by \(\nu /5\) in this regime. Using this sharper estimate and <a href="sec-induction.html#eq:zeta-smaller-than-nu" class="eqref">1</a>, we get </p>
 <div class="displaymath" id="a0000000568">
-  \begin{align}  \sigma ^* &  = (\sigma +\zeta )\left(1+\frac{1}{100m}\right) + 2\nu + e^{-k/(80000m^2)} \notag \\ &  \le (\sigma +\nu )\left(1+\frac{1}{100m}\right) + 2\nu + e^{-k/(80000m^2)} \tag {by \ref{eq:zeta-smaller-than-nu}} \notag \\ &  = \left(1+\frac{1}{100m}\right)\left(m^2\left(\nu +e^{-k/(80000m^2)}\right)+\nu \right) + 2\nu + e^{-k/(80000m^2)} \notag \\ &  \le \left(1+\frac{1}{100m}\right)(m^2+3)\left(\nu +e^{-k/(80000m^2)}\right). \label{eq:gonna-bound-m-function} \end{align}
+  \begin{align*}  \sigma ^* &  \le \left(m^2\left(\nu +e^{-k/(80000m^2)}\right)+\nu \right) \left(1+\frac{1}{100m}\right) + \frac{2}{5}\nu + e^{-k/(80000m^2)} \\ &  = \left((m^2+1)\left(1+\frac{1}{100m}\right)+\frac{2}{5}\right)\nu + \left(m^2\left(1+\frac{1}{100m}\right)+1\right)e^{-k/(80000m^2)}. \end{align*}
 </div>
-<p> Since \(m \ge 2\), </p>
+<p> For every \(m\ge 1\), </p>
 <div class="displaymath" id="a0000000569">
-  \[  \left(1+\frac{1}{100m}\right)(m^2+3) \le (m+1)^2.  \]
+  \[  (m^2+1)\left(1+\frac{1}{100m}\right)+\frac{2}{5}\le (m+1)^2, \qquad m^2\left(1+\frac{1}{100m}\right)+1\le (m+1)^2.  \]
 </div>
-<p> Applying this to <a href="sec-induction.html#eq:gonna-bound-m-function" class="eqref">2</a> yields </p>
+<p> Therefore </p>
 <div class="displaymath" id="a0000000570">
   \[  \sigma ^* \le (m+1)^2\left(\nu +e^{-k/(80000m^2)}\right) \le (m+1)^2\left(\nu +e^{-k/(80000(m+1)^2)}\right),  \]
 </div>
@@ -1669,7 +1671,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>          Lean now isolates the Step&#160;3 extraction from <span class="ttfamily">inductive_step.tex</span> lines 84–108. The principal-block map <span class="ttfamily">extractRoleBlock</span> turns a role-register POVM \(G\) into the two POVMs \(G^{\mathrm A}\) and \(G^{\mathrm B}\) on the original prover space and proves that point-evaluation postprocessing commutes with this extraction. The two round-trip lemmas identify the \(A\) and \(B\) blocks of the symmetrized point measurement with the original prover point measurements. The remaining analytic factor-two estimates <a href="sec-induction.html#eq:cons-a" class="eqref">4</a> and <a href="sec-induction.html#eq:cons-b" class="eqref">5</a> are named by <span class="ttfamily">UnsymmetrizationBridgePackage</span>; no projectivity of arbitrary principal blocks is claimed, matching the paper’s later projectivization step. </p>
+  <p>          Lean now isolates the Step&#160;3 extraction from <span class="ttfamily">inductive_step.tex</span> lines 84–108. The principal-block map <span class="ttfamily">extractRoleBlock</span> turns a role-register POVM \(G\) into the two POVMs \(G^{\mathrm A}\) and \(G^{\mathrm B}\) on the original prover space and proves that point-evaluation postprocessing commutes with this extraction. The two round-trip lemmas identify the \(A\) and \(B\) blocks of the symmetrized point measurement with the original prover point measurements. The remaining analytic factor-two estimates <a href="sec-induction.html#eq:cons-a" class="eqref">3</a> and <a href="sec-induction.html#eq:cons-b" class="eqref">4</a> are named by <span class="ttfamily">UnsymmetrizationBridgePackage</span>; no projectivity of arbitrary principal blocks is claimed, matching the paper’s later projectivization step. </p>
 
   </div>
 </div>
@@ -2336,7 +2338,7 @@
   <div class="equation_content">
     \begin{equation} \label{eq:just-applied-induction} (A_{\mathrm{sym}})_a^u \otimes I \simeq _\sigma I \otimes G_{[g(u)=a]}, \qquad G_{[g(u)=a]} \otimes I \simeq _\sigma I \otimes (A_{\mathrm{sym}})_a^u. \end{equation}
   </div>
-  <span class="equation_label">3</span>
+  <span class="equation_label">2</span>
 </p>
 </div>
 <p>Now unsymmetrize by defining </p>
@@ -2361,7 +2363,7 @@
   <div class="equation_content">
     \begin{equation} \label{eq:G-self-consistency} G_g^{\mathrm A} \otimes I \simeq _{\zeta _1} I \otimes G_g^{\mathrm B}, \end{equation}
   </div>
-  <span class="equation_label">6</span>
+  <span class="equation_label">5</span>
 </p>
 </div>
 <p> where </p>
@@ -2369,7 +2371,7 @@
   \[  \zeta _1 = 2\sigma + 2\sqrt{3\varepsilon +2\sigma } + \frac{md}{q}.  \]
 </div>
 <p> The Lean Step&#160;5 wrapper    formalizes this expansion/reindexing step and combines it with the checked Schwartz–Zippel tensor bound . </p>
-<p>Apply Lemma&#160;<a href="chap-projective.html#lem:orthonormalization-main-lemma">4.7</a> to <a href="sec-induction.html#eq:G-self-consistency">6</a>. This gives projective submeasurements \(P^{\mathrm A},P^{\mathrm B} \in \mathrm{PolySub}(m,q,d)\) with </p>
+<p>Apply Lemma&#160;<a href="chap-projective.html#lem:orthonormalization-main-lemma">4.7</a> to <a href="sec-induction.html#eq:G-self-consistency">5</a>. This gives projective submeasurements \(P^{\mathrm A},P^{\mathrm B} \in \mathrm{PolySub}(m,q,d)\) with </p>
 <div class="displaymath" id="a0000000602">
   \[  G_g^{\mathrm A} \otimes I \approx _{100\zeta _1^{1/4}} P_g^{\mathrm A} \otimes I, \qquad I \otimes G_g^{\mathrm B} \approx _{100\zeta _1^{1/4}} I \otimes P_g^{\mathrm B}.  \]
 </div>
@@ -2382,7 +2384,7 @@
   \[  \zeta _2 = 200\zeta _1^{1/4} + 42\zeta _1^{1/8}.  \]
 </div>
 <p> The paper prints the coefficient \(40\) in this display. The formal Lean cascade uses the widened coefficient \(42\) to absorb the literal completion error \(2\cdot (100\zeta _1^{1/4})+4\sqrt{100\zeta _1^{1/4}}+2\zeta _1\): under the non-vacuous scalar regime \(0 \le \zeta _1 \le 1\), the residual term \(2\zeta _1\) is bounded by \(2\zeta _1^{1/8}\). </p>
-<p>By <a href="sec-induction.html#eq:G-self-consistency">6</a> and Lemma&#160;<a href="sec-prelims.html#prop:simeq-to-approx">3.21</a>, </p>
+<p>By <a href="sec-induction.html#eq:G-self-consistency">5</a> and Lemma&#160;<a href="sec-prelims.html#prop:simeq-to-approx">3.21</a>, </p>
 <div class="displaymath" id="a0000000604">
   \[  G_g^{\mathrm A} \otimes I \approx _{2\zeta _1} I \otimes G_g^{\mathrm B}.  \]
 </div>
@@ -2400,7 +2402,7 @@
   <div class="equation_content">
     \begin{equation} \label{eq:third-goal} Q_g^{\mathrm A} \otimes I \simeq _{\zeta _3/2} I \otimes Q_g^{\mathrm B}. \end{equation}
   </div>
-  <span class="equation_label">8</span>
+  <span class="equation_label">7</span>
 </p>
 </div>
 <p> By data processing, </p>
@@ -2409,10 +2411,10 @@
   <div class="equation_content">
     \begin{equation} \label{eq:just-data-processed-the-heck-outta-this} Q_{[g(u)=a]}^{\mathrm A} \otimes I \simeq _{\zeta _3/2} I \otimes Q_{[g(u)=a]}^{\mathrm B}. \end{equation}
   </div>
-  <span class="equation_label">9</span>
+  <span class="equation_label">8</span>
 </p>
 </div>
-<p>Next, Lemma&#160;<a href="sec-prelims.html#prop:triangle-sub">3.20</a>, applied to <a href="sec-induction.html#eq:G-self-consistency">6</a> and <a href="sec-induction.html#eq:G-with-Q-A">7</a>, implies </p>
+<p>Next, Lemma&#160;<a href="sec-prelims.html#prop:triangle-sub">3.20</a>, applied to <a href="sec-induction.html#eq:G-self-consistency">5</a> and <a href="sec-induction.html#eq:G-with-Q-A">6</a>, implies </p>
 <div class="displaymath" id="a0000000607">
   \[  Q_g^{\mathrm A} \otimes I \simeq _{\zeta _1} I \otimes G_g^{\mathrm B}.  \]
 </div>
@@ -2422,16 +2424,16 @@
   <div class="equation_content">
     \begin{equation} \label{eq:ok-almost-there-ok} Q_{[g(u)=a]}^{\mathrm A} \otimes I \simeq _{\zeta _1} I \otimes G_{[g(u)=a]}^{\mathrm B}. \end{equation}
   </div>
-  <span class="equation_label">10</span>
+  <span class="equation_label">9</span>
 </p>
 </div>
-<p> Applying Lemma&#160;<a href="sec-prelims.html#prop:simeq-triangle-inequality">3.29</a> to <a href="sec-induction.html#eq:cons-b">5</a>, <a href="sec-induction.html#eq:ok-almost-there-ok">10</a>, and <a href="sec-induction.html#eq:just-data-processed-the-heck-outta-this">9</a> yields </p>
+<p> Applying Lemma&#160;<a href="sec-prelims.html#prop:simeq-triangle-inequality">3.29</a> to <a href="sec-induction.html#eq:cons-b">4</a>, <a href="sec-induction.html#eq:ok-almost-there-ok">9</a>, and <a href="sec-induction.html#eq:just-data-processed-the-heck-outta-this">8</a> yields </p>
 <div class="equation" id="eq:one-goal">
 <p>
   <div class="equation_content">
     \begin{equation} \label{eq:one-goal} A_a^{\mathrm A,u} \otimes I \simeq _{\zeta _4} I \otimes Q_{[g(u)=a]}^{\mathrm B}, \end{equation}
   </div>
-  <span class="equation_label">11</span>
+  <span class="equation_label">10</span>
 </p>
 </div>
 <p> where </p>
@@ -2444,7 +2446,7 @@
   <div class="equation_content">
     \begin{equation} \label{eq:another-goal} I \otimes A_a^{\mathrm B,u} \simeq _{\zeta _4} Q_{[g(u)=a]}^{\mathrm A} \otimes I. \end{equation}
   </div>
-  <span class="equation_label">12</span>
+  <span class="equation_label">11</span>
 </p>
 </div>
 <p>Remark&#160;<a href="sec-induction.html#rem:main-formal-lean-residual-packages">10.25</a> records the Lean residual packages that separate the scalar cascade and the Step&#160;5 Schwartz–Zippel handoff from the remaining projective-stage transport work. The scalar side discharges the paper’s line&#160;71–73 coarsening and the Step&#160;8 hypotheses in the non-vacuous branch; the Step&#160;5 wrapper now turns the evaluated estimate at line&#160;116 into full-polynomial consistency at \(\zeta _1\). The remaining Lean residual is the completion-and-line-169 construction: supply the actual role-register measurement, Alice’s line-146 completion estimate, Bob’s left-register completion estimate, and the two exact polynomial-level \(\zeta _1\) links. Lean transports the Bob-side completion estimate to the line-147 right-register form, reconstructs the duplicated Step&#160;6 pre-projective consistency field from these inputs and <span class="ttfamily">hpass</span>, then data-processes the line-169 links to line&#160;172 and derives the two \(\zeta _4\) point goals and the \(\zeta _3/2\) self-consistency target. </p>
@@ -2472,7 +2474,7 @@
 <div class="displaymath" id="a0000000614">
   \[  100000k^2m^4\left(\varepsilon ^{1/40000}+(d/q)^{1/40000}+e^{-k/(2560000m^2)}\right).  \]
 </div>
-<p> Hence <a href="sec-induction.html#eq:one-goal">11</a>, <a href="sec-induction.html#eq:another-goal">12</a>, and <a href="sec-induction.html#eq:third-goal">8</a> give the three claimed conclusions, with \(Q^{\mathrm A}\) and \(Q^{\mathrm B}\) renamed as the theorem’s \(G^{\mathrm A}\) and \(G^{\mathrm B}\). </p>
+<p> Hence <a href="sec-induction.html#eq:one-goal">10</a>, <a href="sec-induction.html#eq:another-goal">11</a>, and <a href="sec-induction.html#eq:third-goal">7</a> give the three claimed conclusions, with \(Q^{\mathrm A}\) and \(Q^{\mathrm B}\) renamed as the theorem’s \(G^{\mathrm A}\) and \(G^{\mathrm B}\). </p>
 
   </div>
 </div>
