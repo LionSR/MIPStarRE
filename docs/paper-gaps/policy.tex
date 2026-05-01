@@ -5,7 +5,7 @@
 \usepackage[hidelinks]{hyperref}
 \setlength{\emergencystretch}{2em}
 
-\input{docs/paper-gaps/command}
+\input{command}
 
 \title{Documenting Possible Gaps, Counterexamples, and Formalization Deviations}
 \author{}
@@ -74,6 +74,16 @@ formalized.
 A failed tactic search, a missing formal lemma, or an inconvenient coercion is
 not enough.  The obstruction must survive translation back into ordinary
 mathematics.
+
+Sometimes an investigation uncovers an improvement that is not a discrepancy:
+the formalization works correctly, but it could be simplified by using an
+existing library, replacing a custom type, or adopting a cleaner proof route.
+These are not, by themselves, paper-gap notes.  They are action items.  When
+such an improvement is identified, open a GitHub issue or pull request that
+describes the proposed change.  If the investigation also produces a paper-gap
+note, link the issue or pull request from that note: the note records the
+mathematical justification, and the issue or pull request drives the
+implementation.
 
 \section{When to Write a Note}
 
