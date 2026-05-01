@@ -201,11 +201,7 @@ lemma ev_leftTensor_mul_rightTensor_nonneg
     {X Y : MIPStarRE.Quantum.Op ι} (hX : 0 ≤ X) (hY : 0 ≤ Y) :
     0 ≤ ev ψ (leftTensor (ι₂ := ι) X * rightTensor (ι₁ := ι) Y) := by
   rw [leftTensor_mul_rightTensor_eq_opTensor]
-  exact
-    ev_nonneg_of_psd ψ _ <|
-      (Matrix.PosSemidef.kronecker
-        (Matrix.nonneg_iff_posSemidef.mp hX)
-        (Matrix.nonneg_iff_posSemidef.mp hY)).nonneg
+  quantum_nonneg
 
 lemma qMatchMass_leftRight_postprocess_ge {α β : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
