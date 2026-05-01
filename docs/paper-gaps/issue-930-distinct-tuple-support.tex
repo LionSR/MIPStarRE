@@ -1,0 +1,121 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\setlength{\emergencystretch}{2em}
+
+\input{command}
+
+\title{The Support of the Distinct-Tuple Distribution}
+\author{}
+\date{2026-05-01}
+
+\begin{document}
+\maketitle
+
+\section{The assertion}
+
+This note concerns the distinct-tuple distribution used in the pasting section of
+\cite{Ji2020LowIndividualDegree}.%
+\footnote{Tracked as part of the discrepancy audit in \ghissue{930}.  In the
+TeX source consulted here, the definition and comparison proposition are in
+\path{references/ldt-paper/ld-pasting.tex}, lines~167--213.}
+For $k\ge 1$, the paper defines
+\[
+  \mathsf{Distinct}_k=\{(x_1,\ldots,x_k)\in \F_q^k: x_i\ne x_j
+    \text{ for }i\ne j\}
+\]
+and writes $(\mathbf y_1,\ldots,\mathbf y_k)\sim \mathsf{Distinct}_k$ for a uniformly
+random element of this set.  The following comparison proposition then bounds
+the total variation distance between a uniformly random tuple in $\F_q^k$ and a
+uniformly random tuple in $\mathsf{Distinct}_k$ by $k^2/q$.
+
+\section{The point at issue}
+
+The distribution on $\mathsf{Distinct}_k$ is a genuine probability distribution only
+when $\mathsf{Distinct}_k$ is nonempty.  This requires $k\le q$.  The statement of the
+comparison proposition and the surrounding pasting theorem do not state this
+condition.  Later in the section the paper assumes $k\ge 400md$, but it does
+not separately assume $k\le q$.
+
+Thus, read literally, the phrase ``uniformly random element of
+$\mathsf{Distinct}_k$'' is undefined in the case $k>q$.  In that case no injective map
+from $\{1,\ldots,k\}$ to $\F_q$ exists.  The displayed bound $k^2/q$ is then
+already at least $1$, so the intended comparison is only used in a regime where
+the estimate is trivial, but the probability distribution itself still needs a
+formal interpretation.
+
+\section{The blueprint statement}
+
+The blueprint repeats the paper's convention rather than making the boundary
+case explicit.  The node \path{def:distinct-tuples} in
+\path{blueprint/src/chapter/ch09_pasting.tex}, lines~198--202, carries
+\verb|\lean| annotations for \path{MIPStarRE.LDT.Pasting.distinctTuples} and
+\path{MIPStarRE.LDT.Pasting.distinctTupleDistribution}, together with
+\verb|\leanok|, and states: ``For $k\ge 1$, let
+$\mathsf{Distinct}_k\subseteq \F_q^k$ be the set of tuples
+$(x_1,\dots,x_k)$ with pairwise distinct coordinates.''  This is the same
+all-$k\ge 1$ convention as the paper; the blueprint definition does not add the
+missing nonemptiness hypothesis $k\le q$.
+
+The companion node \path{prop:ld-dnoteq} in the same file, lines~204--226, has a
+\verb|\lean| annotation for \path{MIPStarRE.LDT.Pasting.ldDnoteq} and is also
+tagged \verb|\leanok|.
+It states that if $x=(x_1,\dots,x_k)$ is uniformly random in $\F_q^k$ and
+$y=(y_1,\dots,y_k)$ is uniformly random in $\mathsf{Distinct}_k$, then
+$d_{\mathrm{TV}}(x,y)\le k^2/q$.  Again, the blueprint records no $k\le q$
+side condition for the phrase ``uniformly random in $\mathsf{Distinct}_k$''.
+
+Thus the Lean repair is invisible from the blueprint side: a reader following
+the formalized blueprint nodes sees the same probability-language statement as
+in the paper, while the checked Lean declarations below implement the total
+object as a finite nonnegative weight for all $k$ and recover a probability
+interpretation only when the support is nonempty, equivalently when $k\le q$.
+
+\section{The formal repair}
+
+The formal development uses a finite-support weighted distribution rather than
+forcing every distribution object to be normalized.  The declaration
+\path{MIPStarRE.LDT.Pasting.distinctTupleDistribution} assigns weight
+$1/|\mathsf{Distinct}_k|$ to each distinct tuple when the support is nonempty, and
+weight zero outside the support.  If $k>q$, the support is empty, so this is the
+zero finite measure rather than a probability distribution.%
+\footnote{See \doclink{MIPStarRE/LDT/Pasting/Defs/Tuples.lean}, lines~23--36.}
+
+The formalization records both facts.  The general theorem
+\path{MIPStarRE.LDT.Pasting.distinctTupleDistribution_weight_sum_le_one}
+proves that the total mass is at most $1$ for every $k$.  The normalized form
+\path{MIPStarRE.LDT.Pasting.distinctTupleDistribution_weight_sum_eq_one_of_le}
+adds the missing hypothesis $k\le q$ and proves that the total mass is exactly
+$1$.%
+\footnote{The normalized statement is in
+\doclink{MIPStarRE/LDT/Pasting/BridgeLemmas/Common.lean}, lines~311--343 of the
+source file.}
+
+The total-variation comparison
+\path{MIPStarRE.LDT.Pasting.ldDnoteq} is correspondingly case-split.  When
+$k\le q$, it proves the usual collision-probability estimate.  When $k>q$, the
+support is empty; the formal total variation between the uniform tuple
+distribution and the zero distinct-tuple weight is $1/2$, and this is bounded
+by $k^2/q$ because $k>q$.%
+\footnote{See \doclink{MIPStarRE/LDT/Pasting/Core.lean}, lines~561--805.}
+Downstream averaging lemmas use the same convention: they compare expectations
+of nonnegative functions bounded by $1$, and the $k>q$ branch is discharged by
+the now-trivial $k^2/q$ error term.
+
+\section{Conclusion}
+
+The paper implicitly treats the distinct-tuple distribution as if it were
+available for all $k\ge 1$.  A literal probability distribution exists only for
+$k\le q$.  The formal development makes the boundary case total by interpreting
+the distinct-tuple object as a finite nonnegative weight for all $k$, and as a
+probability distribution precisely under the additional hypothesis $k\le q$.
+This is a harmless formal repair: it preserves the paper argument in the
+nonempty-support case and makes the empty-support case a trivial bound rather
+than an undefined sampling operation.
+
+\bibliographystyle{alpha}
+\bibliography{references}
+
+\end{document}
