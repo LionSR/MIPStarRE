@@ -1,0 +1,81 @@
+\documentclass{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{xurl}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\setlength{\emergencystretch}{2em}
+
+\input{command}
+
+\title{The ambient dimension in the commutativity theorem for $G$}
+\author{}
+\date{2026-05-01}
+
+\begin{document}
+\maketitle
+
+\section{The assertion}
+
+We examine the statement of the commutativity theorem for the slice
+measurements $G^x$ in \cite[Section~\emph{Commutativity of~$G$}]{Ji2020LowIndividualDegree}.%
+\footnote{Tracked in \ghissue{930}. The paper passage is
+\path{references/ldt-paper/commutativity-G.tex}, lines~228--257.}
+The source states that $(\psi,A,B,L)$ is an
+$(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low
+individual degree test. It then assumes, on average over
+$(\bu,\bx) \in \F_q^{m+1}$,
+\[
+  A^{u,x}_a \ot I \simeq_\zeta I \ot G^x_{[g(u)=a]},
+\]
+where $G^x$ is a projective submeasurement with outcomes in
+$\polyfunc{m}{q}{d}$.
+
+\section{The point at issue}
+
+The displayed consistency condition is naturally a hypothesis about a
+strategy for the $(m+1,q,d)$ test. In that test, the point measurement
+$A$ is indexed by points of $\F_q^{m+1}$, which are written as
+$(u,x)$ with $u\in\F_q^m$ and $x\in\F_q$. A strategy for the
+$(m,q,d)$ test has point measurements indexed by $\F_q^m$ instead, so
+$A^{u,x}_a$ is not the corresponding point measurement.
+
+The surrounding argument also uses the theorem in the successor step:
+the slice measurements $G^x$ live in dimension $m$, and they are pasted
+to produce a measurement in dimension $m+1$. Thus the intended ambient
+strategy is the $(m+1,q,d)$ strategy, while the slice family remains a
+family of $m$-variable polynomial submeasurements.
+
+\section{The formal and blueprint statements}
+
+The blueprint states the corrected ambient dimension: in
+\path{blueprint/src/chapter/ch08_commutativity.tex}, the theorem
+\leanid{thm:com-main} assumes an $(\eps,\delta,\gamma)$-good symmetric
+strategy for the $(m+1,q,d)$ low individual degree test, and takes
+projective submeasurements $G^x$ in $\polysub{m}{q}{d}$.
+
+The formal theorem uses the same convention.%
+\footnote{The declaration is \leanid{MIPStarRE.LDT.Commutativity.comMain}
+in \doclink{MIPStarRE/LDT/Commutativity/Main/Results.lean}. Its parameter
+\leanid{params} describes the slice dimension $m$, while the strategy has
+type \leanid{SymStrat params.next}, where \leanid{params.next.m = params.m+1}.}
+It proves the commutativity conclusion for the full slice products
+\[
+  G^x_g G^y_h \ot I \approx_\nu G^y_h G^x_g \ot I,
+  \qquad
+  \nu = 30m\left(\gamma^{1/4}+\zeta^{1/4}+(d/q)^{1/4}\right),
+\]
+with the same three hypotheses of consistency with $A$, strong
+self-consistency, and boundedness.
+
+\section{Conclusion}
+
+The occurrence of $(m,q,d)$ in the source statement of
+\leanid{thm:com-main} is a harmless dimension typo. The theorem is used
+with an ambient $(m+1,q,d)$ strategy and a family of $m$-dimensional slice
+measurements. The blueprint and the formal development use this corrected
+statement. No Lean theorem statement or proof needs to change.
+
+\bibliographystyle{alpha}
+\bibliography{references}
+
+\end{document}
