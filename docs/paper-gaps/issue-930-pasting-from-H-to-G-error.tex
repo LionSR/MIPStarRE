@@ -22,16 +22,19 @@ This note concerns the from-$H$-to-$G$ lemma in the pasting section of
 TeX source consulted here, the statement of the lemma is in
 \path{references/ldt-paper/ld-pasting.tex}, lines~1294--1308, and the relevant
 error calculation is in lines~1370--1376.}
-Here $m$ is the number of variables in each slice, $q$ is the field size,
-$d$ is the individual-degree bound, and $k$ is the number of pasting stages.
-The parameters $\gamma$ and $\zeta$ are the error parameters carried into the
-commutation and self-consistency estimates used by the pasting argument. The operator $G$ is the average slice
-submeasurement, and $\widehat H$ denotes the sandwiched completed-slice product
-summed over all completed outcomes.
+Throughout this note, $k$ is the number of pasting, or sampling, stages;
+$m$ is the number of variables in each slice; $d$ is the individual-degree
+bound; and $q$ is the field size. The scalars $\gamma$ and $\zeta$ are,
+respectively, the consistency and self-consistency errors carried by the
+surrounding induction. The operator $G$ is the average slice submeasurement, and
+$I-G$ is its complement in the Bernoulli polynomial that is compared with the
+all-outcomes expansion. The symbol $\widehat H$ denotes the sandwiched
+completed-slice product summed over all completed outcomes. Finally, $\nu_4$ is
+the commutation error of \path{lem:commute-g-half-sandwich}, and $\nu_8$ is the
+from-$H$-to-$G$ error parameter in the lemma under discussion.
 
 The lemma compares the all-outcomes expansion of the pasted submeasurement with
-a Bernoulli polynomial in $G$. It states the error
-parameter
+a Bernoulli polynomial in $G$ and $I-G$. It states
 \[
   \nu_8
   = 46km(\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}).
