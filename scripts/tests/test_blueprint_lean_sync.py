@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -20,9 +21,11 @@ from blueprint_lean_sync import (  # noqa: E402
     BlueprintEntry,
     LeanDecl,
     SyncReport,
+    _append_missing_blueprint_step_summary,
     _chapter_stats,
     _leanok_placement,
     _line_has_leanok_marker,
+    _missing_blueprint_summary_command,
     _strip_tex_comment,
     _write_json_report,
     collect_blueprint_entries,
@@ -405,6 +408,78 @@ class CollectLeanDeclsTests(unittest.TestCase):
                 missing_names,
                 ["Role.other", "Parameters.next", "_root_.RootPublic"],
             )
+
+
+class MissingBlueprintStepSummaryTests(unittest.TestCase):
+    def _decl(self, name: str) -> LeanDecl:
+        return LeanDecl(
+            file="MIPStarRE/Fake.lean",
+            line=17,
+            fqn=name,
+            kind="theorem",
+            short_name=name.split(".")[-1],
+            end_line=20,
+        )
+
+    def test_step_summary_lists_missing_declarations_and_command(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            summary_path = Path(td) / "step-summary.md"
+            old_summary = os.environ.get("GITHUB_STEP_SUMMARY")
+            os.environ["GITHUB_STEP_SUMMARY"] = str(summary_path)
+            try:
+                _append_missing_blueprint_step_summary(
+                    [self._decl("Foo.paperFacing")],
+                    command=(
+                        "python3 scripts/blueprint_lean_sync.py --root . "
+                        "--warn-missing-blueprint --diff-base origin/main "
+                        "--changed-files MIPStarRE/Fake.lean"
+                    ),
+                )
+            finally:
+                if old_summary is None:
+                    os.environ.pop("GITHUB_STEP_SUMMARY", None)
+                else:
+                    os.environ["GITHUB_STEP_SUMMARY"] = old_summary
+
+            summary = summary_path.read_text()
+            self.assertIn("## Blueprint reverse-coverage warnings", summary)
+            self.assertIn("`Foo.paperFacing`", summary)
+            self.assertIn("`MIPStarRE/Fake.lean:17`", summary)
+            self.assertIn(r"`\lean{Foo.paperFacing}`", summary)
+            self.assertIn("--warn-missing-blueprint", summary)
+
+    def test_step_summary_is_not_created_without_missing_declarations(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            summary_path = Path(td) / "step-summary.md"
+            old_summary = os.environ.get("GITHUB_STEP_SUMMARY")
+            os.environ["GITHUB_STEP_SUMMARY"] = str(summary_path)
+            try:
+                _append_missing_blueprint_step_summary([])
+            finally:
+                if old_summary is None:
+                    os.environ.pop("GITHUB_STEP_SUMMARY", None)
+                else:
+                    os.environ["GITHUB_STEP_SUMMARY"] = old_summary
+
+            self.assertFalse(summary_path.exists())
+
+    def test_summary_command_includes_nondefault_diff_head(self) -> None:
+        command = _missing_blueprint_summary_command(
+            diff_base="origin/main",
+            diff_head="feature/head",
+            changed_files=["MIPStarRE/Fake.lean"],
+        )
+
+        self.assertIn("--diff-head feature/head", command)
+
+    def test_summary_command_omits_default_diff_head(self) -> None:
+        command = _missing_blueprint_summary_command(
+            diff_base="origin/main",
+            diff_head="HEAD",
+            changed_files=["MIPStarRE/Fake.lean"],
+        )
+
+        self.assertNotIn("--diff-head", command)
 
 
 class LeanokPlacementReportingTests(unittest.TestCase):
