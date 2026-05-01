@@ -40,4 +40,13 @@ attribute [ldt_simp]
   leftTensor_conjTranspose rightTensor_conjTranspose
   leftTensor_one rightTensor_one
 
+section Examples
+
+example {α : Type*} [Fintype α] [DecidableEq α] [Nonempty α] (f : α → Error) :
+    avgOver (uniformDistribution α) f =
+      ∑ a ∈ (Finset.univ : Finset α), (1 / (Fintype.card α : Error)) * f a := by
+  simp [ldt_simp]
+
+end Examples
+
 end MIPStarRE.LDT

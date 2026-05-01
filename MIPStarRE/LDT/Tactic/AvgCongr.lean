@@ -36,6 +36,7 @@ backtracking fallback when the plain route cannot close the resulting leaf.
 open Lean Elab Tactic
 open MIPStarRE.LDT
 
+/-- Recursively peel `avgOver` equality goals with optional leaf tactics. -/
 syntax (name := avgCongr) "avg_congr" (" with " ident,+)? (" using " tactic)? : tactic
 
 private inductive AvgCongrPeelKind where
@@ -129,6 +130,7 @@ private partial def evalAvgCongrCore
             throwError
               "avg_congr failed: no `avgOver` head and leaf tactics did not close the goal"
 
+/-- Elaborator for the `avg_congr` tactic syntax. -/
 @[tactic avgCongr]
 def evalAvgCongr : Tactic := fun stx => do
   match stx with
