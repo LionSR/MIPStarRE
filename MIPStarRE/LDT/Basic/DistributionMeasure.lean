@@ -8,8 +8,13 @@ import Mathlib.MeasureTheory.Measure.Typeclasses.Finite
 
 This optional module views the repository-local `Distribution` type as a finite measure by
 placing a Dirac atom of mass `ENNReal.ofReal (𝒟.weight a)` at each point of the explicit support.
-It intentionally lives outside `Distribution.lean` so the foundational LDT distribution API does
-not acquire measure-theory imports.
+It is the right adapter for finite nonnegative weights that may be subnormalized, may have total
+mass different from `1`, or may even have empty support.
+
+For genuine probability distributions and Mathlib PMF expectations, import
+`MIPStarRE.LDT.Basic.DistributionPMF` instead.  This module intentionally lives outside
+`Distribution.lean` so the foundational LDT distribution API does not acquire measure-theory
+imports.
 -/
 
 open scoped BigOperators ENNReal
