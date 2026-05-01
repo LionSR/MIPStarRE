@@ -4486,11 +4486,12 @@ theorem baseStep6WitnessResidual
       hpass scalars roleResidual) :
     Nonempty (MainFormalCascadeRolePackageResidualStep6WitnessResidual
       params strategy eps hpass k scalars) :=
-  MainFormalCascadeRolePackageResidualStep6WitnessResidual.nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs
-    hsmall roleResidual bridge.orthonormalizationInput
-    bridge.a_A bridge.a_B
-    bridge.leftSelfConsistency bridge.rightSelfConsistency
-    bridge.leftMatchMassPreservation bridge.rightMatchMassPreservation
+  refine
+    (MainFormalCascadeRolePackageResidualStep6WitnessResidual
+      .nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs
+      hsmall roleResidual bridge.orthonormalizationInput bridge.a_A bridge.a_B
+      bridge.leftSelfConsistency bridge.rightSelfConsistency
+      bridge.leftMatchMassPreservation bridge.rightMatchMassPreservation)
 
 /--
 `thm:main-formal` from `test_definition.tex`.
