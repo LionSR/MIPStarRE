@@ -555,6 +555,52 @@ lemma orthonormalizationMainLemma_local {Outcome : Type*}
     MIPStarRE.LDT.MakingMeasurementsProjective.roundedProjMeasStatement_mono
       hRounded (orthonormalizationMainLemma_error_bound ζ hζ hζ1)
 
+/-- Local version of `orthonormalizationMainLemma` from the paper's cross
+consistency hypothesis.
+
+Unlike `orthonormalizationMainLemma_local`, this wrapper consumes
+`A_a ⊗ I ≃ I ⊗ B_a` directly.  The locality-preserving repair input still says
+that the rounded left-lifted family can be chosen as a left-lift of a local
+projective submeasurement. -/
+lemma orthonormalizationMainLemma_local_of_consistency {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState (ι × ι))
+    (hψ : ψ.IsNormalized)
+    (A B : Measurement Outcome ι) (ζ : Error)
+    (hζ : 0 ≤ ζ) (hζ1 : ζ ≤ 1)
+    (hspectral : SpectralTruncationInput
+      ψ (leftLiftedMeasurement (ιB := ι) A)
+      (consistencyToAlmostProjectiveError ζ))
+    (hrepair : LeftLiftedProjectivizationRepairInput
+      ψ A (consistencyToAlmostProjectiveError ζ)) :
+    ConsRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A.toSubMeas)
+      (constSubMeasFamily B.toSubMeas) ζ →
+      ∃ P : ProjSubMeas Outcome ι,
+        SDDRel ψ (uniformDistribution Unit)
+          (constSubMeasFamily A.toSubMeas.liftLeft)
+          (constSubMeasFamily P.toSubMeas.liftLeft)
+          (orthonormalizationMainLemmaError ζ) := by
+  intro hCons
+  have hAlmost :
+      MIPStarRE.LDT.MakingMeasurementsProjective.AlmostProjMeasStatement
+        ψ (leftLiftedMeasurement (ιB := ι) A)
+        (consistencyToAlmostProjectiveError ζ) := by
+    exact MIPStarRE.LDT.MakingMeasurementsProjective.consistencyToAlmostProjective
+      (ψ := ψ) (A := A) (B := B) (ζ := ζ) hCons
+  have hSpectral :
+      SpectralTruncationStatement ψ (leftLiftedMeasurement (ιB := ι) A)
+        (consistencyToAlmostProjectiveError ζ) := by
+    exact MIPStarRE.LDT.MakingMeasurementsProjective.spectralTruncateAlmostProjective
+      (ψ := ψ) (hψ := hψ) (A := leftLiftedMeasurement (ιB := ι) A)
+      (ζ := consistencyToAlmostProjectiveError ζ) hAlmost hspectral
+  obtain ⟨P, hRounded⟩ := hrepair hSpectral
+  refine ⟨P, ?_⟩
+  exact leftLiftedRoundedProjMeasStatement_to_local <|
+    MIPStarRE.LDT.MakingMeasurementsProjective.roundedProjMeasStatement_mono
+      hRounded (orthonormalizationMainLemma_error_bound ζ hζ hζ1)
+
 /-- Measurement-level orthonormalization once the left-lifted repair witness is
 available explicitly. -/
 lemma orthonormalizationMeasurement {Outcome : Type*}
@@ -580,6 +626,39 @@ lemma orthonormalizationMeasurement {Outcome : Type*}
   obtain ⟨P, hP⟩ :=
     orthonormalizationMainLemma_local (ψ := ψ) (hψ := hψ) (A := A) (ζ := ζ)
       hζ hζ1 hspectral hrepair hssc
+  refine ⟨P, ?_⟩
+  rcases hP with ⟨hP⟩
+  exact ⟨hP.trans (orthonormalizationMainLemmaError_le_orthonormalizationError ζ hζ)⟩
+
+/-- Measurement-level orthonormalization from a cross-consistency hypothesis.
+
+This is the measurement analogue of
+`orthonormalizationMainLemma_local_of_consistency`, with the paper's
+`84·ζ^{1/4}` bound weakened to the public `100·ζ^{1/4}` envelope. -/
+lemma orthonormalizationMeasurement_of_consistency {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState (ι × ι))
+    (hψ : ψ.IsNormalized)
+    (A B : Measurement Outcome ι) (ζ : Error)
+    (hζ : 0 ≤ ζ) (hζ1 : ζ ≤ 1)
+    (hspectral : SpectralTruncationInput
+      ψ (leftLiftedMeasurement (ιB := ι) A)
+      (consistencyToAlmostProjectiveError ζ))
+    (hrepair : LeftLiftedProjectivizationRepairInput
+      ψ A (consistencyToAlmostProjectiveError ζ)) :
+    ConsRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A.toSubMeas)
+      (constSubMeasFamily B.toSubMeas) ζ →
+      ∃ P : ProjSubMeas Outcome ι,
+        SDDRel ψ (uniformDistribution Unit)
+          (constSubMeasFamily A.toSubMeas.liftLeft)
+          (constSubMeasFamily P.toSubMeas.liftLeft)
+          (orthonormalizationError ζ) := by
+  intro hCons
+  obtain ⟨P, hP⟩ :=
+    orthonormalizationMainLemma_local_of_consistency (ψ := ψ) (hψ := hψ)
+      (A := A) (B := B) (ζ := ζ) hζ hζ1 hspectral hrepair hCons
   refine ⟨P, ?_⟩
   rcases hP with ⟨hP⟩
   exact ⟨hP.trans (orthonormalizationMainLemmaError_le_orthonormalizationError ζ hζ)⟩

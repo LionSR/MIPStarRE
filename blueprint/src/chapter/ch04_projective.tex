@@ -58,7 +58,9 @@
 
 \begin{theorem}[Orthogonalization lemma]\label{thm:orthonormalization}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
-	% Unproved — tracked by issues #103 (Ch4 orthonormalization) and #426 (projectivization chain).
+	% Lean proof needs additional OrthonormalizationInput hypothesis (spectral-
+	% truncation + locality-preserving repair witnesses) not yet discharged.
+	% Tracked by issues #103 (Ch4 orthonormalization) and #426 (projectivization chain).
 	\uses{def:strong-self-consistency, def:approx_delta}
 	Let $\ket{\psi}$ be a permutation-invariant state,
 	and let $A = \{A_a\}$ be a sub-measurement with strong self-consistency
@@ -199,7 +201,10 @@
 
 \begin{lemma}[Orthogonalization lemma for measurements]\label{lem:orthonormalization-main-lemma}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}
-	% Unproved — tracked by issues #103 (Ch4 orthonormalization) and #426 (projectivization chain).
+	% Lean proof needs explicit SpectralTruncationInput + ProjectivizationRepairInput
+	% hypotheses (representing spectral-truncation and late-repair stages in the
+	% paper's Q/X/XHat/P argument) not yet constructed.
+	% Tracked by issues #103 (Ch4 orthonormalization) and #426 (projectivization chain).
 	\uses{def:simeq, def:approx_delta}
 	Let $\ket{\psi}$ be a state, and let $A = \{A_a\}$ and $B = \{B_a\}$ be measurements such that
 	\[
@@ -372,7 +377,6 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
-		\leanok
 		\uses{lem:trunc-inequality}
 		Write the eigendecomposition of $A_a$ as
 		\[
@@ -436,10 +440,22 @@
 			\sum_{s \in S} f(s) \leq 4\sqrt{\zeta}.
 		\]
 	\end{lemma}
-		\begin{proof}
-			\leanok
-			The four declarations are formalization-only combinatorial support lemmas, each proved by elementary finite-set double-counting and rearrangement.  Together they establish the pairwise inequality and the final bound $\sum_{s \in S} f(s) \leq 4\sqrt{\zeta}$ under the stated hypotheses on $r$, $d$, and $\zeta$.
-		\end{proof}
+	\begin{proof}
+		\leanok
+		Choose $L$ to be a set of $d$ indices on which the sum of $f$ is maximal. If some $s \in S$ and $l \in L$ satisfied $f(l) < f(s)$, replacing $l$ by $s$ would increase this sum, so every small index is bounded by every large index. Summing the inequalities $f(s) \leq f(l)$ over all pairs $(s,l) \in S \times L$ gives
+		\[
+			|L|\sum_{s \in S} f(s) \leq |S|\sum_{l \in L} f(l).
+		\]
+		Since $\alpha$ is the disjoint union of $L$ and $S$, adding $|S|\sum_{s \in S} f(s)$ to both sides yields
+		\[
+			r\sum_{s \in S} f(s) \leq |S|\sum_{x \in \alpha} f(x).
+		\]
+		The hypotheses $|L|=d$ and $r \leq (1+2\sqrt{\zeta})d$ imply $|S|/r \leq 2\sqrt{\zeta}$. Dividing by $r$ and using $\sum_{x \in \alpha} f(x) \leq 1+2\sqrt{\zeta}$ gives
+		\[
+			\sum_{s \in S} f(s) \leq 2\sqrt{\zeta}(1+2\sqrt{\zeta}).
+		\]
+		Finally, $\zeta \leq 1/4$ implies $\sqrt{\zeta} \leq 1/2$, and hence $2\sqrt{\zeta}(1+2\sqrt{\zeta}) \leq 4\sqrt{\zeta}$.
+	\end{proof}
 
 
 	\begin{lemma}[Rank reduction]\label{lem:projective-low-rank-sum}

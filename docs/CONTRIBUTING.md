@@ -465,7 +465,7 @@ The following workflows run automatically:
 | Workflow | Trigger | What it does |
 |----------|---------|-------------|
 | **Lean CI** (`lean_action_ci.yml`) | Push to `main`, PRs touching `.lean`/`lakefile.toml`/`lean-toolchain` | Runs `lake build` with Mathlib cache |
-| **Claude Code Review** (`claude-code-review.yml`) | PR opened/synced/reopened touching `.lean`, `.tex`, `lakefile.toml`, `lean-toolchain` | Automated review for sorrys, Mathlib style, type safety, performance, modularity, documentation |
+| **Claude Code Review** (`claude-code-review.yml`) | PR opened/synced/ready-for-review/reopened touching Lean files, blueprint `.tex` files, `docs/paper-gaps/`, `lakefile.toml`, or `lean-toolchain` | Automated review for proof integrity, Mathlib style, type safety, performance, modularity, mathematical exposition, and documentation |
 | **Issue Tracker** (`tracking-issue-sync.yml`) | Issue closed/reopened; PR merged/opened | Uses native sub-issue progress for tracking status, posts progress comments on linked issues when PRs merge, scans merged PRs for genuine deferred mathematical obligations, and creates `follow-up` issues when needed |
 | **Blueprint Lint** (`lint-blueprint.yml`) | PRs touching blueprint files | Validates LaTeX blueprint for broken labels and references |
 | **Docs & Blueprint Sync** (`docs-blueprint-sync.md`) | Daily (weekdays) + manual dispatch | Detects stale documentation and opens a sync PR if needed |

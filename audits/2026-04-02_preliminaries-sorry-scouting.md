@@ -14,7 +14,7 @@ kind: scouting-report
 - Key Mathlib lemmas needed: `avgOver_mono`, `sq_le_self`, `ev_mono`, `Measurement.outcome_le_one`, `SubMeas.outcome_le_one`, `sandwich_nonneg`, `sandwich_mono`
 - Estimated difficulty: hard
 - Estimated Lean proof lines: 45
-- Blockers: The current Lean statement is only a surrogate for the paper step. `diagonalSandwichFamily` uses `A_a B_a A_a`, but the paper step is about `A_a ⊗ I` versus `A_a ⊗ B_a`. The present formalization has no explicit left/right tensor structure or commutation hypothesis connecting these, so the paper proof does not port directly.
+- Blockers: **RESOLVED (2026-04-30, #936).** The current `diagonalSandwichFamily A B` is `leftTensor(A_a) * rightTensor(B_a)` = `A_a ⊗ B_a`, which faithfully matches the paper's middle term. The tensor formulation has been fully integrated; see `MIPStarRE/LDT/Preliminaries/Defs.lean:68`. The proof in `MIPStarRE/LDT/Preliminaries/ConsistencyBridges.lean` uses the correct bipartite consistency reduction.
 
 ## consSubMeas_sandwichControl (line 272)
 - Paper reference: `prop:cons-sub-meas`
@@ -22,7 +22,7 @@ kind: scouting-report
 - Key Mathlib lemmas needed: `avgOver_mono`, `sq_le_self`, `ev_mono`, `ev_sum`, `ev_sub`, `Measurement.total_eq_one`, `sandwich_nonneg`, `sandwich_mono`
 - Estimated difficulty: hard
 - Estimated Lean proof lines: 40
-- Blockers: The same modeling mismatch appears here. `totalSandwichFamily` is `A_a (Σ_b B_b) A_a`, which reduces to `A_a^2` because `B` is a measurement, while the paper compares against `A^x ⊗ B_a^x`. Without restoring the bipartite/tensor formulation, the proof is not a direct transcription of the paper.
+- Blockers: **RESOLVED (2026-04-30, #936).** The current `totalSandwichFamily A B` is `leftTensor(A_total) * rightTensor(B_a)` = `A ⊗ B_a`, which faithfully matches the paper's right term. The tensor structure is fully in place; see `MIPStarRE/LDT/Preliminaries/Defs.lean:147`.
 
 ## switchSandwich_leftTransfer (line 327)
 - Paper reference: `prop:switch-sandwich`
@@ -30,7 +30,7 @@ kind: scouting-report
 - Key Mathlib lemmas needed: `ev_cauchy_schwarz`, `Matrix.mul_kronecker_mul`, `leftTensor_finset_sum`, projectivity lemmas for `(A q).proj a`, absolute-value triangle inequality on `ℝ`
 - Estimated difficulty: hard
 - Estimated Lean proof lines: 70
-- Blockers: The current hypothesis `BipartiteSDDRel ψ 𝒟 Alifted Alifted δ` is just a self-distance bound on one family and does not relate `Alifted` to `A` at all, so it cannot justify the switches used in the paper. Also, the current expectations are defined using `(A q).toSubMeas.total`, whereas the paper proposition is a sum over the individual projectors `A_a^x`; that is a second statement mismatch.
+- Blockers: **RESOLVED (2026-04-30, #936).** `BipartiteSDDRel` encodes `leftRightSquaredDistanceBound` which says `sddError ψ 𝒟 (liftLeft A) (liftRight A) ≤ δ`, i.e. `A_a^x ⊗ I ≈_δ I ⊗ A_a^x` — exactly the paper's hypothesis `eq:Aapproxd`. The `leftSandwichExpectation`, `middleSandwichExpectation`, and `rightSandwichExpectation` definitions use `leftTensor`/`rightTensor` per paper, and the proof uses outcomewise projectors via `A_q.outcome a`. See `MIPStarRE/LDT/Preliminaries/SwitchSandwichMain/LeftTransfer.lean` (`switchSandwich_leftTransfer`).
 
 ## switchSandwich_rightTransfer (line 341)
 - Paper reference: `prop:switch-sandwich`
@@ -38,7 +38,7 @@ kind: scouting-report
 - Key Mathlib lemmas needed: `ev_cauchy_schwarz`, `Matrix.mul_kronecker_mul`, `leftTensor_finset_sum`, `rightTensor_finset_sum`, projective-total identities like `A.total * A.outcome a = A.outcome a`
 - Estimated difficulty: hard
 - Estimated Lean proof lines: 60
-- Blockers: The same two blockers as above remain: the hypothesis does not connect `Alifted` to `A`, and the current expectation definitions use total operators instead of the paper’s outcomewise sums. There are useful private lemmas in `MIPStarRE/LDT/Pasting/Sandwich.lean` about projective totals, but they are not currently reusable here.
+- Blockers: **RESOLVED (2026-04-30, #936).** `rightSandwichExpectation` correctly uses `leftTensor(B * A_q.outcome a)` = `B A_a^x ⊗ I`. The proof uses both outcomewise projectors and total-projector identities (`projSubMeas_total_proj`) that are now public lemmas in `MIPStarRE/LDT/Preliminaries/SwitchSandwichPrep/Core.lean`. See `MIPStarRE/LDT/Preliminaries/SwitchSandwichMain/RightTransfer.lean` (`switchSandwich_rightTransfer`).
 
 ## completenessTransfer_core (line 374)
 - Paper reference: `prop:completeness-transfer-projective-P`

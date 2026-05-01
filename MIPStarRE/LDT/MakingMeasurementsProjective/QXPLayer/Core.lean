@@ -111,6 +111,8 @@ structure RankReductionWitness {Outcome : Type*}
   total_le :
     QTotal data ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
       (1 : MIPStarRE.Quantum.Op ι)
+  totalRank_le :
+    ∑ a : Outcome, (Qa data a).rank ≤ Fintype.card ι
   auxDim_le :
     Fintype.card data.auxSpace.carrier ≤ Fintype.card ι
 

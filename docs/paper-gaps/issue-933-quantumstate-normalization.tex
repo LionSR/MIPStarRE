@@ -1,0 +1,256 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\setlength{\emergencystretch}{2em}
+
+\input{docs/paper-gaps/command}
+
+\title{Issue 933: Normalization of Quantum States in the LDT Formalization}
+\author{}
+\date{2026-04-30}
+
+\newcommand{\calH}{\mathcal H}
+\newcommand{\ev}{\operatorname{ev}}
+
+\begin{document}
+\maketitle
+
+\section{The normalization convention in the paper}
+
+This note concerns the use of normalized quantum states in
+\cite[Section~\emph{Preliminaries}]{Ji2020LowIndividualDegree}, and the
+corresponding state object in the formal development.
+\footnote{The issue record is
+\href{https://github.com/LionSR/MIPStarRE/issues/933}{GitHub issue \#933}.
+The paper passages consulted here are in
+\path{references/ldt-paper/preliminaries.tex}: the definition of consistency is
+at lines 255--268, the definition of state-dependent distance is at lines
+348--360, the Cauchy--Schwarz transport proposition is at lines 509--536, the
+switch-sandwich proposition is at lines 748--840, and the completion proposition
+is at lines 1101--1173.}
+The paper writes the shared state as a vector $|\psi\rangle$. In this
+notation a state is normalized: $\langle\psi,\psi\rangle=1$. This convention
+is used not only in the definitions of consistency and state-dependent distance,
+but also in the proofs where a complete measurement gives a scalar equal to
+$1$. For example, in the proof that the two definitions of consistency agree
+for measurements, the term
+\[
+  \mathbb E_x \sum_b \langle\psi| I\otimes B_b^x |\psi\rangle
+\]
+is replaced by $1$. The same normalization convention is used when a
+Cauchy--Schwarz factor of the form
+$\sum_a\langle\psi|C_a^2|\psi\rangle$ is bounded by $1$.
+
+The formal state object is deliberately more general. A formal quantum state on
+$\calH$ is a positive semidefinite matrix $\rho$. It does not, by itself,
+assert that $\rho$ has unit trace. The separate predicate
+$\rho$ is normalized means that the normalized trace
+$\tau(\rho)=\operatorname{Tr}(\rho)/\dim\calH$ is equal to $1$. The formal
+expectation is
+\[
+  \ev_\rho(X)=\operatorname{Re} \tau(\rho X).
+\]
+For a pure unit vector $v$, the formal density matrix is
+$\dim(\calH)\,|v\rangle\langle v|$, so that
+$\tau(\dim(\calH)\,|v\rangle\langle v|)=1$ and the formal expectation agrees
+with the paper's bra-ket scalar.
+\footnote{The corresponding declarations are \path{QuantumState},
+\path{QuantumState.IsNormalized}, \path{pureDensity},
+\path{PureState.toQuantumState_isNormalized}, and \path{ev}, in
+\path{MIPStarRE/LDT/Basic/QuantumState.lean}, lines 14--32, 46--108, and
+159--163. The identity expectation lemma is
+\path{ev_one_of_isNormalized} in
+\path{MIPStarRE/LDT/Basic/OperatorExpectations.lean}, lines 88--93.}
+Thus the formal development separates positivity from normalization. It also
+allows mixed density matrices. This is a harmless generalization of the vector
+notation when the normalization predicate is supplied.
+
+At the strategy level the paper convention is already bundled. A symmetric or
+projective LDT strategy carries both its bipartite density matrix and a proof
+that it is normalized.
+\footnote{See the fields \path{SymStrat.isNormalized} and
+\path{ProjStrat.isNormalized} in \path{MIPStarRE/LDT/Test/StrategyCore.lean},
+lines 235--246 and 371--382.}
+The possible mismatch is therefore not that strategies in the main theorem lack
+normalization. The mismatch is that many auxiliary lemmas are stated for an
+arbitrary positive semidefinite density matrix, and a paper-scale estimate is
+valid for such a lemma only if normalization is added explicitly or the estimate
+is rescaled by $\ev_\rho(I)$.
+
+\section{Why the hypothesis is mathematically necessary}
+
+Let $\rho$ be a positive semidefinite density matrix in the formal sense, and
+let $c>0$. Then $c\rho$ is again a positive semidefinite density matrix, and
+\[
+  \ev_{c\rho}(X)=c\,\ev_\rho(X)
+\]
+for every operator $X$. Consequently the formal consistency defects,
+state-dependent squared distances, strong self-consistency defects, and scalar
+transport averages all scale linearly with $c$.
+
+For a normalized state and an operator $0\le X\le I$, one has
+$\ev_\rho(X)\le 1$. Without normalization the bound is instead
+$\ev_\rho(X)\le\ev_\rho(I)=\tau(\rho)$. This distinction is invisible in the
+paper because $|\psi\rangle$ is a unit vector. It is not invisible in the
+formal statement. A typical Cauchy--Schwarz step gives
+\[
+  |\text{transport error}|
+    \le \sqrt{\delta} \sqrt{\ev_\rho(I)}.
+\]
+The paper bound $\sqrt\delta$ follows from this only when
+$\ev_\rho(I)=1$. Thus a theorem over arbitrary positive semidefinite
+$\rho$, with the same state-independent right-hand side as in the paper, would
+be an overgeneralization. It would prove more than the paper's proof supplies,
+and it is generally false under scalar rescaling of $\rho$.
+
+This is a genuine mathematical issue, but it is not a defect in the chosen
+state parameterization. The parameterization is sound when theorems with
+paper-scale constants include the normalization hypothesis. It also gives a
+useful language for intermediate weighted states and trace-scaled estimates,
+where forcing normalization into the base state structure would be inconvenient.
+
+\section{Representative formal sites where normalization is used}
+
+The following list is representative, not exhaustive. The common pattern is
+that the proof uses the identity $\ev_\rho(I)=1$, or uses it after monotonicity
+to turn an operator bound $X\le I$ into a scalar bound $\ev_\rho(X)\le 1$.
+
+First, the basic scalar bounds require normalization. The diagonal mass of a
+submeasurement is at most $1$ on a normalized state, and bipartite consistency
+or strong self-consistency defects are at most $1$ under the same hypothesis.
+\footnote{See \path{subMeas_diagMass_le_one} in
+\path{MIPStarRE/LDT/Preliminaries/SwitchSandwichPrep/Core.lean}, lines
+103--114; \path{qBipartiteConsDefect_le_one_of_isNormalized},
+\path{bipartiteConsError_le_one_of_isProbability}, and
+\path{bipartiteConsError_uniform_le_one} in \path{MIPStarRE/LDT/Test/Defs.lean},
+lines 352--414; and \path{qBipartiteSSCDefect_le_one} and
+\path{bipartiteSSCError_uniform_le_one} in
+\path{MIPStarRE/LDT/Pasting/BridgeLemmas/Common.lean}, lines 345--377.}
+These lemmas are the formal versions of the paper's repeated use of the fact
+that a bounded measurement probability is at most $1$.
+
+Second, the Cauchy--Schwarz transport lemmas matching the paper's
+$\sqrt\delta$-scale estimates carry an explicit normalization hypothesis.
+This includes the transfer of consistency using state-dependent distance, the
+easy approximation lemma, and both left and right clauses of the inner-product
+transport proposition.
+\footnote{Representative declarations are \path{triangleSub} in
+\path{MIPStarRE/LDT/Preliminaries/Triangles.lean}, lines 102--124;
+\path{easyApproxFromApproxDelta}, \path{closenessOfIP}, and
+\path{closenessOfIPAdjoint} in \path{MIPStarRE/LDT/Preliminaries/CauchySchwarz.lean},
+lines 148--218; and the underlying pointwise bounds
+\path{question_easyApproxFromApproxDelta}, \path{closenessOfInnerProduct_left},
+and \path{closenessOfInnerProduct_right}.}
+Not every distance manipulation needs normalization. For example, a purely
+operator-order contraction of a state-dependent squared distance may scale
+linearly on both sides. The normalization hypothesis is needed precisely when a
+bounded operator is converted into the numerical constant $1$, or when that
+constant is hidden in a square-root loss.
+
+Third, the switch-sandwich family of estimates uses normalization at exactly the
+places where the paper bounds a Cauchy--Schwarz factor by $1$. The formal
+statement therefore assumes that the state is normalized, and the left and right
+transfer lemmas pass that assumption to the per-question gap bounds.
+\footnote{See \path{switchSandwich} in
+\path{MIPStarRE/LDT/Preliminaries/SwitchSandwichMain/Completeness.lean}, lines
+22--45; \path{switchSandwich_leftTransfer} and \path{switchSandwich_rightTransfer}
+in \path{MIPStarRE/LDT/Preliminaries/SwitchSandwichMain/LeftTransfer.lean} and
+\path{MIPStarRE/LDT/Preliminaries/SwitchSandwichMain/RightTransfer.lean}; and
+\path{question_switchSandwich_left_gap} and \path{question_switchSandwich_middle_gap}
+in \path{MIPStarRE/LDT/Preliminaries/SwitchSandwichGapBounds/Left.lean} and
+\path{MIPStarRE/LDT/Preliminaries/SwitchSandwichGapBounds/Middle.lean}.}
+These lemmas feed directly into the commutativity transport estimates, such as
+the scalar marginalization bounds for full slices.
+\footnote{For example, see \path{fullSlice_scalar_marginalize_x} and
+\path{fullSlice_scalar_marginalize_y} in
+\path{MIPStarRE/LDT/Commutativity/Main/Auxiliary.lean}, lines 350--413 and
+460--500, and the evaluated inner-product bridge
+\path{evaluatedSlice_hEval_sandwichedRight_to_linearRight}, lines 537--640.}
+
+Fourth, the completion and projectivization chain uses normalization when the
+paper writes that the total mass of a completed measurement is $1$, or when a
+truncation error is stated at the paper's scale. The formal completion theorem,
+the missing-mass estimate, the spectral-truncation input, and the
+orthonormalization theorem all expose the normalized-state hypothesis.
+\footnote{See \path{completionMissingMassBound} in
+\path{MIPStarRE/LDT/Preliminaries/SelfConsistency/Core.lean}, lines 66--149;
+\path{completingToMeasurement} in
+\path{MIPStarRE/LDT/Preliminaries/CompletionTransfer.lean}, lines 234--254;
+\path{SpectralTruncationInput} in
+\path{MIPStarRE/LDT/MakingMeasurementsProjective/Statements.lean}, lines 118--125;
+\path{spectralTruncateAlmostProjective} and \path{roundAlmostProjMeas} in
+\path{MIPStarRE/LDT/MakingMeasurementsProjective/Projectivization.lean}, lines
+379--431; and \path{orthonormalization} in
+\path{MIPStarRE/LDT/MakingMeasurementsProjective/Orthonormalization.lean}, lines
+587--610.}
+This is the correct formal counterpart of the paper's pure-state convention.
+
+\section{Relation with the blueprint and Lean}
+
+The blueprint preliminaries follow the paper's vector-state convention.  They
+write $|\psi\rangle$ in the definitions of consistency and state-dependent
+distance, and in the statements of the transfer lemmas, without introducing a
+separate predicate for normalization.
+\footnote{See \path{blueprint/src/chapter/ch03_preliminaries.tex}, lines
+209--265 for \path{def:simeq} and \path{def:approx_delta}, lines 274--280 for
+\path{prop:triangle-sub}, lines 316--376 for \path{prop:closeness-of-ip} and
+\path{prop:easy-approx-from-approx-delta}, lines 508--536 for
+\path{prop:switch-sandwich}, and lines 698--730 for
+\path{prop:completing-to-measurement}.}
+This matches the paper as mathematical prose: a state vector is understood to be
+unit normalized.  The blueprint therefore inherits the paper convention rather
+than displaying an additional normalization hypothesis.
+
+The corresponding Lean declarations make the suppressed convention explicit.
+For example, the blueprint statements for the triangle transfer, inner-product
+transport, switch-sandwich lemma, completion theorem, spectral truncation input,
+and orthonormalization theorem all link to declarations whose signatures include
+an explicit normalized-state hypothesis.  Thus the blueprint and Lean are
+compatible, but they place the convention at different levels: the blueprint uses
+the standard mathematical meaning of $|\psi\rangle$ as a normalized state, while
+Lean records the hypothesis as data because its base state type contains all
+positive semidefinite matrices.
+
+This note supplies the missing comparison.  Future blueprint edits should either
+continue to use the paper convention for $|\psi\rangle$, or state explicitly that
+a density matrix \(\rho\) is normalized whenever the prose is no longer written
+in vector-state notation.  In either case, a Lean declaration linked from such a
+blueprint item should carry \path{IsNormalized} whenever the proof uses the
+scalar identity \(\ev_\rho(I)=1\).
+
+\section{Verdict and migration policy}
+
+The verdict is that \href{https://github.com/LionSR/MIPStarRE/issues/933}{issue
+\#933} records a real normalization gap between the paper's convention and the
+base formal state structure, but not a theorem-level defect in the current
+strategy statements. The paper works with normalized states. The base formal
+object intentionally records only positivity, and normalization is supplied by a
+separate predicate. This is a harmless parameterization when the predicate is
+required at every theorem whose conclusion has a paper-scale, state-independent
+constant.
+
+The development should therefore not immediately migrate \path{QuantumState} to
+bundle normalization. Such a change would have high blast radius, and it would
+remove a useful type for unnormalized or weighted positive semidefinite states.
+The correct policy is local: keep \path{QuantumState} as the positive cone, keep
+normalization bundled in strategy structures, and require an explicit
+normalization hypothesis on any lemma that proves a bound using
+$\ev_\rho(I)=1$, a scalar upper bound $\le 1$, or a paper-scale
+$\sqrt\delta$ transport estimate.
+
+When an auxiliary theorem is intentionally meant to hold for unnormalized
+states, its statement should show the trace dependence explicitly. For example,
+a Cauchy--Schwarz transport estimate should contain the factor
+$\sqrt{\ev_\rho(I)}$, or an equivalent trace factor, rather than silently using
+$1$. Conversely, if the theorem is meant to match a displayed statement in
+the paper, it should assume that the state is normalized. Future audits should
+look especially for occurrences of $\ev_\rho(I)=1$, scalar conclusions bounded
+by $1$, and square-root transport bounds stated over an arbitrary
+\path{QuantumState} without a normalization hypothesis.
+
+\bibliographystyle{alpha}
+\bibliography{docs/paper-gaps/references}
+
+\end{document}

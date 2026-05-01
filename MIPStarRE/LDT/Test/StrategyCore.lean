@@ -222,6 +222,49 @@ theorem reparamInvariant {params : Parameters} [FieldModel params.q]
 
 end DiagonalCovariantMeasurement
 
+/-- Transport covariance for diagonal-line measurements whose answers are the
+paper-level line functions. -/
+def DiagonalAnswerMeasurementTransportInvariant (params : Parameters)
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (M : IdxProjMeas (DiagonalLine params) (DiagonalLineAnswer params) ι) : Prop :=
+  ∀ (ℓ : DiagonalLine params) (t : Fq params),
+    M (DiagonalLine.rebaseAt ℓ t) =
+      ProjMeas.transport (DiagonalLineAnswer.reparamAtEquiv t) (M ℓ)
+
+/-- Diagonal-line measurements with paper-level function answers, bundled with
+transport-level rebasing covariance.
+
+This parallel API is intended for the paper-faithful restriction redesign: unlike
+`DiagonalLinePolynomial`, the function-answer alphabet admits a total slice
+append/restrict equivalence. -/
+structure DiagonalAnswerCovariantMeasurement (params : Parameters)
+    [FieldModel params.q] (ι : Type*) [Fintype ι] [DecidableEq ι] where
+  toIdxProjMeas :
+    IdxProjMeas (DiagonalLine params) (DiagonalLineAnswer params) ι
+  transportInvariant :
+    DiagonalAnswerMeasurementTransportInvariant params toIdxProjMeas
+
+instance {params : Parameters} [FieldModel params.q] {ι : Type*}
+    [Fintype ι] [DecidableEq ι] :
+    CoeFun (DiagonalAnswerCovariantMeasurement params ι)
+      (fun _ => DiagonalLine params → ProjMeas (DiagonalLineAnswer params) ι) where
+  coe M := M.toIdxProjMeas
+
+/-- Paper-level symmetric strategy data whose diagonal-line answers are functions.
+
+This parallel structure is the target shape for the restriction redesign in
+Section 6: restricting an ambient diagonal line to a slice is total for function
+answers, unlike the current degree-bounded `DiagonalLinePolynomial` alphabet. -/
+structure AnswerSymStrat (params : Parameters) [FieldModel params.q]
+    (ι : Type*) [Fintype ι] [DecidableEq ι] where
+  state : QuantumState (ι × ι)
+  permInvState : PermInvState state
+  densityFixed : swapDensity state.density = state.density
+  isNormalized : state.IsNormalized
+  pointMeasurement : IdxProjMeas (Point params) (Fq params) ι
+  axisParallelMeasurement : AxisParallelCovariantMeasurement params ι
+  diagonalMeasurement : DiagonalAnswerCovariantMeasurement params ι
+
 /-- Paper-local symmetric strategy data.
 
 The line-measurement fields are bundled as transport-covariant wrappers:
@@ -367,6 +410,103 @@ noncomputable def diagonalLineAnswerFamily
     postprocess
       ((strategy.diagonalMeasurement ℓ).toSubMeas)
       (· zeroCoord)
+
+namespace AnswerSymStrat
+
+/-- Sampled point answers in the axis-parallel lines test for an answer-valued
+symmetric strategy. -/
+noncomputable def axisParallelPointAnswerFamily
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : AnswerSymStrat params ι) :
+    IdxSubMeas (AxisParallelTestSample params) (Fq params) ι :=
+  fun s => (strategy.pointMeasurement s.1).toSubMeas
+
+/-- Sampled line answers in the axis-parallel lines test for an answer-valued
+symmetric strategy, evaluated at the base point. -/
+noncomputable def axisParallelLineAnswerFamily
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : AnswerSymStrat params ι) :
+    IdxSubMeas (AxisParallelTestSample params) (Fq params) ι :=
+  fun s =>
+    let ℓ : AxisParallelLine params :=
+      { base := s.1, direction := s.2 }
+    postprocess
+      ((strategy.axisParallelMeasurement ℓ).toSubMeas)
+      (· zeroCoord)
+
+/-- Sampled point answers in the restricted diagonal test for an answer-valued
+symmetric strategy. -/
+noncomputable def diagonalPointAnswerFamily
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : AnswerSymStrat params ι)
+    (j : Fin params.m) :
+    IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ι :=
+  fun s => (strategy.pointMeasurement s.1).toSubMeas
+
+/-- Sampled diagonal-line answers in the restricted diagonal test for an
+answer-valued symmetric strategy, evaluated at the base point. -/
+noncomputable def diagonalLineAnswerFamily
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : AnswerSymStrat params ι)
+    (j : Fin params.m) :
+    IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ι :=
+  fun s =>
+    let v := extendRestrictedDirection j s.2
+    let ℓ : DiagonalLine params :=
+      { base := s.1, direction := v }
+    postprocess
+      ((strategy.diagonalMeasurement ℓ).toSubMeas)
+      (· zeroCoord)
+
+/-- Axis-parallel failure surrogate for an answer-valued symmetric strategy. -/
+noncomputable def axisParallelFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : AnswerSymStrat params ι) : Error :=
+  bipartiteConsError strategy.state
+    (uniformDistribution (AxisParallelTestSample params))
+    (axisParallelPointAnswerFamily strategy)
+    (axisParallelLineAnswerFamily strategy)
+
+/-- Self-consistency failure surrogate for an answer-valued symmetric strategy. -/
+noncomputable def selfConsistencyFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : AnswerSymStrat params ι) : Error :=
+  bipartiteSSCError strategy.state
+    (uniformDistribution (Point params))
+    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+
+/-- Diagonal-line failure surrogate for an answer-valued symmetric strategy. -/
+noncomputable def diagonalFailureProbability
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : AnswerSymStrat params ι) : Error :=
+  (1 / (params.m : Error)) *
+    ∑ j : Fin params.m,
+      bipartiteConsError strategy.state
+        (uniformDistribution (RestrictedDiagonalSample params j))
+        (diagonalPointAnswerFamily strategy j)
+        (diagonalLineAnswerFamily strategy j)
+
+/-- Goodness data for an answer-valued symmetric strategy. -/
+structure IsGood {params : Parameters}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [FieldModel params.q]
+    (strategy : AnswerSymStrat params ι)
+    (eps delta gamma : Error) : Prop where
+  /-- The axis-parallel test fails with probability at most `eps`. -/
+  axisParallelTest : strategy.axisParallelFailureProbability ≤ eps
+  /-- The self-consistency test fails with probability at most `delta`. -/
+  selfConsistencyTest : strategy.selfConsistencyFailureProbability ≤ delta
+  /-- The diagonal-line test fails with probability at most `gamma`. -/
+  diagonalLineTest : strategy.diagonalFailureProbability ≤ gamma
+
+end AnswerSymStrat
 
 /-- Paper-local (not necessarily symmetric) projective strategy data.
 
