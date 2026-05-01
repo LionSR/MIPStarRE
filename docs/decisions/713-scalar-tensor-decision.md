@@ -91,16 +91,15 @@ arguments, and then moves back.
 `eq:gcomterms` expansion.  The tensor machinery is kept out of the downstream
 scalar API, so maintainers of downstream theorems see only scalar inequalities.
 The extra `2√ζ` overhead from the scalar/tensor bridges is bounded by the
-existing
-error parameters (a constant-factor change in `ζ` does not affect the asymptotic
-soundness cascade).
+existing error parameters; a constant-factor change in `ζ` does not affect the
+asymptotic soundness cascade.
 
-**Con**: The internal tensor layer is substantial (~1000 lines in
-`Transport/FullSlice.lean` for collision marginalization alone, plus ~700 lines
-in `Main/Auxiliary.lean` for the bridge chain).  A contributor reading only the
-public lemmas may be surprised that the proof pays an extra `2√ζ` beyond what the
+**Con**: The internal tensor layer is substantial: it includes the
+`Transport/FullSlice/` module family for collision marginalization and the
+bridge chain in `Main/Auxiliary.lean`.  A contributor reading only the public
+lemmas may be surprised that the proof pays an extra `2√ζ` beyond what the
 paper's inline computation suggests; the overhead breakdown is given in the
-"Architecture Map: Scalar↔Tensor Bridge Chain" section above.
+"Architecture Map: Scalar↔Tensor Bridge Chain" section below.
 
 ## Decision
 
@@ -113,10 +112,10 @@ of the downstream scalar API.
 
 | Quantity | Lean Declaration | Location | Paper Anchor |
 |---|---|---|---|
-| Full-slice ABA scalar average | `fullSliceABAAvg` | `Transport/FullSlice.lean` | `eq:gcomterms` first term |
-| Full-slice ABAB scalar average | `fullSliceABABAvg` | `Transport/FullSlice.lean` | `eq:gcomterms` second term |
-| Evaluated-slice ABA scalar average | `evaluatedSliceABAAvg` | `Transport/FullSlice.lean` | evaluated analogue |
-| Evaluated-slice ABAB scalar average | `evaluatedSliceABABAvg` | `Transport/FullSlice.lean` | evaluated analogue |
+| Full-slice ABA scalar average | `fullSliceABAAvg` | `Transport/FullSlice/Averages.lean` | `eq:gcomterms` first term |
+| Full-slice ABAB scalar average | `fullSliceABABAvg` | `Transport/FullSlice/Averages.lean` | `eq:gcomterms` second term |
+| Evaluated-slice ABA scalar average | `evaluatedSliceABAAvg` | `Transport/FullSlice/Averages.lean` | evaluated analogue |
+| Evaluated-slice ABAB scalar average | `evaluatedSliceABABAvg` | `Transport/FullSlice/Averages.lean` | evaluated analogue |
 | First-term scalar transport | `fullSlice_scalar_marginalize_x` | `Main/Auxiliary.lean` | paper lines 295–305 |
 | Second-term scalar transport | `fullSlice_scalar_marginalize_y` | `Main/Auxiliary.lean` | paper lines 332–401 |
 
@@ -124,16 +123,16 @@ of the downstream scalar API.
 
 | Quantity | Lean Declaration | Location | Paper Anchor |
 |---|---|---|---|
-| Full BAB⊗A tensor average | `fullSliceBABAtensorAvg` (private) | `Transport/FullSlice.lean` | `eq:gcom4` RHS |
-| Full ABA⊗B tensor average | `fullSliceABABtensorAvg` (private) | `Transport/FullSlice.lean` | paper line 387 |
-| X-eval BAB⊗A tensor avg | `xEvaluatedSliceBABAtensorAvg` | `Transport/FullSlice.lean` | line 359 bridge |
-| X-eval ABA⊗B tensor avg | `xEvaluatedFullSliceABABtensorAvg` | `Transport/FullSlice.lean` | line 360 bridge |
-| Eval ABA⊗B tensor avg | `evaluatedSliceABABtensorAvg` | `Transport/FullSlice.lean` | `eq:evaluate-gcom...-dos` |
+| Full BAB⊗A tensor average | `fullSliceBABAtensorAvg` | `Transport/FullSlice/Averages.lean` | `eq:gcom4` RHS |
+| Full ABA⊗B tensor average | `fullSliceABABtensorAvg` | `Transport/FullSlice/Averages.lean` | paper line 387 |
+| X-eval BAB⊗A tensor avg | `xEvaluatedSliceBABAtensorAvg` | `Transport/FullSlice/Averages.lean` | line 359 bridge |
+| X-eval ABAB scalar bridge endpoint | `xEvaluatedFullSliceABABAvg` | `Transport/FullSlice/Averages.lean` | line 359 bridge |
+| X-eval ABA⊗B tensor avg | `xEvaluatedFullSliceABABtensorAvg` | `Transport/FullSlice/Averages.lean` | line 360 bridge |
+| Eval ABA⊗B tensor avg | `evaluatedSliceABABtensorAvg` | `Transport/FullSlice/Averages.lean` | `eq:evaluate-gcom...-dos` |
 
-Only the two full-slice tensor averages are private declarations.  The evaluated
-tensor averages are public helper declarations because later bridge lemmas refer
-to them, but they are internal bridge infrastructure rather than stable public
-endpoints.
+The tensor averages in this table are internal-by-convention: they are not part
+of the documented scalar public API, even where the module boundary does not
+enforce this with `private` declarations.
 
 ## Architecture Map: Scalar↔Tensor Bridge Chain
 
@@ -162,8 +161,8 @@ cubic endpoints are compared to a common `G ⊗ G` switch-sandwich center, costi
 
 2. **New lemmas that need operator-level PSD arguments** (Schwartz–Zippel,
    `closenessOfIP`) should add private or internal-use tensor intermediate
-   definitions in `Transport/FullSlice.lean` and connect them to the public
-   scalar API via bridge lemmas with explicit `√ζ` error terms.
+   definitions in `Transport/FullSlice/Averages.lean` and connect them to the
+   public scalar API via bridge lemmas with explicit `√ζ` error terms.
 
 3. **The extra `2√ζ` overhead** in the second-term transport (`4√ζ` total, rather
    than the paper's `2√ζ`) is a consequence of this architecture.
@@ -177,7 +176,9 @@ cubic endpoints are compared to a common `G ⊗ G` switch-sandwich center, costi
 ## Cross-References
 
 - Paper: `references/ldt-paper/commutativity-G.tex`, lines 332–401
-- Source: `MIPStarRE/LDT/Commutativity/Transport/FullSlice.lean`
+- Paper-gap note: `docs/paper-gaps/issue-713-scalar-tensor-decision.tex`
+- Source: `MIPStarRE/LDT/Commutativity/Transport/FullSlice/Averages.lean`
+- Source: `MIPStarRE/LDT/Commutativity/Transport/FullSlice.lean` (barrel)
 - Source: `MIPStarRE/LDT/Commutativity/Main/Auxiliary.lean`
 - Source: `MIPStarRE/LDT/Commutativity/Main/EvaluatedQuestions.lean`
 - Source: `MIPStarRE/LDT/Commutativity/Main/Results.lean` (`comMain`)
