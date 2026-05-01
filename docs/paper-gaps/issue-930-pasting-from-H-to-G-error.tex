@@ -1,0 +1,128 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\setlength{\emergencystretch}{2em}
+
+\input{command}
+
+\title{The Accumulated Error in the Pasting From-\texorpdfstring{$H$}{H}-to-\texorpdfstring{$G$}{G} Lemma}
+\author{}
+\date{2026-05-01}
+
+\begin{document}
+\maketitle
+
+\section{The assertion}
+
+This note concerns the from-$H$-to-$G$ lemma in the pasting section of
+\cite{Ji2020LowIndividualDegree}.%
+\footnote{Tracked as part of the discrepancy audit in \ghissue{930}. In the
+TeX source consulted here, the statement of the lemma is in
+\path{references/ldt-paper/ld-pasting.tex}, lines~1294--1308, and the relevant
+error calculation is in lines~1370--1376.}
+Throughout this note, $k$ is the number of pasting, or sampling, stages;
+$m$ is the number of variables in each slice; $d$ is the individual-degree
+bound; and $q$ is the field size. The scalars $\gamma$ and $\zeta$ are,
+respectively, the consistency and self-consistency errors carried by the
+surrounding induction. The operator $G$ is the average slice submeasurement, and
+$I-G$ is its complement in the Bernoulli polynomial that is compared with the
+all-outcomes expansion. The symbol $\widehat H$ denotes the sandwiched
+completed-slice product summed over all completed outcomes. Finally, $\nu_4$ is
+the commutation error of \path{lem:commute-g-half-sandwich}, and $\nu_8$ is the
+from-$H$-to-$G$ error parameter in the lemma under discussion.
+
+The lemma compares the all-outcomes expansion of the pasted submeasurement with
+a Bernoulli polynomial in $G$ and $I-G$. It states
+\[
+  \nu_8
+  = 46km(\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}).
+  \tag{\path{lem:from-H-to-G}}
+\]
+The proof first proves an adjacent-stage estimate with error
+$2\sqrt{2\zeta}+2\sqrt{\nu_4}$.  Here $\nu_4$ is the commutation error from the
+preceding half-sandwich lemma:
+\[
+  \nu_4
+  =426k^2m(\gamma^{1/16}+\zeta^{1/16}+(d/q)^{1/16}).
+\]
+It then applies the adjacent estimate for $k$ stages.
+
+\section{The arithmetic}
+
+The accumulated adjacent-stage error is
+\[
+  k(2\sqrt{2\zeta}+2\sqrt{\nu_4}).
+\]
+Substituting the displayed value of $\nu_4$ gives
+\[
+\begin{aligned}
+  k(2\sqrt{2\zeta}+2\sqrt{\nu_4})
+  &= 2k\sqrt{2\zeta}
+     +2k\sqrt{426k^2m
+       (\gamma^{1/16}+\zeta^{1/16}+(d/q)^{1/16})} \\
+  &\le 4k\zeta^{1/32}
+     +42k^2m(\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}) \\
+  &\le 46k^2m(\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}),
+\end{aligned}
+\]
+where we use the explicit assumptions
+\[
+  0 \le \gamma,\zeta,d/q \le 1
+  \qquad\text{and}\qquad
+  k \ge 1,\quad m \ge 1.
+\]
+The bounds $\gamma,\zeta,d/q \le 1$ allow the square-root powers to be
+weakened to $1/32$-powers, and $k,m\ge 1$ allow the first term to be absorbed
+into the final $46k^2m(\cdots)$ bound. The second term is quadratic in $k$,
+because the factor $k$ from the telescope multiplies the $k$ already present
+in $\sqrt{\nu_4}$. The displayed calculation in the paper drops this outer
+factor from the commutation term.
+
+Thus the statement proved by the displayed telescope has the corrected error
+\[
+  \nu_8'
+  = 46k^2m(\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}).
+\]
+This correction does not affect the final pasting theorem: the surrounding
+completeness argument absorbs the from-$H$-to-$G$ loss together with the
+all-outcomes loss into
+\[
+  \nu
+  =100k^2m\bigl(\eps^{1/32}+\delta^{1/32}+\gamma^{1/32}
+      +\zeta^{1/32}+(d/q)^{1/32}\bigr).
+\]
+The corrected $\nu_8'$ has the same quadratic dependence on $k$ as this
+final parameter.
+
+\section{The formal and blueprint statements}
+
+The blueprint records the corrected quadratic error in the from-$H$-to-$G$
+lemma and explicitly notes the arithmetic correction.%
+\footnote{See \path{blueprint/src/chapter/ch09_pasting.tex}, lines~1037--1100.}
+The formal development uses the same corrected quantity.%
+\footnote{The corrected error is \leanid{MIPStarRE.LDT.Pasting.fromHToGError}
+in \doclink{MIPStarRE/LDT/Pasting/Statements.lean}, lines~113--124 of the
+source file. The public lemma \leanid{MIPStarRE.LDT.Pasting.fromHToG} proves
+the scalar comparison with this error in
+\doclink{MIPStarRE/LDT/Pasting/Bernoulli/FromHToG.lean}. The absorption into
+$\nu$ is carried by the final completeness proof in
+\doclink{MIPStarRE/LDT/Pasting/Bernoulli/Final.lean}.}
+It separates the literal telescoped error from the displayed bound: the
+telescope contributes $k$ adjacent-stage losses, and the final comparison
+bounds that telescope by the quadratic $\nu_8'$.
+
+\section{Conclusion}
+
+The discrepancy is a harmless intermediate arithmetic correction. The
+linear-in-$k$ value of $\nu_8$ stated in the paper does not follow from the
+preceding adjacent-stage estimate, because the commutation error $\nu_4$
+already contains $k^2$. The corrected bound is quadratic in $k$. Since the
+main pasting theorem already uses a quadratic-in-$k$ error parameter with
+sufficient slack, the final theorem and the formal statement remain aligned.
+
+\bibliographystyle{alpha}
+\bibliography{references}
+
+\end{document}
