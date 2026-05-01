@@ -477,7 +477,14 @@ structure MainFormalSuccessorRecursiveSliceData (params : Parameters)
     (sliceStrategy x).pointMeasurementA =
     (MainInductionStep.xRestrictedStrategy params
       strategy.strategySymmetrization x).pointMeasurement
-  /-- Each slice strategy passes LDT with the common symmetrized error `3 * eps`. -/
+  /-- Each slice strategy passes LDT with the common symmetrized error `3 * eps`.
+
+  Note: this structure constrains only `state` and `pointMeasurementA` of
+  `sliceStrategy x` (Bob's measurement, axis-parallel/diagonal data, and the
+  symmetry witnesses are unconstrained).  A downstream wiring of this bridge
+  into the live `mainFormal` `sorry` will need additional compatibility
+  fields before `slicePasses` becomes load-bearing for a recursive
+  `mainFormal` call. -/
   slicePasses : ∀ x, (sliceStrategy x).PassesLowIndividualDegreeTest (3 * eps)
 
 /-- Convert per-slice induction-hypothesis data into a
@@ -502,12 +509,12 @@ theorem mainFormalSuccessorRecursiveSlices_ofSliceData
     (haxisWeightedBound : MainFormalSuccessorAxisWeightedBound params strategy eps)
     (hdiagonalWeightedBound :
       MainFormalSuccessorDiagonalWeightedBound params strategy eps)
-    (slicedata : MainFormalSuccessorRecursiveSliceData params strategy eps hpass)
+    (sliceData : MainFormalSuccessorRecursiveSliceData params strategy eps hpass)
     (hrecSlice : ∀ (x : Fq params),
       ∃ error : Error, ∃ G : Measurement (Polynomial params) (Role × ι),
-        ConsRel (slicedata.sliceStrategy x).state
+        ConsRel (sliceData.sliceStrategy x).state
           (uniformDistribution (Point params))
-          (IdxProjMeas.toIdxSubMeas (slicedata.sliceStrategy x).pointMeasurementA)
+          (IdxProjMeas.toIdxSubMeas (sliceData.sliceStrategy x).pointMeasurementA)
           (polynomialEvaluationFamily params G.toSubMeas)
           error ∧
         error ≤
@@ -524,7 +531,7 @@ theorem mainFormalSuccessorRecursiveSlices_ofSliceData
   rcases hrecSlice x with ⟨error, G, hG, herr⟩
   refine ⟨error, G, ?_, herr⟩
   -- Rewrite the state and point measurement using the slice-data compatibilities
-  simpa [slicedata.sliceState_eq x, slicedata.slicePoint_eq x] using hG
+  simpa [sliceData.sliceState_eq x, sliceData.slicePoint_eq x] using hG
 /-- Build the successor boundary from bridge inputs instead of the
 already-packaged self-improvement producer.
 
