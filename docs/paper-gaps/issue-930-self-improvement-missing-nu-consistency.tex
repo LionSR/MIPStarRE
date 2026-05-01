@@ -1,0 +1,113 @@
+\documentclass{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\setlength{\emergencystretch}{2em}
+
+\input{command}
+
+\title{Missing $\nu$-consistency hypothesis in self-improvement theorem}
+\author{}
+\date{2026-05-01}
+
+\begin{document}
+\maketitle
+
+\section{The paper statement}
+
+Theorem~\emph{Self-improvement} (both the standalone version in
+\texttt{self\_improvement.tex} and the induction-section version in
+\texttt{inductive\_step.tex}) assumes the following hypothesis on the
+input measurement $G \in \polymeas{m}{q}{d}$:
+\begin{enumerate}
+  \item (Consistency with~$A$): On average over $\bu \sim \F_q^m$,
+  \begin{equation*}
+    A_a^{\bu} \ot I \simeq_\nu  I \ot G_{[g(\bu)=a]}.
+  \end{equation*}
+\end{enumerate}
+Under this hypothesis the paper proves completeness
+$\bra{\psi} H \ot I \ket{\psi} \ge (1-\nu)-\zeta$, point
+consistency at~$\zeta$, strong self-consistency at~$\zeta$, and the
+boundedness estimate $\bra{\psi} Z \ot (I-H) \ket{\psi} \le
+\zeta$, where
+$\zeta = 3000 m (\eps^{1/32} + \delta^{1/32} + (d/q)^{1/32})$.
+For the non-projective helper lemma the error is
+$\widehat\zeta = 100 m (\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2})$.
+
+\section{The Lean formalization}
+
+The Lean theorem
+\leanid{MIPStarRE.LDT.SelfImprovement.selfImprovement}
+(\path{SelfImprovement/Theorems/Results.lean}, lines~172--262) does \emph{not}
+include the $\simeq_\nu$ consistency hypothesis. Instead it takes three
+explicit bridge-input hypotheses:
+\begin{itemize}
+  \item \leanid{hhelperStrongSelfConsistency}~:
+    \leanid{HelperStrongSelfConsistencyInput}
+  \item \leanid{horthonormalization}~:
+    \leanid{OrthonormalizationInput}
+  \item \leanid{hfinalFields}~:
+    \leanid{FinalFieldsInput params strategy eps delta nu}
+\end{itemize}
+The parameter \leanid{nu} appears in the conclusion
+(\leanid{completeness} at level \leanid{(1 - nu) - selfImprovementError})
+but is nowhere constrained by a hypothesis linking it to the input
+measurement~\leanid{G}. Moreover \leanid{G} is passed to
+\leanid{selfImprovementHelper} as an explicit unused argument
+(\texttt{\_G}).
+
+The induction-section wrapper
+\leanid{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection}
+(\path{MainInductionStep/Theorems.lean}, lines~66--155) \emph{does} list the
+$\simeq_\nu$ hypothesis as the parameter \texttt{\_hcons}, but the proof
+immediately delegates to \leanid{SelfImprovement.selfImprovementFromSubMeas},
+which ignores it. The hypothesis is therefore an unused vestigial parameter
+in the induction-section wrapper as well.
+
+\section{Why this matters}
+
+The paper's proof of the four self-improvement conclusions chains through
+$G$'s $\nu$-consistency with~$A$; without this hypothesis the
+completeness bound $(1-\nu)-\zeta$ is logically correct but vacuous
+(one may choose $\nu = 1$). The bridge-input system
+(\leanid{SelfImprovementBridgeInputs}, \leanid{HelperStrongSelfConsistencyInput},
+\leanid{FinalFieldsInput}) is an explicit documented workaround that
+packages the missing proof obligations, but it does \emph{not} restore
+the paper's $\simeq_\nu$ hypothesis to the statement of the Lean
+\leanid{selfImprovement} theorem.
+
+\section{Blueprint status}
+
+The blueprint entry for Theorem~\emph{Self-improvement}
+(\path{ch07\_self\_improvement.tex}, lines~490--495) lists four Lean
+declarations---\leanid{selfImprovement},
+\leanid{SelfImprovementBridgeInputs},
+\leanid{selfImprovementFromBridgeInputs}, and
+\leanid{selfImprovementFromBridgeInputsSubMeas}---and marks them
+\leanid{\textbackslash leanok}. While all four declarations compile without
+\leanid{sorry}, the paper statement and the Lean statement differ in
+their hypotheses. This gap is tracked by \ghissue{931} (self-improvement
+input producers).
+
+\section{Error coefficients}
+
+All error constants match the paper when the bridge inputs are
+discharged:
+\begin{itemize}
+  \item \leanid{selfImprovementHelperError}~$= 100 m (\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2})$ --- matches $\widehat\zeta$;
+  \item \leanid{selfImprovementOrthogonalizationError} delegates to \leanid{orthonormalizationError} --- the paper uses $100 \widehat\zeta^{\,1/4}$;
+  \item \leanid{selfImprovementDataProcessingError}~$= 8 \widehat\zeta + 8 \sqrt{\widehat\zeta_{\text{ortho}}}$ --- matches the paper;
+  \item \leanid{selfImprovementError}~$= 3000 m (\eps^{1/32} + \delta^{1/32} + (d/q)^{1/32})$ --- matches the paper's $\zeta$.
+\end{itemize}
+
+\section{Classification}
+
+This is a \textbf{documented structural gap}: the discrepancy between
+the paper statement and the Lean statement is explicitly surfaced by
+the bridge-input system and tracked by~\ghissue{931}, but the
+\leanid{\textbackslash leanok} annotation on the blueprint node
+could mislead a reader into thinking the full paper theorem is
+formalized without additional hypotheses.
+
+\end{document}
