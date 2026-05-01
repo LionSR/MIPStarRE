@@ -196,11 +196,19 @@ as a matrix indexed by `Point params` directly. -/
 noncomputable def laplacian (params : Parameters) : MIPStarRE.Quantum.Op (Point params) :=
   matrixLaplacianOperator params
 
-/-- The edge-difference form of the Laplacian from `prop:laplacian-rewrite`.
-Definitionally equal to `laplacian` since both represent `(1/M)I - K`. -/
+/-- The edge-difference form of the Laplacian from `prop:laplacian-rewrite`:
+`L = (1/2) · 𝔼_{(u,v)∼C} (|u⟩-|v⟩)(⟨u|-⟨v|)`.
+
+Defined entrywise via the `rerandomizeCoordWeight` distribution on ordered
+vertex pairs.  The equality with `laplacian` is proved in
+`MIPStarRE.LDT.ExpansionHypercubeGraph.laplacian_eq_edgeDifferenceForm`. -/
 noncomputable def laplacianDifferenceForm (params : Parameters) :
     MIPStarRE.Quantum.Op (Point params) :=
-  laplacian params
+  fun a b => (1/2 : ℂ) *
+    ∑ uv : Point params × Point params,
+      ((rerandomizeCoordWeight params uv.1 uv.2 : ℂ)) *
+        (((if a = uv.1 then (1 : ℂ) else 0) - (if a = uv.2 then (1 : ℂ) else 0)) *
+         ((if uv.1 = b then (1 : ℂ) else 0) - (if uv.2 = b then (1 : ℂ) else 0)))
 
 /-- The squared difference operator `(A^u - A^v)ᴴ(A^u - A^v)`. -/
 noncomputable def pointDifferenceSquaredOperator {params : Parameters}
