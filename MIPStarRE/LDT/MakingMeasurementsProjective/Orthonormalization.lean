@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.Tactic.LdtSimp
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 import MIPStarRE.LDT.Basic.MeasurementLift
 import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
@@ -77,8 +78,7 @@ private lemma optionCompletion_bipartiteSSCRel {Outcome : Type*}
         (constSubMeasFamily A))
       hssc.overlapBound
   have horig_q : qBipartiteSSCDefect ψ A ≤ ζ := by
-    simpa [bipartiteSSCError, avgOver, uniformDistribution, constSubMeasFamily]
-      using hssc.overlapBound
+    simpa [ldt_simp] using hssc.overlapBound
   have horig_gap :
       ev ψ (leftTensor (ι₂ := ι) A.total) - qBipartiteMatchMass ψ A A ≤ ζ :=
     le_trans (le_max_right 0 _) horig_q
@@ -721,7 +721,7 @@ theorem orthonormalization {Outcome : Type*}
     have hPq :
         qSDD ψ Ahat.toSubMeas.liftLeft P.toSubMeas.liftLeft ≤
           orthonormalizationMainLemmaError (2 * ζ) := by
-      simpa [sddError, avgOver, uniformDistribution, constSubMeasFamily] using
+      simpa [ldt_simp] using
         hP.squaredDistanceBound
     let Psome : ProjSubMeas Outcome ι := restrictSomeProjSubMeas P
     have hPsomeq :

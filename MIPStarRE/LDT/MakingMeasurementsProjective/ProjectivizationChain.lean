@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.Tactic.LdtSimp
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
 import MIPStarRE.LDT.Preliminaries.Completion
 import MIPStarRE.LDT.Preliminaries.CompletionTransfer
@@ -261,7 +262,7 @@ theorem line156Approx {Outcome : Type*} {ι : Type*}
   let GRight : IdxMeas Unit Outcome ι := fun _ => G_B
   have hpreMeas : ConsRel ψ (uniformDistribution Unit)
       (IdxMeas.toIdxSubMeas GLeft) (IdxMeas.toIdxSubMeas GRight) ζ₁ := by
-    simpa [GLeft, GRight, constSubMeasFamily, IdxMeas.toIdxSubMeas] using
+    simpa [GLeft, GRight, ldt_simp] using
       handoff.preProjectiveConsistency
   have hGBip :=
     MIPStarRE.LDT.Preliminaries.simeqToApprox ψ (uniformDistribution Unit)
@@ -271,8 +272,7 @@ theorem line156Approx {Outcome : Type*} {ι : Type*}
       (constSubMeasFamily G_B.toSubMeas.liftRight)
       (2 * ζ₁) := by
     constructor
-    simpa [GLeft, GRight, constSubMeasFamily, IdxMeas.toIdxSubMeas,
-      IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using
+    simpa [GLeft, GRight, ldt_simp] using
       hGBip.leftRightSquaredDistanceBound
   have hleftSymm : SDDRel ψ (uniformDistribution Unit)
       (constSubMeasFamily Q_A.toSubMeas.liftLeft)
