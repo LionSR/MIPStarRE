@@ -284,7 +284,7 @@ class CollectLeanDeclsTests(unittest.TestCase):
                     def stringLineCommentToken : String := "--"
                     def interpolatedStringToken : String := s!"{"/-"}"
                     def afterInterpolatedStringToken : Nat := 2
-                    def escapedNestedInterpolatedStringToken : String := s!"{\"/-\"}"
+                    def escapedNestedInterpolatedStringToken : String := s!"{\\\"/-\\\"}"
                     def afterEscapedNestedInterpolatedStringToken : Nat := 3
                     def messageInterpolatedStringToken : MessageData := m!"{"/-"}"
                     def afterMessageInterpolatedStringToken : Nat := 4
