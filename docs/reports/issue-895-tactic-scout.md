@@ -313,12 +313,13 @@ tensor placements:
 
 ### Existing APIs to reuse
 
-Lean/Mathlib supports custom simp sets through `register_simp_attr`; Mathlib's
-own registration file is `.lake/packages/mathlib/Mathlib/Tactic/Attr/Register.lean`.
-There is a gotcha documented in `.lake/packages/mathlib/Mathlib/Tactic/Attr/Core.lean:13`:
-a newly registered simp attribute cannot be used in the same file in which it is
-registered.  If this project adds `ldt_simp`, define the attribute in one small
-module and attach lemmas in downstream modules.
+Lean/Mathlib supports custom simp sets through `register_simp_attr`; the
+upstream Mathlib registration file is `Mathlib/Tactic/Attr/Register.lean`
+(module `Mathlib.Tactic.Attr.Register`).  There is a gotcha documented in
+`Mathlib/Tactic/Attr/Core.lean:13`: a newly registered simp attribute cannot be
+used in the same file in which it is registered.  If this project adds
+`ldt_simp`, define the attribute in one small module and attach lemmas in
+downstream modules.
 
 ### Proposed tooling
 
