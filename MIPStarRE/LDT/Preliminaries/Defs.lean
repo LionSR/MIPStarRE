@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Test.Defs
+import MIPStarRE.LDT.Tactic.QuantumNonneg
 
 /-!
 # Preliminary definition packages
@@ -81,10 +82,7 @@ noncomputable def diagonalSandwichFamily {Question Outcome : Type*}
     outcome_pos := by
       intro a
       rw [leftTensor_mul_rightTensor_eq_opTensor]
-      exact
-        (Matrix.PosSemidef.kronecker
-          (Matrix.nonneg_iff_posSemidef.mp ((A q).outcome_pos a))
-          (Matrix.nonneg_iff_posSemidef.mp ((B q).outcome_pos a))).nonneg
+      quantum_nonneg
     sum_eq_total := by
       rfl
     total_le_one := by
@@ -160,10 +158,7 @@ noncomputable def totalSandwichFamily {Question Outcome : Type*}
     outcome_pos := by
       intro a
       rw [leftTensor_mul_rightTensor_eq_opTensor]
-      exact
-        (Matrix.PosSemidef.kronecker
-          (Matrix.nonneg_iff_posSemidef.mp (SubMeas.total_nonneg (A q)))
-          (Matrix.nonneg_iff_posSemidef.mp ((B q).outcome_pos a))).nonneg
+      quantum_nonneg
     sum_eq_total := by
       rfl
     total_le_one := by
