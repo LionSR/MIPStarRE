@@ -296,6 +296,9 @@ private lemma ldGbcon_axis_last_direction_consistency
       _ ≤ (params.next.m : Error) * eps := by
             exact mul_le_mul_of_nonneg_left haxis (by positivity)
 
+/-- `lem:point-vertical-line-sdd`.
+A good strategy induces a state-dependent distance bound between the point
+measurements and the vertical-line (axis-parallel rebased) measurements. -/
 theorem pointVerticalLineSdd
     (params : Parameters)
     [FieldModel params.q]
@@ -896,6 +899,8 @@ lemma looksEasyButTookMeAWhile
           _ = 2 * Real.rpow (lambda ^ (d + 1) * (1 - lambda)) e := by
             rw [← hmul_rpow]
 
+/-- A unit-valued `postprocess` has the same outcome as the total of the underlying
+submeasurement. -/
 lemma postprocess_unit_outcome_eq_total
     {Outcome : Type*} [Fintype Outcome]
     (A : SubMeas Outcome ι) :
@@ -904,7 +909,7 @@ lemma postprocess_unit_outcome_eq_total
   rw [← (postprocess A (fun _ => ())).sum_eq_total]
   simp
 
-/-- `lem:g-complete-self-consistency`. -/
+/-- `lem:q-sdd-complete-part-slice-bound`. -/
 lemma qSDD_completePart_le_slice
     (params : Parameters)
     [FieldModel params.q]
@@ -1064,9 +1069,6 @@ lemma qSDD_completePart_le_slice
       _ = ev ψbi (leftTensor (ι₂ := ι) T) + ev ψbi (rightTensor (ι₁ := ι) T) -
             2 * ∑ g : Polynomial params, ev ψbi (opTensor (P.outcome g) (P.outcome g)) := by
               rw [← Finset.mul_sum]
-      _ = ev ψbi (leftTensor (ι₂ := ι) T) + ev ψbi (rightTensor (ι₁ := ι) T) -
-            2 * ∑ g : Polynomial params, ev ψbi (opTensor (P.outcome g) (P.outcome g)) := by
-              rfl
   have hmatch :
       ∑ g : Polynomial params, ev ψbi (opTensor (P.outcome g) (P.outcome g)) ≤
         ev ψbi (opTensor T T) := by
@@ -1077,6 +1079,9 @@ lemma qSDD_completePart_le_slice
   rw [hcomplete, horig]
   nlinarith
 
+/-- `lem:g-complete-self-consistency`.
+This is exactly the slice strong self-consistency hypothesis, repackaged under
+the Section 12 statement name. -/
 lemma gCompleteSelfConsistency
     (params : Parameters)
     [FieldModel params.q]
@@ -1086,12 +1091,6 @@ lemma gCompleteSelfConsistency
     (_hperm : PermInvState ψbi)
     (hself : family.StronglySelfConsistent ψbi zeta) :
     GCompleteSelfConsistencyStatement params ψbi family zeta := by
-  /-
-  Paper reference: `lem:g-complete-self-consistency` in
-  `references/ldt-paper/ld-pasting.tex`.
-  This is exactly the slice strong self-consistency hypothesis, repackaged under
-  the Section 12 statement name.
-  -/
   exact ⟨hself.sliceSelfConsistency⟩
 
 /-- `cor:g-bot-self-consistency`. -/

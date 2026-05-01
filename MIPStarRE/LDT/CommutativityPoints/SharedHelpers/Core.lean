@@ -20,7 +20,9 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 open scoped Matrix MatrixOrder ComplexOrder BigOperators
 /-! ## Shared reindexing and tensor-placement helpers -/
 
-private lemma qSDDOp_symm
+/-- `qSDDOp` is symmetric: swapping the two operator families gives the same
+squared-distance sum. -/
+lemma qSDDOp_symm
     {Outcome : Type*}
     (ψ : QuantumState ι) [Fintype Outcome]
     (A B : OpFamily Outcome ι) :
