@@ -42,13 +42,6 @@ _LEAN_DECL_RE = re.compile(
     re.MULTILINE,
 )
 _TRACKED_REVERSE_DECL_KINDS = {"def", "theorem", "lemma"}
-# Reverse blueprint coverage intentionally warns for public dotted APIs such as
-# ``Role.other`` and ``Parameters.next``.  A dotted declaration name is not, by
-# itself, evidence that the declaration is an implementation helper.  Keep the
-# internal-helper policy explicit and narrow so future public dotted APIs are
-# not silently skipped.
-_REVERSE_BLUEPRINT_INTERNAL_NAME_PREFIXES = ("_private.", "«_private.")
-_REVERSE_BLUEPRINT_INTERNAL_COMPONENT_NAMES = {"_private", "«_private"}
 _DIFF_HUNK_RE = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
 
 _NAMESPACE_OPEN_RE = re.compile(r"^\s*namespace\s+([\w.]+)", re.MULTILINE)
@@ -85,12 +78,6 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
     string_interpolated = False
     in_raw_string = False
     raw_hash_count = 0
-    # Nested string literals inside interpolation are written with escaped
-    # quote delimiters in the surrounding Lean string token, e.g.
-    # ``s!"{\"/-\"}"``.  Track those delimiters separately from ordinary
-    # string escapes so comment markers inside the nested literal stay inert
-    # and the interpolation context is restored at the closing ``}``.
-    string_delimiter_escaped = False
     for line in text.splitlines():
         out: list[str] = []
         # Block comments are Lean whitespace.  Remember where the most recent
@@ -123,26 +110,6 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
                     i += 2
                     continue
 
-                if in_string and string_delimiter_escaped:
-                    if escaped:
-                        out.append(char)
-                        escaped = False
-                        i += 1
-                        continue
-                    if line.startswith("\\\"", i):
-                        out.extend(line[i : i + 2])
-                        in_string = False
-                        string_interpolated = False
-                        string_delimiter_escaped = False
-                        escaped = False
-                        i += 2
-                        continue
-                    out.append(char)
-                    if char == "\\":
-                        escaped = True
-                    i += 1
-                    continue
-
                 # Raw-string terminator: ``"`` followed by exactly
                 # ``raw_hash_count`` ``#`` characters closes the literal.
                 # Any other ``"`` inside a raw string is ordinary content.
@@ -152,7 +119,6 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
                     if raw_hash_count == 0:
                         in_string = False
                         in_raw_string = False
-                        string_delimiter_escaped = False
                     else:
                         count = 0
                         while i < len(line) and line[i] == "#":
@@ -162,7 +128,6 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
                         if count == raw_hash_count:
                             in_string = False
                             in_raw_string = False
-                            string_delimiter_escaped = False
                     continue
 
                 out.append(char)
@@ -179,7 +144,6 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
                 elif in_string and char == '"':
                     in_string = False
                     string_interpolated = False
-                    string_delimiter_escaped = False
                 elif in_char and char == "'":
                     in_char = False
                 i += 1
@@ -194,24 +158,12 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
                     if interpolation_depth == 0:
                         in_string = True
                         string_interpolated = True
-                        string_delimiter_escaped = False
                         escaped = False
                         if interpolation_stack:
                             interpolation_depth = interpolation_stack.pop()
                         else:
                             in_interpolation = False
                 i += 1
-                continue
-
-            if in_interpolation and line.startswith("\\\"", i):
-                out.extend(line[i : i + 2])
-                in_string = True
-                escaped = False
-                string_interpolated = False
-                in_raw_string = False
-                raw_hash_count = 0
-                string_delimiter_escaped = True
-                i += 2
                 continue
 
             if line.startswith("--", i):
@@ -242,13 +194,11 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
                         raw_hash_count = hash_run
                         escaped = False
                         string_interpolated = False
-                        string_delimiter_escaped = False
                         out.append(line[i])
                         i += 1
                         continue
                 in_string = True
                 escaped = False
-                string_delimiter_escaped = False
                 string_interpolated = (
                     len(out) >= 2
                     and out[-1] == "!"
@@ -757,26 +707,6 @@ def _git_diff_changed_lines(root: Path, rel_path: str, diff_base: str, diff_head
     return changed_lines
 
 
-def _is_reverse_blueprint_internal_decl(decl: LeanDecl) -> bool:
-    """Return whether ``decl`` is an explicit internal helper for reverse checks.
-
-    This predicate deliberately does *not* reject every dotted short name:
-    Lean declarations such as ``Role.other`` and ``Parameters.next`` are public
-    dotted APIs and should still produce missing-blueprint warnings.  Only
-    names matching the narrow generated/private-helper prefixes above are
-    suppressed here; ordinary ``private`` declarations are filtered separately
-    via ``LeanDecl.is_private``.
-    """
-
-    for spelling in {decl.fqn, decl.short_name}:
-        if spelling.startswith(_REVERSE_BLUEPRINT_INTERNAL_NAME_PREFIXES):
-            return True
-    return any(
-        part in _REVERSE_BLUEPRINT_INTERNAL_COMPONENT_NAMES
-        for part in decl.short_name.split(".")
-    )
-
-
 def _decl_blueprint_spellings(decl: LeanDecl) -> set[str]:
     names = {decl.fqn}
     if "." in decl.short_name:
@@ -820,8 +750,6 @@ def find_changed_decls_missing_from_blueprint(
             if decl.is_private:
                 continue
             if decl.kind not in _TRACKED_REVERSE_DECL_KINDS:
-                continue
-            if _is_reverse_blueprint_internal_decl(decl):
                 continue
             if not any(decl.line <= line <= decl.end_line for line in changed_lines):
                 continue

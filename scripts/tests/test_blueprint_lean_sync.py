@@ -386,7 +386,6 @@ class CollectLeanDeclsTests(unittest.TestCase):
                     theorem Parameters.next : True := by
                       trivial
                     def _root_.RootPublic : Nat := 3
-                    def _private.generatedHelper : Nat := 2
                     """
                 ).strip()
                 + "\n"
@@ -402,8 +401,10 @@ class CollectLeanDeclsTests(unittest.TestCase):
             )
 
             missing_names = [decl.fqn for decl in missing]
-            self.assertEqual(missing_names, ["Role.other", "Parameters.next", "_root_.RootPublic"])
-            self.assertNotIn("_private.generatedHelper", missing_names)
+            self.assertEqual(
+                missing_names,
+                ["Role.other", "Parameters.next", "_root_.RootPublic"],
+            )
 
 
 class LeanokPlacementReportingTests(unittest.TestCase):
