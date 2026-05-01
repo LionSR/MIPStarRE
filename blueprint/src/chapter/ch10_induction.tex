@@ -383,6 +383,22 @@
 	boundary package.
 \end{definition}
 
+\begin{definition}[Lean base-case Step~6 hypotheses for the Section~3 proof]\label{def:main-formal-step6-hypotheses}
+	\lean{MIPStarRE.LDT.Test.MainFormalStep6Hypotheses, MIPStarRE.LDT.Test.baseStep6WitnessResidual}
+	\leanok
+	\uses{def:main-formal-successor-boundary, thm:orthonormalization}
+	The structure \texttt{MainFormalStep6Hypotheses} bundles the still-unformalized
+	analytic hypotheses needed for the base case ($m=1$) of
+	Theorem~\ref{thm:main-formal}: orthonormalization inputs (spectral truncation
+	and locality-preserving repair witnesses), distinguished completion outcomes,
+	strong self-consistency, and match-mass preservation for the unsymmetrized
+	POVMs.  The assembly theorem \texttt{baseStep6WitnessResidual} turns these
+	hypotheses (together with the checked base-case role residual from
+	\texttt{MainFormalRolePackageResidual.ofBaseCase}) into the Step~6 witness
+	residual consumed by the downstream cascade.
+\end{definition}
+
+
 \begin{proposition}[Lean successor handoff for the Section 3 proof]\label{lem:main-formal-successor-handoff}
 	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorMainInductionPublicWrapper}
 	\leanok
