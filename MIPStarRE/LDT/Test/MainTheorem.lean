@@ -4384,6 +4384,106 @@ noncomputable def toNativeTargets {params : Parameters} [FieldModel params.q]
 
 end MainFormalCascadeTargets
 
+/-! ### Base-case Step 6 bridge inputs
+
+The base case (`m = 1`) still needs the same analytic hypotheses as the
+successor case: spectral truncation, locality-preserving repair,
+strong self-consistency, and match-mass preservation.  This section
+bundles them into a single structure, following the pattern of
+`SelfImprovementBridgeInputs` and `OrthonormalizationInput`.
+When these upstream proofs are completed, `baseCaseStep6WitnessResidual`
+provides the checked assembly theorem that fills the base-case branch
+of `mainFormal`. -/
+
+/-- Bridge inputs packaging the still-external Step 6 data for the
+base case (`m = 1`). -/
+structure MainFormalBaseCaseStep6BridgeInputs
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (scalars : MainFormalCascadeScalars params eps k)
+    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) where
+  /-- Line-130 orthonormalization inputs: spectral-truncation and
+  locality-preserving repair witnesses for both unsymmetrized POVMs. -/
+  orthonormalizationInput :
+    MainFormalPostRolePackageLine130OrthonormalizationInput
+      params strategy eps k scalars (roleResidual.rolePackage scalars)
+  /-- Alice-side distinguished outcome for the completion step. -/
+  a_A : Polynomial params
+  /-- Bob-side distinguished outcome for the completion step. -/
+  a_B : Polynomial params
+  /-- Alice-side strong self-consistency for the unsymmetrized POVM
+  obtained from the role measurement. -/
+  leftSelfConsistency :
+    BipartiteSSCRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily
+        (unsymmetrizedLeftPOVM
+          (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
+      scalars.zeta1
+  /-- Bob-side strong self-consistency for the unsymmetrized POVM
+  obtained from the role measurement. -/
+  rightSelfConsistency :
+    BipartiteSSCRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily
+        (unsymmetrizedRightPOVM
+          (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
+      scalars.zeta1
+  /-- Alice-side match-mass preservation: for each line-130 orthonormalization
+  residual, the projective submeasurement `P_A` preserves match mass against
+  Bob's unsymmetrized POVM. -/
+  leftMatchMassPreservation :
+    ∀ orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
+        params strategy eps k scalars (roleResidual.rolePackage scalars),
+      MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation
+        strategy.state
+        (unsymmetrizedLeftPOVM
+          (roleResidual.rolePackage scalars).roleMeasurement)
+        orthResidual.P_A
+        (unsymmetrizedRightPOVM
+          (roleResidual.rolePackage scalars).roleMeasurement)
+  /-- Bob-side match-mass preservation: for each line-130 orthonormalization
+  residual, the projective submeasurement `P_B` preserves match mass against
+  Alice's unsymmetrized POVM. -/
+  rightMatchMassPreservation :
+    ∀ orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
+        params strategy eps k scalars (roleResidual.rolePackage scalars),
+      MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation
+        strategy.state
+        (unsymmetrizedRightPOVM
+          (roleResidual.rolePackage scalars).roleMeasurement)
+        orthResidual.P_B
+        (unsymmetrizedLeftPOVM
+          (roleResidual.rolePackage scalars).roleMeasurement)
+
+/-- Fill the base-case branch (`m = 1`) of `mainFormal` using the bundled bridge
+inputs.
+
+This theorem extracts the base-case role residual via
+`MainFormalRolePackageResidual.ofBaseCase` and then assembles the
+Step 6 witness residual through
+`MainFormalCascadeRolePackageResidualStep6WitnessResidual.nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs`.
+
+Refs #1009, #422. -/
+theorem baseCaseStep6WitnessResidual
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (_hm1 : params.m = 1)
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
+    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
+    (bridge : MainFormalBaseCaseStep6BridgeInputs params strategy eps k
+      hpass scalars roleResidual) :
+    Nonempty (MainFormalCascadeRolePackageResidualStep6WitnessResidual
+      params strategy eps hpass k scalars) :=
+  MainFormalCascadeRolePackageResidualStep6WitnessResidual.nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs
+    hsmall roleResidual bridge.orthonormalizationInput
+    bridge.a_A bridge.a_B
+    bridge.leftSelfConsistency bridge.rightSelfConsistency
+    bridge.leftMatchMassPreservation bridge.rightMatchMassPreservation
+
 /--
 `thm:main-formal` from `test_definition.tex`.
 
@@ -4515,31 +4615,38 @@ theorem mainFormal
         Nonempty (MainFormalCascadeRolePackageResidualStep6WitnessResidual
           (params := params) (strategy := strategy) (eps := eps)
           (hpass := hpass) (k := k) (scalars := scalars)) := by
-      -- TODO(#931, #834, #422): The `mainFormal` residual composes three inputs
-      -- into a `MainFormalCascadeRolePackageResidualStep6WitnessResidual` via
-      -- `nonempty_ofRoleResidualAndLine130Inputs`:
-      --
-      -- 1. A `MainFormalRolePackageResidual` (Section 6 role package),
-      --    obtainable via `MainFormalRolePackageBranchResidual.toRolePackageResidual`
-      --    from a base (m=1) or successor `MainFormalRolePackageBranchResidual`.
-      --    The successor branch still needs `MainFormalSuccessorRecursiveSlices`
-      --    and `MainFormalSuccessorSelfImprovementProducer`.
-      --
-      -- 2. A `MainFormalPostRolePackageLine130OrthonormalizationInput`:
-      --    spectral-truncation and locality-preserving repair witnesses for
-      --    both unsymmetrized POVMs.
-      --
-      -- 3. Completion inputs for the line-130 residual.  The generic
-      --    `completionProducer` has a checked wrapper:
-      --    `nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs`.
-      --    It needs:
-      --    - `BipartiteSSCRel` for the unsymmetrized POVMs (strong self-consistency),
-      --    - `OrthonormalizationMatchMassPreservation` values for both sides
-      --      (match-mass monotonicity through orthonormalization), and
-      --    - distinguished outcomes `a_A`, `a_B`.
-      --    The wrapper invokes `completingToMeasurement` for the completion
-      --    closeness fields and packages the exact paper `ζ₁` line-169 links.
-      sorry
+      -- Split into base (m = 1) and successor cases.
+      -- * Base case: the role residual is available via `ofBaseCase`;
+      --   the remaining bridge inputs (spectral truncation, repair,
+      --   BipartiteSSCRel, match-mass preservation) are bundled in
+      --   `MainFormalBaseCaseStep6BridgeInputs` (still external).
+      -- * Successor case: needs `MainFormalSuccessorRecursiveSlices`
+      --   and `MainFormalSuccessorSelfImprovementProducer` (external).
+      by_cases hm1 : params.m = 1
+      · -- Base case (m = 1): obtain the role residual from the checked base handoff.
+        rcases MainFormalRolePackageResidual.ofBaseCase params strategy eps k hpass hm1 with
+          ⟨roleResidual⟩
+        -- The bridge inputs below are the remaining analytic hypotheses:
+        --   orthonormalizationInput : spectral-truncation + repair (§5)
+        --   left/rightSelfConsistency : BipartiteSSCRel for unsymmetrized POVMs (§6)
+        --   left/rightMatchMassPreservation : orthonormalization preserves match mass (§5)
+        -- TODO(#422, #1009): provide these inputs (currently external).
+        have hbridge : MainFormalBaseCaseStep6BridgeInputs params strategy eps k
+            hpass scalars roleResidual := by
+          refine
+            { orthonormalizationInput := ?_
+              a_A := ?_
+              a_B := ?_
+              leftSelfConsistency := ?_
+              rightSelfConsistency := ?_
+              leftMatchMassPreservation := ?_
+              rightMatchMassPreservation := ?_ }
+          all_goals { exact sorry }
+        exact baseCaseStep6WitnessResidual hm1 herr roleResidual hbridge
+      · -- Successor case (m > 1): needs recursive slices and self-improvement.
+        -- TODO(#931, #834, #422): construct `MainFormalSuccessorRecursiveSlices`
+        -- and `MainFormalSuccessorSelfImprovementProducer`.
+        sorry
     rcases hstep6WitnessResidual with ⟨step6WitnessResidual⟩
     let rolePackage := step6WitnessResidual.roleResidual.rolePackage scalars
     have hpre : ConsRel strategy.state (uniformDistribution Unit)
