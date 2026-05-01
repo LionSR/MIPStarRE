@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Averages
-import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Normalization
 import MIPStarRE.LDT.Commutativity.Transport.Pullback
 import MIPStarRE.LDT.Commutativity.Scaffold.Products
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Averages

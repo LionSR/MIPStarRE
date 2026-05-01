@@ -24,6 +24,36 @@ open MIPStarRE.LDT.ExpansionHypercubeGraph
 open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
+/-- Pull a finite outcome sum into a uniform average over the product space. -/
+lemma avgOver_sum_eq_card_mul_avgOver_prod
+    {α β : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [Fintype β] [DecidableEq β] [Nonempty β]
+    (f : α → β → Error) :
+    avgOver (uniformDistribution α) (fun a => ∑ b : β, f a b) =
+      (Fintype.card β : Error) *
+        avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2) := by
+  let c : Error := Fintype.card β
+  have hc : c ≠ 0 := by
+    dsimp [c]
+    exact_mod_cast Fintype.card_ne_zero
+  calc
+    avgOver (uniformDistribution α) (fun a => ∑ b : β, f a b)
+      = avgOver (uniformDistribution α)
+          (fun a => c * avgOver (uniformDistribution β) (fun b => f a b)) := by
+            apply avgOver_congr
+            intro a
+            calc
+              ∑ b : β, f a b = c * ((1 / c) * ∑ b : β, f a b) := by
+                  field_simp [hc]
+              _ = c * avgOver (uniformDistribution β) (fun b => f a b) := by
+                  simp [c, avgOver, uniformDistribution, Finset.mul_sum, hc]
+    _ = c * avgOver (uniformDistribution α)
+          (fun a => avgOver (uniformDistribution β) (fun b => f a b)) := by
+            rw [← avgOver_const_mul]
+    _ = c * avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2) := by
+            rw [← avgOver_uniform_prod]
+
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- The zero raw family on the full-slice outcome space. -/
