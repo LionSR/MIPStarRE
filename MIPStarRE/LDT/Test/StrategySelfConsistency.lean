@@ -11,12 +11,12 @@ namespace MIPStarRE.LDT
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-namespace ProjStrat
+namespace SameSpaceProjStrat
 
 private lemma qBipartiteSSCDefect_symmetrizedPoint_eq_qBipartiteConsDefect
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    (strategy : ProjStrat params ι) (u : Point params) :
+    (strategy : SameSpaceProjStrat params ι) (u : Point params) :
     qBipartiteSSCDefect (strategy.classicalRoleSymmStrategy.state)
         (((strategy.classicalRoleSymmStrategy.pointMeasurement u).toSubMeas)) =
       qBipartiteConsDefect strategy.state
@@ -72,7 +72,7 @@ private lemma qBipartiteSSCDefect_symmetrizedPoint_eq_qBipartiteConsDefect
               have hAA :
                   ev (strategy.classicalRoleSymmStrategy.state)
                     (rolePairCond Role.A Role.A (opTensor (MA.outcome a) (MA.outcome a))) = 0 := by
-                      simpa [ProjStrat.classicalRoleSymmStrategy] using
+                      simpa [SameSpaceProjStrat.classicalRoleSymmStrategy] using
                         ev_classicalRoleSymmState_rolePair_AA strategy.state
                           (opTensor (MA.outcome a) (MA.outcome a))
               have hAB :
@@ -80,7 +80,7 @@ private lemma qBipartiteSSCDefect_symmetrizedPoint_eq_qBipartiteConsDefect
                     (rolePairCond Role.A Role.B (opTensor (MA.outcome a) (MB.outcome a))) =
                       (1 / 2 : Error) *
                         ev strategy.state (opTensor (MA.outcome a) (MB.outcome a)) := by
-                      simpa [ProjStrat.classicalRoleSymmStrategy] using
+                      simpa [SameSpaceProjStrat.classicalRoleSymmStrategy] using
                         ev_classicalRoleSymmState_rolePair_AB strategy.state
                           (opTensor (MA.outcome a) (MB.outcome a))
               have hBA :
@@ -92,14 +92,14 @@ private lemma qBipartiteSSCDefect_symmetrizedPoint_eq_qBipartiteConsDefect
                           (rolePairCond Role.B Role.A (opTensor (MB.outcome a) (MA.outcome a))) =
                           (1 / 2 : Error) * ev (swapQuantumState strategy.state)
                             (opTensor (MB.outcome a) (MA.outcome a)) by
-                        simpa [ProjStrat.classicalRoleSymmStrategy] using
+                        simpa [SameSpaceProjStrat.classicalRoleSymmStrategy] using
                           ev_classicalRoleSymmState_rolePair_BA strategy.state
                             (opTensor (MB.outcome a) (MA.outcome a))]
                       rw [ev_swapQuantumState, swapDensity_opTensor]
               have hBB :
                   ev (strategy.classicalRoleSymmStrategy.state)
                     (rolePairCond Role.B Role.B (opTensor (MB.outcome a) (MB.outcome a))) = 0 := by
-                      simpa [ProjStrat.classicalRoleSymmStrategy] using
+                      simpa [SameSpaceProjStrat.classicalRoleSymmStrategy] using
                         ev_classicalRoleSymmState_rolePair_BB strategy.state
                           (opTensor (MB.outcome a) (MB.outcome a))
               rw [hAA, hAB, hBA, hBB]
@@ -120,7 +120,7 @@ the original point-agreement defect. -/
 theorem classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    (strategy : ProjStrat params ι) :
+    (strategy : SameSpaceProjStrat params ι) :
     (strategy.classicalRoleSymmStrategy).selfConsistencyFailureProbability =
       bipartiteConsError strategy.state (uniformDistribution (Point params))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
@@ -136,7 +136,7 @@ bound from the full test. -/
 theorem classicalRoleSymmStrategy_selfConsistency_le_three_mul
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    {strategy : ProjStrat params ι} {eps : Error}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
     (strategy.classicalRoleSymmStrategy).selfConsistencyFailureProbability ≤ 3 * eps := by
   rw [classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement strategy]
@@ -152,7 +152,7 @@ correct bridge when an independent point-agreement estimate is available. -/
 theorem classicalRoleSymmStrategy_selfConsistency_le_of_pointAgreement
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    {strategy : ProjStrat params ι} {delta : Error}
+    {strategy : SameSpaceProjStrat params ι} {delta : Error}
     (hpoint :
       bipartiteConsError strategy.state (uniformDistribution (Point params))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
@@ -161,6 +161,6 @@ theorem classicalRoleSymmStrategy_selfConsistency_le_of_pointAgreement
   rw [classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement strategy]
   exact hpoint
 
-end ProjStrat
+end SameSpaceProjStrat
 
 end MIPStarRE.LDT

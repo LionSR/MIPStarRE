@@ -174,7 +174,7 @@ distributional property of the witness, so the lemma is insensitive to how the
 ambient `Inhabited (ProjMeas …)` instance is realized. -/
 theorem mainFormal_trivial_witness
     (params : Parameters) [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι)
+    (strategy : SameSpaceProjStrat params ι)
     (eps : Error) (k : ℕ)
     (herr : 1 ≤ mainFormalError params k eps) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
@@ -208,7 +208,7 @@ strategy. This packages that handoff in the exact form consumed later by
 theorem strategySymmetrization_mainInductionBaseCase
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
     (hm1 : params.m = 1) :
     ∃ G : Measurement (Polynomial params) (Role × ι),
@@ -222,14 +222,14 @@ theorem strategySymmetrization_mainInductionBaseCase
     MainInductionStep.mainInductionBaseCase params
       (strategy := strategy.strategySymmetrization)
       (eps := 3 * eps) (delta := 3 * eps) (gamma := 3 * eps) (k := k) hm1
-      (ProjStrat.strategySymmetrization_isGood_three_mul
+      (SameSpaceProjStrat.strategySymmetrization_isGood_three_mul
         (strategy := strategy) (eps := eps) hpass)
 
 /-- Weighted restricted-axis input expected by the Section 6 successor step
 on the role-register symmetrization. -/
 def MainFormalSuccessorAxisWeightedBound (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error) : Prop :=
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error) : Prop :=
   avgOver (uniformDistribution (Fq params))
     (fun x => MainInductionStep.sliceTransverseDirectionWeight params *
       (MainInductionStep.xRestrictedStrategy params
@@ -246,7 +246,7 @@ diagonal branches. `restrictedProbabilities` therefore expects
 `sliceTransverseDirectionWeight` on both weighted bounds. -/
 def MainFormalSuccessorDiagonalWeightedBound (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error) : Prop :=
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error) : Prop :=
   avgOver (uniformDistribution (Fq params))
     (fun x => MainInductionStep.sliceTransverseDirectionWeight params *
       (MainInductionStep.xRestrictedStrategy params
@@ -258,7 +258,7 @@ in the successor branch of `mainFormal`. -/
 noncomputable def mainFormalSuccessorRestrictionPackage
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (haxisWeightedBound : MainFormalSuccessorAxisWeightedBound params strategy eps)
     (hdiagonalWeightedBound : MainFormalSuccessorDiagonalWeightedBound params strategy eps) :
@@ -266,7 +266,7 @@ noncomputable def mainFormalSuccessorRestrictionPackage
       strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) :=
   MainInductionStep.mainInductionPublicRestrictionPackage
     params strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps)
-    (ProjStrat.strategySymmetrization_isGood_three_mul
+    (SameSpaceProjStrat.strategySymmetrization_isGood_three_mul
       (strategy := strategy) (eps := eps) hpass)
     haxisWeightedBound hdiagonalWeightedBound
 
@@ -274,7 +274,7 @@ noncomputable def mainFormalSuccessorRestrictionPackage
 boundary wrapper. -/
 def MainFormalSuccessorRecursiveSlices (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
     (haxisWeightedBound : MainFormalSuccessorAxisWeightedBound params strategy eps)
     (hdiagonalWeightedBound :
@@ -301,7 +301,7 @@ def MainFormalSuccessorRecursiveSlices (params : Parameters)
 public Section 6 boundary wrapper. -/
 def MainFormalSuccessorSelfImprovementProducer (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
     (haxisWeightedBound : MainFormalSuccessorAxisWeightedBound params strategy eps)
     (hdiagonalWeightedBound :
@@ -332,7 +332,7 @@ all fields into a single named package still gives the successor branch of
 hypothesis holes. -/
 structure MainFormalSuccessorBoundary (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ) where
   axisWeightedBound :
     MainFormalSuccessorAxisWeightedBound params strategy eps
@@ -351,12 +351,12 @@ weighted axis-parallel input for the role-register symmetrization used by
 theorem mainFormalSuccessorAxisWeightedBound_ofPass
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
     MainFormalSuccessorAxisWeightedBound params strategy eps :=
   MainInductionStep.weighted_axisParallel_bound params
     strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps)
-    (ProjStrat.strategySymmetrization_isGood_three_mul
+    (SameSpaceProjStrat.strategySymmetrization_isGood_three_mul
       (strategy := strategy) (eps := eps) hpass)
 
 /-- The public restricted-probabilities theorem supplies the successor-case
@@ -365,12 +365,12 @@ weighted diagonal-line input for the role-register symmetrization used by
 theorem mainFormalSuccessorDiagonalWeightedBound_ofPass
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
     MainFormalSuccessorDiagonalWeightedBound params strategy eps :=
   MainInductionStep.weighted_diagonal_bound params
     strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps)
-    (ProjStrat.strategySymmetrization_isGood_three_mul
+    (SameSpaceProjStrat.strategySymmetrization_isGood_three_mul
       (strategy := strategy) (eps := eps) hpass)
 
 /-- Build the successor boundary once the two still-external slice-recursion and
@@ -380,7 +380,7 @@ Section 6 weighted-bound lemmas. -/
 def mainFormalSuccessorBoundary_ofRecursiveSelfImprovement
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
     (hrec : MainFormalSuccessorRecursiveSlices params strategy eps hpass k
       (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
@@ -413,7 +413,7 @@ parameters. -/
 theorem mainFormalSuccessorMainInductionPublicWrapper
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
     (hd : 0 < params.d)
     (boundary : MainFormalSuccessorBoundary params strategy eps hpass k)
@@ -429,7 +429,7 @@ theorem mainFormalSuccessorMainInductionPublicWrapper
   MainInductionStep.mainInductionPublicWrapper params
     (strategy := strategy.strategySymmetrization)
     (eps := 3 * eps) (delta := 3 * eps) (gamma := 3 * eps) (k := k)
-    (ProjStrat.strategySymmetrization_isGood_three_mul
+    (SameSpaceProjStrat.strategySymmetrization_isGood_three_mul
       (strategy := strategy) (eps := eps) hpass)
     hd
     boundary.axisWeightedBound
@@ -442,7 +442,7 @@ theorem mainFormalSuccessorMainInductionPublicWrapper
 role-register symmetrization used by `mainFormal`. -/
 def MainFormalSuccessorAnswerAxisWeightedBound (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error) : Prop :=
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error) : Prop :=
   avgOver (uniformDistribution (Fq params))
     (fun x => MainInductionStep.sliceTransverseDirectionWeight params *
       (MainInductionStep.xRestrictedAnswerSymStrat params
@@ -453,7 +453,7 @@ def MainFormalSuccessorAnswerAxisWeightedBound (params : Parameters)
 role-register symmetrization used by `mainFormal`. -/
 def MainFormalSuccessorAnswerDiagonalWeightedBound (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error) : Prop :=
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error) : Prop :=
   avgOver (uniformDistribution (Fq params))
     (fun x => MainInductionStep.sliceTransverseDirectionWeight params *
       (MainInductionStep.xRestrictedAnswerSymStrat params
@@ -465,7 +465,7 @@ symmetrization used in the successor branch of `mainFormal`. -/
 noncomputable def mainFormalSuccessorAnswerRestrictionPackage
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (haxisWeightedBound : MainFormalSuccessorAnswerAxisWeightedBound params strategy eps)
     (hdiagonalWeightedBound :
@@ -474,7 +474,7 @@ noncomputable def mainFormalSuccessorAnswerRestrictionPackage
       strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) :=
   MainInductionStep.answerMainInductionPublicRestrictionPackage
     params strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps)
-    (ProjStrat.strategySymmetrization_isGood_three_mul
+    (SameSpaceProjStrat.strategySymmetrization_isGood_three_mul
       (strategy := strategy) (eps := eps) hpass)
     haxisWeightedBound hdiagonalWeightedBound
 
@@ -482,7 +482,7 @@ noncomputable def mainFormalSuccessorAnswerRestrictionPackage
 strategies. -/
 def MainFormalSuccessorAnswerRecursiveSlices (params : Parameters)
     [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
     (haxisWeightedBound : MainFormalSuccessorAnswerAxisWeightedBound params strategy eps)
     (hdiagonalWeightedBound :
@@ -508,7 +508,7 @@ def MainFormalSuccessorAnswerRecursiveSlices (params : Parameters)
 /-- Successor-case answer-valued restricted-strategy self-improvement producer. -/
 def MainFormalSuccessorAnswerSelfImprovementProducer (params : Parameters)
     [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
     (haxisWeightedBound : MainFormalSuccessorAnswerAxisWeightedBound params strategy eps)
     (hdiagonalWeightedBound :
@@ -526,7 +526,7 @@ def MainFormalSuccessorAnswerSelfImprovementProducer (params : Parameters)
 /-- Answer-valued successor-case Section 6 boundary inputs for `mainFormal`. -/
 structure MainFormalSuccessorAnswerBoundary (params : Parameters)
     [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ) where
   axisWeightedBound :
     MainFormalSuccessorAnswerAxisWeightedBound params strategy eps
@@ -544,12 +544,12 @@ weighted axis-parallel input. -/
 theorem mainFormalSuccessorAnswerAxisWeightedBound_ofPass
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
     MainFormalSuccessorAnswerAxisWeightedBound params strategy eps :=
   MainInductionStep.answer_weighted_axisParallel_bound params
     strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps)
-    (ProjStrat.strategySymmetrization_isGood_three_mul
+    (SameSpaceProjStrat.strategySymmetrization_isGood_three_mul
       (strategy := strategy) (eps := eps) hpass)
 
 /-- The answer-valued restricted-probabilities theorem supplies the successor-case
@@ -557,12 +557,12 @@ weighted diagonal-line input. -/
 theorem mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
     MainFormalSuccessorAnswerDiagonalWeightedBound params strategy eps :=
   MainInductionStep.answer_weighted_diagonal_bound params
     strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps)
-    (ProjStrat.strategySymmetrization_isGood_three_mul
+    (SameSpaceProjStrat.strategySymmetrization_isGood_three_mul
       (strategy := strategy) (eps := eps) hpass)
 
 /-- Build the answer-valued successor boundary once the two still-external slice
@@ -570,7 +570,7 @@ recursion and restricted-strategy self-improvement inputs are supplied. -/
 def mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
     (hrec : MainFormalSuccessorAnswerRecursiveSlices params strategy eps hpass k
       (mainFormalSuccessorAnswerAxisWeightedBound_ofPass params strategy eps hpass)
@@ -591,7 +591,7 @@ def mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement
 theorem mainFormalSuccessorAnswerMainInductionPublicWrapper
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
     (hd : 0 < params.d)
     (boundary : MainFormalSuccessorAnswerBoundary params strategy eps hpass k)
@@ -607,7 +607,7 @@ theorem mainFormalSuccessorAnswerMainInductionPublicWrapper
   MainInductionStep.answerMainInductionPublicWrapper params
     (strategy := strategy.strategySymmetrization)
     (eps := 3 * eps) (delta := 3 * eps) (gamma := 3 * eps) (k := k)
-    (ProjStrat.strategySymmetrization_isGood_three_mul
+    (SameSpaceProjStrat.strategySymmetrization_isGood_three_mul
       (strategy := strategy) (eps := eps) hpass)
     hd
     boundary.axisWeightedBound
@@ -953,7 +953,7 @@ unsymmetrized estimates; those remain the separate content of
 structure MainFormalRoleMeasurementPackage
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k) where
   /-- The role-register polynomial POVM produced by Section 6. -/
   roleMeasurement : Measurement (Polynomial params) (Role × ι)
@@ -978,7 +978,7 @@ symmetrized errors `(3ε,3ε,3ε)`. -/
 theorem ofMainInductionWitness
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k)
     (hsection6 :
       ∃ G : Measurement (Polynomial params) (Role × ι),
@@ -1002,7 +1002,7 @@ constructor rewrites its error to the `σ` used by the Section 3 cascade. -/
 theorem ofBaseCase
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (hm1 : params.m = 1) :
@@ -1020,7 +1020,7 @@ This lemma exposes the resulting global polynomial measurement in the exact
 theorem ofSuccessorBoundary
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error) (k : ℕ)
     (scalars : MainFormalCascadeScalars params.next eps k)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (hd : 0 < params.d)
@@ -1041,7 +1041,7 @@ extra point-consistency hypotheses are needed here. -/
 def toUnsymmetrizationBridge
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (pkg : MainFormalRoleMeasurementPackage params strategy eps k scalars) :
     UnsymmetrizationBridgePackage params strategy pkg.roleMeasurement scalars.sigma :=
@@ -1063,7 +1063,7 @@ the successor-branch conversion instead of being hidden in this residual. -/
 structure MainFormalRolePackageResidual
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ) where
   /-- Section 6 role-register measurement before rewriting its error to `σ`. -/
   roleMeasurement : Measurement (Polynomial params) (Role × ι)
@@ -1083,7 +1083,7 @@ residual consumed by the final `mainFormal` assembly. -/
 theorem ofMainInductionWitness
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (hsection6 :
       ∃ G : Measurement (Polynomial params) (Role × ι),
@@ -1102,7 +1102,7 @@ by unsymmetrization. -/
 def toRoleMeasurementPackage
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     (residual : MainFormalRolePackageResidual params strategy eps hpass k)
     (scalars : MainFormalCascadeScalars params eps k) :
@@ -1116,7 +1116,7 @@ def toRoleMeasurementPackage
 theorem ofBaseCase
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (hm1 : params.m = 1) :
     Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) := by
@@ -1133,7 +1133,7 @@ syntactic successor form still requires a separate predecessor-transport theorem
 theorem ofSuccessorBoundary
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error) (k : ℕ)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (hd : 0 < params.d)
     (boundary : MainFormalSuccessorBoundary params strategy eps hpass k)
@@ -1148,7 +1148,7 @@ role-package residual. -/
 def rolePackage
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     (residual : MainFormalRolePackageResidual params strategy eps hpass k)
     (scalars : MainFormalCascadeScalars params eps k) :
@@ -1181,10 +1181,10 @@ by the current Section 6 public successor wrapper. -/
 noncomputable def projStratTransportSuccessor
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι)
+    (strategy : SameSpaceProjStrat params ι)
     (successor : Parameters.SuccessorDecomposition params) :
     letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
-    ProjStrat successor.pred.next ι := by
+    SameSpaceProjStrat successor.pred.next ι := by
   classical
   rcases successor with ⟨pred, hnext⟩
   subst params
@@ -1196,7 +1196,7 @@ identity, using the same base-universe field-model transport as
 theorem passesLowIndividualDegreeTest_transportSuccessor
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (successor : Parameters.SuccessorDecomposition params) :
     letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
@@ -1215,7 +1215,7 @@ current-dimension hypothesis and then weakened to the predecessor dimension. -/
 structure MainFormalRolePackageSuccessorResidual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ) where
   /-- A predecessor whose successor is the current parameter bundle. -/
   successor : Parameters.SuccessorDecomposition params
@@ -1237,7 +1237,7 @@ package residual, using the public current-dimension large-`k` hypothesis. -/
 theorem toRolePackageResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     (residual : MainFormalRolePackageSuccessorResidual params strategy eps hpass k)
     (hk_large : 400 * params.m * params.d ≤ k) :
@@ -1254,7 +1254,7 @@ theorem toRolePackageResidual
   -- `FieldModel.{0} pred.q` is not definitionally the same instance.
   letI : FieldModel.{0} pred.q :=
     fieldModelOfSuccessorDecomposition (params := pred.next) ⟨pred, rfl⟩
-  let transportedStrategy : ProjStrat pred.next ι :=
+  let transportedStrategy : SameSpaceProjStrat pred.next ι :=
     projStratTransportSuccessor strategy ⟨pred, rfl⟩
   have transportedPass : transportedStrategy.PassesLowIndividualDegreeTest eps := by
     simpa [transportedStrategy] using
@@ -1272,7 +1272,7 @@ theorem toRolePackageResidual
 def ofSyntacticSuccessor
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error) (k : ℕ)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (hd : 0 < params.d)
     (boundary : MainFormalSuccessorBoundary params strategy eps hpass k)
@@ -1290,7 +1290,7 @@ end MainFormalRolePackageSuccessorResidual
 structure MainFormalRolePackageAnswerSuccessorResidual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ) where
   /-- A predecessor whose successor is the current parameter bundle. -/
   successor : Parameters.SuccessorDecomposition params
@@ -1312,7 +1312,7 @@ role-package residual, using the public current-dimension large-`k` hypothesis. 
 theorem toRolePackageResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     (residual : MainFormalRolePackageAnswerSuccessorResidual params strategy eps hpass k)
     (hk_large : 400 * params.m * params.d ≤ k) :
@@ -1326,7 +1326,7 @@ theorem toRolePackageResidual
     exact le_trans hmono (by simpa [Parameters.next] using hk_large)
   letI : FieldModel.{0} pred.q :=
     fieldModelOfSuccessorDecomposition (params := pred.next) ⟨pred, rfl⟩
-  let transportedStrategy : ProjStrat pred.next ι :=
+  let transportedStrategy : SameSpaceProjStrat pred.next ι :=
     projStratTransportSuccessor strategy ⟨pred, rfl⟩
   have transportedPass : transportedStrategy.PassesLowIndividualDegreeTest eps := by
     simpa [transportedStrategy] using
@@ -1344,7 +1344,7 @@ theorem toRolePackageResidual
 def ofSyntacticSuccessor
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params.next ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error) (k : ℕ)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (hd : 0 < params.d)
     (boundary : MainFormalSuccessorAnswerBoundary params strategy eps hpass k)
@@ -1368,7 +1368,7 @@ role-package residual. -/
 inductive MainFormalRolePackageBranchResidual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ) : Type _ where
   /-- Base dimension, handled by the checked base-case handoff. -/
   | base (hm1 : params.m = 1) :
@@ -1386,7 +1386,7 @@ residual consumed by the downstream assembly. -/
 theorem toRolePackageResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     (residual : MainFormalRolePackageBranchResidual params strategy eps hpass k)
     (hk_large : 400 * params.m * params.d ≤ k) :
@@ -1427,7 +1427,7 @@ point-measurement agreement from the test to prove paper line 116 by
 structure MainFormalCascadeUnsymmetrizedPOVMTargets
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k) where
   /-- The POVM denoted $G^{\mathrm A}$ after unsymmetrizing the Section 6 measurement. -/
   leftPOVM : Measurement (Polynomial params) ι
@@ -1460,7 +1460,7 @@ factor-two estimates recorded in `UnsymmetrizationBridgePackage`. -/
 noncomputable def ofUnsymmetrizationBridge
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (G : Measurement (Polynomial params) (Role × ι))
     (bridge : UnsymmetrizationBridgePackage params strategy G scalars.sigma) :
@@ -1483,7 +1483,7 @@ projectivization work of `inductive_step.tex` lines 84--185. -/
 structure MainFormalCascadeTargets
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ) where
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ) where
   /-- Scalar side conditions and the paper-defined `ν, σ, ζᵢ` cascade. -/
   scalars : MainFormalCascadeScalars params eps k
   /-- The projective measurement denoted $Q^{\mathrm A}$ in the paper. -/
@@ -1521,7 +1521,7 @@ projectivization targets from `inductive_step.tex` lines 84--185. -/
 structure MainFormalCascadeTransportTargets
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k) where
   /-- The projective measurement denoted $Q^{\mathrm A}$ in the paper. -/
   leftMeasurement : ProjMeas (Polynomial params) ι
@@ -1559,7 +1559,7 @@ full-polynomial consistency estimate at exactly `ζ₁`. -/
 structure MainFormalCascadePreProjectiveSelfConsistency
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k) where
   /-- The POVM denoted $G^{\mathrm A}$ in the paper, before projectivization. -/
   leftPOVM : Measurement (Polynomial params) ι
@@ -1583,7 +1583,7 @@ algebraic expansion and the `md/q` collision bound are both already proved in
 to the cascade notation used by the final assembly. -/
 theorem fullSelfConsistency {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (pre : MainFormalCascadePreProjectiveSelfConsistency params strategy eps k scalars) :
     ConsRel strategy.state (uniformDistribution Unit)
@@ -1607,12 +1607,12 @@ original point-measurement agreement.
 This is the `prop:simeq-triangle-inequality` step in
 `references/ldt-paper/inductive_step.tex` lines 110--117.  The two fields of
 `MainFormalCascadeUnsymmetrizedPOVMTargets` provide the `2σ` links
-`eq:cons-a`/`eq:cons-b`; `ProjStrat.point_agreement_le_three_mul` provides the
+`eq:cons-a`/`eq:cons-b`; `SameSpaceProjStrat.point_agreement_le_three_mul` provides the
 middle `3ε` agreement from the low-individual-degree test. -/
 noncomputable def toPreProjectiveSelfConsistency
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (targets : MainFormalCascadeUnsymmetrizedPOVMTargets params strategy eps k scalars)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
@@ -1643,7 +1643,7 @@ noncomputable def toPreProjectiveSelfConsistency
           (IdxMeas.toIdxSubMeas pointA)
           (IdxMeas.toIdxSubMeas pointB)
           (3 * eps) := by
-      exact ⟨ProjStrat.point_agreement_le_three_mul hpass⟩
+      exact ⟨SameSpaceProjStrat.point_agreement_le_three_mul hpass⟩
     have hright :
         ConsRel strategy.state (uniformDistribution (Point params))
           (IdxMeas.toIdxSubMeas pointA)
@@ -1676,7 +1676,7 @@ triangle, and finally apply the checked Schwartz--Zippel Step 5 bridge. -/
 noncomputable def line130Consistency
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     (residual : MainFormalRolePackageResidual params strategy eps hpass k)
     (scalars : MainFormalCascadeScalars params eps k) :
@@ -1709,7 +1709,7 @@ The two point-consistency targets remain explicit residual fields at the paper's
 structure MainFormalCascadeProjectiveStageTargets
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k) where
   /-- Pre-projective `G^A,G^B` data through the Step 5 evaluated estimate. -/
   preSelfConsistency :
@@ -1752,7 +1752,7 @@ The only mathematical step performed here is the projective converse of
 `≃_{ζ₃/2}`, which is exactly paper `eq:third-goal` (lines 159--162). -/
 noncomputable def toTransportTargets {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (targets : MainFormalCascadeProjectiveStageTargets params strategy eps k scalars) :
     MainFormalCascadeTransportTargets params strategy eps k scalars where
@@ -1802,7 +1802,7 @@ self-consistency from these fields and the low-individual-degree pass hypothesis
 structure MainFormalCascadeProjectiveAssemblyResidual
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k) where
   /-- Unsymmetrized POVMs and the two paper `2σ` consistency estimates. -/
   unsymmetrized :
@@ -1846,7 +1846,7 @@ self-consistency consumed by Step 5. -/
 noncomputable def toProjectiveStageTargets
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (residual : MainFormalCascadeProjectiveAssemblyResidual params strategy eps k scalars)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
@@ -1973,7 +1973,7 @@ This package is narrower than `MainFormalCascadeProjectiveAssemblyResidual`:
 structure MainFormalCascadeProjectiveHandoffResidual
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k) where
   /-- The role-register polynomial POVM produced by the Section 6 induction call. -/
   roleMeasurement : Measurement (Polynomial params) (Role × ι)
@@ -2010,7 +2010,7 @@ namespace MainFormalCascadeProjectiveHandoffResidual
 theorem projectiveEvaluationConsistency
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (residual : MainFormalCascadeProjectiveHandoffResidual params strategy eps k scalars) :
     ConsRel strategy.state (uniformDistribution (Point params))
@@ -2032,7 +2032,7 @@ theorem projectiveEvaluationConsistency
 theorem pointAConsistency
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (residual : MainFormalCascadeProjectiveHandoffResidual params strategy eps k scalars) :
     ConsRel strategy.state (uniformDistribution (Point params))
@@ -2089,7 +2089,7 @@ triangle, using swap symmetry to orient the intermediate consistency relations. 
 theorem pointBConsistency
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (residual : MainFormalCascadeProjectiveHandoffResidual params strategy eps k scalars) :
     ConsRel strategy.state (uniformDistribution (Point params))
@@ -2165,7 +2165,7 @@ residual using the checked Step 3, line-156, and point-triangle wrappers above. 
 noncomputable def toProjectiveAssemblyResidual
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (residual : MainFormalCascadeProjectiveHandoffResidual params strategy eps k scalars) :
     MainFormalCascadeProjectiveAssemblyResidual params strategy eps k scalars where
@@ -2212,7 +2212,7 @@ line 171 to line 172 for both links. -/
 structure MainFormalCascadeProjectiveLine169HandoffResidual
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k) where
   /-- The role-register polynomial POVM produced by the Section 6 induction call. -/
   roleMeasurement : Measurement (Polynomial params) (Role × ι)
@@ -2249,7 +2249,7 @@ namespace MainFormalCascadeProjectiveLine169HandoffResidual
 noncomputable def toProjectiveHandoffResidual
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (residual : MainFormalCascadeProjectiveLine169HandoffResidual
       params strategy eps k scalars) :
@@ -2293,7 +2293,7 @@ what is still missing after those mechanical steps:
 structure MainFormalCascadeProjectiveCompletionLine169Residual
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k) where
   /-- The role-register polynomial POVM produced by the Section 6 induction call. -/
   roleMeasurement : Measurement (Polynomial params) (Role × ι)
@@ -2349,7 +2349,7 @@ strict weakening of the previous one. -/
 noncomputable def ofLine169HandoffResidual
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (residual : MainFormalCascadeProjectiveLine169HandoffResidual
       params strategy eps k scalars) :
@@ -2370,7 +2370,7 @@ noncomputable def ofLine169HandoffResidual
 noncomputable def toUnsymmetrizedPOVMTargets
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (residual : MainFormalCascadeProjectiveCompletionLine169Residual
       params strategy eps k scalars) :
@@ -2385,7 +2385,7 @@ original point-agreement bound. -/
 noncomputable def toPreProjectiveSelfConsistency
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (residual : MainFormalCascadeProjectiveCompletionLine169Residual
       params strategy eps k scalars)
@@ -2398,7 +2398,7 @@ pre-projective consistency proof and the two completion-closeness fields. -/
 noncomputable def projectivizationLine156Handoff
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (residual : MainFormalCascadeProjectiveCompletionLine169Residual
       params strategy eps k scalars)
@@ -2419,7 +2419,7 @@ than stored as an independent residual field. -/
 theorem line156Approx
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (residual : MainFormalCascadeProjectiveCompletionLine169Residual
       params strategy eps k scalars)
@@ -2441,7 +2441,7 @@ line 156. -/
 theorem projectiveEvaluationConsistency
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (residual : MainFormalCascadeProjectiveCompletionLine169Residual
       params strategy eps k scalars)
@@ -2465,7 +2465,7 @@ processing line 169, and evaluated line 164. -/
 theorem pointAConsistency
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (residual : MainFormalCascadeProjectiveCompletionLine169Residual
       params strategy eps k scalars)
@@ -2528,7 +2528,7 @@ triangle, again data-processing the polynomial line-169 mirror first. -/
 theorem pointBConsistency
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (residual : MainFormalCascadeProjectiveCompletionLine169Residual
       params strategy eps k scalars)
@@ -2612,7 +2612,7 @@ fields for line 156. -/
 noncomputable def toProjectiveStageTargets
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (residual : MainFormalCascadeProjectiveCompletionLine169Residual
       params strategy eps k scalars)
@@ -2646,7 +2646,7 @@ the two polynomial line-169 transport links. -/
 structure MainFormalCascadeRolePackagedCompletionLine169Residual
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k) where
   /-- The role-register Section 6 output at the cascade scalar `σ`. -/
   rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars
@@ -2694,7 +2694,7 @@ checked unsymmetrization constructor. -/
 noncomputable def toCompletionLine169Residual
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (residual : MainFormalCascadeRolePackagedCompletionLine169Residual
       params strategy eps k scalars) :
@@ -2725,7 +2725,7 @@ unsymmetrized POVMs, and the two polynomial line-169 transport estimates. -/
 structure MainFormalPostRolePackageCompletionLine169Residual
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k)
     (rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars) where
   /-- The completed projective measurement denoted $Q^{\mathrm A}$. -/
@@ -2768,7 +2768,7 @@ completion-line169 residual. -/
 noncomputable def toRolePackagedCompletionLine169Residual
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
     (residual : MainFormalPostRolePackageCompletionLine169Residual
@@ -2801,7 +2801,7 @@ reconstructed pre-projective consistency proof to derive line 169. -/
 structure MainFormalPostRolePackageLeftCompletionLine169Residual
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k)
     (rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars) where
   /-- The completed projective measurement denoted $Q^{\mathrm A}$. -/
@@ -2843,7 +2843,7 @@ preserves those inequalities by positivity. -/
 noncomputable def ofCompleteAtOutcomeStatements
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
     (hsmall : ¬ 1 ≤ mainFormalError params k eps)
@@ -2916,7 +2916,7 @@ existential to construct a data-valued residual would require choice. -/
 theorem nonempty_ofOrthonormalizeAndCompleteInputs
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
     (hsmall : ¬ 1 ≤ mainFormalError params k eps)
@@ -3011,7 +3011,7 @@ added in #869. -/
 noncomputable def toPostRolePackageCompletionLine169Residual
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
     (residual : MainFormalPostRolePackageLeftCompletionLine169Residual
@@ -3083,7 +3083,7 @@ large-`k` hypothesis directly rather than storing it as residual data. -/
 structure MainFormalCascadeRolePackageResidualCompletionLine169Residual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k) where
   /-- The explicit isolated Section 6 residual.  Keeping this field concrete avoids
@@ -3104,7 +3104,7 @@ measurement remains visible to the post-role residual. -/
 noncomputable def toRolePackagedCompletionLine169Residual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
     (residual : MainFormalCascadeRolePackageResidualCompletionLine169Residual
@@ -3128,7 +3128,7 @@ remain explicit. -/
 structure MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k) where
   /-- The explicit isolated Section 6 residual.  Keeping this field concrete avoids
@@ -3151,7 +3151,7 @@ inputs are available. -/
 noncomputable def ofRoleResidualAndCompleteAtOutcomeStatements
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
     (hsmall : ¬ 1 ≤ mainFormalError params k eps)
@@ -3196,7 +3196,7 @@ choice behind a definition. -/
 theorem nonempty_ofRoleResidualAndOrthonormalizeAndCompleteInputs
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
     (hsmall : ¬ 1 ≤ mainFormalError params k eps)
@@ -3256,7 +3256,7 @@ completion estimate, using the separately reconstructed paper line-130
 noncomputable def toRolePackageResidualCompletionLine169Residual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
     (residual : MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual
@@ -3290,7 +3290,7 @@ existentials while the ambient goal is still a proposition. -/
 structure MainFormalCascadeRolePackageResidualOrthonormalizeAndCompleteInputResidual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k) where
   /-- The explicit isolated Section 6 residual. -/
@@ -3354,7 +3354,7 @@ left-completion line-169 residual. -/
 theorem nonempty_leftCompletionLine169Residual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
     (residual :
@@ -3384,7 +3384,7 @@ possible orthonormalize-and-complete output. -/
 structure MainFormalPostRolePackageStep6WitnessResidual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k)
     (rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars) where
   /-- Alice-side projective submeasurement from paper line 138. -/
@@ -3429,7 +3429,7 @@ left-completion line-169 residual. -/
 noncomputable def toPostRolePackageLeftCompletionLine169Residual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
     (residual : MainFormalPostRolePackageStep6WitnessResidual
@@ -3453,7 +3453,7 @@ directions, instead of asking for independent `BipartiteSSCRel` inputs. -/
 structure MainFormalPostRolePackageLine130OrthonormalizationInput
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k)
     (rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars) where
   /-- Spectral-truncation input for `G^A`. -/
@@ -3488,7 +3488,7 @@ kept as a separate downstream obligation. -/
 structure MainFormalPostRolePackageLine130OrthonormalizationResidual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k)
     (rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars) where
   /-- Alice-side projective submeasurement obtained from line-130 consistency. -/
@@ -3518,7 +3518,7 @@ submeasurements in the non-vacuous scalar regime. -/
 theorem nonempty_ofLine130Inputs
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
     (hsmall : ¬ 1 ≤ mainFormalError params k eps)
@@ -3568,7 +3568,7 @@ not produced by the cross-consistency wrapper. -/
 structure MainFormalPostRolePackageLine130CompletionResidual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k)
     (rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars) where
   /-- Projective submeasurements and line-138 closeness derived from line 130. -/
@@ -3622,7 +3622,7 @@ match-mass monotonicity remain supplied separately. -/
 noncomputable def ofLine130OrthonormalizationAndCompletion
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
     (orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
@@ -3678,7 +3678,7 @@ witness package from line-130 orthonormalization plus completion closeness. -/
 noncomputable def toStep6WitnessResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
     (residual : MainFormalPostRolePackageLine130CompletionResidual
@@ -3702,7 +3702,7 @@ line-130 consistency. -/
 structure MainFormalCascadeRolePackageResidualStep6WitnessResidual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error)
+    (strategy : SameSpaceProjStrat params ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k) where
   /-- The explicit isolated Section 6 residual. -/
@@ -3719,7 +3719,7 @@ the post-role line-130 completion residual have both been produced. -/
 theorem nonempty_ofRoleResidualAndCompletion
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
     (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
@@ -3740,7 +3740,7 @@ paper-order handoffs have been named. -/
 theorem nonempty_ofRoleResidualAndLine130Inputs
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
     (hsmall : ¬ 1 ≤ mainFormalError params k eps)
@@ -3764,7 +3764,7 @@ line-130 consistency has been derived separately. -/
 noncomputable def toLeftCompletionLine169Residual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
     (residual : MainFormalCascadeRolePackageResidualStep6WitnessResidual
@@ -3785,7 +3785,7 @@ namespace MainFormalCascadeTransportTargets
 /-- Add the already-discharged scalar package back to the transport-only targets. -/
 noncomputable def toCascadeTargets {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (targets : MainFormalCascadeTransportTargets params strategy eps k scalars) :
     MainFormalCascadeTargets params strategy eps k where
@@ -3821,7 +3821,7 @@ packaging step. -/
 structure MainFormalNativeTargets
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) (k : ℕ) where
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ) where
   /-- The projective measurement denoted $Q^{\mathrm A}$ in the paper. -/
   leftMeasurement : ProjMeas (Polynomial params) ι
   /-- The projective measurement denoted $Q^{\mathrm B}$ in the paper. -/
@@ -3861,7 +3861,7 @@ been constructed. This only weakens the native `\zeta_4` and `\zeta_3/2` bounds 
 construction of `MainFormalNativeTargets`. -/
 theorem toMainFormal {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     (targets : MainFormalNativeTargets params strategy eps k) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
@@ -3894,7 +3894,7 @@ from `inductive_step.tex` lines 159--185, with the Step 6 `ζ₂` scalar widened
 as documented in `ErrorCascade.lean`. -/
 noncomputable def toNativeTargets {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error} {k : ℕ}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     (targets : MainFormalCascadeTargets params strategy eps k) :
     MainFormalNativeTargets params strategy eps k where
   leftMeasurement := targets.leftMeasurement
@@ -3952,7 +3952,7 @@ Fixes #137, #239, #906.
 -/
 theorem mainFormal
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι)
+    (strategy : SameSpaceProjStrat params ι)
     (eps : Error)
     (hd : 0 < params.d)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
@@ -4032,7 +4032,7 @@ theorem mainFormal
 
   by_cases herr : 1 ≤ mainFormalError params k eps
   · exact mainFormal_trivial_witness params strategy eps k herr
-  · have hepsNN : 0 ≤ eps := ProjStrat.eps_nonneg_of_passes hpass
+  · have hepsNN : 0 ≤ eps := SameSpaceProjStrat.eps_nonneg_of_passes hpass
     let scalars : MainFormalCascadeScalars params eps k :=
       MainFormalCascadeScalars.ofNontrivialMainFormal hepsNN hk0 herr
     have hstep6WitnessResidual :

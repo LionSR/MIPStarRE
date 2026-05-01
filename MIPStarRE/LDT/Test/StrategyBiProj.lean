@@ -1,32 +1,20 @@
 import MIPStarRE.LDT.Test.StrategyCore
 
 /-!
-# Section 3 — Two-space projective strategies
+# Section 3 — Two-space projective strategy API
 
-Paper-faithful two-space projective strategy container `BiProjStrat params ιA ιB`
-alongside the existing same-space `ProjStrat params ι` API. The paper's general
-projective strategy (`test_definition.tex`, `def:general-projective-strategy`)
-allows Alice and Bob to use different local Hilbert spaces, whereas the current
-`ProjStrat` forces both provers onto a common local index type `ι`.
+This module houses the two-space `ProjStrat` namespace helpers — the direct-sum
+block operators, role-register measurement constructors, and the paper-faithful
+two-space failure probability functions.
 
-This module is the first low-risk step of the staged refactor outlined in
-`audits/2026-04-23_ch02-separate-local-spaces-scouting.md`:
+The paper-faithful two-space `ProjStrat` structure itself lives in
+`StrategyCore.lean` (was previously named `BiProjStrat`; renamed to `ProjStrat`
+in #560). The same-space special case `SameSpaceProjStrat` (which extends
+`ProjStrat` with swap symmetry) is also in `StrategyCore.lean`.
 
-* the two-space container does **not** carry `PermInvState` or `densityFixed`,
-  since there is no canonical SWAP when `ιA ≠ ιB`;
-* a forgetful embedding `ProjStrat.toBiProjStrat` reinterprets the current
-  same-space strategy as the `ιA = ιB = ι` special case, with projection
-  simp lemmas for downstream staged migrations;
-* direct-sum role-register helpers prepare the later heterogeneous
-  symmetrization local space `Role × (ιA ⊕ ιB)` from
-  `inductive_step.tex:40-59`, without retargeting existing consumers;
-* block-diagonal measurement constructors establish the algebra needed to place
-  Alice and Bob measurements in the corresponding direct-sum and role-register
-  summands;
-* the two-space branch-level failure probability mirrors the paper's
-  low-individual-degree test without changing downstream same-space consumers;
-* no downstream consumer (`SymStrat`, `StrategyFailures`, `MainTheorem`) is
-  changed here — those migrations are tracked by later stages.
+The direct-sum role-register helpers here prepare the later heterogeneous
+symmetrization local space `Role × (ιA ⊕ ιB)` from
+`inductive_step.tex:40-59`.
 
 ## References
 
@@ -40,41 +28,7 @@ namespace MIPStarRE.LDT
 -- `Matrix` supplies the `ᴴ` notation; matrix constants below remain qualified.
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-/-- Paper-faithful two-space projective strategy data.
-
-This matches the paper's `def:general-projective-strategy`: Alice's and Bob's
-measurements act on separate local carriers `ιA` and `ιB`, and the bipartite
-state lives on `ιA × ιB` without a built-in swap symmetry.
-
-The `isNormalized` field records that the bipartite state's density operator has
-normalized trace `1`, mirroring `ProjStrat.isNormalized`.
-
-No `permInvState` / `densityFixed` fields are carried: the SWAP reindexing used
-by `PermInvState` is only defined on `ι × ι`, and there is no canonical swap
-between distinct carriers. Paper-faithful symmetrization for heterogeneous local
-spaces requires a genuine direct-sum construction (e.g. `Sum ιA ιB`) and is
-deferred to a later stage of the refactor. -/
-structure BiProjStrat (params : Parameters) [FieldModel params.q]
-    (ιA : Type*) [Fintype ιA] [DecidableEq ιA]
-    (ιB : Type*) [Fintype ιB] [DecidableEq ιB] where
-  /-- Bipartite state on the tensor product of Alice's and Bob's local carriers. -/
-  state : QuantumState (ιA × ιB)
-  /-- The bipartite state's density operator is trace-normalized. -/
-  isNormalized : state.IsNormalized
-  /-- Alice's point-measurement family, acting on `ιA`. -/
-  pointMeasurementA : IdxProjMeas (Point params) (Fq params) ιA
-  /-- Alice's axis-parallel-line measurement family, acting on `ιA`. -/
-  axisParallelMeasurementA : AxisParallelCovariantMeasurement params ιA
-  /-- Alice's diagonal-line measurement family, acting on `ιA`. -/
-  diagonalMeasurementA : DiagonalCovariantMeasurement params ιA
-  /-- Bob's point-measurement family, acting on `ιB`. -/
-  pointMeasurementB : IdxProjMeas (Point params) (Fq params) ιB
-  /-- Bob's axis-parallel-line measurement family, acting on `ιB`. -/
-  axisParallelMeasurementB : AxisParallelCovariantMeasurement params ιB
-  /-- Bob's diagonal-line measurement family, acting on `ιB`. -/
-  diagonalMeasurementB : DiagonalCovariantMeasurement params ιB
-
-namespace BiProjStrat
+namespace ProjStrat
 
 /-! ### Direct-sum role-register helpers -/
 
@@ -485,14 +439,14 @@ variable {ιB : Type*} [Fintype ιB] [DecidableEq ιB]
 /-- Alice's point answers in the axis-parallel branch: Alice receives `u`,
 the base point of the sampled line, and answers with `A^{A,u}`. -/
 noncomputable def axisParallelPointAnswerFamilyA
-    (strategy : BiProjStrat params ιA ιB) :
+    (strategy : ProjStrat params ιA ιB) :
     IdxSubMeas (AxisParallelTestSample params) (Fq params) ιA :=
   fun s => (strategy.pointMeasurementA s.1).toSubMeas
 
 /-- Bob's point answers in the axis-parallel branch: Bob receives `u`,
 the base point of the sampled line, and answers with `A^{B,u}`. -/
 noncomputable def axisParallelPointAnswerFamilyB
-    (strategy : BiProjStrat params ιA ιB) :
+    (strategy : ProjStrat params ιA ιB) :
     IdxSubMeas (AxisParallelTestSample params) (Fq params) ιB :=
   fun s => (strategy.pointMeasurementB s.1).toSubMeas
 
@@ -500,7 +454,7 @@ noncomputable def axisParallelPointAnswerFamilyB
 `B^{A,ℓ}`, and the verifier postprocesses to the value at the sampled base
 point. -/
 noncomputable def axisParallelLineAnswerFamilyA
-    (strategy : BiProjStrat params ιA ιB) :
+    (strategy : ProjStrat params ιA ιB) :
     IdxSubMeas (AxisParallelTestSample params) (Fq params) ιA :=
   fun s =>
     let ℓ : AxisParallelLine params :=
@@ -513,7 +467,7 @@ noncomputable def axisParallelLineAnswerFamilyA
 `B^{B,ℓ}`, and the verifier postprocesses to the value at the sampled base
 point. -/
 noncomputable def axisParallelLineAnswerFamilyB
-    (strategy : BiProjStrat params ιA ιB) :
+    (strategy : ProjStrat params ιA ιB) :
     IdxSubMeas (AxisParallelTestSample params) (Fq params) ιB :=
   fun s =>
     let ℓ : AxisParallelLine params :=
@@ -525,14 +479,14 @@ noncomputable def axisParallelLineAnswerFamilyB
 /-- Alice's point answers in the restricted diagonal branch: Alice receives the
 sampled base point `u` and answers with `A^{A,u}`. -/
 noncomputable def diagonalPointAnswerFamilyA
-    (strategy : BiProjStrat params ιA ιB) (j : Fin params.m) :
+    (strategy : ProjStrat params ιA ιB) (j : Fin params.m) :
     IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ιA :=
   fun s => (strategy.pointMeasurementA s.1).toSubMeas
 
 /-- Bob's point answers in the restricted diagonal branch: Bob receives the
 sampled base point `u` and answers with `A^{B,u}`. -/
 noncomputable def diagonalPointAnswerFamilyB
-    (strategy : BiProjStrat params ιA ιB) (j : Fin params.m) :
+    (strategy : ProjStrat params ιA ιB) (j : Fin params.m) :
     IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ιB :=
   fun s => (strategy.pointMeasurementB s.1).toSubMeas
 
@@ -540,7 +494,7 @@ noncomputable def diagonalPointAnswerFamilyB
 `L^{A,ℓ}`, and the verifier postprocesses to the value at the sampled base
 point. -/
 noncomputable def diagonalLineAnswerFamilyA
-    (strategy : BiProjStrat params ιA ιB) (j : Fin params.m) :
+    (strategy : ProjStrat params ιA ιB) (j : Fin params.m) :
     IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ιA :=
   fun s =>
     let v := extendRestrictedDirection j s.2
@@ -554,7 +508,7 @@ noncomputable def diagonalLineAnswerFamilyA
 `L^{B,ℓ}`, and the verifier postprocesses to the value at the sampled base
 point. -/
 noncomputable def diagonalLineAnswerFamilyB
-    (strategy : BiProjStrat params ιA ιB) (j : Fin params.m) :
+    (strategy : ProjStrat params ιA ιB) (j : Fin params.m) :
     IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ιB :=
   fun s =>
     let v := extendRestrictedDirection j s.2
@@ -567,7 +521,7 @@ noncomputable def diagonalLineAnswerFamilyB
 /-- Axis-parallel branch component where Alice receives the sampled line and Bob
 receives its base point. -/
 noncomputable def axisParallelLineLeftPointRightFailureProbability
-    (strategy : BiProjStrat params ιA ιB) : Error :=
+    (strategy : ProjStrat params ιA ιB) : Error :=
   bipartiteConsError strategy.state
     (uniformDistribution (AxisParallelTestSample params))
     (axisParallelLineAnswerFamilyA strategy)
@@ -576,7 +530,7 @@ noncomputable def axisParallelLineLeftPointRightFailureProbability
 /-- Axis-parallel branch component where Alice receives the sampled base point
 and Bob receives the sampled line. -/
 noncomputable def axisParallelPointLeftLineRightFailureProbability
-    (strategy : BiProjStrat params ιA ιB) : Error :=
+    (strategy : ProjStrat params ιA ιB) : Error :=
   bipartiteConsError strategy.state
     (uniformDistribution (AxisParallelTestSample params))
     (axisParallelPointAnswerFamilyA strategy)
@@ -585,14 +539,14 @@ noncomputable def axisParallelPointLeftLineRightFailureProbability
 /-- The paper's axis-parallel branch for a two-space general strategy, averaged
 over the two role choices. -/
 noncomputable def axisParallelRoleAverage
-    (strategy : BiProjStrat params ιA ιB) : Error :=
+    (strategy : ProjStrat params ιA ιB) : Error :=
   (axisParallelLineLeftPointRightFailureProbability strategy +
     axisParallelPointLeftLineRightFailureProbability strategy) / 2
 
 /-- Point-agreement branch: both provers receive the same point and the verifier
 checks equality of their field answers. -/
 noncomputable def pointAgreementFailureProbability
-    (strategy : BiProjStrat params ιA ιB) : Error :=
+    (strategy : ProjStrat params ιA ιB) : Error :=
   bipartiteConsError strategy.state
     (uniformDistribution (Point params))
     (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
@@ -601,7 +555,7 @@ noncomputable def pointAgreementFailureProbability
 /-- Diagonal branch component where Alice receives the sampled diagonal line and
 Bob receives its base point. -/
 noncomputable def diagonalLineLeftPointRightFailureProbability
-    (strategy : BiProjStrat params ιA ιB) : Error :=
+    (strategy : ProjStrat params ιA ιB) : Error :=
   (1 / (params.m : Error)) *
     ∑ j : Fin params.m,
       bipartiteConsError strategy.state
@@ -612,7 +566,7 @@ noncomputable def diagonalLineLeftPointRightFailureProbability
 /-- Diagonal branch component where Alice receives the sampled base point and
 Bob receives the sampled diagonal line. -/
 noncomputable def diagonalPointLeftLineRightFailureProbability
-    (strategy : BiProjStrat params ιA ιB) : Error :=
+    (strategy : ProjStrat params ιA ιB) : Error :=
   (1 / (params.m : Error)) *
     ∑ j : Fin params.m,
       bipartiteConsError strategy.state
@@ -623,7 +577,7 @@ noncomputable def diagonalPointLeftLineRightFailureProbability
 /-- The paper's diagonal branch for a two-space general strategy, averaged over
 the two role choices and the restricted diagonal samples. -/
 noncomputable def diagonalRoleAverage
-    (strategy : BiProjStrat params ιA ιB) : Error :=
+    (strategy : ProjStrat params ιA ιB) : Error :=
   (diagonalLineLeftPointRightFailureProbability strategy +
     diagonalPointLeftLineRightFailureProbability strategy) / 2
 
@@ -631,94 +585,95 @@ noncomputable def diagonalRoleAverage
 paper-faithful two-space projective strategy.
 
 This is the heterogeneous analogue of
-`ProjStrat.lowIndividualDegreeFailureProbability`: axis-parallel consistency,
+`SameSpaceProjStrat.lowIndividualDegreeFailureProbability`: axis-parallel consistency,
 point agreement, and diagonal consistency are averaged
 with weights `1 / 3`, while the line branches are themselves averaged over the
 two role choices. -/
 noncomputable def lowIndividualDegreeFailureProbability
-    (strategy : BiProjStrat params ιA ιB) : Error :=
+    (strategy : ProjStrat params ιA ιB) : Error :=
   (strategy.axisParallelRoleAverage + strategy.pointAgreementFailureProbability +
     strategy.diagonalRoleAverage) / 3
 
 /-- Passing the full low-individual-degree test with error `ε`, for the
 paper-faithful two-space strategy container. -/
 structure PassesLowIndividualDegreeTest
-    (strategy : BiProjStrat params ιA ιB) (eps : Error) : Prop where
+    (strategy : ProjStrat params ιA ιB) (eps : Error) : Prop where
   soundnessHypothesis : strategy.lowIndividualDegreeFailureProbability ≤ eps
 
-end BiProjStrat
-
-namespace ProjStrat
-
-/-- Forgetful embedding of the same-space `ProjStrat params ι` into the
-paper-faithful two-space container `BiProjStrat params ι ι`.
-
-Discards the swap-symmetry data (`permInvState`, `densityFixed`) since
-`BiProjStrat` does not carry same-space swap assumptions by design. -/
-def toBiProjStrat {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) : BiProjStrat params ι ι where
-  state := strategy.state
-  isNormalized := strategy.isNormalized
-  pointMeasurementA := strategy.pointMeasurementA
-  axisParallelMeasurementA := strategy.axisParallelMeasurementA
-  diagonalMeasurementA := strategy.diagonalMeasurementA
-  pointMeasurementB := strategy.pointMeasurementB
-  axisParallelMeasurementB := strategy.axisParallelMeasurementB
-  diagonalMeasurementB := strategy.diagonalMeasurementB
-
-/-! Projection lemmas keep the same-space embedding transparent for later
-staged retargeting work. They are deliberately definitional: Stage 1 adds no
-new symmetrization or direct-sum transport. -/
-
-@[simp] theorem toBiProjStrat_state {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) :
-    strategy.toBiProjStrat.state = strategy.state :=
-  rfl
-
-@[simp] theorem toBiProjStrat_isNormalized {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) :
-    strategy.toBiProjStrat.isNormalized = strategy.isNormalized :=
-  rfl
-
-@[simp] theorem toBiProjStrat_pointMeasurementA {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) :
-    strategy.toBiProjStrat.pointMeasurementA = strategy.pointMeasurementA :=
-  rfl
-
-@[simp] theorem toBiProjStrat_axisParallelMeasurementA {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) :
-    strategy.toBiProjStrat.axisParallelMeasurementA = strategy.axisParallelMeasurementA :=
-  rfl
-
-@[simp] theorem toBiProjStrat_diagonalMeasurementA {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) :
-    strategy.toBiProjStrat.diagonalMeasurementA = strategy.diagonalMeasurementA :=
-  rfl
-
-@[simp] theorem toBiProjStrat_pointMeasurementB {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) :
-    strategy.toBiProjStrat.pointMeasurementB = strategy.pointMeasurementB :=
-  rfl
-
-@[simp] theorem toBiProjStrat_axisParallelMeasurementB {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) :
-    strategy.toBiProjStrat.axisParallelMeasurementB = strategy.axisParallelMeasurementB :=
-  rfl
-
-@[simp] theorem toBiProjStrat_diagonalMeasurementB {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) :
-    strategy.toBiProjStrat.diagonalMeasurementB = strategy.diagonalMeasurementB :=
-  rfl
-
 end ProjStrat
+
+
+namespace SameSpaceProjStrat
+
+/-! Projection lemmas keep the same-space-to-two-space embedding transparent.
+They are deliberately definitional: `SameSpaceProjStrat` extends the general
+paper-faithful `ProjStrat`, so Lean's generated `toProjStrat` parent accessor is
+the canonical forgetful map. -/
+
+/-- Source-level alias for Lean's generated `toProjStrat` parent accessor.
+
+The actual parent projection comes from the `extends ProjStrat params ι ι` clause
+on `SameSpaceProjStrat`; this alias gives blueprint/checkdecl tooling a named
+source declaration for the same forgetful map. -/
+def toGeneralProjStrat {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) : ProjStrat params ι ι :=
+  strategy.toProjStrat
+
+@[simp] theorem toGeneralProjStrat_eq_toProjStrat {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) :
+    strategy.toGeneralProjStrat = strategy.toProjStrat :=
+  rfl
+
+@[simp] theorem toProjStrat_state {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) :
+    strategy.toProjStrat.state = strategy.state :=
+  rfl
+
+@[simp] theorem toProjStrat_isNormalized {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) :
+    strategy.toProjStrat.isNormalized = strategy.isNormalized :=
+  rfl
+
+@[simp] theorem toProjStrat_pointMeasurementA {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) :
+    strategy.toProjStrat.pointMeasurementA = strategy.pointMeasurementA :=
+  rfl
+
+@[simp] theorem toProjStrat_axisParallelMeasurementA {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) :
+    strategy.toProjStrat.axisParallelMeasurementA = strategy.axisParallelMeasurementA :=
+  rfl
+
+@[simp] theorem toProjStrat_diagonalMeasurementA {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) :
+    strategy.toProjStrat.diagonalMeasurementA = strategy.diagonalMeasurementA :=
+  rfl
+
+@[simp] theorem toProjStrat_pointMeasurementB {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) :
+    strategy.toProjStrat.pointMeasurementB = strategy.pointMeasurementB :=
+  rfl
+
+@[simp] theorem toProjStrat_axisParallelMeasurementB {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) :
+    strategy.toProjStrat.axisParallelMeasurementB = strategy.axisParallelMeasurementB :=
+  rfl
+
+@[simp] theorem toProjStrat_diagonalMeasurementB {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) :
+    strategy.toProjStrat.diagonalMeasurementB = strategy.diagonalMeasurementB :=
+  rfl
+
+end SameSpaceProjStrat
 
 end MIPStarRE.LDT

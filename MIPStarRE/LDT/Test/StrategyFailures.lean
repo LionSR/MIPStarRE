@@ -135,12 +135,12 @@ theorem gamma_nonneg_of_isGood
   exact le_trans (diagonalFailureProbability_nonneg params strategy)
     hgood.diagonalLineTest
 
-namespace ProjStrat
+namespace SameSpaceProjStrat
 
 /-- View the left prover's local data as a symmetric-strategy-style package. -/
 def leftAsSymmetric {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) :
+    (strategy : SameSpaceProjStrat params ι) :
     SymStrat params ι where
   state := strategy.state
   permInvState := strategy.permInvState
@@ -153,7 +153,7 @@ def leftAsSymmetric {params : Parameters} [FieldModel params.q]
 /-- View the right prover's local data as a symmetric-strategy-style package. -/
 def rightAsSymmetric {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) :
+    (strategy : SameSpaceProjStrat params ι) :
     SymStrat params ι where
   state := strategy.state
   permInvState := strategy.permInvState
@@ -173,7 +173,7 @@ measurements against each other. -/
 noncomputable def axisParallelLineLeftPointRightFailureProbability
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) : Error :=
+    (strategy : SameSpaceProjStrat params ι) : Error :=
   bipartiteConsError strategy.state
     (uniformDistribution (AxisParallelTestSample params))
     (axisParallelLineAnswerFamily strategy.leftAsSymmetric)
@@ -187,7 +187,7 @@ same-local `SymStrat.axisParallelFailureProbability`. -/
 noncomputable def axisParallelPointLeftLineRightFailureProbability
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) : Error :=
+    (strategy : SameSpaceProjStrat params ι) : Error :=
   bipartiteConsError strategy.state
     (uniformDistribution (AxisParallelTestSample params))
     (axisParallelPointAnswerFamily strategy.leftAsSymmetric)
@@ -197,7 +197,7 @@ noncomputable def axisParallelPointLeftLineRightFailureProbability
 noncomputable def pointLeftSelfConsistencyFailureProbability
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) : Error :=
+    (strategy : SameSpaceProjStrat params ι) : Error :=
   bipartiteSSCError strategy.state
     (uniformDistribution (Point params))
     (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
@@ -206,7 +206,7 @@ noncomputable def pointLeftSelfConsistencyFailureProbability
 noncomputable def pointRightSelfConsistencyFailureProbability
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) : Error :=
+    (strategy : SameSpaceProjStrat params ι) : Error :=
   bipartiteSSCError strategy.state
     (uniformDistribution (Point params))
     (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
@@ -220,7 +220,7 @@ it is not the diagonal-line failure probability of either local symmetric view. 
 noncomputable def diagonalLineLeftPointRightFailureProbability
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) : Error :=
+    (strategy : SameSpaceProjStrat params ι) : Error :=
   (1 / (params.m : Error)) *
     ∑ j : Fin params.m,
       bipartiteConsError strategy.state
@@ -236,7 +236,7 @@ role-averaged diagonal part of `lowIndividualDegreeFailureProbability`. -/
 noncomputable def diagonalPointLeftLineRightFailureProbability
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) : Error :=
+    (strategy : SameSpaceProjStrat params ι) : Error :=
   (1 / (params.m : Error)) *
     ∑ j : Fin params.m,
       bipartiteConsError strategy.state
@@ -249,7 +249,7 @@ two role choices. -/
 noncomputable def axisParallelRoleAverage
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) : Error :=
+    (strategy : SameSpaceProjStrat params ι) : Error :=
   let left := strategy.leftAsSymmetric
   let right := strategy.rightAsSymmetric
   let axParDist := uniformDistribution (AxisParallelTestSample params)
@@ -265,7 +265,7 @@ role choices and the restricted diagonal samples. -/
 noncomputable def diagonalRoleAverage
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) : Error :=
+    (strategy : SameSpaceProjStrat params ι) : Error :=
   let left := strategy.leftAsSymmetric
   let right := strategy.rightAsSymmetric
   (1 / (params.m : Error)) *
@@ -289,12 +289,12 @@ Each of the geometric line branches picks a role `r ∈ {A, B}`:
 The self-consistency branch samples a shared point and checks cross-player point
 agreement there.
 
-TODO(#306): `ProjStrat` currently forces both provers onto the
+TODO(#306): `SameSpaceProjStrat` currently forces both provers onto the
 same index type `ι`; the paper allows `H_A ≠ H_B`. -/
 noncomputable def lowIndividualDegreeFailureProbability
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) : Error :=
+    (strategy : SameSpaceProjStrat params ι) : Error :=
   let axisParallelBranch := strategy.axisParallelRoleAverage
   -- Self-consistency: the paper samples the same point for Alice and Bob and
   -- checks agreement of their point answers.
@@ -310,15 +310,15 @@ noncomputable def lowIndividualDegreeFailureProbability
 /-- Passing the full low-individual-degree test with error `ε`. -/
 structure PassesLowIndividualDegreeTest {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) (eps : Error) : Prop where
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) : Prop where
   soundnessHypothesis : strategy.lowIndividualDegreeFailureProbability ≤ eps
 
 /-- The axis-parallel role-average branch of the full test is nonnegative. -/
 theorem axisParallelRoleAverage_nonneg {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) :
+    (strategy : SameSpaceProjStrat params ι) :
     0 ≤ strategy.axisParallelRoleAverage := by
-  dsimp [ProjStrat.axisParallelRoleAverage]
+  dsimp [SameSpaceProjStrat.axisParallelRoleAverage]
   apply div_nonneg
   · linarith [bipartiteConsError_nonneg strategy.state
         (uniformDistribution (AxisParallelTestSample params))
@@ -333,9 +333,9 @@ theorem axisParallelRoleAverage_nonneg {params : Parameters}
 /-- The diagonal role-average branch of the full test is nonnegative. -/
 theorem diagonalRoleAverage_nonneg {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) :
+    (strategy : SameSpaceProjStrat params ι) :
     0 ≤ strategy.diagonalRoleAverage := by
-  dsimp [ProjStrat.diagonalRoleAverage]
+  dsimp [SameSpaceProjStrat.diagonalRoleAverage]
   refine mul_nonneg ?_ ?_
   · positivity
   · refine Finset.sum_nonneg ?_
@@ -354,7 +354,7 @@ theorem diagonalRoleAverage_nonneg {params : Parameters}
 /-- The full low-individual-degree failure probability is nonnegative. -/
 theorem lowIndividualDegreeFailureProbability_nonneg {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : ProjStrat params ι) :
+    (strategy : SameSpaceProjStrat params ι) :
     0 ≤ strategy.lowIndividualDegreeFailureProbability := by
   let pointAgreement : Error :=
     bipartiteConsError strategy.state (uniformDistribution (Point params))
@@ -375,12 +375,12 @@ theorem lowIndividualDegreeFailureProbability_nonneg {params : Parameters}
   have hmain : 0 ≤ (axisParallelBranch + pointAgreement + diagonalBranch) / 3 :=
     div_nonneg hsum (by norm_num : (0 : Error) ≤ 3)
   simpa [pointAgreement, axisParallelBranch, diagonalBranch,
-    ProjStrat.lowIndividualDegreeFailureProbability] using hmain
+    SameSpaceProjStrat.lowIndividualDegreeFailureProbability] using hmain
 
 /-- Any passing witness forces the error parameter to be nonnegative. -/
 theorem eps_nonneg_of_passes {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
     0 ≤ eps :=
   (lowIndividualDegreeFailureProbability_nonneg strategy).trans hpass.soundnessHypothesis
@@ -390,7 +390,7 @@ theorem eps_nonneg_of_passes {params : Parameters}
 averaged in `lowIndividualDegreeFailureProbability`. -/
 theorem point_agreement_le_three_mul {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : ProjStrat params ι} {eps : Error}
+    {strategy : SameSpaceProjStrat params ι} {eps : Error}
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
     bipartiteConsError strategy.state (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
@@ -411,13 +411,13 @@ theorem point_agreement_le_three_mul {params : Parameters}
     simpa [diagonalBranch] using diagonalRoleAverage_nonneg strategy
   have hmain : (axisParallelBranch + pointAgreement + diagonalBranch) / 3 ≤ eps := by
     simpa [axisParallelBranch, pointAgreement, diagonalBranch,
-      ProjStrat.lowIndividualDegreeFailureProbability,
-      ProjStrat.axisParallelRoleAverage, ProjStrat.diagonalRoleAverage,
-      ProjStrat.leftAsSymmetric, ProjStrat.rightAsSymmetric,
+      SameSpaceProjStrat.lowIndividualDegreeFailureProbability,
+      SameSpaceProjStrat.axisParallelRoleAverage, SameSpaceProjStrat.diagonalRoleAverage,
+      SameSpaceProjStrat.leftAsSymmetric, SameSpaceProjStrat.rightAsSymmetric,
       SymStrat.axisParallelFailureProbability, SymStrat.diagonalFailureProbability] using
       hpass.soundnessHypothesis
   linarith
 
-end ProjStrat
+end SameSpaceProjStrat
 
 end MIPStarRE.LDT

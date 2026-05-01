@@ -9,9 +9,9 @@ paper's two-prover classical low individual degree test from
 
 The relation between this paper-faithful classical test model and the
 repository's current quantum/projective surrogate
-`ProjStrat.lowIndividualDegreeFailureProbability` is made explicit through the
+`SameSpaceProjStrat.lowIndividualDegreeFailureProbability` is made explicit through the
 role-average lemmas below together with
-`ProjStrat.lowIndividualDegreeFailureProbability_eq_branchAverage`.
+`SameSpaceProjStrat.lowIndividualDegreeFailureProbability`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -108,10 +108,10 @@ self-consistency branch.
 This is the actual verifier check from `references/ldt-paper/test_definition.tex`:
 both provers receive the same point question and must return the same field
 value. On the projective side,
-`ProjStrat.lowIndividualDegreeFailureProbability_eq_branchAverage` uses the
+`SameSpaceProjStrat.lowIndividualDegreeFailureProbability` uses the
 matching cross-prover point-agreement term
-`ProjStrat.pointAgreementFailureProbability`, and
-`ProjStrat.classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement` explains
+`SameSpaceProjStrat.pointAgreementFailureProbability`, and
+`SameSpaceProjStrat.classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement` explains
 how that term relates to the role-register-symmetrized SSC defect used
 elsewhere in the repository. -/
 def selfConsistencyAccepts {params : Parameters} [FieldModel params.q]
@@ -355,10 +355,11 @@ noncomputable def lowIndividualDegreeAcceptanceProbability {params : Parameters}
       strategy.diagonalAcceptanceProbability) / 3
 
 /-- The full classical test acceptance probability is the acceptance-side
-analogue of `ProjStrat.lowIndividualDegreeFailureProbability_eq_branchAverage`:
+analogue of the branch average inside
+`SameSpaceProjStrat.lowIndividualDegreeFailureProbability`:
 both formulas average the same axis-parallel and diagonal role choices and use
 the same cross-prover point-agreement self-consistency branch. Together with
-`ProjStrat.classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement`, this
+`SameSpaceProjStrat.classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement`, this
 also explains how the comparison interfaces with the symmetric-strategy SSC
 defect used elsewhere in the repository. -/
 theorem lowIndividualDegreeAcceptanceProbability_eq_branchAverage
@@ -388,13 +389,13 @@ theorem lowIndividualDegreeAcceptanceProbability_eq_branchAverage
 /-- Passing the paper's deterministic two-prover classical low individual degree
 test with error `eps`, stated in acceptance-probability form.
 
-This name is deliberately distinct from `ProjStrat.PassesLowIndividualDegreeTest`
+This name is deliberately distinct from `SameSpaceProjStrat.PassesLowIndividualDegreeTest`
 so this paper-faithful classical predicate does not collide by dot notation with
 the repository's quantum/projective surrogate predicate. The precise branch
 comparison is exposed concretely by
 `lowIndividualDegreeAcceptanceProbability_eq_branchAverage` on the classical side
-and `ProjStrat.lowIndividualDegreeFailureProbability_eq_branchAverage` on the
-projective side. -/
+and `SameSpaceProjStrat.lowIndividualDegreeFailureProbability` on the
+same-space projective surrogate side. -/
 structure ClassicallyPassesLowIndividualDegreeTest {params : Parameters}
     [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params) (eps : Error) : Prop where
