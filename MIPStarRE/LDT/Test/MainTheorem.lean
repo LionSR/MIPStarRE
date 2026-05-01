@@ -3564,6 +3564,20 @@ structure MainFormalPostRolePackageLine130OrthonormalizationInput
       (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
       (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)
 
+/-- Type alias for line-130 orthonormalization inputs that serves as a named
+landing point for future formalizations of the orthonormalization lemma's
+truncation and repair steps.
+See `MainFormalPostRolePackageLine130OrthonormalizationInput` for the
+individual fields. -/
+abbrev MainFormalPostRolePackageLine130OrthonormalizationBridgeInputs
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
+    (scalars : MainFormalCascadeScalars params eps k)
+    (rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars) :
+    Type _ :=
+  MainFormalPostRolePackageLine130OrthonormalizationInput
+    params strategy eps k scalars rolePackage
 /-- The pre-completion projective submeasurements obtained from line 130 by the
 cross-consistency orthonormalization wrapper.
 
@@ -4126,6 +4140,15 @@ theorem nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs
         (rightMatchMassPreservation orthResidual) with ⟨completionInput⟩
   exact nonempty_ofRoleResidualAndCompletion roleResidual
     ⟨completionInput.toCompletionResidual⟩
+
+/-- Bridge-shape alias for
+`nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs`
+accepting the orthonormalization inputs under the `…BridgeInputs` name.
+
+The alias is definitional (the bridge `abbrev` unfolds in-place) and exists
+only as a documented entry point for callers that carry the bridge wrapper. -/
+alias nonempty_ofRoleResidualAndBridgeInputsAndCompletingToMeasurementInputs :=
+  nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs
 
 /-- Convert the combined residual to the left-completion residual after the paper
 line-130 consistency has been derived separately. -/
