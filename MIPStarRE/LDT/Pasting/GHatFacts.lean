@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.Core
 import MIPStarRE.LDT.Pasting.CommutingWithG.Incomplete
 
 /-!
@@ -191,26 +192,10 @@ theorem gHatFacts
           multiplyByTotalOnRight
             ((family.meas q.2).toSubMeas)
             (incompletePartSubMeas params family q.1)
-    -- Review note: this duplicates a symmetry argument used elsewhere; keep it local for now.
+    -- Alias for the shared `qSDDOp_symm` lemma, specializing to `(ι × ι)`.
     have hqSDDOp_symm_poly
         (A B : OpFamily (Polynomial params) (ι × ι)) :
-        qSDDOp ψbi A B = qSDDOp ψbi B A := by
-      let F : Polynomial params → MIPStarRE.Quantum.Op (ι × ι) :=
-        fun a => A.outcome a - B.outcome a
-      let G : Polynomial params → MIPStarRE.Quantum.Op (ι × ι) :=
-        fun a => B.outcome a - A.outcome a
-      have hFG : F = fun a => -G a := by
-        funext a
-        dsimp [F, G]
-        abel
-      unfold qSDDOp qSDDCore
-      change ∑ a : Polynomial params, ev ψbi ((F a)ᴴ * F a) =
-        ∑ a : Polynomial params, ev ψbi ((G a)ᴴ * G a)
-      rw [hFG]
-      refine Finset.sum_congr rfl ?_
-      intro a _
-      change ev ψbi ((-G a)ᴴ * (-G a)) = ev ψbi ((G a)ᴴ * G a)
-      simp
+        qSDDOp ψbi A B = qSDDOp ψbi B A := qSDDOp_symm ψbi A B
     have hswapIncompleteBound :
         sddErrorOp ψbi
           (uniformDistribution (SlicePairQuestion params))

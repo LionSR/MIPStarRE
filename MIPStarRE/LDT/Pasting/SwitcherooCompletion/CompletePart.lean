@@ -64,6 +64,9 @@ private lemma qSDDOp_congr_unit_outcome
   unfold qSDDOp qSDDCore
   simp [hA, hB]
 
+/-- When the left/right aggregate families are re-expressed using the
+completed one-outcome form, the aggregate commutation bound translates to the
+complete-part total-product commutation bound. -/
 lemma completePartAggregateCommutation_as_total
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
