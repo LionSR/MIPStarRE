@@ -3530,6 +3530,73 @@ structure MainFormalPostRolePackageLine130OrthonormalizationInput
       (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
       (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)
 
+/-- Bridge-input wrapper for the line-130 orthonormalization inputs that
+separates the still-unproven spectral-truncation and locality-preserving repair
+lemmas from the rest of the `mainFormal` pipeline.
+
+The four fields mirror `MainFormalPostRolePackageLine130OrthonormalizationInput`
+exactly; this separate structure serves as a named landing point for future
+formalizations of the orthonormalization lemma's truncation and repair steps.
+
+It is a `Type`-valued structure (data, not proposition) because
+`SpectralTruncationStatement` contains an explicit rounded family of operators.
+Callers that only need the proof-level downstream consequences should use
+`toLine130OrthonormalizationInput` to obtain the input shape consumed by
+`nonempty_ofLine130Inputs`. -/
+structure MainFormalPostRolePackageLine130OrthonormalizationBridgeInputs
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
+    (scalars : MainFormalCascadeScalars params eps k)
+    (rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars) : Type _ where
+  /-- Spectral-truncation input for `G^A`. -/
+  leftSpectral :
+    MakingMeasurementsProjective.SpectralTruncationInput strategy.state
+      (leftLiftedMeasurement (ιB := ι)
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement))
+      (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)
+  /-- Locality-preserving repair input for `G^A`. -/
+  leftRepair :
+    MakingMeasurementsProjective.LeftLiftedProjectivizationRepairInput strategy.state
+      (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
+      (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)
+  /-- Spectral-truncation input for `G^B`. -/
+  rightSpectral :
+    MakingMeasurementsProjective.SpectralTruncationInput strategy.state
+      (leftLiftedMeasurement (ιB := ι)
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement))
+      (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)
+  /-- Locality-preserving repair input for `G^B`. -/
+  rightRepair :
+    MakingMeasurementsProjective.LeftLiftedProjectivizationRepairInput strategy.state
+      (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
+      (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)
+
+namespace MainFormalPostRolePackageLine130OrthonormalizationBridgeInputs
+
+/-- Convert the bridge-input wrapper to the concrete
+`MainFormalPostRolePackageLine130OrthonormalizationInput` consumed by
+`nonempty_ofLine130Inputs`.
+
+This conversion is purely structural (a field-by-field repackaging) and does not
+discharge any of the four unproven lemmas. -/
+def toLine130OrthonormalizationInput
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
+    (input : MainFormalPostRolePackageLine130OrthonormalizationBridgeInputs
+      params strategy eps k scalars rolePackage) :
+    MainFormalPostRolePackageLine130OrthonormalizationInput
+      params strategy eps k scalars rolePackage where
+  leftSpectral := input.leftSpectral
+  leftRepair := input.leftRepair
+  rightSpectral := input.rightSpectral
+  rightRepair := input.rightRepair
+
+end MainFormalPostRolePackageLine130OrthonormalizationBridgeInputs
+
 /-- The pre-completion projective submeasurements obtained from line 130 by the
 cross-consistency orthonormalization wrapper.
 
@@ -4092,6 +4159,65 @@ theorem nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs
         (rightMatchMassPreservation orthResidual) with ⟨completionInput⟩
   exact nonempty_ofRoleResidualAndCompletion roleResidual
     ⟨completionInput.toCompletionResidual⟩
+
+/-- Assemble the final live residual using the orthonormalization bridge inputs
+and explicit completion witnesses.
+
+This is the bridge-shape version of
+`nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs`
+that accepts the still-unproven spectral-truncation and repair lemmas as a
+separate `MainFormalPostRolePackageLine130OrthonormalizationBridgeInputs`.
+
+The bridge structure defers the four orthonormalization inputs
+(left/right spectral truncation and locality-preserving repair) to the caller
+while keeping the rest of the assembly unchanged. -/
+theorem nonempty_ofRoleResidualAndBridgeInputsAndCompletingToMeasurementInputs
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
+    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
+    (orthoBridge : MainFormalPostRolePackageLine130OrthonormalizationBridgeInputs
+      params strategy eps k scalars (roleResidual.rolePackage scalars))
+    (a_A a_B : Polynomial params)
+    (leftSelfConsistency :
+      BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily
+          (unsymmetrizedLeftPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
+        scalars.zeta1)
+    (rightSelfConsistency :
+      BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily
+          (unsymmetrizedRightPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
+        scalars.zeta1)
+    (leftMatchMassPreservation :
+      ∀ orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
+          params strategy eps k scalars (roleResidual.rolePackage scalars),
+        MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
+          (unsymmetrizedLeftPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement)
+          orthResidual.P_A
+          (unsymmetrizedRightPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement))
+    (rightMatchMassPreservation :
+      ∀ orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
+          params strategy eps k scalars (roleResidual.rolePackage scalars),
+        MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
+          (unsymmetrizedRightPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement)
+          orthResidual.P_B
+          (unsymmetrizedLeftPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement)) :
+    Nonempty (MainFormalCascadeRolePackageResidualStep6WitnessResidual
+      params strategy eps hpass k scalars) :=
+  nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs
+    hsmall roleResidual orthoBridge.toLine130OrthonormalizationInput
+    a_A a_B leftSelfConsistency rightSelfConsistency
+    leftMatchMassPreservation rightMatchMassPreservation
 
 /-- Convert the combined residual to the left-completion residual after the paper
 line-130 consistency has been derived separately. -/
