@@ -200,7 +200,8 @@ noncomputable def laplacian (params : Parameters) : MIPStarRE.Quantum.Op (Point 
 `L = (1/2) · 𝔼_{(u,v)∼C} (|u⟩-|v⟩)(⟨u|-⟨v|)`.
 
 Defined entrywise via the `rerandomizeCoordWeight` distribution on ordered
-vertex pairs.  The equality with `laplacian` is proved in
+vertex pairs: at index `(a, b)` the projector `|u⟩⟨v|` becomes the
+indicator `[a = u][v = b]`.  The equality with `laplacian` is proved in
 `MIPStarRE.LDT.ExpansionHypercubeGraph.laplacian_eq_edgeDifferenceForm`. -/
 noncomputable def laplacianDifferenceForm (params : Parameters) :
     MIPStarRE.Quantum.Op (Point params) :=
