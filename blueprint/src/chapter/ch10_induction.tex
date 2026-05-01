@@ -105,10 +105,7 @@
 
 \begin{theorem}[Pasting]\label{thm:ld-pasting-in-induction-section}
   \lean{MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection}
-  % Lean-local gap: `ldPastingInInductionSection` wraps `Pasting.ldPasting`,
-  % whose closure still contains `sorryAx` through the upstream
-  % `overAllOutcomes` and `fromHToG` residuals. The former
-  % `Pasting/Bernoulli/Final.lean` Bernoulli-tail gap is closed.
+  \leanok
   \uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test. Let $\{G^x\}_{x \in \F_q}$ be projective submeasurements in $\polysub{m}{q}{d}$ with the following properties:
   \begin{enumerate}
@@ -150,6 +147,7 @@
   \end{enumerate}
 \end{theorem}
 \begin{proof}
+	\leanok
 	\uses{thm:ld-pasting}
 	This is exactly Theorem~\ref{thm:ld-pasting}, restated in the induction chapter because it is the pasting input used in the proof of Theorem~\ref{thm:main-induction}.
 \end{proof}
@@ -302,19 +300,25 @@
 	\[
 		\sigma^* = (\sigma+\zeta)\left(1+\frac{1}{100m}\right) + 2\nu + e^{-k/(80000m^2)}.
 	\]
-	It remains to compare $\sigma^*$ with the next-stage target:
-	\begin{align}
+	It remains to compare $\sigma^*$ with the next-stage target. The pasting
+	parameter in Theorem~\ref{thm:ld-pasting-in-induction-section} is bounded by
+	$\nu/5$ in this regime. Using this sharper estimate and
+	\eqref{eq:zeta-smaller-than-nu}, we get
+	\begin{align*}
 		\sigma^*
-		 & = (\sigma+\zeta)\left(1+\frac{1}{100m}\right) + 2\nu + e^{-k/(80000m^2)} \notag                                         \\
-		 & \le (\sigma+\nu)\left(1+\frac{1}{100m}\right) + 2\nu + e^{-k/(80000m^2)} \tag{by \ref{eq:zeta-smaller-than-nu}} \notag  \\
-		 & = \left(1+\frac{1}{100m}\right)\left(m^2\left(\nu+e^{-k/(80000m^2)}\right)+\nu\right) + 2\nu + e^{-k/(80000m^2)} \notag \\
-		 & \le \left(1+\frac{1}{100m}\right)(m^2+3)\left(\nu+e^{-k/(80000m^2)}\right). \label{eq:gonna-bound-m-function}
-	\end{align}
-	Since $m \ge 2$,
+		 & \le \left(m^2\left(\nu+e^{-k/(80000m^2)}\right)+\nu\right)
+		      \left(1+\frac{1}{100m}\right) + \frac{2}{5}\nu
+		      + e^{-k/(80000m^2)} \\
+		 & = \left((m^2+1)\left(1+\frac{1}{100m}\right)+\frac{2}{5}\right)\nu
+		     + \left(m^2\left(1+\frac{1}{100m}\right)+1\right)e^{-k/(80000m^2)}.
+	\end{align*}
+	For every $m\ge 1$,
 	\[
-		\left(1+\frac{1}{100m}\right)(m^2+3) \le (m+1)^2.
+		(m^2+1)\left(1+\frac{1}{100m}\right)+\frac{2}{5}\le (m+1)^2,
+		\qquad
+		m^2\left(1+\frac{1}{100m}\right)+1\le (m+1)^2.
 	\]
-	Applying this to \eqref{eq:gonna-bound-m-function} yields
+	Therefore
 	\[
 		\sigma^* \le (m+1)^2\left(\nu+e^{-k/(80000m^2)}\right)
 		\le (m+1)^2\left(\nu+e^{-k/(80000(m+1)^2)}\right),
