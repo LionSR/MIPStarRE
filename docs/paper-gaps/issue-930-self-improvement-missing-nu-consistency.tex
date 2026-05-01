@@ -17,14 +17,15 @@
 \section{The assertion}
 
 The self-improvement step in \cite[Section~9]{Ji2020LowIndividualDegree}
-takes a projective measurement $G$, a threshold parameter $m$, a field
-size $q$, and a degree bound $d$, together with a parent measurement $A$
-(which is a projective $m'$-qubit measurement for some $m'\le m$).  The
-surrounding strategy has soundness error $\eps$ and completeness error
-$\delta$; the function $g$ maps a point $\bu$ to its evaluation, and
-$[g(\bu)=a]$ selects the outcome indexed by $a$.  The paper's
-self-improvement theorem then assumes the following
-consistency hypothesis on $G$: on average over $\bu\in\F_q^{\,m}$,
+takes a measurement $G\in\polymeas{m}{q}{d}$, where $m$ is the number
+of variables, $q$ the field size, and $d$ the degree bound of the
+low individual degree test.  The surrounding strategy provides a
+projective measurement family $A=\{A^{\bu}\}_{\bu\in\F_q^{\,m}}$ with
+outcomes in $\F_q$, together with a bipartite state $\ket\psi$, soundness
+parameter $\eps$, and completeness parameter $\delta$.  The function $g$
+maps a point $\bu$ to its evaluation, and $[g(\bu)=a]$ selects the outcome
+indexed by $a$.  The paper's self-improvement theorem then assumes the
+following consistency hypothesis on $G$: on average over $\bu\in\F_q^{\,m}$,
 \begin{equation}
   \label{eq:paper-nu-consistency}
   A_a^{\bu}\ot I \simeq_{\nu} I \ot G_{[g(\bu)=a]}.
