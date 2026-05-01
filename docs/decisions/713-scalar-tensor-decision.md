@@ -75,10 +75,10 @@ is also more verbose for downstream consumers that only need the scalar estimate
 
 ### Option 3 — Hybrid (Scalar Public API + Internal Tensor Machinery)
 
-Keep **public** endpoints as scalar averages but use **private** tensor-form
-intermediates for the load-bearing internal steps (`closenessOfIP`,
-Schwartz–Zippel PSD, collision marginalization).  The public lemmas are pure
-scalar inequalities:
+Keep **public** endpoints as scalar averages but use **internal-use**
+tensor-form intermediates for the load-bearing internal steps
+(`closenessOfIP`, Schwartz–Zippel PSD, collision marginalization).  The public
+lemmas are pure scalar inequalities:
 ```
 |fullSliceABAAvg - evaluatedSliceABAAvg| ≤ 4·√ζ
 |fullSliceABABAvg - evaluatedSliceABABAvg| ≤ 2·md/q + 4·√ζ
@@ -88,13 +88,14 @@ the scalar endpoints to the tensor forms, runs the heavy operator-level
 arguments, and then moves back.
 
 **Pro**: The public API remains a faithful scalar counterpart of the paper's
-`eq:gcomterms` expansion.  The tensor machinery is encapsulated as private
-lemmas, so maintainers of downstream theorems see only scalar inequalities.  The
-extra `2√ζ` overhead from the scalar/tensor bridges is bounded by the existing
+`eq:gcomterms` expansion.  The tensor machinery is kept out of the downstream
+scalar API, so maintainers of downstream theorems see only scalar inequalities.
+The extra `2√ζ` overhead from the scalar/tensor bridges is bounded by the
+existing
 error parameters (a constant-factor change in `ζ` does not affect the asymptotic
 soundness cascade).
 
-**Con**: The private tensor layer is substantial (~1000 lines in
+**Con**: The internal tensor layer is substantial (~1000 lines in
 `Transport/FullSlice.lean` for collision marginalization alone, plus ~700 lines
 in `Main/Auxiliary.lean` for the bridge chain).  A contributor reading only the
 public lemmas may be surprised that the proof pays an extra `2√ζ` beyond what the
@@ -104,9 +105,9 @@ paper's inline computation suggests; the overhead breakdown is given in the
 ## Decision
 
 **Option 3 (Hybrid)** was chosen.  The scalar public API keeps the
-`thm:com-main` interface paper-faithful, while the private tensor layer contains
-the mathematically delicate operator-level arguments and keeps them out of the
-downstream dependency surface.
+`thm:com-main` interface paper-faithful, while the internal tensor layer
+contains the mathematically delicate operator-level arguments and keeps them out
+of the downstream scalar API.
 
 ## Architecture Map: Scalar Public API
 
@@ -128,6 +129,11 @@ downstream dependency surface.
 | X-eval BAB⊗A tensor avg | `xEvaluatedSliceBABAtensorAvg` | `Transport/FullSlice.lean` | line 359 bridge |
 | X-eval ABA⊗B tensor avg | `xEvaluatedFullSliceABABtensorAvg` | `Transport/FullSlice.lean` | line 360 bridge |
 | Eval ABA⊗B tensor avg | `evaluatedSliceABABtensorAvg` | `Transport/FullSlice.lean` | `eq:evaluate-gcom...-dos` |
+
+Only the two full-slice tensor averages are private declarations.  The evaluated
+tensor averages are public helper declarations because later bridge lemmas refer
+to them, but they are internal bridge infrastructure rather than stable public
+endpoints.
 
 ## Architecture Map: Scalar↔Tensor Bridge Chain
 
@@ -155,18 +161,18 @@ cubic endpoints are compared to a common `G ⊗ G` switch-sandwich center, costi
    (`fullSlice_scalar_marginalize_x` / `fullSlice_scalar_marginalize_y`).
 
 2. **New lemmas that need operator-level PSD arguments** (Schwartz–Zippel,
-   `closenessOfIP`) should add private tensor intermediate definitions in
-   `Transport/FullSlice.lean` and connect them to the public scalar API via
-   bridge lemmas with explicit `√ζ` error terms.
+   `closenessOfIP`) should add private or internal-use tensor intermediate
+   definitions in `Transport/FullSlice.lean` and connect them to the public
+   scalar API via bridge lemmas with explicit `√ζ` error terms.
 
 3. **The extra `2√ζ` overhead** in the second-term transport (`4√ζ` total, rather
    than the paper's `2√ζ`) is a consequence of this architecture.
 
-4. **Do not expose private tensor intermediates** as public API without updating
-   this decision record.  Any change that makes a tensor-form average public
-   should first discuss whether the scalar API should be downgraded or whether a
-   new public tensor endpoint is justified by a downstream consumer that genuinely
-   needs the operator structure.
+4. **Do not promote internal tensor intermediates** to stable public API without
+   updating this decision record.  Any change that makes a tensor-form average a
+   documented public endpoint should first discuss whether the scalar API should
+   be downgraded or whether the endpoint is justified by a downstream consumer
+   that genuinely needs the operator structure.
 
 ## Cross-References
 
