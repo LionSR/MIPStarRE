@@ -7,107 +7,118 @@
 
 \input{command}
 
-\title{Missing $\nu$-consistency hypothesis in self-improvement theorem}
+\title{Missing $\nu$-Consistency Hypothesis in the Self-Improvement Theorem}
 \author{}
 \date{2026-05-01}
 
 \begin{document}
 \maketitle
 
-\section{The paper statement}
+\section{The assertion}
 
-Theorem~\emph{Self-improvement} (both the standalone version in
-\texttt{self\_improvement.tex} and the induction-section version in
-\texttt{inductive\_step.tex}) assumes the following hypothesis on the
-input measurement $G \in \polymeas{m}{q}{d}$:
-\begin{enumerate}
-  \item (Consistency with~$A$): On average over $\bu \sim \F_q^m$,
-  \begin{equation*}
-    A_a^{\bu} \ot I \simeq_\nu  I \ot G_{[g(\bu)=a]}.
-  \end{equation*}
-\end{enumerate}
-Under this hypothesis the paper proves completeness
-$\bra{\psi} H \ot I \ket{\psi} \ge (1-\nu)-\zeta$, point
-consistency at~$\zeta$, strong self-consistency at~$\zeta$, and the
-boundedness estimate $\bra{\psi} Z \ot (I-H) \ket{\psi} \le
-\zeta$, where
-$\zeta = 3000 m (\eps^{1/32} + \delta^{1/32} + (d/q)^{1/32})$.
-For the non-projective helper lemma the error is
-$\widehat\zeta = 100 m (\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2})$.
+The self-improvement step in \cite[Section~9]{Ji2020LowIndividualDegree}
+takes a projective measurement $G$, a threshold parameter $m$, a field
+size $q$, and a degree bound $d$, together with a parent measurement $A$
+(which is a projective $m'$-qubit measurement for some $m'\le m$). The
+paper's self-improvement theorem then assumes the following
+consistency hypothesis on $G$: on average over $\bu\in\F_q^{\,m}$,
+\begin{equation}
+  \label{eq:paper-nu-consistency}
+  A_a^{\bu}\ot I \simeq_{\nu} I \ot G_{[g(\bu)=a]}.
+\end{equation}
+Here $\simeq_{\nu}$ is the paper's approximation relation comparing two
+families of measurements by the expectation of their difference: for a
+bipartite state $\ket\psi$, the expectation difference is at most $\nu$.
+The parameter $\zeta$ is set to
+$\zeta = 3000\,m\,(\eps^{1/32}+\delta^{1/32}+(d/q)^{1/32})$.
+Under \eqref{eq:paper-nu-consistency} the theorem concludes completeness
+$\bra\psi H\ot I\ket\psi \ge (1-\nu)-\zeta$, point consistency of $H$,
+strong self-consistency of $H$ at level $\zeta$, and the operator bound
+$\bra\psi Z\ot(I-H)\ket\psi \le \zeta$ where $Z$ dominates the averaged
+$A$-operators.\footnote{The paper passages are
+\path{references/ldt-paper/self_improvement.tex}, lines~635--671, and the
+helper lemma lines~348--433; the induction-section wrapper is in
+\path{references/ldt-paper/inductive_step.tex}, lines~149--196. This note
+is part of the retrospective audit in \ghissue{930}. The discrepancy is
+tracked for resolution in \ghissue{931}.}
 
-\section{The Lean formalization}
+\section{The formal statement}
 
-The Lean theorem
-\leanid{MIPStarRE.LDT.SelfImprovement.selfImprovement}
-(\path{SelfImprovement/Theorems/Results.lean}, lines~172--262) does \emph{not}
-include the $\simeq_\nu$ consistency hypothesis. Instead it takes three
-explicit bridge-input hypotheses:
+The Lean development provides the corresponding theorem but does not
+include the $\simeq_{\nu}$ consistency hypothesis \eqref{eq:paper-nu-consistency}.%
+\footnote{The Lean declaration is \leanid{MIPStarRE.LDT.SelfImprovement.selfImprovement}
+in \doclink{MIPStarRE/LDT/SelfImprovement/Theorems/Results.lean}, lines~172--262.}
+Instead it takes three explicit bridge-input hypotheses:\footnote{The
+bridge-input structure is \leanid{SelfImprovementBridgeInputs}
+in \doclink{MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean},
+lines~363--378.}
 \begin{itemize}
-  \item \leanid{hhelperStrongSelfConsistency}~:
-    \leanid{HelperStrongSelfConsistencyInput}
-  \item \leanid{horthonormalization}~:
-    \leanid{OrthonormalizationInput}
-  \item \leanid{hfinalFields}~:
-    \leanid{FinalFieldsInput params strategy eps delta nu}
+  \item a strong-self-consistency input for the averaged helper measurement,
+  \item an orthonormalization input, and
+  \item a final-fields input packaging the remaining conclusions.
 \end{itemize}
-The parameter \leanid{nu} appears in the conclusion
-(\leanid{completeness} at level \leanid{(1 - nu) - selfImprovementError})
-but is nowhere constrained by a hypothesis linking it to the input
-measurement~\leanid{G}. Moreover \leanid{G} is passed to
-\leanid{selfImprovementHelper} as an explicit unused argument
-(\texttt{\_G}).
+The parameter $\nu$ appears in the theorem's conclusion---the completeness
+bound is $(1-\nu)-$\emph{selfImprovementError}---but there is no hypothesis
+tying $\nu$ to the input measurement $G$. The argument $G$ is passed to the
+helper lemma as an explicit unused parameter.
 
-The induction-section wrapper
-\leanid{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection}
-(\path{MainInductionStep/Theorems.lean}, lines~66--155) \emph{does} list the
-$\simeq_\nu$ hypothesis as the parameter \texttt{\_hcons}, but the proof
-immediately delegates to \leanid{SelfImprovement.selfImprovementFromSubMeas},
-which ignores it. The hypothesis is therefore an unused vestigial parameter
-in the induction-section wrapper as well.
+In the induction-step wrapper%
+\footnote{\leanid{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection}
+in \doclink{MIPStarRE/LDT/MainInductionStep/Theorems.lean}, lines~66--155.}
+the $\simeq_{\nu}$ hypothesis does appear as a formal parameter, but the
+proof immediately delegates to a bridge-input-based theorem that ignores it.
+The hypothesis is thus vestigial at both the standalone and the
+induction-section level.
 
-\section{Why this matters}
+\section{Mathematical consequence}
 
-The paper's proof of the four self-improvement conclusions chains through
-$G$'s $\nu$-consistency with~$A$; without this hypothesis the
-completeness bound $(1-\nu)-\zeta$ is logically correct but vacuous
-(one may choose $\nu = 1$). The bridge-input system
-(\leanid{SelfImprovementBridgeInputs}, \leanid{HelperStrongSelfConsistencyInput},
-\leanid{FinalFieldsInput}) is an explicit documented workaround that
-packages the missing proof obligations, but it does \emph{not} restore
-the paper's $\simeq_\nu$ hypothesis to the statement of the Lean
-\leanid{selfImprovement} theorem.
+The omission of $\simeq_{\nu}$ weakens the mathematical content of the
+formal theorem. In the type of the Lean theorem, $\nu$ is a free real
+parameter with no constraint beyond its appearance in the error expression
+$(1-\nu)-\mathrm{error}$. Because the Lean theorem's hypotheses make no
+demands on $\nu$ and do not relate $\nu$ to any property of $G$, a call
+site is free to supply $\nu=1$; the bound then reads $-\mathrm{error}$,
+which is mathematically trivial. More generally, the theorem does not
+construct a small $\nu$ from $G$ and $A$; it merely accepts an arbitrary
+$\nu$ and promises that \emph{if} the bridge-input hypotheses are supplied,
+the conclusions follow. This is a genuine logical gap between the paper
+statement and the formal statement, not a notational convention. The bridge
+inputs record the missing proof obligations explicitly, but they do not
+restore a hypothesis on $G$ to the statement.
 
 \section{Blueprint status}
 
-The blueprint entry for Theorem~\emph{Self-improvement}
-(\path{ch07\_self\_improvement.tex}, lines~490--495) lists four Lean
-declarations---\leanid{selfImprovement},
-\leanid{SelfImprovementBridgeInputs},
-\leanid{selfImprovementFromBridgeInputs}, and
-\leanid{selfImprovementFromBridgeInputsSubMeas}---and marks them
-\leanid{\textbackslash leanok}. While all four declarations compile without
-\leanid{sorry}, the paper statement and the Lean statement differ in
-their hypotheses. This gap is tracked by \ghissue{931} (self-improvement
-input producers).
+The blueprint entry for the self-improvement theorem%
+\footnote{\path{blueprint/src/chapter/ch07_self_improvement.tex},
+lines~490--495.}
+lists the four Lean declarations and marks them \leanid{\textbackslash leanok}.
+While all four compile without \leanid{sorry}, the blueprint does not
+make the hypothesis discrepancy apparent. The Lean statement and the paper
+statement differ, and the blueprint's \leanid{\textbackslash leanok}
+annotation could be read as asserting that the full paper theorem is
+formalized without additional hypotheses.
 
 \section{Error coefficients}
 
-All error constants match the paper when the bridge inputs are
-discharged:
-\begin{itemize}
-  \item \leanid{selfImprovementHelperError}~$= 100 m (\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2})$ --- matches $\widehat\zeta$;
-  \item \leanid{selfImprovementOrthogonalizationError} delegates to \leanid{orthonormalizationError} --- the paper uses $100 \widehat\zeta^{\,1/4}$;
-  \item \leanid{selfImprovementDataProcessingError}~$= 8 \widehat\zeta + 8 \sqrt{\widehat\zeta_{\text{ortho}}}$ --- matches the paper;
-  \item \leanid{selfImprovementError}~$= 3000 m (\eps^{1/32} + \delta^{1/32} + (d/q)^{1/32})$ --- matches the paper's $\zeta$.
-\end{itemize}
+All error constants match the paper when the bridge inputs are discharged.
+The helper error $100\,m\,(\eps^{1/2}+\delta^{1/2}+(d/q)^{1/2})$ matches
+the paper's $\widehat\zeta$; the orthogonalization error delegates to the
+orthonormalization infrastructure, which uses the paper's $100\widehat\zeta^{\,1/4}$;
+the data-processing error $8\widehat\zeta+8\sqrt{\widehat\zeta_{\text{ortho}}}$
+matches the paper; and the final self-improvement error
+$3000\,m\,(\eps^{1/32}+\delta^{1/32}+(d/q)^{1/32})$ matches the paper's $\zeta$.
 
-\section{Classification}
+\section{Conclusion}
 
-This is a \textbf{documented structural gap}: the discrepancy between
-the paper statement and the Lean statement is explicitly surfaced by
-the bridge-input system and tracked by~\ghissue{931}, but the
-\leanid{\textbackslash leanok} annotation on the blueprint node
-could mislead a reader into thinking the full paper theorem is
-formalized without additional hypotheses.
+The paper's self-improvement theorem requires an approximation hypothesis
+$\simeq_{\nu}$ linking the input measurement $G$ to the parent measurement
+$A$. The formal theorem omits this hypothesis and instead accepts a
+package of bridge inputs. Until the bridge inputs are discharged in a way
+that recovers the missing $\simeq_{\nu}$ constraint on $G$, or the
+blueprint is amended to document the changed statement, the formal theorem
+does not match the paper's self-improvement theorem.
+
+\bibliographystyle{alpha}
+\bibliography{references}
 
 \end{document}
