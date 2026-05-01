@@ -369,6 +369,7 @@
 \begin{definition}[Lean successor-boundary aliases for the Section 3 proof]\label{def:main-formal-successor-boundary}
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAxisWeightedBound, MIPStarRE.LDT.Test.MainFormalSuccessorDiagonalWeightedBound, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictionPackage, MIPStarRE.LDT.Test.MainFormalSuccessorRecursiveSlices, MIPStarRE.LDT.Test.MainFormalSuccessorSelfImprovementProducer, MIPStarRE.LDT.Test.MainFormalSuccessorBoundary, MIPStarRE.LDT.Test.mainFormalSuccessorAxisWeightedBound_ofPass, MIPStarRE.LDT.Test.mainFormalSuccessorDiagonalWeightedBound_ofPass, MIPStarRE.LDT.Test.mainFormalSuccessorBoundary_ofRecursiveSelfImprovement}
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorSelfImprovementBridgeInputs, MIPStarRE.LDT.Test.mainFormalSuccessorSelfImprovementProducer_ofBridgeInputs, MIPStarRE.LDT.Test.mainFormalSuccessorBoundary_ofBridgeInputs}
+	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorRecursiveSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRecursiveSlices_ofSliceData}
 	\leanok
 	\uses{lem:symmetrization-bridge, thm:main-induction-public-wrapper}
 	These Lean-only aliases name the successor-case data that
@@ -376,8 +377,10 @@
 	Proposition~\ref{thm:main-induction-public-wrapper}. The public weighted-bound
 	helper lemmas discharge the weighted restricted-axis and restricted-diagonal
 	fields from the symmetrized passing strategy; the remaining external inputs are
-	the recursive slice witnesses, the restricted-strategy self-improvement
-	producer, and their bundled boundary package.
+	the recursive slice witnesses (together with their bridge-data structure
+	and conversion theorem), the restricted-strategy self-improvement
+	producer (together with its bridge-input packaging), and their bundled
+	boundary package.
 \end{definition}
 
 \begin{proposition}[Lean successor handoff for the Section 3 proof]\label{lem:main-formal-successor-handoff}

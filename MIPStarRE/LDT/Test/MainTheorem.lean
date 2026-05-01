@@ -448,6 +448,90 @@ def mainFormalSuccessorBoundary_ofRecursiveSelfImprovement
     recursiveSlices := hrec
     selfImprovementProducer := hself }
 
+/-- Slice-recursion bridge data for the successor branch of `mainFormal`.
+
+For each field element `x`, this package names the induction-hypothesis transport
+fields that the `MainFormalSuccessorRecursiveSlices` definition currently hides:
+a same-space projective strategy on the role-register space
+`SameSpaceProjStrat params (Role × ι)` together with compatibility proofs
+connecting it to the restricted slice from
+`MainInductionStep.xRestrictedStrategy`.
+
+When supplied together with a recursive induction hypothesis (see
+`mainFormalSuccessorRecursiveSlices_ofSliceData`), this data can close the
+`MainFormalSuccessorRecursiveSlices` requirement needed by
+`MainFormalSuccessorBoundary`. -/
+structure MainFormalSuccessorRecursiveSliceData (params : Parameters)
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) where
+  /-- For each field element `x`, a same-space projective strategy on the
+  role-register space that captures the restricted slice at `x`. -/
+  sliceStrategy : Fq params → SameSpaceProjStrat params (Role × ι)
+  /-- The slice strategy shares the symmetrization's bipartite state. -/
+  sliceState_eq : ∀ x, (sliceStrategy x).state = (strategy.strategySymmetrization).state
+  /-- The slice strategy's Alice point measurement matches the restricted
+  point measurement from the main induction step.  (The Bob measurement is
+  not needed for `MainFormalSuccessorRecursiveSlices`.) -/
+  slicePoint_eq : ∀ x,
+    (sliceStrategy x).pointMeasurementA =
+    (MainInductionStep.xRestrictedStrategy params
+      strategy.strategySymmetrization x).pointMeasurement
+  /-- Each slice strategy passes LDT with the common symmetrized error `3 * eps`.
+
+  Note: this structure constrains only `state` and `pointMeasurementA` of
+  `sliceStrategy x` (Bob's measurement, axis-parallel/diagonal data, and the
+  symmetry witnesses are unconstrained).  A downstream wiring of this bridge
+  into the live `mainFormal` `sorry` will need additional compatibility
+  fields before `slicePasses` becomes load-bearing for a recursive
+  `mainFormal` call. -/
+  slicePasses : ∀ x, (sliceStrategy x).PassesLowIndividualDegreeTest (3 * eps)
+
+/-- Convert per-slice induction-hypothesis data into a
+`MainFormalSuccessorRecursiveSlices` witness.
+
+This is the abstract induction-step lemma for #1021.  Given the honest
+`MainFormalSuccessorRecursiveSliceData` together with a recursive induction
+hypothesis that delivers `mainInductionError`-bounded polynomial measurements
+for each slice strategy, this rewrites the state and point-measurement
+compatibilities to produce the exact `MainFormalSuccessorRecursiveSlices` field
+needed by `MainFormalSuccessorBoundary`.
+
+The induction hypothesis `hrecSlice` mirrors what `mainInductionPublicWrapper`
+(or, equivalently, a recursive call to `mainFormal`) returns for the predecessor
+dimension: a polynomial measurement on the role-register space with consistency
+bounded by the main induction error evaluated at the restricted-profile bounds. -/
+theorem mainFormalSuccessorRecursiveSlices_ofSliceData
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (haxisWeightedBound : MainFormalSuccessorAxisWeightedBound params strategy eps)
+    (hdiagonalWeightedBound :
+      MainFormalSuccessorDiagonalWeightedBound params strategy eps)
+    (sliceData : MainFormalSuccessorRecursiveSliceData params strategy eps hpass)
+    (hrecSlice : ∀ (x : Fq params),
+      ∃ error : Error, ∃ G : Measurement (Polynomial params) (Role × ι),
+        ConsRel (sliceData.sliceStrategy x).state
+          (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas (sliceData.sliceStrategy x).pointMeasurementA)
+          (polynomialEvaluationFamily params G.toSubMeas)
+          error ∧
+        error ≤
+          let hrestrict :=
+            mainFormalSuccessorRestrictionPackage params strategy eps hpass
+              haxisWeightedBound hdiagonalWeightedBound
+          MainInductionStep.mainInductionError params k
+            (hrestrict.profile.axisParallel x)
+            (hrestrict.profile.selfConsistency x)
+            (hrestrict.profile.diagonal x)) :
+    MainFormalSuccessorRecursiveSlices params strategy eps hpass k
+      haxisWeightedBound hdiagonalWeightedBound := by
+  intro x
+  rcases hrecSlice x with ⟨error, G, hG, herr⟩
+  refine ⟨error, G, ?_, herr⟩
+  -- Rewrite the state and point measurement using the slice-data compatibilities
+  simpa [sliceData.sliceState_eq x, sliceData.slicePoint_eq x] using hG
 /-- Build the successor boundary from bridge inputs instead of the
 already-packaged self-improvement producer.
 
