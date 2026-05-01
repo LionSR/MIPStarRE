@@ -19,8 +19,11 @@
 The self-improvement step in \cite[Section~9]{Ji2020LowIndividualDegree}
 takes a projective measurement $G$, a threshold parameter $m$, a field
 size $q$, and a degree bound $d$, together with a parent measurement $A$
-(which is a projective $m'$-qubit measurement for some $m'\le m$). The
-paper's self-improvement theorem then assumes the following
+(which is a projective $m'$-qubit measurement for some $m'\le m$).  The
+surrounding strategy has soundness error $\eps$ and completeness error
+$\delta$; the function $g$ maps a point $\bu$ to its evaluation, and
+$[g(\bu)=a]$ selects the outcome indexed by $a$.  The paper's
+self-improvement theorem then assumes the following
 consistency hypothesis on $G$: on average over $\bu\in\F_q^{\,m}$,
 \begin{equation}
   \label{eq:paper-nu-consistency}
@@ -29,16 +32,17 @@ consistency hypothesis on $G$: on average over $\bu\in\F_q^{\,m}$,
 Here $\simeq_{\nu}$ is the paper's approximation relation comparing two
 families of measurements by the expectation of their difference: for a
 bipartite state $\ket\psi$, the expectation difference is at most $\nu$.
+The theorem produces an output measurement $H$ and a dual certificate
+operator $Z$ dominating the averaged $A$-operators.
 The parameter $\zeta$ is set to
 $\zeta = 3000\,m\,(\eps^{1/32}+\delta^{1/32}+(d/q)^{1/32})$.
 Under \eqref{eq:paper-nu-consistency} the theorem concludes completeness
 $\bra\psi H\ot I\ket\psi \ge (1-\nu)-\zeta$, point consistency of $H$,
 strong self-consistency of $H$ at level $\zeta$, and the operator bound
-$\bra\psi Z\ot(I-H)\ket\psi \le \zeta$ where $Z$ dominates the averaged
-$A$-operators.\footnote{The paper passages are
-\path{references/ldt-paper/self_improvement.tex}, lines~635--671, and the
-helper lemma lines~348--433; the induction-section wrapper is in
-\path{references/ldt-paper/inductive_step.tex}, lines~149--196. This note
+$\bra\psi Z\ot(I-H)\ket\psi \le \zeta$.\footnote{The paper passages are
+\path{references/ldt-paper/self_improvement.tex}, lines~635--671 (theorem)
+and lines~24--60 (helper lemma); the induction-section wrapper is in
+\path{references/ldt-paper/inductive_step.tex}, lines~249--286. This note
 is part of the retrospective audit in \ghissue{930}. The discrepancy is
 tracked for resolution in \ghissue{931}.}
 
@@ -58,7 +62,7 @@ lines~363--378.}
   \item a final-fields input packaging the remaining conclusions.
 \end{itemize}
 The parameter $\nu$ appears in the theorem's conclusion---the completeness
-bound is $(1-\nu)-$\emph{selfImprovementError}---but there is no hypothesis
+bound is $(1-\nu)-\zeta$---but there is no hypothesis
 tying $\nu$ to the input measurement $G$. The argument $G$ is passed to the
 helper lemma as an explicit unused parameter.
 
@@ -100,13 +104,17 @@ formalized without additional hypotheses.
 
 \section{Error coefficients}
 
+The paper's helper lemma carries its own error parameter
+$\widehat\zeta = 100\,m\,(\eps^{1/2}+\delta^{1/2}+(d/q)^{1/2})$;
+the orthonormalization step contributes a further error
+$\widehat\zeta_{\text{ortho}} = 100\,\widehat\zeta^{\,1/4}$.
 All error constants match the paper when the bridge inputs are discharged.
-The helper error $100\,m\,(\eps^{1/2}+\delta^{1/2}+(d/q)^{1/2})$ matches
-the paper's $\widehat\zeta$; the orthogonalization error delegates to the
+The helper error matches
+$\widehat\zeta$; the orthogonalization error delegates to the
 orthonormalization infrastructure, which uses the paper's $100\widehat\zeta^{\,1/4}$;
 the data-processing error $8\widehat\zeta+8\sqrt{\widehat\zeta_{\text{ortho}}}$
 matches the paper; and the final self-improvement error
-$3000\,m\,(\eps^{1/32}+\delta^{1/32}+(d/q)^{1/32})$ matches the paper's $\zeta$.
+$\zeta = 3000\,m\,(\eps^{1/32}+\delta^{1/32}+(d/q)^{1/32})$ matches the paper.
 
 \section{Conclusion}
 
