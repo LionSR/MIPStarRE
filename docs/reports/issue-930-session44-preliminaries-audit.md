@@ -16,7 +16,7 @@ I audited a new non-overlapping slice of already-formalized LDT statements in th
 
 This scope avoids the active areas for #1000 (`MIPStarRE/LDT/Tactic/AvgCongr.lean`), #998 (`MIPStarRE/LDT/Commutativity/Transport/FullSlice*`), #997 (`MIPStarRE/LDT/Basic/DistributionPMF.lean` and `DistributionMeasure.lean`), and the draft #889 Lean/Mathlib upgrade.  It also avoids the session 42 #930 slice: expansion/hypercube graph and global variance were not re-audited here.
 
-Verdict: I found no undocumented mathematical discrepancy in this slice, and I did not create a new `docs/paper-gaps/` note.  The formal statements preserve the paper's finite-field trace convention, Fourier orthogonality facts, polynomial-representative convention, and the `md/q` Schwartz--Zippel loss used in the induction step.  The only non-paper-literal aspect is an implementation choice: Lean defines the trace using Mathlib's algebraic trace and proves the Frobenius-sum formula as adjacent theorems.  This is mathematically equivalent to the paper's definition and is not a paper gap.
+Verdict: I found no undocumented mathematical discrepancy in this slice, and I did not create a new `docs/paper-gaps/` note.  The formal statements preserve the paper's finite-field trace convention, Fourier orthogonality facts, polynomial-representative convention, and the `md/q` Schwartz--Zippel loss used in the induction step.  The only non-paper-literal aspect is an implementation choice: Lean defines the trace using Mathlib's algebraic trace and proves the Frobenius-sum formula in adjacent theorems.  This is mathematically equivalent to the paper's definition and is not a paper gap.
 
 ## Validation
 
