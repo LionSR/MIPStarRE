@@ -159,7 +159,8 @@ Assuming the paper's inputs:
 
 this yields `∑_{Small} f ≤ 4√ζ`, matching `eq:small-overlaps` in the paper. The
 Lean statement is slightly stronger than the paper's: it does not need `f ≥ 0`,
-since the ordering hypothesis and partition-total estimate already suffice. -/
+since the ordering hypothesis and partition-total estimate already suffice.
+See `docs/paper-gaps/truncation-combinatorics-f-nonneg.tex`. -/
 lemma sum_small_le_four_sqrt {α : Type*} [Fintype α] [DecidableEq α]
     (L : Finset α)
     {f : α → ℝ}
