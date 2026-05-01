@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -352,6 +353,9 @@ class CollectLeanDeclsTests(unittest.TestCase):
 
     def test_find_changed_decls_missing_from_blueprint_tracks_public_dotted_api(self) -> None:
         """Public dotted names are not internal merely because they contain a dot."""
+        if shutil.which("git") is None:
+            self.skipTest("git executable is required for diff-based reverse-blueprint checks")
+
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             lean_root = root / "MIPStarRE"
@@ -381,6 +385,7 @@ class CollectLeanDeclsTests(unittest.TestCase):
                     def Role.other : Nat := 1
                     theorem Parameters.next : True := by
                       trivial
+                    def _root_.RootPublic : Nat := 3
                     def _private.generatedHelper : Nat := 2
                     """
                 ).strip()
@@ -397,7 +402,7 @@ class CollectLeanDeclsTests(unittest.TestCase):
             )
 
             missing_names = [decl.fqn for decl in missing]
-            self.assertEqual(missing_names, ["Role.other", "Parameters.next"])
+            self.assertEqual(missing_names, ["Role.other", "Parameters.next", "_root_.RootPublic"])
             self.assertNotIn("_private.generatedHelper", missing_names)
 
 

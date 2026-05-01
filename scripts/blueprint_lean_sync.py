@@ -48,7 +48,7 @@ _TRACKED_REVERSE_DECL_KINDS = {"def", "theorem", "lemma"}
 # internal-helper policy explicit and narrow so future public dotted APIs are
 # not silently skipped.
 _REVERSE_BLUEPRINT_INTERNAL_NAME_PREFIXES = ("_private.", "«_private.")
-_REVERSE_BLUEPRINT_INTERNAL_COMPONENT_PREFIXES = ("_",)
+_REVERSE_BLUEPRINT_INTERNAL_COMPONENT_NAMES = {"_private", "«_private"}
 _DIFF_HUNK_RE = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
 
 _NAMESPACE_OPEN_RE = re.compile(r"^\s*namespace\s+([\w.]+)", re.MULTILINE)
@@ -772,7 +772,7 @@ def _is_reverse_blueprint_internal_decl(decl: LeanDecl) -> bool:
         if spelling.startswith(_REVERSE_BLUEPRINT_INTERNAL_NAME_PREFIXES):
             return True
     return any(
-        part.startswith(_REVERSE_BLUEPRINT_INTERNAL_COMPONENT_PREFIXES)
+        part in _REVERSE_BLUEPRINT_INTERNAL_COMPONENT_NAMES
         for part in decl.short_name.split(".")
     )
 
