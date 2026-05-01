@@ -6,6 +6,7 @@ import MIPStarRE.LDT.Test.StrategyFailures
 import MIPStarRE.LDT.CommutativityPoints.Approximation
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 import MIPStarRE.LDT.Pasting.Bernoulli.Final
+import MIPStarRE.LDT.Tactic.AvgCongr
 -- Used by `selfImprovementInInductionSection`.
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results
 
@@ -1280,11 +1281,8 @@ private lemma sliceAxisDirectionErrorAverage_eq_axisDirectionError
       = avgOver (uniformDistribution (Fq params))
           (fun x => avgOver (uniformDistribution (Point params))
             (fun u => g (appendPoint params u x))) := by
-              refine avgOver_congr _ _ _ ?_
-              intro x
               unfold sliceAxisDirectionError
-              refine avgOver_congr _ _ _ ?_
-              intro u
+              avg_congr with x, u
               simpa [g] using restrictedAxisSampleError_eq params strategy x u i
     _ = avgOver (uniformDistribution (Fq params × Point params))
           (fun xu => g (appendPoint params xu.2 xu.1)) := hprod
@@ -1326,9 +1324,7 @@ private lemma axisFailure_eq_average_directionError
       = avgOver (uniformDistribution (Fin params.next.m))
           (fun i => avgOver (uniformDistribution (Point params.next))
             (fun u => err (i, u))) := by
-              refine avgOver_congr _ _ _ ?_
-              intro i
-              rfl
+              avg_congr
     _ = avgOver (uniformDistribution (Fin params.next.m × Point params.next)) err := hprod
     _ = avgOver (uniformDistribution (Point params.next × Fin params.next.m))
           (fun ui => err (ui.2, ui.1)) := hswap
@@ -3182,11 +3178,8 @@ private lemma family_pointConsistencyError_eq_avg
             bipartiteConsError strategy.state (uniformDistribution (Point params))
               (IdxProjMeas.toIdxSubMeas (xRestrictedStrategy params strategy x).pointMeasurement)
               (polynomialEvaluationFamily params (hself.sliceProj x).toSubMeas)) := by
-          apply avgOver_congr
-          intro x
           unfold bipartiteConsError
-          apply avgOver_congr
-          intro u
+          avg_congr with x, u
           simp [g, IdxPolyFamily.evaluatedAtNextPoint, polynomialEvaluationFamily,
             IdxProjMeas.toIdxSubMeas]
 
