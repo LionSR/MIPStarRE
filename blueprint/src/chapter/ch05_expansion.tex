@@ -39,19 +39,14 @@
 \begin{lemma}[Laplacian rewrite]\label{prop:laplacian-rewrite}
 	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianRewrite}
 	\uses{def:adjacency-laplacian}
-	% Lean-local gap: the current `laplacianRewrite` lemma proves the trivial
-	% identity `laplacian = laplacianDifferenceForm`, where
-	% `laplacianDifferenceForm` is currently defined as a synonym for
-	% `laplacian`. The paper-faithful edge-difference form
-	% `L = (1/2) E_{(u,v)} (|u> - |v>)(<u| - <v|)` is not yet formalized, so
-	% no blueprint-ok marker is claimed here.
-	% Unproved — see issue #449 (paper-wide LDT formalization progress).
+	\leanok
 	The Laplacian can be written as
 	\[
 		L = \frac12 \E_{(u,v)\sim C} (\ket{u}-\ket{v})(\bra{u}-\bra{v}).
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	The two vertex marginals of a random edge are uniform on $\F_q^m$. Expanding the right-hand side yields $(1/M)I-K$.
 \end{proof}
 

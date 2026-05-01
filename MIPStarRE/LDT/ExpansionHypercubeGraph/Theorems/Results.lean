@@ -245,10 +245,12 @@ lemma matrixGlobalRewrite (params : Parameters)
   refine ⟨?_⟩
   rw [matrixGlobalVariance_eq_closedForm, matrixGlobalVarianceTraceForm_eq_closedForm]
 
-/-- `prop:laplacian-rewrite`. -/
+/-- `prop:laplacian-rewrite` — the edge-difference form of the Laplacian
+equals the standard `(1/M)I - K` form.  Proved in
+`MIPStarRE.LDT.ExpansionHypercubeGraph.laplacian_eq_edgeDifferenceForm`. -/
 theorem laplacianRewrite (params : Parameters) :
-    laplacian params = laplacianDifferenceForm params := by
-  rfl
+    laplacian params = laplacianDifferenceForm params :=
+  laplacian_eq_edgeDifferenceForm params
 
 /-! ## Public theorem wrappers -/
 
