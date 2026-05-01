@@ -3833,10 +3833,10 @@ Note: this is the internal assembly theorem. The public boundary wrapper is
 `mainInductionPublicWrapper`. The restricted-probabilities boundary is already
 exposed separately via `restrictedProbabilities`, and
 `SelfImprovementPackage.ofSelfImprovementInInductionSection` packages the
-slice-wise restricted-strategy self-improvement output once it is supplied, but
-`hselfProducer` remains an explicit input because the current development still
-lacks the final public assembler connecting those outputs. That remaining
-wrapper work is tracked by TODO(#630). -/
+slice-wise restricted-strategy self-improvement output once it is supplied. This
+theorem therefore keeps `hselfProducer` as an explicit input; the remaining
+producer/wiring work belongs to the final `mainFormal` integration tracked by
+#931, #834, and #422. -/
 theorem mainInductionByRecursionOnM
     (params : Parameters)
     [FieldModel.{0} params.q]
@@ -3934,8 +3934,7 @@ noncomputable def mainInductionPublicRestrictionPackage
 
 /-- `thm:main-induction-public-wrapper`.
 
-This public successor-step wrapper combines the five explicit Section 6 inputs
-tracked by issues #631–#633:
+This public successor-step wrapper combines the five explicit Section 6 inputs:
 1. the weighted restricted-axis and restricted-diagonal bounds,
 2. the resulting `mainInductionPublicRestrictionPackage`,
 3. the slice-wise recursion witnesses used by `PerSliceInductionPackage.ofRecursion`,
@@ -3943,12 +3942,12 @@ tracked by issues #631–#633:
    `selfImprovementInInductionSection`, and
 5. `mainInductionByRecursionOnM`.
 
-Because issue #632 has not yet produced a canonical theorem turning the
-restricted-strategy self-improvement outputs into `SelfImprovementPackage`
-data, this wrapper keeps `hselfProducer` as an honest input rather than
-reintroducing a conclusion-shaped public premise. The conclusion exposes only
-the global measurement witness needed downstream by
-`MIPStarRE.LDT.Test.MainTheorem`. -/
+The theorem deliberately keeps `hselfProducer` as an honest input: the
+self-improvement outputs are packaged by
+`SelfImprovementPackage.ofSelfImprovementInInductionSection` once they are
+supplied, while producing those slice-wise outputs belongs to downstream
+`mainFormal` integration. The conclusion exposes only the global measurement
+witness needed downstream by `MIPStarRE.LDT.Test.MainTheorem`. -/
 theorem mainInductionPublicWrapper
     (params : Parameters)
     [FieldModel.{0} params.q]
