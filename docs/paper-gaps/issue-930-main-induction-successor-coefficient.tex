@@ -1,0 +1,133 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\setlength{\emergencystretch}{2em}
+
+\input{command}
+
+\title{The First Successor-Step Error Absorption in the Main Induction}
+\author{}
+\date{2026-05-01}
+
+\begin{document}
+\maketitle
+
+\section{The coefficient estimate in the source proof}
+
+We examine the last scalar absorption in the proof of the main induction theorem
+of \cite[Section~\emph{The main induction step}]{Ji2020LowIndividualDegree}.%
+\footnote{This note was found during the retrospective audit tracked by
+\ghissue{930}. The source passage is
+\path{references/ldt-paper/inductive_step.tex}, lines~584--620. The separate
+large-$k$ side condition in the same theorem is documented in
+\path{docs/paper-gaps/issue-906-main-formal-k-bound.tex}; it is not the point at
+issue here.}
+In the successor step, the symbol $m$ denotes the dimension of the restricted
+slices, so the theorem being proved is the case of dimension $m+1$. After
+self-improvement and pasting, the proof obtains an error parameter $\sigma^*$ and
+an intermediate parameter $\nu$ such that
+\begin{equation*}
+  \sigma^*
+  \le
+  \left(1+\frac{1}{100m}\right)(m^2+3)
+  \left(\nu+e^{-k/(80000m^2)}\right).
+  \tag{\path{eq:gonna-bound-m-function}}
+\end{equation*}
+The source then says that, because $m\ge 2$,
+\begin{equation*}
+  \left(1+\frac{1}{100m}\right)(m^2+3) \le (m+1)^2.
+  \tag{\path{successor-coefficient}}
+\end{equation*}
+This closes the comparison with the target bound in dimension $m+1$.
+
+\section{The first successor step}
+
+The induction begins with the base case $m=1$ and then applies the successor
+step from dimension $1$ to dimension $2$. In that first successor step, the
+slice dimension in the displayed coefficient is $m=1$. The coefficient
+comparison above is then false:
+\[
+  \left(1+\frac{1}{100}\right)(1^2+3)
+  = \frac{101}{25}
+  > 4
+  = (1+1)^2.
+\]
+Thus the printed reason ``because $m\ge 2$'' does not justify the first
+successor step. This is independent of the large-$k$ side condition: increasing
+$k$ does not change this coefficient comparison.
+
+The issue is only in this final scalar absorption. It does not affect the base
+case, the restricted-probability estimates, the self-improvement input, or the
+pasting theorem statement. It also does not show that the theorem is false in
+dimension $2$; it shows that the displayed coefficient comparison is not the
+argument that proves that case.
+
+\section{The formal replacement argument}
+
+The formal proof keeps the same theorem statement and the same final error
+parameter, but uses a sharper intermediate estimate before the last coefficient
+comparison.%
+\footnote{The sharper estimate is the private lemma
+\leanid{ldPastingInInductionNu\_le\_fifth\_mainInductionNu}; the final assembly is
+\leanid{assembleAveragedPastingInput}. Both are in
+\doclink{MIPStarRE/LDT/MainInductionStep/Theorems.lean}.}
+Let $E_m=e^{-k/(80000m^2)}$. The pasting parameter which the source bounds by
+$\nu$ is in fact bounded, in the small-parameter branch of the induction, by
+$\nu/5$. Together with the bound $\zeta\le\nu$ for the averaged
+self-improvement error, this gives
+\begin{align*}
+  \sigma^*
+  &\le
+  \left(m^2(\nu+E_m)+\nu\right)
+  \left(1+\frac{1}{100m}\right)
+  +\frac{2}{5}\nu+E_m \\
+  &=
+  \left((m^2+1)\left(1+\frac{1}{100m}\right)+\frac{2}{5}\right)\nu
+  +
+  \left(m^2\left(1+\frac{1}{100m}\right)+1\right)E_m.
+\end{align*}
+For every $m\ge 1$,
+\[
+  (m^2+1)\left(1+\frac{1}{100m}\right)+\frac{2}{5}
+  \le (m+1)^2,
+  \qquad
+  m^2\left(1+\frac{1}{100m}\right)+1
+  \le (m+1)^2.
+\]
+The two coefficients are therefore separately absorbed into the target
+coefficient $(m+1)^2$, including at $m=1$. Finally
+$E_m\le e^{-k/(80000(m+1)^2)}$, so the desired successor-step bound follows.
+
+The proof also has the usual saturated-error branch: if the target error is at
+least $1$, a trivial measurement gives the conclusion. The sharper absorption
+above is used only in the nontrivial branch where the small-parameter
+inequalities are derived.
+
+\section{Comparison with the blueprint and formal development}
+
+The blueprint now records this sharper absorption argument in the proof sketch
+for the main induction theorem, rather than repeating the source coefficient
+comparison with the assumption $m\ge2$.
+
+The formal development does not strengthen the theorem statement to avoid the
+first successor step. Instead it proves the sharper one-fifth bound for the
+pasting parameter and uses the two coefficient inequalities above. This is a
+replacement for the final scalar absorption in the source proof, not a change to
+the conclusion of the main induction theorem.
+
+\section{Conclusion}
+
+The source proof contains a harmless gap in the final scalar absorption of the
+successor step. The displayed coefficient estimate using
+$\left(1+1/(100m)\right)(m^2+3)$ requires $m\ge2$, while the induction also needs
+the successor step with $m=1$. The formal proof closes the missing first
+successor step by using the stronger bound that the pasting error parameter is at
+most $\nu/5$, and then absorbing the $\nu$ and exponential coefficients
+separately. The theorem statement and final constants remain unchanged.
+
+\bibliographystyle{alpha}
+\bibliography{references}
+
+\end{document}
