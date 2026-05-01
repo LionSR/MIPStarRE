@@ -11,7 +11,7 @@
 \end{definition}
 
 \begin{definition}[Low individual degree test]\label{def:low-individual-degree-test}
-	\lean{MIPStarRE.LDT.ProjStrat.lowIndividualDegreeFailureProbability, MIPStarRE.LDT.ProjStrat.PassesLowIndividualDegreeTest, MIPStarRE.LDT.BiProjStrat.lowIndividualDegreeFailureProbability, MIPStarRE.LDT.BiProjStrat.PassesLowIndividualDegreeTest}
+	\lean{MIPStarRE.LDT.ProjStrat.lowIndividualDegreeFailureProbability, MIPStarRE.LDT.ProjStrat.PassesLowIndividualDegreeTest, MIPStarRE.LDT.SameSpaceProjStrat.lowIndividualDegreeFailureProbability, MIPStarRE.LDT.SameSpaceProjStrat.PassesLowIndividualDegreeTest}
 	\leanok
 	\uses{def:roles}
 	Fix integers $m,d \ge 0$ and a prime power $q$. The $(m,q,d)$ low individual degree test has three equally likely subtests.
@@ -33,23 +33,18 @@
 \end{definition}
 
 \begin{definition}[General projective strategy]\label{def:projective-strategy}
-	\lean{MIPStarRE.LDT.ProjStrat, MIPStarRE.LDT.BiProjStrat, MIPStarRE.LDT.ProjStrat.toBiProjStrat}
+	\lean{MIPStarRE.LDT.ProjStrat, MIPStarRE.LDT.SameSpaceProjStrat, MIPStarRE.LDT.SameSpaceProjStrat.toGeneralProjStrat}
 	\leanok
-	% Lean-local gap: the paper permits separate local Hilbert spaces $\mathcal H_{\mathrm A}$
-	% and $\mathcal H_{\mathrm B}$, whereas the same-space `ProjStrat` forces a common
-	% finite index type. The staged refactor tracked by Issue #560 / scouting doc
-	% `audits/2026-04-23_ch02-separate-local-spaces-scouting.md` proceeds in three stages:
-	% Stage 1 (#676 and the #669 follow-up) introduces the paper-faithful container
-	% `BiProjStrat ιA ιB`, the forgetful embedding `ProjStrat.toBiProjStrat`, and
-	% the two-space low-individual-degree failure predicate; Stage 2 builds a true
-	% direct-sum role symmetrization to replace the same-space `Role × ι` target;
-	% Stage 3 migrates theorem statements from the paper (`SymStrat`, `mainFormal`) to the
-	% two-space API.
+	% Lean separates the paper-faithful two-space container `ProjStrat ιA ιB`
+	% from the same-space, swap-symmetric surrogate `SameSpaceProjStrat ι` used by
+	% the current role-register symmetrization pipeline. Remaining follow-up work:
+	% build the heterogeneous direct-sum role symmetrization replacing the same-space
+	% `Role × ι` target in the Step 1 bridge.
 	A general projective strategy for the $(m,q,d)$ low individual degree test consists of a bipartite state $\ket{\psi} \in \mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$ together with point, axis-parallel line, and diagonal-line projective measurements for each prover separately. We write these measurements as $A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}$ on the first prover and $A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B}$ on the second.
 \end{definition}
 
 \begin{lemma}[Bipartite strategy block identities]\label{lem:bipartite-strategy-block-identities}
-	\lean{MIPStarRE.LDT.BiProjStrat.localDirectSumBlock_nonneg, MIPStarRE.LDT.BiProjStrat.roleBlock_mul, MIPStarRE.LDT.BiProjStrat.roleBlock_nonneg}
+	\lean{MIPStarRE.LDT.ProjStrat.localDirectSumBlock_nonneg, MIPStarRE.LDT.ProjStrat.roleBlock_mul, MIPStarRE.LDT.ProjStrat.roleBlock_nonneg}
 	\uses{def:projective-strategy}
 	The block operators obtained from a bipartite projective strategy are
 	positive semidefinite, and the role-indexed blocks multiply according to the

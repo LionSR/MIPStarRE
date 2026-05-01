@@ -482,7 +482,8 @@ theorem ofSymConsistency (params : Parameters) [FieldModel params.q]
             have hpoint := qBipartiteConsDefect_extractRoleB_le_two_symm strategy.state
               (strategy.pointMeasurementA u).toMeasurement
               (strategy.pointMeasurementB u).toMeasurement Gu
-            simpa [Gu, SameSpaceProjStrat.strategySymmetrization, SameSpaceProjStrat.classicalRoleSymmStrategy,
+            simpa [Gu, SameSpaceProjStrat.strategySymmetrization,
+              SameSpaceProjStrat.classicalRoleSymmStrategy,
               SameSpaceProjStrat.symmetrizedPointMeasurement, roleSymmetrizedMeasurement,
               symmetrizedIdxProjMeas, IdxProjMeas.toIdxSubMeas,
               unsymmetrizedRightPOVM, extractRoleBMeasurement,
@@ -520,7 +521,8 @@ theorem ofSymConsistency (params : Parameters) [FieldModel params.q]
             have hpoint := qBipartiteConsDefect_extractRoleA_le_two_symm strategy.state
               (strategy.pointMeasurementA u).toMeasurement
               (strategy.pointMeasurementB u).toMeasurement Gu
-            simpa [Gu, SameSpaceProjStrat.strategySymmetrization, SameSpaceProjStrat.classicalRoleSymmStrategy,
+            simpa [Gu, SameSpaceProjStrat.strategySymmetrization,
+              SameSpaceProjStrat.classicalRoleSymmStrategy,
               SameSpaceProjStrat.symmetrizedPointMeasurement, roleSymmetrizedMeasurement,
               symmetrizedIdxProjMeas, IdxProjMeas.toIdxSubMeas,
               unsymmetrizedLeftPOVM, extractRoleAMeasurement,

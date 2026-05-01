@@ -11,7 +11,7 @@ The relation between this paper-faithful classical test model and the
 repository's current quantum/projective surrogate
 `SameSpaceProjStrat.lowIndividualDegreeFailureProbability` is made explicit through the
 role-average lemmas below together with
-`SameSpaceProjStrat.lowIndividualDegreeFailureProbability_eq_branchAverage`.
+`SameSpaceProjStrat.lowIndividualDegreeFailureProbability`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -108,7 +108,7 @@ self-consistency branch.
 This is the actual verifier check from `references/ldt-paper/test_definition.tex`:
 both provers receive the same point question and must return the same field
 value. On the projective side,
-`SameSpaceProjStrat.lowIndividualDegreeFailureProbability_eq_branchAverage` uses the
+`SameSpaceProjStrat.lowIndividualDegreeFailureProbability` uses the
 matching cross-prover point-agreement term
 `SameSpaceProjStrat.pointAgreementFailureProbability`, and
 `SameSpaceProjStrat.classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement` explains
@@ -355,7 +355,8 @@ noncomputable def lowIndividualDegreeAcceptanceProbability {params : Parameters}
       strategy.diagonalAcceptanceProbability) / 3
 
 /-- The full classical test acceptance probability is the acceptance-side
-analogue of `SameSpaceProjStrat.lowIndividualDegreeFailureProbability_eq_branchAverage`:
+analogue of the branch average inside
+`SameSpaceProjStrat.lowIndividualDegreeFailureProbability`:
 both formulas average the same axis-parallel and diagonal role choices and use
 the same cross-prover point-agreement self-consistency branch. Together with
 `SameSpaceProjStrat.classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement`, this
@@ -393,8 +394,8 @@ so this paper-faithful classical predicate does not collide by dot notation with
 the repository's quantum/projective surrogate predicate. The precise branch
 comparison is exposed concretely by
 `lowIndividualDegreeAcceptanceProbability_eq_branchAverage` on the classical side
-and `SameSpaceProjStrat.lowIndividualDegreeFailureProbability_eq_branchAverage` on the
-projective side. -/
+and `SameSpaceProjStrat.lowIndividualDegreeFailureProbability` on the
+same-space projective surrogate side. -/
 structure ClassicallyPassesLowIndividualDegreeTest {params : Parameters}
     [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params) (eps : Error) : Prop where

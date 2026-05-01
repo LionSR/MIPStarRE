@@ -323,7 +323,7 @@
 \section{Proof of the main formal theorem}
 
 \begin{lemma}[Role-register symmetrization bridge]\label{lem:symmetrization-bridge}
-	\lean{MIPStarRE.LDT.ProjStrat.strategySymmetrization, MIPStarRE.LDT.ProjStrat.strategySymmetrization_isGood_three_mul, MIPStarRE.LDT.ProjStrat.strategySymmetrization_isNormalized, MIPStarRE.LDT.ProjStrat.StrategySymmetrizationPackage, MIPStarRE.LDT.ProjStrat.StrategySymmetrizationPackage.strategySymmetrization_isGood, MIPStarRE.LDT.ProjStrat.StrategySymmetrizationPackage.strategySymmetrization_isNormalized, MIPStarRE.LDT.ProjStrat.strategySymmetrizationPackage}
+	\lean{MIPStarRE.LDT.SameSpaceProjStrat.strategySymmetrization, MIPStarRE.LDT.SameSpaceProjStrat.strategySymmetrization_isGood_three_mul, MIPStarRE.LDT.SameSpaceProjStrat.strategySymmetrization_isNormalized, MIPStarRE.LDT.SameSpaceProjStrat.StrategySymmetrizationPackage, MIPStarRE.LDT.SameSpaceProjStrat.StrategySymmetrizationPackage.strategySymmetrization_isGood, MIPStarRE.LDT.SameSpaceProjStrat.StrategySymmetrizationPackage.strategySymmetrization_isNormalized, MIPStarRE.LDT.SameSpaceProjStrat.strategySymmetrizationPackage}
 	\leanok
 	\uses{def:projective-strategy, def:symmetric-projective-strategy, def:good-strategy}
 	Let $(\psi,A^{\mathrm A},B^{\mathrm A},L^{\mathrm A},A^{\mathrm B},B^{\mathrm B},L^{\mathrm B})$ be a projective strategy passing the $(m,q,d)$ low individual degree test with probability at least $1-\eps$. Introducing a two-dimensional role register on each side and taking $(\psi_{\mathrm{sym}}, A_{\mathrm{sym}}, B_{\mathrm{sym}}, L_{\mathrm{sym}})$ as in paper Section~3 yields a symmetric projective strategy that is $(3\eps,3\eps,3\eps)$-good. The Lean package records this symmetrized strategy together with its goodness and normalization proofs for later use by the proof of Theorem~\ref{thm:main-formal}.
@@ -554,8 +554,8 @@
 \uses{thm:error-cascade-main-formal, thm:main-formal-envelope-basics}
 The following Lean declarations are bookkeeping infrastructure for the final
 assembly residual:
-\lean{MIPStarRE.LDT.ProjStrat.axisParallelRoleAverage_nonneg, MIPStarRE.LDT.ProjStrat.diagonalRoleAverage_nonneg}
-\lean{MIPStarRE.LDT.ProjStrat.lowIndividualDegreeFailureProbability_nonneg, MIPStarRE.LDT.ProjStrat.eps_nonneg_of_passes, MIPStarRE.LDT.ProjStrat.point_agreement_le_three_mul}
+\lean{MIPStarRE.LDT.SameSpaceProjStrat.axisParallelRoleAverage_nonneg, MIPStarRE.LDT.SameSpaceProjStrat.diagonalRoleAverage_nonneg}
+\lean{MIPStarRE.LDT.SameSpaceProjStrat.lowIndividualDegreeFailureProbability_nonneg, MIPStarRE.LDT.SameSpaceProjStrat.eps_nonneg_of_passes, MIPStarRE.LDT.SameSpaceProjStrat.point_agreement_le_three_mul}
 \lean{MIPStarRE.LDT.Test.mainFormalError_ge_one_of_one_le_envelope, MIPStarRE.LDT.Test.mainFormalError_ge_one_of_one_lt_eps, MIPStarRE.LDT.Test.mainFormalError_ge_one_of_q_lt_d}
 \lean{MIPStarRE.LDT.Test.mainFormalInductionNu_bound, MIPStarRE.LDT.Test.cascadeHypotheses_of_not_mainFormalError_ge_one}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeScalars.ofCascadeHypotheses, MIPStarRE.LDT.Test.MainFormalCascadeScalars.ofNontrivialMainFormal, MIPStarRE.LDT.Test.MainFormalCascadeScalars.zeta3_div_two_le_mainFormalError}
