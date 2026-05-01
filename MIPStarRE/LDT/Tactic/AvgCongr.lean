@@ -129,6 +129,7 @@ private partial def evalAvgCongrCore
             throwError
               "avg_congr failed: no `avgOver` head and leaf tactics did not close the goal"
 
+/-- Elaborator for the `avg_congr` tactic syntax. -/
 @[tactic avgCongr]
 def evalAvgCongr : Tactic := fun stx => do
   match stx with

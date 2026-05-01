@@ -63,3 +63,17 @@ macro_rules
     | exact _root_.MIPStarRE.LDT.SubMeas.total_nonneg _
     | positivity
     | nlinarith)
+
+section Examples
+
+namespace MIPStarRE.LDT
+
+example {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState (ι × ι)) (X Y : MIPStarRE.Quantum.Op ι)
+    (hX : 0 ≤ X) (hY : 0 ≤ Y) :
+    0 ≤ ev ψ (opTensor X Y) := by
+  quantum_nonneg
+
+end MIPStarRE.LDT
+
+end Examples

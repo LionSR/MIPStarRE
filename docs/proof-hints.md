@@ -24,6 +24,35 @@ missing inequality lemma. It is usually one of these:
 4. Before changing the final proof, prove all transport lemmas and outcome lemmas first.
 5. Keep a running scratch file or todo note with the intended chain of intermediate families.
 
+## Opt-in LDT tactics
+
+The repository has a few local proof helpers. They are deliberately opt-in: importing them does
+not add global simp lemmas or positivity extensions.
+
+- Use `simp [ldt_simp]` or `simpa [ldt_simp]` for audited LDT bookkeeping rewrites.
+  Do not widen the global simp set just to make a local `ldt_simp` proof shorter.
+- Use `quantum_nonneg` for small canonical quantum nonnegativity goals. Keep tensor rewrites
+  such as `leftTensor_mul_rightTensor_eq_opTensor` explicit unless a local benchmark shows that
+  hiding them does not increase elaboration time.
+- Use `avg_congr` for nested `avgOver_congr` boilerplate. The support-restricted fallback in
+  `avg_congr ... using ...` is a narrow convenience; avoid broad migrations to it when the plain
+  pointwise route is already clear.
+- Import `MIPStarRE.LDT.Tactic` only in small files that need several helpers. Otherwise prefer
+  the specific tactic module import.
+
+A local timing pass on 2026-05-01 with cached Mathlib oleans gave these wall-clock `lake env lean`
+checks and no `maxHeartbeats` failures:
+
+| File | Real time |
+| --- | ---: |
+| `MIPStarRE/LDT/Tactic/LdtSimpAttr.lean` | 1.59s |
+| `MIPStarRE/LDT/Tactic/LdtSimp.lean` | 6.32s |
+| `MIPStarRE/LDT/Tactic/QuantumNonneg.lean` | 6.25s |
+| `MIPStarRE/LDT/Tactic/AvgCongr.lean` | 6.57s |
+| `MIPStarRE/LDT/Tactic.lean` | 6.18s |
+| `MIPStarRE/LDT/Preliminaries/Defs.lean` | 8.90s |
+| `MIPStarRE/LDT/Preliminaries/ComparisonCore.lean` | 7.06s |
+
 ## First things to check
 
 ### 1. Does the distribution model match the paper?
