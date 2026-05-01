@@ -17,6 +17,7 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 	\]
 \end{lemma}
 \begin{proof}
+	\leanok
 	\uses{lem:schwartz-zippel-individual, lem:axis-line-polynomial-agreement-mdq}
 	Expand the $\approx_{md/q}$ norm on the weighted vector $(I\ot (G_g)^{1/2})\ket{\psi}$. Because $B^\ell$ is a projective measurement, only those line polynomials $f$ with $f\ne g|_\ell$ and $f(u)=g(u)$ contribute. Lemma~\ref{lem:axis-line-polynomial-agreement-mdq} is the univariate Schwartz--Zippel wrapper used in Lean for this line-restriction event; it supplies the paper's $md/q$ loss, and the remaining operator sum is bounded by the fact that $G$ is a submeasurement.
 \end{proof}
