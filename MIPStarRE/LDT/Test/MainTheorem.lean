@@ -448,6 +448,40 @@ def mainFormalSuccessorBoundary_ofRecursiveSelfImprovement
     recursiveSlices := hrec
     selfImprovementProducer := hself }
 
+/-- Build the successor boundary from bridge inputs instead of the
+already-packaged self-improvement producer.
+
+This is the public-facing constructor for issue #1020: it wires the
+honest per-slice Section 9 bridge inputs through the existing
+`mainFormalSuccessorSelfImprovementProducer_ofBridgeInputs` conversion and
+packages them together with the weighted restricted-probability fields and
+the recursive slice witnesses into a `MainFormalSuccessorBoundary`.
+
+The weighted restricted-probability fields are discharged from `hpass`
+by the public Section 6 weighted-bound lemmas, matching the pattern of
+`mainFormalSuccessorBoundary_ofRecursiveSelfImprovement`. -/
+noncomputable def mainFormalSuccessorBoundary_ofBridgeInputs
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (hrec : MainFormalSuccessorRecursiveSlices params strategy eps hpass k
+      (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
+      (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass))
+    (hbridge : MainFormalSuccessorSelfImprovementBridgeInputs params strategy eps hpass k
+      (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
+      (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass)) :
+    MainFormalSuccessorBoundary params strategy eps hpass k :=
+  let axisBound := mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass
+  let diagonalBound :=
+    mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass
+  { axisWeightedBound := axisBound
+    diagonalWeightedBound := diagonalBound
+    recursiveSlices := hrec
+    selfImprovementProducer :=
+      mainFormalSuccessorSelfImprovementProducer_ofBridgeInputs params strategy eps hpass k
+        axisBound diagonalBound hbridge }
+
 /-- Successor-case Section 6 handoff for `mainFormal`.
 
 This is the actual invocation of
