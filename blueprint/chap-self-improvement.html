@@ -226,7 +226,7 @@
 
     <a class="icon proof" href="chap-self-improvement.html#lem:self-improvement-helper">#</a>
     
-    <a class="icon proof" href="chap-self-improvement.html#a0000000283"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-self-improvement.html#a0000000287"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -290,38 +290,38 @@
   <p>   Let \(G \in \mathrm{PolyMeas}(m,q,d)\) be a measurement with the following property: </p>
 <ol class="enumerate">
   <li><p>(Consistency with&#160;\(A\)):  On average over \(u \sim \mathbb {F}_q^{m}\), </p>
-<div class="displaymath" id="a0000000284">
+<div class="displaymath" id="a0000000288">
   \[  A^{u}_a \otimes I \simeq _{\nu } I \otimes G_{[g(u)=a]}.  \]
 </div>
 </li>
 </ol>
 <p> Let </p>
-<div class="displaymath" id="a0000000285">
+<div class="displaymath" id="a0000000289">
   \[  \zeta = 100m\cdot \Big(\varepsilon ^{1/2} + \delta ^{1/2} + (d/q)^{1/2}\Big).  \]
 </div>
 <p> Then there exists \(H \in \mathrm{PolySub}(m,q,d)\) with the following properties: </p>
 <ol class="enumerate">
   <li><p>(Completeness):  If \(H = \sum _h H_h\), then </p>
-<div class="displaymath" id="a0000000286">
+<div class="displaymath" id="a0000000290">
   \[  \langle \psi  \rvert  H \otimes I \lvert \psi  \rangle  \geq (1-\nu )-\zeta .  \]
 </div>
 </li>
   <li><p>(Consistency with&#160;\(A\)):  On average over \(u \sim \mathbb {F}_q^m\), </p>
-<div class="displaymath" id="a0000000287">
+<div class="displaymath" id="a0000000291">
   \[  A^u_a \otimes I \simeq _{\zeta } I \otimes H_{[h(u) = a]}.  \]
 </div>
 </li>
   <li><p>(Strong self-consistency):  </p>
-<div class="displaymath" id="a0000000288">
+<div class="displaymath" id="a0000000292">
   \[  \sum _{h} \langle \psi  \rvert  H_h \otimes H_h \lvert \psi  \rangle  \geq \langle \psi  \rvert  H \otimes I \lvert \psi  \rangle  - \zeta .  \]
 </div>
 </li>
   <li><p>(Boundedness):  There exists a positive-semidefinite matrix&#160;\(Z\) such that </p>
-<div class="displaymath" id="a0000000289">
+<div class="displaymath" id="a0000000293">
   \[  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  -\mathbb {E}_{u} \sum _a \langle \psi  \rvert  A^{u}_{a} \otimes H_{[h(u)=a]} \lvert \psi  \rangle  \leq \zeta  \]
 </div>
 <p> and for each \(h \in \mathcal{P}(m,q,d)\), </p>
-<div class="displaymath" id="a0000000290">
+<div class="displaymath" id="a0000000294">
   \[  Z \geq \left(\mathbb {E}_{u} A^{u}_{h(u)}\right).  \]
 </div>
 </li>
@@ -329,7 +329,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000283">
+<div class="proof_wrapper" id="a0000000287">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -342,30 +342,30 @@
   \begin{align}  \forall g \in \mathcal{P}(m,q,d): \qquad Z & \geq \left(\mathbb {E}_{u} A^{u}_{g(u)}\right), \label{eq:Z-greater-than-A}\\ T_g \cdot Z & = T_g \cdot \left(\mathbb {E}_{u} A^{u}_{g(u)}\right). \label{eq:swap-Z-for-A} \end{align}
 </div>
 <p> For each \(u \in \mathbb {F}_q^m\), define \(H^u=\{ H_h^u\} _{h \in \mathcal{P}(m,q,d)}\) by </p>
-<div class="displaymath" id="a0000000291">
+<div class="displaymath" id="a0000000295">
   \[  H_h^u := A^u_{h(u)} \cdot T_h \cdot A^u_{h(u)},  \]
 </div>
 <p> and let </p>
-<div class="displaymath" id="a0000000292">
+<div class="displaymath" id="a0000000296">
   \[  H_h := \mathbb {E}_{u} H_h^u.  \]
 </div>
 <p> The pointwise family \(H^u\) is a submeasurement because </p>
-<div class="displaymath" id="a0000000293">
+<div class="displaymath" id="a0000000297">
   \[  \sum _h H_h^u = \sum _a A_a^u \cdot \Big(\sum _{h:h(u)=a} T_h\Big)\cdot A_a^u \le \sum _a (A_a^u)^2 = I,  \]
 </div>
 <p> where the inequality uses that&#160;\(T\) is a measurement and the last identity uses that&#160;\(A\) is projective. Averaging over&#160;\(u\) gives </p>
-<div class="displaymath" id="a0000000294">
+<div class="displaymath" id="a0000000298">
   \[  \sum _h H_h = \mathbb {E}_{u} \sum _h H_h^u \le I,  \]
 </div>
 <p> so \(H\) is also a submeasurement and therefore lies in&#160;\(\mathrm{PolySub}(m,q,d)\). </p>
 <p>Set </p>
-<div class="displaymath" id="a0000000295">
+<div class="displaymath" id="a0000000299">
   \[  \zeta _{\mathrm{variance}} = 24m\cdot \Big(\varepsilon + \delta + \frac{md}{q}\Big).  \]
 </div>
 <p> Lemma&#160;<a href="chap-self-improvement.html#lem:add-in-u">7.3</a> below is the technical transfer from the averaged family&#160;\(H\) back to the sandwiched operators \(A^u_{h(u)}T_hA^u_{h(u)}\). We use it in the completeness, consistency, strong self-consistency, and boundedness estimates that follow. </p>
 <p>We now verify the four conclusions of Lemma&#160;<a href="chap-self-improvement.html#lem:self-improvement-helper">7.1</a>. </p>
 <p><em>Proof of <a href="chap-self-improvement.html#item:self-improvement-completeness">1</a>.</em> The completeness of&#160;\(H\) is </p>
-<div class="displaymath" id="a0000000296">
+<div class="displaymath" id="a0000000300">
   \begin{align}  \sum _h \langle \psi  \rvert  H_h \otimes I \lvert \psi  \rangle  & = \mathbb {E}_{u} \sum _h \langle \psi  \rvert  H^{u}_h \otimes I \lvert \psi  \rangle  \notag \\ & = \mathbb {E}_{u} \sum _h \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot T_h \cdot A^{u}_{h(u)}\bigr) \otimes I \lvert \psi  \rangle  \notag \\ & = \mathbb {E}_{u} \sum _a \langle \psi  \rvert  \bigl(A^{u}_{a} \cdot T_{[h(u) = a]} \cdot A^{u}_{a}\bigr) \otimes I \lvert \psi  \rangle . \label{eq:bracketize-the-expression} \end{align}
 </div>
 <p> We first move the leftmost copy of&#160;\(A^u_a\) across the bipartition: </p>
@@ -387,11 +387,11 @@
 </p>
 </div>
 <p> Here the second Cauchy–Schwarz factor is </p>
-<div class="displaymath" id="a0000000297">
+<div class="displaymath" id="a0000000301">
   \[  \mathbb {E}_{u} \sum _{a\neq b} \langle \psi  \rvert  A^u_a \otimes A^u_b \lvert \psi  \rangle ,  \]
 </div>
 <p> which is at most&#160;\(\delta \) because&#160;\(A\) is self-consistent and projective. Reindexing by&#160;\(h\) and using&#160;<a href="chap-self-improvement.html#eq:swap-Z-for-A" class="eqref">2</a>, </p>
-<div class="displaymath" id="a0000000298">
+<div class="displaymath" id="a0000000302">
   \[  \eqref{eq:mysterious-case-of-the-disappearing-a} = \sum _h \langle \psi  \rvert  \bigl(T_h \cdot \mathbb {E}_{u} A^u_{h(u)}\bigr) \otimes I \lvert \psi  \rangle  = \sum _h \langle \psi  \rvert  (T_h \cdot Z) \otimes I \lvert \psi  \rangle  = \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle .  \]
 </div>
 <p> Thus </p>
@@ -404,7 +404,7 @@
 </p>
 </div>
 <p> Since \(G\) is a measurement,&#160;<a href="chap-self-improvement.html#eq:Z-greater-than-A" class="eqref">1</a> and Lemma&#160;<a href="sec-prelims.html#prop:simeq-for-measurements">3.18</a> give </p>
-<div class="displaymath" id="a0000000299">
+<div class="displaymath" id="a0000000303">
   \[  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  \ge \mathbb {E}_{u} \sum _a \langle \psi  \rvert  A^u_a \otimes G_{[g(u)=a]} \lvert \psi  \rangle  \ge 1-\nu .  \]
 </div>
 <p> Therefore the completeness is at least \(1-\nu -3\sqrt{\delta }\), which is bounded below by \((1-\nu )-\zeta \). </p>
@@ -418,7 +418,7 @@
 </p>
 </div>
 <p> Apply Lemma&#160;<a href="chap-self-improvement.html#lem:add-in-u">7.3</a> with \(\mathcal O=\mathbb {F}_q\), \(M=A\), and \(S_u=\{ (a,h):h(u)\neq a\} \). Then </p>
-<div class="displaymath" id="a0000000300">
+<div class="displaymath" id="a0000000304">
   \[  \eqref{eq:consistency-with-A-baby-step} \approx _{4 \sqrt{\zeta _{\mathrm{variance}}}} \mathbb {E}_{u} \sum _{a, h: h(u) \neq a} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot A^{u}_a \cdot A^{u}_{h(u)}\bigr)\otimes T_h \lvert \psi  \rangle ,  \]
 </div>
 <p> and the right-hand side is&#160;\(0\) because&#160;\(A\) is projective. Hence </p>
@@ -431,7 +431,7 @@
 </p>
 </div>
 <p> Since </p>
-<div class="displaymath" id="a0000000301">
+<div class="displaymath" id="a0000000305">
   \[  4\sqrt{\zeta _{\mathrm{variance}}} = 4 \sqrt{24 m \cdot \Big(\varepsilon + \delta + \frac{md}{q}\Big)} \le 20 m \cdot \Big(\varepsilon ^{1/2} + \delta ^{1/2} + (d/q)^{1/2}\Big) \le \zeta ,  \]
 </div>
 <p> this proves <a href="chap-self-improvement.html#item:self-improvement-A-consistency">2</a>. </p>
@@ -467,7 +467,7 @@
 </p>
 </div>
 <p> The added off-diagonal contribution is </p>
-<div class="displaymath" id="a0000000302">
+<div class="displaymath" id="a0000000306">
   \begin{align}  \eqref{eq:threw-in-h-prime}-\eqref{eq:release-the-kraken} & = \mathbb {E}_{u} \sum _{h \neq h'} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot H^{u}_{h'} \cdot A^{u}_{h(u)}\bigr) \otimes T_h \lvert \psi  \rangle  \notag \\ & = \mathbb {E}_{u} \sum _{h \neq h'} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot T_{h'} \cdot A^{u}_{h(u)}\bigr) \otimes T_h \lvert \psi  \rangle  \cdot \mathbf{1}\! \left[h(u) = h’(u)\right], \label{eq:added-indicator} \end{align}
 </div>
 <p> where the second equality is&#160;<a href="chap-self-improvement.html#eq:h-blt" class="eqref">10</a>. To estimate&#160;<a href="chap-self-improvement.html#eq:added-indicator" class="eqref">14</a>, first replace the left copy of \(A^u_{h(u)}\) by \(A^v_{h(v)}\): </p>
@@ -480,7 +480,7 @@
 </p>
 </div>
 <p> The corresponding Cauchy–Schwarz bound is </p>
-<div class="displaymath" id="a0000000303">
+<div class="displaymath" id="a0000000307">
   \begin{multline}  \Big|\mathbb {E}_{u,v} \sum _{h \neq h'} \langle \psi  \rvert  \bigl((A^{u}_{h(u)} - A^{v}_{h(v)}) \cdot T_{h'} \cdot A^{u}_{h(u)}\bigr) \otimes T_h \lvert \psi  \rangle  \cdot \mathbf{1}\! \left[h(u) = h’(u)\right]\Big|\\ \leq \sqrt{\mathbb {E}_{u,v} \sum _{h \neq h'} \langle \psi  \rvert  \bigl((A^{u}_{h(u)} - A^{v}_{h(v)}) \cdot T_{h'} \cdot (A^{u}_{h(u)} - A^{v}_{h(v)})\bigr) \otimes T_h\lvert \psi  \rangle }\\ \cdot \sqrt{\mathbb {E}_{u,v} \sum _{h \neq h'} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot T_{h'} \cdot A^{u}_{h(u)}\bigr) \otimes T_h\lvert \psi  \rangle  \cdot \mathbf{1}\! \left[h(u) = h'(u)\right]}. \label{eq:swapped-u-for-cauchy-schwarz} \end{multline}
 </div>
 <p> The first factor is bounded by \(\sqrt{\zeta _{\mathrm{variance}}}\) via Lemma&#160;<a href="sec-variance.html#lem:global-variance-of-points">6.3</a>, and the second by&#160;\(1\) because \(T\) and \(H^u\) are submeasurements. </p>
@@ -531,28 +531,28 @@
 </p>
 </div>
 <p> Substituting&#160;<a href="chap-self-improvement.html#eq:swap-Z-for-A" class="eqref">2</a>, then&#160;<a href="chap-self-improvement.html#eq:Z-greater-than-A" class="eqref">1</a>, and finally the already proved bound&#160;<a href="chap-self-improvement.html#eq:explicit-bound-for-A-consistency" class="eqref">8</a>, one obtains </p>
-<div class="displaymath" id="a0000000304">
+<div class="displaymath" id="a0000000308">
   \[  \eqref{eq:move-over-v} \ge \sum _h \langle \psi  \rvert  H_h \otimes I \lvert \psi  \rangle  - 4\sqrt{\zeta _{\mathrm{variance}}}.  \]
 </div>
 <p> Combining&#160;<a href="chap-self-improvement.html#eq:release-the-kraken" class="eqref">12</a>, <a href="chap-self-improvement.html#eq:threw-in-h-prime" class="eqref">13</a>, <a href="chap-self-improvement.html#eq:swap-u-for-v-attack-of-the-clones" class="eqref">22</a>, and&#160;<a href="chap-self-improvement.html#eq:move-over-v" class="eqref">23</a> gives </p>
-<div class="displaymath" id="a0000000305">
+<div class="displaymath" id="a0000000309">
   \[  \sum _h \langle \psi  \rvert  H_h \otimes H_h \lvert \psi  \rangle  \ge \sum _h \langle \psi  \rvert  H_h \otimes I \lvert \psi  \rangle  - 11 \sqrt{\zeta _{\mathrm{variance}}} - \sqrt{2\delta } - \frac{md}{q}.  \]
 </div>
 <p> The paper’s arithmetic shows that the right-hand error is at most </p>
-<div class="displaymath" id="a0000000306">
+<div class="displaymath" id="a0000000310">
   \[  57m\cdot \Big(\varepsilon ^{1/2} + \delta ^{1/2} + (d/q)^{1/2}\Big) \le \zeta ,  \]
 </div>
 <p> which proves <a href="chap-self-improvement.html#item:self-improvement-self">3</a>. </p>
 <p><em>Proof of <a href="chap-self-improvement.html#item:self-improvement-boundedness">4</a>.</em> The boundedness quantity is </p>
-<div class="displaymath" id="a0000000307">
+<div class="displaymath" id="a0000000311">
   \[  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  -\mathbb {E}_{u} \sum _a \langle \psi  \rvert  A^{u}_{a} \otimes H_{[h(u)=a]} \lvert \psi  \rangle .  \]
 </div>
 <p> Reindexing the sum by&#160;\(h\), inserting \(\sum _a A_a^u=I\), and using&#160;<a href="chap-self-improvement.html#eq:explicit-bound-for-A-consistency" class="eqref">8</a>, </p>
-<div class="displaymath" id="a0000000308">
+<div class="displaymath" id="a0000000312">
   \[  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  -\mathbb {E}_{u} \sum _a \langle \psi  \rvert  A^{u}_{a} \otimes H_{[h(u)=a]} \lvert \psi  \rangle  \le \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  - \sum _h \langle \psi  \rvert  I \otimes H_h \lvert \psi  \rangle  + 4 \sqrt{\zeta _{\mathrm{variance}}}.  \]
 </div>
 <p> By&#160;<a href="chap-self-improvement.html#eq:gonna-use-this-later-H-versus-Z" class="eqref">6</a>, the right-hand side is at most \(3\sqrt{\delta }+4\sqrt{\zeta _{\mathrm{variance}}}\). Substituting the definition of \(\zeta _{\mathrm{variance}}\) and collecting terms gives </p>
-<div class="displaymath" id="a0000000309">
+<div class="displaymath" id="a0000000313">
   \[  23m\cdot \Big(\varepsilon ^{1/2} + \delta ^{1/2} + (d/q)^{1/2}\Big) \le \zeta .  \]
 </div>
 <p> Together with&#160;<a href="chap-self-improvement.html#eq:Z-greater-than-A" class="eqref">1</a>, this proves <a href="chap-self-improvement.html#item:self-improvement-boundedness">4</a>. </p>
@@ -574,7 +574,7 @@
 
     <a class="icon proof" href="chap-self-improvement.html#lem:sdp">#</a>
     
-    <a class="icon proof" href="chap-self-improvement.html#a0000000310"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-self-improvement.html#a0000000314"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -602,7 +602,7 @@
   </div>
   <div class="lemma_thmcontent">
   <p>  Let </p>
-<div class="displaymath" id="a0000000311">
+<div class="displaymath" id="a0000000315">
   \[  A_g = \mathbb {E}_{u \sim \mathbb {F}_q^m} A^u_{g(u)}.  \]
 </div>
 <p> Then the primal is </p>
@@ -625,7 +625,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000310">
+<div class="proof_wrapper" id="a0000000314">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -638,15 +638,15 @@
   \begin{align}  \sup & \quad \operatorname{Tr}(C^\dagger X) \label{eq:primal-canonical}\\ \text{s.t.} & \quad \operatorname{Tr}(D_{ij}^\dagger X) = b_{ij} \qquad \forall i,j\in \{ 1,\ldots ,r\} , \notag \\ & \quad X \geq 0, \notag \end{align}
 </div>
 <p> where </p>
-<div class="displaymath" id="a0000000312">
+<div class="displaymath" id="a0000000316">
   \[  C = \sum _{i = 1}^M \lvert i \rangle \langle i \rvert  \otimes A_{g_i},  \]
 </div>
 <p> and, for \(i,j \in \{ 1,\ldots ,r\} \), </p>
-<div class="displaymath" id="a0000000313">
+<div class="displaymath" id="a0000000317">
   \[  D_{ij} = \sum _{k=1}^{M+1} \lvert k \rangle \langle k \rvert  \otimes \lvert i \rangle \langle j \rvert , \qquad b_{ij} = \left\{ \begin{array}{rl} 1 &  \text{if } i = j,\\ 0 &  \text{otherwise}. \end{array}\right.  \]
 </div>
 <p> Writing \(X=\sum _{i,j=1}^{M+1}\lvert i \rangle \langle j \rvert \otimes X_{ij}\), the constraints say precisely that \(\sum _{i=1}^{M+1} X_{ii}=I\), hence \(\sum _{i=1}^{M}X_{ii}\le I\), and the objective is </p>
-<div class="displaymath" id="a0000000314">
+<div class="displaymath" id="a0000000318">
   \[  \operatorname{Tr}(C^\dagger X)=\sum _{i=1}^M \operatorname{Tr}(A_{g_i}\cdot X_{ii}).  \]
 </div>
 <p> Thus&#160;<a href="chap-self-improvement.html#eq:primal-canonical" class="eqref">28</a> is equivalent to&#160;<a href="chap-self-improvement.html#eq:primal-objective" class="eqref">24</a> under the identification \(T_{g_i}=X_{ii}\). </p>
@@ -655,12 +655,12 @@
   \begin{align}  \inf & \quad \sum _i\,  z_{ij} b_{ij} \label{eq:dual-canonical}\\ \text{s.t.} & \quad \sum _{i,j} \, z_{ij} D_{ij} \geq C. \label{eq:dual-canonical-constraint} \end{align}
 </div>
 <p> Since </p>
-<div class="displaymath" id="a0000000315">
+<div class="displaymath" id="a0000000319">
   \[  \sum _{i,j=1}^r z_{ij} D_{ij} = \sum _{k=1}^{M+1} \lvert k \rangle \langle k \rvert  \otimes \left(\sum _{i,j=1}^r z_{ij}\lvert i \rangle \langle j \rvert \right) =: \sum _{k=1}^{M+1}\lvert k \rangle \langle k \rvert  \otimes Z,  \]
 </div>
 <p> the constraint&#160;<a href="chap-self-improvement.html#eq:dual-canonical-constraint" class="eqref">30</a> is exactly \(Z\ge A_{g_i}\) for every \(i\), and the objective is \(\operatorname{Tr}(Z)\). Hence&#160;<a href="chap-self-improvement.html#eq:dual-canonical" class="eqref">29</a> is equivalent to&#160;<a href="chap-self-improvement.html#eq:dual-objective" class="eqref">25</a>. </p>
 <p>Slater’s condition holds because </p>
-<div class="displaymath" id="a0000000316">
+<div class="displaymath" id="a0000000320">
   \[  T_g = \frac{1}{2M}\cdot I \qquad \forall g\in \mathcal{P}(m,q,d), \qquad Z = 2I  \]
 </div>
 <p> are strictly feasible for the primal and dual respectively. Therefore strong duality holds. For an optimal pair \((X,(z_{ij}))\) in canonical form, complementary slackness gives </p>
@@ -690,7 +690,7 @@
 
     <a class="icon proof" href="chap-self-improvement.html#lem:add-in-u">#</a>
     
-    <a class="icon proof" href="chap-self-improvement.html#a0000000317"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-self-improvement.html#a0000000321"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -740,21 +740,21 @@
   </div>
   <div class="lemma_thmcontent">
   <p>   Let \(T=\{ T_h\} \) be an optimal solution of the primal SDP, let </p>
-<div class="displaymath" id="a0000000318">
+<div class="displaymath" id="a0000000322">
   \[  H_h = \mathbb {E}_{u \sim \mathbb {F}_q^m} A^u_{h(u)} T_h A^u_{h(u)},  \]
 </div>
 <p> and set </p>
-<div class="displaymath" id="a0000000319">
+<div class="displaymath" id="a0000000323">
   \[  \zeta _{\mathrm{variance}} = 24m\cdot \Big(\varepsilon + \delta + \frac{md}{q}\Big).  \]
 </div>
 <p> Suppose \(M = \{ M^u_o\} \) is a submeasurement with outcomes in some set \(\mathcal O\). For each \(u \in \mathbb {F}_q^m\), let \(S_u\) be a subset of \(\mathcal O \times \mathcal{P}(m,q,d)\). Then </p>
-<div class="displaymath" id="a0000000320">
+<div class="displaymath" id="a0000000324">
   \[  \mathbb {E}_{u} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  M^{u}_o \otimes H_h \lvert \psi  \rangle  \approx _{4\sqrt{\zeta _{\mathrm{variance}}}} \mathbb {E}_{u} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot M^{u}_o \cdot A^{u}_{h(u)}\bigr) \otimes T_h \lvert \psi  \rangle .  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000317">
+<div class="proof_wrapper" id="a0000000321">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -763,7 +763,7 @@
   </div>
   <div class="proof_content">
   <p>We begin by expanding </p>
-<div class="displaymath" id="a0000000321">
+<div class="displaymath" id="a0000000325">
   \begin{align}  \mathbb {E}_{u} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  M^{u}_o \otimes H_h \lvert \psi  \rangle  & = \mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  M^{u}_o \otimes H^{v}_h \lvert \psi  \rangle  \notag \\ & = \mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  M^{u}_o \otimes \bigl(A^{v}_{h(v)} \cdot T_h \cdot A^{v}_{h(v)}\bigr) \lvert \psi  \rangle . \label{eq:expand-that-H} \end{align}
 </div>
 <p> We claim that </p>
@@ -776,15 +776,15 @@
 </p>
 </div>
 <p> To show this, we bound the magnitude of the difference: </p>
-<div class="displaymath" id="a0000000322">
+<div class="displaymath" id="a0000000326">
   \begin{multline}  \Big|\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \otimes I - I \otimes A^{v}_{h(v)}\bigr) \cdot \bigl(M^{u}_o \otimes (T_h \cdot A^{v}_{h(v)})\bigr)\lvert \psi  \rangle \Big|\\ \leq \sqrt{\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \otimes I - I \otimes A^{v}_{h(v)}\bigr) \cdot (M^{u}_o \otimes T_h) \cdot \bigl(A^{v}_{h(v)} \otimes I - I \otimes A^{v}_{h(v)}\bigr) \lvert \psi  \rangle }\\ \cdot \sqrt{\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  M^{u}_o \otimes \bigl(A^{v}_{h(v)} \cdot T_h\cdot A^{v}_{h(v)}\bigr) \lvert \psi  \rangle }. \label{eq:move-one-cauchy-schwarz} \end{multline}
 </div>
 <p> The first factor is controlled by summing over the value \(a = h(v)\): </p>
-<div class="displaymath" id="a0000000323">
+<div class="displaymath" id="a0000000327">
   \begin{align*} & \mathbb {E}_{u,v} \sum _{a \in \mathbb {F}_q} \langle \psi  \rvert  \bigl(A^v_a \otimes I - I \otimes A^v_a\bigr) \cdot \Bigl(\sum _{(o,h)\in S_u,\,  h(v)=a} M^u_o \otimes T_h\Bigr) \cdot \bigl(A^v_a \otimes I - I \otimes A^v_a\bigr)\lvert \psi  \rangle  \\ & \le \mathbb {E}_{u,v} \sum _{a \in \mathbb {F}_q} \langle \psi  \rvert  \bigl(A^v_a \otimes I - I \otimes A^v_a\bigr)^2 \lvert \psi  \rangle , \end{align*}
 </div>
 <p> where the inequality uses that \(M^u\) and \(T\) are submeasurements. By Lemma&#160;<a href="sec-prelims.html#prop:simeq-to-approx">3.21</a> and the self-consistency of&#160;\(A\), this is at most \(2\delta \). The second factor is </p>
-<div class="displaymath" id="a0000000324">
+<div class="displaymath" id="a0000000328">
   \[  \mathbb {E}_{u,v} \sum _{(o,h)\in S_u} \langle \psi  \rvert  M^u_o \otimes H^v_h \lvert \psi  \rangle ,  \]
 </div>
 <p> which is at most&#160;\(1\) because \(M^u\) and \(H^v\) are submeasurements. </p>
@@ -802,7 +802,7 @@
   \begin{align} \label{eq:move-another-cauchy-schwarz} & \Big|\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl((A^{v}_{h(v)} \cdot M^{u}_o) \otimes T_h\bigr) \cdot \bigl(A^{v}_{h(v)} \otimes I - I \otimes A^{v}_{h(v)}\bigr) \lvert \psi  \rangle \Big| \notag \\ & \leq \sqrt{\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \otimes T_h \lvert \psi  \rangle } \\ & \qquad \cdot \sqrt{\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \otimes I - I \otimes A^{v}_{h(v)}\bigr) \cdot (M^{u}_o \otimes T_h) \cdot \bigl(A^{v}_{h(v)} \otimes I - I \otimes A^{v}_{h(v)}\bigr) \lvert \psi  \rangle }. \notag \end{align}
 </div>
 <p> The first factor is bounded by </p>
-<div class="displaymath" id="a0000000325">
+<div class="displaymath" id="a0000000329">
   \begin{align*} & \mathbb {E}_{u,v} \sum _h \langle \psi  \rvert  \Bigl(A^v_{h(v)} \cdot \sum _{o:(o,h)\in S_u} M^u_o \cdot A^v_{h(v)}\Bigr) \otimes T_h \lvert \psi  \rangle  \\ & \le \mathbb {E}_{u,v} \sum _h \langle \psi  \rvert  (A^v_{h(v)})^2 \otimes T_h \lvert \psi  \rangle  \le \mathbb {E}_{u,v} \sum _h \langle \psi  \rvert  I \otimes T_h \lvert \psi  \rangle  \le 1, \end{align*}
 </div>
 <p> using first that \(M\) is a submeasurement, then that \(A^v_{h(v)} \le I\), and finally that \(T\) is a submeasurement (\(\sum _g T_g \le I\)). The second factor is exactly the same expression as in&#160;<a href="chap-self-improvement.html#eq:move-one-cauchy-schwarz" class="eqref">36</a>, hence at most \(\sqrt{2\delta }\). </p>
@@ -820,7 +820,7 @@
   \begin{multline} \label{eq:change-one-cauchy-schwarz} \Big|\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl((A^{v}_{h(v)} - A^{u}_{h(u)}) \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \otimes T_h \lvert \psi  \rangle \Big|\\ \leq \sqrt{\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl((A^{v}_{h(v)} - A^{u}_{h(u)}) \cdot M^{u}_o \cdot (A^{v}_{h(v)} - A^{u}_{h(u)})\bigr) \otimes T_h \lvert \psi  \rangle }\\ \cdot \sqrt{\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \otimes T_h \lvert \psi  \rangle }. \end{multline}
 </div>
 <p> The first factor can be rewritten as </p>
-<div class="displaymath" id="a0000000326">
+<div class="displaymath" id="a0000000330">
   \begin{align*} & \mathbb {E}_{u,v} \sum _h \langle \psi  \rvert  \Bigl((A^v_{h(v)} - A^u_{h(u)}) \cdot \sum _{o:(o,h)\in S_u} M^u_o \cdot (A^v_{h(v)} - A^u_{h(u)})\Bigr) \otimes T_h \lvert \psi  \rangle  \\ & \le \mathbb {E}_{u,v} \sum _h \langle \psi  \rvert  (A^v_{h(v)} - A^u_{h(u)})^2 \otimes T_h \lvert \psi  \rangle , \end{align*}
 </div>
 <p> because \(M^u\) is a submeasurement. Lemma&#160;<a href="sec-variance.html#lem:global-variance-of-points">6.3</a> bounds this by&#160;\(\zeta _{\mathrm{variance}}\) since \(T \in \mathrm{PolySub}(m,q,d)\). The second factor is exactly the first factor from&#160;<a href="chap-self-improvement.html#eq:move-another-cauchy-schwarz" class="eqref">38</a>, so it is at most&#160;\(1\). </p>
@@ -854,7 +854,7 @@
 
     <a class="icon proof" href="chap-self-improvement.html#thm:self-improvement">#</a>
     
-    <a class="icon proof" href="chap-self-improvement.html#a0000000327"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-self-improvement.html#a0000000331"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -926,38 +926,38 @@
   <p>     Let \(G \in \mathrm{PolyMeas}(m,q,d)\) be a measurement with the following properties: </p>
 <ol class="enumerate">
   <li><p>(Consistency with&#160;\(A\)):  On average over \(u \sim \mathbb {F}_q^{m}\), </p>
-<div class="displaymath" id="a0000000328">
+<div class="displaymath" id="a0000000332">
   \[  A^{u}_a \otimes I \simeq _{\nu } I \otimes G_{[g(u)=a]}.  \]
 </div>
 </li>
 </ol>
 <p> Let </p>
-<div class="displaymath" id="a0000000329">
+<div class="displaymath" id="a0000000333">
   \[  \zeta = 3000m\cdot \Big(\varepsilon ^{1/32} + \delta ^{1/32} + (d/q)^{1/32}\Big).  \]
 </div>
 <p> Then there exists a projective submeasurement \(H \in \mathrm{PolySub}(m,q,d)\) with the following properties: </p>
 <ol class="enumerate">
   <li><p>(Completeness):  If \(H = \sum _h H_h\), then </p>
-<div class="displaymath" id="a0000000330">
+<div class="displaymath" id="a0000000334">
   \[  \langle \psi  \rvert  H \otimes I \lvert \psi  \rangle  \geq (1-\nu )-\zeta .  \]
 </div>
 </li>
   <li><p>(Consistency with&#160;\(A\)):  On average over \(u \sim \mathbb {F}_q^m\), </p>
-<div class="displaymath" id="a0000000331">
+<div class="displaymath" id="a0000000335">
   \[  A^u_a \otimes I \simeq _{\zeta } I \otimes H_{[h(u) = a]}.  \]
 </div>
 </li>
   <li><p>(Strong self-consistency):  </p>
-<div class="displaymath" id="a0000000332">
+<div class="displaymath" id="a0000000336">
   \[  H_h \otimes I \approx _{\zeta } I \otimes H_h.  \]
 </div>
 </li>
   <li><p>(Boundedness):  There exists a positive-semidefinite matrix&#160;\(Z\) such that </p>
-<div class="displaymath" id="a0000000333">
+<div class="displaymath" id="a0000000337">
   \[  \langle \psi  \rvert  Z \otimes (I - H) \lvert \psi  \rangle  \leq \zeta  \]
 </div>
 <p> and for each \(h \in \mathcal{P}(m,q,d)\), </p>
-<div class="displaymath" id="a0000000334">
+<div class="displaymath" id="a0000000338">
   \[  Z \geq \left(\mathbb {E}_{u} A^{u}_{h(u)}\right).  \]
 </div>
 </li>
@@ -965,7 +965,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000327">
+<div class="proof_wrapper" id="a0000000331">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -974,11 +974,11 @@
   </div>
   <div class="proof_content">
   <p> The bound is trivial if one of \(\varepsilon \), \(\delta \), or \(d/q\) is at least&#160;\(1\), so assume all three are at most&#160;\(1\). Apply Lemma&#160;<a href="chap-self-improvement.html#lem:self-improvement-helper">7.1</a> to&#160;\(G\) and let \(\widehat H \in \mathrm{PolySub}(m,q,d)\) be the output, with </p>
-<div class="displaymath" id="a0000000335">
+<div class="displaymath" id="a0000000339">
   \[  \widehat{\zeta } = 100m \cdot \Big(\varepsilon ^{1/2} + \delta ^{1/2} + (d/q)^{1/2}\Big).  \]
 </div>
 <p> By <a href="chap-self-improvement.html#item:self-improvement-self">3</a> of Lemma&#160;<a href="chap-self-improvement.html#lem:self-improvement-helper">7.1</a>, </p>
-<div class="displaymath" id="a0000000336">
+<div class="displaymath" id="a0000000340">
   \[  \sum _{h} \langle \psi  \rvert  \widehat{H}_h \otimes \widehat{H}_h \lvert \psi  \rangle  \geq \langle \psi  \rvert  \widehat{H} \otimes I \lvert \psi  \rangle  - \widehat{\zeta }.  \]
 </div>
 <p> Therefore Theorem&#160;<a href="chap-projective.html#thm:orthonormalization">4.2</a> supplies a projective submeasurement \(H \in \mathrm{PolySub}(m,q,d)\) such that </p>
@@ -991,7 +991,7 @@
 </p>
 </div>
 <p> where </p>
-<div class="displaymath" id="a0000000337">
+<div class="displaymath" id="a0000000341">
   \[  \widehat{\zeta }_{\mathrm{ortho}} = 100 \widehat{\zeta }^{1/4}.  \]
 </div>
 <p> In addition, Lemma&#160;<a href="sec-prelims.html#prop:self-consistency-implies-data-processing">3.39</a> implies that </p>
@@ -1004,49 +1004,49 @@
 </p>
 </div>
 <p> where </p>
-<div class="displaymath" id="a0000000338">
+<div class="displaymath" id="a0000000342">
   \[  \widehat{\zeta }_{\mathrm{dataprocess}} = 8 \widehat{\zeta } + 8 \sqrt{\widehat{\zeta }_{\mathrm{ortho}}}.  \]
 </div>
 <p>The four conclusions are transferred one by one. </p>
 <p><em>Proof of <a href="chap-self-improvement.html#item:self-improvement-projective-completeness">1</a>.</em> Lemma&#160;<a href="sec-prelims.html#prop:completeness-transfer-self-consistent-A">3.38</a> implies </p>
-<div class="displaymath" id="a0000000339">
+<div class="displaymath" id="a0000000343">
   \[  \langle \psi  \rvert  H \otimes I \lvert \psi  \rangle  \geq \langle \psi  \rvert  \widehat{H} \otimes I \lvert \psi  \rangle  - \widehat{\zeta } - 2\sqrt{\widehat{\zeta }_{\mathrm{ortho}}} \geq (1-\nu ) - 2\widehat{\zeta } - 2\sqrt{\widehat{\zeta }_{\mathrm{ortho}}},  \]
 </div>
 <p> where the second inequality is <a href="chap-self-improvement.html#item:self-improvement-completeness">1</a> of Lemma&#160;<a href="chap-self-improvement.html#lem:self-improvement-helper">7.1</a>. </p>
 <p><em>Proof of <a href="chap-self-improvement.html#item:self-improvement-projective-A-consistency">2</a>.</em> Lemma&#160;<a href="sec-prelims.html#prop:triangle-sub">3.20</a> applied to <a href="chap-self-improvement.html#item:self-improvement-A-consistency">2</a> of Lemma&#160;<a href="chap-self-improvement.html#lem:self-improvement-helper">7.1</a> and the post-processed comparison&#160;<a href="chap-self-improvement.html#eq:approx-data-processed" class="eqref">45</a> gives </p>
-<div class="displaymath" id="a0000000340">
+<div class="displaymath" id="a0000000344">
   \[  A^u_a \otimes I \simeq _{\widehat{\zeta } + \sqrt{\widehat{\zeta }_{\mathrm{dataprocess}}}} I \otimes H_{[h(u) = a]}.  \]
 </div>
 <p><em>Proof of <a href="chap-self-improvement.html#item:self-improvement-projective-self">3</a>.</em> Lemma&#160;<a href="sec-prelims.html#prop:two-notions-of-self-consistency">3.36</a> implies </p>
-<div class="displaymath" id="a0000000341">
+<div class="displaymath" id="a0000000345">
   \[  \widehat{H}_h \otimes I \approx _{2\widehat{\zeta }} I \otimes \widehat{H}_h.  \]
 </div>
 <p> Combining this with&#160;<a href="chap-self-improvement.html#eq:approx-between-H-with-and-without-hat" class="eqref">44</a> on both sides and summing the three transports with Lemma&#160;<a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">3.27</a> yields </p>
-<div class="displaymath" id="a0000000342">
+<div class="displaymath" id="a0000000346">
   \[  H_h \otimes I \approx _{6 \widehat{\zeta } + 6\widehat{\zeta }_{\mathrm{ortho}}} I \otimes H_h.  \]
 </div>
 <p><em>Proof of <a href="chap-self-improvement.html#item:self-improvement-projective-boundedness">4</a>.</em> The boundedness quantity is </p>
-<div class="displaymath" id="a0000000343">
+<div class="displaymath" id="a0000000347">
   \begin{align} & \langle \psi  \rvert  Z \otimes (I - H) \lvert \psi  \rangle  \notag \\ ={}&  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  - \sum _h \langle \psi  \rvert  Z \otimes H_h \lvert \psi  \rangle  \notag \\ \leq {}&  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  - \sum _h \langle \psi  \rvert  \mathbb {E}_{u} A^{u}_{h(u)} \otimes H_h \lvert \psi  \rangle  \notag \\ ={}&  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  -\mathbb {E}_{u} \sum _h \langle \psi  \rvert  A^{u}_{h(u)} \otimes H_h \lvert \psi  \rangle  \notag \\ ={}&  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  -\mathbb {E}_{u} \sum _a \langle \psi  \rvert  A^{u}_{a} \otimes H_{[h(u)=a]} \lvert \psi  \rangle . \label{eq:almost-there-self-improvement-edition} \end{align}
 </div>
 <p> Proposition&#160;<a href="sec-prelims.html#prop:easy-approx-from-approx-delta">3.24</a> upgrades <a href="chap-self-improvement.html#eq:approx-data-processed" class="eqref">45</a> to the scalar estimate </p>
-<div class="displaymath" id="a0000000344">
+<div class="displaymath" id="a0000000348">
   \[  \eqref{eq:almost-there-self-improvement-edition} \le \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  -\mathbb {E}_{u} \sum _a \langle \psi  \rvert  A^{u}_{a} \otimes \widehat H_{[h(u)=a]} \lvert \psi  \rangle  + \sqrt{\widehat{\zeta }_{\mathrm{dataprocess}}},  \]
 </div>
 <p> and now <a href="chap-self-improvement.html#item:self-improvement-boundedness">4</a> of Lemma&#160;<a href="chap-self-improvement.html#lem:self-improvement-helper">7.1</a> bounds this by \(\widehat{\zeta } + \sqrt{\widehat{\zeta }_{\mathrm{dataprocess}}}\). </p>
 <p>Thus the four conclusions hold with errors </p>
-<div class="displaymath" id="a0000000345">
+<div class="displaymath" id="a0000000349">
   \[  2\widehat{\zeta } + 2\sqrt{\widehat{\zeta }_{\mathrm{ortho}}}, \qquad \widehat{\zeta } + \sqrt{\widehat{\zeta }_{\mathrm{dataprocess}}}, \qquad 6 \widehat{\zeta } + 6\widehat{\zeta }_{\mathrm{ortho}}, \qquad \widehat{\zeta } + \sqrt{\widehat{\zeta }_{\mathrm{dataprocess}}},  \]
 </div>
 <p> respectively. The paper’s exponent bookkeeping then shows </p>
-<div class="displaymath" id="a0000000346">
+<div class="displaymath" id="a0000000350">
   \[  \widehat{\zeta }_{\mathrm{ortho}} \leq 400 m \cdot \Big(\varepsilon ^{1/8} + \delta ^{1/8} + (d/q)^{1/8}\Big),  \]
 </div>
-<div class="displaymath" id="a0000000347">
+<div class="displaymath" id="a0000000351">
   \[  \widehat{\zeta }_{\mathrm{dataprocess}} \leq 960m \cdot \Big(\varepsilon ^{1/16} + \delta ^{1/16} + (d/q)^{1/16}\Big),  \]
 </div>
 <p> and hence </p>
-<div class="displaymath" id="a0000000348">
+<div class="displaymath" id="a0000000352">
   \[  6 \widehat{\zeta } + 6\widehat{\zeta }_{\mathrm{ortho}} \le \zeta , \qquad \widehat{\zeta } + \sqrt{\widehat{\zeta }_{\mathrm{dataprocess}}} \le \zeta .  \]
 </div>
 <p> Since \(2\widehat{\zeta } + 2\sqrt{\widehat{\zeta }_{\mathrm{ortho}}} \le \widehat{\zeta }_{\mathrm{dataprocess}} \le \zeta \), all four bounds are at most&#160;\(\zeta \). </p>

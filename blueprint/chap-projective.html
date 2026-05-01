@@ -1165,6 +1165,9 @@
 
     <a class="icon proof" href="chap-projective.html#lem:small-overlap-averaging">#</a>
     
+    <a class="icon proof" href="chap-projective.html#a0000000169"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
     
     
     <button class="modal lean">L∃∀N</button>
@@ -1190,17 +1193,41 @@
   </div>
   <div class="lemma_thmcontent">
   <p>     Let \(f : \alpha \to \mathbb {R}\) be a function on a finite index set \(\alpha \) with \(|\alpha | = r\), and let \(L \subseteq \alpha \) with \(|L| = d\) and \(d {\lt} r\). Write \(S = L^\complement \) and assume \(f(s) \leq f(l)\) for every \(s \in S\) and \(l \in L\). Then the pairwise double-counting inequality </p>
-<div class="displaymath" id="a0000000169">
+<div class="displaymath" id="a0000000170">
   \[  |L|\,  \sum _{s \in S} f(s) \leq |S|\,  \sum _{l \in L} f(l)  \]
 </div>
 <p> holds, and hence also </p>
-<div class="displaymath" id="a0000000170">
+<div class="displaymath" id="a0000000171">
   \[  r\,  \sum _{s \in S} f(s) \leq |S|\,  \sum _{x \in \alpha } f(x).  \]
 </div>
 <p> If in addition \(r \leq (1+2\sqrt{\zeta })\, d\), \(\sum _{x \in \alpha } f(x) \leq 1 + 2\sqrt{\zeta }\), and \(0 \leq \zeta \leq 1/4\), then </p>
-<div class="displaymath" id="a0000000171">
+<div class="displaymath" id="a0000000172">
   \[  \sum _{s \in S} f(s) \leq 4\sqrt{\zeta }.  \]
 </div>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000169">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Choose \(L\) to be a set of \(d\) indices on which the sum of \(f\) is maximal. If some \(s \in S\) and \(l \in L\) satisfied \(f(l) {\lt} f(s)\), replacing \(l\) by \(s\) would increase this sum, so every small index is bounded by every large index. Summing the inequalities \(f(s) \leq f(l)\) over all pairs \((s,l) \in S \times L\) gives </p>
+<div class="displaymath" id="a0000000173">
+  \[  |L|\sum _{s \in S} f(s) \leq |S|\sum _{l \in L} f(l).  \]
+</div>
+<p> Since \(\alpha \) is the disjoint union of \(L\) and \(S\), adding \(|S|\sum _{s \in S} f(s)\) to both sides yields </p>
+<div class="displaymath" id="a0000000174">
+  \[  r\sum _{s \in S} f(s) \leq |S|\sum _{x \in \alpha } f(x).  \]
+</div>
+<p> The hypotheses \(|L|=d\) and \(r \leq (1+2\sqrt{\zeta })d\) imply \(|S|/r \leq 2\sqrt{\zeta }\). Dividing by \(r\) and using \(\sum _{x \in \alpha } f(x) \leq 1+2\sqrt{\zeta }\) gives </p>
+<div class="displaymath" id="a0000000175">
+  \[  \sum _{s \in S} f(s) \leq 2\sqrt{\zeta }(1+2\sqrt{\zeta }).  \]
+</div>
+<p> Finally, \(\zeta \leq 1/4\) implies \(\sqrt{\zeta } \leq 1/2\), and hence \(2\sqrt{\zeta }(1+2\sqrt{\zeta }) \leq 4\sqrt{\zeta }\). </p>
 
   </div>
 </div>
@@ -1220,7 +1247,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:projective-low-rank-sum">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000172"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000176"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1248,21 +1275,21 @@
   </div>
   <div class="lemma_thmcontent">
   <p>  There exists a set of projection matrices \(\{ Q_a\} \) such that </p>
-<div class="displaymath" id="a0000000173">
+<div class="displaymath" id="a0000000177">
   \begin{equation*}  A_a \otimes I \approx _{12\sqrt{\zeta }} Q_a \otimes I. \end{equation*}
 </div>
 <p> and </p>
-<div class="displaymath" id="a0000000174">
+<div class="displaymath" id="a0000000178">
   \begin{equation*}  Q:= \sum _a Q_a \leq (1+2\sqrt{\zeta }) \cdot I. \end{equation*}
 </div>
 <p> Furthermore, </p>
-<div class="displaymath" id="a0000000175">
+<div class="displaymath" id="a0000000179">
   \begin{equation*}  \sum _a \mathrm{rank}(Q_a) \leq d. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000172">
+<div class="proof_wrapper" id="a0000000176">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1280,11 +1307,11 @@
 </p>
 </div>
 <p> Let \(\lvert v_{a,1} \rangle ,\ldots ,\lvert v_{a,r_a} \rangle \) be an orthonormal basis for the range of \(R_a\), so </p>
-<div class="displaymath" id="a0000000176">
+<div class="displaymath" id="a0000000180">
   \[  R_a = \sum _{i=1}^{r_a} \lvert v_{a,i} \rangle \langle v_{a,i} \rvert .  \]
 </div>
 <p> Define the overlaps </p>
-<div class="displaymath" id="a0000000177">
+<div class="displaymath" id="a0000000181">
   \[  o_{a,i} = \langle \psi  \rvert  (\lvert v_{a,i} \rangle \langle v_{a,i} \rvert  \otimes I)\lvert \psi  \rangle .  \]
 </div>
 <p> Their total satisfies </p>
@@ -1316,23 +1343,23 @@
 </div>
 <p> using <a href="chap-projective.html#eq:size-of-small-is-small">6</a>, <a href="chap-projective.html#eq:total-overlap">5</a>, and <a href="chap-projective.html#eq:assumption-on-zeta">1</a>. </p>
 <p>For each \(a\), let \(\mathsf{Large}_a=\{ i : (a,i)\in \mathsf{Large}\} \) and define </p>
-<div class="displaymath" id="a0000000178">
+<div class="displaymath" id="a0000000182">
   \[  Q_a = \sum _{i \in \mathsf{Large}_a} \lvert v_{a,i} \rangle \langle v_{a,i} \rvert .  \]
 </div>
 <p> Then \(\sum _a \mathrm{rank}(Q_a)=|\mathsf{Large}| \leq d\), and \(Q_a \leq R_a\) for every \(a\), so </p>
-<div class="displaymath" id="a0000000179">
+<div class="displaymath" id="a0000000183">
   \[  Q = \sum _a Q_a \leq \sum _a R_a = R \leq (1+2\sqrt{\zeta })I.  \]
 </div>
 <p> Also, </p>
-<div class="displaymath" id="a0000000180">
+<div class="displaymath" id="a0000000184">
   \[  R_a-Q_a = \sum _{i \in \mathsf{Small}_a} \lvert v_{a,i} \rangle \langle v_{a,i} \rvert   \]
 </div>
 <p> is a projector, hence </p>
-<div class="displaymath" id="a0000000181">
+<div class="displaymath" id="a0000000185">
   \[  \sum _a \Vert (R_a-Q_a)\otimes I \lvert \psi  \rangle \Vert ^2 = \sum _{(a,i)\in \mathsf{Small}} o_{a,i} \leq 4\sqrt{\zeta }  \]
 </div>
 <p> by <a href="chap-projective.html#eq:small-overlaps">7</a>. Therefore \(R_a \otimes I \approx _{4\sqrt{\zeta }} Q_a \otimes I\). Combining this with <a href="chap-projective.html#lem:projective-non-measurement">4.11</a> and the triangle inequality for \(\approx _\delta \) gives </p>
-<div class="displaymath" id="a0000000182">
+<div class="displaymath" id="a0000000186">
   \[  A_a \otimes I \approx _{12\sqrt{\zeta }} Q_a \otimes I.  \]
 </div>
 
@@ -1355,7 +1382,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:Q-completeness">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000183"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000187"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1383,13 +1410,13 @@
   </div>
   <div class="lemma_thmcontent">
   
-<div class="displaymath" id="a0000000184">
+<div class="displaymath" id="a0000000188">
   \begin{equation*}  \langle \psi  \rvert  Q \otimes I \lvert \psi  \rangle  \geq 1 - 11 \zeta ^{1/4}. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000183">
+<div class="proof_wrapper" id="a0000000187">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1407,7 +1434,7 @@
 </p>
 </div>
 <p> By Cauchy–Schwarz, </p>
-<div class="displaymath" id="a0000000185">
+<div class="displaymath" id="a0000000189">
   \[  \sum _a \langle \psi  \rvert  (Q_a)^2 \otimes I \lvert \psi  \rangle  \leq 1+2\sqrt{\zeta } \quad \text{and}\quad \sum _a \langle \psi  \rvert  (Q_a-A_a)^2 \otimes I \lvert \psi  \rangle  \leq 12\sqrt{\zeta }  \]
 </div>
 <p> from <a href="chap-projective.html#lem:projective-low-rank-sum">4.13</a>. A second Cauchy–Schwarz estimate yields </p>
@@ -1420,7 +1447,7 @@
 </p>
 </div>
 <p> Combining <a href="chap-projective.html#eq:Q-for-an-A">8</a> and <a href="chap-projective.html#eq:another-Q-for-A">9</a> with <a href="chap-projective.html#eq:A-looks-projective">2</a> gives </p>
-<div class="displaymath" id="a0000000186">
+<div class="displaymath" id="a0000000190">
   \[  \langle \psi  \rvert  Q \otimes I \lvert \psi  \rangle  \geq \sum _a \langle \psi  \rvert  A_a \otimes I \lvert \psi  \rangle  - 2\zeta - 9\zeta ^{1/4} = 1 - 11\zeta ^{1/4},  \]
 </div>
 <p> since \(\zeta \leq \zeta ^{1/4}\) under <a href="chap-projective.html#eq:assumption-on-zeta">1</a>. </p>
@@ -1443,7 +1470,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:sqrt-Q-completeness">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000187"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000191"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1471,13 +1498,13 @@
   </div>
   <div class="lemma_thmcontent">
   
-<div class="displaymath" id="a0000000188">
+<div class="displaymath" id="a0000000192">
   \begin{equation*}  \langle \psi  \rvert  \sqrt{Q} \otimes I \lvert \psi  \rangle  \geq 1 - 12 \zeta ^{1/4}. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000187">
+<div class="proof_wrapper" id="a0000000191">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1486,15 +1513,15 @@
   </div>
   <div class="proof_content">
   <p> Diagonalize \(Q=\sum _i \nu _i \lvert u_i \rangle \langle u_i \rvert \). Because \(Q \leq (1+2\sqrt{\zeta })I\) by <a href="chap-projective.html#lem:projective-low-rank-sum">4.13</a>, each \(\nu _i\) is at most \(1+2\sqrt{\zeta }\). Therefore </p>
-<div class="displaymath" id="a0000000189">
+<div class="displaymath" id="a0000000193">
   \[  \sqrt{Q} = \sum _i \sqrt{\nu _i}\lvert u_i \rangle \langle u_i \rvert  \geq \frac{1}{\sqrt{1+2\sqrt{\zeta }}} Q.  \]
 </div>
 <p> The scalar estimate </p>
-<div class="displaymath" id="a0000000190">
+<div class="displaymath" id="a0000000194">
   \[  \frac{1}{\sqrt{1+2\sqrt{\zeta }}} \geq 1-\sqrt{\zeta }  \]
 </div>
 <p> gives \(\sqrt{Q} \geq (1-\sqrt{\zeta })Q\). Hence <a href="chap-projective.html#lem:Q-completeness">4.14</a> implies </p>
-<div class="displaymath" id="a0000000191">
+<div class="displaymath" id="a0000000195">
   \[  \langle \psi  \rvert  \sqrt{Q} \otimes I \lvert \psi  \rangle  \geq (1-\sqrt{\zeta })(1-11\zeta ^{1/4}) \geq 1-12\zeta ^{1/4}.  \]
 </div>
 
@@ -1516,7 +1543,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:q-almost-projective">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000192"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000196"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1544,13 +1571,13 @@
   </div>
   <div class="lemma_thmcontent">
   
-<div class="displaymath" id="a0000000193">
+<div class="displaymath" id="a0000000197">
   \begin{equation*}  \sum _a (Q_a \cdot Q \cdot Q_a - Q_a) \leq 4\sqrt{\zeta } \cdot I. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000192">
+<div class="proof_wrapper" id="a0000000196">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1559,7 +1586,7 @@
   </div>
   <div class="proof_content">
   <p> Since \(Q \leq (1+2\sqrt{\zeta })I\) by <a href="chap-projective.html#lem:projective-low-rank-sum">4.13</a>, </p>
-<div class="displaymath" id="a0000000194">
+<div class="displaymath" id="a0000000198">
   \begin{align*}  \sum _a Q_a \cdot Q \cdot Q_a - \sum _a Q_a &  \leq (1+2\sqrt{\zeta }) \sum _a Q_a \cdot I \cdot Q_a - \sum _a Q_a \\ &  = (1+2\sqrt{\zeta })Q - Q \\ &  = 2\sqrt{\zeta }\, Q \\ &  \leq 2\sqrt{\zeta }(1+2\sqrt{\zeta })I \\ &  \leq 4\sqrt{\zeta }\, I, \end{align*}
 </div>
 <p> using <a href="chap-projective.html#eq:assumption-on-zeta">1</a> in the last step. </p>
@@ -1627,19 +1654,19 @@
   </div>
   <div class="definition_thmcontent">
   <p>   For each \(a\), let </p>
-<div class="displaymath" id="a0000000195">
+<div class="displaymath" id="a0000000199">
   \[  m_a = \mathrm{rank}(Q_a),  \]
 </div>
 <p> and let \(\lvert v_{a,1} \rangle ,\ldots ,\lvert v_{a,m_a} \rangle \) be an orthonormal basis for the range of \(Q_a\), so that </p>
-<div class="displaymath" id="a0000000196">
+<div class="displaymath" id="a0000000200">
   \[  Q_a = \sum _{i=1}^{m_a} \lvert v_{a,i} \rangle \langle v_{a,i} \rvert .  \]
 </div>
 <p> Let </p>
-<div class="displaymath" id="a0000000197">
+<div class="displaymath" id="a0000000201">
   \[  m = \sum _a m_a,  \]
 </div>
 <p> and let \(\{ \lvert a,i \rangle \} \) be an orthonormal basis of \(\mathbb {C}^m\), indexed by all \(a\) and all \(1 \leq i \leq m_a\). For each \(a\), define </p>
-<div class="displaymath" id="a0000000198">
+<div class="displaymath" id="a0000000202">
   \[  X_a = \sum _{i=1}^{m_a} \lvert a,i \rangle \langle v_{a,i} \rvert , \qquad T_a = \sum _{i=1}^{m_a} \lvert a,i \rangle \langle a,i \rvert ,  \]
 </div>
 <p> and define </p>
@@ -1716,7 +1743,7 @@
   </div>
   <div class="definition_thmcontent">
   <p>   The paper presents this step by choosing a singular value decomposition </p>
-<div class="displaymath" id="a0000000199">
+<div class="displaymath" id="a0000000203">
   \[  X = U \cdot \Sigma _{m \times d} \cdot V^\dagger .  \]
 </div>
 <p> The formalization records only the downstream consequences of this choice: the matrices \(X\) and \(\widehat X\), the identities \(X^\dagger X=Q\), \(\widehat X\widehat X^\dagger =I\), and \(X^\dagger \widehat X=\sqrt Q\), together with the \(Q_a=X^\dagger T_aX\) restatement. No explicit rectangular complex-SVD matrices \(U,V,\Sigma \) are needed. </p>
@@ -1742,7 +1769,7 @@
   </div>
   <div class="remark_thmcontent">
   <p> If the family \(\{ Q_a\} \) were a projective measurement, then the vectors \(\lvert v_{a,i} \rangle \), over all \(a\) and all \(1 \leq i \leq m_a\), would be orthonormal. Then <a href="chap-projective.html#eq:looks-like-singular-value-decomposition" class="eqref">10</a> would already be a singular value decomposition of \(X\), with \(\Sigma = I_{m \times d}\). Equivalently, </p>
-<div class="displaymath" id="a0000000200">
+<div class="displaymath" id="a0000000204">
   \[  X = U \cdot I_{m \times d} \cdot V^\dagger .  \]
 </div>
 <p> This motivates replacing \(\Sigma \) by \(I\) in the definition of \(\widehat X\) and \(P\). </p>
@@ -1812,11 +1839,11 @@
   </div>
   <div class="definition_thmcontent">
   <p>   The paper defines </p>
-<div class="displaymath" id="a0000000201">
+<div class="displaymath" id="a0000000205">
   \[  \widehat{X} = U \cdot I_{m \times d} \cdot V^\dagger .  \]
 </div>
 <p> We take \(\widehat X\) to be the reduced matrix supplied by the data package. For each \(a\), define </p>
-<div class="displaymath" id="a0000000202">
+<div class="displaymath" id="a0000000206">
   \[  \widehat{X}_a = T_a \cdot \widehat{X}, \qquad P_a = \widehat{X}_a^\dagger \cdot \widehat{X}_a.  \]
 </div>
 
@@ -1830,12 +1857,14 @@
     <span class="lemma_thmlabel">4.21</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
     <a class="icon proof" href="chap-projective.html#lem:xa-t">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000203"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000207"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1863,13 +1892,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>  For each \(a\), </p>
-<div class="displaymath" id="a0000000204">
+<div class="displaymath" id="a0000000208">
   \[  X_a = T_a \cdot X.  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000203">
+<div class="proof_wrapper" id="a0000000207">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1878,7 +1907,7 @@
   </div>
   <div class="proof_content">
   <p>Multiply the definition of \(X\) by \(T_a\) on the left and use that \(T_a\) selects exactly the basis vectors \(\lvert a,i \rangle \): </p>
-<div class="displaymath" id="a0000000205">
+<div class="displaymath" id="a0000000209">
   \[  T_a \cdot X = \Big(\sum _{i=1}^{m_a} \lvert a,i \rangle \langle a,i \rvert \Big) \Big(\sum _b \sum _{j=1}^{m_b} \lvert b,j \rangle \langle v_{b,j} \rvert \Big) = \sum _{i=1}^{m_a} \lvert a,i \rangle \langle v_{a,i} \rvert  = X_a.  \]
 </div>
 
@@ -1893,12 +1922,14 @@
     <span class="lemma_thmtitle">\(Q_a\) restated</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
     <a class="icon proof" href="chap-projective.html#lem:qa-restated">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000206"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000210"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1926,13 +1957,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>  For each \(a\), </p>
-<div class="displaymath" id="a0000000207">
+<div class="displaymath" id="a0000000211">
   \begin{equation*}  Q_a = X_a^\dagger \cdot X_a = X^\dagger \cdot T_a \cdot X = X_a^\dagger \cdot X. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000206">
+<div class="proof_wrapper" id="a0000000210">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1941,7 +1972,7 @@
   </div>
   <div class="proof_content">
   <p> The identity \(X_a^\dagger X_a = Q_a\) follows by expanding the basis sums. The remaining equalities come from <a href="chap-projective.html#lem:xa-t">4.21</a> and the projectivity of \(T\): </p>
-<div class="displaymath" id="a0000000208">
+<div class="displaymath" id="a0000000212">
   \[  X_a^\dagger \cdot X_a = (X^\dagger \cdot T_a)(T_a \cdot X) = X^\dagger \cdot T_a \cdot X = X_a^\dagger \cdot X.  \]
 </div>
 
@@ -1961,7 +1992,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:X-squared">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000209"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000213"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1989,13 +2020,13 @@
   </div>
   <div class="lemma_thmcontent">
   
-<div class="displaymath" id="a0000000210">
+<div class="displaymath" id="a0000000214">
   \begin{equation*}  X^\dagger \cdot X = Q. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000209">
+<div class="proof_wrapper" id="a0000000213">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2004,7 +2035,7 @@
   </div>
   <div class="proof_content">
   <p> Use that \(T\) is a measurement and then <a href="chap-projective.html#lem:qa-restated">4.22</a>: </p>
-<div class="displaymath" id="a0000000211">
+<div class="displaymath" id="a0000000215">
   \[  X^\dagger \cdot X = \sum _a X^\dagger \cdot T_a \cdot X = \sum _a Q_a = Q.  \]
 </div>
 <p> The additional paper identities involving \(U,V,\Sigma \) are the usual SVD computations, but they are not stored in the Lean API because they are not used by the downstream proof. </p>
@@ -2019,12 +2050,14 @@
     <span class="lemma_thmlabel">4.24</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
     <a class="icon proof" href="chap-projective.html#lem:X-expression-to-Q-expression">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000212"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000216"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2052,13 +2085,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>  For each \(a\), </p>
-<div class="displaymath" id="a0000000213">
+<div class="displaymath" id="a0000000217">
   \begin{equation*}  X_a^\dagger \cdot (X \cdot X^\dagger - I_{m \times m})^2 \cdot X_a = Q_a \cdot Q \cdot Q_a - Q_a. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000212">
+<div class="proof_wrapper" id="a0000000216">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2067,15 +2100,15 @@
   </div>
   <div class="proof_content">
   <p> Expand the square and apply <a href="chap-projective.html#lem:X-squared">4.23</a> and <a href="chap-projective.html#lem:qa-restated">4.22</a> term by term: </p>
-<div class="displaymath" id="a0000000214">
+<div class="displaymath" id="a0000000218">
   \[  X_a^\dagger (X \cdot X^\dagger \cdot X \cdot X^\dagger ) X_a = Q_a \cdot Q \cdot Q_a,  \]
 </div>
 <p> while </p>
-<div class="displaymath" id="a0000000215">
+<div class="displaymath" id="a0000000219">
   \[  X_a^\dagger (X \cdot X^\dagger ) X_a = (X_a^\dagger \cdot X)(X^\dagger \cdot X_a) = Q_a \cdot Q_a = Q_a,  \]
 </div>
 <p> and \(X_a^\dagger I_{m \times m} X_a = X_a^\dagger X_a = Q_a\). Substituting these identities into </p>
-<div class="displaymath" id="a0000000216">
+<div class="displaymath" id="a0000000220">
   \[  (X \cdot X^\dagger - I_{m \times m})^2 = X \cdot X^\dagger \cdot X \cdot X^\dagger - 2X \cdot X^\dagger + I_{m \times m}  \]
 </div>
 <p> gives the claim. </p>
@@ -2091,12 +2124,14 @@
     <span class="lemma_thmtitle">\(P_a\) restated</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
     <a class="icon proof" href="chap-projective.html#lem:pa-restated">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000217"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000221"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2124,13 +2159,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>  For each \(a\), </p>
-<div class="displaymath" id="a0000000218">
+<div class="displaymath" id="a0000000222">
   \begin{equation*}  P_a = \widehat{X}^\dagger \cdot T_a \cdot \widehat{X} = \widehat{X}_a^\dagger \cdot \widehat{X}. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000217">
+<div class="proof_wrapper" id="a0000000221">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2139,7 +2174,7 @@
   </div>
   <div class="proof_content">
   <p> Since \(T\) is projective, </p>
-<div class="displaymath" id="a0000000219">
+<div class="displaymath" id="a0000000223">
   \[  P_a = \widehat{X}_a^\dagger \cdot \widehat{X}_a = (\widehat{X}^\dagger \cdot T_a)(T_a \cdot \widehat{X}) = \widehat{X}^\dagger \cdot T_a \cdot \widehat{X} = \widehat{X}_a^\dagger \cdot \widehat{X}.  \]
 </div>
 
@@ -2159,7 +2194,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:X-hat-squared">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000220"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000224"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2187,13 +2222,13 @@
   </div>
   <div class="lemma_thmcontent">
   
-<div class="displaymath" id="a0000000221">
+<div class="displaymath" id="a0000000225">
   \begin{equation*}  \widehat{X} \cdot \widehat{X}^\dagger = I_{m \times m}. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000220">
+<div class="proof_wrapper" id="a0000000224">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2219,7 +2254,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:X-times-X-hat">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000222"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000226"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2247,13 +2282,13 @@
   </div>
   <div class="lemma_thmcontent">
   
-<div class="displaymath" id="a0000000223">
+<div class="displaymath" id="a0000000227">
   \begin{equation*}  X^\dagger \cdot \widehat{X} = \sqrt{Q}. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000222">
+<div class="proof_wrapper" id="a0000000226">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2274,12 +2309,14 @@
     <span class="lemma_thmtitle">Squared difference</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
     <a class="icon proof" href="chap-projective.html#lem:squared-difference">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000224"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000228"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2307,13 +2344,13 @@
   </div>
   <div class="lemma_thmcontent">
   
-<div class="displaymath" id="a0000000225">
+<div class="displaymath" id="a0000000229">
   \begin{equation*}  (X - \widehat{X}) \cdot (X - \widehat{X})^\dagger \leq (X \cdot X^\dagger - I_{m \times m})^2. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000224">
+<div class="proof_wrapper" id="a0000000228">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2334,12 +2371,14 @@
     <span class="lemma_thmtitle">Projectivity of&#160;\(P\)</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
     <a class="icon proof" href="chap-projective.html#lem:P-projectivity">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000226"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000230"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2370,7 +2409,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000226">
+<div class="proof_wrapper" id="a0000000230">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2379,7 +2418,7 @@
   </div>
   <div class="proof_content">
   <p> For outcomes \(a,b\), </p>
-<div class="displaymath" id="a0000000227">
+<div class="displaymath" id="a0000000231">
   \begin{align*}  P_a \cdot P_b &  = (\widehat{X}^\dagger \cdot T_a \cdot \widehat{X}) (\widehat{X}^\dagger \cdot T_b \cdot \widehat{X}) \\ &  = \widehat{X}^\dagger \cdot T_a \cdot I_{m \times m} \cdot T_b \cdot \widehat{X} \\ &  = \widehat{X}^\dagger \cdot T_a \cdot \widehat{X} \cdot \mathbf{1}\! \left[[\right]a=b] \\ &  = P_a \cdot \mathbf{1}\! \left[[\right]a=b], \end{align*}
 </div>
 <p> where the second line uses <a href="chap-projective.html#lem:X-hat-squared">4.26</a>, the third uses that \(T\) is projective, and the last uses <a href="chap-projective.html#lem:pa-restated">4.25</a>. Summing over \(a\) shows \(\sum _a P_a \leq I\), so \(P\) is a projective sub-measurement. </p>
@@ -2400,7 +2439,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:P-Q-approx">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000228"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000232"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2428,13 +2467,13 @@
   </div>
   <div class="lemma_thmcontent">
   
-<div class="displaymath" id="a0000000229">
+<div class="displaymath" id="a0000000233">
   \begin{equation*}  Q_a \otimes I \approx _{30\zeta ^{1/4}} P_a \otimes I. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000228">
+<div class="proof_wrapper" id="a0000000232">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2462,7 +2501,7 @@
 </p>
 </div>
 <p> By <a href="chap-projective.html#lem:qa-restated">4.22</a>, </p>
-<div class="displaymath" id="a0000000230">
+<div class="displaymath" id="a0000000234">
   \[  \sum _a \langle \psi  \rvert  Q_aP_a \otimes I \lvert \psi  \rangle  = \sum _a \langle \psi  \rvert  (X_a^\dagger \cdot X \cdot P_a) \otimes I \lvert \psi  \rangle .  \]
 </div>
 <p> The main estimate is </p>
@@ -2475,39 +2514,39 @@
 </p>
 </div>
 <p> This follows by Cauchy–Schwarz: </p>
-<div class="displaymath" id="a0000000231">
+<div class="displaymath" id="a0000000235">
   \[  \Big|\sum _a \langle \psi  \rvert  ((X_a^\dagger \cdot (X-\widehat X)) \otimes I)\cdot (P_a \otimes I)\lvert \psi  \rangle \Big|  \]
 </div>
 <p> is bounded by the square root of </p>
-<div class="displaymath" id="a0000000232">
+<div class="displaymath" id="a0000000236">
   \[  \sum _a \langle \psi  \rvert  \big(X_a^\dagger \cdot (X-\widehat X)(X-\widehat X)^\dagger \cdot X_a\big)\otimes I \lvert \psi  \rangle ,  \]
 </div>
 <p> times the square root of \(\sum _a \langle \psi  \rvert (P_a)^2 \otimes I \lvert \psi  \rangle  \leq 1\). The first factor is at most \(4\sqrt{\zeta }\) by <a href="chap-projective.html#lem:squared-difference">4.28</a>, <a href="chap-projective.html#lem:X-expression-to-Q-expression">4.24</a>, and <a href="chap-projective.html#lem:q-almost-projective">4.16</a>, so the total error is at most \(2\zeta ^{1/4}\). </p>
 <p>The right-hand side of <a href="chap-projective.html#eq:add-a-hat">13</a> is real, because </p>
-<div class="displaymath" id="a0000000233">
+<div class="displaymath" id="a0000000237">
   \[  \sum _a \langle \psi  \rvert  (X_a^\dagger \cdot \widehat{X} \cdot P_a)\otimes I \lvert \psi  \rangle  = \langle \psi  \rvert  (X^\dagger \cdot \widehat{X}) \otimes I \lvert \psi  \rangle  = \langle \psi  \rvert  \sqrt{Q} \otimes I \lvert \psi  \rangle ,  \]
 </div>
 <p> where the first equality uses <a href="chap-projective.html#lem:xa-t">4.21</a>, <a href="chap-projective.html#lem:pa-restated">4.25</a>, and <a href="chap-projective.html#lem:X-hat-squared">4.26</a> and that \(T\) is a measurement, and the second uses <a href="chap-projective.html#lem:X-times-X-hat">4.27</a>. Hence <a href="chap-projective.html#lem:sqrt-Q-completeness">4.15</a> and <a href="chap-projective.html#eq:add-a-hat">13</a> imply </p>
-<div class="displaymath" id="a0000000234">
+<div class="displaymath" id="a0000000238">
   \[  \mathfrak {R}\Big(\sum _a \langle \psi  \rvert  Q_aP_a \otimes I \lvert \psi  \rangle \Big) \geq 1-14\zeta ^{1/4}.  \]
 </div>
 <p> Substituting this into <a href="chap-projective.html#eq:complex-conjugates">12</a> and then into <a href="chap-projective.html#eq:P-Q-thing-to-bound">11</a> gives </p>
-<div class="displaymath" id="a0000000235">
+<div class="displaymath" id="a0000000239">
   \[  \sum _a \langle \psi  \rvert  (Q_a-P_a)^2 \otimes I \lvert \psi  \rangle  \leq (1+2\sqrt{\zeta }) + 1 - 2(1-14\zeta ^{1/4}) = 2\sqrt{\zeta } + 28\zeta ^{1/4} \leq 30\zeta ^{1/4}.  \]
 </div>
 
   </div>
 </div>
 <p>Finally, <a href="chap-projective.html#lem:projective-low-rank-sum">4.13</a> gives </p>
-<div class="displaymath" id="a0000000236">
+<div class="displaymath" id="a0000000240">
   \[  A_a \otimes I \approx _{12\sqrt{\zeta }} Q_a \otimes I,  \]
 </div>
 <p> and <a href="chap-projective.html#lem:P-Q-approx">4.30</a> gives </p>
-<div class="displaymath" id="a0000000237">
+<div class="displaymath" id="a0000000241">
   \[  Q_a \otimes I \approx _{30\zeta ^{1/4}} P_a \otimes I.  \]
 </div>
 <p> The triangle inequality for \(\approx _\delta \) yields </p>
-<div class="displaymath" id="a0000000238">
+<div class="displaymath" id="a0000000242">
   \[  A_a \otimes I \approx _{84\zeta ^{1/4}} P_a \otimes I.  \]
 </div>
 
