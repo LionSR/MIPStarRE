@@ -1,11 +1,6 @@
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Averages
-import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.QSDD
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Marginalization
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Normalization
-import MIPStarRE.LDT.Commutativity.Transport.Pullback
-import MIPStarRE.LDT.Commutativity.Scaffold.Products
-import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Averages
-import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 
 /-!
 # Full-slice scalar-to-tensor closeness bridges

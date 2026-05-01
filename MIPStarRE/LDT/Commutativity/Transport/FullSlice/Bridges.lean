@@ -1,12 +1,12 @@
-import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.QSDD
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.Closeness
+import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.QSDD
 
 /-!
 # Full-slice bridges and main result
 
 Compatibility barrel re-exporting the full-slice bridge leaves:
 
-- `Bridges.QSDD`: `qSDDOp` expansion, averaging symmetry, and
+- `Bridges.QSDD`: `qSDDOp` expansion and
   `fullSliceCommutation_qSDDOp_avg_eq`.
 - `Bridges.Closeness`: scalar↔tensor `closenessOfIP` bridges and assembled
   `ABAB` transport bounds.

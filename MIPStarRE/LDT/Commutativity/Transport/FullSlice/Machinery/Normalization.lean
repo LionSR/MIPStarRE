@@ -1,8 +1,4 @@
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Averages
-import MIPStarRE.LDT.Commutativity.Transport.Pullback
-import MIPStarRE.LDT.Commutativity.Scaffold.Products
-import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Averages
-import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 
 /-!
 # Full-slice normalization and self-consistency machinery
@@ -137,7 +133,8 @@ lemma leftTensor_normalizationCondition_sandwich_adjoint_bound
           (∑ b : β, leftTensor (ι₂ := ι) (Q.outcome b * P.outcome a * Q.outcome b))
       = ∑ a : α,
           (∑ b : β, leftTensor (ι₂ := ι) (Q.outcome b * P.outcome a * Q.outcome b)) *
-            (∑ b : β, leftTensor (ι₂ := ι) (Q.outcome b * P.outcome a * Q.outcome b))ᴴ := by
+            (∑ b : β,
+              leftTensor (ι₂ := ι) (Q.outcome b * P.outcome a * Q.outcome b))ᴴ := by
           apply Finset.sum_congr rfl
           intro a _
           rw [hherm a]
@@ -249,7 +246,8 @@ lemma evaluatedSlice_selfConsistency_fst_bound
             (fun a : Fq params =>
               leftTensor (ι₂ := ι) ((evaluatedSliceFirstFactor params family q).outcome a))
             (fun a : Fq params =>
-              rightTensor (ι₁ := ι) ((evaluatedSliceFirstFactor params family q).outcome a))) ≤
+              rightTensor (ι₁ := ι)
+                ((evaluatedSliceFirstFactor params family q).outcome a))) ≤
       zeta := by
   have hpoint :=
     evaluatedPointFamily_selfConsistency_of_stronglySelfConsistent
@@ -267,7 +265,8 @@ lemma evaluatedSlice_selfConsistency_fst_bound
             (fun a : Fq params =>
               leftTensor (ι₂ := ι) ((evaluatedSliceFirstFactor params family q).outcome a))
             (fun a : Fq params =>
-              rightTensor (ι₁ := ι) ((evaluatedSliceFirstFactor params family q).outcome a)))
+              rightTensor (ι₁ := ι)
+                ((evaluatedSliceFirstFactor params family q).outcome a)))
       = avgOver (uniformDistribution (Point params.next × Point params.next))
           (fun q =>
             qSDD strategy.state
@@ -295,7 +294,8 @@ lemma evaluatedSlice_selfConsistency_snd_bound
             (fun b : Fq params =>
               leftTensor (ι₂ := ι) ((evaluatedSliceSecondFactor params family q).outcome b))
             (fun b : Fq params =>
-              rightTensor (ι₁ := ι) ((evaluatedSliceSecondFactor params family q).outcome b))) ≤
+              rightTensor (ι₁ := ι)
+                ((evaluatedSliceSecondFactor params family q).outcome b))) ≤
       zeta := by
   have hpoint :=
     evaluatedPointFamily_selfConsistency_of_stronglySelfConsistent
@@ -313,7 +313,8 @@ lemma evaluatedSlice_selfConsistency_snd_bound
             (fun b : Fq params =>
               leftTensor (ι₂ := ι) ((evaluatedSliceSecondFactor params family q).outcome b))
             (fun b : Fq params =>
-              rightTensor (ι₁ := ι) ((evaluatedSliceSecondFactor params family q).outcome b)))
+              rightTensor (ι₁ := ι)
+                ((evaluatedSliceSecondFactor params family q).outcome b)))
       = avgOver (uniformDistribution (Point params.next × Point params.next))
           (fun q =>
             qSDD strategy.state

@@ -1,8 +1,4 @@
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Averages
-import MIPStarRE.LDT.Commutativity.Transport.Pullback
-import MIPStarRE.LDT.Commutativity.Scaffold.Products
-import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Averages
-import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 
 /-!
 # Full-slice tensor marginalization machinery
