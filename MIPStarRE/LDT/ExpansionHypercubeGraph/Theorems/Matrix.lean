@@ -387,83 +387,59 @@ lemma rerandomizeCoordWeight_colSum (params : Parameters) (v : Point params) :
 
 /-! ## Symmetry of edge weights and the Laplacian edge-difference form -/
 
-private lemma update_swap {params : Parameters} (u v : Point params) (i : Fin params.m) (x : Fq params)
-    (h : Function.update u i x = v) : Function.update v i (u i) = u := by
+/-- If `u[i↦x] = v`, then switching roles gives `v[i↦u_i] = u`. -/
+private lemma update_swap {params : Parameters} (u v : Point params) (i : Fin params.m)
+    (x : Fq params) (h : Function.update u i x = v) :
+    Function.update v i (u i) = u := by
   ext j
   by_cases hji : j = i
-  · rw [hji]; simp
-  · have h_uj_eq_vj : u j = v j := by
-      have hc := congrArg (fun f : Point params => f j) h
-      simpa [hji] using hc
-    simp [hji, h_uj_eq_vj.symm]
+  · subst hji; simp
+  · have hvj : v j = u j := by
+      have hc : Function.update u i x j = v j :=
+        congrArg (fun f : Point params => f j) h
+      rw [Function.update_of_ne hji] at hc
+      exact hc.symm
+    rw [Function.update_of_ne hji, hvj]
+
+/-- If `u[i↦x] = v` then `x = v i`. -/
+private lemma update_value_eq {params : Parameters} (u v : Point params) (i : Fin params.m)
+    (x : Fq params) (h : Function.update u i x = v) : x = v i := by
+  have hc : Function.update u i x i = v i :=
+    congrArg (fun f : Point params => f i) h
+  simpa using hc
 
 /-- The `rerandomizeCoordWeight` is symmetric: `w(u,v) = w(v,u)`. -/
 lemma rerandomizeCoordWeight_symm (params : Parameters) (u v : Point params) :
     rerandomizeCoordWeight params u v = rerandomizeCoordWeight params v u := by
   unfold rerandomizeCoordWeight
   congr 1
-  let S := (Finset.univ : Finset (Fin params.m × Fq params)).filter
-    fun p => Function.update u p.1 p.2 = v
-  let T := (Finset.univ : Finset (Fin params.m × Fq params)).filter
-    fun p => Function.update v p.1 p.2 = u
-  have h_sum_S : (∑ p : Fin params.m × Fq params,
-      if Function.update u p.1 p.2 = v then (1 : ℕ) else 0) = S.card := by
-    simp [S]
-  have h_sum_T : (∑ p : Fin params.m × Fq params,
-      if Function.update v p.1 p.2 = u then (1 : ℕ) else 0) = T.card := by
-    simp [T]
-  rw [h_sum_S, h_sum_T]
-  let f : Fin params.m × Fq params → Fin params.m × Fq params := fun p => (p.1, u p.1)
-  have hf_image_eq : Finset.image f S = T := by
-    ext p
-    constructor
-    · intro hp
-      rw [Finset.mem_image] at hp
-      rcases hp with ⟨q, hq, rfl⟩
-      rw [Finset.mem_filter] at hq
-      rcases hq with ⟨hq_mem, hq_upd⟩
-      rw [Finset.mem_filter]
-      refine ⟨Finset.mem_univ _, ?_⟩
-      exact update_swap u v q.1 q.2 hq_upd
-    · intro hp
-      rw [Finset.mem_filter] at hp
-      rcases hp with ⟨hp_mem, hp_upd⟩
-      rcases p with ⟨j, y⟩
-      have h_uj : u j = y := by
-        have hc := congrArg (fun g : Point params => g j) hp_upd
-        simpa using hc.symm
-      have h_q_in_S : (j, v j) ∈ S := by
-        rw [Finset.mem_filter]
-        refine ⟨Finset.mem_univ _, ?_⟩
-        exact update_swap v u j y hp_upd
-      rw [Finset.mem_image]
-      refine ⟨(j, v j), h_q_in_S, ?_⟩
-      simp [f, h_uj]
-  have hf_inj_on_S : ∀ a ∈ S, ∀ b ∈ S, f a = f b → a = b := by
-    intro a ha b hb hf_eq
-    obtain ⟨i₁, x₁⟩ := a
-    obtain ⟨i₂, x₂⟩ := b
-    have ha_upd : Function.update u i₁ x₁ = v := by
-      simpa [S, Finset.mem_filter] using ha
-    have hb_upd : Function.update u i₂ x₂ = v := by
-      simpa [S, Finset.mem_filter] using hb
-    have hi : i₁ = i₂ := by
-      have h_pair := Prod.mk.inj hf_eq
-      exact h_pair.1
-    have hx₁ : x₁ = v i₁ := by
-      have hc := congrArg (fun g : Point params => g i₁) ha_upd
-      simpa using hc
-    have hx₂ : x₂ = v i₁ := by
-      rw [← hi] at hb_upd
-      have hc := congrArg (fun g : Point params => g i₁) hb_upd
-      simpa using hc
-    rw [hx₁, hx₂, hi]
-  have h_card_eq : S.card = T.card := by
-    calc
-      S.card = (Finset.image f S).card := by
-        rw [Finset.card_image_of_injOn hf_inj_on_S]
-      _ = T.card := by rw [hf_image_eq]
-  simpa using congrArg (fun n : ℕ => (n : Error)) h_card_eq
+  -- Suffices to show the ℕ-valued indicator sums are equal.
+  suffices h : (∑ p : Fin params.m × Fq params,
+      if Function.update u p.1 p.2 = v then (1 : ℕ) else 0) =
+      (∑ p : Fin params.m × Fq params,
+        if Function.update v p.1 p.2 = u then (1 : ℕ) else 0) by
+    exact_mod_cast h
+  -- Reduce both sides to cardinalities and exhibit a bijection (i, x) ↦ (i, u i).
+  rw [Finset.sum_boole, Finset.sum_boole]
+  refine Finset.card_bij (fun p _ => (p.1, u p.1)) ?hi ?hinj ?hsurj
+  · intro ⟨i, x⟩ hp
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hp
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+    exact update_swap u v i x hp
+  · intro ⟨i₁, x₁⟩ h₁ ⟨i₂, x₂⟩ h₂ heq
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at h₁ h₂
+    obtain ⟨hi, _⟩ : i₁ = i₂ ∧ u i₁ = u i₂ := Prod.mk.inj heq
+    subst hi
+    have hx₁ : x₁ = v i₁ := update_value_eq u v i₁ x₁ h₁
+    have hx₂ : x₂ = v i₁ := update_value_eq u v i₁ x₂ h₂
+    simp [hx₁, hx₂]
+  · intro ⟨j, y⟩ hp
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hp
+    refine ⟨(j, v j), ?_, ?_⟩
+    · simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+      exact update_swap v u j y hp
+    · have hy : y = u j := update_value_eq v u j y hp
+      simp [hy]
 
 /-- `prop:laplacian-rewrite`: the Laplacian equals the edge-difference form
 `(1/2) · E_{(u,v)∼C} (|u⟩-|v⟩)(⟨u|-⟨v|)`, proved entrywise using the symmetry
@@ -471,88 +447,182 @@ and row/column-sum properties of the edge distribution. -/
 theorem laplacian_eq_edgeDifferenceForm (params : Parameters) :
     matrixLaplacianOperator params = laplacianDifferenceForm params := by
   ext a b
-  simp [laplacianDifferenceForm, matrixLaplacianOperator, Matrix.sub_apply, Matrix.one_apply,
-    Matrix.smul_apply, Pi.smul_apply, smul_eq_mul,
-    matrixAdjacencyOperator, hypercubeAdjacencyWeight_eq_rerandomizeCoordWeight]
+  -- Step 1: factor each indicator product into a sum of four ANDed indicator terms.
   have h_expand (u v : Point params) :
       ((if a = u then (1 : ℂ) else 0) - (if a = v then (1 : ℂ) else 0)) *
       ((if u = b then (1 : ℂ) else 0) - (if v = b then (1 : ℂ) else 0)) =
-      (if a = u ∧ u = b then (1 : ℂ) else 0) -
-      (if a = u ∧ v = b then (1 : ℂ) else 0) -
-      (if a = v ∧ u = b then (1 : ℂ) else 0) +
-      (if a = v ∧ v = b then (1 : ℂ) else 0) := by
-    by_cases ha_u : a = u <;> by_cases ha_v : a = v <;>
-    by_cases hu_b : u = b <;> by_cases hv_b : v = b <;> simp [ha_u, ha_v, hu_b, hv_b] <;> ring
-  calc
-    (1/2 : ℂ) * (∑ uv : Point params × Point params,
-      ((rerandomizeCoordWeight params uv.1 uv.2 : ℂ)) *
-        (((if a = uv.1 then (1 : ℂ) else 0) - (if a = uv.2 then (1 : ℂ) else 0)) *
-         ((if uv.1 = b then (1 : ℂ) else 0) - (if uv.2 = b then (1 : ℂ) else 0))))
-    _ = (1/2 : ℂ) * (∑ uv : Point params × Point params,
-            ((rerandomizeCoordWeight params uv.1 uv.2 : ℂ)) *
-              ((if a = uv.1 ∧ uv.1 = b then (1 : ℂ) else 0) -
-               (if a = uv.1 ∧ uv.2 = b then (1 : ℂ) else 0) -
-               (if a = uv.2 ∧ uv.1 = b then (1 : ℂ) else 0) +
-               (if a = uv.2 ∧ uv.2 = b then (1 : ℂ) else 0))) := by
-      refine congrArg (fun f => (1/2 : ℂ) * f) (Finset.sum_congr rfl ?_)
-      rintro ⟨u, v⟩ _
-      rw [h_expand u v]
-    _ = (1/2 : ℂ) * ((∑ uv : Point params × Point params, ((rerandomizeCoordWeight params uv.1 uv.2 : ℂ)) *
-              (if a = uv.1 ∧ uv.1 = b then (1 : ℂ) else 0)) -
-        (∑ uv : Point params × Point params, ((rerandomizeCoordWeight params uv.1 uv.2 : ℂ)) *
-              (if a = uv.1 ∧ uv.2 = b then (1 : ℂ) else 0)) -
-        (∑ uv : Point params × Point params, ((rerandomizeCoordWeight params uv.1 uv.2 : ℂ)) *
-              (if a = uv.2 ∧ uv.1 = b then (1 : ℂ) else 0)) +
-        (∑ uv : Point params × Point params, ((rerandomizeCoordWeight params uv.1 uv.2 : ℂ)) *
+      ((if a = u ∧ u = b then (1 : ℂ) else 0)
+        - (if a = u ∧ v = b then (1 : ℂ) else 0)
+        - (if a = v ∧ u = b then (1 : ℂ) else 0)
+        + (if a = v ∧ v = b then (1 : ℂ) else 0)) := by
+    by_cases hau : a = u <;> by_cases hav : a = v <;>
+      by_cases hub : u = b <;> by_cases hvb : v = b <;>
+      simp [hau, hav, hub, hvb] <;> ring
+  -- Step 2: each of the four indicator-weighted sums has a closed form.
+  have hSum1 :
+      ∑ uv : Point params × Point params,
+        (rerandomizeCoordWeight params uv.1 uv.2 : ℂ) *
+          (if a = uv.1 ∧ uv.1 = b then (1 : ℂ) else 0) =
+      (if a = b then ((hypercubeVertexCount params : Error)⁻¹ : ℂ) else 0) := by
+    rw [Fintype.sum_prod_type]
+    by_cases hab : a = b
+    · subst hab
+      have step : ∀ u : Point params,
+          ∑ v : Point params,
+            (rerandomizeCoordWeight params u v : ℂ) *
+              (if a = u ∧ u = a then (1 : ℂ) else 0) =
+          (if u = a then ∑ v, (rerandomizeCoordWeight params u v : ℂ) else 0) := by
+        intro u
+        by_cases hu : u = a
+        · subst hu; simp
+        · simp [hu]
+      simp_rw [step]
+      simp only [Finset.sum_ite_eq', Finset.mem_univ, if_true]
+      have hrow := rerandomizeCoordWeight_rowSum params a
+      have hcast := congrArg (fun x : Error => (x : ℂ)) hrow
+      push_cast at hcast
+      simpa using hcast
+    · -- a ≠ b: every term has a=u and u=b incompatible
+      have hzero : ∀ u v : Point params,
+          (rerandomizeCoordWeight params u v : ℂ) *
+              (if a = u ∧ u = b then (1 : ℂ) else 0) = 0 := by
+        intro u v
+        by_cases hau : a = u
+        · subst hau
+          have : ¬ a = b := hab
+          simp [this]
+        · simp [hau]
+      simp_rw [hzero, Finset.sum_const_zero]
+      simp [hab]
+  have hSum2 :
+      ∑ uv : Point params × Point params,
+        (rerandomizeCoordWeight params uv.1 uv.2 : ℂ) *
+          (if a = uv.1 ∧ uv.2 = b then (1 : ℂ) else 0) =
+      (rerandomizeCoordWeight params a b : ℂ) := by
+    rw [Fintype.sum_prod_type]
+    have step : ∀ u : Point params,
+        ∑ v : Point params,
+          (rerandomizeCoordWeight params u v : ℂ) *
+            (if a = u ∧ v = b then (1 : ℂ) else 0) =
+        (if a = u then (rerandomizeCoordWeight params u b : ℂ) else 0) := by
+      intro u
+      by_cases hau : a = u
+      · subst hau
+        simp [Finset.sum_ite_eq', Finset.mem_univ]
+      · simp [hau]
+    simp_rw [step]
+    simp only [Finset.sum_ite_eq, Finset.mem_univ, if_true]
+  have hSum3 :
+      ∑ uv : Point params × Point params,
+        (rerandomizeCoordWeight params uv.1 uv.2 : ℂ) *
+          (if a = uv.2 ∧ uv.1 = b then (1 : ℂ) else 0) =
+      (rerandomizeCoordWeight params a b : ℂ) := by
+    rw [Fintype.sum_prod_type]
+    have step : ∀ u : Point params,
+        ∑ v : Point params,
+          (rerandomizeCoordWeight params u v : ℂ) *
+            (if a = v ∧ u = b then (1 : ℂ) else 0) =
+        (if u = b then (rerandomizeCoordWeight params u a : ℂ) else 0) := by
+      intro u
+      by_cases hub : u = b
+      · subst hub
+        simp [Finset.sum_ite_eq, Finset.mem_univ]
+      · have hzero : ∀ v : Point params,
+            (rerandomizeCoordWeight params u v : ℂ) *
+                (if a = v ∧ u = b then (1 : ℂ) else 0) = 0 := by
+          intro v
+          have : ¬(a = v ∧ u = b) := fun ⟨_, h2⟩ => hub h2
+          simp [this]
+        simp_rw [hzero, Finset.sum_const_zero]
+        simp [hub]
+    simp_rw [step]
+    simp only [Finset.sum_ite_eq', Finset.mem_univ, if_true]
+    have hsymm := rerandomizeCoordWeight_symm params b a
+    exact_mod_cast hsymm
+  have hSum4 :
+      ∑ uv : Point params × Point params,
+        (rerandomizeCoordWeight params uv.1 uv.2 : ℂ) *
+          (if a = uv.2 ∧ uv.2 = b then (1 : ℂ) else 0) =
+      (if a = b then ((hypercubeVertexCount params : Error)⁻¹ : ℂ) else 0) := by
+    rw [Fintype.sum_prod_type]
+    by_cases hab : a = b
+    · subst hab
+      have step : ∀ u : Point params,
+          ∑ v : Point params,
+            (rerandomizeCoordWeight params u v : ℂ) *
+              (if a = v ∧ v = a then (1 : ℂ) else 0) =
+          (rerandomizeCoordWeight params u a : ℂ) := by
+        intro u
+        simp_rw [show ∀ v : Point params,
+              ((rerandomizeCoordWeight params u v : ℂ) *
+                  (if a = v ∧ v = a then (1 : ℂ) else 0)) =
+              (if v = a then (rerandomizeCoordWeight params u v : ℂ) else 0) from fun v => by
+            by_cases hv : v = a
+            · subst hv; simp
+            · simp [hv]]
+        simp only [Finset.sum_ite_eq', Finset.mem_univ, if_true]
+      simp_rw [step]
+      simp only [if_true]
+      have hcol := rerandomizeCoordWeight_colSum params a
+      have hcast := congrArg (fun x : Error => (x : ℂ)) hcol
+      push_cast at hcast
+      simpa using hcast
+    · have hzero : ∀ u v : Point params,
+          (rerandomizeCoordWeight params u v : ℂ) *
+              (if a = v ∧ v = b then (1 : ℂ) else 0) = 0 := by
+        intro u v
+        by_cases hav : a = v
+        · subst hav
+          have : ¬ a = b := hab
+          simp [this]
+        · simp [hav]
+      simp_rw [hzero, Finset.sum_const_zero]
+      simp [hab]
+  -- Step 3: assemble.  LHS first.
+  have hLHS : matrixLaplacianOperator params a b =
+      (if a = b then ((hypercubeVertexCount params : Error)⁻¹ : ℂ) else 0) -
+      (rerandomizeCoordWeight params a b : ℂ) := by
+    simp only [matrixLaplacianOperator, Matrix.sub_apply, Matrix.smul_apply,
+      Matrix.one_apply, smul_eq_mul, matrixAdjacencyOperator,
+      hypercubeAdjacencyWeight_eq_rerandomizeCoordWeight]
+    by_cases hab : a = b <;> simp [hab]
+  rw [hLHS]
+  simp only [laplacianDifferenceForm]
+  -- Decompose the RHS sum into the four evaluated sums.
+  have hsum_decomp :
+      ∑ uv : Point params × Point params,
+        (rerandomizeCoordWeight params uv.1 uv.2 : ℂ) *
+          (((if a = uv.1 then (1 : ℂ) else 0) - (if a = uv.2 then (1 : ℂ) else 0)) *
+           ((if uv.1 = b then (1 : ℂ) else 0) - (if uv.2 = b then (1 : ℂ) else 0))) =
+      (if a = b then ((hypercubeVertexCount params : Error)⁻¹ : ℂ) else 0)
+        - (rerandomizeCoordWeight params a b : ℂ)
+        - (rerandomizeCoordWeight params a b : ℂ)
+        + (if a = b then ((hypercubeVertexCount params : Error)⁻¹ : ℂ) else 0) := by
+    have rewrite_step :
+        (∑ uv : Point params × Point params,
+          (rerandomizeCoordWeight params uv.1 uv.2 : ℂ) *
+            (((if a = uv.1 then (1 : ℂ) else 0) - (if a = uv.2 then (1 : ℂ) else 0)) *
+             ((if uv.1 = b then (1 : ℂ) else 0) - (if uv.2 = b then (1 : ℂ) else 0)))) =
+        (∑ uv : Point params × Point params,
+          ((rerandomizeCoordWeight params uv.1 uv.2 : ℂ) *
+              (if a = uv.1 ∧ uv.1 = b then (1 : ℂ) else 0)
+            - (rerandomizeCoordWeight params uv.1 uv.2 : ℂ) *
+              (if a = uv.1 ∧ uv.2 = b then (1 : ℂ) else 0)
+            - (rerandomizeCoordWeight params uv.1 uv.2 : ℂ) *
+              (if a = uv.2 ∧ uv.1 = b then (1 : ℂ) else 0)
+            + (rerandomizeCoordWeight params uv.1 uv.2 : ℂ) *
               (if a = uv.2 ∧ uv.2 = b then (1 : ℂ) else 0))) := by
-      simp [Finset.sum_add_distrib, Finset.sum_sub_distrib]
-    _ = (1/2 : ℂ) * (
-        ((if a = b then ∑ v : Point params, (rerandomizeCoordWeight params a v : ℂ) else 0)) -
-        ((rerandomizeCoordWeight params a b : ℂ)) -
-        ((rerandomizeCoordWeight params b a : ℂ)) +
-        ((if a = b then ∑ u : Point params, (rerandomizeCoordWeight params u a : ℂ) else 0))) := by
-      congr 1
-      · rw [Fintype.sum_prod_type]
-        simp_rw [mul_ite, mul_zero, mul_one, ite_mul, zero_mul, one_mul]
-        simp [eq_comm]
-      · rw [Fintype.sum_prod_type]; simp [eq_comm]
-      · rw [Fintype.sum_prod_type]; simp [eq_comm]
-      · rw [Fintype.sum_prod_type]
-        simp_rw [mul_ite, mul_zero, mul_one, ite_mul, zero_mul, one_mul]
-        simp [eq_comm]
-    _ = (1/2 : ℂ) * (
-        ((if a = b then ((hypercubeVertexCount params : Error)⁻¹ : ℂ) else 0)) -
-        ((rerandomizeCoordWeight params a b : ℂ)) -
-        ((rerandomizeCoordWeight params b a : ℂ)) +
-        ((if a = b then ((hypercubeVertexCount params : Error)⁻¹ : ℂ) else 0))) := by
-      congr 1
-      · by_cases hab : a = b
-        · subst hab
-          have hrow := rerandomizeCoordWeight_rowSum params a
-          simpa [Complex.ofReal_div, Complex.ofReal_inv, Complex.ofReal_natCast] using
-            congrArg (fun x : Error => (x : ℂ)) hrow
-        · simp [hab]
-      · rfl
-      · rfl
-      · by_cases hab : a = b
-        · subst hab
-          have hcol := rerandomizeCoordWeight_colSum params a
-          simpa [Complex.ofReal_div, Complex.ofReal_inv, Complex.ofReal_natCast] using
-            congrArg (fun x : Error => (x : ℂ)) hcol
-        · simp [hab]
-    _ = (1/2 : ℂ) * (
-        ((if a = b then (2 : ℂ) * ((hypercubeVertexCount params : Error)⁻¹ : ℂ) else 0)) -
-        (2 : ℂ) * (rerandomizeCoordWeight params a b : ℂ)) := by
-      have hsymm : (rerandomizeCoordWeight params b a : ℂ) =
-          (rerandomizeCoordWeight params a b : ℂ) := by
-        simpa using congrArg (fun x : Error => (x : ℂ)) (rerandomizeCoordWeight_symm params a b)
-      rw [hsymm]
-      by_cases hab : a = b
-      · subst hab; ring
-      · simp [hab]
-    _ = ((if a = b then ((hypercubeVertexCount params : Error)⁻¹ : ℂ) else 0)) -
-        (rerandomizeCoordWeight params a b : ℂ) := by
+      refine Finset.sum_congr rfl ?_
+      rintro ⟨u, v⟩ _
+      simp only
+      rw [h_expand u v]
       ring
+    rw [rewrite_step, Finset.sum_add_distrib, Finset.sum_sub_distrib,
+      Finset.sum_sub_distrib, hSum1, hSum2, hSum3, hSum4]
+  rw [hsum_decomp]
+  by_cases hab : a = b
+  · simp [hab]; ring
+  · simp [hab]; ring
 
 /-- Closed form for the matrix local-variance trace expression. -/
 lemma matrixLocalVarianceTraceForm_eq_closedForm (params : Parameters)
