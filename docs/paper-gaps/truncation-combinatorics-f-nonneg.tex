@@ -28,11 +28,12 @@ In the TeX source consulted here, the estimate occurs in
 We use the notation of the cited source:
 the overlaps $o_{a,i}$ are defined by
 \[
-  o_{a,i} = \bra{\psi} (\ket{v_{a,i}}\bra{v_{a,i}} \ot I) \ket{\psi},
+  o_{a,i} = \langle \psi, (P_{v_{a,i}} \otimes I)\psi\rangle,
 \]
-where $\ket{\psi}$ is the state and each $\ket{v_{a,i}}$ is a unit vector from
-the range of a projector. The total number of overlap pairs is $r$, the set
-$\Small$ is the complement of the $d$ largest overlaps, and $\zeta$ is the
+where $\psi$ is the state and $P_{v_{a,i}}$ is the rank-one projection onto the
+unit vector $v_{a,i}$ from the range of a projector. The total number of overlap
+pairs is $r$, the set $\Small$ is the complement of the $d$ largest overlaps,
+and $\zeta$ is the
 self-consistency error parameter with $0\le \zeta\le 1/4$.
 
 At this point the paper asserts the estimate
@@ -54,28 +55,24 @@ positive operator against a state.
 
 \section{The abstraction in Lean}
 
-The formal development extracts the combinatorial content of the estimate and
-proves it for an arbitrary real-valued function, without assuming nonnegativity.
+The formal development, following the blueprint, extracts the combinatorial
+content of the estimate and proves it for an arbitrary real-valued function,
+without assuming nonnegativity.
 \footnote{The formal lemma is
-\leanid{sum\_small\_le\_four\_sqrt} in
+\texttt{sum\_small\_le\_four\_sqrt} in
 \path{MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/TruncationCombinatorics.lean},
-lines 163--174. It is accompanied by two auxiliary lemmas
-\leanid{card\_mul\_sum\_small\_le} (lines 100--119) and
-\leanid{card\_univ\_mul\_sum\_compl\_le} (lines 125--148).}
+lines 164--175. It is accompanied by two auxiliary lemmas
+\texttt{card\_mul\_sum\_small\_le} (lines 100--119) and
+\texttt{card\_univ\_mul\_sum\_compl\_le} (lines 125--148).}
 
 In the statement of the lemma, the overlaps are replaced by a function
-$f\colon \alpha\to \R$ on a finite set $\alpha$. The subset $L\subseteq\alpha$
-plays the role of the large overlaps (the complement of $\Small$), and the
-hypotheses are
-\begin{itemize}
-  \item $|L|=d$,  $d < |\alpha|$,  and
-        $|\alpha| \le (1+2\sqrt\zeta)\,d$;
-  \item every value on the complement $L^{\mathsf c}$ is at most every value on
-        $L$ (the ordering hypothesis);
-  \item $\sum_{x\in\alpha} f(x) \le 1+2\sqrt\zeta$ (the total estimate);
-  \item $0\le \zeta\le 1/4$.
-\end{itemize}
-The conclusion is
+$f\colon \alpha\to \mathbb{R}$ on a finite set $\alpha$. The subset $L\subseteq\alpha$
+plays the role of the large overlaps, and $L^{\mathsf c}$ plays the role of
+$\Small$. The hypotheses are $|L|=d$, $d < |\alpha|$,
+$|\alpha| \le (1+2\sqrt\zeta)\,d$, the ordering condition
+$f(s)\le f(l)$ for all $s\in L^{\mathsf c}$ and $l\in L$, the total estimate
+$\sum_{x\in\alpha} f(x) \le 1+2\sqrt\zeta$, and
+$0\le \zeta\le 1/4$. The conclusion is
 \[
   \sum_{s\in L^{\mathsf c}} f(s) \le 4\sqrt\zeta.
 \]
@@ -85,11 +82,11 @@ relations; the sign of $f$ plays no role in the calculation.
 
 \section{Comparison}
 
-In the paper, the function $o_{a,i}$ is non-negative by construction, so the
-implicit hypothesis $o_{a,i}\ge 0$ is automatically satisfied and the estimate
-is valid. The formal lemma is therefore strictly stronger than what the paper
-states: it has \emph{fewer} hypotheses (it drops the nonnegativity condition) and
-derives the same conclusion.
+In the paper, the values $o_{a,i}$ are non-negative by construction. Thus any
+abstract version which retains all paper-specific facts may include the
+hypothesis $f(x)\ge 0$. The formal lemma proves the same inequality without that
+hypothesis. It is therefore stronger than the natural abstracted statement with
+non-negative $f$, while leaving the concrete estimate in the paper unchanged.
 
 The difference does not affect soundness. The formal proof of the
 orthogonalization lemma instantiates the combinatorial lemma with the actual
@@ -98,24 +95,25 @@ ordering and total-estimate hypotheses are verified from the properties of the
 overlaps, and the lemma then supplies the needed bound on the sum over the small
 entries.
 
-
 \section{Relation with the blueprint}
 
-The blueprint states this lemma as
+The blueprint states the same abstract averaging lemma as
 \path{lem:small-overlap-averaging} in
 \cite[Chapter~\emph{Making measurements projective}]{MIPStarREBlueprint}.
 \footnote{In the blueprint source consulted here, this is in
-\path{blueprint/src/chapter/ch04_projective.tex}, lines 93--106.}
-It takes $f:\alpha\to \R$ to be an arbitrary real-valued function and does not
-require $f\ge 0$; the hypotheses are exactly the ordering hypothesis, the total
-estimate, the size constraints, and $0\le\zeta\le 1/4$.  The blueprint therefore
-matches the Lean statement rather than the paper, and the discrepancy with the
-paper is already resolved at the blueprint level.
+\path{blueprint/src/chapter/ch04_projective.tex}, lines 419--440.}
+It takes $f:\alpha\to \mathbb{R}$ to be an arbitrary real-valued function and
+does not require $f\ge 0$. Its hypotheses are the ordering condition, the total
+estimate, the size constraints, and $0\le\zeta\le 1/4$, followed by the same
+conclusion $\sum_{s\in L^{\mathsf c}}f(s)\le 4\sqrt\zeta$. Thus the
+blueprint and the formal statement agree: both record the ordered
+double-counting argument in a form which is more general than the concrete
+overlap calculation in the paper.
 
 \section{Conclusion}
 
-There is no mathematical discrepancy. The formal lemma is a conservative
-strengthening of the argument in the paper. The paper's proof of the
+There is no theorem-level gap. The formal lemma is a conservative strengthening
+of the argument in the paper. The paper's proof of the
 small-overlaps bound uses only the ordering hypothesis, the total estimate, and
 the cardinality relations; it never invokes the nonnegativity of the overlaps
 except through their definition. The formal development makes this explicit by
