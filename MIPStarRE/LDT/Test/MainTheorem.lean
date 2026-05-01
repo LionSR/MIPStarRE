@@ -316,6 +316,57 @@ def MainFormalSuccessorSelfImprovementProducer (params : Parameters)
       strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
       hrestrict hinduction
 
+/-- Successor-case bridge-input package for the restricted-strategy
+self-improvement producer.
+
+For each possible per-slice induction package, this asks for the narrow
+`SelfImprovementPackage.SliceBridgeInputs` assumptions: honest per-slice
+`SymStrat`s, equality transports to the restricted-slice interfaces, and the
+remaining Section 9 bridge inputs for those honest slice strategies. -/
+def MainFormalSuccessorSelfImprovementBridgeInputs (params : Parameters)
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (haxisWeightedBound : MainFormalSuccessorAxisWeightedBound params strategy eps)
+    (hdiagonalWeightedBound :
+      MainFormalSuccessorDiagonalWeightedBound params strategy eps) : Type _ :=
+  let hrestrict :=
+    mainFormalSuccessorRestrictionPackage params strategy eps hpass
+      haxisWeightedBound hdiagonalWeightedBound
+  ∀ hinduction :
+    MainInductionStep.PerSliceInductionPackage params
+      strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) hrestrict k,
+    MainInductionStep.SelfImprovementPackage.SliceBridgeInputs params
+      strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
+      hrestrict hinduction
+
+/-- Convert successor-case bridge inputs into the self-improvement producer
+expected by the public Section 6 boundary wrapper.
+
+This does not discharge the bridge-input fields; it only packages them into the
+existing `MainFormalSuccessorSelfImprovementProducer` API. -/
+noncomputable def mainFormalSuccessorSelfImprovementProducer_ofBridgeInputs
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (haxisWeightedBound : MainFormalSuccessorAxisWeightedBound params strategy eps)
+    (hdiagonalWeightedBound :
+      MainFormalSuccessorDiagonalWeightedBound params strategy eps)
+    (hbridge :
+      MainFormalSuccessorSelfImprovementBridgeInputs params strategy eps hpass k
+        haxisWeightedBound hdiagonalWeightedBound) :
+    MainFormalSuccessorSelfImprovementProducer params strategy eps hpass k
+      haxisWeightedBound hdiagonalWeightedBound := by
+  let hrestrict :=
+    mainFormalSuccessorRestrictionPackage params strategy eps hpass
+      haxisWeightedBound hdiagonalWeightedBound
+  intro hinduction
+  exact
+    MainInductionStep.SelfImprovementPackage.ofSliceBridgeInputs params
+      strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
+      hrestrict hinduction (hbridge hinduction)
+
 /-- Successor-case Section 6 boundary inputs for `mainFormal`.
 
 Assume the ambient projective strategy lives over `params.next`. Step 1 already

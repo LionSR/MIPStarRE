@@ -305,4 +305,24 @@ theorem selfImprovementFromBridgeInputs
     hbridge.helperStrongSelfConsistency
     hbridge.orthonormalization hbridge.finalFields hgood G
 
+/-- `SelfImprovementBridgeInputs` + `IsGood` also suffice for the
+submeasurement-input interface used by Section 6, once a measurement completion
+of the input submeasurement is supplied explicitly. -/
+theorem selfImprovementFromBridgeInputsSubMeas
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma nu : Error)
+    (hinputs : SelfImprovementBridgeInputs params strategy eps delta nu)
+    (hgood : strategy.IsGood eps delta gamma)
+    (G : SubMeas (Polynomial params) ι)
+    (Gmeas : Measurement (Polynomial params) ι)
+    (hbridge : Gmeas.toSubMeas = G) :
+    ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+      SelfImprovementSubMeasConclusion params strategy G H Z
+        eps delta gamma nu :=
+  selfImprovementFromSubMeas params strategy eps delta gamma nu
+    hinputs.helperStrongSelfConsistency
+    hinputs.orthonormalization hinputs.finalFields hgood G Gmeas hbridge
+
 end MIPStarRE.LDT.SelfImprovement

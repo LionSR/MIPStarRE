@@ -154,6 +154,17 @@
 	This is exactly Theorem~\ref{thm:ld-pasting}, restated in the induction chapter because it is the pasting input used in the proof of Theorem~\ref{thm:main-induction}.
 \end{proof}
 
+\begin{definition}[Self-improvement bridge data for the successor step]\label{def:self-improvement-bridge-data}
+	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.ofSelfImprovementInInductionSection}
+	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.ofSliceBridgeInputs}
+	\uses{thm:self-improvement-in-induction-section}
+	The successor step records the slice-wise self-improvement output in
+	\texttt{SelfImprovementPackage}.  The Lean-only \texttt{SliceBridgeInputs} package is a
+	narrow wiring interface: it assumes honest per-slice symmetric strategies and
+	Section~\ref{chap:self-improvement} bridge inputs, then converts them into
+	the existing self-improvement package without discharging those assumptions.
+\end{definition}
+
 \begin{definition}[Pasting data for the successor step]\label{def:successor-pasting-data}
 	\lean{MIPStarRE.LDT.MainInductionStep.AveragedPastingInput.output, MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingInput}
 	\uses{lem:weighted-restricted-probability-bounds, thm:ld-pasting-in-induction-section}
@@ -197,6 +208,7 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase, MIPStarRE.LDT.MainInductionStep.mainInductionFromPackages, MIPStarRE.LDT.MainInductionStep.mainInductionByRecursionOnM}
 	together with the stage data
 	\lean{MIPStarRE.LDT.MainInductionStep.SliceRestrictionPackage, MIPStarRE.LDT.MainInductionStep.PerSliceInductionPackage, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage, MIPStarRE.LDT.MainInductionStep.AveragedPastingInput}
+	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.ofSliceBridgeInputs}
 	that mirror the four paper stages $\text{restrict} \to \text{induct} \to \text{self-improve} \to \text{paste}$. The weighted restricted-probability boundary is now public via \lean{MIPStarRE.LDT.MainInductionStep.weighted_axisParallel_bound, MIPStarRE.LDT.MainInductionStep.weighted_diagonal_bound, MIPStarRE.LDT.MainInductionStep.restrictedProbabilities}, and the final public successor-step wrapper is formalized as \lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper}. The remaining gap, tracked by issues \#630 and \#632, is to produce the restricted-strategy self-improvement input needed to instantiate that wrapper directly from higher-level applications, so the displayed theorem is not yet marked \leanok.
 	We may assume $\eps,\delta,\gamma,d/q \le 1$, since otherwise $\nu \ge 1$ and the bound is trivial.
 
@@ -352,6 +364,7 @@
 
 \begin{definition}[Lean successor-boundary aliases for the Section 3 proof]\label{def:main-formal-successor-boundary}
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAxisWeightedBound, MIPStarRE.LDT.Test.MainFormalSuccessorDiagonalWeightedBound, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictionPackage, MIPStarRE.LDT.Test.MainFormalSuccessorRecursiveSlices, MIPStarRE.LDT.Test.MainFormalSuccessorSelfImprovementProducer, MIPStarRE.LDT.Test.MainFormalSuccessorBoundary, MIPStarRE.LDT.Test.mainFormalSuccessorAxisWeightedBound_ofPass, MIPStarRE.LDT.Test.mainFormalSuccessorDiagonalWeightedBound_ofPass, MIPStarRE.LDT.Test.mainFormalSuccessorBoundary_ofRecursiveSelfImprovement}
+	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorSelfImprovementBridgeInputs, MIPStarRE.LDT.Test.mainFormalSuccessorSelfImprovementProducer_ofBridgeInputs}
 	\leanok
 	\uses{lem:symmetrization-bridge, thm:main-induction-public-wrapper}
 	These Lean-only aliases name the successor-case data that

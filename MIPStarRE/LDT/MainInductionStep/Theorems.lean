@@ -229,6 +229,123 @@ noncomputable def SelfImprovementPackage.ofSelfImprovementInInductionSection
       bounded := fun x => (hslice_props x).2.2.2.2.1
       dominatesAveragePointOperator := fun x h => (hslice_props x).2.2.2.2.2 h }
 
+/-- Narrow assumption package for running the Section 9 self-improvement bridge
+on each Section 6 slice.
+
+The package deliberately keeps the remaining mathematical obligations explicit:
+for every slice it asks for an honest `SymStrat params ι` whose state,
+point-measurement interface, and averaged point operator agree with the
+restricted-slice bookkeeping used by Section 6, together with the Section 9
+`SelfImprovementBridgeInputs` for that honest strategy. The equalities below do
+not derive the extra `SymStrat` fields (`permInvState`, `densityFixed`, or
+`isNormalized`) from the restricted strategy; those remain part of the supplied
+honest slice strategies. -/
+structure SelfImprovementPackage.SliceBridgeInputs
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma)
+    (inductionPkg : PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k)
+    where
+  /-- Honest symmetric strategies realizing the slice interfaces. -/
+  sliceStrategy : Fq params → SymStrat params ι
+  /-- Each honest slice strategy uses the ambient state. -/
+  state_eq : ∀ x, (sliceStrategy x).state = strategy.state
+  /-- Its point measurement agrees with the restricted-slice point interface. -/
+  pointMeasurement_eq :
+    ∀ x,
+      (sliceStrategy x).pointMeasurement =
+        (xRestrictedStrategy params strategy x).pointMeasurement
+  /-- Its averaged point operator is the averaged slice point operator used by
+  Section 6. -/
+  averagedPoint_eq :
+    ∀ x h,
+      IdxPolyFamily.averagedPointEvaluationOperator (sliceStrategy x) h =
+        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x h
+  /-- The honest slice strategy is good with the restricted failure profile. -/
+  good :
+    ∀ x,
+      (sliceStrategy x).IsGood
+        (restrictionPkg.profile.axisParallel x)
+        (restrictionPkg.profile.selfConsistency x)
+        (restrictionPkg.profile.diagonal x)
+  /-- The remaining Section 9 bridge inputs for each honest slice strategy. -/
+  bridgeInputs :
+    ∀ x,
+      SelfImprovement.SelfImprovementBridgeInputs params (sliceStrategy x)
+        (restrictionPkg.profile.axisParallel x)
+        (restrictionPkg.profile.selfConsistency x)
+        (inductionPkg.sliceError x)
+
+/-- Convert honest per-slice Section 9 bridge inputs into the Section 6
+self-improvement package.
+
+This is wiring only: `SliceBridgeInputs` still assumes the honest slice
+`SymStrat`s and their Section 9 bridge inputs. The conversion applies
+`selfImprovementInInductionSection` slice-by-slice and transports its fields
+across the recorded equalities to the restricted-slice bookkeeping interface. -/
+noncomputable def SelfImprovementPackage.ofSliceBridgeInputs
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma)
+    (inductionPkg : PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k)
+    (hbridge :
+      SelfImprovementPackage.SliceBridgeInputs params strategy eps delta gamma k
+        restrictionPkg inductionPkg) :
+    SelfImprovementPackage params strategy eps delta gamma k restrictionPkg inductionPkg := by
+  classical
+  refine
+    SelfImprovementPackage.ofSelfImprovementInInductionSection
+      params strategy eps delta gamma k restrictionPkg inductionPkg ?_
+  intro x
+  let sliceStrategy := hbridge.sliceStrategy x
+  have hconsSlice :
+      ConsRel sliceStrategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas sliceStrategy.pointMeasurement)
+        (polynomialEvaluationFamily params (inductionPkg.sliceMeasurement x).toSubMeas)
+        (inductionPkg.sliceError x) := by
+    have hcons := inductionPkg.pointConsistency x
+    rw [← hbridge.state_eq x, ← hbridge.pointMeasurement_eq x] at hcons
+    simpa [sliceStrategy] using hcons
+  rcases selfImprovementInInductionSection params (hbridge.sliceStrategy x)
+      (restrictionPkg.profile.axisParallel x)
+      (restrictionPkg.profile.selfConsistency x)
+      (restrictionPkg.profile.diagonal x)
+      (inductionPkg.sliceError x)
+      (hbridge.bridgeInputs x).helperStrongSelfConsistency
+      (hbridge.bridgeInputs x).orthonormalization
+      (hbridge.bridgeInputs x).finalFields
+      (hbridge.good x)
+      (inductionPkg.sliceMeasurement x).toSubMeas
+      (inductionPkg.sliceMeasurement x)
+      rfl
+      hconsSlice with
+    ⟨H, Z, hH⟩
+  refine ⟨H, Z, ?_⟩
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
+  · have hcomp := hH.completeness
+    rw [hbridge.state_eq x] at hcomp
+    simpa [sliceSelfImprovementError] using hcomp
+  · have hpoint := hH.pointConsistency
+    rw [hbridge.state_eq x, hbridge.pointMeasurement_eq x] at hpoint
+    simpa [sliceSelfImprovementError] using hpoint
+  · have hssc := hH.strongSelfConsistency
+    rw [hbridge.state_eq x] at hssc
+    simpa [sliceSelfImprovementError] using hssc
+  · have hclose := hH.selfCloseness
+    rw [hbridge.state_eq x] at hclose
+    simpa [sliceSelfImprovementError] using hclose
+  · have hbounded := hH.bounded
+    rw [hbridge.state_eq x] at hbounded
+    simpa [sliceSelfImprovementError] using hbounded
+  · intro h
+    simpa [hbridge.averagedPoint_eq x h] using hH.dominatesAveragePointOperator h
+
 /-- Package the slice-wise outputs feeding the answer-valued restricted-strategy
 self-improvement stage into the bookkeeping object expected by answer-valued
 Section 6 assembly. -/
