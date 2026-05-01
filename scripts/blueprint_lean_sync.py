@@ -21,6 +21,7 @@ import argparse
 import json
 import os
 import re
+import shlex
 import subprocess
 import sys
 from dataclasses import dataclass, field
@@ -763,7 +764,113 @@ def find_changed_decls_missing_from_blueprint(
     return missing
 
 
-def print_missing_blueprint_warnings(missing: list[LeanDecl]) -> None:
+def _markdown_table_cell(text: str) -> str:
+    """Escape minimal Markdown table syntax in ``text``."""
+
+    return text.replace("|", r"\|").replace("\n", " ")
+
+
+def _missing_blueprint_summary_markdown(
+    missing: list[LeanDecl],
+    *,
+    command: str | None = None,
+) -> str:
+    """Render a check-summary table for changed declarations missing blueprint refs."""
+
+    lines = [
+        "## Blueprint reverse-coverage warnings",
+        "",
+        (
+            f"{len(missing)} changed public `def`/`theorem`/`lemma` declaration(s) "
+            "have no corresponding `\\lean{}` tag in `blueprint/src/chapter`."
+        ),
+        "",
+        (
+            "Private declarations are ignored. If a listed declaration is only an "
+            "internal helper, leave it out of the blueprint and mention that decision "
+            "in PR review; otherwise add the paper-facing `\\lean{...}` tag."
+        ),
+        "",
+        "| Declaration | Lean location | Suggested action |",
+        "|---|---|---|",
+    ]
+    for decl in missing:
+        decl_cell = _markdown_table_cell(decl.fqn)
+        location_cell = _markdown_table_cell(f"{decl.file}:{decl.line}")
+        lean_tag = _markdown_table_cell(rf"\lean{{{decl.fqn}}}")
+        lines.append(
+            f"| `{decl_cell}` | `{location_cell}` | "
+            f"Add `{lean_tag}` if this declaration is paper-facing. |"
+        )
+
+    if command:
+        lines.extend(
+            [
+                "",
+                "Re-run the reverse-coverage check locally with:",
+                "",
+                "```bash",
+                command,
+                "```",
+            ]
+        )
+
+    return "\n".join(lines) + "\n"
+
+
+def _append_missing_blueprint_step_summary(
+    missing: list[LeanDecl],
+    *,
+    command: str | None = None,
+) -> None:
+    """Append changed-declaration warnings to ``GITHUB_STEP_SUMMARY`` when available."""
+
+    if not missing:
+        return
+
+    summary_path = os.getenv("GITHUB_STEP_SUMMARY")
+    if not summary_path:
+        return
+
+    try:
+        with Path(summary_path).open("a", encoding="utf-8") as summary:
+            summary.write(_missing_blueprint_summary_markdown(missing, command=command))
+    except OSError as exc:
+        print(
+            f"warning: could not write blueprint reverse-coverage step summary: {exc}",
+            file=sys.stderr,
+        )
+
+
+def _missing_blueprint_summary_command(
+    *,
+    diff_base: str,
+    diff_head: str,
+    changed_files: list[str],
+) -> str:
+    """Return the local rerun command for reverse-coverage warnings."""
+
+    command_args = [
+        "python3",
+        "scripts/blueprint_lean_sync.py",
+        "--root",
+        ".",
+        "--warn-missing-blueprint",
+        "--diff-base",
+        diff_base,
+        "--changed-files",
+        *changed_files,
+    ]
+    if diff_head != "HEAD":
+        command_args.extend(["--diff-head", diff_head])
+    return shlex.join(command_args)
+
+
+def print_missing_blueprint_warnings(
+    missing: list[LeanDecl],
+    *,
+    summary_command: str | None = None,
+) -> None:
     """Print a warning-only report for changed declarations missing blueprint refs."""
     print()
     print("=" * 70)
@@ -786,6 +893,7 @@ def print_missing_blueprint_warnings(missing: list[LeanDecl]) -> None:
                 f"{decl.fqn} is changed in this PR but has no corresponding "
                 "\\lean{} tag in blueprint/src/chapter."
             )
+    _append_missing_blueprint_step_summary(missing, command=summary_command)
     print()
 
 
@@ -1243,7 +1351,12 @@ def main() -> None:
             diff_base=args.diff_base,
             diff_head=args.diff_head,
         )
-        print_missing_blueprint_warnings(missing)
+        summary_command = _missing_blueprint_summary_command(
+            diff_base=args.diff_base,
+            diff_head=args.diff_head,
+            changed_files=args.changed_files,
+        )
+        print_missing_blueprint_warnings(missing, summary_command=summary_command)
 
 
 if __name__ == "__main__":

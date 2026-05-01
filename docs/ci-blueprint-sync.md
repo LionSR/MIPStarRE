@@ -85,6 +85,32 @@ both Lean 4.28's capital-U form and older lowercase forms are accepted.
    dependence we cannot verify — if Lean's output format changes, we want
    CI to flag it rather than default to "looks fine".
 
+## Reverse-coverage warnings for changed Lean declarations
+
+The `Lint blueprint` workflow also runs a report-only reverse-coverage check on
+pull requests after the Lean setup step succeeds. It diffs the PR against its
+base ref, restricts attention to changed `MIPStarRE/**/*.lean` files, and runs:
+
+```bash
+python3 scripts/blueprint_lean_sync.py --root . --warn-missing-blueprint \
+  --diff-base origin/<base-ref> --changed-files <changed Lean files>
+```
+
+This check ignores `private` declarations and only tracks changed public
+`def`, `theorem`, and `lemma` declarations. For each tracked declaration whose
+fully qualified name (or dotted short name) has no `\lean{...}` reference in
+`blueprint/src/chapter`, it emits a GitHub Actions warning annotation at the
+Lean source line.
+
+When GitHub provides `GITHUB_STEP_SUMMARY`, the same script also appends one
+`Blueprint reverse-coverage warnings` table to the successful check summary.
+The table aggregates all missing blueprint references in the PR, gives the
+Lean declaration and `file:line`, suggests the `\lean{Declaration}` tag for
+paper-facing declarations, and reminds reviewers that private declarations are
+already filtered while genuinely internal public helpers may be left untagged
+with review context. This keeps the signal PR-friendly without posting one
+comment per declaration.
+
 ## Running locally
 
 Prerequisite: a working Lean toolchain (`elan`) and a prefetched Mathlib
