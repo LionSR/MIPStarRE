@@ -30,14 +30,13 @@ def toMeasure {α : Type*} [MeasurableSpace α] (𝒟 : Distribution α) : Measu
   ∑ a ∈ 𝒟.support, ENNReal.ofReal (𝒟.weight a) • Measure.dirac a
 
 /-- Applying `Distribution.toMeasure` unfolds to the corresponding finite Dirac sum. -/
-@[simp]
 theorem toMeasure_apply {α : Type*} [MeasurableSpace α]
     (𝒟 : Distribution α) (s : Set α) :
     𝒟.toMeasure s =
       ∑ a ∈ 𝒟.support, ENNReal.ofReal (𝒟.weight a) * Measure.dirac a s := by
   simp [toMeasure, Measure.finset_sum_apply, Measure.smul_apply]
 
-/-- The total mass of the associated measure is the `ENNReal` coercion of
+/-- The total mass of the associated measure is the image under `ENNReal.ofReal` of
 `Distribution.totalWeight`. -/
 @[simp]
 theorem toMeasure_univ {α : Type*} [MeasurableSpace α]
@@ -50,7 +49,7 @@ theorem toMeasure_univ {α : Type*} [MeasurableSpace α]
     (fun a ha => 𝒟.nonnegative a)).symm
 
 /-- The measure associated to a `Distribution` is finite, even when it is not normalized. -/
-instance instIsFiniteMeasureToMeasure {α : Type*} [MeasurableSpace α]
+instance toMeasure.instIsFiniteMeasure {α : Type*} [MeasurableSpace α]
     (𝒟 : Distribution α) : IsFiniteMeasure 𝒟.toMeasure where
   measure_univ_lt_top := by
     rw [toMeasure_univ]
