@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import json
+import shutil
+import subprocess
 import sys
 import tempfile
 import textwrap
@@ -25,6 +27,7 @@ from blueprint_lean_sync import (  # noqa: E402
     _write_json_report,
     collect_blueprint_entries,
     collect_file_lean_decls,
+    find_changed_decls_missing_from_blueprint,
     find_orphan_leanok_tags,
 )
 
@@ -277,24 +280,27 @@ class CollectLeanDeclsTests(unittest.TestCase):
                     -- def lineCommented : Nat := 0
 
                     def stringBlockCommentToken : String := "/-"
+                    def afterStringBlockCommentToken : Nat := 1
                     def stringLineCommentToken : String := "--"
                     def interpolatedStringToken : String := s!"{"/-"}"
-                    def afterInterpolatedStringToken : Nat := 1
+                    def afterInterpolatedStringToken : Nat := 2
+                    def escapedNestedInterpolatedStringToken : String := s!"{\"/-\"}"
+                    def afterEscapedNestedInterpolatedStringToken : Nat := 3
                     def messageInterpolatedStringToken : MessageData := m!"{"/-"}"
-                    def afterMessageInterpolatedStringToken : Nat := 2
+                    def afterMessageInterpolatedStringToken : Nat := 4
                     def nestedInterpolatedStringToken : String := s!"{s!"{1}"} /-"
-                    def afterNestedInterpolatedStringToken : Nat := 3
+                    def afterNestedInterpolatedStringToken : Nat := 5
                     def escapedInterpolationBraceToken : String := s!"{{/-}}"
                     def charLiterals : List Char := ['/', '-']
                     def primedName' : Nat := 0
                     def rawStringBlockCommentToken : String := r#""/-""#
-                    def afterRawStringBlockCommentToken : Nat := 4
+                    def afterRawStringBlockCommentToken : Nat := 6
                     def rawStringMultiHashBlockCommentToken : String := r##""/-##"/-##"##
-                    def afterRawStringMultiHashBlockCommentToken : Nat := 5
+                    def afterRawStringMultiHashBlockCommentToken : Nat := 7
                     def plainRawStringBlockCommentToken : String := r" /- "
-                    def afterPlainRawStringBlockCommentToken : Nat := 6
-                    def plainRawStringBeforeHashToken : String := r" /- "#eval 7
-                    def afterPlainRawStringBeforeHashToken : Nat := 7
+                    def afterPlainRawStringBlockCommentToken : Nat := 8
+                    def plainRawStringBeforeHashToken : String := r" /- "#eval 9
+                    def afterPlainRawStringBeforeHashToken : Nat := 9
                     def commentBoundaryBeforeHashQuote : String := r/- not raw -/#"ordinary" /- comment starts
                     def hiddenIfBoundaryIgnored : Nat := 999
                     -/
@@ -318,9 +324,12 @@ class CollectLeanDeclsTests(unittest.TestCase):
             self.assertNotIn("Foo.commentedOut", by_name)
             self.assertNotIn("Foo.lineCommented", by_name)
             self.assertIn("Foo.stringBlockCommentToken", by_name)
+            self.assertIn("Foo.afterStringBlockCommentToken", by_name)
             self.assertIn("Foo.stringLineCommentToken", by_name)
             self.assertIn("Foo.interpolatedStringToken", by_name)
             self.assertIn("Foo.afterInterpolatedStringToken", by_name)
+            self.assertIn("Foo.escapedNestedInterpolatedStringToken", by_name)
+            self.assertIn("Foo.afterEscapedNestedInterpolatedStringToken", by_name)
             self.assertIn("Foo.messageInterpolatedStringToken", by_name)
             self.assertIn("Foo.afterMessageInterpolatedStringToken", by_name)
             self.assertIn("Foo.nestedInterpolatedStringToken", by_name)
@@ -341,6 +350,61 @@ class CollectLeanDeclsTests(unittest.TestCase):
             self.assertIn("Foo.afterCommentBoundaryBeforeHashQuote", by_name)
             self.assertTrue(by_name["Foo.privateHelper"].is_private)
             self.assertFalse(by_name["Foo.publicTheorem"].is_private)
+
+    def test_find_changed_decls_missing_from_blueprint_tracks_public_dotted_api(self) -> None:
+        """Public dotted names are not internal merely because they contain a dot."""
+        if shutil.which("git") is None:
+            self.skipTest("git executable is required for diff-based reverse-blueprint checks")
+
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            lean_root = root / "MIPStarRE"
+            lean_root.mkdir()
+            blueprint_chapter = root / "blueprint" / "src" / "chapter"
+            blueprint_chapter.mkdir(parents=True)
+            (blueprint_chapter / "ch01_empty.tex").write_text("No Lean refs here.\n")
+
+            lean_file = lean_root / "Fake.lean"
+            lean_file.write_text("-- base file before public API additions\n")
+
+            def git(*args: str) -> str:
+                return subprocess.check_output(["git", *args], cwd=root, text=True).strip()
+
+            git("init", "-q")
+            git("config", "user.email", "tests@example.invalid")
+            git("config", "user.name", "Blueprint Sync Tests")
+            git("add", ".")
+            git("commit", "-q", "-m", "base")
+            base = git("rev-parse", "HEAD")
+
+            lean_file.write_text(
+                textwrap.dedent(
+                    """
+                    -- base file before public API additions
+
+                    def Role.other : Nat := 1
+                    theorem Parameters.next : True := by
+                      trivial
+                    def _root_.RootPublic : Nat := 3
+                    """
+                ).strip()
+                + "\n"
+            )
+            git("add", ".")
+            git("commit", "-q", "-m", "add dotted public API")
+
+            missing = find_changed_decls_missing_from_blueprint(
+                root,
+                changed_files=["MIPStarRE/Fake.lean"],
+                diff_base=base,
+                diff_head="HEAD",
+            )
+
+            missing_names = [decl.fqn for decl in missing]
+            self.assertEqual(
+                missing_names,
+                ["Role.other", "Parameters.next", "_root_.RootPublic"],
+            )
 
 
 class LeanokPlacementReportingTests(unittest.TestCase):
