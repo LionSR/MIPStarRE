@@ -48,20 +48,30 @@ formal interpretation.
 
 \section{The blueprint statement}
 
-The blueprint repeats the paper's convention.  The definition
-\path{def:distinct-tuples} in
-\path{blueprint/src/chapter/ch09_pasting.tex}, lines~198--202, defines
-$\mathsf{Distinct}_k$ for $k\ge 1$ and links it to the formal distinct-tuple
-definitions.  The proposition \path{prop:ld-dnoteq} in the same file,
-lines~204--226, then states the total-variation comparison between a uniformly
-random tuple in $\F_q^k$ and a uniformly random tuple in
-$\mathsf{Distinct}_k$.
+The blueprint repeats the paper's convention rather than making the boundary
+case explicit.  The node \path{def:distinct-tuples} in
+\path{blueprint/src/chapter/ch09_pasting.tex}, lines~198--202, carries
+\verb|\lean| annotations for \path{MIPStarRE.LDT.Pasting.distinctTuples} and
+\path{MIPStarRE.LDT.Pasting.distinctTupleDistribution}, together with
+\verb|\leanok|, and states: ``For $k\ge 1$, let
+$\mathsf{Distinct}_k\subseteq \F_q^k$ be the set of tuples
+$(x_1,\dots,x_k)$ with pairwise distinct coordinates.''  This is the same
+all-$k\ge 1$ convention as the paper; the blueprint definition does not add the
+missing nonemptiness hypothesis $k\le q$.
 
-As in the paper, the blueprint does not state the side condition $k\le q$.
-Both blueprint nodes are marked as formalized, so the formalization supplies the
-missing boundary convention: the Lean declaration linked from the blueprint is a
-finite-support weight for all $k$, and it becomes a probability distribution
-only in the nonempty-support case $k\le q$.
+The companion node \path{prop:ld-dnoteq} in the same file, lines~204--226, has a
+\verb|\lean| annotation for \path{MIPStarRE.LDT.Pasting.ldDnoteq} and is also
+tagged \verb|\leanok|.
+It states that if $x=(x_1,\dots,x_k)$ is uniformly random in $\F_q^k$ and
+$y=(y_1,\dots,y_k)$ is uniformly random in $\mathsf{Distinct}_k$, then
+$d_{\mathrm{TV}}(x,y)\le k^2/q$.  Again, the blueprint records no $k\le q$
+side condition for the phrase ``uniformly random in $\mathsf{Distinct}_k$''.
+
+Thus the Lean repair is invisible from the blueprint side: a reader following
+the formalized blueprint nodes sees the same probability-language statement as
+in the paper, while the checked Lean declarations below implement the total
+object as a finite nonnegative weight for all $k$ and recover a probability
+interpretation only when the support is nonempty, equivalently when $k\le q$.
 
 \section{The formal repair}
 

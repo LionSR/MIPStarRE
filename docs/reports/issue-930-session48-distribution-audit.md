@@ -19,7 +19,7 @@ I compared these files with the paper's distribution conventions in:
 
 - `references/ldt-paper/preliminaries.tex:253-286` and `337-368`, where the paper defines consistency and state-dependent distance using a distribution on the question set;
 - `references/ldt-paper/test_definition.tex:21-57`, where the three LDT subtests and their uniform choices are defined;
-- `references/ldt-paper/ld-pasting.tex:167-210`, where the distinct-tuple distribution and its total-variation comparison are used;
+- `references/ldt-paper/ld-pasting.tex:167-213`, where the distinct-tuple distribution and its total-variation comparison are used;
 - blueprint nodes `def:simeq`, `def:approx_delta`, `def:good-strategy`, `def:low-individual-degree-test`, and `def:distinct-tuples` in `blueprint/src/chapter/ch02_test.tex`, `ch03_preliminaries.tex`, and `ch09_pasting.tex`.
 
 Scope check before the audit: the only open PR was draft #889, the Lean/Mathlib upgrade, and it does not touch the audited distribution files.  The open zhengfeng/deng work is #931 on self-improvement inputs and #888 on blueprint warning annotations; neither overlaps this distribution slice.  Issue #997, which introduced and documented the optional PMF/measure adapters, is closed and merged.
@@ -59,7 +59,7 @@ A grep of the Lean tree showed that no downstream LDT module imports `MIPStarRE.
 
 The paper defines `Distinct_k` and writes a uniformly random element of this set for every `k >= 1` (`ld-pasting.tex:167-179`).  This requires `k <= q`.  No such hypothesis appears in the paper statement or in the final pasting theorem's assumptions.
 
-Lean repairs this by defining `distinctTupleDistribution params k` as a finite-support weight for every `k` (`Pasting/Defs/Tuples.lean:23-36`).  The general theorem only proves total mass at most `1` (`Pasting/Defs/Tuples.lean:38-67`).  The exact probability statement is separated as `distinctTupleDistribution_weight_sum_eq_one_of_le`, which assumes `k <= params.q` (`Pasting/BridgeLemmas/Common.lean:311-344`).
+Lean repairs this by defining `distinctTupleDistribution params k` as a finite-support weight for every `k` (`Pasting/Defs/Tuples.lean:23-36`).  The general theorem only proves total mass at most `1` (`Pasting/Defs/Tuples.lean:38-67`).  The exact probability statement is separated as `distinctTupleDistribution_weight_sum_eq_one_of_le`, which assumes `k <= params.q` (`Pasting/BridgeLemmas/Common.lean:311-343`).
 
 The formal `ldDnoteq` comparison handles both cases.  If `k <= q`, it follows the paper's collision-probability argument.  If `k > q`, the distinct support is empty; the formal total variation between the uniform tuple distribution and the zero distinct-tuple weight is `1/2`, and this is bounded by `k^2/q` because `k > q` (`Pasting/Core.lean:561-805`).  The averaging helper `avgOver_distinct_bounded_le_avgOver_uniform_add_tv_of_any_k` propagates the same convention to bounded nonnegative functions (`Pasting/BridgeLemmas/LineInterpolation/Averaging.lean:286-318`).
 
