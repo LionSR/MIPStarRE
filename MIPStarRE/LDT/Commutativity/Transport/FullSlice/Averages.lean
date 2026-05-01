@@ -1,12 +1,13 @@
-import MIPStarRE.LDT.Commutativity.Transport.Pullback
-import MIPStarRE.LDT.Commutativity.Scaffold.Products
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Averages
+import MIPStarRE.LDT.Commutativity.Scaffold.Products
+import MIPStarRE.LDT.Commutativity.Transport.Pullback
 import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 
 /-!
 # Full-slice averages and data indices
 
-Zero-family definition and averaged scalar and tensor quantities for
+Zero-family definition, shared average-reindexing helpers, and averaged scalar
+and tensor quantities for
 the full-slice outcome space, together with data-reindexing equivalences.
 
 Ex-private definitions are tensor-form machinery per architecture
@@ -55,6 +56,104 @@ lemma avgOver_sum_eq_card_mul_avgOver_prod
             rw [← avgOver_uniform_prod]
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+/-- Swapping the full-slice question and outcome identifies the averaged
+`BAB`/`ABA` terms and the averaged `BABA`/`ABAB` terms. -/
+lemma fullSliceCommutation_avg_swap_terms
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
+    avgOver (uniformDistribution (FullSliceQuestion params))
+        (fun q => ∑ gh : FullSliceOutcome params,
+          fullSliceBABTerm params strategy family q gh) =
+      avgOver (uniformDistribution (FullSliceQuestion params))
+        (fun q => ∑ gh : FullSliceOutcome params,
+          fullSliceABATerm params strategy family q gh) ∧
+    avgOver (uniformDistribution (FullSliceQuestion params))
+        (fun q => ∑ gh : FullSliceOutcome params,
+          fullSliceBABATerm params strategy family q gh) =
+      avgOver (uniformDistribution (FullSliceQuestion params))
+        (fun q => ∑ gh : FullSliceOutcome params,
+          fullSliceABABTerm params strategy family q gh) := by
+  let Q := FullSliceQuestion params
+  let O := FullSliceOutcome params
+  let e : (Q × O) ≃ (Q × O) :=
+    { toFun := fun z => ((z.1.2, z.1.1), (z.2.2, z.2.1))
+      invFun := fun z => ((z.1.2, z.1.1), (z.2.2, z.2.1))
+      left_inv := by
+        rintro ⟨⟨x, y⟩, ⟨g, h⟩⟩
+        rfl
+      right_inv := by
+        rintro ⟨⟨x, y⟩, ⟨g, h⟩⟩
+        rfl }
+  have hpairBAB :
+      avgOver (uniformDistribution (Q × O))
+          (fun z => fullSliceBABTerm params strategy family z.1 z.2) =
+        avgOver (uniformDistribution (Q × O))
+          (fun z => fullSliceABATerm params strategy family z.1 z.2) := by
+    calc
+      avgOver (uniformDistribution (Q × O))
+          (fun z => fullSliceBABTerm params strategy family z.1 z.2)
+        = avgOver (uniformDistribution (Q × O))
+            (fun z => fullSliceBABTerm params strategy family (e.symm z).1 (e.symm z).2) := by
+              simpa using
+                (avgOver_uniform_equiv e
+                  (fun z : Q × O => fullSliceBABTerm params strategy family z.1 z.2))
+      _ = avgOver (uniformDistribution (Q × O))
+            (fun z => fullSliceABATerm params strategy family z.1 z.2) := by
+              apply avgOver_congr
+              rintro ⟨⟨x, y⟩, ⟨g, h⟩⟩
+              simp [e, fullSliceBABTerm, fullSliceABATerm,
+                fullSliceFirstFactor, fullSliceSecondFactor]
+  have hpairBABA :
+      avgOver (uniformDistribution (Q × O))
+          (fun z => fullSliceBABATerm params strategy family z.1 z.2) =
+        avgOver (uniformDistribution (Q × O))
+          (fun z => fullSliceABABTerm params strategy family z.1 z.2) := by
+    calc
+      avgOver (uniformDistribution (Q × O))
+          (fun z => fullSliceBABATerm params strategy family z.1 z.2)
+        = avgOver (uniformDistribution (Q × O))
+            (fun z => fullSliceBABATerm params strategy family (e.symm z).1 (e.symm z).2) := by
+              simpa using
+                (avgOver_uniform_equiv e
+                  (fun z : Q × O => fullSliceBABATerm params strategy family z.1 z.2))
+      _ = avgOver (uniformDistribution (Q × O))
+            (fun z => fullSliceABABTerm params strategy family z.1 z.2) := by
+              apply avgOver_congr
+              rintro ⟨⟨x, y⟩, ⟨g, h⟩⟩
+              simp [e, fullSliceBABATerm, fullSliceABABTerm,
+                fullSliceFirstFactor, fullSliceSecondFactor]
+  constructor
+  · calc
+      avgOver (uniformDistribution Q)
+          (fun q => ∑ gh : O, fullSliceBABTerm params strategy family q gh)
+        = (Fintype.card O : Error) * avgOver (uniformDistribution (Q × O))
+            (fun z => fullSliceBABTerm params strategy family z.1 z.2) := by
+              exact avgOver_sum_eq_card_mul_avgOver_prod
+                (fun q gh => fullSliceBABTerm params strategy family q gh)
+      _ = (Fintype.card O : Error) * avgOver (uniformDistribution (Q × O))
+            (fun z => fullSliceABATerm params strategy family z.1 z.2) := by
+              rw [hpairBAB]
+      _ = avgOver (uniformDistribution Q)
+            (fun q => ∑ gh : O, fullSliceABATerm params strategy family q gh) := by
+              symm
+              exact avgOver_sum_eq_card_mul_avgOver_prod
+                (fun q gh => fullSliceABATerm params strategy family q gh)
+  · calc
+      avgOver (uniformDistribution Q)
+          (fun q => ∑ gh : O, fullSliceBABATerm params strategy family q gh)
+        = (Fintype.card O : Error) * avgOver (uniformDistribution (Q × O))
+            (fun z => fullSliceBABATerm params strategy family z.1 z.2) := by
+              exact avgOver_sum_eq_card_mul_avgOver_prod
+                (fun q gh => fullSliceBABATerm params strategy family q gh)
+      _ = (Fintype.card O : Error) * avgOver (uniformDistribution (Q × O))
+            (fun z => fullSliceABABTerm params strategy family z.1 z.2) := by
+              rw [hpairBABA]
+      _ = avgOver (uniformDistribution Q)
+            (fun q => ∑ gh : O, fullSliceABABTerm params strategy family q gh) := by
+              symm
+              exact avgOver_sum_eq_card_mul_avgOver_prod
+                (fun q gh => fullSliceABABTerm params strategy family q gh)
 
 /-- The zero raw family on the full-slice outcome space. -/
 noncomputable def zeroFullSliceOpFamily

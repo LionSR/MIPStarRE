@@ -1,7 +1,4 @@
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Averages
-import MIPStarRE.LDT.Commutativity.Transport.Pullback
-import MIPStarRE.LDT.Commutativity.Scaffold.Products
-import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 
 /-!
 # Zero-family bounds on the full-slice product
