@@ -3544,21 +3544,6 @@ abbrev MainFormalPostRolePackageLine130OrthonormalizationBridgeInputs
     Type _ :=
   MainFormalPostRolePackageLine130OrthonormalizationInput
     params strategy eps k scalars rolePackage
-
-/-- Trivial identity conversion from the bridge alias to the underlying
-`MainFormalPostRolePackageLine130OrthonormalizationInput`. -/
-def MainFormalPostRolePackageLine130OrthonormalizationBridgeInputs.toLine130OrthonormalizationInput
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {scalars : MainFormalCascadeScalars params eps k}
-    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
-    (input : MainFormalPostRolePackageLine130OrthonormalizationBridgeInputs
-      params strategy eps k scalars rolePackage) :
-    MainFormalPostRolePackageLine130OrthonormalizationInput
-      params strategy eps k scalars rolePackage :=
-  input
-
 /-- The pre-completion projective submeasurements obtained from line 130 by the
 cross-consistency orthonormalization wrapper.
 
@@ -4122,64 +4107,14 @@ theorem nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs
   exact nonempty_ofRoleResidualAndCompletion roleResidual
     ⟨completionInput.toCompletionResidual⟩
 
-/-- Assemble the final live residual using the orthonormalization bridge inputs
-and explicit completion witnesses.
-
-This is the bridge-shape version of
+/-- Bridge-shape alias for
 `nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs`
-that accepts the still-unproven spectral-truncation and repair lemmas as a
-separate `MainFormalPostRolePackageLine130OrthonormalizationBridgeInputs`.
+accepting the orthonormalization inputs under the `…BridgeInputs` name.
 
-The bridge structure defers the four orthonormalization inputs
-(left/right spectral truncation and locality-preserving repair) to the caller
-while keeping the rest of the assembly unchanged. -/
-theorem nonempty_ofRoleResidualAndBridgeInputsAndCompletingToMeasurementInputs
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {hpass : strategy.PassesLowIndividualDegreeTest eps}
-    {scalars : MainFormalCascadeScalars params eps k}
-    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
-    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
-    (orthoBridge : MainFormalPostRolePackageLine130OrthonormalizationBridgeInputs
-      params strategy eps k scalars (roleResidual.rolePackage scalars))
-    (a_A a_B : Polynomial params)
-    (leftSelfConsistency :
-      BipartiteSSCRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily
-          (unsymmetrizedLeftPOVM
-            (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
-        scalars.zeta1)
-    (rightSelfConsistency :
-      BipartiteSSCRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily
-          (unsymmetrizedRightPOVM
-            (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
-        scalars.zeta1)
-    (leftMatchMassPreservation :
-      ∀ orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
-          params strategy eps k scalars (roleResidual.rolePackage scalars),
-        MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
-          (unsymmetrizedLeftPOVM
-            (roleResidual.rolePackage scalars).roleMeasurement)
-          orthResidual.P_A
-          (unsymmetrizedRightPOVM
-            (roleResidual.rolePackage scalars).roleMeasurement))
-    (rightMatchMassPreservation :
-      ∀ orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
-          params strategy eps k scalars (roleResidual.rolePackage scalars),
-        MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
-          (unsymmetrizedRightPOVM
-            (roleResidual.rolePackage scalars).roleMeasurement)
-          orthResidual.P_B
-          (unsymmetrizedLeftPOVM
-            (roleResidual.rolePackage scalars).roleMeasurement)) :
-    Nonempty (MainFormalCascadeRolePackageResidualStep6WitnessResidual
-      params strategy eps hpass k scalars) :=
+The alias is definitional (the bridge `abbrev` unfolds in-place) and exists
+only as a documented entry point for callers that carry the bridge wrapper. -/
+alias nonempty_ofRoleResidualAndBridgeInputsAndCompletingToMeasurementInputs :=
   nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs
-    hsmall roleResidual orthoBridge.toLine130OrthonormalizationInput
-    a_A a_B leftSelfConsistency rightSelfConsistency
-    leftMatchMassPreservation rightMatchMassPreservation
 
 /-- Convert the combined residual to the left-completion residual after the paper
 line-130 consistency has been derived separately. -/
