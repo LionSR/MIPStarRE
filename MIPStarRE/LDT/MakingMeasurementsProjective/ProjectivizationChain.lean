@@ -477,10 +477,12 @@ Asserts that the projective submeasurement `P` produced by orthonormalization
 preserves at least as much bipartite correlation with a fixed partner
 measurement `B` as the original measurement `G` did.  This is a
 construction-level property of the specific orthonormalization used; it is NOT
-a consequence of `SDDRel` closeness alone.  It is packaged here as a named
-`Prop` structure so that the `mainFormal` residual can receive it as a single
-field and the downstream `leftConsistency` / `rightConsistency` theorems can
-recover the exact paper line-169 `ζ₁` consistency links. -/
+a consequence of `SDDRel` closeness alone.  This structure is a hypothesis
+container: it is itself unproved and must be supplied by the orthonormalization
+construction.  It is packaged here as a named `Prop` structure so that the
+`mainFormal` residual can receive it as a single field and the downstream
+`leftConsistency` / `rightConsistency` theorems can recover the exact paper
+line-169 `ζ₁` consistency links. -/
 structure OrthonormalizationMatchMassPreservation
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -521,13 +523,13 @@ theorem of_submeasurement_match_mass_and_completion
   rcases hleftPreservation with ⟨hleft⟩
   rcases hrightPreservation with ⟨hright⟩
   have hQALeftProj : Q_A = completeAtOutcomeProj P_A a_A :=
-    ProjMeas.ext (fun a => by
-      simpa [completeAtOutcomeProj_toMeasurement] using
-        congrArg (fun (M : Measurement Outcome ι) => M.outcome a) hQALeft)
+    ProjMeas.ext fun a =>
+      congrArg (fun (M : Measurement Outcome ι) => M.outcome a)
+        (hQALeft.trans (completeAtOutcomeProj_toMeasurement P_A a_A).symm)
   have hQBRightProj : Q_B = completeAtOutcomeProj P_B a_B :=
-    ProjMeas.ext (fun a => by
-      simpa [completeAtOutcomeProj_toMeasurement] using
-        congrArg (fun (M : Measurement Outcome ι) => M.outcome a) hQBRight)
+    ProjMeas.ext fun a =>
+      congrArg (fun (M : Measurement Outcome ι) => M.outcome a)
+        (hQBRight.trans (completeAtOutcomeProj_toMeasurement P_B a_B).symm)
   rw [hQALeftProj, hQBRightProj]
   exact of_completeAtOutcomeProj P_A P_B a_A a_B hleft hright
 
