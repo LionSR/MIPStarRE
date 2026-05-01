@@ -40,18 +40,9 @@ not add global simp lemmas or positivity extensions.
 - Import `MIPStarRE.LDT.Tactic` only in small files that need several helpers. Otherwise prefer
   the specific tactic module import.
 
-A local timing pass on 2026-05-01 with cached Mathlib oleans gave these wall-clock `lake env lean`
-checks and no `maxHeartbeats` failures:
-
-| File | Real time |
-| --- | ---: |
-| `MIPStarRE/LDT/Tactic/LdtSimpAttr.lean` | 1.59s |
-| `MIPStarRE/LDT/Tactic/LdtSimp.lean` | 6.32s |
-| `MIPStarRE/LDT/Tactic/QuantumNonneg.lean` | 6.25s |
-| `MIPStarRE/LDT/Tactic/AvgCongr.lean` | 6.57s |
-| `MIPStarRE/LDT/Tactic.lean` | 6.18s |
-| `MIPStarRE/LDT/Preliminaries/Defs.lean` | 8.90s |
-| `MIPStarRE/LDT/Preliminaries/ComparisonCore.lean` | 7.06s |
+A local timing pass for issue #996 did not require `maxHeartbeats` budget tuning on the
+representative tactic and preliminary files. Re-measure locally before treating a slowdown as a
+regression, because absolute wall-clock timings depend on the current import graph and cache.
 
 ## First things to check
 
