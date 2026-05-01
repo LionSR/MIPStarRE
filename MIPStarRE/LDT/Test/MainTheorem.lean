@@ -3530,57 +3530,24 @@ structure MainFormalPostRolePackageLine130OrthonormalizationInput
       (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
       (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)
 
-/-- Bridge-input wrapper for the line-130 orthonormalization inputs that
-separates the still-unproven spectral-truncation and locality-preserving repair
-lemmas from the rest of the `mainFormal` pipeline.
-
-The four fields mirror `MainFormalPostRolePackageLine130OrthonormalizationInput`
-exactly; this separate structure serves as a named landing point for future
-formalizations of the orthonormalization lemma's truncation and repair steps.
-
-It is a `Type`-valued structure (data, not proposition) because
-`SpectralTruncationStatement` contains an explicit rounded family of operators.
-Callers that only need the proof-level downstream consequences should use
-`toLine130OrthonormalizationInput` to obtain the input shape consumed by
-`nonempty_ofLine130Inputs`. -/
-structure MainFormalPostRolePackageLine130OrthonormalizationBridgeInputs
+/-- Type alias for line-130 orthonormalization inputs that serves as a named
+landing point for future formalizations of the orthonormalization lemma's
+truncation and repair steps.
+See `MainFormalPostRolePackageLine130OrthonormalizationInput` for the
+individual fields. -/
+abbrev MainFormalPostRolePackageLine130OrthonormalizationBridgeInputs
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k)
-    (rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars) : Type _ where
-  /-- Spectral-truncation input for `G^A`. -/
-  leftSpectral :
-    MakingMeasurementsProjective.SpectralTruncationInput strategy.state
-      (leftLiftedMeasurement (ιB := ι)
-        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement))
-      (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)
-  /-- Locality-preserving repair input for `G^A`. -/
-  leftRepair :
-    MakingMeasurementsProjective.LeftLiftedProjectivizationRepairInput strategy.state
-      (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
-      (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)
-  /-- Spectral-truncation input for `G^B`. -/
-  rightSpectral :
-    MakingMeasurementsProjective.SpectralTruncationInput strategy.state
-      (leftLiftedMeasurement (ιB := ι)
-        (unsymmetrizedRightPOVM rolePackage.roleMeasurement))
-      (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)
-  /-- Locality-preserving repair input for `G^B`. -/
-  rightRepair :
-    MakingMeasurementsProjective.LeftLiftedProjectivizationRepairInput strategy.state
-      (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
-      (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)
+    (rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars) :
+    Type _ :=
+  MainFormalPostRolePackageLine130OrthonormalizationInput
+    params strategy eps k scalars rolePackage
 
-namespace MainFormalPostRolePackageLine130OrthonormalizationBridgeInputs
-
-/-- Convert the bridge-input wrapper to the concrete
-`MainFormalPostRolePackageLine130OrthonormalizationInput` consumed by
-`nonempty_ofLine130Inputs`.
-
-This conversion is purely structural (a field-by-field repackaging) and does not
-discharge any of the four unproven lemmas. -/
-def toLine130OrthonormalizationInput
+/-- Trivial identity conversion from the bridge alias to the underlying
+`MainFormalPostRolePackageLine130OrthonormalizationInput`. -/
+def MainFormalPostRolePackageLine130OrthonormalizationBridgeInputs.toLine130OrthonormalizationInput
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
@@ -3589,13 +3556,8 @@ def toLine130OrthonormalizationInput
     (input : MainFormalPostRolePackageLine130OrthonormalizationBridgeInputs
       params strategy eps k scalars rolePackage) :
     MainFormalPostRolePackageLine130OrthonormalizationInput
-      params strategy eps k scalars rolePackage where
-  leftSpectral := input.leftSpectral
-  leftRepair := input.leftRepair
-  rightSpectral := input.rightSpectral
-  rightRepair := input.rightRepair
-
-end MainFormalPostRolePackageLine130OrthonormalizationBridgeInputs
+      params strategy eps k scalars rolePackage :=
+  input
 
 /-- The pre-completion projective submeasurements obtained from line 130 by the
 cross-consistency orthonormalization wrapper.
