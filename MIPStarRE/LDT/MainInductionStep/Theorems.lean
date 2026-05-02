@@ -562,6 +562,73 @@ structure AnswerSelfImprovementPackage.SliceBridgeInputs
         (restrictionPkg.profile.selfConsistency x)
         (inductionPkg.sliceError x)
 
+/-- The averaged point-operator compatibility for answer-valued slices follows
+from point-measurement transport.
+
+Both sides unfold to the same average over `strategy.pointMeasurement
+(appendPoint params u x)` once the honest slice point measurement is identified
+with `xRestrictedAnswerSymStrat`. -/
+theorem AnswerSelfImprovementPackage.SliceBridgeInputs.averagedPoint_eq_of_pointMeasurement_eq
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (sliceStrategy : Fq params → SymStrat params ι)
+    (hpoint :
+      ∀ x,
+        (sliceStrategy x).pointMeasurement =
+          (xRestrictedAnswerSymStrat params strategy x).pointMeasurement) :
+    ∀ x h,
+      IdxPolyFamily.averagedPointEvaluationOperator (sliceStrategy x) h =
+        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x h := by
+  intro x h
+  simp [IdxPolyFamily.averagedPointEvaluationOperator,
+    IdxPolyFamily.averagedSlicePointEvaluationOperator, hpoint x,
+    xRestrictedAnswerSymStrat_pointMeasurement_apply]
+
+/-- Build answer-valued `SliceBridgeInputs` without separately assuming averaged
+point-operator compatibility.
+
+The structural averaged-point field is derived from `pointMeasurement_eq`; the
+remaining inputs are the honest slice strategies, their state transport,
+restricted-profile goodness, and their Section 9 bridge packages. -/
+noncomputable def AnswerSelfImprovementPackage.SliceBridgeInputs.ofPointMeasurementEq
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma)
+    (inductionPkg :
+      AnswerPerSliceInductionPackage params strategy eps delta gamma restrictionPkg k)
+    (sliceStrategy : Fq params → SymStrat params ι)
+    (state_eq : ∀ x, (sliceStrategy x).state = strategy.state)
+    (pointMeasurement_eq :
+      ∀ x,
+        (sliceStrategy x).pointMeasurement =
+          (xRestrictedAnswerSymStrat params strategy x).pointMeasurement)
+    (good :
+      ∀ x,
+        (sliceStrategy x).IsGood
+          (restrictionPkg.profile.axisParallel x)
+          (restrictionPkg.profile.selfConsistency x)
+          (restrictionPkg.profile.diagonal x))
+    (bridgeInputs :
+      ∀ x,
+        SelfImprovement.SelfImprovementBridgeInputs params (sliceStrategy x)
+          (restrictionPkg.profile.axisParallel x)
+          (restrictionPkg.profile.selfConsistency x)
+          (inductionPkg.sliceError x)) :
+    AnswerSelfImprovementPackage.SliceBridgeInputs params strategy eps delta gamma k
+      restrictionPkg inductionPkg where
+  sliceStrategy := sliceStrategy
+  state_eq := state_eq
+  pointMeasurement_eq := pointMeasurement_eq
+  averagedPoint_eq :=
+    AnswerSelfImprovementPackage.SliceBridgeInputs.averagedPoint_eq_of_pointMeasurement_eq
+      params strategy sliceStrategy pointMeasurement_eq
+  good := good
+  bridgeInputs := bridgeInputs
+
 /-- Package the slice-wise outputs feeding the answer-valued restricted-strategy
 self-improvement stage into the bookkeeping object expected by answer-valued
 Section 6 assembly. -/
