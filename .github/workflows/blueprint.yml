@@ -34,6 +34,14 @@ jobs:
           cache: 'pip'
           cache-dependency-path: .github/workflows/blueprint-requirements.txt
 
+      - name: Cache apt packages (TeX Live / Graphviz)
+        id: apt-cache
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt/archives
+          # Bump the suffix when the package list below changes.
+          key: apt-blueprint-texlive-${{ runner.os }}-v1
+
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -46,10 +54,22 @@ jobs:
             graphviz \
             libgraphviz-dev
 
+      - name: Cache pipx leanblueprint environment
+        id: pipx-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pipx
+          # Bump the suffix or update blueprint-requirements.txt to invalidate.
+          key: pipx-leanblueprint-${{ runner.os }}-${{ hashFiles('.github/workflows/blueprint-requirements.txt') }}
+
       - name: Install leanblueprint
+        if: steps.pipx-cache.outputs.cache-hit != 'true'
         run: |
           pipx install leanblueprint
           pipx inject --include-apps --force leanblueprint plastex
+
+      - name: Ensure pipx shims are on PATH
+        run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Build blueprint
         working-directory: blueprint

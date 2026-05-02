@@ -41,10 +41,26 @@ jobs:
           fetch-depth: 0
           ref: ${{ inputs.ref || 'main' }}
 
+      - name: Install Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: .github/workflows/blueprint-requirements.txt
+
       - name: Build project
         uses: leanprover/lean-action@v1
         with:
           build: true
+
+      - name: Cache apt packages (TeX Live / Graphviz)
+        id: apt-cache
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt/archives
+          # Shared key with blueprint.yml so both workflows warm each other's apt cache.
+          # Bump the suffix when the package list below changes.
+          key: apt-blueprint-texlive-${{ runner.os }}-v1
 
       - name: Install TeX and graphviz
         run: |
@@ -58,10 +74,22 @@ jobs:
             graphviz \
             libgraphviz-dev
 
+      - name: Cache pipx leanblueprint environment
+        id: pipx-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pipx
+          # Shared key with blueprint.yml so both workflows warm each other's pipx cache.
+          key: pipx-leanblueprint-${{ runner.os }}-${{ hashFiles('.github/workflows/blueprint-requirements.txt') }}
+
       - name: Install leanblueprint
+        if: steps.pipx-cache.outputs.cache-hit != 'true'
         run: |
           pipx install leanblueprint
           pipx inject --include-apps --force leanblueprint plastex
+
+      - name: Ensure pipx shims are on PATH
+        run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Build blueprint
         working-directory: blueprint
