@@ -279,6 +279,69 @@ structure SelfImprovementPackage.SliceBridgeInputs
         (restrictionPkg.profile.selfConsistency x)
         (inductionPkg.sliceError x)
 
+/-- The averaged slice point-operator compatibility is structural: once an
+honest slice strategy's point measurement agrees with the restricted-slice point
+measurement, the averaged point operators agree by unfolding the two averages. -/
+theorem SelfImprovementPackage.SliceBridgeInputs.averagedPoint_eq_of_pointMeasurement_eq
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (sliceStrategy : Fq params → SymStrat params ι)
+    (hpoint :
+      ∀ x,
+        (sliceStrategy x).pointMeasurement =
+          (xRestrictedStrategy params strategy x).pointMeasurement) :
+    ∀ x h,
+      IdxPolyFamily.averagedPointEvaluationOperator (sliceStrategy x) h =
+        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x h := by
+  intro x h
+  simp [IdxPolyFamily.averagedPointEvaluationOperator,
+    IdxPolyFamily.averagedSlicePointEvaluationOperator, hpoint x, xRestrictedStrategy]
+
+/-- Build `SliceBridgeInputs` without separately assuming averaged point-operator
+compatibility.
+
+The only structural equality needed for that field is `pointMeasurement_eq`; the
+constructor leaves the genuinely remaining inputs unchanged: the honest slice
+strategies, their state transport, their restricted-profile goodness, and their
+Section 9 bridge packages. -/
+noncomputable def SelfImprovementPackage.SliceBridgeInputs.ofPointMeasurementEq
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma)
+    (inductionPkg : PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k)
+    (sliceStrategy : Fq params → SymStrat params ι)
+    (state_eq : ∀ x, (sliceStrategy x).state = strategy.state)
+    (pointMeasurement_eq :
+      ∀ x,
+        (sliceStrategy x).pointMeasurement =
+          (xRestrictedStrategy params strategy x).pointMeasurement)
+    (good :
+      ∀ x,
+        (sliceStrategy x).IsGood
+          (restrictionPkg.profile.axisParallel x)
+          (restrictionPkg.profile.selfConsistency x)
+          (restrictionPkg.profile.diagonal x))
+    (bridgeInputs :
+      ∀ x,
+        SelfImprovement.SelfImprovementBridgeInputs params (sliceStrategy x)
+          (restrictionPkg.profile.axisParallel x)
+          (restrictionPkg.profile.selfConsistency x)
+          (inductionPkg.sliceError x)) :
+    SelfImprovementPackage.SliceBridgeInputs params strategy eps delta gamma k
+      restrictionPkg inductionPkg where
+  sliceStrategy := sliceStrategy
+  state_eq := state_eq
+  pointMeasurement_eq := pointMeasurement_eq
+  averagedPoint_eq :=
+    SelfImprovementPackage.SliceBridgeInputs.averagedPoint_eq_of_pointMeasurement_eq
+      params strategy sliceStrategy pointMeasurement_eq
+  good := good
+  bridgeInputs := bridgeInputs
+
 /-- Convert honest per-slice Section 9 bridge inputs into the Section 6
 self-improvement package.
 
