@@ -4693,7 +4693,8 @@ This theorem takes an explicit `roleResidual` (obtainable from either
 `MainFormalRolePackageResidual.ofBaseCase` or the successor-branch
 handoff) and the `MainFormalStep6Hypotheses` bridge, then assembles the
 Step 6 witness residual through
-`MainFormalCascadeRolePackageResidualStep6WitnessResidual.nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs`.
+`MainFormalCascadeRolePackageResidualStep6WitnessResidual.
+nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs`.
 
 Refs #1009, #422. -/
 theorem baseStep6WitnessResidual
@@ -4709,11 +4710,11 @@ theorem baseStep6WitnessResidual
     Nonempty (MainFormalCascadeRolePackageResidualStep6WitnessResidual
       params strategy eps hpass k scalars) := by
   exact
-    MainFormalCascadeRolePackageResidualStep6WitnessResidual.nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs
+    open MainFormalCascadeRolePackageResidualStep6WitnessResidual in
+      nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs
       hsmall roleResidual bridge.orthonormalizationInput bridge.a_A bridge.a_B
       bridge.leftSelfConsistency bridge.rightSelfConsistency
       bridge.leftMatchMassPreservation bridge.rightMatchMassPreservation
-
 
 /-- Narrowed base-case bridge hypotheses for Step 6 when `params.m = 1`.
 
@@ -4837,8 +4838,68 @@ theorem baseStep6WitnessResidual_ofBaseBridge
   exact baseStep6WitnessResidual hsmall roleResidual
     (baseStep6Hypotheses_ofBaseBridge bridge)
 
+/-- Successor-case Step 6 bridge inputs for the final `mainFormal` assembly.
 
+This package is the successor analogue of the base-case `hbaseBridge`
+hypothesis.  It does not assert the final Step 6 witness residual directly.
+Instead it records the paper-order ingredients needed to construct it:
 
+* a successor role-package residual, whose `MainFormalSuccessorBoundary` contains
+  the recursive slice witnesses and the restricted-strategy self-improvement
+  producer used by Section 6; and
+* for the resulting role residual, the line-130 orthonormalization inputs,
+  distinguished completion outcomes, unsymmetrized strong self-consistency, and
+  match-mass preservation fields bundled as `MainFormalStep6Hypotheses`.
+
+The assembly theorem `successorStep6WitnessResidual_ofBridge` below consumes this
+package to produce the live Step 6 witness residual.  The analytic fields are
+anchored in `references/ldt-paper/inductive_step.tex` lines 130--149 for the
+orthonormalization/completion step and lines 169--185 for the exact `ζ₁`, `ζ₃`,
+and `ζ₄` transport route.
+
+Refs #1041, #834, #422. -/
+structure MainFormalSuccessorStep6BridgeInputs
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) where
+  /-- Successor role-package data: a predecessor decomposition, transported
+  passing strategy, successor boundary, predecessor degree positivity, and the
+  positive-`k` side condition for the Section 6 wrapper. -/
+  rolePackageSuccessor :
+    MainFormalRolePackageSuccessorResidual params strategy eps hpass k
+  /-- Line-130 orthonormalization, completion, strong self-consistency, and
+  match-mass inputs for the concrete role residual obtained from the successor
+  role-package data. -/
+  step6Hypotheses :
+    (scalars : MainFormalCascadeScalars params eps k) →
+      ∀ (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k),
+        MainFormalStep6Hypotheses params strategy eps k hpass scalars roleResidual
+
+/-- Assemble the successor-case Step 6 witness residual from the named bridge
+inputs.
+
+The proof first converts the successor role-package data through the checked
+Section 6 successor wrapper, using the public large-`k` hypothesis.  It then
+applies the line-130/completion assembly to the `MainFormalStep6Hypotheses`
+provided for the resulting role residual.
+
+Refs #1041, #834, #422. -/
+theorem successorStep6WitnessResidual_ofBridge
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
+    (hk_large : 400 * params.m * params.d ≤ k)
+    (bridge : MainFormalSuccessorStep6BridgeInputs params strategy eps k hpass) :
+    Nonempty (MainFormalCascadeRolePackageResidualStep6WitnessResidual
+      params strategy eps hpass k scalars) := by
+  rcases bridge.rolePackageSuccessor.toRolePackageResidual hk_large with
+    ⟨roleResidual⟩
+  exact baseStep6WitnessResidual hsmall roleResidual
+    (bridge.step6Hypotheses scalars roleResidual)
 
 /--
 `thm:main-formal` from `test_definition.tex`.
@@ -4867,6 +4928,11 @@ producer:
   current-dimension large-`k` hypothesis and weakens it to the predecessor
   side condition `400 * pred.m * pred.d ≤ k`.
 
+The successor branch now takes the corresponding Step 6 bridge as the named
+interface `MainFormalSuccessorStep6BridgeInputs`: the role-package successor
+data together with the line-130 orthonormalization, completion, strong
+self-consistency, and match-mass inputs needed for the resulting role residual.
+
 For an arbitrary current parameter bundle, the predecessor decomposition itself is
 now formalized by `Parameters.successorDecompositionOfNeOne`; what remains
 external is producing the successor-boundary data and the later completion /
@@ -4892,7 +4958,9 @@ theorem mainFormal
     (hk0 : 0 < k)
     (hbaseBridge : (scalars : MainFormalCascadeScalars params eps k) →
       ∀ (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k),
-      MainFormalBaseBridgeHypotheses params strategy eps k hpass scalars roleResidual) :
+      MainFormalBaseBridgeHypotheses params strategy eps k hpass scalars roleResidual)
+    (hsuccessorBridge : params.m ≠ 1 → 0 < params.d →
+      MainFormalSuccessorStep6BridgeInputs params strategy eps k hpass) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
@@ -4964,7 +5032,6 @@ theorem mainFormal
   -- targets is already checked; once the residual above is supplied, the
   -- remaining proof is trivial.  Item 4 replaces the older generic `triangleSub`
   -- route whose loss was `ζ₁ + sqrt ζ₂` rather than the printed `ζ₁`.
-
   by_cases herr : 1 ≤ mainFormalError params k eps
   · exact mainFormal_trivial_witness params strategy eps k herr
   · have hepsNN : 0 ≤ eps := SameSpaceProjStrat.eps_nonneg_of_passes hpass
@@ -4982,9 +5049,7 @@ theorem mainFormal
         exact baseStep6WitnessResidual_ofBaseBridge herr roleResidual
           (hbaseBridge scalars roleResidual)
       · -- Successor case (m > 1): needs recursive slices and self-improvement.
-        -- TODO(#931, #834, #422): construct `MainFormalSuccessorRecursiveSlices`
-        -- and `MainFormalSuccessorSelfImprovementProducer`.
-        sorry
+        exact successorStep6WitnessResidual_ofBridge herr hk (hsuccessorBridge hm1 hd)
     rcases hstep6WitnessResidual with ⟨step6WitnessResidual⟩
     let rolePackage := step6WitnessResidual.roleResidual.rolePackage scalars
     have hpre : ConsRel strategy.state (uniformDistribution Unit)

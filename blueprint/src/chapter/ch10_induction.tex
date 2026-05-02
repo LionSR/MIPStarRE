@@ -389,9 +389,7 @@
 \end{definition}
 
 \begin{definition}[Lean base-case Step~6 hypotheses for the Section~3 proof]\label{def:main-formal-step6-hypotheses}
-	\lean{MIPStarRE.LDT.Test.MainFormalStep6Hypotheses, MIPStarRE.LDT.Test.baseStep6WitnessResidual,
-		MIPStarRE.LDT.Test.MainFormalBaseBridgeHypotheses, MIPStarRE.LDT.Test.baseStep6Hypotheses_ofBaseBridge,
-		MIPStarRE.LDT.Test.baseStep6WitnessResidual_ofBaseBridge}
+	\lean{MIPStarRE.LDT.Test.MainFormalStep6Hypotheses, MIPStarRE.LDT.Test.baseStep6WitnessResidual, MIPStarRE.LDT.Test.MainFormalBaseBridgeHypotheses, MIPStarRE.LDT.Test.baseStep6Hypotheses_ofBaseBridge, MIPStarRE.LDT.Test.baseStep6WitnessResidual_ofBaseBridge}
 	\leanok
 	\uses{def:main-formal-successor-boundary, thm:orthonormalization}
 	The structure \texttt{MainFormalStep6Hypotheses} bundles the still-unformalized
@@ -408,6 +406,21 @@
 	\texttt{MainFormalRolePackageResidual.ofBaseCase}, where the
 	\texttt{params.m = 1} hypothesis is used) into the Step~6 witness residual
 	consumed by the downstream cascade.
+\end{definition}
+
+\begin{definition}[Lean successor-case Step~6 bridge inputs for the Section~3 proof]\label{def:main-formal-successor-step6-bridge}
+	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorStep6BridgeInputs, MIPStarRE.LDT.Test.successorStep6WitnessResidual_ofBridge}
+	\leanok
+	\uses{def:main-formal-successor-boundary, thm:orthonormalization}
+	The structure \texttt{MainFormalSuccessorStep6BridgeInputs} is the successor
+	counterpart of the base-case bridge used by Theorem~\ref{thm:main-formal}.  It
+	packages the successor role-package data, including the successor boundary
+	whose fields are the recursive slice witnesses and restricted-strategy
+	self-improvement producer, together with the line-130 orthonormalization and
+	completion hypotheses for the resulting role residual.  The assembly theorem
+	\texttt{successorStep6WitnessResidual\_ofBridge} converts those inputs into
+	the Step~6 witness residual consumed by the checked downstream cascade, without
+	assuming that residual directly.
 \end{definition}
 
 
