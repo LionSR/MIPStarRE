@@ -477,12 +477,13 @@ structure MainFormalSuccessorRecursiveSliceData (params : Parameters)
     (sliceStrategy x).pointMeasurementA =
     (MainInductionStep.xRestrictedStrategy params
       strategy.strategySymmetrization x).pointMeasurement
-  /-- The slice strategy's Alice axis-parallel line measurement matches the
+  /-- The slice strategy's Alice axis-parallel line measurement (underlying
+  projective family, without the transport-covariant wrapper) matches the
   restricted axis-parallel measurement from the main induction step. -/
   sliceAxisParallelA_eq : ∀ x,
-    (sliceStrategy x).axisParallelMeasurementA =
+    (sliceStrategy x).axisParallelMeasurementA.toIdxProjMeas =
     (MainInductionStep.xRestrictedStrategy params
-      strategy.strategySymmetrization x).axisParallelMeasurement
+      strategy.strategySymmetrization x).axisParallelMeasurement.toIdxProjMeas
   /-- The slice strategy's Alice diagonal-line measurement (underlying
   projective family, without the transport-covariant wrapper) matches the
   restricted diagonal measurement from the main induction step. -/
@@ -495,35 +496,19 @@ structure MainFormalSuccessorRecursiveSliceData (params : Parameters)
   Together with `sliceState_eq`, `slicePoint_eq`, `sliceAxisParallelA_eq`, and
   `sliceDiagonalA_eq`, every Alice-side measurement of `sliceStrategy x` is
   constrained to match the restricted slice from the main induction step.  The
-  symmetry witnesses (`permInvState`, `densityFixed`) are already bundled in
-  `SameSpaceProjStrat` and inherited by `sliceStrategy x`.  Bob-side
-  measurements (`pointMeasurementB`, `axisParallelMeasurementB`,
+  symmetry witnesses (`permInvState`, `densityFixed`) are bundled in
+  `SameSpaceProjStrat` and supplied independently for each `sliceStrategy x`;
+  transport across `sliceState_eq` is not tracked here.
+
+  TODO(#1037, #834, #422): the successor-case `mainFormal` `sorry` will need
+  a consumer of `sliceAxisParallelA_eq` and `sliceDiagonalA_eq` (or their
+  `.toIdxProjMeas`-free counterparts) to close the recursive call.
+
+  Bob-side measurements (`pointMeasurementB`, `axisParallelMeasurementB`,
   `diagonalMeasurementB`) are not constrained here; they belong to the
   unsymmetrization component (Step 3 of `mainFormal`) and are external
   hypotheses for a downstream recursive call. -/
   slicePasses : ∀ x, (sliceStrategy x).PassesLowIndividualDegreeTest (3 * eps)
-
-/-- Coherence hypothesis for Bob-side measurements of the per-slice strategy.
-
-`MainFormalSuccessorRecursiveSliceData` constrains Alice-side measurements
-via transport equalities to the restricted slice.  This shorthand names the
-remaining Bob-side measurement compatibility as a single hypothesis that a
-downstream `mainFormal` wiring must discharge.  The precise formulation
-involves role-extraction of the symmetrized measurement and is deferred to
-the unsymmetrization component (Step 3 of `mainFormal`); this `def` marks
-the gap so that callers can thread the hypothesis through bridge-input
-packages without committing to a specific formulation yet. -/
-def MainFormalSuccessorRecursiveSliceBobHypothesis (params : Parameters)
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps)
-    (sliceData : MainFormalSuccessorRecursiveSliceData params strategy eps hpass) : Prop :=
-  -- Placeholder: the real hypothesis would encode Bob-measurement compatibility
-  -- (point, axis-parallel, diagonal) with the restricted symmetrized slice.
-  -- The argument is used only to fix the parameter interface; the actual
-  -- hypothesis is currently trivial.
-  (sliceData.sliceStrategy = sliceData.sliceStrategy)
-
 /-- Convert per-slice induction-hypothesis data into a
 `MainFormalSuccessorRecursiveSlices` witness.
 
