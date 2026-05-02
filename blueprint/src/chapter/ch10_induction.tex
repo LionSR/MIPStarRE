@@ -615,8 +615,8 @@ assembly residual:
 \lean{MIPStarRE.LDT.Test.MainFormalRolePackageResidual, MIPStarRE.LDT.Test.MainFormalRolePackageResidual.toRoleMeasurementPackage, MIPStarRE.LDT.Test.MainFormalRolePackageResidual.ofBaseCase, MIPStarRE.LDT.Test.MainFormalRolePackageResidual.ofSuccessorBoundary, MIPStarRE.LDT.Test.MainFormalRolePackageResidual.rolePackage}
 \lean{MIPStarRE.LDT.Parameters.next, MIPStarRE.LDT.Parameters.previous, MIPStarRE.LDT.Parameters.previous_next_eq, MIPStarRE.LDT.Parameters.SuccessorDecomposition, MIPStarRE.LDT.Parameters.successorDecompositionOfOneLtM, MIPStarRE.LDT.Parameters.one_lt_m_of_ne_one, MIPStarRE.LDT.Parameters.successorDecompositionOfNeOne}
 \lean{MIPStarRE.LDT.Test.fieldModelOfSuccessorDecomposition, MIPStarRE.LDT.Test.projStratTransportSuccessor, MIPStarRE.LDT.Test.passesLowIndividualDegreeTest_transportSuccessor}
-\lean{MIPStarRE.LDT.Test.MainFormalRolePackageSuccessorResidual, MIPStarRE.LDT.Test.MainFormalRolePackageSuccessorResidual.toRolePackageResidual, MIPStarRE.LDT.Test.MainFormalRolePackageSuccessorResidual.ofSyntacticSuccessor}
-\lean{MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual, MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual.toRolePackageResidual}
+\lean{MIPStarRE.LDT.Test.MainFormalRolePackageSuccessorResidual, MIPStarRE.LDT.Test.MainFormalRolePackageSuccessorResidual.toRolePackageResidual, MIPStarRE.LDT.Test.MainFormalRolePackageSuccessorResidual.ofSyntacticSuccessor, MIPStarRE.LDT.Test.MainFormalRolePackageSuccessorResidual.ofSuccessorBridgeInputs}
+\lean{MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual, MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual.toRolePackageResidual, MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual.successorOfBridgeInputs, MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual.rolePackageResidual_ofSuccessorBridgeInputs}
 \lean{MIPStarRE.LDT.roleCond, MIPStarRE.LDT.roleBlock, MIPStarRE.LDT.opTensor_roleCond_sum, MIPStarRE.LDT.ev_classicalRoleSymmState_one, MIPStarRE.LDT.ev_classicalRoleSymmState_rolePair_AB, MIPStarRE.LDT.ev_classicalRoleSymmState_rolePair_BA, MIPStarRE.LDT.ev_classicalRoleSymmState_rolePair_AA, MIPStarRE.LDT.ev_classicalRoleSymmState_rolePair_BB, MIPStarRE.LDT.ev_classicalRoleSymmState_opTensor_roleCond_A, MIPStarRE.LDT.ev_classicalRoleSymmState_opTensor_roleCond_B}
 \lean{MIPStarRE.LDT.classicalRoleSymmState_isNormalized, MIPStarRE.LDT.roleSymmetrizedMeasurement, MIPStarRE.LDT.roleSymmetrizedMeasurement_outcome, MIPStarRE.LDT.roleSymmetrizedMeasurement_total}
 \lean{MIPStarRE.LDT.qBipartiteConsDefect_of_measurements, MIPStarRE.LDT.qBipartiteMatchMass_roleSymmetrizedMeasurement_left, MIPStarRE.LDT.qBipartiteConsDefect_roleSymmetrizedMeasurement_left}
@@ -652,8 +652,11 @@ or an explicit successor branch carrying \texttt{MainFormalSuccessorBoundary}.  
 public large-$k$ hypothesis supplies the Section~6 side condition
 $400m_{\mathrm{pred}}d\le k$; the remaining role work is the
 successor-boundary package, the completion handoff, and the line-169 transport
-data.  The live completion residual carries the concrete role residual rather
-than a separate decorative branch
+data.  The successor-boundary package can now be assembled from recursive slice
+witnesses and self-improvement bridge inputs by
+\texttt{MainFormalRolePackageBranchResidual.successorOfBridgeInputs}; the
+line-130 completion interfaces remain separate.  The live completion residual
+carries the concrete role residual rather than a separate decorative branch
 witness; the branch residual types remain the documented base/successor supply
 paths.  Once the role package is obtained,
 Lean proves the two factor-two unsymmetrization links from
