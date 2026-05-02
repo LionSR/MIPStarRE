@@ -1771,6 +1771,43 @@ structure MainFormalRolePackageAnswerSuccessorResidual
   /-- The positive-`k` side condition used by the Section 6 wrapper. -/
   kPositive : 1 ≤ k
 
+/-- Type of answer-valued recursive slice witnesses for the predecessor
+determined by a non-base current parameter bundle. -/
+private abbrev answerSuccessorRecursiveSlicesInput
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hm_ne_one : params.m ≠ 1) : Prop :=
+  let successor := Parameters.successorDecompositionOfNeOne params hm_ne_one
+  letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
+  let transportedStrategy := projStratTransportSuccessor strategy successor
+  let transportedPass := passesLowIndividualDegreeTest_transportSuccessor hpass successor
+  MainFormalSuccessorAnswerRecursiveSlices successor.pred transportedStrategy eps transportedPass k
+    (mainFormalSuccessorAnswerAxisWeightedBound_ofPass
+      successor.pred transportedStrategy eps transportedPass)
+    (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass
+      successor.pred transportedStrategy eps transportedPass)
+
+/-- Type of answer-valued self-improvement producers for the predecessor
+determined by a non-base current parameter bundle. -/
+private abbrev answerSuccessorSelfImprovementInput
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hm_ne_one : params.m ≠ 1) : Type _ :=
+  let successor := Parameters.successorDecompositionOfNeOne params hm_ne_one
+  letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
+  let transportedStrategy := projStratTransportSuccessor strategy successor
+  let transportedPass := passesLowIndividualDegreeTest_transportSuccessor hpass successor
+  MainFormalSuccessorAnswerSelfImprovementProducer
+    successor.pred transportedStrategy eps transportedPass k
+    (mainFormalSuccessorAnswerAxisWeightedBound_ofPass
+      successor.pred transportedStrategy eps transportedPass)
+    (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass
+      successor.pred transportedStrategy eps transportedPass)
+
 namespace MainFormalRolePackageAnswerSuccessorResidual
 
 /-- Convert explicit answer-valued successor-branch data into the isolated Section 6
@@ -1822,15 +1859,49 @@ def ofSyntacticSuccessor
   dimensionPositive := hd
   kPositive := hk_pos
 
+/-- Assemble the answer-valued successor role-package residual from recursive
+answer slices and an answer-valued self-improvement producer.
+
+This is the answer-register counterpart of the ordinary successor role assembly.
+It packages exactly the answer-side Section 6 inputs through
+`mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement`; it does not call
+`mainFormal` and it leaves the completion and line-169 interfaces downstream. -/
+noncomputable def ofAnswerSuccessorRecursiveSelfImprovement
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hm_ne_one : params.m ≠ 1)
+    (hd : 0 < params.d)
+    (hk_pos : 1 ≤ k)
+    (hrec : answerSuccessorRecursiveSlicesInput (k := k) hpass hm_ne_one)
+    (hself : answerSuccessorSelfImprovementInput (k := k) hpass hm_ne_one) :
+    MainFormalRolePackageAnswerSuccessorResidual params strategy eps hpass k :=
+  let successor := Parameters.successorDecompositionOfNeOne params hm_ne_one
+  letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
+  let transportedStrategy := projStratTransportSuccessor strategy successor
+  let transportedPass := passesLowIndividualDegreeTest_transportSuccessor hpass successor
+  { successor := successor
+    boundary :=
+      mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement successor.pred
+        transportedStrategy eps transportedPass k hrec hself
+    dimensionPositive := by
+      rcases successor with ⟨pred, hnext⟩
+      subst params
+      simpa [Parameters.next] using hd
+    kPositive := hk_pos }
+
 end MainFormalRolePackageAnswerSuccessorResidual
 
 /-- Branch-level residual for producing the Section 6 role package.
 
 The two constructors expose the real alternatives in the current proof state:
 base dimension, or a successor dimension together with explicit predecessor
-transport and successor-boundary data. The large-`k` condition is supplied once,
-from the public theorem hypothesis, when converting the branch to a concrete
-role-package residual. -/
+transport and successor-boundary data. The answer-valued successor constructor
+records the paper-faithful answer-restricted route separately from the ordinary
+restriction route. The large-`k` condition is supplied once, from the public
+theorem hypothesis, when converting the branch to a concrete role-package
+residual. -/
 inductive MainFormalRolePackageBranchResidual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -1843,6 +1914,11 @@ inductive MainFormalRolePackageBranchResidual
   | successor
       (successorResidual :
         MainFormalRolePackageSuccessorResidual params strategy eps hpass k) :
+      MainFormalRolePackageBranchResidual params strategy eps hpass k
+  /-- Successor dimension through answer-valued restriction data. -/
+  | answerSuccessor
+      (successorResidual :
+        MainFormalRolePackageAnswerSuccessorResidual params strategy eps hpass k) :
       MainFormalRolePackageBranchResidual params strategy eps hpass k
 
 namespace MainFormalRolePackageBranchResidual
@@ -1862,6 +1938,50 @@ theorem toRolePackageResidual
       exact MainFormalRolePackageResidual.ofBaseCase params strategy eps k hpass hm1
   | successor successorResidual =>
       exact successorResidual.toRolePackageResidual hk_large
+  | answerSuccessor successorResidual =>
+      exact successorResidual.toRolePackageResidual hk_large
+
+/-- Successor branch constructor from the answer-valued successor inputs.
+
+This packages answer-valued recursive slice witnesses and the corresponding
+self-improvement producer for the transported predecessor into the branch-level
+role residual. It stops before the line-130 completion and line-169 transport
+interfaces. -/
+noncomputable def answerSuccessorOfRecursiveSelfImprovement
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hm_ne_one : params.m ≠ 1)
+    (hd : 0 < params.d)
+    (hk_pos : 1 ≤ k)
+    (hrec : answerSuccessorRecursiveSlicesInput (k := k) hpass hm_ne_one)
+    (hself : answerSuccessorSelfImprovementInput (k := k) hpass hm_ne_one) :
+    MainFormalRolePackageBranchResidual params strategy eps hpass k :=
+  .answerSuccessor
+    (MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorRecursiveSelfImprovement
+      hpass hm_ne_one hd hk_pos hrec hself)
+
+/-- Direct role-package residual corollary for the answer-valued successor
+branch.
+
+Given answer-valued recursive slices, the matching self-improvement producer,
+and the public large-`k` side condition, this produces the isolated Section 6
+role residual consumed by the downstream `mainFormal` cascade. -/
+theorem rolePackageResidual_ofAnswerSuccessorRecursiveSelfImprovement
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hm_ne_one : params.m ≠ 1)
+    (hd : 0 < params.d)
+    (hk_pos : 1 ≤ k)
+    (hk_large : 400 * params.m * params.d ≤ k)
+    (hrec : answerSuccessorRecursiveSlicesInput (k := k) hpass hm_ne_one)
+    (hself : answerSuccessorSelfImprovementInput (k := k) hpass hm_ne_one) :
+    Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) :=
+  (answerSuccessorOfRecursiveSelfImprovement hpass hm_ne_one hd hk_pos hrec hself)
+    |>.toRolePackageResidual hk_large
 
 /-- Successor branch constructor from the two analytic successor inputs.
 
@@ -3582,10 +3702,11 @@ field contains only the projectivization/completion and line-169 data for the ro
 package obtained from that concrete residual.  Thus the live `mainFormal` hole no
 longer asks for an arbitrary `MainFormalRoleMeasurementPackage`, an arbitrary raw
 Section 6 witness, or a decorative branch witness not tied to the concrete
-measurement. The branch-level base/successor constructors remain available on
-`MainFormalRolePackageResidual` and `MainFormalRolePackageBranchResidual` as the
-intended ways to supply this field; their branch conversion consumes the public
-large-`k` hypothesis directly rather than storing it as residual data. -/
+measurement. The branch-level base, ordinary successor, and answer-valued
+successor constructors remain available on `MainFormalRolePackageResidual` and
+`MainFormalRolePackageBranchResidual` as the intended ways to supply this field;
+their branch conversion consumes the public large-`k` hypothesis directly rather
+than storing it as residual data. -/
 structure MainFormalCascadeRolePackageResidualCompletionLine169Residual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -4970,17 +5091,20 @@ exposes this stronger hypothesis instead of trying to derive it from the paper's
 printed `params.m * params.d ≤ k` assumption.
 
 After first separating off the saturated-error branch, the checked role-package
-infrastructure now exposes the base producer and a branch-level successor
-producer:
+infrastructure now exposes the base producer, an ordinary branch-level successor
+producer, and an answer-valued branch-level successor producer:
 
 * the base handoff `strategySymmetrization_mainInductionBaseCase`, packaged as
   `MainFormalRolePackageBranchResidual.base`, and
 * the predecessor/successor handoff
   `MainFormalRolePackageBranchResidual.successor`, which carries a bundled
   `Parameters.SuccessorDecomposition`, transported passing strategy, bundled
-  `MainFormalSuccessorBoundary`. The branch conversion receives the public
-  current-dimension large-`k` hypothesis and weakens it to the predecessor
-  side condition `400 * pred.m * pred.d ≤ k`.
+  `MainFormalSuccessorBoundary`, and
+* the answer-valued predecessor/successor handoff
+  `MainFormalRolePackageBranchResidual.answerSuccessor`, which carries the
+  analogous `MainFormalSuccessorAnswerBoundary`.
+The branch conversion receives the public current-dimension large-`k` hypothesis
+and weakens it to the predecessor side condition `400 * pred.m * pred.d ≤ k`.
 
 For an arbitrary current parameter bundle, the predecessor decomposition itself is
 now formalized by `Parameters.successorDecompositionOfNeOne`; what remains
@@ -5053,12 +5177,10 @@ theorem mainFormal
   --
   -- 1. **Section 6 role residual** via base/successor branch:
   --    - `MainFormalRolePackageBranchResidual` constructed from either
-  --      `base` (if `params.m = 1`) or `successor` (otherwise),
-  --    - `MainFormalSuccessorRecursiveSlices` (recursive induction witnesses,
-  --      currently external),
-  --    - `MainFormalSuccessorSelfImprovementProducer` (per-slice self-improvement
-  --      package producer, connecting `SelfImprovement.selfImprovement`
-  --      to `MainInductionStep.SelfImprovementPackage`).
+  --      `base` (if `params.m = 1`), `successor`, or the answer-valued
+  --      `answerSuccessor`,
+  --    - ordinary or answer-valued recursive induction witnesses,
+  --    - ordinary or answer-valued per-slice self-improvement package producers.
   --
   -- 2. **Line-130 orthonormalization inputs**:
   --    - `MainFormalPostRolePackageLine130OrthonormalizationInput`:
