@@ -855,6 +855,29 @@ lemma selfImprovementHelper
   · simpa [T] using hsdp
   · exact addInU params strategy eps delta gamma hgood T
 
+/-! ### Final-fields point-consistency transport
+
+The paper's projective-output A-consistency
+(`self_improvement.tex` lines 719--726, blueprint
+`ch07_self_improvement.tex` lines 591--596) applies `prop:triangle-sub`
+to the helper-stage A-consistency for `Hhat` together with the
+data-processing comparison
+`Hhat_{[h(u)=a]} ⊗ I ≈ H_{[h(u)=a]} ⊗ I`. The Lean version of
+`prop:triangle-sub` (`Preliminaries.triangleSub_right`) requires both
+right-register families to be `IdxMeas`, but here the
+`polynomialEvaluationFamily` outputs are `IdxSubMeas` (because `Hhat`
+and `H.toSubMeas` are sub-measurements).
+
+The named hypothesis `HelperPointConsistencyInput` in
+`Theorems/Statements.lean` exposes the helper-stage point consistency as
+an explicit producer input, separating it from the residual
+`FinalFieldsInput`. The remaining work to discharge
+`SelfImprovementFinalFields.pointConsistency` is to prove a
+sub-measurement variant of `Preliminaries.triangleSub_right` (the
+"missing submeasurement triangle" cited by the paper), consume the new
+helper-stage hypothesis, and combine with the existing `hdata`
+SDD bound between left-tensor placed evaluation families. -/
+
 /-- `thm:self-improvement`.
 
 The remaining Section 5/8/9 obligations are exposed as explicit theorem

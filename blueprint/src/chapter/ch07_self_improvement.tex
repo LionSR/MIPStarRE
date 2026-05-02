@@ -143,6 +143,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   Therefore the completeness is at least $1-\nu-3\sqrt{\delta}$, which is bounded below by $(1-\nu)-\zeta$.
 
   \emph{Proof of \ref{item:self-improvement-A-consistency}.}
+  \lean{MIPStarRE.LDT.SelfImprovement.HelperPointConsistencyInput}
   The inconsistency of~$H$ with~$A$ is
   \begin{equation}\label{eq:consistency-with-A-baby-step}
     \E_{u} \sum_{a \neq b} \bra{\psi} A^{u}_a \ot H_{[h(u) = b]} \ket{\psi}
@@ -165,7 +166,14 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
     \le 20 m \cdot \Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big)
     \le \zeta,
   \]
-  this proves \ref{item:self-improvement-A-consistency}.
+  this proves \ref{item:self-improvement-A-consistency}. The Lean
+  formalization isolates this paper estimate as the producer hypothesis
+  \mintinline{Lean}{HelperPointConsistencyInput}; the projective transfer
+  in~\ref{item:self-improvement-projective-A-consistency} below consumes
+  this hypothesis together with the orthonormalization data-processing
+  bound, in line with the issue~\#1093 refactor that exposes the
+  helper-stage point-consistency estimate as an explicit producer rather
+  than hiding it inside the residual final-fields package.
 
   \emph{Proof of \ref{item:self-improvement-self}.}
   From the definition of $H_h^u$ and the projectivity of~$A$,
@@ -589,11 +597,22 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   where the second inequality is \ref{item:self-improvement-completeness} of Lemma~\ref{lem:self-improvement-helper}.
 
   \emph{Proof of \ref{item:self-improvement-projective-A-consistency}.}
+  \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementFinalFields}
   Lemma~\ref{prop:triangle-sub} applied to \ref{item:self-improvement-A-consistency} of Lemma~\ref{lem:self-improvement-helper} and the post-processed comparison~\eqref{eq:approx-data-processed} gives
   \[
     A^u_a \ot I \simeq_{\widehat{\zeta} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}}}
     I \ot H_{[h(u) = a]}.
   \]
+  In the current Lean formalization the projective-output point
+  consistency is the field
+  \mintinline{Lean}{SelfImprovementFinalFields.pointConsistency}; the
+  helper-stage producer hypothesis
+  \mintinline{Lean}{HelperPointConsistencyInput} is supplied through the
+  bridge package
+  \mintinline{Lean}{SelfImprovementBridgeInputs.helperPointConsistency},
+  and the remaining transport from \ref{item:self-improvement-A-consistency}
+  to this projective conclusion is the sub-measurement variant of
+  \ref{prop:triangle-sub} discussed in issue~\#1093.
 
   \emph{Proof of \ref{item:self-improvement-projective-self}.}
   Lemma~\ref{prop:two-notions-of-self-consistency} implies
