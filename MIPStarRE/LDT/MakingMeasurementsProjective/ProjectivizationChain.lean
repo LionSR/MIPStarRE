@@ -503,9 +503,16 @@ projective submeasurement implies match-mass preservation.
 This is the local algebraic interface needed by the paper-tight line-169 route:
 once the concrete orthonormalization construction proves
 `G.outcome a ≤ P.outcome a` for every outcome `a`, the diagonal overlap against
-any fixed partner measurement `B` can only increase. -/
+any fixed partner measurement `B` can only increase.
+
+The hypothesis is intentionally strong.  Since `G` is a full `Measurement` and
+`P` is a `ProjSubMeas`, pointwise domination is a sufficient construction-level
+hook, not the conclusion supplied directly by the paper's orthonormalization
+theorem.  In particular, the paper gives state-dependent-distance closeness,
+not an operator inequality `G.outcome a ≤ P.outcome a`; a caller must prove this
+stronger fact for a concrete repair before using this constructor. -/
 theorem of_outcome_le {Outcome : Type*} {ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
+    [Fintype ι] [DecidableEq ι] [Fintype Outcome]
     {ψ : QuantumState (ι × ι)} {G : Measurement Outcome ι}
     {P : ProjSubMeas Outcome ι} {B : Measurement Outcome ι}
     (hpoint : ∀ a : Outcome, G.outcome a ≤ P.outcome a) :
