@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.Basic.SubMeasurementFamilies
 import MIPStarRE.LDT.GlobalVariance.Theorems.Results
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
@@ -604,36 +605,10 @@ lemma addInU_filtered_sandwiched_tensor_sum_le_one
           (T.outcome h) ≤
       (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
   classical
-  calc
-    ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h v = a),
-        opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
-          (T.outcome h)
-      ≤
-        ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h v = a),
-          leftTensor (ι₂ := ι)
-            ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h) := by
-          refine Finset.sum_le_sum ?_
-          intro h _hh
-          exact opTensor_le_leftTensor
-            ((sandwichedPolynomialSubMeasAt params strategy T u).outcome_pos h)
-            (T.outcome_le_one h)
-    _ ≤
-        ∑ h : Polynomial params,
-          leftTensor (ι₂ := ι)
-            ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h) := by
-          exact Finset.sum_le_sum_of_subset_of_nonneg
-            (Finset.filter_subset _ _)
-            (fun h _hmem _hnotmem =>
-              leftTensor_nonneg
-                ((sandwichedPolynomialSubMeasAt params strategy T u).outcome_pos h))
-    _ =
-        leftTensor (ι₂ := ι)
-          ((sandwichedPolynomialSubMeasAt params strategy T u).total) := by
-          rw [← (sandwichedPolynomialSubMeasAt params strategy T u).sum_eq_total]
-          rw [leftTensor_finset_sum]
-    _ ≤ (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
-          exact leftTensor_le_one
-            ((sandwichedPolynomialSubMeasAt params strategy T u).total_le_one)
+  exact SubMeas.opTensor_sum_filter_le_one
+    (sandwichedPolynomialSubMeasAt params strategy T u)
+    T
+    (fun h : Polynomial params => h v = a)
 
 /-- The expanded left endpoint `Q₀` of the four-step scalar chain in
 `self_improvement.tex`, lines 247--252, after setting `M^u = H^u` and averaging
