@@ -296,7 +296,8 @@ theorem SelfImprovementPackage.SliceBridgeInputs.averagedPoint_eq_of_pointMeasur
         IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x h := by
   intro x h
   simp [IdxPolyFamily.averagedPointEvaluationOperator,
-    IdxPolyFamily.averagedSlicePointEvaluationOperator, hpoint x, xRestrictedStrategy]
+    IdxPolyFamily.averagedSlicePointEvaluationOperator, hpoint x,
+    xRestrictedStrategy_pointMeasurement_apply]
 
 /-- Build `SliceBridgeInputs` without separately assuming averaged point-operator
 compatibility.
