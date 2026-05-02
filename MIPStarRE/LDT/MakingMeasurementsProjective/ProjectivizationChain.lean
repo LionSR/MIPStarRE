@@ -505,12 +505,18 @@ once the concrete orthonormalization construction proves
 `G.outcome a ≤ P.outcome a` for every outcome `a`, the diagonal overlap against
 any fixed partner measurement `B` can only increase.
 
-The hypothesis is intentionally strong.  Since `G` is a full `Measurement` and
-`P` is a `ProjSubMeas`, pointwise domination is a sufficient construction-level
-hook, not the conclusion supplied directly by the paper's orthonormalization
-theorem.  In particular, the paper gives state-dependent-distance closeness,
-not an operator inequality `G.outcome a ≤ P.outcome a`; a caller must prove this
-stronger fact for a concrete repair before using this constructor. -/
+In the present typing this hypothesis is stronger than the paper's
+orthonormalization output.  Since `G` is a full `Measurement` and `P` is a
+`ProjSubMeas`, summing `hpoint` forces `P.total = 1`; the positive differences
+`P.outcome a - G.outcome a` must then vanish, so the usable case is essentially
+pointwise equality `G.outcome a = P.outcome a` for every `a`.  Because `P` is
+projective, this is the degenerate no-change situation where the source
+measurement is already projective.
+
+Thus this theorem is only a sufficient tautological constructor for that
+degenerate scope.  It is not a nontrivial orthonormalization repair proof: the
+paper gives state-dependent-distance closeness, not the operator inequality
+`G.outcome a ≤ P.outcome a`. -/
 theorem of_outcome_le {Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
     {ψ : QuantumState (ι × ι)} {G : Measurement Outcome ι}
@@ -565,10 +571,14 @@ theorem of_submeasurement_match_mass_and_completion
 /-- Construct the line-169 match-mass invariant from pointwise domination of the
 two orthonormalized submeasurements and the canonical completion equalities.
 
-This is a narrowed constructor for future line-130 callers: the completion step
-is handled here by `of_submeasurement_match_mass_and_completion`, while the
-remaining construction-level task is exactly to prove the two pointwise
-domination facts for the concrete orthonormalization repair. -/
+This inherits the degenerate scope of
+`OrthonormalizationMatchMassPreservation.of_outcome_le`.  With
+`G_A G_B : Measurement Outcome ι` and `P_A P_B : ProjSubMeas Outcome ι`, the
+pointwise domination hypotheses are only expected when the source measurements
+already agree pointwise with the projective submeasurements (equivalently, in
+the no-change/projective-source case).  The theorem is therefore a sufficient
+constructor that composes the completion step with tautological preservation
+witnesses, not a nontrivial orthonormalization repair proof. -/
 theorem of_completion_and_outcome_le
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
