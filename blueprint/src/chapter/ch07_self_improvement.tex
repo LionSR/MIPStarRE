@@ -261,6 +261,11 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   which proves \ref{item:self-improvement-self}.
 
   \emph{Proof of \ref{item:self-improvement-boundedness}.}
+  The formal statement
+  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_bounded}
+  isolates the operator-monotonicity substep: once the SDP dual witness
+  satisfies $I \le Z$, the projective submeasurement mass is bounded by
+  $Z \ot I$ with zero boundedness error.
   The boundedness quantity is
   \[
     \bra{\psi} Z \ot I \ket{\psi} -\E_{u} \sum_a \bra{\psi}  A^{u}_{a} \ot H_{[h(u)=a]} \ket{\psi}.
