@@ -28,11 +28,13 @@ Both are exposed as explicit structure fields below.
 
 - `ProjectiveNonMeasurementBridgeInput` — explicit hypotheses for spectral truncation
 - `QXPLayerConstructionBridgeInput` — explicit hypotheses for QXP construction
-- `ProjectivizationRepairBridgeInput` — factory assembling the full chain
+- `ProjectivizationRepairBridgeInput` — bundles the full chain inputs (caller supplies)
 - `roundingToProjectorsWitness_of_bridge` — trivial wrapper
 - `rankReductionWitness_of_bridge` — calls `projectiveLowRankSum`
-- `spectralTruncationStatement_of_bridge` — marked `sorry` (gap #1032)
-- `leftLiftedProjectivizationRepairInput_of_bridge` — marked `sorry` (gap #1032)
+- `spectralTruncationStatement_of_bridge` — field-for-field conversion to
+  `SpectralTruncationStatement`
+  (requires the closeness bound weakened to `2√ζ` per paper; see #1032)
+- `toQXPLayerData` — structural copy to `QXPLayerData`
 
 ## References
 
@@ -155,14 +157,14 @@ def toQXPLayerData {Outcome : Type uOutcome} [Fintype Outcome]
 
 This structure bundles all the currently unformalized inputs needed to
 produce a `LeftLiftedProjectivizationRepairInput` from the spectral truncation
-and QXP construction steps. -/
+and QXP construction steps.
+
+Once both gaps are closed by constructive proofs, a conversion lemma will
+produce the `LeftLiftedProjectivizationRepairInput` needed at the `mainFormal`
+site. Until then, the caller supplies these inputs directly. -/
 
 /-- Explicit bridge input for the full chain from almost-projectivity through
 rank reduction and QXP construction to a left-lifted projective submeasurement.
-
-Once both gaps are closed by constructive proofs, the lemma
-`leftLiftedProjectivizationRepairInput_of_bridge` produces the
-`LeftLiftedProjectivizationRepairInput` needed at the `mainFormal` site.
 
 The `qxpConstruction` field is a function from `QLayerData` × `RankReductionWitness`
 to `QXPLayerConstructionBridgeInput` — it constructs the specific X/XHat
@@ -171,7 +173,7 @@ truncation produces a specific rounded family, the rank reduction produces a
 specific Q-layer, and the QXP construction produces specific X/XHat given
 that Q-layer. -/
 structure ProjectivizationRepairBridgeInput {Outcome : Type uOutcome}
-    [Fintype Outcome] [DecidableEq Outcome] [Nonempty Outcome]
+    [Fintype Outcome] [DecidableEq Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) where
   /-- The spectral truncation bridge input producing the rounded projectors `R_a`. -/
@@ -211,7 +213,7 @@ and the source almost-projectivity, produce the paper's Q-layer data
 This def calls `projectiveLowRankSum` from `QXPLayer/RankReduction.lean`
 with the rounded projectors from the bridge input. -/
 lemma rankReductionWitness_of_bridge {Outcome : Type uOutcome}
-    [Fintype Outcome] [DecidableEq Outcome] [Nonempty Outcome]
+    [Fintype Outcome] [DecidableEq Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error)
     (hψ : ψ.IsNormalized)
@@ -230,61 +232,25 @@ lemma rankReductionWitness_of_bridge {Outcome : Type uOutcome}
 /-- Given the spectral truncation bridge input, produce a
 `SpectralTruncationStatement` at error `ζ`.
 
-**Gap**: The spectral truncation construction from the paper
-(`lem:projective-non-measurement`) is currently unformalized. This def
-is marked `sorry` pending the constructive proof tracked by issue #1032.
+This is a structural field-for-field conversion: the bridge already
+carries the same fields as `SpectralTruncationStatement` (after
+`SpectralTruncationStatement.closeness` was weakened to `2√ζ` to match
+the paper's bound at `references/ldt-paper/orthonormalization.tex:417`).
 
-Once proven, this lemma closes the gap between
-`ProjectiveNonMeasurementBridgeInput` and `SpectralTruncationInput`. -/
+The mathematical content of `lem:projective-non-measurement` — constructing
+the rounded family — is the caller's responsibility when building a
+`ProjectiveNonMeasurementBridgeInput`. See #1032 for the constructive
+proof track. -/
 noncomputable def spectralTruncationStatement_of_bridge {Outcome : Type uOutcome}
     [Fintype Outcome] [DecidableEq Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error)
-    (_input : ProjectiveNonMeasurementBridgeInput ψ A ζ) :
-    SpectralTruncationStatement ψ A ζ :=
-  -- TODO(#1032): Construct the SpectralTruncationStatement from the bridge.
-  -- The closeness error in the bridge is (2 * spectralTruncationError ζ),
-  -- while SpectralTruncationStatement expects (spectralTruncationError ζ).
-  -- These differ by factor 2; once `lem:projective-non-measurement` is proved,
-  -- the closeness bound should be tightened or the errors reconciled.
-  sorry
-
-/-- Given the full projectivization repair bridge input, produce a
-`LeftLiftedProjectivizationRepairInput`.
-
-This def assembles the complete chain:
-1. Spectral truncation → `SpectralTruncationStatement` (via bridge)
-2. Rank reduction → `QLayerData` + `RankReductionWitness` (via `projectiveLowRankSum`)
-3. QXP construction → `QXPLayerData` (via bridge)
-4. Projectivity of `P_a` → `ProjSubMeas` (via `pProjectivity`)
-5. Closeness `P ≈ Q` (via `pQApprox`)
-6. Triangle inequality `A ≈ Q ≈ P` → final `RoundedProjMeasStatement`
-
-**Gaps**: Steps 1 and 3 (spectral truncation and QXP construction) are
-currently unformalized. This def is marked `sorry` pending the constructive
-proofs tracked by issue #1032. -/
-lemma leftLiftedProjectivizationRepairInput_of_bridge {Outcome : Type uOutcome}
-    [Fintype Outcome] [DecidableEq Outcome] [Nonempty Outcome]
-    {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    (ψ : QuantumState (ι × ι))
-    (hψ : ψ.IsNormalized)
-    (A : Measurement Outcome ι) (ζ : Error)
-    (hζ_nonneg : 0 ≤ ζ)
-    (hζ_le : ζ ≤ 1 / (4 : Error))
-    (bridge : ProjectivizationRepairBridgeInput ψ (leftLiftedMeasurement (ιB := ι) A) ζ) :
-    LeftLiftedProjectivizationRepairInput ψ A ζ := by
-  -- TODO(#1032): Full assembly from bridge inputs to LeftLiftedProjectivizationRepairInput.
-  -- This requires the spectral truncation statement and the QXP construction.
-  -- The proof sketch is:
-  --   1. Call spectralTruncationStatement_of_bridge to get the spectral truncation output
-  --   2. Call rankReductionWitness_of_bridge to get QLayerData + RankReductionWitness
-  --   3. Call bridge.qxpConstruction to get QXPLayerConstructionBridgeInput
-  --   4. Call toQXPLayerData to get QXPLayerData
-  --   5. Call pProjectivity to get ProjSubMeas
-  --   6. Call pQApprox for closeness P ≈ Q
-  --   7. Use hRank.closeness for A ≈ Q
-  --   8. Triangle inequality for A ≈ P
-  --   9. Convert SDDOpRel to SDDRel and package as RoundedProjMeasStatement
-  sorry
+    (input : ProjectiveNonMeasurementBridgeInput ψ A ζ) :
+    SpectralTruncationStatement ψ A ζ where
+  roundedFamily := input.roundedFamily
+  projective := input.projective
+  closeness := input.closeness
+  sum_eq_total := input.sum_eq_total
+  total_le := input.total_le
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

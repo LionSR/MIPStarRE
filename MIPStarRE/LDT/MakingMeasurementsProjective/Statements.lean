@@ -102,12 +102,13 @@ structure SpectralTruncationStatement {Outcome : Type*}
   /-- Each truncated effect is a projection. -/
   projective : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (roundedFamily.outcome a)
   /-- The truncated family stays close to the input measurement in
-  state-dependent operator distance. -/
+  state-dependent operator distance, with the paper's `2√ζ` bound
+  (`references/ldt-paper/orthonormalization.tex:417`). -/
   closeness :
     SDDOpRel ψ (uniformDistribution Unit)
       (fun _ => (A.toSubMeas : OpFamily Outcome ι))
       (fun _ => roundedFamily)
-      (spectralTruncationError ζ)
+      (2 * spectralTruncationError ζ)
   /-- The stored total operator is the sum of the rounded family. -/
   sum_eq_total : ∑ a, roundedFamily.outcome a = roundedFamily.total
   /-- The total operator of the rounded family is almost bounded by `I`. -/
