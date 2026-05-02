@@ -286,7 +286,7 @@ theorem input_match_mass_eq_sdp_overlap
           (pointConditionedOutcomeOperatorAtPolynomial params strategy g)
           (G.outcome g)).symm
 
-/-- Dual feasibility lower-bounds the SDP overlap by the dual mass
+/-- Dual feasibility upper-bounds the SDP overlap by the dual mass
 `⟨ψ, Z ⊗ I ψ⟩`.
 
 This formalizes `references/ldt-paper/self_improvement.tex`, lines 408--410:
