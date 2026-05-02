@@ -477,14 +477,37 @@ structure MainFormalSuccessorRecursiveSliceData (params : Parameters)
     (sliceStrategy x).pointMeasurementA =
     (MainInductionStep.xRestrictedStrategy params
       strategy.strategySymmetrization x).pointMeasurement
+  /-- The slice strategy's Alice axis-parallel line measurement (underlying
+  projective family, without the transport-covariant wrapper) matches the
+  restricted axis-parallel measurement from the main induction step. -/
+  sliceAxisParallelA_eq : ∀ x,
+    (sliceStrategy x).axisParallelMeasurementA.toIdxProjMeas =
+    (MainInductionStep.xRestrictedStrategy params
+      strategy.strategySymmetrization x).axisParallelMeasurement.toIdxProjMeas
+  /-- The slice strategy's Alice diagonal-line measurement (underlying
+  projective family, without the transport-covariant wrapper) matches the
+  restricted diagonal measurement from the main induction step. -/
+  sliceDiagonalA_eq : ∀ x,
+    (sliceStrategy x).diagonalMeasurementA.toIdxProjMeas =
+    (MainInductionStep.xRestrictedStrategy params
+      strategy.strategySymmetrization x).diagonalMeasurement
   /-- Each slice strategy passes LDT with the common symmetrized error `3 * eps`.
 
-  Note: this structure constrains only `state` and `pointMeasurementA` of
-  `sliceStrategy x` (Bob's measurement, axis-parallel/diagonal data, and the
-  symmetry witnesses are unconstrained).  A downstream wiring of this bridge
-  into the live `mainFormal` `sorry` will need additional compatibility
-  fields before `slicePasses` becomes load-bearing for a recursive
-  `mainFormal` call. -/
+  Together with `sliceState_eq`, `slicePoint_eq`, `sliceAxisParallelA_eq`, and
+  `sliceDiagonalA_eq`, every Alice-side measurement of `sliceStrategy x` is
+  constrained to match the restricted slice from the main induction step.  The
+  symmetry witnesses (`permInvState`, `densityFixed`) are bundled in
+  `SameSpaceProjStrat` and supplied independently for each `sliceStrategy x`;
+  transport across `sliceState_eq` is not tracked here.
+
+  TODO(#1037, #834, #422): the successor-case `mainFormal` `sorry` will need
+  a consumer of `sliceAxisParallelA_eq` and `sliceDiagonalA_eq` (or their
+  `.toIdxProjMeas`-free counterparts) to close the recursive call.
+
+  Bob-side measurements (`pointMeasurementB`, `axisParallelMeasurementB`,
+  `diagonalMeasurementB`) are not constrained here; they belong to the
+  unsymmetrization component (Step 3 of `mainFormal`) and are external
+  hypotheses for a downstream recursive call. -/
   slicePasses : ∀ x, (sliceStrategy x).PassesLowIndividualDegreeTest (3 * eps)
 
 /-- Convert per-slice induction-hypothesis data into a
