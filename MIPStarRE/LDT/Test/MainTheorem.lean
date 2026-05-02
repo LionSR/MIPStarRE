@@ -1593,6 +1593,60 @@ def ofSyntacticSuccessor
   dimensionPositive := hd
   kPositive := hk_pos
 
+/-- Assemble the successor role-package residual from recursive slices and
+self-improvement bridge inputs.
+
+This is the non-base branch constructor used by the live `mainFormal` split.  It
+does not assume a raw Section 6 witness: the caller supplies exactly the two
+analytic successor inputs for the transported predecessor, namely recursive
+slice witnesses and the self-improvement bridge data.  The theorem packages them
+through `mainFormalSuccessorBoundary_ofBridgeInputs`; line-130
+orthonormalization and completion inputs remain downstream hypotheses. -/
+noncomputable def ofSuccessorBridgeInputs
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hm_ne_one : params.m ≠ 1)
+    (hd : 0 < params.d)
+    (hk_pos : 1 ≤ k)
+    (hrec :
+      let successor := Parameters.successorDecompositionOfNeOne params hm_ne_one
+      letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
+      let transportedStrategy := projStratTransportSuccessor strategy successor
+      let transportedPass := passesLowIndividualDegreeTest_transportSuccessor hpass successor
+      MainFormalSuccessorRecursiveSlices successor.pred transportedStrategy eps transportedPass k
+        (mainFormalSuccessorAxisWeightedBound_ofPass
+          successor.pred transportedStrategy eps transportedPass)
+        (mainFormalSuccessorDiagonalWeightedBound_ofPass
+          successor.pred transportedStrategy eps transportedPass))
+    (hbridge :
+      let successor := Parameters.successorDecompositionOfNeOne params hm_ne_one
+      letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
+      let transportedStrategy := projStratTransportSuccessor strategy successor
+      let transportedPass := passesLowIndividualDegreeTest_transportSuccessor hpass successor
+      MainFormalSuccessorSelfImprovementBridgeInputs
+        successor.pred transportedStrategy eps transportedPass k
+        (mainFormalSuccessorAxisWeightedBound_ofPass
+          successor.pred transportedStrategy eps transportedPass)
+        (mainFormalSuccessorDiagonalWeightedBound_ofPass
+          successor.pred transportedStrategy eps transportedPass)) :
+    MainFormalRolePackageSuccessorResidual params strategy eps hpass k where
+  successor := Parameters.successorDecompositionOfNeOne params hm_ne_one
+  boundary := by
+    let successor := Parameters.successorDecompositionOfNeOne params hm_ne_one
+    letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
+    let transportedStrategy := projStratTransportSuccessor strategy successor
+    let transportedPass := passesLowIndividualDegreeTest_transportSuccessor hpass successor
+    exact
+      mainFormalSuccessorBoundary_ofBridgeInputs successor.pred transportedStrategy eps
+        transportedPass k hrec hbridge
+  dimensionPositive := by
+    rcases Parameters.successorDecompositionOfNeOne params hm_ne_one with ⟨pred, hnext⟩
+    subst params
+    simpa [Parameters.next] using hd
+  kPositive := hk_pos
+
 end MainFormalRolePackageSuccessorResidual
 
 /-- Answer-valued successor-branch data for producing the Section 6 role package. -/
@@ -1705,6 +1759,84 @@ theorem toRolePackageResidual
       exact MainFormalRolePackageResidual.ofBaseCase params strategy eps k hpass hm1
   | successor successorResidual =>
       exact successorResidual.toRolePackageResidual hk_large
+
+/-- Successor branch constructor from the two analytic successor inputs.
+
+This packages recursive slice witnesses and self-improvement bridge inputs for
+the transported predecessor into the branch-level role residual.  It deliberately
+stops before the line-130 orthonormalization and completion interfaces. -/
+noncomputable def successorOfBridgeInputs
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hm_ne_one : params.m ≠ 1)
+    (hd : 0 < params.d)
+    (hk_pos : 1 ≤ k)
+    (hrec :
+      let successor := Parameters.successorDecompositionOfNeOne params hm_ne_one
+      letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
+      let transportedStrategy := projStratTransportSuccessor strategy successor
+      let transportedPass := passesLowIndividualDegreeTest_transportSuccessor hpass successor
+      MainFormalSuccessorRecursiveSlices successor.pred transportedStrategy eps transportedPass k
+        (mainFormalSuccessorAxisWeightedBound_ofPass
+          successor.pred transportedStrategy eps transportedPass)
+        (mainFormalSuccessorDiagonalWeightedBound_ofPass
+          successor.pred transportedStrategy eps transportedPass))
+    (hbridge :
+      let successor := Parameters.successorDecompositionOfNeOne params hm_ne_one
+      letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
+      let transportedStrategy := projStratTransportSuccessor strategy successor
+      let transportedPass := passesLowIndividualDegreeTest_transportSuccessor hpass successor
+      MainFormalSuccessorSelfImprovementBridgeInputs
+        successor.pred transportedStrategy eps transportedPass k
+        (mainFormalSuccessorAxisWeightedBound_ofPass
+          successor.pred transportedStrategy eps transportedPass)
+        (mainFormalSuccessorDiagonalWeightedBound_ofPass
+          successor.pred transportedStrategy eps transportedPass)) :
+    MainFormalRolePackageBranchResidual params strategy eps hpass k :=
+  .successor
+    (MainFormalRolePackageSuccessorResidual.ofSuccessorBridgeInputs
+      hpass hm_ne_one hd hk_pos hrec hbridge)
+
+/-- Direct role-package residual corollary for the successor branch.
+
+Given recursive slices, self-improvement bridge inputs, and the public large-`k`
+side condition, this produces the isolated Section 6 role residual consumed by
+the downstream `mainFormal` cascade. -/
+theorem rolePackageResidual_ofSuccessorBridgeInputs
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hm_ne_one : params.m ≠ 1)
+    (hd : 0 < params.d)
+    (hk_pos : 1 ≤ k)
+    (hk_large : 400 * params.m * params.d ≤ k)
+    (hrec :
+      let successor := Parameters.successorDecompositionOfNeOne params hm_ne_one
+      letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
+      let transportedStrategy := projStratTransportSuccessor strategy successor
+      let transportedPass := passesLowIndividualDegreeTest_transportSuccessor hpass successor
+      MainFormalSuccessorRecursiveSlices successor.pred transportedStrategy eps transportedPass k
+        (mainFormalSuccessorAxisWeightedBound_ofPass
+          successor.pred transportedStrategy eps transportedPass)
+        (mainFormalSuccessorDiagonalWeightedBound_ofPass
+          successor.pred transportedStrategy eps transportedPass))
+    (hbridge :
+      let successor := Parameters.successorDecompositionOfNeOne params hm_ne_one
+      letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
+      let transportedStrategy := projStratTransportSuccessor strategy successor
+      let transportedPass := passesLowIndividualDegreeTest_transportSuccessor hpass successor
+      MainFormalSuccessorSelfImprovementBridgeInputs
+        successor.pred transportedStrategy eps transportedPass k
+        (mainFormalSuccessorAxisWeightedBound_ofPass
+          successor.pred transportedStrategy eps transportedPass)
+        (mainFormalSuccessorDiagonalWeightedBound_ofPass
+          successor.pred transportedStrategy eps transportedPass)) :
+    Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) :=
+  (successorOfBridgeInputs hpass hm_ne_one hd hk_pos hrec hbridge).toRolePackageResidual
+    hk_large
 
 end MainFormalRolePackageBranchResidual
 
