@@ -4949,7 +4949,7 @@ theorem mainFormal
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι)
     (eps : Error)
-    (hd : 0 < params.d)
+    (_hd : 0 < params.d)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
     (hk : 400 * params.m * params.d ≤ k)
