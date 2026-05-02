@@ -85,6 +85,19 @@ private lemma ev_opTensor_averageOperatorOverDistribution_left {α : Type*}
   rw [opTensor_smul_left_error]
   exact ev_real_smul ψ (𝒟.weight a) (opTensor (A a) B)
 
+private lemma ev_opTensor_averageOperatorOverDistribution_right {α : Type*}
+    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution α)
+    (A : MIPStarRE.Quantum.Op ι) (B : α → MIPStarRE.Quantum.Op ι) :
+    ev ψ (opTensor A (averageOperatorOverDistribution 𝒟 B)) =
+      avgOver 𝒟 (fun a => ev ψ (opTensor A (B a))) := by
+  unfold averageOperatorOverDistribution avgOver
+  rw [opTensor_sum_right_finset]
+  rw [ev_finset_sum]
+  refine Finset.sum_congr rfl ?_
+  intro a _
+  rw [opTensor_smul_right_error]
+  exact ev_real_smul ψ (𝒟.weight a) (opTensor A (B a))
+
 private lemma cons_rel_uniform_full_total_match_mass_lower_bound
     {Question Outcome : Type*}
     [Fintype Question] [DecidableEq Question] [Nonempty Question]
@@ -477,6 +490,277 @@ lemma addInURightQuantity_selfConsistencySelection_eq_simplified
   intro u
   rw [addInURightOperatorAtPoint_selfConsistencySelection_proj_eq]
   exact ev_sum strategy.state _
+
+/-! ### Scalar chain for the projection-simplified diagonal add-in-u transfer -/
+
+/-- The expanded left endpoint `Q₀` of the four-step scalar chain in
+`self_improvement.tex`, lines 247--252, after setting `M^u = H^u` and averaging
+the second tensor factor `H = E_v H^v`. -/
+noncomputable def addInUCSChainQ0
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) : Error :=
+  avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+    ∑ h : Polynomial params,
+      ev strategy.state
+        (opTensor ((sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h)
+          ((sandwichedPolynomialSubMeasAt params strategy T uv.2).outcome h)))
+
+/-- The scalar `Q₁` obtained from `Q₀` by moving the right point projection
+`A^v_{h(v)}` to the left tensor factor; this is the target of
+`eq:move-one`. -/
+noncomputable def addInUCSChainQ1
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) : Error :=
+  avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+    ∑ h : Polynomial params,
+      let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+      ev strategy.state
+        (opTensor (Av * (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h)
+          (T.outcome h * Av)))
+
+/-- The scalar `Q₂` obtained from `Q₁` by moving the second right point
+projection to the left tensor factor; this is the target of `eq:move-another`. -/
+noncomputable def addInUCSChainQ2
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) : Error :=
+  avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+    ∑ h : Polynomial params,
+      let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+      ev strategy.state
+        (opTensor (Av * (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h *
+            Av)
+          (T.outcome h)))
+
+/-- The scalar `Q₃` obtained from `Q₂` by replacing the first point projection
+`A^v_{h(v)}` by `A^u_{h(u)}`; this is the target of `eq:change-one`. -/
+noncomputable def addInUCSChainQ3
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) : Error :=
+  avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+    ∑ h : Polynomial params,
+      let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1
+      let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+      ev strategy.state
+        (opTensor (Au * (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h *
+            Av)
+          (T.outcome h)))
+
+/-- The scalar `Q₄` obtained from `Q₃` by replacing the second point projection
+`A^v_{h(v)}` by `A^u_{h(u)}`; after the projection collapse, this is the
+projection-simplified right endpoint of the diagonal add-in-u transfer. -/
+noncomputable def addInUCSChainQ4
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) : Error :=
+  avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+    ∑ h : Polynomial params,
+      let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1
+      ev strategy.state
+        (opTensor (Au * (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h *
+            Au)
+          (T.outcome h)))
+
+/-- The expanded chain endpoint `Q₀` is the existing diagonal match-mass left
+side used by `selfConsistencyDiagonalAddInU_of_simplifiedTransfer`. -/
+lemma add_in_u_cs_chain_q0_eq_match_mass
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    qBipartiteMatchMass strategy.state
+        (averagedSandwichedPolynomialSubMeas params strategy T)
+        (averagedSandwichedPolynomialSubMeas params strategy T) =
+      addInUCSChainQ0 params strategy T := by
+  classical
+  calc
+    qBipartiteMatchMass strategy.state
+        (averagedSandwichedPolynomialSubMeas params strategy T)
+        (averagedSandwichedPolynomialSubMeas params strategy T)
+        =
+      ∑ h : Polynomial params,
+        avgOver (uniformDistribution (Point params)) (fun u =>
+          avgOver (uniformDistribution (Point params)) (fun v =>
+            ev strategy.state
+              (opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
+                ((sandwichedPolynomialSubMeasAt params strategy T v).outcome h)))) := by
+        unfold qBipartiteMatchMass averagedSandwichedPolynomialSubMeas
+        refine Finset.sum_congr rfl ?_
+        intro h _
+        rw [ev_opTensor_averageOperatorOverDistribution_left]
+        refine avgOver_congr _ _ _ ?_
+        intro u
+        simpa [sandwichedPolynomialSubMeasAt] using
+          ev_opTensor_averageOperatorOverDistribution_right strategy.state
+            (uniformDistribution (Point params))
+            ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
+            (fun v => (sandwichedPolynomialSubMeasAt params strategy T v).outcome h)
+    _ = addInUCSChainQ0 params strategy T := by
+        symm
+        unfold addInUCSChainQ0
+        rw [avgOver_uniform_prod (α := Point params) (β := Point params)
+          (f := fun u v =>
+            ∑ h : Polynomial params,
+              ev strategy.state
+                (opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
+                  ((sandwichedPolynomialSubMeasAt params strategy T v).outcome h)))]
+        calc
+          avgOver (uniformDistribution (Point params)) (fun u =>
+              avgOver (uniformDistribution (Point params)) (fun v =>
+                ∑ h : Polynomial params,
+                  ev strategy.state
+                    (opTensor
+                      ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
+                      ((sandwichedPolynomialSubMeasAt params strategy T v).outcome h))))
+              =
+            avgOver (uniformDistribution (Point params)) (fun u =>
+              ∑ h : Polynomial params,
+                avgOver (uniformDistribution (Point params)) (fun v =>
+                  ev strategy.state
+                    (opTensor
+                      ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
+                      ((sandwichedPolynomialSubMeasAt params strategy T v).outcome h)))) := by
+              refine avgOver_congr _ _ _ ?_
+              intro u
+              rw [avgOver_sum]
+          _ =
+            ∑ h : Polynomial params,
+              avgOver (uniformDistribution (Point params)) (fun u =>
+                avgOver (uniformDistribution (Point params)) (fun v =>
+                  ev strategy.state
+                    (opTensor
+                      ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
+                      ((sandwichedPolynomialSubMeasAt params strategy T v).outcome h)))) := by
+              rw [avgOver_sum]
+
+/-- The raw chain endpoint `Q₄` collapses to the projection-simplified scalar
+right side used by `selfConsistencyDiagonalAddInU_of_simplifiedTransfer`. -/
+lemma add_in_u_cs_chain_q4_eq_simplified_rhs
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    addInUCSChainQ4 params strategy T =
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ev strategy.state
+            (opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
+              (T.outcome h))) := by
+  classical
+  calc
+    addInUCSChainQ4 params strategy T =
+      avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+        ∑ h : Polynomial params,
+          ev strategy.state
+            (opTensor ((sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h)
+              (T.outcome h))) := by
+        unfold addInUCSChainQ4
+        refine avgOver_congr _ _ _ ?_
+        intro uv
+        refine Finset.sum_congr rfl ?_
+        intro h _
+        have hproj :
+            pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1 *
+              pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1 =
+            pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1 := by
+          simpa [pointConditionedOutcomeOperatorAtPolynomial] using
+            (strategy.pointMeasurement uv.1).proj (h uv.1)
+        have hcollapse :
+            pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1 *
+                (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h *
+                pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1 =
+              (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h := by
+          change
+            pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1 *
+                (pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1 *
+                  T.outcome h *
+                  pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1) *
+                pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1 =
+              pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1 *
+                T.outcome h *
+                pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1
+          exact proj_outer_sandwich_eq _ _ hproj
+        simp [hcollapse]
+    _ =
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ev strategy.state
+            (opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
+              (T.outcome h))) := by
+        exact avgOver_uniform_fst (α := Point params) (β := Point params)
+          (fun u =>
+            ∑ h : Polynomial params,
+              ev strategy.state
+                (opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
+                  (T.outcome h)))
+
+/-- Assemble the projection-simplified scalar transfer from the four scalar
+chain moves. The analytic work remains exactly the four bounds
+`Q₀ ≈ Q₁`, `Q₁ ≈ Q₂`, `Q₂ ≈ Q₃`, and `Q₃ ≈ Q₄`, plus the final arithmetic
+absorption into `addInUError`. -/
+lemma add_in_u_simplified_transfer_of_cs_chain
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (T : SubMeas (Polynomial params) ι)
+    (η01 η12 η23 η34 : Error)
+    (h01 :
+      |addInUCSChainQ0 params strategy T - addInUCSChainQ1 params strategy T| ≤ η01)
+    (h12 :
+      |addInUCSChainQ1 params strategy T - addInUCSChainQ2 params strategy T| ≤ η12)
+    (h23 :
+      |addInUCSChainQ2 params strategy T - addInUCSChainQ3 params strategy T| ≤ η23)
+    (h34 :
+      |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T| ≤ η34)
+    (hsum : η01 + η12 + η23 + η34 ≤ addInUError params eps delta) :
+    |qBipartiteMatchMass strategy.state
+        (averagedSandwichedPolynomialSubMeas params strategy T)
+        (averagedSandwichedPolynomialSubMeas params strategy T) -
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ev strategy.state
+            (opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
+              (T.outcome h)))| ≤ addInUError params eps delta := by
+  let Q0 := addInUCSChainQ0 params strategy T
+  let Q1 := addInUCSChainQ1 params strategy T
+  let Q2 := addInUCSChainQ2 params strategy T
+  let Q3 := addInUCSChainQ3 params strategy T
+  let Q4 := addInUCSChainQ4 params strategy T
+  have htriangle :
+      |Q0 - Q4| ≤ |Q0 - Q1| + |Q1 - Q2| + |Q2 - Q3| + |Q3 - Q4| := by
+    calc
+      |Q0 - Q4| = |(Q0 - Q1) + (Q1 - Q2) + (Q2 - Q3) + (Q3 - Q4)| := by
+        ring_nf
+      _ ≤ |Q0 - Q1| + |Q1 - Q2| + |Q2 - Q3| + |Q3 - Q4| := by
+        have h1 := abs_add_le ((Q0 - Q1) + (Q1 - Q2) + (Q2 - Q3)) (Q3 - Q4)
+        have h2 := abs_add_le ((Q0 - Q1) + (Q1 - Q2)) (Q2 - Q3)
+        have h3 := abs_add_le (Q0 - Q1) (Q1 - Q2)
+        nlinarith
+  have h01' : |Q0 - Q1| ≤ η01 := by
+    simpa [Q0, Q1] using h01
+  have h12' : |Q1 - Q2| ≤ η12 := by
+    simpa [Q1, Q2] using h12
+  have h23' : |Q2 - Q3| ≤ η23 := by
+    simpa [Q2, Q3] using h23
+  have h34' : |Q3 - Q4| ≤ η34 := by
+    simpa [Q3, Q4] using h34
+  calc
+    |qBipartiteMatchMass strategy.state
+        (averagedSandwichedPolynomialSubMeas params strategy T)
+        (averagedSandwichedPolynomialSubMeas params strategy T) -
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ev strategy.state
+            (opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
+              (T.outcome h)))|
+        = |Q0 - Q4| := by
+          rw [add_in_u_cs_chain_q0_eq_match_mass,
+            ← add_in_u_cs_chain_q4_eq_simplified_rhs]
+    _ ≤ |Q0 - Q1| + |Q1 - Q2| + |Q2 - Q3| + |Q3 - Q4| := htriangle
+    _ ≤ η01 + η12 + η23 + η34 := by
+      nlinarith
+    _ ≤ addInUError params eps delta := hsum
 
 /-- Specialization of `selfConsistencyDiagonalAddInU_of_transfer` to the
 projection-simplified scalar transfer hypothesis.
