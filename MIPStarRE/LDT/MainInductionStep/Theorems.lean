@@ -401,6 +401,52 @@ theorem SelfImprovementPackage.SliceBridgeInputs.good_of_restrictedGood
       simp [state_eq x, pointMeasurement_eq x, diagonalMeasurement_eq x]
     simpa [hfail] using hgood.diagonalLineTest
 
+/-- Build `SliceBridgeInputs` from honest slice strategies, measurement
+transport, and Section 9 bridge inputs.
+
+This constructor fills both structural fields that are forced by the restricted
+slice interface: `averagedPoint_eq` follows from point-measurement transport and
+`good` follows from the restricted failure profile plus state/axis/diagonal
+measurement transport.  The only remaining non-structural inputs are the honest
+slice strategies themselves and their Section 9 bridge packages. -/
+noncomputable def SelfImprovementPackage.SliceBridgeInputs.ofMeasurementEq
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma)
+    (inductionPkg : PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k)
+    (sliceStrategy : Fq params → SymStrat params ι)
+    (state_eq : ∀ x, (sliceStrategy x).state = strategy.state)
+    (pointMeasurement_eq :
+      ∀ x,
+        (sliceStrategy x).pointMeasurement =
+          (xRestrictedStrategy params strategy x).pointMeasurement)
+    (axisParallelMeasurement_eq :
+      ∀ x,
+        (sliceStrategy x).axisParallelMeasurement.toIdxProjMeas =
+          (xRestrictedStrategy params strategy x).axisParallelMeasurement.toIdxProjMeas)
+    (diagonalMeasurement_eq :
+      ∀ x,
+        (sliceStrategy x).diagonalMeasurement.toIdxProjMeas =
+          (xRestrictedStrategy params strategy x).diagonalMeasurement)
+    (bridgeInputs :
+      ∀ x,
+        SelfImprovement.SelfImprovementBridgeInputs params (sliceStrategy x)
+          (restrictionPkg.profile.axisParallel x)
+          (restrictionPkg.profile.selfConsistency x)
+          (inductionPkg.sliceError x)) :
+    SelfImprovementPackage.SliceBridgeInputs params strategy eps delta gamma k
+      restrictionPkg inductionPkg :=
+  SelfImprovementPackage.SliceBridgeInputs.ofPointMeasurementEq
+    params strategy eps delta gamma k restrictionPkg inductionPkg sliceStrategy state_eq
+    pointMeasurement_eq
+    (SelfImprovementPackage.SliceBridgeInputs.good_of_restrictedGood
+      params strategy eps delta gamma restrictionPkg sliceStrategy state_eq
+      pointMeasurement_eq axisParallelMeasurement_eq diagonalMeasurement_eq)
+    bridgeInputs
+
 /-- Convert honest per-slice Section 9 bridge inputs into the Section 6
 self-improvement package.
 
