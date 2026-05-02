@@ -929,6 +929,54 @@ def MainFormalSuccessorAnswerSelfImprovementProducer (params : Parameters)
       strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
       hrestrict hinduction
 
+/-- Answer-valued successor-case bridge inputs for the restricted-strategy
+self-improvement producer.
+
+This is the answer-register counterpart of
+`MainFormalSuccessorSelfImprovementBridgeInputs`: for each possible answer-side
+per-slice induction package, callers supply the narrow
+`AnswerSelfImprovementPackage.SliceBridgeInputs` assumptions. -/
+def MainFormalSuccessorAnswerSelfImprovementBridgeInputs (params : Parameters)
+    [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (haxisWeightedBound : MainFormalSuccessorAnswerAxisWeightedBound params strategy eps)
+    (hdiagonalWeightedBound :
+      MainFormalSuccessorAnswerDiagonalWeightedBound params strategy eps) : Type _ :=
+  let hrestrict :=
+    mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
+      haxisWeightedBound hdiagonalWeightedBound
+  ∀ hinduction :
+    MainInductionStep.AnswerPerSliceInductionPackage params
+      strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) hrestrict k,
+    MainInductionStep.AnswerSelfImprovementPackage.SliceBridgeInputs params
+      strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
+      hrestrict hinduction
+
+/-- Convert answer-valued successor-case bridge inputs into the self-improvement
+producer expected by the public answer-valued Section 6 boundary wrapper. -/
+noncomputable def mainFormalSuccessorAnswerSelfImprovementProducer_ofBridgeInputs
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (haxisWeightedBound : MainFormalSuccessorAnswerAxisWeightedBound params strategy eps)
+    (hdiagonalWeightedBound :
+      MainFormalSuccessorAnswerDiagonalWeightedBound params strategy eps)
+    (hbridge :
+      MainFormalSuccessorAnswerSelfImprovementBridgeInputs params strategy eps hpass k
+        haxisWeightedBound hdiagonalWeightedBound) :
+    MainFormalSuccessorAnswerSelfImprovementProducer params strategy eps hpass k
+      haxisWeightedBound hdiagonalWeightedBound := by
+  let hrestrict :=
+    mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
+      haxisWeightedBound hdiagonalWeightedBound
+  intro hinduction
+  exact
+    MainInductionStep.AnswerSelfImprovementPackage.ofSliceBridgeInputs params
+      strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
+      hrestrict hinduction (hbridge hinduction)
+
 /-- Answer-valued successor-case Section 6 boundary inputs for `mainFormal`. -/
 structure MainFormalSuccessorAnswerBoundary (params : Parameters)
     [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
