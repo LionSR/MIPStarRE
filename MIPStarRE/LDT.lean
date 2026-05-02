@@ -51,6 +51,7 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.QCompleteness
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.AlmostProjective
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities
+import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation
 import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkCore
 import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkOneMeas
 import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkFull
