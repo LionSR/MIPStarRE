@@ -509,6 +509,7 @@ structure MainFormalSuccessorRecursiveSliceData (params : Parameters)
   unsymmetrization component (Step 3 of `mainFormal`) and are external
   hypotheses for a downstream recursive call. -/
   slicePasses : ∀ x, (sliceStrategy x).PassesLowIndividualDegreeTest (3 * eps)
+
 /-- Convert per-slice induction-hypothesis data into a
 `MainFormalSuccessorRecursiveSlices` witness.
 
