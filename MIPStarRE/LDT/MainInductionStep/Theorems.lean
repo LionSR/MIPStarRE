@@ -2763,7 +2763,18 @@ noncomputable def AnswerPerSliceInductionPackage.ofRecursion
       error_le := fun x => (hslice x).2 }
 
 /-- View an answer-valued per-slice induction package as a legacy package after
-forgetting the answer-valued restriction boundary. -/
+forgetting the answer-valued restriction boundary.
+
+**Status:** currently unused (no callers).  The inverse direction
+`AnswerPerSliceInductionPackage.ofLegacy` and the combined
+`SelfImprovementPackage.ofAnswerForLegacy` are the live conversions used by the
+answer-valued self-improvement route.  This direction is retained for future
+callers that need to recover an ordinary `PerSliceInductionPackage` from an
+answer-valued one.
+
+**Route note:** the answer-valued route (using `xRestrictedAnswerSymStrat`) is
+the preferred paper-faithful route; see the section comment in
+`MIPStarRE.LDT.Test.MainTheorem` for context. -/
 noncomputable def PerSliceInductionPackage.ofAnswer
     (params : Parameters)
     [FieldModel params.q]
