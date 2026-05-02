@@ -159,6 +159,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
     \E_{u} \sum_{a \neq b} \bra{\psi} A^{u}_a \ot H_{[h(u) = b]} \ket{\psi} \leq 4 \sqrt{\zeta_{\mathrm{variance}}}.
   \end{equation}
   Since
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_point_consistency_error_le_selfImprovementHelperError}
   \[
     4\sqrt{\zeta_{\mathrm{variance}}}
     = 4 \sqrt{24 m \cdot\Big(\eps + \delta + \frac{md}{q}\Big)}
@@ -254,6 +255,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
       - \frac{md}{q}.
   \]
   The paper's arithmetic shows that the right-hand error is at most
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_error_le_selfImprovementHelperError}
   \[
     57m\cdot \Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big)
     \le \zeta,
@@ -272,6 +274,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
     \le \bra{\psi} Z \ot I \ket{\psi} - \sum_h \bra{\psi} I \ot H_h \ket{\psi} + 4 \sqrt{\zeta_{\mathrm{variance}}}.
   \]
   By~\eqref{eq:gonna-use-this-later-H-versus-Z}, the right-hand side is at most $3\sqrt{\delta}+4\sqrt{\zeta_{\mathrm{variance}}}$. Substituting the definition of $\zeta_{\mathrm{variance}}$ and collecting terms gives
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_boundedness_error_le_selfImprovementHelperError}
   \[
     23m\cdot\Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big)
     \le \zeta.
@@ -633,6 +636,8 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
     \widehat{\zeta} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}},
   \]
   respectively. The paper's exponent bookkeeping then shows
+  \lean{MIPStarRE.LDT.SelfImprovement.thirty_selfImprovementHelperError_le_selfImprovementError}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperError_le_selfImprovementError}
   \[
     \widehat{\zeta}_{\mathrm{ortho}}
     \leq 400 m \cdot \Big(\eps^{1/8} + \delta^{1/8} + (d/q)^{1/8}\Big),
