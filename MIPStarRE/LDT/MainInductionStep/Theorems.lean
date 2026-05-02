@@ -629,6 +629,118 @@ noncomputable def AnswerSelfImprovementPackage.SliceBridgeInputs.ofPointMeasurem
   good := good
   bridgeInputs := bridgeInputs
 
+/-- Transport answer-restricted goodness to an honest slice strategy once the
+state and verifier-visible measurements agree with `xRestrictedAnswerSymStrat`.
+
+The diagonal compatibility is stated only after postprocessing both diagonal
+answer alphabets to their `zeroCoord` value; this is the comparison used by the
+LDT diagonal subtest and avoids claiming a false equality between
+`DiagonalLinePolynomial` and `DiagonalLineAnswer` families. -/
+theorem AnswerSelfImprovementPackage.SliceBridgeInputs.good_of_answerRestrictedGood
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (restrictionPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma)
+    (sliceStrategy : Fq params → SymStrat params ι)
+    (state_eq : ∀ x, (sliceStrategy x).state = strategy.state)
+    (pointMeasurement_eq :
+      ∀ x,
+        (sliceStrategy x).pointMeasurement =
+          (xRestrictedAnswerSymStrat params strategy x).pointMeasurement)
+    (axisParallelMeasurement_eq :
+      ∀ x,
+        (sliceStrategy x).axisParallelMeasurement.toIdxProjMeas =
+          (xRestrictedAnswerSymStrat params strategy x).axisParallelMeasurement.toIdxProjMeas)
+    (diagonalZeroCoord_eq :
+      ∀ x ℓ,
+        postprocess
+            (((sliceStrategy x).diagonalMeasurement.toIdxProjMeas ℓ).toSubMeas)
+            (fun f : DiagonalLinePolynomial params => f zeroCoord) =
+          postprocess
+            (((xRestrictedAnswerSymStrat params strategy x).diagonalMeasurement.toIdxProjMeas ℓ).toSubMeas)
+            (fun f : DiagonalLineAnswer params => f zeroCoord)) :
+    ∀ x,
+      (sliceStrategy x).IsGood
+        (restrictionPkg.profile.axisParallel x)
+        (restrictionPkg.profile.selfConsistency x)
+        (restrictionPkg.profile.diagonal x) := by
+  intro x
+  have hgood := restrictionPkg.profile.restrictedGood x
+  refine ⟨?_, ?_, ?_⟩
+  · have hfail : (sliceStrategy x).axisParallelFailureProbability =
+        (xRestrictedAnswerSymStrat params strategy x).axisParallelFailureProbability := by
+      unfold SymStrat.axisParallelFailureProbability
+        AnswerSymStrat.axisParallelFailureProbability
+        axisParallelPointAnswerFamily AnswerSymStrat.axisParallelPointAnswerFamily
+        axisParallelLineAnswerFamily AnswerSymStrat.axisParallelLineAnswerFamily
+      simp [state_eq x, pointMeasurement_eq x, axisParallelMeasurement_eq x]
+    simpa [hfail] using hgood.axisParallelTest
+  · have hfail : (sliceStrategy x).selfConsistencyFailureProbability =
+        (xRestrictedAnswerSymStrat params strategy x).selfConsistencyFailureProbability := by
+      unfold SymStrat.selfConsistencyFailureProbability
+        AnswerSymStrat.selfConsistencyFailureProbability
+      simp [state_eq x, pointMeasurement_eq x]
+    simpa [hfail] using hgood.selfConsistencyTest
+  · have hfail : (sliceStrategy x).diagonalFailureProbability =
+        (xRestrictedAnswerSymStrat params strategy x).diagonalFailureProbability := by
+      unfold SymStrat.diagonalFailureProbability
+        AnswerSymStrat.diagonalFailureProbability
+        diagonalPointAnswerFamily AnswerSymStrat.diagonalPointAnswerFamily
+        diagonalLineAnswerFamily AnswerSymStrat.diagonalLineAnswerFamily
+      simp [state_eq x, pointMeasurement_eq x, diagonalZeroCoord_eq x]
+    simpa [hfail] using hgood.diagonalLineTest
+
+/-- Build answer-valued `SliceBridgeInputs` from honest slice strategies,
+verifier-visible measurement transport, and Section 9 bridge inputs.
+
+This constructor fills both structural fields forced by the answer-restricted
+interface: averaged point compatibility follows from point-measurement transport,
+and goodness follows from the answer-restricted failure profile plus state,
+axis-parallel, and diagonal zero-coordinate transport. -/
+noncomputable def AnswerSelfImprovementPackage.SliceBridgeInputs.ofAnswerMeasurementEq
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma)
+    (inductionPkg :
+      AnswerPerSliceInductionPackage params strategy eps delta gamma restrictionPkg k)
+    (sliceStrategy : Fq params → SymStrat params ι)
+    (state_eq : ∀ x, (sliceStrategy x).state = strategy.state)
+    (pointMeasurement_eq :
+      ∀ x,
+        (sliceStrategy x).pointMeasurement =
+          (xRestrictedAnswerSymStrat params strategy x).pointMeasurement)
+    (axisParallelMeasurement_eq :
+      ∀ x,
+        (sliceStrategy x).axisParallelMeasurement.toIdxProjMeas =
+          (xRestrictedAnswerSymStrat params strategy x).axisParallelMeasurement.toIdxProjMeas)
+    (diagonalZeroCoord_eq :
+      ∀ x ℓ,
+        postprocess
+            (((sliceStrategy x).diagonalMeasurement.toIdxProjMeas ℓ).toSubMeas)
+            (fun f : DiagonalLinePolynomial params => f zeroCoord) =
+          postprocess
+            (((xRestrictedAnswerSymStrat params strategy x).diagonalMeasurement.toIdxProjMeas ℓ).toSubMeas)
+            (fun f : DiagonalLineAnswer params => f zeroCoord))
+    (bridgeInputs :
+      ∀ x,
+        SelfImprovement.SelfImprovementBridgeInputs params (sliceStrategy x)
+          (restrictionPkg.profile.axisParallel x)
+          (restrictionPkg.profile.selfConsistency x)
+          (inductionPkg.sliceError x)) :
+    AnswerSelfImprovementPackage.SliceBridgeInputs params strategy eps delta gamma k
+      restrictionPkg inductionPkg :=
+  AnswerSelfImprovementPackage.SliceBridgeInputs.ofPointMeasurementEq
+    params strategy eps delta gamma k restrictionPkg inductionPkg sliceStrategy state_eq
+    pointMeasurement_eq
+    (AnswerSelfImprovementPackage.SliceBridgeInputs.good_of_answerRestrictedGood
+      params strategy eps delta gamma restrictionPkg sliceStrategy state_eq
+      pointMeasurement_eq axisParallelMeasurement_eq diagonalZeroCoord_eq)
+    bridgeInputs
+
 /-- Package the slice-wise outputs feeding the answer-valued restricted-strategy
 self-improvement stage into the bookkeeping object expected by answer-valued
 Section 6 assembly. -/
