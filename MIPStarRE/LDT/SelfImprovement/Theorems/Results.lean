@@ -99,6 +99,18 @@ private lemma ev_opTensor_averageOperatorOverDistribution_right {α : Type*}
   rw [opTensor_smul_right_error]
   exact ev_real_smul ψ (𝒟.weight a) (opTensor A (B a))
 
+private lemma ev_averageOperatorOverDistribution {α κ : Type*}
+    [Fintype κ] [DecidableEq κ]
+    (ψ : QuantumState κ) (𝒟 : Distribution α)
+    (A : α → MIPStarRE.Quantum.Op κ) :
+    ev ψ (averageOperatorOverDistribution 𝒟 A) =
+      avgOver 𝒟 (fun a => ev ψ (A a)) := by
+  unfold averageOperatorOverDistribution avgOver
+  rw [ev_finset_sum]
+  refine Finset.sum_congr rfl ?_
+  intro a _
+  exact ev_real_smul ψ (𝒟.weight a) (A a)
+
 private lemma cons_rel_uniform_full_total_match_mass_lower_bound
     {Question Outcome : Type*}
     [Fintype Question] [DecidableEq Question] [Nonempty Question]
@@ -818,6 +830,93 @@ lemma selfConsistencyDiagonalAddInU_of_simplifiedTransfer
         params strategy T)
   rw [hRHS_eq]
   exact htransfer
+
+/-! ## Final-fields projective-residual boundedness transport (issue #931)
+
+The boundedness paragraph of `thm:self-improvement` first compares the
+projective residual against the point-agreement average and then replaces the
+projective family `H` by the helper family `Hhat` through the data-processing
+SDD bound. The lemma below isolates the second step: it transports the scalar
+helper boundedness gap across
+`selfConsistencyImpliesDataProcessing`.
+
+This is not a raw residual assumption and does not restate `FinalFieldsInput`;
+it is the checked `easy-approx-from-approx-delta` part of
+`references/ldt-paper/self_improvement.tex` lines 747--755, mirrored in
+`blueprint/src/chapter/ch07_self_improvement.tex` lines 609--618. -/
+
+private lemma helper_agreement_average_ev_eq_avg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (H : SubMeas (Polynomial params) ι) :
+    ev strategy.state (helperAgreementAverageOperator params strategy H) =
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ a : Fq params,
+          ev strategy.state
+            (opTensor ((strategy.pointMeasurement u).outcome a)
+              ((evaluateAt params u H).outcome a))) := by
+  rw [helperAgreementAverageOperator, ev_averageOperatorOverDistribution]
+  refine avgOver_congr (uniformDistribution (Point params)) _ _ ?_
+  intro u
+  simp [helperAgreementOperatorAtPoint, ev_sum]
+
+/-- Transport the helper boundedness gap through the data-processing
+approximation between `Hhat` and `H`.
+
+The input `hdata` is exactly the data-processing SDD bound already produced
+inside `selfImprovement`. The conclusion says that replacing the helper
+polynomial family in the point-agreement average by the projective family costs
+at most `sqrt ε`, matching Proposition `easy-approx-from-approx-delta` in the
+boundedness paragraph of the paper. -/
+theorem helper_boundedness_gap_transport_through_data_processing
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (Hhat : SubMeas (Polynomial params) ι)
+    (H : ProjSubMeas (Polynomial params) ι)
+    (Z : MIPStarRE.Quantum.Op ι)
+    (ε : Error)
+    (hdata :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftLeft)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+        ε) :
+    helperBoundednessGap params strategy H.toSubMeas Z ≤
+      helperBoundednessGap params strategy Hhat Z + Real.sqrt ε := by
+  have hdata_right :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftRight)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftRight)
+        ε := by
+    simpa [IdxSubMeas.liftLeft, IdxSubMeas.liftRight]
+      using
+        sddRel_liftRight_of_liftLeft_permInv
+          strategy.permInvState (uniformDistribution (Point params))
+          (polynomialEvaluationFamily params Hhat)
+          (polynomialEvaluationFamily params H.toSubMeas) ε hdata
+  have happrox :=
+    Preliminaries.easyApproxFromApproxDelta
+      strategy.state strategy.isNormalized
+      (uniformDistribution (Point params))
+      (uniformDistribution_weight_sum_le_one (Point params))
+      ((polynomialEvaluationFamily params Hhat).liftRight)
+      ((polynomialEvaluationFamily params H.toSubMeas).liftRight)
+      (IdxSubMeas.liftLeft (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
+      ε hdata_right
+  have hscalar :
+      |ev strategy.state (helperAgreementAverageOperator params strategy Hhat) -
+        ev strategy.state (helperAgreementAverageOperator params strategy H.toSubMeas)| ≤
+        Real.sqrt ε := by
+    rw [helper_agreement_average_ev_eq_avg params strategy Hhat,
+      helper_agreement_average_ev_eq_avg params strategy H.toSubMeas]
+    simpa [polynomialEvaluationFamily, evaluateAt, IdxSubMeas.liftRight,
+      IdxSubMeas.liftLeft, IdxProjMeas.toIdxSubMeas,
+      rightTensor_mul_leftTensor_eq_opTensor] using happrox
+  unfold helperBoundednessGap helperBoundednessOperator
+  rw [ev_sub, ev_sub]
+  have hle := le_abs_self
+    (ev strategy.state (helperAgreementAverageOperator params strategy Hhat) -
+      ev strategy.state (helperAgreementAverageOperator params strategy H.toSubMeas))
+  linarith
 
 /-- Reduced version of `lem:self-improvement-helper`.
 
