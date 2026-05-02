@@ -404,6 +404,22 @@ lemma pProjectivity {Outcome : Type*}
   · intro a
     rfl
 
+/-- The canonical projective submeasurement obtained from the Q/X/XHat/P
+layer. Its outcomes are the paper's operators `P_a`. -/
+noncomputable def qxpProjSubMeas {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) :
+    ProjSubMeas Outcome ι :=
+  Classical.choose (pProjectivity data)
+
+@[simp] lemma qxpProjSubMeas_outcome {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) (a : Outcome) :
+    (qxpProjSubMeas data).outcome a = Pa data a :=
+  Classical.choose_spec (pProjectivity data) a
+
 /-- Rectangular sandwiching is monotone in the middle operator. -/
 private lemma rectangular_sandwich_mono {α β : Type*}
     [Fintype α] [Finite β]

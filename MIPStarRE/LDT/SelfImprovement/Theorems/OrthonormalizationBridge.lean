@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation
+import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities
 
 /-!
 # Section 9 — `OrthonormalizationInput` producer bridge
@@ -34,6 +35,8 @@ extra assumption.
 * `OrthonormalizationSpectralProducer` — the spectral slice of
   `SelfImprovement.OrthonormalizationInput`, isolated.
 * `OrthonormalizationRepairProducer` — the locality-preserving repair slice.
+* `LeftLiftedQXPLayerRepairWitness` — a stronger QXP-layer repair witness
+  whose rounded family is canonically `ProjSubMeas.liftLeft P`.
 * `orthonormalizationInput_of_producers` — combines the two slices into the
   full `SelfImprovement.OrthonormalizationInput`.
 * `orthonormalizationSpectralProducer_of_roundingWitnesses` — narrows the
@@ -44,6 +47,8 @@ extra assumption.
   the same slice to the named QXP-layer statement
   `projectiveNonMeasurement`, i.e. the Lean form of
   `lem:projective-non-measurement`.
+* `orthonormalizationInput_of_roundingAndQXPLayerRepair` — combines the
+  rounding-witness spectral route with the QXP-layer local repair route.
 
 ## References
 
@@ -115,6 +120,77 @@ abbrev OrthonormalizationRepairProducer
       (optionCompletion Hhat)
       (consistencyToAlmostProjectiveError
         (2 * selfImprovementHelperError params eps delta))
+
+/-! ### QXP-layer locality-preserving repair witnesses -/
+
+/-- A stronger repair witness for a left-lifted measurement, carried by a
+paper-style Q/X/XHat/P layer.
+
+The data field records the local QXP layer.  The rounded family is not an
+arbitrary projective family on the bipartite space: it is the left lift of
+`qxpProjSubMeas data` for some local QXP layer, whose outcomes are the paper
+operators `P_a = XHat† T_a XHat`. -/
+structure LeftLiftedQXPLayerRepairWitness {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState (ι × ι)) (A : Measurement Outcome ι) (ζ : Error) where
+  /-- The local Q/X/XHat/P layer from which the repaired family is extracted. -/
+  data : QXPLayerData Outcome ι
+  /-- The rounded-projective closeness bound for the canonical local QXP
+  projectivization after lifting it to the left tensor factor. -/
+  closeness :
+    SDDRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily (leftLiftedMeasurement (ιB := ι) A).toSubMeas)
+      (constSubMeasFamily
+        (ProjSubMeas.liftLeft (qxpProjSubMeas data)).toSubMeas)
+      (roundingToProjectiveError ζ)
+
+/-- A QXP-layer witness producer implies the existing left-lifted repair input.
+
+This is the locality-preserving bridge needed by the orthonormalization slice:
+once the QXP construction supplies its canonical local projective
+submeasurement and the lifted closeness estimate, the existential in
+`LeftLiftedProjectivizationRepairInput` is discharged by choosing exactly that
+local submeasurement. -/
+noncomputable def leftLiftedProjectivizationRepairInput_of_qxpLayer
+    {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    {ψ : QuantumState (ι × ι)} {A : Measurement Outcome ι} {ζ : Error}
+    (hwitness :
+      SpectralTruncationStatement ψ (leftLiftedMeasurement (ιB := ι) A) ζ →
+        LeftLiftedQXPLayerRepairWitness ψ A ζ) :
+    LeftLiftedProjectivizationRepairInput ψ A ζ :=
+  fun hSpectral =>
+    let W := hwitness hSpectral
+    ⟨qxpProjSubMeas W.data, ⟨W.closeness⟩⟩
+
+/-- SelfImprovement-level producer of QXP-layer repair witnesses for each
+helper submeasurement. -/
+abbrev OrthonormalizationQXPLayerRepairProducer
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι) (eps delta : Error) :=
+  ∀ {Hhat : SubMeas (Polynomial params) ι},
+    BipartiteSSCRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily Hhat)
+      (selfImprovementHelperError params eps delta) →
+    SpectralTruncationStatement strategy.state
+      (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
+      (consistencyToAlmostProjectiveError
+        (2 * selfImprovementHelperError params eps delta)) →
+    LeftLiftedQXPLayerRepairWitness strategy.state (optionCompletion Hhat)
+      (consistencyToAlmostProjectiveError
+        (2 * selfImprovementHelperError params eps delta))
+
+/-- Convert the QXP-layer locality witness producer into the repair slice of
+`SelfImprovement.OrthonormalizationInput`. -/
+noncomputable def orthonormalizationRepairProducer_of_qxpLayer
+    {params : Parameters} [FieldModel params.q]
+    {strategy : SymStrat params ι} {eps delta : Error}
+    (hqxp : OrthonormalizationQXPLayerRepairProducer params strategy eps delta) :
+    OrthonormalizationRepairProducer params strategy eps delta :=
+  fun hssc =>
+    leftLiftedProjectivizationRepairInput_of_qxpLayer (hqxp hssc)
 
 /-! ### Combining slice producers -/
 
@@ -196,5 +272,33 @@ noncomputable def orthonormalizationSpectralProducer_of_projectiveNonMeasurement
       (consistencyToAlmostProjectiveError
         (2 * selfImprovementHelperError params eps delta))
       (hprojective hssc)
+
+/-- Build `SelfImprovement.OrthonormalizationInput` from the two constructive
+Section 5 witness producers exposed by the current bridge:
+
+* per-helper rounding witnesses, which supply the spectral-truncation slice;
+* per-helper QXP-layer repair witnesses, whose canonical projective family is
+  a left lift of a local `ProjSubMeas`.
+
+The remaining mathematical content is exactly the construction of those two
+witness producers; this theorem only composes the already-formalized
+conversions. -/
+noncomputable def orthonormalizationInput_of_roundingAndQXPLayerRepair
+    {params : Parameters} [FieldModel params.q]
+    {strategy : SymStrat params ι} {eps delta : Error}
+    (hround : ∀ {Hhat : SubMeas (Polynomial params) ι},
+      BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily Hhat)
+        (selfImprovementHelperError params eps delta) →
+      Σ' R : OpFamily (Option (Polynomial params)) (ι × ι),
+        RoundingToProjectorsWitness strategy.state
+          (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
+          (consistencyToAlmostProjectiveError
+            (2 * selfImprovementHelperError params eps delta)) R)
+    (hqxp : OrthonormalizationQXPLayerRepairProducer params strategy eps delta) :
+    OrthonormalizationInput params strategy eps delta :=
+  orthonormalizationInput_of_producers
+    (orthonormalizationSpectralProducer_of_roundingWitnesses hround)
+    (orthonormalizationRepairProducer_of_qxpLayer hqxp)
 
 end MIPStarRE.LDT.SelfImprovement
