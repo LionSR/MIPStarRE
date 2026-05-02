@@ -4492,6 +4492,49 @@ theorem baseStep6WitnessResidual
       bridge.leftSelfConsistency bridge.rightSelfConsistency
       bridge.leftMatchMassPreservation bridge.rightMatchMassPreservation
 
+
+/-- Named type for the base-case Step 6 bridge hypotheses consumed by `mainFormal`.
+
+When `params.m = 1`, the Step 6 witness residual can be constructed from the
+six analytic hypotheses packaged by `MainFormalStep6Hypotheses`.  This type
+alias gives that bridge a stable, searchable name, matching the pattern of
+`MainFormalSuccessorSelfImprovementBridgeInputs` on the successor side.
+
+Refs #1043, #1009, #422. -/
+def MainFormalBaseBridgeHypotheses
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) : Type _ :=
+  (scalars : MainFormalCascadeScalars params eps k) →
+  ∀ (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k),
+  MainFormalStep6Hypotheses params strategy eps k hpass scalars roleResidual
+
+/-- Base-case specialization of `baseStep6WitnessResidual` that explicitly
+records the `params.m = 1` hypothesis alongside the bridge.
+
+This theorem is definitionally the same as calling `baseStep6WitnessResidual`
+with the bridge applied to `scalars` and `roleResidual`; it exists to document
+the base-case proof obligation and to serve as a future landing point for
+m=1-specific simplifications (e.g. trivial distinguished outcomes or
+single-element POVM orthonormalization).
+
+Refs #1043. -/
+theorem baseStep6WitnessResidual_ofBaseBridge
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
+    (hm1 : params.m = 1)
+    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
+    (bridge : MainFormalBaseBridgeHypotheses params strategy eps k hpass) :
+    Nonempty (MainFormalCascadeRolePackageResidualStep6WitnessResidual
+      params strategy eps hpass k scalars) := by
+  exact baseStep6WitnessResidual hsmall roleResidual (bridge scalars roleResidual)
+
+
 /--
 `thm:main-formal` from `test_definition.tex`.
 
@@ -4542,9 +4585,7 @@ theorem mainFormal
     (k : ℕ)
     (hk : 400 * params.m * params.d ≤ k)
     (hk0 : 0 < k)
-    (hbaseBridge : (scalars : MainFormalCascadeScalars params eps k) →
-      ∀ (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k),
-      MainFormalStep6Hypotheses params strategy eps k hpass scalars roleResidual) :
+    (hbaseBridge : MainFormalBaseBridgeHypotheses params strategy eps k hpass) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
