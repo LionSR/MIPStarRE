@@ -681,13 +681,19 @@ def MainFormalSuccessorAnswerRecursiveSlices (params : Parameters)
 This is the answer-register counterpart of
 `MainFormalSuccessorRecursiveSliceData`.  For each field element `x`, it
 packages a same-space projective strategy on the role-register space together
-with compatibility proofs connecting its Alice measurement to the
-answer-restricted strategy.
+with compatibility proofs connecting its Alice point and line measurements to
+the answer-restricted strategy.  The diagonal-line measurements have different
+answer alphabets on the two sides, so this package records the common
+zero-coordinate readout rather than a false equality between the full
+measurement families.
 
 When supplied together with a recursive induction hypothesis (see
 `mainFormalSuccessorAnswerRecursiveSlices_ofSliceData`), this data can close the
 `MainFormalSuccessorAnswerRecursiveSlices` requirement needed by
-`MainFormalSuccessorAnswerBoundary`. -/
+`MainFormalSuccessorAnswerBoundary`.  The proof currently consumes only the
+state and point-measurement fields; the axis and diagonal compatibility fields
+are carried so a later wiring of the recursive `mainFormal` call can make
+`slicePasses` depend on the actual restricted answer slice. -/
 structure MainFormalSuccessorAnswerRecursiveSliceData (params : Parameters)
     [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -698,20 +704,39 @@ structure MainFormalSuccessorAnswerRecursiveSliceData (params : Parameters)
   /-- The slice strategy shares the symmetrization's bipartite state. -/
   sliceState_eq : ∀ x, (sliceStrategy x).state = (strategy.strategySymmetrization).state
   /-- The slice strategy's Alice point measurement matches the answer-restricted
-  point measurement from the main induction step.  (The Bob measurement is
-  not needed for `MainFormalSuccessorAnswerRecursiveSlices`.) -/
+  point measurement from the main induction step. -/
   slicePoint_eq : ∀ x,
     (sliceStrategy x).pointMeasurementA =
     (MainInductionStep.xRestrictedAnswerSymStrat params
       strategy.strategySymmetrization x).pointMeasurement
+  /-- The slice strategy's Alice axis-parallel measurement has the same
+  underlying indexed projective measurements as the answer-restricted slice. -/
+  sliceAxisParallelA_eq : ∀ x,
+    (sliceStrategy x).axisParallelMeasurementA.toIdxProjMeas =
+    (MainInductionStep.xRestrictedAnswerSymStrat params
+      strategy.strategySymmetrization x).axisParallelMeasurement.toIdxProjMeas
+  /-- The slice strategy's Alice diagonal measurement agrees with the
+  answer-restricted slice after both line-answer alphabets are evaluated at the
+  base point.  The full diagonal families have different answer types
+  (`DiagonalLinePolynomial` versus `DiagonalLineAnswer`), so the common
+  zero-coordinate readout is the compatible comparison available here. -/
+  sliceDiagonalA_zeroCoord_eq : ∀ x ℓ,
+    postprocess
+        (((sliceStrategy x).diagonalMeasurementA.toIdxProjMeas ℓ).toSubMeas)
+        (fun f : DiagonalLinePolynomial params => f zeroCoord) =
+      postprocess
+        (((MainInductionStep.xRestrictedAnswerSymStrat params
+          strategy.strategySymmetrization x).diagonalMeasurement.toIdxProjMeas ℓ).toSubMeas)
+        (fun f : DiagonalLineAnswer params => f zeroCoord)
   /-- Each slice strategy passes LDT with the common symmetrized error `3 * eps`.
 
-  Note: this structure constrains only `state` and `pointMeasurementA` of
-  `sliceStrategy x` (Bob's measurement, axis-parallel/diagonal data, and the
-  symmetry witnesses are unconstrained).  A downstream wiring of this bridge
-  into the live `mainFormal` `sorry` will need additional compatibility
-  fields before `slicePasses` becomes load-bearing for a recursive
-  `mainFormal` call. -/
+  This remains an externally supplied passing hypothesis.  The fields above now
+  constrain the shared state, Alice point measurements, Alice axis-parallel
+  measurements, and the common diagonal zero-coordinate readout.  They do not
+  transport the same-space strategy's `permInvState` or `densityFixed` proofs,
+  and they do not constrain Bob-side measurements because
+  `xRestrictedAnswerSymStrat` exposes only the symmetric one-register
+  measurement families. -/
   slicePasses : ∀ x, (sliceStrategy x).PassesLowIndividualDegreeTest (3 * eps)
 
 /-- Convert per-slice answer-register induction-hypothesis data into a
@@ -723,6 +748,12 @@ hypothesis that delivers `mainInductionError`-bounded polynomial measurements
 for each slice strategy, this rewrites the state and point-measurement
 compatibilities to produce the exact `MainFormalSuccessorAnswerRecursiveSlices`
 field needed by `MainFormalSuccessorAnswerBoundary`.
+
+The additional axis-parallel and diagonal readout compatibility fields in
+`MainFormalSuccessorAnswerRecursiveSliceData` are not needed for this
+point-consistency target yet; they are retained by the data package so the later
+recursive-call wiring can require `slicePasses` for slices whose Alice-side line
+measurements are pinned to the answer restriction.
 
 The induction hypothesis `hrecSlice` mirrors what the answer-valued
 `mainInductionPublicWrapper` (or, equivalently, a recursive call to
