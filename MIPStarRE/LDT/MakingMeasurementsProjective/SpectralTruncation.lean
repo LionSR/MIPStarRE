@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.Core
+import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction
 
 /-!
 # Section 5 — Spectral truncation statement conversion
@@ -16,6 +16,9 @@ the paper's bound at `references/ldt-paper/orthonormalization.tex:417`.
 
 - `spectralTruncationStatement_of_witness` — field-for-field conversion
   from `RoundingToProjectorsWitness` to `SpectralTruncationStatement`
+- `spectralTruncationInput_of_projectiveNonMeasurement` — noncomputable
+  conversion from the named paper witness `projectiveNonMeasurement` to the
+  `SpectralTruncationInput` interface consumed by orthonormalization
 
 ## References
 
@@ -55,5 +58,32 @@ noncomputable def spectralTruncationStatement_of_witness {Outcome : Type uOutcom
     SpectralTruncationStatement ψ A ζ :=
   ⟨R, hwitness.projective, hwitness.closeness, hwitness.sum_eq_total,
     hwitness.total_le⟩
+
+/-! ### Spectral input from the named paper witness -/
+
+/-- Build `SpectralTruncationInput` from the named
+`lem:projective-non-measurement` witness.
+
+The paper's spectral truncation step is represented in the QXP layer by
+`projectiveNonMeasurement`, which is a proposition asserting the existence of a
+rounded projective family with the same bounds as `SpectralTruncationStatement`.
+The `SpectralTruncationInput` interface is data-valued, so this conversion uses
+choice to extract the rounded family and then applies
+`spectralTruncationStatement_of_witness`.
+
+This does not prove `lem:projective-non-measurement`; it moves the remaining
+constructive obligation to that named paper statement instead of the raw
+`SpectralTruncationInput` shape. -/
+noncomputable def spectralTruncationInput_of_projectiveNonMeasurement
+    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error)
+    (hprojective : projectiveNonMeasurement ψ A ζ) :
+    SpectralTruncationInput ψ A ζ :=
+  fun _hψ _halmostProjective =>
+    let R : OpFamily Outcome ι := Classical.choose hprojective
+    let hR : RoundingToProjectorsWitness ψ A ζ R :=
+      Classical.choose_spec hprojective
+    spectralTruncationStatement_of_witness ψ A ζ R hR
 
 end MIPStarRE.LDT.MakingMeasurementsProjective
