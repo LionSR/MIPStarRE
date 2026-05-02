@@ -566,6 +566,48 @@ noncomputable def mainFormalSuccessorBoundary_ofBridgeInputs
       mainFormalSuccessorSelfImprovementProducer_ofBridgeInputs params strategy eps hpass k
         axisBound diagonalBound hbridge }
 
+/-- Build the successor boundary from an explicit predecessor induction
+hypothesis and the Section 9 bridge inputs.
+
+The predecessor hypothesis is stated at the exact Section 6 strength consumed by
+`MainFormalSuccessorRecursiveSlices`: for each restricted slice it supplies a
+polynomial measurement bounded by the restricted-profile
+`mainInductionError`. This wrapper is non-recursive; it only transports those
+slice witnesses across `MainFormalSuccessorRecursiveSliceData` and then reuses
+`mainFormalSuccessorBoundary_ofBridgeInputs`. -/
+noncomputable def mainFormalSuccessorBoundary_ofPredecessorInduction
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (sliceData : MainFormalSuccessorRecursiveSliceData params strategy eps hpass)
+    (hpredecessor : ∀ (x : Fq params),
+      ∃ error : Error, ∃ G : Measurement (Polynomial params) (Role × ι),
+        ConsRel (sliceData.sliceStrategy x).state
+          (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas (sliceData.sliceStrategy x).pointMeasurementA)
+          (polynomialEvaluationFamily params G.toSubMeas)
+          error ∧
+        error ≤
+          let hrestrict :=
+            mainFormalSuccessorRestrictionPackage params strategy eps hpass
+              (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
+              (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass)
+          MainInductionStep.mainInductionError params k
+            (hrestrict.profile.axisParallel x)
+            (hrestrict.profile.selfConsistency x)
+            (hrestrict.profile.diagonal x))
+    (hbridge : MainFormalSuccessorSelfImprovementBridgeInputs params strategy eps hpass k
+      (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
+      (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass)) :
+    MainFormalSuccessorBoundary params strategy eps hpass k :=
+  mainFormalSuccessorBoundary_ofBridgeInputs params strategy eps hpass k
+    (mainFormalSuccessorRecursiveSlices_ofSliceData params strategy eps hpass k
+      (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
+      (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass)
+      sliceData hpredecessor)
+    hbridge
+
 /-- Successor-case Section 6 handoff for `mainFormal`.
 
 This is the actual invocation of
@@ -841,6 +883,46 @@ def mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement
     diagonalWeightedBound := diagonalBound
     recursiveSlices := hrec
     selfImprovementProducer := hself }
+
+/-- Build the answer-valued successor boundary from an explicit predecessor
+induction hypothesis and an answer-valued self-improvement producer.
+
+This is the answer-register counterpart of
+`mainFormalSuccessorBoundary_ofPredecessorInduction`. The predecessor hypothesis
+is already at restricted-profile `mainInductionError` strength; the wrapper only
+performs the recorded answer-slice transports and packages the boundary. -/
+noncomputable def mainFormalSuccessorAnswerBoundary_ofPredecessorInduction
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (sliceData : MainFormalSuccessorAnswerRecursiveSliceData params strategy eps hpass)
+    (hpredecessor : ∀ (x : Fq params),
+      ∃ error : Error, ∃ G : Measurement (Polynomial params) (Role × ι),
+        ConsRel (sliceData.sliceStrategy x).state
+          (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas (sliceData.sliceStrategy x).pointMeasurementA)
+          (polynomialEvaluationFamily params G.toSubMeas)
+          error ∧
+        error ≤
+          let hrestrict :=
+            mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
+              (mainFormalSuccessorAnswerAxisWeightedBound_ofPass params strategy eps hpass)
+              (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass params strategy eps hpass)
+          MainInductionStep.mainInductionError params k
+            (hrestrict.profile.axisParallel x)
+            (hrestrict.profile.selfConsistency x)
+            (hrestrict.profile.diagonal x))
+    (hself : MainFormalSuccessorAnswerSelfImprovementProducer params strategy eps hpass k
+      (mainFormalSuccessorAnswerAxisWeightedBound_ofPass params strategy eps hpass)
+      (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass params strategy eps hpass)) :
+    MainFormalSuccessorAnswerBoundary params strategy eps hpass k :=
+  mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement params strategy eps hpass k
+    (mainFormalSuccessorAnswerRecursiveSlices_ofSliceData params strategy eps hpass k
+      (mainFormalSuccessorAnswerAxisWeightedBound_ofPass params strategy eps hpass)
+      (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass params strategy eps hpass)
+      sliceData hpredecessor)
+    hself
 
 /-- Answer-valued successor-case Section 6 handoff for `mainFormal`. -/
 theorem mainFormalSuccessorAnswerMainInductionPublicWrapper
