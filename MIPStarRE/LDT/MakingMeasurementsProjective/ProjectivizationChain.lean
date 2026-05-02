@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.Tactic.LdtSimp
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
+import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities
 import MIPStarRE.LDT.Preliminaries.Completion
 import MIPStarRE.LDT.Preliminaries.CompletionTransfer
 import MIPStarRE.LDT.Preliminaries.DistanceBounds
@@ -527,6 +528,83 @@ theorem of_outcome_le {Outcome : Type*} {ι : Type*}
   unfold qBipartiteMatchMass
   exact Finset.sum_le_sum fun a _ =>
     ev_mono ψ _ _ <| opTensor_mono_left (hpoint a) (B.toSubMeas.outcome_pos a)
+
+/-- Outcomewise expectation-level preservation for the orthonormalization step.
+
+This is weaker than a pointwise operator inequality `G.outcome a ≤ P.outcome a`:
+it asks only for the diagonal contribution tested against the fixed partner
+measurement `B` and the ambient state `ψ`.  It supplies the exact match-mass
+preservation that generic state-dependent-distance closeness alone does not
+yield for the paper's line-169 `ζ₁` route, avoiding the `sqrt ζ₂` loss from
+`triangleSub`. -/
+structure OutcomeExpectationPreservation
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι))
+    (G : Measurement Outcome ι) (P : ProjSubMeas Outcome ι)
+    (B : Measurement Outcome ι) : Prop where
+  /-- Each diagonal outcome contribution is preserved after replacing `G` by
+  the projective submeasurement `P`. -/
+  outcomeExpectation :
+    ∀ a : Outcome,
+      ev ψ (opTensor (G.outcome a) (B.outcome a)) ≤
+        ev ψ (opTensor (P.outcome a) (B.outcome a))
+
+/-- Summing the outcomewise expectation-level preservation inequalities gives
+the primitive match-mass preservation input consumed by the line-169 interface.
+
+This theorem is intentionally state- and partner-dependent.  It does not assert
+that orthonormalization is monotone in the operator order; rather, it isolates
+the exact non-degenerate expectation-level property that a concrete
+orthonormalization repair must supply to avoid the generic `triangleSub` loss. -/
+theorem of_outcome_expectation
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    {ψ : QuantumState (ι × ι)}
+    {G : Measurement Outcome ι} {P : ProjSubMeas Outcome ι}
+    {B : Measurement Outcome ι}
+    (hpreserve : OutcomeExpectationPreservation ψ G P B) :
+    OrthonormalizationMatchMassPreservation ψ G P B := by
+  refine ⟨?_⟩
+  unfold qBipartiteMatchMass
+  exact Finset.sum_le_sum fun a _ => hpreserve.outcomeExpectation a
+
+/-- The non-degenerate match-mass property needed from a concrete QXP repair.
+
+For a local QXP layer with canonical projective family
+`P_a = XHat† * T_a * XHat`, this asks that replacing the source measurement
+`G_a` by `P_a` does not reduce the diagonal expectation against the fixed
+partner measurement `B_a`, outcome by outcome.  This is an expectation-level
+property of the state and partner measurement; it is weaker than pointwise
+operator domination and is not implied by the existing SDD-closeness fields. -/
+structure QXPLayerOutcomeExpectationPreservation
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι))
+    (G B : Measurement Outcome ι) (data : QXPLayerData Outcome ι) : Prop where
+  /-- Outcome-level match-mass contribution preserved by the QXP family `P`. -/
+  outcomeExpectation :
+    ∀ a : Outcome,
+      ev ψ (opTensor (G.outcome a) (B.outcome a)) ≤
+        ev ψ (opTensor (Pa data a) (B.outcome a))
+
+/-- A QXP-layer outcome-expectation preservation witness supplies the
+orthonormalization match-mass input for the canonical `qxpProjSubMeas`.
+
+This is the current narrowed non-degenerate target for the exact line-169 route:
+constructing `data` and proving the per-outcome expectation inequalities for
+its paper projectors `P_a = XHat† T_a XHat` is sufficient to produce the
+`OrthonormalizationMatchMassPreservation` consumed by the Step-6 completion
+interface. -/
+theorem of_qxp_outcome_expectation
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    {ψ : QuantumState (ι × ι)} {G B : Measurement Outcome ι}
+    {data : QXPLayerData Outcome ι}
+    (hpreserve : QXPLayerOutcomeExpectationPreservation ψ G B data) :
+    OrthonormalizationMatchMassPreservation ψ G (qxpProjSubMeas data) B := by
+  exact of_outcome_expectation
+    ⟨fun a => by simpa [qxpProjSubMeas_outcome] using hpreserve.outcomeExpectation a⟩
 
 end OrthonormalizationMatchMassPreservation
 
