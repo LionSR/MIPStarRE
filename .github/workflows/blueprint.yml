@@ -21,6 +21,7 @@ permissions:
 jobs:
   blueprint:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     name: Build and deploy blueprint
     steps:
       - name: Checkout project
@@ -30,6 +31,8 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: .github/workflows/blueprint-requirements.txt
 
       - name: Install system dependencies
         run: |
