@@ -109,8 +109,6 @@ theorem sqrt_selfImprovementVarianceError_le
         (Real.sqrt eps + Real.sqrt delta +
           Real.sqrt ((params.d : Error) / (params.q : Error))) := by
   have hmpos : (0 : Error) ≤ (params.m : Error) := m_cast_nonneg params
-  have hqpos : (0 : Error) < (params.q : Error) := params.q_cast_pos
-  have hqne : (params.q : Error) ≠ 0 := ne_of_gt hqpos
   have hdq_nonneg : (0 : Error) ≤ ((params.d : Error) / (params.q : Error)) :=
     d_q_ratio_nonneg params
   -- `selfImprovementVarianceError = 24 * m * (eps + delta + m * (d / q))`
@@ -119,7 +117,7 @@ theorem sqrt_selfImprovementVarianceError_le
         24 * (params.m : Error) *
           (eps + delta +
             ((params.m : Error) * ((params.d : Error) / (params.q : Error)))) := by
-    show 24 * (params.m : Error) *
+    change 24 * (params.m : Error) *
           (eps + delta + ((params.m : Error) * (params.d : Error) / (params.q : Error))) =
         24 * (params.m : Error) *
           (eps + delta + ((params.m : Error) * ((params.d : Error) / (params.q : Error))))
@@ -207,7 +205,7 @@ private theorem sum_sqrt_eq_sum_rpow_half
     Real.sqrt eps + Real.sqrt delta + Real.sqrt dq =
       Real.rpow eps (1 / (2 : Error)) + Real.rpow delta (1 / (2 : Error)) +
         Real.rpow dq (1 / (2 : Error)) := by
-  rw [Real.sqrt_eq_rpow eps, Real.sqrt_eq_rpow delta, Real.sqrt_eq_rpow dq]
+  simp [Real.sqrt_eq_rpow, Real.rpow_eq_pow]
 
 private theorem selfImprovementHelperError_eq
     (params : Parameters) [FieldModel params.q] (eps delta : Error) :
@@ -215,7 +213,8 @@ private theorem selfImprovementHelperError_eq
       100 * (params.m : Error) *
         (Real.sqrt eps + Real.sqrt delta +
           Real.sqrt ((params.d : Error) / (params.q : Error))) := by
-  rw [sum_sqrt_eq_sum_rpow_half eps delta ((params.d : Error) / (params.q : Error))]
+  rw [selfImprovementHelperError,
+    sum_sqrt_eq_sum_rpow_half eps delta ((params.d : Error) / (params.q : Error))]
 
 /-- Helper-stage point-consistency absorption (`self_improvement.tex`,
 lines 438--443).
@@ -266,7 +265,6 @@ theorem helper_strong_self_consistency_error_le_selfImprovementHelperError
   have hmnonneg : (0 : Error) ≤ (params.m : Error) := m_cast_nonneg params
   have hm1 : (1 : Error) ≤ (params.m : Error) := one_le_m_cast params
   have hqpos : (0 : Error) < (params.q : Error) := params.q_cast_pos
-  have hqne : (params.q : Error) ≠ 0 := ne_of_gt hqpos
   have hdq_nonneg : (0 : Error) ≤ ((params.d : Error) / (params.q : Error)) :=
     d_q_ratio_nonneg params
   have hdq_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1 :=
@@ -514,7 +512,7 @@ theorem thirty_selfImprovementHelperError_le_selfImprovementError
       hdelta hdelta_le_one hdq_le_one
   have h3000m_nn : (0 : Error) ≤ 3000 * (params.m : Error) := by positivity
   -- Both sides expand to `3000 m * sum_p` for matching exponents `p`.
-  show 30 *
+  change 30 *
       (100 * (params.m : Error) *
         (Real.rpow eps (1 / (2 : Error)) +
           Real.rpow delta (1 / (2 : Error)) +
@@ -566,8 +564,8 @@ theorem selfImprovementHelperError_le_selfImprovementError
       have h1 := Real.rpow_nonneg heps (1 / (2 : Error))
       have h2 := Real.rpow_nonneg hdelta (1 / (2 : Error))
       have h3 := Real.rpow_nonneg hdq_nn (1 / (2 : Error))
-      linarith
-    show (0 : Error) ≤ 100 * (params.m : Error) *
+      simpa [Real.rpow_eq_pow] using add_nonneg (add_nonneg h1 h2) h3
+    change (0 : Error) ≤ 100 * (params.m : Error) *
         (Real.rpow eps (1 / (2 : Error)) +
           Real.rpow delta (1 / (2 : Error)) +
           Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2 : Error)))
