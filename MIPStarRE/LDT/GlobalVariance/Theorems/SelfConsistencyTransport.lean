@@ -202,6 +202,49 @@ private lemma rightPolynomialWeightSqrt_contraction
             polynomialWeightSqrtOperator_mul_self (params := params) G g]
     _ ≤ 1 := rightTensor_le_one (ι₁ := ι) (G.outcome_le_one g)
 
+private lemma rightPolynomialWeightSqrt_grouped_contraction
+    (params : Parameters)
+    [FieldModel params.q]
+    (G : SubMeas (Polynomial params) ι)
+    (u : Point params) (a : Fq params) :
+    ∑ g : Polynomial params,
+        (if a = g u then rightTensor (ι₁ := ι) (polynomialWeightSqrtOperator params G g)
+          else 0)ᴴ *
+          (if a = g u then rightTensor (ι₁ := ι) (polynomialWeightSqrtOperator params G g)
+            else 0) ≤ 1 := by
+  classical
+  let fiber : Finset (Polynomial params) := Finset.univ.filter fun g => a = g u
+  have hfiber_le_total :
+      ∑ g ∈ fiber, G.outcome g ≤ G.total := by
+    calc
+      ∑ g ∈ fiber, G.outcome g ≤ ∑ g : Polynomial params, G.outcome g := by
+        exact Finset.sum_le_sum_of_subset_of_nonneg
+          (by
+            intro g hg
+            exact Finset.mem_univ g)
+          (by
+            intro g _ _hg
+            exact G.outcome_pos g)
+      _ = G.total := G.sum_eq_total
+  calc
+    ∑ g : Polynomial params,
+        (if a = g u then rightTensor (ι₁ := ι) (polynomialWeightSqrtOperator params G g)
+          else 0)ᴴ *
+          (if a = g u then rightTensor (ι₁ := ι) (polynomialWeightSqrtOperator params G g)
+            else 0)
+      = ∑ g ∈ fiber, rightTensor (ι₁ := ι) (G.outcome g) := by
+          dsimp [fiber]
+          rw [Finset.sum_filter]
+          refine Finset.sum_congr rfl ?_
+          intro g _
+          by_cases hg : a = g u
+          · simp [hg, polynomialWeightSqrtOperator_conjTranspose,
+              polynomialWeightSqrtOperator_mul_self, rightTensor_mul_rightTensor]
+          · simp [hg]
+    _ = rightTensor (ι₁ := ι) (∑ g ∈ fiber, G.outcome g) := by
+          rw [rightTensor_finset_sum]
+    _ ≤ 1 := rightTensor_le_one (ι₁ := ι) (le_trans hfiber_le_total G.total_le_one)
+
 /-- The first self-consistency move in `lem:local-variance-of-points`, after
 applying `prop:cab-approx-delta` with the multiplier `I ⊗ (G_g)^{1/2}` but
 before pulling the point marginal to the hypercube-edge distribution.
@@ -280,6 +323,150 @@ lemma pointConditionedEventSelfConsistency_weighted_point
     weightedPointConditionedRightOperatorAtPolynomial,
     rightTensor_mul_leftTensor_eq_opTensor, rightTensor_mul_rightTensor] using hcab
 
+/-- Grouped-by-evaluation-value endpoint for the first self-consistency move in
+`lem:local-variance-of-points`.
+
+This is the sum-level analogue of `pointConditionedEventSelfConsistency_weighted_point`.
+It follows the transport at `references/ldt-paper/expansion.tex`, lines
+305--306, but first groups all polynomials with the same value `g(u)`.  The
+multiplier family is `0` away from the fiber `a = g(u)` and is
+`I ⊗ (G_g)^{1/2}` on that fiber, so the `cabApproxDelta` contraction is supplied
+by the submeasurement inequality `∑_{g : g(u)=a} G_g ≤ I`.  Consequently the
+bound is `2δ` for the polynomial sum, with no polynomial-cardinality loss. -/
+lemma pointConditionedEventSelfConsistency_weighted_point_sum
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (G : SubMeas (Polynomial params) ι) :
+    (∑ g : Polynomial params,
+      avgOver (uniformDistribution (Point params))
+        (fun u =>
+          let D := weightedPointConditionedOperatorAtPolynomial params strategy G g u -
+            weightedPointConditionedRightOperatorAtPolynomial params strategy G g u
+          ev strategy.state (Dᴴ * D))) ≤
+      2 * delta := by
+  classical
+  let pointMeas : IdxSubMeas (Point params) (Fq params) ι :=
+    fun u => (strategy.pointMeasurement u).toSubMeas
+  let C : Point params → Fq params → Polynomial params → MIPStarRE.Quantum.Op (ι × ι) :=
+    fun u a g =>
+      if a = g u then rightTensor (ι₁ := ι) (polynomialWeightSqrtOperator params G g)
+      else 0
+  have hbase :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        (IdxSubMeas.liftLeft pointMeas)
+        (IdxSubMeas.liftRight pointMeas)
+        (2 * delta) := by
+    have hssc :
+        BipartiteSSCRel strategy.state (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta := by
+      refine ⟨?_⟩
+      simpa [SymStrat.selfConsistencyFailureProbability] using
+        hgood.selfConsistencyTest
+    simpa [pointMeas] using
+      twoNotionsOfSelfConsistency strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta
+        ⟨strategy.permInvState, hssc⟩
+  have hbaseBound :
+      avgOver (uniformDistribution (Point params))
+        (fun u =>
+          qSDDCore strategy.state
+            (fun a : Fq params => ((IdxSubMeas.liftLeft pointMeas) u).outcome a)
+            (fun a : Fq params => ((IdxSubMeas.liftRight pointMeas) u).outcome a)) ≤
+        2 * delta := by
+    simpa [sddError, qSDD, pointMeas] using hbase.squaredDistanceBound
+  have hC :
+      ∀ u a, ∑ g : Polynomial params, (C u a g)ᴴ * C u a g ≤ 1 := by
+    intro u a
+    simpa [C] using rightPolynomialWeightSqrt_grouped_contraction params G u a
+  have hcab :=
+    cabApproxDelta strategy.state (uniformDistribution (Point params))
+      (fun u a => ((IdxSubMeas.liftLeft pointMeas) u).outcome a)
+      (fun u a => ((IdxSubMeas.liftRight pointMeas) u).outcome a)
+      C (2 * delta) hbaseBound hC
+  calc
+    (∑ g : Polynomial params,
+      avgOver (uniformDistribution (Point params))
+        (fun u =>
+          let D := weightedPointConditionedOperatorAtPolynomial params strategy G g u -
+            weightedPointConditionedRightOperatorAtPolynomial params strategy G g u
+          ev strategy.state (Dᴴ * D)))
+      = avgOver (uniformDistribution (Point params))
+          (fun u =>
+            qSDDCore strategy.state
+              (fun ag : Fq params × Polynomial params =>
+                C u ag.1 ag.2 * ((IdxSubMeas.liftLeft pointMeas) u).outcome ag.1)
+              (fun ag : Fq params × Polynomial params =>
+                C u ag.1 ag.2 * ((IdxSubMeas.liftRight pointMeas) u).outcome ag.1)) := by
+          rw [← avgOver_sum]
+          apply avgOver_congr
+          intro u
+          unfold qSDDCore
+          rw [Fintype.sum_prod_type]
+          rw [Finset.sum_comm]
+          apply Finset.sum_congr rfl
+          intro g _
+          symm
+          let term : Fq params → Error := fun x =>
+            ev strategy.state
+              ((((C u x g * ((IdxSubMeas.liftLeft pointMeas) u).outcome x) -
+                    (C u x g * ((IdxSubMeas.liftRight pointMeas) u).outcome x))ᴴ) *
+                ((C u x g * ((IdxSubMeas.liftLeft pointMeas) u).outcome x) -
+                  (C u x g * ((IdxSubMeas.liftRight pointMeas) u).outcome x)))
+          change (∑ x : Fq params, term x) =
+            ev strategy.state
+              (((weightedPointConditionedOperatorAtPolynomial params strategy G g u -
+                  weightedPointConditionedRightOperatorAtPolynomial params strategy G g u)ᴴ) *
+                (weightedPointConditionedOperatorAtPolynomial params strategy G g u -
+                  weightedPointConditionedRightOperatorAtPolynomial params strategy G g u))
+          calc
+            (∑ x : Fq params, term x) = term (g u) := by
+              refine Finset.sum_eq_single (s := (Finset.univ : Finset (Fq params)))
+                (a := g u) ?_ ?_
+              · intro x _ hx
+                simpa [term, C, hx] using ev_zero strategy.state
+              · intro hmissing
+                exact False.elim (hmissing (Finset.mem_univ (g u)))
+            _ = ev strategy.state
+                (((weightedPointConditionedOperatorAtPolynomial params strategy G g u -
+                    weightedPointConditionedRightOperatorAtPolynomial params strategy G g u)ᴴ) *
+                  (weightedPointConditionedOperatorAtPolynomial params strategy G g u -
+                    weightedPointConditionedRightOperatorAtPolynomial params strategy G g u)) := by
+              let A := pointConditionedOutcomeOperatorAtPolynomial params strategy g u
+              let S := polynomialWeightSqrtOperator params G g
+              have hleft :
+                  rightTensor (ι₁ := ι) S *
+                      ((IdxSubMeas.liftLeft pointMeas) u).outcome (g u) =
+                    weightedPointConditionedOperatorAtPolynomial params strategy G g u := by
+                change rightTensor (ι₁ := ι) S * leftTensor (ι₂ := ι) A = opTensor A S
+                exact rightTensor_mul_leftTensor_eq_opTensor A S
+              have hright :
+                  rightTensor (ι₁ := ι) S *
+                      ((IdxSubMeas.liftRight pointMeas) u).outcome (g u) =
+                    weightedPointConditionedRightOperatorAtPolynomial params strategy G g u := by
+                change rightTensor (ι₁ := ι) S * rightTensor (ι₁ := ι) A =
+                  rightTensor (ι₁ := ι) (S * A)
+                exact rightTensor_mul_rightTensor S A
+              let X := weightedPointConditionedOperatorAtPolynomial params strategy G g u
+              let Y := weightedPointConditionedRightOperatorAtPolynomial params strategy G g u
+              calc
+                term (g u) =
+                    ev strategy.state
+                      (((rightTensor (ι₁ := ι) S *
+                            ((IdxSubMeas.liftLeft pointMeas) u).outcome (g u) -
+                          rightTensor (ι₁ := ι) S *
+                            ((IdxSubMeas.liftRight pointMeas) u).outcome (g u))ᴴ) *
+                        (rightTensor (ι₁ := ι) S *
+                            ((IdxSubMeas.liftLeft pointMeas) u).outcome (g u) -
+                          rightTensor (ι₁ := ι) S *
+                            ((IdxSubMeas.liftRight pointMeas) u).outcome (g u))) := by
+                        simp [term, C, S]
+                _ = ev strategy.state (((X - Y)ᴴ) * (X - Y)) := by
+                    rw [hleft, hright]
+    _ ≤ 2 * delta := hcab
+
 /-- The first weighted self-consistency move on the actual hypercube-edge
 sampling distribution `(u,v) ∼ C`.
 
@@ -318,6 +505,50 @@ lemma pointConditionedEventSelfConsistency_weighted_leftEdge
               ev strategy.state (Dᴴ * D))
     _ ≤ 2 * delta := pointConditionedEventSelfConsistency_weighted_point
       params strategy eps delta gamma hgood G g
+
+/-- Sum-level first self-consistency endpoint on the hypercube-edge sampler.
+
+This is the `u`-endpoint version of `references/ldt-paper/expansion.tex`, lines
+305--306, after grouping polynomials by the common value `g(u)` before applying
+`cabApproxDelta`.  It is the edge-distribution form of
+`pointConditionedEventSelfConsistency_weighted_point_sum`. -/
+lemma pointConditionedEventSelfConsistency_weighted_leftEdge_sum
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (G : SubMeas (Polynomial params) ι) :
+    (∑ g : Polynomial params,
+      avgOver (rerandomizeCoord params)
+        (fun uv =>
+          let D := weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1 -
+            weightedPointConditionedRightOperatorAtPolynomial params strategy G g uv.1
+          ev strategy.state (Dᴴ * D))) ≤
+      2 * delta := by
+  calc
+    (∑ g : Polynomial params,
+      avgOver (rerandomizeCoord params)
+        (fun uv =>
+          let D := weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1 -
+            weightedPointConditionedRightOperatorAtPolynomial params strategy G g uv.1
+          ev strategy.state (Dᴴ * D)))
+      = ∑ g : Polynomial params,
+        avgOver (uniformDistribution (Point params))
+          (fun u =>
+            let D := weightedPointConditionedOperatorAtPolynomial params strategy G g u -
+              weightedPointConditionedRightOperatorAtPolynomial params strategy G g u
+            ev strategy.state (Dᴴ * D)) := by
+          apply Finset.sum_congr rfl
+          intro g _
+          exact avgOver_rerandomizeCoord_fst params
+            (fun u =>
+              let D := weightedPointConditionedOperatorAtPolynomial params strategy G g u -
+                weightedPointConditionedRightOperatorAtPolynomial params strategy G g u
+              ev strategy.state (Dᴴ * D))
+    _ ≤ 2 * delta :=
+        pointConditionedEventSelfConsistency_weighted_point_sum
+          params strategy eps delta gamma hgood G
 
 /-- The final weighted self-consistency move on the target endpoint of the
 hypercube edge distribution.
@@ -368,6 +599,62 @@ lemma pointConditionedEventSelfConsistency_weighted_rightEdge
             (weightedPointConditionedRightOperatorAtPolynomial params strategy G g u)
     _ ≤ 2 * delta := pointConditionedEventSelfConsistency_weighted_point
       params strategy eps delta gamma hgood G g
+
+/-- Sum-level final self-consistency endpoint on the hypercube-edge sampler.
+
+This is the `v`-endpoint version of `references/ldt-paper/expansion.tex`, lines
+310--311.  The second marginal of `rerandomizeCoord` is uniform, and the squared
+difference is unchanged after swapping the two endpoint operators. -/
+lemma pointConditionedEventSelfConsistency_weighted_rightEdge_sum
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (G : SubMeas (Polynomial params) ι) :
+    (∑ g : Polynomial params,
+      avgOver (rerandomizeCoord params)
+        (fun uv =>
+          let D := weightedPointConditionedRightOperatorAtPolynomial params strategy G g uv.2 -
+            weightedPointConditionedOperatorAtPolynomial params strategy G g uv.2
+          ev strategy.state (Dᴴ * D))) ≤
+      2 * delta := by
+  calc
+    (∑ g : Polynomial params,
+      avgOver (rerandomizeCoord params)
+        (fun uv =>
+          let D := weightedPointConditionedRightOperatorAtPolynomial params strategy G g uv.2 -
+            weightedPointConditionedOperatorAtPolynomial params strategy G g uv.2
+          ev strategy.state (Dᴴ * D)))
+      = ∑ g : Polynomial params,
+        avgOver (uniformDistribution (Point params))
+          (fun u =>
+            let D := weightedPointConditionedRightOperatorAtPolynomial params strategy G g u -
+              weightedPointConditionedOperatorAtPolynomial params strategy G g u
+            ev strategy.state (Dᴴ * D)) := by
+          apply Finset.sum_congr rfl
+          intro g _
+          exact avgOver_rerandomizeCoord_snd params
+            (fun u =>
+              let D := weightedPointConditionedRightOperatorAtPolynomial params strategy G g u -
+                weightedPointConditionedOperatorAtPolynomial params strategy G g u
+              ev strategy.state (Dᴴ * D))
+    _ = ∑ g : Polynomial params,
+        avgOver (uniformDistribution (Point params))
+          (fun u =>
+            let D := weightedPointConditionedOperatorAtPolynomial params strategy G g u -
+              weightedPointConditionedRightOperatorAtPolynomial params strategy G g u
+            ev strategy.state (Dᴴ * D)) := by
+          apply Finset.sum_congr rfl
+          intro g _
+          apply avgOver_congr
+          intro u
+          exact ev_adjoint_sub_swap strategy.state
+            (weightedPointConditionedOperatorAtPolynomial params strategy G g u)
+            (weightedPointConditionedRightOperatorAtPolynomial params strategy G g u)
+    _ ≤ 2 * delta :=
+        pointConditionedEventSelfConsistency_weighted_point_sum
+          params strategy eps delta gamma hgood G
 
 /-- The `ε` consistency interface for the point-line event at the base point of
 an axis-parallel test sample.
