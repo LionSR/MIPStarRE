@@ -32,6 +32,7 @@ jobs:
         with:
           python-version: '3.12'
           cache: 'pip'
+          cache-dependency-path: .github/workflows/blueprint-requirements.txt
 
       - name: Install system dependencies
         run: |
