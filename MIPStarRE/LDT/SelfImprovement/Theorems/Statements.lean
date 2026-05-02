@@ -312,32 +312,6 @@ abbrev HelperStrongSelfConsistencyInput (params : Parameters) [FieldModel params
         (constSubMeasFamily Hhat)
         (selfImprovementHelperError params eps delta)
 
-/-- The helper-stage point-consistency input.
-
-Paper anchor: `references/ldt-paper/self_improvement.tex` lines 419--443
-(`item:self-improvement-A-consistency` of `lem:self-improvement-helper`),
-blueprint mirror `blueprint/src/chapter/ch07_self_improvement.tex`
-lines 145--168.
-
-The paper proves this by applying `lem:add-in-u` with selection
-`S_u = { (a, h) : h(u) ≠ a }` and using the projectivity of
-`strategy.pointMeasurement`; the right-hand side of the resulting
-transfer is identically zero by projectivity, and the bound becomes
-`4 · √ζ_variance ≤ selfImprovementHelperError`. The named hypothesis
-isolates this paper estimate so the projective transport in
-`Results.lean` can consume it independently of the unfinished
-`addInU` consistency-with-A application. -/
-abbrev HelperPointConsistencyInput (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι) (eps delta : Error) : Prop :=
-  ∀ {T : Measurement (Polynomial params) ι}
-    {Hhat : SubMeas (Polynomial params) ι}
-    {Z : MIPStarRE.Quantum.Op ι},
-    SelfImprovementHelperConclusion params strategy T Hhat Z eps delta →
-      ConsRel strategy.state (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params Hhat)
-        (selfImprovementHelperError params eps delta)
-
 /-- The final orthonormalization input still required by the reduced theorem
 chain.
 
@@ -392,12 +366,6 @@ structure SelfImprovementBridgeInputs (params : Parameters) [FieldModel params.q
   strongly self-consistent at level `selfImprovementHelperError`. -/
   helperStrongSelfConsistency :
     HelperStrongSelfConsistencyInput params strategy eps delta
-  /-- Helper-stage point consistency: the original point measurement is
-  consistent with the evaluation of the averaged sandwiched
-  sub-measurement `Hhat` at every random point, at the helper-error
-  level. Paper: `self_improvement.tex` lines 419--443. -/
-  helperPointConsistency :
-    HelperPointConsistencyInput params strategy eps delta
   /-- Orthonormalization bridge: the strongly self-consistent `Hhat`
   admits the spectral-truncation and locality-preserving repair witnesses
   required by the orthonormalization theorem. -/
