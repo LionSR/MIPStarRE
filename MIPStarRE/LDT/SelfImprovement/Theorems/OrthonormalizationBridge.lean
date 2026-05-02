@@ -43,8 +43,13 @@ extra assumption.
 
 ## References
 
-* `references/ldt-paper/orthonormalization.tex` lines 555–558, 630–652
-  (`thm:orthonormalization` and the locality-preserving repair stage).
+* `references/ldt-paper/orthonormalization.tex` line 414
+  (`lem:projective-non-measurement`) for the spectral-truncation producer.
+* `references/ldt-paper/orthonormalization.tex` lines 270–310 and line 547
+  (`lem:projective-low-rank-sum`) for the option-completion reduction and
+  rounded sub-measurement repair.
+* `references/ldt-paper/orthonormalization.tex` line 67
+  (`thm:orthonormalization`) for the overall theorem this bridge feeds.
 * `references/ldt-paper/self_improvement.tex` lines 679–697
   (helper output `\widehat{H}` is fed to `thm:orthonormalization`).
 * Issue `#931`, comment by `claude` (2026-05-02): the orthonormalization
@@ -61,6 +66,9 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-! ### Spectral and repair slice producers -/
+
+-- The spectral producer is `Type`-valued because spectral truncation carries
+-- rounded-family data, while the repair producer is proposition-valued.
 
 /-- Producer of the **spectral-truncation** slice of
 `SelfImprovement.OrthonormalizationInput`.
@@ -151,11 +159,12 @@ noncomputable def orthonormalizationSpectralProducer_of_roundingWitnesses
             (2 * selfImprovementHelperError params eps delta)) R) :
     OrthonormalizationSpectralProducer params strategy eps delta :=
   fun {Hhat} hssc =>
+    let ⟨R, hR⟩ := hround hssc
     fun _hψ _halmostProj =>
       spectralTruncationStatement_of_witness strategy.state
         (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
         (consistencyToAlmostProjectiveError
           (2 * selfImprovementHelperError params eps delta))
-        (hround hssc).fst (hround hssc).snd
+        R hR
 
 end MIPStarRE.LDT.SelfImprovement
