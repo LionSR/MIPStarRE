@@ -495,6 +495,28 @@ structure OrthonormalizationMatchMassPreservation
     qBipartiteMatchMass ψ P.toSubMeas B.toSubMeas ≥
       qBipartiteMatchMass ψ G.toSubMeas B.toSubMeas
 
+namespace OrthonormalizationMatchMassPreservation
+
+/-- Pointwise domination of the source measurement by the orthonormalized
+projective submeasurement implies match-mass preservation.
+
+This is the local algebraic interface needed by the paper-tight line-169 route:
+once the concrete orthonormalization construction proves
+`G.outcome a ≤ P.outcome a` for every outcome `a`, the diagonal overlap against
+any fixed partner measurement `B` can only increase. -/
+theorem of_outcome_le {Outcome : Type*} {ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState (ι × ι)} {G : Measurement Outcome ι}
+    {P : ProjSubMeas Outcome ι} {B : Measurement Outcome ι}
+    (hpoint : ∀ a : Outcome, G.outcome a ≤ P.outcome a) :
+    OrthonormalizationMatchMassPreservation ψ G P B := by
+  constructor
+  unfold qBipartiteMatchMass
+  exact Finset.sum_le_sum fun a _ =>
+    ev_mono ψ _ _ <| opTensor_mono_left (hpoint a) (B.toSubMeas.outcome_pos a)
+
+end OrthonormalizationMatchMassPreservation
+
 namespace ProjectivizationMatchMassMonotonicity
 
 /-- Construct `ProjectivizationMatchMassMonotonicity` from match-mass preservation
@@ -532,6 +554,29 @@ theorem of_submeasurement_match_mass_and_completion
         (hQBRight.trans (completeAtOutcomeProj_toMeasurement P_B a_B).symm)
   rw [hQALeftProj, hQBRightProj]
   exact of_completeAtOutcomeProj P_A P_B a_A a_B hleft hright
+
+/-- Construct the line-169 match-mass invariant from pointwise domination of the
+two orthonormalized submeasurements and the canonical completion equalities.
+
+This is a narrowed constructor for future line-130 callers: the completion step
+is handled here by `of_submeasurement_match_mass_and_completion`, while the
+remaining construction-level task is exactly to prove the two pointwise
+domination facts for the concrete orthonormalization repair. -/
+theorem of_completion_and_outcome_le
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    {ψ : QuantumState (ι × ι)} {G_A G_B : Measurement Outcome ι}
+    (P_A P_B : ProjSubMeas Outcome ι) (a_A a_B : Outcome)
+    (Q_A Q_B : ProjMeas Outcome ι)
+    (hQALeft : Q_A.toMeasurement = completeAtOutcome P_A.toSubMeas a_A)
+    (hQBRight : Q_B.toMeasurement = completeAtOutcome P_B.toSubMeas a_B)
+    (hleftPoint : ∀ a : Outcome, G_A.outcome a ≤ P_A.outcome a)
+    (hrightPoint : ∀ a : Outcome, G_B.outcome a ≤ P_B.outcome a) :
+    ProjectivizationMatchMassMonotonicity ψ G_A G_B Q_A Q_B :=
+  of_submeasurement_match_mass_and_completion P_A P_B a_A a_B Q_A Q_B
+    hQALeft hQBRight
+    (OrthonormalizationMatchMassPreservation.of_outcome_le hleftPoint)
+    (OrthonormalizationMatchMassPreservation.of_outcome_le hrightPoint)
 
 end ProjectivizationMatchMassMonotonicity
 
