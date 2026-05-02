@@ -85,6 +85,96 @@ private lemma ev_opTensor_averageOperatorOverDistribution_left {α : Type*}
   rw [opTensor_smul_left_error]
   exact ev_real_smul ψ (𝒟.weight a) (opTensor (A a) B)
 
+private lemma cons_rel_uniform_full_total_match_mass_lower_bound
+    {Question Outcome : Type*}
+    [Fintype Question] [DecidableEq Question] [Nonempty Question]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized)
+    (A B : IdxSubMeas Question Outcome ι)
+    (δ : Error)
+    (hA_total : ∀ q : Question, (A q).total = 1)
+    (hB_total : ∀ q : Question, (B q).total = 1)
+    (hcons : ConsRel ψ (uniformDistribution Question) A B δ) :
+    1 - δ ≤ avgOver (uniformDistribution Question)
+      (fun q => qBipartiteMatchMass ψ (A q) (B q)) := by
+  let 𝒟 := uniformDistribution Question
+  let matchMass : Question → Error := fun q => qBipartiteMatchMass ψ (A q) (B q)
+  have hdefect_point :
+      ∀ q : Question,
+        1 - matchMass q ≤ qBipartiteConsDefect ψ (A q) (B q) := by
+    intro q
+    unfold matchMass qBipartiteConsDefect
+    have htotal :
+        ev ψ (opTensor (A q).total (B q).total) = 1 := by
+      simp [hA_total q, hB_total q, opTensor, ev_one_of_isNormalized ψ hψ]
+    have hle :
+        1 - qBipartiteMatchMass ψ (A q) (B q) ≤
+          max 0 (1 - qBipartiteMatchMass ψ (A q) (B q)) :=
+      le_max_right 0 _
+    simp [htotal, hle]
+  have havg_defect :
+      avgOver 𝒟 (fun q => 1 - matchMass q) ≤ δ := by
+    calc
+      avgOver 𝒟 (fun q => 1 - matchMass q)
+          ≤ avgOver 𝒟 (fun q => qBipartiteConsDefect ψ (A q) (B q)) := by
+            exact avgOver_mono 𝒟 _ _ hdefect_point
+      _ = bipartiteConsError ψ 𝒟 A B := by rfl
+      _ ≤ δ := hcons.offDiagonalBound
+  have hconst : avgOver 𝒟 (fun _ : Question => (1 : Error)) = 1 := by
+    simpa [𝒟] using (avgOver_uniform_const (α := Question) (c := (1 : Error)))
+  have hneg :
+      avgOver 𝒟 (fun q => -matchMass q) =
+        -avgOver 𝒟 matchMass := by
+    simpa [avgOver_const_mul, matchMass] using
+      (avgOver_const_mul 𝒟 (-1) matchMass)
+  have hsplit :
+      avgOver 𝒟 (fun q => 1 - matchMass q) =
+        1 - avgOver 𝒟 matchMass := by
+    calc
+      avgOver 𝒟 (fun q => 1 - matchMass q)
+          = avgOver 𝒟 (fun q => (1 : Error) + (-matchMass q)) := by
+            simp [sub_eq_add_neg]
+      _ = avgOver 𝒟 (fun _ : Question => (1 : Error)) +
+            avgOver 𝒟 (fun q => -matchMass q) := by
+            rw [avgOver_add]
+      _ = 1 - avgOver 𝒟 matchMass := by
+            rw [hconst, hneg]
+            ring
+  rw [hsplit] at havg_defect
+  linarith
+
+/-- The incoming consistency of the original polynomial measurement gives the
+matching-mass lower bound used in the helper-stage completeness proof.
+
+This is the last step of the proof of
+`references/ldt-paper/self_improvement.tex`, lines 407--414: after evaluating
+the original input measurement `G` at a random point, `ConsRel ... nu` says the
+off-diagonal mass is at most `nu`, hence the diagonal matching mass is at least
+`1 - nu`. The blueprint mirror is
+`blueprint/src/chapter/ch07_self_improvement.tex`, lines 137--142. -/
+theorem input_consistency_match_mass_lower_bound
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : Measurement (Polynomial params) ι)
+    (nu : Error)
+    (hcons : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params G.toSubMeas) nu) :
+    1 - nu ≤
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        qBipartiteMatchMass strategy.state
+          ((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u)
+          ((polynomialEvaluationFamily params G.toSubMeas) u)) := by
+  refine cons_rel_uniform_full_total_match_mass_lower_bound
+    strategy.state strategy.isNormalized
+    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+    (polynomialEvaluationFamily params G.toSubMeas) nu ?_ ?_ hcons
+  · intro u
+    exact (strategy.pointMeasurement u).total_eq_one
+  · intro u
+    simpa [polynomialEvaluationFamily, evaluateAt, postprocess_total] using G.total_eq_one
+
 /-- Reduced version of `lem:sdp`.
 
 This reduced wrapper now instantiates the paper's explicit Slater witnesses: the
