@@ -354,6 +354,7 @@ theorem SelfImprovementPackage.SliceBridgeInputs.good_of_restrictedGood
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
     (restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma)
     (sliceStrategy : Fq params → SymStrat params ι)
     (state_eq : ∀ x, (sliceStrategy x).state = strategy.state)
