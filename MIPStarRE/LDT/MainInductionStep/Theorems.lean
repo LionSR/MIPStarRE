@@ -279,6 +279,31 @@ structure SelfImprovementPackage.SliceBridgeInputs
         (restrictionPkg.profile.selfConsistency x)
         (inductionPkg.sliceError x)
 
+/-- The averaged-point transport field of `SliceBridgeInputs` follows from
+point-measurement transport.
+
+This discharges one structural part of the honest-slice upgrade: once an honest
+slice strategy's point measurement is identified with `xRestrictedStrategy`, the
+averaged point operator used by Section 6 is definitionally the slice-average of
+the ambient strategy. -/
+theorem SelfImprovementPackage.averagedPoint_eq_of_pointMeasurement_eq
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (sliceStrategy : Fq params → SymStrat params ι)
+    (hpoint : ∀ x,
+      (sliceStrategy x).pointMeasurement =
+        (xRestrictedStrategy params strategy x).pointMeasurement) :
+    ∀ x h,
+      IdxPolyFamily.averagedPointEvaluationOperator (sliceStrategy x) h =
+        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x h := by
+  intro x h
+  unfold IdxPolyFamily.averagedPointEvaluationOperator
+    IdxPolyFamily.averagedSlicePointEvaluationOperator
+  congr 1
+  funext u
+  simp [hpoint x, xRestrictedStrategy_pointMeasurement_apply]
+
 /-- Convert honest per-slice Section 9 bridge inputs into the Section 6
 self-improvement package.
 
