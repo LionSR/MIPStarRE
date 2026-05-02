@@ -828,8 +828,12 @@ preservation theorem for the repaired submeasurements, not just the generic
 	\end{equation}
 
 	Remark~\ref{rem:main-formal-lean-residual-packages} records the Lean residual
-	packages that separate the scalar cascade and the Step~5 Schwartz--Zippel
-	handoff from the remaining projective-stage transport work.  The scalar side
+	packages that separate the scalar cascade, the Section~6 branch handoff, and
+	the Step~6 analytic bridge from the remaining projective-stage transport work.
+	The current Lean statement of 	exttt{mainFormal} exposes these named inputs
+	explicitly; producing them from the paper hypotheses remains the work tracked
+	by the successor-slice and self-improvement issues, so no 	exttt{\leanok}
+	claim is made for Theorem~\ref{thm:main-formal}.  The scalar side
 	discharges the paper's line~71--73 coarsening and the Step~8 hypotheses in the
 	non-vacuous branch; the Step~5 wrapper now turns the evaluated estimate at
 	line~116 into full-polynomial consistency at $\zeta_1$.  The remaining Lean

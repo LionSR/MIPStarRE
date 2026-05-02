@@ -4605,11 +4605,15 @@ producer:
   current-dimension large-`k` hypothesis and weakens it to the predecessor
   side condition `400 * pred.m * pred.d ≤ k`.
 
-For an arbitrary current parameter bundle, the predecessor decomposition itself is
-now formalized by `Parameters.successorDecompositionOfNeOne`; what remains
-external is producing the successor-boundary data and the later completion /
-line-169 residuals. No checked lemma here claims that the former intermediate
-range `params.m * params.d ≤ k < 400 * params.m * params.d` is vacuous.
+For an arbitrary current parameter bundle, the theorem now takes the
+branch-level Section~6 handoff explicitly as
+`MainFormalRolePackageBranchResidual`.  Its base constructor records the
+checked `m = 1` handoff, while its successor constructor carries the predecessor
+decomposition and successor-boundary data.  What remains external in the Step~6
+bridge is the analytic orthonormalization/completion/match-mass content needed
+to turn the resulting role package into the paper-shaped witness residual.  No
+checked lemma here claims that the former intermediate range
+`params.m * params.d ≤ k < 400 * params.m * params.d` is vacuous.
 
 Universe note: the Lean statement uses `[FieldModel.{0} params.q]`, matching the
 base-universe field-model assumption of the public Section 6 successor wrapper.
@@ -4623,12 +4627,13 @@ theorem mainFormal
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι)
     (eps : Error)
-    (hd : 0 < params.d)
+    (_hd : 0 < params.d)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
     (hk : 400 * params.m * params.d ≤ k)
     (hk0 : 0 < k)
-    (hbaseBridge : (scalars : MainFormalCascadeScalars params eps k) →
+    (hroleBranch : MainFormalRolePackageBranchResidual params strategy eps hpass k)
+    (hstep6Bridge : (scalars : MainFormalCascadeScalars params eps k) →
       ∀ (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k),
       MainFormalStep6Hypotheses params strategy eps k hpass scalars roleResidual) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
@@ -4712,16 +4717,8 @@ theorem mainFormal
         Nonempty (MainFormalCascadeRolePackageResidualStep6WitnessResidual
           (params := params) (strategy := strategy) (eps := eps)
           (hpass := hpass) (k := k) (scalars := scalars)) := by
-      by_cases hm1 : params.m = 1
-      · -- Base case (m = 1): role residual from checked handoff,
-        -- bridge from the external `hbaseBridge` hypothesis.
-        rcases MainFormalRolePackageResidual.ofBaseCase params strategy eps k hpass hm1 with
-          ⟨roleResidual⟩
-        exact baseStep6WitnessResidual herr roleResidual (hbaseBridge scalars roleResidual)
-      · -- Successor case (m > 1): needs recursive slices and self-improvement.
-        -- TODO(#931, #834, #422): construct `MainFormalSuccessorRecursiveSlices`
-        -- and `MainFormalSuccessorSelfImprovementProducer`.
-        sorry
+      rcases hroleBranch.toRolePackageResidual hk with ⟨roleResidual⟩
+      exact baseStep6WitnessResidual herr roleResidual (hstep6Bridge scalars roleResidual)
     rcases hstep6WitnessResidual with ⟨step6WitnessResidual⟩
     let rolePackage := step6WitnessResidual.roleResidual.rolePackage scalars
     have hpre : ConsRel strategy.state (uniformDistribution Unit)
