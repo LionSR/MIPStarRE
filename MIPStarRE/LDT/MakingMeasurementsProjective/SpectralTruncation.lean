@@ -94,11 +94,8 @@ noncomputable def spectralTruncationStatement_of_witness {Outcome : Type uOutcom
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error)
     (R : OpFamily Outcome ι)
     (hwitness : RoundingToProjectorsWitness ψ A ζ R) :
-    SpectralTruncationStatement ψ A ζ where
-  roundedFamily := R
-  projective := hwitness.projective
-  closeness := hwitness.closeness
-  sum_eq_total := hwitness.sum_eq_total
-  total_le := hwitness.total_le
+    SpectralTruncationStatement ψ A ζ :=
+  ⟨R, hwitness.projective, hwitness.closeness, hwitness.sum_eq_total,
+    hwitness.total_le⟩
 
 end MIPStarRE.LDT.MakingMeasurementsProjective
