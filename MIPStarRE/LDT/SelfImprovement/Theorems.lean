@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
+import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationBridge
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results
 
 /-!
