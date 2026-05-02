@@ -762,6 +762,112 @@ lemma add_in_u_simplified_transfer_of_cs_chain
       nlinarith
     _ ≤ addInUError params eps delta := hsum
 
+/-- Reusable numerical absorption: whenever `2 a ≤ b`, the four-term sum
+`2 √(2 a) + 2 √b` collapses into `4 √b`. This is the schematic shape of the
+paper's closing absorption step in the proof of `lem:add-in-u`
+(`self_improvement.tex:341--342`). -/
+lemma two_sqrt_two_mul_add_two_sqrt_le_four_sqrt
+    {a b : Error} (hab : 2 * a ≤ b) :
+    2 * Real.sqrt (2 * a) + 2 * Real.sqrt b ≤ 4 * Real.sqrt b := by
+  have hsqrt : Real.sqrt (2 * a) ≤ Real.sqrt b := Real.sqrt_le_sqrt hab
+  linarith
+
+/-- Paper-side comparison `2 δ ≤ ζ_variance` from the closing line of the proof
+of `lem:add-in-u` (`self_improvement.tex:342`,
+`blueprint/src/chapter/ch07_self_improvement.tex:494`). Since
+`ζ_variance = 24 m (ε + δ + m d / q)` and `m ≥ 1`, the term `24 m δ` already
+exceeds `2 δ` whenever `eps, delta ≥ 0`. -/
+lemma two_mul_delta_le_selfImprovementVarianceError
+    (params : Parameters)
+    [FieldModel params.q]
+    (eps delta : Error)
+    (hε : 0 ≤ eps) (hδ : 0 ≤ delta) :
+    2 * delta ≤ selfImprovementVarianceError params eps delta := by
+  have hm : (1 : Error) ≤ (params.m : Error) := by
+    have hm_nat : (1 : ℕ) ≤ params.m := params.hm
+    exact_mod_cast hm_nat
+  have hm_nonneg : (0 : Error) ≤ (params.m : Error) := by linarith
+  have hB : 0 ≤ generalizeBError params := by
+    dsimp [generalizeBError]; positivity
+  unfold selfImprovementVarianceError globalVarianceOfPointsError
+  calc
+    2 * delta
+        ≤ 24 * delta := by linarith
+    _ = 24 * (1 : Error) * delta := by ring
+    _ ≤ 24 * (params.m : Error) * delta := by
+        have : (0 : Error) ≤ ((params.m : Error) - 1) * delta :=
+          mul_nonneg (by linarith) hδ
+        nlinarith
+    _ ≤ 24 * (params.m : Error) * (eps + delta + generalizeBError params) := by
+        have h24m : (0 : Error) ≤ 24 * (params.m : Error) := by nlinarith
+        nlinarith [mul_nonneg h24m hε, mul_nonneg h24m hB]
+
+/-- Arithmetic absorption used by `add_in_u_simplified_transfer_of_cs_chain`:
+the four step-bound sum `2 √(2 δ) + 2 √(ζ_variance)` is dominated by
+`addInUError = 4 ζ_variance^{1/2}` (`self_improvement.tex:341--342`,
+`blueprint/src/chapter/ch07_self_improvement.tex:492--494`). This is the
+arithmetic side condition that lets the step bounds with the paper-faithful
+`Real.sqrt` shape (companion issues #1089 and #1090) discharge the `hsum`
+hypothesis of `add_in_u_simplified_transfer_of_cs_chain`. -/
+lemma two_sqrt_two_delta_add_two_sqrt_selfImprovementVarianceError_le_addInUError
+    (params : Parameters)
+    [FieldModel params.q]
+    (eps delta : Error)
+    (hε : 0 ≤ eps) (hδ : 0 ≤ delta) :
+    2 * Real.sqrt (2 * delta) +
+        2 * Real.sqrt (selfImprovementVarianceError params eps delta) ≤
+      addInUError params eps delta := by
+  have hbase :=
+    two_sqrt_two_mul_add_two_sqrt_le_four_sqrt
+      (two_mul_delta_le_selfImprovementVarianceError params eps delta hε hδ)
+  have habs :
+      addInUError params eps delta =
+        4 * Real.sqrt (selfImprovementVarianceError params eps delta) := by
+    unfold addInUError
+    rw [← Real.sqrt_eq_rpow]
+  rw [habs]
+  exact hbase
+
+/-- Wrapper composing `add_in_u_simplified_transfer_of_cs_chain` with the
+arithmetic absorption: when the four chain step bounds have the paper-faithful
+shapes `√(2 δ)`, `√(2 δ)`, `√(ζ_variance)`, `√(ζ_variance)`, the
+projection-simplified transfer holds with the displayed
+`addInUError = 4 ζ_variance^{1/2}`. The four hypotheses match the targets of
+companion issues #1089 (Step 1/2) and #1083/#1088/#1090 (Step 3/4). -/
+lemma add_in_u_simplified_transfer_of_cs_chain_sqrt_form
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (hε : 0 ≤ eps) (hδ : 0 ≤ delta)
+    (T : SubMeas (Polynomial params) ι)
+    (h01 :
+      |addInUCSChainQ0 params strategy T - addInUCSChainQ1 params strategy T| ≤
+        Real.sqrt (2 * delta))
+    (h12 :
+      |addInUCSChainQ1 params strategy T - addInUCSChainQ2 params strategy T| ≤
+        Real.sqrt (2 * delta))
+    (h23 :
+      |addInUCSChainQ2 params strategy T - addInUCSChainQ3 params strategy T| ≤
+        Real.sqrt (selfImprovementVarianceError params eps delta))
+    (h34 :
+      |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T| ≤
+        Real.sqrt (selfImprovementVarianceError params eps delta)) :
+    |qBipartiteMatchMass strategy.state
+        (averagedSandwichedPolynomialSubMeas params strategy T)
+        (averagedSandwichedPolynomialSubMeas params strategy T) -
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ev strategy.state
+            (opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
+              (T.outcome h)))| ≤ addInUError params eps delta :=
+  add_in_u_simplified_transfer_of_cs_chain params strategy eps delta T
+    (Real.sqrt (2 * delta)) (Real.sqrt (2 * delta))
+    (Real.sqrt (selfImprovementVarianceError params eps delta))
+    (Real.sqrt (selfImprovementVarianceError params eps delta))
+    h01 h12 h23 h34
+    (two_sqrt_two_delta_add_two_sqrt_selfImprovementVarianceError_le_addInUError
+      params eps delta hε hδ)
+
 /-- Specialization of `selfConsistencyDiagonalAddInU_of_transfer` to the
 projection-simplified scalar transfer hypothesis.
 
