@@ -1996,8 +1996,9 @@ determined by a non-base current parameter bundle.
 
 The recursive slice witnesses produced by
 `mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage` consume exactly an
-input of this shape, which is what a recursive call to `mainFormal` for the
-transported predecessor would supply on the answer side. -/
+input of this shape.  This is an adapter package for the predecessor Section 6
+induction hypothesis, not the direct output of a recursive call to
+`mainFormal`. -/
 private abbrev answerSuccessorPerSliceInductionPackageInput
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -2143,8 +2144,8 @@ noncomputable def ofAnswerSuccessorBridgeInputs
 predecessor `AnswerPerSliceInductionPackage` and answer-side self-improvement
 bridge inputs.
 
-This is the most direct route from the inputs that a recursive call to
-`mainFormal` plus the Section 9 bridge data would return on the answer side: it
+This adapter route starts from a packaged predecessor per-slice induction
+hypothesis together with the Section 9 bridge data on the answer side.  It
 composes `mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage` (which
 produces the recursive slice witnesses from the per-slice induction package)
 with `ofAnswerSuccessorBridgeInputs`.  Like the other constructors in this
@@ -2358,10 +2359,9 @@ theorem rolePackageResidual_ofAnswerSuccessorBridgeInputs
 /-- Answer-side successor branch constructor from a predecessor
 `AnswerPerSliceInductionPackage` and per-slice Section 9 bridge inputs.
 
-This is the most direct preferred route on the answer side: it consumes exactly
-what a recursive call to `mainFormal` for the transported predecessor (packaged
-as the answer-valued per-slice induction package) plus the answer-side
-self-improvement bridge data would supply, and it composes them through
+This preferred answer-side adapter route consumes a packaged per-slice
+induction hypothesis for the transported predecessor together with the
+answer-side self-improvement bridge data, and composes them through
 `mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage` and
 `mainFormalSuccessorAnswerBoundary_ofBridgeInputs`.  It is pure structural
 composition over the answer-side adapters merged on `main`; it does not call
