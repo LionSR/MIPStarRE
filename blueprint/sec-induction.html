@@ -1585,6 +1585,12 @@
           
           <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Test.baseStep6WitnessResidual" class="lean_decl">MIPStarRE.LDT.Test.baseStep6WitnessResidual</a></li>
           
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Test.MainFormalBaseBridgeHypotheses" class="lean_decl">MIPStarRE.LDT.Test.MainFormalBaseBridgeHypotheses</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Test.baseStep6Hypotheses_ofBaseBridge" class="lean_decl">MIPStarRE.LDT.Test.baseStep6Hypotheses_ofBaseBridge</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Test.baseStep6WitnessResidual_ofBaseBridge" class="lean_decl">MIPStarRE.LDT.Test.baseStep6WitnessResidual_ofBaseBridge</a></li>
+          
         </ul>
     
       </div>
@@ -1594,7 +1600,7 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>   The structure <span class="ttfamily">MainFormalStep6Hypotheses</span> bundles the still-unformalized analytic hypotheses needed for the base case (\(m=1\)) of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>: orthonormalization inputs (spectral truncation and locality-preserving repair witnesses), distinguished completion outcomes, strong self-consistency, and match-mass preservation for the unsymmetrized POVMs. The assembly theorem <span class="ttfamily">baseStep6WitnessResidual</span> turns these hypotheses (together with the checked base-case role residual from <span class="ttfamily">MainFormalRolePackageResidual.ofBaseCase</span>) into the Step&#160;6 witness residual consumed by the downstream cascade. </p>
+  <p>   The structure <span class="ttfamily">MainFormalStep6Hypotheses</span> bundles the still-unformalized analytic hypotheses needed for the base case (\(m=1\)) of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>: orthonormalization inputs (spectral truncation and locality-preserving repair witnesses), distinguished completion outcomes, strong self-consistency, and match-mass preservation for the unsymmetrized POVMs. The narrowed alias <span class="ttfamily">MainFormalBaseBridgeHypotheses</span> omits the two distinguished outcomes; <span class="ttfamily">baseStep6Hypotheses_ofBaseBridge</span> fills both with the explicit zero polynomial. The assembly theorems <span class="ttfamily">baseStep6WitnessResidual</span> and <span class="ttfamily">baseStep6WitnessResidual_ofBaseBridge</span> turn these hypotheses (together with the checked base-case role residual from <span class="ttfamily">MainFormalRolePackageResidual.ofBaseCase</span>, where the <span class="ttfamily">params.m = 1</span> hypothesis is used) into the Step&#160;6 witness residual consumed by the downstream cascade. </p>
 
   </div>
 </div>
