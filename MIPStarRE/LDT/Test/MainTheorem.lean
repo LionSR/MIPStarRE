@@ -1895,13 +1895,13 @@ end MainFormalRolePackageAnswerSuccessorResidual
 
 /-- Branch-level residual for producing the Section 6 role package.
 
-The two constructors expose the real alternatives in the current proof state:
-base dimension, or a successor dimension together with explicit predecessor
-transport and successor-boundary data. The answer-valued successor constructor
-records the paper-faithful answer-restricted route separately from the ordinary
-restriction route. The large-`k` condition is supplied once, from the public
-theorem hypothesis, when converting the branch to a concrete role-package
-residual. -/
+The three constructors expose the real alternatives in the current proof state:
+base dimension, an ordinary successor dimension, or an answer-valued successor
+dimension, each with explicit predecessor transport and successor-boundary data.
+The answer-valued successor constructor records the paper-faithful
+answer-restricted route separately from the ordinary restriction route. The
+large-`k` condition is supplied once, from the public theorem hypothesis, when
+converting the branch to a concrete role-package residual. -/
 inductive MainFormalRolePackageBranchResidual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
