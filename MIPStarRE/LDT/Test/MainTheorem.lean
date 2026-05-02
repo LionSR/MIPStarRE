@@ -225,6 +225,22 @@ theorem strategySymmetrization_mainInductionBaseCase
       (SameSpaceProjStrat.strategySymmetrization_isGood_three_mul
         (strategy := strategy) (eps := eps) hpass)
 
+/-! ### Ordinary (compatibility) successor route
+
+The declarations in this section form the **ordinary successor route**, which
+uses `xRestrictedStrategy` (ordinary diagonal restriction) as the per-slice
+recursive strategy.  This route is kept as a compatibility interface: it
+provides `MainFormalSuccessorBoundary` and the associated wrappers, which feed
+into the `MainFormalRolePackageBranchResidual.successor` constructor.
+
+**Note:** `xRestrictedStrategy` uses `restrictDiagonalMeasurement`, which
+post-processes the diagonal outcome to the `zeroCoord` readout and re-embeds it
+as a constant polynomial.  This loses full diagonal-covariance and means the
+restricted strategy cannot be upgraded to an honest `SymStrat` with the diagonal
+transport invariant.  For paper-faithful Section 6 recursion, prefer the
+**answer-valued successor route** below.
+-/
+
 /-- Weighted restricted-axis input expected by the Section 6 successor step
 on the role-register symmetrization. -/
 def MainFormalSuccessorAxisWeightedBound (params : Parameters)
@@ -698,6 +714,25 @@ theorem mainFormalSuccessorMainInductionPublicWrapper
     boundary.recursiveSlices
     boundary.selfImprovementProducer
     hk_pos hk
+
+/-! ### Answer-valued (preferred) successor route
+
+The declarations in this section form the **answer-valued (preferred) successor
+route**, which uses `xRestrictedAnswerSymStrat` as the per-slice recursive
+strategy.  This route is preferred over the ordinary successor route because:
+
+* `xRestrictedAnswerSymStrat` preserves the full answer-valued diagonal
+  restriction and its transport invariant, so the restricted strategy can serve
+  as an honest input to Section 9 self-improvement.
+* It maps directly to the paper's answer-register construction, with the
+  diagonal outcome function carried end-to-end rather than truncated to
+  `zeroCoord`.
+
+These declarations feed into the
+`MainFormalRolePackageBranchResidual.answerSuccessor` constructor.  The
+ordinary route (`MainFormalRolePackageBranchResidual.successor`) is retained as
+a compatibility path for callers already working with ordinary restriction data.
+-/
 
 /-- Answer-valued successor-case weighted restricted-axis input for the
 role-register symmetrization used by `mainFormal`. -/
@@ -4268,7 +4303,12 @@ structure MainFormalPostRolePackageLine130OrthonormalizationInput
 landing point for future formalizations of the orthonormalization lemma's
 truncation and repair steps.
 See `MainFormalPostRolePackageLine130OrthonormalizationInput` for the
-individual fields. -/
+individual fields.
+
+**Status:** currently unused (no callers).  Kept as a documented entry point for
+callers that prefer the `…BridgeInputs` name, but the underlying
+`MainFormalPostRolePackageLine130OrthonormalizationInput` is the authoritative
+type. -/
 abbrev MainFormalPostRolePackageLine130OrthonormalizationBridgeInputs
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -4558,7 +4598,11 @@ line-169 `ζ₁` links.
 This exposes the role of
 `ProjectivizationMatchMassMonotonicity.of_submeasurement_match_mass_and_completion`
 for callers that reason directly with completed projective measurements, while
-`toCompletionResidual` keeps the older residual's P-level match-mass fields. -/
+`toCompletionResidual` keeps the older residual's P-level match-mass fields.
+
+**Status:** currently unused (no callers).  Kept as a named interface for
+downstream consumers that need the `ProjectivizationMatchMassMonotonicity`
+witness directly rather than going through `toCompletionResidual`. -/
 theorem toProjectivizationMatchMassMonotonicity
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -4754,7 +4798,13 @@ A caller supplies, for each line-130 orthonormalization residual produced from
 the bridge inputs, the concrete distinguished outcomes, completed-closeness
 proofs, and orthonormalization match-mass preservation facts packaged as
 `MainFormalPostRolePackageLine130CompletionInput`.  This theorem converts that
-package into the old producer shape by `toCompletionResidual`. -/
+package into the old producer shape by `toCompletionResidual`.
+
+**Status:** currently unused (no callers).  The more analytic variant
+`nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs` (and
+its alias `nonempty_ofRoleResidualAndBridgeInputsAndCompletingToMeasurementInputs`)
+expose the same endpoint with explicit `BipartiteSSCRel` and match-mass inputs
+instead of a pre-packaged `CompletionInput`. -/
 theorem nonempty_ofRoleResidualAndLine130InputsAndCompletionInputs
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -4846,7 +4896,12 @@ theorem nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs
 accepting the orthonormalization inputs under the `…BridgeInputs` name.
 
 The alias is definitional (the bridge `abbrev` unfolds in-place) and exists
-only as a documented entry point for callers that carry the bridge wrapper. -/
+only as a documented entry point for callers that carry the bridge wrapper.
+
+**Status:** currently unused (no callers).  The underlying theorem
+`nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs` is the
+canonical form; this alias is retained for callers that hold the bridge-wrapper
+type. -/
 alias nonempty_ofRoleResidualAndBridgeInputsAndCompletingToMeasurementInputs :=
   nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs
 
