@@ -857,7 +857,7 @@ proof. It does not assume the projective self-closeness it produces and does
 not restate `FinalFieldsInput`.
 
 Paper anchors:
-* `references/ldt-paper/self_improvement.tex` lines 718--729 — projective
+* `references/ldt-paper/self_improvement.tex` lines 727--741 — projective
   self-closeness `Hhat ⊗ I ≈ I ⊗ Hhat → H ⊗ I ≈ I ⊗ H` via the
   triangle. The corresponding blueprint paragraph is
   `blueprint/src/chapter/ch07_self_improvement.tex` `\emph{Proof of
