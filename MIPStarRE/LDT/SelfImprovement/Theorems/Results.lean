@@ -820,13 +820,23 @@ lemma two_sqrt_two_delta_add_two_sqrt_selfImprovementVarianceError_le_addInUErro
   have hbase :=
     two_sqrt_two_mul_add_two_sqrt_le_four_sqrt
       (two_mul_delta_le_selfImprovementVarianceError params eps delta hε hδ)
-  have habs :
-      addInUError params eps delta =
-        4 * Real.sqrt (selfImprovementVarianceError params eps delta) := by
-    unfold addInUError
-    rw [← Real.sqrt_eq_rpow]
-  rw [habs]
-  exact hbase
+  simpa [addInUError, Real.sqrt_eq_rpow] using hbase
+
+/-- Four-term form of the `addInUError` absorption, matching the side condition
+of `add_in_u_simplified_transfer_of_cs_chain`. -/
+lemma four_term_selfImprovementVarianceError_le_addInUError
+    (params : Parameters)
+    [FieldModel params.q]
+    (eps delta : Error)
+    (hε : 0 ≤ eps) (hδ : 0 ≤ delta) :
+    Real.sqrt (2 * delta) + Real.sqrt (2 * delta) +
+        Real.sqrt (selfImprovementVarianceError params eps delta) +
+        Real.sqrt (selfImprovementVarianceError params eps delta) ≤
+      addInUError params eps delta := by
+  have htwo :=
+    two_sqrt_two_delta_add_two_sqrt_selfImprovementVarianceError_le_addInUError
+      params eps delta hε hδ
+  linarith
 
 /-- Wrapper composing `add_in_u_simplified_transfer_of_cs_chain` with the
 arithmetic absorption: when the four chain step bounds have the paper-faithful
@@ -865,7 +875,7 @@ lemma add_in_u_simplified_transfer_of_cs_chain_sqrt_form
     (Real.sqrt (selfImprovementVarianceError params eps delta))
     (Real.sqrt (selfImprovementVarianceError params eps delta))
     h01 h12 h23 h34
-    (two_sqrt_two_delta_add_two_sqrt_selfImprovementVarianceError_le_addInUError
+    (four_term_selfImprovementVarianceError_le_addInUError
       params eps delta hε hδ)
 
 /-- Specialization of `selfConsistencyDiagonalAddInU_of_transfer` to the
