@@ -299,6 +299,151 @@ lemma selfConsistencyDiagonalAddInU_of_transfer
   simpa [addInULeftQuantity_selfConsistencySelection_eq_matchMass,
     addInURightQuantity_selfConsistencySelection_eq_release] using htransfer
 
+/-- Projective sandwich collapse: if `A * A = A`, then `A * (A * X * A) * A = A * X * A`.
+
+This is the operator-algebra fact used to simplify the diagonal `add-in-u`
+right-hand side: the outer `A^u_{h(u)}` factors collapse into the inner
+sandwich `A^u_{h(u)} T_h A^u_{h(u)}` because
+`(strategy.pointMeasurement u).proj` makes every point-measurement outcome a
+projection. -/
+private lemma proj_outer_sandwich_eq {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A X : MIPStarRE.Quantum.Op ι) (hA : A * A = A) :
+    A * (A * X * A) * A = A * X * A := by
+  have h1 : A * (A * X * A) * A = (A * A) * X * (A * A) := by noncomm_ring
+  rw [h1, hA]
+
+/-- Projective simplification of the diagonal `add-in-u` right operator at a point.
+
+Combining `addInURightOperatorAtPoint_selfConsistencySelection` with the
+projectivity of `strategy.pointMeasurement` (each `A^u_a * A^u_a = A^u_a`),
+the at-point operator collapses to the simpler tensor sum
+`Σ_h H^u_h ⊗ T_h` where `H^u_h = sandwichedPolynomialSubMeasAt T u h`. -/
+private lemma addInURightOperatorAtPoint_selfConsistencySelection_proj_eq
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι)
+    (u : Point params) :
+    addInURightOperatorAtPoint params strategy
+        (sandwichedPolynomialSubMeasAt params strategy T)
+        T
+        (selfConsistencyAddInUSelection params) u =
+      ∑ h : Polynomial params,
+        opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
+          (T.outcome h) := by
+  classical
+  rw [addInURightOperatorAtPoint_selfConsistencySelection]
+  refine Finset.sum_congr rfl ?_
+  intro h _
+  -- Unfold the `let Au := ...` binder produced by
+  -- `addInURightOperatorAtPoint_selfConsistencySelection` so that we can
+  -- expand the inner sandwich `(M u).outcome h = Au * T_h * Au`.
+  show opTensor
+      (pointConditionedOutcomeOperatorAtPolynomial params strategy h u *
+        ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h) *
+        pointConditionedOutcomeOperatorAtPolynomial params strategy h u)
+      (T.outcome h) = _
+  have hproj :
+      pointConditionedOutcomeOperatorAtPolynomial params strategy h u *
+        pointConditionedOutcomeOperatorAtPolynomial params strategy h u =
+      pointConditionedOutcomeOperatorAtPolynomial params strategy h u := by
+    simpa [pointConditionedOutcomeOperatorAtPolynomial] using
+      (strategy.pointMeasurement u).proj (h u)
+  have hsandwich :
+      (sandwichedPolynomialSubMeasAt params strategy T u).outcome h =
+        pointConditionedOutcomeOperatorAtPolynomial params strategy h u *
+          T.outcome h *
+          pointConditionedOutcomeOperatorAtPolynomial params strategy h u := by
+    rfl
+  rw [hsandwich]
+  congr 1
+  exact proj_outer_sandwich_eq _ _ hproj
+
+/-- Projective simplification of the diagonal `add-in-u` right quantity.
+
+This is the projection-collapsed paper expression: the two outer
+`A^u_{h(u)}` factors absorb into the inner sandwich `H^u_h = A^u_{h(u)}
+T_h A^u_{h(u)}`, leaving the cleaner form
+`E_u Σ_h ⟨ψ, H^u_h ⊗ T_h ψ⟩` used in the simplified scalar transfer. -/
+lemma addInURightQuantity_selfConsistencySelection_eq_simplified
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    addInURightQuantity params strategy
+        (sandwichedPolynomialSubMeasAt params strategy T)
+        T
+        (selfConsistencyAddInUSelection params) =
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ev strategy.state
+            (opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
+              (T.outcome h))) := by
+  classical
+  change avgOver (uniformDistribution (Point params)) (fun u =>
+      ev strategy.state (addInURightOperatorAtPoint params strategy
+        (sandwichedPolynomialSubMeasAt params strategy T)
+        T
+        (selfConsistencyAddInUSelection params) u)) = _
+  refine avgOver_congr (uniformDistribution (Point params)) _ _ ?_
+  intro u
+  rw [addInURightOperatorAtPoint_selfConsistencySelection_proj_eq]
+  exact ev_sum strategy.state _
+
+/-- Specialization of `selfConsistencyDiagonalAddInU_of_transfer` to the
+projection-simplified scalar transfer hypothesis.
+
+Compared to `selfConsistencyDiagonalAddInU_of_transfer`, the hypothesis is
+stated against the cleaner right-hand side `E_u Σ_h ⟨ψ, H^u_h ⊗ T_h ψ⟩`
+obtained after collapsing the outer projection factors of
+`eq:release-the-kraken` via `proj_outer_sandwich_eq`. The conclusion is
+identical and can therefore feed the same diagonal helper-SSC application;
+the simplification reduces the remaining Cauchy--Schwarz/global-variance
+proof obligation (`self_improvement.tex:247--343`) to a transfer in the
+simpler shape. -/
+lemma selfConsistencyDiagonalAddInU_of_simplifiedTransfer
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (T : SubMeas (Polynomial params) ι)
+    (htransfer :
+      |qBipartiteMatchMass strategy.state
+          (averagedSandwichedPolynomialSubMeas params strategy T)
+          (averagedSandwichedPolynomialSubMeas params strategy T) -
+        avgOver (uniformDistribution (Point params)) (fun u =>
+          ∑ h : Polynomial params,
+            ev strategy.state
+              (opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
+                (T.outcome h)))| ≤ addInUError params eps delta) :
+    |qBipartiteMatchMass strategy.state
+        (averagedSandwichedPolynomialSubMeas params strategy T)
+        (averagedSandwichedPolynomialSubMeas params strategy T) -
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
+          ev strategy.state
+            (opTensor (Au * (sandwichedPolynomialSubMeasAt params strategy T u).outcome h * Au)
+              (T.outcome h)))| ≤ addInUError params eps delta := by
+  -- Both RHS shapes are equal to the underlying `addInURightQuantity`, so the
+  -- full paper RHS (`eq:release-the-kraken`) equals the projection-collapsed
+  -- RHS used in `htransfer`.
+  have hRHS_eq :
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
+          ev strategy.state
+            (opTensor (Au * (sandwichedPolynomialSubMeasAt params strategy T u).outcome h * Au)
+              (T.outcome h)))
+        = avgOver (uniformDistribution (Point params)) (fun u =>
+          ∑ h : Polynomial params,
+            ev strategy.state
+              (opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
+                (T.outcome h))) :=
+    (addInURightQuantity_selfConsistencySelection_eq_release
+        params strategy T).symm.trans
+      (addInURightQuantity_selfConsistencySelection_eq_simplified
+        params strategy T)
+  rw [hRHS_eq]
+  exact htransfer
+
 /-- Reduced version of `lem:self-improvement-helper`.
 
 Unlike the paper helper lemma, this theorem does not yet take the consistency
