@@ -59,7 +59,7 @@ We note that \ref{eq:local-variance-of-points-equation} is equivalent to the sta
 This can be viewed as a local-variance bound for the point measurements.
 
 \begin{lemma}[Global variance of the points measurements]\label{lem:global-variance-of-points}
-	\lean{MIPStarRE.LDT.GlobalVariance.globalVarianceOfPoints}
+	\lean{MIPStarRE.LDT.GlobalVariance.globalVarianceOfPoints, MIPStarRE.LDT.GlobalVariance.globalVarianceDeviation_sum_le_m_mul_localVarianceDeviation_sum, MIPStarRE.LDT.GlobalVariance.globalVarianceDeviation_sum_le_of_localVarianceDeviation_sum_le}
 	\leanok
 	\uses{def:local-and-variance, lem:local-to-global, lem:local-variance-of-points}
 	Let $G \in \polysub{m}{q}{d}$. On the uniform distribution over independent $u,v \in \F_q^m$,

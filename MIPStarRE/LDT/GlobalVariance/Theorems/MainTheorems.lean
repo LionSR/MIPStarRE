@@ -259,6 +259,71 @@ lemma globalVarianceOfPointsFromLocalDeviation
             (fun g => pointConditionedGlobalVarianceAtPolynomial params strategy G g)
             (globalVarianceOfPointsError params eps delta) hglobalVariance }
 
+/-- Sum-level local-to-global transfer for the polynomial-indexed squared-norm
+form of `lem:global-variance-of-points`.
+
+This is the unnormalized analogue of the pointwise
+`globalVarianceDeviationAtPolynomial_le_m_localVarianceDeviationAtPolynomial`:
+the independent-points deviation summed over all polynomials is at most `m`
+times the corresponding edge-deviation sum. -/
+lemma globalVarianceDeviation_sum_le_m_mul_localVarianceDeviation_sum
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι) :
+    (∑ g : Polynomial params,
+      globalVarianceDeviationAtPolynomial params strategy strategy.state G g) ≤
+      (params.m : Error) *
+        ∑ g : Polynomial params,
+          localVarianceDeviationAtPolynomial params strategy strategy.state G g := by
+  calc
+    (∑ g : Polynomial params,
+      globalVarianceDeviationAtPolynomial params strategy strategy.state G g)
+        ≤ ∑ g : Polynomial params,
+            (params.m : Error) *
+              localVarianceDeviationAtPolynomial params strategy strategy.state G g :=
+          Finset.sum_le_sum fun g _ =>
+            globalVarianceDeviationAtPolynomial_le_m_localVarianceDeviationAtPolynomial
+              params strategy G g
+    _ = (params.m : Error) *
+        ∑ g : Polynomial params,
+          localVarianceDeviationAtPolynomial params strategy strategy.state G g := by
+          rw [Finset.mul_sum]
+
+/-- A polynomial-sum local-variance bound implies the corresponding sum-form
+global-variance bound with the paper's `24m(ε + δ + md/q)` error term.
+
+The hypothesis `hlocal` is the paper's `eq:equivalent-local-variance`
+(`references/ldt-paper/expansion.tex:317--321`). The conclusion is the
+sum-form squared-norm bound underlying `eq:global-variance-of-points-equation`
+(`references/ldt-paper/expansion.tex:325--353`). -/
+lemma globalVarianceDeviation_sum_le_of_localVarianceDeviation_sum_le
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (G : SubMeas (Polynomial params) ι)
+    (hlocal :
+      (∑ g : Polynomial params,
+        localVarianceDeviationAtPolynomial params strategy strategy.state G g) ≤
+        localVarianceOfPointsError params eps delta) :
+    (∑ g : Polynomial params,
+      globalVarianceDeviationAtPolynomial params strategy strategy.state G g) ≤
+      globalVarianceOfPointsError params eps delta := by
+  calc
+    (∑ g : Polynomial params,
+      globalVarianceDeviationAtPolynomial params strategy strategy.state G g)
+        ≤ (params.m : Error) *
+            ∑ g : Polynomial params,
+              localVarianceDeviationAtPolynomial params strategy strategy.state G g :=
+          globalVarianceDeviation_sum_le_m_mul_localVarianceDeviation_sum
+            params strategy G
+    _ ≤ (params.m : Error) * localVarianceOfPointsError params eps delta :=
+          mul_le_mul_of_nonneg_left hlocal (by positivity)
+    _ = globalVarianceOfPointsError params eps delta := by
+          simp only [globalVarianceOfPointsError, localVarianceOfPointsError]
+          ring
+
 /-- Strategy-state reduction for `lem:local-variance-of-points` from the
 post-triangle six-step transport-chain bound.
 
