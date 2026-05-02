@@ -235,6 +235,51 @@ theorem otherTwoNotionsOfSelfConsistency {Question Outcome : Type*}
                 (ev ψ (leftTensor (ι₂ := ι) M.total) -
                   ∑ a : Outcome, ev ψ (opTensor (M.outcome a) (M.outcome a)))
           exact max_le_max le_rfl hinner
-    _ ≤ δ := hssc
+      _ ≤ δ := hssc
+
+/-- Diagonal consistency for a full measurement is exactly bipartite strong
+self-consistency.
+
+This is the converse of `otherTwoNotionsOfSelfConsistency` in the special case
+where the indexed family is measurement-valued.  Completeness identifies both
+total-mass terms with the identity operator, so the self-`ConsRel` defect
+`G ⊗ I ≃ I ⊗ G` and the diagonal SSC defect have the same questionwise
+quantity. -/
+theorem bipartiteSSCRel_of_consRel_self_measurement {Question Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι))
+    (𝒟 : Distribution Question)
+    (A : IdxMeas Question Outcome ι) (δ : Error) :
+    @ConsRel Question Outcome ι ι _ _ _ _ _ ψ 𝒟
+        (IdxMeas.toIdxSubMeas A) (IdxMeas.toIdxSubMeas A) δ →
+      BipartiteSSCRel ψ 𝒟 (IdxMeas.toIdxSubMeas A) δ := by
+  intro ⟨hcons⟩
+  constructor
+  have hdefect :
+      bipartiteSSCError ψ 𝒟 (IdxMeas.toIdxSubMeas A) =
+        bipartiteConsError ψ 𝒟
+          (IdxMeas.toIdxSubMeas A) (IdxMeas.toIdxSubMeas A) := by
+    unfold bipartiteSSCError bipartiteConsError
+    apply avgOver_congr
+    intro q
+    simp [qBipartiteSSCDefect, qBipartiteConsDefect, qBipartiteMatchMass,
+      IdxMeas.toIdxSubMeas, (A q).total_eq_one, leftTensor, opTensor]
+  simpa [hdefect] using hcons
+
+/-- For full measurements, bipartite SSC and diagonal self-consistency are
+equivalent. -/
+theorem bipartiteSSCRel_iff_consRel_self_measurement {Question Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι))
+    (𝒟 : Distribution Question)
+    (A : IdxMeas Question Outcome ι) (δ : Error) :
+    BipartiteSSCRel ψ 𝒟 (IdxMeas.toIdxSubMeas A) δ ↔
+      @ConsRel Question Outcome ι ι _ _ _ _ _ ψ 𝒟
+        (IdxMeas.toIdxSubMeas A) (IdxMeas.toIdxSubMeas A) δ := by
+  constructor
+  · exact otherTwoNotionsOfSelfConsistency ψ 𝒟 (IdxMeas.toIdxSubMeas A) δ
+  · exact bipartiteSSCRel_of_consRel_self_measurement ψ 𝒟 A δ
 
 end MIPStarRE.LDT.Preliminaries
