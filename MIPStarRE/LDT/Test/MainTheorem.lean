@@ -297,6 +297,33 @@ def MainFormalSuccessorRecursiveSlices (params : Parameters)
           (hrestrict.profile.selfConsistency x)
           (hrestrict.profile.diagonal x)
 
+/-- A Section 6 per-slice induction package supplies the recursive slice
+witnesses needed by the `mainFormal` successor boundary.
+
+This constructor is only a package adapter: the caller must still provide the
+`PerSliceInductionPackage` from a genuine predecessor induction hypothesis. It
+does not invoke the public `mainFormal` theorem. -/
+theorem mainFormalSuccessorRecursiveSlices_ofInductionPackage
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (haxisWeightedBound : MainFormalSuccessorAxisWeightedBound params strategy eps)
+    (hdiagonalWeightedBound :
+      MainFormalSuccessorDiagonalWeightedBound params strategy eps)
+    (hinduction :
+      MainInductionStep.PerSliceInductionPackage params
+        strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps)
+        (mainFormalSuccessorRestrictionPackage params strategy eps hpass
+          haxisWeightedBound hdiagonalWeightedBound)
+        k) :
+    MainFormalSuccessorRecursiveSlices params strategy eps hpass k
+      haxisWeightedBound hdiagonalWeightedBound := by
+  intro x
+  exact
+    ⟨hinduction.sliceError x, hinduction.sliceMeasurement x,
+      hinduction.pointConsistency x, hinduction.error_le x⟩
+
 /-- Successor-case restricted-strategy self-improvement producer expected by the
 public Section 6 boundary wrapper. -/
 def MainFormalSuccessorSelfImprovementProducer (params : Parameters)
@@ -738,6 +765,34 @@ def MainFormalSuccessorAnswerRecursiveSlices (params : Parameters)
           (hrestrict.profile.axisParallel x)
           (hrestrict.profile.selfConsistency x)
           (hrestrict.profile.diagonal x)
+
+/-- A Section 6 answer-valued per-slice induction package supplies the
+answer-side recursive slice witnesses needed by the `mainFormal` successor
+boundary.
+
+As in the ordinary-register constructor, this only exposes the package fields at
+the Test-level boundary; the predecessor induction package must come from a
+non-circular induction hypothesis. -/
+theorem mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (haxisWeightedBound : MainFormalSuccessorAnswerAxisWeightedBound params strategy eps)
+    (hdiagonalWeightedBound :
+      MainFormalSuccessorAnswerDiagonalWeightedBound params strategy eps)
+    (hinduction :
+      MainInductionStep.AnswerPerSliceInductionPackage params
+        strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps)
+        (mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
+          haxisWeightedBound hdiagonalWeightedBound)
+        k) :
+    MainFormalSuccessorAnswerRecursiveSlices params strategy eps hpass k
+      haxisWeightedBound hdiagonalWeightedBound := by
+  intro x
+  exact
+    ⟨hinduction.sliceError x, hinduction.sliceMeasurement x,
+      hinduction.pointConsistency x, hinduction.error_le x⟩
 
 
 /-- Answer-side slice-recursion bridge data for the successor branch of
