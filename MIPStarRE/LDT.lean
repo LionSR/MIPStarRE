@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Basic.ParametersBase
+import MIPStarRE.LDT.Basic.SqrtBounds
 import MIPStarRE.LDT.Basic.AxisParallelLine
 import MIPStarRE.LDT.Basic.DiagonalLine
 import MIPStarRE.LDT.Basic.LinePolynomials
