@@ -695,35 +695,27 @@ lemma add_in_u_cs_chain_q4_eq_simplified_rhs
                 (opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
                   (T.outcome h)))
 
-/-! ### Raw Cauchy--Schwarz Step 3/4 estimates
+/-! ### Add-in-u variance-bound conversions
 
-The next two lemmas furnish the raw Cauchy--Schwarz estimates that the
-GlobalVariance bridge lemmas
-`add_in_u_cs_chain_q2_q3_le_sqrt_of_globalVarianceDeviation_sum_le` and
-`add_in_u_cs_chain_q3_q4_le_sqrt_of_globalVarianceDeviation_sum_le` consume.
+The following four lemmas are conditional real-valued conversions for the
+`Q₂ → Q₃` and `Q₃ → Q₄` add-in-u steps.  They do not prove the
+operator-theoretic Cauchy--Schwarz estimates from
+`references/ldt-paper/self_improvement.tex`, lines 299--340.  Instead, they
+convert either a squared real bound or a factored product of square-root bounds
+into the absolute-value square-root shape used by the surrounding scalar chain.
 
-The conclusions are exactly the pre-bridge shape used in
-`references/ldt-paper/self_improvement.tex`, lines 299--340: an absolute
-difference bounded by `Real.sqrt` of the sum of independent-points squared
-deviations `globalVarianceDeviationAtPolynomial`, before any further upgrade
-to `sqrt (globalVarianceOfPointsError ...)`.  Each lemma packages the
-operator-theoretic Cauchy--Schwarz output (sub-measurement contraction on the
-`(A^v - A^u)` square root and the trivial `≤ 1` bound on the second square root
-following from `M^u` being a sub-measurement and `T` a measurement) into a
-single squared hypothesis whose discharge is the remaining operator obligation
-described in the paper. -/
+The hypotheses `hsq`, `hCS`, and `hD*_le*` are the places where future
+operator-level arguments must supply the Cauchy--Schwarz, submeasurement
+contraction, and total-mass estimates.  In particular, `T` is a submeasurement
+in these statements; any `≤ 1` input corresponds to a `total_le_one`-style
+bound rather than a measurement equality. -/
 
-/-- Raw Cauchy--Schwarz estimate for the `Q₂ → Q₃` first-`A`-replacement step.
+/-- Convert a squared `Q₂ → Q₃` real bound to an absolute-value sqrt bound.
 
-This is the variance-use side of `eq:change-one-cauchy-schwarz` in
-`references/ldt-paper/self_improvement.tex`, lines 299--318.  The hypothesis
-`hsq` is the squared form of the post-Cauchy--Schwarz bound after applying the
-sub-measurement contraction `(A^v - A^u) M^u (A^v - A^u) ≤ (A^v - A^u)^2`
-inside the first square root and the chain `A^v M^u A^v ⊗ T_h ≤ I` summed over
-`h` (using that `T` is a measurement) for the second square root.  The lemma
-then extracts the absolute-value square-root bound consumed by
-`add_in_u_cs_chain_q2_q3_le_sqrt_of_globalVarianceDeviation_sum_le`. -/
-lemma add_in_u_cs_chain_q2_q3_raw_estimate_of_squared_bound
+This lemma is only the `Real.abs_le_sqrt` conversion.  The hypothesis `hsq`
+must already contain any operator Cauchy--Schwarz and submeasurement estimates
+needed to prove the squared bound. -/
+lemma add_in_u_cs_chain_q2_q3_abs_le_sqrt_of_sq_le
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (T : SubMeas (Polynomial params) ι)
@@ -737,16 +729,13 @@ lemma add_in_u_cs_chain_q2_q3_raw_estimate_of_squared_bound
           globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
   Real.abs_le_sqrt hsq
 
-/-- Cauchy--Schwarz factored variant of the `Q₂ → Q₃` raw estimate.
+/-- Convert factored `Q₂ → Q₃` sqrt bounds to the summed-deviation sqrt bound.
 
-Captures the paper structure of `eq:change-one-cauchy-schwarz`
-(`self_improvement.tex:306--311`) directly: the absolute difference is bounded
-by a product of two square roots, the first of which is bounded by the summed
-independent-points deviation (after sub-measurement contraction) and the
-second of which is bounded by `1` (because `M^u` is a sub-measurement and `T`
-is a measurement).  Combines these inputs into the displayed
-`sqrt (∑ g, globalVarianceDeviationAtPolynomial ...)` bound. -/
-lemma add_in_u_cs_chain_q2_q3_raw_estimate_of_factor_bounds
+This lemma assumes the Cauchy--Schwarz product bound as `hCS`, a bound on the
+first factor by the summed independent-points deviation, and a `≤ 1` bound on
+the second factor.  The proof is purely real-valued; the submeasurement and
+operator content belongs in the hypotheses. -/
+lemma add_in_u_cs_chain_q2_q3_le_sqrt_of_factor_bounds
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (T : SubMeas (Polynomial params) ι)
@@ -762,9 +751,7 @@ lemma add_in_u_cs_chain_q2_q3_raw_estimate_of_factor_bounds
       Real.sqrt
         (∑ g : Polynomial params,
           globalVarianceDeviationAtPolynomial params strategy strategy.state T g) := by
-  have hsqrt_D₂ : Real.sqrt D₂ ≤ 1 := by
-    rw [← Real.sqrt_one]
-    exact Real.sqrt_le_sqrt hD₂_le_one
+  have hsqrt_D₂ : Real.sqrt D₂ ≤ 1 := Real.sqrt_le_one.mpr hD₂_le_one
   have hsqrt_D₁ :
       Real.sqrt D₁ ≤ Real.sqrt
           (∑ g : Polynomial params,
@@ -781,18 +768,12 @@ lemma add_in_u_cs_chain_q2_q3_raw_estimate_of_factor_bounds
               globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
           hsqrt_D₁
 
-/-- Raw Cauchy--Schwarz estimate for the `Q₃ → Q₄` second-`A`-replacement step.
+/-- Convert a squared `Q₃ → Q₄` real bound to an absolute-value sqrt bound.
 
-This is the variance-use side of the Cauchy--Schwarz application in
-`references/ldt-paper/self_improvement.tex`, lines 319--340 (the multline
-following `eq:change-another`).  As in the `Q₂ → Q₃` case, the hypothesis
-`hsq` is the squared form of the post-Cauchy--Schwarz bound: the first square
-root reduces via `A^u M^u A^u ⊗ T_h ≤ I` (summed over `h`, using that `T` is a
-measurement) to `≤ 1`, while the second square root reduces via
-sub-measurement contraction to `∑ g, globalVarianceDeviationAtPolynomial ... g`.
-Extracts the displayed absolute-value sqrt bound consumed by
-`add_in_u_cs_chain_q3_q4_le_sqrt_of_globalVarianceDeviation_sum_le`. -/
-lemma add_in_u_cs_chain_q3_q4_raw_estimate_of_squared_bound
+This lemma is only the `Real.abs_le_sqrt` conversion.  The hypothesis `hsq`
+must already contain any operator Cauchy--Schwarz and submeasurement estimates
+needed to prove the squared bound. -/
+lemma add_in_u_cs_chain_q3_q4_abs_le_sqrt_of_sq_le
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (T : SubMeas (Polynomial params) ι)
@@ -806,15 +787,13 @@ lemma add_in_u_cs_chain_q3_q4_raw_estimate_of_squared_bound
           globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
   Real.abs_le_sqrt hsq
 
-/-- Cauchy--Schwarz factored variant of the `Q₃ → Q₄` raw estimate.
+/-- Convert factored `Q₃ → Q₄` sqrt bounds to the summed-deviation sqrt bound.
 
-Mirrors `add_in_u_cs_chain_q2_q3_raw_estimate_of_factor_bounds` for the
-second-`A`-replacement step.  Here the roles of the two square roots are
-swapped relative to the `Q₂ → Q₃` step: the first square root is bounded by
-`1` (`A^u M^u A^u ⊗ T_h ≤ I` summed over `h`) and the second is bounded by
-the summed independent-points deviation.  The lemma is symmetric under that
-swap and produces the same displayed sqrt bound. -/
-lemma add_in_u_cs_chain_q3_q4_raw_estimate_of_factor_bounds
+This lemma assumes the Cauchy--Schwarz product bound as `hCS`, a `≤ 1` bound
+on the first factor, and a bound on the second factor by the summed
+independent-points deviation.  The proof is purely real-valued; the
+submeasurement and operator content belongs in the hypotheses. -/
+lemma add_in_u_cs_chain_q3_q4_le_sqrt_of_factor_bounds
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (T : SubMeas (Polynomial params) ι)
@@ -830,9 +809,7 @@ lemma add_in_u_cs_chain_q3_q4_raw_estimate_of_factor_bounds
       Real.sqrt
         (∑ g : Polynomial params,
           globalVarianceDeviationAtPolynomial params strategy strategy.state T g) := by
-  have hsqrt_D₁ : Real.sqrt D₁ ≤ 1 := by
-    rw [← Real.sqrt_one]
-    exact Real.sqrt_le_sqrt hD₁_le_one
+  have hsqrt_D₁ : Real.sqrt D₁ ≤ 1 := Real.sqrt_le_one.mpr hD₁_le_one
   have hsqrt_D₂ :
       Real.sqrt D₂ ≤ Real.sqrt
           (∑ g : Polynomial params,
