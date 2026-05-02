@@ -281,8 +281,8 @@ lemma globalVarianceDeviation_sum_le_m_mul_localVarianceDeviation_sum
       globalVarianceDeviationAtPolynomial params strategy strategy.state G g)
         ≤ ∑ g : Polynomial params,
             (params.m : Error) *
-              localVarianceDeviationAtPolynomial params strategy strategy.state G g := by
-          exact Finset.sum_le_sum fun g _ =>
+              localVarianceDeviationAtPolynomial params strategy strategy.state G g :=
+          Finset.sum_le_sum fun g _ =>
             globalVarianceDeviationAtPolynomial_le_m_localVarianceDeviationAtPolynomial
               params strategy G g
     _ = (params.m : Error) *
@@ -293,9 +293,11 @@ lemma globalVarianceDeviation_sum_le_m_mul_localVarianceDeviation_sum
 /-- A polynomial-sum local-variance bound implies the corresponding sum-form
 global-variance bound with the paper's `24m(ε + δ + md/q)` error term.
 
-The remaining analytic work for `eq:global-variance-of-points-equation` is the
-sum-level local bound supplied as the hypothesis here. -/
-lemma globalVarianceDeviationSum_le_of_localVarianceDeviationSum_le
+The hypothesis `hlocal` is the paper's `eq:equivalent-local-variance`
+(`references/ldt-paper/expansion.tex:317--321`). The conclusion is the
+sum-form squared-norm bound underlying `eq:global-variance-of-points-equation`
+(`references/ldt-paper/expansion.tex:325--353`). -/
+lemma globalVarianceDeviation_sum_le_of_localVarianceDeviation_sum_le
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -316,10 +318,10 @@ lemma globalVarianceDeviationSum_le_of_localVarianceDeviationSum_le
               localVarianceDeviationAtPolynomial params strategy strategy.state G g :=
           globalVarianceDeviation_sum_le_m_mul_localVarianceDeviation_sum
             params strategy G
-    _ ≤ (params.m : Error) * localVarianceOfPointsError params eps delta := by
-          exact mul_le_mul_of_nonneg_left hlocal (by positivity)
+    _ ≤ (params.m : Error) * localVarianceOfPointsError params eps delta :=
+          mul_le_mul_of_nonneg_left hlocal (by positivity)
     _ = globalVarianceOfPointsError params eps delta := by
-          simp [globalVarianceOfPointsError, localVarianceOfPointsError]
+          simp only [globalVarianceOfPointsError, localVarianceOfPointsError]
           ring
 
 /-- Strategy-state reduction for `lem:local-variance-of-points` from the
