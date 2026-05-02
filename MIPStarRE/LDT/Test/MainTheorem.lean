@@ -4496,15 +4496,15 @@ theorem baseStep6WitnessResidual
 /-- Narrowed base-case bridge hypotheses for Step 6 when `params.m = 1`.
 
 Compared to `MainFormalStep6Hypotheses`, this structure omits the two
-distinguished outcomes `a_A` and `a_B`, which can be filled with default
-polynomials (the zero polynomial) at `m = 1`.  The remaining five fields
+distinguished outcomes `a_A` and `a_B`, which the conversion below fills with
+the explicit zero polynomial at `m = 1`.  The remaining five fields
 — orthonormalization inputs, strong self-consistency, and match-mass
 preservation — are the genuinely analytic obligations that must be supplied
 by the caller.
 
 A conversion theorem `baseStep6Hypotheses_ofBaseBridge` constructs the full
 `MainFormalStep6Hypotheses` from a `MainFormalBaseBridgeHypotheses` by
-providing default distinguished outcomes.
+providing the explicit zero polynomial as the distinguished outcome on both sides.
 
 Refs #1043, #1009, #422. -/
 structure MainFormalBaseBridgeHypotheses
@@ -4563,7 +4563,8 @@ structure MainFormalBaseBridgeHypotheses
           (roleResidual.rolePackage scalars).roleMeasurement)
 
 /-- Convert narrowed base bridge hypotheses to the full
-`MainFormalStep6Hypotheses` by providing default distinguished outcomes.
+`MainFormalStep6Hypotheses` by providing the explicit zero polynomial as the
+distinguished outcome on both sides.
 
 The distinguished outcomes `a_A` and `a_B` are chosen as the zero polynomial;
 `completeAtOutcomeProj` works for any distinguished outcome, so this choice
@@ -4582,20 +4583,21 @@ noncomputable def baseStep6Hypotheses_ofBaseBridge
       scalars roleResidual) :
     MainFormalStep6Hypotheses params strategy eps k hpass scalars roleResidual where
   orthonormalizationInput := bridge.orthonormalizationInput
-  a_A := Classical.choice (inferInstance : Nonempty (Polynomial params))
-  a_B := Classical.choice (inferInstance : Nonempty (Polynomial params))
+  a_A := { poly := 0, lowIndividualDegree := by intro i; simp [MvPolynomial.degreeOf_zero] }
+  a_B := { poly := 0, lowIndividualDegree := by intro i; simp [MvPolynomial.degreeOf_zero] }
   leftSelfConsistency := bridge.leftSelfConsistency
   rightSelfConsistency := bridge.rightSelfConsistency
   leftMatchMassPreservation := bridge.leftMatchMassPreservation
   rightMatchMassPreservation := bridge.rightMatchMassPreservation
 
-/-- Base-case specialization of `baseStep6WitnessResidual` that explicitly
-records the `params.m = 1` hypothesis alongside the narrowed bridge.
+/-- Convenience wrapper for `baseStep6WitnessResidual` using the narrowed
+base bridge.
 
 The narrowed `MainFormalBaseBridgeHypotheses` omits `a_A` and `a_B`, which
-are filled with the zero polynomial by `baseStep6Hypotheses_ofBaseBridge`.
-This serves as a future landing point for m=1-specific simplifications
-(e.g. single-element POVM orthonormalization).
+are filled with the explicit zero polynomial by
+`baseStep6Hypotheses_ofBaseBridge`. The `params.m = 1` hypothesis is consumed
+upstream when constructing the base-case role residual, so this wrapper only
+packages the Step~6 bridge conversion.
 
 Refs #1043. -/
 theorem baseStep6WitnessResidual_ofBaseBridge
@@ -4605,7 +4607,6 @@ theorem baseStep6WitnessResidual_ofBaseBridge
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
     (hsmall : ¬ 1 ≤ mainFormalError params k eps)
-    (hm1 : params.m = 1)
     (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
     (bridge : MainFormalBaseBridgeHypotheses params strategy eps k hpass
       scalars roleResidual) :
@@ -4756,8 +4757,8 @@ theorem mainFormal
         -- bridge from the external `hbaseBridge` hypothesis.
         rcases MainFormalRolePackageResidual.ofBaseCase params strategy eps k hpass hm1 with
           ⟨roleResidual⟩
-        exact baseStep6WitnessResidual herr roleResidual
-          (baseStep6Hypotheses_ofBaseBridge (hbaseBridge scalars roleResidual))
+        exact baseStep6WitnessResidual_ofBaseBridge herr roleResidual
+          (hbaseBridge scalars roleResidual)
       · -- Successor case (m > 1): needs recursive slices and self-improvement.
         -- TODO(#931, #834, #422): construct `MainFormalSuccessorRecursiveSlices`
         -- and `MainFormalSuccessorSelfImprovementProducer`.
