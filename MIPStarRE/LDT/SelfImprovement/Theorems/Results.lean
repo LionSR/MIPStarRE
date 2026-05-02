@@ -651,31 +651,34 @@ the precise analytic ingredient that is still missing — the helper-stage
 completeness lower bound on `Hhat.liftLeft` — and discharging the rest of the
 transport algebra (orthonormalization SDD step) with a checked proof.
 
-Concretely, `completenessTransportThroughOrthonormalization` is a generic
+Concretely, `completeness_transport_through_orthonormalization` is a generic
 transport theorem that lifts `completenessTransferSelfConsistentA` (already
 proved in `Preliminaries.SelfConsistency.Extensions`) to the
 `Unit`-indexed constant-family setting used by `selfImprovement`.
-`finalFieldsCompleteness_of_helperCompleteness` specializes that to the
+`final_fields_completeness_of_helper_completeness` specializes that to the
 self-improvement parameters and yields the precise `(1 - nu) - δ - 2 √ε`
 target on `H.toSubMeas.liftLeft`.
 
 This does **not** add a raw residual: the residual hypothesis has been narrowed
 from the entire `FinalFieldsInput` lump to the single named paper obligation
 `hhelperCompleteness`, which corresponds to `self_improvement.tex` lines
-136--142 (helper completeness) followed by the projective transfer at lines
-713--717. The remaining four `FinalFieldsInput` fields (point-consistency,
-self-closeness, projective-residual, boundedness) are not addressed here.
+351--414 (helper completeness, especially the Cauchy--Schwarz step at lines
+366--414) followed by the projective transfer at lines 713--717. The remaining
+four `FinalFieldsInput` fields (point-consistency, self-closeness,
+projective-residual, boundedness) are not addressed here.
 
 Paper anchors:
-* `references/ldt-paper/self_improvement.tex` lines 136--142 — helper-stage
-  completeness `⟨ψ|Hhat ⊗ I|ψ⟩ ≥ 1 - ν - O(...)` from the Cauchy--Schwarz
-  argument fed by the input consistency hypothesis on `G` and `nu`.
+* `references/ldt-paper/self_improvement.tex` lines 351--414 — helper-stage
+  completeness `⟨ψ|Hhat ⊗ I|ψ⟩ ≥ 1 - ν - O(...)`, with the Cauchy--Schwarz
+  argument fed by the input consistency hypothesis on `G` and `nu` at lines
+  366--414. The blueprint mirror is
+  `blueprint/src/chapter/ch07_self_improvement.tex` lines 101--142.
 * `references/ldt-paper/self_improvement.tex` lines 713--717 — projective
   transport of completeness from `Hhat` to `H` using strong self-consistency
   and the orthonormalization SDD bound.
 -/
 
-private lemma idxSubMeasMass_uniformUnit_constSubMeasFamily_liftLeft
+private lemma idx_sub_meas_mass_uniform_unit_const_sub_meas_family_lift_left
     {α : Type*} [Fintype α]
     (ψ : QuantumState (ι × ι)) (A : SubMeas α ι) :
     idxSubMeasMass ψ (uniformDistribution Unit)
@@ -695,8 +698,8 @@ completeness producer for `thm:self-improvement` (issue #931). Given:
   `m`, expressed as `subMeasMass ψ A.liftLeft ≥ m`. This is the still-missing
   paper obligation; with the current API the only way to obtain it is from the
   Cauchy--Schwarz argument in `references/ldt-paper/self_improvement.tex`
-  lines 136--142, which uses the incoming consistency hypothesis on `G` and
-  `nu`.
+  lines 351--414, especially lines 366--414, which uses the incoming
+  consistency hypothesis on `G` and `nu`.
 * `hssc` — bipartite strong self-consistency of `A` (the helper SSC supplied
   by `HelperStrongSelfConsistencyInput`).
 * `hsdd` — the orthonormalization SDD bound between the left lifts of `A` and
@@ -708,7 +711,7 @@ natural sum-of-errors `m - δ - 2 √ε` from the paper transport.
 
 The proof reduces to `completenessTransferSelfConsistentA` after rewriting
 `idxSubMeasMass` of a `Unit`-indexed constant family as `subMeasMass`. -/
-theorem completenessTransportThroughOrthonormalization
+theorem completeness_transport_through_orthonormalization
     {α : Type*} [Fintype α]
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -728,12 +731,12 @@ theorem completenessTransportThroughOrthonormalization
       idxSubMeasMass strategy.state (uniformDistribution Unit)
           (IdxSubMeas.liftLeft (constSubMeasFamily A)) =
         subMeasMass strategy.state A.liftLeft :=
-    idxSubMeasMass_uniformUnit_constSubMeasFamily_liftLeft strategy.state A
+    idx_sub_meas_mass_uniform_unit_const_sub_meas_family_lift_left strategy.state A
   have hB_eq :
       idxSubMeasMass strategy.state (uniformDistribution Unit)
           (IdxSubMeas.liftLeft (constSubMeasFamily B)) =
         subMeasMass strategy.state B.liftLeft :=
-    idxSubMeasMass_uniformUnit_constSubMeasFamily_liftLeft strategy.state B
+    idx_sub_meas_mass_uniform_unit_const_sub_meas_family_lift_left strategy.state B
   -- Apply the bipartite-SSC + SDD completeness transfer at `Question = Unit`.
   have htransfer :=
     Preliminaries.completenessTransferSelfConsistentA
@@ -771,11 +774,20 @@ a separate numerical step on the explicit error definitions
 This narrows the missing input for the `completeness` field of
 `FinalFieldsInput` from the entire five-field residual to the single named
 paper obligation `hhelperCompleteness` matching
-`references/ldt-paper/self_improvement.tex` lines 136--142, which is the only
-remaining analytic step (the Cauchy--Schwarz argument that feeds on `G`/`nu`
-and the strategy's input consistency). It does **not** assume the projective
-completeness it produces, and it does **not** restate `FinalFieldsInput`. -/
-theorem finalFieldsCompleteness_of_helperCompleteness
+`references/ldt-paper/self_improvement.tex` lines 351--414, which is the only
+remaining analytic step (especially the Cauchy--Schwarz argument at lines
+366--414 that feeds on `G`/`nu` and the strategy's input consistency). The
+blueprint mirror is `blueprint/src/chapter/ch07_self_improvement.tex` lines
+101--142.
+
+The hypothesis uses the weaker `(1 - nu) - selfImprovementHelperError`
+bookkeeping expected by the final-fields chain. A future helper-completeness
+producer may prove the paper's tighter `1 - ν - 3√δ` bound and then weaken it
+to this threshold.
+
+It does **not** assume the projective completeness it produces, and it does
+**not** restate `FinalFieldsInput`. -/
+theorem final_fields_completeness_of_helper_completeness
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta nu : Error)
@@ -808,7 +820,7 @@ theorem finalFieldsCompleteness_of_helperCompleteness
     simpa [IdxSubMeas.liftLeft, constSubMeasFamily] using horth
   -- Apply the generic transport theorem.
   have hresult :=
-    completenessTransportThroughOrthonormalization params strategy Hhat H.toSubMeas
+    completeness_transport_through_orthonormalization params strategy Hhat H.toSubMeas
       ((1 - nu) - selfImprovementHelperError params eps delta)
       (selfImprovementHelperError params eps delta)
       (selfImprovementOrthogonalizationError params eps delta)
