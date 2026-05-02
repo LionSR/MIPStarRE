@@ -7,9 +7,9 @@ import MIPStarRE.LDT.Basic.MeasurementLift
 /-!
 # Section 5 — Spectral truncation and locality-preserving repair bridges
 
-This file provides bridge structures and lemmas that connect the still-unformalized
-spectral-truncation and locality-preserving repair steps to the downstream
-consumers (`SpectralTruncationInput`, `LeftLiftedProjectivizationRepairInput`).
+This file provides bridge structures and lemmas that name the still-unformalized
+spectral-truncation and locality-preserving repair steps and their downstream
+consumers (`SpectralTruncationInput`, `OrthonormalizationInput`).
 
 ## Gap summary
 
@@ -27,14 +27,12 @@ Both are exposed as explicit structure fields below.
 ## What this file provides
 
 - `ProjectiveNonMeasurementBridgeInput` — explicit hypotheses for spectral truncation
-- `QXPLayerConstructionBridgeInput` — explicit hypotheses for QXP construction
 - `ProjectivizationRepairBridgeInput` — bundles the full chain inputs (caller supplies)
 - `roundingToProjectorsWitness_of_bridge` — trivial wrapper
 - `rankReductionWitness_of_bridge` — calls `projectiveLowRankSum`
 - `spectralTruncationStatement_of_bridge` — field-for-field conversion to
   `SpectralTruncationStatement`
   (requires the closeness bound weakened to `2√ζ` per paper; see #1032)
-- `toQXPLayerData` — structural copy to `QXPLayerData`
 
 ## References
 
@@ -69,8 +67,7 @@ paper-compatible error bounds.
 
 This structure is kept as a named landing point for future Lean proofs of
 the truncation-function step. Once a constructive proof is available, the
-downstream lemmas in this file will produce `SpectralTruncationInput` and
-`LeftLiftedProjectivizationRepairInput`. -/
+downstream lemmas in this file will produce `SpectralTruncationInput`. -/
 structure ProjectiveNonMeasurementBridgeInput {Outcome : Type uOutcome}
     [Fintype Outcome] [DecidableEq Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
@@ -113,45 +110,9 @@ requires explicit matrices `X` and `XHat` satisfying:
 - `Xᴴ * XHat = √Q` (mixed product)
 
 Building these from the `QLayerData` is currently unformalized.
-The following structure names the missing data. -/
-
-/-- Explicit bridge input for the `Q/X/XHat/P` construction from `QLayerData`.
-
-Given a `QLayerData` carrying the rank-reduced projectors `Q_a` and auxiliary
-projective measurement `T_a`, produce the matrices `X` and `XHat` satisfying
-the paper's `def:matrix-decomposition-Q` and `def:svd-of-X` identities. -/
-structure QXPLayerConstructionBridgeInput (Outcome : Type uOutcome) [Fintype Outcome]
-    (ι : Type uι) [Fintype ι] [DecidableEq ι] where
-  /-- Input rank-reduced Q-layer data. -/
-  qLayer : QLayerData Outcome ι
-  /-- Right-isometric matrix: `Xᴴ * X = Q`. -/
-  x : Matrix qLayer.auxSpace.carrier ι ℂ
-  /-- Coisometry on auxiliary space: `XHat * XHatᴴ = I`. -/
-  xHat : Matrix qLayer.auxSpace.carrier ι ℂ
-  /-- `Q_a = Xᴴ * T_a * X` for all a. -/
-  qa_eq : ∀ a : Outcome, qLayer.q.outcome a = xᴴ * Ta qLayer a * x
-  /-- Each `Q_a` is a projection. -/
-  qa_projective : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (qLayer.q.outcome a)
-  /-- `XHat` is a coisometry on the auxiliary space. -/
-  xHat_coisometry : xHat * xHatᴴ = 1
-  /-- Right Gram matrix: `Xᴴ * X = Q`. -/
-  x_gram_right : xᴴ * x = QTotal qLayer
-  /-- Mixed product: `Xᴴ * XHat = √Q`. -/
-  xHat_mixed : xᴴ * xHat = CFC.sqrt (QTotal qLayer)
-
-/-- Convert a QXP construction bridge input to the internal `QXPLayerData`. -/
-def toQXPLayerData {Outcome : Type uOutcome} [Fintype Outcome]
-    {ι : Type uι} [Fintype ι] [DecidableEq ι]
-    (input : QXPLayerConstructionBridgeInput Outcome ι) :
-    QXPLayerData Outcome ι where
-  qLayer := input.qLayer
-  x := input.x
-  xHat := input.xHat
-  qa_eq := input.qa_eq
-  qa_projective := input.qa_projective
-  xHat_coisometry := input.xHat_coisometry
-  x_gram_right := input.x_gram_right
-  xHat_mixed := input.xHat_mixed
+The `qxpConstruction` field in `ProjectivizationRepairBridgeInput` names this
+missing construction; the QXP data is returned as `QXPLayerData` tied to the
+input `QLayerData` by a dependent equality. -/
 
 /-! ### Projectivization repair bridge input
 
@@ -161,20 +122,18 @@ and QXP construction steps.
 
 Once both gaps are closed by constructive proofs, a conversion lemma will
 produce the `LeftLiftedProjectivizationRepairInput` needed at the `mainFormal`
-site. Until then, the caller supplies these inputs directly. -/
+site. Until then, the caller supplies the output of these fields directly. -/
 
 /-- Explicit bridge input for the full chain from almost-projectivity through
 rank reduction and QXP construction to a left-lifted projective submeasurement.
 
 The `qxpConstruction` field is a function from `QLayerData` × `RankReductionWitness`
-to `QXPLayerConstructionBridgeInput` — it constructs the specific X/XHat
-matrices for each instance. This is an intentional separation: the spectral
-truncation produces a specific rounded family, the rank reduction produces a
-specific Q-layer, and the QXP construction produces specific X/XHat given
-that Q-layer. -/
+to `QXPLayerData` (with a dependent equality tying `d.qLayer = data`).  This
+ensures that the Q-layer produced by rank reduction is the same Q-layer consumed
+by the QXP construction. -/
 structure ProjectivizationRepairBridgeInput {Outcome : Type uOutcome}
     [Fintype Outcome] [DecidableEq Outcome]
-    {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) where
   /-- The spectral truncation bridge input producing the rounded projectors `R_a`. -/
   spectralInput : ProjectiveNonMeasurementBridgeInput ψ A ζ
@@ -182,13 +141,13 @@ structure ProjectivizationRepairBridgeInput {Outcome : Type uOutcome}
   source_almost_projective :
     ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ
   /-- The QXP construction function: given Q-layer data and a rank-reduction
-  witness, produce the X/XHat matrices satisfying the QXP identities.
+  witness, produce `QXPLayerData` whose `qLayer` is exactly the input `data`.
 
   This field must be instantiated once the constructive QXP transition from
   `QLayerData` to `QXPLayerData` is formalized. -/
   qxpConstruction :
     (data : QLayerData Outcome ι) → RankReductionWitness ψ A ζ data →
-      QXPLayerConstructionBridgeInput Outcome ι
+      { d : QXPLayerData Outcome ι // d.qLayer = data }
 
 /-! ### Conversion lemmas
 
