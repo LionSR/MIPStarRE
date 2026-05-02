@@ -495,6 +495,41 @@ structure OrthonormalizationMatchMassPreservation
     qBipartiteMatchMass ψ P.toSubMeas B.toSubMeas ≥
       qBipartiteMatchMass ψ G.toSubMeas B.toSubMeas
 
+namespace OrthonormalizationMatchMassPreservation
+
+/-- Pointwise domination of the source measurement by the orthonormalized
+projective submeasurement implies match-mass preservation.
+
+This is the local algebraic interface needed by the paper-tight line-169 route:
+once the concrete orthonormalization construction proves
+`G.outcome a ≤ P.outcome a` for every outcome `a`, the diagonal overlap against
+any fixed partner measurement `B` can only increase.
+
+In the present typing this hypothesis is stronger than the paper's
+orthonormalization output.  Since `G` is a full `Measurement` and `P` is a
+`ProjSubMeas`, summing `hpoint` forces `P.total = 1`; the positive differences
+`P.outcome a - G.outcome a` must then vanish, so the usable case is essentially
+pointwise equality `G.outcome a = P.outcome a` for every `a`.  Because `P` is
+projective, this is the degenerate no-change situation where the source
+measurement is already projective.
+
+Thus this theorem is only a sufficient tautological constructor for that
+degenerate scope.  It is not a nontrivial orthonormalization repair proof: the
+paper gives state-dependent-distance closeness, not the operator inequality
+`G.outcome a ≤ P.outcome a`. -/
+theorem of_outcome_le {Outcome : Type*} {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype Outcome]
+    {ψ : QuantumState (ι × ι)} {G : Measurement Outcome ι}
+    {P : ProjSubMeas Outcome ι} {B : Measurement Outcome ι}
+    (hpoint : ∀ a : Outcome, G.outcome a ≤ P.outcome a) :
+    OrthonormalizationMatchMassPreservation ψ G P B := by
+  constructor
+  unfold qBipartiteMatchMass
+  exact Finset.sum_le_sum fun a _ =>
+    ev_mono ψ _ _ <| opTensor_mono_left (hpoint a) (B.toSubMeas.outcome_pos a)
+
+end OrthonormalizationMatchMassPreservation
+
 namespace ProjectivizationMatchMassMonotonicity
 
 /-- Construct `ProjectivizationMatchMassMonotonicity` from match-mass preservation
@@ -532,6 +567,33 @@ theorem of_submeasurement_match_mass_and_completion
         (hQBRight.trans (completeAtOutcomeProj_toMeasurement P_B a_B).symm)
   rw [hQALeftProj, hQBRightProj]
   exact of_completeAtOutcomeProj P_A P_B a_A a_B hleft hright
+
+/-- Construct the line-169 match-mass invariant from pointwise domination of the
+two orthonormalized submeasurements and the canonical completion equalities.
+
+This inherits the degenerate scope of
+`OrthonormalizationMatchMassPreservation.of_outcome_le`.  With
+`G_A G_B : Measurement Outcome ι` and `P_A P_B : ProjSubMeas Outcome ι`, the
+pointwise domination hypotheses are only expected when the source measurements
+already agree pointwise with the projective submeasurements (equivalently, in
+the no-change/projective-source case).  The theorem is therefore a sufficient
+constructor that composes the completion step with tautological preservation
+witnesses, not a nontrivial orthonormalization repair proof. -/
+theorem of_completion_and_outcome_le
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    {ψ : QuantumState (ι × ι)} {G_A G_B : Measurement Outcome ι}
+    (P_A P_B : ProjSubMeas Outcome ι) (a_A a_B : Outcome)
+    (Q_A Q_B : ProjMeas Outcome ι)
+    (hQALeft : Q_A.toMeasurement = completeAtOutcome P_A.toSubMeas a_A)
+    (hQBRight : Q_B.toMeasurement = completeAtOutcome P_B.toSubMeas a_B)
+    (hleftPoint : ∀ a : Outcome, G_A.outcome a ≤ P_A.outcome a)
+    (hrightPoint : ∀ a : Outcome, G_B.outcome a ≤ P_B.outcome a) :
+    ProjectivizationMatchMassMonotonicity ψ G_A G_B Q_A Q_B :=
+  of_submeasurement_match_mass_and_completion P_A P_B a_A a_B Q_A Q_B
+    hQALeft hQBRight
+    (OrthonormalizationMatchMassPreservation.of_outcome_le hleftPoint)
+    (OrthonormalizationMatchMassPreservation.of_outcome_le hrightPoint)
 
 end ProjectivizationMatchMassMonotonicity
 
