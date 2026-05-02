@@ -1041,6 +1041,36 @@ def mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement
     recursiveSlices := hrec
     selfImprovementProducer := hself }
 
+/-- Build the answer-valued successor boundary from bridge inputs instead of an
+already-packaged self-improvement producer.
+
+This is the answer-register counterpart of
+`mainFormalSuccessorBoundary_ofBridgeInputs`: it wires the answer-valued
+per-slice Section 9 bridge inputs through
+`mainFormalSuccessorAnswerSelfImprovementProducer_ofBridgeInputs` and packages
+that producer together with recursive slice witnesses and the weighted
+restricted-probability fields. -/
+noncomputable def mainFormalSuccessorAnswerBoundary_ofBridgeInputs
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (hrec : MainFormalSuccessorAnswerRecursiveSlices params strategy eps hpass k
+      (mainFormalSuccessorAnswerAxisWeightedBound_ofPass params strategy eps hpass)
+      (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass params strategy eps hpass))
+    (hbridge :
+      MainFormalSuccessorAnswerSelfImprovementBridgeInputs params strategy eps hpass k
+        (mainFormalSuccessorAnswerAxisWeightedBound_ofPass params strategy eps hpass)
+        (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass params strategy eps hpass)) :
+    MainFormalSuccessorAnswerBoundary params strategy eps hpass k :=
+  mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement params strategy eps hpass k
+    hrec
+    (mainFormalSuccessorAnswerSelfImprovementProducer_ofBridgeInputs params strategy eps
+      hpass k
+      (mainFormalSuccessorAnswerAxisWeightedBound_ofPass params strategy eps hpass)
+      (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass params strategy eps hpass)
+      hbridge)
+
 /-- Build the answer-valued successor boundary from an explicit predecessor
 induction hypothesis and an answer-valued self-improvement producer.
 
