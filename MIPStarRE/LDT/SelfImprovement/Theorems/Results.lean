@@ -643,4 +643,179 @@ theorem selfImprovementFromBridgeInputsSubMeas
     hinputs.helperStrongSelfConsistency
     hinputs.orthonormalization hinputs.finalFields hgood G Gmeas hbridge
 
+/-! ## Final-fields completeness producer (issue #931)
+
+The reduced `FinalFieldsInput` lumps five distinct paper-side obligations into a
+single residual. The lemmas below isolate the **completeness** field, exposing
+the precise analytic ingredient that is still missing — the helper-stage
+completeness lower bound on `Hhat.liftLeft` — and discharging the rest of the
+transport algebra (orthonormalization SDD step) with a checked proof.
+
+Concretely, `completenessTransportThroughOrthonormalization` is a generic
+transport theorem that lifts `completenessTransferSelfConsistentA` (already
+proved in `Preliminaries.SelfConsistency.Extensions`) to the
+`Unit`-indexed constant-family setting used by `selfImprovement`.
+`finalFieldsCompleteness_of_helperCompleteness` specializes that to the
+self-improvement parameters and yields the precise `(1 - nu) - δ - 2 √ε`
+target on `H.toSubMeas.liftLeft`.
+
+This does **not** add a raw residual: the residual hypothesis has been narrowed
+from the entire `FinalFieldsInput` lump to the single named paper obligation
+`hhelperCompleteness`, which corresponds to `self_improvement.tex` lines
+136--142 (helper completeness) followed by the projective transfer at lines
+713--717. The remaining four `FinalFieldsInput` fields (point-consistency,
+self-closeness, projective-residual, boundedness) are not addressed here.
+
+Paper anchors:
+* `references/ldt-paper/self_improvement.tex` lines 136--142 — helper-stage
+  completeness `⟨ψ|Hhat ⊗ I|ψ⟩ ≥ 1 - ν - O(...)` from the Cauchy--Schwarz
+  argument fed by the input consistency hypothesis on `G` and `nu`.
+* `references/ldt-paper/self_improvement.tex` lines 713--717 — projective
+  transport of completeness from `Hhat` to `H` using strong self-consistency
+  and the orthonormalization SDD bound.
+-/
+
+private lemma idxSubMeasMass_uniformUnit_constSubMeasFamily_liftLeft
+    {α : Type*} [Fintype α]
+    (ψ : QuantumState (ι × ι)) (A : SubMeas α ι) :
+    idxSubMeasMass ψ (uniformDistribution Unit)
+        (IdxSubMeas.liftLeft (constSubMeasFamily A)) =
+      subMeasMass ψ A.liftLeft := by
+  simp [idxSubMeasMass, avgOver, uniformDistribution, constSubMeasFamily,
+    IdxSubMeas.liftLeft, SubMeas.liftLeft]
+
+/-- Completeness transport through helper-stage strong self-consistency and the
+orthonormalization SDD step, for the `Unit`-indexed constant-family setting
+used by the self-improvement pipeline.
+
+This is the orthonormalization transport ingredient of the final-fields
+completeness producer for `thm:self-improvement` (issue #931). Given:
+
+* `hcomplete` — completeness of the *helper-stage* submeasurement `A` at level
+  `m`, expressed as `subMeasMass ψ A.liftLeft ≥ m`. This is the still-missing
+  paper obligation; with the current API the only way to obtain it is from the
+  Cauchy--Schwarz argument in `references/ldt-paper/self_improvement.tex`
+  lines 136--142, which uses the incoming consistency hypothesis on `G` and
+  `nu`.
+* `hssc` — bipartite strong self-consistency of `A` (the helper SSC supplied
+  by `HelperStrongSelfConsistencyInput`).
+* `hsdd` — the orthonormalization SDD bound between the left lifts of `A` and
+  `B` (the SDD bound supplied by the orthonormalization step inside
+  `selfImprovement`).
+
+The conclusion is the projective-stage completeness of `B.liftLeft` with the
+natural sum-of-errors `m - δ - 2 √ε` from the paper transport.
+
+The proof reduces to `completenessTransferSelfConsistentA` after rewriting
+`idxSubMeasMass` of a `Unit`-indexed constant family as `subMeasMass`. -/
+theorem completenessTransportThroughOrthonormalization
+    {α : Type*} [Fintype α]
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (A B : SubMeas α ι)
+    (m δ ε : Error)
+    (hcomplete : CompletenessAtLeast strategy.state A.liftLeft m)
+    (hssc :
+      BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily A) δ)
+    (hsdd :
+      SDDRel strategy.state (uniformDistribution Unit)
+        (IdxSubMeas.liftLeft (constSubMeasFamily A))
+        (IdxSubMeas.liftLeft (constSubMeasFamily B)) ε) :
+    CompletenessAtLeast strategy.state B.liftLeft (m - δ - 2 * Real.sqrt ε) := by
+  -- Mass equalities for `Unit`-indexed constant families.
+  have hA_eq :
+      idxSubMeasMass strategy.state (uniformDistribution Unit)
+          (IdxSubMeas.liftLeft (constSubMeasFamily A)) =
+        subMeasMass strategy.state A.liftLeft :=
+    idxSubMeasMass_uniformUnit_constSubMeasFamily_liftLeft strategy.state A
+  have hB_eq :
+      idxSubMeasMass strategy.state (uniformDistribution Unit)
+          (IdxSubMeas.liftLeft (constSubMeasFamily B)) =
+        subMeasMass strategy.state B.liftLeft :=
+    idxSubMeasMass_uniformUnit_constSubMeasFamily_liftLeft strategy.state B
+  -- Apply the bipartite-SSC + SDD completeness transfer at `Question = Unit`.
+  have htransfer :=
+    Preliminaries.completenessTransferSelfConsistentA
+      strategy.state strategy.permInvState strategy.isNormalized
+      (uniformDistribution Unit)
+      (uniformDistribution_weight_sum_le_one Unit)
+      (constSubMeasFamily A) (constSubMeasFamily B) δ ε hssc hsdd
+  rw [hA_eq, hB_eq] at htransfer
+  rcases hcomplete with ⟨hAmass⟩
+  refine ⟨?_⟩
+  -- `hAmass : m ≤ subMeasMass ψ A.liftLeft`
+  -- `htransfer : subMeasMass ψ A.liftLeft - δ - 2 √ε ≤ subMeasMass ψ B.liftLeft`
+  linarith
+
+/-- Final-fields completeness producer (issue #931).
+
+Given the still-missing helper-stage completeness lower bound on `Hhat.liftLeft`
+together with the helper-stage strong self-consistency of `Hhat` and the
+orthonormalization SDD bound between `Hhat.liftLeft` and `H.toSubMeas.liftLeft`
+(the latter two are already produced inside `selfImprovement`), this checked
+theorem derives the `completeness` field of `SelfImprovementFinalFields`.
+
+The output bound is the **natural** paper sum
+
+```
+(1 - nu) - selfImprovementHelperError - selfImprovementHelperError
+         - 2 * sqrt (selfImprovementOrthogonalizationError)
+```
+
+rather than `(1 - nu) - selfImprovementError`. Comparing the two thresholds is
+a separate numerical step on the explicit error definitions
+(`selfImprovementHelperError`, `selfImprovementOrthogonalizationError`,
+`selfImprovementError`) that does not require any new analytic input.
+
+This narrows the missing input for the `completeness` field of
+`FinalFieldsInput` from the entire five-field residual to the single named
+paper obligation `hhelperCompleteness` matching
+`references/ldt-paper/self_improvement.tex` lines 136--142, which is the only
+remaining analytic step (the Cauchy--Schwarz argument that feeds on `G`/`nu`
+and the strategy's input consistency). It does **not** assume the projective
+completeness it produces, and it does **not** restate `FinalFieldsInput`. -/
+theorem finalFieldsCompleteness_of_helperCompleteness
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta nu : Error)
+    (Hhat : SubMeas (Polynomial params) ι)
+    (H : ProjSubMeas (Polynomial params) ι)
+    (hhelperCompleteness :
+      CompletenessAtLeast strategy.state Hhat.liftLeft
+        ((1 - nu) - selfImprovementHelperError params eps delta))
+    (hssc :
+      BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily Hhat)
+        (selfImprovementHelperError params eps delta))
+    (horth :
+      SDDRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily Hhat.liftLeft)
+        (constSubMeasFamily H.toSubMeas.liftLeft)
+        (selfImprovementOrthogonalizationError params eps delta)) :
+    CompletenessAtLeast strategy.state H.toSubMeas.liftLeft
+      ((1 - nu) - selfImprovementHelperError params eps delta
+        - selfImprovementHelperError params eps delta
+        - 2 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta)) := by
+  -- The orthonormalization SDD bound is stated on `constSubMeasFamily` of the
+  -- left lifts; rewrite it into the `IdxSubMeas.liftLeft` form expected by the
+  -- generic transport theorem.
+  have hsdd :
+      SDDRel strategy.state (uniformDistribution Unit)
+        (IdxSubMeas.liftLeft (constSubMeasFamily Hhat))
+        (IdxSubMeas.liftLeft (constSubMeasFamily H.toSubMeas))
+        (selfImprovementOrthogonalizationError params eps delta) := by
+    simpa [IdxSubMeas.liftLeft, constSubMeasFamily] using horth
+  -- Apply the generic transport theorem.
+  have hresult :=
+    completenessTransportThroughOrthonormalization params strategy Hhat H.toSubMeas
+      ((1 - nu) - selfImprovementHelperError params eps delta)
+      (selfImprovementHelperError params eps delta)
+      (selfImprovementOrthogonalizationError params eps delta)
+      hhelperCompleteness hssc hsdd
+  -- Rearrange `(1 - nu - δ) - δ - 2 √ε` into the displayed form.
+  refine ⟨?_⟩
+  rcases hresult with ⟨hresult⟩
+  linarith
+
 end MIPStarRE.LDT.SelfImprovement
