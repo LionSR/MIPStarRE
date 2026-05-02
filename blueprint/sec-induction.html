@@ -849,9 +849,9 @@
         
         <ul class="uses">
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs" class="lean_decl">MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs</a></li>
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.averagedPoint_eq_of_pointMeasurement_eq" class="lean_decl">MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.averagedPoint_eq_of_pointMeasurement_eq</a></li>
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.ofSliceBridgeInputs" class="lean_decl">MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.ofSliceBridgeInputs</a></li>
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.ofPointMeasurementEq" class="lean_decl">MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.ofPointMeasurementEq</a></li>
           
         </ul>
     
@@ -862,7 +862,7 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>    The successor step records the slice-wise self-improvement output in <span class="ttfamily">SelfImprovementPackage</span>. The Lean-only <span class="ttfamily">SliceBridgeInputs</span> package is a narrow wiring interface: it assumes honest per-slice symmetric strategies and Section&#160;<a href="chap-self-improvement.html">7</a> bridge inputs, then converts them into the existing self-improvement package without discharging those assumptions. </p>
+  <p>     The successor step records the slice-wise self-improvement output in <span class="ttfamily">SelfImprovementPackage</span>. The Lean-only <span class="ttfamily">SliceBridgeInputs</span> package is a narrow wiring interface: it assumes honest per-slice symmetric strategies and Section&#160;<a href="chap-self-improvement.html">7</a> bridge inputs, while the averaged point-operator compatibility is derived structurally from the point-measurement transport. It then converts the remaining data into the existing self-improvement package. </p>
 
   </div>
 </div>
@@ -1102,7 +1102,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> In Lean, the base case and the internal successor-step assembly are now formalized through  together with the stage data   that mirror the four paper stages \(\text{restrict} \to \text{induct} \to \text{self-improve} \to \text{paste}\). The weighted restricted-probability boundary is now public via , and the final public successor-step wrapper is formalized as . The remaining gap, tracked by issues #630 and #632, is to produce the restricted-strategy self-improvement input needed to instantiate that wrapper directly from higher-level applications, so the displayed theorem is not yet marked . We may assume \(\varepsilon ,\delta ,\gamma ,d/q \le 1\), since otherwise \(\nu \ge 1\) and the bound is trivial. </p>
+  <p> In Lean, the base case and the internal successor-step assembly are now formalized through  together with the stage data    that mirror the four paper stages \(\text{restrict} \to \text{induct} \to \text{self-improve} \to \text{paste}\). The weighted restricted-probability boundary is now public via , and the final public successor-step wrapper is formalized as . The remaining gap, tracked by issue #931, is to produce the restricted-strategy self-improvement input needed to instantiate that wrapper directly from higher-level applications, so the displayed theorem is not yet marked . We may assume \(\varepsilon ,\delta ,\gamma ,d/q \le 1\), since otherwise \(\nu \ge 1\) and the bound is trivial. </p>
 <p>The proof is by induction on \(m\). The base case \(m=1\) is Lemma&#160;<a href="sec-induction.html#lem:main-induction-base">10.10</a>. </p>
 <p>For the step from \(m\) to \(m+1\), let \((\psi ,A,B,L)\) be an \((\varepsilon ,\delta ,\gamma )\)-good symmetric strategy for the \((m+1,q,d)\) test, and let \(k \ge 400(m+1)d\). For each \(x \in \mathbb {F}_q\), let \((\psi ,A^x,B^x,L^x)\) be the \(x\)-restricted strategy, with failure parameters \(\varepsilon _x,\delta _x,\gamma _x\). Apply the induction hypothesis to each restricted strategy with the same integer \(k\) and define </p>
 <div class="displaymath" id="a0000000551">
