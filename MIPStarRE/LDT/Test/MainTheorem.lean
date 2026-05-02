@@ -4493,31 +4493,109 @@ theorem baseStep6WitnessResidual
       bridge.leftMatchMassPreservation bridge.rightMatchMassPreservation
 
 
-/-- Named type for the base-case Step 6 bridge hypotheses consumed by `mainFormal`.
+/-- Narrowed base-case bridge hypotheses for Step 6 when `params.m = 1`.
 
-When `params.m = 1`, the Step 6 witness residual can be constructed from the
-six analytic hypotheses packaged by `MainFormalStep6Hypotheses`.  This type
-alias gives that bridge a stable, searchable name, matching the pattern of
-`MainFormalSuccessorSelfImprovementBridgeInputs` on the successor side.
+Compared to `MainFormalStep6Hypotheses`, this structure omits the two
+distinguished outcomes `a_A` and `a_B`, which can be filled with default
+polynomials (the zero polynomial) at `m = 1`.  The remaining five fields
+— orthonormalization inputs, strong self-consistency, and match-mass
+preservation — are the genuinely analytic obligations that must be supplied
+by the caller.
+
+A conversion theorem `baseStep6Hypotheses_ofBaseBridge` constructs the full
+`MainFormalStep6Hypotheses` from a `MainFormalBaseBridgeHypotheses` by
+providing default distinguished outcomes.
 
 Refs #1043, #1009, #422. -/
-def MainFormalBaseBridgeHypotheses
+structure MainFormalBaseBridgeHypotheses
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps) : Type _ :=
-  (scalars : MainFormalCascadeScalars params eps k) →
-  ∀ (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k),
-  MainFormalStep6Hypotheses params strategy eps k hpass scalars roleResidual
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (scalars : MainFormalCascadeScalars params eps k)
+    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) where
+  /-- Line-130 orthonormalization inputs: spectral-truncation and
+  locality-preserving repair witnesses for both unsymmetrized POVMs. -/
+  orthonormalizationInput :
+    MainFormalPostRolePackageLine130OrthonormalizationInput
+      params strategy eps k scalars (roleResidual.rolePackage scalars)
+  /-- Alice-side strong self-consistency for the unsymmetrized POVM
+  obtained from the role measurement. -/
+  leftSelfConsistency :
+    BipartiteSSCRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily
+        (unsymmetrizedLeftPOVM
+          (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
+      scalars.zeta1
+  /-- Bob-side strong self-consistency for the unsymmetrized POVM
+  obtained from the role measurement. -/
+  rightSelfConsistency :
+    BipartiteSSCRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily
+        (unsymmetrizedRightPOVM
+          (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
+      scalars.zeta1
+  /-- Alice-side match-mass preservation: for each line-130 orthonormalization
+  residual, the projective submeasurement `P_A` preserves match mass against
+  Bob's unsymmetrized POVM. -/
+  leftMatchMassPreservation :
+    ∀ orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
+        params strategy eps k scalars (roleResidual.rolePackage scalars),
+      MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation
+        strategy.state
+        (unsymmetrizedLeftPOVM
+          (roleResidual.rolePackage scalars).roleMeasurement)
+        orthResidual.P_A
+        (unsymmetrizedRightPOVM
+          (roleResidual.rolePackage scalars).roleMeasurement)
+  /-- Bob-side match-mass preservation: for each line-130 orthonormalization
+  residual, the projective submeasurement `P_B` preserves match mass against
+  Alice's unsymmetrized POVM. -/
+  rightMatchMassPreservation :
+    ∀ orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
+        params strategy eps k scalars (roleResidual.rolePackage scalars),
+      MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation
+        strategy.state
+        (unsymmetrizedRightPOVM
+          (roleResidual.rolePackage scalars).roleMeasurement)
+        orthResidual.P_B
+        (unsymmetrizedLeftPOVM
+          (roleResidual.rolePackage scalars).roleMeasurement)
+
+/-- Convert narrowed base bridge hypotheses to the full
+`MainFormalStep6Hypotheses` by providing default distinguished outcomes.
+
+The distinguished outcomes `a_A` and `a_B` are chosen as the zero polynomial;
+`completeAtOutcomeProj` works for any distinguished outcome, so this choice
+is sound.  Callers that need specific distinguished outcomes should use
+`MainFormalStep6Hypotheses` directly.
+
+Refs #1043. -/
+noncomputable def baseStep6Hypotheses_ofBaseBridge
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    {scalars : MainFormalCascadeScalars params eps k}
+    {roleResidual : MainFormalRolePackageResidual params strategy eps hpass k}
+    (bridge : MainFormalBaseBridgeHypotheses params strategy eps k hpass
+      scalars roleResidual) :
+    MainFormalStep6Hypotheses params strategy eps k hpass scalars roleResidual where
+  orthonormalizationInput := bridge.orthonormalizationInput
+  a_A := Classical.choice (inferInstance : Nonempty (Polynomial params))
+  a_B := Classical.choice (inferInstance : Nonempty (Polynomial params))
+  leftSelfConsistency := bridge.leftSelfConsistency
+  rightSelfConsistency := bridge.rightSelfConsistency
+  leftMatchMassPreservation := bridge.leftMatchMassPreservation
+  rightMatchMassPreservation := bridge.rightMatchMassPreservation
 
 /-- Base-case specialization of `baseStep6WitnessResidual` that explicitly
-records the `params.m = 1` hypothesis alongside the bridge.
+records the `params.m = 1` hypothesis alongside the narrowed bridge.
 
-This theorem is definitionally the same as calling `baseStep6WitnessResidual`
-with the bridge applied to `scalars` and `roleResidual`; it exists to document
-the base-case proof obligation and to serve as a future landing point for
-m=1-specific simplifications (e.g. trivial distinguished outcomes or
-single-element POVM orthonormalization).
+The narrowed `MainFormalBaseBridgeHypotheses` omits `a_A` and `a_B`, which
+are filled with the zero polynomial by `baseStep6Hypotheses_ofBaseBridge`.
+This serves as a future landing point for m=1-specific simplifications
+(e.g. single-element POVM orthonormalization).
 
 Refs #1043. -/
 theorem baseStep6WitnessResidual_ofBaseBridge
@@ -4529,10 +4607,14 @@ theorem baseStep6WitnessResidual_ofBaseBridge
     (hsmall : ¬ 1 ≤ mainFormalError params k eps)
     (hm1 : params.m = 1)
     (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
-    (bridge : MainFormalBaseBridgeHypotheses params strategy eps k hpass) :
+    (bridge : MainFormalBaseBridgeHypotheses params strategy eps k hpass
+      scalars roleResidual) :
     Nonempty (MainFormalCascadeRolePackageResidualStep6WitnessResidual
       params strategy eps hpass k scalars) := by
-  exact baseStep6WitnessResidual hsmall roleResidual (bridge scalars roleResidual)
+  exact baseStep6WitnessResidual hsmall roleResidual
+    (baseStep6Hypotheses_ofBaseBridge bridge)
+
+
 
 
 /--
@@ -4585,7 +4667,9 @@ theorem mainFormal
     (k : ℕ)
     (hk : 400 * params.m * params.d ≤ k)
     (hk0 : 0 < k)
-    (hbaseBridge : MainFormalBaseBridgeHypotheses params strategy eps k hpass) :
+    (hbaseBridge : (scalars : MainFormalCascadeScalars params eps k) →
+      ∀ (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k),
+      MainFormalBaseBridgeHypotheses params strategy eps k hpass scalars roleResidual) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
@@ -4672,7 +4756,8 @@ theorem mainFormal
         -- bridge from the external `hbaseBridge` hypothesis.
         rcases MainFormalRolePackageResidual.ofBaseCase params strategy eps k hpass hm1 with
           ⟨roleResidual⟩
-        exact baseStep6WitnessResidual herr roleResidual (hbaseBridge scalars roleResidual)
+        exact baseStep6WitnessResidual herr roleResidual
+          (baseStep6Hypotheses_ofBaseBridge (hbaseBridge scalars roleResidual))
       · -- Successor case (m > 1): needs recursive slices and self-improvement.
         -- TODO(#931, #834, #422): construct `MainFormalSuccessorRecursiveSlices`
         -- and `MainFormalSuccessorSelfImprovementProducer`.
