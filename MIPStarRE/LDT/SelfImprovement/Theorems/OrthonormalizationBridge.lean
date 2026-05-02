@@ -40,6 +40,10 @@ extra assumption.
   spectral slice down to a producer of `RoundingToProjectorsWitness`es for the
   option-completed left-lifted helper measurement, using the conversion
   introduced by `#1042`.
+* `orthonormalizationSpectralProducer_of_projectiveNonMeasurement` — narrows
+  the same slice to the named QXP-layer statement
+  `projectiveNonMeasurement`, i.e. the Lean form of
+  `lem:projective-non-measurement`.
 
 ## References
 
@@ -166,5 +170,31 @@ noncomputable def orthonormalizationSpectralProducer_of_roundingWitnesses
         (consistencyToAlmostProjectiveError
           (2 * selfImprovementHelperError params eps delta))
         R hR
+
+/-- Build the spectral slice of `SelfImprovement.OrthonormalizationInput` from
+the named QXP-layer `projectiveNonMeasurement` statement.
+
+Compared with `orthonormalizationSpectralProducer_of_roundingWitnesses`, this
+version exposes the remaining constructive obligation at the paper-facing
+statement `lem:projective-non-measurement` instead of asking callers to provide
+the dependent pair of rounded-family data directly. -/
+noncomputable def orthonormalizationSpectralProducer_of_projectiveNonMeasurement
+    {params : Parameters} [FieldModel params.q]
+    {strategy : SymStrat params ι} {eps delta : Error}
+    (hprojective : ∀ {Hhat : SubMeas (Polynomial params) ι},
+      BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily Hhat)
+        (selfImprovementHelperError params eps delta) →
+      projectiveNonMeasurement strategy.state
+        (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
+        (consistencyToAlmostProjectiveError
+          (2 * selfImprovementHelperError params eps delta))) :
+    OrthonormalizationSpectralProducer params strategy eps delta :=
+  fun {Hhat} hssc =>
+    spectralTruncationInput_of_projectiveNonMeasurement strategy.state
+      (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
+      (consistencyToAlmostProjectiveError
+        (2 * selfImprovementHelperError params eps delta))
+      (hprojective hssc)
 
 end MIPStarRE.LDT.SelfImprovement
