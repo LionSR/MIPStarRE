@@ -4693,8 +4693,7 @@ This theorem takes an explicit `roleResidual` (obtainable from either
 `MainFormalRolePackageResidual.ofBaseCase` or the successor-branch
 handoff) and the `MainFormalStep6Hypotheses` bridge, then assembles the
 Step 6 witness residual through
-`MainFormalCascadeRolePackageResidualStep6WitnessResidual.
-nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs`.
+`MainFormalCascadeRolePackageResidualStep6WitnessResidual.nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs`.
 
 Refs #1009, #422. -/
 theorem baseStep6WitnessResidual
@@ -4710,8 +4709,7 @@ theorem baseStep6WitnessResidual
     Nonempty (MainFormalCascadeRolePackageResidualStep6WitnessResidual
       params strategy eps hpass k scalars) := by
   exact
-    open MainFormalCascadeRolePackageResidualStep6WitnessResidual in
-      nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs
+    MainFormalCascadeRolePackageResidualStep6WitnessResidual.nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs
       hsmall roleResidual bridge.orthonormalizationInput bridge.a_A bridge.a_B
       bridge.leftSelfConsistency bridge.rightSelfConsistency
       bridge.leftMatchMassPreservation bridge.rightMatchMassPreservation
@@ -4959,7 +4957,7 @@ theorem mainFormal
     (hbaseBridge : (scalars : MainFormalCascadeScalars params eps k) →
       ∀ (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k),
       MainFormalBaseBridgeHypotheses params strategy eps k hpass scalars roleResidual)
-    (hsuccessorBridge : params.m ≠ 1 → 0 < params.d →
+    (hsuccessorBridge : params.m ≠ 1 →
       MainFormalSuccessorStep6BridgeInputs params strategy eps k hpass) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
@@ -5049,7 +5047,7 @@ theorem mainFormal
         exact baseStep6WitnessResidual_ofBaseBridge herr roleResidual
           (hbaseBridge scalars roleResidual)
       · -- Successor case (m > 1): needs recursive slices and self-improvement.
-        exact successorStep6WitnessResidual_ofBridge herr hk (hsuccessorBridge hm1 hd)
+        exact successorStep6WitnessResidual_ofBridge herr hk (hsuccessorBridge hm1)
     rcases hstep6WitnessResidual with ⟨step6WitnessResidual⟩
     let rolePackage := step6WitnessResidual.roleResidual.rolePackage scalars
     have hpre : ConsRel strategy.state (uniformDistribution Unit)
