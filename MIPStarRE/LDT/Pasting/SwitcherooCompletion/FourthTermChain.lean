@@ -4,7 +4,7 @@ import MIPStarRE.LDT.Pasting.SwitcherooCompletion.Expansion
 /-!
 # Section 12 pasting: fourth-term chain helpers
 
-Private helpers for the fourth-term chain in `commutativitySwitcheroo`.
+Internal helpers by convention for the fourth-term chain in `commutativitySwitcheroo`.
 These were extracted from `SwitcherooCompletion` to keep that file under
 the 1000-line threshold.
 -/
@@ -18,219 +18,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-lemma switcherooAggregateLeftFront_contraction
-    {Outcome : Type*} [Fintype Outcome]
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι)
-    (M : IdxProjSubMeas (Fq params) Outcome ι)
-    (q : SlicePairQuestion params) :
-    (∑ go : Polynomial params × Outcome,
-        (∑ _u : Unit,
-            leftTensor (ι₂ := ι)
-              (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2))ᴴ *
-          (∑ _u : Unit,
-            leftTensor (ι₂ := ι)
-              (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2))) ≤ 1 := by
-  calc
-    (∑ go : Polynomial params × Outcome,
-        (∑ u : Unit,
-            leftTensor (ι₂ := ι)
-              (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2))ᴴ *
-          (∑ u : Unit,
-            leftTensor (ι₂ := ι)
-              (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2)))
-      = ∑ go : Polynomial params × Outcome,
-          leftTensor (ι₂ := ι)
-            ((M q.2).outcome go.2 *
-              (family.meas q.1).outcome go.1 *
-              (M q.2).outcome go.2) := by
-            refine Finset.sum_congr rfl ?_
-            intro go _
-            calc
-              (∑ u : Unit,
-                  leftTensor (ι₂ := ι)
-                    (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2))ᴴ *
-                (∑ u : Unit,
-                  leftTensor (ι₂ := ι)
-                    (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2))
-                = (leftTensor (ι₂ := ι)
-                    (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2))ᴴ *
-                    leftTensor (ι₂ := ι)
-                      (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2) := by
-                        simp
-              _ = leftTensor (ι₂ := ι)
-                    ((((family.meas q.1).outcome go.1) * (M q.2).outcome go.2)ᴴ *
-                      (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2)) := by
-                        rw [show
-                          (leftTensor (ι₂ := ι)
-                              (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2))ᴴ =
-                            leftTensor (ι₂ := ι)
-                              ((((family.meas q.1).outcome go.1) * (M q.2).outcome go.2)ᴴ) by
-                              simpa [leftTensor, opTensor] using
-                                (conjTranspose_opTensor
-                                  (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2)
-                                  (1 : MIPStarRE.Quantum.Op ι))]
-                        rw [leftTensor_mul_leftTensor]
-              _ = leftTensor (ι₂ := ι)
-                    ((M q.2).outcome go.2 *
-                      (family.meas q.1).outcome go.1 *
-                      (M q.2).outcome go.2) := by
-                        congr 1
-                        have hGherm : ((family.meas q.1).outcome go.1)ᴴ =
-                            (family.meas q.1).outcome go.1 :=
-                          (family.meas q.1).outcome_hermitian go.1
-                        have hMoherm : ((M q.2).outcome go.2)ᴴ =
-                            (M q.2).outcome go.2 :=
-                          (M q.2).outcome_hermitian go.2
-                        calc
-                          ((((family.meas q.1).outcome go.1) * (M q.2).outcome go.2)ᴴ) *
-                              (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2)
-                            = (((M q.2).outcome go.2) * (family.meas q.1).outcome go.1) *
-                                (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2) := by
-                                    simp [Matrix.conjTranspose_mul, hGherm, hMoherm]
-                          _ = (M q.2).outcome go.2 *
-                                ((family.meas q.1).outcome go.1 * (family.meas q.1).outcome go.1) *
-                                (M q.2).outcome go.2 := by
-                                    simp [mul_assoc]
-                          _ = (M q.2).outcome go.2 *
-                                (family.meas q.1).outcome go.1 *
-                                (M q.2).outcome go.2 := by
-                                    rw [(family.meas q.1).proj go.1]
-    _ = ∑ o : Outcome,
-          leftTensor (ι₂ := ι)
-            ((M q.2).outcome o * (completePartSubMeas params family q.1).total *
-              (M q.2).outcome o) := by
-            calc
-              ∑ go : Polynomial params × Outcome,
-                  leftTensor (ι₂ := ι)
-                    ((M q.2).outcome go.2 *
-                      (family.meas q.1).outcome go.1 *
-                      (M q.2).outcome go.2)
-                = ∑ g : Polynomial params,
-                    ∑ o : Outcome,
-                      leftTensor (ι₂ := ι)
-                        ((M q.2).outcome o *
-                          (family.meas q.1).outcome g *
-                          (M q.2).outcome o) := by
-                          simpa using
-                            (Fintype.sum_prod_type' (f := fun g o =>
-                              leftTensor (ι₂ := ι)
-                                ((M q.2).outcome o *
-                                  (family.meas q.1).outcome g *
-                                  (M q.2).outcome o)))
-              _ = ∑ o : Outcome,
-                    ∑ g : Polynomial params,
-                      leftTensor (ι₂ := ι)
-                        ((M q.2).outcome o *
-                          (family.meas q.1).outcome g *
-                          (M q.2).outcome o) := by
-                          rw [Finset.sum_comm]
-              _ = ∑ o : Outcome,
-                    leftTensor (ι₂ := ι)
-                      ((M q.2).outcome o * (completePartSubMeas params family q.1).total *
-                        (M q.2).outcome o) := by
-                          refine Finset.sum_congr rfl ?_
-                          intro o _
-                          rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ]
-                          congr 1
-                          calc
-                            ∑ g : Polynomial params,
-                                (M q.2).outcome o * (family.meas q.1).outcome g * (M q.2).outcome o
-                              = (M q.2).outcome o *
-                                  (∑ g : Polynomial params, (family.meas q.1).outcome g) *
-                                  (M q.2).outcome o := by
-                                    simp [mul_assoc, Matrix.mul_sum, Finset.sum_mul]
-                            _ = (M q.2).outcome o * (completePartSubMeas params family q.1).total *
-                                  (M q.2).outcome o := by
-                                    rw [(family.meas q.1).sum_eq_total]
-                                    simp [completePartSubMeas, postprocess_total]
-    _ ≤ 1 := by
-          rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ]
-          have hGle : (completePartSubMeas params family q.1).total ≤ 1 :=
-            (completePartSubMeas params family q.1).total_le_one
-          have hmid_le :
-              ∑ o : Outcome,
-                  (M q.2).outcome o * (completePartSubMeas params family q.1).total *
-                    (M q.2).outcome o ≤ 1 := by
-            exact projSubMeas_sandwich_sum_le_one (M q.2)
-              ((completePartSubMeas params family q.1).total) hGle
-          calc
-            leftTensor (ι₂ := ι)
-                (∑ o : Outcome,
-                  (M q.2).outcome o * (completePartSubMeas params family q.1).total *
-                    (M q.2).outcome o)
-              ≤ leftTensor (ι₂ := ι) (1 : MIPStarRE.Quantum.Op ι) := by
-                  simpa [leftTensor, opTensor] using
-                    (opTensor_mono_left (ι₂ := ι) (B := (1 : MIPStarRE.Quantum.Op ι))
-                      hmid_le (show (0 : MIPStarRE.Quantum.Op ι) ≤ 1 by exact zero_le_one))
-            _ = 1 := by simp [leftTensor]
-
-lemma switcherooAggregateLeftFrontRaw_point
-    {Outcome : Type*} [Fintype Outcome]
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (M : IdxProjSubMeas (Fq params) Outcome ι)
-    (q : SlicePairQuestion params) :
-    (∑ go : Polynomial params × Outcome,
-        ∑ _u : Unit,
-          ev ψbi
-            ((switcherooPointProductLeft params family M q).outcome go *
-              leftTensor (ι₂ := ι)
-                (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2))) =
-      ∑ go : Polynomial params × Outcome,
-        ev ψbi
-          (leftTensor (ι₂ := ι)
-            (((family.meas q.1).outcome go.1) *
-              (M q.2).outcome go.2 *
-              (family.meas q.1).outcome go.1 *
-              (M q.2).outcome go.2)) := by
-  refine Finset.sum_congr rfl ?_
-  intro go _
-  rcases go with ⟨g, o⟩
-  simp [switcherooPointProductLeft, orderedProductOpFamily,
-    OpFamily.leftPlacedOpFamily, leftTensor_mul_leftTensor, mul_assoc]
-
-lemma switcherooAggregateFirstSplitRaw_point
-    {Outcome : Type*} [Fintype Outcome]
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (M : IdxProjSubMeas (Fq params) Outcome ι)
-    (q : SlicePairQuestion params) :
-    (∑ go : Polynomial params × Outcome,
-        ∑ _u : Unit,
-          ev ψbi
-            ((switcherooPointProductRight params family M q).outcome go *
-              leftTensor (ι₂ := ι)
-                (((family.meas q.1).outcome go.1) * (M q.2).outcome go.2))) =
-      ∑ go : Polynomial params × Outcome,
-        ev ψbi
-          (leftTensor (ι₂ := ι)
-            ((M q.2).outcome go.2 *
-              (family.meas q.1).outcome go.1 *
-              (M q.2).outcome go.2)) := by
-  refine Finset.sum_congr rfl ?_
-  intro go _
-  rcases go with ⟨g, o⟩
-  calc
-    ∑ u : Unit,
-        ev ψbi
-          ((switcherooPointProductRight params family M q).outcome (g, o) *
-            leftTensor (ι₂ := ι) (((family.meas q.1).outcome g) * (M q.2).outcome o))
-      = ev ψbi
-          (leftTensor (ι₂ := ι)
-            ((M q.2).outcome o * (family.meas q.1).outcome g *
-              (family.meas q.1).outcome g * (M q.2).outcome o)) := by
-              simp [switcherooPointProductRight, reversedProductOpFamily,
-                OpFamily.leftPlacedOpFamily, leftTensor_mul_leftTensor, mul_assoc]
-    _ = ev ψbi
-          (leftTensor (ι₂ := ι)
-            ((M q.2).outcome o * (family.meas q.1).outcome g *
-              (M q.2).outcome o)) := by
-              congr 1
-              simp [mul_assoc, (family.meas q.1).proj g]
-
+/-- Pointwise identity rewriting the mixed raw scalar into the right/left tensor order. -/
 lemma switcherooAggregateMixedRaw_point
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -259,6 +47,8 @@ lemma switcherooAggregateMixedRaw_point
   refine Finset.sum_congr rfl ?_
   intro o _
   rw [rightTensor_mul_leftTensor_eq_opTensor, leftTensor_mul_rightTensor_eq_opTensor]
+
+/-- Bridge: the mixed raw scalar is within √ζ of the left-front raw scalar. -/
 lemma switcherooAggregateMixedRaw_close_leftFrontRaw
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -397,6 +187,7 @@ lemma switcherooAggregateMixedRaw_close_leftFrontRaw
       switcherooAggregateFourthTerm_mixed_close_left_front_raw
           params ψbi hnorm family M zeta hselfG
 
+/-- Sum-rewrite identity collapsing the product-type sum for the once-commuted raw scalar. -/
 lemma switcherooAggregateOnceCommutedRaw_point
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -431,6 +222,8 @@ lemma switcherooAggregateOnceCommutedRaw_point
   change (∑ g : Polynomial params, ∑ o : Outcome, f g o) =
     ∑ go : Polynomial params × Outcome, f go.1 go.2
   simpa using (Fintype.sum_prod_type' (f := f)).symm
+
+/-- Bridge: the once-commuted raw scalar is within √ζ of the mixed raw scalar. -/
 lemma switcherooAggregateOnceCommutedRaw_close_mixed
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]

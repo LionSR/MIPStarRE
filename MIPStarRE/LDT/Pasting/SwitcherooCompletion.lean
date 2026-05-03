@@ -3,13 +3,11 @@ import MIPStarRE.LDT.Pasting.SwitcherooCompletion.SecondTerm
 import MIPStarRE.LDT.Pasting.SwitcherooCompletion.Utilities
 import MIPStarRE.LDT.Pasting.SwitcherooCompletion.FourthTermChain
 
-
 /-!
 # Section 12 pasting: switcheroo completion bounds
 
 Completion and first-stage switcheroo error bounds.
 -/
-
 
 namespace MIPStarRE.LDT.Pasting
 
@@ -295,6 +293,5 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
     _ = commutativitySwitcherooError zeta omega chi := by
           simp [commutativitySwitcherooError, Real.sqrt_eq_rpow]
           ring
-
 
 end MIPStarRE.LDT.Pasting
