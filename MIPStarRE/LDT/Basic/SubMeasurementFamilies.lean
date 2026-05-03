@@ -96,6 +96,22 @@ noncomputable def postprocess {α β : Type*} {ι : Type*} [Fintype ι] [Decidab
 
 namespace SubMeas
 
+/-- Postprocessing a submeasurement by the identity readout leaves it unchanged. -/
+@[simp] theorem postprocess_id {α ι : Type*}
+    [Fintype α] [Fintype ι] [DecidableEq ι]
+    (A : SubMeas α ι) :
+    postprocess A (fun a : α => a) = A := by
+  classical
+  refine SubMeas.ext ?_ rfl
+  intro a
+  simp only [postprocess, Finset.sum_filter]
+  rw [Finset.sum_eq_single a]
+  · simp
+  · intro b _hb hba
+    simp [hba]
+  · intro ha
+    simp at ha
+
 /-- Transport a submeasurement along an equivalence of outcome types. -/
 noncomputable def transport {α β : Type*} {ι : Type*}
     [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]

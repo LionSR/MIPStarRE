@@ -551,21 +551,6 @@ lemma addInU_pointMeasurement_snd_selfConsistency
       delta
       (fun _uv (a : Fq params) => a)
       hssc_pair
-  have hpost_id :
-      ∀ uv : Point params × Point params,
-        postprocess ((strategy.pointMeasurement uv.2).toSubMeas)
-            (fun a : Fq params => a) =
-          (strategy.pointMeasurement uv.2).toSubMeas := by
-    intro uv
-    refine SubMeas.ext ?_ rfl
-    intro a
-    simp only [postprocess, Finset.sum_filter]
-    rw [Finset.sum_eq_single a]
-    · simp
-    · intro b _hb hba
-      simp [hba]
-    · intro ha
-      simp at ha
   have hleft :
       IdxSubMeas.liftLeft
           (fun uv : Point params × Point params =>
@@ -575,7 +560,7 @@ lemma addInU_pointMeasurement_snd_selfConsistency
           (fun uv : Point params × Point params =>
             (strategy.pointMeasurement uv.2).toSubMeas) := by
     funext uv
-    simp [IdxSubMeas.liftLeft, hpost_id uv]
+    simp [IdxSubMeas.liftLeft]
   have hright :
       IdxSubMeas.liftRight
           (fun uv : Point params × Point params =>
@@ -585,7 +570,7 @@ lemma addInU_pointMeasurement_snd_selfConsistency
           (fun uv : Point params × Point params =>
             (strategy.pointMeasurement uv.2).toSubMeas) := by
     funext uv
-    simp [IdxSubMeas.liftRight, hpost_id uv]
+    simp [IdxSubMeas.liftRight]
   simpa [hleft, hright] using hraw
 
 /-- The grouped tensor mass over a fiber `h(v)=a` is a contraction.
