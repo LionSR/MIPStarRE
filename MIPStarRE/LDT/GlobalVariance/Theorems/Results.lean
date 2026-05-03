@@ -3,6 +3,7 @@ import MIPStarRE.LDT.GlobalVariance.Theorems.CollisionExpansion
 import MIPStarRE.LDT.GlobalVariance.Theorems.SelfConsistencyTransport
 import MIPStarRE.LDT.GlobalVariance.Theorems.TransportChain
 import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
+import MIPStarRE.LDT.GlobalVariance.Theorems.PolynomialSumBounds
 
 /-!
 # GlobalVariance Theorems — Results barrel
@@ -20,6 +21,8 @@ sub-modules:
   presentation
 - `MainTheorems`: top-level `lem:local-variance-of-points`,
   `lem:global-variance-of-points`, and matrix-level counterparts
+- `PolynomialSumBounds`: cardinality-free polynomial-sum bounds for the
+  Schwartz-Zippel transport step underlying `eq:equivalent-local-variance`
 
 Backward-compatibility: all theorems previously in `Results.lean` remain
 available through this barrel import.

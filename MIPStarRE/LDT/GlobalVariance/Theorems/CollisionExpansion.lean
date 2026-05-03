@@ -254,7 +254,8 @@ private lemma generalizeBCollisionSeed_integrand
   rw [ev_finset_sum]
   simp [Finset.sum_filter]
 
-private lemma generalizeBLineCollisionTensorMass_nonneg
+/-- Positivity of the tensor mass appearing in the line-collision expansion. -/
+lemma generalizeBLineCollisionTensorMass_nonneg
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -315,7 +316,8 @@ private lemma generalizeBLineCollisionTensorMass_sum_le_one
             _ ≤ 1 := leftTensor_le_one (ι₂ := ι) B.total_le_one
     _ = 1 := ev_one_of_isNormalized strategy.state strategy.isNormalized
 
-private lemma generalizeBLineCollisionCoefficient_le
+/-- Schwartz--Zippel coefficient bound for a fixed polynomial, line, and line answer. -/
+lemma generalizeBLineCollisionCoefficient_le
     (params : Parameters)
     [FieldModel params.q]
     (g : Polynomial params) (ℓ : AxisParallelLine params) (f : AxisLinePolynomial params) :
