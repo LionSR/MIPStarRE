@@ -1,8 +1,8 @@
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Averages
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Marginalization
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Normalization
-
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.ClosenessCore
+
 /-!
 # Full-slice scalar-to-tensor closeness bridges
 
@@ -13,7 +13,7 @@ chain connecting full-slice and evaluated-slice `ABAB` averages.
 The core `closenessOfIP` scalar↔tensor bridges are factored into
 `ClosenessCore.lean` (extracted per #1127).
 
-Ex-private definitions are tensor-form machinery per architecture decision
+Previously private lemmas are tensor-form machinery per architecture decision
 #713; downstream code should use the scalar public API exposed by the
 full-slice transport theorems.
 

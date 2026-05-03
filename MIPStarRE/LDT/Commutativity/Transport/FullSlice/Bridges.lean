@@ -17,7 +17,7 @@ Compatibility barrel re-exporting the full-slice bridge leaves:
 - `Bridges.ClosenessXEval`: x-evaluated/full-y `closenessOfIP` bridge
   (extracted per #1127).
 
-Ex-private definitions are tensor-form machinery per architecture decision
+Previously private lemmas are tensor-form machinery per architecture decision
 #713; downstream code should use the scalar public API exposed by the
 full-slice transport theorems.
 

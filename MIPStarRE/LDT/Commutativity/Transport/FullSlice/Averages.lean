@@ -245,8 +245,8 @@ noncomputable def fullSliceBABAtensorAvg
 `E_{u,v,x,y} ∑_{a,b} ⟨ψ|
    G^y_[h(v)=b] G^x_[g(u)=a] G^y_[h(v)=b] ⊗ G^x_[g(u)=a] |ψ⟩`.
 
-Evaluated-side partner used by `evaluatedSliceABAB_scalar_to_BABAtensor` and
-the tensor-form Schwartz–Zippel marginalization. Internal per #713. -/
+Evaluated-side partner used by the tensor-form Schwartz–Zippel
+marginalization. Internal per #713. -/
 noncomputable def evaluatedSliceBABAtensorAvg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
