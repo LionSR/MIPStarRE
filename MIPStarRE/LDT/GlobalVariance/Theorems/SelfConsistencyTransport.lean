@@ -1122,11 +1122,16 @@ private lemma liftLeft_lineAnswerMeasurement_outcome_at_g
         (generalizeBLeftOperatorAtPolynomial params strategy g
           ({ base := s.1, direction := s.2 }, s.1)) := by
   classical
-  simp [IdxSubMeas.liftLeft, IdxMeas.toIdxSubMeas,
+  simp only [IdxSubMeas.liftLeft, IdxMeas.toIdxSubMeas,
     axisParallelLineAnswerMeasurement, axisParallelLineAnswerFamily,
     generalizeBLeftOperatorAtPolynomial, generalizeBLeftEventSubMeasAtPolynomial,
     axisParallelLineQuestionParameter, subCoord, zeroCoord,
     SubMeas.toMeasurement_toSubMeas, mkLeftPlacedSubMeas_outcome, postprocess]
+  congr 1
+  congr 1
+  apply Finset.ext
+  intro a
+  simp
 
 /-- The lifted point-answer family outcome at value `a = g(s.1)` reduces to the
 right-tensor of the `point-conditioned` operator at base point `s.1`. -/
