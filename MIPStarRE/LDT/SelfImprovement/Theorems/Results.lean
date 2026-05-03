@@ -920,23 +920,21 @@ theorem helper_boundedness_gap_transport_through_data_processing
 
 /-- Final-fields producer for the `BoundedByOperator` conclusion.
 
-If the SDP dual witness dominates the identity, then every projective
-submeasurement output is bounded by its left placement: `H.total ≤ 1 ≤ Z`.
-The same identity domination also gives the positivity of `Z`. Consequently
-the boundedness error is zero, and hence is below any nonnegative error
-threshold. This is a standalone producer; it does not alter the current
-`FinalFieldsInput` interface. -/
+If the SDP dual witness dominates the identity, then the left-placed mass of any
+submeasurement is dominated by `Z ⊗ I`: the total bound `A.total ≤ 1 ≤ Z` lifts
+by monotonicity to `leftTensor A.total ≤ leftTensor Z`, and evaluation against
+the state preserves this order. Consequently `bndError ψ A.liftLeft (Z ⊗ I) = 0`,
+so the boundedness statement holds at any nonnegative tolerance. This is a
+standalone producer; it does not alter the current `FinalFieldsInput` interface. -/
 theorem final_fields_bounded
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (H : ProjSubMeas (Polynomial params) ι)
-    (Z : MIPStarRE.Quantum.Op ι)
+    {α : Type*} [Fintype α]
+    (ψ : QuantumState (ι × ι))
+    (A : SubMeas α ι)
+    {Z : MIPStarRE.Quantum.Op ι}
     (hOne : (1 : MIPStarRE.Quantum.Op ι) ≤ Z)
     {ε : Error}
     (hε : 0 ≤ ε) :
-    BoundedByOperator strategy.state H.toSubMeas.liftLeft
-      (leftTensor (ι₂ := ι) Z) ε := by
-  classical
+    BoundedByOperator ψ A.liftLeft (leftTensor (ι₂ := ι) Z) ε := by
   refine
     { witnessOpPSD := ?_
       upperBound := ?_ }
@@ -944,32 +942,27 @@ theorem final_fields_bounded
     rw [this]
     have hPSD : 0 ≤ Z := le_trans (op_one_nonneg (d := ι)) hOne
     exact opTensor_nonneg hPSD op_one_nonneg
-  · have hHle : H.toSubMeas.total ≤ Z :=
-      le_trans H.toSubMeas.total_le_one hOne
+  · have hAle : A.total ≤ Z :=
+      le_trans A.total_le_one hOne
     have hLTle :
-        leftTensor (ι₂ := ι) H.toSubMeas.total ≤ leftTensor (ι₂ := ι) Z := by
+        leftTensor (ι₂ := ι) A.total ≤ leftTensor (ι₂ := ι) Z := by
       have hopMono :
-          opTensor H.toSubMeas.total (1 : MIPStarRE.Quantum.Op ι) ≤
+          opTensor A.total (1 : MIPStarRE.Quantum.Op ι) ≤
             opTensor Z (1 : MIPStarRE.Quantum.Op ι) :=
-        opTensor_mono_left hHle op_one_nonneg
+        opTensor_mono_left hAle op_one_nonneg
       simpa [leftTensor, opTensor] using hopMono
     have hsubmass :
-        subMeasMass strategy.state H.toSubMeas.liftLeft =
-          ev strategy.state (leftTensor (ι₂ := ι) H.toSubMeas.total) := by
-      unfold subMeasMass
-      change ev strategy.state (leftTensor (ι₂ := ι) H.toSubMeas.total) = _
-      rfl
+        subMeasMass ψ A.liftLeft = ev ψ (leftTensor (ι₂ := ι) A.total) := rfl
     have hev_le :
-        ev strategy.state (leftTensor (ι₂ := ι) H.toSubMeas.total) ≤
-          ev strategy.state (leftTensor (ι₂ := ι) Z) :=
-      ev_mono strategy.state _ _ hLTle
+        ev ψ (leftTensor (ι₂ := ι) A.total) ≤ ev ψ (leftTensor (ι₂ := ι) Z) :=
+      ev_mono ψ _ _ hLTle
     have hbnd_zero :
-        bndError strategy.state H.toSubMeas.liftLeft (leftTensor (ι₂ := ι) Z) = 0 := by
+        bndError ψ A.liftLeft (leftTensor (ι₂ := ι) Z) = 0 := by
       unfold bndError
       rw [hsubmass]
       have :
-          ev strategy.state (leftTensor (ι₂ := ι) H.toSubMeas.total) -
-              ev strategy.state (leftTensor (ι₂ := ι) Z) ≤ 0 := by
+          ev ψ (leftTensor (ι₂ := ι) A.total) -
+              ev ψ (leftTensor (ι₂ := ι) Z) ≤ 0 := by
         linarith
       exact max_eq_left this
     rw [hbnd_zero]
