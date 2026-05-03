@@ -16,7 +16,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- Contraction witness for the final `sqrt chi` left-front overlap step. -/
-private lemma switcherooAggregateLeftFront_contraction
+lemma switcherooAggregateLeftFront_contraction
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
