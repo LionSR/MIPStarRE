@@ -4946,6 +4946,12 @@ theorem toProjectivizationMatchMassMonotonicity
       (Preliminaries.completeAtOutcomeProj orthResidual.P_B input.a_B)
       rfl rfl input.leftMatchMassPreservation input.rightMatchMassPreservation
 
+/-- Completing after lifting to the left tensor agrees with lifting the
+completion of the original submeasurement.
+
+This identifies the `qSDD` term coming from
+`Preliminaries.completion_self_distance` for `B.liftLeft` with the left-lifted
+completion of `B` used by `completeAtOutcomeProj`. -/
 private lemma qSDD_liftLeft_completeAtOutcome_eq
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -4975,6 +4981,12 @@ private lemma qSDD_liftLeft_completeAtOutcome_eq
   intro a _
   rw [hcomplete_outcome a]
 
+/-- The diagonal match mass against a genuine measurement is bounded by the left
+total of the other submeasurement.
+
+The hypothesis `B : Measurement` is essential: the proof uses
+`Measurement.outcome_le_one` to dominate each tensor summand by the left tensor
+of the corresponding outcome of `A`. -/
 private lemma qBipartiteMatchMass_le_left_total_of_measurement
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -4995,15 +5007,132 @@ private lemma qBipartiteMatchMass_le_left_total_of_measurement
           rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ A.outcome]
           rw [A.sum_eq_total]
 
+/-- A bound on the missing left total controls the completion defect of a
+projective submeasurement.
+
+The proof rewrites the completion distance as `ev ψ ((1 - P.total)^2)` via
+`Preliminaries.completion_self_distance`, then uses `R^2 ≤ R` for
+`R = 1 - P.liftLeft.total`. -/
+private lemma qSDD_completeAtOutcomeProj_le_of_total_gap
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized)
+    (P : ProjSubMeas Outcome ι) (a0 : Outcome) {ζ : Error}
+    (hgap : 1 - ev ψ (leftTensor (ι₂ := ι) P.toSubMeas.total) ≤ ζ) :
+    qSDD ψ P.toSubMeas.liftLeft
+      (Preliminaries.completeAtOutcomeProj P a0).toSubMeas.liftLeft ≤ ζ := by
+  let R : MIPStarRE.Quantum.Op (ι × ι) :=
+    (1 : MIPStarRE.Quantum.Op (ι × ι)) - P.toSubMeas.liftLeft.total
+  have hraw :
+      qSDD ψ P.toSubMeas.liftLeft
+          (Preliminaries.completeAtOutcome P.toSubMeas.liftLeft a0).toSubMeas ≤
+        ζ := by
+    have hcomp :
+        qSDD ψ P.toSubMeas.liftLeft
+            (Preliminaries.completeAtOutcome P.toSubMeas.liftLeft a0).toSubMeas =
+          ev ψ (R * R) := by
+      simpa [R] using
+        (Preliminaries.completion_self_distance ψ P.toSubMeas.liftLeft a0)
+    have hR_nonneg : 0 ≤ R := by
+      dsimp [R]
+      exact sub_nonneg.mpr P.toSubMeas.liftLeft.total_le_one
+    have hR_le_one : R ≤ 1 := by
+      dsimp [R]
+      exact sub_le_self (1 : MIPStarRE.Quantum.Op (ι × ι))
+        P.toSubMeas.liftLeft.total_nonneg
+    have hR_sq_le : R * R ≤ R :=
+      MIPStarRE.Quantum.sq_le_self hR_nonneg hR_le_one
+    have hR_sq_ev : ev ψ (R * R) ≤ ev ψ R :=
+      ev_mono ψ _ _ hR_sq_le
+    have hR_ev : ev ψ R ≤ ζ := by
+      have hR_eq :
+          ev ψ R =
+            1 - ev ψ (leftTensor (ι₂ := ι) P.toSubMeas.total) := by
+        dsimp [R]
+        rw [ev_sub]
+        simp [SubMeas.liftLeft, ev_one_of_isNormalized ψ hψ]
+      linarith
+    rw [hcomp]
+    exact le_trans hR_sq_ev hR_ev
+  have hq_eq := qSDD_liftLeft_completeAtOutcome_eq ψ P.toSubMeas P.toSubMeas a0
+  rw [hq_eq] at hraw
+  simpa [Preliminaries.completeAtOutcomeProj_toSubMeas] using hraw
+
+/-- Combine cross consistency, orthonormalization closeness, and match-mass
+preservation into the completed-closeness estimate for one side.
+
+This is the side-agnostic Step 6 argument used below for both roles: the cross
+`ConsRel` bounds `1 - qBipartiteMatchMass`, the match-mass hypothesis turns that
+into a bound on the missing total of `P`, and `questionSDD_triangle` then joins
+the orthonormalization and completion errors. -/
+private lemma completedCloseness_of_consistency_and_matchMassPreservation
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized) (ζ : Error)
+    (G H : Measurement Outcome ι) (P : ProjSubMeas Outcome ι) (a0 : Outcome)
+    (hpre : ConsRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily G.toSubMeas) (constSubMeasFamily H.toSubMeas) ζ)
+    (hmatch :
+      MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation ψ G P H)
+    (horth :
+      SDDRel ψ (uniformDistribution Unit)
+        (constSubMeasFamily G.toSubMeas.liftLeft)
+        (constSubMeasFamily P.toSubMeas.liftLeft)
+        (MakingMeasurementsProjective.orthonormalizationError ζ)) :
+    SDDRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily G.toSubMeas.liftLeft)
+      (constSubMeasFamily
+        (Preliminaries.completeAtOutcomeProj P a0).toSubMeas.liftLeft)
+      (MakingMeasurementsProjective.orthonormalizeAndCompleteError ζ) := by
+  let Q := Preliminaries.completeAtOutcomeProj P a0
+  have hpre_q : qBipartiteConsDefect ψ G.toSubMeas H.toSubMeas ≤ ζ := by
+    simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily] using
+      hpre.offDiagonalBound
+  have hmatch_GH : 1 - qBipartiteMatchMass ψ G.toSubMeas H.toSubMeas ≤ ζ := by
+    rw [qBipartiteConsDefect_of_measurements ψ G H] at hpre_q
+    have hone : ev ψ (1 : MIPStarRE.Quantum.Op (ι × ι)) = 1 :=
+      ev_one_of_isNormalized ψ hψ
+    linarith
+  have hmatch_PH : 1 - qBipartiteMatchMass ψ P.toSubMeas H.toSubMeas ≤ ζ := by
+    linarith [hmatch_GH, hmatch.matchMassPreservation]
+  have hmass_P :
+      1 - ev ψ (leftTensor (ι₂ := ι) P.toSubMeas.total) ≤ ζ := by
+    have hmatch_le :=
+      qBipartiteMatchMass_le_left_total_of_measurement ψ P.toSubMeas H
+    linarith
+  have hPP_q : qSDD ψ P.toSubMeas.liftLeft Q.toSubMeas.liftLeft ≤ ζ := by
+    simpa [Q] using qSDD_completeAtOutcomeProj_le_of_total_gap ψ hψ P a0 hmass_P
+  have hGP_q :
+      qSDD ψ G.toSubMeas.liftLeft P.toSubMeas.liftLeft ≤
+        MakingMeasurementsProjective.orthonormalizationError ζ := by
+    simpa [Preliminaries.constFamily_sdd_unit] using horth.squaredDistanceBound
+  constructor
+  rw [Preliminaries.constFamily_sdd_unit]
+  calc
+    qSDD ψ G.toSubMeas.liftLeft Q.toSubMeas.liftLeft
+      ≤ 2 * (qSDD ψ G.toSubMeas.liftLeft P.toSubMeas.liftLeft +
+          qSDD ψ P.toSubMeas.liftLeft Q.toSubMeas.liftLeft) := by
+            exact Preliminaries.questionSDD_triangle ψ
+              G.toSubMeas.liftLeft P.toSubMeas.liftLeft Q.toSubMeas.liftLeft
+    _ ≤ 2 * (MakingMeasurementsProjective.orthonormalizationError ζ + ζ) := by
+          gcongr
+    _ = 2 * MakingMeasurementsProjective.orthonormalizationError ζ + 2 * ζ := by ring
+    _ ≤ MakingMeasurementsProjective.orthonormalizeAndCompleteError ζ := by
+          have hsqrt_nonneg :
+              0 ≤ 4 * Real.sqrt (MakingMeasurementsProjective.orthonormalizationError ζ) := by
+            positivity
+          unfold MakingMeasurementsProjective.orthonormalizeAndCompleteError
+          linarith
+
 /-- Produce the line-130 completion witnesses directly from the cross
 consistency statement and the orthonormalization match-mass data.
 
-This is a stricter fit to the paper's Step 6 flow than the diagonal-SSC wrapper:
-the role package already reconstructs line 130 as a cross `ConsRel`
+This argument does not invoke `Preliminaries.completingToMeasurement`.
+Instead, the role package already reconstructs line 130 as a cross `ConsRel`
 `G^A \simeq_{\zeta_1} G^B`, the orthonormalization residual already carries the
-projective submeasurements `P^A,P^B`, and the remaining input needed to control
-the completion residual is that these `P`-families do not decrease the diagonal
-match mass against the opposite unsymmetrized POVM. -/
+projective submeasurements `P^A,P^B`, and the remaining completion bound is
+derived directly from the construction-level match-mass preservation facts for
+those `P`-families. -/
 theorem nonempty_ofLine130ConsistencyAndMatchMassPreservation
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -5023,110 +5152,23 @@ theorem nonempty_ofLine130ConsistencyAndMatchMassPreservation
         (unsymmetrizedRightPOVM rolePackage.roleMeasurement))
     (rightMatchMassPreservation :
       MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
-        (unsymmetrizedRightPOVM rolePackage.roleMeasurement) orthResidual.P_B
-        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)) :
+      (unsymmetrizedRightPOVM rolePackage.roleMeasurement) orthResidual.P_B
+      (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)) :
     Nonempty (MainFormalPostRolePackageLine130CompletionInput
       params strategy eps k scalars rolePackage orthResidual) := by
   let G_A := unsymmetrizedLeftPOVM rolePackage.roleMeasurement
   let G_B := unsymmetrizedRightPOVM rolePackage.roleMeasurement
-  let Q_A := Preliminaries.completeAtOutcomeProj orthResidual.P_A a_A
-  let Q_B := Preliminaries.completeAtOutcomeProj orthResidual.P_B a_B
   have hleftCompletedCloseness :
       SDDRel strategy.state (uniformDistribution Unit)
         (constSubMeasFamily G_A.toSubMeas.liftLeft)
-        (constSubMeasFamily Q_A.toSubMeas.liftLeft)
+        (constSubMeasFamily
+          (Preliminaries.completeAtOutcomeProj orthResidual.P_A a_A).toSubMeas.liftLeft)
         (MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1) := by
-    have hpre_q :
-        qBipartiteConsDefect strategy.state G_A.toSubMeas G_B.toSubMeas ≤ scalars.zeta1 := by
-      simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily] using
-        hpre.offDiagonalBound
-    have hmatch_GA_GB :
-        1 - qBipartiteMatchMass strategy.state G_A.toSubMeas G_B.toSubMeas ≤ scalars.zeta1 := by
-      rw [qBipartiteConsDefect_of_measurements strategy.state G_A G_B] at hpre_q
-      have hone :
-          ev strategy.state (1 : MIPStarRE.Quantum.Op (ι × ι)) = 1 :=
-        ev_one_of_isNormalized strategy.state strategy.isNormalized
-      linarith
-    have hmatch_PA_GB :
-        1 - qBipartiteMatchMass strategy.state orthResidual.P_A.toSubMeas G_B.toSubMeas ≤
-          scalars.zeta1 := by
-      linarith [hmatch_GA_GB,
-        leftMatchMassPreservation.matchMassPreservation]
-    have hmass_PA :
-        1 - ev strategy.state (leftTensor (ι₂ := ι) orthResidual.P_A.toSubMeas.total) ≤
-          scalars.zeta1 := by
-      have hmatch_le := qBipartiteMatchMass_le_left_total_of_measurement
-        strategy.state orthResidual.P_A.toSubMeas G_B
-      linarith
-    have hPP_q :
-        qSDD strategy.state orthResidual.P_A.toSubMeas.liftLeft Q_A.toSubMeas.liftLeft ≤
-          scalars.zeta1 := by
-      let R : MIPStarRE.Quantum.Op (ι × ι) :=
-        (1 : MIPStarRE.Quantum.Op (ι × ι)) - orthResidual.P_A.toSubMeas.liftLeft.total
-      have hraw :
-          qSDD strategy.state orthResidual.P_A.toSubMeas.liftLeft
-              (Preliminaries.completeAtOutcome
-                orthResidual.P_A.toSubMeas.liftLeft a_A).toSubMeas ≤
-            scalars.zeta1 := by
-        have hcomp :
-            qSDD strategy.state orthResidual.P_A.toSubMeas.liftLeft
-                (Preliminaries.completeAtOutcome
-                  orthResidual.P_A.toSubMeas.liftLeft a_A).toSubMeas =
-              ev strategy.state (R * R) := by
-          simpa [R] using
-            (Preliminaries.completion_self_distance strategy.state
-              orthResidual.P_A.toSubMeas.liftLeft a_A)
-        have hR_nonneg : 0 ≤ R := by
-          dsimp [R]
-          exact sub_nonneg.mpr orthResidual.P_A.toSubMeas.liftLeft.total_le_one
-        have hR_le_one : R ≤ 1 := by
-          dsimp [R]
-          exact sub_le_self (1 : MIPStarRE.Quantum.Op (ι × ι))
-            orthResidual.P_A.toSubMeas.liftLeft.total_nonneg
-        have hR_sq_le : R * R ≤ R :=
-          MIPStarRE.Quantum.sq_le_self hR_nonneg hR_le_one
-        have hR_sq_ev : ev strategy.state (R * R) ≤ ev strategy.state R :=
-          ev_mono strategy.state _ _ hR_sq_le
-        have hR_ev : ev strategy.state R ≤ scalars.zeta1 := by
-          have hR_eq :
-              ev strategy.state R =
-                1 - ev strategy.state
-                  (leftTensor (ι₂ := ι) orthResidual.P_A.toSubMeas.total) := by
-            dsimp [R]
-            rw [ev_sub]
-            simp [SubMeas.liftLeft, ev_one_of_isNormalized strategy.state strategy.isNormalized]
-          linarith
-        rw [hcomp]
-        exact le_trans hR_sq_ev hR_ev
-      have hq_eq := qSDD_liftLeft_completeAtOutcome_eq strategy.state
-        orthResidual.P_A.toSubMeas orthResidual.P_A.toSubMeas a_A
-      rw [hq_eq] at hraw
-      simpa [Q_A, Preliminaries.completeAtOutcomeProj_toSubMeas] using hraw
-    have hGP_q :
-        qSDD strategy.state G_A.toSubMeas.liftLeft orthResidual.P_A.toSubMeas.liftLeft ≤
-          MakingMeasurementsProjective.orthonormalizationError scalars.zeta1 := by
-      simpa [Preliminaries.constFamily_sdd_unit] using
-        orthResidual.leftCloseness.squaredDistanceBound
-    constructor
-    rw [Preliminaries.constFamily_sdd_unit]
-    calc
-      qSDD strategy.state G_A.toSubMeas.liftLeft Q_A.toSubMeas.liftLeft
-        ≤ 2 * (qSDD strategy.state G_A.toSubMeas.liftLeft orthResidual.P_A.toSubMeas.liftLeft +
-            qSDD strategy.state orthResidual.P_A.toSubMeas.liftLeft Q_A.toSubMeas.liftLeft) := by
-              exact Preliminaries.questionSDD_triangle strategy.state
-                G_A.toSubMeas.liftLeft orthResidual.P_A.toSubMeas.liftLeft Q_A.toSubMeas.liftLeft
-      _ ≤ 2 * (MakingMeasurementsProjective.orthonormalizationError scalars.zeta1 +
-            scalars.zeta1) := by
-              gcongr
-      _ = 2 * MakingMeasurementsProjective.orthonormalizationError scalars.zeta1 +
-            2 * scalars.zeta1 := by ring
-      _ ≤ MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1 := by
-            have hsqrt_nonneg :
-                0 ≤ 4 * Real.sqrt
-                  (MakingMeasurementsProjective.orthonormalizationError scalars.zeta1) := by
-              positivity
-            unfold MakingMeasurementsProjective.orthonormalizeAndCompleteError
-            linarith
+    simpa [G_A, G_B] using
+      completedCloseness_of_consistency_and_matchMassPreservation
+        strategy.state strategy.isNormalized scalars.zeta1
+        G_A G_B orthResidual.P_A a_A hpre leftMatchMassPreservation
+        orthResidual.leftCloseness
   have hpre_symm : ConsRel strategy.state (uniformDistribution Unit)
       (constSubMeasFamily G_B.toSubMeas)
       (constSubMeasFamily G_A.toSubMeas)
@@ -5139,99 +5181,14 @@ theorem nonempty_ofLine130ConsistencyAndMatchMassPreservation
   have hrightCompletedCloseness :
       SDDRel strategy.state (uniformDistribution Unit)
         (constSubMeasFamily G_B.toSubMeas.liftLeft)
-        (constSubMeasFamily Q_B.toSubMeas.liftLeft)
+        (constSubMeasFamily
+          (Preliminaries.completeAtOutcomeProj orthResidual.P_B a_B).toSubMeas.liftLeft)
         (MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1) := by
-    have hpre_q :
-        qBipartiteConsDefect strategy.state G_B.toSubMeas G_A.toSubMeas ≤ scalars.zeta1 := by
-      simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily] using
-        hpre_symm.offDiagonalBound
-    have hmatch_GB_GA :
-        1 - qBipartiteMatchMass strategy.state G_B.toSubMeas G_A.toSubMeas ≤ scalars.zeta1 := by
-      rw [qBipartiteConsDefect_of_measurements strategy.state G_B G_A] at hpre_q
-      have hone :
-          ev strategy.state (1 : MIPStarRE.Quantum.Op (ι × ι)) = 1 :=
-        ev_one_of_isNormalized strategy.state strategy.isNormalized
-      linarith
-    have hmatch_PB_GA :
-        1 - qBipartiteMatchMass strategy.state orthResidual.P_B.toSubMeas G_A.toSubMeas ≤
-          scalars.zeta1 := by
-      linarith [hmatch_GB_GA,
-        rightMatchMassPreservation.matchMassPreservation]
-    have hmass_PB :
-        1 - ev strategy.state (leftTensor (ι₂ := ι) orthResidual.P_B.toSubMeas.total) ≤
-          scalars.zeta1 := by
-      have hmatch_le := qBipartiteMatchMass_le_left_total_of_measurement
-        strategy.state orthResidual.P_B.toSubMeas G_A
-      linarith
-    have hPP_q :
-        qSDD strategy.state orthResidual.P_B.toSubMeas.liftLeft Q_B.toSubMeas.liftLeft ≤
-          scalars.zeta1 := by
-      let R : MIPStarRE.Quantum.Op (ι × ι) :=
-        (1 : MIPStarRE.Quantum.Op (ι × ι)) - orthResidual.P_B.toSubMeas.liftLeft.total
-      have hraw :
-          qSDD strategy.state orthResidual.P_B.toSubMeas.liftLeft
-              (Preliminaries.completeAtOutcome
-                orthResidual.P_B.toSubMeas.liftLeft a_B).toSubMeas ≤
-            scalars.zeta1 := by
-        have hcomp :
-            qSDD strategy.state orthResidual.P_B.toSubMeas.liftLeft
-                (Preliminaries.completeAtOutcome
-                  orthResidual.P_B.toSubMeas.liftLeft a_B).toSubMeas =
-              ev strategy.state (R * R) := by
-          simpa [R] using
-            (Preliminaries.completion_self_distance strategy.state
-              orthResidual.P_B.toSubMeas.liftLeft a_B)
-        have hR_nonneg : 0 ≤ R := by
-          dsimp [R]
-          exact sub_nonneg.mpr orthResidual.P_B.toSubMeas.liftLeft.total_le_one
-        have hR_le_one : R ≤ 1 := by
-          dsimp [R]
-          exact sub_le_self (1 : MIPStarRE.Quantum.Op (ι × ι))
-            orthResidual.P_B.toSubMeas.liftLeft.total_nonneg
-        have hR_sq_le : R * R ≤ R :=
-          MIPStarRE.Quantum.sq_le_self hR_nonneg hR_le_one
-        have hR_sq_ev : ev strategy.state (R * R) ≤ ev strategy.state R :=
-          ev_mono strategy.state _ _ hR_sq_le
-        have hR_ev : ev strategy.state R ≤ scalars.zeta1 := by
-          have hR_eq :
-              ev strategy.state R =
-                1 - ev strategy.state
-                  (leftTensor (ι₂ := ι) orthResidual.P_B.toSubMeas.total) := by
-            dsimp [R]
-            rw [ev_sub]
-            simp [SubMeas.liftLeft, ev_one_of_isNormalized strategy.state strategy.isNormalized]
-          linarith
-        rw [hcomp]
-        exact le_trans hR_sq_ev hR_ev
-      have hq_eq := qSDD_liftLeft_completeAtOutcome_eq strategy.state
-        orthResidual.P_B.toSubMeas orthResidual.P_B.toSubMeas a_B
-      rw [hq_eq] at hraw
-      simpa [Q_B, Preliminaries.completeAtOutcomeProj_toSubMeas] using hraw
-    have hGP_q :
-        qSDD strategy.state G_B.toSubMeas.liftLeft orthResidual.P_B.toSubMeas.liftLeft ≤
-          MakingMeasurementsProjective.orthonormalizationError scalars.zeta1 := by
-      simpa [Preliminaries.constFamily_sdd_unit] using
-        orthResidual.rightCloseness.squaredDistanceBound
-    constructor
-    rw [Preliminaries.constFamily_sdd_unit]
-    calc
-      qSDD strategy.state G_B.toSubMeas.liftLeft Q_B.toSubMeas.liftLeft
-        ≤ 2 * (qSDD strategy.state G_B.toSubMeas.liftLeft orthResidual.P_B.toSubMeas.liftLeft +
-            qSDD strategy.state orthResidual.P_B.toSubMeas.liftLeft Q_B.toSubMeas.liftLeft) := by
-              exact Preliminaries.questionSDD_triangle strategy.state
-                G_B.toSubMeas.liftLeft orthResidual.P_B.toSubMeas.liftLeft Q_B.toSubMeas.liftLeft
-      _ ≤ 2 * (MakingMeasurementsProjective.orthonormalizationError scalars.zeta1 +
-            scalars.zeta1) := by
-              gcongr
-      _ = 2 * MakingMeasurementsProjective.orthonormalizationError scalars.zeta1 +
-            2 * scalars.zeta1 := by ring
-      _ ≤ MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1 := by
-            have hsqrt_nonneg :
-                0 ≤ 4 * Real.sqrt
-                  (MakingMeasurementsProjective.orthonormalizationError scalars.zeta1) := by
-              positivity
-            unfold MakingMeasurementsProjective.orthonormalizeAndCompleteError
-            linarith
+    simpa [G_A, G_B] using
+      completedCloseness_of_consistency_and_matchMassPreservation
+        strategy.state strategy.isNormalized scalars.zeta1
+        G_B G_A orthResidual.P_B a_B hpre_symm rightMatchMassPreservation
+        orthResidual.rightCloseness
   exact ⟨{
     a_A := a_A
     a_B := a_B
@@ -5575,7 +5532,7 @@ theorem nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs
 /-- Assemble the final live residual from the paper line-130 cross consistency,
 the orthonormalization inputs, and the P-level match-mass preservation data.
 
-This is the narrower paper-faithful Step 6 route: the checked role residual
+This is the live Lean Step 6 route: the checked role residual
 reconstructs line 130 as a cross `ConsRel`, the orthonormalization wrapper
 produces `P^A,P^B`, and the remaining completion step is discharged directly from
 that cross relation plus the construction-level match-mass preservation facts,
@@ -5617,12 +5574,11 @@ theorem nonempty_ofRoleResidualAndLine130InputsAndMatchMassPreservation
   have hcompletion :
       Nonempty (MainFormalPostRolePackageLine130CompletionInput
         params strategy eps k scalars (roleResidual.rolePackage scalars) orthResidual) :=
-    MainFormalPostRolePackageLine130CompletionInput.nonempty_ofLine130ConsistencyAndMatchMassPreservation
-      (params := params) (strategy := strategy) (eps := eps) (k := k)
-      (scalars := scalars) (rolePackage := roleResidual.rolePackage scalars)
-      orthResidual a_A a_B hpre
-      (leftMatchMassPreservation orthResidual)
-      (rightMatchMassPreservation orthResidual)
+    (open MainFormalPostRolePackageLine130CompletionInput in
+      nonempty_ofLine130ConsistencyAndMatchMassPreservation)
+        orthResidual a_A a_B hpre
+        (leftMatchMassPreservation orthResidual)
+        (rightMatchMassPreservation orthResidual)
   rcases hcompletion with ⟨completionInput⟩
   exact nonempty_ofRoleResidualAndCompletion roleResidual
     ⟨completionInput.toCompletionResidual⟩
@@ -5877,11 +5833,10 @@ theorem baseStep6WitnessResidual
       hpass scalars roleResidual) :
     Nonempty (MainFormalCascadeRolePackageResidualStep6WitnessResidual
       params strategy eps hpass k scalars) := by
-  exact MainFormalCascadeRolePackageResidualStep6WitnessResidual.nonempty_ofRoleResidualAndLine130InputsAndMatchMassPreservation
-        (params := params) (strategy := strategy) (eps := eps)
-        (hpass := hpass) (k := k) (scalars := scalars)
-        hsmall roleResidual bridge.orthonormalizationInput bridge.a_A bridge.a_B
-    bridge.leftMatchMassPreservation bridge.rightMatchMassPreservation
+  exact (open MainFormalCascadeRolePackageResidualStep6WitnessResidual in
+    nonempty_ofRoleResidualAndLine130InputsAndMatchMassPreservation
+      hsmall roleResidual bridge.orthonormalizationInput bridge.a_A bridge.a_B
+      bridge.leftMatchMassPreservation bridge.rightMatchMassPreservation)
 
 
 /-- Narrowed base-case bridge hypotheses for Step 6 when `params.m = 1`.
