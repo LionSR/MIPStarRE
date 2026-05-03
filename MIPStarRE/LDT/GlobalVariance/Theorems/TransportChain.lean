@@ -597,13 +597,14 @@ lemma localVarianceTransportChainError_le_localVarianceOfPointsError
   linarith
 
 
-/-! ## Sum-form local-variance chain (partial)
+/-! ## Sum-form local-variance chain (complete)
 
-This section provides the polynomial-sum reverse generalize-B bound
-(the last missing individual step bound) and documents the remaining
-chain-assembly step for the full `eq:equivalent-local-variance` theorem.
+This section supplies the polynomial-sum reverse generalize-B bound
+(the last individual step bound) and the full chain-assembly lemma
+`localVarianceDeviation_sum_le_localVarianceOfPointsError`, which
+closes `eq:equivalent-local-variance`.
 
-### Individual sum-form step bounds (all now available)
+### Individual sum-form step bounds (all available)
 
 1. `pointConditionedEventSelfConsistency_weighted_leftEdge_sum` (2δ, Step 1)
 2. `axisParallelPointLineConsistency_weighted_rightToLeftLineQuestion_sum` (2ε, Step 2)
@@ -612,11 +613,13 @@ chain-assembly step for the full `eq:equivalent-local-variance` theorem.
 5. `axisParallelPointLineConsistency_weighted_leftToRightLineQuestion_sum` (2ε, Step 5)
 6. `pointConditionedEventSelfConsistency_weighted_rightEdge_sum` (2δ, Step 6)
 
-### Remaining: six-step chain assembly
+### Six-step chain assembly
 
-The missing piece is the chain assembly that telescopes the six operator
-differences via `ev_sum_conjTranspose_mul_sum_le`, sums over `g`, swaps
-outer sums, and applies the `_sum` bounds.  The mathematical proof is:
+The chain assembly lemma `localVarianceDeviation_sum_le_localVarianceOfPointsError`
+(**below**) telescopes the six operator differences via
+`ev_sum_conjTranspose_mul_sum_le`, sums over `g`, swaps outer sums, and
+applies the six `_sum` bounds.  The proof follows the sketch originally
+documented here (and tracked in #1137):
 
 ```
 For each g, q:  A0_g(q) − A6_g(q) = Σ_{i=0}^5 (Ai_g(q) − A_{i+1}_g(q)).
@@ -627,10 +630,6 @@ Averaging over 𝒟 and summing over g:
 Reindex each inner sum to a native distribution and apply the _sum bound.
 Finally reindex the left side from 𝒟 to rerandomizeCoord.
 ```
-
-All six `_sum` bounds are now proved on `main`.  The engineering challenge
-is to write this chain assembly in Lean without the kernel timing out on
-large `avgOver` expansions and reindexing computations.  — tracked in #1137.
 -/
 
 /-- Reverse generalize-B bound summed over all polynomials.
