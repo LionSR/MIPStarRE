@@ -1302,10 +1302,9 @@ private lemma addInU_step1_C_contraction
   set K : Fq params → MIPStarRE.Quantum.Op (ι × ι) := fun a =>
     ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h uv.2 = a),
       opTensor ((sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h)
-        (T.outcome h) with hK_def
+        (T.outcome h)
   set Pa : Fq params → MIPStarRE.Quantum.Op (ι × ι) := fun a =>
     rightTensor (ι₁ := ι) ((strategy.pointMeasurement uv.2).toSubMeas.outcome a)
-    with hPa_def
   -- Step (a): rewrite each indexed `Σ_h …` as `K a * Pa a`
   have hsum_eq : ∀ a : Fq params,
       (∑ h : Polynomial params,
@@ -1551,8 +1550,7 @@ lemma addInU_cs_chain_step1_abs_le_sqrt_two_delta
           ev strategy.state (X (h uv.2) h) := by
         rw [Finset.sum_eq_single (h uv.2)]
         · intro a _ ha
-          rw [hX a h (Ne.symm ha)]
-          simp [ev]
+          rw [hX a h (Ne.symm ha), ev_zero strategy.state]
         · intro hmem
           exact (hmem (Finset.mem_univ _)).elim
       exact hsingle
@@ -1597,12 +1595,8 @@ lemma addInU_cs_chain_step1_abs_le_sqrt_two_delta
     refine avgOver_congr _ _ _ ?_
     intro uv
     exact hmatch_pointwise uv
-  -- Wrap up: the closenessOfInnerProduct_right output equals |Q1 - Q0|; flip via abs_sub_comm
-  have hgoal_swap :
-      addInUCSChainQ0 params strategy T - addInUCSChainQ1 params strategy T =
-        -(addInUCSChainQ1 params strategy T - addInUCSChainQ0 params strategy T) := by
-    ring
-  rw [hgoal_swap, abs_neg]
+  -- Wrap up: use abs_sub_comm to reverse the subtraction order
+  rw [abs_sub_comm]
   rw [← hmatch]
   exact hcs
 
@@ -1637,10 +1631,9 @@ private lemma addInU_step2_C_contraction
   set K : Fq params → MIPStarRE.Quantum.Op (ι × ι) := fun a =>
     ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h uv.2 = a),
       opTensor ((sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h)
-        (T.outcome h) with hK_def
+        (T.outcome h)
   set Pa : Fq params → MIPStarRE.Quantum.Op (ι × ι) := fun a =>
     leftTensor (ι₂ := ι) ((strategy.pointMeasurement uv.2).toSubMeas.outcome a)
-    with hPa_def
   have hsum_eq : ∀ a : Fq params,
       (∑ h : Polynomial params,
           (if h uv.2 = a then
@@ -1879,11 +1872,8 @@ lemma addInU_cs_chain_step2_abs_le_sqrt_two_delta
     refine avgOver_congr _ _ _ ?_
     intro uv
     exact hmatch_pointwise uv
-  have hgoal_swap :
-      addInUCSChainQ1 params strategy T - addInUCSChainQ2 params strategy T =
-        -(addInUCSChainQ2 params strategy T - addInUCSChainQ1 params strategy T) := by
-    ring
-  rw [hgoal_swap, abs_neg]
+  -- Wrap up: use abs_sub_comm to reverse the subtraction order
+  rw [abs_sub_comm]
   rw [← hmatch]
   exact hcs
 
