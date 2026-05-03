@@ -1446,7 +1446,7 @@ theorem helperAgreementOperatorAtPoint_eq_sum_polynomial
         ∑ a : Fq params,
           opTensor ((strategy.pointMeasurement u).outcome a)
             (∑ h ∈ Finset.univ.filter
-                (fun h : Polynomial params => h.toFun u = a), H.outcome h) := by
+                (fun h : Polynomial params => h u = a), H.outcome h) := by
     change (∑ a : Fq params,
         opTensor ((strategy.pointMeasurement u).outcome a)
           ((evaluateAt params u H).outcome a)) = _
@@ -1455,7 +1455,7 @@ theorem helperAgreementOperatorAtPoint_eq_sum_polynomial
     have hev :
         (evaluateAt params u H).outcome a =
           ∑ h ∈ Finset.univ.filter
-              (fun h : Polynomial params => h.toFun u = a), H.outcome h := by
+              (fun h : Polynomial params => h u = a), H.outcome h := by
       simp only [evaluateAt, postprocess, Finset.sum_filter]
       refine Finset.sum_congr rfl (fun h _ => ?_)
       congr 1
@@ -1465,15 +1465,15 @@ theorem helperAgreementOperatorAtPoint_eq_sum_polynomial
     ∑ a : Fq params,
         opTensor ((strategy.pointMeasurement u).outcome a)
           (∑ h ∈ Finset.univ.filter
-              (fun h : Polynomial params => h.toFun u = a), H.outcome h)
+              (fun h : Polynomial params => h u = a), H.outcome h)
         = ∑ a : Fq params, ∑ h ∈ Finset.univ.filter
-              (fun h : Polynomial params => h.toFun u = a),
+              (fun h : Polynomial params => h u = a),
             opTensor ((strategy.pointMeasurement u).outcome a) (H.outcome h) := by
               refine Finset.sum_congr rfl ?_
               intro a _
               rw [opTensor_sum_right_finset]
       _ = ∑ a : Fq params, ∑ h ∈ Finset.univ.filter
-              (fun h : Polynomial params => h.toFun u = a),
+              (fun h : Polynomial params => h u = a),
             opTensor ((strategy.pointMeasurement u).outcome (h u)) (H.outcome h) := by
               refine Finset.sum_congr rfl ?_
               intro a _
@@ -1485,7 +1485,7 @@ theorem helperAgreementOperatorAtPoint_eq_sum_polynomial
             opTensor ((strategy.pointMeasurement u).outcome (h u)) (H.outcome h) := by
               simpa using
                 Finset.sum_fiberwise (Finset.univ : Finset (Polynomial params))
-                  (fun h : Polynomial params => h.toFun u)
+                  (fun h : Polynomial params => h u)
                   (fun h =>
                     opTensor ((strategy.pointMeasurement u).outcome (h u))
                       (H.outcome h))
