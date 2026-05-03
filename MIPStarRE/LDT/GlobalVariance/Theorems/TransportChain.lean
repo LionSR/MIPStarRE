@@ -1,4 +1,6 @@
 import MIPStarRE.LDT.GlobalVariance.Theorems.SelfConsistencyTransport
+import MIPStarRE.LDT.GlobalVariance.Theorems.SelfConsistencyTransportSum
+import MIPStarRE.LDT.GlobalVariance.Theorems.PolynomialSumBounds
 
 namespace MIPStarRE.LDT.GlobalVariance
 
@@ -593,5 +595,81 @@ lemma localVarianceTransportChainError_le_localVarianceOfPointsError
     positivity
   dsimp [localVarianceTransportChainError, localVarianceOfPointsError]
   linarith
+
+
+/-! ## Sum-form local-variance chain (partial)
+
+This section provides the polynomial-sum reverse generalize-B bound
+(the last missing individual step bound) and documents the remaining
+chain-assembly step for the full `eq:equivalent-local-variance` theorem.
+
+### Individual sum-form step bounds (all now available)
+
+1. `pointConditionedEventSelfConsistency_weighted_leftEdge_sum` (2δ, Step 1)
+2. `axisParallelPointLineConsistency_weighted_rightToLeftLineQuestion_sum` (2ε, Step 2)
+3. `generalizeBDeviationAtPolynomial_polysum_le_error` (md/q forward, Step 3)
+4. `generalizeBReversePointwiseBound_polysum_le_error` (md/q reverse, Step 4) — **below**
+5. `axisParallelPointLineConsistency_weighted_leftToRightLineQuestion_sum` (2ε, Step 5)
+6. `pointConditionedEventSelfConsistency_weighted_rightEdge_sum` (2δ, Step 6)
+
+### Remaining: six-step chain assembly
+
+The missing piece is the chain assembly that telescopes the six operator
+differences via `ev_sum_conjTranspose_mul_sum_le`, sums over `g`, swaps
+outer sums, and applies the `_sum` bounds.  The mathematical proof is:
+
+```
+For each g, q:  A0_g(q) − A6_g(q) = Σ_{i=0}^5 (Ai_g(q) − A_{i+1}_g(q)).
+By ev_sum_conjTranspose_mul_sum_le:
+  ‖A0−A6‖² ≤ 6·Σ_i ‖Ai−A_{i+1}‖²   (pointwise).
+Averaging over 𝒟 and summing over g:
+  Σ_g avgOver ‖A0−A6‖² ≤ 6·Σ_i Σ_g avgOver ‖Ai−A_{i+1}‖².
+Reindex each inner sum to a native distribution and apply the _sum bound.
+Finally reindex the left side from 𝒟 to rerandomizeCoord.
+```
+
+All six `_sum` bounds are now proved on `main`.  The engineering challenge
+is to write this chain assembly in Lean without the kernel timing out on
+large `avgOver` expansions and reindexing computations.  — tracked in #1137.
+-/
+
+/-- Reverse generalize-B bound summed over all polynomials.
+
+The reverse squared distance equals the forward one by `ev_adjoint_sub_swap`;
+therefore the polynomial-sum bound follows from the forward version
+`generalizeBDeviationAtPolynomial_polysum_le_error`.  This supplies the
+sum-form Step 4 bound (the `md/q` reverse direction) for the six-step
+local-variance chain. -/
+lemma generalizeBReversePointwiseBound_polysum_le_error
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι) :
+    (∑ g : Polynomial params,
+      avgOver (axisParallelLineQuestionDistribution params)
+        (fun qu =>
+          let D := weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu -
+            weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu
+          ev strategy.state (Dᴴ * D))) ≤
+      generalizeBError params := by
+  have h_eq : (∑ g : Polynomial params,
+      avgOver (axisParallelLineQuestionDistribution params)
+        (fun qu =>
+          let D := weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu -
+            weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu
+          ev strategy.state (Dᴴ * D))) =
+    (∑ g : Polynomial params,
+      avgOver (axisParallelLineQuestionDistribution params)
+        (fun qu =>
+          let D := weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu -
+            weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu
+          ev strategy.state (Dᴴ * D))) := by
+    refine Finset.sum_congr rfl fun g _ => ?_
+    apply avgOver_congr
+    intro qu
+    exact ev_adjoint_sub_swap strategy.state
+      (weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu)
+      (weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu)
+  rw [h_eq]
+  exact generalizeBDeviationAtPolynomial_polysum_le_error params strategy G
 
 end MIPStarRE.LDT.GlobalVariance
