@@ -546,7 +546,6 @@ lemma hBConsistencyError_add_mdq_add_dnoteq_le_overAllOutcomesError
   dsimp only [hBConsistencyError, overAllOutcomesError]
   linarith [hsmall]
 
-
 /-- A line answer matching every supported completed slice agrees with the vertical
 line induced by the interpolant chosen from the interpolation support.
 
@@ -602,4 +601,5 @@ lemma tupleInterpolatedVerticalLine_eq_of_no_supported_mismatch
     intro hEq
     exact hEvalNe (hlineEval.trans hEq)
   exact hNoMismatch ⟨i, hiSome, hmismatch⟩
+
 end MIPStarRE.LDT.Pasting
