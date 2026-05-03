@@ -708,6 +708,137 @@ lemma add_in_u_cs_chain_q4_eq_simplified_rhs
                 (opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
                   (T.outcome h)))
 
+/-! ### Add-in-u variance-bound conversions
+
+The following four lemmas are conditional real-valued conversions for the
+`Q₂ → Q₃` and `Q₃ → Q₄` add-in-u steps.  They do not prove the
+operator-theoretic Cauchy--Schwarz estimates from
+`references/ldt-paper/self_improvement.tex`, lines 299--340.  Instead, they
+convert either a squared real bound or a factored product of square-root bounds
+into the absolute-value square-root shape used by the surrounding scalar chain.
+
+The hypotheses `hsq`, `hCS`, and `hD*_le*` are the places where future
+operator-level arguments must supply the Cauchy--Schwarz, submeasurement
+contraction, and total-mass estimates.  In particular, `T` is a submeasurement
+in these statements; any `≤ 1` input corresponds to a `total_le_one`-style
+bound rather than a measurement equality. -/
+
+/-- Convert a squared `Q₂ → Q₃` real bound to an absolute-value sqrt bound.
+
+This lemma is only the `Real.abs_le_sqrt` conversion.  The hypothesis `hsq`
+must already contain any operator Cauchy--Schwarz and submeasurement estimates
+needed to prove the squared bound. -/
+lemma add_in_u_cs_chain_q2_q3_abs_le_sqrt_of_sq_le
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι)
+    (hsq :
+      (addInUCSChainQ2 params strategy T - addInUCSChainQ3 params strategy T) ^ 2 ≤
+        ∑ g : Polynomial params,
+          globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :
+    |addInUCSChainQ2 params strategy T - addInUCSChainQ3 params strategy T| ≤
+      Real.sqrt
+        (∑ g : Polynomial params,
+          globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
+  Real.abs_le_sqrt hsq
+
+/-- Convert factored `Q₂ → Q₃` sqrt bounds to the summed-deviation sqrt bound.
+
+This lemma assumes the Cauchy--Schwarz product bound as `hCS`, a bound on the
+first factor by the summed independent-points deviation, and a `≤ 1` bound on
+the second factor.  The proof is purely real-valued; the submeasurement and
+operator content belongs in the hypotheses. -/
+lemma add_in_u_cs_chain_q2_q3_le_sqrt_of_factor_bounds
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι)
+    (D₁ D₂ : Error)
+    (hCS :
+      |addInUCSChainQ2 params strategy T - addInUCSChainQ3 params strategy T| ≤
+        Real.sqrt D₁ * Real.sqrt D₂)
+    (hD₁_le :
+      D₁ ≤ ∑ g : Polynomial params,
+          globalVarianceDeviationAtPolynomial params strategy strategy.state T g)
+    (hD₂_le_one : D₂ ≤ 1) :
+    |addInUCSChainQ2 params strategy T - addInUCSChainQ3 params strategy T| ≤
+      Real.sqrt
+        (∑ g : Polynomial params,
+          globalVarianceDeviationAtPolynomial params strategy strategy.state T g) := by
+  have hsqrt_D₂ : Real.sqrt D₂ ≤ 1 := Real.sqrt_le_one.mpr hD₂_le_one
+  have hsqrt_D₁ :
+      Real.sqrt D₁ ≤ Real.sqrt
+          (∑ g : Polynomial params,
+            globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
+    Real.sqrt_le_sqrt hD₁_le
+  calc
+    |addInUCSChainQ2 params strategy T - addInUCSChainQ3 params strategy T|
+        ≤ Real.sqrt D₁ * Real.sqrt D₂ := hCS
+    _ ≤ Real.sqrt D₁ * 1 :=
+          mul_le_mul_of_nonneg_left hsqrt_D₂ (Real.sqrt_nonneg _)
+    _ = Real.sqrt D₁ := mul_one _
+    _ ≤ Real.sqrt
+            (∑ g : Polynomial params,
+              globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
+          hsqrt_D₁
+
+/-- Convert a squared `Q₃ → Q₄` real bound to an absolute-value sqrt bound.
+
+This lemma is only the `Real.abs_le_sqrt` conversion.  The hypothesis `hsq`
+must already contain any operator Cauchy--Schwarz and submeasurement estimates
+needed to prove the squared bound. -/
+lemma add_in_u_cs_chain_q3_q4_abs_le_sqrt_of_sq_le
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι)
+    (hsq :
+      (addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T) ^ 2 ≤
+        ∑ g : Polynomial params,
+          globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :
+    |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T| ≤
+      Real.sqrt
+        (∑ g : Polynomial params,
+          globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
+  Real.abs_le_sqrt hsq
+
+/-- Convert factored `Q₃ → Q₄` sqrt bounds to the summed-deviation sqrt bound.
+
+This lemma assumes the Cauchy--Schwarz product bound as `hCS`, a `≤ 1` bound
+on the first factor, and a bound on the second factor by the summed
+independent-points deviation.  The proof is purely real-valued; the
+submeasurement and operator content belongs in the hypotheses. -/
+lemma add_in_u_cs_chain_q3_q4_le_sqrt_of_factor_bounds
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι)
+    (D₁ D₂ : Error)
+    (hCS :
+      |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T| ≤
+        Real.sqrt D₁ * Real.sqrt D₂)
+    (hD₁_le_one : D₁ ≤ 1)
+    (hD₂_le :
+      D₂ ≤ ∑ g : Polynomial params,
+          globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :
+    |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T| ≤
+      Real.sqrt
+        (∑ g : Polynomial params,
+          globalVarianceDeviationAtPolynomial params strategy strategy.state T g) := by
+  have hsqrt_D₁ : Real.sqrt D₁ ≤ 1 := Real.sqrt_le_one.mpr hD₁_le_one
+  have hsqrt_D₂ :
+      Real.sqrt D₂ ≤ Real.sqrt
+          (∑ g : Polynomial params,
+            globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
+    Real.sqrt_le_sqrt hD₂_le
+  calc
+    |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T|
+        ≤ Real.sqrt D₁ * Real.sqrt D₂ := hCS
+    _ ≤ 1 * Real.sqrt D₂ :=
+          mul_le_mul_of_nonneg_right hsqrt_D₁ (Real.sqrt_nonneg _)
+    _ = Real.sqrt D₂ := one_mul _
+    _ ≤ Real.sqrt
+            (∑ g : Polynomial params,
+              globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
+          hsqrt_D₂
+
 /-- Assemble the projection-simplified scalar transfer from the four scalar
 chain moves. The analytic work remains exactly the four bounds
 `Q₀ ≈ Q₁`, `Q₁ ≈ Q₂`, `Q₂ ≈ Q₃`, and `Q₃ ≈ Q₄`, plus the final arithmetic
