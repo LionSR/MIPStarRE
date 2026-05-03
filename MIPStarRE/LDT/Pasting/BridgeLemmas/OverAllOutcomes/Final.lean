@@ -20,7 +20,9 @@ open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
 /-- For a fixed distinct tuple and interpolation-eligible nonglobal outcome, the
+
 probability (over the vertical-line base point `u`) of the line-consistency
 indicator is bounded by the paper's `md/q` Schwartz--Zippel term.
 

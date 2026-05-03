@@ -21,6 +21,7 @@ open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
 /-- Distinct-tuple mass of interpolation-eligible but globally inconsistent outcomes.
 
 This is the scalar quantity bounded in `ld-pasting.tex` lines 1174--1275 when the
@@ -493,3 +494,5 @@ lemma overAllOutcomes_distinct_nonglobal_mass_le_bad_line_mass_add_lineConsisten
           overAllOutcomesDistinctLineConsistentNonglobalMass params strategy family k := by
           rw [avgOver_add]
           rfl
+
+end MIPStarRE.LDT.Pasting
