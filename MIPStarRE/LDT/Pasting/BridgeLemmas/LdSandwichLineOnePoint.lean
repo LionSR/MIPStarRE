@@ -2190,8 +2190,11 @@ private lemma ldSandwichLineOnePoint_endpoint_comm_error_le
           simp [ldSandwichLineOnePointError, S, E, D, Γ, Z, R]
           ring
 
-/-- The linear (pre-`max`) form of the bipartite consistency defect. -/
-private noncomputable def qBipartiteLinearConsDefect {Outcome : Type*}
+/-- The linear (pre-`max`) form of the bipartite consistency defect.
+
+Internal helper for the `LdSandwichLineOnePoint` Cauchy--Schwarz setup;
+exposed for a future file-split (`#1127`). -/
+noncomputable def qBipartiteLinearConsDefect {Outcome : Type*}
     {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     [Fintype Outcome]
     (ψ : QuantumState (ιA × ιB))
@@ -2204,8 +2207,11 @@ consistency defect is the paper's sum against the complementary right outcome.
 This is the bookkeeping step that rewrites
 `⟨ψ|A_total ⊗ B_total|ψ⟩ - Σ_o ⟨ψ|A_o ⊗ B_o|ψ⟩` as
 `Σ_a ⟨ψ|A_a ⊗ (I - B_a)|ψ⟩` when Bob's family is a measurement and both
-`none` outcomes vanish. -/
-private lemma qBipartiteLinearConsDefect_option_eq_sum_some_complement
+`none` outcomes vanish.
+
+Internal helper for the `LdSandwichLineOnePoint` Cauchy--Schwarz setup;
+exposed for a future file-split (`#1127`). -/
+lemma qBipartiteLinearConsDefect_option_eq_sum_some_complement
     {α ιA ιB : Type*}
     [Fintype α] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (ψ : QuantumState (ιA × ιB))
@@ -2252,8 +2258,11 @@ private lemma qBipartiteLinearConsDefect_option_eq_sum_some_complement
 
 /-- The linear consistency defect is nonnegative when the right-hand family is a
 measurement.  This lets the paper's averaged linear estimate feed the `max 0`
-`qBipartiteConsDefect` wrapper without needing a pointwise absolute-value gap. -/
-private lemma qBipartiteLinearConsDefect_nonneg_of_right_total_one
+`qBipartiteConsDefect` wrapper without needing a pointwise absolute-value gap.
+
+Internal helper for the `LdSandwichLineOnePoint` Cauchy--Schwarz setup;
+exposed for a future file-split (`#1127`). -/
+lemma qBipartiteLinearConsDefect_nonneg_of_right_total_one
     {Outcome : Type*}
     {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     [Fintype Outcome]
@@ -2289,8 +2298,11 @@ error comparison follows.
 This is the paper-faithful wrapper for `lem:ld-sandwich-line-one-point`: the
 Cauchy--Schwarz argument controls an averaged linear expression, not an average
 of pointwise absolute values.  Nonnegativity of the linear defects removes the
-outer `max 0`. -/
-private lemma bipartiteConsError_le_of_linearDefect_average_bound
+outer `max 0`.
+
+Internal helper for the `LdSandwichLineOnePoint` Cauchy--Schwarz setup;
+exposed for a future file-split (`#1127`). -/
+lemma bipartiteConsError_le_of_linearDefect_average_bound
     {Question Outcome : Type*}
     {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     [Fintype Outcome]
