@@ -1414,6 +1414,121 @@ private lemma helper_agreement_average_ev_eq_avg
   intro u
   simp [helperAgreementOperatorAtPoint, ev_sum]
 
+/-- Reindexing identity for the pointwise helper-agreement operator.
+
+The fiberwise definition `H_{[h(u)=a]} := ∑_{h : h(u)=a} H_h` collapses the
+`a`-summed expression `∑_a A^u_a ⊗ H_{[h(u)=a]}` to the polynomial-indexed sum
+`∑_h A^u_{h(u)} ⊗ H_h`, by expanding the tensor product fiberwise and applying
+`Finset.sum_fiberwise` along `h ↦ h u`.
+
+This is the first equality of the boundedness display in the proof of
+`\ref{item:self-improvement-boundedness}`:
+`references/ldt-paper/self_improvement.tex` line 612, mirrored at
+`blueprint/src/chapter/ch07_self_improvement.tex` lines 274--282
+("Reindexing the sum by~$h$"). It is a purely algebraic identity — no estimate,
+no measurement structure used beyond the postprocess fiber decomposition built
+into `evaluateAt`. -/
+theorem helperAgreementOperatorAtPoint_eq_sum_polynomial
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (H : SubMeas (Polynomial params) ι)
+    (u : Point params) :
+    helperAgreementOperatorAtPoint params strategy H u =
+      ∑ h : Polynomial params,
+        opTensor ((strategy.pointMeasurement u).outcome (h u))
+          (H.outcome h) := by
+  classical
+  -- First reduce `helperAgreementOperatorAtPoint`'s `evaluateAt` to the explicit
+  -- fiber sum on each summand; everything else then follows from
+  -- `Finset.sum_fiberwise` along `h ↦ h u` and bilinearity of `opTensor`.
+  have hexpand :
+      helperAgreementOperatorAtPoint params strategy H u =
+        ∑ a : Fq params,
+          opTensor ((strategy.pointMeasurement u).outcome a)
+            (∑ h ∈ Finset.univ.filter
+                (fun h : Polynomial params => h.toFun u = a), H.outcome h) := by
+    change (∑ a : Fq params,
+        opTensor ((strategy.pointMeasurement u).outcome a)
+          ((evaluateAt params u H).outcome a)) = _
+    refine Finset.sum_congr rfl ?_
+    intro a _
+    have hev :
+        (evaluateAt params u H).outcome a =
+          ∑ h ∈ Finset.univ.filter
+              (fun h : Polynomial params => h.toFun u = a), H.outcome h := by
+      simp only [evaluateAt, postprocess, Finset.sum_filter]
+      refine Finset.sum_congr rfl (fun h _ => ?_)
+      congr 1
+    rw [hev]
+  rw [hexpand]
+  calc
+    ∑ a : Fq params,
+        opTensor ((strategy.pointMeasurement u).outcome a)
+          (∑ h ∈ Finset.univ.filter
+              (fun h : Polynomial params => h.toFun u = a), H.outcome h)
+        = ∑ a : Fq params, ∑ h ∈ Finset.univ.filter
+              (fun h : Polynomial params => h.toFun u = a),
+            opTensor ((strategy.pointMeasurement u).outcome a) (H.outcome h) := by
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              rw [opTensor_sum_right_finset]
+      _ = ∑ a : Fq params, ∑ h ∈ Finset.univ.filter
+              (fun h : Polynomial params => h.toFun u = a),
+            opTensor ((strategy.pointMeasurement u).outcome (h u)) (H.outcome h) := by
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              refine Finset.sum_congr rfl ?_
+              intro h hh
+              simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hh
+              rw [show h u = a from hh]
+      _ = ∑ h : Polynomial params,
+            opTensor ((strategy.pointMeasurement u).outcome (h u)) (H.outcome h) := by
+              simpa using
+                Finset.sum_fiberwise (Finset.univ : Finset (Polynomial params))
+                  (fun h : Polynomial params => h.toFun u)
+                  (fun h =>
+                    opTensor ((strategy.pointMeasurement u).outcome (h u))
+                      (H.outcome h))
+
+/-- Reindexed expansion of the averaged helper-agreement operator.
+
+Combining the pointwise reindexing identity
+`helperAgreementOperatorAtPoint_eq_sum_polynomial` with
+`helper_agreement_average_ev_eq_avg`, the scalar
+`⟨ψ| E_u Σ_a A^u_a ⊗ H_{[h(u)=a]} |ψ⟩` equals the polynomial-indexed expectation
+`E_u Σ_h ⟨ψ| A^u_{h(u)} ⊗ H_h |ψ⟩` from the second line of the boundedness
+display in the proof of `\ref{item:self-improvement-boundedness}`
+(`references/ldt-paper/self_improvement.tex` line 612;
+`blueprint/src/chapter/ch07_self_improvement.tex` lines 274--282). -/
+theorem helper_agreement_average_ev_eq_polynomial_sum
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (H : SubMeas (Polynomial params) ι) :
+    ev strategy.state (helperAgreementAverageOperator params strategy H) =
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ev strategy.state
+            (opTensor ((strategy.pointMeasurement u).outcome (h u))
+              (H.outcome h))) := by
+  rw [helper_agreement_average_ev_eq_avg]
+  refine avgOver_congr (uniformDistribution (Point params)) _ _ ?_
+  intro u
+  have hpt :
+      helperAgreementOperatorAtPoint params strategy H u =
+        ∑ h : Polynomial params,
+          opTensor ((strategy.pointMeasurement u).outcome (h u)) (H.outcome h) :=
+    helperAgreementOperatorAtPoint_eq_sum_polynomial params strategy H u
+  have hpt_ev :
+      ev strategy.state (helperAgreementOperatorAtPoint params strategy H u) =
+        ∑ h : Polynomial params,
+          ev strategy.state
+            (opTensor ((strategy.pointMeasurement u).outcome (h u))
+              (H.outcome h)) := by
+    rw [hpt, ev_sum]
+  -- The LHS goal is the unfolded `helperAgreementOperatorAtPoint`-summand at `u`.
+  simp only [helperAgreementOperatorAtPoint, ev_sum] at hpt_ev
+  exact hpt_ev
+
 /-- Transport the helper boundedness gap through the data-processing
 approximation between `Hhat` and `H`.
 
