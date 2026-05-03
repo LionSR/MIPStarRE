@@ -18,14 +18,3 @@ See `docs/decisions/713-scalar-tensor-decision.md` for the full decision record.
 
 - arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
 -/
-
-namespace MIPStarRE.LDT.Commutativity
-
-open MIPStarRE.LDT
-open MIPStarRE.LDT.ExpansionHypercubeGraph
-open MIPStarRE.LDT.CommutativityPoints
-open scoped BigOperators MatrixOrder Matrix ComplexOrder
-
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
-
-end MIPStarRE.LDT.Commutativity
