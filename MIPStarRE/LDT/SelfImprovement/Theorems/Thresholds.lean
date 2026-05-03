@@ -1,4 +1,4 @@
-import Mathlib.Analysis.MeanInequalitiesPow
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import MIPStarRE.LDT.Basic.SqrtBounds
 import MIPStarRE.LDT.SelfImprovement.Defs
 
@@ -496,15 +496,8 @@ theorem thirty_selfImprovementHelperError_le_selfImprovementError
       hdelta hdelta_le_one hdq_le_one
   have h3000m_nn : (0 : Error) ≤ 3000 * (params.m : Error) := by positivity
   -- Both sides expand to `3000 m * sum_p` for matching exponents `p`.
-  change 30 *
-      (100 * (params.m : Error) *
-        (Real.rpow eps (1 / (2 : Error)) +
-          Real.rpow delta (1 / (2 : Error)) +
-          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2 : Error)))) ≤
-        3000 * (params.m : Error) *
-          (Real.rpow eps (1 / (32 : Error)) +
-            Real.rpow delta (1 / (32 : Error)) +
-            Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (32 : Error)))
+  unfold selfImprovementHelperError selfImprovementError
+    MainInductionStep.selfImprovementInInductionError
   calc
     30 *
         (100 * (params.m : Error) *
