@@ -262,12 +262,17 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
       - \sqrt{2\delta}
       - \frac{md}{q}.
   \]
-  The Lean producer-side packaging of this step is
+  The Lean producer-side packaging of this step starts with the input structure
   \lean{MIPStarRE.LDT.SelfImprovement.HelperStrongSelfConsistencyProducerInputs}
+  and then uses the proved wrappers
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_of_helper_conclusion}
-  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_input_of_producer}.
+  \leanok
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_input_of_producer}
+  \leanok
+  to recover the final helper-stage self-consistency input.
   The paper's arithmetic shows that the right-hand error is at most
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_error_le_selfImprovementHelperError}
+  \leanok
   \[
     57m\cdot \Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big)
     \le \zeta,
