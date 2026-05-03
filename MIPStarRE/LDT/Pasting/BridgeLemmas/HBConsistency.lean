@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.Pasting.BridgeLemmas.LdSandwichLineOnePoint
-import MIPStarRE.LDT.Pasting.BridgeLemmas.LineInterpolation
+import MIPStarRE.LDT.Pasting.BridgeLemmas.LineInterpolation.HBError
 
 /-!
 # Section 12 pasting: H-B consistency
