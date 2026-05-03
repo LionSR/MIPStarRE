@@ -2,29 +2,31 @@ import MIPStarRE.LDT.Test.ErrorCascade.Definitions
 import MIPStarRE.LDT.Test.ErrorCascade.EnvelopeBounds
 
 /-!
-# Error cascade — sigma, ζ₁, ζ₂, ζ₃, ζ₄ bounds and the main consolidator
+# Error cascade — bounds for `σ`, `ζ₁`, `ζ₂`, `ζ₃`, `ζ₄` and the main consolidator
 
 This module proves the tight and absorbing bounds for each cascade variable
-σ, ζ₁, ζ₂, ζ₃, ζ₄, and assembles them into ,
-the top-level error-cascade consolidator used by  Step 8.
+`σ`, `ζ₁`, `ζ₂`, `ζ₃`, `ζ₄`, and assembles them into
+`errorCascade_le_mainFormalError`,
+the top-level error-cascade consolidator used by `mainFormalError` (Step 8).
 
 Each cascade-step lemma has three components:
 
-* The **tight cascade bound** (, , …),
+* The **tight cascade bound** (`cascadeSigma_tight_bound`, `cascadeZeta1_bound`, …),
   deriving the native estimate directly from the cascade definition.
-* The **absorbing bound** (, , …), coarsening the
-  tight estimate to the final  envelope.
-* Where appropriate, nonnegativity lemmas (,
-  ).
+* The **absorbing bound** (`sigma_bound`, `zeta1_bound`, …), coarsening the
+  tight estimate to the final `mainFormalEnvelope` envelope.
+* Where appropriate, nonnegativity lemmas (`cascadeSigma_nonneg`,
+  `cascadeZeta1_nonneg`).
 
-The consolidator  packages all five bounds
-against  itself (with , as stated
+The consolidator `errorCascade_le_mainFormalError` packages all five bounds
+against `mainFormalError` itself (with `ζ₃/2 ≤ mainFormalError`, as stated
 in paper line 230).
 
 ## References
 
-* , lines 187–234.
+* `references/ldt-paper/inductive_step.tex`, lines 187–234.
 -/
+
 
 open scoped BigOperators
 
