@@ -103,9 +103,14 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \begin{align}
     \sum_h \bra{\psi} H_h \ot I \ket{\psi}
     &= \E_{u} \sum_h \bra{\psi} H^{u}_h \ot I \ket{\psi} \notag\\
-    &= \E_{u} \sum_h \bra{\psi} \bigl(A^{u}_{h(u)} \cdot T_h \cdot A^{u}_{h(u)}\bigr) \ot I \ket{\psi} \notag\\
-    &= \E_{u} \sum_a \bra{\psi} \bigl(A^{u}_{a} \cdot T_{[h(u) = a]} \cdot A^{u}_{a}\bigr) \ot I \ket{\psi}. \label{eq:bracketize-the-expression}
+    &= \E_{u} \sum_h \bra{\psi} \bigl(A^{u}_{h(u)} \cdot T_h \cdot A^{u}_{h(u)}\bigr) \ot I \ket{\psi}.
   \end{align}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_mass_eq_avg_pointwise_sandwich_sum}
+  Grouping the polynomials according to their value at~$u$ gives
+  \begin{equation}\label{eq:bracketize-the-expression}
+    \E_{u} \sum_h \bra{\psi} \bigl(A^{u}_{h(u)} \cdot T_h \cdot A^{u}_{h(u)}\bigr) \ot I \ket{\psi}
+    = \E_{u} \sum_a \bra{\psi} \bigl(A^{u}_{a} \cdot T_{[h(u) = a]} \cdot A^{u}_{a}\bigr) \ot I \ket{\psi}.
+  \end{equation}
   We first move the leftmost copy of~$A^u_a$ across the bipartition:
   \begin{equation}\label{eq:yet-another-move-a}
     \eqref{eq:bracketize-the-expression}

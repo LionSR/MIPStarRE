@@ -380,6 +380,87 @@ theorem input_consistency_dual_mass_lower_bound
     _ ≤ ev strategy.state (leftTensor (ι₂ := ι) Z) :=
           sdp_overlap_le_dual_mass params strategy G.toSubMeas Z hZ hdual
 
+/-- Exact `Hhat` reindexing for the helper-stage left-tensor mass.
+
+Expanding `Hhat = E_u H^u` through `subMeasMass ψ Hhat.liftLeft = ev ψ (Hhat.total ⊗ I)`,
+swapping the leftTensor through the polynomial sum, and pulling the `ev` through
+the per-outcome point average gives the paper identity
+
+  `⟨ψ| Hhat ⊗ I |ψ⟩ = E_u Σ_h ⟨ψ| H^u_h ⊗ I |ψ⟩`,
+
+where `H^u_h = A^u_{h(u)} · T_h · A^u_{h(u)}` is
+`sandwichedPolynomialOutcomeOperatorAt`. This is the algebraic opening of the
+helper-stage completeness chain at
+`references/ldt-paper/self_improvement.tex`, lines 354--356, mirrored at
+`blueprint/src/chapter/ch07_self_improvement.tex`, lines 103--106.
+
+The conclusion is exact (not approximate) and depends on no input-consistency
+or SDP hypotheses. The remaining helper-completeness ingredients --- the
+Cauchy--Schwarz reductions
+(`self_improvement.tex:360--403`) onto a `Z ⊗ I`-shaped expression, and the
+input-consistency dual-mass bound already supplied by
+`input_consistency_dual_mass_lower_bound` --- compose against this identity. -/
+theorem helper_mass_eq_avg_pointwise_sandwich_sum
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    subMeasMass strategy.state
+        (averagedSandwichedPolynomialSubMeas params strategy T).liftLeft =
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ev strategy.state
+            (leftTensor (ι₂ := ι)
+              (sandwichedPolynomialOutcomeOperatorAt params strategy T u h))) := by
+  -- Per-outcome scalar identity: `ev (leftTensor (Hhat.outcome h)) = E_u ev (leftTensor H^u_h)`.
+  -- `Hhat.outcome h` is by definition the per-point average of
+  -- `sandwichedPolynomialOutcomeOperatorAt`; pulling `ev (leftTensor _)` through
+  -- the average is `ev_opTensor_averageOperatorOverDistribution_left` with `B = 1`.
+  have hev_each :
+      ∀ h : Polynomial params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+            ((averagedSandwichedPolynomialSubMeas params strategy T).outcome h)) =
+          avgOver (uniformDistribution (Point params)) (fun u =>
+            ev strategy.state
+              (leftTensor (ι₂ := ι)
+                (sandwichedPolynomialOutcomeOperatorAt params strategy T u h))) := by
+    intro h
+    exact ev_opTensor_averageOperatorOverDistribution_left strategy.state
+      (uniformDistribution (Point params))
+      (fun u => sandwichedPolynomialOutcomeOperatorAt params strategy T u h)
+      (1 : MIPStarRE.Quantum.Op ι)
+  -- Open the LHS as a polynomial-indexed sum via the generic
+  -- `ev_leftTensor_total_eq_sum_outcome`, replace each summand by its per-point
+  -- average via `hev_each`, and swap sum/avgOver via `avgOver_sum`.
+  calc
+    subMeasMass strategy.state
+        (averagedSandwichedPolynomialSubMeas params strategy T).liftLeft
+        =
+      ∑ h : Polynomial params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+            ((averagedSandwichedPolynomialSubMeas params strategy T).outcome h)) :=
+        ev_leftTensor_total_eq_sum_outcome strategy.state _
+    _ =
+      ∑ h : Polynomial params,
+        avgOver (uniformDistribution (Point params)) (fun u =>
+          ev strategy.state
+            (leftTensor (ι₂ := ι)
+              (sandwichedPolynomialOutcomeOperatorAt params strategy T u h))) :=
+        Finset.sum_congr rfl (fun h _ => hev_each h)
+    _ =
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ev strategy.state
+            (leftTensor (ι₂ := ι)
+              (sandwichedPolynomialOutcomeOperatorAt params strategy T u h))) := by
+        rw [← avgOver_sum (uniformDistribution (Point params))
+              (fun u h =>
+                ev strategy.state
+                  (leftTensor (ι₂ := ι)
+                    (sandwichedPolynomialOutcomeOperatorAt params strategy T u h)))]
+
 /-- Reduced version of `lem:sdp`.
 
 This reduced wrapper now instantiates the paper's explicit Slater witnesses: the
