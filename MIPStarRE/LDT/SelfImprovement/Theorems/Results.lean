@@ -2340,7 +2340,7 @@ lemma add_in_u_cs_chain_q3_q4_self_energy_factor_le_one
         let Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
         ev strategy.state (opTensor (Au * Mh * Au) (T.outcome h))) ≤ 1 := by
   classical
-  set S : Point params → SubMeas (Polynomial params) ι :=
+  let S : Point params → SubMeas (Polynomial params) ι :=
     fun u => sandwichedPolynomialSubMeasAt params strategy T u
   -- Projection collapse: `Au * (S u).outcome h * Au = (S u).outcome h`
   have hcollapse : ∀ (u : Point params) (h : Polynomial params),
@@ -2400,17 +2400,7 @@ lemma add_in_u_cs_chain_q3_q4_self_energy_factor_le_one
       _ ≤ ev strategy.state (1 : MIPStarRE.Quantum.Op (ι × ι)) :=
             ev_mono strategy.state _ _ hop_sum_le_one
       _ = 1 := ev_one_of_isNormalized strategy.state strategy.isNormalized
-  -- Average over `u` preserves the bound
-  have havg_le_one :
-      avgOver (uniformDistribution (Point params))
-        (fun u =>
-          ∑ h : Polynomial params,
-            ev strategy.state (opTensor ((S u).outcome h) (T.outcome h))) ≤ 1 := by
-    refine le_trans
-      (avgOver_mono (uniformDistribution (Point params)) _ _ hpointwise) ?_
-    exact le_of_eq
-      (avgOver_uniform_const (α := Point params) (c := (1 : Error)))
-  exact havg_le_one
+  exact avgOver_uniform_le_of_pointwise_le _ 1 zero_le_one hpointwise
 
 /-- Sqrt-monotonicity transit lemma used by the two GlobalVariance endpoint
 bridges below: a real bounded by `Real.sqrt s` is bounded by `Real.sqrt ζ`
