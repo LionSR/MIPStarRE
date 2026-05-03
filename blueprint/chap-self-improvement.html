@@ -337,7 +337,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> Let \(T=\{ T_g\} \) and \(Z\) be the optimal solutions to the SDPs&#160;<a href="chap-self-improvement.html#eq:primal-objective" class="eqref">24</a> and&#160;<a href="chap-self-improvement.html#eq:dual-objective" class="eqref">25</a> given by Lemma&#160;<a href="chap-self-improvement.html#lem:sdp">7.2</a>. Then \(T\) is a measurement, and </p>
+  <p> Let \(T=\{ T_g\} \) and \(Z\) be the optimal solutions to the SDPs&#160;<a href="chap-self-improvement.html#eq:primal-objective" class="eqref">25</a> and&#160;<a href="chap-self-improvement.html#eq:dual-objective" class="eqref">26</a> given by Lemma&#160;<a href="chap-self-improvement.html#lem:sdp">7.2</a>. Then \(T\) is a measurement, and </p>
 <div class="displaymath" id="eq:Z-greater-than-A">
   \begin{align}  \forall g \in \mathcal{P}(m,q,d): \qquad Z & \geq \left(\mathbb {E}_{u} A^{u}_{g(u)}\right), \label{eq:Z-greater-than-A}\\ T_g \cdot Z & = T_g \cdot \left(\mathbb {E}_{u} A^{u}_{g(u)}\right). \label{eq:swap-Z-for-A} \end{align}
 </div>
@@ -366,7 +366,16 @@
 <p>We now verify the four conclusions of Lemma&#160;<a href="chap-self-improvement.html#lem:self-improvement-helper">7.1</a>. </p>
 <p><em>Proof of <a href="chap-self-improvement.html#item:self-improvement-completeness">1</a>.</em> The completeness of&#160;\(H\) is </p>
 <div class="displaymath" id="a0000000300">
-  \begin{align}  \sum _h \langle \psi  \rvert  H_h \otimes I \lvert \psi  \rangle  & = \mathbb {E}_{u} \sum _h \langle \psi  \rvert  H^{u}_h \otimes I \lvert \psi  \rangle  \notag \\ & = \mathbb {E}_{u} \sum _h \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot T_h \cdot A^{u}_{h(u)}\bigr) \otimes I \lvert \psi  \rangle  \notag \\ & = \mathbb {E}_{u} \sum _a \langle \psi  \rvert  \bigl(A^{u}_{a} \cdot T_{[h(u) = a]} \cdot A^{u}_{a}\bigr) \otimes I \lvert \psi  \rangle . \label{eq:bracketize-the-expression} \end{align}
+  \begin{align}  \sum _h \langle \psi  \rvert  H_h \otimes I \lvert \psi  \rangle  & = \mathbb {E}_{u} \sum _h \langle \psi  \rvert  H^{u}_h \otimes I \lvert \psi  \rangle  \notag \\ & = \mathbb {E}_{u} \sum _h \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot T_h \cdot A^{u}_{h(u)}\bigr) \otimes I \lvert \psi  \rangle . \end{align}
+</div>
+<p>  Grouping the polynomials according to their value at&#160;\(u\) gives </p>
+<div class="equation" id="eq:bracketize-the-expression">
+<p>
+  <div class="equation_content">
+    \begin{equation} \label{eq:bracketize-the-expression} \mathbb {E}_{u} \sum _h \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot T_h \cdot A^{u}_{h(u)}\bigr) \otimes I \lvert \psi  \rangle  = \mathbb {E}_{u} \sum _a \langle \psi  \rvert  \bigl(A^{u}_{a} \cdot T_{[h(u) = a]} \cdot A^{u}_{a}\bigr) \otimes I \lvert \psi  \rangle . \end{equation}
+  </div>
+  <span class="equation_label">4</span>
+</p>
 </div>
 <p> We first move the leftmost copy of&#160;\(A^u_a\) across the bipartition: </p>
 <div class="equation" id="eq:yet-another-move-a">
@@ -374,16 +383,16 @@
   <div class="equation_content">
     \begin{equation} \label{eq:yet-another-move-a} \eqref{eq:bracketize-the-expression} \approx _{2\sqrt{\delta }} \mathbb {E}_{u} \sum _a \langle \psi  \rvert  \bigl(T_{[h(u)=a]} \cdot A^{u}_{a}\bigr) \otimes A^{u}_{a} \lvert \psi  \rangle . \end{equation}
   </div>
-  <span class="equation_label">4</span>
+  <span class="equation_label">5</span>
 </p>
 </div>
-<p> The difference is bounded by Cauchy–Schwarz as in&#160;<a href="chap-self-improvement.html#eq:move-one-cauchy-schwarz" class="eqref">36</a>; the first factor is at most \(\sqrt{2\delta }\) by self-consistency of&#160;\(A\), and the second is at most&#160;\(1\) because \(T_{[h(u)=a]} \le I\). We next remove the remaining copy of&#160;\(A^u_a\) on Bob’s side: </p>
+<p> The difference is bounded by Cauchy–Schwarz as in&#160;<a href="chap-self-improvement.html#eq:move-one-cauchy-schwarz" class="eqref">37</a>; the first factor is at most \(\sqrt{2\delta }\) by self-consistency of&#160;\(A\), and the second is at most&#160;\(1\) because \(T_{[h(u)=a]} \le I\). We next remove the remaining copy of&#160;\(A^u_a\) on Bob’s side: </p>
 <div class="equation" id="eq:mysterious-case-of-the-disappearing-a">
 <p>
   <div class="equation_content">
     \begin{equation} \label{eq:mysterious-case-of-the-disappearing-a} \eqref{eq:yet-another-move-a} \approx _{\sqrt{\delta }} \mathbb {E}_{u} \sum _a \langle \psi  \rvert  \bigl(T_{[h(u)=a]} \cdot A^{u}_{a}\bigr) \otimes I \lvert \psi  \rangle . \end{equation}
   </div>
-  <span class="equation_label">5</span>
+  <span class="equation_label">6</span>
 </p>
 </div>
 <p> Here the second Cauchy–Schwarz factor is </p>
@@ -400,7 +409,7 @@
   <div class="equation_content">
     \begin{equation} \label{eq:gonna-use-this-later-H-versus-Z} \sum _h \langle \psi  \rvert  H_h \otimes I \lvert \psi  \rangle  \geq \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  - 3\sqrt{\delta }. \end{equation}
   </div>
-  <span class="equation_label">6</span>
+  <span class="equation_label">7</span>
 </p>
 </div>
 <p>     Since \(G\) is a measurement,&#160;<a href="chap-self-improvement.html#eq:Z-greater-than-A" class="eqref">1</a> and Lemma&#160;<a href="sec-prelims.html#prop:simeq-for-measurements">3.18</a> give </p>
@@ -414,7 +423,7 @@
   <div class="equation_content">
     \begin{equation} \label{eq:consistency-with-A-baby-step} \mathbb {E}_{u} \sum _{a \neq b} \langle \psi  \rvert  A^{u}_a \otimes H_{[h(u) = b]} \lvert \psi  \rangle  = \mathbb {E}_{u} \sum _{a, h: h(u) \neq a} \langle \psi  \rvert  A^{u}_a \otimes H_h \lvert \psi  \rangle . \end{equation}
   </div>
-  <span class="equation_label">7</span>
+  <span class="equation_label">8</span>
 </p>
 </div>
 <p> Apply Lemma&#160;<a href="chap-self-improvement.html#lem:add-in-u">7.3</a> with \(\mathcal O=\mathbb {F}_q\), \(M=A\), and \(S_u=\{ (a,h):h(u)\neq a\} \). Then </p>
@@ -427,7 +436,7 @@
   <div class="equation_content">
     \begin{equation} \label{eq:explicit-bound-for-A-consistency} \mathbb {E}_{u} \sum _{a \neq b} \langle \psi  \rvert  A^{u}_a \otimes H_{[h(u) = b]} \lvert \psi  \rangle  \leq 4 \sqrt{\zeta _{\mathrm{variance}}}. \end{equation}
   </div>
-  <span class="equation_label">8</span>
+  <span class="equation_label">9</span>
 </p>
 </div>
 <p> Since  </p>
@@ -445,7 +454,7 @@
   <div class="equation_content">
     \begin{equation} \label{eq:self-consistency-baby-step} \sum _{h\in \mathcal{P}(m,q,d)} \langle \psi  \rvert  H_h \otimes H_h \lvert \psi  \rangle  = \mathbb {E}_{u} \sum _{h \in \mathcal{P}(m,q,d)} \langle \psi  \rvert  H_h^{u} \otimes H_h \lvert \psi  \rangle . \end{equation}
   </div>
-  <span class="equation_label">11</span>
+  <span class="equation_label">12</span>
 </p>
 </div>
 <p> Apply Lemma&#160;<a href="chap-self-improvement.html#lem:add-in-u">7.3</a> with \(\mathcal O=\mathcal{P}(m,q,d)\), \(M=H\), and \(S_u=\{ (h,h):h\in \mathcal{P}(m,q,d)\} \). This gives </p>
@@ -454,7 +463,7 @@
   <div class="equation_content">
     \begin{equation} \label{eq:release-the-kraken} \eqref{eq:self-consistency-baby-step} \approx _{4 \sqrt{\zeta _{\mathrm{variance}}}} \mathbb {E}_{u} \sum _{h \in \mathcal{P}(m,q,d)} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot H_h^{u} \cdot A^{u}_{h(u)}\bigr) \otimes T_h \lvert \psi  \rangle . \end{equation}
   </div>
-  <span class="equation_label">12</span>
+  <span class="equation_label">13</span>
 </p>
 </div>
 <p> We next enlarge the sum from \(h'=h\) to all pairs \(h,h'\): </p>
@@ -463,20 +472,20 @@
   <div class="equation_content">
     \begin{equation} \label{eq:threw-in-h-prime} \eqref{eq:release-the-kraken} \approx _{2\sqrt{\zeta _{\mathrm{variance}}} + \frac{md}{q}} \mathbb {E}_{u} \sum _{h, h' \in \mathcal{P}(m,q,d)} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot H^{u}_{h'} \cdot A^{u}_{h(u)}\bigr) \otimes T_h \lvert \psi  \rangle . \end{equation}
   </div>
-  <span class="equation_label">13</span>
+  <span class="equation_label">14</span>
 </p>
 </div>
 <p> The added off-diagonal contribution is </p>
 <div class="displaymath" id="a0000000306">
   \begin{align}  \eqref{eq:threw-in-h-prime}-\eqref{eq:release-the-kraken} & = \mathbb {E}_{u} \sum _{h \neq h'} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot H^{u}_{h'} \cdot A^{u}_{h(u)}\bigr) \otimes T_h \lvert \psi  \rangle  \notag \\ & = \mathbb {E}_{u} \sum _{h \neq h'} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot T_{h'} \cdot A^{u}_{h(u)}\bigr) \otimes T_h \lvert \psi  \rangle  \cdot \mathbf{1}\! \left[h(u) = h’(u)\right], \label{eq:added-indicator} \end{align}
 </div>
-<p> where the second equality is&#160;<a href="chap-self-improvement.html#eq:h-blt" class="eqref">10</a>. To estimate&#160;<a href="chap-self-improvement.html#eq:added-indicator" class="eqref">14</a>, first replace the left copy of \(A^u_{h(u)}\) by \(A^v_{h(v)}\): </p>
+<p> where the second equality is&#160;<a href="chap-self-improvement.html#eq:h-blt" class="eqref">11</a>. To estimate&#160;<a href="chap-self-improvement.html#eq:added-indicator" class="eqref">15</a>, first replace the left copy of \(A^u_{h(u)}\) by \(A^v_{h(v)}\): </p>
 <div class="equation" id="eq:swapped-u-for-v">
 <p>
   <div class="equation_content">
     \begin{equation} \label{eq:swapped-u-for-v} \eqref{eq:added-indicator} \approx _{\sqrt{\zeta _{\mathrm{variance}}}} \mathbb {E}_{u,v} \sum _{h \neq h'} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \cdot T_{h'} \cdot A^{u}_{h(u)}\bigr) \otimes T_h \lvert \psi  \rangle  \cdot \mathbf{1}\! \left[h(u) = h'(u)\right]. \end{equation}
   </div>
-  <span class="equation_label">15</span>
+  <span class="equation_label">16</span>
 </p>
 </div>
 <p> The corresponding Cauchy–Schwarz bound is </p>
@@ -490,7 +499,7 @@
   <div class="equation_content">
     \begin{equation} \label{eq:swapped-u-for-v-this-time-it's-personal} \eqref{eq:swapped-u-for-v} \approx _{\sqrt{\zeta _{\mathrm{variance}}}} \mathbb {E}_{u,v} \sum _{h \neq h'} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \cdot T_{h'} \cdot A^{v}_{h(v)}\bigr) \otimes T_h \lvert \psi  \rangle  \cdot \mathbf{1}\! \left[h(u) = h'(u)\right]. \end{equation}
   </div>
-  <span class="equation_label">19</span>
+  <span class="equation_label">20</span>
 </p>
 </div>
 <p> The same intermediate estimate gives </p>
@@ -499,17 +508,17 @@
   <div class="equation_content">
     \begin{equation} \label{eq:gonna-use-this-later} \mathbb {E}_{u,v} \sum _{h \neq h'} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \cdot T_{h'} \cdot A^{v}_{h(v)}\bigr)\otimes T_h\lvert \psi  \rangle  \leq 1, \end{equation}
   </div>
-  <span class="equation_label">20</span>
+  <span class="equation_label">21</span>
 </p>
 </div>
-<p> so Schwartz–Zippel bounds the indicator average by \(md/q\) and proves&#160;<a href="chap-self-improvement.html#eq:threw-in-h-prime" class="eqref">13</a>. </p>
-<p>Using&#160;<a href="chap-self-improvement.html#eq:h-blt" class="eqref">10</a>, the right-hand side of&#160;<a href="chap-self-improvement.html#eq:threw-in-h-prime" class="eqref">13</a> is </p>
+<p> so Schwartz–Zippel bounds the indicator average by \(md/q\) and proves&#160;<a href="chap-self-improvement.html#eq:threw-in-h-prime" class="eqref">14</a>. </p>
+<p>Using&#160;<a href="chap-self-improvement.html#eq:h-blt" class="eqref">11</a>, the right-hand side of&#160;<a href="chap-self-improvement.html#eq:threw-in-h-prime" class="eqref">14</a> is </p>
 <div class="equation" id="eq:delete-an-A">
 <p>
   <div class="equation_content">
     \begin{equation} \label{eq:delete-an-A} \mathbb {E}_{u} \sum _{h, h' \in \mathcal{P}(m,q,d)} \langle \psi  \rvert  \bigl(H^{u}_{h'} \cdot A^{u}_{h(u)}\bigr) \otimes T_h \lvert \psi  \rangle . \end{equation}
   </div>
-  <span class="equation_label">21</span>
+  <span class="equation_label">22</span>
 </p>
 </div>
 <p> Replace the remaining copy of \(A^u_{h(u)}\) by \(A^v_{h(v)}\): </p>
@@ -518,7 +527,7 @@
   <div class="equation_content">
     \begin{equation} \label{eq:swap-u-for-v-attack-of-the-clones} \eqref{eq:delete-an-A} \approx _{\sqrt{\zeta _{\mathrm{variance}}}} \mathbb {E}_{u,v} \sum _{h, h' \in \mathcal{P}(m,q,d)} \langle \psi  \rvert  \bigl(H^{u}_{h'} \cdot A^{v}_{h(v)}\bigr) \otimes T_h \lvert \psi  \rangle . \end{equation}
   </div>
-  <span class="equation_label">22</span>
+  <span class="equation_label">23</span>
 </p>
 </div>
 <p> Here the first Cauchy–Schwarz factor is at most&#160;\(1\) because \(T\) and \(H^u\) are submeasurements, and the second is again bounded by Lemma&#160;<a href="sec-variance.html#lem:global-variance-of-points">6.3</a>. Finally move this last copy of&#160;\(A^v_{h(v)}\) to Bob’s side: </p>
@@ -527,14 +536,14 @@
   <div class="equation_content">
     \begin{equation} \label{eq:move-over-v} \eqref{eq:swap-u-for-v-attack-of-the-clones} \approx _{\sqrt{2\delta }} \mathbb {E}_{u,v} \sum _{h, h' \in \mathcal{P}(m,q,d)} \langle \psi  \rvert  H^{u}_{h'} \otimes \bigl(T_h \cdot A^{v}_{h(v)}\bigr) \lvert \psi  \rangle . \end{equation}
   </div>
-  <span class="equation_label">23</span>
+  <span class="equation_label">24</span>
 </p>
 </div>
-<p> Substituting&#160;<a href="chap-self-improvement.html#eq:swap-Z-for-A" class="eqref">2</a>, then&#160;<a href="chap-self-improvement.html#eq:Z-greater-than-A" class="eqref">1</a>, and finally the already proved bound&#160;<a href="chap-self-improvement.html#eq:explicit-bound-for-A-consistency" class="eqref">8</a>, one obtains </p>
+<p> Substituting&#160;<a href="chap-self-improvement.html#eq:swap-Z-for-A" class="eqref">2</a>, then&#160;<a href="chap-self-improvement.html#eq:Z-greater-than-A" class="eqref">1</a>, and finally the already proved bound&#160;<a href="chap-self-improvement.html#eq:explicit-bound-for-A-consistency" class="eqref">9</a>, one obtains </p>
 <div class="displaymath" id="a0000000308">
   \[  \eqref{eq:move-over-v} \ge \sum _h \langle \psi  \rvert  H_h \otimes I \lvert \psi  \rangle  - 4\sqrt{\zeta _{\mathrm{variance}}}.  \]
 </div>
-<p> Combining&#160;<a href="chap-self-improvement.html#eq:release-the-kraken" class="eqref">12</a>, <a href="chap-self-improvement.html#eq:threw-in-h-prime" class="eqref">13</a>, <a href="chap-self-improvement.html#eq:swap-u-for-v-attack-of-the-clones" class="eqref">22</a>, and&#160;<a href="chap-self-improvement.html#eq:move-over-v" class="eqref">23</a> gives </p>
+<p> Combining&#160;<a href="chap-self-improvement.html#eq:release-the-kraken" class="eqref">13</a>, <a href="chap-self-improvement.html#eq:threw-in-h-prime" class="eqref">14</a>, <a href="chap-self-improvement.html#eq:swap-u-for-v-attack-of-the-clones" class="eqref">23</a>, and&#160;<a href="chap-self-improvement.html#eq:move-over-v" class="eqref">24</a> gives </p>
 <div class="displaymath" id="a0000000309">
   \[  \sum _h \langle \psi  \rvert  H_h \otimes H_h \lvert \psi  \rangle  \ge \sum _h \langle \psi  \rvert  H_h \otimes I \lvert \psi  \rangle  - 11 \sqrt{\zeta _{\mathrm{variance}}} - \sqrt{2\delta } - \frac{md}{q}.  \]
 </div>
@@ -547,11 +556,11 @@
 <div class="displaymath" id="a0000000311">
   \[  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  -\mathbb {E}_{u} \sum _a \langle \psi  \rvert  A^{u}_{a} \otimes H_{[h(u)=a]} \lvert \psi  \rangle .  \]
 </div>
-<p> Reindexing the sum by&#160;\(h\), inserting \(\sum _a A_a^u=I\), and using&#160;<a href="chap-self-improvement.html#eq:explicit-bound-for-A-consistency" class="eqref">8</a>, </p>
+<p> Reindexing the sum by&#160;\(h\), inserting \(\sum _a A_a^u=I\), and using&#160;<a href="chap-self-improvement.html#eq:explicit-bound-for-A-consistency" class="eqref">9</a>, </p>
 <div class="displaymath" id="a0000000312">
   \[  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  -\mathbb {E}_{u} \sum _a \langle \psi  \rvert  A^{u}_{a} \otimes H_{[h(u)=a]} \lvert \psi  \rangle  \le \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  - \sum _h \langle \psi  \rvert  I \otimes H_h \lvert \psi  \rangle  + 4 \sqrt{\zeta _{\mathrm{variance}}}.  \]
 </div>
-<p> By&#160;<a href="chap-self-improvement.html#eq:gonna-use-this-later-H-versus-Z" class="eqref">6</a>, the right-hand side is at most \(3\sqrt{\delta }+4\sqrt{\zeta _{\mathrm{variance}}}\). Substituting the definition of \(\zeta _{\mathrm{variance}}\) and collecting terms gives  </p>
+<p> By&#160;<a href="chap-self-improvement.html#eq:gonna-use-this-later-H-versus-Z" class="eqref">7</a>, the right-hand side is at most \(3\sqrt{\delta }+4\sqrt{\zeta _{\mathrm{variance}}}\). Substituting the definition of \(\zeta _{\mathrm{variance}}\) and collecting terms gives  </p>
 <div class="displaymath" id="a0000000313">
   \[  23m\cdot \Big(\varepsilon ^{1/2} + \delta ^{1/2} + (d/q)^{1/2}\Big) \le \zeta .  \]
 </div>
@@ -613,13 +622,13 @@
 <div class="displaymath" id="eq:dual-objective">
   \begin{align}  \inf & \quad \operatorname{Tr}(Z) \label{eq:dual-objective}\\ \text{ s.t.} & \quad Z \geq A_g. \label{eq:dual-constraint} \end{align}
 </div>
-<p> These semidefinite programs are dual to each other. Moreover there is an optimal pair of solutions \(\{ T_g\} \) to&#160;<a href="chap-self-improvement.html#eq:primal-objective" class="eqref">24</a> and \(Z\) to&#160;<a href="chap-self-improvement.html#eq:dual-objective" class="eqref">25</a> such that \(\sum _g T_g = I\) and </p>
+<p> These semidefinite programs are dual to each other. Moreover there is an optimal pair of solutions \(\{ T_g\} \) to&#160;<a href="chap-self-improvement.html#eq:primal-objective" class="eqref">25</a> and \(Z\) to&#160;<a href="chap-self-improvement.html#eq:dual-objective" class="eqref">26</a> such that \(\sum _g T_g = I\) and </p>
 <div class="equation" id="eq:slater">
 <p>
   <div class="equation_content">
     \begin{equation} \label{eq:slater} T_g Z \, =\,  T_g {A_g},\qquad \forall g\in \mathcal{P}(m,q,d). \end{equation}
   </div>
-  <span class="equation_label">27</span>
+  <span class="equation_label">28</span>
 </p>
 </div>
 
@@ -633,7 +642,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>Rewrite&#160;<a href="chap-self-improvement.html#eq:primal-objective" class="eqref">24</a> in canonical block form. Let \(r\) be the dimension of the space on which&#160;\(A\) acts, let \(M = |\mathcal{P}(m,q,d)|\), and fix an ordering \(g_1,\ldots ,g_M\) of the polynomials. Consider </p>
+  <p>Rewrite&#160;<a href="chap-self-improvement.html#eq:primal-objective" class="eqref">25</a> in canonical block form. Let \(r\) be the dimension of the space on which&#160;\(A\) acts, let \(M = |\mathcal{P}(m,q,d)|\), and fix an ordering \(g_1,\ldots ,g_M\) of the polynomials. Consider </p>
 <div class="displaymath" id="eq:primal-canonical">
   \begin{align}  \sup & \quad \operatorname{Tr}(C^\dagger X) \label{eq:primal-canonical}\\ \text{s.t.} & \quad \operatorname{Tr}(D_{ij}^\dagger X) = b_{ij} \qquad \forall i,j\in \{ 1,\ldots ,r\} , \notag \\ & \quad X \geq 0, \notag \end{align}
 </div>
@@ -649,7 +658,7 @@
 <div class="displaymath" id="a0000000318">
   \[  \operatorname{Tr}(C^\dagger X)=\sum _{i=1}^M \operatorname{Tr}(A_{g_i}\cdot X_{ii}).  \]
 </div>
-<p> Thus&#160;<a href="chap-self-improvement.html#eq:primal-canonical" class="eqref">28</a> is equivalent to&#160;<a href="chap-self-improvement.html#eq:primal-objective" class="eqref">24</a> under the identification \(T_{g_i}=X_{ii}\). </p>
+<p> Thus&#160;<a href="chap-self-improvement.html#eq:primal-canonical" class="eqref">29</a> is equivalent to&#160;<a href="chap-self-improvement.html#eq:primal-objective" class="eqref">25</a> under the identification \(T_{g_i}=X_{ii}\). </p>
 <p>The canonical dual is </p>
 <div class="displaymath" id="eq:dual-canonical">
   \begin{align}  \inf & \quad \sum _i\,  z_{ij} b_{ij} \label{eq:dual-canonical}\\ \text{s.t.} & \quad \sum _{i,j} \, z_{ij} D_{ij} \geq C. \label{eq:dual-canonical-constraint} \end{align}
@@ -658,7 +667,7 @@
 <div class="displaymath" id="a0000000319">
   \[  \sum _{i,j=1}^r z_{ij} D_{ij} = \sum _{k=1}^{M+1} \lvert k \rangle \langle k \rvert  \otimes \left(\sum _{i,j=1}^r z_{ij}\lvert i \rangle \langle j \rvert \right) =: \sum _{k=1}^{M+1}\lvert k \rangle \langle k \rvert  \otimes Z,  \]
 </div>
-<p> the constraint&#160;<a href="chap-self-improvement.html#eq:dual-canonical-constraint" class="eqref">30</a> is exactly \(Z\ge A_{g_i}\) for every \(i\), and the objective is \(\operatorname{Tr}(Z)\). Hence&#160;<a href="chap-self-improvement.html#eq:dual-canonical" class="eqref">29</a> is equivalent to&#160;<a href="chap-self-improvement.html#eq:dual-objective" class="eqref">25</a>. </p>
+<p> the constraint&#160;<a href="chap-self-improvement.html#eq:dual-canonical-constraint" class="eqref">31</a> is exactly \(Z\ge A_{g_i}\) for every \(i\), and the objective is \(\operatorname{Tr}(Z)\). Hence&#160;<a href="chap-self-improvement.html#eq:dual-canonical" class="eqref">30</a> is equivalent to&#160;<a href="chap-self-improvement.html#eq:dual-objective" class="eqref">26</a>. </p>
 <p>Slater’s condition holds because </p>
 <div class="displaymath" id="a0000000320">
   \[  T_g = \frac{1}{2M}\cdot I \qquad \forall g\in \mathcal{P}(m,q,d), \qquad Z = 2I  \]
@@ -669,10 +678,10 @@
   <div class="equation_content">
     \begin{equation} \label{eq:complementary-slackness} X\Big( \sum _{i,j} \, z_{ij} D_{ij} - C \Big) \, =\,  0. \end{equation}
   </div>
-  <span class="equation_label">31</span>
+  <span class="equation_label">32</span>
 </p>
 </div>
-<p> We may assume that \(X\) is block diagonal. Translating&#160;<a href="chap-self-improvement.html#eq:complementary-slackness" class="eqref">31</a> back to the variables \(\{ T_g\} \) and&#160;\(Z\) yields \(T_g(Z-A_g)=0\) for every&#160;\(g\) and \(X_{M+1,M+1}=0\). The latter identity is exactly \(\sum _g T_g=I\), and the former is&#160;<a href="chap-self-improvement.html#eq:slater" class="eqref">27</a>. </p>
+<p> We may assume that \(X\) is block diagonal. Translating&#160;<a href="chap-self-improvement.html#eq:complementary-slackness" class="eqref">32</a> back to the variables \(\{ T_g\} \) and&#160;\(Z\) yields \(T_g(Z-A_g)=0\) for every&#160;\(g\) and \(X_{M+1,M+1}=0\). The latter identity is exactly \(\sum _g T_g=I\), and the former is&#160;<a href="chap-self-improvement.html#eq:slater" class="eqref">28</a>. </p>
 
   </div>
 </div>
@@ -772,7 +781,7 @@
   <div class="equation_content">
     \begin{equation} \label{eq:move-one} \eqref{eq:expand-that-H} \approx _{\sqrt{2\delta }} \mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \cdot M^{u}_o\bigr) \otimes \bigl(T_h \cdot A^{v}_{h(v)}\bigr) \lvert \psi  \rangle . \end{equation}
   </div>
-  <span class="equation_label">33</span>
+  <span class="equation_label">34</span>
 </p>
 </div>
 <p> To show this, we bound the magnitude of the difference: </p>
@@ -794,7 +803,7 @@
   <div class="equation_content">
     \begin{equation} \label{eq:move-another} \eqref{eq:move-one} \approx _{\sqrt{2\delta }} \mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \otimes T_h \lvert \psi  \rangle . \end{equation}
   </div>
-  <span class="equation_label">37</span>
+  <span class="equation_label">38</span>
 </p>
 </div>
 <p> Again, we bound the magnitude of the difference: </p>
@@ -805,14 +814,14 @@
 <div class="displaymath" id="a0000000329">
   \begin{align*} & \mathbb {E}_{u,v} \sum _h \langle \psi  \rvert  \Bigl(A^v_{h(v)} \cdot \sum _{o:(o,h)\in S_u} M^u_o \cdot A^v_{h(v)}\Bigr) \otimes T_h \lvert \psi  \rangle  \\ & \le \mathbb {E}_{u,v} \sum _h \langle \psi  \rvert  (A^v_{h(v)})^2 \otimes T_h \lvert \psi  \rangle  \le \mathbb {E}_{u,v} \sum _h \langle \psi  \rvert  I \otimes T_h \lvert \psi  \rangle  \le 1, \end{align*}
 </div>
-<p> using first that \(M\) is a submeasurement, then that \(A^v_{h(v)} \le I\), and finally that \(T\) is a submeasurement (\(\sum _g T_g \le I\)). The second factor is exactly the same expression as in&#160;<a href="chap-self-improvement.html#eq:move-one-cauchy-schwarz" class="eqref">36</a>, hence at most \(\sqrt{2\delta }\). </p>
+<p> using first that \(M\) is a submeasurement, then that \(A^v_{h(v)} \le I\), and finally that \(T\) is a submeasurement (\(\sum _g T_g \le I\)). The second factor is exactly the same expression as in&#160;<a href="chap-self-improvement.html#eq:move-one-cauchy-schwarz" class="eqref">37</a>, hence at most \(\sqrt{2\delta }\). </p>
 <p>Having moved both copies of&#160;\(A\) to the left-hand side, we next show that </p>
 <div class="equation" id="eq:change-one">
 <p>
   <div class="equation_content">
     \begin{equation} \label{eq:change-one} \eqref{eq:move-another} \approx _{\sqrt{\zeta _{\mathrm{variance}}}} \mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \otimes T_h \lvert \psi  \rangle . \end{equation}
   </div>
-  <span class="equation_label">39</span>
+  <span class="equation_label">40</span>
 </p>
 </div>
 <p> The difference is bounded by </p>
@@ -823,17 +832,17 @@
 <div class="displaymath" id="a0000000330">
   \begin{align*} & \mathbb {E}_{u,v} \sum _h \langle \psi  \rvert  \Bigl((A^v_{h(v)} - A^u_{h(u)}) \cdot \sum _{o:(o,h)\in S_u} M^u_o \cdot (A^v_{h(v)} - A^u_{h(u)})\Bigr) \otimes T_h \lvert \psi  \rangle  \\ & \le \mathbb {E}_{u,v} \sum _h \langle \psi  \rvert  (A^v_{h(v)} - A^u_{h(u)})^2 \otimes T_h \lvert \psi  \rangle , \end{align*}
 </div>
-<p> because \(M^u\) is a submeasurement. Lemma&#160;<a href="sec-variance.html#lem:global-variance-of-points">6.3</a> bounds this by&#160;\(\zeta _{\mathrm{variance}}\) since \(T \in \mathrm{PolySub}(m,q,d)\). The second factor is exactly the first factor from&#160;<a href="chap-self-improvement.html#eq:move-another-cauchy-schwarz" class="eqref">38</a>, so it is at most&#160;\(1\). </p>
+<p> because \(M^u\) is a submeasurement. Lemma&#160;<a href="sec-variance.html#lem:global-variance-of-points">6.3</a> bounds this by&#160;\(\zeta _{\mathrm{variance}}\) since \(T \in \mathrm{PolySub}(m,q,d)\). The second factor is exactly the first factor from&#160;<a href="chap-self-improvement.html#eq:move-another-cauchy-schwarz" class="eqref">39</a>, so it is at most&#160;\(1\). </p>
 <p>Finally, we show that </p>
 <div class="equation" id="eq:change-another">
 <p>
   <div class="equation_content">
     \begin{equation} \label{eq:change-another} \eqref{eq:change-one} \approx _{\sqrt{\zeta _{\mathrm{variance}}}} \mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot M^{u}_o \cdot A^{u}_{h(u)}\bigr) \otimes T_h \lvert \psi  \rangle . \end{equation}
   </div>
-  <span class="equation_label">43</span>
+  <span class="equation_label">44</span>
 </p>
 </div>
-<p> The same Cauchy–Schwarz estimate as in&#160;<a href="chap-self-improvement.html#eq:change-one-cauchy-schwarz" class="eqref">40</a>, with the final copy of \(A^v_{h(v)}\) replaced by \(A^u_{h(u)}\), gives the same bound \(\sqrt{\zeta _{\mathrm{variance}}}\). Indeed, the factor containing \(A^u_{h(u)} \cdot M^u_o \cdot A^u_{h(u)}\) is bounded by&#160;\(1\) by the same submeasurement argument as above, while the factor containing \((A^v_{h(v)} - A^u_{h(u)})^2\) is unchanged. Summing the four transports gives an error of \(2\sqrt{2\delta } + 2\sqrt{\zeta _{\mathrm{variance}}}\), and the lemma follows from \(2\delta \leq \zeta _{\mathrm{variance}}\). </p>
+<p> The same Cauchy–Schwarz estimate as in&#160;<a href="chap-self-improvement.html#eq:change-one-cauchy-schwarz" class="eqref">41</a>, with the final copy of \(A^v_{h(v)}\) replaced by \(A^u_{h(u)}\), gives the same bound \(\sqrt{\zeta _{\mathrm{variance}}}\). Indeed, the factor containing \(A^u_{h(u)} \cdot M^u_o \cdot A^u_{h(u)}\) is bounded by&#160;\(1\) by the same submeasurement argument as above, while the factor containing \((A^v_{h(v)} - A^u_{h(u)})^2\) is unchanged. Summing the four transports gives an error of \(2\sqrt{2\delta } + 2\sqrt{\zeta _{\mathrm{variance}}}\), and the lemma follows from \(2\delta \leq \zeta _{\mathrm{variance}}\). </p>
 
   </div>
 </div>
@@ -987,7 +996,7 @@
   <div class="equation_content">
     \begin{equation} \label{eq:approx-between-H-with-and-without-hat} \widehat{H}_h \otimes I \approx _{\widehat{\zeta }_{\mathrm{ortho}}} H_{h} \otimes I, \end{equation}
   </div>
-  <span class="equation_label">44</span>
+  <span class="equation_label">45</span>
 </p>
 </div>
 <p> where </p>
@@ -1000,7 +1009,7 @@
   <div class="equation_content">
     \begin{equation} \label{eq:approx-data-processed} \widehat{H}_{[h(u)=a]} \otimes I \approx _{\widehat{\zeta }_{\mathrm{dataprocess}}} H_{[h(u)=a]} \otimes I, \end{equation}
   </div>
-  <span class="equation_label">45</span>
+  <span class="equation_label">46</span>
 </p>
 </div>
 <p> where </p>
@@ -1013,7 +1022,7 @@
   \[  \langle \psi  \rvert  H \otimes I \lvert \psi  \rangle  \geq \langle \psi  \rvert  \widehat{H} \otimes I \lvert \psi  \rangle  - \widehat{\zeta } - 2\sqrt{\widehat{\zeta }_{\mathrm{ortho}}} \geq (1-\nu ) - 2\widehat{\zeta } - 2\sqrt{\widehat{\zeta }_{\mathrm{ortho}}},  \]
 </div>
 <p> where the second inequality is <a href="chap-self-improvement.html#item:self-improvement-completeness">1</a> of Lemma&#160;<a href="chap-self-improvement.html#lem:self-improvement-helper">7.1</a>. </p>
-<p><em>Proof of <a href="chap-self-improvement.html#item:self-improvement-projective-A-consistency">2</a>.</em> Lemma&#160;<a href="sec-prelims.html#prop:triangle-sub">3.20</a> applied to <a href="chap-self-improvement.html#item:self-improvement-A-consistency">2</a> of Lemma&#160;<a href="chap-self-improvement.html#lem:self-improvement-helper">7.1</a> and the post-processed comparison&#160;<a href="chap-self-improvement.html#eq:approx-data-processed" class="eqref">45</a> gives </p>
+<p><em>Proof of <a href="chap-self-improvement.html#item:self-improvement-projective-A-consistency">2</a>.</em> Lemma&#160;<a href="sec-prelims.html#prop:triangle-sub">3.20</a> applied to <a href="chap-self-improvement.html#item:self-improvement-A-consistency">2</a> of Lemma&#160;<a href="chap-self-improvement.html#lem:self-improvement-helper">7.1</a> and the post-processed comparison&#160;<a href="chap-self-improvement.html#eq:approx-data-processed" class="eqref">46</a> gives </p>
 <div class="displaymath" id="a0000000344">
   \[  A^u_a \otimes I \simeq _{\widehat{\zeta } + \sqrt{\widehat{\zeta }_{\mathrm{dataprocess}}}} I \otimes H_{[h(u) = a]}.  \]
 </div>
@@ -1021,7 +1030,7 @@
 <div class="displaymath" id="a0000000345">
   \[  \widehat{H}_h \otimes I \approx _{2\widehat{\zeta }} I \otimes \widehat{H}_h.  \]
 </div>
-<p> Combining this with&#160;<a href="chap-self-improvement.html#eq:approx-between-H-with-and-without-hat" class="eqref">44</a> on both sides and summing the three transports with Lemma&#160;<a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">3.27</a> yields </p>
+<p> Combining this with&#160;<a href="chap-self-improvement.html#eq:approx-between-H-with-and-without-hat" class="eqref">45</a> on both sides and summing the three transports with Lemma&#160;<a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">3.27</a> yields </p>
 <div class="displaymath" id="a0000000346">
   \[  H_h \otimes I \approx _{6 \widehat{\zeta } + 6\widehat{\zeta }_{\mathrm{ortho}}} I \otimes H_h.  \]
 </div>
@@ -1029,7 +1038,7 @@
 <div class="displaymath" id="a0000000347">
   \begin{align} & \langle \psi  \rvert  Z \otimes (I - H) \lvert \psi  \rangle  \notag \\ ={}&  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  - \sum _h \langle \psi  \rvert  Z \otimes H_h \lvert \psi  \rangle  \notag \\ \leq {}&  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  - \sum _h \langle \psi  \rvert  \mathbb {E}_{u} A^{u}_{h(u)} \otimes H_h \lvert \psi  \rangle  \notag \\ ={}&  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  -\mathbb {E}_{u} \sum _h \langle \psi  \rvert  A^{u}_{h(u)} \otimes H_h \lvert \psi  \rangle  \notag \\ ={}&  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  -\mathbb {E}_{u} \sum _a \langle \psi  \rvert  A^{u}_{a} \otimes H_{[h(u)=a]} \lvert \psi  \rangle . \label{eq:almost-there-self-improvement-edition} \end{align}
 </div>
-<p> Proposition&#160;<a href="sec-prelims.html#prop:easy-approx-from-approx-delta">3.24</a> upgrades  <a href="chap-self-improvement.html#eq:approx-data-processed" class="eqref">45</a> to the scalar estimate </p>
+<p> Proposition&#160;<a href="sec-prelims.html#prop:easy-approx-from-approx-delta">3.24</a> upgrades  <a href="chap-self-improvement.html#eq:approx-data-processed" class="eqref">46</a> to the scalar estimate </p>
 <div class="displaymath" id="a0000000348">
   \[  \eqref{eq:almost-there-self-improvement-edition} \le \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  -\mathbb {E}_{u} \sum _a \langle \psi  \rvert  A^{u}_{a} \otimes \widehat H_{[h(u)=a]} \lvert \psi  \rangle  + \sqrt{\widehat{\zeta }_{\mathrm{dataprocess}}},  \]
 </div>
