@@ -4938,8 +4938,9 @@ theorem toProjectivizationMatchMassMonotonicity
       (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
       (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
       (Preliminaries.completeAtOutcomeProj orthResidual.P_A input.a_A)
-      (Preliminaries.completeAtOutcomeProj orthResidual.P_B input.a_B) :=
-  MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_submeasurement_match_mass_and_completion
+      (Preliminaries.completeAtOutcomeProj orthResidual.P_B input.a_B) := by
+  open MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity in
+    exact of_submeasurement_match_mass_and_completion
       orthResidual.P_A orthResidual.P_B input.a_A input.a_B
       (Preliminaries.completeAtOutcomeProj orthResidual.P_A input.a_A)
       (Preliminaries.completeAtOutcomeProj orthResidual.P_B input.a_B)
@@ -5528,7 +5529,8 @@ This theorem takes an explicit `roleResidual` (obtainable from either
 `MainFormalRolePackageResidual.ofBaseCase` or the successor-branch
 handoff) and the `MainFormalStep6Hypotheses` bridge, then assembles the
 Step 6 witness residual through
-`MainFormalCascadeRolePackageResidualStep6WitnessResidual.nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs`.
+`MainFormalCascadeRolePackageResidualStep6WitnessResidual
+.nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs`.
 
 Refs #1009, #422. -/
 theorem baseStep6WitnessResidual
@@ -5544,10 +5546,11 @@ theorem baseStep6WitnessResidual
     Nonempty (MainFormalCascadeRolePackageResidualStep6WitnessResidual
       params strategy eps hpass k scalars) := by
   exact
-    MainFormalCascadeRolePackageResidualStep6WitnessResidual.nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs
-      hsmall roleResidual bridge.orthonormalizationInput bridge.a_A bridge.a_B
-      bridge.leftSelfConsistency bridge.rightSelfConsistency
-      bridge.leftMatchMassPreservation bridge.rightMatchMassPreservation
+    (open MainFormalCascadeRolePackageResidualStep6WitnessResidual in
+      nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs
+        hsmall roleResidual bridge.orthonormalizationInput bridge.a_A bridge.a_B
+        bridge.leftSelfConsistency bridge.rightSelfConsistency
+        bridge.leftMatchMassPreservation bridge.rightMatchMassPreservation)
 
 
 /-- Narrowed base-case bridge hypotheses for Step 6 when `params.m = 1`.

@@ -137,33 +137,21 @@ private lemma ldGbcon_rebased_vertical_line
   let ℓ : AxisParallelLine params.next :=
     { base := appendPoint params (truncatePoint params u) zeroCoord
     , direction := lastCoord params }
+  have happend : appendPoint params (truncatePoint params u) (pointHeight params u) = u := by
+    exact (pointNextEquiv params).left_inv u
   have hbase : ℓ.pointAt (pointHeight params u) = u := by
     calc
       ℓ.pointAt (pointHeight params u)
         = appendPoint params (truncatePoint params u) (pointHeight params u) := by
-            funext i
-            by_cases hi : i = lastCoord params
-            · subst hi
-              simp [ℓ, AxisParallelLine.pointAt, appendPoint, pointHeight, lastCoord]
-              change addCoord zeroCoord (u (lastCoord params)) = u (lastCoord params)
-              rw [← encode_decodeScalar (u (lastCoord params))]
-              simp [addCoord, zeroCoord]
-            · have hi_lt : i.1 < params.m := by
-                have hi_succ : i.1 < params.m + 1 := by
-                  simpa [Parameters.next] using i.2
-                have hne : i.1 ≠ params.m := by
-                  intro h
-                  apply hi
-                  exact Fin.ext h
-                omega
-              simp [ℓ, AxisParallelLine.pointAt, appendPoint, truncatePoint, hi, hi_lt]
-      _ = u := (pointNextEquiv params).left_inv u
-  change ({ base := ℓ.pointAt (pointHeight params u)
-          , direction := lastCoord params } : AxisParallelLine params.next) =
-    { base := u, direction := lastCoord params }
-  exact congrArg
-    (fun b => ({ base := b, direction := lastCoord params } : AxisParallelLine params.next))
-    hbase
+            simpa [ℓ] using
+              verticalLine_pointAt_appendPoint params
+                (truncatePoint params u) (pointHeight params u)
+      _ = u := happend
+  simpa [AxisParallelLine.rebaseAt, ℓ] using
+    congrArg
+      (fun base : Point params.next =>
+        ({ base := base, direction := lastCoord params } : AxisParallelLine params.next))
+      hbase
 
 private lemma ldGbconAxisLineMeasurement_eq_verticalLineMeasurement
     (params : Parameters) [FieldModel params.q]
@@ -938,9 +926,14 @@ lemma qSDD_completePart_le_slice
           ((completePartSubMeas params family x).liftRight)
         = ev ψbi (((leftTensor (ι₂ := ι) T - rightTensor (ι₁ := ι) T)ᴴ) *
             (leftTensor (ι₂ := ι) T - rightTensor (ι₁ := ι) T)) := by
-              unfold qSDD qSDDCore completePartSubMeas
-              simp [SubMeas.liftLeft, SubMeas.liftRight, postprocess, T]
-              rw [P.sum_eq_total]
+              unfold qSDD qSDDCore
+              simp only [Finset.univ_unique, PUnit.default_eq_unit,
+                SubMeas.liftLeft, SubMeas.liftRight,
+                mkLeftPlacedSubMeas_outcome, mkRightPlacedSubMeas_outcome,
+                Matrix.conjTranspose_sub, Finset.sum_singleton,
+                leftTensor_conjTranspose, rightTensor_conjTranspose,
+                completePartSubMeas_outcome_unit, completePartSubMeas_total, T]
+              simp [P]
       _ = ev ψbi (leftTensor (ι₂ := ι) (T * T)) +
             ev ψbi (rightTensor (ι₁ := ι) (T * T)) - 2 * ev ψbi (opTensor T T) := by
               have hLherm : (leftTensor (ι₂ := ι) T)ᴴ = leftTensor (ι₂ := ι) T := by
