@@ -14,6 +14,7 @@ This repository uses [Claude Code](https://docs.anthropic.com/en/docs/claude-cod
   - [Lean Linter-Warning Sweep](#lean-linter-warning-sweep-lean-linter-warning-sweepyml)
   - [Lean Linter-Warning Auto-Fix](#lean-linter-warning-auto-fix-lean-linter-warning-autofixyml)
   - [README Freshness Audit](#readme-freshness-audit-readme-freshness-audityml)
+  - [Oversized Lean File Guard](#oversized-lean-file-guard-oversized-lean-filesyml)
   - [Blueprint Auto-Fix](#blueprint-auto-fix-blueprint-auto-fixyml)
   - [Review Comment Auto-Fix](#review-comment-auto-fix-auto-fixyml)
   - [Claude Mention Handler](#claude-mention-handler-claudeyml)
@@ -296,6 +297,20 @@ focused documentation PR after human review.
 
 ```bash
 python3 scripts/audit_readme_freshness.py --root . --readme README.md
+```
+
+### Oversized Lean File Guard (`oversized-lean-files.yml`)
+
+**What it does**: Runs an incremental guard that prevents new oversized Lean files (>1000 lines) from entering the repository. An explicit allowlist (`.github/file_lengths_allowlist.txt`) records the current line-count ceiling for already-oversized files that are awaiting a split. New files over 1000 lines, or allowlisted files that grow beyond their recorded ceiling, fail the check.
+
+**When it runs**: On every PR that touches `.lean` files, the allowlist, the check script, or the workflow itself. This is a lightweight Python-only check (no Lake/Lean build).
+
+**Why it is incremental**: The repository currently has ~19 files exceeding 1000 lines (as tracked in issue #1127). Those files are recorded in the allowlist with their current line counts as ceilings. New oversized files are blocked outright. As files are split by dedicated PRs, the corresponding allowlist entries are removed.
+
+**Local command**:
+
+```bash
+python3 scripts/check_oversized_lean_files.py --root .
 ```
 
 ### Blueprint Auto-Fix (`blueprint-auto-fix.yml`)
