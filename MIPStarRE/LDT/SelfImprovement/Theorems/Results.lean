@@ -201,6 +201,184 @@ theorem input_consistency_match_mass_lower_bound
   · intro u
     simpa [polynomialEvaluationFamily, evaluateAt, postprocess_total] using G.total_eq_one
 
+/-- Reindex the averaged input-consistency overlap as the SDP overlap
+`Σ_g ⟨ψ, A_g ⊗ G_g⟩`.
+
+This is the algebraic content of `references/ldt-paper/self_improvement.tex`,
+lines 410--411: the pointwise match mass
+`E_u Σ_a ⟨ψ, A^u_a ⊗ G_[g(u)=a] ψ⟩` is the same expression as
+`Σ_g ⟨ψ, (E_u A^u_{g(u)}) ⊗ G_g ψ⟩`, after reindexing by the value of `g` at
+`u`. The blueprint mirror is
+`blueprint/src/chapter/ch07_self_improvement.tex`, lines 137--141. -/
+theorem input_match_mass_eq_sdp_overlap
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι) :
+    avgOver (uniformDistribution (Point params)) (fun u =>
+        qBipartiteMatchMass strategy.state
+          ((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u)
+          ((polynomialEvaluationFamily params G) u)) =
+      ∑ g : Polynomial params,
+        ev strategy.state
+          (opTensor (averagedPointOperator params strategy g) (G.outcome g)) := by
+  classical
+  calc
+    avgOver (uniformDistribution (Point params)) (fun u =>
+        qBipartiteMatchMass strategy.state
+          ((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u)
+          ((polynomialEvaluationFamily params G) u))
+        =
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ g : Polynomial params,
+          ev strategy.state
+            (opTensor (pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
+              (G.outcome g))) := by
+        refine avgOver_congr (uniformDistribution (Point params)) _ _ ?_
+        intro u
+        symm
+        calc
+          ∑ g : Polynomial params,
+              ev strategy.state
+                (opTensor (pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
+                  (G.outcome g))
+            =
+          ∑ a : Fq params,
+              ∑ g ∈ Finset.univ.filter (fun g : Polynomial params => g u = a),
+                ev strategy.state
+                  (opTensor ((strategy.pointMeasurement u).outcome a) (G.outcome g)) := by
+              rw [show ∑ g : Polynomial params,
+                    ev strategy.state
+                      (opTensor (pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
+                        (G.outcome g)) =
+                  ∑ a : Fq params,
+                    ∑ g ∈ Finset.univ.filter (fun g : Polynomial params => g u = a),
+                      ev strategy.state
+                        (opTensor (pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
+                          (G.outcome g)) from by
+                simpa using (Finset.sum_fiberwise Finset.univ
+                  (fun g : Polynomial params => g u)
+                  (fun g =>
+                    ev strategy.state
+                      (opTensor (pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
+                        (G.outcome g)))).symm]
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              refine Finset.sum_congr rfl ?_
+              intro g hg
+              simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hg
+              simp [pointConditionedOutcomeOperatorAtPolynomial, hg]
+          _ =
+          ∑ a : Fq params,
+              ev strategy.state
+                (opTensor ((strategy.pointMeasurement u).outcome a)
+                  (∑ g ∈ Finset.univ.filter (fun g : Polynomial params => g u = a),
+                    G.outcome g)) := by
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              rw [opTensor_sum_right_finset]
+              exact (ev_finset_sum strategy.state _ _).symm
+          _ =
+          qBipartiteMatchMass strategy.state
+            ((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u)
+            ((polynomialEvaluationFamily params G) u) := by
+              unfold qBipartiteMatchMass polynomialEvaluationFamily evaluateAt postprocess
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              simp [IdxProjMeas.toIdxSubMeas]
+              congr 4
+    _ =
+      ∑ g : Polynomial params,
+        ev strategy.state
+          (opTensor (averagedPointOperator params strategy g) (G.outcome g)) := by
+        rw [avgOver_sum]
+        refine Finset.sum_congr rfl ?_
+        intro g _
+        exact (ev_opTensor_averageOperatorOverDistribution_left strategy.state
+          (uniformDistribution (Point params))
+          (pointConditionedOutcomeOperatorAtPolynomial params strategy g)
+          (G.outcome g)).symm
+
+/-- Dual feasibility upper-bounds the SDP overlap by the dual mass
+`⟨ψ, Z ⊗ I ψ⟩`.
+
+This formalizes `references/ldt-paper/self_improvement.tex`, lines 408--410:
+since `G` is a submeasurement, `Z ⊗ I` dominates `Z ⊗ G`, and since the SDP
+dual is feasible, each `Z` dominates the averaged point operator
+`E_u A^u_{g(u)}`. -/
+theorem sdp_overlap_le_dual_mass
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι)
+    (Z : MIPStarRE.Quantum.Op ι)
+    (hZ : 0 ≤ Z)
+    (hdual :
+      ∀ g : Polynomial params,
+        0 ≤ sdpDualSlackOperator params strategy Z g) :
+    (∑ g : Polynomial params,
+        ev strategy.state
+          (opTensor (averagedPointOperator params strategy g) (G.outcome g))) ≤
+      ev strategy.state (leftTensor (ι₂ := ι) Z) := by
+  classical
+  calc
+    (∑ g : Polynomial params,
+        ev strategy.state
+          (opTensor (averagedPointOperator params strategy g) (G.outcome g)))
+        ≤
+      ∑ g : Polynomial params,
+        ev strategy.state (opTensor Z (G.outcome g)) := by
+        refine Finset.sum_le_sum ?_
+        intro g _
+        apply ev_mono
+        exact opTensor_mono_left
+          (sub_nonneg.mp (by simpa [sdpDualSlackOperator] using hdual g))
+          (G.outcome_pos g)
+    _ = ev strategy.state (opTensor Z G.total) := by
+        rw [← G.sum_eq_total]
+        rw [opTensor_sum_right_univ]
+        exact (ev_sum strategy.state _).symm
+    _ ≤ ev strategy.state (leftTensor (ι₂ := ι) Z) := by
+        exact ev_mono strategy.state _ _
+          (opTensor_le_leftTensor hZ G.total_le_one)
+
+/-- The input-consistency lower bound, after the SDP reindexing and dual
+feasibility steps, gives the lower bound on the dual mass used in helper
+completeness.
+
+This packages `references/ldt-paper/self_improvement.tex`, lines 406--412,
+without asserting the later Cauchy--Schwarz comparison from `Hhat` to `Z` or any
+of the projective final-fields transport handled by PR #1071. -/
+theorem input_consistency_dual_mass_lower_bound
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : Measurement (Polynomial params) ι)
+    (Z : MIPStarRE.Quantum.Op ι)
+    (nu : Error)
+    (hZ : 0 ≤ Z)
+    (hdual :
+      ∀ g : Polynomial params,
+        0 ≤ sdpDualSlackOperator params strategy Z g)
+    (hcons : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params G.toSubMeas) nu) :
+    1 - nu ≤ ev strategy.state (leftTensor (ι₂ := ι) Z) := by
+  calc
+    1 - nu
+        ≤ avgOver (uniformDistribution (Point params)) (fun u =>
+            qBipartiteMatchMass strategy.state
+              ((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u)
+              ((polynomialEvaluationFamily params G.toSubMeas) u)) :=
+          input_consistency_match_mass_lower_bound params strategy G nu hcons
+    _ =
+      ∑ g : Polynomial params,
+        ev strategy.state
+          (opTensor (averagedPointOperator params strategy g) (G.outcome g)) :=
+          input_match_mass_eq_sdp_overlap params strategy G.toSubMeas
+    _ ≤ ev strategy.state (leftTensor (ι₂ := ι) Z) :=
+          sdp_overlap_le_dual_mass params strategy G.toSubMeas Z hZ hdual
+
 /-- Reduced version of `lem:sdp`.
 
 This reduced wrapper now instantiates the paper's explicit Slater witnesses: the
