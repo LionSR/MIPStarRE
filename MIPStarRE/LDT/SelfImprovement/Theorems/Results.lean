@@ -2663,6 +2663,139 @@ theorem helper_agreement_average_ev_eq_polynomial_sum
   simp only [helperAgreementOperatorAtPoint, ev_sum] at hpt_ev
   exact hpt_ev
 
+/-- Off-diagonal decomposition of the pointwise helper boundedness slack.
+
+For each point `u`, the difference between the right-placed total
+`I ⊗ H.total = ∑_h I ⊗ H_h` and the pointwise helper-agreement operator
+`helperAgreementOperatorAtPoint params strategy H u = ∑_a A^u_a ⊗ H_{[h(u)=a]}`
+equals the off-diagonal sum
+`∑_h ∑_{a ≠ h(u)} A^u_a ⊗ H_h`,
+by combining the polynomial-indexed reindexing of `helperAgreementOperatorAtPoint`
+from #1124 (`helperAgreementOperatorAtPoint_eq_sum_polynomial`) with
+`∑_a A^u_a = 1` (since `pointMeasurement u` is a measurement) and the bilinearity
+of `opTensor`.
+
+This is the operator-level form of the second algebraic identity in the
+boundedness display in `\ref{item:self-improvement-boundedness}`
+(`references/ldt-paper/self_improvement.tex` line 613, mirrored at
+`blueprint/src/chapter/ch07_self_improvement.tex` lines 296--300, the step
+"Combined with $\sum_a A_a^u = I$ and~\eqref{eq:explicit-bound-for-A-consistency}
+this gives ..."). The averaged scalar form of the off-diagonal sum on the right
+is the LHS of `eq:explicit-bound-for-A-consistency` (line 435), which the paper
+bounds by `4 √ζ_variance`. -/
+theorem helperAgreementOperatorAtPoint_off_diagonal_decomposition
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (H : SubMeas (Polynomial params) ι)
+    (u : Point params) :
+    rightTensor (ι₁ := ι) H.total -
+        helperAgreementOperatorAtPoint params strategy H u =
+      ∑ h : Polynomial params,
+        ∑ a ∈ (Finset.univ : Finset (Fq params)).erase (h u),
+          opTensor ((strategy.pointMeasurement u).outcome a) (H.outcome h) := by
+  classical
+  -- Step 1: rewrite `helperAgreementOperatorAtPoint` via the #1124 reindexing.
+  rw [helperAgreementOperatorAtPoint_eq_sum_polynomial]
+  -- Step 2: rewrite `rightTensor H.total = ∑_h opTensor 1 (H.outcome h)`.
+  have hrhs_total :
+      rightTensor (ι₁ := ι) H.total =
+        ∑ h : Polynomial params,
+          opTensor (1 : MIPStarRE.Quantum.Op ι) (H.outcome h) := by
+    change opTensor (1 : MIPStarRE.Quantum.Op ι) H.total = _
+    rw [← H.sum_eq_total]
+    exact opTensor_sum_right_univ (1 : MIPStarRE.Quantum.Op ι) H.outcome
+  rw [hrhs_total, ← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl ?_
+  intro h _
+  -- Pull subtraction inside `opTensor`.
+  rw [opTensor_sub_left]
+  -- Use `∑_a A^u_a = 1` to expand `1 - A^u_{h(u)} = ∑_{a ≠ h(u)} A^u_a`.
+  have htot :
+      ∑ a : Fq params, (strategy.pointMeasurement u).outcome a =
+        (1 : MIPStarRE.Quantum.Op ι) :=
+    (strategy.pointMeasurement u).toMeasurement.sum_eq
+  have hsplit :
+      (strategy.pointMeasurement u).outcome (h u) +
+          ∑ a ∈ (Finset.univ : Finset (Fq params)).erase (h u),
+            (strategy.pointMeasurement u).outcome a =
+        (1 : MIPStarRE.Quantum.Op ι) := by
+    rw [← htot]
+    exact Finset.add_sum_erase _ _ (Finset.mem_univ (h u))
+  have hsubst :
+      (1 : MIPStarRE.Quantum.Op ι) -
+          (strategy.pointMeasurement u).outcome (h u) =
+        ∑ a ∈ (Finset.univ : Finset (Fq params)).erase (h u),
+          (strategy.pointMeasurement u).outcome a := by
+    rw [← hsplit]
+    abel
+  rw [hsubst]
+  -- Pull the sum out of the left factor of `opTensor`.
+  exact opTensor_sum_left_finset _ _ _
+
+/-- Averaged scalar form of the off-diagonal decomposition.
+
+Composed from `helperAgreementOperatorAtPoint_off_diagonal_decomposition` by
+applying the bilinearity of `ev`/`avgOver` over subtraction and averaging via
+`avgOver_uniform_const`.  The difference
+`⟨ψ, I ⊗ H.total, ψ⟩ - ⟨ψ, helperAgreementAverageOperator, ψ⟩` equals the
+averaged off-diagonal scalar sum
+`E_u ∑_h ∑_{a ≠ h(u)} ⟨ψ, A^u_a ⊗ H_h, ψ⟩`,
+which is the LHS of `eq:explicit-bound-for-A-consistency`
+(`references/ldt-paper/self_improvement.tex` line 435; blueprint
+`ch07_self_improvement.tex` lines 153--168). -/
+theorem helper_boundedness_slack_average_ev_eq_off_diagonal_avg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (H : SubMeas (Polynomial params) ι) :
+    ev strategy.state (rightTensor (ι₁ := ι) H.total) -
+        ev strategy.state (helperAgreementAverageOperator params strategy H) =
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ∑ a ∈ (Finset.univ : Finset (Fq params)).erase (h u),
+            ev strategy.state
+              (opTensor ((strategy.pointMeasurement u).outcome a)
+                (H.outcome h))) := by
+  classical
+  have h_ev_pointwise (u : Point params) :
+      ev strategy.state (rightTensor (ι₁ := ι) H.total) -
+          ev strategy.state (helperAgreementOperatorAtPoint params strategy H u) =
+        ∑ h : Polynomial params,
+          ∑ a ∈ (Finset.univ : Finset (Fq params)).erase (h u),
+            ev strategy.state
+              (opTensor ((strategy.pointMeasurement u).outcome a)
+                (H.outcome h)) := by
+    rw [← ev_sub, helperAgreementOperatorAtPoint_off_diagonal_decomposition,
+      ev_sum]
+    simp only [ev_finset_sum]
+  calc
+    ev strategy.state (rightTensor (ι₁ := ι) H.total) -
+          ev strategy.state (helperAgreementAverageOperator params strategy H) =
+      ev strategy.state (rightTensor (ι₁ := ι) H.total) -
+        avgOver (uniformDistribution (Point params))
+          (fun u => ev strategy.state
+            (helperAgreementOperatorAtPoint params strategy H u)) := by
+      rw [helperAgreementAverageOperator, ev_averageOperatorOverDistribution]
+    _ = avgOver (uniformDistribution (Point params))
+          (fun _ => ev strategy.state (rightTensor (ι₁ := ι) H.total)) -
+        avgOver (uniformDistribution (Point params))
+          (fun u => ev strategy.state
+            (helperAgreementOperatorAtPoint params strategy H u)) := by
+      rw [avgOver_uniform_const]
+    _ = avgOver (uniformDistribution (Point params))
+          (fun u => ev strategy.state (rightTensor (ι₁ := ι) H.total) -
+            ev strategy.state
+              (helperAgreementOperatorAtPoint params strategy H u)) := by
+      rw [avgOver_sub]
+    _ = avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ∑ a ∈ (Finset.univ : Finset (Fq params)).erase (h u),
+            ev strategy.state
+              (opTensor ((strategy.pointMeasurement u).outcome a)
+                (H.outcome h))) := by
+      refine avgOver_congr (uniformDistribution (Point params)) _ _ ?_
+      intro u
+      exact h_ev_pointwise u
+
 /-- Transport the helper boundedness gap through the data-processing
 approximation between `Hhat` and `H`.
 
