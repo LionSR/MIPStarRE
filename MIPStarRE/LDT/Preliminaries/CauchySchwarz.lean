@@ -20,19 +20,6 @@ namespace MIPStarRE.LDT.Preliminaries
 
 open MIPStarRE.LDT
 
-private lemma avgOver_sub {Question : Type*}
-    (𝒟 : Distribution Question) (f g : Question → Error) :
-    avgOver 𝒟 f - avgOver 𝒟 g = avgOver 𝒟 (fun q => f q - g q) := by
-  unfold avgOver
-  calc
-    ∑ a ∈ 𝒟.support, 𝒟.weight a * f a - ∑ a ∈ 𝒟.support, 𝒟.weight a * g a
-      = ∑ a ∈ 𝒟.support, (𝒟.weight a * f a - 𝒟.weight a * g a) := by
-          rw [Finset.sum_sub_distrib]
-    _ = ∑ a ∈ 𝒟.support, 𝒟.weight a * (f a - g a) := by
-          refine Finset.sum_congr rfl ?_
-          intro q hq
-          ring
-
 private lemma avgOver_gap_le_sqrt_of_pointwise
     {Question : Type*}
     (𝒟 : Distribution Question)
@@ -44,7 +31,7 @@ private lemma avgOver_gap_le_sqrt_of_pointwise
   calc
     |avgOver 𝒟 lhs - avgOver 𝒟 rhs|
       = |avgOver 𝒟 (fun q => lhs q - rhs q)| := by
-          rw [avgOver_sub]
+          rw [← avgOver_sub]
     _ ≤ Real.sqrt (avgOver 𝒟 sdd) := by
           exact
             avgOver_abs_le_sqrt_of_pointwise 𝒟

@@ -1071,6 +1071,186 @@ lemma add_in_u_cs_chain_q4_eq_simplified_rhs
                 (opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
                   (T.outcome h)))
 
+/-! ### Algebraic CS-alignment for the add-in-u Step 1/2 differences
+
+This section records pure operator-algebra rewrites that bring the differences
+`addInUCSChainQ1 - addInUCSChainQ0` and `addInUCSChainQ2 - addInUCSChainQ1`
+into the shapes required by the paper's Cauchy--Schwarz steps
+`eq:move-one-cauchy-schwarz` and `eq:move-another-cauchy-schwarz`
+(`references/ldt-paper/self_improvement.tex`, lines 261--266 and 285--289).
+The reverse-difference companions give the downstream orientation
+`Q₀ - Q₁` and `Q₁ - Q₂` without repeating subtraction bookkeeping.
+
+They do **not** discharge the Cauchy--Schwarz estimate itself; they reduce the
+raw `|Q₁ - Q₀| ≤ √(2δ)` and `|Q₁ - Q₂| ≤ √(2δ)` bounds to (a) a
+sandwich-form Cauchy--Schwarz on the resulting `D · (M^u_h ⊗ T_h) · D'`-style
+expression, plus (b) the two square-root inputs available via
+`addInU_pointMeasurement_snd_selfConsistency` and
+`addInU_filtered_sandwiched_tensor_sum_le_one`.
+
+Names are deliberately suffixed `_diff_eq` to keep them honest as intermediate
+algebraic identities rather than as the final scalar bounds. -/
+
+private lemma addInU_step1_pointwise_op_eq
+    {κ : Type*} [Fintype κ] [DecidableEq κ]
+    (M Av Th : MIPStarRE.Quantum.Op κ) :
+    opTensor (Av * M) (Th * Av) - opTensor M (Av * Th * Av) =
+      (leftTensor (ι₂ := κ) Av - rightTensor (ι₁ := κ) Av) *
+        (opTensor M Th * rightTensor (ι₁ := κ) Av) := by
+  have hLeft :
+      leftTensor (ι₂ := κ) Av * (opTensor M Th * rightTensor (ι₁ := κ) Av) =
+        opTensor (Av * M) (Th * Av) := by
+    change opTensor Av 1 * (opTensor M Th * opTensor 1 Av) =
+        opTensor (Av * M) (Th * Av)
+    rw [opTensor_mul, opTensor_mul]
+    simp
+  have hRight :
+      rightTensor (ι₁ := κ) Av * (opTensor M Th * rightTensor (ι₁ := κ) Av) =
+        opTensor M (Av * Th * Av) := by
+    change opTensor 1 Av * (opTensor M Th * opTensor 1 Av) =
+        opTensor M (Av * Th * Av)
+    rw [opTensor_mul, opTensor_mul]
+    simp [Matrix.mul_assoc]
+  rw [sub_mul, hLeft, hRight]
+
+private lemma addInU_step2_pointwise_op_eq
+    {κ : Type*} [Fintype κ] [DecidableEq κ]
+    (M Av Th : MIPStarRE.Quantum.Op κ) :
+    opTensor (Av * M * Av) Th - opTensor (Av * M) (Th * Av) =
+      leftTensor (ι₂ := κ) Av *
+        (opTensor M Th * (leftTensor (ι₂ := κ) Av - rightTensor (ι₁ := κ) Av)) := by
+  have hLeft :
+      leftTensor (ι₂ := κ) Av * (opTensor M Th * leftTensor (ι₂ := κ) Av) =
+        opTensor (Av * M * Av) Th := by
+    change opTensor Av 1 * (opTensor M Th * opTensor Av 1) =
+        opTensor (Av * M * Av) Th
+    rw [opTensor_mul, opTensor_mul]
+    simp [Matrix.mul_assoc]
+  have hRight :
+      leftTensor (ι₂ := κ) Av * (opTensor M Th * rightTensor (ι₁ := κ) Av) =
+        opTensor (Av * M) (Th * Av) := by
+    change opTensor Av 1 * (opTensor M Th * opTensor 1 Av) =
+        opTensor (Av * M) (Th * Av)
+    rw [opTensor_mul, opTensor_mul]
+    simp
+  rw [mul_sub, mul_sub, hLeft, hRight]
+
+/-- Algebraic CS-alignment for the `Q₀ → Q₁` step.
+
+Rewrites the difference `addInUCSChainQ1 - addInUCSChainQ0` in the exact form
+appearing on the LHS of `eq:move-one-cauchy-schwarz` (paper lines 261--266):
+the inner-product of the commutator
+`A^v_{h(v)} ⊗ I − I ⊗ A^v_{h(v)}` with `M^u_h ⊗ T_h · (I ⊗ A^v_{h(v)})`,
+averaged over `(u, v)` and summed over `h`.
+
+This identity is purely algebraic; the actual `√(2δ)` bound still requires
+the operator Cauchy--Schwarz step plus
+`addInU_pointMeasurement_snd_selfConsistency`. -/
+lemma addInU_cs_chain_step1_diff_eq
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    addInUCSChainQ1 params strategy T - addInUCSChainQ0 params strategy T =
+      avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+        ∑ h : Polynomial params,
+          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+          let Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+          ev strategy.state
+            ((leftTensor (ι₂ := ι) Av - rightTensor (ι₁ := ι) Av) *
+              (opTensor Mh (T.outcome h) * rightTensor (ι₁ := ι) Av))) := by
+  classical
+  unfold addInUCSChainQ0 addInUCSChainQ1
+  rw [← avgOver_sub]
+  refine avgOver_congr _ _ _ ?_
+  intro uv
+  rw [← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl ?_
+  intro h _
+  set Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+  set Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+  rw [← ev_sub]
+  congr 1
+  exact addInU_step1_pointwise_op_eq Mh Av (T.outcome h)
+
+/-- Algebraic CS-alignment for the `Q₁ → Q₂` step.
+
+Rewrites the difference `addInUCSChainQ2 - addInUCSChainQ1` in the exact form
+appearing on the LHS of `eq:move-another-cauchy-schwarz` (paper lines 285--289):
+the inner-product of `(A^v_{h(v)} · M^u_h) ⊗ T_h` with the commutator
+`A^v_{h(v)} ⊗ I − I ⊗ A^v_{h(v)}`, averaged over `(u, v)` and summed over `h`.
+The Lean statement keeps the equivalent factored form
+`(A^v_{h(v)} ⊗ I) · (M^u_h ⊗ T_h)` before the commutator.
+
+This identity is purely algebraic; the actual `√(2δ)` bound still requires
+the operator Cauchy--Schwarz step plus
+`addInU_pointMeasurement_snd_selfConsistency` and
+`addInU_filtered_sandwiched_tensor_sum_le_one`. -/
+lemma addInU_cs_chain_step2_diff_eq
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    addInUCSChainQ2 params strategy T - addInUCSChainQ1 params strategy T =
+      avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+        ∑ h : Polynomial params,
+          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+          let Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+          ev strategy.state
+            (leftTensor (ι₂ := ι) Av *
+              (opTensor Mh (T.outcome h) *
+                (leftTensor (ι₂ := ι) Av - rightTensor (ι₁ := ι) Av)))) := by
+  classical
+  unfold addInUCSChainQ1 addInUCSChainQ2
+  rw [← avgOver_sub]
+  refine avgOver_congr _ _ _ ?_
+  intro uv
+  rw [← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl ?_
+  intro h _
+  set Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+  set Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+  rw [← ev_sub]
+  congr 1
+  exact addInU_step2_pointwise_op_eq Mh Av (T.outcome h)
+
+/-- Reverse-orientation form of `addInU_cs_chain_step1_diff_eq`.
+
+This is the same algebraic identity as the `Q₀ → Q₁` rewrite, stated in the
+`Q₀ - Q₁` orientation used by the later absolute-value chain. -/
+lemma addInU_cs_chain_step1_reverse_diff_eq
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    addInUCSChainQ0 params strategy T - addInUCSChainQ1 params strategy T =
+      -avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+        ∑ h : Polynomial params,
+          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+          let Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+          ev strategy.state
+            ((leftTensor (ι₂ := ι) Av - rightTensor (ι₁ := ι) Av) *
+              (opTensor Mh (T.outcome h) * rightTensor (ι₁ := ι) Av))) := by
+  rw [← addInU_cs_chain_step1_diff_eq params strategy T]
+  ring
+
+/-- Reverse-orientation form of `addInU_cs_chain_step2_diff_eq`.
+
+This is the same algebraic identity as the `Q₁ → Q₂` rewrite, stated in the
+`Q₁ - Q₂` orientation used by the later absolute-value chain. -/
+lemma addInU_cs_chain_step2_reverse_diff_eq
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    addInUCSChainQ1 params strategy T - addInUCSChainQ2 params strategy T =
+      -avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+        ∑ h : Polynomial params,
+          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+          let Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+          ev strategy.state
+            (leftTensor (ι₂ := ι) Av *
+              (opTensor Mh (T.outcome h) *
+                (leftTensor (ι₂ := ι) Av - rightTensor (ι₁ := ι) Av)))) := by
+  rw [← addInU_cs_chain_step2_diff_eq params strategy T]
+  ring
+
 /-! ### Add-in-u variance-bound conversions
 
 The following four lemmas are conditional real-valued conversions for the
