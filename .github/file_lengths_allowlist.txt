@@ -12,7 +12,7 @@
 #
 # Last updated: 2026-05-03 (current state of main)
 
-MIPStarRE/LDT/Test/MainTheorem.lean: 5876
+MIPStarRE/LDT/Test/MainTheorem.lean: 6144
 MIPStarRE/LDT/MainInductionStep/Theorems.lean: 4725
 MIPStarRE/LDT/Pasting/BridgeLemmas/LdSandwichLineOnePoint.lean: 3902
 MIPStarRE/LDT/SelfImprovement/Theorems/Results.lean: 2696
@@ -23,7 +23,7 @@ MIPStarRE/LDT/Pasting/SwitcherooCompletion.lean: 1673
 MIPStarRE/LDT/Pasting/BridgeLemmas/OverAllOutcomes.lean: 1545
 MIPStarRE/LDT/Pasting/Bernoulli/FromHToG/AdjacentStages.lean: 1533
 MIPStarRE/LDT/Test/ErrorCascade.lean: 1468
-MIPStarRE/LDT/GlobalVariance/Theorems/SelfConsistencyTransport.lean: 1382
+MIPStarRE/LDT/GlobalVariance/Theorems/SelfConsistencyTransport.lean: 1079
 MIPStarRE/LDT/Pasting/Bernoulli/FromHToG/Core.lean: 1339
 MIPStarRE/LDT/Pasting/Core.lean: 1194
 MIPStarRE/LDT/Test/StrategyRole.lean: 1183
