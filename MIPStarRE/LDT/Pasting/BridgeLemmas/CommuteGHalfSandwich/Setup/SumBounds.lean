@@ -171,6 +171,10 @@ lemma gHatReverseHalfProduct_sum_adjoint_mul_le_one
 
 /-! ### Error-envelope bound -/
 
+
+/-- The fixed paper exponent `1/16` keeps `Real.rpow` nonnegative even on the
+negative branch, because `cos (π / 16) > 0`. This lets the `commuteGHalfSandwich`
+error envelopes avoid threading an extra `0 ≤ gamma` hypothesis. -/
 lemma rpow_oneSixteenth_nonneg (x : Error) :
     0 ≤ Real.rpow x (1 / (16 : Error)) := by
   simpa [Real.rpow_eq_pow] using (show 0 ≤ x ^ (1 / (16 : Error)) by
