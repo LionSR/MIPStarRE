@@ -49,8 +49,8 @@ structure FromHToGAdjacentStageExactFacts
               fromHToGRecurrenceWeight params family prefixLen
                 (prependTypeBit false τtail) * (1 - family.averagedSubMeas.total)))
 
-/-- Package the exact `S`-recurrence bookkeeping facts already proved in this
-file. -/
+/-- Package the exact `S`-recurrence bookkeeping facts proved in
+`Core/AveragesAndOps` and `Core/StageMass`. -/
 lemma fromHToGAdjacentStageExactFacts_of_weights
     (params : Parameters)
     [FieldModel params.q]
