@@ -1799,7 +1799,10 @@ structure HelperStrongSelfConsistencyProducerInputs
           (sandwichedPolynomialSubMeasAt params strategy T.toSubMeas)
           T.toSubMeas
           (selfConsistencyAddInUSelection params) ≤
-      selfImprovementHelperError params eps delta - addInUError params eps delta
+      (11 * Real.sqrt (selfImprovementVarianceError params eps delta) +
+          Real.sqrt (2 * delta) +
+          ((params.m : Error) * (params.d : Error) / (params.q : Error))) -
+        addInUError params eps delta
 
 /-- Produce the helper-stage strong self-consistency conclusion from the actual
 helper construction together with the named add-in-`u`/variance transports.
@@ -1823,6 +1826,7 @@ theorem helper_strong_self_consistency_of_helper_conclusion
     (strategy : SymStrat params ι)
     (eps delta : Error)
     (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
     {T : Measurement (Polynomial params) ι}
     {Hhat : SubMeas (Polynomial params) ι}
     {Z : MIPStarRE.Quantum.Op ι}
@@ -1870,7 +1874,9 @@ theorem helper_strong_self_consistency_of_helper_conclusion
   have hhelperGap :
       subMeasMass strategy.state Hhat.liftLeft -
           qBipartiteMatchMass strategy.state Hhat Hhat ≤
-        selfImprovementHelperError params eps delta := by
+        11 * Real.sqrt (selfImprovementVarianceError params eps delta) +
+          Real.sqrt (2 * delta) +
+          ((params.m : Error) * (params.d : Error) / (params.q : Error)) := by
     have hreleaseGap :
         addInURightQuantity params strategy
             (sandwichedPolynomialSubMeasAt params strategy T.toSubMeas)
@@ -1880,29 +1886,21 @@ theorem helper_strong_self_consistency_of_helper_conclusion
         addInUError params eps delta := by
       linarith [(abs_le.mp htransfer_release_hhat).1]
     linarith [hproducer.residualLowerBound, hreleaseGap]
+  have hhelperGap_absorbed :
+      subMeasMass strategy.state Hhat.liftLeft -
+          qBipartiteMatchMass strategy.state Hhat Hhat ≤
+        selfImprovementHelperError params eps delta := by
+    have habsorb :=
+      helper_strong_self_consistency_error_le_selfImprovementHelperError
+        params eps delta heps hdelta hd_le_q
+    linarith
   have hhelperErr_nonneg :
       0 ≤ selfImprovementHelperError params eps delta := by
-    unfold selfImprovementHelperError
-    have hm_nonneg : (0 : Error) ≤ (params.m : Error) := by positivity
-    have hcoef_nonneg : 0 ≤ 100 * (params.m : Error) := by nlinarith
-    have hdq_nonneg : (0 : Error) ≤ ((params.d : Error) / (params.q : Error)) := by positivity
-    have hrpow_eps_nonneg : 0 ≤ Real.rpow eps (1 / (2 : Error)) :=
-      Real.rpow_nonneg heps _
-    have hrpow_delta_nonneg : 0 ≤ Real.rpow delta (1 / (2 : Error)) :=
-      Real.rpow_nonneg hdelta _
-    have hrpow_dq_nonneg :
-        0 ≤ Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (2 : Error)) :=
-      Real.rpow_nonneg hdq_nonneg _
-    have hsum_nonneg :
-        0 ≤ Real.rpow eps (1 / (2 : Error)) +
-            Real.rpow delta (1 / (2 : Error)) +
-            Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (2 : Error)) := by
-      nlinarith
-    exact mul_nonneg hcoef_nonneg hsum_nonneg
+    exact selfImprovementHelperError_nonneg params eps delta heps hdelta
   constructor
   simpa [bipartiteSSCError, avgOver, uniformDistribution, constSubMeasFamily,
     qBipartiteSSCDefect, subMeasMass, SubMeas.liftLeft] using
-    (max_le hhelperErr_nonneg hhelperGap)
+    (max_le hhelperErr_nonneg hhelperGap_absorbed)
 
 /-- Promote a producer of the four add-in-`u`/variance helper-SSC bounds to the
 `HelperStrongSelfConsistencyInput` surface consumed by `selfImprovement`.
@@ -1916,6 +1914,7 @@ theorem helper_strong_self_consistency_input_of_producer
     (strategy : SymStrat params ι)
     (eps delta : Error)
     (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
     (hproducer :
       ∀ {T : Measurement (Polynomial params) ι}
         {Hhat : SubMeas (Polynomial params) ι}
@@ -1926,7 +1925,7 @@ theorem helper_strong_self_consistency_input_of_producer
     HelperStrongSelfConsistencyInput params strategy eps delta := by
   intro T Hhat Z hhelper
   exact helper_strong_self_consistency_of_helper_conclusion
-    params strategy eps delta heps hdelta hhelper (hproducer hhelper)
+    params strategy eps delta heps hdelta hd_le_q hhelper (hproducer hhelper)
 
 /-! ## Final-fields projective-residual boundedness transport (issue #931)
 
