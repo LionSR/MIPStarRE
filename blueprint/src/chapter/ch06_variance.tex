@@ -23,7 +23,7 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 \end{proof}
 
 \begin{lemma}[Local variance of the points measurements]\label{lem:local-variance-of-points}
-	\lean{MIPStarRE.LDT.GlobalVariance.localVarianceOfPoints, MIPStarRE.LDT.GlobalVariance.localVarianceTransportChainError, MIPStarRE.LDT.GlobalVariance.localVarianceTransportChainError_le_localVarianceOfPointsError, MIPStarRE.LDT.GlobalVariance.localVarianceTransportChainBound, MIPStarRE.LDT.GlobalVariance.localVarianceOfPointsFromTransportChainBound, MIPStarRE.LDT.GlobalVariance.globalVarianceOfPointsFromTransportChainBound, MIPStarRE.LDT.GlobalVariance.axisParallelBaseEventApproximation_weighted_sample_sum, MIPStarRE.LDT.GlobalVariance.axisParallelPointLineConsistency_weighted_leftToRightLineQuestion_sum, MIPStarRE.LDT.GlobalVariance.axisParallelPointLineConsistency_weighted_rightToLeftLineQuestion_sum}
+	\lean{MIPStarRE.LDT.GlobalVariance.localVarianceOfPoints, MIPStarRE.LDT.GlobalVariance.localVarianceTransportChainError, MIPStarRE.LDT.GlobalVariance.localVarianceTransportChainError_le_localVarianceOfPointsError, MIPStarRE.LDT.GlobalVariance.localVarianceTransportChainBound, MIPStarRE.LDT.GlobalVariance.localVarianceOfPointsFromTransportChainBound, MIPStarRE.LDT.GlobalVariance.globalVarianceOfPointsFromTransportChainBound}
 	\leanok
 	\uses{lem:good-strategy-characterization, prop:simeq-to-approx, lem:generalize-b, prop:triangle-inequality-for-approx_delta}
 	Let $G \in \polysub{m}{q}{d}$. On the hypercube edge distribution $(u,v) \sim C$,
@@ -57,6 +57,12 @@ We note that \ref{eq:local-variance-of-points-equation} is equivalent to the sta
 	\label{eq:equivalent-local-variance}
 \end{equation}
 This can be viewed as a local-variance bound for the point measurements.
+
+\begin{remark}[Polynomial-sum formalization inputs for \ref{eq:equivalent-local-variance}]\label{rem:equivalent-local-variance-formalization-inputs}
+	\lean{MIPStarRE.LDT.GlobalVariance.axisParallelBaseEventApproximation_weighted_sample_sum, MIPStarRE.LDT.GlobalVariance.axisParallelPointLineConsistency_weighted_leftToRightLineQuestion_sum, MIPStarRE.LDT.GlobalVariance.axisParallelPointLineConsistency_weighted_rightToLeftLineQuestion_sum}
+	\uses{lem:local-variance-of-points, lem:generalize-b}
+	The three referenced declarations are formalization-only auxiliary lemmas, not named statements of the paper. They are the polynomial-sum (cardinality-free) endpoints corresponding to the two $\approx_{2\eps}$ axis-parallel point/line consistency steps in the per-$g$ chain of Lemma \ref{lem:local-variance-of-points}, oriented with the line event on the left register, and they are the inputs from which a polynomial-sum chain proving \ref{eq:equivalent-local-variance} directly is to be obtained. The chain itself is not yet formalized, so the equation above does not carry its own \texttt{\textbackslash leanok} marker.
+\end{remark}
 
 \begin{lemma}[Global variance of the points measurements]\label{lem:global-variance-of-points}
 	\lean{MIPStarRE.LDT.GlobalVariance.globalVarianceOfPoints, MIPStarRE.LDT.GlobalVariance.globalVarianceDeviation_sum_le_m_mul_localVarianceDeviation_sum, MIPStarRE.LDT.GlobalVariance.globalVarianceDeviation_sum_le_of_localVarianceDeviation_sum_le}
