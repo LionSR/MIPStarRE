@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.Basic.SubMeasurementFamilies
 import MIPStarRE.LDT.GlobalVariance.Theorems.Results
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain
@@ -683,6 +684,107 @@ lemma addInURightQuantity_selfConsistencySelection_eq_simplified
   exact ev_sum strategy.state _
 
 /-! ### Scalar chain for the projection-simplified diagonal add-in-u transfer -/
+
+/-- Strong self-consistency for the point measurement, pulled back to the second
+coordinate of the independent `(u, v)` average used by the add-in-`u` scalar
+chain.
+
+This is the distributional self-consistency input for the `A^v_{h(v)}` moves in
+`self_improvement.tex`, lines 255--297: the point measurement sampled at `v`
+has the same `2δ` left/right state-dependent distance after the product average
+over `(u, v)`. -/
+lemma addInU_pointMeasurement_snd_selfConsistency
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (delta : Error)
+    (hssc : BipartiteSSCRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta) :
+    SDDRel strategy.state (uniformDistribution (Point params × Point params))
+      (IdxSubMeas.liftLeft
+        (fun uv : Point params × Point params =>
+          (strategy.pointMeasurement uv.2).toSubMeas))
+      (IdxSubMeas.liftRight
+        (fun uv : Point params × Point params =>
+          (strategy.pointMeasurement uv.2).toSubMeas))
+      (2 * delta) := by
+  classical
+  have hssc_pair :
+      BipartiteSSCRel strategy.state
+        (uniformDistribution (Point params × Point params))
+        (fun uv : Point params × Point params =>
+          (strategy.pointMeasurement uv.2).toSubMeas)
+        delta := by
+    rcases hssc with ⟨hssc⟩
+    constructor
+    calc
+      avgOver (uniformDistribution (Point params × Point params))
+          (fun uv : Point params × Point params =>
+            qBipartiteSSCDefect strategy.state
+              ((strategy.pointMeasurement uv.2).toSubMeas))
+        =
+          avgOver (uniformDistribution (Point params))
+            (fun v : Point params =>
+              qBipartiteSSCDefect strategy.state
+                ((strategy.pointMeasurement v).toSubMeas)) := by
+            exact avgOver_uniform_snd
+              (α := Point params) (β := Point params)
+              (fun v : Point params =>
+                qBipartiteSSCDefect strategy.state
+                  ((strategy.pointMeasurement v).toSubMeas))
+      _ ≤ delta := by
+            simpa [bipartiteSSCError, IdxProjMeas.toIdxSubMeas] using hssc
+  have hraw :=
+    Preliminaries.twoNotionsOfSelfConsistencyAfterEvaluation
+      strategy.state strategy.permInvState
+      (uniformDistribution (Point params × Point params))
+      (fun uv : Point params × Point params =>
+        (strategy.pointMeasurement uv.2).toSubMeas)
+      delta
+      (fun _uv (a : Fq params) => a)
+      hssc_pair
+  have hleft :
+      IdxSubMeas.liftLeft
+          (fun uv : Point params × Point params =>
+            postprocess ((strategy.pointMeasurement uv.2).toSubMeas)
+              (fun a : Fq params => a)) =
+        IdxSubMeas.liftLeft
+          (fun uv : Point params × Point params =>
+            (strategy.pointMeasurement uv.2).toSubMeas) := by
+    funext uv
+    simp [IdxSubMeas.liftLeft]
+  have hright :
+      IdxSubMeas.liftRight
+          (fun uv : Point params × Point params =>
+            postprocess ((strategy.pointMeasurement uv.2).toSubMeas)
+              (fun a : Fq params => a)) =
+        IdxSubMeas.liftRight
+          (fun uv : Point params × Point params =>
+            (strategy.pointMeasurement uv.2).toSubMeas) := by
+    funext uv
+    simp [IdxSubMeas.liftRight]
+  simpa [hleft, hright] using hraw
+
+/-- The grouped tensor mass over a fiber `h(v)=a` is a contraction.
+
+This is the submeasurement bound used inside the first Cauchy--Schwarz square
+root in `self_improvement.tex`, lines 267--272: after grouping by the value
+`a = h(v)`, the selected operators
+`H^u_h ⊗ T_h` are dominated by the total mass of the sandwiched polynomial
+submeasurement at `u`, hence by `I`. -/
+lemma addInU_filtered_sandwiched_tensor_sum_le_one
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι)
+    (u v : Point params) (a : Fq params) :
+    ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h v = a),
+        opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
+          (T.outcome h) ≤
+      (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
+  classical
+  exact SubMeas.opTensor_sum_filter_le_one
+    (sandwichedPolynomialSubMeasAt params strategy T u)
+    T
+    (fun h : Polynomial params => h v = a)
 
 /-- The expanded left endpoint `Q₀` of the four-step scalar chain in
 `self_improvement.tex`, lines 247--252, after setting `M^u = H^u` and averaging

@@ -96,6 +96,22 @@ noncomputable def postprocess {α β : Type*} {ι : Type*} [Fintype ι] [Decidab
 
 namespace SubMeas
 
+/-- Postprocessing a submeasurement by the identity readout leaves it unchanged. -/
+@[simp] theorem postprocess_id {α ι : Type*}
+    [Fintype α] [Fintype ι] [DecidableEq ι]
+    (A : SubMeas α ι) :
+    postprocess A (fun a : α => a) = A := by
+  classical
+  refine SubMeas.ext ?_ rfl
+  intro a
+  simp only [postprocess, Finset.sum_filter]
+  rw [Finset.sum_eq_single a]
+  · simp
+  · intro b _hb hba
+    simp [hba]
+  · intro ha
+    simp at ha
+
 /-- Transport a submeasurement along an equivalence of outcome types. -/
 noncomputable def transport {α β : Type*} {ι : Type*}
     [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
@@ -563,6 +579,35 @@ theorem rightTensor_le_one
     (opTensor_le_leftTensor
       (A := (1 : MIPStarRE.Quantum.Op ι₁)) (B := A)
       (zero_le_one : (0 : MIPStarRE.Quantum.Op ι₁) ≤ 1) hA)
+
+namespace SubMeas
+
+/-- A filtered diagonal tensor sum of two submeasurements is a contraction.
+
+The estimate uses only positivity and the submeasurement total bound on the
+left factor, together with the pointwise `≤ 1` bound on the right factor. -/
+theorem opTensor_sum_filter_le_one {α ι : Type*}
+    [Fintype α] [Fintype ι] [DecidableEq ι]
+    (S T : SubMeas α ι) (P : α → Prop) [DecidablePred P] :
+    ∑ x ∈ Finset.univ.filter P, opTensor (S.outcome x) (T.outcome x) ≤
+      (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
+  calc
+    ∑ x ∈ Finset.univ.filter P, opTensor (S.outcome x) (T.outcome x)
+      ≤ ∑ x ∈ Finset.univ.filter P, leftTensor (ι₂ := ι) (S.outcome x) := by
+          refine Finset.sum_le_sum ?_
+          intro x _hx
+          exact opTensor_le_leftTensor (S.outcome_pos x) (T.outcome_le_one x)
+    _ ≤ ∑ x : α, leftTensor (ι₂ := ι) (S.outcome x) := by
+          exact Finset.sum_le_sum_of_subset_of_nonneg
+            (Finset.filter_subset _ _)
+            (fun x _hmem _hnotmem => leftTensor_nonneg (S.outcome_pos x))
+    _ = leftTensor (ι₂ := ι) S.total := by
+          rw [← S.sum_eq_total]
+          rw [leftTensor_finset_sum]
+    _ ≤ (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
+          exact leftTensor_le_one S.total_le_one
+
+end SubMeas
 
 /-- A single tensor summand with a sandwiched left register is nonnegative in
 expectation.
