@@ -297,6 +297,40 @@ structure AnswerPerSliceInductionPackage (params : Parameters)
           (restrictionPkg.profile.selfConsistency x)
           (restrictionPkg.profile.diagonal x)
 
+/-- Main-induction conclusion for a function-answer symmetric strategy.
+
+This is the answer-valued analogue of the conclusion of `thm:main-induction`.
+It is used as the explicit predecessor induction hypothesis for the
+paper-faithful answer-valued restriction route: for a strategy in dimension `m`,
+it supplies a global polynomial measurement consistent with the point
+measurement at the Section 6 error `mainInductionError`. -/
+def AnswerMainInductionConclusion (params : Parameters)
+    [FieldModel params.q]
+    (strategy : AnswerSymStrat params ι)
+    (eps delta gamma : Error) (k : ℕ) : Prop :=
+  ∃ G : Measurement (Polynomial params) ι,
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params G.toSubMeas)
+      (mainInductionError params k eps delta gamma)
+
+/-- Predicate form of the answer-valued predecessor main-induction hypothesis.
+
+This is a Lean-only interface for the induction step in
+`inductive_step.tex`, lines 441--454.  It is deliberately stated at
+`mainInductionError` strength and for `AnswerSymStrat`, so callers can instantiate
+the paper-faithful `xRestrictedAnswerSymStrat` slices without appealing to the
+public `Test.mainFormal` theorem. -/
+def AnswerMainInductionHypothesis (params : Parameters)
+    [FieldModel params.q] : Prop :=
+  ∀ (ι : Type*) [Fintype ι] [DecidableEq ι],
+    ∀ (strategy : AnswerSymStrat params ι) (eps delta gamma : Error) (k : ℕ),
+      0 < params.d →
+        strategy.IsGood eps delta gamma →
+          1 ≤ k →
+            400 * params.m * params.d ≤ k →
+              AnswerMainInductionConclusion params strategy eps delta gamma k
+
 /-- The slice-local self-improvement error `ζ_x`. -/
 noncomputable def sliceSelfImprovementError (params : Parameters)
     [FieldModel params.q]

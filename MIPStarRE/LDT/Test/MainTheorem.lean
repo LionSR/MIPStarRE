@@ -5658,9 +5658,11 @@ theorem mainFormal
           ⟨roleResidual⟩
         exact baseStep6WitnessResidual_ofBaseBridge herr roleResidual
           (hbaseBridge scalars roleResidual)
-      · -- Successor case (m > 1): needs recursive slices and self-improvement.
-        -- TODO(#931, #834, #422): construct `MainFormalSuccessorRecursiveSlices`
-        -- and `MainFormalSuccessorSelfImprovementProducer`.
+      · -- Successor case (m > 1): the answer-valued recursive-slice adapter is
+        -- available, but this theorem still has no predecessor per-slice induction
+        -- package or answer-side self-improvement bridge inputs in scope.
+        -- TODO(#931, #834, #422): supply those successor inputs and assemble the
+        -- resulting role residual into a Step 6 witness residual.
         sorry
     rcases hstep6WitnessResidual with ⟨step6WitnessResidual⟩
     let rolePackage := step6WitnessResidual.roleResidual.rolePackage scalars
