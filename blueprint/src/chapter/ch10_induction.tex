@@ -408,9 +408,12 @@
 	analytic hypotheses needed for the base case ($m=1$) of
 	Theorem~\ref{thm:main-formal}: orthonormalization inputs (spectral truncation
 	and locality-preserving repair witnesses), distinguished completion outcomes,
-	strong self-consistency, and match-mass preservation for the unsymmetrized
-	POVMs.  The narrowed alias \texttt{MainFormalBaseBridgeHypotheses}
-	omits the two distinguished outcomes;
+	and match-mass preservation for the orthonormalized projective
+	submeasurements against the opposite unsymmetrized POVM.  The line-130 cross
+	consistency relation is reconstructed internally from the checked role residual
+	and used directly in the completion step, so no separate diagonal strong
+	self-consistency package remains in this bridge.  The narrowed alias
+	\texttt{MainFormalBaseBridgeHypotheses} omits the two distinguished outcomes;
 	\texttt{baseStep6Hypotheses\_ofBaseBridge} fills both with the explicit zero
 	polynomial.  The assembly theorems \texttt{baseStep6WitnessResidual} and
 	\texttt{baseStep6WitnessResidual\_ofBaseBridge} turn these hypotheses

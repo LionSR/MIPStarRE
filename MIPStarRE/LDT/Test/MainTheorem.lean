@@ -4945,6 +4945,300 @@ theorem toProjectivizationMatchMassMonotonicity
       (Preliminaries.completeAtOutcomeProj orthResidual.P_B input.a_B)
       rfl rfl input.leftMatchMassPreservation input.rightMatchMassPreservation
 
+private lemma qSDD_liftLeft_completeAtOutcome_eq
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι)) (A B : SubMeas Outcome ι) (a0 : Outcome) :
+    qSDD ψ A.liftLeft (Preliminaries.completeAtOutcome B.liftLeft a0).toSubMeas =
+      qSDD ψ A.liftLeft (Preliminaries.completeAtOutcome B a0).toSubMeas.liftLeft := by
+  have hcomplete_outcome :
+      ∀ a : Outcome,
+        (Preliminaries.completeAtOutcome B.liftLeft a0).toSubMeas.outcome a =
+          ((Preliminaries.completeAtOutcome B a0).toSubMeas.liftLeft).outcome a := by
+    intro a
+    by_cases h : a = a0
+    · subst h
+      ext i j
+      rcases i with ⟨i₁, i₂⟩
+      rcases j with ⟨j₁, j₂⟩
+      by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
+        simp [Preliminaries.completeAtOutcome, SubMeas.liftLeft, leftTensor, sub_eq_add_neg,
+          h₁, h₂, add_comm, add_assoc]
+    · ext i j
+      rcases i with ⟨i₁, i₂⟩
+      rcases j with ⟨j₁, j₂⟩
+      by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
+        simp [Preliminaries.completeAtOutcome, SubMeas.liftLeft, leftTensor, h, h₁, h₂]
+  unfold qSDD qSDDCore
+  refine Finset.sum_congr rfl ?_
+  intro a _
+  rw [hcomplete_outcome a]
+
+private lemma qBipartiteMatchMass_le_left_total_of_measurement
+    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) (B : Measurement Outcome ι) :
+    qBipartiteMatchMass ψ A B.toSubMeas ≤
+      ev ψ (leftTensor (ι₂ := ι) A.total) := by
+  unfold qBipartiteMatchMass
+  calc
+    ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (B.outcome a))
+      ≤ ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ι) (A.outcome a)) := by
+          refine Finset.sum_le_sum ?_
+          intro a _
+          exact ev_mono ψ _ _ <|
+            opTensor_le_leftTensor (ι₂ := ι)
+              (A.outcome_pos a) (Measurement.outcome_le_one B a)
+    _ = ev ψ (leftTensor (ι₂ := ι) A.total) := by
+          rw [← ev_sum ψ (fun a : Outcome => leftTensor (ι₂ := ι) (A.outcome a))]
+          rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ A.outcome]
+          rw [A.sum_eq_total]
+
+/-- Produce the line-130 completion witnesses directly from the cross
+consistency statement and the orthonormalization match-mass data.
+
+This is a stricter fit to the paper's Step 6 flow than the diagonal-SSC wrapper:
+the role package already reconstructs line 130 as a cross `ConsRel`
+`G^A \simeq_{\zeta_1} G^B`, the orthonormalization residual already carries the
+projective submeasurements `P^A,P^B`, and the remaining input needed to control
+the completion residual is that these `P`-families do not decrease the diagonal
+match mass against the opposite unsymmetrized POVM. -/
+theorem nonempty_ofLine130ConsistencyAndMatchMassPreservation
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
+    (orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
+      params strategy eps k scalars rolePackage)
+    (a_A a_B : Polynomial params)
+    (hpre : ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+      (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+      scalars.zeta1)
+    (leftMatchMassPreservation :
+      MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement) orthResidual.P_A
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement))
+    (rightMatchMassPreservation :
+      MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement) orthResidual.P_B
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)) :
+    Nonempty (MainFormalPostRolePackageLine130CompletionInput
+      params strategy eps k scalars rolePackage orthResidual) := by
+  let G_A := unsymmetrizedLeftPOVM rolePackage.roleMeasurement
+  let G_B := unsymmetrizedRightPOVM rolePackage.roleMeasurement
+  let Q_A := Preliminaries.completeAtOutcomeProj orthResidual.P_A a_A
+  let Q_B := Preliminaries.completeAtOutcomeProj orthResidual.P_B a_B
+  have hleftCompletedCloseness :
+      SDDRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily G_A.toSubMeas.liftLeft)
+        (constSubMeasFamily Q_A.toSubMeas.liftLeft)
+        (MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1) := by
+    have hpre_q :
+        qBipartiteConsDefect strategy.state G_A.toSubMeas G_B.toSubMeas ≤ scalars.zeta1 := by
+      simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily] using
+        hpre.offDiagonalBound
+    have hmatch_GA_GB :
+        1 - qBipartiteMatchMass strategy.state G_A.toSubMeas G_B.toSubMeas ≤ scalars.zeta1 := by
+      rw [qBipartiteConsDefect_of_measurements strategy.state G_A G_B] at hpre_q
+      have hone :
+          ev strategy.state (1 : MIPStarRE.Quantum.Op (ι × ι)) = 1 :=
+        ev_one_of_isNormalized strategy.state strategy.isNormalized
+      linarith
+    have hmatch_PA_GB :
+        1 - qBipartiteMatchMass strategy.state orthResidual.P_A.toSubMeas G_B.toSubMeas ≤
+          scalars.zeta1 := by
+      linarith [hmatch_GA_GB,
+        leftMatchMassPreservation.matchMassPreservation]
+    have hmass_PA :
+        1 - ev strategy.state (leftTensor (ι₂ := ι) orthResidual.P_A.toSubMeas.total) ≤
+          scalars.zeta1 := by
+      have hmatch_le := qBipartiteMatchMass_le_left_total_of_measurement
+        strategy.state orthResidual.P_A.toSubMeas G_B
+      linarith
+    have hPP_q :
+        qSDD strategy.state orthResidual.P_A.toSubMeas.liftLeft Q_A.toSubMeas.liftLeft ≤
+          scalars.zeta1 := by
+      let R : MIPStarRE.Quantum.Op (ι × ι) :=
+        (1 : MIPStarRE.Quantum.Op (ι × ι)) - orthResidual.P_A.toSubMeas.liftLeft.total
+      have hraw :
+          qSDD strategy.state orthResidual.P_A.toSubMeas.liftLeft
+              (Preliminaries.completeAtOutcome
+                orthResidual.P_A.toSubMeas.liftLeft a_A).toSubMeas ≤
+            scalars.zeta1 := by
+        have hcomp :
+            qSDD strategy.state orthResidual.P_A.toSubMeas.liftLeft
+                (Preliminaries.completeAtOutcome
+                  orthResidual.P_A.toSubMeas.liftLeft a_A).toSubMeas =
+              ev strategy.state (R * R) := by
+          simpa [R] using
+            (Preliminaries.completion_self_distance strategy.state
+              orthResidual.P_A.toSubMeas.liftLeft a_A)
+        have hR_nonneg : 0 ≤ R := by
+          dsimp [R]
+          exact sub_nonneg.mpr orthResidual.P_A.toSubMeas.liftLeft.total_le_one
+        have hR_le_one : R ≤ 1 := by
+          dsimp [R]
+          exact sub_le_self (1 : MIPStarRE.Quantum.Op (ι × ι))
+            orthResidual.P_A.toSubMeas.liftLeft.total_nonneg
+        have hR_sq_le : R * R ≤ R :=
+          MIPStarRE.Quantum.sq_le_self hR_nonneg hR_le_one
+        have hR_sq_ev : ev strategy.state (R * R) ≤ ev strategy.state R :=
+          ev_mono strategy.state _ _ hR_sq_le
+        have hR_ev : ev strategy.state R ≤ scalars.zeta1 := by
+          have hR_eq :
+              ev strategy.state R =
+                1 - ev strategy.state
+                  (leftTensor (ι₂ := ι) orthResidual.P_A.toSubMeas.total) := by
+            dsimp [R]
+            rw [ev_sub]
+            simp [SubMeas.liftLeft, ev_one_of_isNormalized strategy.state strategy.isNormalized]
+          linarith
+        rw [hcomp]
+        exact le_trans hR_sq_ev hR_ev
+      have hq_eq := qSDD_liftLeft_completeAtOutcome_eq strategy.state
+        orthResidual.P_A.toSubMeas orthResidual.P_A.toSubMeas a_A
+      rw [hq_eq] at hraw
+      simpa [Q_A, Preliminaries.completeAtOutcomeProj_toSubMeas] using hraw
+    have hGP_q :
+        qSDD strategy.state G_A.toSubMeas.liftLeft orthResidual.P_A.toSubMeas.liftLeft ≤
+          MakingMeasurementsProjective.orthonormalizationError scalars.zeta1 := by
+      simpa [Preliminaries.constFamily_sdd_unit] using
+        orthResidual.leftCloseness.squaredDistanceBound
+    constructor
+    rw [Preliminaries.constFamily_sdd_unit]
+    calc
+      qSDD strategy.state G_A.toSubMeas.liftLeft Q_A.toSubMeas.liftLeft
+        ≤ 2 * (qSDD strategy.state G_A.toSubMeas.liftLeft orthResidual.P_A.toSubMeas.liftLeft +
+            qSDD strategy.state orthResidual.P_A.toSubMeas.liftLeft Q_A.toSubMeas.liftLeft) := by
+              exact Preliminaries.questionSDD_triangle strategy.state
+                G_A.toSubMeas.liftLeft orthResidual.P_A.toSubMeas.liftLeft Q_A.toSubMeas.liftLeft
+      _ ≤ 2 * (MakingMeasurementsProjective.orthonormalizationError scalars.zeta1 +
+            scalars.zeta1) := by
+              gcongr
+      _ = 2 * MakingMeasurementsProjective.orthonormalizationError scalars.zeta1 +
+            2 * scalars.zeta1 := by ring
+      _ ≤ MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1 := by
+            have hsqrt_nonneg :
+                0 ≤ 4 * Real.sqrt
+                  (MakingMeasurementsProjective.orthonormalizationError scalars.zeta1) := by
+              positivity
+            unfold MakingMeasurementsProjective.orthonormalizeAndCompleteError
+            linarith
+  have hpre_symm : ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily G_B.toSubMeas)
+      (constSubMeasFamily G_A.toSubMeas)
+      scalars.zeta1 :=
+    consRel_symm_of_density_fixed strategy.state strategy.densityFixed
+      (uniformDistribution Unit)
+      (constSubMeasFamily G_A.toSubMeas)
+      (constSubMeasFamily G_B.toSubMeas)
+      scalars.zeta1 hpre
+  have hrightCompletedCloseness :
+      SDDRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily G_B.toSubMeas.liftLeft)
+        (constSubMeasFamily Q_B.toSubMeas.liftLeft)
+        (MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1) := by
+    have hpre_q :
+        qBipartiteConsDefect strategy.state G_B.toSubMeas G_A.toSubMeas ≤ scalars.zeta1 := by
+      simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily] using
+        hpre_symm.offDiagonalBound
+    have hmatch_GB_GA :
+        1 - qBipartiteMatchMass strategy.state G_B.toSubMeas G_A.toSubMeas ≤ scalars.zeta1 := by
+      rw [qBipartiteConsDefect_of_measurements strategy.state G_B G_A] at hpre_q
+      have hone :
+          ev strategy.state (1 : MIPStarRE.Quantum.Op (ι × ι)) = 1 :=
+        ev_one_of_isNormalized strategy.state strategy.isNormalized
+      linarith
+    have hmatch_PB_GA :
+        1 - qBipartiteMatchMass strategy.state orthResidual.P_B.toSubMeas G_A.toSubMeas ≤
+          scalars.zeta1 := by
+      linarith [hmatch_GB_GA,
+        rightMatchMassPreservation.matchMassPreservation]
+    have hmass_PB :
+        1 - ev strategy.state (leftTensor (ι₂ := ι) orthResidual.P_B.toSubMeas.total) ≤
+          scalars.zeta1 := by
+      have hmatch_le := qBipartiteMatchMass_le_left_total_of_measurement
+        strategy.state orthResidual.P_B.toSubMeas G_A
+      linarith
+    have hPP_q :
+        qSDD strategy.state orthResidual.P_B.toSubMeas.liftLeft Q_B.toSubMeas.liftLeft ≤
+          scalars.zeta1 := by
+      let R : MIPStarRE.Quantum.Op (ι × ι) :=
+        (1 : MIPStarRE.Quantum.Op (ι × ι)) - orthResidual.P_B.toSubMeas.liftLeft.total
+      have hraw :
+          qSDD strategy.state orthResidual.P_B.toSubMeas.liftLeft
+              (Preliminaries.completeAtOutcome
+                orthResidual.P_B.toSubMeas.liftLeft a_B).toSubMeas ≤
+            scalars.zeta1 := by
+        have hcomp :
+            qSDD strategy.state orthResidual.P_B.toSubMeas.liftLeft
+                (Preliminaries.completeAtOutcome
+                  orthResidual.P_B.toSubMeas.liftLeft a_B).toSubMeas =
+              ev strategy.state (R * R) := by
+          simpa [R] using
+            (Preliminaries.completion_self_distance strategy.state
+              orthResidual.P_B.toSubMeas.liftLeft a_B)
+        have hR_nonneg : 0 ≤ R := by
+          dsimp [R]
+          exact sub_nonneg.mpr orthResidual.P_B.toSubMeas.liftLeft.total_le_one
+        have hR_le_one : R ≤ 1 := by
+          dsimp [R]
+          exact sub_le_self (1 : MIPStarRE.Quantum.Op (ι × ι))
+            orthResidual.P_B.toSubMeas.liftLeft.total_nonneg
+        have hR_sq_le : R * R ≤ R :=
+          MIPStarRE.Quantum.sq_le_self hR_nonneg hR_le_one
+        have hR_sq_ev : ev strategy.state (R * R) ≤ ev strategy.state R :=
+          ev_mono strategy.state _ _ hR_sq_le
+        have hR_ev : ev strategy.state R ≤ scalars.zeta1 := by
+          have hR_eq :
+              ev strategy.state R =
+                1 - ev strategy.state
+                  (leftTensor (ι₂ := ι) orthResidual.P_B.toSubMeas.total) := by
+            dsimp [R]
+            rw [ev_sub]
+            simp [SubMeas.liftLeft, ev_one_of_isNormalized strategy.state strategy.isNormalized]
+          linarith
+        rw [hcomp]
+        exact le_trans hR_sq_ev hR_ev
+      have hq_eq := qSDD_liftLeft_completeAtOutcome_eq strategy.state
+        orthResidual.P_B.toSubMeas orthResidual.P_B.toSubMeas a_B
+      rw [hq_eq] at hraw
+      simpa [Q_B, Preliminaries.completeAtOutcomeProj_toSubMeas] using hraw
+    have hGP_q :
+        qSDD strategy.state G_B.toSubMeas.liftLeft orthResidual.P_B.toSubMeas.liftLeft ≤
+          MakingMeasurementsProjective.orthonormalizationError scalars.zeta1 := by
+      simpa [Preliminaries.constFamily_sdd_unit] using
+        orthResidual.rightCloseness.squaredDistanceBound
+    constructor
+    rw [Preliminaries.constFamily_sdd_unit]
+    calc
+      qSDD strategy.state G_B.toSubMeas.liftLeft Q_B.toSubMeas.liftLeft
+        ≤ 2 * (qSDD strategy.state G_B.toSubMeas.liftLeft orthResidual.P_B.toSubMeas.liftLeft +
+            qSDD strategy.state orthResidual.P_B.toSubMeas.liftLeft Q_B.toSubMeas.liftLeft) := by
+              exact Preliminaries.questionSDD_triangle strategy.state
+                G_B.toSubMeas.liftLeft orthResidual.P_B.toSubMeas.liftLeft Q_B.toSubMeas.liftLeft
+      _ ≤ 2 * (MakingMeasurementsProjective.orthonormalizationError scalars.zeta1 +
+            scalars.zeta1) := by
+              gcongr
+      _ = 2 * MakingMeasurementsProjective.orthonormalizationError scalars.zeta1 +
+            2 * scalars.zeta1 := by ring
+      _ ≤ MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1 := by
+            have hsqrt_nonneg :
+                0 ≤ 4 * Real.sqrt
+                  (MakingMeasurementsProjective.orthonormalizationError scalars.zeta1) := by
+              positivity
+            unfold MakingMeasurementsProjective.orthonormalizeAndCompleteError
+            linarith
+  exact ⟨{
+    a_A := a_A
+    a_B := a_B
+    leftCompletedCloseness := hleftCompletedCloseness
+    rightCompletedCloseness := hrightCompletedCloseness
+    leftMatchMassPreservation := leftMatchMassPreservation
+    rightMatchMassPreservation := rightMatchMassPreservation }⟩
+
 /-- Produce explicit completion witnesses from the analytic completion theorem.
 
 The only analytic hypotheses are exactly the two strong self-consistency facts
@@ -5277,6 +5571,153 @@ theorem nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs
   exact nonempty_ofRoleResidualAndCompletion roleResidual
     ⟨completionInput.toCompletionResidual⟩
 
+/-- Assemble the final live residual from the bundled line-130 diagonal SSC
+input.
+
+This is the role-residual-level counterpart of
+`MainFormalPostRolePackageLine130CompletionInput.nonempty_ofDiagonalSSCInput`:
+the two line-130 strong self-consistency obligations stay bundled in the exact
+paper-shaped package consumed by `completingToMeasurement`, rather than being
+passed as separate `BipartiteSSCRel` fields. -/
+theorem nonempty_ofRoleResidualAndLine130InputsAndDiagonalSSCInput
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
+    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
+    (input : MainFormalPostRolePackageLine130OrthonormalizationInput
+      params strategy eps k scalars (roleResidual.rolePackage scalars))
+    (a_A a_B : Polynomial params)
+    (diagonalSSC : MainFormalPostRolePackageLine130DiagonalSSCInput
+      params strategy eps k scalars (roleResidual.rolePackage scalars))
+    (leftMatchMassPreservation :
+      ∀ orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
+          params strategy eps k scalars (roleResidual.rolePackage scalars),
+        MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
+          (unsymmetrizedLeftPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement)
+          orthResidual.P_A
+          (unsymmetrizedRightPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement))
+    (rightMatchMassPreservation :
+      ∀ orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
+          params strategy eps k scalars (roleResidual.rolePackage scalars),
+        MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
+          (unsymmetrizedRightPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement)
+          orthResidual.P_B
+          (unsymmetrizedLeftPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement)) :
+    Nonempty (MainFormalCascadeRolePackageResidualStep6WitnessResidual
+      params strategy eps hpass k scalars) :=
+  nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs
+    hsmall roleResidual input a_A a_B
+    diagonalSSC.leftSelfConsistency diagonalSSC.rightSelfConsistency
+    leftMatchMassPreservation rightMatchMassPreservation
+
+/-- Assemble the final live residual from the diagonal self-`ConsRel` version of
+the line-130 obligation.
+
+This wrapper performs the checked conversion
+`MainFormalPostRolePackageLine130DiagonalSSCInput.ofDiagonalConsistency`
+before invoking
+`nonempty_ofRoleResidualAndLine130InputsAndDiagonalSSCInput`. -/
+theorem nonempty_ofRoleResidualAndLine130InputsAndDiagonalConsistencyInput
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
+    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
+    (input : MainFormalPostRolePackageLine130OrthonormalizationInput
+      params strategy eps k scalars (roleResidual.rolePackage scalars))
+    (a_A a_B : Polynomial params)
+    (diagonalConsistency : MainFormalPostRolePackageLine130DiagonalConsistencyInput
+      params strategy eps k scalars (roleResidual.rolePackage scalars))
+    (leftMatchMassPreservation :
+      ∀ orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
+          params strategy eps k scalars (roleResidual.rolePackage scalars),
+        MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
+          (unsymmetrizedLeftPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement)
+          orthResidual.P_A
+          (unsymmetrizedRightPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement))
+    (rightMatchMassPreservation :
+      ∀ orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
+          params strategy eps k scalars (roleResidual.rolePackage scalars),
+        MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
+          (unsymmetrizedRightPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement)
+          orthResidual.P_B
+          (unsymmetrizedLeftPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement)) :
+    Nonempty (MainFormalCascadeRolePackageResidualStep6WitnessResidual
+      params strategy eps hpass k scalars) :=
+  nonempty_ofRoleResidualAndLine130InputsAndDiagonalSSCInput
+    hsmall roleResidual input a_A a_B
+    (MainFormalPostRolePackageLine130DiagonalSSCInput.ofDiagonalConsistency
+      diagonalConsistency)
+    leftMatchMassPreservation rightMatchMassPreservation
+
+/-- Assemble the final live residual from the paper line-130 cross consistency,
+the orthonormalization inputs, and the P-level match-mass preservation data.
+
+This is the narrower paper-faithful Step 6 route: the checked role residual
+reconstructs line 130 as a cross `ConsRel`, the orthonormalization wrapper
+produces `P^A,P^B`, and the remaining completion step is discharged directly from
+that cross relation plus the construction-level match-mass preservation facts,
+without asking callers for separate diagonal strong self-consistency packages. -/
+theorem nonempty_ofRoleResidualAndLine130InputsAndMatchMassPreservation
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
+    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
+    (input : MainFormalPostRolePackageLine130OrthonormalizationInput
+      params strategy eps k scalars (roleResidual.rolePackage scalars))
+    (a_A a_B : Polynomial params)
+    (leftMatchMassPreservation :
+      ∀ orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
+          params strategy eps k scalars (roleResidual.rolePackage scalars),
+        MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
+          (unsymmetrizedLeftPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement)
+          orthResidual.P_A
+          (unsymmetrizedRightPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement))
+    (rightMatchMassPreservation :
+      ∀ orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
+          params strategy eps k scalars (roleResidual.rolePackage scalars),
+        MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
+          (unsymmetrizedRightPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement)
+          orthResidual.P_B
+          (unsymmetrizedLeftPOVM
+            (roleResidual.rolePackage scalars).roleMeasurement)) :
+    Nonempty (MainFormalCascadeRolePackageResidualStep6WitnessResidual
+      params strategy eps hpass k scalars) := by
+  have hpre := roleResidual.line130Consistency scalars
+  rcases MainFormalPostRolePackageLine130OrthonormalizationResidual.nonempty_ofLine130Inputs
+      hsmall hpre input with ⟨orthResidual⟩
+  have hcompletion :
+      Nonempty (MainFormalPostRolePackageLine130CompletionInput
+        params strategy eps k scalars (roleResidual.rolePackage scalars) orthResidual) :=
+    MainFormalPostRolePackageLine130CompletionInput.nonempty_ofLine130ConsistencyAndMatchMassPreservation
+      (params := params) (strategy := strategy) (eps := eps) (k := k)
+      (scalars := scalars) (rolePackage := roleResidual.rolePackage scalars)
+      orthResidual a_A a_B hpre
+      (leftMatchMassPreservation orthResidual)
+      (rightMatchMassPreservation orthResidual)
+  rcases hcompletion with ⟨completionInput⟩
+  exact nonempty_ofRoleResidualAndCompletion roleResidual
+    ⟨completionInput.toCompletionResidual⟩
+
 /-- Bridge-shape alias for
 `nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs`
 accepting the orthonormalization inputs under the `…BridgeInputs` name.
@@ -5446,8 +5887,8 @@ end MainFormalCascadeTargets
 The base case (`m = 1`) generation of the Step 6 witness residual still
 requires the same analytic content as the successor case: spectral
 truncation and locality-preserving repair witnesses for the unsymmetrized
-POVMs, strong self-consistency (`BipartiteSSCRel`), and match-mass
-preservation.  These are proof obligations whose formalization
+POVMs and match-mass preservation for the orthonormalized projective
+submeasurements. These are proof obligations whose formalization
 corresponds to unformalized content in Section 5 and Section 6 of the
 paper; they are bundled as a single structure to give a single target
 for the remaining work.  When these hypotheses are supplied,
@@ -5457,8 +5898,7 @@ fills the base branch of `mainFormal`. -/
 /-- Analytic hypotheses that are still unformalized for the
 base case (`m = 1`) Step 6 witness residual: orthonormalization
 inputs (spectral truncation and repair witnesses), distinguished
-outcomes, strong self-consistency (`BipartiteSSCRel`), and
-match-mass preservation for the unsymmetrized POVMs.
+outcomes, and match-mass preservation for the unsymmetrized POVMs.
 
 Supplying these hypotheses yields a complete `baseStep6WitnessResidual`
 for the base branch of `mainFormal`; the remaining successor-case
@@ -5479,22 +5919,6 @@ structure MainFormalStep6Hypotheses
   a_A : Polynomial params
   /-- Bob-side distinguished outcome for the completion step. -/
   a_B : Polynomial params
-  /-- Alice-side strong self-consistency for the unsymmetrized POVM
-  obtained from the role measurement. -/
-  leftSelfConsistency :
-    BipartiteSSCRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily
-        (unsymmetrizedLeftPOVM
-          (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
-      scalars.zeta1
-  /-- Bob-side strong self-consistency for the unsymmetrized POVM
-  obtained from the role measurement. -/
-  rightSelfConsistency :
-    BipartiteSSCRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily
-        (unsymmetrizedRightPOVM
-          (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
-      scalars.zeta1
   /-- Alice-side match-mass preservation: for each line-130 orthonormalization
   residual, the projective submeasurement `P_A` preserves match mass against
   Bob's unsymmetrized POVM. -/
@@ -5528,7 +5952,8 @@ This theorem takes an explicit `roleResidual` (obtainable from either
 `MainFormalRolePackageResidual.ofBaseCase` or the successor-branch
 handoff) and the `MainFormalStep6Hypotheses` bridge, then assembles the
 Step 6 witness residual through
-`MainFormalCascadeRolePackageResidualStep6WitnessResidual.nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs`.
+`MainFormalCascadeRolePackageResidualStep6WitnessResidual
+  .nonempty_ofRoleResidualAndLine130InputsAndMatchMassPreservation`.
 
 Refs #1009, #422. -/
 theorem baseStep6WitnessResidual
@@ -5543,20 +5968,20 @@ theorem baseStep6WitnessResidual
       hpass scalars roleResidual) :
     Nonempty (MainFormalCascadeRolePackageResidualStep6WitnessResidual
       params strategy eps hpass k scalars) := by
-  exact
-    MainFormalCascadeRolePackageResidualStep6WitnessResidual.nonempty_ofRoleResidualAndLine130InputsAndCompletingToMeasurementInputs
-      hsmall roleResidual bridge.orthonormalizationInput bridge.a_A bridge.a_B
-      bridge.leftSelfConsistency bridge.rightSelfConsistency
-      bridge.leftMatchMassPreservation bridge.rightMatchMassPreservation
+  exact MainFormalCascadeRolePackageResidualStep6WitnessResidual.nonempty_ofRoleResidualAndLine130InputsAndMatchMassPreservation
+        (params := params) (strategy := strategy) (eps := eps)
+        (hpass := hpass) (k := k) (scalars := scalars)
+        hsmall roleResidual bridge.orthonormalizationInput bridge.a_A bridge.a_B
+    bridge.leftMatchMassPreservation bridge.rightMatchMassPreservation
 
 
 /-- Narrowed base-case bridge hypotheses for Step 6 when `params.m = 1`.
 
 Compared to `MainFormalStep6Hypotheses`, this structure omits the two
 distinguished outcomes `a_A` and `a_B`, which the conversion below fills with
-the explicit zero polynomial at `m = 1`.  The remaining five fields
-— orthonormalization inputs, strong self-consistency, and match-mass
-preservation — are the genuinely analytic obligations that must be supplied
+the explicit zero polynomial at `m = 1`.  The remaining three fields
+— orthonormalization inputs and match-mass preservation — are the genuinely
+analytic obligations that must be supplied
 by the caller.
 
 A conversion theorem `baseStep6Hypotheses_ofBaseBridge` constructs the full
@@ -5576,22 +6001,6 @@ structure MainFormalBaseBridgeHypotheses
   orthonormalizationInput :
     MainFormalPostRolePackageLine130OrthonormalizationInput
       params strategy eps k scalars (roleResidual.rolePackage scalars)
-  /-- Alice-side strong self-consistency for the unsymmetrized POVM
-  obtained from the role measurement. -/
-  leftSelfConsistency :
-    BipartiteSSCRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily
-        (unsymmetrizedLeftPOVM
-          (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
-      scalars.zeta1
-  /-- Bob-side strong self-consistency for the unsymmetrized POVM
-  obtained from the role measurement. -/
-  rightSelfConsistency :
-    BipartiteSSCRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily
-        (unsymmetrizedRightPOVM
-          (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
-      scalars.zeta1
   /-- Alice-side match-mass preservation: for each line-130 orthonormalization
   residual, the projective submeasurement `P_A` preserves match mass against
   Bob's unsymmetrized POVM. -/
@@ -5642,8 +6051,6 @@ noncomputable def baseStep6Hypotheses_ofBaseBridge
   orthonormalizationInput := bridge.orthonormalizationInput
   a_A := { poly := 0, lowIndividualDegree := by intro i; simp [MvPolynomial.degreeOf_zero] }
   a_B := { poly := 0, lowIndividualDegree := by intro i; simp [MvPolynomial.degreeOf_zero] }
-  leftSelfConsistency := bridge.leftSelfConsistency
-  rightSelfConsistency := bridge.rightSelfConsistency
   leftMatchMassPreservation := bridge.leftMatchMassPreservation
   rightMatchMassPreservation := bridge.rightMatchMassPreservation
 
