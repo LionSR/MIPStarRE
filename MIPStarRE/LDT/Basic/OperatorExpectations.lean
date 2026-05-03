@@ -470,16 +470,18 @@ theorem ev_sum_conjTranspose_mul_sum_le {ι : Type*} [Fintype ι] [DecidableEq �
 /-! ### Bipartite-tensor sandwich Cauchy–Schwarz
 
 The lemmas below give the operator/real Cauchy–Schwarz step for expectations of
-sandwiched products lifted to a bipartite tensor space.  They are the missing
-primitive for the raw `Q₂ → Q₃` and `Q₃ → Q₄` Cauchy–Schwarz estimates of
-`self_improvement.tex`, lines 306–311 and 326–332 (the `eq:change-one-cauchy-
-schwarz` and `eq:change-another` displays), where the bilinear form is
-`⟨X, Y⟩_{M, T} := ev ψ (opTensor (Xᴴ · M · Y) T)` with PSD `M`, `T`. -/
+sandwiched products lifted to a bipartite tensor space. They are a reusable
+primitive toward the raw `Q₂ → Q₃` and `Q₃ → Q₄` Cauchy–Schwarz estimates of
+`self_improvement.tex`, lines 306–311 and 326–332 (the
+`eq:change-one-cauchy-schwarz` and `eq:change-another` displays), where the
+bilinear form is `⟨X, Y⟩_{M, T} := ev ψ (opTensor (Xᴴ · M · Y) T)` with PSD
+`M`, `T`. -/
 
 /-- Bipartite-tensor Cauchy–Schwarz for state expectations.
 
 For PSD operators `M`, `T` and arbitrary operators `X`, `Y`,
-`(ev ψ (opTensor (Xᴴ M Y) T))² ≤ ev ψ (opTensor (Xᴴ M X) T) * ev ψ (opTensor (Yᴴ M Y) T)`.
+`(ev ψ (opTensor (Xᴴ M Y) T))² ≤ ev ψ (opTensor (Xᴴ M X) T) *
+ev ψ (opTensor (Yᴴ M Y) T)`.
 
 The proof factors `M = √M · √M`, `T = √T · √T` (continuous functional calculus
 square roots) and applies `ev_cauchy_schwarz` to
@@ -499,8 +501,10 @@ theorem ev_opTensor_sandwich_cauchy_schwarz
     (Matrix.nonneg_iff_posSemidef.mp (CFC.sqrt_nonneg M)).isHermitian.eq
   have hsT_herm : (CFC.sqrt T)ᴴ = CFC.sqrt T :=
     (Matrix.nonneg_iff_posSemidef.mp (CFC.sqrt_nonneg T)).isHermitian.eq
-  set A : MIPStarRE.Quantum.Op (ι₁ × ι₂) := opTensor (CFC.sqrt M * X) (CFC.sqrt T) with hA_def
-  set B : MIPStarRE.Quantum.Op (ι₁ × ι₂) := opTensor (CFC.sqrt M * Y) (CFC.sqrt T) with hB_def
+  set A : MIPStarRE.Quantum.Op (ι₁ × ι₂) :=
+    opTensor (CFC.sqrt M * X) (CFC.sqrt T) with hA_def
+  set B : MIPStarRE.Quantum.Op (ι₁ × ι₂) :=
+    opTensor (CFC.sqrt M * Y) (CFC.sqrt T) with hB_def
   have hA_adj : Aᴴ = opTensor (Xᴴ * CFC.sqrt M) (CFC.sqrt T) := by
     rw [hA_def, conjTranspose_opTensor, Matrix.conjTranspose_mul, hsM_herm, hsT_herm]
   have hB_adj : Bᴴ = opTensor (Yᴴ * CFC.sqrt M) (CFC.sqrt T) := by
@@ -511,21 +515,18 @@ theorem ev_opTensor_sandwich_cauchy_schwarz
     · calc Xᴴ * CFC.sqrt M * (CFC.sqrt M * Y)
           = Xᴴ * (CFC.sqrt M * CFC.sqrt M) * Y := by noncomm_ring
         _ = Xᴴ * M * Y := by rw [hsM_self]
-    · exact hsT_self
   have hAA : Aᴴ * A = opTensor (Xᴴ * M * X) T := by
     rw [hA_adj, hA_def, opTensor_mul]
     congr 1
     · calc Xᴴ * CFC.sqrt M * (CFC.sqrt M * X)
           = Xᴴ * (CFC.sqrt M * CFC.sqrt M) * X := by noncomm_ring
         _ = Xᴴ * M * X := by rw [hsM_self]
-    · exact hsT_self
   have hBB : Bᴴ * B = opTensor (Yᴴ * M * Y) T := by
     rw [hB_adj, hB_def, opTensor_mul]
     congr 1
     · calc Yᴴ * CFC.sqrt M * (CFC.sqrt M * Y)
           = Yᴴ * (CFC.sqrt M * CFC.sqrt M) * Y := by noncomm_ring
         _ = Yᴴ * M * Y := by rw [hsM_self]
-    · exact hsT_self
   have hcs := ev_cauchy_schwarz ψ A B
   rw [hAB, hAA, hBB] at hcs
   exact hcs
@@ -546,7 +547,8 @@ private theorem ev_opTensor_sandwich_diag_nonneg
     (Matrix.nonneg_iff_posSemidef.mp (CFC.sqrt_nonneg M)).isHermitian.eq
   have hsT_herm : (CFC.sqrt T)ᴴ = CFC.sqrt T :=
     (Matrix.nonneg_iff_posSemidef.mp (CFC.sqrt_nonneg T)).isHermitian.eq
-  set A : MIPStarRE.Quantum.Op (ι₁ × ι₂) := opTensor (CFC.sqrt M * X) (CFC.sqrt T) with hA_def
+  set A : MIPStarRE.Quantum.Op (ι₁ × ι₂) :=
+    opTensor (CFC.sqrt M * X) (CFC.sqrt T) with hA_def
   have hA_adj : Aᴴ = opTensor (Xᴴ * CFC.sqrt M) (CFC.sqrt T) := by
     rw [hA_def, conjTranspose_opTensor, Matrix.conjTranspose_mul, hsM_herm, hsT_herm]
   have hAA : Aᴴ * A = opTensor (Xᴴ * M * X) T := by
@@ -555,7 +557,6 @@ private theorem ev_opTensor_sandwich_diag_nonneg
     · calc Xᴴ * CFC.sqrt M * (CFC.sqrt M * X)
           = Xᴴ * (CFC.sqrt M * CFC.sqrt M) * X := by noncomm_ring
         _ = Xᴴ * M * X := by rw [hsM_self]
-    · exact hsT_self
   have := ev_adjoint_self_nonneg ψ A
   rwa [hAA] at this
 
@@ -588,9 +589,10 @@ theorem ev_opTensor_sandwich_abs_le_sqrt
 Specialization of `ev_opTensor_sandwich_abs_le_sqrt` to a sum indexed by
 `Outcome`, followed by the real-valued Cauchy–Schwarz `sum_sqrt_mul_sqrt_le`.
 
-This is the direct sum-form analogue of `sum_ev_mul_le_sqrt` and is the operator
-template consumed by the raw add-in-`u` Step 3/4 producers (the bilinear forms
-share the polynomial outcome index between numerator and denominator). -/
+This is the direct sum-form analogue of `sum_ev_mul_le_sqrt`. It packages the
+operator Cauchy–Schwarz template needed by future raw add-in-`u` Step 3/4
+producers when the bilinear forms share the polynomial outcome index between
+numerator and denominator. -/
 theorem sum_ev_opTensor_sandwich_le_sqrt
     {Outcome ι₁ ι₂ : Type*}
     [Fintype Outcome] [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
