@@ -255,7 +255,11 @@ for a small error $\Delta = \poly(m)\cdot \poly(\eps,\delta,\gamma,\zeta,d/q)$. 
 \end{equation}
 The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar inequality.
 
-% ORPHAN: motivation for the first construction only; the final pasting proof proceeds through the second construction instead.
+% ORPHAN: This lemma is used only in the expository first construction
+% (sec:construction-numba-one), a motivational discussion of a discarded
+% approach.  The final pasting proof proceeds through the second construction
+% (sec:construction-numba-two) instead.  No formal proof node depends on
+% this lemma; it is an intentional island in the dependency graph.
 \begin{lemma}[A scalar inequality for the first construction]\label{lem:looks-easy-but-took-me-a-while}
 	\lean{MIPStarRE.LDT.Pasting.looksEasyButTookMeAWhile}
 	\leanok
