@@ -174,28 +174,28 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
     simpa [firstTerm, completePartSubMeas, postprocess_total] using
       switcherooAggregateFirstTerm_eq_leftSandwich params ψbi family M
   have hstep1 :=
-    switcherooAggregateFourthTerm_close_once_commuted_raw_local
+    switcherooAggregateFourthTerm_close_once_commuted_raw
       params ψbi hnorm family M chi hcomm
   have hstep2 :
-      |switcherooAggregateOnceCommutedRawLocal params ψbi family M -
-          switcherooAggregateMixedRawLocal params ψbi family M| ≤ Real.sqrt zeta := by
-    exact switcherooAggregateOnceCommutedRawLocal_close_mixedLocal
+      |switcherooAggregateOnceCommutedRaw params ψbi family M -
+          switcherooAggregateMixedRaw params ψbi family M| ≤ Real.sqrt zeta := by
+    exact switcherooAggregateOnceCommutedRaw_close_mixed
       params ψbi hnorm family M zeta hselfG
   have hstep3 :
-      |switcherooAggregateMixedRawLocal params ψbi family M -
-          switcherooAggregateLeftFrontRawLocal params ψbi family M| ≤ Real.sqrt zeta := by
-    exact switcherooAggregateMixedRawLocal_close_leftFrontRawLocal
+      |switcherooAggregateMixedRaw params ψbi family M -
+          switcherooAggregateLeftFrontRaw params ψbi family M| ≤ Real.sqrt zeta := by
+    exact switcherooAggregateMixedRaw_close_leftFrontRaw
       params ψbi hnorm family M zeta hselfG
   have hstep4 :=
     switcherooAggregateLeftFrontRaw_close_firstSplitRaw
       params ψbi hnorm family M chi hcomm
   have hstep5 :
-      switcherooAggregateFirstSplitRawLocal params ψbi family M =
+      switcherooAggregateFirstSplitRaw params ψbi family M =
         switcherooAggregateFirstTerm params ψbi family M := by
-    simpa [switcherooAggregateFirstSplitRawLocal, mul_assoc] using
-      switcherooAggregateFirstTerm_eq_split_by_g_local params ψbi family M
+    simpa [switcherooAggregateFirstSplitRaw, mul_assoc] using
+      switcherooAggregateFirstTerm_eq_split_by_g params ψbi family M
   have hstep5' :
-      |switcherooAggregateFirstSplitRawLocal params ψbi family M -
+      |switcherooAggregateFirstSplitRaw params ψbi family M -
           switcherooAggregateFirstTerm params ψbi family M| ≤ 0 := by
     rw [hstep5]
     simp
@@ -207,30 +207,30 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
       |switcherooAggregateFourthTerm params ψbi family M -
           switcherooAggregateFirstTerm params ψbi family M|
         ≤ |switcherooAggregateFourthTerm params ψbi family M -
-              switcherooAggregateOnceCommutedRawLocal params ψbi family M| +
-            |switcherooAggregateOnceCommutedRawLocal params ψbi family M -
-              switcherooAggregateMixedRawLocal params ψbi family M| +
-            |switcherooAggregateMixedRawLocal params ψbi family M -
-              switcherooAggregateLeftFrontRawLocal params ψbi family M| +
-            |switcherooAggregateLeftFrontRawLocal params ψbi family M -
-              switcherooAggregateFirstSplitRawLocal params ψbi family M| +
-            |switcherooAggregateFirstSplitRawLocal params ψbi family M -
+              switcherooAggregateOnceCommutedRaw params ψbi family M| +
+            |switcherooAggregateOnceCommutedRaw params ψbi family M -
+              switcherooAggregateMixedRaw params ψbi family M| +
+            |switcherooAggregateMixedRaw params ψbi family M -
+              switcherooAggregateLeftFrontRaw params ψbi family M| +
+            |switcherooAggregateLeftFrontRaw params ψbi family M -
+              switcherooAggregateFirstSplitRaw params ψbi family M| +
+            |switcherooAggregateFirstSplitRaw params ψbi family M -
               switcherooAggregateFirstTerm params ψbi family M| := by
               nlinarith [abs_sub_le
                 (switcherooAggregateFourthTerm params ψbi family M)
-                (switcherooAggregateOnceCommutedRawLocal params ψbi family M)
+                (switcherooAggregateOnceCommutedRaw params ψbi family M)
                 (switcherooAggregateFirstTerm params ψbi family M),
                 abs_sub_le
-                  (switcherooAggregateOnceCommutedRawLocal params ψbi family M)
-                  (switcherooAggregateMixedRawLocal params ψbi family M)
+                  (switcherooAggregateOnceCommutedRaw params ψbi family M)
+                  (switcherooAggregateMixedRaw params ψbi family M)
                   (switcherooAggregateFirstTerm params ψbi family M),
                 abs_sub_le
-                  (switcherooAggregateMixedRawLocal params ψbi family M)
-                  (switcherooAggregateLeftFrontRawLocal params ψbi family M)
+                  (switcherooAggregateMixedRaw params ψbi family M)
+                  (switcherooAggregateLeftFrontRaw params ψbi family M)
                   (switcherooAggregateFirstTerm params ψbi family M),
                 abs_sub_le
-                  (switcherooAggregateLeftFrontRawLocal params ψbi family M)
-                  (switcherooAggregateFirstSplitRawLocal params ψbi family M)
+                  (switcherooAggregateLeftFrontRaw params ψbi family M)
+                  (switcherooAggregateFirstSplitRaw params ψbi family M)
                   (switcherooAggregateFirstTerm params ψbi family M)]
       _ ≤ Real.sqrt chi + Real.sqrt zeta + Real.sqrt zeta + Real.sqrt chi + 0 := by
             nlinarith [hstep1, hstep2, hstep3, hstep4, hstep5']
