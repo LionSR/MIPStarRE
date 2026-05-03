@@ -216,6 +216,57 @@ private theorem filteredPolynomialOutcomeSum_le_one (params : Parameters)
     _ = T.total := T.sum_eq_total
     _ ≤ 1 := T.total_le_one
 
+/-- Operator-level fiberwise reindexing identity for the per-point sandwich
+operator: regrouping `Σ_h H^u_h` by the value `a = h(u)` and pulling the
+constant `A^u_a` factors through each fiber sum gives
+
+  `Σ_h H^u_h = Σ_a A^u_a · T_{[h(u) = a]} · A^u_a`,
+
+where `H^u_h = A^u_{h(u)} · T_h · A^u_{h(u)}` is
+`sandwichedPolynomialOutcomeOperatorAt` and the bracketed
+`T_{[h(u) = a]} = Σ_{h : h u = a} T_h` is the inner fiber sum.
+
+This is a purely algebraic regrouping (no input-consistency, SDP, or
+self-consistency hypotheses); it formalizes `eq:bracketize-the-expression` of
+`references/ldt-paper/self_improvement.tex`, lines 356--358 (mirrored at
+`blueprint/src/chapter/ch07_self_improvement.tex`, lines 110--113), at the
+operator level for a fixed point `u`. It is reused both by the
+`total_le_one` field of `sandwichedPolynomialSubMeasAt` and by the
+helper-stage bracketing identity in `Theorems/Results.lean`. -/
+theorem sandwichedPolynomialOutcomeOperatorAt_sum_eq_bracketed
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) (u : Point params) :
+    (∑ h : Polynomial params,
+        sandwichedPolynomialOutcomeOperatorAt params strategy T u h) =
+      ∑ a : Fq params,
+        (strategy.pointMeasurement u).outcome a *
+          (∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
+            T.outcome h) *
+          (strategy.pointMeasurement u).outcome a := by
+  classical
+  rw [show (∑ h : Polynomial params,
+              sandwichedPolynomialOutcomeOperatorAt params strategy T u h) =
+            ∑ a : Fq params,
+              ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
+                sandwichedPolynomialOutcomeOperatorAt params strategy T u h from by
+          simpa using (Finset.sum_fiberwise Finset.univ
+            (fun h : Polynomial params => h u)
+            (sandwichedPolynomialOutcomeOperatorAt params strategy T u)).symm]
+  refine Finset.sum_congr rfl ?_
+  intro a _
+  have hreplace :
+      ∀ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
+        sandwichedPolynomialOutcomeOperatorAt params strategy T u h =
+          (strategy.pointMeasurement u).outcome a *
+            T.outcome h *
+            (strategy.pointMeasurement u).outcome a := by
+    intro h hh
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hh
+    simp [sandwichedPolynomialOutcomeOperatorAt,
+      pointConditionedOutcomeOperatorAtPolynomial, hh]
+  rw [Finset.sum_congr rfl hreplace, ← Matrix.sum_mul, ← Matrix.mul_sum]
+
 /-- The pointwise sandwiched submeasurement `H^u = {H^u_h}`. -/
 noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
     [FieldModel params.q]
@@ -234,36 +285,16 @@ noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
       rfl
     total_le_one := by
       let Au := (strategy.pointMeasurement u)
-      -- Regroup by evaluation value a = h(u)
+      -- Regroup by evaluation value `a = h(u)` via the shared bracketing identity.
       calc
         ∑ h : Polynomial params, sandwichedPolynomialOutcomeOperatorAt params strategy T u h
           = ∑ a : Fq params,
-              ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
-                Au.toSubMeas.outcome a * T.outcome h * Au.toSubMeas.outcome a := by
-              rw [show ∑ h : Polynomial params,
-                    sandwichedPolynomialOutcomeOperatorAt params strategy T u h =
-                  ∑ a : Fq params,
-                    ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
-                      sandwichedPolynomialOutcomeOperatorAt params strategy T u h from by
-                simpa using (Finset.sum_fiberwise Finset.univ
-                  (fun h : Polynomial params => h u)
-                  (sandwichedPolynomialOutcomeOperatorAt params strategy T u)).symm]
-              refine Finset.sum_congr rfl ?_
-              intro a _
-              refine Finset.sum_congr rfl ?_
-              intro h hh
-              simp only [sandwichedPolynomialOutcomeOperatorAt,
-                pointConditionedOutcomeOperatorAtPolynomial]
-              simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hh
-              simp [Au, hh]
-        _ = ∑ a : Fq params,
               Au.toSubMeas.outcome a *
                 (∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
                   T.outcome h) *
-                Au.toSubMeas.outcome a := by
-              refine Finset.sum_congr rfl ?_
-              intro a _
-              rw [← Matrix.sum_mul, ← Matrix.mul_sum]
+                Au.toSubMeas.outcome a :=
+              sandwichedPolynomialOutcomeOperatorAt_sum_eq_bracketed
+                (ι := ι) params strategy T u
         _ ≤ ∑ a : Fq params, Au.toSubMeas.outcome a := by
               refine Finset.sum_le_sum ?_
               intro a _

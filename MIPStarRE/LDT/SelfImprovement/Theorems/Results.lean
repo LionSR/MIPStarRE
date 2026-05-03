@@ -461,45 +461,6 @@ theorem helper_mass_eq_avg_pointwise_sandwich_sum
                   (leftTensor (ι₂ := ι)
                     (sandwichedPolynomialOutcomeOperatorAt params strategy T u h)))]
 
-/-- Operator-level fiberwise reindexing identity for the per-point sandwich
-operator. Inside each fiber `{h : h u = a}` the inner `A^u_{h(u)}` is constant
-(equal to `A^u_a`), and `Matrix.sum_mul`/`Matrix.mul_sum` pull this constant
-factor through the sum over `T_h`. Mirrors the operator-level computation in
-`sandwichedPolynomialSubMeasAt.total_le_one`. -/
-private lemma sandwichedPolynomialOutcomeOperatorAt_sum_eq_bracketed
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (T : SubMeas (Polynomial params) ι) (u : Point params) :
-    (∑ h : Polynomial params,
-        sandwichedPolynomialOutcomeOperatorAt params strategy T u h) =
-      ∑ a : Fq params,
-        (strategy.pointMeasurement u).outcome a *
-          (∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
-            T.outcome h) *
-          (strategy.pointMeasurement u).outcome a := by
-  classical
-  rw [show (∑ h : Polynomial params,
-              sandwichedPolynomialOutcomeOperatorAt params strategy T u h) =
-            ∑ a : Fq params,
-              ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
-                sandwichedPolynomialOutcomeOperatorAt params strategy T u h from by
-          simpa using (Finset.sum_fiberwise Finset.univ
-            (fun h : Polynomial params => h u)
-            (sandwichedPolynomialOutcomeOperatorAt params strategy T u)).symm]
-  refine Finset.sum_congr rfl ?_
-  intro a _
-  have hreplace :
-      ∀ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
-        sandwichedPolynomialOutcomeOperatorAt params strategy T u h =
-          (strategy.pointMeasurement u).outcome a *
-            T.outcome h *
-            (strategy.pointMeasurement u).outcome a := by
-    intro h hh
-    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hh
-    simp [sandwichedPolynomialOutcomeOperatorAt,
-      pointConditionedOutcomeOperatorAtPolynomial, hh]
-  rw [Finset.sum_congr rfl hreplace, ← Matrix.sum_mul, ← Matrix.mul_sum]
-
 /-- Per-point bracketing identity for the helper-stage left-tensor mass.
 
 Fiberwise reindexing by `h ↦ h(u)` and pulling `A^u_a · _ · A^u_a` through the
