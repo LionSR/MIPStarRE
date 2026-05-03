@@ -2762,6 +2762,62 @@ noncomputable def AnswerPerSliceInductionPackage.ofRecursion
       pointConsistency := fun x => (hslice x).1
       error_le := fun x => (hslice x).2 }
 
+/-- Build an answer-valued per-slice induction package from exact
+main-induction conclusions for the answer-restricted slices.
+
+This is the package form of the paper's invocation of the induction hypothesis in
+`inductive_step.tex`, lines 441--454.  The hypotheses already have the exact
+restricted-profile `mainInductionError` bound, so the proof only records those
+witnesses in the `AnswerPerSliceInductionPackage` structure. -/
+noncomputable def AnswerPerSliceInductionPackage.ofMainInductionConclusions
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma)
+    (hinduction :
+      ∀ x,
+        AnswerMainInductionConclusion params
+          (xRestrictedAnswerSymStrat params strategy x)
+          (restrictionPkg.profile.axisParallel x)
+          (restrictionPkg.profile.selfConsistency x)
+          (restrictionPkg.profile.diagonal x)
+          k) :
+    AnswerPerSliceInductionPackage params strategy eps delta gamma restrictionPkg k := by
+  refine AnswerPerSliceInductionPackage.ofRecursion params strategy eps delta gamma k
+    restrictionPkg ?_
+  intro x
+  rcases hinduction x with ⟨G, hG⟩
+  refine ⟨_, G, hG, le_rfl⟩
+
+/-- Build an answer-valued per-slice induction package from a predecessor
+answer-valued main-induction hypothesis.
+
+The restriction package already records that every `xRestrictedAnswerSymStrat`
+is good with the slice profile.  The large-`k` side condition is the predecessor
+side condition `400 * params.m * params.d ≤ k`, matching the application of the
+induction hypothesis in `inductive_step.tex`, lines 441--442. -/
+noncomputable def AnswerPerSliceInductionPackage.ofMainInductionHypothesis
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma)
+    (hinduction : AnswerMainInductionHypothesis params)
+    (hd : 0 < params.d)
+    (hk_pos : 1 ≤ k)
+    (hk : 400 * params.m * params.d ≤ k) :
+    AnswerPerSliceInductionPackage params strategy eps delta gamma restrictionPkg k :=
+  AnswerPerSliceInductionPackage.ofMainInductionConclusions params strategy eps delta gamma k
+    restrictionPkg fun x =>
+      hinduction ι (xRestrictedAnswerSymStrat params strategy x)
+        (restrictionPkg.profile.axisParallel x)
+        (restrictionPkg.profile.selfConsistency x)
+        (restrictionPkg.profile.diagonal x)
+        k hd (restrictionPkg.profile.restrictedGood x) hk_pos hk
+
 /-- View an answer-valued per-slice induction package as a legacy package after
 forgetting the answer-valued restriction boundary.
 
