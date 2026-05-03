@@ -56,12 +56,14 @@ We note that \ref{eq:local-variance-of-points-equation} is equivalent to the sta
 	24\left(\eps+\delta+\frac{md}{q}\right).
 	\label{eq:equivalent-local-variance}
 \end{equation}
+\lean{MIPStarRE.LDT.GlobalVariance.localVarianceDeviation_sum_le_localVarianceOfPointsError}
+\leanok
 This can be viewed as a local-variance bound for the point measurements.
 
-\begin{remark}[Polynomial-sum formalization inputs for \ref{eq:equivalent-local-variance}]\label{rem:equivalent-local-variance-formalization-inputs}
+\begin{remark}[Polynomial-sum formalization for \ref{eq:equivalent-local-variance}]\label{rem:equivalent-local-variance-formalization-inputs}
 	\lean{MIPStarRE.LDT.GlobalVariance.axisParallelBaseEventApproximation_weighted_sample_sum, MIPStarRE.LDT.GlobalVariance.axisParallelPointLineConsistency_weighted_leftToRightLineQuestion_sum, MIPStarRE.LDT.GlobalVariance.axisParallelPointLineConsistency_weighted_rightToLeftLineQuestion_sum}
 	\uses{lem:local-variance-of-points, lem:generalize-b}
-	The three referenced declarations are formalization-only auxiliary lemmas, not named statements of the paper. They are the polynomial-sum (cardinality-free) endpoints corresponding to the two $\approx_{2\eps}$ axis-parallel point/line consistency steps in the per-$g$ chain of Lemma \ref{lem:local-variance-of-points}, oriented with the line event on the left register, and they are the inputs from which a polynomial-sum chain proving \ref{eq:equivalent-local-variance} directly is to be obtained. The chain itself is not yet formalized, so the equation above does not carry its own \texttt{\textbackslash leanok} marker.
+	The three referenced declarations and the one attached to \eqref{eq:equivalent-local-variance} above together provide the full polynomial-sum (cardinality-free) chain proving the equation.  The chain assembly lemma \texttt{localVarianceDeviation\_sum\_le\_localVarianceOfPointsError} telescopes the six operator differences via \texttt{ev\_sum\_conjTranspose\_mul\_sum\_le}, sums over~$g$, and applies the six individual \texttt{\_sum} bounds (including the reverse~\texttt{generalizeB} sum) to avoid the per-polynomial cardinality blow-up.
 \end{remark}
 
 \begin{lemma}[Global variance of the points measurements]\label{lem:global-variance-of-points}
