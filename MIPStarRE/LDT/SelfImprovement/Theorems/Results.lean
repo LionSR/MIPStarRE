@@ -1017,6 +1017,144 @@ lemma add_in_u_cs_chain_q3_q4_le_sqrt_of_factor_bounds
               globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
           hsqrt_D₂
 
+/-- Sqrt-monotonicity transit lemma used by the two GlobalVariance endpoint
+bridges below: a real bounded by `Real.sqrt s` is bounded by `Real.sqrt ζ`
+whenever `s ≤ ζ`. Both `Q₂→Q₃` and `Q₃→Q₄` apply this fact with the same `s`
+(the summed `globalVarianceDeviationAtPolynomial`). -/
+private lemma le_sqrt_of_le_sqrt_of_le {a : ℝ} {s ζ : Error}
+    (hcs : a ≤ Real.sqrt s) (hsum : s ≤ ζ) : a ≤ Real.sqrt ζ :=
+  le_trans hcs (Real.sqrt_le_sqrt hsum)
+
+/-- The global-variance sum bound upgrades the raw Cauchy--Schwarz estimate for
+the first global-variance replacement step into the displayed `sqrt ζ` bound.
+
+This is the variance-use fragment of `eq:change-one` in
+`references/ldt-paper/self_improvement.tex`, lines 299--318. The hypothesis
+`hcs` is the Cauchy--Schwarz estimate `eq:change-one-cauchy-schwarz`
+(lines 306--311) **after** the second-square-root has been bounded by `1`
+using `(A^v_{h(v)})² ≤ I` and the fact that `T` is a measurement
+(lines 312--316, 318); concretely, the right-hand side is the summed
+`globalVarianceDeviationAtPolynomial` (the displayed first-square-root
+content). This lemma applies only the remaining `≤ ζ_variance` step from
+`lem:global-variance-of-points` (line 317) via sqrt-monotonicity. -/
+lemma add_in_u_cs_chain_q2_q3_le_sqrt_of_globalVarianceDeviation_sum_le
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι)
+    {ζ : Error}
+    (hglobal :
+      (∑ g : Polynomial params,
+        globalVarianceDeviationAtPolynomial params strategy strategy.state T g) ≤ ζ)
+    (hcs :
+      |addInUCSChainQ2 params strategy T - addInUCSChainQ3 params strategy T| ≤
+        Real.sqrt
+          (∑ g : Polynomial params,
+            globalVarianceDeviationAtPolynomial params strategy strategy.state T g)) :
+    |addInUCSChainQ2 params strategy T - addInUCSChainQ3 params strategy T| ≤
+      Real.sqrt ζ :=
+  le_sqrt_of_le_sqrt_of_le hcs hglobal
+
+/-- The global-variance sum bound upgrades the raw Cauchy--Schwarz estimate for
+the second global-variance replacement step into the displayed `sqrt ζ` bound.
+
+This is the variance-use fragment of `eq:change-another` in
+`references/ldt-paper/self_improvement.tex`, lines 319--340. The hypothesis
+`hcs` is the Cauchy--Schwarz estimate of lines 326--332 **after** the
+first-square-root has been bounded by `1` using `(A^u_{h(u)})² ≤ I` and the
+fact that `T` is a measurement (lines 333--338); concretely, the right-hand
+side is the summed `globalVarianceDeviationAtPolynomial` (the displayed
+second-square-root content, equal to the first-square-root term of
+`eq:change-one-cauchy-schwarz` per line 340). This lemma applies only the
+remaining `≤ ζ_variance` step (line 340) via sqrt-monotonicity. -/
+lemma add_in_u_cs_chain_q3_q4_le_sqrt_of_globalVarianceDeviation_sum_le
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι)
+    {ζ : Error}
+    (hglobal :
+      (∑ g : Polynomial params,
+        globalVarianceDeviationAtPolynomial params strategy strategy.state T g) ≤ ζ)
+    (hcs :
+      |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T| ≤
+        Real.sqrt
+          (∑ g : Polynomial params,
+            globalVarianceDeviationAtPolynomial params strategy strategy.state T g)) :
+    |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T| ≤
+      Real.sqrt ζ :=
+  le_sqrt_of_le_sqrt_of_le hcs hglobal
+
+/-- Combined Step 3/4 variance bridge for the projection-simplified add-in-u
+Cauchy--Schwarz chain.
+
+Given the two raw Cauchy--Schwarz estimates against the summed
+independent-points deviation and a GlobalVariance sum bound, this produces the
+two `sqrt ζ` absolute-difference bounds needed by
+`add_in_u_simplified_transfer_of_cs_chain`. It deliberately does not assemble
+the final transfer, so the remaining self-consistency steps and arithmetic
+absorption stay separate. -/
+lemma add_in_u_cs_chain_global_variance_steps_of_sum_bound
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι)
+    {ζ : Error}
+    (hglobal :
+      (∑ g : Polynomial params,
+        globalVarianceDeviationAtPolynomial params strategy strategy.state T g) ≤ ζ)
+    (h23cs :
+      |addInUCSChainQ2 params strategy T - addInUCSChainQ3 params strategy T| ≤
+        Real.sqrt
+          (∑ g : Polynomial params,
+            globalVarianceDeviationAtPolynomial params strategy strategy.state T g))
+    (h34cs :
+      |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T| ≤
+        Real.sqrt
+          (∑ g : Polynomial params,
+            globalVarianceDeviationAtPolynomial params strategy strategy.state T g)) :
+    |addInUCSChainQ2 params strategy T - addInUCSChainQ3 params strategy T| ≤
+        Real.sqrt ζ ∧
+      |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T| ≤
+        Real.sqrt ζ := by
+  exact
+    ⟨add_in_u_cs_chain_q2_q3_le_sqrt_of_globalVarianceDeviation_sum_le
+        params strategy T hglobal h23cs,
+      add_in_u_cs_chain_q3_q4_le_sqrt_of_globalVarianceDeviation_sum_le
+        params strategy T hglobal h34cs⟩
+
+/-- Local-variance-sum version of the combined Step 3/4 variance bridge.
+
+This consumes the expected output of the local-variance normalization step
+(`expansion.tex`, lines 317--321) through
+`globalVarianceDeviation_sum_le_of_localVarianceDeviation_sum_le`, then applies
+the combined Step 3/4 bridge above. -/
+lemma add_in_u_cs_chain_global_variance_steps_of_local_sum_bound
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (T : SubMeas (Polynomial params) ι)
+    (hlocal :
+      (∑ g : Polynomial params,
+        localVarianceDeviationAtPolynomial params strategy strategy.state T g) ≤
+        localVarianceOfPointsError params eps delta)
+    (h23cs :
+      |addInUCSChainQ2 params strategy T - addInUCSChainQ3 params strategy T| ≤
+        Real.sqrt
+          (∑ g : Polynomial params,
+            globalVarianceDeviationAtPolynomial params strategy strategy.state T g))
+    (h34cs :
+      |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T| ≤
+        Real.sqrt
+          (∑ g : Polynomial params,
+            globalVarianceDeviationAtPolynomial params strategy strategy.state T g)) :
+    |addInUCSChainQ2 params strategy T - addInUCSChainQ3 params strategy T| ≤
+        Real.sqrt (globalVarianceOfPointsError params eps delta) ∧
+      |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T| ≤
+        Real.sqrt (globalVarianceOfPointsError params eps delta) := by
+  exact add_in_u_cs_chain_global_variance_steps_of_sum_bound
+    params strategy T
+    (globalVarianceDeviation_sum_le_of_localVarianceDeviation_sum_le
+      params strategy eps delta T hlocal)
+    h23cs h34cs
+
 /-- Assemble the projection-simplified scalar transfer from the four scalar
 chain moves. The analytic work remains exactly the four bounds
 `Q₀ ≈ Q₁`, `Q₁ ≈ Q₂`, `Q₂ ≈ Q₃`, and `Q₃ ≈ Q₄`, plus the final arithmetic
