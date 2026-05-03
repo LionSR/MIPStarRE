@@ -569,7 +569,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \end{definition}
 
 \begin{lemma}[Strong self-consistency implies ordinary self-consistency]\label{prop:other-two-notions-of-self-consistency}
-	\lean{MIPStarRE.LDT.Preliminaries.otherTwoNotionsOfSelfConsistency}
+	\lean{MIPStarRE.LDT.Preliminaries.otherTwoNotionsOfSelfConsistency, MIPStarRE.LDT.Preliminaries.bipartiteSSCRel_iff_consRel_self_measurement}
 	\leanok
 	\uses{def:strong-self-consistency, def:simeq}
 	If $A$ is $\delta$-strongly self-consistent, then $A_a^x \ot I \simeq_\delta I \ot A_a^x$. If $A$ is a measurement, the converse also holds.
@@ -577,6 +577,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \begin{proof}
 	\leanok
 	Rewrite the off-diagonal mass as the difference between the total mass of $A$ and the diagonal overlap in the strong self-consistency inequality.
+	When $A$ is a full measurement, the total mass is the identity, so this inequality becomes an equality; hence the ordinary self-consistency defect and the strong self-consistency defect coincide, giving the converse.
 \end{proof}
 
 \begin{lemma}[Strong self-consistency and state-dependent distance]\label{prop:two-notions-of-self-consistency}
