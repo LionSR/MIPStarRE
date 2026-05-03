@@ -24,20 +24,6 @@ identity `∑_f B^ℓ_f = B^ℓ.total` and the polynomial submeasurement normali
 and lines 317-321 (`eq:equivalent-local-variance`).
 -/
 
-/-- Positivity of the tensor mass appearing in the line-collision expansion. -/
-private lemma generalizeBLineCollisionTensorMass_nonneg
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (G : SubMeas (Polynomial params) ι)
-    (g : Polynomial params) (ℓ : AxisParallelLine params) (f : AxisLinePolynomial params) :
-    0 ≤ ev strategy.state (opTensor ((strategy.axisParallelMeasurement ℓ).toSubMeas.outcome f)
-      (G.outcome g)) := by
-  simpa [leftTensor_mul_rightTensor_eq_opTensor] using
-    ev_leftTensor_mul_rightTensor_nonneg strategy.state
-      ((strategy.axisParallelMeasurement ℓ).toSubMeas.outcome_pos f)
-      (G.outcome_pos g)
-
 /-- Polynomial-sum analogue of
 `generalizeBLineCollisionTensorMass_sum_le_one`.
 
@@ -117,36 +103,6 @@ private lemma generalizeBLineCollisionTensorMass_polysum_le_one
                   opTensor_le_leftTensor (SubMeas.total_nonneg B) G.total_le_one
               _ ≤ 1 := leftTensor_le_one (ι₂ := ι) B.total_le_one
     _ = 1 := ev_one_of_isNormalized strategy.state strategy.isNormalized
-
-/-- Schwartz--Zippel coefficient bound for a fixed polynomial, line, and line answer. -/
-private lemma generalizeBLineCollisionCoefficient_le
-    (params : Parameters)
-    [FieldModel params.q]
-    (g : Polynomial params) (ℓ : AxisParallelLine params) (f : AxisLinePolynomial params) :
-    avgOver (uniformDistribution (Fq params))
-      (fun t =>
-        if f t = (Polynomial.restrictToAxisParallelLine params g ℓ) t ∧
-            f.poly ≠ (Polynomial.restrictToAxisParallelLine params g ℓ).poly then
-          (1 : Error)
-        else 0) ≤ generalizeBError params := by
-  classical
-  let h := Polynomial.restrictToAxisParallelLine params g ℓ
-  let δ := generalizeBError params
-  have hδ_nonneg : 0 ≤ δ := by
-    dsimp [δ, generalizeBError]
-    positivity
-  by_cases hneq : f.poly ≠ h.poly
-  · have hline := axisLinePolynomialAgreement_avg_le_mdq params f h hneq
-    simpa [h, δ, generalizeBError, hneq] using hline
-  · rw [show
-        avgOver (uniformDistribution (Fq params))
-          (fun t =>
-            if f t = (Polynomial.restrictToAxisParallelLine params g ℓ) t ∧
-                f.poly ≠ (Polynomial.restrictToAxisParallelLine params g ℓ).poly then
-              (1 : Error)
-            else 0) = 0 by
-          simpa [h, hneq] using (avgOver_zero (uniformDistribution (Fq params)))]
-    exact hδ_nonneg
 
 /-- Polynomial-sum analogue of `generalizeBLineCollisionExpansion_le_error`.
 
