@@ -822,22 +822,6 @@ lemma two_sqrt_two_delta_add_two_sqrt_selfImprovementVarianceError_le_addInUErro
       (two_mul_delta_le_selfImprovementVarianceError params eps delta hε hδ)
   simpa [addInUError, Real.sqrt_eq_rpow] using hbase
 
-/-- Four-term form of the `addInUError` absorption, matching the side condition
-of `add_in_u_simplified_transfer_of_cs_chain`. -/
-lemma four_term_selfImprovementVarianceError_le_addInUError
-    (params : Parameters)
-    [FieldModel params.q]
-    (eps delta : Error)
-    (hε : 0 ≤ eps) (hδ : 0 ≤ delta) :
-    Real.sqrt (2 * delta) + Real.sqrt (2 * delta) +
-        Real.sqrt (selfImprovementVarianceError params eps delta) +
-        Real.sqrt (selfImprovementVarianceError params eps delta) ≤
-      addInUError params eps delta := by
-  have htwo :=
-    two_sqrt_two_delta_add_two_sqrt_selfImprovementVarianceError_le_addInUError
-      params eps delta hε hδ
-  linarith
-
 /-- Wrapper composing `add_in_u_simplified_transfer_of_cs_chain` with the
 arithmetic absorption: when the four chain step bounds have the paper-faithful
 shapes `√(2 δ)`, `√(2 δ)`, `√(ζ_variance)`, `√(ζ_variance)`, the
@@ -869,14 +853,21 @@ lemma add_in_u_simplified_transfer_of_cs_chain_sqrt_form
         ∑ h : Polynomial params,
           ev strategy.state
             (opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
-              (T.outcome h)))| ≤ addInUError params eps delta :=
-  add_in_u_simplified_transfer_of_cs_chain params strategy eps delta T
+              (T.outcome h)))| ≤ addInUError params eps delta := by
+  have hsum :
+      Real.sqrt (2 * delta) + Real.sqrt (2 * delta) +
+          Real.sqrt (selfImprovementVarianceError params eps delta) +
+          Real.sqrt (selfImprovementVarianceError params eps delta) ≤
+        addInUError params eps delta := by
+    have htwo :=
+      two_sqrt_two_delta_add_two_sqrt_selfImprovementVarianceError_le_addInUError
+        params eps delta hε hδ
+    linarith
+  exact add_in_u_simplified_transfer_of_cs_chain params strategy eps delta T
     (Real.sqrt (2 * delta)) (Real.sqrt (2 * delta))
     (Real.sqrt (selfImprovementVarianceError params eps delta))
     (Real.sqrt (selfImprovementVarianceError params eps delta))
-    h01 h12 h23 h34
-    (four_term_selfImprovementVarianceError_le_addInUError
-      params eps delta hε hδ)
+    h01 h12 h23 h34 hsum
 
 /-- Specialization of `selfConsistencyDiagonalAddInU_of_transfer` to the
 projection-simplified scalar transfer hypothesis.
