@@ -20,6 +20,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+/-- Turn a postprocessed submeasurement from a measurement into a measurement. -/
 noncomputable def postprocessMeasurement
     {α β : Type*} {ι : Type*}
     [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
