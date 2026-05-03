@@ -466,14 +466,14 @@
   <span class="equation_label">2</span>
 </p>
 </div>
-<p> This can be viewed as a local-variance bound for the point measurements. </p>
+<p>  This can be viewed as a local-variance bound for the point measurements. </p>
 <div class="remark_thmwrapper theorem-style-remark" id="rem:equivalent-local-variance-formalization-inputs">
   <div class="remark_thmheading">
     <span class="remark_thmcaption">
     Remark
     </span>
     <span class="remark_thmlabel">6.3</span>
-    <span class="remark_thmtitle">Polynomial-sum formalization inputs for <a href="sec-variance.html#eq:equivalent-local-variance">2</a></span>
+    <span class="remark_thmtitle">Polynomial-sum formalization for <a href="sec-variance.html#eq:equivalent-local-variance">2</a></span>
     <div class="thm_header_extras">
 
         </div>
@@ -525,7 +525,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>   The three referenced declarations are formalization-only auxiliary lemmas, not named statements of the paper. They are the polynomial-sum (cardinality-free) endpoints corresponding to the two \(\approx _{2\varepsilon }\) axis-parallel point/line consistency steps in the per-\(g\) chain of Lemma <a href="sec-variance.html#lem:local-variance-of-points">6.2</a>, oriented with the line event on the left register, and they are the inputs from which a polynomial-sum chain proving <a href="sec-variance.html#eq:equivalent-local-variance">2</a> directly is to be obtained. The chain itself is not yet formalized, so the equation above does not carry its own <span class="ttfamily">\leanok</span> marker. </p>
+  <p>   The three referenced declarations and the one attached to <a href="sec-variance.html#eq:equivalent-local-variance" class="eqref">2</a> above together provide the full polynomial-sum (cardinality-free) chain proving the equation. The chain assembly lemma <span class="ttfamily">localVarianceDeviation_sum_le_localVarianceOfPointsError</span> telescopes the six operator differences via <span class="ttfamily">ev_sum_conjTranspose_mul_sum_le</span>, sums over&#160;\(g\), and applies the six individual <span class="ttfamily">_sum</span> bounds (including the reverse&#160;<span class="ttfamily">generalizeB</span> sum) to avoid the per-polynomial cardinality blow-up. </p>
 
   </div>
 </div>
