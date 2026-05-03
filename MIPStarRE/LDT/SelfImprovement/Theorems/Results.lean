@@ -1456,9 +1456,9 @@ theorem helperAgreementOperatorAtPoint_eq_sum_polynomial
         (evaluateAt params u H).outcome a =
           ∑ h ∈ Finset.univ.filter
               (fun h : Polynomial params => h u = a), H.outcome h := by
-      simp only [evaluateAt, postprocess, Finset.sum_filter]
-      refine Finset.sum_congr rfl (fun h _ => ?_)
-      congr 1
+      ext i j
+      simp only [evaluateAt, postprocess]
+      convert rfl
     rw [hev]
   rw [hexpand]
   calc
