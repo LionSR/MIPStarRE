@@ -126,6 +126,7 @@ import MIPStarRE.LDT.Pasting.SwitcherooCompletion.Expansion
 import MIPStarRE.LDT.Pasting.SwitcherooCompletion.SecondTerm
 import MIPStarRE.LDT.Pasting.SwitcherooCompletion
 import MIPStarRE.LDT.Pasting.SwitcherooCompletion.CompletePart
+import MIPStarRE.LDT.Pasting.SwitcherooCompletion.Utilities
 import MIPStarRE.LDT.Pasting.CommutingWithG
 import MIPStarRE.LDT.Pasting.GHatFacts
 import MIPStarRE.LDT.Pasting.BridgeLemmas
