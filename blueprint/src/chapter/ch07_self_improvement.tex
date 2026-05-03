@@ -280,7 +280,20 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \[
     \bra{\psi} Z \ot I \ket{\psi} -\E_{u} \sum_a \bra{\psi}  A^{u}_{a} \ot H_{[h(u)=a]} \ket{\psi}.
   \]
-  Reindexing the sum by~$h$, inserting $\sum_a A_a^u=I$, and using~\eqref{eq:explicit-bound-for-A-consistency},
+  The reindexing of the sum by~$h$ is the algebraic identity
+  \lean{MIPStarRE.LDT.SelfImprovement.helperAgreementOperatorAtPoint_eq_sum_polynomial}
+  \leanok
+  \[
+    \sum_a A^u_a \ot H_{[h(u)=a]} = \sum_h A^u_{h(u)} \ot H_h,
+  \]
+  whose averaged scalar form reads
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_agreement_average_ev_eq_polynomial_sum}
+  \leanok
+  \[
+    \E_u \sum_a \bra{\psi}\,A^u_a \ot H_{[h(u)=a]}\,\ket{\psi}
+      = \E_u \sum_h \bra{\psi}\,A^u_{h(u)} \ot H_h\,\ket{\psi}.
+  \]
+  Combined with $\sum_a A_a^u=I$ and~\eqref{eq:explicit-bound-for-A-consistency} this gives
   \[
     \bra{\psi} Z \ot I \ket{\psi}
     -\E_{u} \sum_a \bra{\psi}  A^{u}_{a} \ot H_{[h(u)=a]} \ket{\psi}
