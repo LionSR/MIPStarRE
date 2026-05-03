@@ -200,6 +200,35 @@ private theorem selfImprovementHelperError_eq
   rw [selfImprovementHelperError,
     sum_sqrt_eq_sum_rpow_half eps delta ((params.d : Error) / (params.q : Error))]
 
+/-- The helper-stage threshold is nonnegative for nonnegative `eps` and `delta`.
+
+This is the basic positivity fact reused by the helper-stage absorption wrappers
+and by the final-stage comparison with `selfImprovementError`. -/
+theorem selfImprovementHelperError_nonneg
+    (params : Parameters) [FieldModel params.q]
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta) :
+    0 ≤ selfImprovementHelperError params eps delta := by
+  have hdq_nn : (0 : Error) ≤ ((params.d : Error) / (params.q : Error)) :=
+    d_q_ratio_nonneg params
+  change (0 : Error) ≤ 100 * (params.m : Error) *
+      (Real.rpow eps (1 / (2 : Error)) +
+        Real.rpow delta (1 / (2 : Error)) +
+        Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2 : Error)))
+  have hcoef_nn : (0 : Error) ≤ 100 * (params.m : Error) := by positivity
+  have hsum_nn :
+      (0 : Error) ≤ Real.rpow eps (1 / (2 : Error)) +
+          Real.rpow delta (1 / (2 : Error)) +
+          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2 : Error)) := by
+    have heps_nn : 0 ≤ Real.rpow eps (1 / (2 : Error)) := Real.rpow_nonneg heps _
+    have hdelta_nn : 0 ≤ Real.rpow delta (1 / (2 : Error)) :=
+      Real.rpow_nonneg hdelta _
+    have hdq_rpow_nn :
+        0 ≤ Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2 : Error)) :=
+      Real.rpow_nonneg hdq_nn _
+    exact add_nonneg (add_nonneg heps_nn hdelta_nn) hdq_rpow_nn
+  exact mul_nonneg hcoef_nn hsum_nn
+
 /-- Helper-stage point-consistency absorption (`self_improvement.tex`,
 lines 438--443).
 
@@ -530,23 +559,8 @@ theorem selfImprovementHelperError_le_selfImprovementError
   have h30 :=
     thirty_selfImprovementHelperError_le_selfImprovementError params eps delta
       heps heps_le_one hdelta hdelta_le_one hd_le_q
-  have hhelper_nn : 0 ≤ selfImprovementHelperError params eps delta := by
-    have hmnn : (0 : Error) ≤ (params.m : Error) := m_cast_nonneg params
-    have hdq_nn : (0 : Error) ≤ ((params.d : Error) / (params.q : Error)) :=
-      d_q_ratio_nonneg params
-    have hsum_nn :
-        (0 : Error) ≤ Real.rpow eps (1 / (2 : Error)) +
-            Real.rpow delta (1 / (2 : Error)) +
-            Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2 : Error)) := by
-      have h1 := Real.rpow_nonneg heps (1 / (2 : Error))
-      have h2 := Real.rpow_nonneg hdelta (1 / (2 : Error))
-      have h3 := Real.rpow_nonneg hdq_nn (1 / (2 : Error))
-      simpa [Real.rpow_eq_pow] using add_nonneg (add_nonneg h1 h2) h3
-    change (0 : Error) ≤ 100 * (params.m : Error) *
-        (Real.rpow eps (1 / (2 : Error)) +
-          Real.rpow delta (1 / (2 : Error)) +
-          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2 : Error)))
-    positivity
+  have hhelper_nn : 0 ≤ selfImprovementHelperError params eps delta :=
+    selfImprovementHelperError_nonneg params eps delta heps hdelta
   linarith
 
 end MIPStarRE.LDT.SelfImprovement
