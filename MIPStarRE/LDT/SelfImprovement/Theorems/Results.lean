@@ -922,15 +922,15 @@ theorem helper_boundedness_gap_transport_through_data_processing
 
 If the SDP dual witness dominates the identity, then every projective
 submeasurement output is bounded by its left placement: `H.total ≤ 1 ≤ Z`.
-Consequently the boundedness error is zero, and hence is below any nonnegative
-error threshold. This is a standalone producer; it does not alter the current
+The same identity domination also gives the positivity of `Z`. Consequently
+the boundedness error is zero, and hence is below any nonnegative error
+threshold. This is a standalone producer; it does not alter the current
 `FinalFieldsInput` interface. -/
 theorem final_fields_bounded
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (H : ProjSubMeas (Polynomial params) ι)
     (Z : MIPStarRE.Quantum.Op ι)
-    (hPSD : 0 ≤ Z)
     (hOne : (1 : MIPStarRE.Quantum.Op ι) ≤ Z)
     {ε : Error}
     (hε : 0 ≤ ε) :
@@ -942,6 +942,7 @@ theorem final_fields_bounded
       upperBound := ?_ }
   · have : leftTensor (ι₂ := ι) Z = opTensor Z (1 : MIPStarRE.Quantum.Op ι) := rfl
     rw [this]
+    have hPSD : 0 ≤ Z := le_trans (op_one_nonneg (d := ι)) hOne
     exact opTensor_nonneg hPSD op_one_nonneg
   · have hHle : H.toSubMeas.total ≤ Z :=
       le_trans H.toSubMeas.total_le_one hOne
