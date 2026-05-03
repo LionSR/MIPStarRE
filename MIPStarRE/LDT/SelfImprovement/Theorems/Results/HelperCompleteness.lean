@@ -8,10 +8,36 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
 
 /-!
-# HelperCompleteness
+# Helper completeness and SDP bridge
 
-Split leaf from `Results.lean` (Refs #1127, #1114).
+Input-consistency lower bounds, SDP dual feasibility, helper-mass
+identities, and the reduced `sdp` and `addInU` wrappers.
+
+## Contents
+
+- **input_consistency_match_mass_lower_bound** — the incoming `ConsRel`
+  gives `1 - nu ≤ avgOver matchMass` (paper lines 407–414).
+- **input_match_mass_eq_sdp_overlap** — reindex the averaged overlap as
+  `Σ_g ⟨ψ, A_g ⊗ G_g⟩` (paper lines 410–411).
+- **sdp_overlap_le_dual_mass** — dual feasibility upper-bounds the SDP
+  overlap by `⟨ψ, Z ⊗ I ψ⟩` (paper lines 408–410).
+- **input_consistency_dual_mass_lower_bound** — the combined lower bound
+  `1 - nu ≤ ev ψ (leftTensor Z)` (paper lines 406–412).
+- **helper_mass_eq_avg_pointwise_sandwich_sum** — exact Ĥ reindexing for
+  the helper-stage left-tensor mass (paper lines 354–356).
+- **helper_pointwise_sandwich_sum_eq_bracketed** / **helper_mass_eq_avg_pointwise_bracketed_sum** —
+  fiberwise bracketing identity (paper lines 356–358).
+- **sdp** — reduced wrapper instantiating the paper's SDP primal/dual
+  witnesses.
+- **addInU** — reduced wrapper for `AddInUStatement` from the
+  global-variance transport chain.
+
+## References
+
+- `references/ldt-paper/self_improvement.tex` lines 354–468
+- `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
 
 namespace MIPStarRE.LDT.SelfImprovement
 

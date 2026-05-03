@@ -9,10 +9,41 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness
 
 /-!
-# SelfImprovementTop
+# Self-improvement theorem wrappers and final-fields producers
 
-Split leaf from `Results.lean` (Refs #1127, #1114).
+The main `selfImprovementHelper` and `selfImprovement` theorems,
+bridge-input variants, and the final-fields completeness and
+self-closeness producers.
+
+## Contents
+
+- **selfImprovementHelper** — reduced helper producing `T`, `Ĥ`, `Z` and
+  `SelfImprovementHelperConclusion` from `sdp` + `addInU`.
+- **selfImprovement** — `thm:self-improvement`: assembles the full
+  pipeline (helper SSC → orthonormalization → data processing →
+  final fields) to produce `SelfImprovementConclusion`.
+- **selfImprovementFromSubMeas / selfImprovementFromBridgeInputs /
+  selfImprovementFromBridgeInputsSubMeas** — bridge-input variants for
+  submeasurement and packaged-bridge interfaces.
+- **completeness_transport_through_orthonormalization** — generic
+  transport lifting `completenessTransferSelfConsistentA` to the
+  `Unit`-indexed constant-family setting.
+- **final_fields_completeness_of_helper_completeness** — derives the
+  `completeness` field of `SelfImprovementFinalFields` from the
+  helper-stage completeness lower bound (paper lines 351–414, 713–717).
+- **self_closeness_transport_through_orthonormalization** — generic
+  three-step triangle transport `H.liftLeft → Ĥ.liftLeft → Ĥ.liftRight →
+  H.liftRight` for self-closeness.
+- **final_fields_self_closeness** — derives the `selfCloseness` field of
+  `SelfImprovementFinalFields` from already-supplied helper SSC and
+  orthonormalization SDD (paper lines 727–741).
+
+## References
+
+- `references/ldt-paper/self_improvement.tex`
+- `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
 
 namespace MIPStarRE.LDT.SelfImprovement
 

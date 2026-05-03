@@ -8,10 +8,38 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
 
 /-!
-# AddInUDiagonalAndDefs
+# Diagonal add-in-u specialization and CS chain definitions
 
-Split leaf from `Results.lean` (Refs #1127, #1114).
+The diagonal selection `selfConsistencyAddInUSelection`, projective
+collapse of the diagonal add-in-u right side, and the Q₀–Q₄ scalar
+chain definitions with endpoint lemmas.
+
+## Contents
+
+- **selfConsistencyAddInUSelection** — the diagonal selection
+  `S_u = {(h, h)}` for the strong-self-consistency application of
+  `lem:add-in-u` (paper lines 459–468).
+- **addInULeftQuantity_selfConsistencySelection_eq_matchMass** — the
+  left side equals the diagonal bipartite match mass of Ĥ.
+- **addInURightQuantity_selfConsistencySelection_eq_release** — the
+  right side is the "release-the-kraken" expression.
+- **addInURightQuantity_selfConsistencySelection_eq_simplified** —
+  projective collapse of the right side using `proj_outer_sandwich_eq`.
+- **selfConsistencyDiagonalAddInU_of_transfer** — the transfer lemma
+  connecting the full paper RHS to the projection-simplified RHS.
+- **Q₀–Q₄ scalar chain** — `addInUCSChainQ0` through `addInUCSChainQ4`,
+  the four scalar quantities from the paper's Cauchy–Schwarz transfer
+  (paper lines 247–252).
+- **add_in_u_cs_chain_q0_eq_match_mass** / **q4_eq_simplified_rhs** —
+  endpoint lemmas identifying Q₀ with the match-mass left side and Q₄
+  with the projection-collapsed right side.
+
+## References
+
+- `references/ldt-paper/self_improvement.tex` lines 247–252, 455–468
+- `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
 
 namespace MIPStarRE.LDT.SelfImprovement
 

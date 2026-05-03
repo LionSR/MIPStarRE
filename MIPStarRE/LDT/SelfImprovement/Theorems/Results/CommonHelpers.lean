@@ -7,10 +7,34 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 
 /-!
-# CommonHelpers
+# Shared internal helpers for SelfImprovement results
 
-Split leaf from `Results.lean` (Refs #1127, #1114).
+Formerly `private` lemmas, now module-visible with internal-helper docstrings
+so they can be reused across the split result-module leaves.
+
+## Contents
+
+- **averagedPointOperator_le_one** — the averaged point operator for any
+  polynomial is bounded by 1; used by `sdp` to establish dual feasibility.
+- **bipartiteSSCRel_uniform_const** — lift a bipartite SSC from `Unit` to
+  any nonempty question type (used by `selfImprovement`).
+- **sddRel_uniform_const** — lift an SDD from `Unit` to any nonempty
+  question type (used by `selfImprovement`).
+- **ev_opTensor_averageOperatorOverDistribution_left / right** — pull
+  `ev` through `opTensor` with `averageOperatorOverDistribution` on the
+  left or right tensor factor.
+- **ev_averageOperatorOverDistribution** — pull `ev` through a plain
+  `averageOperatorOverDistribution`.
+- **cons_rel_uniform_full_total_match_mass_lower_bound** — from `ConsRel`
+  with total-1 families, derive `1 - δ ≤ avgOver matchMass`; used by
+  `input_consistency_match_mass_lower_bound`.
+
+## References
+
+- `references/ldt-paper/self_improvement.tex`
+- `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
 
 namespace MIPStarRE.LDT.SelfImprovement
 

@@ -9,10 +9,35 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUDiagonalAndDefs
 
 /-!
-# AddInUStep12
+# Add-in-u Cauchy–Schwarz Step 1/2 bounds and algebraic alignment
 
-Split leaf from `Results.lean` (Refs #1127, #1114).
+Algebraic operator-rewrites that align the add-in-u chain differences into
+commutator-times-PSD form, and the raw Cauchy–Schwarz bounds
+`|Q₀−Q₁| ≤ √(2δ)` and `|Q₁−Q₂| ≤ √(2δ)` from the paper.
+
+## Contents
+
+- **addInU_pointMeasurement_snd_selfConsistency** — point-measurement
+  self-consistency on the second coordinate of the `(u, v)` product
+  average, giving `SDD ≤ 2δ`.
+- **addInU_filtered_sandwiched_tensor_sum_le_one** — grouped
+  `h(v)=a` tensor mass is a contraction (`≤ 1`).
+- **addInU_step1/step2/step4_pointwise_op_eq** (private) — operator-level
+  difference rewrites for the three CS steps.
+- **addInU_cs_chain_step1/step2/step4_diff_eq** — algebraic alignment of
+  the chain differences to commutator-times-PSD form.
+- **addInU_step1/step2_C_contraction** (private) — the summed Hermitian
+  contraction side conditions for `closenessOfInnerProduct_right/left`.
+- **addInU_cs_chain_step1/step2_abs_le_sqrt_two_delta** — the raw
+  `√(2δ)` bounds for Step 1 and Step 2, proved via
+  `closenessOfInnerProduct` and the above inputs.
+
+## References
+
+- `references/ldt-paper/self_improvement.tex` lines 255–297
+- `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
 
 namespace MIPStarRE.LDT.SelfImprovement
 

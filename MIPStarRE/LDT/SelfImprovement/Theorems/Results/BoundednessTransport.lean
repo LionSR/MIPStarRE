@@ -8,10 +8,38 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
 
 /-!
-# BoundednessTransport
+# Final-fields projective-residual boundedness transport
 
-Split leaf from `Results.lean` (Refs #1127, #1114).
+Off-diagonal decomposition of the helper boundedness slack,
+data-processing transport of the boundedness gap, and the standalone
+`final_fields_bounded` producer.
+
+## Contents
+
+- **helperAgreementOperatorAtPoint_eq_sum_polynomial** — reindexing
+  identity collapsing the fiberwise `∑_a A^u_a ⊗ H_{[h(u)=a]}` to the
+  polynomial-indexed sum `∑_h A^u_{h(u)} ⊗ H_h` (paper line 612).
+- **helper_agreement_average_ev_eq_polynomial_sum** — averaged scalar
+  form of the reindexing.
+- **helperAgreementOperatorAtPoint_off_diagonal_decomposition** —
+  operator-level off-diagonal decomposition
+  `I ⊗ H.total - helperAgreementOperatorAtPoint = ∑_h ∑_{a≠h(u)} A^u_a ⊗ H_h`
+  (paper line 613; blueprint lines 296–300).
+- **helper_boundedness_slack_average_ev_eq_off_diagonal_avg** — averaged
+  scalar form of the off-diagonal decomposition (LHS of
+  `eq:explicit-bound-for-A-consistency`, paper line 435).
+- **helper_boundedness_gap_transport_through_data_processing** — transport
+  the helper boundedness gap through the data-processing SDD approximation
+  between Ĥ and H (paper lines 747–755).
+- **final_fields_bounded** — standalone producer: if `1 ≤ Z` then
+  any submeasurement is `BoundedByOperator` relative to `Z ⊗ I`.
+
+## References
+
+- `references/ldt-paper/self_improvement.tex` lines 435, 612–613, 747–755
+- `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
 
 namespace MIPStarRE.LDT.SelfImprovement
 

@@ -10,10 +10,44 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUDiagonalAndDefs
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep12
 
 /-!
-# AddInUStep34AndTransfer
+# Add-in-u variance-bound conversions, factored Q₃→Q₄ CS, assembly and transfer
 
-Split leaf from `Results.lean` (Refs #1127, #1114).
+Variance-bound conversions for Q₂→Q₃ / Q₃→Q₄, the factored
+`add_in_u_cs_chain_q3_q4_factored_cs` Cauchy–Schwarz lemma with
+self-energy factor bound, the four-step chain assembly, arithmetic
+absorption `2√(2δ) + 2√ζ ≤ 4√ζ`, and the projection-simplified
+diagonal transfer.
+
+## Contents
+
+- **Variance-bound conversions** — `add_in_u_cs_chain_q2_q3_abs_le_sqrt_of_sq_le`,
+  `_le_sqrt_of_factor_bounds`, and the Q₃→Q₄ analogues.
+- **add_in_u_cs_chain_q3_q4_factored_cs** — the factored CS lemma
+  `|Q₃−Q₄| ≤ √D₁ · √D₂` with `D₁` bounded by summed
+  `globalVarianceDeviationAtPolynomial`.
+- **add_in_u_cs_chain_q3_q4_self_energy_factor_le_one** — the
+  `D₁ ≤ 1` self-energy factor for the Q₃→Q₄ factored CS path.
+- **GlobalVariance endpoint bridges** —
+  `_le_sqrt_of_globalVarianceDeviation_sum_le` and
+  `add_in_u_cs_chain_global_variance_steps_of_sum_bound / _of_local_sum_bound`
+  upgrading raw CS estimates to `√ζ` bounds.
+- **add_in_u_simplified_transfer_of_cs_chain** — the four-step chain
+  assembly: given four `|Qᵢ−Qⱼ| ≤ ηᵢⱼ` bounds summing to `≤ addInUError`,
+  yields the projection-simplified transfer.
+- **Arithmetic absorption** — `two_mul_delta_le_selfImprovementVarianceError`
+  and `two_sqrt_two_delta_add_two_sqrt_selfImprovementVarianceError_le_addInUError`
+  (paper lines 341–342).
+- **add_in_u_simplified_transfer_of_cs_chain_sqrt_form** — wrapper
+  composing the CS chain with arithmetic absorption.
+- **selfConsistencyDiagonalAddInU_of_simplifiedTransfer** — specialization
+  to the projection-simplified scalar transfer hypothesis.
+
+## References
+
+- `references/ldt-paper/self_improvement.tex` lines 299–343
+- `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
 
 namespace MIPStarRE.LDT.SelfImprovement
 
