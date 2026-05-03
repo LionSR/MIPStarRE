@@ -467,5 +467,148 @@ theorem ev_sum_conjTranspose_mul_sum_le {ι : Type*} [Fintype ι] [DecidableEq �
     _ = (Fintype.card α : ℝ) * ∑ a, ev ψ ((X a)ᴴ * X a) :=
         double_sum_avg_eq _
 
+/-! ### Bipartite-tensor sandwich Cauchy–Schwarz
+
+The lemmas below give the operator/real Cauchy–Schwarz step for expectations of
+sandwiched products lifted to a bipartite tensor space. They are a reusable
+primitive toward the raw `Q₂ → Q₃` and `Q₃ → Q₄` Cauchy–Schwarz estimates of
+`self_improvement.tex`, lines 306–311 and 326–332 (the
+`eq:change-one-cauchy-schwarz` and `eq:change-another` displays), where the
+bilinear form is `⟨X, Y⟩_{M, T} := ev ψ (opTensor (Xᴴ · M · Y) T)` with PSD
+`M`, `T`. -/
+
+/-- Bipartite-tensor Cauchy–Schwarz for state expectations.
+
+For PSD operators `M`, `T` and arbitrary operators `X`, `Y`,
+`(ev ψ (opTensor (Xᴴ M Y) T))² ≤ ev ψ (opTensor (Xᴴ M X) T) *
+ev ψ (opTensor (Yᴴ M Y) T)`.
+
+The proof factors `M = √M · √M`, `T = √T · √T` (continuous functional calculus
+square roots) and applies `ev_cauchy_schwarz` to
+`opTensor (√M · X) √T` and `opTensor (√M · Y) √T`. -/
+theorem ev_opTensor_sandwich_cauchy_schwarz
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (ψ : QuantumState (ι₁ × ι₂))
+    (X Y M : MIPStarRE.Quantum.Op ι₁)
+    (T : MIPStarRE.Quantum.Op ι₂)
+    (hM : 0 ≤ M) (hT : 0 ≤ T) :
+    (ev ψ (opTensor (Xᴴ * M * Y) T)) ^ 2 ≤
+      ev ψ (opTensor (Xᴴ * M * X) T) * ev ψ (opTensor (Yᴴ * M * Y) T) := by
+  classical
+  have hsM_self : CFC.sqrt M * CFC.sqrt M = M := CFC.sqrt_mul_sqrt_self M hM
+  have hsT_self : CFC.sqrt T * CFC.sqrt T = T := CFC.sqrt_mul_sqrt_self T hT
+  have hsM_herm : (CFC.sqrt M)ᴴ = CFC.sqrt M :=
+    (Matrix.nonneg_iff_posSemidef.mp (CFC.sqrt_nonneg M)).isHermitian.eq
+  have hsT_herm : (CFC.sqrt T)ᴴ = CFC.sqrt T :=
+    (Matrix.nonneg_iff_posSemidef.mp (CFC.sqrt_nonneg T)).isHermitian.eq
+  set A : MIPStarRE.Quantum.Op (ι₁ × ι₂) :=
+    opTensor (CFC.sqrt M * X) (CFC.sqrt T) with hA_def
+  set B : MIPStarRE.Quantum.Op (ι₁ × ι₂) :=
+    opTensor (CFC.sqrt M * Y) (CFC.sqrt T) with hB_def
+  have hA_adj : Aᴴ = opTensor (Xᴴ * CFC.sqrt M) (CFC.sqrt T) := by
+    rw [hA_def, conjTranspose_opTensor, Matrix.conjTranspose_mul, hsM_herm, hsT_herm]
+  have hB_adj : Bᴴ = opTensor (Yᴴ * CFC.sqrt M) (CFC.sqrt T) := by
+    rw [hB_def, conjTranspose_opTensor, Matrix.conjTranspose_mul, hsM_herm, hsT_herm]
+  have hAB : Aᴴ * B = opTensor (Xᴴ * M * Y) T := by
+    rw [hA_adj, hB_def, opTensor_mul]
+    congr 1
+    · calc Xᴴ * CFC.sqrt M * (CFC.sqrt M * Y)
+          = Xᴴ * (CFC.sqrt M * CFC.sqrt M) * Y := by noncomm_ring
+        _ = Xᴴ * M * Y := by rw [hsM_self]
+  have hAA : Aᴴ * A = opTensor (Xᴴ * M * X) T := by
+    rw [hA_adj, hA_def, opTensor_mul]
+    congr 1
+    · calc Xᴴ * CFC.sqrt M * (CFC.sqrt M * X)
+          = Xᴴ * (CFC.sqrt M * CFC.sqrt M) * X := by noncomm_ring
+        _ = Xᴴ * M * X := by rw [hsM_self]
+  have hBB : Bᴴ * B = opTensor (Yᴴ * M * Y) T := by
+    rw [hB_adj, hB_def, opTensor_mul]
+    congr 1
+    · calc Yᴴ * CFC.sqrt M * (CFC.sqrt M * Y)
+          = Yᴴ * (CFC.sqrt M * CFC.sqrt M) * Y := by noncomm_ring
+        _ = Yᴴ * M * Y := by rw [hsM_self]
+  have hcs := ev_cauchy_schwarz ψ A B
+  rw [hAB, hAA, hBB] at hcs
+  exact hcs
+
+/-- Diagonal sandwich expectation `ev ψ (opTensor (Xᴴ M X) T)` is nonneg
+when `M`, `T` are PSD. -/
+private theorem ev_opTensor_sandwich_diag_nonneg
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (ψ : QuantumState (ι₁ × ι₂))
+    (X M : MIPStarRE.Quantum.Op ι₁)
+    (T : MIPStarRE.Quantum.Op ι₂)
+    (hM : 0 ≤ M) (hT : 0 ≤ T) :
+    0 ≤ ev ψ (opTensor (Xᴴ * M * X) T) :=
+  ev_nonneg_of_psd ψ _
+    (opTensor_nonneg
+      ((Matrix.nonneg_iff_posSemidef.mp hM).conjTranspose_mul_mul_same X).nonneg
+      hT)
+
+/-- Absolute-value form of the bipartite-tensor sandwich Cauchy–Schwarz. -/
+theorem ev_opTensor_sandwich_abs_le_sqrt
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (ψ : QuantumState (ι₁ × ι₂))
+    (X Y M : MIPStarRE.Quantum.Op ι₁)
+    (T : MIPStarRE.Quantum.Op ι₂)
+    (hM : 0 ≤ M) (hT : 0 ≤ T) :
+    |ev ψ (opTensor (Xᴴ * M * Y) T)| ≤
+      Real.sqrt (ev ψ (opTensor (Xᴴ * M * X) T)) *
+        Real.sqrt (ev ψ (opTensor (Yᴴ * M * Y) T)) := by
+  have hsq := ev_opTensor_sandwich_cauchy_schwarz ψ X Y M T hM hT
+  have hX_nonneg := ev_opTensor_sandwich_diag_nonneg ψ X M T hM hT
+  have hY_nonneg := ev_opTensor_sandwich_diag_nonneg ψ Y M T hM hT
+  refine abs_le_of_sq_le_sq' ?_ (mul_nonneg (Real.sqrt_nonneg _) (Real.sqrt_nonneg _)) |>.2
+  calc
+    |ev ψ (opTensor (Xᴴ * M * Y) T)| ^ 2
+        = (ev ψ (opTensor (Xᴴ * M * Y) T)) ^ 2 := by rw [sq_abs]
+    _ ≤ ev ψ (opTensor (Xᴴ * M * X) T) * ev ψ (opTensor (Yᴴ * M * Y) T) := hsq
+    _ = (Real.sqrt (ev ψ (opTensor (Xᴴ * M * X) T)) *
+            Real.sqrt (ev ψ (opTensor (Yᴴ * M * Y) T))) ^ 2 := by
+          rw [sq]
+          ring_nf
+          rw [Real.sq_sqrt hX_nonneg, Real.sq_sqrt hY_nonneg]
+
+/-- Finset Cauchy–Schwarz for sums of bipartite-tensor sandwich expectations.
+
+Specialization of `ev_opTensor_sandwich_abs_le_sqrt` to a sum indexed by
+`Outcome`, followed by the real-valued Cauchy–Schwarz `sum_sqrt_mul_sqrt_le`.
+
+This is the direct sum-form analogue of `sum_ev_mul_le_sqrt`. It packages the
+operator Cauchy–Schwarz template needed by future raw add-in-`u` Step 3/4
+producers when the bilinear forms share the polynomial outcome index between
+numerator and denominator. -/
+theorem sum_ev_opTensor_sandwich_le_sqrt
+    {Outcome ι₁ ι₂ : Type*}
+    [Fintype Outcome] [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (ψ : QuantumState (ι₁ × ι₂))
+    (X Y M : Outcome → MIPStarRE.Quantum.Op ι₁)
+    (T : Outcome → MIPStarRE.Quantum.Op ι₂)
+    (hM : ∀ a, 0 ≤ M a) (hT : ∀ a, 0 ≤ T a) :
+    |∑ a : Outcome, ev ψ (opTensor ((X a)ᴴ * M a * Y a) (T a))| ≤
+      Real.sqrt (∑ a : Outcome, ev ψ (opTensor ((X a)ᴴ * M a * X a) (T a))) *
+        Real.sqrt (∑ a : Outcome, ev ψ (opTensor ((Y a)ᴴ * M a * Y a) (T a))) := by
+  calc
+    |∑ a : Outcome, ev ψ (opTensor ((X a)ᴴ * M a * Y a) (T a))|
+        ≤ ∑ a : Outcome, |ev ψ (opTensor ((X a)ᴴ * M a * Y a) (T a))| :=
+              Finset.abs_sum_le_sum_abs _ _
+    _ ≤ ∑ a : Outcome,
+            Real.sqrt (ev ψ (opTensor ((X a)ᴴ * M a * X a) (T a))) *
+              Real.sqrt (ev ψ (opTensor ((Y a)ᴴ * M a * Y a) (T a))) := by
+              refine Finset.sum_le_sum ?_
+              intro a _
+              exact ev_opTensor_sandwich_abs_le_sqrt ψ (X a) (Y a) (M a) (T a)
+                (hM a) (hT a)
+    _ ≤ Real.sqrt (∑ a : Outcome, ev ψ (opTensor ((X a)ᴴ * M a * X a) (T a))) *
+          Real.sqrt (∑ a : Outcome, ev ψ (opTensor ((Y a)ᴴ * M a * Y a) (T a))) := by
+              exact
+                Real.sum_sqrt_mul_sqrt_le (s := Finset.univ)
+                  (f := fun a => ev ψ (opTensor ((X a)ᴴ * M a * X a) (T a)))
+                  (g := fun a => ev ψ (opTensor ((Y a)ᴴ * M a * Y a) (T a)))
+                  (fun a => ev_opTensor_sandwich_diag_nonneg ψ (X a) (M a) (T a)
+                    (hM a) (hT a))
+                  (fun a => ev_opTensor_sandwich_diag_nonneg ψ (Y a) (M a) (T a)
+                    (hM a) (hT a))
+
 
 end MIPStarRE.LDT
