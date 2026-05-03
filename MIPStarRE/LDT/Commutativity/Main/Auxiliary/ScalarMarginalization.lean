@@ -31,16 +31,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-
-namespace MIPStarRE.LDT.Commutativity
-
-open MIPStarRE.LDT
-open MIPStarRE.LDT.ExpansionHypercubeGraph
-open MIPStarRE.LDT.CommutativityPoints
-open scoped BigOperators MatrixOrder Matrix ComplexOrder
-
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
-
 /-- A real-line triangle helper for the #713 hybrid scalar/tensor route.
 
 If the scalar full endpoint is within `sqrtz` of a full tensor endpoint, the two
