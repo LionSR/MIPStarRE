@@ -3,11 +3,6 @@ name: Oversized Lean file guard
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-    paths:
-      - '**.lean'
-      - 'scripts/check_oversized_lean_files.py'
-      - 'scripts/tests/test_check_oversized_lean_files.py'
-      - '.github/workflows/oversized-lean-files.yml'
 
 # NOTE: As of 2026-05-03, this check reports ~19 oversized files on main
 # (tracked in issue #1127).  The script exits non-zero but the step uses
