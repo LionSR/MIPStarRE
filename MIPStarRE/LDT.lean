@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Basic.ParametersBase
+import MIPStarRE.LDT.Basic.SqrtBounds
 import MIPStarRE.LDT.Basic.AxisParallelLine
 import MIPStarRE.LDT.Basic.DiagonalLine
 import MIPStarRE.LDT.Basic.LinePolynomials
@@ -77,6 +78,7 @@ import MIPStarRE.LDT.SelfImprovement.Defs
 import MIPStarRE.LDT.SelfImprovement.MatrixRealization
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationBridge
+import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results
 import MIPStarRE.LDT.CommutativityPoints.Defs
 import MIPStarRE.LDT.CommutativityPoints.Approximation

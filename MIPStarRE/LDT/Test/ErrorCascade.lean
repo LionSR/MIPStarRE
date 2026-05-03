@@ -1,4 +1,5 @@
 import Mathlib.Analysis.Complex.ExponentialBounds
+import MIPStarRE.LDT.Basic.SqrtBounds
 import MIPStarRE.LDT.Test.SurfaceVsPoint
 
 /-!
@@ -240,21 +241,6 @@ private theorem stepEnvelope_le_mainFormalEnvelope {params : Parameters} {k : �
       stepEnvelope_le_stepEnvelope (h := h) (hn₁Pos := hnPos) (hn := hn)
         (hN₁Pos := hNPos) (hN := hN)
     _ = mainFormalEnvelope params k eps := by rw [mainFormalEnvelope_eq_stepEnvelope]
-
-private theorem sqrt_add_le_add_sqrt {x y : Error} (hx : 0 ≤ x) (hy : 0 ≤ y) :
-    Real.sqrt (x + y) ≤ Real.sqrt x + Real.sqrt y := by
-  refine (Real.sqrt_le_iff).2 ?_
-  constructor
-  · positivity
-  · nlinarith [Real.sq_sqrt hx, Real.sq_sqrt hy, Real.sqrt_nonneg x, Real.sqrt_nonneg y]
-
-private theorem sqrt_add3_le_add3_sqrt {x y z : Error} (hx : 0 ≤ x) (hy : 0 ≤ y) (hz : 0 ≤ z) :
-    Real.sqrt (x + y + z) ≤ Real.sqrt x + Real.sqrt y + Real.sqrt z := by
-  calc
-    Real.sqrt (x + y + z) = Real.sqrt ((x + y) + z) := by ring
-    _ ≤ Real.sqrt (x + y) + Real.sqrt z := sqrt_add_le_add_sqrt (add_nonneg hx hy) hz
-    _ ≤ Real.sqrt x + Real.sqrt y + Real.sqrt z := by
-      nlinarith [sqrt_add_le_add_sqrt hx hy, Real.sqrt_nonneg z]
 
 private theorem sqrt_rpow_one_div {x n : Error} (hx : 0 ≤ x) (_hn : 0 < n) :
     Real.sqrt (Real.rpow x (1 / n)) = Real.rpow x (1 / (2 * n)) := by
