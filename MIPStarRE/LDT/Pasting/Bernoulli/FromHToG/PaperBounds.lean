@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.AdjacentStages
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.PaperBounds.ContextBounds
+import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.PaperBounds.SandwichContext
 
 /-!
 # Section 12 pasting: from-H-to-G collapsed bounds
