@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.Pasting.GHatFacts
 import MIPStarRE.LDT.Pasting.Core
+import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
 import MIPStarRE.LDT.Basic.LowDegreePolynomial
 
 /-!
@@ -76,68 +77,16 @@ lemma postprocess_hRestrictionToVerticalLine_eq_evaluateAt
       postprocess H (fun h => Polynomial.restrictToAxisParallelLine params.next h verticalLine) by
       rfl]
   rw [postprocess_postprocess]
-  have hrestrict_apply
-      (h : Polynomial params.next)
-      (ℓ : AxisParallelLine params.next)
-      (t : Fq params.next) :
-      (Polynomial.restrictToAxisParallelLine params.next h ℓ) t =
-        h (AxisParallelLine.pointAt ℓ t) := by
-    have haxis :
-        (fun i => _root_.Polynomial.eval (decodeScalar t)
-            (Polynomial.axisCoordinatePolynomial params.next ℓ i)) =
-          decodePoint (AxisParallelLine.pointAt ℓ t) := by
-      funext i
-      by_cases hi : i = ℓ.direction
-      · subst hi
-        simp [AxisParallelLine.pointAt, Polynomial.axisCoordinatePolynomial,
-          addCoord, decodePoint, decode_encodeScalar, _root_.Polynomial.eval_add,
-          _root_.Polynomial.eval_C, _root_.Polynomial.eval_X]
-      · simp [AxisParallelLine.pointAt, Polynomial.axisCoordinatePolynomial,
-          hi, decodePoint, _root_.Polynomial.eval_C]
-    have hconst :
-        (Polynomial.evalRingHom (decodeScalar t)).comp _root_.Polynomial.C = RingHom.id _ := by
-      ext a
-      simp
-    calc
-      (Polynomial.restrictToAxisParallelLine params.next h ℓ) t
-        = encodeScalar
-            (MvPolynomial.eval₂
-              ((Polynomial.evalRingHom (decodeScalar t)).comp _root_.Polynomial.C)
-              (fun i => _root_.Polynomial.eval (decodeScalar t)
-                (Polynomial.axisCoordinatePolynomial params.next ℓ i))
-              h.poly) := by
-                simp [Polynomial.restrictToAxisParallelLine, AxisLinePolynomial.toFun,
-                  evalLinePolynomialModel]
-                rw [MvPolynomial.polynomial_eval_eval₂]
-      _ = encodeScalar
-            (MvPolynomial.eval₂ (RingHom.id _)
-              (decodePoint (AxisParallelLine.pointAt ℓ t)) h.poly) := by
-                rw [hconst]
-                simpa using congrArg
-                  (fun g => encodeScalar (MvPolynomial.eval₂ (RingHom.id _) g h.poly)) haxis
-      _ = h (AxisParallelLine.pointAt ℓ t) := by
-            rfl
+  have happend : appendPoint params (truncatePoint params u) (pointHeight params u) = u := by
+    exact (pointNextEquiv params).left_inv u
   have hbase : AxisParallelLine.pointAt verticalLine (pointHeight params u) = u := by
     calc
       AxisParallelLine.pointAt verticalLine (pointHeight params u)
         = appendPoint params (truncatePoint params u) (pointHeight params u) := by
-            funext i
-            by_cases hi : i = lastCoord params
-            · subst hi
-              simp [verticalLine, AxisParallelLine.pointAt, appendPoint, pointHeight, lastCoord]
-              change addCoord zeroCoord (u (lastCoord params)) = u (lastCoord params)
-              rw [← encode_decodeScalar (u (lastCoord params))]
-              simp [addCoord, zeroCoord]
-            · have hi_lt : i.1 < params.m := by
-                have hi_succ : i.1 < params.m + 1 := by
-                  simpa [Parameters.next] using i.2
-                have hne : i.1 ≠ params.m := by
-                  intro h
-                  apply hi
-                  exact Fin.ext h
-                omega
-              simp [verticalLine, AxisParallelLine.pointAt, appendPoint, truncatePoint, hi, hi_lt]
-      _ = u := (pointNextEquiv params).left_inv u
+            simpa [verticalLine] using
+              verticalLine_pointAt_appendPoint params
+                (truncatePoint params u) (pointHeight params u)
+      _ = u := happend
   have hfun :
       (fun h =>
         (Polynomial.restrictToAxisParallelLine params.next h verticalLine)
@@ -148,7 +97,8 @@ lemma postprocess_hRestrictionToVerticalLine_eq_evaluateAt
             (Polynomial.restrictToAxisParallelLine params.next h verticalLine)
                 (pointHeight params u)
               = h (AxisParallelLine.pointAt verticalLine (pointHeight params u)) :=
-                  hrestrict_apply h verticalLine (pointHeight params u)
+                  Polynomial.restrictToAxisParallelLine_apply params.next h verticalLine
+                    (pointHeight params u)
             _ = h u := by simp [hbase]
   unfold evaluateAt
   refine congrArg (postprocess H) (funext fun h => ?_)

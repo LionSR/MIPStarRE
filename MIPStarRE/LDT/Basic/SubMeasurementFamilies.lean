@@ -473,6 +473,26 @@ theorem leftTensor_finset_sum {α : Type*}
       rw [Finset.sum_insert ha, Finset.sum_insert ha, ih]
       simp [leftTensor, Matrix.add_kronecker]
 
+/-- Expanding the left-tensor mass of a submeasurement on a bipartite state as
+the sum of per-outcome left-tensor expectations.
+
+This is a generic identity at the level of `ev ψ (leftTensor _)`: applying
+`SubMeas.sum_eq_total`, pulling `leftTensor` through the finite sum via
+`leftTensor_finset_sum`, and distributing `ev` through the sum via
+`ev_finset_sum`. Using the definitional equalities
+`subMeasMass ψ A.liftLeft = ev ψ A.liftLeft.total = ev ψ (leftTensor A.total)`,
+this immediately yields the helper-stage opening
+`subMeasMass ψ A.liftLeft = ∑ a, ev ψ (leftTensor (A.outcome a))` used in the
+Section 9 / Section 12 calculations. -/
+theorem ev_leftTensor_total_eq_sum_outcome {α : Type*} [Fintype α]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState (ι × ι)) (A : SubMeas α ι) :
+    ev ψ (leftTensor (ι₂ := ι) A.total) =
+      ∑ a : α, ev ψ (leftTensor (ι₂ := ι) (A.outcome a)) := by
+  rw [← A.sum_eq_total,
+      ← leftTensor_finset_sum (ι₂ := ι) Finset.univ (fun a : α => A.outcome a),
+      ev_finset_sum]
+
 /-- Right tensor placement commutes with finite sums. -/
 theorem rightTensor_finset_sum {α : Type*}
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]

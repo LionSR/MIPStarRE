@@ -457,7 +457,7 @@ theorem laplacian_eq_edgeDifferenceForm (params : Parameters) :
         + (if a = v ∧ v = b then (1 : ℂ) else 0)) := by
     by_cases hau : a = u <;> by_cases hav : a = v <;>
       by_cases hub : u = b <;> by_cases hvb : v = b <;>
-      simp [hau, hav, hub, hvb] <;> ring
+      simp [hau, hav, hub, hvb]; ring
   -- Step 2: each of the four indicator-weighted sums has a closed form.
   have hSum1 :
       ∑ uv : Point params × Point params,

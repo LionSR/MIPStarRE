@@ -459,6 +459,81 @@ private lemma ldSandwichLineOnePoint_endpoint_ldGbcon_lift
           ldSandwichLineOnePointRightFamily, postprocess_postprocess, hi] using hprod)
   simpa [endpointLeft, endpointRight, iFin] using hlift
 
+private lemma gHatIdxMeas_outcome_some_eq_evaluateAt
+    (params : Parameters)
+    [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (x : Fq params) (u : Point params) (a : Fq params) :
+    (∑ g : GHatOutcome params,
+      if Option.map (fun g' : Polynomial params => g' u) g = some a then
+        (gHatIdxMeas params family x).outcome g
+      else
+        0) =
+      (evaluateAt params u ((family.meas x).toSubMeas)).outcome a := by
+  rw [Fintype.sum_option]
+  conv_lhs =>
+    simp [gHatIdxMeas, completeSubMeas]
+  conv_rhs =>
+    simp [evaluateAt, postprocess, Finset.sum_filter]
+  refine Finset.sum_congr rfl ?_
+  intro g _hg
+  by_cases hg : g u = a <;> simp [hg]
+
+private lemma gHatSandwichFamily_restrict_zero_outcome_some
+    (params : Parameters)
+    [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    {n : ℕ} (xs : PointTuple params (n + 1))
+    (u : Point params) (a : Fq params) :
+    (postprocess
+      (restrictSubMeas (gHatSandwichFamily params family (n + 1) xs)
+        (fun gs => (gs 0).isSome = true))
+      (fun gs => Option.map (fun g : Polynomial params => g u) (gs 0))).outcome (some a) =
+      ∑ gs : GHatTupleOutcome params (n + 1),
+        if Option.map (fun g : Polynomial params => g u) (gs 0) = some a then
+          let half := gHatHalfProductOutcomeOperator params family (n + 1) xs gs
+          half * halfᴴ
+        else
+          0 := by
+  conv_lhs =>
+    simp [postprocess, restrictSubMeas, gHatSandwichFamily, Finset.sum_filter]
+  refine Finset.sum_congr rfl ?_
+  intro gs _hgs
+  by_cases hmap : Option.map (fun g : Polynomial params => g u) (gs 0) = some a
+  · rcases Option.map_eq_some_iff.mp hmap with ⟨g, hgs0, hg⟩
+    simp [hgs0]
+  · have hnone : ¬ ∃ g : Polynomial params, gs 0 = some g ∧ g u = a := by
+      rintro ⟨g, hgs0, hg⟩
+      exact hmap (Option.map_eq_some_iff.mpr ⟨g, hgs0, hg⟩)
+    simp [hnone]
+
+private lemma evaluateAt_postprocess_some_outcome_none_eq_zero
+    (params : Parameters)
+    [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (x : Fq params) (u : Point params) :
+    (postprocess (evaluateAt params u ((family.meas x).toSubMeas)) some).outcome none = 0 := by
+  simp [evaluateAt, postprocess]
+
+private lemma gHatSandwichFamily_restrict_zero_outcome_none_eq_zero
+    (params : Parameters)
+    [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    {n : ℕ} (xs : PointTuple params (n + 1))
+    (u : Point params) :
+    (postprocess
+      (restrictSubMeas (gHatSandwichFamily params family (n + 1) xs)
+        (fun gs => (gs 0).isSome = true))
+      (fun gs => Option.map (fun g : Polynomial params => g u) (gs 0))).outcome none = 0 := by
+  conv_lhs =>
+    simp [postprocess, restrictSubMeas, gHatSandwichFamily, Finset.sum_filter]
+  apply Finset.sum_eq_zero
+  intro gs _hgs
+  by_cases hsome : (gs 0).isSome = true
+  · rcases Option.isSome_iff_exists.mp hsome with ⟨g, hg⟩
+    simp [hg]
+  · simp [hsome]
+
 private lemma ldSandwichLineOnePoint_zero_halfProduct_sum_eq_endpoint
     (params : Parameters)
     [FieldModel params.q]
@@ -550,11 +625,8 @@ private lemma ldSandwichLineOnePoint_zero_halfProduct_sum_eq_endpoint
                         simp [hg]
               · simp [hg]
         _ = (evaluateAt params u ((family.meas (xs 0)).toSubMeas)).outcome a := by
-              simp [G, gHatIdxMeas, completeSubMeas, evaluateAt, postprocess,
-                Finset.sum_filter]
-              refine Finset.sum_congr rfl ?_
-              intro g _hg
-              by_cases hg : g u = a <;> simp [hg]
+              simpa [G] using
+                gHatIdxMeas_outcome_some_eq_evaluateAt params family (xs 0) u a
 
 private lemma ldSandwichLineOnePointLeftFamily_zero_outcome_some_eq_endpoint
     (params : Parameters)
@@ -583,20 +655,8 @@ private lemma ldSandwichLineOnePointLeftFamily_zero_outcome_some_eq_endpoint
                 half * halfᴴ
               else
                 0 := by
-        simp [ldSandwichLineOnePointLeftFamily, postprocess, restrictSubMeas, xs, u,
-          Finset.sum_filter]
-        refine Finset.sum_congr rfl ?_
-        intro gs _hgs
-        by_cases hmap : Option.map (fun g : Polynomial params => g u) (gs 0) = some a
-        · rcases Option.map_eq_some_iff.mp hmap with ⟨g, hgs0, hg⟩
-          have hgq : g q.1 = a := by
-            simpa [u] using hg
-          simp [hgs0, hgq, gHatSandwichFamily]
-        · have hnone : ¬ ∃ g : Polynomial params, gs 0 = some g ∧ g q.1 = a := by
-            rintro ⟨g, hgs0, hg⟩
-            apply hmap
-            exact Option.map_eq_some_iff.mpr ⟨g, hgs0, by simpa [u] using hg⟩
-          simp [hnone]
+        simpa [ldSandwichLineOnePointLeftFamily, xs, u] using
+          gHatSandwichFamily_restrict_zero_outcome_some params family xs u a
       have hsplit :
           (∑ gs : GHatTupleOutcome params (r + 1),
             if Option.map (fun g : Polynomial params => g u) (gs 0) = some a then
@@ -684,11 +744,8 @@ private lemma ldSandwichLineOnePointLeftFamily_zero_outcome_some_eq_endpoint
                         simp [hmap]
               · simp [hmap]
         _ = (evaluateAt params u ((family.meas (xs 0)).toSubMeas)).outcome a := by
-              simp [G, gHatIdxMeas, completeSubMeas, evaluateAt, postprocess,
-                Finset.sum_filter]
-              refine Finset.sum_congr rfl ?_
-              intro g _hg
-              by_cases hg : g u = a <;> simp [hg]
+              simpa [G] using
+                gHatIdxMeas_outcome_some_eq_evaluateAt params family (xs 0) u a
 
 private lemma ldSandwichLineOnePointLeftFamily_zero_eq_endpoint
     (params : Parameters)
@@ -709,11 +766,19 @@ private lemma ldSandwichLineOnePointLeftFamily_zero_eq_endpoint
         cases k with
         | zero => cases hk
         | succ r =>
-            simp [ldSandwichLineOnePointLeftFamily, postprocess, restrictSubMeas,
-              Finset.sum_filter]
-            apply Finset.sum_eq_zero
-            intro gs _
-            by_cases hgs : gs 0 = none <;> simp [hgs]
+            have hleftNone :
+                ((ldSandwichLineOnePointLeftFamily params strategy family (r + 1) 0) q).outcome
+                    none = 0 := by
+              simpa [ldSandwichLineOnePointLeftFamily] using
+                gHatSandwichFamily_restrict_zero_outcome_none_eq_zero params family q.2 q.1
+            have hrightNone :
+                (postprocess
+                  (evaluateAt params q.1 ((family.meas (q.2 ⟨0, hk⟩)).toSubMeas))
+                  some).outcome none = 0 := by
+              simpa using
+                evaluateAt_postprocess_some_outcome_none_eq_zero
+                  params family (q.2 ⟨0, hk⟩) q.1
+            rw [hleftNone, hrightNone]
     | some a =>
         simpa [postprocess, Finset.sum_filter] using
           ldSandwichLineOnePointLeftFamily_zero_outcome_some_eq_endpoint
@@ -728,11 +793,19 @@ private lemma ldSandwichLineOnePointLeftFamily_zero_eq_endpoint
         cases k with
         | zero => cases hk
         | succ r =>
-            simp [ldSandwichLineOnePointLeftFamily, postprocess, restrictSubMeas,
-              Finset.sum_filter]
-            apply Finset.sum_eq_zero
-            intro gs _
-            by_cases hgs : gs 0 = none <;> simp [hgs]
+            have hleftNone :
+                ((ldSandwichLineOnePointLeftFamily params strategy family (r + 1) 0) q).outcome
+                    none = 0 := by
+              simpa [ldSandwichLineOnePointLeftFamily] using
+                gHatSandwichFamily_restrict_zero_outcome_none_eq_zero params family q.2 q.1
+            have hrightNone :
+                (postprocess
+                  (evaluateAt params q.1 ((family.meas (q.2 ⟨0, hk⟩)).toSubMeas))
+                  some).outcome none = 0 := by
+              simpa using
+                evaluateAt_postprocess_some_outcome_none_eq_zero
+                  params family (q.2 ⟨0, hk⟩) q.1
+            rw [hleftNone, hrightNone]
     | some a =>
         simpa [postprocess, Finset.sum_filter] using
           ldSandwichLineOnePointLeftFamily_zero_outcome_some_eq_endpoint
@@ -1347,9 +1420,8 @@ private lemma gHatRotatedHalfProduct_lastFront_eq_halfProduct
   | succ i =>
       intro xs gs
       have hprefix := gHatHalfProduct_prefix_mul_last params family i xs gs
-      simp [pointTupleLastFrontEquiv, gHatTupleOutcomeLastFrontEquiv,
-        gHatRotatedHalfProductOutcomeOperator]
-      exact hprefix.symm
+      simpa only [pointTupleLastFrontEquiv, gHatTupleOutcomeLastFrontEquiv,
+        gHatRotatedHalfProductOutcomeOperator] using hprefix.symm
 
 /-- Reversing the prefix after moving the last coordinate to the front gives the adjoint product. -/
 private lemma gHatHalfProduct_lastReverse_eq_conjTranspose
@@ -1383,10 +1455,10 @@ private lemma gHatHalfProduct_lastReverse_eq_conjTranspose
         | zero =>
             simp [pointTupleTail, pointTupleLastReverseEquiv, xsPrefix]
         | succ j =>
-            simp [pointTupleTail, pointTupleLastReverseEquiv, xsPrefix]
-            exact congrArg xs (Fin.ext (by
-              change i - ((j : ℕ) + 1) = i - 1 - (j : ℕ)
-              omega))
+            simpa only [pointTupleTail, pointTupleLastReverseEquiv, xsPrefix] using
+              congrArg xs (Fin.ext (by
+                change i - ((j : ℕ) + 1) = i - 1 - (j : ℕ)
+                omega))
       have hgtail :
           gHatTupleOutcomeTail ((gHatTupleOutcomeLastReverseEquiv params (i + 1)) gs) =
             (gHatTupleOutcomeLastReverseEquiv params i) gsPrefix := by
@@ -1395,10 +1467,10 @@ private lemma gHatHalfProduct_lastReverse_eq_conjTranspose
         | zero =>
             simp [gHatTupleOutcomeTail, gHatTupleOutcomeLastReverseEquiv, gsPrefix]
         | succ j =>
-            simp [gHatTupleOutcomeTail, gHatTupleOutcomeLastReverseEquiv, gsPrefix]
-            exact congrArg gs (Fin.ext (by
-              change i - ((j : ℕ) + 1) = i - 1 - (j : ℕ)
-              omega))
+            simpa only [gHatTupleOutcomeTail, gHatTupleOutcomeLastReverseEquiv, gsPrefix] using
+              congrArg gs (Fin.ext (by
+                change i - ((j : ℕ) + 1) = i - 1 - (j : ℕ)
+                omega))
       have hlast :
           ((gHatIdxMeas params family (xs ⟨i + 1, by omega⟩)).outcome
               (gs ⟨i + 1, by omega⟩))ᴴ =
@@ -1414,7 +1486,7 @@ private lemma gHatHalfProduct_lastReverse_eq_conjTranspose
       rw [hprefix]
       rw [Matrix.conjTranspose_mul, hlast]
       simp [pointTupleLastReverseEquiv, gHatTupleOutcomeLastReverseEquiv,
-        xsPrefix, gsPrefix, mul_assoc]
+        xsPrefix, gsPrefix]
 
 /-- The rotated product on the last-reversed tuple is the adjoint of the last-front product. -/
 private lemma gHatRotatedHalfProduct_lastReverse_eq_conjTranspose_lastFront
@@ -1451,10 +1523,10 @@ private lemma gHatRotatedHalfProduct_lastReverse_eq_conjTranspose_lastFront
         | zero =>
             simp [pointTupleTail, pointTupleLastReverseEquiv, xsPrefix]
         | succ j =>
-            simp [pointTupleTail, pointTupleLastReverseEquiv, xsPrefix]
-            exact congrArg xs (Fin.ext (by
-              change i - ((j : ℕ) + 1) = i - 1 - (j : ℕ)
-              omega))
+            simpa only [pointTupleTail, pointTupleLastReverseEquiv, xsPrefix] using
+              congrArg xs (Fin.ext (by
+                change i - ((j : ℕ) + 1) = i - 1 - (j : ℕ)
+                omega))
       have hgtail :
           gHatTupleOutcomeTail ((gHatTupleOutcomeLastReverseEquiv params (i + 1)) gs) =
             (gHatTupleOutcomeLastReverseEquiv params i) gsPrefix := by
@@ -1463,10 +1535,10 @@ private lemma gHatRotatedHalfProduct_lastReverse_eq_conjTranspose_lastFront
         | zero =>
             simp [gHatTupleOutcomeTail, gHatTupleOutcomeLastReverseEquiv, gsPrefix]
         | succ j =>
-            simp [gHatTupleOutcomeTail, gHatTupleOutcomeLastReverseEquiv, gsPrefix]
-            exact congrArg gs (Fin.ext (by
-              change i - ((j : ℕ) + 1) = i - 1 - (j : ℕ)
-              omega))
+            simpa only [gHatTupleOutcomeTail, gHatTupleOutcomeLastReverseEquiv, gsPrefix] using
+              congrArg gs (Fin.ext (by
+                change i - ((j : ℕ) + 1) = i - 1 - (j : ℕ)
+                omega))
       have hprefixAdj :=
         gHatHalfProduct_lastReverse_eq_conjTranspose params family i xsPrefix gsPrefix
       have hhead :
@@ -1572,8 +1644,9 @@ private lemma ldSandwichLineOnePointPrefixMovedFamily_outcome_none_eq_zero
     {k i : ℕ} (hi : i < k)
     (q : SandwichedLineQuestion params k) :
     (ldSandwichLineOnePointPrefixMovedFamily params family hi q).outcome none = 0 := by
-  simp [ldSandwichLineOnePointPrefixMovedFamily, postprocess, restrictSubMeas,
-    Finset.sum_filter]
+  conv_lhs =>
+    simp [ldSandwichLineOnePointPrefixMovedFamily, postprocess, restrictSubMeas,
+      Finset.sum_filter]
   apply Finset.sum_eq_zero
   intro gs _hgs
   by_cases hsome : (gs 0).isSome = true
@@ -1685,8 +1758,9 @@ private lemma ldSandwichLineOnePointLeftFamily_outcome_none_eq_zero
     {k i : ℕ} (hi : i < k)
     (q : SandwichedLineQuestion params k) :
     ((ldSandwichLineOnePointLeftFamily params strategy family k i) q).outcome none = 0 := by
-  simp [ldSandwichLineOnePointLeftFamily, postprocess, restrictSubMeas, hi,
-    Finset.sum_filter]
+  conv_lhs =>
+    simp [ldSandwichLineOnePointLeftFamily, postprocess, restrictSubMeas, hi,
+      Finset.sum_filter]
   apply Finset.sum_eq_zero
   intro gs _hgs
   cases hgs_i : gs ⟨i, hi⟩ with
@@ -1703,8 +1777,9 @@ private lemma ldSandwichLineOnePointPrefixOriginalFamily_outcome_none_eq_zero
     {k i : ℕ} (hi : i < k)
     (q : SandwichedLineQuestion params k) :
     (ldSandwichLineOnePointPrefixOriginalFamily params family hi q).outcome none = 0 := by
-  simp [ldSandwichLineOnePointPrefixOriginalFamily, postprocess, restrictSubMeas,
-    Finset.sum_filter]
+  conv_lhs =>
+    simp [ldSandwichLineOnePointPrefixOriginalFamily, postprocess, restrictSubMeas,
+      Finset.sum_filter]
   apply Finset.sum_eq_zero
   intro gs _hgs
   by_cases hsome : (gs ⟨i, Nat.lt_succ_self i⟩).isSome = true
@@ -2849,7 +2924,7 @@ private lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_adjointRawC
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
-    {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0)
+    {k i : ℕ} (hi : i < k) (_hi0 : i ≠ 0)
     (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi) :
     avgOver (uniformDistribution (SandwichedLineQuestion params k))
       (fun q => qSDDCore strategy.state

@@ -4938,8 +4938,9 @@ theorem toProjectivizationMatchMassMonotonicity
       (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
       (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
       (Preliminaries.completeAtOutcomeProj orthResidual.P_A input.a_A)
-      (Preliminaries.completeAtOutcomeProj orthResidual.P_B input.a_B) :=
-  MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_submeasurement_match_mass_and_completion
+      (Preliminaries.completeAtOutcomeProj orthResidual.P_B input.a_B) := by
+  open MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity in
+    exact of_submeasurement_match_mass_and_completion
       orthResidual.P_A orthResidual.P_B input.a_A input.a_B
       (Preliminaries.completeAtOutcomeProj orthResidual.P_A input.a_A)
       (Preliminaries.completeAtOutcomeProj orthResidual.P_B input.a_B)

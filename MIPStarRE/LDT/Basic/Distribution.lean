@@ -163,6 +163,12 @@ theorem avgOver_add {α : Type*} (𝒟 : Distribution α) (f g : α → Error) :
       avgOver 𝒟 f + avgOver 𝒟 g := by
   simp only [avgOver, mul_add, Finset.sum_add_distrib]
 
+/-- Averaging distributes over subtraction. -/
+theorem avgOver_sub {α : Type*} (𝒟 : Distribution α) (f g : α → Error) :
+    avgOver 𝒟 (fun a => f a - g a) =
+      avgOver 𝒟 f - avgOver 𝒟 g := by
+  simp only [avgOver, mul_sub, Finset.sum_sub_distrib]
+
 /-- Averaging commutes with scalar multiplication. -/
 theorem avgOver_const_mul {α : Type*} (𝒟 : Distribution α)
     (c : Error) (f : α → Error) :

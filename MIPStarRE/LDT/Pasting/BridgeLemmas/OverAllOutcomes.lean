@@ -1218,20 +1218,18 @@ private lemma avgOver_subMeasMass_restrict_liftLeft_eq_sum_coeff
           intro a _
           rw [avgOver_mul_const]
 
-/-- Sum of the per-outcome Alice-side masses of a submeasurement. -/
+/-- Sum of the per-outcome Alice-side masses of a submeasurement.
+
+Wrapper around the generic `ev_leftTensor_total_eq_sum_outcome`: by definition
+`subMeasMass ψ A.liftLeft = ev ψ A.liftLeft.total = ev ψ (leftTensor A.total)`,
+and the generic lemma expands the right-hand side as `∑ a, ev ψ (leftTensor (A.outcome a))`. -/
 private lemma subMeasMass_liftLeft_eq_sum_outcome
     {Outcome : Type*} [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
     (A : SubMeas Outcome ι) :
     subMeasMass ψ A.liftLeft =
-      ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ι) (A.outcome a)) := by
-  calc
-    subMeasMass ψ A.liftLeft = ev ψ (leftTensor (ι₂ := ι) A.total) := rfl
-    _ = ev ψ (leftTensor (ι₂ := ι) (∑ a : Outcome, A.outcome a)) := by
-          rw [A.sum_eq_total]
-    _ = ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ι) (A.outcome a)) := by
-          rw [← leftTensor_finset_sum (ι₂ := ι) Finset.univ (fun a => A.outcome a)]
-          rw [ev_finset_sum]
+      ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ι) (A.outcome a)) :=
+  ev_leftTensor_total_eq_sum_outcome ψ A
 
 /-- Fixed-distinct-tuple form of the line-consistent Schwartz--Zippel bound. -/
 private lemma lineConsistentIndicatorLocal_avg_le_mdq

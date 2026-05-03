@@ -311,7 +311,7 @@ lemma fromHToGAdjacentStageM3E_paperMove
                   rw [← leftTensor_finset_sum (ι₂ := ι) Finset.univ]
                   refine Finset.sum_congr rfl ?_
                   intro gs _hgs
-                  simp [fromHToG_leftTensor_conjTranspose, leftTensor_mul_leftTensor]
+                  simp [leftTensor_mul_leftTensor]
           _ = 1 := by simp [hsum, leftTensor]
           _ ≤ 1 := le_rfl
       have hcab := MIPStarRE.LDT.Preliminaries.cabApproxDelta ψbi
@@ -817,8 +817,12 @@ lemma fromHToGAdjacentStage_paperMoveChain
                         intro g _hg
                         rw [← Finset.sum_mul]
                         rw [leftTensor_finset_sum]
-                        have hsum := fromHToG_gHatSandwichFamily_sum_eq_one params family n q.2
-                        simp [gHatSandwichFamily] at hsum
+                        have hsum :
+                            (∑ gs : GHatTupleOutcome params n,
+                              let T := gHatHalfProductOutcomeOperator params family n q.2 gs
+                              T * Tᴴ) = 1 := by
+                          simpa [gHatSandwichFamily] using
+                            fromHToG_gHatSandwichFamily_sum_eq_one params family n q.2
                         rw [hsum]
                         simp [leftTensor]
                   _ = 1 := by

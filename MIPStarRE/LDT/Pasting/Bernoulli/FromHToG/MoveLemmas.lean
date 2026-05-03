@@ -218,23 +218,25 @@ lemma fromHToG_pointTupleTail_snoc
   funext i
   refine Fin.lastCases ?_ ?_ i
   · have hL : pointTupleTail (Fin.snoc xs x) (Fin.last n) = x := by
-        show Fin.snoc (α := fun _ : Fin (n + 2) => Fq params) xs x (Fin.last (n + 1)) = x
-        simpa [pointTupleTail, Fin.succ_last] using
-          (Fin.snoc_last (α := fun _ : Fin (n + 2) => Fq params) x xs)
-    have hR : Fin.snoc (α := fun _ : Fin (n + 1) => Fq params) (pointTupleTail xs) x (Fin.last n) = x := by
-      simpa using
-        (Fin.snoc_last (α := fun _ : Fin (n + 1) => Fq params) x (pointTupleTail xs))
+        change Fin.snoc (α := fun _ : Fin (n + 2) => Fq params) xs x
+          (Fin.last (n + 1)) = x
+        simp
+    have hR :
+        Fin.snoc (α := fun _ : Fin (n + 1) => Fq params) (pointTupleTail xs) x
+          (Fin.last n) = x := by
+      simp
     exact hL.trans hR.symm
   · intro j
     have hL : pointTupleTail (Fin.snoc xs x) j.castSucc = xs j.succ := by
-      show Fin.snoc (α := fun _ : Fin (n + 2) => Fq params) xs x (j.succ.castSucc) = xs j.succ
-      simpa [pointTupleTail] using
-        (Fin.snoc_castSucc (α := fun _ : Fin (n + 2) => Fq params) x xs j.succ)
-    have hR : Fin.snoc (α := fun _ : Fin (n + 1) => Fq params) (pointTupleTail xs) x j.castSucc = pointTupleTail xs j := by
-      simpa using
-        (Fin.snoc_castSucc (α := fun _ : Fin (n + 1) => Fq params)
-          x (pointTupleTail xs) j)
-    exact hL.trans (by simpa [pointTupleTail] using hR.symm)
+      change Fin.snoc (α := fun _ : Fin (n + 2) => Fq params) xs x
+        (j.succ.castSucc) = xs j.succ
+      rw [Fin.snoc_castSucc]
+    have hR :
+        Fin.snoc (α := fun _ : Fin (n + 1) => Fq params) (pointTupleTail xs) x
+          j.castSucc = xs j.succ := by
+      rw [Fin.snoc_castSucc]
+      rfl
+    exact hL.trans hR.symm
 
 /-- Tail of a snoc completed-outcome tuple. -/
 lemma fromHToG_gHatTupleOutcomeTail_snoc
@@ -244,26 +246,25 @@ lemma fromHToG_gHatTupleOutcomeTail_snoc
   funext i
   refine Fin.lastCases ?_ ?_ i
   · have hL : gHatTupleOutcomeTail (Fin.snoc gs g) (Fin.last n) = g := by
-        show Fin.snoc (α := fun _ : Fin (n + 2) => GHatOutcome params) gs g (Fin.last (n + 1)) = g
-        simpa [gHatTupleOutcomeTail, Fin.succ_last] using
-          (Fin.snoc_last (α := fun _ : Fin (n + 2) => GHatOutcome params) g gs)
-    have hR : Fin.snoc (α := fun _ : Fin (n + 1) => GHatOutcome params)
-        (gHatTupleOutcomeTail gs) g (Fin.last n) = g := by
-      simpa using
-        (Fin.snoc_last (α := fun _ : Fin (n + 1) => GHatOutcome params)
-          g (gHatTupleOutcomeTail gs))
+        change Fin.snoc (α := fun _ : Fin (n + 2) => GHatOutcome params) gs g
+          (Fin.last (n + 1)) = g
+        simp
+    have hR :
+        Fin.snoc (α := fun _ : Fin (n + 1) => GHatOutcome params)
+          (gHatTupleOutcomeTail gs) g (Fin.last n) = g := by
+      simp
     exact hL.trans hR.symm
   · intro j
     have hL : gHatTupleOutcomeTail (Fin.snoc gs g) j.castSucc = gs j.succ := by
-      show Fin.snoc (α := fun _ : Fin (n + 2) => GHatOutcome params) gs g (j.succ.castSucc) = gs j.succ
-      simpa [gHatTupleOutcomeTail] using
-        (Fin.snoc_castSucc (α := fun _ : Fin (n + 2) => GHatOutcome params) g gs j.succ)
-    have hR : Fin.snoc (α := fun _ : Fin (n + 1) => GHatOutcome params)
-        (gHatTupleOutcomeTail gs) g j.castSucc = gHatTupleOutcomeTail gs j := by
-      simpa using
-        (Fin.snoc_castSucc (α := fun _ : Fin (n + 1) => GHatOutcome params)
-          g (gHatTupleOutcomeTail gs) j)
-    exact hL.trans (by simpa [gHatTupleOutcomeTail] using hR.symm)
+      change Fin.snoc (α := fun _ : Fin (n + 2) => GHatOutcome params) gs g
+        (j.succ.castSucc) = gs j.succ
+      rw [Fin.snoc_castSucc]
+    have hR :
+        Fin.snoc (α := fun _ : Fin (n + 1) => GHatOutcome params)
+          (gHatTupleOutcomeTail gs) g j.castSucc = gs j.succ := by
+      rw [Fin.snoc_castSucc]
+      rfl
+    exact hL.trans hR.symm
 
 /-- Ordered half-products satisfy a snoc recursion. -/
 lemma fromHToG_gHatHalfProductOutcomeOperator_snoc
@@ -286,11 +287,9 @@ lemma fromHToG_gHatHalfProductOutcomeOperator_snoc
       rw [fromHToG_gHatHalfProductOutcomeOperator_snoc params family n
         (pointTupleTail xs) x (gHatTupleOutcomeTail gs) g]
       have hheadx : Fin.snoc (α := fun _ : Fin (n + 2) => Fq params) xs x 0 = xs 0 := by
-        simpa using
-          (Fin.snoc_castSucc (α := fun _ : Fin (n + 2) => Fq params) x xs 0)
+        simp
       have hheadg : Fin.snoc (α := fun _ : Fin (n + 2) => GHatOutcome params) gs g 0 = gs 0 := by
-        simpa using
-          (Fin.snoc_castSucc (α := fun _ : Fin (n + 2) => GHatOutcome params) g gs 0)
+        simp
       simp [hheadx, hheadg, gHatHalfProductOutcomeOperator, mul_assoc]
 
 /-- Reversing a tuple turns the ordered half-product into its adjoint. -/
@@ -310,31 +309,33 @@ lemma fromHToG_gHatHalfProduct_reverse_eq_adjoint
       refine Fin.snocCases ?_ gs
       intro gs g
       have hheadx : ((fromHToGPointTupleReverseEquiv params (n + 1)) (Fin.snoc xs x)) 0 = x := by
-        change Fin.snoc (α := fun _ : Fin (n + 1) => Fq params) xs x (Fin.rev 0) = x
+        change Fin.snoc (α := fun _ : Fin (n + 1) => Fq params) xs x
+          (Fin.rev 0) = x
         rw [Fin.rev_zero]
-        simpa using (Fin.snoc_last (α := fun _ : Fin (n + 1) => Fq params) x xs)
-      have hheadg : ((fromHToGGHatTupleOutcomeReverseEquiv params (n + 1)) (Fin.snoc gs g)) 0 = g := by
-        change Fin.snoc (α := fun _ : Fin (n + 1) => GHatOutcome params) gs g (Fin.rev 0) = g
+        simp
+      have hheadg :
+          ((fromHToGGHatTupleOutcomeReverseEquiv params (n + 1)) (Fin.snoc gs g)) 0 = g := by
+        change Fin.snoc (α := fun _ : Fin (n + 1) => GHatOutcome params) gs g
+          (Fin.rev 0) = g
         rw [Fin.rev_zero]
-        simpa using
-          (Fin.snoc_last (α := fun _ : Fin (n + 1) => GHatOutcome params) g gs)
+        simp
       have htailx :
           pointTupleTail ((fromHToGPointTupleReverseEquiv params (n + 1)) (Fin.snoc xs x)) =
             (fromHToGPointTupleReverseEquiv params n) xs := by
         funext i
-        change Fin.snoc (α := fun _ : Fin (n + 1) => Fq params) xs x (i.succ.rev) = xs i.rev
+        change Fin.snoc (α := fun _ : Fin (n + 1) => Fq params) xs x
+          (i.succ.rev) = xs i.rev
         rw [Fin.rev_succ]
-        simpa using
-          (Fin.snoc_castSucc (α := fun _ : Fin (n + 1) => Fq params) x xs i.rev)
+        simp
       have htailg :
           gHatTupleOutcomeTail ((fromHToGGHatTupleOutcomeReverseEquiv params (n + 1))
             (Fin.snoc gs g)) =
               (fromHToGGHatTupleOutcomeReverseEquiv params n) gs := by
         funext i
-        change Fin.snoc (α := fun _ : Fin (n + 1) => GHatOutcome params) gs g (i.succ.rev) = gs i.rev
+        change Fin.snoc (α := fun _ : Fin (n + 1) => GHatOutcome params) gs g
+          (i.succ.rev) = gs i.rev
         rw [Fin.rev_succ]
-        simpa using
-          (Fin.snoc_castSucc (α := fun _ : Fin (n + 1) => GHatOutcome params) g gs i.rev)
+        simp
       rw [gHatHalfProductOutcomeOperator, hheadx, hheadg, htailx, htailg]
       rw [fromHToG_gHatHalfProduct_reverse_eq_adjoint params family n xs gs]
       rw [fromHToG_gHatHalfProductOutcomeOperator_snoc params family n xs x gs g]
@@ -473,7 +474,9 @@ lemma fromHToG_closenessOfIP_avgContext
     _ ≤ Real.sqrt (avgOver 𝒟 (fun q => ∑ a : OutcomeA, x q a)) *
           Real.sqrt (avgOver 𝒟 (fun q => ∑ a : OutcomeA, y q a)) := hweighted
     _ ≤ 1 * Real.sqrt (avgOver 𝒟 (fun q => ∑ a : OutcomeA, y q a)) := by
-          exact mul_le_mul_of_nonneg_right (by simpa using Real.sqrt_le_sqrt hC) (Real.sqrt_nonneg _)
+          exact mul_le_mul_of_nonneg_right
+            (by simpa using Real.sqrt_le_sqrt hC)
+            (Real.sqrt_nonneg _)
     _ = Real.sqrt (avgOver 𝒟 (fun q => ∑ a : OutcomeA, y q a)) := by ring
     _ = Real.sqrt (avgOver 𝒟 (fun q => qSDDCore ψ (A q) (B q))) := by rw [hy_eq]
     _ ≤ Real.sqrt γ := by
@@ -540,9 +543,20 @@ lemma fromHToG_type_filtered_outcome_sum
         F τ gs) =
       ∑ gs : GHatTupleOutcome params n, F (gHatTupleType gs) gs := by
   classical
-  simp [Finset.sum_filter]
-  rw [Finset.sum_comm]
-  simp
+  calc
+    (∑ τ : GHatType n,
+      ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+          gHatTupleType gs = τ,
+        F τ gs)
+        = ∑ τ : GHatType n,
+            ∑ gs : GHatTupleOutcome params n,
+              if gHatTupleType gs = τ then F τ gs else 0 := by
+                simp only [Finset.sum_filter]
+    _ = ∑ gs : GHatTupleOutcome params n, F (gHatTupleType gs) gs := by
+          rw [Finset.sum_comm]
+          refine Finset.sum_congr rfl ?_
+          intro gs _hgs
+          simp
 
 /-- Collapse the paper's Boolean/type-filtered outcome sum to an unfiltered
 outcome sum, choosing the Boolean and type from the outcomes themselves. -/
@@ -583,8 +597,22 @@ lemma fromHToG_bool_type_filtered_outcome_sum
               (fun τ gs => F b τ g gs)
     _ = ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
           F g.isSome (gHatTupleType gs) g gs := by
-            simp [Finset.sum_filter]
-            rw [add_comm]
+            calc
+              (∑ b : Bool,
+                ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+                  ∑ gs : GHatTupleOutcome params n, F b (gHatTupleType gs) g gs)
+                  = ∑ b : Bool,
+                      ∑ g : GHatOutcome params,
+                        if g.isSome = b then
+                          ∑ gs : GHatTupleOutcome params n, F b (gHatTupleType gs) g gs
+                        else 0 := by
+                          simp only [Finset.sum_filter]
+              _ = ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+                    F g.isSome (gHatTupleType gs) g gs := by
+                    rw [Finset.sum_comm]
+                    refine Finset.sum_congr rfl ?_
+                    intro g _hg
+                    by_cases hg : g.isSome <;> simp [hg]
 
 /-- Move two finite sums through two nested averages. -/
 lemma fromHToG_sum₂_avgOver₂

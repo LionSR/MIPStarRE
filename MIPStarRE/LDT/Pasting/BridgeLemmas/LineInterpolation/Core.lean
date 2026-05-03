@@ -130,41 +130,7 @@ lemma restrictToAxisParallelLine_apply
     (t : Fq params.next) :
     (Polynomial.restrictToAxisParallelLine params.next h ℓ) t =
       h (AxisParallelLine.pointAt ℓ t) := by
-  have haxis :
-      (fun i => _root_.Polynomial.eval (decodeScalar t)
-          (Polynomial.axisCoordinatePolynomial params.next ℓ i)) =
-        decodePoint (AxisParallelLine.pointAt ℓ t) := by
-    funext i
-    by_cases hi : i = ℓ.direction
-    · subst hi
-      simp [AxisParallelLine.pointAt, Polynomial.axisCoordinatePolynomial,
-        addCoord, decodePoint, decode_encodeScalar, _root_.Polynomial.eval_add,
-        _root_.Polynomial.eval_C, _root_.Polynomial.eval_X]
-    · simp [AxisParallelLine.pointAt, Polynomial.axisCoordinatePolynomial,
-        hi, decodePoint, _root_.Polynomial.eval_C]
-  have hconst :
-      (Polynomial.evalRingHom (decodeScalar t)).comp _root_.Polynomial.C = RingHom.id _ := by
-    ext a
-    simp
-  calc
-    (Polynomial.restrictToAxisParallelLine params.next h ℓ) t
-      = encodeScalar
-          (MvPolynomial.eval₂
-            ((Polynomial.evalRingHom (decodeScalar t)).comp _root_.Polynomial.C)
-            (fun i => _root_.Polynomial.eval (decodeScalar t)
-              (Polynomial.axisCoordinatePolynomial params.next ℓ i))
-            h.poly) := by
-              simp [Polynomial.restrictToAxisParallelLine, AxisLinePolynomial.toFun,
-                evalLinePolynomialModel]
-              rw [MvPolynomial.polynomial_eval_eval₂]
-    _ = encodeScalar
-          (MvPolynomial.eval₂ (RingHom.id _)
-            (decodePoint (AxisParallelLine.pointAt ℓ t)) h.poly) := by
-              rw [hconst]
-              simpa using congrArg
-                (fun g => encodeScalar (MvPolynomial.eval₂ (RingHom.id _) g h.poly)) haxis
-    _ = h (AxisParallelLine.pointAt ℓ t) := by
-          rfl
+  exact Polynomial.restrictToAxisParallelLine_apply params.next h ℓ t
 
 lemma restrictToVerticalLine_eval_eq_restrictAtHeight_eval
     (params : Parameters) [FieldModel params.q]

@@ -380,6 +380,87 @@ theorem input_consistency_dual_mass_lower_bound
     _ ≤ ev strategy.state (leftTensor (ι₂ := ι) Z) :=
           sdp_overlap_le_dual_mass params strategy G.toSubMeas Z hZ hdual
 
+/-- Exact `Hhat` reindexing for the helper-stage left-tensor mass.
+
+Expanding `Hhat = E_u H^u` through `subMeasMass ψ Hhat.liftLeft = ev ψ (Hhat.total ⊗ I)`,
+swapping the leftTensor through the polynomial sum, and pulling the `ev` through
+the per-outcome point average gives the paper identity
+
+  `⟨ψ| Hhat ⊗ I |ψ⟩ = E_u Σ_h ⟨ψ| H^u_h ⊗ I |ψ⟩`,
+
+where `H^u_h = A^u_{h(u)} · T_h · A^u_{h(u)}` is
+`sandwichedPolynomialOutcomeOperatorAt`. This is the algebraic opening of the
+helper-stage completeness chain at
+`references/ldt-paper/self_improvement.tex`, lines 354--356, mirrored at
+`blueprint/src/chapter/ch07_self_improvement.tex`, lines 103--106.
+
+The conclusion is exact (not approximate) and depends on no input-consistency
+or SDP hypotheses. The remaining helper-completeness ingredients --- the
+Cauchy--Schwarz reductions
+(`self_improvement.tex:360--403`) onto a `Z ⊗ I`-shaped expression, and the
+input-consistency dual-mass bound already supplied by
+`input_consistency_dual_mass_lower_bound` --- compose against this identity. -/
+theorem helper_mass_eq_avg_pointwise_sandwich_sum
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    subMeasMass strategy.state
+        (averagedSandwichedPolynomialSubMeas params strategy T).liftLeft =
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ev strategy.state
+            (leftTensor (ι₂ := ι)
+              (sandwichedPolynomialOutcomeOperatorAt params strategy T u h))) := by
+  -- Per-outcome scalar identity: `ev (leftTensor (Hhat.outcome h)) = E_u ev (leftTensor H^u_h)`.
+  -- `Hhat.outcome h` is by definition the per-point average of
+  -- `sandwichedPolynomialOutcomeOperatorAt`; pulling `ev (leftTensor _)` through
+  -- the average is `ev_opTensor_averageOperatorOverDistribution_left` with `B = 1`.
+  have hev_each :
+      ∀ h : Polynomial params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+            ((averagedSandwichedPolynomialSubMeas params strategy T).outcome h)) =
+          avgOver (uniformDistribution (Point params)) (fun u =>
+            ev strategy.state
+              (leftTensor (ι₂ := ι)
+                (sandwichedPolynomialOutcomeOperatorAt params strategy T u h))) := by
+    intro h
+    exact ev_opTensor_averageOperatorOverDistribution_left strategy.state
+      (uniformDistribution (Point params))
+      (fun u => sandwichedPolynomialOutcomeOperatorAt params strategy T u h)
+      (1 : MIPStarRE.Quantum.Op ι)
+  -- Open the LHS as a polynomial-indexed sum via the generic
+  -- `ev_leftTensor_total_eq_sum_outcome`, replace each summand by its per-point
+  -- average via `hev_each`, and swap sum/avgOver via `avgOver_sum`.
+  calc
+    subMeasMass strategy.state
+        (averagedSandwichedPolynomialSubMeas params strategy T).liftLeft
+        =
+      ∑ h : Polynomial params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+            ((averagedSandwichedPolynomialSubMeas params strategy T).outcome h)) :=
+        ev_leftTensor_total_eq_sum_outcome strategy.state _
+    _ =
+      ∑ h : Polynomial params,
+        avgOver (uniformDistribution (Point params)) (fun u =>
+          ev strategy.state
+            (leftTensor (ι₂ := ι)
+              (sandwichedPolynomialOutcomeOperatorAt params strategy T u h))) :=
+        Finset.sum_congr rfl (fun h _ => hev_each h)
+    _ =
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ev strategy.state
+            (leftTensor (ι₂ := ι)
+              (sandwichedPolynomialOutcomeOperatorAt params strategy T u h))) := by
+        rw [← avgOver_sum (uniformDistribution (Point params))
+              (fun u h =>
+                ev strategy.state
+                  (leftTensor (ι₂ := ι)
+                    (sandwichedPolynomialOutcomeOperatorAt params strategy T u h)))]
+
 /-- Reduced version of `lem:sdp`.
 
 This reduced wrapper now instantiates the paper's explicit Slater witnesses: the
@@ -601,7 +682,7 @@ right-hand side: the outer `A^u_{h(u)}` factors collapse into the inner
 sandwich `A^u_{h(u)} T_h A^u_{h(u)}` because
 `(strategy.pointMeasurement u).proj` makes every point-measurement outcome a
 projection. -/
-private lemma proj_outer_sandwich_eq {ι : Type*} [Fintype ι] [DecidableEq ι]
+private lemma proj_outer_sandwich_eq {ι : Type*} [Fintype ι]
     (A X : MIPStarRE.Quantum.Op ι) (hA : A * A = A) :
     A * (A * X * A) * A = A * X * A := by
   have h1 : A * (A * X * A) * A = (A * A) * X * (A * A) := by noncomm_ring
@@ -632,11 +713,13 @@ private lemma addInURightOperatorAtPoint_selfConsistencySelection_proj_eq
   -- Unfold the `let Au := ...` binder produced by
   -- `addInURightOperatorAtPoint_selfConsistencySelection` so that we can
   -- expand the inner sandwich `(M u).outcome h = Au * T_h * Au`.
-  show opTensor
+  change opTensor
       (pointConditionedOutcomeOperatorAtPolynomial params strategy h u *
         ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h) *
         pointConditionedOutcomeOperatorAtPolynomial params strategy h u)
-      (T.outcome h) = _
+      (T.outcome h) =
+    opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
+      (T.outcome h)
   have hproj :
       pointConditionedOutcomeOperatorAtPolynomial params strategy h u *
         pointConditionedOutcomeOperatorAtPolynomial params strategy h u =
@@ -987,6 +1070,186 @@ lemma add_in_u_cs_chain_q4_eq_simplified_rhs
               ev strategy.state
                 (opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
                   (T.outcome h)))
+
+/-! ### Algebraic CS-alignment for the add-in-u Step 1/2 differences
+
+This section records pure operator-algebra rewrites that bring the differences
+`addInUCSChainQ1 - addInUCSChainQ0` and `addInUCSChainQ2 - addInUCSChainQ1`
+into the shapes required by the paper's Cauchy--Schwarz steps
+`eq:move-one-cauchy-schwarz` and `eq:move-another-cauchy-schwarz`
+(`references/ldt-paper/self_improvement.tex`, lines 261--266 and 285--289).
+The reverse-difference companions give the downstream orientation
+`Q₀ - Q₁` and `Q₁ - Q₂` without repeating subtraction bookkeeping.
+
+They do **not** discharge the Cauchy--Schwarz estimate itself; they reduce the
+raw `|Q₁ - Q₀| ≤ √(2δ)` and `|Q₁ - Q₂| ≤ √(2δ)` bounds to (a) a
+sandwich-form Cauchy--Schwarz on the resulting `D · (M^u_h ⊗ T_h) · D'`-style
+expression, plus (b) the two square-root inputs available via
+`addInU_pointMeasurement_snd_selfConsistency` and
+`addInU_filtered_sandwiched_tensor_sum_le_one`.
+
+Names are deliberately suffixed `_diff_eq` to keep them honest as intermediate
+algebraic identities rather than as the final scalar bounds. -/
+
+private lemma addInU_step1_pointwise_op_eq
+    {κ : Type*} [Fintype κ] [DecidableEq κ]
+    (M Av Th : MIPStarRE.Quantum.Op κ) :
+    opTensor (Av * M) (Th * Av) - opTensor M (Av * Th * Av) =
+      (leftTensor (ι₂ := κ) Av - rightTensor (ι₁ := κ) Av) *
+        (opTensor M Th * rightTensor (ι₁ := κ) Av) := by
+  have hLeft :
+      leftTensor (ι₂ := κ) Av * (opTensor M Th * rightTensor (ι₁ := κ) Av) =
+        opTensor (Av * M) (Th * Av) := by
+    change opTensor Av 1 * (opTensor M Th * opTensor 1 Av) =
+        opTensor (Av * M) (Th * Av)
+    rw [opTensor_mul, opTensor_mul]
+    simp
+  have hRight :
+      rightTensor (ι₁ := κ) Av * (opTensor M Th * rightTensor (ι₁ := κ) Av) =
+        opTensor M (Av * Th * Av) := by
+    change opTensor 1 Av * (opTensor M Th * opTensor 1 Av) =
+        opTensor M (Av * Th * Av)
+    rw [opTensor_mul, opTensor_mul]
+    simp [Matrix.mul_assoc]
+  rw [sub_mul, hLeft, hRight]
+
+private lemma addInU_step2_pointwise_op_eq
+    {κ : Type*} [Fintype κ] [DecidableEq κ]
+    (M Av Th : MIPStarRE.Quantum.Op κ) :
+    opTensor (Av * M * Av) Th - opTensor (Av * M) (Th * Av) =
+      leftTensor (ι₂ := κ) Av *
+        (opTensor M Th * (leftTensor (ι₂ := κ) Av - rightTensor (ι₁ := κ) Av)) := by
+  have hLeft :
+      leftTensor (ι₂ := κ) Av * (opTensor M Th * leftTensor (ι₂ := κ) Av) =
+        opTensor (Av * M * Av) Th := by
+    change opTensor Av 1 * (opTensor M Th * opTensor Av 1) =
+        opTensor (Av * M * Av) Th
+    rw [opTensor_mul, opTensor_mul]
+    simp [Matrix.mul_assoc]
+  have hRight :
+      leftTensor (ι₂ := κ) Av * (opTensor M Th * rightTensor (ι₁ := κ) Av) =
+        opTensor (Av * M) (Th * Av) := by
+    change opTensor Av 1 * (opTensor M Th * opTensor 1 Av) =
+        opTensor (Av * M) (Th * Av)
+    rw [opTensor_mul, opTensor_mul]
+    simp
+  rw [mul_sub, mul_sub, hLeft, hRight]
+
+/-- Algebraic CS-alignment for the `Q₀ → Q₁` step.
+
+Rewrites the difference `addInUCSChainQ1 - addInUCSChainQ0` in the exact form
+appearing on the LHS of `eq:move-one-cauchy-schwarz` (paper lines 261--266):
+the inner-product of the commutator
+`A^v_{h(v)} ⊗ I − I ⊗ A^v_{h(v)}` with `M^u_h ⊗ T_h · (I ⊗ A^v_{h(v)})`,
+averaged over `(u, v)` and summed over `h`.
+
+This identity is purely algebraic; the actual `√(2δ)` bound still requires
+the operator Cauchy--Schwarz step plus
+`addInU_pointMeasurement_snd_selfConsistency`. -/
+lemma addInU_cs_chain_step1_diff_eq
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    addInUCSChainQ1 params strategy T - addInUCSChainQ0 params strategy T =
+      avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+        ∑ h : Polynomial params,
+          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+          let Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+          ev strategy.state
+            ((leftTensor (ι₂ := ι) Av - rightTensor (ι₁ := ι) Av) *
+              (opTensor Mh (T.outcome h) * rightTensor (ι₁ := ι) Av))) := by
+  classical
+  unfold addInUCSChainQ0 addInUCSChainQ1
+  rw [← avgOver_sub]
+  refine avgOver_congr _ _ _ ?_
+  intro uv
+  rw [← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl ?_
+  intro h _
+  set Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+  set Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+  rw [← ev_sub]
+  congr 1
+  exact addInU_step1_pointwise_op_eq Mh Av (T.outcome h)
+
+/-- Algebraic CS-alignment for the `Q₁ → Q₂` step.
+
+Rewrites the difference `addInUCSChainQ2 - addInUCSChainQ1` in the exact form
+appearing on the LHS of `eq:move-another-cauchy-schwarz` (paper lines 285--289):
+the inner-product of `(A^v_{h(v)} · M^u_h) ⊗ T_h` with the commutator
+`A^v_{h(v)} ⊗ I − I ⊗ A^v_{h(v)}`, averaged over `(u, v)` and summed over `h`.
+The Lean statement keeps the equivalent factored form
+`(A^v_{h(v)} ⊗ I) · (M^u_h ⊗ T_h)` before the commutator.
+
+This identity is purely algebraic; the actual `√(2δ)` bound still requires
+the operator Cauchy--Schwarz step plus
+`addInU_pointMeasurement_snd_selfConsistency` and
+`addInU_filtered_sandwiched_tensor_sum_le_one`. -/
+lemma addInU_cs_chain_step2_diff_eq
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    addInUCSChainQ2 params strategy T - addInUCSChainQ1 params strategy T =
+      avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+        ∑ h : Polynomial params,
+          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+          let Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+          ev strategy.state
+            (leftTensor (ι₂ := ι) Av *
+              (opTensor Mh (T.outcome h) *
+                (leftTensor (ι₂ := ι) Av - rightTensor (ι₁ := ι) Av)))) := by
+  classical
+  unfold addInUCSChainQ1 addInUCSChainQ2
+  rw [← avgOver_sub]
+  refine avgOver_congr _ _ _ ?_
+  intro uv
+  rw [← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl ?_
+  intro h _
+  set Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+  set Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+  rw [← ev_sub]
+  congr 1
+  exact addInU_step2_pointwise_op_eq Mh Av (T.outcome h)
+
+/-- Reverse-orientation form of `addInU_cs_chain_step1_diff_eq`.
+
+This is the same algebraic identity as the `Q₀ → Q₁` rewrite, stated in the
+`Q₀ - Q₁` orientation used by the later absolute-value chain. -/
+lemma addInU_cs_chain_step1_reverse_diff_eq
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    addInUCSChainQ0 params strategy T - addInUCSChainQ1 params strategy T =
+      -avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+        ∑ h : Polynomial params,
+          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+          let Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+          ev strategy.state
+            ((leftTensor (ι₂ := ι) Av - rightTensor (ι₁ := ι) Av) *
+              (opTensor Mh (T.outcome h) * rightTensor (ι₁ := ι) Av))) := by
+  rw [← addInU_cs_chain_step1_diff_eq params strategy T]
+  ring
+
+/-- Reverse-orientation form of `addInU_cs_chain_step2_diff_eq`.
+
+This is the same algebraic identity as the `Q₁ → Q₂` rewrite, stated in the
+`Q₁ - Q₂` orientation used by the later absolute-value chain. -/
+lemma addInU_cs_chain_step2_reverse_diff_eq
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    addInUCSChainQ1 params strategy T - addInUCSChainQ2 params strategy T =
+      -avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+        ∑ h : Polynomial params,
+          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+          let Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+          ev strategy.state
+            (leftTensor (ι₂ := ι) Av *
+              (opTensor Mh (T.outcome h) *
+                (leftTensor (ι₂ := ι) Av - rightTensor (ι₁ := ι) Av)))) := by
+  rw [← addInU_cs_chain_step2_diff_eq params strategy T]
+  ring
 
 /-! ### Add-in-u variance-bound conversions
 
@@ -1515,6 +1778,121 @@ private lemma helper_agreement_average_ev_eq_avg
   refine avgOver_congr (uniformDistribution (Point params)) _ _ ?_
   intro u
   simp [helperAgreementOperatorAtPoint, ev_sum]
+
+/-- Reindexing identity for the pointwise helper-agreement operator.
+
+The fiberwise definition `H_{[h(u)=a]} := ∑_{h : h(u)=a} H_h` collapses the
+`a`-summed expression `∑_a A^u_a ⊗ H_{[h(u)=a]}` to the polynomial-indexed sum
+`∑_h A^u_{h(u)} ⊗ H_h`, by expanding the tensor product fiberwise and applying
+`Finset.sum_fiberwise` along `h ↦ h u`.
+
+This is the first equality of the boundedness display in the proof of
+`\ref{item:self-improvement-boundedness}`:
+`references/ldt-paper/self_improvement.tex` line 612, mirrored at
+`blueprint/src/chapter/ch07_self_improvement.tex` lines 274--282
+("Reindexing the sum by~$h$"). It is a purely algebraic identity — no estimate,
+no measurement structure used beyond the postprocess fiber decomposition built
+into `evaluateAt`. -/
+theorem helperAgreementOperatorAtPoint_eq_sum_polynomial
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (H : SubMeas (Polynomial params) ι)
+    (u : Point params) :
+    helperAgreementOperatorAtPoint params strategy H u =
+      ∑ h : Polynomial params,
+        opTensor ((strategy.pointMeasurement u).outcome (h u))
+          (H.outcome h) := by
+  classical
+  -- First reduce `helperAgreementOperatorAtPoint`'s `evaluateAt` to the explicit
+  -- fiber sum on each summand; everything else then follows from
+  -- `Finset.sum_fiberwise` along `h ↦ h u` and bilinearity of `opTensor`.
+  have hexpand :
+      helperAgreementOperatorAtPoint params strategy H u =
+        ∑ a : Fq params,
+          opTensor ((strategy.pointMeasurement u).outcome a)
+            (∑ h ∈ Finset.univ.filter
+                (fun h : Polynomial params => h u = a), H.outcome h) := by
+    change (∑ a : Fq params,
+        opTensor ((strategy.pointMeasurement u).outcome a)
+          ((evaluateAt params u H).outcome a)) = _
+    refine Finset.sum_congr rfl ?_
+    intro a _
+    have hev :
+        (evaluateAt params u H).outcome a =
+          ∑ h ∈ Finset.univ.filter
+              (fun h : Polynomial params => h u = a), H.outcome h := by
+      ext i j
+      simp only [evaluateAt, postprocess]
+      convert rfl
+    rw [hev]
+  rw [hexpand]
+  calc
+    ∑ a : Fq params,
+        opTensor ((strategy.pointMeasurement u).outcome a)
+          (∑ h ∈ Finset.univ.filter
+              (fun h : Polynomial params => h u = a), H.outcome h)
+        = ∑ a : Fq params, ∑ h ∈ Finset.univ.filter
+              (fun h : Polynomial params => h u = a),
+            opTensor ((strategy.pointMeasurement u).outcome a) (H.outcome h) := by
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              rw [opTensor_sum_right_finset]
+      _ = ∑ a : Fq params, ∑ h ∈ Finset.univ.filter
+              (fun h : Polynomial params => h u = a),
+            opTensor ((strategy.pointMeasurement u).outcome (h u)) (H.outcome h) := by
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              refine Finset.sum_congr rfl ?_
+              intro h hh
+              simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hh
+              rw [show h u = a from hh]
+      _ = ∑ h : Polynomial params,
+            opTensor ((strategy.pointMeasurement u).outcome (h u)) (H.outcome h) := by
+              simpa using
+                Finset.sum_fiberwise (Finset.univ : Finset (Polynomial params))
+                  (fun h : Polynomial params => h u)
+                  (fun h =>
+                    opTensor ((strategy.pointMeasurement u).outcome (h u))
+                      (H.outcome h))
+
+/-- Reindexed expansion of the averaged helper-agreement operator.
+
+Combining the pointwise reindexing identity
+`helperAgreementOperatorAtPoint_eq_sum_polynomial` with
+`helper_agreement_average_ev_eq_avg`, the scalar
+`⟨ψ| E_u Σ_a A^u_a ⊗ H_{[h(u)=a]} |ψ⟩` equals the polynomial-indexed expectation
+`E_u Σ_h ⟨ψ| A^u_{h(u)} ⊗ H_h |ψ⟩` from the second line of the boundedness
+display in the proof of `\ref{item:self-improvement-boundedness}`
+(`references/ldt-paper/self_improvement.tex` line 612;
+`blueprint/src/chapter/ch07_self_improvement.tex` lines 274--282). -/
+theorem helper_agreement_average_ev_eq_polynomial_sum
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (H : SubMeas (Polynomial params) ι) :
+    ev strategy.state (helperAgreementAverageOperator params strategy H) =
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ev strategy.state
+            (opTensor ((strategy.pointMeasurement u).outcome (h u))
+              (H.outcome h))) := by
+  rw [helper_agreement_average_ev_eq_avg]
+  refine avgOver_congr (uniformDistribution (Point params)) _ _ ?_
+  intro u
+  have hpt :
+      helperAgreementOperatorAtPoint params strategy H u =
+        ∑ h : Polynomial params,
+          opTensor ((strategy.pointMeasurement u).outcome (h u)) (H.outcome h) :=
+    helperAgreementOperatorAtPoint_eq_sum_polynomial params strategy H u
+  have hpt_ev :
+      ev strategy.state (helperAgreementOperatorAtPoint params strategy H u) =
+        ∑ h : Polynomial params,
+          ev strategy.state
+            (opTensor ((strategy.pointMeasurement u).outcome (h u))
+              (H.outcome h)) := by
+    rw [hpt, ev_sum]
+  -- The LHS goal is the unfolded `helperAgreementOperatorAtPoint`-summand at `u`.
+  simp only [helperAgreementOperatorAtPoint, ev_sum] at hpt_ev
+  exact hpt_ev
 
 /-- Transport the helper boundedness gap through the data-processing
 approximation between `Hhat` and `H`.
