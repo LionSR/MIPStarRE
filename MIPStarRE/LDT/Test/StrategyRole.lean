@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Test.StrategyRole.Core
+import MIPStarRE.LDT.Test.StrategyRole.Algebra
 import MIPStarRE.LDT.Test.StrategyRole.Symmetrization
 
 /-!
@@ -8,6 +9,7 @@ Role-register operators and strategy symmetrization infrastructure extracted fro
 `MIPStarRE.LDT.Test.Strategy`.
 
 This module is a barrel re-export. See individual submodules:
-- `MIPStarRE.LDT.Test.StrategyRole.Core` for role-register operators and tensor algebra
+- `MIPStarRE.LDT.Test.StrategyRole.Core` for role-register operators, tensor algebra and density-fixed symmetry
+- `MIPStarRE.LDT.Test.StrategyRole.Algebra` for role-pair algebraic identities and expectation calculations
 - `MIPStarRE.LDT.Test.StrategyRole.Symmetrization` for symmetrized measurements and strategies
 -/
