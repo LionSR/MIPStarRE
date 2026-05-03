@@ -658,7 +658,8 @@ theorem AnswerSelfImprovementPackage.SliceBridgeInputs.good_of_answerRestrictedG
             (((sliceStrategy x).diagonalMeasurement.toIdxProjMeas ℓ).toSubMeas)
             (fun f : DiagonalLinePolynomial params => f zeroCoord) =
           postprocess
-            (((xRestrictedAnswerSymStrat params strategy x).diagonalMeasurement.toIdxProjMeas ℓ).toSubMeas)
+            (((xRestrictedAnswerSymStrat params strategy x).diagonalMeasurement.toIdxProjMeas
+              ℓ).toSubMeas)
             (fun f : DiagonalLineAnswer params => f zeroCoord)) :
     ∀ x,
       (sliceStrategy x).IsGood
@@ -723,7 +724,8 @@ noncomputable def AnswerSelfImprovementPackage.SliceBridgeInputs.ofAnswerMeasure
             (((sliceStrategy x).diagonalMeasurement.toIdxProjMeas ℓ).toSubMeas)
             (fun f : DiagonalLinePolynomial params => f zeroCoord) =
           postprocess
-            (((xRestrictedAnswerSymStrat params strategy x).diagonalMeasurement.toIdxProjMeas ℓ).toSubMeas)
+            (((xRestrictedAnswerSymStrat params strategy x).diagonalMeasurement.toIdxProjMeas
+              ℓ).toSubMeas)
             (fun f : DiagonalLineAnswer params => f zeroCoord))
     (bridgeInputs :
       ∀ x,

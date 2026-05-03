@@ -697,9 +697,10 @@ lemma fromHToG_sum_averagedSandwichByType_total_eq_one
               (gHatSandwichFamily params family n xs).outcome gs) := by
             refine Finset.sum_congr rfl ?_
             intro xs _hxs
-            simp [Finset.sum_filter]
-            rw [Finset.sum_comm]
-            simp
+            exact congrArg
+              ((uniformDistribution (PointTuple params n)).weight xs • ·)
+              (fromHToG_type_filtered_outcome_sum params
+                (fun τ gs => (gHatSandwichFamily params family n xs).outcome gs))
     _ = ∑ xs ∈ (uniformDistribution (PointTuple params n)).support,
           (uniformDistribution (PointTuple params n)).weight xs • (1 : MIPStarRE.Quantum.Op ι) := by
             refine Finset.sum_congr rfl ?_
@@ -829,7 +830,7 @@ lemma fromHToG_SUS_context_avg_le_one
     intro τ _hτ
     let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
     let Aτ := (averagedSandwichByTypeSubMeas params family n τ).total
-    show avgOver (uniformDistribution (Fq params)) (fun x =>
+    change avgOver (uniformDistribution (Fq params)) (fun x =>
         avgOver (uniformDistribution (PointTuple params n)) (fun xs => F b τ x xs)) ≤
       branchRhs b τ
     have hrew :
@@ -858,7 +859,8 @@ lemma fromHToG_SUS_context_avg_le_one
         simpa [U] using fromHToG_gHatIdxMeas_outcome_isHermitian params family x g
       have hUproj : U * U = U := by
         simpa [U] using fromHToG_gHatIdxMeas_proj params family x g
-      have hSherm : Sᴴ = S := fromHToGRecurrenceWeight_isHermitian params family ℓ (prependTypeBit b τ)
+      have hSherm : Sᴴ = S :=
+        fromHToGRecurrenceWeight_isHermitian params family ℓ (prependTypeBit b τ)
       calc
         ev ψbi ((leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) (S * U)) *
             (leftTensor (ι₂ := ι) T * rightTensor (ι₁ := ι) (S * U))ᴴ)
@@ -959,7 +961,7 @@ lemma fromHToG_SUS_context_avg_le_one
             refine Finset.sum_congr rfl ?_
             intro τ _hτ
             rw [Fintype.sum_bool]
-            simp [branchRhs]
+            dsimp [branchRhs]
             rw [← ev_add]
             apply congrArg (ev ψbi)
             calc
@@ -979,10 +981,6 @@ lemma fromHToG_SUS_context_avg_le_one
                     rightTensor (ι₁ := ι)
                       (family.averagedSubMeas.total + (1 - family.averagedSubMeas.total)) := by
                         rw [fromHToG_rightTensor_add]
-              _ = leftTensor (ι₂ := ι)
-                    (averagedSandwichByTypeSubMeas params family n τ).total *
-                    rightTensor (ι₁ := ι) (1 : MIPStarRE.Quantum.Op ι) := by
-                        simp
     _ = ∑ τ : GHatType n,
           ev ψbi (leftTensor (ι₂ := ι)
             (averagedSandwichByTypeSubMeas params family n τ).total) := by

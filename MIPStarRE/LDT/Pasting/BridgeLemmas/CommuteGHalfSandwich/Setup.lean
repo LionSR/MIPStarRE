@@ -328,12 +328,8 @@ lemma commuteGHalfSandwich_split_zero
       0 := by
   refine ⟨?_⟩
   unfold sddErrorOp qSDDOp qSDDCore headTailOrderedFamily headTailRotatedFamily
-  simp [gHatHalfProductOutcomeOperator, leftTensor_mul_leftTensor]
-  have hzero :
-      avgOver (uniformDistribution (SliceQuestion params × PointTuple params 0))
-        (fun q => ((Fintype.card (Polynomial params) : Error) + 1) * ev ψbi 0) = 0 := by
-    simp [avgOver, uniformDistribution, ev_zero]
-  nlinarith [hzero]
+  simp only [gHatHalfProductOutcomeOperator, leftTensor_one, mul_one]
+  simp [avgOver, uniformDistribution, ev_zero]
 
 lemma gHatSelfConsistency_sddOpRel
     (params : Parameters) [FieldModel params.q]
@@ -1382,15 +1378,9 @@ lemma commuteGHalfSandwich_move_recursive_zero
   refine ⟨?_⟩
   unfold sddErrorOp qSDDOp qSDDCore commuteGHalfSandwich_moveSourceFamily
       commuteGHalfSandwich_moveFamily
-  simp [gHatHalfProductOutcomeOperator, gHatReverseHalfProductOutcomeOperator,
-    leftTensor_mul_leftTensor]
-  have hzero :
-      avgOver (uniformDistribution (SliceQuestion params × SliceQuestion params ×
-          PointTuple params 0))
-        (fun q => ((Fintype.card (Polynomial params) : Error) + 1) *
-          ((Fintype.card (Polynomial params) : Error) + 1) * ev ψbi 0) = 0 := by
-    simp [avgOver, uniformDistribution, ev_zero]
-  nlinarith [hzero]
+  simp only [gHatHalfProductOutcomeOperator, gHatReverseHalfProductOutcomeOperator,
+    leftTensor_one, mul_one]
+  simp [avgOver, uniformDistribution, ev_zero]
 
 def pointTupleOneEquiv (params : Parameters) :
     PointTuple params 1 ≃ SliceQuestion params where

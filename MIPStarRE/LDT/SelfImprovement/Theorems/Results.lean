@@ -600,7 +600,7 @@ right-hand side: the outer `A^u_{h(u)}` factors collapse into the inner
 sandwich `A^u_{h(u)} T_h A^u_{h(u)}` because
 `(strategy.pointMeasurement u).proj` makes every point-measurement outcome a
 projection. -/
-private lemma proj_outer_sandwich_eq {ι : Type*} [Fintype ι] [DecidableEq ι]
+private lemma proj_outer_sandwich_eq {ι : Type*} [Fintype ι]
     (A X : MIPStarRE.Quantum.Op ι) (hA : A * A = A) :
     A * (A * X * A) * A = A * X * A := by
   have h1 : A * (A * X * A) * A = (A * A) * X * (A * A) := by noncomm_ring
@@ -631,11 +631,13 @@ private lemma addInURightOperatorAtPoint_selfConsistencySelection_proj_eq
   -- Unfold the `let Au := ...` binder produced by
   -- `addInURightOperatorAtPoint_selfConsistencySelection` so that we can
   -- expand the inner sandwich `(M u).outcome h = Au * T_h * Au`.
-  show opTensor
+  change opTensor
       (pointConditionedOutcomeOperatorAtPolynomial params strategy h u *
         ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h) *
         pointConditionedOutcomeOperatorAtPolynomial params strategy h u)
-      (T.outcome h) = _
+      (T.outcome h) =
+    opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
+      (T.outcome h)
   have hproj :
       pointConditionedOutcomeOperatorAtPolynomial params strategy h u *
         pointConditionedOutcomeOperatorAtPolynomial params strategy h u =
