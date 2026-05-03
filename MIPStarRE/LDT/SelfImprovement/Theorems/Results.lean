@@ -1227,6 +1227,56 @@ theorem helper_boundedness_gap_transport_through_data_processing
       ev strategy.state (helperAgreementAverageOperator params strategy H.toSubMeas))
   linarith
 
+/-- Final-fields producer for the `BoundedByOperator` conclusion.
+
+If the SDP dual witness dominates the identity, then the left-placed mass of any
+submeasurement is dominated by `Z ⊗ I`: the total bound `A.total ≤ 1 ≤ Z` lifts
+by monotonicity to `leftTensor A.total ≤ leftTensor Z`, and evaluation against
+the state preserves this order. Consequently `bndError ψ A.liftLeft (Z ⊗ I) = 0`,
+so the boundedness statement holds at any nonnegative tolerance. This is a
+standalone producer; it does not alter the current `FinalFieldsInput` interface. -/
+theorem final_fields_bounded
+    {α : Type*} [Fintype α]
+    (ψ : QuantumState (ι × ι))
+    (A : SubMeas α ι)
+    {Z : MIPStarRE.Quantum.Op ι}
+    (hOne : (1 : MIPStarRE.Quantum.Op ι) ≤ Z)
+    {ε : Error}
+    (hε : 0 ≤ ε) :
+    BoundedByOperator ψ A.liftLeft (leftTensor (ι₂ := ι) Z) ε := by
+  refine
+    { witnessOpPSD := ?_
+      upperBound := ?_ }
+  · have : leftTensor (ι₂ := ι) Z = opTensor Z (1 : MIPStarRE.Quantum.Op ι) := rfl
+    rw [this]
+    have hPSD : 0 ≤ Z := le_trans (op_one_nonneg (d := ι)) hOne
+    exact opTensor_nonneg hPSD op_one_nonneg
+  · have hAle : A.total ≤ Z :=
+      le_trans A.total_le_one hOne
+    have hLTle :
+        leftTensor (ι₂ := ι) A.total ≤ leftTensor (ι₂ := ι) Z := by
+      have hopMono :
+          opTensor A.total (1 : MIPStarRE.Quantum.Op ι) ≤
+            opTensor Z (1 : MIPStarRE.Quantum.Op ι) :=
+        opTensor_mono_left hAle op_one_nonneg
+      simpa [leftTensor, opTensor] using hopMono
+    have hsubmass :
+        subMeasMass ψ A.liftLeft = ev ψ (leftTensor (ι₂ := ι) A.total) := rfl
+    have hev_le :
+        ev ψ (leftTensor (ι₂ := ι) A.total) ≤ ev ψ (leftTensor (ι₂ := ι) Z) :=
+      ev_mono ψ _ _ hLTle
+    have hbnd_zero :
+        bndError ψ A.liftLeft (leftTensor (ι₂ := ι) Z) = 0 := by
+      unfold bndError
+      rw [hsubmass]
+      have :
+          ev ψ (leftTensor (ι₂ := ι) A.total) -
+              ev ψ (leftTensor (ι₂ := ι) Z) ≤ 0 := by
+        linarith
+      exact max_eq_left this
+    rw [hbnd_zero]
+    exact hε
+
 /-- Reduced version of `lem:self-improvement-helper`.
 
 Unlike the paper helper lemma, this theorem does not yet take the consistency
