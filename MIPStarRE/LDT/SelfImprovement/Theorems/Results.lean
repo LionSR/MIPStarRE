@@ -461,6 +461,149 @@ theorem helper_mass_eq_avg_pointwise_sandwich_sum
                   (leftTensor (ι₂ := ι)
                     (sandwichedPolynomialOutcomeOperatorAt params strategy T u h)))]
 
+/-- Operator-level fiberwise reindexing identity for the per-point sandwich
+operator. Inside each fiber `{h : h u = a}` the inner `A^u_{h(u)}` is constant
+(equal to `A^u_a`), and `Matrix.sum_mul`/`Matrix.mul_sum` pull this constant
+factor through the sum over `T_h`. Mirrors the operator-level computation in
+`sandwichedPolynomialSubMeasAt.total_le_one`. -/
+private lemma sandwichedPolynomialOutcomeOperatorAt_sum_eq_bracketed
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) (u : Point params) :
+    (∑ h : Polynomial params,
+        sandwichedPolynomialOutcomeOperatorAt params strategy T u h) =
+      ∑ a : Fq params,
+        (strategy.pointMeasurement u).outcome a *
+          (∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
+            T.outcome h) *
+          (strategy.pointMeasurement u).outcome a := by
+  classical
+  rw [show (∑ h : Polynomial params,
+              sandwichedPolynomialOutcomeOperatorAt params strategy T u h) =
+            ∑ a : Fq params,
+              ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
+                sandwichedPolynomialOutcomeOperatorAt params strategy T u h from by
+          simpa using (Finset.sum_fiberwise Finset.univ
+            (fun h : Polynomial params => h u)
+            (sandwichedPolynomialOutcomeOperatorAt params strategy T u)).symm]
+  refine Finset.sum_congr rfl ?_
+  intro a _
+  have hreplace :
+      ∀ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
+        sandwichedPolynomialOutcomeOperatorAt params strategy T u h =
+          (strategy.pointMeasurement u).outcome a *
+            T.outcome h *
+            (strategy.pointMeasurement u).outcome a := by
+    intro h hh
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hh
+    simp [sandwichedPolynomialOutcomeOperatorAt,
+      pointConditionedOutcomeOperatorAtPolynomial, hh]
+  rw [Finset.sum_congr rfl hreplace, ← Matrix.sum_mul, ← Matrix.mul_sum]
+
+/-- Per-point bracketing identity for the helper-stage left-tensor mass.
+
+Fiberwise reindexing by `h ↦ h(u)` and pulling `A^u_a · _ · A^u_a` through the
+sum, `leftTensor`, and `ev` give the paper identity at a fixed point `u`:
+
+  `Σ_h ⟨ψ| H^u_h ⊗ I |ψ⟩
+    = Σ_a ⟨ψ| (A^u_a · T_{[h(u) = a]} · A^u_a) ⊗ I |ψ⟩`,
+
+where `H^u_h = A^u_{h(u)} · T_h · A^u_{h(u)}` is
+`sandwichedPolynomialOutcomeOperatorAt`, and the bracketed
+`T_{[h(u) = a]} = Σ_{h : h u = a} T_h` is the inner fiber sum.
+
+This is the identity `eq:bracketize-the-expression` of
+`references/ldt-paper/self_improvement.tex`, lines 356--358 (mirrored at
+`blueprint/src/chapter/ch07_self_improvement.tex`, lines 110--113), at a fixed
+point `u` (before averaging). The conclusion is exact (not approximate) and
+depends on no input-consistency, SDP, or self-consistency hypotheses; it is
+purely an algebraic regrouping of `Σ_h H^u_h` by the value of `h` at `u`.
+
+Composed with `helper_mass_eq_avg_pointwise_sandwich_sum` (PR #1119) this yields
+the bracketed form `helper_mass_eq_avg_pointwise_bracketed_sum` of the
+helper-stage `Hhat ⊗ I` mass, which is the starting point for the remaining
+Cauchy--Schwarz reduction at `self_improvement.tex:360--403` toward
+`eq:gonna-use-this-later-H-versus-Z`. -/
+theorem helper_pointwise_sandwich_sum_eq_bracketed
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) (u : Point params) :
+    (∑ h : Polynomial params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+            (sandwichedPolynomialOutcomeOperatorAt params strategy T u h))) =
+      ∑ a : Fq params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+            ((strategy.pointMeasurement u).outcome a *
+              (∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
+                T.outcome h) *
+              (strategy.pointMeasurement u).outcome a)) := by
+  classical
+  calc
+    (∑ h : Polynomial params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+            (sandwichedPolynomialOutcomeOperatorAt params strategy T u h)))
+        =
+      ev strategy.state
+        (leftTensor (ι₂ := ι)
+          (∑ h : Polynomial params,
+            sandwichedPolynomialOutcomeOperatorAt params strategy T u h)) := by
+        rw [← ev_finset_sum, leftTensor_finset_sum]
+    _ =
+      ev strategy.state
+        (leftTensor (ι₂ := ι)
+          (∑ a : Fq params,
+            (strategy.pointMeasurement u).outcome a *
+              (∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
+                T.outcome h) *
+              (strategy.pointMeasurement u).outcome a)) := by
+        rw [sandwichedPolynomialOutcomeOperatorAt_sum_eq_bracketed]
+    _ =
+      ∑ a : Fq params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+            ((strategy.pointMeasurement u).outcome a *
+              (∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
+                T.outcome h) *
+              (strategy.pointMeasurement u).outcome a)) := by
+        rw [← leftTensor_finset_sum, ev_finset_sum]
+
+/-- Bracketed form of the helper-stage `Hhat ⊗ I` mass identity.
+
+Combines `helper_mass_eq_avg_pointwise_sandwich_sum` (PR #1119) with the
+per-point bracketing identity `helper_pointwise_sandwich_sum_eq_bracketed`:
+
+  `⟨ψ| Hhat ⊗ I |ψ⟩
+    = E_u Σ_a ⟨ψ| (A^u_a · T_{[h(u) = a]} · A^u_a) ⊗ I |ψ⟩`,
+
+where `T_{[h(u) = a]} = Σ_{h : h u = a} T_h`. This is the second equality in the
+displayed completeness chain at
+`references/ldt-paper/self_improvement.tex`, lines 354--358 (mirrored at
+`blueprint/src/chapter/ch07_self_improvement.tex`, lines 103--113), composed
+with the bracketing reindexing `eq:bracketize-the-expression`. The conclusion
+is exact (not approximate) and depends on no input-consistency, SDP, or
+self-consistency hypotheses. -/
+theorem helper_mass_eq_avg_pointwise_bracketed_sum
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    subMeasMass strategy.state
+        (averagedSandwichedPolynomialSubMeas params strategy T).liftLeft =
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ a : Fq params,
+          ev strategy.state
+            (leftTensor (ι₂ := ι)
+              ((strategy.pointMeasurement u).outcome a *
+                (∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
+                  T.outcome h) *
+                (strategy.pointMeasurement u).outcome a))) := by
+  rw [helper_mass_eq_avg_pointwise_sandwich_sum]
+  refine avgOver_congr (uniformDistribution (Point params)) _ _ ?_
+  intro u
+  exact helper_pointwise_sandwich_sum_eq_bracketed params strategy T u
+
 /-- Reduced version of `lem:sdp`.
 
 This reduced wrapper now instantiates the paper's explicit Slater witnesses: the
