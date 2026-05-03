@@ -199,6 +199,102 @@ noncomputable def projectiveP {Outcome : Type*} [Fintype Outcome]
     OpFamily Outcome ι :=
   PFamily data
 
+/-- Local producer for the `X/Xhat/P` data layer.
+
+Given a `Q`-layer (`def:matrix-decomposition-Q`), the matrix decomposition `X`
+of the paper, the chosen `Xhat`, and the two genuinely SVD-derived identities
+`Xhat * Xhatᴴ = I` (`lem:X-hat-squared`) and `Xᴴ * Xhat = √Q`
+(`lem:X-times-X-hat`), this assembles the `QXPLayerData` package consumed by
+the downstream `lem:P-Q-approx` argument.
+
+Exactly one propositional field is proved inside this producer:
+`x_gram_right` (`Xᴴ * X = Q`, paper label `lem:X-squared`) follows from the
+embedding `Q_a = Xᴴ * T_a * X` (`qa_eq`) together with the fact that the
+auxiliary measurement `T = {T_a}` sums to the identity. The other propositional
+fields, including `qa_projective`, are supplied by the caller.
+
+The hypothesis `qa_eq` records exactly the `lem:qa-restated` choice, and the
+two SVD-derived hypotheses are precisely what the paper proves about
+`Xhat = U · I_{m×d} · V†`. The producer therefore feeds directly into
+`QXPLayerData` once a rectangular complex SVD of `X` is available; that SVD
+existence is the only remaining gap and is independent of this producer. -/
+noncomputable def QXPLayerData.ofQLayerAndSvdIdentities
+    {Outcome : Type uOutcome} [Fintype Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (qLayer : QLayerData Outcome ι)
+    (qa_projective : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (Qa qLayer a))
+    (q_sum_eq_total : ∑ a : Outcome, Qa qLayer a = QTotal qLayer)
+    (x : Matrix qLayer.auxSpace.carrier ι ℂ)
+    (xHat : Matrix qLayer.auxSpace.carrier ι ℂ)
+    (qa_eq : ∀ a : Outcome, qLayer.q.outcome a = xᴴ * Ta qLayer a * x)
+    (xHat_coisometry : xHat * xHatᴴ = (1 : MIPStarRE.Quantum.Op qLayer.auxSpace.carrier))
+    (xHat_mixed : xᴴ * xHat = CFC.sqrt (QTotal qLayer)) :
+    QXPLayerData Outcome ι where
+  qLayer := qLayer
+  x := x
+  xHat := xHat
+  qa_eq := qa_eq
+  qa_projective := qa_projective
+  xHat_coisometry := xHat_coisometry
+  x_gram_right := by
+    have hT_sum :
+        (∑ a : Outcome, Ta qLayer a) =
+          (1 : MIPStarRE.Quantum.Op qLayer.auxSpace.carrier) := by
+      simpa [Ta] using qLayer.t.sum_eq
+    have hmul_sum :
+        xᴴ * (∑ a : Outcome, Ta qLayer a) =
+          ∑ a : Outcome, xᴴ * Ta qLayer a := by
+      simpa using
+        (Matrix.mul_sum (s := Finset.univ)
+          (f := fun a : Outcome => Ta qLayer a) (M := xᴴ))
+    have hsum_mul :
+        (∑ a : Outcome, xᴴ * Ta qLayer a) * x =
+          ∑ a : Outcome, xᴴ * Ta qLayer a * x := by
+      simpa using
+        (Matrix.sum_mul (s := Finset.univ)
+          (f := fun a : Outcome => xᴴ * Ta qLayer a) (M := x))
+    calc
+      xᴴ * x
+          = xᴴ * (∑ a : Outcome, Ta qLayer a) * x := by
+            rw [hT_sum, Matrix.mul_one]
+      _ = (∑ a : Outcome, xᴴ * Ta qLayer a) * x := by
+            rw [hmul_sum]
+      _ = ∑ a : Outcome, xᴴ * Ta qLayer a * x := hsum_mul
+      _ = ∑ a : Outcome, qLayer.q.outcome a := by
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            exact (qa_eq a).symm
+      _ = ∑ a : Outcome, Qa qLayer a := rfl
+      _ = QTotal qLayer := q_sum_eq_total
+  xHat_mixed := xHat_mixed
+
+/-- Existence form of `QXPLayerData.ofQLayerAndSvdIdentities`,
+matching the shape requested by issue #1117.
+
+Given a `Q`-layer, supplied projectivity and total-sum hypotheses, the matrix
+decomposition `X`, the chosen `Xhat`, and the two SVD-derived primitives, there
+is a `QXPLayerData` whose `qLayer`, `x`, and `xHat` are exactly the supplied
+data, with the latter two compared after transport along the `qLayer` equality.
+The propositional fields are filled by the supplied hypotheses, except
+`x_gram_right`, which is proved internally from `qa_eq` and the measurement
+identity for `T`. -/
+theorem exists_qxpLayerData_ofQLayerAndSvdIdentities
+    {Outcome : Type uOutcome} [Fintype Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (qLayer : QLayerData Outcome ι)
+    (qa_projective : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (Qa qLayer a))
+    (q_sum_eq_total : ∑ a : Outcome, Qa qLayer a = QTotal qLayer)
+    (x : Matrix qLayer.auxSpace.carrier ι ℂ)
+    (xHat : Matrix qLayer.auxSpace.carrier ι ℂ)
+    (qa_eq : ∀ a : Outcome, qLayer.q.outcome a = xᴴ * Ta qLayer a * x)
+    (xHat_coisometry : xHat * xHatᴴ = (1 : MIPStarRE.Quantum.Op qLayer.auxSpace.carrier))
+    (xHat_mixed : xᴴ * xHat = CFC.sqrt (QTotal qLayer)) :
+    ∃ data : QXPLayerData Outcome ι,
+      ∃ hq : data.qLayer = qLayer,
+        hq ▸ data.x = x ∧ hq ▸ data.xHat = xHat :=
+  ⟨QXPLayerData.ofQLayerAndSvdIdentities qLayer qa_projective q_sum_eq_total
+      x xHat qa_eq xHat_coisometry xHat_mixed, rfl, rfl, rfl⟩
+
 
 end
 
