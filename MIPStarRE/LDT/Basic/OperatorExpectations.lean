@@ -539,26 +539,11 @@ private theorem ev_opTensor_sandwich_diag_nonneg
     (X M : MIPStarRE.Quantum.Op ι₁)
     (T : MIPStarRE.Quantum.Op ι₂)
     (hM : 0 ≤ M) (hT : 0 ≤ T) :
-    0 ≤ ev ψ (opTensor (Xᴴ * M * X) T) := by
-  classical
-  have hsM_self : CFC.sqrt M * CFC.sqrt M = M := CFC.sqrt_mul_sqrt_self M hM
-  have hsT_self : CFC.sqrt T * CFC.sqrt T = T := CFC.sqrt_mul_sqrt_self T hT
-  have hsM_herm : (CFC.sqrt M)ᴴ = CFC.sqrt M :=
-    (Matrix.nonneg_iff_posSemidef.mp (CFC.sqrt_nonneg M)).isHermitian.eq
-  have hsT_herm : (CFC.sqrt T)ᴴ = CFC.sqrt T :=
-    (Matrix.nonneg_iff_posSemidef.mp (CFC.sqrt_nonneg T)).isHermitian.eq
-  set A : MIPStarRE.Quantum.Op (ι₁ × ι₂) :=
-    opTensor (CFC.sqrt M * X) (CFC.sqrt T) with hA_def
-  have hA_adj : Aᴴ = opTensor (Xᴴ * CFC.sqrt M) (CFC.sqrt T) := by
-    rw [hA_def, conjTranspose_opTensor, Matrix.conjTranspose_mul, hsM_herm, hsT_herm]
-  have hAA : Aᴴ * A = opTensor (Xᴴ * M * X) T := by
-    rw [hA_adj, hA_def, opTensor_mul]
-    congr 1
-    · calc Xᴴ * CFC.sqrt M * (CFC.sqrt M * X)
-          = Xᴴ * (CFC.sqrt M * CFC.sqrt M) * X := by noncomm_ring
-        _ = Xᴴ * M * X := by rw [hsM_self]
-  have := ev_adjoint_self_nonneg ψ A
-  rwa [hAA] at this
+    0 ≤ ev ψ (opTensor (Xᴴ * M * X) T) :=
+  ev_nonneg_of_psd ψ _
+    (opTensor_nonneg
+      ((Matrix.nonneg_iff_posSemidef.mp hM).conjTranspose_mul_mul_same X).nonneg
+      hT)
 
 /-- Absolute-value form of the bipartite-tensor sandwich Cauchy–Schwarz. -/
 theorem ev_opTensor_sandwich_abs_le_sqrt
