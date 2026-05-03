@@ -2315,6 +2315,93 @@ theorem add_in_u_cs_chain_q3_q4_factored_cs
       rwa [hY_herm] at this
     exact ev_nonneg_of_psd strategy.state _ (opTensor_nonneg hYMhY_pos hTh_pos)
 
+
+/-- Self-energy factor `≤ 1` for the `Q₃ → Q₄` factored Cauchy--Schwarz.
+
+The first square-root factor `D₁` produced by `add_in_u_cs_chain_q3_q4_factored_cs`
+is bounded by `1`. The proof collapses the outer projection `A^u_{h(u)}` around
+the sandwiched submeasurement `H^u_h = A^u_{h(u)} · T_h · A^u_{h(u)}` via
+projectivity, then bounds the per-point sum of `opTensor (H^u_h) (T_h)` by
+the submeasurement-opTensor-sum lemma, lifts to expectation via `ev ψ`,
+and averages over `(u, v)` with the `v`-average collapsing to unity.
+
+This supplies the `hD₁_le_one` hypothesis required by
+`add_in_u_cs_chain_q3_q4_le_sqrt_of_factor_bounds`.  The proof is
+fully symmetric in `u` ↔ `v` up to projection renaming, so the same
+pattern directly supplies `hD₂_le_one` for the `Q₂ → Q₃` factored
+`add_in_u_cs_chain_q2_q3_le_sqrt_of_factor_bounds` analogue. -/
+lemma add_in_u_cs_chain_q3_q4_self_energy_factor_le_one
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+      ∑ h : Polynomial params,
+        let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1
+        let Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+        ev strategy.state (opTensor (Au * Mh * Au) (T.outcome h))) ≤ 1 := by
+  classical
+  let S : Point params → SubMeas (Polynomial params) ι :=
+    fun u => sandwichedPolynomialSubMeasAt params strategy T u
+  -- Projection collapse: `Au * (S u).outcome h * Au = (S u).outcome h`
+  have hcollapse : ∀ (u : Point params) (h : Polynomial params),
+      let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
+      Au * (S u).outcome h * Au = (S u).outcome h := by
+    intro u h Au
+    have hproj : Au * Au = Au := by
+      simpa [pointConditionedOutcomeOperatorAtPolynomial] using
+        (strategy.pointMeasurement u).proj (h u)
+    have hMh_eq : (S u).outcome h = Au * T.outcome h * Au := rfl
+    rw [hMh_eq]
+    exact proj_outer_sandwich_eq Au (T.outcome h) hproj
+  -- Rewrite D₁ using the collapse
+  have hD₁_eq :
+      avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+        ∑ h : Polynomial params,
+          let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1
+          let Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+          ev strategy.state (opTensor (Au * Mh * Au) (T.outcome h))) =
+      avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+        ∑ h : Polynomial params,
+          ev strategy.state (opTensor ((S uv.1).outcome h) (T.outcome h))) := by
+    refine avgOver_congr _ _ _ ?_
+    intro uv
+    refine Finset.sum_congr rfl ?_
+    intro h _
+    dsimp
+    have h_eq := hcollapse uv.1 h
+    dsimp at h_eq
+    rw [h_eq]
+  rw [hD₁_eq]
+  -- The integrand depends only on `uv.1`, so the average over `v` collapses
+  rw [avgOver_uniform_fst
+    (α := Point params) (β := Point params)
+    (f := fun u =>
+      ∑ h : Polynomial params,
+        ev strategy.state (opTensor ((S u).outcome h) (T.outcome h)))]
+  -- Per-point bound: the expectation sum is ≤ 1
+  have hpointwise : ∀ u : Point params,
+      ∑ h : Polynomial params,
+        ev strategy.state (opTensor ((S u).outcome h) (T.outcome h)) ≤ 1 := by
+    intro u
+    have hop_sum_le_one :
+        (∑ h : Polynomial params,
+          opTensor ((S u).outcome h) (T.outcome h)) ≤
+        (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
+      have := SubMeas.opTensor_sum_filter_le_one (S u) T
+        (fun _ : Polynomial params => True)
+      simpa [Finset.filter_true] using this
+    calc
+      ∑ h : Polynomial params,
+          ev strategy.state (opTensor ((S u).outcome h) (T.outcome h))
+          = ev strategy.state
+              (∑ h : Polynomial params,
+                opTensor ((S u).outcome h) (T.outcome h)) := by
+            rw [ev_finset_sum]
+      _ ≤ ev strategy.state (1 : MIPStarRE.Quantum.Op (ι × ι)) :=
+            ev_mono strategy.state _ _ hop_sum_le_one
+      _ = 1 := ev_one_of_isNormalized strategy.state strategy.isNormalized
+  exact avgOver_uniform_le_of_pointwise_le _ 1 zero_le_one hpointwise
+
 /-- Sqrt-monotonicity transit lemma used by the two GlobalVariance endpoint
 bridges below: a real bounded by `Real.sqrt s` is bounded by `Real.sqrt ζ`
 whenever `s ≤ ζ`. Both `Q₂→Q₃` and `Q₃→Q₄` apply this fact with the same `s`
