@@ -1,6 +1,7 @@
 import MIPStarRE.LDT.GlobalVariance.Theorems.AlgebraicIdentity
 import MIPStarRE.LDT.GlobalVariance.Theorems.CollisionExpansion
 import MIPStarRE.LDT.GlobalVariance.Theorems.SelfConsistencyTransport
+import MIPStarRE.LDT.GlobalVariance.Theorems.SelfConsistencyTransportSum
 import MIPStarRE.LDT.GlobalVariance.Theorems.TransportChain
 import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
 import MIPStarRE.LDT.GlobalVariance.Theorems.PolynomialSumBounds
@@ -17,6 +18,9 @@ sub-modules:
   Schwartz-Zippel collision expansion
 - `SelfConsistencyTransport`: good-strategy self-consistency transport (`2δ` and
   `2ε` approximation steps)
+- `SelfConsistencyTransportSum`: polynomial-sum (cardinality-free) `2ε`
+  axis-parallel consistency endpoints, the sum-form analogues of the per-`g`
+  transport steps in `SelfConsistencyTransport`
 - `TransportChain`: six-step local-variance transport assembly on the line-pair
   presentation
 - `MainTheorems`: top-level `lem:local-variance-of-points`,
