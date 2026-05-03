@@ -1,0 +1,169 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\setlength{\emergencystretch}{2em}
+
+\input{command}
+
+\title{Issue 1100: Endpoint Branches in the Proof of
+\texorpdfstring{$\path{lem:projective-non-measurement}$}{lem:projective-non-measurement}}
+\author{}
+\date{2026-05-03}
+
+\begin{document}
+\maketitle
+
+\section{The cited statement}
+
+This note concerns the lemma ``Rounding to projectors'' in
+\cite[Section~5]{Ji2020LowIndividualDegree}.\footnote{Tracked in
+\ghissue{1100}. In the TeX source consulted here, the statement and proof are in
+\path{references/ldt-paper/orthonormalization.tex}, lines~414--531.}
+The cited lemma states that, for a measurement $A = \{A_a\}$,
+there exists a family of projectors $\{R_a\}$ such that
+\[
+  A_a \ot I \approx_{2\sqrt{\zeta}} R_a \ot I
+\]
+and, writing $R = \sum_a R_a$,
+\[
+  R \leq (1 + 2\sqrt{\zeta}) I.
+\]
+In the surrounding proof, the parameter $\zeta$ is the error term already fixed
+in the orthonormalization-main-lemma argument.
+
+Just before this lemma, the paper derives
+\[
+  \sum_a \bra{\psi} (A_a - A_a^2) \ot I \ket{\psi} \le 2\zeta.
+  \tag{\path{eq:A-looks-projective}}
+\]
+This is the only input used in the proof of the rounding lemma: once
+\path{eq:A-looks-projective} has been obtained, the auxiliary measurement $B$ no
+longer appears.
+
+\section{The large-error branch}
+
+The paper does handle the large-$\zeta$ region, but it does so one level above
+the rounding lemma.  At the start of the proof of the orthonormalization-main
+lemma it says that the argument is trivial when $\zeta > 1/4$, and therefore
+continues under the standing assumption
+\[
+  \zeta \le 1/4.
+  \tag{\path{eq:assumption-on-zeta}}
+\]
+This reduction appears in
+\path{references/ldt-paper/orthonormalization.tex}, lines~375--379, before the
+derivation of \path{eq:A-looks-projective} and before the proof of
+\path{lem:projective-non-measurement}.  Thus the cited argument for the rounding
+lemma is intended to be read only in the small-error regime.
+
+For the paper as written, this is enough: the lemma is invoked only inside the
+proof which has already restricted to $\zeta \le 1/4$.  A standalone formal
+declaration, however, cannot rely on that surrounding reduction unless it is
+built into the declaration itself.  If one wants a public theorem whose
+conclusion is the rounding witness for all $\zeta \ge 0$, then the trivial
+large-error branch must be supplied explicitly in the formal development even
+though the paper leaves it implicit at the level of
+\path{lem:projective-non-measurement}.
+
+\section{The endpoint \texorpdfstring{$\zeta = 0$}{zeta = 0}}
+
+The proof of the rounding lemma introduces an auxiliary threshold parameter
+$\delta$ satisfying
+\[
+  0 < \delta \le 1/2.
+  \tag{\path{eq:bound-on-delta}}
+\]
+The positivity of $\delta$ is used throughout the truncation argument, because
+the scalar inequality
+\[
+  (x - \mathsf{trunc}_\delta(x))^2 \le \frac{1}{\delta}(x - x^2)
+\]
+and its operator consequence
+\[
+  (A_a - R_a)^2 \le \frac{1}{\delta}(A_a - A_a^2)
+\]
+both divide by $\delta$.  The same factor $1/\delta$ is then carried into the
+state-dependent-distance estimate in lines~487--493 of the source file.
+
+At the end of the proof, the paper sets
+\[
+  \delta = \sqrt{\zeta}.
+\]
+This substitution appears in
+\path{references/ldt-paper/orthonormalization.tex}, lines~528--529.  Together
+with \path{eq:bound-on-delta}, it covers exactly the regime
+\[
+  0 < \zeta \le 1/4.
+\]
+When $\zeta = 0$, the statement of the lemma still makes sense, but the printed
+proof no longer applies literally, because it would require $\delta = 0$ while
+simultaneously using $1/\delta$.
+
+This is therefore a proof-level endpoint omission rather than a theorem-level
+counterexample.  The mathematical content of the $\zeta = 0$ case is clear.  If
+\[
+  \sum_a \bra{\psi} (A_a - A_a^2) \ot I \ket{\psi} = 0,
+\]
+then each summand is a nonnegative expectation and hence vanishes.  Writing
+$A_a = \sum_i \lambda_{a,i} \ket{u_{a,i}}\bra{u_{a,i}}$ with
+$0 \le \lambda_{a,i} \le 1$, one may define $R_a$ to be the spectral projector
+onto the $1$-eigenspace of $A_a$.  Then $R_a \le A_a$, so
+\[
+  \sum_a R_a \le \sum_a A_a = I,
+\]
+which is stronger than the bound claimed in the lemma.  Moreover the vanishing
+of
+\(
+\bra{\psi} (A_a - A_a^2) \ot I \ket{\psi}
+\)
+forces the state to have no weight on eigenspaces with eigenvalue strictly
+between $0$ and $1$, so
+\[
+  A_a \ot I \approx_0 R_a \ot I.
+\]
+The endpoint is therefore valid, but it requires a separate spectral argument.
+
+\section{Relation with the formal development}
+
+The current \Lean{} declarations make this distinction explicit.\footnote{The
+constructive small-error branch is formalized by
+\leanid{projectiveNonMeasurement\_of\_sourceAlmostProjective} and
+\leanid{projectiveNonMeasurement\_of\_almostProjMeasStatement} in
+\doclink{MIPStarRE/LDT/MakingMeasurementsProjective/SpectralTruncation.lean}. The
+downstream SelfImprovement wrapper is
+\leanid{orthonormalizationSpectralProducer\_of\_sourceAlmostProjective} in
+\doclink{MIPStarRE/LDT/SelfImprovement/Theorems/OrthonormalizationBridge.lean}.}
+These declarations prove the nontrivial paper branch under the hypotheses
+$0 < \zeta$ and $\zeta \le 1/4$.  This matches the part of the cited argument in
+which one may set $\delta = \sqrt{\zeta}$ and still satisfy
+\path{eq:bound-on-delta}.  The remaining unconditional theorem-level packaging
+still needs two additional branches: the trivial large-error case and the exact
+$\zeta = 0$ endpoint described above.
+
+In other words, the formal development has not discovered a contradiction in the
+paper statement.  It has isolated the exact places where the cited proof uses
+positivity of $\delta$, and therefore where the proof must be supplemented if
+one wants a theorem stated without side conditions.
+
+\section{Conclusion}
+
+The paper does not need a separate large-$\zeta$ calculation inside the proof of
+\path{lem:projective-non-measurement}, because that regime has already been
+removed in the surrounding proof of the orthonormalization-main lemma.  The
+formal development must nevertheless add such a branch if it exposes the
+rounding lemma as an unconditional standalone theorem.
+
+The more delicate omission is the endpoint $\zeta = 0$.  The statement of the
+rounding lemma remains meaningful there, but the printed proof covers only
+$0 < \zeta \le 1/4$, because it introduces a positive parameter $\delta$ and
+later sets $\delta = \sqrt{\zeta}$.  Thus the cited source leaves the endpoint
+argument implicit.  A faithful unconditional formalization should keep the
+paper's nontrivial branch for $0 < \zeta \le 1/4$, and add separate proofs for
+the large-error region and for the exact endpoint $\zeta = 0$.
+
+\bibliographystyle{alpha}
+\bibliography{references}
+
+\end{document}

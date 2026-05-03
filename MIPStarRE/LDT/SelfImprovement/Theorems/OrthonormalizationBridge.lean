@@ -273,6 +273,25 @@ noncomputable def orthonormalizationSpectralProducer_of_projectiveNonMeasurement
         (2 * selfImprovementHelperError params eps delta))
       (hprojective hssc)
 
+/-- Build the spectral slice of `SelfImprovement.OrthonormalizationInput`
+directly from the constructive spectral-truncation theorem.
+
+This route now packages all three scalar branches needed for the paper-facing
+statement `lem:projective-non-measurement`: the exact endpoint `ζ = 0`, the
+nontrivial proof for `0 < ζ ≤ 1/4`, and the trivial large-error branch used in
+the surrounding orthonormalization argument.  Callers therefore supply only the
+source almost-projective defect through `SpectralTruncationInput`; the case
+split is handled internally. -/
+noncomputable def orthonormalizationSpectralProducer_of_sourceAlmostProjective
+    {params : Parameters} [FieldModel params.q]
+    {strategy : SymStrat params ι} {eps delta : Error} :
+    OrthonormalizationSpectralProducer params strategy eps delta :=
+  fun {Hhat} _hssc =>
+    spectralTruncationInput_of_sourceAlmostProjective strategy.state
+      (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
+      (consistencyToAlmostProjectiveError
+        (2 * selfImprovementHelperError params eps delta))
+
 /-- Build `SelfImprovement.OrthonormalizationInput` from the two constructive
 Section 5 witness producers exposed by the current bridge:
 
