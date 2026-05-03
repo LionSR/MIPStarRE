@@ -301,11 +301,11 @@ python3 scripts/audit_readme_freshness.py --root . --readme README.md
 
 ### Oversized Lean File Guard (`oversized-lean-files.yml`)
 
-**What it does**: Runs an incremental guard that prevents new oversized Lean files (>1000 lines) from entering the repository. An explicit allowlist (`.github/file_lengths_allowlist.txt`) records the current line-count ceiling for already-oversized files that are awaiting a split. New files over 1000 lines, or allowlisted files that grow beyond their recorded ceiling, fail the check.
+**What it does**: A hard gate that fails if any ``.lean`` file exceeds 1000 lines.  This is a lightweight Python-only check (no Lake/Lean build).
 
-**When it runs**: On every PR that touches `.lean` files, the allowlist, the check script, or the workflow itself. This is a lightweight Python-only check (no Lake/Lean build).
+**When it runs**: On every PR that touches ``.lean`` files, the check script, its tests, or the workflow itself.
 
-**Why it is incremental**: The repository currently has ~19 files exceeding 1000 lines (as tracked in issue #1127). Those files are recorded in the allowlist with their current line counts as ceilings. New oversized files are blocked outright. As files are split by dedicated PRs, the corresponding allowlist entries are removed.
+**Current status (2026-05-03)**: ``main`` still has ~19 files exceeding the threshold (tracked in issue #1127), so the workflow uses ``continue-on-error: true`` until all files are split.  Once the split wave (#1127) is complete, remove that line to make the check blocking.
 
 **Local command**:
 

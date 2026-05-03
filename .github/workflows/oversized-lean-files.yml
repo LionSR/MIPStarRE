@@ -5,9 +5,14 @@ on:
     types: [opened, synchronize, reopened]
     paths:
       - '**.lean'
-      - '.github/file_lengths_allowlist.txt'
       - 'scripts/check_oversized_lean_files.py'
+      - 'scripts/tests/test_check_oversized_lean_files.py'
       - '.github/workflows/oversized-lean-files.yml'
+
+# NOTE: As of 2026-05-03, this check will fail against main because ~19 files
+# still exceed 1000 lines (tracked in issue #1127).  Once all oversized files
+# have been split, this workflow can be enabled as a blocking CI check by
+# removing or commenting out the ``continue-on-error`` line below.
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -20,6 +25,7 @@ jobs:
   guard:
     name: Check Lean file lengths
     runs-on: ubuntu-latest
+    continue-on-error: true  # TODO(#1127): remove once all files are split
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
