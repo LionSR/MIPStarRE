@@ -1,6 +1,7 @@
 import MIPStarRE.LDT.Test.ErrorCascade.Definitions
 import MIPStarRE.LDT.Test.ErrorCascade.EnvelopeBounds
 import MIPStarRE.LDT.Test.ErrorCascade.CascadeBounds
+import MIPStarRE.LDT.Test.SurfaceVsPoint
 
 /-!
 # Section 3 — Error cascade bounds for `mainFormal` (Step 8/8)
@@ -19,6 +20,9 @@ This is a barrel module re-exporting the leaf modules:
 - `EnvelopeBounds`: internal step-envelope machinery and numeric root bounds.
 - `CascadeBounds`: tight and absorbing cascade bounds for σ, ζ₁–ζ₄, plus the
   consolidator `errorCascade_le_mainFormalError`.
+
+Preserves the existing transitive `SurfaceVsPoint` import for downstream
+consumers (MainTheorem).
 
 ## References
 
