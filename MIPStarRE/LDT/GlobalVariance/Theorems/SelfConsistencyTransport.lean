@@ -245,6 +245,93 @@ private lemma rightPolynomialWeightSqrt_grouped_contraction
           rw [rightTensor_finset_sum]
     _ ≤ 1 := rightTensor_le_one (ι₁ := ι) (le_trans hfiber_le_total G.total_le_one)
 
+/-- Shared polynomial-sum `cabApproxDelta` transport.
+
+The argument keeps the answer space at `Fq params`, applies
+`prop:cab-approx-delta` with multiplier
+`if a = g(base s) then I ⊗ (G_g)^{1/2} else 0`, and uses the grouped
+contraction `rightPolynomialWeightSqrt_grouped_contraction`.  The bridge
+hypotheses identify the surviving fiber `a = g(base s)` with the weighted
+left and right operators desired by the caller. -/
+private lemma cabApproxDelta_sum_from_sdd
+    {Sample : Type*}
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψ : QuantumState (ι × ι))
+    (𝒟 : Distribution Sample)
+    (base : Sample → Point params)
+    (left right : Sample → Fq params → MIPStarRE.Quantum.Op (ι × ι))
+    (L R : Sample → Polynomial params → MIPStarRE.Quantum.Op (ι × ι))
+    (G : SubMeas (Polynomial params) ι)
+    (η : Error)
+    (hbase : avgOver 𝒟 (fun s => qSDDCore ψ (left s) (right s)) ≤ η)
+    (hleft : ∀ s g,
+      rightTensor (ι₁ := ι) (polynomialWeightSqrtOperator params G g) *
+          left s (g (base s)) =
+        L s g)
+    (hright : ∀ s g,
+      rightTensor (ι₁ := ι) (polynomialWeightSqrtOperator params G g) *
+          right s (g (base s)) =
+        R s g) :
+    (∑ g : Polynomial params,
+      avgOver 𝒟 (fun s => ev ψ (((L s g - R s g)ᴴ) * (L s g - R s g)))) ≤
+      η := by
+  classical
+  let C : Sample → Fq params → Polynomial params → MIPStarRE.Quantum.Op (ι × ι) :=
+    fun s a g =>
+      if a = g (base s) then rightTensor (ι₁ := ι) (polynomialWeightSqrtOperator params G g)
+      else 0
+  have hC :
+      ∀ s a, ∑ g : Polynomial params, (C s a g)ᴴ * C s a g ≤ 1 := by
+    intro s a
+    simpa [C] using rightPolynomialWeightSqrt_grouped_contraction params G (base s) a
+  have hcab := cabApproxDelta ψ 𝒟 left right C η hbase hC
+  calc
+    (∑ g : Polynomial params,
+      avgOver 𝒟 (fun s => ev ψ (((L s g - R s g)ᴴ) * (L s g - R s g))))
+      = avgOver 𝒟
+          (fun s =>
+            qSDDCore ψ
+              (fun ag : Fq params × Polynomial params => C s ag.1 ag.2 * left s ag.1)
+              (fun ag : Fq params × Polynomial params => C s ag.1 ag.2 * right s ag.1)) := by
+          rw [← avgOver_sum]
+          apply avgOver_congr
+          intro s
+          unfold qSDDCore
+          rw [Fintype.sum_prod_type]
+          rw [Finset.sum_comm]
+          apply Finset.sum_congr rfl
+          intro g _
+          symm
+          let term : Fq params → Error := fun x =>
+            ev ψ ((((C s x g * left s x) - (C s x g * right s x))ᴴ) *
+              ((C s x g * left s x) - (C s x g * right s x)))
+          change (∑ x : Fq params, term x) =
+            ev ψ (((L s g - R s g)ᴴ) * (L s g - R s g))
+          calc
+            (∑ x : Fq params, term x) = term (g (base s)) := by
+              refine Finset.sum_eq_single (s := (Finset.univ : Finset (Fq params)))
+                (a := g (base s)) ?_ ?_
+              · intro x _ hx
+                simpa [term, C, hx] using ev_zero ψ
+              · intro hmissing
+                exact False.elim (hmissing (Finset.mem_univ (g (base s))))
+            _ = ev ψ (((L s g - R s g)ᴴ) * (L s g - R s g)) := by
+              let S : MIPStarRE.Quantum.Op ι := polynomialWeightSqrtOperator params G g
+              let X := L s g
+              let Y := R s g
+              calc
+                term (g (base s)) =
+                    ev ψ
+                      (((rightTensor (ι₁ := ι) S * left s (g (base s)) -
+                          rightTensor (ι₁ := ι) S * right s (g (base s)))ᴴ) *
+                        (rightTensor (ι₁ := ι) S * left s (g (base s)) -
+                          rightTensor (ι₁ := ι) S * right s (g (base s)))) := by
+                        simp [term, C, S]
+                _ = ev ψ (((X - Y)ᴴ) * (X - Y)) := by
+                    rw [hleft s g, hright s g]
+    _ ≤ η := hcab
+
 /-- The first self-consistency move in `lem:local-variance-of-points`, after
 applying `prop:cab-approx-delta` with the multiplier `I ⊗ (G_g)^{1/2}` but
 before pulling the point marginal to the hypercube-edge distribution.
@@ -350,10 +437,6 @@ lemma pointConditionedEventSelfConsistency_weighted_point_sum
   classical
   let pointMeas : IdxSubMeas (Point params) (Fq params) ι :=
     fun u => (strategy.pointMeasurement u).toSubMeas
-  let C : Point params → Fq params → Polynomial params → MIPStarRE.Quantum.Op (ι × ι) :=
-    fun u a g =>
-      if a = g u then rightTensor (ι₁ := ι) (polynomialWeightSqrtOperator params G g)
-      else 0
   have hbase :
       SDDRel strategy.state (uniformDistribution (Point params))
         (IdxSubMeas.liftLeft pointMeas)
@@ -377,95 +460,28 @@ lemma pointConditionedEventSelfConsistency_weighted_point_sum
             (fun a : Fq params => ((IdxSubMeas.liftRight pointMeas) u).outcome a)) ≤
         2 * delta := by
     simpa [sddError, qSDD, pointMeas] using hbase.squaredDistanceBound
-  have hC :
-      ∀ u a, ∑ g : Polynomial params, (C u a g)ᴴ * C u a g ≤ 1 := by
-    intro u a
-    simpa [C] using rightPolynomialWeightSqrt_grouped_contraction params G u a
-  have hcab :=
-    cabApproxDelta strategy.state (uniformDistribution (Point params))
+  simpa using
+    cabApproxDelta_sum_from_sdd params strategy.state
+      (uniformDistribution (Point params))
+      (fun u => u)
       (fun u a => ((IdxSubMeas.liftLeft pointMeas) u).outcome a)
       (fun u a => ((IdxSubMeas.liftRight pointMeas) u).outcome a)
-      C (2 * delta) hbaseBound hC
-  calc
-    (∑ g : Polynomial params,
-      avgOver (uniformDistribution (Point params))
-        (fun u =>
-          let D := weightedPointConditionedOperatorAtPolynomial params strategy G g u -
-            weightedPointConditionedRightOperatorAtPolynomial params strategy G g u
-          ev strategy.state (Dᴴ * D)))
-      = avgOver (uniformDistribution (Point params))
-          (fun u =>
-            qSDDCore strategy.state
-              (fun ag : Fq params × Polynomial params =>
-                C u ag.1 ag.2 * ((IdxSubMeas.liftLeft pointMeas) u).outcome ag.1)
-              (fun ag : Fq params × Polynomial params =>
-                C u ag.1 ag.2 * ((IdxSubMeas.liftRight pointMeas) u).outcome ag.1)) := by
-          rw [← avgOver_sum]
-          apply avgOver_congr
-          intro u
-          unfold qSDDCore
-          rw [Fintype.sum_prod_type]
-          rw [Finset.sum_comm]
-          apply Finset.sum_congr rfl
-          intro g _
-          symm
-          let term : Fq params → Error := fun x =>
-            ev strategy.state
-              ((((C u x g * ((IdxSubMeas.liftLeft pointMeas) u).outcome x) -
-                    (C u x g * ((IdxSubMeas.liftRight pointMeas) u).outcome x))ᴴ) *
-                ((C u x g * ((IdxSubMeas.liftLeft pointMeas) u).outcome x) -
-                  (C u x g * ((IdxSubMeas.liftRight pointMeas) u).outcome x)))
-          change (∑ x : Fq params, term x) =
-            ev strategy.state
-              (((weightedPointConditionedOperatorAtPolynomial params strategy G g u -
-                  weightedPointConditionedRightOperatorAtPolynomial params strategy G g u)ᴴ) *
-                (weightedPointConditionedOperatorAtPolynomial params strategy G g u -
-                  weightedPointConditionedRightOperatorAtPolynomial params strategy G g u))
-          calc
-            (∑ x : Fq params, term x) = term (g u) := by
-              refine Finset.sum_eq_single (s := (Finset.univ : Finset (Fq params)))
-                (a := g u) ?_ ?_
-              · intro x _ hx
-                simpa [term, C, hx] using ev_zero strategy.state
-              · intro hmissing
-                exact False.elim (hmissing (Finset.mem_univ (g u)))
-            _ = ev strategy.state
-                (((weightedPointConditionedOperatorAtPolynomial params strategy G g u -
-                    weightedPointConditionedRightOperatorAtPolynomial params strategy G g u)ᴴ) *
-                  (weightedPointConditionedOperatorAtPolynomial params strategy G g u -
-                    weightedPointConditionedRightOperatorAtPolynomial params strategy G g u)) := by
-              let A := pointConditionedOutcomeOperatorAtPolynomial params strategy g u
-              let S := polynomialWeightSqrtOperator params G g
-              have hleft :
-                  rightTensor (ι₁ := ι) S *
-                      ((IdxSubMeas.liftLeft pointMeas) u).outcome (g u) =
-                    weightedPointConditionedOperatorAtPolynomial params strategy G g u := by
-                change rightTensor (ι₁ := ι) S * leftTensor (ι₂ := ι) A = opTensor A S
-                exact rightTensor_mul_leftTensor_eq_opTensor A S
-              have hright :
-                  rightTensor (ι₁ := ι) S *
-                      ((IdxSubMeas.liftRight pointMeas) u).outcome (g u) =
-                    weightedPointConditionedRightOperatorAtPolynomial params strategy G g u := by
-                change rightTensor (ι₁ := ι) S * rightTensor (ι₁ := ι) A =
-                  rightTensor (ι₁ := ι) (S * A)
-                exact rightTensor_mul_rightTensor S A
-              let X := weightedPointConditionedOperatorAtPolynomial params strategy G g u
-              let Y := weightedPointConditionedRightOperatorAtPolynomial params strategy G g u
-              calc
-                term (g u) =
-                    ev strategy.state
-                      (((rightTensor (ι₁ := ι) S *
-                            ((IdxSubMeas.liftLeft pointMeas) u).outcome (g u) -
-                          rightTensor (ι₁ := ι) S *
-                            ((IdxSubMeas.liftRight pointMeas) u).outcome (g u))ᴴ) *
-                        (rightTensor (ι₁ := ι) S *
-                            ((IdxSubMeas.liftLeft pointMeas) u).outcome (g u) -
-                          rightTensor (ι₁ := ι) S *
-                            ((IdxSubMeas.liftRight pointMeas) u).outcome (g u))) := by
-                        simp [term, C, S]
-                _ = ev strategy.state (((X - Y)ᴴ) * (X - Y)) := by
-                    rw [hleft, hright]
-    _ ≤ 2 * delta := hcab
+      (fun u g => weightedPointConditionedOperatorAtPolynomial params strategy G g u)
+      (fun u g => weightedPointConditionedRightOperatorAtPolynomial params strategy G g u)
+      G (2 * delta) hbaseBound
+      (by
+        intro u g
+        let A := pointConditionedOutcomeOperatorAtPolynomial params strategy g u
+        let S := polynomialWeightSqrtOperator params G g
+        change rightTensor (ι₁ := ι) S * leftTensor (ι₂ := ι) A = opTensor A S
+        exact rightTensor_mul_leftTensor_eq_opTensor A S)
+      (by
+        intro u g
+        let A := pointConditionedOutcomeOperatorAtPolynomial params strategy g u
+        let S := polynomialWeightSqrtOperator params G g
+        change rightTensor (ι₁ := ι) S * rightTensor (ι₁ := ι) A =
+          rightTensor (ι₁ := ι) (S * A)
+        exact rightTensor_mul_rightTensor S A)
 
 /-- The first weighted self-consistency move on the actual hypercube-edge
 sampling distribution `(u,v) ∼ C`.
@@ -1185,11 +1201,6 @@ lemma axisParallelBaseEventApproximation_weighted_sample_sum
     axisParallelPointAnswerMeasurement params strategy
   let lineMeas : IdxMeas (AxisParallelTestSample params) (Fq params) ι :=
     axisParallelLineAnswerMeasurement params strategy
-  let C : AxisParallelTestSample params → Fq params → Polynomial params →
-      MIPStarRE.Quantum.Op (ι × ι) :=
-    fun s a g =>
-      if a = g s.1 then rightTensor (ι₁ := ι) (polynomialWeightSqrtOperator params G g)
-      else 0
   have hcons :
       ConsRel strategy.state (uniformDistribution (AxisParallelTestSample params))
         (IdxMeas.toIdxSubMeas pointMeas) (IdxMeas.toIdxSubMeas lineMeas) eps :=
@@ -1215,124 +1226,49 @@ lemma axisParallelBaseEventApproximation_weighted_sample_sum
               ((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas pointMeas)) s).outcome a)) ≤
         2 * eps := by
     simpa [sddError, qSDD] using happrox.leftRightSquaredDistanceBound
-  have hC :
-      ∀ s a, ∑ g : Polynomial params, (C s a g)ᴴ * C s a g ≤ 1 := by
-    intro s a
-    simpa [C] using rightPolynomialWeightSqrt_grouped_contraction params G s.1 a
-  have hcab :=
-    cabApproxDelta strategy.state (uniformDistribution (AxisParallelTestSample params))
+  simpa using
+    cabApproxDelta_sum_from_sdd params strategy.state
+      (uniformDistribution (AxisParallelTestSample params))
+      (fun s => s.1)
       (fun s a => ((IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas lineMeas)) s).outcome a)
       (fun s a => ((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas pointMeas)) s).outcome a)
-      C (2 * eps) hbase hC
-  calc
-    (∑ g : Polynomial params,
-      avgOver (uniformDistribution (AxisParallelTestSample params))
-        (fun s =>
-          let qu : AxisParallelLineQuestion params :=
-            ({ base := s.1, direction := s.2 }, s.1)
-          let D := weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu -
-            weightedPointConditionedRightOperatorAtPolynomial params strategy G g s.1
-          ev strategy.state (Dᴴ * D)))
-      = avgOver (uniformDistribution (AxisParallelTestSample params))
-          (fun s =>
-            qSDDCore strategy.state
-              (fun ag : Fq params × Polynomial params =>
-                C s ag.1 ag.2 *
-                  ((IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas lineMeas)) s).outcome ag.1)
-              (fun ag : Fq params × Polynomial params =>
-                C s ag.1 ag.2 *
-                  ((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas pointMeas)) s).outcome ag.1)) := by
-          rw [← avgOver_sum]
-          apply avgOver_congr
-          intro s
-          unfold qSDDCore
-          rw [Fintype.sum_prod_type]
-          rw [Finset.sum_comm]
-          apply Finset.sum_congr rfl
-          intro g _
-          symm
-          let term : Fq params → Error := fun x =>
-            ev strategy.state
-              ((((C s x g *
-                    ((IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas lineMeas)) s).outcome x) -
-                  (C s x g *
-                    ((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas pointMeas)) s).outcome x))ᴴ) *
-                ((C s x g *
-                    ((IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas lineMeas)) s).outcome x) -
-                  (C s x g *
-                    ((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas pointMeas)) s).outcome x)))
-          let qu : AxisParallelLineQuestion params :=
-            ({ base := s.1, direction := s.2 }, s.1)
-          change (∑ x : Fq params, term x) =
-            ev strategy.state
-              (((weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu -
-                  weightedPointConditionedRightOperatorAtPolynomial params strategy G g s.1)ᴴ) *
-                (weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu -
-                  weightedPointConditionedRightOperatorAtPolynomial params strategy G g s.1))
-          calc
-            (∑ x : Fq params, term x) = term (g s.1) := by
-              refine Finset.sum_eq_single (s := (Finset.univ : Finset (Fq params)))
-                (a := g s.1) ?_ ?_
-              · intro x _ hx
-                simpa [term, C, hx] using ev_zero strategy.state
-              · intro hmissing
-                exact False.elim (hmissing (Finset.mem_univ (g s.1)))
-            _ = ev strategy.state
-                (((weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu -
-                    weightedPointConditionedRightOperatorAtPolynomial
-                      params strategy G g s.1)ᴴ) *
-                  (weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu -
-                    weightedPointConditionedRightOperatorAtPolynomial
-                      params strategy G g s.1)) := by
-              let S : MIPStarRE.Quantum.Op ι := polynomialWeightSqrtOperator params G g
-              let A : MIPStarRE.Quantum.Op ι :=
-                pointConditionedOutcomeOperatorAtPolynomial params strategy g s.1
-              let L : MIPStarRE.Quantum.Op ι :=
-                generalizeBLeftOperatorAtPolynomial params strategy g qu
-              have hline_outcome :
-                  ((IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas lineMeas)) s).outcome (g s.1) =
-                    leftTensor (ι₂ := ι) L :=
-                liftLeft_lineAnswerMeasurement_outcome_at_g params strategy g s
-              have hpoint_outcome :
-                  ((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas pointMeas)) s).outcome (g s.1) =
-                    rightTensor (ι₁ := ι) A :=
-                liftRight_pointAnswerMeasurement_outcome_at_g params strategy g s
-              have hline :
-                  rightTensor (ι₁ := ι) S *
-                      ((IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas lineMeas)) s).outcome (g s.1) =
-                    weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu := by
-                rw [hline_outcome]
-                show rightTensor (ι₁ := ι) S * leftTensor (ι₂ := ι) L = opTensor L S
-                exact rightTensor_mul_leftTensor_eq_opTensor L S
-              have hpoint :
-                  rightTensor (ι₁ := ι) S *
-                      ((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas pointMeas)) s).outcome (g s.1) =
-                    weightedPointConditionedRightOperatorAtPolynomial params strategy G g s.1 := by
-                rw [hpoint_outcome]
-                show rightTensor (ι₁ := ι) S * rightTensor (ι₁ := ι) A =
-                  rightTensor (ι₁ := ι) (S * A)
-                exact rightTensor_mul_rightTensor S A
-              let X := weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu
-              let Y := weightedPointConditionedRightOperatorAtPolynomial params strategy G g s.1
-              calc
-                term (g s.1) =
-                    ev strategy.state
-                      (((rightTensor (ι₁ := ι) S *
-                            ((IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas lineMeas)) s).outcome
-                              (g s.1) -
-                          rightTensor (ι₁ := ι) S *
-                            ((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas pointMeas)) s).outcome
-                              (g s.1))ᴴ) *
-                        (rightTensor (ι₁ := ι) S *
-                            ((IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas lineMeas)) s).outcome
-                              (g s.1) -
-                          rightTensor (ι₁ := ι) S *
-                            ((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas pointMeas)) s).outcome
-                              (g s.1))) := by
-                        simp [term, C, S]
-                _ = ev strategy.state (((X - Y)ᴴ) * (X - Y)) := by
-                    rw [hline, hpoint]
-    _ ≤ 2 * eps := hcab
+      (fun s g =>
+        let qu : AxisParallelLineQuestion params := ({ base := s.1, direction := s.2 }, s.1)
+        weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu)
+      (fun s g => weightedPointConditionedRightOperatorAtPolynomial params strategy G g s.1)
+      G (2 * eps) hbase
+      (by
+        intro s g
+        let qu : AxisParallelLineQuestion params := ({ base := s.1, direction := s.2 }, s.1)
+        let S : MIPStarRE.Quantum.Op ι := polynomialWeightSqrtOperator params G g
+        let L : MIPStarRE.Quantum.Op ι :=
+          generalizeBLeftOperatorAtPolynomial params strategy g qu
+        have hline_outcome :
+            ((IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas lineMeas)) s).outcome (g s.1) =
+              leftTensor (ι₂ := ι) L :=
+          liftLeft_lineAnswerMeasurement_outcome_at_g params strategy g s
+        change rightTensor (ι₁ := ι) S *
+            ((IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas lineMeas)) s).outcome (g s.1) =
+          weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu
+        rw [hline_outcome]
+        change rightTensor (ι₁ := ι) S * leftTensor (ι₂ := ι) L = opTensor L S
+        exact rightTensor_mul_leftTensor_eq_opTensor L S)
+      (by
+        intro s g
+        let S : MIPStarRE.Quantum.Op ι := polynomialWeightSqrtOperator params G g
+        let A : MIPStarRE.Quantum.Op ι :=
+          pointConditionedOutcomeOperatorAtPolynomial params strategy g s.1
+        have hpoint_outcome :
+            ((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas pointMeas)) s).outcome (g s.1) =
+              rightTensor (ι₁ := ι) A :=
+          liftRight_pointAnswerMeasurement_outcome_at_g params strategy g s
+        change rightTensor (ι₁ := ι) S *
+            ((IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas pointMeas)) s).outcome (g s.1) =
+          weightedPointConditionedRightOperatorAtPolynomial params strategy G g s.1
+        rw [hpoint_outcome]
+        change rightTensor (ι₁ := ι) S * rightTensor (ι₁ := ι) A =
+          rightTensor (ι₁ := ι) (S * A)
+        exact rightTensor_mul_rightTensor S A)
 
 /-- Sum-level form of the weighted line-to-point approximation
 (`expansion.tex:309--310`, paper step 5) on the
