@@ -1,5 +1,7 @@
 import MIPStarRE.LDT.Pasting.Bernoulli.Recurrence
 import MIPStarRE.LDT.Pasting.Defs.Tuples
+import MIPStarRE.LDT.Pasting.CommutingWithG.Complete
+import MIPStarRE.LDT.Pasting.CommutingWithG.Incomplete
 import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich
 import MIPStarRE.LDT.Pasting.BridgeLemmas.HAConsistency
 import MIPStarRE.LDT.Pasting.BridgeLemmas.OverAllOutcomes

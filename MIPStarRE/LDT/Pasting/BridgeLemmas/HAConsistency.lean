@@ -1,5 +1,7 @@
 import MIPStarRE.LDT.Commutativity.Main.Results
 import MIPStarRE.LDT.Pasting.BridgeLemmas.HBConsistency
+import MIPStarRE.LDT.Pasting.CommutingWithG.Complete
+import MIPStarRE.LDT.Pasting.CommutingWithG.Incomplete
 
 /-!
 # Section 12 pasting: H-A consistency

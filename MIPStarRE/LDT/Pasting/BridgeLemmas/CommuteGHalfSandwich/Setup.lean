@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.Core
+import MIPStarRE.LDT.Preliminaries.CompletionTransfer
 import MIPStarRE.LDT.Pasting.BridgeLemmas.Common
 
 /-!

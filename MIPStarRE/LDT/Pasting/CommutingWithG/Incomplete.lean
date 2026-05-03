@@ -1,4 +1,5 @@
-import MIPStarRE.LDT.Pasting.CommutingWithG.Complete
+import MIPStarRE.LDT.Pasting.Core
+import MIPStarRE.LDT.Pasting.Sandwich.Switcheroo
 
 /-!
 # Section 12 pasting: commuting-with-G incomplete part
