@@ -23,14 +23,6 @@ private lemma switcherooAggregateLeft_completePart_outcome
     (q : SlicePairQuestion params) :
     (switcherooAggregateLeft params family (completePartProjFamily params family) q).outcome () =
       (completePartTotalProductLeft params family q).outcome () := by
-  have hsingle1 :
-      (postprocess ((family.meas q.1).toSubMeas) (fun _ => ())).outcome () =
-        (postprocess ((family.meas q.1).toSubMeas) (fun _ => ())).total :=
-    postprocess_unit_outcome_eq_total ((family.meas q.1).toSubMeas)
-  have hsingle2 :
-      (postprocess ((family.meas q.2).toSubMeas) (fun _ => ())).outcome () =
-        (postprocess ((family.meas q.2).toSubMeas) (fun _ => ())).total :=
-    postprocess_unit_outcome_eq_total ((family.meas q.2).toSubMeas)
   simp [switcherooAggregateLeft, completePartProjFamily,
     completePartTotalProductLeft, multiplyByTotalOnRight,
     multiplyByTotalOnLeft, OpFamily.leftPlacedOpFamily]
@@ -43,14 +35,6 @@ private lemma switcherooAggregateRight_completePart_outcome
     (q : SlicePairQuestion params) :
     (switcherooAggregateRight params family (completePartProjFamily params family) q).outcome () =
       (completePartTotalProductRight params family q).outcome () := by
-  have hsingle1 :
-      (postprocess ((family.meas q.1).toSubMeas) (fun _ => ())).outcome () =
-        (postprocess ((family.meas q.1).toSubMeas) (fun _ => ())).total :=
-    postprocess_unit_outcome_eq_total ((family.meas q.1).toSubMeas)
-  have hsingle2 :
-      (postprocess ((family.meas q.2).toSubMeas) (fun _ => ())).outcome () =
-        (postprocess ((family.meas q.2).toSubMeas) (fun _ => ())).total :=
-    postprocess_unit_outcome_eq_total ((family.meas q.2).toSubMeas)
   simp [switcherooAggregateRight, completePartProjFamily,
     completePartTotalProductRight, multiplyByTotalOnRight,
     multiplyByTotalOnLeft, OpFamily.leftPlacedOpFamily]

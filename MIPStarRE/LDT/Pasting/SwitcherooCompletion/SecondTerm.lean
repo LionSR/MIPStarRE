@@ -285,8 +285,7 @@ lemma switcherooAggregateMGCenterComplete_eq_opTensor_avg
             (completePartProjFamily params family x).outcome () = Gtotal x := by
           change (completePartSubMeas params family x).outcome () =
             (completePartSubMeas params family x).total
-          simpa [completePartSubMeas] using
-            postprocess_unit_outcome_eq_total ((family.meas x).toSubMeas)
+          exact completePartSubMeas_outcome_unit params family x
         simp [F, Gtotal, Mtotal, hsingle, leftTensor_mul_rightTensor_eq_opTensor]
 
 /-- The `G ⊗ M` switcheroo center, repackaged as a slice-pair `opTensor` average

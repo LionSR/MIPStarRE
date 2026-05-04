@@ -25,14 +25,8 @@ noncomputable def completePartProjFamily
       proj := by
         intro u
         cases u
-        have hsingle :
-            (completePartSubMeas params family x).outcome () =
-              (completePartSubMeas params family x).total := by
-          simpa [completePartSubMeas] using
-            postprocess_unit_outcome_eq_total ((family.meas x).toSubMeas)
-        rw [hsingle]
-        simpa [completePartSubMeas, postprocess_total] using
-          MIPStarRE.LDT.Preliminaries.projSubMeas_total_proj (family.meas x) }
+        rw [completePartSubMeas_outcome_unit params family x]
+        simpa using ProjSubMeas.total_proj (family.meas x) }
 
 /-- The second positive term in the switcheroo expansion. -/
 noncomputable def switcherooAggregateSecondTerm
