@@ -352,6 +352,47 @@ lemma fromHToGAdjacentStageM1_pointwise_rightShape
       (fromHToGRecurrenceWeight params family ℓ
         (prependTypeBit g.isSome (gHatTupleType gs)))).symm
 
+/-- Globalize the common adjacent-stage pointwise rewrite skeleton. -/
+lemma fromHToGAdjacentStage_globalize_pointwiseShape
+    (params : Parameters) [FieldModel params.q]
+    {n : ℕ}
+    (source : Bool → GHatType n → Fq params → PointTuple params n → Error)
+    (target : Fq params → PointTuple params n → Error)
+    (hpoint : ∀ x xs,
+      (∑ b : Bool, ∑ τ : GHatType n, source b τ x xs) = target x xs) :
+    (∑ b : Bool, ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          source b τ x xs) =
+      avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+        target q.1 q.2 := by
+  calc
+    (∑ b : Bool, ∑ τ : GHatType n,
+      avgOver (uniformDistribution (Fq params)) fun x =>
+        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
+          source b τ x xs)
+      = avgOver (uniformDistribution (Fq params)) (fun x =>
+          avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+            ∑ b : Bool, ∑ τ : GHatType n, source b τ x xs)) := by
+          simpa using
+            fromHToG_sum₂_avgOver₂
+              (uniformDistribution (Fq params))
+              (uniformDistribution (PointTuple params n))
+              source
+    _ = avgOver (uniformDistribution (Fq params)) (fun x =>
+          avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
+            target x xs)) := by
+          refine avgOver_congr _ _ _ ?_
+          intro x
+          refine avgOver_congr _ _ _ ?_
+          intro xs
+          exact hpoint x xs
+    _ = avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>
+          target q.1 q.2 := by
+          exact
+            (avgOver_uniform_prod (α := Fq params) (β := PointTuple params n)
+              (f := fun x xs => target x xs)).symm
+
 /-- Global rewrite of `A0` to the left-action shape used by `closenessOfIP`. -/
 lemma fromHToGAdjacentStageA0_eq_leftShape
     (params : Parameters) [FieldModel params.q]
@@ -370,73 +411,27 @@ lemma fromHToGAdjacentStageA0_eq_leftShape
   classical
   intro n
   unfold fromHToGAdjacentStageA0
-  change (∑ b : Bool, ∑ τ : GHatType n,
-      avgOver (uniformDistribution (Fq params)) fun x =>
-        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
-          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
-            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
-                gHatTupleType gs = τ,
-              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
-              let U := (gHatIdxMeas params family x).outcome g
-              let T := gHatHalfProductOutcomeOperator params family n xs gs
-              ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ * U) *
-                rightTensor (ι₁ := ι) S)) = _
-  calc
-    (∑ b : Bool, ∑ τ : GHatType n,
-      avgOver (uniformDistribution (Fq params)) fun x =>
-        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
-          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
-            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
-                gHatTupleType gs = τ,
-              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
-              let U := (gHatIdxMeas params family x).outcome g
-              let T := gHatHalfProductOutcomeOperator params family n xs gs
-              ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ * U) *
-                rightTensor (ι₁ := ι) S))
-        = avgOver (uniformDistribution (Fq params)) (fun x =>
-            avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
-              ∑ b : Bool, ∑ τ : GHatType n,
-                ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
-                  ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
-                      gHatTupleType gs = τ,
-                    let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
-                    let U := (gHatIdxMeas params family x).outcome g
-                    let T := gHatHalfProductOutcomeOperator params family n xs gs
-                    ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ * U) *
-                      rightTensor (ι₁ := ι) S))) :=
-          fromHToG_sum₂_avgOver₂ (uniformDistribution (Fq params))
-            (uniformDistribution (PointTuple params n)) _
-    _ = avgOver (uniformDistribution (Fq params)) (fun x =>
-          avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
-            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
-              let S := fromHToGRecurrenceWeight params family ℓ
-                (prependTypeBit g.isSome (gHatTupleType gs))
-              let U := (gHatIdxMeas params family x).outcome g
-              let T := gHatHalfProductOutcomeOperator params family n xs gs
-              ev ψbi ((leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) S) *
-                leftTensor (ι₂ := ι) U))) := by
-          refine avgOver_congr _ _ _ ?_
-          intro x
-          refine avgOver_congr _ _ _ ?_
-          intro xs
-          exact fromHToGAdjacentStageA0_pointwise_leftShape params ψbi family ℓ n x xs
-    _ = avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
-          ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
-            let S := fromHToGRecurrenceWeight params family ℓ
-              (prependTypeBit g.isSome (gHatTupleType gs))
-            let U := (gHatIdxMeas params family q.1).outcome g
-            let T := gHatHalfProductOutcomeOperator params family n q.2 gs
-            ev ψbi ((leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) S) *
-              leftTensor (ι₂ := ι) U)) := by
-          exact (avgOver_uniform_prod (α := Fq params) (β := PointTuple params n)
-            (f := fun x xs =>
-              ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
-                let S := fromHToGRecurrenceWeight params family ℓ
-                  (prependTypeBit g.isSome (gHatTupleType gs))
-                let U := (gHatIdxMeas params family x).outcome g
-                let T := gHatHalfProductOutcomeOperator params family n xs gs
-                ev ψbi ((leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) S) *
-                  leftTensor (ι₂ := ι) U))).symm
+  simpa using
+    (fromHToGAdjacentStage_globalize_pointwiseShape (params := params) (n := n)
+      (source := fun b τ x xs =>
+        ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+          ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+              gHatTupleType gs = τ,
+            let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+            let U := (gHatIdxMeas params family x).outcome g
+            let T := gHatHalfProductOutcomeOperator params family n xs gs
+            ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ * U) *
+              rightTensor (ι₁ := ι) S))
+      (target := fun x xs =>
+        ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+          let S := fromHToGRecurrenceWeight params family ℓ
+            (prependTypeBit g.isSome (gHatTupleType gs))
+          let U := (gHatIdxMeas params family x).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n xs gs
+          ev ψbi ((leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) S) *
+            leftTensor (ι₂ := ι) U))
+      (hpoint := fun x xs =>
+        fromHToGAdjacentStageA0_pointwise_leftShape params ψbi family ℓ n x xs))
 
 /-- Global rewrite of `M₁` to the right-action shape used by `closenessOfIP`. -/
 lemma fromHToGAdjacentStageM1_eq_rightShape
@@ -456,73 +451,27 @@ lemma fromHToGAdjacentStageM1_eq_rightShape
   classical
   intro n
   unfold fromHToGAdjacentStageM1
-  change (∑ b : Bool, ∑ τ : GHatType n,
-      avgOver (uniformDistribution (Fq params)) fun x =>
-        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
-          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
-            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
-                gHatTupleType gs = τ,
-              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
-              let U := (gHatIdxMeas params family x).outcome g
-              let T := gHatHalfProductOutcomeOperator params family n xs gs
-              ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ) *
-                rightTensor (ι₁ := ι) (S * U))) = _
-  calc
-    (∑ b : Bool, ∑ τ : GHatType n,
-      avgOver (uniformDistribution (Fq params)) fun x =>
-        avgOver (uniformDistribution (PointTuple params n)) fun xs =>
-          ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
-            ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
-                gHatTupleType gs = τ,
-              let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
-              let U := (gHatIdxMeas params family x).outcome g
-              let T := gHatHalfProductOutcomeOperator params family n xs gs
-              ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ) *
-                rightTensor (ι₁ := ι) (S * U)))
-        = avgOver (uniformDistribution (Fq params)) (fun x =>
-            avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
-              ∑ b : Bool, ∑ τ : GHatType n,
-                ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
-                  ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
-                      gHatTupleType gs = τ,
-                    let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
-                    let U := (gHatIdxMeas params family x).outcome g
-                    let T := gHatHalfProductOutcomeOperator params family n xs gs
-                    ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ) *
-                      rightTensor (ι₁ := ι) (S * U)))) :=
-          fromHToG_sum₂_avgOver₂ (uniformDistribution (Fq params))
-            (uniformDistribution (PointTuple params n)) _
-    _ = avgOver (uniformDistribution (Fq params)) (fun x =>
-          avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
-            ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
-              let S := fromHToGRecurrenceWeight params family ℓ
-                (prependTypeBit g.isSome (gHatTupleType gs))
-              let U := (gHatIdxMeas params family x).outcome g
-              let T := gHatHalfProductOutcomeOperator params family n xs gs
-              ev ψbi ((leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) S) *
-                rightTensor (ι₁ := ι) U))) := by
-          refine avgOver_congr _ _ _ ?_
-          intro x
-          refine avgOver_congr _ _ _ ?_
-          intro xs
-          exact fromHToGAdjacentStageM1_pointwise_rightShape params ψbi family ℓ n x xs
-    _ = avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
-          ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
-            let S := fromHToGRecurrenceWeight params family ℓ
-              (prependTypeBit g.isSome (gHatTupleType gs))
-            let U := (gHatIdxMeas params family q.1).outcome g
-            let T := gHatHalfProductOutcomeOperator params family n q.2 gs
-            ev ψbi ((leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) S) *
-              rightTensor (ι₁ := ι) U)) := by
-          exact (avgOver_uniform_prod (α := Fq params) (β := PointTuple params n)
-            (f := fun x xs =>
-              ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
-                let S := fromHToGRecurrenceWeight params family ℓ
-                  (prependTypeBit g.isSome (gHatTupleType gs))
-                let U := (gHatIdxMeas params family x).outcome g
-                let T := gHatHalfProductOutcomeOperator params family n xs gs
-                ev ψbi ((leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) S) *
-                  rightTensor (ι₁ := ι) U))).symm
+  simpa using
+    (fromHToGAdjacentStage_globalize_pointwiseShape (params := params) (n := n)
+      (source := fun b τ x xs =>
+        ∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = b,
+          ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
+              gHatTupleType gs = τ,
+            let S := fromHToGRecurrenceWeight params family ℓ (prependTypeBit b τ)
+            let U := (gHatIdxMeas params family x).outcome g
+            let T := gHatHalfProductOutcomeOperator params family n xs gs
+            ev ψbi (leftTensor (ι₂ := ι) (U * T * Tᴴ) *
+              rightTensor (ι₁ := ι) (S * U)))
+      (target := fun x xs =>
+        ∑ g : GHatOutcome params, ∑ gs : GHatTupleOutcome params n,
+          let S := fromHToGRecurrenceWeight params family ℓ
+            (prependTypeBit g.isSome (gHatTupleType gs))
+          let U := (gHatIdxMeas params family x).outcome g
+          let T := gHatHalfProductOutcomeOperator params family n xs gs
+          ev ψbi ((leftTensor (ι₂ := ι) (U * T * Tᴴ) * rightTensor (ι₁ := ι) S) *
+            rightTensor (ι₁ := ι) U))
+      (hpoint := fun x xs =>
+        fromHToGAdjacentStageM1_pointwise_rightShape params ψbi family ℓ n x xs))
 
 
 end MIPStarRE.LDT.Pasting
