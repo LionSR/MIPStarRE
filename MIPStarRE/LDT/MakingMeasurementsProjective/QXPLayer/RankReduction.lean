@@ -638,6 +638,45 @@ lemma sigmaFinCard_le_of_sum_le {Outcome : Type*} [Fintype Outcome]
   simp only [Fintype.card_fin]
   exact hm
 
+/-- Transport a rank-reduction witness to the canonical sigma-space layer with
+the same operator family.
+
+The analytic fields of `RankReductionWitness` depend only on the operator
+family `Q_a` and its total operator.  The only genuinely auxiliary-space field
+is the dimension bound, and for the sigma-space layer it follows from the
+stored total-rank estimate. -/
+theorem RankReductionWitness.toSigmaRangeQLayer
+    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState ι} {A : Measurement Outcome ι} {ζ : Error}
+    {qLayer : QLayerData Outcome ι}
+    [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (qLayer.q.outcome a).rank))]
+    (hRank : RankReductionWitness ψ A ζ qLayer) :
+    RankReductionWitness ψ A ζ (sigmaRangeQLayer qLayer.q) := by
+  classical
+  refine
+    { projective := ?_
+      outcome_nonneg := ?_
+      sum_eq_total := ?_
+      source_almost_projective := hRank.source_almost_projective
+      closeness := ?_
+      total_le := ?_
+      totalRank_le := ?_
+      auxDim_le := ?_ }
+  · intro a
+    simpa [sigmaRangeQLayer, Qa] using hRank.projective a
+  · intro a
+    simpa [sigmaRangeQLayer, Qa] using hRank.outcome_nonneg a
+  · simpa [sigmaRangeQLayer, Qa, QTotal] using hRank.sum_eq_total
+  · simpa [sigmaRangeQLayer] using hRank.closeness
+  · simpa [sigmaRangeQLayer, QTotal] using hRank.total_le
+  · simpa [sigmaRangeQLayer, Qa] using hRank.totalRank_le
+  · simpa [sigmaRangeQLayer, FiniteHilbertSpace.sigmaFin, Fintype.card_ulift] using
+      sigmaFinCard_le_of_sum_le
+        (ι := ι) (m := fun a : Outcome => (qLayer.q.outcome a).rank)
+        hRank.totalRank_le
+
 /-- Concrete auxiliary-space producer from a direct total-rank bound. -/
 lemma projectiveLowRankSum_auxData_of_rank_bound {Outcome : Type uOutcome}
     [Fintype Outcome] [Nonempty Outcome]
