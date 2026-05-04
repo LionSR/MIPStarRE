@@ -853,24 +853,6 @@ theorem final_fields_projective_residual_error_le_selfImprovementError
     _ = selfImprovementError params eps delta := by
       rw [selfImprovementError_eq_finalStagePowerSum]
 
-private theorem sum_rpow_half_le_sum_rpow_one_thirtysecond
-    (params : Parameters) (eps delta : Error)
-    (heps : 0 ≤ eps) (heps_le_one : eps ≤ 1)
-    (hdelta : 0 ≤ delta) (hdelta_le_one : delta ≤ 1)
-    (hdq_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1) :
-    Real.rpow eps (1 / (2 : Error)) + Real.rpow delta (1 / (2 : Error)) +
-        Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2 : Error)) ≤
-      Real.rpow eps (1 / (32 : Error)) + Real.rpow delta (1 / (32 : Error)) +
-        Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (32 : Error)) := by
-  have hdq_nonneg : (0 : Error) ≤ ((params.d : Error) / (params.q : Error)) :=
-    d_q_ratio_nonneg params
-  have hexp_nonneg : (0 : Error) ≤ 1 / (32 : Error) := by norm_num
-  have hexp_le : (1 / (32 : Error)) ≤ 1 / (2 : Error) := by norm_num
-  refine add_le_add (add_le_add ?_ ?_) ?_
-  · exact Real.rpow_le_rpow_of_exponent_ge' heps heps_le_one hexp_nonneg hexp_le
-  · exact Real.rpow_le_rpow_of_exponent_ge' hdelta hdelta_le_one hexp_nonneg hexp_le
-  · exact Real.rpow_le_rpow_of_exponent_ge' hdq_nonneg hdq_le_one hexp_nonneg hexp_le
-
 /-- `30 * selfImprovementHelperError ≤ selfImprovementError` for unit-interval
 parameters.
 
@@ -889,30 +871,26 @@ theorem thirty_selfImprovementHelperError_le_selfImprovementError
   have hqpos : (0 : Error) < (params.q : Error) := params.q_cast_pos
   have hdq_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1 :=
     (div_le_one hqpos).mpr hd_le_q
-  have hmono :=
-    sum_rpow_half_le_sum_rpow_one_thirtysecond params eps delta heps heps_le_one
-      hdelta hdelta_le_one hdq_le_one
+  have hmono :
+      finalStagePowerSum params eps delta (1 / (2 : Error)) ≤
+        finalStagePowerSum params eps delta (1 / (32 : Error)) :=
+    finalStagePowerSum_le_of_exponent_ge params eps delta heps heps_le_one hdelta
+      hdelta_le_one hdq_le_one (by norm_num) (by norm_num)
   have h3000m_nn : (0 : Error) ≤ 3000 * (params.m : Error) := by positivity
   -- Both sides expand to `3000 m * sum_p` for matching exponents `p`.
-  unfold selfImprovementHelperError selfImprovementError
-    MainInductionStep.selfImprovementInInductionError
+  rw [selfImprovementHelperError_eq_finalStagePowerSum,
+    selfImprovementError_eq_finalStagePowerSum]
   calc
     30 *
         (100 * (params.m : Error) *
-          (Real.rpow eps (1 / (2 : Error)) +
-            Real.rpow delta (1 / (2 : Error)) +
-            Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2 : Error))))
+          finalStagePowerSum params eps delta (1 / (2 : Error)))
         =
       3000 * (params.m : Error) *
-        (Real.rpow eps (1 / (2 : Error)) +
-          Real.rpow delta (1 / (2 : Error)) +
-          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2 : Error))) := by
+        finalStagePowerSum params eps delta (1 / (2 : Error)) := by
             ring
     _ ≤
       3000 * (params.m : Error) *
-        (Real.rpow eps (1 / (32 : Error)) +
-          Real.rpow delta (1 / (32 : Error)) +
-          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (32 : Error))) :=
+        finalStagePowerSum params eps delta (1 / (32 : Error)) :=
         mul_le_mul_of_nonneg_left hmono h3000m_nn
 
 /-- A direct corollary of `thirty_selfImprovementHelperError_le_selfImprovementError`:
