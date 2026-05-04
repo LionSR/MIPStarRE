@@ -12,8 +12,7 @@ namespace MIPStarRE.LDT
 
 namespace Test
 
-/-- The paper-line-130 diagonal consistency obligation for the two unsymmetrized
-role POVMs.
+/-- Additional diagonal consistency input for the two unsymmetrized role POVMs.
 
 The diagonal consistency handoff supplies only the cross relation `G^A ⊗ I ≃ I ⊗ G^B`. The
 completion theorem used at lines 143--147 needs the diagonal hypotheses for each
@@ -43,8 +42,8 @@ structure MainFormalPostRolePackageDiagonalConsistencyInput
         (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
       scalars.zeta1
 
-/-- The `BipartiteSSCRel` form of the line-130 diagonal obligation, exactly as
-consumed by `completingToMeasurement`. -/
+/-- The `BipartiteSSCRel` form of the additional diagonal obligation consumed
+by `completingToMeasurement`. -/
 structure MainFormalPostRolePackageDiagonalSSCInput
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -66,8 +65,8 @@ structure MainFormalPostRolePackageDiagonalSSCInput
 
 namespace MainFormalPostRolePackageDiagonalSSCInput
 
-/-- Convert the diagonal self-`ConsRel` version of the line-130 obligation into
-the `BipartiteSSCRel` form required by the completion theorem.
+/-- Convert the diagonal self-`ConsRel` completion input into the
+`BipartiteSSCRel` form required by the completion theorem.
 
 This is a checked bookkeeping step only: the real mathematical gap remains
 proving the two diagonal consistency fields from the paper's cross `G^A/G^B`
@@ -548,11 +547,12 @@ theorem nonempty_ofCompletingToMeasurementInputs
     leftMatchMassPreservation := leftMatchMassPreservation
     rightMatchMassPreservation := rightMatchMassPreservation }⟩
 
-/-- Produce completion witnesses from the line-130 diagonal SSC package.
+/-- Produce completion witnesses from the additional diagonal SSC package.
 
 This is the same construction as `nonempty_ofCompletingToMeasurementInputs`, but
-the two self-consistency inputs are bundled under the exact paper-line-130
-obligation identified by `MainFormalPostRolePackageDiagonalSSCInput`. -/
+the two self-consistency inputs are bundled under
+`MainFormalPostRolePackageDiagonalSSCInput`, the extra diagonal data needed
+after the paper's line-130 cross relation has been reconstructed. -/
 theorem nonempty_ofDiagonalSSCInput
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -580,12 +580,12 @@ theorem nonempty_ofDiagonalSSCInput
     leftMatchMassPreservation rightMatchMassPreservation
 
 /-- Produce completion witnesses from the diagonal self-`ConsRel` version of the
-line-130 obligation.
+extra completion obligation.
 
 This theorem makes the exact remaining paper lemma usable in the native
-`≃`/`ConsRel` form: once callers prove diagonal line-130 consistency for
-`G^A` and `G^B`, the conversion to `BipartiteSSCRel` and the completion theorem
-are both checked. -/
+`≃`/`ConsRel` form: once callers prove diagonal consistency for `G^A` and
+`G^B`, in addition to the paper's line-130 cross relation, the conversion to
+`BipartiteSSCRel` and the completion theorem are both checked. -/
 theorem nonempty_ofDiagonalConsistencyInput
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

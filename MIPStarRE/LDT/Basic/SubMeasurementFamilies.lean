@@ -292,6 +292,38 @@ noncomputable def transport {α β : Type*} {ι : Type*}
     intro b
     simpa using A.proj (e.symm b)
 
+/-- Postprocessing a projective submeasurement preserves outcome projectivity. -/
+theorem postprocess_outcome_proj {α β : Type*} {ι : Type*}
+    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
+    (P : ProjSubMeas α ι) (f : α → β) (b : β) :
+    (postprocess P.toSubMeas f).outcome b * (postprocess P.toSubMeas f).outcome b =
+      (postprocess P.toSubMeas f).outcome b := by
+  classical
+  let fiber : Finset α := Finset.univ.filter fun a => f a = b
+  calc
+    (postprocess P.toSubMeas f).outcome b * (postprocess P.toSubMeas f).outcome b
+      = (∑ a ∈ fiber, P.outcome a) * (∑ a' ∈ fiber, P.outcome a') := by
+          simp [postprocess, fiber]
+    _ = ∑ a ∈ fiber, ∑ a' ∈ fiber, P.outcome a * P.outcome a' := by
+          rw [Finset.sum_mul]
+          simp_rw [Finset.mul_sum]
+    _ = ∑ a ∈ fiber, ∑ a' ∈ fiber, if a' = a then P.outcome a else 0 := by
+          refine Finset.sum_congr rfl ?_
+          intro a ha
+          refine Finset.sum_congr rfl ?_
+          intro a' ha'
+          by_cases h : a' = a
+          · subst h
+            simp [P.proj]
+          · have hne : a ≠ a' := fun h' => h h'.symm
+            simp [ProjSubMeas.outcome_orthogonal P _ _ hne, h]
+    _ = ∑ a ∈ fiber, P.outcome a := by
+          refine Finset.sum_congr rfl ?_
+          intro a ha
+          simp [fiber, ha]
+    _ = (postprocess P.toSubMeas f).outcome b := by
+          simp [postprocess, fiber]
+
 end ProjSubMeas
 
 namespace ProjMeas
@@ -326,33 +358,11 @@ noncomputable def postprocess {α β : Type*} {ι : Type*}
       simpa [MIPStarRE.LDT.postprocess] using A.total_eq_one
   }
   proj := by
-    classical
+    let P : ProjSubMeas α ι :=
+      { toSubMeas := A.toSubMeas
+        proj := A.proj }
     intro b
-    let fiber : Finset α := Finset.univ.filter fun a => f a = b
-    calc
-      (MIPStarRE.LDT.postprocess A.toSubMeas f).outcome b *
-          (MIPStarRE.LDT.postprocess A.toSubMeas f).outcome b
-        = (∑ a ∈ fiber, A.outcome a) * (∑ a' ∈ fiber, A.outcome a') := by
-            simp [MIPStarRE.LDT.postprocess, fiber]
-      _ = ∑ a ∈ fiber, ∑ a' ∈ fiber, A.outcome a * A.outcome a' := by
-            rw [Finset.sum_mul]
-            simp_rw [Finset.mul_sum]
-      _ = ∑ a ∈ fiber, ∑ a' ∈ fiber, if a' = a then A.outcome a else 0 := by
-            refine Finset.sum_congr rfl ?_
-            intro a ha
-            refine Finset.sum_congr rfl ?_
-            intro a' ha'
-            by_cases h : a' = a
-            · subst h
-              simp [A.proj]
-            · have hne : a ≠ a' := fun h' => h h'.symm
-              simp [A.outcome_orthogonal _ _ hne, h]
-      _ = ∑ a ∈ fiber, A.outcome a := by
-            refine Finset.sum_congr rfl ?_
-            intro a ha
-            simp [fiber, ha]
-      _ = (MIPStarRE.LDT.postprocess A.toSubMeas f).outcome b := by
-            simp [MIPStarRE.LDT.postprocess, fiber]
+    simpa [P] using ProjSubMeas.postprocess_outcome_proj P f b
 
 @[simp] theorem postprocess_toSubMeas {α β : Type*} {ι : Type*}
     [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]

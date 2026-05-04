@@ -882,6 +882,130 @@ theorem final_fields_projective_residual_error_le_selfImprovementError
     _ = selfImprovementError params eps delta := by
       rw [selfImprovementError_eq_finalStagePowerSum]
 
+/-- Final completeness threshold absorption (`self_improvement.tex`,
+lines 803--810).
+
+The natural error emitted by the projective completeness transport is
+`2ζ̂ + 2 sqrt ζ̂_ortho`. Under the standard unit-interval hypotheses for
+`ε`, `δ`, and `d/q`, this theorem absorbs that natural error into the literal
+`selfImprovementError` threshold used by `SelfImprovementFinalFields`. -/
+theorem final_fields_completeness_error_le_selfImprovementError
+    (params : Parameters) [FieldModel params.q]
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (heps_le_one : eps ≤ 1)
+    (hdelta : 0 ≤ delta) (hdelta_le_one : delta ≤ 1)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error)) :
+    2 * selfImprovementHelperError params eps delta +
+        2 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta) ≤
+      selfImprovementError params eps delta := by
+  have hqpos : (0 : Error) < (params.q : Error) := params.q_cast_pos
+  have hdq_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1 :=
+    (div_le_one hqpos).mpr hd_le_q
+  have hhelper_mono :
+      finalStagePowerSum params eps delta (1 / (2 : Error)) ≤
+        finalStagePowerSum params eps delta (1 / (32 : Error)) :=
+    finalStagePowerSum_le_of_exponent_ge params eps delta heps heps_le_one hdelta
+      hdelta_le_one hdq_le_one (by norm_num) (by norm_num)
+  have hsqrt_orth_mono :
+      finalStagePowerSum params eps delta (1 / (16 : Error)) ≤
+        finalStagePowerSum params eps delta (1 / (32 : Error)) :=
+    finalStagePowerSum_le_of_exponent_ge params eps delta heps heps_le_one hdelta
+      hdelta_le_one hdq_le_one (by norm_num) (by norm_num)
+  have hhelper :
+      selfImprovementHelperError params eps delta ≤
+        100 * (params.m : Error) *
+          finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+    rw [selfImprovementHelperError_eq_finalStagePowerSum]
+    exact mul_le_mul_of_nonneg_left hhelper_mono (by positivity)
+  have hsqrt_orth :
+      Real.sqrt (selfImprovementOrthogonalizationError params eps delta) ≤
+        20 * (params.m : Error) *
+          finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+    have hsqrt16 :=
+      sqrt_selfImprovementOrthogonalizationError_le_twenty_m_powerSum_sixteenth
+        params eps delta heps hdelta
+    exact hsqrt16.trans
+      (mul_le_mul_of_nonneg_left hsqrt_orth_mono (by positivity))
+  have hm_nonneg : 0 ≤ (params.m : Error) := m_cast_nonneg params
+  have hsum32_nonneg :
+      0 ≤ finalStagePowerSum params eps delta (1 / (32 : Error)) :=
+    finalStagePowerSum_nonneg params eps delta (1 / (32 : Error)) heps hdelta
+  have hnatural :
+      2 * selfImprovementHelperError params eps delta +
+          2 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta) ≤
+        3000 * (params.m : Error) *
+          finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+    nlinarith
+  calc
+    2 * selfImprovementHelperError params eps delta +
+        2 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta)
+        ≤ 3000 * (params.m : Error) *
+            finalStagePowerSum params eps delta (1 / (32 : Error)) := hnatural
+    _ = selfImprovementError params eps delta := by
+      rw [selfImprovementError_eq_finalStagePowerSum]
+
+/-- Final self-closeness threshold absorption (`self_improvement.tex`,
+lines 803--810).
+
+The natural error emitted by the projective self-closeness transport is
+`3 * (ζ̂_ortho + 2ζ̂ + ζ̂_ortho)`. Under the standard unit-interval hypotheses
+for `ε`, `δ`, and `d/q`, this theorem absorbs that natural error into the
+literal `selfImprovementError` threshold used by `SelfImprovementFinalFields`.
+-/
+theorem final_fields_self_closeness_error_le_selfImprovementError
+    (params : Parameters) [FieldModel params.q]
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (heps_le_one : eps ≤ 1)
+    (hdelta : 0 ≤ delta) (hdelta_le_one : delta ≤ 1)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error)) :
+    3 * (selfImprovementOrthogonalizationError params eps delta +
+        2 * selfImprovementHelperError params eps delta +
+        selfImprovementOrthogonalizationError params eps delta) ≤
+      selfImprovementError params eps delta := by
+  have hqpos : (0 : Error) < (params.q : Error) := params.q_cast_pos
+  have hdq_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1 :=
+    (div_le_one hqpos).mpr hd_le_q
+  have horth_mono :
+      finalStagePowerSum params eps delta (1 / (8 : Error)) ≤
+        finalStagePowerSum params eps delta (1 / (32 : Error)) :=
+    finalStagePowerSum_le_of_exponent_ge params eps delta heps heps_le_one hdelta
+      hdelta_le_one hdq_le_one (by norm_num) (by norm_num)
+  have hhelper_mono :
+      finalStagePowerSum params eps delta (1 / (2 : Error)) ≤
+        finalStagePowerSum params eps delta (1 / (32 : Error)) :=
+    finalStagePowerSum_le_of_exponent_ge params eps delta heps heps_le_one hdelta
+      hdelta_le_one hdq_le_one (by norm_num) (by norm_num)
+  have horth :
+      selfImprovementOrthogonalizationError params eps delta ≤
+        400 * (params.m : Error) *
+          finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+    have horth8 :=
+      selfImprovementOrthogonalizationError_le_four_hundred_m_powerSum_eighth
+        params eps delta heps hdelta
+    exact horth8.trans
+      (mul_le_mul_of_nonneg_left horth_mono (by positivity))
+  have hhelper :
+      selfImprovementHelperError params eps delta ≤
+        100 * (params.m : Error) *
+          finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+    rw [selfImprovementHelperError_eq_finalStagePowerSum]
+    exact mul_le_mul_of_nonneg_left hhelper_mono (by positivity)
+  have hnatural :
+      3 * (selfImprovementOrthogonalizationError params eps delta +
+          2 * selfImprovementHelperError params eps delta +
+          selfImprovementOrthogonalizationError params eps delta) ≤
+        3000 * (params.m : Error) *
+          finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+    nlinarith
+  calc
+    3 * (selfImprovementOrthogonalizationError params eps delta +
+        2 * selfImprovementHelperError params eps delta +
+        selfImprovementOrthogonalizationError params eps delta)
+        ≤ 3000 * (params.m : Error) *
+            finalStagePowerSum params eps delta (1 / (32 : Error)) := hnatural
+    _ = selfImprovementError params eps delta := by
+      rw [selfImprovementError_eq_finalStagePowerSum]
+
 /-- `30 * selfImprovementHelperError ≤ selfImprovementError` for unit-interval
 parameters.
 
