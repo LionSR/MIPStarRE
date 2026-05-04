@@ -7,6 +7,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport
 
 /-!
 # Self-improvement theorem wrappers and final-fields producers
@@ -37,6 +38,8 @@ self-closeness producers.
 - **final_fields_self_closeness** — derives the `selfCloseness` field of
   `SelfImprovementFinalFields` from already-supplied helper SSC and
   orthonormalization SDD (paper lines 727–741).
+- **final_fields_bounded** — imported standalone boundedness producer used by
+  `selfImprovement` to fill the final `BoundedByOperator` field from `1 ≤ Z`.
 
 ## References
 
@@ -88,6 +91,7 @@ lemma selfImprovementHelper
       averagedConstruction := rfl
       addInUVarianceBound := ?_
       positiveSemidefiniteWitness := hsdp.dualPositive
+      oneLeDualWitness := hsdp.dualDominatesIdentity
       dualDominatesAveragedPoint := hsdp.dualFeasible }
   · simpa [T] using hsdp
   · exact addInU params strategy eps delta gamma hgood T
@@ -179,6 +183,26 @@ theorem selfImprovement
   have hfinal :
       SelfImprovementFinalFields params strategy H Z eps delta nu :=
     hfinalFields hhelper horth hdata
+  have hselfImprovementError_nonneg :
+      0 ≤ selfImprovementError params eps delta := by
+    have heps : 0 ≤ eps := eps_nonneg_of_isGood params strategy hgood
+    have hdelta : 0 ≤ delta := delta_nonneg_of_isGood params strategy hgood
+    have hm_nonneg : (0 : Error) ≤ (params.m : Error) := by
+      exact_mod_cast Nat.zero_le params.m
+    have hd_nonneg : (0 : Error) ≤ (params.d : Error) := by
+      exact_mod_cast Nat.zero_le params.d
+    have hq_nonneg : (0 : Error) ≤ (params.q : Error) := le_of_lt params.q_cast_pos
+    have hdq_nonneg : (0 : Error) ≤ (params.d : Error) / (params.q : Error) :=
+      div_nonneg hd_nonneg hq_nonneg
+    have hsum_nonneg :
+        0 ≤ Real.rpow eps (1 / (32 : Error)) +
+            Real.rpow delta (1 / (32 : Error)) +
+            Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (32 : Error)) := by
+      exact add_nonneg
+        (add_nonneg (Real.rpow_nonneg heps _) (Real.rpow_nonneg hdelta _))
+        (Real.rpow_nonneg hdq_nonneg _)
+    unfold selfImprovementError MainInductionStep.selfImprovementInInductionError
+    exact mul_nonneg (mul_nonneg (by norm_num) hm_nonneg) hsum_nonneg
   refine ⟨H, Z, ?_⟩
   exact
     { witness := ⟨T, Hhat, hhelper, horth, hdata⟩
@@ -188,7 +212,9 @@ theorem selfImprovement
       positiveSemidefiniteWitness := hhelper.positiveSemidefiniteWitness
       dualDominatesAveragedPoint := hhelper.dualDominatesAveragedPoint
       projectiveResidualBound := hfinal.projectiveResidualBound
-      bounded := hfinal.bounded }
+      bounded :=
+        final_fields_bounded strategy.state H.toSubMeas hhelper.oneLeDualWitness
+          hselfImprovementError_nonneg }
 
 /--
 Bridge from the measurement-input version in `self_improvement.tex` to the
@@ -256,7 +282,7 @@ theorem selfImprovementFromBridgeInputsSubMeas
 
 /-! ## Final-fields completeness producer (issue #931)
 
-The reduced `FinalFieldsInput` lumps five distinct paper-side obligations into a
+The reduced `FinalFieldsInput` lumps four distinct paper-side obligations into a
 single residual. The lemmas below isolate the **completeness** field, exposing
 the precise analytic ingredient that is still missing — the helper-stage
 completeness lower bound on `Hhat.liftLeft` — and discharging the rest of the
@@ -275,8 +301,8 @@ from the entire `FinalFieldsInput` lump to the single named paper obligation
 `hhelperCompleteness`, which corresponds to `self_improvement.tex` lines
 351--414 (helper completeness, especially the Cauchy--Schwarz step at lines
 366--414) followed by the projective transfer at lines 713--717. The remaining
-four `FinalFieldsInput` fields (point-consistency, self-closeness,
-projective-residual, boundedness) are not addressed here.
+three `FinalFieldsInput` fields (point-consistency, self-closeness, and
+projective-residual) are not addressed here.
 
 Paper anchors:
 * `references/ldt-paper/self_improvement.tex` lines 351--414 — helper-stage
@@ -383,7 +409,7 @@ a separate numerical step on the explicit error definitions
 `selfImprovementError`) that does not require any new analytic input.
 
 This narrows the missing input for the `completeness` field of
-`FinalFieldsInput` from the entire five-field residual to the single named
+`FinalFieldsInput` from the remaining four-field residual to the single named
 paper obligation `hhelperCompleteness` matching
 `references/ldt-paper/self_improvement.tex` lines 351--414, which is the only
 remaining analytic step (especially the Cauchy--Schwarz argument at lines

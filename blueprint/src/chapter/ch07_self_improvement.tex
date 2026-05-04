@@ -282,12 +282,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   which proves \ref{item:self-improvement-self}.
 
   \emph{Proof of \ref{item:self-improvement-boundedness}.}
-  The formal statement
-  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_bounded}
-  isolates the operator-monotonicity substep: once the SDP dual witness
-  satisfies $I \le Z$, the projective submeasurement mass is bounded by
-  $Z \ot I$ with zero boundedness error.
-  The boundedness quantity is
+  The helper-stage boundedness quantity is
   \[
     \bra{\psi} Z \ot I \ket{\psi} -\E_{u} \sum_a \bra{\psi}  A^{u}_{a} \ot H_{[h(u)=a]} \ket{\psi}.
   \]
@@ -689,6 +684,9 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \]
 
   \emph{Proof of \ref{item:self-improvement-projective-boundedness}.}
+  \lean{MIPStarRE.LDT.SelfImprovement.projective_boundedness_gap_le_helper_boundedness_gap}
+  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_projective_residual_bound_natural}
+  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_projective_residual_bound}
   The boundedness quantity is
   \begin{align}
     &\bra{\psi} Z \ot (I - H) \ket{\psi} \notag\\
@@ -705,6 +703,11 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
     \le \bra{\psi} Z \ot I \ket{\psi} -\E_{u} \sum_a \bra{\psi}  A^{u}_{a} \ot \widehat H_{[h(u)=a]} \ket{\psi} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}},
   \]
   and now \ref{item:self-improvement-boundedness} of Lemma~\ref{lem:self-improvement-helper} bounds this by $\widehat{\zeta} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}}$.
+  The formal boundedness field
+  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_bounded}
+  is the corresponding operator-monotonicity step: once the SDP dual witness
+  satisfies $I\le Z$, the total mass of the projective submeasurement is bounded
+  by $Z\ot I$ with zero boundedness error.
 
   Thus the four conclusions hold with errors
   \[
