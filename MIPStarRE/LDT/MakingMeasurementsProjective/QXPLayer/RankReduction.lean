@@ -500,6 +500,57 @@ lemma sigmaFinRangeEmbedding_qa_eq {Outcome : Type uOutcome}
     ProjMeas.transport, Measurement.transport, SubMeas.transport, Matrix.mul_apply,
     Matrix.conjTranspose_apply, Matrix.diagonal_apply] using hsum.symm
 
+/-- The finite-enumeration range embedding has right Gram matrix equal to the
+total operator of the projective family.
+
+This is the canonical sigma-space form of the paper's identity `X† X = Q`.  The
+proof uses only that the auxiliary projectors `T_a` form a measurement and the
+pointwise restatement `Q_a = X† T_a X`. -/
+lemma sigmaFinRangeEmbedding_gram_right {Outcome : Type uOutcome}
+    [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (q : OpFamily Outcome ι)
+    (qa_projective : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (q.outcome a))
+    (q_sum_eq_total : ∑ a : Outcome, q.outcome a = q.total) :
+    (sigmaFinRangeEmbedding q.outcome qa_projective)ᴴ *
+        (sigmaFinRangeEmbedding q.outcome qa_projective) =
+      q.total := by
+  classical
+  let X := sigmaFinRangeEmbedding q.outcome qa_projective
+  let T := sigmaFinProjMeas (fun a : Outcome => (q.outcome a).rank)
+  have hT_sum :
+      (∑ a : Outcome, T.outcome a) =
+        (1 : MIPStarRE.Quantum.Op (ULift.{uι}
+          (FiniteHilbertSpace.sigmaFinCarrier
+            (fun a : Outcome => (q.outcome a).rank)))) := by
+    simpa [T] using T.sum_eq
+  have hmul_sum :
+      Xᴴ * (∑ a : Outcome, T.outcome a) =
+        ∑ a : Outcome, Xᴴ * T.outcome a := by
+    simpa using
+      (Matrix.mul_sum (s := Finset.univ)
+        (f := fun a : Outcome => T.outcome a) (M := Xᴴ))
+  have hsum_mul :
+      (∑ a : Outcome, Xᴴ * T.outcome a) * X =
+        ∑ a : Outcome, Xᴴ * T.outcome a * X := by
+    simpa using
+      (Matrix.sum_mul (s := Finset.univ)
+        (f := fun a : Outcome => Xᴴ * T.outcome a) (M := X))
+  calc
+    (sigmaFinRangeEmbedding q.outcome qa_projective)ᴴ *
+        (sigmaFinRangeEmbedding q.outcome qa_projective)
+        = Xᴴ * X := rfl
+    _ = Xᴴ * (∑ a : Outcome, T.outcome a) * X := by
+          rw [hT_sum, Matrix.mul_one]
+    _ = (∑ a : Outcome, Xᴴ * T.outcome a) * X := by rw [hmul_sum]
+    _ = ∑ a : Outcome, Xᴴ * T.outcome a * X := hsum_mul
+    _ = ∑ a : Outcome, q.outcome a := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          simpa [X, T, Ta] using
+            (sigmaFinRangeEmbedding_qa_eq q.outcome qa_projective a).symm
+    _ = q.total := q_sum_eq_total
+
 /-- Assemble `QXPLayerData` from the canonical sigma-space embedding and the
 remaining SVD/polar identities for `Xhat`.
 
