@@ -352,7 +352,10 @@ noncomputable def sigmaFinRangeEmbedding {Outcome : Type uOutcome}
 /-- The literal block projective measurement on `Σ a, Fin (m a)` selecting the
 `a`-summand.  This is the paper's measurement
 `T_a = Σ_i |a,i⟩⟨a,i|` before replacing the sigma type by the universe-stable
-finite-enumeration model used in `sigmaFinProjMeas`. -/
+finite-enumeration model used in `sigmaFinProjMeas`.  The two constructions are
+kept separate so that `sigmaRangeEmbedding_qa_eq` follows the paper's literal
+index set, while the finite-enumeration form supplies the nonempty auxiliary
+Hilbert space used by `QXPLayerData`. -/
 noncomputable def sigmaProjMeas {Outcome : Type uOutcome}
     [Fintype Outcome] [DecidableEq Outcome] (m : Outcome → ℕ) :
     ProjMeas Outcome (Σ a : Outcome, Fin (m a)) where
