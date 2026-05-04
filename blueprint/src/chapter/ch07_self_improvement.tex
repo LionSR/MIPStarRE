@@ -325,6 +325,9 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
       = \E_u \sum_h \sum_{a \neq h(u)} \bra{\psi}\,A^u_a \ot H_h\,\ket{\psi}.
   \]
   Combined with~\eqref{eq:explicit-bound-for-A-consistency} this gives
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_boundedness_gap_eq_upper_gap_add_off_diagonal_avg}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_boundedness_gap_le_selfImprovementHelperError}
+  \leanok
   \[
     \bra{\psi} Z \ot I \ket{\psi}
     -\E_{u} \sum_a \bra{\psi}  A^{u}_{a} \ot H_{[h(u)=a]} \ket{\psi}
