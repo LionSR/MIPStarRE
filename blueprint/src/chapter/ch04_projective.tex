@@ -736,20 +736,24 @@
 		\leanok
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndSvdIdentities}
 		\leanok
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvd}
+		\leanok
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndSvdIdentities}
+		\leanok
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvd}
 		\leanok
 		\uses{def:matrix-decomposition-Q}
 		The paper presents this step by choosing a singular value decomposition
 		\[
 			X = U \cdot \Sigma_{m \times d} \cdot V^\dagger.
 		\]
-		The formalization records only the downstream consequences of this choice:
-		the matrices $X$ and $\widehat X$, the identities $X^\dagger X=Q$,
-		$\widehat X\widehat X^\dagger=I$, and $X^\dagger\widehat X=\sqrt Q$, together
-		with the $Q_a=X^\dagger T_aX$ restatement.  The elementary multiplications
-		with explicit rectangular SVD matrices $U,V,\Sigma$ are formalized separately
-		at the two $\widehat X$ identities below, while the data package itself keeps
-		only the consequences used downstream.
+		The formalization has two closely related interfaces.  The reduced data
+		package records the downstream consequences of the choice: the matrices $X$
+		and $\widehat X$, the identities $X^\dagger X=Q$,
+		$\widehat X\widehat X^\dagger=I$, and $X^\dagger\widehat X=\sqrt Q$,
+		together with the $Q_a=X^\dagger T_aX$ restatement.  The rectangular-SVD
+		producers take explicit matrices $U,V,\Sigma,I_{m\times d}$ and derive the
+		two stored $\widehat X$ identities from the matrix calculation below.
 	\end{definition}
 
 	\begin{remark}\label{rem:motivation-for-P}
@@ -916,6 +920,7 @@
 	\begin{lemma}[$\widehat{X}$ squared]\label{lem:X-hat-squared}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xHatSquared,
 			MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_coisometry,
+			MIPStarRE.LDT.MakingMeasurementsProjective.exists_xHat_of_rectangularSvd,
 			MIPStarRE.LDT.MakingMeasurementsProjective.exists_sigmaFin_xHat_coisometry_of_sum_le,
 			MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinXHatCoisometry_spec}
 		\leanok
@@ -931,9 +936,9 @@
 		chosen matrix \texttt{sigmaFinXHatCoisometry} and its specification record this
 		existence result as an input for the future construction.  The formal lemma
 		\texttt{rectangularSvd\_xHat\_coisometry} records the corresponding matrix
-		calculation, and the data package then stores the resulting coisometry
-		identity for the particular $\widehat X$ used together with the mixed
-		square-root identity below.
+		calculation, and \texttt{exists\_xHat\_of\_rectangularSvd} packages the
+		resulting choice of $\widehat X$ together with the mixed square-root identity
+		below.
 	\end{proof}
 
 	\begin{lemma}[$X$ times $\widehat{X}$]\label{lem:X-times-X-hat}
