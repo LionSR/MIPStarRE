@@ -28,6 +28,12 @@ data-processing transport of the boundedness gap, and the standalone
 - **helper_boundedness_slack_average_ev_eq_off_diagonal_avg** — averaged
   scalar form of the off-diagonal decomposition (LHS of
   `eq:explicit-bound-for-A-consistency`, paper line 435).
+- **helper_boundedness_gap_eq_upper_gap_add_off_diagonal_avg** — rewrites the
+  helper boundedness gap as the `Z`-versus-`H.total` scalar gap plus the
+  off-diagonal average.
+- **helper_boundedness_gap_le_selfImprovementHelperError** — combines the
+  `H`-versus-`Z` scalar comparison with the off-diagonal average estimate to
+  obtain the helper boundedness gap at the helper threshold.
 - **helper_boundedness_gap_transport_through_data_processing** — transport
   the helper boundedness gap through the data-processing SDD approximation
   between Ĥ and H (paper lines 747–755).
@@ -335,6 +341,88 @@ theorem helper_boundedness_slack_average_ev_eq_off_diagonal_avg
       refine avgOver_congr (uniformDistribution (Point params)) _ _ ?_
       intro u
       exact h_ev_pointwise u
+
+/-- Algebraic decomposition of the helper boundedness gap.
+
+The scalar gap
+`⟨Z ⊗ I - helperAgreementAverageOperator⟩` is the sum of
+`⟨Z ⊗ I⟩ - ⟨I ⊗ H.total⟩` and the off-diagonal average produced by
+`helper_boundedness_slack_average_ev_eq_off_diagonal_avg`.  This is the
+formal algebraic bridge between the reindexing calculation and the final
+boundedness estimate in the proof of self-improvement. -/
+theorem helper_boundedness_gap_eq_upper_gap_add_off_diagonal_avg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (H : SubMeas (Polynomial params) ι)
+    (Z : MIPStarRE.Quantum.Op ι) :
+    helperBoundednessGap params strategy H Z =
+      (ev strategy.state (helperUpperOperator params Z) -
+          ev strategy.state (rightTensor (ι₁ := ι) H.total)) +
+        avgOver (uniformDistribution (Point params)) (fun u =>
+          ∑ h : Polynomial params,
+            ∑ a ∈ (Finset.univ : Finset (Fq params)).erase (h u),
+              ev strategy.state
+                (opTensor ((strategy.pointMeasurement u).outcome a)
+                  (H.outcome h))) := by
+  have hslack :=
+    helper_boundedness_slack_average_ev_eq_off_diagonal_avg params strategy H
+  have hgap_decomp :
+      helperBoundednessGap params strategy H Z =
+        (ev strategy.state (helperUpperOperator params Z) -
+            ev strategy.state (rightTensor (ι₁ := ι) H.total)) +
+          (ev strategy.state (rightTensor (ι₁ := ι) H.total) -
+            ev strategy.state (helperAgreementAverageOperator params strategy H)) := by
+    unfold helperBoundednessGap helperBoundednessOperator
+    rw [ev_sub]
+    ring
+  rw [hgap_decomp, hslack]
+
+/-- Helper-stage boundedness from the scalar comparison and the off-diagonal
+estimate.
+
+The helper boundedness gap decomposes as
+`⟨Z ⊗ I⟩ - ⟨I ⊗ Hhat.total⟩` plus the off-diagonal average from
+`helper_boundedness_slack_average_ev_eq_off_diagonal_avg`.  Thus the comparison
+`⟨Z ⊗ I⟩ - ⟨I ⊗ Hhat.total⟩ ≤ 3 √δ`, together with the off-diagonal estimate
+`≤ 4 √ζ_variance`, gives the helper threshold after applying
+`helper_boundedness_error_le_selfImprovementHelperError`. -/
+theorem helper_boundedness_gap_le_selfImprovementHelperError
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
+    {Hhat : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (hZ_vs_H :
+      ev strategy.state (helperUpperOperator params Z) -
+          ev strategy.state (rightTensor (ι₁ := ι) Hhat.total) ≤
+        3 * Real.sqrt delta)
+    (hoffdiag :
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ∑ a ∈ (Finset.univ : Finset (Fq params)).erase (h u),
+            ev strategy.state
+              (opTensor ((strategy.pointMeasurement u).outcome a)
+                (Hhat.outcome h))) ≤
+        4 * Real.sqrt (selfImprovementVarianceError params eps delta)) :
+    helperBoundednessGap params strategy Hhat Z ≤
+      selfImprovementHelperError params eps delta := by
+  calc
+    helperBoundednessGap params strategy Hhat Z =
+        (ev strategy.state (helperUpperOperator params Z) -
+            ev strategy.state (rightTensor (ι₁ := ι) Hhat.total)) +
+          avgOver (uniformDistribution (Point params)) (fun u =>
+            ∑ h : Polynomial params,
+              ∑ a ∈ (Finset.univ : Finset (Fq params)).erase (h u),
+                ev strategy.state
+                  (opTensor ((strategy.pointMeasurement u).outcome a)
+                    (Hhat.outcome h))) :=
+      helper_boundedness_gap_eq_upper_gap_add_off_diagonal_avg params strategy Hhat Z
+    _ ≤ 3 * Real.sqrt delta +
+        4 * Real.sqrt (selfImprovementVarianceError params eps delta) :=
+      add_le_add hZ_vs_H hoffdiag
+    _ ≤ selfImprovementHelperError params eps delta :=
+      helper_boundedness_error_le_selfImprovementHelperError params eps delta heps hdelta
 
 /-- Transport the helper boundedness gap through the data-processing
 approximation between `Hhat` and `H`.
