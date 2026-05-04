@@ -8,6 +8,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUDiagonalAndDefs
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep12
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness
 
 /-!
 # Add-in-u variance-bound conversions, factored Step 3/4 CS, assembly and transfer
@@ -44,9 +45,7 @@ projection-simplified diagonal transfer.
   `add_in_u_cs_chain_global_variance_steps_of_local_sum_bound_from_factor_bounds`,
   and `add_in_u_simplified_transfer_of_cs_chain_local_variance_form`.
 - **Self-consistency/local-variance wrapper** —
-  `add_in_u_simplified_transfer_of_cs_chain_selfConsistency_local_variance_form`,
-  `helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance`,
-  and `helper_strong_self_consistency_input_of_selfConsistency_localVariance`.
+  `add_in_u_simplified_transfer_of_cs_chain_selfConsistency_local_variance_form`.
 - **add_in_u_simplified_transfer_of_cs_chain** — the four-step chain
   assembly: given four `|Qᵢ−Qⱼ| ≤ ηᵢⱼ` bounds summing to `≤ addInUError`,
   yields the projection-simplified transfer.
@@ -57,8 +56,9 @@ projection-simplified diagonal transfer.
   composing the CS chain with arithmetic absorption.
 - **selfConsistencyDiagonalAddInU_of_simplifiedTransfer** — specialization
   to the projection-simplified scalar transfer hypothesis.
-- **SelfImprovementBridgeInputs.ofHelperStrongSelfConsistencyProducer** —
-  bridge-input constructor deriving the helper SSC field from its producer.
+- **helper_mass_sub_release_eq_polynomial_off_diagonal** — exact expansion of
+  the helper mass minus the released diagonal right-hand side as the
+  off-diagonal polynomial-pair contribution.
 
 ## References
 
@@ -1245,300 +1245,148 @@ lemma selfConsistencyDiagonalAddInU_of_simplifiedTransfer
   rw [hRHS_eq]
   exact htransfer
 
-/-- Producer-shaped inputs for the helper-stage strong self-consistency proof.
+private lemma sum_sum_sub_diagonal_eq_off_diagonal
+    {α β : Type*} [Fintype α] [DecidableEq α] [AddCommGroup β] (F : α → α → β) :
+    (∑ x : α, ∑ y : α, F x y) - (∑ x : α, F x x) =
+      ∑ x : α, ∑ y ∈ (Finset.univ : Finset α).erase x, F x y := by
+  classical
+  rw [← Finset.sum_sub_distrib]
+  exact Finset.sum_congr rfl fun x _ =>
+    (Finset.sum_erase_eq_sub (s := Finset.univ) (a := x)
+      (f := fun y => F x y) (Finset.mem_univ x)).symm
 
-These fields isolate the remaining paper-side obligations in the proof of
-`item:self-improvement-self` once the reduced helper conclusion is fixed:
+/-- Exact residual-side expansion for the helper strong self-consistency proof.
 
-1. the four scalar transport bounds along the chain
-   `Q₀ \to Q₁ \to Q₂ \to Q₃ \to Q₄`, and
-2. the final lower bound on the released right-hand side before the arithmetic
-   absorption into `selfImprovementHelperError`.
+For the averaged helper `Hhat = E_u H^u` produced from the primal measurement
+`T`, the difference between the helper left mass and the released diagonal
+add-in-`u` right-hand side is precisely the contribution of the off-diagonal
+polynomial pairs `(h',h)` with `h' ≠ h`:
 
-This structure is intentionally narrower than
-`HelperStrongSelfConsistencyInput`: it records the actual intermediate estimates
-still needed from the add-in-`u`, self-consistency, and variance calculations,
-rather than restating the final `BipartiteSSCRel` conclusion. -/
-structure HelperStrongSelfConsistencyProducerInputs
+`E_u \sum_h \sum_{h'≠h} ⟨ψ, H^u_{h'} ⊗ T_h ψ⟩`.
+
+This is the exact algebraic opening of the Lean residual
+`helper_left_mass - release-the-kraken`; the later Cauchy--Schwarz,
+Schwartz--Zippel, point-consistency, and self-consistency estimates are the
+remaining inequalities that bound this off-diagonal expression in the proof of
+`item:self-improvement-self`.
+
+This Lean identity expands the helper left mass minus the released diagonal
+right-hand side directly.  It therefore differs from the paper's intermediate
+``threw-in-`h'`'' expression, where the off-diagonal helper operator is still
+sandwiched by `A^u_{h(u)}`. -/
+theorem helper_mass_sub_release_eq_polynomial_off_diagonal
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
-    (T : Measurement (Polynomial params) ι)
-    (Hhat : SubMeas (Polynomial params) ι)
-    (eps delta : Error) : Prop where
-  /-- Paper `eq:move-one`: the `Q₀ \to Q₁` transport bound. -/
-  step01Bound :
-    |addInUCSChainQ0 params strategy T.toSubMeas -
-        addInUCSChainQ1 params strategy T.toSubMeas| ≤
-      Real.sqrt (2 * delta)
-  /-- Paper `eq:move-another`: the `Q₁ \to Q₂` transport bound. -/
-  step12Bound :
-    |addInUCSChainQ1 params strategy T.toSubMeas -
-        addInUCSChainQ2 params strategy T.toSubMeas| ≤
-      Real.sqrt (2 * delta)
-  /-- Paper `eq:change-one`: the `Q₂ \to Q₃` variance transport bound. -/
-  step23Bound :
-    |addInUCSChainQ2 params strategy T.toSubMeas -
-        addInUCSChainQ3 params strategy T.toSubMeas| ≤
-      Real.sqrt (selfImprovementVarianceError params eps delta)
-  /-- Paper `eq:change-another`: the `Q₃ \to Q₄` variance transport bound. -/
-  step34Bound :
-    |addInUCSChainQ3 params strategy T.toSubMeas -
-        addInUCSChainQ4 params strategy T.toSubMeas| ≤
-      Real.sqrt (selfImprovementVarianceError params eps delta)
-  /-- The released right-hand side is within the paper's pre-absorption helper
-  SSC error of the helper mass. -/
-  residualLowerBound :
-    subMeasMass strategy.state Hhat.liftLeft -
-        addInURightQuantity params strategy
+    (T : Measurement (Polynomial params) ι) :
+    subMeasMass strategy.state
+        (averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas).liftLeft -
+      addInURightQuantity params strategy
+        (sandwichedPolynomialSubMeasAt params strategy T.toSubMeas)
+        T.toSubMeas
+        (selfConsistencyAddInUSelection params) =
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ∑ h' ∈ (Finset.univ : Finset (Polynomial params)).erase h,
+            ev strategy.state
+              (opTensor
+                ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h')
+                (T.toSubMeas.outcome h))) := by
+  classical
+  have hmass :
+      subMeasMass strategy.state
+          (averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas).liftLeft =
+        avgOver (uniformDistribution (Point params)) (fun u =>
+          ∑ h' : Polynomial params,
+            ∑ h : Polynomial params,
+              ev strategy.state
+                (opTensor
+                  ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h')
+                  (T.toSubMeas.outcome h))) := by
+    have hmass0 :
+        subMeasMass strategy.state
+            (averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas).liftLeft =
+          avgOver (uniformDistribution (Point params)) (fun u =>
+            ∑ h' : Polynomial params,
+              ev strategy.state
+                (leftTensor (ι₂ := ι)
+                  (sandwichedPolynomialOutcomeOperatorAt
+                    params strategy T.toSubMeas u h'))) := by
+      simpa using helper_mass_eq_avg_pointwise_sandwich_sum
+        params strategy T.toSubMeas
+    rw [hmass0]
+    refine avgOver_congr (uniformDistribution (Point params)) _ _ ?_
+    intro u
+    refine Finset.sum_congr rfl ?_
+    intro h' _
+    have hTsum :
+        (∑ h : Polynomial params, T.toSubMeas.outcome h) =
+          (1 : MIPStarRE.Quantum.Op ι) := by
+      rw [T.toSubMeas.sum_eq_total, T.total_eq_one]
+    calc
+      ev strategy.state
+          (leftTensor (ι₂ := ι)
+            (sandwichedPolynomialOutcomeOperatorAt params strategy T.toSubMeas u h'))
+          =
+        ev strategy.state
+          (opTensor
+            ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h')
+            (1 : MIPStarRE.Quantum.Op ι)) := by
+          rfl
+      _ =
+        ev strategy.state
+          (opTensor
+            ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h')
+            (∑ h : Polynomial params, T.toSubMeas.outcome h)) := by
+          rw [hTsum]
+      _ =
+        ev strategy.state
+          (∑ h : Polynomial params,
+            opTensor
+              ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h')
+              (T.toSubMeas.outcome h)) := by
+          rw [← opTensor_sum_right_univ]
+      _ =
+        ∑ h : Polynomial params,
+          ev strategy.state
+            (opTensor
+              ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h')
+              (T.toSubMeas.outcome h)) := by
+          rw [ev_sum]
+  have hrelease :
+      addInURightQuantity params strategy
           (sandwichedPolynomialSubMeasAt params strategy T.toSubMeas)
           T.toSubMeas
-          (selfConsistencyAddInUSelection params) ≤
-      (11 * Real.sqrt (selfImprovementVarianceError params eps delta) +
-          Real.sqrt (2 * delta) +
-          ((params.m : Error) * (params.d : Error) / (params.q : Error))) -
-        addInUError params eps delta
-
-/-- Construct the helper-stage producer package from the remaining mathematical
-inputs after the add-in-`u` chain has been closed.
-
-The point self-consistency hypothesis supplies the two self-consistency moves
-`Q₀ → Q₁` and `Q₁ → Q₂`; the local-variance sum bound supplies the two
-global-variance moves `Q₂ → Q₃` and `Q₃ → Q₄`. The only additional scalar input
-is the residual lower bound for the released right-hand side. -/
-lemma helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta : Error)
-    {T : Measurement (Polynomial params) ι}
-    {Hhat : SubMeas (Polynomial params) ι}
-    (hssc : BipartiteSSCRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta)
-    (hlocal :
-      (∑ g : Polynomial params,
-        localVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g) ≤
-        localVarianceOfPointsError params eps delta)
-    (hresidual :
-      subMeasMass strategy.state Hhat.liftLeft -
-          addInURightQuantity params strategy
-            (sandwichedPolynomialSubMeasAt params strategy T.toSubMeas)
-            T.toSubMeas
-            (selfConsistencyAddInUSelection params) ≤
-        (11 * Real.sqrt (selfImprovementVarianceError params eps delta) +
-            Real.sqrt (2 * delta) +
-            ((params.m : Error) * (params.d : Error) / (params.q : Error))) -
-          addInUError params eps delta) :
-    HelperStrongSelfConsistencyProducerInputs params strategy T Hhat eps delta := by
-  have hsteps :=
-    add_in_u_cs_chain_global_variance_steps_of_local_sum_bound_from_factor_bounds
-      params strategy eps delta T.toSubMeas hlocal
-  exact
-    { step01Bound :=
-        addInU_cs_chain_step1_abs_le_sqrt_two_delta
-          params strategy T.toSubMeas delta hssc
-      step12Bound :=
-        addInU_cs_chain_step2_abs_le_sqrt_two_delta
-          params strategy T.toSubMeas delta hssc
-      step23Bound := hsteps.1
-      step34Bound := hsteps.2
-      residualLowerBound := hresidual }
-
-/-- Produce the helper-stage strong self-consistency conclusion from the actual
-helper construction together with the named add-in-`u`/variance transports.
-
-The theorem consumes the reduced helper output
-`SelfImprovementHelperConclusion params strategy T Hhat Z eps delta` and a
-producer-shaped package of the four scalar chain bounds plus the final lower
-bound on the released right-hand side. It then assembles the diagonal transfer
-using `add_in_u_simplified_transfer_of_cs_chain_sqrt_form`, upgrades it to the
-paper's released right-hand side via
-`selfConsistencyDiagonalAddInU_of_simplifiedTransfer`, and applies the closing
-arithmetic absorption
-`helper_strong_self_consistency_error_le_selfImprovementHelperError`.
-
-This is the first hole-free route from the actual helper construction to the
-`HelperStrongSelfConsistencyInput` surface. The remaining analytic work is
-therefore pushed into the producer package, rather than left as a raw
-`BipartiteSSCRel` assumption. -/
-theorem helper_strong_self_consistency_of_helper_conclusion
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta : Error)
-    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
-    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
-    {T : Measurement (Polynomial params) ι}
-    {Hhat : SubMeas (Polynomial params) ι}
-    {Z : MIPStarRE.Quantum.Op ι}
-    (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
-    (hproducer : HelperStrongSelfConsistencyProducerInputs
-      params strategy T Hhat eps delta) :
-    BipartiteSSCRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily Hhat)
-      (selfImprovementHelperError params eps delta) := by
-  have htransfer_simplified :
-      |qBipartiteMatchMass strategy.state
-          (averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas)
-          (averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas) -
+          (selfConsistencyAddInUSelection params) =
         avgOver (uniformDistribution (Point params)) (fun u =>
           ∑ h : Polynomial params,
             ev strategy.state
               (opTensor
                 ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h)
-                (T.toSubMeas.outcome h)))| ≤
-        addInUError params eps delta :=
-    add_in_u_simplified_transfer_of_cs_chain_sqrt_form
-      params strategy eps delta heps hdelta T.toSubMeas
-      hproducer.step01Bound hproducer.step12Bound
-      hproducer.step23Bound hproducer.step34Bound
-  have htransfer_release :
-      |qBipartiteMatchMass strategy.state
-          (averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas)
-          (averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas) -
-        addInURightQuantity params strategy
-          (sandwichedPolynomialSubMeasAt params strategy T.toSubMeas)
-          T.toSubMeas
-          (selfConsistencyAddInUSelection params)| ≤
-        addInUError params eps delta := by
-    simpa [addInURightQuantity_selfConsistencySelection_eq_release] using
-      selfConsistencyDiagonalAddInU_of_simplifiedTransfer
-        params strategy eps delta T.toSubMeas htransfer_simplified
-  have htransfer_release_hhat :
-      |qBipartiteMatchMass strategy.state Hhat Hhat -
-        addInURightQuantity params strategy
-          (sandwichedPolynomialSubMeasAt params strategy T.toSubMeas)
-          T.toSubMeas
-          (selfConsistencyAddInUSelection params)| ≤
-        addInUError params eps delta := by
-    simpa [hhelper.averagedConstruction] using htransfer_release
-  have hhelperGap :
-      subMeasMass strategy.state Hhat.liftLeft -
-          qBipartiteMatchMass strategy.state Hhat Hhat ≤
-        11 * Real.sqrt (selfImprovementVarianceError params eps delta) +
-          Real.sqrt (2 * delta) +
-          ((params.m : Error) * (params.d : Error) / (params.q : Error)) := by
-    have hreleaseGap :
-        addInURightQuantity params strategy
-            (sandwichedPolynomialSubMeasAt params strategy T.toSubMeas)
-            T.toSubMeas
-            (selfConsistencyAddInUSelection params) -
-          qBipartiteMatchMass strategy.state Hhat Hhat ≤
-        addInUError params eps delta := by
-      linarith [(abs_le.mp htransfer_release_hhat).1]
-    linarith [hproducer.residualLowerBound, hreleaseGap]
-  have hhelperGap_absorbed :
-      subMeasMass strategy.state Hhat.liftLeft -
-          qBipartiteMatchMass strategy.state Hhat Hhat ≤
-        selfImprovementHelperError params eps delta := by
-    have habsorb :=
-      helper_strong_self_consistency_error_le_selfImprovementHelperError
-        params eps delta heps hdelta hd_le_q
-    linarith
-  have hhelperErr_nonneg :
-      0 ≤ selfImprovementHelperError params eps delta := by
-    exact selfImprovementHelperError_nonneg params eps delta
-  constructor
-  simpa [bipartiteSSCError, avgOver, uniformDistribution, constSubMeasFamily,
-    qBipartiteSSCDefect, subMeasMass, SubMeas.liftLeft] using
-    (max_le hhelperErr_nonneg hhelperGap_absorbed)
-
-/-- Promote a producer of the four add-in-`u`/variance helper-SSC bounds to the
-`HelperStrongSelfConsistencyInput` surface consumed by `selfImprovement`.
-
-This theorem does not alter the `selfImprovement` statement. It narrows the
-remaining hypothesis from the final `BipartiteSSCRel` conclusion to a producer
-which consumes the actual helper output together with the named intermediate
-transport bounds. -/
-theorem helper_strong_self_consistency_input_of_producer
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta : Error)
-    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
-    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
-    (hproducer :
-      ∀ {T : Measurement (Polynomial params) ι}
-        {Hhat : SubMeas (Polynomial params) ι}
-        {Z : MIPStarRE.Quantum.Op ι},
-        SelfImprovementHelperConclusion params strategy T Hhat Z eps delta →
-          HelperStrongSelfConsistencyProducerInputs
-            params strategy T Hhat eps delta) :
-    HelperStrongSelfConsistencyInput params strategy eps delta := by
-  intro T Hhat Z hhelper
-  exact helper_strong_self_consistency_of_helper_conclusion
-    params strategy eps delta heps hdelta hd_le_q hhelper (hproducer hhelper)
-
-/-- Construct the helper-stage strong self-consistency input from the point
-self-consistency, local-variance, and residual estimates which remain after the
-helper construction has been fixed.
-
-This theorem composes the already formalized `Q₀ → Q₁ → Q₂ → Q₃ → Q₄` chain
-with the closing helper-SSC wrapper.  It is the paper-facing form needed when
-the self-improvement theorem is applied on a restricted slice: the caller
-supplies the point self-consistency relation once, and supplies the local
-variance and released-residual estimates for each helper output. -/
-theorem helper_strong_self_consistency_input_of_selfConsistency_localVariance
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta : Error)
-    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
-    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
-    (hssc : BipartiteSSCRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta)
-    (hlocal :
-      ∀ {T : Measurement (Polynomial params) ι}
-        {Hhat : SubMeas (Polynomial params) ι}
-        {Z : MIPStarRE.Quantum.Op ι},
-        SelfImprovementHelperConclusion params strategy T Hhat Z eps delta →
-          (∑ g : Polynomial params,
-            localVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g) ≤
-            localVarianceOfPointsError params eps delta)
-    (hresidual :
-      ∀ {T : Measurement (Polynomial params) ι}
-        {Hhat : SubMeas (Polynomial params) ι}
-        {Z : MIPStarRE.Quantum.Op ι},
-        SelfImprovementHelperConclusion params strategy T Hhat Z eps delta →
-          subMeasMass strategy.state Hhat.liftLeft -
-              addInURightQuantity params strategy
-                (sandwichedPolynomialSubMeasAt params strategy T.toSubMeas)
-                T.toSubMeas
-                (selfConsistencyAddInUSelection params) ≤
-            (11 * Real.sqrt (selfImprovementVarianceError params eps delta) +
-                Real.sqrt (2 * delta) +
-                ((params.m : Error) * (params.d : Error) / (params.q : Error))) -
-              addInUError params eps delta) :
-    HelperStrongSelfConsistencyInput params strategy eps delta := by
-  refine helper_strong_self_consistency_input_of_producer
-    params strategy eps delta heps hdelta hd_le_q ?_
-  intro T Hhat Z hhelper
-  exact helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance
-    params strategy eps delta hssc (hlocal hhelper) (hresidual hhelper)
-
-/-- Build the full self-improvement bridge package when the helper strong
-self-consistency field is supplied by its producer.
-
-This constructor isolates the first of the three residual Section 9 inputs in
-`SelfImprovementBridgeInputs`.  The helper-stage field is derived from the
-actual helper output and the add-in-`u`/variance producer package, while the
-orthonormalization and final-fields inputs remain explicit hypotheses. -/
-def SelfImprovementBridgeInputs.ofHelperStrongSelfConsistencyProducer
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta nu : Error)
-    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
-    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
-    (hproducer :
-      ∀ {T : Measurement (Polynomial params) ι}
-        {Hhat : SubMeas (Polynomial params) ι}
-        {Z : MIPStarRE.Quantum.Op ι},
-        SelfImprovementHelperConclusion params strategy T Hhat Z eps delta →
-          HelperStrongSelfConsistencyProducerInputs
-            params strategy T Hhat eps delta)
-    (horthonormalization : OrthonormalizationInput params strategy eps delta)
-    (hfinalFields : FinalFieldsInput params strategy eps delta nu) :
-    SelfImprovementBridgeInputs params strategy eps delta nu where
-  helperStrongSelfConsistency :=
-    helper_strong_self_consistency_input_of_producer
-      params strategy eps delta heps hdelta hd_le_q hproducer
-  orthonormalization := horthonormalization
-  finalFields := hfinalFields
-
+                (T.toSubMeas.outcome h))) :=
+    addInURightQuantity_selfConsistencySelection_eq_simplified
+      params strategy T.toSubMeas
+  rw [hmass, hrelease, ← avgOver_sub]
+  refine avgOver_congr (uniformDistribution (Point params)) _ _ ?_
+  intro u
+  have hswap :
+      (∑ h' : Polynomial params,
+          ∑ h : Polynomial params,
+            ev strategy.state
+              (opTensor
+                ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h')
+                (T.toSubMeas.outcome h))) =
+        ∑ h : Polynomial params,
+          ∑ h' : Polynomial params,
+            ev strategy.state
+              (opTensor
+                ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h')
+                (T.toSubMeas.outcome h)) := by
+    rw [Finset.sum_comm]
+  rw [hswap]
+  exact sum_sum_sub_diagonal_eq_off_diagonal (fun h h' =>
+    ev strategy.state
+      (opTensor
+        ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h')
+        (T.toSubMeas.outcome h)))
 
 end MIPStarRE.LDT.SelfImprovement
