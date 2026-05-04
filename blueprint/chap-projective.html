@@ -2297,6 +2297,14 @@
           
           <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_mixed_of_sqrtQ" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_mixed_of_sqrtQ</a></li>
           
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_middle_eq_sqrt_of_square" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_middle_eq_sqrt_of_square</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndRectangularSvdSquareRoot" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndRectangularSvdSquareRoot</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvdSquareRoot" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvdSquareRoot</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot</a></li>
+          
         </ul>
     
       </div>
@@ -2321,7 +2329,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The paper obtains this from the SVD formula for \(X\) and the definition of \(\widehat X\). The formal lemma <span class="ttfamily">rectangularSvd_xHat_mixed_of_sqrtQ</span> is the corresponding matrix calculation in the form whose square-root target is the operator \(Q\) supplied by the QXP construction. The reduced data package then records this mixed-product identity as a primitive consequence, which is exactly the part needed in <a href="chap-projective.html#lem:squared-difference">4.28</a> and <a href="chap-projective.html#lem:P-Q-approx">4.30</a>. The companion paper identity for \(X\widehat X^\dagger \) is not used downstream. </p>
+  <p> The paper obtains this from the SVD formula for \(X\) and the definition of \(\widehat X\). The formal lemma <span class="ttfamily">rectangularSvd_xHat_mixed_of_sqrtQ</span> is the corresponding matrix calculation in the form whose square-root target is the operator \(Q\) supplied by the QXP construction. The formal lemma <span class="ttfamily">rectangularSvd_middle_eq_sqrt_of_square</span> records the spectral step: a positive middle factor whose square is \(Q\) is the positive square root of \(Q\). The reduced data package then records this mixed-product identity as a primitive consequence, which is exactly the part needed in <a href="chap-projective.html#lem:squared-difference">4.28</a> and <a href="chap-projective.html#lem:P-Q-approx">4.30</a>. The companion paper identity for \(X\widehat X^\dagger \) is not used downstream. </p>
 
   </div>
 </div>
@@ -2482,6 +2490,8 @@
           
           <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndSvdIdentities" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndSvdIdentities</a></li>
           
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot</a></li>
+          
         </ul>
     
       </div>
@@ -2506,7 +2516,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The formal proof follows this argument directly from the primitive \(X\), \(\widehat X\), and \(P\) identities; the \(30\zeta ^{1/4}\) estimate is derived here rather than stored as part of the data package. The quantity to bound is </p>
+  <p> The formal proof follows this argument directly from the primitive \(X\), \(\widehat X\), and \(P\) identities; the \(30\zeta ^{1/4}\) estimate is derived here rather than stored as part of the data package. The rectangular-SVD producer combines the same estimate with the positive-square identification of the middle factor from <a href="chap-projective.html#lem:X-times-X-hat">4.27</a>. The quantity to bound is </p>
 <div class="equation" id="eq:P-Q-thing-to-bound">
 <p>
   <div class="equation_content">
