@@ -223,7 +223,14 @@ private theorem sum_sqrt_eq_sum_rpow_half
         Real.rpow dq (1 / (2 : Error)) := by
   simp [Real.sqrt_eq_rpow, Real.rpow_eq_pow]
 
-private theorem selfImprovementHelperError_eq
+/-- Expansion of the helper-stage self-improvement error into the square-root
+sum used in the paper.
+
+This form is often the convenient one for the helper-stage absorptions: it
+identifies `selfImprovementHelperError` with
+`100 m (√ε + √δ + √(d/q))`, rather than requiring each proof to unfold the
+definition and convert the three `rpow` terms separately. -/
+theorem selfImprovementHelperError_eq
     (params : Parameters) [FieldModel params.q] (eps delta : Error) :
     selfImprovementHelperError params eps delta =
       100 * (params.m : Error) *
