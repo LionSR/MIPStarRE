@@ -460,24 +460,75 @@ structure MainFormalSuccessorRecursiveSliceData (params : Parameters)
     (sliceStrategy x).diagonalMeasurementA.toIdxProjMeas =
     (MainInductionStep.xRestrictedStrategy params
       strategy.strategySymmetrization x).diagonalMeasurement
+  /-- The slice strategy's Bob point measurement matches the same restricted
+  point measurement.  The restricted interface is a symmetric one-register
+  strategy, so the same restricted point family is the target for both
+  registers of the same-space slice strategy. -/
+  slicePointB_eq : ∀ x,
+    (sliceStrategy x).pointMeasurementB =
+    (MainInductionStep.xRestrictedStrategy params
+      strategy.strategySymmetrization x).pointMeasurement
+  /-- The slice strategy's Bob axis-parallel line measurement (underlying
+  projective family, without the transport-covariant wrapper) matches the
+  restricted axis-parallel measurement from the main induction step. -/
+  sliceAxisParallelB_eq : ∀ x,
+    (sliceStrategy x).axisParallelMeasurementB.toIdxProjMeas =
+    (MainInductionStep.xRestrictedStrategy params
+      strategy.strategySymmetrization x).axisParallelMeasurement.toIdxProjMeas
+  /-- The slice strategy's Bob diagonal-line measurement (underlying projective
+  family, without the transport-covariant wrapper) matches the restricted
+  diagonal measurement from the main induction step. -/
+  sliceDiagonalB_eq : ∀ x,
+    (sliceStrategy x).diagonalMeasurementB.toIdxProjMeas =
+    (MainInductionStep.xRestrictedStrategy params
+      strategy.strategySymmetrization x).diagonalMeasurement
   /-- Each slice strategy passes LDT with the common symmetrized error `3 * eps`.
 
   Together with `sliceState_eq`, `slicePoint_eq`, `sliceAxisParallelA_eq`, and
-  `sliceDiagonalA_eq`, every Alice-side measurement of `sliceStrategy x` is
-  constrained to match the restricted slice from the main induction step.  The
-  symmetry witnesses (`permInvState`, `densityFixed`) are bundled in
+  `sliceDiagonalA_eq`, together with the corresponding Bob-side fields above,
+  every verifier-visible measurement of `sliceStrategy x` is constrained to
+  match the restricted slice from the main induction step.  The symmetry
+  witnesses (`permInvState`, `densityFixed`) are bundled in
   `SameSpaceProjStrat` and supplied independently for each `sliceStrategy x`;
-  transport across `sliceState_eq` is not tracked here.
+  the one-register restricted strategy does not itself carry separate
+  same-space symmetry witnesses to compare against.
 
-  TODO(#1037, #834, #422): the successor-case `mainFormal` `sorry` will need
-  a consumer of `sliceAxisParallelA_eq` and `sliceDiagonalA_eq` (or their
-  `.toIdxProjMeas`-free counterparts) to close the recursive call.
-
-  Bob-side measurements (`pointMeasurementB`, `axisParallelMeasurementB`,
-  `diagonalMeasurementB`) are not constrained here; they belong to the
-  unsymmetrization component (Step 3 of `mainFormal`) and are external
-  hypotheses for a downstream recursive call. -/
+  TODO(#1037, #834, #422): the successor-case `mainFormal` proof will need
+  a consumer of these compatibility fields (or their `.toIdxProjMeas`-free
+  counterparts) to close the recursive call. -/
   slicePasses : ∀ x, (sliceStrategy x).PassesLowIndividualDegreeTest (3 * eps)
+
+/-- The passing hypothesis for a pinned slice bounds the restricted
+point-agreement branch.
+
+The new Bob-side point compatibility is the essential input: after rewriting
+both provers' point measurements to the restricted slice, the general
+three-branch estimate for a passing same-space strategy becomes a statement
+  about `MainInductionStep.xRestrictedStrategy`.  Since `slicePasses x` is
+  stated with error `3 * eps`, the resulting branch bound is
+  `3 * (3 * eps)`. -/
+theorem mainFormalSuccessorRestrictedPointAgreement_le_ofSliceData
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (sliceData : MainFormalSuccessorRecursiveSliceData params strategy eps hpass)
+    (x : Fq params) :
+    bipartiteConsError
+      (MainInductionStep.xRestrictedStrategy params
+        strategy.strategySymmetrization x).state
+      (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas
+        (MainInductionStep.xRestrictedStrategy params
+          strategy.strategySymmetrization x).pointMeasurement)
+      (IdxProjMeas.toIdxSubMeas
+        (MainInductionStep.xRestrictedStrategy params
+          strategy.strategySymmetrization x).pointMeasurement) ≤
+    3 * (3 * eps) := by
+  have hpoint :=
+    SameSpaceProjStrat.point_agreement_le_three_mul (sliceData.slicePasses x)
+  simpa [sliceData.sliceState_eq x, sliceData.slicePoint_eq x,
+    sliceData.slicePointB_eq x] using hpoint
 
 /-- Convert per-slice induction-hypothesis data into a
 `MainFormalSuccessorRecursiveSlices` witness.
