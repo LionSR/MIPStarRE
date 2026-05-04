@@ -377,7 +377,7 @@
 \begin{definition}[Lean successor-boundary aliases for the Section 3 proof]\label{def:main-formal-successor-boundary}
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAxisWeightedBound, MIPStarRE.LDT.Test.MainFormalSuccessorDiagonalWeightedBound, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictionPackage, MIPStarRE.LDT.Test.MainFormalSuccessorRecursiveSlices, MIPStarRE.LDT.Test.MainFormalSuccessorSelfImprovementProducer, MIPStarRE.LDT.Test.MainFormalSuccessorBoundary, MIPStarRE.LDT.Test.mainFormalSuccessorAxisWeightedBound_ofPass, MIPStarRE.LDT.Test.mainFormalSuccessorDiagonalWeightedBound_ofPass, MIPStarRE.LDT.Test.mainFormalSuccessorBoundary_ofRecursiveSelfImprovement}
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorSelfImprovementBridgeInputs, MIPStarRE.LDT.Test.MainFormalSuccessorSelfImprovementInductionPackage, MIPStarRE.LDT.Test.mainFormalSuccessorSelfImprovementBridgeInputs_ofMeasurementEq, MIPStarRE.LDT.Test.mainFormalSuccessorSelfImprovementBridgeInputs_ofOrthonormalizationRepair, MIPStarRE.LDT.Test.mainFormalSuccessorSelfImprovementProducer_ofBridgeInputs, MIPStarRE.LDT.Test.mainFormalSuccessorBoundary_ofBridgeInputs, MIPStarRE.LDT.Test.mainFormalSuccessorBoundary_ofPredecessorInduction}
-	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorRecursiveSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedPointAgreement_le_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRecursiveSlices_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRecursiveSlices_ofInductionPackage}
+	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorRecursiveSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedPointAgreement_le_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedAxisParallel_le_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedDiagonal_le_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRecursiveSlices_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRecursiveSlices_ofInductionPackage}
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAnswerRecursiveSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRecursiveSlices_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerBoundary_ofPredecessorInduction}
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAnswerSelfImprovementBridgeInputs, MIPStarRE.LDT.Test.MainFormalSuccessorAnswerSelfImprovementInductionPackage, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofMeasurementEq, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofOrthonormalizationRepair, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSelfImprovementProducer_ofBridgeInputs, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerBoundary_ofBridgeInputs}
 	\leanok
@@ -393,9 +393,12 @@
 	boundary package.  The ordinary slice bridge records both Alice- and Bob-side
 	compatibility with the restricted point, axis-parallel, and diagonal
 	measurements; in particular, the formal lemma
-	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedPointAgreement_le_ofSliceData}
-	extracts the restricted point-agreement bound from the pinned slice's passing
-	hypothesis.  On the answer-register side, the slice bridge data now records
+	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedPointAgreement_le_ofSliceData,
+	MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedAxisParallel_le_ofSliceData,
+	MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedDiagonal_le_ofSliceData}
+	extract the restricted point-agreement, axis-parallel, and diagonal branch
+	bounds from the pinned slice's passing hypothesis.  On the answer-register
+	side, the slice bridge data now records
 	both Alice- and Bob-side compatibility for the restricted point and
 	axis-parallel measurements, together with the common zero-coordinate readout of
 	the diagonal measurement on both registers.  The symmetry proofs of the
