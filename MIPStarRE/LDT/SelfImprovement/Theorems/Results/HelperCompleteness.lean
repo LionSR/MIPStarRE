@@ -29,6 +29,9 @@ identities, and the reduced `sdp` and `addInU` wrappers.
 - **helper_linearized_completeness_eq_dual_mass_of_complementary_slackness** —
   the final average-over-`u` algebraic SDP rewrite after the Cauchy--Schwarz
   moves.
+- **helper_hhat_vs_z_of_cauchy_schwarz_and_complementary_slackness** — assembles
+  the two scalar Cauchy--Schwarz estimates and complementary slackness into the
+  recorded `Hhat`-versus-`Z` comparison.
 - **helper_completeness_of_dual_mass_lower_bound** — combines the
   `Hhat`-versus-`Z` comparison with the dual-mass lower bound.
 - **helper_completeness_of_input_consistency** — uses SDP dual feasibility and
@@ -357,6 +360,45 @@ theorem sdp_complementary_slackness_sum_eq_dual_mass
     _ = ev strategy.state (leftTensor (ι₂ := ι) Z) := by
         rw [hT_total, Matrix.one_mul]
 
+/-- The scalar expression after the first Cauchy--Schwarz move in helper
+completeness.
+
+This is
+`E_u Σ_a ⟨ψ, (T_[h(u)=a] A^u_a) ⊗ A^u_a ψ⟩`, the right-hand side of
+`eq:yet-another-move-a` in the paper.  The fiber
+`T_[h(u)=a]` is represented by the finite sum over polynomials whose value at
+`u` is `a`. -/
+noncomputable def helperFirstMovedCompletenessQuantity
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) : Error :=
+  avgOver (uniformDistribution (Point params)) (fun u =>
+    ∑ a : Fq params,
+      let Au := (strategy.pointMeasurement u).outcome a
+      let Tfiber :=
+        ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
+          T.outcome h
+      ev strategy.state (opTensor (Tfiber * Au) Au))
+
+/-- The scalar expression after removing the remaining point-measurement
+operator in helper completeness.
+
+This is
+`E_u Σ_h ⟨ψ, (T_h A^u_{h(u)}) ⊗ I ψ⟩`.  Complementary slackness identifies this
+quantity with the dual mass `⟨ψ, Z ⊗ I ψ⟩`. -/
+noncomputable def helperLinearizedCompletenessQuantity
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) : Error :=
+  avgOver (uniformDistribution (Point params)) (fun u =>
+    ∑ h : Polynomial params,
+      ev strategy.state
+        (leftTensor (ι₂ := ι)
+          (T.outcome h *
+            pointConditionedOutcomeOperatorAtPolynomial params strategy h u)))
+
 /-- The final algebraic rewrite in the helper-completeness Cauchy--Schwarz
 argument, isolated from the two analytic estimates.
 
@@ -479,6 +521,25 @@ theorem helper_linearized_completeness_eq_dual_mass_of_complementary_slackness
         intro h
         exact (hslack h).symm
 
+/-- The named linearized helper-completeness quantity is the SDP dual mass under
+complementary slackness. -/
+theorem helper_linearized_completeness_quantity_eq_dual_mass_of_complementary_slackness
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι)
+    (Z : MIPStarRE.Quantum.Op ι)
+    (hTtotal : T.total = 1)
+    (hslack :
+      ∀ h : Polynomial params,
+        T.outcome h * averagedPointOperator params strategy h =
+          T.outcome h * Z) :
+    helperLinearizedCompletenessQuantity params strategy T =
+      ev strategy.state (leftTensor (ι₂ := ι) Z) := by
+  simpa [helperLinearizedCompletenessQuantity] using
+    helper_linearized_completeness_eq_dual_mass_of_complementary_slackness
+      params strategy T Z hTtotal hslack
+
 /-- Complementary-slackness conversion specialized to the SDP witness packaged
 inside `SelfImprovementHelperConclusion`. -/
 theorem helper_sdp_complementary_slackness_sum_eq_dual_mass
@@ -500,6 +561,54 @@ theorem helper_sdp_complementary_slackness_sum_eq_dual_mass
       ev strategy.state (leftTensor (ι₂ := ι) Z) :=
   sdp_complementary_slackness_sum_eq_dual_mass params strategy T.toSubMeas Z
     hhelper.sdpWitness.primalTotalOperator hcomp
+
+/-- The recorded `Hhat`-versus-`Z` comparison follows from the two
+Cauchy--Schwarz scalar bounds and complementary slackness.
+
+The first hypothesis is the bound for moving the leftmost copy of `A^u_a` across
+the bipartition; the second is the bound for removing the remaining copy of
+`A^u_a` on the right register.  Together with complementary slackness, these
+are precisely the estimates leading to
+`eq:gonna-use-this-later-H-versus-Z` in the paper. -/
+theorem helper_hhat_vs_z_of_cauchy_schwarz_and_complementary_slackness
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    {T : Measurement (Polynomial params) ι}
+    {Hhat : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
+    (hmove_left :
+      |helperFirstMovedCompletenessQuantity params strategy T.toSubMeas -
+        subMeasMass strategy.state Hhat.liftLeft| ≤
+        2 * Real.sqrt delta)
+    (hremove_right :
+      |helperLinearizedCompletenessQuantity params strategy T.toSubMeas -
+        helperFirstMovedCompletenessQuantity params strategy T.toSubMeas| ≤
+        Real.sqrt delta)
+    (hslack :
+      ∀ h : Polynomial params,
+        T.toSubMeas.outcome h * averagedPointOperator params strategy h =
+          T.toSubMeas.outcome h * Z) :
+    ev strategy.state (leftTensor (ι₂ := ι) Z) - 3 * Real.sqrt delta ≤
+      subMeasMass strategy.state Hhat.liftLeft := by
+  have hmove_left_upper :
+      helperFirstMovedCompletenessQuantity params strategy T.toSubMeas -
+        subMeasMass strategy.state Hhat.liftLeft ≤
+        2 * Real.sqrt delta :=
+    (abs_le.mp hmove_left).2
+  have hremove_right_upper :
+      helperLinearizedCompletenessQuantity params strategy T.toSubMeas -
+        helperFirstMovedCompletenessQuantity params strategy T.toSubMeas ≤
+        Real.sqrt delta :=
+    (abs_le.mp hremove_right).2
+  have hlinearized :
+      helperLinearizedCompletenessQuantity params strategy T.toSubMeas =
+        ev strategy.state (leftTensor (ι₂ := ι) Z) :=
+    helper_linearized_completeness_quantity_eq_dual_mass_of_complementary_slackness
+      params strategy T.toSubMeas Z hhelper.sdpWitness.primalTotalOperator hslack
+  linarith
 
 /-- Helper-stage completeness from the `Hhat`-versus-`Z` comparison and the
 dual-mass lower bound.
@@ -564,6 +673,48 @@ theorem helper_completeness_of_input_consistency
   exact
     input_consistency_dual_mass_lower_bound params strategy G Z nu
       hhelper.positiveSemidefiniteWitness hhelper.dualDominatesAveragedPoint hcons
+
+/-- Helper-stage completeness from the two Cauchy--Schwarz scalar bounds,
+complementary slackness, and input consistency.
+
+This theorem is the completeness paragraph with the `Hhat`-versus-`Z`
+comparison assembled internally from its two analytic estimates and the exact
+SDP rewrite.  The remaining external hypotheses are therefore the two
+Cauchy--Schwarz estimates themselves and the complementary-slackness equation. -/
+theorem helper_completeness_of_cauchy_schwarz_input_consistency
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : Measurement (Polynomial params) ι)
+    (eps delta nu : Error)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
+    {T : Measurement (Polynomial params) ι}
+    {Hhat : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
+    (hmove_left :
+      |helperFirstMovedCompletenessQuantity params strategy T.toSubMeas -
+        subMeasMass strategy.state Hhat.liftLeft| ≤
+        2 * Real.sqrt delta)
+    (hremove_right :
+      |helperLinearizedCompletenessQuantity params strategy T.toSubMeas -
+        helperFirstMovedCompletenessQuantity params strategy T.toSubMeas| ≤
+        Real.sqrt delta)
+    (hslack :
+      ∀ h : Polynomial params,
+        T.toSubMeas.outcome h * averagedPointOperator params strategy h =
+          T.toSubMeas.outcome h * Z)
+    (hcons : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params G.toSubMeas) nu) :
+    CompletenessAtLeast strategy.state Hhat.liftLeft
+      ((1 - nu) - selfImprovementHelperError params eps delta) := by
+  refine
+    helper_completeness_of_input_consistency params strategy G eps delta nu
+      heps hdelta hhelper ?_ hcons
+  exact
+    helper_hhat_vs_z_of_cauchy_schwarz_and_complementary_slackness
+      params strategy eps delta hhelper hmove_left hremove_right hslack
 
 /-- Exact `Hhat` reindexing for the helper-stage left-tensor mass.
 
