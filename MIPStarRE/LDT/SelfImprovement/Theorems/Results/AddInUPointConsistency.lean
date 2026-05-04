@@ -3,6 +3,7 @@ import MIPStarRE.LDT.GlobalVariance.Theorems.Results
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
+import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 
 /-!
@@ -16,6 +17,11 @@ This module isolates the theorem-side `add-in-u` specialization with
 It does **not** prove the full point-consistency estimate. Instead, it provides
 the missing theorem-side selection object together with the left/right quantity
 identities needed by a later transfer theorem.
+
+The final theorem in this file also records the numerical absorption from the
+natural add-in-`u` error `4 sqrt ζ_variance` to the helper-stage error
+`ζ_hat`.  Thus the remaining analytic input is precisely the
+selection-dependent transfer estimate, not an additional arithmetic comparison.
 
 ## References
 
@@ -132,8 +138,9 @@ theorem addInURightQuantity_pointConsistencySelection_eq_zero
     intro ah hh
     rcases ah with ⟨a, h⟩
     have hh' : h u ≠ a := by
-      simp [pointConsistencyAddInUSelection] at hh
-      exact hh
+      have hmem : (a, h) ∈ pointConsistencyAddInUSelection params u := by
+        simpa [addInUSelectionPairs] using hh
+      simpa [pointConsistencyAddInUSelection] using hmem
     change ev strategy.state
         (opTensor
           (pointConditionedOutcomeOperatorAtPolynomial params strategy h u *
@@ -197,5 +204,54 @@ theorem pointConsistencyAddInU_off_diagonal_avg_le_of_transfer
   rw [addInURightQuantity_pointConsistencySelection_eq_zero] at h
   rw [addInULeftQuantity_pointConsistencySelection_eq_off_diagonal_avg] at h
   simpa using (abs_le.mp h).2
+
+/-- Helper-stage point-consistency bound from the off-diagonal `add-in-u`
+transfer estimate.
+
+The preceding theorem gives the natural bound `addInUError`, which is equal to
+`4 * sqrt ζ_variance` after rewriting by `Real.sqrt_eq_rpow`.  This wrapper
+applies the numerical
+absorption from `self_improvement.tex`, lines 438--443, so that the resulting
+off-diagonal helper mass is already bounded by the helper-stage error
+`selfImprovementHelperError`.  The only remaining analytic input is the
+selection-dependent `add-in-u` transfer inequality for
+`pointConsistencyAddInUSelection`. -/
+theorem pointConsistencyAddInU_off_diagonal_avg_le_helper_error_of_transfer
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
+    (T : SubMeas (Polynomial params) ι)
+    (H : SubMeas (Polynomial params) ι)
+    (htransfer :
+      |addInULeftQuantity params strategy
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          H
+          (pointConsistencyAddInUSelection params) -
+        addInURightQuantity params strategy
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          T
+          (pointConsistencyAddInUSelection params)| ≤ addInUError params eps delta) :
+    avgOver (uniformDistribution (Point params)) (fun u =>
+      ∑ h : Polynomial params,
+        ∑ a ∈ (Finset.univ : Finset (Fq params)).erase (h u),
+          ev strategy.state
+            (opTensor ((strategy.pointMeasurement u).outcome a)
+              (H.outcome h))) ≤ selfImprovementHelperError params eps delta := by
+  have hoffdiag :
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ∑ a ∈ (Finset.univ : Finset (Fq params)).erase (h u),
+            ev strategy.state
+              (opTensor ((strategy.pointMeasurement u).outcome a)
+                (H.outcome h))) ≤ addInUError params eps delta :=
+    pointConsistencyAddInU_off_diagonal_avg_le_of_transfer
+      params strategy eps delta T H htransfer
+  have habsorb :
+      addInUError params eps delta ≤ selfImprovementHelperError params eps delta := by
+    simpa [addInUError, Real.sqrt_eq_rpow] using
+      helper_point_consistency_error_le_selfImprovementHelperError
+        params eps delta heps hdelta
+  exact hoffdiag.trans habsorb
 
 end MIPStarRE.LDT.SelfImprovement
