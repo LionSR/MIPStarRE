@@ -15,6 +15,9 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+/-! ### Shared switcheroo contraction helper package -/
+
+/-- The `g`-indexed sandwich family used in the once-commuted contraction bounds. -/
 noncomputable def switcherooAggregateFourthTermX
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -24,6 +27,7 @@ noncomputable def switcherooAggregateFourthTermX
     Polynomial params → MIPStarRE.Quantum.Op ι :=
   fun g => ∑ o : Outcome, (M q.2).outcome o * (family.meas q.1).outcome g * (M q.2).outcome o
 
+/-- The complete-part total operator is Hermitian. -/
 lemma switcherooCompletePartTotal_hermitian
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
@@ -32,6 +36,7 @@ lemma switcherooCompletePartTotal_hermitian
   (Matrix.nonneg_iff_posSemidef.mp
     (SubMeas.total_nonneg (completePartSubMeas params family q.1))).isHermitian.eq
 
+/-- The complete-part total operator is idempotent. -/
 lemma switcherooCompletePartTotal_sq
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
@@ -42,6 +47,7 @@ lemma switcherooCompletePartTotal_sq
   simpa [completePartSubMeas, postprocess_total] using
     projSubMeas_total_sq (family.meas q.1)
 
+/-- The complete-part total operator is bounded by the identity. -/
 lemma switcherooCompletePartTotal_le_one
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
@@ -49,6 +55,7 @@ lemma switcherooCompletePartTotal_le_one
     (completePartSubMeas params family q.1).total ≤ 1 :=
   (completePartSubMeas params family q.1).total_le_one
 
+/-- Every outcome of the external projective family is Hermitian. -/
 lemma switcherooMeasuredOutcome_hermitian
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -58,6 +65,7 @@ lemma switcherooMeasuredOutcome_hermitian
     ((M q.2).outcome o)ᴴ = (M q.2).outcome o :=
   (Matrix.nonneg_iff_posSemidef.mp ((M q.2).outcome_pos o)).isHermitian.eq
 
+/-- Every slice outcome of the completed family is Hermitian. -/
 lemma switcherooSliceOutcome_hermitian
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
@@ -66,6 +74,7 @@ lemma switcherooSliceOutcome_hermitian
     ((family.meas q.1).outcome g)ᴴ = (family.meas q.1).outcome g :=
   (Matrix.nonneg_iff_posSemidef.mp ((family.meas q.1).outcome_pos g)).isHermitian.eq
 
+/-- The shared `X_g` sandwich family is Hermitian pointwise. -/
 lemma switcherooAggregateFourthTermX_hermitian
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -82,6 +91,7 @@ lemma switcherooAggregateFourthTermX_hermitian
   simp [Matrix.conjTranspose_mul, switcherooMeasuredOutcome_hermitian params M q o,
     switcherooSliceOutcome_hermitian params family q g, mul_assoc]
 
+/-- The shared `X_g` sandwich family is positive semidefinite pointwise. -/
 lemma switcherooAggregateFourthTermX_nonneg
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -96,6 +106,7 @@ lemma switcherooAggregateFourthTermX_nonneg
   exact MIPStarRE.Quantum.sandwich_nonneg ((family.meas q.1).outcome_pos g)
     (switcherooMeasuredOutcome_hermitian params M q o)
 
+/-- The shared `X_g` sandwich family is bounded by the identity pointwise. -/
 lemma switcherooAggregateFourthTermX_le_one
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -107,6 +118,7 @@ lemma switcherooAggregateFourthTermX_le_one
   projSubMeas_sandwich_sum_le_one (M q.2) ((family.meas q.1).outcome g)
     ((family.meas q.1).outcome_le_one g)
 
+/-- The shared `X_g` sandwich family satisfies `X_g^2 ≤ X_g`. -/
 lemma switcherooAggregateFourthTermX_sq_le
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -121,6 +133,7 @@ lemma switcherooAggregateFourthTermX_sq_le
     (switcherooAggregateFourthTermX_nonneg params family M q g)
     (switcherooAggregateFourthTermX_le_one params family M q g)
 
+/-- Summing the shared `X_g` family collapses to the middle sandwich term. -/
 lemma switcherooAggregateFourthTermX_sum
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -142,6 +155,7 @@ lemma switcherooAggregateFourthTermX_sum
           rw [(family.meas q.1).sum_eq_total]
           simp [completePartSubMeas, postprocess_total]
 
+/-- The middle sandwich sum used in the contraction bounds is a contraction. -/
 lemma switcherooAggregateFourthTerm_middle_sum_le_one
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]

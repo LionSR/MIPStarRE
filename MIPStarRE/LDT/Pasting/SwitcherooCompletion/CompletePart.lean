@@ -91,7 +91,8 @@ lemma completePartAggregateCommutation_as_total
     _ ≤ gamma := hcomm
 
 set_option maxHeartbeats 1000000 in -- large sqrt/rpow proof, see issue #894
--- Variant of firstSwitcherooError bound using eighthSum; shared with commuting-with-G.
+/-- Variant of the first switcheroo scalar bound using the intermediate
+`eighthSum`; shared with `CommutingWithG/Complete`. -/
 lemma firstSwitcherooError_le_eighth_stage
     (params : Parameters) [FieldModel params.q]
     (gamma zeta : Error)
