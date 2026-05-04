@@ -136,11 +136,15 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
     = \sum_h \bra{\psi} (T_h \cdot Z) \ot I \ket{\psi}
     = \bra{\psi} Z \ot I \ket{\psi}.
   \]
+  \lean{MIPStarRE.LDT.SelfImprovement.helperFirstMovedCompletenessQuantity}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperLinearizedCompletenessQuantity}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_linearized_completeness_eq_dual_mass_of_complementary_slackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_linearized_completeness_quantity_eq_dual_mass_of_complementary_slackness}
   Thus
   \begin{equation}\label{eq:gonna-use-this-later-H-versus-Z}
     \sum_h \bra{\psi} H_h \ot I \ket{\psi} \geq \bra{\psi} Z \ot I \ket{\psi} - 3\sqrt{\delta}.
   \end{equation}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_hhat_vs_z_of_cauchy_schwarz_and_complementary_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.input_consistency_match_mass_lower_bound}
   \lean{MIPStarRE.LDT.SelfImprovement.input_match_mass_eq_sdp_overlap}
   \lean{MIPStarRE.LDT.SelfImprovement.sdp_overlap_le_dual_mass}
@@ -149,6 +153,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helper_sdp_complementary_slackness_sum_eq_dual_mass}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_completeness_of_dual_mass_lower_bound}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_completeness_of_input_consistency}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_completeness_of_cauchy_schwarz_input_consistency}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_completeness_error_le_selfImprovementHelperError}
   \leanok
   Since $G$ is a measurement,~\eqref{eq:Z-greater-than-A} and Lemma~\ref{prop:simeq-for-measurements} give
