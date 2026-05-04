@@ -26,6 +26,8 @@ data-processing transport of the boundedness gap, and the standalone
   operator-level off-diagonal decomposition
   `I ⊗ H.total - helperAgreementOperatorAtPoint = ∑_h ∑_{a≠h(u)} A^u_a ⊗ H_h`
   (paper line 613; blueprint lines 296–300).
+- **helperAgreementOperatorAtPoint_ev_slack_eq_off_diagonal_sum** —
+  pointwise scalar form of the same off-diagonal decomposition.
 - **helper_boundedness_slack_average_ev_eq_off_diagonal_avg** — averaged
   scalar form of the off-diagonal decomposition (LHS of
   `eq:explicit-bound-for-A-consistency`, paper line 435).
@@ -282,6 +284,35 @@ theorem helperAgreementOperatorAtPoint_off_diagonal_decomposition
   -- Pull the sum out of the left factor of `opTensor`.
   exact opTensor_sum_left_finset _ _ _
 
+/-- Scalar form of the pointwise off-diagonal decomposition.
+
+For each evaluation point `u`, the scalar slack
+`⟨ψ, I ⊗ H.total, ψ⟩ - ⟨ψ, helperAgreementOperatorAtPoint u, ψ⟩`
+is the sum of the off-diagonal masses
+`⟨ψ, A^u_a ⊗ H_h, ψ⟩` over the pairs with `a ≠ h(u)`. -/
+theorem helperAgreementOperatorAtPoint_ev_slack_eq_off_diagonal_sum
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (H : SubMeas (Polynomial params) ι)
+    (u : Point params) :
+    ev strategy.state (rightTensor (ι₁ := ι) H.total) -
+        ev strategy.state (helperAgreementOperatorAtPoint params strategy H u) =
+      ∑ h : Polynomial params,
+        ∑ a ∈ (Finset.univ : Finset (Fq params)).erase (h u),
+          ev strategy.state
+            (opTensor ((strategy.pointMeasurement u).outcome a)
+              (H.outcome h)) := by
+  rw [← ev_sub, helperAgreementOperatorAtPoint_off_diagonal_decomposition,
+    ev_sum]
+  simp only [ev_finset_sum]
+
+private lemma opTensor_one_left_eq_rightTensor
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (B : MIPStarRE.Quantum.Op ι₂) :
+    opTensor (ι₁ := ι₁) (1 : MIPStarRE.Quantum.Op ι₁) B =
+      rightTensor (ι₁ := ι₁) B := by
+  rfl
+
 /-- Averaged scalar form of the off-diagonal decomposition.
 
 Composed from `helperAgreementOperatorAtPoint_off_diagonal_decomposition` by
@@ -314,9 +345,7 @@ theorem helper_boundedness_slack_average_ev_eq_off_diagonal_avg
             ev strategy.state
               (opTensor ((strategy.pointMeasurement u).outcome a)
                 (H.outcome h)) := by
-    rw [← ev_sub, helperAgreementOperatorAtPoint_off_diagonal_decomposition,
-      ev_sum]
-    simp only [ev_finset_sum]
+    exact helperAgreementOperatorAtPoint_ev_slack_eq_off_diagonal_sum params strategy H u
   calc
     ev strategy.state (rightTensor (ι₁ := ι) H.total) -
           ev strategy.state (helperAgreementAverageOperator params strategy H) =
@@ -378,9 +407,7 @@ theorem helper_point_consistency_error_eq_off_diagonal_avg
             ev strategy.state
               (opTensor ((strategy.pointMeasurement u).outcome a)
                 (H.outcome h)) := by
-    rw [← ev_sub, helperAgreementOperatorAtPoint_off_diagonal_decomposition,
-      ev_sum]
-    simp only [ev_finset_sum]
+    exact helperAgreementOperatorAtPoint_ev_slack_eq_off_diagonal_sum params strategy H u
   have hdiff_nonneg :
       0 ≤ ev strategy.state (rightTensor (ι₁ := ι) H.total) -
           ev strategy.state (helperAgreementOperatorAtPoint params strategy H u) := by
@@ -403,7 +430,15 @@ theorem helper_point_consistency_error_eq_off_diagonal_avg
     have hB_total : (((polynomialEvaluationFamily params H) u).total) = H.total := by
       simpa [polynomialEvaluationFamily, evaluateAt] using
         postprocess_total H (fun g : Polynomial params => g u)
-    rw [hA_total, hB_total]
+    calc
+      ev strategy.state
+          (opTensor
+            (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total)
+            (((polynomialEvaluationFamily params H) u).total)) =
+        ev strategy.state (opTensor (1 : MIPStarRE.Quantum.Op ι) H.total) := by
+          rw [hA_total, hB_total]
+      _ = ev strategy.state (rightTensor (ι₁ := ι) H.total) := by
+          rw [opTensor_one_left_eq_rightTensor]
   have hmatch :
       qBipartiteMatchMass strategy.state
           ((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u)
