@@ -426,6 +426,77 @@ lemma sigmaRangeEmbedding_qa_eq {Outcome : Type uOutcome}
   simp [onb, sigmaRangeEmbedding, sigmaProjMeas, Matrix.mul_apply,
     Matrix.conjTranspose_apply, Matrix.diagonal_apply, Fintype.sum_sigma]
 
+/-- The finite-enumeration range embedding realizes each projector as
+`Q_a = X† T_a X`.
+
+This is the universe-stable form of `sigmaRangeEmbedding_qa_eq`, with the same
+sigma basis encoded by `FiniteHilbertSpace.sigmaFinCarrier`. -/
+lemma sigmaFinRangeEmbedding_qa_eq {Outcome : Type uOutcome}
+    [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (Q : Outcome → MIPStarRE.Quantum.Op ι)
+    (hproj : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (Q a))
+    (a : Outcome) :
+    let X := sigmaFinRangeEmbedding Q hproj
+    let T := sigmaFinProjMeas (fun a : Outcome => (Q a).rank)
+    Q a = Xᴴ * T.outcome a * X := by
+  classical
+  let onb : (b : Outcome) →
+      MIPStarRE.Quantum.ProjectorRangeONB (Q b) (hproj b) :=
+    fun b => MIPStarRE.Quantum.IsProj.rangeONB (Q b) (hproj b)
+  ext i j
+  have hdecomp :
+      (Q a) i j =
+        ∑ k : Fin (Q a).rank,
+          (onb a).vec k i * star ((onb a).vec k j) := by
+    simpa [onb, Matrix.sum_apply, Matrix.vecMulVec_apply] using
+      congrFun (congrFun (onb a).decomposition i) j
+  rw [hdecomp]
+  let S := FiniteHilbertSpace.sigmaFinCarrier (fun a : Outcome => (Q a).rank)
+  let e : Outcome ≃ Fin (Fintype.card Outcome) := Fintype.equivFin Outcome
+  have hsum :
+      (∑ x : ULift.{uι} S,
+        if x.down.1 = e a then
+          (onb (e.symm x.down.1)).vec x.down.2 i *
+            star ((onb (e.symm x.down.1)).vec x.down.2 j)
+        else 0) =
+        ∑ k : Fin (Q a).rank,
+          (onb a).vec k i * star ((onb a).vec k j) := by
+    calc
+      (∑ x : ULift.{uι} S,
+        if x.down.1 = e a then
+          (onb (e.symm x.down.1)).vec x.down.2 i *
+            star ((onb (e.symm x.down.1)).vec x.down.2 j)
+        else 0)
+          = ∑ x : S,
+              if x.1 = e a then
+                (onb (e.symm x.1)).vec x.2 i *
+                  star ((onb (e.symm x.1)).vec x.2 j)
+              else 0 := by
+              simpa using
+                (Equiv.sum_comp (Equiv.ulift : ULift.{uι} S ≃ S)
+                  (fun x : S =>
+                    if x.1 = e a then
+                      (onb (e.symm x.1)).vec x.2 i *
+                        star ((onb (e.symm x.1)).vec x.2 j)
+                    else 0))
+      _ = ∑ k : Fin (Q a).rank,
+          (onb a).vec k i * star ((onb a).vec k j) := by
+          suffices
+              (∑ k : Fin (Q (e.symm (e a))).rank,
+                (onb (e.symm (e a))).vec k i *
+                  star ((onb (e.symm (e a))).vec k j)) =
+              ∑ k : Fin (Q a).rank,
+                (onb a).vec k i * star ((onb a).vec k j) by
+            simpa [S, FiniteHilbertSpace.sigmaFinCarrier, Fintype.sum_sigma] using this
+          let F : Outcome → ℂ := fun b =>
+            ∑ k : Fin (Q b).rank, (onb b).vec k i * star ((onb b).vec k j)
+          change F (e.symm (e a)) = F a
+          exact congrArg F (e.symm_apply_apply a)
+  simpa [onb, sigmaFinRangeEmbedding, sigmaFinProjMeas, finSigmaProjMeas,
+    ProjMeas.transport, Measurement.transport, SubMeas.transport, Matrix.mul_apply,
+    Matrix.conjTranspose_apply, Matrix.diagonal_apply] using hsum.symm
+
 /-- A one-point projective measurement concentrating all mass on the chosen outcome. -/
 private noncomputable def pointProjMeas {Outcome : Type uOutcome}
     [Fintype Outcome] [DecidableEq Outcome]
