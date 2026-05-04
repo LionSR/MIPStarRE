@@ -392,7 +392,7 @@
 	producer (together with its bridge-input packaging), and their bundled
 	boundary package.  The ordinary slice bridge records both Alice- and Bob-side
 	compatibility with the restricted point, axis-parallel, and diagonal
-	measurements; in particular, the formal lemma
+	measurements; in particular, the formal lemmas
 	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedPointAgreement_le_ofSliceData,
 	MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedAxisParallel_le_ofSliceData,
 	MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedDiagonal_le_ofSliceData}
@@ -642,7 +642,10 @@
 The following Lean declarations are bookkeeping infrastructure for the final
 assembly residual:
 \lean{MIPStarRE.LDT.SameSpaceProjStrat.axisParallelRoleAverage_nonneg, MIPStarRE.LDT.SameSpaceProjStrat.diagonalRoleAverage_nonneg}
-\lean{MIPStarRE.LDT.SameSpaceProjStrat.lowIndividualDegreeFailureProbability_nonneg, MIPStarRE.LDT.SameSpaceProjStrat.eps_nonneg_of_passes, MIPStarRE.LDT.SameSpaceProjStrat.point_agreement_le_three_mul}
+\lean{MIPStarRE.LDT.SameSpaceProjStrat.lowIndividualDegreeFailureProbability_nonneg, MIPStarRE.LDT.SameSpaceProjStrat.eps_nonneg_of_passes}
+\lean{MIPStarRE.LDT.SameSpaceProjStrat.axisParallelRoleAverage_le_three_mul}
+\lean{MIPStarRE.LDT.SameSpaceProjStrat.diagonalRoleAverage_le_three_mul}
+\lean{MIPStarRE.LDT.SameSpaceProjStrat.point_agreement_le_three_mul}
 \lean{MIPStarRE.LDT.Test.mainFormalError_ge_one_of_one_le_envelope, MIPStarRE.LDT.Test.mainFormalError_ge_one_of_one_lt_eps, MIPStarRE.LDT.Test.mainFormalError_ge_one_of_q_lt_d}
 \lean{MIPStarRE.LDT.Test.mainFormalInductionNu_bound, MIPStarRE.LDT.Test.cascadeHypotheses_of_not_mainFormalError_ge_one}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeScalars.ofCascadeHypotheses, MIPStarRE.LDT.Test.MainFormalCascadeScalars.ofNontrivialMainFormal, MIPStarRE.LDT.Test.MainFormalCascadeScalars.zeta3_div_two_le_mainFormalError}
