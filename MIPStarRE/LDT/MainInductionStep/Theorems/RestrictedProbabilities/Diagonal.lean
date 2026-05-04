@@ -149,7 +149,7 @@ private lemma diagonalSliceIndexErrorAverage_eq_diagonalIndexError
           (uniformDistribution (RestrictedDiagonalSample params.next (embedCoord params j)))
           g := by
             simpa using
-              (CommutativityPoints.avgOver_uniform_equiv
+              (MIPStarRE.LDT.avgOver_uniform_equiv
                 (e := pointAppendProdEquiv params (Fin (j.val + 1) → Fq params))
                 (f := fun xs : Fq params × RestrictedDiagonalSample params j =>
                   g ((pointAppendProdEquiv params (Fin (j.val + 1) → Fq params)) xs)))
@@ -236,7 +236,7 @@ private lemma averageRestrictedDiagonalFailure_eq_embeddedDiagonalIndices
     _ = avgOver (uniformDistribution (Fin params.m × Fq params))
           (fun jx => diagonalSliceIndexError params strategy jx.2 jx.1) := by
             simpa using
-              (CommutativityPoints.avgOver_uniform_equiv
+              (MIPStarRE.LDT.avgOver_uniform_equiv
                 (e := Equiv.prodComm (Fq params) (Fin params.m))
                 (f := fun xj : Fq params × Fin params.m =>
                   diagonalSliceIndexError params strategy xj.1 xj.2))
