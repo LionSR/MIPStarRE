@@ -15,6 +15,144 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+noncomputable def switcherooAggregateFourthTermX
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι)
+    (q : SlicePairQuestion params) :
+    Polynomial params → MIPStarRE.Quantum.Op ι :=
+  fun g => ∑ o : Outcome, (M q.2).outcome o * (family.meas q.1).outcome g * (M q.2).outcome o
+
+lemma switcherooCompletePartTotal_hermitian
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (q : SlicePairQuestion params) :
+    ((completePartSubMeas params family q.1).total)ᴴ = (completePartSubMeas params family q.1).total :=
+  (Matrix.nonneg_iff_posSemidef.mp
+    (SubMeas.total_nonneg (completePartSubMeas params family q.1))).isHermitian.eq
+
+lemma switcherooCompletePartTotal_sq
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (q : SlicePairQuestion params) :
+    (completePartSubMeas params family q.1).total *
+        (completePartSubMeas params family q.1).total =
+      (completePartSubMeas params family q.1).total := by
+  simpa [completePartSubMeas, postprocess_total] using
+    projSubMeas_total_sq (family.meas q.1)
+
+lemma switcherooCompletePartTotal_le_one
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (q : SlicePairQuestion params) :
+    (completePartSubMeas params family q.1).total ≤ 1 :=
+  (completePartSubMeas params family q.1).total_le_one
+
+lemma switcherooMeasuredOutcome_hermitian
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (M : IdxProjSubMeas (Fq params) Outcome ι)
+    (q : SlicePairQuestion params)
+    (o : Outcome) :
+    ((M q.2).outcome o)ᴴ = (M q.2).outcome o :=
+  (Matrix.nonneg_iff_posSemidef.mp ((M q.2).outcome_pos o)).isHermitian.eq
+
+lemma switcherooSliceOutcome_hermitian
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (q : SlicePairQuestion params)
+    (g : Polynomial params) :
+    ((family.meas q.1).outcome g)ᴴ = (family.meas q.1).outcome g :=
+  (Matrix.nonneg_iff_posSemidef.mp ((family.meas q.1).outcome_pos g)).isHermitian.eq
+
+lemma switcherooAggregateFourthTermX_hermitian
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι)
+    (q : SlicePairQuestion params)
+    (g : Polynomial params) :
+    (switcherooAggregateFourthTermX params family M q g)ᴴ =
+      switcherooAggregateFourthTermX params family M q g := by
+  unfold switcherooAggregateFourthTermX
+  rw [Matrix.conjTranspose_sum]
+  refine Finset.sum_congr rfl ?_
+  intro o _
+  simp [Matrix.conjTranspose_mul, switcherooMeasuredOutcome_hermitian params M q o,
+    switcherooSliceOutcome_hermitian params family q g, mul_assoc]
+
+lemma switcherooAggregateFourthTermX_nonneg
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι)
+    (q : SlicePairQuestion params)
+    (g : Polynomial params) :
+    0 ≤ switcherooAggregateFourthTermX params family M q g := by
+  unfold switcherooAggregateFourthTermX
+  refine Finset.sum_nonneg ?_
+  intro o _
+  exact MIPStarRE.Quantum.sandwich_nonneg ((family.meas q.1).outcome_pos g)
+    (switcherooMeasuredOutcome_hermitian params M q o)
+
+lemma switcherooAggregateFourthTermX_le_one
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι)
+    (q : SlicePairQuestion params)
+    (g : Polynomial params) :
+    switcherooAggregateFourthTermX params family M q g ≤ 1 :=
+  projSubMeas_sandwich_sum_le_one (M q.2) ((family.meas q.1).outcome g)
+    ((family.meas q.1).outcome_le_one g)
+
+lemma switcherooAggregateFourthTermX_sq_le
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι)
+    (q : SlicePairQuestion params)
+    (g : Polynomial params) :
+    switcherooAggregateFourthTermX params family M q g *
+        switcherooAggregateFourthTermX params family M q g ≤
+      switcherooAggregateFourthTermX params family M q g :=
+  MIPStarRE.Quantum.sq_le_self
+    (switcherooAggregateFourthTermX_nonneg params family M q g)
+    (switcherooAggregateFourthTermX_le_one params family M q g)
+
+lemma switcherooAggregateFourthTermX_sum
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι)
+    (q : SlicePairQuestion params) :
+    ∑ g : Polynomial params, switcherooAggregateFourthTermX params family M q g =
+      ∑ o : Outcome,
+        (M q.2).outcome o * (completePartSubMeas params family q.1).total * (M q.2).outcome o := by
+  unfold switcherooAggregateFourthTermX
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl ?_
+  intro o _
+  calc
+    ∑ g : Polynomial params, (M q.2).outcome o * (family.meas q.1).outcome g * (M q.2).outcome o
+      = (M q.2).outcome o * (∑ g : Polynomial params, (family.meas q.1).outcome g) * (M q.2).outcome o := by
+          simp [mul_assoc, Matrix.mul_sum, Finset.sum_mul]
+    _ = (M q.2).outcome o * (completePartSubMeas params family q.1).total * (M q.2).outcome o := by
+          rw [(family.meas q.1).sum_eq_total]
+          simp [completePartSubMeas, postprocess_total]
+
+lemma switcherooAggregateFourthTerm_middle_sum_le_one
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι)
+    (q : SlicePairQuestion params) :
+    ∑ o : Outcome,
+        (M q.2).outcome o * (completePartSubMeas params family q.1).total * (M q.2).outcome o ≤ 1 :=
+  projSubMeas_sandwich_sum_le_one (M q.2) ((completePartSubMeas params family q.1).total)
+    (switcherooCompletePartTotal_le_one params family q)
+
 /-- Contraction witness for the first `sqrt chi` switcheroo transfer. -/
 private lemma switcherooAggregateFourthTerm_split_contraction
     {Outcome : Type*} [Fintype Outcome]
@@ -34,18 +172,16 @@ private lemma switcherooAggregateFourthTerm_split_contraction
   let G : MIPStarRE.Quantum.Op ι := (completePartSubMeas params family q.1).total
   let Gq : Polynomial params → MIPStarRE.Quantum.Op ι := (family.meas q.1).outcome
   let Mo : Outcome → MIPStarRE.Quantum.Op ι := (M q.2).outcome
-  have hGherm : Gᴴ = G :=
-    (Matrix.nonneg_iff_posSemidef.mp
-      (SubMeas.total_nonneg (completePartSubMeas params family q.1))).isHermitian.eq
+  have hGherm : Gᴴ = G := by
+    simpa [G] using switcherooCompletePartTotal_hermitian params family q
   have hGsq : G * G = G := by
-    simpa [G, completePartSubMeas, postprocess_total] using
-      projSubMeas_total_sq (family.meas q.1)
+    simpa [G] using switcherooCompletePartTotal_sq params family q
   have hMoherm : ∀ o : Outcome, (Mo o)ᴴ = Mo o := by
     intro o
-    exact (Matrix.nonneg_iff_posSemidef.mp ((M q.2).outcome_pos o)).isHermitian.eq
+    simpa [Mo] using switcherooMeasuredOutcome_hermitian params M q o
   have hGqherm : ∀ g : Polynomial params, (Gq g)ᴴ = Gq g := by
     intro g
-    exact (Matrix.nonneg_iff_posSemidef.mp ((family.meas q.1).outcome_pos g)).isHermitian.eq
+    simpa [Gq] using switcherooSliceOutcome_hermitian params family q g
   have hsum :
       (∑ go : Polynomial params × Outcome,
           (leftTensor (ι₂ := ι) (G * Mo go.2 * Gq go.1)) *
@@ -115,8 +251,7 @@ private lemma switcherooAggregateFourthTerm_split_contraction
             congr 1
             simp [mul_assoc, Matrix.mul_sum, Finset.sum_mul]
   have hmid_le : ∑ o : Outcome, Mo o * G * Mo o ≤ 1 := by
-    exact projSubMeas_sandwich_sum_le_one (M q.2) G
-      (by simpa [G] using (completePartSubMeas params family q.1).total_le_one)
+    simpa [G, Mo] using switcherooAggregateFourthTerm_middle_sum_le_one params family M q
   have hsandwich_le : G * (∑ o : Outcome, Mo o * G * Mo o) * G ≤ G := by
     calc
       G * (∑ o : Outcome, Mo o * G * Mo o) * G ≤ G * 1 * G := by
@@ -257,39 +392,29 @@ private lemma switcherooAggregateFourthTerm_once_commuted_contraction_left
   let Gq : Polynomial params → MIPStarRE.Quantum.Op ι := (family.meas q.1).outcome
   let Mo : Outcome → MIPStarRE.Quantum.Op ι := (M q.2).outcome
   let X : Polynomial params → MIPStarRE.Quantum.Op ι :=
-    fun g => ∑ o : Outcome, Mo o * Gq g * Mo o
-  have hGherm : Gᴴ = G :=
-    (Matrix.nonneg_iff_posSemidef.mp
-      (SubMeas.total_nonneg (completePartSubMeas params family q.1))).isHermitian.eq
+    switcherooAggregateFourthTermX params family M q
+  have hGherm : Gᴴ = G := by
+    simpa [G] using switcherooCompletePartTotal_hermitian params family q
   have hGsq : G * G = G := by
-    simpa [G, completePartSubMeas, postprocess_total] using
-      projSubMeas_total_sq (family.meas q.1)
+    simpa [G] using switcherooCompletePartTotal_sq params family q
   have hMoherm : ∀ o : Outcome, (Mo o)ᴴ = Mo o := by
     intro o
-    exact (Matrix.nonneg_iff_posSemidef.mp ((M q.2).outcome_pos o)).isHermitian.eq
+    simpa [Mo] using switcherooMeasuredOutcome_hermitian params M q o
   have hGqherm : ∀ g : Polynomial params, (Gq g)ᴴ = Gq g := by
     intro g
-    exact (Matrix.nonneg_iff_posSemidef.mp ((family.meas q.1).outcome_pos g)).isHermitian.eq
+    simpa [Gq] using switcherooSliceOutcome_hermitian params family q g
   have hXherm : ∀ g : Polynomial params, (X g)ᴴ = X g := by
     intro g
-    unfold X
-    rw [Matrix.conjTranspose_sum]
-    refine Finset.sum_congr rfl ?_
-    intro o _
-    simp [Matrix.conjTranspose_mul, hMoherm o, hGqherm g, mul_assoc]
+    simpa [X] using switcherooAggregateFourthTermX_hermitian params family M q g
   have hXnonneg : ∀ g : Polynomial params, 0 ≤ X g := by
     intro g
-    unfold X
-    refine Finset.sum_nonneg ?_
-    intro o _
-    exact MIPStarRE.Quantum.sandwich_nonneg ((family.meas q.1).outcome_pos g) (hMoherm o)
+    simpa [X] using switcherooAggregateFourthTermX_nonneg params family M q g
   have hXle : ∀ g : Polynomial params, X g ≤ 1 := by
     intro g
-    exact projSubMeas_sandwich_sum_le_one (M q.2) (Gq g)
-      ((family.meas q.1).outcome_le_one g)
+    simpa [X] using switcherooAggregateFourthTermX_le_one params family M q g
   have hXsq_le : ∀ g : Polynomial params, X g * X g ≤ X g := by
     intro g
-    exact MIPStarRE.Quantum.sq_le_self (hXnonneg g) (hXle g)
+    simpa [X] using switcherooAggregateFourthTermX_sq_le params family M q g
   have hsum :
       (∑ g : Polynomial params,
           (∑ o : Outcome, leftTensor (ι₂ := ι) (G * Mo o * Gq g * Mo o)) *
@@ -305,11 +430,15 @@ private lemma switcherooAggregateFourthTerm_once_commuted_contraction_left
             · rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ
                 (fun o : Outcome => G * Mo o * Gq g * Mo o)]
               congr 1
-              simp [X, mul_assoc, Matrix.mul_sum]
+              simpa [X, switcherooAggregateFourthTermX, mul_assoc] using
+                (Finset.mul_sum (s := Finset.univ) (a := G)
+                  (f := fun o : Outcome => Mo o * Gq g * Mo o)).symm
             · rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ
                 (fun o : Outcome => G * Mo o * Gq g * Mo o)]
               congr 1
-              simp [X, mul_assoc, Matrix.mul_sum]
+              simpa [X, switcherooAggregateFourthTermX, mul_assoc] using
+                (Finset.mul_sum (s := Finset.univ) (a := G)
+                  (f := fun o : Outcome => Mo o * Gq g * Mo o)).symm
       _ = leftTensor (ι₂ := ι) (G * X g) * leftTensor (ι₂ := ι) ((G * X g)ᴴ) := by
             congr 2
             simpa [leftTensor, opTensor] using
@@ -328,20 +457,9 @@ private lemma switcherooAggregateFourthTerm_once_commuted_contraction_left
         (by simpa [mul_assoc] using MIPStarRE.Quantum.sandwich_mono hGherm (hXsq_le g))
         (show (0 : MIPStarRE.Quantum.Op ι) ≤ 1 by exact zero_le_one))
   have hsumX : ∑ g : Polynomial params, X g = ∑ o : Outcome, Mo o * G * Mo o := by
-    unfold X
-    rw [Finset.sum_comm]
-    refine Finset.sum_congr rfl ?_
-    intro o _
-    calc
-      ∑ g : Polynomial params, Mo o * Gq g * Mo o
-        = Mo o * (∑ g : Polynomial params, Gq g) * Mo o := by
-            simp [mul_assoc, Matrix.mul_sum, Finset.sum_mul]
-      _ = Mo o * G * Mo o := by
-            rw [(family.meas q.1).sum_eq_total]
-            simp [G]
+    simpa [X, G, Mo] using switcherooAggregateFourthTermX_sum params family M q
   have hmid_le : ∑ o : Outcome, Mo o * G * Mo o ≤ 1 := by
-    exact projSubMeas_sandwich_sum_le_one (M q.2) G (by simpa [G] using
-      (completePartSubMeas params family q.1).total_le_one)
+    simpa [G, Mo] using switcherooAggregateFourthTerm_middle_sum_le_one params family M q
   have hsandwich_le : G * (∑ g : Polynomial params, X g) * G ≤ G := by
     calc
       G * (∑ g : Polynomial params, X g) * G ≤ G * 1 * G := by
