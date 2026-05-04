@@ -2,6 +2,7 @@ import MIPStarRE.LDT.MainInductionStep.Statements
 import MIPStarRE.LDT.Test.StrategyFailures
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 import MIPStarRE.LDT.Pasting.Bernoulli.Final
+import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationBridge
 -- Used by `selfImprovementInInductionSection`.
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results
 
@@ -444,6 +445,64 @@ noncomputable def SelfImprovementPackage.SliceBridgeInputs.ofMeasurementEq
       pointMeasurement_eq axisParallelMeasurement_eq diagonalMeasurement_eq)
     bridgeInputs
 
+/-- Build `SliceBridgeInputs` from honest slice strategies and the constructive
+orthonormalization repair producer.
+
+The spectral part of the orthonormalization input is supplied by the closed
+source-almost-projective spectral truncation theorem. Thus the caller need only
+provide, for each slice, the locality-preserving repair producer together with
+the other two Section 9 inputs. -/
+noncomputable def SelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationRepair
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma)
+    (inductionPkg : PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k)
+    (sliceStrategy : Fq params → SymStrat params ι)
+    (state_eq : ∀ x, (sliceStrategy x).state = strategy.state)
+    (pointMeasurement_eq :
+      ∀ x,
+        (sliceStrategy x).pointMeasurement =
+          (xRestrictedStrategy params strategy x).pointMeasurement)
+    (axisParallelMeasurement_eq :
+      ∀ x,
+        (sliceStrategy x).axisParallelMeasurement.toIdxProjMeas =
+          (xRestrictedStrategy params strategy x).axisParallelMeasurement.toIdxProjMeas)
+    (diagonalMeasurement_eq :
+      ∀ x,
+        (sliceStrategy x).diagonalMeasurement.toIdxProjMeas =
+          (xRestrictedStrategy params strategy x).diagonalMeasurement)
+    (helperStrongSelfConsistency :
+      ∀ x,
+        SelfImprovement.HelperStrongSelfConsistencyInput params (sliceStrategy x)
+          (restrictionPkg.profile.axisParallel x)
+          (restrictionPkg.profile.selfConsistency x))
+    (repair :
+      ∀ x,
+        SelfImprovement.OrthonormalizationRepairProducer params (sliceStrategy x)
+          (restrictionPkg.profile.axisParallel x)
+          (restrictionPkg.profile.selfConsistency x))
+    (finalFields :
+      ∀ x,
+        SelfImprovement.FinalFieldsInput params (sliceStrategy x)
+          (restrictionPkg.profile.axisParallel x)
+          (restrictionPkg.profile.selfConsistency x)
+          (inductionPkg.sliceError x)) :
+    SelfImprovementPackage.SliceBridgeInputs params strategy eps delta gamma k
+      restrictionPkg inductionPkg :=
+  SelfImprovementPackage.SliceBridgeInputs.ofMeasurementEq
+    params strategy eps delta gamma k restrictionPkg inductionPkg sliceStrategy state_eq
+    pointMeasurement_eq axisParallelMeasurement_eq diagonalMeasurement_eq
+    (fun x =>
+      { helperStrongSelfConsistency := helperStrongSelfConsistency x
+        orthonormalization :=
+          SelfImprovement.orthonormalizationInput_of_producers
+            SelfImprovement.orthonormalizationSpectralProducer_of_sourceAlmostProjective
+            (repair x)
+        finalFields := finalFields x })
+
 /-- Convert honest per-slice Section 9 bridge inputs into the Section 6
 self-improvement package.
 
@@ -739,6 +798,70 @@ noncomputable def AnswerSelfImprovementPackage.SliceBridgeInputs.ofAnswerMeasure
       params strategy eps delta gamma restrictionPkg sliceStrategy state_eq
       pointMeasurement_eq axisParallelMeasurement_eq diagonalZeroCoord_eq)
     bridgeInputs
+
+/-- Build answer-valued `SliceBridgeInputs` from honest slice strategies and the
+constructive orthonormalization repair producer.
+
+As in the ordinary slice bridge, the spectral part of the orthonormalization
+input is supplied by the closed source-almost-projective spectral truncation
+theorem.  The caller supplies only the locality-preserving repair producer,
+besides the helper strong self-consistency and final-fields inputs. -/
+noncomputable def AnswerSelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationRepair
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma)
+    (inductionPkg :
+      AnswerPerSliceInductionPackage params strategy eps delta gamma restrictionPkg k)
+    (sliceStrategy : Fq params → SymStrat params ι)
+    (state_eq : ∀ x, (sliceStrategy x).state = strategy.state)
+    (pointMeasurement_eq :
+      ∀ x,
+        (sliceStrategy x).pointMeasurement =
+          (xRestrictedAnswerSymStrat params strategy x).pointMeasurement)
+    (axisParallelMeasurement_eq :
+      ∀ x,
+        (sliceStrategy x).axisParallelMeasurement.toIdxProjMeas =
+          (xRestrictedAnswerSymStrat params strategy x).axisParallelMeasurement.toIdxProjMeas)
+    (diagonalZeroCoord_eq :
+      ∀ x ℓ,
+        postprocess
+            (((sliceStrategy x).diagonalMeasurement.toIdxProjMeas ℓ).toSubMeas)
+            (fun f : DiagonalLinePolynomial params => f zeroCoord) =
+          postprocess
+            (((xRestrictedAnswerSymStrat params strategy x).diagonalMeasurement.toIdxProjMeas
+              ℓ).toSubMeas)
+            (fun f : DiagonalLineAnswer params => f zeroCoord))
+    (helperStrongSelfConsistency :
+      ∀ x,
+        SelfImprovement.HelperStrongSelfConsistencyInput params (sliceStrategy x)
+          (restrictionPkg.profile.axisParallel x)
+          (restrictionPkg.profile.selfConsistency x))
+    (repair :
+      ∀ x,
+        SelfImprovement.OrthonormalizationRepairProducer params (sliceStrategy x)
+          (restrictionPkg.profile.axisParallel x)
+          (restrictionPkg.profile.selfConsistency x))
+    (finalFields :
+      ∀ x,
+        SelfImprovement.FinalFieldsInput params (sliceStrategy x)
+          (restrictionPkg.profile.axisParallel x)
+          (restrictionPkg.profile.selfConsistency x)
+          (inductionPkg.sliceError x)) :
+    AnswerSelfImprovementPackage.SliceBridgeInputs params strategy eps delta gamma k
+      restrictionPkg inductionPkg :=
+  AnswerSelfImprovementPackage.SliceBridgeInputs.ofAnswerMeasurementEq
+    params strategy eps delta gamma k restrictionPkg inductionPkg sliceStrategy state_eq
+    pointMeasurement_eq axisParallelMeasurement_eq diagonalZeroCoord_eq
+    (fun x =>
+      { helperStrongSelfConsistency := helperStrongSelfConsistency x
+        orthonormalization :=
+          SelfImprovement.orthonormalizationInput_of_producers
+            SelfImprovement.orthonormalizationSpectralProducer_of_sourceAlmostProjective
+            (repair x)
+        finalFields := finalFields x })
 
 /-- Package the slice-wise outputs feeding the answer-valued restricted-strategy
 self-improvement stage into the bookkeeping object expected by answer-valued

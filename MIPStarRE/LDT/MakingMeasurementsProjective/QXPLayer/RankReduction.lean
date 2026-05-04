@@ -500,6 +500,26 @@ lemma sigmaFinRangeEmbedding_qa_eq {Outcome : Type uOutcome}
     ProjMeas.transport, Measurement.transport, SubMeas.transport, Matrix.mul_apply,
     Matrix.conjTranspose_apply, Matrix.diagonal_apply] using hsum.symm
 
+/-- The finite-enumeration `Q` layer associated to an operator family.
+
+The auxiliary Hilbert space is the finite-enumeration model of
+`Σ a, Fin (rank Q_a)`, lifted to the universe of the ambient space.  The block
+measurement selecting the summands indexed by a fixed outcome is projective.
+This construction requires the sigma carrier to be nonempty; the degenerate
+all-ranks-zero case is handled separately by the low-rank auxiliary-space
+producer. -/
+noncomputable def sigmaRangeQLayer
+    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (q : OpFamily Outcome ι)
+    [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (q.outcome a).rank))] :
+    QLayerData Outcome ι where
+  auxSpace := FiniteHilbertSpace.sigmaFin
+    (fun a : Outcome => (q.outcome a).rank)
+  q := q
+  t := sigmaFinProjMeas (fun a : Outcome => (q.outcome a).rank)
+
 /-- Assemble `QXPLayerData` from the canonical sigma-space embedding and the
 remaining SVD/polar identities for `Xhat`.
 
@@ -526,21 +546,55 @@ noncomputable def QXPLayerData.ofSigmaRangeAndSvdIdentities
       CFC.sqrt q.total) :
     QXPLayerData Outcome ι := by
   classical
-  let auxSpace : FiniteHilbertSpace.{uι} :=
-    FiniteHilbertSpace.sigmaFin (fun a : Outcome => (q.outcome a).rank)
-  let qLayer : QLayerData Outcome ι :=
-    { auxSpace := auxSpace
-      q := q
-      t := sigmaFinProjMeas (fun a : Outcome => (q.outcome a).rank) }
+  let qLayer : QLayerData Outcome ι := sigmaRangeQLayer q
   exact QXPLayerData.ofQLayerAndSvdIdentities qLayer qa_projective
-    (by simpa [qLayer, Qa, QTotal] using q_sum_eq_total)
+    (by simpa [qLayer, sigmaRangeQLayer, Qa, QTotal] using q_sum_eq_total)
     (sigmaFinRangeEmbedding q.outcome qa_projective) xHat
     (by
       intro a
-      simpa [qLayer, auxSpace, Ta] using
+      simpa [qLayer, sigmaRangeQLayer, Ta] using
         sigmaFinRangeEmbedding_qa_eq q.outcome qa_projective a)
-    (by simpa [auxSpace] using xHat_coisometry)
+    (by simpa [qLayer, sigmaRangeQLayer] using xHat_coisometry)
     (by simpa [qLayer, QTotal] using xHat_mixed)
+
+/-- Assemble the sigma-space `Q/X/Xhat/P` layer from a rank-reduction witness
+and the remaining SVD/polar identities for `Xhat`.
+
+The rank-reduction witness supplies the two facts about the family `Q_a` that
+enter the matrix decomposition: each `Q_a` is a projection, and
+`∑_a Q_a = Q`.  The auxiliary space, the projective measurement `T`, and the
+matrix `X` are therefore the canonical finite-enumeration construction attached
+to the ranks of the projectors `Q_a`.  As in the paper, the only data still not
+constructed here are the coisometry and mixed square-root identities for the
+chosen matrix `Xhat`. -/
+theorem exists_qxpLayerData_ofRankReductionSigmaRangeAndSvdIdentities
+    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState ι} {A : Measurement Outcome ι} {ζ : Error}
+    {qLayer : QLayerData Outcome ι}
+    (hRank : RankReductionWitness ψ A ζ qLayer)
+    [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (qLayer.q.outcome a).rank))]
+    (xHat : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (qLayer.q.outcome a).rank))) ι ℂ)
+    (xHat_coisometry : xHat * xHatᴴ =
+      (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
+        (fun a : Outcome => (qLayer.q.outcome a).rank)))))
+    (xHat_mixed :
+      (sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective)ᴴ * xHat =
+        CFC.sqrt (QTotal qLayer)) :
+    ∃ data : QXPLayerData Outcome ι,
+      ∃ hq : data.qLayer = sigmaRangeQLayer qLayer.q,
+        hq ▸ data.x =
+            (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from
+              sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective) ∧
+          hq ▸ data.xHat =
+            (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from xHat) := by
+  classical
+  exact
+    ⟨QXPLayerData.ofSigmaRangeAndSvdIdentities (q := qLayer.q)
+      hRank.projective hRank.sum_eq_total xHat xHat_coisometry xHat_mixed,
+      rfl, rfl, rfl⟩
 
 /-- A one-point projective measurement concentrating all mass on the chosen outcome. -/
 private noncomputable def pointProjMeas {Outcome : Type uOutcome}
@@ -586,6 +640,45 @@ lemma sigmaFinCard_le_of_sum_le {Outcome : Type*} [Fintype Outcome]
   rw [Fintype.card_sigma]
   simp only [Fintype.card_fin]
   exact hm
+
+/-- Transport a rank-reduction witness to the canonical sigma-space layer with
+the same operator family.
+
+The analytic fields of `RankReductionWitness` depend only on the operator
+family `Q_a` and its total operator.  The only genuinely auxiliary-space field
+is the dimension bound, and for the sigma-space layer it follows from the
+stored total-rank estimate. -/
+theorem RankReductionWitness.toSigmaRangeQLayer
+    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState ι} {A : Measurement Outcome ι} {ζ : Error}
+    {qLayer : QLayerData Outcome ι}
+    [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (qLayer.q.outcome a).rank))]
+    (hRank : RankReductionWitness ψ A ζ qLayer) :
+    RankReductionWitness ψ A ζ (sigmaRangeQLayer qLayer.q) := by
+  classical
+  refine
+    { projective := ?_
+      outcome_nonneg := ?_
+      sum_eq_total := ?_
+      source_almost_projective := hRank.source_almost_projective
+      closeness := ?_
+      total_le := ?_
+      totalRank_le := ?_
+      auxDim_le := ?_ }
+  · intro a
+    simpa [sigmaRangeQLayer, Qa] using hRank.projective a
+  · intro a
+    simpa [sigmaRangeQLayer, Qa] using hRank.outcome_nonneg a
+  · simpa [sigmaRangeQLayer, Qa, QTotal] using hRank.sum_eq_total
+  · simpa [sigmaRangeQLayer] using hRank.closeness
+  · simpa [sigmaRangeQLayer, QTotal] using hRank.total_le
+  · simpa [sigmaRangeQLayer, Qa] using hRank.totalRank_le
+  · simpa [sigmaRangeQLayer, FiniteHilbertSpace.sigmaFin, Fintype.card_ulift] using
+      sigmaFinCard_le_of_sum_le
+        (ι := ι) (m := fun a : Outcome => (qLayer.q.outcome a).rank)
+        hRank.totalRank_le
 
 /-- Concrete auxiliary-space producer from a direct total-rank bound. -/
 lemma projectiveLowRankSum_auxData_of_rank_bound {Outcome : Type uOutcome}

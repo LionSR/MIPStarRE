@@ -32,12 +32,18 @@ self-closeness producers.
 - **final_fields_completeness_of_helper_completeness** — derives the
   `completeness` field of `SelfImprovementFinalFields` from the
   helper-stage completeness lower bound (paper lines 351–414, 713–717).
+- **final_fields_completeness_of_helper_completeness_of_small_errors** —
+  literal-threshold wrapper for the same completeness field, using the
+  final-stage absorption inequalities.
 - **self_closeness_transport_through_orthonormalization** — generic
   three-step triangle transport `H.liftLeft → Ĥ.liftLeft → Ĥ.liftRight →
   H.liftRight` for self-closeness.
 - **final_fields_self_closeness** — derives the `selfCloseness` field of
   `SelfImprovementFinalFields` from already-supplied helper SSC and
   orthonormalization SDD (paper lines 727–741).
+- **final_fields_self_closeness_of_small_errors** — literal-threshold wrapper
+  for the same self-closeness field, using the final-stage absorption
+  inequalities.
 - **final_fields_bounded** — imported standalone boundedness producer used by
   `selfImprovement` to fill the final `BoundedByOperator` field from `1 ≤ Z`.
 
@@ -467,6 +473,46 @@ theorem final_fields_completeness_of_helper_completeness
   rcases hresult with ⟨hresult⟩
   linarith
 
+/-- Literal-threshold completeness producer under the standard unit-interval
+hypotheses.
+
+This wraps `final_fields_completeness_of_helper_completeness` with the
+numerical absorption `final_fields_completeness_error_le_selfImprovementError`,
+giving exactly the `completeness` threshold used in
+`SelfImprovementFinalFields`. -/
+theorem final_fields_completeness_of_helper_completeness_of_small_errors
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta nu : Error)
+    (heps : 0 ≤ eps) (heps_le_one : eps ≤ 1)
+    (hdelta : 0 ≤ delta) (hdelta_le_one : delta ≤ 1)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
+    (Hhat : SubMeas (Polynomial params) ι)
+    (H : ProjSubMeas (Polynomial params) ι)
+    (hhelperCompleteness :
+      CompletenessAtLeast strategy.state Hhat.liftLeft
+        ((1 - nu) - selfImprovementHelperError params eps delta))
+    (hssc :
+      BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily Hhat)
+        (selfImprovementHelperError params eps delta))
+    (horth :
+      SDDRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily Hhat.liftLeft)
+        (constSubMeasFamily H.toSubMeas.liftLeft)
+        (selfImprovementOrthogonalizationError params eps delta)) :
+    CompletenessAtLeast strategy.state H.toSubMeas.liftLeft
+      ((1 - nu) - selfImprovementError params eps delta) := by
+  have hnatural :=
+    final_fields_completeness_of_helper_completeness params strategy eps delta nu
+      Hhat H hhelperCompleteness hssc horth
+  have herr :=
+    final_fields_completeness_error_le_selfImprovementError params eps delta
+      heps heps_le_one hdelta hdelta_le_one hd_le_q
+  rcases hnatural with ⟨hnatural⟩
+  refine ⟨?_⟩
+  linarith
+
 
 /-! ## Final-fields self-closeness producer (issue #931)
 
@@ -628,6 +674,48 @@ theorem final_fields_self_closeness
   -- rightPlacedSubMeas` form used by the `selfCloseness` field.
   simpa [SubMeas.liftLeft, SubMeas.liftRight,
     leftPlacedSubMeas, rightPlacedSubMeas, constSubMeasFamily] using hresult
+
+/-- Literal-threshold self-closeness producer under the standard
+unit-interval hypotheses.
+
+This wraps `final_fields_self_closeness` with the numerical absorption
+`final_fields_self_closeness_error_le_selfImprovementError`, giving exactly
+the `selfCloseness` threshold used in `SelfImprovementFinalFields`. -/
+theorem final_fields_self_closeness_of_small_errors
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (heps_le_one : eps ≤ 1)
+    (hdelta : 0 ≤ delta) (hdelta_le_one : delta ≤ 1)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
+    (Hhat : SubMeas (Polynomial params) ι)
+    (H : ProjSubMeas (Polynomial params) ι)
+    (hssc :
+      BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily Hhat)
+        (selfImprovementHelperError params eps delta))
+    (horth :
+      SDDRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily Hhat.liftLeft)
+        (constSubMeasFamily H.toSubMeas.liftLeft)
+        (selfImprovementOrthogonalizationError params eps delta)) :
+    SDDRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily
+        (leftPlacedSubMeas (ιB := ι) H.toSubMeas))
+      (constSubMeasFamily
+        (rightPlacedSubMeas (ιA := ι) H.toSubMeas))
+      (selfImprovementError params eps delta) :=
+  Preliminaries.stateDependentDistanceRel_mono strategy.state
+    (uniformDistribution Unit)
+    (constSubMeasFamily (leftPlacedSubMeas (ιB := ι) H.toSubMeas))
+    (constSubMeasFamily (rightPlacedSubMeas (ιA := ι) H.toSubMeas))
+    (3 * (selfImprovementOrthogonalizationError params eps delta
+      + 2 * selfImprovementHelperError params eps delta
+      + selfImprovementOrthogonalizationError params eps delta))
+    (selfImprovementError params eps delta)
+    (final_fields_self_closeness_error_le_selfImprovementError params eps delta
+      heps heps_le_one hdelta hdelta_le_one hd_le_q)
+    (final_fields_self_closeness params strategy eps delta Hhat H hssc horth)
 
 
 end MIPStarRE.LDT.SelfImprovement
