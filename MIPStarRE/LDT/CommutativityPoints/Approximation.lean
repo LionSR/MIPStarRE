@@ -22,15 +22,6 @@ diagonal-lines test. -/
 private def lastRestrictionIndex (params : Parameters) : Fin params.m :=
   ⟨params.m - 1, Nat.sub_lt params.hm Nat.zero_lt_one⟩
 
-/-- Reindexing a uniform average along an equivalence preserves its value. -/
-lemma avgOver_uniform_equiv
-    {α β : Type*} [Fintype α] [DecidableEq α] [Nonempty α]
-    [Fintype β] [DecidableEq β] [Nonempty β]
-    (e : α ≃ β) (f : α → Error) :
-    avgOver (uniformDistribution α) f =
-      avgOver (uniformDistribution β) (fun b => f (e.symm b)) := by
-  simpa using MIPStarRE.LDT.avgOver_uniform_equiv e f
-
 /-- Decompose a point in `Point params.next` into its truncated point and final coordinate. -/
 def pointNextEquiv (params : Parameters) [FieldModel params.q] :
     Point params.next ≃ Point params × Fq params where
@@ -76,7 +67,7 @@ lemma avgOver_uniform_pointNext_decompose
         avgOver (uniformDistribution (Point params × Fq params))
           (fun ux => f (appendPoint params ux.1 ux.2)) := by
     simpa using
-      (avgOver_uniform_equiv
+      (MIPStarRE.LDT.avgOver_uniform_equiv
         (e := Equiv.prodComm (Fq params) (Point params))
         (f := fun xu : Fq params × Point params => f (appendPoint params xu.2 xu.1)))
   have hequiv :
@@ -84,7 +75,7 @@ lemma avgOver_uniform_pointNext_decompose
           (fun ux => f (appendPoint params ux.1 ux.2)) =
         avgOver (uniformDistribution (Point params.next)) f := by
     simpa using
-      (avgOver_uniform_equiv
+      (MIPStarRE.LDT.avgOver_uniform_equiv
         (e := pointNextEquiv params)
         (f := f)).symm
   calc
@@ -390,7 +381,7 @@ lemma sampledDiagonalLineApproximation_pointWithDiagonalLine
           (fun st => f (e st)) := by
     symm
     simpa [pointWithDiagonalLineDistribution, f] using
-      (avgOver_uniform_equiv e (fun st => f (e st)))
+      (MIPStarRE.LDT.avgOver_uniform_equiv e (fun st => f (e st)))
   let g : RestrictedDiagonalSample params j → Error := fun s =>
     qSDD strategy.state
       ((IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy j)) s)
