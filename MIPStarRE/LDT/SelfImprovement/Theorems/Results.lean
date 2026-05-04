@@ -28,7 +28,11 @@ All original declarations remain available under the same namespace.
 - `AddInUDiagonalAndDefs` — diagonal add-in-u specialization, Q₀–Q₄ CS chain defs
 - `AddInUStep12` — algebraic alignment and raw CS Step 1/2 bounds
 - `AddInUStep34AndTransfer` — variance conversions, factored CS, assembly, transfer
-- `BoundednessTransport` — off-diagonal decomposition, boundedness gap transport
+- `BoundednessTransport` — off-diagonal decomposition, boundedness gap transport,
+  projective-residual producers
+  (`projective_boundedness_gap_le_helper_boundedness_gap`,
+  `final_fields_projective_residual_bound_natural`,
+  `final_fields_projective_residual_bound`, `final_fields_bounded`)
 - `SelfImprovementTop` — `selfImprovement` wrappers, completeness/self-closeness producers
 
 ## References

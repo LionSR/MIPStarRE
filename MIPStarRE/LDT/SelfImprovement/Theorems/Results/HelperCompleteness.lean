@@ -503,6 +503,8 @@ lemma sdp
     { primalTotalOperator := T.total_eq_one
       dualPositive := by
         simp [Z]
+      dualDominatesIdentity := by
+        simpa [Z] using one_le_sdpStrictDualWitness (ι := ι)
       dualFeasible := ?_ }
   intro g
   simpa [Z, sdpDualSlackOperator] using
