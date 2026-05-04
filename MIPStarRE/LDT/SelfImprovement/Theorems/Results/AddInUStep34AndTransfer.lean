@@ -1250,15 +1250,10 @@ private lemma sum_sum_sub_diagonal_eq_off_diagonal
     (∑ x : α, ∑ y : α, F x y) - (∑ x : α, F x x) =
       ∑ x : α, ∑ y ∈ (Finset.univ : Finset α).erase x, F x y := by
   classical
-  calc
-    (∑ x : α, ∑ y : α, F x y) - (∑ x : α, F x x)
-        = ∑ x : α, ((∑ y : α, F x y) - F x x) := by
-            rw [Finset.sum_sub_distrib]
-    _ = ∑ x : α, ∑ y ∈ (Finset.univ : Finset α).erase x, F x y := by
-        refine Finset.sum_congr rfl ?_
-        intro x _
-        exact (Finset.sum_erase_eq_sub (s := Finset.univ) (a := x)
-          (f := fun y => F x y) (Finset.mem_univ x)).symm
+  rw [← Finset.sum_sub_distrib]
+  exact Finset.sum_congr rfl fun x _ =>
+    (Finset.sum_erase_eq_sub (s := Finset.univ) (a := x)
+      (f := fun y => F x y) (Finset.mem_univ x)).symm
 
 /-- Exact residual-side expansion for the helper strong self-consistency proof.
 
@@ -1269,10 +1264,11 @@ polynomial pairs `(h',h)` with `h' ≠ h`:
 
 `E_u \sum_h \sum_{h'≠h} ⟨ψ, H^u_{h'} ⊗ T_h ψ⟩`.
 
-This is the exact algebraic opening of the post-release residual estimate in
-the proof of `item:self-improvement-self`; the later Cauchy--Schwarz,
+This is the exact algebraic opening of the Lean residual
+`helper_left_mass - release-the-kraken`; the later Cauchy--Schwarz,
 Schwartz--Zippel, point-consistency, and self-consistency estimates are the
-remaining inequalities that bound this off-diagonal expression.
+remaining inequalities that bound this off-diagonal expression in the proof of
+`item:self-improvement-self`.
 
 This Lean identity expands the helper left mass minus the released diagonal
 right-hand side directly.  It therefore differs from the paper's intermediate
