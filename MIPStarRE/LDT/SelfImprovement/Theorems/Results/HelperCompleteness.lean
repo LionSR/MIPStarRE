@@ -23,6 +23,8 @@ identities, and the reduced `sdp` and `addInU` wrappers.
   overlap by `⟨ψ, Z ⊗ I ψ⟩` (paper lines 408–410).
 - **input_consistency_dual_mass_lower_bound** — the combined lower bound
   `1 - nu ≤ ev ψ (leftTensor Z)` (paper lines 406–412).
+- **helper_linearized_completeness_eq_dual_mass_of_complementary_slackness** —
+  the final algebraic SDP rewrite after the Cauchy--Schwarz moves.
 - **helper_completeness_of_dual_mass_lower_bound** — combines the
   `Hhat`-versus-`Z` comparison with the dual-mass lower bound.
 - **helper_completeness_of_input_consistency** — uses SDP dual feasibility and
@@ -301,6 +303,133 @@ theorem input_consistency_dual_mass_lower_bound
           input_match_mass_eq_sdp_overlap params strategy G.toSubMeas
     _ ≤ ev strategy.state (leftTensor (ι₂ := ι) Z) :=
           sdp_overlap_le_dual_mass params strategy G.toSubMeas Z hZ hdual
+
+/-- The final algebraic rewrite in the helper-completeness Cauchy--Schwarz
+argument, isolated from the two analytic estimates.
+
+After the two Cauchy--Schwarz moves in
+`references/ldt-paper/self_improvement.tex`, lines 360--399, the remaining
+linear expression is
+
+`E_u Σ_h ⟨ψ, (T_h A^u_{h(u)}) ⊗ I ψ⟩`.
+
+This theorem reindexes the average to
+`Σ_h ⟨ψ, (T_h E_u A^u_{h(u)}) ⊗ I ψ⟩`, applies the complementary-slackness
+identity `T_h E_u A^u_{h(u)} = T_h Z`, and finally uses `Σ_h T_h = I`.
+The statement deliberately keeps complementary slackness as an explicit
+hypothesis; it is not a consequence of the current reduced
+`SdpOptimalPair` interface. -/
+theorem helper_linearized_completeness_eq_dual_mass_of_complementary_slackness
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι)
+    (Z : MIPStarRE.Quantum.Op ι)
+    (hTtotal : T.total = 1)
+    (hslack :
+      ∀ h : Polynomial params,
+        T.outcome h * averagedPointOperator params strategy h =
+          T.outcome h * Z) :
+    avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ev strategy.state
+            (leftTensor (ι₂ := ι)
+              (T.outcome h *
+                pointConditionedOutcomeOperatorAtPolynomial params strategy h u))) =
+      ev strategy.state (leftTensor (ι₂ := ι) Z) := by
+  classical
+  let 𝒟 := uniformDistribution (Point params)
+  have hmul_avg :
+      ∀ h : Polynomial params,
+        averageOperatorOverDistribution 𝒟
+            (fun u => T.outcome h *
+              pointConditionedOutcomeOperatorAtPolynomial params strategy h u) =
+          T.outcome h * averagedPointOperator params strategy h := by
+    intro h
+    calc
+      averageOperatorOverDistribution 𝒟
+          (fun u => T.outcome h *
+            pointConditionedOutcomeOperatorAtPolynomial params strategy h u)
+          =
+        ∑ u ∈ 𝒟.support,
+          𝒟.weight u •
+            (T.outcome h *
+              pointConditionedOutcomeOperatorAtPolynomial params strategy h u) := by
+          rfl
+      _ =
+        ∑ u ∈ 𝒟.support,
+          T.outcome h *
+            (𝒟.weight u •
+              pointConditionedOutcomeOperatorAtPolynomial params strategy h u) := by
+          refine Finset.sum_congr rfl ?_
+          intro u _
+          rw [mul_smul_comm]
+      _ =
+        T.outcome h *
+          (∑ u ∈ 𝒟.support,
+            𝒟.weight u •
+              pointConditionedOutcomeOperatorAtPolynomial params strategy h u) := by
+          rw [Matrix.mul_sum]
+      _ =
+        T.outcome h * averagedPointOperator params strategy h := by
+          rfl
+  calc
+    avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ev strategy.state
+            (leftTensor (ι₂ := ι)
+              (T.outcome h *
+                pointConditionedOutcomeOperatorAtPolynomial params strategy h u)))
+        =
+      ∑ h : Polynomial params,
+        avgOver (uniformDistribution (Point params)) (fun u =>
+          ev strategy.state
+            (leftTensor (ι₂ := ι)
+              (T.outcome h *
+                pointConditionedOutcomeOperatorAtPolynomial params strategy h u))) := by
+        rw [avgOver_sum]
+    _ =
+      ∑ h : Polynomial params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+            (T.outcome h * averagedPointOperator params strategy h)) := by
+        refine Finset.sum_congr rfl ?_
+        intro h _
+        calc
+          avgOver (uniformDistribution (Point params)) (fun u =>
+              ev strategy.state
+                (leftTensor (ι₂ := ι)
+                  (T.outcome h *
+                    pointConditionedOutcomeOperatorAtPolynomial params strategy h u)))
+              =
+            ev strategy.state
+              (leftTensor (ι₂ := ι)
+                (averageOperatorOverDistribution 𝒟
+                  (fun u =>
+                    T.outcome h *
+                      pointConditionedOutcomeOperatorAtPolynomial params strategy h u))) := by
+              exact (ev_opTensor_averageOperatorOverDistribution_left strategy.state
+                𝒟
+                (fun u =>
+                  T.outcome h *
+                    pointConditionedOutcomeOperatorAtPolynomial params strategy h u)
+                (1 : MIPStarRE.Quantum.Op ι)).symm
+          _ =
+            ev strategy.state
+              (leftTensor (ι₂ := ι)
+                (T.outcome h * averagedPointOperator params strategy h)) := by
+              rw [hmul_avg]
+    _ =
+      ∑ h : Polynomial params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι) (T.outcome h * Z)) := by
+        refine Finset.sum_congr rfl ?_
+        intro h _
+        rw [hslack h]
+    _ =
+      ev strategy.state (leftTensor (ι₂ := ι) Z) := by
+        rw [← ev_finset_sum, leftTensor_finset_sum, ← Finset.sum_mul,
+          T.sum_eq_total, hTtotal, one_mul]
 
 /-- Helper-stage completeness from the `Hhat`-versus-`Z` comparison and the
 dual-mass lower bound.
