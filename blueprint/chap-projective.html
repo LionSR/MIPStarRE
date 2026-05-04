@@ -1755,7 +1755,7 @@
 <div class="displaymath" id="a0000000203">
   \[  X = U \cdot \Sigma _{m \times d} \cdot V^\dagger .  \]
 </div>
-<p> The formalization records only the downstream consequences of this choice: the matrices \(X\) and \(\widehat X\), the identities \(X^\dagger X=Q\), \(\widehat X\widehat X^\dagger =I\), and \(X^\dagger \widehat X=\sqrt Q\), together with the \(Q_a=X^\dagger T_aX\) restatement. No explicit rectangular complex-SVD matrices \(U,V,\Sigma \) are needed. </p>
+<p> The formalization records only the downstream consequences of this choice: the matrices \(X\) and \(\widehat X\), the identities \(X^\dagger X=Q\), \(\widehat X\widehat X^\dagger =I\), and \(X^\dagger \widehat X=\sqrt Q\), together with the \(Q_a=X^\dagger T_aX\) restatement. The elementary multiplications with explicit rectangular SVD matrices \(U,V,\Sigma \) are formalized separately at the two \(\widehat X\) identities below, while the data package itself keeps only the consequences used downstream. </p>
 
   </div>
 </div>
@@ -2225,6 +2225,12 @@
         
         <ul class="uses">
           
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.xHatSquared" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.xHatSquared</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_coisometry" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_coisometry</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.exists_sigmaFin_xHat_coisometry_of_sum_le" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.exists_sigmaFin_xHat_coisometry_of_sum_le</a></li>
+          
           <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinXHatCoisometry_spec" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinXHatCoisometry_spec</a></li>
           
         </ul>
@@ -2251,7 +2257,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>The paper proves this by multiplying out \(\widehat{X}=U\cdot I_{m\times d}\cdot V^\dagger \) and using the unitarity of \(U\) and \(V\). In Lean, the dimension hypothesis \(m\leq d\) already gives a rectangular matrix with orthonormal rows on the sigma auxiliary space; the chosen matrix <span class="ttfamily">sigmaFinXHatCoisometry</span> and its specification record this existence result as an input for the future construction. The data package then records the resulting coisometry identity for the particular \(\widehat X\) used together with the mixed square-root identity below. </p>
+  <p>The paper proves this by multiplying out \(\widehat{X}=U\cdot I_{m\times d}\cdot V^\dagger \) and using the unitarity of \(U\) and \(V\). In Lean, the dimension hypothesis \(m\leq d\) already gives a rectangular matrix with orthonormal rows on the sigma auxiliary space; the chosen matrix <span class="ttfamily">sigmaFinXHatCoisometry</span> and its specification record this existence result as an input for the future construction. The formal lemma <span class="ttfamily">rectangularSvd_xHat_coisometry</span> records the corresponding matrix calculation, and the data package then stores the resulting coisometry identity for the particular \(\widehat X\) used together with the mixed square-root identity below. </p>
 
   </div>
 </div>
@@ -2287,6 +2293,8 @@
           
           <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.xTimesXHat" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.xTimesXHat</a></li>
           
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_mixed_of_sqrtQ" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_mixed_of_sqrtQ</a></li>
+          
         </ul>
     
       </div>
@@ -2311,7 +2319,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The paper obtains this from the SVD formula for \(X\) and the definition of \(\widehat X\). We record the mixed-product identity as a primitive consequence of the reduced data package, which is exactly the part needed in <a href="chap-projective.html#lem:squared-difference">4.28</a> and <a href="chap-projective.html#lem:P-Q-approx">4.30</a>. The companion paper identity for \(X\widehat X^\dagger \) is not used downstream. </p>
+  <p> The paper obtains this from the SVD formula for \(X\) and the definition of \(\widehat X\). The formal lemma <span class="ttfamily">rectangularSvd_xHat_mixed_of_sqrtQ</span> is the corresponding matrix calculation in the form whose square-root target is the operator \(Q\) supplied by the QXP construction. The reduced data package then records this mixed-product identity as a primitive consequence, which is exactly the part needed in <a href="chap-projective.html#lem:squared-difference">4.28</a> and <a href="chap-projective.html#lem:P-Q-approx">4.30</a>. The companion paper identity for \(X\widehat X^\dagger \) is not used downstream. </p>
 
   </div>
 </div>
