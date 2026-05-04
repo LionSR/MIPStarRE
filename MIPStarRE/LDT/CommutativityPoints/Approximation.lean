@@ -53,6 +53,52 @@ def pointNextEquiv (params : Parameters) [FieldModel params.q] :
     rintro ⟨u, x⟩
     simp [truncatePoint_appendPoint, pointHeight_appendPoint]
 
+/-- Decompose the uniform average over a next-level point into a height and prefix average. -/
+lemma avgOver_uniform_pointNext_decompose
+    (params : Parameters) [FieldModel params.q]
+    (f : Point params.next → Error) :
+    avgOver (uniformDistribution (Point params.next)) f =
+      avgOver (uniformDistribution (Fq params))
+        (fun x => avgOver (uniformDistribution (Point params))
+          (fun u => f (appendPoint params u x))) := by
+  have hprod :
+      avgOver (uniformDistribution (Fq params))
+          (fun x => avgOver (uniformDistribution (Point params))
+            (fun u => f (appendPoint params u x))) =
+        avgOver (uniformDistribution (Fq params × Point params))
+          (fun xu => f (appendPoint params xu.2 xu.1)) := by
+    simpa using
+      (avgOver_uniform_prod (α := Fq params) (β := Point params)
+        (f := fun x u => f (appendPoint params u x))).symm
+  have hswap :
+      avgOver (uniformDistribution (Fq params × Point params))
+          (fun xu => f (appendPoint params xu.2 xu.1)) =
+        avgOver (uniformDistribution (Point params × Fq params))
+          (fun ux => f (appendPoint params ux.1 ux.2)) := by
+    simpa using
+      (avgOver_uniform_equiv
+        (e := Equiv.prodComm (Fq params) (Point params))
+        (f := fun xu : Fq params × Point params => f (appendPoint params xu.2 xu.1)))
+  have hequiv :
+      avgOver (uniformDistribution (Point params × Fq params))
+          (fun ux => f (appendPoint params ux.1 ux.2)) =
+        avgOver (uniformDistribution (Point params.next)) f := by
+    simpa using
+      (avgOver_uniform_equiv
+        (e := pointNextEquiv params)
+        (f := f)).symm
+  calc
+    avgOver (uniformDistribution (Point params.next)) f
+      = avgOver (uniformDistribution (Point params × Fq params))
+          (fun ux => f (appendPoint params ux.1 ux.2)) := hequiv.symm
+    _ = avgOver (uniformDistribution (Fq params × Point params))
+          (fun xu => f (appendPoint params xu.2 xu.1)) := by
+            simpa using hswap.symm
+    _ = avgOver (uniformDistribution (Fq params))
+          (fun x => avgOver (uniformDistribution (Point params))
+            (fun u => f (appendPoint params u x))) := by
+            simpa using hprod.symm
+
 /-- Build an operator family from its outcomes, taking the total to be their sum. -/
 noncomputable def opFamilyOfOutcome {Outcome : Type*} [Fintype Outcome]
     (outcome : Outcome → MIPStarRE.Quantum.Op ι) :

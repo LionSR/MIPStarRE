@@ -273,6 +273,139 @@ theorem ProjSubMeas.outcome_hermitian {α : Type*} {ι : Type*}
     (P.outcome a)ᴴ = P.outcome a :=
   SubMeas.outcome_hermitian P.toSubMeas a
 
+/-- Each projective outcome is absorbed by the total operator. -/
+theorem ProjSubMeas.outcome_mul_total_eq_outcome {α : Type*} {ι : Type*}
+    [Fintype α] [Fintype ι] [DecidableEq ι]
+    (P : ProjSubMeas α ι) (a : α) :
+    P.outcome a * P.total = P.outcome a := by
+  let Pa := P.outcome a
+  let R : MIPStarRE.Quantum.Op ι := 1 - P.total
+  have hPa_herm : Paᴴ = Pa := by
+    simpa [Pa] using P.outcome_hermitian a
+  have hR_nonneg : 0 ≤ R := by
+    simpa [R] using sub_nonneg.mpr P.total_le_one
+  have hR_le_self : R ≤ 1 - Pa := by
+    simpa [R, Pa] using
+      sub_le_sub_left (P.outcome_le_total a) (1 : MIPStarRE.Quantum.Op ι)
+  have hPaRPa_nonneg : 0 ≤ Pa * R * Pa := by
+    exact MIPStarRE.Quantum.sandwich_nonneg hR_nonneg hPa_herm
+  have hPa_one_sub_Pa : Pa * (1 - Pa) * Pa = 0 := by
+    calc
+      Pa * (1 - Pa) * Pa = (Pa * 1 - Pa * Pa) * Pa := by rw [mul_sub]
+      _ = 0 := by simp [Pa, P.proj a]
+  have hPaRPa_eq_zero : Pa * R * Pa = 0 := by
+    apply le_antisymm
+    · calc
+        Pa * R * Pa ≤ Pa * (1 - Pa) * Pa := by
+          exact MIPStarRE.Quantum.sandwich_mono hPa_herm hR_le_self
+        _ = 0 := hPa_one_sub_Pa
+    · simpa using hPaRPa_nonneg
+  have hP_total_herm : P.totalᴴ = P.total := by
+    exact (Matrix.nonneg_iff_posSemidef.mp P.total_nonneg).isHermitian.eq
+  have hR_herm : Rᴴ = R := by
+    simp [R, hP_total_herm]
+  have hR_sq_le : R * R ≤ R := by
+    have hR_le_one : R ≤ 1 := by
+      simpa [R] using sub_le_self (1 : MIPStarRE.Quantum.Op ι) P.total_nonneg
+    exact MIPStarRE.Quantum.sq_le_self hR_nonneg hR_le_one
+  have hRPa_conj_mul : (R * Pa)ᴴ * (R * Pa) = Pa * (R * R) * Pa := by
+    calc
+      (R * Pa)ᴴ * (R * Pa) = (Paᴴ * Rᴴ) * (R * Pa) := by
+        simp [Matrix.conjTranspose_mul]
+      _ = Pa * (R * R) * Pa := by simp [hPa_herm, hR_herm, mul_assoc]
+  have hRPa_eq_zero : R * Pa = 0 := by
+    apply Matrix.conjTranspose_mul_self_eq_zero.mp
+    rw [hRPa_conj_mul]
+    apply le_antisymm
+    · calc
+        Pa * (R * R) * Pa ≤ Pa * R * Pa := by
+          exact MIPStarRE.Quantum.sandwich_mono hPa_herm hR_sq_le
+        _ = 0 := hPaRPa_eq_zero
+    · have hnonneg : 0 ≤ Pa * (R * R) * Pa := by
+        exact MIPStarRE.Quantum.sandwich_nonneg
+          (show 0 ≤ R * R by
+            exact Commute.mul_nonneg hR_nonneg hR_nonneg (Commute.refl R))
+          hPa_herm
+      simpa using hnonneg
+  calc
+    P.outcome a * P.total = Pa * (1 - R) := by
+      simp [Pa, R, sub_eq_add_neg, add_comm, add_left_comm]
+    _ = Pa - Pa * R := by rw [mul_sub, mul_one]
+    _ = Pa := by
+          have : Pa * R = 0 := by
+            simpa [hPa_herm, hR_herm] using congrArg Matrix.conjTranspose hRPa_eq_zero
+          simp [this]
+    _ = P.outcome a := by rfl
+
+/-- The total operator of a projective submeasurement is itself a projector. -/
+theorem ProjSubMeas.total_proj {α : Type*} {ι : Type*}
+    [Fintype α] [Fintype ι] [DecidableEq ι]
+    (P : ProjSubMeas α ι) :
+    P.total * P.total = P.total := by
+  calc
+    P.total * P.total = (∑ a : α, P.outcome a) * P.total := by rw [P.sum_eq_total]
+    _ = ∑ a : α, P.outcome a * P.total := by rw [Matrix.sum_mul]
+    _ = ∑ a : α, P.outcome a := by
+          refine Finset.sum_congr rfl ?_
+          intro a _ha
+          exact P.outcome_mul_total_eq_outcome a
+    _ = P.total := P.sum_eq_total
+
+/-- Distinct outcomes of a projective submeasurement are orthogonal. -/
+theorem ProjSubMeas.outcome_orthogonal {α : Type*}
+    {ι : Type*} [Fintype α] [Fintype ι]
+    [DecidableEq ι]
+    (P : ProjSubMeas α ι) (a b : α) (hab : a ≠ b) :
+    P.outcome a * P.outcome b = 0 := by
+  classical
+  set Pa := P.outcome a
+  set Pb := P.outcome b
+  have hsum : Pa + Pb ≤ P.total := by
+    calc
+      Pa + Pb
+        = ∑ i ∈ ({a, b} : Finset α), P.outcome i := by
+            simp [Pa, Pb, hab]
+      _ ≤ ∑ i : α, P.outcome i := by
+            exact Finset.sum_le_sum_of_subset_of_nonneg
+              (by simp)
+              (fun i _ _ => P.outcome_pos i)
+      _ = P.total := P.sum_eq_total
+  have hPb_le : Pb ≤ 1 - Pa := by
+    calc
+      Pb = Pa + Pb - Pa := by abel
+      _ ≤ P.total - Pa := by
+          exact sub_le_sub_right hsum Pa
+      _ ≤ 1 - Pa := by
+          exact sub_le_sub_right P.total_le_one Pa
+  have hPa_herm : Paᴴ = Pa := P.outcome_hermitian a
+  have hPb_herm : Pbᴴ = Pb := P.outcome_hermitian b
+  have hPaPbPa_nonneg : 0 ≤ Pa * Pb * Pa :=
+    MIPStarRE.Quantum.sandwich_nonneg (P.outcome_pos b) hPa_herm
+  have hPa_idem : Pa * (1 - Pa) * Pa = 0 := by
+    calc
+      Pa * (1 - Pa) * Pa = (Pa * 1 - Pa * Pa) * Pa := by rw [mul_sub]
+      _ = 0 := by simp [Pa, P.proj a]
+  have hPaPbPa_eq_zero : Pa * Pb * Pa = 0 := by
+    apply le_antisymm
+    · calc
+        Pa * Pb * Pa ≤ Pa * (1 - Pa) * Pa :=
+          MIPStarRE.Quantum.sandwich_mono hPa_herm hPb_le
+        _ = 0 := hPa_idem
+    · exact hPaPbPa_nonneg
+  have hPbPa_eq_zero : Pb * Pa = 0 := by
+    apply Matrix.conjTranspose_mul_self_eq_zero.mp
+    calc
+      (Pb * Pa)ᴴ * (Pb * Pa) = (Paᴴ * Pbᴴ) * (Pb * Pa) := by
+        simp [Matrix.conjTranspose_mul]
+      _ = Pa * (Pb * Pb) * Pa := by
+        simp [hPa_herm, hPb_herm, mul_assoc]
+      _ = Pa * Pb * Pa := by simp [Pb, P.proj b]
+      _ = 0 := hPaPbPa_eq_zero
+  calc
+    Pa * Pb = (Pb * Pa)ᴴ := by
+      simp [Matrix.conjTranspose_mul, hPa_herm, hPb_herm]
+    _ = 0 := by rw [hPbPa_eq_zero]; simp
+
 /-- Projective measurement outcomes are Hermitian (inherited from Measurement.outcome_pos). -/
 theorem ProjMeas.outcome_hermitian {α : Type*} {ι : Type*}
     [Fintype α] [Fintype ι] [DecidableEq ι]
@@ -286,58 +419,10 @@ theorem ProjMeas.outcome_orthogonal {α : Type*}
     [DecidableEq ι]
     (P : ProjMeas α ι) (a b : α) (hab : a ≠ b) :
     P.outcome a * P.outcome b = 0 := by
-  classical
-  set Pa := P.outcome a
-  set Pb := P.outcome b
-  have hPa_herm : Paᴴ = Pa := P.outcome_hermitian a
-  have hPb_herm : Pbᴴ = Pb := P.outcome_hermitian b
-  have hPb_le : Pb ≤ 1 - Pa := by
-    have hsum : Pa + Pb ≤ ∑ i, P.outcome i := by
-      calc Pa + Pb
-          = ∑ i ∈ ({a, b} : Finset α),
-              P.outcome i := by
-              simp [Pa, Pb, hab]
-        _ ≤ ∑ i, P.outcome i :=
-              Finset.sum_le_sum_of_subset_of_nonneg
-                (Finset.subset_univ _)
-                (fun i _ _ =>
-                  P.toMeasurement.outcome_pos i)
-    rw [P.toMeasurement.sum_eq_total,
-      P.total_eq_one] at hsum
-    calc Pb = Pa + Pb - Pa := by abel
-      _ ≤ 1 - Pa := by
-          exact sub_le_sub_right hsum Pa
-  have hPaPbPa_nonneg : 0 ≤ Pa * Pb * Pa :=
-    MIPStarRE.Quantum.sandwich_nonneg
-      (P.toMeasurement.outcome_pos b) hPa_herm
-  have hPa_idem : Pa * (1 - Pa) * Pa = 0 := by
-    calc Pa * (1 - Pa) * Pa
-        = (Pa * 1 - Pa * Pa) * Pa := by
-          rw [mul_sub]
-      _ = 0 := by simp [Pa, P.proj a]
-  have hPaPbPa_eq_zero : Pa * Pb * Pa = 0 := by
-    apply le_antisymm
-    · calc Pa * Pb * Pa
-          ≤ Pa * (1 - Pa) * Pa :=
-            MIPStarRE.Quantum.sandwich_mono
-              hPa_herm hPb_le
-        _ = 0 := hPa_idem
-    · exact hPaPbPa_nonneg
-  have hPbPa_eq_zero : Pb * Pa = 0 := by
-    apply Matrix.conjTranspose_mul_self_eq_zero.mp
-    calc (Pb * Pa)ᴴ * (Pb * Pa)
-        = (Paᴴ * Pbᴴ) * (Pb * Pa) := by
-          simp [Matrix.conjTranspose_mul]
-      _ = Pa * (Pb * Pb) * Pa := by
-          simp [hPa_herm, hPb_herm, mul_assoc]
-      _ = Pa * Pb * Pa := by
-          simp [Pb, P.proj b]
-      _ = 0 := hPaPbPa_eq_zero
-  calc Pa * Pb
-      = (Pb * Pa)ᴴ := by
-        simp [Matrix.conjTranspose_mul,
-          hPa_herm, hPb_herm]
-    _ = 0 := by rw [hPbPa_eq_zero]; simp
+  let P' : ProjSubMeas α ι :=
+    { toSubMeas := P.toSubMeas
+      proj := P.proj }
+  simpa [P'] using P'.outcome_orthogonal a b hab
 
 /-- Any two outcomes of a ProjMeas commute. -/
 theorem ProjMeas.outcome_commute {α : Type*}
