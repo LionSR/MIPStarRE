@@ -75,18 +75,6 @@ theorem rectangularSvd_xHat_mixed_raw
             _ = V * Sᴴ * (Iro * Vᴴ) := by rw [hUcollapse]
             _ = V * (Sᴴ * Iro) * Vᴴ := by simp [Matrix.mul_assoc]
 
-/-- The mixed rectangular SVD identity in the right Gram form. -/
-theorem rectangularSvd_xHat_mixed
-    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
-    (x : Matrix μ ι ℂ)
-    (U : Matrix μ μ ℂ) (V : Matrix ι ι ℂ)
-    (S Iro : Matrix μ ι ℂ)
-    (hU_right : Uᴴ * U = (1 : Matrix μ μ ℂ))
-    (hx : x = U * S * Vᴴ)
-    (hSqrt : V * (Sᴴ * Iro) * Vᴴ = CFC.sqrt (xᴴ * x)) :
-    xᴴ * (U * Iro * Vᴴ) = CFC.sqrt (xᴴ * x) := by
-  rw [rectangularSvd_xHat_mixed_raw x U V S Iro hU_right hx, hSqrt]
-
 /-- The mixed rectangular SVD identity with the target square root supplied as
 an external operator `Q`.
 
@@ -103,6 +91,18 @@ theorem rectangularSvd_xHat_mixed_of_sqrtQ
     (hSqrt : V * (Sᴴ * Iro) * Vᴴ = CFC.sqrt Q) :
     xᴴ * (U * Iro * Vᴴ) = CFC.sqrt Q := by
   rw [rectangularSvd_xHat_mixed_raw x U V S Iro hU_right hx, hSqrt]
+
+/-- The mixed rectangular SVD identity in the right Gram form. -/
+theorem rectangularSvd_xHat_mixed
+    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
+    (x : Matrix μ ι ℂ)
+    (U : Matrix μ μ ℂ) (V : Matrix ι ι ℂ)
+    (S Iro : Matrix μ ι ℂ)
+    (hU_right : Uᴴ * U = (1 : Matrix μ μ ℂ))
+    (hx : x = U * S * Vᴴ)
+    (hSqrt : V * (Sᴴ * Iro) * Vᴴ = CFC.sqrt (xᴴ * x)) :
+    xᴴ * (U * Iro * Vᴴ) = CFC.sqrt (xᴴ * x) := by
+  exact rectangularSvd_xHat_mixed_of_sqrtQ x U V S Iro (xᴴ * x) hU_right hx hSqrt
 
 /-- Assemble `QXPLayerData` from a rank-reduction witness and the SVD
 identities for `Xhat`.
