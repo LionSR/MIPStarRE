@@ -96,7 +96,8 @@ theorem completionMissingMassBound {Outcome : Type*}
   have hdiagA_lb : 1 - ζ ≤ diagA := by
     have hsq := bipartiteSSCSquaredMass ψ hperm A.toSubMeas ζ hssc
     have hmassA : ev ψ (leftTensor (ι₂ := ι) A.total) = 1 := by
-      simpa [A.total_eq_one, leftTensor] using ev_one_of_isNormalized ψ hψ
+      rw [A.total_eq_one, leftTensor_one]
+      exact ev_one_of_isNormalized ψ hψ
     linarith
   have hgapA_raw :
       |diagA - overlap| ≤ Real.sqrt (qSDD ψ A.toSubMeas.liftLeft B.liftLeft) := by
