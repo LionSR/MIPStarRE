@@ -23,6 +23,25 @@ open Module
 
 namespace LinearIsometry
 
+/-- The adjoint of a finite-dimensional linear isometry is a left inverse. -/
+theorem adjoint_comp_toLinearMap
+    {𝕜 : Type*} [RCLike 𝕜]
+    {E F : Type*}
+    [NormedAddCommGroup E] [InnerProductSpace 𝕜 E] [FiniteDimensional 𝕜 E]
+    [NormedAddCommGroup F] [InnerProductSpace 𝕜 F] [FiniteDimensional 𝕜 F]
+    (L : E →ₗᵢ[𝕜] F) :
+    L.toLinearMap.adjoint.comp L.toLinearMap = 1 := by
+  apply LinearMap.ext
+  intro x
+  refine ext_inner_right 𝕜 fun y => ?_
+  calc
+    inner 𝕜 ((L.toLinearMap.adjoint.comp L.toLinearMap) x) y =
+        inner 𝕜 (L x) (L y) := by
+          rw [LinearMap.comp_apply, LinearMap.adjoint_inner_left]
+          rfl
+    _ = inner 𝕜 x y := L.inner_map_map x y
+    _ = inner 𝕜 ((1 : E →ₗ[𝕜] E) x) y := rfl
+
 /-- A finite-dimensional Hilbert space admits a linear isometric embedding into
 any finite-dimensional Hilbert space whose dimension is at least as large.
 
@@ -50,48 +69,49 @@ end LinearIsometry
 
 namespace Matrix
 
-/-- A rectangular complex matrix with orthonormal rows exists whenever the row
+/-- The matrix of an adjoint product is the adjoint-composition of the
+corresponding Euclidean linear map. -/
+theorem toEuclideanLin_conjTranspose_mul_self
+    {𝕜 : Type*} [RCLike 𝕜]
+    {m n : Type*} [Fintype m] [Fintype n] [DecidableEq n]
+    (A : Matrix m n 𝕜) :
+    Matrix.toEuclideanLin (Aᴴ * A) =
+      (Matrix.toEuclideanLin A).adjoint.comp (Matrix.toEuclideanLin A) := by
+  classical
+  rw [Matrix.toEuclideanLin, Matrix.toLpLin_mul_same (p := (2 : ENNReal)),
+    Matrix.toEuclideanLin_conjTranspose_eq_adjoint]
+
+/-- A rectangular matrix with orthonormal rows exists whenever the row
 index set has cardinality at most the column index set.
 
 Equivalently, if `m ≤ n` in finite dimension, then there is an `m × n` matrix
 `X` satisfying `X X† = I_m`.  The proof chooses a linear isometric embedding
-`EuclideanSpace ℂ m →ₗᵢ[ℂ] EuclideanSpace ℂ n` and then takes the adjoint of
+`EuclideanSpace 𝕜 m →ₗᵢ[𝕜] EuclideanSpace 𝕜 n` and then takes the adjoint of
 its matrix. -/
 theorem exists_mul_conjTranspose_eq_one_of_card_le
+    {𝕜 : Type*} [RCLike 𝕜]
     {m n : Type*} [Fintype m] [DecidableEq m] [Fintype n]
     (h : Fintype.card m ≤ Fintype.card n) :
-    ∃ X : Matrix m n ℂ, X * Xᴴ = 1 := by
+    ∃ X : Matrix m n 𝕜, X * Xᴴ = 1 := by
   classical
-  let E := EuclideanSpace ℂ m
-  let F := EuclideanSpace ℂ n
-  have hfin : finrank ℂ E ≤ finrank ℂ F := by
+  let E := EuclideanSpace 𝕜 m
+  let F := EuclideanSpace 𝕜 n
+  have hfin : finrank 𝕜 E ≤ finrank 𝕜 F := by
     simpa [E, F] using h
-  let L : E →ₗᵢ[ℂ] F := LinearIsometry.ofFinrankLE hfin
-  let M : Matrix n m ℂ := Matrix.toEuclideanLin.symm L.toLinearMap
-  let X : Matrix m n ℂ := Mᴴ
+  let L : E →ₗᵢ[𝕜] F := LinearIsometry.ofFinrankLE hfin
+  let M : Matrix n m 𝕜 := Matrix.toEuclideanLin.symm L.toLinearMap
+  let X : Matrix m n 𝕜 := Mᴴ
   have hM_lin : Matrix.toEuclideanLin M = L.toLinearMap := by
     exact Matrix.toEuclideanLin.apply_symm_apply L.toLinearMap
-  have hL_adjoint_comp : L.toLinearMap.adjoint.comp L.toLinearMap = 1 := by
-    apply LinearMap.ext
-    intro x
-    refine ext_inner_right ℂ fun y => ?_
-    calc
-      inner ℂ ((L.toLinearMap.adjoint.comp L.toLinearMap) x) y =
-          inner ℂ (L x) (L y) := by
-            rw [LinearMap.comp_apply, LinearMap.adjoint_inner_left]
-            rfl
-      _ = inner ℂ x y := L.inner_map_map x y
-      _ = inner ℂ ((1 : E →ₗ[ℂ] E) x) y := rfl
   have hMstarM : Mᴴ * M = 1 := by
     apply Matrix.toEuclideanLin.injective
     calc
       Matrix.toEuclideanLin (Mᴴ * M) =
           (Matrix.toEuclideanLin M).adjoint.comp (Matrix.toEuclideanLin M) := by
-            simp [Matrix.toEuclideanLin, Matrix.toLpLin_mul_same (p := (2 : ENNReal)),
-              Matrix.toEuclideanLin_conjTranspose_eq_adjoint]
+            exact Matrix.toEuclideanLin_conjTranspose_mul_self M
       _ = L.toLinearMap.adjoint.comp L.toLinearMap := by rw [hM_lin]
-      _ = 1 := hL_adjoint_comp
-      _ = Matrix.toEuclideanLin (1 : Matrix m m ℂ) := by
+      _ = 1 := L.adjoint_comp_toLinearMap
+      _ = Matrix.toEuclideanLin (1 : Matrix m m 𝕜) := by
             rw [Matrix.toEuclideanLin, Matrix.toLpLin_one]
             rfl
   refine ⟨X, ?_⟩
