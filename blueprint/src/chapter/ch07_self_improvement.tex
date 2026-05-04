@@ -695,6 +695,7 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \lean{MIPStarRE.LDT.SelfImprovement.projective_boundedness_gap_le_helper_boundedness_gap}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_projective_residual_bound_natural}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_projective_residual_bound}
+  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_projective_residual_bound_of_small_errors}
   The boundedness quantity is
   \begin{align}
     &\bra{\psi} Z \ot (I - H) \ket{\psi} \notag\\
@@ -727,7 +728,10 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
     \qquad
     \widehat{\zeta} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}},
   \]
-  respectively. The paper's exponent bookkeeping then shows
+  respectively. The paper's exponent bookkeeping then shows the following
+  bounds; the displayed Lean theorem records the projective-residual absorption
+  $\widehat{\zeta} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}} \le \zeta$.
+  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_projective_residual_error_le_selfImprovementError}
   \[
     \widehat{\zeta}_{\mathrm{ortho}}
     \leq 400 m \cdot \Big(\eps^{1/8} + \delta^{1/8} + (d/q)^{1/8}\Big),

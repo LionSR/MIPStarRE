@@ -557,6 +557,41 @@ theorem final_fields_projective_residual_bound
       hhelper hhelperBounded hdata)
     habsorb
 
+/-- Literal-threshold projective-residual producer under the standard
+unit-interval smallness hypotheses.
+
+This is the convenience wrapper around
+`final_fields_projective_residual_bound`: the numerical absorption input is
+provided by
+`final_fields_projective_residual_error_le_selfImprovementError`, so callers
+only need the helper-stage boundedness estimate, data-processing output, and
+the usual smallness assumptions on `eps`, `delta`, and `d/q`. -/
+theorem final_fields_projective_residual_bound_of_small_errors
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (heps_le_one : eps ≤ 1)
+    (hdelta : 0 ≤ delta) (hdelta_le_one : delta ≤ 1)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
+    {T : Measurement (Polynomial params) ι}
+    {Hhat : SubMeas (Polynomial params) ι}
+    {H : ProjSubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
+    (hhelperBounded :
+      helperBoundednessGap params strategy Hhat Z ≤
+        selfImprovementHelperError params eps delta)
+    (hdata :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftLeft)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+        (selfImprovementDataProcessingError params eps delta)) :
+    projectiveBoundednessGap params strategy H Z ≤
+      selfImprovementError params eps delta :=
+  final_fields_projective_residual_bound params strategy eps delta hhelper hhelperBounded hdata
+    (final_fields_projective_residual_error_le_selfImprovementError params eps delta
+      heps heps_le_one hdelta hdelta_le_one hd_le_q)
+
 /-- Final-fields producer for the `BoundedByOperator` conclusion.
 
 If the SDP dual witness dominates the identity, then the left-placed mass of any
