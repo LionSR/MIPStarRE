@@ -158,6 +158,14 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
     \E_{u} \sum_{a \neq b} \bra{\psi} A^{u}_a \ot H_{[h(u) = b]} \ket{\psi}
     = \E_{u} \sum_{a, h: h(u) \neq a} \bra{\psi} A^{u}_a \ot H_h \ket{\psi}.
   \end{equation}
+  The theorem-side off-diagonal selection used for this `add-in-u` application is
+  \lean{MIPStarRE.LDT.SelfImprovement.pointConsistencyAddInUSelection}, and the
+  corresponding left/right quantity wrappers are
+  \lean{MIPStarRE.LDT.SelfImprovement.addInULeftQuantity_pointConsistencySelection_eq_off_diagonal_avg}
+  \leanok
+  and
+  \lean{MIPStarRE.LDT.SelfImprovement.addInURightQuantity_pointConsistencySelection_eq_zero}
+  \leanok.
   Apply Lemma~\ref{lem:add-in-u} with $\mathcal O=\F_q$, $M=A$, and $S_u=\{(a,h):h(u)\neq a\}$. Then
   \[
     \eqref{eq:consistency-with-A-baby-step}
