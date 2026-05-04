@@ -86,6 +86,62 @@ theorem input_consistency_match_mass_lower_bound
   · intro u
     simpa [polynomialEvaluationFamily, evaluateAt, postprocess_total] using G.total_eq_one
 
+/-- Reindex a polynomial sum by the value of the polynomial at a fixed point.
+
+This is the finite fiber decomposition used in the input-mass SDP bridge. The
+lemma keeps the `Finset.sum_fiberwise` invocation separate from the tensor
+algebra in `input_match_mass_eq_sdp_overlap`. -/
+private lemma input_sdp_overlap_fiberwise_sum_eq
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι)
+    (u : Point params) :
+    (∑ g : Polynomial params,
+        ev strategy.state
+          (opTensor (pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
+            (G.outcome g))) =
+      ∑ a : Fq params,
+        ∑ g ∈ Finset.univ.filter (fun g : Polynomial params => g u = a),
+          ev strategy.state
+            (opTensor (pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
+              (G.outcome g)) := by
+  classical
+  simpa using (Finset.sum_fiberwise Finset.univ
+    (fun g : Polynomial params => g u)
+    (fun g =>
+      ev strategy.state
+        (opTensor (pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
+          (G.outcome g)))).symm
+
+/-- The bracketed fiber expression is exactly the bipartite matching mass of
+the point measurement against the polynomial measurement evaluated at `u`. -/
+private lemma input_sdp_bracketed_sum_eq_match_mass
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : SubMeas (Polynomial params) ι)
+    (u : Point params) :
+    (∑ a : Fq params,
+        ev strategy.state
+          (opTensor ((strategy.pointMeasurement u).outcome a)
+            (∑ g ∈ Finset.univ.filter (fun g : Polynomial params => g u = a),
+              G.outcome g))) =
+      qBipartiteMatchMass strategy.state
+        ((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u)
+        ((polynomialEvaluationFamily params G) u) := by
+  classical
+  unfold qBipartiteMatchMass polynomialEvaluationFamily evaluateAt postprocess
+  refine Finset.sum_congr rfl ?_
+  intro a _
+  simp only [IdxProjMeas.toIdxSubMeas]
+  congr 2
+  refine Finset.sum_congr ?_ ?_
+  · ext g
+    simp
+  · intro g _
+    rfl
+
 /-- Reindex the averaged input-consistency overlap as the SDP overlap
 `Σ_g ⟨ψ, A_g ⊗ G_g⟩`.
 
@@ -132,21 +188,7 @@ theorem input_match_mass_eq_sdp_overlap
               ∑ g ∈ Finset.univ.filter (fun g : Polynomial params => g u = a),
                 ev strategy.state
                   (opTensor ((strategy.pointMeasurement u).outcome a) (G.outcome g)) := by
-              rw [show ∑ g : Polynomial params,
-                    ev strategy.state
-                      (opTensor (pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
-                        (G.outcome g)) =
-                  ∑ a : Fq params,
-                    ∑ g ∈ Finset.univ.filter (fun g : Polynomial params => g u = a),
-                      ev strategy.state
-                        (opTensor (pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
-                          (G.outcome g)) from by
-                simpa using (Finset.sum_fiberwise Finset.univ
-                  (fun g : Polynomial params => g u)
-                  (fun g =>
-                    ev strategy.state
-                      (opTensor (pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
-                        (G.outcome g)))).symm]
+              rw [input_sdp_overlap_fiberwise_sum_eq]
               refine Finset.sum_congr rfl ?_
               intro a _
               refine Finset.sum_congr rfl ?_
@@ -167,11 +209,7 @@ theorem input_match_mass_eq_sdp_overlap
           qBipartiteMatchMass strategy.state
             ((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u)
             ((polynomialEvaluationFamily params G) u) := by
-              unfold qBipartiteMatchMass polynomialEvaluationFamily evaluateAt postprocess
-              refine Finset.sum_congr rfl ?_
-              intro a _
-              simp [IdxProjMeas.toIdxSubMeas]
-              congr 4
+              exact input_sdp_bracketed_sum_eq_match_mass params strategy G u
     _ =
       ∑ g : Polynomial params,
         ev strategy.state
