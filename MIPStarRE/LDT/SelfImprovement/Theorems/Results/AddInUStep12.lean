@@ -266,6 +266,11 @@ appearing on the LHS of `eq:change-one-cauchy-schwarz` (paper lines 306--311):
 the expectation of `((A^v_{h(v)} - A^u_{h(u)}) · H^u_h · A^v_{h(v)}) ⊗ T_h`,
 averaged over `(u, v)` and summed over `h`.
 
+The paper writes the middle factor as the fiber operator `M^u_o`; in this
+formalization the preceding `o`-sum has already been collapsed along
+`o = h(u)`, so the same factor appears as
+`H^u_h = (sandwichedPolynomialSubMeasAt params strategy T u).outcome h`.
+
 This identity is purely algebraic; the operator Cauchy--Schwarz estimate is
 proved downstream by `add_in_u_cs_chain_q2_q3_factored_cs`. -/
 lemma addInU_cs_chain_step3_diff_eq

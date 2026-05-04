@@ -214,6 +214,11 @@ are the variance term
 `(A^v_{h(v)} - A^u_{h(u)}) · H^u_h · (A^v_{h(v)} - A^u_{h(u)})`
 and the self-energy term `A^v_{h(v)} · H^u_h · A^v_{h(v)}`.
 
+The paper presents this step before the fiberwise `o`-sum is collapsed, using
+the middle operator `M^u_o`.  The Lean chain has already reindexed that sum by
+`o = h(u)`, so the middle operator is the helper outcome
+`H^u_h = (sandwichedPolynomialSubMeasAt params strategy T u).outcome h`.
+
 This is the operator Cauchy--Schwarz part of `eq:change-one-cauchy-schwarz` in
 `references/ldt-paper/self_improvement.tex`, lines 306--311. It does not yet
 identify the first factor with the summed global-variance deviation, nor bound
