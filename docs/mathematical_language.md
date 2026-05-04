@@ -41,6 +41,20 @@ uses them with that meaning. Likewise, avoid implementation-local substitutes
 such as `projectivization` or `spectral truncation` when the paper gives a
 clearer phrase.
 
+File-split PRs must preserve this rule. New module names, namespaces, and public
+declarations introduced by a split should name the mathematical layer being
+isolated, not the local workflow step or a paper line number. For example, prefer
+names such as `DiagonalCompletion`, `CompletionTransport`, or
+`ProjectiveConsistency` over names built from `Line130`, `Line169`, `Step6`, or
+`FinalAssembly`, unless the cited paper itself uses that phrase as the
+mathematical name.
+
+If a split reveals exact or near-exact helper declarations recurring across
+chapters, do not copy the helper into another chapter-local leaf. Confirm that
+the statements are mathematically the same, then move the shared result into an
+appropriate common module with a mathematical name and keep chapter-specific
+wrappers only when they preserve paper-facing terminology.
+
 If a docstring must mention a legacy Lean identifier, cite it in backticks and
 describe the mathematical object in paper terminology. If an old public
 identifier cannot be renamed in the current PR, record the required migration
