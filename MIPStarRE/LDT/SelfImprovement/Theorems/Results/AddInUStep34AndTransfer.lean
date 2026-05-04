@@ -44,8 +44,9 @@ projection-simplified diagonal transfer.
   `add_in_u_cs_chain_global_variance_steps_of_local_sum_bound_from_factor_bounds`,
   and `add_in_u_simplified_transfer_of_cs_chain_local_variance_form`.
 - **Self-consistency/local-variance wrapper** —
-  `add_in_u_simplified_transfer_of_cs_chain_selfConsistency_local_variance_form`
-  and `helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance`.
+  `add_in_u_simplified_transfer_of_cs_chain_selfConsistency_local_variance_form`,
+  `helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance`,
+  and `helper_strong_self_consistency_input_of_selfConsistency_localVariance`.
 - **add_in_u_simplified_transfer_of_cs_chain** — the four-step chain
   assembly: given four `|Qᵢ−Qⱼ| ≤ ηᵢⱼ` bounds summing to `≤ addInUError`,
   yields the projection-simplified transfer.
@@ -1354,7 +1355,7 @@ paper's released right-hand side via
 arithmetic absorption
 `helper_strong_self_consistency_error_le_selfImprovementHelperError`.
 
-This is the first no-`sorry` route from the actual helper construction to the
+This is the first hole-free route from the actual helper construction to the
 `HelperStrongSelfConsistencyInput` surface. The remaining analytic work is
 therefore pushed into the producer package, rather than left as a raw
 `BipartiteSSCRel` assumption. -/
@@ -1463,6 +1464,52 @@ theorem helper_strong_self_consistency_input_of_producer
   intro T Hhat Z hhelper
   exact helper_strong_self_consistency_of_helper_conclusion
     params strategy eps delta heps hdelta hd_le_q hhelper (hproducer hhelper)
+
+/-- Construct the helper-stage strong self-consistency input from the point
+self-consistency, local-variance, and residual estimates which remain after the
+helper construction has been fixed.
+
+This theorem composes the already formalized `Q₀ → Q₁ → Q₂ → Q₃ → Q₄` chain
+with the closing helper-SSC wrapper.  It is the paper-facing form needed when
+the self-improvement theorem is applied on a restricted slice: the caller
+supplies the point self-consistency relation once, and supplies the local
+variance and released-residual estimates for each helper output. -/
+theorem helper_strong_self_consistency_input_of_selfConsistency_localVariance
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
+    (hssc : BipartiteSSCRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta)
+    (hlocal :
+      ∀ {T : Measurement (Polynomial params) ι}
+        {Hhat : SubMeas (Polynomial params) ι}
+        {Z : MIPStarRE.Quantum.Op ι},
+        SelfImprovementHelperConclusion params strategy T Hhat Z eps delta →
+          (∑ g : Polynomial params,
+            localVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g) ≤
+            localVarianceOfPointsError params eps delta)
+    (hresidual :
+      ∀ {T : Measurement (Polynomial params) ι}
+        {Hhat : SubMeas (Polynomial params) ι}
+        {Z : MIPStarRE.Quantum.Op ι},
+        SelfImprovementHelperConclusion params strategy T Hhat Z eps delta →
+          subMeasMass strategy.state Hhat.liftLeft -
+              addInURightQuantity params strategy
+                (sandwichedPolynomialSubMeasAt params strategy T.toSubMeas)
+                T.toSubMeas
+                (selfConsistencyAddInUSelection params) ≤
+            (11 * Real.sqrt (selfImprovementVarianceError params eps delta) +
+                Real.sqrt (2 * delta) +
+                ((params.m : Error) * (params.d : Error) / (params.q : Error))) -
+              addInUError params eps delta) :
+    HelperStrongSelfConsistencyInput params strategy eps delta := by
+  refine helper_strong_self_consistency_input_of_producer
+    params strategy eps delta heps hdelta hd_le_q ?_
+  intro T Hhat Z hhelper
+  exact helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance
+    params strategy eps delta hssc (hlocal hhelper) (hresidual hhelper)
 
 /-- Build the full self-improvement bridge package when the helper strong
 self-consistency field is supplied by its producer.

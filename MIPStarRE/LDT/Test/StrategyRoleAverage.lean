@@ -24,7 +24,7 @@ private noncomputable def axisParallelLineAnswerMeasurement
     postprocess ((M ℓ).toSubMeas) (· zeroCoord)
   total_eq_one := by
     let ℓ : AxisParallelLine params := { base := s.1, direction := s.2 }
-    simpa [ℓ, postprocess_total] using (M ℓ).total_eq_one
+    rw [postprocess_total, (M ℓ).total_eq_one]
 
 private noncomputable def diagonalLineAnswerMeasurement
     {params : Parameters} [FieldModel params.q]
@@ -39,7 +39,7 @@ private noncomputable def diagonalLineAnswerMeasurement
   total_eq_one := by
     let v := extendRestrictedDirection j s.2
     let ℓ : DiagonalLine params := { base := s.1, direction := v }
-    simpa [v, ℓ, postprocess_total] using (M ℓ).total_eq_one
+    rw [postprocess_total, (M ℓ).total_eq_one]
 
 @[simp] private lemma postprocess_symmetrizedIdxProjMeas_outcome
     {Question α β : Type*} {ι : Type*}
@@ -51,6 +51,52 @@ private noncomputable def diagonalLineAnswerMeasurement
   classical
   simp [symmetrizedIdxProjMeas, postprocess, roleCond_finset_sum,
     Finset.sum_add_distrib]
+
+private lemma axisParallelLineAnswerFamily_classicalRoleSymm_eq_roleSymmetrized
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) (s : AxisParallelTestSample params) :
+    axisParallelLineAnswerFamily strategy.classicalRoleSymmStrategy s =
+      (MIPStarRE.LDT.roleSymmetrizedMeasurement
+        (axisParallelLineAnswerMeasurement strategy.axisParallelMeasurementA s)
+        (axisParallelLineAnswerMeasurement strategy.axisParallelMeasurementB s)).toSubMeas := by
+  let ℓ : AxisParallelLine params := { base := s.1, direction := s.2 }
+  refine SubMeas.ext ?_ ?_
+  · intro a
+    simp [axisParallelLineAnswerFamily, SameSpaceProjStrat.classicalRoleSymmStrategy,
+      SameSpaceProjStrat.symmetrizedAxisParallelMeasurement,
+      axisParallelLineAnswerMeasurement]
+  · change (postprocess
+        ((symmetrizedIdxProjMeas strategy.axisParallelMeasurementA
+          strategy.axisParallelMeasurementB ℓ).toSubMeas)
+        (· zeroCoord)).total = 1
+    rw [postprocess_total,
+      (symmetrizedIdxProjMeas strategy.axisParallelMeasurementA
+        strategy.axisParallelMeasurementB ℓ).total_eq_one]
+
+private lemma diagonalLineAnswerFamily_classicalRoleSymm_eq_roleSymmetrized
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι)
+    (j : Fin params.m) (s : RestrictedDiagonalSample params j) :
+    diagonalLineAnswerFamily strategy.classicalRoleSymmStrategy j s =
+      (MIPStarRE.LDT.roleSymmetrizedMeasurement
+        (diagonalLineAnswerMeasurement strategy.diagonalMeasurementA j s)
+        (diagonalLineAnswerMeasurement strategy.diagonalMeasurementB j s)).toSubMeas := by
+  let v := extendRestrictedDirection j s.2
+  let ℓ : DiagonalLine params := { base := s.1, direction := v }
+  refine SubMeas.ext ?_ ?_
+  · intro a
+    simp [diagonalLineAnswerFamily, SameSpaceProjStrat.classicalRoleSymmStrategy,
+      SameSpaceProjStrat.symmetrizedDiagonalMeasurement,
+      diagonalLineAnswerMeasurement]
+  · change (postprocess
+        ((symmetrizedIdxProjMeas strategy.diagonalMeasurementA
+          strategy.diagonalMeasurementB ℓ).toSubMeas)
+        (· zeroCoord)).total = 1
+    rw [postprocess_total,
+      (symmetrizedIdxProjMeas strategy.diagonalMeasurementA
+        strategy.diagonalMeasurementB ℓ).total_eq_one]
 
 private lemma qBipartiteMatchMass_roleSymmetrizedMeasurement_eq_average
     {Outcome : Type*} {ι : Type*}
@@ -177,7 +223,6 @@ private lemma qBipartiteConsDefect_roleSymmetrizedMeasurement_eq_average
             rw [← qBipartiteConsDefect_of_measurements ψ MA NB]
             rw [← qBipartiteConsDefect_of_measurements ψ NA MB]
 
-set_option maxHeartbeats 1000000 in
 -- The sample-level symmetrization lemma still unfolds the role-placed measurement API.
 private lemma axisParallel_symm_sample_eq_average
     {params : Parameters} [FieldModel params.q]
@@ -196,19 +241,16 @@ private lemma axisParallel_symm_sample_eq_average
   let PB := strategy.pointMeasurementB s.1
   let LA := axisParallelLineAnswerMeasurement strategy.axisParallelMeasurementA s
   let LB := axisParallelLineAnswerMeasurement strategy.axisParallelMeasurementB s
-  simpa [qBipartiteConsDefect, qBipartiteMatchMass,
-    SameSpaceProjStrat.classicalRoleSymmStrategy,
-    SameSpaceProjStrat.symmetrizedPointMeasurement,
-    SameSpaceProjStrat.symmetrizedAxisParallelMeasurement,
-    SameSpaceProjStrat.leftAsSymmetric, SameSpaceProjStrat.rightAsSymmetric,
-    axisParallelPointAnswerFamily, axisParallelLineAnswerFamily,
-    axisParallelLineAnswerMeasurement, MIPStarRE.LDT.roleSymmetrizedMeasurement,
-    postprocess_total, postprocess_symmetrizedIdxProjMeas_outcome,
-    PA, PB, LA, LB, add_comm] using
+  rw [axisParallelLineAnswerFamily_classicalRoleSymm_eq_roleSymmetrized strategy s]
+  change qBipartiteConsDefect (classicalRoleSymmState strategy.state)
+      (MIPStarRE.LDT.roleSymmetrizedMeasurement PA.toMeasurement PB.toMeasurement).toSubMeas
+      (MIPStarRE.LDT.roleSymmetrizedMeasurement LA LB).toSubMeas =
+    (qBipartiteConsDefect strategy.state LA.toSubMeas PB.toSubMeas +
+      qBipartiteConsDefect strategy.state PA.toSubMeas LB.toSubMeas) / 2
+  simpa [add_comm] using
     qBipartiteConsDefect_roleSymmetrizedMeasurement_eq_average strategy.state
       PA.toMeasurement PB.toMeasurement LA LB
 
-set_option maxHeartbeats 1000000 in
 -- The diagonal sample uses the same role-placed expansion uniformly in the restriction index.
 private lemma diagonal_symm_sample_eq_average
     {params : Parameters} [FieldModel params.q]
@@ -228,15 +270,13 @@ private lemma diagonal_symm_sample_eq_average
   let PB := strategy.pointMeasurementB s.1
   let LA := diagonalLineAnswerMeasurement strategy.diagonalMeasurementA j s
   let LB := diagonalLineAnswerMeasurement strategy.diagonalMeasurementB j s
-  simpa [qBipartiteConsDefect, qBipartiteMatchMass,
-    SameSpaceProjStrat.classicalRoleSymmStrategy,
-    SameSpaceProjStrat.symmetrizedPointMeasurement,
-    SameSpaceProjStrat.symmetrizedDiagonalMeasurement,
-    SameSpaceProjStrat.leftAsSymmetric, SameSpaceProjStrat.rightAsSymmetric,
-    diagonalPointAnswerFamily, diagonalLineAnswerFamily,
-    diagonalLineAnswerMeasurement, MIPStarRE.LDT.roleSymmetrizedMeasurement,
-    postprocess_total, postprocess_symmetrizedIdxProjMeas_outcome,
-    PA, PB, LA, LB, add_comm] using
+  rw [diagonalLineAnswerFamily_classicalRoleSymm_eq_roleSymmetrized strategy j s]
+  change qBipartiteConsDefect (classicalRoleSymmState strategy.state)
+      (MIPStarRE.LDT.roleSymmetrizedMeasurement PA.toMeasurement PB.toMeasurement).toSubMeas
+      (MIPStarRE.LDT.roleSymmetrizedMeasurement LA LB).toSubMeas =
+    (qBipartiteConsDefect strategy.state LA.toSubMeas PB.toSubMeas +
+      qBipartiteConsDefect strategy.state PA.toSubMeas LB.toSubMeas) / 2
+  simpa [add_comm] using
     qBipartiteConsDefect_roleSymmetrizedMeasurement_eq_average strategy.state
       PA.toMeasurement PB.toMeasurement LA LB
 
@@ -365,50 +405,22 @@ theorem classicalRoleSymmStrategy_is_good_three_mul {params : Parameters}
     bipartiteConsError strategy.state (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-  let axisParallelBranch : Error := strategy.axisParallelRoleAverage
-  let diagonalBranch : Error := strategy.diagonalRoleAverage
   have hpoint_nonneg : 0 ≤ pointAgreement := by
     exact bipartiteConsError_nonneg strategy.state (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-  have haxis_nonneg : 0 ≤ axisParallelBranch := by
-    dsimp [axisParallelBranch]
-    apply div_nonneg
-    · linarith [bipartiteConsError_nonneg strategy.state
-          (uniformDistribution (AxisParallelTestSample params))
-          (axisParallelLineAnswerFamily strategy.leftAsSymmetric)
-          (axisParallelPointAnswerFamily strategy.rightAsSymmetric),
-        bipartiteConsError_nonneg strategy.state
-          (uniformDistribution (AxisParallelTestSample params))
-          (axisParallelPointAnswerFamily strategy.leftAsSymmetric)
-          (axisParallelLineAnswerFamily strategy.rightAsSymmetric)]
-    · norm_num
-  have hdiag_nonneg : 0 ≤ diagonalBranch := by
-    dsimp [diagonalBranch]
-    refine mul_nonneg ?_ ?_
-    · positivity
-    · refine Finset.sum_nonneg ?_
-      intro j _
-      apply div_nonneg
-      · linarith [bipartiteConsError_nonneg strategy.state
-            (uniformDistribution (RestrictedDiagonalSample params j))
-            (diagonalLineAnswerFamily strategy.leftAsSymmetric j)
-            (diagonalPointAnswerFamily strategy.rightAsSymmetric j),
-          bipartiteConsError_nonneg strategy.state
-            (uniformDistribution (RestrictedDiagonalSample params j))
-            (diagonalPointAnswerFamily strategy.leftAsSymmetric j)
-            (diagonalLineAnswerFamily strategy.rightAsSymmetric j)]
-      · norm_num
-  have hmain : (axisParallelBranch + pointAgreement + diagonalBranch) / 3 ≤ eps := by
-    simpa [axisParallelBranch, pointAgreement, diagonalBranch,
-      SameSpaceProjStrat.lowIndividualDegreeFailureProbability,
-      SameSpaceProjStrat.axisParallelRoleAverage, SameSpaceProjStrat.diagonalRoleAverage,
-      SameSpaceProjStrat.leftAsSymmetric, SameSpaceProjStrat.rightAsSymmetric,
-      SymStrat.axisParallelFailureProbability, SymStrat.diagonalFailureProbability] using
+  have haxis_nonneg : 0 ≤ strategy.axisParallelRoleAverage :=
+    axisParallelRoleAverage_nonneg strategy
+  have hdiag_nonneg : 0 ≤ strategy.diagonalRoleAverage :=
+    diagonalRoleAverage_nonneg strategy
+  have hmain :
+      (strategy.axisParallelRoleAverage + pointAgreement +
+        strategy.diagonalRoleAverage) / 3 ≤ eps := by
+    simpa [pointAgreement, SameSpaceProjStrat.lowIndividualDegreeFailureProbability] using
       hpass.soundnessHypothesis
-  have haxis : axisParallelBranch ≤ 3 * eps := by
+  have haxis : strategy.axisParallelRoleAverage ≤ 3 * eps := by
     linarith
-  have hdiag : diagonalBranch ≤ 3 * eps := by
+  have hdiag : strategy.diagonalRoleAverage ≤ 3 * eps := by
     linarith
   refine ⟨?_, ?_, ?_⟩
   · rw [classicalRoleSymmStrategy_axisParallel_eq_roleAverage strategy]

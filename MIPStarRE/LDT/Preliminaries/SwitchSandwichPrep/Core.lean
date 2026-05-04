@@ -134,64 +134,7 @@ lemma projSubMeas_outcome_mul_total_eq_outcome
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
     (A : ProjSubMeas Outcome ι) (a : Outcome) :
     A.outcome a * A.total = A.outcome a := by
-  let P := A.outcome a
-  let R : MIPStarRE.Quantum.Op ι := 1 - A.total
-  have hP_herm : Pᴴ = P := by
-    simpa [P] using A.outcome_hermitian a
-  have hR_nonneg : 0 ≤ R := by
-    simpa [R] using sub_nonneg.mpr A.total_le_one
-  have hR_le_self : R ≤ 1 - P := by
-    simpa [R, P] using
-      sub_le_sub_left (A.outcome_le_total a) (1 : MIPStarRE.Quantum.Op ι)
-  have hPRP_nonneg : 0 ≤ P * R * P := by
-    exact MIPStarRE.Quantum.sandwich_nonneg hR_nonneg hP_herm
-  have hP_one_sub_P : P * (1 - P) * P = 0 := by
-    calc
-      P * (1 - P) * P = (P * 1 - P * P) * P := by rw [mul_sub]
-      _ = 0 := by simp [P, A.proj a]
-  have hPRP_eq_zero : P * R * P = 0 := by
-    apply le_antisymm
-    · calc
-        P * R * P ≤ P * (1 - P) * P := by
-          exact MIPStarRE.Quantum.sandwich_mono hP_herm hR_le_self
-        _ = 0 := hP_one_sub_P
-    · simpa using hPRP_nonneg
-  have hA_total_herm : A.totalᴴ = A.total := by
-    exact (Matrix.nonneg_iff_posSemidef.mp A.total_nonneg).isHermitian.eq
-  have hR_herm : Rᴴ = R := by
-    simp [R, hA_total_herm]
-  have hR_sq_le : R * R ≤ R := by
-    have hR_le_one : R ≤ 1 := by
-      simpa [R] using sub_le_self (1 : MIPStarRE.Quantum.Op ι) A.total_nonneg
-    exact MIPStarRE.Quantum.sq_le_self hR_nonneg hR_le_one
-  have hRP_conj_mul : (R * P)ᴴ * (R * P) = P * (R * R) * P := by
-    calc
-      (R * P)ᴴ * (R * P) = (Pᴴ * Rᴴ) * (R * P) := by
-        simp [Matrix.conjTranspose_mul]
-      _ = P * (R * R) * P := by simp [hP_herm, hR_herm, mul_assoc]
-  have hRP_eq_zero : R * P = 0 := by
-    apply Matrix.conjTranspose_mul_self_eq_zero.mp
-    rw [hRP_conj_mul]
-    apply le_antisymm
-    · calc
-        P * (R * R) * P ≤ P * R * P := by
-          exact MIPStarRE.Quantum.sandwich_mono hP_herm hR_sq_le
-        _ = 0 := hPRP_eq_zero
-    · have hnonneg : 0 ≤ P * (R * R) * P := by
-        exact MIPStarRE.Quantum.sandwich_nonneg
-          (show 0 ≤ R * R by
-            exact Commute.mul_nonneg hR_nonneg hR_nonneg (Commute.refl R))
-          hP_herm
-      simpa using hnonneg
-  calc
-    A.outcome a * A.total = P * (1 - R) := by
-      simp [P, R, sub_eq_add_neg, add_comm, add_left_comm]
-    _ = P - P * R := by rw [mul_sub, mul_one]
-    _ = P := by
-          have : P * R = 0 := by
-            simpa [hP_herm, hR_herm] using congrArg Matrix.conjTranspose hRP_eq_zero
-          simp [this]
-    _ = A.outcome a := by rfl
+  simpa using ProjSubMeas.outcome_mul_total_eq_outcome A a
 
 /-- The total operator of a projective sub-measurement is itself a projector. -/
 lemma projSubMeas_total_proj
@@ -199,16 +142,7 @@ lemma projSubMeas_total_proj
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
     (A : ProjSubMeas Outcome ι) :
     A.total * A.total = A.total := by
-  calc
-    A.total * A.total = (∑ a : Outcome, A.outcome a) * A.total := by
-      rw [A.sum_eq_total]
-    _ = ∑ a : Outcome, A.outcome a * A.total := by
-      rw [Matrix.sum_mul]
-    _ = ∑ a : Outcome, A.outcome a := by
-      refine Finset.sum_congr rfl ?_
-      intro a _
-      exact projSubMeas_outcome_mul_total_eq_outcome A a
-    _ = A.total := A.sum_eq_total
+  simpa using ProjSubMeas.total_proj A
 
 /-- Any `OpBounded01` operator is bounded above by the identity. -/
 private lemma opBounded01_le_one
