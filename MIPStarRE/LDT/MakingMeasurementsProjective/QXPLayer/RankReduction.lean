@@ -1,6 +1,7 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.Core
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.TruncationCombinatorics
 import MIPStarRE.LDT.Preliminaries.CompletionTransfer
+import MIPStarRE.Quantum.FiniteHilbert
 import MIPStarRE.Quantum.ProjectorONB
 import Mathlib.Analysis.Matrix.Spectrum
 
@@ -500,6 +501,58 @@ lemma sigmaFinRangeEmbedding_qa_eq {Outcome : Type uOutcome}
     ProjMeas.transport, Measurement.transport, SubMeas.transport, Matrix.mul_apply,
     Matrix.conjTranspose_apply, Matrix.diagonal_apply] using hsum.symm
 
+/-- The finite-enumeration range embedding has right Gram matrix equal to the
+total operator of the projective family.
+
+This is the canonical sigma-space form of the paper's identity `X† X = Q`.  The
+proof uses only that the auxiliary projectors `T_a` form a measurement and the
+pointwise restatement `Q_a = X† T_a X`, together with the recorded total
+identity `∑ a, Q_a = Q`. -/
+lemma sigmaFinRangeEmbedding_gram_right {Outcome : Type uOutcome}
+    [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (q : OpFamily Outcome ι)
+    (qa_projective : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (q.outcome a))
+    (q_sum_eq_total : ∑ a : Outcome, q.outcome a = q.total) :
+    (sigmaFinRangeEmbedding q.outcome qa_projective)ᴴ *
+        (sigmaFinRangeEmbedding q.outcome qa_projective) =
+      q.total := by
+  classical
+  let X := sigmaFinRangeEmbedding q.outcome qa_projective
+  let T := sigmaFinProjMeas (fun a : Outcome => (q.outcome a).rank)
+  have hT_sum :
+      (∑ a : Outcome, T.outcome a) =
+        (1 : MIPStarRE.Quantum.Op (ULift.{uι}
+          (FiniteHilbertSpace.sigmaFinCarrier
+            (fun a : Outcome => (q.outcome a).rank)))) := by
+    simpa [T] using T.sum_eq
+  have hmul_sum :
+      Xᴴ * (∑ a : Outcome, T.outcome a) =
+        ∑ a : Outcome, Xᴴ * T.outcome a := by
+    simpa using
+      (Matrix.mul_sum (s := Finset.univ)
+        (f := fun a : Outcome => T.outcome a) (M := Xᴴ))
+  have hsum_mul :
+      (∑ a : Outcome, Xᴴ * T.outcome a) * X =
+        ∑ a : Outcome, Xᴴ * T.outcome a * X := by
+    simpa using
+      (Matrix.sum_mul (s := Finset.univ)
+        (f := fun a : Outcome => Xᴴ * T.outcome a) (M := X))
+  calc
+    (sigmaFinRangeEmbedding q.outcome qa_projective)ᴴ *
+        (sigmaFinRangeEmbedding q.outcome qa_projective)
+        = Xᴴ * X := rfl
+    _ = Xᴴ * (∑ a : Outcome, T.outcome a) * X := by
+          rw [hT_sum, Matrix.mul_one]
+    _ = (∑ a : Outcome, Xᴴ * T.outcome a) * X := by rw [hmul_sum]
+    _ = ∑ a : Outcome, Xᴴ * T.outcome a * X := hsum_mul
+    _ = ∑ a : Outcome, q.outcome a := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          simpa [X, T] using
+            (sigmaFinRangeEmbedding_qa_eq q.outcome qa_projective a).symm
+    _ = q.total := q_sum_eq_total
+
 /-- The finite-enumeration `Q` layer associated to an operator family.
 
 The auxiliary Hilbert space is the finite-enumeration model of
@@ -640,6 +693,60 @@ lemma sigmaFinCard_le_of_sum_le {Outcome : Type*} [Fintype Outcome]
   rw [Fintype.card_sigma]
   simp only [Fintype.card_fin]
   exact hm
+
+/-- If the sigma auxiliary space has dimension at most the ambient Hilbert
+space, then there is a rectangular matrix `Xhat` whose rows are orthonormal.
+
+This is the formal content of the paper's identity
+`\widehat X \widehat X^\dagger = I_m` that follows only from the rectangular
+dimension bound `m ≤ d`.  The companion mixed identity
+`X^\dagger \widehat X = √Q` is the remaining polar/SVD input. -/
+theorem exists_sigmaFin_xHat_coisometry_of_card_le
+    {Outcome : Type*} [Fintype Outcome]
+    {ι : Type*} [Fintype ι]
+    (m : Outcome → ℕ)
+    (hm : Fintype.card (FiniteHilbertSpace.sigmaFinCarrier m) ≤ Fintype.card ι) :
+    ∃ xHat : Matrix (ULift (FiniteHilbertSpace.sigmaFinCarrier m)) ι ℂ,
+      xHat * xHatᴴ =
+        (1 : MIPStarRE.Quantum.Op (ULift (FiniteHilbertSpace.sigmaFinCarrier m))) := by
+  classical
+  exact Matrix.exists_mul_conjTranspose_eq_one_of_card_le (by
+    simpa [Fintype.card_ulift] using hm)
+
+/-- The total-rank bound in `lem:projective-low-rank-sum` supplies the
+coisometry part of the paper's `Xhat` construction on the sigma auxiliary
+space. -/
+theorem exists_sigmaFin_xHat_coisometry_of_sum_le
+    {Outcome : Type*} [Fintype Outcome]
+    {ι : Type*} [Fintype ι]
+    (m : Outcome → ℕ)
+    (hm : ∑ a, m a ≤ Fintype.card ι) :
+    ∃ xHat : Matrix (ULift (FiniteHilbertSpace.sigmaFinCarrier m)) ι ℂ,
+      xHat * xHatᴴ =
+        (1 : MIPStarRE.Quantum.Op (ULift (FiniteHilbertSpace.sigmaFinCarrier m))) := by
+  exact exists_sigmaFin_xHat_coisometry_of_card_le m
+    (sigmaFinCard_le_of_sum_le (ι := ι) m hm)
+
+/-- A chosen rectangular coisometry on the sigma auxiliary space, obtained from
+the total-rank bound. -/
+noncomputable def sigmaFinXHatCoisometry
+    {Outcome : Type*} [Fintype Outcome]
+    {ι : Type*} [Fintype ι]
+    (m : Outcome → ℕ)
+    (hm : ∑ a, m a ≤ Fintype.card ι) :
+    Matrix (ULift (FiniteHilbertSpace.sigmaFinCarrier m)) ι ℂ :=
+  Classical.choose (exists_sigmaFin_xHat_coisometry_of_sum_le m hm)
+
+/-- The chosen sigma-space rectangular coisometry has orthonormal rows. -/
+lemma sigmaFinXHatCoisometry_spec
+    {Outcome : Type*} [Fintype Outcome]
+    {ι : Type*} [Fintype ι]
+    (m : Outcome → ℕ)
+    (hm : ∑ a, m a ≤ Fintype.card ι) :
+    sigmaFinXHatCoisometry (ι := ι) m hm *
+        (sigmaFinXHatCoisometry (ι := ι) m hm)ᴴ =
+      (1 : MIPStarRE.Quantum.Op (ULift (FiniteHilbertSpace.sigmaFinCarrier m))) :=
+  Classical.choose_spec (exists_sigmaFin_xHat_coisometry_of_sum_le m hm)
 
 /-- Transport a rank-reduction witness to the canonical sigma-space layer with
 the same operator family.

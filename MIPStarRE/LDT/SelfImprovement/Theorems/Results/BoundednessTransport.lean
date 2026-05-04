@@ -37,6 +37,9 @@ data-processing transport of the boundedness gap, and the standalone
 - **helper_boundedness_gap_le_selfImprovementHelperError** — combines the
   `H`-versus-`Z` scalar comparison with the off-diagonal average estimate to
   obtain the helper boundedness gap at the helper threshold.
+- **helper_boundedness_gap_le_selfImprovementHelperError_of_pointConsistencyAddInU_transfer**
+  — same conclusion, with the off-diagonal estimate supplied by the
+  point-consistency `add-in-u` transfer.
 - **helper_point_consistency_error_eq_off_diagonal_avg** — identifies the
   averaged off-diagonal mass with the helper-stage `ConsRel` defect for the
   point measurement against `polynomialEvaluationFamily`.
@@ -566,6 +569,58 @@ theorem helper_boundedness_gap_le_selfImprovementHelperError
       add_le_add hZ_vs_H hoffdiag
     _ ≤ selfImprovementHelperError params eps delta :=
       helper_boundedness_error_le_selfImprovementHelperError params eps delta heps hdelta
+
+/-- Helper-stage boundedness from the scalar comparison and the
+point-consistency `add-in-u` transfer.
+
+This wrapper composes the off-diagonal estimate supplied by
+`pointConsistencyAddInUSelection` with
+`helper_boundedness_gap_le_selfImprovementHelperError`.  It is the theorem-side
+form of the sentence "combined with the explicit `A`-consistency bound" in the
+boundedness paragraph of the self-improvement proof. -/
+theorem helper_boundedness_gap_le_selfImprovementHelperError_of_pointConsistencyAddInU_transfer
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
+    {T Hhat : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (hZ_vs_H :
+      ev strategy.state (helperUpperOperator params Z) -
+          ev strategy.state (rightTensor (ι₁ := ι) Hhat.total) ≤
+        3 * Real.sqrt delta)
+    (htransfer :
+      |addInULeftQuantity params strategy
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          Hhat
+          (pointConsistencyAddInUSelection params) -
+        addInURightQuantity params strategy
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          T
+          (pointConsistencyAddInUSelection params)| ≤ addInUError params eps delta) :
+    helperBoundednessGap params strategy Hhat Z ≤
+      selfImprovementHelperError params eps delta := by
+  have hoffdiag_addInU :
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ∑ a ∈ (Finset.univ : Finset (Fq params)).erase (h u),
+            ev strategy.state
+              (opTensor ((strategy.pointMeasurement u).outcome a)
+                (Hhat.outcome h))) ≤ addInUError params eps delta :=
+    pointConsistencyAddInU_off_diagonal_avg_le_of_transfer
+      params strategy eps delta T Hhat htransfer
+  have hoffdiag :
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ∑ a ∈ (Finset.univ : Finset (Fq params)).erase (h u),
+            ev strategy.state
+              (opTensor ((strategy.pointMeasurement u).outcome a)
+                (Hhat.outcome h))) ≤
+        4 * Real.sqrt (selfImprovementVarianceError params eps delta) := by
+    simpa [addInUError, Real.sqrt_eq_rpow] using hoffdiag_addInU
+  exact
+    helper_boundedness_gap_le_selfImprovementHelperError
+      params strategy eps delta heps hdelta hZ_vs_H hoffdiag
 
 /-- Transport the helper boundedness gap through the data-processing
 approximation between `Hhat` and `H`.
