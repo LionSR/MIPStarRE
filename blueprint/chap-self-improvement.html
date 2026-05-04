@@ -554,7 +554,7 @@
   \[  57m\cdot \Big(\varepsilon ^{1/2} + \delta ^{1/2} + (d/q)^{1/2}\Big) \le \zeta ,  \]
 </div>
 <p> which proves <a href="chap-self-improvement.html#item:self-improvement-self">3</a>. </p>
-<p><em>Proof of <a href="chap-self-improvement.html#item:self-improvement-boundedness">4</a>.</em> The formal statement  isolates the operator-monotonicity substep: once the SDP dual witness satisfies \(I \le Z\), the projective submeasurement mass is bounded by \(Z \otimes I\) with zero boundedness error. The boundedness quantity is </p>
+<p><em>Proof of <a href="chap-self-improvement.html#item:self-improvement-boundedness">4</a>.</em> The helper-stage boundedness quantity is </p>
 <div class="displaymath" id="a0000000311">
   \[  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  -\mathbb {E}_{u} \sum _a \langle \psi  \rvert  A^{u}_{a} \otimes H_{[h(u)=a]} \lvert \psi  \rangle .  \]
 </div>
@@ -1052,7 +1052,7 @@
 <div class="displaymath" id="a0000000350">
   \[  H_h \otimes I \approx _{6 \widehat{\zeta } + 6\widehat{\zeta }_{\mathrm{ortho}}} I \otimes H_h.  \]
 </div>
-<p><em>Proof of <a href="chap-self-improvement.html#item:self-improvement-projective-boundedness">4</a>.</em> The boundedness quantity is </p>
+<p><em>Proof of <a href="chap-self-improvement.html#item:self-improvement-projective-boundedness">4</a>.</em>    The boundedness quantity is </p>
 <div class="displaymath" id="a0000000351">
   \begin{align} & \langle \psi  \rvert  Z \otimes (I - H) \lvert \psi  \rangle  \notag \\ ={}&  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  - \sum _h \langle \psi  \rvert  Z \otimes H_h \lvert \psi  \rangle  \notag \\ \leq {}&  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  - \sum _h \langle \psi  \rvert  \mathbb {E}_{u} A^{u}_{h(u)} \otimes H_h \lvert \psi  \rangle  \notag \\ ={}&  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  -\mathbb {E}_{u} \sum _h \langle \psi  \rvert  A^{u}_{h(u)} \otimes H_h \lvert \psi  \rangle  \notag \\ ={}&  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  -\mathbb {E}_{u} \sum _a \langle \psi  \rvert  A^{u}_{a} \otimes H_{[h(u)=a]} \lvert \psi  \rangle . \label{eq:almost-there-self-improvement-edition} \end{align}
 </div>
@@ -1060,7 +1060,7 @@
 <div class="displaymath" id="a0000000352">
   \[  \eqref{eq:almost-there-self-improvement-edition} \le \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  -\mathbb {E}_{u} \sum _a \langle \psi  \rvert  A^{u}_{a} \otimes \widehat H_{[h(u)=a]} \lvert \psi  \rangle  + \sqrt{\widehat{\zeta }_{\mathrm{dataprocess}}},  \]
 </div>
-<p> and now <a href="chap-self-improvement.html#item:self-improvement-boundedness">4</a> of Lemma&#160;<a href="chap-self-improvement.html#lem:self-improvement-helper">7.1</a> bounds this by \(\widehat{\zeta } + \sqrt{\widehat{\zeta }_{\mathrm{dataprocess}}}\). </p>
+<p> and now <a href="chap-self-improvement.html#item:self-improvement-boundedness">4</a> of Lemma&#160;<a href="chap-self-improvement.html#lem:self-improvement-helper">7.1</a> bounds this by \(\widehat{\zeta } + \sqrt{\widehat{\zeta }_{\mathrm{dataprocess}}}\). The formal boundedness field  is the corresponding operator-monotonicity step: once the SDP dual witness satisfies \(I\le Z\), the total mass of the projective submeasurement is bounded by \(Z\otimes I\) with zero boundedness error. </p>
 <p>Thus the four conclusions hold with errors </p>
 <div class="displaymath" id="a0000000353">
   \[  2\widehat{\zeta } + 2\sqrt{\widehat{\zeta }_{\mathrm{ortho}}}, \qquad \widehat{\zeta } + \sqrt{\widehat{\zeta }_{\mathrm{dataprocess}}}, \qquad 6 \widehat{\zeta } + 6\widehat{\zeta }_{\mathrm{ortho}}, \qquad \widehat{\zeta } + \sqrt{\widehat{\zeta }_{\mathrm{dataprocess}}},  \]
