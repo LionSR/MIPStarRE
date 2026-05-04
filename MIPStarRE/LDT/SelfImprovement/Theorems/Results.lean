@@ -8,6 +8,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUDiagonalAndDefs
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUPointConsistency
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep12
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport
@@ -26,6 +27,8 @@ All original declarations remain available under the same namespace.
 - `CommonHelpers` — shared internal helpers (formerly private)
 - `HelperCompleteness` — input-consistency lower bounds, SDP bridge, `sdp`, `addInU`
 - `AddInUDiagonalAndDefs` — diagonal add-in-u specialization, Q₀–Q₄ CS chain defs
+- `AddInUPointConsistency` — off-diagonal add-in-u selection infrastructure for
+  helper `A`-consistency
 - `AddInUStep12` — algebraic alignment and raw CS Step 1/2 bounds
 - `AddInUStep34AndTransfer` — variance conversions, factored CS, assembly, transfer
 - `BoundednessTransport` — off-diagonal decomposition, boundedness gap transport,
