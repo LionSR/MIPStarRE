@@ -205,16 +205,16 @@ lemma sddRel_liftRight_of_liftLeft_permInv
   rw [hsddeq]
   exact h.squaredDistanceBound
 
-/-! ### Line-156 triangle handoff -/
+/-! ### Projective self-consistency handoff -/
 
 /-- Residual data for the projective-measurement part of Step 6.
 
 The fields are exactly the hypotheses needed after the orthonormalization and
 completion constructions have produced projective measurements `Q_A,Q_B` close to
 the pre-projective measurements `G_A,G_B`.  The theorem
-`ProjectivizationLine156Handoff.line156Approx` below turns this data into the
-paper's line-156 approximation. -/
-structure ProjectivizationLine156Handoff
+`ProjectivizationSelfConsistencyHandoff.fullPolynomialConsistency` below turns
+this data into the paper's projective-measurement consistency estimate. -/
+structure ProjectivizationSelfConsistencyHandoff
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
@@ -236,9 +236,9 @@ structure ProjectivizationLine156Handoff
       (constSubMeasFamily G_B.toSubMeas.liftRight)
       (constSubMeasFamily Q_B.toSubMeas.liftRight) ζ₂
 
-namespace ProjectivizationLine156Handoff
+namespace ProjectivizationSelfConsistencyHandoff
 
-/-- Step 6 line-156 handoff.
+/-- Projective self-consistency for the completed measurements.
 
 From line-131 consistency `G_A ⊗ I ≃_{ζ₁} I ⊗ G_B`,
 `prop:simeq-to-approx` gives `G_A ⊗ I ≈_{2ζ₁} I ⊗ G_B`.  Combining this with
@@ -249,12 +249,12 @@ triangle gives
 
 which is exactly the paper's `ζ₃ = 6ζ₁ + 6ζ₂`
 (`inductive_step.tex:154--158`). -/
-theorem line156Approx {Outcome : Type*} {ι : Type*}
+theorem fullPolynomialConsistency {Outcome : Type*} {ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     {ψ : QuantumState (ι × ι)}
     {G_A G_B : Measurement Outcome ι} {Q_A Q_B : ProjMeas Outcome ι}
     {ζ₁ ζ₂ : Error}
-    (handoff : ProjectivizationLine156Handoff ψ G_A G_B Q_A Q_B ζ₁ ζ₂) :
+    (handoff : ProjectivizationSelfConsistencyHandoff ψ G_A G_B Q_A Q_B ζ₁ ζ₂) :
     MIPStarRE.LDT.Preliminaries.BipartiteSDDRel ψ (uniformDistribution Unit)
       (constSubMeasFamily Q_A.toSubMeas)
       (constSubMeasFamily Q_B.toSubMeas)
@@ -300,7 +300,7 @@ theorem line156Approx {Outcome : Type*} {ι : Type*}
         ≤ 3 * (ζ₂ + 2 * ζ₁ + ζ₂) := htri.squaredDistanceBound
     _ = 6 * ζ₁ + 6 * ζ₂ := by ring
 
-end ProjectivizationLine156Handoff
+end ProjectivizationSelfConsistencyHandoff
 
 /-! ### Line-169 match-mass monotonicity -/
 
@@ -309,8 +309,8 @@ end ProjectivizationLine156Handoff
 The ordinary Step 6 handoff records only state-dependent-distance closeness
 `G_A ≈ Q_A` and `G_B ≈ Q_B`.  Combining those fields with
 `prop:triangle-sub` gives a `ζ₁ + sqrt ζ₂` consistency loss, as witnessed by
-`ProjectivizationLine156Handoff.leftConsistency_with_triangleSub_loss` and
-`ProjectivizationLine156Handoff.rightConsistency_with_triangleSub_loss` below.
+`ProjectivizationSelfConsistencyHandoff.leftConsistency_with_triangleSub_loss` and
+`ProjectivizationSelfConsistencyHandoff.rightConsistency_with_triangleSub_loss` below.
 The paper-tight line-169 estimate at exactly `ζ₁` therefore needs a stronger
 construction-level invariant: replacing `G_A` by `Q_A`, and symmetrically
 replacing `G_B` by `Q_B`, must not decrease the diagonal match mass against the
@@ -620,8 +620,8 @@ projective measurements `Q_A`, `Q_B` are the canonical completions of `P_A`,
 `P_B`, this lifts the preservation through the completion step.
 
 Together with `leftConsistency` and `rightConsistency`, this fills the
-`line169MatchMassMonotonicity` field of
-`MainFormalPostRolePackageLeftCompletionLine169Residual`. -/
+`completionTransportMatchMassMonotonicity` field of
+`MainFormalCascadeProjectiveCompletionTransportResidual`. -/
 theorem of_submeasurement_match_mass_and_completion
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -675,10 +675,11 @@ theorem of_completion_and_outcome_le
 
 end ProjectivizationMatchMassMonotonicity
 
-namespace ProjectivizationLine156Handoff
+namespace ProjectivizationSelfConsistencyHandoff
 
-/-- The honest Alice-side line-169 statement derivable from the existing Step 6
-handoff alone has the generic `triangleSub` loss `ζ₁ + sqrt ζ₂`.
+/-- The honest Alice-side transport statement derivable from the existing
+projectivization handoff alone has the generic `triangleSub` loss
+`ζ₁ + sqrt ζ₂`.
 
 This theorem is useful as a checked comparison point for the Step 6
 blocker: it shows exactly what the current SDD-closeness API provides without
@@ -688,7 +689,7 @@ theorem leftConsistency_with_triangleSub_loss {Outcome : Type*} {ι : Type*}
     {ψ : QuantumState (ι × ι)} (hψ : ψ.IsNormalized)
     {G_A G_B : Measurement Outcome ι} {Q_A Q_B : ProjMeas Outcome ι}
     {ζ₁ ζ₂ : Error}
-    (handoff : ProjectivizationLine156Handoff ψ G_A G_B Q_A Q_B ζ₁ ζ₂) :
+    (handoff : ProjectivizationSelfConsistencyHandoff ψ G_A G_B Q_A Q_B ζ₁ ζ₂) :
     ConsRel ψ (uniformDistribution Unit)
       (constSubMeasFamily Q_A.toSubMeas)
       (constSubMeasFamily G_B.toSubMeas)
@@ -710,7 +711,7 @@ theorem leftConsistency_with_triangleSub_loss {Outcome : Type*} {ι : Type*}
       (IdxMeas.toIdxSubMeas GRight) ζ₁ ζ₂ hAC hAB
   simpa [GLeft, GRight, QLeft, constSubMeasFamily, IdxMeas.toIdxSubMeas] using h
 
-/-- The honest Bob-side line-169 transport available from the existing Step 6
+/-- The honest Bob-side transport available from the existing projectivization
 handoff alone, before applying any permutation-symmetry flip, also incurs the
 `ζ₁ + sqrt ζ₂` `triangleSub` loss. -/
 theorem rightConsistency_with_triangleSub_loss {Outcome : Type*} {ι : Type*}
@@ -718,7 +719,7 @@ theorem rightConsistency_with_triangleSub_loss {Outcome : Type*} {ι : Type*}
     {ψ : QuantumState (ι × ι)} (hψ : ψ.IsNormalized)
     {G_A G_B : Measurement Outcome ι} {Q_A Q_B : ProjMeas Outcome ι}
     {ζ₁ ζ₂ : Error}
-    (handoff : ProjectivizationLine156Handoff ψ G_A G_B Q_A Q_B ζ₁ ζ₂) :
+    (handoff : ProjectivizationSelfConsistencyHandoff ψ G_A G_B Q_A Q_B ζ₁ ζ₂) :
     ConsRel ψ (uniformDistribution Unit)
       (constSubMeasFamily G_A.toSubMeas)
       (constSubMeasFamily Q_B.toSubMeas)
@@ -740,7 +741,7 @@ theorem rightConsistency_with_triangleSub_loss {Outcome : Type*} {ι : Type*}
       GRight QRight ζ₁ ζ₂ hAB hBD
   simpa [GLeft, GRight, QRight, constSubMeasFamily, IdxMeas.toIdxSubMeas] using h
 
-end ProjectivizationLine156Handoff
+end ProjectivizationSelfConsistencyHandoff
 
 /-! ### Output data -/
 
@@ -818,9 +819,9 @@ theorem completedCloseness_liftRight
 
 end OrthonormalizeAndCompleteStatement
 
-namespace ProjectivizationLine156Handoff
+namespace ProjectivizationSelfConsistencyHandoff
 
-/-- Build the line-156 Step 6 residual data from the two
+/-- Build the projective self-consistency handoff from the two
 orthonormalize-and-complete statements.
 
 This records the exact Step 6 producer obligations for the current
@@ -845,7 +846,7 @@ theorem ofOrthonormalizeAndCompleteStatements
     (leftStmt : OrthonormalizeAndCompleteStatement ψ G_A P_A Q_A a_A ζ)
     (rightStmt : OrthonormalizeAndCompleteStatement ψ G_B P_B Q_B a_B ζ)
     (hζ : orthonormalizeAndCompleteError ζ ≤ ζ₂) :
-    ProjectivizationLine156Handoff ψ G_A G_B Q_A Q_B ζ₁ ζ₂ := by
+    ProjectivizationSelfConsistencyHandoff ψ G_A G_B Q_A Q_B ζ₁ ζ₂ := by
   refine
     { preProjectiveConsistency := hpre
       leftCompletionCloseness := ?_
@@ -862,7 +863,7 @@ theorem ofOrthonormalizeAndCompleteStatements
       (orthonormalizeAndCompleteError ζ) ζ₂ hζ
       (rightStmt.completedCloseness_liftRight hperm)
 
-end ProjectivizationLine156Handoff
+end ProjectivizationSelfConsistencyHandoff
 
 /-! ### Main theorem -/
 

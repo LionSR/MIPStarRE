@@ -78,7 +78,7 @@
 \begin{remark}[Lean right-register completion helpers]\label{rem:lean-right-register-completion-helpers}
 	\uses{thm:orthonormalization, prop:completing-to-measurement}
 	\lean{MIPStarRE.LDT.Preliminaries.qSDDCore_rightTensor_eq_leftTensor_of_permInv, MIPStarRE.LDT.MakingMeasurementsProjective.qSDD_liftRight_eq_liftLeft_of_permInv, MIPStarRE.LDT.MakingMeasurementsProjective.sddRel_liftRight_of_liftLeft_permInv}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement.completedCloseness_liftRight, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff.ofOrthonormalizeAndCompleteStatements}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement.completedCloseness_liftRight, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.ofOrthonormalizeAndCompleteStatements}
 	The inductive-step application of the orthogonalization lemma uses
 	completion on both tensor factors.  The formal development records the
 	analytic completion statement on the left register; the shared preliminary
@@ -101,7 +101,7 @@
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation.OutcomeExpectationPreservation, MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation.of_outcome_expectation}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation.QXPLayerOutcomeExpectationPreservation, MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation.of_qxp_outcome_expectation}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.leftConsistency, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.rightConsistency}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff.leftConsistency_with_triangleSub_loss, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff.rightConsistency_with_triangleSub_loss}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.leftConsistency_with_triangleSub_loss, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.rightConsistency_with_triangleSub_loss}
 	Lean exposes the quantitative obstruction at the projectivization handoff used
 	in the inductive step.  The existing line-156 handoff gives only the generic
 	consequence of Proposition~\ref{prop:triangle-sub}: from

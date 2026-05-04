@@ -399,14 +399,14 @@
 \end{definition}
 
 \begin{definition}[Lean base-case Step~6 hypotheses for the Section~3 proof]\label{def:main-formal-step6-hypotheses}
-	\lean{MIPStarRE.LDT.Test.MainFormalStep6Hypotheses, MIPStarRE.LDT.Test.baseStep6WitnessResidual,
-		MIPStarRE.LDT.Test.MainFormalBaseBridgeHypotheses, MIPStarRE.LDT.Test.baseStep6Hypotheses_ofBaseBridge,
-		MIPStarRE.LDT.Test.baseStep6WitnessResidual_ofBaseBridge}
-	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageLine130CompletionInput.nonempty_ofLine130ConsistencyAndMatchMassPreservation,
-		MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualStep6WitnessResidual.nonempty_ofRoleResidualAndLine130InputsAndMatchMassPreservation}
+	\lean{MIPStarRE.LDT.Test.MainFormalBaseProjectiveCompletionHypotheses, MIPStarRE.LDT.Test.baseProjectiveCompletionResidual,
+		MIPStarRE.LDT.Test.MainFormalBaseBridgeHypotheses, MIPStarRE.LDT.Test.baseProjectiveCompletionHypotheses_ofBaseBridge,
+		MIPStarRE.LDT.Test.baseProjectiveCompletionResidual_ofBaseBridge}
+	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalCompletionInput.nonempty_ofDiagonalConsistencyAndMatchMassPreservation,
+		MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualProjectiveCompletionResidual.nonempty_ofRoleResidualAndDiagonalInputsAndMatchMassPreservation}
 	\leanok
 	\uses{def:main-formal-successor-boundary, thm:orthonormalization}
-	The structure \texttt{MainFormalStep6Hypotheses} bundles the still-unformalized
+	The structure \texttt{MainFormalBaseProjectiveCompletionHypotheses} bundles the still-unformalized
 	analytic hypotheses needed for the base case ($m=1$) of
 	Theorem~\ref{thm:main-formal}: orthonormalization inputs (spectral truncation
 	and locality-preserving repair witnesses), distinguished completion outcomes,
@@ -416,9 +416,9 @@
 	and used directly in the completion step, so no separate diagonal strong
 	self-consistency package remains in this bridge.  The narrowed alias
 	\texttt{MainFormalBaseBridgeHypotheses} omits the two distinguished outcomes;
-	\texttt{baseStep6Hypotheses\_ofBaseBridge} fills both with the explicit zero
-	polynomial.  The assembly theorems \texttt{baseStep6WitnessResidual} and
-	\texttt{baseStep6WitnessResidual\_ofBaseBridge} turn these hypotheses
+	\texttt{baseProjectiveCompletionHypotheses\_ofBaseBridge} fills both with the explicit zero
+	polynomial.  The assembly theorems \texttt{baseProjectiveCompletionResidual} and
+	\texttt{baseProjectiveCompletionResidual\_ofBaseBridge} turn these hypotheses
 	(together with the checked base-case role residual from
 	\texttt{MainFormalRolePackageResidual.ofBaseCase}, where the
 	\texttt{params.m = 1} hypothesis is used) into the Step~6 witness residual
@@ -641,18 +641,18 @@ assembly residual:
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveAssemblyResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveAssemblyResidual.toProjectiveStageTargets}
 \lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndCompleteError, MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndComplete, MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndCompleteError_le_absorbedZeta2}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeScalars.orthonormalizeAndCompleteError_zeta1_le_zeta2}
-\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine156Handoff.line156Approx}
+\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.fullPolynomialConsistency}
 \lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.completeAtOutcomeProj_left_matchMass_ge, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_completeAtOutcomeProj}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.projectiveEvaluationConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.pointAConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.pointBConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveHandoffResidual.toProjectiveAssemblyResidual}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveLine169HandoffResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveLine169HandoffResidual.toProjectiveHandoffResidual}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.ofLine169HandoffResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.toUnsymmetrizedPOVMTargets, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.toPreProjectiveSelfConsistency}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.projectivizationLine156Handoff, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.line156Approx, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.projectiveEvaluationConsistency}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.pointAConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.pointBConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionLine169Residual.toProjectiveStageTargets}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeRolePackagedCompletionLine169Residual, MIPStarRE.LDT.Test.MainFormalCascadeRolePackagedCompletionLine169Residual.toCompletionLine169Residual}
-\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageCompletionLine169Residual, MIPStarRE.LDT.Test.MainFormalPostRolePackageCompletionLine169Residual.toRolePackagedCompletionLine169Residual}
-\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageLeftCompletionLine169Residual, MIPStarRE.LDT.Test.MainFormalPostRolePackageLeftCompletionLine169Residual.toPostRolePackageCompletionLine169Residual}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualCompletionLine169Residual, MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualCompletionLine169Residual.toRolePackagedCompletionLine169Residual}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual, MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual.toRolePackageResidualCompletionLine169Residual}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveEvaluationHandoffResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveEvaluationHandoffResidual.toProjectiveHandoffResidual}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.ofProjectiveEvaluationHandoffResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.toUnsymmetrizedPOVMTargets, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.toPreProjectiveSelfConsistency}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.projectivizationSelfConsistencyHandoff, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.fullPolynomialConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.projectiveEvaluationConsistency}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.pointAConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.pointBConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.toProjectiveStageTargets}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeRolePackagedCompletionTransportResidual, MIPStarRE.LDT.Test.MainFormalCascadeRolePackagedCompletionTransportResidual.toCompletionTransportResidual}
+\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageCompletionTransportResidual, MIPStarRE.LDT.Test.MainFormalPostRolePackageCompletionTransportResidual.toRolePackagedCompletionTransportResidual}
+\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageLeftCompletionTransportResidual, MIPStarRE.LDT.Test.MainFormalPostRolePackageLeftCompletionTransportResidual.toPostRolePackageCompletionTransportResidual}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualCompletionTransportResidual, MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualCompletionTransportResidual.toRolePackagedCompletionTransportResidual}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual, MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual.toRolePackageResidualCompletionTransportResidual}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeTransportTargets, MIPStarRE.LDT.Test.MainFormalCascadeTransportTargets.toCascadeTargets, MIPStarRE.LDT.Test.MainFormalCascadeTargets.toNativeTargets}
 \lean{MIPStarRE.LDT.Test.MainFormalNativeTargets, MIPStarRE.LDT.Test.MainFormalNativeTargets.toMainFormal}
 They split off the vacuous branch where the theorem error is at least $1$,
@@ -695,7 +695,7 @@ projective consistency, data-processes the two polynomial line-169 $\zeta_1$
 links to the evaluated line-172 links, and proves the two native $\zeta_4$ point
 goals via \texttt{simeq-triangle-inequality}.  After the \#869 right-register
 completion transport, the remaining active residual is now the split
-\texttt{MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual}: its
+\texttt{MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual}: its
 first field is the concrete Section~6 role residual, and its post-role field asks
 only for Alice's line-146 completion closeness, Bob's left-register completion
 closeness as returned by orthonormalize-and-complete, and the construction-level
