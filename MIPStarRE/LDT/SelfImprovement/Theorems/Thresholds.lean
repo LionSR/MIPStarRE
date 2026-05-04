@@ -223,7 +223,14 @@ private theorem sum_sqrt_eq_sum_rpow_half
         Real.rpow dq (1 / (2 : Error)) := by
   simp [Real.sqrt_eq_rpow, Real.rpow_eq_pow]
 
-private theorem selfImprovementHelperError_eq
+/-- Expansion of the helper-stage self-improvement error into the square-root
+sum used in the paper.
+
+This form is often the convenient one for the helper-stage absorptions: it
+identifies `selfImprovementHelperError` with
+`100 m (√ε + √δ + √(d/q))`, rather than requiring each proof to unfold the
+definition and convert the three `rpow` terms separately. -/
+theorem selfImprovementHelperError_eq
     (params : Parameters) [FieldModel params.q] (eps delta : Error) :
     selfImprovementHelperError params eps delta =
       100 * (params.m : Error) *
@@ -232,34 +239,16 @@ private theorem selfImprovementHelperError_eq
   rw [selfImprovementHelperError,
     sum_sqrt_eq_sum_rpow_half eps delta ((params.d : Error) / (params.q : Error))]
 
-/-- The helper-stage threshold is nonnegative for nonnegative `eps` and `delta`.
+/-- The helper-stage threshold is nonnegative.
 
 This is the basic positivity fact reused by the helper-stage absorption wrappers
 and by the final-stage comparison with `selfImprovementError`. -/
 theorem selfImprovementHelperError_nonneg
     (params : Parameters) [FieldModel params.q]
-    (eps delta : Error)
-    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta) :
+    (eps delta : Error) :
     0 ≤ selfImprovementHelperError params eps delta := by
-  have hdq_nn : (0 : Error) ≤ ((params.d : Error) / (params.q : Error)) :=
-    d_q_ratio_nonneg params
-  change (0 : Error) ≤ 100 * (params.m : Error) *
-      (Real.rpow eps (1 / (2 : Error)) +
-        Real.rpow delta (1 / (2 : Error)) +
-        Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2 : Error)))
-  have hcoef_nn : (0 : Error) ≤ 100 * (params.m : Error) := by positivity
-  have hsum_nn :
-      (0 : Error) ≤ Real.rpow eps (1 / (2 : Error)) +
-          Real.rpow delta (1 / (2 : Error)) +
-          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2 : Error)) := by
-    have heps_nn : 0 ≤ Real.rpow eps (1 / (2 : Error)) := Real.rpow_nonneg heps _
-    have hdelta_nn : 0 ≤ Real.rpow delta (1 / (2 : Error)) :=
-      Real.rpow_nonneg hdelta _
-    have hdq_rpow_nn :
-        0 ≤ Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2 : Error)) :=
-      Real.rpow_nonneg hdq_nn _
-    exact add_nonneg (add_nonneg heps_nn hdelta_nn) hdq_rpow_nn
-  exact mul_nonneg hcoef_nn hsum_nn
+  rw [selfImprovementHelperError_eq]
+  positivity
 
 /-- Helper-stage point-consistency absorption (`self_improvement.tex`,
 lines 438--443).
@@ -669,7 +658,7 @@ private theorem selfImprovementOrthogonalizationError_le_four_hundred_m_powerSum
     selfImprovementOrthogonalizationError params eps delta ≤
       400 * (params.m : Error) * finalStagePowerSum params eps delta (1 / (8 : Error)) := by
   have hhelper_nn : 0 ≤ selfImprovementHelperError params eps delta :=
-    selfImprovementHelperError_nonneg params eps delta heps hdelta
+    selfImprovementHelperError_nonneg params eps delta
   have hsqrt_helper :=
     sqrt_selfImprovementHelperError_le_ten_m_powerSum_quarter params eps delta heps hdelta
   have hsqrt_mS :
@@ -1053,7 +1042,7 @@ theorem selfImprovementHelperError_le_selfImprovementError
     thirty_selfImprovementHelperError_le_selfImprovementError params eps delta
       heps heps_le_one hdelta hdelta_le_one hd_le_q
   have hhelper_nn : 0 ≤ selfImprovementHelperError params eps delta :=
-    selfImprovementHelperError_nonneg params eps delta heps hdelta
+    selfImprovementHelperError_nonneg params eps delta
   linarith
 
 end MIPStarRE.LDT.SelfImprovement
