@@ -10,11 +10,12 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUDiagonalAndDefs
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep12
 
 /-!
-# Add-in-u variance-bound conversions, factored Q₃→Q₄ CS, assembly and transfer
+# Add-in-u variance-bound conversions, factored Step 3/4 CS, assembly and transfer
 
 Variance-bound conversions for Q₂→Q₃ / Q₃→Q₄, the factored
-`add_in_u_cs_chain_q3_q4_factored_cs` Cauchy–Schwarz lemma with
-self-energy factor bound, the four-step chain assembly, arithmetic
+`add_in_u_cs_chain_q2_q3_factored_cs` and
+`add_in_u_cs_chain_q3_q4_factored_cs` Cauchy–Schwarz lemmas, the
+available Q₃→Q₄ self-energy factor bound, the four-step chain assembly, arithmetic
 absorption `2√(2δ) + 2√ζ ≤ 4√ζ`, and the projection-simplified
 diagonal transfer.
 
@@ -22,9 +23,9 @@ diagonal transfer.
 
 - **Variance-bound conversions** — `add_in_u_cs_chain_q2_q3_abs_le_sqrt_of_sq_le`,
   `_le_sqrt_of_factor_bounds`, and the Q₃→Q₄ analogues.
-- **add_in_u_cs_chain_q3_q4_factored_cs** — the factored CS lemma
-  `|Q₃−Q₄| ≤ √D₁ · √D₂` with `D₁` bounded by summed
-  `globalVarianceDeviationAtPolynomial`.
+- **add_in_u_cs_chain_q2_q3_factored_cs** and
+  **add_in_u_cs_chain_q3_q4_factored_cs** — the factored CS lemmas
+  `|Q₂−Q₃| ≤ √D₁ · √D₂` and `|Q₃−Q₄| ≤ √D₁ · √D₂`.
 - **add_in_u_cs_chain_q3_q4_self_energy_factor_le_one** — the
   `D₁ ≤ 1` self-energy factor for the Q₃→Q₄ factored CS path.
 - **GlobalVariance endpoint bridges** —
@@ -189,6 +190,114 @@ lemma add_in_u_cs_chain_q3_q4_le_sqrt_of_factor_bounds
             (∑ g : Polynomial params,
               globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
           hsqrt_D₂
+
+/-- Factored operator Cauchy--Schwarz bound for the `Q₂ → Q₃` add-in-`u` step.
+
+Applies the bipartite-tensor sandwich Cauchy--Schwarz primitive
+`ev_opTensor_sandwich_abs_le_sqrt` at each `(u, v, h)` and lifts the pointwise
+estimate through the avgOver-finset Cauchy--Schwarz inequality. The two factors
+are the variance term
+`(A^v_{h(v)} - A^u_{h(u)}) · H^u_h · (A^v_{h(v)} - A^u_{h(u)})`
+and the self-energy term `A^v_{h(v)} · H^u_h · A^v_{h(v)}`.
+
+This is the operator Cauchy--Schwarz part of `eq:change-one-cauchy-schwarz` in
+`references/ldt-paper/self_improvement.tex`, lines 306--311. It does not yet
+identify the first factor with the summed global-variance deviation, nor bound
+the second factor by `1`; those are the remaining estimates needed to feed
+`add_in_u_cs_chain_q2_q3_le_sqrt_of_factor_bounds`. -/
+theorem add_in_u_cs_chain_q2_q3_factored_cs
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    |addInUCSChainQ2 params strategy T - addInUCSChainQ3 params strategy T| ≤
+      Real.sqrt
+        (avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+          ∑ h : Polynomial params,
+            let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1
+            let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+            let Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+            ev strategy.state
+              (opTensor ((Av - Au) * Mh * (Av - Au)) (T.outcome h)))) *
+      Real.sqrt
+        (avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+          ∑ h : Polynomial params,
+            let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+            let Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+            ev strategy.state
+              (opTensor (Av * Mh * Av) (T.outcome h)))) := by
+  classical
+  rw [addInU_cs_chain_step3_diff_eq params strategy T]
+  refine MIPStarRE.LDT.Preliminaries.weightedFinsetCauchySchwarz
+    (Question := Point params × Point params) (Outcome := Polynomial params)
+    (uniformDistribution (Point params × Point params))
+    (t := fun uv h =>
+      let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1
+      let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+      let Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+      ev strategy.state (opTensor ((Av - Au) * Mh * Av) (T.outcome h)))
+    (x := fun uv h =>
+      let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1
+      let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+      let Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+      ev strategy.state
+        (opTensor ((Av - Au) * Mh * (Av - Au)) (T.outcome h)))
+    (y := fun uv h =>
+      let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+      let Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+      ev strategy.state (opTensor (Av * Mh * Av) (T.outcome h))) ?_ ?_ ?_
+  · -- Pointwise CS bound at each `(u, v, h)`.
+    intro uv h
+    set Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1
+    set Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+    set Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+    have hMh_pos : 0 ≤ Mh :=
+      (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome_pos h
+    have hTh_pos : 0 ≤ T.outcome h := T.outcome_pos h
+    have hAu_herm : Auᴴ = Au :=
+      SubMeas.outcome_hermitian (strategy.pointMeasurement uv.1).toSubMeas (h uv.1)
+    have hAv_herm : Avᴴ = Av :=
+      SubMeas.outcome_hermitian (strategy.pointMeasurement uv.2).toSubMeas (h uv.2)
+    have hX_herm : (Av - Au)ᴴ = Av - Au := by
+      rw [Matrix.conjTranspose_sub, hAu_herm, hAv_herm]
+    have hsandwich :=
+      ev_opTensor_sandwich_abs_le_sqrt strategy.state (Av - Au) Av Mh
+        (T.outcome h) hMh_pos hTh_pos
+    simp only [hX_herm, hAv_herm] at hsandwich
+    exact hsandwich
+  · -- `0 ≤ x uv h`: the variance-style diagonal expectation is nonnegative.
+    intro uv h
+    set Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1
+    set Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+    set Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+    have hMh_pos : 0 ≤ Mh :=
+      (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome_pos h
+    have hTh_pos : 0 ≤ T.outcome h := T.outcome_pos h
+    have hAu_herm : Auᴴ = Au :=
+      SubMeas.outcome_hermitian (strategy.pointMeasurement uv.1).toSubMeas (h uv.1)
+    have hAv_herm : Avᴴ = Av :=
+      SubMeas.outcome_hermitian (strategy.pointMeasurement uv.2).toSubMeas (h uv.2)
+    have hX_herm : (Av - Au)ᴴ = Av - Au := by
+      rw [Matrix.conjTranspose_sub, hAu_herm, hAv_herm]
+    have hXMhX_pos : 0 ≤ (Av - Au) * Mh * (Av - Au) := by
+      have :=
+        ((Matrix.nonneg_iff_posSemidef.mp hMh_pos).conjTranspose_mul_mul_same
+          (Av - Au)).nonneg
+      rwa [hX_herm] at this
+    exact ev_nonneg_of_psd strategy.state _ (opTensor_nonneg hXMhX_pos hTh_pos)
+  · -- `0 ≤ y uv h`: the self-energy expectation is nonnegative.
+    intro uv h
+    set Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+    set Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+    have hMh_pos : 0 ≤ Mh :=
+      (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome_pos h
+    have hTh_pos : 0 ≤ T.outcome h := T.outcome_pos h
+    have hAv_herm : Avᴴ = Av :=
+      SubMeas.outcome_hermitian (strategy.pointMeasurement uv.2).toSubMeas (h uv.2)
+    have hAvMhAv_pos : 0 ≤ Av * Mh * Av := by
+      have :=
+        ((Matrix.nonneg_iff_posSemidef.mp hMh_pos).conjTranspose_mul_mul_same Av).nonneg
+      rwa [hAv_herm] at this
+    exact ev_nonneg_of_psd strategy.state _ (opTensor_nonneg hAvMhAv_pos hTh_pos)
 
 /-- Factored operator Cauchy–Schwarz bound for the `Q₃ → Q₄` add-in-`u` step.
 
