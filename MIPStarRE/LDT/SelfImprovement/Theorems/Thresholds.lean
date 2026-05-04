@@ -246,21 +246,16 @@ and by the final-stage comparison with `selfImprovementError`. -/
 theorem selfImprovementHelperError_nonneg
     (params : Parameters) [FieldModel params.q]
     (eps delta : Error)
-    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta) :
+    (_heps : 0 ≤ eps) (_hdelta : 0 ≤ delta) :
     0 ≤ selfImprovementHelperError params eps delta := by
-  have hdq_nn : (0 : Error) ≤ ((params.d : Error) / (params.q : Error)) :=
-    d_q_ratio_nonneg params
   rw [selfImprovementHelperError_eq]
   have hcoef_nn : (0 : Error) ≤ 100 * (params.m : Error) := by positivity
   have heps_sqrt_nn : (0 : Error) ≤ Real.sqrt eps := by
-    have _ : (0 : Error) ≤ eps := heps
     exact Real.sqrt_nonneg eps
   have hdelta_sqrt_nn : (0 : Error) ≤ Real.sqrt delta := by
-    have _ : (0 : Error) ≤ delta := hdelta
     exact Real.sqrt_nonneg delta
   have hdq_sqrt_nn :
       (0 : Error) ≤ Real.sqrt ((params.d : Error) / (params.q : Error)) := by
-    have _ : (0 : Error) ≤ ((params.d : Error) / (params.q : Error)) := hdq_nn
     exact Real.sqrt_nonneg _
   have hsum_nn :
       (0 : Error) ≤ Real.sqrt eps + Real.sqrt delta +
