@@ -497,6 +497,48 @@ lemma sigmaFinRangeEmbedding_qa_eq {Outcome : Type uOutcome}
     ProjMeas.transport, Measurement.transport, SubMeas.transport, Matrix.mul_apply,
     Matrix.conjTranspose_apply, Matrix.diagonal_apply] using hsum.symm
 
+/-- Assemble `QXPLayerData` from the canonical sigma-space embedding and the
+remaining SVD/polar identities for `Xhat`.
+
+The matrix `X` and the auxiliary projective measurement are fixed to be the
+finite-enumeration sigma construction associated to the projective family `q`.
+Thus the hypothesis `Q_a = X† T_a X` required by
+`QXPLayerData.ofQLayerAndSvdIdentities` is supplied by
+`sigmaFinRangeEmbedding_qa_eq`; only the coisometry and mixed-square-root
+identities for `Xhat` remain as inputs. -/
+noncomputable def QXPLayerData.ofSigmaRangeAndSvdIdentities
+    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (q : OpFamily Outcome ι)
+    (qa_projective : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (q.outcome a))
+    (q_sum_eq_total : ∑ a : Outcome, q.outcome a = q.total)
+    [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (q.outcome a).rank))]
+    (xHat : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (q.outcome a).rank))) ι ℂ)
+    (xHat_coisometry : xHat * xHatᴴ =
+      (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
+        (fun a : Outcome => (q.outcome a).rank)))))
+    (xHat_mixed : (sigmaFinRangeEmbedding q.outcome qa_projective)ᴴ * xHat =
+      CFC.sqrt q.total) :
+    QXPLayerData Outcome ι := by
+  classical
+  let auxSpace : FiniteHilbertSpace.{uι} :=
+    FiniteHilbertSpace.sigmaFin (fun a : Outcome => (q.outcome a).rank)
+  let qLayer : QLayerData Outcome ι :=
+    { auxSpace := auxSpace
+      q := q
+      t := sigmaFinProjMeas (fun a : Outcome => (q.outcome a).rank) }
+  exact QXPLayerData.ofQLayerAndSvdIdentities qLayer qa_projective
+    (by simpa [qLayer, Qa, QTotal] using q_sum_eq_total)
+    (sigmaFinRangeEmbedding q.outcome qa_projective) xHat
+    (by
+      intro a
+      simpa [qLayer, auxSpace, Ta] using
+        sigmaFinRangeEmbedding_qa_eq q.outcome qa_projective a)
+    (by simpa [auxSpace] using xHat_coisometry)
+    (by simpa [qLayer, QTotal] using xHat_mixed)
+
 /-- A one-point projective measurement concentrating all mass on the chosen outcome. -/
 private noncomputable def pointProjMeas {Outcome : Type uOutcome}
     [Fintype Outcome] [DecidableEq Outcome]
