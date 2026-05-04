@@ -1517,6 +1517,19 @@ theorem zeta4_le_mainFormalError {params : Parameters} {eps : Error} {k : ℕ}
     scalars.zeta4 ≤ mainFormalError params k eps :=
   (cascadeBounds scalars).2.2.2.2
 
+/-- Step 8 absorption for the repaired line-169 point-transport error
+`2σ + 2√(ζ₁ + 10ζ₁^{1/8} + ζ₃/2)`. -/
+theorem repairedLine169PointError_le_mainFormalError
+    {params : Parameters} {eps : Error} {k : ℕ}
+    (scalars : MainFormalCascadeScalars params eps k) :
+    2 * scalars.sigma +
+        2 * Real.sqrt
+          (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error)) +
+            scalars.zeta3 / 2) ≤
+      mainFormalError params k eps := by
+  exact repairedLine169PointError_bound scalars.cascadeHypotheses
+    scalars.inductionNu_nonneg scalars.inductionNu_bound rfl rfl rfl rfl
+
 /-- Step 8 absorption for the native `ζ₃/2` self-consistency target. -/
 theorem zeta3_div_two_le_mainFormalError {params : Parameters} {eps : Error} {k : ℕ}
     (scalars : MainFormalCascadeScalars params eps k) :
@@ -3003,6 +3016,124 @@ private theorem projectiveEvaluationConsistency_ofLine156
       leftConst rightConst (ζ₃ / 2) happrox
   simpa [leftConst, rightConst, constSubMeasFamily, IdxProjMeas.toIdxSubMeas]
     using consRel_constPolynomialEvaluation ψ Q_A.toMeasurement Q_B.toMeasurement hcons
+
+/-- Point-goal transport from the repaired polynomial line-169 estimate.
+
+Compared with the paper's exact line-169 `\zeta_1` link, this uses the checked
+local repair `\zeta_1 + 10 \zeta_1^{1/8}` and then weakens the resulting point
+error directly to `mainFormalError`. -/
+private theorem pointAConsistency_of_repairedLine169
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (roleMeasurement : Measurement (Polynomial params) (Role × ι))
+    (leftMeasurement rightMeasurement : ProjMeas (Polynomial params) ι)
+    (hAB : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (polynomialEvaluationFamily params (unsymmetrizedRightPOVM roleMeasurement).toSubMeas)
+      (2 * scalars.sigma))
+    (hCB : ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params leftMeasurement.toSubMeas)
+      (polynomialEvaluationFamily params (unsymmetrizedRightPOVM roleMeasurement).toSubMeas)
+      (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error))))
+    (hCD : ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params leftMeasurement.toSubMeas)
+      (polynomialEvaluationFamily params rightMeasurement.toSubMeas)
+      (scalars.zeta3 / 2)) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (polynomialEvaluationFamily params rightMeasurement.toSubMeas)
+      (mainFormalError params k eps) := by
+  let pointA : IdxMeas (Point params) (Fq params) ι :=
+    IdxProjMeas.toIdxMeas strategy.pointMeasurementA
+  let rightG : IdxMeas (Point params) (Fq params) ι :=
+    polynomialEvaluationMeasurementFamily params (unsymmetrizedRightPOVM roleMeasurement)
+  let leftQ : IdxMeas (Point params) (Fq params) ι :=
+    polynomialEvaluationMeasurementFamily params leftMeasurement.toMeasurement
+  let rightQ : IdxMeas (Point params) (Fq params) ι :=
+    polynomialEvaluationMeasurementFamily params rightMeasurement.toMeasurement
+  have htriangle :=
+    Preliminaries.simeqTriangleInequality strategy.state
+      (uniformDistribution (Point params)) strategy.isNormalized
+      (uniformDistribution_weight_sum_le_one (Point params))
+      pointA rightG leftQ rightQ
+      (2 * scalars.sigma)
+      (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error)))
+      (scalars.zeta3 / 2)
+      (by simpa [pointA, rightG, polynomialEvaluationMeasurementFamily] using hAB)
+      (by simpa [leftQ, rightG, polynomialEvaluationMeasurementFamily] using hCB)
+      (by simpa [leftQ, rightQ, polynomialEvaluationMeasurementFamily] using hCD)
+  exact ConsRel.mono
+    (MainFormalCascadeScalars.repairedLine169PointError_le_mainFormalError scalars)
+    (by simpa [pointA, rightG, leftQ, rightQ, polynomialEvaluationMeasurementFamily,
+      add_assoc, add_left_comm, add_comm] using htriangle)
+
+/-- Bob-side mirror of `pointAConsistency_of_repairedLine169`. -/
+private theorem pointBConsistency_of_repairedLine169
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (roleMeasurement : Measurement (Polynomial params) (Role × ι))
+    (leftMeasurement rightMeasurement : ProjMeas (Polynomial params) ι)
+    (hAB : ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params (unsymmetrizedLeftPOVM roleMeasurement).toSubMeas)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+      (2 * scalars.sigma))
+    (hCB : ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params rightMeasurement.toSubMeas)
+      (polynomialEvaluationFamily params (unsymmetrizedLeftPOVM roleMeasurement).toSubMeas)
+      (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error))))
+    (hCD : ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params leftMeasurement.toSubMeas)
+      (polynomialEvaluationFamily params rightMeasurement.toSubMeas)
+      (scalars.zeta3 / 2)) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params leftMeasurement.toSubMeas)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+      (mainFormalError params k eps) := by
+  let pointB : IdxMeas (Point params) (Fq params) ι :=
+    IdxProjMeas.toIdxMeas strategy.pointMeasurementB
+  let leftG : IdxMeas (Point params) (Fq params) ι :=
+    polynomialEvaluationMeasurementFamily params (unsymmetrizedLeftPOVM roleMeasurement)
+  let rightQ : IdxMeas (Point params) (Fq params) ι :=
+    polynomialEvaluationMeasurementFamily params rightMeasurement.toMeasurement
+  let leftQ : IdxMeas (Point params) (Fq params) ι :=
+    polynomialEvaluationMeasurementFamily params leftMeasurement.toMeasurement
+  have hAB' : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxMeas.toIdxSubMeas pointB) (IdxMeas.toIdxSubMeas leftG) (2 * scalars.sigma) := by
+    exact consRel_symm_of_density_fixed strategy.state strategy.densityFixed
+      (uniformDistribution (Point params)) (IdxMeas.toIdxSubMeas leftG)
+      (IdxMeas.toIdxSubMeas pointB) (2 * scalars.sigma)
+      (by simpa [pointB, leftG, polynomialEvaluationMeasurementFamily] using hAB)
+  have hCD' : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxMeas.toIdxSubMeas rightQ) (IdxMeas.toIdxSubMeas leftQ) (scalars.zeta3 / 2) := by
+    exact consRel_symm_of_density_fixed strategy.state strategy.densityFixed
+      (uniformDistribution (Point params)) (IdxMeas.toIdxSubMeas leftQ)
+      (IdxMeas.toIdxSubMeas rightQ) (scalars.zeta3 / 2)
+      (by simpa [leftQ, rightQ, polynomialEvaluationMeasurementFamily] using hCD)
+  have htriangle :=
+    Preliminaries.simeqTriangleInequality strategy.state
+      (uniformDistribution (Point params)) strategy.isNormalized
+      (uniformDistribution_weight_sum_le_one (Point params))
+      pointB leftG rightQ leftQ
+      (2 * scalars.sigma)
+      (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error)))
+      (scalars.zeta3 / 2)
+      hAB'
+      (by simpa [rightQ, leftG, polynomialEvaluationMeasurementFamily] using hCB)
+      hCD'
+  have htarget : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxMeas.toIdxSubMeas pointB) (IdxMeas.toIdxSubMeas leftQ)
+      (mainFormalError params k eps) :=
+    ConsRel.mono
+      (MainFormalCascadeScalars.repairedLine169PointError_le_mainFormalError scalars)
+      (by simpa [pointB, leftG, rightQ, leftQ, polynomialEvaluationMeasurementFamily,
+        add_assoc, add_left_comm, add_comm] using htriangle)
+  exact consRel_symm_of_density_fixed strategy.state strategy.densityFixed
+    (uniformDistribution (Point params)) (IdxMeas.toIdxSubMeas pointB)
+    (IdxMeas.toIdxSubMeas leftQ) (mainFormalError params k eps) htarget
 
 /-- Residual after wiring the merged Step 3 and line-156 projectivization packages.
 
@@ -4627,7 +4758,64 @@ theorem nonempty_ofLine130Inputs
     leftCloseness := hP_A
     rightCloseness := hP_B }⟩
 
+/-- Repaired Alice-side polynomial line-169 transport from the line-130
+orthonormalization residual.
+
+This uses the checked pre-completion replacement theorem from
+`ProjectivizationLine169Repair`: the orthonormalized submeasurement is compared
+to the source POVM before completion, so the additive loss is only
+`10 * ζ₁^(1/8)`. -/
+theorem leftPolynomialConsistency_with_orthonormalization_loss
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
+    (orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
+      params strategy eps k scalars rolePackage)
+    (a_A : Polynomial params)
+    (hpre : ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+      (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+      scalars.zeta1) :
+    ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily (Preliminaries.completeAtOutcomeProj orthResidual.P_A a_A).toSubMeas)
+      (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+      (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error))) := by
+  have hraw :=
+    (open MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair in
+      leftConsistency_with_orthonormalization_loss
+        strategy.state strategy.isNormalized orthResidual.P_A a_A hpre orthResidual.leftCloseness)
+  simpa using hraw
+
+/-- Repaired Bob-side polynomial line-169 transport from the line-130
+orthonormalization residual. -/
+theorem rightPolynomialConsistency_with_orthonormalization_loss
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
+    (orthResidual : MainFormalPostRolePackageLine130OrthonormalizationResidual
+      params strategy eps k scalars rolePackage)
+    (a_B : Polynomial params)
+    (hpre : ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+      (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+      scalars.zeta1) :
+    ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily (Preliminaries.completeAtOutcomeProj orthResidual.P_B a_B).toSubMeas)
+      (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+      (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error))) := by
+  have hraw :=
+    (open MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair in
+      rightConsistency_with_orthonormalization_loss
+        strategy.state strategy.isNormalized orthResidual.P_B a_B hpre orthResidual.rightCloseness)
+  simpa using hraw
+
 end MainFormalPostRolePackageLine130OrthonormalizationResidual
+
+open MainFormalPostRolePackageLine130OrthonormalizationResidual
 
 /-- Post-orthonormalization Step 6 residual that keeps the line-130 provenance
 for `P^A,P^B` and exposes only the completion and match-mass obligations still
@@ -5944,6 +6132,256 @@ theorem baseStep6WitnessResidual_ofBaseBridge
     (baseStep6Hypotheses_ofBaseBridge bridge)
 
 
+/-- Narrowed repaired base-case bridge for Step 6 when `params.m = 1`.
+
+This removes the exact line-169 match-mass preservation fields from the base
+bridge.  The repaired pre-completion route needs only the line-130
+orthonormalization inputs and a diagonal consistency input for the completion
+theorem on the two unsymmetrized role-block POVMs. -/
+structure MainFormalBaseRepairedBridgeHypotheses
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (scalars : MainFormalCascadeScalars params eps k)
+    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) where
+  /-- Line-130 orthonormalization inputs: spectral-truncation and locality-preserving
+  repair witnesses for both unsymmetrized POVMs. -/
+  orthonormalizationInput :
+    MainFormalPostRolePackageLine130OrthonormalizationInput
+      params strategy eps k scalars (roleResidual.rolePackage scalars)
+  /-- Diagonal line-130 consistency for the two unsymmetrized role POVMs, used to
+  invoke the completion theorem without the exact match-mass route. -/
+  diagonalConsistency :
+    MainFormalPostRolePackageLine130DiagonalConsistencyInput
+      params strategy eps k scalars (roleResidual.rolePackage scalars)
+
+/-- Generic repaired Step-6 bridge over an already constructed role residual.
+
+This is the successor-ready form of the base repaired bridge: once the concrete
+Section 6 `roleResidual` is in hand, the remaining line-130 orthonormalization
+and diagonal-completion inputs suffice to finish the repaired Step-6 assembly. -/
+abbrev MainFormalRepairedBridgeHypotheses
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (scalars : MainFormalCascadeScalars params eps k)
+    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) :
+    Type _ :=
+  MainFormalBaseRepairedBridgeHypotheses params strategy eps k hpass scalars roleResidual
+
+/-- Base-case assembly of `mainFormal` through the repaired line-169 route.
+
+Starting from the checked base-role residual, this theorem runs the line-130
+orthonormalization wrapper, completes the resulting projective submeasurements
+using the diagonal consistency input, derives the repaired polynomial line-169
+transport with loss `10 * ζ₁^(1/8)`, and then proves the final point and
+self-consistency goals directly at `mainFormalError`. -/
+theorem baseMainFormal_ofRepairedBaseBridge
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
+    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
+    (bridge : MainFormalBaseRepairedBridgeHypotheses params strategy eps k hpass
+      scalars roleResidual) :
+    ∃ G_A G_B : ProjMeas (Polynomial params) ι,
+      ConsRel strategy.state (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+          (polynomialEvaluationFamily params G_B.toSubMeas)
+          (mainFormalError params k eps) ∧
+        ConsRel strategy.state (uniformDistribution (Point params))
+          (polynomialEvaluationFamily params G_A.toSubMeas)
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+          (mainFormalError params k eps) ∧
+        ConsRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily G_A.toSubMeas)
+          (constSubMeasFamily G_B.toSubMeas)
+          (mainFormalError params k eps) := by
+  let rolePackage := roleResidual.rolePackage scalars
+  let unsym := rolePackage.toUnsymmetrizationBridge
+  have hpre : ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+      (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+      scalars.zeta1 := by
+    simpa [rolePackage] using roleResidual.line130Consistency scalars
+  rcases MainFormalPostRolePackageLine130OrthonormalizationResidual.nonempty_ofLine130Inputs
+      hsmall hpre bridge.orthonormalizationInput with ⟨orthResidual⟩
+  let a0 : Polynomial params :=
+    { poly := 0
+      lowIndividualDegree := by intro i; simp [MvPolynomial.degreeOf_zero] }
+  let diagonalSSC : MainFormalPostRolePackageLine130DiagonalSSCInput
+      params strategy eps k scalars rolePackage :=
+    MainFormalPostRolePackageLine130DiagonalSSCInput.ofDiagonalConsistency
+      bridge.diagonalConsistency
+  obtain ⟨C_A, hC_A, hC_Astmt⟩ :=
+    Preliminaries.completingToMeasurement
+      (Outcome := Polynomial params) (ι := ι) strategy.state strategy.permInvState
+      strategy.isNormalized (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
+      orthResidual.P_A.toSubMeas a0
+      (MakingMeasurementsProjective.orthonormalizationError scalars.zeta1)
+      scalars.zeta1 diagonalSSC.leftSelfConsistency orthResidual.leftCloseness
+  obtain ⟨C_B, hC_B, hC_Bstmt⟩ :=
+    Preliminaries.completingToMeasurement
+      (Outcome := Polynomial params) (ι := ι) strategy.state strategy.permInvState
+      strategy.isNormalized (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
+      orthResidual.P_B.toSubMeas a0
+      (MakingMeasurementsProjective.orthonormalizationError scalars.zeta1)
+      scalars.zeta1 diagonalSSC.rightSelfConsistency orthResidual.rightCloseness
+  let Q_A : ProjMeas (Polynomial params) ι :=
+    Preliminaries.completeAtOutcomeProj orthResidual.P_A a0
+  let Q_B : ProjMeas (Polynomial params) ι :=
+    Preliminaries.completeAtOutcomeProj orthResidual.P_B a0
+  have leftCompletedCloseness :
+      SDDRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas.liftLeft)
+        (constSubMeasFamily Q_A.toSubMeas.liftLeft)
+        (MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1) := by
+    simpa [Q_A, MakingMeasurementsProjective.orthonormalizeAndCompleteError, hC_A] using
+      hC_Astmt.closenessAfterCompletion
+  have rightCompletedClosenessLeft :
+      SDDRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas.liftLeft)
+        (constSubMeasFamily Q_B.toSubMeas.liftLeft)
+        (MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1) := by
+    simpa [Q_B, MakingMeasurementsProjective.orthonormalizeAndCompleteError, hC_B] using
+      hC_Bstmt.closenessAfterCompletion
+  have leftStmt : MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement
+      strategy.state (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
+      orthResidual.P_A Q_A a0 scalars.zeta1 := by
+    exact
+      { orthonormalizationCloseness := orthResidual.leftCloseness
+        completedCloseness := leftCompletedCloseness }
+  have rightStmt : MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement
+      strategy.state (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
+      orthResidual.P_B Q_B a0 scalars.zeta1 := by
+    exact
+      { orthonormalizationCloseness := orthResidual.rightCloseness
+        completedCloseness := rightCompletedClosenessLeft }
+  have hζ2 : MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1 ≤
+      scalars.zeta2 :=
+    MainFormalCascadeScalars.orthonormalizeAndCompleteError_zeta1_le_zeta2 scalars hsmall
+  have hline156Handoff :=
+    (open MakingMeasurementsProjective.ProjectivizationLine156Handoff in
+      ofOrthonormalizeAndCompleteStatements strategy.permInvState hpre leftStmt rightStmt hζ2)
+  have hline156 : Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily Q_A.toSubMeas)
+      (constSubMeasFamily Q_B.toSubMeas)
+      scalars.zeta3 := by
+    simpa [Q_A, Q_B, MainFormalCascadeScalars.zeta3, cascadeZeta3] using
+      MakingMeasurementsProjective.ProjectivizationLine156Handoff.line156Approx hline156Handoff
+  have hself : ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily Q_A.toSubMeas)
+      (constSubMeasFamily Q_B.toSubMeas)
+      (scalars.zeta3 / 2) := by
+    let leftConst : IdxProjMeas Unit (Polynomial params) ι := fun _ => Q_A
+    let rightConst : IdxProjMeas Unit (Polynomial params) ι := fun _ => Q_B
+    have happrox : Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
+        (IdxProjMeas.toIdxSubMeas leftConst)
+        (IdxProjMeas.toIdxSubMeas rightConst)
+        (2 * (scalars.zeta3 / 2)) := by
+      change Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily Q_A.toSubMeas) (constSubMeasFamily Q_B.toSubMeas)
+        (2 * (scalars.zeta3 / 2))
+      convert hline156 using 1
+      ring
+    have hcons :=
+      Preliminaries.approxToSimeq strategy.state (uniformDistribution Unit)
+        leftConst rightConst (scalars.zeta3 / 2) happrox
+    simpa [Q_A, Q_B, leftConst, rightConst, constSubMeasFamily, IdxProjMeas.toIdxSubMeas]
+      using hcons
+  have hleftPoly : ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily Q_A.toSubMeas)
+      (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+      (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error))) := by
+    simpa [Q_A] using
+      leftPolynomialConsistency_with_orthonormalization_loss orthResidual a0 hpre
+  have hrightPre : ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+      (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+      scalars.zeta1 :=
+    consRel_symm_of_density_fixed strategy.state strategy.densityFixed
+      (uniformDistribution Unit)
+      (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+      (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+      scalars.zeta1 hpre
+  have hrightPoly : ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily Q_B.toSubMeas)
+      (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+      (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error))) := by
+    simpa [Q_B] using
+      rightPolynomialConsistency_with_orthonormalization_loss orthResidual a0 hrightPre
+  have hprojEval : ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params Q_A.toSubMeas)
+      (polynomialEvaluationFamily params Q_B.toSubMeas)
+      (scalars.zeta3 / 2) := by
+    simpa [Q_A, Q_B] using projectiveEvaluationConsistency_ofLine156 Q_A Q_B hline156
+  have hleftEval : ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params Q_A.toSubMeas)
+      (polynomialEvaluationFamily params
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+      (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error))) := by
+    simpa [Q_A] using
+      consRel_constPolynomialEvaluation strategy.state Q_A.toMeasurement
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement) hleftPoly
+  have hrightEval : ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params Q_B.toSubMeas)
+      (polynomialEvaluationFamily params
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+      (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error))) := by
+    simpa [Q_B] using
+      consRel_constPolynomialEvaluation strategy.state Q_B.toMeasurement
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement) hrightPoly
+  have hpointA : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (polynomialEvaluationFamily params Q_B.toSubMeas)
+      (mainFormalError params k eps) :=
+    pointAConsistency_of_repairedLine169 rolePackage.roleMeasurement Q_A Q_B
+      unsym.pointAConsistency hleftEval hprojEval
+  have hpointB : ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params Q_A.toSubMeas)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+      (mainFormalError params k eps) :=
+    pointBConsistency_of_repairedLine169 rolePackage.roleMeasurement Q_A Q_B
+      unsym.pointBConsistency hrightEval hprojEval
+  exact ⟨Q_A, Q_B, hpointA, hpointB,
+    ConsRel.mono (MainFormalCascadeScalars.zeta3_div_two_le_mainFormalError scalars) hself⟩
+
+/-- Generic repaired Step-6 assembly once the concrete role residual is known.
+
+This is mathematically identical to `baseMainFormal_ofRepairedBaseBridge`; the
+name records that the theorem is not specific to `m = 1`.  The base branch of
+`mainFormal` and the future successor branch should both factor through this
+interface. -/
+theorem mainFormal_ofRoleResidualAndRepairedBridge
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
+    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
+    (bridge : MainFormalRepairedBridgeHypotheses params strategy eps k hpass
+      scalars roleResidual) :
+    ∃ G_A G_B : ProjMeas (Polynomial params) ι,
+      ConsRel strategy.state (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+          (polynomialEvaluationFamily params G_B.toSubMeas)
+          (mainFormalError params k eps) ∧
+        ConsRel strategy.state (uniformDistribution (Point params))
+          (polynomialEvaluationFamily params G_A.toSubMeas)
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+          (mainFormalError params k eps) ∧
+        ConsRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily G_A.toSubMeas)
+          (constSubMeasFamily G_B.toSubMeas)
+          (mainFormalError params k eps) :=
+  baseMainFormal_ofRepairedBaseBridge hsmall roleResidual bridge
+
+
 
 
 /--
@@ -5988,7 +6426,7 @@ This is a current Lean API limitation, not a paper constraint; once the Section 
 wrapper is universe-polymorphic, this public theorem should be generalized as
 well.
 
-Fixes #137, #239, #906.
+Fixes #137, #239, #906, #1099.
 -/
 theorem mainFormal
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -6001,7 +6439,7 @@ theorem mainFormal
     (hk0 : 0 < k)
     (hbaseBridge : (scalars : MainFormalCascadeScalars params eps k) →
       ∀ (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k),
-      MainFormalBaseBridgeHypotheses params strategy eps k hpass scalars roleResidual) :
+      MainFormalRepairedBridgeHypotheses params strategy eps k hpass scalars roleResidual) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
@@ -6057,15 +6495,17 @@ theorem mainFormal
   --      spectral-truncation and locality-preserving repair witnesses
   --      for both unsymmetrized POVMs.
   --
-  -- 3. **Completion closeness** for the two POVMs, derived through
-  --    `completingToMeasurement`.  Needs `BipartiteSSCRel` for the
-  --    unsymmetrized POVMs (external).
+  -- 3. **Completion input** for the two POVMs, derived through
+  --    `completingToMeasurement`.  In the repaired base route this is supplied as
+  --    diagonal line-130 consistency for the two unsymmetrized POVMs, which is
+  --    converted to the `BipartiteSSCRel` hypotheses consumed by the completion
+  --    theorem.
   --
-  -- 4. **Match-mass preservation** values (type
-  --    `MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation`)
-  --    for both sides.  With these, `of_submeasurement_match_mass_and_completion`
-  --    produces the `ProjectivizationMatchMassMonotonicity` needed by
-  --    `leftConsistency` / `rightConsistency` for the exact paper `ζ₁` links.
+  -- 4. **Repaired line-169 transport**.  The line-169 scalar correction is now
+  --    formalized: once a concrete `roleResidual` and repaired bridge input are
+  --    available, `mainFormal_ofRoleResidualAndRepairedBridge` finishes the base
+  --    Step-6 assembly using the sharper pre-completion loss
+  --    `ζ₁ + 10 * ζ₁^(1/8)`.
   --
   -- The full downstream cascade from the role package through the projective
   -- targets is already checked; once the residual above is supplied, the
@@ -6077,67 +6517,19 @@ theorem mainFormal
   · have hepsNN : 0 ≤ eps := SameSpaceProjStrat.eps_nonneg_of_passes hpass
     let scalars : MainFormalCascadeScalars params eps k :=
       MainFormalCascadeScalars.ofNontrivialMainFormal hepsNN hk0 herr
-    have hstep6WitnessResidual :
-        Nonempty (MainFormalCascadeRolePackageResidualStep6WitnessResidual
-          (params := params) (strategy := strategy) (eps := eps)
-          (hpass := hpass) (k := k) (scalars := scalars)) := by
-      by_cases hm1 : params.m = 1
-      · -- Base case (m = 1): role residual from checked handoff,
-        -- bridge from the external `hbaseBridge` hypothesis.
-        rcases MainFormalRolePackageResidual.ofBaseCase params strategy eps k hpass hm1 with
-          ⟨roleResidual⟩
-        exact baseStep6WitnessResidual_ofBaseBridge herr roleResidual
-          (hbaseBridge scalars roleResidual)
-      · -- Successor case (m > 1): the answer-valued recursive-slice adapter is
-        -- available, but this theorem still has no predecessor per-slice induction
-        -- package or answer-side self-improvement bridge inputs in scope.
-        -- TODO(#931, #834, #422): supply those successor inputs and assemble the
-        -- resulting role residual into a Step 6 witness residual.
-        sorry
-    rcases hstep6WitnessResidual with ⟨step6WitnessResidual⟩
-    let rolePackage := step6WitnessResidual.roleResidual.rolePackage scalars
-    have hpre : ConsRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily
-          (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
-        (constSubMeasFamily
-          (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
-        scalars.zeta1 := by
-      simpa [rolePackage] using step6WitnessResidual.roleResidual.line130Consistency scalars
-    let rolePackageResidualLeftCompletionLine169Residual :
-        MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual
-          (params := params) (strategy := strategy) (eps := eps)
-          (hpass := hpass) (k := k) (scalars := scalars) :=
-      step6WitnessResidual.toLeftCompletionLine169Residual herr
-    have hpreForResidual : ConsRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily
-          (unsymmetrizedLeftPOVM
-            (rolePackageResidualLeftCompletionLine169Residual.roleResidual.rolePackage
-              scalars).roleMeasurement).toSubMeas)
-        (constSubMeasFamily
-          (unsymmetrizedRightPOVM
-            (rolePackageResidualLeftCompletionLine169Residual.roleResidual.rolePackage
-              scalars).roleMeasurement).toSubMeas)
-        scalars.zeta1 := by
-      simpa [rolePackage, rolePackageResidualLeftCompletionLine169Residual,
-        MainFormalCascadeRolePackageResidualStep6WitnessResidual.toLeftCompletionLine169Residual]
-        using hpre
-    have rolePackageResidualCompletionLine169Residual :
-        MainFormalCascadeRolePackageResidualCompletionLine169Residual
-          (params := params) (strategy := strategy) (eps := eps)
-          (hpass := hpass) (k := k) (scalars := scalars) :=
-      rolePackageResidualLeftCompletionLine169Residual
-        |>.toRolePackageResidualCompletionLine169Residual hpreForResidual
-    have rolePackagedCompletionLine169Residual :
-        MainFormalCascadeRolePackagedCompletionLine169Residual params strategy eps k scalars :=
-      rolePackageResidualCompletionLine169Residual.toRolePackagedCompletionLine169Residual
-    have completionLine169Residual :
-        MainFormalCascadeProjectiveCompletionLine169Residual params strategy eps k scalars :=
-      rolePackagedCompletionLine169Residual.toCompletionLine169Residual
-    have projectiveTargets :
-        MainFormalCascadeProjectiveStageTargets params strategy eps k scalars :=
-      completionLine169Residual.toProjectiveStageTargets hpass
-    exact MainFormalNativeTargets.toMainFormal
-      (projectiveTargets.toTransportTargets.toCascadeTargets.toNativeTargets)
+    by_cases hm1 : params.m = 1
+    · -- Base case (m = 1): use the repaired line-169 route driven by
+      -- orthonormalization and diagonal completion inputs.
+      rcases MainFormalRolePackageResidual.ofBaseCase params strategy eps k hpass hm1 with
+        ⟨roleResidual⟩
+      exact mainFormal_ofRoleResidualAndRepairedBridge herr roleResidual
+        (hbaseBridge scalars roleResidual)
+    · -- Successor case (m > 1): the answer-valued recursive-slice adapter is
+      -- available, but this theorem still has no predecessor per-slice induction
+      -- package or answer-side self-improvement bridge inputs in scope.
+      -- TODO(#931, #834, #422): supply those successor inputs and assemble the
+      -- resulting role residual into the repaired Step 6 projectivization chain.
+      sorry
 
 end Test
 

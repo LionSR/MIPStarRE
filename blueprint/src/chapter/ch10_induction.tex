@@ -402,8 +402,10 @@
 	\lean{MIPStarRE.LDT.Test.MainFormalStep6Hypotheses, MIPStarRE.LDT.Test.baseStep6WitnessResidual,
 		MIPStarRE.LDT.Test.MainFormalBaseBridgeHypotheses, MIPStarRE.LDT.Test.baseStep6Hypotheses_ofBaseBridge,
 		MIPStarRE.LDT.Test.baseStep6WitnessResidual_ofBaseBridge}
-	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageLine130CompletionInput.nonempty_ofLine130ConsistencyAndMatchMassPreservation,
-		MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualStep6WitnessResidual.nonempty_ofRoleResidualAndLine130InputsAndMatchMassPreservation}
+	\lean{MIPStarRE.LDT.Test.MainFormalBaseRepairedBridgeHypotheses,
+		MIPStarRE.LDT.Test.MainFormalRepairedBridgeHypotheses,
+		MIPStarRE.LDT.Test.baseMainFormal_ofRepairedBaseBridge,
+		MIPStarRE.LDT.Test.mainFormal_ofRoleResidualAndRepairedBridge}
 	\leanok
 	\uses{def:main-formal-successor-boundary, thm:orthonormalization}
 	The structure \texttt{MainFormalStep6Hypotheses} bundles the still-unformalized
@@ -423,6 +425,18 @@
 	\texttt{MainFormalRolePackageResidual.ofBaseCase}, where the
 	\texttt{params.m = 1} hypothesis is used) into the Step~6 witness residual
 	consumed by the downstream cascade.
+
+	The sharper repaired base route is packaged separately by
+	\texttt{MainFormalBaseRepairedBridgeHypotheses}.  It keeps the same
+	orthonormalization inputs but replaces the exact match-mass fields by the
+	diagonal line-130 consistency input needed for completion.  The generic theorem
+	\texttt{mainFormal\_ofRoleResidualAndRepairedBridge} combines that diagonal
+	completion input with the checked pre-completion line-169 repair from
+	Remark~\ref{rem:lean-line169-projectivization-match-mass}, so the base branch
+	of \texttt{mainFormal} retains the original final envelope rather than widening
+	to the generic $\zeta_1+\sqrt{\zeta_2}$ scale.  The theorem
+	\texttt{baseMainFormal\_ofRepairedBaseBridge} is the base-case wrapper of this
+	role-residual form.
 \end{definition}
 
 
@@ -721,14 +735,14 @@ monotonicity invariant rather than being independent residual data.  As stated i
 $\delta+\sqrt{\epsilon}$ loss, so applying it directly to
 $G^{\mathrm A}\simeq_{\zeta_1}G^{\mathrm B}$ and
 $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
-$Q^{\mathrm A}\simeq_{\zeta_1+\sqrt{\zeta_2}}G^{\mathrm B}$, not the printed
-$\zeta_1$ estimate.  The generic corrected route would degrade the final point
-error to scale $t^{1/65536}$, outside the current \texttt{mainFormalError}
-envelope.  Closing the residual while preserving the paper constants therefore
-still requires the remaining construction-level projectivization/correlation-
-preservation theorem for the repaired submeasurements, not just the generic
-\texttt{triangle-sub} lemma. No proof-level completeness tag is claimed here while
-\texttt{mainFormal} still contains that completion-line-169 residual.
+	$Q^{\mathrm A}\simeq_{\zeta_1+\sqrt{\zeta_2}}G^{\mathrm B}$, not the printed
+	$\zeta_1$ estimate.  The generic corrected route would degrade the final point
+	error to scale $t^{1/65536}$, outside the current \texttt{mainFormalError}
+	envelope.  The sharper local pre-completion repair from
+	Remark~\ref{rem:lean-line169-projectivization-match-mass} avoids that
+	widening and is the route used by the present base-case formal assembly.
+	No proof-level completeness tag is claimed here while \texttt{mainFormal}
+	still contains the successor-case completion residual.
 
 \end{remark}
 \begin{proof}
