@@ -500,6 +500,24 @@ lemma sigmaFinRangeEmbedding_qa_eq {Outcome : Type uOutcome}
     ProjMeas.transport, Measurement.transport, SubMeas.transport, Matrix.mul_apply,
     Matrix.conjTranspose_apply, Matrix.diagonal_apply] using hsum.symm
 
+/-- The canonical finite-enumeration `Q` layer associated to a projective
+family.
+
+The auxiliary Hilbert space is the sigma type `Σ a, Fin (rank Q_a)`, lifted to
+the universe of the ambient space.  The projective measurement is the block
+measurement selecting the summands indexed by a fixed outcome. -/
+noncomputable def sigmaRangeQLayer
+    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (q : OpFamily Outcome ι)
+    [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (q.outcome a).rank))] :
+    QLayerData Outcome ι where
+  auxSpace := FiniteHilbertSpace.sigmaFin
+    (fun a : Outcome => (q.outcome a).rank)
+  q := q
+  t := sigmaFinProjMeas (fun a : Outcome => (q.outcome a).rank)
+
 /-- Assemble `QXPLayerData` from the canonical sigma-space embedding and the
 remaining SVD/polar identities for `Xhat`.
 
@@ -526,21 +544,54 @@ noncomputable def QXPLayerData.ofSigmaRangeAndSvdIdentities
       CFC.sqrt q.total) :
     QXPLayerData Outcome ι := by
   classical
-  let auxSpace : FiniteHilbertSpace.{uι} :=
-    FiniteHilbertSpace.sigmaFin (fun a : Outcome => (q.outcome a).rank)
-  let qLayer : QLayerData Outcome ι :=
-    { auxSpace := auxSpace
-      q := q
-      t := sigmaFinProjMeas (fun a : Outcome => (q.outcome a).rank) }
+  let qLayer : QLayerData Outcome ι := sigmaRangeQLayer q
   exact QXPLayerData.ofQLayerAndSvdIdentities qLayer qa_projective
-    (by simpa [qLayer, Qa, QTotal] using q_sum_eq_total)
+    (by simpa [qLayer, sigmaRangeQLayer, Qa, QTotal] using q_sum_eq_total)
     (sigmaFinRangeEmbedding q.outcome qa_projective) xHat
     (by
       intro a
-      simpa [qLayer, auxSpace, Ta] using
+      simpa [qLayer, sigmaRangeQLayer, Ta] using
         sigmaFinRangeEmbedding_qa_eq q.outcome qa_projective a)
-    (by simpa [auxSpace] using xHat_coisometry)
+    (by simpa [qLayer, sigmaRangeQLayer] using xHat_coisometry)
     (by simpa [qLayer, QTotal] using xHat_mixed)
+
+/-- Assemble the sigma-space `Q/X/Xhat/P` layer from a rank-reduction witness
+and the remaining SVD/polar identities for `Xhat`.
+
+The rank-reduction witness supplies the two facts about the family `Q_a` that
+enter the matrix decomposition: each `Q_a` is a projection, and
+`∑_a Q_a = Q`.  The auxiliary space, the projective measurement `T`, and the
+matrix `X` are therefore the canonical finite-enumeration construction attached
+to the ranks of the projectors `Q_a`.  As in the paper, the only data still not
+constructed here are the coisometry and mixed square-root identities for the
+chosen matrix `Xhat`. -/
+theorem exists_qxpLayerData_ofRankReductionSigmaRangeAndSvdIdentities
+    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState ι} {A : Measurement Outcome ι} {ζ : Error}
+    {qLayer : QLayerData Outcome ι}
+    (hRank : RankReductionWitness ψ A ζ qLayer)
+    [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (qLayer.q.outcome a).rank))]
+    (xHat : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (qLayer.q.outcome a).rank))) ι ℂ)
+    (xHat_coisometry : xHat * xHatᴴ =
+      (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
+        (fun a : Outcome => (qLayer.q.outcome a).rank)))))
+    (xHat_mixed :
+      (sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective)ᴴ * xHat =
+        CFC.sqrt (QTotal qLayer)) :
+    ∃ data : QXPLayerData Outcome ι,
+      ∃ hq : data.qLayer = sigmaRangeQLayer qLayer.q,
+        Eq.ndrec (motive := fun qLayer' => Matrix qLayer'.auxSpace.carrier ι ℂ)
+          data.x hq = sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective ∧
+        Eq.ndrec (motive := fun qLayer' => Matrix qLayer'.auxSpace.carrier ι ℂ)
+          data.xHat hq = xHat := by
+  classical
+  exact
+    ⟨QXPLayerData.ofSigmaRangeAndSvdIdentities (q := qLayer.q)
+      hRank.projective hRank.sum_eq_total xHat xHat_coisometry xHat_mixed,
+      rfl, rfl, rfl⟩
 
 /-- A one-point projective measurement concentrating all mass on the chosen outcome. -/
 private noncomputable def pointProjMeas {Outcome : Type uOutcome}
