@@ -3,6 +3,7 @@ import MIPStarRE.LDT.GlobalVariance.Theorems.Results
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
+import MIPStarRE.LDT.Preliminaries.Triangles
 import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
@@ -46,6 +47,10 @@ data-processing transport of the boundedness gap, and the standalone
 - **helper_point_consistency_of_pointConsistencyAddInU_transfer** — packages
   the point-consistency `add-in-u` transfer as a `ConsRel` at
   `selfImprovementHelperError`.
+- **final_fields_point_consistency_totalGap_natural** — transports the
+  helper-stage point consistency through the projective data-processing
+  comparison, with the submeasurement total-overlap displacement recorded
+  explicitly.
 - **helper_boundedness_gap_transport_through_data_processing** — transport
   the helper boundedness gap through the data-processing SDD approximation
   between Ĥ and H (paper lines 747–755).
@@ -487,6 +492,122 @@ theorem helper_point_consistency_of_pointConsistencyAddInU_transfer
   exact
     pointConsistencyAddInU_off_diagonal_avg_le_helper_error_of_transfer
       params strategy eps delta heps hdelta T Hhat htransfer
+
+/-- Natural-error transport of point consistency from the helper output to the
+projective output, with the submeasurement total-overlap displacement stated
+explicitly.
+
+The measurement-valued right-register triangle lemma has no total-overlap term:
+both right-register totals are the identity.  In the present application
+`polynomialEvaluationFamily params Hhat` and
+`polynomialEvaluationFamily params H.toSubMeas` are only submeasurements, so
+the total-overlap term
+`⟨ψ, A^u_{\mathrm{tot}} ⊗ H^u_{\mathrm{tot}} ψ⟩` must also be transported.
+This theorem separates that displacement as the parameter `η`; the remaining
+contribution is exactly the square root of the data-processing SDD error. -/
+theorem final_fields_point_consistency_totalGap_natural
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta η : Error)
+    {Hhat : SubMeas (Polynomial params) ι}
+    {H : ProjSubMeas (Polynomial params) ι}
+    (hhelperPoint :
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params Hhat)
+        (selfImprovementHelperError params eps delta))
+    (hdata :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftLeft)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+        (selfImprovementDataProcessingError params eps delta))
+    (hTotal :
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        |ev strategy.state
+            (leftTensor (ι₂ := ι)
+              (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total) *
+              rightTensor (ι₁ := ι)
+                (((polynomialEvaluationFamily params H.toSubMeas) u).total)) -
+          ev strategy.state
+            (leftTensor (ι₂ := ι)
+              (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total) *
+              rightTensor (ι₁ := ι)
+                (((polynomialEvaluationFamily params Hhat) u).total))|) ≤ η) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params H.toSubMeas)
+      (selfImprovementHelperError params eps delta +
+        Real.sqrt (selfImprovementDataProcessingError params eps delta) + η) := by
+  have hdata_right :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftRight)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftRight)
+        (selfImprovementDataProcessingError params eps delta) := by
+    simpa [IdxSubMeas.liftLeft, IdxSubMeas.liftRight]
+      using
+        sddRel_liftRight_of_liftLeft_permInv
+          strategy.permInvState (uniformDistribution (Point params))
+          (polynomialEvaluationFamily params Hhat)
+          (polynomialEvaluationFamily params H.toSubMeas)
+          (selfImprovementDataProcessingError params eps delta) hdata
+  exact
+    Preliminaries.triangleSub_right_subMeas_totalGap
+      strategy.state (uniformDistribution (Point params)) strategy.isNormalized
+      (uniformDistribution_weight_sum_le_one (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params Hhat)
+      (polynomialEvaluationFamily params H.toSubMeas)
+      (selfImprovementHelperError params eps delta)
+      (selfImprovementDataProcessingError params eps delta) η hhelperPoint
+      hdata_right hTotal
+
+/-- Literal-threshold point-consistency transport from the helper output to the
+projective output.
+
+This wrapper isolates the numerical absorption needed to turn the natural
+error
+`selfImprovementHelperError + sqrt selfImprovementDataProcessingError + η`
+into the final `selfImprovementError` threshold.  The analytic content is
+contained in `final_fields_point_consistency_totalGap_natural`. -/
+theorem final_fields_point_consistency_totalGap
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta η : Error)
+    {Hhat : SubMeas (Polynomial params) ι}
+    {H : ProjSubMeas (Polynomial params) ι}
+    (hhelperPoint :
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params Hhat)
+        (selfImprovementHelperError params eps delta))
+    (hdata :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftLeft)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+        (selfImprovementDataProcessingError params eps delta))
+    (hTotal :
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        |ev strategy.state
+            (leftTensor (ι₂ := ι)
+              (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total) *
+              rightTensor (ι₁ := ι)
+                (((polynomialEvaluationFamily params H.toSubMeas) u).total)) -
+          ev strategy.state
+            (leftTensor (ι₂ := ι)
+              (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total) *
+              rightTensor (ι₁ := ι)
+                (((polynomialEvaluationFamily params Hhat) u).total))|) ≤ η)
+    (habsorb :
+      selfImprovementHelperError params eps delta +
+          Real.sqrt (selfImprovementDataProcessingError params eps delta) + η ≤
+        selfImprovementError params eps delta) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params H.toSubMeas)
+      (selfImprovementError params eps delta) :=
+  MIPStarRE.LDT.ConsRel.mono habsorb
+    (final_fields_point_consistency_totalGap_natural params strategy eps delta η
+      hhelperPoint hdata hTotal)
 
 /-- Algebraic decomposition of the helper boundedness gap.
 
