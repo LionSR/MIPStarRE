@@ -29,14 +29,17 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 The paper's `lem:sdp` eventually supplies strong duality, complementary
 slackness, and a concrete matrix-level optimal witness. The current Lean
 development only consumes the weaker facts recorded here: the primal witness is
-a full measurement (`T.total = 1`), the dual witness is PSD, and it dominates
-every averaged point operator. -/
+a full measurement (`T.total = 1`), the dual witness is PSD, it dominates the
+identity, and it dominates every averaged point operator. Despite the historical
+name, this reduced package does not assert SDP optimality. -/
 structure SdpOptimalPair (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (T : SubMeas (Polynomial params) ι) (Z : MIPStarRE.Quantum.Op ι) : Prop where
   primalTotalOperator :
     T.total = 1
   dualPositive : 0 ≤ Z
+  dualDominatesIdentity :
+    (1 : MIPStarRE.Quantum.Op ι) ≤ Z
   dualFeasible :
     ∀ g : Polynomial params,
       0 ≤ sdpDualSlackOperator params strategy Z g
@@ -206,6 +209,8 @@ structure SelfImprovementHelperConclusion (params : Parameters) [FieldModel para
     AddInUStatement params strategy T eps delta
   positiveSemidefiniteWitness :
     0 ≤ Z
+  oneLeDualWitness :
+    (1 : MIPStarRE.Quantum.Op ι) ≤ Z
   dualDominatesAveragedPoint :
     ∀ g : Polynomial params,
       0 ≤ sdpDualSlackOperator params strategy Z g
@@ -272,7 +277,10 @@ structure SelfImprovementSubMeasConclusion (params : Parameters) [FieldModel par
 
 TODO: replace this temporary bridge data with the actual Section 9 transport
 lemmas once the helper-stage strong self-consistency, data-processing, and
-boundedness/completeness arguments are formalized. -/
+projective-residual/completeness arguments are formalized. The boundedness field
+is no longer part of this residual package: the current strict SDP witness
+records `1 ≤ Z`, and `final_fields_bounded` derives the `BoundedByOperator`
+conclusion from that operator-monotonicity fact. -/
 structure SelfImprovementFinalFields (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (H : ProjSubMeas (Polynomial params) ι)
@@ -295,10 +303,6 @@ structure SelfImprovementFinalFields (params : Parameters) [FieldModel params.q]
   projectiveResidualBound :
     projectiveBoundednessGap params strategy H Z ≤
       selfImprovementError params eps delta
-  bounded :
-    BoundedByOperator strategy.state H.toSubMeas.liftLeft
-      (leftTensor (ι₂ := ι) Z)
-      (selfImprovementError params eps delta)
 
 /-- The helper-stage strong self-consistency input still missing from the
 reduced theorem chain. -/
@@ -329,7 +333,11 @@ abbrev OrthonormalizationInput (params : Parameters) [FieldModel params.q]
       (selfImprovementHelperError params eps delta)
 
 /-- The remaining Section 9 output fields still not produced directly by the
-reduced helper and orthonormalization theorems. -/
+reduced helper and orthonormalization theorems.
+
+The final `BoundedByOperator` conclusion is produced internally from the SDP
+witness bound `1 ≤ Z`, so this residual input now contains only completeness,
+point-consistency, self-closeness, and the projective-residual estimate. -/
 abbrev FinalFieldsInput (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (eps delta nu : Error) : Prop :=
   ∀ {T : Measurement (Polynomial params) ι}
@@ -372,8 +380,8 @@ structure SelfImprovementBridgeInputs (params : Parameters) [FieldModel params.q
   orthonormalization :
     OrthonormalizationInput params strategy eps delta
   /-- Final-fields transport: the remaining completeness, point-consistency,
-  self-closeness, projective-residual, and boundedness conclusions are
-  derivable from the helper+orthonormalization+data-processing outputs. -/
+  self-closeness, and projective-residual conclusions are derivable from the
+  helper+orthonormalization+data-processing outputs. -/
   finalFields :
     FinalFieldsInput params strategy eps delta nu
 

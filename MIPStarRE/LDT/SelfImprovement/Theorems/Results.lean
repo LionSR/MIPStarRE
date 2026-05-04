@@ -624,6 +624,8 @@ lemma sdp
     { primalTotalOperator := T.total_eq_one
       dualPositive := by
         simp [Z]
+      dualDominatesIdentity := by
+        simpa [Z] using one_le_sdpStrictDualWitness (ι := ι)
       dualFeasible := ?_ }
   intro g
   simpa [Z, sdpDualSlackOperator] using
@@ -2095,14 +2097,177 @@ theorem helper_boundedness_gap_transport_through_data_processing
       ev strategy.state (helperAgreementAverageOperator params strategy H.toSubMeas))
   linarith
 
+/-- Compare the final projective residual with the helper boundedness gap for the
+same projective family.
+
+This is the SDP dual-slack step in the projective boundedness paragraph of
+`thm:self-improvement` (`references/ldt-paper/self_improvement.tex`, lines
+742--749): the term `Z ⊗ H_h` in the projective residual dominates
+`(E_u A^u_{h(u)}) ⊗ H_h` for each polynomial `h`, and summing these inequalities
+turns `Z ⊗ (I - H)` into the helper-stage defect
+`Z ⊗ I - E_u Σ_a A^u_a ⊗ H_[h(u)=a]`. -/
+theorem projective_boundedness_gap_le_helper_boundedness_gap
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (H : ProjSubMeas (Polynomial params) ι)
+    (Z : MIPStarRE.Quantum.Op ι)
+    (hdual :
+      ∀ h : Polynomial params,
+        0 ≤ sdpDualSlackOperator params strategy Z h) :
+    projectiveBoundednessGap params strategy H Z ≤
+      helperBoundednessGap params strategy H.toSubMeas Z := by
+  classical
+  have hprojective_eq :
+      projectiveBoundednessGap params strategy H Z =
+        ev strategy.state (leftTensor (ι₂ := ι) Z) -
+          ∑ h : Polynomial params,
+            ev strategy.state (opTensor Z (H.toSubMeas.outcome h)) := by
+    have hsub_tensor :
+        opTensor Z (1 - H.toSubMeas.total) =
+          opTensor Z (1 : MIPStarRE.Quantum.Op ι) -
+            opTensor Z H.toSubMeas.total := by
+      ext x y
+      simp [opTensor, sub_eq_add_neg, mul_add]
+    have htotal_tensor :
+        opTensor Z H.toSubMeas.total =
+          ∑ h : Polynomial params, opTensor Z (H.toSubMeas.outcome h) := by
+      rw [← H.toSubMeas.sum_eq_total, opTensor_sum_right_univ]
+    unfold projectiveBoundednessGap projectiveResidualOperator
+    calc
+      ev strategy.state (leftTensor (ι₂ := ι) Z *
+          rightTensor (ι₁ := ι) (1 - H.toSubMeas.total))
+          = ev strategy.state (opTensor Z (1 - H.toSubMeas.total)) := by
+            rw [leftTensor_mul_rightTensor_eq_opTensor]
+      _ = ev strategy.state
+            (opTensor Z (1 : MIPStarRE.Quantum.Op ι) -
+              opTensor Z H.toSubMeas.total) := by
+            rw [hsub_tensor]
+      _ = ev strategy.state (opTensor Z (1 : MIPStarRE.Quantum.Op ι)) -
+            ev strategy.state (opTensor Z H.toSubMeas.total) := by
+            rw [ev_sub]
+      _ = ev strategy.state (leftTensor (ι₂ := ι) Z) -
+            ev strategy.state (opTensor Z H.toSubMeas.total) := rfl
+      _ = ev strategy.state (leftTensor (ι₂ := ι) Z) -
+            ∑ h : Polynomial params,
+              ev strategy.state (opTensor Z (H.toSubMeas.outcome h)) := by
+            rw [htotal_tensor, ev_sum]
+  have hhelper_agreement_eq :
+      ev strategy.state (helperAgreementAverageOperator params strategy H.toSubMeas) =
+        ∑ h : Polynomial params,
+          ev strategy.state
+            (opTensor (averagedPointOperator params strategy h)
+              (H.toSubMeas.outcome h)) := by
+    rw [helper_agreement_average_ev_eq_polynomial_sum]
+    rw [avgOver_sum]
+    refine Finset.sum_congr rfl ?_
+    intro h _
+    exact (ev_opTensor_averageOperatorOverDistribution_left strategy.state
+      (uniformDistribution (Point params))
+      (pointConditionedOutcomeOperatorAtPolynomial params strategy h)
+      (H.toSubMeas.outcome h)).symm
+  have hhelper_eq :
+      helperBoundednessGap params strategy H.toSubMeas Z =
+        ev strategy.state (leftTensor (ι₂ := ι) Z) -
+          ∑ h : Polynomial params,
+            ev strategy.state
+              (opTensor (averagedPointOperator params strategy h)
+                (H.toSubMeas.outcome h)) := by
+    unfold helperBoundednessGap helperBoundednessOperator helperUpperOperator
+    rw [ev_sub, hhelper_agreement_eq]
+  have hsum_le :
+      (∑ h : Polynomial params,
+          ev strategy.state
+            (opTensor (averagedPointOperator params strategy h) (H.toSubMeas.outcome h))) ≤
+        ∑ h : Polynomial params,
+          ev strategy.state (opTensor Z (H.toSubMeas.outcome h)) := by
+    refine Finset.sum_le_sum ?_
+    intro h _
+    apply ev_mono
+    exact opTensor_mono_left
+      (sub_nonneg.mp (by simpa [sdpDualSlackOperator] using hdual h))
+      (H.toSubMeas.outcome_pos h)
+  rw [hprojective_eq, hhelper_eq]
+  linarith
+
+/-- Natural-error projective-residual producer.
+
+Given the helper-stage boundedness estimate for `Hhat`, the dual-slack
+comparator above and the existing data-processing transport produce the final
+projective residual at the paper's natural error
+`selfImprovementHelperError + sqrt selfImprovementDataProcessingError`. The
+separate numerical absorption into the literal `selfImprovementError` threshold
+is intentionally not hidden in this theorem. -/
+theorem final_fields_projective_residual_bound_natural
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    {T : Measurement (Polynomial params) ι}
+    {Hhat : SubMeas (Polynomial params) ι}
+    {H : ProjSubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
+    (hhelperBounded :
+      helperBoundednessGap params strategy Hhat Z ≤
+        selfImprovementHelperError params eps delta)
+    (hdata :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftLeft)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+        (selfImprovementDataProcessingError params eps delta)) :
+    projectiveBoundednessGap params strategy H Z ≤
+      selfImprovementHelperError params eps delta +
+        Real.sqrt (selfImprovementDataProcessingError params eps delta) := by
+  have hcompare :=
+    projective_boundedness_gap_le_helper_boundedness_gap params strategy H Z
+      hhelper.dualDominatesAveragedPoint
+  have htransport :=
+    helper_boundedness_gap_transport_through_data_processing params strategy Hhat H Z
+      (selfImprovementDataProcessingError params eps delta) hdata
+  linarith
+
+/-- Literal-threshold projective-residual producer.
+
+This wraps `final_fields_projective_residual_bound_natural` with a separately
+named numerical absorption lemma. The analytic inputs are only the helper-stage
+boundedness estimate, dual feasibility from `SelfImprovementHelperConclusion`,
+and the data-processing SDD output already produced inside `selfImprovement`. -/
+theorem final_fields_projective_residual_bound
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    {T : Measurement (Polynomial params) ι}
+    {Hhat : SubMeas (Polynomial params) ι}
+    {H : ProjSubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
+    (hhelperBounded :
+      helperBoundednessGap params strategy Hhat Z ≤
+        selfImprovementHelperError params eps delta)
+    (hdata :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftLeft)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+        (selfImprovementDataProcessingError params eps delta))
+    (habsorb :
+      selfImprovementHelperError params eps delta +
+          Real.sqrt (selfImprovementDataProcessingError params eps delta) ≤
+        selfImprovementError params eps delta) :
+    projectiveBoundednessGap params strategy H Z ≤
+      selfImprovementError params eps delta :=
+  le_trans
+    (final_fields_projective_residual_bound_natural params strategy eps delta
+      hhelper hhelperBounded hdata)
+    habsorb
+
 /-- Final-fields producer for the `BoundedByOperator` conclusion.
 
 If the SDP dual witness dominates the identity, then the left-placed mass of any
 submeasurement is dominated by `Z ⊗ I`: the total bound `A.total ≤ 1 ≤ Z` lifts
 by monotonicity to `leftTensor A.total ≤ leftTensor Z`, and evaluation against
 the state preserves this order. Consequently `bndError ψ A.liftLeft (Z ⊗ I) = 0`,
-so the boundedness statement holds at any nonnegative tolerance. This is a
-standalone producer; it does not alter the current `FinalFieldsInput` interface. -/
+so the boundedness statement holds at any nonnegative tolerance. The
+`selfImprovement` assembly uses this producer instead of requiring the
+boundedness field from `FinalFieldsInput`. -/
 theorem final_fields_bounded
     {α : Type*} [Fintype α]
     (ψ : QuantumState (ι × ι))
@@ -2178,6 +2343,7 @@ lemma selfImprovementHelper
       averagedConstruction := rfl
       addInUVarianceBound := ?_
       positiveSemidefiniteWitness := hsdp.dualPositive
+      oneLeDualWitness := hsdp.dualDominatesIdentity
       dualDominatesAveragedPoint := hsdp.dualFeasible }
   · simpa [T] using hsdp
   · exact addInU params strategy eps delta gamma hgood T
@@ -2269,6 +2435,26 @@ theorem selfImprovement
   have hfinal :
       SelfImprovementFinalFields params strategy H Z eps delta nu :=
     hfinalFields hhelper horth hdata
+  have hselfImprovementError_nonneg :
+      0 ≤ selfImprovementError params eps delta := by
+    have heps : 0 ≤ eps := eps_nonneg_of_isGood params strategy hgood
+    have hdelta : 0 ≤ delta := delta_nonneg_of_isGood params strategy hgood
+    have hm_nonneg : (0 : Error) ≤ (params.m : Error) := by
+      exact_mod_cast Nat.zero_le params.m
+    have hd_nonneg : (0 : Error) ≤ (params.d : Error) := by
+      exact_mod_cast Nat.zero_le params.d
+    have hq_nonneg : (0 : Error) ≤ (params.q : Error) := le_of_lt params.q_cast_pos
+    have hdq_nonneg : (0 : Error) ≤ (params.d : Error) / (params.q : Error) :=
+      div_nonneg hd_nonneg hq_nonneg
+    have hsum_nonneg :
+        0 ≤ Real.rpow eps (1 / (32 : Error)) +
+            Real.rpow delta (1 / (32 : Error)) +
+            Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (32 : Error)) := by
+      exact add_nonneg
+        (add_nonneg (Real.rpow_nonneg heps _) (Real.rpow_nonneg hdelta _))
+        (Real.rpow_nonneg hdq_nonneg _)
+    unfold selfImprovementError MainInductionStep.selfImprovementInInductionError
+    exact mul_nonneg (mul_nonneg (by norm_num) hm_nonneg) hsum_nonneg
   refine ⟨H, Z, ?_⟩
   exact
     { witness := ⟨T, Hhat, hhelper, horth, hdata⟩
@@ -2278,7 +2464,9 @@ theorem selfImprovement
       positiveSemidefiniteWitness := hhelper.positiveSemidefiniteWitness
       dualDominatesAveragedPoint := hhelper.dualDominatesAveragedPoint
       projectiveResidualBound := hfinal.projectiveResidualBound
-      bounded := hfinal.bounded }
+      bounded :=
+        final_fields_bounded strategy.state H.toSubMeas hhelper.oneLeDualWitness
+          hselfImprovementError_nonneg }
 
 /--
 Bridge from the measurement-input version in `self_improvement.tex` to the
@@ -2346,7 +2534,7 @@ theorem selfImprovementFromBridgeInputsSubMeas
 
 /-! ## Final-fields completeness producer (issue #931)
 
-The reduced `FinalFieldsInput` lumps five distinct paper-side obligations into a
+The reduced `FinalFieldsInput` lumps four distinct paper-side obligations into a
 single residual. The lemmas below isolate the **completeness** field, exposing
 the precise analytic ingredient that is still missing — the helper-stage
 completeness lower bound on `Hhat.liftLeft` — and discharging the rest of the
@@ -2365,8 +2553,8 @@ from the entire `FinalFieldsInput` lump to the single named paper obligation
 `hhelperCompleteness`, which corresponds to `self_improvement.tex` lines
 351--414 (helper completeness, especially the Cauchy--Schwarz step at lines
 366--414) followed by the projective transfer at lines 713--717. The remaining
-four `FinalFieldsInput` fields (point-consistency, self-closeness,
-projective-residual, boundedness) are not addressed here.
+three `FinalFieldsInput` fields (point-consistency, self-closeness, and
+projective-residual) are not addressed here.
 
 Paper anchors:
 * `references/ldt-paper/self_improvement.tex` lines 351--414 — helper-stage
@@ -2473,7 +2661,7 @@ a separate numerical step on the explicit error definitions
 `selfImprovementError`) that does not require any new analytic input.
 
 This narrows the missing input for the `completeness` field of
-`FinalFieldsInput` from the entire five-field residual to the single named
+`FinalFieldsInput` from the remaining four-field residual to the single named
 paper obligation `hhelperCompleteness` matching
 `references/ldt-paper/self_improvement.tex` lines 351--414, which is the only
 remaining analytic step (especially the Cauchy--Schwarz argument at lines
