@@ -1432,7 +1432,7 @@ theorem helper_strong_self_consistency_of_helper_conclusion
     linarith
   have hhelperErr_nonneg :
       0 ≤ selfImprovementHelperError params eps delta := by
-    exact selfImprovementHelperError_nonneg params eps delta heps hdelta
+    exact selfImprovementHelperError_nonneg params eps delta
   constructor
   simpa [bipartiteSSCError, avgOver, uniformDistribution, constSubMeasFamily,
     qBipartiteSSCDefect, subMeasMass, SubMeas.liftLeft] using

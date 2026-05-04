@@ -239,29 +239,16 @@ theorem selfImprovementHelperError_eq
   rw [selfImprovementHelperError,
     sum_sqrt_eq_sum_rpow_half eps delta ((params.d : Error) / (params.q : Error))]
 
-/-- The helper-stage threshold is nonnegative for nonnegative `eps` and `delta`.
+/-- The helper-stage threshold is nonnegative.
 
 This is the basic positivity fact reused by the helper-stage absorption wrappers
 and by the final-stage comparison with `selfImprovementError`. -/
 theorem selfImprovementHelperError_nonneg
     (params : Parameters) [FieldModel params.q]
-    (eps delta : Error)
-    (_heps : 0 ≤ eps) (_hdelta : 0 ≤ delta) :
+    (eps delta : Error) :
     0 ≤ selfImprovementHelperError params eps delta := by
   rw [selfImprovementHelperError_eq]
-  have hcoef_nn : (0 : Error) ≤ 100 * (params.m : Error) := by positivity
-  have heps_sqrt_nn : (0 : Error) ≤ Real.sqrt eps := by
-    exact Real.sqrt_nonneg eps
-  have hdelta_sqrt_nn : (0 : Error) ≤ Real.sqrt delta := by
-    exact Real.sqrt_nonneg delta
-  have hdq_sqrt_nn :
-      (0 : Error) ≤ Real.sqrt ((params.d : Error) / (params.q : Error)) := by
-    exact Real.sqrt_nonneg _
-  have hsum_nn :
-      (0 : Error) ≤ Real.sqrt eps + Real.sqrt delta +
-        Real.sqrt ((params.d : Error) / (params.q : Error)) := by
-    exact add_nonneg (add_nonneg heps_sqrt_nn hdelta_sqrt_nn) hdq_sqrt_nn
-  exact mul_nonneg hcoef_nn hsum_nn
+  positivity
 
 /-- Helper-stage point-consistency absorption (`self_improvement.tex`,
 lines 438--443).
@@ -671,7 +658,7 @@ private theorem selfImprovementOrthogonalizationError_le_four_hundred_m_powerSum
     selfImprovementOrthogonalizationError params eps delta ≤
       400 * (params.m : Error) * finalStagePowerSum params eps delta (1 / (8 : Error)) := by
   have hhelper_nn : 0 ≤ selfImprovementHelperError params eps delta :=
-    selfImprovementHelperError_nonneg params eps delta heps hdelta
+    selfImprovementHelperError_nonneg params eps delta
   have hsqrt_helper :=
     sqrt_selfImprovementHelperError_le_ten_m_powerSum_quarter params eps delta heps hdelta
   have hsqrt_mS :
@@ -1055,7 +1042,7 @@ theorem selfImprovementHelperError_le_selfImprovementError
     thirty_selfImprovementHelperError_le_selfImprovementError params eps delta
       heps heps_le_one hdelta hdelta_le_one hd_le_q
   have hhelper_nn : 0 ≤ selfImprovementHelperError params eps delta :=
-    selfImprovementHelperError_nonneg params eps delta heps hdelta
+    selfImprovementHelperError_nonneg params eps delta
   linarith
 
 end MIPStarRE.LDT.SelfImprovement
