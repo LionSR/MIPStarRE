@@ -145,6 +145,8 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.input_match_mass_eq_sdp_overlap}
   \lean{MIPStarRE.LDT.SelfImprovement.sdp_overlap_le_dual_mass}
   \lean{MIPStarRE.LDT.SelfImprovement.input_consistency_dual_mass_lower_bound}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdp_complementary_slackness_sum_eq_dual_mass}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_sdp_complementary_slackness_sum_eq_dual_mass}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_completeness_of_dual_mass_lower_bound}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_completeness_of_input_consistency}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_completeness_error_le_selfImprovementHelperError}
@@ -183,6 +185,10 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \end{equation}
   Since
   \lean{MIPStarRE.LDT.SelfImprovement.pointConsistencyAddInU_off_diagonal_avg_le_helper_error_of_transfer}
+  \leanok
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_point_consistency_error_eq_off_diagonal_avg}
+  \leanok
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_point_consistency_of_pointConsistencyAddInU_transfer}
   \leanok
   \lean{MIPStarRE.LDT.SelfImprovement.helper_point_consistency_error_le_selfImprovementHelperError}
   \leanok
@@ -289,7 +295,12 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \leanok
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_input_of_producer}
   \leanok
-  to recover the final helper-stage self-consistency input.
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_input_of_selfConsistency_localVariance}
+  \leanok
+  to recover the final helper-stage self-consistency input. The corresponding
+  bridge-package constructor is
+  \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementBridgeInputs.ofHelperStrongSelfConsistencyProducer}
+  \leanok.
   The paper's arithmetic shows that the right-hand error is at most
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_error_le_selfImprovementHelperError}
   \leanok
@@ -337,6 +348,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   Combined with~\eqref{eq:explicit-bound-for-A-consistency} this gives
   \lean{MIPStarRE.LDT.SelfImprovement.helper_boundedness_gap_eq_upper_gap_add_off_diagonal_avg}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_boundedness_gap_le_selfImprovementHelperError}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_boundedness_gap_le_selfImprovementHelperError_of_pointConsistencyAddInU_transfer}
   \leanok
   \[
     \bra{\psi} Z \ot I \ket{\psi}
@@ -688,6 +700,7 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \emph{Proof of \ref{item:self-improvement-projective-completeness}.}
   \lean{MIPStarRE.LDT.SelfImprovement.completeness_transport_through_orthonormalization}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_completeness_of_helper_completeness}
+  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_completeness_of_helper_completeness_of_small_errors}
   Lemma~\ref{prop:completeness-transfer-self-consistent-A} implies
   \[
     \bra{\psi} H \ot I \ket{\psi}
@@ -706,6 +719,7 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \emph{Proof of \ref{item:self-improvement-projective-self}.}
   \lean{MIPStarRE.LDT.SelfImprovement.self_closeness_transport_through_orthonormalization}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_self_closeness}
+  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_self_closeness_of_small_errors}
   Lemma~\ref{prop:two-notions-of-self-consistency} implies
   \[
     \widehat{H}_h \ot I \approx_{2\widehat{\zeta}} I \ot \widehat{H}_h.
@@ -753,8 +767,13 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
     \widehat{\zeta} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}},
   \]
   respectively. The paper's exponent bookkeeping then shows the following
-  bounds; the displayed Lean theorem records the projective-residual absorption
+  bounds; the displayed Lean theorems record the completeness, self-closeness,
+  and projective-residual absorptions
+  $2 \widehat{\zeta} + 2\sqrt{\widehat{\zeta}_{\mathrm{ortho}}} \le \zeta$,
+  $6 \widehat{\zeta} + 6\widehat{\zeta}_{\mathrm{ortho}} \le \zeta$ and
   $\widehat{\zeta} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}} \le \zeta$.
+  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_completeness_error_le_selfImprovementError}
+  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_self_closeness_error_le_selfImprovementError}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_projective_residual_error_le_selfImprovementError}
   \[
     \widehat{\zeta}_{\mathrm{ortho}}

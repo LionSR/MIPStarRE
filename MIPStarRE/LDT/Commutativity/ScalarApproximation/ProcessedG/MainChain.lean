@@ -291,6 +291,21 @@ lemma evaluatedSlice_scalar_chain_bound
         let Pfun : Polynomial params → Point params → MIPStarRE.Quantum.Op ι :=
           fun g v => (strategy.pointMeasurement (appendPoint params v y)).outcome (g v)
         let R : MIPStarRE.Quantum.Op ι := 1 - (G y).total
+        have hFavg :
+            ∀ g : Polynomial params,
+              averageOperatorOverDistribution (uniformDistribution (Point params.next))
+                (fun q1 => ∑ a : Fq params, Ffun q1 g a) =
+              (gCommStabilityR params family y).outcome g := by
+          intro g
+          unfold gCommStabilityR averageIdxSubMeas
+          simp [Ffun, postprocess_sandwichByOuter_prod_snd_outcome]
+        have hPavg :
+            ∀ g : Polynomial params,
+              averageOperatorOverDistribution (uniformDistribution (Point params))
+                (fun v => Pfun g v) =
+              IdxPolyFamily.averagedSlicePointEvaluationOperator strategy y g := by
+          intro g
+          rfl
         calc
           avgOver (uniformDistribution (Point params))
               (fun v => avgOver (uniformDistribution (Point params.next))
@@ -321,12 +336,10 @@ lemma evaluatedSlice_scalar_chain_bound
                 (𝒟V := uniformDistribution (Point params))
                 (ψ := strategy.state) (F := Ffun) (P := Pfun) (R := R)
           _ = evaluatedSlicePhaseTwoStabilityDefect params strategy family G y := by
-              simp [evaluatedSlicePhaseTwoStabilityDefect, gCommStabilityR,
-                IdxPolyFamily.averagedSlicePointEvaluationOperator, averageIdxSubMeas,
-                averageOperatorOverDistribution, evaluatedPointFamily,
-                IdxPolyFamily.evaluatedAtNextPoint, evaluateAt,
-                postprocess_sandwichByOuter_prod_snd_outcome, Ffun, Pfun, R,
-                Parameters.next]
+              unfold evaluatedSlicePhaseTwoStabilityDefect
+              refine Finset.sum_congr rfl ?_
+              intro g _
+              rw [hFavg g, hPavg g]
       unfold evaluatedSlicePhaseTwoReindexingResidual
       rw [hprod, hdecomposeSecond]
       apply avgOver_congr

@@ -23,8 +23,12 @@ identities, and the reduced `sdp` and `addInU` wrappers.
   overlap by `⟨ψ, Z ⊗ I ψ⟩` (paper lines 408–410).
 - **input_consistency_dual_mass_lower_bound** — the combined lower bound
   `1 - nu ≤ ev ψ (leftTensor Z)` (paper lines 406–412).
+- **sdp_complementary_slackness_sum_eq_dual_mass** — converts the
+  complementary-slackness sum `Σ_h T_h(E_u A^u_{h(u)})` to the dual mass
+  `⟨ψ, Z ⊗ I ψ⟩`.
 - **helper_linearized_completeness_eq_dual_mass_of_complementary_slackness** —
-  the final algebraic SDP rewrite after the Cauchy--Schwarz moves.
+  the final average-over-`u` algebraic SDP rewrite after the Cauchy--Schwarz
+  moves.
 - **helper_completeness_of_dual_mass_lower_bound** — combines the
   `Hhat`-versus-`Z` comparison with the dual-mass lower bound.
 - **helper_completeness_of_input_consistency** — uses SDP dual feasibility and
@@ -304,6 +308,55 @@ theorem input_consistency_dual_mass_lower_bound
     _ ≤ ev strategy.state (leftTensor (ι₂ := ι) Z) :=
           sdp_overlap_le_dual_mass params strategy G.toSubMeas Z hZ hdual
 
+/-- Complementary slackness converts the averaged-point sum to the dual mass.
+
+This is the exact algebraic replacement used at the end of
+`references/ldt-paper/self_improvement.tex`, lines 397--403: after the
+Cauchy--Schwarz moves have produced
+`Σ_h ⟨ψ, T_h · (E_u A^u_{h(u)}) ⊗ I ψ⟩`, complementary slackness replaces
+`T_h · (E_u A^u_{h(u)})` by `T_h · Z`, and the primal completeness
+`Σ_h T_h = I` reduces the sum to `⟨ψ, Z ⊗ I ψ⟩`. -/
+theorem sdp_complementary_slackness_sum_eq_dual_mass
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι)
+    (Z : MIPStarRE.Quantum.Op ι)
+    (hT_total : T.total = 1)
+    (hcomp :
+      ∀ h : Polynomial params,
+        sdpComplementarySlacknessEquation params strategy T Z h) :
+    (∑ h : Polynomial params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+            (T.outcome h * averagedPointOperator params strategy h))) =
+      ev strategy.state (leftTensor (ι₂ := ι) Z) := by
+  calc
+    (∑ h : Polynomial params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι)
+            (T.outcome h * averagedPointOperator params strategy h)))
+        =
+      ∑ h : Polynomial params,
+        ev strategy.state
+          (leftTensor (ι₂ := ι) (T.outcome h * Z)) := by
+        refine Finset.sum_congr rfl ?_
+        intro h _
+        rw [← hcomp h]
+    _ =
+      ev strategy.state
+        (leftTensor (ι₂ := ι)
+          (∑ h : Polynomial params, T.outcome h * Z)) := by
+        rw [← ev_finset_sum]
+        congr 1
+        rw [leftTensor_finset_sum]
+    _ =
+      ev strategy.state
+        (leftTensor (ι₂ := ι) (T.total * Z)) := by
+        rw [← Finset.sum_mul, T.sum_eq_total]
+    _ = ev strategy.state (leftTensor (ι₂ := ι) Z) := by
+        rw [hT_total, Matrix.one_mul]
+
 /-- The final algebraic rewrite in the helper-completeness Cauchy--Schwarz
 argument, isolated from the two analytic estimates.
 
@@ -315,7 +368,8 @@ linear expression is
 
 This theorem reindexes the average to
 `Σ_h ⟨ψ, (T_h E_u A^u_{h(u)}) ⊗ I ψ⟩`, applies the complementary-slackness
-identity `T_h E_u A^u_{h(u)} = T_h Z`, and finally uses `Σ_h T_h = I`.
+identity `T_h E_u A^u_{h(u)} = T_h Z`, and finally invokes
+`sdp_complementary_slackness_sum_eq_dual_mass` to use `Σ_h T_h = I`.
 The statement deliberately keeps complementary slackness as an explicit
 hypothesis; it is not a consequence of the current reduced
 `SdpOptimalPair` interface. -/
@@ -419,17 +473,33 @@ theorem helper_linearized_completeness_eq_dual_mass_of_complementary_slackness
               (leftTensor (ι₂ := ι)
                 (T.outcome h * averagedPointOperator params strategy h)) := by
               rw [hmul_avg]
-    _ =
-      ∑ h : Polynomial params,
+    _ = ev strategy.state (leftTensor (ι₂ := ι) Z) := by
+        refine sdp_complementary_slackness_sum_eq_dual_mass
+          params strategy T Z hTtotal ?_
+        intro h
+        exact (hslack h).symm
+
+/-- Complementary-slackness conversion specialized to the SDP witness packaged
+inside `SelfImprovementHelperConclusion`. -/
+theorem helper_sdp_complementary_slackness_sum_eq_dual_mass
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    {T : Measurement (Polynomial params) ι}
+    {Hhat : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
+    (hcomp :
+      ∀ h : Polynomial params,
+        sdpComplementarySlacknessEquation params strategy T.toSubMeas Z h) :
+    (∑ h : Polynomial params,
         ev strategy.state
-          (leftTensor (ι₂ := ι) (T.outcome h * Z)) := by
-        refine Finset.sum_congr rfl ?_
-        intro h _
-        rw [hslack h]
-    _ =
-      ev strategy.state (leftTensor (ι₂ := ι) Z) := by
-        rw [← ev_finset_sum, leftTensor_finset_sum, ← Finset.sum_mul,
-          T.sum_eq_total, hTtotal, one_mul]
+          (leftTensor (ι₂ := ι)
+            (T.toSubMeas.outcome h * averagedPointOperator params strategy h))) =
+      ev strategy.state (leftTensor (ι₂ := ι) Z) :=
+  sdp_complementary_slackness_sum_eq_dual_mass params strategy T.toSubMeas Z
+    hhelper.sdpWitness.primalTotalOperator hcomp
 
 /-- Helper-stage completeness from the `Hhat`-versus-`Z` comparison and the
 dual-mass lower bound.

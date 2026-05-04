@@ -600,8 +600,10 @@ theorem baseProjectiveCompletionResidual_ofBaseBridge
 
 This removes the exact line-169 match-mass preservation fields from the base
 bridge.  The repaired pre-completion route needs only the line-130
-orthonormalization inputs and a diagonal consistency input for the completion
-theorem on the two unsymmetrized role-block POVMs. -/
+orthonormalization inputs and an additional diagonal consistency input for the
+completion theorem on the two unsymmetrized role-block POVMs.  This diagonal
+input is not the paper's line-130 assertion itself; line 130 supplies the
+cross relation between the two unsymmetrized roles. -/
 structure MainFormalBaseRepairedBridgeHypotheses
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -614,8 +616,8 @@ structure MainFormalBaseRepairedBridgeHypotheses
   orthonormalizationInput :
     MainFormalPostRolePackageDiagonalOrthonormalizationInput
       params strategy eps k scalars (roleResidual.rolePackage scalars)
-  /-- Diagonal line-130 consistency for the two unsymmetrized role POVMs, used to
-  invoke the completion theorem without the exact match-mass route. -/
+  /-- Additional diagonal consistency for the two unsymmetrized role POVMs, used
+  to invoke the completion theorem without the exact match-mass route. -/
   diagonalConsistency :
     MainFormalPostRolePackageDiagonalConsistencyInput
       params strategy eps k scalars (roleResidual.rolePackage scalars)
@@ -954,9 +956,9 @@ theorem mainFormal
   --
   -- 3. **Completion input** for the two POVMs, derived through
   --    `completingToMeasurement`.  In the repaired base route this is supplied as
-  --    diagonal line-130 consistency for the two unsymmetrized POVMs, which is
-  --    converted to the `BipartiteSSCRel` hypotheses consumed by the completion
-  --    theorem.
+  --    additional diagonal consistency for the two unsymmetrized POVMs, beyond
+  --    the line-130 cross relation, and is converted to the `BipartiteSSCRel`
+  --    hypotheses consumed by the completion theorem.
   --
   -- 4. **Repaired line-169 transport**.  The paper's exact `ζ₁` replacement step
   --    is false as printed; the checked local repair compares with the

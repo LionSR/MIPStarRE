@@ -261,6 +261,11 @@ private lemma gCommStabilityTwo_raw_scalar_pointwise_bound
       (strategy.pointMeasurement vy).toSubMeas.outcome b
     let Q : Point params → Polynomial params → MIPStarRE.Quantum.Op ι := fun u g =>
       (strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome (g u)
+    have hW :
+        ∀ g : Polynomial params,
+          averageOperatorOverDistribution 𝒟U (fun u => Q u g) = W g := by
+      intro g
+      rfl
     calc
       avgOver 𝒟U (fun u =>
           ∑ g : Polynomial params, ∑ b : Fq params,
@@ -282,8 +287,11 @@ private lemma gCommStabilityTwo_raw_scalar_pointwise_bound
               (avgOver_right_linear (ι := ι) 𝒟U strategy.state L P Q)
       _ = ∑ gb : Polynomial params × Fq params, t vy gb := by
             rw [Fintype.sum_prod_type]
-            simp [t, L, P, Q, W, T, 𝒟U,
-              IdxPolyFamily.averagedSlicePointEvaluationOperator]
+            refine Finset.sum_congr rfl ?_
+            intro g _
+            refine Finset.sum_congr rfl ?_
+            intro b _
+            rw [hW g]
   have hT_herm : Tᴴ = T := by
     exact
       (Matrix.nonneg_iff_posSemidef.mp <| by
