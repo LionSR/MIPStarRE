@@ -37,9 +37,12 @@ data-processing transport of the boundedness gap, and the standalone
 - **helper_boundedness_gap_le_selfImprovementHelperError** — combines the
   `H`-versus-`Z` scalar comparison with the off-diagonal average estimate to
   obtain the helper boundedness gap at the helper threshold.
-- **helper_point_consistency_of_pointConsistencyAddInU_transfer** — identifies
-  the same off-diagonal average as a helper-stage `ConsRel` defect and bounds it
-  by the point-consistency `add-in-u` transfer.
+- **helper_point_consistency_error_eq_off_diagonal_avg** — identifies the
+  averaged off-diagonal mass with the helper-stage `ConsRel` defect for the
+  point measurement against `polynomialEvaluationFamily`.
+- **helper_point_consistency_of_pointConsistencyAddInU_transfer** — packages
+  the point-consistency `add-in-u` transfer as a `ConsRel` at
+  `selfImprovementHelperError`.
 - **helper_boundedness_gap_transport_through_data_processing** — transport
   the helper boundedness gap through the data-processing SDD approximation
   between Ĥ and H (paper lines 747–755).
