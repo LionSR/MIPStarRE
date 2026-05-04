@@ -203,6 +203,26 @@ noncomputable def leftLiftedQXPLayerRepairWitness_of_lifted_qxp_sddOpRel
   rw [herror]
   exact hclose.squaredDistanceBound
 
+/-- A QXP-layer witness producer implies the existing left-lifted repair input.
+
+This is the locality-preserving bridge needed by the orthonormalization slice:
+once the QXP construction supplies its canonical local projective
+submeasurement and the lifted closeness estimate, the existential in
+`LeftLiftedProjectivizationRepairInput` is discharged by choosing exactly that
+local submeasurement. -/
+noncomputable def leftLiftedProjectivizationRepairInput_of_qxpLayer
+    {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    {ψ : QuantumState (ι × ι)} {A : Measurement Outcome ι} {ζ : Error}
+    (hwitness :
+      SpectralTruncationStatement ψ (leftLiftedMeasurement (ιB := ι) A) ζ →
+        LeftLiftedQXPLayerRepairWitness ψ A ζ) :
+    LeftLiftedProjectivizationRepairInput ψ A ζ :=
+  fun hSpectral =>
+    let W := hwitness hSpectral
+    ⟨qxpProjSubMeas W.data, ⟨W.closeness⟩⟩
+
 /-- Build the left-lifted projectivization repair input directly from a lifted
 raw QXP approximation.
 
@@ -227,29 +247,8 @@ noncomputable def leftLiftedProjectivizationRepairInput_of_lifted_qxp_sddOpRel
           (OpFamily.leftPlacedOpFamily (ιB := ι) (PFamily data)))
         (roundingToProjectiveError ζ)) :
     LeftLiftedProjectivizationRepairInput ψ A ζ :=
-  fun _ =>
-    let W := leftLiftedQXPLayerRepairWitness_of_lifted_qxp_sddOpRel data hA hclose
-    ⟨qxpProjSubMeas W.data, ⟨W.closeness⟩⟩
-
-/-- A QXP-layer witness producer implies the existing left-lifted repair input.
-
-This is the locality-preserving bridge needed by the orthonormalization slice:
-once the QXP construction supplies its canonical local projective
-submeasurement and the lifted closeness estimate, the existential in
-`LeftLiftedProjectivizationRepairInput` is discharged by choosing exactly that
-local submeasurement. -/
-noncomputable def leftLiftedProjectivizationRepairInput_of_qxpLayer
-    {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    {ψ : QuantumState (ι × ι)} {A : Measurement Outcome ι} {ζ : Error}
-    (hwitness :
-      SpectralTruncationStatement ψ (leftLiftedMeasurement (ιB := ι) A) ζ →
-        LeftLiftedQXPLayerRepairWitness ψ A ζ) :
-    LeftLiftedProjectivizationRepairInput ψ A ζ :=
-  fun hSpectral =>
-    let W := hwitness hSpectral
-    ⟨qxpProjSubMeas W.data, ⟨W.closeness⟩⟩
+  leftLiftedProjectivizationRepairInput_of_qxpLayer
+    (fun _ => leftLiftedQXPLayerRepairWitness_of_lifted_qxp_sddOpRel data hA hclose)
 
 /-- SelfImprovement-level producer of QXP-layer repair witnesses for each
 helper submeasurement. -/
