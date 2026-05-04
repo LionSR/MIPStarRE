@@ -3,7 +3,46 @@ import MIPStarRE.LDT.Test.MainTheorem.ProjectiveConsistency
 /-!
 # Completion transport residuals
 
-Statement-preserving slice of `MIPStarRE.LDT.Test.MainTheorem`.
+Post-role completion-transport residuals used between the role-register output
+and the projective-consistency layer.  The layered structures progressively
+reduce the still-external Section 6 obligations: the role package is consumed
+first, then the unsymmetrization and projectivization data, and finally the
+left-completion transport links.
+
+## Main definitions
+
+* `MainFormalCascadeRolePackagedCompletionTransportResidual`,
+  `toCompletionTransportResidual` — residual after consuming the checked
+  role-register Section 6 package, with the
+  `MainFormalRoleMeasurementPackage` carrying the symmetrized consistency.
+* `MainFormalPostRolePackageCompletionTransportResidual`,
+  `toRolePackagedCompletionTransportResidual` — post-role variant with the
+  unsymmetrization bridge package carried explicitly.
+* `MainFormalPostRolePackageLeftCompletionTransportResidual`,
+  `ofCompleteAtOutcomeStatements`,
+  `nonempty_ofOrthonormalizeAndCompleteInputs`,
+  `toPostRolePackageCompletionTransportResidual` — left-side completion
+  transport residual built from the orthonormalize-and-complete inputs.
+* `MainFormalCascadeRolePackageResidualCompletionTransportResidual`,
+  `toRolePackagedCompletionTransportResidual` — wrapper carrying the
+  isolated `MainFormalRolePackageResidual` together with the completion
+  transport data.
+* `MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual`,
+  `ofRoleResidualAndCompleteAtOutcomeStatements`,
+  `nonempty_ofRoleResidualAndOrthonormalizeAndCompleteInputs`,
+  `toRolePackageResidualCompletionTransportResidual` — same but starting
+  from the role residual and the right-side complete-at-outcome statements.
+* `MainFormalCascadeRolePackageResidualOrthonormalizeAndCompleteInputResidual`,
+  `nonempty_leftCompletionTransportResidual` — residual using the unwrapped
+  orthonormalize-and-complete inputs.
+
+## References
+
+* `references/ldt-paper/inductive_step.tex`, lines 130, 146 — the diagonal
+  cross-relation and the completion-side measurements `Q^A`, `Q^B`.
+* `references/ldt-paper/inductive_step.tex`, line 169 — the polynomial
+  transport links between `(P^A, P^B)` and `(Q^A, Q^B)` consumed by the
+  completion-transport residuals.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -92,14 +131,16 @@ noncomputable def toCompletionTransportResidual
 
 end MainFormalCascadeRolePackagedCompletionTransportResidual
 
-/-- Projectivization/completion and line-169 residual after a concrete role package
-has already been produced.
+/-- Projectivization/completion and polynomial projective-evaluation transport
+residual (`references/ldt-paper/inductive_step.tex` line 169) after a concrete
+role package has already been produced.
 
 This is the post-role part of
 `MainFormalCascadeRolePackagedCompletionTransportResidual`: the role-register
 measurement is no longer a field, so the remaining data are exactly the two
 completed projective measurements, their completion closeness to the
-unsymmetrized POVMs, and the two polynomial line-169 transport estimates. -/
+unsymmetrized POVMs, and the two polynomial projective-evaluation transport
+estimates of `inductive_step.tex` line 169. -/
 structure MainFormalPostRolePackageCompletionTransportResidual
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -730,7 +771,8 @@ namespace MainFormalCascadeRolePackageResidualOrthonormalizeAndCompleteInputResi
 
 open MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual in
 /-- Run orthonormalize-and-complete on the two role-block POVMs and recover the
-left-completion line-169 residual. -/
+left-completion polynomial projective-evaluation transport residual
+(`references/ldt-paper/inductive_step.tex` line 169). -/
 theorem nonempty_leftCompletionTransportResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

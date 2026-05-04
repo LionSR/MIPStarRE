@@ -3,7 +3,38 @@ import MIPStarRE.LDT.Test.MainTheorem.ClassicalAndBase
 /-!
 # Ordinary restricted-slice recursion
 
-Statement-preserving slice of `MIPStarRE.LDT.Test.MainTheorem`.
+Successor-case restriction package using the ordinary diagonal restriction
+`xRestrictedStrategy`.  This is the compatibility route into
+`MainFormalRolePackageBranchResidual.successor`; the answer-valued route in
+`AnswerValuedRestriction.lean` is the paper-faithful preferred route, with the
+trade-off documented in the namespaced section docstring below.
+
+## Main definitions
+
+* `MainFormalSuccessorAxisWeightedBound`,
+  `MainFormalSuccessorDiagonalWeightedBound` — the per-slice weighted
+  axis-parallel and diagonal failure-probability bounds.
+* `mainFormalSuccessorRestrictionPackage`,
+  `MainFormalSuccessorRecursiveSlices` — the per-slice recursion data
+  produced by repeatedly applying the predecessor `mainFormal`.
+* `MainFormalSuccessorBoundary` — the role-register boundary witness consumed
+  by the successor branch of `MainFormalRolePackageBranchResidual`.
+* `MainFormalSuccessorSelfImprovementProducer`,
+  `MainFormalSuccessorSelfImprovementBridgeInputs`,
+  `mainFormalSuccessorSelfImprovementProducer_ofBridgeInputs` — Section 9
+  self-improvement bridge inputs and the producer constructed from them.
+* `mainFormalSuccessorRecursiveSlices_ofInductionPackage`,
+  `mainFormalSuccessorBoundary_ofRecursiveSelfImprovement`,
+  `mainFormalSuccessorBoundary_ofBridgeInputs`,
+  `mainFormalSuccessorBoundary_ofPredecessorInduction` — assemblers turning
+  the predecessor induction data into the successor boundary.
+
+## References
+
+* `references/ldt-paper/inductive_step.tex` — Section 6 successor route and
+  the per-slice restriction recursion.
+* `references/ldt-paper/inductive_step.tex` (Section 9 region) — the
+  self-improvement step using the per-slice failure bounds.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

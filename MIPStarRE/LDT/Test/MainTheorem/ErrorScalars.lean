@@ -3,7 +3,37 @@ import MIPStarRE.LDT.Test.MainTheorem.AnswerValuedRestriction
 /-!
 # Main-formal error scalars
 
-Statement-preserving slice of `MIPStarRE.LDT.Test.MainTheorem`.
+Section 3 specialisation of the main-induction `ν` after Step 1 symmetrization
+and the resulting cascade scalars `σ`, `ζ₁`, `ζ₂`, `ζ₃`, `ζ₄` used throughout
+the projective-completion chain.
+
+## Main definitions
+
+* `mainFormalInductionNu`, `mainFormalCascadeSigma_eq_mainInductionError` —
+  the Section 3 specialisation of the main-induction quantity at the
+  symmetrized error vector `(3ε, 3ε, 3ε)` and its identification with the
+  cascade scalar `σ`.
+* `mainFormalInductionNu_nonneg`, `mainFormalInductionNu_bound` —
+  monotonicity inputs used to compare `ν` against the ambient error.
+* `mainFormalError_ge_one_of_one_le_envelope`,
+  `mainFormalError_ge_one_of_one_lt_eps`,
+  `mainFormalError_ge_one_of_q_lt_d`,
+  `cascadeHypotheses_of_not_mainFormalError_ge_one` — the trivial-witness
+  branches and the non-trivial cascade bookkeeping.
+* `MainFormalCascadeScalars` — the structure carrying the four scalars
+  together with the hypotheses needed to instantiate the cascade.
+* `MainFormalCascadeScalars.sigma`, `.zeta1`, `.zeta2`, `.zeta3`, `.zeta4` and
+  the `*_nonneg`, `*_le_*`, `zeta3_div_two_le_mainFormalError`,
+  `orthonormalizeAndCompleteError_zeta1_le_zeta2` lemmas — the cascade values
+  and the bounds linking them to `mainFormalError`.
+
+## References
+
+* `references/ldt-paper/inductive_step.tex`, lines 68–81 — Step 1
+  symmetrization with errors `(3ε, 3ε, 3ε)` and the introduction of `ν` and
+  the cascade scalars.
+* `references/ldt-paper/inductive_step.tex`, lines 133+ — usage of the
+  cascade notation in the projective-completion chain.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

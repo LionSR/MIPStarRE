@@ -3,7 +3,42 @@ import MIPStarRE.LDT.Test.MainTheorem.OrdinaryRestriction
 /-!
 # Answer-valued restricted-slice recursion
 
-Statement-preserving slice of `MIPStarRE.LDT.Test.MainTheorem`.
+Paper-faithful (preferred) successor-case restriction package using the
+answer-valued diagonal restriction `xRestrictedAnswerSymStrat`.  Unlike the
+ordinary route in `OrdinaryRestriction.lean`, this version preserves the full
+answer-valued diagonal restriction and its transport invariant, so the
+restricted strategy can serve as an honest input to the Section 9
+self-improvement bridge.
+
+## Main definitions
+
+* `MainFormalSuccessorAnswerAxisWeightedBound`,
+  `MainFormalSuccessorAnswerDiagonalWeightedBound` — the answer-register
+  weighted per-slice axis-parallel and diagonal failure-probability bounds.
+* `mainFormalSuccessorAnswerRestrictionPackage`,
+  `MainFormalSuccessorAnswerRecursiveSlices`,
+  `MainFormalSuccessorAnswerRecursiveSliceData` — the answer-register
+  per-slice recursion data and its slice-data presentation.
+* `MainFormalSuccessorAnswerBoundary` — the answer-register role-boundary
+  witness fed into `MainFormalRolePackageBranchResidual.answerSuccessor`.
+* `MainFormalSuccessorAnswerSelfImprovementProducer`,
+  `MainFormalSuccessorAnswerSelfImprovementBridgeInputs` — Section 9 bridge
+  inputs and producer for the preferred route.
+* `mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage`,
+  `mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement`,
+  `mainFormalSuccessorAnswerBoundary_ofBridgeInputs`,
+  `mainFormalSuccessorAnswerBoundary_ofPredecessorInduction` — assemblers
+  turning the predecessor induction data into the preferred-route boundary.
+* `mainFormalSuccessorAnswerMainInductionPublicWrapper` — public wrapper
+  exposing the preferred per-slice main-induction data.
+
+## References
+
+* `references/ldt-paper/inductive_step.tex` — Section 6 successor route, with
+  the answer-register transport playing the role of the paper's preferred
+  per-slice diagonal recursion.
+* `references/ldt-paper/inductive_step.tex` (Section 9 region) — the
+  self-improvement bridge that consumes the answer-valued route.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

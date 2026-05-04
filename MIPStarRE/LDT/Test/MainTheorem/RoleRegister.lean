@@ -3,7 +3,37 @@ import MIPStarRE.LDT.Test.MainTheorem.ErrorScalars
 /-!
 # Role-register residuals
 
-Statement-preserving slice of `MIPStarRE.LDT.Test.MainTheorem`.
+Section 6 role-register output for the symmetrized strategy and the residual
+packages branching it into the base case and the two successor routes.
+
+## Main definitions
+
+* `MainFormalRoleMeasurementPackage` — the role-register polynomial POVM
+  produced by the main-induction call on `strategy.strategySymmetrization`,
+  together with its symmetrized point-consistency estimate at the cascade
+  scalar `σ`.
+* `MainFormalRoleMeasurementPackage.ofMainInductionWitness`, `ofBaseCase`,
+  `ofSuccessorBoundary`, `toUnsymmetrizationBridge` — constructors from a
+  main-induction witness, from the base case, and from a successor boundary,
+  plus the conversion into the two-side unsymmetrization bridge.
+* `MainFormalRolePackageResidual` — the residual carrying the role-register
+  package together with the still-external Section 6 obligations.
+* `MainFormalRolePackageResidual.ofMainInductionWitness`,
+  `toRoleMeasurementPackage`, `ofBaseCase`, `ofSuccessorBoundary`,
+  `rolePackage` — main constructors and projections on the residual.
+* `fieldModelOfSuccessorDecomposition`, `projStratTransportSuccessor`,
+  `passesLowIndividualDegreeTest_transportSuccessor` — successor-route
+  field-model transport machinery used by the successor branch.
+* `MainFormalRolePackageSuccessorResidual`, `toRolePackageResidual` — the
+  per-slice successor residual and its projection into the unbranched
+  residual.
+
+## References
+
+* `references/ldt-paper/inductive_step.tex`, lines 97–108 — the factor-two
+  role-block estimates and the role-register Section 6 packaging.
+* `references/ldt-paper/test_definition.tex` — the main-theorem entry point
+  consuming the role-register output.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

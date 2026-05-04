@@ -3,7 +3,42 @@ import MIPStarRE.LDT.Test.MainTheorem.RoleRegister
 /-!
 # Unsymmetrized target packages
 
-Statement-preserving slice of `MIPStarRE.LDT.Test.MainTheorem`.
+Cascade target bundles bridging the role-register output to the
+projective-consistency stage.  These structures package the unsymmetrized
+left/right POVMs, the merged Step 3 / Step 5 evaluated and full-polynomial
+consistency estimates, and the projective stage targets fed to
+`ProjectiveConsistency.lean`.
+
+## Main definitions
+
+* `polynomialEvaluationMeasurementFamily` — local helper evaluating a
+  polynomial-valued complete measurement at every point while keeping the
+  totality proof, complementing the public `polynomialEvaluationFamily`.
+* `MainFormalCascadeUnsymmetrizedPOVMTargets`,
+  `MainFormalCascadeUnsymmetrizedPOVMTargets.ofUnsymmetrizationBridge` — the
+  pair of unsymmetrized polynomial POVMs derived from the role-register
+  measurement, with the constructor consuming an
+  `UnsymmetrizationBridgePackage`.
+* `MainFormalCascadeTargets`, `MainFormalCascadeTransportTargets` — the
+  Section 3 cascade bundles consumed by the post-role transport stages.
+* `MainFormalCascadePreProjectiveSelfConsistency.fullSelfConsistency` and
+  `toPreProjectiveSelfConsistency` — pre-projective full-polynomial
+  consistency at `ζ₁` for the unsymmetrized POVMs and its conversion from
+  Step 5.
+* `diagonalConsistency` — the diagonal cross-relation supplied to the
+  Step 6 completion handoff.
+* `MainFormalCascadeProjectiveStageTargets`,
+  `MainFormalCascadeProjectiveAssemblyResidual`,
+  `toTransportTargets`, `toProjectiveStageTargets` — the Section 6 projective
+  stage targets and the assembly residual handed to the projective-consistency
+  layer.
+
+## References
+
+* `references/ldt-paper/inductive_step.tex`, lines 110–130 — unsymmetrized
+  left/right POVMs and the diagonal cross-relation.
+* `references/ldt-paper/inductive_step.tex`, lines 154–158 — the
+  Schwartz–Zippel inputs and the polynomial self-consistency at `ζ₁`/`ζ₃`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -312,13 +347,14 @@ end MainFormalRolePackageResidual
 /-- The remaining projective-stage transport package for `mainFormal`.
 
 Compared with `MainFormalCascadeTransportTargets`, this package has already
-split off the Step 5 Schwartz--Zippel handoff.  It asks for the line-156
-projective approximation as a bridge out of the proved pre-projective
-self-consistency at `ζ₁`; the conversion from that `≈_{ζ₃}` statement to the
-native `eq:third-goal` consistency statement is proved by
-`toTransportTargets` using the projective converse of `prop:simeq-to-approx`.
-The two point-consistency targets remain explicit residual fields at the paper's
-`ζ₄`, corresponding to `eq:one-goal` and `eq:another-goal`. -/
+split off the Step 5 Schwartz--Zippel handoff.  It asks for the polynomial
+projective self-consistency (`references/ldt-paper/inductive_step.tex` lines
+154--158) as a bridge out of the proved pre-projective self-consistency at
+`ζ₁`; the conversion from that `≈_{ζ₃}` statement to the native
+`eq:third-goal` consistency statement is proved by `toTransportTargets` using
+the projective converse of `prop:simeq-to-approx`.  The two point-consistency
+targets remain explicit residual fields at the paper's `ζ₄`, corresponding to
+`eq:one-goal` and `eq:another-goal`. -/
 structure MainFormalCascadeProjectiveStageTargets
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -343,8 +379,10 @@ structure MainFormalCascadeProjectiveStageTargets
       (polynomialEvaluationFamily params leftMeasurement.toSubMeas)
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
       scalars.zeta4
-  /-- Paper line 156, produced from the Step 5 full-polynomial consistency at `ζ₁`
-  and the projectivization/completion approximation chain. -/
+  /-- Polynomial projective self-consistency
+  (`references/ldt-paper/inductive_step.tex` lines 154--158), produced from
+  the Step 5 full-polynomial consistency at `ζ₁` and the
+  projectivization/completion approximation chain. -/
   fullPolynomialConsistency :
     ConsRel strategy.state (uniformDistribution Unit)
       (constSubMeasFamily preSelfConsistency.leftPOVM.toSubMeas)
@@ -357,8 +395,9 @@ structure MainFormalCascadeProjectiveStageTargets
 
 namespace MainFormalCascadeProjectiveStageTargets
 
-/-- Convert the line-156 projective approximation package into the transport-only
-cascade targets.
+/-- Convert the polynomial projective self-consistency package
+(`references/ldt-paper/inductive_step.tex` lines 154--158) into the
+transport-only cascade targets.
 
 The only mathematical step performed here is the projective converse of
 `prop:simeq-to-approx`: for projective measurements, an `≈_{ζ₃}` relation gives
@@ -409,9 +448,11 @@ triangle step has been factored out.
 This package asks for the unsymmetrized `G^A,G^B` POVMs with their two `2σ`
 links (`inductive_step.tex` lines 97--109), then records the still-open
 projectivization/completion and point-transport outputs from lines 135--185:
-the line-156 `≈_{ζ₃}` bridge and the two native `ζ₄` point-consistency goals.
-The theorem `toProjectiveStageTargets` proves the line-116 pre-projective
-self-consistency from these fields and the low-individual-degree pass hypothesis. -/
+the polynomial projective self-consistency `≈_{ζ₃}` bridge
+(`inductive_step.tex` lines 154--158) and the two native `ζ₄`
+point-consistency goals.  The theorem `toProjectiveStageTargets` proves the
+line-116 pre-projective self-consistency from these fields and the
+low-individual-degree pass hypothesis. -/
 structure MainFormalCascadeProjectiveAssemblyResidual
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -436,8 +477,10 @@ structure MainFormalCascadeProjectiveAssemblyResidual
       (polynomialEvaluationFamily params leftMeasurement.toSubMeas)
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
       scalars.zeta4
-  /-- Paper line 156, produced by orthogonalization, completion,
-  `prop:simeq-to-approx`, and the `≈_δ` triangle inequality. -/
+  /-- Polynomial projective self-consistency
+  (`references/ldt-paper/inductive_step.tex` lines 154--158), produced by
+  orthogonalization, completion, `prop:simeq-to-approx`, and the `≈_δ`
+  triangle inequality. -/
   fullPolynomialConsistency :
     ConsRel strategy.state (uniformDistribution Unit)
       (constSubMeasFamily unsymmetrized.leftPOVM.toSubMeas)

@@ -3,7 +3,47 @@ import MIPStarRE.LDT.Test.MainTheorem.DiagonalCompletion
 /-!
 # Main-formal target assembly
 
-Statement-preserving slice of `MIPStarRE.LDT.Test.MainTheorem`.
+Top-level Section 3 assembly of `mainFormal`: combines the role-register
+output, the projective-completion residuals, and the base-case bridge into the
+public main-theorem statement.
+
+## Main definitions
+
+* `MainFormalCascadeRolePackageResidualProjectiveCompletionResidual` —
+  paper-shaped residual carrying the still-external data in the non-vacuous
+  branch: the role residual, the projective-completion residual, and the
+  `match-mass` polynomial supplement.
+* `nonempty_ofRoleResidualAndCompletion`,
+  `nonempty_ofRoleResidualAndDiagonalInputs`,
+  `nonempty_ofRoleResidualAndDiagonalInputsAndCompletionInputs`,
+  `nonempty_ofRoleResidualAndDiagonalInputsAndCompletingToMeasurementInputs`,
+  `nonempty_ofRoleResidualAndDiagonalInputsAndMatchMassPreservation` —
+  non-emptiness witnesses for the residual at each level of the input chain.
+* `toLeftCompletionTransportResidual`, `toCascadeTargets` — projections into
+  the completion-transport and cascade-target layers.
+* `MainFormalNativeTargets`, `toMainFormal`, `toNativeTargets` — the native
+  targets bundle and the assembler turning it into the public `mainFormal`
+  conclusion.
+* `MainFormalBaseProjectiveCompletionHypotheses`,
+  `baseProjectiveCompletionResidual`, `MainFormalBaseBridgeHypotheses`,
+  `baseProjectiveCompletionHypotheses_ofBaseBridge`,
+  `baseProjectiveCompletionResidual_ofBaseBridge` — `m = 1` base-case
+  hypotheses, the residual they produce, and the bridge from the
+  base-bridge form.
+* `mainFormal` — the public main-theorem statement; the successor branch
+  `params.m ≠ 1` is currently discharged with a documented `sorry`
+  (issues #931, #834, #422), which is preserved verbatim from the
+  pre-split file.
+
+## References
+
+* `references/ldt-paper/test_definition.tex`, `thm:main-formal` —
+  Section 3 main-theorem statement formalised by `mainFormal`.
+* `references/ldt-paper/inductive_step.tex`, lines 130–169 — the diagonal
+  consistency, completion theorem, and polynomial transport stages consumed
+  by the residuals above.
+* `blueprint/src/chapter/ch10_induction.tex` — blueprint cross-references for
+  the residual structures and the base-case hypotheses.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -629,8 +669,9 @@ and weakens it to the predecessor side condition `400 * pred.m * pred.d ≤ k`.
 
 For an arbitrary current parameter bundle, the predecessor decomposition itself is
 now formalized by `Parameters.successorDecompositionOfNeOne`; what remains
-external is producing the successor-boundary data and the later completion /
-line-169 residuals. No checked lemma here claims that the former intermediate
+external is producing the successor-boundary data and the later completion and
+projective-evaluation transport residuals (`inductive_step.tex` line 169).
+No checked lemma here claims that the former intermediate
 range `params.m * params.d ≤ k < 400 * params.m * params.d` is vacuous.
 
 Universe note: the Lean statement uses `[FieldModel.{0} params.q]`, matching the

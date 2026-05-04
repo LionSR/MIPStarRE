@@ -3,7 +3,36 @@ import MIPStarRE.LDT.Test.MainTheorem.CompletionTransport
 /-!
 # Orthonormalization and completion data
 
-Statement-preserving slice of `MIPStarRE.LDT.Test.MainTheorem`.
+Post-role Step 6 witness data with the orthonormalize-and-complete witnesses
+fixed.  These structures carry the concrete projective submeasurements
+`P^A, P^B`, the distinguished completion outcomes, and the completed
+measurements `Q^A, Q^B` produced from the diagonal-orthonormalization input.
+
+## Main definitions
+
+* `MainFormalPostRolePackageProjectiveCompletionResidual`,
+  `toPostRolePackageLeftCompletionTransportResidual` — Step 6 witness data
+  with the projective and completed measurements fixed, plus the
+  construction-level `match-mass` line-supplement fields.
+* `MainFormalPostRolePackageDiagonalOrthonormalizationInput` — the
+  diagonal-orthonormalization input package: pre-projective consistency,
+  diagonal consistency, and the orthonormalize-and-complete witnesses for
+  both sides.
+* `MainFormalPostRolePackageDiagonalOrthonormalizationResidual`,
+  `nonempty_ofDiagonalInputs` — residual produced by orthonormalizing the
+  diagonal consistency, together with the non-emptiness witness.
+* `MainFormalPostRolePackageDiagonalCompletionResidual`,
+  `ofDiagonalOrthonormalizationAndCompletion` — post-orthonormalization
+  completion residual obtained by composing diagonal orthonormalization with
+  the completion step.
+
+## References
+
+* `references/ldt-paper/inductive_step.tex`, lines 135–149 — the Step 6
+  orthonormalize-and-complete construction producing `Q^A`, `Q^B`.
+* `references/ldt-paper/inductive_step.tex`, line 169 — the polynomial
+  transport supplement consumed by the completion-transport residuals in
+  `CompletionTransport.lean`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -67,7 +96,8 @@ structure MainFormalPostRolePackageProjectiveCompletionResidual
 namespace MainFormalPostRolePackageProjectiveCompletionResidual
 
 /-- Consume the post-role Step 6 witness residual and recover the checked
-left-completion line-169 residual. -/
+left-completion polynomial projective-evaluation transport residual
+(`references/ldt-paper/inductive_step.tex` line 169). -/
 noncomputable def toPostRolePackageLeftCompletionTransportResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

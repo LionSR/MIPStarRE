@@ -3,7 +3,36 @@ import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationData
 /-!
 # Diagonal completion inputs
 
-Statement-preserving slice of `MIPStarRE.LDT.Test.MainTheorem`.
+Diagonal-side Step 6 inputs to the orthonormalize-and-complete construction.
+This is the layer that turns the cross relation
+`G^A ⊗ I ≃ I ⊗ G^B` into the diagonal hypotheses needed by the completion
+theorem at lines 143–147 of `inductive_step.tex`.
+
+## Main definitions
+
+* `MainFormalPostRolePackageDiagonalConsistencyInput` — the stronger,
+  self-referential `ConsRel` form of the diagonal cross relation for both
+  completed sides.
+* `MainFormalPostRolePackageDiagonalSSCInput`,
+  `MainFormalPostRolePackageDiagonalSSCInput.ofDiagonalConsistency` —
+  state-space-consistency form and its construction from the previous input.
+* `MainFormalPostRolePackageDiagonalCompletionInput`,
+  `toCompletionResidual`, `toProjectivizationMatchMassMonotonicity` —
+  full diagonal-completion input package together with its conversion into a
+  completion residual and the supporting `match-mass` monotonicity step.
+* `nonempty_ofDiagonalConsistencyAndMatchMassPreservation`,
+  `nonempty_ofCompletingToMeasurementInputs`,
+  `nonempty_ofDiagonalSSCInput`,
+  `nonempty_ofDiagonalConsistencyInput`,
+  `toProjectiveCompletionResidual` — non-emptiness witnesses showing the
+  diagonal-completion residual exists from each level of the input chain.
+
+## References
+
+* `references/ldt-paper/inductive_step.tex`, line 130 — the diagonal cross
+  relation `G^A ⊗ I ≃ I ⊗ G^B`.
+* `references/ldt-paper/inductive_step.tex`, lines 143–147 — the
+  completion theorem requiring diagonal hypotheses on each completed side.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

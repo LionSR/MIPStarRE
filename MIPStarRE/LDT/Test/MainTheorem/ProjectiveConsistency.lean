@@ -3,7 +3,44 @@ import MIPStarRE.LDT.Test.MainTheorem.UnsymmetrizedTargets
 /-!
 # Projective consistency transport
 
-Statement-preserving slice of `MIPStarRE.LDT.Test.MainTheorem`.
+Projective evaluation residuals at the polynomial cascade scalar `ζ₃` and the
+data-processing wrappers turning constant-polynomial self-consistency into
+pointwise evaluation.  This is the layer feeding the Section 6 evaluated point
+consistencies into `MainFormal.lean`.
+
+## Main definitions
+
+* `consRel_constPolynomialEvaluation`,
+  `projectiveEvaluationConsistency_ofFullPolynomialConsistency` — the
+  data-processing move turning the polynomial self-consistency
+  `Q^A_g ⊗ I ≃ I ⊗ Q^B_g` into pointwise evaluation at `ζ₃ / 2`.
+* `MainFormalCascadeProjectiveHandoffResidual` — residual after wiring the
+  merged Step 3 and projective-self-consistency packages, with the
+  `projectivization` field provided as a
+  `ProjectivizationSelfConsistencyHandoff` for the chosen role POVMs.
+* `MainFormalCascadeProjectiveHandoffResidual.projectiveEvaluationConsistency`,
+  `pointAConsistency`, `pointBConsistency` — the evaluated point consistencies
+  derived from the handoff.
+* `MainFormalCascadeProjectiveEvaluationHandoffResidual`,
+  `toProjectiveHandoffResidual` — checked variant where the projective
+  self-consistency is rebuilt from a freshly supplied Step 5 and completion
+  closeness rather than asserted.
+* `MainFormalCascadeProjectiveCompletionTransportResidual`,
+  `ofProjectiveEvaluationHandoffResidual`,
+  `toUnsymmetrizedPOVMTargets`, `toPreProjectiveSelfConsistency`,
+  `projectivizationSelfConsistencyHandoff`, `fullPolynomialConsistency`,
+  `projectiveEvaluationConsistency`, `pointAConsistency`, `pointBConsistency`,
+  `toProjectiveStageTargets` — completion-transport residual and the
+  evaluated point consistencies derived from it.
+
+## References
+
+* `references/ldt-paper/inductive_step.tex`, lines 154–158 — the projective
+  self-consistency `ζ₃ = 6 ζ₁ + 6 ζ₂` provided by
+  `ProjectivizationSelfConsistencyHandoff.fullPolynomialConsistency`.
+* `references/ldt-paper/inductive_step.tex`, lines 163–172 —
+  `eq:cons-b`, the evaluated point consistencies, and the transport step
+  feeding paper `eq:one-goal`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -72,8 +109,9 @@ private theorem consRel_constPolynomialEvaluation
       (uniformDistribution (Point params)) Aconst Bconst δ (fun u g => g u) hconstPoint
   simpa [Aconst, Bconst, polynomialEvaluationFamily, evaluateAt] using hprocessed
 
-/-- Turn a line-156 projective approximation into the evaluated consistency used
-in the final point-consistency triangles.
+/-- Turn the polynomial projective self-consistency
+(`references/ldt-paper/inductive_step.tex` lines 154--158) into the evaluated
+consistency used in the final point-consistency triangles.
 
 The proof first applies the projective converse of `prop:simeq-to-approx` at the
 polynomial level, then uses question-dependent data processing to evaluate both
@@ -106,19 +144,21 @@ private theorem projectiveEvaluationConsistency_ofFullPolynomialConsistency
   simpa [leftConst, rightConst, constSubMeasFamily, IdxProjMeas.toIdxSubMeas]
     using consRel_constPolynomialEvaluation ψ Q_A.toMeasurement Q_B.toMeasurement hcons
 
-/-- Residual after wiring the merged Step 3 and line-156 projectivization packages.
+/-- Residual after wiring the merged Step 3 unsymmetrization and the projective
+self-consistency handoff (`references/ldt-paper/inductive_step.tex` lines
+154--158).
 
 This package is narrower than `MainFormalCascadeProjectiveAssemblyResidual`:
 
 * the unsymmetrized POVMs must be the actual role blocks of a role-register
   measurement `G`, with the two factor-two bounds supplied by
   `UnsymmetrizationBridgePackage`;
-* the line-156 approximation must come from
+* the polynomial projective self-consistency must come from
   `MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff`;
-* the remaining point-transport work is isolated to the two line-172 style
-  evaluated `ζ₁` links from the completed projective measurements back to the
-  pre-projective role blocks.  The two native `ζ₄` point goals are then proved
-  below by the paper's `prop:simeq-triangle-inequality` route. -/
+* the remaining point-transport work is isolated to the two evaluated `ζ₁`
+  links from the completed projective measurements back to the pre-projective
+  role blocks (paper line 172).  The two native `ζ₄` point goals are then
+  proved below by the paper's `prop:simeq-triangle-inequality` route. -/
 structure MainFormalCascadeProjectiveHandoffResidual
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -133,7 +173,8 @@ structure MainFormalCascadeProjectiveHandoffResidual
   leftMeasurement : ProjMeas (Polynomial params) ι
   /-- The completed projective measurement denoted $Q^{\mathrm B}$. -/
   rightMeasurement : ProjMeas (Polynomial params) ι
-  /-- Step 6 line-156 handoff from pre-projective consistency and completion closeness. -/
+  /-- Step 6 projective self-consistency handoff from pre-projective consistency
+  and completion closeness. -/
   projectivization :
     MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff strategy.state
       (unsymmetrizedLeftPOVM roleMeasurement) (unsymmetrizedRightPOVM roleMeasurement)
@@ -155,7 +196,9 @@ structure MainFormalCascadeProjectiveHandoffResidual
 
 namespace MainFormalCascadeProjectiveHandoffResidual
 
-/-- Evaluated version of the projective self-consistency from the line-156 handoff. -/
+/-- Evaluated form of the projective self-consistency produced by
+`ProjectivizationSelfConsistencyHandoff.fullPolynomialConsistency`
+(`references/ldt-paper/inductive_step.tex` lines 154--158). -/
 theorem projectiveEvaluationConsistency
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -310,7 +353,8 @@ theorem pointBConsistency
   simpa [pointB, leftG, rightQ, leftQ, polynomialEvaluationMeasurementFamily] using htarget
 
 /-- Assemble the previous projective-assembly residual from the narrower handoff
-residual using the checked Step 3, line-156, and point-triangle wrappers above. -/
+residual using the checked Step 3 unsymmetrization, the projective
+self-consistency handoff, and the point-triangle wrappers above. -/
 noncomputable def toProjectiveAssemblyResidual
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -347,18 +391,19 @@ noncomputable def toProjectiveAssemblyResidual
 
 end MainFormalCascadeProjectiveHandoffResidual
 
-/-- Polynomial-level line-169 residual before the line-172 data-processing step.
+/-- Polynomial-level projective-evaluation handoff residual sitting just before
+the evaluated point-consistency data-processing step.
 
 This package is narrower than `MainFormalCascadeProjectiveHandoffResidual`: the
-line-172 evaluated `ζ₁` links are no longer fields.  Instead it asks for the
-polynomial-level statements from `inductive_step.tex` lines 167--173,
+evaluated `ζ₁` point-consistency links are no longer fields.  Instead it asks
+for the polynomial-level statements from `inductive_step.tex` lines 167--173,
 
 * `Q^A_g ⊗ I ≃_{ζ₁} I ⊗ G^B_g`, and
 * its Bob-role mirror `Q^B_g ⊗ I ≃_{ζ₁} I ⊗ G^A_g`,
 
 both over the constant polynomial question.  The theorem
-`toProjectiveHandoffResidual` below proves the paper's data-processing move from
-line 171 to line 172 for both links. -/
+`toProjectiveHandoffResidual` below proves the paper's data-processing move
+from line 171 to line 172 for both links. -/
 structure MainFormalCascadeProjectiveEvaluationHandoffResidual
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -373,7 +418,8 @@ structure MainFormalCascadeProjectiveEvaluationHandoffResidual
   leftMeasurement : ProjMeas (Polynomial params) ι
   /-- The completed projective measurement denoted $Q^{\mathrm B}$. -/
   rightMeasurement : ProjMeas (Polynomial params) ι
-  /-- Step 6 line-156 handoff from pre-projective consistency and completion closeness. -/
+  /-- Step 6 projective self-consistency handoff from pre-projective consistency
+  and completion closeness. -/
   projectivization :
     MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff strategy.state
       (unsymmetrizedLeftPOVM roleMeasurement) (unsymmetrizedRightPOVM roleMeasurement)
@@ -493,7 +539,8 @@ structure MainFormalCascadeProjectiveCompletionTransportResidual
 
 namespace MainFormalCascadeProjectiveCompletionTransportResidual
 
-/-- The older line-169 residual contains all fields needed by the finer
+/-- The polynomial projective-evaluation handoff residual
+(`inductive_step.tex` line 169) contains all fields needed by the finer
 completion-transport residual; this coercion documents that the new target is a
 strict weakening of the previous one. -/
 noncomputable def ofProjectiveEvaluationHandoffResidual
@@ -543,8 +590,10 @@ noncomputable def toPreProjectiveSelfConsistency
     MainFormalCascadePreProjectiveSelfConsistency params strategy eps k scalars :=
   residual.toUnsymmetrizedPOVMTargets.toPreProjectiveSelfConsistency hpass
 
-/-- Rebuild the Step 6 line-156 handoff from a freshly supplied Step 5
-pre-projective consistency proof and the two completion-closeness fields. -/
+/-- Rebuild the Step 6 projective self-consistency handoff
+(`references/ldt-paper/inductive_step.tex` lines 154--158) from a freshly
+supplied Step 5 pre-projective consistency proof and the two
+completion-closeness fields. -/
 noncomputable def projectivizationSelfConsistencyHandoff
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -564,8 +613,10 @@ noncomputable def projectivizationSelfConsistencyHandoff
   leftCompletionCloseness := residual.leftCompletionCloseness
   rightCompletionCloseness := residual.rightCompletionCloseness
 
-/-- Paper line 156, reconstructed from Step 5 and completion closeness rather
-than stored as an independent residual field. -/
+/-- Polynomial projective self-consistency
+(`references/ldt-paper/inductive_step.tex` lines 154--158), reconstructed from
+Step 5 and completion closeness rather than stored as an independent residual
+field. -/
 theorem fullPolynomialConsistency
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -586,8 +637,11 @@ theorem fullPolynomialConsistency
       (residual.projectivizationSelfConsistencyHandoff hpre)
   simpa [MainFormalCascadeScalars.zeta3, cascadeZeta3] using hline
 
-/-- Evaluated version of the projective self-consistency from reconstructed
-line 156. -/
+/-- Evaluated form of the projective self-consistency reconstructed from a
+freshly supplied Step 5 full-polynomial consistency and the completion
+closeness data, via
+`ProjectivizationSelfConsistencyHandoff.fullPolynomialConsistency`
+(`references/ldt-paper/inductive_step.tex` lines 154--158). -/
 theorem projectiveEvaluationConsistency
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -758,7 +812,7 @@ theorem pointBConsistency
 /-- Assemble the projective-stage targets directly from the finer residual.  This
 reconstructs the duplicated pre-projective consistency field from the factor-two
 role-block estimates and `hpass`, then combines it with the completion-closeness
-fields for line 156. -/
+fields feeding the polynomial projective self-consistency. -/
 noncomputable def toProjectiveStageTargets
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

@@ -13,7 +13,31 @@ import MIPStarRE.LDT.Test.Unsymmetrization
 /-!
 # Classical soundness and base case
 
-Statement-preserving slice of `MIPStarRE.LDT.Test.MainTheorem`.
+Classical low-individual-degree placeholders and the `m = 1` base-case bridge
+for the Section 3 main-theorem assembly.
+
+## Main definitions
+
+* `razSafraSlackBound`, `RazSafraSoundnessStatement`,
+  `PolishchukSpielmanClassicalSoundnessStatement` — placeholder polynomial-size
+  slack and the statements of the classical soundness theorems for the surface
+  vs. point and two-prover classical low-individual-degree tests.
+* `razSafra`, `classicalTestSoundness` — wrappers exposing the classical
+  results to downstream callers.
+* `mainFormal_trivial_witness` — the `q < d` /
+  `mainFormalError ≥ 1` short-circuit witness used at the head of `mainFormal`.
+* `strategySymmetrization_mainInductionBaseCase` — the `m = 1` base-case
+  bridge: it discharges the symmetrized `mainInductionStep` call once the
+  per-base hypotheses are supplied.
+
+## References
+
+* `references/ldt-paper/test_definition.tex` — Section 1 overview of the
+  classical low-individual-degree tests and the Section 3 main-theorem base
+  case.
+* `references/ldt-paper/inductive_step.tex` — base-case treatment of the
+  inductive symmetrization step.
+* Source paper: `arXiv:2009.12982`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
