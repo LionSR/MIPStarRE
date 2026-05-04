@@ -111,25 +111,43 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
     \E_{u} \sum_h \bra{\psi} \bigl(A^{u}_{h(u)} \cdot T_h \cdot A^{u}_{h(u)}\bigr) \ot I \ket{\psi}
     = \E_{u} \sum_a \bra{\psi} \bigl(A^{u}_{a} \cdot T_{[h(u) = a]} \cdot A^{u}_{a}\bigr) \ot I \ket{\psi}.
   \end{equation}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperFiberOperator}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperFiberOperator_nonneg}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperFiberOperator_le_one}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperBracketedCompletenessQuantity}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_pointwise_sandwich_sum_eq_bracketed}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_mass_eq_avg_pointwise_bracketed_sum}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperBracketedCompletenessQuantity_eq_mass}
   We first move the leftmost copy of~$A^u_a$ across the bipartition:
   \begin{equation}\label{eq:yet-another-move-a}
     \eqref{eq:bracketize-the-expression}
     \approx_{2\sqrt{\delta}}
     \E_{u} \sum_a \bra{\psi} \bigl(T_{[h(u)=a]} \cdot A^{u}_{a}\bigr) \ot A^{u}_{a} \ket{\psi}.
   \end{equation}
-  The difference is bounded by Cauchy--Schwarz as in~\eqref{eq:move-one-cauchy-schwarz}; the first factor is at most $\sqrt{2\delta}$ by self-consistency of~$A$, and the second is at most~$1$ because $T_{[h(u)=a]} \le I$. We next remove the remaining copy of~$A^u_a$ on Bob's side:
+  The difference is bounded by Cauchy--Schwarz as in~\eqref{eq:move-one-cauchy-schwarz}; the first factor is at most $\sqrt{2\delta}$ by self-consistency of~$A$, and the second is at most~$1$ because $T_{[h(u)=a]} \le I$.
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_first_move_second_factor_operator_le_one}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_first_move_second_factor_le_one}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_first_move_abs_sub_bracketed_le_two_sqrt_delta}
+  We next remove the remaining copy of~$A^u_a$ on Bob's side:
   \begin{equation}\label{eq:mysterious-case-of-the-disappearing-a}
     \eqref{eq:yet-another-move-a}
     \approx_{\sqrt{\delta}}
     \E_{u} \sum_a \bra{\psi} \bigl(T_{[h(u)=a]} \cdot A^{u}_{a}\bigr) \ot I \ket{\psi}.
   \end{equation}
+  The first Cauchy--Schwarz factor is at most~$1$ because the fiber operators form a submeasurement after grouping~$T$ by the value of~$h(u)$.
+  \lean{MIPStarRE.LDT.SelfImprovement.helperFiberOperator_sum_eq_total}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_second_move_first_factor_operator_le_one}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_second_move_first_factor_le_one}
   Here the second Cauchy--Schwarz factor is
   \[
     \E_{u} \sum_{a\neq b} \bra{\psi} A^u_a \ot A^u_b \ket{\psi},
   \]
   which is at most~$\delta$ because~$A$ is self-consistent and projective. Reindexing by~$h$ and using~\eqref{eq:swap-Z-for-A},
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_second_move_second_factor_pointwise_le_qBipartiteSSCDefect}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_second_move_second_factor_le_delta}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_linearized_completeness_quantity_eq_fiber_sum}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_second_move_pointwise_abs_le_sqrt}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_second_move_abs_sub_first_moved_le_sqrt_delta}
   \[
     \eqref{eq:mysterious-case-of-the-disappearing-a}
     = \sum_h \bra{\psi} \bigl(T_h \cdot \E_{u} A^u_{h(u)}\bigr) \ot I \ket{\psi}
@@ -151,9 +169,13 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.input_consistency_dual_mass_lower_bound}
   \lean{MIPStarRE.LDT.SelfImprovement.sdp_complementary_slackness_sum_eq_dual_mass}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_sdp_complementary_slackness_sum_eq_dual_mass}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_hhat_vs_z_of_bracketed_cauchy_schwarz_and_complementary_slackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_hhat_vs_z_of_self_consistency_and_complementary_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_completeness_of_dual_mass_lower_bound}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_completeness_of_input_consistency}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_completeness_of_bracketed_cauchy_schwarz_input_consistency}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_completeness_of_cauchy_schwarz_input_consistency}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_completeness_of_self_consistency_complementary_slackness_input_consistency}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_completeness_error_le_selfImprovementHelperError}
   \leanok
   Since $G$ is a measurement,~\eqref{eq:Z-greater-than-A} and Lemma~\ref{prop:simeq-for-measurements} give
