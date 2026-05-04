@@ -37,6 +37,8 @@ extra assumption.
 * `OrthonormalizationRepairProducer` — the locality-preserving repair slice.
 * `LeftLiftedQXPLayerRepairWitness` — a stronger QXP-layer repair witness
   whose rounded family is canonically `ProjSubMeas.liftLeft P`.
+* `leftLiftedQXPLayerRepairWitness_of_lifted_qxp_sddOpRel` — converts a
+  lifted raw QXP approximation into that locality-preserving witness.
 * `orthonormalizationInput_of_producers` — combines the two slices into the
   full `SelfImprovement.OrthonormalizationInput`.
 * `orthonormalizationSpectralProducer_of_roundingWitnesses` — narrows the
@@ -144,6 +146,60 @@ structure LeftLiftedQXPLayerRepairWitness {Outcome : Type*}
       (constSubMeasFamily
         (ProjSubMeas.liftLeft (qxpProjSubMeas data)).toSubMeas)
       (roundingToProjectiveError ζ)
+
+/-- Build the left-lifted QXP repair witness from a lifted raw QXP
+approximation.
+
+The hypothesis is the local QXP approximation after placing both raw operator
+families on the left tensor factor.  Together with the pointwise identification
+of the source measurement `A` with the `Q`-layer outcomes, this yields exactly
+the `LeftLiftedQXPLayerRepairWitness`: the repaired projective family is the
+left lift of the canonical local `qxpProjSubMeas data`, not an arbitrary
+bipartite projective family. -/
+noncomputable def leftLiftedQXPLayerRepairWitness_of_lifted_qxp_sddOpRel
+    {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    {ψ : QuantumState (ι × ι)} {A : Measurement Outcome ι} {ζ : Error}
+    (data : QXPLayerData Outcome ι)
+    (hA :
+      ∀ a : Outcome, data.qLayer.q.outcome a = A.outcome a)
+    (hclose :
+      SDDOpRel ψ (uniformDistribution Unit)
+        (constOpFamily
+          (OpFamily.leftPlacedOpFamily (ιB := ι) data.qLayer.q))
+        (constOpFamily
+          (OpFamily.leftPlacedOpFamily (ιB := ι) (PFamily data)))
+        (roundingToProjectiveError ζ)) :
+    LeftLiftedQXPLayerRepairWitness ψ A ζ := by
+  refine
+    { data := data
+      closeness := ?_ }
+  refine ⟨?_⟩
+  have herror :
+      sddError ψ (uniformDistribution Unit)
+          (constSubMeasFamily (leftLiftedMeasurement (ιB := ι) A).toSubMeas)
+          (constSubMeasFamily
+            (ProjSubMeas.liftLeft (qxpProjSubMeas data)).toSubMeas) =
+        sddErrorOp ψ (uniformDistribution Unit)
+          (constOpFamily
+            (OpFamily.leftPlacedOpFamily (ιB := ι) data.qLayer.q))
+          (constOpFamily
+            (OpFamily.leftPlacedOpFamily (ιB := ι) (PFamily data))) := by
+    unfold sddError sddErrorOp
+    refine avgOver_congr (uniformDistribution Unit) _ _ ?_
+    intro u
+    unfold qSDD qSDDOp qSDDCore
+    refine Finset.sum_congr rfl ?_
+    intro a _
+    have hTa : (Ta data.qLayer a)ᴴ = Ta data.qLayer a := by
+      simpa [Ta] using ProjMeas.outcome_hermitian data.qLayer.t a
+    simp [constSubMeasFamily, constOpFamily, leftLiftedMeasurement,
+      leftPlacedSubMeas, ProjSubMeas.liftLeft, SubMeas.liftLeft,
+      OpFamily.leftPlacedOpFamily, PFamily, pFamilyFromXHat, Pa, hA, hTa,
+      Matrix.mul_assoc]
+  rw [herror]
+  exact hclose.squaredDistanceBound
 
 /-- A QXP-layer witness producer implies the existing left-lifted repair input.
 
