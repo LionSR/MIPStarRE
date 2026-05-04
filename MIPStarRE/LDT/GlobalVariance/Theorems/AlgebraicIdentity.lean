@@ -95,7 +95,10 @@ lemma polynomialWeightSqrtOperator_mul_self
   simpa [polynomialWeightSqrtOperator] using
     CFC.sqrt_mul_sqrt_self (G.outcome g) (G.outcome_pos g)
 
-private lemma weightedPointConditionedOperator_sub
+/-- The difference of the two weighted point-conditioned operators factors as
+the tensor product of the point-operator difference and the square root of the
+polynomial outcome. -/
+lemma weightedPointConditionedOperator_sub
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -109,7 +112,9 @@ private lemma weightedPointConditionedOperator_sub
         (polynomialWeightSqrtOperator params G g) := by
   simp [weightedPointConditionedOperatorAtPolynomial, opTensor_sub_left]
 
-private lemma weightedPointConditionedOperator_sq
+/-- The square of the weighted point-conditioned difference is the tensor of
+the squared point-operator difference with the polynomial outcome. -/
+lemma weightedPointConditionedOperator_sq
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
