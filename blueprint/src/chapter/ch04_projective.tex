@@ -746,8 +746,10 @@
 		The formalization records only the downstream consequences of this choice:
 		the matrices $X$ and $\widehat X$, the identities $X^\dagger X=Q$,
 		$\widehat X\widehat X^\dagger=I$, and $X^\dagger\widehat X=\sqrt Q$, together
-		with the $Q_a=X^\dagger T_aX$ restatement.  No explicit rectangular complex-SVD
-		matrices $U,V,\Sigma$ are needed.
+		with the $Q_a=X^\dagger T_aX$ restatement.  The elementary multiplications
+		with explicit rectangular SVD matrices $U,V,\Sigma$ are formalized separately
+		at the two $\widehat X$ identities below, while the data package itself keeps
+		only the consequences used downstream.
 	\end{definition}
 
 	\begin{remark}\label{rem:motivation-for-P}
@@ -912,9 +914,10 @@
 	\end{proof}
 
 	\begin{lemma}[$\widehat{X}$ squared]\label{lem:X-hat-squared}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xHatSquared}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_sigmaFin_xHat_coisometry_of_sum_le}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinXHatCoisometry_spec}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xHatSquared,
+			MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_coisometry,
+			MIPStarRE.LDT.MakingMeasurementsProjective.exists_sigmaFin_xHat_coisometry_of_sum_le,
+			MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinXHatCoisometry_spec}
 		\leanok
 		\begin{equation*}
 			\widehat{X} \cdot \widehat{X}^\dagger = I_{m \times m}.
@@ -926,13 +929,16 @@
 		$U$ and $V$.  In Lean, the dimension hypothesis $m\leq d$ already gives a
 		rectangular matrix with orthonormal rows on the sigma auxiliary space; the
 		chosen matrix \texttt{sigmaFinXHatCoisometry} and its specification record this
-		existence result as an input for the future construction.  The data package
-		then records the resulting coisometry identity for the particular
-		$\widehat X$ used together with the mixed square-root identity below.
+		existence result as an input for the future construction.  The formal lemma
+		\texttt{rectangularSvd\_xHat\_coisometry} records the corresponding matrix
+		calculation, and the data package then stores the resulting coisometry
+		identity for the particular $\widehat X$ used together with the mixed
+		square-root identity below.
 	\end{proof}
 
 	\begin{lemma}[$X$ times $\widehat{X}$]\label{lem:X-times-X-hat}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xTimesXHat}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xTimesXHat,
+			MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_mixed_of_sqrtQ}
 		\leanok
 		\begin{equation*}
 			X^\dagger \cdot \widehat{X} = \sqrt{Q}.
@@ -941,10 +947,13 @@
 	\begin{proof}
 		\uses{lem:X-squared}
 		The paper obtains this from the SVD formula for $X$ and the definition of
-		$\widehat X$.  We record the mixed-product identity as a primitive consequence
-		of the reduced data package, which is exactly the part needed in
-		\ref{lem:squared-difference} and \ref{lem:P-Q-approx}.  The companion paper
-		identity for $X\widehat X^\dagger$ is not used downstream.
+		$\widehat X$.  The formal lemma
+		\texttt{rectangularSvd\_xHat\_mixed\_of\_sqrtQ} is the corresponding matrix
+		calculation in the form whose square-root target is the operator $Q$ supplied
+		by the QXP construction.  The reduced data package then records this
+		mixed-product identity as a primitive consequence, which is exactly the part
+		needed in \ref{lem:squared-difference} and \ref{lem:P-Q-approx}.  The
+		companion paper identity for $X\widehat X^\dagger$ is not used downstream.
 	\end{proof}
 
 	\begin{lemma}[Squared difference]\label{lem:squared-difference}

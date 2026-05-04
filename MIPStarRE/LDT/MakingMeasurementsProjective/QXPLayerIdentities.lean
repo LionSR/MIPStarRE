@@ -18,6 +18,92 @@ open MIPStarRE.LDT
 
 noncomputable section
 
+/-- The row-coisometry identity for the rectangular SVD choice of `Xhat`.
+
+If `U` and `V` are unitary in the directions used below, and if the rectangular
+identity factor `Iro` has orthonormal rows, then the paper's matrix
+`U * Iro * Vᴴ` also has orthonormal rows.  This is the elementary matrix
+calculation behind `lem:X-hat-squared`. -/
+theorem rectangularSvd_xHat_coisometry
+    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
+    (U : Matrix μ μ ℂ) (V : Matrix ι ι ℂ)
+    (Iro : Matrix μ ι ℂ)
+    (hU_left : U * Uᴴ = (1 : Matrix μ μ ℂ))
+    (hV_right : Vᴴ * V = (1 : Matrix ι ι ℂ))
+    (hIro : Iro * Iroᴴ = (1 : Matrix μ μ ℂ)) :
+    (U * Iro * Vᴴ) * (U * Iro * Vᴴ)ᴴ = (1 : Matrix μ μ ℂ) := by
+  calc
+    (U * Iro * Vᴴ) * (U * Iro * Vᴴ)ᴴ =
+        U * (Iro * Iroᴴ) * Uᴴ := by
+          rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul]
+          simp only [Matrix.conjTranspose_conjTranspose]
+          have hVcollapse : Vᴴ * (V * (Iroᴴ * Uᴴ)) = Iroᴴ * Uᴴ := by
+            rw [← Matrix.mul_assoc, hV_right, Matrix.one_mul]
+          calc
+            U * Iro * Vᴴ * (V * (Iroᴴ * Uᴴ)) =
+                U * Iro * (Vᴴ * (V * (Iroᴴ * Uᴴ))) := by
+                  simp [Matrix.mul_assoc]
+            _ = U * Iro * (Iroᴴ * Uᴴ) := by rw [hVcollapse]
+            _ = U * (Iro * Iroᴴ) * Uᴴ := by simp [Matrix.mul_assoc]
+    _ = U * Uᴴ := by rw [hIro, Matrix.mul_one]
+    _ = 1 := hU_left
+
+/-- The mixed product obtained by multiplying the rectangular SVD formulae.
+
+This lemma contains only the matrix algebra.  The spectral identification of the
+right hand side with a square root is supplied separately, since downstream
+constructors usually know the square root in the form `CFC.sqrt Q`. -/
+theorem rectangularSvd_xHat_mixed_raw
+    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι]
+    (x : Matrix μ ι ℂ)
+    (U : Matrix μ μ ℂ) (V : Matrix ι ι ℂ)
+    (S Iro : Matrix μ ι ℂ)
+    (hU_right : Uᴴ * U = (1 : Matrix μ μ ℂ))
+    (hx : x = U * S * Vᴴ) :
+    xᴴ * (U * Iro * Vᴴ) = V * (Sᴴ * Iro) * Vᴴ := by
+  calc
+    xᴴ * (U * Iro * Vᴴ) =
+        V * (Sᴴ * Iro) * Vᴴ := by
+          rw [hx, Matrix.conjTranspose_mul, Matrix.conjTranspose_mul]
+          simp only [Matrix.conjTranspose_conjTranspose]
+          have hUcollapse : Uᴴ * (U * (Iro * Vᴴ)) = Iro * Vᴴ := by
+            rw [← Matrix.mul_assoc, hU_right, Matrix.one_mul]
+          calc
+            V * (Sᴴ * Uᴴ) * (U * Iro * Vᴴ) =
+                V * Sᴴ * (Uᴴ * (U * (Iro * Vᴴ))) := by
+                  simp [Matrix.mul_assoc]
+            _ = V * Sᴴ * (Iro * Vᴴ) := by rw [hUcollapse]
+            _ = V * (Sᴴ * Iro) * Vᴴ := by simp [Matrix.mul_assoc]
+
+/-- The mixed rectangular SVD identity with the target square root supplied as
+an external operator `Q`.
+
+This is the form compatible with the QXP constructors, where the spectral input
+is naturally stated as `CFC.sqrt (QTotal qLayer)` rather than by rewriting
+through the right Gram matrix of `X`. -/
+theorem rectangularSvd_xHat_mixed_of_sqrtQ
+    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
+    (x : Matrix μ ι ℂ)
+    (U : Matrix μ μ ℂ) (V : Matrix ι ι ℂ)
+    (S Iro : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
+    (hU_right : Uᴴ * U = (1 : Matrix μ μ ℂ))
+    (hx : x = U * S * Vᴴ)
+    (hSqrt : V * (Sᴴ * Iro) * Vᴴ = CFC.sqrt Q) :
+    xᴴ * (U * Iro * Vᴴ) = CFC.sqrt Q := by
+  rw [rectangularSvd_xHat_mixed_raw x U V S Iro hU_right hx, hSqrt]
+
+/-- The mixed rectangular SVD identity in the right Gram form. -/
+theorem rectangularSvd_xHat_mixed
+    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
+    (x : Matrix μ ι ℂ)
+    (U : Matrix μ μ ℂ) (V : Matrix ι ι ℂ)
+    (S Iro : Matrix μ ι ℂ)
+    (hU_right : Uᴴ * U = (1 : Matrix μ μ ℂ))
+    (hx : x = U * S * Vᴴ)
+    (hSqrt : V * (Sᴴ * Iro) * Vᴴ = CFC.sqrt (xᴴ * x)) :
+    xᴴ * (U * Iro * Vᴴ) = CFC.sqrt (xᴴ * x) := by
+  exact rectangularSvd_xHat_mixed_of_sqrtQ x U V S Iro (xᴴ * x) hU_right hx hSqrt
+
 /-- Assemble `QXPLayerData` from a rank-reduction witness and the SVD
 identities for `Xhat`.
 
