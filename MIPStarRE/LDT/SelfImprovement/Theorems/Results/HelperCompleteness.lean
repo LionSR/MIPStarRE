@@ -23,6 +23,11 @@ identities, and the reduced `sdp` and `addInU` wrappers.
   overlap by `⟨ψ, Z ⊗ I ψ⟩` (paper lines 408–410).
 - **input_consistency_dual_mass_lower_bound** — the combined lower bound
   `1 - nu ≤ ev ψ (leftTensor Z)` (paper lines 406–412).
+- **helper_completeness_of_dual_mass_lower_bound** — combines the
+  `Hhat`-versus-`Z` comparison with the dual-mass lower bound.
+- **helper_completeness_of_input_consistency** — uses SDP dual feasibility and
+  input consistency to produce the helper-stage completeness bound from the
+  `Hhat`-versus-`Z` comparison.
 - **helper_mass_eq_avg_pointwise_sandwich_sum** — exact Ĥ reindexing for
   the helper-stage left-tensor mass (paper lines 354–356).
 - **helper_pointwise_sandwich_sum_eq_bracketed** / **helper_mass_eq_avg_pointwise_bracketed_sum** —
@@ -258,6 +263,70 @@ theorem input_consistency_dual_mass_lower_bound
           input_match_mass_eq_sdp_overlap params strategy G.toSubMeas
     _ ≤ ev strategy.state (leftTensor (ι₂ := ι) Z) :=
           sdp_overlap_le_dual_mass params strategy G.toSubMeas Z hZ hdual
+
+/-- Helper-stage completeness from the `Hhat`-versus-`Z` comparison and the
+dual-mass lower bound.
+
+The paper proves
+`subMeasMass ψ Hhat.liftLeft ≥ ⟨ψ, Z ⊗ I, ψ⟩ - 3 √δ` by the two
+Cauchy--Schwarz moves in the helper-completeness paragraph.  Once the separate
+input-consistency argument gives `1 - ν ≤ ⟨ψ, Z ⊗ I, ψ⟩`, this theorem performs
+the scalar assembly and absorbs the loss `3 √δ` into the helper threshold
+`ζ̂ = selfImprovementHelperError params eps delta`. -/
+theorem helper_completeness_of_dual_mass_lower_bound
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta nu : Error)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
+    {Hhat : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (hHhat_vs_Z :
+      ev strategy.state (leftTensor (ι₂ := ι) Z) - 3 * Real.sqrt delta ≤
+        subMeasMass strategy.state Hhat.liftLeft)
+    (hdualMass :
+      1 - nu ≤ ev strategy.state (leftTensor (ι₂ := ι) Z)) :
+    CompletenessAtLeast strategy.state Hhat.liftLeft
+      ((1 - nu) - selfImprovementHelperError params eps delta) := by
+  refine ⟨?_⟩
+  have herr :=
+    helper_completeness_error_le_selfImprovementHelperError params eps delta heps hdelta
+  linarith
+
+/-- Helper-stage completeness from input consistency and the
+`Hhat`-versus-`Z` comparison.
+
+This is the checked assembly of the final part of the helper-completeness
+paragraph in `thm:self-improvement`.  The only analytic input still external is
+the paper's Cauchy--Schwarz comparison
+`subMeasMass ψ Hhat.liftLeft ≥ ⟨ψ, Z ⊗ I, ψ⟩ - 3 √δ`; the SDP dual-feasibility
+fields of `SelfImprovementHelperConclusion` and the input consistency of `G`
+produce the dual-mass lower bound internally. -/
+theorem helper_completeness_of_input_consistency
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : Measurement (Polynomial params) ι)
+    (eps delta nu : Error)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
+    {T : Measurement (Polynomial params) ι}
+    {Hhat : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
+    (hHhat_vs_Z :
+      ev strategy.state (leftTensor (ι₂ := ι) Z) - 3 * Real.sqrt delta ≤
+        subMeasMass strategy.state Hhat.liftLeft)
+    (hcons : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params G.toSubMeas) nu) :
+    CompletenessAtLeast strategy.state Hhat.liftLeft
+      ((1 - nu) - selfImprovementHelperError params eps delta) := by
+  refine
+    helper_completeness_of_dual_mass_lower_bound params strategy eps delta nu
+      heps hdelta hHhat_vs_Z ?_
+  exact
+    input_consistency_dual_mass_lower_bound params strategy G Z nu
+      hhelper.positiveSemidefiniteWitness hhelper.dualDominatesAveragedPoint hcons
 
 /-- Exact `Hhat` reindexing for the helper-stage left-tensor mass.
 

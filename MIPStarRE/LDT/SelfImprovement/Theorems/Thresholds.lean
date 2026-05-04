@@ -509,6 +509,28 @@ theorem helper_boundedness_error_le_selfImprovementHelperError
           nlinarith [hmnonneg]
         exact mul_le_mul_of_nonneg_right hcoef hsum_nonneg
 
+/-- Helper-stage completeness absorption (`self_improvement.tex`, lines
+403--414).
+
+The loss `3 √δ` from the Cauchy--Schwarz comparison is bounded by the helper
+threshold `ζ̂`. -/
+theorem helper_completeness_error_le_selfImprovementHelperError
+    (params : Parameters) [FieldModel params.q]
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta) :
+    3 * Real.sqrt delta ≤ selfImprovementHelperError params eps delta := by
+  have hvariance_nonneg :
+      0 ≤ 4 * Real.sqrt (selfImprovementVarianceError params eps delta) := by
+    positivity
+  calc
+    3 * Real.sqrt delta
+        ≤ 3 * Real.sqrt delta +
+            4 * Real.sqrt (selfImprovementVarianceError params eps delta) := by
+          linarith
+    _ ≤ selfImprovementHelperError params eps delta :=
+          helper_boundedness_error_le_selfImprovementHelperError params eps delta
+            heps hdelta
+
 /-! ## Final-stage threshold: `30 ζ̂ ≤ ζ`
 
 For `ε, δ, d/q ∈ [0, 1]`, the helper-stage error is dominated by
