@@ -264,8 +264,17 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
       - \sqrt{2\delta}
       - \frac{md}{q}.
   \]
+  The Lean producer-side packaging of this step starts with the input structure
+  \lean{MIPStarRE.LDT.SelfImprovement.HelperStrongSelfConsistencyProducerInputs}
+  and then uses the proved wrappers
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_of_helper_conclusion}
+  \leanok
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_input_of_producer}
+  \leanok
+  to recover the final helper-stage self-consistency input.
   The paper's arithmetic shows that the right-hand error is at most
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_error_le_selfImprovementHelperError}
+  \leanok
   \[
     57m\cdot \Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big)
     \le \zeta,
@@ -290,7 +299,24 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
     \E_u \sum_a \bra{\psi}\,A^u_a \ot H_{[h(u)=a]}\,\ket{\psi}
       = \E_u \sum_h \bra{\psi}\,A^u_{h(u)} \ot H_h\,\ket{\psi}.
   \]
-  Combined with $\sum_a A_a^u=I$ and~\eqref{eq:explicit-bound-for-A-consistency} this gives
+  Using $\sum_a A_a^u=I$, the pointwise difference between the right-placed
+  total $I \ot H.\mathrm{total} = \sum_h I \ot H_h$ and the helper-agreement
+  operator at $u$ reindexes as the off-diagonal sum
+  \lean{MIPStarRE.LDT.SelfImprovement.helperAgreementOperatorAtPoint_off_diagonal_decomposition}
+  \leanok
+  \[
+    \sum_h I \ot H_h - \sum_a A^u_a \ot H_{[h(u)=a]}
+      = \sum_h \sum_{a \neq h(u)} A^u_a \ot H_h,
+  \]
+  whose averaged scalar form reads
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_boundedness_slack_average_ev_eq_off_diagonal_avg}
+  \leanok
+  \[
+    \sum_h \bra{\psi}\,I \ot H_h\,\ket{\psi}
+        - \E_u \sum_a \bra{\psi}\,A^u_a \ot H_{[h(u)=a]}\,\ket{\psi}
+      = \E_u \sum_h \sum_{a \neq h(u)} \bra{\psi}\,A^u_a \ot H_h\,\ket{\psi}.
+  \]
+  Combined with~\eqref{eq:explicit-bound-for-A-consistency} this gives
   \[
     \bra{\psi} Z \ot I \ket{\psi}
     -\E_{u} \sum_a \bra{\psi}  A^{u}_{a} \ot H_{[h(u)=a]} \ket{\psi}
@@ -404,6 +430,11 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.addInU_cs_chain_step2_diff_eq}
   \lean{MIPStarRE.LDT.SelfImprovement.addInU_cs_chain_step1_reverse_diff_eq}
   \lean{MIPStarRE.LDT.SelfImprovement.addInU_cs_chain_step2_reverse_diff_eq}
+  \lean{MIPStarRE.LDT.SelfImprovement.addInU_cs_chain_step4_diff_eq}
+  \lean{MIPStarRE.LDT.SelfImprovement.addInU_cs_chain_step1_abs_le_sqrt_two_delta}
+  \lean{MIPStarRE.LDT.SelfImprovement.addInU_cs_chain_step2_abs_le_sqrt_two_delta}
+  \lean{MIPStarRE.LDT.SelfImprovement.add_in_u_cs_chain_q3_q4_factored_cs}
+  \lean{MIPStarRE.LDT.SelfImprovement.add_in_u_cs_chain_q3_q4_self_energy_factor_le_one}
   \lean{MIPStarRE.LDT.SelfImprovement.add_in_u_cs_chain_q2_q3_le_sqrt_of_globalVarianceDeviation_sum_le}
   \lean{MIPStarRE.LDT.SelfImprovement.add_in_u_cs_chain_q3_q4_le_sqrt_of_globalVarianceDeviation_sum_le}
   \lean{MIPStarRE.LDT.SelfImprovement.add_in_u_cs_chain_global_variance_steps_of_sum_bound}
