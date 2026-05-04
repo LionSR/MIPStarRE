@@ -250,22 +250,22 @@ theorem selfImprovementHelperError_nonneg
     0 ≤ selfImprovementHelperError params eps delta := by
   have hdq_nn : (0 : Error) ≤ ((params.d : Error) / (params.q : Error)) :=
     d_q_ratio_nonneg params
-  change (0 : Error) ≤ 100 * (params.m : Error) *
-      (Real.rpow eps (1 / (2 : Error)) +
-        Real.rpow delta (1 / (2 : Error)) +
-        Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2 : Error)))
+  rw [selfImprovementHelperError_eq]
   have hcoef_nn : (0 : Error) ≤ 100 * (params.m : Error) := by positivity
+  have heps_sqrt_nn : (0 : Error) ≤ Real.sqrt eps := by
+    have _ : (0 : Error) ≤ eps := heps
+    exact Real.sqrt_nonneg eps
+  have hdelta_sqrt_nn : (0 : Error) ≤ Real.sqrt delta := by
+    have _ : (0 : Error) ≤ delta := hdelta
+    exact Real.sqrt_nonneg delta
+  have hdq_sqrt_nn :
+      (0 : Error) ≤ Real.sqrt ((params.d : Error) / (params.q : Error)) := by
+    have _ : (0 : Error) ≤ ((params.d : Error) / (params.q : Error)) := hdq_nn
+    exact Real.sqrt_nonneg _
   have hsum_nn :
-      (0 : Error) ≤ Real.rpow eps (1 / (2 : Error)) +
-          Real.rpow delta (1 / (2 : Error)) +
-          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2 : Error)) := by
-    have heps_nn : 0 ≤ Real.rpow eps (1 / (2 : Error)) := Real.rpow_nonneg heps _
-    have hdelta_nn : 0 ≤ Real.rpow delta (1 / (2 : Error)) :=
-      Real.rpow_nonneg hdelta _
-    have hdq_rpow_nn :
-        0 ≤ Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2 : Error)) :=
-      Real.rpow_nonneg hdq_nn _
-    exact add_nonneg (add_nonneg heps_nn hdelta_nn) hdq_rpow_nn
+      (0 : Error) ≤ Real.sqrt eps + Real.sqrt delta +
+        Real.sqrt ((params.d : Error) / (params.q : Error)) := by
+    exact add_nonneg (add_nonneg heps_sqrt_nn hdelta_sqrt_nn) hdq_sqrt_nn
   exact mul_nonneg hcoef_nn hsum_nn
 
 /-- Helper-stage point-consistency absorption (`self_improvement.tex`,
