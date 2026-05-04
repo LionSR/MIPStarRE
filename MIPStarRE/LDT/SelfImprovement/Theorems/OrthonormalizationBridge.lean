@@ -39,6 +39,8 @@ extra assumption.
   whose rounded family is canonically `ProjSubMeas.liftLeft P`.
 * `leftLiftedQXPLayerRepairWitness_of_lifted_qxp_sddOpRel` — converts a
   lifted raw QXP approximation into that locality-preserving witness.
+* `leftLiftedProjectivizationRepairInput_of_lifted_qxp_sddOpRel` — composes
+  the same approximation with the existing repair-input bridge.
 * `orthonormalizationInput_of_producers` — combines the two slices into the
   full `SelfImprovement.OrthonormalizationInput`.
 * `orthonormalizationSpectralProducer_of_roundingWitnesses` — narrows the
@@ -200,6 +202,34 @@ noncomputable def leftLiftedQXPLayerRepairWitness_of_lifted_qxp_sddOpRel
       Matrix.mul_assoc]
   rw [herror]
   exact hclose.squaredDistanceBound
+
+/-- Build the left-lifted projectivization repair input directly from a lifted
+raw QXP approximation.
+
+This is the repair-input form of
+`leftLiftedQXPLayerRepairWitness_of_lifted_qxp_sddOpRel`.  It composes that
+QXP witness with `leftLiftedProjectivizationRepairInput_of_qxpLayer`, so the
+chosen repaired family remains the canonical local family
+`qxpProjSubMeas data` after left tensor placement. -/
+noncomputable def leftLiftedProjectivizationRepairInput_of_lifted_qxp_sddOpRel
+    {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    {ψ : QuantumState (ι × ι)} {A : Measurement Outcome ι} {ζ : Error}
+    (data : QXPLayerData Outcome ι)
+    (hA :
+      ∀ a : Outcome, data.qLayer.q.outcome a = A.outcome a)
+    (hclose :
+      SDDOpRel ψ (uniformDistribution Unit)
+        (constOpFamily
+          (OpFamily.leftPlacedOpFamily (ιB := ι) data.qLayer.q))
+        (constOpFamily
+          (OpFamily.leftPlacedOpFamily (ιB := ι) (PFamily data)))
+        (roundingToProjectiveError ζ)) :
+    LeftLiftedProjectivizationRepairInput ψ A ζ :=
+  fun _ =>
+    let W := leftLiftedQXPLayerRepairWitness_of_lifted_qxp_sddOpRel data hA hclose
+    ⟨qxpProjSubMeas W.data, ⟨W.closeness⟩⟩
 
 /-- A QXP-layer witness producer implies the existing left-lifted repair input.
 
