@@ -539,7 +539,12 @@ noncomputable def finalStagePowerSum (params : Parameters)
   Real.rpow eps p + Real.rpow delta p +
     Real.rpow ((params.d : Error) / (params.q : Error)) p
 
-private theorem finalStagePowerSum_nonneg
+/-- The final-stage power sum is nonnegative when its base parameters are
+nonnegative.
+
+This is the positivity fact used when multiplying coefficient comparisons by
+`ε^p + δ^p + (d/q)^p`. -/
+theorem finalStagePowerSum_nonneg
     (params : Parameters) (eps delta p : Error)
     (heps : 0 ≤ eps) (hdelta : 0 ≤ delta) :
     0 ≤ finalStagePowerSum params eps delta p := by
@@ -550,7 +555,12 @@ private theorem finalStagePowerSum_nonneg
     (add_nonneg (Real.rpow_nonneg heps _) (Real.rpow_nonneg hdelta _))
     (Real.rpow_nonneg hdq_nonneg _)
 
-private theorem finalStagePowerSum_le_of_exponent_ge
+/-- Exponent monotonicity for the final-stage power sum on the unit interval.
+
+If `ε`, `δ`, and `d/q` all lie in `[0, 1]`, then increasing the exponent
+decreases each term of the power sum. This is the formal arithmetic step behind
+the final threshold comparison in `self_improvement.tex`, lines 803--810. -/
+theorem finalStagePowerSum_le_of_exponent_ge
     (params : Parameters) (eps delta : Error)
     (heps : 0 ≤ eps) (heps_le_one : eps ≤ 1)
     (hdelta : 0 ≤ delta) (hdelta_le_one : delta ≤ 1)
@@ -578,7 +588,13 @@ private theorem sqrt_rpow_eq_rpow_half {x p : Error} (hx : 0 ≤ x) :
       exact (Real.rpow_mul hx p (1 / (2 : Error))).symm
     _ = Real.rpow x (p / 2) := by ring_nf
 
-private theorem sqrt_finalStagePowerSum_le
+/-- The square root of a final-stage power sum is bounded by the power sum with
+half the exponent.
+
+The proof is the elementary estimate
+`sqrt (x + y + z) ≤ sqrt x + sqrt y + sqrt z`, applied to the three powers
+`ε^p`, `δ^p`, and `(d/q)^p`. -/
+theorem sqrt_finalStagePowerSum_le
     (params : Parameters) (eps delta p : Error)
     (heps : 0 ≤ eps) (hdelta : 0 ≤ delta) :
     Real.sqrt (finalStagePowerSum params eps delta p) ≤
@@ -598,13 +614,23 @@ private theorem sqrt_finalStagePowerSum_le
       rw [sqrt_rpow_eq_rpow_half heps, sqrt_rpow_eq_rpow_half hdelta,
         sqrt_rpow_eq_rpow_half hdq_nonneg]
 
-private theorem selfImprovementHelperError_eq_finalStagePowerSum
+/-- The helper-stage threshold as the final-stage power sum with exponent
+`1/2`.
+
+This is definitionally equal to `selfImprovementHelperError`; the named lemma is
+used to avoid unfolding the error definition inside later absorptions. -/
+theorem selfImprovementHelperError_eq_finalStagePowerSum
     (params : Parameters) [FieldModel params.q] (eps delta : Error) :
     selfImprovementHelperError params eps delta =
       100 * (params.m : Error) * finalStagePowerSum params eps delta (1 / (2 : Error)) := by
   rfl
 
-private theorem selfImprovementError_eq_finalStagePowerSum
+/-- The final self-improvement threshold as the final-stage power sum with
+exponent `1/32`.
+
+This records the literal error parameter appearing in the formal statement of
+the self-improvement theorem. -/
+theorem selfImprovementError_eq_finalStagePowerSum
     (params : Parameters) [FieldModel params.q] (eps delta : Error) :
     selfImprovementError params eps delta =
       3000 * (params.m : Error) * finalStagePowerSum params eps delta (1 / (32 : Error)) := by
@@ -651,14 +677,25 @@ private theorem rpow_quarter_eq_sqrt_sqrt {x : Error} (hx : 0 ≤ x) :
     _ = Real.rpow (Real.rpow x (1 / (2 : Error))) (1 / (2 : Error)) := by
       exact Real.rpow_mul hx (1 / (2 : Error)) (1 / (2 : Error))
 
+/-- The orthogonalization threshold written as an iterated square root of the
+helper threshold.
+
+The paper writes the corresponding quantity as
+`100 * \widehat{\zeta}^{1/4}`. This lemma gives the equivalent square-root
+form used by the estimates which follow orthonormalization. -/
+theorem selfImprovementOrthogonalizationError_eq
+    (params : Parameters) [FieldModel params.q] (eps delta : Error) :
+    selfImprovementOrthogonalizationError params eps delta =
+      100 * Real.sqrt (Real.sqrt (selfImprovementHelperError params eps delta)) := by
+  unfold selfImprovementOrthogonalizationError orthonormalizationError
+  rw [rpow_quarter_eq_sqrt_sqrt (selfImprovementHelperError_nonneg params eps delta)]
+
 private theorem selfImprovementOrthogonalizationError_le_four_hundred_m_powerSum_eighth
     (params : Parameters) [FieldModel params.q]
     (eps delta : Error)
     (heps : 0 ≤ eps) (hdelta : 0 ≤ delta) :
     selfImprovementOrthogonalizationError params eps delta ≤
       400 * (params.m : Error) * finalStagePowerSum params eps delta (1 / (8 : Error)) := by
-  have hhelper_nn : 0 ≤ selfImprovementHelperError params eps delta :=
-    selfImprovementHelperError_nonneg params eps delta
   have hsqrt_helper :=
     sqrt_selfImprovementHelperError_le_ten_m_powerSum_quarter params eps delta heps hdelta
   have hsqrt_mS :
@@ -688,8 +725,7 @@ private theorem selfImprovementOrthogonalizationError_le_four_hundred_m_powerSum
                     finalStagePowerSum params eps delta (1 / (8 : Error)) := by
                     convert mul_le_mul_of_nonneg_left hsqrt_sum h4m_nn using 2
                     ring_nf
-  unfold selfImprovementOrthogonalizationError orthonormalizationError
-  rw [rpow_quarter_eq_sqrt_sqrt hhelper_nn]
+  rw [selfImprovementOrthogonalizationError_eq]
   calc
     100 * Real.sqrt (Real.sqrt (selfImprovementHelperError params eps delta))
         ≤ 100 * Real.sqrt
@@ -736,6 +772,18 @@ private theorem sqrt_selfImprovementOrthogonalizationError_le_twenty_m_powerSum_
                   convert mul_le_mul_of_nonneg_left hsqrt_sum h20m_nn using 2
                   ring_nf
 
+/-- The data-processing threshold written with an ordinary square root.
+
+This is the displayed expression used after projecting the helper output:
+`8\widehat{\zeta} + 8\sqrt{\widehat{\zeta}_{\mathrm{ortho}}}`. -/
+theorem selfImprovementDataProcessingError_eq
+    (params : Parameters) [FieldModel params.q] (eps delta : Error) :
+    selfImprovementDataProcessingError params eps delta =
+      8 * selfImprovementHelperError params eps delta +
+        8 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta) := by
+  unfold selfImprovementDataProcessingError
+  simp [Real.sqrt_eq_rpow, Real.rpow_eq_pow]
+
 private theorem selfImprovementDataProcessingError_le_nine_sixty_m_powerSum_sixteenth
     (params : Parameters) [FieldModel params.q]
     (eps delta : Error)
@@ -757,15 +805,11 @@ private theorem selfImprovementDataProcessingError_le_nine_sixty_m_powerSum_sixt
   have hsqrt_orth :=
     sqrt_selfImprovementOrthogonalizationError_le_twenty_m_powerSum_sixteenth
       params eps delta heps hdelta
-  unfold selfImprovementDataProcessingError
+  rw [selfImprovementDataProcessingError_eq]
   calc
     8 * selfImprovementHelperError params eps delta +
-        8 * Real.rpow (selfImprovementOrthogonalizationError params eps delta)
-          (1 / (2 : Error))
-        = 8 * selfImprovementHelperError params eps delta +
-            8 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta) := by
-          simp [Real.sqrt_eq_rpow, Real.rpow_eq_pow]
-    _ ≤ 8 * (100 * (params.m : Error) *
+        8 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta)
+        ≤ 8 * (100 * (params.m : Error) *
             finalStagePowerSum params eps delta (1 / (16 : Error))) +
           8 * (20 * (params.m : Error) *
             finalStagePowerSum params eps delta (1 / (16 : Error))) := by
