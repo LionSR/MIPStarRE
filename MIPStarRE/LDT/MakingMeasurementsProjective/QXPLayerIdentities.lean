@@ -77,6 +77,18 @@ theorem rectangularSvd_xHat_mixed_raw
             _ = V * Sᴴ * (Iro * Vᴴ) := by rw [hUcollapse]
             _ = V * (Sᴴ * Iro) * Vᴴ := by simp [Matrix.mul_assoc]
 
+/-- A positive operator whose square is `Q` is the CFC square root of `Q`.
+
+This is the uniqueness of the positive square root, stated in the matrix
+language used in the projectivization layer. -/
+theorem eq_sqrt_of_sq_of_nonneg
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (B Q : Matrix ι ι ℂ)
+    (hB_nonneg : 0 ≤ B)
+    (hB_sq : B * B = Q) :
+    B = CFC.sqrt Q := by
+  exact (CFC.sqrt_unique hB_sq hB_nonneg).symm
+
 /-- The square-root identification for the middle factor in the rectangular SVD
 calculation.
 
@@ -87,14 +99,11 @@ spectral input which turns the raw SVD calculation into the paper's identity
 theorem rectangularSvd_middle_eq_sqrt_of_square
     {μ ι : Type*} [Fintype μ] [Fintype ι] [DecidableEq ι]
     (V : Matrix ι ι ℂ) (S Iro : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
-    (hQ_nonneg : 0 ≤ Q)
     (hMiddle_nonneg : 0 ≤ V * (Sᴴ * Iro) * Vᴴ)
     (hMiddle_sq :
       (V * (Sᴴ * Iro) * Vᴴ) * (V * (Sᴴ * Iro) * Vᴴ) = Q) :
     V * (Sᴴ * Iro) * Vᴴ = CFC.sqrt Q := by
-  exact
-    ((CFC.sqrt_eq_iff Q (V * (Sᴴ * Iro) * Vᴴ) hQ_nonneg hMiddle_nonneg).mpr
-      hMiddle_sq).symm
+  exact eq_sqrt_of_sq_of_nonneg (V * (Sᴴ * Iro) * Vᴴ) Q hMiddle_nonneg hMiddle_sq
 
 /-- The mixed rectangular SVD identity with the target square root supplied as
 an external operator `Q`.
@@ -124,32 +133,6 @@ theorem rectangularSvd_xHat_mixed
     (hSqrt : V * (Sᴴ * Iro) * Vᴴ = CFC.sqrt (xᴴ * x)) :
     xᴴ * (U * Iro * Vᴴ) = CFC.sqrt (xᴴ * x) := by
   exact rectangularSvd_xHat_mixed_of_sqrtQ x U V S Iro (xᴴ * x) hU_right hx hSqrt
-
-/-- The total operator of a finite projective family is positive when it is
-identified with the sum of its outcomes. -/
-theorem qTotal_nonneg_of_projective_sum
-    {Outcome : Type*} [Fintype Outcome]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (q : OpFamily Outcome ι)
-    (qa_projective : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (q.outcome a))
-    (q_sum_eq_total : ∑ a : Outcome, q.outcome a = q.total) :
-    0 ≤ q.total := by
-  rw [← q_sum_eq_total]
-  exact Finset.sum_nonneg fun a _ => by
-    have hproj := qa_projective a
-    simpa [hproj.isHermitian.eq, hproj.idempotent] using
-      (Matrix.posSemidef_conjTranspose_mul_self (q.outcome a)).nonneg
-
-/-- The total operator supplied by a rank-reduction witness is positive. -/
-theorem qTotal_nonneg_of_rankReduction
-    {Outcome : Type*} [Fintype Outcome]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {ψ : QuantumState ι} {A : Measurement Outcome ι} {ζ : Error}
-    {qLayer : QLayerData Outcome ι}
-    (hRank : RankReductionWitness ψ A ζ qLayer) :
-    0 ≤ QTotal qLayer := by
-  rw [← hRank.sum_eq_total]
-  exact Finset.sum_nonneg fun a _ => hRank.outcome_nonneg a
 
 /-- The rectangular SVD data determine a candidate `Xhat` and its two primitive
 identities.
@@ -274,7 +257,7 @@ noncomputable def QXPLayerData.ofRankReductionAndRectangularSvdSquareRoot
   QXPLayerData.ofRankReductionAndRectangularSvd hRank x U V S Iro qa_eq
     hU_left hU_right hV_right hIro hx
     (rectangularSvd_middle_eq_sqrt_of_square V S Iro (QTotal qLayer)
-      (qTotal_nonneg_of_rankReduction hRank) hMiddle_nonneg hMiddle_sq)
+      hMiddle_nonneg hMiddle_sq)
 
 /-- Existence form of
 `QXPLayerData.ofRankReductionAndSvdIdentities`, matching the data-package shape
@@ -444,7 +427,6 @@ noncomputable def QXPLayerData.ofSigmaRangeAndRectangularSvdSquareRoot
     qa_projective q_sum_eq_total U V S Iro
       hU_left hU_right hV_right hIro hx
       (rectangularSvd_middle_eq_sqrt_of_square V S Iro q.total
-        (qTotal_nonneg_of_projective_sum q qa_projective q_sum_eq_total)
         hMiddle_nonneg hMiddle_sq)
 
 /-- Rank-reduction existence form for the canonical sigma-space QXP layer from
