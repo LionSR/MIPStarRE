@@ -943,7 +943,11 @@
 
 	\begin{lemma}[$X$ times $\widehat{X}$]\label{lem:X-times-X-hat}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xTimesXHat,
-			MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_mixed_of_sqrtQ}
+			MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_mixed_of_sqrtQ,
+			MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_middle_eq_sqrt_of_square,
+			MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndRectangularSvdSquareRoot,
+			MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvdSquareRoot,
+			MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot}
 		\leanok
 		\begin{equation*}
 			X^\dagger \cdot \widehat{X} = \sqrt{Q}.
@@ -955,10 +959,13 @@
 		$\widehat X$.  The formal lemma
 		\texttt{rectangularSvd\_xHat\_mixed\_of\_sqrtQ} is the corresponding matrix
 		calculation in the form whose square-root target is the operator $Q$ supplied
-		by the QXP construction.  The reduced data package then records this
-		mixed-product identity as a primitive consequence, which is exactly the part
-		needed in \ref{lem:squared-difference} and \ref{lem:P-Q-approx}.  The
-		companion paper identity for $X\widehat X^\dagger$ is not used downstream.
+		by the QXP construction.  The formal lemma
+		\texttt{rectangularSvd\_middle\_eq\_sqrt\_of\_square} records the spectral
+		step: a positive middle factor whose square is $Q$ is the positive square
+		root of $Q$.  The reduced data package then records this mixed-product
+		identity as a primitive consequence, which is exactly the part needed in
+		\ref{lem:squared-difference} and \ref{lem:P-Q-approx}.  The companion paper
+		identity for $X\widehat X^\dagger$ is not used downstream.
 	\end{proof}
 
 	\begin{lemma}[Squared difference]\label{lem:squared-difference}
@@ -1006,7 +1013,8 @@
 	\begin{lemma}[$P$ is close to~$Q$]\label{lem:P-Q-approx}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox}
 		\leanok
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndSvdIdentities}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndSvdIdentities,
+			MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot}
 		\leanok
 		\begin{equation*}
 			Q_a \ot I \approx_{30\zeta^{1/4}} P_a \ot I.
@@ -1016,7 +1024,9 @@
 		\uses{lem:projective-low-rank-sum, lem:q-almost-projective, lem:sqrt-Q-completeness, lem:xa-t, lem:qa-restated, lem:X-expression-to-Q-expression, lem:pa-restated, lem:X-hat-squared, lem:X-times-X-hat, lem:squared-difference, lem:P-projectivity}
 		The formal proof follows this argument directly from the primitive
 		$X$, $\widehat X$, and $P$ identities; the $30\zeta^{1/4}$ estimate is
-		derived here rather than stored as part of the data package.
+		derived here rather than stored as part of the data package.  The
+		rectangular-SVD producer combines the same estimate with the positive-square
+		identification of the middle factor from \ref{lem:X-times-X-hat}.
 		The quantity to bound is
 		\begin{equation}\label{eq:P-Q-thing-to-bound}
 			\sum_a \bra{\psi} (Q_a-P_a)^2 \ot I \ket{\psi}
