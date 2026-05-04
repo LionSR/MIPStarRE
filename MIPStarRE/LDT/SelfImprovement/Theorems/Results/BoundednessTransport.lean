@@ -31,11 +31,14 @@ data-processing transport of the boundedness gap, and the standalone
 - **helper_boundedness_gap_transport_through_data_processing** — transport
   the helper boundedness gap through the data-processing SDD approximation
   between Ĥ and H (paper lines 747–755).
-- **projective_boundedness_gap_le_helper_boundedness_gap** — compare the
-  projective residual with the helper boundedness gap using SDP dual slack.
-- **final_fields_projective_residual_bound_natural /
-  final_fields_projective_residual_bound** — projective-residual producers from
-  helper boundedness and data processing.
+- **projective_boundedness_gap_le_helper_boundedness_gap** — dual-slack
+  step: the projective residual `⟨ψ|Z⊗(I−H)|ψ⟩` is bounded by the helper
+  boundedness gap (paper lines 742–749).
+- **final_fields_projective_residual_bound_natural** — combines the dual-slack
+  comparator with the data-processing transport to bound the projective
+  residual at `selfImprovementHelperError + √selfImprovementDataProcessingError`.
+- **final_fields_projective_residual_bound** — literal-threshold wrapper
+  absorbing the natural error into `selfImprovementError`.
 - **final_fields_bounded** — standalone producer: if `1 ≤ Z` then
   any submeasurement is `BoundedByOperator` relative to `Z ⊗ I`.
 
@@ -391,6 +394,7 @@ theorem helper_boundedness_gap_transport_through_data_processing
       ev strategy.state (helperAgreementAverageOperator params strategy H.toSubMeas))
   linarith
 
+
 /-- Compare the final projective residual with the helper boundedness gap for the
 same projective family.
 
@@ -559,8 +563,9 @@ If the SDP dual witness dominates the identity, then the left-placed mass of any
 submeasurement is dominated by `Z ⊗ I`: the total bound `A.total ≤ 1 ≤ Z` lifts
 by monotonicity to `leftTensor A.total ≤ leftTensor Z`, and evaluation against
 the state preserves this order. Consequently `bndError ψ A.liftLeft (Z ⊗ I) = 0`,
-so the boundedness statement holds at any nonnegative tolerance. This is a
-standalone producer; it does not alter the current `FinalFieldsInput` interface. -/
+so the boundedness statement holds at any nonnegative tolerance. The
+`selfImprovement` assembly uses this producer instead of requiring the
+boundedness field from `FinalFieldsInput`. -/
 theorem final_fields_bounded
     {α : Type*} [Fintype α]
     (ψ : QuantumState (ι × ι))

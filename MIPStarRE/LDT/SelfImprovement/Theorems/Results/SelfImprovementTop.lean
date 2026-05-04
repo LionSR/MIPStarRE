@@ -282,7 +282,7 @@ theorem selfImprovementFromBridgeInputsSubMeas
 
 /-! ## Final-fields completeness producer (issue #931)
 
-The reduced `FinalFieldsInput` lumps five distinct paper-side obligations into a
+The reduced `FinalFieldsInput` lumps four distinct paper-side obligations into a
 single residual. The lemmas below isolate the **completeness** field, exposing
 the precise analytic ingredient that is still missing — the helper-stage
 completeness lower bound on `Hhat.liftLeft` — and discharging the rest of the
@@ -301,8 +301,8 @@ from the entire `FinalFieldsInput` lump to the single named paper obligation
 `hhelperCompleteness`, which corresponds to `self_improvement.tex` lines
 351--414 (helper completeness, especially the Cauchy--Schwarz step at lines
 366--414) followed by the projective transfer at lines 713--717. The remaining
-four `FinalFieldsInput` fields (point-consistency, self-closeness,
-projective-residual, boundedness) are not addressed here.
+three `FinalFieldsInput` fields (point-consistency, self-closeness, and
+projective-residual) are not addressed here.
 
 Paper anchors:
 * `references/ldt-paper/self_improvement.tex` lines 351--414 — helper-stage
@@ -409,7 +409,7 @@ a separate numerical step on the explicit error definitions
 `selfImprovementError`) that does not require any new analytic input.
 
 This narrows the missing input for the `completeness` field of
-`FinalFieldsInput` from the entire five-field residual to the single named
+`FinalFieldsInput` from the remaining four-field residual to the single named
 paper obligation `hhelperCompleteness` matching
 `references/ldt-paper/self_improvement.tex` lines 351--414, which is the only
 remaining analytic step (especially the Cauchy--Schwarz argument at lines
