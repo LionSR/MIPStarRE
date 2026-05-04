@@ -18,6 +18,65 @@ open MIPStarRE.LDT
 
 noncomputable section
 
+/-- Algebraic consequences of the rectangular SVD choice for `Xhat`.
+
+Suppose `x = U * Sigma * Vᴴ`, with `U` and `V` unitary in the matrix sense, and
+suppose the rectangular identity matrix `Irect` has orthonormal rows.  If the
+remaining spectral input identifies the conjugated diagonal mixed product with
+`CFC.sqrt (xᴴ * x)`, then the paper's choice
+`xHat = U * Irect * Vᴴ` satisfies the two `Xhat` identities used by the QXP
+layer:
+`xHat * xHatᴴ = I` and `xᴴ * xHat = sqrt (xᴴ * x)`.
+
+This theorem isolates the elementary matrix multiplication from the genuinely
+spectral assertion about the square root. -/
+theorem rectangularSvd_xHat_identities
+    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
+    (x : Matrix μ ι ℂ)
+    (U : Matrix μ μ ℂ) (V : Matrix ι ι ℂ)
+    (Sigma Irect : Matrix μ ι ℂ)
+    (hU_left : U * Uᴴ = (1 : Matrix μ μ ℂ))
+    (hU_right : Uᴴ * U = (1 : Matrix μ μ ℂ))
+    (hV_right : Vᴴ * V = (1 : Matrix ι ι ℂ))
+    (hx : x = U * Sigma * Vᴴ)
+    (hIrect : Irect * Irectᴴ = (1 : Matrix μ μ ℂ))
+    (hSqrt : V * (Sigmaᴴ * Irect) * Vᴴ = CFC.sqrt (xᴴ * x)) :
+    ∃ xHat : Matrix μ ι ℂ,
+      xHat = U * Irect * Vᴴ ∧
+        xHat * xHatᴴ = (1 : Matrix μ μ ℂ) ∧
+        xᴴ * xHat = CFC.sqrt (xᴴ * x) := by
+  classical
+  refine ⟨U * Irect * Vᴴ, rfl, ?_, ?_⟩
+  · calc
+      (U * Irect * Vᴴ) * (U * Irect * Vᴴ)ᴴ =
+          U * (Irect * Irectᴴ) * Uᴴ := by
+            rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul]
+            simp only [Matrix.conjTranspose_conjTranspose]
+            have hVcollapse : Vᴴ * (V * (Irectᴴ * Uᴴ)) = Irectᴴ * Uᴴ := by
+              rw [← Matrix.mul_assoc, hV_right, Matrix.one_mul]
+            calc
+              U * Irect * Vᴴ * (V * (Irectᴴ * Uᴴ)) =
+                  U * Irect * (Vᴴ * (V * (Irectᴴ * Uᴴ))) := by
+                    simp [Matrix.mul_assoc]
+              _ = U * Irect * (Irectᴴ * Uᴴ) := by rw [hVcollapse]
+              _ = U * (Irect * Irectᴴ) * Uᴴ := by simp [Matrix.mul_assoc]
+      _ = U * Uᴴ := by rw [hIrect, Matrix.mul_one]
+      _ = 1 := hU_left
+  · calc
+      xᴴ * (U * Irect * Vᴴ) =
+          V * (Sigmaᴴ * Irect) * Vᴴ := by
+            rw [hx, Matrix.conjTranspose_mul, Matrix.conjTranspose_mul]
+            simp only [Matrix.conjTranspose_conjTranspose]
+            have hUcollapse : Uᴴ * (U * (Irect * Vᴴ)) = Irect * Vᴴ := by
+              rw [← Matrix.mul_assoc, hU_right, Matrix.one_mul]
+            calc
+              V * (Sigmaᴴ * Uᴴ) * (U * Irect * Vᴴ) =
+                  V * Sigmaᴴ * (Uᴴ * (U * (Irect * Vᴴ))) := by
+                    simp [Matrix.mul_assoc]
+              _ = V * Sigmaᴴ * (Irect * Vᴴ) := by rw [hUcollapse]
+              _ = V * (Sigmaᴴ * Irect) * Vᴴ := by simp [Matrix.mul_assoc]
+      _ = CFC.sqrt (xᴴ * x) := hSqrt
+
 /-- Assemble `QXPLayerData` from a rank-reduction witness and the SVD
 identities for `Xhat`.
 
