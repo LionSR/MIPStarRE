@@ -1,0 +1,202 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\setlength{\emergencystretch}{2em}
+
+\input{command}
+
+\title{Issue 1099: The Line-169 Replacement Step in the Main-Induction Projectivization Chain}
+\author{}
+\date{2026-05-04}
+
+\begin{document}
+\maketitle
+
+\section{The cited step}
+
+This note concerns the projectivization step in the proof of the main induction
+theorem in \cite{Ji2020LowIndividualDegree}.\footnote{Tracked in
+\ghissue{1099}. In the TeX source consulted here, the relevant passage is in
+\path{references/ldt-paper/inductive_step.tex}, lines~150--180, and the
+specific replacement step is lines~167--173.}
+At this point in the argument, the paper has already produced polynomial-outcome
+measurements $G^{\mathrm A}$ and $G^{\mathrm B}$ with consistency error
+$\zeta_1$, projective submeasurements $P^{\mathrm A}$ and
+$P^{\mathrm B}$ from orthonormalization, and completed projective measurements
+$Q^{\mathrm A}$ and $Q^{\mathrm B}$.
+
+The paper first states the pre-projective consistency estimate
+\[
+  G^{\mathrm A}_g \otimes I \simeq_{\zeta_1} I \otimes G^{\mathrm B}_g,
+  \tag{\path{eq:G-self-consistency}}
+\]
+then the completion estimate
+\[
+  G^{\mathrm A}_g \otimes I \approx_{\zeta_2} Q^{\mathrm A}_g \otimes I,
+  \tag{\path{eq:G-with-Q-A}}
+\]
+and finally says that Proposition~\path{prop:triangle-sub}, applied to these two
+relations, implies
+\[
+  Q^{\mathrm A}_g \otimes I \simeq_{\zeta_1} I \otimes G^{\mathrm B}_g.
+  \tag{paper line 169}
+\]
+The same claim is then used, after data processing, in the point-evaluation
+transport.
+
+\section{Why the printed inference is incorrect}
+
+The substitution proposition \path{prop:triangle-sub} does not preserve the
+original consistency error when one replaces a measurement by an
+$\approx_{\epsilon}$-close one.  Its checked content is that from
+\[
+  A \simeq_{\delta} C
+  \qquad\text{and}\qquad
+  A \approx_{\epsilon} B
+\]
+one obtains
+\[
+  B \simeq_{\delta + \sqrt{\epsilon}} C.
+\]
+Thus applying it directly to \path{eq:G-self-consistency} and
+\path{eq:G-with-Q-A} yields only
+\[
+  Q^{\mathrm A}_g \otimes I
+  \simeq_{\zeta_1 + \sqrt{\zeta_2}}
+  I \otimes G^{\mathrm B}_g,
+\]
+not the printed exact $\zeta_1$ bound.
+
+This is not a formalization artefact.  It is the quantitative content of the
+cited proposition itself.  The paper's displayed use of \path{prop:triangle-sub}
+therefore drops a square-root term.
+
+\section{A more local corrected estimate}
+
+There is, however, a sharper local repair than the naive
+$\zeta_1 + \sqrt{\zeta_2}$ route.  One should compare with the
+orthonormalized submeasurement \emph{before} completion.
+
+Orthogonalization gives
+\[
+  G^{\mathrm A}_g \otimes I
+  \approx_{100\zeta_1^{1/4}}
+  P^{\mathrm A}_g \otimes I.
+\]
+For a fixed partner measurement $G^{\mathrm B}$, Proposition
+\path{prop:easy-approx-from-approx-delta} bounds the change in diagonal match
+mass by the square root of the $\approx$-error.  Specializing that proposition
+to the single-question setting gives
+\[
+  \bigl|
+    \sum_g \langle \psi,
+      (G^{\mathrm A}_g \otimes G^{\mathrm B}_g)\psi\rangle
+    -
+    \sum_g \langle \psi,
+      (P^{\mathrm A}_g \otimes G^{\mathrm B}_g)\psi\rangle
+  \bigr|
+  \leq \sqrt{100\zeta_1^{1/4}}
+  = 10\zeta_1^{1/8}.
+\]
+Since \path{eq:G-self-consistency} says that the first match mass is at least
+$1-\zeta_1$, one obtains
+\[
+  \sum_g \langle \psi,
+    (P^{\mathrm A}_g \otimes G^{\mathrm B}_g)\psi\rangle
+  \geq 1 - \zeta_1 - 10\zeta_1^{1/8}.
+\]
+
+Now complete $P^{\mathrm A}$ at a distinguished outcome to obtain
+$Q^{\mathrm A}$.  The completion adds the positive residual
+$I - \sum_g P^{\mathrm A}_g$ to one outcome, so the diagonal match mass against
+the fixed partner measurement $G^{\mathrm B}$ can only increase.  Therefore
+\[
+  \sum_g \langle \psi,
+    (Q^{\mathrm A}_g \otimes G^{\mathrm B}_g)\psi\rangle
+  \geq 1 - \zeta_1 - 10\zeta_1^{1/8},
+\]
+which is equivalent to the corrected consistency estimate
+\[
+  Q^{\mathrm A}_g \otimes I
+  \simeq_{\zeta_1 + 10\zeta_1^{1/8}}
+  I \otimes G^{\mathrm B}_g.
+\]
+The Bob-side mirror is identical after exchanging the tensor factors.
+
+This repaired bound is strictly local to the projectivization step.  It uses
+only the already-derived $G$--$P$ orthonormalization comparison and the
+positivity of canonical completion.  Quantitatively it is much better than the
+direct completed-measurement substitution route
+$\zeta_1 + \sqrt{\zeta_2}$, because it inserts the square root before the
+completion scalar has been expanded.
+
+\section{Relation with the blueprint and Lean}
+
+The blueprint remark on the Lean line-169 interface now records three distinct
+routes:\footnote{See
+\path{blueprint/src/chapter/ch04_projective.tex}, the remark
+\path{rem:lean-line169-projectivization-match-mass}.}
+the exact route through the construction-level invariant
+\texttt{ProjectivizationMatchMassMonotonicity}, the generic
+$\zeta_1 + \sqrt{\zeta_2}$ substitution route, and the local repaired route
+$\zeta_1 + 10\zeta_1^{1/8}$ described above.
+
+The formal development proves the repaired route by checked declarations.\footnote{The
+generic pre-completion transport theorems are
+\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency\_of\_completion\_and\_sdd}
+and
+\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency\_of\_completion\_and\_sdd}
+in
+\doclink{MIPStarRE/LDT/MakingMeasurementsProjective/ProjectivizationChain.lean}.
+Specializing the $\approx$-error to
+\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationError}
+gives
+\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency\_with\_orthonormalization\_loss}
+and its Bob-side mirror.}
+These declarations do not prove the paper's exact $\zeta_1$ line.  They prove
+the local corrected error $\zeta_1 + 10\zeta_1^{1/8}$.
+
+The generic corrected route $\zeta_1 + \sqrt{\zeta_2}$ remains available as the
+literal consequence of \path{prop:triangle-sub}, but propagating that loss all
+the way through the final point-transport triangle would force a larger final
+envelope at the $1/65536$ scale.  The present formal base-case assembly instead
+uses the sharper local pre-completion repair, so the public final envelope keeps
+the older $1/40000$ scale.
+
+The separate exact-$\zeta_1$ formal interface remains the construction-level
+match-mass monotonicity invariant discussed in issue~\ghissue{1099}.  In other
+words, the formal development now cleanly distinguishes two questions:
+
+\begin{itemize}
+\item the paper's printed use of \path{prop:triangle-sub}, which is incorrect as
+  stated and has the checked local repair above; and
+\item the stronger exact-$\zeta_1$ replacement step, which would require an
+  additional construction-specific monotonicity theorem not supplied by the
+  cited proof.
+\end{itemize}
+
+\section{Conclusion}
+
+The verdict is that the paper's line-169 replacement step contains a genuine
+quantitative error.  Applying \path{prop:triangle-sub} to the completed
+measurement $Q^{\mathrm A}$ does not yield the printed exact $\zeta_1$ bound.
+
+The most local corrected estimate presently available is
+\[
+  Q^{\mathrm A}_g \otimes I
+  \simeq_{\zeta_1 + 10\zeta_1^{1/8}}
+  I \otimes G^{\mathrm B}_g,
+\]
+with the analogous Bob-side statement.  This repair is already formalized and
+is substantially sharper than the naive $\zeta_1 + \sqrt{\zeta_2}$ route, but
+it is still weaker than the paper's exact line.  The formal public theorem keeps
+the older $1/40000$ envelope by using this sharper local repair rather than the
+generic corrected route.  Whether the exact $\zeta_1$ transport can be recovered
+from a more refined construction-level argument remains a separate open question.
+
+\bibliographystyle{alpha}
+\bibliography{references}
+
+\end{document}

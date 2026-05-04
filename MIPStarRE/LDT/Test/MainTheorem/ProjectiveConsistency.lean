@@ -19,7 +19,7 @@ This is the data-processing move used after paper line 156: once
 `Q^A_g \otimes I \simeq I \otimes Q^B_g` is available over the single
 polynomial question, evaluating both polynomial outcomes at a point `u` preserves
 consistency over the uniform point distribution. -/
-private theorem consRel_constPolynomialEvaluation
+theorem consRel_constPolynomialEvaluation
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState (ι × ι))
@@ -78,7 +78,7 @@ in the final point-consistency triangles.
 The proof first applies the projective converse of `prop:simeq-to-approx` at the
 polynomial level, then uses question-dependent data processing to evaluate both
 projective polynomial measurements at each point. -/
-private theorem projectiveEvaluationConsistency_ofFullPolynomialConsistency
+theorem projectiveEvaluationConsistency_ofFullPolynomialConsistency
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {ψ : QuantumState (ι × ι)}
@@ -609,6 +609,124 @@ theorem projectiveEvaluationConsistency
       using pre.fullSelfConsistency
   exact projectiveEvaluationConsistency_ofFullPolynomialConsistency
     residual.leftMeasurement residual.rightMeasurement (residual.fullPolynomialConsistency hpre)
+
+/-- Point-goal transport from the repaired polynomial line-169 estimate.
+
+Compared with the paper's exact line-169 `\zeta_1` link, this uses the checked
+local repair `\zeta_1 + 10 \zeta_1^{1/8}` and then weakens the resulting point
+error directly to `mainFormalError`. -/
+theorem pointAConsistency_of_repairedLine169
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (roleMeasurement : Measurement (Polynomial params) (Role × ι))
+    (leftMeasurement rightMeasurement : ProjMeas (Polynomial params) ι)
+    (hAB : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (polynomialEvaluationFamily params (unsymmetrizedRightPOVM roleMeasurement).toSubMeas)
+      (2 * scalars.sigma))
+    (hCB : ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params leftMeasurement.toSubMeas)
+      (polynomialEvaluationFamily params (unsymmetrizedRightPOVM roleMeasurement).toSubMeas)
+      (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error))))
+    (hCD : ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params leftMeasurement.toSubMeas)
+      (polynomialEvaluationFamily params rightMeasurement.toSubMeas)
+      (scalars.zeta3 / 2)) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (polynomialEvaluationFamily params rightMeasurement.toSubMeas)
+      (mainFormalError params k eps) := by
+  let pointA : IdxMeas (Point params) (Fq params) ι :=
+    IdxProjMeas.toIdxMeas strategy.pointMeasurementA
+  let rightG : IdxMeas (Point params) (Fq params) ι :=
+    polynomialEvaluationMeasurementFamily params (unsymmetrizedRightPOVM roleMeasurement)
+  let leftQ : IdxMeas (Point params) (Fq params) ι :=
+    polynomialEvaluationMeasurementFamily params leftMeasurement.toMeasurement
+  let rightQ : IdxMeas (Point params) (Fq params) ι :=
+    polynomialEvaluationMeasurementFamily params rightMeasurement.toMeasurement
+  have htriangle :=
+    Preliminaries.simeqTriangleInequality strategy.state
+      (uniformDistribution (Point params)) strategy.isNormalized
+      (uniformDistribution_weight_sum_le_one (Point params))
+      pointA rightG leftQ rightQ
+      (2 * scalars.sigma)
+      (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error)))
+      (scalars.zeta3 / 2)
+      (by simpa [pointA, rightG, polynomialEvaluationMeasurementFamily] using hAB)
+      (by simpa [leftQ, rightG, polynomialEvaluationMeasurementFamily] using hCB)
+      (by simpa [leftQ, rightQ, polynomialEvaluationMeasurementFamily] using hCD)
+  exact ConsRel.mono
+    (MainFormalCascadeScalars.repairedLine169PointError_le_mainFormalError scalars)
+    (by simpa [pointA, rightG, leftQ, rightQ, polynomialEvaluationMeasurementFamily,
+      add_assoc, add_left_comm, add_comm] using htriangle)
+
+/-- Bob-side mirror of `pointAConsistency_of_repairedLine169`. -/
+theorem pointBConsistency_of_repairedLine169
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (roleMeasurement : Measurement (Polynomial params) (Role × ι))
+    (leftMeasurement rightMeasurement : ProjMeas (Polynomial params) ι)
+    (hAB : ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params (unsymmetrizedLeftPOVM roleMeasurement).toSubMeas)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+      (2 * scalars.sigma))
+    (hCB : ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params rightMeasurement.toSubMeas)
+      (polynomialEvaluationFamily params (unsymmetrizedLeftPOVM roleMeasurement).toSubMeas)
+      (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error))))
+    (hCD : ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params leftMeasurement.toSubMeas)
+      (polynomialEvaluationFamily params rightMeasurement.toSubMeas)
+      (scalars.zeta3 / 2)) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params leftMeasurement.toSubMeas)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+      (mainFormalError params k eps) := by
+  let pointB : IdxMeas (Point params) (Fq params) ι :=
+    IdxProjMeas.toIdxMeas strategy.pointMeasurementB
+  let leftG : IdxMeas (Point params) (Fq params) ι :=
+    polynomialEvaluationMeasurementFamily params (unsymmetrizedLeftPOVM roleMeasurement)
+  let rightQ : IdxMeas (Point params) (Fq params) ι :=
+    polynomialEvaluationMeasurementFamily params rightMeasurement.toMeasurement
+  let leftQ : IdxMeas (Point params) (Fq params) ι :=
+    polynomialEvaluationMeasurementFamily params leftMeasurement.toMeasurement
+  have hAB' : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxMeas.toIdxSubMeas pointB) (IdxMeas.toIdxSubMeas leftG) (2 * scalars.sigma) := by
+    exact consRel_symm_of_density_fixed strategy.state strategy.densityFixed
+      (uniformDistribution (Point params)) (IdxMeas.toIdxSubMeas leftG)
+      (IdxMeas.toIdxSubMeas pointB) (2 * scalars.sigma)
+      (by simpa [pointB, leftG, polynomialEvaluationMeasurementFamily] using hAB)
+  have hCD' : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxMeas.toIdxSubMeas rightQ) (IdxMeas.toIdxSubMeas leftQ) (scalars.zeta3 / 2) := by
+    exact consRel_symm_of_density_fixed strategy.state strategy.densityFixed
+      (uniformDistribution (Point params)) (IdxMeas.toIdxSubMeas leftQ)
+      (IdxMeas.toIdxSubMeas rightQ) (scalars.zeta3 / 2)
+      (by simpa [leftQ, rightQ, polynomialEvaluationMeasurementFamily] using hCD)
+  have htriangle :=
+    Preliminaries.simeqTriangleInequality strategy.state
+      (uniformDistribution (Point params)) strategy.isNormalized
+      (uniformDistribution_weight_sum_le_one (Point params))
+      pointB leftG rightQ leftQ
+      (2 * scalars.sigma)
+      (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error)))
+      (scalars.zeta3 / 2)
+      hAB'
+      (by simpa [rightQ, leftG, polynomialEvaluationMeasurementFamily] using hCB)
+      hCD'
+  have htarget : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxMeas.toIdxSubMeas pointB) (IdxMeas.toIdxSubMeas leftQ)
+      (mainFormalError params k eps) :=
+    ConsRel.mono
+      (MainFormalCascadeScalars.repairedLine169PointError_le_mainFormalError scalars)
+      (by simpa [pointB, leftG, rightQ, leftQ, polynomialEvaluationMeasurementFamily,
+        add_assoc, add_left_comm, add_comm] using htriangle)
+  exact consRel_symm_of_density_fixed strategy.state strategy.densityFixed
+    (uniformDistribution (Point params)) (IdxMeas.toIdxSubMeas pointB)
+    (IdxMeas.toIdxSubMeas leftQ) (mainFormalError params k eps) htarget
 
 /-- Derive paper `eq:one-goal` from `eq:cons-b`, line 172 obtained by data
 processing line 169, and evaluated line 164. -/

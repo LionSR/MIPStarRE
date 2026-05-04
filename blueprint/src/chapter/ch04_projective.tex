@@ -100,6 +100,8 @@
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation.of_outcome_le, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_completion_and_outcome_le}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation.OutcomeExpectationPreservation, MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation.of_outcome_expectation}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation.QXPLayerOutcomeExpectationPreservation, MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation.of_qxp_outcome_expectation}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_of_completion_and_sdd, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_of_completion_and_sdd}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_with_orthonormalization_loss, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_with_orthonormalization_loss}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.leftConsistency, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.rightConsistency}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.leftConsistency_with_triangleSub_loss, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.rightConsistency_with_triangleSub_loss}
 	Lean exposes the quantitative obstruction at the projectivization handoff used
@@ -112,6 +114,25 @@
 	\texttt{leftConsistency\_with\_triangleSub\_loss} and
 	\texttt{rightConsistency\_with\_triangleSub\_loss} are checked wrappers for
 	this honest square-root-loss route.
+
+	Lean also proves a more local repaired transport that keeps the comparison at
+	the pre-completion stage.  If $P^{\mathrm A}$ is the orthonormalized
+	projective sub-measurement with $G^{\mathrm A}\approx_{\epsilon}P^{\mathrm A}$,
+	then Proposition~\ref{prop:easy-approx-from-approx-delta} bounds the diagonal
+	match-mass loss by $\sqrt{\epsilon}$, and canonical completion can only add
+	nonnegative diagonal match mass.  Thus the declarations
+	\texttt{leftConsistency\_of\_completion\_and\_sdd} and
+	\texttt{rightConsistency\_of\_completion\_and\_sdd} prove
+	$Q^{\mathrm A}\simeq_{\zeta_1+\sqrt{\epsilon}}G^{\mathrm B}$ and its Bob-side
+	mirror from the pre-projective $\zeta_1$ consistency plus the
+	pre-completion $\approx_{\epsilon}$ comparison.  In particular, substituting
+	the checked orthonormalization error
+	$\epsilon=100\zeta_1^{1/4}$ yields the repaired line-169 bound
+	$\zeta_1+10\zeta_1^{1/8}$ recorded by
+	\texttt{leftConsistency\_with\_orthonormalization\_loss} and its mirror.
+	This is much sharper than the direct completion-level
+	$\zeta_1+\sqrt{\zeta_2}$ route, but it is still not the paper's exact
+	$\zeta_1$.
 
 	The paper-tight line-169 estimate at exactly $\zeta_1$ therefore requires
 	more than state-dependent-distance closeness.  Lean records the missing
