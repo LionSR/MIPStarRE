@@ -56,6 +56,9 @@ projection-simplified diagonal transfer.
   composing the CS chain with arithmetic absorption.
 - **selfConsistencyDiagonalAddInU_of_simplifiedTransfer** — specialization
   to the projection-simplified scalar transfer hypothesis.
+- **helper_mass_sub_release_eq_polynomial_off_diagonal** — exact expansion of
+  the helper mass minus the released diagonal right-hand side as the
+  off-diagonal polynomial-pair contribution.
 
 ## References
 
@@ -1241,6 +1244,195 @@ lemma selfConsistencyDiagonalAddInU_of_simplifiedTransfer
         params strategy T)
   rw [hRHS_eq]
   exact htransfer
+
+private lemma sum_sum_sub_diagonal_eq_off_diagonal
+    {α : Type*} [Fintype α] [DecidableEq α] (F : α → α → Error) :
+    (∑ x : α, ∑ y : α, F x y) - (∑ x : α, F x x) =
+      ∑ x : α, ∑ y ∈ (Finset.univ : Finset α).erase x, F x y := by
+  classical
+  calc
+    (∑ x : α, ∑ y : α, F x y) - (∑ x : α, F x x)
+        = ∑ x : α, ((∑ y : α, F x y) - F x x) := by
+            rw [Finset.sum_sub_distrib]
+    _ = ∑ x : α, ∑ y ∈ (Finset.univ : Finset α).erase x, F x y := by
+      refine Finset.sum_congr rfl ?_
+      intro x _
+      have hsplit :
+          F x x + ∑ y ∈ (Finset.univ : Finset α).erase x, F x y =
+            ∑ y : α, F x y :=
+        Finset.add_sum_erase _ _ (Finset.mem_univ x)
+      linarith
+
+/-- Exact residual-side expansion for the helper strong self-consistency proof.
+
+For the averaged helper `Hhat = E_u H^u` produced from the primal measurement
+`T`, the difference between the helper left mass and the released diagonal
+add-in-`u` right-hand side is precisely the contribution of the off-diagonal
+polynomial pairs `(h',h)` with `h' ≠ h`:
+
+`E_u \sum_h \sum_{h'≠h} ⟨ψ, H^u_{h'} ⊗ T_h ψ⟩`.
+
+This is the exact algebraic opening of the post-release residual estimate in
+the proof of `item:self-improvement-self`; the later Cauchy--Schwarz,
+Schwartz--Zippel, point-consistency, and self-consistency estimates are the
+remaining inequalities that bound this off-diagonal expression. -/
+theorem helper_mass_sub_release_eq_polynomial_off_diagonal
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : Measurement (Polynomial params) ι) :
+    subMeasMass strategy.state
+        (averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas).liftLeft -
+      addInURightQuantity params strategy
+        (sandwichedPolynomialSubMeasAt params strategy T.toSubMeas)
+        T.toSubMeas
+        (selfConsistencyAddInUSelection params) =
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ∑ h' ∈ (Finset.univ : Finset (Polynomial params)).erase h,
+            ev strategy.state
+              (opTensor
+                ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h')
+                (T.toSubMeas.outcome h))) := by
+  classical
+  have hmass :
+      subMeasMass strategy.state
+          (averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas).liftLeft =
+        avgOver (uniformDistribution (Point params)) (fun u =>
+          ∑ h' : Polynomial params,
+            ∑ h : Polynomial params,
+              ev strategy.state
+                (opTensor
+                  ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h')
+                  (T.toSubMeas.outcome h))) := by
+    have hev_each :
+        ∀ h' : Polynomial params,
+          ev strategy.state
+            (leftTensor (ι₂ := ι)
+              ((averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas).outcome h')) =
+            avgOver (uniformDistribution (Point params)) (fun u =>
+              ev strategy.state
+                (leftTensor (ι₂ := ι)
+                  (sandwichedPolynomialOutcomeOperatorAt params strategy T.toSubMeas u h'))) := by
+      intro h'
+      exact ev_opTensor_averageOperatorOverDistribution_left strategy.state
+        (uniformDistribution (Point params))
+        (fun u =>
+          sandwichedPolynomialOutcomeOperatorAt params strategy T.toSubMeas u h')
+        (1 : MIPStarRE.Quantum.Op ι)
+    have hmass0 :
+        subMeasMass strategy.state
+            (averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas).liftLeft =
+          avgOver (uniformDistribution (Point params)) (fun u =>
+            ∑ h' : Polynomial params,
+              ev strategy.state
+                (leftTensor (ι₂ := ι)
+                  (sandwichedPolynomialOutcomeOperatorAt
+                    params strategy T.toSubMeas u h'))) := by
+      calc
+        subMeasMass strategy.state
+            (averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas).liftLeft
+            =
+          ∑ h' : Polynomial params,
+            ev strategy.state
+              (leftTensor (ι₂ := ι)
+                ((averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas).outcome h')) :=
+            ev_leftTensor_total_eq_sum_outcome strategy.state _
+        _ =
+          ∑ h' : Polynomial params,
+            avgOver (uniformDistribution (Point params)) (fun u =>
+              ev strategy.state
+                (leftTensor (ι₂ := ι)
+                  (sandwichedPolynomialOutcomeOperatorAt
+                    params strategy T.toSubMeas u h'))) :=
+            Finset.sum_congr rfl (fun h' _ => hev_each h')
+        _ =
+          avgOver (uniformDistribution (Point params)) (fun u =>
+            ∑ h' : Polynomial params,
+              ev strategy.state
+                (leftTensor (ι₂ := ι)
+                  (sandwichedPolynomialOutcomeOperatorAt
+                    params strategy T.toSubMeas u h'))) := by
+          rw [← avgOver_sum (uniformDistribution (Point params))
+            (fun u h' =>
+              ev strategy.state
+                (leftTensor (ι₂ := ι)
+                  (sandwichedPolynomialOutcomeOperatorAt
+                    params strategy T.toSubMeas u h')))]
+    rw [hmass0]
+    refine avgOver_congr (uniformDistribution (Point params)) _ _ ?_
+    intro u
+    refine Finset.sum_congr rfl ?_
+    intro h' _
+    have hTsum :
+        (∑ h : Polynomial params, T.toSubMeas.outcome h) =
+          (1 : MIPStarRE.Quantum.Op ι) := by
+      rw [T.toSubMeas.sum_eq_total, T.total_eq_one]
+    calc
+      ev strategy.state
+          (leftTensor (ι₂ := ι)
+            (sandwichedPolynomialOutcomeOperatorAt params strategy T.toSubMeas u h'))
+          =
+        ev strategy.state
+          (opTensor
+            ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h')
+            (1 : MIPStarRE.Quantum.Op ι)) := by
+          rfl
+      _ =
+        ev strategy.state
+          (opTensor
+            ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h')
+            (∑ h : Polynomial params, T.toSubMeas.outcome h)) := by
+          rw [hTsum]
+      _ =
+        ev strategy.state
+          (∑ h : Polynomial params,
+            opTensor
+              ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h')
+              (T.toSubMeas.outcome h)) := by
+          rw [← opTensor_sum_right_univ]
+      _ =
+        ∑ h : Polynomial params,
+          ev strategy.state
+            (opTensor
+              ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h')
+              (T.toSubMeas.outcome h)) := by
+          rw [ev_sum]
+  have hrelease :
+      addInURightQuantity params strategy
+          (sandwichedPolynomialSubMeasAt params strategy T.toSubMeas)
+          T.toSubMeas
+          (selfConsistencyAddInUSelection params) =
+        avgOver (uniformDistribution (Point params)) (fun u =>
+          ∑ h : Polynomial params,
+            ev strategy.state
+              (opTensor
+                ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h)
+                (T.toSubMeas.outcome h))) :=
+    addInURightQuantity_selfConsistencySelection_eq_simplified
+      params strategy T.toSubMeas
+  rw [hmass, hrelease, ← avgOver_sub]
+  refine avgOver_congr (uniformDistribution (Point params)) _ _ ?_
+  intro u
+  have hswap :
+      (∑ h' : Polynomial params,
+          ∑ h : Polynomial params,
+            ev strategy.state
+              (opTensor
+                ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h')
+                (T.toSubMeas.outcome h))) =
+        ∑ h : Polynomial params,
+          ∑ h' : Polynomial params,
+            ev strategy.state
+              (opTensor
+                ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h')
+                (T.toSubMeas.outcome h)) := by
+    rw [Finset.sum_comm]
+  rw [hswap]
+  exact sum_sum_sub_diagonal_eq_off_diagonal (fun h h' =>
+    ev strategy.state
+      (opTensor
+        ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h')
+        (T.toSubMeas.outcome h)))
 
 /-- Producer-shaped inputs for the helper-stage strong self-consistency proof.
 
