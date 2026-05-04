@@ -330,6 +330,102 @@ noncomputable def sigmaFinProjMeas {Outcome : Type*} [Fintype Outcome] [Decidabl
     (finSigmaProjMeas (n := Fintype.card Outcome)
       (m := fun i => m ((Fintype.equivFin Outcome).symm i)))
 
+/-- The matrix `X` associated to a projective family on the sigma auxiliary
+space.
+
+Rows are indexed by the finite model of `Σ a, Fin (rank Q_a)`.  The row
+corresponding to `(a,i)` is the bra vector `⟨v_{a,i}|`, where
+`v_{a,i}` is the `i`th vector in the chosen orthonormal basis of the range of
+`Q_a`.  This is the Lean form of
+`X = Σ_a Σ_i |a,i⟩⟨v_{a,i}|` in the paper. -/
+noncomputable def sigmaFinRangeEmbedding {Outcome : Type uOutcome}
+    [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (Q : Outcome → MIPStarRE.Quantum.Op ι)
+    (hproj : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (Q a)) :
+    Matrix (ULift.{uι}
+      (FiniteHilbertSpace.sigmaFinCarrier (fun a : Outcome => (Q a).rank))) ι ℂ :=
+  fun x j =>
+    let a : Outcome := (Fintype.equivFin Outcome).symm x.down.1
+    star ((MIPStarRE.Quantum.IsProj.rangeONB (Q a) (hproj a)).vec x.down.2 j)
+
+/-- The literal block projective measurement on `Σ a, Fin (m a)` selecting the
+`a`-summand.  This is the paper's measurement
+`T_a = Σ_i |a,i⟩⟨a,i|` before replacing the sigma type by the universe-stable
+finite-enumeration model used in `sigmaFinProjMeas`. -/
+noncomputable def sigmaProjMeas {Outcome : Type uOutcome}
+    [Fintype Outcome] [DecidableEq Outcome] (m : Outcome → ℕ) :
+    ProjMeas Outcome (Σ a : Outcome, Fin (m a)) where
+  outcome := fun a =>
+    Matrix.diagonal fun x : Σ a : Outcome, Fin (m a) => if x.1 = a then 1 else 0
+  total := 1
+  outcome_pos := by
+    intro a
+    refine Matrix.nonneg_iff_posSemidef.mpr ?_
+    exact Matrix.PosSemidef.diagonal <| by
+      intro x
+      by_cases hx : x.1 = a <;> simp [hx]
+  sum_eq_total := by
+    ext x y
+    rw [Matrix.sum_apply]
+    by_cases hxy : x = y
+    · subst hxy
+      simp
+    · simp [hxy]
+  total_le_one := le_rfl
+  total_eq_one := rfl
+  proj := by
+    intro a
+    rw [Matrix.diagonal_mul_diagonal]
+    ext x y
+    by_cases hxy : x = y
+    · subst hxy
+      by_cases hx : x.1 = a <;> simp [hx]
+    · simp [hxy]
+
+/-- The paper's literal matrix `X = Σ_a Σ_i |a,i⟩⟨v_{a,i}|`
+on the sigma auxiliary space. -/
+noncomputable def sigmaRangeEmbedding {Outcome : Type uOutcome}
+    [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (Q : Outcome → MIPStarRE.Quantum.Op ι)
+    (hproj : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (Q a)) :
+    Matrix (Σ a : Outcome, Fin (Q a).rank) ι ℂ :=
+  fun x j =>
+    star ((MIPStarRE.Quantum.IsProj.rangeONB (Q x.1) (hproj x.1)).vec x.2 j)
+
+/-- The literal sigma-space range embedding realizes each projector as
+`Q_a = X† T_a X`.
+
+This is the matrix-decomposition identity immediately underlying the paper's
+`Q_a` restatement.  It is independent of the later polar/SVD construction of
+`Xhat`. -/
+lemma sigmaRangeEmbedding_qa_eq {Outcome : Type uOutcome}
+    [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (Q : Outcome → MIPStarRE.Quantum.Op ι)
+    (hproj : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (Q a))
+    (a : Outcome) :
+    let X := sigmaRangeEmbedding Q hproj
+    let T := sigmaProjMeas (fun a : Outcome => (Q a).rank)
+    Q a = Xᴴ * T.outcome a * X := by
+  classical
+  let X := sigmaRangeEmbedding Q hproj
+  let T := sigmaProjMeas (fun a : Outcome => (Q a).rank)
+  let onb : (b : Outcome) →
+      MIPStarRE.Quantum.ProjectorRangeONB (Q b) (hproj b) :=
+    fun b => MIPStarRE.Quantum.IsProj.rangeONB (Q b) (hproj b)
+  ext i j
+  have hdecomp :
+      (Q a) i j =
+        ∑ k : Fin (Q a).rank,
+          (onb a).vec k i * star ((onb a).vec k j) := by
+    simpa [onb, Matrix.sum_apply, Matrix.vecMulVec_apply] using
+      congrFun (congrFun (onb a).decomposition i) j
+  rw [hdecomp]
+  simp [onb, sigmaRangeEmbedding, sigmaProjMeas, Matrix.mul_apply,
+    Matrix.conjTranspose_apply, Matrix.diagonal_apply, Fintype.sum_sigma]
+
 /-- A one-point projective measurement concentrating all mass on the chosen outcome. -/
 private noncomputable def pointProjMeas {Outcome : Type uOutcome}
     [Fintype Outcome] [DecidableEq Outcome]
