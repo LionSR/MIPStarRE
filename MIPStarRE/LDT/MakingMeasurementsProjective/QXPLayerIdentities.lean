@@ -18,6 +18,56 @@ open MIPStarRE.LDT
 
 noncomputable section
 
+/-- Assemble `QXPLayerData` from a rank-reduction witness and the SVD
+identities for `Xhat`.
+
+The rank-reduction witness supplies the projectivity of each `Q_a` and the
+identity `∑_a Q_a = Q`.  The remaining hypotheses are exactly the local
+matrix-decomposition data for `Q_a = X† T_a X` and the two SVD-derived
+identities for the chosen `Xhat`.  Thus this constructor removes the
+rank-reduction fields from the caller's obligations; the only external
+mathematical input still not produced here is the rectangular SVD/polar
+decomposition that provides `xHat`. -/
+noncomputable def QXPLayerData.ofRankReductionAndSvdIdentities
+    {Outcome : Type*} [Fintype Outcome]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState ι} {A : Measurement Outcome ι} {ζ : Error}
+    {qLayer : QLayerData Outcome ι}
+    (hRank : RankReductionWitness ψ A ζ qLayer)
+    (x : Matrix qLayer.auxSpace.carrier ι ℂ)
+    (xHat : Matrix qLayer.auxSpace.carrier ι ℂ)
+    (qa_eq : ∀ a : Outcome, qLayer.q.outcome a = xᴴ * Ta qLayer a * x)
+    (xHat_coisometry :
+      xHat * xHatᴴ = (1 : MIPStarRE.Quantum.Op qLayer.auxSpace.carrier))
+    (xHat_mixed : xᴴ * xHat = CFC.sqrt (QTotal qLayer)) :
+    QXPLayerData Outcome ι :=
+  QXPLayerData.ofQLayerAndSvdIdentities qLayer hRank.projective hRank.sum_eq_total
+    x xHat qa_eq xHat_coisometry xHat_mixed
+
+/-- Existence form of
+`QXPLayerData.ofRankReductionAndSvdIdentities`, matching the data-package shape
+used by the QXP repair layer.
+
+The produced data keeps the supplied `qLayer`, `x`, and `xHat` judgmentally
+visible up to transport along the recorded `qLayer` equality. -/
+theorem exists_qxpLayerData_ofRankReductionAndSvdIdentities
+    {Outcome : Type*} [Fintype Outcome]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState ι} {A : Measurement Outcome ι} {ζ : Error}
+    {qLayer : QLayerData Outcome ι}
+    (hRank : RankReductionWitness ψ A ζ qLayer)
+    (x : Matrix qLayer.auxSpace.carrier ι ℂ)
+    (xHat : Matrix qLayer.auxSpace.carrier ι ℂ)
+    (qa_eq : ∀ a : Outcome, qLayer.q.outcome a = xᴴ * Ta qLayer a * x)
+    (xHat_coisometry :
+      xHat * xHatᴴ = (1 : MIPStarRE.Quantum.Op qLayer.auxSpace.carrier))
+    (xHat_mixed : xᴴ * xHat = CFC.sqrt (QTotal qLayer)) :
+    ∃ data : QXPLayerData Outcome ι,
+      ∃ hq : data.qLayer = qLayer,
+        hq ▸ data.x = x ∧ hq ▸ data.xHat = xHat :=
+  ⟨QXPLayerData.ofRankReductionAndSvdIdentities hRank x xHat qa_eq
+      xHat_coisometry xHat_mixed, rfl, rfl, rfl⟩
+
 /-- **`X_a = T_a X`** (`lem:xa-t`). -/
 lemma xa_t {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
