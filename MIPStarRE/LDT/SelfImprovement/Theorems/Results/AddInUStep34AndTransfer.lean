@@ -45,7 +45,8 @@ projection-simplified diagonal transfer.
   and `add_in_u_simplified_transfer_of_cs_chain_local_variance_form`.
 - **Self-consistency/local-variance wrapper** —
   `add_in_u_simplified_transfer_of_cs_chain_selfConsistency_local_variance_form`
-  and `helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance`.
+  `helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance`,
+  and `helper_strong_self_consistency_input_of_selfConsistency_localVariance`.
 - **add_in_u_simplified_transfer_of_cs_chain** — the four-step chain
   assembly: given four `|Qᵢ−Qⱼ| ≤ ηᵢⱼ` bounds summing to `≤ addInUError`,
   yields the projection-simplified transfer.
