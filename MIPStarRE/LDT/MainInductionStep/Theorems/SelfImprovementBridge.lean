@@ -2,6 +2,7 @@ import MIPStarRE.LDT.MainInductionStep.Statements
 import MIPStarRE.LDT.Test.StrategyFailures
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 import MIPStarRE.LDT.Pasting.Bernoulli.Final
+import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationBridge
 -- Used by `selfImprovementInInductionSection`.
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results
 
@@ -443,6 +444,64 @@ noncomputable def SelfImprovementPackage.SliceBridgeInputs.ofMeasurementEq
       params strategy eps delta gamma restrictionPkg sliceStrategy state_eq
       pointMeasurement_eq axisParallelMeasurement_eq diagonalMeasurement_eq)
     bridgeInputs
+
+/-- Build `SliceBridgeInputs` from honest slice strategies and the constructive
+orthonormalization repair producer.
+
+The spectral part of the orthonormalization input is supplied by the closed
+source-almost-projective spectral truncation theorem. Thus the caller need only
+provide, for each slice, the locality-preserving repair producer together with
+the other two Section 9 inputs. -/
+noncomputable def SelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationRepair
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma)
+    (inductionPkg : PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k)
+    (sliceStrategy : Fq params → SymStrat params ι)
+    (state_eq : ∀ x, (sliceStrategy x).state = strategy.state)
+    (pointMeasurement_eq :
+      ∀ x,
+        (sliceStrategy x).pointMeasurement =
+          (xRestrictedStrategy params strategy x).pointMeasurement)
+    (axisParallelMeasurement_eq :
+      ∀ x,
+        (sliceStrategy x).axisParallelMeasurement.toIdxProjMeas =
+          (xRestrictedStrategy params strategy x).axisParallelMeasurement.toIdxProjMeas)
+    (diagonalMeasurement_eq :
+      ∀ x,
+        (sliceStrategy x).diagonalMeasurement.toIdxProjMeas =
+          (xRestrictedStrategy params strategy x).diagonalMeasurement)
+    (helperStrongSelfConsistency :
+      ∀ x,
+        SelfImprovement.HelperStrongSelfConsistencyInput params (sliceStrategy x)
+          (restrictionPkg.profile.axisParallel x)
+          (restrictionPkg.profile.selfConsistency x))
+    (repair :
+      ∀ x,
+        SelfImprovement.OrthonormalizationRepairProducer params (sliceStrategy x)
+          (restrictionPkg.profile.axisParallel x)
+          (restrictionPkg.profile.selfConsistency x))
+    (finalFields :
+      ∀ x,
+        SelfImprovement.FinalFieldsInput params (sliceStrategy x)
+          (restrictionPkg.profile.axisParallel x)
+          (restrictionPkg.profile.selfConsistency x)
+          (inductionPkg.sliceError x)) :
+    SelfImprovementPackage.SliceBridgeInputs params strategy eps delta gamma k
+      restrictionPkg inductionPkg :=
+  SelfImprovementPackage.SliceBridgeInputs.ofMeasurementEq
+    params strategy eps delta gamma k restrictionPkg inductionPkg sliceStrategy state_eq
+    pointMeasurement_eq axisParallelMeasurement_eq diagonalMeasurement_eq
+    (fun x =>
+      { helperStrongSelfConsistency := helperStrongSelfConsistency x
+        orthonormalization :=
+          SelfImprovement.orthonormalizationInput_of_producers
+            SelfImprovement.orthonormalizationSpectralProducer_of_sourceAlmostProjective
+            (repair x)
+        finalFields := finalFields x })
 
 /-- Convert honest per-slice Section 9 bridge inputs into the Section 6
 self-improvement package.
