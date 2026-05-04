@@ -1,6 +1,7 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.Core
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.TruncationCombinatorics
 import MIPStarRE.LDT.Preliminaries.CompletionTransfer
+import MIPStarRE.Quantum.FiniteHilbert
 import MIPStarRE.Quantum.ProjectorONB
 import Mathlib.Analysis.Matrix.Spectrum
 
@@ -586,6 +587,39 @@ lemma sigmaFinCard_le_of_sum_le {Outcome : Type*} [Fintype Outcome]
   rw [Fintype.card_sigma]
   simp only [Fintype.card_fin]
   exact hm
+
+/-- If the sigma auxiliary space has dimension at most the ambient Hilbert
+space, then there is a rectangular matrix `Xhat` whose rows are orthonormal.
+
+This is the formal content of the paper's identity
+`\widehat X \widehat X^\dagger = I_m` that follows only from the rectangular
+dimension bound `m ≤ d`.  The companion mixed identity
+`X^\dagger \widehat X = √Q` is the remaining polar/SVD input. -/
+theorem exists_sigmaFin_xHat_coisometry_of_card_le
+    {Outcome : Type*} [Fintype Outcome]
+    {ι : Type*} [Fintype ι]
+    (m : Outcome → ℕ)
+    (hm : Fintype.card (FiniteHilbertSpace.sigmaFinCarrier m) ≤ Fintype.card ι) :
+    ∃ xHat : Matrix (ULift (FiniteHilbertSpace.sigmaFinCarrier m)) ι ℂ,
+      xHat * xHatᴴ =
+        (1 : MIPStarRE.Quantum.Op (ULift (FiniteHilbertSpace.sigmaFinCarrier m))) := by
+  classical
+  exact Matrix.exists_mul_conjTranspose_eq_one_of_card_le (by
+    simpa [Fintype.card_ulift] using hm)
+
+/-- The total-rank bound in `lem:projective-low-rank-sum` supplies the
+coisometry part of the paper's `Xhat` construction on the sigma auxiliary
+space. -/
+theorem exists_sigmaFin_xHat_coisometry_of_sum_le
+    {Outcome : Type*} [Fintype Outcome]
+    {ι : Type*} [Fintype ι]
+    (m : Outcome → ℕ)
+    (hm : ∑ a, m a ≤ Fintype.card ι) :
+    ∃ xHat : Matrix (ULift (FiniteHilbertSpace.sigmaFinCarrier m)) ι ℂ,
+      xHat * xHatᴴ =
+        (1 : MIPStarRE.Quantum.Op (ULift (FiniteHilbertSpace.sigmaFinCarrier m))) := by
+  exact exists_sigmaFin_xHat_coisometry_of_card_le m
+    (sigmaFinCard_le_of_sum_le (ι := ι) m hm)
 
 /-- Concrete auxiliary-space producer from a direct total-rank bound. -/
 lemma projectiveLowRankSum_auxData_of_rank_bound {Outcome : Type uOutcome}

@@ -911,6 +911,7 @@
 
 	\begin{lemma}[$\widehat{X}$ squared]\label{lem:X-hat-squared}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xHatSquared}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_sigmaFin_xHat_coisometry_of_sum_le}
 		\leanok
 		\begin{equation*}
 			\widehat{X} \cdot \widehat{X}^\dagger = I_{m \times m}.
@@ -919,8 +920,10 @@
 	\begin{proof}
 		The paper proves this by multiplying out
 		$\widehat{X}=U\cdot I_{m\times d}\cdot V^\dagger$ and using the unitarity of
-		$U$ and $V$.  We record this coisometry identity as one of the primitive
-		consequences of the reduced data package.
+		$U$ and $V$.  In Lean, the dimension hypothesis $m\leq d$ already gives a
+		rectangular matrix with orthonormal rows on the sigma auxiliary space; the
+		data package records the resulting coisometry identity for the particular
+		$\widehat X$ used together with the mixed square-root identity below.
 	\end{proof}
 
 	\begin{lemma}[$X$ times $\widehat{X}$]\label{lem:X-times-X-hat}
