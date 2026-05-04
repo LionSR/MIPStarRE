@@ -44,7 +44,7 @@ projection-simplified diagonal transfer.
   `add_in_u_cs_chain_global_variance_steps_of_local_sum_bound_from_factor_bounds`,
   and `add_in_u_simplified_transfer_of_cs_chain_local_variance_form`.
 - **Self-consistency/local-variance wrapper** —
-  `add_in_u_simplified_transfer_of_cs_chain_selfConsistency_local_variance_form`
+  `add_in_u_simplified_transfer_of_cs_chain_selfConsistency_local_variance_form`,
   `helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance`,
   and `helper_strong_self_consistency_input_of_selfConsistency_localVariance`.
 - **add_in_u_simplified_transfer_of_cs_chain** — the four-step chain
