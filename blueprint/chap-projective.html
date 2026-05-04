@@ -2023,6 +2023,8 @@
           
           <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.xSquared" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.xSquared</a></li>
           
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinRangeEmbedding_gram_right" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinRangeEmbedding_gram_right</a></li>
+          
         </ul>
     
       </div>
@@ -2223,7 +2225,7 @@
         
         <ul class="uses">
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.xHatSquared" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.xHatSquared</a></li>
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinXHatCoisometry_spec" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinXHatCoisometry_spec</a></li>
           
         </ul>
     
@@ -2249,7 +2251,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>The paper proves this by multiplying out \(\widehat{X}=U\cdot I_{m\times d}\cdot V^\dagger \) and using the unitarity of \(U\) and \(V\). We record this coisometry identity as one of the primitive consequences of the reduced data package. </p>
+  <p>The paper proves this by multiplying out \(\widehat{X}=U\cdot I_{m\times d}\cdot V^\dagger \) and using the unitarity of \(U\) and \(V\). In Lean, the dimension hypothesis \(m\leq d\) already gives a rectangular matrix with orthonormal rows on the sigma auxiliary space; the chosen matrix <span class="ttfamily">sigmaFinXHatCoisometry</span> and its specification record this existence result as an input for the future construction. The data package then records the resulting coisometry identity for the particular \(\widehat X\) used together with the mixed square-root identity below. </p>
 
   </div>
 </div>
