@@ -621,6 +621,27 @@ theorem exists_sigmaFin_xHat_coisometry_of_sum_le
   exact exists_sigmaFin_xHat_coisometry_of_card_le m
     (sigmaFinCard_le_of_sum_le (ι := ι) m hm)
 
+/-- A chosen rectangular coisometry on the sigma auxiliary space, obtained from
+the total-rank bound. -/
+noncomputable def sigmaFinXHatCoisometry
+    {Outcome : Type*} [Fintype Outcome]
+    {ι : Type*} [Fintype ι]
+    (m : Outcome → ℕ)
+    (hm : ∑ a, m a ≤ Fintype.card ι) :
+    Matrix (ULift (FiniteHilbertSpace.sigmaFinCarrier m)) ι ℂ :=
+  Classical.choose (exists_sigmaFin_xHat_coisometry_of_sum_le m hm)
+
+/-- The chosen sigma-space rectangular coisometry has orthonormal rows. -/
+lemma sigmaFinXHatCoisometry_spec
+    {Outcome : Type*} [Fintype Outcome]
+    {ι : Type*} [Fintype ι]
+    (m : Outcome → ℕ)
+    (hm : ∑ a, m a ≤ Fintype.card ι) :
+    sigmaFinXHatCoisometry (ι := ι) m hm *
+        (sigmaFinXHatCoisometry (ι := ι) m hm)ᴴ =
+      (1 : MIPStarRE.Quantum.Op (ULift (FiniteHilbertSpace.sigmaFinCarrier m))) :=
+  Classical.choose_spec (exists_sigmaFin_xHat_coisometry_of_sum_le m hm)
+
 /-- Concrete auxiliary-space producer from a direct total-rank bound. -/
 lemma projectiveLowRankSum_auxData_of_rank_bound {Outcome : Type uOutcome}
     [Fintype Outcome] [Nonempty Outcome]
