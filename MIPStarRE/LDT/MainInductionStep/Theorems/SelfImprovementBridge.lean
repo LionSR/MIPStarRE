@@ -692,7 +692,7 @@ The diagonal compatibility is stated only after postprocessing both diagonal
 answer alphabets to their `zeroCoord` value; this is the comparison used by the
 LDT diagonal subtest and avoids claiming a false equality between
 `DiagonalLinePolynomial` and `DiagonalLineAnswer` families. -/
-theorem AnswerSelfImprovementPackage.SliceBridgeInputs.good_of_answerRestrictedGood
+theorem AnswerSelfImprovementPackage.SliceBridgeInputs.good_of_restrictedGood
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -755,7 +755,7 @@ This constructor fills both structural fields forced by the answer-restricted
 interface: averaged point compatibility follows from point-measurement transport,
 and goodness follows from the answer-restricted failure profile plus state,
 axis-parallel, and diagonal zero-coordinate transport. -/
-noncomputable def AnswerSelfImprovementPackage.SliceBridgeInputs.ofAnswerMeasurementEq
+noncomputable def AnswerSelfImprovementPackage.SliceBridgeInputs.ofMeasurementEq
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -794,7 +794,7 @@ noncomputable def AnswerSelfImprovementPackage.SliceBridgeInputs.ofAnswerMeasure
   AnswerSelfImprovementPackage.SliceBridgeInputs.ofPointMeasurementEq
     params strategy eps delta gamma k restrictionPkg inductionPkg sliceStrategy state_eq
     pointMeasurement_eq
-    (AnswerSelfImprovementPackage.SliceBridgeInputs.good_of_answerRestrictedGood
+    (AnswerSelfImprovementPackage.SliceBridgeInputs.good_of_restrictedGood
       params strategy eps delta gamma restrictionPkg sliceStrategy state_eq
       pointMeasurement_eq axisParallelMeasurement_eq diagonalZeroCoord_eq)
     bridgeInputs
@@ -852,7 +852,7 @@ noncomputable def AnswerSelfImprovementPackage.SliceBridgeInputs.ofOrthonormaliz
           (inductionPkg.sliceError x)) :
     AnswerSelfImprovementPackage.SliceBridgeInputs params strategy eps delta gamma k
       restrictionPkg inductionPkg :=
-  AnswerSelfImprovementPackage.SliceBridgeInputs.ofAnswerMeasurementEq
+  AnswerSelfImprovementPackage.SliceBridgeInputs.ofMeasurementEq
     params strategy eps delta gamma k restrictionPkg inductionPkg sliceStrategy state_eq
     pointMeasurement_eq axisParallelMeasurement_eq diagonalZeroCoord_eq
     (fun x =>

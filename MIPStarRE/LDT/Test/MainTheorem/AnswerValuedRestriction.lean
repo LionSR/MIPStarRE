@@ -310,6 +310,154 @@ def MainFormalSuccessorAnswerSelfImprovementBridgeInputs (params : Parameters)
       strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
       hrestrict hinduction
 
+/-- The per-slice induction package type used by the answer-valued successor
+self-improvement bridge. -/
+abbrev MainFormalSuccessorAnswerSelfImprovementInductionPackage (params : Parameters)
+    [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (haxisWeightedBound : MainFormalSuccessorAnswerAxisWeightedBound params strategy eps)
+    (hdiagonalWeightedBound :
+      MainFormalSuccessorAnswerDiagonalWeightedBound params strategy eps) : Type _ :=
+  let hrestrict :=
+    mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
+      haxisWeightedBound hdiagonalWeightedBound
+  MainInductionStep.AnswerPerSliceInductionPackage params
+    strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) hrestrict k
+
+/-- Assemble answer-valued successor self-improvement bridge inputs from honest
+slice strategies, verifier-visible measurement transports, and the remaining
+Section 9 bridge data. -/
+noncomputable def mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofMeasurementEq
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (haxisWeightedBound : MainFormalSuccessorAnswerAxisWeightedBound params strategy eps)
+    (hdiagonalWeightedBound :
+      MainFormalSuccessorAnswerDiagonalWeightedBound params strategy eps)
+    (sliceStrategy :
+      MainFormalSuccessorAnswerSelfImprovementInductionPackage params strategy eps hpass k
+        haxisWeightedBound hdiagonalWeightedBound →
+        Fq params → SymStrat params (Role × ι))
+    (state_eq :
+      ∀ hinduction x, (sliceStrategy hinduction x).state =
+        strategy.strategySymmetrization.state)
+    (pointMeasurement_eq :
+      ∀ hinduction x,
+        (sliceStrategy hinduction x).pointMeasurement =
+          (MainInductionStep.xRestrictedAnswerSymStrat params
+            strategy.strategySymmetrization x).pointMeasurement)
+    (axisParallelMeasurement_eq :
+      ∀ hinduction x,
+        (sliceStrategy hinduction x).axisParallelMeasurement.toIdxProjMeas =
+          (MainInductionStep.xRestrictedAnswerSymStrat params
+            strategy.strategySymmetrization x).axisParallelMeasurement.toIdxProjMeas)
+    (diagonalZeroCoord_eq :
+      ∀ hinduction x ℓ,
+        postprocess
+            (((sliceStrategy hinduction x).diagonalMeasurement.toIdxProjMeas ℓ).toSubMeas)
+            (fun f : DiagonalLinePolynomial params => f zeroCoord) =
+          postprocess
+            (((MainInductionStep.xRestrictedAnswerSymStrat params
+              strategy.strategySymmetrization x).diagonalMeasurement.toIdxProjMeas ℓ).toSubMeas)
+            (fun f : DiagonalLineAnswer params => f zeroCoord))
+    (bridgeInputs :
+      ∀ hinduction x,
+        SelfImprovement.SelfImprovementBridgeInputs params (sliceStrategy hinduction x)
+          ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
+            haxisWeightedBound hdiagonalWeightedBound).profile.axisParallel x)
+          ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
+            haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x)
+          (hinduction.sliceError x)) :
+    MainFormalSuccessorAnswerSelfImprovementBridgeInputs params strategy eps hpass k
+      haxisWeightedBound hdiagonalWeightedBound := by
+  let hrestrict :=
+    mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
+      haxisWeightedBound hdiagonalWeightedBound
+  intro hinduction
+  exact
+    MainInductionStep.AnswerSelfImprovementPackage.SliceBridgeInputs.ofMeasurementEq
+      params strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
+      hrestrict hinduction (sliceStrategy hinduction) (state_eq hinduction)
+      (pointMeasurement_eq hinduction) (axisParallelMeasurement_eq hinduction)
+      (diagonalZeroCoord_eq hinduction) (bridgeInputs hinduction)
+
+/-- Assemble answer-valued successor self-improvement bridge inputs from the
+three named Section 9 producers, using the closed spectral truncation input for
+the orthonormalization stage. -/
+noncomputable def mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofOrthonormalizationRepair
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (haxisWeightedBound : MainFormalSuccessorAnswerAxisWeightedBound params strategy eps)
+    (hdiagonalWeightedBound :
+      MainFormalSuccessorAnswerDiagonalWeightedBound params strategy eps)
+    (sliceStrategy :
+      MainFormalSuccessorAnswerSelfImprovementInductionPackage params strategy eps hpass k
+        haxisWeightedBound hdiagonalWeightedBound →
+        Fq params → SymStrat params (Role × ι))
+    (state_eq :
+      ∀ hinduction x, (sliceStrategy hinduction x).state =
+        strategy.strategySymmetrization.state)
+    (pointMeasurement_eq :
+      ∀ hinduction x,
+        (sliceStrategy hinduction x).pointMeasurement =
+          (MainInductionStep.xRestrictedAnswerSymStrat params
+            strategy.strategySymmetrization x).pointMeasurement)
+    (axisParallelMeasurement_eq :
+      ∀ hinduction x,
+        (sliceStrategy hinduction x).axisParallelMeasurement.toIdxProjMeas =
+          (MainInductionStep.xRestrictedAnswerSymStrat params
+            strategy.strategySymmetrization x).axisParallelMeasurement.toIdxProjMeas)
+    (diagonalZeroCoord_eq :
+      ∀ hinduction x ℓ,
+        postprocess
+            (((sliceStrategy hinduction x).diagonalMeasurement.toIdxProjMeas ℓ).toSubMeas)
+            (fun f : DiagonalLinePolynomial params => f zeroCoord) =
+          postprocess
+            (((MainInductionStep.xRestrictedAnswerSymStrat params
+              strategy.strategySymmetrization x).diagonalMeasurement.toIdxProjMeas ℓ).toSubMeas)
+            (fun f : DiagonalLineAnswer params => f zeroCoord))
+    (helperStrongSelfConsistency :
+      ∀ hinduction x,
+        SelfImprovement.HelperStrongSelfConsistencyInput params
+          (sliceStrategy hinduction x)
+          ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
+            haxisWeightedBound hdiagonalWeightedBound).profile.axisParallel x)
+          ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
+            haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x))
+    (repair :
+      ∀ hinduction x,
+        SelfImprovement.OrthonormalizationRepairProducer params
+          (sliceStrategy hinduction x)
+          ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
+            haxisWeightedBound hdiagonalWeightedBound).profile.axisParallel x)
+          ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
+            haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x))
+    (finalFields :
+      ∀ hinduction x,
+        SelfImprovement.FinalFieldsInput params (sliceStrategy hinduction x)
+          ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
+            haxisWeightedBound hdiagonalWeightedBound).profile.axisParallel x)
+          ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
+            haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x)
+          (hinduction.sliceError x)) :
+    MainFormalSuccessorAnswerSelfImprovementBridgeInputs params strategy eps hpass k
+      haxisWeightedBound hdiagonalWeightedBound := by
+  let hrestrict :=
+    mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
+      haxisWeightedBound hdiagonalWeightedBound
+  intro hinduction
+  exact
+    MainInductionStep.AnswerSelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationRepair
+      params strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
+      hrestrict hinduction (sliceStrategy hinduction) (state_eq hinduction)
+      (pointMeasurement_eq hinduction) (axisParallelMeasurement_eq hinduction)
+      (diagonalZeroCoord_eq hinduction) (helperStrongSelfConsistency hinduction)
+      (repair hinduction) (finalFields hinduction)
+
 /-- Convert answer-valued successor-case bridge inputs into the self-improvement
 producer expected by the public answer-valued Section 6 boundary wrapper. -/
 noncomputable def mainFormalSuccessorAnswerSelfImprovementProducer_ofBridgeInputs
