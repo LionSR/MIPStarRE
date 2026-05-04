@@ -500,12 +500,14 @@ lemma sigmaFinRangeEmbedding_qa_eq {Outcome : Type uOutcome}
     ProjMeas.transport, Measurement.transport, SubMeas.transport, Matrix.mul_apply,
     Matrix.conjTranspose_apply, Matrix.diagonal_apply] using hsum.symm
 
-/-- The canonical finite-enumeration `Q` layer associated to a projective
-family.
+/-- The finite-enumeration `Q` layer associated to an operator family.
 
-The auxiliary Hilbert space is the sigma type `Σ a, Fin (rank Q_a)`, lifted to
-the universe of the ambient space.  The projective measurement is the block
-measurement selecting the summands indexed by a fixed outcome. -/
+The auxiliary Hilbert space is the finite-enumeration model of
+`Σ a, Fin (rank Q_a)`, lifted to the universe of the ambient space.  The block
+measurement selecting the summands indexed by a fixed outcome is projective.
+This construction requires the sigma carrier to be nonempty; the degenerate
+all-ranks-zero case is handled separately by the low-rank auxiliary-space
+producer. -/
 noncomputable def sigmaRangeQLayer
     {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
@@ -583,10 +585,11 @@ theorem exists_qxpLayerData_ofRankReductionSigmaRangeAndSvdIdentities
         CFC.sqrt (QTotal qLayer)) :
     ∃ data : QXPLayerData Outcome ι,
       ∃ hq : data.qLayer = sigmaRangeQLayer qLayer.q,
-        Eq.ndrec (motive := fun qLayer' => Matrix qLayer'.auxSpace.carrier ι ℂ)
-          data.x hq = sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective ∧
-        Eq.ndrec (motive := fun qLayer' => Matrix qLayer'.auxSpace.carrier ι ℂ)
-          data.xHat hq = xHat := by
+        hq ▸ data.x =
+            (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from
+              sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective) ∧
+          hq ▸ data.xHat =
+            (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from xHat) := by
   classical
   exact
     ⟨QXPLayerData.ofSigmaRangeAndSvdIdentities (q := qLayer.q)

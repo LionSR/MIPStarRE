@@ -916,7 +916,12 @@ lemma pQApprox_ofRankReductionSigmaRangeAndSvdIdentities
     (hψ : ψ.IsNormalized)
     (hζ : 0 ≤ ζ) (hζ_small : ζ ≤ 1 / (4 : Error)) :
     ∃ data : QXPLayerData Outcome ι,
-      data.qLayer = sigmaRangeQLayer qLayer.q ∧
+      ∃ hq : data.qLayer = sigmaRangeQLayer qLayer.q,
+        hq ▸ data.x =
+          (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from
+            sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective) ∧
+        hq ▸ data.xHat =
+          (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from xHat) ∧
         SDDOpRel ψ (uniformDistribution Unit)
           (constOpFamily data.qLayer.q)
           (constOpFamily (PFamily data))
@@ -925,7 +930,7 @@ lemma pQApprox_ofRankReductionSigmaRangeAndSvdIdentities
   let data : QXPLayerData Outcome ι :=
     QXPLayerData.ofSigmaRangeAndSvdIdentities (q := qLayer.q)
       hRank.projective hRank.sum_eq_total xHat xHat_coisometry xHat_mixed
-  refine ⟨data, rfl, ?_⟩
+  refine ⟨data, rfl, rfl, rfl, ?_⟩
   exact pQApprox ψ A ζ data hψ hζ hζ_small hRank.toSigmaRangeQLayer
 
 end
