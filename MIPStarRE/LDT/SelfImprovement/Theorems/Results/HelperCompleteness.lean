@@ -466,7 +466,7 @@ theorem helper_second_move_first_factor_operator_le_one
           simpa [leftTensor, opTensor] using
             (opTensor_mono_left (ι₂ := ι)
               (B := (1 : MIPStarRE.Quantum.Op ι)) hT_sq_le
-              (show (0 : MIPStarRE.Quantum.Op ι) ≤ 1 by exact zero_le_one))
+              (zero_le_one : (0 : MIPStarRE.Quantum.Op ι) ≤ 1))
     _ = leftTensor (ι₂ := ι) (∑ a : Fq params, helperFiberOperator params T u a) := by
         rw [leftTensor_finset_sum]
     _ = leftTensor (ι₂ := ι) T.total := by
@@ -664,7 +664,7 @@ theorem helper_first_move_second_factor_operator_le_one
     simpa [leftTensor, opTensor] using
       (opTensor_mono_left (ι₂ := ι)
         (B := (1 : MIPStarRE.Quantum.Op ι)) hterm
-        (show (0 : MIPStarRE.Quantum.Op ι) ≤ 1 by exact zero_le_one))
+        (zero_le_one : (0 : MIPStarRE.Quantum.Op ι) ≤ 1))
   calc
     (∑ a : Fq params,
       let Au := (strategy.pointMeasurement u).outcome a
