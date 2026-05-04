@@ -702,7 +702,7 @@
 	\end{proof}
 
 	\begin{definition}[Matrix decomposition of~$Q_a$]\label{def:matrix-decomposition-Q}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.matrixDecompositionQ}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.matrixDecompositionQ, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaProjMeas, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinProjMeas, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaRangeEmbedding, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinRangeEmbedding}
 		\leanok
 		\uses{lem:projective-low-rank-sum}
 		For each $a$, let
@@ -733,6 +733,8 @@
 
 	\begin{definition}[SVD of~$X$]\label{def:svd-of-X}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.svdOfX}
+		\leanok
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndSvdIdentities}
 		\leanok
 		\uses{def:matrix-decomposition-Q}
 		The paper presents this step by choosing a singular value decomposition
@@ -798,7 +800,7 @@
 	\end{proof}
 
 	\begin{lemma}[$Q_a$ restated]\label{lem:qa-restated}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qaRestated}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sigmaRangeEmbedding_qa_eq, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinRangeEmbedding_qa_eq, MIPStarRE.LDT.MakingMeasurementsProjective.qaRestated}
 		\leanok
 		For each $a$,
 		\begin{equation*}

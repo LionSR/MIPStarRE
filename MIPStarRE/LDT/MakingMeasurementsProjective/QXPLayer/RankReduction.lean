@@ -330,6 +330,218 @@ noncomputable def sigmaFinProjMeas {Outcome : Type*} [Fintype Outcome] [Decidabl
     (finSigmaProjMeas (n := Fintype.card Outcome)
       (m := fun i => m ((Fintype.equivFin Outcome).symm i)))
 
+/-- The matrix `X` associated to a projective family on the sigma auxiliary
+space.
+
+Rows are indexed by the finite model of `Σ a, Fin (rank Q_a)`.  The row
+corresponding to `(a,i)` is the bra vector `⟨v_{a,i}|`, where
+`v_{a,i}` is the `i`th vector in the chosen orthonormal basis of the range of
+`Q_a`.  This is the Lean form of
+`X = Σ_a Σ_i |a,i⟩⟨v_{a,i}|` in the paper. -/
+noncomputable def sigmaFinRangeEmbedding {Outcome : Type uOutcome}
+    [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (Q : Outcome → MIPStarRE.Quantum.Op ι)
+    (hproj : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (Q a)) :
+    Matrix (ULift.{uι}
+      (FiniteHilbertSpace.sigmaFinCarrier (fun a : Outcome => (Q a).rank))) ι ℂ :=
+  fun x j =>
+    let a : Outcome := (Fintype.equivFin Outcome).symm x.down.1
+    star ((MIPStarRE.Quantum.IsProj.rangeONB (Q a) (hproj a)).vec x.down.2 j)
+
+/-- The literal block projective measurement on `Σ a, Fin (m a)` selecting the
+`a`-summand.  This is the paper's measurement
+`T_a = Σ_i |a,i⟩⟨a,i|` before replacing the sigma type by the universe-stable
+finite-enumeration model used in `sigmaFinProjMeas`.  The two constructions are
+kept separate so that `sigmaRangeEmbedding_qa_eq` follows the paper's literal
+index set, while the finite-enumeration form supplies the nonempty auxiliary
+Hilbert space used by `QXPLayerData`. -/
+noncomputable def sigmaProjMeas {Outcome : Type uOutcome}
+    [Fintype Outcome] [DecidableEq Outcome] (m : Outcome → ℕ) :
+    ProjMeas Outcome (Σ a : Outcome, Fin (m a)) where
+  outcome := fun a =>
+    Matrix.diagonal fun x : Σ a : Outcome, Fin (m a) => if x.1 = a then 1 else 0
+  total := 1
+  outcome_pos := by
+    intro a
+    refine Matrix.nonneg_iff_posSemidef.mpr ?_
+    exact Matrix.PosSemidef.diagonal <| by
+      intro x
+      by_cases hx : x.1 = a <;> simp [hx]
+  sum_eq_total := by
+    ext x y
+    rw [Matrix.sum_apply]
+    by_cases hxy : x = y
+    · subst hxy
+      simp
+    · simp [hxy]
+  total_le_one := le_rfl
+  total_eq_one := rfl
+  proj := by
+    intro a
+    rw [Matrix.diagonal_mul_diagonal]
+    ext x y
+    by_cases hxy : x = y
+    · subst hxy
+      by_cases hx : x.1 = a <;> simp [hx]
+    · simp [hxy]
+
+/-- The paper's literal matrix `X = Σ_a Σ_i |a,i⟩⟨v_{a,i}|`
+on the sigma auxiliary space. -/
+noncomputable def sigmaRangeEmbedding {Outcome : Type uOutcome}
+    [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (Q : Outcome → MIPStarRE.Quantum.Op ι)
+    (hproj : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (Q a)) :
+    Matrix (Σ a : Outcome, Fin (Q a).rank) ι ℂ :=
+  fun x j =>
+    star ((MIPStarRE.Quantum.IsProj.rangeONB (Q x.1) (hproj x.1)).vec x.2 j)
+
+/-- The literal sigma-space range embedding realizes each projector as
+`Q_a = X† T_a X`.
+
+This is the matrix-decomposition identity immediately underlying the paper's
+`Q_a` restatement.  It is independent of the later polar/SVD construction of
+`Xhat`. -/
+lemma sigmaRangeEmbedding_qa_eq {Outcome : Type uOutcome}
+    [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (Q : Outcome → MIPStarRE.Quantum.Op ι)
+    (hproj : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (Q a))
+    (a : Outcome) :
+    let X := sigmaRangeEmbedding Q hproj
+    let T := sigmaProjMeas (fun a : Outcome => (Q a).rank)
+    Q a = Xᴴ * T.outcome a * X := by
+  classical
+  let X := sigmaRangeEmbedding Q hproj
+  let T := sigmaProjMeas (fun a : Outcome => (Q a).rank)
+  let onb : (b : Outcome) →
+      MIPStarRE.Quantum.ProjectorRangeONB (Q b) (hproj b) :=
+    fun b => MIPStarRE.Quantum.IsProj.rangeONB (Q b) (hproj b)
+  ext i j
+  have hdecomp :
+      (Q a) i j =
+        ∑ k : Fin (Q a).rank,
+          (onb a).vec k i * star ((onb a).vec k j) := by
+    simpa [onb, Matrix.sum_apply, Matrix.vecMulVec_apply] using
+      congrFun (congrFun (onb a).decomposition i) j
+  rw [hdecomp]
+  simp [onb, sigmaRangeEmbedding, sigmaProjMeas, Matrix.mul_apply,
+    Matrix.conjTranspose_apply, Matrix.diagonal_apply, Fintype.sum_sigma]
+
+/-- The finite-enumeration range embedding realizes each projector as
+`Q_a = X† T_a X`.
+
+This is the universe-stable form of `sigmaRangeEmbedding_qa_eq`, with the same
+sigma basis encoded by `FiniteHilbertSpace.sigmaFinCarrier`. -/
+lemma sigmaFinRangeEmbedding_qa_eq {Outcome : Type uOutcome}
+    [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (Q : Outcome → MIPStarRE.Quantum.Op ι)
+    (hproj : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (Q a))
+    (a : Outcome) :
+    let X := sigmaFinRangeEmbedding Q hproj
+    let T := sigmaFinProjMeas (fun a : Outcome => (Q a).rank)
+    Q a = Xᴴ * T.outcome a * X := by
+  classical
+  let onb : (b : Outcome) →
+      MIPStarRE.Quantum.ProjectorRangeONB (Q b) (hproj b) :=
+    fun b => MIPStarRE.Quantum.IsProj.rangeONB (Q b) (hproj b)
+  ext i j
+  have hdecomp :
+      (Q a) i j =
+        ∑ k : Fin (Q a).rank,
+          (onb a).vec k i * star ((onb a).vec k j) := by
+    simpa [onb, Matrix.sum_apply, Matrix.vecMulVec_apply] using
+      congrFun (congrFun (onb a).decomposition i) j
+  rw [hdecomp]
+  let S := FiniteHilbertSpace.sigmaFinCarrier (fun a : Outcome => (Q a).rank)
+  let e : Outcome ≃ Fin (Fintype.card Outcome) := Fintype.equivFin Outcome
+  have hsum :
+      (∑ x : ULift.{uι} S,
+        if x.down.1 = e a then
+          (onb (e.symm x.down.1)).vec x.down.2 i *
+            star ((onb (e.symm x.down.1)).vec x.down.2 j)
+        else 0) =
+        ∑ k : Fin (Q a).rank,
+          (onb a).vec k i * star ((onb a).vec k j) := by
+    calc
+      (∑ x : ULift.{uι} S,
+        if x.down.1 = e a then
+          (onb (e.symm x.down.1)).vec x.down.2 i *
+            star ((onb (e.symm x.down.1)).vec x.down.2 j)
+        else 0)
+          = ∑ x : S,
+              if x.1 = e a then
+                (onb (e.symm x.1)).vec x.2 i *
+                  star ((onb (e.symm x.1)).vec x.2 j)
+              else 0 := by
+              simpa using
+                (Equiv.sum_comp (Equiv.ulift : ULift.{uι} S ≃ S)
+                  (fun x : S =>
+                    if x.1 = e a then
+                      (onb (e.symm x.1)).vec x.2 i *
+                        star ((onb (e.symm x.1)).vec x.2 j)
+                    else 0))
+      _ = ∑ k : Fin (Q a).rank,
+          (onb a).vec k i * star ((onb a).vec k j) := by
+          suffices
+              (∑ k : Fin (Q (e.symm (e a))).rank,
+                (onb (e.symm (e a))).vec k i *
+                  star ((onb (e.symm (e a))).vec k j)) =
+              ∑ k : Fin (Q a).rank,
+                (onb a).vec k i * star ((onb a).vec k j) by
+            simpa [S, FiniteHilbertSpace.sigmaFinCarrier, Fintype.sum_sigma] using this
+          let F : Outcome → ℂ := fun b =>
+            ∑ k : Fin (Q b).rank, (onb b).vec k i * star ((onb b).vec k j)
+          change F (e.symm (e a)) = F a
+          exact congrArg F (e.symm_apply_apply a)
+  simpa [onb, sigmaFinRangeEmbedding, sigmaFinProjMeas, finSigmaProjMeas,
+    ProjMeas.transport, Measurement.transport, SubMeas.transport, Matrix.mul_apply,
+    Matrix.conjTranspose_apply, Matrix.diagonal_apply] using hsum.symm
+
+/-- Assemble `QXPLayerData` from the canonical sigma-space embedding and the
+remaining SVD/polar identities for `Xhat`.
+
+The matrix `X` and the auxiliary projective measurement are fixed to be the
+finite-enumeration sigma construction associated to the projective family `q`.
+Thus the hypothesis `Q_a = X† T_a X` required by
+`QXPLayerData.ofQLayerAndSvdIdentities` is supplied by
+`sigmaFinRangeEmbedding_qa_eq`; only the coisometry and mixed-square-root
+identities for `Xhat` remain as inputs. -/
+noncomputable def QXPLayerData.ofSigmaRangeAndSvdIdentities
+    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (q : OpFamily Outcome ι)
+    (qa_projective : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (q.outcome a))
+    (q_sum_eq_total : ∑ a : Outcome, q.outcome a = q.total)
+    [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (q.outcome a).rank))]
+    (xHat : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (q.outcome a).rank))) ι ℂ)
+    (xHat_coisometry : xHat * xHatᴴ =
+      (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
+        (fun a : Outcome => (q.outcome a).rank)))))
+    (xHat_mixed : (sigmaFinRangeEmbedding q.outcome qa_projective)ᴴ * xHat =
+      CFC.sqrt q.total) :
+    QXPLayerData Outcome ι := by
+  classical
+  let auxSpace : FiniteHilbertSpace.{uι} :=
+    FiniteHilbertSpace.sigmaFin (fun a : Outcome => (q.outcome a).rank)
+  let qLayer : QLayerData Outcome ι :=
+    { auxSpace := auxSpace
+      q := q
+      t := sigmaFinProjMeas (fun a : Outcome => (q.outcome a).rank) }
+  exact QXPLayerData.ofQLayerAndSvdIdentities qLayer qa_projective
+    (by simpa [qLayer, Qa, QTotal] using q_sum_eq_total)
+    (sigmaFinRangeEmbedding q.outcome qa_projective) xHat
+    (by
+      intro a
+      simpa [qLayer, auxSpace, Ta] using
+        sigmaFinRangeEmbedding_qa_eq q.outcome qa_projective a)
+    (by simpa [auxSpace] using xHat_coisometry)
+    (by simpa [qLayer, QTotal] using xHat_mixed)
+
 /-- A one-point projective measurement concentrating all mass on the chosen outcome. -/
 private noncomputable def pointProjMeas {Outcome : Type uOutcome}
     [Fintype Outcome] [DecidableEq Outcome]
