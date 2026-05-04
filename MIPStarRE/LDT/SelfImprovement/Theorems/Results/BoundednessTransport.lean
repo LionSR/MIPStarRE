@@ -6,6 +6,7 @@ import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
 import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUPointConsistency
 
 /-!
 # Final-fields projective-residual boundedness transport
@@ -34,6 +35,9 @@ data-processing transport of the boundedness gap, and the standalone
 - **helper_boundedness_gap_le_selfImprovementHelperError** — combines the
   `H`-versus-`Z` scalar comparison with the off-diagonal average estimate to
   obtain the helper boundedness gap at the helper threshold.
+- **helper_point_consistency_of_addInU_transfer** — converts the off-diagonal
+  `add-in-u` transfer estimate into the helper-stage consistency relation with
+  the point measurement.
 - **helper_boundedness_gap_transport_through_data_processing** — transport
   the helper boundedness gap through the data-processing SDD approximation
   between Ĥ and H (paper lines 747–755).
@@ -423,6 +427,119 @@ theorem helper_boundedness_gap_le_selfImprovementHelperError
       add_le_add hZ_vs_H hoffdiag
     _ ≤ selfImprovementHelperError params eps delta :=
       helper_boundedness_error_le_selfImprovementHelperError params eps delta heps hdelta
+
+/-- Pointwise form of the helper point-consistency off-diagonal identity.
+
+For the point measurement `A^u` and the evaluated helper family
+`H_{[h(u)=a]}`, the bipartite consistency defect is exactly the sum of the
+off-diagonal terms `A^u_a ⊗ H_h` with `a ≠ h(u)`.  The proof combines the
+definition of `qBipartiteConsDefect` with the off-diagonal decomposition already
+used in the helper boundedness argument. -/
+private theorem point_consistency_qBipartiteConsDefect_eq_off_diagonal_sum
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (H : SubMeas (Polynomial params) ι)
+    (u : Point params) :
+    qBipartiteConsDefect strategy.state
+      ((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u)
+      ((polynomialEvaluationFamily params H) u) =
+      ∑ h : Polynomial params,
+        ∑ a ∈ (Finset.univ : Finset (Fq params)).erase (h u),
+          ev strategy.state
+            (opTensor ((strategy.pointMeasurement u).outcome a)
+              (H.outcome h)) := by
+  classical
+  let A := (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u
+  let B := (polynomialEvaluationFamily params H) u
+  let offdiag : Error :=
+    ∑ h : Polynomial params,
+      ∑ a ∈ (Finset.univ : Finset (Fq params)).erase (h u),
+        ev strategy.state
+          (opTensor ((strategy.pointMeasurement u).outcome a)
+            (H.outcome h))
+  have hdiff :
+      ev strategy.state (opTensor A.total B.total) -
+          qBipartiteMatchMass strategy.state A B = offdiag := by
+    have hpoint :
+        ev strategy.state (rightTensor (ι₁ := ι) H.total) -
+            ev strategy.state (helperAgreementOperatorAtPoint params strategy H u) =
+          offdiag := by
+      rw [← ev_sub, helperAgreementOperatorAtPoint_off_diagonal_decomposition,
+        ev_sum]
+      simp only [ev_finset_sum, offdiag]
+    have htotal : opTensor A.total B.total = rightTensor (ι₁ := ι) H.total := by
+      simp [A, B, IdxProjMeas.toIdxSubMeas, polynomialEvaluationFamily, evaluateAt,
+        postprocess, (strategy.pointMeasurement u).total_eq_one]
+    have hmatch :
+        qBipartiteMatchMass strategy.state A B =
+          ev strategy.state (helperAgreementOperatorAtPoint params strategy H u) := by
+      rw [helperAgreementOperatorAtPoint, ev_sum]
+      simp [qBipartiteMatchMass, A, B, polynomialEvaluationFamily,
+        IdxProjMeas.toIdxSubMeas]
+    rw [htotal, hmatch]
+    exact hpoint
+  have hoffdiag_nonneg : 0 ≤ offdiag := by
+    dsimp [offdiag]
+    refine Finset.sum_nonneg ?_
+    intro h _
+    refine Finset.sum_nonneg ?_
+    intro a _
+    exact ev_nonneg_of_psd strategy.state _
+      (opTensor_nonneg ((strategy.pointMeasurement u).outcome_pos a) (H.outcome_pos h))
+  unfold qBipartiteConsDefect
+  change max 0
+      (ev strategy.state (opTensor A.total B.total) -
+        qBipartiteMatchMass strategy.state A B) = offdiag
+  rw [hdiff]
+  exact max_eq_right hoffdiag_nonneg
+
+/-- Helper-stage point consistency from the off-diagonal add-in-`u` transfer.
+
+This is the Lean form of the proof of
+`item:self-improvement-A-consistency` before the later projective transport:
+the add-in-`u` estimate bounds the averaged off-diagonal mass for
+`A^u_a ⊗ Hhat_h`, and the preceding identity identifies that mass with the
+`ConsRel` defect of the point measurement against the evaluated helper family. -/
+theorem helper_point_consistency_of_addInU_transfer
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
+    (T Hhat : SubMeas (Polynomial params) ι)
+    (htransfer :
+      |addInULeftQuantity params strategy
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          Hhat
+          (pointConsistencyAddInUSelection params) -
+        addInURightQuantity params strategy
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          T
+          (pointConsistencyAddInUSelection params)| ≤ addInUError params eps delta) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params Hhat)
+      (selfImprovementHelperError params eps delta) := by
+  have hoffdiag :=
+    pointConsistencyAddInU_off_diagonal_avg_le_helper_error_of_transfer
+      params strategy eps delta heps hdelta T Hhat htransfer
+  constructor
+  calc
+    bipartiteConsError strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params Hhat)
+        =
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ∑ a ∈ (Finset.univ : Finset (Fq params)).erase (h u),
+            ev strategy.state
+              (opTensor ((strategy.pointMeasurement u).outcome a)
+                (Hhat.outcome h))) := by
+          unfold bipartiteConsError
+          refine avgOver_congr (uniformDistribution (Point params)) _ _ ?_
+          intro u
+          exact point_consistency_qBipartiteConsDefect_eq_off_diagonal_sum
+            params strategy Hhat u
+    _ ≤ selfImprovementHelperError params eps delta := hoffdiag
 
 /-- Transport the helper boundedness gap through the data-processing
 approximation between `Hhat` and `H`.
