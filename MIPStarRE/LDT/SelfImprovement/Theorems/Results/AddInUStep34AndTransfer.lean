@@ -1389,5 +1389,4 @@ theorem helper_mass_sub_release_eq_polynomial_off_diagonal
         ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h')
         (T.toSubMeas.outcome h)))
 
-
 end MIPStarRE.LDT.SelfImprovement

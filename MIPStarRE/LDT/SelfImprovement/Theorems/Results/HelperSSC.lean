@@ -294,4 +294,33 @@ theorem helper_strong_self_consistency_input_of_selfConsistency_localVariance
   exact helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance
     params strategy eps delta hssc (hlocal hhelper) (hresidual hhelper)
 
+/-- Build the full self-improvement bridge package when the helper strong
+self-consistency field is supplied by its producer.
+
+This constructor isolates the first of the three residual Section 9 inputs in
+`SelfImprovementBridgeInputs`. The helper-stage field is derived from the
+actual helper output and the add-in-`u`/variance producer package, while the
+orthonormalization and final-fields inputs remain explicit hypotheses. -/
+def SelfImprovementBridgeInputs.ofHelperStrongSelfConsistencyProducer
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta nu : Error)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
+    (hproducer :
+      ∀ {T : Measurement (Polynomial params) ι}
+        {Hhat : SubMeas (Polynomial params) ι}
+        {Z : MIPStarRE.Quantum.Op ι},
+        SelfImprovementHelperConclusion params strategy T Hhat Z eps delta →
+          HelperStrongSelfConsistencyProducerInputs
+            params strategy T Hhat eps delta)
+    (horthonormalization : OrthonormalizationInput params strategy eps delta)
+    (hfinalFields : FinalFieldsInput params strategy eps delta nu) :
+    SelfImprovementBridgeInputs params strategy eps delta nu where
+  helperStrongSelfConsistency :=
+    helper_strong_self_consistency_input_of_producer
+      params strategy eps delta heps hdelta hd_le_q hproducer
+  orthonormalization := horthonormalization
+  finalFields := hfinalFields
+
 end MIPStarRE.LDT.SelfImprovement
