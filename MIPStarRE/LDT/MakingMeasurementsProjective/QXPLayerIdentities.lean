@@ -975,6 +975,49 @@ lemma pQApprox {Outcome : Type*}
   constructor
   simpa [sddErrorOp, avgOver, uniformDistribution, constOpFamily] using hqSDD_bound
 
+/-- Apply `lem:P-Q-approx` to the canonical sigma-space QXP layer obtained
+from a rank-reduction witness.
+
+The theorem keeps the SVD/polar data for `Xhat` explicit, but removes the
+remaining bookkeeping needed to use `pQApprox`: the rank-reduction witness is
+transported to the sigma-space layer, and the resulting `QXPLayerData` is the
+canonical one built from `sigmaFinRangeEmbedding`. -/
+lemma pQApprox_ofRankReductionSigmaRangeAndSvdIdentities
+    {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι)
+    (A : Measurement Outcome ι) (ζ : Error)
+    {qLayer : QLayerData Outcome ι}
+    (hRank : RankReductionWitness ψ A ζ qLayer)
+    [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (qLayer.q.outcome a).rank))]
+    (xHat : Matrix (ULift (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (qLayer.q.outcome a).rank))) ι ℂ)
+    (xHat_coisometry : xHat * xHatᴴ =
+      (1 : MIPStarRE.Quantum.Op (ULift (FiniteHilbertSpace.sigmaFinCarrier
+        (fun a : Outcome => (qLayer.q.outcome a).rank)))))
+    (xHat_mixed :
+      (sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective)ᴴ * xHat =
+        CFC.sqrt (QTotal qLayer))
+    (hψ : ψ.IsNormalized)
+    (hζ : 0 ≤ ζ) (hζ_small : ζ ≤ 1 / (4 : Error)) :
+    ∃ data : QXPLayerData Outcome ι,
+      ∃ hq : data.qLayer = sigmaRangeQLayer qLayer.q,
+        hq ▸ data.x =
+          (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from
+            sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective) ∧
+        hq ▸ data.xHat =
+          (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from xHat) ∧
+        SDDOpRel ψ (uniformDistribution Unit)
+          (constOpFamily data.qLayer.q)
+          (constOpFamily (PFamily data))
+          (30 * zetaQuarterRoot ζ) := by
+  classical
+  let data : QXPLayerData Outcome ι :=
+    QXPLayerData.ofSigmaRangeAndSvdIdentities (q := qLayer.q)
+      hRank.projective hRank.sum_eq_total xHat xHat_coisometry xHat_mixed
+  refine ⟨data, rfl, rfl, rfl, ?_⟩
+  exact pQApprox ψ A ζ data hψ hζ hζ_small hRank.toSigmaRangeQLayer
 
 end
 

@@ -1,3 +1,4 @@
+import MIPStarRE.Quantum.FiniteHilbert
 import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkCore
 
 /-!
@@ -76,12 +77,6 @@ private lemma partialIsometry_to_unitary
           (Matrix.toEuclideanLin A).comp (Matrix.toEuclideanLin B) := by
     intro A B
     simp [Matrix.toEuclideanLin, Matrix.toLpLin_mul_same (p := (2 : ENNReal)) A B]
-  have toEuclideanLin_conjTranspose_mul_self :
-      ∀ A : MIPStarRE.Quantum.Op n,
-        Matrix.toEuclideanLin (Aᴴ * A) =
-          (Matrix.toEuclideanLin A).adjoint.comp (Matrix.toEuclideanLin A) := by
-    intro A
-    rw [toEuclideanLin_mul, Matrix.toEuclideanLin_conjTranspose_eq_adjoint]
   let E := EuclideanSpace ℂ n
   letI : NormedAddCommGroup E := by dsimp [E]; infer_instance
   letI : InnerProductSpace ℂ E := by dsimp [E]; infer_instance
@@ -104,7 +99,7 @@ private lemma partialIsometry_to_unitary
   have hgram : Vₗ.adjoint.comp Vₗ = Pₗ := by
     calc
       Vₗ.adjoint.comp Vₗ = Matrix.toEuclideanLin (Vᴴ * V) := by
-        rw [toEuclideanLin_conjTranspose_mul_self]
+        rw [Matrix.toEuclideanLin_conjTranspose_mul_self]
       _ = Pₗ := by rw [hVV]
   let Llin : S →ₗ[ℂ] E := Vₗ.comp S.subtype
   have hLnorm : ∀ x : S, ‖Llin x‖ = ‖x‖ := by
@@ -125,25 +120,14 @@ private lemma partialIsometry_to_unitary
     Matrix.toEuclideanLin.symm Ulin.toLinearMap
   have hUmat_lin : Matrix.toEuclideanLin Umat = Ulin.toLinearMap := by
     exact Matrix.toEuclideanLin.apply_symm_apply Ulin.toLinearMap
-  have hU_adjoint_comp : Ulin.toLinearMap.adjoint.comp Ulin.toLinearMap = 1 := by
-    apply LinearMap.ext
-    intro x
-    refine ext_inner_right ℂ fun y => ?_
-    calc
-      inner ℂ ((Ulin.toLinearMap.adjoint.comp Ulin.toLinearMap) x) y =
-          inner ℂ (Ulin x) (Ulin y) := by
-            rw [LinearMap.comp_apply, LinearMap.adjoint_inner_left]
-            rfl
-      _ = inner ℂ x y := Ulin.inner_map_map x y
-      _ = inner ℂ ((1 : E →ₗ[ℂ] E) x) y := rfl
   have hUstarU : Umatᴴ * Umat = 1 := by
     apply Matrix.toEuclideanLin.injective
     calc
       Matrix.toEuclideanLin (Umatᴴ * Umat) =
           (Matrix.toEuclideanLin Umat).adjoint.comp (Matrix.toEuclideanLin Umat) := by
-            rw [toEuclideanLin_conjTranspose_mul_self]
+            rw [Matrix.toEuclideanLin_conjTranspose_mul_self]
       _ = Ulin.toLinearMap.adjoint.comp Ulin.toLinearMap := by rw [hUmat_lin]
-      _ = 1 := hU_adjoint_comp
+      _ = 1 := Ulin.adjoint_comp_toLinearMap
       _ = Matrix.toEuclideanLin (1 : MIPStarRE.Quantum.Op n) := by
             rw [Matrix.toEuclideanLin, Matrix.toLpLin_one]
             rfl

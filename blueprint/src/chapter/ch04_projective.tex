@@ -736,6 +736,8 @@
 		\leanok
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndSvdIdentities}
 		\leanok
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndSvdIdentities}
+		\leanok
 		\uses{def:matrix-decomposition-Q}
 		The paper presents this step by choosing a singular value decomposition
 		\[
@@ -825,7 +827,7 @@
 	\end{proof}
 
 	\begin{lemma}[$X$ squared]\label{lem:X-squared}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xSquared}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xSquared, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinRangeEmbedding_gram_right}
 		\leanok
 		\begin{equation*}
 			X^\dagger \cdot X = Q.
@@ -913,7 +915,9 @@
 
 	\begin{lemma}[$\widehat{X}$ squared]\label{lem:X-hat-squared}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xHatSquared,
-			MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_coisometry}
+			MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_coisometry,
+			MIPStarRE.LDT.MakingMeasurementsProjective.exists_sigmaFin_xHat_coisometry_of_sum_le,
+			MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinXHatCoisometry_spec}
 		\leanok
 		\begin{equation*}
 			\widehat{X} \cdot \widehat{X}^\dagger = I_{m \times m}.
@@ -922,10 +926,14 @@
 	\begin{proof}
 		The paper proves this by multiplying out
 		$\widehat{X}=U\cdot I_{m\times d}\cdot V^\dagger$ and using the unitarity of
-		$U$ and $V$.  The formal lemma
-		\texttt{rectangularSvd\_xHat\_coisometry} is the corresponding matrix
-		calculation; the reduced data package then records this coisometry identity
-		as a primitive consequence.
+		$U$ and $V$.  In Lean, the dimension hypothesis $m\leq d$ already gives a
+		rectangular matrix with orthonormal rows on the sigma auxiliary space; the
+		chosen matrix \texttt{sigmaFinXHatCoisometry} and its specification record this
+		existence result as an input for the future construction.  The formal lemma
+		\texttt{rectangularSvd\_xHat\_coisometry} records the corresponding matrix
+		calculation, and the data package then stores the resulting coisometry
+		identity for the particular $\widehat X$ used together with the mixed
+		square-root identity below.
 	\end{proof}
 
 	\begin{lemma}[$X$ times $\widehat{X}$]\label{lem:X-times-X-hat}
@@ -992,6 +1000,8 @@
 
 	\begin{lemma}[$P$ is close to~$Q$]\label{lem:P-Q-approx}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox}
+		\leanok
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndSvdIdentities}
 		\leanok
 		\begin{equation*}
 			Q_a \ot I \approx_{30\zeta^{1/4}} P_a \ot I.
