@@ -11,6 +11,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUDiagonalAndDefs
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUPointConsistency
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep12
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperSSC
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop
 
@@ -31,6 +32,7 @@ All original declarations remain available under the same namespace.
   helper `A`-consistency
 - `AddInUStep12` — algebraic alignment and raw CS Step 1/2 bounds
 - `AddInUStep34AndTransfer` — variance conversions, factored CS, assembly, transfer
+- `HelperSSC` — final helper strong self-consistency producer packaging
 - `BoundednessTransport` — off-diagonal decomposition, boundedness gap transport,
   projective-residual producers
   (`projective_boundedness_gap_le_helper_boundedness_gap`,
