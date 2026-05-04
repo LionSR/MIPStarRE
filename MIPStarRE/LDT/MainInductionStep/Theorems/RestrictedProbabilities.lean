@@ -39,31 +39,6 @@ private lemma selfConsistencyRestrictedAverage_eq
   let g : Point params.next → Error :=
     fun u =>
       qBipartiteSSCDefect strategy.state ((strategy.pointMeasurement u).toSubMeas)
-  have hprod :
-      avgOver (uniformDistribution (Fq params))
-          (fun x => avgOver (uniformDistribution (Point params))
-            (fun u => g (appendPoint params u x))) =
-        avgOver (uniformDistribution (Fq params × Point params))
-          (fun xu => g (appendPoint params xu.2 xu.1)) := by
-    simpa using
-      (avgOver_uniform_prod (α := Fq params) (β := Point params)
-        (f := fun x u => g (appendPoint params u x))).symm
-  have hswap :
-      avgOver (uniformDistribution (Fq params × Point params))
-          (fun xu => g (appendPoint params xu.2 xu.1)) =
-        avgOver (uniformDistribution (Point params × Fq params))
-          (fun ux => g (appendPoint params ux.1 ux.2)) := by
-    simpa using
-      (CommutativityPoints.avgOver_uniform_equiv (e := Equiv.prodComm (Fq params) (Point params))
-        (f := fun xu : Fq params × Point params => g (appendPoint params xu.2 xu.1)))
-  have hequiv :
-      avgOver (uniformDistribution (Point params × Fq params))
-          (fun ux => g (appendPoint params ux.1 ux.2)) =
-        avgOver (uniformDistribution (Point params.next)) g := by
-    simpa using
-      (CommutativityPoints.avgOver_uniform_equiv
-        (e := CommutativityPoints.pointNextEquiv params)
-        (f := g)).symm
   calc
     avgOver (uniformDistribution (Fq params))
         (fun x => (xRestrictedStrategy params strategy x).selfConsistencyFailureProbability)
@@ -71,11 +46,8 @@ private lemma selfConsistencyRestrictedAverage_eq
           (fun x => avgOver (uniformDistribution (Point params))
             (fun u => g (appendPoint params u x))) := by
               rfl
-    _ = avgOver (uniformDistribution (Fq params × Point params))
-          (fun xu => g (appendPoint params xu.2 xu.1)) := hprod
-    _ = avgOver (uniformDistribution (Point params × Fq params))
-          (fun ux => g (appendPoint params ux.1 ux.2)) := hswap
-    _ = avgOver (uniformDistribution (Point params.next)) g := hequiv
+    _ = avgOver (uniformDistribution (Point params.next)) g := by
+          simpa using (CommutativityPoints.avgOver_uniform_pointNext_decompose params g).symm
     _ = strategy.selfConsistencyFailureProbability := by
           rfl
 
@@ -211,31 +183,6 @@ private lemma sliceAxisDirectionErrorAverage_eq_axisDirectionError
     qBipartiteConsDefect strategy.state
       (axisParallelPointAnswerFamily strategy (u, embedCoord params i))
       (axisParallelLineAnswerFamily strategy (u, embedCoord params i))
-  have hprod :
-      avgOver (uniformDistribution (Fq params))
-          (fun x => avgOver (uniformDistribution (Point params))
-            (fun u => g (appendPoint params u x))) =
-        avgOver (uniformDistribution (Fq params × Point params))
-          (fun xu => g (appendPoint params xu.2 xu.1)) := by
-    simpa using
-      (avgOver_uniform_prod (α := Fq params) (β := Point params)
-        (f := fun x u => g (appendPoint params u x))).symm
-  have hswap :
-      avgOver (uniformDistribution (Fq params × Point params))
-          (fun xu => g (appendPoint params xu.2 xu.1)) =
-        avgOver (uniformDistribution (Point params × Fq params))
-          (fun ux => g (appendPoint params ux.1 ux.2)) := by
-    simpa using
-      (CommutativityPoints.avgOver_uniform_equiv (e := Equiv.prodComm (Fq params) (Point params))
-        (f := fun xu : Fq params × Point params => g (appendPoint params xu.2 xu.1)))
-  have hequiv :
-      avgOver (uniformDistribution (Point params × Fq params))
-          (fun ux => g (appendPoint params ux.1 ux.2)) =
-        avgOver (uniformDistribution (Point params.next)) g := by
-    simpa using
-      (CommutativityPoints.avgOver_uniform_equiv
-        (e := CommutativityPoints.pointNextEquiv params)
-        (f := g)).symm
   calc
     avgOver (uniformDistribution (Fq params))
         (fun x => sliceAxisDirectionError params strategy x i)
@@ -245,11 +192,8 @@ private lemma sliceAxisDirectionErrorAverage_eq_axisDirectionError
               unfold sliceAxisDirectionError
               avg_congr with x, u
               simpa [g] using restrictedAxisSampleError_eq params strategy x u i
-    _ = avgOver (uniformDistribution (Fq params × Point params))
-          (fun xu => g (appendPoint params xu.2 xu.1)) := hprod
-    _ = avgOver (uniformDistribution (Point params × Fq params))
-          (fun ux => g (appendPoint params ux.1 ux.2)) := hswap
-    _ = avgOver (uniformDistribution (Point params.next)) g := hequiv
+    _ = avgOver (uniformDistribution (Point params.next)) g := by
+          simpa using (CommutativityPoints.avgOver_uniform_pointNext_decompose params g).symm
     _ = axisDirectionError params strategy (embedCoord params i) := by
           rfl
 

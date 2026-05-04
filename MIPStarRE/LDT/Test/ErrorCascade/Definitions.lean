@@ -20,7 +20,10 @@ namespace MIPStarRE.LDT
 
 namespace Test
 
-/-- The explicit `ν` from `thm:main-formal`, recorded with the paper's formula. -/
+/-- The formal final error envelope for `thm:main-formal`.
+
+The sharper pre-completion line-169 repair keeps the point-transport scale at
+the original `1/40000` exponent used by the surrounding Step 8 cascade. -/
 noncomputable def mainFormalError (params : Parameters) (k : ℕ) (eps : Error) : Error :=
   100000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
     (Real.rpow eps (1 / (40000 : Error)) +

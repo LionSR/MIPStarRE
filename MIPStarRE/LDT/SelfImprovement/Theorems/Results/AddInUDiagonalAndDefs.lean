@@ -360,27 +360,7 @@ lemma addInU_pointMeasurement_snd_selfConsistency
       delta
       (fun _uv (a : Fq params) => a)
       hssc_pair
-  have hleft :
-      IdxSubMeas.liftLeft
-          (fun uv : Point params × Point params =>
-            postprocess ((strategy.pointMeasurement uv.2).toSubMeas)
-              (fun a : Fq params => a)) =
-        IdxSubMeas.liftLeft
-          (fun uv : Point params × Point params =>
-            (strategy.pointMeasurement uv.2).toSubMeas) := by
-    funext uv
-    simp [IdxSubMeas.liftLeft]
-  have hright :
-      IdxSubMeas.liftRight
-          (fun uv : Point params × Point params =>
-            postprocess ((strategy.pointMeasurement uv.2).toSubMeas)
-              (fun a : Fq params => a)) =
-        IdxSubMeas.liftRight
-          (fun uv : Point params × Point params =>
-            (strategy.pointMeasurement uv.2).toSubMeas) := by
-    funext uv
-    simp [IdxSubMeas.liftRight]
-  simpa [hleft, hright] using hraw
+  simpa using hraw
 
 /-- The grouped tensor mass over a fiber `h(v)=a` is a contraction.
 

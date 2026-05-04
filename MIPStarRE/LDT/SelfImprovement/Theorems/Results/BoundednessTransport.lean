@@ -6,6 +6,7 @@ import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
 import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUPointConsistency
 
 /-!
 # Final-fields projective-residual boundedness transport
@@ -25,6 +26,8 @@ data-processing transport of the boundedness gap, and the standalone
   operator-level off-diagonal decomposition
   `I ⊗ H.total - helperAgreementOperatorAtPoint = ∑_h ∑_{a≠h(u)} A^u_a ⊗ H_h`
   (paper line 613; blueprint lines 296–300).
+- **helperAgreementOperatorAtPoint_ev_slack_eq_off_diagonal_sum** —
+  pointwise scalar form of the same off-diagonal decomposition.
 - **helper_boundedness_slack_average_ev_eq_off_diagonal_avg** — averaged
   scalar form of the off-diagonal decomposition (LHS of
   `eq:explicit-bound-for-A-consistency`, paper line 435).
@@ -34,6 +37,12 @@ data-processing transport of the boundedness gap, and the standalone
 - **helper_boundedness_gap_le_selfImprovementHelperError** — combines the
   `H`-versus-`Z` scalar comparison with the off-diagonal average estimate to
   obtain the helper boundedness gap at the helper threshold.
+- **helper_point_consistency_error_eq_off_diagonal_avg** — identifies the
+  averaged off-diagonal mass with the helper-stage `ConsRel` defect for the
+  point measurement against `polynomialEvaluationFamily`.
+- **helper_point_consistency_of_pointConsistencyAddInU_transfer** — packages
+  the point-consistency `add-in-u` transfer as a `ConsRel` at
+  `selfImprovementHelperError`.
 - **helper_boundedness_gap_transport_through_data_processing** — transport
   the helper boundedness gap through the data-processing SDD approximation
   between Ĥ and H (paper lines 747–755).
@@ -278,6 +287,35 @@ theorem helperAgreementOperatorAtPoint_off_diagonal_decomposition
   -- Pull the sum out of the left factor of `opTensor`.
   exact opTensor_sum_left_finset _ _ _
 
+/-- Scalar form of the pointwise off-diagonal decomposition.
+
+For each evaluation point `u`, the scalar slack
+`⟨ψ, I ⊗ H.total, ψ⟩ - ⟨ψ, helperAgreementOperatorAtPoint u, ψ⟩`
+is the sum of the off-diagonal masses
+`⟨ψ, A^u_a ⊗ H_h, ψ⟩` over the pairs with `a ≠ h(u)`. -/
+theorem helperAgreementOperatorAtPoint_ev_slack_eq_off_diagonal_sum
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (H : SubMeas (Polynomial params) ι)
+    (u : Point params) :
+    ev strategy.state (rightTensor (ι₁ := ι) H.total) -
+        ev strategy.state (helperAgreementOperatorAtPoint params strategy H u) =
+      ∑ h : Polynomial params,
+        ∑ a ∈ (Finset.univ : Finset (Fq params)).erase (h u),
+          ev strategy.state
+            (opTensor ((strategy.pointMeasurement u).outcome a)
+              (H.outcome h)) := by
+  rw [← ev_sub, helperAgreementOperatorAtPoint_off_diagonal_decomposition,
+    ev_sum]
+  simp only [ev_finset_sum]
+
+private lemma opTensor_one_left_eq_rightTensor
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (B : MIPStarRE.Quantum.Op ι₂) :
+    opTensor (ι₁ := ι₁) (1 : MIPStarRE.Quantum.Op ι₁) B =
+      rightTensor (ι₁ := ι₁) B := by
+  rfl
+
 /-- Averaged scalar form of the off-diagonal decomposition.
 
 Composed from `helperAgreementOperatorAtPoint_off_diagonal_decomposition` by
@@ -310,9 +348,7 @@ theorem helper_boundedness_slack_average_ev_eq_off_diagonal_avg
             ev strategy.state
               (opTensor ((strategy.pointMeasurement u).outcome a)
                 (H.outcome h)) := by
-    rw [← ev_sub, helperAgreementOperatorAtPoint_off_diagonal_decomposition,
-      ev_sum]
-    simp only [ev_finset_sum]
+    exact helperAgreementOperatorAtPoint_ev_slack_eq_off_diagonal_sum params strategy H u
   calc
     ev strategy.state (rightTensor (ι₁ := ι) H.total) -
           ev strategy.state (helperAgreementAverageOperator params strategy H) =
@@ -341,6 +377,113 @@ theorem helper_boundedness_slack_average_ev_eq_off_diagonal_avg
       refine avgOver_congr (uniformDistribution (Point params)) _ _ ?_
       intro u
       exact h_ev_pointwise u
+
+/-- The helper-stage consistency defect is exactly the averaged off-diagonal
+mass appearing in the point-consistency `add-in-u` calculation.
+
+This is the same algebraic identity as
+`helper_boundedness_slack_average_ev_eq_off_diagonal_avg`, read as a
+`ConsRel` defect for the point measurement against the polynomial-evaluation
+family of `H`. -/
+theorem helper_point_consistency_error_eq_off_diagonal_avg
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (H : SubMeas (Polynomial params) ι) :
+    bipartiteConsError strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params H) =
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ∑ a ∈ (Finset.univ : Finset (Fq params)).erase (h u),
+            ev strategy.state
+              (opTensor ((strategy.pointMeasurement u).outcome a)
+                (H.outcome h))) := by
+  classical
+  unfold bipartiteConsError
+  refine avgOver_congr (uniformDistribution (Point params)) _ _ ?_
+  intro u
+  have hdiff_eq :
+      ev strategy.state (rightTensor (ι₁ := ι) H.total) -
+          ev strategy.state (helperAgreementOperatorAtPoint params strategy H u) =
+        ∑ h : Polynomial params,
+          ∑ a ∈ (Finset.univ : Finset (Fq params)).erase (h u),
+            ev strategy.state
+              (opTensor ((strategy.pointMeasurement u).outcome a)
+                (H.outcome h)) := by
+    exact helperAgreementOperatorAtPoint_ev_slack_eq_off_diagonal_sum params strategy H u
+  have hdiff_nonneg :
+      0 ≤ ev strategy.state (rightTensor (ι₁ := ι) H.total) -
+          ev strategy.state (helperAgreementOperatorAtPoint params strategy H u) := by
+    rw [hdiff_eq]
+    exact Finset.sum_nonneg fun h _ =>
+      Finset.sum_nonneg fun a _ =>
+        ev_nonneg_of_psd strategy.state _
+          (opTensor_nonneg ((strategy.pointMeasurement u).toMeasurement.outcome_pos a)
+            (H.outcome_pos h))
+  have htotal :
+      ev strategy.state
+          (opTensor
+            (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total)
+            (((polynomialEvaluationFamily params H) u).total)) =
+        ev strategy.state (rightTensor (ι₁ := ι) H.total) := by
+    have hA_total :
+        (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total) =
+          (1 : MIPStarRE.Quantum.Op ι) := by
+      exact (strategy.pointMeasurement u).total_eq_one
+    have hB_total : (((polynomialEvaluationFamily params H) u).total) = H.total := by
+      simpa [polynomialEvaluationFamily, evaluateAt] using
+        postprocess_total H (fun g : Polynomial params => g u)
+    calc
+      ev strategy.state
+          (opTensor
+            (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total)
+            (((polynomialEvaluationFamily params H) u).total)) =
+        ev strategy.state (opTensor (1 : MIPStarRE.Quantum.Op ι) H.total) := by
+          rw [hA_total, hB_total]
+      _ = ev strategy.state (rightTensor (ι₁ := ι) H.total) := by
+          rw [opTensor_one_left_eq_rightTensor]
+  have hmatch :
+      qBipartiteMatchMass strategy.state
+          ((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u)
+          ((polynomialEvaluationFamily params H) u) =
+        ev strategy.state (helperAgreementOperatorAtPoint params strategy H u) := by
+    simp [qBipartiteMatchMass, helperAgreementOperatorAtPoint,
+      polynomialEvaluationFamily, evaluateAt, ev_sum, IdxProjMeas.toIdxSubMeas]
+  unfold qBipartiteConsDefect
+  rw [htotal, hmatch]
+  rw [max_eq_right hdiff_nonneg, hdiff_eq]
+
+/-- Helper-stage point consistency from the point-consistency `add-in-u`
+transfer hypothesis.
+
+The transfer bound controls the off-diagonal mass
+`E_u ∑_h ∑_{a ≠ h(u)} ⟨ψ, A^u_a ⊗ Hhat_h ψ⟩`.  The preceding algebraic
+identity identifies this mass with the `ConsRel` defect for the point
+measurement and the polynomial-evaluation family of `Hhat`. -/
+theorem helper_point_consistency_of_pointConsistencyAddInU_transfer
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
+    {T Hhat : SubMeas (Polynomial params) ι}
+    (htransfer :
+      |addInULeftQuantity params strategy
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          Hhat
+          (pointConsistencyAddInUSelection params) -
+        addInURightQuantity params strategy
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          T
+          (pointConsistencyAddInUSelection params)| ≤ addInUError params eps delta) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params Hhat)
+      (selfImprovementHelperError params eps delta) := by
+  refine ⟨?_⟩
+  rw [helper_point_consistency_error_eq_off_diagonal_avg]
+  exact
+    pointConsistencyAddInU_off_diagonal_avg_le_helper_error_of_transfer
+      params strategy eps delta heps hdelta T Hhat htransfer
 
 /-- Algebraic decomposition of the helper boundedness gap.
 
