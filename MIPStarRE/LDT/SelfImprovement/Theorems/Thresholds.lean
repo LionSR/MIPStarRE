@@ -25,11 +25,11 @@ The final-stage building block converts the literal
 parameters, formalizing the leading exponent-monotonicity step in
 `references/ldt-paper/self_improvement.tex`, lines 803--810.
 
-The orthonormalization-error nesting absorptions
-(`6 ζ̂ + 6 ζ̂_ortho ≤ ζ`, `2 ζ̂ + 2 √ζ̂_ortho ≤ ζ`,
-`ζ̂ + √ζ̂_dataprocess ≤ ζ`) require the rpow-subadditivity chain at
-`self_improvement.tex`, lines 772--810, and are intentionally left to a
-follow-up so this file ships without proof-evasion or new sorrys.
+The final projective-residual absorption `ζ̂ + √ζ̂_dataprocess ≤ ζ` is proved
+below using the reusable three-term power sum `finalStagePowerSum`. The
+remaining orthonormalization-error nesting absorptions
+(`6 ζ̂ + 6 ζ̂_ortho ≤ ζ` and `2 ζ̂ + 2 √ζ̂_ortho ≤ ζ`) use the same
+bookkeeping pattern and can be added as separate producer-side comparisons.
 
 Blueprint mirrors:
 
@@ -72,6 +72,38 @@ private theorem sqrt_24m_sq_le_5m (params : Parameters) :
   have h5m_nn : (0 : Error) ≤ 5 * (params.m : Error) := by positivity
   refine (Real.sqrt_le_left h5m_nn).mpr ?_
   nlinarith [sq_nonneg ((params.m : Error)), hmpos]
+
+private theorem sqrt_100m_le_10m (params : Parameters) :
+    Real.sqrt (100 * (params.m : Error)) ≤ 10 * (params.m : Error) := by
+  have hmpos : (0 : Error) ≤ (params.m : Error) := m_cast_nonneg params
+  have hm1 : (1 : Error) ≤ (params.m : Error) := one_le_m_cast params
+  have h10m_nn : (0 : Error) ≤ 10 * (params.m : Error) := by positivity
+  refine (Real.sqrt_le_left h10m_nn).mpr ?_
+  nlinarith [hmpos, hm1]
+
+private theorem sqrt_10m_le_4m (params : Parameters) :
+    Real.sqrt (10 * (params.m : Error)) ≤ 4 * (params.m : Error) := by
+  have hmpos : (0 : Error) ≤ (params.m : Error) := m_cast_nonneg params
+  have hm1 : (1 : Error) ≤ (params.m : Error) := one_le_m_cast params
+  have h4m_nn : (0 : Error) ≤ 4 * (params.m : Error) := by positivity
+  refine (Real.sqrt_le_left h4m_nn).mpr ?_
+  nlinarith [hmpos, hm1]
+
+private theorem sqrt_400m_le_20m (params : Parameters) :
+    Real.sqrt (400 * (params.m : Error)) ≤ 20 * (params.m : Error) := by
+  have hmpos : (0 : Error) ≤ (params.m : Error) := m_cast_nonneg params
+  have hm1 : (1 : Error) ≤ (params.m : Error) := one_le_m_cast params
+  have h20m_nn : (0 : Error) ≤ 20 * (params.m : Error) := by positivity
+  refine (Real.sqrt_le_left h20m_nn).mpr ?_
+  nlinarith [hmpos, hm1]
+
+private theorem sqrt_960m_le_31m (params : Parameters) :
+    Real.sqrt (960 * (params.m : Error)) ≤ 31 * (params.m : Error) := by
+  have hmpos : (0 : Error) ≤ (params.m : Error) := m_cast_nonneg params
+  have hm1 : (1 : Error) ≤ (params.m : Error) := one_le_m_cast params
+  have h31m_nn : (0 : Error) ≤ 31 * (params.m : Error) := by positivity
+  refine (Real.sqrt_le_left h31m_nn).mpr ?_
+  nlinarith [hmpos, hm1]
 
 /-! ## Subroutine: square-root bound on `globalVarianceOfPointsError`
 
@@ -477,6 +509,28 @@ theorem helper_boundedness_error_le_selfImprovementHelperError
           nlinarith [hmnonneg]
         exact mul_le_mul_of_nonneg_right hcoef hsum_nonneg
 
+/-- Helper-stage completeness absorption (`self_improvement.tex`, lines
+403--414).
+
+The loss `3 √δ` from the Cauchy--Schwarz comparison is bounded by the helper
+threshold `ζ̂`. -/
+theorem helper_completeness_error_le_selfImprovementHelperError
+    (params : Parameters) [FieldModel params.q]
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta) :
+    3 * Real.sqrt delta ≤ selfImprovementHelperError params eps delta := by
+  have hvariance_nonneg :
+      0 ≤ 4 * Real.sqrt (selfImprovementVarianceError params eps delta) := by
+    positivity
+  calc
+    3 * Real.sqrt delta
+        ≤ 3 * Real.sqrt delta +
+            4 * Real.sqrt (selfImprovementVarianceError params eps delta) := by
+          linarith
+    _ ≤ selfImprovementHelperError params eps delta :=
+          helper_boundedness_error_le_selfImprovementHelperError params eps delta
+            heps hdelta
+
 /-! ## Final-stage threshold: `30 ζ̂ ≤ ζ`
 
 For `ε, δ, d/q ∈ [0, 1]`, the helper-stage error is dominated by
@@ -484,23 +538,342 @@ For `ε, δ, d/q ∈ [0, 1]`, the helper-stage error is dominated by
 paper's chained absorption (`self_improvement.tex`, lines 803--810): for
 unit-interval `x` and `0 ≤ z ≤ y`, `x^y ≤ x^z`. -/
 
-private theorem sum_rpow_half_le_sum_rpow_one_thirtysecond
+/-- The three-term power sum used in the final-stage self-improvement threshold
+bookkeeping.
+
+For exponent `p`, this is the Lean counterpart of
+`ε^p + δ^p + (d/q)^p`. Keeping this expression named makes the nested
+absorptions in `self_improvement.tex`, lines 772--810, insensitive to future
+constant adjustments. -/
+noncomputable def finalStagePowerSum (params : Parameters)
+    (eps delta p : Error) : Error :=
+  Real.rpow eps p + Real.rpow delta p +
+    Real.rpow ((params.d : Error) / (params.q : Error)) p
+
+private theorem finalStagePowerSum_nonneg
+    (params : Parameters) (eps delta p : Error)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta) :
+    0 ≤ finalStagePowerSum params eps delta p := by
+  unfold finalStagePowerSum
+  have hdq_nonneg : (0 : Error) ≤ ((params.d : Error) / (params.q : Error)) :=
+    d_q_ratio_nonneg params
+  exact add_nonneg
+    (add_nonneg (Real.rpow_nonneg heps _) (Real.rpow_nonneg hdelta _))
+    (Real.rpow_nonneg hdq_nonneg _)
+
+private theorem finalStagePowerSum_le_of_exponent_ge
     (params : Parameters) (eps delta : Error)
     (heps : 0 ≤ eps) (heps_le_one : eps ≤ 1)
     (hdelta : 0 ≤ delta) (hdelta_le_one : delta ≤ 1)
-    (hdq_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1) :
-    Real.rpow eps (1 / (2 : Error)) + Real.rpow delta (1 / (2 : Error)) +
-        Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2 : Error)) ≤
-      Real.rpow eps (1 / (32 : Error)) + Real.rpow delta (1 / (32 : Error)) +
-        Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (32 : Error)) := by
+    (hdq_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1)
+    {pLarge pSmall : Error} (hpSmall_nonneg : 0 ≤ pSmall)
+    (hpSmall_le_pLarge : pSmall ≤ pLarge) :
+    finalStagePowerSum params eps delta pLarge ≤
+      finalStagePowerSum params eps delta pSmall := by
+  unfold finalStagePowerSum
   have hdq_nonneg : (0 : Error) ≤ ((params.d : Error) / (params.q : Error)) :=
     d_q_ratio_nonneg params
-  have hexp_nonneg : (0 : Error) ≤ 1 / (32 : Error) := by norm_num
-  have hexp_le : (1 / (32 : Error)) ≤ 1 / (2 : Error) := by norm_num
   refine add_le_add (add_le_add ?_ ?_) ?_
-  · exact Real.rpow_le_rpow_of_exponent_ge' heps heps_le_one hexp_nonneg hexp_le
-  · exact Real.rpow_le_rpow_of_exponent_ge' hdelta hdelta_le_one hexp_nonneg hexp_le
-  · exact Real.rpow_le_rpow_of_exponent_ge' hdq_nonneg hdq_le_one hexp_nonneg hexp_le
+  · exact Real.rpow_le_rpow_of_exponent_ge' heps heps_le_one hpSmall_nonneg
+      hpSmall_le_pLarge
+  · exact Real.rpow_le_rpow_of_exponent_ge' hdelta hdelta_le_one hpSmall_nonneg
+      hpSmall_le_pLarge
+  · exact Real.rpow_le_rpow_of_exponent_ge' hdq_nonneg hdq_le_one hpSmall_nonneg
+      hpSmall_le_pLarge
+
+private theorem sqrt_rpow_eq_rpow_half {x p : Error} (hx : 0 ≤ x) :
+    Real.sqrt (Real.rpow x p) = Real.rpow x (p / 2) := by
+  rw [Real.sqrt_eq_rpow]
+  calc
+    Real.rpow (Real.rpow x p) (1 / (2 : Error)) = Real.rpow x (p * (1 / 2)) := by
+      exact (Real.rpow_mul hx p (1 / (2 : Error))).symm
+    _ = Real.rpow x (p / 2) := by ring_nf
+
+private theorem sqrt_finalStagePowerSum_le
+    (params : Parameters) (eps delta p : Error)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta) :
+    Real.sqrt (finalStagePowerSum params eps delta p) ≤
+      finalStagePowerSum params eps delta (p / 2) := by
+  have hdq_nonneg : (0 : Error) ≤ ((params.d : Error) / (params.q : Error)) :=
+    d_q_ratio_nonneg params
+  unfold finalStagePowerSum
+  calc
+    Real.sqrt (Real.rpow eps p + Real.rpow delta p +
+        Real.rpow ((params.d : Error) / (params.q : Error)) p)
+        ≤ Real.sqrt (Real.rpow eps p) + Real.sqrt (Real.rpow delta p) +
+          Real.sqrt (Real.rpow ((params.d : Error) / (params.q : Error)) p) :=
+      sqrt_add3_le_add3_sqrt (Real.rpow_nonneg heps _) (Real.rpow_nonneg hdelta _)
+        (Real.rpow_nonneg hdq_nonneg _)
+    _ = Real.rpow eps (p / 2) + Real.rpow delta (p / 2) +
+        Real.rpow ((params.d : Error) / (params.q : Error)) (p / 2) := by
+      rw [sqrt_rpow_eq_rpow_half heps, sqrt_rpow_eq_rpow_half hdelta,
+        sqrt_rpow_eq_rpow_half hdq_nonneg]
+
+private theorem selfImprovementHelperError_eq_finalStagePowerSum
+    (params : Parameters) [FieldModel params.q] (eps delta : Error) :
+    selfImprovementHelperError params eps delta =
+      100 * (params.m : Error) * finalStagePowerSum params eps delta (1 / (2 : Error)) := by
+  rfl
+
+private theorem selfImprovementError_eq_finalStagePowerSum
+    (params : Parameters) [FieldModel params.q] (eps delta : Error) :
+    selfImprovementError params eps delta =
+      3000 * (params.m : Error) * finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+  rfl
+
+private theorem sqrt_selfImprovementHelperError_le_ten_m_powerSum_quarter
+    (params : Parameters) [FieldModel params.q]
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta) :
+    Real.sqrt (selfImprovementHelperError params eps delta) ≤
+      10 * (params.m : Error) * finalStagePowerSum params eps delta (1 / (4 : Error)) := by
+  have h100m_nn : (0 : Error) ≤ 100 * (params.m : Error) := by positivity
+  have hsqrt100m := sqrt_100m_le_10m params
+  have hsqrt_sum :=
+    sqrt_finalStagePowerSum_le params eps delta (1 / (2 : Error)) heps hdelta
+  have h10m_nn : (0 : Error) ≤ 10 * (params.m : Error) := by positivity
+  rw [selfImprovementHelperError_eq_finalStagePowerSum]
+  calc
+    Real.sqrt (100 * (params.m : Error) *
+        finalStagePowerSum params eps delta (1 / (2 : Error)))
+        = Real.sqrt (100 * (params.m : Error)) *
+          Real.sqrt (finalStagePowerSum params eps delta (1 / (2 : Error))) := by
+          rw [Real.sqrt_mul h100m_nn]
+    _ ≤ (10 * (params.m : Error)) *
+          finalStagePowerSum params eps delta (1 / (4 : Error)) := by
+          calc
+            Real.sqrt (100 * (params.m : Error)) *
+                Real.sqrt (finalStagePowerSum params eps delta (1 / (2 : Error)))
+                ≤ (10 * (params.m : Error)) *
+                    Real.sqrt (finalStagePowerSum params eps delta (1 / (2 : Error))) :=
+                  mul_le_mul_of_nonneg_right hsqrt100m (Real.sqrt_nonneg _)
+            _ ≤ (10 * (params.m : Error)) *
+                  finalStagePowerSum params eps delta (1 / (4 : Error)) := by
+                  convert mul_le_mul_of_nonneg_left hsqrt_sum h10m_nn using 2
+                  ring_nf
+
+private theorem rpow_quarter_eq_sqrt_sqrt {x : Error} (hx : 0 ≤ x) :
+    Real.rpow x (1 / (4 : Error)) = Real.sqrt (Real.sqrt x) := by
+  rw [Real.sqrt_eq_rpow, Real.sqrt_eq_rpow]
+  calc
+    Real.rpow x (1 / (4 : Error)) = Real.rpow x ((1 / (2 : Error)) * (1 / 2)) := by
+      congr 1
+      ring
+    _ = Real.rpow (Real.rpow x (1 / (2 : Error))) (1 / (2 : Error)) := by
+      exact Real.rpow_mul hx (1 / (2 : Error)) (1 / (2 : Error))
+
+private theorem selfImprovementOrthogonalizationError_le_four_hundred_m_powerSum_eighth
+    (params : Parameters) [FieldModel params.q]
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta) :
+    selfImprovementOrthogonalizationError params eps delta ≤
+      400 * (params.m : Error) * finalStagePowerSum params eps delta (1 / (8 : Error)) := by
+  have hhelper_nn : 0 ≤ selfImprovementHelperError params eps delta :=
+    selfImprovementHelperError_nonneg params eps delta heps hdelta
+  have hsqrt_helper :=
+    sqrt_selfImprovementHelperError_le_ten_m_powerSum_quarter params eps delta heps hdelta
+  have hsqrt_mS :
+      Real.sqrt (10 * (params.m : Error) *
+          finalStagePowerSum params eps delta (1 / (4 : Error))) ≤
+        4 * (params.m : Error) * finalStagePowerSum params eps delta (1 / (8 : Error)) := by
+    have h10m_nn : (0 : Error) ≤ 10 * (params.m : Error) := by positivity
+    have hsqrt10m := sqrt_10m_le_4m params
+    have hsqrt_sum :=
+      sqrt_finalStagePowerSum_le params eps delta (1 / (4 : Error)) heps hdelta
+    have h4m_nn : (0 : Error) ≤ 4 * (params.m : Error) := by positivity
+    calc
+      Real.sqrt (10 * (params.m : Error) *
+          finalStagePowerSum params eps delta (1 / (4 : Error)))
+          = Real.sqrt (10 * (params.m : Error)) *
+            Real.sqrt (finalStagePowerSum params eps delta (1 / (4 : Error))) := by
+            rw [Real.sqrt_mul h10m_nn]
+      _ ≤ (4 * (params.m : Error)) *
+            finalStagePowerSum params eps delta (1 / (8 : Error)) := by
+            calc
+              Real.sqrt (10 * (params.m : Error)) *
+                  Real.sqrt (finalStagePowerSum params eps delta (1 / (4 : Error)))
+                  ≤ (4 * (params.m : Error)) *
+                      Real.sqrt (finalStagePowerSum params eps delta (1 / (4 : Error))) :=
+                    mul_le_mul_of_nonneg_right hsqrt10m (Real.sqrt_nonneg _)
+              _ ≤ (4 * (params.m : Error)) *
+                    finalStagePowerSum params eps delta (1 / (8 : Error)) := by
+                    convert mul_le_mul_of_nonneg_left hsqrt_sum h4m_nn using 2
+                    ring_nf
+  unfold selfImprovementOrthogonalizationError orthonormalizationError
+  rw [rpow_quarter_eq_sqrt_sqrt hhelper_nn]
+  calc
+    100 * Real.sqrt (Real.sqrt (selfImprovementHelperError params eps delta))
+        ≤ 100 * Real.sqrt
+            (10 * (params.m : Error) * finalStagePowerSum params eps delta (1 / (4 : Error))) :=
+          mul_le_mul_of_nonneg_left (Real.sqrt_le_sqrt hsqrt_helper) (by norm_num)
+    _ ≤ 100 * (4 * (params.m : Error) *
+          finalStagePowerSum params eps delta (1 / (8 : Error))) :=
+        mul_le_mul_of_nonneg_left hsqrt_mS (by norm_num)
+    _ = 400 * (params.m : Error) *
+          finalStagePowerSum params eps delta (1 / (8 : Error)) := by ring
+
+private theorem sqrt_selfImprovementOrthogonalizationError_le_twenty_m_powerSum_sixteenth
+    (params : Parameters) [FieldModel params.q]
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta) :
+    Real.sqrt (selfImprovementOrthogonalizationError params eps delta) ≤
+      20 * (params.m : Error) * finalStagePowerSum params eps delta (1 / (16 : Error)) := by
+  have horth :=
+    selfImprovementOrthogonalizationError_le_four_hundred_m_powerSum_eighth
+      params eps delta heps hdelta
+  have h400m_nn : (0 : Error) ≤ 400 * (params.m : Error) := by positivity
+  have hsqrt400m := sqrt_400m_le_20m params
+  have hsqrt_sum :=
+    sqrt_finalStagePowerSum_le params eps delta (1 / (8 : Error)) heps hdelta
+  have h20m_nn : (0 : Error) ≤ 20 * (params.m : Error) := by positivity
+  calc
+    Real.sqrt (selfImprovementOrthogonalizationError params eps delta)
+        ≤ Real.sqrt (400 * (params.m : Error) *
+            finalStagePowerSum params eps delta (1 / (8 : Error))) :=
+          Real.sqrt_le_sqrt horth
+    _ = Real.sqrt (400 * (params.m : Error)) *
+          Real.sqrt (finalStagePowerSum params eps delta (1 / (8 : Error))) := by
+          rw [Real.sqrt_mul h400m_nn]
+    _ ≤ (20 * (params.m : Error)) *
+          finalStagePowerSum params eps delta (1 / (16 : Error)) := by
+          calc
+            Real.sqrt (400 * (params.m : Error)) *
+                Real.sqrt (finalStagePowerSum params eps delta (1 / (8 : Error)))
+                ≤ (20 * (params.m : Error)) *
+                    Real.sqrt (finalStagePowerSum params eps delta (1 / (8 : Error))) :=
+                  mul_le_mul_of_nonneg_right hsqrt400m (Real.sqrt_nonneg _)
+            _ ≤ (20 * (params.m : Error)) *
+                  finalStagePowerSum params eps delta (1 / (16 : Error)) := by
+                  convert mul_le_mul_of_nonneg_left hsqrt_sum h20m_nn using 2
+                  ring_nf
+
+private theorem selfImprovementDataProcessingError_le_nine_sixty_m_powerSum_sixteenth
+    (params : Parameters) [FieldModel params.q]
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (heps_le_one : eps ≤ 1)
+    (hdelta : 0 ≤ delta) (hdelta_le_one : delta ≤ 1)
+    (hdq_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1) :
+    selfImprovementDataProcessingError params eps delta ≤
+      960 * (params.m : Error) * finalStagePowerSum params eps delta (1 / (16 : Error)) := by
+  have hhelper_mono :
+      finalStagePowerSum params eps delta (1 / (2 : Error)) ≤
+        finalStagePowerSum params eps delta (1 / (16 : Error)) :=
+    finalStagePowerSum_le_of_exponent_ge params eps delta heps heps_le_one hdelta
+      hdelta_le_one hdq_le_one (by norm_num) (by norm_num)
+  have hhelper :
+      selfImprovementHelperError params eps delta ≤
+        100 * (params.m : Error) * finalStagePowerSum params eps delta (1 / (16 : Error)) := by
+    rw [selfImprovementHelperError_eq_finalStagePowerSum]
+    exact mul_le_mul_of_nonneg_left hhelper_mono (by positivity)
+  have hsqrt_orth :=
+    sqrt_selfImprovementOrthogonalizationError_le_twenty_m_powerSum_sixteenth
+      params eps delta heps hdelta
+  unfold selfImprovementDataProcessingError
+  calc
+    8 * selfImprovementHelperError params eps delta +
+        8 * Real.rpow (selfImprovementOrthogonalizationError params eps delta)
+          (1 / (2 : Error))
+        = 8 * selfImprovementHelperError params eps delta +
+            8 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta) := by
+          simp [Real.sqrt_eq_rpow, Real.rpow_eq_pow]
+    _ ≤ 8 * (100 * (params.m : Error) *
+            finalStagePowerSum params eps delta (1 / (16 : Error))) +
+          8 * (20 * (params.m : Error) *
+            finalStagePowerSum params eps delta (1 / (16 : Error))) := by
+          gcongr
+    _ = 960 * (params.m : Error) *
+          finalStagePowerSum params eps delta (1 / (16 : Error)) := by ring
+
+private theorem sqrt_selfImprovementDataProcessingError_le_thirty_one_m_powerSum_thirtysecond
+    (params : Parameters) [FieldModel params.q]
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (heps_le_one : eps ≤ 1)
+    (hdelta : 0 ≤ delta) (hdelta_le_one : delta ≤ 1)
+    (hdq_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1) :
+    Real.sqrt (selfImprovementDataProcessingError params eps delta) ≤
+      31 * (params.m : Error) * finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+  have hdata :=
+    selfImprovementDataProcessingError_le_nine_sixty_m_powerSum_sixteenth
+      params eps delta heps heps_le_one hdelta hdelta_le_one hdq_le_one
+  have h960m_nn : (0 : Error) ≤ 960 * (params.m : Error) := by positivity
+  have hsqrt960m := sqrt_960m_le_31m params
+  have hsqrt_sum :=
+    sqrt_finalStagePowerSum_le params eps delta (1 / (16 : Error)) heps hdelta
+  have h31m_nn : (0 : Error) ≤ 31 * (params.m : Error) := by positivity
+  calc
+    Real.sqrt (selfImprovementDataProcessingError params eps delta)
+        ≤ Real.sqrt (960 * (params.m : Error) *
+            finalStagePowerSum params eps delta (1 / (16 : Error))) :=
+          Real.sqrt_le_sqrt hdata
+    _ = Real.sqrt (960 * (params.m : Error)) *
+          Real.sqrt (finalStagePowerSum params eps delta (1 / (16 : Error))) := by
+          rw [Real.sqrt_mul h960m_nn]
+    _ ≤ (31 * (params.m : Error)) *
+          finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+          calc
+            Real.sqrt (960 * (params.m : Error)) *
+                Real.sqrt (finalStagePowerSum params eps delta (1 / (16 : Error)))
+                ≤ (31 * (params.m : Error)) *
+                    Real.sqrt (finalStagePowerSum params eps delta (1 / (16 : Error))) :=
+                  mul_le_mul_of_nonneg_right hsqrt960m (Real.sqrt_nonneg _)
+            _ ≤ (31 * (params.m : Error)) *
+                  finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+                  convert mul_le_mul_of_nonneg_left hsqrt_sum h31m_nn using 2
+                  ring_nf
+
+/-- Final projective-residual threshold absorption (`self_improvement.tex`,
+lines 803--810).
+
+The natural error emitted by the projective residual producer is
+`ζ̂ + √ζ̂_dataprocess`. Under the standard unit-interval hypotheses for
+`ε`, `δ`, and `d/q`, this theorem absorbs that natural error into the literal
+`selfImprovementError` threshold used by `SelfImprovementConclusion`. -/
+theorem final_fields_projective_residual_error_le_selfImprovementError
+    (params : Parameters) [FieldModel params.q]
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (heps_le_one : eps ≤ 1)
+    (hdelta : 0 ≤ delta) (hdelta_le_one : delta ≤ 1)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error)) :
+    selfImprovementHelperError params eps delta +
+        Real.sqrt (selfImprovementDataProcessingError params eps delta) ≤
+      selfImprovementError params eps delta := by
+  have hqpos : (0 : Error) < (params.q : Error) := params.q_cast_pos
+  have hdq_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1 :=
+    (div_le_one hqpos).mpr hd_le_q
+  have hhelper_mono :
+      finalStagePowerSum params eps delta (1 / (2 : Error)) ≤
+        finalStagePowerSum params eps delta (1 / (32 : Error)) :=
+    finalStagePowerSum_le_of_exponent_ge params eps delta heps heps_le_one hdelta
+      hdelta_le_one hdq_le_one (by norm_num) (by norm_num)
+  have hhelper :
+      selfImprovementHelperError params eps delta ≤
+        100 * (params.m : Error) * finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+    rw [selfImprovementHelperError_eq_finalStagePowerSum]
+    exact mul_le_mul_of_nonneg_left hhelper_mono (by positivity)
+  have hdata_sqrt :=
+    sqrt_selfImprovementDataProcessingError_le_thirty_one_m_powerSum_thirtysecond
+      params eps delta heps heps_le_one hdelta hdelta_le_one hdq_le_one
+  have hsum32_nn :
+      0 ≤ finalStagePowerSum params eps delta (1 / (32 : Error)) :=
+    finalStagePowerSum_nonneg params eps delta (1 / (32 : Error)) heps hdelta
+  have hcoef :
+      131 * (params.m : Error) ≤ 3000 * (params.m : Error) := by
+    nlinarith [m_cast_nonneg params]
+  calc
+    selfImprovementHelperError params eps delta +
+        Real.sqrt (selfImprovementDataProcessingError params eps delta)
+        ≤ 100 * (params.m : Error) *
+            finalStagePowerSum params eps delta (1 / (32 : Error)) +
+          31 * (params.m : Error) *
+            finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+          linarith
+    _ = 131 * (params.m : Error) *
+          finalStagePowerSum params eps delta (1 / (32 : Error)) := by ring
+    _ ≤ 3000 * (params.m : Error) *
+          finalStagePowerSum params eps delta (1 / (32 : Error)) :=
+        mul_le_mul_of_nonneg_right hcoef hsum32_nn
+    _ = selfImprovementError params eps delta := by
+      rw [selfImprovementError_eq_finalStagePowerSum]
 
 /-- `30 * selfImprovementHelperError ≤ selfImprovementError` for unit-interval
 parameters.
@@ -520,30 +893,26 @@ theorem thirty_selfImprovementHelperError_le_selfImprovementError
   have hqpos : (0 : Error) < (params.q : Error) := params.q_cast_pos
   have hdq_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1 :=
     (div_le_one hqpos).mpr hd_le_q
-  have hmono :=
-    sum_rpow_half_le_sum_rpow_one_thirtysecond params eps delta heps heps_le_one
-      hdelta hdelta_le_one hdq_le_one
+  have hmono :
+      finalStagePowerSum params eps delta (1 / (2 : Error)) ≤
+        finalStagePowerSum params eps delta (1 / (32 : Error)) :=
+    finalStagePowerSum_le_of_exponent_ge params eps delta heps heps_le_one hdelta
+      hdelta_le_one hdq_le_one (by norm_num) (by norm_num)
   have h3000m_nn : (0 : Error) ≤ 3000 * (params.m : Error) := by positivity
   -- Both sides expand to `3000 m * sum_p` for matching exponents `p`.
-  unfold selfImprovementHelperError selfImprovementError
-    MainInductionStep.selfImprovementInInductionError
+  rw [selfImprovementHelperError_eq_finalStagePowerSum,
+    selfImprovementError_eq_finalStagePowerSum]
   calc
     30 *
         (100 * (params.m : Error) *
-          (Real.rpow eps (1 / (2 : Error)) +
-            Real.rpow delta (1 / (2 : Error)) +
-            Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2 : Error))))
+          finalStagePowerSum params eps delta (1 / (2 : Error)))
         =
       3000 * (params.m : Error) *
-        (Real.rpow eps (1 / (2 : Error)) +
-          Real.rpow delta (1 / (2 : Error)) +
-          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (2 : Error))) := by
+        finalStagePowerSum params eps delta (1 / (2 : Error)) := by
             ring
     _ ≤
       3000 * (params.m : Error) *
-        (Real.rpow eps (1 / (32 : Error)) +
-          Real.rpow delta (1 / (32 : Error)) +
-          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (32 : Error))) :=
+        finalStagePowerSum params eps delta (1 / (32 : Error)) :=
         mul_le_mul_of_nonneg_left hmono h3000m_nn
 
 /-- A direct corollary of `thirty_selfImprovementHelperError_le_selfImprovementError`:

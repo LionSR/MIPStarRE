@@ -8,6 +8,16 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+/-- Averaging over two independently sampled hypercube points is the same as
+averaging over the uniform distribution on the product of point types. -/
+lemma avgOver_independentPointPair_eq_uniform_prod
+    (params : Parameters) [FieldModel params.q]
+    (f : Point params × Point params → Error) :
+    avgOver (independentPointPair params) f =
+      avgOver (uniformDistribution (Point params × Point params)) f := by
+  unfold avgOver independentPointPair independentPointPairWeight uniformDistribution
+  simp [hypercubeVertexCount, Fintype.card_prod]
+
 private lemma matrixLocalVariance_eq_closedForm (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
     matrixLocalVariance params model =

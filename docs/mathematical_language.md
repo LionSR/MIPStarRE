@@ -41,6 +41,25 @@ uses them with that meaning. Likewise, avoid implementation-local substitutes
 such as `projectivization` or `spectral truncation` when the paper gives a
 clearer phrase.
 
+This is a general rule for the repository, not only a rule for file splits.
+Module names, namespace names, public declarations, theorem fields, docstrings,
+blueprint-facing names, issue titles, and spec documents should name the
+mathematical layer under discussion, not the local workflow step, paper line
+number, or implementation history. For example, prefer names such as
+`DiagonalCompletion`, `CompletionTransport`, or `ProjectiveConsistency` over
+names built from `Line130`, `Line169`, `Step6`, or `FinalAssembly`, unless the
+cited paper itself uses that phrase as the mathematical name.
+
+File-split PRs are a common place where this rule matters: new leaves should be
+named by the mathematical boundary they isolate, and any public declarations
+exposed by the split should be reviewed under the same standard.
+
+If exact or near-exact helper declarations recur across chapters, do not copy
+the helper into another chapter-local leaf. Confirm that the statements are
+mathematically the same, then move the shared result into an appropriate common
+module with a mathematical name and keep chapter-specific wrappers only when
+they preserve paper-facing terminology.
+
 If a docstring must mention a legacy Lean identifier, cite it in backticks and
 describe the mathematical object in paper terminology. If an old public
 identifier cannot be renamed in the current PR, record the required migration

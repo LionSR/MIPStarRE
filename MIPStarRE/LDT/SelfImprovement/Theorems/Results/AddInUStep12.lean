@@ -113,6 +113,21 @@ private lemma addInU_step2_pointwise_op_eq
     simp
   rw [mul_sub, mul_sub, hLeft, hRight]
 
+/-- Operator algebra reduction for the `Q₂ → Q₃` add-in-`u` step.
+
+The operator difference of the bipartite-tensor expectations of
+`A^v · H^u_h · A^v` and `A^u · H^u_h · A^v` (with shared right factor `T_h`)
+factors as `(A^v − A^u) · H^u_h · A^v` on the left tensor factor, leaving the
+right factor `T_h` untouched. -/
+private lemma addInU_step3_pointwise_op_eq
+    {κ : Type*} [Fintype κ] [DecidableEq κ]
+    (Au Av Mh Th : MIPStarRE.Quantum.Op κ) :
+    opTensor (Av * Mh * Av) Th - opTensor (Au * Mh * Av) Th =
+      opTensor ((Av - Au) * Mh * Av) Th := by
+  rw [opTensor_sub_left]
+  congr 1
+  noncomm_ring
+
 /-- Operator algebra reduction for the `Q₃ → Q₄` add-in-`u` step.
 
 The operator difference of the bipartite-tensor expectations of
@@ -243,6 +258,47 @@ lemma addInU_cs_chain_step2_reverse_diff_eq
                 (leftTensor (ι₂ := ι) Av - rightTensor (ι₁ := ι) Av)))) := by
   rw [← addInU_cs_chain_step2_diff_eq params strategy T]
   ring
+
+/-- Algebraic CS-alignment for the `Q₂ → Q₃` step.
+
+Rewrites the difference `addInUCSChainQ2 - addInUCSChainQ3` in the exact form
+appearing on the LHS of `eq:change-one-cauchy-schwarz` (paper lines 306--311):
+the expectation of `((A^v_{h(v)} - A^u_{h(u)}) · H^u_h · A^v_{h(v)}) ⊗ T_h`,
+averaged over `(u, v)` and summed over `h`.
+
+The paper writes the middle factor as the fiber operator `M^u_o`; in this
+formalization the preceding `o`-sum has already been collapsed along
+`o = h(u)`, so the same factor appears as
+`H^u_h = (sandwichedPolynomialSubMeasAt params strategy T u).outcome h`.
+
+This identity is purely algebraic; the operator Cauchy--Schwarz estimate is
+proved downstream by `add_in_u_cs_chain_q2_q3_factored_cs`. -/
+lemma addInU_cs_chain_step3_diff_eq
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    addInUCSChainQ2 params strategy T - addInUCSChainQ3 params strategy T =
+      avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+        ∑ h : Polynomial params,
+          let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1
+          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+          let Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+          ev strategy.state
+            (opTensor ((Av - Au) * Mh * Av) (T.outcome h))) := by
+  classical
+  unfold addInUCSChainQ2 addInUCSChainQ3
+  rw [← avgOver_sub]
+  refine avgOver_congr _ _ _ ?_
+  intro uv
+  rw [← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl ?_
+  intro h _
+  set Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1
+  set Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+  set Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
+  rw [← ev_sub]
+  congr 1
+  exact addInU_step3_pointwise_op_eq Au Av Mh (T.outcome h)
 
 /-! ### Raw Cauchy--Schwarz bound for the add-in-u Step 1 difference
 
