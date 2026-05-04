@@ -399,7 +399,7 @@ lemma fromHToG_SUS_context_avg_le_one
       have hUherm : Uᴴ = U := by
         simpa [U] using fromHToG_gHatIdxMeas_outcome_isHermitian params family x g
       have hUproj : U * U = U := by
-        simpa [U] using fromHToG_gHatIdxMeas_proj params family x g
+        simpa [U] using gHatIdxMeas_proj params family x g
       have hSherm : Sᴴ = S :=
         fromHToGRecurrenceWeight_isHermitian params family ℓ (prependTypeBit b τ)
       calc
