@@ -362,26 +362,6 @@ lemma gHatPairProduct_sddOpRel_triple
     (fun q => gHatPairProductRight params family q.1)
     (gHatCommutationError params gamma zeta)).1 hfst
 
-lemma gHatIdxMeas_proj
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) (x : Fq params) (g : GHatOutcome params) :
-    (gHatIdxMeas params family x).outcome g * (gHatIdxMeas params family x).outcome g =
-      (gHatIdxMeas params family x).outcome g := by
-  cases g with
-  | none =>
-      let T := (family.meas x).total
-      change (1 - T) * (1 - T) = 1 - T
-      have hTT : T * T = T := by
-        simpa [T] using MIPStarRE.LDT.Preliminaries.projSubMeas_total_proj (family.meas x)
-      calc
-        (1 - T) * (1 - T) = 1 - T - T + T * T := by
-          noncomm_ring
-        _ = 1 - T := by
-          rw [hTT]
-          abel
-  | some p =>
-      simp [gHatIdxMeas, completeSubMeas, (family.meas x).proj p]
-
 /-! ### Slice-front equivalences -/
 
 def thirdSliceFrontEquiv (params : Parameters) (r : ℕ) :

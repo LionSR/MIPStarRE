@@ -15,25 +15,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-private lemma gHatIdxMeas_proj (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) (x : Fq params) (g : GHatOutcome params) :
-    (gHatIdxMeas params family x).outcome g * (gHatIdxMeas params family x).outcome g =
-      (gHatIdxMeas params family x).outcome g := by
-  cases g with
-  | none =>
-      let T := (family.meas x).total
-      change (1 - T) * (1 - T) = 1 - T
-      have hTT : T * T = T := by
-        simpa [T] using ProjSubMeas.total_proj (family.meas x)
-      calc
-        (1 - T) * (1 - T) = 1 - T - T + T * T := by
-          noncomm_ring
-        _ = 1 - T := by
-          rw [hTT]
-          abel
-  | some p =>
-      simp [gHatIdxMeas, completeSubMeas, (family.meas x).proj p]
-
 /-- Each binomial term in the Bernoulli tail operator is positive semidefinite. -/
 lemma binomialOperatorTerm_nonneg {G : MIPStarRE.Quantum.Op ι} (n r : ℕ)
     (hG : 0 ≤ G) (hGle : G ≤ 1) :
