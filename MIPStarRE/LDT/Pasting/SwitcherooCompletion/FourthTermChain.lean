@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Pasting.SwitcherooContraction
+import MIPStarRE.LDT.Pasting.SwitcherooContraction.Raw
 import MIPStarRE.LDT.Pasting.SwitcherooCompletion.Expansion
 
 /-!
