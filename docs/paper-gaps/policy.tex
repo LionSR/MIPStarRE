@@ -57,23 +57,25 @@ formalization task.  That section should estimate the difficulty, the rough
 implementation weight, the split between Mathlib reuse and project-local work,
 and the key Mathlib APIs or modules.  Use honest ranges, not false precision.
 
-Most notes should then have four mathematical sections: the source assertion,
-the mechanism being checked, the key theorem forms to develop or use, and the
-blueprint/formal comparison, followed by the conclusion.  Use more sections only
-when a counterexample or long derivation genuinely needs room.
+The \emph{Key theorem forms} section should be Section~2, immediately after
+\emph{At a glance}.  Put the theorem forms before the source details so the
+reader knows what the formalization is aiming to prove.  After that, keep the
+source assertion, the mechanism being checked, the blueprint/formal comparison,
+and the conclusion.  Use more sections only when a counterexample or long
+derivation genuinely needs room.
 
 Keep background to the minimum needed for the local point.  Prefer one clear
 special case over a general restatement of the surrounding theorem.  Use displayed
 equations for the source assertion, the key calculation, and the theorem forms;
 avoid displays for traceability data, declaration names, or long lists.  The
-section ``Form of the Note'' below specifies where such traceability data
-belongs; the body should read as mathematical prose, not as a log of what
-commands were run.
+blueprint/formal comparison should be compact and should not repeat the theorem
+forms.  The section ``Form of the Note'' below specifies where traceability data
+belongs; the body should read as mathematical prose, not as a log.
 
 If the verdict is that there is no mathematical discrepancy, say so plainly and
-stop.  Do not turn the note into a broad audit report.  If the only remaining
-work is an implementation task, name it briefly and link the issue or pull
-request in a footnote.
+stop.  Keep the conclusion highly compact, normally under twenty source lines.
+If the only remaining work is an implementation task, name it briefly and link
+the issue or pull request in a footnote.
 
 \section{When the Investigation Starts}
 
