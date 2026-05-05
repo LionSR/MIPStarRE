@@ -104,6 +104,7 @@ the readout map. -/
     (A : SubMeas α ι) (f : α → β) (b : β) :
     (postprocess A f).outcome b =
       ∑ a ∈ Finset.univ.filter (fun a => f a = b), A.outcome a := by
+  classical
   simp only [postprocess]
   refine Finset.sum_congr ?_ ?_
   · ext a
