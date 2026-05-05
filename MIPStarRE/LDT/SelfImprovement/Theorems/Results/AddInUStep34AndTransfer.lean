@@ -49,6 +49,8 @@ projection-simplified diagonal transfer.
 - **add_in_u_simplified_transfer_of_cs_chain** — the four-step chain
   assembly: given four `|Qᵢ−Qⱼ| ≤ ηᵢⱼ` bounds summing to `≤ addInUError`,
   yields the projection-simplified transfer.
+- **add_in_u_selected_transfer_of_cs_chain** — the same four-step assembly
+  before specializing the add-in-u outcome family and selection.
 - **Arithmetic absorption** — `two_mul_delta_le_selfImprovementVarianceError`
   and `two_sqrt_two_delta_add_two_sqrt_selfImprovementVarianceError_le_addInUError`
   (paper lines 341–342).
@@ -990,14 +992,6 @@ lemma add_in_u_simplified_transfer_of_cs_chain
         have h2 := abs_add_le ((Q0 - Q1) + (Q1 - Q2)) (Q2 - Q3)
         have h3 := abs_add_le (Q0 - Q1) (Q1 - Q2)
         nlinarith
-  have h01' : |Q0 - Q1| ≤ η01 := by
-    simpa [Q0, Q1] using h01
-  have h12' : |Q1 - Q2| ≤ η12 := by
-    simpa [Q1, Q2] using h12
-  have h23' : |Q2 - Q3| ≤ η23 := by
-    simpa [Q2, Q3] using h23
-  have h34' : |Q3 - Q4| ≤ η34 := by
-    simpa [Q3, Q4] using h34
   calc
     |qBipartiteMatchMass strategy.state
         (averagedSandwichedPolynomialSubMeas params strategy T)
@@ -1010,6 +1004,65 @@ lemma add_in_u_simplified_transfer_of_cs_chain
         = |Q0 - Q4| := by
           rw [add_in_u_cs_chain_q0_eq_match_mass,
             ← add_in_u_cs_chain_q4_eq_simplified_rhs]
+    _ ≤ |Q0 - Q1| + |Q1 - Q2| + |Q2 - Q3| + |Q3 - Q4| := htriangle
+    _ ≤ η01 + η12 + η23 + η34 := by
+      nlinarith
+    _ ≤ addInUError params eps delta := hsum
+
+/-- Assemble the selected add-in-`u` scalar transfer from the four selected
+scalar chain moves.
+
+This is the selection-parametrized counterpart of
+`add_in_u_simplified_transfer_of_cs_chain`.  The endpoints are the theorem-side
+generic add-in-u quantities rather than the diagonal match-mass and simplified
+release quantities. -/
+lemma add_in_u_selected_transfer_of_cs_chain
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (M : IdxSubMeas (Point params) Outcome ι)
+    (T : SubMeas (Polynomial params) ι)
+    (S : AddInUSelection params Outcome)
+    (η01 η12 η23 η34 : Error)
+    (h01 :
+      |addInUSelectedCSChainQ0 params strategy M T S -
+        addInUSelectedCSChainQ1 params strategy M T S| ≤ η01)
+    (h12 :
+      |addInUSelectedCSChainQ1 params strategy M T S -
+        addInUSelectedCSChainQ2 params strategy M T S| ≤ η12)
+    (h23 :
+      |addInUSelectedCSChainQ2 params strategy M T S -
+        addInUSelectedCSChainQ3 params strategy M T S| ≤ η23)
+    (h34 :
+      |addInUSelectedCSChainQ3 params strategy M T S -
+        addInUSelectedCSChainQ4 params strategy M T S| ≤ η34)
+    (hsum : η01 + η12 + η23 + η34 ≤ addInUError params eps delta) :
+    |addInULeftQuantity params strategy M
+        (averagedSandwichedPolynomialSubMeas params strategy T) S -
+      addInURightQuantity params strategy M T S| ≤ addInUError params eps delta := by
+  let Q0 := addInUSelectedCSChainQ0 params strategy M T S
+  let Q1 := addInUSelectedCSChainQ1 params strategy M T S
+  let Q2 := addInUSelectedCSChainQ2 params strategy M T S
+  let Q3 := addInUSelectedCSChainQ3 params strategy M T S
+  let Q4 := addInUSelectedCSChainQ4 params strategy M T S
+  have htriangle :
+      |Q0 - Q4| ≤ |Q0 - Q1| + |Q1 - Q2| + |Q2 - Q3| + |Q3 - Q4| := by
+    calc
+      |Q0 - Q4| = |(Q0 - Q1) + (Q1 - Q2) + (Q2 - Q3) + (Q3 - Q4)| := by
+        ring_nf
+      _ ≤ |Q0 - Q1| + |Q1 - Q2| + |Q2 - Q3| + |Q3 - Q4| := by
+        have h1 := abs_add_le ((Q0 - Q1) + (Q1 - Q2) + (Q2 - Q3)) (Q3 - Q4)
+        have h2 := abs_add_le ((Q0 - Q1) + (Q1 - Q2)) (Q2 - Q3)
+        have h3 := abs_add_le (Q0 - Q1) (Q1 - Q2)
+        nlinarith
+  calc
+    |addInULeftQuantity params strategy M
+        (averagedSandwichedPolynomialSubMeas params strategy T) S -
+      addInURightQuantity params strategy M T S|
+        = |Q0 - Q4| := by
+          rw [addInUSelectedCSChainQ0_eq_leftQuantity_averagedSandwiched,
+            addInUSelectedCSChainQ4_eq_rightQuantity]
     _ ≤ |Q0 - Q1| + |Q1 - Q2| + |Q2 - Q3| + |Q3 - Q4| := htriangle
     _ ≤ η01 + η12 + η23 + η34 := by
       nlinarith

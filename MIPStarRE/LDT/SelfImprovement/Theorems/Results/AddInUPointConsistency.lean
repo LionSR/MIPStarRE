@@ -5,6 +5,8 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
 import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUDiagonalAndDefs
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer
 
 /-!
 # Off-diagonal add-in-u selection infrastructure for helper point consistency
@@ -15,8 +17,9 @@ This module isolates the theorem-side `add-in-u` specialization with
 `A`-consistency bound (`eq:explicit-bound-for-A-consistency`).
 
 It does **not** prove the full point-consistency estimate. Instead, it provides
-the missing theorem-side selection object together with the left/right quantity
-identities needed by a later transfer theorem.
+the missing theorem-side selection object, the associated selected scalar
+Cauchy--Schwarz chain, and the left/right quantity identities needed by a later
+transfer theorem.
 
 The final theorem in this file also records the numerical absorption from the
 natural add-in-`u` error `4 sqrt ζ_variance` to the helper-stage error
@@ -66,6 +69,152 @@ private theorem pointConsistencyAddInUSelection_pairs_sum
   rcases p with ⟨a, h⟩
   unfold addInUSelectionPairs pointConsistencyAddInUSelection
   simp [Finset.mem_erase, ne_comm]
+
+/-! ### Off-diagonal selected scalar chain -/
+
+/-- The off-diagonal point-consistency specialization of the selected add-in-u
+chain endpoint `Q₀`. -/
+noncomputable def pointConsistencyAddInUCSChainQ0
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) : Error :=
+  addInUSelectedCSChainQ0 params strategy
+    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+    T
+    (pointConsistencyAddInUSelection params)
+
+/-- The off-diagonal point-consistency specialization of the selected add-in-u
+chain scalar `Q₁`. -/
+noncomputable def pointConsistencyAddInUCSChainQ1
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) : Error :=
+  addInUSelectedCSChainQ1 params strategy
+    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+    T
+    (pointConsistencyAddInUSelection params)
+
+/-- The off-diagonal point-consistency specialization of the selected add-in-u
+chain scalar `Q₂`. -/
+noncomputable def pointConsistencyAddInUCSChainQ2
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) : Error :=
+  addInUSelectedCSChainQ2 params strategy
+    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+    T
+    (pointConsistencyAddInUSelection params)
+
+/-- The off-diagonal point-consistency specialization of the selected add-in-u
+chain scalar `Q₃`. -/
+noncomputable def pointConsistencyAddInUCSChainQ3
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) : Error :=
+  addInUSelectedCSChainQ3 params strategy
+    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+    T
+    (pointConsistencyAddInUSelection params)
+
+/-- The off-diagonal point-consistency specialization of the selected add-in-u
+chain endpoint `Q₄`. -/
+noncomputable def pointConsistencyAddInUCSChainQ4
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) : Error :=
+  addInUSelectedCSChainQ4 params strategy
+    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+    T
+    (pointConsistencyAddInUSelection params)
+
+/-- The off-diagonal selected-chain endpoint `Q₀` is the corresponding generic
+add-in-u left quantity with the averaged sandwiched polynomial submeasurement. -/
+theorem pointConsistencyAddInUCSChainQ0_eq_leftQuantity_averagedSandwiched
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    addInULeftQuantity params strategy
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (averagedSandwichedPolynomialSubMeas params strategy T)
+        (pointConsistencyAddInUSelection params) =
+      pointConsistencyAddInUCSChainQ0 params strategy T := by
+  simpa [pointConsistencyAddInUCSChainQ0] using
+    addInUSelectedCSChainQ0_eq_leftQuantity_averagedSandwiched
+      (params := params)
+      (strategy := strategy)
+      (M := IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (T := T)
+      (S := pointConsistencyAddInUSelection params)
+
+/-- The off-diagonal selected-chain endpoint `Q₄` is the corresponding generic
+add-in-u right quantity. -/
+theorem pointConsistencyAddInUCSChainQ4_eq_rightQuantity
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    addInURightQuantity params strategy
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        T
+        (pointConsistencyAddInUSelection params) =
+      pointConsistencyAddInUCSChainQ4 params strategy T := by
+  simpa [pointConsistencyAddInUCSChainQ4] using
+    addInUSelectedCSChainQ4_eq_rightQuantity
+      (params := params)
+      (strategy := strategy)
+      (M := IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (T := T)
+      (S := pointConsistencyAddInUSelection params)
+
+/-- Point-consistency add-in-u transfer assembled from the four selected scalar
+chain estimates.
+
+This theorem is the off-diagonal counterpart of the diagonal chain assembly:
+once the four selected Cauchy--Schwarz moves are available with total error at
+most `addInUError`, it gives the theorem-side transfer hypothesis consumed by
+`pointConsistencyAddInU_off_diagonal_avg_le_of_transfer`. -/
+theorem pointConsistencyAddInU_transfer_of_selected_chain_bounds
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (T : SubMeas (Polynomial params) ι)
+    (η01 η12 η23 η34 : Error)
+    (h01 :
+      |pointConsistencyAddInUCSChainQ0 params strategy T -
+        pointConsistencyAddInUCSChainQ1 params strategy T| ≤ η01)
+    (h12 :
+      |pointConsistencyAddInUCSChainQ1 params strategy T -
+        pointConsistencyAddInUCSChainQ2 params strategy T| ≤ η12)
+    (h23 :
+      |pointConsistencyAddInUCSChainQ2 params strategy T -
+        pointConsistencyAddInUCSChainQ3 params strategy T| ≤ η23)
+    (h34 :
+      |pointConsistencyAddInUCSChainQ3 params strategy T -
+        pointConsistencyAddInUCSChainQ4 params strategy T| ≤ η34)
+    (hsum : η01 + η12 + η23 + η34 ≤ addInUError params eps delta) :
+    |addInULeftQuantity params strategy
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (averagedSandwichedPolynomialSubMeas params strategy T)
+        (pointConsistencyAddInUSelection params) -
+      addInURightQuantity params strategy
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        T
+        (pointConsistencyAddInUSelection params)| ≤ addInUError params eps delta := by
+  simpa [pointConsistencyAddInUCSChainQ0, pointConsistencyAddInUCSChainQ1,
+    pointConsistencyAddInUCSChainQ2, pointConsistencyAddInUCSChainQ3,
+    pointConsistencyAddInUCSChainQ4] using
+    add_in_u_selected_transfer_of_cs_chain
+      (params := params)
+      (strategy := strategy)
+      (eps := eps)
+      (delta := delta)
+      (M := IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (T := T)
+      (S := pointConsistencyAddInUSelection params)
+      (η01 := η01)
+      (η12 := η12)
+      (η23 := η23)
+      (η34 := η34)
+      h01 h12 h23 h34 hsum
 
 /-- The left side of the helper point-consistency `add-in-u` application is the
 averaged off-diagonal helper-agreement mass.

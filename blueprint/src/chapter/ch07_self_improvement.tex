@@ -203,6 +203,16 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   and
   \lean{MIPStarRE.LDT.SelfImprovement.addInURightQuantity_pointConsistencySelection_eq_zero}
   \leanok.
+  The selected scalar chain for this specialization is recorded by
+  \lean{MIPStarRE.LDT.SelfImprovement.pointConsistencyAddInUCSChainQ0}
+  \lean{MIPStarRE.LDT.SelfImprovement.pointConsistencyAddInUCSChainQ1}
+  \lean{MIPStarRE.LDT.SelfImprovement.pointConsistencyAddInUCSChainQ2}
+  \lean{MIPStarRE.LDT.SelfImprovement.pointConsistencyAddInUCSChainQ3}
+  \lean{MIPStarRE.LDT.SelfImprovement.pointConsistencyAddInUCSChainQ4}
+  \lean{MIPStarRE.LDT.SelfImprovement.pointConsistencyAddInUCSChainQ0_eq_leftQuantity_averagedSandwiched}
+  \lean{MIPStarRE.LDT.SelfImprovement.pointConsistencyAddInUCSChainQ4_eq_rightQuantity}
+  \lean{MIPStarRE.LDT.SelfImprovement.pointConsistencyAddInU_transfer_of_selected_chain_bounds}
+  \leanok.
   Apply Lemma~\ref{lem:add-in-u} with $\mathcal O=\F_q$, $M=A$, and $S_u=\{(a,h):h(u)\neq a\}$. Then
   \[
     \eqref{eq:consistency-with-A-baby-step}
@@ -605,14 +615,31 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.addInUCSChainQ2}
   \lean{MIPStarRE.LDT.SelfImprovement.addInUCSChainQ3}
   \lean{MIPStarRE.LDT.SelfImprovement.addInUCSChainQ4}
+  \lean{MIPStarRE.LDT.SelfImprovement.addInUSelectedCSChainQ0}
+  \lean{MIPStarRE.LDT.SelfImprovement.addInUSelectedCSChainQ1}
+  \lean{MIPStarRE.LDT.SelfImprovement.addInUSelectedCSChainQ2}
+  \lean{MIPStarRE.LDT.SelfImprovement.addInUSelectedCSChainQ3}
+  \lean{MIPStarRE.LDT.SelfImprovement.addInUSelectedCSChainQ4}
   \lean{MIPStarRE.LDT.SelfImprovement.add_in_u_cs_chain_q0_eq_match_mass}
   \lean{MIPStarRE.LDT.SelfImprovement.add_in_u_cs_chain_q4_eq_simplified_rhs}
+  \lean{MIPStarRE.LDT.SelfImprovement.addInUSelectedCSChainQ0_eq_leftQuantity_averagedSandwiched}
+  \lean{MIPStarRE.LDT.SelfImprovement.addInUSelectedCSChainQ4_eq_rightQuantity}
   \lean{MIPStarRE.LDT.SelfImprovement.addInU_cs_chain_step1_diff_eq}
   \lean{MIPStarRE.LDT.SelfImprovement.addInU_cs_chain_step2_diff_eq}
   \lean{MIPStarRE.LDT.SelfImprovement.addInU_cs_chain_step1_reverse_diff_eq}
   \lean{MIPStarRE.LDT.SelfImprovement.addInU_cs_chain_step2_reverse_diff_eq}
   \lean{MIPStarRE.LDT.SelfImprovement.addInU_cs_chain_step3_diff_eq}
   \lean{MIPStarRE.LDT.SelfImprovement.addInU_cs_chain_step4_diff_eq}
+  \lean{MIPStarRE.LDT.SelfImprovement.addInU_selected_cs_chain_step1_diff_eq}
+  \lean{MIPStarRE.LDT.SelfImprovement.addInU_selected_cs_chain_step2_diff_eq}
+  \lean{MIPStarRE.LDT.SelfImprovement.addInU_selected_cs_chain_step3_diff_eq}
+  \lean{MIPStarRE.LDT.SelfImprovement.addInU_selected_cs_chain_step4_diff_eq}
+  \lean{MIPStarRE.LDT.SelfImprovement.addInU_selected_cs_chain_step1_reverse_diff_eq}
+  \lean{MIPStarRE.LDT.SelfImprovement.addInU_selected_cs_chain_step2_reverse_diff_eq}
+  \lean{MIPStarRE.LDT.SelfImprovement.addInU_selected_cs_chain_step3_reverse_diff_eq}
+  \lean{MIPStarRE.LDT.SelfImprovement.addInU_selected_cs_chain_step4_reverse_diff_eq}
+  \lean{MIPStarRE.LDT.SelfImprovement.addInU_selected_cs_chain_step1_abs_le_sqrt_two_delta}
+  \lean{MIPStarRE.LDT.SelfImprovement.addInU_selected_cs_chain_step2_abs_le_sqrt_two_delta}
   \lean{MIPStarRE.LDT.SelfImprovement.addInU_cs_chain_step1_abs_le_sqrt_two_delta}
   \lean{MIPStarRE.LDT.SelfImprovement.addInU_cs_chain_step2_abs_le_sqrt_two_delta}
   \lean{MIPStarRE.LDT.SelfImprovement.add_in_u_cs_chain_q2_q3_factored_cs}
@@ -630,6 +657,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.add_in_u_cs_chain_global_variance_steps_of_sum_bound_from_factor_bounds}
   \lean{MIPStarRE.LDT.SelfImprovement.add_in_u_cs_chain_global_variance_steps_of_local_sum_bound_from_factor_bounds}
   \lean{MIPStarRE.LDT.SelfImprovement.add_in_u_simplified_transfer_of_cs_chain}
+  \lean{MIPStarRE.LDT.SelfImprovement.add_in_u_selected_transfer_of_cs_chain}
   \lean{MIPStarRE.LDT.SelfImprovement.add_in_u_simplified_transfer_of_cs_chain_sqrt_form}
   \lean{MIPStarRE.LDT.SelfImprovement.add_in_u_simplified_transfer_of_cs_chain_local_variance_form}
   \lean{MIPStarRE.LDT.SelfImprovement.add_in_u_simplified_transfer_of_cs_chain_selfConsistency_local_variance_form}
