@@ -154,6 +154,23 @@ private lemma input_sdp_overlap_fiberwise_sum_eq
         (opTensor (pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
           (G.outcome g)))).symm
 
+/-- The pointwise polynomial-evaluation family has the expected fibre outcome. -/
+private lemma polynomialEvaluationFamily_outcome_eq_fiber_sum
+    (params : Parameters)
+    [FieldModel params.q]
+    (G : SubMeas (Polynomial params) ι)
+    (u : Point params)
+    (a : Fq params) :
+    ((polynomialEvaluationFamily params G) u).outcome a =
+      ∑ g ∈ Finset.univ.filter (fun g : Polynomial params => g u = a), G.outcome g := by
+  classical
+  unfold polynomialEvaluationFamily evaluateAt postprocess
+  refine Finset.sum_congr ?_ ?_
+  · ext g
+    simp
+  · intro g _
+    rfl
+
 /-- The bracketed fiber expression is exactly the bipartite matching mass of
 the point measurement against the polynomial measurement evaluated at `u`. -/
 private lemma input_sdp_bracketed_sum_eq_match_mass
@@ -171,16 +188,11 @@ private lemma input_sdp_bracketed_sum_eq_match_mass
         ((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u)
         ((polynomialEvaluationFamily params G) u) := by
   classical
-  unfold qBipartiteMatchMass polynomialEvaluationFamily evaluateAt postprocess
+  unfold qBipartiteMatchMass
   refine Finset.sum_congr rfl ?_
   intro a _
   simp only [IdxProjMeas.toIdxSubMeas]
-  congr 2
-  refine Finset.sum_congr ?_ ?_
-  · ext g
-    simp
-  · intro g _
-    rfl
+  rw [polynomialEvaluationFamily_outcome_eq_fiber_sum]
 
 /-- Reindex the averaged input-consistency overlap as the SDP overlap
 `Σ_g ⟨ψ, A_g ⊗ G_g⟩`.
