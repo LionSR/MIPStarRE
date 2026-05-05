@@ -147,12 +147,11 @@ private lemma input_sdp_overlap_fiberwise_sum_eq
             (opTensor (pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
               (G.outcome g)) := by
   classical
-  simpa using (Finset.sum_fiberwise Finset.univ
-    (fun g : Polynomial params => g u)
+  simpa using polynomial_sum_fiberwise params u
     (fun g =>
       ev strategy.state
         (opTensor (pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
-          (G.outcome g)))).symm
+          (G.outcome g)))
 
 /-- The pointwise polynomial-evaluation family has the expected fiber outcome. -/
 private lemma polynomialEvaluationFamily_outcome_eq_fiber_sum
@@ -443,8 +442,7 @@ theorem helperFiberOperator_sum_eq_total
   calc
     (∑ a : Fq params, helperFiberOperator params T u a)
         = ∑ h : Polynomial params, T.outcome h := by
-          simpa [helperFiberOperator] using
-            Finset.sum_fiberwise Finset.univ (fun h : Polynomial params => h u) T.outcome
+          simpa [helperFiberOperator] using (polynomial_sum_fiberwise params u T.outcome).symm
     _ = T.total := T.sum_eq_total
 
 /-- Pointwise operator form of the identity bound for the first
@@ -780,9 +778,9 @@ theorem helper_linearized_completeness_quantity_eq_fiber_sum
       ∑ a : Fq params, ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
         ev strategy.state (leftTensor (ι₂ := ι)
           (T.outcome h * pointConditionedOutcomeOperatorAtPolynomial params strategy h u)) from by
-      simpa using (Finset.sum_fiberwise Finset.univ (fun h : Polynomial params => h u)
+      exact polynomial_sum_fiberwise params u
         (fun h => ev strategy.state (leftTensor (ι₂ := ι)
-          (T.outcome h * pointConditionedOutcomeOperatorAtPolynomial params strategy h u)))).symm]
+          (T.outcome h * pointConditionedOutcomeOperatorAtPolynomial params strategy h u)))]
   refine Finset.sum_congr rfl ?_
   intro a _
   rw [← ev_finset_sum]
@@ -1518,9 +1516,8 @@ private lemma sandwichedPolynomialOutcomeOperatorAt_sum_eq_bracketed
             ∑ a : Fq params,
               ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
                 sandwichedPolynomialOutcomeOperatorAt params strategy T u h from by
-          simpa using (Finset.sum_fiberwise Finset.univ
-            (fun h : Polynomial params => h u)
-            (sandwichedPolynomialOutcomeOperatorAt params strategy T u)).symm]
+          exact polynomial_sum_fiberwise params u
+            (sandwichedPolynomialOutcomeOperatorAt params strategy T u)]
   refine Finset.sum_congr rfl ?_
   intro a _
   have hreplace :

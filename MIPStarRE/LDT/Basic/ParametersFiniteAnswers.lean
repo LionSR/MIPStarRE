@@ -9,6 +9,8 @@ Finite-type instances for the bounded polynomial answer spaces defined in
 
 namespace MIPStarRE.LDT
 
+open scoped BigOperators
+
 /-! ### Finite answer spaces -/
 
 /-- Axis-line polynomial answers form a finite type via their bounded coefficient vectors. -/
@@ -118,5 +120,22 @@ noncomputable instance (params : Parameters) [FieldModel params.q] :
   letI : Fintype (MvPolynomial.restrictDegree (Fin params.m) (Scalar params) params.d) :=
     Fintype.ofFinite _
   exact Fintype.ofEquiv _ e.symm
+
+/-- Reindex a polynomial-indexed sum by the value of the polynomial at a fixed point.
+
+The low individual degree test frequently groups global polynomial answers by
+the fiber of the evaluation map `h ↦ h u`.  This lemma records that finite
+reindexing in the notation used throughout the LDT formalization. -/
+theorem polynomial_sum_fiberwise
+    (params : Parameters)
+    [FieldModel params.q]
+    (u : Point params)
+    {β : Type*} [AddCommMonoid β]
+    (f : Polynomial params → β) :
+    (∑ h : Polynomial params, f h) =
+      ∑ a : Fq params,
+        ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a), f h := by
+  classical
+  simpa using (Finset.sum_fiberwise Finset.univ (fun h : Polynomial params => h u) f).symm
 
 end MIPStarRE.LDT
