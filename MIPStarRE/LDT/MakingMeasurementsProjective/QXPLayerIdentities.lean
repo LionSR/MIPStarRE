@@ -407,6 +407,67 @@ theorem matrix_image_eq_zero_of_nonpositive_gram_eigenvalue
       _ = 0 := by rw [hadj, inner_zero_right]
   exact inner_self_eq_zero.mp hinner
 
+/-- Vectors orthogonal to the positive Gram images are killed by `X†`.
+
+The proof tests the adjoint vector against the complete eigenvector basis of
+`Q = Xᴴ * X`.  Positive eigenvectors are handled by the normalized-image
+orthogonality assumption, while non-positive eigenvectors are killed by `X`
+itself.  This is the kernel statement needed when completing the positive
+left singular-vector rows to a full unitary. -/
+theorem adjoint_image_eq_zero_of_orthogonal_positive_gram_images
+    {μ ι : Type*}
+    [Fintype μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
+    (hQ : Q.IsHermitian)
+    (hQ_pos : Q.PosSemidef)
+    (hgram : Xᴴ * X = Q)
+    (y : EuclideanSpace ℂ μ)
+    (hy : ∀ i : {i : ι // 0 < hQ.eigenvalues i},
+      inner ℂ
+        (((1 / Real.sqrt (hQ.eigenvalues i.1) : ℝ) : ℂ) •
+          Matrix.toEuclideanLin X (hQ.eigenvectorBasis i.1))
+        y = 0) :
+    (Matrix.toEuclideanLin X).adjoint y = 0 := by
+  classical
+  let L := Matrix.toEuclideanLin X
+  apply hQ.eigenvectorBasis.repr.injective
+  ext j
+  simp only [LinearIsometryEquiv.map_zero, OrthonormalBasis.repr_apply_apply]
+  by_cases hj : 0 < hQ.eigenvalues j
+  · let jp : {i : ι // 0 < hQ.eigenvalues i} := ⟨j, hj⟩
+    have hsqrt_ne : ((Real.sqrt (hQ.eigenvalues j) : ℝ) : ℂ) ≠ 0 := by
+      exact_mod_cast (ne_of_gt (Real.sqrt_pos.2 hj))
+    have hscale :
+        ((Real.sqrt (hQ.eigenvalues j) : ℝ) : ℂ) *
+            ((1 / Real.sqrt (hQ.eigenvalues j) : ℝ) : ℂ) = 1 := by
+      rw [one_div, Complex.ofReal_inv, mul_inv_cancel₀ hsqrt_ne]
+    have himage :
+        L (hQ.eigenvectorBasis j) =
+          ((Real.sqrt (hQ.eigenvalues j) : ℝ) : ℂ) •
+            (((1 / Real.sqrt (hQ.eigenvalues j) : ℝ) : ℂ) •
+              L (hQ.eigenvectorBasis j)) := by
+      rw [smul_smul, hscale, one_smul]
+    have hinner_image : inner ℂ (L (hQ.eigenvectorBasis j)) y = 0 := by
+      have hhy :
+          inner ℂ
+            (((1 / Real.sqrt (hQ.eigenvalues j) : ℝ) : ℂ) •
+              L (hQ.eigenvectorBasis j)) y = 0 := by
+        simpa [jp, L] using hy jp
+      rw [himage]
+      rw [inner_smul_left, hhy, mul_zero]
+    calc
+      inner ℂ (hQ.eigenvectorBasis j) ((Matrix.toEuclideanLin X).adjoint y) =
+          inner ℂ (L (hQ.eigenvectorBasis j)) y := by
+            rw [LinearMap.adjoint_inner_right]
+      _ = 0 := hinner_image
+  · have hzero := matrix_image_eq_zero_of_nonpositive_gram_eigenvalue X Q
+      hQ hQ_pos hgram j hj
+    calc
+      inner ℂ (hQ.eigenvectorBasis j) ((Matrix.toEuclideanLin X).adjoint y) =
+          inner ℂ (L (hQ.eigenvectorBasis j)) y := by
+            rw [LinearMap.adjoint_inner_right]
+      _ = 0 := by rw [hzero, inner_zero_left]
+
 /-- Spectral form of `normalized_matrix_image_rows_mul_conjTranspose`.
 
 The rows indexed by the strictly positive eigenvalues of the Hermitian Gram
