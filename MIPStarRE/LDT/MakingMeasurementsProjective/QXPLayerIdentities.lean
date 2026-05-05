@@ -680,24 +680,7 @@ theorem exists_rectangular_coisometry_extending_orthonormal_rows
   classical
   let f : μ ↪ ν := Classical.choice (Function.Embedding.nonempty_of_card_le hcard)
   let fe : κ ↪ ν := e.trans f
-  let invRange : Set.range fe → κ := (Equiv.ofInjective fe fe.injective).symm
-  let rowFull : ν → EuclideanSpace ℂ ν := fun j =>
-    if hj : j ∈ Set.range fe then row (invRange ⟨j, hj⟩) else 0
-  have hrowFull : ∀ i : κ, rowFull (fe i) = row i := by
-    intro i
-    simp [rowFull, invRange, Equiv.ofInjective_symm_apply]
-  have horthRange : Orthonormal ℂ ((Set.range fe).restrict rowFull) := by
-    have hcomp : Orthonormal ℂ (fun x : Set.range fe => row (invRange x)) :=
-      hrow.comp invRange (Equiv.injective _)
-    convert hcomp with x
-    change rowFull x = row (invRange x)
-    change (if hj : (x : ν) ∈ Set.range fe then row (invRange ⟨x, hj⟩) else 0) =
-      row (invRange x)
-    rw [dif_pos x.2]
-  obtain ⟨b, hb⟩ :=
-    Orthonormal.exists_orthonormalBasis_extension_of_card_eq
-      (𝕜 := ℂ) (E := EuclideanSpace ℂ ν) (ι := ν)
-      (card_ι := by simp) (v := rowFull) (s := Set.range fe) horthRange
+  obtain ⟨b, hb⟩ := exists_orthonormalBasis_extension_of_embedding row hrow fe
   let W : Matrix μ ν ℂ := Matrix.of fun i r => b (f i) r
   have hleft : W * Wᴴ = (1 : Matrix μ μ ℂ) := by
     simpa [W] using
@@ -705,8 +688,8 @@ theorem exists_rectangular_coisometry_extending_orthonormal_rows
         (fun i : μ => b (f i)) (b.orthonormal.comp f f.injective)
   refine ⟨W, hleft, ?_⟩
   intro i r
-  change (b (fe i)) r = row i r
-  rw [hb (fe i) ⟨i, rfl⟩, hrowFull i]
+  change (b (f (e i))) r = row i r
+  rw [show f (e i) = fe i from rfl, hb i]
 
 /-- Extend the positive Gram right-singular rows to a rectangular coisometry.
 
@@ -759,17 +742,8 @@ theorem transpose_unitary_mul_rectangular_coisometry
     (hW : W * Wᴴ = (1 : Matrix μ μ ℂ)) :
     (Uᵀ * W) * (Uᵀ * W)ᴴ = (1 : Matrix μ μ ℂ) := by
   have hU_transpose : Uᵀ * (Uᵀ)ᴴ = (1 : Matrix μ μ ℂ) := by
-    ext i j
-    have hentry := congrFun (congrFun hU_right j) i
-    have hone : (1 : Matrix μ μ ℂ) j i = (1 : Matrix μ μ ℂ) i j := by
-      by_cases hij : i = j
-      · subst j
-        simp
-      · have hji : j ≠ i := fun h => hij h.symm
-        simp [hij, hji]
-    rw [← hone]
-    simpa [Matrix.mul_apply, Matrix.conjTranspose_apply, Matrix.transpose_apply,
-      mul_comm] using hentry
+    rw [show (Uᵀ : Matrix μ μ ℂ)ᴴ = (Uᴴ)ᵀ from rfl,
+      ← Matrix.transpose_mul, hU_right, Matrix.transpose_one]
   calc
     (Uᵀ * W) * (Uᵀ * W)ᴴ =
         Uᵀ * (W * Wᴴ) * (Uᵀ)ᴴ := by
