@@ -33,6 +33,10 @@ chain definitions with endpoint lemmas.
 - **add_in_u_cs_chain_q0_eq_match_mass** / **q4_eq_simplified_rhs** —
   endpoint lemmas identifying Q₀ with the match-mass left side and Q₄
   with the projection-collapsed right side.
+- **helperOffDiagonal...Quantity** — named scalar forms of the off-diagonal
+  projector-inserted residual and the post-swap Schwartz--Zippel endpoint,
+  together with the conditional assembly of the paper's
+  `2√ζ + md/q` estimate.
 
 ## References
 
@@ -580,6 +584,130 @@ theorem polynomial_off_diagonal_swapped_indicator_sandwich_avg_le_mdq
     simpa [fullCollision] using
       polynomial_collision_pointMeasurement_sandwichTensor_avg_le_mdq params strategy T
   exact havg_le_full.trans hfull
+
+/-! ### Off-diagonal residual quantities for the helper SSC estimate -/
+
+/-- The off-diagonal contribution after inserting the outer point projector
+`A^u_{h(u)}` around the pointwise helper outcome `H^u_{h'}`.
+
+This is the non-diagonal term added when the diagonal released expression is
+enlarged to the full `(h,h')` sum in the proof of helper strong
+self-consistency. -/
+noncomputable def helperOffDiagonalOuterSandwichQuantity
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) : Error :=
+  avgOver (uniformDistribution (Point params)) (fun u =>
+    ∑ h : Polynomial params,
+      ∑ h' ∈ (Finset.univ : Finset (Polynomial params)).erase h,
+        let Ah := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
+        ev strategy.state
+          (opTensor
+            (Ah * ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h') * Ah)
+            (T.outcome h)))
+
+/-- The same off-diagonal contribution after using `eq:h-blt`: the outer
+projector has been removed from the operator and replaced by the polynomial
+agreement indicator `1_{h(u)=h'(u)}`. -/
+noncomputable def helperOffDiagonalIndicatorQuantity
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) : Error :=
+  avgOver (uniformDistribution (Point params)) (fun u =>
+    ∑ h : Polynomial params,
+      ∑ h' ∈ (Finset.univ : Finset (Polynomial params)).erase h,
+        (if h u = h' u then (1 : Error) else 0) *
+          ev strategy.state
+            (opTensor
+              ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h')
+              (T.outcome h)))
+
+/-- The post-variance-swap endpoint for the off-diagonal contribution.
+
+Here both copies of the point projector have been evaluated at an independent
+point `v`, while the agreement indicator has already been averaged over the
+original point `u`.  This is the scalar expression to which the
+Schwartz--Zippel estimate is applied. -/
+noncomputable def helperOffDiagonalSwappedIndicatorQuantity
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) : Error :=
+  avgOver (uniformDistribution (Point params)) (fun v =>
+    ∑ h : Polynomial params,
+      ∑ h' ∈ (Finset.univ : Finset (Polynomial params)).erase h,
+        avgOver (uniformDistribution (Point params))
+            (fun u => if h u = h' u then (1 : Error) else 0) *
+          ev strategy.state
+            (opTensor
+              (pointConditionedOutcomeOperatorAtPolynomial params strategy h v *
+                T.outcome h' *
+                pointConditionedOutcomeOperatorAtPolynomial params strategy h v)
+              (T.outcome h)))
+
+/-- Named form of the identity `eq:h-blt` for the off-diagonal helper SSC
+quantity. -/
+theorem helperOffDiagonalOuterSandwichQuantity_eq_indicator
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    helperOffDiagonalOuterSandwichQuantity params strategy T =
+      helperOffDiagonalIndicatorQuantity params strategy T := by
+  simpa [helperOffDiagonalOuterSandwichQuantity, helperOffDiagonalIndicatorQuantity]
+    using polynomial_off_diagonal_outer_sandwich_eq_indicator_avg params strategy T
+
+/-- Named Schwartz--Zippel endpoint for the helper SSC off-diagonal term. -/
+theorem helperOffDiagonalSwappedIndicatorQuantity_le_mdq
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    helperOffDiagonalSwappedIndicatorQuantity params strategy T ≤
+      (params.m * params.d : Error) / params.q := by
+  simpa [helperOffDiagonalSwappedIndicatorQuantity] using
+    polynomial_off_diagonal_swapped_indicator_sandwich_avg_le_mdq params strategy T
+
+/-- Assemble the off-diagonal projector-insertion bound from the two variance
+swaps and the Schwartz--Zippel endpoint.
+
+The hypothesis `htransport` is precisely the analytic content of the two
+Cauchy--Schwarz variance moves in the proof of
+`item:self-improvement-self`: it transports the indicator form of the
+off-diagonal term to the endpoint with both point projectors evaluated at the
+independent point `v`.  The conclusion is the corresponding paper estimate
+before substituting the concrete value of the transport error. -/
+theorem helperOffDiagonalOuterSandwichQuantity_le_of_swapped_transport
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι)
+    (η : Error)
+    (htransport :
+      helperOffDiagonalIndicatorQuantity params strategy T ≤
+        helperOffDiagonalSwappedIndicatorQuantity params strategy T + η) :
+    helperOffDiagonalOuterSandwichQuantity params strategy T ≤
+      η + (params.m * params.d : Error) / params.q := by
+  rw [helperOffDiagonalOuterSandwichQuantity_eq_indicator]
+  have hsz := helperOffDiagonalSwappedIndicatorQuantity_le_mdq params strategy T
+  linarith
+
+/-- Paper-shaped form of the off-diagonal projector-insertion estimate.
+
+Once the two variance swaps have supplied transport error
+`2√ζ_variance`, the inserted off-diagonal contribution is bounded by
+`2√ζ_variance + md/q`. -/
+theorem helperOffDiagonalOuterSandwichQuantity_le_two_sqrt_variance_add_mdq
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (T : SubMeas (Polynomial params) ι)
+    (htransport :
+      helperOffDiagonalIndicatorQuantity params strategy T ≤
+        helperOffDiagonalSwappedIndicatorQuantity params strategy T +
+          2 * Real.sqrt (selfImprovementVarianceError params eps delta)) :
+    helperOffDiagonalOuterSandwichQuantity params strategy T ≤
+      2 * Real.sqrt (selfImprovementVarianceError params eps delta) +
+        (params.m * params.d : Error) / params.q :=
+  helperOffDiagonalOuterSandwichQuantity_le_of_swapped_transport
+    params strategy T (2 * Real.sqrt (selfImprovementVarianceError params eps delta))
+    htransport
 
 /-- Projective simplification of the diagonal `add-in-u` right operator at a point.
 
