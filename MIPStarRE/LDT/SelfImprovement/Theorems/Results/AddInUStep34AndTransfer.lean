@@ -213,6 +213,33 @@ lemma add_in_u_cs_chain_q3_q4_le_sqrt_of_factor_bounds
           globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
   le_sqrt_of_factor_bounds_left hCS hD₁_le_one hD₂_le
 
+/-- Weighted Cauchy--Schwarz for the non-selected add-in-`u` Step 3/4
+summands.
+
+The non-selected Step 3 and Step 4 estimates use the same finite inequality
+over independent point pairs and polynomial outcomes.  This helper fixes that
+common summation structure, leaving the two applications to supply only their
+step-specific summands and pointwise operator Cauchy--Schwarz estimates. -/
+private theorem addInU_weighted_cauchy_schwarz
+    (params : Parameters) [FieldModel params.q]
+    (t x y : Point params × Point params → Polynomial params → Error)
+    (ht : ∀ uv h, |t uv h| ≤ Real.sqrt (x uv h) * Real.sqrt (y uv h))
+    (hx : ∀ uv h, 0 ≤ x uv h)
+    (hy : ∀ uv h, 0 ≤ y uv h) :
+    |avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+      ∑ h : Polynomial params, t uv h)| ≤
+      Real.sqrt
+        (avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+          ∑ h : Polynomial params, x uv h)) *
+      Real.sqrt
+        (avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+          ∑ h : Polynomial params, y uv h)) := by
+  exact
+    MIPStarRE.LDT.Preliminaries.weightedFinsetCauchySchwarz
+      (Question := Point params × Point params) (Outcome := Polynomial params)
+      (uniformDistribution (Point params × Point params))
+      (t := t) (x := x) (y := y) ht hx hy
+
 /-- Factored operator Cauchy--Schwarz bound for the `Q₂ → Q₃` add-in-`u` step.
 
 Applies the bipartite-tensor sandwich Cauchy--Schwarz primitive
@@ -254,9 +281,7 @@ theorem add_in_u_cs_chain_q2_q3_factored_cs
               (opTensor (Av * Mh * Av) (T.outcome h)))) := by
   classical
   rw [addInU_cs_chain_step3_diff_eq params strategy T]
-  refine MIPStarRE.LDT.Preliminaries.weightedFinsetCauchySchwarz
-    (Question := Point params × Point params) (Outcome := Polynomial params)
-    (uniformDistribution (Point params × Point params))
+  refine addInU_weighted_cauchy_schwarz params
     (t := fun uv h =>
       let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1
       let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
@@ -366,9 +391,7 @@ theorem add_in_u_cs_chain_q3_q4_factored_cs
               (opTensor ((Av - Au) * Mh * (Av - Au)) (T.outcome h)))) := by
   classical
   rw [addInU_cs_chain_step4_diff_eq params strategy T]
-  refine MIPStarRE.LDT.Preliminaries.weightedFinsetCauchySchwarz
-    (Question := Point params × Point params) (Outcome := Polynomial params)
-    (uniformDistribution (Point params × Point params))
+  refine addInU_weighted_cauchy_schwarz params
     (t := fun uv h =>
       let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1
       let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
