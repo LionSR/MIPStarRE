@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep12.Selected
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep12.Algebra
 
 /-!
 # Unselected add-in-u Step 1/2 Cauchy--Schwarz bounds

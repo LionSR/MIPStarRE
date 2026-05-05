@@ -9,30 +9,23 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUDiagonalAndDefs
 
 /-!
-# Add-in-u Cauchy–Schwarz Step 1/2 bounds and algebraic alignment
+# Add-in-u Cauchy--Schwarz algebraic alignment
 
-Algebraic operator-rewrites that align the add-in-u chain differences into
-commutator-times-PSD form, and the raw Cauchy–Schwarz bounds
-`|Q₀−Q₁| ≤ √(2δ)` and `|Q₁−Q₂| ≤ √(2δ)` from the paper.
+Algebraic operator-rewrites that align the add-in-u chain differences with the
+forms used in the Cauchy--Schwarz estimates from the paper.
 
 ## Contents
 
-- **addInU_pointMeasurement_snd_selfConsistency** — point-measurement
-  self-consistency on the second coordinate of the `(u, v)` product
-  average, giving `SDD ≤ 2δ`.
-- **addInU_filtered_sandwiched_tensor_sum_le_one** — grouped
-  `h(v)=a` tensor mass is a contraction (`≤ 1`).
 - **addInU_step1/step2/step3/step4_pointwise_op_eq** (private) — operator-level
   difference rewrites for the four scalar moves.
 - **addInU_cs_chain_step1/step2/step3/step4_diff_eq** — algebraic alignment of
   the diagonal chain differences to commutator-times-PSD form.
 - **addInU_selected_cs_chain_step1/step2/step3/step4_diff_eq** — the same
   algebraic alignments before specializing the add-in-u selection.
-- **addInU_step1/step2_C_contraction** (private) — the summed Hermitian
-  contraction side conditions for `closenessOfInnerProduct_right/left`.
-- **addInU_cs_chain_step1/step2_abs_le_sqrt_two_delta** — the raw
-  `√(2δ)` bounds for Step 1 and Step 2, proved via
-  `closenessOfInnerProduct` and the above inputs.
+
+The contraction and raw `√(2δ)` estimates using these identities live in
+`AddInUStep12.Raw`; the selected-family raw estimates live in
+`AddInUStep12.Selected`.
 
 ## References
 
