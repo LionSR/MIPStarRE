@@ -2,25 +2,21 @@ import MIPStarRE.LDT.Test.ErrorCascade.Definitions
 import MIPStarRE.LDT.Test.ErrorCascade.EnvelopeBounds
 
 /-!
-# Error cascade — bounds for `σ`, `ζ₁`, `ζ₂`, `ζ₃`, `ζ₄` and the main consolidator
+# Error cascade — bounds for `σ` and `ζ₁`
 
-This module proves the tight and absorbing bounds for each cascade variable
-`σ`, `ζ₁`, `ζ₂`, `ζ₃`, `ζ₄`, and assembles them into
-`errorCascade_le_mainFormalError`,
-the top-level error-cascade consolidator used by `mainFormalError` (Step 8).
+This module proves the tight and absorbing bounds for the first two cascade
+variables, `σ` and `ζ₁`.  The later variables `ζ₂`, `ζ₃`, and `ζ₄`, together
+with the top-level consolidator `errorCascade_le_mainFormalError`, are in the
+subsequent leaves of `Test.ErrorCascade.CascadeBounds`.
 
-Each cascade-step lemma has three components:
+The first cascade steps have three components:
 
 * The **tight cascade bound** (`cascadeSigma_tight_bound`, `cascadeZeta1_bound`, …),
   deriving the native estimate directly from the cascade definition.
 * The **absorbing bound** (`sigma_bound`, `zeta1_bound`, …), coarsening the
   tight estimate to the final `mainFormalEnvelope` envelope.
-* Where appropriate, nonnegativity lemmas (`cascadeSigma_nonneg`,
-  `cascadeZeta1_nonneg`).
-
-The consolidator `errorCascade_le_mainFormalError` packages all five bounds
-against `mainFormalError` itself (with `ζ₃/2 ≤ mainFormalError`, as stated
-in paper line 230).
+* The corresponding nonnegativity lemmas (`cascadeSigma_nonneg`,
+  `cascadeZeta1_nonneg`), used by the later cascade estimates.
 
 ## References
 
