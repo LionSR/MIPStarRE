@@ -871,6 +871,10 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap_natural_of_total_difference}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap_of_total_difference}
+  \lean{MIPStarRE.LDT.Preliminaries.subMeas_total_ev_gap_abs_le_sqrt_card_qSDD}
+  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_total_difference_le_sqrt_card_data}
+  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap_natural_of_data_processing}
+  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap_of_data_processing}
   Since \(A^u_{\mathrm{tot}}=I\) and postprocessing does not change the total
   operator, Lean also records the equivalent form in which this displacement is
   the single scalar difference
@@ -881,7 +885,15 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
       \langle \psi, I \ot \widehat H_{\mathrm{tot}} \psi\rangle
     \right|
   \]
-  between the right-register totals of \(H\) and \(\widehat H\).
+  between the right-register totals of \(H\) and \(\widehat H\).  The
+  outcomewise data-processing bound controls this scalar by applying the
+  vector triangle inequality to the sum over \(a\in\F_q\); the formal estimate
+  gives the additional term
+  \[
+    \sqrt{q\,\widehat{\zeta}_{\mathrm{dataprocess}}}.
+  \]
+  Thus the total-overlap term is no longer an independent hypothesis, although
+  the numerical absorption of this alphabet-size loss is recorded separately.
 
   \emph{Proof of \ref{item:self-improvement-projective-self}.}
   \lean{MIPStarRE.LDT.SelfImprovement.self_closeness_transport_through_orthonormalization}
