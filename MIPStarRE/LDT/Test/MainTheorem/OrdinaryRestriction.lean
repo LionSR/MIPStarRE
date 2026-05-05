@@ -530,6 +530,174 @@ theorem mainFormalSuccessorRestrictedPointAgreement_le_ofSliceData
   simpa [sliceData.sliceState_eq x, sliceData.slicePoint_eq x,
     sliceData.slicePointB_eq x] using hpoint
 
+/-- The passing hypothesis for a pinned slice bounds the restricted
+axis-parallel branch.
+
+The two role choices in the same-space axis branch become the same restricted
+axis-parallel test after applying the Alice and Bob compatibility fields.  The
+swap-invariance of the slice state identifies the left-line/right-point term
+with the left-point/right-line term, so the role average is precisely the
+restricted branch. -/
+theorem mainFormalSuccessorRestrictedAxisParallel_le_ofSliceData
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (sliceData : MainFormalSuccessorRecursiveSliceData params strategy eps hpass)
+    (x : Fq params) :
+    (MainInductionStep.xRestrictedStrategy params
+      strategy.strategySymmetrization x).axisParallelFailureProbability ≤
+    3 * (3 * eps) := by
+  let restricted :=
+    MainInductionStep.xRestrictedStrategy params strategy.strategySymmetrization x
+  let slice := sliceData.sliceStrategy x
+  let axParDist := uniformDistribution (AxisParallelTestSample params)
+  let leftTerm :=
+    bipartiteConsError slice.state axParDist
+      (axisParallelLineAnswerFamily slice.leftAsSymmetric)
+      (axisParallelPointAnswerFamily slice.rightAsSymmetric)
+  let rightTerm :=
+    bipartiteConsError slice.state axParDist
+      (axisParallelPointAnswerFamily slice.leftAsSymmetric)
+      (axisParallelLineAnswerFamily slice.rightAsSymmetric)
+  have hleft_eq_restricted : leftTerm = restricted.axisParallelFailureProbability := by
+    calc
+      leftTerm =
+          bipartiteConsError slice.state axParDist
+            (axisParallelPointAnswerFamily slice.rightAsSymmetric)
+            (axisParallelLineAnswerFamily slice.leftAsSymmetric) := by
+            exact bipartiteConsError_symm_of_density_fixed slice.state slice.densityFixed
+              axParDist (axisParallelLineAnswerFamily slice.leftAsSymmetric)
+              (axisParallelPointAnswerFamily slice.rightAsSymmetric)
+      _ = restricted.axisParallelFailureProbability := by
+            unfold restricted bipartiteConsError
+              MainInductionStep.RestrictedSymStrat.axisParallelFailureProbability
+              MainInductionStep.RestrictedSymStrat.axisParallelPointAnswerFamily
+              MainInductionStep.RestrictedSymStrat.axisParallelLineAnswerFamily
+              axisParallelPointAnswerFamily axisParallelLineAnswerFamily
+            apply avgOver_congr
+            intro s
+            simp [slice, SameSpaceProjStrat.leftAsSymmetric,
+              SameSpaceProjStrat.rightAsSymmetric, sliceData.sliceState_eq x,
+              sliceData.slicePointB_eq x, sliceData.sliceAxisParallelA_eq x]
+  have hright_eq_restricted : rightTerm = restricted.axisParallelFailureProbability := by
+    unfold rightTerm restricted bipartiteConsError
+      MainInductionStep.RestrictedSymStrat.axisParallelFailureProbability
+      MainInductionStep.RestrictedSymStrat.axisParallelPointAnswerFamily
+      MainInductionStep.RestrictedSymStrat.axisParallelLineAnswerFamily
+      axisParallelPointAnswerFamily axisParallelLineAnswerFamily
+    apply avgOver_congr
+    intro s
+    simp [slice, SameSpaceProjStrat.leftAsSymmetric, SameSpaceProjStrat.rightAsSymmetric,
+      sliceData.sliceState_eq x, sliceData.slicePoint_eq x,
+      sliceData.sliceAxisParallelB_eq x]
+  have hrole :
+      slice.axisParallelRoleAverage = restricted.axisParallelFailureProbability := by
+    unfold SameSpaceProjStrat.axisParallelRoleAverage
+    change (leftTerm + rightTerm) / 2 = restricted.axisParallelFailureProbability
+    rw [hleft_eq_restricted, hright_eq_restricted]
+    ring
+  have haxis :=
+    SameSpaceProjStrat.axisParallelRoleAverage_le_three_mul (sliceData.slicePasses x)
+  rw [hrole] at haxis
+  simpa [restricted] using haxis
+
+/-- The passing hypothesis for a pinned slice bounds the restricted diagonal
+branch.
+
+As in the axis-parallel case, the Alice and Bob diagonal compatibility fields
+identify the two same-space role choices with the restricted diagonal test.
+The slice state's swap symmetry removes the order of the two prover registers
+inside the consistency defect. -/
+theorem mainFormalSuccessorRestrictedDiagonal_le_ofSliceData
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (sliceData : MainFormalSuccessorRecursiveSliceData params strategy eps hpass)
+    (x : Fq params) :
+    (MainInductionStep.xRestrictedStrategy params
+      strategy.strategySymmetrization x).diagonalFailureProbability ≤
+    3 * (3 * eps) := by
+  let restricted :=
+    MainInductionStep.xRestrictedStrategy params strategy.strategySymmetrization x
+  let slice := sliceData.sliceStrategy x
+  have hrole :
+      slice.diagonalRoleAverage = restricted.diagonalFailureProbability := by
+    unfold SameSpaceProjStrat.diagonalRoleAverage
+      MainInductionStep.RestrictedSymStrat.diagonalFailureProbability
+      MainInductionStep.RestrictedSymStrat.restrictedDiagonalPointAnswerFamily
+      MainInductionStep.RestrictedSymStrat.restrictedDiagonalLineAnswerFamily
+    refine congrArg (fun t => (1 / (params.m : Error)) * t) ?_
+    refine Finset.sum_congr rfl ?_
+    intro j _
+    let dist := uniformDistribution (RestrictedDiagonalSample params j)
+    let leftTerm :=
+      bipartiteConsError slice.state dist
+        (diagonalLineAnswerFamily slice.leftAsSymmetric j)
+        (diagonalPointAnswerFamily slice.rightAsSymmetric j)
+    let rightTerm :=
+      bipartiteConsError slice.state dist
+        (diagonalPointAnswerFamily slice.leftAsSymmetric j)
+        (diagonalLineAnswerFamily slice.rightAsSymmetric j)
+    have hleft_eq_restricted :
+        leftTerm =
+          bipartiteConsError restricted.state dist
+            (MainInductionStep.RestrictedSymStrat.restrictedDiagonalPointAnswerFamily
+              restricted j)
+            (MainInductionStep.RestrictedSymStrat.restrictedDiagonalLineAnswerFamily
+              restricted j) := by
+      calc
+        leftTerm =
+            bipartiteConsError slice.state dist
+              (diagonalPointAnswerFamily slice.rightAsSymmetric j)
+              (diagonalLineAnswerFamily slice.leftAsSymmetric j) := by
+              exact bipartiteConsError_symm_of_density_fixed slice.state slice.densityFixed
+                dist (diagonalLineAnswerFamily slice.leftAsSymmetric j)
+                (diagonalPointAnswerFamily slice.rightAsSymmetric j)
+        _ = bipartiteConsError restricted.state dist
+              (MainInductionStep.RestrictedSymStrat.restrictedDiagonalPointAnswerFamily
+                restricted j)
+              (MainInductionStep.RestrictedSymStrat.restrictedDiagonalLineAnswerFamily
+                restricted j) := by
+              unfold bipartiteConsError
+                MainInductionStep.RestrictedSymStrat.restrictedDiagonalPointAnswerFamily
+                MainInductionStep.RestrictedSymStrat.restrictedDiagonalLineAnswerFamily
+                diagonalPointAnswerFamily diagonalLineAnswerFamily
+              apply avgOver_congr
+              intro s
+              simp [restricted, slice, SameSpaceProjStrat.leftAsSymmetric,
+                SameSpaceProjStrat.rightAsSymmetric, sliceData.sliceState_eq x,
+                sliceData.slicePointB_eq x, sliceData.sliceDiagonalA_eq x]
+    have hright_eq_restricted :
+        rightTerm =
+          bipartiteConsError restricted.state dist
+            (MainInductionStep.RestrictedSymStrat.restrictedDiagonalPointAnswerFamily
+              restricted j)
+            (MainInductionStep.RestrictedSymStrat.restrictedDiagonalLineAnswerFamily
+              restricted j) := by
+      unfold rightTerm bipartiteConsError
+        MainInductionStep.RestrictedSymStrat.restrictedDiagonalPointAnswerFamily
+        MainInductionStep.RestrictedSymStrat.restrictedDiagonalLineAnswerFamily
+        diagonalPointAnswerFamily diagonalLineAnswerFamily
+      apply avgOver_congr
+      intro s
+      simp [restricted, slice, SameSpaceProjStrat.leftAsSymmetric,
+        SameSpaceProjStrat.rightAsSymmetric, sliceData.sliceState_eq x,
+        sliceData.slicePoint_eq x, sliceData.sliceDiagonalB_eq x]
+    change (leftTerm + rightTerm) / 2 =
+      bipartiteConsError restricted.state dist
+        (MainInductionStep.RestrictedSymStrat.restrictedDiagonalPointAnswerFamily
+          restricted j)
+        (MainInductionStep.RestrictedSymStrat.restrictedDiagonalLineAnswerFamily
+          restricted j)
+    rw [hleft_eq_restricted, hright_eq_restricted]
+    ring
+  have hdiagonal :=
+    SameSpaceProjStrat.diagonalRoleAverage_le_three_mul (sliceData.slicePasses x)
+  rw [hrole] at hdiagonal
+  simpa [restricted] using hdiagonal
+
 /-- Convert per-slice induction-hypothesis data into a
 `MainFormalSuccessorRecursiveSlices` witness.
 

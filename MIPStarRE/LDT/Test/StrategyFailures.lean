@@ -385,6 +385,75 @@ theorem eps_nonneg_of_passes {params : Parameters}
     0 ≤ eps :=
   (lowIndividualDegreeFailureProbability_nonneg strategy).trans hpass.soundnessHypothesis
 
+private lemma three_summand_bounds_of_average_le
+    {axis point diagonal eps : Error}
+    (haxis : 0 ≤ axis) (hpoint : 0 ≤ point) (hdiagonal : 0 ≤ diagonal)
+    (hmain : (axis + point + diagonal) / 3 ≤ eps) :
+    axis ≤ 3 * eps ∧ point ≤ 3 * eps ∧ diagonal ≤ 3 * eps := by
+  constructor
+  · linarith
+  constructor
+  · linarith
+  · linarith
+
+/-- Passing the full test bounds the role-averaged axis-parallel branch by
+`3 * eps`, since it is one of the three nonnegative summands in
+`lowIndividualDegreeFailureProbability`. -/
+theorem axisParallelRoleAverage_le_three_mul {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error}
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
+    strategy.axisParallelRoleAverage ≤ 3 * eps := by
+  let pointAgreement : Error :=
+    bipartiteConsError strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  have hpoint_nonneg : 0 ≤ pointAgreement := by
+    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  have haxis_nonneg : 0 ≤ strategy.axisParallelRoleAverage :=
+    axisParallelRoleAverage_nonneg strategy
+  have hdiag_nonneg : 0 ≤ strategy.diagonalRoleAverage :=
+    diagonalRoleAverage_nonneg strategy
+  have hmain :
+      (strategy.axisParallelRoleAverage + pointAgreement +
+        strategy.diagonalRoleAverage) / 3 ≤ eps := by
+    simpa [pointAgreement, SameSpaceProjStrat.lowIndividualDegreeFailureProbability] using
+      hpass.soundnessHypothesis
+  exact
+    (three_summand_bounds_of_average_le haxis_nonneg hpoint_nonneg hdiag_nonneg
+      hmain).1
+
+/-- Passing the full test bounds the role-averaged diagonal branch by
+`3 * eps`, since it is one of the three nonnegative summands in
+`lowIndividualDegreeFailureProbability`. -/
+theorem diagonalRoleAverage_le_three_mul {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error}
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
+    strategy.diagonalRoleAverage ≤ 3 * eps := by
+  let pointAgreement : Error :=
+    bipartiteConsError strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  have hpoint_nonneg : 0 ≤ pointAgreement := by
+    exact bipartiteConsError_nonneg strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+  have haxis_nonneg : 0 ≤ strategy.axisParallelRoleAverage :=
+    axisParallelRoleAverage_nonneg strategy
+  have hdiag_nonneg : 0 ≤ strategy.diagonalRoleAverage :=
+    diagonalRoleAverage_nonneg strategy
+  have hmain :
+      (strategy.axisParallelRoleAverage + pointAgreement +
+        strategy.diagonalRoleAverage) / 3 ≤ eps := by
+    simpa [pointAgreement, SameSpaceProjStrat.lowIndividualDegreeFailureProbability] using
+      hpass.soundnessHypothesis
+  exact
+    (three_summand_bounds_of_average_le haxis_nonneg hpoint_nonneg hdiag_nonneg
+      hmain).2.2
+
 /-- Passing the full test bounds the cross-prover point-agreement branch by
 `3 * eps`, exactly because that branch is one of the three nonnegative terms
 averaged in `lowIndividualDegreeFailureProbability`. -/
@@ -416,7 +485,9 @@ theorem point_agreement_le_three_mul {params : Parameters}
       SameSpaceProjStrat.leftAsSymmetric, SameSpaceProjStrat.rightAsSymmetric,
       SymStrat.axisParallelFailureProbability, SymStrat.diagonalFailureProbability] using
       hpass.soundnessHypothesis
-  linarith
+  exact
+    (three_summand_bounds_of_average_le haxis_nonneg hpoint_nonneg hdiag_nonneg
+      hmain).2.1
 
 end SameSpaceProjStrat
 

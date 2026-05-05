@@ -550,5 +550,19 @@ theorem consRel_symm_of_density_fixed {ι : Type*} [Fintype ι] [DecidableEq ι]
           exact qBipartiteConsDefect_symm_of_density_fixed ψ hfix (A q) (B q)
     _ ≤ δ := h
 
+/-- For a swap-invariant same-space bipartite state, the averaged bipartite
+consistency defect is symmetric in the two indexed submeasurement families. -/
+theorem bipartiteConsError_symm_of_density_fixed {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState (ι × ι))
+    (hfix : swapDensity ψ.density = ψ.density)
+    {Question Outcome : Type*} [Fintype Outcome]
+    (𝒟 : Distribution Question)
+    (A B : IdxSubMeas Question Outcome ι) :
+    bipartiteConsError ψ 𝒟 A B = bipartiteConsError ψ 𝒟 B A := by
+  unfold bipartiteConsError
+  apply avgOver_congr
+  intro q
+  exact qBipartiteConsDefect_symm_of_density_fixed ψ hfix (A q) (B q)
+
 
 end MIPStarRE.LDT
