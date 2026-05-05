@@ -25,6 +25,62 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+private noncomputable def evaluatedSlicePhaseFourInserted
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (C : EvaluatedSliceQuestion params → EvaluatedSliceOutcome params → MIPStarRE.Quantum.Op (ι × ι)) :
+    EvaluatedSliceQuestion params → Error := fun q =>
+  ∑ ab : EvaluatedSliceOutcome params,
+    ev strategy.state
+      (C q ab *
+        rightTensor (ι₁ := ι)
+          (((evaluatedSlicePointMeas params strategy q.2).outcome ab.2) *
+            ((evaluatedSlicePointMeas params strategy q.1).outcome ab.1)))
+
+private noncomputable def evaluatedSlicePhaseFourSwapped
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (C : EvaluatedSliceQuestion params → EvaluatedSliceOutcome params → MIPStarRE.Quantum.Op (ι × ι)) :
+    EvaluatedSliceQuestion params → Error := fun q =>
+  ∑ ab : EvaluatedSliceOutcome params,
+    ev strategy.state
+      (C q ab *
+        rightTensor (ι₁ := ι)
+          (((evaluatedSlicePointMeas params strategy q.1).outcome ab.1) *
+            ((evaluatedSlicePointMeas params strategy q.2).outcome ab.2)))
+
+private lemma evaluatedSlice_pointSwap_right_bound_of_norms
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hgood : strategy.IsGood eps delta gamma)
+    (C : EvaluatedSliceQuestion params → EvaluatedSliceOutcome params → MIPStarRE.Quantum.Op (ι × ι))
+    (hC : ∀ q, ∑ ab : EvaluatedSliceOutcome params, C q ab * (C q ab)ᴴ ≤ 1)
+    (lhs rhs : EvaluatedSliceQuestion params → Error)
+    (hlhs : avgOver (uniformDistribution (EvaluatedSliceQuestion params)) lhs =
+      avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (evaluatedSlicePhaseFourInserted (ι := ι) params strategy C))
+    (hrhs : avgOver (uniformDistribution (EvaluatedSliceQuestion params)) rhs =
+      avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+        (evaluatedSlicePhaseFourSwapped (ι := ι) params strategy C)) :
+    |avgOver (uniformDistribution (EvaluatedSliceQuestion params)) lhs -
+        avgOver (uniformDistribution (EvaluatedSliceQuestion params)) rhs| ≤
+      6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
+  have hswap :=
+    evaluatedSlice_phaseFour_pointSwap_right_bound
+      params strategy eps delta gamma hnorm hgood C hC
+  calc
+    |avgOver (uniformDistribution (EvaluatedSliceQuestion params)) lhs -
+        avgOver (uniformDistribution (EvaluatedSliceQuestion params)) rhs|
+      = |avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+            (evaluatedSlicePhaseFourInserted (ι := ι) params strategy C) -
+          avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+            (evaluatedSlicePhaseFourSwapped (ι := ι) params strategy C)| := by
+            rw [hlhs, hrhs]
+    _ ≤ 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
+          simpa [evaluatedSlicePhaseFourInserted, evaluatedSlicePhaseFourSwapped] using hswap
+
 /- Scalar approximation chain for the evaluated-slice commutation.
 
 This is the core of the paper's proof of `lem:comm-data-processed-g`
@@ -510,26 +566,10 @@ lemma evaluatedSlice_scalar_chain_bound
               rightTensor (ι₁ := ι)
                 (((evaluatedSlicePointMeas params strategy q.1).outcome a) *
                   ((evaluatedSlicePointMeas params strategy q.2).outcome b))))).symm
-    have hswap :=
-      evaluatedSlice_phaseFour_pointSwap_right_bound
+    exact
+      evaluatedSlice_pointSwap_right_bound_of_norms
         params strategy eps delta gamma _hnorm _hgood C hC
-    calc
-      |avgOver 𝒟 phase3PaperInserted - avgOver 𝒟 phase4PaperSwapped|
-          = |avgOver 𝒟 (fun q => ∑ ab : EvaluatedSliceOutcome params,
-              ev strategy.state
-                (C q ab *
-                  rightTensor (ι₁ := ι)
-                    (((evaluatedSlicePointMeas params strategy q.2).outcome ab.2) *
-                      ((evaluatedSlicePointMeas params strategy q.1).outcome ab.1)))) -
-            avgOver 𝒟 (fun q => ∑ ab : EvaluatedSliceOutcome params,
-              ev strategy.state
-                (C q ab *
-                  rightTensor (ι₁ := ι)
-                    (((evaluatedSlicePointMeas params strategy q.1).outcome ab.1) *
-                      ((evaluatedSlicePointMeas params strategy q.2).outcome ab.2))))| := by
-              rw [hphase3_norm, hphase4_norm]
-      _ ≤ 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
-              simpa [𝒟, C] using hswap
+        phase3PaperInserted phase4PaperSwapped hphase3_norm hphase4_norm
   -- Paper phase five: remove the trailing `G^x` total from the line-87 endpoint.
   -- The `√ζ + 6√(γ(m+1))` bound decomposes as:
   --   - `√ζ` from `gCommStabilityTwo_raw_scalar` (the boundedness part of
@@ -640,38 +680,10 @@ lemma evaluatedSlice_scalar_chain_bound
                   (((evaluatedSlicePointMeas params strategy q.2).outcome b) *
                     ((evaluatedSlicePointMeas params strategy q.1).outcome a))))).symm
       have hswap :=
-        evaluatedSlice_phaseFour_pointSwap_right_bound
+        evaluatedSlice_pointSwap_right_bound_of_norms
           params strategy eps delta gamma _hnorm _hgood C hC
-      calc
-        |avgOver 𝒟 orderedDefect - avgOver 𝒟 swappedDefect|
-            = |avgOver 𝒟 (fun q => ∑ ab : EvaluatedSliceOutcome params,
-                ev strategy.state
-                  (C q ab *
-                    rightTensor (ι₁ := ι)
-                      (((evaluatedSlicePointMeas params strategy q.1).outcome ab.1) *
-                        ((evaluatedSlicePointMeas params strategy q.2).outcome ab.2)))) -
-              avgOver 𝒟 (fun q => ∑ ab : EvaluatedSliceOutcome params,
-                ev strategy.state
-                  (C q ab *
-                    rightTensor (ι₁ := ι)
-                      (((evaluatedSlicePointMeas params strategy q.2).outcome ab.2) *
-                        ((evaluatedSlicePointMeas params strategy q.1).outcome ab.1))))| := by
-                rw [hord_norm, hswap_norm]
-        _ = |avgOver 𝒟 (fun q => ∑ ab : EvaluatedSliceOutcome params,
-                ev strategy.state
-                  (C q ab *
-                    rightTensor (ι₁ := ι)
-                      (((evaluatedSlicePointMeas params strategy q.2).outcome ab.2) *
-                        ((evaluatedSlicePointMeas params strategy q.1).outcome ab.1)))) -
-              avgOver 𝒟 (fun q => ∑ ab : EvaluatedSliceOutcome params,
-                ev strategy.state
-                  (C q ab *
-                    rightTensor (ι₁ := ι)
-                      (((evaluatedSlicePointMeas params strategy q.1).outcome ab.1) *
-                        ((evaluatedSlicePointMeas params strategy q.2).outcome ab.2))))| := by
-                rw [abs_sub_comm]
-        _ ≤ 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
-                simpa [𝒟, C] using hswap
+          swappedDefect orderedDefect hswap_norm hord_norm
+      simpa [abs_sub_comm] using hswap
     have hordered_abs :
         |avgOver 𝒟 orderedDefect| ≤
           Real.sqrt zeta + 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
