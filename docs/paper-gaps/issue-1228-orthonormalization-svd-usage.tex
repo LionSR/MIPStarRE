@@ -33,7 +33,7 @@ basis $\ket{a,i}$, it defines
   X_a=\sum_i \ket{a,i}\bra{v_{a,i}},
   \qquad
   X=\sum_a X_a,
-  \tag{\texttt{def:matrix-decomposition-Q}}
+  \tag{\texttt{[blueprint] def:matrix-decomposition-Q}}
 \]
 and a projective measurement $T=\{T_a\}$ on the auxiliary space.  The basic
 identities are
@@ -47,7 +47,7 @@ The SVD is then applied to the rectangular $m\times d$ matrix $X$, where
 $m=\sum_a\operatorname{rank}(Q_a)\le d$:
 \[
   X=U\Sigma_{m\times d}V^\dagger.
-  \tag{\texttt{def:svd-of-X}}
+  \tag{\texttt{[blueprint] def:svd-of-X}}
 \]
 
 \section{What the SVD supplies}
@@ -57,7 +57,7 @@ The paper uses the SVD to replace the singular values of $X$ by $1$.  It defines
   \widehat X=UI_{m\times d}V^\dagger,
   \qquad
   P_a=\widehat X^\dagger T_a\widehat X.
-  \tag{\texttt{def:projective-P}}
+  \tag{\texttt{[blueprint] def:projective-P}}
 \]
 Only three consequences are used later.
 
@@ -138,11 +138,11 @@ same two identities for $\widehat X$ that the paper obtains from the SVD.%
 
 Mathlib supplies the finite-dimensional Hilbert-space and spectral ingredients:
 orthonormal bases, adjoints, the Hermitian spectral theorem, matrix/euclidean
-linear-map bridges, and the continuous-functional-calculus square root.  It does
-not currently provide, in this repository, a rectangular complex SVD or polar
-decomposition theorem with exactly the output shape needed here.  The
-project-local positive-Gram route fills that gap; possible upstreaming of the
-generic pieces is tracked separately.%
+linear-map bridges, and the continuous-functional-calculus square root.  The
+version of Mathlib pinned here does not currently provide a rectangular complex
+SVD or polar decomposition theorem with exactly the output shape needed here.
+The project-local positive-Gram route fills that gap; possible upstreaming of
+the generic pieces is tracked separately.%
 \footnote{Representative reused APIs include \leanid{Orthonormal},
 \leanid{Matrix.IsHermitian.eigenvectorBasis}, \leanid{CFC.sqrt}, and
 \leanid{CFC.sqrt\_unique}.  The local coisometry helper
