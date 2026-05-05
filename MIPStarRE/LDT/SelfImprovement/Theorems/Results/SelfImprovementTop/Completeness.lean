@@ -1,52 +1,24 @@
 import MIPStarRE.LDT.Basic.SubMeasurementFamilies
-import MIPStarRE.LDT.GlobalVariance.Theorems.Results
-import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
-import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
 import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport
 
 /-!
-
 # Final-fields completeness producer
 
-
-
 This module contains the completeness transport used to fill the `completeness`
-
 field of `SelfImprovementFinalFields`.  The statements formalize the passage
-
 from helper-stage completeness, through the orthonormalization SDD step, to the
-
 projective final-field completeness estimate in
-
 `references/ldt-paper/self_improvement.tex`, lines 351--414 and 713--717.
-
 -/
-
-
 
 namespace MIPStarRE.LDT.SelfImprovement
 
-
-
 open MIPStarRE.LDT
-
-open MIPStarRE.LDT.ExpansionHypercubeGraph
-
-open MIPStarRE.LDT.GlobalVariance
-
-open MIPStarRE.LDT.MakingMeasurementsProjective
-
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-
-
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
-
 
 /-! ## Final-fields completeness producer (issue #931)
 

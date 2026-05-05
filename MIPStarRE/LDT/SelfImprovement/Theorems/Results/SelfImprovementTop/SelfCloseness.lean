@@ -1,50 +1,25 @@
 import MIPStarRE.LDT.Basic.SubMeasurementFamilies
-import MIPStarRE.LDT.GlobalVariance.Theorems.Results
-import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
 import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport
 
 /-!
-
 # Final-fields self-closeness producer
 
-
-
 This module contains the self-closeness transport used to fill the `selfCloseness`
-
 field of `SelfImprovementFinalFields`.  The statements formalize the triangle
-
 transport through helper self-consistency and the orthonormalization SDD step in
-
 `references/ldt-paper/self_improvement.tex`, lines 727--741.
-
 -/
-
-
 
 namespace MIPStarRE.LDT.SelfImprovement
 
-
-
 open MIPStarRE.LDT
-
-open MIPStarRE.LDT.ExpansionHypercubeGraph
-
-open MIPStarRE.LDT.GlobalVariance
-
 open MIPStarRE.LDT.MakingMeasurementsProjective
-
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-
-
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
-
 
 /-! ## Final-fields self-closeness producer (issue #931)
 

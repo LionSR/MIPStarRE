@@ -10,11 +10,10 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport
 
 /-!
-# Self-improvement theorem wrappers and final-fields producers
+# Self-improvement theorem wrappers
 
 The main `selfImprovementHelper` and `selfImprovement` theorems,
-bridge-input variants, and the final-fields completeness and
-self-closeness producers.
+and the bridge-input variants used to enter the self-improvement theorem.
 
 ## Contents
 
@@ -29,26 +28,6 @@ self-closeness producers.
 - **selfImprovementFromSubMeas / selfImprovementFromBridgeInputs /
   selfImprovementFromBridgeInputsSubMeas** — bridge-input variants for
   submeasurement and packaged-bridge interfaces.
-- **completeness_transport_through_orthonormalization** — generic
-  transport lifting `completenessTransferSelfConsistentA` to the
-  `Unit`-indexed constant-family setting.
-- **final_fields_completeness_of_helper_completeness** — derives the
-  `completeness` field of `SelfImprovementFinalFields` from the
-  helper-stage completeness lower bound (paper lines 351–414, 713–717).
-- **final_fields_completeness_of_helper_completeness_of_small_errors** —
-  literal-threshold wrapper for the same completeness field, using the
-  final-stage absorption inequalities.
-- **self_closeness_transport_through_orthonormalization** — generic
-  three-step triangle transport `H.liftLeft → Ĥ.liftLeft → Ĥ.liftRight →
-  H.liftRight` for self-closeness.
-- **final_fields_self_closeness** — derives the `selfCloseness` field of
-  `SelfImprovementFinalFields` from already-supplied helper SSC and
-  orthonormalization SDD (paper lines 727–741).
-- **final_fields_self_closeness_of_small_errors** — literal-threshold wrapper
-  for the same self-closeness field, using the final-stage absorption
-  inequalities.
-- **final_fields_bounded** — imported standalone boundedness producer used by
-  `selfImprovement` to fill the final `BoundedByOperator` field from `1 ≤ Z`.
 
 ## References
 
