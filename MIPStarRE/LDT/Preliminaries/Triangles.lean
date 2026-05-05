@@ -99,7 +99,6 @@ theorem subMeas_total_ev_gap_abs_le_sqrt_card_qSDD
       ev ψ ((∑ a : Outcome, D a)ᴴ * (∑ a : Outcome, D a)) ≤
         (Fintype.card Outcome : Error) * qSDD ψ A B := by
     simpa [D, qSDD, qSDDCore] using triangleInequalityForVectorsSquared ψ D
-  have hq_nonneg : 0 ≤ qSDD ψ A B := qSDD_nonneg ψ A B
   have hcard_nonneg : 0 ≤ (Fintype.card Outcome : Error) := by positivity
   have hsqrt_tri :
       Real.sqrt (ev ψ ((∑ a : Outcome, D a)ᴴ * (∑ a : Outcome, D a))) ≤

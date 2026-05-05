@@ -747,11 +747,6 @@ theorem final_fields_total_difference_le_sqrt_card_data
                 (((polynomialEvaluationFamily params Hhat).liftRight) u)
                 (((polynomialEvaluationFamily params H.toSubMeas).liftRight) u)) := by
       simpa [totalGap, htot_H, htot_Hhat, abs_sub_comm] using hgap
-    have hq_nonneg :
-        0 ≤ qSDD strategy.state
-          (((polynomialEvaluationFamily params Hhat).liftRight) u)
-          (((polynomialEvaluationFamily params H.toSubMeas).liftRight) u) :=
-      qSDD_nonneg strategy.state _ _
     have hcard_nonneg : 0 ≤ (Fintype.card (Fq params) : Error) := by positivity
     have hgap_sqrt :
         totalGap ≤
