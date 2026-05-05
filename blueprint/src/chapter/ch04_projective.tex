@@ -923,8 +923,13 @@
 			MIPStarRE.LDT.MakingMeasurementsProjective.orthonormal_normalized_image_of_adjoint_comp_eigenvectors,
 			MIPStarRE.LDT.MakingMeasurementsProjective.orthonormal_normalized_matrix_image_of_gram_eigenvectors,
 			MIPStarRE.LDT.MakingMeasurementsProjective.orthonormal_normalized_matrix_image_of_positive_gram_spectrum,
+			MIPStarRE.LDT.MakingMeasurementsProjective.normalizedMatrixImageRows,
+			MIPStarRE.LDT.MakingMeasurementsProjective.positiveGramSpectrumImageRows,
 			MIPStarRE.LDT.MakingMeasurementsProjective.normalized_matrix_image_rows_mul_conjTranspose,
+			MIPStarRE.LDT.MakingMeasurementsProjective.normalized_matrix_image_rows_transpose_mixed,
 			MIPStarRE.LDT.MakingMeasurementsProjective.normalized_matrix_image_rows_mul_conjTranspose_of_positive_gram_spectrum,
+			MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_image_rows_transpose_mixed,
+			MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_card_le_rows,
 			MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_isHermitian_of_x_squared,
 			MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_coisometry,
 			MIPStarRE.LDT.MakingMeasurementsProjective.exists_xHat_of_rectangularSvd,
@@ -945,7 +950,10 @@
 		\texttt{orthonormal\_normalized\_image\_of\_adjoint\_comp\_eigenvectors}
 		records the singular-vector normalization calculation, while
 		\texttt{normalized\_matrix\_image\_rows\_mul\_conjTranspose} packages the
-		corresponding row-coisometry identity.  The formal lemma
+		corresponding row-coisometry identity, while
+		\texttt{positive\_gram\_spectrum\_image\_rows\_transpose\_mixed} records the
+		adjoint action $X^\dagger(\lambda^{-1/2}Xv)=\lambda^{1/2}v$ on the positive
+		spectral part of the Gram operator.  The formal lemma
 		\texttt{rectangularSvd\_xHat\_coisometry} records the corresponding matrix
 		calculation, and \texttt{exists\_xHat\_of\_rectangularSvd} packages the
 		resulting choice of $\widehat X$ together with the mixed square-root identity

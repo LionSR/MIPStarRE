@@ -126,6 +126,20 @@ theorem orthonormal_normalized_matrix_image_of_gram_eigenvectors
   rw [← Matrix.toEuclideanLin_conjTranspose_mul_self X]
   exact heig i
 
+/-- The eigenvector basis of a Hermitian Gram operator remains an eigenvector
+family after the Gram operator is written as `Xᴴ * X`. -/
+private theorem toEuclideanLin_gram_eigenvectorBasis
+    {μ ι : Type*}
+    [Fintype μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
+    (hQ : Q.IsHermitian)
+    (hgram : Xᴴ * X = Q) (i : ι) :
+    Matrix.toEuclideanLin (Xᴴ * X) (hQ.eigenvectorBasis i) =
+      (hQ.eigenvalues i : ℂ) • hQ.eigenvectorBasis i := by
+  rw [hgram]
+  simpa [Matrix.toEuclideanLin, Matrix.toLpLin_apply] using
+    congrArg (fun v : ι → ℂ => WithLp.toLp 2 v) (hQ.mulVec_eigenvectorBasis i)
+
 /-- Spectral form of `orthonormal_normalized_matrix_image_of_gram_eigenvectors`.
 
 After the right Gram matrix of `X` has been identified with a Hermitian
@@ -152,9 +166,29 @@ theorem orthonormal_normalized_matrix_image_of_positive_gram_spectrum
         (fun _i _j h => Subtype.ext h)
   · exact fun i => i.2
   · intro i
-    rw [hgram]
-    simpa [Matrix.toEuclideanLin, Matrix.toLpLin_apply] using
-      congrArg (fun v : ι → ℂ => WithLp.toLp 2 v) (hQ.mulVec_eigenvectorBasis i.1)
+    exact toEuclideanLin_gram_eigenvectorBasis X Q hQ hgram i.1
+
+/-- The matrix whose rows are the normalized images of a prescribed Gram
+eigenvector family. -/
+noncomputable def normalizedMatrixImageRows
+    {κ μ ι : Type*}
+    [Fintype μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ)
+    (v : κ → EuclideanSpace ℂ ι) (lam : κ → ℝ) :
+    Matrix κ μ ℂ :=
+  Matrix.of fun i r =>
+    (((1 / Real.sqrt (lam i) : ℝ) : ℂ) • Matrix.toEuclideanLin X (v i)) r
+
+/-- The matrix of normalized images indexed by the positive spectrum of a
+Hermitian Gram operator. -/
+noncomputable def positiveGramSpectrumImageRows
+    {μ ι : Type*}
+    [Fintype μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ) (hQ : Q.IsHermitian) :
+    Matrix {i : ι // 0 < hQ.eigenvalues i} μ ℂ :=
+  normalizedMatrixImageRows X
+    (fun i : {i : ι // 0 < hQ.eigenvalues i} => hQ.eigenvectorBasis i.1)
+    (fun i : {i : ι // 0 < hQ.eigenvalues i} => hQ.eigenvalues i.1)
 
 /-- The normalized positive Gram images assemble into a coisometry matrix.
 
@@ -170,15 +204,88 @@ theorem normalized_matrix_image_rows_mul_conjTranspose
     (hlam : ∀ i : κ, 0 < lam i)
     (heig : ∀ i : κ,
       Matrix.toEuclideanLin (Xᴴ * X) (v i) = (lam i : ℂ) • v i) :
-    (Matrix.of fun i r =>
-        (((1 / Real.sqrt (lam i) : ℝ) : ℂ) • Matrix.toEuclideanLin X (v i)) r) *
-        (Matrix.of fun i r =>
-          (((1 / Real.sqrt (lam i) : ℝ) : ℂ) • Matrix.toEuclideanLin X (v i)) r)ᴴ =
+    normalizedMatrixImageRows X v lam * (normalizedMatrixImageRows X v lam)ᴴ =
       (1 : Matrix κ κ ℂ) := by
-  exact Matrix.mul_conjTranspose_eq_one_of_orthonormal_rows
+  simpa [normalizedMatrixImageRows] using
+    Matrix.mul_conjTranspose_eq_one_of_orthonormal_rows
     (fun i : κ =>
       ((1 / Real.sqrt (lam i) : ℝ) : ℂ) • Matrix.toEuclideanLin X (v i))
     (orthonormal_normalized_matrix_image_of_gram_eigenvectors X v lam hv hlam heig)
+
+/-- The transpose of the normalized-image row matrix satisfies the mixed
+Gram identity on the chosen eigenvector family.
+
+This is the finite-dimensional calculation
+\[
+  X^\dagger(\lambda_i^{-1/2}Xv_i)=\lambda_i^{1/2}v_i,
+\]
+recorded as a matrix identity with one column for each eigenvector. -/
+theorem normalized_matrix_image_rows_transpose_mixed
+    {κ μ ι : Type*}
+    [Fintype μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ)
+    (v : κ → EuclideanSpace ℂ ι) (lam : κ → ℝ)
+    (hlam : ∀ i : κ, 0 < lam i)
+    (heig : ∀ i : κ,
+      Matrix.toEuclideanLin (Xᴴ * X) (v i) = (lam i : ℂ) • v i) :
+    Xᴴ * (normalizedMatrixImageRows X v lam)ᵀ =
+      Matrix.of fun j i => ((Real.sqrt (lam i) : ℝ) : ℂ) * v i j := by
+  ext j i
+  have hcoord :
+      Matrix.toEuclideanLin (Xᴴ * X) (v i) j = (lam i : ℂ) * v i j := by
+    simpa [Pi.smul_apply] using
+      congrArg (fun w : EuclideanSpace ℂ ι => w j) (heig i)
+  have hsqrt_ne : ((Real.sqrt (lam i) : ℝ) : ℂ) ≠ 0 := by
+    exact_mod_cast (ne_of_gt (Real.sqrt_pos.2 (hlam i)))
+  have hlam_eq :
+      (lam i : ℂ) =
+        ((Real.sqrt (lam i) : ℝ) : ℂ) *
+          ((Real.sqrt (lam i) : ℝ) : ℂ) := by
+    have hsqrt_sq : Real.sqrt (lam i) * Real.sqrt (lam i) = lam i := by
+      rw [← sq, Real.sq_sqrt (le_of_lt (hlam i))]
+    exact_mod_cast hsqrt_sq.symm
+  calc
+    (Xᴴ * (normalizedMatrixImageRows X v lam)ᵀ) j i =
+        ((1 / Real.sqrt (lam i) : ℝ) : ℂ) *
+          Matrix.toEuclideanLin (Xᴴ * X) (v i) j := by
+          simp only [one_div, Complex.ofReal_inv, Matrix.ofLp_toLpLin, Matrix.toLin'_apply,
+            normalizedMatrixImageRows, Matrix.mul_apply, Matrix.transpose_apply,
+            Matrix.conjTranspose_apply, Matrix.of_apply]
+          rw [← Matrix.mulVec_mulVec]
+          simp only [Matrix.mulVec, dotProduct, RCLike.star_def, PiLp.smul_apply,
+            Matrix.ofLp_toLpLin, Matrix.toLin'_apply, smul_eq_mul, Matrix.conjTranspose_apply]
+          rw [Finset.mul_sum]
+          refine Finset.sum_congr rfl ?_
+          intro r _hr
+          ring
+    _ = ((1 / Real.sqrt (lam i) : ℝ) : ℂ) * ((lam i : ℂ) * v i j) := by
+          rw [hcoord]
+    _ = ((Real.sqrt (lam i) : ℝ) : ℂ) * v i j := by
+          rw [hlam_eq]
+          rw [one_div, Complex.ofReal_inv]
+          field_simp [hsqrt_ne]
+
+/-- Spectral form of `normalized_matrix_image_rows_transpose_mixed`.
+
+On the positive spectral part of the Gram operator, the adjoint of `X` sends
+the normalized image of an eigenvector back to the eigenvector multiplied by the
+positive square root of its eigenvalue.  This is the matrix identity which
+records the nonzero singular values in the rectangular polar construction. -/
+theorem positive_gram_spectrum_image_rows_transpose_mixed
+    {μ ι : Type*}
+    [Fintype μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
+    (hQ : Q.IsHermitian)
+    (hgram : Xᴴ * X = Q) :
+    Xᴴ * (positiveGramSpectrumImageRows X Q hQ)ᵀ =
+      Matrix.of fun j i =>
+        ((Real.sqrt (hQ.eigenvalues i.1) : ℝ) : ℂ) *
+          hQ.eigenvectorBasis i.1 j := by
+  exact normalized_matrix_image_rows_transpose_mixed X
+    (fun i : {i : ι // 0 < hQ.eigenvalues i} => hQ.eigenvectorBasis i.1)
+    (fun i : {i : ι // 0 < hQ.eigenvalues i} => hQ.eigenvalues i.1)
+    (fun i => i.2)
+    (fun i => toEuclideanLin_gram_eigenvectorBasis X Q hQ hgram i.1)
 
 /-- Spectral form of `normalized_matrix_image_rows_mul_conjTranspose`.
 
@@ -191,18 +298,37 @@ theorem normalized_matrix_image_rows_mul_conjTranspose_of_positive_gram_spectrum
     (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
     (hQ : Q.IsHermitian)
     (hgram : Xᴴ * X = Q) :
-    (Matrix.of fun i r =>
-        (((1 / Real.sqrt (hQ.eigenvalues i.1) : ℝ) : ℂ) •
-          Matrix.toEuclideanLin X (hQ.eigenvectorBasis i.1)) r) *
-        (Matrix.of fun i r =>
-          (((1 / Real.sqrt (hQ.eigenvalues i.1) : ℝ) : ℂ) •
-            Matrix.toEuclideanLin X (hQ.eigenvectorBasis i.1)) r)ᴴ =
+    positiveGramSpectrumImageRows X Q hQ * (positiveGramSpectrumImageRows X Q hQ)ᴴ =
       (1 : Matrix {i : ι // 0 < hQ.eigenvalues i} {i : ι // 0 < hQ.eigenvalues i} ℂ) := by
-  exact Matrix.mul_conjTranspose_eq_one_of_orthonormal_rows
-    (fun i : {i : ι // 0 < hQ.eigenvalues i} =>
-      ((1 / Real.sqrt (hQ.eigenvalues i.1) : ℝ) : ℂ) •
-        Matrix.toEuclideanLin X (hQ.eigenvectorBasis i.1))
-    (orthonormal_normalized_matrix_image_of_positive_gram_spectrum X Q hQ hgram)
+  simpa [positiveGramSpectrumImageRows, normalizedMatrixImageRows] using
+    Matrix.mul_conjTranspose_eq_one_of_orthonormal_rows
+      (fun i : {i : ι // 0 < hQ.eigenvalues i} =>
+        ((1 / Real.sqrt (hQ.eigenvalues i.1) : ℝ) : ℂ) •
+          Matrix.toEuclideanLin X (hQ.eigenvectorBasis i.1))
+      (orthonormal_normalized_matrix_image_of_positive_gram_spectrum X Q hQ hgram)
+
+/-- The strictly positive Gram spectrum has cardinality at most the row
+dimension of the rectangular matrix.
+
+The proof uses the normalized-image orthonormal family above: an orthonormal
+family in `EuclideanSpace ℂ μ` is linearly independent, so its index set cannot
+be larger than the dimension of that space. -/
+theorem positive_gram_spectrum_card_le_rows
+    {μ ι : Type*}
+    [Fintype μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
+    (hQ : Q.IsHermitian)
+    (hgram : Xᴴ * X = Q) :
+    Fintype.card {i : ι // 0 < hQ.eigenvalues i} ≤ Fintype.card μ := by
+  have horth :
+      Orthonormal ℂ
+        (fun i : {i : ι // 0 < hQ.eigenvalues i} =>
+          ((1 / Real.sqrt (hQ.eigenvalues i.1) : ℝ) : ℂ) •
+            Matrix.toEuclideanLin X (hQ.eigenvectorBasis i.1)) :=
+    orthonormal_normalized_matrix_image_of_positive_gram_spectrum X Q hQ hgram
+  have hcard :=
+    (Orthonormal.linearIndependent horth).fintype_card_le_finrank
+  simpa using hcard
 
 /-- The row-coisometry identity for the rectangular SVD choice of `Xhat`.
 
