@@ -21,7 +21,12 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable, Sequence
 
-from audit_conclusion_shaped_hypotheses import _mask_lean_non_code
+from audit_conclusion_shaped_hypotheses import (
+    _identifier_char,
+    _line_number,
+    _mask_lean_non_code,
+    _starts_keyword,
+)
 
 
 EXCLUDE_DIRS: tuple[str, ...] = (".git", ".lake", "lake-packages", "tmp")
@@ -35,7 +40,12 @@ _DECL_RE = re.compile(
     r"(?P<name>[^\s:({\[]+)"
 )
 _TOP_LEVEL_COMMAND_RE = re.compile(
-    r"(?m)^(?:@\[[^\n]*\]|#[A-Za-z_][A-Za-z0-9_']*|[^\W\d][\w'?]*)(?:[ \t]|$)"
+    r"(?m)^(?:"
+    r"(?:@\[[^\n]*\]|#[A-Za-z_][A-Za-z0-9_']*|[^\W\d][\w'?]*)(?:[ \t]|$)"
+    r"|[ \t]+(?:@\[[^\n]*\][ \t]*)*"
+    r"(?:(?:private|protected|noncomputable|unsafe|nonrec)[ \t]+)*"
+    r"(?:lemma|theorem)[ \t]+"
+    r")"
 )
 _COMMENT_OR_WS_RE = re.compile(r"\s+")
 
@@ -72,10 +82,6 @@ class DuplicateReport:
         return not self.duplicate_groups
 
 
-def _line_number(text: str, offset: int) -> int:
-    return text.count("\n", 0, offset) + 1
-
-
 def mask_comments_and_strings(text: str) -> str:
     """Mask Lean comments and string-like literals with spaces, preserving offsets."""
 
@@ -88,23 +94,6 @@ def _find_top_level_command(masked: str, start: int) -> int:
     for match in _TOP_LEVEL_COMMAND_RE.finditer(masked, start):
         return match.start()
     return len(masked)
-
-
-def _starts_keyword(text: str, index: int, keyword: str) -> bool:
-    """Return whether ``keyword`` begins at ``index`` with identifier boundaries."""
-
-    if not text.startswith(keyword, index):
-        return False
-    before = text[index - 1] if index > 0 else " "
-    after_index = index + len(keyword)
-    after = text[after_index] if after_index < len(text) else " "
-    return not _identifier_char(before) and not _identifier_char(after)
-
-
-def _identifier_char(char: str) -> bool:
-    """Return whether ``char`` can continue a Lean identifier for boundary checks."""
-
-    return char.isalnum() or char in "_'?"
 
 
 def _equation_body_span(masked_decl: str, absolute_start: int) -> tuple[int, int] | None:

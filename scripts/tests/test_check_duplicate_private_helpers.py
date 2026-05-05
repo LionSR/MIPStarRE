@@ -184,6 +184,30 @@ class ParseHelperDeclarationTests(unittest.TestCase):
             names = {decl.name for decl in report.duplicate_groups[0].declarations}
             self.assertEqual(names, {"first", "second"})
 
+    def test_indented_mutual_declarations_terminate_previous_body(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "LDT" / "Foo.lean"
+            _write(
+                mod,
+                """\
+                mutual
+                  private theorem first : Bool → Bool
+                  | true => true
+                  | false => false
+
+                  private theorem second : Bool → Bool
+                  | true => true
+                  | false => false
+                end
+                """,
+            )
+            report = run_audit(root, min_normalized_chars=5)
+            self.assertEqual(report.scanned_declarations, 2)
+            self.assertEqual(len(report.duplicate_groups), 1)
+            names = {decl.name for decl in report.duplicate_groups[0].declarations}
+            self.assertEqual(names, {"first", "second"})
+
     def test_unicode_and_question_identifier_boundaries_do_not_split_keywords(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
