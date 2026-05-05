@@ -746,6 +746,38 @@ theorem exists_rectangular_coisometry_with_positive_gram_spectrum_right_rows
     exists_rectangular_coisometry_extending_orthonormal_rows row hrow e hcard
   exact ⟨W, hW, by simpa [row] using hrows⟩
 
+/-- Left multiplication by the transpose of a unitary preserves row
+coisometries.
+
+This is the coisometry half of the polar-extension calculation for the
+candidate `Xhat = Uᵀ W`: the rectangular factor `W` has orthonormal rows, and
+the square factor `U` merely changes the orthonormal basis of the row space. -/
+theorem transpose_unitary_mul_rectangular_coisometry
+    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι]
+    (U : Matrix μ μ ℂ) (W : Matrix μ ι ℂ)
+    (hU_right : Uᴴ * U = (1 : Matrix μ μ ℂ))
+    (hW : W * Wᴴ = (1 : Matrix μ μ ℂ)) :
+    (Uᵀ * W) * (Uᵀ * W)ᴴ = (1 : Matrix μ μ ℂ) := by
+  have hU_transpose : Uᵀ * (Uᵀ)ᴴ = (1 : Matrix μ μ ℂ) := by
+    ext i j
+    have hentry := congrFun (congrFun hU_right j) i
+    have hone : (1 : Matrix μ μ ℂ) j i = (1 : Matrix μ μ ℂ) i j := by
+      by_cases hij : i = j
+      · subst j
+        simp
+      · have hji : j ≠ i := fun h => hij h.symm
+        simp [hij, hji]
+    rw [← hone]
+    simpa [Matrix.mul_apply, Matrix.conjTranspose_apply, Matrix.transpose_apply,
+      mul_comm] using hentry
+  calc
+    (Uᵀ * W) * (Uᵀ * W)ᴴ =
+        Uᵀ * (W * Wᴴ) * (Uᵀ)ᴴ := by
+          rw [Matrix.conjTranspose_mul]
+          simp [Matrix.mul_assoc]
+    _ = Uᵀ * (Uᵀ)ᴴ := by rw [hW, Matrix.mul_one]
+    _ = 1 := hU_transpose
+
 /-- The row-coisometry identity for the rectangular SVD choice of `Xhat`.
 
 If `U` and `V` are unitary in the directions used below, and if the rectangular
