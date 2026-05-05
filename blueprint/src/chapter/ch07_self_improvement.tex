@@ -233,6 +233,10 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
     H^u_h &= A^u_{h(u)} \cdot T_h \cdot A^u_{h(u)} = A^u_{h(u)} \cdot H^u_h \cdot A^u_{h(u)}, \label{eq:h-sandwich}\\
     A^u_{h(u)} \cdot H^u_{h'} \cdot A^u_{h(u)} &= H^u_{h'} \cdot A^u_{h(u)} = \bigl(A^u_{h(u)} \cdot T_{h'} \cdot A^u_{h(u)}\bigr)\cdot \bone{h(u) = h'(u)}. \label{eq:h-blt}
   \end{align}
+  \lean{MIPStarRE.LDT.SelfImprovement.pointConditioned_sandwichedPolynomialOutcome_outer_eq_ite}
+  \lean{MIPStarRE.LDT.SelfImprovement.ev_opTensor_pointConditioned_sandwichedPolynomialOutcome_outer_eq_indicator}
+  \lean{MIPStarRE.LDT.SelfImprovement.polynomial_off_diagonal_outer_sandwich_eq_indicator_avg}
+  \leanok
   The strong self-consistency expression is
   \begin{equation}\label{eq:self-consistency-baby-step}
     \sum_{h\in\polyfunc{m}{q}{d}} \bra{\psi} H_h \ot H_h \ket{\psi}
@@ -283,11 +287,30 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
     \leq 1,
   \end{equation}
   so Schwartz--Zippel bounds the indicator average by $md/q$ and proves~\eqref{eq:threw-in-h-prime}.
+  \lean{MIPStarRE.LDT.SelfImprovement.polynomial_collision_pointMeasurement_sandwichTensor_avg_le_mdq}
+  \lean{MIPStarRE.LDT.SelfImprovement.polynomial_off_diagonal_swapped_indicator_sandwich_avg_le_mdq}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalOuterSandwichQuantity}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalIndicatorQuantity}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalOneSidedSwappedIndicatorQuantity}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalSwappedIndicatorQuantity}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalOuterSandwichQuantity_eq_indicator}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalSwappedIndicatorQuantity_le_mdq}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalIndicatorQuantity_le_swapped_of_abs_transports}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalOuterSandwichQuantity_le_two_sqrt_variance_add_mdq}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalOuterSandwichQuantity_le_two_sqrt_variance_add_mdq_of_abs_transports}
+  \leanok
 
   Using~\eqref{eq:h-blt}, the right-hand side of~\eqref{eq:threw-in-h-prime} is
   \begin{equation}\label{eq:delete-an-A}
     \E_{u} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi} \bigl(H^{u}_{h'} \cdot A^{u}_{h(u)}\bigr) \ot T_h \ket{\psi}.
   \end{equation}
+  \lean{MIPStarRE.LDT.SelfImprovement.sandwichedPolynomialOutcome_mul_pointConditioned_eq_ite}
+  \lean{MIPStarRE.LDT.SelfImprovement.pointConditioned_sandwichedPolynomialOutcome_outer_eq_right}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperFullOuterSandwichQuantity}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperDeleteAQuantity}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperFullOuterSandwichQuantity_eq_release_add_offDiagonalOuterSandwichQuantity}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperFullOuterSandwichQuantity_eq_deleteAQuantity}
+  \leanok
   Replace the remaining copy of $A^u_{h(u)}$ by $A^v_{h(v)}$:
   \begin{equation}\label{eq:swap-u-for-v-attack-of-the-clones}
     \eqref{eq:delete-an-A}
@@ -300,6 +323,11 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
     \approx_{\sqrt{2\delta}}
     \E_{u,v} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi} H^{u}_{h'}  \ot \bigl(T_h \cdot A^{v}_{h(v)}\bigr) \ket{\psi}.
   \end{equation}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperDeleteAClonedQuantity}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperMoveOverVQuantity}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperDeleteAQuantity_le_moveOverV_of_abs_transports}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperMoveOverVQuantity_le_deleteA_of_abs_transports}
+  \leanok
   Substituting~\eqref{eq:swap-Z-for-A}, then~\eqref{eq:Z-greater-than-A}, and finally the already proved bound~\eqref{eq:explicit-bound-for-A-consistency}, one obtains
   \[
     \eqref{eq:move-over-v}
@@ -317,6 +345,14 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.HelperStrongSelfConsistencyProducerInputs}
   and the exact residual-side expansion
   \lean{MIPStarRE.LDT.SelfImprovement.helper_mass_sub_release_eq_polynomial_off_diagonal}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalBareQuantity}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalBareQuantity_le_one}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_residualLowerBound_of_offDiagonal_bound}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_residualLowerBound_of_paper_chain_bound}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalBareQuantity_le_paper_chain_of_scalar_transports}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance_offDiagonal}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance_paperChain}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_producer_inputs_of_selfConsistency_localVariance_scalarTransports}
   \leanok
   and then uses the proved wrappers
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_of_helper_conclusion}
