@@ -38,6 +38,15 @@ theorem trace_reindex {α β R : Type*} [Fintype α] [Fintype β]
   rw [← e.symm.sum_comp (fun i : α => M i i)]
   rfl
 
+/-- The trace pairing of two block-diagonal matrices is the sum of the trace
+pairings of the corresponding diagonal blocks. -/
+theorem trace_blockDiagonal_mul {o m R : Type*}
+    [Fintype o] [DecidableEq o] [Fintype m] [NonUnitalNonAssocSemiring R]
+    (B D : o → Matrix m m R) :
+    Matrix.trace (Matrix.blockDiagonal B * Matrix.blockDiagonal D) =
+      ∑ b : o, Matrix.trace (B b * D b) := by
+  rw [← Matrix.blockDiagonal_mul B D, Matrix.trace_blockDiagonal]
+
 end Matrix
 
 namespace MIPStarRE.Quantum
