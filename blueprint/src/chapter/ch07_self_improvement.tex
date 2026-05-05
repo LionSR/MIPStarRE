@@ -497,11 +497,19 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpComplementarySlacknessEquation}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.primalMeasurement}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.complementarySlacknessEquation}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSubmeasurementToSubMeas}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPointRealizationOfStrategy}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixAveragedPointOperator_ofPointRealization}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpDualSlackOperator_ofPointRealization}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.toSdpOptimalPairWithSlackness_of_dualDominatesIdentity}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness.toSdpStatementWithSlackness_of_dualDominatesIdentity}
   \leanok
   From a matrix-level strong-duality witness with complementary slackness of the
   shape asserted by Lemma~\ref{lem:sdp}, one obtains a complete measurement
   \(\{T_g\}\), a feasible dual operator \(Z\), equality of the primal and dual
-  objectives, and the equations \(T_gZ=T_gA_g\) for all \(g\).
+  objectives, and the equations \(T_gZ=T_gA_g\) for all \(g\).  The formal
+  bridge to the current abstract helper interface is conditional on the
+  additional reduced-interface bound \(I\leq Z\) for this selected dual witness.
 \end{lemma}
 \begin{proof}
   \leanok
@@ -960,9 +968,11 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   and now \ref{item:self-improvement-boundedness} of Lemma~\ref{lem:self-improvement-helper} bounds this by $\widehat{\zeta} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}}$.
   The formal boundedness field
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_bounded}
+  \leanok
   is the corresponding operator-monotonicity step: once the SDP dual witness
-  satisfies $I\le Z$, the total mass of the projective submeasurement is bounded
-  by $Z\ot I$ with zero boundedness error.
+  satisfies $I\le Z$, the total mass of any left-placed submeasurement, and in
+  particular of the final projective submeasurement, is bounded by $Z\ot I$ with
+  zero boundedness error.
 
   Thus the four conclusions hold with errors
   \[
