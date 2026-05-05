@@ -904,10 +904,6 @@ theorem gBotSelfConsistency
               rcases j with ⟨j₁, j₂⟩
               simp [T, leftTensor, rightTensor, sub_eq_add_neg]
               ring
-            have hcomplete_outcome_T :
-                (postprocess ((family.meas x).toSubMeas) (fun _ => ())).outcome () = T := by
-              simpa [T, completePartSubMeas] using
-                completePartSubMeas_outcome_unit params family x
             calc
               qSDD ψbi
                   ((incompletePartLeftFamily params family) x)
@@ -943,7 +939,8 @@ theorem gBotSelfConsistency
                     ((completePartRightFamily params family) x) := by
                           simp [qSDD, qSDDCore, completePartLeftFamily,
                             completePartRightFamily, completePartSubMeas,
-                            leftPlacedSubMeas, rightPlacedSubMeas, T, hcomplete_outcome_T]
+                            leftPlacedSubMeas, rightPlacedSubMeas, T,
+                            (family.meas x).sum_eq_total]
     _ ≤ zeta := hcomplete_total
 
 end MIPStarRE.LDT.Pasting

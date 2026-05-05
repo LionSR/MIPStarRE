@@ -244,8 +244,17 @@ lemma postprocess_decide_false_add_true_eq_total
     {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]
     (A : SubMeas Outcome ι) (a0 : Outcome) :
     (postprocess A (fun a => decide (a = a0))).outcome false + A.outcome a0 = A.total := by
-  have hsum := (postprocess A (fun a => decide (a = a0))).sum_eq_total
-  simpa [Bool.forall_bool, add_comm, postprocess_decide_eq_true_outcome] using hsum
+  set P := postprocess A (fun a => decide (a = a0))
+  have hsum : ∑ b : Bool, P.outcome b = P.total := P.sum_eq_total
+  have hexpand : ∑ b : Bool, P.outcome b = P.outcome false + P.outcome true := by
+    rw [Fintype.sum_bool]
+    exact add_comm _ _
+  have htotal : P.total = A.total := postprocess_total A _
+  have htrue : P.outcome true = A.outcome a0 :=
+    postprocess_decide_eq_true_outcome A a0
+  rw [hexpand, htrue] at hsum
+  rw [htotal] at hsum
+  exact hsum
 
 lemma postprocess_decide_eq_false_outcome
     {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]

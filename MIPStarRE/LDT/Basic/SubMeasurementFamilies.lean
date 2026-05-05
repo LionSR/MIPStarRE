@@ -97,6 +97,21 @@ noncomputable def postprocess {α β : Type*} {ι : Type*} [Fintype ι] [Decidab
 
 namespace SubMeas
 
+/-- The outcome of a postprocessed submeasurement is the sum over the fiber of
+the readout map. -/
+@[simp] theorem postprocess_outcome {α β ι : Type*}
+    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq β] [DecidableEq ι]
+    (A : SubMeas α ι) (f : α → β) (b : β) :
+    (postprocess A f).outcome b =
+      ∑ a ∈ Finset.univ.filter (fun a => f a = b), A.outcome a := by
+  classical
+  simp only [postprocess]
+  refine Finset.sum_congr ?_ ?_
+  · ext a
+    simp
+  · intro a _
+    rfl
+
 /-- Postprocessing a submeasurement by the identity readout leaves it unchanged. -/
 @[simp] theorem postprocess_id {α ι : Type*}
     [Fintype α] [Fintype ι] [DecidableEq ι]
