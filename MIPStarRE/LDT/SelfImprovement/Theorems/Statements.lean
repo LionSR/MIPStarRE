@@ -44,12 +44,39 @@ structure SdpOptimalPair (params : Parameters) [FieldModel params.q]
     ∀ g : Polynomial params,
       0 ≤ sdpDualSlackOperator params strategy Z g
 
+/-- SDP optimal-pair data strengthened by complementary slackness.
+
+The reduced `SdpOptimalPair` interface above contains only the feasibility and
+normalization facts already produced by the current Lean wrapper for `lem:sdp`.
+The paper's strong-duality argument also gives complementary slackness.  This
+successor interface records that additional conclusion without claiming that
+the reduced wrapper has already proved it. -/
+structure SdpOptimalPairWithSlackness (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) (Z : MIPStarRE.Quantum.Op ι) : Prop where
+  toSdpOptimalPair :
+    SdpOptimalPair params strategy T Z
+  complementarySlackness :
+    ∀ g : Polynomial params,
+      sdpComplementarySlacknessEquation params strategy T Z g
+
 /-- Reduced conclusion for the currently formalized fragment of `lem:sdp`. -/
 structure SdpStatement (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) : Prop where
   witness :
     ∃ T : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SdpOptimalPair params strategy T Z
+
+/-- SDP conclusion strengthened by complementary slackness.
+
+This is the statement shape expected from the paper's strong-duality argument:
+it has the same witnesses as `SdpStatement`, but their optimal-pair data also
+contains complementary slackness. -/
+structure SdpStatementWithSlackness (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι) : Prop where
+  witness :
+    ∃ T : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+      SdpOptimalPairWithSlackness params strategy T Z
 
 /-- The operator inside the left-hand side of `lem:add-in-u` at a fixed point `u`.
 Returns a bipartite operator `(M u).outcome o ⊗ H.outcome h`. -/
@@ -214,6 +241,24 @@ structure SelfImprovementHelperConclusion (params : Parameters) [FieldModel para
   dualDominatesAveragedPoint :
     ∀ g : Polynomial params,
       0 ≤ sdpDualSlackOperator params strategy Z g
+
+/-- Helper conclusion strengthened by the SDP complementary-slackness equation.
+
+This is the paper-facing successor to `SelfImprovementHelperConclusion` needed
+by the helper-completeness chain: it keeps all fields of the reduced helper
+conclusion and additionally records the strong-duality consequence
+`T_g Z = T_g A_g`. -/
+structure SelfImprovementHelperConclusionWithSlackness (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : Measurement (Polynomial params) ι)
+    (H : SubMeas (Polynomial params) ι)
+    (Z : MIPStarRE.Quantum.Op ι) (eps delta : Error) : Prop where
+  toHelperConclusion :
+    SelfImprovementHelperConclusion params strategy T H Z eps delta
+  complementarySlackness :
+    ∀ g : Polynomial params,
+      sdpComplementarySlacknessEquation params strategy T.toSubMeas Z g
 
 /-- Conclusion of `thm:self-improvement`. -/
 structure SelfImprovementConclusion (params : Parameters) [FieldModel params.q]

@@ -65,6 +65,13 @@ identities, and the reduced `sdp` and `addInU` wrappers.
 - **helper_hhat_vs_z_of_self_consistency_and_complementary_slackness** — the
   `Hhat`-versus-`Z` comparison with both Cauchy--Schwarz estimates produced from
   point self-consistency.
+- **helper_hhat_vs_z_of_self_consistency_and_helper_slackness** — the same
+  comparison using the strengthened helper conclusion that carries SDP
+  complementary slackness.
+- **helper_sdp_optimal_pair_with_slackness** — reconstructs the slackness-carrying
+  SDP pair from the strengthened helper conclusion.
+- **helper_completeness_of_self_consistency_helper_slackness_input_consistency** —
+  helper completeness with no separate `hslack` argument.
 - **sdp** — reduced wrapper instantiating the paper's SDP primal/dual
   witnesses.
 - **addInU** — reduced wrapper for `AddInUStatement` from the
@@ -1795,6 +1802,94 @@ theorem helper_completeness_of_self_consistency_complementary_slackness_input_co
       params strategy T.toSubMeas delta hssc
   · exact helper_second_move_abs_sub_first_moved_le_sqrt_delta
       params strategy T.toSubMeas delta hssc
+
+/-- Extract the orientation of complementary slackness used by the helper
+completeness proof from the strengthened helper conclusion. -/
+theorem helper_slackness_eq_of_helper_with_slackness
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    {T : Measurement (Polynomial params) ι}
+    {Hhat : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (hhelper :
+      SelfImprovementHelperConclusionWithSlackness params strategy T Hhat Z eps delta)
+    (h : Polynomial params) :
+    T.toSubMeas.outcome h * averagedPointOperator params strategy h =
+      T.toSubMeas.outcome h * Z :=
+  (hhelper.complementarySlackness h).symm
+
+/-- Reconstruct the slackness-carrying SDP pair from the strengthened helper
+conclusion. -/
+theorem helper_sdp_optimal_pair_with_slackness
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    {T : Measurement (Polynomial params) ι}
+    {Hhat : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (hhelper :
+      SelfImprovementHelperConclusionWithSlackness params strategy T Hhat Z eps delta) :
+    SdpOptimalPairWithSlackness params strategy T.toSubMeas Z :=
+  { toSdpOptimalPair := hhelper.toHelperConclusion.sdpWitness
+    complementarySlackness := hhelper.complementarySlackness }
+
+/-- The `Hhat`-versus-`Z` comparison from point self-consistency and a helper
+conclusion carrying SDP complementary slackness.
+
+This is the version of `eq:gonna-use-this-later-H-versus-Z` whose inputs are a
+single strengthened helper conclusion and point-measurement self-consistency,
+rather than a separate family of slackness equations. -/
+theorem helper_hhat_vs_z_of_self_consistency_and_helper_slackness
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    {T : Measurement (Polynomial params) ι}
+    {Hhat : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (hhelper :
+      SelfImprovementHelperConclusionWithSlackness params strategy T Hhat Z eps delta)
+    (hssc : BipartiteSSCRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta) :
+    ev strategy.state (leftTensor (ι₂ := ι) Z) - 3 * Real.sqrt delta ≤
+      subMeasMass strategy.state Hhat.liftLeft :=
+  helper_hhat_vs_z_of_self_consistency_and_complementary_slackness
+    params strategy eps delta hhelper.toHelperConclusion hssc
+    (helper_slackness_eq_of_helper_with_slackness params strategy eps delta hhelper)
+
+/-- Helper-stage completeness from point self-consistency, a helper conclusion
+carrying SDP complementary slackness, and input consistency.
+
+This wrapper removes the standalone `hslack` hypothesis from
+`helper_completeness_of_self_consistency_complementary_slackness_input_consistency`;
+the slackness equations are read from
+`SelfImprovementHelperConclusionWithSlackness`. -/
+theorem helper_completeness_of_self_consistency_helper_slackness_input_consistency
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (G : Measurement (Polynomial params) ι)
+    (eps delta nu : Error)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
+    {T : Measurement (Polynomial params) ι}
+    {Hhat : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (hhelper :
+      SelfImprovementHelperConclusionWithSlackness params strategy T Hhat Z eps delta)
+    (hssc : BipartiteSSCRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta)
+    (hcons : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params G.toSubMeas) nu) :
+    CompletenessAtLeast strategy.state Hhat.liftLeft
+      ((1 - nu) - selfImprovementHelperError params eps delta) :=
+  helper_completeness_of_self_consistency_complementary_slackness_input_consistency
+    params strategy G eps delta nu heps hdelta hhelper.toHelperConclusion hssc
+    (helper_slackness_eq_of_helper_with_slackness params strategy eps delta hhelper)
+    hcons
 
 /-- Reduced version of `lem:sdp`.
 
