@@ -474,6 +474,94 @@ theorem matrixSdpCanonicalPrimalBlockMatrix_feasible
   nonnegative := matrixSdpCanonicalPrimalBlockMatrix_nonneg params model T
   constraintEqOne := matrixSdpCanonicalConstraintOperator_primalBlockMatrix params model T
 
+/-- Every diagonal block `X_{bb}` of a positive canonical primal matrix is
+positive semidefinite.
+
+This is the formal version of the paper's assertion that, from `X ≥ 0`, each
+principal block `X_{ii}` is positive. -/
+theorem matrixSdpCanonicalDiagonalBlock_nonneg
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    {X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)}
+    (hX : 0 ≤ X)
+    (b : MatrixSdpCanonicalBlockIndex params) :
+    0 ≤ matrixSdpCanonicalDiagonalBlock params model X b := by
+  refine Matrix.nonneg_iff_posSemidef.mpr ?_
+  have hpos : Matrix.PosSemidef X := Matrix.nonneg_iff_posSemidef.mp hX
+  convert hpos.submatrix (fun i : model.space.carrier => (b, i)) using 1
+
+/-- The polynomial diagonal blocks of a feasible canonical primal matrix form a
+submeasurement total.
+
+The canonical constraint gives `X_{none,none} + ∑_g X_{gg} = I`; since the
+slack block `X_{none,none}` is positive, the polynomial blocks satisfy
+`∑_g X_{gg} ≤ I`. -/
+theorem matrixSdpCanonicalPrimalFeasible_sum_diagonalBlock_some_le_one
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    {X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)}
+    (hX : MatrixSdpCanonicalPrimalFeasible params model X) :
+    ∑ g : Polynomial params,
+        matrixSdpCanonicalDiagonalBlock params model X (some g) ≤
+      1 := by
+  have hsum :
+      matrixSdpCanonicalDiagonalBlock params model X none +
+          ∑ g : Polynomial params,
+            matrixSdpCanonicalDiagonalBlock params model X (some g) =
+        1 := by
+    simpa [matrixSdpCanonicalConstraintOperator, Fintype.sum_option] using
+      hX.constraintEqOne
+  have hslack :
+      0 ≤ matrixSdpCanonicalDiagonalBlock params model X none :=
+    matrixSdpCanonicalDiagonalBlock_nonneg params model hX.nonnegative none
+  calc
+    ∑ g : Polynomial params,
+        matrixSdpCanonicalDiagonalBlock params model X (some g)
+        ≤ matrixSdpCanonicalDiagonalBlock params model X none +
+            ∑ g : Polynomial params,
+              matrixSdpCanonicalDiagonalBlock params model X (some g) := by
+          simpa using add_le_add_right hslack
+            (∑ g : Polynomial params,
+              matrixSdpCanonicalDiagonalBlock params model X (some g))
+    _ = 1 := hsum
+
+/-- The paper primal submeasurement extracted from a feasible canonical primal
+matrix by setting `T_g = X_{gg}` on the polynomial blocks. -/
+noncomputable def matrixSdpCanonicalExtractedPrimalSubmeasurement
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (hX : MatrixSdpCanonicalPrimalFeasible params model X) :
+    MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space where
+  effect g := matrixSdpCanonicalDiagonalBlock params model X (some g)
+  pos g := matrixSdpCanonicalDiagonalBlock_nonneg params model hX.nonnegative (some g)
+  sum_le_one := matrixSdpCanonicalPrimalFeasible_sum_diagonalBlock_some_le_one
+    params model hX
+
+@[simp] theorem matrixSdpCanonicalExtractedPrimalSubmeasurement_effect
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (hX : MatrixSdpCanonicalPrimalFeasible params model X)
+    (g : Polynomial params) :
+    (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX).effect g =
+      matrixSdpCanonicalDiagonalBlock params model X (some g) :=
+  rfl
+
+/-- A feasible canonical primal matrix determines a paper primal
+submeasurement with effects `T_g = X_{gg}`. -/
+theorem matrixSdpCanonicalPrimalFeasible_extracts_submeasurement
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (hX : MatrixSdpCanonicalPrimalFeasible params model X) :
+    ∃ T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space,
+      ∀ g : Polynomial params,
+        T.effect g = matrixSdpCanonicalDiagonalBlock params model X (some g) := by
+  refine ⟨matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX, ?_⟩
+  intro g
+  rfl
+
 /-- The canonical objective matrix `C = diag(A_g, 0)` in the paper's block SDP. -/
 noncomputable def matrixSdpCanonicalObjectiveBlockFamily (params : Parameters)
     [FieldModel params.q]
