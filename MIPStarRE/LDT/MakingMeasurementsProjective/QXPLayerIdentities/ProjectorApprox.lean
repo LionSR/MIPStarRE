@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.LayerAlgebra
+import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.RectangularSvd
 
 /-!
 # Section 5 — P-Q approximation for QXP layers

@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.RectangularSvd
+import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.PositiveGram
 
 /-!
 # Section 5 — Q/X/XHat/P algebraic identities
