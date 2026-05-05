@@ -437,9 +437,73 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
 
 \subsection{A Semidefinite Program}
 
+\begin{lemma}[Uniform SDP feasible witness]\label{lem:sdp-uniform-feasible-witness}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdpStrictPrimalWeight}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdpStrictPrimalSubMeas}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdpStrictPrimalSubMeas_total}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdpStrictDualWitness}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdpStrictDualWitness_nonneg}
+  \lean{MIPStarRE.LDT.SelfImprovement.one_le_sdpStrictDualWitness}
+  \leanok
+  The uniform primal family
+  \(T_g=(2|\polyfunc{m}{q}{d}|)^{-1}I\) has total mass \((1/2)I\), and the dual
+  operator \(Z=2I\) is positive semidefinite and dominates the identity.
+\end{lemma}
+\begin{proof}
+  \leanok
+  This is the elementary Slater-type feasible witness recorded in the basic
+  self-improvement definitions.
+\end{proof}
+
+\begin{lemma}[Explicit matrix feasible bounds]\label{lem:sdp-matrix-feasible-bounds}
+  \uses{lem:sdp-uniform-feasible-witness}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStrictPrimalSubmeasurement}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStrictPrimalSubmeasurement_sum_effect}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStrictDualWitness}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStrictDualWitness_nonneg}
+  \lean{MIPStarRE.LDT.SelfImprovement.one_le_matrixSdpStrictDualWitness}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixAveragedPointOperator_le_one}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStrictDualWitness_dualFeasible}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpFeasibleBounds}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpFeasibleBounds_canonical}
+  \leanok
+  In every concrete matrix realization, the uniform family
+  \(T_g=(2|\polyfunc{m}{q}{d}|)^{-1}I\) has total mass \((1/2)I\).  The dual
+  operator \(Z=2I\) is positive semidefinite, dominates the identity, and
+  satisfies \(Z\geq A_g\) for every polynomial \(g\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  The formal proof is the matrix specialization of the uniform SDP witness
+  recorded in the basic definitions.  The inequality \(A_g\leq I\) follows by
+  averaging the point-measurement effects and using the submeasurement bound at
+  each point.
+\end{proof}
+
+\begin{lemma}[Matrix slackness output]\label{lem:sdp-matrix-slackness-output}
+  \uses{lem:sdp}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness.exists_measurement_witness}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpComplementarySlacknessEquation}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.primalMeasurement}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.complementarySlacknessEquation}
+  \leanok
+  From a matrix-level strong-duality witness with complementary slackness of the
+  shape asserted by Lemma~\ref{lem:sdp}, one obtains a complete measurement
+  \(\{T_g\}\), a feasible dual operator \(Z\), equality of the primal and dual
+  objectives, and the equations \(T_gZ=T_gA_g\) for all \(g\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  The identity \(\sum_gT_g=I\) turns the optimal primal submeasurement into a
+  measurement.  The zero-defect form \(T_g(Z-A_g)=0\) is equivalent, by
+  distributivity, to the displayed equation \(T_gZ=T_gA_g\).
+\end{proof}
+
 \begin{lemma}[Dual SDP and complementary slackness]\label{lem:sdp}
   \lean{MIPStarRE.LDT.SelfImprovement.sdp}
-	\leanok
+  \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness}
   Let
   \[
     A_g = \E_{u \sim \F_q^m} A^u_{g(u)}.
@@ -510,6 +574,19 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
     X\Big( \sum_{i,j} \,z_{ij} D_{ij} - C \Big) \,=\, 0.
   \end{equation}
   We may assume that $X$ is block diagonal. Translating~\eqref{eq:complementary-slackness} back to the variables $\{T_g\}$ and~$Z$ yields $T_g(Z-A_g)=0$ for every~$g$ and $X_{M+1,M+1}=0$. The latter identity is exactly $\sum_g T_g=I$, and the former is~\eqref{eq:slater}.
+  In the concrete matrix realization, Lean records the defect-zero condition as
+  \texttt{matrixSdpComplementarySlacknessDefect}; the theorem
+  \texttt{MatrixSdpOptimalWitness.complementarySlacknessEquation} translates it
+  to the displayed equation \(T_gZ=T_gA_g\), while
+  \texttt{MatrixSdpOptimalWitness.primalMeasurement} packages
+  \(\sum_g T_g=I\) as a complete measurement.  The statement
+  \texttt{MatrixSdpStatementWithSlackness} records this matrix-level
+  strong-duality output without identifying it with the reduced feasible
+  witness supplied by \texttt{sdp}.  The explicit Slater witnesses used above
+  are separately recorded by \texttt{matrixSdpStrictPrimalSubmeasurement},
+  \texttt{matrixSdpStrictDualWitness}, and
+  \texttt{matrixSdpFeasibleBounds\_canonical}; the dual feasibility of \(2I\)
+  follows from \texttt{matrixAveragedPointOperator\_le\_one}.
 \end{proof}
 
 \begin{lemma}[Averaging over the evaluation point]\label{lem:add-in-u}
