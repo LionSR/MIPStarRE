@@ -1,6 +1,7 @@
 import MIPStarRE.LDT.Test.MainTheorem.CompletionTransport
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain
 import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation
+import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationBridge
 
 /-!
 # Orthonormalization and completion data
@@ -166,6 +167,94 @@ noncomputable def ofRepairInputs
         (unsymmetrizedRightPOVM rolePackage.roleMeasurement))
       (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)
   rightRepair := rightRepair
+
+/-- Build the line-130 orthonormalization input from QXP-layer repair witnesses.
+
+The spectral-truncation fields are still supplied by
+`spectralTruncationInput_of_sourceAlmostProjective`.  The two remaining repair
+fields are obtained by choosing the canonical local projective submeasurement
+attached to each QXP layer, so the repaired lifted family has the required form
+`P_a ⊗ I`. -/
+noncomputable def ofQXPLayerRepairWitnesses
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
+    (leftWitness :
+      MakingMeasurementsProjective.SpectralTruncationStatement strategy.state
+        (leftLiftedMeasurement (ιB := ι)
+          (unsymmetrizedLeftPOVM rolePackage.roleMeasurement))
+        (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1) →
+      MIPStarRE.LDT.SelfImprovement.LeftLiftedQXPLayerRepairWitness strategy.state
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
+        (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1))
+    (rightWitness :
+      MakingMeasurementsProjective.SpectralTruncationStatement strategy.state
+        (leftLiftedMeasurement (ιB := ι)
+          (unsymmetrizedRightPOVM rolePackage.roleMeasurement))
+        (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1) →
+      MIPStarRE.LDT.SelfImprovement.LeftLiftedQXPLayerRepairWitness strategy.state
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
+        (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)) :
+    MainFormalPostRolePackageDiagonalOrthonormalizationInput
+      params strategy eps k scalars rolePackage :=
+  ofRepairInputs
+    (MIPStarRE.LDT.SelfImprovement.leftLiftedProjectivizationRepairInput_of_qxpLayer
+      leftWitness)
+    (MIPStarRE.LDT.SelfImprovement.leftLiftedProjectivizationRepairInput_of_qxpLayer
+      rightWitness)
+
+/-- Build the line-130 orthonormalization input from lifted QXP approximations.
+
+This is a more concrete form of `ofQXPLayerRepairWitnesses`: each side supplies
+a QXP layer whose `q` family is the corresponding unsymmetrized POVM, together
+with the lifted state-dependent approximation to the associated `P` family.
+The constructor packages these approximations as locality-preserving repair
+inputs for the Alice and Bob unsymmetrized measurements. -/
+noncomputable def ofLiftedQXPApproximations
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
+    (leftData :
+      MakingMeasurementsProjective.QXPLayerData (Polynomial params) ι)
+    (leftMatches :
+      ∀ g : Polynomial params,
+        leftData.qLayer.q.outcome g =
+          (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).outcome g)
+    (leftClose :
+      SDDOpRel strategy.state (uniformDistribution Unit)
+        (constOpFamily
+          (OpFamily.leftPlacedOpFamily (ιB := ι) leftData.qLayer.q))
+        (constOpFamily
+          (OpFamily.leftPlacedOpFamily (ιB := ι)
+            (MakingMeasurementsProjective.PFamily leftData)))
+        (MakingMeasurementsProjective.roundingToProjectiveError
+          (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)))
+    (rightData :
+      MakingMeasurementsProjective.QXPLayerData (Polynomial params) ι)
+    (rightMatches :
+      ∀ g : Polynomial params,
+        rightData.qLayer.q.outcome g =
+          (unsymmetrizedRightPOVM rolePackage.roleMeasurement).outcome g)
+    (rightClose :
+      SDDOpRel strategy.state (uniformDistribution Unit)
+        (constOpFamily
+          (OpFamily.leftPlacedOpFamily (ιB := ι) rightData.qLayer.q))
+        (constOpFamily
+          (OpFamily.leftPlacedOpFamily (ιB := ι)
+            (MakingMeasurementsProjective.PFamily rightData)))
+        (MakingMeasurementsProjective.roundingToProjectiveError
+          (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1))) :
+    MainFormalPostRolePackageDiagonalOrthonormalizationInput
+      params strategy eps k scalars rolePackage :=
+  ofRepairInputs
+    (MIPStarRE.LDT.SelfImprovement.leftLiftedProjectivizationRepairInput_of_lifted_qxp_sddOpRel
+      leftData leftMatches leftClose)
+    (MIPStarRE.LDT.SelfImprovement.leftLiftedProjectivizationRepairInput_of_lifted_qxp_sddOpRel
+      rightData rightMatches rightClose)
 
 end MainFormalPostRolePackageDiagonalOrthonormalizationInput
 
