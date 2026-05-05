@@ -63,6 +63,62 @@ theorem triangleInequalityForVectorsSquared
       (Fintype.card κ : Error) * ∑ i, ev ψ ((D i)ᴴ * D i) := by
   simpa using ev_sum_conjTranspose_mul_sum_le ψ D
 
+/-- The expectation of the difference of two submeasurement totals is controlled
+by the state-dependent distance between the two outcome families, with the
+finite-outcome Cauchy--Schwarz loss.
+
+This is the total-operator analogue of the matching-mass estimates used in
+`triangleSub`.  It is useful precisely when the right-register families are
+submeasurements rather than measurements, so that their total operators need
+not be the identity. -/
+theorem subMeas_total_ev_gap_abs_le_sqrt_card_qSDD
+    {Outcome ι : Type*} [Fintype Outcome] [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (hψ : ψ.IsNormalized)
+    (A B : SubMeas Outcome ι) :
+    |ev ψ A.total - ev ψ B.total| ≤
+      Real.sqrt (Fintype.card Outcome : Error) * Real.sqrt (qSDD ψ A B) := by
+  let D : Outcome → MIPStarRE.Quantum.Op ι := fun a => A.outcome a - B.outcome a
+  have htotal : A.total - B.total = ∑ a : Outcome, D a := by
+    calc
+      A.total - B.total
+          = (∑ a : Outcome, A.outcome a) - ∑ a : Outcome, B.outcome a := by
+              rw [← A.sum_eq_total, ← B.sum_eq_total]
+      _ = ∑ a : Outcome, D a := by
+              rw [Finset.sum_sub_distrib]
+  have hev :
+      ev ψ A.total - ev ψ B.total = ev ψ (∑ a : Outcome, D a) := by
+    rw [← ev_sub, htotal]
+  have hcs :
+      |ev ψ (∑ a : Outcome, D a)| ≤
+        Real.sqrt (ev ψ ((1 : MIPStarRE.Quantum.Op ι) *
+            (1 : MIPStarRE.Quantum.Op ι)ᴴ)) *
+          Real.sqrt (ev ψ ((∑ a : Outcome, D a)ᴴ * (∑ a : Outcome, D a))) := by
+    simpa using ev_abs_mul_le_sqrt ψ (1 : MIPStarRE.Quantum.Op ι)
+      (∑ a : Outcome, D a)
+  have htri :
+      ev ψ ((∑ a : Outcome, D a)ᴴ * (∑ a : Outcome, D a)) ≤
+        (Fintype.card Outcome : Error) * qSDD ψ A B := by
+    simpa [D, qSDD, qSDDCore] using triangleInequalityForVectorsSquared ψ D
+  have hcard_nonneg : 0 ≤ (Fintype.card Outcome : Error) := by positivity
+  have hsqrt_tri :
+      Real.sqrt (ev ψ ((∑ a : Outcome, D a)ᴴ * (∑ a : Outcome, D a))) ≤
+        Real.sqrt ((Fintype.card Outcome : Error) * qSDD ψ A B) :=
+    Real.sqrt_le_sqrt htri
+  calc
+    |ev ψ A.total - ev ψ B.total|
+        = |ev ψ (∑ a : Outcome, D a)| := by rw [hev]
+    _ ≤ Real.sqrt (ev ψ ((1 : MIPStarRE.Quantum.Op ι) *
+          (1 : MIPStarRE.Quantum.Op ι)ᴴ)) *
+        Real.sqrt (ev ψ ((∑ a : Outcome, D a)ᴴ * (∑ a : Outcome, D a))) := hcs
+    _ = Real.sqrt (ev ψ (1 : MIPStarRE.Quantum.Op ι)) *
+        Real.sqrt (ev ψ ((∑ a : Outcome, D a)ᴴ * (∑ a : Outcome, D a))) := by
+          simp
+    _ = Real.sqrt (ev ψ ((∑ a : Outcome, D a)ᴴ * (∑ a : Outcome, D a))) := by
+          simp [ev_one_of_isNormalized ψ hψ]
+    _ ≤ Real.sqrt ((Fintype.card Outcome : Error) * qSDD ψ A B) := hsqrt_tri
+    _ = Real.sqrt (Fintype.card Outcome : Error) * Real.sqrt (qSDD ψ A B) := by
+          rw [Real.sqrt_mul hcard_nonneg]
+
 /-! ### Elementary max bound -/
 
 /-- Adding `y` inside `max 0` changes the value by at most `|y|`. -/

@@ -680,6 +680,169 @@ theorem final_fields_point_consistency_totalGap_natural_of_total_difference
     final_fields_point_consistency_totalGap_natural
       params strategy eps delta η hhelperPoint hdata hTotalAvg
 
+/-- The data-processing SDD comparison controls the total-overlap displacement
+which appears in the submeasurement form of the point-consistency triangle.
+
+For each point `u`, the right-register total difference is the sum of the
+field-answer differences in the two postprocessed polynomial families.  The
+finite-outcome Cauchy--Schwarz estimate
+`subMeas_total_ev_gap_abs_le_sqrt_card_qSDD`, averaged over `u`, bounds this
+single scalar by
+`sqrt (#F_q * ε)`.  The factor `#F_q` records the cost of passing from the
+outcomewise state-dependent distance to the total operator. -/
+theorem final_fields_total_difference_le_sqrt_card_data
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (ε : Error)
+    {Hhat : SubMeas (Polynomial params) ι}
+    {H : ProjSubMeas (Polynomial params) ι}
+    (hdata :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftLeft)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+        ε) :
+    |ev strategy.state (rightTensor (ι₁ := ι) H.toSubMeas.total) -
+      ev strategy.state (rightTensor (ι₁ := ι) Hhat.total)| ≤
+      Real.sqrt ((Fintype.card (Fq params) : Error) * ε) := by
+  let totalGap : Error :=
+    |ev strategy.state (rightTensor (ι₁ := ι) H.toSubMeas.total) -
+      ev strategy.state (rightTensor (ι₁ := ι) Hhat.total)|
+  have hdata_right :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftRight)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftRight)
+        ε := by
+    simpa [IdxSubMeas.liftLeft, IdxSubMeas.liftRight]
+      using
+        sddRel_liftRight_of_liftLeft_permInv
+          strategy.permInvState (uniformDistribution (Point params))
+          (polynomialEvaluationFamily params Hhat)
+          (polynomialEvaluationFamily params H.toSubMeas) ε hdata
+  have hpoint :
+      ∀ u : Point params,
+        |totalGap| ≤
+          Real.sqrt ((Fintype.card (Fq params) : Error) *
+            qSDD strategy.state
+              (((polynomialEvaluationFamily params Hhat).liftRight) u)
+              (((polynomialEvaluationFamily params H.toSubMeas).liftRight) u)) := by
+    intro u
+    have htot_H :
+        (((polynomialEvaluationFamily params H.toSubMeas).liftRight) u).total =
+          rightTensor (ι₁ := ι) H.toSubMeas.total := by
+      simp [IdxSubMeas.liftRight, polynomialEvaluationFamily, evaluateAt, postprocess_total]
+    have htot_Hhat :
+        (((polynomialEvaluationFamily params Hhat).liftRight) u).total =
+          rightTensor (ι₁ := ι) Hhat.total := by
+      simp [IdxSubMeas.liftRight, polynomialEvaluationFamily, evaluateAt, postprocess_total]
+    have hgap :=
+      Preliminaries.subMeas_total_ev_gap_abs_le_sqrt_card_qSDD
+        strategy.state strategy.isNormalized
+        (((polynomialEvaluationFamily params Hhat).liftRight) u)
+        (((polynomialEvaluationFamily params H.toSubMeas).liftRight) u)
+    have hgap' :
+        totalGap ≤
+          Real.sqrt (Fintype.card (Fq params) : Error) *
+            Real.sqrt
+              (qSDD strategy.state
+                (((polynomialEvaluationFamily params Hhat).liftRight) u)
+                (((polynomialEvaluationFamily params H.toSubMeas).liftRight) u)) := by
+      simpa [totalGap, htot_H, htot_Hhat, abs_sub_comm] using hgap
+    have hcard_nonneg : 0 ≤ (Fintype.card (Fq params) : Error) := by positivity
+    have hgap_sqrt :
+        totalGap ≤
+          Real.sqrt ((Fintype.card (Fq params) : Error) *
+            qSDD strategy.state
+              (((polynomialEvaluationFamily params Hhat).liftRight) u)
+              (((polynomialEvaluationFamily params H.toSubMeas).liftRight) u)) := by
+      simpa [Real.sqrt_mul hcard_nonneg] using hgap'
+    simpa [totalGap, abs_of_nonneg (abs_nonneg _)] using hgap_sqrt
+  have hq_nonneg :
+      ∀ u : Point params,
+        0 ≤ (Fintype.card (Fq params) : Error) *
+          qSDD strategy.state
+            (((polynomialEvaluationFamily params Hhat).liftRight) u)
+            (((polynomialEvaluationFamily params H.toSubMeas).liftRight) u) := by
+    intro u
+    exact mul_nonneg (by positivity) (qSDD_nonneg strategy.state _ _)
+  have havg :=
+    Preliminaries.avgOver_abs_le_sqrt_of_pointwise
+      (uniformDistribution (Point params))
+      (fun _ : Point params => totalGap)
+      (fun u : Point params =>
+        (Fintype.card (Fq params) : Error) *
+          qSDD strategy.state
+            (((polynomialEvaluationFamily params Hhat).liftRight) u)
+            (((polynomialEvaluationFamily params H.toSubMeas).liftRight) u))
+      hpoint hq_nonneg
+      (uniformDistribution_weight_sum_le_one (Point params))
+  have hconst :
+      avgOver (uniformDistribution (Point params)) (fun _ : Point params => totalGap) =
+        totalGap := by
+    rw [avgOver_uniform_const]
+  have havg_sdd :
+      avgOver (uniformDistribution (Point params))
+          (fun u : Point params =>
+            (Fintype.card (Fq params) : Error) *
+              qSDD strategy.state
+                (((polynomialEvaluationFamily params Hhat).liftRight) u)
+                (((polynomialEvaluationFamily params H.toSubMeas).liftRight) u))
+        ≤ (Fintype.card (Fq params) : Error) * ε := by
+    rw [avgOver_const_mul]
+    exact mul_le_mul_of_nonneg_left hdata_right.squaredDistanceBound (by positivity)
+  calc
+    |ev strategy.state (rightTensor (ι₁ := ι) H.toSubMeas.total) -
+      ev strategy.state (rightTensor (ι₁ := ι) Hhat.total)|
+        = totalGap := rfl
+    _ = |avgOver (uniformDistribution (Point params))
+          (fun _ : Point params => totalGap)| := by
+          rw [hconst, abs_of_nonneg (abs_nonneg _)]
+    _ ≤ Real.sqrt
+        (avgOver (uniformDistribution (Point params))
+          (fun u : Point params =>
+            (Fintype.card (Fq params) : Error) *
+              qSDD strategy.state
+                (((polynomialEvaluationFamily params Hhat).liftRight) u)
+                (((polynomialEvaluationFamily params H.toSubMeas).liftRight) u))) := havg
+    _ ≤ Real.sqrt ((Fintype.card (Fq params) : Error) * ε) :=
+        Real.sqrt_le_sqrt havg_sdd
+
+/-- Natural-error point-consistency transport with the total-overlap
+displacement bounded internally from the data-processing SDD estimate.
+
+The price of eliminating the explicit total-difference hypothesis is the
+additional term `sqrt (#F_q * selfImprovementDataProcessingError)`. -/
+theorem final_fields_point_consistency_totalGap_natural_of_data_processing
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    {Hhat : SubMeas (Polynomial params) ι}
+    {H : ProjSubMeas (Polynomial params) ι}
+    (hhelperPoint :
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params Hhat)
+        (selfImprovementHelperError params eps delta))
+    (hdata :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftLeft)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+        (selfImprovementDataProcessingError params eps delta)) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params H.toSubMeas)
+      (selfImprovementHelperError params eps delta +
+        Real.sqrt (selfImprovementDataProcessingError params eps delta) +
+        Real.sqrt ((Fintype.card (Fq params) : Error) *
+          selfImprovementDataProcessingError params eps delta)) := by
+  exact
+    final_fields_point_consistency_totalGap_natural_of_total_difference
+      params strategy eps delta
+      (Real.sqrt ((Fintype.card (Fq params) : Error) *
+        selfImprovementDataProcessingError params eps delta))
+      hhelperPoint hdata
+      (final_fields_total_difference_le_sqrt_card_data
+        params strategy (selfImprovementDataProcessingError params eps delta) hdata)
+
 /-- Literal-threshold point-consistency transport from the helper output to the
 projective output.
 
@@ -763,6 +926,44 @@ theorem final_fields_point_consistency_totalGap_of_total_difference
   MIPStarRE.LDT.ConsRel.mono habsorb
     (final_fields_point_consistency_totalGap_natural_of_total_difference
       params strategy eps delta η hhelperPoint hdata hTotal)
+
+/-- Literal-threshold point-consistency transport with the total-overlap
+displacement bounded from the data-processing estimate.
+
+This theorem removes the external total-difference hypothesis.  It keeps the
+numerical absorption as an explicit hypothesis, because the Cauchy--Schwarz
+argument produces the additional factor `sqrt #F_q`; deciding whether this term
+is absorbed by the present threshold or whether the paper-side constants must be
+adjusted is a separate numerical question. -/
+theorem final_fields_point_consistency_totalGap_of_data_processing
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    {Hhat : SubMeas (Polynomial params) ι}
+    {H : ProjSubMeas (Polynomial params) ι}
+    (hhelperPoint :
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params Hhat)
+        (selfImprovementHelperError params eps delta))
+    (hdata :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftLeft)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+        (selfImprovementDataProcessingError params eps delta))
+    (habsorb :
+      selfImprovementHelperError params eps delta +
+          Real.sqrt (selfImprovementDataProcessingError params eps delta) +
+          Real.sqrt ((Fintype.card (Fq params) : Error) *
+            selfImprovementDataProcessingError params eps delta) ≤
+        selfImprovementError params eps delta) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params H.toSubMeas)
+      (selfImprovementError params eps delta) :=
+  MIPStarRE.LDT.ConsRel.mono habsorb
+    (final_fields_point_consistency_totalGap_natural_of_data_processing
+      params strategy eps delta hhelperPoint hdata)
 
 /-- Algebraic decomposition of the helper boundedness gap.
 
