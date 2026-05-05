@@ -573,6 +573,106 @@ theorem final_fields_point_consistency_totalGap_natural
       (selfImprovementDataProcessingError params eps delta) η hhelperPoint
       hdata_right hTotal
 
+/-- Natural-error point-consistency transport when the total-overlap
+displacement is supplied as a single right-register total difference.
+
+Since the point measurement is complete and
+`polynomialEvaluationFamily params H` has the same total as `H`, the averaged
+total-overlap term in `final_fields_point_consistency_totalGap_natural` is
+independent of the point `u`.  This theorem records the corresponding reduction
+of the issue #1226 obstruction to the scalar difference between the totals of
+the two right-register submeasurements. -/
+theorem final_fields_point_consistency_totalGap_natural_of_total_difference
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta η : Error)
+    {Hhat : SubMeas (Polynomial params) ι}
+    {H : ProjSubMeas (Polynomial params) ι}
+    (hhelperPoint :
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params Hhat)
+        (selfImprovementHelperError params eps delta))
+    (hdata :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftLeft)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+        (selfImprovementDataProcessingError params eps delta))
+    (hTotal :
+      |ev strategy.state (rightTensor (ι₁ := ι) H.toSubMeas.total) -
+        ev strategy.state (rightTensor (ι₁ := ι) Hhat.total)| ≤ η) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params H.toSubMeas)
+      (selfImprovementHelperError params eps delta +
+        Real.sqrt (selfImprovementDataProcessingError params eps delta) + η) := by
+  have hTotalAvg :
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        |ev strategy.state
+            (leftTensor (ι₂ := ι)
+              (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total) *
+              rightTensor (ι₁ := ι)
+                (((polynomialEvaluationFamily params H.toSubMeas) u).total)) -
+          ev strategy.state
+            (leftTensor (ι₂ := ι)
+              (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total) *
+              rightTensor (ι₁ := ι)
+                (((polynomialEvaluationFamily params Hhat) u).total))|) ≤ η := by
+    have hpoint : ∀ u : Point params,
+        |ev strategy.state
+            (leftTensor (ι₂ := ι)
+              (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total) *
+              rightTensor (ι₁ := ι)
+                (((polynomialEvaluationFamily params H.toSubMeas) u).total)) -
+          ev strategy.state
+            (leftTensor (ι₂ := ι)
+              (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total) *
+              rightTensor (ι₁ := ι)
+                (((polynomialEvaluationFamily params Hhat) u).total))| =
+        |ev strategy.state (rightTensor (ι₁ := ι) H.toSubMeas.total) -
+          ev strategy.state (rightTensor (ι₁ := ι) Hhat.total)| := by
+      intro u
+      have hA_total :
+          (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total) =
+            (1 : MIPStarRE.Quantum.Op ι) := by
+        exact (strategy.pointMeasurement u).total_eq_one
+      have hH_total :
+          (((polynomialEvaluationFamily params H.toSubMeas) u).total) =
+            H.toSubMeas.total := by
+        simpa [polynomialEvaluationFamily, evaluateAt] using
+          postprocess_total H.toSubMeas (fun g : Polynomial params => g u)
+      have hHhat_total :
+          (((polynomialEvaluationFamily params Hhat) u).total) =
+            Hhat.total := by
+        simpa [polynomialEvaluationFamily, evaluateAt] using
+          postprocess_total Hhat (fun g : Polynomial params => g u)
+      rw [hA_total, hH_total, hHhat_total]
+      rw [leftTensor_mul_rightTensor_eq_opTensor, opTensor_one_left_eq_rightTensor,
+        leftTensor_mul_rightTensor_eq_opTensor, opTensor_one_left_eq_rightTensor]
+    have hconst :
+        avgOver (uniformDistribution (Point params)) (fun u =>
+          |ev strategy.state
+              (leftTensor (ι₂ := ι)
+                (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total) *
+                rightTensor (ι₁ := ι)
+                  (((polynomialEvaluationFamily params H.toSubMeas) u).total)) -
+            ev strategy.state
+              (leftTensor (ι₂ := ι)
+                (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total) *
+                rightTensor (ι₁ := ι)
+                  (((polynomialEvaluationFamily params Hhat) u).total))|) =
+          avgOver (uniformDistribution (Point params)) (fun _ =>
+            |ev strategy.state (rightTensor (ι₁ := ι) H.toSubMeas.total) -
+              ev strategy.state (rightTensor (ι₁ := ι) Hhat.total)|) := by
+      refine avgOver_congr (uniformDistribution (Point params)) _ _ ?_
+      intro u
+      exact hpoint u
+    rw [hconst, avgOver_uniform_const]
+    exact hTotal
+  exact
+    final_fields_point_consistency_totalGap_natural
+      params strategy eps delta η hhelperPoint hdata hTotalAvg
+
 /-- Literal-threshold point-consistency transport from the helper output to the
 projective output.
 
@@ -620,6 +720,42 @@ theorem final_fields_point_consistency_totalGap
   MIPStarRE.LDT.ConsRel.mono habsorb
     (final_fields_point_consistency_totalGap_natural params strategy eps delta η
       hhelperPoint hdata hTotal)
+
+/-- Literal-threshold point-consistency transport from a right-register total
+difference bound.
+
+This is the `selfImprovementError`-absorbed companion to
+`final_fields_point_consistency_totalGap_natural_of_total_difference`. -/
+theorem final_fields_point_consistency_totalGap_of_total_difference
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta η : Error)
+    {Hhat : SubMeas (Polynomial params) ι}
+    {H : ProjSubMeas (Polynomial params) ι}
+    (hhelperPoint :
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params Hhat)
+        (selfImprovementHelperError params eps delta))
+    (hdata :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftLeft)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+        (selfImprovementDataProcessingError params eps delta))
+    (hTotal :
+      |ev strategy.state (rightTensor (ι₁ := ι) H.toSubMeas.total) -
+        ev strategy.state (rightTensor (ι₁ := ι) Hhat.total)| ≤ η)
+    (habsorb :
+      selfImprovementHelperError params eps delta +
+          Real.sqrt (selfImprovementDataProcessingError params eps delta) + η ≤
+        selfImprovementError params eps delta) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params H.toSubMeas)
+      (selfImprovementError params eps delta) :=
+  MIPStarRE.LDT.ConsRel.mono habsorb
+    (final_fields_point_consistency_totalGap_natural_of_total_difference
+      params strategy eps delta η hhelperPoint hdata hTotal)
 
 /-- Algebraic decomposition of the helper boundedness gap.
 
