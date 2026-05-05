@@ -438,6 +438,42 @@ theorem add_in_u_cs_chain_q3_q4_factored_cs
       rwa [hY_herm] at this
     exact ev_nonneg_of_psd strategy.state _ (opTensor_nonneg hYMhY_pos hTh_pos)
 
+/-- Selected-support weighted Cauchy--Schwarz for the add-in-`u` Step 3/4
+summands.
+
+The selected Step 3 and Step 4 estimates use the same finite inequality: the
+summands are restricted to the selected pairs `S_u`, and are extended by zero
+outside this support.  This helper fixes the distribution and the selected
+support, leaving only the three summands and their pointwise estimates to be
+specified by the two applications. -/
+private theorem addInU_selected_weighted_cauchy_schwarz
+    {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (S : AddInUSelection params Outcome)
+    (t x y : Point params × Point params → Outcome × Polynomial params → Error)
+    (ht :
+      ∀ uv ah, ah ∈ addInUSelectionPairs params S uv.1 →
+        |t uv ah| ≤ Real.sqrt (x uv ah) * Real.sqrt (y uv ah))
+    (hx : ∀ uv ah, ah ∈ addInUSelectionPairs params S uv.1 → 0 ≤ x uv ah)
+    (hy : ∀ uv ah, ah ∈ addInUSelectionPairs params S uv.1 → 0 ≤ y uv ah) :
+    |avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+      ∑ ah : Outcome × Polynomial params,
+        if ah ∈ addInUSelectionPairs params S uv.1 then t uv ah else 0)| ≤
+      Real.sqrt
+        (avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+          ∑ ah : Outcome × Polynomial params,
+            if ah ∈ addInUSelectionPairs params S uv.1 then x uv ah else 0)) *
+      Real.sqrt
+        (avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+          ∑ ah : Outcome × Polynomial params,
+            if ah ∈ addInUSelectionPairs params S uv.1 then y uv ah else 0)) := by
+  classical
+  exact
+    MIPStarRE.LDT.Preliminaries.weightedFinsetCauchySchwarz_on_selectedSupport
+      (𝒟 := uniformDistribution (Point params × Point params))
+      (selected := fun uv ah => ah ∈ addInUSelectionPairs params S uv.1)
+      (t := t) (x := x) (y := y) ht hx hy
+
 /-- Selected factored Cauchy--Schwarz bound for the `Q₂ → Q₃` add-in-`u` step.
 
 This is the selection-parametrized analogue of
@@ -476,9 +512,7 @@ private theorem addInU_selected_cs_chain_step3_factored_cs
   classical
   rw [addInU_selected_cs_chain_step3_diff_eq params strategy M T S]
   simpa using
-    MIPStarRE.LDT.Preliminaries.weightedFinsetCauchySchwarz_on_selectedSupport
-      (𝒟 := uniformDistribution (Point params × Point params))
-      (selected := fun uv ah => ah ∈ addInUSelectionPairs params S uv.1)
+    addInU_selected_weighted_cauchy_schwarz (Outcome := Outcome) params S
       (t := fun uv ah =>
         let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
         let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
@@ -588,9 +622,7 @@ private theorem addInU_selected_cs_chain_step4_factored_cs
   classical
   rw [addInU_selected_cs_chain_step4_diff_eq params strategy M T S]
   simpa using
-    MIPStarRE.LDT.Preliminaries.weightedFinsetCauchySchwarz_on_selectedSupport
-      (𝒟 := uniformDistribution (Point params × Point params))
-      (selected := fun uv ah => ah ∈ addInUSelectionPairs params S uv.1)
+    addInU_selected_weighted_cauchy_schwarz (Outcome := Outcome) params S
       (t := fun uv ah =>
         let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
         let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
