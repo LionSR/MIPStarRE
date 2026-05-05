@@ -26,15 +26,17 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Matrix-level SDP data with complementary slackness and dual dominance
-feeds the slackness-carrying self-improvement helper.
+/-- Matrix-level SDP data, together with the helper hypotheses, feed the
+slackness-carrying self-improvement helper.
 
 The theorem is the downstream use of
 `MatrixSdpStatementWithSlacknessAndDominance`: once the matrix SDP argument
-supplies an optimal pair satisfying complementary slackness and \(I \le Z\),
-the existing helper construction produces \(T\), \(\widehat H\), and \(Z\)
-together with the complementary-slackness equations used in the
-helper-completeness chain. -/
+supplies an optimal pair satisfying complementary slackness and \(I \le Z\), it
+may be combined with the helper-side assumptions `strategy.IsGood eps delta
+gamma`, the error parameter `nu`, and the comparison measurement `G`.  Under
+these additional hypotheses, the existing helper construction produces \(T\),
+\(\widehat H\), and \(Z\) together with the complementary-slackness equations
+used in the helper-completeness chain. -/
 lemma selfImprovementHelperWithMatrixSdpSlacknessAndDominance
     (params : Parameters)
     [FieldModel params.q]
