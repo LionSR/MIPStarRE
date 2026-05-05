@@ -17,6 +17,44 @@
 \begin{document}
 \maketitle
 
+\section{At a glance}
+
+\begin{itemize}
+  \item \textbf{Difficulty: easy.} This issue is about the feasible set of one
+  displayed SDP, not about proving SDP strong duality. The full duality theorem
+  is a separate hard task.%
+  \footnote{The full strong-duality producer is discussed in
+  \path{docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex}.}
+  \item \textbf{Estimated weight:} already resolved; replaying the repair is about
+  \textbf{2--4 interface changes} and roughly \textbf{100--250 lines} of
+  project-local definitions and adapters.
+  \item \textbf{Mathlib/project split:} about \textbf{20\% Mathlib} and
+  \textbf{80\% project-local}. Mathlib supplies finite sums and matrix order;
+  the project supplies the submeasurement, measurement, SDP-wrapper, and
+  completion interfaces.
+  \item \textbf{Key Mathlib inputs:} finite sums over the polynomial set, matrix
+  positive-semidefinite/order facts, and scalar multiplication of positive
+  operators.
+\end{itemize}
+
+\section{Key theorem forms}
+
+The resolved formal interface should isolate four statements.
+
+\begin{enumerate}
+  \item \textbf{Submeasurement primal form.} The primal variable is a family
+  $T=\{T_g\}$ with $T_g\ge0$ and $\sum_gT_g\le I$.
+  \item \textbf{Strict feasible witness.} For $M=|\cP|$, the family
+  $T_g=(2M)^{-1}I$ satisfies $\sum_gT_g=\frac12 I$ and is strictly feasible.
+  \item \textbf{Saturation as output.} The identity $\sum_gT_g=I$ belongs to the
+  selected optimal witness, together with $T_gZ=T_gA_g$; it is not a feasibility
+  condition.
+  \item \textbf{Completion only downstream.} If a later wrapper needs a full
+  measurement, complete the chosen submeasurement explicitly, and do not identify
+  that completion with the paper's strict Slater witness.
+\end{enumerate}
+
+
 \section{The primal feasible set in the paper}
 
 This note concerns the semidefinite program used in the self-improvement
