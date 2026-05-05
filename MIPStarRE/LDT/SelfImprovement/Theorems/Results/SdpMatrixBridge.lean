@@ -50,8 +50,15 @@ noncomputable def matrixSubmeasurementToSubMeas {Outcome : Type*}
   total_le_one := by
     simpa [MIPStarRE.Quantum.Submeasurement.total] using M.sum_le_one
 
-/-- The matrix SDP realization canonically associated to a strategy. -/
-noncomputable def matrixSdpRealizationOfStrategy (params : Parameters)
+/-- The point-measurement part of the matrix SDP realization associated to a strategy.
+
+The present bridge only uses the point-measurement fields of
+`MatrixSdpRealization`, through `matrixAveragedPointOperator` and
+`matrixSdpDualSlackOperator`.  The state field is therefore filled by the zero
+positive operator.  This construction should not be used for state-dependent
+matrix expressions such as `matrixExpectation`; such expressions would compute
+with the zero operator rather than with `strategy.state`. -/
+noncomputable def matrixSdpPointRealizationOfStrategy (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι) : MatrixSdpRealization params where
   space := {
@@ -74,31 +81,31 @@ noncomputable def matrixSdpRealizationOfStrategy (params : Parameters)
       exact le_of_eq (strategy.pointMeasurement u).total_eq_one
   }
 
-/-- The matrix averaged point operator for the canonical strategy realization
-is the abstract averaged point operator. -/
-theorem matrixAveragedPointOperator_ofStrategy (params : Parameters)
+/-- The averaged point operator for the point-measurement matrix realization is
+the abstract averaged point operator. -/
+theorem matrixAveragedPointOperator_ofPointRealization (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι) (g : Polynomial params) :
     matrixAveragedPointOperator params
-        (matrixSdpRealizationOfStrategy params strategy) g =
+        (matrixSdpPointRealizationOfStrategy params strategy) g =
       averagedPointOperator params strategy g := by
   unfold matrixAveragedPointOperator averagedPointOperator
   refine averageOperatorOverDistribution_congr _ _ _ ?_
   intro u
   simp [matrixAveragedPointOperatorContribution,
-    pointConditionedOutcomeOperatorAtPolynomial, matrixSdpRealizationOfStrategy]
+    pointConditionedOutcomeOperatorAtPolynomial, matrixSdpPointRealizationOfStrategy]
 
-/-- The matrix dual slack operator for the canonical strategy realization is
-the abstract dual slack operator. -/
-theorem matrixSdpDualSlackOperator_ofStrategy (params : Parameters)
+/-- The matrix dual slack operator for the point-measurement matrix realization
+is the abstract dual slack operator. -/
+theorem matrixSdpDualSlackOperator_ofPointRealization (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (Z : MIPStarRE.Quantum.Op ι) (g : Polynomial params) :
     matrixSdpDualSlackOperator params
-        (matrixSdpRealizationOfStrategy params strategy) Z g =
+        (matrixSdpPointRealizationOfStrategy params strategy) Z g =
       sdpDualSlackOperator params strategy Z g := by
   rw [matrixSdpDualSlackOperator, sdpDualSlackOperator,
-    matrixAveragedPointOperator_ofStrategy]
+    matrixAveragedPointOperator_ofPointRealization]
 
 namespace MatrixSdpOptimalWitness
 
@@ -112,10 +119,10 @@ theorem toSdpOptimalPairWithSlackness_of_dualDominatesIdentity
     {params : Parameters} [FieldModel params.q]
     {strategy : SymStrat params ι}
     {T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params)
-      (matrixSdpRealizationOfStrategy params strategy).space}
+      (matrixSdpPointRealizationOfStrategy params strategy).space}
     {Z : MIPStarRE.Quantum.Op ι}
     (h : MatrixSdpOptimalWitness params
-      (matrixSdpRealizationOfStrategy params strategy) T Z)
+      (matrixSdpPointRealizationOfStrategy params strategy) T Z)
     (hdom : (1 : MIPStarRE.Quantum.Op ι) ≤ Z) :
     SdpOptimalPairWithSlackness params strategy (matrixSubmeasurementToSubMeas T) Z where
   toSdpOptimalPair := {
@@ -126,21 +133,22 @@ theorem toSdpOptimalPairWithSlackness_of_dualDominatesIdentity
     dualDominatesIdentity := hdom
     dualFeasible := by
       intro g
-      simpa [matrixSdpDualSlackOperator_ofStrategy] using h.dualFeasible g
+      simpa [matrixSdpDualSlackOperator_ofPointRealization] using h.dualFeasible g
   }
   complementarySlackness := by
     intro g
     simpa [matrixSubmeasurementToSubMeas, sdpComplementarySlacknessEquation,
-      matrixSdpComplementarySlacknessEquation, matrixAveragedPointOperator_ofStrategy] using
+      matrixSdpComplementarySlacknessEquation,
+      matrixAveragedPointOperator_ofPointRealization] using
         h.complementarySlacknessEquation g
 
 end MatrixSdpOptimalWitness
 
 namespace MatrixSdpStatementWithSlackness
 
-/-- A matrix strong-duality statement for the canonical strategy realization
-implies the abstract slackness statement, assuming the chosen matrix optimal
-dual witness also dominates the identity.
+/-- A matrix strong-duality statement for the point-measurement realization of
+a strategy implies the abstract slackness statement, assuming the chosen matrix
+optimal dual witness also dominates the identity.
 
 The dominance hypothesis records the remaining mismatch between the matrix SDP
 output and the reduced abstract interface used by the helper proof.  It is
@@ -151,7 +159,7 @@ theorem toSdpStatementWithSlackness_of_dualDominatesIdentity
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (h : MatrixSdpStatementWithSlackness params
-      (matrixSdpRealizationOfStrategy params strategy))
+      (matrixSdpPointRealizationOfStrategy params strategy))
     (hdom :
       let hTZ := Classical.choose_spec h.witness
       let Z := Classical.choose hTZ
@@ -162,7 +170,7 @@ theorem toSdpStatementWithSlackness_of_dualDominatesIdentity
   let Z := Classical.choose hTZ
   have hopt :
       MatrixSdpOptimalWitness params
-        (matrixSdpRealizationOfStrategy params strategy) T Z :=
+        (matrixSdpPointRealizationOfStrategy params strategy) T Z :=
     Classical.choose_spec hTZ
   exact ⟨matrixSubmeasurementToSubMeas T, Z,
     hopt.toSdpOptimalPairWithSlackness_of_dualDominatesIdentity hdom⟩
