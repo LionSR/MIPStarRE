@@ -300,7 +300,6 @@ lemma evaluatedSlice_scalar_chain_bound
           unfold gCommStabilityR averageIdxSubMeas
           refine averageOperatorOverDistribution_congr _ _ _ (fun q1 => ?_)
           rw [postprocess_sandwichByOuter_prod_snd_outcome]
-          simp [Ffun]
         have hPavg :
             ∀ g : Polynomial params,
               averageOperatorOverDistribution (uniformDistribution (Point params))
