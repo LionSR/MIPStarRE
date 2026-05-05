@@ -149,13 +149,60 @@ class ParseHelperDeclarationTests(unittest.TestCase):
 
                 nonrec private lemma third (h : True ∧ True) : True := by
                   exact And.left h
+
+                #check second
+
+                private lemma fourth (h : True ∧ True) : True := by
+                  exact And.left h
                 """,
             )
             report = run_audit(root, min_normalized_chars=5)
-            self.assertEqual(report.scanned_declarations, 3)
+            self.assertEqual(report.scanned_declarations, 4)
             self.assertEqual(len(report.duplicate_groups), 1)
             names = {decl.name for decl in report.duplicate_groups[0].declarations}
-            self.assertEqual(names, {"first", "second", "third"})
+            self.assertEqual(names, {"first", "second", "third", "fourth"})
+
+    def test_equation_style_duplicate_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "LDT" / "Foo.lean"
+            _write(
+                mod,
+                """\
+                private lemma first : Bool → Bool
+                | true => true
+                | false => false
+
+                private theorem second : Bool → Bool
+                | true => true
+                | false => false
+                """,
+            )
+            report = run_audit(root, min_normalized_chars=5)
+            self.assertEqual(report.scanned_declarations, 2)
+            self.assertEqual(len(report.duplicate_groups), 1)
+            names = {decl.name for decl in report.duplicate_groups[0].declarations}
+            self.assertEqual(names, {"first", "second"})
+
+    def test_unicode_and_question_identifier_boundaries_do_not_split_keywords(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "LDT" / "Foo.lean"
+            _write(
+                mod,
+                """\
+                private lemma unicodeLet :
+                    letα = letα := by
+                  rfl
+
+                private lemma questionLet :
+                    let? = let? := by
+                  rfl
+                """,
+            )
+            decls = parse_helper_declarations(mod, root=root, min_normalized_chars=5)
+            self.assertEqual(len(decls), 2)
+            self.assertEqual({decl.normalized_body for decl in decls}, {"byrfl"})
 
     def test_public_public_duplicate_is_not_reported(self) -> None:
         with tempfile.TemporaryDirectory() as td:

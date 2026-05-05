@@ -35,7 +35,7 @@ _DECL_RE = re.compile(
     r"(?P<name>[^\s:({\[]+)"
 )
 _TOP_LEVEL_COMMAND_RE = re.compile(
-    r"(?m)^(?:@\[[^\n]*\]|[A-Za-z_][A-Za-z0-9_']*)(?:[ \t]|$)"
+    r"(?m)^(?:@\[[^\n]*\]|#[A-Za-z_][A-Za-z0-9_']*|[^\W\d][\w'?]*)(?:[ \t]|$)"
 )
 _COMMENT_OR_WS_RE = re.compile(r"\s+")
 
@@ -98,8 +98,21 @@ def _starts_keyword(text: str, index: int, keyword: str) -> bool:
     before = text[index - 1] if index > 0 else " "
     after_index = index + len(keyword)
     after = text[after_index] if after_index < len(text) else " "
-    ident = set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_'")
-    return before not in ident and after not in ident
+    return not _identifier_char(before) and not _identifier_char(after)
+
+
+def _identifier_char(char: str) -> bool:
+    """Return whether ``char`` can continue a Lean identifier for boundary checks."""
+
+    return char.isalnum() or char in "_'?"
+
+
+def _equation_body_span(masked_decl: str, absolute_start: int) -> tuple[int, int] | None:
+    """Return the body span for declarations proved by equation clauses."""
+
+    for match in re.finditer(r"(?m)^[ \t]*\|", masked_decl):
+        return (absolute_start + match.start(), absolute_start + len(masked_decl))
+    return None
 
 
 def _proof_body_span(masked_decl: str, absolute_start: int) -> tuple[int, int] | None:
@@ -133,7 +146,7 @@ def _proof_body_span(masked_decl: str, absolute_start: int) -> tuple[int, int] |
                 continue
             return (absolute_start + i + 2, absolute_start + len(masked_decl))
         i += 1
-    return None
+    return _equation_body_span(masked_decl, absolute_start)
 
 
 def _normalize_body(text: str) -> str:
