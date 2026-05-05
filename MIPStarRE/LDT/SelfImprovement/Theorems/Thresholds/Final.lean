@@ -19,56 +19,6 @@ open MIPStarRE.LDT
 open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
 
-/-! ## Parameter convenience facts -/
-
-private theorem one_le_m_cast (params : Parameters) :
-    (1 : Error) ≤ (params.m : Error) := by exact_mod_cast params.hm
-
-private theorem m_cast_nonneg (params : Parameters) :
-    (0 : Error) ≤ (params.m : Error) := by positivity
-
-private theorem d_q_ratio_nonneg (params : Parameters) :
-    (0 : Error) ≤ ((params.d : Error) / (params.q : Error)) :=
-  div_nonneg (by exact_mod_cast Nat.zero_le _) (le_of_lt params.q_cast_pos)
-
-private theorem d_q_ratio_le_one_of_d_le_q
-    (params : Parameters)
-    (hd_le_q : (params.d : Error) ≤ (params.q : Error)) :
-    ((params.d : Error) / (params.q : Error)) ≤ 1 :=
-  (div_le_one params.q_cast_pos).mpr hd_le_q
-
-private theorem sqrt_100m_le_10m (params : Parameters) :
-    Real.sqrt (100 * (params.m : Error)) ≤ 10 * (params.m : Error) := by
-  have hmpos : (0 : Error) ≤ (params.m : Error) := m_cast_nonneg params
-  have hm1 : (1 : Error) ≤ (params.m : Error) := one_le_m_cast params
-  have h10m_nn : (0 : Error) ≤ 10 * (params.m : Error) := by positivity
-  refine (Real.sqrt_le_left h10m_nn).mpr ?_
-  nlinarith [hmpos, hm1]
-
-private theorem sqrt_10m_le_4m (params : Parameters) :
-    Real.sqrt (10 * (params.m : Error)) ≤ 4 * (params.m : Error) := by
-  have hmpos : (0 : Error) ≤ (params.m : Error) := m_cast_nonneg params
-  have hm1 : (1 : Error) ≤ (params.m : Error) := one_le_m_cast params
-  have h4m_nn : (0 : Error) ≤ 4 * (params.m : Error) := by positivity
-  refine (Real.sqrt_le_left h4m_nn).mpr ?_
-  nlinarith [hmpos, hm1]
-
-private theorem sqrt_400m_le_20m (params : Parameters) :
-    Real.sqrt (400 * (params.m : Error)) ≤ 20 * (params.m : Error) := by
-  have hmpos : (0 : Error) ≤ (params.m : Error) := m_cast_nonneg params
-  have hm1 : (1 : Error) ≤ (params.m : Error) := one_le_m_cast params
-  have h20m_nn : (0 : Error) ≤ 20 * (params.m : Error) := by positivity
-  refine (Real.sqrt_le_left h20m_nn).mpr ?_
-  nlinarith [hmpos, hm1]
-
-private theorem sqrt_960m_le_31m (params : Parameters) :
-    Real.sqrt (960 * (params.m : Error)) ≤ 31 * (params.m : Error) := by
-  have hmpos : (0 : Error) ≤ (params.m : Error) := m_cast_nonneg params
-  have hm1 : (1 : Error) ≤ (params.m : Error) := one_le_m_cast params
-  have h31m_nn : (0 : Error) ≤ 31 * (params.m : Error) := by positivity
-  refine (Real.sqrt_le_left h31m_nn).mpr ?_
-  nlinarith [hmpos, hm1]
-
 /-! ## Final-stage threshold: `30 ζ̂ ≤ ζ`
 
 For `ε, δ, d/q ∈ [0, 1]`, the helper-stage error is dominated by
