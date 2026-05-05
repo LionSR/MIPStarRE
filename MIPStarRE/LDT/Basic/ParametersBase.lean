@@ -415,9 +415,24 @@ def zeroPoint {params : Parameters} [FieldModel params.q] : Point params :=
 def embedCoord (params : Parameters) : Fin params.m → Fin params.next.m :=
   fun i => ⟨i.1, Nat.lt_trans i.2 (Nat.lt_succ_self params.m)⟩
 
+/-- The old-coordinate inclusion into the appended coordinate space is injective. -/
+theorem embedCoord_injective (params : Parameters) :
+    Function.Injective (embedCoord params) := by
+  intro i j hij
+  apply Fin.ext
+  simpa [embedCoord] using congrArg Fin.val hij
+
 /-- The last coordinate of `F_q^(m+1)`. -/
 def lastCoord (params : Parameters) : Fin params.next.m :=
   ⟨params.m, Nat.lt_succ_self params.m⟩
+
+/-- No old coordinate is the appended last coordinate. -/
+theorem embedCoord_ne_lastCoord (params : Parameters) (i : Fin params.m) :
+    embedCoord params i ≠ lastCoord params := by
+  intro h
+  have hval := congrArg Fin.val h
+  simp [embedCoord, lastCoord] at hval
+  omega
 
 /-- Append a final coordinate to a point in `F_q^m`. -/
 def appendPoint (params : Parameters) (u : Point params) (x : Fq params) : Point params.next :=

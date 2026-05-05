@@ -320,12 +320,6 @@ private lemma averageRestrictedAxisFailure_eq_embeddedAxisDirections
             intro i
             exact sliceAxisDirectionErrorAverage_eq_axisDirectionError params strategy i
 
-private lemma embedCoord_injective (params : Parameters) :
-    Function.Injective (embedCoord params) := by
-  intro i j hij
-  apply Fin.ext
-  simpa [embedCoord] using congrArg Fin.val hij
-
 private lemma weighted_embedded_average_le_full_average
     (params : Parameters)
     (f : Fin params.next.m → Error)
