@@ -1,0 +1,132 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\setlength{\emergencystretch}{2em}
+
+\input{command}
+
+\title{Issue 1093: The Total-Overlap Term in Projective Point-Consistency Transport}
+\author{}
+\date{2026-05-05}
+
+\begin{document}
+\maketitle
+
+\section{The cited step}
+
+This note concerns the projective point-consistency step in the
+self-improvement theorem of \cite[Section~9]{Ji2020LowIndividualDegree}.%
+\footnote{Tracked in \ghissue{1093} and \ghpr{1222}.  In the TeX source
+consulted here, the projective point-consistency step is in
+\path{references/ldt-paper/self_improvement.tex}, lines~719--726.  The
+substitution proposition used there is \path{prop:triangle-sub} in
+\path{references/ldt-paper/preliminaries.tex}.}
+The helper stage produces a polynomial submeasurement $\widehat H$ which is
+consistent with the point measurement $A$: on average over $u$,
+\[
+  A^u_a \ot I \simeq_{\widehat \zeta}
+  I \ot \widehat H_{[h(u)=a]}.
+\]
+After orthonormalization, the paper obtains a projective submeasurement $H$ and
+a postprocessed state-dependent distance estimate
+\[
+  I \ot \widehat H_{[h(u)=a]}
+  \approx_{\widehat \zeta_{\mathrm{dataprocess}}}
+  I \ot H_{[h(u)=a]}.
+\]
+The printed proof then applies \path{prop:triangle-sub} and concludes
+\[
+  A^u_a \ot I \simeq_{\widehat \zeta +
+    \sqrt{\widehat \zeta_{\mathrm{dataprocess}}}}
+  I \ot H_{[h(u)=a]}.
+\]
+
+\section{Where the total term enters}
+
+In the measurement-valued right-register form of the triangle-substitution
+argument, the consistency defect for a fixed question has the form
+\[
+  \max\left(0,\,
+    \langle \psi, A_{\mathrm{tot}} \ot B_{\mathrm{tot}} \psi\rangle
+    - \sum_a \langle \psi, A_a \ot B_a \psi\rangle\right).
+\]
+When $B$ is a measurement, $B_{\mathrm{tot}} = I$.  Thus replacing one
+right-register measurement by another changes only the matching-mass term
+\[
+  \sum_a \langle \psi, A_a \ot B_a \psi\rangle.
+\]
+That term is exactly what the usual Cauchy--Schwarz estimate controls by the
+square root of the state-dependent distance.
+
+In the projective-output point-consistency step, however, the right-register
+families are
+\[
+  u \longmapsto \widehat H_{[h(u)=a]},
+  \qquad
+  u \longmapsto H_{[h(u)=a]}.
+\]
+They are submeasurements, not measurements.  Their total operators are
+$\widehat H_{\mathrm{tot}}$ and $H_{\mathrm{tot}}$, respectively, and these need
+not both equal the identity.  Consequently the replacement also changes the
+total-overlap term.  The additional scalar is
+\[
+  \mathbb E_u \left|
+    \langle \psi, A^u_{\mathrm{tot}} \ot H_{\mathrm{tot}} \psi\rangle
+    -
+    \langle \psi, A^u_{\mathrm{tot}} \ot \widehat H_{\mathrm{tot}} \psi\rangle
+  \right|.
+\]
+Since $A^u$ is a measurement, $A^u_{\mathrm{tot}} = I$, but this does not remove
+the distinction between $H_{\mathrm{tot}}$ and $\widehat H_{\mathrm{tot}}$.
+
+\section{Relation with the formal development}
+
+The formal development therefore proves a submeasurement version of the
+right-register substitution lemma with this total-overlap displacement stated
+explicitly.%
+\footnote{The preliminary statement is
+\leanid{triangleSub\_right\_subMeas\_totalGap} in
+\doclink{MIPStarRE/LDT/Preliminaries/Triangles.lean}.  The self-improvement
+wrappers are \leanid{final\_fields\_point\_consistency\_totalGap\_natural} and
+\leanid{final\_fields\_point\_consistency\_totalGap} in
+\doclink{MIPStarRE/LDT/SelfImprovement/Theorems/Results/BoundednessTransport.lean}.}
+In ordinary mathematical terms, the formal lemma says that if the helper
+point-consistency error is at most $\delta$, the state-dependent distance
+between the two right-register submeasurement families is at most $\varepsilon$,
+and the averaged total-overlap displacement is at most $\eta$, then the
+transported consistency error is at most
+\[
+  \delta + \sqrt{\varepsilon} + \eta.
+\]
+This is the same argument as the measurement-valued triangle-substitution
+proposition, except that the term which vanishes for measurements is retained.
+
+The formal statement does not yet prove an internal bound on $\eta$ from the
+data-processing estimate.  A separate estimate may be possible, for example
+with a dimension- or outcome-cardinality dependent loss obtained by applying
+Cauchy--Schwarz to the sum of the outcome differences.  Such a bound is not the
+literal measurement-valued step printed in the paper, and it has not yet been
+formalized as part of the self-improvement theorem.
+
+\section{Conclusion}
+
+The printed proof applies a measurement-valued substitution principle at a
+place where the formal objects are submeasurements.  The matching-mass part of
+the argument is unchanged and is controlled by the square root of the
+state-dependent distance, but a second term involving the right-register totals
+appears.  This term is zero for measurements and is not zero in general for
+submeasurements.
+
+Thus the current formal development records a genuine proof-level gap in the
+projective point-consistency paragraph.  The corrected formal statement includes
+an additional total-overlap displacement parameter.  Closing the paper step as
+stated requires either a proof that this displacement is absorbed by the
+available data-processing error, possibly with a revised numerical constant, or
+a different argument which avoids changing the total-overlap term.
+
+\bibliographystyle{alpha}
+\bibliography{references}
+
+\end{document}

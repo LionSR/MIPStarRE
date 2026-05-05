@@ -251,6 +251,61 @@ theorem triangleSub
 
 /-! ### Right-register variant of `triangleSub` -/
 
+private lemma right_match_gap_abs_le_sqrt_qSDD
+    {Outcome : Type*} {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype Outcome]
+    (ψ : QuantumState ι) (hψ : ψ.IsNormalized)
+    (A B D : SubMeas Outcome ι) :
+    |(∑ a : Outcome, ev ψ (A.outcome a * B.outcome a)) -
+        ∑ a : Outcome, ev ψ (A.outcome a * D.outcome a)| ≤
+      Real.sqrt (qSDD ψ B D) := by
+  let diagA : Error := ∑ a : Outcome, ev ψ (A.outcome a * A.outcome a)
+  have hdiagA_le_one : diagA ≤ 1 := by
+    simpa [diagA] using subMeas_diagMass_le_one ψ hψ A
+  have haux :
+      |∑ a : Outcome, ev ψ (A.outcome a * (B.outcome a - D.outcome a))| ≤
+        Real.sqrt diagA * Real.sqrt (qSDD ψ B D) := by
+    calc
+      |∑ a : Outcome, ev ψ (A.outcome a * (B.outcome a - D.outcome a))|
+        ≤ Real.sqrt
+            (∑ a : Outcome, ev ψ (A.outcome a * (A.outcome a)ᴴ)) *
+            Real.sqrt
+              (∑ a : Outcome,
+                ev ψ ((B.outcome a - D.outcome a)ᴴ *
+                  (B.outcome a - D.outcome a))) := by
+              simpa using
+                sum_ev_mul_le_sqrt ψ
+                  (fun a => A.outcome a)
+                  (fun a => B.outcome a - D.outcome a)
+      _ = Real.sqrt diagA * Real.sqrt (qSDD ψ B D) := by
+            simp [diagA, qSDD, qSDDCore, SubMeas.outcome_hermitian]
+  have hsqrtA : Real.sqrt diagA ≤ 1 := by
+    simpa using Real.sqrt_le_sqrt hdiagA_le_one
+  have haux' :
+      |∑ a : Outcome, ev ψ (A.outcome a * (B.outcome a - D.outcome a))| ≤
+        Real.sqrt (qSDD ψ B D) := by
+    calc
+      |∑ a : Outcome, ev ψ (A.outcome a * (B.outcome a - D.outcome a))|
+        ≤ Real.sqrt diagA * Real.sqrt (qSDD ψ B D) := haux
+      _ ≤ 1 * Real.sqrt (qSDD ψ B D) := by
+            exact mul_le_mul_of_nonneg_right hsqrtA (Real.sqrt_nonneg _)
+      _ = Real.sqrt (qSDD ψ B D) := by ring
+  convert haux' using 1
+  refine congrArg abs ?_
+  calc
+    (∑ a : Outcome, ev ψ (A.outcome a * B.outcome a)) -
+        ∑ a : Outcome, ev ψ (A.outcome a * D.outcome a)
+      = ∑ a : Outcome,
+          (ev ψ (A.outcome a * B.outcome a) -
+            ev ψ (A.outcome a * D.outcome a)) := by
+              rw [← Finset.sum_sub_distrib]
+    _ = ∑ a : Outcome, ev ψ (A.outcome a * (B.outcome a - D.outcome a)) := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          rw [(ev_sub ψ (A.outcome a * B.outcome a)
+            (A.outcome a * D.outcome a)).symm]
+          simp [mul_sub]
+
 theorem triangleSub_right
     {Question Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
@@ -285,54 +340,8 @@ theorem triangleSub_right
   rcases hBD with ⟨hBD⟩
   have hgap_pointwise : ∀ q, |gap q| ≤ Real.sqrt (sdd q) := by
     intro q
-    let diagA : Error := ∑ a : Outcome, ev ψ ((AL q).outcome a * (AL q).outcome a)
-    have hdiagA_le_one : diagA ≤ 1 := by
-      simpa [diagA] using subMeas_diagMass_le_one ψ hψ (AL q)
-    have haux :
-        |∑ a : Outcome, ev ψ ((AL q).outcome a * ((BR q).outcome a - (DR q).outcome a))| ≤
-          Real.sqrt diagA * Real.sqrt (sdd q) := by
-      calc
-        |∑ a : Outcome, ev ψ ((AL q).outcome a * ((BR q).outcome a - (DR q).outcome a))|
-          ≤ Real.sqrt
-              (∑ a : Outcome, ev ψ ((AL q).outcome a * ((AL q).outcome a)ᴴ)) *
-              Real.sqrt
-                (∑ a : Outcome,
-                  ev ψ
-                    (((BR q).outcome a - (DR q).outcome a)ᴴ *
-                      ((BR q).outcome a - (DR q).outcome a))) := by
-                  simpa using
-                    sum_ev_mul_le_sqrt ψ
-                      (fun a => (AL q).outcome a)
-                      (fun a => (BR q).outcome a - (DR q).outcome a)
-        _ = Real.sqrt diagA * Real.sqrt (sdd q) := by
-              simp [diagA, sdd, qSDD, qSDDCore, SubMeas.outcome_hermitian]
-    have hsqrtA : Real.sqrt diagA ≤ 1 := by
-      simpa using Real.sqrt_le_sqrt hdiagA_le_one
-    have haux' :
-        |∑ a : Outcome, ev ψ ((AL q).outcome a * ((BR q).outcome a - (DR q).outcome a))| ≤
-          Real.sqrt (sdd q) := by
-      calc
-        |∑ a : Outcome, ev ψ ((AL q).outcome a * ((BR q).outcome a - (DR q).outcome a))|
-          ≤ Real.sqrt diagA * Real.sqrt (sdd q) := haux
-        _ ≤ 1 * Real.sqrt (sdd q) := by
-              exact mul_le_mul_of_nonneg_right hsqrtA (Real.sqrt_nonneg _)
-        _ = Real.sqrt (sdd q) := by ring
-    convert haux' using 1
-    dsimp [gap, matchB, matchD]
-    refine congrArg abs ?_
-    calc
-      ∑ a : Outcome, ev ψ ((AL q).outcome a * (BR q).outcome a) -
-          ∑ a : Outcome, ev ψ ((AL q).outcome a * (DR q).outcome a)
-        = ∑ a : Outcome,
-            (ev ψ ((AL q).outcome a * (BR q).outcome a) -
-              ev ψ ((AL q).outcome a * (DR q).outcome a)) := by
-                rw [← Finset.sum_sub_distrib]
-      _ = ∑ a : Outcome, ev ψ ((AL q).outcome a * ((BR q).outcome a - (DR q).outcome a)) := by
-            refine Finset.sum_congr rfl ?_
-            intro a _
-            rw [(ev_sub ψ ((AL q).outcome a * (BR q).outcome a)
-              ((AL q).outcome a * (DR q).outcome a)).symm]
-            simp [mul_sub]
+    simpa [gap, matchB, matchD, sdd] using
+      right_match_gap_abs_le_sqrt_qSDD ψ hψ (AL q) (BR q) (DR q)
   have hgap_avg_abs :
       avgOver 𝒟 (fun q => |gap q|) ≤ Real.sqrt (avgOver 𝒟 sdd) := by
     exact
@@ -391,6 +400,110 @@ theorem triangleSub_right
           exact add_le_add hAB hgap_avg_abs
     _ ≤ δ + Real.sqrt ε := by
           simpa [add_comm] using add_le_add_right (Real.sqrt_le_sqrt hBD) δ
+
+/-- Right-register substitution for submeasurements, with the total-overlap
+displacement stated explicitly.
+
+For complete right-register measurements the total-overlap term
+`ev ψ (A_total ⊗ B_total)` is independent of the right family.  For general
+submeasurements this term may change.  The lemma therefore separates the usual
+state-dependent-distance contribution from the averaged displacement of the
+right total operator. -/
+theorem triangleSub_right_subMeas_totalGap
+    {Question Outcome : Type*} {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype Outcome]
+    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
+    (hψ : ψ.IsNormalized) (h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1)
+    (A B D : IdxSubMeas Question Outcome ι) (δ ε η : Error)
+    (hAB : ConsRel ψ 𝒟 A B δ)
+    (hBD : SDDRel ψ 𝒟
+      (IdxSubMeas.liftRight B)
+      (IdxSubMeas.liftRight D) ε)
+    (hTotal :
+      avgOver 𝒟 (fun q =>
+        |ev ψ (leftTensor (ι₂ := ι) ((A q).total) *
+            rightTensor (ι₁ := ι) ((D q).total)) -
+          ev ψ (leftTensor (ι₂ := ι) ((A q).total) *
+            rightTensor (ι₁ := ι) ((B q).total))|) ≤ η) :
+    ConsRel ψ 𝒟 A D (δ + Real.sqrt ε + η) := by
+  let AL : IdxSubMeas Question Outcome (ι × ι) := IdxSubMeas.liftLeft A
+  let BR : IdxSubMeas Question Outcome (ι × ι) := IdxSubMeas.liftRight B
+  let DR : IdxSubMeas Question Outcome (ι × ι) := IdxSubMeas.liftRight D
+  let matchB : Question → Error := fun q =>
+    ∑ a : Outcome, ev ψ ((AL q).outcome a * (BR q).outcome a)
+  let matchD : Question → Error := fun q =>
+    ∑ a : Outcome, ev ψ ((AL q).outcome a * (DR q).outcome a)
+  let totalB : Question → Error := fun q =>
+    ev ψ ((AL q).total * (BR q).total)
+  let totalD : Question → Error := fun q =>
+    ev ψ ((AL q).total * (DR q).total)
+  let sdd : Question → Error := fun q =>
+    qSDD ψ (BR q) (DR q)
+  let matchGap : Question → Error := fun q => matchB q - matchD q
+  let totalGap : Question → Error := fun q => totalD q - totalB q
+  rcases hAB with ⟨hAB⟩
+  rw [bipartiteConsError_eq_consError_placed] at hAB
+  rcases hBD with ⟨hBD⟩
+  have hmatchGap_pointwise : ∀ q, |matchGap q| ≤ Real.sqrt (sdd q) := by
+    intro q
+    simpa [matchGap, matchB, matchD, sdd] using
+      right_match_gap_abs_le_sqrt_qSDD ψ hψ (AL q) (BR q) (DR q)
+  have hmatchGap_avg_abs :
+      avgOver 𝒟 (fun q => |matchGap q|) ≤ Real.sqrt (avgOver 𝒟 sdd) := by
+    exact
+      avgOver_abs_le_sqrt_of_pointwise_nonneg 𝒟 h𝒟 matchGap sdd
+        hmatchGap_pointwise
+        (fun q => qSDD_nonneg ψ (BR q) (DR q))
+  have htotalGap_avg_abs :
+      avgOver 𝒟 (fun q => |totalGap q|) ≤ η := by
+    simpa [totalGap, totalD, totalB, AL, BR, DR, IdxSubMeas.liftLeft,
+      IdxSubMeas.liftRight] using hTotal
+  have hdefect_pointwise :
+      ∀ q, qConsDefect ψ (AL q) (DR q) ≤
+        qConsDefect ψ (AL q) (BR q) + |matchGap q| + |totalGap q| := by
+    intro q
+    have hdefB :
+        qConsDefect ψ (AL q) (BR q) = max 0 (totalB q - matchB q) := by
+      unfold qConsDefect qMatchMass
+      dsimp [totalB, matchB]
+    have hdefD :
+        qConsDefect ψ (AL q) (DR q) = max 0 (totalD q - matchD q) := by
+      unfold qConsDefect qMatchMass
+      dsimp [totalD, matchD]
+    calc
+      qConsDefect ψ (AL q) (DR q)
+        = max 0 (((totalB q - matchB q) + matchGap q) + totalGap q) := by
+            rw [hdefD]
+            dsimp [matchGap, totalGap]
+            ring_nf
+      _ ≤ max 0 ((totalB q - matchB q) + matchGap q) + |totalGap q| := by
+            exact max_zero_add_le _ _
+      _ ≤ (max 0 (totalB q - matchB q) + |matchGap q|) + |totalGap q| := by
+            linarith [max_zero_add_le (totalB q - matchB q) (matchGap q)]
+      _ = qConsDefect ψ (AL q) (BR q) + |matchGap q| + |totalGap q| := by
+            rw [hdefB]
+  constructor
+  rw [bipartiteConsError_eq_consError_placed]
+  unfold consError sddError at *
+  calc
+    avgOver 𝒟 (fun q => qConsDefect ψ (AL q) (DR q))
+      ≤ avgOver 𝒟
+          (fun q => qConsDefect ψ (AL q) (BR q) + |matchGap q| + |totalGap q|) := by
+          apply avgOver_mono
+          intro q
+          exact hdefect_pointwise q
+    _ = (avgOver 𝒟 (fun q => qConsDefect ψ (AL q) (BR q)) +
+          avgOver 𝒟 (fun q => |matchGap q|)) +
+          avgOver 𝒟 (fun q => |totalGap q|) := by
+            rw [avgOver_add, avgOver_add]
+    _ ≤ (δ + Real.sqrt (avgOver 𝒟 sdd)) + η := by
+          exact add_le_add (add_le_add hAB hmatchGap_avg_abs) htotalGap_avg_abs
+    _ ≤ (δ + Real.sqrt ε) + η := by
+          have hsqrt_sdd_le :
+              Real.sqrt (avgOver 𝒟 sdd) ≤ Real.sqrt ε := by
+            exact Real.sqrt_le_sqrt (by simpa [sdd, BR, DR] using hBD)
+          linarith
+    _ = δ + Real.sqrt ε + η := by ring
 
 /-- `prop:simeq-triangle-inequality`.
 

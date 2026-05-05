@@ -745,6 +745,12 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
     A^u_a \ot I \simeq_{\widehat{\zeta} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}}}
     I \ot H_{[h(u) = a]}.
   \]
+  In Lean the corresponding transport is stated for submeasurements with the
+  total-overlap displacement recorded explicitly; this is the term which
+  vanishes in the measurement-valued form of Lemma~\ref{prop:triangle-sub}.
+  \lean{MIPStarRE.LDT.Preliminaries.triangleSub_right_subMeas_totalGap}
+  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap_natural}
+  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap}
 
   \emph{Proof of \ref{item:self-improvement-projective-self}.}
   \lean{MIPStarRE.LDT.SelfImprovement.self_closeness_transport_through_orthonormalization}
