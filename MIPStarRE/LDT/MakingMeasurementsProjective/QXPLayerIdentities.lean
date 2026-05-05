@@ -708,6 +708,44 @@ theorem exists_rectangular_coisometry_extending_orthonormal_rows
   change (b (fe i)) r = row i r
   rw [hb (fe i) ⟨i, rfl⟩, hrowFull i]
 
+/-- Extend the positive Gram right-singular rows to a rectangular coisometry.
+
+The selected rows are the conjugate eigenvector rows of the right Gram
+operator.  The cardinality hypothesis is the rectangular dimension condition:
+there must be enough columns to complete the prescribed rows to an
+orthonormal row family indexed by the auxiliary row space. -/
+theorem exists_rectangular_coisometry_with_positive_gram_spectrum_right_rows
+    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
+    (Q : Matrix ι ι ℂ) (hQ : Q.IsHermitian)
+    (e : {i : ι // 0 < hQ.eigenvalues i} ↪ μ)
+    (hcard : Fintype.card μ ≤ Fintype.card ι) :
+    ∃ W : Matrix μ ι ℂ,
+      W * Wᴴ = (1 : Matrix μ μ ℂ) ∧
+        ∀ (i : {i : ι // 0 < hQ.eigenvalues i}) (r : ι),
+          W (e i) r = positiveGramSpectrumRightRows Q hQ i r := by
+  classical
+  let row : {i : ι // 0 < hQ.eigenvalues i} → EuclideanSpace ℂ ι := fun i =>
+    WithLp.toLp 2 fun r : ι => positiveGramSpectrumRightRows Q hQ i r
+  have hrow : Orthonormal ℂ row := by
+    rw [orthonormal_iff_ite]
+    intro i j
+    have hright := positive_gram_spectrum_right_rows_mul_conjTranspose Q hQ
+    have hentry := congrFun (congrFun hright j) i
+    have hone :
+        (1 : Matrix {i : ι // 0 < hQ.eigenvalues i}
+          {i : ι // 0 < hQ.eigenvalues i} ℂ) j i =
+          if i = j then (1 : ℂ) else 0 := by
+      by_cases hij : i = j
+      · subst j
+        simp
+      · have hji : j ≠ i := fun h => hij h.symm
+        simp [hij, hji]
+    simpa [row, Matrix.mul_apply, Matrix.conjTranspose_apply,
+      EuclideanSpace.inner_eq_star_dotProduct, dotProduct, mul_comm, eq_comm, hone] using hentry
+  obtain ⟨W, hW, hrows⟩ :=
+    exists_rectangular_coisometry_extending_orthonormal_rows row hrow e hcard
+  exact ⟨W, hW, by simpa [row] using hrows⟩
+
 /-- The row-coisometry identity for the rectangular SVD choice of `Xhat`.
 
 If `U` and `V` are unitary in the directions used below, and if the rectangular
