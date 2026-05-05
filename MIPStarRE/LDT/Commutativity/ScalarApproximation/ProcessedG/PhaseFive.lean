@@ -527,9 +527,9 @@ lemma evaluatedSlicePhaseFiveStabilityDefect_expansion_at
               (leftTensor (ι₂ := ι)
                   (∑ vy : Point params.next, cV • ∑ b : Fq params, L vy g b) *
                 rightTensor (ι₁ := ι) (∑ u : Point params, cU • R u g)) := by
-          simp [evaluatedSlicePhaseFiveStabilityDefect, gCommStabilityTwoR,
-            averageIdxSubMeas, averageOperatorOverDistribution,
-            postprocess_sandwichByOuterSubMeas_snd_outcome,
+          simp_rw [evaluatedSlicePhaseFiveStabilityDefect, gCommStabilityTwoR,
+            averageIdxSubMeas, postprocess_sandwichByOuterSubMeas_snd_outcome]
+          simp [averageOperatorOverDistribution,
             IdxPolyFamily.averagedSlicePointEvaluationOperator, cV, cU, L, R,
             uniformDistribution, Finset.sum_mul, mul_assoc]
     _ = ∑ g : Polynomial params, ∑ u : Point params, ∑ vy : Point params.next,

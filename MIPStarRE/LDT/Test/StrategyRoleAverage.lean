@@ -65,7 +65,8 @@ private lemma axisParallelLineAnswerFamily_classicalRoleSymm_eq_roleSymmetrized
   · intro a
     simp [axisParallelLineAnswerFamily, SameSpaceProjStrat.classicalRoleSymmStrategy,
       SameSpaceProjStrat.symmetrizedAxisParallelMeasurement,
-      axisParallelLineAnswerMeasurement]
+      axisParallelLineAnswerMeasurement, symmetrizedIdxProjMeas,
+      Finset.sum_add_distrib, roleCond_finset_sum]
   · change (postprocess
         ((symmetrizedIdxProjMeas strategy.axisParallelMeasurementA
           strategy.axisParallelMeasurementB ℓ).toSubMeas)
@@ -89,7 +90,8 @@ private lemma diagonalLineAnswerFamily_classicalRoleSymm_eq_roleSymmetrized
   · intro a
     simp [diagonalLineAnswerFamily, SameSpaceProjStrat.classicalRoleSymmStrategy,
       SameSpaceProjStrat.symmetrizedDiagonalMeasurement,
-      diagonalLineAnswerMeasurement]
+      diagonalLineAnswerMeasurement, symmetrizedIdxProjMeas,
+      Finset.sum_add_distrib, roleCond_finset_sum]
   · change (postprocess
         ((symmetrizedIdxProjMeas strategy.diagonalMeasurementA
           strategy.diagonalMeasurementB ℓ).toSubMeas)

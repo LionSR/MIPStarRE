@@ -107,7 +107,9 @@ lemma pointWithCompletePart_as_switcheroo_input
                 completePartPointProductRight, completePartSubMeas,
                 multiplyByTotalOnRight, multiplyByTotalOnLeft,
                 orderedProductOpFamily, reversedProductOpFamily,
-                OpFamily.leftPlacedOpFamily, postprocess_total, hsingle]
+                OpFamily.leftPlacedOpFamily, postprocess_total, hsingle,
+                (family.meas q.1).sum_eq_total,
+                (family.meas q.2).sum_eq_total]
     _ ≤ gamma := hcomm
 
 /-- The complete-part family inherits self-consistency from the slice family by
