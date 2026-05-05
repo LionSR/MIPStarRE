@@ -247,8 +247,12 @@ def matrixSdpCanonicalDiagonalBlock (params : Parameters) [FieldModel params.q]
     (b : MatrixSdpCanonicalBlockIndex params) : MatrixOperator model.space :=
   fun i j => X (b, i) (b, j)
 
-/-- The operator-valued canonical equality constraint
-`∑_b X_{bb} = I`. -/
+/-- The operator-valued canonical equality constraint `∑_b X_{bb} = I`.
+
+The paper states the same constraint as the scalar family
+`Tr(D_{ij}^† X) = b_{ij}` for all matrix units `D_{ij}` and then identifies it
+with the operator equation `∑_b X_{bb} = I`. This definition records the
+left-hand operator of that equivalent equation. -/
 noncomputable def matrixSdpCanonicalConstraintOperator (params : Parameters)
     [FieldModel params.q]
     (model : MatrixSdpRealization params)
@@ -262,7 +266,7 @@ noncomputable def matrixSdpCanonicalBlockDiagonal (params : Parameters) [FieldMo
     (model : MatrixSdpRealization params)
     (B : MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space) :
     MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) :=
-  fun x y => if _h : x.1 = y.1 then B x.1 x.2 y.2 else 0
+  fun x y => if x.1 = y.1 then B x.1 x.2 y.2 else 0
 
 @[simp] theorem matrixSdpCanonicalDiagonalBlock_blockDiagonal (params : Parameters)
     [FieldModel params.q]
@@ -447,7 +451,12 @@ noncomputable def matrixSdpCanonicalObjectiveOperator (params : Parameters)
   simp [matrixSdpCanonicalObjectiveOperator]
 
 /-- The canonical block objective evaluated on the block matrix associated to a
-paper primal submeasurement is the paper primal objective. -/
+paper primal submeasurement is the paper primal objective.
+
+The paper writes this as `Tr(C† X)`.  In the present canonical model the
+objective blocks are the averaged point operators, hence Hermitian measurement
+effects averaged over points; the without-dagger trace pairing used here is the
+same expression in this Hermitian case. -/
 theorem matrixSdpCanonicalObjective_trace_primalBlockMatrix
     (params : Parameters) [FieldModel params.q]
     (model : MatrixSdpRealization params)
