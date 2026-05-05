@@ -49,6 +49,30 @@ lemma ev_adjoint_sub_swap
     _ = ev ψ (((X - Y)ᴴ) * (X - Y)) := by
       simp
 
+/-- The selected `some ()` contribution is bounded by the full `Option Unit`
+summed squared-distance core.
+
+This extracts the common monotonicity step used when a two-outcome
+postprocessed event is passed to `cabApproxDelta`: the singleton selected
+outcome is one summand of the full `Option Unit` sum defining `qSDDCore`. -/
+lemma qSDDCore_optionUnit_some_le
+    {α κ : Type*} [Fintype κ] [DecidableEq κ]
+    (ψ : QuantumState κ) (𝒟 : Distribution α)
+    (A B : α → Option Unit → MIPStarRE.Quantum.Op κ) :
+    avgOver 𝒟
+        (fun x =>
+          qSDDCore ψ
+            (fun _ : Unit => A x (some ()))
+            (fun _ : Unit => B x (some ()))) ≤
+      avgOver 𝒟 (fun x => qSDDCore ψ (A x) (B x)) := by
+  refine avgOver_mono _ _ _ ?_
+  intro x
+  unfold qSDDCore
+  simpa using
+    (Finset.single_le_sum
+      (fun a _ => ev_adjoint_self_nonneg ψ (A x a - B x a))
+      (Finset.mem_univ (some ())))
+
 /-- The reverse `lem:generalize-b` step used at
 `references/ldt-paper/expansion.tex`, line 309.
 
