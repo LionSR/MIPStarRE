@@ -21,9 +21,7 @@
 %     Use \leanid{Name} for Lean identifiers, \ghissue{N} for issues,
 %     \ghpr{N} for pull requests, \doclink{path/to/File.lean} for doc-gen links.
 %   - Write in the first-person plural, active voice, direct sentences.
-%   - Begin with a concise estimate when the note concerns formalization work.
 %   - Put Key theorem forms as Section 2, immediately after At a glance.
-%   - No \noindent\textbf{Verdict:} labels: the Conclusion section is the verdict.
 %   - Keep blueprint/formal comparison and conclusion compact.
 %   - The body must read as mathematical prose, not as an audit log.
 %   - Compile from the repository root with pdflatex.
@@ -40,19 +38,6 @@
   not every imported file.
 \end{itemize}
 
-\section{The source assertion}
-
-We examine a step in \cite{Ji2020LowIndividualDegree}.%
-\footnote{Tracked in \ghissue{NNN}. The paper passage is at
-\path{references/ldt-paper/FILE.tex}, lines~A--B.}
-In the notation of the paper, the cited source needs
-\[
-  \mathcal H \Longrightarrow C.
-  \tag{\texttt{source-label}}
-\]
-Here $\mathcal H$ is the available hypothesis set, and $C$ is the conclusion
-used later.
-
 \section{Key theorem forms}
 
 The formalization should isolate the following mathematical statements.
@@ -67,6 +52,19 @@ Keep declaration names in a footnote if they are needed for traceability.%
 \footnote{For example, the formal declarations might be \leanid{modelSource},
 \leanid{modelAdapter}, and \leanid{modelDownstream} in
 \doclink{MIPStarRE/Path/To/File.lean}.}
+
+\section{The source assertion}
+
+We examine a step in \cite{Ji2020LowIndividualDegree}.%
+\footnote{Tracked in \ghissue{NNN}. The paper passage is at
+\path{references/ldt-paper/FILE.tex}, lines~A--B.}
+In the notation of the paper, the cited source needs
+\[
+  \mathcal H \Longrightarrow C.
+  \tag{\texttt{source-label}}
+\]
+Here $\mathcal H$ is the available hypothesis set, and $C$ is the conclusion
+used later.
 
 \section{Comparison with the blueprint and formalization}
 
