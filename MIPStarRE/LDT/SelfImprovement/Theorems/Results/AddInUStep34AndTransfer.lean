@@ -1799,9 +1799,9 @@ lemma two_mul_delta_le_selfImprovementVarianceError
     have hm_nat : (1 : ℕ) ≤ params.m := params.hm
     exact_mod_cast hm_nat
   have hm_nonneg : (0 : Error) ≤ (params.m : Error) := by linarith
-  have hB : 0 ≤ generalizeBError params := by
-    dsimp [generalizeBError]; positivity
-  unfold selfImprovementVarianceError globalVarianceOfPointsError
+  have hdq_nonneg : (0 : Error) ≤ ((params.d : Error) / (params.q : Error)) :=
+    div_nonneg (by exact_mod_cast Nat.zero_le _) (le_of_lt params.q_cast_pos)
+  rw [selfImprovementVarianceError_eq]
   calc
     2 * delta
         ≤ 24 * delta := by linarith
@@ -1810,9 +1810,15 @@ lemma two_mul_delta_le_selfImprovementVarianceError
         have : (0 : Error) ≤ ((params.m : Error) - 1) * delta :=
           mul_nonneg (by linarith) hdelta
         nlinarith
-    _ ≤ 24 * (params.m : Error) * (eps + delta + generalizeBError params) := by
+    _ ≤ 24 * (params.m : Error) *
+          (eps + delta +
+            ((params.m : Error) * ((params.d : Error) / (params.q : Error)))) := by
         have h24m : (0 : Error) ≤ 24 * (params.m : Error) := by nlinarith
-        nlinarith [mul_nonneg h24m heps, mul_nonneg h24m hB]
+        have hmdq_nonneg :
+            (0 : Error) ≤ (params.m : Error) *
+              ((params.d : Error) / (params.q : Error)) :=
+          mul_nonneg hm_nonneg hdq_nonneg
+        nlinarith [mul_nonneg h24m heps, mul_nonneg h24m hmdq_nonneg]
 
 /-- Arithmetic absorption used by `add_in_u_simplified_transfer_of_cs_chain`:
 the four step-bound sum `2 √(2 δ) + 2 √(ζ_variance)` is dominated by
