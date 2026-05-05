@@ -25,11 +25,6 @@ structure MatrixSdpRealization (params : Parameters) [FieldModel params.q] where
   state : PositiveMatrixState space
   pointMeasurement : Point params → MatrixSubmeasurement (Fq params) space
 
-/-- The paper's strict-feasibility weight for the matrix SDP primal witness. -/
-noncomputable def matrixSdpStrictPrimalWeight (params : Parameters)
-    [FieldModel params.q] : Error :=
-  sdpStrictPrimalWeight params
-
 /-- The matrix-level strict-feasible primal witness
 `T_g = (2 |\polyfunc{m}{q}{d}|)^{-1} I`. -/
 noncomputable def matrixSdpStrictPrimalSubmeasurement (params : Parameters)
@@ -91,24 +86,17 @@ def matrixAveragedPointOperatorContribution (params : Parameters)
     (g : Polynomial params) (u : Point params) : MatrixOperator model.space :=
   (model.pointMeasurement u).effect (g u)
 
-/-- The concrete averaged operator `A_g = E_u A^u_{g(u)}`. -/
+/-- The concrete averaged operator `A_g = E_u A^u_{g(u)}`.
+
+This is defined through the project-wide distributional average
+`averageOperatorOverDistribution` so that the submeasurement averaging lemmas
+apply directly.  The operator is used only in this matrix realization layer. -/
 noncomputable def matrixAveragedPointOperator (params : Parameters)
     [FieldModel params.q]
     (model : MatrixSdpRealization params)
     (g : Polynomial params) : MatrixOperator model.space :=
   averageOperatorOverDistribution (uniformDistribution (Point params))
     (matrixAveragedPointOperatorContribution params model g)
-
-/-- The concrete matrix average agrees with the paper-local uniform operator
-average used elsewhere in the formalization. -/
-theorem matrixAveragedPointOperator_eq_averageOperatorOverDistribution (params : Parameters)
-    [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (g : Polynomial params) :
-    matrixAveragedPointOperator params model g =
-      averageOperatorOverDistribution (uniformDistribution (Point params))
-        (matrixAveragedPointOperatorContribution params model g) := by
-  rfl
 
 /-- The averaged point operator `A_g` is bounded by the identity. -/
 theorem matrixAveragedPointOperator_le_one (params : Parameters)
@@ -119,8 +107,7 @@ theorem matrixAveragedPointOperator_le_one (params : Parameters)
   let A : SubMeas Unit model.space.carrier :=
     averageUnitSubMeas (ι := model.space.carrier)
       (matrixAveragedPointOperatorContribution params model g)
-      (fun u => by
-        exact (model.pointMeasurement u).pos (g u))
+      (fun u => (model.pointMeasurement u).pos (g u))
       (fun u => by
         calc
           (model.pointMeasurement u).effect (g u)
@@ -129,8 +116,8 @@ theorem matrixAveragedPointOperator_le_one (params : Parameters)
                   (fun a _ => (model.pointMeasurement u).pos a)
                   (Finset.mem_univ (g u))
           _ ≤ 1 := (model.pointMeasurement u).sum_le_one)
-  simpa [A, matrixAveragedPointOperator_eq_averageOperatorOverDistribution,
-    matrixAveragedPointOperatorContribution, averageUnitSubMeas_outcome] using
+  simpa [A, matrixAveragedPointOperator, matrixAveragedPointOperatorContribution,
+    averageUnitSubMeas_outcome] using
       A.outcome_le_one ()
 
 /-- The concrete primal contribution `T_g A_g`. -/
@@ -236,7 +223,9 @@ structure MatrixSdpOptimalWitness (params : Parameters) [FieldModel params.q]
 This is the concrete matrix analogue of `SdpStatementWithSlackness`: it does
 not assert that the currently formalized reduced `sdp` witness is optimal.
 Instead it records the kind of optimal witness obtained from the paper's
-Slater/strong-duality argument. -/
+Slater/strong-duality argument.
+
+Grounded by: #1230. -/
 structure MatrixSdpStatementWithSlackness (params : Parameters) [FieldModel params.q]
     (model : MatrixSdpRealization params) : Prop where
   witness :
