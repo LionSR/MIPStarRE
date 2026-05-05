@@ -222,6 +222,254 @@ theorem matrixSdpFeasibleBounds_canonical (params : Parameters) [FieldModel para
   dualDominatesIdentity := one_le_matrixSdpStrictDualWitness model
   dualFeasible := matrixSdpStrictDualWitness_dualFeasible params model
 
+/-! ### Canonical block primal form -/
+
+/-- The block index set for the canonical primal SDP.
+
+The `some g` blocks carry the primal operators `T_g`.  The `none` block is the
+slack block `S` in the canonical equality constraint
+`∑_g T_g + S = I`. -/
+abbrev MatrixSdpCanonicalBlockIndex (params : Parameters) [FieldModel params.q] :=
+  Option (Polynomial params)
+
+/-- The finite Hilbert space carrying the canonical block primal variable. -/
+noncomputable def matrixSdpCanonicalBlockHilbertSpace (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params) : FiniteHilbertSpace where
+  carrier := MatrixSdpCanonicalBlockIndex params × model.space.carrier
+  instFintype := inferInstance
+  instDecidableEq := inferInstance
+  instNonempty := inferInstance
+
+/-- The diagonal block of a canonical primal matrix. -/
+def matrixSdpCanonicalDiagonalBlock (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (b : MatrixSdpCanonicalBlockIndex params) : MatrixOperator model.space :=
+  fun i j => X (b, i) (b, j)
+
+/-- The operator-valued canonical equality constraint
+`∑_b X_{bb} = I`. -/
+noncomputable def matrixSdpCanonicalConstraintOperator (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) :
+    MatrixOperator model.space :=
+  ∑ b : MatrixSdpCanonicalBlockIndex params,
+    matrixSdpCanonicalDiagonalBlock params model X b
+
+/-- The block-diagonal matrix with prescribed diagonal blocks. -/
+noncomputable def matrixSdpCanonicalBlockDiagonal (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (B : MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space) :
+    MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) :=
+  fun x y => if _h : x.1 = y.1 then B x.1 x.2 y.2 else 0
+
+@[simp] theorem matrixSdpCanonicalDiagonalBlock_blockDiagonal (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (B : MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space)
+    (b : MatrixSdpCanonicalBlockIndex params) :
+    matrixSdpCanonicalDiagonalBlock params model
+        (matrixSdpCanonicalBlockDiagonal params model B) b =
+      B b := by
+  ext i j
+  simp [matrixSdpCanonicalDiagonalBlock, matrixSdpCanonicalBlockDiagonal]
+
+/-- The canonical equality constraint of a block-diagonal matrix is the sum of
+its diagonal blocks. -/
+theorem matrixSdpCanonicalConstraintOperator_blockDiagonal (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (B : MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space) :
+    matrixSdpCanonicalConstraintOperator params model
+        (matrixSdpCanonicalBlockDiagonal params model B) =
+      ∑ b : MatrixSdpCanonicalBlockIndex params, B b := by
+  simp [matrixSdpCanonicalConstraintOperator]
+
+/-- The trace pairing of two canonical block-diagonal operators is the sum of
+the trace pairings of their diagonal blocks. -/
+theorem matrixSdpCanonicalBlockDiagonal_trace_mul (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (B D : MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space) :
+    Matrix.trace
+        (matrixSdpCanonicalBlockDiagonal params model B *
+          matrixSdpCanonicalBlockDiagonal params model D) =
+      ∑ b : MatrixSdpCanonicalBlockIndex params, Matrix.trace (B b * D b) := by
+  rw [Matrix.trace]
+  trans ∑ x : MatrixSdpCanonicalBlockIndex params × model.space.carrier,
+      ∑ j : model.space.carrier, B x.1 x.2 j * D x.1 j x.2
+  · refine Finset.sum_congr rfl ?_
+    intro x _
+    simp only [Matrix.diag_apply]
+    rw [Matrix.mul_apply]
+    change (∑ y : MatrixSdpCanonicalBlockIndex params × model.space.carrier,
+        matrixSdpCanonicalBlockDiagonal params model B x y *
+          matrixSdpCanonicalBlockDiagonal params model D y x) =
+      ∑ j : model.space.carrier, B x.1 x.2 j * D x.1 j x.2
+    rw [Fintype.sum_prod_type]
+    simp [matrixSdpCanonicalBlockDiagonal]
+  · rw [Fintype.sum_prod_type]
+    simp [Matrix.trace, Matrix.mul_apply]
+
+/-- The primal slack block `S = I - ∑_g T_g`. -/
+noncomputable def matrixSdpCanonicalSlackOperator (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space) :
+    MatrixOperator model.space :=
+  1 - ∑ g : Polynomial params, T.effect g
+
+/-- The slack block of a matrix submeasurement is positive semidefinite. -/
+theorem matrixSdpCanonicalSlackOperator_nonneg (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space) :
+    0 ≤ matrixSdpCanonicalSlackOperator params model T := by
+  exact sub_nonneg.mpr T.sum_le_one
+
+/-- The block family associated to the paper primal variable and its slack. -/
+noncomputable def matrixSdpCanonicalPrimalBlockFamily (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space) :
+    MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space
+  | none => matrixSdpCanonicalSlackOperator params model T
+  | some g => T.effect g
+
+@[simp] theorem matrixSdpCanonicalPrimalBlockFamily_none (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space) :
+    matrixSdpCanonicalPrimalBlockFamily params model T none =
+      matrixSdpCanonicalSlackOperator params model T :=
+  rfl
+
+@[simp] theorem matrixSdpCanonicalPrimalBlockFamily_some (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
+    (g : Polynomial params) :
+    matrixSdpCanonicalPrimalBlockFamily params model T (some g) = T.effect g :=
+  rfl
+
+/-- The canonical block matrix associated to the paper primal submeasurement. -/
+noncomputable def matrixSdpCanonicalPrimalBlockMatrix (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space) :
+    MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) :=
+  matrixSdpCanonicalBlockDiagonal params model
+    (matrixSdpCanonicalPrimalBlockFamily params model T)
+
+/-- The polynomial diagonal blocks of the canonical primal matrix are the
+paper primal operators `T_g`. -/
+theorem matrixSdpCanonicalDiagonalBlock_primalBlockMatrix_some
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
+    (g : Polynomial params) :
+    matrixSdpCanonicalDiagonalBlock params model
+        (matrixSdpCanonicalPrimalBlockMatrix params model T) (some g) =
+      T.effect g := by
+  simp [matrixSdpCanonicalPrimalBlockMatrix]
+
+/-- The extra diagonal block of the canonical primal matrix is the slack
+operator `I - ∑_g T_g`. -/
+theorem matrixSdpCanonicalDiagonalBlock_primalBlockMatrix_none
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space) :
+    matrixSdpCanonicalDiagonalBlock params model
+        (matrixSdpCanonicalPrimalBlockMatrix params model T) none =
+      matrixSdpCanonicalSlackOperator params model T := by
+  simp [matrixSdpCanonicalPrimalBlockMatrix]
+
+/-- The canonical block matrix associated to a submeasurement satisfies the
+canonical equality constraint `∑_g T_g + S = I`. -/
+theorem matrixSdpCanonicalConstraintOperator_primalBlockMatrix
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space) :
+    matrixSdpCanonicalConstraintOperator params model
+        (matrixSdpCanonicalPrimalBlockMatrix params model T) =
+      1 := by
+  rw [matrixSdpCanonicalPrimalBlockMatrix,
+    matrixSdpCanonicalConstraintOperator_blockDiagonal]
+  rw [Fintype.sum_option]
+  simp [matrixSdpCanonicalSlackOperator]
+
+/-- The canonical objective matrix `C = diag(A_g, 0)` in the paper's block SDP. -/
+noncomputable def matrixSdpCanonicalObjectiveBlockFamily (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params) :
+    MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space
+  | none => 0
+  | some g => matrixAveragedPointOperator params model g
+
+/-- The canonical objective operator of the block SDP. -/
+noncomputable def matrixSdpCanonicalObjectiveOperator (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params) :
+    MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) :=
+  matrixSdpCanonicalBlockDiagonal params model
+    (matrixSdpCanonicalObjectiveBlockFamily params model)
+
+@[simp] theorem matrixSdpCanonicalObjectiveBlockFamily_none (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params) :
+    matrixSdpCanonicalObjectiveBlockFamily params model none = 0 :=
+  rfl
+
+@[simp] theorem matrixSdpCanonicalObjectiveBlockFamily_some (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (g : Polynomial params) :
+    matrixSdpCanonicalObjectiveBlockFamily params model (some g) =
+      matrixAveragedPointOperator params model g :=
+  rfl
+
+@[simp] theorem matrixSdpCanonicalDiagonalBlock_objectiveOperator_none
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params) :
+    matrixSdpCanonicalDiagonalBlock params model
+        (matrixSdpCanonicalObjectiveOperator params model) none =
+      0 := by
+  simp [matrixSdpCanonicalObjectiveOperator]
+
+@[simp] theorem matrixSdpCanonicalDiagonalBlock_objectiveOperator_some
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (g : Polynomial params) :
+    matrixSdpCanonicalDiagonalBlock params model
+        (matrixSdpCanonicalObjectiveOperator params model) (some g) =
+      matrixAveragedPointOperator params model g := by
+  simp [matrixSdpCanonicalObjectiveOperator]
+
+/-- The canonical block objective evaluated on the block matrix associated to a
+paper primal submeasurement is the paper primal objective. -/
+theorem matrixSdpCanonicalObjective_trace_primalBlockMatrix
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space) :
+    Complex.re (Matrix.trace
+        (matrixSdpCanonicalObjectiveOperator params model *
+          matrixSdpCanonicalPrimalBlockMatrix params model T)) =
+      matrixSdpPrimalObjective params model T := by
+  rw [matrixSdpCanonicalObjectiveOperator, matrixSdpCanonicalPrimalBlockMatrix]
+  rw [matrixSdpCanonicalBlockDiagonal_trace_mul]
+  rw [Fintype.sum_option]
+  simp only [matrixSdpCanonicalObjectiveBlockFamily_none,
+    matrixSdpCanonicalPrimalBlockFamily_none, zero_mul, Matrix.trace_zero,
+    matrixSdpCanonicalObjectiveBlockFamily_some, matrixSdpCanonicalPrimalBlockFamily_some,
+    zero_add, Complex.re_sum]
+  unfold matrixSdpPrimalObjective matrixSdpPrimalContributionOperator
+  rw [Matrix.trace_sum]
+  simp only [Complex.re_sum]
+  refine Finset.sum_congr rfl ?_
+  intro g _
+  rw [Matrix.trace_mul_comm]
+
 /-- The concrete complementary-slackness defect `T_g (Z - A_g)`. -/
 noncomputable def matrixSdpComplementarySlacknessDefect (params : Parameters)
     [FieldModel params.q]
