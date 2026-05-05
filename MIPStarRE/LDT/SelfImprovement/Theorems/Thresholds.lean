@@ -120,6 +120,20 @@ The paper's central arithmetic step (`self_improvement.tex`, line 441) is
 We separate the constant `5` from the multipliers `4`/`11`/`3` used downstream
 and prove a single reusable bound. -/
 
+/-- Expansion of the variance error into the three residuals appearing in the
+self-improvement paper.
+
+The final summand is written as `m * (d / q)`, rather than `(m * d) / q`, so
+that square-root estimates may split the last product directly. -/
+theorem selfImprovementVarianceError_eq
+    (params : Parameters) [FieldModel params.q] (eps delta : Error) :
+    selfImprovementVarianceError params eps delta =
+      24 * (params.m : Error) *
+        (eps + delta +
+          ((params.m : Error) * ((params.d : Error) / (params.q : Error)))) := by
+  unfold selfImprovementVarianceError globalVarianceOfPointsError generalizeBError
+  rw [mul_div_assoc]
+
 /-- Paper-faithful square-root bound on the variance error
 (`self_improvement.tex`, lines 440--442). -/
 theorem sqrt_selfImprovementVarianceError_le
@@ -133,18 +147,7 @@ theorem sqrt_selfImprovementVarianceError_le
   have hmpos : (0 : Error) ≤ (params.m : Error) := m_cast_nonneg params
   have hdq_nonneg : (0 : Error) ≤ ((params.d : Error) / (params.q : Error)) :=
     d_q_ratio_nonneg params
-  -- `selfImprovementVarianceError = 24 * m * (eps + delta + m * (d / q))`
-  have hexpand :
-      selfImprovementVarianceError params eps delta =
-        24 * (params.m : Error) *
-          (eps + delta +
-            ((params.m : Error) * ((params.d : Error) / (params.q : Error)))) := by
-    change 24 * (params.m : Error) *
-          (eps + delta + ((params.m : Error) * (params.d : Error) / (params.q : Error))) =
-        24 * (params.m : Error) *
-          (eps + delta + ((params.m : Error) * ((params.d : Error) / (params.q : Error))))
-    rw [mul_div_assoc]
-  rw [hexpand]
+  rw [selfImprovementVarianceError_eq]
   have h24m_nn : (0 : Error) ≤ 24 * (params.m : Error) := by positivity
   have hmdq_nn :
       (0 : Error) ≤ (params.m : Error) * ((params.d : Error) / (params.q : Error)) :=
