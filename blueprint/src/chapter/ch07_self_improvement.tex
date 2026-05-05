@@ -497,11 +497,19 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpComplementarySlacknessEquation}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.primalMeasurement}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.complementarySlacknessEquation}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSubmeasurementToSubMeas}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpRealizationOfStrategy}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixAveragedPointOperator_ofStrategy}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpDualSlackOperator_ofStrategy}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.toSdpOptimalPairWithSlackness_of_dualDominatesIdentity}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness.toSdpStatementWithSlackness_of_dualDominatesIdentity}
   \leanok
   From a matrix-level strong-duality witness with complementary slackness of the
   shape asserted by Lemma~\ref{lem:sdp}, one obtains a complete measurement
   \(\{T_g\}\), a feasible dual operator \(Z\), equality of the primal and dual
-  objectives, and the equations \(T_gZ=T_gA_g\) for all \(g\).
+  objectives, and the equations \(T_gZ=T_gA_g\) for all \(g\).  The formal
+  bridge to the current abstract helper interface is conditional on the
+  additional reduced-interface bound \(I\leq Z\).
 \end{lemma}
 \begin{proof}
   \leanok
