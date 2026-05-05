@@ -20,6 +20,190 @@ universe uOutcome uι
 
 noncomputable section
 
+/-- Normalizing the images of positive Gram eigenvectors gives an orthonormal
+family.
+
+This is the elementary singular-vector calculation underlying the rectangular
+polar-decomposition route.  If `v_i` are orthonormal eigenvectors of `L†L` with
+positive eigenvalues `λ_i`, then the vectors `λ_i^{-1/2} L v_i` are
+orthonormal in the target Hilbert space. -/
+theorem orthonormal_normalized_image_of_adjoint_comp_eigenvectors
+    {κ E F : Type*}
+    [NormedAddCommGroup E] [InnerProductSpace ℂ E]
+    [FiniteDimensional ℂ E]
+    [NormedAddCommGroup F] [InnerProductSpace ℂ F]
+    [FiniteDimensional ℂ F]
+    (L : E →ₗ[ℂ] F)
+    (v : κ → E) (lam : κ → ℝ)
+    (hv : Orthonormal ℂ v)
+    (hlam : ∀ i : κ, 0 < lam i)
+    (heig : ∀ i : κ, L.adjoint (L (v i)) = (lam i : ℂ) • v i) :
+    Orthonormal ℂ
+      (fun i : κ => ((1 / Real.sqrt (lam i) : ℝ) : ℂ) • L (v i)) := by
+  classical
+  rw [orthonormal_iff_ite]
+  intro i j
+  have hinner_image :
+      inner ℂ (L (v i)) (L (v j)) =
+        (lam j : ℂ) * (if i = j then (1 : ℂ) else 0) := by
+    calc
+      inner ℂ (L (v i)) (L (v j)) =
+          inner ℂ (v i) (L.adjoint (L (v j))) := by
+            rw [LinearMap.adjoint_inner_right]
+      _ = inner ℂ (v i) ((lam j : ℂ) • v j) := by rw [heig j]
+      _ = (lam j : ℂ) * (if i = j then (1 : ℂ) else 0) := by
+            simp [orthonormal_iff_ite.mp hv i j]
+  have hscale_mul :
+      ((1 / Real.sqrt (lam j) : ℝ) : ℂ) *
+          ((lam j : ℂ) * (if i = j then (1 : ℂ) else 0) *
+            ((1 / Real.sqrt (lam i) : ℝ) : ℂ)) =
+        if i = j then (1 : ℂ) else 0 := by
+    by_cases hij : i = j
+    · subst j
+      have hsqrt_ne : (Real.sqrt (lam i) : ℝ) ≠ 0 :=
+        ne_of_gt (Real.sqrt_pos.2 (hlam i))
+      have hsqrt_neC : ((Real.sqrt (lam i) : ℝ) : ℂ) ≠ 0 := by
+        exact_mod_cast hsqrt_ne
+      have hlam_eq :
+          (lam i : ℂ) =
+            ((Real.sqrt (lam i) : ℝ) : ℂ) *
+              ((Real.sqrt (lam i) : ℝ) : ℂ) := by
+        have hsqrt_sq : Real.sqrt (lam i) * Real.sqrt (lam i) = lam i := by
+          rw [← sq, Real.sq_sqrt (le_of_lt (hlam i))]
+        exact_mod_cast hsqrt_sq.symm
+      simp only [if_true, mul_one, one_div]
+      rw [hlam_eq]
+      simp only [Complex.ofReal_inv]
+      calc
+        ((Real.sqrt (lam i) : ℝ) : ℂ)⁻¹ *
+            (((Real.sqrt (lam i) : ℝ) : ℂ) *
+              ((Real.sqrt (lam i) : ℝ) : ℂ) *
+                ((Real.sqrt (lam i) : ℝ) : ℂ)⁻¹) =
+            (((Real.sqrt (lam i) : ℝ) : ℂ)⁻¹ *
+              ((Real.sqrt (lam i) : ℝ) : ℂ)) *
+                (((Real.sqrt (lam i) : ℝ) : ℂ) *
+                  ((Real.sqrt (lam i) : ℝ) : ℂ)⁻¹) := by ring
+        _ = 1 := by
+          rw [inv_mul_cancel₀ hsqrt_neC, mul_inv_cancel₀ hsqrt_neC]
+          simp
+    · simp [hij]
+  calc
+    inner ℂ (((1 / Real.sqrt (lam i) : ℝ) : ℂ) • L (v i))
+        (((1 / Real.sqrt (lam j) : ℝ) : ℂ) • L (v j)) =
+        ((1 / Real.sqrt (lam j) : ℝ) : ℂ) *
+          (inner ℂ (L (v i)) (L (v j)) *
+            ((1 / Real.sqrt (lam i) : ℝ) : ℂ)) := by
+          simp
+    _ = ((1 / Real.sqrt (lam j) : ℝ) : ℂ) *
+          ((lam j : ℂ) * (if i = j then (1 : ℂ) else 0) *
+            ((1 / Real.sqrt (lam i) : ℝ) : ℂ)) := by rw [hinner_image]
+    _ = if i = j then (1 : ℂ) else 0 := hscale_mul
+
+/-- Matrix form of
+`orthonormal_normalized_image_of_adjoint_comp_eigenvectors`.
+
+For a rectangular matrix `X`, orthonormal eigenvectors of the Gram operator
+`Xᴴ * X` with positive eigenvalues yield orthonormal normalized images under
+`X`.  This is the first local linear-algebra step toward constructing the
+rectangular polar coisometry required for the QXP `Xhat` layer. -/
+theorem orthonormal_normalized_matrix_image_of_gram_eigenvectors
+    {κ μ ι : Type*}
+    [Fintype μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ)
+    (v : κ → EuclideanSpace ℂ ι) (lam : κ → ℝ)
+    (hv : Orthonormal ℂ v)
+    (hlam : ∀ i : κ, 0 < lam i)
+    (heig : ∀ i : κ,
+      Matrix.toEuclideanLin (Xᴴ * X) (v i) = (lam i : ℂ) • v i) :
+    Orthonormal ℂ
+      (fun i : κ =>
+        ((1 / Real.sqrt (lam i) : ℝ) : ℂ) • Matrix.toEuclideanLin X (v i)) := by
+  refine orthonormal_normalized_image_of_adjoint_comp_eigenvectors
+    (Matrix.toEuclideanLin X) v lam hv hlam ?_
+  intro i
+  change ((Matrix.toEuclideanLin X).adjoint.comp (Matrix.toEuclideanLin X)) (v i) =
+    (lam i : ℂ) • v i
+  rw [← Matrix.toEuclideanLin_conjTranspose_mul_self X]
+  exact heig i
+
+/-- Spectral form of `orthonormal_normalized_matrix_image_of_gram_eigenvectors`.
+
+After the right Gram matrix of `X` has been identified with a Hermitian
+operator `Q`, its positive spectral subspace gives an orthonormal family of
+normalized images under `X`.  This is the form used when the rectangular polar
+construction is indexed by the positive spectrum of the total `Q` operator. -/
+theorem orthonormal_normalized_matrix_image_of_positive_gram_spectrum
+    {μ ι : Type*}
+    [Fintype μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
+    (hQ : Q.IsHermitian)
+    (hgram : Xᴴ * X = Q) :
+    Orthonormal ℂ
+      (fun i : {i : ι // 0 < hQ.eigenvalues i} =>
+        ((1 / Real.sqrt (hQ.eigenvalues i.1) : ℝ) : ℂ) •
+          Matrix.toEuclideanLin X (hQ.eigenvectorBasis i.1)) := by
+  refine orthonormal_normalized_matrix_image_of_gram_eigenvectors X
+    (fun i : {i : ι // 0 < hQ.eigenvalues i} => hQ.eigenvectorBasis i.1)
+    (fun i : {i : ι // 0 < hQ.eigenvalues i} => hQ.eigenvalues i.1)
+    ?_ ?_ ?_
+  · simpa [Function.comp_def] using
+      hQ.eigenvectorBasis.orthonormal.comp
+        (fun i : {i : ι // 0 < hQ.eigenvalues i} => i.1)
+        (fun _i _j h => Subtype.ext h)
+  · exact fun i => i.2
+  · intro i
+    rw [hgram]
+    simpa [Matrix.toEuclideanLin, Matrix.toLpLin_apply] using
+      congrArg (fun v : ι → ℂ => WithLp.toLp 2 v) (hQ.mulVec_eigenvectorBasis i.1)
+
+/-- The normalized positive Gram images assemble into a coisometry matrix.
+
+This is the row-matrix form of the preceding orthonormality statement.  It is
+the bridge from the singular-vector calculation to the matrix equation
+`Xhat Xhat† = I` used by the QXP layer. -/
+theorem normalized_matrix_image_rows_mul_conjTranspose
+    {κ μ ι : Type*}
+    [DecidableEq κ] [Fintype μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ)
+    (v : κ → EuclideanSpace ℂ ι) (lam : κ → ℝ)
+    (hv : Orthonormal ℂ v)
+    (hlam : ∀ i : κ, 0 < lam i)
+    (heig : ∀ i : κ,
+      Matrix.toEuclideanLin (Xᴴ * X) (v i) = (lam i : ℂ) • v i) :
+    (Matrix.of fun i r =>
+        (((1 / Real.sqrt (lam i) : ℝ) : ℂ) • Matrix.toEuclideanLin X (v i)) r) *
+        (Matrix.of fun i r =>
+          (((1 / Real.sqrt (lam i) : ℝ) : ℂ) • Matrix.toEuclideanLin X (v i)) r)ᴴ =
+      (1 : Matrix κ κ ℂ) := by
+  exact Matrix.mul_conjTranspose_eq_one_of_orthonormal_rows
+    (fun i : κ =>
+      ((1 / Real.sqrt (lam i) : ℝ) : ℂ) • Matrix.toEuclideanLin X (v i))
+    (orthonormal_normalized_matrix_image_of_gram_eigenvectors X v lam hv hlam heig)
+
+/-- Spectral form of `normalized_matrix_image_rows_mul_conjTranspose`.
+
+The rows indexed by the strictly positive eigenvalues of the Hermitian Gram
+operator are the normalized images of the corresponding Gram eigenvectors.
+They therefore assemble into a coisometry. -/
+theorem normalized_matrix_image_rows_mul_conjTranspose_of_positive_gram_spectrum
+    {μ ι : Type*}
+    [Fintype μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
+    (hQ : Q.IsHermitian)
+    (hgram : Xᴴ * X = Q) :
+    (Matrix.of fun i r =>
+        (((1 / Real.sqrt (hQ.eigenvalues i.1) : ℝ) : ℂ) •
+          Matrix.toEuclideanLin X (hQ.eigenvectorBasis i.1)) r) *
+        (Matrix.of fun i r =>
+          (((1 / Real.sqrt (hQ.eigenvalues i.1) : ℝ) : ℂ) •
+            Matrix.toEuclideanLin X (hQ.eigenvectorBasis i.1)) r)ᴴ =
+      (1 : Matrix {i : ι // 0 < hQ.eigenvalues i} {i : ι // 0 < hQ.eigenvalues i} ℂ) := by
+  exact Matrix.mul_conjTranspose_eq_one_of_orthonormal_rows
+    (fun i : {i : ι // 0 < hQ.eigenvalues i} =>
+      ((1 / Real.sqrt (hQ.eigenvalues i.1) : ℝ) : ℂ) •
+        Matrix.toEuclideanLin X (hQ.eigenvectorBasis i.1))
+    (orthonormal_normalized_matrix_image_of_positive_gram_spectrum X Q hQ hgram)
+
 /-- The row-coisometry identity for the rectangular SVD choice of `Xhat`.
 
 If `U` and `V` are unitary in the directions used below, and if the rectangular
@@ -574,6 +758,19 @@ lemma xSquared {Outcome : Type*}
     (data : QXPLayerData Outcome ι) :
     data.xᴴ * data.x = QTotal data.qLayer := by
   exact data.x_gram_right
+
+/-- The total `Q` operator in a QXP layer is Hermitian.
+
+This follows from `lem:X-squared`: the total operator is the right Gram matrix
+`X†X`.  The statement gives downstream spectral arguments a canonical
+Hermitian witness for `QTotal data.qLayer`. -/
+lemma qtotal_isHermitian_of_x_squared {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) :
+    (QTotal data.qLayer).IsHermitian := by
+  rw [← data.x_gram_right]
+  exact Matrix.isHermitian_conjTranspose_mul_self data.x
 
 /-- **`X`-expression to `Q`-expression** (`lem:X-expression-to-Q-expression`).
 
