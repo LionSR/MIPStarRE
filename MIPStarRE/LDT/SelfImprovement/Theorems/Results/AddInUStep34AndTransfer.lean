@@ -901,7 +901,9 @@ lemma add_in_u_cs_chain_global_variance_steps_of_sum_bound_from_factor_bounds
 This consumes the expected output of the local-variance normalization step
 (`expansion.tex`, lines 317--321) through
 `globalVarianceDeviation_sum_le_of_localVarianceDeviation_sum_le`, then applies
-the combined Step 3/4 bridge above. -/
+the combined Step 3/4 bridge above.  It remains a named bridge because the
+blueprint cites this local-sum interface separately from the closed
+factor-bound wrapper below. -/
 lemma add_in_u_cs_chain_global_variance_steps_of_local_sum_bound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -932,7 +934,12 @@ lemma add_in_u_cs_chain_global_variance_steps_of_local_sum_bound
     h23cs h34cs
 
 /-- Local-variance-sum version of the combined Step 3/4 variance bridge using
-the factor estimates proved in this file. -/
+the factor estimates proved in this file.
+
+This is the closed local-sum form of
+`add_in_u_cs_chain_global_variance_steps_of_sum_bound_from_factor_bounds`: the
+only new input is the local-variance sum hypothesis, which is first transported
+to the global-variance sum bound. -/
 lemma add_in_u_cs_chain_global_variance_steps_of_local_sum_bound_from_factor_bounds
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -947,10 +954,10 @@ lemma add_in_u_cs_chain_global_variance_steps_of_local_sum_bound_from_factor_bou
       |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T| ≤
         Real.sqrt (selfImprovementVarianceError params eps delta) := by
   have hsteps :=
-    add_in_u_cs_chain_global_variance_steps_of_local_sum_bound
-      params strategy eps delta T hlocal
-      (add_in_u_cs_chain_q2_q3_le_sqrt_globalVarianceDeviation_sum params strategy T)
-      (add_in_u_cs_chain_q3_q4_le_sqrt_globalVarianceDeviation_sum params strategy T)
+    add_in_u_cs_chain_global_variance_steps_of_sum_bound_from_factor_bounds
+      params strategy T
+      (globalVarianceDeviation_sum_le_of_localVarianceDeviation_sum_le
+        params strategy eps delta T hlocal)
   simpa [selfImprovementVarianceError] using hsteps
 
 /-- Assemble the projection-simplified scalar transfer from the four scalar
