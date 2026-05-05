@@ -15,6 +15,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperSSC
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SdpMatrixHelperBridge
 
 /-!
 # Section 9 — Self-improvement theorem wrappers
@@ -29,6 +30,8 @@ All original declarations remain available under the same namespace.
 - `CommonHelpers` — shared internal helpers (formerly private)
 - `SdpMatrixBridge` — comparison between the matrix-level slackness interface
   and the abstract SDP statement with slackness
+- `SdpMatrixHelperBridge` — matrix-level SDP slackness and dominance bridge
+  into `selfImprovementHelperWithSlackness`
 - `HelperCompleteness` — input-consistency lower bounds, SDP bridge, `sdp`, `addInU`
 - `AddInUDiagonalAndDefs` — diagonal add-in-u specialization, Q₀–Q₄ CS chain defs
 - `AddInUPointConsistency` — off-diagonal add-in-u selection infrastructure for
