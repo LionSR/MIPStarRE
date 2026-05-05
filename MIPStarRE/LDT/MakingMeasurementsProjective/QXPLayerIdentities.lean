@@ -1,3 +1,4 @@
+import Mathlib.Data.Fintype.EquivFin
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.Core
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.QCompleteness
@@ -329,6 +330,126 @@ theorem positive_gram_spectrum_card_le_rows
   have hcard :=
     (Orthonormal.linearIndependent horth).fintype_card_le_finrank
   simpa using hcard
+
+/-- Extend an orthonormal family along an embedding into the ambient row index
+set.
+
+This is the finite-dimensional basis-extension step used in the rectangular
+polar-decomposition construction: after choosing distinct row indices for the
+prescribed vectors, the family can be completed to an orthonormal basis of the
+whole row space. -/
+private theorem exists_orthonormalBasis_extension_of_embedding
+    {κ μ : Type*} [Fintype μ]
+    (row : κ → EuclideanSpace ℂ μ)
+    (hrow : Orthonormal ℂ row)
+    (e : κ ↪ μ) :
+    ∃ b : OrthonormalBasis μ ℂ (EuclideanSpace ℂ μ),
+      ∀ i : κ, b (e i) = row i := by
+  classical
+  let invRange : Set.range e → κ := (Equiv.ofInjective e e.injective).symm
+  let rowFull : μ → EuclideanSpace ℂ μ := fun j =>
+    if hj : j ∈ Set.range e then row (invRange ⟨j, hj⟩) else 0
+  have hrowFull : ∀ i : κ, rowFull (e i) = row i := by
+    intro i
+    simp [rowFull, invRange, Equiv.ofInjective_symm_apply]
+  have horthRange : Orthonormal ℂ ((Set.range e).restrict rowFull) := by
+    have hcomp : Orthonormal ℂ (fun x : Set.range e => row (invRange x)) :=
+      hrow.comp invRange (Equiv.injective _)
+    convert hcomp with x
+    change rowFull x = row (invRange x)
+    change (if hj : (x : μ) ∈ Set.range e then row (invRange ⟨x, hj⟩) else 0) =
+      row (invRange x)
+    rw [dif_pos x.2]
+  obtain ⟨b, hb⟩ :=
+    Orthonormal.exists_orthonormalBasis_extension_of_card_eq
+      (𝕜 := ℂ) (E := EuclideanSpace ℂ μ) (ι := μ)
+      (card_ι := by simp) (v := rowFull) (s := Set.range e) horthRange
+  refine ⟨b, fun i => ?_⟩
+  rw [hb (e i) ⟨i, rfl⟩, hrowFull i]
+
+/-- A square unitary matrix whose selected rows are a prescribed orthonormal
+family.
+
+The row equations are stated pointwise so that later matrix calculations can
+rewrite entries without unfolding the chosen orthonormal basis. -/
+theorem exists_unitary_rows_extending_orthonormal
+    {κ μ : Type*} [Fintype μ] [DecidableEq μ]
+    (row : κ → EuclideanSpace ℂ μ)
+    (hrow : Orthonormal ℂ row)
+    (e : κ ↪ μ) :
+    ∃ U : Matrix μ μ ℂ,
+      U * Uᴴ = (1 : Matrix μ μ ℂ) ∧
+        Uᴴ * U = (1 : Matrix μ μ ℂ) ∧
+          ∀ (i : κ) (r : μ), U (e i) r = row i r := by
+  classical
+  obtain ⟨b, hb⟩ := exists_orthonormalBasis_extension_of_embedding row hrow e
+  let U : Matrix μ μ ℂ := Matrix.of fun i r => b i r
+  have hleft : U * Uᴴ = (1 : Matrix μ μ ℂ) := by
+    simpa [U] using
+      Matrix.mul_conjTranspose_eq_one_of_orthonormal_rows
+        (fun i : μ => b i) b.orthonormal
+  have hright : Uᴴ * U = (1 : Matrix μ μ ℂ) := by
+    exact mul_eq_one_comm.mp hleft
+  refine ⟨U, hleft, hright, ?_⟩
+  intro i r
+  simp [U, hb i]
+
+/-- The positive Gram image rows can be embedded into a square unitary matrix.
+
+The hypothesis `e` chooses distinct row positions for the strictly positive
+eigenvalues of the Gram operator.  The theorem then completes the corresponding
+normalized image rows to a unitary matrix on the row space.  This is the
+basis-extension ingredient needed to turn the positive spectral part into the
+left unitary factor of the rectangular polar construction. -/
+theorem exists_unitary_with_positive_gram_spectrum_rows
+    {μ ι : Type*}
+    [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
+    (hQ : Q.IsHermitian)
+    (hgram : Xᴴ * X = Q)
+    (e : {i : ι // 0 < hQ.eigenvalues i} ↪ μ) :
+    ∃ U : Matrix μ μ ℂ,
+      U * Uᴴ = (1 : Matrix μ μ ℂ) ∧
+        Uᴴ * U = (1 : Matrix μ μ ℂ) ∧
+          ∀ (i : {i : ι // 0 < hQ.eigenvalues i}) (r : μ),
+            U (e i) r = positiveGramSpectrumImageRows X Q hQ i r := by
+  classical
+  let row : {i : ι // 0 < hQ.eigenvalues i} → EuclideanSpace ℂ μ := fun i =>
+    ((1 / Real.sqrt (hQ.eigenvalues i.1) : ℝ) : ℂ) •
+      Matrix.toEuclideanLin X (hQ.eigenvectorBasis i.1)
+  obtain ⟨U, hU_left, hU_right, hrows⟩ :=
+    exists_unitary_rows_extending_orthonormal row
+      (orthonormal_normalized_matrix_image_of_positive_gram_spectrum X Q hQ hgram) e
+  refine ⟨U, hU_left, hU_right, ?_⟩
+  intro i r
+  simpa [row, positiveGramSpectrumImageRows, normalizedMatrixImageRows] using
+    hrows i r
+
+/-- Existential form of
+`exists_unitary_with_positive_gram_spectrum_rows`.
+
+The normalized positive Gram image rows have cardinality at most the row
+dimension, so one may choose distinct row positions and then extend those rows
+to a square unitary matrix. -/
+theorem exists_unitary_with_positive_gram_spectrum_rows_of_card
+    {μ ι : Type*}
+    [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
+    (hQ : Q.IsHermitian)
+    (hgram : Xᴴ * X = Q) :
+    ∃ e : {i : ι // 0 < hQ.eigenvalues i} ↪ μ,
+      ∃ U : Matrix μ μ ℂ,
+        U * Uᴴ = (1 : Matrix μ μ ℂ) ∧
+          Uᴴ * U = (1 : Matrix μ μ ℂ) ∧
+            ∀ (i : {i : ι // 0 < hQ.eigenvalues i}) (r : μ),
+              U (e i) r = positiveGramSpectrumImageRows X Q hQ i r := by
+  classical
+  have hcard :
+      Fintype.card {i : ι // 0 < hQ.eigenvalues i} ≤ Fintype.card μ :=
+    positive_gram_spectrum_card_le_rows X Q hQ hgram
+  let e : {i : ι // 0 < hQ.eigenvalues i} ↪ μ :=
+    Classical.choice (Function.Embedding.nonempty_of_card_le hcard)
+  exact ⟨e, exists_unitary_with_positive_gram_spectrum_rows X Q hQ hgram e⟩
 
 /-- The row-coisometry identity for the rectangular SVD choice of `Xhat`.
 
@@ -897,6 +1018,31 @@ lemma qtotal_isHermitian_of_x_squared {Outcome : Type*}
     (QTotal data.qLayer).IsHermitian := by
   rw [← data.x_gram_right]
   exact Matrix.isHermitian_conjTranspose_mul_self data.x
+
+/-- The total `Q` operator in a QXP layer is positive semidefinite.
+
+This is the positivity companion to `qtotal_isHermitian_of_x_squared`; after
+`QTotal` is identified with the Gram matrix `X†X`, positivity follows from the
+standard Gram-matrix argument. -/
+lemma qtotal_posSemidef_of_x_squared {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) :
+    (QTotal data.qLayer).PosSemidef := by
+  rw [← data.x_gram_right]
+  exact Matrix.posSemidef_conjTranspose_mul_self data.x
+
+/-- The spectral eigenvalues of the total `Q` operator are nonnegative.
+
+This is the scalar form of `qtotal_posSemidef_of_x_squared` used when the
+rectangular polar construction separates the positive and zero spectral
+subspaces. -/
+lemma qtotal_eigenvalues_nonneg_of_x_squared {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) (i : ι) :
+    0 ≤ (qtotal_isHermitian_of_x_squared data).eigenvalues i :=
+  (qtotal_posSemidef_of_x_squared data).eigenvalues_nonneg i
 
 /-- **`X`-expression to `Q`-expression** (`lem:X-expression-to-Q-expression`).
 
