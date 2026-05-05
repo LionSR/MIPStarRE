@@ -46,6 +46,29 @@ policy or template which reads like a checklist will tend to produce checklist
 notes; the examples and templates should therefore be written as mathematical
 prose.
 
+\section{Concision and Readability}
+
+A paper-gap note should be short enough that a reader can understand the issue
+in one sitting.  The first page should answer three questions: what the source
+uses, what the formalization or audit checked, and what the current verdict is.
+Most notes should have four sections: the source assertion, the mathematical
+mechanism being checked, the blueprint/formal comparison, and the conclusion.
+Use more sections only when a counterexample or long derivation genuinely needs
+room.
+
+Keep background to the minimum needed for the local point.  Prefer one clear
+special case over a general restatement of the surrounding theorem.  Use displayed
+equations for the source assertion, the key calculation, and the corrected or
+formal statement; avoid displays for traceability data, declaration names, or
+long lists.  Paths, Lean declarations, issue numbers, and pull requests should
+usually live in footnotes.  The body should read as mathematical prose, not as a
+log of what commands were run.
+
+If the verdict is that there is no mathematical discrepancy, say so plainly and
+stop.  Do not turn the note into a broad audit report.  If the only remaining
+work is an implementation task, name it briefly and link the issue or pull
+request in a footnote.
+
 \section{When the Investigation Starts}
 
 The investigation starts when the obstruction appears to be mathematical rather
