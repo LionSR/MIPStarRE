@@ -298,6 +298,8 @@ lemma evaluatedSlice_scalar_chain_bound
               (gCommStabilityR params family y).outcome g := by
           intro g
           unfold gCommStabilityR averageIdxSubMeas
+          apply averageOperatorOverDistribution_congr
+          intro q
           simp [Ffun, postprocess_sandwichByOuter_prod_snd_outcome]
         have hPavg :
             ∀ g : Polynomial params,
