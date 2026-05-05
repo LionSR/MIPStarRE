@@ -461,7 +461,7 @@ structure MatrixSdpCanonicalPrimalFeasible (params : Parameters) [FieldModel par
   /-- The canonical primal matrix variable is positive semidefinite. -/
   nonnegative : 0 ≤ X
   /-- The diagonal-block equality constraint holds. -/
-  constraint_eq_one : matrixSdpCanonicalConstraintOperator params model X = 1
+  constraintEqOne : matrixSdpCanonicalConstraintOperator params model X = 1
 
 /-- A paper primal submeasurement determines a feasible point of the canonical
 block primal SDP by adjoining the slack block `I - ∑_g T_g`. -/
@@ -472,7 +472,7 @@ theorem matrixSdpCanonicalPrimalBlockMatrix_feasible
     MatrixSdpCanonicalPrimalFeasible params model
       (matrixSdpCanonicalPrimalBlockMatrix params model T) where
   nonnegative := matrixSdpCanonicalPrimalBlockMatrix_nonneg params model T
-  constraint_eq_one := matrixSdpCanonicalConstraintOperator_primalBlockMatrix params model T
+  constraintEqOne := matrixSdpCanonicalConstraintOperator_primalBlockMatrix params model T
 
 /-- The canonical objective matrix `C = diag(A_g, 0)` in the paper's block SDP. -/
 noncomputable def matrixSdpCanonicalObjectiveBlockFamily (params : Parameters)
