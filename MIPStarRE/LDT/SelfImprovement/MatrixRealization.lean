@@ -521,6 +521,45 @@ noncomputable def matrixSdpCanonicalObjectiveOperator (params : Parameters)
       matrixAveragedPointOperator params model g := by
   simp [matrixSdpCanonicalObjectiveOperator]
 
+/-- The block family for the canonical dual slack operator.
+
+It has polynomial blocks `Z - A_g` and slack block `Z`, exactly as in the
+canonical dual constraint obtained from the paper SDP. -/
+noncomputable def matrixSdpCanonicalDualSlackBlockFamily (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (Z : MatrixOperator model.space) :
+    MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space
+  | none => Z
+  | some g => matrixSdpDualSlackOperator params model Z g
+
+/-- The canonical dual slack block matrix is positive semidefinite under paper
+dual feasibility.
+
+The canonical dual constraint for the block SDP is the positivity of the block
+diagonal operator with blocks `Z - A_g` on the polynomial summands and `Z` on
+the slack summand.  The polynomial blocks are precisely the paper dual
+feasibility inequalities, while the slack block follows from the same
+inequalities because the averaged point operators are positive. -/
+theorem matrixSdpCanonicalDualSlackBlockDiagonal_nonneg_of_dualFeasible
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (Z : MatrixOperator model.space)
+    (hdual :
+      ∀ g : Polynomial params,
+        0 ≤ matrixSdpDualSlackOperator params model Z g) :
+    0 ≤ matrixSdpCanonicalBlockDiagonal params model
+      (matrixSdpCanonicalDualSlackBlockFamily params model Z) := by
+  refine matrixSdpCanonicalBlockDiagonal_nonneg params model
+    (matrixSdpCanonicalDualSlackBlockFamily params model Z) ?_
+  intro b
+  cases b with
+  | none =>
+      simpa [matrixSdpCanonicalDualSlackBlockFamily] using
+        matrixSdpDualPositive_of_dualFeasible params model Z hdual
+  | some g =>
+      simpa [matrixSdpCanonicalDualSlackBlockFamily] using hdual g
+
 /-- The canonical block objective evaluated on the block matrix associated to a
 paper primal submeasurement is the paper primal objective.
 
