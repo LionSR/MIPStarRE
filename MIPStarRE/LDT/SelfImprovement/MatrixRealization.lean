@@ -268,6 +268,62 @@ noncomputable def matrixSdpCanonicalBlockDiagonal (params : Parameters) [FieldMo
     MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) :=
   fun x y => if x.1 = y.1 then B x.1 x.2 y.2 else 0
 
+private theorem matrix_blockDiagonal_sum_kronecker_projections {o m : Type*}
+    [Fintype o] [DecidableEq o] [Finite m] (B : o → Matrix m m ℂ) :
+    Matrix.blockDiagonal B =
+      ∑ b : o, Matrix.kronecker (B b)
+        (Matrix.diagonal fun c : o => if c = b then (1 : ℂ) else 0) := by
+  classical
+  letI : Fintype m := Fintype.ofFinite m
+  ext x y
+  rcases x with ⟨i, bx⟩
+  rcases y with ⟨j, cy⟩
+  rw [Matrix.sum_apply]
+  by_cases hxy : bx = cy
+  · subst cy
+    simp [Matrix.blockDiagonal_apply, Matrix.kronecker, Matrix.kroneckerMap_apply]
+  · simp [Matrix.blockDiagonal_apply, Matrix.kronecker, Matrix.kroneckerMap_apply, hxy]
+
+private theorem matrix_blockDiagonal_nonneg {o m : Type*}
+    [Finite o] [DecidableEq o] [Finite m]
+    (B : o → Matrix m m ℂ) (hB : ∀ b, 0 ≤ B b) :
+    0 ≤ Matrix.blockDiagonal B := by
+  classical
+  letI : Fintype o := Fintype.ofFinite o
+  letI : Fintype m := Fintype.ofFinite m
+  rw [matrix_blockDiagonal_sum_kronecker_projections B]
+  exact Finset.sum_nonneg fun b _ =>
+    MIPStarRE.Quantum.kronecker_nonneg (hB b) (by
+      refine Matrix.nonneg_iff_posSemidef.mpr ?_
+      exact Matrix.PosSemidef.diagonal <| by
+        intro c
+        by_cases hc : c = b <;> simp [hc])
+
+/-- A canonical block-diagonal operator is positive semidefinite when all of its
+diagonal matrix blocks are positive semidefinite. -/
+theorem matrixSdpCanonicalBlockDiagonal_nonneg (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (B : MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space)
+    (hB : ∀ b, 0 ≤ B b) :
+    0 ≤ matrixSdpCanonicalBlockDiagonal params model B := by
+  classical
+  rw [show matrixSdpCanonicalBlockDiagonal params model B =
+      Matrix.reindex
+        (Equiv.prodComm model.space.carrier (MatrixSdpCanonicalBlockIndex params))
+        (Equiv.prodComm model.space.carrier (MatrixSdpCanonicalBlockIndex params))
+        (Matrix.blockDiagonal B) by
+    ext x y
+    rcases x with ⟨b, i⟩
+    rcases y with ⟨c, j⟩
+    simp [matrixSdpCanonicalBlockDiagonal, Matrix.reindex_apply,
+      Matrix.blockDiagonal_apply]]
+  refine Matrix.nonneg_iff_posSemidef.mpr ?_
+  rw [Matrix.reindex_apply]
+  exact (Matrix.posSemidef_submatrix_equiv
+    (M := Matrix.blockDiagonal B)
+    (Equiv.prodComm model.space.carrier (MatrixSdpCanonicalBlockIndex params)).symm).2
+    (Matrix.nonneg_iff_posSemidef.mp (matrix_blockDiagonal_nonneg B hB))
+
 @[simp] theorem matrixSdpCanonicalDiagonalBlock_blockDiagonal (params : Parameters)
     [FieldModel params.q]
     (model : MatrixSdpRealization params)
@@ -389,6 +445,23 @@ theorem matrixSdpCanonicalDiagonalBlock_primalBlockMatrix_none
       matrixSdpCanonicalSlackOperator params model T := by
   simp [matrixSdpCanonicalPrimalBlockMatrix]
 
+/-- The canonical block matrix associated to a paper primal submeasurement is
+positive semidefinite. -/
+theorem matrixSdpCanonicalPrimalBlockMatrix_nonneg
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space) :
+    0 ≤ matrixSdpCanonicalPrimalBlockMatrix params model T := by
+  rw [matrixSdpCanonicalPrimalBlockMatrix]
+  refine matrixSdpCanonicalBlockDiagonal_nonneg params model
+    (matrixSdpCanonicalPrimalBlockFamily params model T) ?_
+  intro b
+  cases b with
+  | none =>
+      exact matrixSdpCanonicalSlackOperator_nonneg params model T
+  | some g =>
+      exact T.pos g
+
 /-- The canonical block matrix associated to a submeasurement satisfies the
 canonical equality constraint `∑_g T_g + S = I`. -/
 theorem matrixSdpCanonicalConstraintOperator_primalBlockMatrix
@@ -402,6 +475,28 @@ theorem matrixSdpCanonicalConstraintOperator_primalBlockMatrix
     matrixSdpCanonicalConstraintOperator_blockDiagonal]
   rw [Fintype.sum_option]
   simp [matrixSdpCanonicalSlackOperator]
+
+/-- Feasibility for the canonical primal block SDP: the block variable is
+positive semidefinite and satisfies the equality constraint
+`∑_g X_{gg} = I`. -/
+structure MatrixSdpCanonicalPrimalFeasible (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) : Prop where
+  /-- The canonical primal matrix variable is positive semidefinite. -/
+  nonnegative : 0 ≤ X
+  /-- The diagonal-block equality constraint holds. -/
+  constraint_eq_one : matrixSdpCanonicalConstraintOperator params model X = 1
+
+/-- A paper primal submeasurement determines a feasible point of the canonical
+block primal SDP by adjoining the slack block `I - ∑_g T_g`. -/
+theorem matrixSdpCanonicalPrimalBlockMatrix_feasible
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space) :
+    MatrixSdpCanonicalPrimalFeasible params model
+      (matrixSdpCanonicalPrimalBlockMatrix params model T) where
+  nonnegative := matrixSdpCanonicalPrimalBlockMatrix_nonneg params model T
+  constraint_eq_one := matrixSdpCanonicalConstraintOperator_primalBlockMatrix params model T
 
 /-- The canonical objective matrix `C = diag(A_g, 0)` in the paper's block SDP. -/
 noncomputable def matrixSdpCanonicalObjectiveBlockFamily (params : Parameters)
