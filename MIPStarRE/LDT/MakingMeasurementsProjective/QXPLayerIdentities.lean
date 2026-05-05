@@ -813,6 +813,151 @@ theorem adjoint_image_eq_zero_of_unitary_positive_gram_completion_row
   simpa [hU_rows i, EuclideanSpace.inner_eq_star_dotProduct, dotProduct, mul_comm]
     using hentry_zero
 
+/-- The selected columns of `X† Uᵀ` are the positive Gram-image mixed columns.
+
+If the selected rows of `U` are the normalized images of the positive Gram
+eigenvectors, then multiplying by `X†` and transposing `U` recovers precisely
+the column matrix `X† Rᵀ`, where `R` is the positive Gram-image row matrix. -/
+theorem positive_gram_selected_left_unitary_mixed_column
+    {μ ι : Type*} [Fintype μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
+    (hQ : Q.IsHermitian)
+    (e : {i : ι // 0 < hQ.eigenvalues i} ↪ μ)
+    (U : Matrix μ μ ℂ)
+    (hU_rows : ∀ (i : {i : ι // 0 < hQ.eigenvalues i}) (r : μ),
+      U (e i) r = positiveGramSpectrumImageRows X Q hQ i r)
+    (i : {i : ι // 0 < hQ.eigenvalues i}) (r : ι) :
+    (Xᴴ * Uᵀ) r (e i) =
+      (Xᴴ * (positiveGramSpectrumImageRows X Q hQ)ᵀ) r i := by
+  simp [Matrix.mul_apply, Matrix.conjTranspose_apply, Matrix.transpose_apply, hU_rows i]
+
+/-- The complementary columns of `X† Uᵀ` vanish.
+
+This is the matrix-column form of
+`adjoint_image_eq_zero_of_unitary_positive_gram_completion_row`.  It records
+that the arbitrary rows used to complete the positive image rows to a full
+unitary make no contribution after left multiplication by `X†`. -/
+theorem positive_gram_completion_left_unitary_mixed_column_eq_zero
+    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
+    (hQ : Q.IsHermitian) (hQ_pos : Q.PosSemidef)
+    (hgram : Xᴴ * X = Q)
+    (e : {i : ι // 0 < hQ.eigenvalues i} ↪ μ)
+    (U : Matrix μ μ ℂ)
+    (hU_left : U * Uᴴ = (1 : Matrix μ μ ℂ))
+    (hU_rows : ∀ (i : {i : ι // 0 < hQ.eigenvalues i}) (r : μ),
+      U (e i) r = positiveGramSpectrumImageRows X Q hQ i r)
+    (a : μ) (ha : a ∉ Set.range e) (r : ι) :
+    (Xᴴ * Uᵀ) r a = 0 := by
+  have hzero :=
+    adjoint_image_eq_zero_of_unitary_positive_gram_completion_row X Q hQ hQ_pos
+      hgram e U hU_left hU_rows a ha
+  have hzero_lin :
+      Matrix.toEuclideanLin Xᴴ (WithLp.toLp 2 fun r : μ => U a r) = 0 := by
+    rw [Matrix.toEuclideanLin_conjTranspose_eq_adjoint]
+    exact hzero
+  have hcoord := congrArg (fun y : EuclideanSpace ℂ ι => y r) hzero_lin
+  simpa [Matrix.toEuclideanLin, Matrix.toLpLin_apply, Matrix.mul_apply,
+    Matrix.conjTranspose_apply, Matrix.transpose_apply] using hcoord
+
+/-- The polar-extension mixed product is the positive-spectrum mixed product.
+
+The candidate `Xhat = Uᵀ W` has selected rows matching the positive left and
+right singular rows.  After expanding the middle index, the selected part is
+exactly the positive-spectrum square-root product, while every complementary
+row is killed by `X†`. -/
+theorem positive_gram_polar_extension_mixed_eq_positive_rows
+    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
+    (hQ : Q.IsHermitian) (hQ_pos : Q.PosSemidef)
+    (hgram : Xᴴ * X = Q)
+    (e : {i : ι // 0 < hQ.eigenvalues i} ↪ μ)
+    (U : Matrix μ μ ℂ) (W : Matrix μ ι ℂ)
+    (hU_left : U * Uᴴ = (1 : Matrix μ μ ℂ))
+    (hU_rows : ∀ (i : {i : ι // 0 < hQ.eigenvalues i}) (r : μ),
+      U (e i) r = positiveGramSpectrumImageRows X Q hQ i r)
+    (hW_rows : ∀ (i : {i : ι // 0 < hQ.eigenvalues i}) (r : ι),
+      W (e i) r = positiveGramSpectrumRightRows Q hQ i r) :
+    Xᴴ * (Uᵀ * W) =
+      Xᴴ * (positiveGramSpectrumImageRows X Q hQ)ᵀ *
+        positiveGramSpectrumRightRows Q hQ := by
+  classical
+  ext r c
+  let term : μ → ℂ := fun a => (Xᴴ * Uᵀ) r a * W a c
+  letI : Fintype {a : μ // a ∈ Set.range e} :=
+    Subtype.fintype (fun a : μ => a ∈ Set.range e)
+  letI : Fintype {a : μ // ¬ a ∈ Set.range e} :=
+    Subtype.fintype (fun a : μ => ¬ a ∈ Set.range e)
+  have hsplit :=
+    Fintype.sum_subtype_add_sum_subtype (p := fun a : μ => a ∈ Set.range e) term
+  have hcomp : ∀ a : {a : μ // ¬ a ∈ Set.range e}, term a.1 = 0 := by
+    intro a
+    simp [term, positive_gram_completion_left_unitary_mixed_column_eq_zero X Q
+      hQ hQ_pos hgram e U hU_left hU_rows a.1 a.2 r]
+  let er :
+      {i : ι // 0 < hQ.eigenvalues i} ≃ {a : μ // a ∈ Set.range e} :=
+    Equiv.ofInjective e e.injective
+  have hrange :
+      (∑ a : {a : μ // a ∈ Set.range e}, term a.1) =
+        ∑ i : {i : ι // 0 < hQ.eigenvalues i},
+          (Xᴴ * (positiveGramSpectrumImageRows X Q hQ)ᵀ) r i *
+            positiveGramSpectrumRightRows Q hQ i c := by
+    have hreindex :
+        (∑ i : {i : ι // 0 < hQ.eigenvalues i}, term (e i)) =
+          ∑ a : {a : μ // a ∈ Set.range e}, term a.1 := by
+      exact Fintype.sum_equiv er (fun i => term (e i)) (fun a => term a.1)
+        (fun _ => rfl)
+    rw [← hreindex]
+    refine Finset.sum_congr rfl ?_
+    intro i _hi
+    simp [term, positive_gram_selected_left_unitary_mixed_column X Q hQ e U
+      hU_rows i r, hW_rows i c]
+  have hsum :
+      (∑ a : μ, term a) =
+        ∑ i : {i : ι // 0 < hQ.eigenvalues i},
+          (Xᴴ * (positiveGramSpectrumImageRows X Q hQ)ᵀ) r i *
+            positiveGramSpectrumRightRows Q hQ i c := by
+    calc
+      (∑ a : μ, term a) =
+          (∑ a : {a : μ // a ∈ Set.range e}, term a.1) +
+            ∑ a : {a : μ // ¬ a ∈ Set.range e}, term a.1 := hsplit.symm
+      _ = ∑ a : {a : μ // a ∈ Set.range e}, term a.1 := by
+            simp only [hcomp, Finset.sum_const_zero, add_zero]
+      _ = ∑ i : {i : ι // 0 < hQ.eigenvalues i},
+            (Xᴴ * (positiveGramSpectrumImageRows X Q hQ)ᵀ) r i *
+              positiveGramSpectrumRightRows Q hQ i c := hrange
+  calc
+    (Xᴴ * (Uᵀ * W)) r c = ((Xᴴ * Uᵀ) * W) r c := by
+      rw [Matrix.mul_assoc]
+    _ = ∑ a : μ, term a := by simp [term, Matrix.mul_apply]
+    _ = ∑ i : {i : ι // 0 < hQ.eigenvalues i},
+          (Xᴴ * (positiveGramSpectrumImageRows X Q hQ)ᵀ) r i *
+            positiveGramSpectrumRightRows Q hQ i c := hsum
+    _ = (Xᴴ * (positiveGramSpectrumImageRows X Q hQ)ᵀ *
+          positiveGramSpectrumRightRows Q hQ) r c := by
+        simp [Matrix.mul_apply]
+
+/-- The polar-extension mixed product is the square root of the Gram operator.
+
+This combines the finite-dimensional completion calculation for
+`Xhat = Uᵀ W` with the positive-spectrum square-root identity. -/
+theorem positive_gram_polar_extension_mixed_eq_sqrt
+    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
+    (hQ : Q.IsHermitian) (hQ_pos : Q.PosSemidef)
+    (hgram : Xᴴ * X = Q)
+    (e : {i : ι // 0 < hQ.eigenvalues i} ↪ μ)
+    (U : Matrix μ μ ℂ) (W : Matrix μ ι ℂ)
+    (hU_left : U * Uᴴ = (1 : Matrix μ μ ℂ))
+    (hU_rows : ∀ (i : {i : ι // 0 < hQ.eigenvalues i}) (r : μ),
+      U (e i) r = positiveGramSpectrumImageRows X Q hQ i r)
+    (hW_rows : ∀ (i : {i : ι // 0 < hQ.eigenvalues i}) (r : ι),
+      W (e i) r = positiveGramSpectrumRightRows Q hQ i r) :
+    Xᴴ * (Uᵀ * W) = CFC.sqrt Q := by
+  rw [positive_gram_polar_extension_mixed_eq_positive_rows X Q hQ hQ_pos
+    hgram e U W hU_left hU_rows hW_rows]
+  exact positive_gram_spectrum_image_rows_mixed_eq_sqrt X Q hQ hQ_pos hgram
+
 /-- The row-coisometry identity for the rectangular SVD choice of `Xhat`.
 
 If `U` and `V` are unitary in the directions used below, and if the rectangular
