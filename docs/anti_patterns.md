@@ -532,7 +532,9 @@ yet) file a sub-issue in [#449].
 ## Reviewer checklist
 
 Use this alongside the [`PROOF_INTEGRITY.md`](./PROOF_INTEGRITY.md) blocker
-list. For any theorem or lemma that claims a paper result, ask:
+list and the [`proof_frontier_review.md`](./proof_frontier_review.md)
+checklist for structure fields. For any theorem or lemma that claims a paper
+result, ask:
 
 - [ ] **Hypothesis audit.** Does any hypothesis contain (up to `∃`/`∧`) the
       theorem's conclusion? If yes, that's A1 — reject or strengthen.
