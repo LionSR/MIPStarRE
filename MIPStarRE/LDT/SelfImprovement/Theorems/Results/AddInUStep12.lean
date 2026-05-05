@@ -528,6 +528,189 @@ lemma addInU_selected_cs_chain_step4_reverse_diff_eq
   rw [← addInU_selected_cs_chain_step4_diff_eq params strategy M T S]
   ring
 
+/-- The selected fiber tensor mass is a contraction.
+
+For fixed points `u, v` and a value `a`, the selected sum over pairs
+`(o,h) ∈ S_u` with `h(v)=a` is bounded by the full product
+`M^u_{\mathrm{tot}} ⊗ T_{\mathrm{tot}}`, hence by the identity. -/
+private lemma addInU_selected_filtered_tensor_sum_le_one
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (M : IdxSubMeas (Point params) Outcome ι)
+    (T : SubMeas (Polynomial params) ι)
+    (S : AddInUSelection params Outcome)
+    (u v : Point params)
+    (a : Fq params) :
+    ∑ ah ∈ (addInUSelectionPairs params S u).filter (fun ah => ah.2 v = a),
+        opTensor ((M u).outcome ah.1) (T.outcome ah.2) ≤
+      (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
+  classical
+  calc
+    ∑ ah ∈ (addInUSelectionPairs params S u).filter (fun ah => ah.2 v = a),
+        opTensor ((M u).outcome ah.1) (T.outcome ah.2)
+        ≤ ∑ ah : Outcome × Polynomial params,
+            opTensor ((M u).outcome ah.1) (T.outcome ah.2) := by
+          exact Finset.sum_le_sum_of_subset_of_nonneg
+            (by
+              intro ah hah
+              exact Finset.mem_univ ah)
+            (by
+              intro ah _ _
+              exact opTensor_nonneg ((M u).outcome_pos ah.1) (T.outcome_pos ah.2))
+    _ = opTensor (M u).total T.total := by
+          change (∑ oh ∈ (Finset.univ : Finset Outcome).product
+                (Finset.univ : Finset (Polynomial params)),
+              opTensor ((M u).outcome oh.1) (T.outcome oh.2)) =
+            opTensor (M u).total T.total
+          have hprod :
+              (∑ oh ∈ (Finset.univ : Finset Outcome).product
+                  (Finset.univ : Finset (Polynomial params)),
+                opTensor ((M u).outcome oh.1) (T.outcome oh.2)) =
+                ∑ o ∈ (Finset.univ : Finset Outcome),
+                  ∑ h ∈ (Finset.univ : Finset (Polynomial params)),
+                    opTensor ((M u).outcome o) (T.outcome h) := by
+            simpa using
+              (Finset.sum_product
+                (s := (Finset.univ : Finset Outcome))
+                (t := (Finset.univ : Finset (Polynomial params)))
+                (f := fun oh : Outcome × Polynomial params =>
+                  opTensor ((M u).outcome oh.1) (T.outcome oh.2)))
+          rw [hprod]
+          calc
+            ∑ o : Outcome, ∑ h : Polynomial params,
+                opTensor ((M u).outcome o) (T.outcome h)
+                = ∑ o : Outcome, opTensor ((M u).outcome o) T.total := by
+                  refine Finset.sum_congr rfl ?_
+                  intro o _
+                  rw [← T.sum_eq_total, opTensor_sum_right_univ]
+            _ = opTensor (M u).total T.total := by
+                  rw [← (M u).sum_eq_total, opTensor_sum_left_univ]
+    _ ≤ leftTensor (ι₂ := ι) (M u).total := by
+          exact opTensor_le_leftTensor (SubMeas.total_nonneg (M u)) T.total_le_one
+    _ ≤ (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
+          exact leftTensor_le_one (ι₂ := ι) (M u).total_le_one
+
+/-- Cauchy--Schwarz contraction side condition for selected Step 1.
+
+For a fixed `(u, v)`, the selected fiber sum
+`K_a = ∑_{(o,h) ∈ S_u, h(v)=a} M^u_o ⊗ T_h` is a contraction.  Sandwiching
+by the right-register point projector `A^v_a` and summing over `a` is therefore
+bounded by the identity. -/
+private lemma addInU_selected_step1_C_contraction
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (M : IdxSubMeas (Point params) Outcome ι)
+    (T : SubMeas (Polynomial params) ι)
+    (S : AddInUSelection params Outcome)
+    (uv : Point params × Point params) :
+    ∑ a : Fq params,
+        (∑ ah ∈ (addInUSelectionPairs params S uv.1).filter
+              (fun ah => ah.2 uv.2 = a),
+            opTensor ((M uv.1).outcome ah.1) (T.outcome ah.2) *
+                rightTensor (ι₁ := ι)
+                  ((strategy.pointMeasurement uv.2).toSubMeas.outcome a))ᴴ *
+          (∑ ah ∈ (addInUSelectionPairs params S uv.1).filter
+              (fun ah => ah.2 uv.2 = a),
+            opTensor ((M uv.1).outcome ah.1) (T.outcome ah.2) *
+                rightTensor (ι₁ := ι)
+                  ((strategy.pointMeasurement uv.2).toSubMeas.outcome a)) ≤
+      (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
+  classical
+  let K : Fq params → MIPStarRE.Quantum.Op (ι × ι) := fun a =>
+    ∑ ah ∈ (addInUSelectionPairs params S uv.1).filter (fun ah => ah.2 uv.2 = a),
+      opTensor ((M uv.1).outcome ah.1) (T.outcome ah.2)
+  let Pa : Fq params → MIPStarRE.Quantum.Op (ι × ι) := fun a =>
+    rightTensor (ι₁ := ι) ((strategy.pointMeasurement uv.2).toSubMeas.outcome a)
+  have hsum_eq : ∀ a : Fq params,
+      (∑ ah ∈ (addInUSelectionPairs params S uv.1).filter
+          (fun ah => ah.2 uv.2 = a),
+        opTensor ((M uv.1).outcome ah.1) (T.outcome ah.2) *
+            rightTensor (ι₁ := ι)
+              ((strategy.pointMeasurement uv.2).toSubMeas.outcome a)) =
+        K a * Pa a := by
+    intro a
+    rw [← Finset.sum_mul]
+  have hK_herm : ∀ a, (K a)ᴴ = K a := by
+    intro a
+    have hM_herm : ∀ o : Outcome, ((M uv.1).outcome o)ᴴ = (M uv.1).outcome o :=
+      fun o =>
+        (Matrix.nonneg_iff_posSemidef.mp ((M uv.1).outcome_pos o)).isHermitian.eq
+    have hT_herm : ∀ h : Polynomial params, (T.outcome h)ᴴ = T.outcome h := fun h =>
+      (Matrix.nonneg_iff_posSemidef.mp (T.outcome_pos h)).isHermitian.eq
+    simp [K, Matrix.conjTranspose_sum, conjTranspose_opTensor, hM_herm, hT_herm]
+  have hPa_herm : ∀ a, (Pa a)ᴴ = Pa a := by
+    intro a
+    have hOutcome_herm :
+        ((strategy.pointMeasurement uv.2).toSubMeas.outcome a)ᴴ =
+          (strategy.pointMeasurement uv.2).toSubMeas.outcome a :=
+      (Matrix.nonneg_iff_posSemidef.mp
+        ((strategy.pointMeasurement uv.2).toSubMeas.outcome_pos a)).isHermitian.eq
+    simp [Pa, rightTensor_conjTranspose, hOutcome_herm]
+  have hPa_proj : ∀ a, Pa a * Pa a = Pa a := by
+    intro a
+    have hproj : (strategy.pointMeasurement uv.2).toSubMeas.outcome a *
+        (strategy.pointMeasurement uv.2).toSubMeas.outcome a =
+        (strategy.pointMeasurement uv.2).toSubMeas.outcome a :=
+      (strategy.pointMeasurement uv.2).proj a
+    change rightTensor (ι₁ := ι)
+        ((strategy.pointMeasurement uv.2).toSubMeas.outcome a) *
+        rightTensor (ι₁ := ι)
+          ((strategy.pointMeasurement uv.2).toSubMeas.outcome a) =
+      rightTensor (ι₁ := ι)
+        ((strategy.pointMeasurement uv.2).toSubMeas.outcome a)
+    rw [rightTensor_mul_rightTensor, hproj]
+  have hK_nonneg : ∀ a, 0 ≤ K a := by
+    intro a
+    refine Finset.sum_nonneg ?_
+    intro ah _
+    exact opTensor_nonneg ((M uv.1).outcome_pos ah.1) (T.outcome_pos ah.2)
+  have hK_le_one : ∀ a, K a ≤ 1 := by
+    intro a
+    exact addInU_selected_filtered_tensor_sum_le_one params M T S uv.1 uv.2 a
+  have hK_sq_le_one : ∀ a, K a * K a ≤ 1 := by
+    intro a
+    exact le_trans (MIPStarRE.Quantum.sq_le_self (hK_nonneg a) (hK_le_one a)) (hK_le_one a)
+  have hterm_le : ∀ a : Fq params, (K a * Pa a)ᴴ * (K a * Pa a) ≤ Pa a := by
+    intro a
+    have hexpand : (K a * Pa a)ᴴ * (K a * Pa a) = Pa a * (K a * K a) * Pa a := by
+      rw [Matrix.conjTranspose_mul, hK_herm a, hPa_herm a]
+      ac_rfl
+    rw [hexpand]
+    calc
+      Pa a * (K a * K a) * Pa a
+          ≤ Pa a * 1 * Pa a := MIPStarRE.Quantum.sandwich_mono (hPa_herm a) (hK_sq_le_one a)
+      _ = Pa a * Pa a := by simp
+      _ = Pa a := hPa_proj a
+  have hsum_Pa : ∑ a : Fq params, Pa a = (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
+    change ∑ a : Fq params,
+        rightTensor (ι₁ := ι)
+          ((strategy.pointMeasurement uv.2).toSubMeas.outcome a) =
+      (1 : MIPStarRE.Quantum.Op (ι × ι))
+    rw [rightTensor_finset_sum]
+    rw [(strategy.pointMeasurement uv.2).toSubMeas.sum_eq_total]
+    have htotal : (strategy.pointMeasurement uv.2).toSubMeas.total = 1 :=
+      (strategy.pointMeasurement uv.2).total_eq_one
+    rw [htotal, rightTensor_one]
+  calc
+    ∑ a : Fq params,
+        (∑ ah ∈ (addInUSelectionPairs params S uv.1).filter
+              (fun ah => ah.2 uv.2 = a),
+            opTensor ((M uv.1).outcome ah.1) (T.outcome ah.2) *
+                rightTensor (ι₁ := ι)
+                  ((strategy.pointMeasurement uv.2).toSubMeas.outcome a))ᴴ *
+          (∑ ah ∈ (addInUSelectionPairs params S uv.1).filter
+              (fun ah => ah.2 uv.2 = a),
+            opTensor ((M uv.1).outcome ah.1) (T.outcome ah.2) *
+                rightTensor (ι₁ := ι)
+                  ((strategy.pointMeasurement uv.2).toSubMeas.outcome a))
+        = ∑ a : Fq params, (K a * Pa a)ᴴ * (K a * Pa a) := by
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            rw [hsum_eq a]
+      _ ≤ ∑ a : Fq params, Pa a := Finset.sum_le_sum (fun a _ => hterm_le a)
+      _ = 1 := hsum_Pa
+
 /-! ### Raw Cauchy--Schwarz bound for the add-in-u Step 1 difference
 
 This section proves the raw `|Q₀ - Q₁| ≤ √(2δ)` bound from
