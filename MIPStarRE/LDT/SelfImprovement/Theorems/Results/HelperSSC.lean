@@ -12,6 +12,16 @@ chain and the residual algebra.  This module keeps the final producer surface
 separate from that calculation, so the add-in-`u` module remains a smaller
 review unit.
 
+## Contents
+
+- **HelperStrongSelfConsistencyProducerInputs** — the producer-shaped surface
+  for the four scalar chain estimates and the released residual estimate.
+- **helper_residualLowerBound_of_offDiagonal_bound** — reduction of the
+  released residual producer field to the explicit off-diagonal polynomial-pair
+  bound.
+- **helper_strong_self_consistency_of_helper_conclusion** — assembly of the
+  producer fields into the helper-stage strong self-consistency conclusion.
+
 ## References
 
 - `references/ldt-paper/self_improvement.tex`
@@ -124,6 +134,88 @@ lemma helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVar
       step23Bound := hsteps.1
       step34Bound := hsteps.2
       residualLowerBound := hresidual }
+
+/-- Reduce the producer residual field to the off-diagonal residual scalar
+bound.
+
+For the actual helper output, the equality
+`Hhat = E_u A^u_{h(u)} T_h A^u_{h(u)}` identifies the left-hand side of
+`HelperStrongSelfConsistencyProducerInputs.residualLowerBound` with the
+off-diagonal quantity isolated by
+`helper_mass_sub_release_eq_polynomial_off_diagonal`.  Thus the remaining
+analytic work may be stated as a bound on that concrete polynomial-pair sum,
+rather than as a bound on the producer field itself. -/
+theorem helper_residualLowerBound_of_offDiagonal_bound
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    {T : Measurement (Polynomial params) ι}
+    {Hhat : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
+    (hoffdiag :
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ∑ h' ∈ (Finset.univ : Finset (Polynomial params)).erase h,
+            ev strategy.state
+              (opTensor
+                ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h')
+                (T.toSubMeas.outcome h))) ≤
+        (11 * Real.sqrt (selfImprovementVarianceError params eps delta) +
+            Real.sqrt (2 * delta) +
+            ((params.m : Error) * (params.d : Error) / (params.q : Error))) -
+          addInUError params eps delta) :
+    subMeasMass strategy.state Hhat.liftLeft -
+        addInURightQuantity params strategy
+          (sandwichedPolynomialSubMeasAt params strategy T.toSubMeas)
+          T.toSubMeas
+          (selfConsistencyAddInUSelection params) ≤
+      (11 * Real.sqrt (selfImprovementVarianceError params eps delta) +
+          Real.sqrt (2 * delta) +
+          ((params.m : Error) * (params.d : Error) / (params.q : Error))) -
+        addInUError params eps delta := by
+  rw [hhelper.averagedConstruction]
+  rw [helper_mass_sub_release_eq_polynomial_off_diagonal]
+  exact hoffdiag
+
+/-- Construct the helper-stage producer package from local variance and a
+named off-diagonal residual estimate.
+
+This is the same producer as
+`helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance`,
+but its final input is the concrete off-diagonal polynomial-pair bound obtained
+after expanding the released residual. -/
+lemma helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance_offDiagonal
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    {T : Measurement (Polynomial params) ι}
+    {Hhat : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
+    (hssc : BipartiteSSCRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta)
+    (hlocal :
+      (∑ g : Polynomial params,
+        localVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g) ≤
+        localVarianceOfPointsError params eps delta)
+    (hoffdiag :
+      avgOver (uniformDistribution (Point params)) (fun u =>
+        ∑ h : Polynomial params,
+          ∑ h' ∈ (Finset.univ : Finset (Polynomial params)).erase h,
+            ev strategy.state
+              (opTensor
+                ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h')
+                (T.toSubMeas.outcome h))) ≤
+        (11 * Real.sqrt (selfImprovementVarianceError params eps delta) +
+            Real.sqrt (2 * delta) +
+            ((params.m : Error) * (params.d : Error) / (params.q : Error))) -
+          addInUError params eps delta) :
+    HelperStrongSelfConsistencyProducerInputs params strategy T Hhat eps delta := by
+  exact helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance
+    params strategy eps delta hssc hlocal
+    (helper_residualLowerBound_of_offDiagonal_bound
+      params strategy eps delta hhelper hoffdiag)
 
 /-- Produce the helper-stage strong self-consistency conclusion from the actual
 helper construction together with the named add-in-`u`/variance transports.
