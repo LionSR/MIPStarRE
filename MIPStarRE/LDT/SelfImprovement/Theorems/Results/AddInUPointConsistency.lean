@@ -228,7 +228,7 @@ theorem pointConsistencyAddInU_transfer_of_selected_chain_selfConsistency_global
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta : Error)
-    (hε : 0 ≤ eps) (hδ : 0 ≤ delta)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
     (T : SubMeas (Polynomial params) ι)
     (hssc : BipartiteSSCRel strategy.state (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta)
@@ -300,7 +300,7 @@ theorem pointConsistencyAddInU_transfer_of_selected_chain_selfConsistency_global
   have hsum : ηsc + ηsc + ηgv + ηgv ≤ addInUError params eps delta := by
     have h :=
       two_sqrt_two_delta_add_two_sqrt_selfImprovementVarianceError_le_addInUError
-        params eps delta hε hδ
+        params eps delta heps hdelta
     dsimp [ηsc, ηgv]
     linarith
   exact
