@@ -919,6 +919,13 @@
 
 	\begin{lemma}[$\widehat{X}$ squared]\label{lem:X-hat-squared}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xHatSquared,
+			Matrix.mul_conjTranspose_eq_one_of_orthonormal_rows,
+			MIPStarRE.LDT.MakingMeasurementsProjective.orthonormal_normalized_image_of_adjoint_comp_eigenvectors,
+			MIPStarRE.LDT.MakingMeasurementsProjective.orthonormal_normalized_matrix_image_of_gram_eigenvectors,
+			MIPStarRE.LDT.MakingMeasurementsProjective.orthonormal_normalized_matrix_image_of_positive_gram_spectrum,
+			MIPStarRE.LDT.MakingMeasurementsProjective.normalized_matrix_image_rows_mul_conjTranspose,
+			MIPStarRE.LDT.MakingMeasurementsProjective.normalized_matrix_image_rows_mul_conjTranspose_of_positive_gram_spectrum,
+			MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_isHermitian_of_x_squared,
 			MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_coisometry,
 			MIPStarRE.LDT.MakingMeasurementsProjective.exists_xHat_of_rectangularSvd,
 			MIPStarRE.LDT.MakingMeasurementsProjective.exists_sigmaFin_xHat_coisometry_of_sum_le,
@@ -935,6 +942,10 @@
 		rectangular matrix with orthonormal rows on the sigma auxiliary space; the
 		chosen matrix \texttt{sigmaFinXHatCoisometry} and its specification record this
 		existence result as an input for the future construction.  The formal lemma
+		\texttt{orthonormal\_normalized\_image\_of\_adjoint\_comp\_eigenvectors}
+		records the singular-vector normalization calculation, while
+		\texttt{normalized\_matrix\_image\_rows\_mul\_conjTranspose} packages the
+		corresponding row-coisometry identity.  The formal lemma
 		\texttt{rectangularSvd\_xHat\_coisometry} records the corresponding matrix
 		calculation, and \texttt{exists\_xHat\_of\_rectangularSvd} packages the
 		resulting choice of $\widehat X$ together with the mixed square-root identity
