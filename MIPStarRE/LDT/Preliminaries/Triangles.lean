@@ -561,6 +561,105 @@ theorem triangleSub_right_subMeas_totalGap
           linarith
     _ = δ + Real.sqrt ε + η := by ring
 
+/-- Right-register substitution for submeasurements when the right total
+overlap is monotone in the replacement direction.
+
+The general submeasurement form `triangleSub_right_subMeas_totalGap` includes
+the absolute displacement of the total-overlap term.  In the special case where
+the new right family has no larger total overlap with the fixed left family,
+this displacement is not needed: increasing the total is the only way in which
+the total term can worsen the consistency defect.  The remaining contribution
+is exactly the usual matching-mass Cauchy--Schwarz term. -/
+theorem triangleSub_right_subMeas_total_le
+    {Question Outcome : Type*} {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype Outcome]
+    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
+    (hψ : ψ.IsNormalized) (h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1)
+    (A B D : IdxSubMeas Question Outcome ι) (δ ε : Error)
+    (hAB : ConsRel ψ 𝒟 A B δ)
+    (hBD : SDDRel ψ 𝒟
+      (IdxSubMeas.liftRight B)
+      (IdxSubMeas.liftRight D) ε)
+    (hTotalLe :
+      ∀ q : Question,
+        ev ψ (leftTensor (ι₂ := ι) ((A q).total) *
+            rightTensor (ι₁ := ι) ((D q).total)) ≤
+          ev ψ (leftTensor (ι₂ := ι) ((A q).total) *
+            rightTensor (ι₁ := ι) ((B q).total))) :
+    ConsRel ψ 𝒟 A D (δ + Real.sqrt ε) := by
+  let AL : IdxSubMeas Question Outcome (ι × ι) := IdxSubMeas.liftLeft A
+  let BR : IdxSubMeas Question Outcome (ι × ι) := IdxSubMeas.liftRight B
+  let DR : IdxSubMeas Question Outcome (ι × ι) := IdxSubMeas.liftRight D
+  let matchB : Question → Error := fun q =>
+    ∑ a : Outcome, ev ψ ((AL q).outcome a * (BR q).outcome a)
+  let matchD : Question → Error := fun q =>
+    ∑ a : Outcome, ev ψ ((AL q).outcome a * (DR q).outcome a)
+  let totalB : Question → Error := fun q =>
+    ev ψ ((AL q).total * (BR q).total)
+  let totalD : Question → Error := fun q =>
+    ev ψ ((AL q).total * (DR q).total)
+  let sdd : Question → Error := fun q =>
+    qSDD ψ (BR q) (DR q)
+  let matchGap : Question → Error := fun q => matchB q - matchD q
+  rcases hAB with ⟨hAB⟩
+  rw [bipartiteConsError_eq_consError_placed] at hAB
+  rcases hBD with ⟨hBD⟩
+  have hmatchGap_pointwise : ∀ q, |matchGap q| ≤ Real.sqrt (sdd q) := by
+    intro q
+    simpa [matchGap, matchB, matchD, sdd] using
+      right_match_gap_abs_le_sqrt_qSDD ψ hψ (AL q) (BR q) (DR q)
+  have hmatchGap_avg_abs :
+      avgOver 𝒟 (fun q => |matchGap q|) ≤ Real.sqrt (avgOver 𝒟 sdd) := by
+    exact
+      avgOver_abs_le_sqrt_of_pointwise_nonneg 𝒟 h𝒟 matchGap sdd
+        hmatchGap_pointwise
+        (fun q => qSDD_nonneg ψ (BR q) (DR q))
+  have hdefect_pointwise :
+      ∀ q, qConsDefect ψ (AL q) (DR q) ≤
+        qConsDefect ψ (AL q) (BR q) + |matchGap q| := by
+    intro q
+    have hdefB :
+        qConsDefect ψ (AL q) (BR q) = max 0 (totalB q - matchB q) := by
+      unfold qConsDefect qMatchMass
+      dsimp [totalB, matchB]
+    have hdefD :
+        qConsDefect ψ (AL q) (DR q) = max 0 (totalD q - matchD q) := by
+      unfold qConsDefect qMatchMass
+      dsimp [totalD, matchD]
+    have htotal : totalD q ≤ totalB q := by
+      simpa [totalD, totalB, AL, BR, DR, IdxSubMeas.liftLeft,
+        IdxSubMeas.liftRight] using hTotalLe q
+    calc
+      qConsDefect ψ (AL q) (DR q)
+        = max 0 (totalD q - matchD q) := hdefD
+      _ ≤ max 0 (totalB q - matchD q) := by
+            exact max_le_max le_rfl (sub_le_sub_right htotal (matchD q))
+      _ = max 0 ((totalB q - matchB q) + matchGap q) := by
+            dsimp [matchGap]
+            ring_nf
+      _ ≤ max 0 (totalB q - matchB q) + |matchGap q| :=
+            max_zero_add_le _ _
+      _ = qConsDefect ψ (AL q) (BR q) + |matchGap q| := by
+            rw [hdefB]
+  constructor
+  rw [bipartiteConsError_eq_consError_placed]
+  unfold consError sddError at *
+  calc
+    avgOver 𝒟 (fun q => qConsDefect ψ (AL q) (DR q))
+      ≤ avgOver 𝒟
+          (fun q => qConsDefect ψ (AL q) (BR q) + |matchGap q|) := by
+          apply avgOver_mono
+          intro q
+          exact hdefect_pointwise q
+    _ = avgOver 𝒟 (fun q => qConsDefect ψ (AL q) (BR q)) +
+          avgOver 𝒟 (fun q => |matchGap q|) := by
+            rw [avgOver_add]
+    _ ≤ δ + Real.sqrt (avgOver 𝒟 sdd) := by
+          exact add_le_add hAB hmatchGap_avg_abs
+    _ ≤ δ + Real.sqrt ε := by
+          simpa [add_comm] using
+            add_le_add_left (Real.sqrt_le_sqrt (by simpa [sdd, BR, DR] using hBD)) δ
+
 /-- `prop:simeq-triangle-inequality`.
 
 Apply `simeqToApprox` to the two hypotheses through the middle
