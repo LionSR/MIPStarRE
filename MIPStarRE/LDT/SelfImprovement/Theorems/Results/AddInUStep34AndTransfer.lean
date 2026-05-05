@@ -1166,6 +1166,32 @@ lemma addInU_selected_cs_chain_step4_abs_le_sqrt_of_globalVarianceDeviation_sum_
       params strategy M T S)
     (Real.sqrt_le_sqrt hglobal)
 
+/-- Combined selected Step 3/4 global-variance bridge.
+
+The two selected replacement steps use the same summed global-variance
+hypothesis.  This closed form supplies the raw selected Cauchy--Schwarz
+estimates from the factored Step 3/4 proofs in this file and then applies the
+external bound on the global-variance sum to both steps. -/
+lemma addInU_selected_cs_chain_step34_abs_le_sqrt_of_globalVarianceDeviation_sum_le
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (M : IdxSubMeas (Point params) Outcome ι)
+    (T : SubMeas (Polynomial params) ι)
+    (S : AddInUSelection params Outcome)
+    {ζ : Error}
+    (hglobal :
+      (∑ g : Polynomial params,
+        globalVarianceDeviationAtPolynomial params strategy strategy.state T g) ≤ ζ) :
+    |addInUSelectedCSChainQ2 params strategy M T S -
+        addInUSelectedCSChainQ3 params strategy M T S| ≤ Real.sqrt ζ ∧
+      |addInUSelectedCSChainQ3 params strategy M T S -
+        addInUSelectedCSChainQ4 params strategy M T S| ≤ Real.sqrt ζ :=
+  ⟨addInU_selected_cs_chain_step3_abs_le_sqrt_of_globalVarianceDeviation_sum_le
+      params strategy M T S hglobal,
+    addInU_selected_cs_chain_step4_abs_le_sqrt_of_globalVarianceDeviation_sum_le
+      params strategy M T S hglobal⟩
+
 
 /-- Self-energy factor `≤ 1` for the `Q₃ → Q₄` factored Cauchy--Schwarz.
 
