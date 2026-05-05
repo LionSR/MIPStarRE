@@ -44,6 +44,12 @@ class MaskingTests(unittest.TestCase):
         self.assertNotIn("hidden", masked)
         self.assertIn("private lemma real", masked)
 
+    def test_trailing_escape_in_unclosed_string_is_masked(self) -> None:
+        source = 'def s := "unterminated\\\\'
+        masked = mask_comments_and_strings(source)
+        self.assertEqual(len(masked), len(source))
+        self.assertNotIn("unterminated", masked)
+
 
 class ParseHelperDeclarationTests(unittest.TestCase):
     def test_detects_private_duplicate_with_comment_whitespace_normalization(self) -> None:
@@ -89,6 +95,52 @@ class ParseHelperDeclarationTests(unittest.TestCase):
                 [decl.is_private for decl in report.duplicate_groups[0].declarations],
                 [False, True],
             )
+
+    def test_inline_attribute_private_duplicate_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "LDT" / "Foo.lean"
+            _write(
+                mod,
+                """\
+                @[simp] private lemma first (h : True ∧ True) : True := by
+                  exact And.left h
+
+                @[local simp] private theorem second (h : True ∧ True) : True := by
+                  exact And.left h
+                """,
+            )
+            report = run_audit(root, min_normalized_chars=5)
+            self.assertEqual(report.scanned_declarations, 2)
+            self.assertEqual(len(report.duplicate_groups), 1)
+            names = {decl.name for decl in report.duplicate_groups[0].declarations}
+            self.assertEqual(names, {"first", "second"})
+
+    def test_top_level_commands_terminate_previous_proof_body(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "LDT" / "Foo.lean"
+            _write(
+                mod,
+                """\
+                private lemma first (h : True ∧ True) : True := by
+                  exact And.left h
+
+                set_option maxHeartbeats 100 in
+                private lemma second (h : True ∧ True) : True := by
+                  exact And.left h
+
+                attribute [simp] second
+
+                nonrec private lemma third (h : True ∧ True) : True := by
+                  exact And.left h
+                """,
+            )
+            report = run_audit(root, min_normalized_chars=5)
+            self.assertEqual(report.scanned_declarations, 3)
+            self.assertEqual(len(report.duplicate_groups), 1)
+            names = {decl.name for decl in report.duplicate_groups[0].declarations}
+            self.assertEqual(names, {"first", "second", "third"})
 
     def test_public_public_duplicate_is_not_reported(self) -> None:
         with tempfile.TemporaryDirectory() as td:

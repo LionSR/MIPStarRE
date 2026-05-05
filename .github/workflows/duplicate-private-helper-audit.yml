@@ -36,9 +36,16 @@ jobs:
         run: python3 -m unittest scripts/tests/test_check_duplicate_private_helpers.py
 
       - name: Run duplicate private-helper audit
-        continue-on-error: true
-        run: >
-          python3 scripts/check_duplicate_private_helpers.py
-          --root .
-          --github-annotations
-          --ci
+        run: |
+          set +e
+          python3 scripts/check_duplicate_private_helpers.py \
+            --root . \
+            --github-annotations \
+            --ci
+          audit_status=$?
+          set -e
+          if [ "$audit_status" -eq 1 ]; then
+            echo "Duplicate private-helper candidates were reported; this audit is advisory."
+            exit 0
+          fi
+          exit "$audit_status"

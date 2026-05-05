@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable, Sequence
@@ -26,13 +27,13 @@ DEFAULT_MIN_NORMALIZED_CHARS = 40
 
 _DECL_RE = re.compile(
     r"(?m)^[ \t]*"
-    r"(?P<attrs>(?:@\[[^\n]*\][ \t]*\n[ \t]*)*)"
+    r"(?P<attrs>(?:@\[[^\n]*\][ \t]*(?:\n[ \t]*)?)*)"
     r"(?P<mods>(?:(?:private|protected|noncomputable|unsafe|nonrec)[ \t]+)*)"
     r"(?P<kind>lemma|theorem)[ \t]+"
     r"(?P<name>[^\s:({\[]+)"
 )
 _TOP_LEVEL_COMMAND_RE = re.compile(
-    r"(?m)^[A-Za-z_][A-Za-z0-9_']*(?:[ \t]|$)"
+    r"(?m)^(?:@\[[^\n]*\]|[A-Za-z_][A-Za-z0-9_']*)(?:[ \t]|$)"
 )
 _COMMENT_OR_WS_RE = re.compile(r"\s+")
 
@@ -114,7 +115,7 @@ def mask_comments_and_strings(text: str) -> str:
             j = i + 1
             while j < len(text):
                 if text[j] == "\\":
-                    j += 2
+                    j = min(j + 2, len(text))
                     continue
                 if text[j] == '"':
                     j += 1
@@ -131,30 +132,7 @@ def _find_top_level_command(masked: str, start: int) -> int:
     """Return the start of the next top-level command after ``start``."""
 
     for match in _TOP_LEVEL_COMMAND_RE.finditer(masked, start):
-        word = match.group(0).strip()
-        if word in {
-            "abbrev",
-            "axiom",
-            "class",
-            "def",
-            "end",
-            "example",
-            "import",
-            "inductive",
-            "instance",
-            "lemma",
-            "namespace",
-            "noncomputable",
-            "open",
-            "private",
-            "protected",
-            "section",
-            "structure",
-            "theorem",
-            "unsafe",
-            "variable",
-        }:
-            return match.start()
+        return match.start()
     return len(masked)
 
 
@@ -359,4 +337,8 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except Exception as exc:
+        print(f"duplicate-private-helper audit failed: {exc}", file=sys.stderr)
+        raise SystemExit(2) from exc
