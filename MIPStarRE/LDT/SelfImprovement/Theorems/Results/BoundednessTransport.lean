@@ -190,12 +190,10 @@ theorem helperAgreementOperatorAtPoint_eq_sum_polynomial
               rw [show h u = a from hh]
       _ = ∑ h : Polynomial params,
             opTensor ((strategy.pointMeasurement u).outcome (h u)) (H.outcome h) := by
-              simpa using
-                Finset.sum_fiberwise (Finset.univ : Finset (Polynomial params))
-                  (fun h : Polynomial params => h u)
-                  (fun h =>
-                    opTensor ((strategy.pointMeasurement u).outcome (h u))
-                      (H.outcome h))
+              simpa using (polynomial_sum_fiberwise params u
+                (fun h =>
+                  opTensor ((strategy.pointMeasurement u).outcome (h u))
+                    (H.outcome h))).symm
 
 /-- Reindexed expansion of the averaged helper-agreement operator.
 

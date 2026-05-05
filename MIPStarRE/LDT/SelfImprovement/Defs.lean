@@ -245,9 +245,8 @@ noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
                   ∑ a : Fq params,
                     ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
                       sandwichedPolynomialOutcomeOperatorAt params strategy T u h from by
-                simpa using (Finset.sum_fiberwise Finset.univ
-                  (fun h : Polynomial params => h u)
-                  (sandwichedPolynomialOutcomeOperatorAt params strategy T u)).symm]
+                exact polynomial_sum_fiberwise params u
+                  (sandwichedPolynomialOutcomeOperatorAt params strategy T u)]
               refine Finset.sum_congr rfl ?_
               intro a _
               refine Finset.sum_congr rfl ?_

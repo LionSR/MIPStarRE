@@ -94,24 +94,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Decompose a polynomial-indexed sum into the fibers of the evaluation map
-`h ↦ h u`.
-
-This is the common finite reindexing used in the helper-completeness argument:
-the paper repeatedly groups polynomials according to their value at the sampled
-point `u`. -/
-private lemma polynomial_sum_fiberwise
-    (params : Parameters)
-    [FieldModel params.q]
-    (u : Point params)
-    {β : Type*} [AddCommMonoid β]
-    (f : Polynomial params → β) :
-    (∑ h : Polynomial params, f h) =
-      ∑ a : Fq params,
-        ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a), f h := by
-  classical
-  simpa using (Finset.sum_fiberwise Finset.univ (fun h : Polynomial params => h u) f).symm
-
 /-- The incoming consistency of the original polynomial measurement gives the
 matching-mass lower bound used in the helper-stage completeness proof.
 
