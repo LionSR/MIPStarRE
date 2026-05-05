@@ -77,9 +77,12 @@ The paper replaces the singular values of $X$ by $1$:
   \tag{\texttt{[blueprint] def:projective-P}}
 \]
 Only three consequences are used later.%
-\footnote{The first consequence is derived in
-\path{references/ldt-paper/orthonormalization.tex}, lines~862--896.  The second
-and third are derived in lines~984--1064.}
+\footnote{The first consequence, \texttt{lem:X-hat-squared}, is proved in
+\path{references/ldt-paper/orthonormalization.tex}, lines~984--1001.  The
+second, \texttt{lem:X-times-X-hat}, is proved in lines~1005--1034, and the
+third, \texttt{lem:squared-difference}, in lines~1036--1064.  Each proof uses
+the auxiliary identities $XX^\dagger=U\Sigma_{m\times m}^2U^\dagger$ and
+$X^\dagger X=Q$ from \texttt{lem:X-squared}, lines~862--896.}
 
 \begin{enumerate}
   \item \textbf{Coisometry:} $\widehat X\widehat X^\dagger=I_{m\times m}$.  This
