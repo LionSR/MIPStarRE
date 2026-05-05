@@ -1,4 +1,5 @@
-import MIPStarRE.LDT.GlobalVariance.Theorems.SelfConsistencyTransport.Point
+import MIPStarRE.LDT.GlobalVariance.Theorems.CollisionExpansion
+import MIPStarRE.LDT.GlobalVariance.Theorems.SelfConsistencyTransport.Utilities
 
 namespace MIPStarRE.LDT.GlobalVariance
 
