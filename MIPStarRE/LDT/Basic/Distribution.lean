@@ -214,6 +214,21 @@ theorem avgOver_sum {α β : Type*} [Fintype β]
     _ = ∑ b : β, ∑ a ∈ 𝒟.support, 𝒟.weight a * f a b := by
           rw [Finset.sum_comm]
 
+/-- Pull a finite-set sum through an average. -/
+theorem avgOver_finset_sum {α β : Type*}
+    (𝒟 : Distribution α) (s : Finset β) (f : α → β → Error) :
+    avgOver 𝒟 (fun a => ∑ b ∈ s, f a b) =
+      ∑ b ∈ s, avgOver 𝒟 (fun a => f a b) := by
+  unfold avgOver
+  calc
+    ∑ a ∈ 𝒟.support, 𝒟.weight a * ∑ b ∈ s, f a b
+        = ∑ a ∈ 𝒟.support, ∑ b ∈ s, 𝒟.weight a * f a b := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          rw [Finset.mul_sum]
+    _ = ∑ b ∈ s, ∑ a ∈ 𝒟.support, 𝒟.weight a * f a b := by
+          rw [Finset.sum_comm]
+
 /-- Fubini swap for two nested finite-support distribution averages. -/
 theorem avgOver_comm {α β : Type*} (𝒟α : Distribution α) (𝒟β : Distribution β)
     (f : α → β → Error) :

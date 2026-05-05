@@ -1325,20 +1325,6 @@ noncomputable def addInUSelectedCSChainQ4
       ev strategy.state
         (opTensor (Au * (M uv.1).outcome ah.1 * Au) (T.outcome ah.2)))
 
-private theorem avgOver_finset_sum {α β : Type*}
-    (𝒟 : Distribution α) (s : Finset β) (f : α → β → Error) :
-    avgOver 𝒟 (fun a => ∑ b ∈ s, f a b) =
-      ∑ b ∈ s, avgOver 𝒟 (fun a => f a b) := by
-  unfold avgOver
-  calc
-    ∑ a ∈ 𝒟.support, 𝒟.weight a * ∑ b ∈ s, f a b
-        = ∑ a ∈ 𝒟.support, ∑ b ∈ s, 𝒟.weight a * f a b := by
-          refine Finset.sum_congr rfl ?_
-          intro a _
-          rw [Finset.mul_sum]
-    _ = ∑ b ∈ s, ∑ a ∈ 𝒟.support, 𝒟.weight a * f a b := by
-          rw [Finset.sum_comm]
-
 /-- The selected-chain endpoint `Q₀` is the generic add-in-u left quantity when
 the second measurement is the averaged sandwiched polynomial submeasurement. -/
 theorem addInUSelectedCSChainQ0_eq_leftQuantity_averagedSandwiched
