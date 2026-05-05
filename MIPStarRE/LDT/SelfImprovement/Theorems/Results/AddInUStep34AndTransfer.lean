@@ -260,6 +260,36 @@ private theorem addInU_weightedFinsetCauchySchwarz_on_selectedSupport
         · simpa [hsel] using hy q a hsel
         · simp [hsel])
 
+/-- The unrestricted finite Cauchy--Schwarz estimate obtained from the
+selected-support form by taking the selected set to be all outcomes. -/
+private theorem addInU_weightedFinsetCauchySchwarz_allSupport
+    {Question Outcome : Type*} [Fintype Outcome]
+    (𝒟 : Distribution Question)
+    (t x y : Question → Outcome → Error)
+    (ht : ∀ q a, |t q a| ≤ Real.sqrt (x q a) * Real.sqrt (y q a))
+    (hx : ∀ q a, 0 ≤ x q a)
+    (hy : ∀ q a, 0 ≤ y q a) :
+    |avgOver 𝒟 (fun q => ∑ a : Outcome, t q a)| ≤
+      Real.sqrt (avgOver 𝒟 (fun q => ∑ a : Outcome, x q a)) *
+      Real.sqrt (avgOver 𝒟 (fun q => ∑ a : Outcome, y q a)) := by
+  have hcs :=
+    addInU_weightedFinsetCauchySchwarz_on_selectedSupport
+      (𝒟 := 𝒟)
+      (selected := fun _ _ => True)
+      (t := t)
+      (x := x)
+      (y := y)
+      (by
+        intro q a _
+        exact ht q a)
+      (by
+        intro q a _
+        exact hx q a)
+      (by
+        intro q a _
+        exact hy q a)
+  simpa using hcs
+
 /-- Factored operator Cauchy--Schwarz bound for the `Q₂ → Q₃` add-in-`u` step.
 
 Applies the bipartite-tensor sandwich Cauchy--Schwarz primitive
@@ -301,7 +331,7 @@ theorem add_in_u_cs_chain_q2_q3_factored_cs
               (opTensor (Av * Mh * Av) (T.outcome h)))) := by
   classical
   rw [addInU_cs_chain_step3_diff_eq params strategy T]
-  refine MIPStarRE.LDT.Preliminaries.weightedFinsetCauchySchwarz
+  refine addInU_weightedFinsetCauchySchwarz_allSupport
     (Question := Point params × Point params) (Outcome := Polynomial params)
     (uniformDistribution (Point params × Point params))
     (t := fun uv h =>
@@ -413,7 +443,7 @@ theorem add_in_u_cs_chain_q3_q4_factored_cs
               (opTensor ((Av - Au) * Mh * (Av - Au)) (T.outcome h)))) := by
   classical
   rw [addInU_cs_chain_step4_diff_eq params strategy T]
-  refine MIPStarRE.LDT.Preliminaries.weightedFinsetCauchySchwarz
+  refine addInU_weightedFinsetCauchySchwarz_allSupport
     (Question := Point params × Point params) (Outcome := Polynomial params)
     (uniformDistribution (Point params × Point params))
     (t := fun uv h =>
