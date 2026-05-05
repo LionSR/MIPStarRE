@@ -332,21 +332,17 @@ theorem matrixSdpCanonicalBlockDiagonal_trace_mul (params : Parameters)
         (matrixSdpCanonicalBlockDiagonal params model B *
           matrixSdpCanonicalBlockDiagonal params model D) =
       ∑ b : MatrixSdpCanonicalBlockIndex params, Matrix.trace (B b * D b) := by
-  rw [Matrix.trace]
-  trans ∑ x : MatrixSdpCanonicalBlockIndex params × model.space.carrier,
-      ∑ j : model.space.carrier, B x.1 x.2 j * D x.1 j x.2
-  · refine Finset.sum_congr rfl ?_
-    intro x _
-    simp only [Matrix.diag_apply]
-    rw [Matrix.mul_apply]
-    change (∑ y : MatrixSdpCanonicalBlockIndex params × model.space.carrier,
-        matrixSdpCanonicalBlockDiagonal params model B x y *
-          matrixSdpCanonicalBlockDiagonal params model D y x) =
-      ∑ j : model.space.carrier, B x.1 x.2 j * D x.1 j x.2
-    rw [Fintype.sum_prod_type]
-    simp [matrixSdpCanonicalBlockDiagonal]
-  · rw [Fintype.sum_prod_type]
-    simp [Matrix.trace, Matrix.mul_apply]
+  let e := Equiv.prodComm model.space.carrier (MatrixSdpCanonicalBlockIndex params)
+  rw [matrixSdpCanonicalBlockDiagonal_eq_reindex_blockDiagonal,
+    matrixSdpCanonicalBlockDiagonal_eq_reindex_blockDiagonal]
+  change Matrix.trace
+      ((Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal B) *
+        (Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal D)) =
+    ∑ b : MatrixSdpCanonicalBlockIndex params, Matrix.trace (B b * D b)
+  rw [← Matrix.reindexAlgEquiv_mul (R := ℂ) (A := ℂ) e
+    (Matrix.blockDiagonal B) (Matrix.blockDiagonal D)]
+  simp only [Matrix.reindexAlgEquiv_apply]
+  rw [Matrix.trace_reindex, Matrix.trace_blockDiagonal_mul]
 
 /-- The primal slack block `S = I - ∑_g T_g`. -/
 noncomputable def matrixSdpCanonicalSlackOperator (params : Parameters)
