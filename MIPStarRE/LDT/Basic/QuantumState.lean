@@ -234,6 +234,27 @@ theorem opTensor_mono_left
     opTensor A₁ B ≤ opTensor A₂ B := by
   simpa [opTensor] using MIPStarRE.Quantum.kronecker_mono_left hA hB
 
+/-- `opTensor` is monotone in the right factor against a PSD left factor. -/
+theorem opTensor_mono_right
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    {A : MIPStarRE.Quantum.Op ι₁} {B₁ B₂ : MIPStarRE.Quantum.Op ι₂}
+    (hA : 0 ≤ A) (hB : B₁ ≤ B₂) :
+    opTensor A B₁ ≤ opTensor A B₂ := by
+  change (opTensor A B₂ - opTensor A B₁).PosSemidef
+  have hpsd :
+      (Matrix.kronecker A (B₂ - B₁)).PosSemidef := by
+    exact Matrix.nonneg_iff_posSemidef.mp <|
+      MIPStarRE.Quantum.kronecker_nonneg hA (sub_nonneg.mpr hB)
+  rw [opTensor, opTensor, MIPStarRE.Quantum.kronecker_sub_right]
+  exact hpsd
+
+/-- Right tensor placement is monotone. -/
+theorem rightTensor_mono
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    {B₁ B₂ : MIPStarRE.Quantum.Op ι₂} (hB : B₁ ≤ B₂) :
+    rightTensor (ι₁ := ι₁) B₁ ≤ rightTensor (ι₁ := ι₁) B₂ := by
+  exact opTensor_mono_right Matrix.PosSemidef.one.nonneg hB
+
 
 /-- `rightTensor B * leftTensor A = opTensor A B`. -/
 theorem rightTensor_mul_leftTensor_eq_opTensor

@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.Basic.QuantumState
 import MIPStarRE.LDT.Basic.SubMeasurementFamilies
 import MIPStarRE.LDT.GlobalVariance.Theorems.Results
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
@@ -62,6 +63,9 @@ data-processing transport of the boundedness gap, and the standalone
   records the sharper point-consistency route where the projective replacement
   has monotone right-total expectation, eliminating the alphabet-size
   total-overlap term.
+- **final_fields_point_consistency_natural_of_total_operator_le** —
+  obtains the same sharper route from the operator inequality
+  `H.total ≤ Hhat.total`.
 - **helper_boundedness_gap_transport_through_data_processing** — transport
   the helper boundedness gap through the data-processing SDD approximation
   between Ĥ and H (paper lines 747–755).
@@ -864,6 +868,79 @@ theorem final_fields_point_consistency_of_total_expectation_le_of_small_errors
     (final_fields_projective_residual_error_le_selfImprovementError
       params eps delta heps heps_le_one hdelta hdelta_le_one hd_le_q)
     (final_fields_point_consistency_natural_of_total_expectation_le
+      params strategy eps delta hhelperPoint hdata hTotalLe)
+
+/-- Natural-error point-consistency transport from operator right-total
+monotonicity.
+
+The operator inequality `H.total ≤ Hhat.total` implies the scalar right-total
+comparison after placing both operators on the right tensor factor and taking
+expectation in the shared state.  This lemma records the operator-order form of
+the monotone-total route, leaving the production of that operator inequality to
+the projectivization stage. -/
+theorem final_fields_point_consistency_natural_of_total_operator_le
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    {Hhat : SubMeas (Polynomial params) ι}
+    {H : ProjSubMeas (Polynomial params) ι}
+    (hhelperPoint :
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params Hhat)
+        (selfImprovementHelperError params eps delta))
+    (hdata :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftLeft)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+        (selfImprovementDataProcessingError params eps delta))
+    (hTotalLe : H.toSubMeas.total ≤ Hhat.total) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params H.toSubMeas)
+      (selfImprovementHelperError params eps delta +
+        Real.sqrt (selfImprovementDataProcessingError params eps delta)) := by
+  have hTotalExpectationLe :
+      ev strategy.state (rightTensor (ι₁ := ι) H.toSubMeas.total) ≤
+        ev strategy.state (rightTensor (ι₁ := ι) Hhat.total) := by
+    exact ev_mono strategy.state _ _ (MIPStarRE.LDT.rightTensor_mono hTotalLe)
+  exact
+    final_fields_point_consistency_natural_of_total_expectation_le
+      params strategy eps delta hhelperPoint hdata hTotalExpectationLe
+
+/-- Literal-threshold point-consistency transport from operator right-total
+monotonicity and the standard small-error hypotheses.
+
+This is the operator-order version of
+`final_fields_point_consistency_of_total_expectation_le_of_small_errors`. -/
+theorem final_fields_point_consistency_of_total_operator_le_of_small_errors
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (heps_le_one : eps ≤ 1)
+    (hdelta : 0 ≤ delta) (hdelta_le_one : delta ≤ 1)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
+    {Hhat : SubMeas (Polynomial params) ι}
+    {H : ProjSubMeas (Polynomial params) ι}
+    (hhelperPoint :
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params Hhat)
+        (selfImprovementHelperError params eps delta))
+    (hdata :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftLeft)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+        (selfImprovementDataProcessingError params eps delta))
+    (hTotalLe : H.toSubMeas.total ≤ Hhat.total) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params H.toSubMeas)
+      (selfImprovementError params eps delta) :=
+  MIPStarRE.LDT.ConsRel.mono
+    (final_fields_projective_residual_error_le_selfImprovementError
+      params eps delta heps heps_le_one hdelta hdelta_le_one hd_le_q)
+    (final_fields_point_consistency_natural_of_total_operator_le
       params strategy eps delta hhelperPoint hdata hTotalLe)
 
 /-- The data-processing SDD comparison controls the total-overlap displacement
