@@ -778,6 +778,41 @@ theorem transpose_unitary_mul_rectangular_coisometry
     _ = Uᵀ * (Uᵀ)ᴴ := by rw [hW, Matrix.mul_one]
     _ = 1 := hU_transpose
 
+/-- Completion rows of the left unitary outside the positive Gram spectrum are
+killed by `X†`.
+
+The selected rows of `U` are the normalized positive images of the Gram
+eigenvectors.  If a row index is not one of the selected positive spectral
+indices, the row-orthogonality of `U` makes that row orthogonal to all positive
+Gram images.  The adjoint-kernel lemma then gives the stated vanishing. -/
+theorem adjoint_image_eq_zero_of_unitary_positive_gram_completion_row
+    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
+    (hQ : Q.IsHermitian) (hQ_pos : Q.PosSemidef)
+    (hgram : Xᴴ * X = Q)
+    (e : {i : ι // 0 < hQ.eigenvalues i} ↪ μ)
+    (U : Matrix μ μ ℂ)
+    (hU_left : U * Uᴴ = (1 : Matrix μ μ ℂ))
+    (hU_rows : ∀ (i : {i : ι // 0 < hQ.eigenvalues i}) (r : μ),
+      U (e i) r = positiveGramSpectrumImageRows X Q hQ i r)
+    (a : μ) (ha : a ∉ Set.range e) :
+    (Matrix.toEuclideanLin X).adjoint (WithLp.toLp 2 fun r : μ => U a r) = 0 := by
+  refine adjoint_image_eq_zero_of_orthogonal_positive_gram_images X Q hQ hQ_pos
+    hgram (WithLp.toLp 2 fun r : μ => U a r) ?_
+  intro i
+  have hae : a ≠ e i := by
+    intro h
+    exact ha ⟨i, h.symm⟩
+  have hentry := congrFun (congrFun hU_left a) (e i)
+  have hentry_zero :
+      ∑ r : μ, U a r * star (U (e i) r) = 0 := by
+    simpa [Matrix.mul_apply, Matrix.conjTranspose_apply, hae] using hentry
+  change inner ℂ
+      (WithLp.toLp 2 fun r : μ => positiveGramSpectrumImageRows X Q hQ i r)
+      (WithLp.toLp 2 fun r : μ => U a r) = 0
+  simpa [hU_rows i, EuclideanSpace.inner_eq_star_dotProduct, dotProduct, mul_comm]
+    using hentry_zero
+
 /-- The row-coisometry identity for the rectangular SVD choice of `Xhat`.
 
 If `U` and `V` are unitary in the directions used below, and if the rectangular
