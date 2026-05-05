@@ -22,6 +22,11 @@ review unit.
 - **helper_residualLowerBound_of_paper_chain_bound** — reduction from the
   paper's `7√ζ_variance + √(2δ) + md/q` residual-chain estimate to the producer
   field.
+- **helperOffDiagonalBareQuantity_le_paper_chain_of_scalar_transports** —
+  assembly of the residual-chain estimate from the displayed scalar transport
+  bounds.
+- **helper_producer_inputs_of_selfConsistency_localVariance_scalarTransports** —
+  producer packaging from the displayed scalar transport estimates.
 - **helperOffDiagonalBareQuantity_le_one** — the submeasurement contraction
   bound for the bare off-diagonal polynomial-pair mass.
 - **helper_strong_self_consistency_of_helper_conclusion** — assembly of the
@@ -323,6 +328,90 @@ theorem helper_residualLowerBound_of_paper_chain_bound
   rw [hrewrite]
   exact hoffdiag
 
+/-- Assemble the paper's final residual-chain estimate from the displayed scalar
+transport bounds.
+
+The first two hypotheses are the two variance swaps used to pass from
+`eq:added-indicator` to the Schwartz--Zippel endpoint.  The next two hypotheses
+are the transports from `eq:delete-an-A` to `eq:move-over-v`.  The final
+hypothesis is the lower bound on the `move-over-v` endpoint obtained after
+substituting the averaged operator `Z` and using the explicit point-consistency
+bound for the point measurement. -/
+theorem helperOffDiagonalBareQuantity_le_paper_chain_of_scalar_transports
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    {T : Measurement (Polynomial params) ι}
+    {Hhat : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
+    (hleft :
+      |helperOffDiagonalIndicatorQuantity params strategy T.toSubMeas -
+        helperOffDiagonalOneSidedSwappedIndicatorQuantity params strategy T.toSubMeas| ≤
+          Real.sqrt (selfImprovementVarianceError params eps delta))
+    (hright :
+      |helperOffDiagonalOneSidedSwappedIndicatorQuantity params strategy T.toSubMeas -
+        helperOffDiagonalSwappedIndicatorQuantity params strategy T.toSubMeas| ≤
+          Real.sqrt (selfImprovementVarianceError params eps delta))
+    (hclone :
+      |helperDeleteAQuantity params strategy T.toSubMeas -
+        helperDeleteAClonedQuantity params strategy T.toSubMeas| ≤
+          Real.sqrt (selfImprovementVarianceError params eps delta))
+    (hmove :
+      |helperDeleteAClonedQuantity params strategy T.toSubMeas -
+        helperMoveOverVQuantity params strategy T.toSubMeas| ≤
+          Real.sqrt (2 * delta))
+    (hmoveLower :
+      subMeasMass strategy.state Hhat.liftLeft ≤
+        helperMoveOverVQuantity params strategy T.toSubMeas +
+          4 * Real.sqrt (selfImprovementVarianceError params eps delta)) :
+    helperOffDiagonalBareQuantity params strategy T.toSubMeas ≤
+      7 * Real.sqrt (selfImprovementVarianceError params eps delta) +
+        Real.sqrt (2 * delta) +
+        ((params.m : Error) * (params.d : Error) / (params.q : Error)) := by
+  let release :=
+    addInURightQuantity params strategy
+      (sandwichedPolynomialSubMeasAt params strategy T.toSubMeas)
+      T.toSubMeas
+      (selfConsistencyAddInUSelection params)
+  let ζsqrt := Real.sqrt (selfImprovementVarianceError params eps delta)
+  let sqrtTwoDelta := Real.sqrt (2 * delta)
+  let mdq := ((params.m : Error) * (params.d : Error) / (params.q : Error))
+  have houter :
+      helperOffDiagonalOuterSandwichQuantity params strategy T.toSubMeas ≤
+        2 * ζsqrt + mdq := by
+    simpa [ζsqrt, mdq] using
+      helperOffDiagonalOuterSandwichQuantity_le_two_sqrt_variance_add_mdq_of_abs_transports
+        params strategy eps delta T.toSubMeas hleft hright
+  have hmove_to_delete :
+      helperMoveOverVQuantity params strategy T.toSubMeas ≤
+        helperDeleteAQuantity params strategy T.toSubMeas + ζsqrt + sqrtTwoDelta := by
+    simpa [ζsqrt, sqrtTwoDelta] using
+      helperMoveOverVQuantity_le_deleteA_of_abs_transports
+        params strategy eps delta T.toSubMeas hclone hmove
+  have hmove_to_full :
+      helperMoveOverVQuantity params strategy T.toSubMeas ≤
+        helperFullOuterSandwichQuantity params strategy T.toSubMeas + ζsqrt + sqrtTwoDelta := by
+    simpa [helperFullOuterSandwichQuantity_eq_deleteAQuantity params strategy T.toSubMeas]
+      using hmove_to_delete
+  have hmove_to_release :
+      helperMoveOverVQuantity params strategy T.toSubMeas ≤
+        release + 3 * ζsqrt + sqrtTwoDelta + mdq := by
+    have hfull_split :
+        helperFullOuterSandwichQuantity params strategy T.toSubMeas =
+          release + helperOffDiagonalOuterSandwichQuantity params strategy T.toSubMeas := by
+      simpa [release] using
+        helperFullOuterSandwichQuantity_eq_release_add_offDiagonalOuterSandwichQuantity
+          params strategy T.toSubMeas
+    linarith
+  have hresidual :
+      subMeasMass strategy.state Hhat.liftLeft - release ≤
+        7 * ζsqrt + sqrtTwoDelta + mdq := by
+    linarith
+  rw [hhelper.averagedConstruction] at hresidual
+  rw [helper_mass_sub_release_eq_polynomial_off_diagonal] at hresidual
+  simpa [release, ζsqrt, sqrtTwoDelta, mdq, helperOffDiagonalBareQuantity] using hresidual
+
 /-- Construct the helper-stage producer package from local variance and a
 named off-diagonal residual estimate.
 
@@ -387,6 +476,56 @@ lemma helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVar
     params strategy eps delta hssc hlocal
     (helper_residualLowerBound_of_paper_chain_bound
       params strategy eps delta hhelper hoffdiag)
+
+/-- Construct the helper-stage producer package directly from the scalar
+transport estimates appearing in the paper.
+
+Compared with
+`helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance_paperChain`,
+this version does not ask for the already assembled residual-chain estimate.
+It consumes the two off-diagonal variance swaps, the two post-`delete-an-A`
+transports, and the final lower bound on the `move-over-v` endpoint, then
+assembles the residual estimate internally. -/
+lemma helper_producer_inputs_of_selfConsistency_localVariance_scalarTransports
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    {T : Measurement (Polynomial params) ι}
+    {Hhat : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
+    (hssc : BipartiteSSCRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta)
+    (hlocal :
+      (∑ g : Polynomial params,
+        localVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g) ≤
+        localVarianceOfPointsError params eps delta)
+    (hleft :
+      |helperOffDiagonalIndicatorQuantity params strategy T.toSubMeas -
+        helperOffDiagonalOneSidedSwappedIndicatorQuantity params strategy T.toSubMeas| ≤
+          Real.sqrt (selfImprovementVarianceError params eps delta))
+    (hright :
+      |helperOffDiagonalOneSidedSwappedIndicatorQuantity params strategy T.toSubMeas -
+        helperOffDiagonalSwappedIndicatorQuantity params strategy T.toSubMeas| ≤
+          Real.sqrt (selfImprovementVarianceError params eps delta))
+    (hclone :
+      |helperDeleteAQuantity params strategy T.toSubMeas -
+        helperDeleteAClonedQuantity params strategy T.toSubMeas| ≤
+          Real.sqrt (selfImprovementVarianceError params eps delta))
+    (hmove :
+      |helperDeleteAClonedQuantity params strategy T.toSubMeas -
+        helperMoveOverVQuantity params strategy T.toSubMeas| ≤
+          Real.sqrt (2 * delta))
+    (hmoveLower :
+      subMeasMass strategy.state Hhat.liftLeft ≤
+        helperMoveOverVQuantity params strategy T.toSubMeas +
+          4 * Real.sqrt (selfImprovementVarianceError params eps delta)) :
+    HelperStrongSelfConsistencyProducerInputs params strategy T Hhat eps delta := by
+  exact
+    helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance_paperChain
+      params strategy eps delta hhelper hssc hlocal
+      (helperOffDiagonalBareQuantity_le_paper_chain_of_scalar_transports
+        params strategy eps delta hhelper hleft hright hclone hmove hmoveLower)
 
 /-- Produce the helper-stage strong self-consistency conclusion from the actual
 helper construction together with the named add-in-`u`/variance transports.

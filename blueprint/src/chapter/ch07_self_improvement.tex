@@ -308,6 +308,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.pointConditioned_sandwichedPolynomialOutcome_outer_eq_right}
   \lean{MIPStarRE.LDT.SelfImprovement.helperFullOuterSandwichQuantity}
   \lean{MIPStarRE.LDT.SelfImprovement.helperDeleteAQuantity}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperFullOuterSandwichQuantity_eq_release_add_offDiagonalOuterSandwichQuantity}
   \lean{MIPStarRE.LDT.SelfImprovement.helperFullOuterSandwichQuantity_eq_deleteAQuantity}
   \leanok
   Replace the remaining copy of $A^u_{h(u)}$ by $A^v_{h(v)}$:
@@ -325,6 +326,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helperDeleteAClonedQuantity}
   \lean{MIPStarRE.LDT.SelfImprovement.helperMoveOverVQuantity}
   \lean{MIPStarRE.LDT.SelfImprovement.helperDeleteAQuantity_le_moveOverV_of_abs_transports}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperMoveOverVQuantity_le_deleteA_of_abs_transports}
   \leanok
   Substituting~\eqref{eq:swap-Z-for-A}, then~\eqref{eq:Z-greater-than-A}, and finally the already proved bound~\eqref{eq:explicit-bound-for-A-consistency}, one obtains
   \[
@@ -347,8 +349,10 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalBareQuantity_le_one}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_residualLowerBound_of_offDiagonal_bound}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_residualLowerBound_of_paper_chain_bound}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalBareQuantity_le_paper_chain_of_scalar_transports}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance_offDiagonal}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance_paperChain}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_producer_inputs_of_selfConsistency_localVariance_scalarTransports}
   \leanok
   and then uses the proved wrappers
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_of_helper_conclusion}

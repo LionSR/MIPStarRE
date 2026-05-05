@@ -37,6 +37,9 @@ chain definitions with endpoint lemmas.
   projector-inserted residual and the post-swap Schwartz--Zippel endpoint,
   together with the conditional assembly of the paper's
   `2√ζ + md/q` estimate.
+- **helperFullOuterSandwichQuantity_eq_release_add_offDiagonalOuterSandwichQuantity** —
+  the exact decomposition of the full inserted sum into the released diagonal
+  contribution and the off-diagonal remainder.
 
 ## References
 
@@ -756,6 +759,42 @@ noncomputable def helperFullOuterSandwichQuantity
             (Ah * ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h') * Ah)
             (T.outcome h)))
 
+/-- The full inserted expression splits into its released diagonal part and its
+off-diagonal remainder.
+
+This is the finite-sum identity underlying the passage from
+`eq:release-the-kraken` to `eq:threw-in-h-prime`: for each fixed polynomial
+`h`, the sum over all `h'` is the diagonal term `h' = h` plus the sum over
+`h' ≠ h`. -/
+theorem helperFullOuterSandwichQuantity_eq_release_add_offDiagonalOuterSandwichQuantity
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    helperFullOuterSandwichQuantity params strategy T =
+      addInURightQuantity params strategy
+        (sandwichedPolynomialSubMeasAt params strategy T)
+        T
+        (selfConsistencyAddInUSelection params) +
+      helperOffDiagonalOuterSandwichQuantity params strategy T := by
+  classical
+  rw [addInURightQuantity_selfConsistencySelection_eq_release,
+    helperFullOuterSandwichQuantity, helperOffDiagonalOuterSandwichQuantity]
+  rw [← avgOver_add]
+  refine avgOver_congr (uniformDistribution (Point params)) _ _ ?_
+  intro u
+  rw [← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl ?_
+  intro h _
+  rw [← Finset.sum_erase_add (Finset.univ : Finset (Polynomial params))
+    (fun h' =>
+      let Ah := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
+      ev strategy.state
+        (opTensor
+          (Ah * ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h') * Ah)
+          (T.outcome h)))
+    (Finset.mem_univ h)]
+  ring
+
 /-- The full enlarged expression after deleting the left copy of the point
 projector.
 
@@ -871,6 +910,41 @@ theorem helperDeleteAQuantity_le_moveOverV_of_abs_transports
           helperMoveOverVQuantity params strategy T ≤
         Real.sqrt (2 * delta) :=
     (abs_le.mp hmove).2
+  linarith
+
+/-- The reverse scalar direction of the post-`delete-an-A` transport estimates.
+
+This is the direction used when the final `move-over-v` expression is known to
+be large and one transfers that lower bound back to the `delete-an-A` expression.
+It is again only the triangle-inequality assembly of the two analytic transport
+estimates. -/
+theorem helperMoveOverVQuantity_le_deleteA_of_abs_transports
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (T : SubMeas (Polynomial params) ι)
+    (hclone :
+      |helperDeleteAQuantity params strategy T -
+        helperDeleteAClonedQuantity params strategy T| ≤
+          Real.sqrt (selfImprovementVarianceError params eps delta))
+    (hmove :
+      |helperDeleteAClonedQuantity params strategy T -
+        helperMoveOverVQuantity params strategy T| ≤
+          Real.sqrt (2 * delta)) :
+    helperMoveOverVQuantity params strategy T ≤
+      helperDeleteAQuantity params strategy T +
+        Real.sqrt (selfImprovementVarianceError params eps delta) +
+        Real.sqrt (2 * delta) := by
+  have hclone_ge :
+      -Real.sqrt (selfImprovementVarianceError params eps delta) ≤
+          helperDeleteAQuantity params strategy T -
+            helperDeleteAClonedQuantity params strategy T :=
+    (abs_le.mp hclone).1
+  have hmove_ge :
+      -Real.sqrt (2 * delta) ≤
+          helperDeleteAClonedQuantity params strategy T -
+            helperMoveOverVQuantity params strategy T :=
+    (abs_le.mp hmove).1
   linarith
 
 /-- Named form of the identity `eq:h-blt` for the off-diagonal helper SSC
