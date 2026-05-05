@@ -793,6 +793,44 @@ theorem selfImprovementDataProcessingError_eq
   unfold selfImprovementDataProcessingError
   simp [Real.sqrt_eq_rpow, Real.rpow_eq_pow]
 
+/-- The data-processing threshold contains the term `8 * selfImprovementHelperError`.
+
+This lower bound is the scalar source of the alphabet-size obstruction in the
+current point-consistency transport: once the total-overlap estimate contributes
+`sqrt (#F_q * selfImprovementDataProcessingError)`, this positive summand carries
+the cardinality of the alphabet into the final-stage error. -/
+theorem eight_selfImprovementHelperError_le_selfImprovementDataProcessingError
+    (params : Parameters) [FieldModel params.q] (eps delta : Error) :
+    8 * selfImprovementHelperError params eps delta ≤
+      selfImprovementDataProcessingError params eps delta := by
+  rw [selfImprovementDataProcessingError_eq]
+  have horth_sqrt_nonneg :
+      0 ≤ 8 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta) := by
+    positivity
+  linarith
+
+/-- The alphabet-size square-root term is bounded below by the corresponding
+term coming from `8 * selfImprovementHelperError`.
+
+This is the formal scalar obstruction isolated in issue #1240: without an
+additional smallness hypothesis involving `#F_q`, a sharper total-overlap
+argument, or a larger final threshold, the present Lean bound retains an
+alphabet-size contribution not present in the paper's displayed
+`ζ̂ + sqrt ζ̂_dataprocess` expression. -/
+theorem sqrt_card_mul_eight_helper_le_sqrt_card_mul_dataProcessing
+    (params : Parameters) [FieldModel params.q] (eps delta : Error) :
+    Real.sqrt
+        ((Fintype.card (Fq params) : Error) *
+          (8 * selfImprovementHelperError params eps delta)) ≤
+      Real.sqrt
+        ((Fintype.card (Fq params) : Error) *
+          selfImprovementDataProcessingError params eps delta) := by
+  exact Real.sqrt_le_sqrt
+    (mul_le_mul_of_nonneg_left
+      (eight_selfImprovementHelperError_le_selfImprovementDataProcessingError
+        params eps delta)
+      (by positivity))
+
 private theorem selfImprovementDataProcessingError_le_nine_sixty_m_powerSum_sixteenth
     (params : Parameters) [FieldModel params.q]
     (eps delta : Error)
