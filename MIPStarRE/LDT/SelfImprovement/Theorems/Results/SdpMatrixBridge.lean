@@ -132,24 +132,30 @@ namespace MatrixSdpStatementWithSlackness
 implies the abstract slackness statement, assuming the chosen matrix optimal
 dual witness also dominates the identity.
 
-The quantified dominance hypothesis records the remaining mismatch between the
-matrix SDP output and the reduced abstract interface used by the helper proof. -/
+The dominance hypothesis records the remaining mismatch between the matrix SDP
+output and the reduced abstract interface used by the helper proof.  It is
+asked only for the concrete witness supplied by `h.witness`, not for all
+possible matrix optimal witnesses. -/
 theorem toSdpStatementWithSlackness_of_dualDominatesIdentity
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (h : MatrixSdpStatementWithSlackness params
       (matrixSdpRealizationOfStrategy params strategy))
-    (hdom : ∀ {T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params)
-          (matrixSdpRealizationOfStrategy params strategy).space}
-        {Z : MIPStarRE.Quantum.Op ι},
-        MatrixSdpOptimalWitness params
-          (matrixSdpRealizationOfStrategy params strategy) T Z →
-          (1 : MIPStarRE.Quantum.Op ι) ≤ Z) :
+    (hdom :
+      let hTZ := Classical.choose_spec h.witness
+      let Z := Classical.choose hTZ
+      (1 : MIPStarRE.Quantum.Op ι) ≤ Z) :
     SdpStatementWithSlackness params strategy := by
-  obtain ⟨T, Z, hopt⟩ := h.witness
+  let T := Classical.choose h.witness
+  let hTZ := Classical.choose_spec h.witness
+  let Z := Classical.choose hTZ
+  have hopt :
+      MatrixSdpOptimalWitness params
+        (matrixSdpRealizationOfStrategy params strategy) T Z :=
+    Classical.choose_spec hTZ
   exact ⟨matrixSubmeasurementToSubMeas T, Z,
-    hopt.toSdpOptimalPairWithSlackness_of_dualDominatesIdentity (hdom hopt)⟩
+    hopt.toSdpOptimalPairWithSlackness_of_dualDominatesIdentity hdom⟩
 
 end MatrixSdpStatementWithSlackness
 
