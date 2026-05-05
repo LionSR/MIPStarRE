@@ -300,6 +300,120 @@ lemma addInU_cs_chain_step3_diff_eq
   congr 1
   exact addInU_step3_pointwise_op_eq Au Av Mh (T.outcome h)
 
+/-! ### Selection-parametrized Step 1/2 algebraic identities -/
+
+/-- Algebraic CS-alignment for the selected `Q₀ → Q₁` step.
+
+This is the selection-parametrized form of `addInU_cs_chain_step1_diff_eq`.
+It rewrites the scalar difference using the same commutator
+`A^v_{h(v)} ⊗ I − I ⊗ A^v_{h(v)}`, but sums only over the selected pairs
+`(o,h) ∈ S_u` and leaves the arbitrary outcome operator `M^u_o` in place. -/
+lemma addInU_selected_cs_chain_step1_diff_eq
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (M : IdxSubMeas (Point params) Outcome ι)
+    (T : SubMeas (Polynomial params) ι)
+    (S : AddInUSelection params Outcome) :
+    addInUSelectedCSChainQ1 params strategy M T S -
+        addInUSelectedCSChainQ0 params strategy M T S =
+      avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+        ∑ ah ∈ addInUSelectionPairs params S uv.1,
+          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+          let Moh := (M uv.1).outcome ah.1
+          ev strategy.state
+            ((leftTensor (ι₂ := ι) Av - rightTensor (ι₁ := ι) Av) *
+              (opTensor Moh (T.outcome ah.2) * rightTensor (ι₁ := ι) Av))) := by
+  classical
+  unfold addInUSelectedCSChainQ0 addInUSelectedCSChainQ1
+  rw [← avgOver_sub]
+  refine avgOver_congr _ _ _ ?_
+  intro uv
+  rw [← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl ?_
+  intro ah _
+  set Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+  set Moh := (M uv.1).outcome ah.1
+  rw [← ev_sub]
+  congr 1
+  exact addInU_step1_pointwise_op_eq Moh Av (T.outcome ah.2)
+
+/-- Algebraic CS-alignment for the selected `Q₁ → Q₂` step.
+
+This is the selection-parametrized form of `addInU_cs_chain_step2_diff_eq`,
+with the arbitrary selected outcome operator `M^u_o` in the left tensor factor. -/
+lemma addInU_selected_cs_chain_step2_diff_eq
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (M : IdxSubMeas (Point params) Outcome ι)
+    (T : SubMeas (Polynomial params) ι)
+    (S : AddInUSelection params Outcome) :
+    addInUSelectedCSChainQ2 params strategy M T S -
+        addInUSelectedCSChainQ1 params strategy M T S =
+      avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+        ∑ ah ∈ addInUSelectionPairs params S uv.1,
+          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+          let Moh := (M uv.1).outcome ah.1
+          ev strategy.state
+            (leftTensor (ι₂ := ι) Av *
+              (opTensor Moh (T.outcome ah.2) *
+                (leftTensor (ι₂ := ι) Av - rightTensor (ι₁ := ι) Av)))) := by
+  classical
+  unfold addInUSelectedCSChainQ1 addInUSelectedCSChainQ2
+  rw [← avgOver_sub]
+  refine avgOver_congr _ _ _ ?_
+  intro uv
+  rw [← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl ?_
+  intro ah _
+  set Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+  set Moh := (M uv.1).outcome ah.1
+  rw [← ev_sub]
+  congr 1
+  exact addInU_step2_pointwise_op_eq Moh Av (T.outcome ah.2)
+
+/-- Reverse-orientation selected form of `addInU_selected_cs_chain_step1_diff_eq`. -/
+lemma addInU_selected_cs_chain_step1_reverse_diff_eq
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (M : IdxSubMeas (Point params) Outcome ι)
+    (T : SubMeas (Polynomial params) ι)
+    (S : AddInUSelection params Outcome) :
+    addInUSelectedCSChainQ0 params strategy M T S -
+        addInUSelectedCSChainQ1 params strategy M T S =
+      -avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+        ∑ ah ∈ addInUSelectionPairs params S uv.1,
+          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+          let Moh := (M uv.1).outcome ah.1
+          ev strategy.state
+            ((leftTensor (ι₂ := ι) Av - rightTensor (ι₁ := ι) Av) *
+              (opTensor Moh (T.outcome ah.2) * rightTensor (ι₁ := ι) Av))) := by
+  rw [← addInU_selected_cs_chain_step1_diff_eq params strategy M T S]
+  ring
+
+/-- Reverse-orientation selected form of `addInU_selected_cs_chain_step2_diff_eq`. -/
+lemma addInU_selected_cs_chain_step2_reverse_diff_eq
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (M : IdxSubMeas (Point params) Outcome ι)
+    (T : SubMeas (Polynomial params) ι)
+    (S : AddInUSelection params Outcome) :
+    addInUSelectedCSChainQ1 params strategy M T S -
+        addInUSelectedCSChainQ2 params strategy M T S =
+      -avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+        ∑ ah ∈ addInUSelectionPairs params S uv.1,
+          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+          let Moh := (M uv.1).outcome ah.1
+          ev strategy.state
+            (leftTensor (ι₂ := ι) Av *
+              (opTensor Moh (T.outcome ah.2) *
+                (leftTensor (ι₂ := ι) Av - rightTensor (ι₁ := ι) Av)))) := by
+  rw [← addInU_selected_cs_chain_step2_diff_eq params strategy M T S]
+  ring
+
 /-! ### Raw Cauchy--Schwarz bound for the add-in-u Step 1 difference
 
 This section proves the raw `|Q₀ - Q₁| ≤ √(2δ)` bound from
