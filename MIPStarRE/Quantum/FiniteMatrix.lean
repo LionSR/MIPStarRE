@@ -121,6 +121,49 @@ theorem kronecker_nonneg
       (Matrix.nonneg_iff_posSemidef.mp hA)
       (Matrix.nonneg_iff_posSemidef.mp hB)).nonneg
 
+end MIPStarRE.Quantum
+
+namespace Matrix
+
+/-- A block-diagonal matrix is the sum of its blocks tensored with the
+coordinate projections on the block index. -/
+theorem blockDiagonal_eq_sum_kronecker_diagonal {o m : Type*}
+    [Fintype o] [DecidableEq o] [Finite m] (B : o → Matrix m m ℂ) :
+    Matrix.blockDiagonal B =
+      ∑ b : o, Matrix.kronecker (B b)
+        (Matrix.diagonal fun c : o => if c = b then (1 : ℂ) else 0) := by
+  classical
+  letI : Fintype m := Fintype.ofFinite m
+  ext x y
+  rcases x with ⟨i, bx⟩
+  rcases y with ⟨j, cy⟩
+  rw [Matrix.sum_apply]
+  by_cases hxy : bx = cy
+  · subst cy
+    simp [Matrix.blockDiagonal_apply, Matrix.kronecker, Matrix.kroneckerMap_apply]
+  · simp [Matrix.blockDiagonal_apply, Matrix.kronecker, Matrix.kroneckerMap_apply, hxy]
+
+/-- A block-diagonal complex matrix is positive semidefinite when all of its
+diagonal blocks are positive semidefinite. -/
+theorem blockDiagonal_nonneg {o m : Type*}
+    [Finite o] [DecidableEq o] [Finite m]
+    (B : o → Matrix m m ℂ) (hB : ∀ b, 0 ≤ B b) :
+    0 ≤ Matrix.blockDiagonal B := by
+  classical
+  letI : Fintype o := Fintype.ofFinite o
+  letI : Fintype m := Fintype.ofFinite m
+  rw [Matrix.blockDiagonal_eq_sum_kronecker_diagonal B]
+  exact Finset.sum_nonneg fun b _ =>
+    MIPStarRE.Quantum.kronecker_nonneg (hB b) (by
+      refine Matrix.nonneg_iff_posSemidef.mpr ?_
+      exact Matrix.PosSemidef.diagonal <| by
+        intro c
+        by_cases hc : c = b <;> simp [hc])
+
+end Matrix
+
+namespace MIPStarRE.Quantum
+
 /-- If `0 ≤ A` and `B ≤ 1`, then `A ⊗ B ≤ A ⊗ 1`. -/
 theorem kronecker_le_kronecker_right_one
     {d₁ d₂ : Type*} [hd₁ : Finite d₁] [hd₂ : Finite d₂] [DecidableEq d₂]
@@ -146,6 +189,8 @@ theorem kronecker_mono_left
     exact Matrix.nonneg_iff_posSemidef.mp <| kronecker_nonneg (sub_nonneg.mpr hA) hB
   rw [kronecker_sub_left]
   exact hpsd
+
+variable {d : Type*} [Fintype d]
 
 /-! ### Normalized trace -/
 
