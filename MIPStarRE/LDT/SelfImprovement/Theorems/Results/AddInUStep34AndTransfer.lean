@@ -213,83 +213,6 @@ lemma add_in_u_cs_chain_q3_q4_le_sqrt_of_factor_bounds
           globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
   le_sqrt_of_factor_bounds_left hCS hD₁_le_one hD₂_le
 
-/-- Weighted finite Cauchy--Schwarz with the summand restricted to a selected
-support.
-
-The ordinary add-in-`u` Step 3/4 estimates are the specialization in which
-`selected` is everywhere true.  The selected estimates use the actual fiber
-condition `(o,h) ∈ S_u`, with the complement represented by zero summands. -/
-private theorem addInU_weightedFinsetCauchySchwarz_on_selectedSupport
-    {Question Outcome : Type*} [Fintype Outcome]
-    (𝒟 : Distribution Question)
-    (selected : Question → Outcome → Prop)
-    [∀ q a, Decidable (selected q a)]
-    (t x y : Question → Outcome → Error)
-    (ht :
-      ∀ q a, selected q a →
-        |t q a| ≤ Real.sqrt (x q a) * Real.sqrt (y q a))
-    (hx : ∀ q a, selected q a → 0 ≤ x q a)
-    (hy : ∀ q a, selected q a → 0 ≤ y q a) :
-    |avgOver 𝒟 (fun q =>
-      ∑ a : Outcome, if selected q a then t q a else 0)| ≤
-      Real.sqrt
-        (avgOver 𝒟 (fun q =>
-          ∑ a : Outcome, if selected q a then x q a else 0)) *
-      Real.sqrt
-        (avgOver 𝒟 (fun q =>
-          ∑ a : Outcome, if selected q a then y q a else 0)) := by
-  simpa using
-    MIPStarRE.LDT.Preliminaries.weightedFinsetCauchySchwarz
-      𝒟
-      (fun q a => if h : selected q a then t q a else 0)
-      (fun q a => if h : selected q a then x q a else 0)
-      (fun q a => if h : selected q a then y q a else 0)
-      (by
-        intro q a
-        by_cases hsel : selected q a
-        · simpa [hsel] using ht q a hsel
-        · simp [hsel])
-      (by
-        intro q a
-        by_cases hsel : selected q a
-        · simpa [hsel] using hx q a hsel
-        · simp [hsel])
-      (by
-        intro q a
-        by_cases hsel : selected q a
-        · simpa [hsel] using hy q a hsel
-        · simp [hsel])
-
-/-- The unrestricted finite Cauchy--Schwarz estimate obtained from the
-selected-support form by taking the selected set to be all outcomes. -/
-private theorem addInU_weightedFinsetCauchySchwarz_allSupport
-    {Question Outcome : Type*} [Fintype Outcome]
-    (𝒟 : Distribution Question)
-    (t x y : Question → Outcome → Error)
-    (ht : ∀ q a, |t q a| ≤ Real.sqrt (x q a) * Real.sqrt (y q a))
-    (hx : ∀ q a, 0 ≤ x q a)
-    (hy : ∀ q a, 0 ≤ y q a) :
-    |avgOver 𝒟 (fun q => ∑ a : Outcome, t q a)| ≤
-      Real.sqrt (avgOver 𝒟 (fun q => ∑ a : Outcome, x q a)) *
-      Real.sqrt (avgOver 𝒟 (fun q => ∑ a : Outcome, y q a)) := by
-  have hcs :=
-    addInU_weightedFinsetCauchySchwarz_on_selectedSupport
-      (𝒟 := 𝒟)
-      (selected := fun _ _ => True)
-      (t := t)
-      (x := x)
-      (y := y)
-      (by
-        intro q a _
-        exact ht q a)
-      (by
-        intro q a _
-        exact hx q a)
-      (by
-        intro q a _
-        exact hy q a)
-  simpa using hcs
-
 /-- Factored operator Cauchy--Schwarz bound for the `Q₂ → Q₃` add-in-`u` step.
 
 Applies the bipartite-tensor sandwich Cauchy--Schwarz primitive
@@ -331,7 +254,7 @@ theorem add_in_u_cs_chain_q2_q3_factored_cs
               (opTensor (Av * Mh * Av) (T.outcome h)))) := by
   classical
   rw [addInU_cs_chain_step3_diff_eq params strategy T]
-  refine addInU_weightedFinsetCauchySchwarz_allSupport
+  refine MIPStarRE.LDT.Preliminaries.weightedFinsetCauchySchwarz
     (Question := Point params × Point params) (Outcome := Polynomial params)
     (uniformDistribution (Point params × Point params))
     (t := fun uv h =>
@@ -443,7 +366,7 @@ theorem add_in_u_cs_chain_q3_q4_factored_cs
               (opTensor ((Av - Au) * Mh * (Av - Au)) (T.outcome h)))) := by
   classical
   rw [addInU_cs_chain_step4_diff_eq params strategy T]
-  refine addInU_weightedFinsetCauchySchwarz_allSupport
+  refine MIPStarRE.LDT.Preliminaries.weightedFinsetCauchySchwarz
     (Question := Point params × Point params) (Outcome := Polynomial params)
     (uniformDistribution (Point params × Point params))
     (t := fun uv h =>
@@ -553,7 +476,7 @@ private theorem addInU_selected_cs_chain_step3_factored_cs
   classical
   rw [addInU_selected_cs_chain_step3_diff_eq params strategy M T S]
   simpa using
-    addInU_weightedFinsetCauchySchwarz_on_selectedSupport
+    MIPStarRE.LDT.Preliminaries.weightedFinsetCauchySchwarz_on_selectedSupport
       (𝒟 := uniformDistribution (Point params × Point params))
       (selected := fun uv ah => ah ∈ addInUSelectionPairs params S uv.1)
       (t := fun uv ah =>
@@ -665,7 +588,7 @@ private theorem addInU_selected_cs_chain_step4_factored_cs
   classical
   rw [addInU_selected_cs_chain_step4_diff_eq params strategy M T S]
   simpa using
-    addInU_weightedFinsetCauchySchwarz_on_selectedSupport
+    MIPStarRE.LDT.Preliminaries.weightedFinsetCauchySchwarz_on_selectedSupport
       (𝒟 := uniformDistribution (Point params × Point params))
       (selected := fun uv ah => ah ∈ addInUSelectionPairs params S uv.1)
       (t := fun uv ah =>
