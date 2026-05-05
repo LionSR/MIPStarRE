@@ -404,6 +404,7 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_sourceAlmostProjective_full}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_almostProjMeasStatement}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_almostProjMeasStatement_full}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncationStatement.toRoundingToProjectorsWitness}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.spectralTruncationInput_of_projectiveNonMeasurement}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.spectralTruncationInput_of_sourceAlmostProjective}
 		\leanok
@@ -519,6 +520,8 @@
 		\uses{lem:projective-non-measurement, lem:small-overlap-averaging, prop:triangle-inequality-for-approx_delta}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_projectors,
 			MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_rank_bound,
+			MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_spectralTruncationStatement,
+			MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_spectralTruncationInput,
 			MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_truncate}
 		Let $\{R_a\}$ be given by \ref{lem:projective-non-measurement}. Write $r_a=\mathrm{rank}(R_a)$ and $r=\sum_a r_a$. If $r \leq d$, take $Q_a=R_a$. Otherwise,
 		\begin{equation}\label{eq:bound-on-r}
