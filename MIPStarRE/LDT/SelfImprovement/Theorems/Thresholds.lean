@@ -812,12 +812,13 @@ theorem eight_selfImprovementHelperError_le_selfImprovementDataProcessingError
 /-- The alphabet-size square-root term is bounded below by the corresponding
 term coming from `8 * selfImprovementHelperError`.
 
-This is the formal scalar obstruction isolated in issue #1240: without an
-additional smallness hypothesis involving `#F_q`, a sharper total-overlap
-argument, or a larger final threshold, the present Lean bound retains an
-alphabet-size contribution not present in the paper's displayed
-`ζ̂ + sqrt ζ̂_dataprocess` expression. -/
-theorem sqrt_card_mul_eight_helper_le_sqrt_card_mul_dataProcessing
+This records that, in the present final-fields transport, the cardinality
+factor cannot be removed by lower-bounding
+`selfImprovementDataProcessingError` through `8 * selfImprovementHelperError`.
+The structural obstruction is the surrounding estimate carrying
+`sqrt (#F_q * selfImprovementDataProcessingError)` into a final threshold
+which has no corresponding alphabet-size term. -/
+theorem sqrt_card_mul_eight_helperError_le_sqrt_card_mul_dataProcessingError
     (params : Parameters) [FieldModel params.q] (eps delta : Error) :
     Real.sqrt
         ((Fintype.card (Fq params) : Error) *
