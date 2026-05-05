@@ -94,6 +94,39 @@ contraction, and total-mass estimates.  In particular, `T` is a submeasurement
 in these statements; any `≤ 1` input corresponds to a `total_le_one`-style
 bound rather than a measurement equality. -/
 
+/-- The scalar square-to-square-root conversion used by both global-variance
+replacement steps. -/
+private lemma abs_le_sqrt_of_sq_le {a : ℝ} {s : Error} (hsq : a ^ 2 ≤ s) :
+    |a| ≤ Real.sqrt s :=
+  Real.abs_le_sqrt hsq
+
+/-- Bound a Cauchy--Schwarz product when the first factor is controlled by the
+global-variance sum and the second factor is a contraction. -/
+private lemma le_sqrt_of_factor_bounds_right {a : ℝ} {D₁ D₂ S : Error}
+    (hCS : a ≤ Real.sqrt D₁ * Real.sqrt D₂)
+    (hD₁_le : D₁ ≤ S)
+    (hD₂_le_one : D₂ ≤ 1) :
+    a ≤ Real.sqrt S := by
+  have hsqrt_D₂ : Real.sqrt D₂ ≤ 1 := Real.sqrt_le_one.mpr hD₂_le_one
+  have hsqrt_D₁ : Real.sqrt D₁ ≤ Real.sqrt S := Real.sqrt_le_sqrt hD₁_le
+  calc
+    a ≤ Real.sqrt D₁ * Real.sqrt D₂ := hCS
+    _ ≤ Real.sqrt D₁ * 1 :=
+          mul_le_mul_of_nonneg_left hsqrt_D₂ (Real.sqrt_nonneg _)
+    _ = Real.sqrt D₁ := mul_one _
+    _ ≤ Real.sqrt S := hsqrt_D₁
+
+/-- Bound a Cauchy--Schwarz product when the first factor is a contraction and
+the second factor is controlled by the global-variance sum. -/
+private lemma le_sqrt_of_factor_bounds_left {a : ℝ} {D₁ D₂ S : Error}
+    (hCS : a ≤ Real.sqrt D₁ * Real.sqrt D₂)
+    (hD₁_le_one : D₁ ≤ 1)
+    (hD₂_le : D₂ ≤ S) :
+    a ≤ Real.sqrt S := by
+  have hCS' : a ≤ Real.sqrt D₂ * Real.sqrt D₁ := by
+    simpa [mul_comm] using hCS
+  exact le_sqrt_of_factor_bounds_right hCS' hD₂_le hD₁_le_one
+
 /-- Convert a squared `Q₂ → Q₃` real bound to an absolute-value sqrt bound.
 
 This lemma is only the `Real.abs_le_sqrt` conversion.  The hypothesis `hsq`
@@ -111,7 +144,7 @@ lemma add_in_u_cs_chain_q2_q3_abs_le_sqrt_of_sq_le
       Real.sqrt
         (∑ g : Polynomial params,
           globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
-  Real.abs_le_sqrt hsq
+  abs_le_sqrt_of_sq_le hsq
 
 /-- Convert factored `Q₂ → Q₃` sqrt bounds to the summed-deviation sqrt bound.
 
@@ -134,23 +167,8 @@ lemma add_in_u_cs_chain_q2_q3_le_sqrt_of_factor_bounds
     |addInUCSChainQ2 params strategy T - addInUCSChainQ3 params strategy T| ≤
       Real.sqrt
         (∑ g : Polynomial params,
-          globalVarianceDeviationAtPolynomial params strategy strategy.state T g) := by
-  have hsqrt_D₂ : Real.sqrt D₂ ≤ 1 := Real.sqrt_le_one.mpr hD₂_le_one
-  have hsqrt_D₁ :
-      Real.sqrt D₁ ≤ Real.sqrt
-          (∑ g : Polynomial params,
-            globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
-    Real.sqrt_le_sqrt hD₁_le
-  calc
-    |addInUCSChainQ2 params strategy T - addInUCSChainQ3 params strategy T|
-        ≤ Real.sqrt D₁ * Real.sqrt D₂ := hCS
-    _ ≤ Real.sqrt D₁ * 1 :=
-          mul_le_mul_of_nonneg_left hsqrt_D₂ (Real.sqrt_nonneg _)
-    _ = Real.sqrt D₁ := mul_one _
-    _ ≤ Real.sqrt
-            (∑ g : Polynomial params,
-              globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
-          hsqrt_D₁
+          globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
+  le_sqrt_of_factor_bounds_right hCS hD₁_le hD₂_le_one
 
 /-- Convert a squared `Q₃ → Q₄` real bound to an absolute-value sqrt bound.
 
@@ -169,7 +187,7 @@ lemma add_in_u_cs_chain_q3_q4_abs_le_sqrt_of_sq_le
       Real.sqrt
         (∑ g : Polynomial params,
           globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
-  Real.abs_le_sqrt hsq
+  abs_le_sqrt_of_sq_le hsq
 
 /-- Convert factored `Q₃ → Q₄` sqrt bounds to the summed-deviation sqrt bound.
 
@@ -192,23 +210,8 @@ lemma add_in_u_cs_chain_q3_q4_le_sqrt_of_factor_bounds
     |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T| ≤
       Real.sqrt
         (∑ g : Polynomial params,
-          globalVarianceDeviationAtPolynomial params strategy strategy.state T g) := by
-  have hsqrt_D₁ : Real.sqrt D₁ ≤ 1 := Real.sqrt_le_one.mpr hD₁_le_one
-  have hsqrt_D₂ :
-      Real.sqrt D₂ ≤ Real.sqrt
-          (∑ g : Polynomial params,
-            globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
-    Real.sqrt_le_sqrt hD₂_le
-  calc
-    |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T|
-        ≤ Real.sqrt D₁ * Real.sqrt D₂ := hCS
-    _ ≤ 1 * Real.sqrt D₂ :=
-          mul_le_mul_of_nonneg_right hsqrt_D₁ (Real.sqrt_nonneg _)
-    _ = Real.sqrt D₂ := one_mul _
-    _ ≤ Real.sqrt
-            (∑ g : Polynomial params,
-              globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
-          hsqrt_D₂
+          globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
+  le_sqrt_of_factor_bounds_left hCS hD₁_le_one hD₂_le
 
 /-- Factored operator Cauchy--Schwarz bound for the `Q₂ → Q₃` add-in-`u` step.
 
