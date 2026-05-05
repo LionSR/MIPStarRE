@@ -327,6 +327,37 @@ noncomputable def positiveGramSpectrumRightRows
     Matrix {i : ι // 0 < hQ.eigenvalues i} ι ℂ :=
   Matrix.of fun i j => star (hQ.eigenvectorBasis i.1 j)
 
+/-- The conjugate eigenvector rows over the positive Gram spectrum are
+orthonormal.
+
+This is the right-singular-vector companion to the normalized image-row
+coisometry.  It is independent of the matrix `X`; it uses only the
+orthonormality of the Hermitian eigenvector basis for `Q`. -/
+theorem positive_gram_spectrum_right_rows_mul_conjTranspose
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (Q : Matrix ι ι ℂ) (hQ : Q.IsHermitian) :
+    positiveGramSpectrumRightRows Q hQ *
+        (positiveGramSpectrumRightRows Q hQ)ᴴ =
+      (1 : Matrix {i : ι // 0 < hQ.eigenvalues i}
+        {i : ι // 0 < hQ.eigenvalues i} ℂ) := by
+  classical
+  ext i j
+  have horth := orthonormal_iff_ite.mp hQ.eigenvectorBasis.orthonormal i.1 j.1
+  simp only [positiveGramSpectrumRightRows, Matrix.mul_apply, Matrix.conjTranspose_apply,
+    Matrix.of_apply, star_star, Matrix.one_apply]
+  calc
+    ∑ k : ι, star (hQ.eigenvectorBasis i.1 k) * hQ.eigenvectorBasis j.1 k =
+        inner ℂ (hQ.eigenvectorBasis i.1) (hQ.eigenvectorBasis j.1) := by
+          simp [EuclideanSpace.inner_eq_star_dotProduct, dotProduct, mul_comm]
+    _ = if i.1 = j.1 then (1 : ℂ) else 0 := horth
+    _ = if i = j then (1 : ℂ) else 0 := by
+      by_cases hij : i = j
+      · simp [hij]
+      · have hval : i.1 ≠ j.1 := by
+          intro h
+          exact hij (Subtype.ext h)
+        simp [hij, hval]
+
 /-- The positive Gram-image rows recover the square root of the Gram operator.
 
 The identity

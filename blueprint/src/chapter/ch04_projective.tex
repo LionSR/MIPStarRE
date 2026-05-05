@@ -836,6 +836,7 @@
 			MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_eigenvalues_nonneg_of_x_squared}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sqrt_eq_sum_sqrt_eigenvalues_vecMulVec,
 			MIPStarRE.LDT.MakingMeasurementsProjective.positiveGramSpectrumRightRows,
+			MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_right_rows_mul_conjTranspose,
 			MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_image_rows_mixed_eq_sqrt,
 			MIPStarRE.LDT.MakingMeasurementsProjective.matrix_image_eq_zero_of_nonpositive_gram_eigenvalue,
 			MIPStarRE.LDT.MakingMeasurementsProjective.adjoint_image_eq_zero_of_orthogonal_positive_gram_images}
@@ -861,8 +862,9 @@
 		which will identify the mixed positive-Gram-image product with
 		$\sqrt Q$: the positive eigenvalues give the nonzero columns, while the
 		zero eigenspace has zero coefficient in the square-root expansion and is
-		killed by $X$.  Equivalently, any row-space vector orthogonal to the
-		positive Gram images is killed by $X^\dagger$.
+		killed by $X$.  The conjugate right-eigenvector rows over the positive
+		spectrum are also orthonormal.  Equivalently, any row-space vector
+		orthogonal to the positive Gram images is killed by $X^\dagger$.
 	\end{proof}
 
 	\begin{lemma}\label{lem:X-expression-to-Q-expression}
