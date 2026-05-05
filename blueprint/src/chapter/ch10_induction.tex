@@ -411,7 +411,8 @@
 		MIPStarRE.LDT.Test.MainFormalBaseBridgeHypotheses, MIPStarRE.LDT.Test.baseProjectiveCompletionHypotheses_ofBaseBridge,
 		MIPStarRE.LDT.Test.baseProjectiveCompletionResidual_ofBaseBridge}
 	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalCompletionInput.nonempty_ofDiagonalConsistencyAndMatchMassPreservation,
-		MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualProjectiveCompletionResidual.nonempty_ofRoleResidualAndDiagonalInputsAndMatchMassPreservation}
+		MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualProjectiveCompletionResidual.nonempty_ofRoleResidualAndDiagonalInputsAndMatchMassPreservation,
+		MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRepairInputs}
 	\lean{MIPStarRE.LDT.Test.MainFormalBaseRepairedBridgeHypotheses,
 		MIPStarRE.LDT.Test.MainFormalRepairedBridgeHypotheses,
 		MIPStarRE.LDT.Test.baseMainFormal_ofRepairedBaseBridge,
@@ -420,10 +421,14 @@
 	\uses{def:main-formal-successor-boundary, thm:orthonormalization}
 	The structure \texttt{MainFormalBaseProjectiveCompletionHypotheses} bundles the still-unformalized
 	analytic hypotheses needed for the base case ($m=1$) of
-	Theorem~\ref{thm:main-formal}: orthonormalization inputs (spectral truncation
-	and locality-preserving repair witnesses), distinguished completion outcomes,
-	and match-mass preservation for the orthonormalized projective
-	submeasurements against the opposite unsymmetrized POVM.  The line-130 cross
+	Theorem~\ref{thm:main-formal}: the locality-preserving repair witnesses used
+	by orthonormalization, distinguished completion outcomes, and match-mass
+	preservation for the orthonormalized projective submeasurements against the
+	opposite unsymmetrized POVM.  The spectral-truncation fields in the
+	line-130 orthonormalization input are supplied by
+	\texttt{MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRepairInputs},
+	which applies the Section~5 spectral-truncation producer to the two
+	unsymmetrized role measurements after left tensor placement.  The line-130 cross
 	consistency relation is reconstructed internally from the checked role residual
 	and used directly in the completion step, so no separate diagonal strong
 	self-consistency package remains in this bridge.  The narrowed alias
