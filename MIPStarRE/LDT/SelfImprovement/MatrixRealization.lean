@@ -120,6 +120,17 @@ theorem matrixAveragedPointOperator_le_one (params : Parameters)
     averageUnitSubMeas_outcome] using
       A.outcome_le_one ()
 
+/-- The averaged point operator `A_g` is positive semidefinite. -/
+theorem matrixAveragedPointOperator_nonneg (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (g : Polynomial params) :
+    0 ≤ matrixAveragedPointOperator params model g := by
+  unfold matrixAveragedPointOperator averageOperatorOverDistribution
+  exact Finset.sum_nonneg fun u _ =>
+    smul_nonneg ((uniformDistribution (Point params)).nonnegative u)
+      ((model.pointMeasurement u).pos (g u))
+
 /-- The concrete primal contribution `T_g A_g`. -/
 noncomputable def matrixSdpPrimalContributionOperator (params : Parameters)
     [FieldModel params.q]
@@ -162,12 +173,33 @@ theorem matrixSdpStrictDualWitness_dualFeasible (params : Parameters)
     (le_trans (matrixAveragedPointOperator_le_one params model g)
       (one_le_matrixSdpStrictDualWitness model))
 
+/-- Dual feasibility already implies that the dual operator is positive
+semidefinite, since every averaged point operator `A_g` is positive. -/
+theorem matrixSdpDualPositive_of_dualFeasible (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (Z : MatrixOperator model.space)
+    (hdual :
+      ∀ g : Polynomial params,
+        0 ≤ matrixSdpDualSlackOperator params model Z g) :
+    0 ≤ Z := by
+  -- Any polynomial would suffice here; the distinguished one is only a
+  -- convenient fixed element of the finite polynomial type.
+  let g0 : Polynomial params := sdpDistinguishedPolynomial params
+  have hAg_nonneg : 0 ≤ matrixAveragedPointOperator params model g0 :=
+    matrixAveragedPointOperator_nonneg params model g0
+  have hAg_le_Z : matrixAveragedPointOperator params model g0 ≤ Z :=
+    sub_nonneg.mp (by simpa [matrixSdpDualSlackOperator] using hdual g0)
+  exact hAg_nonneg.trans hAg_le_Z
+
 /-- Matrix-level record of the explicit feasible bounds used in the SDP argument.
 
 The uniform primal family has total `(1/2)I`, while the dual witness `2I` is
-positive semidefinite, dominates the identity, and is dual feasible.  These are
-the non-strict matrix inequalities currently recorded in Lean; the structure is
-not an optimality statement and does not include complementary slackness. -/
+dominates the identity and is dual feasible. Positivity of the dual witness is
+derivable from dual feasibility and the positivity of the averaged point
+operators. These are the non-strict matrix inequalities currently recorded in
+Lean; the structure is not an optimality statement and does not include
+complementary slackness. -/
 structure MatrixSdpFeasibleBounds (params : Parameters) [FieldModel params.q]
     (model : MatrixSdpRealization params)
     (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
@@ -175,7 +207,6 @@ structure MatrixSdpFeasibleBounds (params : Parameters) [FieldModel params.q]
   primalTotalHalf :
     ∑ g : Polynomial params, T.effect g =
       ((1 / 2 : Error) • (1 : MatrixOperator model.space))
-  dualPositive : 0 ≤ Z
   dualDominatesIdentity : (1 : MatrixOperator model.space) ≤ Z
   dualFeasible :
     ∀ g : Polynomial params,
@@ -188,7 +219,6 @@ theorem matrixSdpFeasibleBounds_canonical (params : Parameters) [FieldModel para
       (matrixSdpStrictPrimalSubmeasurement params model)
       (matrixSdpStrictDualWitness model) where
   primalTotalHalf := matrixSdpStrictPrimalSubmeasurement_sum_effect params model
-  dualPositive := matrixSdpStrictDualWitness_nonneg model
   dualDominatesIdentity := one_le_matrixSdpStrictDualWitness model
   dualFeasible := matrixSdpStrictDualWitness_dualFeasible params model
 
@@ -208,7 +238,6 @@ structure MatrixSdpOptimalWitness (params : Parameters) [FieldModel params.q]
     (Z : MatrixOperator model.space) : Prop where
   primalTotalEqOne :
     ∑ g : Polynomial params, T.effect g = 1
-  dualPositive : 0 ≤ Z
   dualFeasible :
     ∀ g : Polynomial params,
       0 ≤ matrixSdpDualSlackOperator params model Z g
@@ -275,6 +304,17 @@ def matrixSdpComplementarySlacknessEquation (params : Parameters)
   T.effect g * Z = T.effect g * matrixAveragedPointOperator params model g
 
 namespace MatrixSdpOptimalWitness
+
+/-- The dual operator in an optimal matrix SDP witness is positive
+semidefinite.  This follows from dual feasibility, because the averaged point
+operators are positive. -/
+theorem dualPositive {params : Parameters} [FieldModel params.q]
+    {model : MatrixSdpRealization params}
+    {T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space}
+    {Z : MatrixOperator model.space}
+    (h : MatrixSdpOptimalWitness params model T Z) :
+    0 ≤ Z :=
+  matrixSdpDualPositive_of_dualFeasible params model Z h.dualFeasible
 
 /-- An optimal matrix SDP witness whose primal total is the identity determines
 a complete matrix measurement. -/

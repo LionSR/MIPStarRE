@@ -98,10 +98,7 @@ lemma selfImprovementHelper
   refine
     { sdpWitness := ?_
       averagedConstruction := rfl
-      addInUVarianceBound := ?_
-      positiveSemidefiniteWitness := hsdp.dualPositive
-      oneLeDualWitness := hsdp.dualDominatesIdentity
-      dualDominatesAveragedPoint := hsdp.dualFeasible }
+      addInUVarianceBound := ?_ }
   · simpa [T] using hsdp
   · exact addInU params strategy eps delta gamma hgood T
 
@@ -140,10 +137,7 @@ lemma selfImprovementHelperWithSlackness
   · refine
       { sdpWitness := ?_
         averagedConstruction := rfl
-        addInUVarianceBound := ?_
-        positiveSemidefiniteWitness := hsdpPair.toSdpOptimalPair.dualPositive
-        oneLeDualWitness := hsdpPair.toSdpOptimalPair.dualDominatesIdentity
-        dualDominatesAveragedPoint := hsdpPair.toSdpOptimalPair.dualFeasible }
+        addInUVarianceBound := ?_ }
     · simpa [T] using hsdpPair.toSdpOptimalPair
     · exact addInU params strategy eps delta gamma hgood T
   · intro g
@@ -262,11 +256,11 @@ theorem selfImprovement
       completeness := hfinal.completeness
       pointConsistency := hfinal.pointConsistency
       selfCloseness := hfinal.selfCloseness
-      positiveSemidefiniteWitness := hhelper.positiveSemidefiniteWitness
-      dualDominatesAveragedPoint := hhelper.dualDominatesAveragedPoint
+      positiveSemidefiniteWitness := hhelper.sdpWitness.dualPositive
+      dualDominatesAveragedPoint := hhelper.sdpWitness.dualFeasible
       projectiveResidualBound := hfinal.projectiveResidualBound
       bounded :=
-        final_fields_bounded strategy.state H.toSubMeas hhelper.oneLeDualWitness
+        final_fields_bounded strategy.state H.toSubMeas hhelper.sdpWitness.dualDominatesIdentity
           hselfImprovementError_nonneg }
 
 /--

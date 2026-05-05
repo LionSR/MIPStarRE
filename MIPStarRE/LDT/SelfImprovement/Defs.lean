@@ -136,6 +136,16 @@ noncomputable def averagedPointOperator (params : Parameters)
   averageOperatorOverDistribution (uniformDistribution (Point params))
     (pointConditionedOutcomeOperatorAtPolynomial params strategy g)
 
+/-- The averaged point operator `A_g` is positive semidefinite. -/
+theorem averagedPointOperator_nonneg (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι) (g : Polynomial params) :
+    0 ≤ averagedPointOperator params strategy g := by
+  unfold averagedPointOperator averageOperatorOverDistribution
+  exact Finset.sum_nonneg fun u _ =>
+    smul_nonneg ((uniformDistribution (Point params)).nonnegative u)
+      ((strategy.pointMeasurement u).toSubMeas.outcome_pos (g u))
+
 /--
 The operator `T_g A_g` contributing to the primal SDP objective.
 
@@ -173,6 +183,25 @@ noncomputable def sdpDualSlackOperator (params : Parameters)
     (strategy : SymStrat params ι)
     (Z : MIPStarRE.Quantum.Op ι) (g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
   Z - averagedPointOperator params strategy g
+
+/-- Dual feasibility already implies that the dual operator is positive
+semidefinite, since every averaged point operator `A_g` is positive. -/
+theorem sdpDualPositive_of_dualFeasible (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (Z : MIPStarRE.Quantum.Op ι)
+    (hdual :
+      ∀ g : Polynomial params,
+        0 ≤ sdpDualSlackOperator params strategy Z g) :
+    0 ≤ Z := by
+  -- Any polynomial would suffice here; the distinguished one is only a
+  -- convenient fixed element of the finite polynomial type.
+  let g0 : Polynomial params := sdpDistinguishedPolynomial params
+  have hAg_nonneg : 0 ≤ averagedPointOperator params strategy g0 :=
+    averagedPointOperator_nonneg params strategy g0
+  have hAg_le_Z : averagedPointOperator params strategy g0 ≤ Z :=
+    sub_nonneg.mp (by simpa [sdpDualSlackOperator] using hdual g0)
+  exact hAg_nonneg.trans hAg_le_Z
 
 /-- The complementary-slackness equation `T_g Z = T_g A_g`. -/
 def sdpComplementarySlacknessEquation (params : Parameters)

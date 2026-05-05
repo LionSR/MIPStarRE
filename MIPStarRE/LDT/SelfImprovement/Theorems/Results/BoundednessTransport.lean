@@ -1402,7 +1402,7 @@ theorem final_fields_projective_residual_bound_natural
         Real.sqrt (selfImprovementDataProcessingError params eps delta) := by
   have hcompare :=
     projective_boundedness_gap_le_helper_boundedness_gap params strategy H Z
-      hhelper.dualDominatesAveragedPoint
+      hhelper.sdpWitness.dualFeasible
   have htransport :=
     helper_boundedness_gap_transport_through_data_processing params strategy Hhat H Z
       (selfImprovementDataProcessingError params eps delta) hdata

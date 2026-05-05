@@ -1369,7 +1369,7 @@ theorem helper_completeness_of_input_consistency
       heps hdelta hHhat_vs_Z ?_
   exact
     input_consistency_dual_mass_lower_bound params strategy G Z nu
-      hhelper.positiveSemidefiniteWitness hhelper.dualDominatesAveragedPoint hcons
+      hhelper.sdpWitness.dualPositive hhelper.sdpWitness.dualFeasible hcons
 
 /-- Helper-stage completeness from the two Cauchy--Schwarz scalar bounds,
 complementary slackness, and input consistency.
@@ -1912,8 +1912,6 @@ lemma sdp
   refine ⟨T.toSubMeas, Z, ?_⟩
   refine
     { primalTotalOperator := T.total_eq_one
-      dualPositive := by
-        simp [Z]
       dualDominatesIdentity := by
         simpa [Z] using one_le_sdpStrictDualWitness (ι := ι)
       dualFeasible := ?_ }
