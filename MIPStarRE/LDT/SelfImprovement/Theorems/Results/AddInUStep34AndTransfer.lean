@@ -1729,7 +1729,7 @@ lemma add_in_u_simplified_transfer_of_cs_chain
         have h1 := abs_add_le ((Q0 - Q1) + (Q1 - Q2) + (Q2 - Q3)) (Q3 - Q4)
         have h2 := abs_add_le ((Q0 - Q1) + (Q1 - Q2)) (Q2 - Q3)
         have h3 := abs_add_le (Q0 - Q1) (Q1 - Q2)
-        nlinarith
+        linarith
   calc
     |qBipartiteMatchMass strategy.state
         (averagedSandwichedPolynomialSubMeas params strategy T)
@@ -1744,7 +1744,7 @@ lemma add_in_u_simplified_transfer_of_cs_chain
             ← add_in_u_cs_chain_q4_eq_simplified_rhs]
     _ ≤ |Q0 - Q1| + |Q1 - Q2| + |Q2 - Q3| + |Q3 - Q4| := htriangle
     _ ≤ η01 + η12 + η23 + η34 := by
-      nlinarith
+      linarith
     _ ≤ addInUError params eps delta := hsum
 
 /-- Assemble the selected add-in-`u` scalar transfer from the four selected
@@ -1793,7 +1793,7 @@ lemma add_in_u_selected_transfer_of_cs_chain
         have h1 := abs_add_le ((Q0 - Q1) + (Q1 - Q2) + (Q2 - Q3)) (Q3 - Q4)
         have h2 := abs_add_le ((Q0 - Q1) + (Q1 - Q2)) (Q2 - Q3)
         have h3 := abs_add_le (Q0 - Q1) (Q1 - Q2)
-        nlinarith
+        linarith
   calc
     |addInULeftQuantity params strategy M
         (averagedSandwichedPolynomialSubMeas params strategy T) S -
@@ -1803,7 +1803,7 @@ lemma add_in_u_selected_transfer_of_cs_chain
             addInUSelectedCSChainQ4_eq_rightQuantity]
     _ ≤ |Q0 - Q1| + |Q1 - Q2| + |Q2 - Q3| + |Q3 - Q4| := htriangle
     _ ≤ η01 + η12 + η23 + η34 := by
-      nlinarith
+      linarith
     _ ≤ addInUError params eps delta := hsum
 
 /-- Reusable numerical absorption: whenever `2 a ≤ b`, the four-term sum
@@ -1825,7 +1825,7 @@ lemma two_mul_delta_le_selfImprovementVarianceError
     (params : Parameters)
     [FieldModel params.q]
     (eps delta : Error)
-    (hε : 0 ≤ eps) (hδ : 0 ≤ delta) :
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta) :
     2 * delta ≤ selfImprovementVarianceError params eps delta := by
   have hm : (1 : Error) ≤ (params.m : Error) := by
     have hm_nat : (1 : ℕ) ≤ params.m := params.hm
@@ -1840,11 +1840,11 @@ lemma two_mul_delta_le_selfImprovementVarianceError
     _ = 24 * (1 : Error) * delta := by ring
     _ ≤ 24 * (params.m : Error) * delta := by
         have : (0 : Error) ≤ ((params.m : Error) - 1) * delta :=
-          mul_nonneg (by linarith) hδ
+          mul_nonneg (by linarith) hdelta
         nlinarith
     _ ≤ 24 * (params.m : Error) * (eps + delta + generalizeBError params) := by
         have h24m : (0 : Error) ≤ 24 * (params.m : Error) := by nlinarith
-        nlinarith [mul_nonneg h24m hε, mul_nonneg h24m hB]
+        nlinarith [mul_nonneg h24m heps, mul_nonneg h24m hB]
 
 /-- Arithmetic absorption used by `add_in_u_simplified_transfer_of_cs_chain`:
 the four step-bound sum `2 √(2 δ) + 2 √(ζ_variance)` is dominated by
@@ -1857,13 +1857,13 @@ lemma two_sqrt_two_delta_add_two_sqrt_selfImprovementVarianceError_le_addInUErro
     (params : Parameters)
     [FieldModel params.q]
     (eps delta : Error)
-    (hε : 0 ≤ eps) (hδ : 0 ≤ delta) :
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta) :
     2 * Real.sqrt (2 * delta) +
         2 * Real.sqrt (selfImprovementVarianceError params eps delta) ≤
       addInUError params eps delta := by
   have hbase :=
     two_sqrt_two_mul_add_two_sqrt_le_four_sqrt
-      (two_mul_delta_le_selfImprovementVarianceError params eps delta hε hδ)
+      (two_mul_delta_le_selfImprovementVarianceError params eps delta heps hdelta)
   simpa [addInUError, Real.sqrt_eq_rpow] using hbase
 
 /-- Wrapper composing `add_in_u_simplified_transfer_of_cs_chain` with the
@@ -1876,7 +1876,7 @@ lemma add_in_u_simplified_transfer_of_cs_chain_sqrt_form
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta : Error)
-    (hε : 0 ≤ eps) (hδ : 0 ≤ delta)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
     (T : SubMeas (Polynomial params) ι)
     (h01 :
       |addInUCSChainQ0 params strategy T - addInUCSChainQ1 params strategy T| ≤
@@ -1905,7 +1905,7 @@ lemma add_in_u_simplified_transfer_of_cs_chain_sqrt_form
         addInUError params eps delta := by
     have htwo :=
       two_sqrt_two_delta_add_two_sqrt_selfImprovementVarianceError_le_addInUError
-        params eps delta hε hδ
+        params eps delta heps hdelta
     linarith
   exact add_in_u_simplified_transfer_of_cs_chain params strategy eps delta T
     (Real.sqrt (2 * delta)) (Real.sqrt (2 * delta))
@@ -1923,7 +1923,7 @@ lemma add_in_u_simplified_transfer_of_cs_chain_local_variance_form
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta : Error)
-    (hε : 0 ≤ eps) (hδ : 0 ≤ delta)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
     (T : SubMeas (Polynomial params) ι)
     (hlocal :
       (∑ g : Polynomial params,
@@ -1947,7 +1947,7 @@ lemma add_in_u_simplified_transfer_of_cs_chain_local_variance_form
     add_in_u_cs_chain_global_variance_steps_of_local_sum_bound_from_factor_bounds
       params strategy eps delta T hlocal
   exact add_in_u_simplified_transfer_of_cs_chain_sqrt_form
-    params strategy eps delta hε hδ T h01 h12 hsteps.1 hsteps.2
+    params strategy eps delta heps hdelta T h01 h12 hsteps.1 hsteps.2
 
 /-- Projection-simplified add-in-`u` transfer from point self-consistency and
 the local-variance sum bound.
@@ -1959,7 +1959,7 @@ lemma add_in_u_simplified_transfer_of_cs_chain_selfConsistency_local_variance_fo
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta : Error)
-    (hε : 0 ≤ eps) (hδ : 0 ≤ delta)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
     (T : SubMeas (Polynomial params) ι)
     (hssc : BipartiteSSCRel strategy.state (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta)
@@ -1976,7 +1976,7 @@ lemma add_in_u_simplified_transfer_of_cs_chain_selfConsistency_local_variance_fo
             (opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
               (T.outcome h)))| ≤ addInUError params eps delta :=
   add_in_u_simplified_transfer_of_cs_chain_local_variance_form
-    params strategy eps delta hε hδ T hlocal
+    params strategy eps delta heps hdelta T hlocal
     (addInU_cs_chain_step1_abs_le_sqrt_two_delta params strategy T delta hssc)
     (addInU_cs_chain_step2_abs_le_sqrt_two_delta params strategy T delta hssc)
 
