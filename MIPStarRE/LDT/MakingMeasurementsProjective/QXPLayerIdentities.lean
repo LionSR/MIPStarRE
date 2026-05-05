@@ -2493,6 +2493,50 @@ lemma pQApprox_ofRankReductionSigmaRangeAndSvdIdentities
   refine ⟨data, rfl, rfl, rfl, ?_⟩
   exact pQApprox ψ A ζ data hψ hζ hζ_small hRank.toSigmaRangeQLayer
 
+/-- Apply `lem:P-Q-approx` to the positive-Gram sigma-space QXP layer.
+
+This is the constructor-facing form of the local `Q -> X -> Xhat -> P` stage.
+The rank-reduction witness supplies the sigma-space `X`; the positive-Gram
+polar construction supplies `Xhat`; and the theorem concludes the paper's
+`P`-versus-`Q` approximation without any external SVD data. -/
+lemma pQApprox_ofRankReductionSigmaRangePositiveGram
+    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι)
+    (A : Measurement Outcome ι) (ζ : Error)
+    {qLayer : QLayerData Outcome ι}
+    (hRank : RankReductionWitness ψ A ζ qLayer)
+    [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (qLayer.q.outcome a).rank))]
+    (hψ : ψ.IsNormalized)
+    (hζ : 0 ≤ ζ) (hζ_small : ζ ≤ 1 / (4 : Error)) :
+    ∃ xHat : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (qLayer.q.outcome a).rank))) ι ℂ,
+      xHat * xHatᴴ =
+          (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
+            (fun a : Outcome => (qLayer.q.outcome a).rank)))) ∧
+        (sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective)ᴴ * xHat =
+            CFC.sqrt (QTotal qLayer) ∧
+          ∃ data : QXPLayerData Outcome ι,
+            ∃ hq : data.qLayer = sigmaRangeQLayer qLayer.q,
+              hq ▸ data.x =
+                  (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from
+                    sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective) ∧
+                hq ▸ data.xHat =
+                    (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from
+                      xHat) ∧
+                  SDDOpRel ψ (uniformDistribution Unit)
+                    (constOpFamily data.qLayer.q)
+                    (constOpFamily (PFamily data))
+                    (30 * zetaQuarterRoot ζ) := by
+  obtain ⟨xHat, hxHat_coisometry, hxHat_mixed⟩ :=
+    exists_xHat_of_sigmaFinRangeEmbedding_positiveGram hRank
+  let data : QXPLayerData Outcome ι :=
+    QXPLayerData.ofSigmaRangeAndSvdIdentities (q := qLayer.q)
+      hRank.projective hRank.sum_eq_total xHat hxHat_coisometry hxHat_mixed
+  refine ⟨xHat, hxHat_coisometry, hxHat_mixed, data, rfl, rfl, rfl, ?_⟩
+  exact pQApprox ψ A ζ data hψ hζ hζ_small hRank.toSigmaRangeQLayer
+
 /-- Apply `lem:P-Q-approx` to the canonical sigma-space QXP layer obtained
 from rectangular SVD data and the positive-square characterization of the
 middle factor.
