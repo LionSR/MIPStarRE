@@ -450,7 +450,7 @@
 <div class="displaymath" id="eq:h-sandwich">
   \begin{align}  H^u_h & = A^u_{h(u)} \cdot T_h \cdot A^u_{h(u)} = A^u_{h(u)} \cdot H^u_h \cdot A^u_{h(u)}, \label{eq:h-sandwich}\\ A^u_{h(u)} \cdot H^u_{h'} \cdot A^u_{h(u)} & = H^u_{h'} \cdot A^u_{h(u)} = \bigl(A^u_{h(u)} \cdot T_{h'} \cdot A^u_{h(u)}\bigr)\cdot \mathbf{1}\! \left[h(u) = h’(u)\right]. \label{eq:h-blt} \end{align}
 </div>
-<p> The strong self-consistency expression is </p>
+<p>    The strong self-consistency expression is </p>
 <div class="equation" id="eq:self-consistency-baby-step">
 <p>
   <div class="equation_content">
@@ -513,7 +513,7 @@
   <span class="equation_label">21</span>
 </p>
 </div>
-<p> so Schwartz–Zippel bounds the indicator average by \(md/q\) and proves&#160;<a href="chap-self-improvement.html#eq:threw-in-h-prime" class="eqref">14</a>. </p>
+<p> so Schwartz–Zippel bounds the indicator average by \(md/q\) and proves&#160;<a href="chap-self-improvement.html#eq:threw-in-h-prime" class="eqref">14</a>.            </p>
 <p>Using&#160;<a href="chap-self-improvement.html#eq:h-blt" class="eqref">11</a>, the right-hand side of&#160;<a href="chap-self-improvement.html#eq:threw-in-h-prime" class="eqref">14</a> is </p>
 <div class="equation" id="eq:delete-an-A">
 <p>
@@ -523,7 +523,7 @@
   <span class="equation_label">22</span>
 </p>
 </div>
-<p> Replace the remaining copy of \(A^u_{h(u)}\) by \(A^v_{h(v)}\): </p>
+<p>       Replace the remaining copy of \(A^u_{h(u)}\) by \(A^v_{h(v)}\): </p>
 <div class="equation" id="eq:swap-u-for-v-attack-of-the-clones">
 <p>
   <div class="equation_content">
@@ -541,7 +541,7 @@
   <span class="equation_label">24</span>
 </p>
 </div>
-<p> Substituting&#160;<a href="chap-self-improvement.html#eq:swap-Z-for-A" class="eqref">2</a>, then&#160;<a href="chap-self-improvement.html#eq:Z-greater-than-A" class="eqref">1</a>, and finally the already proved bound&#160;<a href="chap-self-improvement.html#eq:explicit-bound-for-A-consistency" class="eqref">9</a>, one obtains </p>
+<p>     Substituting&#160;<a href="chap-self-improvement.html#eq:swap-Z-for-A" class="eqref">2</a>, then&#160;<a href="chap-self-improvement.html#eq:Z-greater-than-A" class="eqref">1</a>, and finally the already proved bound&#160;<a href="chap-self-improvement.html#eq:explicit-bound-for-A-consistency" class="eqref">9</a>, one obtains </p>
 <div class="displaymath" id="a0000000308">
   \[  \eqref{eq:move-over-v} \ge \sum _h \langle \psi  \rvert  H_h \otimes I \lvert \psi  \rangle  - 4\sqrt{\zeta _{\mathrm{variance}}}.  \]
 </div>
@@ -549,7 +549,7 @@
 <div class="displaymath" id="a0000000309">
   \[  \sum _h \langle \psi  \rvert  H_h \otimes H_h \lvert \psi  \rangle  \ge \sum _h \langle \psi  \rvert  H_h \otimes I \lvert \psi  \rangle  - 11 \sqrt{\zeta _{\mathrm{variance}}} - \sqrt{2\delta } - \frac{md}{q}.  \]
 </div>
-<p> The Lean producer-side packaging of this step starts with the input structure  and the exact residual-side expansion  and then uses the proved wrappers     to recover the final helper-stage self-consistency input. The corresponding bridge-package constructor is  . The paper’s arithmetic shows that the right-hand error is at most  </p>
+<p> The Lean producer-side packaging of this step starts with the input structure  and the exact residual-side expansion          and then uses the proved wrappers     to recover the final helper-stage self-consistency input. The corresponding bridge-package constructor is  . The paper’s arithmetic shows that the right-hand error is at most  </p>
 <div class="displaymath" id="a0000000310">
   \[  57m\cdot \Big(\varepsilon ^{1/2} + \delta ^{1/2} + (d/q)^{1/2}\Big) \le \zeta ,  \]
 </div>
