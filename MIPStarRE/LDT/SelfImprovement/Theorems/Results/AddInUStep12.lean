@@ -711,6 +711,253 @@ private lemma addInU_selected_step1_C_contraction
       _ ≤ ∑ a : Fq params, Pa a := Finset.sum_le_sum (fun a _ => hterm_le a)
       _ = 1 := hsum_Pa
 
+/-- Raw selected `|Q₀ - Q₁| ≤ √(2δ)` bound for the first add-in-u move.
+
+This is the selection-parametrized form of
+`addInU_cs_chain_step1_abs_le_sqrt_two_delta`.  It applies the weighted
+Cauchy--Schwarz estimate to the selected pairs `(o,h) ∈ S_u`; the contraction
+side condition is `addInU_selected_step1_C_contraction`. -/
+lemma addInU_selected_cs_chain_step1_abs_le_sqrt_two_delta
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (M : IdxSubMeas (Point params) Outcome ι)
+    (T : SubMeas (Polynomial params) ι)
+    (S : AddInUSelection params Outcome)
+    (delta : Error)
+    (hssc : BipartiteSSCRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta) :
+    |addInUSelectedCSChainQ0 params strategy M T S -
+        addInUSelectedCSChainQ1 params strategy M T S| ≤
+      Real.sqrt (2 * delta) := by
+  classical
+  have hSDD := addInU_pointMeasurement_snd_selfConsistency params strategy delta hssc
+  let Aop : Point params × Point params → Fq params → MIPStarRE.Quantum.Op (ι × ι) :=
+    fun uv a => leftTensor (ι₂ := ι)
+      ((strategy.pointMeasurement uv.2).toSubMeas.outcome a)
+  let Bop : Point params × Point params → Fq params → MIPStarRE.Quantum.Op (ι × ι) :=
+    fun uv a => rightTensor (ι₁ := ι)
+      ((strategy.pointMeasurement uv.2).toSubMeas.outcome a)
+  let Cop : Point params × Point params → Fq params → Outcome × Polynomial params →
+      MIPStarRE.Quantum.Op (ι × ι) :=
+    fun uv a ah =>
+      if ah ∈ (addInUSelectionPairs params S uv.1).filter (fun ah => ah.2 uv.2 = a) then
+        opTensor ((M uv.1).outcome ah.1) (T.outcome ah.2) *
+          rightTensor (ι₁ := ι)
+            ((strategy.pointMeasurement uv.2).toSubMeas.outcome a)
+      else 0
+  have hOutcome_herm : ∀ (v : Point params) (a : Fq params),
+      ((strategy.pointMeasurement v).toSubMeas.outcome a)ᴴ =
+        (strategy.pointMeasurement v).toSubMeas.outcome a := fun v a =>
+    (Matrix.nonneg_iff_posSemidef.mp
+      ((strategy.pointMeasurement v).toSubMeas.outcome_pos a)).isHermitian.eq
+  have hAop_herm : ∀ uv a, (Aop uv a)ᴴ = Aop uv a := by
+    intro uv a
+    change (leftTensor (ι₂ := ι)
+        ((strategy.pointMeasurement uv.2).toSubMeas.outcome a))ᴴ =
+      leftTensor (ι₂ := ι)
+        ((strategy.pointMeasurement uv.2).toSubMeas.outcome a)
+    rw [leftTensor_conjTranspose, hOutcome_herm uv.2 a]
+  have hBop_herm : ∀ uv a, (Bop uv a)ᴴ = Bop uv a := by
+    intro uv a
+    change (rightTensor (ι₁ := ι)
+        ((strategy.pointMeasurement uv.2).toSubMeas.outcome a))ᴴ =
+      rightTensor (ι₁ := ι)
+        ((strategy.pointMeasurement uv.2).toSubMeas.outcome a)
+    rw [rightTensor_conjTranspose, hOutcome_herm uv.2 a]
+  have hfun_A : ∀ uv : Point params × Point params,
+      (fun a : Fq params => (Aop uv a)ᴴ) = Aop uv := by
+    intro uv
+    funext a
+    exact hAop_herm uv a
+  have hfun_B : ∀ uv : Point params × Point params,
+      (fun a : Fq params => (Bop uv a)ᴴ) = Bop uv := by
+    intro uv
+    funext a
+    exact hBop_herm uv a
+  have hAB :
+      avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+        qSDDCore strategy.state
+          (fun a : Fq params => (Aop uv a)ᴴ) (fun a : Fq params => (Bop uv a)ᴴ)) ≤
+        2 * delta := by
+    rcases hSDD with ⟨hsdd⟩
+    refine le_trans ?_ hsdd
+    refine le_of_eq ?_
+    refine avgOver_congr _ _ _ ?_
+    intro uv
+    rw [hfun_A uv, hfun_B uv]
+    rfl
+  have hsum_C : ∀ (uv : Point params × Point params) (a : Fq params),
+      (∑ ah : Outcome × Polynomial params, Cop uv a ah) =
+        ∑ ah ∈ (addInUSelectionPairs params S uv.1).filter (fun ah => ah.2 uv.2 = a),
+          opTensor ((M uv.1).outcome ah.1) (T.outcome ah.2) *
+            rightTensor (ι₁ := ι)
+              ((strategy.pointMeasurement uv.2).toSubMeas.outcome a) := by
+    intro uv a
+    let s := (addInUSelectionPairs params S uv.1).filter (fun ah => ah.2 uv.2 = a)
+    let f : Outcome × Polynomial params → MIPStarRE.Quantum.Op (ι × ι) := fun ah =>
+      opTensor ((M uv.1).outcome ah.1) (T.outcome ah.2) *
+        rightTensor (ι₁ := ι)
+          ((strategy.pointMeasurement uv.2).toSubMeas.outcome a)
+    have hfilter :
+        (∑ ah : Outcome × Polynomial params, if ah ∈ s then f ah else 0) =
+          ∑ ah ∈ s, f ah := by
+      calc
+        (∑ ah : Outcome × Polynomial params, if ah ∈ s then f ah else 0)
+            = ∑ ah ∈ s, if ah ∈ s then f ah else 0 := by
+                exact
+                  (Finset.sum_subset (Finset.subset_univ s)
+                    (fun ah _ hnot => by simp [hnot])).symm
+        _ = ∑ ah ∈ s, f ah := by
+              refine Finset.sum_congr rfl ?_
+              intro ah hah
+              simp [hah]
+    simpa [Cop, s, f] using hfilter
+  have hC : ∀ uv : Point params × Point params,
+      (∑ a : Fq params,
+          (∑ ah : Outcome × Polynomial params, Cop uv a ah)ᴴ *
+            (∑ ah : Outcome × Polynomial params, Cop uv a ah)) ≤ 1 := by
+    intro uv
+    simpa [hsum_C uv] using addInU_selected_step1_C_contraction params strategy M T S uv
+  have hcs := MIPStarRE.LDT.Preliminaries.closenessOfInnerProduct_right
+    strategy.state strategy.isNormalized
+    (uniformDistribution (Point params × Point params))
+    (uniformDistribution_weight_sum_le_one (Point params × Point params))
+    Aop Bop Cop (2 * delta) hAB hC
+  have hcollapse :
+      ∀ (uv : Point params × Point params)
+        (D : (Point params × Point params) → Fq params →
+          MIPStarRE.Quantum.Op (ι × ι)),
+        (∑ a : Fq params, ∑ ah : Outcome × Polynomial params,
+            ev strategy.state (D uv a * Cop uv a ah)) =
+          ∑ ah ∈ addInUSelectionPairs params S uv.1,
+            ev strategy.state
+              (D uv (ah.2 uv.2) *
+                (opTensor ((M uv.1).outcome ah.1) (T.outcome ah.2) *
+                  rightTensor (ι₁ := ι)
+                    ((strategy.pointMeasurement uv.2).toSubMeas.outcome (ah.2 uv.2)))) := by
+    intro uv D
+    rw [Finset.sum_comm]
+    let s := addInUSelectionPairs params S uv.1
+    let f : Outcome × Polynomial params → Error := fun ah =>
+      ev strategy.state
+        (D uv (ah.2 uv.2) *
+          (opTensor ((M uv.1).outcome ah.1) (T.outcome ah.2) *
+            rightTensor (ι₁ := ι)
+              ((strategy.pointMeasurement uv.2).toSubMeas.outcome (ah.2 uv.2))))
+    have hinner : ∀ ah : Outcome × Polynomial params,
+        (∑ a : Fq params, ev strategy.state (D uv a * Cop uv a ah)) =
+          if ah ∈ s then f ah else 0 := by
+      intro ah
+      by_cases hmem : ah ∈ s
+      · rw [Finset.sum_eq_single (ah.2 uv.2)]
+        · simp [Cop, s, f, hmem]
+        · intro a _ ha
+          have hnot : ah ∉ s.filter (fun bh => bh.2 uv.2 = a) := by
+            intro hf
+            exact ha (Eq.symm (Finset.mem_filter.mp hf).2)
+          have hCop_zero : Cop uv a ah = 0 := by
+            have hnot' :
+                ¬ (ah ∈ addInUSelectionPairs params S uv.1 ∧ ah.2 uv.2 = a) := by
+              intro hf
+              exact hnot (Finset.mem_filter.mpr hf)
+            simp [Cop, hnot']
+          rw [hCop_zero, Matrix.mul_zero, ev_zero]
+        · intro hmissing
+          exact (hmissing (Finset.mem_univ _)).elim
+      · have hzero : ∀ a : Fq params, ah ∉ s.filter (fun bh => bh.2 uv.2 = a) := by
+          intro a hf
+          exact hmem ((Finset.mem_filter.mp hf).1)
+        calc
+          ∑ a : Fq params, ev strategy.state (D uv a * Cop uv a ah)
+              = ∑ a : Fq params, 0 := by
+                  refine Finset.sum_congr rfl ?_
+                  intro a _
+                  have hCop_zero : Cop uv a ah = 0 := by
+                    have hnot' :
+                        ¬ (ah ∈ addInUSelectionPairs params S uv.1 ∧ ah.2 uv.2 = a) := by
+                      intro hf
+                      exact hzero a (Finset.mem_filter.mpr hf)
+                    simp [Cop, hnot']
+                  rw [hCop_zero, Matrix.mul_zero, ev_zero]
+          _ = if ah ∈ s then f ah else 0 := by simp [hmem]
+    calc
+      ∑ ah : Outcome × Polynomial params,
+          ∑ a : Fq params, ev strategy.state (D uv a * Cop uv a ah)
+          = ∑ ah : Outcome × Polynomial params, if ah ∈ s then f ah else 0 := by
+              refine Finset.sum_congr rfl ?_
+              intro ah _
+              exact hinner ah
+      _ = ∑ ah ∈ s, f ah := by
+            have hfilter :
+                (∑ ah : Outcome × Polynomial params, if ah ∈ s then f ah else 0) =
+                  ∑ ah ∈ s, f ah := by
+              calc
+                (∑ ah : Outcome × Polynomial params, if ah ∈ s then f ah else 0)
+                    = ∑ ah ∈ s, if ah ∈ s then f ah else 0 := by
+                        exact
+                          (Finset.sum_subset (Finset.subset_univ s)
+                            (fun ah _ hnot => by simp [hnot])).symm
+                _ = ∑ ah ∈ s, f ah := by
+                      refine Finset.sum_congr rfl ?_
+                      intro ah hah
+                      simp [hah]
+            exact hfilter
+  have hmatch_pointwise : ∀ uv : Point params × Point params,
+      (∑ a : Fq params, ∑ ah : Outcome × Polynomial params,
+          ev strategy.state (Aop uv a * Cop uv a ah)) -
+        (∑ a : Fq params, ∑ ah : Outcome × Polynomial params,
+          ev strategy.state (Bop uv a * Cop uv a ah)) =
+      ∑ ah ∈ addInUSelectionPairs params S uv.1,
+        let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+        let Moh := (M uv.1).outcome ah.1
+        ev strategy.state
+          ((leftTensor (ι₂ := ι) Av - rightTensor (ι₁ := ι) Av) *
+            (opTensor Moh (T.outcome ah.2) * rightTensor (ι₁ := ι) Av)) := by
+    intro uv
+    rw [hcollapse uv Aop, hcollapse uv Bop]
+    rw [← Finset.sum_sub_distrib]
+    refine Finset.sum_congr rfl ?_
+    intro ah _
+    rw [← ev_sub]
+    congr 1
+    change
+      leftTensor (ι₂ := ι)
+          (pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2) *
+          (opTensor ((M uv.1).outcome ah.1) (T.outcome ah.2) *
+            rightTensor (ι₁ := ι)
+              (pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2)) -
+        rightTensor (ι₁ := ι)
+          (pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2) *
+          (opTensor ((M uv.1).outcome ah.1) (T.outcome ah.2) *
+            rightTensor (ι₁ := ι)
+              (pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2)) =
+        (leftTensor (ι₂ := ι)
+            (pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2) -
+          rightTensor (ι₁ := ι)
+            (pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2)) *
+          (opTensor ((M uv.1).outcome ah.1) (T.outcome ah.2) *
+            rightTensor (ι₁ := ι)
+              (pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2))
+    noncomm_ring
+  have hmatch :
+      avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+        ∑ a : Fq params, ∑ ah : Outcome × Polynomial params,
+          ev strategy.state (Aop uv a * Cop uv a ah)) -
+      avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+        ∑ a : Fq params, ∑ ah : Outcome × Polynomial params,
+          ev strategy.state (Bop uv a * Cop uv a ah)) =
+      addInUSelectedCSChainQ1 params strategy M T S -
+        addInUSelectedCSChainQ0 params strategy M T S := by
+    rw [addInU_selected_cs_chain_step1_diff_eq params strategy M T S]
+    rw [← avgOver_sub]
+    refine avgOver_congr _ _ _ ?_
+    intro uv
+    exact hmatch_pointwise uv
+  rw [abs_sub_comm]
+  rw [← hmatch]
+  exact hcs
+
 /-! ### Raw Cauchy--Schwarz bound for the add-in-u Step 1 difference
 
 This section proves the raw `|Q₀ - Q₁| ≤ √(2δ)` bound from
