@@ -12,6 +12,10 @@ pinned: true
 2. **Every review comment must be addressed before merge.** If Bugbot, Claude, Copilot, or Codex flagged something, it must be fixed or explicitly justified — not just acknowledged.
 3. **Don't rush through PR triage.** Reading "0 sorry, CI pass" is not enough. Must read every inline comment and PR-level comment in full.
 4. **Closing a PR loses its unique code.** Before closing, verify that all definitions/theorems from that PR exist elsewhere (on main or in another open PR). PR #100's `permuteConjBlockMap`/`orbitUnitaryPow` were lost.
+5. **Source-level holes are not the whole proof frontier.** For PRs that add or
+   thread structure fields, use
+   [`proof_frontier_review.md`](proof_frontier_review.md) to distinguish producer
+   theorems from residual inputs and bookkeeping conversions.
 
 ## Process for PR Review
 

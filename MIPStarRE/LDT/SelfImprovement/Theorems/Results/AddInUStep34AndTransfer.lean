@@ -167,8 +167,8 @@ lemma add_in_u_cs_chain_q2_q3_le_sqrt_of_factor_bounds
     |addInUCSChainQ2 params strategy T - addInUCSChainQ3 params strategy T| ≤
       Real.sqrt
         (∑ g : Polynomial params,
-          globalVarianceDeviationAtPolynomial params strategy strategy.state T g) := by
-  exact le_sqrt_of_factor_bounds_right hCS hD₁_le hD₂_le_one
+          globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
+  le_sqrt_of_factor_bounds_right hCS hD₁_le hD₂_le_one
 
 /-- Convert a squared `Q₃ → Q₄` real bound to an absolute-value sqrt bound.
 
@@ -210,8 +210,8 @@ lemma add_in_u_cs_chain_q3_q4_le_sqrt_of_factor_bounds
     |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T| ≤
       Real.sqrt
         (∑ g : Polynomial params,
-          globalVarianceDeviationAtPolynomial params strategy strategy.state T g) := by
-  exact le_sqrt_of_factor_bounds_left hCS hD₁_le_one hD₂_le
+          globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
+  le_sqrt_of_factor_bounds_left hCS hD₁_le_one hD₂_le
 
 /-- Factored operator Cauchy--Schwarz bound for the `Q₂ → Q₃` add-in-`u` step.
 
@@ -1629,7 +1629,9 @@ lemma add_in_u_cs_chain_global_variance_steps_of_sum_bound_from_factor_bounds
 This consumes the expected output of the local-variance normalization step
 (`expansion.tex`, lines 317--321) through
 `globalVarianceDeviation_sum_le_of_localVarianceDeviation_sum_le`, then applies
-the combined Step 3/4 bridge above. -/
+the combined Step 3/4 bridge above.  It remains a named bridge because the
+blueprint cites this local-sum interface separately from the closed
+factor-bound wrapper below. -/
 lemma add_in_u_cs_chain_global_variance_steps_of_local_sum_bound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -1660,7 +1662,12 @@ lemma add_in_u_cs_chain_global_variance_steps_of_local_sum_bound
     h23cs h34cs
 
 /-- Local-variance-sum version of the combined Step 3/4 variance bridge using
-the factor estimates proved in this file. -/
+the factor estimates proved in this file.
+
+This is the closed local-sum form of
+`add_in_u_cs_chain_global_variance_steps_of_sum_bound_from_factor_bounds`: the
+only new input is the local-variance sum hypothesis, which is first transported
+to the global-variance sum bound. -/
 lemma add_in_u_cs_chain_global_variance_steps_of_local_sum_bound_from_factor_bounds
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
