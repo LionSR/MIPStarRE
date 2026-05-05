@@ -367,6 +367,80 @@ theorem polynomial_off_diagonal_outer_sandwich_eq_indicator_avg
     ev_opTensor_pointConditioned_sandwichedPolynomialOutcome_outer_eq_indicator
       params strategy T u h h'
 
+/-- Right multiplication form of the point-projector identity.
+
+For a point `u`, multiplying the pointwise helper outcome `H^u_{h'}` on the
+right by `A^u_{h(u)}` retains exactly the summands with `h(u)=h'(u)`.  Together
+with `pointConditioned_sandwichedPolynomialOutcome_outer_eq_ite`, this is the
+operator identity used to pass from the enlarged outer-sandwich expression to
+the paper's `eq:delete-an-A` form. -/
+lemma sandwichedPolynomialOutcome_mul_pointConditioned_eq_ite
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι)
+    (u : Point params) (h h' : Polynomial params) :
+    let Ah := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
+    ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h') * Ah =
+      if h u = h' u then
+        (sandwichedPolynomialSubMeasAt params strategy T u).outcome h'
+      else
+        0 := by
+  classical
+  by_cases heval : h u = h' u
+  · rw [if_pos heval]
+    let Ah := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
+    have hproj : Ah * Ah = Ah := by
+      simpa [Ah, pointConditionedOutcomeOperatorAtPolynomial] using
+        (strategy.pointMeasurement u).proj (h u)
+    have houtcome :
+        (sandwichedPolynomialSubMeasAt params strategy T u).outcome h' =
+          Ah * T.outcome h' * Ah := by
+      simp [sandwichedPolynomialSubMeasAt, sandwichedPolynomialOutcomeOperatorAt,
+        pointConditionedOutcomeOperatorAtPolynomial, Ah, heval]
+    rw [houtcome]
+    calc
+      (Ah * T.outcome h' * Ah) * Ah =
+          Ah * T.outcome h' * (Ah * Ah) := by noncomm_ring
+      _ = Ah * T.outcome h' * Ah := by rw [hproj]
+  · rw [if_neg heval]
+    let Ah := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
+    let Ah' := pointConditionedOutcomeOperatorAtPolynomial params strategy h' u
+    have hrev : ¬ h' u = h u := fun hv => heval hv.symm
+    have horth : Ah' * Ah = 0 := by
+      simpa [Ah, Ah', pointConditionedOutcomeOperatorAtPolynomial] using
+        ProjMeas.outcome_orthogonal (strategy.pointMeasurement u) (h' u) (h u) hrev
+    have houtcome :
+        (sandwichedPolynomialSubMeasAt params strategy T u).outcome h' =
+          Ah' * T.outcome h' * Ah' := by
+      simp [sandwichedPolynomialSubMeasAt, sandwichedPolynomialOutcomeOperatorAt,
+        pointConditionedOutcomeOperatorAtPolynomial, Ah']
+    rw [houtcome]
+    calc
+      (Ah' * T.outcome h' * Ah') * Ah =
+          Ah' * T.outcome h' * (Ah' * Ah) := by noncomm_ring
+      _ = 0 := by rw [horth]; simp
+
+/-- The full outer point-sandwich equals the one-sided `delete-an-A` form.
+
+This is the operator identity underlying the paper's passage from the enlarged
+sum in `eq:threw-in-h-prime` to `eq:delete-an-A`. -/
+lemma pointConditioned_sandwichedPolynomialOutcome_outer_eq_right
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι)
+    (u : Point params) (h h' : Polynomial params) :
+    let Ah := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
+    Ah * ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h') * Ah =
+      ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h') * Ah := by
+  classical
+  change pointConditionedOutcomeOperatorAtPolynomial params strategy h u *
+      ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h') *
+      pointConditionedOutcomeOperatorAtPolynomial params strategy h u =
+    ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h') *
+      pointConditionedOutcomeOperatorAtPolynomial params strategy h u
+  rw [pointConditioned_sandwichedPolynomialOutcome_outer_eq_ite]
+  rw [sandwichedPolynomialOutcome_mul_pointConditioned_eq_ite]
+
 /-- Schwartz--Zippel bound for the point-measurement sandwich collision term.
 
 After the two variance swaps in the helper strong self-consistency proof, the
@@ -664,6 +738,67 @@ noncomputable def helperOffDiagonalSwappedIndicatorQuantity
                 T.outcome h' *
                 pointConditionedOutcomeOperatorAtPolynomial params strategy h v)
               (T.outcome h)))
+
+/-- The full enlarged expression after inserting the outer point projector.
+
+This includes both the diagonal and off-diagonal pairs `(h,h')`, and is the
+right-hand side of `eq:threw-in-h-prime` before applying `eq:h-blt`. -/
+noncomputable def helperFullOuterSandwichQuantity
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) : Error :=
+  avgOver (uniformDistribution (Point params)) (fun u =>
+    ∑ h : Polynomial params,
+      ∑ h' : Polynomial params,
+        let Ah := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
+        ev strategy.state
+          (opTensor
+            (Ah * ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h') * Ah)
+            (T.outcome h)))
+
+/-- The full enlarged expression after deleting the left copy of the point
+projector.
+
+This is the paper's `eq:delete-an-A` scalar quantity. -/
+noncomputable def helperDeleteAQuantity
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) : Error :=
+  avgOver (uniformDistribution (Point params)) (fun u =>
+    ∑ h : Polynomial params,
+      ∑ h' : Polynomial params,
+        let Ah := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
+        ev strategy.state
+          (opTensor
+            (((sandwichedPolynomialSubMeasAt params strategy T u).outcome h') * Ah)
+            (T.outcome h)))
+
+/-- Formal version of the paper's `eq:delete-an-A` identity. -/
+theorem helperFullOuterSandwichQuantity_eq_deleteAQuantity
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    helperFullOuterSandwichQuantity params strategy T =
+      helperDeleteAQuantity params strategy T := by
+  classical
+  refine avgOver_congr (uniformDistribution (Point params)) _ _ ?_
+  intro u
+  refine Finset.sum_congr rfl ?_
+  intro h _
+  refine Finset.sum_congr rfl ?_
+  intro h' _
+  change ev strategy.state
+      (opTensor
+        (pointConditionedOutcomeOperatorAtPolynomial params strategy h u *
+          ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h') *
+          pointConditionedOutcomeOperatorAtPolynomial params strategy h u)
+        (T.outcome h)) =
+    ev strategy.state
+      (opTensor
+        (((sandwichedPolynomialSubMeasAt params strategy T u).outcome h') *
+          pointConditionedOutcomeOperatorAtPolynomial params strategy h u)
+        (T.outcome h))
+  rw [pointConditioned_sandwichedPolynomialOutcome_outer_eq_right]
 
 /-- Named form of the identity `eq:h-blt` for the off-diagonal helper SSC
 quantity. -/

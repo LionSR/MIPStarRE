@@ -304,6 +304,12 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \begin{equation}\label{eq:delete-an-A}
     \E_{u} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi} \bigl(H^{u}_{h'} \cdot A^{u}_{h(u)}\bigr) \ot T_h \ket{\psi}.
   \end{equation}
+  \lean{MIPStarRE.LDT.SelfImprovement.sandwichedPolynomialOutcome_mul_pointConditioned_eq_ite}
+  \lean{MIPStarRE.LDT.SelfImprovement.pointConditioned_sandwichedPolynomialOutcome_outer_eq_right}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperFullOuterSandwichQuantity}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperDeleteAQuantity}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperFullOuterSandwichQuantity_eq_deleteAQuantity}
+  \leanok
   Replace the remaining copy of $A^u_{h(u)}$ by $A^v_{h(v)}$:
   \begin{equation}\label{eq:swap-u-for-v-attack-of-the-clones}
     \eqref{eq:delete-an-A}
