@@ -334,6 +334,40 @@ private lemma opTensor_one_left_eq_rightTensor
       rightTensor (ι₁ := ι₁) B := by
   rfl
 
+private lemma pointMeasurement_total_evalFamily_total_opTensor_ev_eq_rightTensor
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (S : SubMeas (Polynomial params) ι)
+    (u : Point params) :
+    ev strategy.state
+        (opTensor
+          (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total)
+          (((polynomialEvaluationFamily params S) u).total)) =
+      ev strategy.state (rightTensor (ι₁ := ι) S.total) := by
+  have hA_total :
+      (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total) =
+        (1 : MIPStarRE.Quantum.Op ι) := by
+    exact (strategy.pointMeasurement u).total_eq_one
+  have hS_total : (((polynomialEvaluationFamily params S) u).total) = S.total := by
+    simpa [polynomialEvaluationFamily, evaluateAt] using
+      postprocess_total S (fun g : Polynomial params => g u)
+  rw [hA_total, hS_total, opTensor_one_left_eq_rightTensor]
+
+private lemma pointMeasurement_total_evalFamily_total_ev_eq_rightTensor
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (S : SubMeas (Polynomial params) ι)
+    (u : Point params) :
+    ev strategy.state
+        (leftTensor (ι₂ := ι)
+            (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total) *
+          rightTensor (ι₁ := ι)
+            (((polynomialEvaluationFamily params S) u).total)) =
+      ev strategy.state (rightTensor (ι₁ := ι) S.total) := by
+  rw [leftTensor_mul_rightTensor_eq_opTensor]
+  exact pointMeasurement_total_evalFamily_total_opTensor_ev_eq_rightTensor
+    params strategy S u
+
 /-- Averaged scalar form of the off-diagonal decomposition.
 
 Composed from `helperAgreementOperatorAtPoint_off_diagonal_decomposition` by
@@ -444,22 +478,8 @@ theorem helper_point_consistency_error_eq_off_diagonal_avg
             (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total)
             (((polynomialEvaluationFamily params H) u).total)) =
         ev strategy.state (rightTensor (ι₁ := ι) H.total) := by
-    have hA_total :
-        (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total) =
-          (1 : MIPStarRE.Quantum.Op ι) := by
-      exact (strategy.pointMeasurement u).total_eq_one
-    have hB_total : (((polynomialEvaluationFamily params H) u).total) = H.total := by
-      simpa [polynomialEvaluationFamily, evaluateAt] using
-        postprocess_total H (fun g : Polynomial params => g u)
-    calc
-      ev strategy.state
-          (opTensor
-            (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total)
-            (((polynomialEvaluationFamily params H) u).total)) =
-        ev strategy.state (opTensor (1 : MIPStarRE.Quantum.Op ι) H.total) := by
-          rw [hA_total, hB_total]
-      _ = ev strategy.state (rightTensor (ι₁ := ι) H.total) := by
-          rw [opTensor_one_left_eq_rightTensor]
+    exact pointMeasurement_total_evalFamily_total_opTensor_ev_eq_rightTensor
+      params strategy H u
   have hmatch :
       qBipartiteMatchMass strategy.state
           ((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u)
@@ -632,23 +652,10 @@ theorem final_fields_point_consistency_totalGap_natural_of_total_difference
         |ev strategy.state (rightTensor (ι₁ := ι) H.toSubMeas.total) -
           ev strategy.state (rightTensor (ι₁ := ι) Hhat.total)| := by
       intro u
-      have hA_total :
-          (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total) =
-            (1 : MIPStarRE.Quantum.Op ι) := by
-        exact (strategy.pointMeasurement u).total_eq_one
-      have hH_total :
-          (((polynomialEvaluationFamily params H.toSubMeas) u).total) =
-            H.toSubMeas.total := by
-        simpa [polynomialEvaluationFamily, evaluateAt] using
-          postprocess_total H.toSubMeas (fun g : Polynomial params => g u)
-      have hHhat_total :
-          (((polynomialEvaluationFamily params Hhat) u).total) =
-            Hhat.total := by
-        simpa [polynomialEvaluationFamily, evaluateAt] using
-          postprocess_total Hhat (fun g : Polynomial params => g u)
-      rw [hA_total, hH_total, hHhat_total]
-      rw [leftTensor_mul_rightTensor_eq_opTensor, opTensor_one_left_eq_rightTensor,
-        leftTensor_mul_rightTensor_eq_opTensor, opTensor_one_left_eq_rightTensor]
+      rw [pointMeasurement_total_evalFamily_total_ev_eq_rightTensor
+          params strategy H.toSubMeas u,
+        pointMeasurement_total_evalFamily_total_ev_eq_rightTensor
+          params strategy Hhat u]
     have hconst :
         avgOver (uniformDistribution (Point params)) (fun u =>
           |ev strategy.state
