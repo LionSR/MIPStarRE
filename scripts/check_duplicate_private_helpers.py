@@ -22,7 +22,6 @@ from pathlib import Path
 from typing import Iterable, Sequence
 
 from audit_conclusion_shaped_hypotheses import (
-    _identifier_char,
     _line_number,
     _mask_lean_non_code,
     _starts_keyword,
