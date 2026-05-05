@@ -25,6 +25,65 @@ structure MatrixSdpRealization (params : Parameters) [FieldModel params.q] where
   state : PositiveMatrixState space
   pointMeasurement : Point params → MatrixSubmeasurement (Fq params) space
 
+/-- The paper's strict-feasibility weight for the matrix SDP primal witness. -/
+noncomputable def matrixSdpStrictPrimalWeight (params : Parameters)
+    [FieldModel params.q] : Error :=
+  sdpStrictPrimalWeight params
+
+/-- The matrix-level strict-feasible primal witness
+`T_g = (2 |\polyfunc{m}{q}{d}|)^{-1} I`. -/
+noncomputable def matrixSdpStrictPrimalSubmeasurement (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params) :
+    MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space where
+  effect := (sdpStrictPrimalSubMeas (ι := model.space.carrier) params).outcome
+  pos := (sdpStrictPrimalSubMeas (ι := model.space.carrier) params).outcome_pos
+  sum_le_one := by
+    simpa [(sdpStrictPrimalSubMeas (ι := model.space.carrier) params).sum_eq_total] using
+      (sdpStrictPrimalSubMeas (ι := model.space.carrier) params).total_le_one
+
+/-- The matrix-level strict-feasible primal witness has total mass
+`(1/2) I`. -/
+theorem matrixSdpStrictPrimalSubmeasurement_sum_effect (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params) :
+    ∑ g : Polynomial params,
+        (matrixSdpStrictPrimalSubmeasurement params model).effect g =
+      ((1 / 2 : Error) • (1 : MatrixOperator model.space)) := by
+  calc
+    ∑ g : Polynomial params,
+        (matrixSdpStrictPrimalSubmeasurement params model).effect g =
+        (sdpStrictPrimalSubMeas (ι := model.space.carrier) params).total := by
+          simpa [matrixSdpStrictPrimalSubmeasurement] using
+            (sdpStrictPrimalSubMeas (ι := model.space.carrier) params).sum_eq_total
+    _ = ((1 / 2 : Error) • (1 : MatrixOperator model.space)) :=
+        sdpStrictPrimalSubMeas_total (ι := model.space.carrier) params
+
+/-- The paper's matrix-level strict-feasible dual witness `Z = 2I`. -/
+noncomputable def matrixSdpStrictDualWitness {params : Parameters} [FieldModel params.q]
+    (model : MatrixSdpRealization params) : MatrixOperator model.space :=
+  (2 : Error) • (1 : MatrixOperator model.space)
+
+/-- The matrix-level strict-feasible dual witness is positive semidefinite. -/
+theorem matrixSdpStrictDualWitness_nonneg {params : Parameters} [FieldModel params.q]
+    (model : MatrixSdpRealization params) :
+    0 ≤ matrixSdpStrictDualWitness model := by
+  unfold matrixSdpStrictDualWitness
+  exact smul_nonneg (by norm_num)
+    (op_one_nonneg (d := model.space.carrier))
+
+/-- The matrix-level strict-feasible dual witness dominates the identity. -/
+theorem one_le_matrixSdpStrictDualWitness {params : Parameters} [FieldModel params.q]
+    (model : MatrixSdpRealization params) :
+    (1 : MatrixOperator model.space) ≤ matrixSdpStrictDualWitness model := by
+  calc
+    (1 : MatrixOperator model.space) =
+        (1 : Error) • (1 : MatrixOperator model.space) := by simp
+    _ ≤ (2 : Error) • (1 : MatrixOperator model.space) :=
+        smul_le_smul_of_nonneg_right
+          (show (1 : Error) ≤ 2 by norm_num)
+          (op_one_nonneg (d := model.space.carrier))
+
 /-- The concrete operator `A^u_{g(u)}` entering the SDP average. -/
 def matrixAveragedPointOperatorContribution (params : Parameters)
     [FieldModel params.q]
@@ -37,7 +96,42 @@ noncomputable def matrixAveragedPointOperator (params : Parameters)
     [FieldModel params.q]
     (model : MatrixSdpRealization params)
     (g : Polynomial params) : MatrixOperator model.space :=
-  matrixAverageOperator (matrixAveragedPointOperatorContribution params model g)
+  averageOperatorOverDistribution (uniformDistribution (Point params))
+    (matrixAveragedPointOperatorContribution params model g)
+
+/-- The concrete matrix average agrees with the paper-local uniform operator
+average used elsewhere in the formalization. -/
+theorem matrixAveragedPointOperator_eq_averageOperatorOverDistribution (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (g : Polynomial params) :
+    matrixAveragedPointOperator params model g =
+      averageOperatorOverDistribution (uniformDistribution (Point params))
+        (matrixAveragedPointOperatorContribution params model g) := by
+  rfl
+
+/-- The averaged point operator `A_g` is bounded by the identity. -/
+theorem matrixAveragedPointOperator_le_one (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (g : Polynomial params) :
+    matrixAveragedPointOperator params model g ≤ 1 := by
+  let A : SubMeas Unit model.space.carrier :=
+    averageUnitSubMeas (ι := model.space.carrier)
+      (matrixAveragedPointOperatorContribution params model g)
+      (fun u => by
+        exact (model.pointMeasurement u).pos (g u))
+      (fun u => by
+        calc
+          (model.pointMeasurement u).effect (g u)
+              ≤ ∑ a : Fq params, (model.pointMeasurement u).effect a :=
+                Finset.single_le_sum
+                  (fun a _ => (model.pointMeasurement u).pos a)
+                  (Finset.mem_univ (g u))
+          _ ≤ 1 := (model.pointMeasurement u).sum_le_one)
+  simpa [A, matrixAveragedPointOperator_eq_averageOperatorOverDistribution,
+    matrixAveragedPointOperatorContribution, averageUnitSubMeas_outcome] using
+      A.outcome_le_one ()
 
 /-- The concrete primal contribution `T_g A_g`. -/
 noncomputable def matrixSdpPrimalContributionOperator (params : Parameters)
@@ -68,6 +162,48 @@ noncomputable def matrixSdpDualSlackOperator (params : Parameters)
     (Z : MatrixOperator model.space)
     (g : Polynomial params) : MatrixOperator model.space :=
   Z - matrixAveragedPointOperator params model g
+
+/-- The matrix-level strict-feasible dual witness `2I` dominates every averaged
+point operator. -/
+theorem matrixSdpStrictDualWitness_dualFeasible (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params) :
+    ∀ g : Polynomial params,
+      0 ≤ matrixSdpDualSlackOperator params model (matrixSdpStrictDualWitness model) g := by
+  intro g
+  exact sub_nonneg.mpr
+    (le_trans (matrixAveragedPointOperator_le_one params model g)
+      (one_le_matrixSdpStrictDualWitness model))
+
+/-- Matrix-level record of the explicit feasible bounds used in the SDP argument.
+
+The uniform primal family has total `(1/2)I`, while the dual witness `2I` is
+positive semidefinite, dominates the identity, and is dual feasible.  These are
+the non-strict matrix inequalities currently recorded in Lean; the structure is
+not an optimality statement and does not include complementary slackness. -/
+structure MatrixSdpFeasibleBounds (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
+    (Z : MatrixOperator model.space) : Prop where
+  primalTotalHalf :
+    ∑ g : Polynomial params, T.effect g =
+      ((1 / 2 : Error) • (1 : MatrixOperator model.space))
+  dualPositive : 0 ≤ Z
+  dualDominatesIdentity : (1 : MatrixOperator model.space) ≤ Z
+  dualFeasible :
+    ∀ g : Polynomial params,
+      0 ≤ matrixSdpDualSlackOperator params model Z g
+
+/-- The canonical explicit matrix feasible bounds used in the SDP argument. -/
+theorem matrixSdpFeasibleBounds_canonical (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params) :
+    MatrixSdpFeasibleBounds params model
+      (matrixSdpStrictPrimalSubmeasurement params model)
+      (matrixSdpStrictDualWitness model) where
+  primalTotalHalf := matrixSdpStrictPrimalSubmeasurement_sum_effect params model
+  dualPositive := matrixSdpStrictDualWitness_nonneg model
+  dualDominatesIdentity := one_le_matrixSdpStrictDualWitness model
+  dualFeasible := matrixSdpStrictDualWitness_dualFeasible params model
 
 /-- The concrete complementary-slackness defect `T_g (Z - A_g)`. -/
 noncomputable def matrixSdpComplementarySlacknessDefect (params : Parameters)
