@@ -81,11 +81,6 @@ theorem fullPolynomialConsistency {Outcome : Type*} {ι : Type*}
         (constSubMeasFamily Q_B.toSubMeas.liftRight)
         ≤ 3 * (ζ₂ + 2 * ζ₁ + ζ₂) := htri.squaredDistanceBound
     _ = 6 * ζ₁ + 6 * ζ₂ := by ring
-
-end ProjectivizationSelfConsistencyHandoff
-
-namespace ProjectivizationSelfConsistencyHandoff
-
 /-- The honest Alice-side transport statement derivable from the existing
 projectivization handoff alone has the generic `triangleSub` loss
 `ζ₁ + sqrt ζ₂`.

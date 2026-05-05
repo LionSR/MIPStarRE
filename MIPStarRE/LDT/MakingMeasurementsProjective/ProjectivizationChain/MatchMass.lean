@@ -26,11 +26,11 @@ The ordinary Step 6 handoff records only state-dependent-distance closeness
 `G_A ≈ Q_A` and `G_B ≈ Q_B`.  Combining those fields with
 `prop:triangle-sub` gives a `ζ₁ + sqrt ζ₂` consistency loss, as witnessed by
 `ProjectivizationSelfConsistencyHandoff.leftConsistency_with_triangleSub_loss` and
-`ProjectivizationSelfConsistencyHandoff.rightConsistency_with_triangleSub_loss` below.
-The paper-tight line-169 estimate at exactly `ζ₁` therefore needs a stronger
-construction-level invariant: replacing `G_A` by `Q_A`, and symmetrically
-replacing `G_B` by `Q_B`, must not decrease the diagonal match mass against the
-opposite pre-projective measurement.
+`ProjectivizationSelfConsistencyHandoff.rightConsistency_with_triangleSub_loss`
+in `ProjectivizationChain.Handoff`.  The paper-tight line-169 estimate at
+exactly `ζ₁` therefore needs a stronger construction-level invariant: replacing
+`G_A` by `Q_A`, and symmetrically replacing `G_B` by `Q_B`, must not decrease
+the diagonal match mass against the opposite pre-projective measurement.
 
 This structure records that invariant in its primitive match-mass form, rather
 than restating the downstream `ConsRel` conclusion.  A future constructor can

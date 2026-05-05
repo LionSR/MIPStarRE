@@ -7,54 +7,27 @@ import MIPStarRE.LDT.Preliminaries.DistanceBounds
 import MIPStarRE.LDT.Preliminaries.Triangles
 
 /-!
-# Section 10 — Step 6 (orthonormalize-and-complete chain)
+# Section 10 — basic projectivization data
 
-This file formalises **Step 6** of the eight-step proof of the main inductive
-step (`mainFormal`). In the paper, Step 6 is the orthonormalization and
-completion argument (`inductive_step.tex` lines 130–149) whose ultimate goal is
-to produce projective measurements `Q^A`, `Q^B` close to `G^A`, `G^B`. That
-argument has two analytic substeps:
+This module contains the scalar estimates and elementary transport lemmas used
+by the Step 6 projectivization chain.  The mathematical source is the
+orthonormalization-and-completion argument in `inductive_step.tex`, lines
+130--149, together with the orthonormalization theorem and the completion
+proposition cited there.
 
-1. **Orthonormalization** (`thm:orthonormalization`, cross-referenced from
-   Section 5).
-2. **Completion to a measurement** (`prop:completing-to-measurement`).
+The declarations here are deliberately prior to the construction of the final
+projective measurements.  They record the literal scalar obtained by composing
+orthonormalization with completion, its absorbed form in the unit-error regime,
+the right-register transport available under permutation invariance, and the
+residual hypotheses passed to the self-consistency handoff theorem.  The actual
+projective-measurement output theorem is in `ProjectivizationChain.Output`.
 
-The completed measurement is then canonically projective: if
-`P : ProjSubMeas Outcome ι`, then `P.total` is itself a projection and the
-residual effect `I - Σ_a P_a = 1 - P.total` is orthogonal to the repaired
-outcome. This file records that observation so that Step 6 now directly
-returns a `ProjMeas` witness.
-
-The main theorem is therefore still named `orthonormalizeAndComplete`, because
-its closeness estimate is obtained by composing the orthonormalization and
-completion bounds exactly as in the paper, while additionally recording the
-projective structure of the canonical completion.
-
-The chain composes two existing pieces of infrastructure together with a short
-projective-packaging lemma:
-
-1. **Orthonormalization** (`MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization`,
-   in `Theorems.lean`) — produces a projective sub-measurement
-   `P : ProjSubMeas Outcome ι` close to `G` in state-dependent distance:
-   `G_g ⊗ I ≈_{100·ζ^{1/4}} P_g ⊗ I`.
-
-2. **Completion to a measurement**
-   (`MIPStarRE.LDT.Preliminaries.completingToMeasurement`,
-   in `Preliminaries/Theorems.lean`) — adjoins the missing mass `I − Σ_a P_a`
-   at a distinguished outcome `a*` to produce a measurement `Q` with
-   `G_g ⊗ I ≈_{2δ + 4√δ + 2ζ} Q_g ⊗ I` where `δ = 100·ζ^{1/4}`.
-
-3. **Projective packaging of the completion**
-   (`MIPStarRE.LDT.Preliminaries.completeAtOutcomeProj`) — upgrades the same
-   completed measurement to a `ProjMeas` without changing its underlying POVM.
-
-The composition gives the literal completion scalar
-(`inductive_step.tex`, line 149 plus `prop:completing-to-measurement`):
+The scalar computation is
 
     ζ₂ = 2 · (100·ζ^{1/4}) + 4 · √(100·ζ^{1/4}) + 2·ζ
        = 200·ζ^{1/4} + 40·ζ^{1/8} + 2·ζ.
 
-The paper prints the closed-form `ζ₂ = 200·ζ^{1/4} + 40·ζ^{1/8}`.  The Lean
+The paper prints the closed form `ζ₂ = 200·ζ^{1/4} + 40·ζ^{1/8}`.  The Lean
 cascade uses the slightly widened absorbed scalar
 `200·ζ^{1/4} + 42·ζ^{1/8}` downstream, since in the non-vacuous regime
 `0 ≤ ζ ≤ 1` gives `2·ζ ≤ 2·ζ^{1/8}`.
@@ -118,7 +91,7 @@ noncomputable def orthonormalizeAndCompleteError (ζ : Error) : Error :=
     2 * ζ
 
 /-- Square-root simplification for the orthonormalization error. -/
-private theorem sqrt_orthonormalizationError_eq {ζ : Error} (hζ0 : 0 ≤ ζ) :
+theorem sqrt_orthonormalizationError_eq {ζ : Error} (hζ0 : 0 ≤ ζ) :
     Real.sqrt (orthonormalizationError ζ) = 10 * Real.rpow ζ (1 / (8 : Error)) := by
   have hsqrt100 : Real.sqrt (100 : Error) = 10 := by
     rw [← Real.sqrt_sq (show (0 : Error) ≤ 10 by norm_num)]
@@ -212,8 +185,9 @@ lemma sddRel_liftRight_of_liftLeft_permInv
 The fields are exactly the hypotheses needed after the orthonormalization and
 completion constructions have produced projective measurements `Q_A,Q_B` close to
 the pre-projective measurements `G_A,G_B`.  The theorem
-`ProjectivizationSelfConsistencyHandoff.fullPolynomialConsistency` below turns
-this data into the paper's projective-measurement consistency estimate. -/
+`ProjectivizationSelfConsistencyHandoff.fullPolynomialConsistency` in
+`ProjectivizationChain.Handoff` turns this data into the paper's
+projective-measurement consistency estimate. -/
 structure ProjectivizationSelfConsistencyHandoff
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]

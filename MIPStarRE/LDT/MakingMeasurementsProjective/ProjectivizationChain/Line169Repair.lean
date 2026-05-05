@@ -19,30 +19,6 @@ open MIPStarRE.LDT.Preliminaries
   (completeAtOutcome completeAtOutcomeProj completeAtOutcomeProj_toMeasurement
     completingToMeasurement)
 
-/-- Square-root simplification for the orthonormalization error. -/
-private theorem sqrt_orthonormalizationError_eq {ζ : Error} (hζ0 : 0 ≤ ζ) :
-    Real.sqrt (orthonormalizationError ζ) = 10 * Real.rpow ζ (1 / (8 : Error)) := by
-  have hsqrt100 : Real.sqrt (100 : Error) = 10 := by
-    rw [← Real.sqrt_sq (show (0 : Error) ≤ 10 by norm_num)]
-    norm_num
-  have hsqrtRpow : Real.sqrt (Real.rpow ζ (1 / (4 : Error))) =
-      Real.rpow ζ (1 / (8 : Error)) := by
-    rw [Real.sqrt_eq_rpow]
-    calc
-      Real.rpow (Real.rpow ζ (1 / (4 : Error))) (1 / (2 : Error))
-          = Real.rpow ζ ((1 / (4 : Error)) * (1 / (2 : Error))) := by
-              simpa using
-                (Real.rpow_mul hζ0 (1 / (4 : Error)) (1 / (2 : Error))).symm
-      _ = Real.rpow ζ (1 / (8 : Error)) := by norm_num
-  unfold orthonormalizationError
-  calc
-    Real.sqrt (100 * Real.rpow ζ (1 / (4 : Error)))
-        = Real.sqrt (100 : Error) *
-            Real.sqrt (Real.rpow ζ (1 / (4 : Error))) := by
-            rw [Real.sqrt_mul (by norm_num : 0 ≤ (100 : Error))]
-    _ = 10 * Real.rpow ζ (1 / (8 : Error)) := by
-        rw [hsqrt100, hsqrtRpow]
-
 /-! ### Local line-169 repair via pre-completion orthonormalization -/
 
 namespace ProjectivizationLine169Repair
