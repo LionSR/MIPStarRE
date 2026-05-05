@@ -7,6 +7,7 @@ import MIPStarRE.LDT.Preliminaries.Triangles
 import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUPointConsistency
 
 /-!
@@ -41,6 +42,12 @@ data-processing transport of the boundedness gap, and the standalone
 - **helper_boundedness_gap_le_selfImprovementHelperError_of_pointConsistencyAddInU_transfer**
   — same conclusion, with the off-diagonal estimate supplied by the
   point-consistency `add-in-u` transfer.
+- **helper_upper_gap_rightTensor_le_three_sqrt_delta_of_helper_outputs**
+  — converts the helper-completeness `Hhat`-versus-`Z` comparison into the
+  right-tensor scalar comparison required by the boundedness gap decomposition.
+- **helper_boundedness_gap_le_selfImprovementHelperError_of_helper_outputs**
+  — supplies the `Z`-versus-`Hhat.total` comparison from helper outputs,
+  leaving only the explicit off-diagonal `add-in-u` transfer as input.
 - **helper_point_consistency_error_eq_off_diagonal_avg** — identifies the
   averaged off-diagonal mass with the helper-stage `ConsRel` defect for the
   point measurement against `polynomialEvaluationFamily`.
@@ -62,6 +69,9 @@ data-processing transport of the boundedness gap, and the standalone
   residual at `selfImprovementHelperError + √selfImprovementDataProcessingError`.
 - **final_fields_projective_residual_bound** — literal-threshold wrapper
   absorbing the natural error into `selfImprovementError`.
+- **final_fields_projective_residual_bound_of_helper_outputs**
+  — final projective-residual producer from helper outputs, data processing,
+  complementary slackness, and the off-diagonal `add-in-u` transfer.
 - **final_fields_bounded** — standalone producer: if `1 ≤ Z` then
   any submeasurement is `BoundedByOperator` relative to `Z ⊗ I`.
 
@@ -745,6 +755,92 @@ theorem helper_boundedness_gap_le_selfImprovementHelperError_of_pointConsistency
     helper_boundedness_gap_le_selfImprovementHelperError
       params strategy eps delta heps hdelta hZ_vs_H hoffdiag
 
+/-- Convert the helper-completeness `Hhat`-versus-`Z` comparison to the
+right-placed total comparison used in the boundedness gap.
+
+The helper-completeness paragraph naturally proves
+`⟨ψ, Z ⊗ I⟩ - 3√δ ≤ subMeasMass ψ Hhat.liftLeft`. The boundedness decomposition,
+however, uses the right-placed total `⟨ψ, I ⊗ Hhat.total⟩`. On the
+permutation-invariant strategy state these scalars agree, so the comparison
+becomes `⟨ψ, Z ⊗ I⟩ - ⟨ψ, I ⊗ Hhat.total⟩ ≤ 3√δ`. -/
+theorem helper_upper_gap_rightTensor_le_three_sqrt_delta_of_helper_outputs
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    {T : Measurement (Polynomial params) ι}
+    {Hhat : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
+    (hssc : BipartiteSSCRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta)
+    (hslack :
+      ∀ h : Polynomial params,
+        T.toSubMeas.outcome h * averagedPointOperator params strategy h =
+          T.toSubMeas.outcome h * Z) :
+    ev strategy.state (helperUpperOperator params Z) -
+        ev strategy.state (rightTensor (ι₁ := ι) Hhat.total) ≤
+      3 * Real.sqrt delta := by
+  have hleft :
+      ev strategy.state (leftTensor (ι₂ := ι) Z) - 3 * Real.sqrt delta ≤
+        subMeasMass strategy.state Hhat.liftLeft :=
+    helper_hhat_vs_z_of_self_consistency_and_complementary_slackness
+      params strategy eps delta hhelper hssc hslack
+  have hmass :
+      subMeasMass strategy.state Hhat.liftLeft =
+        ev strategy.state (leftTensor (ι₂ := ι) Hhat.total) := rfl
+  have hswap :
+      ev strategy.state (leftTensor (ι₂ := ι) Hhat.total) =
+        ev strategy.state (rightTensor (ι₁ := ι) Hhat.total) :=
+    strategy.permInvState.swap_ev Hhat.total
+  unfold helperUpperOperator
+  rw [hmass, hswap] at hleft
+  linarith
+
+/-- Helper-stage boundedness from the actual helper comparison and the
+point-consistency `add-in-u` transfer.
+
+This theorem composes the helper-completeness comparison `Hhat`-versus-`Z`
+with the boundedness off-diagonal estimate. Complementary slackness remains an
+explicit hypothesis because the reduced `SelfImprovementHelperConclusion`
+records only the presently formalized SDP facts. The off-diagonal transfer is
+likewise explicit: it is the theorem-side form of the `add-in-u` application
+with `S_u = {(a,h) : h(u) ≠ a}`. -/
+theorem helper_boundedness_gap_le_selfImprovementHelperError_of_helper_outputs
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
+    {T : Measurement (Polynomial params) ι}
+    {Hhat : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
+    (hssc : BipartiteSSCRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta)
+    (hslack :
+      ∀ h : Polynomial params,
+        T.toSubMeas.outcome h * averagedPointOperator params strategy h =
+          T.toSubMeas.outcome h * Z)
+    (htransfer :
+      |addInULeftQuantity params strategy
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          Hhat
+          (pointConsistencyAddInUSelection params) -
+        addInURightQuantity params strategy
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          T.toSubMeas
+          (pointConsistencyAddInUSelection params)| ≤ addInUError params eps delta) :
+    helperBoundednessGap params strategy Hhat Z ≤
+      selfImprovementHelperError params eps delta := by
+  have hZ_vs_H :
+      ev strategy.state (helperUpperOperator params Z) -
+          ev strategy.state (rightTensor (ι₁ := ι) Hhat.total) ≤
+        3 * Real.sqrt delta :=
+    helper_upper_gap_rightTensor_le_three_sqrt_delta_of_helper_outputs
+      params strategy eps delta hhelper hssc hslack
+  exact
+    helper_boundedness_gap_le_selfImprovementHelperError_of_pointConsistencyAddInU_transfer
+      params strategy eps delta heps hdelta hZ_vs_H htransfer
+
 /-- Transport the helper boundedness gap through the data-processing
 approximation between `Hhat` and `H`.
 
@@ -1000,6 +1096,59 @@ theorem final_fields_projective_residual_bound_of_small_errors
   final_fields_projective_residual_bound params strategy eps delta hhelper hhelperBounded hdata
     (final_fields_projective_residual_error_le_selfImprovementError params eps delta
       heps heps_le_one hdelta hdelta_le_one hd_le_q)
+
+/-- Final projective-residual producer from helper outputs and the
+point-consistency `add-in-u` transfer.
+
+The theorem performs the boundedness part of the final-fields assembly once the
+orthonormalization data-processing estimate is available. It supplies the
+helper-stage boundedness estimate from the helper comparison, complementary
+slackness, point self-consistency, and the off-diagonal `add-in-u` transfer,
+then applies the standard data-processing transport and numerical absorption
+into `selfImprovementError`. -/
+theorem final_fields_projective_residual_bound_of_helper_outputs
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (heps_le_one : eps ≤ 1)
+    (hdelta : 0 ≤ delta) (hdelta_le_one : delta ≤ 1)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
+    {T : Measurement (Polynomial params) ι}
+    {Hhat : SubMeas (Polynomial params) ι}
+    {H : ProjSubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
+    (hssc : BipartiteSSCRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta)
+    (hslack :
+      ∀ h : Polynomial params,
+        T.toSubMeas.outcome h * averagedPointOperator params strategy h =
+          T.toSubMeas.outcome h * Z)
+    (htransfer :
+      |addInULeftQuantity params strategy
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          Hhat
+          (pointConsistencyAddInUSelection params) -
+        addInURightQuantity params strategy
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          T.toSubMeas
+          (pointConsistencyAddInUSelection params)| ≤ addInUError params eps delta)
+    (hdata :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftLeft)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+        (selfImprovementDataProcessingError params eps delta)) :
+    projectiveBoundednessGap params strategy H Z ≤
+      selfImprovementError params eps delta := by
+  have hhelperBounded :
+      helperBoundednessGap params strategy Hhat Z ≤
+        selfImprovementHelperError params eps delta :=
+    helper_boundedness_gap_le_selfImprovementHelperError_of_helper_outputs
+      params strategy eps delta heps hdelta hhelper hssc hslack htransfer
+  exact
+    final_fields_projective_residual_bound_of_small_errors
+      params strategy eps delta heps heps_le_one hdelta hdelta_le_one hd_le_q
+      hhelper hhelperBounded hdata
 
 /-- Final-fields producer for the `BoundedByOperator` conclusion.
 
