@@ -218,6 +218,23 @@ structure MatrixSdpOptimalWitness (params : Parameters) [FieldModel params.q]
     ∀ g : Polynomial params,
       matrixSdpComplementarySlacknessDefect params model T Z g = 0
 
+/-- Matrix-level optimal SDP witness together with the dominance condition
+required by the reduced abstract helper interface.
+
+The paper's dual SDP feasibility gives \(Z \ge A_g\).  The current reduced
+abstract interface also asks for \(I \le Z\), because boundedness is expressed
+against this dual operator.  This successor package records that extra
+dominance for the same optimal dual witness, without changing the matrix
+strong-duality statement below. -/
+structure MatrixSdpOptimalWitnessWithDominance (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
+    (Z : MatrixOperator model.space) : Prop where
+  toMatrixSdpOptimalWitness :
+    MatrixSdpOptimalWitness params model T Z
+  dualDominatesIdentity : (1 : MatrixOperator model.space) ≤ Z
+
 /-- Matrix-level statement of the strong-duality output for the SDP.
 
 This is the concrete matrix analogue of `SdpStatementWithSlackness`: it does
@@ -232,6 +249,21 @@ structure MatrixSdpStatementWithSlackness (params : Parameters) [FieldModel para
     ∃ T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space,
       ∃ Z : MatrixOperator model.space,
         MatrixSdpOptimalWitness params model T Z
+
+/-- Matrix-level strong-duality statement with the additional dominance
+condition needed by the reduced abstract helper interface.
+
+This is the matrix-side target for the downstream bridge into
+`SelfImprovementHelperConclusionWithSlackness`: it keeps the same optimal pair
+and complementary-slackness data as `MatrixSdpStatementWithSlackness`, and also
+records \(I \le Z\) for the selected dual witness. -/
+structure MatrixSdpStatementWithSlacknessAndDominance (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params) : Prop where
+  witness :
+    ∃ T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space,
+      ∃ Z : MatrixOperator model.space,
+        MatrixSdpOptimalWitnessWithDominance params model T Z
 
 /-- The concrete complementary-slackness equation `T_g Z = T_g A_g`. -/
 def matrixSdpComplementarySlacknessEquation (params : Parameters)
@@ -277,6 +309,19 @@ theorem complementarySlacknessEquation {params : Parameters} [FieldModel params.
   exact sub_eq_zero.mp hzero
 
 end MatrixSdpOptimalWitness
+
+namespace MatrixSdpStatementWithSlacknessAndDominance
+
+/-- Forget the additional dominance condition and recover the matrix-level
+strong-duality statement with complementary slackness. -/
+theorem toMatrixSdpStatementWithSlackness {params : Parameters} [FieldModel params.q]
+    {model : MatrixSdpRealization params}
+    (h : MatrixSdpStatementWithSlacknessAndDominance params model) :
+    MatrixSdpStatementWithSlackness params model := by
+  obtain ⟨T, Z, hopt⟩ := h.witness
+  exact ⟨T, Z, hopt.toMatrixSdpOptimalWitness⟩
+
+end MatrixSdpStatementWithSlacknessAndDominance
 
 namespace MatrixSdpStatementWithSlackness
 

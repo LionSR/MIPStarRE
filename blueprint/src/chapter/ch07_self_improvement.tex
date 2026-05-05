@@ -493,6 +493,9 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
 \begin{lemma}[Matrix slackness output]\label{lem:sdp-matrix-slackness-output}
   \uses{lem:sdp}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitnessWithDominance}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.toMatrixSdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness.exists_measurement_witness}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpComplementarySlacknessEquation}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.primalMeasurement}
@@ -503,6 +506,8 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpDualSlackOperator_ofPointRealization}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.toSdpOptimalPairWithSlackness_of_dualDominatesIdentity}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness.toSdpStatementWithSlackness_of_dualDominatesIdentity}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.toSdpStatementWithSlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithMatrixSdpSlacknessAndDominance}
   \leanok
   From a matrix-level strong-duality witness with complementary slackness of the
   shape asserted by Lemma~\ref{lem:sdp}, one obtains a complete measurement
@@ -510,6 +515,9 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   objectives, and the equations \(T_gZ=T_gA_g\) for all \(g\).  The formal
   bridge to the current abstract helper interface is conditional on the
   additional reduced-interface bound \(I\leq Z\) for this selected dual witness.
+  Lean also records a successor matrix package in which this dominance condition
+  is bundled with the same optimal witness; that package feeds directly into
+  the slackness-carrying self-improvement helper.
 \end{lemma}
 \begin{proof}
   \leanok
