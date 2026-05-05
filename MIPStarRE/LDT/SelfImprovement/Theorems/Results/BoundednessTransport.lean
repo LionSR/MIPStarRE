@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.Basic.QuantumState
 import MIPStarRE.LDT.Basic.SubMeasurementFamilies
 import MIPStarRE.LDT.GlobalVariance.Theorems.Results
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
@@ -902,7 +903,7 @@ theorem final_fields_point_consistency_natural_of_total_operator_le
   have hTotalExpectationLe :
       ev strategy.state (rightTensor (ι₁ := ι) H.toSubMeas.total) ≤
         ev strategy.state (rightTensor (ι₁ := ι) Hhat.total) := by
-    exact ev_mono strategy.state _ _ (rightTensor_mono hTotalLe)
+    exact ev_mono strategy.state _ _ (MIPStarRE.LDT.rightTensor_mono hTotalLe)
   exact
     final_fields_point_consistency_natural_of_total_expectation_le
       params strategy eps delta hhelperPoint hdata hTotalExpectationLe

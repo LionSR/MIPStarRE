@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.Basic.QuantumState
 import MIPStarRE.LDT.Basic.SubMeasurementFamilies
 import MIPStarRE.LDT.Commutativity.GCommStability.OverlapOne
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
@@ -23,14 +24,7 @@ lemma opTensor_mono_right_of_nonneg
     {A B₁ B₂ : MIPStarRE.Quantum.Op ι} :
     0 ≤ A → B₁ ≤ B₂ → opTensor A B₁ ≤ opTensor A B₂ := by
   intro hA hB
-  change Matrix.kronecker A B₁ ≤ Matrix.kronecker A B₂
-  letI : Finite ι := Finite.of_fintype ι
-  change (Matrix.kronecker A B₂ - Matrix.kronecker A B₁).PosSemidef
-  have hpsd : Matrix.PosSemidef (Matrix.kronecker A (B₂ - B₁)) := by
-    exact Matrix.nonneg_iff_posSemidef.mp <|
-      MIPStarRE.Quantum.kronecker_nonneg hA (sub_nonneg.mpr hB)
-  rw [MIPStarRE.Quantum.kronecker_sub_right]
-  exact hpsd
+  exact MIPStarRE.LDT.opTensor_mono_right hA hB
 
 lemma averagedSlicePointEvaluationOperator_nonneg
     (params : Parameters) [FieldModel params.q]
