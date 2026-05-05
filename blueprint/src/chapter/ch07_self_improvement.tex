@@ -740,7 +740,7 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
     prop:completeness-transfer-self-consistent-A, prop:triangle-sub,
     prop:two-notions-of-self-consistency,
     prop:triangle-inequality-for-approx_delta, prop:easy-approx-from-approx-delta}
-  The bound is trivial if one of $\eps$, $\delta$, or $d/q$ is at least~$1$, so assume all three are at most~$1$. Apply Lemma~\ref{lem:self-improvement-helper} to~$G$ and let $\widehat H \in \polysub{m}{q}{d}$ be the output, with
+  The bound is trivial if one of $\eps$, $\delta$, or $d/q$ is at least~$1$, so assume all three are at most~$1$.  In Lean, the third assumption is recorded as $d \le q$, which is equivalent to $d/q \le 1$ since $q>0$. Apply Lemma~\ref{lem:self-improvement-helper} to~$G$ and let $\widehat H \in \polysub{m}{q}{d}$ be the output, with
   \[
     \widehat{\zeta} = 100m \cdot \Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big).
   \]

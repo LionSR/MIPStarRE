@@ -56,6 +56,12 @@ private theorem d_q_ratio_nonneg (params : Parameters) :
     (0 : Error) ≤ ((params.d : Error) / (params.q : Error)) :=
   div_nonneg (by exact_mod_cast Nat.zero_le _) (le_of_lt params.q_cast_pos)
 
+private theorem d_q_ratio_le_one_of_d_le_q
+    (params : Parameters)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error)) :
+    ((params.d : Error) / (params.q : Error)) ≤ 1 :=
+  (div_le_one params.q_cast_pos).mpr hd_le_q
+
 /-- For `m ≥ 1`, `√(24m) ≤ 5m`. -/
 private theorem sqrt_24m_le_5m (params : Parameters) :
     Real.sqrt (24 * (params.m : Error)) ≤ 5 * (params.m : Error) := by
@@ -286,7 +292,8 @@ theorem helper_point_consistency_error_le_selfImprovementHelperError
 /-- Helper-stage strong-self-consistency absorption (`self_improvement.tex`,
 lines 595--603).
 
-`11 √ζ_variance + √(2δ) + md/q ≤ ζ̂`. -/
+`11 √ζ_variance + √(2δ) + md/q ≤ ζ̂`.  The hypothesis `hd_le_q`
+records the small-error branch `d/q ≤ 1` used in the paper, since `q > 0`. -/
 theorem helper_strong_self_consistency_error_le_selfImprovementHelperError
     (params : Parameters) [FieldModel params.q]
     (eps delta : Error)
@@ -298,11 +305,10 @@ theorem helper_strong_self_consistency_error_le_selfImprovementHelperError
       selfImprovementHelperError params eps delta := by
   have hmnonneg : (0 : Error) ≤ (params.m : Error) := m_cast_nonneg params
   have hm1 : (1 : Error) ≤ (params.m : Error) := one_le_m_cast params
-  have hqpos : (0 : Error) < (params.q : Error) := params.q_cast_pos
   have hdq_nonneg : (0 : Error) ≤ ((params.d : Error) / (params.q : Error)) :=
     d_q_ratio_nonneg params
   have hdq_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1 :=
-    (div_le_one hqpos).mpr hd_le_q
+    d_q_ratio_le_one_of_d_le_q params hd_le_q
   have hsqrtbound :=
     sqrt_selfImprovementVarianceError_le params eps delta heps hdelta
   -- `√(2δ) ≤ 2 √δ`, since `√2 ≤ 2`.
@@ -860,7 +866,9 @@ lines 803--810).
 The natural error emitted by the projective residual producer is
 `ζ̂ + √ζ̂_dataprocess`. Under the standard unit-interval hypotheses for
 `ε`, `δ`, and `d/q`, this theorem absorbs that natural error into the literal
-`selfImprovementError` threshold used by `SelfImprovementConclusion`. -/
+`selfImprovementError` threshold used by `SelfImprovementConclusion`.  Lean
+records the third unit-interval hypothesis as `d ≤ q`, equivalently `d/q ≤ 1`
+because `q` is positive. -/
 theorem final_fields_projective_residual_error_le_selfImprovementError
     (params : Parameters) [FieldModel params.q]
     (eps delta : Error)
@@ -870,9 +878,8 @@ theorem final_fields_projective_residual_error_le_selfImprovementError
     selfImprovementHelperError params eps delta +
         Real.sqrt (selfImprovementDataProcessingError params eps delta) ≤
       selfImprovementError params eps delta := by
-  have hqpos : (0 : Error) < (params.q : Error) := params.q_cast_pos
   have hdq_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1 :=
-    (div_le_one hqpos).mpr hd_le_q
+    d_q_ratio_le_one_of_d_le_q params hd_le_q
   have hhelper_mono :
       finalStagePowerSum params eps delta (1 / (2 : Error)) ≤
         finalStagePowerSum params eps delta (1 / (32 : Error)) :=
@@ -914,7 +921,9 @@ lines 803--810).
 The natural error emitted by the projective completeness transport is
 `2ζ̂ + 2 sqrt ζ̂_ortho`. Under the standard unit-interval hypotheses for
 `ε`, `δ`, and `d/q`, this theorem absorbs that natural error into the literal
-`selfImprovementError` threshold used by `SelfImprovementFinalFields`. -/
+`selfImprovementError` threshold used by `SelfImprovementFinalFields`.  Lean
+records the third unit-interval hypothesis as `d ≤ q`, equivalently `d/q ≤ 1`
+because `q` is positive. -/
 theorem final_fields_completeness_error_le_selfImprovementError
     (params : Parameters) [FieldModel params.q]
     (eps delta : Error)
@@ -924,9 +933,8 @@ theorem final_fields_completeness_error_le_selfImprovementError
     2 * selfImprovementHelperError params eps delta +
         2 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta) ≤
       selfImprovementError params eps delta := by
-  have hqpos : (0 : Error) < (params.q : Error) := params.q_cast_pos
   have hdq_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1 :=
-    (div_le_one hqpos).mpr hd_le_q
+    d_q_ratio_le_one_of_d_le_q params hd_le_q
   have hhelper_mono :
       finalStagePowerSum params eps delta (1 / (2 : Error)) ≤
         finalStagePowerSum params eps delta (1 / (32 : Error)) :=
@@ -977,6 +985,8 @@ The natural error emitted by the projective self-closeness transport is
 `3 * (ζ̂_ortho + 2ζ̂ + ζ̂_ortho)`. Under the standard unit-interval hypotheses
 for `ε`, `δ`, and `d/q`, this theorem absorbs that natural error into the
 literal `selfImprovementError` threshold used by `SelfImprovementFinalFields`.
+Lean records the third unit-interval hypothesis as `d ≤ q`, equivalently
+`d/q ≤ 1` because `q` is positive.
 -/
 theorem final_fields_self_closeness_error_le_selfImprovementError
     (params : Parameters) [FieldModel params.q]
@@ -988,9 +998,8 @@ theorem final_fields_self_closeness_error_le_selfImprovementError
         2 * selfImprovementHelperError params eps delta +
         selfImprovementOrthogonalizationError params eps delta) ≤
       selfImprovementError params eps delta := by
-  have hqpos : (0 : Error) < (params.q : Error) := params.q_cast_pos
   have hdq_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1 :=
-    (div_le_one hqpos).mpr hd_le_q
+    d_q_ratio_le_one_of_d_le_q params hd_le_q
   have horth_mono :
       finalStagePowerSum params eps delta (1 / (8 : Error)) ≤
         finalStagePowerSum params eps delta (1 / (32 : Error)) :=
@@ -1038,7 +1047,8 @@ parameters.
 This formalizes the leading exponent-monotonicity step of the paper's chained
 absorption in `self_improvement.tex`, lines 803--810. It is the foundational
 final-stage threshold from which the producer-side projective-output
-absorptions are derived. -/
+absorptions are derived.  The hypothesis `hd_le_q` records the paper's
+small-error branch `d/q ≤ 1`, using positivity of `q`. -/
 theorem thirty_selfImprovementHelperError_le_selfImprovementError
     (params : Parameters) [FieldModel params.q]
     (eps delta : Error)
@@ -1047,9 +1057,8 @@ theorem thirty_selfImprovementHelperError_le_selfImprovementError
     (hd_le_q : (params.d : Error) ≤ (params.q : Error)) :
     30 * selfImprovementHelperError params eps delta ≤
       selfImprovementError params eps delta := by
-  have hqpos : (0 : Error) < (params.q : Error) := params.q_cast_pos
   have hdq_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1 :=
-    (div_le_one hqpos).mpr hd_le_q
+    d_q_ratio_le_one_of_d_le_q params hd_le_q
   have hmono :
       finalStagePowerSum params eps delta (1 / (2 : Error)) ≤
         finalStagePowerSum params eps delta (1 / (32 : Error)) :=
