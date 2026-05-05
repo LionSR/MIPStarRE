@@ -20,6 +20,9 @@ self-closeness producers.
 
 - **selfImprovementHelper** — reduced helper producing `T`, `Ĥ`, `Z` and
   `SelfImprovementHelperConclusion` from `sdp` + `addInU`.
+- **selfImprovementHelperWithSlackness** — companion helper producing the
+  slackness-carrying helper conclusion from an SDP statement whose witnesses
+  already include complementary slackness.
 - **selfImprovement** — `thm:self-improvement`: assembles the full
   pipeline (helper SSC → orthonormalization → data processing →
   final fields) to produce `SelfImprovementConclusion`.
@@ -101,6 +104,50 @@ lemma selfImprovementHelper
       dualDominatesAveragedPoint := hsdp.dualFeasible }
   · simpa [T] using hsdp
   · exact addInU params strategy eps delta gamma hgood T
+
+/-- Helper lemma driven by an SDP statement carrying complementary slackness.
+
+This is the paper-facing companion to `selfImprovementHelper`: if the SDP
+stage supplies the strong-duality conclusion recorded in
+`SdpStatementWithSlackness`, then the helper output also carries the
+complementary-slackness equations needed by the helper-completeness chain. The
+reduced theorem `selfImprovementHelper` remains separate, because its current
+`sdp` input has not yet formalized the strong-duality argument. -/
+lemma selfImprovementHelperWithSlackness
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (hsdp : SdpStatementWithSlackness params strategy)
+    (hgood : strategy.IsGood eps delta gamma)
+    (_nu : Error)
+    -- Kept for API compatibility with the full helper statement, where future
+    -- proof obligations will depend on the incoming polynomial measurement.
+    (_G : Measurement (Polynomial params) ι) :
+    ∃ T : Measurement (Polynomial params) ι,
+      ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+        SelfImprovementHelperConclusionWithSlackness params strategy T H Z eps delta := by
+  obtain ⟨Tsub, Z, hsdpPair⟩ := hsdp.witness
+  let T : Measurement (Polynomial params) ι :=
+    { toSubMeas := Tsub
+      total_eq_one := hsdpPair.toSdpOptimalPair.primalTotalOperator }
+  let Hhat : SubMeas (Polynomial params) ι :=
+    averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas
+  refine ⟨T, Hhat, Z, ?_⟩
+  refine
+    { toHelperConclusion := ?_
+      complementarySlackness := ?_ }
+  · refine
+      { sdpWitness := ?_
+        averagedConstruction := rfl
+        addInUVarianceBound := ?_
+        positiveSemidefiniteWitness := hsdpPair.toSdpOptimalPair.dualPositive
+        oneLeDualWitness := hsdpPair.toSdpOptimalPair.dualDominatesIdentity
+        dualDominatesAveragedPoint := hsdpPair.toSdpOptimalPair.dualFeasible }
+    · simpa [T] using hsdpPair.toSdpOptimalPair
+    · exact addInU params strategy eps delta gamma hgood T
+  · intro g
+    simpa [T] using hsdpPair.complementarySlackness g
 
 /-- `thm:self-improvement`.
 
