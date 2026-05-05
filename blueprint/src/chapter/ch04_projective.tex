@@ -946,6 +946,7 @@
 			MIPStarRE.LDT.MakingMeasurementsProjective.exists_unitary_rows_extending_orthonormal,
 			MIPStarRE.LDT.MakingMeasurementsProjective.exists_unitary_with_positive_gram_spectrum_rows,
 			MIPStarRE.LDT.MakingMeasurementsProjective.exists_unitary_with_positive_gram_spectrum_rows_of_card,
+			MIPStarRE.LDT.MakingMeasurementsProjective.exists_rectangular_coisometry_extending_orthonormal_rows,
 			MIPStarRE.LDT.MakingMeasurementsProjective.exists_unitary_with_qxp_positive_gram_spectrum_rows,
 			MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_isHermitian_of_x_squared,
 			MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_coisometry,
@@ -974,7 +975,10 @@
 		\texttt{exists\_unitary\_with\_positive\_gram\_spectrum\_rows} records the
 		next finite-dimensional step: after choosing distinct row positions for the
 		positive spectrum, these normalized image rows extend to a square unitary
-		matrix on the row space.  The formal lemma
+		matrix on the row space.  The companion lemma
+		\texttt{exists\_rectangular\_coisometry\_extending\_orthonormal\_rows}
+		records the analogous rectangular completion for prescribed right rows
+		when the dimension bound permits it.  The formal lemma
 		\texttt{rectangularSvd\_xHat\_coisometry} records the corresponding matrix
 		calculation, and \texttt{exists\_xHat\_of\_rectangularSvd} packages the
 		resulting choice of $\widehat X$ together with the mixed square-root identity

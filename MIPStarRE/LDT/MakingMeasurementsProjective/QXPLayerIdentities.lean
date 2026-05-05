@@ -662,6 +662,52 @@ theorem exists_unitary_with_positive_gram_spectrum_rows_of_card
     Classical.choice (Function.Embedding.nonempty_of_card_le hcard)
   exact ⟨e, exists_unitary_with_positive_gram_spectrum_rows X Q hQ hgram e⟩
 
+/-- Extend an orthonormal row family to a rectangular coisometry.
+
+The embedding `e : κ ↪ μ` specifies the rows of the rectangular matrix which
+must agree with the prescribed family.  The dimension hypothesis
+`Fintype.card μ ≤ Fintype.card ν` supplies enough room to complete these rows
+to an orthonormal family indexed by all of `μ`. -/
+theorem exists_rectangular_coisometry_extending_orthonormal_rows
+    {κ μ ν : Type*} [Fintype μ] [DecidableEq μ] [Fintype ν]
+    (row : κ → EuclideanSpace ℂ ν)
+    (hrow : Orthonormal ℂ row)
+    (e : κ ↪ μ)
+    (hcard : Fintype.card μ ≤ Fintype.card ν) :
+    ∃ W : Matrix μ ν ℂ,
+      W * Wᴴ = (1 : Matrix μ μ ℂ) ∧
+        ∀ (i : κ) (r : ν), W (e i) r = row i r := by
+  classical
+  let f : μ ↪ ν := Classical.choice (Function.Embedding.nonempty_of_card_le hcard)
+  let fe : κ ↪ ν := e.trans f
+  let invRange : Set.range fe → κ := (Equiv.ofInjective fe fe.injective).symm
+  let rowFull : ν → EuclideanSpace ℂ ν := fun j =>
+    if hj : j ∈ Set.range fe then row (invRange ⟨j, hj⟩) else 0
+  have hrowFull : ∀ i : κ, rowFull (fe i) = row i := by
+    intro i
+    simp [rowFull, invRange, Equiv.ofInjective_symm_apply]
+  have horthRange : Orthonormal ℂ ((Set.range fe).restrict rowFull) := by
+    have hcomp : Orthonormal ℂ (fun x : Set.range fe => row (invRange x)) :=
+      hrow.comp invRange (Equiv.injective _)
+    convert hcomp with x
+    change rowFull x = row (invRange x)
+    change (if hj : (x : ν) ∈ Set.range fe then row (invRange ⟨x, hj⟩) else 0) =
+      row (invRange x)
+    rw [dif_pos x.2]
+  obtain ⟨b, hb⟩ :=
+    Orthonormal.exists_orthonormalBasis_extension_of_card_eq
+      (𝕜 := ℂ) (E := EuclideanSpace ℂ ν) (ι := ν)
+      (card_ι := by simp) (v := rowFull) (s := Set.range fe) horthRange
+  let W : Matrix μ ν ℂ := Matrix.of fun i r => b (f i) r
+  have hleft : W * Wᴴ = (1 : Matrix μ μ ℂ) := by
+    simpa [W] using
+      Matrix.mul_conjTranspose_eq_one_of_orthonormal_rows
+        (fun i : μ => b (f i)) (b.orthonormal.comp f f.injective)
+  refine ⟨W, hleft, ?_⟩
+  intro i r
+  change (b (fe i)) r = row i r
+  rw [hb (fe i) ⟨i, rfl⟩, hrowFull i]
+
 /-- The row-coisometry identity for the rectangular SVD choice of `Xhat`.
 
 If `U` and `V` are unitary in the directions used below, and if the rectangular
