@@ -213,6 +213,53 @@ lemma add_in_u_cs_chain_q3_q4_le_sqrt_of_factor_bounds
           globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
   le_sqrt_of_factor_bounds_left hCS hD₁_le_one hD₂_le
 
+/-- Weighted finite Cauchy--Schwarz with the summand restricted to a selected
+support.
+
+The ordinary add-in-`u` Step 3/4 estimates are the specialization in which
+`selected` is everywhere true.  The selected estimates use the actual fiber
+condition `(o,h) ∈ S_u`, with the complement represented by zero summands. -/
+private theorem addInU_weightedFinsetCauchySchwarz_on_selectedSupport
+    {Question Outcome : Type*} [Fintype Outcome]
+    (𝒟 : Distribution Question)
+    (selected : Question → Outcome → Prop)
+    [∀ q a, Decidable (selected q a)]
+    (t x y : Question → Outcome → Error)
+    (ht :
+      ∀ q a, selected q a →
+        |t q a| ≤ Real.sqrt (x q a) * Real.sqrt (y q a))
+    (hx : ∀ q a, selected q a → 0 ≤ x q a)
+    (hy : ∀ q a, selected q a → 0 ≤ y q a) :
+    |avgOver 𝒟 (fun q =>
+      ∑ a : Outcome, if selected q a then t q a else 0)| ≤
+      Real.sqrt
+        (avgOver 𝒟 (fun q =>
+          ∑ a : Outcome, if selected q a then x q a else 0)) *
+      Real.sqrt
+        (avgOver 𝒟 (fun q =>
+          ∑ a : Outcome, if selected q a then y q a else 0)) := by
+  simpa using
+    MIPStarRE.LDT.Preliminaries.weightedFinsetCauchySchwarz
+      𝒟
+      (fun q a => if h : selected q a then t q a else 0)
+      (fun q a => if h : selected q a then x q a else 0)
+      (fun q a => if h : selected q a then y q a else 0)
+      (by
+        intro q a
+        by_cases hsel : selected q a
+        · simpa [hsel] using ht q a hsel
+        · simp [hsel])
+      (by
+        intro q a
+        by_cases hsel : selected q a
+        · simpa [hsel] using hx q a hsel
+        · simp [hsel])
+      (by
+        intro q a
+        by_cases hsel : selected q a
+        · simpa [hsel] using hy q a hsel
+        · simp [hsel])
+
 /-- Factored operator Cauchy--Schwarz bound for the `Q₂ → Q₃` add-in-`u` step.
 
 Applies the bipartite-tensor sandwich Cauchy--Schwarz primitive
@@ -475,98 +522,82 @@ private theorem addInU_selected_cs_chain_step3_factored_cs
             else 0)) := by
   classical
   rw [addInU_selected_cs_chain_step3_diff_eq params strategy M T S]
-  simpa [Finset.sum_filter] using
-    MIPStarRE.LDT.Preliminaries.weightedFinsetCauchySchwarz
-      (Question := Point params × Point params)
-      (Outcome := Outcome × Polynomial params)
-      (uniformDistribution (Point params × Point params))
+  simpa using
+    addInU_weightedFinsetCauchySchwarz_on_selectedSupport
+      (𝒟 := uniformDistribution (Point params × Point params))
+      (selected := fun uv ah => ah ∈ addInUSelectionPairs params S uv.1)
       (t := fun uv ah =>
-        if ah ∈ addInUSelectionPairs params S uv.1 then
-          let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
-          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
-          let Moh := (M uv.1).outcome ah.1
-          ev strategy.state (opTensor ((Av - Au) * Moh * Av) (T.outcome ah.2))
-        else 0)
+        let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
+        let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+        let Moh := (M uv.1).outcome ah.1
+        ev strategy.state (opTensor ((Av - Au) * Moh * Av) (T.outcome ah.2)))
       (x := fun uv ah =>
-        if ah ∈ addInUSelectionPairs params S uv.1 then
-          let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
-          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
-          let Moh := (M uv.1).outcome ah.1
-          ev strategy.state
-            (opTensor ((Av - Au) * Moh * (Av - Au)) (T.outcome ah.2))
-        else 0)
+        let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
+        let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+        let Moh := (M uv.1).outcome ah.1
+        ev strategy.state
+          (opTensor ((Av - Au) * Moh * (Av - Au)) (T.outcome ah.2)))
       (y := fun uv ah =>
-        if ah ∈ addInUSelectionPairs params S uv.1 then
-          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
-          let Moh := (M uv.1).outcome ah.1
-          ev strategy.state (opTensor (Av * Moh * Av) (T.outcome ah.2))
-        else 0)
+        let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+        let Moh := (M uv.1).outcome ah.1
+        ev strategy.state (opTensor (Av * Moh * Av) (T.outcome ah.2)))
       (by
-        intro uv ah
-        by_cases hmem : ah ∈ addInUSelectionPairs params S uv.1
-        · simp only [hmem, ↓reduceIte]
-          set Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
-          set Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
-          set Moh := (M uv.1).outcome ah.1
-          have hMoh_pos : 0 ≤ Moh := (M uv.1).outcome_pos ah.1
-          have hTh_pos : 0 ≤ T.outcome ah.2 := T.outcome_pos ah.2
-          have hAu_herm : Auᴴ = Au :=
-            SubMeas.outcome_hermitian (strategy.pointMeasurement uv.1).toSubMeas
-              (ah.2 uv.1)
-          have hAv_herm : Avᴴ = Av :=
-            SubMeas.outcome_hermitian (strategy.pointMeasurement uv.2).toSubMeas
-              (ah.2 uv.2)
-          have hX_herm : (Av - Au)ᴴ = Av - Au := by
-            rw [Matrix.conjTranspose_sub, hAu_herm, hAv_herm]
-          have hsandwich :=
-            ev_opTensor_sandwich_abs_le_sqrt strategy.state (Av - Au) Av Moh
-              (T.outcome ah.2) hMoh_pos hTh_pos
-          simpa only [hX_herm, hAv_herm] using hsandwich
-        · simp [hmem])
+        intro uv ah _hmem
+        set Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
+        set Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+        set Moh := (M uv.1).outcome ah.1
+        have hMoh_pos : 0 ≤ Moh := (M uv.1).outcome_pos ah.1
+        have hTh_pos : 0 ≤ T.outcome ah.2 := T.outcome_pos ah.2
+        have hAu_herm : Auᴴ = Au :=
+          SubMeas.outcome_hermitian (strategy.pointMeasurement uv.1).toSubMeas
+            (ah.2 uv.1)
+        have hAv_herm : Avᴴ = Av :=
+          SubMeas.outcome_hermitian (strategy.pointMeasurement uv.2).toSubMeas
+            (ah.2 uv.2)
+        have hX_herm : (Av - Au)ᴴ = Av - Au := by
+          rw [Matrix.conjTranspose_sub, hAu_herm, hAv_herm]
+        have hsandwich :=
+          ev_opTensor_sandwich_abs_le_sqrt strategy.state (Av - Au) Av Moh
+            (T.outcome ah.2) hMoh_pos hTh_pos
+        simpa only [hX_herm, hAv_herm] using hsandwich)
       (by
-        intro uv ah
-        by_cases hmem : ah ∈ addInUSelectionPairs params S uv.1
-        · simp only [hmem, ↓reduceIte]
-          set Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
-          set Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
-          set Moh := (M uv.1).outcome ah.1
-          have hMoh_pos : 0 ≤ Moh := (M uv.1).outcome_pos ah.1
-          have hTh_pos : 0 ≤ T.outcome ah.2 := T.outcome_pos ah.2
-          have hAu_herm : Auᴴ = Au :=
-            SubMeas.outcome_hermitian (strategy.pointMeasurement uv.1).toSubMeas
-              (ah.2 uv.1)
-          have hAv_herm : Avᴴ = Av :=
-            SubMeas.outcome_hermitian (strategy.pointMeasurement uv.2).toSubMeas
-              (ah.2 uv.2)
-          have hX_herm : (Av - Au)ᴴ = Av - Au := by
-            rw [Matrix.conjTranspose_sub, hAu_herm, hAv_herm]
-          have hXMohX_pos : 0 ≤ (Av - Au) * Moh * (Av - Au) := by
-            have :=
-              ((Matrix.nonneg_iff_posSemidef.mp hMoh_pos).conjTranspose_mul_mul_same
-                (Av - Au)).nonneg
-            rwa [hX_herm] at this
-          exact ev_nonneg_of_psd strategy.state _
-            (opTensor_nonneg hXMohX_pos hTh_pos)
-        · simp [hmem])
+        intro uv ah _hmem
+        set Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
+        set Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+        set Moh := (M uv.1).outcome ah.1
+        have hMoh_pos : 0 ≤ Moh := (M uv.1).outcome_pos ah.1
+        have hTh_pos : 0 ≤ T.outcome ah.2 := T.outcome_pos ah.2
+        have hAu_herm : Auᴴ = Au :=
+          SubMeas.outcome_hermitian (strategy.pointMeasurement uv.1).toSubMeas
+            (ah.2 uv.1)
+        have hAv_herm : Avᴴ = Av :=
+          SubMeas.outcome_hermitian (strategy.pointMeasurement uv.2).toSubMeas
+            (ah.2 uv.2)
+        have hX_herm : (Av - Au)ᴴ = Av - Au := by
+          rw [Matrix.conjTranspose_sub, hAu_herm, hAv_herm]
+        have hXMohX_pos : 0 ≤ (Av - Au) * Moh * (Av - Au) := by
+          have :=
+            ((Matrix.nonneg_iff_posSemidef.mp hMoh_pos).conjTranspose_mul_mul_same
+              (Av - Au)).nonneg
+          rwa [hX_herm] at this
+        exact ev_nonneg_of_psd strategy.state _
+          (opTensor_nonneg hXMohX_pos hTh_pos))
       (by
-        intro uv ah
-        by_cases hmem : ah ∈ addInUSelectionPairs params S uv.1
-        · simp only [hmem, ↓reduceIte]
-          set Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
-          set Moh := (M uv.1).outcome ah.1
-          have hMoh_pos : 0 ≤ Moh := (M uv.1).outcome_pos ah.1
-          have hTh_pos : 0 ≤ T.outcome ah.2 := T.outcome_pos ah.2
-          have hAv_herm : Avᴴ = Av :=
-            SubMeas.outcome_hermitian (strategy.pointMeasurement uv.2).toSubMeas
-              (ah.2 uv.2)
-          have hAvMohAv_pos : 0 ≤ Av * Moh * Av := by
-            have :=
-              ((Matrix.nonneg_iff_posSemidef.mp hMoh_pos).conjTranspose_mul_mul_same
-                Av).nonneg
-            rwa [hAv_herm] at this
-          exact ev_nonneg_of_psd strategy.state _
-            (opTensor_nonneg hAvMohAv_pos hTh_pos)
-        · simp [hmem])
+        intro uv ah _hmem
+        set Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+        set Moh := (M uv.1).outcome ah.1
+        have hMoh_pos : 0 ≤ Moh := (M uv.1).outcome_pos ah.1
+        have hTh_pos : 0 ≤ T.outcome ah.2 := T.outcome_pos ah.2
+        have hAv_herm : Avᴴ = Av :=
+          SubMeas.outcome_hermitian (strategy.pointMeasurement uv.2).toSubMeas
+            (ah.2 uv.2)
+        have hAvMohAv_pos : 0 ≤ Av * Moh * Av := by
+          have :=
+            ((Matrix.nonneg_iff_posSemidef.mp hMoh_pos).conjTranspose_mul_mul_same
+              Av).nonneg
+          rwa [hAv_herm] at this
+        exact ev_nonneg_of_psd strategy.state _
+          (opTensor_nonneg hAvMohAv_pos hTh_pos))
 
 /-- Selected factored Cauchy--Schwarz bound for the `Q₃ → Q₄` add-in-`u` step.
 
@@ -603,98 +634,82 @@ private theorem addInU_selected_cs_chain_step4_factored_cs
             else 0)) := by
   classical
   rw [addInU_selected_cs_chain_step4_diff_eq params strategy M T S]
-  simpa [Finset.sum_filter] using
-    MIPStarRE.LDT.Preliminaries.weightedFinsetCauchySchwarz
-      (Question := Point params × Point params)
-      (Outcome := Outcome × Polynomial params)
-      (uniformDistribution (Point params × Point params))
+  simpa using
+    addInU_weightedFinsetCauchySchwarz_on_selectedSupport
+      (𝒟 := uniformDistribution (Point params × Point params))
+      (selected := fun uv ah => ah ∈ addInUSelectionPairs params S uv.1)
       (t := fun uv ah =>
-        if ah ∈ addInUSelectionPairs params S uv.1 then
-          let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
-          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
-          let Moh := (M uv.1).outcome ah.1
-          ev strategy.state (opTensor (Au * Moh * (Av - Au)) (T.outcome ah.2))
-        else 0)
+        let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
+        let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+        let Moh := (M uv.1).outcome ah.1
+        ev strategy.state (opTensor (Au * Moh * (Av - Au)) (T.outcome ah.2)))
       (x := fun uv ah =>
-        if ah ∈ addInUSelectionPairs params S uv.1 then
-          let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
-          let Moh := (M uv.1).outcome ah.1
-          ev strategy.state (opTensor (Au * Moh * Au) (T.outcome ah.2))
-        else 0)
+        let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
+        let Moh := (M uv.1).outcome ah.1
+        ev strategy.state (opTensor (Au * Moh * Au) (T.outcome ah.2)))
       (y := fun uv ah =>
-        if ah ∈ addInUSelectionPairs params S uv.1 then
-          let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
-          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
-          let Moh := (M uv.1).outcome ah.1
-          ev strategy.state
-            (opTensor ((Av - Au) * Moh * (Av - Au)) (T.outcome ah.2))
-        else 0)
+        let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
+        let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+        let Moh := (M uv.1).outcome ah.1
+        ev strategy.state
+          (opTensor ((Av - Au) * Moh * (Av - Au)) (T.outcome ah.2)))
       (by
-        intro uv ah
-        by_cases hmem : ah ∈ addInUSelectionPairs params S uv.1
-        · simp only [hmem, ↓reduceIte]
-          set Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
-          set Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
-          set Moh := (M uv.1).outcome ah.1
-          have hMoh_pos : 0 ≤ Moh := (M uv.1).outcome_pos ah.1
-          have hTh_pos : 0 ≤ T.outcome ah.2 := T.outcome_pos ah.2
-          have hAu_herm : Auᴴ = Au :=
-            SubMeas.outcome_hermitian (strategy.pointMeasurement uv.1).toSubMeas
-              (ah.2 uv.1)
-          have hAv_herm : Avᴴ = Av :=
-            SubMeas.outcome_hermitian (strategy.pointMeasurement uv.2).toSubMeas
-              (ah.2 uv.2)
-          have hY_herm : (Av - Au)ᴴ = Av - Au := by
-            rw [Matrix.conjTranspose_sub, hAu_herm, hAv_herm]
-          have hsandwich :=
-            ev_opTensor_sandwich_abs_le_sqrt strategy.state Au (Av - Au) Moh
-              (T.outcome ah.2) hMoh_pos hTh_pos
-          simpa only [hAu_herm, hY_herm] using hsandwich
-        · simp [hmem])
+        intro uv ah _hmem
+        set Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
+        set Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+        set Moh := (M uv.1).outcome ah.1
+        have hMoh_pos : 0 ≤ Moh := (M uv.1).outcome_pos ah.1
+        have hTh_pos : 0 ≤ T.outcome ah.2 := T.outcome_pos ah.2
+        have hAu_herm : Auᴴ = Au :=
+          SubMeas.outcome_hermitian (strategy.pointMeasurement uv.1).toSubMeas
+            (ah.2 uv.1)
+        have hAv_herm : Avᴴ = Av :=
+          SubMeas.outcome_hermitian (strategy.pointMeasurement uv.2).toSubMeas
+            (ah.2 uv.2)
+        have hY_herm : (Av - Au)ᴴ = Av - Au := by
+          rw [Matrix.conjTranspose_sub, hAu_herm, hAv_herm]
+        have hsandwich :=
+          ev_opTensor_sandwich_abs_le_sqrt strategy.state Au (Av - Au) Moh
+            (T.outcome ah.2) hMoh_pos hTh_pos
+        simpa only [hAu_herm, hY_herm] using hsandwich)
       (by
-        intro uv ah
-        by_cases hmem : ah ∈ addInUSelectionPairs params S uv.1
-        · simp only [hmem, ↓reduceIte]
-          set Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
-          set Moh := (M uv.1).outcome ah.1
-          have hMoh_pos : 0 ≤ Moh := (M uv.1).outcome_pos ah.1
-          have hTh_pos : 0 ≤ T.outcome ah.2 := T.outcome_pos ah.2
-          have hAu_herm : Auᴴ = Au :=
-            SubMeas.outcome_hermitian (strategy.pointMeasurement uv.1).toSubMeas
-              (ah.2 uv.1)
-          have hAuMohAu_pos : 0 ≤ Au * Moh * Au := by
-            have :=
-              ((Matrix.nonneg_iff_posSemidef.mp hMoh_pos).conjTranspose_mul_mul_same
-                Au).nonneg
-            rwa [hAu_herm] at this
-          exact ev_nonneg_of_psd strategy.state _
-            (opTensor_nonneg hAuMohAu_pos hTh_pos)
-        · simp [hmem])
+        intro uv ah _hmem
+        set Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
+        set Moh := (M uv.1).outcome ah.1
+        have hMoh_pos : 0 ≤ Moh := (M uv.1).outcome_pos ah.1
+        have hTh_pos : 0 ≤ T.outcome ah.2 := T.outcome_pos ah.2
+        have hAu_herm : Auᴴ = Au :=
+          SubMeas.outcome_hermitian (strategy.pointMeasurement uv.1).toSubMeas
+            (ah.2 uv.1)
+        have hAuMohAu_pos : 0 ≤ Au * Moh * Au := by
+          have :=
+            ((Matrix.nonneg_iff_posSemidef.mp hMoh_pos).conjTranspose_mul_mul_same
+              Au).nonneg
+          rwa [hAu_herm] at this
+        exact ev_nonneg_of_psd strategy.state _
+          (opTensor_nonneg hAuMohAu_pos hTh_pos))
       (by
-        intro uv ah
-        by_cases hmem : ah ∈ addInUSelectionPairs params S uv.1
-        · simp only [hmem, ↓reduceIte]
-          set Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
-          set Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
-          set Moh := (M uv.1).outcome ah.1
-          have hMoh_pos : 0 ≤ Moh := (M uv.1).outcome_pos ah.1
-          have hTh_pos : 0 ≤ T.outcome ah.2 := T.outcome_pos ah.2
-          have hAu_herm : Auᴴ = Au :=
-            SubMeas.outcome_hermitian (strategy.pointMeasurement uv.1).toSubMeas
-              (ah.2 uv.1)
-          have hAv_herm : Avᴴ = Av :=
-            SubMeas.outcome_hermitian (strategy.pointMeasurement uv.2).toSubMeas
-              (ah.2 uv.2)
-          have hY_herm : (Av - Au)ᴴ = Av - Au := by
-            rw [Matrix.conjTranspose_sub, hAu_herm, hAv_herm]
-          have hYMohY_pos : 0 ≤ (Av - Au) * Moh * (Av - Au) := by
-            have :=
-              ((Matrix.nonneg_iff_posSemidef.mp hMoh_pos).conjTranspose_mul_mul_same
-                (Av - Au)).nonneg
-            rwa [hY_herm] at this
-          exact ev_nonneg_of_psd strategy.state _
-            (opTensor_nonneg hYMohY_pos hTh_pos)
-        · simp [hmem])
+        intro uv ah _hmem
+        set Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
+        set Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+        set Moh := (M uv.1).outcome ah.1
+        have hMoh_pos : 0 ≤ Moh := (M uv.1).outcome_pos ah.1
+        have hTh_pos : 0 ≤ T.outcome ah.2 := T.outcome_pos ah.2
+        have hAu_herm : Auᴴ = Au :=
+          SubMeas.outcome_hermitian (strategy.pointMeasurement uv.1).toSubMeas
+            (ah.2 uv.1)
+        have hAv_herm : Avᴴ = Av :=
+          SubMeas.outcome_hermitian (strategy.pointMeasurement uv.2).toSubMeas
+            (ah.2 uv.2)
+        have hY_herm : (Av - Au)ᴴ = Av - Au := by
+          rw [Matrix.conjTranspose_sub, hAu_herm, hAv_herm]
+        have hYMohY_pos : 0 ≤ (Av - Au) * Moh * (Av - Au) := by
+          have :=
+            ((Matrix.nonneg_iff_posSemidef.mp hMoh_pos).conjTranspose_mul_mul_same
+              (Av - Au)).nonneg
+          rwa [hY_herm] at this
+        exact ev_nonneg_of_psd strategy.state _
+          (opTensor_nonneg hYMohY_pos hTh_pos))
 
 /-- A selected sandwich tensor sum is bounded by replacing the selected
 submeasurement mass with the identity.
