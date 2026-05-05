@@ -21,60 +21,69 @@
 %     Use \leanid{Name} for Lean identifiers, \ghissue{N} for issues,
 %     \ghpr{N} for pull requests, \doclink{path/to/File.lean} for doc-gen links.
 %   - Write in the first-person plural, active voice, direct sentences.
-%   - No \noindent\textbf{Verdict:} labels - the Conclusion section IS the verdict.
-%   - The body must read as pure mathematical prose.
-%   - Be concise: answer what the source uses, what was checked, and the
-%     verdict in the first page when possible. Avoid audit-log chronology.
-%   - Displayed equations should be clean; do not pack \text{...} annotations
-%     or formal declaration names into displayed math.
+%   - Begin with a concise estimate when the note concerns formalization work.
+%   - State the mathematical forms of the key theorems to prove or use.
+%   - No \noindent\textbf{Verdict:} labels: the Conclusion section is the verdict.
+%   - The body must read as mathematical prose, not as an audit log.
 %   - Compile from the repository root with pdflatex.
 
-\section{The assertion}
+\section{At a glance}
+
+\begin{itemize}
+  \item \textbf{Difficulty.} Easy, medium, or hard, with one sentence explaining why.
+  \item \textbf{Estimated weight.} Roughly how many new definitions or theorem
+  interfaces and how many lines of formal proof are expected.  Give a range.
+  \item \textbf{Mathlib/project split.} Estimate the percentage that should be
+  direct Mathlib reuse versus project-local development.
+  \item \textbf{Key Mathlib inputs.} List the main mathematical APIs or modules,
+  not every imported file.
+\end{itemize}
+
+\section{The source assertion}
 
 We examine a step in \cite{Ji2020LowIndividualDegree}.%
 \footnote{Tracked in \ghissue{NNN}. The paper passage is at
 \path{references/ldt-paper/FILE.tex}, lines~A--B.}
-Let the cited source state
+In the notation of the paper, the cited source needs
 \[
   \mathcal H \Longrightarrow C.
-  \tag{\path{thm:model-source}}
+  \tag{\texttt{source-label}}
 \]
-The notation is fixed: $\mathcal H$ is the available hypothesis set,
-and $C$ is the conclusion required later in the argument.
+Here $\mathcal H$ is the available hypothesis set, and $C$ is the conclusion
+used later.
 
-\section{The point at issue}
+\section{Key theorem forms}
 
-The proof of the displayed implication invokes a lemma which, in the
-special case used, proves
+The formalization should isolate the following mathematical statements.
+\begin{enumerate}
+  \item \textbf{Source theorem form.}  State the theorem exactly as the paper uses it.
+  \item \textbf{Adapter theorem form.}  State any translation between the paper
+  objects and the formal objects.
+  \item \textbf{Downstream theorem form.}  State the exact conclusion consumed
+  later in the proof.
+\end{enumerate}
+Keep declaration names in a footnote if they are needed for traceability.%
+\footnote{For example, the formal declarations might be \leanid{modelSource},
+\leanid{modelAdapter}, and \leanid{modelDownstream} in
+\doclink{MIPStarRE/Path/To/File.lean}.}
+
+\section{Comparison with the blueprint and formalization}
+
+The blueprint should either match the cited source or explicitly record the
+changed theorem form.  The formal development proves the corrected or adapted
+statement
 \[
   \mathcal H \land \mathcal K \Longrightarrow C,
-  \tag{\path{lem:model-input}}
 \]
-where $\mathcal K$ is an additional hypothesis. If the surrounding
-argument does not prove $\mathcal K$, then $\mathcal H\Rightarrow C$
-has not been justified. The mathematical question is whether
-$\mathcal K$ follows from $\mathcal H$, must be added to the statement,
-or can be avoided by a different argument.
-
-\section{The formal statement}
-
-The formal development proves\footnote{The declaration is
-\leanid{modelCorrected} in \doclink{MIPStarRE/Path/To/File.lean}.}
-\[
-  \mathcal H \land \mathcal K \Longrightarrow C.
-\]
-This strengthens the hypotheses rather than deriving $\mathcal K$ from
-the original assumptions. The formal declaration confirms the
-corrected mathematical statement; it is not a substitute for explaining
-that statement in prose.
+where $\mathcal K$ is the additional input isolated above.  Explain in prose
+whether $\mathcal K$ is already available, still open, or unnecessary after a
+different argument.
 
 \section{Conclusion}
 
-The original proof requires the additional hypothesis $\mathcal K$.
-The corrected statement suffices for the surrounding argument whenever
-$\mathcal K$ is supplied. Without a derivation of $\mathcal K$ or a
-different proof of $C$, the original implication
-$\mathcal H\Rightarrow C$ remains unjustified.
+State the verdict plainly.  For example: the source statement is correct and the
+remaining work is formalization; the source proof needs an additional
+hypothesis; or there is no discrepancy and no further action is needed.
 
 \bibliographystyle{alpha}
 \bibliography{references}

@@ -49,20 +49,26 @@ prose.
 \section{Concision and Readability}
 
 A paper-gap note should be short enough that a reader can understand the issue
-in one sitting.  The first page should answer three questions: what the source
-uses, what the formalization or audit checked, and what the current verdict is.
-Most notes should have four sections: the source assertion, the mathematical
-mechanism being checked, the blueprint/formal comparison, and the conclusion.
-Use more sections only when a counterexample or long derivation genuinely needs
-room.
+in one sitting.  The first page should answer four questions: what the source
+uses, how hard the remaining formal work is, what the formalization or audit
+checked, and what the current verdict is.  Begin with a short
+\emph{At a glance} section when the note concerns an open or recently resolved
+formalization task.  That section should estimate the difficulty, the rough
+implementation weight, the split between Mathlib reuse and project-local work,
+and the key Mathlib APIs or modules.  Use honest ranges, not false precision.
+
+Most notes should then have four mathematical sections: the source assertion,
+the mechanism being checked, the key theorem forms to develop or use, and the
+blueprint/formal comparison, followed by the conclusion.  Use more sections only
+when a counterexample or long derivation genuinely needs room.
 
 Keep background to the minimum needed for the local point.  Prefer one clear
 special case over a general restatement of the surrounding theorem.  Use displayed
-equations for the source assertion, the key calculation, and the corrected or
-formal statement; avoid displays for traceability data, declaration names, or
-long lists.  The section ``Form of the Note'' below specifies where such
-traceability data belongs; the body should read as mathematical prose, not as a
-log of what commands were run.
+equations for the source assertion, the key calculation, and the theorem forms;
+avoid displays for traceability data, declaration names, or long lists.  The
+section ``Form of the Note'' below specifies where such traceability data
+belongs; the body should read as mathematical prose, not as a log of what
+commands were run.
 
 If the verdict is that there is no mathematical discrepancy, say so plainly and
 stop.  Do not turn the note into a broad audit report.  If the only remaining

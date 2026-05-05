@@ -14,144 +14,165 @@
 \begin{document}
 \maketitle
 
-\section{The source step}
+\section{At a glance}
 
-We review the semidefinite program used in the self-improvement lemma of the
-low individual degree test paper \cite{Ji2020LowIndividualDegree}.%
+\begin{itemize}
+  \item \textbf{Difficulty: hard.}  The missing part is not another wrapper: it is
+  a finite-dimensional SDP strong-duality and complementary-slackness producer.
+  \item \textbf{Estimated weight:} roughly \textbf{6--10 theorem interfaces} and
+  \textbf{800--1500 lines} of project-local proof, assuming no ready-made SDP
+  duality theorem is imported.
+  \item \textbf{Mathlib/project split:} about \textbf{35\% Mathlib} and
+  \textbf{65\% project-local}.  Mathlib supplies matrix order, positive
+  semidefinite cones, convex-cone/separation infrastructure, and finite-dimensional
+  linear algebra; the project must connect these to the paper's block SDP.
+  \item \textbf{Key Mathlib inputs:} positive semidefinite matrices, matrix trace
+  algebra, convex cones and dual cones, and hyperplane separation for proper
+  cones.%
+  \footnote{Representative APIs live around
+  \texttt{Mathlib.LinearAlgebra.Matrix.PosDef},
+  \texttt{Mathlib.Analysis.Matrix.Order},
+  \texttt{Mathlib.Analysis.Convex.Cone.Dual},
+  \texttt{Mathlib.Analysis.Convex.Cone.InnerDual}, and
+  \texttt{Mathlib.Geometry.Convex.Cone.*}.}
+\end{itemize}
+
+\section{The source SDP}
+
+The self-improvement lemma in \cite{Ji2020LowIndividualDegree} uses one SDP.%
 \footnote{The SDP is in \path{references/ldt-paper/self_improvement.tex},
-lines~62--88.  The strict feasibility and complementary-slackness paragraph is
-in lines~168--190.  The downstream helper proof starts at line~194.}
-This is the only SDP used as an analytic ingredient in the paper.  Its job is to
-choose a polynomial-indexed primal family $T=\{T_g\}$ and a dual certificate
-$Z$.
-
-For a low individual degree polynomial $g$, set
+lines~62--88.  The strict-feasibility and complementary-slackness paragraph is
+in lines~168--190.}
+For each low individual degree polynomial $g$, set
 \[
   A_g=\E_{\bu\sim\F_q^m} A^{\bu}_{g(\bu)}.
 \]
-The paper's primal and dual programs are
+The primal and dual programs are
 \begin{align}
-  \sup_{\{T_g\}}
-    &\quad \sum_g \tr(T_gA_g) \\
-  \text{subject to}
-    &\quad T_g\ge 0,\qquad \sum_gT_g\le I,
+  \sup_{\{T_g\}}&\quad \sum_g\tr(T_gA_g) \\
+  \text{subject to}&\quad T_g\ge0,\\[-0.2em]
+  &\quad \sum_gT_g\le I,
   \tag{\texttt{eq:primal-objective}}
 \end{align}
 \begin{align}
-  \inf_Z
-    &\quad \tr(Z) \\
-  \text{subject to}
-    &\quad Z\ge A_g\quad\text{for every }g.
+  \inf_Z&\quad \tr(Z) \\
+  \text{subject to}&\quad Z\ge A_g\quad\text{for every }g.
   \tag{\texttt{eq:dual-objective}}
 \end{align}
-Thus the primal feasible object is a submeasurement, not a measurement.  The SDP
-lemma then selects an optimal pair satisfying the additional conclusions
+The primal variable is a \textbf{submeasurement}.  The SDP lemma then chooses an
+optimal pair satisfying
 \[
   \sum_gT_g=I,
   \qquad
   T_gZ=T_gA_g\quad\text{for every }g.
   \tag{\texttt{lem:sdp}, \texttt{eq:slater}}
 \]
-The equality $\sum_gT_g=I$ is not a primal constraint.  It is a property of the
-chosen optimum.
+The proof uses both layers: feasibility gives $\sum_gT_g\le I$, while the chosen
+optimum gives the saturated identity and complementary slackness.
 
 \section{How the proof uses the optimum}
 
-After fixing the optimal pair $(T,Z)$, the paper defines
+The paper defines
 \[
   H^u_h=A^u_{h(u)}T_hA^u_{h(u)},
   \qquad
   H_h=\E_{\bu}H^{\bu}_h.
   \tag{\texttt{self\_improvement.tex:203--220}}
 \]
-The proof uses three SDP outputs.
+The SDP contributes three facts.
 
-First, the submeasurement inequalities $T_g\ge0$ and $\sum_gT_g\le I$ make each
-$H^u$ and the average $H$ submeasurements.  This is the feasibility part of the
-primal SDP.
+\begin{enumerate}
+  \item \textbf{Submeasurement bounds.}  The inequalities $T_g\ge0$ and
+  $\sum_gT_g\le I$ imply that $H^u$ and $H$ are submeasurements.
+  \item \textbf{Saturation.}  The identity $\sum_gT_g=I$ lets sums over $T_g$
+  collapse to the identity.
+  \item \textbf{Slackness and boundedness.}  The identity $T_gZ=T_gA_g$ lets the
+  proof replace $A_g$ by $Z$ after left multiplication by $T_g$:
+  \[
+    \E_{\bu}\sum_h\bra{\psi}(T_hA^{\bu}_{h(\bu)})\ot I\ket{\psi}
+    =\sum_h\bra{\psi}(T_hZ)\ot I\ket{\psi}.
+  \]
+  Dual feasibility $Z\ge A_g$ then supplies the boundedness certificate carried
+  through the induction.%
+  \footnote{The two slackness substitutions are in
+  \path{references/ldt-paper/self_improvement.tex}, lines~397--400 and 580--584.
+  The boundedness conclusion is restated in
+  \path{references/ldt-paper/inductive_step.tex}, lines~277--284, 315--322,
+  477--484, and 542--549.}
+\end{enumerate}
 
-Second, the selected optimum is saturated: $\sum_gT_g=I$.  The proof uses this
-when sums over $T_g$ collapse to the identity.
+\section{Key theorem forms to develop}
 
-Third, complementary slackness lets the proof replace $A_g$ by $Z$ after left
-multiplication by $T_g$.  In the completeness argument, for example,
-\[
-  \E_{\bu}\sum_h\bra{\psi}(T_hA^{\bu}_{h(\bu)})\ot I\ket{\psi}
-  =\sum_h\bra{\psi}(T_hA_h)\ot I\ket{\psi}
-  =\sum_h\bra{\psi}(T_hZ)\ot I\ket{\psi}.
-\]
-The same replacement is used again in the strong self-consistency argument.%
-\footnote{The two swaps are in
-\path{references/ldt-paper/self_improvement.tex}, lines~397--400 and 580--584.}
-Dual feasibility $Z\ge A_g$ then supplies the boundedness certificate carried
-through the induction.%
-\footnote{The boundedness conclusion is restated in
-\path{references/ldt-paper/inductive_step.tex}, lines~277--284, 315--322,
-477--484, and 542--549.}
+The formal SDP work should isolate the following mathematical theorems.
 
-\section{The submeasurement boundary}
+\begin{enumerate}
+  \item \textbf{Finite-dimensional SDP duality with Slater.}  For a Hermitian
+  objective $C$, a real linear constraint map $\mathcal A$, and right-hand side
+  $b$, strict primal and dual feasibility should imply optimizers $X_*$ and
+  $y_*$ for
+  \[
+    \sup\{\langle C,X\rangle: \mathcal A(X)=b,\ X\succeq0\},
+    \qquad
+    \inf\{\langle b,y\rangle: \mathcal A^*(y)-C\succeq0\},
+  \]
+  equality of the two values, and complementary slackness
+  $X_*(\mathcal A^*(y_*)-C)=0$.
 
-The distinction between feasibility and saturation is essential.  If
-$M=|\polyfunc{m}{q}{d}|$, the paper's strict Slater witness is
-\[
-  T_g=\frac{1}{2M}I,
-  \qquad
-  Z=2I.
-\]
-Its total primal mass is $\sum_gT_g=\frac12I$.  It is strictly feasible for the
-paper's submeasurement SDP, but it would be excluded by an equality-constrained
-primal program.
+  \item \textbf{Paper SDP equivalence.}  The canonical block variable should be
+  equivalent to effects $T_g$ plus a slack block $S$, with
+  $\sum_gT_g+S=I$ and the same objective value $\sum_g\tr(T_gA_g)$.
 
-This was the mismatch behind the earlier SDP weakening issue: the formal primal
-interface must stay at $\sum_gT_g\le I$ until the strong-duality argument
-selects a saturated optimum.%
-\footnote{The original mismatch is documented in
-\path{docs/paper-gaps/issue-196-sdp-weakening.tex}.}
+  \item \textbf{Self-improvement output.}  Specializing the duality theorem to
+  the paper's $A_g$ should produce $T$ and $Z$ with
+  \[
+    T_g\ge0,\\[-0.2em]
+    \sum_gT_g=I,
+    \qquad
+    Z\ge A_g,
+    \qquad
+    T_gZ=T_gA_g.
+  \]
+
+  \item \textbf{Interface bridge.}  The matrix-level witness should imply the
+  abstract self-improvement SDP statement consumed by the helper proof, including
+  any extra dominance field required by the current reduced interface.%
+  \footnote{This bridge is already isolated in
+  \doclink{MIPStarRE/LDT/SelfImprovement/Theorems/Results/SdpMatrixBridge.lean}.}
+\end{enumerate}
 
 \section{Blueprint and formalization}
 
-The blueprint follows the paper.  It states the primal with $\sum_gT_g\le I$,
-records the strict feasible witness $T_g=(2M)^{-1}I$, and separately records
-the matrix-level slackness output giving a complete primal measurement and the
-equations $T_gZ=T_gA_g$.%
+The blueprint follows the paper: it states the submeasurement primal, records the
+strict feasible witness $T_g=(2M)^{-1}I$, and separately records the
+slackness-producing optimal witness.%
 \footnote{See \path{blueprint/src/chapter/ch07_self_improvement.tex}, especially
 \texttt{lem:sdp-uniform-feasible-witness},
 \texttt{lem:sdp-matrix-feasible-bounds},
 \texttt{lem:sdp-matrix-slackness-output}, and \texttt{lem:sdp}.}
 
-The Lean development mirrors this split.  The primal objective, the strict
-primal witness, the complementary-slackness equation, and the sandwiched
-construction all take a submeasurement as input.  A reduced SDP statement records
-only the facts currently produced by the wrapper: a submeasurement whose total is
-$I$, a positive dual operator, and dual feasibility.  A stronger statement adds
-the complementary-slackness equations required by the paper-facing helper
-argument.%
+The Lean development already keeps the submeasurement boundary explicit.  The
+primal objective, strict primal witness, slackness equation, and sandwiched
+construction all take a submeasurement as input.  The remaining open task is the
+producer for the stronger slackness-carrying statement.%
 \footnote{Representative declarations are \leanid{sdpStrictPrimalSubMeas},
 \leanid{sdpPrimalObjective}, \leanid{sdpComplementarySlacknessEquation}, and
 \leanid{averagedSandwichedPolynomialSubMeas} in
-\doclink{MIPStarRE/LDT/SelfImprovement/Defs.lean}, and \leanid{SdpStatement}
-and \leanid{SdpStatementWithSlackness} in
-\doclink{MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean}.}
-At the matrix layer, the strong-duality shape is represented by a witness with
-identity total, dual feasibility, equality of primal and dual objective values,
-and complementary slackness.%
-\footnote{See \leanid{MatrixSdpOptimalWitness} and
-\leanid{MatrixSdpStatementWithSlackness} in
-\doclink{MIPStarRE/LDT/SelfImprovement/MatrixRealization.lean}.  The open task
-of proving the slackness-carrying producer is \ghissue{1230}.}
+\doclink{MIPStarRE/LDT/SelfImprovement/Defs.lean}.  The reduced and strengthened
+interfaces are \leanid{SdpStatement} and \leanid{SdpStatementWithSlackness} in
+\doclink{MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean}.  The open
+producer task is \ghissue{1230}.}
 
 \section{Conclusion}
 
-There is no new mathematical discrepancy in how the paper uses the SDP.  The
-paper uses a submeasurement primal program, then derives saturation and
-complementary slackness for a chosen optimum.  Those derived facts are exactly
-what the self-improvement proof uses to build $H$ and carry the boundedness
-certificate $Z$.
+There is \textbf{no new mathematical discrepancy} in how the LDT paper uses the
+SDP.  The paper uses a submeasurement primal program, then derives saturation
+and complementary slackness for a chosen optimum.  Those derived facts are what
+the self-improvement proof needs.
 
-The formalization now records the submeasurement boundary correctly.  The
-remaining work is to formalize the strong-duality and complementary-slackness
-producer for the stronger SDP statement.  That is a formal proof task, not a
-change to the paper's SDP argument.
+The remaining work is \textbf{hard formalization work}: prove or import the
+finite-dimensional SDP duality theorem with complementary slackness, specialize
+it to the paper's block program, and connect the resulting witness to the
+self-improvement interface.
 
 \bibliographystyle{alpha}
 \bibliography{references}

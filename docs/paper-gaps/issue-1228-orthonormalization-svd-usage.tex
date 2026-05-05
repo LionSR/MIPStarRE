@@ -14,35 +14,54 @@
 \begin{document}
 \maketitle
 
+\section{At a glance}
+
+\begin{itemize}
+  \item \textbf{Difficulty: medium.}  The paper's SVD step is finite-dimensional
+  linear algebra, and the current project already has the main positive-Gram
+  construction.  A reusable Mathlib-quality rectangular SVD theorem would be
+  harder.
+  \item \textbf{Estimated weight:} about \textbf{3--6 theorem interfaces} and
+  \textbf{300--700 lines} to finish or reuse the local route; a fully general
+  rectangular complex SVD/polar theorem suitable for upstreaming would likely be
+  \textbf{800--1500 lines}.
+  \item \textbf{Mathlib/project split:} about \textbf{65\% Mathlib} and
+  \textbf{35\% project-local} for the present route.  Mathlib supplies spectral
+  theory, adjoints, orthonormal bases, and $\sqrt{\,\cdot\,}$; the project supplies
+  the rectangular $X,\widehat X,P$ packaging and paper-specific estimates.
+  \item \textbf{Key Mathlib inputs:} finite-dimensional inner-product spaces,
+  matrix adjoints, Hermitian eigenvectors/eigenvalues, positive semidefinite
+  matrices, and continuous-functional-calculus square roots.%
+  \footnote{Representative APIs include \leanid{Orthonormal},
+  \leanid{Matrix.IsHermitian.eigenvectorBasis},
+  \leanid{Matrix.IsHermitian.eigenvalues}, \leanid{CFC.sqrt}, and
+  \leanid{CFC.sqrt\_unique}.}
+\end{itemize}
+
 \section{The source step}
 
-We review the singular value decomposition used in the orthonormalization proof
-of \cite{Ji2020LowIndividualDegree}.%
+The SVD appears in the orthonormalization proof of
+\cite{Ji2020LowIndividualDegree}.%
 \footnote{The SVD passage is in
 \path{references/ldt-paper/orthonormalization.tex}, lines~774--845.}
-This is a local linear-algebra step.  It is separate from the earlier spectral
-truncation of $A_a$ and the choice of orthonormal bases for projector ranges.
-
 After rounding and rank reduction, the paper has projectors $Q_a$ with
-$Q=\sum_aQ_a$ and $\sum_a\operatorname{rank}(Q_a)\le d$.  Choosing an
-orthonormal basis $\ket{v_{a,i}}$ for the range of each $Q_a$, and an auxiliary
-basis $\ket{a,i}$, it defines
+$Q=\sum_aQ_a$ and $\sum_a\operatorname{rank}(Q_a)\le d$.  It chooses vectors
+$\ket{v_{a,i}}$ spanning the ranges of the $Q_a$ and defines
 \[
-  X_a=\sum_i \ket{a,i}\bra{v_{a,i}},
+  X_a=\sum_i\ket{a,i}\bra{v_{a,i}},
   \qquad
-  X=\sum_a X_a,
+  X=\sum_aX_a,
   \tag{\texttt{[blueprint] def:matrix-decomposition-Q}}
 \]
-and a projective measurement $T=\{T_a\}$ on the auxiliary space.  The basic
-identities are
+with auxiliary projectors $T_a$.  The basic identities are
 \[
   X_a=T_aX,
   \qquad
   Q_a=X_a^\dagger X_a=X^\dagger T_aX.
-  \tag{\texttt{lem:xa-t}, \texttt{lem:qa-restated}}
+  \tag{\texttt{lem:xa-t},\ \texttt{lem:qa-restated}}
 \]
-The SVD is then applied to the rectangular $m\times d$ matrix $X$, where
-$m=\sum_a\operatorname{rank}(Q_a)\le d$:
+Since the total rank is at most $d$, the matrix $X$ is $m\times d$ with $m\le d$.
+The paper takes an SVD
 \[
   X=U\Sigma_{m\times d}V^\dagger.
   \tag{\texttt{[blueprint] def:svd-of-X}}
@@ -50,7 +69,7 @@ $m=\sum_a\operatorname{rank}(Q_a)\le d$:
 
 \section{What the SVD supplies}
 
-The paper uses the SVD to replace the singular values of $X$ by $1$.  It defines
+The paper replaces the singular values of $X$ by $1$:
 \[
   \widehat X=UI_{m\times d}V^\dagger,
   \qquad
@@ -58,116 +77,99 @@ The paper uses the SVD to replace the singular values of $X$ by $1$.  It defines
   \tag{\texttt{[blueprint] def:projective-P}}
 \]
 Only three consequences are used later.%
-\footnote{The first consequence is proved in
-\path{references/ldt-paper/orthonormalization.tex}, lines~862--896.  The
-second and third consequences are proved in lines~984--1064.}
+\footnote{The first consequence is derived in
+\path{references/ldt-paper/orthonormalization.tex}, lines~862--896.  The second
+and third are derived in lines~984--1064.}
 
-First, because $m\le d$,
-\[
-  \widehat X\widehat X^\dagger=I_{m\times m}.
-  \tag{\texttt{lem:X-hat-squared}}
-\]
-This makes $P=\{P_a\}$ a projective submeasurement: inserting the identity
-between $T_a$ and $T_b$ gives $P_aP_b=\mathbf 1_{a=b}P_a$.
+\begin{enumerate}
+  \item \textbf{Coisometry:} $\widehat X\widehat X^\dagger=I_{m\times m}$.  This
+  makes $P=\{P_a\}$ projective.
+  \item \textbf{Square-root coupling:} $X^\dagger\widehat X=\sqrt Q$, because
+  $X^\dagger X=Q$ and the corresponding middle SVD factor is positive.
+  \item \textbf{Squared difference:}
+  \[
+    (X-\widehat X)(X-\widehat X)^\dagger
+    \le (XX^\dagger-I_{m\times m})^2.
+  \]
+  This is the scalar inequality $(\sigma-1)^2\le(\sigma^2-1)^2$ for
+  $\sigma\ge0$, after multiplying by $(\sigma+1)^2\ge1$.
+\end{enumerate}
 
-Second,
+These facts enter one Cauchy--Schwarz estimate and give
 \[
-  X^\dagger\widehat X=\sqrt Q.
-  \tag{\texttt{lem:X-times-X-hat}}
-\]
-Indeed, $X^\dagger\widehat X=V\Sigma_{d\times d}V^\dagger$ while
-$X^\dagger X=Q=V\Sigma_{d\times d}^2V^\dagger$, and the middle operator is
-positive.
-
-Third,
-\[
-  (X-\widehat X)(X-\widehat X)^\dagger
-  \le (XX^\dagger-I_{m\times m})^2.
-  \tag{\texttt{lem:squared-difference}}
-\]
-This is the diagonal inequality $(\Sigma-I)^2\le(\Sigma^2-I)^2$: for each
-singular value $\sigma\ge0$, one has $(\sigma+1)^2\ge1$ and hence
-$(\sigma-1)^2\le(\sigma+1)^2(\sigma-1)^2=(\sigma^2-1)^2$.
-The proof then uses this estimate in one
-Cauchy--Schwarz step to replace $X$ by $\widehat X$ in a $Q_aP_a$ overlap.  With
-the almost-projectivity bound for $Q$, it obtains
-\[
-  Q_a\ot I\approx_{30\zeta^{1/4}}P_a\ot I,
+  Q_a\ot I\approx_{30\zeta^{1/4}}P_a\ot I.
   \tag{\texttt{lem:P-Q-approx}}
 \]
-and hence, using the rank-reduction estimate
-$A_a\ot I\approx_{12\sqrt\zeta}Q_a\ot I$, the final bound
+Together with $A_a\ot I\approx_{12\sqrt\zeta}Q_a\ot I$, this yields
 $A_a\ot I\approx_{84\zeta^{1/4}}P_a\ot I$.%
-\footnote{The $P$-versus-$Q$ estimate and the final triangle step are in
+\footnote{The $P$-versus-$Q$ estimate and final triangle step are in
 \path{references/ldt-paper/orthonormalization.tex}, lines~1089--1192.}
 
-Thus the SVD is a polar-repair step: it replaces $X$ by a coisometry
-$\widehat X$ for which the right coupling still satisfies
-$X^\dagger\widehat X=\sqrt Q$.
+\section{Key theorem forms to develop}
+
+The formalization should isolate the following theorem forms.
+
+\begin{enumerate}
+  \item \textbf{Rectangular polar theorem.}  If $X$ is $m\times d$, $m\le d$,
+  and $Q=X^\dagger X$, then there exists $\widehat X$ such that
+  \[
+    \widehat X\widehat X^\dagger=I_m,
+    \qquad
+    X^\dagger\widehat X=\sqrt Q.
+  \]
+
+  \item \textbf{SVD adapter.}  If $X=U\Sigma V^\dagger$ and
+  $\widehat X=UI_{m\times d}V^\dagger$, then the two identities above follow
+  from the unitary laws and positivity of the SVD middle factor.
+
+  \item \textbf{Projectivity and approximation.}  For
+  $P_a=\widehat X^\dagger T_a\widehat X$, the coisometry identity implies
+  $P_aP_b=\mathbf 1_{a=b}P_a$, and the squared-difference estimate plus almost
+  projectivity of $Q$ implies the $P$-versus-$Q$ bound.
+\end{enumerate}
 
 \section{Blueprint and formalization}
 
-The blueprint follows the same structure.  It records the matrix decomposition,
-the SVD step, and the definition of $P$ under the labels
-\texttt{def:matrix-decomposition-Q}, \texttt{def:svd-of-X}, and
-\texttt{def:projective-P}; it then records the three SVD consequences and the
-$P$-versus-$Q$ estimate under the labels displayed above.%
+The blueprint follows the same sequence: matrix decomposition, SVD, definition of
+$P$, then the three identities and the $P$-versus-$Q$ estimate.%
 \footnote{See \path{blueprint/src/chapter/ch04_projective.tex}, lines~704--785
 and 833--1153.}
 
-The Lean development separates packaging from mathematics.  The formal object
-for the SVD stage is a reduced $X,\widehat X,P$ data package, not a full record
-of $U$, $V$, and $\Sigma$.  This package stores exactly the identities needed
-downstream: $Q_a=X^\dagger T_aX$, $\widehat X\widehat X^\dagger=I$, and
-$X^\dagger\widehat X=\sqrt Q$.  The constructors that assemble this package are
-mostly bookkeeping wrappers: they keep the paper's objects visible and prove
-$X^\dagger X=Q$ from $Q_a=X^\dagger T_aX$ and $\sum_aT_a=I$.%
-\footnote{The formal names are \leanid{svdOfX}, \leanid{QXPLayerData},
-\leanid{QXPLayerData.ofQLayerAndSvdIdentities}, and related constructors in
+The Lean development separates \textbf{packaging} from \textbf{linear algebra}.
+The $X,\widehat X,P$ data package stores the identities needed downstream, while
+wrappers keep the paper's objects visible and prove bookkeeping facts such as
+$X^\dagger X=Q$.%
+\footnote{The formal names are \leanid{svdOfX}, \leanid{QXPLayerData}, and
+related constructors in
 \doclink{MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/Core.lean}.}
-
-The substantive local algebra has two forms.  One form proves the paper-facing
-rectangular-SVD calculations once matrices $U,V,\Sigma,I_{m\times d}$ are
-supplied.  The other form avoids an explicit SVD record: from $X^\dagger X=Q$,
-positivity of $Q$, and $m\le d$, it constructs $\widehat X$ directly from the
-positive spectral subspace of $Q$.  This positive-Gram construction gives the
-same two identities for $\widehat X$ that the paper obtains from the SVD.%
-\footnote{The SVD-adapter declarations include
-\leanid{rectangularSvd\_xHat\_coisometry}, \leanid{rectangularSvd\_xHat\_mixed\_raw},
-\leanid{rectangularSvd\_middle\_eq\_sqrt\_of\_square}, and
-\leanid{exists\_xHat\_of\_rectangularSvd}.  The positive-Gram route includes
-\leanid{exists\_xHat\_of\_positive\_gram\_spectrum},
-\leanid{exists\_xHat\_of\_sigmaFinRangeEmbedding\_positiveGram}, and
-\leanid{pQApprox\_ofRankReductionSigmaRangePositiveGram}.  These are in
+The substantive linear algebra is in two routes: explicit rectangular-SVD
+adapters, and a positive-Gram construction that builds $\widehat X$ directly from
+the positive spectral subspace of $Q$.%
+\footnote{The relevant declarations include
+\leanid{rectangularSvd\_xHat\_coisometry},
+\leanid{rectangularSvd\_xHat\_mixed\_raw},
+\leanid{rectangularSvd\_middle\_eq\_sqrt\_of\_square},
+\leanid{exists\_xHat\_of\_rectangularSvd},
+\leanid{exists\_xHat\_of\_positive\_gram\_spectrum}, and
+\leanid{pQApprox\_ofRankReductionSigmaRangePositiveGram} in
 \doclink{MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities.lean}.}
-
-Mathlib supplies the finite-dimensional Hilbert-space and spectral ingredients:
-orthonormal bases, adjoints, the Hermitian spectral theorem, matrix/euclidean
-linear-map bridges, and the continuous-functional-calculus square root.  The
-version of Mathlib pinned here does not currently provide a rectangular complex
-SVD or polar decomposition theorem with exactly the output shape needed here.
-The project-local positive-Gram route fills that gap; possible upstreaming of
-the generic pieces is tracked separately.%
-\footnote{Representative reused APIs include \leanid{Orthonormal},
-\leanid{Matrix.IsHermitian.eigenvectorBasis}, \leanid{CFC.sqrt}, and
-\leanid{CFC.sqrt\_unique}.  The local coisometry helper
+The version of Mathlib pinned here does not provide exactly the rectangular SVD
+or polar theorem above, so the project-local positive-Gram route supplies it.%
+\footnote{The local coisometry helper
 \leanid{Matrix.exists\_mul\_conjTranspose\_eq\_one\_of\_card\_le} is in
-\doclink{MIPStarRE/Quantum/FiniteHilbert.lean}.  Upstreaming is tracked in
-\ghissue{1250}.}
+\doclink{MIPStarRE/Quantum/FiniteHilbert.lean}.  Possible upstreaming is tracked
+in \ghissue{1250}.}
 
 \section{Conclusion}
 
-There is no mathematical discrepancy in the paper's SVD step.  The paper uses
-SVD only to construct $\widehat X$ with
-$\widehat X\widehat X^\dagger=I$ and $X^\dagger\widehat X=\sqrt Q$, and then to
-prove the squared-difference estimate used in the $P$-versus-$Q$ bound.  The
-blueprint and Lean formalization preserve exactly this mechanism.
+There is \textbf{no mathematical discrepancy} in the paper's SVD step.  The SVD
+is used only to construct $\widehat X$ with
+$\widehat X\widehat X^\dagger=I$ and $X^\dagger\widehat X=\sqrt Q$, and to prove
+the squared-difference estimate behind the $P$-versus-$Q$ bound.
 
-The current formalization is more modular than the paper: it stores the two
-primitive $\widehat X$ identities and can produce them either from explicit
-rectangular-SVD data or from a positive-Gram construction using Mathlib spectral
-APIs.  Remaining orthonormalization work concerns other inputs, such as spectral
-truncation and locality-preserving repair; it is not a new SVD gap.
+The formalization preserves this mechanism.  It can use explicit rectangular-SVD
+data when available, but the reliable project route is the positive-Gram
+construction built from Mathlib spectral APIs.
 
 \bibliographystyle{alpha}
 \bibliography{references}
