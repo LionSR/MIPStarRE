@@ -174,7 +174,9 @@ The spectral-truncation fields are still supplied by
 `spectralTruncationInput_of_sourceAlmostProjective`.  The two remaining repair
 fields are obtained by choosing the canonical local projective submeasurement
 attached to each QXP layer, so the repaired lifted family has the required form
-`P_a ⊗ I`. -/
+`P_a ⊗ I`.  As for `ofRepairInputs`, this records a constructive producer for
+the orthonormalization input; wiring the downstream main-theorem assembly to
+this producer is a separate step. -/
 noncomputable def ofQXPLayerRepairWitnesses
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -211,7 +213,9 @@ This is a more concrete form of `ofQXPLayerRepairWitnesses`: each side supplies
 a QXP layer whose `q` family is the corresponding unsymmetrized POVM, together
 with the lifted state-dependent approximation to the associated `P` family.
 The constructor packages these approximations as locality-preserving repair
-inputs for the Alice and Bob unsymmetrized measurements. -/
+inputs for the Alice and Bob unsymmetrized measurements.  It supplies the same
+line-130 input package as `ofRepairInputs`; the later bridge structures still
+consume an already assembled orthonormalization input. -/
 noncomputable def ofLiftedQXPApproximations
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

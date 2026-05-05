@@ -412,7 +412,9 @@
 		MIPStarRE.LDT.Test.baseProjectiveCompletionResidual_ofBaseBridge}
 	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalCompletionInput.nonempty_ofDiagonalConsistencyAndMatchMassPreservation,
 		MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualProjectiveCompletionResidual.nonempty_ofRoleResidualAndDiagonalInputsAndMatchMassPreservation,
-		MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRepairInputs}
+		MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRepairInputs,
+		MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofQXPLayerRepairWitnesses,
+		MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofLiftedQXPApproximations}
 	\lean{MIPStarRE.LDT.Test.MainFormalBaseRepairedBridgeHypotheses,
 		MIPStarRE.LDT.Test.MainFormalRepairedBridgeHypotheses,
 		MIPStarRE.LDT.Test.baseMainFormal_ofRepairedBaseBridge,
@@ -429,9 +431,14 @@
 	is available to fill the spectral-truncation fields from the Section~5
 	spectral-truncation producer applied to the two unsymmetrized role measurements
 	after left tensor placement.  Thus the spectral half of the line-130
-	orthonormalization input has a constructive producer, although the base bridge
-	structures still accept a full orthonormalization input until a later assembly
-	step routes them through this constructor.  The line-130 cross
+	orthonormalization input has a constructive producer.  The constructors
+	\texttt{ofQXPLayerRepairWitnesses} and
+	\texttt{ofLiftedQXPApproximations} also give constructive producers for the
+	locality-preserving repair half: the former consumes the Section~9 QXP-layer
+	repair witnesses, and the latter consumes explicit QXP-layer data together
+	with the corresponding left-placed state-dependent approximation.  The base
+	bridge structures still accept a full orthonormalization input until a later
+	assembly step routes them through these constructors.  The line-130 cross
 	consistency relation is reconstructed internally from the checked role residual
 	and used directly in the completion step, so no separate diagonal strong
 	self-consistency package remains in this bridge.  The narrowed alias
