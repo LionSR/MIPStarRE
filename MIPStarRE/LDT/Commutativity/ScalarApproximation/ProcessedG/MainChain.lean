@@ -49,6 +49,39 @@ private noncomputable def evaluatedSlicePhaseFourSwapped
           (((evaluatedSlicePointMeas params strategy q.1).outcome ab.1) *
             ((evaluatedSlicePointMeas params strategy q.2).outcome ab.2)))
 
+/-- Shared left-register prefix for the ProcessedG right-register point-swap bounds. -/
+private noncomputable def evaluatedSlicePointSwapRightPrefix
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (T : EvaluatedSliceQuestion params → MIPStarRE.Quantum.Op ι) :
+    EvaluatedSliceQuestion params → EvaluatedSliceOutcome params → MIPStarRE.Quantum.Op (ι × ι) :=
+  fun q ab =>
+    leftTensor (ι₂ := ι)
+      (((evaluatedSliceFirstFactor params family q).outcome ab.1) *
+        ((evaluatedSliceSecondFactor params family q).outcome ab.2) *
+        T q)
+
+/-- Normalization for the shared ProcessedG right-register point-swap prefix. -/
+private lemma evaluatedSlice_pointSwap_right_prefix_normalization
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι)
+    (T : EvaluatedSliceQuestion params → MIPStarRE.Quantum.Op ι)
+    (hT_nonneg : ∀ q, 0 ≤ T q)
+    (hT_le_one : ∀ q, T q ≤ 1) :
+    ∀ q,
+      ∑ ab : EvaluatedSliceOutcome params,
+        evaluatedSlicePointSwapRightPrefix (ι := ι) params family T q ab *
+            (evaluatedSlicePointSwapRightPrefix (ι := ι) params family T q ab)ᴴ ≤
+          1 := by
+  intro q
+  simpa [evaluatedSlicePointSwapRightPrefix] using
+    (leftTensor_prefix_total_normalization
+      (A := evaluatedSliceFirstFactor params family q)
+      (B := evaluatedSliceSecondFactor params family q)
+      (T := T q)
+      (hT_nonneg := hT_nonneg q)
+      (hT_le_one := hT_le_one q))
+
 private lemma evaluatedSlice_pointSwap_right_bound_of_norms
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -491,21 +524,17 @@ lemma evaluatedSlice_scalar_chain_bound
       |avgOver 𝒟 phase3PaperInserted - avgOver 𝒟 phase4PaperSwapped| ≤
         6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
     let C : EvaluatedSliceQuestion params → EvaluatedSliceOutcome params →
-        MIPStarRE.Quantum.Op (ι × ι) := fun q ab =>
-      leftTensor (ι₂ := ι)
-        (((evaluatedSliceFirstFactor params family q).outcome ab.1) *
-          ((evaluatedSliceSecondFactor params family q).outcome ab.2) *
-          (evaluatedSliceFirstFactor params family q).total)
+        MIPStarRE.Quantum.Op (ι × ι) :=
+      evaluatedSlicePointSwapRightPrefix (ι := ι) params family (fun q =>
+        (evaluatedSliceFirstFactor params family q).total)
     have hC :
         ∀ q, ∑ ab : EvaluatedSliceOutcome params, C q ab * (C q ab)ᴴ ≤ 1 := by
-      intro q
       simpa [C] using
-        (leftTensor_prefix_total_normalization
-          (A := evaluatedSliceFirstFactor params family q)
-          (B := evaluatedSliceSecondFactor params family q)
-          (T := (evaluatedSliceFirstFactor params family q).total)
-          (hT_nonneg := (evaluatedSliceFirstFactor params family q).total_nonneg)
-          (hT_le_one := (evaluatedSliceFirstFactor params family q).total_le_one))
+        evaluatedSlice_pointSwap_right_prefix_normalization
+          (ι := ι) params family
+          (fun q => (evaluatedSliceFirstFactor params family q).total)
+          (fun q => (evaluatedSliceFirstFactor params family q).total_nonneg)
+          (fun q => (evaluatedSliceFirstFactor params family q).total_le_one)
     have hphase3_norm :
         avgOver 𝒟 phase3PaperInserted =
           avgOver 𝒟 (fun q => ∑ ab : EvaluatedSliceOutcome params,
@@ -524,7 +553,7 @@ lemma evaluatedSlice_scalar_chain_bound
                   rightTensor (ι₁ := ι)
                     (((evaluatedSlicePointMeas params strategy q.2).outcome b) *
                       ((evaluatedSlicePointMeas params strategy q.1).outcome a))) := by
-              dsimp [phase3PaperInserted, C]
+              dsimp [phase3PaperInserted, C, evaluatedSlicePointSwapRightPrefix]
               refine Finset.sum_congr rfl ?_
               intro a _
               refine Finset.sum_congr rfl ?_
@@ -555,7 +584,7 @@ lemma evaluatedSlice_scalar_chain_bound
                     ((evaluatedSlicePointMeas params strategy q.2).outcome ab.2)))) := by
       apply avgOver_congr
       intro q
-      dsimp [phase4PaperSwapped, C]
+      dsimp [phase4PaperSwapped, C, evaluatedSlicePointSwapRightPrefix]
       simpa using
         (Fintype.sum_prod_type' (f := fun a : Fq params => fun b : Fq params =>
           ev strategy.state
@@ -614,29 +643,26 @@ lemma evaluatedSlice_scalar_chain_bound
         |avgOver 𝒟 orderedDefect - avgOver 𝒟 swappedDefect| ≤
           6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
       let C : EvaluatedSliceQuestion params → EvaluatedSliceOutcome params →
-          MIPStarRE.Quantum.Op (ι × ι) := fun q ab =>
-        leftTensor (ι₂ := ι)
-          (((evaluatedSliceFirstFactor params family q).outcome ab.1) *
-            ((evaluatedSliceSecondFactor params family q).outcome ab.2) *
-            (1 - (G (pointHeight params q.1)).total))
+          MIPStarRE.Quantum.Op (ι × ι) :=
+        evaluatedSlicePointSwapRightPrefix (ι := ι) params family (fun q =>
+          (1 : MIPStarRE.Quantum.Op ι) - (G (pointHeight params q.1)).total)
+      have hT_nonneg : ∀ q : EvaluatedSliceQuestion params,
+          0 ≤ (1 : MIPStarRE.Quantum.Op ι) - (G (pointHeight params q.1)).total := by
+        intro q
+        exact sub_nonneg.mpr (G (pointHeight params q.1)).total_le_one
+      have hT_le_one : ∀ q : EvaluatedSliceQuestion params,
+          (1 : MIPStarRE.Quantum.Op ι) - (G (pointHeight params q.1)).total ≤ 1 := by
+        intro q
+        simpa using
+          (sub_le_self (1 : MIPStarRE.Quantum.Op ι)
+            (G (pointHeight params q.1)).total_nonneg)
       have hC :
           ∀ q, ∑ ab : EvaluatedSliceOutcome params, C q ab * (C q ab)ᴴ ≤ 1 := by
-        intro q
-        have hT_nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ι) -
-            (G (pointHeight params q.1)).total := by
-          exact sub_nonneg.mpr (G (pointHeight params q.1)).total_le_one
-        have hT_le_one : (1 : MIPStarRE.Quantum.Op ι) -
-            (G (pointHeight params q.1)).total ≤ 1 := by
-          simpa using
-            (sub_le_self (1 : MIPStarRE.Quantum.Op ι)
-              (G (pointHeight params q.1)).total_nonneg)
         simpa [C] using
-          (leftTensor_prefix_total_normalization
-            (A := evaluatedSliceFirstFactor params family q)
-            (B := evaluatedSliceSecondFactor params family q)
-            (T := (1 : MIPStarRE.Quantum.Op ι) - (G (pointHeight params q.1)).total)
-            (hT_nonneg := hT_nonneg)
-            (hT_le_one := hT_le_one))
+          evaluatedSlice_pointSwap_right_prefix_normalization
+            (ι := ι) params family
+            (fun q => (1 : MIPStarRE.Quantum.Op ι) - (G (pointHeight params q.1)).total)
+            hT_nonneg hT_le_one
       have hord_norm :
           avgOver 𝒟 orderedDefect =
             avgOver 𝒟 (fun q => ∑ ab : EvaluatedSliceOutcome params,
@@ -647,7 +673,8 @@ lemma evaluatedSlice_scalar_chain_bound
                       ((evaluatedSlicePointMeas params strategy q.2).outcome ab.2)))) := by
         apply avgOver_congr
         intro q
-        dsimp [orderedDefect, evaluatedSlicePhaseFivePaperOrderedDefect, C]
+        dsimp [orderedDefect, evaluatedSlicePhaseFivePaperOrderedDefect, C,
+          evaluatedSlicePointSwapRightPrefix]
         simpa using
           (Fintype.sum_prod_type' (f := fun a : Fq params => fun b : Fq params =>
             ev strategy.state
@@ -668,7 +695,8 @@ lemma evaluatedSlice_scalar_chain_bound
                       ((evaluatedSlicePointMeas params strategy q.1).outcome ab.1)))) := by
         apply avgOver_congr
         intro q
-        dsimp [swappedDefect, evaluatedSlicePhaseFivePaperSwappedDefect, C]
+        dsimp [swappedDefect, evaluatedSlicePhaseFivePaperSwappedDefect, C,
+          evaluatedSlicePointSwapRightPrefix]
         simpa using
           (Fintype.sum_prod_type' (f := fun a : Fq params => fun b : Fq params =>
             ev strategy.state
