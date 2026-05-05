@@ -2235,9 +2235,19 @@
           
           <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.orthonormal_normalized_matrix_image_of_positive_gram_spectrum" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.orthonormal_normalized_matrix_image_of_positive_gram_spectrum</a></li>
           
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.normalizedMatrixImageRows" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.normalizedMatrixImageRows</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.positiveGramSpectrumImageRows" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.positiveGramSpectrumImageRows</a></li>
+          
           <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.normalized_matrix_image_rows_mul_conjTranspose" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.normalized_matrix_image_rows_mul_conjTranspose</a></li>
           
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.normalized_matrix_image_rows_transpose_mixed" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.normalized_matrix_image_rows_transpose_mixed</a></li>
+          
           <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.normalized_matrix_image_rows_mul_conjTranspose_of_positive_gram_spectrum" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.normalized_matrix_image_rows_mul_conjTranspose_of_positive_gram_spectrum</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_image_rows_transpose_mixed" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_image_rows_transpose_mixed</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_card_le_rows" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_card_le_rows</a></li>
           
           <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_isHermitian_of_x_squared" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_isHermitian_of_x_squared</a></li>
           
@@ -2273,7 +2283,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>The paper proves this by multiplying out \(\widehat{X}=U\cdot I_{m\times d}\cdot V^\dagger \) and using the unitarity of \(U\) and \(V\). In Lean, the dimension hypothesis \(m\leq d\) already gives a rectangular matrix with orthonormal rows on the sigma auxiliary space; the chosen matrix <span class="ttfamily">sigmaFinXHatCoisometry</span> and its specification record this existence result as an input for the future construction. The formal lemma <span class="ttfamily">orthonormal_normalized_image_of_adjoint_comp_eigenvectors</span> records the singular-vector normalization calculation, while <span class="ttfamily">normalized_matrix_image_rows_mul_conjTranspose</span> packages the corresponding row-coisometry identity. The formal lemma <span class="ttfamily">rectangularSvd_xHat_coisometry</span> records the corresponding matrix calculation, and <span class="ttfamily">exists_xHat_of_rectangularSvd</span> packages the resulting choice of \(\widehat X\) together with the mixed square-root identity below. </p>
+  <p>The paper proves this by multiplying out \(\widehat{X}=U\cdot I_{m\times d}\cdot V^\dagger \) and using the unitarity of \(U\) and \(V\). In Lean, the dimension hypothesis \(m\leq d\) already gives a rectangular matrix with orthonormal rows on the sigma auxiliary space; the chosen matrix <span class="ttfamily">sigmaFinXHatCoisometry</span> and its specification record this existence result as an input for the future construction. The formal lemma <span class="ttfamily">orthonormal_normalized_image_of_adjoint_comp_eigenvectors</span> records the singular-vector normalization calculation, <span class="ttfamily">normalized_matrix_image_rows_mul_conjTranspose</span> packages the corresponding row-coisometry identity, and <span class="ttfamily">positive_gram_spectrum_image_rows_transpose_mixed</span> records the adjoint action \(X^\dagger (\lambda ^{-1/2}Xv)=\lambda ^{1/2}v\) on the positive spectral part of the Gram operator. The formal lemma <span class="ttfamily">rectangularSvd_xHat_coisometry</span> records the corresponding matrix calculation, and <span class="ttfamily">exists_xHat_of_rectangularSvd</span> packages the resulting choice of \(\widehat X\) together with the mixed square-root identity below. </p>
 
   </div>
 </div>
