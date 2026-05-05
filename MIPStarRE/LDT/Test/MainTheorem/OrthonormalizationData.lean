@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.Test.MainTheorem.CompletionTransport
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain
+import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation
 
 /-!
 # Orthonormalization and completion data
@@ -8,6 +9,7 @@ Statement-preserving slice of `MIPStarRE.LDT.Test.MainTheorem`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
+open MIPStarRE.LDT.MakingMeasurementsProjective
 
 namespace MIPStarRE.LDT
 
@@ -121,6 +123,51 @@ structure MainFormalPostRolePackageDiagonalOrthonormalizationInput
     MakingMeasurementsProjective.LeftLiftedProjectivizationRepairInput strategy.state
       (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
       (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)
+
+namespace MainFormalPostRolePackageDiagonalOrthonormalizationInput
+
+/-- Build the line-130 orthonormalization input once the two locality-preserving
+repair inputs are available.
+
+This constructor supplies the spectral-truncation fields from the constructive
+producer `spectralTruncationInput_of_sourceAlmostProjective`, applied to the two
+unsymmetrized role measurements after left tensor placement.  Callers that use
+this constructor therefore supply only the Alice- and Bob-side repair steps,
+which preserve the local form of the repaired projective submeasurements.  The
+existing bridge structures still accept a full orthonormalization input; routing
+those bridges through this constructor is a separate assembly step. -/
+noncomputable def ofRepairInputs
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
+    (leftRepair :
+      MakingMeasurementsProjective.LeftLiftedProjectivizationRepairInput strategy.state
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
+        (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1))
+    (rightRepair :
+      MakingMeasurementsProjective.LeftLiftedProjectivizationRepairInput strategy.state
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
+        (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)) :
+    MainFormalPostRolePackageDiagonalOrthonormalizationInput
+      params strategy eps k scalars rolePackage where
+  leftSpectral :=
+    MakingMeasurementsProjective.spectralTruncationInput_of_sourceAlmostProjective
+      strategy.state
+      (leftLiftedMeasurement (ιB := ι)
+        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement))
+      (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)
+  leftRepair := leftRepair
+  rightSpectral :=
+    MakingMeasurementsProjective.spectralTruncationInput_of_sourceAlmostProjective
+      strategy.state
+      (leftLiftedMeasurement (ιB := ι)
+        (unsymmetrizedRightPOVM rolePackage.roleMeasurement))
+      (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)
+  rightRepair := rightRepair
+
+end MainFormalPostRolePackageDiagonalOrthonormalizationInput
 
 /-- Type alias for line-130 orthonormalization inputs that serves as a named
 landing point for future formalizations of the orthonormalization lemma's
@@ -251,7 +298,7 @@ theorem leftPolynomialConsistency_with_orthonormalization_loss
       (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
       (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error))) := by
   have hraw :=
-    MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_with_orthonormalization_loss
+    ProjectivizationLine169Repair.leftConsistency_with_orthonormalization_loss
       strategy.state strategy.isNormalized orthResidual.P_A a_A hpre orthResidual.leftCloseness
   simpa using hraw
 
@@ -275,7 +322,7 @@ theorem rightPolynomialConsistency_with_orthonormalization_loss
       (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
       (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error))) := by
   have hraw :=
-    MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_with_orthonormalization_loss
+    ProjectivizationLine169Repair.rightConsistency_with_orthonormalization_loss
       strategy.state strategy.isNormalized orthResidual.P_B a_B hpre orthResidual.rightCloseness
   simpa using hraw
 
