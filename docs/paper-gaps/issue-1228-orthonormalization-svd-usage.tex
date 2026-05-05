@@ -19,9 +19,7 @@
 We review the singular value decomposition used in the orthonormalization proof
 of \cite{Ji2020LowIndividualDegree}.%
 \footnote{The SVD passage is in
-\path{references/ldt-paper/orthonormalization.tex}, lines~774--845.  The
-identities derived from it are in lines~862--896 and 984--1064, and the final
-$P$-versus-$Q$ estimate is in lines~1089--1192.}
+\path{references/ldt-paper/orthonormalization.tex}, lines~774--845.}
 This is a local linear-algebra step.  It is separate from the earlier spectral
 truncation of $A_a$ and the choice of orthonormal bases for projector ranges.
 
@@ -59,7 +57,10 @@ The paper uses the SVD to replace the singular values of $X$ by $1$.  It defines
   P_a=\widehat X^\dagger T_a\widehat X.
   \tag{\texttt{[blueprint] def:projective-P}}
 \]
-Only three consequences are used later.
+Only three consequences are used later.%
+\footnote{The first consequence is proved in
+\path{references/ldt-paper/orthonormalization.tex}, lines~862--896.  The
+second and third consequences are proved in lines~984--1064.}
 
 First, because $m\le d$,
 \[
@@ -84,8 +85,10 @@ Third,
   \le (XX^\dagger-I_{m\times m})^2.
   \tag{\texttt{lem:squared-difference}}
 \]
-This is the diagonal inequality $(\Sigma-I)^2\le(\Sigma^2-I)^2$ for
-nonnegative singular values.  The proof then uses this estimate in one
+This is the diagonal inequality $(\Sigma-I)^2\le(\Sigma^2-I)^2$: for each
+singular value $\sigma\ge0$, one has $(\sigma+1)^2\ge1$ and hence
+$(\sigma-1)^2\le(\sigma+1)^2(\sigma-1)^2=(\sigma^2-1)^2$.
+The proof then uses this estimate in one
 Cauchy--Schwarz step to replace $X$ by $\widehat X$ in a $Q_aP_a$ overlap.  With
 the almost-projectivity bound for $Q$, it obtains
 \[
@@ -94,11 +97,13 @@ the almost-projectivity bound for $Q$, it obtains
 \]
 and hence, using the rank-reduction estimate
 $A_a\ot I\approx_{12\sqrt\zeta}Q_a\ot I$, the final bound
-$A_a\ot I\approx_{84\zeta^{1/4}}P_a\ot I$.
+$A_a\ot I\approx_{84\zeta^{1/4}}P_a\ot I$.%
+\footnote{The $P$-versus-$Q$ estimate and the final triangle step are in
+\path{references/ldt-paper/orthonormalization.tex}, lines~1089--1192.}
 
-Thus the SVD is a polar-repair step: it keeps the right Gram operator
-$X^\dagger X=Q$ and replaces $X$ by a coisometry $\widehat X$ with the same
-positive square-root coupling to $Q$.
+Thus the SVD is a polar-repair step: it replaces $X$ by a coisometry
+$\widehat X$ for which the right coupling still satisfies
+$X^\dagger\widehat X=\sqrt Q$.
 
 \section{Blueprint and formalization}
 
