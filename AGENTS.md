@@ -434,6 +434,7 @@ Use this file together with:
 | `docs/CONTRIBUTING.md` | PR format, issue templates, label taxonomy, review checklist |
 | `docs/PROOF_INTEGRITY.md` | Blocker / warning patterns for proof correctness |
 | `docs/anti_patterns.md` | Subtler proof-evasion patterns |
+| `docs/proof_frontier_review.md` | Review checklist for producer theorems versus residual inputs |
 | `docs/style.md` | Mathlib code style (line length, indentation, tactic formatting) |
 | `docs/naming.md` | Mathlib naming conventions |
 | `docs/doc.md` | Mathlib documentation standards |
