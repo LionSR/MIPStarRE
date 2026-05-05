@@ -373,6 +373,14 @@ Every PR touching Lean code should be reviewed against these criteria:
    Mathlib-bypass castles (A5), and external `*Statement` smuggles (A6).
    Use the reviewer checklist at the end of that file.
 
+12. **Proof frontier integrity** -- If the PR introduces or threads structure
+   fields such as `*Input`, `*Residual`, `*BridgeInputs`, `*Witness`,
+   `*Statement`, `*Conclusion`, or `*Package`, review it against
+   [proof_frontier_review.md](proof_frontier_review.md). A PR that only
+   repackages an assumption should not be described as proving the corresponding
+   paper step; it must name the missing producer theorem or link the native
+   sub-issue that tracks it.
+
 ### Semantic scaffold checklist (required for core math objects)
 
 For semantic objects such as measurements, submeasurements, distributions,
