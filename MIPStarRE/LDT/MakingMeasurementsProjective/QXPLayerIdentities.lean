@@ -288,6 +288,91 @@ theorem positive_gram_spectrum_image_rows_transpose_mixed
     (fun i => i.2)
     (fun i => toEuclideanLin_gram_eigenvectorBasis X Q hQ hgram i.1)
 
+/-- Spectral expansion of the CFC square root of a positive Hermitian matrix.
+
+This is the square-root analogue of the Hermitian spectral expansion.  It is
+used below to compare the mixed product produced by the positive Gram-image
+columns with the operator `CFC.sqrt Q` on the whole ambient space, including
+the zero eigenspace. -/
+lemma sqrt_eq_sum_sqrt_eigenvalues_vecMulVec
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (Q : Matrix ι ι ℂ) (hQ : Q.IsHermitian)
+    (hQ_pos : Q.PosSemidef) :
+    CFC.sqrt Q =
+      ∑ i : ι, (((Real.sqrt (hQ.eigenvalues i) : ℝ) : ℂ) •
+        Matrix.vecMulVec ((hQ.eigenvectorBasis i).ofLp)
+          (star ((hQ.eigenvectorBasis i).ofLp))) := by
+  classical
+  calc
+    CFC.sqrt Q = hQ.cfc Real.sqrt := by
+      rw [CFC.sqrt_eq_real_sqrt Q (ha := hQ_pos.nonneg),
+        cfcₙ_eq_cfc (hf0 := by simp), hQ.cfc_eq]
+    _ = ∑ i : ι, (((Real.sqrt (hQ.eigenvalues i) : ℝ) : ℂ) •
+          Matrix.vecMulVec ((hQ.eigenvectorBasis i).ofLp)
+            (star ((hQ.eigenvectorBasis i).ofLp))) := by
+        ext r c
+        simp [Matrix.IsHermitian.cfc, Unitary.conjStarAlgAut_apply,
+          Matrix.mul_apply, Matrix.diagonal_apply, Matrix.sum_apply,
+          Matrix.vecMulVec_apply, Matrix.IsHermitian.eigenvectorUnitary_apply,
+          mul_assoc, mul_comm]
+
+/-- Rows dual to the positive Gram eigenvectors.
+
+Multiplying the positive mixed columns by this matrix sums those columns
+against the conjugate eigenvector coordinates.  Thus the product is the
+spectral expansion of the square root of the Gram operator. -/
+noncomputable def positiveGramSpectrumRightRows
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (Q : Matrix ι ι ℂ) (hQ : Q.IsHermitian) :
+    Matrix {i : ι // 0 < hQ.eigenvalues i} ι ℂ :=
+  Matrix.of fun i j => star (hQ.eigenvectorBasis i.1 j)
+
+/-- The positive Gram-image rows recover the square root of the Gram operator.
+
+The identity
+`Xᴴ * (positiveGramSpectrumImageRows X Q hQ)ᵀ` records the positive spectral
+columns `sqrt(λ_i) v_i`.  Multiplying by the conjugate eigenvector rows gives
+the spectral expansion of `CFC.sqrt Q`; the zero eigenspace contributes nothing
+because `Q` is positive semidefinite. -/
+theorem positive_gram_spectrum_image_rows_mixed_eq_sqrt
+    {μ ι : Type*}
+    [Fintype μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
+    (hQ : Q.IsHermitian)
+    (hQ_pos : Q.PosSemidef)
+    (hgram : Xᴴ * X = Q) :
+    Xᴴ * (positiveGramSpectrumImageRows X Q hQ)ᵀ *
+        positiveGramSpectrumRightRows Q hQ =
+      CFC.sqrt Q := by
+  classical
+  have hmixed := positive_gram_spectrum_image_rows_transpose_mixed X Q hQ hgram
+  have hsqrt := sqrt_eq_sum_sqrt_eigenvalues_vecMulVec Q hQ hQ_pos
+  ext r c
+  have hsqrt_entry := congrFun (congrFun hsqrt r) c
+  rw [hmixed]
+  simp only [Complex.coe_smul, Matrix.sum_apply, Matrix.smul_apply,
+    Matrix.vecMulVec_apply, Pi.star_apply, RCLike.star_def, Complex.real_smul,
+    positiveGramSpectrumRightRows, Matrix.mul_apply, Matrix.of_apply] at hsqrt_entry ⊢
+  rw [hsqrt_entry]
+  let coeff : ι → ℂ := fun i =>
+    ((Real.sqrt (hQ.eigenvalues i) : ℝ) : ℂ) *
+      hQ.eigenvectorBasis i r * star (hQ.eigenvectorBasis i c)
+  have hzero :
+      ∀ i : {i : ι // ¬ 0 < hQ.eigenvalues i}, coeff i.1 = 0 := by
+    intro i
+    have hnonneg : 0 ≤ hQ.eigenvalues i.1 := hQ_pos.eigenvalues_nonneg i.1
+    have hle : hQ.eigenvalues i.1 ≤ 0 := le_of_not_gt i.2
+    have hLam : hQ.eigenvalues i.1 = 0 := le_antisymm hle hnonneg
+    simp [coeff, hLam]
+  have hsplit :=
+    Fintype.sum_subtype_add_sum_subtype (p := fun i : ι => 0 < hQ.eigenvalues i)
+      coeff
+  have hpositive_sum : (∑ i : {i : ι // 0 < hQ.eigenvalues i}, coeff i.1) =
+      ∑ i : ι, coeff i := by
+    rw [← hsplit]
+    simp [hzero]
+  simpa [coeff, mul_assoc] using hpositive_sum
+
 /-- Spectral form of `normalized_matrix_image_rows_mul_conjTranspose`.
 
 The rows indexed by the strictly positive eigenvalues of the Hermitian Gram

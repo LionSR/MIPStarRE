@@ -834,6 +834,9 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xSquared, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinRangeEmbedding_gram_right}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_posSemidef_of_x_squared,
 			MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_eigenvalues_nonneg_of_x_squared}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sqrt_eq_sum_sqrt_eigenvalues_vecMulVec,
+			MIPStarRE.LDT.MakingMeasurementsProjective.positiveGramSpectrumRightRows,
+			MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_image_rows_mixed_eq_sqrt}
 		\leanok
 		\begin{equation*}
 			X^\dagger \cdot X = Q.
@@ -852,8 +855,10 @@
 			Q.
 		\]
 		The additional paper identities involving $U,V,\Sigma$ are the usual SVD
-		computations, but they are not stored in the Lean API because they are not used
-		by the downstream proof.
+		computations.  The Lean development also records the spectral calculation
+		which will identify the mixed positive-Gram-image product with
+		$\sqrt Q$: the positive eigenvalues give the nonzero columns, while the
+		zero eigenspace has zero coefficient in the square-root expansion.
 	\end{proof}
 
 	\begin{lemma}\label{lem:X-expression-to-Q-expression}
