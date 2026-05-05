@@ -211,6 +211,30 @@ class ParseHelperDeclarationTests(unittest.TestCase):
             self.assertEqual(len(decls), 1)
             self.assertEqual(decls[0].normalized_body, "byexactTrue.intro")
 
+    def test_top_level_let_in_proposition_is_not_taken_as_proof_body(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mod = root / "MIPStarRE" / "LDT" / "Foo.lean"
+            _write(
+                mod,
+                """\
+                private lemma first :
+                    let n := 5
+                    n = n := by
+                  rfl
+
+                private lemma second :
+                    let n := 6
+                    n = n := by
+                  rfl
+                """,
+            )
+            report = run_audit(root, min_normalized_chars=5)
+            self.assertEqual(report.scanned_declarations, 2)
+            self.assertEqual(len(report.duplicate_groups), 1)
+            names = {decl.name for decl in report.duplicate_groups[0].declarations}
+            self.assertEqual(names, {"first", "second"})
+
     def test_excludes_lake_directory(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

@@ -90,20 +90,47 @@ def _find_top_level_command(masked: str, start: int) -> int:
     return len(masked)
 
 
+def _starts_keyword(text: str, index: int, keyword: str) -> bool:
+    """Return whether ``keyword`` begins at ``index`` with identifier boundaries."""
+
+    if not text.startswith(keyword, index):
+        return False
+    before = text[index - 1] if index > 0 else " "
+    after_index = index + len(keyword)
+    after = text[after_index] if after_index < len(text) else " "
+    ident = set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_'")
+    return before not in ident and after not in ident
+
+
 def _proof_body_span(masked_decl: str, absolute_start: int) -> tuple[int, int] | None:
-    """Return absolute offsets for the proof body after the first ``:=``."""
+    """Return absolute offsets for the proof body after the declaration ``:=``."""
 
     stack: list[str] = []
     pairs = {"(": ")", "{": "}", "[": "]", "⦃": "⦄"}
     closing = {value: key for key, value in pairs.items()}
+    pending_let_assignment = False
     i = 0
     while i < len(masked_decl) - 1:
         char = masked_decl[i]
+        let_keyword_len = None
+        if not stack:
+            if _starts_keyword(masked_decl, i, "letI"):
+                let_keyword_len = 4
+            elif _starts_keyword(masked_decl, i, "let"):
+                let_keyword_len = 3
+        if let_keyword_len is not None:
+            pending_let_assignment = True
+            i += let_keyword_len
+            continue
         if char in pairs:
             stack.append(char)
         elif char in closing and stack and stack[-1] == closing[char]:
             stack.pop()
         elif char == ":" and masked_decl[i + 1] == "=" and not stack:
+            if pending_let_assignment:
+                pending_let_assignment = False
+                i += 2
+                continue
             return (absolute_start + i + 2, absolute_start + len(masked_decl))
         i += 1
     return None
