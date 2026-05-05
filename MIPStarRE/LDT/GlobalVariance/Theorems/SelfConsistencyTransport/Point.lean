@@ -11,12 +11,12 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-! # Good-strategy self-consistency transport
+/-! # Point-event self-consistency transport
 
-This module contains the good-strategy interfaces that establish the
-`2δ` and `2ε` approximation steps for the six-step local-variance
-transport chain in `lem:local-variance-of-points`
-(`expansion.tex`, lines 300--311).
+This module contains the point self-consistency endpoints for the six-step
+local-variance transport chain in `lem:local-variance-of-points`
+(`expansion.tex`, lines 300--311).  These are the first and last `2δ`
+moves; the point-line `2ε` moves live in `PointLine.lean`.
 -/
 
 /-! ## Good-strategy interfaces for the local-variance transport chain -/
@@ -109,15 +109,9 @@ lemma pointConditionedEventSelfConsistency_weighted_point
             qSDDCore strategy.state
               (fun a : Option Unit => ((IdxSubMeas.liftLeft pointEvent) u).outcome a)
               (fun a : Option Unit => ((IdxSubMeas.liftRight pointEvent) u).outcome a)) := by
-    refine avgOver_mono _ _ _ ?_
-    intro u
-    unfold qSDDCore
-    simpa using
-      (Finset.single_le_sum
-        (fun a _ => ev_adjoint_self_nonneg strategy.state
-          (((IdxSubMeas.liftLeft pointEvent) u).outcome a -
-            ((IdxSubMeas.liftRight pointEvent) u).outcome a))
-        (Finset.mem_univ (some ())))
+    exact qSDDCore_optionUnit_some_le strategy.state (uniformDistribution (Point params))
+      (fun u a => ((IdxSubMeas.liftLeft pointEvent) u).outcome a)
+      (fun u a => ((IdxSubMeas.liftRight pointEvent) u).outcome a)
   have hAB :
       avgOver (uniformDistribution (Point params))
         (fun u =>

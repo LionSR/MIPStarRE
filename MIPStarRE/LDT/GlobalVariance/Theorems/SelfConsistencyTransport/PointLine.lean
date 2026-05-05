@@ -241,15 +241,10 @@ lemma axisParallelBaseEventApproximation_weighted_sample
             qSDDCore strategy.state
               (fun a : Option Unit => ((IdxSubMeas.liftLeft lineEvent) s).outcome a)
               (fun a : Option Unit => ((IdxSubMeas.liftRight pointEvent) s).outcome a)) := by
-    refine avgOver_mono _ _ _ ?_
-    intro s
-    unfold qSDDCore
-    simpa using
-      (Finset.single_le_sum
-        (fun a _ => ev_adjoint_self_nonneg strategy.state
-          (((IdxSubMeas.liftLeft lineEvent) s).outcome a -
-            ((IdxSubMeas.liftRight pointEvent) s).outcome a))
-        (Finset.mem_univ (some ())))
+    exact qSDDCore_optionUnit_some_le strategy.state
+      (uniformDistribution (AxisParallelTestSample params))
+      (fun s a => ((IdxSubMeas.liftLeft lineEvent) s).outcome a)
+      (fun s a => ((IdxSubMeas.liftRight pointEvent) s).outcome a)
   have hAB :
       avgOver (uniformDistribution (AxisParallelTestSample params))
         (fun s =>
