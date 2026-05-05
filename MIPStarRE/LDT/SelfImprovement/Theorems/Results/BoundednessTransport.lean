@@ -58,6 +58,10 @@ data-processing transport of the boundedness gap, and the standalone
   helper-stage point consistency through the projective data-processing
   comparison, with the submeasurement total-overlap displacement recorded
   explicitly.
+- **final_fields_point_consistency_natural_of_total_expectation_le** —
+  records the sharper point-consistency route where the projective replacement
+  has monotone right-total expectation, eliminating the alphabet-size
+  total-overlap term.
 - **helper_boundedness_gap_transport_through_data_processing** — transport
   the helper boundedness gap through the data-processing SDD approximation
   between Ĥ and H (paper lines 747–755).
@@ -715,6 +719,152 @@ theorem final_fields_point_consistency_totalGap_natural_of_total_difference
   exact
     final_fields_point_consistency_totalGap_natural
       params strategy eps delta η hhelperPoint hdata hTotalAvg
+
+/-- Natural-error point-consistency transport under monotone total overlap.
+
+If the projective replacement has no larger right-register total overlap with
+the point measurement than the helper submeasurement, the submeasurement
+triangle argument has the same natural error as the measurement-valued paper
+step:
+`selfImprovementHelperError + sqrt selfImprovementDataProcessingError`.  This
+is the structural route which avoids introducing the alphabet-size term
+`sqrt (#F_q * selfImprovementDataProcessingError)`. -/
+theorem final_fields_point_consistency_natural_of_total_le
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    {Hhat : SubMeas (Polynomial params) ι}
+    {H : ProjSubMeas (Polynomial params) ι}
+    (hhelperPoint :
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params Hhat)
+        (selfImprovementHelperError params eps delta))
+    (hdata :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftLeft)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+        (selfImprovementDataProcessingError params eps delta))
+    (hTotalLe :
+      ∀ u : Point params,
+        ev strategy.state
+            (leftTensor (ι₂ := ι)
+              (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total) *
+              rightTensor (ι₁ := ι)
+                (((polynomialEvaluationFamily params H.toSubMeas) u).total)) ≤
+          ev strategy.state
+            (leftTensor (ι₂ := ι)
+              (((IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) u).total) *
+              rightTensor (ι₁ := ι)
+                (((polynomialEvaluationFamily params Hhat) u).total))) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params H.toSubMeas)
+      (selfImprovementHelperError params eps delta +
+        Real.sqrt (selfImprovementDataProcessingError params eps delta)) := by
+  have hdata_right :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftRight)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftRight)
+        (selfImprovementDataProcessingError params eps delta) := by
+    simpa [IdxSubMeas.liftLeft, IdxSubMeas.liftRight]
+      using
+        sddRel_liftRight_of_liftLeft_permInv
+          strategy.permInvState (uniformDistribution (Point params))
+          (polynomialEvaluationFamily params Hhat)
+          (polynomialEvaluationFamily params H.toSubMeas)
+          (selfImprovementDataProcessingError params eps delta) hdata
+  exact
+    Preliminaries.triangleSub_right_subMeas_total_le
+      strategy.state (uniformDistribution (Point params)) strategy.isNormalized
+      (uniformDistribution_weight_sum_le_one (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params Hhat)
+      (polynomialEvaluationFamily params H.toSubMeas)
+      (selfImprovementHelperError params eps delta)
+      (selfImprovementDataProcessingError params eps delta) hhelperPoint
+      hdata_right hTotalLe
+
+/-- Natural-error point-consistency transport from a scalar right-total
+monotonicity hypothesis.
+
+Since the point measurement is complete and postprocessing preserves total
+operators, the pointwise monotone-total hypothesis reduces to the single scalar
+comparison between the expectations of `H.total` and `Hhat.total` on the right
+register. -/
+theorem final_fields_point_consistency_natural_of_total_expectation_le
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    {Hhat : SubMeas (Polynomial params) ι}
+    {H : ProjSubMeas (Polynomial params) ι}
+    (hhelperPoint :
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params Hhat)
+        (selfImprovementHelperError params eps delta))
+    (hdata :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftLeft)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+        (selfImprovementDataProcessingError params eps delta))
+    (hTotalLe :
+      ev strategy.state (rightTensor (ι₁ := ι) H.toSubMeas.total) ≤
+        ev strategy.state (rightTensor (ι₁ := ι) Hhat.total)) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params H.toSubMeas)
+      (selfImprovementHelperError params eps delta +
+        Real.sqrt (selfImprovementDataProcessingError params eps delta)) := by
+  refine
+    final_fields_point_consistency_natural_of_total_le
+      params strategy eps delta hhelperPoint hdata ?_
+  intro u
+  rw [pointMeasurement_total_evalFamily_total_ev_eq_rightTensor
+      params strategy H.toSubMeas u,
+    pointMeasurement_total_evalFamily_total_ev_eq_rightTensor
+      params strategy Hhat u]
+  exact hTotalLe
+
+/-- Literal-threshold point-consistency transport from scalar right-total
+monotonicity and the standard small-error hypotheses.
+
+This is the absorbable form of the projective point-consistency transport:
+the monotone-total hypothesis removes the alphabet-size total-overlap term, and
+the existing final-stage numerical estimate absorbs
+`selfImprovementHelperError + sqrt selfImprovementDataProcessingError` into
+`selfImprovementError`. -/
+theorem final_fields_point_consistency_of_total_expectation_le_of_small_errors
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (heps_le_one : eps ≤ 1)
+    (hdelta : 0 ≤ delta) (hdelta_le_one : delta ≤ 1)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
+    {Hhat : SubMeas (Polynomial params) ι}
+    {H : ProjSubMeas (Polynomial params) ι}
+    (hhelperPoint :
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params Hhat)
+        (selfImprovementHelperError params eps delta))
+    (hdata :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftLeft)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+        (selfImprovementDataProcessingError params eps delta))
+    (hTotalLe :
+      ev strategy.state (rightTensor (ι₁ := ι) H.toSubMeas.total) ≤
+        ev strategy.state (rightTensor (ι₁ := ι) Hhat.total)) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params H.toSubMeas)
+      (selfImprovementError params eps delta) :=
+  MIPStarRE.LDT.ConsRel.mono
+    (final_fields_projective_residual_error_le_selfImprovementError
+      params eps delta heps heps_le_one hdelta hdelta_le_one hd_le_q)
+    (final_fields_point_consistency_natural_of_total_expectation_le
+      params strategy eps delta hhelperPoint hdata hTotalLe)
 
 /-- The data-processing SDD comparison controls the total-overlap displacement
 which appears in the submeasurement form of the point-consistency triangle.
