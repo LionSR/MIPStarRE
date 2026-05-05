@@ -213,6 +213,51 @@ The downstream Lean estimates \leanid{xHatSquared}, \leanid{xTimesXHat},
 \leanid{squaredDifference}, and \leanid{pQApprox} consume only these primitive
 identities, just as the paper's later proof does.
 
+\section{Wrappers, local algebra, and Mathlib inputs}
+
+It is useful to separate packaging from mathematical content in this layer.  The
+names \leanid{svdOfX}, \leanid{QXPLayerData}, and the constructors
+\leanid{QXPLayerData.ofQLayerAndSvdIdentities},
+\leanid{QXPLayerData.ofRankReductionAndSvdIdentities}, and their existential
+variants are mostly wrappers.  They keep the paper's $Q\to X\to\widehat X\to P$
+objects visible and discharge bookkeeping such as $X^\dagger X=Q$ from
+$Q_a=X^\dagger T_aX$ and $\sum_aT_a=I$.  They do not themselves prove a general
+SVD theorem.
+
+The substantive project-local algebra is in two places.  First, the
+rectangular-SVD adapters prove that, once matrices $U,V,S,I_{m\times d}$ with
+the paper's SVD laws are supplied, the choice
+$\widehat X=UI_{m\times d}V^\dagger$ has the coisometry and mixed-square-root
+properties needed downstream.  Second, the positive-Gram construction proves the
+same properties without asking for an explicit SVD record: it constructs the
+rows of $\widehat X$ from the positive spectral subspace of $Q=X^\dagger X$ and
+then completes them to a rectangular coisometry.
+
+The positive-Gram construction is where Mathlib is used most heavily.  The
+formal proof uses Mathlib's finite-dimensional inner-product and orthonormal
+basis API for the singular-vector normalization calculation, the matrix-adjoint
+interface relating $X^\dagger X$ to an adjoint composition, the Hermitian
+spectral theorem through eigenvalues and eigenvector bases of a Hermitian
+matrix, and the continuous functional calculus square root with its uniqueness
+property.%
+\footnote{Representative Mathlib-facing declarations used in this layer include
+\leanid{Orthonormal}, \leanid{LinearMap.adjoint_inner_right},
+\leanid{Matrix.toEuclideanLin_conjTranspose_mul_self},
+\leanid{Matrix.IsHermitian.eigenvectorBasis},
+\leanid{Matrix.IsHermitian.eigenvalues}, \leanid{CFC.sqrt}, and
+\leanid{CFC.sqrt_unique}.  The local coisometry existence helper
+\leanid{Matrix.exists_mul_conjTranspose_eq_one_of_card_le} in
+\path{MIPStarRE/Quantum/FiniteHilbert.lean} is built from Mathlib's
+\leanid{stdOrthonormalBasis} and \leanid{LinearMap.isometryOfOrthonormal}.}
+What is not currently supplied directly by Mathlib is a rectangular complex SVD
+or polar-decomposition theorem with exactly the output shape needed here.  The
+project therefore proves the necessary finite-dimensional positive-Gram route
+locally.  Several of these generic linear-algebra lemmas may be suitable for
+future Mathlib upstreaming, but the paper-gap verdict does not depend on that
+upstreaming.%
+\footnote{The possible upstreaming of generic project-local matrix lemmas is
+tracked separately in \ghissue{1250}.}
+
 \section{Conclusion}
 
 The verdict is that there is no mathematical discrepancy in the paper's use of
