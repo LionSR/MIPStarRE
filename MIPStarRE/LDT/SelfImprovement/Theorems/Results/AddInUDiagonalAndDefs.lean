@@ -622,6 +622,27 @@ noncomputable def helperOffDiagonalIndicatorQuantity
               ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h')
               (T.outcome h)))
 
+/-- The intermediate off-diagonal expression after the first variance swap.
+
+The left copy of the point projector has been evaluated at an independent point
+`v`, while the right copy is still evaluated at the original point `u`.  This is
+the Lean scalar form of the expression in the paper immediately after
+`eq:swapped-u-for-v`. -/
+noncomputable def helperOffDiagonalOneSidedSwappedIndicatorQuantity
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) : Error :=
+  avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+    ∑ h : Polynomial params,
+      ∑ h' ∈ (Finset.univ : Finset (Polynomial params)).erase h,
+        (if h uv.1 = h' uv.1 then (1 : Error) else 0) *
+          ev strategy.state
+            (opTensor
+              (pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2 *
+                T.outcome h' *
+                pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1)
+              (T.outcome h)))
+
 /-- The post-variance-swap endpoint for the off-diagonal contribution.
 
 Here both copies of the point projector have been evaluated at an independent
@@ -664,6 +685,42 @@ theorem helperOffDiagonalSwappedIndicatorQuantity_le_mdq
       (params.m * params.d : Error) / params.q := by
   simpa [helperOffDiagonalSwappedIndicatorQuantity] using
     polynomial_off_diagonal_swapped_indicator_sandwich_avg_le_mdq params strategy T
+
+/-- Assemble the two one-projector variance transports for the off-diagonal
+helper residual.
+
+The first hypothesis is the estimate for replacing the left copy of
+`A^u_{h(u)}` by `A^v_{h(v)}`.  The second hypothesis is the estimate for
+replacing the remaining right copy by the same independent point `v`.  Together
+they give the transport inequality used before the Schwartz--Zippel endpoint in
+the proof of helper strong self-consistency. -/
+theorem helperOffDiagonalIndicatorQuantity_le_swapped_of_abs_transports
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (T : SubMeas (Polynomial params) ι)
+    (hleft :
+      |helperOffDiagonalIndicatorQuantity params strategy T -
+        helperOffDiagonalOneSidedSwappedIndicatorQuantity params strategy T| ≤
+          Real.sqrt (selfImprovementVarianceError params eps delta))
+    (hright :
+      |helperOffDiagonalOneSidedSwappedIndicatorQuantity params strategy T -
+        helperOffDiagonalSwappedIndicatorQuantity params strategy T| ≤
+          Real.sqrt (selfImprovementVarianceError params eps delta)) :
+    helperOffDiagonalIndicatorQuantity params strategy T ≤
+      helperOffDiagonalSwappedIndicatorQuantity params strategy T +
+        2 * Real.sqrt (selfImprovementVarianceError params eps delta) := by
+  have hleft_le :
+      helperOffDiagonalIndicatorQuantity params strategy T -
+          helperOffDiagonalOneSidedSwappedIndicatorQuantity params strategy T ≤
+        Real.sqrt (selfImprovementVarianceError params eps delta) :=
+    (abs_le.mp hleft).2
+  have hright_le :
+      helperOffDiagonalOneSidedSwappedIndicatorQuantity params strategy T -
+          helperOffDiagonalSwappedIndicatorQuantity params strategy T ≤
+        Real.sqrt (selfImprovementVarianceError params eps delta) :=
+    (abs_le.mp hright).2
+  linarith
 
 /-- Assemble the off-diagonal projector-insertion bound from the two variance
 swaps and the Schwartz--Zippel endpoint.
@@ -708,6 +765,32 @@ theorem helperOffDiagonalOuterSandwichQuantity_le_two_sqrt_variance_add_mdq
   helperOffDiagonalOuterSandwichQuantity_le_of_swapped_transport
     params strategy T (2 * Real.sqrt (selfImprovementVarianceError params eps delta))
     htransport
+
+/-- Paper-shaped off-diagonal bound from the two explicit variance transports.
+
+This version exposes the two Cauchy--Schwarz/global-variance moves separately:
+first from the indicator form to the one-sided swapped expression, and then from
+the one-sided swapped expression to the Schwartz--Zippel endpoint. -/
+theorem helperOffDiagonalOuterSandwichQuantity_le_two_sqrt_variance_add_mdq_of_abs_transports
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (T : SubMeas (Polynomial params) ι)
+    (hleft :
+      |helperOffDiagonalIndicatorQuantity params strategy T -
+        helperOffDiagonalOneSidedSwappedIndicatorQuantity params strategy T| ≤
+          Real.sqrt (selfImprovementVarianceError params eps delta))
+    (hright :
+      |helperOffDiagonalOneSidedSwappedIndicatorQuantity params strategy T -
+        helperOffDiagonalSwappedIndicatorQuantity params strategy T| ≤
+          Real.sqrt (selfImprovementVarianceError params eps delta)) :
+    helperOffDiagonalOuterSandwichQuantity params strategy T ≤
+      2 * Real.sqrt (selfImprovementVarianceError params eps delta) +
+        (params.m * params.d : Error) / params.q :=
+  helperOffDiagonalOuterSandwichQuantity_le_two_sqrt_variance_add_mdq
+    params strategy eps delta T
+    (helperOffDiagonalIndicatorQuantity_le_swapped_of_abs_transports
+      params strategy eps delta T hleft hright)
 
 /-- Projective simplification of the diagonal `add-in-u` right operator at a point.
 
