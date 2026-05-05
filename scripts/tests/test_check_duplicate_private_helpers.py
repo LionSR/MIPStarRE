@@ -50,6 +50,21 @@ class MaskingTests(unittest.TestCase):
         self.assertEqual(len(masked), len(source))
         self.assertNotIn("unterminated", masked)
 
+    def test_masks_raw_and_interpolated_strings(self) -> None:
+        source = textwrap.dedent(
+            """\
+            def raw := r#"private lemma rawFake : True := by trivial"#
+            def interpolated := s!"{ "private theorem interpFake : True := by trivial" }"
+            private lemma real : True := by
+              exact True.intro
+            """
+        )
+        masked = mask_comments_and_strings(source)
+        self.assertEqual(len(masked), len(source))
+        self.assertNotIn("rawFake", masked)
+        self.assertNotIn("interpFake", masked)
+        self.assertIn("private lemma real", masked)
+
 
 class ParseHelperDeclarationTests(unittest.TestCase):
     def test_detects_private_duplicate_with_comment_whitespace_normalization(self) -> None:
@@ -216,12 +231,28 @@ class ParseHelperDeclarationTests(unittest.TestCase):
 class RenderTests(unittest.TestCase):
     def test_text_report_can_emit_github_warning(self) -> None:
         decl = audit.HelperDecl("MIPStarRE/A.lean", 7, "dup", "lemma", True, "body" * 20)
+        other = audit.HelperDecl(
+            "MIPStarRE/A.lean",
+            11,
+            "other",
+            "lemma",
+            False,
+            "body" * 20,
+        )
         report = audit.DuplicateReport(
             scanned_declarations=2,
-            duplicate_groups=(audit.DuplicateGroup(80, (decl, decl)),),
+            duplicate_groups=(audit.DuplicateGroup(80, (decl, other)),),
         )
         text = audit.render_text_report(report, github_annotations=True)
         self.assertIn("::warning file=MIPStarRE/A.lean,line=7", text)
+        self.assertIn(
+            "dup has the same normalized proof body as MIPStarRE/A.lean:11 other",
+            text,
+        )
+        self.assertNotIn(
+            "dup has the same normalized proof body as MIPStarRE/A.lean:7 dup",
+            text,
+        )
 
     def test_ci_exit_code_fails_only_with_duplicates(self) -> None:
         with tempfile.TemporaryDirectory() as td:

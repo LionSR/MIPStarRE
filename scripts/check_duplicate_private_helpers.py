@@ -21,6 +21,8 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable, Sequence
 
+from audit_conclusion_shaped_hypotheses import _mask_lean_non_code
+
 
 EXCLUDE_DIRS: tuple[str, ...] = (".git", ".lake", "lake-packages", "tmp")
 DEFAULT_MIN_NORMALIZED_CHARS = 40
@@ -74,58 +76,10 @@ def _line_number(text: str, offset: int) -> int:
     return text.count("\n", 0, offset) + 1
 
 
-def _mask_span(buf: list[str], start: int, end: int) -> None:
-    """Replace ``buf[start:end]`` with spaces while preserving newlines."""
-
-    for i in range(start, end):
-        if buf[i] != "\n":
-            buf[i] = " "
-
-
 def mask_comments_and_strings(text: str) -> str:
-    """Mask Lean comments and strings with spaces, preserving offsets."""
+    """Mask Lean comments and string-like literals with spaces, preserving offsets."""
 
-    buf = list(text)
-    i = 0
-    while i < len(text):
-        if text.startswith("--", i):
-            end = text.find("\n", i + 2)
-            if end == -1:
-                end = len(text)
-            _mask_span(buf, i, end)
-            i = end
-            continue
-        if text.startswith("/-", i):
-            depth = 1
-            j = i + 2
-            while j < len(text) - 1 and depth:
-                if text.startswith("/-", j):
-                    depth += 1
-                    j += 2
-                elif text.startswith("-/", j):
-                    depth -= 1
-                    j += 2
-                else:
-                    j += 1
-            end = j if depth == 0 else len(text)
-            _mask_span(buf, i, end)
-            i = end
-            continue
-        if text[i] == '"':
-            j = i + 1
-            while j < len(text):
-                if text[j] == "\\":
-                    j = min(j + 2, len(text))
-                    continue
-                if text[j] == '"':
-                    j += 1
-                    break
-                j += 1
-            _mask_span(buf, i, j)
-            i = j
-            continue
-        i += 1
-    return "".join(buf)
+    return _mask_lean_non_code(text)
 
 
 def _find_top_level_command(masked: str, start: int) -> int:
@@ -268,16 +222,20 @@ def render_text_report(report: DuplicateReport, *, github_annotations: bool = Fa
     for index, group in enumerate(report.duplicate_groups, start=1):
         lines.append("")
         lines.append(f"Group {index}: normalized body length {group.normalized_size}")
-        names = ", ".join(decl.name for decl in group.declarations)
-        for decl in group.declarations:
+        for decl_index, decl in enumerate(group.declarations):
             privacy = "private " if decl.is_private else ""
             lines.append(f"- {decl.file}:{decl.line}: {privacy}{decl.kind} {decl.name}")
             if github_annotations and decl.is_private:
+                comparison_names = ", ".join(
+                    f"{other.file}:{other.line} {other.name}"
+                    for other_index, other in enumerate(group.declarations)
+                    if other_index != decl_index
+                )
                 lines.append(
                     "::warning "
                     f"file={decl.file},line={decl.line},"
                     "title=Duplicate private helper body::"
-                    f"{decl.name} has the same normalized proof body as {names}"
+                    f"{decl.name} has the same normalized proof body as {comparison_names}"
                 )
     return "\n".join(lines) + "\n"
 
