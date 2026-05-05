@@ -1263,41 +1263,45 @@
 <div class="displaymath" id="a0000000351">
   \[  A^u_a \otimes I \simeq _{\widehat{\zeta } + \sqrt{\widehat{\zeta }_{\mathrm{dataprocess}}}} I \otimes H_{[h(u) = a]}.  \]
 </div>
-<p> In Lean the corresponding transport is stated for submeasurements with the total-overlap displacement recorded explicitly; this is the term which vanishes in the measurement-valued form of Lemma&#160;<a href="sec-prelims.html#prop:triangle-sub">3.20</a>.      Since \(A^u_{\mathrm{tot}}=I\) and postprocessing does not change the total operator, Lean also records the equivalent form in which this displacement is the single scalar difference </p>
+<p> In Lean the corresponding transport is stated for submeasurements with the total-overlap displacement recorded explicitly; this is the term which vanishes in the measurement-valued form of Lemma&#160;<a href="sec-prelims.html#prop:triangle-sub">3.20</a>.          Since \(A^u_{\mathrm{tot}}=I\) and postprocessing does not change the total operator, Lean also records the equivalent form in which this displacement is the single scalar difference </p>
 <div class="displaymath" id="a0000000352">
   \[  \left| \langle \psi , I \otimes H_{\mathrm{tot}} \psi \rangle - \langle \psi , I \otimes \widehat H_{\mathrm{tot}} \psi \rangle \right|  \]
 </div>
-<p> between the right-register totals of \(H\) and \(\widehat H\). </p>
-<p><em>Proof of <a href="chap-self-improvement.html#item:self-improvement-projective-self">3</a>.</em>    Lemma&#160;<a href="sec-prelims.html#prop:two-notions-of-self-consistency">3.36</a> implies </p>
+<p> between the right-register totals of \(H\) and \(\widehat H\). The outcomewise data-processing bound controls this scalar by applying the vector triangle inequality to the sum over \(a\in \mathbb {F}_q\); the formal estimate gives the additional term </p>
 <div class="displaymath" id="a0000000353">
+  \[  \sqrt{q\, \widehat{\zeta }_{\mathrm{dataprocess}}}.  \]
+</div>
+<p> Thus the total-overlap term is no longer an independent hypothesis, although the numerical absorption of this alphabet-size loss is recorded separately. </p>
+<p><em>Proof of <a href="chap-self-improvement.html#item:self-improvement-projective-self">3</a>.</em>    Lemma&#160;<a href="sec-prelims.html#prop:two-notions-of-self-consistency">3.36</a> implies </p>
+<div class="displaymath" id="a0000000354">
   \[  \widehat{H}_h \otimes I \approx _{2\widehat{\zeta }} I \otimes \widehat{H}_h.  \]
 </div>
 <p> Combining this with&#160;<a href="chap-self-improvement.html#eq:approx-between-H-with-and-without-hat" class="eqref">45</a> on both sides and summing the three transports with Lemma&#160;<a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">3.27</a> yields </p>
-<div class="displaymath" id="a0000000354">
+<div class="displaymath" id="a0000000355">
   \[  H_h \otimes I \approx _{6 \widehat{\zeta } + 6\widehat{\zeta }_{\mathrm{ortho}}} I \otimes H_h.  \]
 </div>
 <p><em>Proof of <a href="chap-self-improvement.html#item:self-improvement-projective-boundedness">4</a>.</em>      The boundedness quantity is </p>
-<div class="displaymath" id="a0000000355">
+<div class="displaymath" id="a0000000356">
   \begin{align} & \langle \psi  \rvert  Z \otimes (I - H) \lvert \psi  \rangle  \notag \\ ={}&  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  - \sum _h \langle \psi  \rvert  Z \otimes H_h \lvert \psi  \rangle  \notag \\ \leq {}&  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  - \sum _h \langle \psi  \rvert  \mathbb {E}_{u} A^{u}_{h(u)} \otimes H_h \lvert \psi  \rangle  \notag \\ ={}&  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  -\mathbb {E}_{u} \sum _h \langle \psi  \rvert  A^{u}_{h(u)} \otimes H_h \lvert \psi  \rangle  \notag \\ ={}&  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  -\mathbb {E}_{u} \sum _a \langle \psi  \rvert  A^{u}_{a} \otimes H_{[h(u)=a]} \lvert \psi  \rangle . \label{eq:almost-there-self-improvement-edition} \end{align}
 </div>
 <p> Proposition&#160;<a href="sec-prelims.html#prop:easy-approx-from-approx-delta">3.24</a> upgrades  <a href="chap-self-improvement.html#eq:approx-data-processed" class="eqref">46</a> to the scalar estimate </p>
-<div class="displaymath" id="a0000000356">
+<div class="displaymath" id="a0000000357">
   \[  \eqref{eq:almost-there-self-improvement-edition} \le \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  -\mathbb {E}_{u} \sum _a \langle \psi  \rvert  A^{u}_{a} \otimes \widehat H_{[h(u)=a]} \lvert \psi  \rangle  + \sqrt{\widehat{\zeta }_{\mathrm{dataprocess}}},  \]
 </div>
 <p> and now <a href="chap-self-improvement.html#item:self-improvement-boundedness">4</a> of Lemma&#160;<a href="chap-self-improvement.html#lem:self-improvement-helper">7.1</a> bounds this by \(\widehat{\zeta } + \sqrt{\widehat{\zeta }_{\mathrm{dataprocess}}}\). The formal boundedness field  is the corresponding operator-monotonicity step: once the SDP dual witness satisfies \(I\le Z\), the total mass of the projective submeasurement is bounded by \(Z\otimes I\) with zero boundedness error. </p>
 <p>Thus the four conclusions hold with errors </p>
-<div class="displaymath" id="a0000000357">
+<div class="displaymath" id="a0000000358">
   \[  2\widehat{\zeta } + 2\sqrt{\widehat{\zeta }_{\mathrm{ortho}}}, \qquad \widehat{\zeta } + \sqrt{\widehat{\zeta }_{\mathrm{dataprocess}}}, \qquad 6 \widehat{\zeta } + 6\widehat{\zeta }_{\mathrm{ortho}}, \qquad \widehat{\zeta } + \sqrt{\widehat{\zeta }_{\mathrm{dataprocess}}},  \]
 </div>
 <p> respectively. The paper’s exponent bookkeeping then shows the following bounds. The formal bookkeeping uses the three-term power sum \(\varepsilon ^p + \delta ^p + (d/q)^p\), its monotonicity on the unit interval, and the corresponding square-root estimate. The displayed Lean theorems record these arithmetic identities together with the completeness, self-closeness, and projective-residual absorptions \(2 \widehat{\zeta } + 2\sqrt{\widehat{\zeta }_{\mathrm{ortho}}} \le \zeta \), \(6 \widehat{\zeta } + 6\widehat{\zeta }_{\mathrm{ortho}} \le \zeta \) and \(\widehat{\zeta } + \sqrt{\widehat{\zeta }_{\mathrm{dataprocess}}} \le \zeta \).            </p>
-<div class="displaymath" id="a0000000358">
+<div class="displaymath" id="a0000000359">
   \[  \widehat{\zeta }_{\mathrm{ortho}} \leq 400 m \cdot \Big(\varepsilon ^{1/8} + \delta ^{1/8} + (d/q)^{1/8}\Big),  \]
 </div>
-<div class="displaymath" id="a0000000359">
+<div class="displaymath" id="a0000000360">
   \[  \widehat{\zeta }_{\mathrm{dataprocess}} \leq 960m \cdot \Big(\varepsilon ^{1/16} + \delta ^{1/16} + (d/q)^{1/16}\Big),  \]
 </div>
 <p> and hence </p>
-<div class="displaymath" id="a0000000360">
+<div class="displaymath" id="a0000000361">
   \[  6 \widehat{\zeta } + 6\widehat{\zeta }_{\mathrm{ortho}} \le \zeta , \qquad \widehat{\zeta } + \sqrt{\widehat{\zeta }_{\mathrm{dataprocess}}} \le \zeta .  \]
 </div>
 <p> Since \(2\widehat{\zeta } + 2\sqrt{\widehat{\zeta }_{\mathrm{ortho}}} \le \widehat{\zeta }_{\mathrm{dataprocess}} \le \zeta \), all four bounds are at most&#160;\(\zeta \). </p>
