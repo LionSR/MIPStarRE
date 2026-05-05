@@ -40,7 +40,7 @@ space with orthonormal basis vectors $\ket{a,i}$, the paper defines
   X_a = \sum_{i=1}^{m_a} \ket{a,i}\bra{v_{a,i}},
   \qquad
   X = \sum_a X_a,
-  \tag{\texttt{orthonormalization.tex:784--790}}
+  \tag{\texttt{def:matrix-decomposition-Q}}
 \]
 and a projective measurement $T=\{T_a\}$ by
 \[
@@ -56,7 +56,7 @@ The basic identities are
 The SVD is then applied to this rectangular $m\times d$ matrix $X$:
 \[
   X = U\Sigma_{m\times d}V^\dagger,
-  \tag{\texttt{orthonormalization.tex:837--845}}
+  \tag{\texttt{def:svd-of-X}}
 \]
 where $U$ is $m\times m$ unitary, $V$ is $d\times d$ unitary, and
 $\Sigma_{m\times d}$ is diagonal with nonnegative real entries.
@@ -72,7 +72,7 @@ paper defines
   \widehat X_a = T_a\widehat X,
   \qquad
   P_a = \widehat X_a^\dagger \widehat X_a.
-  \tag{\texttt{orthonormalization.tex:954--963}}
+  \tag{\texttt{def:projective-P}}
 \]
 Because $m\le d$, the rectangular identity satisfies
 $I_{m\times d}I_{d\times m}=I_{m\times m}$, so
@@ -128,16 +128,16 @@ coisometry $\widehat X$ whose row Gram is the identity.
 \section{The blueprint comparison}
 
 The informal blueprint follows this organization.  It introduces the matrix
-$X$ in \path{def:matrix-decomposition-Q}, records the SVD step in
-\path{def:svd-of-X}, and defines $P$ from
-$\widehat X=UI_{m\times d}V^\dagger$ in \path{def:projective-P}.%
+$X$ in \texttt{def:matrix-decomposition-Q}, records the SVD step in
+\texttt{def:svd-of-X}, and defines $P$ from
+$\widehat X=UI_{m\times d}V^\dagger$ in \texttt{def:projective-P}.%
 \footnote{See \path{blueprint/src/chapter/ch04_projective.tex}, lines~704--785.}
 It then records the SVD-derived identities separately: $X^\dagger X=Q$ in
-\path{lem:X-squared}, $\widehat X\widehat X^\dagger=I$ in
-\path{lem:X-hat-squared}, $X^\dagger\widehat X=\sqrt Q$ in
-\path{lem:X-times-X-hat}, the squared-difference estimate in
-\path{lem:squared-difference}, and the final $P$-versus-$Q$ estimate in
-\path{lem:P-Q-approx}.%
+\texttt{lem:X-squared}, $\widehat X\widehat X^\dagger=I$ in
+\texttt{lem:X-hat-squared}, $X^\dagger\widehat X=\sqrt Q$ in
+\texttt{lem:X-times-X-hat}, the squared-difference estimate in
+\texttt{lem:squared-difference}, and the final $P$-versus-$Q$ estimate in
+\texttt{lem:P-Q-approx}.%
 \footnote{These blueprint nodes are in
 \path{blueprint/src/chapter/ch04_projective.tex}, lines~833--868 and
 933--1153.}
@@ -151,18 +151,19 @@ faithful to the paper: the proof only needs the coisometry identity for
 $\widehat X$, the mixed square-root identity, and the resulting estimates; it
 never uses the SVD factors for any other purpose.
 
+
 \section{The current formal statement}
 
-The Lean development mirrors the blueprint separation.  The type named after the
-paper's SVD stage is a reduced package of downstream consequences rather than a
-record of all SVD factors.%
-\footnote{The abbreviation \leanid{svdOfX} is defined as
+The formal development mirrors the blueprint separation.  The object standing
+for the paper's SVD stage is a reduced data package of downstream consequences,
+not a record of all SVD factors.%
+\footnote{The relevant formal names are \leanid{svdOfX} and
 \leanid{QXPLayerData} in
-\path{MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/Core.lean}, lines
-184--191.}
-A value of \leanid{QXPLayerData} stores the $Q$-layer, the matrices $X$ and
-$\widehat X$, the restatement $Q_a=X^\dagger T_aX$, projectivity of the $Q_a$,
-and the two primitive identities
+\doclink{MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/Core.lean},
+lines~184--191.}
+This package stores the $Q$-layer, the matrices $X$ and $\widehat X$, the
+restatement $Q_a=X^\dagger T_aX$, projectivity of the $Q_a$, and the two
+primitive identities
 \[
   \widehat X\widehat X^\dagger=I,
   \qquad
@@ -170,22 +171,23 @@ and the two primitive identities
 \]
 It also proves internally that $X^\dagger X=Q$ from the $Q_a=X^\dagger T_aX$
 restatement and the fact that $T$ is a measurement.%
-\footnote{See \leanid{QXPLayerData.ofQLayerAndSvdIdentities} in
-\path{MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/Core.lean}, lines
-202--269.}
+\footnote{This is the constructor
+\leanid{QXPLayerData.ofQLayerAndSvdIdentities} in
+\doclink{MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/Core.lean},
+lines~202--269.}
 
 The formal development also records the paper-facing rectangular-SVD algebra.
 If matrices $U,V,S$ and a rectangular identity factor $I_{m\times d}$ satisfy
-the unitary laws and $X=USV^\dagger$, then Lean proves the coisometry identity
-for $UI_{m\times d}V^\dagger$ and the raw mixed-product formula.  A separate
-positive-square-root uniqueness lemma turns the mixed product into
-$\sqrt Q$ when the middle factor is positive and has square $Q$.%
-\footnote{The relevant declarations are
+the unitary laws and $X=USV^\dagger$, then the coisometry identity for
+$UI_{m\times d}V^\dagger$ and the raw mixed-product formula follow by matrix
+algebra.  A separate positive-square-root uniqueness lemma turns the mixed
+product into $\sqrt Q$ when the middle factor is positive and has square $Q$.%
+\footnote{The relevant formal declarations are
 \leanid{rectangularSvd_xHat_coisometry},
 \leanid{rectangularSvd_xHat_mixed_raw},
 \leanid{rectangularSvd_middle_eq_sqrt_of_square}, and
 \leanid{exists_xHat_of_rectangularSvd} in
-\path{MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities.lean},
+\doclink{MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities.lean},
 lines~1040--1178.}
 Those statements are exactly the matrix calculations that the paper performs
 with $X=U\Sigma V^\dagger$ and
@@ -194,7 +196,8 @@ $\widehat X=UI_{m\times d}V^\dagger$.
 Recent formalization work goes one step further and constructs the same
 $\widehat X$ data through a positive-Gram, or rectangular polar-decomposition,
 route.  From $X^\dagger X=Q$, positivity of $Q$, and the dimension inequality
-$m\le d$, Lean constructs a rectangular coisometry $\widehat X$ such that
+$m\le d$, the construction produces a rectangular coisometry $\widehat X$ such
+that
 \[
   \widehat X\widehat X^\dagger=I,
   \qquad
@@ -206,23 +209,27 @@ than a general rectangular-SVD existence theorem.%
 \footnote{See \leanid{exists_xHat_of_positive_gram_spectrum},
 \leanid{exists_xHat_of_sigmaFinRangeEmbedding_positiveGram}, and
 \leanid{pQApprox_ofRankReductionSigmaRangePositiveGram} in
-\path{MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities.lean}.  The
-project-local dependency was tracked in \ghissue{1228}, following the older
+\doclink{MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities.lean}.
+The project-local dependency was tracked in \ghissue{1228}, following the older
 SVD-interface work in \ghissue{1117} and \ghissue{652}.}
-The downstream Lean estimates \leanid{xHatSquared}, \leanid{xTimesXHat},
-\leanid{squaredDifference}, and \leanid{pQApprox} consume only these primitive
-identities, just as the paper's later proof does.
+The downstream estimates consume only these primitive identities, just as the
+paper's later proof does.%
+\footnote{The downstream formal declarations are \leanid{xHatSquared},
+\leanid{xTimesXHat}, \leanid{squaredDifference}, and \leanid{pQApprox} in
+\doclink{MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities.lean}.}
 
 \section{Wrappers, local algebra, and Mathlib inputs}
 
 It is useful to separate packaging from mathematical content in this layer.  The
-names \leanid{svdOfX}, \leanid{QXPLayerData}, and the constructors
+SVD-stage wrapper, the $X/\widehat X/P$ data package, and the constructors which
+turn supplied identities into that package are mostly wrappers.%
+\footnote{The formal names are \leanid{svdOfX}, \leanid{QXPLayerData},
 \leanid{QXPLayerData.ofQLayerAndSvdIdentities},
 \leanid{QXPLayerData.ofRankReductionAndSvdIdentities}, and their existential
-variants are mostly wrappers.  They keep the paper's $Q\to X\to\widehat X\to P$
-objects visible and discharge bookkeeping such as $X^\dagger X=Q$ from
-$Q_a=X^\dagger T_aX$ and $\sum_aT_a=I$.  They do not themselves prove a general
-SVD theorem.
+variants.}
+They keep the paper's $Q\to X\to\widehat X\to P$ objects visible and discharge
+bookkeeping such as $X^\dagger X=Q$ from $Q_a=X^\dagger T_aX$ and
+$\sum_aT_a=I$.  They do not themselves prove a general SVD theorem.
 
 The substantive project-local algebra is in two places.  First, the
 rectangular-SVD adapters prove that, once matrices $U,V,S,I_{m\times d}$ with
@@ -247,7 +254,7 @@ property.%
 \leanid{Matrix.IsHermitian.eigenvalues}, \leanid{CFC.sqrt}, and
 \leanid{CFC.sqrt_unique}.  The local coisometry existence helper
 \leanid{Matrix.exists_mul_conjTranspose_eq_one_of_card_le} in
-\path{MIPStarRE/Quantum/FiniteHilbert.lean} is built from Mathlib's
+\doclink{MIPStarRE/Quantum/FiniteHilbert.lean} is built from Mathlib's
 \leanid{stdOrthonormalBasis} and \leanid{LinearMap.isometryOfOrthonormal}.}
 What is not currently supplied directly by Mathlib is a rectangular complex SVD
 or polar-decomposition theorem with exactly the output shape needed here.  The
