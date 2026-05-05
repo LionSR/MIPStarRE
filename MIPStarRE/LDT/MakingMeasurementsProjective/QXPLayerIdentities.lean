@@ -373,6 +373,40 @@ theorem positive_gram_spectrum_image_rows_mixed_eq_sqrt
     simp [hzero]
   simpa [coeff, mul_assoc] using hpositive_sum
 
+/-- Zero Gram eigenvectors are killed by the rectangular matrix.
+
+If `Q = Xᴴ * X` is positive semidefinite and an eigenvalue of `Q` is not
+strictly positive, then it is zero.  The corresponding eigenvector therefore
+lies in the kernel of `X`.  This is the algebraic reason why the arbitrary
+completion directions in the rectangular polar construction do not contribute
+to the mixed product `Xᴴ * Xhat`. -/
+theorem matrix_image_eq_zero_of_nonpositive_gram_eigenvalue
+    {μ ι : Type*}
+    [Fintype μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
+    (hQ : Q.IsHermitian)
+    (hQ_pos : Q.PosSemidef)
+    (hgram : Xᴴ * X = Q)
+    (i : ι) (hi : ¬ 0 < hQ.eigenvalues i) :
+    Matrix.toEuclideanLin X (hQ.eigenvectorBasis i) = 0 := by
+  let L := Matrix.toEuclideanLin X
+  have hnonneg : 0 ≤ hQ.eigenvalues i := hQ_pos.eigenvalues_nonneg i
+  have hle : hQ.eigenvalues i ≤ 0 := le_of_not_gt hi
+  have hLam : hQ.eigenvalues i = 0 := le_antisymm hle hnonneg
+  have heig := toEuclideanLin_gram_eigenvectorBasis X Q hQ hgram i
+  have hadj : L.adjoint (L (hQ.eigenvectorBasis i)) = 0 := by
+    change ((Matrix.toEuclideanLin X).adjoint.comp (Matrix.toEuclideanLin X))
+        (hQ.eigenvectorBasis i) = 0
+    rw [← Matrix.toEuclideanLin_conjTranspose_mul_self X, heig, hLam]
+    simp
+  have hinner : inner ℂ (L (hQ.eigenvectorBasis i)) (L (hQ.eigenvectorBasis i)) = 0 := by
+    calc
+      inner ℂ (L (hQ.eigenvectorBasis i)) (L (hQ.eigenvectorBasis i)) =
+          inner ℂ (hQ.eigenvectorBasis i) (L.adjoint (L (hQ.eigenvectorBasis i))) := by
+            rw [LinearMap.adjoint_inner_right]
+      _ = 0 := by rw [hadj, inner_zero_right]
+  exact inner_self_eq_zero.mp hinner
+
 /-- Spectral form of `normalized_matrix_image_rows_mul_conjTranspose`.
 
 The rows indexed by the strictly positive eigenvalues of the Hermitian Gram
