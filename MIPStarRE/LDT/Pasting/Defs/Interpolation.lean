@@ -47,25 +47,6 @@ def extractSlicePoly {params : Parameters} {k : ℕ}
     simpa [gHatTupleSupport] using hi
   exact (gs i).get hisSome
 
-/-- The old-coordinate embedding into the appended coordinate space is injective. -/
-private theorem embedCoord_injective (params : Parameters) :
-    Function.Injective (embedCoord params) := by
-  intro a b h
-  simp only [embedCoord, Fin.mk.injEq] at h
-  exact Fin.ext h
-
-/-- The appended last coordinate is outside the image of the old-coordinate embedding. -/
-private theorem degreeOf_rename_embedCoord_last (params : Parameters) [FieldModel params.q]
-    (p : PolynomialModel params) :
-    MvPolynomial.degreeOf (lastCoord params)
-      (MvPolynomial.rename (embedCoord params) p : PolynomialModel params.next) = 0 := by
-  rw [MvPolynomial.degreeOf, MvPolynomial.degrees_rename_of_injective
-    (embedCoord_injective params)]
-  simp only [Multiset.count_eq_zero, Multiset.mem_map]
-  rintro ⟨b, _, hb⟩
-  simp only [embedCoord, lastCoord, Fin.ext_iff] at hb
-  omega
-
 /-- Each Lagrange basis polynomial has degree at most one less than the size of the
 interpolation support, without requiring distinct interpolation nodes. -/
 private theorem natDegree_lagrangeBasis_le_card_sub_one {K ρ : Type*} [Field K] [DecidableEq ρ]
@@ -200,10 +181,8 @@ noncomputable def interpolateCompletedSlicesFromSupport (params : Parameters)
         ext
         simp [embedCoord, oldCoord]
       have hcoord_ne_last : coord ≠ lastCoord params := by
-        intro h
-        have hval : coord.val = params.m := by
-          simpa [lastCoord] using congrArg Fin.val h
-        omega
+        rw [← hcoord_eq]
+        exact embedCoord_ne_lastCoord params oldCoord
       have hLiMv_zero : MvPolynomial.degreeOf coord LiMv ≤ 0 := by
         simpa [LiMv, hcoord_ne_last] using
           (degreeOf_eval₂_C_X_le_natDegree
@@ -240,7 +219,7 @@ noncomputable def interpolateCompletedSlicesFromSupport (params : Parameters)
         change MvPolynomial.degreeOf (lastCoord params)
             (MvPolynomial.rename (embedCoord params) slice.poly :
               PolynomialModel params.next) ≤ 0
-        rw [degreeOf_rename_embedCoord_last]
+        rw [degreeOf_rename_embedCoord_lastCoord]
       calc
         MvPolynomial.degreeOf (lastCoord params) (LiMv * slicePoly)
             ≤ MvPolynomial.degreeOf (lastCoord params) LiMv +

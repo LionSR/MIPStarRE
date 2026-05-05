@@ -14,6 +14,18 @@ structure Polynomial (params : Parameters) [FieldModel params.q] where
   poly : PolynomialModel params
   lowIndividualDegree : ∀ i, MvPolynomial.degreeOf i poly ≤ params.d
 
+/-- Renaming a polynomial along the old-coordinate inclusion does not introduce
+the appended last coordinate. -/
+theorem degreeOf_rename_embedCoord_lastCoord (params : Parameters) [FieldModel params.q]
+    (p : PolynomialModel params) :
+    MvPolynomial.degreeOf (lastCoord params)
+      (MvPolynomial.rename (embedCoord params) p : PolynomialModel params.next) = 0 := by
+  rw [MvPolynomial.degreeOf, MvPolynomial.degrees_rename_of_injective
+    (embedCoord_injective params)]
+  simp only [Multiset.count_eq_zero, Multiset.mem_map]
+  rintro ⟨b, _, hb⟩
+  exact embedCoord_ne_lastCoord params b hb
+
 namespace Polynomial
 
 /-- Evaluation of the stored multivariate polynomial on a coded point. -/
@@ -39,10 +51,7 @@ noncomputable def appendAtHeight (params : Parameters) [FieldModel params.q]
   poly := MvPolynomial.rename (embedCoord params) g.poly
   lowIndividualDegree := by
     intro i
-    have hinj : Function.Injective (embedCoord params) := by
-      intro a b h
-      simp only [embedCoord, Fin.mk.injEq] at h
-      exact Fin.ext h
+    have hinj : Function.Injective (embedCoord params) := embedCoord_injective params
     by_cases h : i.val < params.m
     · -- i is in the range of embedCoord: transfer the degree bound
       have hi : embedCoord params ⟨i.val, h⟩ = i := by
@@ -50,12 +59,13 @@ noncomputable def appendAtHeight (params : Parameters) [FieldModel params.q]
       rw [← hi, MvPolynomial.degreeOf_rename_of_injective hinj]
       exact g.lowIndividualDegree _
     · -- i is not in range: degreeOf = 0
-      suffices MvPolynomial.degreeOf i (MvPolynomial.rename (embedCoord params) g.poly) = 0 by
-        omega
-      rw [MvPolynomial.degreeOf, MvPolynomial.degrees_rename_of_injective hinj]
-      simp only [Multiset.count_eq_zero, Multiset.mem_map]
-      rintro ⟨b, _, hb⟩
-      simp only [embedCoord, Fin.ext_iff] at hb
+      have hi_last : i = lastCoord params := by
+        apply Fin.ext
+        have hle : params.m ≤ i.val := Nat.le_of_not_gt h
+        have hlt : i.val < params.m + 1 := by
+          simpa [Parameters.next] using i.isLt
+        exact le_antisymm (Nat.le_of_lt_succ hlt) hle
+      rw [hi_last, degreeOf_rename_embedCoord_lastCoord]
       omega
 
 /-- Coordinate map for restricting a polynomial in `m+1` variables to the slice `X_m = x`. -/
