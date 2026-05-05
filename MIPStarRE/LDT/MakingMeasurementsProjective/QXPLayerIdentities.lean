@@ -958,6 +958,30 @@ theorem positive_gram_polar_extension_mixed_eq_sqrt
     hgram e U W hU_left hU_rows hW_rows]
   exact positive_gram_spectrum_image_rows_mixed_eq_sqrt X Q hQ hQ_pos hgram
 
+/-- Existence of the polar-extension `Xhat` from a positive Gram factorization.
+
+If `Q = X†X` is positive semidefinite and the row dimension is at most the
+column dimension, the positive spectral rows of `Q` determine a rectangular
+coisometry `Xhat` satisfying the two primitive QXP identities:
+`Xhat Xhat† = I` and `X† Xhat = sqrt Q`. -/
+theorem exists_xHat_of_positive_gram_spectrum
+    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
+    (hQ : Q.IsHermitian) (hQ_pos : Q.PosSemidef)
+    (hgram : Xᴴ * X = Q)
+    (hcard : Fintype.card μ ≤ Fintype.card ι) :
+    ∃ xHat : Matrix μ ι ℂ,
+      xHat * xHatᴴ = (1 : Matrix μ μ ℂ) ∧
+        Xᴴ * xHat = CFC.sqrt Q := by
+  obtain ⟨e, U, hU_left, hU_right, hU_rows⟩ :=
+    exists_unitary_with_positive_gram_spectrum_rows_of_card X Q hQ hgram
+  obtain ⟨W, hW, hW_rows⟩ :=
+    exists_rectangular_coisometry_with_positive_gram_spectrum_right_rows Q hQ e hcard
+  refine ⟨Uᵀ * W, ?_, ?_⟩
+  · exact transpose_unitary_mul_rectangular_coisometry U W hU_right hW
+  · exact positive_gram_polar_extension_mixed_eq_sqrt X Q hQ hQ_pos hgram e
+      U W hU_left hU_rows hW_rows
+
 /-- The row-coisometry identity for the rectangular SVD choice of `Xhat`.
 
 If `U` and `V` are unitary in the directions used below, and if the rectangular
