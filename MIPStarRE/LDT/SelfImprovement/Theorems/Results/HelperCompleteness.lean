@@ -163,7 +163,7 @@ private lemma polynomialEvaluationFamily_outcome_eq_fiber_sum
     (a : Fq params) :
     ((polynomialEvaluationFamily params G) u).outcome a =
       ∑ g ∈ Finset.univ.filter (fun g : Polynomial params => g u = a), G.outcome g := by
-  simp [polynomialEvaluationFamily, evaluateAt]
+  rw [polynomialEvaluationFamily, evaluateAt, SubMeas.postprocess_outcome]
 
 /-- The bracketed fiber expression is exactly the bipartite matching mass of
 the point measurement against the polynomial measurement evaluated at `u`. -/
