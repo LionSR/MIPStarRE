@@ -194,7 +194,7 @@ theorem matrixSdpDualPositive_of_dualFeasible (params : Parameters)
 
 /-- Matrix-level record of the explicit feasible bounds used in the SDP argument.
 
-The uniform primal family has total `(1/2)I`, while the dual witness `2I` is
+The uniform primal family has total `(1/2)I`, while the dual witness `2I`
 dominates the identity and is dual feasible. Positivity of the dual witness is
 derivable from dual feasibility and the positivity of the averaged point
 operators. These are the non-strict matrix inequalities currently recorded in
