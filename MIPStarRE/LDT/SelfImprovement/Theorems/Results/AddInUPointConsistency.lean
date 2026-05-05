@@ -273,30 +273,24 @@ theorem pointConsistencyAddInU_transfer_of_selected_chain_selfConsistency_global
           (S := pointConsistencyAddInUSelection params)
           (delta := delta)
           hssc
+  obtain ⟨hsteps3, hsteps4⟩ :=
+    addInU_selected_cs_chain_step34_abs_le_sqrt_of_globalVarianceDeviation_sum_le
+      (params := params)
+      (strategy := strategy)
+      (M := IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (T := T)
+      (S := pointConsistencyAddInUSelection params)
+      hglobal
   have h23 :
       |pointConsistencyAddInUCSChainQ2 params strategy T -
         pointConsistencyAddInUCSChainQ3 params strategy T| ≤ ηgv := by
     simpa [pointConsistencyAddInUCSChainQ2, pointConsistencyAddInUCSChainQ3, ηgv]
-      using
-        addInU_selected_cs_chain_step3_abs_le_sqrt_of_globalVarianceDeviation_sum_le
-          (params := params)
-          (strategy := strategy)
-          (M := IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-          (T := T)
-          (S := pointConsistencyAddInUSelection params)
-          hglobal
+      using hsteps3
   have h34 :
       |pointConsistencyAddInUCSChainQ3 params strategy T -
         pointConsistencyAddInUCSChainQ4 params strategy T| ≤ ηgv := by
     simpa [pointConsistencyAddInUCSChainQ3, pointConsistencyAddInUCSChainQ4, ηgv]
-      using
-        addInU_selected_cs_chain_step4_abs_le_sqrt_of_globalVarianceDeviation_sum_le
-          (params := params)
-          (strategy := strategy)
-          (M := IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-          (T := T)
-          (S := pointConsistencyAddInUSelection params)
-          hglobal
+      using hsteps4
   have hsum : ηsc + ηsc + ηgv + ηgv ≤ addInUError params eps delta := by
     have h :=
       two_sqrt_two_delta_add_two_sqrt_selfImprovementVarianceError_le_addInUError
