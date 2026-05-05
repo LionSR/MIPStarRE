@@ -992,14 +992,6 @@ lemma add_in_u_simplified_transfer_of_cs_chain
         have h2 := abs_add_le ((Q0 - Q1) + (Q1 - Q2)) (Q2 - Q3)
         have h3 := abs_add_le (Q0 - Q1) (Q1 - Q2)
         nlinarith
-  have h01' : |Q0 - Q1| ≤ η01 := by
-    simpa [Q0, Q1] using h01
-  have h12' : |Q1 - Q2| ≤ η12 := by
-    simpa [Q1, Q2] using h12
-  have h23' : |Q2 - Q3| ≤ η23 := by
-    simpa [Q2, Q3] using h23
-  have h34' : |Q3 - Q4| ≤ η34 := by
-    simpa [Q3, Q4] using h34
   calc
     |qBipartiteMatchMass strategy.state
         (averagedSandwichedPolynomialSubMeas params strategy T)
@@ -1064,14 +1056,6 @@ lemma add_in_u_selected_transfer_of_cs_chain
         have h2 := abs_add_le ((Q0 - Q1) + (Q1 - Q2)) (Q2 - Q3)
         have h3 := abs_add_le (Q0 - Q1) (Q1 - Q2)
         nlinarith
-  have h01' : |Q0 - Q1| ≤ η01 := by
-    simpa [Q0, Q1] using h01
-  have h12' : |Q1 - Q2| ≤ η12 := by
-    simpa [Q1, Q2] using h12
-  have h23' : |Q2 - Q3| ≤ η23 := by
-    simpa [Q2, Q3] using h23
-  have h34' : |Q3 - Q4| ≤ η34 := by
-    simpa [Q3, Q4] using h34
   calc
     |addInULeftQuantity params strategy M
         (averagedSandwichedPolynomialSubMeas params strategy T) S -

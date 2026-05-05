@@ -307,7 +307,8 @@ lemma addInU_cs_chain_step3_diff_eq
 /-- Algebraic CS-alignment for the selected `Q₀ → Q₁` step.
 
 This is the selection-parametrized form of `addInU_cs_chain_step1_diff_eq`.
-It rewrites the scalar difference using the same commutator
+The identity is stated in the same orientation as the diagonal chain, namely
+as `Q₁ - Q₀`.  It rewrites the scalar difference using the same commutator
 `A^v_{h(v)} ⊗ I − I ⊗ A^v_{h(v)}`, but sums only over the selected pairs
 `(o,h) ∈ S_u` and leaves the arbitrary outcome operator `M^u_o` in place. -/
 lemma addInU_selected_cs_chain_step1_diff_eq

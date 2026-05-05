@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Basic.SubMeasurementFamilies
+import MIPStarRE.LDT.Basic.Distribution
 import MIPStarRE.LDT.GlobalVariance.Theorems.Results
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain
@@ -1383,7 +1384,7 @@ theorem addInUSelectedCSChainQ0_eq_leftQuantity_averagedSandwiched
           ev strategy.state
             (opTensor ((M u).outcome ah.1)
               ((sandwichedPolynomialSubMeasAt params strategy T v).outcome ah.2))) := by
-        exact (avgOver_finset_sum (uniformDistribution (Point params))
+        exact (MIPStarRE.LDT.avgOver_finset_sum (uniformDistribution (Point params))
           (addInUSelectionPairs params S u)
           (fun v ah =>
             ev strategy.state
