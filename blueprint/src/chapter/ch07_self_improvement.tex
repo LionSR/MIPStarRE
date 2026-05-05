@@ -322,6 +322,10 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
     \approx_{\sqrt{2\delta}}
     \E_{u,v} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi} H^{u}_{h'}  \ot \bigl(T_h \cdot A^{v}_{h(v)}\bigr) \ket{\psi}.
   \end{equation}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperDeleteAClonedQuantity}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperMoveOverVQuantity}
+  \lean{MIPStarRE.LDT.SelfImprovement.helperDeleteAQuantity_le_moveOverV_of_abs_transports}
+  \leanok
   Substituting~\eqref{eq:swap-Z-for-A}, then~\eqref{eq:Z-greater-than-A}, and finally the already proved bound~\eqref{eq:explicit-bound-for-A-consistency}, one obtains
   \[
     \eqref{eq:move-over-v}

@@ -800,6 +800,79 @@ theorem helperFullOuterSandwichQuantity_eq_deleteAQuantity
         (T.outcome h))
   rw [pointConditioned_sandwichedPolynomialOutcome_outer_eq_right]
 
+/-- The `delete-an-A` expression after replacing the remaining point projector
+by an independent point.
+
+This is the scalar quantity on the right-hand side of the paper's
+`eq:swap-u-for-v-attack-of-the-clones`. -/
+noncomputable def helperDeleteAClonedQuantity
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) : Error :=
+  avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+    ∑ h : Polynomial params,
+      ∑ h' : Polynomial params,
+        ev strategy.state
+          (opTensor
+            (((sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h') *
+              pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2)
+            (T.outcome h)))
+
+/-- The expression obtained after moving the remaining point projector to the
+right tensor factor.
+
+This is the scalar quantity on the right-hand side of the paper's
+`eq:move-over-v`. -/
+noncomputable def helperMoveOverVQuantity
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) : Error :=
+  avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+    ∑ h : Polynomial params,
+      ∑ h' : Polynomial params,
+        ev strategy.state
+          (opTensor
+            ((sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h')
+            (T.outcome h *
+              pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2)))
+
+/-- Assemble the post-`delete-an-A` transport estimates.
+
+The first hypothesis is the variance replacement
+`A^u_{h(u)} → A^v_{h(v)}` in `eq:swap-u-for-v-attack-of-the-clones`.  The second
+hypothesis is the self-consistency move `eq:move-over-v`, which moves the
+remaining point projector from Alice's tensor factor to Bob's tensor factor.
+This lemma only performs the scalar triangle-inequality assembly; the analytic
+proofs of the two displayed hypotheses remain separate. -/
+theorem helperDeleteAQuantity_le_moveOverV_of_abs_transports
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (T : SubMeas (Polynomial params) ι)
+    (hclone :
+      |helperDeleteAQuantity params strategy T -
+        helperDeleteAClonedQuantity params strategy T| ≤
+          Real.sqrt (selfImprovementVarianceError params eps delta))
+    (hmove :
+      |helperDeleteAClonedQuantity params strategy T -
+        helperMoveOverVQuantity params strategy T| ≤
+          Real.sqrt (2 * delta)) :
+    helperDeleteAQuantity params strategy T ≤
+      helperMoveOverVQuantity params strategy T +
+        Real.sqrt (selfImprovementVarianceError params eps delta) +
+        Real.sqrt (2 * delta) := by
+  have hclone_le :
+      helperDeleteAQuantity params strategy T -
+          helperDeleteAClonedQuantity params strategy T ≤
+        Real.sqrt (selfImprovementVarianceError params eps delta) :=
+    (abs_le.mp hclone).2
+  have hmove_le :
+      helperDeleteAClonedQuantity params strategy T -
+          helperMoveOverVQuantity params strategy T ≤
+        Real.sqrt (2 * delta) :=
+    (abs_le.mp hmove).2
+  linarith
+
 /-- Named form of the identity `eq:h-blt` for the off-diagonal helper SSC
 quantity. -/
 theorem helperOffDiagonalOuterSandwichQuantity_eq_indicator
