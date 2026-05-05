@@ -1,6 +1,7 @@
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities
+import MIPStarRE.LDT.Preliminaries.DistanceBounds
 
 /-!
 # Section 9 — `OrthonormalizationInput` producer bridge
@@ -39,6 +40,9 @@ extra assumption.
   whose rounded family is canonically `ProjSubMeas.liftLeft P`.
 * `leftLiftedQXPLayerRepairWitness_of_lifted_qxp_sddOpRel` — converts a
   lifted raw QXP approximation into that locality-preserving witness.
+* `leftLiftedQXPLayerRepairWitness_of_local_qxp_sddOpRel` — transports a local
+  QXP approximation through a left marginal identity before applying the lifted
+  witness constructor.
 * `leftLiftedProjectivizationRepairInput_of_lifted_qxp_sddOpRel` — composes
   the same approximation with the existing repair-input bridge.
 * `orthonormalizationInput_of_producers` — combines the two slices into the
@@ -202,6 +206,37 @@ noncomputable def leftLiftedQXPLayerRepairWitness_of_lifted_qxp_sddOpRel
       Matrix.mul_assoc]
   rw [herror]
   exact hclose.squaredDistanceBound
+
+/-- Build the left-lifted QXP repair witness from a local QXP approximation and
+a left-marginal expectation identity.
+
+The local approximation is measured in a state `φ` on the original Hilbert
+space.  If `φ` has the same expectations as the left tensor placements in the
+bipartite state `ψ`, then the local `Q`-versus-`P` estimate transports to the
+left tensor factor and hence gives the locality-preserving witness required by
+the orthonormalization bridge. -/
+noncomputable def leftLiftedQXPLayerRepairWitness_of_local_qxp_sddOpRel
+    {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    {ψ : QuantumState (ι × ι)} {φ : QuantumState ι}
+    {A : Measurement Outcome ι} {ζ : Error}
+    (data : QXPLayerData Outcome ι)
+    (hA :
+      ∀ a : Outcome, data.qLayer.q.outcome a = A.outcome a)
+    (hev : ∀ X : MIPStarRE.Quantum.Op ι,
+      ev ψ (leftTensor (ι₂ := ι) X) = ev φ X)
+    (hclose :
+      SDDOpRel φ (uniformDistribution Unit)
+        (constOpFamily data.qLayer.q)
+        (constOpFamily (PFamily data))
+        (roundingToProjectiveError ζ)) :
+    LeftLiftedQXPLayerRepairWitness ψ A ζ :=
+  leftLiftedQXPLayerRepairWitness_of_lifted_qxp_sddOpRel data hA
+    (MIPStarRE.LDT.Preliminaries.sddOpRel_leftPlaced_of_ev_eq ψ φ
+      (uniformDistribution Unit)
+      (constOpFamily data.qLayer.q) (constOpFamily (PFamily data))
+      (roundingToProjectiveError ζ) hev hclose)
 
 /-- A QXP-layer witness producer implies the existing left-lifted repair input.
 

@@ -376,5 +376,44 @@ lemma sddOpRel_symm
   constructor
   simpa [sddErrorOp, qSDDOp_symm] using h
 
+/-- Transport a local raw-operator state-dependent distance estimate to the
+left tensor factor of a bipartite state.
+
+The hypothesis `hev` is the defining marginal identity for the left register:
+expectations of local operators in `φ` agree with expectations of their
+left-tensor placements in `ψ`.  Under this identity, the squared-distance
+defect of two local raw operator families is exactly the squared-distance
+defect of their left placements. -/
+lemma sddOpRel_leftPlaced_of_ev_eq
+    {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι)) (φ : QuantumState ι)
+    (𝒟 : Distribution Question)
+    (A B : IdxOpFamily Question Outcome ι) (δ : Error)
+    (hev : ∀ X : MIPStarRE.Quantum.Op ι,
+      ev ψ (leftTensor (ι₂ := ι) X) = ev φ X) :
+    SDDOpRel φ 𝒟 A B δ →
+    SDDOpRel ψ 𝒟
+      (fun q => OpFamily.leftPlacedOpFamily (ιB := ι) (A q))
+      (fun q => OpFamily.leftPlacedOpFamily (ιB := ι) (B q)) δ := by
+  intro ⟨hAB⟩
+  constructor
+  unfold sddErrorOp at *
+  calc
+    avgOver 𝒟
+        (fun q =>
+          qSDDOp ψ
+            (OpFamily.leftPlacedOpFamily (ιB := ι) (A q))
+            (OpFamily.leftPlacedOpFamily (ιB := ι) (B q)))
+      = avgOver 𝒟 (fun q => qSDDOp φ (A q) (B q)) := by
+          refine avgOver_congr 𝒟 _ _ ?_
+          intro q
+          unfold qSDDOp qSDDCore
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          simp [OpFamily.leftPlacedOpFamily, leftTensor_sub,
+            leftTensor_mul_leftTensor, hev]
+    _ ≤ δ := hAB
+
 
 end MIPStarRE.LDT.Preliminaries
