@@ -8,6 +8,7 @@ import MIPStarRE.LDT.Test.MainTheorem.ProjectiveConsistency
 import MIPStarRE.LDT.Test.MainTheorem.CompletionTransport
 import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationData
 import MIPStarRE.LDT.Test.MainTheorem.DiagonalCompletion
+import MIPStarRE.LDT.Test.MainTheorem.NativeTargets
 import MIPStarRE.LDT.Test.MainTheorem.MainFormal
 
 /-!
