@@ -129,12 +129,13 @@ namespace MainFormalPostRolePackageDiagonalOrthonormalizationInput
 /-- Build the line-130 orthonormalization input once the two locality-preserving
 repair inputs are available.
 
-The spectral-truncation fields are no longer external assumptions: they are
-obtained from the constructive spectral-truncation producer
-`spectralTruncationInput_of_sourceAlmostProjective`, applied to the two
-unsymmetrized role measurements after left tensor placement.  The remaining
-inputs are precisely the Alice- and Bob-side repair steps, which preserve the
-local form of the repaired projective submeasurements. -/
+This constructor supplies the spectral-truncation fields from the constructive
+producer `spectralTruncationInput_of_sourceAlmostProjective`, applied to the two
+unsymmetrized role measurements after left tensor placement.  Callers that use
+this constructor therefore supply only the Alice- and Bob-side repair steps,
+which preserve the local form of the repaired projective submeasurements.  The
+existing bridge structures still accept a full orthonormalization input; routing
+those bridges through this constructor is a separate assembly step. -/
 noncomputable def ofRepairInputs
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
