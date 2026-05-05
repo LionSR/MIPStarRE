@@ -129,7 +129,6 @@ theorem toSdpOptimalPairWithSlackness_of_dualDominatesIdentity
     primalTotalOperator := by
       simpa [matrixSubmeasurementToSubMeas, MIPStarRE.Quantum.Submeasurement.total] using
         h.primalTotalEqOne
-    dualPositive := h.dualPositive
     dualDominatesIdentity := hdom
     dualFeasible := by
       intro g

@@ -476,15 +476,18 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStrictDualWitness}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStrictDualWitness_nonneg}
   \lean{MIPStarRE.LDT.SelfImprovement.one_le_matrixSdpStrictDualWitness}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixAveragedPointOperator_nonneg}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixAveragedPointOperator_le_one}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStrictDualWitness_dualFeasible}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpDualPositive_of_dualFeasible}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpFeasibleBounds}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpFeasibleBounds_canonical}
   \leanok
   In every concrete matrix realization, the uniform family
   \(T_g=(2|\polyfunc{m}{q}{d}|)^{-1}I\) has total mass \((1/2)I\).  The dual
-  operator \(Z=2I\) is positive semidefinite, dominates the identity, and
-  satisfies \(Z\geq A_g\) for every polynomial \(g\).
+  operator \(Z=2I\) dominates the identity and satisfies \(Z\geq A_g\) for every
+  polynomial \(g\).  More generally, dual feasibility implies positivity of
+  \(Z\), since the averaged point operators \(A_g\) are positive semidefinite.
 \end{lemma}
 \begin{proof}
   \leanok
@@ -502,6 +505,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.toMatrixSdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness.exists_measurement_witness}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpComplementarySlacknessEquation}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.dualPositive}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.primalMeasurement}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.complementarySlacknessEquation}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSubmeasurementToSubMeas}
@@ -534,6 +538,9 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
 
 \begin{lemma}[Dual SDP and complementary slackness]\label{lem:sdp}
   \lean{MIPStarRE.LDT.SelfImprovement.sdp}
+  \lean{MIPStarRE.LDT.SelfImprovement.averagedPointOperator_nonneg}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdpDualPositive_of_dualFeasible}
+  \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPair.dualPositive}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness}
   Let

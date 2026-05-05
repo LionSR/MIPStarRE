@@ -29,20 +29,34 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 The paper's `lem:sdp` eventually supplies strong duality, complementary
 slackness, and a concrete matrix-level optimal witness. The current Lean
 development only consumes the weaker facts recorded here: the primal witness is
-a full measurement (`T.total = 1`), the dual witness is PSD, it dominates the
-identity, and it dominates every averaged point operator. Despite the historical
-name, this reduced package does not assert SDP optimality. -/
+a full measurement (`T.total = 1`), the dual witness dominates the identity,
+and it dominates every averaged point operator. Positivity of the dual witness
+is derivable from dual feasibility and positivity of the averaged point
+operators. Despite the historical name, this reduced package does not assert
+SDP optimality. -/
 structure SdpOptimalPair (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (T : SubMeas (Polynomial params) ι) (Z : MIPStarRE.Quantum.Op ι) : Prop where
   primalTotalOperator :
     T.total = 1
-  dualPositive : 0 ≤ Z
   dualDominatesIdentity :
     (1 : MIPStarRE.Quantum.Op ι) ≤ Z
   dualFeasible :
     ∀ g : Polynomial params,
       0 ≤ sdpDualSlackOperator params strategy Z g
+
+namespace SdpOptimalPair
+
+/-- The dual operator in an SDP witness is positive semidefinite. -/
+theorem dualPositive {params : Parameters} [FieldModel params.q]
+    {strategy : SymStrat params ι}
+    {T : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (h : SdpOptimalPair params strategy T Z) :
+    0 ≤ Z :=
+  sdpDualPositive_of_dualFeasible params strategy Z h.dualFeasible
+
+end SdpOptimalPair
 
 /-- SDP optimal-pair data strengthened by complementary slackness.
 
@@ -214,10 +228,11 @@ structure AddInUStatement (params : Parameters)
 /-- Reduced conclusion for the SDP and `addInU` stage of
 `lem:self-improvement-helper`.
 
-This structure intentionally records only the guarantees produced directly by the
-current `sdp` and `addInU` arguments: the SDP witness, the averaged construction of
-`H`, the reduced `addInU` variance bound, and the PSD / dual-feasibility facts
-for `Z`.
+This structure intentionally records only the guarantees produced directly by
+the current `sdp` and `addInU` arguments: the SDP witness, the averaged
+construction of `H`, and the reduced `addInU` variance bound. Positivity,
+identity domination, and pointwise dual feasibility of `Z` are read from the
+bundled SDP witness rather than repeated as helper fields.
 
 The paper and blueprint state four additional helper-lemma guarantees
 (`completeness`, `pointConsistency`, strong self-consistency, and boundedness).
@@ -234,13 +249,6 @@ structure SelfImprovementHelperConclusion (params : Parameters) [FieldModel para
     H = averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas
   addInUVarianceBound :
     AddInUStatement params strategy T eps delta
-  positiveSemidefiniteWitness :
-    0 ≤ Z
-  oneLeDualWitness :
-    (1 : MIPStarRE.Quantum.Op ι) ≤ Z
-  dualDominatesAveragedPoint :
-    ∀ g : Polynomial params,
-      0 ≤ sdpDualSlackOperator params strategy Z g
 
 /-- Helper conclusion strengthened by the SDP complementary-slackness equation.
 
