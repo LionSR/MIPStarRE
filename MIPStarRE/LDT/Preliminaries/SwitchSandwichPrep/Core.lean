@@ -83,6 +83,49 @@ lemma weightedFinsetCauchySchwarz
           Real.sqrt (avgOver 𝒟 (fun q => ∑ a : Outcome, y q a)) := by
             rfl
 
+/-- Weighted finite Cauchy--Schwarz with the summand restricted to a selected
+support.
+
+The statement is the ordinary weighted finite Cauchy--Schwarz inequality
+applied to the zero-extension of `t`, `x`, and `y` away from `selected`. -/
+lemma weightedFinsetCauchySchwarz_on_selectedSupport
+    {Question Outcome : Type*} [Fintype Outcome]
+    (𝒟 : Distribution Question)
+    (selected : Question → Outcome → Prop)
+    [∀ q a, Decidable (selected q a)]
+    (t x y : Question → Outcome → Error)
+    (ht :
+      ∀ q a, selected q a →
+        |t q a| ≤ Real.sqrt (x q a) * Real.sqrt (y q a))
+    (hx : ∀ q a, selected q a → 0 ≤ x q a)
+    (hy : ∀ q a, selected q a → 0 ≤ y q a) :
+    |avgOver 𝒟 (fun q =>
+      ∑ a : Outcome, if selected q a then t q a else 0)| ≤
+      Real.sqrt
+        (avgOver 𝒟 (fun q =>
+          ∑ a : Outcome, if selected q a then x q a else 0)) *
+      Real.sqrt
+        (avgOver 𝒟 (fun q =>
+          ∑ a : Outcome, if selected q a then y q a else 0)) := by
+  refine weightedFinsetCauchySchwarz
+    𝒟
+    (fun q a => if selected q a then t q a else 0)
+    (fun q a => if selected q a then x q a else 0)
+    (fun q a => if selected q a then y q a else 0)
+    ?_ ?_ ?_
+  · intro q a
+    by_cases hsel : selected q a
+    · simpa [hsel] using ht q a hsel
+    · simp [hsel]
+  · intro q a
+    by_cases hsel : selected q a
+    · simpa [hsel] using hx q a hsel
+    · simp [hsel]
+  · intro q a
+    by_cases hsel : selected q a
+    · simpa [hsel] using hy q a hsel
+    · simp [hsel]
+
 /-- The diagonal mass of a sub-measurement is bounded by its total mass. -/
 lemma subMeas_diagMass_le_mass
     {Outcome : Type*} {ι : Type*}
