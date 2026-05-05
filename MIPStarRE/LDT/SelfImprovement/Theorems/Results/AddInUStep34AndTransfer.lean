@@ -1815,13 +1815,11 @@ lemma add_in_u_cs_chain_global_variance_steps_of_local_sum_bound_from_factor_bou
         Real.sqrt (selfImprovementVarianceError params eps delta) ∧
       |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T| ≤
         Real.sqrt (selfImprovementVarianceError params eps delta) := by
-  have h23 :=
-    add_in_u_cs_chain_q2_q3_le_sqrt_of_localVarianceDeviation_sum_le_from_factor_bounds
-      params strategy eps delta T hlocal
-  have h34 :=
+  exact
+    ⟨add_in_u_cs_chain_q2_q3_le_sqrt_of_localVarianceDeviation_sum_le_from_factor_bounds
+      params strategy eps delta T hlocal,
     add_in_u_cs_chain_q3_q4_le_sqrt_of_localVarianceDeviation_sum_le_from_factor_bounds
-      params strategy eps delta T hlocal
-  simpa [selfImprovementVarianceError] using And.intro h23 h34
+      params strategy eps delta T hlocal⟩
 
 /-- Assemble the projection-simplified scalar transfer from the four scalar
 chain moves. The analytic work remains exactly the four bounds
