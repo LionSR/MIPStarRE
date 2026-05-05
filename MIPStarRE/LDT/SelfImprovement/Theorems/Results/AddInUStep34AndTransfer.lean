@@ -82,6 +82,36 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+private lemma le_sqrt_of_factor_bounds_right
+    {a D₁ D₂ s : Error}
+    (hCS : a ≤ Real.sqrt D₁ * Real.sqrt D₂)
+    (hD₁_le : D₁ ≤ s)
+    (hD₂_le_one : D₂ ≤ 1) :
+    a ≤ Real.sqrt s := by
+  have hsqrt_D₂ : Real.sqrt D₂ ≤ 1 := Real.sqrt_le_one.mpr hD₂_le_one
+  have hsqrt_D₁ : Real.sqrt D₁ ≤ Real.sqrt s := Real.sqrt_le_sqrt hD₁_le
+  calc
+    a ≤ Real.sqrt D₁ * Real.sqrt D₂ := hCS
+    _ ≤ Real.sqrt D₁ * 1 :=
+          mul_le_mul_of_nonneg_left hsqrt_D₂ (Real.sqrt_nonneg _)
+    _ = Real.sqrt D₁ := mul_one _
+    _ ≤ Real.sqrt s := hsqrt_D₁
+
+private lemma le_sqrt_of_factor_bounds_left
+    {a D₁ D₂ s : Error}
+    (hCS : a ≤ Real.sqrt D₁ * Real.sqrt D₂)
+    (hD₁_le_one : D₁ ≤ 1)
+    (hD₂_le : D₂ ≤ s) :
+    a ≤ Real.sqrt s := by
+  have hsqrt_D₁ : Real.sqrt D₁ ≤ 1 := Real.sqrt_le_one.mpr hD₁_le_one
+  have hsqrt_D₂ : Real.sqrt D₂ ≤ Real.sqrt s := Real.sqrt_le_sqrt hD₂_le
+  calc
+    a ≤ Real.sqrt D₁ * Real.sqrt D₂ := hCS
+    _ ≤ 1 * Real.sqrt D₂ :=
+          mul_le_mul_of_nonneg_right hsqrt_D₁ (Real.sqrt_nonneg _)
+    _ = Real.sqrt D₂ := one_mul _
+    _ ≤ Real.sqrt s := hsqrt_D₂
+
 /-! ### Add-in-u variance-bound conversions
 
 The following four lemmas are conditional real-valued conversions for the
@@ -138,22 +168,7 @@ lemma add_in_u_cs_chain_q2_q3_le_sqrt_of_factor_bounds
       Real.sqrt
         (∑ g : Polynomial params,
           globalVarianceDeviationAtPolynomial params strategy strategy.state T g) := by
-  have hsqrt_D₂ : Real.sqrt D₂ ≤ 1 := Real.sqrt_le_one.mpr hD₂_le_one
-  have hsqrt_D₁ :
-      Real.sqrt D₁ ≤ Real.sqrt
-          (∑ g : Polynomial params,
-            globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
-    Real.sqrt_le_sqrt hD₁_le
-  calc
-    |addInUCSChainQ2 params strategy T - addInUCSChainQ3 params strategy T|
-        ≤ Real.sqrt D₁ * Real.sqrt D₂ := hCS
-    _ ≤ Real.sqrt D₁ * 1 :=
-          mul_le_mul_of_nonneg_left hsqrt_D₂ (Real.sqrt_nonneg _)
-    _ = Real.sqrt D₁ := mul_one _
-    _ ≤ Real.sqrt
-            (∑ g : Polynomial params,
-              globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
-          hsqrt_D₁
+  exact le_sqrt_of_factor_bounds_right hCS hD₁_le hD₂_le_one
 
 /-- Convert a squared `Q₃ → Q₄` real bound to an absolute-value sqrt bound.
 
@@ -196,22 +211,7 @@ lemma add_in_u_cs_chain_q3_q4_le_sqrt_of_factor_bounds
       Real.sqrt
         (∑ g : Polynomial params,
           globalVarianceDeviationAtPolynomial params strategy strategy.state T g) := by
-  have hsqrt_D₁ : Real.sqrt D₁ ≤ 1 := Real.sqrt_le_one.mpr hD₁_le_one
-  have hsqrt_D₂ :
-      Real.sqrt D₂ ≤ Real.sqrt
-          (∑ g : Polynomial params,
-            globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
-    Real.sqrt_le_sqrt hD₂_le
-  calc
-    |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T|
-        ≤ Real.sqrt D₁ * Real.sqrt D₂ := hCS
-    _ ≤ 1 * Real.sqrt D₂ :=
-          mul_le_mul_of_nonneg_right hsqrt_D₁ (Real.sqrt_nonneg _)
-    _ = Real.sqrt D₂ := one_mul _
-    _ ≤ Real.sqrt
-            (∑ g : Polynomial params,
-              globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
-          hsqrt_D₂
+  exact le_sqrt_of_factor_bounds_left hCS hD₁_le_one hD₂_le
 
 /-- Factored operator Cauchy--Schwarz bound for the `Q₂ → Q₃` add-in-`u` step.
 
@@ -445,7 +445,7 @@ This is the selection-parametrized analogue of
 `(o,h)`, with the terms outside the selected set `S_u` set to zero; this form is
 convenient for the finite Cauchy--Schwarz lemma and is equivalent to the
 fiberwise selected sum appearing in the paper. -/
-theorem addInU_selected_cs_chain_step3_factored_cs
+private theorem addInU_selected_cs_chain_step3_factored_cs
     {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -574,7 +574,7 @@ This is the selection-parametrized analogue of
 `add_in_u_cs_chain_q3_q4_factored_cs`; as in
 `addInU_selected_cs_chain_step3_factored_cs`, terms outside the selected set
 are represented by zeros in the finite Cauchy--Schwarz sum. -/
-theorem addInU_selected_cs_chain_step4_factored_cs
+private theorem addInU_selected_cs_chain_step4_factored_cs
     {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -791,37 +791,36 @@ private lemma addInU_selected_sandwich_tensor_if_sum_le
           opTensor (X h * (M u).total * X h) (T.outcome h) := huniv_eq
     _ ≤ ∑ h : Polynomial params, opTensor (X h * X h) (T.outcome h) := htotal_le
 
-/-- Selected self-energy factor `≤ 1` for the `Q₂ → Q₃` factored
-Cauchy--Schwarz bound. -/
-lemma addInU_selected_cs_chain_step3_self_energy_factor_le_one
+private lemma addInU_selected_cs_chain_self_energy_factor_le_one_at
     {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (M : IdxSubMeas (Point params) Outcome ι)
     (T : SubMeas (Polynomial params) ι)
-    (S : AddInUSelection params Outcome) :
+    (S : AddInUSelection params Outcome)
+    (p : Point params × Point params → Point params) :
     avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
       ∑ ah : Outcome × Polynomial params,
         if ah ∈ addInUSelectionPairs params S uv.1 then
-          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+          let A := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 (p uv)
           let Moh := (M uv.1).outcome ah.1
-          ev strategy.state (opTensor (Av * Moh * Av) (T.outcome ah.2))
+          ev strategy.state (opTensor (A * Moh * A) (T.outcome ah.2))
         else 0) ≤ 1 := by
   classical
   have hpointwise : ∀ uv : Point params × Point params,
       (∑ ah : Outcome × Polynomial params,
         if ah ∈ addInUSelectionPairs params S uv.1 then
-          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+          let A := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 (p uv)
           let Moh := (M uv.1).outcome ah.1
-          ev strategy.state (opTensor (Av * Moh * Av) (T.outcome ah.2))
+          ev strategy.state (opTensor (A * Moh * A) (T.outcome ah.2))
         else 0) ≤ 1 := by
     intro uv
     let X : Polynomial params → MIPStarRE.Quantum.Op ι :=
-      fun h => pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
+      fun h => pointConditionedOutcomeOperatorAtPolynomial params strategy h (p uv)
     have hX_herm : ∀ h : Polynomial params, (X h)ᴴ = X h := by
       intro h
-      exact SubMeas.outcome_hermitian (strategy.pointMeasurement uv.2).toSubMeas
-        (h uv.2)
+      exact SubMeas.outcome_hermitian (strategy.pointMeasurement (p uv)).toSubMeas
+        (h (p uv))
     have hsum_le :
         (∑ ah : Outcome × Polynomial params,
           if ah ∈ addInUSelectionPairs params S uv.1 then
@@ -839,14 +838,14 @@ lemma addInU_selected_cs_chain_step3_self_energy_factor_le_one
                 intro h _
                 have hproj : X h * X h = X h := by
                   dsimp [X, pointConditionedOutcomeOperatorAtPolynomial]
-                  exact (strategy.pointMeasurement uv.2).proj (h uv.2)
+                  exact (strategy.pointMeasurement (p uv)).proj (h (p uv))
                 rw [hproj]
         _ ≤ ∑ h : Polynomial params,
               opTensor (1 : MIPStarRE.Quantum.Op ι) (T.outcome h) := by
               refine Finset.sum_le_sum ?_
               intro h _
               exact opTensor_mono_left
-                ((strategy.pointMeasurement uv.2).toSubMeas.outcome_le_one (h uv.2))
+                ((strategy.pointMeasurement (p uv)).toSubMeas.outcome_le_one (h (p uv)))
                 (T.outcome_pos h)
         _ = rightTensor (ι₁ := ι) T.total := by
               rw [← T.sum_eq_total, ← opTensor_sum_right_univ]
@@ -854,25 +853,25 @@ lemma addInU_selected_cs_chain_step3_self_energy_factor_le_one
     have hop_le :
         (∑ ah : Outcome × Polynomial params,
           if ah ∈ addInUSelectionPairs params S uv.1 then
-            let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+            let A := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 (p uv)
             let Moh := (M uv.1).outcome ah.1
-            opTensor (Av * Moh * Av) (T.outcome ah.2)
+            opTensor (A * Moh * A) (T.outcome ah.2)
           else 0) ≤ 1 := by
       simpa [X] using le_trans hsum_le hright_le_one
     calc
       (∑ ah : Outcome × Polynomial params,
         if ah ∈ addInUSelectionPairs params S uv.1 then
-          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+          let A := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 (p uv)
           let Moh := (M uv.1).outcome ah.1
-          ev strategy.state (opTensor (Av * Moh * Av) (T.outcome ah.2))
+          ev strategy.state (opTensor (A * Moh * A) (T.outcome ah.2))
         else 0)
           = ev strategy.state
               (∑ ah : Outcome × Polynomial params,
                 if ah ∈ addInUSelectionPairs params S uv.1 then
-                  let Av := pointConditionedOutcomeOperatorAtPolynomial
-                    params strategy ah.2 uv.2
+                  let A := pointConditionedOutcomeOperatorAtPolynomial
+                    params strategy ah.2 (p uv)
                   let Moh := (M uv.1).outcome ah.1
-                  opTensor (Av * Moh * Av) (T.outcome ah.2)
+                  opTensor (A * Moh * A) (T.outcome ah.2)
                 else 0) := by
               rw [ev_finset_sum]
               refine Finset.sum_congr rfl ?_
@@ -885,9 +884,30 @@ lemma addInU_selected_cs_chain_step3_self_energy_factor_le_one
       _ = 1 := ev_one_of_isNormalized strategy.state strategy.isNormalized
   exact avgOver_uniform_le_of_pointwise_le _ 1 zero_le_one hpointwise
 
+/-- Selected self-energy factor `≤ 1` for the `Q₂ → Q₃` factored
+Cauchy--Schwarz bound. -/
+private lemma addInU_selected_cs_chain_step3_self_energy_factor_le_one
+    {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (M : IdxSubMeas (Point params) Outcome ι)
+    (T : SubMeas (Polynomial params) ι)
+    (S : AddInUSelection params Outcome) :
+    avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+      ∑ ah : Outcome × Polynomial params,
+        if ah ∈ addInUSelectionPairs params S uv.1 then
+          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+          let Moh := (M uv.1).outcome ah.1
+          ev strategy.state (opTensor (Av * Moh * Av) (T.outcome ah.2))
+        else 0) ≤ 1 := by
+  classical
+  simpa using
+    addInU_selected_cs_chain_self_energy_factor_le_one_at
+      params strategy M T S (fun uv : Point params × Point params => uv.2)
+
 /-- Selected self-energy factor `≤ 1` for the `Q₃ → Q₄` factored
 Cauchy--Schwarz bound. -/
-lemma addInU_selected_cs_chain_step4_self_energy_factor_le_one
+private lemma addInU_selected_cs_chain_step4_self_energy_factor_le_one
     {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -902,82 +922,9 @@ lemma addInU_selected_cs_chain_step4_self_energy_factor_le_one
           ev strategy.state (opTensor (Au * Moh * Au) (T.outcome ah.2))
         else 0) ≤ 1 := by
   classical
-  have hpointwise : ∀ uv : Point params × Point params,
-      (∑ ah : Outcome × Polynomial params,
-        if ah ∈ addInUSelectionPairs params S uv.1 then
-          let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
-          let Moh := (M uv.1).outcome ah.1
-          ev strategy.state (opTensor (Au * Moh * Au) (T.outcome ah.2))
-        else 0) ≤ 1 := by
-    intro uv
-    let X : Polynomial params → MIPStarRE.Quantum.Op ι :=
-      fun h => pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.1
-    have hX_herm : ∀ h : Polynomial params, (X h)ᴴ = X h := by
-      intro h
-      exact SubMeas.outcome_hermitian (strategy.pointMeasurement uv.1).toSubMeas
-        (h uv.1)
-    have hsum_le :
-        (∑ ah : Outcome × Polynomial params,
-          if ah ∈ addInUSelectionPairs params S uv.1 then
-            opTensor (X ah.2 * (M uv.1).outcome ah.1 * X ah.2) (T.outcome ah.2)
-          else 0) ≤
-        ∑ h : Polynomial params, opTensor (X h * X h) (T.outcome h) :=
-      addInU_selected_sandwich_tensor_if_sum_le params M T S uv.1 X hX_herm
-    have hright_le_one :
-        (∑ h : Polynomial params, opTensor (X h * X h) (T.outcome h)) ≤
-          (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
-      calc
-        ∑ h : Polynomial params, opTensor (X h * X h) (T.outcome h)
-            = ∑ h : Polynomial params, opTensor (X h) (T.outcome h) := by
-                refine Finset.sum_congr rfl ?_
-                intro h _
-                have hproj : X h * X h = X h := by
-                  dsimp [X, pointConditionedOutcomeOperatorAtPolynomial]
-                  exact (strategy.pointMeasurement uv.1).proj (h uv.1)
-                rw [hproj]
-        _ ≤ ∑ h : Polynomial params,
-              opTensor (1 : MIPStarRE.Quantum.Op ι) (T.outcome h) := by
-              refine Finset.sum_le_sum ?_
-              intro h _
-              exact opTensor_mono_left
-                ((strategy.pointMeasurement uv.1).toSubMeas.outcome_le_one (h uv.1))
-                (T.outcome_pos h)
-        _ = rightTensor (ι₁ := ι) T.total := by
-              rw [← T.sum_eq_total, ← opTensor_sum_right_univ]
-        _ ≤ 1 := rightTensor_le_one (ι₁ := ι) T.total_le_one
-    have hop_le :
-        (∑ ah : Outcome × Polynomial params,
-          if ah ∈ addInUSelectionPairs params S uv.1 then
-            let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
-            let Moh := (M uv.1).outcome ah.1
-            opTensor (Au * Moh * Au) (T.outcome ah.2)
-          else 0) ≤ 1 := by
-      simpa [X] using le_trans hsum_le hright_le_one
-    calc
-      (∑ ah : Outcome × Polynomial params,
-        if ah ∈ addInUSelectionPairs params S uv.1 then
-          let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
-          let Moh := (M uv.1).outcome ah.1
-          ev strategy.state (opTensor (Au * Moh * Au) (T.outcome ah.2))
-        else 0)
-          = ev strategy.state
-              (∑ ah : Outcome × Polynomial params,
-                if ah ∈ addInUSelectionPairs params S uv.1 then
-                  let Au := pointConditionedOutcomeOperatorAtPolynomial
-                    params strategy ah.2 uv.1
-                  let Moh := (M uv.1).outcome ah.1
-                  opTensor (Au * Moh * Au) (T.outcome ah.2)
-                else 0) := by
-              rw [ev_finset_sum]
-              refine Finset.sum_congr rfl ?_
-              intro ah _
-              by_cases hmem : ah ∈ addInUSelectionPairs params S uv.1
-              · simp [hmem]
-              · simp [hmem, ev_zero]
-      _ ≤ ev strategy.state (1 : MIPStarRE.Quantum.Op (ι × ι)) :=
-            ev_mono strategy.state _ _ hop_le
-      _ = 1 := ev_one_of_isNormalized strategy.state strategy.isNormalized
-  exact avgOver_uniform_le_of_pointwise_le _ 1 zero_le_one hpointwise
+  simpa using
+    addInU_selected_cs_chain_self_energy_factor_le_one_at
+      params strategy M T S (fun uv : Point params × Point params => uv.1)
 
 /-- The selected Step 3/4 variance factor is bounded by the summed
 global-variance deviation.
@@ -986,7 +933,7 @@ The selected middle operators form a submeasurement after summing over their
 outcome coordinate, so the selected sandwich is dominated by the square of
 `A^v_{h(v)} - A^u_{h(u)}`.  Averaging over independent points identifies the
 result with the global-variance deviation sum. -/
-lemma addInU_selected_cs_chain_step34_variance_factor_le_globalVarianceDeviation_sum
+private lemma addInU_selected_cs_chain_step34_variance_factor_le_globalVarianceDeviation_sum
     {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -1131,36 +1078,6 @@ lemma addInU_selected_cs_chain_step34_variance_factor_le_globalVarianceDeviation
     _ = ∑ g : Polynomial params,
           globalVarianceDeviationAtPolynomial params strategy strategy.state T g := hsquared_eq
 
-private lemma selected_le_sqrt_of_factor_bounds_right
-    {a D₁ D₂ s : Error}
-    (hCS : a ≤ Real.sqrt D₁ * Real.sqrt D₂)
-    (hD₁_le : D₁ ≤ s)
-    (hD₂_le_one : D₂ ≤ 1) :
-    a ≤ Real.sqrt s := by
-  have hsqrt_D₂ : Real.sqrt D₂ ≤ 1 := Real.sqrt_le_one.mpr hD₂_le_one
-  have hsqrt_D₁ : Real.sqrt D₁ ≤ Real.sqrt s := Real.sqrt_le_sqrt hD₁_le
-  calc
-    a ≤ Real.sqrt D₁ * Real.sqrt D₂ := hCS
-    _ ≤ Real.sqrt D₁ * 1 :=
-          mul_le_mul_of_nonneg_left hsqrt_D₂ (Real.sqrt_nonneg _)
-    _ = Real.sqrt D₁ := mul_one _
-    _ ≤ Real.sqrt s := hsqrt_D₁
-
-private lemma selected_le_sqrt_of_factor_bounds_left
-    {a D₁ D₂ s : Error}
-    (hCS : a ≤ Real.sqrt D₁ * Real.sqrt D₂)
-    (hD₁_le_one : D₁ ≤ 1)
-    (hD₂_le : D₂ ≤ s) :
-    a ≤ Real.sqrt s := by
-  have hsqrt_D₁ : Real.sqrt D₁ ≤ 1 := Real.sqrt_le_one.mpr hD₁_le_one
-  have hsqrt_D₂ : Real.sqrt D₂ ≤ Real.sqrt s := Real.sqrt_le_sqrt hD₂_le
-  calc
-    a ≤ Real.sqrt D₁ * Real.sqrt D₂ := hCS
-    _ ≤ 1 * Real.sqrt D₂ :=
-          mul_le_mul_of_nonneg_right hsqrt_D₁ (Real.sqrt_nonneg _)
-    _ = Real.sqrt D₂ := one_mul _
-    _ ≤ Real.sqrt s := hsqrt_D₂
-
 /-- Raw selected `Q₂ → Q₃` global-variance Cauchy--Schwarz bound after the
 selected variance and self-energy factors have been estimated. -/
 lemma addInU_selected_cs_chain_step3_abs_le_sqrt_globalVarianceDeviation_sum
@@ -1177,7 +1094,7 @@ lemma addInU_selected_cs_chain_step3_abs_le_sqrt_globalVarianceDeviation_sum
           globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
   by
   classical
-  exact selected_le_sqrt_of_factor_bounds_right
+  exact le_sqrt_of_factor_bounds_right
     (addInU_selected_cs_chain_step3_factored_cs params strategy M T S)
     (addInU_selected_cs_chain_step34_variance_factor_le_globalVarianceDeviation_sum
       params strategy M T S)
@@ -1199,7 +1116,7 @@ lemma addInU_selected_cs_chain_step4_abs_le_sqrt_globalVarianceDeviation_sum
           globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
   by
   classical
-  exact selected_le_sqrt_of_factor_bounds_left
+  exact le_sqrt_of_factor_bounds_left
     (addInU_selected_cs_chain_step4_factored_cs params strategy M T S)
     (addInU_selected_cs_chain_step4_self_energy_factor_le_one params strategy M T S)
     (addInU_selected_cs_chain_step34_variance_factor_le_globalVarianceDeviation_sum

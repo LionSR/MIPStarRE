@@ -523,6 +523,44 @@ theorem helper_point_consistency_of_pointConsistencyAddInU_transfer
     pointConsistencyAddInU_off_diagonal_avg_le_helper_error_of_transfer
       params strategy eps delta heps hdelta T Hhat htransfer
 
+/-- Helper-stage point consistency obtained directly from the selected
+add-in-`u` chain.
+
+The hypotheses are the two analytic inputs used by the selected four-step
+chain: bipartite self-consistency for the point measurement, and the
+global-variance sum bound for the polynomial submeasurement `T`.  The helper
+submeasurement is the averaged sandwiched polynomial submeasurement built from
+`T`, exactly as in the helper-stage application. -/
+theorem helper_point_consistency_of_selected_chain_selfConsistency_globalVariance
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
+    (T : SubMeas (Polynomial params) ι)
+    (hssc : BipartiteSSCRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta)
+    (hglobal :
+      (∑ g : Polynomial params,
+        globalVarianceDeviationAtPolynomial params strategy strategy.state T g) ≤
+          selfImprovementVarianceError params eps delta) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params
+        (averagedSandwichedPolynomialSubMeas params strategy T))
+      (selfImprovementHelperError params eps delta) := by
+  exact
+    helper_point_consistency_of_pointConsistencyAddInU_transfer
+      (params := params)
+      (strategy := strategy)
+      (eps := eps)
+      (delta := delta)
+      (heps := heps)
+      (hdelta := hdelta)
+      (T := T)
+      (Hhat := averagedSandwichedPolynomialSubMeas params strategy T)
+      (pointConsistencyAddInU_transfer_of_selected_chain_selfConsistency_globalVariance
+        params strategy eps delta heps hdelta T hssc hglobal)
+
 /-- Natural-error transport of point consistency from the helper output to the
 projective output, with the submeasurement total-overlap displacement stated
 explicitly.

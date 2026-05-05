@@ -302,7 +302,7 @@ theorem pointConsistencyAddInU_transfer_of_selected_chain_selfConsistency_global
       two_sqrt_two_delta_add_two_sqrt_selfImprovementVarianceError_le_addInUError
         params eps delta hε hδ
     dsimp [ηsc, ηgv]
-    nlinarith
+    linarith
   exact
     pointConsistencyAddInU_transfer_of_selected_chain_bounds
       (params := params)
