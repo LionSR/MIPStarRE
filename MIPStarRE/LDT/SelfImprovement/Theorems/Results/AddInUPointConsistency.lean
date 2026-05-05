@@ -216,6 +216,106 @@ theorem pointConsistencyAddInU_transfer_of_selected_chain_bounds
       (η34 := η34)
       h01 h12 h23 h34 hsum
 
+/-- Point-consistency add-in-u transfer with the two self-consistency moves and
+the two selected global-variance moves supplied by the proved Cauchy--Schwarz
+bounds.
+
+This is the theorem-side form of the off-diagonal application of
+`lem:add-in-u`: the first two selected moves use bipartite self-consistency of
+the point measurement, while the last two use the global-variance sum bound for
+the polynomial submeasurement `T`. -/
+theorem pointConsistencyAddInU_transfer_of_selected_chain_selfConsistency_globalVariance
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (hε : 0 ≤ eps) (hδ : 0 ≤ delta)
+    (T : SubMeas (Polynomial params) ι)
+    (hssc : BipartiteSSCRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta)
+    (hglobal :
+      (∑ g : Polynomial params,
+        globalVarianceDeviationAtPolynomial params strategy strategy.state T g) ≤
+          selfImprovementVarianceError params eps delta) :
+    |addInULeftQuantity params strategy
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (averagedSandwichedPolynomialSubMeas params strategy T)
+        (pointConsistencyAddInUSelection params) -
+      addInURightQuantity params strategy
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        T
+        (pointConsistencyAddInUSelection params)| ≤ addInUError params eps delta := by
+  classical
+  let ηsc : Error := Real.sqrt (2 * delta)
+  let ηgv : Error := Real.sqrt (selfImprovementVarianceError params eps delta)
+  have h01 :
+      |pointConsistencyAddInUCSChainQ0 params strategy T -
+        pointConsistencyAddInUCSChainQ1 params strategy T| ≤ ηsc := by
+    simpa [pointConsistencyAddInUCSChainQ0, pointConsistencyAddInUCSChainQ1, ηsc]
+      using
+        addInU_selected_cs_chain_step1_abs_le_sqrt_two_delta
+          (params := params)
+          (strategy := strategy)
+          (M := IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          (T := T)
+          (S := pointConsistencyAddInUSelection params)
+          (delta := delta)
+          hssc
+  have h12 :
+      |pointConsistencyAddInUCSChainQ1 params strategy T -
+        pointConsistencyAddInUCSChainQ2 params strategy T| ≤ ηsc := by
+    simpa [pointConsistencyAddInUCSChainQ1, pointConsistencyAddInUCSChainQ2, ηsc]
+      using
+        addInU_selected_cs_chain_step2_abs_le_sqrt_two_delta
+          (params := params)
+          (strategy := strategy)
+          (M := IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          (T := T)
+          (S := pointConsistencyAddInUSelection params)
+          (delta := delta)
+          hssc
+  have h23 :
+      |pointConsistencyAddInUCSChainQ2 params strategy T -
+        pointConsistencyAddInUCSChainQ3 params strategy T| ≤ ηgv := by
+    simpa [pointConsistencyAddInUCSChainQ2, pointConsistencyAddInUCSChainQ3, ηgv]
+      using
+        addInU_selected_cs_chain_step3_abs_le_sqrt_of_globalVarianceDeviation_sum_le
+          (params := params)
+          (strategy := strategy)
+          (M := IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          (T := T)
+          (S := pointConsistencyAddInUSelection params)
+          hglobal
+  have h34 :
+      |pointConsistencyAddInUCSChainQ3 params strategy T -
+        pointConsistencyAddInUCSChainQ4 params strategy T| ≤ ηgv := by
+    simpa [pointConsistencyAddInUCSChainQ3, pointConsistencyAddInUCSChainQ4, ηgv]
+      using
+        addInU_selected_cs_chain_step4_abs_le_sqrt_of_globalVarianceDeviation_sum_le
+          (params := params)
+          (strategy := strategy)
+          (M := IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          (T := T)
+          (S := pointConsistencyAddInUSelection params)
+          hglobal
+  have hsum : ηsc + ηsc + ηgv + ηgv ≤ addInUError params eps delta := by
+    have h :=
+      two_sqrt_two_delta_add_two_sqrt_selfImprovementVarianceError_le_addInUError
+        params eps delta hε hδ
+    dsimp [ηsc, ηgv]
+    nlinarith
+  exact
+    pointConsistencyAddInU_transfer_of_selected_chain_bounds
+      (params := params)
+      (strategy := strategy)
+      (eps := eps)
+      (delta := delta)
+      (T := T)
+      (η01 := ηsc)
+      (η12 := ηsc)
+      (η23 := ηgv)
+      (η34 := ηgv)
+      h01 h12 h23 h34 hsum
+
 /-- The left side of the helper point-consistency `add-in-u` application is the
 averaged off-diagonal helper-agreement mass.
 
