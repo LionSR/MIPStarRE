@@ -27,9 +27,12 @@ chain definitions with endpoint lemmas.
   projective collapse of the right side using `proj_outer_sandwich_eq`.
 - **selfConsistencyDiagonalAddInU_of_transfer** — the transfer lemma
   connecting the full paper RHS to the projection-simplified RHS.
-- **Q₀–Q₄ scalar chain** — `addInUCSChainQ0` through `addInUCSChainQ4`,
-  the four scalar quantities from the paper's Cauchy–Schwarz transfer
-  (paper lines 247–252).
+- **selected Q₀–Q₄ scalar chain** — `addInUSelectedCSChainQ0` through
+  `addInUSelectedCSChainQ4`, the selection-parametrized Cauchy--Schwarz
+  quantities for the paper's `lem:add-in-u`.
+- **diagonal Q₀–Q₄ scalar chain** — `addInUCSChainQ0` through
+  `addInUCSChainQ4`, the diagonal specialization used in the existing
+  strong-self-consistency transfer (paper lines 247–252).
 - **add_in_u_cs_chain_q0_eq_match_mass** / **q4_eq_simplified_rhs** —
   endpoint lemmas identifying Q₀ with the match-mass left side and Q₄
   with the projection-collapsed right side.
@@ -1234,6 +1237,203 @@ lemma addInU_filtered_sandwiched_tensor_sum_le_one
     (sandwichedPolynomialSubMeasAt params strategy T u)
     T
     (fun h : Polynomial params => h v = a)
+
+/-! ### Selection-parametrized add-in-u scalar chain
+
+The paper proves `lem:add-in-u` for an arbitrary outcome family `M` and
+selection `S_u ⊆ 𝒪 × polyfunc`.  The diagonal helper strong-self-consistency
+application below is one specialization of this statement.  The following
+definitions record the same five scalar quantities before specializing to the
+diagonal case, so that the off-diagonal point-consistency selection can reuse
+the Cauchy--Schwarz chain rather than restating the transfer hypothesis. -/
+
+/-- The selected-chain left endpoint `Q₀`.
+
+For a selected pair `(o, h) ∈ S_u`, this is the expectation of
+`M^u_o ⊗ H^v_h`, where `H^v_h = A^v_{h(v)} T_h A^v_{h(v)}`. -/
+noncomputable def addInUSelectedCSChainQ0
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (M : IdxSubMeas (Point params) Outcome ι)
+    (T : SubMeas (Polynomial params) ι)
+    (S : AddInUSelection params Outcome) : Error :=
+  avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+    ∑ ah ∈ addInUSelectionPairs params S uv.1,
+      ev strategy.state
+        (opTensor ((M uv.1).outcome ah.1)
+          ((sandwichedPolynomialSubMeasAt params strategy T uv.2).outcome ah.2)))
+
+/-- The selected-chain scalar `Q₁`, after moving the right point projector
+`A^v_{h(v)}` to the left tensor factor once. -/
+noncomputable def addInUSelectedCSChainQ1
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (M : IdxSubMeas (Point params) Outcome ι)
+    (T : SubMeas (Polynomial params) ι)
+    (S : AddInUSelection params Outcome) : Error :=
+  avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+    ∑ ah ∈ addInUSelectionPairs params S uv.1,
+      let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+      ev strategy.state
+        (opTensor (Av * (M uv.1).outcome ah.1) (T.outcome ah.2 * Av)))
+
+/-- The selected-chain scalar `Q₂`, after moving both right point projectors to
+the left tensor factor. -/
+noncomputable def addInUSelectedCSChainQ2
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (M : IdxSubMeas (Point params) Outcome ι)
+    (T : SubMeas (Polynomial params) ι)
+    (S : AddInUSelection params Outcome) : Error :=
+  avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+    ∑ ah ∈ addInUSelectionPairs params S uv.1,
+      let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+      ev strategy.state
+        (opTensor (Av * (M uv.1).outcome ah.1 * Av) (T.outcome ah.2)))
+
+/-- The selected-chain scalar `Q₃`, after replacing the first point projector
+at `v` by the corresponding point projector at `u`. -/
+noncomputable def addInUSelectedCSChainQ3
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (M : IdxSubMeas (Point params) Outcome ι)
+    (T : SubMeas (Polynomial params) ι)
+    (S : AddInUSelection params Outcome) : Error :=
+  avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+    ∑ ah ∈ addInUSelectionPairs params S uv.1,
+      let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
+      let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
+      ev strategy.state
+        (opTensor (Au * (M uv.1).outcome ah.1 * Av) (T.outcome ah.2)))
+
+/-- The selected-chain scalar `Q₄`, after replacing both point projectors at
+`v` by the corresponding point projectors at `u`. -/
+noncomputable def addInUSelectedCSChainQ4
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (M : IdxSubMeas (Point params) Outcome ι)
+    (T : SubMeas (Polynomial params) ι)
+    (S : AddInUSelection params Outcome) : Error :=
+  avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
+    ∑ ah ∈ addInUSelectionPairs params S uv.1,
+      let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
+      ev strategy.state
+        (opTensor (Au * (M uv.1).outcome ah.1 * Au) (T.outcome ah.2)))
+
+private theorem avgOver_finset_sum {α β : Type*}
+    (𝒟 : Distribution α) (s : Finset β) (f : α → β → Error) :
+    avgOver 𝒟 (fun a => ∑ b ∈ s, f a b) =
+      ∑ b ∈ s, avgOver 𝒟 (fun a => f a b) := by
+  unfold avgOver
+  calc
+    ∑ a ∈ 𝒟.support, 𝒟.weight a * ∑ b ∈ s, f a b
+        = ∑ a ∈ 𝒟.support, ∑ b ∈ s, 𝒟.weight a * f a b := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          rw [Finset.mul_sum]
+    _ = ∑ b ∈ s, ∑ a ∈ 𝒟.support, 𝒟.weight a * f a b := by
+          rw [Finset.sum_comm]
+
+/-- The selected-chain endpoint `Q₀` is the generic add-in-u left quantity when
+the second measurement is the averaged sandwiched polynomial submeasurement. -/
+theorem addInUSelectedCSChainQ0_eq_leftQuantity_averagedSandwiched
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (M : IdxSubMeas (Point params) Outcome ι)
+    (T : SubMeas (Polynomial params) ι)
+    (S : AddInUSelection params Outcome) :
+    addInULeftQuantity params strategy M
+        (averagedSandwichedPolynomialSubMeas params strategy T)
+        S =
+      addInUSelectedCSChainQ0 params strategy M T S := by
+  classical
+  change avgOver (uniformDistribution (Point params)) (fun u =>
+      ev strategy.state
+        (addInULeftOperatorAtPoint params strategy M
+          (averagedSandwichedPolynomialSubMeas params strategy T) S u)) =
+    addInUSelectedCSChainQ0 params strategy M T S
+  unfold addInULeftOperatorAtPoint addInUSelectedCSChainQ0
+  rw [avgOver_uniform_prod (α := Point params) (β := Point params)
+    (f := fun u v =>
+      ∑ ah ∈ addInUSelectionPairs params S u,
+        ev strategy.state
+          (opTensor ((M u).outcome ah.1)
+            ((sandwichedPolynomialSubMeasAt params strategy T v).outcome ah.2)))]
+  refine avgOver_congr (uniformDistribution (Point params)) _ _ ?_
+  intro u
+  calc
+    ev strategy.state
+        (∑ ah ∈ addInUSelectionPairs params S u,
+          opTensor ((M u).outcome ah.1)
+            ((averagedSandwichedPolynomialSubMeas params strategy T).outcome ah.2))
+        =
+      ∑ ah ∈ addInUSelectionPairs params S u,
+        ev strategy.state
+          (opTensor ((M u).outcome ah.1)
+            ((averagedSandwichedPolynomialSubMeas params strategy T).outcome ah.2)) := by
+        rw [ev_finset_sum]
+    _ =
+      ∑ ah ∈ addInUSelectionPairs params S u,
+        avgOver (uniformDistribution (Point params)) (fun v =>
+          ev strategy.state
+            (opTensor ((M u).outcome ah.1)
+              ((sandwichedPolynomialSubMeasAt params strategy T v).outcome ah.2))) := by
+        refine Finset.sum_congr rfl ?_
+        intro ah _
+        simpa [averagedSandwichedPolynomialSubMeas, sandwichedPolynomialSubMeasAt] using
+          ev_opTensor_averageOperatorOverDistribution_right strategy.state
+            (uniformDistribution (Point params))
+            ((M u).outcome ah.1)
+            (fun v => (sandwichedPolynomialSubMeasAt params strategy T v).outcome ah.2)
+    _ =
+      avgOver (uniformDistribution (Point params)) (fun v =>
+        ∑ ah ∈ addInUSelectionPairs params S u,
+          ev strategy.state
+            (opTensor ((M u).outcome ah.1)
+              ((sandwichedPolynomialSubMeasAt params strategy T v).outcome ah.2))) := by
+        exact (avgOver_finset_sum (uniformDistribution (Point params))
+          (addInUSelectionPairs params S u)
+          (fun v ah =>
+            ev strategy.state
+              (opTensor ((M u).outcome ah.1)
+                ((sandwichedPolynomialSubMeasAt params strategy T v).outcome ah.2)))).symm
+
+/-- The selected-chain endpoint `Q₄` is the generic add-in-u right quantity. -/
+theorem addInUSelectedCSChainQ4_eq_rightQuantity
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (M : IdxSubMeas (Point params) Outcome ι)
+    (T : SubMeas (Polynomial params) ι)
+    (S : AddInUSelection params Outcome) :
+    addInURightQuantity params strategy M T S =
+      addInUSelectedCSChainQ4 params strategy M T S := by
+  classical
+  change avgOver (uniformDistribution (Point params)) (fun u =>
+      ev strategy.state
+        (addInURightOperatorAtPoint params strategy M T S u)) =
+    addInUSelectedCSChainQ4 params strategy M T S
+  unfold addInURightOperatorAtPoint addInUSelectedCSChainQ4
+  rw [avgOver_uniform_prod (α := Point params) (β := Point params)
+    (f := fun u _ =>
+      ∑ ah ∈ addInUSelectionPairs params S u,
+        let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 u
+        ev strategy.state
+          (opTensor (Au * (M u).outcome ah.1 * Au) (T.outcome ah.2)))]
+  refine avgOver_congr (uniformDistribution (Point params)) _ _ ?_
+  intro u
+  rw [ev_finset_sum]
+  exact (avgOver_uniform_const
+    (∑ ah ∈ addInUSelectionPairs params S u,
+      let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 u
+      ev strategy.state
+        (opTensor (Au * (M u).outcome ah.1 * Au) (T.outcome ah.2)))).symm
 
 /-- The expanded left endpoint `Q₀` of the four-step scalar chain in
 `self_improvement.tex`, lines 247--252, after setting `M^u = H^u` and averaging
