@@ -123,7 +123,7 @@ def _proof_body_span(masked_decl: str, absolute_start: int) -> tuple[int, int] |
     closing = {value: key for key, value in pairs.items()}
     pending_let_assignment = False
     i = 0
-    while i < len(masked_decl) - 1:
+    while i < len(masked_decl):
         char = masked_decl[i]
         let_keyword_len = None
         if not stack:
@@ -139,7 +139,7 @@ def _proof_body_span(masked_decl: str, absolute_start: int) -> tuple[int, int] |
             stack.append(char)
         elif char in closing and stack and stack[-1] == closing[char]:
             stack.pop()
-        elif char == ":" and masked_decl[i + 1] == "=" and not stack:
+        elif char == ":" and i + 1 < len(masked_decl) and masked_decl[i + 1] == "=" and not stack:
             if pending_let_assignment:
                 pending_let_assignment = False
                 i += 2
