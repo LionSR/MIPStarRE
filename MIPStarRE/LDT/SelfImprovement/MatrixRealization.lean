@@ -95,6 +95,88 @@ structure MatrixSdpOptimalWitness (params : Parameters) [FieldModel params.q]
     ∀ g : Polynomial params,
       matrixSdpComplementarySlacknessDefect params model T Z g = 0
 
+/-- Matrix-level statement of the strong-duality output for the SDP.
+
+This is the concrete matrix analogue of `SdpStatementWithSlackness`: it does
+not assert that the currently formalized reduced `sdp` witness is optimal.
+Instead it records the kind of optimal witness obtained from the paper's
+Slater/strong-duality argument. -/
+structure MatrixSdpStatementWithSlackness (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params) : Prop where
+  witness :
+    ∃ T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space,
+      ∃ Z : MatrixOperator model.space,
+        MatrixSdpOptimalWitness params model T Z
+
+/-- The concrete complementary-slackness equation `T_g Z = T_g A_g`. -/
+def matrixSdpComplementarySlacknessEquation (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
+    (Z : MatrixOperator model.space)
+    (g : Polynomial params) : Prop :=
+  T.effect g * Z = T.effect g * matrixAveragedPointOperator params model g
+
+namespace MatrixSdpOptimalWitness
+
+/-- An optimal matrix SDP witness whose primal total is the identity determines
+a complete matrix measurement. -/
+noncomputable def primalMeasurement {params : Parameters} [FieldModel params.q]
+    {model : MatrixSdpRealization params}
+    {T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space}
+    {Z : MatrixOperator model.space}
+    (h : MatrixSdpOptimalWitness params model T Z) :
+    MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space :=
+  MIPStarRE.Quantum.Measurement.ofSumEqOne T.effect T.pos h.primalTotalEqOne
+
+@[simp] theorem primalMeasurement_effect {params : Parameters} [FieldModel params.q]
+    {model : MatrixSdpRealization params}
+    {T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space}
+    {Z : MatrixOperator model.space}
+    (h : MatrixSdpOptimalWitness params model T Z) (g : Polynomial params) :
+    h.primalMeasurement.effect g = T.effect g :=
+  rfl
+
+/-- The defect-zero form of complementary slackness is the equation
+`T_g Z = T_g A_g`. -/
+theorem complementarySlacknessEquation {params : Parameters} [FieldModel params.q]
+    {model : MatrixSdpRealization params}
+    {T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space}
+    {Z : MatrixOperator model.space}
+    (h : MatrixSdpOptimalWitness params model T Z) (g : Polynomial params) :
+    matrixSdpComplementarySlacknessEquation params model T Z g := by
+  have hzero :
+      T.effect g * Z - T.effect g * matrixAveragedPointOperator params model g = 0 := by
+    simpa [matrixSdpComplementarySlacknessDefect, matrixSdpDualSlackOperator,
+      Matrix.mul_sub] using h.complementarySlackness g
+  exact sub_eq_zero.mp hzero
+
+end MatrixSdpOptimalWitness
+
+namespace MatrixSdpStatementWithSlackness
+
+/-- A matrix strong-duality statement gives a complete primal measurement, a
+dual operator, dual feasibility, equality of objective values, and the
+complementary-slackness equations in the displayed `T_g Z = T_g A_g` form. -/
+theorem exists_measurement_witness {params : Parameters} [FieldModel params.q]
+    {model : MatrixSdpRealization params}
+    (h : MatrixSdpStatementWithSlackness params model) :
+    ∃ T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space,
+      ∃ Z : MatrixOperator model.space,
+        0 ≤ Z ∧
+        (∀ g : Polynomial params, 0 ≤ matrixSdpDualSlackOperator params model Z g) ∧
+        matrixSdpPrimalObjective params model T.toSubmeasurement =
+          matrixSdpDualObjective model Z ∧
+        ∀ g : Polynomial params,
+          T.effect g * Z = T.effect g * matrixAveragedPointOperator params model g := by
+  obtain ⟨Tsub, Z, hopt⟩ := h.witness
+  refine ⟨hopt.primalMeasurement, Z, hopt.dualPositive, hopt.dualFeasible, ?_, ?_⟩
+  · simpa [MatrixSdpOptimalWitness.primalMeasurement] using hopt.strongDuality
+  · intro g
+    simpa using hopt.complementarySlacknessEquation g
+
+end MatrixSdpStatementWithSlackness
+
 /-- A raw point-indexed matrix outcome family used in the matrix `add-in-u` transfer. -/
 abbrev MatrixIndexedPointOutcomeFamily (params : Parameters) [FieldModel params.q]
     (Outcome : Type*) (H : FiniteHilbertSpace) :=

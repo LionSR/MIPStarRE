@@ -439,7 +439,13 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
 
 \begin{lemma}[Dual SDP and complementary slackness]\label{lem:sdp}
   \lean{MIPStarRE.LDT.SelfImprovement.sdp}
-	\leanok
+  \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness.exists_measurement_witness}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpComplementarySlacknessEquation}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.primalMeasurement}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.complementarySlacknessEquation}
   Let
   \[
     A_g = \E_{u \sim \F_q^m} A^u_{g(u)}.
@@ -510,6 +516,15 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
     X\Big( \sum_{i,j} \,z_{ij} D_{ij} - C \Big) \,=\, 0.
   \end{equation}
   We may assume that $X$ is block diagonal. Translating~\eqref{eq:complementary-slackness} back to the variables $\{T_g\}$ and~$Z$ yields $T_g(Z-A_g)=0$ for every~$g$ and $X_{M+1,M+1}=0$. The latter identity is exactly $\sum_g T_g=I$, and the former is~\eqref{eq:slater}.
+  In the concrete matrix realization, Lean records the defect-zero condition as
+  \texttt{matrixSdpComplementarySlacknessDefect}; the theorem
+  \texttt{MatrixSdpOptimalWitness.complementarySlacknessEquation} translates it
+  to the displayed equation \(T_gZ=T_gA_g\), while
+  \texttt{MatrixSdpOptimalWitness.primalMeasurement} packages
+  \(\sum_g T_g=I\) as a complete measurement.  The statement
+  \texttt{MatrixSdpStatementWithSlackness} records this matrix-level
+  strong-duality output without identifying it with the reduced feasible
+  witness supplied by \texttt{sdp}.
 \end{proof}
 
 \begin{lemma}[Averaging over the evaluation point]\label{lem:add-in-u}
