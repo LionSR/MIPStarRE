@@ -1612,6 +1612,48 @@ lemma add_in_u_cs_chain_q3_q4_le_sqrt_of_globalVarianceDeviation_sum_le
       Real.sqrt ζ :=
   le_sqrt_of_le_sqrt_of_le hcs hglobal
 
+/-- Closed `Q₂ → Q₃` global-variance bridge using the factor estimates proved
+in this file.
+
+This is the non-conditional specialization of
+`add_in_u_cs_chain_q2_q3_le_sqrt_of_globalVarianceDeviation_sum_le`: the raw
+Cauchy--Schwarz estimate is supplied by
+`add_in_u_cs_chain_q2_q3_le_sqrt_globalVarianceDeviation_sum`. -/
+lemma add_in_u_cs_chain_q2_q3_le_sqrt_of_globalVarianceDeviation_sum_le_from_factor_bounds
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι)
+    {ζ : Error}
+    (hglobal :
+      (∑ g : Polynomial params,
+        globalVarianceDeviationAtPolynomial params strategy strategy.state T g) ≤ ζ) :
+    |addInUCSChainQ2 params strategy T - addInUCSChainQ3 params strategy T| ≤
+      Real.sqrt ζ :=
+  add_in_u_cs_chain_q2_q3_le_sqrt_of_globalVarianceDeviation_sum_le
+    params strategy T hglobal
+    (add_in_u_cs_chain_q2_q3_le_sqrt_globalVarianceDeviation_sum params strategy T)
+
+/-- Closed `Q₃ → Q₄` global-variance bridge using the factor estimates proved
+in this file.
+
+This is the non-conditional specialization of
+`add_in_u_cs_chain_q3_q4_le_sqrt_of_globalVarianceDeviation_sum_le`: the raw
+Cauchy--Schwarz estimate is supplied by
+`add_in_u_cs_chain_q3_q4_le_sqrt_globalVarianceDeviation_sum`. -/
+lemma add_in_u_cs_chain_q3_q4_le_sqrt_of_globalVarianceDeviation_sum_le_from_factor_bounds
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι)
+    {ζ : Error}
+    (hglobal :
+      (∑ g : Polynomial params,
+        globalVarianceDeviationAtPolynomial params strategy strategy.state T g) ≤ ζ) :
+    |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T| ≤
+      Real.sqrt ζ :=
+  add_in_u_cs_chain_q3_q4_le_sqrt_of_globalVarianceDeviation_sum_le
+    params strategy T hglobal
+    (add_in_u_cs_chain_q3_q4_le_sqrt_globalVarianceDeviation_sum params strategy T)
+
 /-- Combined Step 3/4 variance bridge for the projection-simplified add-in-u
 Cauchy--Schwarz chain.
 
@@ -1669,9 +1711,10 @@ lemma add_in_u_cs_chain_global_variance_steps_of_sum_bound_from_factor_bounds
         Real.sqrt ζ ∧
       |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T| ≤
         Real.sqrt ζ :=
-  add_in_u_cs_chain_global_variance_steps_of_sum_bound params strategy T hglobal
-    (add_in_u_cs_chain_q2_q3_le_sqrt_globalVarianceDeviation_sum params strategy T)
-    (add_in_u_cs_chain_q3_q4_le_sqrt_globalVarianceDeviation_sum params strategy T)
+  ⟨add_in_u_cs_chain_q2_q3_le_sqrt_of_globalVarianceDeviation_sum_le_from_factor_bounds
+      params strategy T hglobal,
+    add_in_u_cs_chain_q3_q4_le_sqrt_of_globalVarianceDeviation_sum_le_from_factor_bounds
+      params strategy T hglobal⟩
 
 /-- Local-variance-sum version of the combined Step 3/4 variance bridge.
 
@@ -1710,6 +1753,48 @@ lemma add_in_u_cs_chain_global_variance_steps_of_local_sum_bound
       params strategy eps delta T hlocal)
     h23cs h34cs
 
+/-- Closed local-variance-sum bridge for the `Q₂ → Q₃` replacement step.
+
+The local variance theorem first gives the corresponding summed global-variance
+bound; the raw Cauchy--Schwarz estimate is then supplied by the factor
+estimates already proved in this file. -/
+lemma add_in_u_cs_chain_q2_q3_le_sqrt_of_localVarianceDeviation_sum_le_from_factor_bounds
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (T : SubMeas (Polynomial params) ι)
+    (hlocal :
+      (∑ g : Polynomial params,
+        localVarianceDeviationAtPolynomial params strategy strategy.state T g) ≤
+        localVarianceOfPointsError params eps delta) :
+    |addInUCSChainQ2 params strategy T - addInUCSChainQ3 params strategy T| ≤
+      Real.sqrt (globalVarianceOfPointsError params eps delta) :=
+  add_in_u_cs_chain_q2_q3_le_sqrt_of_globalVarianceDeviation_sum_le_from_factor_bounds
+    params strategy T
+    (globalVarianceDeviation_sum_le_of_localVarianceDeviation_sum_le
+      params strategy eps delta T hlocal)
+
+/-- Closed local-variance-sum bridge for the `Q₃ → Q₄` replacement step.
+
+This is the second single-step counterpart of
+`add_in_u_cs_chain_global_variance_steps_of_local_sum_bound_from_factor_bounds`.
+-/
+lemma add_in_u_cs_chain_q3_q4_le_sqrt_of_localVarianceDeviation_sum_le_from_factor_bounds
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (T : SubMeas (Polynomial params) ι)
+    (hlocal :
+      (∑ g : Polynomial params,
+        localVarianceDeviationAtPolynomial params strategy strategy.state T g) ≤
+        localVarianceOfPointsError params eps delta) :
+    |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T| ≤
+      Real.sqrt (globalVarianceOfPointsError params eps delta) :=
+  add_in_u_cs_chain_q3_q4_le_sqrt_of_globalVarianceDeviation_sum_le_from_factor_bounds
+    params strategy T
+    (globalVarianceDeviation_sum_le_of_localVarianceDeviation_sum_le
+      params strategy eps delta T hlocal)
+
 /-- Local-variance-sum version of the combined Step 3/4 variance bridge using
 the factor estimates proved in this file.
 
@@ -1730,12 +1815,13 @@ lemma add_in_u_cs_chain_global_variance_steps_of_local_sum_bound_from_factor_bou
         Real.sqrt (selfImprovementVarianceError params eps delta) ∧
       |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T| ≤
         Real.sqrt (selfImprovementVarianceError params eps delta) := by
-  have hsteps :=
-    add_in_u_cs_chain_global_variance_steps_of_local_sum_bound
+  have h23 :=
+    add_in_u_cs_chain_q2_q3_le_sqrt_of_localVarianceDeviation_sum_le_from_factor_bounds
       params strategy eps delta T hlocal
-      (add_in_u_cs_chain_q2_q3_le_sqrt_globalVarianceDeviation_sum params strategy T)
-      (add_in_u_cs_chain_q3_q4_le_sqrt_globalVarianceDeviation_sum params strategy T)
-  simpa [selfImprovementVarianceError] using hsteps
+  have h34 :=
+    add_in_u_cs_chain_q3_q4_le_sqrt_of_localVarianceDeviation_sum_le_from_factor_bounds
+      params strategy eps delta T hlocal
+  simpa [selfImprovementVarianceError] using And.intro h23 h34
 
 /-- Assemble the projection-simplified scalar transfer from the four scalar
 chain moves. The analytic work remains exactly the four bounds
