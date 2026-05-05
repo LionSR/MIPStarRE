@@ -504,7 +504,9 @@ both right-register totals are the identity.  In the present application
 the total-overlap term
 `⟨ψ, A^u_{\mathrm{tot}} ⊗ H^u_{\mathrm{tot}} ψ⟩` must also be transported.
 This theorem separates that displacement as the parameter `η`; the remaining
-contribution is exactly the square root of the data-processing SDD error. -/
+contribution is exactly the square root of the data-processing SDD error.  The
+note `docs/paper-gaps/issue-1093-submeasurement-triangle-total-overlap.tex`
+records the corresponding discrepancy with the measurement-valued paper step. -/
 theorem final_fields_point_consistency_totalGap_natural
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
