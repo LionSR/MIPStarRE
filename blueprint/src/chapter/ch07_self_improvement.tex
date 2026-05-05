@@ -792,6 +792,19 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \lean{MIPStarRE.LDT.Preliminaries.triangleSub_right_subMeas_totalGap}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap_natural}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap}
+  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap_natural_of_total_difference}
+  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap_of_total_difference}
+  Since \(A^u_{\mathrm{tot}}=I\) and postprocessing does not change the total
+  operator, Lean also records the equivalent form in which this displacement is
+  the single scalar difference
+  \[
+    \left|
+      \langle \psi, I \ot H_{\mathrm{tot}} \psi\rangle
+      -
+      \langle \psi, I \ot \widehat H_{\mathrm{tot}} \psi\rangle
+    \right|
+  \]
+  between the right-register totals of \(H\) and \(\widehat H\).
 
   \emph{Proof of \ref{item:self-improvement-projective-self}.}
   \lean{MIPStarRE.LDT.SelfImprovement.self_closeness_transport_through_orthonormalization}
