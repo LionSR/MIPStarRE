@@ -94,12 +94,6 @@ contraction, and total-mass estimates.  In particular, `T` is a submeasurement
 in these statements; any `≤ 1` input corresponds to a `total_le_one`-style
 bound rather than a measurement equality. -/
 
-/-- The scalar square-to-square-root conversion used by both global-variance
-replacement steps. -/
-private lemma abs_le_sqrt_of_sq_le {a : ℝ} {s : Error} (hsq : a ^ 2 ≤ s) :
-    |a| ≤ Real.sqrt s :=
-  Real.abs_le_sqrt hsq
-
 /-- Bound a Cauchy--Schwarz product when the first factor is controlled by the
 global-variance sum and the second factor is a contraction. -/
 private lemma le_sqrt_of_factor_bounds_right {a : ℝ} {D₁ D₂ S : Error}
@@ -124,7 +118,8 @@ private lemma le_sqrt_of_factor_bounds_left {a : ℝ} {D₁ D₂ S : Error}
     (hD₂_le : D₂ ≤ S) :
     a ≤ Real.sqrt S := by
   have hCS' : a ≤ Real.sqrt D₂ * Real.sqrt D₁ := by
-    simpa [mul_comm] using hCS
+    rw [mul_comm] at hCS
+    exact hCS
   exact le_sqrt_of_factor_bounds_right hCS' hD₂_le hD₁_le_one
 
 /-- Convert a squared `Q₂ → Q₃` real bound to an absolute-value sqrt bound.
@@ -144,7 +139,7 @@ lemma add_in_u_cs_chain_q2_q3_abs_le_sqrt_of_sq_le
       Real.sqrt
         (∑ g : Polynomial params,
           globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
-  abs_le_sqrt_of_sq_le hsq
+  Real.abs_le_sqrt hsq
 
 /-- Convert factored `Q₂ → Q₃` sqrt bounds to the summed-deviation sqrt bound.
 
@@ -187,7 +182,7 @@ lemma add_in_u_cs_chain_q3_q4_abs_le_sqrt_of_sq_le
       Real.sqrt
         (∑ g : Polynomial params,
           globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
-  abs_le_sqrt_of_sq_le hsq
+  Real.abs_le_sqrt hsq
 
 /-- Convert factored `Q₃ → Q₄` sqrt bounds to the summed-deviation sqrt bound.
 
@@ -954,10 +949,10 @@ lemma add_in_u_cs_chain_global_variance_steps_of_local_sum_bound_from_factor_bou
       |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T| ≤
         Real.sqrt (selfImprovementVarianceError params eps delta) := by
   have hsteps :=
-    add_in_u_cs_chain_global_variance_steps_of_sum_bound_from_factor_bounds
-      params strategy T
-      (globalVarianceDeviation_sum_le_of_localVarianceDeviation_sum_le
-        params strategy eps delta T hlocal)
+    add_in_u_cs_chain_global_variance_steps_of_local_sum_bound
+      params strategy eps delta T hlocal
+      (add_in_u_cs_chain_q2_q3_le_sqrt_globalVarianceDeviation_sum params strategy T)
+      (add_in_u_cs_chain_q3_q4_le_sqrt_globalVarianceDeviation_sum params strategy T)
   simpa [selfImprovementVarianceError] using hsteps
 
 /-- Assemble the projection-simplified scalar transfer from the four scalar
