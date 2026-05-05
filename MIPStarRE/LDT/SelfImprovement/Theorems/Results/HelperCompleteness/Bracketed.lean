@@ -161,9 +161,9 @@ point `u` (before averaging). The conclusion is exact (not approximate) and
 depends on no input-consistency, SDP, or self-consistency hypotheses; it is
 purely an algebraic regrouping of `Σ_h H^u_h` by the value of `h` at `u`.
 
-Composed with `helper_mass_eq_avg_pointwise_sandwich_sum` (PR #1119) this yields
-the bracketed form `helper_mass_eq_avg_pointwise_bracketed_sum` of the
-helper-stage `Hhat ⊗ I` mass, which is the starting point for the remaining
+Composed with `helper_mass_eq_avg_pointwise_sandwich_sum`, this yields the
+bracketed form `helper_mass_eq_avg_pointwise_bracketed_sum` of the helper-stage
+`Hhat ⊗ I` mass, which is the starting point for the remaining
 Cauchy--Schwarz reduction at `self_improvement.tex:360--403` toward
 `eq:gonna-use-this-later-H-versus-Z`. -/
 theorem helper_pointwise_sandwich_sum_eq_bracketed
@@ -214,8 +214,8 @@ theorem helper_pointwise_sandwich_sum_eq_bracketed
 
 /-- Bracketed form of the helper-stage `Hhat ⊗ I` mass identity.
 
-Combines `helper_mass_eq_avg_pointwise_sandwich_sum` (PR #1119) with the
-per-point bracketing identity `helper_pointwise_sandwich_sum_eq_bracketed`:
+Combines `helper_mass_eq_avg_pointwise_sandwich_sum` with the per-point
+bracketing identity `helper_pointwise_sandwich_sum_eq_bracketed`:
 
   `⟨ψ| Hhat ⊗ I |ψ⟩
     = E_u Σ_a ⟨ψ| (A^u_a · T_{[h(u) = a]} · A^u_a) ⊗ I |ψ⟩`,
