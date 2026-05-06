@@ -1,4 +1,8 @@
-import MIPStarRE.LDT.Pasting.Core.LdGbcon
+import MIPStarRE.LDT.Pasting.Statements
+import MIPStarRE.LDT.MainInductionStep.Statements
+import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
+import MIPStarRE.LDT.Preliminaries.Triangles
+import MIPStarRE.LDT.Pasting.Core.DDistinct
 
 /-!
 # Section 12 pasting: complete and incomplete part self-consistency
