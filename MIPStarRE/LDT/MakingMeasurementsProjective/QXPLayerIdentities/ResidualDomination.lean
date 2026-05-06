@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.LayerAlgebra
+import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 
 /-!
@@ -48,6 +49,16 @@ def qxpSomeOutcomeTotal {Outcome : Type*}
     MIPStarRE.Quantum.Op ι :=
   ∑ a : Outcome, (qxpProjSubMeas data).outcome (some a)
 
+/-- The retained `some` total is the total of the restriction obtained by
+discarding the fresh `none` outcome. -/
+@[simp] lemma qxpSomeOutcomeTotal_eq_restrictSomeProjSubMeas_total {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (data : QXPLayerData (Option Outcome) ι) :
+    qxpSomeOutcomeTotal data =
+      (restrictSomeProjSubMeas (qxpProjSubMeas data)).toSubMeas.total :=
+  rfl
+
 /-- Residual domination forces the repaired non-residual total to be bounded by
 the original submeasurement total. -/
 lemma qxpSomeOutcomeTotal_le_of_residualDomination {Outcome : Type*}
@@ -56,35 +67,9 @@ lemma qxpSomeOutcomeTotal_le_of_residualDomination {Outcome : Type*}
     (data : QXPLayerData (Option Outcome) ι) (A : SubMeas Outcome ι)
     (hdom : QXPLayerResidualDomination data A) :
     qxpSomeOutcomeTotal data ≤ A.total := by
-  let S : MIPStarRE.Quantum.Op ι := qxpSomeOutcomeTotal data
-  have hsum_le_one :
-      (qxpProjSubMeas data).outcome none + S ≤ (1 : MIPStarRE.Quantum.Op ι) := by
-    calc
-      (qxpProjSubMeas data).outcome none + S
-          = ∑ oa : Option Outcome, (qxpProjSubMeas data).outcome oa := by
-              simp [S, qxpSomeOutcomeTotal, Fintype.sum_option]
-      _ = (qxpProjSubMeas data).toSubMeas.total := by
-            rw [(qxpProjSubMeas data).sum_eq_total]
-      _ ≤ 1 := (qxpProjSubMeas data).total_le_one
-  have hresidual :
-      (1 : MIPStarRE.Quantum.Op ι) - A.total ≤
-        (qxpProjSubMeas data).outcome none := by
-    simpa using hdom.residual_le
-  have hcompleted :
-      (1 : MIPStarRE.Quantum.Op ι) - A.total + S ≤
-        (1 : MIPStarRE.Quantum.Op ι) := by
-    calc
-      (1 : MIPStarRE.Quantum.Op ι) - A.total + S
-          ≤ (qxpProjSubMeas data).outcome none + S := by
-              simpa [add_comm] using add_le_add_right hresidual S
-      _ ≤ 1 := hsum_le_one
-  have hnonneg : 0 ≤ A.total - S := by
-    have hsub : 0 ≤
-        (1 : MIPStarRE.Quantum.Op ι) -
-          ((1 : MIPStarRE.Quantum.Op ι) - A.total + S) :=
-      sub_nonneg.mpr hcompleted
-    simpa [sub_eq_add_neg, add_assoc, add_comm, add_left_comm] using hsub
-  exact sub_nonneg.mp hnonneg
+  simpa using
+    restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le
+      A (qxpProjSubMeas data) hdom.residual_le
 
 /-- Scalar expectation form of `qxpSomeOutcomeTotal_le_of_residualDomination`. -/
 lemma qxpSomeOutcomeTotal_ev_le_of_residualDomination {Outcome : Type*}
