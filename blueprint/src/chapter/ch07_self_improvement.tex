@@ -599,6 +599,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSlackOperator_eq_zero_of_mul_dual_eq_zero_of_one_le}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_of_canonicalSlackOperator_eq_zero}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_of_canonicalComplementarySlackness_of_one_le}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness}
   Let
   \[
     A_g = \E_{u \sim \F_q^m} A^u_{g(u)}.
@@ -675,6 +676,9 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   Since \(S\ge 0\) and the selected dual witness satisfies \(I\le Z\), the
   identity \(S Z=0\) forces \(S=0\).
   Hence \(\sum_g T_g=I\), and the former equations are~\eqref{eq:slater}.
+  Lean packages these canonical conclusions as a
+  \texttt{MatrixSdpOptimalWitnessWithDominance} once dual feasibility and
+  equality of the paper primal and dual objectives have also been supplied.
   In the concrete matrix realization, Lean records the defect-zero condition as
   \texttt{matrixSdpComplementarySlacknessDefect}; the theorem
   \texttt{MatrixSdpOptimalWitness.complementarySlacknessEquation} translates it

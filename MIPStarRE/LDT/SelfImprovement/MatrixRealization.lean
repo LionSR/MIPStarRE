@@ -1030,6 +1030,43 @@ structure MatrixSdpOptimalWitnessWithDominance (params : Parameters)
     MatrixSdpOptimalWitness params model T Z
   dualDominatesIdentity : (1 : MatrixOperator model.space) ≤ Z
 
+/-- Package a paper-form optimal witness from the canonical block SDP
+conclusions.
+
+The hypotheses are the canonical pieces supplied by the finite-dimensional SDP
+argument: paper dual feasibility, equality of the paper primal and dual
+objectives, canonical complementary slackness, and the dominance condition
+`I ≤ Z`.  The preceding saturation lemma supplies the missing primal
+normalization, while the polynomial-block projection of canonical
+complementary slackness supplies the defect equations
+`T_g (Z - A_g) = 0`. -/
+theorem matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
+    (Z : MatrixOperator model.space)
+    (hdual :
+      ∀ g : Polynomial params,
+        0 ≤ matrixSdpDualSlackOperator params model Z g)
+    (hstrong :
+      matrixSdpPrimalObjective params model T = matrixSdpDualObjective model Z)
+    (hcanonical :
+      matrixSdpCanonicalPrimalBlockMatrix params model T *
+          (matrixSdpCanonicalDualOperator params model Z -
+            matrixSdpCanonicalObjectiveOperator params model) =
+        0)
+    (hOneLe : (1 : MatrixOperator model.space) ≤ Z) :
+    MatrixSdpOptimalWitnessWithDominance params model T Z where
+  toMatrixSdpOptimalWitness :=
+    { primalTotalEqOne :=
+        matrixSdpPrimalTotalEqOne_of_canonicalComplementarySlackness_of_one_le
+          params model T Z hcanonical hOneLe
+      dualFeasible := hdual
+      strongDuality := hstrong
+      complementarySlackness :=
+        matrixSdpComplementarySlacknessDefect_of_canonical params model T Z hcanonical }
+  dualDominatesIdentity := hOneLe
+
 /-- Matrix-level statement of the strong-duality output for the SDP.
 
 This is the concrete matrix analogue of `SdpStatementWithSlackness`: it does
