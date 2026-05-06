@@ -1,0 +1,52 @@
+name: Duplicate private-helper audit
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'MIPStarRE/**/*.lean'
+      - 'scripts/audit_conclusion_shaped_hypotheses.py'
+      - 'scripts/check_duplicate_private_helpers.py'
+      - 'scripts/tests/**'
+      - '.github/workflows/duplicate-private-helper-audit.yml'
+
+# This is intentionally advisory for #1145.  Exact duplicate proof bodies are
+# review candidates, not proof of semantic duplication.
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  duplicate-private-helpers:
+    name: Report duplicate private helpers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Run script regression tests
+        run: python3 -m unittest scripts/tests/test_check_duplicate_private_helpers.py
+
+      - name: Run duplicate private-helper audit
+        run: |
+          set +e
+          python3 scripts/check_duplicate_private_helpers.py \
+            --root . \
+            --github-annotations \
+            --ci
+          audit_status=$?
+          set -e
+          if [ "$audit_status" -eq 1 ]; then
+            echo "Duplicate private-helper candidates were reported; this audit is advisory."
+            exit 0
+          fi
+          exit "$audit_status"
