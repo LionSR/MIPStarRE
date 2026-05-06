@@ -11,7 +11,8 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems
 
 Compatibility barrel re-exporting all induction-step theorem leaf modules:
 
-- `SelfImprovementBridge`: self-improvement package API and pasting wrapper
+- `SelfImprovementBridge`: ordinary and answer-valued self-improvement bridge API,
+  with the Section 6 pasting wrapper
 - `InductionParameterBounds`: parameter-bound helpers for `mainInductionError < 1`
 - `RestrictedProbabilities`: restricted failure probability bookkeeping
 - `PackageConstructors`: package constructors and skeletal assembly
