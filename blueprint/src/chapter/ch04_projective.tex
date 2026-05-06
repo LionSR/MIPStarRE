@@ -75,6 +75,38 @@
 	\]
 \end{theorem}
 
+\begin{lemma}[Residual domination implies retained-total domination]\label{lem:residual-total-domination}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas, MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationInputWithResidualDomination, MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization_with_total_le_of_residual_domination}
+	\leanok
+	Let \(A=\{A_a\}_{a\in\mathcal A}\) be a sub-measurement, and complete it to
+	\(\widehat A\) on \(\mathcal A\cup\{\bot\}\) by setting
+	\(\widehat A_\bot=I-A_{\mathrm{tot}}\).  Let \(\widehat P\) be a projective
+	sub-measurement on the completed outcome set.  If the completed projective
+	family puts at least the original residual mass on the fresh outcome,
+	\[
+		\widehat A_\bot \leq \widehat P_\bot,
+	\]
+	then the restriction \(P_a=\widehat P_a\), \(a\in\mathcal A\), satisfies
+	\[
+		P_{\mathrm{tot}}\leq A_{\mathrm{tot}}.
+	\]
+	Consequently, for any bipartite state \(\psi\),
+	\[
+		\langle\psi,\, I\otimes P_{\mathrm{tot}}\rangle
+		\leq
+		\langle\psi,\, I\otimes A_{\mathrm{tot}}\rangle.
+	\]
+	This isolates the order-theoretic invariant needed to pass from the
+	option-completed orthonormalization output to the monotone-total route used in
+	the self-improvement theorem.  The formal development also records the
+	corresponding strengthened orthonormalization wrapper: if the repair input for
+	the option-completed measurement carries this residual-domination invariant,
+	then the orthonormalized restriction satisfies both the usual
+	state-dependent-distance conclusion and the displayed total comparisons.
+\end{lemma}
+
 \begin{remark}[Lean right-register completion helpers]\label{rem:lean-right-register-completion-helpers}
 	\uses{thm:orthonormalization, prop:completing-to-measurement}
 	\lean{MIPStarRE.LDT.Preliminaries.qSDDCore_rightTensor_eq_leftTensor_of_permInv, MIPStarRE.LDT.MakingMeasurementsProjective.qSDD_liftRight_eq_liftLeft_of_permInv, MIPStarRE.LDT.MakingMeasurementsProjective.sddRel_liftRight_of_liftLeft_permInv}
