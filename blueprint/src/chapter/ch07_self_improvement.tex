@@ -526,7 +526,9 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithCanonicalMatrixSdpSlacknessAndDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithCanonicalOptimalPairSdpSlacknessAndDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDomination}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDominationInput}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDomination}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDominationInput}
   \leanok
   From a matrix-level strong-duality witness with complementary slackness of the
   shape asserted by Lemma~\ref{lem:sdp}, one obtains a complete measurement
@@ -541,6 +543,8 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   self-improvement helper.  Combined with the residual-dominating
   orthonormalization input, the canonical form of the same bridge gives the
   full self-improvement conclusion, including the projective residual bound.
+  The formalization records both the per-helper orthonormalization form and the
+  bundled SelfImprovement-level input form of this conclusion.
   Lean also isolates the exact canonical optimal-pair output still required
   from strong duality: a feasible canonical primal matrix, a dual-feasible
   operator with equal objective value, canonical complementary slackness, and
@@ -1070,7 +1074,8 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerTotalDomination.of_outcome_le}
   \lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerTotalDomination.rightTensor_total_ev_le}
   \lean{MIPStarRE.LDT.SelfImprovement.LeftLiftedQXPLayerRepairWitnessWithResidualDomination}
-  \lean{MIPStarRE.LDT.SelfImprovement.LeftLiftedQXPLayerRepairWitnessWithResidualDomination.toRepairWitness}
+  \lean{MIPStarRE.LDT.SelfImprovement.LeftLiftedQXPLayerRepairWitnessWithResidualDomination.restrictSome_total_le}
+  \lean{MIPStarRE.LDT.SelfImprovement.LeftLiftedQXPLayerRepairWitnessWithResidualDomination.restrictSome_rightTensor_total_ev_le}
   \lean{MIPStarRE.LDT.SelfImprovement.leftLiftedProjectivizationRepairInputWithResidualDomination_of_qxpLayer}
   \lean{MIPStarRE.LDT.SelfImprovement.OrthonormalizationQXPLayerRepairProducerWithResidualDomination}
   \lean{MIPStarRE.LDT.SelfImprovement.OrthonormalizationResidualDominationInput}
