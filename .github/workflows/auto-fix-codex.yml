@@ -277,12 +277,22 @@ jobs:
           ${{ steps.review_comments.outputs.result }}
           JSON
 
-          {
-            echo "skip=$(jq -r '.skip // false' "$RUNNER_TEMP/review-comments.json")"
-            echo "review_summary=$(jq -r '.reviewSummary // "No summary available"' "$RUNNER_TEMP/review-comments.json" | tr '\n' ' ')"
-            echo "review_state=$(jq -r '.reviewState // "UNKNOWN"' "$RUNNER_TEMP/review-comments.json")"
-            echo "threads=$(jq -c '.threads // []' "$RUNNER_TEMP/review-comments.json")"
-          } >> "$GITHUB_OUTPUT"
+          write_output() {
+            local name="$1"
+            local value="$2"
+            local delimiter
+            delimiter="__${name}_$(date +%s%N)__"
+            {
+              printf '%s<<%s\n' "$name" "$delimiter"
+              printf '%s\n' "$value"
+              printf '%s\n' "$delimiter"
+            } >> "$GITHUB_OUTPUT"
+          }
+
+          write_output skip "$(jq -r '.skip // false' "$RUNNER_TEMP/review-comments.json")"
+          write_output review_summary "$(jq -r '.reviewSummary // "No summary available"' "$RUNNER_TEMP/review-comments.json")"
+          write_output review_state "$(jq -r '.reviewState // "UNKNOWN"' "$RUNNER_TEMP/review-comments.json")"
+          write_output threads "$(jq -c '.threads // []' "$RUNNER_TEMP/review-comments.json")"
 
       - name: Set up Lean toolchain and cache
         if: |
