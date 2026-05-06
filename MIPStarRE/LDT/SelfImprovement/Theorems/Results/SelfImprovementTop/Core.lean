@@ -46,6 +46,33 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+/-- A good strategy has a nonnegative final self-improvement error threshold. -/
+lemma selfImprovementError_nonneg_of_isGood
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    {eps delta gamma : Error}
+    (hgood : strategy.IsGood eps delta gamma) :
+    0 ≤ selfImprovementError params eps delta := by
+  have heps : 0 ≤ eps := eps_nonneg_of_isGood params strategy hgood
+  have hdelta : 0 ≤ delta := delta_nonneg_of_isGood params strategy hgood
+  have hm_nonneg : (0 : Error) ≤ (params.m : Error) := by
+    exact_mod_cast Nat.zero_le params.m
+  have hd_nonneg : (0 : Error) ≤ (params.d : Error) := by
+    exact_mod_cast Nat.zero_le params.d
+  have hq_nonneg : (0 : Error) ≤ (params.q : Error) := le_of_lt params.q_cast_pos
+  have hdq_nonneg : (0 : Error) ≤ (params.d : Error) / (params.q : Error) :=
+    div_nonneg hd_nonneg hq_nonneg
+  have hsum_nonneg :
+      0 ≤ Real.rpow eps (1 / (32 : Error)) +
+          Real.rpow delta (1 / (32 : Error)) +
+          Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (32 : Error)) := by
+    exact add_nonneg
+      (add_nonneg (Real.rpow_nonneg heps _) (Real.rpow_nonneg hdelta _))
+      (Real.rpow_nonneg hdq_nonneg _)
+  unfold selfImprovementError MainInductionStep.selfImprovementInInductionError
+  exact mul_nonneg (mul_nonneg (by norm_num) hm_nonneg) hsum_nonneg
+
 /-- Reduced version of `lem:self-improvement-helper`.
 
 Unlike the paper helper lemma, this theorem does not yet take the consistency
@@ -210,25 +237,8 @@ theorem selfImprovement
       SelfImprovementFinalFields params strategy H Z eps delta nu :=
     hfinalFields hhelper horth hdata
   have hselfImprovementError_nonneg :
-      0 ≤ selfImprovementError params eps delta := by
-    have heps : 0 ≤ eps := eps_nonneg_of_isGood params strategy hgood
-    have hdelta : 0 ≤ delta := delta_nonneg_of_isGood params strategy hgood
-    have hm_nonneg : (0 : Error) ≤ (params.m : Error) := by
-      exact_mod_cast Nat.zero_le params.m
-    have hd_nonneg : (0 : Error) ≤ (params.d : Error) := by
-      exact_mod_cast Nat.zero_le params.d
-    have hq_nonneg : (0 : Error) ≤ (params.q : Error) := le_of_lt params.q_cast_pos
-    have hdq_nonneg : (0 : Error) ≤ (params.d : Error) / (params.q : Error) :=
-      div_nonneg hd_nonneg hq_nonneg
-    have hsum_nonneg :
-        0 ≤ Real.rpow eps (1 / (32 : Error)) +
-            Real.rpow delta (1 / (32 : Error)) +
-            Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (32 : Error)) := by
-      exact add_nonneg
-        (add_nonneg (Real.rpow_nonneg heps _) (Real.rpow_nonneg hdelta _))
-        (Real.rpow_nonneg hdq_nonneg _)
-    unfold selfImprovementError MainInductionStep.selfImprovementInInductionError
-    exact mul_nonneg (mul_nonneg (by norm_num) hm_nonneg) hsum_nonneg
+      0 ≤ selfImprovementError params eps delta :=
+    selfImprovementError_nonneg_of_isGood params strategy hgood
   refine ⟨H, Z, ?_⟩
   exact
     { witness := ⟨T, Hhat, hhelper, horth, hdata⟩

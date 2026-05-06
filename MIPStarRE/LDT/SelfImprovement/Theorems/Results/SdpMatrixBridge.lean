@@ -107,6 +107,51 @@ theorem matrixSdpDualSlackOperator_ofPointRealization (params : Parameters)
   rw [matrixSdpDualSlackOperator, sdpDualSlackOperator,
     matrixAveragedPointOperator_ofPointRealization]
 
+/-- Canonical primal-dual data with complementary slackness and dual
+dominance.
+
+This is the exact finite-dimensional SDP output still required from the
+strong-duality argument in `lem:sdp`: a feasible canonical primal matrix, a
+dual-feasible operator with the same objective value, canonical complementary
+slackness, and \(I \le Z\). -/
+structure MatrixSdpCanonicalOptimalPairWithDominance
+    (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (Z : MatrixOperator model.space) : Prop where
+  feasible : MatrixSdpCanonicalPrimalFeasible params model X
+  dualFeasible :
+    ∀ g : Polynomial params,
+      0 ≤ matrixSdpDualSlackOperator params model Z g
+  strongDuality :
+    Complex.re (Matrix.trace
+        (matrixSdpCanonicalObjectiveOperator params model * X)) =
+      matrixSdpDualObjective model Z
+  complementarySlackness :
+    X * (matrixSdpCanonicalDualOperator params model Z -
+          matrixSdpCanonicalObjectiveOperator params model) =
+      0
+  dualDominatesIdentity : (1 : MatrixOperator model.space) ≤ Z
+
+namespace MatrixSdpCanonicalOptimalPairWithDominance
+
+/-- A canonical optimal pair with dominance packages the matrix-level
+slackness statement with dominance. -/
+theorem toMatrixSdpStatementWithSlacknessAndDominance
+    {params : Parameters}
+    [FieldModel params.q]
+    {model : MatrixSdpRealization params}
+    {X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)}
+    {Z : MatrixOperator model.space}
+    (h : MatrixSdpCanonicalOptimalPairWithDominance params model X Z) :
+    MatrixSdpStatementWithSlacknessAndDominance params model :=
+  matrixSdpStatementWithSlacknessAndDominance_of_canonicalFeasibleComplementarySlackness
+    params model X h.feasible Z h.dualFeasible h.strongDuality
+    h.complementarySlackness h.dualDominatesIdentity
+
+end MatrixSdpCanonicalOptimalPairWithDominance
+
 namespace MatrixSdpOptimalWitness
 
 /-- A matrix optimal witness gives an abstract SDP optimal pair with slackness,
@@ -237,6 +282,21 @@ theorem sdpStatementWithSlackness_of_canonicalFeasibleComplementarySlackness
       params (matrixSdpPointRealizationOfStrategy params strategy) X hX Z
       hdual hstrong hcanonical hOneLe)
 
+/-- A canonical optimal pair with dominance gives the abstract Section 9 SDP
+statement with complementary slackness. -/
+theorem sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
+      (matrixSdpPointRealizationOfStrategy params strategy)))
+    (Z : MIPStarRE.Quantum.Op ι)
+    (h : MatrixSdpCanonicalOptimalPairWithDominance params
+      (matrixSdpPointRealizationOfStrategy params strategy) X Z) :
+    SdpStatementWithSlackness params strategy :=
+  MatrixSdpStatementWithSlacknessAndDominance.toSdpStatementWithSlackness
+    params strategy h.toMatrixSdpStatementWithSlacknessAndDominance
+
 /-- Canonical block-SDP feasibility, objective equality, complementary
 slackness, and dual dominance give the displayed abstract SDP measurement
 witness.
@@ -290,5 +350,26 @@ theorem sdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness
   exact ⟨hpair.primalMeasurement, hpair.toSdpOptimalPair.dualPositive,
     hpair.toSdpOptimalPair.dualDominatesIdentity, hpair.toSdpOptimalPair.dualFeasible,
     hpair.complementarySlackness⟩
+
+/-- A canonical optimal pair with dominance gives the displayed abstract SDP
+measurement witness. -/
+theorem sdpMeasurementWitness_of_canonicalOptimalPairWithDominance
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
+      (matrixSdpPointRealizationOfStrategy params strategy)))
+    (Z : MIPStarRE.Quantum.Op ι)
+    (h : MatrixSdpCanonicalOptimalPairWithDominance params
+      (matrixSdpPointRealizationOfStrategy params strategy) X Z) :
+    ∃ T : Measurement (Polynomial params) ι,
+      0 ≤ Z ∧
+      (1 : MIPStarRE.Quantum.Op ι) ≤ Z ∧
+      (∀ g : Polynomial params, 0 ≤ sdpDualSlackOperator params strategy Z g) ∧
+      ∀ g : Polynomial params,
+        sdpComplementarySlacknessEquation params strategy T.toSubMeas Z g :=
+  sdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness
+    params strategy X h.feasible Z h.dualFeasible h.strongDuality
+    h.complementarySlackness h.dualDominatesIdentity
 
 end MIPStarRE.LDT.SelfImprovement
