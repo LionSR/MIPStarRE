@@ -508,6 +508,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.dualPositive}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.primalMeasurement}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.complementarySlacknessEquation}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSubmeasurementToSubMeas}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPointRealizationOfStrategy}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixAveragedPointOperator_ofPointRealization}
@@ -515,7 +516,10 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.toSdpOptimalPairWithSlackness_of_dualDominatesIdentity}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness.toSdpStatementWithSlackness_of_dualDominatesIdentity}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.toSdpStatementWithSlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalFeasibleComplementarySlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithMatrixSdpSlacknessAndDominance}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithCanonicalMatrixSdpSlacknessAndDominance}
   \leanok
   From a matrix-level strong-duality witness with complementary slackness of the
   shape asserted by Lemma~\ref{lem:sdp}, one obtains a complete measurement
@@ -527,7 +531,9 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   is bundled with the same optimal witness.  Together with the usual helper
   hypotheses \(\strategy\) is good, the error parameter \(\nu\), and the
   comparison measurement \(G\), that package feeds the slackness-carrying
-  self-improvement helper.
+  self-improvement helper.  The same bridge is first stated as an abstract SDP
+  statement, and then as a direct helper input, for a canonical feasible primal
+  matrix satisfying objective equality and canonical complementary slackness.
 \end{lemma}
 \begin{proof}
   \leanok
@@ -542,7 +548,10 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.sdpDualPositive_of_dualFeasible}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPair.dualPositive}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness.primalMeasurement}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness.toSdpStatement}
+  \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness.exists_measurement_witness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalBlockIndex}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalBlockHilbertSpace}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDiagonalBlock}
@@ -557,6 +566,8 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalBlockDiagonal_nonneg_iff}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalConstraintOperator_blockDiagonal}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalBlockDiagonal_trace_mul}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalBlockDiagonal_trace_mul_left}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDiagonalBlock_mul_blockDiagonal_right}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalBlockDiagonal_mul}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSlackOperator}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSlackOperator_nonneg}
@@ -572,6 +583,10 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalPrimalFeasible_sum_diagonalBlock_some_le_one}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalExtractedPrimalSubmeasurement}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalExtractedPrimalSubmeasurement_effect}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSlackOperator_extractedPrimalSubmeasurement}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDiagonalBlock_primalBlockMatrix_extracted_some}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDiagonalBlock_primalBlockMatrix_extracted_none}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDiagonalBlock_primalBlockMatrix_extracted}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalPrimalFeasible_extracts_submeasurement}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalObjectiveBlockFamily}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalObjectiveOperator}
@@ -592,15 +607,23 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpDualFeasible_of_canonicalDualConstraint_nonneg}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalStrictDualConstraint_nonneg}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalObjective_trace_primalBlockMatrix}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalObjective_trace_extractedPrimalSubmeasurement}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalObjective_trace_primalBlockMatrix_extracted}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDiagonalBlock_mul_dualSlack}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalPrimalBlockMatrix_mul_dualSlack}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalPrimalBlockMatrix_extracted_mul_dualSlack_of_canonical}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpComplementarySlacknessDefect_of_canonical}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpComplementarySlacknessDefect_extracted_of_canonical}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSlack_mul_dual_of_complementarySlackness}
   \lean{MIPStarRE.Quantum.eq_zero_of_nonneg_mul_eq_zero_of_one_le}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSlackOperator_eq_zero_of_mul_dual_eq_zero_of_one_le}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_of_canonicalSlackOperator_eq_zero}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_of_canonicalComplementarySlackness_of_one_le}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_extracted_of_canonicalComplementarySlackness_of_one_le}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpOptimalWitnessWithDominance_of_canonicalFeasibleComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlacknessAndDominance_of_canonicalComplementarySlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlacknessAndDominance_of_canonicalFeasibleComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.exists_measurement_witness}
   Let
   \[
@@ -702,6 +725,10 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \texttt{matrixSdpStrictDualWitness}, and
   \texttt{matrixSdpFeasibleBounds\_canonical}; the dual feasibility of \(2I\)
   follows from \texttt{matrixAveragedPointOperator\_le\_one}.
+  The block-diagonal reduction is also recorded for arbitrary feasible
+  canonical matrices: extracting the diagonal blocks preserves the objective
+  and transfers canonical complementary slackness to the extracted paper primal
+  submeasurement.
 \end{proof}
 
 \begin{lemma}[Averaging over the evaluation point]\label{lem:add-in-u}

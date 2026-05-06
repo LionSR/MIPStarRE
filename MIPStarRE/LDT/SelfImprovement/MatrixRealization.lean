@@ -369,6 +369,88 @@ theorem matrixSdpCanonicalBlockDiagonal_trace_mul (params : Parameters)
   simp only [Matrix.reindexAlgEquiv_apply]
   rw [Matrix.trace_reindex, Matrix.trace_blockDiagonal_mul]
 
+private lemma sum_prod_if_fst_eq_mul_right {β α R : Type*} [Fintype β] [DecidableEq β]
+    [Fintype α] [NonUnitalNonAssocSemiring R] (b : β)
+    (F G : β × α → R) :
+    (∑ x : β × α, (if b = x.1 then F x else 0) * G x) =
+      ∑ a : α, F (b, a) * G (b, a) := by
+  classical
+  rw [Fintype.sum_prod_type]
+  calc
+    ∑ x : β, ∑ y : α, (if b = x then F (x, y) else 0) * G (x, y)
+        = ∑ x : β, (if b = x then ∑ y : α, F (x, y) * G (x, y) else 0) := by
+          refine Finset.sum_congr rfl ?_
+          intro x _
+          by_cases hx : b = x <;> simp [hx]
+    _ = ∑ y : α, F (b, y) * G (b, y) := by
+          simp
+
+/-- The trace pairing of a canonical block-diagonal operator with an arbitrary
+canonical matrix depends only on the diagonal blocks of the latter.
+
+This is the block calculation used in the converse direction of the canonical
+primal SDP identification: when the objective operator is block diagonal, the
+off-diagonal blocks of a feasible canonical matrix do not contribute to the
+objective value. -/
+theorem matrixSdpCanonicalBlockDiagonal_trace_mul_left (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (B : MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) :
+    Matrix.trace (matrixSdpCanonicalBlockDiagonal params model B * X) =
+      ∑ b : MatrixSdpCanonicalBlockIndex params,
+        Matrix.trace (B b * matrixSdpCanonicalDiagonalBlock params model X b) := by
+  classical
+  unfold Matrix.trace
+  simp only [Matrix.diag_apply]
+  change (∑ x : MatrixSdpCanonicalBlockIndex params × model.space.carrier,
+      (matrixSdpCanonicalBlockDiagonal params model B * X) x x) =
+    ∑ b : MatrixSdpCanonicalBlockIndex params,
+      ∑ i : model.space.carrier,
+        (B b * matrixSdpCanonicalDiagonalBlock params model X b) i i
+  rw [Fintype.sum_prod_type]
+  simp only [Matrix.mul_apply, matrixSdpCanonicalBlockDiagonal,
+    matrixSdpCanonicalDiagonalBlock]
+  change (∑ b : MatrixSdpCanonicalBlockIndex params, ∑ i : model.space.carrier,
+      ∑ y : MatrixSdpCanonicalBlockIndex params × model.space.carrier,
+        (if b = y.1 then B b i y.2 else 0) * X y (b, i)) =
+    ∑ b : MatrixSdpCanonicalBlockIndex params, ∑ i : model.space.carrier,
+      ∑ j : model.space.carrier, B b i j * X (b, j) (b, i)
+  simp_rw [sum_prod_if_fst_eq_mul_right]
+
+/-- The diagonal block of a product with a canonical block-diagonal operator on
+the right depends only on the corresponding diagonal block of the left factor. -/
+theorem matrixSdpCanonicalDiagonalBlock_mul_blockDiagonal_right (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (B : MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space)
+    (b : MatrixSdpCanonicalBlockIndex params) :
+    matrixSdpCanonicalDiagonalBlock params model
+        (X * matrixSdpCanonicalBlockDiagonal params model B) b =
+      matrixSdpCanonicalDiagonalBlock params model X b * B b := by
+  classical
+  ext i j
+  unfold matrixSdpCanonicalDiagonalBlock
+  simp only [Matrix.mul_apply, matrixSdpCanonicalBlockDiagonal]
+  change (∑ y : MatrixSdpCanonicalBlockIndex params × model.space.carrier,
+      X (b, i) y * (if y.1 = b then B y.1 y.2 j else 0)) =
+    ∑ k : model.space.carrier, X (b, i) (b, k) * B b k j
+  rw [Fintype.sum_prod_type]
+  calc
+    ∑ x : MatrixSdpCanonicalBlockIndex params,
+        ∑ y : model.space.carrier,
+          X (b, i) (x, y) * (if x = b then B x y j else 0)
+        = ∑ x : MatrixSdpCanonicalBlockIndex params,
+          (if x = b then
+            ∑ y : model.space.carrier, X (b, i) (x, y) * B x y j
+          else 0) := by
+            refine Finset.sum_congr rfl ?_
+            intro x _
+            by_cases hx : x = b <;> simp [hx]
+    _ = ∑ k : model.space.carrier, X (b, i) (b, k) * B b k j := by
+          simp
+
 /-- The product of two canonical block-diagonal operators is the canonical
 block-diagonal operator obtained by multiplying corresponding blocks. -/
 theorem matrixSdpCanonicalBlockDiagonal_mul (params : Parameters)
@@ -591,6 +673,82 @@ noncomputable def matrixSdpCanonicalExtractedPrimalSubmeasurement
     (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX).effect g =
       matrixSdpCanonicalDiagonalBlock params model X (some g) :=
   rfl
+
+/-- The slack block of the submeasurement extracted from a feasible canonical
+matrix is the original canonical slack diagonal block. -/
+theorem matrixSdpCanonicalSlackOperator_extractedPrimalSubmeasurement
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (hX : MatrixSdpCanonicalPrimalFeasible params model X) :
+    matrixSdpCanonicalSlackOperator params model
+        (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX) =
+      matrixSdpCanonicalDiagonalBlock params model X none := by
+  have hsum :
+      matrixSdpCanonicalDiagonalBlock params model X none +
+          ∑ g : Polynomial params,
+            matrixSdpCanonicalDiagonalBlock params model X (some g) =
+        1 := by
+    simpa [matrixSdpCanonicalConstraintOperator, Fintype.sum_option] using
+      hX.constraintEqOne
+  unfold matrixSdpCanonicalSlackOperator
+  calc
+    1 -
+        ∑ g : Polynomial params,
+          (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX).effect g =
+        1 - ∑ g : Polynomial params,
+          matrixSdpCanonicalDiagonalBlock params model X (some g) := by
+          rfl
+    _ = matrixSdpCanonicalDiagonalBlock params model X none := by
+          rw [← hsum]
+          abel
+
+@[simp] theorem matrixSdpCanonicalDiagonalBlock_primalBlockMatrix_extracted_some
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (hX : MatrixSdpCanonicalPrimalFeasible params model X)
+    (g : Polynomial params) :
+    matrixSdpCanonicalDiagonalBlock params model
+        (matrixSdpCanonicalPrimalBlockMatrix params model
+          (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX))
+        (some g) =
+      matrixSdpCanonicalDiagonalBlock params model X (some g) := by
+  simp [matrixSdpCanonicalPrimalBlockMatrix]
+
+@[simp] theorem matrixSdpCanonicalDiagonalBlock_primalBlockMatrix_extracted_none
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (hX : MatrixSdpCanonicalPrimalFeasible params model X) :
+    matrixSdpCanonicalDiagonalBlock params model
+        (matrixSdpCanonicalPrimalBlockMatrix params model
+          (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX))
+        none =
+      matrixSdpCanonicalDiagonalBlock params model X none := by
+  simpa [matrixSdpCanonicalPrimalBlockMatrix] using
+    matrixSdpCanonicalSlackOperator_extractedPrimalSubmeasurement params model X hX
+
+/-- Replacing a feasible canonical matrix by the canonical block matrix of its
+extracted paper submeasurement preserves every diagonal block. -/
+theorem matrixSdpCanonicalDiagonalBlock_primalBlockMatrix_extracted
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (hX : MatrixSdpCanonicalPrimalFeasible params model X)
+    (b : MatrixSdpCanonicalBlockIndex params) :
+    matrixSdpCanonicalDiagonalBlock params model
+        (matrixSdpCanonicalPrimalBlockMatrix params model
+          (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX))
+        b =
+      matrixSdpCanonicalDiagonalBlock params model X b := by
+  cases b with
+  | none =>
+      exact matrixSdpCanonicalDiagonalBlock_primalBlockMatrix_extracted_none
+        params model X hX
+  | some g =>
+      exact matrixSdpCanonicalDiagonalBlock_primalBlockMatrix_extracted_some
+        params model X hX g
 
 /-- A feasible canonical primal matrix determines a paper primal
 submeasurement with effects `T_g = X_{gg}`. -/
@@ -870,6 +1028,68 @@ theorem matrixSdpCanonicalObjective_trace_primalBlockMatrix
   intro g _
   rw [Matrix.trace_mul_comm]
 
+/-- The canonical block objective evaluated on an arbitrary feasible canonical
+primal matrix is the paper primal objective of its extracted submeasurement.
+
+This is the converse objective identity to
+`matrixSdpCanonicalObjective_trace_primalBlockMatrix`: once a canonical feasible
+matrix `X` is given, reading the polynomial diagonal blocks as `T_g = X_{gg}`
+preserves the SDP objective value. -/
+theorem matrixSdpCanonicalObjective_trace_extractedPrimalSubmeasurement
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (hX : MatrixSdpCanonicalPrimalFeasible params model X) :
+    Complex.re (Matrix.trace
+        (matrixSdpCanonicalObjectiveOperator params model * X)) =
+      matrixSdpPrimalObjective params model
+        (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX) := by
+  rw [matrixSdpCanonicalObjectiveOperator]
+  rw [matrixSdpCanonicalBlockDiagonal_trace_mul_left]
+  rw [Fintype.sum_option]
+  simp only [matrixSdpCanonicalObjectiveBlockFamily_none, zero_mul, Matrix.trace_zero,
+    matrixSdpCanonicalObjectiveBlockFamily_some, zero_add, Complex.re_sum]
+  unfold matrixSdpPrimalObjective matrixSdpPrimalContributionOperator
+  rw [Matrix.trace_sum]
+  simp only [Complex.re_sum]
+  refine Finset.sum_congr rfl ?_
+  intro g _
+  rw [matrixSdpCanonicalExtractedPrimalSubmeasurement_effect]
+  rw [Matrix.trace_mul_comm]
+
+/-- Replacing a feasible canonical matrix by the canonical block matrix of the
+extracted paper submeasurement preserves the canonical objective value. -/
+theorem matrixSdpCanonicalObjective_trace_primalBlockMatrix_extracted
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (hX : MatrixSdpCanonicalPrimalFeasible params model X) :
+    Complex.re (Matrix.trace
+        (matrixSdpCanonicalObjectiveOperator params model *
+          matrixSdpCanonicalPrimalBlockMatrix params model
+            (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX))) =
+      Complex.re (Matrix.trace
+        (matrixSdpCanonicalObjectiveOperator params model * X)) := by
+  rw [matrixSdpCanonicalObjective_trace_primalBlockMatrix]
+  rw [matrixSdpCanonicalObjective_trace_extractedPrimalSubmeasurement]
+
+/-- The diagonal block of a canonical primal-dual slack product is the product
+of the corresponding primal diagonal block and canonical dual slack block. -/
+theorem matrixSdpCanonicalDiagonalBlock_mul_dualSlack
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (Z : MatrixOperator model.space)
+    (b : MatrixSdpCanonicalBlockIndex params) :
+    matrixSdpCanonicalDiagonalBlock params model
+        (X * (matrixSdpCanonicalDualOperator params model Z -
+          matrixSdpCanonicalObjectiveOperator params model)) b =
+      matrixSdpCanonicalDiagonalBlock params model X b *
+        matrixSdpCanonicalDualSlackBlockFamily params model Z b := by
+  rw [matrixSdpCanonicalDualOperator_sub_objectiveOperator]
+  exact matrixSdpCanonicalDiagonalBlock_mul_blockDiagonal_right params model X
+    (matrixSdpCanonicalDualSlackBlockFamily params model Z) b
+
 /-- The concrete complementary-slackness defect `T_g (Z - A_g)`. -/
 noncomputable def matrixSdpComplementarySlacknessDefect (params : Parameters)
     [FieldModel params.q]
@@ -901,6 +1121,54 @@ theorem matrixSdpCanonicalPrimalBlockMatrix_mul_dualSlack
     matrixSdpCanonicalPrimalBlockMatrix,
     matrixSdpCanonicalBlockDiagonal_mul]
 
+/-- If a feasible canonical primal matrix satisfies canonical complementary
+slackness, then the block-diagonal matrix obtained from its polynomial diagonal
+blocks also satisfies canonical complementary slackness.
+
+This is the formal version of the reduction in the SDP proof which permits one
+to replace an optimal canonical matrix by its block-diagonal part. -/
+theorem matrixSdpCanonicalPrimalBlockMatrix_extracted_mul_dualSlack_of_canonical
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (hX : MatrixSdpCanonicalPrimalFeasible params model X)
+    (Z : MatrixOperator model.space)
+    (hcanonical :
+      X * (matrixSdpCanonicalDualOperator params model Z -
+            matrixSdpCanonicalObjectiveOperator params model) =
+        0) :
+    matrixSdpCanonicalPrimalBlockMatrix params model
+          (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX) *
+        (matrixSdpCanonicalDualOperator params model Z -
+          matrixSdpCanonicalObjectiveOperator params model) =
+      0 := by
+  rw [matrixSdpCanonicalPrimalBlockMatrix_mul_dualSlack]
+  ext x y
+  rcases x with ⟨b, i⟩
+  rcases y with ⟨c, j⟩
+  by_cases hbc : b = c
+  · subst c
+    have hentry :
+        (matrixSdpCanonicalDiagonalBlock params model X b *
+            matrixSdpCanonicalDualSlackBlockFamily params model Z b) i j = 0 := by
+      have hblock :=
+        congrArg (fun Y => matrixSdpCanonicalDiagonalBlock params model Y b)
+          hcanonical
+      change matrixSdpCanonicalDiagonalBlock params model
+          (X * (matrixSdpCanonicalDualOperator params model Z -
+            matrixSdpCanonicalObjectiveOperator params model)) b =
+        matrixSdpCanonicalDiagonalBlock params model 0 b at hblock
+      rw [matrixSdpCanonicalDiagonalBlock_mul_dualSlack] at hblock
+      simpa [matrixSdpCanonicalDiagonalBlock] using congrFun (congrFun hblock i) j
+    cases b with
+    | none =>
+        simpa [matrixSdpCanonicalBlockDiagonal, matrixSdpCanonicalPrimalBlockFamily,
+          matrixSdpCanonicalSlackOperator_extractedPrimalSubmeasurement] using hentry
+    | some g =>
+        simpa [matrixSdpCanonicalBlockDiagonal, matrixSdpCanonicalPrimalBlockFamily] using
+          hentry
+  · simp [matrixSdpCanonicalBlockDiagonal, hbc]
+
 /-- Canonical complementary slackness implies the paper-form defect equation
 `T_g (Z - A_g) = 0` on each polynomial block. -/
 theorem matrixSdpComplementarySlacknessDefect_of_canonical
@@ -922,6 +1190,27 @@ theorem matrixSdpComplementarySlacknessDefect_of_canonical
   rw [matrixSdpCanonicalPrimalBlockMatrix_mul_dualSlack] at hblock
   simpa [matrixSdpComplementarySlacknessDefect, matrixSdpCanonicalDiagonalBlock] using
     hblock
+
+/-- Canonical complementary slackness for a feasible canonical matrix gives
+the paper-form defect equation for the extracted paper primal submeasurement. -/
+theorem matrixSdpComplementarySlacknessDefect_extracted_of_canonical
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (hX : MatrixSdpCanonicalPrimalFeasible params model X)
+    (Z : MatrixOperator model.space)
+    (hcanonical :
+      X * (matrixSdpCanonicalDualOperator params model Z -
+            matrixSdpCanonicalObjectiveOperator params model) =
+        0)
+    (g : Polynomial params) :
+    matrixSdpComplementarySlacknessDefect params model
+        (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX) Z g =
+      0 :=
+  matrixSdpComplementarySlacknessDefect_of_canonical params model
+    (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX) Z
+    (matrixSdpCanonicalPrimalBlockMatrix_extracted_mul_dualSlack_of_canonical
+      params model X hX Z hcanonical) g
 
 /-- Canonical complementary slackness also gives the slack-block equation
 `S Z = 0`, where `S = I - ∑_g T_g`. -/
@@ -997,6 +1286,28 @@ theorem matrixSdpPrimalTotalEqOne_of_canonicalComplementarySlackness_of_one_le
         params model T Z hcanonical)
       hOneLe)
 
+/-- Canonical complementary slackness and \(I \le Z\) saturate the extracted
+paper primal submeasurement. -/
+theorem matrixSdpPrimalTotalEqOne_extracted_of_canonicalComplementarySlackness_of_one_le
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (hX : MatrixSdpCanonicalPrimalFeasible params model X)
+    (Z : MatrixOperator model.space)
+    (hcanonical :
+      X * (matrixSdpCanonicalDualOperator params model Z -
+            matrixSdpCanonicalObjectiveOperator params model) =
+        0)
+    (hOneLe : (1 : MatrixOperator model.space) ≤ Z) :
+    ∑ g : Polynomial params,
+        (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX).effect g =
+      1 :=
+  matrixSdpPrimalTotalEqOne_of_canonicalComplementarySlackness_of_one_le
+    params model (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX) Z
+    (matrixSdpCanonicalPrimalBlockMatrix_extracted_mul_dualSlack_of_canonical
+      params model X hX Z hcanonical)
+    hOneLe
+
 /-- Matrix-level witness for an optimal SDP pair. -/
 structure MatrixSdpOptimalWitness (params : Parameters) [FieldModel params.q]
     (model : MatrixSdpRealization params)
@@ -1067,6 +1378,47 @@ theorem matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness
         matrixSdpComplementarySlacknessDefect_of_canonical params model T Z hcanonical }
   dualDominatesIdentity := hOneLe
 
+/-- Package an optimal paper-form witness directly from an arbitrary feasible
+canonical primal matrix.
+
+The theorem combines the two block-diagonal reductions: the extracted paper
+submeasurement has the same objective as the canonical matrix, and canonical
+complementary slackness is preserved when one replaces the canonical matrix by
+the block-diagonal matrix determined by its diagonal blocks. -/
+theorem matrixSdpOptimalWitnessWithDominance_of_canonicalFeasibleComplementarySlackness
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (hX : MatrixSdpCanonicalPrimalFeasible params model X)
+    (Z : MatrixOperator model.space)
+    (hdual :
+      ∀ g : Polynomial params,
+        0 ≤ matrixSdpDualSlackOperator params model Z g)
+    (hstrong :
+      Complex.re (Matrix.trace
+          (matrixSdpCanonicalObjectiveOperator params model * X)) =
+        matrixSdpDualObjective model Z)
+    (hcanonical :
+      X * (matrixSdpCanonicalDualOperator params model Z -
+            matrixSdpCanonicalObjectiveOperator params model) =
+        0)
+    (hOneLe : (1 : MatrixOperator model.space) ≤ Z) :
+    MatrixSdpOptimalWitnessWithDominance params model
+      (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX) Z := by
+  refine matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness
+    params model (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX) Z
+    hdual ?_ ?_ hOneLe
+  · calc
+      matrixSdpPrimalObjective params model
+          (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX)
+          = Complex.re (Matrix.trace
+              (matrixSdpCanonicalObjectiveOperator params model * X)) := by
+              exact (matrixSdpCanonicalObjective_trace_extractedPrimalSubmeasurement
+                params model X hX).symm
+      _ = matrixSdpDualObjective model Z := hstrong
+  · exact matrixSdpCanonicalPrimalBlockMatrix_extracted_mul_dualSlack_of_canonical
+      params model X hX Z hcanonical
+
 /-- Matrix-level statement of the strong-duality output for the SDP.
 
 This is the concrete matrix analogue of `SdpStatementWithSlackness`: it does
@@ -1126,6 +1478,38 @@ theorem matrixSdpStatementWithSlacknessAndDominance_of_canonicalComplementarySla
     ⟨T, Z,
       matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness
         params model T Z hdual hstrong hcanonical hOneLe⟩
+
+/-- Package a matrix SDP statement with dominance from an arbitrary feasible
+canonical primal matrix satisfying objective equality and complementary
+slackness.
+
+This statement-level theorem is the paper-facing block-diagonal reduction:
+given the output of canonical strong duality, it extracts the paper primal
+submeasurement and records the complete matrix-level slackness package needed
+by the downstream self-improvement bridge. -/
+theorem matrixSdpStatementWithSlacknessAndDominance_of_canonicalFeasibleComplementarySlackness
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (hX : MatrixSdpCanonicalPrimalFeasible params model X)
+    (Z : MatrixOperator model.space)
+    (hdual :
+      ∀ g : Polynomial params,
+        0 ≤ matrixSdpDualSlackOperator params model Z g)
+    (hstrong :
+      Complex.re (Matrix.trace
+          (matrixSdpCanonicalObjectiveOperator params model * X)) =
+        matrixSdpDualObjective model Z)
+    (hcanonical :
+      X * (matrixSdpCanonicalDualOperator params model Z -
+            matrixSdpCanonicalObjectiveOperator params model) =
+        0)
+    (hOneLe : (1 : MatrixOperator model.space) ≤ Z) :
+    MatrixSdpStatementWithSlacknessAndDominance params model where
+  witness :=
+    ⟨matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX, Z,
+      matrixSdpOptimalWitnessWithDominance_of_canonicalFeasibleComplementarySlackness
+        params model X hX Z hdual hstrong hcanonical hOneLe⟩
 
 /-- The concrete complementary-slackness equation `T_g Z = T_g A_g`. -/
 def matrixSdpComplementarySlacknessEquation (params : Parameters)
@@ -1220,6 +1604,54 @@ theorem exists_measurement_witness {params : Parameters} [FieldModel params.q]
     simpa using hopt.toMatrixSdpOptimalWitness.complementarySlacknessEquation g
 
 end MatrixSdpStatementWithSlacknessAndDominance
+
+/-- Canonical block-SDP conclusions give the displayed paper-form measurement
+and dual witness.
+
+This is the measurement-level form of
+`matrixSdpStatementWithSlacknessAndDominance_of_canonicalFeasibleComplementarySlackness`.
+From an arbitrary feasible canonical primal matrix satisfying objective equality
+and canonical complementary slackness, together with dual feasibility and
+\(I \le Z\), it extracts a complete paper primal measurement and records the
+dual feasibility, objective equality, and equations \(T_g Z = T_g A_g\). -/
+theorem matrixSdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (hX : MatrixSdpCanonicalPrimalFeasible params model X)
+    (Z : MatrixOperator model.space)
+    (hdual :
+      ∀ g : Polynomial params,
+        0 ≤ matrixSdpDualSlackOperator params model Z g)
+    (hstrong :
+      Complex.re (Matrix.trace
+          (matrixSdpCanonicalObjectiveOperator params model * X)) =
+        matrixSdpDualObjective model Z)
+    (hcanonical :
+      X * (matrixSdpCanonicalDualOperator params model Z -
+            matrixSdpCanonicalObjectiveOperator params model) =
+        0)
+    (hOneLe : (1 : MatrixOperator model.space) ≤ Z) :
+    ∃ T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space,
+      0 ≤ Z ∧
+      (1 : MatrixOperator model.space) ≤ Z ∧
+      (∀ g : Polynomial params, 0 ≤ matrixSdpDualSlackOperator params model Z g) ∧
+      matrixSdpPrimalObjective params model T.toSubmeasurement =
+        matrixSdpDualObjective model Z ∧
+      ∀ g : Polynomial params,
+        T.effect g * Z = T.effect g * matrixAveragedPointOperator params model g := by
+  let Tsub := matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX
+  let hopt :
+      MatrixSdpOptimalWitnessWithDominance params model Tsub Z :=
+    matrixSdpOptimalWitnessWithDominance_of_canonicalFeasibleComplementarySlackness
+      params model X hX Z hdual hstrong hcanonical hOneLe
+  refine ⟨hopt.toMatrixSdpOptimalWitness.primalMeasurement,
+    hopt.toMatrixSdpOptimalWitness.dualPositive, hopt.dualDominatesIdentity,
+    hopt.toMatrixSdpOptimalWitness.dualFeasible, ?_, ?_⟩
+  · simpa [MatrixSdpOptimalWitness.primalMeasurement] using
+      hopt.toMatrixSdpOptimalWitness.strongDuality
+  · intro g
+    simpa using hopt.toMatrixSdpOptimalWitness.complementarySlacknessEquation g
 
 namespace MatrixSdpStatementWithSlackness
 
