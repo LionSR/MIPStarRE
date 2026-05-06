@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical
+import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical.Witness
 
 /-!
 # Section 9 — Saturated canonical SDP witnesses
