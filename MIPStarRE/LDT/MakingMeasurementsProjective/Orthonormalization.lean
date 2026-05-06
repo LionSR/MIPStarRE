@@ -2,6 +2,8 @@ import MIPStarRE.LDT.Tactic.LdtSimp
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 import MIPStarRE.LDT.Basic.MeasurementLift
 import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
+import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization.Completion
+import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization.ErrorBounds
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
 /-!
@@ -16,7 +18,7 @@ namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 open MIPStarRE.LDT
 
-/-! ### Local helpers for submeasurements -/
+/-! ### Local helpers for the large-error branch -/
 
 /-- The zero family is a projective submeasurement. This supplies the trivial
 large-`ζ` branch of `orthonormalization`, where the target error bound is already
@@ -31,261 +33,6 @@ private def zeroProjSubMeas {Outcome : Type*} {ι : Type*}
       sum_eq_total := by simp
       total_le_one := zero_le_one }
   proj := fun _ => by simp
-
-/-- Discard the fresh `none` outcome from an option-indexed projective
-submeasurement. The remaining `some a` outcomes still form a projective
-submeasurement. -/
-noncomputable def restrictSomeProjSubMeas {Outcome : Type*} {ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
-    (P : ProjSubMeas (Option Outcome) ι) :
-    ProjSubMeas Outcome ι where
-  toSubMeas :=
-    { outcome := fun a => P.outcome (some a)
-      total := ∑ a : Outcome, P.outcome (some a)
-      outcome_pos := fun a => P.outcome_pos (some a)
-      sum_eq_total := rfl
-      total_le_one := by
-        calc
-          ∑ a : Outcome, P.outcome (some a)
-            ≤ P.outcome none + ∑ a : Outcome, P.outcome (some a) :=
-                le_add_of_nonneg_left (P.outcome_pos none)
-          _ = ∑ oa : Option Outcome, P.outcome oa := by
-                simp [Fintype.sum_option]
-          _ = P.total := by rw [P.sum_eq_total]
-          _ ≤ 1 := P.total_le_one }
-  proj := fun a => by simpa using P.proj (some a)
-
-/-- If the projective replacement of the completed measurement puts at least the
-original residual mass on the fresh `none` outcome, then the retained `some`
-outcomes have total dominated by the original submeasurement total.
-
-This is the precise construction-level order statement needed by the
-monotone-total route in the self-improvement argument.  It separates the
-formal algebra from the still-missing repair invariant
-`(optionCompletion A).outcome none ≤ P.outcome none`. -/
-theorem restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le
-    {Outcome : Type*} {ι : Type*} [Fintype Outcome]
-    [Fintype ι] [DecidableEq ι] [DecidableEq Outcome]
-    (A : SubMeas Outcome ι) (P : ProjSubMeas (Option Outcome) ι)
-    (hresidual : (optionCompletion A).outcome none ≤ P.outcome none) :
-    (restrictSomeProjSubMeas P).toSubMeas.total ≤ A.total := by
-  let S : MIPStarRE.Quantum.Op ι := ∑ a : Outcome, P.outcome (some a)
-  have hsum_le_one :
-      P.outcome none + S ≤ (1 : MIPStarRE.Quantum.Op ι) := by
-    calc
-      P.outcome none + S
-          = ∑ oa : Option Outcome, P.outcome oa := by
-              simp [S, Fintype.sum_option]
-      _ = P.total := by rw [P.sum_eq_total]
-      _ ≤ 1 := P.total_le_one
-  have hresidual' :
-      (1 : MIPStarRE.Quantum.Op ι) - A.total ≤ P.outcome none := by
-    simpa using hresidual
-  have hcompleted :
-      (1 : MIPStarRE.Quantum.Op ι) - A.total + S ≤
-        (1 : MIPStarRE.Quantum.Op ι) := by
-    calc
-      (1 : MIPStarRE.Quantum.Op ι) - A.total + S
-          ≤ P.outcome none + S := by
-              simpa [add_comm] using add_le_add_right hresidual' S
-      _ ≤ 1 := hsum_le_one
-  have hnonneg : 0 ≤ A.total - S := by
-    have hsub : 0 ≤
-        (1 : MIPStarRE.Quantum.Op ι) -
-          ((1 : MIPStarRE.Quantum.Op ι) - A.total + S) :=
-      sub_nonneg.mpr hcompleted
-    simpa [sub_eq_add_neg, add_assoc, add_comm, add_left_comm] using hsub
-  have hS_le : S ≤ A.total := sub_nonneg.mp hnonneg
-  simpa [restrictSomeProjSubMeas, S] using hS_le
-
-/-- The right-register expectation form of
-`restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le`.
-
-This is the scalar comparison needed by the monotone-total transport in the
-self-improvement theorem.  The proof first obtains the operator inequality on
-the local Hilbert space and then applies monotonicity of right tensor placement
-and of expectation in the ambient state. -/
-theorem restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le
-    {Outcome : Type*} {ι : Type*} [Fintype Outcome]
-    [Fintype ι] [DecidableEq ι] [DecidableEq Outcome]
-    (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι)
-    (P : ProjSubMeas (Option Outcome) ι)
-    (hresidual : (optionCompletion A).outcome none ≤ P.outcome none) :
-    ev ψ (rightTensor (ι₁ := ι) (restrictSomeProjSubMeas P).toSubMeas.total) ≤
-      ev ψ (rightTensor (ι₁ := ι) A.total) := by
-  exact ev_mono ψ _ _ <|
-    rightTensor_mono
-      (restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le A P hresidual)
-
-/-- Completing a submeasurement by a fresh failure outcome preserves bipartite
-strong self-consistency up to the paper's factor `2`: the original diagonal gap
-controls the original outcomes, and the same gap controls the residual `none`
-outcome after applying permutation invariance. -/
-private lemma optionCompletion_bipartiteSSCRel {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState (ι × ι))
-    (hperm : PermInvState ψ) (hψ : ψ.IsNormalized)
-    (A : SubMeas Outcome ι) (ζ : Error) :
-    BipartiteSSCRel ψ (uniformDistribution Unit)
-        (constSubMeasFamily A) ζ →
-      BipartiteSSCRel ψ (uniformDistribution Unit)
-        (constSubMeasFamily (optionCompletion A).toSubMeas)
-        (2 * ζ) := by
-  intro hssc
-  let R : MIPStarRE.Quantum.Op ι := 1 - A.total
-  have hζ_nonneg : 0 ≤ ζ :=
-    le_trans
-      (bipartiteSSCError_nonneg ψ (uniformDistribution Unit)
-        (constSubMeasFamily A))
-      hssc.overlapBound
-  have horig_q : qBipartiteSSCDefect ψ A ≤ ζ := by
-    simpa [ldt_simp] using hssc.overlapBound
-  have horig_gap :
-      ev ψ (leftTensor (ι₂ := ι) A.total) - qBipartiteMatchMass ψ A A ≤ ζ :=
-    le_trans (le_max_right 0 _) horig_q
-  have htotal_q :
-      qBipartiteSSCDefect ψ (postprocess A (fun _ : Outcome => ())) ≤ ζ :=
-    le_trans
-      (MIPStarRE.LDT.Preliminaries.qBipartiteSSCDefect_postprocess_le
-        (ψ := ψ) (M := A) (f := fun _ : Outcome => ()))
-      horig_q
-  have htotal_gap :
-      ev ψ (leftTensor (ι₂ := ι) A.total) - ev ψ (opTensor A.total A.total) ≤ ζ :=
-    le_trans (le_max_right 0 _) <| by
-      simpa [qBipartiteSSCDefect, postprocess, A.sum_eq_total] using htotal_q
-  have hresidual_eq :
-      ev ψ (leftTensor (ι₂ := ι) R) - ev ψ (opTensor R R) =
-        ev ψ (rightTensor (ι₁ := ι) A.total) - ev ψ (opTensor A.total A.total) := by
-    have hop :
-        leftTensor (ι₂ := ι) R - opTensor R R =
-          rightTensor (ι₁ := ι) A.total - opTensor A.total A.total := by
-      calc
-        leftTensor (ι₂ := ι) R - opTensor R R
-            = opTensor R (1 : MIPStarRE.Quantum.Op ι) - opTensor R R := by
-                rfl
-        _ = opTensor R ((1 : MIPStarRE.Quantum.Op ι) - R) := by
-                simpa [opTensor] using
-                  (MIPStarRE.Quantum.kronecker_sub_right (A := R)
-                    (B₁ := (1 : MIPStarRE.Quantum.Op ι)) (B₂ := R))
-        _ = opTensor R A.total := by
-                simp [R]
-        _ = opTensor (1 : MIPStarRE.Quantum.Op ι) A.total - opTensor A.total A.total := by
-                simpa [R] using
-                  (opTensor_sub_left (A := (1 : MIPStarRE.Quantum.Op ι))
-                    (B := A.total) (C := A.total)).symm
-        _ = rightTensor (ι₁ := ι) A.total - opTensor A.total A.total := by
-                rfl
-    simpa [ev_sub] using congrArg (ev ψ) hop
-  have hresidual_gap :
-      ev ψ (leftTensor (ι₂ := ι) R) - ev ψ (opTensor R R) ≤ ζ := by
-    rw [hresidual_eq, ← hperm.swap_ev A.total]
-    exact htotal_gap
-  have hleftR :
-      ev ψ (leftTensor (ι₂ := ι) R) = 1 - ev ψ (leftTensor (ι₂ := ι) A.total) := by
-    have hleftSub' :
-        1 - leftTensor (ι₂ := ι) A.total = leftTensor (ι₂ := ι) R := by
-      calc
-        1 - leftTensor (ι₂ := ι) A.total
-            = leftTensor (ι₂ := ι) (1 : MIPStarRE.Quantum.Op ι) -
-                leftTensor (ι₂ := ι) A.total := by
-                  rw [leftTensor_one (ι₁ := ι) (ι₂ := ι)]
-        _ = leftTensor (ι₂ := ι) R := by
-              change opTensor (1 : MIPStarRE.Quantum.Op ι) (1 : MIPStarRE.Quantum.Op ι) -
-                  opTensor A.total (1 : MIPStarRE.Quantum.Op ι) =
-                opTensor R (1 : MIPStarRE.Quantum.Op ι)
-              simpa [R] using
-                (opTensor_sub_left (A := (1 : MIPStarRE.Quantum.Op ι))
-                  (B := A.total) (C := (1 : MIPStarRE.Quantum.Op ι)))
-    rw [← hleftSub', ev_sub]
-    simp [ev_one_of_isNormalized ψ hψ]
-  have hcompleted_gap :
-      1 - (qBipartiteMatchMass ψ A A + ev ψ (opTensor R R)) ≤ 2 * ζ := by
-    linarith [horig_gap, hresidual_gap, hleftR]
-  have hoverlap_completion :
-      ∑ oa : Option Outcome,
-          ev ψ
-            (opTensor
-              ((optionCompletion A).outcome oa)
-              ((optionCompletion A).outcome oa)) =
-        ev ψ (opTensor R R) + qBipartiteMatchMass ψ A A := by
-    rw [Fintype.sum_option]
-    simp [qBipartiteMatchMass, R]
-  have hcompleted_q :
-      qBipartiteSSCDefect ψ (optionCompletion A).toSubMeas ≤ 2 * ζ := by
-    unfold qBipartiteSSCDefect
-    dsimp
-    have hmass_completion :
-        ev ψ (leftTensor (ι₂ := ι) (optionCompletion A).toSubMeas.total) = 1 := by
-      calc
-        ev ψ (leftTensor (ι₂ := ι) (optionCompletion A).toSubMeas.total)
-            = ev ψ (leftTensor (ι₂ := ι) (1 : MIPStarRE.Quantum.Op ι)) := by
-                rw [(optionCompletion A).total_eq_one]
-        _ = ev ψ (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
-                simpa using
-                  congrArg (ev ψ) (leftTensor_one (ι₁ := ι) (ι₂ := ι))
-        _ = 1 := ev_one_of_isNormalized ψ hψ
-    rw [hmass_completion, hoverlap_completion]
-    refine max_le_iff.mpr ?_
-    constructor
-    · nlinarith
-    · simpa [add_comm, add_left_comm, add_assoc] using hcompleted_gap
-  constructor
-  simpa [bipartiteSSCError, avgOver, uniformDistribution, constSubMeasFamily]
-    using hcompleted_q
-
-/-- Discarding the extra `none` outcome from the option-completed measurement can
-only decrease the `qSDD` sum: one simply drops a nonnegative summand. -/
-private lemma qSDD_liftLeft_restrictSomeProjSubMeas_le {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState (ι × ι))
-    (A : SubMeas Outcome ι) (P : ProjSubMeas (Option Outcome) ι) :
-    qSDD ψ A.liftLeft (restrictSomeProjSubMeas P).toSubMeas.liftLeft ≤
-      qSDD ψ (optionCompletion A).toSubMeas.liftLeft P.toSubMeas.liftLeft := by
-  have hsome :
-      qSDD ψ A.liftLeft (restrictSomeProjSubMeas P).toSubMeas.liftLeft =
-        ∑ a : Outcome,
-          ev ψ
-            ((((optionCompletion A).toSubMeas.liftLeft).outcome (some a) -
-                  (P.toSubMeas.liftLeft).outcome (some a))ᴴ *
-                (((optionCompletion A).toSubMeas.liftLeft).outcome (some a) -
-                  (P.toSubMeas.liftLeft).outcome (some a))) := by
-    unfold qSDD qSDDCore
-    refine Finset.sum_congr rfl ?_
-    intro a _
-    simp [optionCompletion, restrictSomeProjSubMeas, SubMeas.liftLeft]
-  rw [hsome]
-  have hnone_nonneg :
-      0 ≤ ev ψ
-        ((((optionCompletion A).toSubMeas.liftLeft).outcome none -
-              (P.toSubMeas.liftLeft).outcome none)ᴴ *
-            (((optionCompletion A).toSubMeas.liftLeft).outcome none -
-              (P.toSubMeas.liftLeft).outcome none)) :=
-    ev_adjoint_self_nonneg ψ _
-  calc
-    ∑ a : Outcome,
-        ev ψ
-          ((((optionCompletion A).toSubMeas.liftLeft).outcome (some a) -
-                (P.toSubMeas.liftLeft).outcome (some a))ᴴ *
-              (((optionCompletion A).toSubMeas.liftLeft).outcome (some a) -
-                (P.toSubMeas.liftLeft).outcome (some a)))
-      ≤
-        ev ψ
-          ((((optionCompletion A).toSubMeas.liftLeft).outcome none -
-                (P.toSubMeas.liftLeft).outcome none)ᴴ *
-              (((optionCompletion A).toSubMeas.liftLeft).outcome none -
-                (P.toSubMeas.liftLeft).outcome none)) +
-          ∑ a : Outcome,
-            ev ψ
-              ((((optionCompletion A).toSubMeas.liftLeft).outcome (some a) -
-                    (P.toSubMeas.liftLeft).outcome (some a))ᴴ *
-                  (((optionCompletion A).toSubMeas.liftLeft).outcome (some a) -
-                    (P.toSubMeas.liftLeft).outcome (some a))) :=
-            le_add_of_nonneg_left hnone_nonneg
-    _ = qSDD ψ (optionCompletion A).toSubMeas.liftLeft P.toSubMeas.liftLeft := by
-          unfold qSDD qSDDCore
-          rw [Fintype.sum_option]
 
 /-- The zero projective submeasurement is within unit `qSDD` of any lifted
 submeasurement on a normalized state. -/
@@ -312,7 +59,9 @@ private lemma qSDD_liftLeft_zeroProjSubMeas_le_one {Outcome : Type*}
       by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
         simp [zeroProjSubMeas, SubMeas.liftLeft, leftTensor, h₁, h₂]
     calc
-      ev ψ ((Z - ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft).outcome a)ᴴ *
+      ev ψ
+          ((Z -
+              ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft).outcome a)ᴴ *
             (Z - ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft).outcome a))
         = ev ψ (Zᴴ * Z) := by
             rw [hzero]
@@ -323,88 +72,6 @@ private lemma qSDD_liftLeft_zeroProjSubMeas_le_one {Outcome : Type*}
             rfl
   rw [hq]
   simpa using MIPStarRE.LDT.Preliminaries.subMeas_diagMass_le_one ψ hψ A.liftLeft
-
-/-- The quarter-root factor `2^{1/4}` is below the paper-friendly rational bound
-`25/21`, which is exactly the slack needed to turn `84·(2ζ)^{1/4}` into
-`100·ζ^{1/4}`. -/
-private lemma quarterRootTwo_le_twentyFiveTwentyOne :
-    Real.rpow (2 : Error) (1 / (4 : Error)) ≤ 25 / 21 := by
-  let x : Error := Real.rpow (2 : Error) (1 / (4 : Error))
-  have hx_nonneg : 0 ≤ x := by
-    dsimp [x]
-    exact Real.rpow_nonneg (by norm_num) _
-  have hx4 : x ^ (4 : ℕ) = 2 := by
-    change (Real.rpow (2 : Error) (1 / (4 : Error))) ^ (4 : ℕ) = 2
-    calc
-      (Real.rpow (2 : Error) (1 / (4 : Error))) ^ (4 : ℕ)
-          = (Real.rpow (2 : Error) (1 / (4 : Error))) ^ (4 : Error) := by
-              symm
-              exact Real.rpow_natCast _ 4
-      _ = Real.rpow (2 : Error) ((1 / (4 : Error)) * 4) := by
-              simpa using
-                (Real.rpow_mul (x := (2 : Error)) (by positivity)
-                  (1 / (4 : Error)) 4).symm
-      _ = Real.rpow (2 : Error) 1 := by norm_num
-      _ = 2 := by norm_num [Real.rpow_natCast]
-  by_contra hx_gt
-  have hx_lt : (25 / 21 : Error) < x := lt_of_not_ge hx_gt
-  have hpow_lt : (25 / 21 : Error) ^ (4 : ℕ) < x ^ (4 : ℕ) := by
-    exact pow_lt_pow_left₀ hx_lt (by positivity) (by decide)
-  have hq : (2 : Error) < (25 / 21 : Error) ^ (4 : ℕ) := by
-    norm_num
-  have : (25 / 21 : Error) ^ (4 : ℕ) < 2 := by
-    simpa [hx4] using hpow_lt
-  linarith
-
-/-- Bookkeeping for the submeasurement version of the orthonormalization theorem:
-after completing `A` by a fresh outcome, the local measurement lemma returns the
-error `84·(2ζ)^{1/4}`, which is bounded by the paper's `100·ζ^{1/4}`. -/
-private lemma orthonormalizationMainLemmaError_two_mul_le_orthonormalizationError
-    (ζ : Error) (hζ : 0 ≤ ζ) :
-    orthonormalizationMainLemmaError (2 * ζ) ≤ orthonormalizationError ζ := by
-  dsimp [orthonormalizationMainLemmaError, orthonormalizationError]
-  rw [Real.mul_rpow (by positivity) hζ]
-  have hconst :
-      84 * Real.rpow (2 : Error) (1 / (4 : Error)) ≤ 100 := by
-    calc
-      84 * Real.rpow (2 : Error) (1 / (4 : Error))
-        ≤ 84 * (25 / 21 : Error) := by
-            refine mul_le_mul_of_nonneg_left quarterRootTwo_le_twentyFiveTwentyOne ?_
-            norm_num
-      _ = 100 := by norm_num
-  have hquart_nonneg : 0 ≤ Real.rpow ζ (1 / (4 : Error)) := Real.rpow_nonneg hζ _
-  calc
-    84 *
-        (Real.rpow (2 : Error) (1 / (4 : Error)) *
-          Real.rpow ζ (1 / (4 : Error))) =
-      (84 * Real.rpow (2 : Error) (1 / (4 : Error))) *
-        Real.rpow ζ (1 / (4 : Error)) := by ring
-    _ ≤ 100 * Real.rpow ζ (1 / (4 : Error)) := by
-          exact mul_le_mul_of_nonneg_right hconst hquart_nonneg
-
-/-- In the large-`ζ` branch `ζ > 1/2`, the target bound `100·ζ^{1/4}` already
-exceeds `1`, so the trivial zero projective submeasurement suffices. -/
-private lemma orthonormalizationError_ge_one_of_half_lt (ζ : Error)
-    (hhalf_lt : (1 / 2 : Error) < ζ) :
-    1 ≤ orthonormalizationError ζ := by
-  dsimp [orthonormalizationError]
-  have hhalf_rpow_le :
-      Real.rpow (1 / 2 : Error) (1 / (4 : Error)) ≤
-        Real.rpow ζ (1 / (4 : Error)) := by
-    exact Real.rpow_le_rpow (by positivity) (le_of_lt hhalf_lt) (by positivity)
-  have hhalf_le_root :
-      (1 / 2 : Error) ≤ Real.rpow (1 / 2 : Error) (1 / (4 : Error)) := by
-    simpa [Real.rpow_one] using
-      (Real.rpow_le_rpow_of_exponent_ge'
-        (show 0 ≤ (1 / 2 : Error) by positivity)
-        (show (1 / 2 : Error) ≤ 1 by norm_num)
-        (show 0 ≤ (1 / (4 : Error)) by positivity)
-        (by norm_num : (1 / (4 : Error)) ≤ 1))
-  have hroot_lower : (1 / 2 : Error) ≤ Real.rpow ζ (1 / (4 : Error)) :=
-    le_trans hhalf_le_root hhalf_rpow_le
-  have h50_le : (50 : Error) ≤ 100 * Real.rpow ζ (1 / (4 : Error)) := by
-    nlinarith
-  exact (by norm_num : (1 : Error) ≤ 50).trans h50_le
 
 /-- In the large-`ζ` branch, the zero projective submeasurement satisfies the
 orthonormalization SDD bound. -/
@@ -441,59 +108,6 @@ private lemma zeroProjSubMeas_rightTensor_total_ev_le {Outcome : Type*} {ι : Ty
         (zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.total) ≤
       ev ψ (rightTensor (ι₁ := ι) A.total) := by
   exact ev_mono ψ _ _ <| rightTensor_mono (zeroProjSubMeas_total_le A)
-
-/-- Error bookkeeping for the composition of `consistencyToAlmostProjective`
-and `roundAlmostProjMeas`. -/
-private lemma orthonormalizationMainLemma_error_bound (ζ : Error)
-    (hζ : 0 ≤ ζ) (hζ1 : ζ ≤ 1) :
-    roundingToProjectiveError (consistencyToAlmostProjectiveError ζ) ≤
-      orthonormalizationMainLemmaError ζ := by
-  /-
-  The theorem below is structurally just the composition of
-  `consistencyToAlmostProjective` and `roundAlmostProjMeas`.
-  The remaining bookkeeping is the scalar inequality comparing the composed
-  rounding bound with the named `orthonormalizationMainLemmaError`.
-  -/
-  dsimp [roundingToProjectiveError, consistencyToAlmostProjectiveError,
-    orthonormalizationMainLemmaError]
-  rw [Real.mul_rpow (by positivity) hζ]
-  have hζrpow :
-      Real.rpow ζ (1 / (2 : Error)) ≤ Real.rpow ζ (1 / (4 : Error)) := by
-    refine Real.rpow_le_rpow_of_exponent_ge' hζ hζ1 ?_ ?_
-    · positivity
-    · norm_num
-  have hsqrt_two_le_seven : Real.rpow (2 : Error) (1 / (2 : Error)) ≤ 7 := by
-    have hsqrt_two_le_two : Real.rpow (2 : Error) (1 / (2 : Error)) ≤ 2 := by
-      simpa using
-        (Real.rpow_le_self_of_one_le
-          (h₁ := (by norm_num : (1 : Error) ≤ 2))
-          (h₂ := (by norm_num : (1 / (2 : Error)) ≤ 1)))
-    exact hsqrt_two_le_two.trans (by norm_num)
-  have hquarter_nonneg : 0 ≤ Real.rpow ζ (1 / (4 : Error)) := Real.rpow_nonneg hζ _
-  calc
-    12 * (Real.rpow (2 : Error) (1 / (2 : Error)) * Real.rpow ζ (1 / (2 : Error)))
-      ≤ 12 * (Real.rpow (2 : Error) (1 / (2 : Error)) * Real.rpow ζ (1 / (4 : Error))) := by
-          refine mul_le_mul_of_nonneg_left ?_ (by norm_num)
-          exact mul_le_mul_of_nonneg_left hζrpow (Real.rpow_nonneg (by norm_num) _)
-    _ = (12 * Real.rpow (2 : Error) (1 / (2 : Error))) * Real.rpow ζ (1 / (4 : Error)) := by
-      ring
-    _ ≤ 84 * Real.rpow ζ (1 / (4 : Error)) := by
-      refine mul_le_mul_of_nonneg_right ?_ hquarter_nonneg
-      have hcoeff : 12 * Real.rpow (2 : Error) (1 / (2 : Error)) ≤ 12 * 7 := by
-        exact mul_le_mul_of_nonneg_left hsqrt_two_le_seven (by norm_num)
-      simpa using hcoeff.trans_eq (by norm_num : (12 : Error) * 7 = 84)
-
-/-- The scalar weakening `84·ζ^{1/4} ≤ 100·ζ^{1/4}` from the local
-orthonormalization bound to the paper's error term. Factored out as a named
-lemma because the same bookkeeping reappears in any top-level theorem that
-derives `orthonormalization` from `orthonormalizationMeasurement` via
-submeasurement completion. -/
-lemma orthonormalizationMainLemmaError_le_orthonormalizationError
-    (ζ : Error) (hζ : 0 ≤ ζ) :
-    orthonormalizationMainLemmaError ζ ≤ orthonormalizationError ζ := by
-  dsimp [orthonormalizationMainLemmaError, orthonormalizationError]
-  exact mul_le_mul_of_nonneg_right
-    (by norm_num : (84 : Error) ≤ 100) (Real.rpow_nonneg hζ _)
 
 /-- `lem:orthonormalization-main-lemma`.
 
