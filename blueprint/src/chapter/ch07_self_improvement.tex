@@ -675,16 +675,20 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   Translating~\eqref{eq:complementary-slackness} back to the variables
   $\{T_g\}$ and~$Z$ yields $T_g(Z-A_g)=0$ for every~$g$ and \(S Z=0\), where
   \(S=I-\sum_gT_g\) is the slack block.
-  Since \(S\ge 0\) and the selected dual witness satisfies \(I\le Z\), the
-  identity \(S Z=0\) forces \(S=0\).
-  Hence \(\sum_g T_g=I\), and the former equations are~\eqref{eq:slater}.
-  Lean packages these canonical conclusions as a
+  The paper then treats this as forcing \(S=0\).  The current Lean development
+  separates this point from the unconditional SDP statement: it proves the
+  displayed saturation from the auxiliary dominance hypothesis \(I\le Z\).
+  Thus, if the canonical complementary-slackness pair is supplied together with
+  \(I\le Z\), Lean packages these conditional conclusions as a
   \texttt{MatrixSdpOptimalWitnessWithDominance} once dual feasibility and
   equality of the paper primal and dual objectives have also been supplied.
   It also records the corresponding statement-level package, and an elimination
   theorem which exposes the complete measurement, the dual witness~$Z$, the
   retained dominance \(I\le Z\), dual feasibility, strong duality, and the
-  equations~\eqref{eq:slater}.
+  equations~\eqref{eq:slater}.  The additional dominance requirement is not a
+  consequence of the dual constraints \(Z\ge A_g\) alone; the discrepancy and
+  the intended saturated-witness replacement are recorded in
+  \texttt{docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex}.
   In the concrete matrix realization, Lean records the defect-zero condition as
   \texttt{matrixSdpComplementarySlacknessDefect}; the theorem
   \texttt{MatrixSdpOptimalWitness.complementarySlacknessEquation} translates it

@@ -78,9 +78,11 @@ submeasurement fix.
     T_g(Z-A_g)=0
     \quad\text{for all }g.
   \]
-  Saturation can be obtained by completing primal slack into any outcome without
-  decreasing the objective; slackness then follows from zero duality gap and
-  positive-semidefinite dual slacks.
+  Saturation should be obtained by completing primal slack into an outcome whose
+  objective coefficient is positive semidefinite, without decreasing the
+  objective.  Slackness should then be recovered from zero duality gap and
+  positive-semidefinite dual slacks.  This route avoids the stronger and
+  generally unavailable hypothesis $I\preceq Z$.
 
   \item \textbf{Self-improvement SDP output.}  Package the previous item as the
   exact data consumed by the helper proof:
@@ -94,8 +96,10 @@ submeasurement fix.
     T_gZ=T_gA_g.
   \]
   If the current Lean interface still asks for the extra field $I\preceq Z$,
-  either prove it for the selected witness or, more faithfully, relax that
-  interface to the paper's $Z\succeq0$ and $Z\succeq A_g$ fields.%
+  this should be understood as an auxiliary conditional bridge, not as a
+  consequence of the SDP dual constraints.  The faithful target is to relax that
+  interface to the paper's $Z\succeq0$ and $Z\succeq A_g$ fields, or to replace
+  the conditional bridge by the saturated-witness argument above.%
   \footnote{The current bridge isolating this interface issue is
   \doclink{MIPStarRE/LDT/SelfImprovement/Theorems/Results/SdpMatrixBridge.lean}.}
 \end{enumerate}
@@ -121,6 +125,31 @@ optimal pair with
   T_gZ=T_gA_g.
   \tag{\texttt{lem:sdp}, \texttt{eq:slater}}
 \]
+
+\section{The dominance condition is auxiliary}
+
+The dual constraint $Z\succeq A_g$ does not imply $Z\succeq I$.  In the scalar
+one-outcome case with $A_g=\frac12 I$, the trace-minimizing dual solution is
+$Z=\frac12 I$, which is feasible and optimal but does not dominate the identity.
+Thus the implication
+\[
+  S\succeq0,\qquad SZ=0,\qquad Z\succeq A_g\ \forall g
+  \quad\Longrightarrow\quad S=0
+\]
+is not a valid consequence of dual feasibility alone.  It becomes valid after
+adding the stronger hypothesis $I\preceq Z$, because then $Z\succeq0$ and
+$S(Z-I)\succeq0$ after commuting the positive factors; from $SZ=0$ this gives
+$0\preceq -S$, hence $S=0$.
+
+The corresponding Lean lemma is therefore deliberately conditional.  The
+declaration
+\[
+  \leanid{MIPStarRE.Quantum.eq_zero_of_nonneg_mul_eq_zero_of_one_le}
+\]
+proves the matrix-order fact under $I\preceq Z$, and the declarations ending in
+\leanid{WithDominance} package the resulting SDP data with that extra field.
+They do not prove that an arbitrary optimal dual witness selected by Slater
+duality satisfies $I\preceq Z$.
 
 \section{How the proof uses the optimum}
 
@@ -165,10 +194,19 @@ the \textbf{producer} for the stronger slackness-carrying statement.%
 
 \section{Conclusion}
 
-There is \textbf{no new discrepancy} in the paper's SDP use.  The hard remaining
-work is to prove or import strong duality with complementary slackness, specialize
-it to the paper's block SDP, produce a saturated optimal witness, and connect it
-to the self-improvement interface.
+There is a genuine distinction between the unconditional SDP statement used in
+the paper and the conditional dominance bridge currently formalized in Lean.
+The formal declarations with the suffix \leanid{WithDominance} prove correct
+conditional statements: if a canonical optimal pair is supplied with
+$I\preceq Z$, then complementary slackness forces the slack block to vanish and
+the pair yields a complete measurement satisfying the displayed slackness
+equations.  This does not by itself prove the unconditional conclusion of
+\texttt{lem:sdp}.
+
+The faithful completion of the paper route is still to prove or import strong
+duality with complementary slackness, specialize it to the paper's block SDP,
+produce a saturated optimal witness without assuming $I\preceq Z$, and connect
+that witness to the self-improvement interface.
 
 \bibliographystyle{alpha}
 \bibliography{references}
