@@ -376,7 +376,7 @@ theorem matrixSdpCanonicalConstraintOperator_primalBlockMatrix
 
 /-- Feasibility for the canonical primal block SDP: the block variable is
 positive semidefinite and satisfies the equality constraint
-`∑_g X_{gg} = I`. -/
+`X_{none,none} + ∑_g X_{gg} = I`. -/
 structure MatrixSdpCanonicalPrimalFeasible (params : Parameters) [FieldModel params.q]
     (model : MatrixSdpRealization params)
     (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) : Prop where
