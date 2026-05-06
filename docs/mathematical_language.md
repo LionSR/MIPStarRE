@@ -16,6 +16,9 @@ These guidelines apply to:
 - declaration docstrings;
 - documentation-visible section comments;
 - explanatory comments that describe the mathematical role of a declaration.
+- blueprint prose and formalization-support notes;
+- issue titles and issue bodies;
+- PR titles and PR descriptions.
 
 ## Source of Truth
 
@@ -28,6 +31,31 @@ Use terminology from the following sources, in this order:
 When the paper has a term for the object, use that term. For Section 5, for
 example, prefer orthogonalization lemma, truncation function, rounding to
 projectors, rank reduction, and completing to measurement.
+
+## Reference Notation And Terminology
+
+The notation and terminology of the original reference are the default for
+reader-facing mathematical text.  A reader should be able to compare a Lean
+docstring, blueprint paragraph, issue, or PR description with the cited source
+without first learning a private vocabulary used by the formalization.
+
+When Lean must use a different name or representation, define the deviation in a
+stable place.  The explanation should say:
+
+- the notation or term used in the paper;
+- the Lean object or name which represents it;
+- the mathematical reason for the difference, if there is one;
+- the scope in which the replacement should be used.
+
+Suitable stable places include the module docstring of the defining Lean file, a
+declaration docstring for a public auxiliary structure, the relevant blueprint
+paragraph, or a report under `docs/reports/` or `docs/paper-gaps/`.  A PR
+description may mention the deviation, but it should not be the only place where
+future readers can learn it.
+
+Formalization-only auxiliary lemmas should be introduced as such.  Their prose
+should name the nearby paper equation, theorem, or construction they support,
+rather than presenting the auxiliary name as paper terminology.
 
 ## Naming Norm
 
