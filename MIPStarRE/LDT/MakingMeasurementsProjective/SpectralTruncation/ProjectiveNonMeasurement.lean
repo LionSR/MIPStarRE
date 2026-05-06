@@ -27,14 +27,6 @@ universe uOutcome uι
 private noncomputable def truncationCutoff (δ : Error) : Error → Error :=
   fun x => if 1 - δ ≤ x then 1 else 0
 
-private lemma truncationCutoff_sq_eq_self (δ x : Error) :
-    (truncationCutoff δ x) ^ (2 : Nat) = truncationCutoff δ x := by
-  by_cases h : 1 - δ ≤ x <;> simp [truncationCutoff, h]
-
-private lemma truncationCutoff_nonneg (δ x : Error) :
-    0 ≤ truncationCutoff δ x := by
-  by_cases h : 1 - δ ≤ x <;> simp [truncationCutoff, h]
-
 private lemma truncationCutoff_le_inv_one_sub_mul
     (δ x : Error) (hδ : 0 < δ) (hδhalf : δ ≤ 1 / 2) (hx0 : 0 ≤ x) (_hx1 : x ≤ 1) :
     truncationCutoff δ x ≤ (1 / (1 - δ)) * x := by

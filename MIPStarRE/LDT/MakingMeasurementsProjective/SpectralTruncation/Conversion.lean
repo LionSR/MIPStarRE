@@ -1,4 +1,5 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation.ProjectiveNonMeasurement
+import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
+import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction
 
 /-!
 # Spectral Truncation Interface Conversions
@@ -8,9 +9,10 @@ This file contains the structural conversions from the paper witness
 rank-reduction layer to the `SpectralTruncationStatement` and
 `SpectralTruncationInput` interfaces used by orthonormalization.
 
-The conversions are field-for-field copies.  The mathematical construction of
-the rounded projective family is proved in
-`MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation.ProjectiveNonMeasurement`.
+The conversions are field-for-field copies.  The constructive spectral
+truncation theorem, which produces such a rounded projective family from the
+paper's almost-projective hypothesis, is proved in the sibling proof-layer
+module `SpectralTruncation.ProjectiveNonMeasurement`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
