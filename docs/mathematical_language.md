@@ -40,23 +40,27 @@ docstring, blueprint paragraph, issue, or PR description with the cited source
 without first learning a private vocabulary used by the formalization.
 
 When Lean must use a different name or representation, define the deviation in a
-stable place which future readers can find from the affected statement.  The
-explanation should say:
+location which future readers can find from the affected statement.  Use the
+first applicable location in the following order:
+
+1. the declaration docstring of the public object whose name or representation
+   differs from the paper;
+2. the module docstring of the defining Lean file, when the deviation concerns a
+   family of declarations in that file;
+3. the relevant blueprint paragraph, when the notation appears only in the
+   blueprint;
+4. a report under `docs/reports/` or `docs/paper-gaps/`, when the deviation is a
+   larger discrepancy between the paper, blueprint, and Lean.
+
+The explanation should say:
 
 - the notation or term used in the paper;
 - the Lean object or name which represents it;
 - the mathematical reason for the difference, if there is one;
 - the scope in which the replacement should be used.
 
-The place should be chosen according to the mathematical surface on which the
-deviation appears.  For a public Lean name or representation, use the module
-docstring of the defining Lean file or the declaration docstring of the public
-object.  For a blueprint-only change of notation, use the relevant blueprint
-paragraph.  For a larger discrepancy between the paper, blueprint, and Lean,
-use a report under `docs/reports/` or `docs/paper-gaps/`, and point to that
-report from the nearby blueprint or Lean documentation when appropriate.  A PR
-description may mention the deviation, but it should not be the only place where
-future readers can learn it.
+A PR description may mention the deviation, but it should not be the only place
+where future readers can learn it.
 
 Formalization-only auxiliary lemmas should be introduced as such.  Their prose
 should name the nearby paper equation, theorem, or construction they support,

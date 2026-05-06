@@ -1,3 +1,15 @@
+---
+title: "Issue #1287: Reference terminology and notation audit"
+date: 2026-05-06
+purpose: >
+  Record the visible terminology and notation surfaces affected by issue #1287,
+  and explain the repository rule introduced by the accompanying documentation
+  change.
+status: snapshot
+track: paper2009ldt
+kind: terminology-audit
+---
+
 # Issue #1287: Reference Terminology and Notation Audit
 
 Issue #1287 asks for a repository-wide writing convention: public mathematical
@@ -66,3 +78,20 @@ mathematical terminology and notation by default.  If Lean uses a different
 name or representation, the documentation must define the paper term, the Lean
 representative, the mathematical reason for the difference, and the scope where
 the replacement is intended to be used.
+
+## Validation
+
+- Reviewed the project writing rules in `docs/mathematical_language.md` and
+  `docs/blueprint_style_guide.md`.
+- Sampled blueprint prose and high-traffic Lean files from Sections 5, 6, and 9
+  to identify recurring terminology departures from the LDT paper.
+- Checked that the resulting documentation rule distinguishes paper terminology
+  from formalization-only auxiliary names.
+
+## Review Use
+
+Reviewers should use this audit when a PR introduces a new public Lean name,
+blueprint paragraph, issue description, or PR description whose terminology
+differs from `references/ldt-paper/`.  The expected review question is whether
+the paper term, the Lean representative, the mathematical reason for the
+departure, and the intended scope are all defined in a reader-facing location.
