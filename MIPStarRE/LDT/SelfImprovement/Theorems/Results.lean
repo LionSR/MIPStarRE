@@ -44,7 +44,7 @@ All original declarations remain available under the same namespace.
   (`projective_boundedness_gap_le_helper_boundedness_gap`,
   `final_fields_projective_residual_bound_natural`,
   `final_fields_projective_residual_bound`, `final_fields_bounded`)
-- `SelfImprovementTop` — `selfImprovement` wrappers, completeness/self-closeness producers
+- `SelfImprovementTop` — `selfImprovement` wrappers and final-fields producers
 
 ## References
 
