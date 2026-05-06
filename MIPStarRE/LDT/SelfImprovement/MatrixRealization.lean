@@ -1097,6 +1097,36 @@ structure MatrixSdpStatementWithSlacknessAndDominance (params : Parameters)
       ∃ Z : MatrixOperator model.space,
         MatrixSdpOptimalWitnessWithDominance params model T Z
 
+/-- Package the canonical block-SDP conclusions as the matrix-level statement
+with the dominance hypothesis retained.
+
+This is the statement form of
+`matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness`: the
+canonical complementary-slackness equation supplies the primal normalization and
+the defect-zero equations, while the remaining hypotheses record paper dual
+feasibility, equality of the paper primal and dual objectives, and \(I \le Z\). -/
+theorem matrixSdpStatementWithSlacknessAndDominance_of_canonicalComplementarySlackness
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
+    (Z : MatrixOperator model.space)
+    (hdual :
+      ∀ g : Polynomial params,
+        0 ≤ matrixSdpDualSlackOperator params model Z g)
+    (hstrong :
+      matrixSdpPrimalObjective params model T = matrixSdpDualObjective model Z)
+    (hcanonical :
+      matrixSdpCanonicalPrimalBlockMatrix params model T *
+          (matrixSdpCanonicalDualOperator params model Z -
+            matrixSdpCanonicalObjectiveOperator params model) =
+        0)
+    (hOneLe : (1 : MatrixOperator model.space) ≤ Z) :
+    MatrixSdpStatementWithSlacknessAndDominance params model where
+  witness :=
+    ⟨T, Z,
+      matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness
+        params model T Z hdual hstrong hcanonical hOneLe⟩
+
 /-- The concrete complementary-slackness equation `T_g Z = T_g A_g`. -/
 def matrixSdpComplementarySlacknessEquation (params : Parameters)
     [FieldModel params.q]
@@ -1163,6 +1193,31 @@ theorem toMatrixSdpStatementWithSlackness {params : Parameters} [FieldModel para
     MatrixSdpStatementWithSlackness params model := by
   obtain ⟨T, Z, hopt⟩ := h.witness
   exact ⟨T, Z, hopt.toMatrixSdpOptimalWitness⟩
+
+/-- A matrix strong-duality statement with dominance gives a complete primal
+measurement, a dual operator satisfying \(I \le Z\), dual feasibility, equality
+of objective values, and the complementary-slackness equations
+`T_g Z = T_g A_g`. -/
+theorem exists_measurement_witness {params : Parameters} [FieldModel params.q]
+    {model : MatrixSdpRealization params}
+    (h : MatrixSdpStatementWithSlacknessAndDominance params model) :
+    ∃ T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space,
+      ∃ Z : MatrixOperator model.space,
+        0 ≤ Z ∧
+        (1 : MatrixOperator model.space) ≤ Z ∧
+        (∀ g : Polynomial params, 0 ≤ matrixSdpDualSlackOperator params model Z g) ∧
+        matrixSdpPrimalObjective params model T.toSubmeasurement =
+          matrixSdpDualObjective model Z ∧
+        ∀ g : Polynomial params,
+          T.effect g * Z = T.effect g * matrixAveragedPointOperator params model g := by
+  obtain ⟨Tsub, Z, hopt⟩ := h.witness
+  refine ⟨hopt.toMatrixSdpOptimalWitness.primalMeasurement, Z,
+    hopt.toMatrixSdpOptimalWitness.dualPositive, hopt.dualDominatesIdentity,
+    hopt.toMatrixSdpOptimalWitness.dualFeasible, ?_, ?_⟩
+  · simpa [MatrixSdpOptimalWitness.primalMeasurement] using
+      hopt.toMatrixSdpOptimalWitness.strongDuality
+  · intro g
+    simpa using hopt.toMatrixSdpOptimalWitness.complementarySlacknessEquation g
 
 end MatrixSdpStatementWithSlacknessAndDominance
 

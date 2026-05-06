@@ -600,6 +600,8 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_of_canonicalSlackOperator_eq_zero}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_of_canonicalComplementarySlackness_of_one_le}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlacknessAndDominance_of_canonicalComplementarySlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.exists_measurement_witness}
   Let
   \[
     A_g = \E_{u \sim \F_q^m} A^u_{g(u)}.
@@ -679,6 +681,10 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   Lean packages these canonical conclusions as a
   \texttt{MatrixSdpOptimalWitnessWithDominance} once dual feasibility and
   equality of the paper primal and dual objectives have also been supplied.
+  It also records the corresponding statement-level package, and an elimination
+  theorem which exposes the complete measurement, the dual witness~$Z$, the
+  retained dominance \(I\le Z\), dual feasibility, strong duality, and the
+  equations~\eqref{eq:slater}.
   In the concrete matrix realization, Lean records the defect-zero condition as
   \texttt{matrixSdpComplementarySlacknessDefect}; the theorem
   \texttt{MatrixSdpOptimalWitness.complementarySlacknessEquation} translates it
