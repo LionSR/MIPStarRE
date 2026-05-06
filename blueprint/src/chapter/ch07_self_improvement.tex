@@ -504,6 +504,8 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.toMatrixSdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness.exists_measurement_witness}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPairWithDominance}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPairWithDominance.toMatrixSdpStatementWithSlacknessAndDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpComplementarySlacknessEquation}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.dualPositive}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.primalMeasurement}
@@ -517,9 +519,14 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness.toSdpStatementWithSlackness_of_dualDominatesIdentity}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.toSdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalFeasibleComplementarySlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPairWithDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithMatrixSdpSlacknessAndDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithCanonicalMatrixSdpSlacknessAndDominance}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithCanonicalOptimalPairSdpSlacknessAndDominance}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDomination}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDomination}
   \leanok
   From a matrix-level strong-duality witness with complementary slackness of the
   shape asserted by Lemma~\ref{lem:sdp}, one obtains a complete measurement
@@ -531,9 +538,16 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   is bundled with the same optimal witness.  Together with the usual helper
   hypotheses \(\strategy\) is good, the error parameter \(\nu\), and the
   comparison measurement \(G\), that package feeds the slackness-carrying
-  self-improvement helper.  The same bridge is first stated as an abstract SDP
-  statement, and then as a direct helper input, for a canonical feasible primal
-  matrix satisfying objective equality and canonical complementary slackness.
+  self-improvement helper.  Combined with the residual-dominating
+  orthonormalization input, the canonical form of the same bridge gives the
+  full self-improvement conclusion, including the projective residual bound.
+  Lean also isolates the exact canonical optimal-pair output still required
+  from strong duality: a feasible canonical primal matrix, a dual-feasible
+  operator with equal objective value, canonical complementary slackness, and
+  the dominance \(I \le Z\).
+  The bridge is first stated as an abstract SDP statement, and then as a direct
+  helper input, for a canonical feasible primal matrix satisfying objective
+  equality and canonical complementary slackness.
 \end{lemma}
 \begin{proof}
   \leanok
@@ -939,6 +953,7 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovement}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementError_nonneg_of_isGood}
   \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementBridgeInputs}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromBridgeInputs}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromBridgeInputsSubMeas}
