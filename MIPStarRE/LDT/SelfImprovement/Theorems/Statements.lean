@@ -92,6 +92,63 @@ structure SdpStatementWithSlackness (params : Parameters) [FieldModel params.q]
     ∃ T : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SdpOptimalPairWithSlackness params strategy T Z
 
+namespace SdpOptimalPairWithSlackness
+
+/-- The primal submeasurement in a slackness-carrying SDP pair is a
+measurement. -/
+def primalMeasurement {params : Parameters} [FieldModel params.q]
+    {strategy : SymStrat params ι}
+    {T : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (h : SdpOptimalPairWithSlackness params strategy T Z) :
+    Measurement (Polynomial params) ι where
+  toSubMeas := T
+  total_eq_one := h.toSdpOptimalPair.primalTotalOperator
+
+@[simp] theorem primalMeasurement_toSubMeas {params : Parameters} [FieldModel params.q]
+    {strategy : SymStrat params ι}
+    {T : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (h : SdpOptimalPairWithSlackness params strategy T Z) :
+    h.primalMeasurement.toSubMeas = T :=
+  rfl
+
+end SdpOptimalPairWithSlackness
+
+namespace SdpStatementWithSlackness
+
+/-- Forget complementary slackness and recover the reduced SDP statement. -/
+theorem toSdpStatement {params : Parameters} [FieldModel params.q]
+    {strategy : SymStrat params ι}
+    (h : SdpStatementWithSlackness params strategy) :
+    SdpStatement params strategy := by
+  obtain ⟨T, Z, hpair⟩ := h.witness
+  exact ⟨T, Z, hpair.toSdpOptimalPair⟩
+
+/-- A slackness-carrying SDP statement gives the displayed paper-form
+measurement and dual witness.
+
+This is the abstract analogue of the matrix-level witness extractors: the
+existential SDP package contains a complete primal measurement, a positive dual
+operator dominating the identity and every averaged point operator, and the
+complementary-slackness equations. -/
+theorem exists_measurement_witness {params : Parameters} [FieldModel params.q]
+    {strategy : SymStrat params ι}
+    (h : SdpStatementWithSlackness params strategy) :
+    ∃ T : Measurement (Polynomial params) ι,
+      ∃ Z : MIPStarRE.Quantum.Op ι,
+        0 ≤ Z ∧
+        (1 : MIPStarRE.Quantum.Op ι) ≤ Z ∧
+        (∀ g : Polynomial params, 0 ≤ sdpDualSlackOperator params strategy Z g) ∧
+        ∀ g : Polynomial params,
+          sdpComplementarySlacknessEquation params strategy T.toSubMeas Z g := by
+  obtain ⟨Tsub, Z, hpair⟩ := h.witness
+  exact ⟨hpair.primalMeasurement, Z, hpair.toSdpOptimalPair.dualPositive,
+    hpair.toSdpOptimalPair.dualDominatesIdentity,
+    hpair.toSdpOptimalPair.dualFeasible, hpair.complementarySlackness⟩
+
+end SdpStatementWithSlackness
+
 /-- The operator inside the left-hand side of `lem:add-in-u` at a fixed point `u`.
 Returns a bipartite operator `(M u).outcome o ⊗ H.outcome h`. -/
 noncomputable def addInULeftOperatorAtPoint {Outcome : Type*} [Fintype Outcome]
@@ -428,7 +485,7 @@ structure SelfImprovementBridgeInputs (params : Parameters) [FieldModel params.q
   helperStrongSelfConsistency :
     HelperStrongSelfConsistencyInput params strategy eps delta
   /-- Orthonormalization bridge: the strongly self-consistent `Hhat`
-  admits the spectral-truncation and locality-preserving repair witnesses
+  has the spectral-truncation and locality-preserving repair witnesses
   required by the orthonormalization theorem. -/
   orthonormalization :
     OrthonormalizationInput params strategy eps delta

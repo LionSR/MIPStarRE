@@ -55,4 +55,52 @@ lemma selfImprovementHelperWithMatrixSdpSlacknessAndDominance
       params strategy hsdp)
     hgood nu G
 
+/-- Canonical block-SDP data feed the slackness-carrying self-improvement
+helper.
+
+This is the paper-facing consumer of
+`sdpStatementWithSlackness_of_canonicalFeasibleComplementarySlackness`.
+Once a canonical
+primal matrix `X` is feasible, the canonical dual `Z` is feasible, the canonical
+objective equals the dual objective, canonical complementary slackness holds,
+and the selected dual satisfies \(I \le Z\), the existing matrix SDP bridge
+produces the helper output with complementary slackness. -/
+lemma selfImprovementHelperWithCanonicalMatrixSdpSlacknessAndDominance
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
+      (matrixSdpPointRealizationOfStrategy params strategy)))
+    (hX : MatrixSdpCanonicalPrimalFeasible params
+      (matrixSdpPointRealizationOfStrategy params strategy) X)
+    (Z : MIPStarRE.Quantum.Op ι)
+    (hdual :
+      ∀ g : Polynomial params,
+        0 ≤ matrixSdpDualSlackOperator params
+          (matrixSdpPointRealizationOfStrategy params strategy) Z g)
+    (hstrong :
+      Complex.re (Matrix.trace
+          (matrixSdpCanonicalObjectiveOperator params
+            (matrixSdpPointRealizationOfStrategy params strategy) * X)) =
+        matrixSdpDualObjective
+          (matrixSdpPointRealizationOfStrategy params strategy) Z)
+    (hcanonical :
+      X * (matrixSdpCanonicalDualOperator params
+          (matrixSdpPointRealizationOfStrategy params strategy) Z -
+            matrixSdpCanonicalObjectiveOperator params
+              (matrixSdpPointRealizationOfStrategy params strategy)) =
+        0)
+    (hOneLe : (1 : MIPStarRE.Quantum.Op ι) ≤ Z)
+    (hgood : strategy.IsGood eps delta gamma)
+    (nu : Error)
+    (G : Measurement (Polynomial params) ι) :
+    ∃ T : Measurement (Polynomial params) ι,
+      ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+        SelfImprovementHelperConclusionWithSlackness params strategy T H Z eps delta :=
+  selfImprovementHelperWithSlackness params strategy eps delta gamma
+    (sdpStatementWithSlackness_of_canonicalFeasibleComplementarySlackness
+      params strategy X hX Z hdual hstrong hcanonical hOneLe)
+    hgood nu G
+
 end MIPStarRE.LDT.SelfImprovement
