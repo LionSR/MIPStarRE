@@ -779,8 +779,10 @@ comparison
 
 `⟨ψ, I ⊗ H.total⟩ ≤ ⟨ψ, I ⊗ Hhat.total⟩`.
 
-It is the exact invariant needed to replace the current alphabet-size transport
-by the paper's measurement-valued `triangleSub` step. -/
+Here `rightTensor` is the codebase convention for placing the helper or
+projective total operator on the second tensor factor, namely as `I ⊗ (-)`.
+This is the exact invariant needed to replace the current alphabet-size
+transport by the paper's measurement-valued `triangleSub` step. -/
 theorem final_fields_of_helper_outputs_of_total_expectation_le
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
