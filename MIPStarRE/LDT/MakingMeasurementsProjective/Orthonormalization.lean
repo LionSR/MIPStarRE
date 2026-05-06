@@ -90,7 +90,8 @@ private lemma qSDD_liftLeft_zeroProjSubMeas_le_orthonormalizationError
     exact qSDD_liftLeft_zeroProjSubMeas_le_one (ψ := ψ) (hψ := hψ) (A := A)
   have hδ :
       1 ≤ orthonormalizationError ζ :=
-    orthonormalizationError_ge_one_of_half_lt ζ (lt_of_not_ge hζhalf)
+    Orthonormalization.ErrorBounds.orthonormalizationError_ge_one_of_half_lt ζ
+      (lt_of_not_ge hζhalf)
   exact hq.trans hδ
 
 /-- The zero projective submeasurement has total dominated by any
@@ -158,7 +159,7 @@ lemma orthonormalizationMainLemma {Outcome : Type*}
   refine ⟨P, ?_⟩
   simpa using
     (MIPStarRE.LDT.MakingMeasurementsProjective.roundedProjMeasStatement_mono hRounded
-      (orthonormalizationMainLemma_error_bound ζ hζ hζ1))
+      (Orthonormalization.ErrorBounds.orthonormalizationMainLemma_error_bound ζ hζ hζ1))
 
 /-- Pointwise collapse for a complete measurement `A`: the bipartite
 self-consistency defect equals the bipartite consistency defect of `A` with
@@ -265,7 +266,8 @@ lemma orthonormalizationMainLemma_local {Outcome : Type*}
   refine ⟨P, ?_⟩
   exact leftLiftedRoundedProjMeasStatement_to_local <|
     MIPStarRE.LDT.MakingMeasurementsProjective.roundedProjMeasStatement_mono
-      hRounded (orthonormalizationMainLemma_error_bound ζ hζ hζ1)
+      hRounded
+      (Orthonormalization.ErrorBounds.orthonormalizationMainLemma_error_bound ζ hζ hζ1)
 
 /-- Local version of `orthonormalizationMainLemma` from the paper's cross
 consistency hypothesis.
@@ -311,7 +313,8 @@ lemma orthonormalizationMainLemma_local_of_consistency {Outcome : Type*}
   refine ⟨P, ?_⟩
   exact leftLiftedRoundedProjMeasStatement_to_local <|
     MIPStarRE.LDT.MakingMeasurementsProjective.roundedProjMeasStatement_mono
-      hRounded (orthonormalizationMainLemma_error_bound ζ hζ hζ1)
+      hRounded
+      (Orthonormalization.ErrorBounds.orthonormalizationMainLemma_error_bound ζ hζ hζ1)
 
 /-- Measurement-level orthonormalization once the left-lifted repair witness is
 available explicitly. -/
@@ -340,7 +343,9 @@ lemma orthonormalizationMeasurement {Outcome : Type*}
       hζ hζ1 hspectral hrepair hssc
   refine ⟨P, ?_⟩
   rcases hP with ⟨hP⟩
-  exact ⟨hP.trans (orthonormalizationMainLemmaError_le_orthonormalizationError ζ hζ)⟩
+  exact ⟨hP.trans
+    (Orthonormalization.ErrorBounds.orthonormalizationMainLemmaError_le_orthonormalizationError
+      ζ hζ)⟩
 
 /-- Measurement-level orthonormalization from a cross-consistency hypothesis.
 
@@ -373,7 +378,9 @@ lemma orthonormalizationMeasurement_of_consistency {Outcome : Type*}
       (A := A) (B := B) (ζ := ζ) hζ hζ1 hspectral hrepair hCons
   refine ⟨P, ?_⟩
   rcases hP with ⟨hP⟩
-  exact ⟨hP.trans (orthonormalizationMainLemmaError_le_orthonormalizationError ζ hζ)⟩
+  exact ⟨hP.trans
+    (Orthonormalization.ErrorBounds.orthonormalizationMainLemmaError_le_orthonormalizationError
+      ζ hζ)⟩
 
 set_option linter.unusedFintypeInType false in
 /-- `thm:orthonormalization`.
@@ -424,7 +431,8 @@ theorem orthonormalization {Outcome : Type*}
           (constSubMeasFamily Ahat.toSubMeas)
           (2 * ζ) := by
       simpa [Ahat] using
-        optionCompletion_bipartiteSSCRel (ψ := ψ) (hperm := hperm)
+        Orthonormalization.Completion.optionCompletion_bipartiteSSCRel
+          (ψ := ψ) (hperm := hperm)
           (hψ := hψ) (A := A) (ζ := ζ) hssc
     obtain ⟨P, hP⟩ :=
       orthonormalizationMainLemma_local (Outcome := Option Outcome) (ι := ι)
@@ -440,14 +448,16 @@ theorem orthonormalization {Outcome : Type*}
         qSDD ψ A.liftLeft Psome.toSubMeas.liftLeft ≤
           orthonormalizationMainLemmaError (2 * ζ) := by
       exact le_trans
-        (qSDD_liftLeft_restrictSomeProjSubMeas_le (ψ := ψ) (A := A) (P := P))
+        (Orthonormalization.Completion.qSDD_liftLeft_restrictSomeProjSubMeas_le
+          (ψ := ψ) (A := A) (P := P))
         hPq
     refine ⟨Psome, ?_⟩
     constructor
     simpa [sddError, avgOver, uniformDistribution, constSubMeasFamily] using
       (le_trans hPsomeq
-        (orthonormalizationMainLemmaError_two_mul_le_orthonormalizationError
-          ζ hζ_nonneg))
+        (open Orthonormalization.ErrorBounds in
+          orthonormalizationMainLemmaError_two_mul_le_orthonormalizationError
+            ζ hζ_nonneg))
   · let P : ProjSubMeas Outcome ι := zeroProjSubMeas (Outcome := Outcome) (ι := ι)
     have hq :
         qSDD ψ A.liftLeft P.toSubMeas.liftLeft ≤ orthonormalizationError ζ := by
@@ -509,7 +519,8 @@ theorem orthonormalization_with_total_le_of_residual_domination {Outcome : Type*
           (constSubMeasFamily Ahat.toSubMeas)
           (2 * ζ) := by
       simpa [Ahat] using
-        optionCompletion_bipartiteSSCRel (ψ := ψ) (hperm := hperm)
+        Orthonormalization.Completion.optionCompletion_bipartiteSSCRel
+          (ψ := ψ) (hperm := hperm)
           (hψ := hψ) (A := A) (ζ := ζ) hssc
     have hCons :
         ConsRel ψ (uniformDistribution Unit)
@@ -539,8 +550,8 @@ theorem orthonormalization_with_total_le_of_residual_domination {Outcome : Type*
       leftLiftedRoundedProjMeasStatement_to_local <|
         MIPStarRE.LDT.MakingMeasurementsProjective.roundedProjMeasStatement_mono
           hRounded
-          (orthonormalizationMainLemma_error_bound (2 * ζ)
-            hTwoζ_nonneg hTwoζ_le_one)
+          (Orthonormalization.ErrorBounds.orthonormalizationMainLemma_error_bound
+            (2 * ζ) hTwoζ_nonneg hTwoζ_le_one)
     have hPq :
         qSDD ψ Ahat.toSubMeas.liftLeft P.toSubMeas.liftLeft ≤
           orthonormalizationMainLemmaError (2 * ζ) := by
@@ -550,7 +561,8 @@ theorem orthonormalization_with_total_le_of_residual_domination {Outcome : Type*
         qSDD ψ A.liftLeft Psome.toSubMeas.liftLeft ≤
           orthonormalizationMainLemmaError (2 * ζ) := by
       exact le_trans
-        (qSDD_liftLeft_restrictSomeProjSubMeas_le (ψ := ψ) (A := A) (P := P))
+        (Orthonormalization.Completion.qSDD_liftLeft_restrictSomeProjSubMeas_le
+          (ψ := ψ) (A := A) (P := P))
         hPq
     have htotal : Psome.toSubMeas.total ≤ A.total := by
       exact
@@ -566,8 +578,9 @@ theorem orthonormalization_with_total_le_of_residual_domination {Outcome : Type*
     constructor
     simpa [sddError, avgOver, uniformDistribution, constSubMeasFamily] using
       (le_trans hPsomeq
-        (orthonormalizationMainLemmaError_two_mul_le_orthonormalizationError
-          ζ hζ_nonneg))
+        (open Orthonormalization.ErrorBounds in
+          orthonormalizationMainLemmaError_two_mul_le_orthonormalizationError
+            ζ hζ_nonneg))
   · let P : ProjSubMeas Outcome ι := zeroProjSubMeas (Outcome := Outcome) (ι := ι)
     have hq :
         qSDD ψ A.liftLeft P.toSubMeas.liftLeft ≤ orthonormalizationError ζ := by

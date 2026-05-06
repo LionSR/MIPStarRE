@@ -106,6 +106,9 @@ theorem restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_resi
     rightTensor_mono
       (restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le A P hresidual)
 
+namespace Orthonormalization
+namespace Completion
+
 /-- Completing a submeasurement by a fresh failure outcome preserves bipartite
 strong self-consistency up to the paper's factor `2`: the original diagonal gap
 controls the original outcomes, and the same gap controls the residual `none`
@@ -275,5 +278,8 @@ lemma qSDD_liftLeft_restrictSomeProjSubMeas_le {Outcome : Type*}
     _ = qSDD ψ (optionCompletion A).toSubMeas.liftLeft P.toSubMeas.liftLeft := by
           unfold qSDD qSDDCore
           rw [Fintype.sum_option]
+
+end Completion
+end Orthonormalization
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

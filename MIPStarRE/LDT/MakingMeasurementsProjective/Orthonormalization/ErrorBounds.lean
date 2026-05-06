@@ -14,10 +14,13 @@ namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 /-! ### Scalar estimates -/
 
+namespace Orthonormalization
+namespace ErrorBounds
+
 /-- The quarter-root factor `2^{1/4}` is below the paper-friendly rational bound
 `25/21`, which is exactly the slack needed to turn `84·(2ζ)^{1/4}` into
 `100·ζ^{1/4}`. -/
-lemma quarterRootTwo_le_twentyFiveTwentyOne :
+private lemma quarterRootTwo_le_twentyFiveTwentyOne :
     Real.rpow (2 : Error) (1 / (4 : Error)) ≤ 25 / 21 := by
   let x : Error := Real.rpow (2 : Error) (1 / (4 : Error))
   have hx_nonneg : 0 ≤ x := by
@@ -148,5 +151,8 @@ lemma orthonormalizationMainLemmaError_le_orthonormalizationError
   dsimp [orthonormalizationMainLemmaError, orthonormalizationError]
   exact mul_le_mul_of_nonneg_right
     (by norm_num : (84 : Error) ≤ 100) (Real.rpow_nonneg hζ _)
+
+end ErrorBounds
+end Orthonormalization
 
 end MIPStarRE.LDT.MakingMeasurementsProjective
