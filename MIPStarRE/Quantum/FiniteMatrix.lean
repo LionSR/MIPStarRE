@@ -169,6 +169,27 @@ theorem blockDiagonal_nonneg {o m : Type*}
         intro c
         by_cases hc : c = b <;> simp [hc])
 
+/-- A block-diagonal complex matrix is positive semidefinite exactly when each
+of its diagonal blocks is positive semidefinite. -/
+theorem blockDiagonal_nonneg_iff {o m : Type*}
+    [Finite o] [DecidableEq o] [Finite m]
+    (B : o → Matrix m m ℂ) :
+    0 ≤ Matrix.blockDiagonal B ↔ ∀ b, 0 ≤ B b := by
+  classical
+  letI : Fintype o := Fintype.ofFinite o
+  letI : Fintype m := Fintype.ofFinite m
+  constructor
+  · intro hB b
+    refine Matrix.nonneg_iff_posSemidef.mpr ?_
+    let e : m → m × o := fun i => (i, b)
+    have hsub :
+        ((Matrix.blockDiagonal B).submatrix e e).PosSemidef :=
+      (Matrix.nonneg_iff_posSemidef.mp hB).submatrix e
+    convert hsub using 1
+    ext i j
+    simp [e, Matrix.blockDiagonal_apply]
+  · exact Matrix.blockDiagonal_nonneg B
+
 end Matrix
 
 namespace MIPStarRE.Quantum

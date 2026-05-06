@@ -1,3 +1,4 @@
+import MIPStarRE.Quantum.FiniteMatrix
 import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
 import MIPStarRE.LDT.SelfImprovement.Defs
 
@@ -300,6 +301,30 @@ theorem matrixSdpCanonicalBlockDiagonal_nonneg (params : Parameters) [FieldModel
     (Equiv.prodComm model.space.carrier (MatrixSdpCanonicalBlockIndex params)).symm).2
     (Matrix.nonneg_iff_posSemidef.mp (Matrix.blockDiagonal_nonneg B hB))
 
+/-- A canonical block-diagonal operator is positive semidefinite exactly when
+all of its diagonal matrix blocks are positive semidefinite. -/
+theorem matrixSdpCanonicalBlockDiagonal_nonneg_iff
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (B : MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space) :
+    0 ≤ matrixSdpCanonicalBlockDiagonal params model B ↔
+      ∀ b, 0 ≤ B b := by
+  classical
+  constructor
+  · intro hB b
+    let e := Equiv.prodComm model.space.carrier (MatrixSdpCanonicalBlockIndex params)
+    have hblock : 0 ≤ Matrix.blockDiagonal B := by
+      refine Matrix.nonneg_iff_posSemidef.mpr ?_
+      have hreindexed :
+          (Matrix.reindex e e (Matrix.blockDiagonal B)).PosSemidef := by
+        refine Matrix.nonneg_iff_posSemidef.mp ?_
+        simpa [e, matrixSdpCanonicalBlockDiagonal_eq_reindex_blockDiagonal]
+          using hB
+      exact (Matrix.posSemidef_submatrix_equiv
+        (M := Matrix.blockDiagonal B) e.symm).1 hreindexed
+    exact (Matrix.blockDiagonal_nonneg_iff B).mp hblock b
+  · exact matrixSdpCanonicalBlockDiagonal_nonneg params model B
+
 @[simp] theorem matrixSdpCanonicalDiagonalBlock_blockDiagonal (params : Parameters)
     [FieldModel params.q]
     (model : MatrixSdpRealization params)
@@ -343,6 +368,29 @@ theorem matrixSdpCanonicalBlockDiagonal_trace_mul (params : Parameters)
     (Matrix.blockDiagonal B) (Matrix.blockDiagonal D)]
   simp only [Matrix.reindexAlgEquiv_apply]
   rw [Matrix.trace_reindex, Matrix.trace_blockDiagonal_mul]
+
+/-- The product of two canonical block-diagonal operators is the canonical
+block-diagonal operator obtained by multiplying corresponding blocks. -/
+theorem matrixSdpCanonicalBlockDiagonal_mul (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (B D : MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space) :
+    matrixSdpCanonicalBlockDiagonal params model B *
+        matrixSdpCanonicalBlockDiagonal params model D =
+      matrixSdpCanonicalBlockDiagonal params model (fun b => B b * D b) := by
+  let e := Equiv.prodComm model.space.carrier (MatrixSdpCanonicalBlockIndex params)
+  rw [matrixSdpCanonicalBlockDiagonal_eq_reindex_blockDiagonal,
+    matrixSdpCanonicalBlockDiagonal_eq_reindex_blockDiagonal,
+    matrixSdpCanonicalBlockDiagonal_eq_reindex_blockDiagonal]
+  change
+    (Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal B) *
+        (Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal D) =
+      (Matrix.reindexAlgEquiv ℂ ℂ e)
+        (Matrix.blockDiagonal (fun b => B b * D b))
+  rw [← Matrix.reindexAlgEquiv_mul (R := ℂ) (A := ℂ) e
+    (Matrix.blockDiagonal B) (Matrix.blockDiagonal D)]
+  congr
+  rw [Matrix.blockDiagonal_mul]
 
 /-- The primal slack block `S = I - ∑_g T_g`. -/
 noncomputable def matrixSdpCanonicalSlackOperator (params : Parameters)
@@ -605,6 +653,46 @@ noncomputable def matrixSdpCanonicalObjectiveOperator (params : Parameters)
       matrixAveragedPointOperator params model g := by
   simp [matrixSdpCanonicalObjectiveOperator]
 
+/-- The block family representing the canonical dual operator associated to a
+paper dual variable `Z`.
+
+In the paper calculation this is
+`∑_{i,j} z_{ij} D_{ij}`, which is the block-diagonal matrix with the same
+operator `Z` on every canonical block. -/
+noncomputable def matrixSdpCanonicalDualOperatorBlockFamily (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (Z : MatrixOperator model.space) :
+    MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space :=
+  fun _ => Z
+
+/-- The canonical dual operator corresponding to a paper dual variable `Z`. -/
+noncomputable def matrixSdpCanonicalDualOperator (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (Z : MatrixOperator model.space) :
+    MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) :=
+  matrixSdpCanonicalBlockDiagonal params model
+    (matrixSdpCanonicalDualOperatorBlockFamily params model Z)
+
+@[simp] theorem matrixSdpCanonicalDualOperatorBlockFamily_apply
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (Z : MatrixOperator model.space)
+    (b : MatrixSdpCanonicalBlockIndex params) :
+    matrixSdpCanonicalDualOperatorBlockFamily params model Z b = Z :=
+  rfl
+
+@[simp] theorem matrixSdpCanonicalDiagonalBlock_dualOperator
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (Z : MatrixOperator model.space)
+    (b : MatrixSdpCanonicalBlockIndex params) :
+    matrixSdpCanonicalDiagonalBlock params model
+        (matrixSdpCanonicalDualOperator params model Z) b =
+      Z := by
+  simp [matrixSdpCanonicalDualOperator]
+
 /-- The block family for the canonical dual slack operator.
 
 It has polynomial blocks `Z - A_g` and slack block `Z`, exactly as in the
@@ -616,6 +704,47 @@ noncomputable def matrixSdpCanonicalDualSlackBlockFamily (params : Parameters)
     MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space
   | none => Z
   | some g => matrixSdpDualSlackOperator params model Z g
+
+@[simp] theorem matrixSdpCanonicalDualSlackBlockFamily_none (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (Z : MatrixOperator model.space) :
+    matrixSdpCanonicalDualSlackBlockFamily params model Z none = Z :=
+  rfl
+
+@[simp] theorem matrixSdpCanonicalDualSlackBlockFamily_some (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (Z : MatrixOperator model.space)
+    (g : Polynomial params) :
+    matrixSdpCanonicalDualSlackBlockFamily params model Z (some g) =
+      matrixSdpDualSlackOperator params model Z g :=
+  rfl
+
+/-- The canonical dual slack is the difference between the canonical dual
+operator and the canonical objective operator. -/
+theorem matrixSdpCanonicalDualOperator_sub_objectiveOperator
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (Z : MatrixOperator model.space) :
+    matrixSdpCanonicalDualOperator params model Z -
+        matrixSdpCanonicalObjectiveOperator params model =
+      matrixSdpCanonicalBlockDiagonal params model
+        (matrixSdpCanonicalDualSlackBlockFamily params model Z) := by
+  ext x y
+  rcases x with ⟨b, i⟩
+  rcases y with ⟨c, j⟩
+  by_cases hbc : b = c
+  · subst c
+    cases b with
+    | none =>
+        simp [matrixSdpCanonicalDualOperator, matrixSdpCanonicalObjectiveOperator,
+          matrixSdpCanonicalBlockDiagonal]
+    | some g =>
+        simp [matrixSdpCanonicalDualOperator, matrixSdpCanonicalObjectiveOperator,
+          matrixSdpCanonicalBlockDiagonal, matrixSdpDualSlackOperator]
+  · simp [matrixSdpCanonicalDualOperator, matrixSdpCanonicalObjectiveOperator,
+      matrixSdpCanonicalBlockDiagonal, hbc]
 
 /-- The canonical dual slack block matrix is positive semidefinite under paper
 dual feasibility.
@@ -643,6 +772,74 @@ theorem matrixSdpCanonicalDualSlackBlockDiagonal_nonneg_of_dualFeasible
         matrixSdpDualPositive_of_dualFeasible params model Z hdual
   | some g =>
       simpa [matrixSdpCanonicalDualSlackBlockFamily] using hdual g
+
+/-- Positivity of the canonical dual slack block matrix is equivalent to the
+paper dual feasibility inequalities `Z ≥ A_g`. -/
+theorem matrixSdpCanonicalDualSlackBlockDiagonal_nonneg_iff_dualFeasible
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (Z : MatrixOperator model.space) :
+    0 ≤ matrixSdpCanonicalBlockDiagonal params model
+        (matrixSdpCanonicalDualSlackBlockFamily params model Z) ↔
+      ∀ g : Polynomial params,
+        0 ≤ matrixSdpDualSlackOperator params model Z g := by
+  constructor
+  · intro hcanonical g
+    have hblocks :=
+      (matrixSdpCanonicalBlockDiagonal_nonneg_iff params model
+        (matrixSdpCanonicalDualSlackBlockFamily params model Z)).mp hcanonical
+    simpa using hblocks (some g)
+  · exact matrixSdpCanonicalDualSlackBlockDiagonal_nonneg_of_dualFeasible params model Z
+
+/-- The canonical dual constraint for `Z` is equivalent to the paper dual
+constraints `Z ≥ A_g`. -/
+theorem matrixSdpCanonicalDualConstraint_nonneg_iff_dualFeasible
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (Z : MatrixOperator model.space) :
+    0 ≤ matrixSdpCanonicalDualOperator params model Z -
+        matrixSdpCanonicalObjectiveOperator params model ↔
+      ∀ g : Polynomial params,
+        0 ≤ matrixSdpDualSlackOperator params model Z g := by
+  rw [matrixSdpCanonicalDualOperator_sub_objectiveOperator]
+  exact matrixSdpCanonicalDualSlackBlockDiagonal_nonneg_iff_dualFeasible params model Z
+
+/-- Paper dual feasibility implies feasibility of the canonical block dual
+constraint. -/
+theorem matrixSdpCanonicalDualConstraint_nonneg_of_dualFeasible
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (Z : MatrixOperator model.space)
+    (hdual :
+      ∀ g : Polynomial params,
+        0 ≤ matrixSdpDualSlackOperator params model Z g) :
+    0 ≤ matrixSdpCanonicalDualOperator params model Z -
+        matrixSdpCanonicalObjectiveOperator params model :=
+  (matrixSdpCanonicalDualConstraint_nonneg_iff_dualFeasible params model Z).mpr hdual
+
+/-- Feasibility of the canonical block dual constraint recovers the paper dual
+inequalities. -/
+theorem matrixSdpDualFeasible_of_canonicalDualConstraint_nonneg
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (Z : MatrixOperator model.space)
+    (hcanonical :
+      0 ≤ matrixSdpCanonicalDualOperator params model Z -
+        matrixSdpCanonicalObjectiveOperator params model) :
+    ∀ g : Polynomial params,
+      0 ≤ matrixSdpDualSlackOperator params model Z g :=
+  (matrixSdpCanonicalDualConstraint_nonneg_iff_dualFeasible params model Z).mp hcanonical
+
+/-- The paper's strict dual witness `Z = 2I` is feasible for the canonical dual
+constraint. -/
+theorem matrixSdpCanonicalStrictDualConstraint_nonneg
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params) :
+    0 ≤ matrixSdpCanonicalDualOperator params model (matrixSdpStrictDualWitness model) -
+        matrixSdpCanonicalObjectiveOperator params model :=
+  matrixSdpCanonicalDualConstraint_nonneg_of_dualFeasible params model
+    (matrixSdpStrictDualWitness model)
+    (matrixSdpStrictDualWitness_dualFeasible params model)
 
 /-- The canonical block objective evaluated on the block matrix associated to a
 paper primal submeasurement is the paper primal objective.
@@ -681,6 +878,70 @@ noncomputable def matrixSdpComplementarySlacknessDefect (params : Parameters)
     (Z : MatrixOperator model.space)
     (g : Polynomial params) : MatrixOperator model.space :=
   (T.effect g) * matrixSdpDualSlackOperator params model Z g
+
+/-- Multiplying the canonical primal block matrix by the canonical dual slack
+keeps only the blockwise products.
+
+This is the formal block-diagonal calculation behind the paper's passage from
+canonical complementary slackness to the equations
+`T_g (Z - A_g) = 0`. -/
+theorem matrixSdpCanonicalPrimalBlockMatrix_mul_dualSlack
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
+    (Z : MatrixOperator model.space) :
+    matrixSdpCanonicalPrimalBlockMatrix params model T *
+        (matrixSdpCanonicalDualOperator params model Z -
+          matrixSdpCanonicalObjectiveOperator params model) =
+      matrixSdpCanonicalBlockDiagonal params model
+        (fun b =>
+          matrixSdpCanonicalPrimalBlockFamily params model T b *
+            matrixSdpCanonicalDualSlackBlockFamily params model Z b) := by
+  rw [matrixSdpCanonicalDualOperator_sub_objectiveOperator,
+    matrixSdpCanonicalPrimalBlockMatrix,
+    matrixSdpCanonicalBlockDiagonal_mul]
+
+/-- Canonical complementary slackness implies the paper-form defect equation
+`T_g (Z - A_g) = 0` on each polynomial block. -/
+theorem matrixSdpComplementarySlacknessDefect_of_canonical
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
+    (Z : MatrixOperator model.space)
+    (hcanonical :
+      matrixSdpCanonicalPrimalBlockMatrix params model T *
+          (matrixSdpCanonicalDualOperator params model Z -
+            matrixSdpCanonicalObjectiveOperator params model) =
+        0)
+    (g : Polynomial params) :
+    matrixSdpComplementarySlacknessDefect params model T Z g = 0 := by
+  have hblock :=
+    congrArg
+      (fun X => matrixSdpCanonicalDiagonalBlock params model X (some g))
+      hcanonical
+  rw [matrixSdpCanonicalPrimalBlockMatrix_mul_dualSlack] at hblock
+  simpa [matrixSdpComplementarySlacknessDefect, matrixSdpCanonicalDiagonalBlock] using
+    hblock
+
+/-- Canonical complementary slackness also gives the slack-block equation
+`S Z = 0`, where `S = I - ∑_g T_g`. -/
+theorem matrixSdpCanonicalSlack_mul_dual_of_complementarySlackness
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
+    (Z : MatrixOperator model.space)
+    (hcanonical :
+      matrixSdpCanonicalPrimalBlockMatrix params model T *
+          (matrixSdpCanonicalDualOperator params model Z -
+            matrixSdpCanonicalObjectiveOperator params model) =
+        0) :
+    matrixSdpCanonicalSlackOperator params model T * Z = 0 := by
+  have hblock :=
+    congrArg
+      (fun X => matrixSdpCanonicalDiagonalBlock params model X none)
+      hcanonical
+  rw [matrixSdpCanonicalPrimalBlockMatrix_mul_dualSlack] at hblock
+  simpa [matrixSdpCanonicalDiagonalBlock] using hblock
 
 /-- Matrix-level witness for an optimal SDP pair. -/
 structure MatrixSdpOptimalWitness (params : Parameters) [FieldModel params.q]
