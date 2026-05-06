@@ -15,8 +15,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 open MIPStarRE.LDT
 open MIPStarRE.LDT.Preliminaries
-  (completeAtOutcome completeAtOutcomeProj completeAtOutcomeProj_toMeasurement
-    completingToMeasurement)
+  (completeAtOutcome completeAtOutcomeProj completeAtOutcomeProj_toMeasurement)
 
 /-! ### Line-169 match-mass monotonicity -/
 

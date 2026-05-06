@@ -15,9 +15,7 @@ namespace MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 open MIPStarRE.LDT
-open MIPStarRE.LDT.Preliminaries
-  (completeAtOutcome completeAtOutcomeProj completeAtOutcomeProj_toMeasurement
-    completingToMeasurement)
+open MIPStarRE.LDT.Preliminaries (completeAtOutcomeProj)
 
 /-! ### Local line-169 repair via pre-completion orthonormalization -/
 
@@ -235,7 +233,9 @@ theorem leftConsistency_with_orthonormalization_loss
       using hpre.offDiagonalBound
   have hζ0 : 0 ≤ ζ :=
     le_trans (qBipartiteConsDefect_nonneg ψ G_A.toSubMeas G_B.toSubMeas) hpre_q
-  simpa [sqrt_orthonormalizationError_eq hζ0] using
+  have hsqrt :=
+    MIPStarRE.LDT.MakingMeasurementsProjective.sqrt_orthonormalizationError_eq hζ0
+  simpa [hsqrt] using
     leftConsistency_of_completion_and_sdd ψ hψ P_A a_A hpre horth
 
 /-- Bob-side mirror of `leftConsistency_with_orthonormalization_loss`. -/
@@ -261,7 +261,9 @@ theorem rightConsistency_with_orthonormalization_loss
       using hpre.offDiagonalBound
   have hζ0 : 0 ≤ ζ :=
     le_trans (qBipartiteConsDefect_nonneg ψ G_B.toSubMeas G_A.toSubMeas) hpre_q
-  simpa [sqrt_orthonormalizationError_eq hζ0] using
+  have hsqrt :=
+    MIPStarRE.LDT.MakingMeasurementsProjective.sqrt_orthonormalizationError_eq hζ0
+  simpa [hsqrt] using
     rightConsistency_of_completion_and_sdd ψ hψ P_B a_B hpre horth
 
 end ProjectivizationLine169Repair

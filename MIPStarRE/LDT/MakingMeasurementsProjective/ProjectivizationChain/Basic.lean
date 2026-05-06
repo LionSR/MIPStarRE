@@ -66,9 +66,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 open MIPStarRE.LDT
-open MIPStarRE.LDT.Preliminaries
-  (completeAtOutcome completeAtOutcomeProj completeAtOutcomeProj_toMeasurement
-    completingToMeasurement)
 
 /-! ### Error functions -/
 
@@ -91,7 +88,7 @@ noncomputable def orthonormalizeAndCompleteError (ζ : Error) : Error :=
     2 * ζ
 
 /-- Square-root simplification for the orthonormalization error. -/
-theorem sqrt_orthonormalizationError_eq {ζ : Error} (hζ0 : 0 ≤ ζ) :
+protected theorem sqrt_orthonormalizationError_eq {ζ : Error} (hζ0 : 0 ≤ ζ) :
     Real.sqrt (orthonormalizationError ζ) = 10 * Real.rpow ζ (1 / (8 : Error)) := by
   have hsqrt100 : Real.sqrt (100 : Error) = 10 := by
     rw [← Real.sqrt_sq (show (0 : Error) ≤ 10 by norm_num)]
@@ -127,7 +124,9 @@ theorem orthonormalizeAndCompleteError_le_absorbedZeta2 {ζ : Error}
         (show 0 ≤ 1 / (8 : Error) by positivity)
         (by norm_num : 1 / (8 : Error) ≤ (1 : Error)))
   unfold orthonormalizeAndCompleteError
-  rw [sqrt_orthonormalizationError_eq hζ0]
+  have hsqrt :=
+    MIPStarRE.LDT.MakingMeasurementsProjective.sqrt_orthonormalizationError_eq hζ0
+  rw [hsqrt]
   unfold orthonormalizationError
   nlinarith [hζ_le_eighth]
 
