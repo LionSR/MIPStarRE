@@ -51,7 +51,7 @@ def qxpSomeOutcomeTotal {Outcome : Type*}
 
 /-- The retained `some` total is the total of the restriction obtained by
 discarding the fresh `none` outcome. -/
-@[simp] lemma qxpSomeOutcomeTotal_eq_restrictSomeProjSubMeas_total {Outcome : Type*}
+lemma qxpSomeOutcomeTotal_eq_restrictSomeProjSubMeas_total {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
     (data : QXPLayerData (Option Outcome) ι) :
