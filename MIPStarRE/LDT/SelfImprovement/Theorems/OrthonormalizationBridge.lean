@@ -189,17 +189,6 @@ structure LeftLiftedQXPLayerRepairWitnessWithResidualDomination {Outcome : Type*
 
 namespace LeftLiftedQXPLayerRepairWitnessWithResidualDomination
 
-/-- Forget the residual-domination field, retaining the ordinary QXP repair
-witness for the option-completed measurement. -/
-def toRepairWitness {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    {ψ : QuantumState (ι × ι)} {A : SubMeas Outcome ι} {ζ : Error}
-    (W : LeftLiftedQXPLayerRepairWitnessWithResidualDomination ψ A ζ) :
-    LeftLiftedQXPLayerRepairWitness ψ (optionCompletion A) ζ where
-  data := W.data
-  closeness := W.closeness
-
 /-- The residual-domination field gives the operator total comparison for the
 restricted repaired family selected by the QXP layer. -/
 theorem restrictSome_total_le {Outcome : Type*}
