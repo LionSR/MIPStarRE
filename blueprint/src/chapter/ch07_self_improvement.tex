@@ -919,6 +919,7 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_of_helper_outputs_of_total_expectation_le}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_of_helper_outputs_of_total_operator_le}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_exists_of_helper_outputs_of_residual_domination}
+  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_exists_of_helper_outputs_of_residualDominationInput}
   \leanok
   \uses{def:polymeasurements, def:simeq, def:approx_delta, def:strong-self-consistency}
   Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following properties:
@@ -1016,8 +1017,24 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   projective total is bounded by the helper total as an operator, hence also
   has no larger right-register expectation in the strategy state.  Under this
   structural hypothesis the alphabet-size displacement term is not introduced.
+  The QXP-layer interface used by the formalization records both the total
+  domination of the canonical projective family and the sharper
+  residual-domination field for the fresh option-completion outcome.
   \lean{MIPStarRE.LDT.Preliminaries.triangleSub_right_subMeas_totalGap}
   \lean{MIPStarRE.LDT.Preliminaries.triangleSub_right_subMeas_total_le}
+  \lean{MIPStarRE.LDT.MakingMeasurementsProjective.qxpProjSubMeas_total_eq_xHat_adjoint_mul_xHat}
+  \lean{MIPStarRE.LDT.MakingMeasurementsProjective.qxpProjSubMeas_total_le_of_outcome_le}
+  \lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerTotalDomination}
+  \lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerTotalDomination.of_outcome_le}
+  \lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerTotalDomination.rightTensor_total_ev_le}
+  \lean{MIPStarRE.LDT.SelfImprovement.LeftLiftedQXPLayerRepairWitnessWithResidualDomination}
+  \lean{MIPStarRE.LDT.SelfImprovement.LeftLiftedQXPLayerRepairWitnessWithResidualDomination.toRepairWitness}
+  \lean{MIPStarRE.LDT.SelfImprovement.leftLiftedProjectivizationRepairInputWithResidualDomination_of_qxpLayer}
+  \lean{MIPStarRE.LDT.SelfImprovement.OrthonormalizationQXPLayerRepairProducerWithResidualDomination}
+  \lean{MIPStarRE.LDT.SelfImprovement.OrthonormalizationResidualDominationInput}
+  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationInput_of_residualDominationInput}
+  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationResidualDominationInput_of_producers}
+  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationResidualDominationInput_of_roundingAndQXPLayerRepair}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap_natural}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap_natural_of_total_difference}
