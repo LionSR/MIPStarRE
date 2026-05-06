@@ -501,9 +501,16 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \uses{lem:sdp}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitnessWithDominance}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_extracted_of_canonicalSlackBlock_eq_zero}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpOptimalWitness_of_canonicalSaturatedComplementarySlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpOptimalWitness_of_canonicalFeasibleSaturatedComplementarySlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlackness_of_canonicalSaturatedComplementarySlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlackness_of_canonicalFeasibleSaturatedComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.toMatrixSdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness.exists_measurement_witness}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPair}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPair.toMatrixSdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPairWithDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPairWithDominance.toMatrixSdpStatementWithSlacknessAndDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpComplementarySlacknessEquation}
@@ -520,6 +527,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.toSdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalFeasibleComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPair}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPairWithDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithMatrixSdpSlacknessAndDominance}
@@ -545,13 +553,16 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   full self-improvement conclusion, including the projective residual bound.
   The formalization records both the per-helper orthonormalization form and the
   bundled SelfImprovement-level input form of this conclusion.
-  Lean also isolates the exact canonical optimal-pair output still required
+  Lean also isolates the saturated canonical optimal-pair output still required
   from strong duality: a feasible canonical primal matrix, a dual-feasible
   operator with equal objective value, canonical complementary slackness, and
-  the dominance \(I \le Z\).
-  The bridge is first stated as an abstract SDP statement, and then as a direct
-  helper input, for a canonical feasible primal matrix satisfying objective
-  equality and canonical complementary slackness.
+  vanishing of the extra canonical slack block.  This package gives the
+  displayed measurement witness without assuming \(I \le Z\).  Separately,
+  Lean retains the dominance-carrying package used by the present reduced
+  helper interface.  That bridge is first stated as an abstract SDP statement,
+  and then as a direct helper input, for a canonical feasible primal matrix
+  satisfying objective equality and canonical complementary slackness together
+  with the auxiliary dominance hypothesis.
 \end{lemma}
 \begin{proof}
   \leanok
