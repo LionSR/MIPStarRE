@@ -550,11 +550,14 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalBlockDiagonal}
   \lean{Matrix.blockDiagonal_eq_sum_kronecker_diagonal}
   \lean{Matrix.blockDiagonal_nonneg}
+  \lean{Matrix.blockDiagonal_nonneg_iff}
   \lean{Matrix.trace_blockDiagonal_mul}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalBlockDiagonal_eq_reindex_blockDiagonal}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalBlockDiagonal_nonneg}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalBlockDiagonal_nonneg_iff}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalConstraintOperator_blockDiagonal}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalBlockDiagonal_trace_mul}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalBlockDiagonal_mul}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSlackOperator}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSlackOperator_nonneg}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalPrimalBlockFamily}
@@ -574,9 +577,24 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalObjectiveOperator}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDiagonalBlock_objectiveOperator_none}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDiagonalBlock_objectiveOperator_some}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDualOperatorBlockFamily}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDualOperator}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDualOperatorBlockFamily_apply}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDiagonalBlock_dualOperator}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDualSlackBlockFamily}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDualSlackBlockFamily_none}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDualSlackBlockFamily_some}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDualOperator_sub_objectiveOperator}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDualSlackBlockDiagonal_nonneg_of_dualFeasible}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDualSlackBlockDiagonal_nonneg_iff_dualFeasible}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDualConstraint_nonneg_iff_dualFeasible}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDualConstraint_nonneg_of_dualFeasible}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpDualFeasible_of_canonicalDualConstraint_nonneg}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalStrictDualConstraint_nonneg}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalObjective_trace_primalBlockMatrix}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalPrimalBlockMatrix_mul_dualSlack}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpComplementarySlacknessDefect_of_canonical}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSlack_mul_dual_of_complementarySlackness}
   Let
   \[
     A_g = \E_{u \sim \F_q^m} A^u_{g(u)}.
