@@ -537,6 +537,8 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDominationInput}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDomination}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDominationInput}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairAndQXPResidualDomination}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairAndQXPRepairAndResidualDomination}
   \leanok
   From a matrix-level strong-duality witness with complementary slackness of the
   shape asserted by Lemma~\ref{lem:sdp}, one obtains a complete measurement
@@ -553,6 +555,9 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   full self-improvement conclusion, including the projective residual bound.
   The formalization records both the per-helper orthonormalization form and the
   bundled SelfImprovement-level input form of this conclusion.
+  The residual-domination hypothesis can be supplied either as an intrinsic
+  self-improvement orthonormalization input or by a QXP repair producer carrying
+  the fresh-outcome domination invariant.
   Lean also isolates the saturated canonical optimal-pair output still required
   from strong duality: a feasible canonical primal matrix, a dual-feasible
   operator with equal objective value, canonical complementary slackness, and
@@ -1092,6 +1097,9 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \lean{MIPStarRE.LDT.SelfImprovement.OrthonormalizationResidualDominationInput}
   \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationInput_of_residualDominationInput}
   \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationResidualDominationInput_of_producers}
+  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationInput_of_sourceAlmostProjectiveAndQXPLayerRepair}
+  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationResidualDominationInput_of_sourceAlmostProjectiveAndQXPLayerRepair}
+  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationResidualDominationInput_of_sourceQXPRepairAndResidualDomination}
   \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationResidualDominationInput_of_roundingAndQXPLayerRepair}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap_natural}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap}
