@@ -19,10 +19,9 @@ measurement witnesses used by the self-improvement bridge.
 namespace MIPStarRE.LDT.SelfImprovement
 
 open MIPStarRE.LDT
-open MIPStarRE.LDT.ExpansionHypercubeGraph
 open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
-open scoped BigOperators MatrixOrder Matrix ComplexOrder
+open scoped BigOperators MatrixOrder Matrix
 
 /-- Matrix-level witness for an optimal SDP pair. -/
 structure MatrixSdpOptimalWitness (params : Parameters) [FieldModel params.q]
