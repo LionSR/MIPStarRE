@@ -5,10 +5,11 @@ import MIPStarRE.LDT.Preliminaries.Triangles
 import MIPStarRE.LDT.Pasting.Core.DDistinct
 
 /-!
-# Section 12 pasting: core setup
+# Section 12 pasting: vertical-line consistency transfer
 
-Initial pasting lemmas and consistency consequences extracted from
-`MIPStarRE.LDT.Pasting.Theorems`.
+The `ldGbcon` transfer compares the slice family `G^x` with the vertical-line
+answers `B^u`.  It combines the conditioned axis-parallel consistency estimate
+with the point-to-vertical-line state-dependent-distance bound.
 -/
 
 namespace MIPStarRE.LDT.Pasting
