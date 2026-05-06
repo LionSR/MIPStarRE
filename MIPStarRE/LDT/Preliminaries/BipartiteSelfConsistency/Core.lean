@@ -97,14 +97,6 @@ lemma sscError_nonneg {Question Outcome : Type*}
   unfold sscError
   exact avgOver_nonneg 𝒟 _ fun a => by unfold qSSCDefect; exact le_max_left 0 _
 
-private lemma leftTensor_mono
-    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    {A B : MIPStarRE.Quantum.Op ι₁} (hAB : A ≤ B) :
-    leftTensor (ι₂ := ι₂) A ≤ leftTensor (ι₂ := ι₂) B := by
-  simpa [leftTensor, opTensor] using
-    (opTensor_mono_left (ι₂ := ι₂) (B := (1 : MIPStarRE.Quantum.Op ι₂))
-      hAB (show (0 : MIPStarRE.Quantum.Op ι₂) ≤ 1 by exact zero_le_one))
-
 private lemma qSDD_liftLeft_liftRight_le_two_qBipartiteSSCDefect
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
