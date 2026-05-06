@@ -40,16 +40,21 @@ docstring, blueprint paragraph, issue, or PR description with the cited source
 without first learning a private vocabulary used by the formalization.
 
 When Lean must use a different name or representation, define the deviation in a
-stable place.  The explanation should say:
+stable place which future readers can find from the affected statement.  The
+explanation should say:
 
 - the notation or term used in the paper;
 - the Lean object or name which represents it;
 - the mathematical reason for the difference, if there is one;
 - the scope in which the replacement should be used.
 
-Suitable stable places include the module docstring of the defining Lean file, a
-declaration docstring for a public auxiliary structure, the relevant blueprint
-paragraph, or a report under `docs/reports/` or `docs/paper-gaps/`.  A PR
+The place should be chosen according to the mathematical surface on which the
+deviation appears.  For a public Lean name or representation, use the module
+docstring of the defining Lean file or the declaration docstring of the public
+object.  For a blueprint-only change of notation, use the relevant blueprint
+paragraph.  For a larger discrepancy between the paper, blueprint, and Lean,
+use a report under `docs/reports/` or `docs/paper-gaps/`, and point to that
+report from the nearby blueprint or Lean documentation when appropriate.  A PR
 description may mention the deviation, but it should not be the only place where
 future readers can learn it.
 

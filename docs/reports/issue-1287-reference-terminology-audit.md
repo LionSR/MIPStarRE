@@ -1,4 +1,4 @@
-# Issue #1287: Reference Terminology And Notation Audit
+# Issue #1287: Reference Terminology and Notation Audit
 
 Issue #1287 asks for a repository-wide writing convention: public mathematical
 prose should use the terminology and notation of the original references
