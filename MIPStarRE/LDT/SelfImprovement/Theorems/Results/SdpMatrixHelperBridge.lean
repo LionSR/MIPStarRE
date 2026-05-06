@@ -423,7 +423,6 @@ lemma selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDominationIn
     X hsdp.feasible Z hsdp.dualFeasible hsdp.strongDuality
     hsdp.complementarySlackness hsdp.dualDominatesIdentity hgood G
     hhelperCompleteness hhelperSSCInput htransfer horthInput
-    hhelperCompleteness hhelperSSCInput htransfer horthInput
 
 /-- A canonical optimal pair with dominance and a residual-dominating QXP repair
 producer assemble a full self-improvement conclusion.
