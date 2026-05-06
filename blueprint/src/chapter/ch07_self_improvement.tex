@@ -595,6 +595,13 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalPrimalBlockMatrix_mul_dualSlack}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpComplementarySlacknessDefect_of_canonical}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSlack_mul_dual_of_complementarySlackness}
+  \lean{MIPStarRE.Quantum.eq_zero_of_nonneg_mul_eq_zero_of_one_le}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSlackOperator_eq_zero_of_mul_dual_eq_zero_of_one_le}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_of_canonicalSlackOperator_eq_zero}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_of_canonicalComplementarySlackness_of_one_le}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlacknessAndDominance_of_canonicalComplementarySlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.exists_measurement_witness}
   Let
   \[
     A_g = \E_{u \sim \F_q^m} A^u_{g(u)}.
@@ -664,7 +671,24 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \begin{equation}\label{eq:complementary-slackness}
     X\Big( \sum_{i,j} \,z_{ij} D_{ij} - C \Big) \,=\, 0.
   \end{equation}
-  We may assume that $X$ is block diagonal. Translating~\eqref{eq:complementary-slackness} back to the variables $\{T_g\}$ and~$Z$ yields $T_g(Z-A_g)=0$ for every~$g$ and $X_{M+1,M+1}=0$. The latter identity is exactly $\sum_g T_g=I$, and the former is~\eqref{eq:slater}.
+  We may assume that $X$ is block diagonal.
+  Translating~\eqref{eq:complementary-slackness} back to the variables
+  $\{T_g\}$ and~$Z$ yields $T_g(Z-A_g)=0$ for every~$g$ and \(S Z=0\), where
+  \(S=I-\sum_gT_g\) is the slack block.
+  The paper then treats this as forcing \(S=0\).  The current Lean development
+  separates this point from the unconditional SDP statement: it proves the
+  displayed saturation from the auxiliary dominance hypothesis \(I\le Z\).
+  Thus, if the canonical complementary-slackness pair is supplied together with
+  \(I\le Z\), Lean packages these conditional conclusions as a
+  \texttt{MatrixSdpOptimalWitnessWithDominance} once dual feasibility and
+  equality of the paper primal and dual objectives have also been supplied.
+  It also records the corresponding statement-level package, and an elimination
+  theorem which exposes the complete measurement, the dual witness~$Z$, the
+  retained dominance \(I\le Z\), dual feasibility, strong duality, and the
+  equations~\eqref{eq:slater}.  The additional dominance requirement is not a
+  consequence of the dual constraints \(Z\ge A_g\) alone; the discrepancy and
+  the intended saturated-witness replacement are recorded in
+  \texttt{docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex}.
   In the concrete matrix realization, Lean records the defect-zero condition as
   \texttt{matrixSdpComplementarySlacknessDefect}; the theorem
   \texttt{MatrixSdpOptimalWitness.complementarySlacknessEquation} translates it
