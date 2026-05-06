@@ -1,3 +1,5 @@
+# ci-sync-version: claude-provider-deepseek-v1
+# ci-sync-source: shared Lean automation, prompts externalized under .github/prompts
 name: Issue Tracker
 
 on:
@@ -9,13 +11,14 @@ on:
   # Every review submission (including comment-only) triggered a full
   # checkout + Claude Code invocation, even though the job filter skipped
   # comment-only reviews. The value (posting "approved" / "changes requested"
-  # notes on tracking issues via the PR-opened case) did not justify the cost.
+  # notes on tracking issues via Playbook C) did not justify the cost.
   # Re-enable if lightweight tracking of review states is needed.
 
 # Per-event concurrency: each PR/issue gets its own queue to avoid
 # GitHub's pending-queue depth limit (which cancels middle runs when
 # many PRs merge simultaneously). The risk of concurrent writes to the
 # same tracking issue body is low and acceptable vs losing updates.
+#
 concurrency:
   group: issue-tracker-${{ github.event.pull_request.number || github.event.issue.number || github.run_id }}
   cancel-in-progress: false
@@ -24,420 +27,88 @@ jobs:
   track:
     # Skip: forks (no secrets), closed-but-not-completed issues, closed-but-not-merged PRs
     if: |
-      !github.event.pull_request.head.repo.fork &&
+      vars.CLAUDE_REVIEW_ENABLED != 'false' &&
       (
-        (github.event_name == 'issues' && (github.event.issue.state_reason == 'completed' || github.event.action == 'reopened')) ||
-        (github.event_name == 'pull_request' && (github.event.action != 'closed' || github.event.pull_request.merged == true))
+        (
+          github.event_name == 'issues' &&
+          (github.event.issue.state_reason == 'completed' || github.event.action == 'reopened')
+        ) ||
+        (
+          github.event_name == 'pull_request' &&
+          !github.event.pull_request.head.repo.fork &&
+          (github.event.action != 'closed' || github.event.pull_request.merged == true)
+        )
       )
     runs-on: ubuntu-latest
+    env:
+      CLAUDE_CODE_PROVIDER: ${{ vars.CLAUDE_CODE_PROVIDER || 'anthropic' }}
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+      DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+      ANTHROPIC_BASE_URL: ${{ vars.ANTHROPIC_BASE_URL }}
+      CLAUDE_OPUS_MODEL: ${{ vars.CLAUDE_OPUS_MODEL }}
+      CLAUDE_SONNET_MODEL: ${{ vars.CLAUDE_SONNET_MODEL }}
+      CLAUDE_DEEPSEEK_OPUS_MODEL: ${{ vars.CLAUDE_DEEPSEEK_OPUS_MODEL }}
+      CLAUDE_DEEPSEEK_SONNET_MODEL: ${{ vars.CLAUDE_DEEPSEEK_SONNET_MODEL }}
     permissions:
       contents: read
       pull-requests: read
       issues: write
       id-token: write
     steps:
+      - name: Check Claude review switch
+        id: claude-switch
+        env:
+          CLAUDE_REVIEW_ENABLED: ${{ vars.CLAUDE_REVIEW_ENABLED }}
+        run: |
+          if [ "$CLAUDE_REVIEW_ENABLED" = "false" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::Skipping issue tracker: CLAUDE_REVIEW_ENABLED=false"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout repository
+        if: steps.claude-switch.outputs.skip != 'true'
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - name: Run Claude Code
-        id: claude
-        uses: anthropics/claude-code-action@v1
+      - name: Checkout trusted automation
+        if: steps.claude-switch.outputs.skip != 'true'
+        uses: actions/checkout@v6
         with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          allowed_bots: '*'
-          claude_args: |
-            --model claude-opus-4-7
-            --allowedTools "mcp__github__*,Bash(git diff *),Bash(git log *),Bash(git show *)"
-
-          prompt: |
-            You maintain issue-tracking prose for the MIPStarRE repository — a Lean 4 /
-            Mathlib formalization project for quantum complexity theory (MIP* = RE,
-            low-degree tests). A GitHub event just occurred. Determine what happened
-            and take the appropriate actions.
-
-            Use the GitHub MCP tools (not gh CLI) for all GitHub operations.
-
-            ## Event Context
-
-            - **Event**: ${{ github.event_name }} / ${{ github.event.action }}
-            - **Repository**: ${{ github.repository }}
-            - **Triggered by**: ${{ github.event.sender.login }}
-
-            ${{ github.event_name == 'issues' && format('- **Issue number**: #{0}', github.event.issue.number) || '' }}
-            ${{ github.event_name == 'issues' && format('- **Issue title**: {0}', github.event.issue.title) || '' }}
-            ${{ github.event_name == 'issues' && format('- **Issue labels**: {0}', join(github.event.issue.labels.*.name, ', ')) || '' }}
-
-            ${{ github.event_name != 'issues' && format('- **PR number**: #{0}', github.event.pull_request.number) || '' }}
-            ${{ github.event_name != 'issues' && format('- **PR title**: {0}', github.event.pull_request.title) || '' }}
-            ${{ github.event_name != 'issues' && format('- **PR labels**: {0}', join(github.event.pull_request.labels.*.name, ', ')) || '' }}
-            ${{ github.event_name != 'issues' && format('- **PR state**: {0}', github.event.pull_request.state) || '' }}
-            ${{ github.event_name != 'issues' && format('- **PR draft**: {0}', github.event.pull_request.draft) || '' }}
-            ${{ github.event_name != 'issues' && format('- **Author**: {0}', github.event.pull_request.user.login) || '' }}
-            ${{ github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && format('- **Merged by**: {0}', github.event.pull_request.merged_by.login) || '' }}
-            ${{ github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && format('- **Base branch**: {0}', github.event.pull_request.base.ref) || '' }}
-            ${{ github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && format('- **Head branch**: {0}', github.event.pull_request.head.ref) || '' }}
-            ${{ github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && format('- **Base SHA**: {0}', github.event.pull_request.base.sha) || '' }}
-            ${{ github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && format('- **Head SHA**: {0}', github.event.pull_request.head.sha) || '' }}
-
-            ---
-
-            ## Project Conventions
-
-            Consult `docs/CONTRIBUTING.md` if you need additional context
-            beyond what is summarized here.
-
-            ### Tracking Issues
-
-            Tracking issues have the `tracking` label and use
-            **native GitHub sub-issues** for progress tracking:
-
-            ```markdown
-            ### Sub-issues to attach
-            - #101
-            - #102
-            ```
-
-            The markdown list is only a readable index. Native tracking comes
-            from structured sub-issue relationships, which GitHub maintains
-            outside the issue body. Do not use retired fenced tasklist blocks
-            and do not edit markdown checkboxes for progress.
-
-            ### Label Taxonomy
-
-            Use the project's established labels (see `docs/CONTRIBUTING.md` §4):
-
-            **Area / work type**: `formalization`, `infrastructure`, `documentation`,
-              `cleanup`, `refactor`, `ci`
-            **Paper**: `2009.12982`
-            **Chapter / theorem-family labels**: `ldt-basic`, `preliminaries`, `commutativity`,
-              `pasting`, `main-induction`, `proof`, `proof-infra`,
-              `sorry-elimination`, `statement-fix`, `mismatch`, `blueprint`,
-              `blueprint-sync`
-            **Tracking / operations**: `tracking`, `chapter-tracking`, `follow-up`,
-              `auto-fix-claude`, `codex`, `standup`
-
-            ### Issue Linking
-
-            PRs link to issues via their body or branch name:
-            - **Body keywords**: `Addresses #N`, `Partially addresses #N`
-              (keeps issue open), `Closes #N`, `Fixes #N` (auto-closes issue)
-            - **Branch name**: `claude/issue-N-*`, `codex/issue-N-*`
-
-            ### Other GitHub Actions (Avoid Duplication)
-
-            - **PR Mathematical Description** (`pr-cleanup.yml`): When a PR opens from a
-              `claude/*` or `codex/*` branch, it already comments on the
-              linked issue ("PR #X has been opened…"). Do NOT duplicate
-              that comment for those branches.
-            - **Claude Code Review** (`claude-code-review.yml`): Handles
-              code quality. You handle sub-issue relationships and linked-issue comments only.
-            - **Daily Mathematical Progress / CI Auto-Fix**: Separate GitHub Actions. Treat
-              their events as normal activity.
-
-            ---
-
-            ## Key Rules
-
-            These rules apply across all event cases:
-
-            1. **Native sub-issue state is the progress source.** Do not edit
-               issue-body checkboxes for tracking status. GitHub computes
-               sub-issue progress from the state of attached children.
-
-            2. **No dedicated completion label.** Use the native sub-issue
-               completed/total summary for progress comments, but do **not**
-               add or remove an `all-resolved` label; that label is not part of
-               the live repository taxonomy.
-
-            3. **No duplicate comments.** Before commenting, consider whether
-               another workflow already covers this event (see above).
-
-            4. **If neither a tracking issue nor a linked issue is found,
-               skip silently.** But if only one is found, still act on it
-               — e.g., a PR with `Addresses #N` but no tracking issue
-               should still get the linked-issue progress comment.
-
-            5. **Use mathematical language in generated prose.** When creating
-               or commenting on formalization issues, name the theorem, lemma,
-               definition, or proof obligation directly. If available, include
-               the paper or blueprint path, line number, label, and a short
-               quotation or precise paraphrase. Do not replace the mathematical
-               statement with local scheduling shorthand.
-
-            ---
-
-            ## Event Cases
-
-            Based on the event, follow the appropriate case below.
-
-            ### Case A: Issue Closed as Completed
-
-            **When**: `issues` / `closed` with state_reason `completed`
-
-            1. Find parent tracking issues that have #N attached as a native
-               sub-issue. If the parent cannot be read directly, fall back to
-               open tracking issues whose body index references `#N`.
-            2. Read the parent issue's native sub-issue summary for completed
-               and total counts.
-            3. Suggest next steps (see §5 below).
-            4. Comment on the tracking issue (check recent comments first
-               to avoid duplicates — Key Rules §3):
-               "Issue #N (*title*) has been resolved.
-               [X/Y sub-issues complete]
-
-               **Suggested next theorem or proof obligation:** <one-line recommendation from §5>"
-
-            ---
-
-            ### Case A2: Issue Reopened
-
-            **When**: `issues` / `reopened`
-
-            1. Find parent tracking issues that have #N attached as a native
-               sub-issue. If the parent cannot be read directly, fall back to
-               tracking issues whose body index references `#N`.
-            2. Read the parent issue's native sub-issue summary for completed
-               and total counts.
-            3. Read the reopened issue to understand why it was reopened
-               (check recent comments, linked PRs). Suggest what needs
-               to happen to re-resolve it (see §5, linked-issue variant).
-            4. Comment on the tracking issue (check recent comments first
-               to avoid duplicates — Key Rules §3):
-               "Issue #N (*title*) has been reopened.
-               [X/Y sub-issues complete]
-
-               **Suggested next theorem or proof obligation:** <why it was reopened + what to do>"
-
-            ---
-
-            ### Case B: PR Merged
-
-            **When**: `pull_request` / `closed` with `merged == true`
-
-            Do two things: **B1** (record progress in the parent issue) and **B2**
-            (look for newly stated mathematical obligations).
-
-            #### B1 — Notify tracking issues and linked issues
-
-            1. **Find linked issues.** Check the PR body for `Addresses #N`,
-               `Partially addresses #N`, `Closes #N`, `Fixes #N`. Also check
-               the branch name for `*/issue-{N}-*`.
-            2. **Find tracking issues** (label `tracking`, **open**) that are
-               native parents of any linked issue, or whose body references
-               the PR number or linked issue number.
-            3. Suggest next steps for each tracking issue (see §5 below).
-            4. **Comment on each tracking issue** (check recent comments
-               first to avoid duplicates — Key Rules §3) with a summary:
-               the PR title, what it accomplished, current sub-issue progress,
-               and a suggestion for the next theorem or proof obligation. Example:
-               "PR #X (*title*) merged. <what was proved or corrected>. [X/Y sub-issues
-               complete]
-
-               **Suggested next theorem or proof obligation:** <one-line recommendation from §5>"
-            5. **Comment on each linked issue that stays open** (i.e., the
-               PR used `Addresses` or `Partially addresses`). Check recent
-               comments first to avoid duplicates (Key Rules §3). Summarize
-               what the PR accomplished and what remains. Include a
-               suggestion for the next theorem or proof obligation on that issue.
-               Example:
-               "PR #X (*title*) has been merged. <what was proved or corrected>.
-               Remaining mathematical obligation: <what is left>.
-
-               **Suggested next theorem or proof obligation:** <concrete action for this issue>"
-
-            Do NOT comment on issues that will be auto-closed by the PR
-            (`Closes`/`Fixes`) — the auto-close fires Case A, which
-            handles both the sub-issue progress comment and the tracking
-            comment.
-
-            **Remember**: Do not edit issue-body checkboxes (Key Rules §1).
-
-            #### B2 — Find Newly Stated Mathematical Obligations
-
-            1. Read the PR body, comments, and review threads via MCP tools.
-            2. Get the diff: prefer `mcp__github__pull_request_read` with
-               method `get_diff` (works for squash merges). Fall back to
-               `git diff <base-sha>..<head-sha>` if unavailable.
-            3. Scan the diff for new `sorry` markers (Lean proof obligations)
-               and new TODO/FIXME/HACK/XXX/WORKAROUND comments.
-
-            **Prioritize human reviewer feedback** over automated suggestions.
-            Automated accounts typically have `[bot]` in their username or are
-            known services (dependabot, renovate, copilot, cursor, codex).
-
-            Look for:
-            - Human reviewer feedback acknowledged but deferred (highest priority)
-            - New `sorry` markers in `.lean` files
-            - Explicitly deferred mathematical obligations ("out of scope",
-              "separate PR", "later")
-            - New TODO/FIXME/HACK comments (not pre-existing)
-            - Missing `\lean{}` / `\leanok` blueprint tags in `.tex` files
-            - Unresolved review threads
-
-            Do NOT create issues for:
-            - Work already completed in the PR
-            - Pre-existing TODOs/sorrys not introduced by the PR
-            - Nitpick-level review comments (style, naming)
-            - Speculative future work not discussed in the PR
-            - Automated suggestions already addressed or dismissed
-
-            For each genuine mathematical obligation, create an issue:
-            - **Title**: Short, imperative, mathematically precise
-              (e.g., "Discharge sorry in TransferMatrix.injective_iff")
-            - **Body**:
-              ```markdown
-              ## Mathematical statement
-              <The theorem, lemma, definition, or proof obligation, stated precisely.>
-
-              ## Source
-              - Paper or blueprint: `<path>:<line>`, label `<label>`.
-                Quote or precise paraphrase: <short quotation or precise paraphrase>.
-              - Lean target: `<DeclarationName>` in `<MIPStarRE/...>.lean`, if known.
-
-              ## Present Lean status
-              <Specific declarations, files, sorry sites, or blueprint tags involved.>
-
-              ## References
-              - PR: #<PR>
-              - <Related issues, review comments, paper theorem labels, or arXiv refs>
-              ```
-            - **Labels**: `follow-up` plus relevant area/paper/topic labels
-              copied from the PR. Add `formalization` for remaining proof obligations,
-              `blueprint-sync` for missing tags, `bug` for correctness issues.
-
-            Then attach each new issue to the relevant **open** tracking issue
-            as a native GitHub sub-issue. If the API/tool surface available in
-            this run cannot attach sub-issues, leave a comment naming the new
-            mathematical obligation and stating that it still needs to be attached manually.
-            - Comment (check recent comments first — Key Rules §3):
-              "Added mathematical obligation issues from #<PR>: #<issue1>, …
-              [X/Y sub-issues complete]"
-            - If multiple issues were created, suggest which one to
-              tackle first (see §5, tracking-issue variant).
-
-            **Be conservative.** Only create issues for genuine, actionable
-            mathematical obligations. When in doubt, skip. False positives create noise.
-
-            ---
-
-            ### Case C: PR Opened
-
-            **When**: `pull_request` / `opened`
-
-            This is lightweight — most events need no action.
-
-            1. Find the linked issue from the PR body or branch name.
-            2. Find **open** tracking issues (label `tracking`) referencing
-               that issue or the PR.
-            3. Only act if meaningful AND not already handled by another
-               GitHub Action. All comments go on the **tracking issue**:
-               - **PR opened** — only for branches that do NOT start with
-                 `claude/` or `codex/` (PR Mathematical Description already handles those):
-                 "PR #<PR> opened to address #<issue>."
-            4. Skip everything else silently.
-
-            ---
-
-            ## §5 — Suggestions for the Next Mathematical Obligation
-
-            When a case asks you to suggest the next step, generate a
-            brief, actionable recommendation. Think beyond the immediate
-            next proof obligation — consider what this completion proves or supplies downstream,
-            how it fits into the broader formalization roadmap, and whether
-            preparatory work (scouting, blueprint review) would de-risk
-            the next step.
-
-            ### Tracking-issue variant (Cases A, A2, B1, B2)
-
-            1. Read the tracking issue's native sub-issues to find open child
-               issues. If unavailable, fall back to issue references in the
-               body index.
-            2. Check dependencies. First look at the tracking issue body
-               itself — it often lists a suggested order or dependency
-               notes. If that's sufficient, use it. Otherwise, read the open
-               child issues to check their **dependencies** ("Depends
-               on", "Blocked by", or references to other open issues).
-            3. Recommend a theorem, lemma, definition, or proof obligation whose dependencies are all resolved
-               (closed, or already completed as native sub-issues). If multiple
-               issues are unblocked, prefer:
-               - Statements explicitly marked as foundational
-               - Statements that provide hypotheses for the most later results
-               - Statements with a clear paper or blueprint proof route
-            4. If **no issues are unblocked** (all have open dependencies),
-               say so and recommend the dependency that should be tackled
-               first.
-            5. If **all sub-issues are complete**, suggest closing the tracking
-               issue.
-            6. Note downstream impact: briefly mention what completing
-               the suggested statement would provide for later theorem labels
-               or tracking issues.
-
-            ### Linked-issue variant (Cases A2, B1 step 5)
-
-            For a specific issue (not the tracking issue), suggest the
-            concrete next action based on available context:
-            - **After a PR merges** (B1): look at what the PR changed,
-              what remains in the issue scope, and what specific files,
-              declarations, or proof obligations to tackle next.
-            - **After a reopen** (A2): look at recent comments or the
-              close/reopen history to understand what broke or changed,
-              and suggest how to re-resolve it.
-            - Be specific about files, declarations, or proof steps.
-              Example: "Next: discharge the remaining 2 sorrys in
-              `Foo.lean`, which depend on `bar_lemma` from Mathlib."
-
-            ### Scouting and source review
-
-            For issues that are mathematically complex or involve new
-            Mathlib API surface, suggest preparatory scouting before
-            diving into the proof:
-
-            - **Mathlib scouting**: If the recommended issue involves
-              heavy Mathlib dependencies and does not already have a
-              Mathlib scouting report in its comments, suggest running
-              one (the Mathlib Scout GitHub Action triggers on issues with
-              the `formalization` label). Rescouting may also be
-              warranted when Mathlib has been bumped since the last
-              report — new lemmas may simplify the approach.
-            - **Blueprint / paper review**: If the issue formalizes a
-              specific theorem or section from a paper, suggest
-              reviewing the corresponding blueprint LaTeX source
-              (`blueprint/src/chapter/*.tex`) to check the proof
-              sketch, `\lean{}` / `\leanok` status, and any gap
-              annotations. The paper's original proof structure often
-              reveals dependencies or intermediate lemmas that are
-              not yet tracked as issues.
-
-            Skip scouting suggestions for straightforward issues
-            (simple sorry discharges with known proof paths,
-            infrastructure work).
-
-            ### Format
-
-            Keep the primary suggestion to 1–2 sentences. Be specific
-            — reference issue numbers and titles. Add a brief
-            downstream note and scouting hint only when warranted.
-
-            Example:
-            "**Suggested next theorem or proof obligation:** #138 (*Discharge sorry in
-            SelfImprovement.lean*) — all dependencies resolved and
-            it is the last open proof obligation in this theorem family; completing it would let
-            the parent tracking issue close. Consider a Mathlib
-            rescouting report first in case the relevant API has
-            landed since the last Mathlib bump."
-
-            ---
-
-            ## Final Record
-
-            After executing a case, record what you did:
-            - Which case you followed
-            - What tracking issues were updated (with sub-issue progress counts)
-            - What linked issues were commented on
-            - What mathematical obligation issues were created (if any)
-            - What theorem, lemma, definition, or proof obligation was suggested next
-            - What the resulting completed/total sub-issue counts were
-            - Whether any comments were skipped to avoid duplication
-            - Or note that no action was needed
+          ref: ${{ github.event.pull_request.base.ref || github.event.repository.default_branch }}
+          path: .trusted-actions
+          fetch-depth: 1
+
+      - name: Run Claude Code
+        if: steps.claude-switch.outputs.skip != 'true'
+        id: claude
+        uses: ./.trusted-actions/.github/actions/claude-code-with-provider
+        with:
+          provider: ${{ env.CLAUDE_CODE_PROVIDER }}
+          model-tier: sonnet
+          allowed-bots: '*'
+          allowed_tools_preset: tracking-issue-sync
+
+          claude-prompt-file: .trusted-actions/.github/prompts/tracking-issue-sync-prompt.md
+          claude-prompt-context: |
+            Event: ${{ github.event_name }} / ${{ github.event.action }}
+            Repository: ${{ github.repository }}
+            Triggered by: ${{ github.event.sender.login }}
+
+            ${{ github.event_name == 'issues' && format('Issue number: #{0}', github.event.issue.number) || '' }}
+            ${{ github.event_name == 'issues' && format('Issue title: {0}', github.event.issue.title) || '' }}
+            ${{ github.event_name == 'issues' && format('Issue labels: {0}', join(github.event.issue.labels.*.name, ', ')) || '' }}
+
+            ${{ github.event_name != 'issues' && format('PR number: #{0}', github.event.pull_request.number) || '' }}
+            ${{ github.event_name != 'issues' && format('PR title: {0}', github.event.pull_request.title) || '' }}
+            ${{ github.event_name != 'issues' && format('PR labels: {0}', join(github.event.pull_request.labels.*.name, ', ')) || '' }}
+            ${{ github.event_name != 'issues' && format('PR state: {0}', github.event.pull_request.state) || '' }}
+            ${{ github.event_name != 'issues' && format('PR draft: {0}', github.event.pull_request.draft) || '' }}
+            ${{ github.event_name != 'issues' && format('Author: {0}', github.event.pull_request.user.login) || '' }}
+            ${{ github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && format('Merged by: {0}', github.event.pull_request.merged_by.login) || '' }}
+            ${{ github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && format('Base branch: {0}', github.event.pull_request.base.ref) || '' }}
+            ${{ github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && format('Head branch: {0}', github.event.pull_request.head.ref) || '' }}
+            ${{ github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && format('Base SHA: {0}', github.event.pull_request.base.sha) || '' }}
+            ${{ github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && format('Head SHA: {0}', github.event.pull_request.head.sha) || '' }}
