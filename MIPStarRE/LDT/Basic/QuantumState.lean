@@ -234,6 +234,13 @@ theorem opTensor_mono_left
     opTensor A₁ B ≤ opTensor A₂ B := by
   simpa [opTensor] using MIPStarRE.Quantum.kronecker_mono_left hA hB
 
+/-- Left tensor placement is monotone. -/
+theorem leftTensor_mono
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    {A₁ A₂ : MIPStarRE.Quantum.Op ι₁} (hA : A₁ ≤ A₂) :
+    leftTensor (ι₂ := ι₂) A₁ ≤ leftTensor (ι₂ := ι₂) A₂ :=
+  opTensor_mono_left hA zero_le_one
+
 /-- `opTensor` is monotone in the right factor against a PSD left factor. -/
 theorem opTensor_mono_right
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]

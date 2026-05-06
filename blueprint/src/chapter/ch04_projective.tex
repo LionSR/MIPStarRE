@@ -1077,6 +1077,12 @@
 
 	\begin{lemma}[Projectivity of~$P$]\label{lem:P-projectivity}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pProjectivity}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sum_pa_eq_xHat_adjoint_mul_xHat}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qxpProjSubMeas_total_eq_xHat_adjoint_mul_xHat}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qxpProjSubMeas_total_ev_eq_sum_pa_ev}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qxpProjSubMeas_total_le_of_outcome_le}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerTotalDomination}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerTotalDomination.of_outcome_le}
 		\leanok
 		$P = \{P_a\}$ forms a projective sub-measurement.
 	\end{lemma}
@@ -1096,7 +1102,11 @@
 			 & =
 			P_a \cdot \bone[a=b],
 		\end{align*}
-		where the second line uses \ref{lem:X-hat-squared}, the third uses that $T$ is projective, and the last uses \ref{lem:pa-restated}. Summing over $a$ shows $\sum_a P_a \leq I$, so $P$ is a projective sub-measurement.
+		where the second line uses \ref{lem:X-hat-squared}, the third uses that $T$ is projective, and the last uses \ref{lem:pa-restated}. Summing over $a$ shows $\sum_a P_a \leq I$, so $P$ is a projective sub-measurement.  The formalization also records the sharper identity
+		\[
+			\sum_a P_a=\widehat X^\dagger\widehat X,
+		\]
+		and the resulting total-domination interfaces used later in the monotone-total self-improvement route.
 	\end{proof}
 
 	\begin{lemma}[$P$ is close to~$Q$]\label{lem:P-Q-approx}

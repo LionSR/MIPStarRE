@@ -382,6 +382,31 @@ lemma squaredDifference {Outcome : Type*}
           congr 1 <;> noncomm_ring
     _ = (data.x * data.xᴴ - 1) * (data.x * data.xᴴ - 1) := by simp [hYsq]
 
+/-- The sum of the QXP `P`-operators is the Gram operator `XHat† XHat`.
+
+This is the total-mass identity for the canonical projective submeasurement
+produced from the Q/X/XHat/P layer. -/
+lemma sum_pa_eq_xHat_adjoint_mul_xHat {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) :
+    (∑ a, Pa data a) = data.xHatᴴ * data.xHat := by
+  classical
+  have hsum_aux (s : Finset Outcome) :
+      Finset.sum s (fun a => Pa data a) =
+        data.xHatᴴ * (Finset.sum s fun a => Ta data.qLayer a) * data.xHat := by
+    induction s using Finset.induction_on with
+    | empty => simp
+    | insert a s ha ih =>
+        rw [Finset.sum_insert ha, Finset.sum_insert ha, ih]
+        simp [Pa, Matrix.mul_assoc, Matrix.add_mul, Matrix.mul_add]
+  calc
+    (∑ a, Pa data a) = data.xHatᴴ * (∑ a, Ta data.qLayer a) * data.xHat := by
+      simpa using hsum_aux Finset.univ
+    _ = data.xHatᴴ * data.xHat := by
+      simpa [Ta] using
+        congrArg (fun M => data.xHatᴴ * M * data.xHat) data.qLayer.t.sum_eq
+
 /-- **Projectivity of `P`** (`lem:P-projectivity`).
 
 The family `P_a` built from `XHat` and `T_a` is a projective
@@ -433,23 +458,7 @@ lemma pProjectivity {Outcome : Type*}
       simpa [h_one_sub_X_herm, h_one_sub_X_sq] using hpsd
     have hsum :
         (∑ a, Pa data a) = X := by
-      have hsum_aux (s : Finset Outcome) :
-          Finset.sum s (fun a => Pa data a) =
-            data.xHatᴴ * (Finset.sum s fun a => Ta data.qLayer a) * data.xHat := by
-        induction s using Finset.induction_on with
-        | empty => simp
-        | insert a s ha ih =>
-            rw [Finset.sum_insert ha, Finset.sum_insert ha, ih]
-            simp [Pa, Matrix.mul_assoc, Matrix.add_mul, Matrix.mul_add]
-      calc
-        (∑ a, Pa data a) = data.xHatᴴ * (∑ a, Ta data.qLayer a) * data.xHat := by
-          simpa using hsum_aux Finset.univ
-        _ = data.xHatᴴ * (∑ a, Ta data.qLayer a) * data.xHat := by
-          rfl
-        _ = data.xHatᴴ * data.xHat := by
-          simpa [Ta] using
-            congrArg (fun M => data.xHatᴴ * M * data.xHat) data.qLayer.t.sum_eq
-        _ = X := by rfl
+      simpa [X] using sum_pa_eq_xHat_adjoint_mul_xHat data
     rw [hsum]
     exact sub_nonneg.mp h_one_sub_X_nonneg
   · intro a
@@ -481,6 +490,201 @@ noncomputable def qxpProjSubMeas {Outcome : Type*}
     (data : QXPLayerData Outcome ι) (a : Outcome) :
     (qxpProjSubMeas data).outcome a = Pa data a :=
   Classical.choose_spec (pProjectivity data) a
+
+/-- The total of the canonical QXP projective submeasurement is `XHat† XHat`.
+
+This exposes the total-mass identity implicit in `pProjectivity`, which is
+needed when comparing the repaired projective family to the source
+submeasurement in later monotonicity arguments. -/
+lemma qxpProjSubMeas_total_eq_xHat_adjoint_mul_xHat {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) :
+    (qxpProjSubMeas data).toSubMeas.total = data.xHatᴴ * data.xHat := by
+  calc
+    (qxpProjSubMeas data).toSubMeas.total
+        = ∑ a, (qxpProjSubMeas data).outcome a :=
+            (qxpProjSubMeas data).sum_eq_total.symm
+    _ = ∑ a, Pa data a := by
+          simp [qxpProjSubMeas_outcome]
+    _ = data.xHatᴴ * data.xHat := sum_pa_eq_xHat_adjoint_mul_xHat data
+
+/-- The expectation of the QXP projective total is the sum of the expectations
+of the paper projectors `P_a`. -/
+lemma qxpProjSubMeas_total_ev_eq_sum_pa_ev {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) (ψ : QuantumState ι) :
+    ev ψ (qxpProjSubMeas data).toSubMeas.total =
+      ∑ a : Outcome, ev ψ (Pa data a) := by
+  calc
+    ev ψ (qxpProjSubMeas data).toSubMeas.total
+        = ev ψ (∑ a, (qxpProjSubMeas data).outcome a) := by
+            rw [(qxpProjSubMeas data).sum_eq_total]
+    _ = ∑ a : Outcome, ev ψ ((qxpProjSubMeas data).outcome a) := ev_sum ψ _
+    _ = ∑ a : Outcome, ev ψ (Pa data a) := by
+          simp [qxpProjSubMeas_outcome]
+
+/-- Outcomewise domination of the QXP projectors implies domination of the
+total operator.
+
+This is the summation form of the monotone-total invariant needed downstream:
+once the concrete repair proves `P_a ≤ A_a` for every outcome, the canonical
+QXP projective total is bounded by the source submeasurement total. -/
+lemma qxpProjSubMeas_total_le_of_outcome_le {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) (A : SubMeas Outcome ι)
+    (hpoint : ∀ a : Outcome, Pa data a ≤ A.outcome a) :
+    (qxpProjSubMeas data).toSubMeas.total ≤ A.total := by
+  calc
+    (qxpProjSubMeas data).toSubMeas.total
+        = ∑ a, (qxpProjSubMeas data).outcome a :=
+            (qxpProjSubMeas data).sum_eq_total.symm
+    _ = ∑ a, Pa data a := by
+          simp [qxpProjSubMeas_outcome]
+    _ ≤ ∑ a, A.outcome a := Finset.sum_le_sum fun a _ => hpoint a
+    _ = A.total := A.sum_eq_total
+
+/-- Expectation form of a supplied QXP total-operator comparison. -/
+private lemma qxpProjSubMeas_total_ev_le_of_total_le {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι)
+    (data : QXPLayerData Outcome ι) (A : SubMeas Outcome ι)
+    (hTotal : (qxpProjSubMeas data).toSubMeas.total ≤ A.total) :
+    ev ψ (qxpProjSubMeas data).toSubMeas.total ≤ ev ψ A.total :=
+  ev_mono ψ _ _ hTotal
+
+/-- Right-register expectation form of a supplied QXP total-operator comparison. -/
+private lemma qxpProjSubMeas_rightTensor_total_ev_le_of_total_le {Outcome : Type*}
+    {ιLeft ι : Type*} [Fintype ιLeft] [DecidableEq ιLeft]
+    [Fintype ι] [DecidableEq ι] [Fintype Outcome]
+    (ψ : QuantumState (ιLeft × ι))
+    (data : QXPLayerData Outcome ι) (A : SubMeas Outcome ι)
+    (hTotal : (qxpProjSubMeas data).toSubMeas.total ≤ A.total) :
+    ev ψ (rightTensor (ι₁ := ιLeft) (qxpProjSubMeas data).toSubMeas.total) ≤
+      ev ψ (rightTensor (ι₁ := ιLeft) A.total) :=
+  ev_mono ψ _ _ <| rightTensor_mono hTotal
+
+/-- Left-register expectation form of a supplied QXP total-operator comparison. -/
+private lemma qxpProjSubMeas_leftTensor_total_ev_le_of_total_le {Outcome : Type*}
+    {ι ιRight : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype ιRight] [DecidableEq ιRight] [Fintype Outcome]
+    (ψ : QuantumState (ι × ιRight))
+    (data : QXPLayerData Outcome ι) (A : SubMeas Outcome ι)
+    (hTotal : (qxpProjSubMeas data).toSubMeas.total ≤ A.total) :
+    ev ψ (leftTensor (ι₂ := ιRight) (qxpProjSubMeas data).toSubMeas.total) ≤
+      ev ψ (leftTensor (ι₂ := ιRight) A.total) :=
+  ev_mono ψ _ _ <| leftTensor_mono hTotal
+
+/-- Outcomewise domination of the QXP projectors gives the corresponding scalar
+expectation comparison for the total operator. -/
+lemma qxpProjSubMeas_total_ev_le_of_outcome_le {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι)
+    (data : QXPLayerData Outcome ι) (A : SubMeas Outcome ι)
+    (hpoint : ∀ a : Outcome, Pa data a ≤ A.outcome a) :
+    ev ψ (qxpProjSubMeas data).toSubMeas.total ≤ ev ψ A.total :=
+  qxpProjSubMeas_total_ev_le_of_total_le ψ data A
+    (qxpProjSubMeas_total_le_of_outcome_le data A hpoint)
+
+/-- Outcomewise domination of the QXP projectors gives the corresponding
+right-register expectation comparison.
+
+The proof is only the operator inequality from
+`qxpProjSubMeas_total_le_of_outcome_le`, followed by monotonicity of right
+tensor placement and of the state expectation. -/
+lemma qxpProjSubMeas_rightTensor_total_ev_le_of_outcome_le {Outcome : Type*}
+    {ιLeft ι : Type*} [Fintype ιLeft] [DecidableEq ιLeft]
+    [Fintype ι] [DecidableEq ι] [Fintype Outcome]
+    (ψ : QuantumState (ιLeft × ι))
+    (data : QXPLayerData Outcome ι) (A : SubMeas Outcome ι)
+    (hpoint : ∀ a : Outcome, Pa data a ≤ A.outcome a) :
+    ev ψ (rightTensor (ι₁ := ιLeft) (qxpProjSubMeas data).toSubMeas.total) ≤
+      ev ψ (rightTensor (ι₁ := ιLeft) A.total) :=
+  qxpProjSubMeas_rightTensor_total_ev_le_of_total_le ψ data A
+    (qxpProjSubMeas_total_le_of_outcome_le data A hpoint)
+
+/-- Outcomewise domination of the QXP projectors gives the corresponding
+left-register expectation comparison.
+
+The proof is the same operator comparison as in
+`qxpProjSubMeas_total_le_of_outcome_le`, transported through left tensor
+placement and then evaluated in the ambient state. -/
+lemma qxpProjSubMeas_leftTensor_total_ev_le_of_outcome_le {Outcome : Type*}
+    {ι ιRight : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype ιRight] [DecidableEq ιRight] [Fintype Outcome]
+    (ψ : QuantumState (ι × ιRight))
+    (data : QXPLayerData Outcome ι) (A : SubMeas Outcome ι)
+    (hpoint : ∀ a : Outcome, Pa data a ≤ A.outcome a) :
+    ev ψ (leftTensor (ι₂ := ιRight) (qxpProjSubMeas data).toSubMeas.total) ≤
+      ev ψ (leftTensor (ι₂ := ιRight) A.total) :=
+  qxpProjSubMeas_leftTensor_total_ev_le_of_total_le ψ data A
+    (qxpProjSubMeas_total_le_of_outcome_le data A hpoint)
+
+/-- Total-domination invariant for the QXP repair.
+
+This proposition is the construction-level operator comparison required by the
+paper-tight monotone-total route: the canonical projective family obtained from
+the QXP layer has total operator bounded by the source submeasurement total.
+It is deliberately stronger than state-dependent-distance closeness and should
+be proved from the concrete repair, not inferred from the orthonormalization
+error estimate alone. -/
+structure QXPLayerTotalDomination {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) (A : SubMeas Outcome ι) : Prop where
+  /-- The projective QXP total is bounded by the source submeasurement total. -/
+  total_le : (qxpProjSubMeas data).toSubMeas.total ≤ A.total
+
+namespace QXPLayerTotalDomination
+
+/-- Outcomewise operator domination is a sufficient way to prove the QXP
+total-domination invariant. -/
+theorem of_outcome_le {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    {data : QXPLayerData Outcome ι} {A : SubMeas Outcome ι}
+    (hpoint : ∀ a : Outcome, Pa data a ≤ A.outcome a) :
+    QXPLayerTotalDomination data A where
+  total_le := qxpProjSubMeas_total_le_of_outcome_le data A hpoint
+
+/-- A QXP total-domination witness gives the scalar expectation comparison for
+the total operators. -/
+theorem ev_total_le {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι] [Fintype Outcome]
+    {ψ : QuantumState ι}
+    {data : QXPLayerData Outcome ι} {A : SubMeas Outcome ι}
+    (hdom : QXPLayerTotalDomination data A) :
+    ev ψ (qxpProjSubMeas data).toSubMeas.total ≤ ev ψ A.total :=
+  qxpProjSubMeas_total_ev_le_of_total_le ψ data A hdom.total_le
+
+/-- A QXP total-domination witness gives the scalar right-register comparison
+used by the final-fields transport. -/
+theorem rightTensor_total_ev_le {Outcome : Type*}
+    {ιLeft ι : Type*} [Fintype ιLeft] [DecidableEq ιLeft]
+    [Fintype ι] [DecidableEq ι] [Fintype Outcome]
+    {ψ : QuantumState (ιLeft × ι)}
+    {data : QXPLayerData Outcome ι} {A : SubMeas Outcome ι}
+    (hdom : QXPLayerTotalDomination data A) :
+    ev ψ (rightTensor (ι₁ := ιLeft) (qxpProjSubMeas data).toSubMeas.total) ≤
+      ev ψ (rightTensor (ι₁ := ιLeft) A.total) :=
+  qxpProjSubMeas_rightTensor_total_ev_le_of_total_le ψ data A hdom.total_le
+
+/-- A QXP total-domination witness gives the scalar left-register comparison. -/
+theorem leftTensor_total_ev_le {Outcome : Type*}
+    {ι ιRight : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype ιRight] [DecidableEq ιRight] [Fintype Outcome]
+    {ψ : QuantumState (ι × ιRight)}
+    {data : QXPLayerData Outcome ι} {A : SubMeas Outcome ι}
+    (hdom : QXPLayerTotalDomination data A) :
+    ev ψ (leftTensor (ι₂ := ιRight) (qxpProjSubMeas data).toSubMeas.total) ≤
+      ev ψ (leftTensor (ι₂ := ιRight) A.total) :=
+  qxpProjSubMeas_leftTensor_total_ev_le_of_total_le ψ data A hdom.total_le
+
+end QXPLayerTotalDomination
 
 end
 
