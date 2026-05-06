@@ -441,6 +441,22 @@ def orthonormalizationInput_of_producers
     { spectral := hspectral hssc
       repair := hrepair hssc }
 
+/-- Forget the residual domination conclusion from one strengthened
+orthonormalization repair input. -/
+noncomputable def repairInput_of_repairInputWithResidualDomination
+    {params : Parameters} [FieldModel params.q]
+    {strategy : SymStrat params ι} {eps delta : Error}
+    {Hhat : SubMeas (Polynomial params) ι}
+    (H :
+      MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationInputWithResidualDomination
+        strategy.state Hhat (selfImprovementHelperError params eps delta)) :
+    LeftLiftedProjectivizationRepairInput strategy.state (optionCompletion Hhat)
+      (consistencyToAlmostProjectiveError
+        (2 * selfImprovementHelperError params eps delta)) :=
+  fun hSpectral =>
+    let ⟨P, hRounded, _hResidual⟩ := H.repair hSpectral
+    ⟨P, hRounded⟩
+
 /-- Forget the residual-domination field of the strengthened input, yielding
 the ordinary orthonormalization input required by the reduced self-improvement
 theorem. -/
@@ -453,14 +469,7 @@ noncomputable def orthonormalizationInput_of_residualDominationInput
   fun {_Hhat} hssc =>
     let H := hinput hssc
     { spectral := H.spectral
-      repair := by
-        change LeftLiftedProjectivizationRepairInput strategy.state
-          (optionCompletion _Hhat)
-          (consistencyToAlmostProjectiveError
-            (2 * selfImprovementHelperError params eps delta))
-        intro hSpectral
-        obtain ⟨P, hRounded, _hresidual⟩ := H.repair hSpectral
-        exact ⟨P, hRounded⟩ }
+      repair := repairInput_of_repairInputWithResidualDomination H }
 
 /-- Combine the spectral slice and the residual-dominating QXP repair slice into
 the strengthened orthonormalization input used by the monotone-total route. -/
