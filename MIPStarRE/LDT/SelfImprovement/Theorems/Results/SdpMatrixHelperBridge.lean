@@ -247,6 +247,80 @@ lemma selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDomination
         final_fields_bounded strategy.state H.toSubMeas
           hhelper.sdpWitness.dualDominatesIdentity hselfImprovementError_nonneg }
 
+/-- Canonical block-SDP slackness and a bundled residual-domination input
+assemble a full self-improvement conclusion.
+
+This is the same assembly theorem as
+`selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDomination`, but with
+the orthonormalization hypothesis stated in the SelfImprovement-level form
+`OrthonormalizationResidualDominationInput`.  The helper strong
+self-consistency input selects the helper submeasurement \(\widehat H\), and
+the bundled input then gives the residual-dominating orthonormalization datum
+for that particular \(\widehat H\). -/
+lemma selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDominationInput
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma nu : Error)
+    (heps_le_one : eps ≤ 1)
+    (hdelta_le_one : delta ≤ 1)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
+      (matrixSdpPointRealizationOfStrategy params strategy)))
+    (hX : MatrixSdpCanonicalPrimalFeasible params
+      (matrixSdpPointRealizationOfStrategy params strategy) X)
+    (Z : MIPStarRE.Quantum.Op ι)
+    (hdual :
+      ∀ g : Polynomial params,
+        0 ≤ matrixSdpDualSlackOperator params
+          (matrixSdpPointRealizationOfStrategy params strategy) Z g)
+    (hstrong :
+      Complex.re (Matrix.trace
+          (matrixSdpCanonicalObjectiveOperator params
+            (matrixSdpPointRealizationOfStrategy params strategy) * X)) =
+        matrixSdpDualObjective
+          (matrixSdpPointRealizationOfStrategy params strategy) Z)
+    (hcanonical :
+      X * (matrixSdpCanonicalDualOperator params
+          (matrixSdpPointRealizationOfStrategy params strategy) Z -
+            matrixSdpCanonicalObjectiveOperator params
+              (matrixSdpPointRealizationOfStrategy params strategy)) =
+        0)
+    (hOneLe : (1 : MIPStarRE.Quantum.Op ι) ≤ Z)
+    (hgood : strategy.IsGood eps delta gamma)
+    (G : Measurement (Polynomial params) ι)
+    (hhelperCompleteness :
+      ∀ {T : Measurement (Polynomial params) ι}
+        {Hhat : SubMeas (Polynomial params) ι}
+        {Z : MIPStarRE.Quantum.Op ι},
+        SelfImprovementHelperConclusionWithSlackness params strategy T Hhat Z eps delta →
+          CompletenessAtLeast strategy.state Hhat.liftLeft
+            ((1 - nu) - selfImprovementHelperError params eps delta))
+    (hhelperSSCInput : HelperStrongSelfConsistencyInput params strategy eps delta)
+    (htransfer :
+      ∀ {T : Measurement (Polynomial params) ι}
+        {Hhat : SubMeas (Polynomial params) ι}
+        {Z : MIPStarRE.Quantum.Op ι},
+        SelfImprovementHelperConclusionWithSlackness params strategy T Hhat Z eps delta →
+          |addInULeftQuantity params strategy
+              (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+              Hhat
+              (pointConsistencyAddInUSelection params) -
+            addInURightQuantity params strategy
+              (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+              T.toSubMeas
+              (pointConsistencyAddInUSelection params)| ≤
+            addInUError params eps delta)
+    (horthInput : OrthonormalizationResidualDominationInput params strategy eps delta) :
+    ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+      SelfImprovementConclusion params strategy G H Z eps delta gamma nu :=
+  selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDomination
+    params strategy eps delta gamma nu heps_le_one hdelta_le_one hd_le_q
+    X hX Z hdual hstrong hcanonical hOneLe hgood G
+    hhelperCompleteness hhelperSSCInput htransfer
+    (fun hhelperWithSlackness =>
+      horthInput (hhelperSSCInput hhelperWithSlackness.toHelperConclusion))
+
 /-- A canonical optimal pair with dominance and residual-dominating
 orthonormalization assemble a full self-improvement conclusion. -/
 lemma selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDomination
@@ -300,5 +374,53 @@ lemma selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDomination
     X hsdp.feasible Z hsdp.dualFeasible hsdp.strongDuality
     hsdp.complementarySlackness hsdp.dualDominatesIdentity hgood G
     hhelperCompleteness hhelperSSCInput htransfer horthonormalization
+
+/-- A canonical optimal pair with dominance and a bundled residual-domination
+input assemble a full self-improvement conclusion. -/
+lemma selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDominationInput
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma nu : Error)
+    (heps_le_one : eps ≤ 1)
+    (hdelta_le_one : delta ≤ 1)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
+      (matrixSdpPointRealizationOfStrategy params strategy)))
+    (Z : MIPStarRE.Quantum.Op ι)
+    (hsdp : MatrixSdpCanonicalOptimalPairWithDominance params
+      (matrixSdpPointRealizationOfStrategy params strategy) X Z)
+    (hgood : strategy.IsGood eps delta gamma)
+    (G : Measurement (Polynomial params) ι)
+    (hhelperCompleteness :
+      ∀ {T : Measurement (Polynomial params) ι}
+        {Hhat : SubMeas (Polynomial params) ι}
+        {Z : MIPStarRE.Quantum.Op ι},
+        SelfImprovementHelperConclusionWithSlackness params strategy T Hhat Z eps delta →
+          CompletenessAtLeast strategy.state Hhat.liftLeft
+            ((1 - nu) - selfImprovementHelperError params eps delta))
+    (hhelperSSCInput : HelperStrongSelfConsistencyInput params strategy eps delta)
+    (htransfer :
+      ∀ {T : Measurement (Polynomial params) ι}
+        {Hhat : SubMeas (Polynomial params) ι}
+        {Z : MIPStarRE.Quantum.Op ι},
+        SelfImprovementHelperConclusionWithSlackness params strategy T Hhat Z eps delta →
+          |addInULeftQuantity params strategy
+              (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+              Hhat
+              (pointConsistencyAddInUSelection params) -
+            addInURightQuantity params strategy
+              (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+              T.toSubMeas
+              (pointConsistencyAddInUSelection params)| ≤
+            addInUError params eps delta)
+    (horthInput : OrthonormalizationResidualDominationInput params strategy eps delta) :
+    ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+      SelfImprovementConclusion params strategy G H Z eps delta gamma nu :=
+  selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDominationInput
+    params strategy eps delta gamma nu heps_le_one hdelta_le_one hd_le_q
+    X hsdp.feasible Z hsdp.dualFeasible hsdp.strongDuality
+    hsdp.complementarySlackness hsdp.dualDominatesIdentity hgood G
+    hhelperCompleteness hhelperSSCInput htransfer horthInput
 
 end MIPStarRE.LDT.SelfImprovement

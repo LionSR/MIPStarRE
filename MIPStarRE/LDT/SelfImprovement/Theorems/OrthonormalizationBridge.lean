@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
+import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
 import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities
 import MIPStarRE.LDT.Preliminaries.DistanceBounds
@@ -198,6 +199,30 @@ def toRepairWitness {Outcome : Type*}
     LeftLiftedQXPLayerRepairWitness ψ (optionCompletion A) ζ where
   data := W.data
   closeness := W.closeness
+
+/-- The residual-domination field gives the operator total comparison for the
+restricted repaired family selected by the QXP layer. -/
+theorem restrictSome_total_le {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    {ψ : QuantumState (ι × ι)} {A : SubMeas Outcome ι} {ζ : Error}
+    (W : LeftLiftedQXPLayerRepairWitnessWithResidualDomination ψ A ζ) :
+    (restrictSomeProjSubMeas (qxpProjSubMeas W.data)).toSubMeas.total ≤ A.total :=
+  restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le
+    A (qxpProjSubMeas W.data) W.residual_domination
+
+/-- The residual-domination field gives the right-register expectation
+comparison for the restricted repaired family selected by the QXP layer. -/
+theorem restrictSome_rightTensor_total_ev_le {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    {ψ : QuantumState (ι × ι)} {A : SubMeas Outcome ι} {ζ : Error}
+    (W : LeftLiftedQXPLayerRepairWitnessWithResidualDomination ψ A ζ) :
+    ev ψ (rightTensor (ι₁ := ι)
+        (restrictSomeProjSubMeas (qxpProjSubMeas W.data)).toSubMeas.total) ≤
+      ev ψ (rightTensor (ι₁ := ι) A.total) :=
+  restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le
+    (ψ := ψ) A (qxpProjSubMeas W.data) W.residual_domination
 
 end LeftLiftedQXPLayerRepairWitnessWithResidualDomination
 
