@@ -595,6 +595,10 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalPrimalBlockMatrix_mul_dualSlack}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpComplementarySlacknessDefect_of_canonical}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSlack_mul_dual_of_complementarySlackness}
+  \lean{MIPStarRE.Quantum.eq_zero_of_nonneg_mul_eq_zero_of_one_le}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSlackOperator_eq_zero_of_mul_dual_eq_zero_of_one_le}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_of_canonicalSlackOperator_eq_zero}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_of_canonicalComplementarySlackness_of_one_le}
   Let
   \[
     A_g = \E_{u \sim \F_q^m} A^u_{g(u)}.
@@ -664,7 +668,13 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \begin{equation}\label{eq:complementary-slackness}
     X\Big( \sum_{i,j} \,z_{ij} D_{ij} - C \Big) \,=\, 0.
   \end{equation}
-  We may assume that $X$ is block diagonal. Translating~\eqref{eq:complementary-slackness} back to the variables $\{T_g\}$ and~$Z$ yields $T_g(Z-A_g)=0$ for every~$g$ and $X_{M+1,M+1}=0$. The latter identity is exactly $\sum_g T_g=I$, and the former is~\eqref{eq:slater}.
+  We may assume that $X$ is block diagonal.
+  Translating~\eqref{eq:complementary-slackness} back to the variables
+  $\{T_g\}$ and~$Z$ yields $T_g(Z-A_g)=0$ for every~$g$ and \(S Z=0\), where
+  \(S=I-\sum_gT_g\) is the slack block.
+  Since \(S\ge 0\) and the selected dual witness satisfies \(I\le Z\), the
+  identity \(S Z=0\) forces \(S=0\).
+  Hence \(\sum_g T_g=I\), and the former equations are~\eqref{eq:slater}.
   In the concrete matrix realization, Lean records the defect-zero condition as
   \texttt{matrixSdpComplementarySlacknessDefect}; the theorem
   \texttt{MatrixSdpOptimalWitness.complementarySlacknessEquation} translates it

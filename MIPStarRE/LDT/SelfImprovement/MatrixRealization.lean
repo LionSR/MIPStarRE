@@ -943,6 +943,60 @@ theorem matrixSdpCanonicalSlack_mul_dual_of_complementarySlackness
   rw [matrixSdpCanonicalPrimalBlockMatrix_mul_dualSlack] at hblock
   simpa [matrixSdpCanonicalDiagonalBlock] using hblock
 
+/-- If the canonical slack block annihilates a dual operator which dominates the
+identity, then the slack block itself vanishes.
+
+This is the positivity step used after canonical complementary slackness: the
+paper obtains `S Z = 0` for the slack block `S = I - ∑_g T_g`; since the selected
+dual satisfies `I ≤ Z`, no non-zero positive slack can remain. -/
+theorem matrixSdpCanonicalSlackOperator_eq_zero_of_mul_dual_eq_zero_of_one_le
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
+    (Z : MatrixOperator model.space)
+    (hSlackDual : matrixSdpCanonicalSlackOperator params model T * Z = 0)
+    (hOneLe : (1 : MatrixOperator model.space) ≤ Z) :
+    matrixSdpCanonicalSlackOperator params model T = 0 :=
+  MIPStarRE.Quantum.eq_zero_of_nonneg_mul_eq_zero_of_one_le
+    (matrixSdpCanonicalSlackOperator_nonneg params model T) hOneLe hSlackDual
+
+/-- Vanishing of the canonical slack block is exactly saturation of the paper
+primal submeasurement. -/
+theorem matrixSdpPrimalTotalEqOne_of_canonicalSlackOperator_eq_zero
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
+    (hSlack : matrixSdpCanonicalSlackOperator params model T = 0) :
+    ∑ g : Polynomial params, T.effect g = 1 := by
+  have hsub : (1 : MatrixOperator model.space) - ∑ g : Polynomial params, T.effect g = 0 := by
+    simpa [matrixSdpCanonicalSlackOperator] using hSlack
+  exact (sub_eq_zero.mp hsub).symm
+
+/-- Canonical complementary slackness, together with the dominance condition
+`I ≤ Z`, saturates the paper primal submeasurement.
+
+This theorem is the matrix-level form of the paper's passage from the canonical
+slack-block equation `S Z = 0` to `S = 0`, hence
+`∑_g T_g = I`. -/
+theorem matrixSdpPrimalTotalEqOne_of_canonicalComplementarySlackness_of_one_le
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
+    (Z : MatrixOperator model.space)
+    (hcanonical :
+      matrixSdpCanonicalPrimalBlockMatrix params model T *
+          (matrixSdpCanonicalDualOperator params model Z -
+            matrixSdpCanonicalObjectiveOperator params model) =
+        0)
+    (hOneLe : (1 : MatrixOperator model.space) ≤ Z) :
+    ∑ g : Polynomial params, T.effect g = 1 := by
+  exact matrixSdpPrimalTotalEqOne_of_canonicalSlackOperator_eq_zero params model T
+    (matrixSdpCanonicalSlackOperator_eq_zero_of_mul_dual_eq_zero_of_one_le
+      params model T Z
+      (matrixSdpCanonicalSlack_mul_dual_of_complementarySlackness
+        params model T Z hcanonical)
+      hOneLe)
+
 /-- Matrix-level witness for an optimal SDP pair. -/
 structure MatrixSdpOptimalWitness (params : Parameters) [FieldModel params.q]
     (model : MatrixSdpRealization params)

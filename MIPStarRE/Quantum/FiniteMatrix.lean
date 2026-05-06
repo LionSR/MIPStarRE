@@ -116,6 +116,34 @@ theorem sq_le_self [DecidableEq d] {X : Op d} (hX : 0 ≤ X) (hXle : X ≤ 1) :
   exact sub_nonneg.mp <| by
     simpa [mul_sub] using hnonneg
 
+/-- A positive operator annihilated on the right by an operator dominating the
+identity must vanish. -/
+theorem eq_zero_of_nonneg_mul_eq_zero_of_one_le [DecidableEq d]
+    {S Z : Op d} (hS : 0 ≤ S) (hZ : (1 : Op d) ≤ Z) (hSZ : S * Z = 0) :
+    S = 0 := by
+  have hZ_nonneg : 0 ≤ Z :=
+    le_trans Matrix.PosSemidef.one.nonneg hZ
+  have hS_herm : Sᴴ = S :=
+    (Matrix.nonneg_iff_posSemidef.mp hS).isHermitian.eq
+  have hZ_herm : Zᴴ = Z :=
+    (Matrix.nonneg_iff_posSemidef.mp hZ_nonneg).isHermitian.eq
+  have hZS : Z * S = 0 := by
+    have hconj : (S * Z)ᴴ = 0 := by
+      rw [hSZ]
+      simp
+    simpa [Matrix.conjTranspose_mul, hS_herm, hZ_herm] using hconj
+  have hcomm : Commute S Z :=
+    hSZ.trans hZS.symm
+  have hcommSub : Commute S (Z - 1) :=
+    hcomm.sub_right (Commute.one_right S)
+  have hneg_nonneg : 0 ≤ -S := by
+    have hprod : 0 ≤ S * (Z - 1) :=
+      Commute.mul_nonneg hS (sub_nonneg.mpr hZ) hcommSub
+    have hprod_eq : S * (Z - 1) = -S := by
+      rw [mul_sub, hSZ, Matrix.mul_one, zero_sub]
+    simpa [hprod_eq] using hprod
+  exact le_antisymm (neg_nonneg.mp hneg_nonneg) hS
+
 /-! ### Kronecker product order lemmas -/
 
 /-- Kronecker products preserve positivity. -/
