@@ -228,4 +228,35 @@ structure OrthonormalizationInput {Outcome : Type*}
     LeftLiftedProjectivizationRepairInput ψ Ahat
       (consistencyToAlmostProjectiveError (2 * ζ))
 
+/-- Strengthened orthonormalization input carrying residual domination through
+the option-completed repair.
+
+The ordinary `OrthonormalizationInput` only asks that the repair of
+`optionCompletion A` can be chosen as a left-lifted local projective
+submeasurement.  For the monotone-total route in self-improvement one needs an
+additional construction-level fact: the repaired projective family on
+`Option Outcome` assigns at least the original residual `1 - A.total` to the
+fresh `none` outcome.  This invariant is deliberately stated as extra input,
+since it is not a consequence of state-dependent-distance closeness alone. -/
+structure OrthonormalizationInputWithResidualDomination {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) (ζ : Error) where
+  /-- Truncation-function step on the option-completed measurement. -/
+  spectral :
+    let Ahat : Measurement (Option Outcome) ι := optionCompletion A
+    SpectralTruncationInput ψ (leftLiftedMeasurement (ιB := ι) Ahat)
+      (consistencyToAlmostProjectiveError (2 * ζ))
+  /-- Locality-preserving repair, strengthened by domination of the completed
+  residual outcome. -/
+  repair :
+    let Ahat : Measurement (Option Outcome) ι := optionCompletion A
+    SpectralTruncationStatement ψ (leftLiftedMeasurement (ιB := ι) Ahat)
+        (consistencyToAlmostProjectiveError (2 * ζ)) →
+      ∃ P : ProjSubMeas (Option Outcome) ι,
+        RoundedProjMeasStatement ψ (leftLiftedMeasurement (ιB := ι) Ahat)
+          (ProjSubMeas.liftLeft P)
+          (roundingToProjectiveError (consistencyToAlmostProjectiveError (2 * ζ))) ∧
+        (optionCompletion A).outcome none ≤ P.outcome none
+
 end MIPStarRE.LDT.MakingMeasurementsProjective

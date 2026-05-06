@@ -917,6 +917,8 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromBridgeInputsSubMeas}
   \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationSpectralProducer_of_projectiveNonMeasurement}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_of_helper_outputs_of_total_expectation_le}
+  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_of_helper_outputs_of_total_operator_le}
+  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_exists_of_helper_outputs_of_residual_domination}
   \leanok
   \uses{def:polymeasurements, def:simeq, def:approx_delta, def:strong-self-consistency}
   Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following properties:
@@ -1009,6 +1011,11 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   In Lean the corresponding transport is stated for submeasurements with the
   total-overlap displacement recorded explicitly; this is the term which
   vanishes in the measurement-valued form of Lemma~\ref{prop:triangle-sub}.
+  The monotone-total route records a sufficient structural replacement: if the
+  orthonormalization repair preserves the completed residual outcome, then the
+  projective total is bounded by the helper total as an operator, hence also
+  has no larger right-register expectation in the strategy state.  Under this
+  structural hypothesis the alphabet-size displacement term is not introduced.
   \lean{MIPStarRE.LDT.Preliminaries.triangleSub_right_subMeas_totalGap}
   \lean{MIPStarRE.LDT.Preliminaries.triangleSub_right_subMeas_total_le}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap_natural}

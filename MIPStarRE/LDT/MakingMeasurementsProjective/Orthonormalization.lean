@@ -35,7 +35,7 @@ private def zeroProjSubMeas {Outcome : Type*} {ι : Type*}
 /-- Discard the fresh `none` outcome from an option-indexed projective
 submeasurement. The remaining `some a` outcomes still form a projective
 submeasurement. -/
-private noncomputable def restrictSomeProjSubMeas {Outcome : Type*} {ι : Type*}
+noncomputable def restrictSomeProjSubMeas {Outcome : Type*} {ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (P : ProjSubMeas (Option Outcome) ι) :
     ProjSubMeas Outcome ι where
@@ -54,6 +54,68 @@ private noncomputable def restrictSomeProjSubMeas {Outcome : Type*} {ι : Type*}
           _ = P.total := by rw [P.sum_eq_total]
           _ ≤ 1 := P.total_le_one }
   proj := fun a => by simpa using P.proj (some a)
+
+/-- If the projective replacement of the completed measurement puts at least the
+original residual mass on the fresh `none` outcome, then the retained `some`
+outcomes have total dominated by the original submeasurement total.
+
+This is the precise construction-level order statement needed by the
+monotone-total route in the self-improvement argument.  It separates the
+formal algebra from the still-missing repair invariant
+`(optionCompletion A).outcome none ≤ P.outcome none`. -/
+theorem restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le
+    {Outcome : Type*} {ι : Type*} [Fintype Outcome]
+    [Fintype ι] [DecidableEq ι] [DecidableEq Outcome]
+    (A : SubMeas Outcome ι) (P : ProjSubMeas (Option Outcome) ι)
+    (hresidual : (optionCompletion A).outcome none ≤ P.outcome none) :
+    (restrictSomeProjSubMeas P).toSubMeas.total ≤ A.total := by
+  let S : MIPStarRE.Quantum.Op ι := ∑ a : Outcome, P.outcome (some a)
+  have hsum_le_one :
+      P.outcome none + S ≤ (1 : MIPStarRE.Quantum.Op ι) := by
+    calc
+      P.outcome none + S
+          = ∑ oa : Option Outcome, P.outcome oa := by
+              simp [S, Fintype.sum_option]
+      _ = P.total := by rw [P.sum_eq_total]
+      _ ≤ 1 := P.total_le_one
+  have hresidual' :
+      (1 : MIPStarRE.Quantum.Op ι) - A.total ≤ P.outcome none := by
+    simpa using hresidual
+  have hcompleted :
+      (1 : MIPStarRE.Quantum.Op ι) - A.total + S ≤
+        (1 : MIPStarRE.Quantum.Op ι) := by
+    calc
+      (1 : MIPStarRE.Quantum.Op ι) - A.total + S
+          ≤ P.outcome none + S := by
+              simpa [add_comm] using add_le_add_right hresidual' S
+      _ ≤ 1 := hsum_le_one
+  have hnonneg : 0 ≤ A.total - S := by
+    have hsub : 0 ≤
+        (1 : MIPStarRE.Quantum.Op ι) -
+          ((1 : MIPStarRE.Quantum.Op ι) - A.total + S) :=
+      sub_nonneg.mpr hcompleted
+    simpa [sub_eq_add_neg, add_assoc, add_comm, add_left_comm] using hsub
+  have hS_le : S ≤ A.total := sub_nonneg.mp hnonneg
+  simpa [restrictSomeProjSubMeas, S] using hS_le
+
+/-- The right-register expectation form of
+`restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le`.
+
+This is the scalar comparison needed by the monotone-total transport in the
+self-improvement theorem.  The proof first obtains the operator inequality on
+the local Hilbert space and then applies monotonicity of right tensor placement
+and of expectation in the ambient state. -/
+theorem restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le
+    {Outcome : Type*} {ι : Type*} [Fintype Outcome]
+    [Fintype ι] [DecidableEq ι] [DecidableEq Outcome]
+    (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι)
+    (P : ProjSubMeas (Option Outcome) ι)
+    (hresidual : (optionCompletion A).outcome none ≤ P.outcome none) :
+    ev ψ (rightTensor (ι₁ := ι) (restrictSomeProjSubMeas P).toSubMeas.total) ≤
+      ev ψ (rightTensor (ι₁ := ι) A.total) := by
+  exact ev_mono ψ _ _ <|
+    rightTensor_mono
+      (restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le A P hresidual)
 
 /-- Completing a submeasurement by a fresh failure outcome preserves bipartite
 strong self-consistency up to the paper's factor `2`: the original diagonal gap
@@ -343,6 +405,42 @@ private lemma orthonormalizationError_ge_one_of_half_lt (ζ : Error)
   have h50_le : (50 : Error) ≤ 100 * Real.rpow ζ (1 / (4 : Error)) := by
     nlinarith
   exact (by norm_num : (1 : Error) ≤ 50).trans h50_le
+
+/-- In the large-`ζ` branch, the zero projective submeasurement satisfies the
+orthonormalization SDD bound. -/
+private lemma qSDD_liftLeft_zeroProjSubMeas_le_orthonormalizationError
+    {Outcome : Type*} {ι : Type*} [Fintype Outcome] [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized)
+    (A : SubMeas Outcome ι) (ζ : Error)
+    (hζhalf : ¬ ζ ≤ 1 / 2) :
+    qSDD ψ A.liftLeft
+        ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft) ≤
+      orthonormalizationError ζ := by
+  have hq :
+      qSDD ψ A.liftLeft
+          ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft) ≤
+        1 := by
+    exact qSDD_liftLeft_zeroProjSubMeas_le_one (ψ := ψ) (hψ := hψ) (A := A)
+  have hδ :
+      1 ≤ orthonormalizationError ζ :=
+    orthonormalizationError_ge_one_of_half_lt ζ (lt_of_not_ge hζhalf)
+  exact hq.trans hδ
+
+/-- The zero projective submeasurement has total dominated by any
+submeasurement total. -/
+private lemma zeroProjSubMeas_total_le {Outcome : Type*} {ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι] (A : SubMeas Outcome ι) :
+    (zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.total ≤ A.total := by
+  simpa [zeroProjSubMeas] using SubMeas.total_nonneg A
+
+/-- The right-register expectation form of `zeroProjSubMeas_total_le`. -/
+private lemma zeroProjSubMeas_rightTensor_total_ev_le {Outcome : Type*} {ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) :
+    ev ψ (rightTensor (ι₁ := ι)
+        (zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.total) ≤
+      ev ψ (rightTensor (ι₁ := ι) A.total) := by
+  exact ev_mono ψ _ _ <| rightTensor_mono (zeroProjSubMeas_total_le A)
 
 /-- Error bookkeeping for the composition of `consistencyToAlmostProjective`
 and `roundAlmostProjMeas`. -/
@@ -738,15 +836,141 @@ theorem orthonormalization {Outcome : Type*}
           ζ hζ_nonneg))
   · let P : ProjSubMeas Outcome ι := zeroProjSubMeas (Outcome := Outcome) (ι := ι)
     have hq :
-        qSDD ψ A.liftLeft P.toSubMeas.liftLeft ≤ 1 := by
+        qSDD ψ A.liftLeft P.toSubMeas.liftLeft ≤ orthonormalizationError ζ := by
       simpa [P] using
-        qSDD_liftLeft_zeroProjSubMeas_le_one (ψ := ψ) (hψ := hψ) (A := A)
-    have hδ :
-        1 ≤ orthonormalizationError ζ :=
-      orthonormalizationError_ge_one_of_half_lt ζ (lt_of_not_ge hζhalf)
+        qSDD_liftLeft_zeroProjSubMeas_le_orthonormalizationError
+          (ψ := ψ) (hψ := hψ) (A := A) (ζ := ζ) hζhalf
     refine ⟨P, ?_⟩
     constructor
     simpa [sddError, avgOver, uniformDistribution, constSubMeasFamily] using
-      hq.trans hδ
+      hq
+
+/-- Orthonormalization with the residual-domination invariant needed for the
+monotone-total self-improvement route.
+
+This is a strengthened wrapper around the submeasurement orthonormalization
+argument.  Its additional input is not derived from SDD closeness: it says that
+the option-completed repair preserves at least the original residual mass on
+the fresh `none` outcome.  Under that construction-level invariant, discarding
+the `none` outcome gives a projective submeasurement whose total is dominated
+by the original total, and hence the same comparison after right tensor
+placement and evaluation in the ambient state. -/
+theorem orthonormalization_with_total_le_of_residual_domination {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState (ι × ι))
+    (hperm : PermInvState ψ)
+    (hψ : ψ.IsNormalized)
+    (A : SubMeas Outcome ι) (ζ : Error) :
+    BipartiteSSCRel ψ (uniformDistribution Unit)
+        (constSubMeasFamily A) ζ →
+      OrthonormalizationInputWithResidualDomination ψ A ζ →
+      ∃ P : ProjSubMeas Outcome ι,
+        SDDRel ψ (uniformDistribution Unit)
+          (constSubMeasFamily A.liftLeft)
+          (constSubMeasFamily P.toSubMeas.liftLeft)
+          (orthonormalizationError ζ) ∧
+        P.toSubMeas.total ≤ A.total ∧
+        ev ψ (rightTensor (ι₁ := ι) P.toSubMeas.total) ≤
+          ev ψ (rightTensor (ι₁ := ι) A.total) := by
+  intro hssc hbridge
+  rcases hbridge with ⟨hspectral, hrepair⟩
+  by_cases hζhalf : ζ ≤ 1 / 2
+  · have hζ_nonneg : 0 ≤ ζ :=
+      le_trans
+        (bipartiteSSCError_nonneg ψ (uniformDistribution Unit)
+          (constSubMeasFamily A))
+        hssc.overlapBound
+    have hTwoζ_nonneg : 0 ≤ 2 * ζ := by
+      nlinarith
+    have hTwoζ_le_one : 2 * ζ ≤ 1 := by
+      nlinarith
+    let Ahat : Measurement (Option Outcome) ι := optionCompletion A
+    have hspectral' :
+        SpectralTruncationInput ψ (leftLiftedMeasurement (ιB := ι) Ahat)
+          (consistencyToAlmostProjectiveError (2 * ζ)) := by
+      simpa [Ahat] using hspectral
+    have hAhatssc :
+        BipartiteSSCRel ψ (uniformDistribution Unit)
+          (constSubMeasFamily Ahat.toSubMeas)
+          (2 * ζ) := by
+      simpa [Ahat] using
+        optionCompletion_bipartiteSSCRel (ψ := ψ) (hperm := hperm)
+          (hψ := hψ) (A := A) (ζ := ζ) hssc
+    have hCons :
+        ConsRel ψ (uniformDistribution Unit)
+          (constSubMeasFamily Ahat.toSubMeas)
+          (constSubMeasFamily Ahat.toSubMeas)
+          (2 * ζ) :=
+      bipartiteSSCRel_self_of_measurement (ψ := ψ) Ahat (2 * ζ) hAhatssc
+    have hAlmost :
+        MIPStarRE.LDT.MakingMeasurementsProjective.AlmostProjMeasStatement
+          ψ (leftLiftedMeasurement (ιB := ι) Ahat)
+          (consistencyToAlmostProjectiveError (2 * ζ)) := by
+      exact MIPStarRE.LDT.MakingMeasurementsProjective.consistencyToAlmostProjective
+        (ψ := ψ) (A := Ahat) (B := Ahat) (ζ := 2 * ζ) hCons
+    have hSpectral :
+        SpectralTruncationStatement ψ (leftLiftedMeasurement (ιB := ι) Ahat)
+          (consistencyToAlmostProjectiveError (2 * ζ)) := by
+      exact MIPStarRE.LDT.MakingMeasurementsProjective.spectralTruncateAlmostProjective
+        (ψ := ψ) (hψ := hψ)
+        (A := leftLiftedMeasurement (ιB := ι) Ahat)
+        (ζ := consistencyToAlmostProjectiveError (2 * ζ)) hAlmost hspectral'
+    obtain ⟨P, hRounded, hresidual⟩ := hrepair hSpectral
+    have hP :
+        SDDRel ψ (uniformDistribution Unit)
+          (constSubMeasFamily Ahat.toSubMeas.liftLeft)
+          (constSubMeasFamily P.toSubMeas.liftLeft)
+          (orthonormalizationMainLemmaError (2 * ζ)) :=
+      leftLiftedRoundedProjMeasStatement_to_local <|
+        MIPStarRE.LDT.MakingMeasurementsProjective.roundedProjMeasStatement_mono
+          hRounded
+          (orthonormalizationMainLemma_error_bound (2 * ζ)
+            hTwoζ_nonneg hTwoζ_le_one)
+    have hPq :
+        qSDD ψ Ahat.toSubMeas.liftLeft P.toSubMeas.liftLeft ≤
+          orthonormalizationMainLemmaError (2 * ζ) := by
+      simpa [ldt_simp] using hP.squaredDistanceBound
+    let Psome : ProjSubMeas Outcome ι := restrictSomeProjSubMeas P
+    have hPsomeq :
+        qSDD ψ A.liftLeft Psome.toSubMeas.liftLeft ≤
+          orthonormalizationMainLemmaError (2 * ζ) := by
+      exact le_trans
+        (qSDD_liftLeft_restrictSomeProjSubMeas_le (ψ := ψ) (A := A) (P := P))
+        hPq
+    have htotal : Psome.toSubMeas.total ≤ A.total := by
+      exact
+        restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le
+          A P hresidual
+    have htotal_ev :
+        ev ψ (rightTensor (ι₁ := ι) Psome.toSubMeas.total) ≤
+          ev ψ (rightTensor (ι₁ := ι) A.total) := by
+      exact
+        restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le
+          (ψ := ψ) A P hresidual
+    refine ⟨Psome, ?_, htotal, htotal_ev⟩
+    constructor
+    simpa [sddError, avgOver, uniformDistribution, constSubMeasFamily] using
+      (le_trans hPsomeq
+        (orthonormalizationMainLemmaError_two_mul_le_orthonormalizationError
+          ζ hζ_nonneg))
+  · let P : ProjSubMeas Outcome ι := zeroProjSubMeas (Outcome := Outcome) (ι := ι)
+    have hq :
+        qSDD ψ A.liftLeft P.toSubMeas.liftLeft ≤ orthonormalizationError ζ := by
+      simpa [P] using
+        qSDD_liftLeft_zeroProjSubMeas_le_orthonormalizationError
+          (ψ := ψ) (hψ := hψ) (A := A) (ζ := ζ) hζhalf
+    have htotal : P.toSubMeas.total ≤ A.total := by
+      simpa [P] using zeroProjSubMeas_total_le (Outcome := Outcome) (ι := ι) A
+    have htotal_ev :
+        ev ψ (rightTensor (ι₁ := ι) P.toSubMeas.total) ≤
+          ev ψ (rightTensor (ι₁ := ι) A.total) := by
+      simpa [P] using
+        zeroProjSubMeas_rightTensor_total_ev_le
+          (Outcome := Outcome) (ι := ι) ψ A
+    refine ⟨P, ?_, htotal, htotal_ev⟩
+    constructor
+    simpa [sddError, avgOver, uniformDistribution, constSubMeasFamily] using
+      hq
 
 end MIPStarRE.LDT.MakingMeasurementsProjective
