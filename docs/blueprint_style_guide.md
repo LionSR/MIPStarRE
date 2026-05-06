@@ -46,6 +46,18 @@ Notation must be **internally consistent** across the entire blueprint and **clo
 - **Expansion**: use standard notation for graph expansion parameters
 - **Macros** (in `macros/common.tex`): define project-specific macros and use them consistently
 
+The original reference controls notation whenever it gives a usable convention.
+If the blueprint needs a different symbol, index convention, or name in order to
+match Lean, introduce it explicitly and relate it to the paper notation in the
+same paragraph.  Do not let a `\lean{...}` tag, a Lean namespace, or a file name
+be the only explanation of a changed term.
+
+When a public Lean declaration is a formalization-only auxiliary lemma, the
+blueprint should say so before listing the declaration.  The surrounding prose
+should identify the paper theorem, equation, or construction that the auxiliary
+lemma supports, and should avoid making the auxiliary name look like a named
+result from the source article.
+
 ## What NOT to Put in the Blueprint
 - **Lean identifier names in math text.** Write "the self-improvement lemma", never "the `selfImprovement` step". The `\lean{LDT.selfImprovement}` tag handles the linking.
 - **Implementation details.** Don't say "bundled as an element of the Euclidean space" or "using `EuclideanSpace.equiv`". Describe the mathematical object.
