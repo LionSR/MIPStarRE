@@ -45,7 +45,7 @@ plus project-local expectation lemmas (`ev_adjoint_self_nonneg`,
 `ev_abs_mul_le_sqrt`).  No external "Cauchy–Schwarz theorem" import is
 needed because the form used is a direct consequence of the
 *sum-of-sqrt-products* inequality, which Mathlib provides in
-`Mathlib/Data/Real/Sqrt.lean`.
+`Analysis/Calculus/MeanInequalities`.
 
 **Pedagogical note**: The key insight is that
 `|∑ a, ψ(X_a Y_a)| ≤ (∑ a, ψ(X_a X_a†))^(1/2) · (∑ a, ψ(Y_a† Y_a))^(1/2)`
@@ -75,7 +75,7 @@ Not a candidate for Mathlib.
 
 **Mathlib source**: `Mathlib.Algebra.MvPolynomial.SchwartzZippel`
 
-The Mathlib lemma `MvPolynomial.schwartz_zippel_totalDegree` gives exactly this bound
+The Mathlib lemma `MvPolynomial.schwartz_zippel` gives exactly this bound
 for polynomials over any integral domain, with zero-probability measured
 as a cardinality ratio over the full product space.  The project wraps it:
 
@@ -85,8 +85,7 @@ abbrev polyFunc (m : ℕ) (K : Type*) [CommSemiring K] (d : ℕ) :
   MvPolynomial.restrictDegree (Fin m) K d
 ```
 
-Then the Schwartz–Zippel bound follows from
-`MvPolynomial.schwartz_zippel_totalDegree`.
+Then the Schwartz–Zippel bound follows from `MvPolynomial.schwartz_zippel`.
 
 **Pedagogical note**: Schwartz–Zippel is a standard result in theoretical
 computer science.  The Mathlib proof follows the classical induction on
@@ -256,7 +255,7 @@ the `CFC.sqrt` of a PSD operator appears.
 Hermitian matrix via spectral decomposition, specifically `√A` for
 `A ≥ 0`.
 
-**Mathlib source**: `Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus`
+**Mathlib source**: `Mathlib.Analysis.CstarAlgebra.ContinuousFunctionalCalculus`
 provides the CFC.  For `Matrix ι ι ℂ`:
 
 - `CFC.sqrt_nonneg` — `0 ≤ A` ⇒ `0 ≤ √A`
@@ -345,16 +344,13 @@ Analogous to Polishchuk–Spielman but for the surface-vs-point test.
 
 ### Matrix Chernoff bound
 
-**Lean declaration**: `chernoffBernoulliMatrix` (internal, in
-`MIPStarRE/LDT/Pasting/Bernoulli/MatrixChernoff.lean`).
+**Lean declaration**: `chernoffBernoulliMatrix` (internal, in Commutativity/).
 
-This is a fully proved lemma — the project supplies a local proof:
-`MIPStarRE/LDT/Pasting/Bernoulli/MatrixChernoff.lean:78`
-establishes `ChernoffBernoulliMatrixStatement` from explicit local hypotheses
-and without any unresolved statement-style (`*Statement`) hypothesis.  No
-pending external `*Statement` premise remains for this lemma.  There remains
-a Mathlib gap for a general matrix Chernoff inequality (beyond this
-project-specific formalization).
+This is a matrix-version of the Chernoff concentration bound, used for
+Bernoulli matrix sums.  There is a Mathlib gap for the matrix case
+(standard Chernoff exists for scalars but not for matrix-valued random
+variables), so the project has a `*Statement` hypothesis pending
+upstreaming or local proof.
 
 **Pedagogical note**: The classical Chernoff bound says that the sum of
 independent Bernoulli random variables concentrates exponentially around
