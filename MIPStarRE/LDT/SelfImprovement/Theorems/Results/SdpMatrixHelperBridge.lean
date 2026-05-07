@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SdpMatrixBridge
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop
+import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationBridge
 
 /-!
 # Matrix SDP helper bridge
@@ -422,5 +423,117 @@ lemma selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDominationIn
     X hsdp.feasible Z hsdp.dualFeasible hsdp.strongDuality
     hsdp.complementarySlackness hsdp.dualDominatesIdentity hgood G
     hhelperCompleteness hhelperSSCInput htransfer horthInput
+
+/-- A canonical optimal pair with dominance and a residual-dominating QXP repair
+producer assemble a full self-improvement conclusion.
+
+The spectral-truncation slice is discharged by
+`orthonormalizationSpectralProducer_of_sourceAlmostProjective`; hence the
+remaining orthonormalization hypothesis is exactly the QXP repair producer with
+fresh-outcome residual domination. -/
+lemma selfImprovementWithCanonicalOptimalPairAndQXPResidualDomination
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma nu : Error)
+    (heps_le_one : eps ≤ 1)
+    (hdelta_le_one : delta ≤ 1)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
+      (matrixSdpPointRealizationOfStrategy params strategy)))
+    (Z : MIPStarRE.Quantum.Op ι)
+    (hsdp : MatrixSdpCanonicalOptimalPairWithDominance params
+      (matrixSdpPointRealizationOfStrategy params strategy) X Z)
+    (hgood : strategy.IsGood eps delta gamma)
+    (G : Measurement (Polynomial params) ι)
+    (hhelperCompleteness :
+      ∀ {T : Measurement (Polynomial params) ι}
+        {Hhat : SubMeas (Polynomial params) ι}
+        {Z : MIPStarRE.Quantum.Op ι},
+        SelfImprovementHelperConclusionWithSlackness params strategy T Hhat Z eps delta →
+          CompletenessAtLeast strategy.state Hhat.liftLeft
+            ((1 - nu) - selfImprovementHelperError params eps delta))
+    (hhelperSSCInput : HelperStrongSelfConsistencyInput params strategy eps delta)
+    (htransfer :
+      ∀ {T : Measurement (Polynomial params) ι}
+        {Hhat : SubMeas (Polynomial params) ι}
+        {Z : MIPStarRE.Quantum.Op ι},
+        SelfImprovementHelperConclusionWithSlackness params strategy T Hhat Z eps delta →
+          |addInULeftQuantity params strategy
+              (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+              Hhat
+              (pointConsistencyAddInUSelection params) -
+            addInURightQuantity params strategy
+              (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+              T.toSubMeas
+              (pointConsistencyAddInUSelection params)| ≤
+            addInUError params eps delta)
+    (hqxp :
+      OrthonormalizationQXPLayerRepairProducerWithResidualDomination
+        params strategy eps delta) :
+    ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+      SelfImprovementConclusion params strategy G H Z eps delta gamma nu :=
+  selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDominationInput
+    params strategy eps delta gamma nu heps_le_one hdelta_le_one hd_le_q
+    X Z hsdp hgood G hhelperCompleteness hhelperSSCInput htransfer
+    (orthonormalizationResidualDominationInput_of_sourceAlmostProjectiveAndQXPLayerRepair
+      hqxp)
+
+/-- A canonical optimal pair, an ordinary QXP repair producer, and a separate
+fresh-outcome residual-domination proof assemble a full self-improvement
+conclusion. -/
+lemma selfImprovementWithCanonicalOptimalPairAndQXPRepairAndResidualDomination
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma nu : Error)
+    (heps_le_one : eps ≤ 1)
+    (hdelta_le_one : delta ≤ 1)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
+      (matrixSdpPointRealizationOfStrategy params strategy)))
+    (Z : MIPStarRE.Quantum.Op ι)
+    (hsdp : MatrixSdpCanonicalOptimalPairWithDominance params
+      (matrixSdpPointRealizationOfStrategy params strategy) X Z)
+    (hgood : strategy.IsGood eps delta gamma)
+    (G : Measurement (Polynomial params) ι)
+    (hhelperCompleteness :
+      ∀ {T : Measurement (Polynomial params) ι}
+        {Hhat : SubMeas (Polynomial params) ι}
+        {Z : MIPStarRE.Quantum.Op ι},
+        SelfImprovementHelperConclusionWithSlackness params strategy T Hhat Z eps delta →
+          CompletenessAtLeast strategy.state Hhat.liftLeft
+            ((1 - nu) - selfImprovementHelperError params eps delta))
+    (hhelperSSCInput : HelperStrongSelfConsistencyInput params strategy eps delta)
+    (htransfer :
+      ∀ {T : Measurement (Polynomial params) ι}
+        {Hhat : SubMeas (Polynomial params) ι}
+        {Z : MIPStarRE.Quantum.Op ι},
+        SelfImprovementHelperConclusionWithSlackness params strategy T Hhat Z eps delta →
+          |addInULeftQuantity params strategy
+              (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+              Hhat
+              (pointConsistencyAddInUSelection params) -
+            addInURightQuantity params strategy
+              (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+              T.toSubMeas
+              (pointConsistencyAddInUSelection params)| ≤
+            addInUError params eps delta)
+    (hqxp : OrthonormalizationQXPLayerRepairProducer params strategy eps delta)
+    (hdom : ∀ {Hhat : SubMeas (Polynomial params) ι}
+      (hssc : BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily Hhat)
+        (selfImprovementHelperError params eps delta))
+      (hSpectral : SpectralTruncationStatement strategy.state
+        (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
+        (consistencyToAlmostProjectiveError
+          (2 * selfImprovementHelperError params eps delta))),
+        QXPLayerResidualDomination (hqxp hssc hSpectral).data Hhat) :
+    ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+      SelfImprovementConclusion params strategy G H Z eps delta gamma nu :=
+  selfImprovementWithCanonicalOptimalPairAndQXPResidualDomination
+    params strategy eps delta gamma nu heps_le_one hdelta_le_one hd_le_q
+    X Z hsdp hgood G hhelperCompleteness hhelperSSCInput htransfer
+    (residualDominatingRepairProducer_of_qxpLayer_and_residualDomination hqxp hdom)
 
 end MIPStarRE.LDT.SelfImprovement

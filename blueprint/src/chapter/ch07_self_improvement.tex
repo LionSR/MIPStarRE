@@ -537,6 +537,8 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDominationInput}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDomination}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDominationInput}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairAndQXPResidualDomination}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairAndQXPRepairAndResidualDomination}
   \leanok
   From a matrix-level strong-duality witness with complementary slackness of the
   shape asserted by Lemma~\ref{lem:sdp}, one obtains a complete measurement
@@ -553,6 +555,9 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   full self-improvement conclusion, including the projective residual bound.
   The formalization records both the per-helper orthonormalization form and the
   bundled SelfImprovement-level input form of this conclusion.
+  The residual-domination hypothesis can be supplied either as an intrinsic
+  self-improvement orthonormalization input or by a QXP repair producer carrying
+  the fresh-outcome domination invariant.
   Lean also isolates the saturated canonical optimal-pair output still required
   from strong duality: a feasible canonical primal matrix, a dual-feasible
   operator with equal objective value, canonical complementary slackness, and
@@ -977,6 +982,9 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_of_helper_outputs_of_total_operator_le}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_exists_of_helper_outputs_of_residual_domination}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_exists_of_helper_outputs_of_residualDominationInput}
+  \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementSlacknessResidualDominationBridgeInputs}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndResidualDominationInput}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromSlacknessResidualDominationBridgeInputs}
   \leanok
   \uses{def:polymeasurements, def:simeq, def:approx_delta, def:strong-self-consistency}
   Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following properties:
@@ -1037,6 +1045,11 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \[
     \widehat{\zeta}_{\mathrm{ortho}} = 100 \widehat{\zeta}^{1/4}.
   \]
+  Lean also records an abstract residual-domination wrapper for this final
+  assembly: once the SDP helper carries complementary slackness and the
+  orthonormalization input carries the fresh-outcome residual domination, the
+  final point-consistency field is produced through the monotone-total route,
+  without invoking the alphabet-size total-gap absorption.
   In addition, Lemma~\ref{prop:self-consistency-implies-data-processing} implies that
   \begin{equation}\label{eq:approx-data-processed}
     \widehat{H}_{[h(u)=a]} \ot I \approx_{\widehat{\zeta}_{\mathrm{dataprocess}}} H_{[h(u)=a]} \ot I,
@@ -1092,6 +1105,9 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \lean{MIPStarRE.LDT.SelfImprovement.OrthonormalizationResidualDominationInput}
   \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationInput_of_residualDominationInput}
   \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationResidualDominationInput_of_producers}
+  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationInput_of_sourceAlmostProjectiveAndQXPLayerRepair}
+  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationResidualDominationInput_of_sourceAlmostProjectiveAndQXPLayerRepair}
+  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationResidualDominationInput_of_sourceQXPRepairAndResidualDomination}
   \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationResidualDominationInput_of_roundingAndQXPLayerRepair}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap_natural}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap}
