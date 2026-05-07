@@ -10,7 +10,9 @@ The original file (`Setup.lean`, \>1800 lines) has been split into:
 
 - `Setup/Definitions.lean` — tuple equivalences, operator definitions, family constructions
 - `Setup/SumBounds.lean` — sum-of-products `≤ 1` bounds and error envelope
-- `Setup/StepLemmas.lean` — split-iff, step-commutation, first-slice-left move, mid-to-target
+- `Setup/StepLemmas/Split.lean` — split-iff, reindexing, and the two-term base case
+- `Setup/StepLemmas/Move.lean` — step-commutation and move-chain lemmas
+- `Setup/StepLemmas.lean` — compatibility barrel for the two step-lemma modules
 
 ## References
 
