@@ -413,7 +413,7 @@ theorem final_fields_of_helper_outputs_of_residualDominationInput
       final_fields_exists_of_helper_outputs_of_residualDominationInput
         params strategy eps delta nu heps heps_le_one hdelta hdelta_le_one hd_le_q
         hhelper hhelperCompleteness hhelperSSC hpointSSC hslack htransfer
-        (horthInput hhelperSSC)
+        horthInput
     exact ⟨H, hfinal⟩
 
 end MIPStarRE.LDT.SelfImprovement
