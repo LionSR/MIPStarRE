@@ -135,8 +135,18 @@ def main() -> int:
              "Reported as a warning, not an error.",
     )
     args = parser.parse_args()
-    known_set: set[str] = set(args.known)
-    return check_files(args.root.resolve(), known_set)
+    root_resolved = args.root.resolve()
+    known_set: set[str] = set()
+    for k in args.known:
+        p = Path(k)
+        if not p.is_absolute():
+            p = root_resolved / p
+        try:
+            known_set.add(p.resolve().relative_to(root_resolved).as_posix())
+        except ValueError:
+            # If the path is not under root, keep it as-is
+            known_set.add(p.as_posix())
+    return check_files(root_resolved, known_set)
 
 
 if __name__ == "__main__":
