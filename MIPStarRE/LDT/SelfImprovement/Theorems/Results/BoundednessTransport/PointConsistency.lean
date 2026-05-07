@@ -869,5 +869,45 @@ theorem final_fields_point_consistency_totalGap_of_data_processing
     (final_fields_point_consistency_totalGap_natural_of_data_processing
       params strategy eps delta hhelperPoint hdata)
 
+/-- Literal-threshold point-consistency transport from data-processing with an
+explicit finite-field branch.
+
+Under `|F_q| ≤ 8464`, the additional term
+`√(#F_q * selfImprovementDataProcessingError)` is absorbed into
+`selfImprovementError` by the explicit coefficient estimate in
+`final_fields_projective_residual_error_le_selfImprovementError_of_small_alphabet`.
+
+The hypothesis is a concrete branch condition and can be discharged where the
+global parameters satisfy the finite-field size constraint. -/
+theorem final_fields_point_consistency_totalGap_of_data_processing_of_small_alphabet
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (heps_le_one : eps ≤ 1)
+    (hdelta : 0 ≤ delta) (hdelta_le_one : delta ≤ 1)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
+    {Hhat : SubMeas (Polynomial params) ι}
+    {H : ProjSubMeas (Polynomial params) ι}
+    (hhelperPoint :
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params Hhat)
+        (selfImprovementHelperError params eps delta))
+    (hdata :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftLeft)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+        (selfImprovementDataProcessingError params eps delta))
+    (hq_le : Fintype.card (Fq params) ≤ 8464) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params H.toSubMeas)
+      (selfImprovementError params eps delta) :=
+  MIPStarRE.LDT.ConsRel.mono
+    (final_fields_projective_residual_error_le_selfImprovementError_of_small_alphabet
+      params eps delta heps heps_le_one hdelta hdelta_le_one hd_le_q hq_le)
+    (final_fields_point_consistency_totalGap_natural_of_data_processing
+      params strategy eps delta hhelperPoint hdata)
+
 
 end MIPStarRE.LDT.SelfImprovement
