@@ -40,7 +40,7 @@ MIPStarRE/
 ├── Quantum/               # Reusable matrix / measurement infrastructure
 │   ├── FiniteMatrix.lean
 │   └── Measurement.lean
-└── LDT/                   # Low individual degree test (11 submodules)
+└── LDT/                   # Low individual degree test (12 submodules)
     ├── Basic/
     ├── Test/
     ├── Preliminaries/
