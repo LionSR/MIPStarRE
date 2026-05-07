@@ -174,8 +174,7 @@ to link to Lean:
 | Tag | Meaning | Example |
 |-----|---------|---------|
 | `\lean{Name}` | The corresponding Lean declaration exists | `\lean{MIPStarRE.LDT.Test.mainFormal}` |
-| `\leanok` (statement-level) | The Lean declaration compiles; confirms statement synchronization, not proof closure | `\leanok` |
-| `\leanok` (proof-level) | The proof block is fully formalized — the theorem or lemma has a complete sorry-free proof | `\lean{...}` plus `\leanok` inside `\begin{proof}` |
+| `\leanok` | The Lean declaration is sorry-free and its proof is mathematically faithful to the paper statement | `\leanok` |
 | `\uses{label}` | The statement or proof block depends on the cited result | `\uses{thm:orthonormalization, prop:completing-to-measurement}` |
 
 ### Why some nodes show white in the dep graph
@@ -184,8 +183,8 @@ The dependency graph at
 `https://LionSR.github.io/MIPStarRE/blueprint/dep_graph_document.html`
 color-codes theorem nodes:
 
-- **Green**: proof-level `\leanok` is present (the proof block is fully formalized)
-- **White** (or white-border): `\lean{}` exists but proof-level `\leanok` is absent; may carry a statement-level `\leanok` during staged development
+- **Green**: `\leanok` is present
+- **White** (or white-border): `\lean{}` exists but `\leanok` is absent
 - **Gray**: No `\lean{}` tag
 
 As of the session 49 audit (2026-05-07), the web dependency graph was
@@ -210,13 +209,6 @@ Some nodes have `\lean{}` but deliberately omit `\leanok`:
 
 - **`thm:main-formal`** (ch02): The 1 `sorry` in `MainFormal.lean` means
   the proof chain is not yet closed.
-
-> **Recently resolved**: `thm:main-induction-public-wrapper` (ch10) was
-> marked `\leanok` (both statement-level and proof-level) as part of
-> PR [#1368].  The Lean declarations exist and compile; the wrapper has a
-> complete internal proof.  The restricted-strategy self-improvement
-> integration into the higher-level public theorem remains tracked
-> separately by [#931].
 
 ### The `\uses{}` convention
 
@@ -432,4 +424,3 @@ with the step it replaces.
 [#451]: https://github.com/LionSR/MIPStarRE/issues/451
 [#931]: https://github.com/LionSR/MIPStarRE/issues/931
 [#422]: https://github.com/LionSR/MIPStarRE/issues/422
-[#1368]: https://github.com/LionSR/MIPStarRE/pull/1368
