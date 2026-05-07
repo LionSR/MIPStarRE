@@ -41,3 +41,4 @@
 *.pdf
 blueprint/lean_decls
 .claude/
+.worktrees/

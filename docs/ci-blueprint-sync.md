@@ -85,31 +85,39 @@ both Lean 4.28's capital-U form and older lowercase forms are accepted.
    dependence we cannot verify — if Lean's output format changes, we want
    CI to flag it rather than default to "looks fine".
 
-## Reverse-coverage warnings for changed Lean declarations
+## Reverse-coverage checks for changed Lean declarations
 
-The `Lint blueprint` workflow also runs a report-only reverse-coverage check on
-pull requests after the Lean setup step succeeds. It diffs the PR against its
-base ref, restricts attention to changed `MIPStarRE/**/*.lean` files, and runs:
+The `Lint blueprint` workflow also runs a reverse-coverage check on pull
+requests after the Lean setup step succeeds. It diffs the PR against its base
+ref, restricts attention to changed `MIPStarRE/**/*.lean` files, and runs:
 
 ```bash
 python3 scripts/blueprint_lean_sync.py --root . --warn-missing-blueprint \
   --diff-base origin/<base-ref> --changed-files <changed Lean files>
 ```
 
+For ordinary pull requests this remains a warning-producing report. If the
+pull request has the label `enforce-blueprint-coverage`, the workflow adds
+`--fail-on-missing-blueprint` and the same missing-reference report becomes a
+failing check. This gives the project an experimental round for testing and
+auto-fixing these obligations before making the gate universal.
+
 This check ignores `private` declarations and only tracks changed public
 `def`, `theorem`, and `lemma` declarations. For each tracked declaration whose
 fully qualified name (or dotted short name) has no `\lean{...}` reference in
 `blueprint/src/chapter`, it emits a GitHub Actions warning annotation at the
-Lean source line.
+Lean source line. On labelled enforcement PRs, a changed paper-facing Lean
+declaration must be accompanied by the corresponding blueprint tag before the
+pull request is considered green.
 
 When GitHub provides `GITHUB_STEP_SUMMARY`, the same script also appends one
-`Blueprint reverse-coverage warnings` table to the successful check summary.
+`Blueprint reverse-coverage warnings` table to the check summary.
 The table aggregates all missing blueprint references in the PR, gives the
 Lean declaration and `file:line`, suggests the `\lean{Declaration}` tag for
 paper-facing declarations, and reminds reviewers that private declarations are
 already filtered while genuinely internal public helpers may be left untagged
-with review context. This keeps the signal PR-friendly without posting one
-comment per declaration.
+with review context. This keeps the signal precise without posting one comment
+per declaration.
 
 ## Running locally
 

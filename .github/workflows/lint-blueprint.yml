@@ -17,7 +17,7 @@ on:
       - 'scripts/tex_utils.py'
       - 'scripts/blueprint_lean_sync.py'
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, labeled]
     paths:
       - '**.lean'
       - 'lakefile.*'
@@ -88,9 +88,11 @@ jobs:
             exit "$cmd_status"
           fi
 
-      # ── Lean-dependent checks (advisory, do not block PRs) ──
+      # ── Lean-dependent checks ──
       # These require a full Lean build, which is already covered by
-      # lean_action_ci.yml. Run them here as best-effort validation.
+      # lean_action_ci.yml. Keep setup and full-surface checks best-effort,
+      # but fail PRs when changed paper-facing Lean declarations are not
+      # reflected in the blueprint.
 
       - name: Set up Lean toolchain
         continue-on-error: true
@@ -115,17 +117,20 @@ jobs:
           BASE_REF: ${{ github.event.pull_request.base.ref }}
         run: git fetch --no-tags origin "$BASE_REF"
 
-      - name: Warn on changed Lean declarations missing blueprint entries
+      - name: Check changed Lean declarations have blueprint entries
         if: github.event_name == 'pull_request' && steps.lean-setup.outcome == 'success'
-        continue-on-error: true
         env:
           BASE_REF: origin/${{ github.event.pull_request.base.ref }}
+          ENFORCE_BLUEPRINT_REVERSE_COVERAGE: >-
+            ${{ contains(github.event.pull_request.labels.*.name,
+            'enforce-blueprint-coverage') }}
         run: |
           python3 - <<'PY'
           import os
           import subprocess
 
           base_ref = os.environ["BASE_REF"]
+          enforce = os.environ.get("ENFORCE_BLUEPRINT_REVERSE_COVERAGE") == "true"
 
           changed = subprocess.check_output(
               [
@@ -157,7 +162,8 @@ jobs:
                   base_ref,
                   "--changed-files",
                   *changed_lean_files,
-              ],
+              ]
+              + (["--fail-on-missing-blueprint"] if enforce else []),
               check=True,
           )
           PY
