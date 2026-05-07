@@ -46,20 +46,24 @@ namespace Test
 
 /-! ### Orthonormalization-input bridge lemmas -/
 
-/-- Assemble the full repaired-bridge hypotheses from a role residual and the two
-locality-preserving repair witnesses.
+/-- Assemble the full repaired-bridge hypotheses from a role residual, the two
+locality-preserving repair witnesses, and the diagonal self-consistency input.
 
 This produces exactly the `MainFormalBaseRepairedBridgeHypotheses` consumed by
 `baseMainFormal_ofRepairedBaseBridge` and `mainFormal_ofRoleResidualAndRepairedBridge`.
 
-The diagonal consistency is derived from the role residual (no extra hypotheses)
-via `MainFormalPostRolePackageDiagonalConsistencyInput.of_roleResidual`.
 The orthonormalization input uses `spectralTruncationInput_of_sourceAlmostProjective`
 for its spectral fields and takes the repair witnesses as explicit hypotheses
 via `MainFormalPostRolePackageDiagonalOrthonormalizationInput.of_roleResidual`.
 
+**Diagonal self-consistency** (`diagonalConsistency`) is NOT derivable from the
+role residual's cross consistency (`G^A ⊗ I ≃ I ⊗ G^B`).  It requires
+self-consistency (`G^A ⊗ I ≃ G^A ⊗ I` and `G^B ⊗ I ≃ G^B ⊗ I`), which is a
+structurally stronger statement.  Callers must supply it as a separate
+hypothesis.
+
 Callers constructing `hbaseBridge` for `mainFormal` should instantiate this lemma
-with their per-role-residual repair witnesses.
+with their per-role-residual repair witnesses and diagonal self-consistency proofs.
 
 Refs #1359, #1043. -/
 theorem repairedBridgeHypotheses_of_roleResidual
@@ -78,14 +82,16 @@ theorem repairedBridgeHypotheses_of_roleResidual
       MakingMeasurementsProjective.LeftLiftedProjectivizationRepairInput strategy.state
         (unsymmetrizedRightPOVM
           (roleResidual.rolePackage scalars).roleMeasurement)
-        (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)) :
+        (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1))
+    (diagonalConsistency :
+      MainFormalPostRolePackageDiagonalConsistencyInput
+        params strategy eps k scalars (roleResidual.rolePackage scalars)) :
     MainFormalBaseRepairedBridgeHypotheses params strategy eps k hpass
       scalars roleResidual where
   orthonormalizationInput :=
     MainFormalPostRolePackageDiagonalOrthonormalizationInput.of_roleResidual
       roleResidual leftRepair rightRepair
-  diagonalConsistency :=
-    MainFormalPostRolePackageDiagonalConsistencyInput.of_roleResidual roleResidual
+  diagonalConsistency := diagonalConsistency
 
 /-! ### Base (m = 1) Step 6 analytic hypotheses
 
