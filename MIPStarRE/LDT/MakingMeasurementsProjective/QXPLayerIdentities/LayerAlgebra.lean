@@ -68,6 +68,48 @@ lemma xSquared {Outcome : Type*}
     data.xᴴ * data.x = QTotal data.qLayer := by
   exact data.x_gram_right
 
+/-- If the original `X` rows are already coisometric and the mixed product
+`X† XHat` agrees with the Gram operator `X† X`, then the polar replacement
+`XHat` is equal to `X`.
+
+This is the algebraic form of the observation used in the residual-domination
+route: on a part where the row block already lies in the unit singular
+subspace, the `XHat` replacement does not change it. -/
+lemma xHat_eq_x_of_x_mul_conjTranspose_eq_one_of_mixed_eq_gram {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι)
+    (hx_left :
+      data.x * data.xᴴ =
+        (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier))
+    (hmixed : data.xᴴ * data.xHat = data.xᴴ * data.x) :
+    data.xHat = data.x := by
+  calc
+    data.xHat =
+        (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier) * data.xHat := by
+      simp
+    _ = (data.x * data.xᴴ) * data.xHat := by rw [hx_left]
+    _ = data.x * (data.xᴴ * data.xHat) := by simp [Matrix.mul_assoc]
+    _ = data.x * (data.xᴴ * data.x) := by rw [hmixed]
+    _ = (data.x * data.xᴴ) * data.x := by simp [Matrix.mul_assoc]
+    _ = (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier) * data.x := by
+      rw [hx_left]
+    _ = data.x := by simp
+
+/-- Row-block form of
+`xHat_eq_x_of_x_mul_conjTranspose_eq_one_of_mixed_eq_gram`. -/
+lemma xHatA_eq_xa_of_x_mul_conjTranspose_eq_one_of_mixed_eq_gram {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) (a : Outcome)
+    (hx_left :
+      data.x * data.xᴴ =
+        (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier))
+    (hmixed : data.xᴴ * data.xHat = data.xᴴ * data.x) :
+    XHatA data a = Xa data a := by
+  rw [XHatA, Xa,
+    xHat_eq_x_of_x_mul_conjTranspose_eq_one_of_mixed_eq_gram data hx_left hmixed]
+
 /-- The total `Q` operator in a QXP layer is Hermitian.
 
 This follows from `lem:X-squared`: the total operator is the right Gram matrix
@@ -164,8 +206,10 @@ lemma xExpressionToQExpression {Outcome : Type*}
         Xa data a := by
           congr 1
           noncomm_ring
-    _ = (Xa data a)ᴴ * data.x * (data.xᴴ * data.x * (data.xᴴ * Xa data a)) +
-        (-2 • ((Xa data a)ᴴ * data.x * (data.xᴴ * Xa data a)) + (Xa data a)ᴴ * Xa data a) := by
+    _ =
+        (Xa data a)ᴴ * data.x * (data.xᴴ * data.x * (data.xᴴ * Xa data a)) +
+          (-2 • ((Xa data a)ᴴ * data.x * (data.xᴴ * Xa data a)) +
+            (Xa data a)ᴴ * Xa data a) := by
           rw [Matrix.mul_assoc]
           rw [Matrix.add_mul, Matrix.add_mul]
           rw [Matrix.mul_add, Matrix.mul_add]
