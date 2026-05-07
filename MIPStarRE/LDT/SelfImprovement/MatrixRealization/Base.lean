@@ -174,6 +174,31 @@ theorem matrixSdpStrictDualWitness_dualFeasible (params : Parameters)
     (le_trans (matrixAveragedPointOperator_le_one params model g)
       (one_le_matrixSdpStrictDualWitness model))
 
+/-- For the strict dual witness `Z = 2I`, every paper dual slack
+`Z - A_g` dominates the identity. -/
+theorem one_le_matrixSdpStrictDualWitness_dualSlack (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (g : Polynomial params) :
+    (1 : MatrixOperator model.space) ≤
+      matrixSdpDualSlackOperator params model (matrixSdpStrictDualWitness model) g := by
+  calc
+    (1 : MatrixOperator model.space) =
+        matrixSdpStrictDualWitness model - (1 : MatrixOperator model.space) := by
+          unfold matrixSdpStrictDualWitness
+          ext i j
+          by_cases hij : i = j
+          · subst j
+            simp
+            norm_num
+          · simp [hij]
+    _ ≤ matrixSdpStrictDualWitness model -
+          matrixAveragedPointOperator params model g := by
+        exact sub_le_sub_left (matrixAveragedPointOperator_le_one params model g)
+          (matrixSdpStrictDualWitness model)
+    _ = matrixSdpDualSlackOperator params model (matrixSdpStrictDualWitness model) g := by
+        rfl
+
 /-- Dual feasibility already implies that the dual operator is positive
 semidefinite, since every averaged point operator `A_g` is positive. -/
 theorem matrixSdpDualPositive_of_dualFeasible (params : Parameters)
@@ -212,6 +237,9 @@ structure MatrixSdpFeasibleBounds (params : Parameters) [FieldModel params.q]
   dualFeasible :
     ∀ g : Polynomial params,
       0 ≤ matrixSdpDualSlackOperator params model Z g
+  dualSlackDominatesIdentity :
+    ∀ g : Polynomial params,
+      (1 : MatrixOperator model.space) ≤ matrixSdpDualSlackOperator params model Z g
 
 /-- The canonical explicit matrix feasible bounds used in the SDP argument. -/
 theorem matrixSdpFeasibleBounds_canonical (params : Parameters) [FieldModel params.q]
@@ -222,6 +250,8 @@ theorem matrixSdpFeasibleBounds_canonical (params : Parameters) [FieldModel para
   primalTotalHalf := matrixSdpStrictPrimalSubmeasurement_sum_effect params model
   dualDominatesIdentity := one_le_matrixSdpStrictDualWitness model
   dualFeasible := matrixSdpStrictDualWitness_dualFeasible params model
+  dualSlackDominatesIdentity :=
+    one_le_matrixSdpStrictDualWitness_dualSlack params model
 
 
 end MIPStarRE.LDT.SelfImprovement

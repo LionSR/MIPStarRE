@@ -479,9 +479,12 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixAveragedPointOperator_nonneg}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixAveragedPointOperator_le_one}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStrictDualWitness_dualFeasible}
+  \lean{MIPStarRE.LDT.SelfImprovement.one_le_matrixSdpStrictDualWitness_dualSlack}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpDualPositive_of_dualFeasible}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpFeasibleBounds}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpFeasibleBounds_canonical}
+  \lean{MIPStarRE.LDT.SelfImprovement.one_le_matrixSdpCanonicalStrictDualConstraint}
+  \lean{MIPStarRE.LDT.SelfImprovement.one_le_matrixSdpCanonicalStrictDualSlackBlockFamily}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalStrictPrimalBlockMatrix_feasible}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalStrictPrimalBlockMatrix_slack_half}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalStrictPrimalBlockMatrix_objective}
@@ -490,12 +493,12 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \leanok
   In every concrete matrix realization, the uniform family
   \(T_g=(2|\polyfunc{m}{q}{d}|)^{-1}I\) has total mass \((1/2)I\).  The dual
-  operator \(Z=2I\) dominates the identity and satisfies \(Z\geq A_g\) for every
-  polynomial \(g\).  In the canonical block SDP, the corresponding block
-  matrix is feasible, its slack block is \((1/2)I\), and the canonical dual
-  constraint is satisfied by the same dual witness.  More generally, dual
-  feasibility implies positivity of \(Z\), since the averaged point operators
-  \(A_g\) are positive semidefinite.
+  operator \(Z=2I\) dominates the identity and satisfies \(Z-A_g\geq I\), hence
+  \(Z\geq A_g\), for every polynomial \(g\).  In the canonical block SDP, the
+  corresponding block matrix is feasible, its slack block is \((1/2)I\), and
+  the canonical dual slack for the same dual witness also dominates the block
+  identity.  More generally, dual feasibility implies positivity of \(Z\), since
+  the averaged point operators \(A_g\) are positive semidefinite.
 \end{lemma}
 \begin{proof}
   \leanok

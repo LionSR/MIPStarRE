@@ -256,6 +256,55 @@ theorem matrixSdpCanonicalStrictDualConstraint_nonneg
     (matrixSdpStrictDualWitness model)
     (matrixSdpStrictDualWitness_dualFeasible params model)
 
+/-- Every canonical dual-slack block of the strict dual witness dominates the
+identity. -/
+theorem one_le_matrixSdpCanonicalStrictDualSlackBlockFamily
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (b : MatrixSdpCanonicalBlockIndex params) :
+    (1 : MatrixOperator model.space) ≤
+      matrixSdpCanonicalDualSlackBlockFamily params model
+        (matrixSdpStrictDualWitness model) b := by
+  cases b with
+  | none =>
+      exact one_le_matrixSdpStrictDualWitness model
+  | some g =>
+      exact one_le_matrixSdpStrictDualWitness_dualSlack params model g
+
+/-- The canonical strict dual slack dominates the identity on the block Hilbert
+space. -/
+theorem one_le_matrixSdpCanonicalStrictDualConstraint
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params) :
+    (1 : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) ≤
+      matrixSdpCanonicalDualOperator params model (matrixSdpStrictDualWitness model) -
+        matrixSdpCanonicalObjectiveOperator params model := by
+  rw [← sub_nonneg]
+  rw [matrixSdpCanonicalDualOperator_sub_objectiveOperator]
+  let B :=
+    matrixSdpCanonicalDualSlackBlockFamily params model (matrixSdpStrictDualWitness model)
+  have hsub :
+      matrixSdpCanonicalBlockDiagonal params model B -
+          (1 : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) =
+        matrixSdpCanonicalBlockDiagonal params model
+          (fun b => B b - (1 : MatrixOperator model.space)) := by
+    ext x y
+    rcases x with ⟨b, i⟩
+    rcases y with ⟨c, j⟩
+    by_cases hbc : b = c
+    · subst c
+      by_cases hij : i = j
+      · subst j
+        simp [B, matrixSdpCanonicalBlockDiagonal]
+      · simp [B, matrixSdpCanonicalBlockDiagonal, hij]
+    · simp [B, matrixSdpCanonicalBlockDiagonal, hbc]
+  rw [hsub]
+  refine matrixSdpCanonicalBlockDiagonal_nonneg params model
+    (fun b => B b - (1 : MatrixOperator model.space)) ?_
+  intro b
+  exact sub_nonneg.mpr
+    (one_le_matrixSdpCanonicalStrictDualSlackBlockFamily params model b)
+
 /-- The canonical block matrix associated to the strict primal witness is
 feasible for the canonical primal SDP. -/
 theorem matrixSdpCanonicalStrictPrimalBlockMatrix_feasible
@@ -309,8 +358,16 @@ structure MatrixSdpCanonicalFeasibleBounds (params : Parameters) [FieldModel par
   paperDualFeasible :
     ∀ g : Polynomial params,
       0 ≤ matrixSdpDualSlackOperator params model (matrixSdpStrictDualWitness model) g
+  paperDualSlackDominatesIdentity :
+    ∀ g : Polynomial params,
+      (1 : MatrixOperator model.space) ≤
+        matrixSdpDualSlackOperator params model (matrixSdpStrictDualWitness model) g
   dualDominatesIdentity :
     (1 : MatrixOperator model.space) ≤ matrixSdpStrictDualWitness model
+  canonicalDualSlackDominatesIdentity :
+    (1 : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) ≤
+      matrixSdpCanonicalDualOperator params model (matrixSdpStrictDualWitness model) -
+        matrixSdpCanonicalObjectiveOperator params model
 
 /-- The explicit uniform primal witness and `Z=2I` give the canonical feasible
 bounds used before applying finite-dimensional SDP strong duality. -/
@@ -322,7 +379,11 @@ theorem matrixSdpCanonicalFeasibleBounds_canonical
   primalSlackHalf := matrixSdpCanonicalStrictPrimalBlockMatrix_slack_half params model
   canonicalDualFeasible := matrixSdpCanonicalStrictDualConstraint_nonneg params model
   paperDualFeasible := matrixSdpStrictDualWitness_dualFeasible params model
+  paperDualSlackDominatesIdentity :=
+    one_le_matrixSdpStrictDualWitness_dualSlack params model
   dualDominatesIdentity := one_le_matrixSdpStrictDualWitness model
+  canonicalDualSlackDominatesIdentity :=
+    one_le_matrixSdpCanonicalStrictDualConstraint params model
 
 /-- The canonical block objective evaluated on the block matrix associated to a
 paper primal submeasurement is the paper primal objective.
