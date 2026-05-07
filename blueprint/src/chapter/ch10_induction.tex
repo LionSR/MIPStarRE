@@ -336,6 +336,7 @@
 
 \begin{proposition}[Public Lean wrapper for the successor-step assembly]\label{thm:main-induction-public-wrapper}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicRestrictionPackage, MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper}
+	\leanok
 	\uses{lem:restricted-probabilities, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section, thm:main-induction}
 	This Lean-only theorem records the five explicit successor-step ingredients used in the proof of Theorem~\ref{thm:main-induction}: the weighted slice bounds feeding Lemma~\ref{lem:restricted-probabilities}, the extracted slice-restriction data, the per-slice recursive witnesses, the producer for the corresponding self-improvement data, and the recursion-to-pasting assembly. Under those hypotheses it returns a measurement $G \in \polymeas{m+1}{q}{d}$ satisfying the same consistency conclusion as Theorem~\ref{thm:main-induction}, but without exposing the intermediate stage data at the public boundary.
 \end{proposition}

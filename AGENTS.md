@@ -254,6 +254,14 @@ Hermitian/PSD operators, and spectral theory. When proving lemmas:
 - Do not re-declare standard Mathlib lemmas (e.g., custom matrix transpose
   lemmas when `Matrix.transpose_*` exists)
 
+For a pedagogical register of external lemmas not explained in the paper,
+see `docs/external-lemmas-pedagogy.md`. This includes Schwartz–Zippel,
+Fourier orthogonality, Cauchy–Schwarz for approximate measurements, CFC,
+and external result statements (Polishchuk–Spielman, Raz–Safra).
+
+For design patterns like extra-hypothesis discharge and blueprint
+synchronization, see `docs/formalization-patterns.md`.
+
 ### Validation ladder
 
 1. `lake env lean path/to/File.lean`
@@ -418,6 +426,9 @@ If modifying blueprint material:
 
 For blueprint style conventions, see `docs/blueprint_style_guide.md`.
 
+For the extra-hypothesis discharge pattern that underlies `\lean{}`/`\leanok`
+tagging strategy, see `docs/formalization-patterns.md`.
+
 ## Agent Rule Sources
 
 Checked in this repository snapshot:
@@ -442,6 +453,8 @@ Use this file together with:
 | `docs/blueprint_style_guide.md` | Blueprint notation and section conventions |
 | `docs/api_surface.md` | Useful obligation-closing lemmas for `SubMeas` |
 | `docs/paper-gaps/policy.tex` | Paper-gap documentation conventions |
+| `docs/formalization-patterns.md` | Design patterns: extra-hypothesis discharge, blueprint sync, split-module architecture, barrel and bridge packages |
+| `docs/external-lemmas-pedagogy.md` | Register of Mathlib/external lemmas not explained in the paper, with pedagogical notes |
 | `docs/ci-automation.md` | CI/CD workflow details |
 | `docs/pr-review.md` | Mathlib PR review guide |
 | `docs/pr_review_management.md` | Review thread workflow and bot integration |
