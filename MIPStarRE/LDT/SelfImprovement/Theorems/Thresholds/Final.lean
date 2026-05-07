@@ -550,6 +550,7 @@ theorem final_fields_projective_residual_error_of_small_alphabet_le_selfImprovem
         nlinarith [hm_nonneg, hsum32_nonneg]
   _ = selfImprovementError params eps delta := by
     rw [selfImprovementError_eq_finalStagePowerSum]
+
 /-- Final completeness threshold absorption (`self_improvement.tex`,
 lines 803--810).
 
