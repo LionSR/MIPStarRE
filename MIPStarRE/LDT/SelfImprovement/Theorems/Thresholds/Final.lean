@@ -558,8 +558,8 @@ theorem final_fields_projective_residual_error_le_selfImprovementError_of_small_
       finalStagePowerSum params eps delta (1 / (32 : Error)) := by
         have hm_nonneg : 0 ≤ (params.m : Error) := m_cast_nonneg params
         nlinarith [hm_nonneg, hsum32_nonneg]
-  _ = selfImprovementError params eps delta := by
-    rw [selfImprovementError_eq_finalStagePowerSum]
+    _ = selfImprovementError params eps delta := by
+      rw [selfImprovementError_eq_finalStagePowerSum]
 
 /-- Final completeness threshold absorption (`self_improvement.tex`,
 lines 803--810).
