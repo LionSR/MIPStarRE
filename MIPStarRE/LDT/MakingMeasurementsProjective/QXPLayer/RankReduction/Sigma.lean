@@ -553,6 +553,113 @@ lemma sigmaFinRangeEmbedding_gram_right {Outcome : Type uOutcome}
             (sigmaFinRangeEmbedding_qa_eq q.outcome qa_projective a).symm
     _ = q.total := q_sum_eq_total
 
+/-- A finite family of projectors whose total is bounded by the identity has
+orthogonal distinct summands. -/
+lemma projectorFamily_mul_eq_zero_of_ne_of_sum_le_one {Outcome : Type uOutcome}
+    [Fintype Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (Q : Outcome → MIPStarRE.Quantum.Op ι)
+    (hproj : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (Q a))
+    (hsum_le_one : (∑ a : Outcome, Q a) ≤ (1 : MIPStarRE.Quantum.Op ι))
+    {a b : Outcome} (hab : a ≠ b) :
+    Q a * Q b = 0 := by
+  classical
+  let P : ProjSubMeas Outcome ι :=
+    { toSubMeas := {
+        outcome := Q
+        total := ∑ a : Outcome, Q a
+        outcome_pos := fun a => MIPStarRE.Quantum.IsProj.nonneg (Q a) (hproj a)
+        sum_eq_total := rfl
+        total_le_one := hsum_le_one }
+      proj := fun a => (hproj a).idempotent }
+  simpa [P] using P.outcome_orthogonal a b hab
+
+/-- Distinct projectors in a subnormalized projective family have orthogonal
+chosen range basis vectors. -/
+lemma projectorFamily_rangeONB_dotProduct_eq_zero_of_ne_of_sum_le_one
+    {Outcome : Type uOutcome} [Fintype Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (Q : Outcome → MIPStarRE.Quantum.Op ι)
+    (hproj : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (Q a))
+    (hsum_le_one : (∑ a : Outcome, Q a) ≤ (1 : MIPStarRE.Quantum.Op ι))
+    {a b : Outcome} (hab : a ≠ b)
+    (i : Fin (Q a).rank) (j : Fin (Q b).rank) :
+    star ((MIPStarRE.Quantum.IsProj.rangeONB (Q a) (hproj a)).vec i) ⬝ᵥ
+        (MIPStarRE.Quantum.IsProj.rangeONB (Q b) (hproj b)).vec j = 0 := by
+  classical
+  let onb : (c : Outcome) →
+      MIPStarRE.Quantum.ProjectorRangeONB (Q c) (hproj c) :=
+    fun c => MIPStarRE.Quantum.IsProj.rangeONB (Q c) (hproj c)
+  have hmul :
+      Q a * Q b = 0 :=
+    projectorFamily_mul_eq_zero_of_ne_of_sum_le_one Q hproj hsum_le_one hab
+  have hfixa : Q a *ᵥ (onb a).vec i = (onb a).vec i :=
+    (onb a).mulVec_vec i
+  have hfixb : Q b *ᵥ (onb b).vec j = (onb b).vec j :=
+    (onb b).mulVec_vec j
+  have hQa_vb : Q a *ᵥ (onb b).vec j = 0 := by
+    calc
+      Q a *ᵥ (onb b).vec j = Q a *ᵥ (Q b *ᵥ (onb b).vec j) := by
+          rw [hfixb]
+      _ = (Q a * Q b) *ᵥ (onb b).vec j := by
+          rw [Matrix.mulVec_mulVec]
+      _ = 0 := by
+          rw [hmul]
+          simp
+  have hrow :
+      Matrix.vecMul (star ((onb a).vec i)) (Q a) = star ((onb a).vec i) := by
+    have hstar := congrArg star hfixa
+    rw [Matrix.star_mulVec, (hproj a).isHermitian.eq] at hstar
+    exact hstar
+  calc
+    star ((onb a).vec i) ⬝ᵥ (onb b).vec j =
+        Matrix.vecMul (star ((onb a).vec i)) (Q a) ⬝ᵥ (onb b).vec j := by
+          rw [hrow]
+    _ = star ((onb a).vec i) ⬝ᵥ Q a *ᵥ (onb b).vec j := by
+          rw [Matrix.dotProduct_mulVec]
+    _ = 0 := by
+          rw [hQa_vb]
+          simp [onb]
+
+/-- For a subnormalized projective family, the finite sigma range embedding has
+orthonormal rows. -/
+lemma sigmaFinRangeEmbedding_mul_conjTranspose_eq_one_of_sum_le_one
+    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (Q : Outcome → MIPStarRE.Quantum.Op ι)
+    (hproj : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (Q a))
+    (hsum_le_one : (∑ a : Outcome, Q a) ≤ (1 : MIPStarRE.Quantum.Op ι)) :
+    sigmaFinRangeEmbedding Q hproj *
+        (sigmaFinRangeEmbedding Q hproj)ᴴ =
+      (1 : MIPStarRE.Quantum.Op
+        (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
+          (fun a : Outcome => (Q a).rank)))) := by
+  classical
+  ext x y
+  cases x with
+  | up x =>
+  cases y with
+  | up y =>
+  cases x with
+  | mk ax ix =>
+  cases y with
+  | mk ay iy =>
+  by_cases hax : ax = ay
+  · subst ay
+    simpa [sigmaFinRangeEmbedding, Matrix.mul_apply, Matrix.conjTranspose_apply,
+      Matrix.one_apply] using
+      (MIPStarRE.Quantum.IsProj.rangeONB (Q ((Fintype.equivFin Outcome).symm ax))
+        (hproj ((Fintype.equivFin Outcome).symm ax))).orthonormal ix iy
+  · have hab : (Fintype.equivFin Outcome).symm ax ≠
+        (Fintype.equivFin Outcome).symm ay := by
+      intro h
+      exact hax ((Fintype.equivFin Outcome).symm.injective h)
+    have hdot :=
+      projectorFamily_rangeONB_dotProduct_eq_zero_of_ne_of_sum_le_one
+        Q hproj hsum_le_one hab ix iy
+    simpa [sigmaFinRangeEmbedding, Matrix.mul_apply, Matrix.conjTranspose_apply,
+      Matrix.one_apply, hax] using hdot
+
 /-- The finite-enumeration `Q` layer associated to an operator family.
 
 The auxiliary Hilbert space is the finite-enumeration model of

@@ -738,6 +738,9 @@
 
 	\begin{definition}[Matrix decomposition of~$Q_a$]\label{def:matrix-decomposition-Q}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.matrixDecompositionQ, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaProjMeas, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinProjMeas, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaRangeEmbedding, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinRangeEmbedding}
+		\lean{MIPStarRE.Quantum.ProjectorRangeONB.rankOne_mulVec_vec,
+			MIPStarRE.Quantum.ProjectorRangeONB.mulVec_vec,
+			MIPStarRE.Quantum.IsProj.nonneg}
 		\leanok
 		\uses{lem:projective-low-rank-sum}
 		For each $a$, let
@@ -792,6 +795,10 @@
 	\end{definition}
 
 	\begin{remark}\label{rem:motivation-for-P}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectorFamily_mul_eq_zero_of_ne_of_sum_le_one,
+			MIPStarRE.LDT.MakingMeasurementsProjective.projectorFamily_rangeONB_dotProduct_eq_zero_of_ne_of_sum_le_one,
+			MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinRangeEmbedding_mul_conjTranspose_eq_one_of_sum_le_one}
+		\leanok
 		If the family $\{Q_a\}$ were a projective measurement, then the vectors
 		$\ket{v_{a,i}}$, over all $a$ and all $1 \leq i \leq m_a$, would be orthonormal.
 		Then \eqref{eq:looks-like-singular-value-decomposition} would already be a singular value
@@ -985,6 +992,7 @@
 			MIPStarRE.LDT.MakingMeasurementsProjective.exists_rectangular_coisometry_with_positive_gram_spectrum_right_rows,
 			MIPStarRE.LDT.MakingMeasurementsProjective.transpose_unitary_mul_rectangular_coisometry,
 			MIPStarRE.LDT.MakingMeasurementsProjective.exists_unitary_with_qxp_positive_gram_spectrum_rows,
+			MIPStarRE.LDT.MakingMeasurementsProjective.xHat_of_positive_gram_spectrum_choices,
 			MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_isHermitian_of_x_squared,
 			MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_coisometry,
 			MIPStarRE.LDT.MakingMeasurementsProjective.exists_xHat_of_rectangularSvd,
@@ -1114,6 +1122,7 @@
 		\leanok
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndSvdIdentities}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangePositiveGram}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangePositiveGram_with_x_coisometry}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot}
 		\leanok
 		\begin{equation*}
@@ -1126,7 +1135,12 @@
 		$X$, $\widehat X$, and $P$ identities; the $30\zeta^{1/4}$ estimate is
 		derived here rather than stored as part of the data package.  The
 		rectangular-SVD producer combines the same estimate with the positive-square
-		identification of the middle factor from \ref{lem:X-times-X-hat}.
+		identification of the middle factor from \ref{lem:X-times-X-hat}.  The
+		positive-Gram sigma-space producer also records the coisometry
+		\(X X^\dagger=I\) for the original sigma embedding when the projective
+		\(Q\)-family is subnormalized; this is the construction-level hypothesis
+		later used in the residual-domination argument for the fresh completed
+		outcome.
 		The quantity to bound is
 		\begin{equation}\label{eq:P-Q-thing-to-bound}
 			\sum_a \bra{\psi} (Q_a-P_a)^2 \ot I \ket{\psi}

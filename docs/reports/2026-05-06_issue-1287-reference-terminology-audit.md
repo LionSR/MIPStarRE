@@ -5,7 +5,7 @@ purpose: >
   Record the visible terminology and notation surfaces affected by issue #1287,
   and explain the repository rule introduced by the accompanying documentation
   change.
-status: snapshot
+status: implemented
 track: paper2009ldt
 kind: terminology-audit
 ---
@@ -78,6 +78,16 @@ mathematical terminology and notation by default.  If Lean uses a different
 name or representation, the documentation must define the paper term, the Lean
 representative, the mathematical reason for the difference, and the scope where
 the replacement is intended to be used.
+
+## Resolution
+
+This report serves as the concrete implementation for issue #1287.
+The repository rule is now in force through `docs/mathematical_language.md`
+and the blueprint conventions in `docs/blueprint_style_guide.md`.
+For future work, this convention should be enforced at the first review pass
+by checking whether a public declaration name or reader-facing prose matches
+the source notation, and adding an explicit paper-to-LDT mapping when the
+deviation is intentional and unavoidable.
 
 ## Validation
 

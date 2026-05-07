@@ -106,6 +106,35 @@ theorem sandwich_mono {M P Q : Op d} (hMH : Mᴴ = M) (hPQ : P ≤ Q) :
     simpa [mul_sub, sub_mul] using
       sandwich_nonneg (M := M) (P := Q - P) (sub_nonneg.mpr hPQ) hMH
 
+/-- The real trace pairing of two positive semidefinite operators is
+nonnegative.
+
+This is the finite-dimensional Hilbert-Schmidt positivity fact used in weak
+duality arguments: if \(A,B\geq 0\), then
+\(\operatorname{Re}\operatorname{Tr}(AB)\geq 0\). -/
+theorem trace_mul_nonneg_of_nonneg {A B : Op d} (hA : 0 ≤ A) (hB : 0 ≤ B) :
+    0 ≤ Complex.re (Matrix.trace (A * B)) := by
+  letI : DecidableEq d := Classical.decEq d
+  obtain ⟨Y, hY⟩ := CStarAlgebra.nonneg_iff_eq_star_mul_self.mp hB
+  subst B
+  rw [Matrix.star_eq_conjTranspose]
+  have htrace_nonneg :
+      (0 : ℂ) ≤ Matrix.trace (Y * A * Yᴴ) :=
+    (Matrix.PosSemidef.mul_mul_conjTranspose_same
+      (Matrix.nonneg_iff_posSemidef.mp hA) Y).trace_nonneg
+  have hre : 0 ≤ Complex.re (Matrix.trace (Y * A * Yᴴ)) :=
+    (Complex.nonneg_iff.mp htrace_nonneg).1
+  have htrace :
+      Matrix.trace (A * (Yᴴ * Y)) = Matrix.trace (Y * A * Yᴴ) := by
+    calc
+      Matrix.trace (A * (Yᴴ * Y)) = Matrix.trace ((A * Yᴴ) * Y) := by
+        simp [Matrix.mul_assoc]
+      _ = Matrix.trace (Y * (A * Yᴴ)) := by
+        rw [Matrix.trace_mul_comm]
+      _ = Matrix.trace (Y * A * Yᴴ) := by
+        simp [Matrix.mul_assoc]
+  simpa [htrace] using hre
+
 /-- An operator between `0` and `1` dominates its square. -/
 theorem sq_le_self [DecidableEq d] {X : Op d} (hX : 0 ≤ X) (hXle : X ≤ 1) :
     X * X ≤ X := by

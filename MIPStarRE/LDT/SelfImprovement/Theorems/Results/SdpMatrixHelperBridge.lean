@@ -2,6 +2,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SdpMatrixBridge
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.Bracketed
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop
 import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationBridge
+import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationInputConstructors
 
 /-!
 # Matrix SDP helper bridge
@@ -126,6 +127,31 @@ lemma selfImprovementHelperWithCanonicalOptimalPairSdpSlacknessAndDominance
   selfImprovementHelperWithSlackness params strategy eps delta gamma
     (sdp_with_slackness
       params strategy X Z hsdp)
+    hgood nu G
+
+/-- A saturated canonical optimal pair, together with a separately proved
+dominance bound `I ≤ Z`, feeds the slackness-carrying self-improvement
+helper. -/
+lemma selfImprovementHelperWithCanonicalOptimalPairSdpSlackness_of_dualDominatesIdentity
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
+      (matrixSdpPointRealizationOfStrategy params strategy)))
+    (Z : MIPStarRE.Quantum.Op ι)
+    (hsdp : MatrixSdpCanonicalOptimalPair params
+      (matrixSdpPointRealizationOfStrategy params strategy) X Z)
+    (hOneLe : (1 : MIPStarRE.Quantum.Op ι) ≤ Z)
+    (hgood : strategy.IsGood eps delta gamma)
+    (nu : Error)
+    (G : Measurement (Polynomial params) ι) :
+    ∃ T : Measurement (Polynomial params) ι,
+      ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+        SelfImprovementHelperConclusionWithSlackness params strategy T H Z eps delta :=
+  selfImprovementHelperWithSlackness params strategy eps delta gamma
+    (sdpStatementWithSlackness_of_canonicalOptimalPair_of_dualDominatesIdentity
+      params strategy X Z hsdp hOneLe)
     hgood nu G
 
 /-- Canonical block-SDP slackness and residual-dominating orthonormalization
