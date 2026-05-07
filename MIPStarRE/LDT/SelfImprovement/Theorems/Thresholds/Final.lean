@@ -518,7 +518,7 @@ theorem final_fields_projective_residual_error_le_selfImprovementError_of_small_
       Real.sqrt ((8464 : Error) * selfImprovementDataProcessingError params eps delta) =
           Real.sqrt (8464 : Error) *
             Real.sqrt (selfImprovementDataProcessingError params eps delta) := by
-              rw [Real.sqrt_mul h8464_nonneg]
+        rw [Real.sqrt_mul h8464_nonneg]
       _ = 92 * Real.sqrt (selfImprovementDataProcessingError params eps delta) := by
         norm_num
   have hsqrt_card : Real.sqrt ((Fintype.card (Fq params) : Error) *
@@ -535,11 +535,12 @@ theorem final_fields_projective_residual_error_le_selfImprovementError_of_small_
           selfImprovementDataProcessingError params eps delta) ≤
           92 * Real.sqrt (selfImprovementDataProcessingError params eps delta) := hsqrt_card
       _ ≤ 92 * (31 * (params.m : Error) *
-            finalStagePowerSum params eps delta (1 / (32 : Error))) := by
-            gcongr
-            exact hdata_sqrt
+          finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+        gcongr
+        exact hdata_sqrt
       _ = 2852 * (params.m : Error) *
-            finalStagePowerSum params eps delta (1 / (32 : Error)) := by ring_nf
+          finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+        ring_nf
   calc
     selfImprovementHelperError params eps delta +
         Real.sqrt (selfImprovementDataProcessingError params eps delta) +
@@ -551,11 +552,12 @@ theorem final_fields_projective_residual_error_le_selfImprovementError_of_small_
             finalStagePowerSum params eps delta (1 / (32 : Error)) := by
       nlinarith [hhelper_sqrt, hcard_term]
     _ = 2983 * (params.m : Error) *
-      finalStagePowerSum params eps delta (1 / (32 : Error)) := by ring_nf
+        finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+      ring_nf
     _ ≤ 3000 * (params.m : Error) *
-      finalStagePowerSum params eps delta (1 / (32 : Error)) := by
-        have hm_nonneg : 0 ≤ (params.m : Error) := m_cast_nonneg params
-        nlinarith [hm_nonneg, hsum32_nonneg]
+        finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+      have hm_nonneg : 0 ≤ (params.m : Error) := m_cast_nonneg params
+      nlinarith [hm_nonneg, hsum32_nonneg]
     _ = selfImprovementError params eps delta := by
       rw [selfImprovementError_eq_finalStagePowerSum]
 
