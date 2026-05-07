@@ -551,10 +551,10 @@ theorem final_fields_projective_residual_error_le_selfImprovementError_of_small_
             finalStagePowerSum params eps delta (1 / (32 : Error)) +
           2852 * (params.m : Error) *
             finalStagePowerSum params eps delta (1 / (32 : Error)) := by
-              nlinarith [hhelper_sqrt, hcard_term]
-  _ = 2983 * (params.m : Error) *
+      nlinarith [hhelper_sqrt, hcard_term]
+    _ = 2983 * (params.m : Error) *
       finalStagePowerSum params eps delta (1 / (32 : Error)) := by ring_nf
-  _ ≤ 3000 * (params.m : Error) *
+    _ ≤ 3000 * (params.m : Error) *
       finalStagePowerSum params eps delta (1 / (32 : Error)) := by
         have hm_nonneg : 0 ≤ (params.m : Error) := m_cast_nonneg params
         nlinarith [hm_nonneg, hsum32_nonneg]
