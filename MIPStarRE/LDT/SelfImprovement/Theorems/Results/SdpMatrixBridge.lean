@@ -200,6 +200,33 @@ theorem toMatrixSdpStatementWithSlacknessAndDominance
 
 end MatrixSdpCanonicalOptimalPairWithDominance
 
+namespace MatrixSdpCanonicalOptimalPair
+
+/-- Add the reduced-interface dominance condition to a saturated canonical
+optimal pair.
+
+The saturated package records the paper-facing strong-duality output: the
+primal slack block vanishes, but no condition `I ≤ Z` is imposed on the chosen
+dual witness.  This constructor keeps that distinction explicit while allowing
+callers that have separately proved `I ≤ Z` to reuse the existing
+dominance-carrying helper interface. -/
+theorem withDominance
+    {params : Parameters}
+    [FieldModel params.q]
+    {model : MatrixSdpRealization params}
+    {X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)}
+    {Z : MatrixOperator model.space}
+    (h : MatrixSdpCanonicalOptimalPair params model X Z)
+    (hOneLe : (1 : MatrixOperator model.space) ≤ Z) :
+    MatrixSdpCanonicalOptimalPairWithDominance params model X Z where
+  feasible := h.feasible
+  dualFeasible := h.dualFeasible
+  strongDuality := h.strongDuality
+  complementarySlackness := h.complementarySlackness
+  dualDominatesIdentity := hOneLe
+
+end MatrixSdpCanonicalOptimalPair
+
 namespace MatrixSdpOptimalWitness
 
 /-- A matrix optimal witness gives an abstract SDP optimal pair with slackness,
@@ -344,6 +371,27 @@ theorem sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance
     SdpStatementWithSlackness params strategy :=
   MatrixSdpStatementWithSlacknessAndDominance.toSdpStatementWithSlackness
     params strategy h.toMatrixSdpStatementWithSlacknessAndDominance
+
+/-- A saturated canonical optimal pair, together with a separately proved
+dominance bound `I ≤ Z`, gives the abstract Section 9 SDP statement with
+complementary slackness.
+
+This is the bridge from the paper-faithful saturated package
+`MatrixSdpCanonicalOptimalPair` to the current reduced helper interface, whose
+matrix-side input is still dominance-carrying. -/
+theorem sdpStatementWithSlackness_of_canonicalOptimalPair_of_dualDominatesIdentity
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
+      (matrixSdpPointRealizationOfStrategy params strategy)))
+    (Z : MIPStarRE.Quantum.Op ι)
+    (h : MatrixSdpCanonicalOptimalPair params
+      (matrixSdpPointRealizationOfStrategy params strategy) X Z)
+    (hOneLe : (1 : MIPStarRE.Quantum.Op ι) ≤ Z) :
+    SdpStatementWithSlackness params strategy :=
+  sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance
+    params strategy X Z (h.withDominance hOneLe)
 
 /-- A saturated canonical optimal pair gives the displayed abstract SDP
 measurement witness, without asserting the auxiliary dominance condition
