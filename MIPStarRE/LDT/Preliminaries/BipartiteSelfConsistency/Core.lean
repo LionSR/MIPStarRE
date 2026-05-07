@@ -19,17 +19,6 @@ namespace MIPStarRE.LDT.Preliminaries
 
 open MIPStarRE.LDT
 
-/-- The self-distance defect `qSDD ψ M M` is zero. -/
-private lemma qSDD_self
-    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι) (M : SubMeas Outcome ι) :
-    qSDD ψ M M = 0 := by
-  unfold qSDD qSDDCore
-  apply Finset.sum_eq_zero
-  intro a _
-  simp [ev]
-
 /-- The self-distance `sddError ψ 𝒟 A A` is zero. -/
 lemma sddError_self {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]

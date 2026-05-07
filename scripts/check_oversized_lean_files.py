@@ -4,10 +4,13 @@
 Reference: issue #1127 — every Lean file over 1000 lines must be split.
 This is a hard gate: any ``.lean`` file exceeding 1000 lines fails the check.
 
-Note: as of 2026-05-03, ``main`` still has ~19 files exceeding the threshold.
-This check is designed to be enabled once all current oversized files have been
-split.  Until then, it can be run locally as ``python3 scripts/check_oversized_lean_files.py --root .``
-to track progress.
+Known oversized files (tracked by issue #1127) can be listed via ``--known``
+arguments; they are reported as warnings but do **not** cause the check to fail.
+Once a known file is split, remove it from the ``--known`` list.
+
+Note: as of 2026-05-03, ``main`` still had ~19 files exceeding the threshold.
+As of 2026-05-07, only 1 remains: ``BoundednessTransport.lean`` (tracked by
+#1127 partial split).
 """
 
 from __future__ import annotations
@@ -52,13 +55,14 @@ def _count_lines(path: Path) -> int:
 # ---------------------------------------------------------------------------
 
 
-def check_files(root: Path) -> int:
+def check_files(root: Path, known_oversized: set[str]) -> int:
     """Scan all .lean files under *root*; return 1 if any exceed the threshold, else 0.
 
-    Every oversized file is reported as an error.  A summary line lists the
-    total count.
+    Files listed in *known_oversized* are reported as warnings (not errors)
+    and do not cause the check to fail.  Unknown oversized files cause failure.
     """
     oversized: list[tuple[int, str]] = []
+    known: list[tuple[int, str]] = []
     total: int = 0
 
     for path in root.rglob("*.lean"):
@@ -73,9 +77,20 @@ def check_files(root: Path) -> int:
 
         lines = _count_lines(path)
         if lines > THRESHOLD:
-            oversized.append((lines, rel))
+            if rel in known_oversized:
+                known.append((lines, rel))
+            else:
+                oversized.append((lines, rel))
 
-    # Report oversized files (sorted largest first)
+    # Report known oversized files as warnings
+    for lines, rel in sorted(known, reverse=True):
+        print(
+            f"::warning file={rel},line={THRESHOLD + 1},"
+            f"title=Known oversized Lean file::{rel}: {lines} lines "
+            f"(limit: {THRESHOLD}) — known, tracked by issue #1127"
+        )
+
+    # Report unknown oversized files as errors
     for lines, rel in sorted(oversized, reverse=True):
         print(
             f"::error file={rel},line={THRESHOLD + 1},"
@@ -83,11 +98,16 @@ def check_files(root: Path) -> int:
             f"(limit: {THRESHOLD})"
         )
 
-    print(f"Scanned {total} .lean files, {len(oversized)} exceed {THRESHOLD} lines.")
+    total_oversized = len(known) + len(oversized)
+    print(f"Scanned {total} .lean files, {total_oversized} exceed {THRESHOLD} lines"
+          f" ({len(known)} known, {len(oversized)} new).")
     if oversized:
-        print(f"::error::{len(oversized)} oversized file(s) detected.")
+        print(f"::error::{len(oversized)} new oversized file(s) detected.")
         return 1
-    print("All .lean files are within the line limit.")
+    if total_oversized == 0:
+        print("All .lean files are within the line limit.")
+    else:
+        print(f"{len(known)} known oversized file(s) — no new oversized files.")
     return 0
 
 
@@ -106,8 +126,17 @@ def main() -> int:
         default=Path("."),
         help="Repository root (default: .)",
     )
+    parser.add_argument(
+        "--known",
+        action="append",
+        default=[],
+        metavar="PATH",
+        help="Known oversized file (can be used multiple times). "
+             "Reported as a warning, not an error.",
+    )
     args = parser.parse_args()
-    return check_files(args.root.resolve())
+    known_set: set[str] = set(args.known)
+    return check_files(args.root.resolve(), known_set)
 
 
 if __name__ == "__main__":
