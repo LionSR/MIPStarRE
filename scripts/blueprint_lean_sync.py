@@ -1322,8 +1322,8 @@ def main() -> None:
         "--fail-on-missing-blueprint",
         action="store_true",
         help=(
-            "When used with --warn-missing-blueprint, exit with code 1 if any "
-            "changed declaration is missing a corresponding \\lean{} tag"
+            "Require --warn-missing-blueprint, and exit with code 1 if any changed "
+            "declaration is missing a corresponding \\lean{} tag"
         ),
     )
     parser.add_argument(
