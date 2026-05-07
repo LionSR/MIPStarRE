@@ -497,11 +497,11 @@ theorem final_fields_projective_residual_error_le_selfImprovementError_of_small_
     have hhelper_nonneg : 0 ≤ selfImprovementHelperError params eps delta := by
       unfold selfImprovementHelperError
       positivity
-    have horth_sqrt_nonneg :
+    have horth_nonneg :
         0 ≤ Real.sqrt (selfImprovementOrthogonalizationError params eps delta) := by
       positivity
-    unfold selfImprovementDataProcessingError
-    nlinarith [hhelper_nonneg, horth_sqrt_nonneg]
+    rw [selfImprovementDataProcessingError_eq]
+    nlinarith [hhelper_nonneg, horth_nonneg]
   have hcard_le :
       (Fintype.card (Fq params) : Error) * selfImprovementDataProcessingError params eps delta ≤
         (8464 : Error) * selfImprovementDataProcessingError params eps delta := by
