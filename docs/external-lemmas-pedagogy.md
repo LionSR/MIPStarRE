@@ -256,7 +256,7 @@ the `CFC.sqrt` of a PSD operator appears.
 Hermitian matrix via spectral decomposition, specifically `√A` for
 `A ≥ 0`.
 
-**Mathlib source**: `Mathlib.Analysis.CstarAlgebra.ContinuousFunctionalCalculus`
+**Mathlib source**: `Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus`
 provides the CFC.  For `Matrix ι ι ℂ`:
 
 - `CFC.sqrt_nonneg` — `0 ≤ A` ⇒ `0 ≤ √A`
@@ -346,13 +346,15 @@ Analogous to Polishchuk–Spielman but for the surface-vs-point test.
 ### Matrix Chernoff bound
 
 **Lean declaration**: `chernoffBernoulliMatrix` (internal, in
-`Pasting/Bernoulli/MatrixChernoff.lean`).
+`MIPStarRE/LDT/Pasting/Bernoulli/MatrixChernoff.lean`).
 
-This is a matrix-version of the Chernoff concentration bound, used for
-Bernoulli matrix sums.  The project now proves this internal statement locally
-using CFC reduction plus a local scalar Hoeffding step; it is no longer kept as
-an external `*Statement` hypothesis.  There remains a Mathlib gap for a general
-matrix Chernoff inequality (beyond this project-specific formalization).
+This is a fully proved lemma — the project supplies a local proof:
+`MIPStarRE/LDT/Pasting/Bernoulli/MatrixChernoff.lean:78`
+establishes `ChernoffBernoulliMatrixStatement` from explicit local hypotheses
+and without any unresolved statement-style (`*Statement`) hypothesis.  No
+pending external `*Statement` premise remains for this lemma.  There remains
+a Mathlib gap for a general matrix Chernoff inequality (beyond this
+project-specific formalization).
 
 **Pedagogical note**: The classical Chernoff bound says that the sum of
 independent Bernoulli random variables concentrates exponentially around
