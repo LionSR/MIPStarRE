@@ -75,7 +75,7 @@ Not a candidate for Mathlib.
 
 **Mathlib source**: `Mathlib.Algebra.MvPolynomial.SchwartzZippel`
 
-The Mathlib lemma `MvPolynomial.schwartz_zippel` gives exactly this bound
+The Mathlib lemma `MvPolynomial.schwartz_zippel_totalDegree` gives exactly this bound
 for polynomials over any integral domain, with zero-probability measured
 as a cardinality ratio over the full product space.  The project wraps it:
 
@@ -85,7 +85,8 @@ abbrev polyFunc (m : ℕ) (K : Type*) [CommSemiring K] (d : ℕ) :
   MvPolynomial.restrictDegree (Fin m) K d
 ```
 
-Then the Schwartz–Zippel bound follows from `MvPolynomial.schwartz_zippel`.
+Then the Schwartz–Zippel bound follows from
+`MvPolynomial.schwartz_zippel_totalDegree`.
 
 **Pedagogical note**: Schwartz–Zippel is a standard result in theoretical
 computer science.  The Mathlib proof follows the classical induction on
@@ -344,13 +345,14 @@ Analogous to Polishchuk–Spielman but for the surface-vs-point test.
 
 ### Matrix Chernoff bound
 
-**Lean declaration**: `chernoffBernoulliMatrix` (internal, in Commutativity/).
+**Lean declaration**: `chernoffBernoulliMatrix` (internal, in
+`Pasting/Bernoulli/MatrixChernoff.lean`).
 
 This is a matrix-version of the Chernoff concentration bound, used for
-Bernoulli matrix sums.  There is a Mathlib gap for the matrix case
-(standard Chernoff exists for scalars but not for matrix-valued random
-variables), so the project has a `*Statement` hypothesis pending
-upstreaming or local proof.
+Bernoulli matrix sums.  The project now proves this internal statement locally
+using CFC reduction plus a local scalar Hoeffding step; it is no longer kept as
+an external `*Statement` hypothesis.  There remains a Mathlib gap for a general
+matrix Chernoff inequality (beyond this project-specific formalization).
 
 **Pedagogical note**: The classical Chernoff bound says that the sum of
 independent Bernoulli random variables concentrates exponentially around
