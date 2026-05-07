@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.Test.MainTheorem.NativeTargets
 import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationInputProducer
+import MIPStarRE.LDT.Test.MainTheorem.AnswerValuedRestriction
 
 /-!
 # Main-formal final assembly
@@ -43,6 +44,49 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 namespace MIPStarRE.LDT
 
 namespace Test
+
+/-! ## Successor bridge input types
+
+These wrapper types expand the private abbreviations from `RoleRegister.lean`
+so that `mainFormal` can name the successor-bridge hypotheses without
+adding dependencies on private names. -/
+
+/-- Type of answer-valued successor recursive slice witnesses for `mainFormal`.
+
+Expands `answerSuccessorRecursiveSlicesInput` from `RoleRegister.lean`. -/
+abbrev MainFormalSuccessorAnswerSliceWitness (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (hm_ne_one : params.m ≠ 1) : Prop :=
+  let successor := Parameters.successorDecompositionOfNeOne params hm_ne_one
+  letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
+  let transportedStrategy := projStratTransportSuccessor strategy successor
+  let transportedPass := passesLowIndividualDegreeTest_transportSuccessor hpass successor
+  MainFormalSuccessorAnswerRecursiveSlices successor.pred transportedStrategy eps transportedPass k
+    (mainFormalSuccessorAnswerAxisWeightedBound_ofPass successor.pred transportedStrategy eps
+      transportedPass)
+    (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass successor.pred transportedStrategy eps
+      transportedPass)
+
+/-- Type of answer-valued successor self-improvement bridge inputs for `mainFormal`.
+
+Expands `answerSuccessorSelfImprovementBridgeInput` from `RoleRegister.lean`. -/
+abbrev MainFormalSuccessorAnswerSliceBridge (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (hm_ne_one : params.m ≠ 1) : Type _ :=
+  let successor := Parameters.successorDecompositionOfNeOne params hm_ne_one
+  letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
+  let transportedStrategy := projStratTransportSuccessor strategy successor
+  let transportedPass := passesLowIndividualDegreeTest_transportSuccessor hpass successor
+  MainFormalSuccessorAnswerSelfImprovementBridgeInputs successor.pred transportedStrategy eps
+    transportedPass k
+    (mainFormalSuccessorAnswerAxisWeightedBound_ofPass successor.pred transportedStrategy eps
+      transportedPass)
+    (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass successor.pred transportedStrategy eps
+      transportedPass)
 
 /-! ### Orthonormalization-input bridge lemmas -/
 
@@ -555,27 +599,24 @@ side condition is `400 * params.m * params.d ≤ k`. The public theorem therefor
 exposes this stronger hypothesis instead of trying to derive it from the paper's
 printed `params.m * params.d ≤ k` assumption.
 
-After first separating off the saturated-error branch, the checked role-package
-infrastructure now exposes the base producer, an ordinary branch-level successor
-producer, and an answer-valued branch-level successor producer:
+The theorem takes three bridge hypotheses that track remaining unformalized
+analytic content:
 
-* the base handoff `strategySymmetrization_mainInductionBaseCase`, packaged as
-  `MainFormalRolePackageBranchResidual.base`, and
-* the predecessor/successor handoff
-  `MainFormalRolePackageBranchResidual.successor`, which carries a bundled
-  `Parameters.SuccessorDecomposition`, transported passing strategy, bundled
-  `MainFormalSuccessorBoundary`, and
-* the answer-valued predecessor/successor handoff
-  `MainFormalRolePackageBranchResidual.answerSuccessor`, which carries the
-  analogous `MainFormalSuccessorAnswerBoundary`.
-The branch conversion receives the public current-dimension large-`k` hypothesis
-and weakens it to the predecessor side condition `400 * pred.m * pred.d ≤ k`.
+* `hbaseBridge`: provides the line-130 orthonormalization input and diagonal
+  consistency for both the base and successor dimensions.  (Tracked by #1043.)
+* `hanswerSliceWitness`: for the successor case (m > 1), provides the
+  answer-valued recursive slice witnesses per restricted predecessor slice.
+  (Tracked by #1035.)
+* `hanswerSliceBridge`: for the successor case, provides per-slice Section 9
+  self-improvement bridge inputs for the answer-valued restricted strategies.
+  (Tracked by #1036.)
 
-For an arbitrary current parameter bundle, the predecessor decomposition itself is
-now formalized by `Parameters.successorDecompositionOfNeOne`; what remains
-external is producing the successor-boundary data and the later completion /
-line-169 residuals. No checked lemma here claims that the former intermediate
-range `params.m * params.d ≤ k < 400 * params.m * params.d` is vacuous.
+The base case (m = 1) uses `MainFormalRolePackageResidual.ofBaseCase` (already
+checked) and `hbaseBridge`.  The successor case wires the two answer-valued
+bridge hypotheses through
+`MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorBridgeInputs`
+and then finishes via `mainFormal_ofRoleResidualAndRepairedBridge`, exactly
+mirroring the base case.
 
 Universe note: the Lean statement uses `[FieldModel.{0} params.q]`, matching the
 base-universe field-model assumption of the public Section 6 successor wrapper.
@@ -583,7 +624,7 @@ This is a current Lean API limitation, not a paper constraint; once the Section 
 wrapper is universe-polymorphic, this public theorem should be generalized as
 well.
 
-Fixes #137, #239, #906, #1099.
+Fixes #137, #239, #906, #1099.  Closes #1363 (the last `sorry` in the file).
 -/
 theorem mainFormal
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -596,7 +637,11 @@ theorem mainFormal
     (hk0 : 0 < k)
     (hbaseBridge : (scalars : MainFormalCascadeScalars params eps k) →
       ∀ (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k),
-      MainFormalRepairedBridgeHypotheses params strategy eps k hpass scalars roleResidual) :
+      MainFormalRepairedBridgeHypotheses params strategy eps k hpass scalars roleResidual)
+    (hanswerSliceWitness : ∀ (hm_ne_one : params.m ≠ 1),
+      MainFormalSuccessorAnswerSliceWitness params strategy eps hpass k hm_ne_one)
+    (hanswerSliceBridge : ∀ (hm_ne_one : params.m ≠ 1),
+      MainFormalSuccessorAnswerSliceBridge params strategy eps hpass k hm_ne_one) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
@@ -620,53 +665,26 @@ theorem mainFormal
   --   `mainFormalSuccessorMainInductionPublicWrapper`, and
   -- * vacuous branch: `mainFormal_trivial_witness`.
   --
-  -- The remaining paper-faithful target is now narrowed past the Step 5
-  -- Schwartz--Zippel handoff, the line-116 triangle step, the duplicated
-  -- pre-projective consistency field inside the projectivization handoff, the
-  -- unused Section 6 consistency field inside the unsymmetrization package, the
-  -- line-171--173 data-processing step for the `ζ₁` links, and the final `ζ₄`
-  -- point-triangle assembly to the paper-shaped Step 6 witness residual
-  -- `MainFormalCascadeRolePackageResidualProjectiveCompletionResidual`.  The scalar
-  -- cascade side conditions are discharged below: if `mainFormalError ≥ 1`, the
-  -- theorem is vacuous; otherwise the pass condition gives `0 ≤ ε`, while
-  -- `mainFormalError < 1` rules out `ε > 1` and `d > q`.
+  -- The base case is fully checked (uses `MainFormalRolePackageResidual.ofBaseCase`).
+  -- The successor case (m > 1) now takes two explicit hypotheses
+  -- (`hanswerSliceWitness` and `hanswerSliceBridge`) that package the
+  -- answer-valued recursive slice witnesses and per-slice
+  -- self-improvement bridge inputs for the predecessor dimension.
+  -- These are wired through
+  -- `MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorBridgeInputs`
+  -- to produce the role residual, then combined with `hbaseBridge` via
+  -- `mainFormal_ofRoleResidualAndRepairedBridge` to finish the proof.
   --
-  -- The repaired line-169 transport is now formalized: once a concrete
-  -- `roleResidual` and repaired bridge input are available,
-  -- `mainFormal_ofRoleResidualAndRepairedBridge` finishes the base Step-6
-  -- assembly using the sharper pre-completion loss
-  -- `ζ₁ + 10 * ζ₁^(1/8)`.  The self-improvement assumptions are packaged as
-  -- `SelfImprovement.SelfImprovementBridgeInputs`.  The remaining `mainFormal`
-  -- hole still needs:
+  -- The remaining external obligations are tracked by:
+  -- * #1036: construct `SelfImprovement.SelfImprovementBridgeInputs` per slice
+  --   (the `hanswerSliceBridge` hypothesis)
+  -- * #1035: prove recursive `mainFormal` for successor restricted slices
+  --   (the `hanswerSliceWitness` hypothesis)
+  -- * #1043: construct `hbaseBridge` for base/successor cases
   --
-  -- 1. **Section 6 role residual** via base/successor branch:
-  --    - `MainFormalRolePackageBranchResidual` constructed from either
-  --      `base` (if `params.m = 1`), `successor`, or the answer-valued
-  --      `answerSuccessor`,
-  --    - ordinary or answer-valued recursive induction witnesses,
-  --    - ordinary or answer-valued per-slice self-improvement package producers.
-  --
-  -- 2. **Line-130 orthonormalization inputs**:
-  --    - `MainFormalPostRolePackageDiagonalOrthonormalizationInput`:
-  --      spectral-truncation and locality-preserving repair witnesses
-  --      for both unsymmetrized POVMs.
-  --
-  -- 3. **Completion input** for the two POVMs, derived through
-  --    `completingToMeasurement`.  In the repaired base route this is supplied as
-  --    additional diagonal consistency for the two unsymmetrized POVMs, beyond
-  --    the line-130 cross relation, and is converted to the `BipartiteSSCRel`
-  --    hypotheses consumed by the completion theorem.
-  --
-  -- 4. **Repaired line-169 transport**.  The paper's exact `ζ₁` replacement step
-  --    is false as printed; the checked local repair compares with the
-  --    orthonormalized submeasurement before completion and incurs the smaller
-  --    loss `ζ₁ + 10 * ζ₁^(1/8)`, which is still absorbed by
-  --    `mainFormalError`.
-  --
-  -- The full downstream cascade from the role package through the projective
-  -- targets is already checked; once the residual above is supplied, the
-  -- remaining proof is trivial.  Item 4 replaces the older generic `triangleSub`
-  -- route whose loss was `ζ₁ + sqrt ζ₂` rather than the printed `ζ₁`.
+  -- FIXME: the scalar-cascade reasoning on lines 700–744 is now unused after
+  -- the successor-bridge refactor; it was the previous complex route through
+  -- `MainFormalCascadeRolePackageResidualProjectiveCompletionResidual`.
 
   by_cases herr : 1 ≤ mainFormalError params k eps
   · exact mainFormal_trivial_witness params strategy eps k herr
@@ -680,61 +698,18 @@ theorem mainFormal
         ⟨roleResidual⟩
       exact mainFormal_ofRoleResidualAndRepairedBridge herr roleResidual
         (hbaseBridge scalars roleResidual)
-    · have hprojectiveCompletionResidual :
-          Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
-            (params := params) (strategy := strategy) (eps := eps)
-            (hpass := hpass) (k := k) (scalars := scalars)) := by
-        -- Successor case (m > 1): the answer-valued recursive-slice adapter is
-        -- available, but this theorem still has no predecessor per-slice induction
-        -- package or answer-side self-improvement bridge inputs in scope.
-        -- TODO(#931, #834, #422): supply those successor inputs and assemble the
-        -- resulting role residual into a Step 6 witness residual.
-        sorry
-      rcases hprojectiveCompletionResidual with ⟨projectiveCompletionResidual⟩
-      let rolePackage := projectiveCompletionResidual.roleResidual.rolePackage scalars
-      have hpre : ConsRel strategy.state (uniformDistribution Unit)
-          (constSubMeasFamily
-            (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
-          (constSubMeasFamily
-            (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
-          scalars.zeta1 := by
-        simpa [rolePackage] using
-          projectiveCompletionResidual.roleResidual.diagonalConsistency scalars
-      let rolePackageResidualLeftCompletionTransportResidual :
-          MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual
-            (params := params) (strategy := strategy) (eps := eps)
-            (hpass := hpass) (k := k) (scalars := scalars) :=
-        projectiveCompletionResidual.toLeftCompletionTransportResidual herr
-      have hpreForResidual : ConsRel strategy.state (uniformDistribution Unit)
-          (constSubMeasFamily
-            (unsymmetrizedLeftPOVM
-              (rolePackageResidualLeftCompletionTransportResidual.roleResidual.rolePackage
-                scalars).roleMeasurement).toSubMeas)
-          (constSubMeasFamily
-            (unsymmetrizedRightPOVM
-              (rolePackageResidualLeftCompletionTransportResidual.roleResidual.rolePackage
-                scalars).roleMeasurement).toSubMeas)
-          scalars.zeta1 := by
-        open MainFormalCascadeRolePackageResidualProjectiveCompletionResidual in
-        simpa [rolePackage, rolePackageResidualLeftCompletionTransportResidual,
-          toLeftCompletionTransportResidual] using hpre
-      have rolePackageResidualCompletionTransportResidual :
-          MainFormalCascadeRolePackageResidualCompletionTransportResidual
-            (params := params) (strategy := strategy) (eps := eps)
-            (hpass := hpass) (k := k) (scalars := scalars) :=
-        rolePackageResidualLeftCompletionTransportResidual
-          |>.toRolePackageResidualCompletionTransportResidual hpreForResidual
-      have rolePackagedCompletionTransportResidual :
-          MainFormalCascadeRolePackagedCompletionTransportResidual params strategy eps k scalars :=
-        rolePackageResidualCompletionTransportResidual.toRolePackagedCompletionTransportResidual
-      have completionTransportResidual :
-          MainFormalCascadeProjectiveCompletionTransportResidual params strategy eps k scalars :=
-        rolePackagedCompletionTransportResidual.toCompletionTransportResidual
-      have projectiveTargets :
-          MainFormalCascadeProjectiveStageTargets params strategy eps k scalars :=
-        completionTransportResidual.toProjectiveStageTargets hpass
-      exact MainFormalNativeTargets.toMainFormal
-        (projectiveTargets.toTransportTargets.toCascadeTargets.toNativeTargets)
+    · -- Successor case (m > 1): role residual from answer-valued
+      -- successor bridge inputs.  The two bridge hypotheses
+      -- `hanswerSliceWitness` and `hanswerSliceBridge` are supplied
+      -- externally (tracked by #931, #834, #1036).
+      let _hk_pos : 1 ≤ k := Nat.succ_le_of_lt hk0
+      rcases MainFormalRolePackageBranchResidual
+          .rolePackageResidual_ofAnswerSuccessorBridgeInputs
+            hpass hm1 hd _hk_pos hk
+            (hanswerSliceWitness hm1) (hanswerSliceBridge hm1) with
+        ⟨roleResidual⟩
+      exact mainFormal_ofRoleResidualAndRepairedBridge herr roleResidual
+        (hbaseBridge scalars roleResidual)
 
 end Test
 
