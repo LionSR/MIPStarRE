@@ -468,7 +468,7 @@ as in `final_fields_projective_residual_error_le_selfImprovementError`.
 The explicit bound `|F_q| ≤ 8464` is a concrete branch condition; it is not implied by
 the standing unit-interval hypotheses and is isolated here so the dependency is explicit.
 -/
-theorem final_fields_projective_residual_error_of_small_alphabet_le_selfImprovementError
+theorem final_fields_projective_residual_error_le_selfImprovementError_of_small_alphabet
     (params : Parameters) [FieldModel params.q]
     (eps delta : Error)
     (heps : 0 ≤ eps) (heps_le_one : eps ≤ 1)

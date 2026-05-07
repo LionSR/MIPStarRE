@@ -875,7 +875,7 @@ explicit finite-field branch.
 Under `|F_q| ≤ 8464`, the additional term
 `√(#F_q * selfImprovementDataProcessingError)` is absorbed into
 `selfImprovementError` by the explicit coefficient estimate in
-`final_fields_projective_residual_error_of_small_alphabet_le_selfImprovementError`.
+`final_fields_projective_residual_error_le_selfImprovementError_of_small_alphabet`.
 
 The hypothesis is a concrete branch condition and can be discharged where the
 global parameters satisfy the finite-field size constraint. -/
@@ -904,7 +904,7 @@ theorem final_fields_point_consistency_totalGap_of_data_processing_of_small_alph
       (polynomialEvaluationFamily params H.toSubMeas)
       (selfImprovementError params eps delta) :=
   MIPStarRE.LDT.ConsRel.mono
-    (final_fields_projective_residual_error_of_small_alphabet_le_selfImprovementError
+    (final_fields_projective_residual_error_le_selfImprovementError_of_small_alphabet
       params eps delta heps heps_le_one hdelta hdelta_le_one hd_le_q hq_le)
     (final_fields_point_consistency_totalGap_natural_of_data_processing
       params strategy eps delta hhelperPoint hdata)
