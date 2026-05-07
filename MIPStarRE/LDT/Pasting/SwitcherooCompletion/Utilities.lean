@@ -109,8 +109,7 @@ lemma pointWithCompletePart_as_switcheroo_input
                 completePartPointProductRight, completePartSubMeas,
                 multiplyByTotalOnRight, multiplyByTotalOnLeft,
                 orderedProductOpFamily, reversedProductOpFamily,
-                OpFamily.leftPlacedOpFamily, postprocess_total, hsingle,
-                (family.meas q.1).sum_eq_total,
+                OpFamily.leftPlacedOpFamily, postprocess_total,
                 (family.meas q.2).sum_eq_total]
     _ ≤ gamma := hcomm
 

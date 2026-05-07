@@ -28,7 +28,8 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 private noncomputable def evaluatedSlicePhaseFourInserted
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (C : EvaluatedSliceQuestion params → EvaluatedSliceOutcome params → MIPStarRE.Quantum.Op (ι × ι)) :
+    (C : EvaluatedSliceQuestion params → EvaluatedSliceOutcome params →
+      MIPStarRE.Quantum.Op (ι × ι)) :
     EvaluatedSliceQuestion params → Error := fun q =>
   ∑ ab : EvaluatedSliceOutcome params,
     ev strategy.state
@@ -40,7 +41,8 @@ private noncomputable def evaluatedSlicePhaseFourInserted
 private noncomputable def evaluatedSlicePhaseFourSwapped
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (C : EvaluatedSliceQuestion params → EvaluatedSliceOutcome params → MIPStarRE.Quantum.Op (ι × ι)) :
+    (C : EvaluatedSliceQuestion params → EvaluatedSliceOutcome params →
+      MIPStarRE.Quantum.Op (ι × ι)) :
     EvaluatedSliceQuestion params → Error := fun q =>
   ∑ ab : EvaluatedSliceOutcome params,
     ev strategy.state
@@ -88,7 +90,8 @@ private lemma evaluatedSlice_pointSwap_right_bound_of_norms
     (eps delta gamma : Error)
     (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
-    (C : EvaluatedSliceQuestion params → EvaluatedSliceOutcome params → MIPStarRE.Quantum.Op (ι × ι))
+    (C : EvaluatedSliceQuestion params → EvaluatedSliceOutcome params →
+      MIPStarRE.Quantum.Op (ι × ι))
     (hC : ∀ q, ∑ ab : EvaluatedSliceOutcome params, C q ab * (C q ab)ᴴ ≤ 1)
     (lhs rhs : EvaluatedSliceQuestion params → Error)
     (hlhs : avgOver (uniformDistribution (EvaluatedSliceQuestion params)) lhs =

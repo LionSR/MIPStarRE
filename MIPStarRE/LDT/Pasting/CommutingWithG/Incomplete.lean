@@ -147,9 +147,7 @@ theorem commutingWithGIncomplete
                     completePartTotalProductLeft, completePartTotalProductRight,
                     OpFamily.leftPlacedOpFamily, multiplyByTotalOnRight,
                     multiplyByTotalOnLeft, incompletePartSubMeas, completePartSubMeas,
-                    sub_eq_add_neg, leftTensor, hq1, h₂,
-                    (family.meas q.1).sum_eq_total,
-                    (family.meas q.2).sum_eq_total]
+                    sub_eq_add_neg, leftTensor, h₂, (family.meas q.1).sum_eq_total]
               rw [hdiff]
       _ ≤ commutingWithGIncompleteError params gamma zeta := by
           simpa [commutingWithGIncompleteError] using hcomplete_bound

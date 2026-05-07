@@ -32,7 +32,8 @@ lemma switcherooCompletePartTotal_hermitian
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
     (q : SlicePairQuestion params) :
-    ((completePartSubMeas params family q.1).total)ᴴ = (completePartSubMeas params family q.1).total :=
+    ((completePartSubMeas params family q.1).total)ᴴ =
+      (completePartSubMeas params family q.1).total :=
   (Matrix.nonneg_iff_posSemidef.mp
     (SubMeas.total_nonneg (completePartSubMeas params family q.1))).isHermitian.eq
 
@@ -149,7 +150,9 @@ lemma switcherooAggregateFourthTermX_sum
   intro o _
   calc
     ∑ g : Polynomial params, (M q.2).outcome o * (family.meas q.1).outcome g * (M q.2).outcome o
-      = (M q.2).outcome o * (∑ g : Polynomial params, (family.meas q.1).outcome g) * (M q.2).outcome o := by
+      = (M q.2).outcome o *
+          (∑ g : Polynomial params, (family.meas q.1).outcome g) *
+          (M q.2).outcome o := by
           simp [mul_assoc, Matrix.mul_sum, Finset.sum_mul]
     _ = (M q.2).outcome o * (completePartSubMeas params family q.1).total * (M q.2).outcome o := by
           rw [(family.meas q.1).sum_eq_total]

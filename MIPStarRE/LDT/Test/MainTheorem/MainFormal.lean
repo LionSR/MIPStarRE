@@ -348,7 +348,8 @@ theorem baseMainFormal_ofRepairedBaseBridge
       (constSubMeasFamily Q_B.toSubMeas)
       scalars.zeta3 := by
     simpa [Q_A, Q_B, MainFormalCascadeScalars.zeta3, cascadeZeta3] using
-      MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.fullPolynomialConsistency hline156Handoff
+      MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.fullPolynomialConsistency
+        hline156Handoff
   have hself : ConsRel strategy.state (uniformDistribution Unit)
       (constSubMeasFamily Q_A.toSubMeas)
       (constSubMeasFamily Q_B.toSubMeas)
@@ -374,8 +375,8 @@ theorem baseMainFormal_ofRepairedBaseBridge
       (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
       (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error))) := by
     simpa [Q_A] using
-      MainFormalPostRolePackageDiagonalOrthonormalizationResidual.leftPolynomialConsistency_with_orthonormalization_loss
-        orthResidual a0 hpre
+      (open MainFormalPostRolePackageDiagonalOrthonormalizationResidual in
+        leftPolynomialConsistency_with_orthonormalization_loss orthResidual a0 hpre)
   have hrightPre : ConsRel strategy.state (uniformDistribution Unit)
       (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
       (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
@@ -390,13 +391,14 @@ theorem baseMainFormal_ofRepairedBaseBridge
       (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
       (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error))) := by
     simpa [Q_B] using
-      MainFormalPostRolePackageDiagonalOrthonormalizationResidual.rightPolynomialConsistency_with_orthonormalization_loss
-        orthResidual a0 hrightPre
+      (open MainFormalPostRolePackageDiagonalOrthonormalizationResidual in
+        rightPolynomialConsistency_with_orthonormalization_loss orthResidual a0 hrightPre)
   have hprojEval : ConsRel strategy.state (uniformDistribution (Point params))
       (polynomialEvaluationFamily params Q_A.toSubMeas)
       (polynomialEvaluationFamily params Q_B.toSubMeas)
       (scalars.zeta3 / 2) := by
-    simpa [Q_A, Q_B] using projectiveEvaluationConsistency_ofFullPolynomialConsistency Q_A Q_B hline156
+    simpa [Q_A, Q_B] using
+      projectiveEvaluationConsistency_ofFullPolynomialConsistency Q_A Q_B hline156
   have hleftEval : ConsRel strategy.state (uniformDistribution (Point params))
       (polynomialEvaluationFamily params Q_A.toSubMeas)
       (polynomialEvaluationFamily params
