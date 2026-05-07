@@ -71,11 +71,11 @@ theorem exists_xHat_of_positive_gram_spectrum
     exists_unitary_with_positive_gram_spectrum_rows_of_card X Q hQ hgram
   obtain ⟨W, hW, hW_rows⟩ :=
     exists_rectangular_coisometry_with_positive_gram_spectrum_right_rows Q hQ e hcard
+  have hchoices := xHat_of_positive_gram_spectrum_choices X Q hQ hQ_pos hgram e
+    U W hU_left hU_right hU_rows hW hW_rows
   refine ⟨Uᵀ * W, ?_, ?_⟩
-  · exact (xHat_of_positive_gram_spectrum_choices X Q hQ hQ_pos hgram e
-      U W hU_left hU_right hU_rows hW hW_rows).1
-  · exact (xHat_of_positive_gram_spectrum_choices X Q hQ hQ_pos hgram e
-      U W hU_left hU_right hU_rows hW hW_rows).2
+  · exact hchoices.1
+  · exact hchoices.2
 
 /-- Sigma-range specialization of the positive-Gram `Xhat` construction.
 
