@@ -46,11 +46,15 @@ jobs:
         id: audit
         run: |
           set -eo pipefail
+          # Single invocation: --out writes JSON, the human report goes to
+          # stderr, and --emit-gha-output writes has_fail/has_warn/finding_count
+          # into $GITHUB_OUTPUT.  Walking 425 Lean files twice was the previous
+          # waste — see norm 0003 (read CI logs / don't repeat work).
           python3 scripts/audit_drift.py \
             --root . \
-            --out "$RUNNER_TEMP/drift.json"
-          # Re-emit the human report into the step summary.
-          python3 scripts/audit_drift.py --root . --out /dev/null 2>"$RUNNER_TEMP/drift.txt"
+            --out "$RUNNER_TEMP/drift.json" \
+            --emit-gha-output \
+            2> "$RUNNER_TEMP/drift.txt"
           {
             echo "## Drift audit"
             echo ""
@@ -58,20 +62,6 @@ jobs:
             cat "$RUNNER_TEMP/drift.txt"
             echo "\`\`\`"
           } >> "$GITHUB_STEP_SUMMARY"
-
-          # Compute fail/warn flags for downstream steps.
-          python3 - <<'PY'
-          import json, os, pathlib
-          payload = json.loads(pathlib.Path(os.environ["RUNNER_TEMP"], "drift.json").read_text())
-          findings = payload.get("findings", [])
-          fail = any(f.get("severity") == "fail" for f in findings)
-          warn = any(f.get("severity") == "warn" for f in findings)
-          out = pathlib.Path(os.environ["GITHUB_OUTPUT"])
-          with out.open("a") as fp:
-              fp.write(f"has_fail={'true' if fail else 'false'}\n")
-              fp.write(f"has_warn={'true' if warn else 'false'}\n")
-              fp.write(f"finding_count={len(findings)}\n")
-          PY
 
       - name: Upload drift artefact
         uses: actions/upload-artifact@v4

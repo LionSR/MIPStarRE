@@ -30,7 +30,24 @@ import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable
+
+# Make sibling scripts importable both when this file is invoked directly
+# (``python3 scripts/audit_drift.py``) and when it is imported as a module
+# (e.g. by ``scripts/tests/test_audit_drift.py``).
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+# Reuse the project's canonical Lean parsing primitives so this audit agrees
+# with the badge counts and the duplicate-helper audit.
+from generate_badges import (  # noqa: E402  -- import after sys.path injection
+    AXIOM_RE,
+    SORRY_RE,
+    strip_comments_and_strings,
+)
+from check_duplicate_private_helpers import iter_lean_files  # noqa: E402
+from _bot_fix_constants import (  # noqa: E402
+    BOT_FIX_PREFIXES,
+    MAX_BOT_FIX_ITERATIONS,
+)
 
 # ---------------------------------------------------------------------------
 # Configuration
@@ -40,35 +57,34 @@ from typing import Iterable
 # Mirrors ``scripts/check_oversized_lean_files.py``.
 OVERSIZED_LINE_BUDGET = 1000
 
-# Iteration cap for auto-fix loops, mirrored from
-# ``.github/workflows/_ci-auto-fix-shared.yml`` and ``auto-fix.yml``.
-MAX_BOT_FIX_ITERATIONS = 5
-BOT_FIX_PREFIXES = ("[claude-auto-fix]", "[claude-review-fix]")
+# Forbidden tokens beyond ``sorry``/``axiom`` (those have dedicated counters).
+# Each pattern is matched against the comment-and-string-stripped source so
+# occurrences inside docstrings or string literals don't count.
+EXTRA_FORBIDDEN_TOKENS: dict[str, re.Pattern[str]] = {
+    "admit":          re.compile(r"\badmit\b"),
+    "native_decide":  re.compile(r"\bnative_decide\b"),
+    "unsafeCast":     re.compile(r"\bunsafeCast\b"),
+    "unsafeCoerce":   re.compile(r"\bunsafeCoerce\b"),
+    "lcProof":        re.compile(r"\blcProof\b"),
+    "ofReduceBool":   re.compile(r"\bofReduceBool\b"),
+    "ofReduceNat":    re.compile(r"\bofReduceNat\b"),
+    "dbg_trace":      re.compile(r"\bdbg_trace\b"),
+}
 
-# Tokens that are unconditionally forbidden in tracked Lean files.
-FORBIDDEN_LEAN_TOKENS = (
-    "sorry",
-    "admit",
-    "native_decide",
-    "unsafeCast",
-    "unsafeCoerce",
-    "lcProof",
-    "ofReduceBool",
-    "ofReduceNat",
-    "dbg_trace",
+# Declaration starters whose docstring presence we measure.  Intentionally
+# narrow: extending this set widens the metric, which would silently shift
+# the baseline.  See norm 0005.
+DECL_PATTERN = re.compile(
+    r"^(?:noncomputable\s+|protected\s+|private\s+)*(?:def|theorem|lemma)\s+",
+    re.MULTILINE,
 )
 
-# Distinguish a real ``sorry`` from a substring inside an identifier or word.
-# The pattern requires a non-word character on either side.
-TOKEN_PATTERNS = {
-    token: re.compile(rf"(?<!\w){re.escape(token)}(?!\w)")
-    for token in FORBIDDEN_LEAN_TOKENS + ("axiom",)
-}
+# Capture each ``axiom <Name>`` declaration so allow-listed entries can be
+# subtracted from the count.
+AXIOM_DECL_PATTERN = re.compile(r"^\s*axiom\s+([A-Za-z0-9_'.]+)", re.MULTILINE)
 
 DEFAULT_BASELINE_PATH = Path("audits/drift/baseline.json")
 DEFAULT_ALLOWLIST_PATH = Path("audits/drift/axiom_allowlist.json")
-LEAN_GLOB = "**/*.lean"
-LEAN_ROOTS = ("MIPStarRE", "MIPStarRE.lean")
 
 
 # ---------------------------------------------------------------------------
@@ -85,10 +101,9 @@ class Snapshot:
     axiom_count_total: int = 0
     axiom_count_after_allowlist: int = 0
     oversized_lean_files: int = 0
-    oversized_lean_files_paths: list[str] = field(default_factory=list)
     forbidden_token_hits: dict[str, int] = field(default_factory=dict)
-    defs_total: int = 0
-    defs_missing_docstring: int = 0
+    decls_total: int = 0
+    decls_missing_docstring: int = 0
     lean_files_total: int = 0
     total_lean_lines: int = 0
     consecutive_botfix_commits_max: int = 0
@@ -129,34 +144,27 @@ def _git_head_sha(root: Path) -> str:
     return sha or "unknown"
 
 
-def _iter_lean_files(root: Path) -> Iterable[Path]:
-    base = root / "MIPStarRE"
-    if base.is_dir():
-        yield from sorted(p for p in base.rglob("*.lean") if p.is_file())
-    top = root / "MIPStarRE.lean"
-    if top.is_file():
-        yield top
+def _now_utc_iso() -> str:
+    return _dt.datetime.now(_dt.UTC).isoformat().replace("+00:00", "Z")
 
 
-def _count_pattern_in_text(text: str, pattern: re.Pattern[str]) -> int:
-    # Strip comments before counting tokens. Lean comments: ``--`` to end of
-    # line and ``/-`` ... ``-/`` block comments.  We approximate cheaply: this
-    # is a drift heuristic, not a parser.
-    text_no_block = re.sub(r"/-.*?-/", "", text, flags=re.DOTALL)
-    text_no_line = re.sub(r"--[^\n]*", "", text_no_block)
-    return len(pattern.findall(text_no_line))
+def _measure_lean_files(root: Path, allowlist: dict) -> tuple[Snapshot, list[str]]:
+    """Walk Lean files under ``root`` and produce a snapshot plus the list of
+    oversized file paths (relative to ``root``).
 
+    The oversized-paths list is returned separately so callers can include it
+    in a per-run report without persisting it into the baseline (where it
+    would create diff noise on every rename).
+    """
 
-def _measure_lean_files(root: Path, allowlist: dict) -> Snapshot:
-    snap = Snapshot(commit=_git_head_sha(root), generated_at=_dt.datetime.utcnow().isoformat() + "Z")
-    forbidden_hits: dict[str, int] = {token: 0 for token in FORBIDDEN_LEAN_TOKENS}
-    axiom_pattern = TOKEN_PATTERNS["axiom"]
-    axiom_decl_pattern = re.compile(r"^\s*axiom\s+([A-Za-z0-9_'.]+)", re.MULTILINE)
-    def_pattern = re.compile(r"^(?:noncomputable\s+|protected\s+|private\s+)*(?:def|theorem|lemma)\s+", re.MULTILINE)
-    docstring_re = re.compile(r"/--[\s\S]*?-/\s*$", re.MULTILINE)
-
+    snap = Snapshot(commit=_git_head_sha(root), generated_at=_now_utc_iso())
+    forbidden_hits: dict[str, int] = {token: 0 for token in EXTRA_FORBIDDEN_TOKENS}
     seen_axioms: set[str] = set()
-    for path in _iter_lean_files(root):
+    oversized_paths: list[str] = []
+
+    base = root / "MIPStarRE"
+    candidate_iter = iter_lean_files(base) if base.is_dir() else iter([])
+    for path in candidate_iter:
         try:
             text = path.read_text(encoding="utf-8")
         except (OSError, UnicodeDecodeError):
@@ -167,33 +175,35 @@ def _measure_lean_files(root: Path, allowlist: dict) -> Snapshot:
         snap.total_lean_lines += line_count
         if line_count > OVERSIZED_LINE_BUDGET:
             snap.oversized_lean_files += 1
-            snap.oversized_lean_files_paths.append(str(path.relative_to(root)))
+            oversized_paths.append(str(path.relative_to(root)))
 
-        for token, pattern in TOKEN_PATTERNS.items():
-            if token == "axiom":
-                continue
-            count = _count_pattern_in_text(text, pattern)
-            if count:
-                forbidden_hits[token] = forbidden_hits.get(token, 0) + count
+        # Strip comments and strings ONCE per file; reuse the cleaned buffer
+        # across every token / declaration scan.
+        cleaned = strip_comments_and_strings(text)
 
-        # ``sorry`` is also tracked separately (it is the headline metric).
-        snap.sorry_count = forbidden_hits.get("sorry", 0)
+        snap.sorry_count += len(SORRY_RE.findall(cleaned))
+        for token, pattern in EXTRA_FORBIDDEN_TOKENS.items():
+            forbidden_hits[token] += len(pattern.findall(cleaned))
 
-        # Axiom declarations: count occurrences of the keyword and capture
-        # the declared name so we can subtract allow-listed entries.
-        snap.axiom_count_total += _count_pattern_in_text(text, axiom_pattern)
-        for match in axiom_decl_pattern.finditer(text):
+        snap.axiom_count_total += len(AXIOM_RE.findall(cleaned))
+        for match in AXIOM_DECL_PATTERN.finditer(cleaned):
             seen_axioms.add(match.group(1))
 
-        # Definitions / theorems lacking a docstring.  Heuristic: a def line
-        # is "documented" if the preceding non-blank line ends in ``-/``.
-        for m in def_pattern.finditer(text):
-            snap.defs_total += 1
-            preceding = text[: m.start()]
-            # Walk back over blank lines and find the previous non-blank line.
-            tail = preceding.rstrip()
-            if not tail.endswith("-/"):
-                snap.defs_missing_docstring += 1
+        # Docstring heuristic: a `def`/`theorem`/`lemma` is documented if the
+        # immediately preceding non-blank text ends in ``-/`` (the Lean
+        # docstring closer ``-/`` of a ``/-- ... -/`` block).  We deliberately
+        # scan the *raw* text — docstrings live inside what the masker would
+        # erase.
+        for m in DECL_PATTERN.finditer(text):
+            snap.decls_total += 1
+            if not text[: m.start()].rstrip().endswith("-/"):
+                snap.decls_missing_docstring += 1
+
+    # Top-level barrel file participates in the file count only.
+    top = root / "MIPStarRE.lean"
+    if top.is_file():
+        snap.lean_files_total += 1
+        snap.total_lean_lines += top.read_text(encoding="utf-8").count("\n")
 
     snap.forbidden_token_hits = {k: v for k, v in forbidden_hits.items() if v}
 
@@ -201,14 +211,11 @@ def _measure_lean_files(root: Path, allowlist: dict) -> Snapshot:
     snap.axiom_count_after_allowlist = max(
         snap.axiom_count_total - len(seen_axioms & allowlisted), 0
     )
-    return snap
+    return snap, oversized_paths
 
 
 def _max_consecutive_botfix(root: Path, *, lookback: int = 50) -> int:
-    log = _run(
-        ["git", "log", f"-n{lookback}", "--pretty=%s"],
-        root,
-    )
+    log = _run(["git", "log", f"-n{lookback}", "--pretty=%s"], root)
     streak = 0
     best = 0
     for line in log.splitlines():
@@ -224,68 +231,72 @@ def _max_consecutive_botfix(root: Path, *, lookback: int = 50) -> int:
 # Comparison / drift detection
 # ---------------------------------------------------------------------------
 
+# Metrics that must not increase vs. the baseline.  Each entry is
+# ``(metric_name, baseline_attr, current_attr, severity)``.
+_MONOTONE_METRICS: tuple[tuple[str, str, str, str], ...] = (
+    ("sorry_count", "sorry_count", "sorry_count", "fail"),
+    ("axiom_count_after_allowlist", "axiom_count_after_allowlist",
+     "axiom_count_after_allowlist", "fail"),
+    ("oversized_lean_files", "oversized_lean_files", "oversized_lean_files", "fail"),
+)
+
+
 def _compare(snap: Snapshot, baseline: Snapshot | None) -> list[DriftFinding]:
     findings: list[DriftFinding] = []
 
-    def add(metric: str, current, threshold: str, severity: str, baseline_val=None):
-        findings.append(DriftFinding(metric, baseline_val, current, threshold, severity))
-
     if baseline is not None:
-        if snap.sorry_count > baseline.sorry_count:
-            add("sorry_count", snap.sorry_count, "no increase vs baseline", "fail", baseline.sorry_count)
-        if snap.axiom_count_after_allowlist > baseline.axiom_count_after_allowlist:
-            add(
-                "axiom_count_after_allowlist",
-                snap.axiom_count_after_allowlist,
-                "no increase vs baseline",
-                "fail",
-                baseline.axiom_count_after_allowlist,
-            )
-        if snap.oversized_lean_files > baseline.oversized_lean_files:
-            add(
-                "oversized_lean_files",
-                snap.oversized_lean_files,
-                "no increase vs baseline",
-                "fail",
-                baseline.oversized_lean_files,
-            )
-        # Allow up to +5% growth in undocumented defs to absorb noise from
-        # routine additions; harder regressions fail.
-        if baseline.defs_total > 0:
-            allowed = baseline.defs_missing_docstring * 1.05
-            if snap.defs_missing_docstring > allowed:
-                add(
-                    "defs_missing_docstring",
-                    snap.defs_missing_docstring,
-                    f"no increase >5% vs baseline ({baseline.defs_missing_docstring})",
-                    "warn",
-                    baseline.defs_missing_docstring,
-                )
+        for metric, base_attr, cur_attr, severity in _MONOTONE_METRICS:
+            base_val = getattr(baseline, base_attr)
+            cur_val = getattr(snap, cur_attr)
+            if cur_val > base_val:
+                findings.append(DriftFinding(
+                    metric=metric,
+                    baseline=base_val,
+                    current=cur_val,
+                    threshold="no increase vs baseline",
+                    severity=severity,
+                ))
+        # Allow up to +5% growth in undocumented decls to absorb noise from
+        # routine additions; harder regressions warn.
+        if baseline.decls_total > 0:
+            allowed = baseline.decls_missing_docstring * 1.05
+            if snap.decls_missing_docstring > allowed:
+                findings.append(DriftFinding(
+                    metric="decls_missing_docstring",
+                    baseline=baseline.decls_missing_docstring,
+                    current=snap.decls_missing_docstring,
+                    threshold=f"no increase >5% vs baseline ({baseline.decls_missing_docstring})",
+                    severity="warn",
+                ))
 
     # Absolute checks (apply with or without a baseline).
     for token, hits in snap.forbidden_token_hits.items():
-        if token == "sorry":
-            # Already covered; don't double-report.
-            continue
-        if hits > 0 and token != "admit":
-            add(f"forbidden_token::{token}", hits, "must be 0", "fail")
-        elif hits > 0 and token == "admit":
-            add(f"forbidden_token::{token}", hits, "must be 0", "fail")
+        if hits > 0:
+            findings.append(DriftFinding(
+                metric=f"forbidden_token::{token}",
+                baseline=None,
+                current=hits,
+                threshold="must be 0",
+                severity="fail",
+            ))
 
-    if snap.consecutive_botfix_commits_max >= MAX_BOT_FIX_ITERATIONS:
-        add(
-            "consecutive_botfix_commits_max",
-            snap.consecutive_botfix_commits_max,
-            f"< {MAX_BOT_FIX_ITERATIONS}",
-            "fail",
-        )
-    elif snap.consecutive_botfix_commits_max >= MAX_BOT_FIX_ITERATIONS - 1:
-        add(
-            "consecutive_botfix_commits_max",
-            snap.consecutive_botfix_commits_max,
-            f"approaching cap of {MAX_BOT_FIX_ITERATIONS}",
-            "warn",
-        )
+    streak = snap.consecutive_botfix_commits_max
+    if streak >= MAX_BOT_FIX_ITERATIONS:
+        findings.append(DriftFinding(
+            metric="consecutive_botfix_commits_max",
+            baseline=None,
+            current=streak,
+            threshold=f"< {MAX_BOT_FIX_ITERATIONS}",
+            severity="fail",
+        ))
+    elif streak >= MAX_BOT_FIX_ITERATIONS - 1:
+        findings.append(DriftFinding(
+            metric="consecutive_botfix_commits_max",
+            baseline=None,
+            current=streak,
+            threshold=f"approaching cap of {MAX_BOT_FIX_ITERATIONS}",
+            severity="warn",
+        ))
 
     return findings
 
@@ -295,26 +306,22 @@ def _compare(snap: Snapshot, baseline: Snapshot | None) -> list[DriftFinding]:
 # ---------------------------------------------------------------------------
 
 def _load_baseline(path: Path) -> Snapshot | None:
-    if not path.is_file():
-        return None
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
+    except (FileNotFoundError, OSError, json.JSONDecodeError):
         return None
     fields = {f.name for f in dataclasses.fields(Snapshot)}
     return Snapshot(**{k: v for k, v in data.items() if k in fields})
 
 
 def _load_allowlist(path: Path) -> dict:
-    if not path.is_file():
-        return {"entries": []}
     try:
         return json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
+    except (FileNotFoundError, OSError, json.JSONDecodeError):
         return {"entries": []}
 
 
-def _human_report(snap: Snapshot, findings: list[DriftFinding]) -> str:
+def _human_report(snap: Snapshot, oversized_paths: list[str], findings: list[DriftFinding]) -> str:
     lines = [
         f"Drift audit at {snap.generated_at} (commit {snap.commit[:12]})",
         "",
@@ -324,14 +331,18 @@ def _human_report(snap: Snapshot, findings: list[DriftFinding]) -> str:
         f"  axiom_count_total                = {snap.axiom_count_total}",
         f"  axiom_count_after_allowlist      = {snap.axiom_count_after_allowlist}",
         f"  oversized_lean_files (>{OVERSIZED_LINE_BUDGET})         = {snap.oversized_lean_files}",
-        f"  defs_total                       = {snap.defs_total}",
-        f"  defs_missing_docstring           = {snap.defs_missing_docstring}",
+        f"  decls_total                      = {snap.decls_total}",
+        f"  decls_missing_docstring          = {snap.decls_missing_docstring}",
         f"  consecutive_botfix_commits_max   = {snap.consecutive_botfix_commits_max}",
     ]
     if snap.forbidden_token_hits:
         lines.append("  forbidden_token_hits             =")
         for k, v in sorted(snap.forbidden_token_hits.items()):
             lines.append(f"    {k}: {v}")
+    if oversized_paths:
+        lines.append("  oversized files:")
+        for p in oversized_paths:
+            lines.append(f"    {p}")
     if not findings:
         lines.append("")
         lines.append("No drift findings.")
@@ -342,6 +353,11 @@ def _human_report(snap: Snapshot, findings: list[DriftFinding]) -> str:
         bl = "" if f.baseline is None else f"  (baseline {f.baseline})"
         lines.append(f"  [{f.severity:4}] {f.metric}: current {f.current}{bl}; threshold: {f.threshold}")
     return "\n".join(lines)
+
+
+def _resolve(root: Path, p: str) -> Path:
+    candidate = Path(p)
+    return candidate if candidate.is_absolute() else root / candidate
 
 
 # ---------------------------------------------------------------------------
@@ -377,19 +393,25 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Exit non-zero if any finding has severity 'warn' or higher.",
     )
+    parser.add_argument(
+        "--emit-gha-output",
+        action="store_true",
+        help="Append has_fail/has_warn/finding_count keys to $GITHUB_OUTPUT.",
+    )
     args = parser.parse_args(argv)
 
     root = Path(args.root).resolve()
-    allowlist = _load_allowlist(root / args.allowlist) if not Path(args.allowlist).is_absolute() else _load_allowlist(Path(args.allowlist))
-    snap = _measure_lean_files(root, allowlist)
+    allowlist = _load_allowlist(_resolve(root, args.allowlist))
+    snap, oversized_paths = _measure_lean_files(root, allowlist)
     snap.consecutive_botfix_commits_max = _max_consecutive_botfix(root)
 
-    baseline_path = root / args.baseline if not Path(args.baseline).is_absolute() else Path(args.baseline)
+    baseline_path = _resolve(root, args.baseline)
     baseline = _load_baseline(baseline_path)
     findings = _compare(snap, baseline)
 
     payload = {
         "snapshot": snap.to_dict(),
+        "oversized_lean_files_paths": oversized_paths,
         "findings": [f.to_dict() for f in findings],
         "baseline_commit": baseline.commit if baseline else None,
     }
@@ -399,7 +421,7 @@ def main(argv: list[str] | None = None) -> int:
     else:
         sys.stdout.write(json.dumps(payload, indent=2) + "\n")
 
-    sys.stderr.write(_human_report(snap, findings) + "\n")
+    sys.stderr.write(_human_report(snap, oversized_paths, findings) + "\n")
 
     if args.update_baseline:
         baseline_path.parent.mkdir(parents=True, exist_ok=True)
@@ -407,6 +429,13 @@ def main(argv: list[str] | None = None) -> int:
         sys.stderr.write(f"Baseline updated at {baseline_path}\n")
 
     severities = {f.severity for f in findings}
+    if args.emit_gha_output:
+        gha = Path(__import__("os").environ.get("GITHUB_OUTPUT", "/dev/null"))
+        with gha.open("a", encoding="utf-8") as fp:
+            fp.write(f"has_fail={'true' if 'fail' in severities else 'false'}\n")
+            fp.write(f"has_warn={'true' if 'warn' in severities else 'false'}\n")
+            fp.write(f"finding_count={len(findings)}\n")
+
     if args.fail_on_drift and "fail" in severities:
         return 2
     if args.fail_on_warn and severities & {"fail", "warn"}:

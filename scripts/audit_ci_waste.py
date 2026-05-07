@@ -52,12 +52,13 @@ import sys
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable
 
-# Mirrors ``MAX_BOT_FIX_ITERATIONS`` in ``_ci-auto-fix-shared.yml`` and
-# ``audit_drift.py``.
-BOT_FIX_PREFIXES = ("[claude-auto-fix]", "[claude-review-fix]")
-MAX_BOT_FIX_ITERATIONS = 5
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from _bot_fix_constants import (  # noqa: E402
+    BOT_FIX_PREFIXES,
+    MAX_BOT_FIX_ITERATIONS,
+)
 
 
 @dataclass

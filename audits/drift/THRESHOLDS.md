@@ -13,8 +13,8 @@ A threshold change must be its own PR with a written justification. See
 | `axiom_count` (excluding allow-list) | must not increase                                                   |
 | `oversized_lean_files` (>1000 lines) | must not increase                                                   |
 | `dbg_trace_calls`                   | must be 0 in committed Lean files                                   |
-| `defs_missing_docstring`            | must not increase by more than 5%                                   |
-| `consecutive_botfix_commits_max`    | must be < 5 (matches `MAX_BOT_FIX_ITERATIONS`)                      |
+| `decls_missing_docstring`           | must not increase by more than 5% (counts `def`/`theorem`/`lemma` only) |
+| `consecutive_botfix_commits_max`    | must be < 5 (matches `MAX_BOT_FIX_ITERATIONS`; counts `[claude-*-fix]` and `[codex-*-fix]`) |
 | `lean_files_total`                  | informational only                                                  |
 | `total_lean_lines`                  | informational only                                                  |
 

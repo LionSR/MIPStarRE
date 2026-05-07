@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import json
-import subprocess
 import sys
 import tempfile
 import textwrap
@@ -51,21 +50,23 @@ class MeasurementTests(unittest.TestCase):
             big = root / "MIPStarRE" / "Big.lean"
             big.write_text("\n".join(["theorem t : True := trivial"] * 1500) + "\n", encoding="utf-8")
 
-            allowlist = {"entries": []}
-            snap = audit._measure_lean_files(root, allowlist)
+            snap, oversized_paths = audit._measure_lean_files(root, {"entries": []})
             self.assertEqual(snap.sorry_count, 1)
             self.assertEqual(snap.oversized_lean_files, 1)
-            self.assertIn("MIPStarRE/Big.lean", snap.oversized_lean_files_paths)
+            self.assertIn("MIPStarRE/Big.lean", oversized_paths)
 
-    def test_measure_ignores_sorry_in_comments(self) -> None:
+    def test_measure_ignores_sorry_in_comments_and_strings(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = _setup_repo(Path(td))
             (root / "MIPStarRE" / "B.lean").write_text(
-                "-- old plan was: sorry\ntheorem t : True := trivial\n",
+                "-- old plan was: sorry\n"
+                '/-- doc: "sorry" -/\n'
+                "theorem t : True := trivial\n",
                 encoding="utf-8",
             )
-            snap = audit._measure_lean_files(root, {"entries": []})
-            # Only the seed `sorry` in A.lean should be counted, not the comment.
+            snap, _paths = audit._measure_lean_files(root, {"entries": []})
+            # Only the seed `sorry` in A.lean should be counted; the line
+            # comment and the string-literal occurrence must be masked.
             self.assertEqual(snap.sorry_count, 1)
 
     def test_compare_flags_increase_in_sorry(self) -> None:
