@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Test.MainTheorem.NativeTargets
+import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationInputProducer
 
 /-!
 # Main-formal final assembly
@@ -42,6 +43,49 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 namespace MIPStarRE.LDT
 
 namespace Test
+
+/-! ### Orthonormalization-input bridge lemmas -/
+
+/-- Assemble the full repaired-bridge hypotheses from a role residual and the two
+locality-preserving repair witnesses.
+
+This produces exactly the `MainFormalBaseRepairedBridgeHypotheses` consumed by
+`baseMainFormal_ofRepairedBaseBridge` and `mainFormal_ofRoleResidualAndRepairedBridge`.
+
+The diagonal consistency is derived from the role residual (no extra hypotheses)
+via `MainFormalPostRolePackageDiagonalConsistencyInput.of_roleResidual`.
+The orthonormalization input uses `spectralTruncationInput_of_sourceAlmostProjective`
+for its spectral fields and takes the repair witnesses as explicit hypotheses
+via `MainFormalPostRolePackageDiagonalOrthonormalizationInput.of_roleResidual`.
+
+Callers constructing `hbaseBridge` for `mainFormal` should instantiate this lemma
+with their per-role-residual repair witnesses.
+
+Refs #1359, #1043. -/
+theorem repairedBridgeHypotheses_of_roleResidual
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
+    (leftRepair :
+      MakingMeasurementsProjective.LeftLiftedProjectivizationRepairInput strategy.state
+        (unsymmetrizedLeftPOVM
+          (roleResidual.rolePackage scalars).roleMeasurement)
+        (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1))
+    (rightRepair :
+      MakingMeasurementsProjective.LeftLiftedProjectivizationRepairInput strategy.state
+        (unsymmetrizedRightPOVM
+          (roleResidual.rolePackage scalars).roleMeasurement)
+        (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)) :
+    MainFormalBaseRepairedBridgeHypotheses params strategy eps k hpass
+      scalars roleResidual where
+  orthonormalizationInput :=
+    MainFormalPostRolePackageDiagonalOrthonormalizationInput.of_roleResidual
+      roleResidual leftRepair rightRepair
+  diagonalConsistency :=
+    MainFormalPostRolePackageDiagonalConsistencyInput.of_roleResidual roleResidual
 
 /-! ### Base (m = 1) Step 6 analytic hypotheses
 
