@@ -17,7 +17,7 @@ on:
       - 'scripts/tex_utils.py'
       - 'scripts/blueprint_lean_sync.py'
   pull_request:
-    types: [opened, synchronize, reopened, labeled]
+    types: [opened, synchronize, reopened, labeled, unlabeled]
     paths:
       - '**.lean'
       - 'lakefile.*'

@@ -20,8 +20,9 @@ Instructions:
    - `plasTeX` parse errors: these often indicate unsupported LaTeX commands. Simplify or wrap in `\ifplastex` guards.
    - `ERROR` lines about unresolved references: find the `\uses{}` or `\ref{}` referencing a non-existent label and fix the label name.
 3. GitHub annotations titled `Blueprint update suggested` are actionable
-   failures. Address them in the same run; do not treat them as optional
-   warnings merely because the annotation text says "warning".
+   failures only when the PR has the `enforce-blueprint-coverage` label. On
+   unlabelled PRs, treat them as advisory reverse-coverage warnings unless the
+   failing CI log explicitly shows that they caused the blueprint check to fail.
 4. The blueprint `.tex` files are in `blueprint/src/chapter/`. The blueprint configuration is in `blueprint/src/`.
 5. You can test your fix locally by running:
 

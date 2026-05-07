@@ -1344,6 +1344,9 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    if args.fail_on_missing_blueprint and not args.warn_missing_blueprint:
+        parser.error("--fail-on-missing-blueprint requires --warn-missing-blueprint")
+
     should_run_sync = (
         args.update_lean_decls
         or args.ci

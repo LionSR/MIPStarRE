@@ -499,6 +499,24 @@ class MissingBlueprintStepSummaryTests(unittest.TestCase):
             stderr.getvalue(),
         )
 
+    def test_fail_on_missing_requires_warn_mode(self) -> None:
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(SCRIPT_DIR / "blueprint_lean_sync.py"),
+                "--fail-on-missing-blueprint",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertEqual(result.returncode, 2)
+        self.assertIn(
+            "--fail-on-missing-blueprint requires --warn-missing-blueprint",
+            result.stderr,
+        )
+
 
 class LeanokPlacementReportingTests(unittest.TestCase):
     """The JSON report and chapter stats must keep statement-level and
