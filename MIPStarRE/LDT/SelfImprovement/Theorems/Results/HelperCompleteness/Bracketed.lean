@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.Linearized
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SdpMatrixBridge
 
 /-!
 # Helper completeness: bracketed mass identities and reduced wrappers
@@ -530,6 +531,37 @@ lemma sdp
     sub_nonneg.mpr
       (le_trans (averagedPointOperator_le_one params strategy g)
         (one_le_sdpStrictDualWitness (ι := ι)))
+
+/-- Canonical block-SDP data with complementary slackness yields the strengthened
+`lem:sdp` helper statement used by the point-consistency transport.
+
+This reduction is the abstract counterpart of `lem:sdp` that includes the
+matrix-slackness equations needed by the strengthened helper wrappers downstream.
+The dual certificate is already supplied as part of `hpair`, so no additional
+argument is required beyond the canonical realization assumptions.
+
+In particular, this packages
+`MatrixSdpCanonicalOptimalPairWithDominance` for the point-measurement
+realization and returns the reduced `SdpStatementWithSlackness` interface from
+Section 9.
+
+The stronger `SdpStatementWithSlackness` interface is required downstream by
+the `SelfImprovement` transport chain to obtain point-consistency from the
+helper-completeness branch without re-proving slackness internally at each
+consistency application.
+-/
+lemma sdpWithSlackness
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
+      (matrixSdpPointRealizationOfStrategy params strategy)))
+    (Z : MIPStarRE.Quantum.Op ι)
+    (hsdp : MatrixSdpCanonicalOptimalPairWithDominance params
+      (matrixSdpPointRealizationOfStrategy params strategy) X Z) :
+    SdpStatementWithSlackness params strategy :=
+  sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance
+    params strategy X Z hsdp
 
 /-- Reduced version of `lem:add-in-u`.
 
