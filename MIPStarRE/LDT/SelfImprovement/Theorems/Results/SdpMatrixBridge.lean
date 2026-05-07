@@ -198,6 +198,55 @@ theorem toMatrixSdpStatementWithSlacknessAndDominance
     params model X h.feasible Z h.dualFeasible h.strongDuality
     h.complementarySlackness h.dualDominatesIdentity
 
+/-- A canonical optimal pair with dominance is saturated.
+
+The paper obtains the vanishing of the extra canonical slack block from
+complementary slackness on the `none` block.  In the dominance-carrying
+interface this same conclusion follows from the block equation
+`X(D(Z)-C)=0` and the lower bound \(I \le Z\). -/
+theorem toCanonicalOptimalPair
+    {params : Parameters}
+    [FieldModel params.q]
+    {model : MatrixSdpRealization params}
+    {X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)}
+    {Z : MatrixOperator model.space}
+    (h : MatrixSdpCanonicalOptimalPairWithDominance params model X Z) :
+    MatrixSdpCanonicalOptimalPair params model X Z where
+  feasible := h.feasible
+  dualFeasible := h.dualFeasible
+  strongDuality := h.strongDuality
+  complementarySlackness := h.complementarySlackness
+  slackBlock_eq_zero := by
+    let T := matrixSdpCanonicalExtractedPrimalSubmeasurement params model X h.feasible
+    have hcanonical_T :
+        matrixSdpCanonicalPrimalBlockMatrix params model T *
+            (matrixSdpCanonicalDualOperator params model Z -
+              matrixSdpCanonicalObjectiveOperator params model) =
+          0 :=
+      matrixSdpCanonicalPrimalBlockMatrix_extracted_mul_dualSlack_of_canonical
+        params model X h.feasible Z h.complementarySlackness
+    have hSlackDual : matrixSdpCanonicalSlackOperator params model T * Z = 0 :=
+      matrixSdpCanonicalSlack_mul_dual_of_complementarySlackness
+        params model T Z hcanonical_T
+    have hSlack : matrixSdpCanonicalSlackOperator params model T = 0 :=
+      matrixSdpCanonicalSlackOperator_eq_zero_of_mul_dual_eq_zero_of_one_le
+        params model T Z hSlackDual h.dualDominatesIdentity
+    simpa [T] using
+      (matrixSdpCanonicalSlackOperator_extractedPrimalSubmeasurement
+        params model X h.feasible).symm.trans hSlack
+
+/-- A canonical optimal pair with dominance also gives the dominance-free
+matrix slackness statement after saturating the extra canonical block. -/
+theorem toMatrixSdpStatementWithSlackness
+    {params : Parameters}
+    [FieldModel params.q]
+    {model : MatrixSdpRealization params}
+    {X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)}
+    {Z : MatrixOperator model.space}
+    (h : MatrixSdpCanonicalOptimalPairWithDominance params model X Z) :
+    MatrixSdpStatementWithSlackness params model :=
+  h.toCanonicalOptimalPair.toMatrixSdpStatementWithSlackness
+
 end MatrixSdpCanonicalOptimalPairWithDominance
 
 namespace MatrixSdpCanonicalOptimalPair

@@ -525,6 +525,8 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPair.withDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPairWithDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPairWithDominance.toMatrixSdpStatementWithSlacknessAndDominance}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPairWithDominance.toCanonicalOptimalPair}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPairWithDominance.toMatrixSdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpComplementarySlacknessEquation}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.dualPositive}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.primalMeasurement}
@@ -577,10 +579,15 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   from strong duality: a feasible canonical primal matrix, a dual-feasible
   operator with equal objective value, canonical complementary slackness, and
   vanishing of the extra canonical slack block.  This package gives the
-  displayed measurement witness without assuming \(I \le Z\).  Separately,
-  Lean retains the dominance-carrying package used by the present reduced
-  helper interface.  That bridge is first stated as an abstract SDP statement,
-  and then as a direct helper input, for a canonical feasible primal matrix
+  displayed measurement witness without assuming \(I \le Z\).  Lean also proves
+  the converse saturation step for the dominance-carrying package: the canonical
+  complementary-slackness equation on the extra block gives
+  \(X_{\mathrm{none},\mathrm{none}}Z=0\), and the lower bound \(I\leq Z\)
+  forces \(X_{\mathrm{none},\mathrm{none}}=0\).  Thus the
+  dominance-carrying optimal pair canonically determines the saturated optimal
+  pair, and hence also the matrix slackness statement without the dominance
+  field.  The remaining bridge is first stated as an abstract SDP statement, and
+  then as a direct helper input, for a canonical feasible primal matrix
   satisfying objective equality and canonical complementary slackness together
   with the auxiliary dominance hypothesis.
 \end{lemma}
