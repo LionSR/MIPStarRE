@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationData
-import MIPStarRE.LDT.Test.MainTheorem.UnsymmetrizedTargets
 
 /-!
 # Orthonormalization input producer from role residual
@@ -11,22 +10,24 @@ the full `MainFormalBaseRepairedBridgeHypotheses` lives in `MainFormal.lean`
 
 ## What's proved
 
-* `MainFormalPostRolePackageDiagonalConsistencyInput.of_roleResidual` —
-  the diagonal consistency input (both forward and symmetric `ConsRel` fields)
-  is derivable from the role residual alone.
 * `MainFormalPostRolePackageDiagonalOrthonormalizationInput.of_roleResidual` —
   the orthonormalization input is derivable from the role residual once the two
   locality-preserving repair witnesses are supplied.
 
-## What's still unproved
+## What's not derivable from the role residual alone
 
-The `leftRepair` and `rightRepair` parameters are
-`LeftLiftedProjectivizationRepairInput` for the two unsymmetrized POVMs.
-These require QXP-layer data (a `QXPLayerData` with a projective `P` family
-close to the source `G` family), which is the output of Section 9
-(self-improvement).  Until the self-improvement theorem is applied at the
-current level, these are honest hypotheses — they are NOT derivable from the
-role residual alone.
+* **Diagonal self-consistency** (`MainFormalPostRolePackageDiagonalConsistencyInput`):
+  the structure requires `ConsRel G^A G^A ζ₁` and `ConsRel G^B G^B ζ₁` (each POVM
+  with itself).  The role residual's `diagonalConsistency` gives cross consistency
+  `ConsRel G^A G^B ζ₁` (the two POVMs with each other), which is a different type.
+  Diagonal self-consistency is therefore a **separate hypothesis** that must be
+  supplied alongside the repair witnesses when constructing `hbaseBridge`.
+
+* **Locality-preserving repair**: the `LeftLiftedProjectivizationRepairInput`
+  parameters require QXP-layer data (a `QXPLayerData` with a projective `P`
+  family close to the source `G` family), which is the output of Section 9
+  (self-improvement).  Until the self-improvement theorem is applied at the
+  current level, these are honest hypotheses.
 
 ## References
 
@@ -41,36 +42,6 @@ open MIPStarRE.LDT.MakingMeasurementsProjective
 namespace MIPStarRE.LDT
 
 namespace Test
-
-namespace MainFormalPostRolePackageDiagonalConsistencyInput
-
-/-- Produce the diagonal consistency input from a concrete Section 6 role residual.
-
-The forward direction is `roleResidual.diagonalConsistency scalars` (paper line 130);
-the symmetric direction is obtained by `consRel_symm_of_density_fixed`.
-No additional analytic hypotheses are needed. -/
-theorem of_roleResidual
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {hpass : strategy.PassesLowIndividualDegreeTest eps}
-    {scalars : MainFormalCascadeScalars params eps k}
-    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) :
-    MainFormalPostRolePackageDiagonalConsistencyInput
-      params strategy eps k scalars (roleResidual.rolePackage scalars) where
-  leftDiagonalConsistency := roleResidual.diagonalConsistency scalars
-  rightDiagonalConsistency :=
-    consRel_symm_of_density_fixed strategy.state strategy.densityFixed
-      (uniformDistribution Unit)
-      (constSubMeasFamily
-        (unsymmetrizedLeftPOVM
-          (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
-      (constSubMeasFamily
-        (unsymmetrizedRightPOVM
-          (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
-      scalars.zeta1 (roleResidual.diagonalConsistency scalars)
-
-end MainFormalPostRolePackageDiagonalConsistencyInput
 
 namespace MainFormalPostRolePackageDiagonalOrthonormalizationInput
 
