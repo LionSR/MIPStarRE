@@ -256,8 +256,10 @@ MIPStarRE/LDT/
 ├── MakingMeasurementsProjective/   # Orthonormalization, projective completion
 ├── MainInductionStep/        # Section 6 induction wrapper
 ├── ExpansionHypercubeGraph/  # Section 7–8 expansion, global variance
+├── GlobalVariance/           # Section 8.5 (and related global variance machinery)
 ├── SelfImprovement/          # Section 9 self-improvement
 ├── CommutativityPoints/      # Section 10 commutativity setup
+├── Tactic/                   # Section 10 proof orchestration utilities
 ├── Commutativity/            # Section 11 commutativity bounds
 └── Pasting/                  # Section 12 pasting
 ```

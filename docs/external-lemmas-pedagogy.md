@@ -219,7 +219,7 @@ matrix algebra; `Matrix.le_iff` and `Matrix.nonneg_iff_posSemidef`
 connect the order to PSD; `leftTensor`, `rightTensor`, and `opTensor`
 provide the Kronecker product; `Matrix.trace` provides the trace.
 
-Key Mathlib lemmas used but not reproved:
+Project-local lemmas used in this section, proved in the project:
 
 - `sandwich_nonneg` — PSD is preserved under `M·P·M` when `M` is Hermitian
   and `P` is PSD
@@ -236,11 +236,10 @@ congruence.  Tensor product with identity preserves both PSD and the
 `≤ 1` bound because the eigenvalues of `A ⊗ I` are just the eigenvalues
 of `A`.
 
-**Upstream potential**: Most of these are standard Mathlib facts already.
-The project-local `sandwich_nonneg` and `sandwich_mono` could be
-upstreamed if Mathlib doesn't have the `Matrix`-flavored versions
-(Mathlib's `PosSemidef` API may already cover them under different
-names).
+**Upstream potential**: The project-local lemmas listed above are already used as trusted building
+blocks for PSD transport and tensor-product bounds in the codebase. If Mathlib
+exposes matching statements under standard names, these can be replaced without
+changing any mathematical content.
 
 ---
 
