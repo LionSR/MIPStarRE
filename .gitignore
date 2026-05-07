@@ -43,3 +43,5 @@ blueprint/lean_decls
 .claude/
 .worktrees/
 .repo-evolution/
+__pycache__/
+*.pyc
