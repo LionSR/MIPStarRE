@@ -494,14 +494,12 @@ theorem final_fields_projective_residual_error_le_selfImprovementError_of_small_
     sqrt_selfImprovementDataProcessingError_le_thirty_one_m_powerSum_thirtysecond
       params eps delta heps heps_le_one hdelta hdelta_le_one hdq_le_one
   have hdata_nonneg : 0 ≤ selfImprovementDataProcessingError params eps delta := by
-    have hhelper_nonneg : 0 ≤ selfImprovementHelperError params eps delta := by
-      unfold selfImprovementHelperError
-      positivity
-    have horth_nonneg :
-        0 ≤ Real.sqrt (selfImprovementOrthogonalizationError params eps delta) := by
-      positivity
+    have hhelper_nonneg : 0 ≤ selfImprovementHelperError params eps delta :=
+      selfImprovementHelperError_nonneg params eps delta
+    have horth_sqrt_nonneg : 0 ≤ Real.sqrt (selfImprovementOrthogonalizationError params eps delta) :=
+      Real.sqrt_nonneg _
     rw [selfImprovementDataProcessingError_eq]
-    nlinarith [hhelper_nonneg, horth_nonneg]
+    nlinarith
   have hcard_le :
       (Fintype.card (Fq params) : Error) * selfImprovementDataProcessingError params eps delta ≤
         (8464 : Error) * selfImprovementDataProcessingError params eps delta := by
