@@ -805,59 +805,6 @@ noncomputable def orthonormalizationResidualDominationInput_of_spectral_qxpLayer
   orthonormalizationResidualDominationInput_of_producers hspectral
     (residualDominatingRepairProducer_of_qxpLayer_and_coisometry hqxp hsource hcoisometry)
 
-/-- Build the residual-domination orthonormalization input from an ordinary QXP
-repair producer and a pointwise residual-outcome inequality. -/
-noncomputable def orthonormalizationResidualDominationInput_of_sourceQXPRepairAnd_none_le
-    {params : Parameters} [FieldModel params.q]
-    {strategy : SymStrat params ι} {eps delta : Error}
-    (hqxp : OrthonormalizationQXPLayerRepairProducer params strategy eps delta)
-    (hnone : ∀ {Hhat : SubMeas (Polynomial params) ι}
-      (hssc : BipartiteSSCRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily Hhat)
-        (selfImprovementHelperError params eps delta))
-      (hSpectral : SpectralTruncationStatement strategy.state
-        (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
-        (consistencyToAlmostProjectiveError
-          (2 * selfImprovementHelperError params eps delta))),
-      (optionCompletion Hhat).outcome none ≤
-        (qxpProjSubMeas ((hqxp hssc hSpectral).data)).outcome none) :
-    OrthonormalizationResidualDominationInput params strategy eps delta :=
-  orthonormalizationResidualDominationInput_of_producers
-    orthonormalizationSpectralProducer_of_sourceAlmostProjective
-    (residualDominatingRepairProducer_of_qxpLayer_and_none_le hqxp hnone)
-
-/-- Build the residual-domination orthonormalization input from spectral rounding
-and an ordinary QXP repair producer together with the residual-outcome
-inequality. -/
-noncomputable def
-    orthonormalizationResidualDominationInput_of_roundingAndQXPLayerRepairAnd_none_le
-    {params : Parameters} [FieldModel params.q]
-    {strategy : SymStrat params ι} {eps delta : Error}
-    (hround : ∀ {Hhat : SubMeas (Polynomial params) ι},
-      BipartiteSSCRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily Hhat)
-        (selfImprovementHelperError params eps delta) →
-      Σ' R : OpFamily (Option (Polynomial params)) (ι × ι),
-        RoundingToProjectorsWitness strategy.state
-          (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
-          (consistencyToAlmostProjectiveError
-            (2 * selfImprovementHelperError params eps delta)) R)
-    (hqxp : OrthonormalizationQXPLayerRepairProducer params strategy eps delta)
-    (hnone : ∀ {Hhat : SubMeas (Polynomial params) ι}
-      (hssc : BipartiteSSCRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily Hhat)
-        (selfImprovementHelperError params eps delta))
-      (hSpectral : SpectralTruncationStatement strategy.state
-        (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
-        (consistencyToAlmostProjectiveError
-          (2 * selfImprovementHelperError params eps delta))),
-      (optionCompletion Hhat).outcome none ≤
-        (qxpProjSubMeas ((hqxp hssc hSpectral).data)).outcome none) :
-    OrthonormalizationResidualDominationInput params strategy eps delta :=
-  orthonormalizationResidualDominationInput_of_producers
-    (orthonormalizationSpectralProducer_of_roundingWitnesses hround)
-    (residualDominatingRepairProducer_of_qxpLayer_and_none_le hqxp hnone)
-
 /-! ### Spectral slice from per-`Hhat` rounding witnesses -/
 
 /-- Build the spectral slice of `SelfImprovement.OrthonormalizationInput` from
@@ -938,5 +885,58 @@ noncomputable def orthonormalizationSpectralProducer_of_sourceAlmostProjective
       (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
       (consistencyToAlmostProjectiveError
         (2 * selfImprovementHelperError params eps delta))
+
+/-- Build the residual-domination orthonormalization input from an ordinary QXP
+repair producer and a pointwise residual-outcome inequality. -/
+noncomputable def orthonormalizationResidualDominationInput_of_sourceQXPRepairAnd_none_le
+    {params : Parameters} [FieldModel params.q]
+    {strategy : SymStrat params ι} {eps delta : Error}
+    (hqxp : OrthonormalizationQXPLayerRepairProducer params strategy eps delta)
+    (hnone : ∀ {Hhat : SubMeas (Polynomial params) ι}
+      (hssc : BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily Hhat)
+        (selfImprovementHelperError params eps delta))
+      (hSpectral : SpectralTruncationStatement strategy.state
+        (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
+        (consistencyToAlmostProjectiveError
+          (2 * selfImprovementHelperError params eps delta))),
+      (optionCompletion Hhat).outcome none ≤
+        (qxpProjSubMeas ((hqxp hssc hSpectral).data)).outcome none) :
+    OrthonormalizationResidualDominationInput params strategy eps delta :=
+  orthonormalizationResidualDominationInput_of_producers
+    orthonormalizationSpectralProducer_of_sourceAlmostProjective
+    (residualDominatingRepairProducer_of_qxpLayer_and_none_le hqxp hnone)
+
+/-- Build the residual-domination orthonormalization input from spectral rounding
+and an ordinary QXP repair producer together with the residual-outcome
+inequality. -/
+noncomputable def
+    orthonormalizationResidualDominationInput_of_roundingAndQXPLayerRepairAnd_none_le
+    {params : Parameters} [FieldModel params.q]
+    {strategy : SymStrat params ι} {eps delta : Error}
+    (hround : ∀ {Hhat : SubMeas (Polynomial params) ι},
+      BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily Hhat)
+        (selfImprovementHelperError params eps delta) →
+      Σ' R : OpFamily (Option (Polynomial params)) (ι × ι),
+        RoundingToProjectorsWitness strategy.state
+          (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
+          (consistencyToAlmostProjectiveError
+            (2 * selfImprovementHelperError params eps delta)) R)
+    (hqxp : OrthonormalizationQXPLayerRepairProducer params strategy eps delta)
+    (hnone : ∀ {Hhat : SubMeas (Polynomial params) ι}
+      (hssc : BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily Hhat)
+        (selfImprovementHelperError params eps delta))
+      (hSpectral : SpectralTruncationStatement strategy.state
+        (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
+        (consistencyToAlmostProjectiveError
+          (2 * selfImprovementHelperError params eps delta))),
+      (optionCompletion Hhat).outcome none ≤
+        (qxpProjSubMeas ((hqxp hssc hSpectral).data)).outcome none) :
+    OrthonormalizationResidualDominationInput params strategy eps delta :=
+  orthonormalizationResidualDominationInput_of_producers
+    (orthonormalizationSpectralProducer_of_roundingWitnesses hround)
+    (residualDominatingRepairProducer_of_qxpLayer_and_none_le hqxp hnone)
 
 end MIPStarRE.LDT.SelfImprovement
