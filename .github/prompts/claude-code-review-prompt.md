@@ -41,7 +41,18 @@ that determines whether the PR can be approved with outstanding issues.
 7. 🟡 **Documentation**: Do new definitions and key theorems have docstrings? Are module-level
    doc comments present for new files? Do docstrings explain mathematical meaning, not just
    Lean syntax? Missing documentation must be added before approval.
-8. 🟡 **Paper-gap notes**: When the PR changes files under `docs/paper-gaps/`, read
+8. 🟡 **Blueprint coverage for changed declarations**: If the PR has the label
+   `enforce-blueprint-coverage` and changes a public paper-facing `def`,
+   `theorem`, or `lemma` under `MIPStarRE/`, the corresponding blueprint item
+   should carry the appropriate `\lean{...}` tag. You may run
+   `python3 scripts/blueprint_lean_sync.py --root . --warn-missing-blueprint
+   --fail-on-missing-blueprint --diff-base origin/<base-ref> --changed-files <files>`
+   when the changed-file list is clear. On such labelled PRs, a `Blueprint
+   update suggested` CI annotation is a requires-changes finding unless the
+   declaration is genuinely only an internal helper and the PR explains why it
+   should remain outside the blueprint. On unlabelled PRs, mention this only as
+   advisory context.
+9. 🟡 **Paper-gap notes**: When the PR changes files under `docs/paper-gaps/`, read
    `docs/paper-gaps/policy.tex` before reviewing the changed note. Check that the note is a
    self-contained mathematical account: it introduces its notation, states the cited assertion,
    isolates the calculation or logical obstruction, compares the cited source with the
@@ -52,7 +63,9 @@ that determines whether the PR can be approved with outstanding issues.
 
 **Out of scope** (handled by the dedicated `Blueprint Sync & Prose Review` workflow — do
 NOT comment on these here, to avoid duplicate review threads):
-- Blueprint ↔ Lean sync (`\lean{...}` / `\leanok` / `\uses{...}` tags, `\leanok` on proofs).
+- General blueprint ↔ Lean sync drift outside the changed Lean declarations
+  reviewed above (`\leanok` / `\uses{...}` tags, `\leanok` on proofs, stale
+  blueprint entries).
 - Prose quality / banned AI-software language in blueprint `.tex` and Lean docstrings.
   This exclusion does not apply to paper-gap notes, which are reviewed here against
   `docs/paper-gaps/policy.tex`.

@@ -45,7 +45,7 @@ jobs:
       CLAUDE_SONNET_MODEL: ${{ vars.CLAUDE_SONNET_MODEL }}
       DEEPSEEK_BASE_URL: https://api.deepseek.com/anthropic
       CLAUDE_ALLOWED_TOOLS: >
-        Read,Glob,Grep,Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr comment:*),Bash(gh api graphql:*),Bash(lake build),Bash(lake exe cache get),Bash(lake update),Bash(lake env),Bash(lean *),Bash(elan *),Bash(grep *),mcp__github__*
+        Read,Glob,Grep,Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr comment:*),Bash(gh api graphql:*),Bash(lake build),Bash(lake exe cache get),Bash(lake update),Bash(lake env),Bash(lean *),Bash(elan *),Bash(grep *),Bash(git fetch *),Bash(python3 scripts/blueprint_lean_sync.py *),mcp__github__*
 
     steps:
       - name: Check Claude review switch

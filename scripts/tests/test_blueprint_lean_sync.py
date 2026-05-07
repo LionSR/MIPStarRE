@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import contextlib
+import io
 import json
 import os
 import shutil
@@ -32,6 +34,7 @@ from blueprint_lean_sync import (  # noqa: E402
     collect_file_lean_decls,
     find_changed_decls_missing_from_blueprint,
     find_orphan_leanok_tags,
+    print_missing_blueprint_warnings,
 )
 
 
@@ -480,6 +483,39 @@ class MissingBlueprintStepSummaryTests(unittest.TestCase):
         )
 
         self.assertNotIn("--diff-head", command)
+
+    def test_fail_on_missing_prints_error(self) -> None:
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            print_missing_blueprint_warnings(
+                [self._decl("Foo.paperFacing")],
+                fail_on_missing=True,
+            )
+
+        self.assertIn("WARNING: Changed declarations not yet in blueprint", stdout.getvalue())
+        self.assertIn(
+            r"ERROR: changed Lean declarations are missing corresponding \lean{} tags",
+            stderr.getvalue(),
+        )
+
+    def test_fail_on_missing_requires_warn_mode(self) -> None:
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(SCRIPT_DIR / "blueprint_lean_sync.py"),
+                "--fail-on-missing-blueprint",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertEqual(result.returncode, 2)
+        self.assertIn(
+            "--fail-on-missing-blueprint requires --warn-missing-blueprint",
+            result.stderr,
+        )
 
 
 class LeanokPlacementReportingTests(unittest.TestCase):

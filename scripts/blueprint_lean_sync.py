@@ -870,8 +870,9 @@ def print_missing_blueprint_warnings(
     missing: list[LeanDecl],
     *,
     summary_command: str | None = None,
+    fail_on_missing: bool = False,
 ) -> None:
-    """Print a warning-only report for changed declarations missing blueprint refs."""
+    """Print a report for changed declarations missing blueprint refs."""
     print()
     print("=" * 70)
     print("  CHANGED LEAN DECLARATIONS ↔ BLUEPRINT COVERAGE")
@@ -894,6 +895,17 @@ def print_missing_blueprint_warnings(
                 "\\lean{} tag in blueprint/src/chapter."
             )
     _append_missing_blueprint_step_summary(missing, command=summary_command)
+    if fail_on_missing:
+        if os.getenv("GITHUB_ACTIONS") == "true":
+            print(
+                "::error::Changed Lean declarations are missing corresponding "
+                "\\lean{} tags in blueprint/src/chapter."
+            )
+        print(
+            "ERROR: changed Lean declarations are missing corresponding "
+            "\\lean{} tags in blueprint/src/chapter.",
+            file=sys.stderr,
+        )
     print()
 
 
@@ -1307,6 +1319,14 @@ def main() -> None:
         ),
     )
     parser.add_argument(
+        "--fail-on-missing-blueprint",
+        action="store_true",
+        help=(
+            "Require --warn-missing-blueprint, and exit with code 1 if any changed "
+            "declaration is missing a corresponding \\lean{} tag"
+        ),
+    )
+    parser.add_argument(
         "--changed-files",
         nargs="*",
         default=None,
@@ -1323,6 +1343,9 @@ def main() -> None:
         help="Git head revision for reverse blueprint coverage checks (default: HEAD)",
     )
     args = parser.parse_args()
+
+    if args.fail_on_missing_blueprint and not args.warn_missing_blueprint:
+        parser.error("--fail-on-missing-blueprint requires --warn-missing-blueprint")
 
     should_run_sync = (
         args.update_lean_decls
@@ -1356,7 +1379,13 @@ def main() -> None:
             diff_head=args.diff_head,
             changed_files=args.changed_files,
         )
-        print_missing_blueprint_warnings(missing, summary_command=summary_command)
+        print_missing_blueprint_warnings(
+            missing,
+            summary_command=summary_command,
+            fail_on_missing=args.fail_on_missing_blueprint,
+        )
+        if args.fail_on_missing_blueprint and missing:
+            sys.exit(1)
 
 
 if __name__ == "__main__":
