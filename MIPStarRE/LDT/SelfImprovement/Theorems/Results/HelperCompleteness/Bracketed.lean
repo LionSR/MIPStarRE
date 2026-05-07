@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.Linearized
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SdpMatrixBridge
 
 /-!
 # Helper completeness: bracketed mass identities and reduced wrappers
@@ -530,6 +531,26 @@ lemma sdp
     sub_nonneg.mpr
       (le_trans (averagedPointOperator_le_one params strategy g)
         (one_le_sdpStrictDualWitness (ι := ι)))
+
+/-- Canonical block-SDP data yields the complementary-slackness variant of
+`lem:sdp`.
+
+This wrapper is the strategy-level counterpart of
+`sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance`.
+The output is `SdpStatementWithSlackness` and therefore includes the
+complementary-slackness equations needed by the strengthened helper wrappers. -/
+lemma sdpWithSlackness
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
+      (matrixSdpPointRealizationOfStrategy params strategy)))
+    (Z : MIPStarRE.Quantum.Op ι)
+    (hsdp : MatrixSdpCanonicalOptimalPairWithDominance params
+      (matrixSdpPointRealizationOfStrategy params strategy) X Z) :
+    SdpStatementWithSlackness params strategy :=
+  sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance
+    params strategy X Z hsdp
 
 /-- Reduced version of `lem:add-in-u`.
 

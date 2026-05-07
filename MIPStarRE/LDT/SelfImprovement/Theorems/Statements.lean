@@ -382,15 +382,16 @@ structure SelfImprovementSubMeasConclusion (params : Parameters) [FieldModel par
       Gmeas.toSubMeas = G ∧
       SelfImprovementConclusion params strategy Gmeas H Z eps delta gamma nu
 
-/-- The final Section 9 fields not produced directly by the current
-`selfImprovementHelper` and `orthonormalization` arguments.
+/-- Final fields for the Section 9 transport stage.
 
-TODO: replace this temporary bridge data with the actual Section 9 transport
-lemmas once the helper-stage strong self-consistency, data-processing, and
-projective-residual/completeness arguments are formalized. The boundedness field
-is no longer part of this residual package: the current strict SDP witness
-records `1 ≤ Z`, and `final_fields_bounded` derives the `BoundedByOperator`
-conclusion from that operator-monotonicity fact. -/
+The final fields are the Section 9 outputs that remain after combining:
+`SelfImprovementHelper`, orthonormalization, data-processing, and
+`orthonormalization_with_total_le_of_residual_domination`.
+
+The package records completeness, point-consistency, self-closeness, and the
+projective-residual estimate. The boundedness term is not repeated here because
+it is recovered later from the strict SDP witness condition `1 ≤ Z` together
+with monotonicity of the boundedness field. -/
 structure SelfImprovementFinalFields (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (H : ProjSubMeas (Polynomial params) ι)
@@ -414,8 +415,8 @@ structure SelfImprovementFinalFields (params : Parameters) [FieldModel params.q]
     projectiveBoundednessGap params strategy H Z ≤
       selfImprovementError params eps delta
 
-/-- The helper-stage strong self-consistency input still missing from the
-reduced theorem chain. -/
+/-- The helper-stage strong self-consistency assumption used in the reduced
+theorem chain. -/
 abbrev HelperStrongSelfConsistencyInput (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (eps delta : Error) : Prop :=
   ∀ {T : Measurement (Polynomial params) ι}
@@ -426,13 +427,16 @@ abbrev HelperStrongSelfConsistencyInput (params : Parameters) [FieldModel params
         (constSubMeasFamily Hhat)
         (selfImprovementHelperError params eps delta)
 
-/-- The final orthonormalization input still required by the reduced theorem
-chain.
+/-- The final orthonormalization input required by the reduced theorem chain.
 
-The top-level orthonormalization theorem is now proved from the paper's
-completion-to-`Option` reduction, so the remaining bridge only has to supply
-the spectral-truncation and locality-preserving repair witnesses for the helper
-submeasurement `Hhat`. -/
+In the paper's notation, this is the local wrapper produced by the
+`completion-to-`Option` reduction that supplies:
+
+- a spectral truncation family on `leftLiftedMeasurement` of `optionCompletion Hhat`;
+- a locality-preserving repair family for the same helper submeasurement;
+- and the monotone-total domination data on the residual branch.
+
+The bridge now uses only these primitives. -/
 abbrev OrthonormalizationInput (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (eps delta : Error) :=
   ∀ {Hhat : SubMeas (Polynomial params) ι},
