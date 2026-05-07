@@ -92,6 +92,12 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+/-! NOTE: This file has not yet been fully split.  Sub-module extractions exist in
+`BoundednessTransport/Agreement.lean` and `BoundednessTransport/PointConsistency.lean`
+but this file still contains duplicated theorems and private helpers (see #1127).
+Once the split is complete, the private helpers below and the duplicated theorems
+can be removed and replaced by imports of the sub-modules. -/
+
 /-! ## Final-fields projective-residual boundedness transport (issue #931)
 
 The boundedness paragraph of `thm:self-improvement` first compares the
@@ -106,6 +112,9 @@ it is the checked `easy-approx-from-approx-delta` part of
 `references/ldt-paper/self_improvement.tex` lines 747--755, mirrored in
 `blueprint/src/chapter/ch07_self_improvement.tex` lines 609--618. -/
 
+-- TODO(#1127): This lemma is duplicated in `BoundednessTransport/Agreement.lean` as a
+-- public `lemma helper_agreement_average_ev_eq_avg`.  Once the parent file is fully split,
+-- remove this private copy and import the sub-module instead.
 private lemma helper_agreement_average_ev_eq_avg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -327,6 +336,10 @@ theorem helperAgreementOperatorAtPoint_ev_slack_eq_off_diagonal_sum
     ev_sum]
   simp only [ev_finset_sum]
 
+-- TODO(#1127): These three private lemmas are duplicated in
+-- `BoundednessTransport/PointConsistency.lean` (made public there).
+-- Once the parent file is fully split, remove these private copies and
+-- import the sub-module instead.
 private lemma opTensor_one_left_eq_rightTensor
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     (B : MIPStarRE.Quantum.Op ι₂) :

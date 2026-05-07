@@ -36,14 +36,14 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-private lemma opTensor_one_left_eq_rightTensor
+lemma opTensor_one_left_eq_rightTensor
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     (B : MIPStarRE.Quantum.Op ι₂) :
     opTensor (ι₁ := ι₁) (1 : MIPStarRE.Quantum.Op ι₁) B =
       rightTensor (ι₁ := ι₁) B := by
   rfl
 
-private lemma pointMeasurement_total_evalFamily_total_opTensor_ev_eq_rightTensor
+lemma pointMeasurement_total_evalFamily_total_opTensor_ev_eq_rightTensor
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (S : SubMeas (Polynomial params) ι)
@@ -62,7 +62,7 @@ private lemma pointMeasurement_total_evalFamily_total_opTensor_ev_eq_rightTensor
       postprocess_total S (fun g : Polynomial params => g u)
   rw [hA_total, hS_total, opTensor_one_left_eq_rightTensor]
 
-private lemma pointMeasurement_total_evalFamily_total_ev_eq_rightTensor
+lemma pointMeasurement_total_evalFamily_total_ev_eq_rightTensor
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (S : SubMeas (Polynomial params) ι)

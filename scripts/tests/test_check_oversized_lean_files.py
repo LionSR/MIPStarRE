@@ -81,7 +81,7 @@ class CheckFilesTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             _make_repo(root)
-            rc = check_files(root)
+            rc = check_files(root, set())
             self.assertEqual(rc, 0)
 
     def test_all_under_threshold(self) -> None:
@@ -90,7 +90,7 @@ class CheckFilesTests(unittest.TestCase):
             _make_repo(root)
             _write_lean(root / "MIPStarRE" / "LDT" / "A.lean", 500)
             _write_lean(root / "MIPStarRE" / "LDT" / "B.lean", THRESHOLD - 1)
-            rc = check_files(root)
+            rc = check_files(root, set())
             self.assertEqual(rc, 0)
 
     def test_exactly_at_threshold_passes(self) -> None:
@@ -98,7 +98,7 @@ class CheckFilesTests(unittest.TestCase):
             root = Path(td)
             _make_repo(root)
             _write_lean(root / "MIPStarRE" / "LDT" / "Exact.lean", THRESHOLD)
-            rc = check_files(root)
+            rc = check_files(root, set())
             self.assertEqual(rc, 0)
 
     def test_oversized_file_fails(self) -> None:
@@ -106,7 +106,7 @@ class CheckFilesTests(unittest.TestCase):
             root = Path(td)
             _make_repo(root)
             _write_lean(root / "MIPStarRE" / "LDT" / "Big.lean", THRESHOLD + 1)
-            rc = check_files(root)
+            rc = check_files(root, set())
             self.assertEqual(rc, 1)
 
     def test_multiple_oversized(self) -> None:
@@ -115,7 +115,7 @@ class CheckFilesTests(unittest.TestCase):
             _make_repo(root)
             _write_lean(root / "MIPStarRE" / "LDT" / "Big.lean", THRESHOLD + 1)
             _write_lean(root / "MIPStarRE" / "LDT" / "Bigger.lean", THRESHOLD + 500)
-            rc = check_files(root)
+            rc = check_files(root, set())
             self.assertEqual(rc, 1)
 
     def test_excludes_tmp(self) -> None:
@@ -125,7 +125,7 @@ class CheckFilesTests(unittest.TestCase):
             _make_repo(root)
             (root / "tmp").mkdir(exist_ok=True)
             _write_lean(root / "tmp" / "Scratch.lean", THRESHOLD + 1)
-            rc = check_files(root)
+            rc = check_files(root, set())
             self.assertEqual(rc, 0)
 
     def test_tmp_ancestor_not_excluded_integration(self) -> None:
@@ -134,8 +134,38 @@ class CheckFilesTests(unittest.TestCase):
             root = Path(td) / "repo"
             _make_repo(root)
             _write_lean(root / "MIPStarRE" / "LDT" / "Good.lean", 50)
-            rc = check_files(root)
+            rc = check_files(root, set())
             self.assertEqual(rc, 0)
+
+    # ── known_oversized exemptions ─────────────────────────────────────────
+
+    def test_known_oversized_passes(self) -> None:
+        """An oversized file listed in known_oversized does not cause failure."""
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _make_repo(root)
+            _write_lean(root / "MIPStarRE" / "LDT" / "Big.lean", THRESHOLD + 1)
+            rc = check_files(root, {"MIPStarRE/LDT/Big.lean"})
+            self.assertEqual(rc, 0)
+
+    def test_known_oversized_with_unknown_fails(self) -> None:
+        """An unknown oversized file still fails even when known files exist."""
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _make_repo(root)
+            _write_lean(root / "MIPStarRE" / "LDT" / "Known.lean", THRESHOLD + 1)
+            _write_lean(root / "MIPStarRE" / "LDT" / "Unknown.lean", THRESHOLD + 1)
+            rc = check_files(root, {"MIPStarRE/LDT/Known.lean"})
+            self.assertEqual(rc, 1)
+
+    def test_known_oversized_empty_set_same_as_default(self) -> None:
+        """No known files: oversized file fails normally."""
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _make_repo(root)
+            _write_lean(root / "MIPStarRE" / "LDT" / "Big.lean", THRESHOLD + 1)
+            rc = check_files(root, set())
+            self.assertEqual(rc, 1)
 
 
 if __name__ == "__main__":

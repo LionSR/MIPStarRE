@@ -5,9 +5,10 @@ on:
     types: [opened, synchronize, reopened]
 
 # NOTE: As of 2026-05-07, one known oversized file remains on main:
-#   MIPStarRE/LDT/SelfImprovement/Theorems/Results/BoundednessTransport.lean (1684 lines)
-# This file is tracked by issue #1127 (partial split).  Once it is split,
-# remove ``continue-on-error: true`` below to make the gate blocking.
+#   MIPStarRE/LDT/SelfImprovement/Theorems/Results/BoundednessTransport.lean (1697 lines)
+# This file is tracked by issue #1127 (partial split).
+# Once it is split, remove the ``--known`` argument below.
+# New oversized files cause the check to fail.
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -30,5 +31,7 @@ jobs:
           python-version: '3.12'
 
       - name: Run oversized-file guard
-        continue-on-error: true  # TODO(#1127): remove once all files are split
-        run: python3 scripts/check_oversized_lean_files.py --root .
+        run: >
+          python3 scripts/check_oversized_lean_files.py
+          --root .
+          --known MIPStarRE/LDT/SelfImprovement/Theorems/Results/BoundednessTransport.lean

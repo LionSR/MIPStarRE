@@ -44,6 +44,7 @@
 
 \begin{definition}[Average restricted errors]\label{def:average-restricted-errors}
 	\lean{MIPStarRE.LDT.MainInductionStep.averageRestrictedAxisParallelError, MIPStarRE.LDT.MainInductionStep.averageRestrictedSelfConsistencyError, MIPStarRE.LDT.MainInductionStep.averageRestrictedDiagonalError}
+	\leanok
 	\uses{def:restricted-strategy}
 	The average restricted errors are the expectations over $x \in \F_q$ of the
 	axis-parallel, self-consistency, and restricted diagonal-line failure
@@ -52,6 +53,7 @@
 
 \begin{lemma}[Weighted restricted-probability bounds]\label{lem:weighted-restricted-probability-bounds}
 	\lean{MIPStarRE.LDT.MainInductionStep.RestrictedProbabilitiesStatement.ofWeightedBounds}
+	\leanok
 	\uses{lem:restricted-probabilities, def:average-restricted-errors}
 	The weighted bounds from Lemma~\ref{lem:restricted-probabilities} imply the
 	restricted-probability data used in the successor step.
@@ -157,6 +159,7 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.ofSliceBridgeInputs}
 	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceBridgeInputs, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceBridgeInputs.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceBridgeInputs.ofPointMeasurementEq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceBridgeInputs.good_of_restrictedGood, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceBridgeInputs.ofMeasurementEq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationRepair, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.ofSliceBridgeInputs}
 	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.ofPointMeasurementEq, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.good_of_restrictedGood, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.ofMeasurementEq, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationRepair}
+	\leanok
 	\uses{thm:self-improvement-in-induction-section}
 	The successor step records the slice-wise self-improvement output in
 	\texttt{SelfImprovementPackage}, and the answer-valued route records the analogous
@@ -170,6 +173,7 @@
 
 \begin{definition}[Pasting data for the successor step]\label{def:successor-pasting-data}
 	\lean{MIPStarRE.LDT.MainInductionStep.AveragedPastingInput.output, MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingInput}
+	\leanok
 	\uses{lem:weighted-restricted-probability-bounds, thm:ld-pasting-in-induction-section}
 	The successor step forms the pasting input by combining the restricted
 	probability estimates with the slice-wise self-improvement data.

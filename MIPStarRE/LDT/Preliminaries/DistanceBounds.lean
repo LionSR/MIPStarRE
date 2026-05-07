@@ -143,6 +143,10 @@ lemma stateDependentDistanceRel_mono
   intro ⟨h⟩
   exact ⟨le_trans h hle⟩
 
+-- NOTE: This private lemma duplicates `conjTranspose_mul_mono_local` in
+-- `Pasting/BridgeLemmas/CommuteGHalfSandwich/Setup/Definitions.lean`.  The
+-- duplication is intentional: Preliminaries cannot import Pasting (dependency
+-- order).  If a shared location is established, this can be deduplicated.
 private lemma conjTranspose_mul_mono
     {ι : Type*} [Fintype ι]
     {X Y Z : MIPStarRE.Quantum.Op ι}
@@ -347,6 +351,10 @@ lemma stateDependentDistanceOpRel_mono
   intro ⟨h⟩
   exact ⟨le_trans h hle⟩
 
+-- NOTE: This private lemma duplicates the public `qSDDOp_symm` in
+-- `CommutativityPoints/SharedHelpers/Core.lean`.  The duplication is
+-- intentional: Preliminaries cannot import CommutativityPoints (dependency
+-- order).  If a shared location is established, this can be deduplicated.
 private lemma qSDDOp_symm
     {Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Fintype Outcome]
