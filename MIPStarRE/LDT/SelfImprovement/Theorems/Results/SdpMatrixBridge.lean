@@ -510,4 +510,26 @@ theorem sdpMeasurementWitness_of_canonicalOptimalPairWithDominance
     params strategy X h.feasible Z h.dualFeasible h.strongDuality
     h.complementarySlackness h.dualDominatesIdentity
 
+/-- A saturated canonical optimal pair, together with a separately proved
+dominance bound `I ≤ Z`, gives the displayed abstract SDP measurement
+witness. -/
+theorem sdpMeasurementWitness_of_canonicalOptimalPair_of_dualDominatesIdentity
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
+      (matrixSdpPointRealizationOfStrategy params strategy)))
+    (Z : MIPStarRE.Quantum.Op ι)
+    (h : MatrixSdpCanonicalOptimalPair params
+      (matrixSdpPointRealizationOfStrategy params strategy) X Z)
+    (hOneLe : (1 : MIPStarRE.Quantum.Op ι) ≤ Z) :
+    ∃ T : Measurement (Polynomial params) ι,
+      0 ≤ Z ∧
+      (1 : MIPStarRE.Quantum.Op ι) ≤ Z ∧
+      (∀ g : Polynomial params, 0 ≤ sdpDualSlackOperator params strategy Z g) ∧
+      ∀ g : Polynomial params,
+        sdpComplementarySlacknessEquation params strategy T.toSubMeas Z g :=
+  sdpMeasurementWitness_of_canonicalOptimalPairWithDominance
+    params strategy X Z (h.withDominance hOneLe)
+
 end MIPStarRE.LDT.SelfImprovement
