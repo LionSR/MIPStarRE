@@ -378,7 +378,7 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective
     (hζ : 0 < ζ) (hζ_small : ζ ≤ 1 / 4)
     (hsource : ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ) :
     projectiveNonMeasurement ψ A ζ := by
-  let ε  classical
+  classical
   let ε : Error := spectralTruncationError ζ
   have hζ_nonneg : 0 ≤ ζ := le_of_lt hζ
   have hε_pos : 0 < ε := by
@@ -448,7 +448,7 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_zero
     (ψ : QuantumState ι) (A : Measurement Outcome ι)
     (hsource : ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 0) :
     projectiveNonMeasurement ψ A 0 := by
-  refine  classical
+  classical
   refine ⟨roundedProjectorFamily A 0, ?_⟩
   refine ⟨?_, ?_, rfl, ?_⟩
   · intro a
@@ -643,7 +643,7 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_large
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error)
     (hψ : ψ.IsNormalized) (hlarge : 1 / 4 < ζ) :
     projectiveNonMeasurement ψ A ζ := by
-  refine  classical
+  classical
   refine ⟨zeroProjectorFamily (Outcome := Outcome) (ι := ι), ?_⟩
   refine ⟨?_, ?_, zeroProjectorFamily_sum_eq_total (Outcome := Outcome) (ι := ι), ?_⟩
   · intro a
@@ -697,7 +697,7 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_full
     (hψ : ψ.IsNormalized)
     (hsource : ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ) :
     projectiveNonMeasurement ψ A ζ := by
-  by_cases  classical
+  classical
   by_cases hzero : ζ = 0
   · have hsource0 : ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 0 := by
       simpa [hzero] using hsource

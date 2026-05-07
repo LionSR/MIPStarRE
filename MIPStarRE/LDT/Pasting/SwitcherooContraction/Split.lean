@@ -386,7 +386,7 @@ lemma switcherooAggregateFourthTerm_split_close_once_commuted
   simpa [hleft, hright] using hclose
 
 /-- Left-action contraction witness for the first `sqrt zeta` transfer. -/
-private lemma switcherooAggregateFourthTerm_once_commuted_contraction_left
+lemma switcherooAggregateFourthTerm_once_commuted_contraction_left
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
