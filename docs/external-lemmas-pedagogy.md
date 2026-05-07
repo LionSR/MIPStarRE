@@ -45,7 +45,7 @@ plus project-local expectation lemmas (`ev_adjoint_self_nonneg`,
 `ev_abs_mul_le_sqrt`).  No external "Cauchy–Schwarz theorem" import is
 needed because the form used is a direct consequence of the
 *sum-of-sqrt-products* inequality, which Mathlib provides in
-`Analysis/Calculus/MeanInequalities`.
+`Mathlib/Data/Real/Sqrt.lean`.
 
 **Pedagogical note**: The key insight is that
 `|∑ a, ψ(X_a Y_a)| ≤ (∑ a, ψ(X_a X_a†))^(1/2) · (∑ a, ψ(Y_a† Y_a))^(1/2)`
