@@ -407,8 +407,7 @@ theorem final_fields_of_helper_outputs_of_residualDominationInput
     (horthInput :
       OrthonormalizationResidualDominationInput params strategy eps delta) :
     ∃ H : ProjSubMeas (Polynomial params) ι,
-      SelfImprovementFinalFields params strategy H Z eps delta nu :=
-  by
+      SelfImprovementFinalFields params strategy H Z eps delta nu := by
     obtain ⟨H, hfinal, _, _, _⟩ :=
       final_fields_exists_of_helper_outputs_of_residualDominationInput
         params strategy eps delta nu heps heps_le_one hdelta hdelta_le_one hd_le_q
