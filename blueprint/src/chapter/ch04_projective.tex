@@ -1122,6 +1122,7 @@
 		\leanok
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndSvdIdentities}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangePositiveGram}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangePositiveGram_with_x_coisometry}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot}
 		\leanok
 		\begin{equation*}
@@ -1134,7 +1135,12 @@
 		$X$, $\widehat X$, and $P$ identities; the $30\zeta^{1/4}$ estimate is
 		derived here rather than stored as part of the data package.  The
 		rectangular-SVD producer combines the same estimate with the positive-square
-		identification of the middle factor from \ref{lem:X-times-X-hat}.
+		identification of the middle factor from \ref{lem:X-times-X-hat}.  The
+		positive-Gram sigma-space producer also records the coisometry
+		\(X X^\dagger=I\) for the original sigma embedding when the projective
+		\(Q\)-family is subnormalized; this is the construction-level hypothesis
+		later used in the residual-domination argument for the fresh completed
+		outcome.
 		The quantity to bound is
 		\begin{equation}\label{eq:P-Q-thing-to-bound}
 			\sum_a \bra{\psi} (Q_a-P_a)^2 \ot I \ket{\psi}
