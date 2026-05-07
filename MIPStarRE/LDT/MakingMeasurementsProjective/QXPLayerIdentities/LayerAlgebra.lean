@@ -110,6 +110,55 @@ lemma xHatA_eq_xa_of_x_mul_conjTranspose_eq_one_of_mixed_eq_gram {Outcome : Type
   rw [XHatA, Xa,
     xHat_eq_x_of_x_mul_conjTranspose_eq_one_of_mixed_eq_gram data hx_left hmixed]
 
+/-- If the original `X` rows are already coisometric, then the polar
+replacement `XHat` is equal to `X`.
+
+Indeed, `X X† = I` makes the Gram operator `X† X` idempotent.  Since this Gram
+operator is positive, its positive square root is itself; the stored mixed
+identity `X† XHat = sqrt (X† X)` therefore reduces to the hypothesis of
+`xHat_eq_x_of_x_mul_conjTranspose_eq_one_of_mixed_eq_gram`. -/
+lemma xHat_eq_x_of_x_mul_conjTranspose_eq_one {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι)
+    (hx_left :
+      data.x * data.xᴴ =
+        (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier)) :
+    data.xHat = data.x := by
+  have hgram_sq :
+      (data.xᴴ * data.x) * (data.xᴴ * data.x) = data.xᴴ * data.x := by
+    calc
+      (data.xᴴ * data.x) * (data.xᴴ * data.x) =
+          data.xᴴ * (data.x * data.xᴴ) * data.x := by
+            simp [Matrix.mul_assoc]
+      _ = data.xᴴ *
+          ((1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier) * data.x) := by
+            rw [hx_left]
+            simp
+      _ = data.xᴴ * data.x := by simp
+  have hgram_nonneg : 0 ≤ data.xᴴ * data.x :=
+    (Matrix.posSemidef_conjTranspose_mul_self data.x).nonneg
+  have hsqrt :
+      CFC.sqrt (data.xᴴ * data.x) = data.xᴴ * data.x :=
+    CFC.sqrt_unique hgram_sq hgram_nonneg
+  have hmixed : data.xᴴ * data.xHat = data.xᴴ * data.x := by
+    calc
+      data.xᴴ * data.xHat = CFC.sqrt (QTotal data.qLayer) := data.xHat_mixed
+      _ = CFC.sqrt (data.xᴴ * data.x) := by rw [← data.x_gram_right]
+      _ = data.xᴴ * data.x := hsqrt
+  exact xHat_eq_x_of_x_mul_conjTranspose_eq_one_of_mixed_eq_gram data hx_left hmixed
+
+/-- Row-block form of `xHat_eq_x_of_x_mul_conjTranspose_eq_one`. -/
+lemma xHatA_eq_xa_of_x_mul_conjTranspose_eq_one {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) (a : Outcome)
+    (hx_left :
+      data.x * data.xᴴ =
+        (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier)) :
+    XHatA data a = Xa data a := by
+  rw [XHatA, Xa, xHat_eq_x_of_x_mul_conjTranspose_eq_one data hx_left]
+
 /-- The total `Q` operator in a QXP layer is Hermitian.
 
 This follows from `lem:X-squared`: the total operator is the right Gram matrix
