@@ -483,9 +483,17 @@ theorem final_fields_projective_residual_error_le_selfImprovementError_of_small_
   have hhelper_sqrt :=
     final_fields_projective_residual_error_le_131_times_finalStagePowerSum params
       eps delta heps heps_le_one hdelta hdelta_le_one hd_le_q
+  have hdq_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1 :=
+    d_q_ratio_le_one_of_d_le_q params hd_le_q
   have hsum32_nonneg :
       0 ≤ finalStagePowerSum params eps delta (1 / (32 : Error)) :=
     finalStagePowerSum_nonneg params eps delta (1 / (32 : Error)) heps hdelta
+  have hdata_sqrt :
+      Real.sqrt (selfImprovementDataProcessingError params eps delta) ≤
+        31 * (params.m : Error) *
+          finalStagePowerSum params eps delta (1 / (32 : Error)) :=
+    sqrt_selfImprovementDataProcessingError_le_thirty_one_m_powerSum_thirtysecond
+      params eps delta heps heps_le_one hdelta hdelta_le_one hdq_le_one
   have hdata_nonneg : 0 ≤ selfImprovementDataProcessingError params eps delta := by
     rw [selfImprovementDataProcessingError_eq]
     positivity
@@ -524,12 +532,8 @@ theorem final_fields_projective_residual_error_le_selfImprovementError_of_small_
           selfImprovementDataProcessingError params eps delta) ≤
           92 * Real.sqrt (selfImprovementDataProcessingError params eps delta) := hsqrt_card
       _ ≤ 92 * (31 * (params.m : Error) *
-            finalStagePowerSum params eps delta (1 / (32 : Error))) := by
-            have hnonneg : (0 : Error) ≤
-                31 * (params.m : Error) *
-                  finalStagePowerSum params eps delta (1 / (32 : Error)) := by
-              positivity
-            nlinarith
+            finalStagePowerSum params eps delta (1 / (32 : Error))) :=
+          mul_le_mul_of_nonneg_left hdata_sqrt (by norm_num)
       _ = 2852 * (params.m : Error) *
             finalStagePowerSum params eps delta (1 / (32 : Error)) := by ring_nf
   calc
