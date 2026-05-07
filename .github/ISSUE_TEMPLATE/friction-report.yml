@@ -1,0 +1,72 @@
+name: Friction Report
+description: Report a recurring pain point that slows development
+labels: ["friction", "infrastructure"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        File a friction report when you (or another contributor / agent) hit
+        the **same** pain point a second time. See
+        [`docs/evolution/norms/0004-file-friction-report-on-second-recurrence.md`](../docs/evolution/norms/0004-file-friction-report-on-second-recurrence.md).
+
+        After the issue is filed, copy the body into a file under
+        `docs/evolution/friction/` so the weekly meta-loop can read it. The
+        file goes through PR review like any other change.
+
+  - type: input
+    id: summary
+    attributes:
+      label: One-line summary
+      description: A short headline for the friction.
+      placeholder: "e.g., dbg_trace cleanup keeps coming back in PRs"
+    validations:
+      required: true
+
+  - type: textarea
+    id: what_slowed_you_down
+    attributes:
+      label: What slowed you down
+      description: Concrete description. Which command, which file, which workflow, what happened, how much time you estimate it cost.
+      placeholder: |
+        Building MIPStarRE/LDT/SelfImprovement/.../X.lean takes 90 seconds in
+        isolation; reviewers keep asking me to remove `dbg_trace` calls; the
+        Lean linter sweep flags `unusedSimpArgs` in three modules every week.
+    validations:
+      required: true
+
+  - type: textarea
+    id: how_often
+    attributes:
+      label: How often
+      description: How many times have you (or PRs you have observed) hit this in the last week / month? Cite PR numbers if available.
+      placeholder: |
+        Three times in the last fortnight: PR #1234, #1245, #1260.
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggested_fix
+    attributes:
+      label: Suggested fix
+      description: What change would remove or reduce this friction? Be specific. If unknown, say "cause unknown".
+      placeholder: |
+        Add a CI check in scripts/check_no_dbg_trace.py and wire it into
+        oversized-lean-files.yml.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: target
+    attributes:
+      label: Where would the fix live?
+      multiple: true
+      options:
+        - "scripts/ (new or extended check)"
+        - ".github/workflows/ (new or extended workflow)"
+        - "AGENTS.md (new norm or convention)"
+        - "docs/evolution/norms/ (new norm)"
+        - "MIPStarRE/ (refactor)"
+        - "blueprint/ (style or layout)"
+        - "Unknown / mixed"
+    validations:
+      required: false

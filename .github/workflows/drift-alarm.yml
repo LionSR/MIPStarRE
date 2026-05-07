@@ -1,0 +1,145 @@
+name: Drift alarm
+
+# Daily quantitative health check.  Runs scripts/audit_drift.py against the
+# baseline in audits/drift/baseline.json and opens (or updates) a tracking
+# issue if any "fail" finding is reported.
+#
+# Threshold changes must come as their own PR per
+# docs/evolution/norms/0005-fix-drift-causes-not-thresholds.md.
+
+on:
+  schedule:
+    # 07:50 UTC every day, before the Monday maintenance sweeps.
+    - cron: "50 7 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "MIPStarRE/**"
+      - "scripts/audit_drift.py"
+      - "audits/drift/**"
+
+concurrency:
+  group: drift-alarm
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  audit:
+    name: Run drift audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 50  # enough commits for the bot-fix streak detector
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Run drift audit
+        id: audit
+        run: |
+          set -eo pipefail
+          python3 scripts/audit_drift.py \
+            --root . \
+            --out "$RUNNER_TEMP/drift.json"
+          # Re-emit the human report into the step summary.
+          python3 scripts/audit_drift.py --root . --out /dev/null 2>"$RUNNER_TEMP/drift.txt"
+          {
+            echo "## Drift audit"
+            echo ""
+            echo "\`\`\`text"
+            cat "$RUNNER_TEMP/drift.txt"
+            echo "\`\`\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          # Compute fail/warn flags for downstream steps.
+          python3 - <<'PY'
+          import json, os, pathlib
+          payload = json.loads(pathlib.Path(os.environ["RUNNER_TEMP"], "drift.json").read_text())
+          findings = payload.get("findings", [])
+          fail = any(f.get("severity") == "fail" for f in findings)
+          warn = any(f.get("severity") == "warn" for f in findings)
+          out = pathlib.Path(os.environ["GITHUB_OUTPUT"])
+          with out.open("a") as fp:
+              fp.write(f"has_fail={'true' if fail else 'false'}\n")
+              fp.write(f"has_warn={'true' if warn else 'false'}\n")
+              fp.write(f"finding_count={len(findings)}\n")
+          PY
+
+      - name: Upload drift artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: drift-audit-report
+          path: |
+            ${{ runner.temp }}/drift.json
+            ${{ runner.temp }}/drift.txt
+          if-no-files-found: error
+
+      - name: File or update drift alarm issue
+        if: steps.audit.outputs.has_fail == 'true'
+        uses: actions/github-script@v8
+        env:
+          DRIFT_REPORT_PATH: ${{ runner.temp }}/drift.json
+        with:
+          script: |
+            const fs = require('fs');
+            const path = process.env.DRIFT_REPORT_PATH;
+            const payload = JSON.parse(fs.readFileSync(path, 'utf8'));
+            const findings = payload.findings || [];
+            const failFindings = findings.filter(f => f.severity === 'fail');
+            const lines = failFindings.map(f =>
+              `- **${f.metric}**: current ${f.current}` +
+              (f.baseline !== null && f.baseline !== undefined
+                ? ` (baseline ${f.baseline})`
+                : '') +
+              ` — threshold: ${f.threshold}`
+            );
+            const sha = (payload.snapshot && payload.snapshot.commit) || context.sha;
+            const body = [
+              `Drift audit on \`${sha.substring(0, 12)}\` reported failing metrics.`,
+              '',
+              ...lines,
+              '',
+              'See `docs/evolution/norms/0005-fix-drift-causes-not-thresholds.md` —',
+              'fix the underlying regression rather than the threshold.',
+              '',
+              `Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+            ].join('\n');
+
+            // Find an existing open drift issue to update; otherwise open one.
+            const search = await github.rest.search.issuesAndPullRequests({
+              q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open label:drift in:title "Drift alarm"`,
+              per_page: 5,
+            });
+            const existing = search.data.items[0];
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                body,
+              });
+              core.notice(`Appended to #${existing.number}`);
+            } else {
+              const issue = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `Drift alarm: ${failFindings.length} failing metrics`,
+                body,
+                labels: ['drift', 'infrastructure'],
+              });
+              core.notice(`Opened #${issue.data.number}`);
+            }
+
+      - name: Fail the job on drift
+        if: steps.audit.outputs.has_fail == 'true'
+        run: |
+          echo "Drift audit reported failing metrics."
+          exit 1

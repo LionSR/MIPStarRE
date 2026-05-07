@@ -1,0 +1,214 @@
+name: Repo evolution (weekly)
+
+# Weekly meta-loop. Reads drift, CI-waste, recent PR/review activity, and
+# the friction ledger; asks Claude to propose small, reversible amendments
+# to AGENTS.md, scripts, workflows, or norms; opens a `repo-evolution`
+# tracking issue.
+#
+# This workflow does NOT push code or open PRs. See
+# docs/evolution/charter.md (principle 7) and the system prompt at
+# .github/prompts/repo-evolution-system-prompt.md.
+
+on:
+  schedule:
+    # Mondays at 10:30 UTC, after the Monday maintenance sweeps.
+    - cron: "30 10 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: repo-evolution
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+  actions: read
+  id-token: write
+
+jobs:
+  evolve:
+    runs-on: ubuntu-latest
+    env:
+      CLAUDE_CODE_PROVIDER: ${{ vars.CLAUDE_CODE_PROVIDER || 'anthropic' }}
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+      DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+      ANTHROPIC_BASE_URL: ${{ vars.ANTHROPIC_BASE_URL }}
+      CLAUDE_OPUS_MODEL: ${{ vars.CLAUDE_OPUS_MODEL }}
+      CLAUDE_SONNET_MODEL: ${{ vars.CLAUDE_SONNET_MODEL }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 200
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Compute today's date
+        id: date
+        run: echo "today=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+
+      - name: Run drift audit
+        run: |
+          python3 scripts/audit_drift.py --root . --out "$RUNNER_TEMP/drift.json"
+
+      - name: Gather recent workflow runs
+        id: ci_runs
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+            // Pull recent runs (paginated). 100 is plenty for a week.
+            const runs = await github.paginate(github.rest.actions.listWorkflowRunsForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              created: `>=${since}`,
+              per_page: 100,
+            }, (response) => response.data);
+
+            // Light flattening; the audit script only needs a subset of fields.
+            const flat = runs.slice(0, 300).map(r => ({
+              id: r.id,
+              name: r.name,
+              workflow_path: r.path,
+              head_branch: r.head_branch,
+              head_sha: r.head_sha,
+              conclusion: r.conclusion,
+              status: r.status,
+              run_started_at: r.run_started_at,
+              updated_at: r.updated_at,
+              run_attempt: r.run_attempt,
+              event: r.event,
+              head_commit_message: r.head_commit && r.head_commit.message
+                ? r.head_commit.message.split('\n')[0]
+                : '',
+            }));
+
+            // For each failed run, pull the names of failed jobs.
+            for (const r of flat) {
+              if (r.conclusion !== 'failure') continue;
+              try {
+                const jobs = await github.rest.actions.listJobsForWorkflowRun({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  run_id: r.id,
+                  per_page: 30,
+                });
+                r.failed_jobs = jobs.data.jobs
+                  .filter(j => j.conclusion === 'failure')
+                  .map(j => j.name);
+              } catch (e) {
+                r.failed_jobs = [];
+              }
+            }
+
+            const fs = require('fs');
+            const path = process.env.RUNNER_TEMP + '/runs.json';
+            fs.writeFileSync(path, JSON.stringify({ runs: flat }, null, 2));
+            return path;
+
+      - name: Run CI-waste audit
+        run: |
+          python3 scripts/audit_ci_waste.py \
+            --in "$RUNNER_TEMP/runs.json" \
+            --out "$RUNNER_TEMP/ci-waste.json"
+          {
+            echo "## CI waste"
+            echo ""
+            echo "\`\`\`json"
+            cat "$RUNNER_TEMP/ci-waste.json"
+            echo "\`\`\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Gather recent PR and review activity
+        id: pr_activity
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+            const sinceDate = since.split('T')[0];
+
+            const merged = await github.rest.search.issuesAndPullRequests({
+              q: `repo:${context.repo.owner}/${context.repo.repo} is:pr is:merged merged:>=${sinceDate}`,
+              per_page: 30,
+            });
+
+            // For up to 20 of the most recently merged PRs, gather review comments.
+            const items = merged.data.items.slice(0, 20);
+            const reviewComments = [];
+            for (const pr of items) {
+              try {
+                const comments = await github.rest.pulls.listReviewComments({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: pr.number,
+                  per_page: 30,
+                });
+                for (const c of comments.data) {
+                  reviewComments.push({
+                    pr: pr.number,
+                    pr_title: pr.title,
+                    author: c.user && c.user.login,
+                    body: (c.body || '').substring(0, 400),
+                  });
+                }
+              } catch (e) {
+                /* ignore individual PR fetch errors */
+              }
+            }
+
+            return {
+              merged_prs: items.map(p => ({
+                number: p.number,
+                title: p.title,
+                user: p.user && p.user.login,
+                labels: p.labels.map(l => l.name),
+              })),
+              review_comments: reviewComments.slice(0, 80),
+            };
+
+      - name: Stage meta-loop context for Claude
+        run: |
+          # Stage the audit outputs in repository-relative paths so Claude can
+          # Read them. We deliberately do NOT commit these — the workflow
+          # checkout is throwaway.
+          mkdir -p .repo-evolution
+          cp "$RUNNER_TEMP/drift.json"    .repo-evolution/drift.json
+          cp "$RUNNER_TEMP/ci-waste.json" .repo-evolution/ci-waste.json
+          cp "$RUNNER_TEMP/runs.json"     .repo-evolution/runs.json
+
+      - name: Generate weekly proposal with Claude
+        uses: ./.github/actions/claude-code-with-provider
+        with:
+          provider: ${{ env.CLAUDE_CODE_PROVIDER }}
+          model-tier: opus
+          claude-prompt-file: .github/prompts/repo-evolution-prompt.md
+          system-prompt-file: .github/prompts/repo-evolution-system-prompt.md
+          allowed_tools_preset: repo-evolution
+          claude-prompt-context: |
+            Today's date: ${{ steps.date.outputs.today }}
+            Issue title to create: repo-evolution: ${{ steps.date.outputs.today }}
+
+            Audit artefacts staged for Read in the repo root:
+
+              .repo-evolution/drift.json
+              .repo-evolution/ci-waste.json
+              .repo-evolution/runs.json
+
+            Recent merged PRs and review comments (last 7 days):
+
+            ${{ toJSON(fromJSON(steps.pr_activity.outputs.result)) }}
+
+      - name: Upload meta-loop artefacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: repo-evolution-${{ steps.date.outputs.today }}
+          path: |
+            ${{ runner.temp }}/drift.json
+            ${{ runner.temp }}/ci-waste.json
+            ${{ runner.temp }}/runs.json
+          if-no-files-found: warn

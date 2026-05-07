@@ -446,7 +446,40 @@ Use this file together with:
 | `docs/pr-review.md` | Mathlib PR review guide |
 | `docs/pr_review_management.md` | Review thread workflow and bot integration |
 | `audits/` | Chapter-by-chapter scouting reports |
+| `docs/evolution/` | Self-evolution framework: norms ledger, friction reports, weekly proposals |
 | Pinned memories (external agent tooling) | Agent session memory maintained by the agent runtime; not a directory in the repository checkout. Pinned memories contain accumulated project lessons |
+
+## Self-Evolution
+
+The repository maintains its own memory of recurring lessons under
+`docs/evolution/`. Every coding agent (Claude session, Codex, human) should:
+
+1. **Skim `docs/evolution/norms/INDEX.md`** before starting non-trivial work.
+   Norms are accepted, append-only rules — see
+   `docs/evolution/charter.md` for the principles.
+2. **Read CI failure logs before retrying.** When `lake build` or any
+   workflow fails, identify the failing step and message before pushing
+   another commit. Two consecutive same-failure runs on a branch is the
+   stop-and-think point — see
+   `docs/evolution/norms/0003-read-ci-failure-logs-before-retrying.md`.
+   The 5-iteration cap on auto-fix loops in
+   `.github/workflows/_ci-auto-fix-shared.yml` is a fire alarm, not a
+   budget.
+3. **File a friction report on the second recurrence.** When the same
+   review comment, the same cleanup, or the same workflow flake hits twice,
+   open `.github/ISSUE_TEMPLATE/friction-report.yml` and copy the body into
+   a file under `docs/evolution/friction/`. See norm 0004.
+4. **Treat drift alarms as causes to investigate, not thresholds to raise.**
+   The drift audit (`scripts/audit_drift.py`, run by
+   `.github/workflows/drift-alarm.yml`) measures sorry counts, oversized
+   files, forbidden tokens, and the auto-fix iteration streak. Threshold
+   changes are their own PR. See norm 0005.
+
+The weekly meta-loop (`.github/workflows/repo-evolution.yml`) reads drift,
+CI waste, recent merged PRs, review comments, and the friction ledger, then
+asks Claude to propose small reversible amendments — new norms, AGENTS.md
+edits, script tweaks. The output is a `repo-evolution` tracking issue;
+acceptance is always a separate human-reviewed PR.
 
 ## Practical Defaults for Agents
 

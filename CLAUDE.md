@@ -14,5 +14,7 @@ proof-integrity rules.** This repository has a single, consolidated agent guide 
   locate definitions and search for lemmas in `.lake/packages/mathlib/`.
 - Prefer `lake env lean MIPStarRE/Path/To/File.lean` for fast iteration; only run
   `lake build` before pushing.
+- Skim `docs/evolution/norms/INDEX.md` before starting non-trivial work, and
+  read CI failure logs before pushing a retry. See `AGENTS.md` §Self-Evolution.
 - The `AGENTS.md` and `CLAUDE.md` files are consumed by the Claude Code
   agent; keep them under 200 lines total.

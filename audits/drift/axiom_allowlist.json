@@ -1,0 +1,4 @@
+{
+  "_comment": "Allow-list of axiom declarations explicitly accepted in this repo. Keys are fully qualified Lean axiom names; values record the justification, the PR that introduced the axiom, and the SHA the entry was minted at. The drift audit subtracts entries here from the total axiom count.",
+  "entries": []
+}

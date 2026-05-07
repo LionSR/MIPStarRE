@@ -289,6 +289,9 @@ runs:
           daily-standup)
             preset_allowed_tools="Read,Glob,Grep,Bash(git log *),Bash(git diff *),Bash(git show *),Bash(gh label create *),mcp__github__search_issues,mcp__github__issue_write,mcp__github__issue_read,mcp__github__add_issue_comment,mcp__github__get_label,mcp__github__list_issues,mcp__github__search_pull_requests,mcp__github__list_pull_requests,mcp__github__pull_request_read,mcp__github__list_commits"
             ;;
+          repo-evolution)
+            preset_allowed_tools="Read,Glob,Grep,Bash(git log *),Bash(git diff *),Bash(git show *),Bash(python3 scripts/audit_drift.py*),Bash(python3 scripts/audit_ci_waste.py*),Bash(cat *),Bash(ls *),Bash(wc *),mcp__github__search_issues,mcp__github__list_issues,mcp__github__issue_write,mcp__github__issue_read,mcp__github__add_issue_comment,mcp__github__list_commits,mcp__github__search_pull_requests,mcp__github__list_pull_requests,mcp__github__pull_request_read,mcp__github__get_label"
+            ;;
           *)
             echo "::error::Unknown allowed_tools_preset: ${allowed_tools_preset}"
             exit 1
