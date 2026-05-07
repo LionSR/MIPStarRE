@@ -177,7 +177,7 @@ jobs:
 
       - name: Check blueprint Lean declarations
         if: |
-          always() &&
+          !cancelled() &&
           steps.lean-setup.outcome == 'success' &&
           steps.lean-decls.outcome == 'success'
         continue-on-error: true
