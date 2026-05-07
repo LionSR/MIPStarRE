@@ -107,6 +107,55 @@ lemma qxpSomeOutcomeTotal_leftTensor_ev_le_of_residualDomination {Outcome : Type
 
 namespace QXPLayerResidualDomination
 
+/-- Residual domination from the fresh-outcome comparison in the QXP layer.
+
+When the Q-layer over `Option Outcome` is the option completion of the source
+submeasurement, the original residual is the QXP operator `Q_none`.  Thus the
+construction-level inequality `Q_none ≤ P_none` is exactly the residual
+domination needed by the monotone-total orthonormalization route. -/
+theorem of_fresh_outcome_le {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    {data : QXPLayerData (Option Outcome) ι} {A : SubMeas Outcome ι}
+    (hsource :
+      data.qLayer.q.outcome none = (optionCompletion A).outcome none)
+    (hfresh : data.qLayer.q.outcome none ≤ Pa data none) :
+    QXPLayerResidualDomination data A := by
+  constructor
+  calc
+    (optionCompletion A).outcome none = data.qLayer.q.outcome none := hsource.symm
+    _ ≤ Pa data none := hfresh
+    _ = (qxpProjSubMeas data).outcome none := by
+          rw [qxpProjSubMeas_outcome]
+
+/-- A residual-domination witness gives the fresh-outcome comparison
+`Q_none ≤ P_none` whenever the Q-layer is identified with the option completion
+of the source submeasurement. -/
+theorem fresh_outcome_le {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    {data : QXPLayerData (Option Outcome) ι} {A : SubMeas Outcome ι}
+    (hsource :
+      data.qLayer.q.outcome none = (optionCompletion A).outcome none)
+    (hdom : QXPLayerResidualDomination data A) :
+    data.qLayer.q.outcome none ≤ Pa data none := by
+  calc
+    data.qLayer.q.outcome none = (optionCompletion A).outcome none := hsource
+    _ ≤ (qxpProjSubMeas data).outcome none := hdom.residual_le
+    _ = Pa data none := qxpProjSubMeas_outcome data none
+
+/-- Under the source identification, residual domination is equivalent to the
+fresh QXP outcome comparison `Q_none ≤ P_none`. -/
+theorem iff_fresh_outcome_le {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    {data : QXPLayerData (Option Outcome) ι} {A : SubMeas Outcome ι}
+    (hsource :
+      data.qLayer.q.outcome none = (optionCompletion A).outcome none) :
+    QXPLayerResidualDomination data A ↔
+      data.qLayer.q.outcome none ≤ Pa data none :=
+  ⟨fresh_outcome_le hsource, of_fresh_outcome_le hsource⟩
+
 /-- Build residual domination from the raw residual-outcome comparison. -/
 theorem of_residual_le {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]

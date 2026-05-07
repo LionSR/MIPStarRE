@@ -169,6 +169,44 @@ lemma rankOne_mul (i j : Fin P.rank) :
     rw [hzero]
     simp [hij]
 
+/-- A rank-one projector from the chosen range basis acts by the corresponding
+Kronecker delta on basis vectors. -/
+lemma rankOne_mulVec_vec (i j : Fin P.rank) :
+    b.rankOne i *ᵥ b.vec j = if i = j then b.vec i else 0 := by
+  rw [rankOne, Matrix.vecMulVec_mulVec]
+  have horth := b.orthonormal i j
+  by_cases hij : i = j
+  · subst hij
+    rw [horth]
+    simp
+  · have hzero : star (b.vec i) ⬝ᵥ b.vec j = 0 := by simpa [hij] using horth
+    rw [hzero]
+    simp [hij]
+
+/-- Each vector in the chosen orthonormal basis of the range is fixed by the
+projector. -/
+lemma mulVec_vec (i : Fin P.rank) :
+    P *ᵥ b.vec i = b.vec i := by
+  calc
+    P *ᵥ b.vec i =
+        (∑ j, Matrix.vecMulVec (b.vec j) (star (b.vec j))) *ᵥ b.vec i := by
+          rw [← b.decomposition]
+    _ = b.vec i := by
+          rw [Matrix.sum_mulVec]
+          rw [Finset.sum_eq_single i]
+          · rw [Matrix.vecMulVec_mulVec]
+            have horth := b.orthonormal i i
+            rw [horth]
+            simp
+          · intro j _ hji
+            rw [Matrix.vecMulVec_mulVec]
+            have horth := b.orthonormal j i
+            have hzero : star (b.vec j) ⬝ᵥ b.vec i = 0 := by simpa [hji] using horth
+            rw [hzero]
+            simp
+          · intro hi
+            exact False.elim (hi (Finset.mem_univ i))
+
 /-- A selected sum of orthonormal rank-one projectors is Hermitian. -/
 lemma subprojector_isHermitian (S : Finset (Fin P.rank)) :
     (b.subprojector S).IsHermitian := by
@@ -314,6 +352,15 @@ noncomputable def IsProj.rangeONB (P : Op ι) (hP : IsProj P) :
           fun i : {i : ι // hP.isHermitian.eigenvalues i ≠ 0} =>
             Matrix.vecMulVec ((hP.isHermitian.eigenvectorBasis i.1).ofLp)
               (star ((hP.isHermitian.eigenvectorBasis i.1).ofLp))).symm))
+
+/-- An orthogonal projection is positive semidefinite. -/
+lemma IsProj.nonneg (P : Op ι) (hP : IsProj P) :
+    0 ≤ P := by
+  classical
+  let b := hP.rangeONB P
+  rw [b.decomposition]
+  exact Finset.sum_nonneg fun i _ =>
+    (Matrix.posSemidef_vecMulVec_self_star (b.vec i)).nonneg
 
 end
 

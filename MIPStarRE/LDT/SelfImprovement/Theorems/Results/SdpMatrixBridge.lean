@@ -198,7 +198,83 @@ theorem toMatrixSdpStatementWithSlacknessAndDominance
     params model X h.feasible Z h.dualFeasible h.strongDuality
     h.complementarySlackness h.dualDominatesIdentity
 
+/-- A canonical optimal pair with dominance is saturated.
+
+The paper obtains the vanishing of the extra canonical slack block from
+complementary slackness on the `none` block.  In the dominance-carrying
+interface this same conclusion follows from the block equation
+`X(D(Z)-C)=0` and the lower bound \(I \le Z\). -/
+theorem toCanonicalOptimalPair
+    {params : Parameters}
+    [FieldModel params.q]
+    {model : MatrixSdpRealization params}
+    {X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)}
+    {Z : MatrixOperator model.space}
+    (h : MatrixSdpCanonicalOptimalPairWithDominance params model X Z) :
+    MatrixSdpCanonicalOptimalPair params model X Z where
+  feasible := h.feasible
+  dualFeasible := h.dualFeasible
+  strongDuality := h.strongDuality
+  complementarySlackness := h.complementarySlackness
+  slackBlock_eq_zero := by
+    let T := matrixSdpCanonicalExtractedPrimalSubmeasurement params model X h.feasible
+    have hcanonical_T :
+        matrixSdpCanonicalPrimalBlockMatrix params model T *
+            (matrixSdpCanonicalDualOperator params model Z -
+              matrixSdpCanonicalObjectiveOperator params model) =
+          0 :=
+      matrixSdpCanonicalPrimalBlockMatrix_extracted_mul_dualSlack_of_canonical
+        params model X h.feasible Z h.complementarySlackness
+    have hSlackDual : matrixSdpCanonicalSlackOperator params model T * Z = 0 :=
+      matrixSdpCanonicalSlack_mul_dual_of_complementarySlackness
+        params model T Z hcanonical_T
+    have hSlack : matrixSdpCanonicalSlackOperator params model T = 0 :=
+      matrixSdpCanonicalSlackOperator_eq_zero_of_mul_dual_eq_zero_of_one_le
+        params model T Z hSlackDual h.dualDominatesIdentity
+    simpa [T] using
+      (matrixSdpCanonicalSlackOperator_extractedPrimalSubmeasurement
+        params model X h.feasible).symm.trans hSlack
+
+/-- A canonical optimal pair with dominance also gives the dominance-free
+matrix slackness statement after saturating the extra canonical block. -/
+theorem toMatrixSdpStatementWithSlackness
+    {params : Parameters}
+    [FieldModel params.q]
+    {model : MatrixSdpRealization params}
+    {X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)}
+    {Z : MatrixOperator model.space}
+    (h : MatrixSdpCanonicalOptimalPairWithDominance params model X Z) :
+    MatrixSdpStatementWithSlackness params model :=
+  h.toCanonicalOptimalPair.toMatrixSdpStatementWithSlackness
+
 end MatrixSdpCanonicalOptimalPairWithDominance
+
+namespace MatrixSdpCanonicalOptimalPair
+
+/-- Add the reduced-interface dominance condition to a saturated canonical
+optimal pair.
+
+The saturated package records the paper-facing strong-duality output: the
+primal slack block vanishes, but no condition `I ≤ Z` is imposed on the chosen
+dual witness.  This constructor keeps that distinction explicit while allowing
+callers that have separately proved `I ≤ Z` to reuse the existing
+dominance-carrying helper interface. -/
+theorem withDominance
+    {params : Parameters}
+    [FieldModel params.q]
+    {model : MatrixSdpRealization params}
+    {X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)}
+    {Z : MatrixOperator model.space}
+    (h : MatrixSdpCanonicalOptimalPair params model X Z)
+    (hOneLe : (1 : MatrixOperator model.space) ≤ Z) :
+    MatrixSdpCanonicalOptimalPairWithDominance params model X Z where
+  feasible := h.feasible
+  dualFeasible := h.dualFeasible
+  strongDuality := h.strongDuality
+  complementarySlackness := h.complementarySlackness
+  dualDominatesIdentity := hOneLe
+
+end MatrixSdpCanonicalOptimalPair
 
 namespace MatrixSdpOptimalWitness
 
@@ -345,6 +421,27 @@ theorem sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance
   MatrixSdpStatementWithSlacknessAndDominance.toSdpStatementWithSlackness
     params strategy h.toMatrixSdpStatementWithSlacknessAndDominance
 
+/-- A saturated canonical optimal pair, together with a separately proved
+dominance bound `I ≤ Z`, gives the abstract Section 9 SDP statement with
+complementary slackness.
+
+This is the bridge from the paper-faithful saturated package
+`MatrixSdpCanonicalOptimalPair` to the current reduced helper interface, whose
+matrix-side input is still dominance-carrying. -/
+theorem sdpStatementWithSlackness_of_canonicalOptimalPair_of_dualDominatesIdentity
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
+      (matrixSdpPointRealizationOfStrategy params strategy)))
+    (Z : MIPStarRE.Quantum.Op ι)
+    (h : MatrixSdpCanonicalOptimalPair params
+      (matrixSdpPointRealizationOfStrategy params strategy) X Z)
+    (hOneLe : (1 : MIPStarRE.Quantum.Op ι) ≤ Z) :
+    SdpStatementWithSlackness params strategy :=
+  sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance
+    params strategy X Z (h.withDominance hOneLe)
+
 /-- A saturated canonical optimal pair gives the displayed abstract SDP
 measurement witness, without asserting the auxiliary dominance condition
 `I ≤ Z`.
@@ -461,5 +558,27 @@ theorem sdpMeasurementWitness_of_canonicalOptimalPairWithDominance
   sdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness
     params strategy X h.feasible Z h.dualFeasible h.strongDuality
     h.complementarySlackness h.dualDominatesIdentity
+
+/-- A saturated canonical optimal pair, together with a separately proved
+dominance bound `I ≤ Z`, gives the displayed abstract SDP measurement
+witness. -/
+theorem sdpMeasurementWitness_of_canonicalOptimalPair_of_dualDominatesIdentity
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
+      (matrixSdpPointRealizationOfStrategy params strategy)))
+    (Z : MIPStarRE.Quantum.Op ι)
+    (h : MatrixSdpCanonicalOptimalPair params
+      (matrixSdpPointRealizationOfStrategy params strategy) X Z)
+    (hOneLe : (1 : MIPStarRE.Quantum.Op ι) ≤ Z) :
+    ∃ T : Measurement (Polynomial params) ι,
+      0 ≤ Z ∧
+      (1 : MIPStarRE.Quantum.Op ι) ≤ Z ∧
+      (∀ g : Polynomial params, 0 ≤ sdpDualSlackOperator params strategy Z g) ∧
+      ∀ g : Polynomial params,
+        sdpComplementarySlacknessEquation params strategy T.toSubMeas Z g :=
+  sdpMeasurementWitness_of_canonicalOptimalPairWithDominance
+    params strategy X Z (h.withDominance hOneLe)
 
 end MIPStarRE.LDT.SelfImprovement

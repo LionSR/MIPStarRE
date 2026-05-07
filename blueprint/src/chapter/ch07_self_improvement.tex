@@ -479,15 +479,26 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixAveragedPointOperator_nonneg}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixAveragedPointOperator_le_one}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStrictDualWitness_dualFeasible}
+  \lean{MIPStarRE.LDT.SelfImprovement.one_le_matrixSdpStrictDualWitness_dualSlack}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpDualPositive_of_dualFeasible}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpFeasibleBounds}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpFeasibleBounds_canonical}
+  \lean{MIPStarRE.LDT.SelfImprovement.one_le_matrixSdpCanonicalStrictDualConstraint}
+  \lean{MIPStarRE.LDT.SelfImprovement.one_le_matrixSdpCanonicalStrictDualSlackBlockFamily}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalStrictPrimalBlockMatrix_feasible}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalStrictPrimalBlockMatrix_slack_half}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalStrictPrimalBlockMatrix_objective}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalFeasibleBounds}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalFeasibleBounds_canonical}
   \leanok
   In every concrete matrix realization, the uniform family
   \(T_g=(2|\polyfunc{m}{q}{d}|)^{-1}I\) has total mass \((1/2)I\).  The dual
-  operator \(Z=2I\) dominates the identity and satisfies \(Z\geq A_g\) for every
-  polynomial \(g\).  More generally, dual feasibility implies positivity of
-  \(Z\), since the averaged point operators \(A_g\) are positive semidefinite.
+  operator \(Z=2I\) dominates the identity and satisfies \(Z-A_g\geq I\), hence
+  \(Z\geq A_g\), for every polynomial \(g\).  In the canonical block SDP, the
+  corresponding block matrix is feasible, its slack block is \((1/2)I\), and
+  the canonical dual slack for the same dual witness also dominates the block
+  identity.  More generally, dual feasibility implies positivity of \(Z\), since
+  the averaged point operators \(A_g\) are positive semidefinite.
 \end{lemma}
 \begin{proof}
   \leanok
@@ -511,8 +522,11 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness.exists_measurement_witness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPair}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPair.toMatrixSdpStatementWithSlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPair.withDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPairWithDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPairWithDominance.toMatrixSdpStatementWithSlacknessAndDominance}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPairWithDominance.toCanonicalOptimalPair}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPairWithDominance.toMatrixSdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpComplementarySlacknessEquation}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.dualPositive}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.primalMeasurement}
@@ -527,12 +541,15 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.toSdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalFeasibleComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPair_of_dualDominatesIdentity}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPair}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPairWithDominance}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPair_of_dualDominatesIdentity}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithMatrixSdpSlacknessAndDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithCanonicalMatrixSdpSlacknessAndDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithCanonicalOptimalPairSdpSlacknessAndDominance}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithCanonicalOptimalPairSdpSlackness_of_dualDominatesIdentity}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDomination}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDominationInput}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDomination}
@@ -562,10 +579,15 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   from strong duality: a feasible canonical primal matrix, a dual-feasible
   operator with equal objective value, canonical complementary slackness, and
   vanishing of the extra canonical slack block.  This package gives the
-  displayed measurement witness without assuming \(I \le Z\).  Separately,
-  Lean retains the dominance-carrying package used by the present reduced
-  helper interface.  That bridge is first stated as an abstract SDP statement,
-  and then as a direct helper input, for a canonical feasible primal matrix
+  displayed measurement witness without assuming \(I \le Z\).  Lean also proves
+  the converse saturation step for the dominance-carrying package: the canonical
+  complementary-slackness equation on the extra block gives
+  \(X_{\mathrm{none},\mathrm{none}}Z=0\), and the lower bound \(I\leq Z\)
+  forces \(X_{\mathrm{none},\mathrm{none}}=0\).  Thus the
+  dominance-carrying optimal pair canonically determines the saturated optimal
+  pair, and hence also the matrix slackness statement without the dominance
+  field.  The remaining bridge is first stated as an abstract SDP statement, and
+  then as a direct helper input, for a canonical feasible primal matrix
   satisfying objective equality and canonical complementary slackness together
   with the auxiliary dominance hypothesis.
 \end{lemma}
@@ -643,6 +665,10 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalObjective_trace_primalBlockMatrix}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalObjective_trace_extractedPrimalSubmeasurement}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalObjective_trace_primalBlockMatrix_extracted}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDualOperator_trace_feasible}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDualGap_trace}
+  \lean{MIPStarRE.Quantum.trace_mul_nonneg_of_nonneg}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalWeakDuality}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDiagonalBlock_mul_dualSlack}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalPrimalBlockMatrix_mul_dualSlack}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalPrimalBlockMatrix_extracted_mul_dualSlack_of_canonical}
@@ -716,7 +742,17 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
     = \sum_{k=1}^{M+1} \ket{k}\bra{k} \ot \left(\sum_{i,j=1}^r z_{ij}\ket{i}\bra{j}\right)
     =: \sum_{k=1}^{M+1}\ket{k}\bra{k} \ot Z,
   \]
-  the constraint~\eqref{eq:dual-canonical-constraint} is exactly $Z\ge A_{g_i}$ for every $i$, and the objective is $\Tr(Z)$. Hence~\eqref{eq:dual-canonical} is equivalent to~\eqref{eq:dual-objective}.
+  the constraint~\eqref{eq:dual-canonical-constraint} is exactly $Z\ge A_{g_i}$ for every $i$, and the objective is $\Tr(Z)$.  In Lean, the latter statement is recorded as the trace-pairing identity
+  \[
+    \Re\Tr(D(Z)X)=\Re\Tr(Z)
+  \]
+  for every feasible canonical primal matrix \(X\), where \(D(Z)\) denotes the
+  block-diagonal canonical dual operator.  Consequently the canonical
+  primal-dual gap is the real trace pairing of \(X\) with the canonical dual
+  slack \(D(Z)-C\).  Since the real trace pairing of positive semidefinite
+  operators is nonnegative, Lean also records the resulting weak-duality
+  inequality for any feasible canonical primal and dual pair.
+  Hence~\eqref{eq:dual-canonical} is equivalent to~\eqref{eq:dual-objective}.
 
   Slater's condition holds because
   \[
@@ -1089,19 +1125,38 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   structural hypothesis the alphabet-size displacement term is not introduced.
   The QXP-layer interface used by the formalization records both the total
   domination of the canonical projective family and the sharper
-  residual-domination field for the fresh option-completion outcome.
+  residual-domination field for the fresh option-completion outcome.  Under
+  the identification of the Q-layer with the option-completed source
+  submeasurement, this residual-domination field is equivalent to the
+  fresh-outcome comparison \(Q_{\mathrm{none}} \leq P_{\mathrm{none}}\).
+  Algebraically, this fresh-outcome comparison follows as soon as the
+  construction of \(\widehat X\) preserves the corresponding fresh row block,
+  namely \(\widehat X_{\mathrm{none}}=X_{\mathrm{none}}\).
   \lean{MIPStarRE.LDT.Preliminaries.triangleSub_right_subMeas_totalGap}
   \lean{MIPStarRE.LDT.Preliminaries.triangleSub_right_subMeas_total_le}
+  \lean{MIPStarRE.LDT.MakingMeasurementsProjective.pa_eq_xHatA_adjoint_mul_xHatA}
+  \lean{MIPStarRE.LDT.MakingMeasurementsProjective.qa_eq_pa_of_xHatA_eq_xa}
+  \lean{MIPStarRE.LDT.MakingMeasurementsProjective.fresh_outcome_le_of_xHatA_eq_xa}
+  \lean{MIPStarRE.LDT.MakingMeasurementsProjective.xHat_eq_x_of_x_mul_conjTranspose_eq_one_of_mixed_eq_gram}
+  \lean{MIPStarRE.LDT.MakingMeasurementsProjective.xHatA_eq_xa_of_x_mul_conjTranspose_eq_one_of_mixed_eq_gram}
+  \lean{MIPStarRE.LDT.MakingMeasurementsProjective.xHat_eq_x_of_x_mul_conjTranspose_eq_one}
+  \lean{MIPStarRE.LDT.MakingMeasurementsProjective.xHatA_eq_xa_of_x_mul_conjTranspose_eq_one}
   \lean{MIPStarRE.LDT.MakingMeasurementsProjective.qxpProjSubMeas_total_eq_xHat_adjoint_mul_xHat}
   \lean{MIPStarRE.LDT.MakingMeasurementsProjective.qxpProjSubMeas_total_le_of_outcome_le}
   \lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerTotalDomination}
   \lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerTotalDomination.of_outcome_le}
   \lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerTotalDomination.rightTensor_total_ev_le}
+  \lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerResidualDomination.of_fresh_outcome_le}
+  \lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerResidualDomination.fresh_outcome_le}
+  \lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerResidualDomination.iff_fresh_outcome_le}
   \lean{MIPStarRE.LDT.SelfImprovement.LeftLiftedQXPLayerRepairWitnessWithResidualDomination}
   \lean{MIPStarRE.LDT.SelfImprovement.LeftLiftedQXPLayerRepairWitnessWithResidualDomination.restrictSome_total_le}
   \lean{MIPStarRE.LDT.SelfImprovement.LeftLiftedQXPLayerRepairWitnessWithResidualDomination.restrictSome_rightTensor_total_ev_le}
+  \lean{MIPStarRE.LDT.SelfImprovement.leftLiftedQXPLayerRepairWitnessWithResidualDomination_of_lifted_qxp_sddOpRel_fresh_outcome_le}
+  \lean{MIPStarRE.LDT.SelfImprovement.leftLiftedQXPLayerRepairWitnessWithResidualDomination_of_local_qxp_sddOpRel_fresh_outcome_le}
   \lean{MIPStarRE.LDT.SelfImprovement.leftLiftedProjectivizationRepairInputWithResidualDomination_of_qxpLayer}
   \lean{MIPStarRE.LDT.SelfImprovement.OrthonormalizationQXPLayerRepairProducerWithResidualDomination}
+  \lean{MIPStarRE.LDT.SelfImprovement.residualDominatingRepairProducer_of_qxpLayer_and_freshOutcome}
   \lean{MIPStarRE.LDT.SelfImprovement.OrthonormalizationResidualDominationInput}
   \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationInput_of_residualDominationInput}
   \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationResidualDominationInput_of_producers}

@@ -68,6 +68,97 @@ lemma xSquared {Outcome : Type*}
     data.xᴴ * data.x = QTotal data.qLayer := by
   exact data.x_gram_right
 
+/-- If the original `X` rows are already coisometric and the mixed product
+`X† XHat` agrees with the Gram operator `X† X`, then the polar replacement
+`XHat` is equal to `X`.
+
+This is the algebraic form of the observation used in the residual-domination
+route: on a part where the row block already lies in the unit singular
+subspace, the `XHat` replacement does not change it. -/
+lemma xHat_eq_x_of_x_mul_conjTranspose_eq_one_of_mixed_eq_gram {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι)
+    (hx_left :
+      data.x * data.xᴴ =
+        (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier))
+    (hmixed : data.xᴴ * data.xHat = data.xᴴ * data.x) :
+    data.xHat = data.x := by
+  calc
+    data.xHat =
+        (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier) * data.xHat := by
+      simp
+    _ = (data.x * data.xᴴ) * data.xHat := by rw [hx_left]
+    _ = data.x * (data.xᴴ * data.xHat) := by simp [Matrix.mul_assoc]
+    _ = data.x * (data.xᴴ * data.x) := by rw [hmixed]
+    _ = (data.x * data.xᴴ) * data.x := by simp [Matrix.mul_assoc]
+    _ = (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier) * data.x := by
+      rw [hx_left]
+    _ = data.x := by simp
+
+/-- Row-block form of
+`xHat_eq_x_of_x_mul_conjTranspose_eq_one_of_mixed_eq_gram`. -/
+lemma xHatA_eq_xa_of_x_mul_conjTranspose_eq_one_of_mixed_eq_gram {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) (a : Outcome)
+    (hx_left :
+      data.x * data.xᴴ =
+        (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier))
+    (hmixed : data.xᴴ * data.xHat = data.xᴴ * data.x) :
+    XHatA data a = Xa data a := by
+  rw [XHatA, Xa,
+    xHat_eq_x_of_x_mul_conjTranspose_eq_one_of_mixed_eq_gram data hx_left hmixed]
+
+/-- If the original `X` rows are already coisometric, then the polar
+replacement `XHat` is equal to `X`.
+
+Indeed, `X X† = I` makes the Gram operator `X† X` idempotent.  Since this Gram
+operator is positive, its positive square root is itself; the stored mixed
+identity `X† XHat = sqrt (X† X)` therefore reduces to the hypothesis of
+`xHat_eq_x_of_x_mul_conjTranspose_eq_one_of_mixed_eq_gram`. -/
+lemma xHat_eq_x_of_x_mul_conjTranspose_eq_one {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι)
+    (hx_left :
+      data.x * data.xᴴ =
+        (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier)) :
+    data.xHat = data.x := by
+  have hgram_sq :
+      (data.xᴴ * data.x) * (data.xᴴ * data.x) = data.xᴴ * data.x := by
+    calc
+      (data.xᴴ * data.x) * (data.xᴴ * data.x) =
+          data.xᴴ * (data.x * data.xᴴ) * data.x := by
+            simp [Matrix.mul_assoc]
+      _ = data.xᴴ *
+          ((1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier) * data.x) := by
+            rw [hx_left]
+            simp
+      _ = data.xᴴ * data.x := by simp
+  have hgram_nonneg : 0 ≤ data.xᴴ * data.x :=
+    (Matrix.posSemidef_conjTranspose_mul_self data.x).nonneg
+  have hsqrt :
+      CFC.sqrt (data.xᴴ * data.x) = data.xᴴ * data.x :=
+    CFC.sqrt_unique hgram_sq hgram_nonneg
+  have hmixed : data.xᴴ * data.xHat = data.xᴴ * data.x := by
+    calc
+      data.xᴴ * data.xHat = CFC.sqrt (QTotal data.qLayer) := data.xHat_mixed
+      _ = CFC.sqrt (data.xᴴ * data.x) := by rw [← data.x_gram_right]
+      _ = data.xᴴ * data.x := hsqrt
+  exact xHat_eq_x_of_x_mul_conjTranspose_eq_one_of_mixed_eq_gram data hx_left hmixed
+
+/-- Row-block form of `xHat_eq_x_of_x_mul_conjTranspose_eq_one`. -/
+lemma xHatA_eq_xa_of_x_mul_conjTranspose_eq_one {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) (a : Outcome)
+    (hx_left :
+      data.x * data.xᴴ =
+        (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier)) :
+    XHatA data a = Xa data a := by
+  rw [XHatA, Xa, xHat_eq_x_of_x_mul_conjTranspose_eq_one data hx_left]
+
 /-- The total `Q` operator in a QXP layer is Hermitian.
 
 This follows from `lem:X-squared`: the total operator is the right Gram matrix
@@ -164,8 +255,10 @@ lemma xExpressionToQExpression {Outcome : Type*}
         Xa data a := by
           congr 1
           noncomm_ring
-    _ = (Xa data a)ᴴ * data.x * (data.xᴴ * data.x * (data.xᴴ * Xa data a)) +
-        (-2 • ((Xa data a)ᴴ * data.x * (data.xᴴ * Xa data a)) + (Xa data a)ᴴ * Xa data a) := by
+    _ =
+        (Xa data a)ᴴ * data.x * (data.xᴴ * data.x * (data.xᴴ * Xa data a)) +
+          (-2 • ((Xa data a)ᴴ * data.x * (data.xᴴ * Xa data a)) +
+            (Xa data a)ᴴ * Xa data a) := by
           rw [Matrix.mul_assoc]
           rw [Matrix.add_mul, Matrix.add_mul]
           rw [Matrix.mul_add, Matrix.mul_add]
@@ -209,6 +302,58 @@ lemma paRestated {Outcome : Type*}
     calc
       Pa data a = data.xHatᴴ * Ta data.qLayer a * data.xHat := by rfl
       _ = (XHatA data a)ᴴ * data.xHat := by rw [hXHatA]
+
+/-- The `P_a` operator is the right Gram matrix of the corresponding
+`XHat_a` row block.
+
+This is the row-block form of `paRestated`: the auxiliary projector `T_a` is
+idempotent, so inserting the second copy of `T_a` does not change the
+operator. -/
+lemma pa_eq_xHatA_adjoint_mul_xHatA {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) (a : Outcome) :
+    Pa data a = (XHatA data a)ᴴ * XHatA data a := by
+  have hTa : (Ta data.qLayer a)ᴴ = Ta data.qLayer a := by
+    simpa [Ta] using ProjMeas.outcome_hermitian data.qLayer.t a
+  have hTa_proj : Ta data.qLayer a * Ta data.qLayer a = Ta data.qLayer a := by
+    simpa [Ta] using data.qLayer.t.proj a
+  calc
+    Pa data a = data.xHatᴴ * Ta data.qLayer a * data.xHat := by rfl
+    _ = data.xHatᴴ * (Ta data.qLayer a * Ta data.qLayer a) * data.xHat := by
+          rw [hTa_proj]
+    _ = (XHatA data a)ᴴ * XHatA data a := by
+          simp [XHatA, Matrix.conjTranspose_mul, hTa, Matrix.mul_assoc]
+
+/-- If the `XHat` construction preserves one row block, then the corresponding
+`Q` and `P` outcomes agree.
+
+This lemma isolates the construction-level obligation needed for the fresh
+outcome in the option-completed orthonormalization step. -/
+lemma qa_eq_pa_of_xHatA_eq_xa {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) (a : Outcome)
+    (hrow : XHatA data a = Xa data a) :
+    Qa data.qLayer a = Pa data a := by
+  calc
+    Qa data.qLayer a = (Xa data a)ᴴ * Xa data a := (qaRestated data a).1
+    _ = (XHatA data a)ᴴ * XHatA data a := by rw [hrow]
+    _ = Pa data a := (pa_eq_xHatA_adjoint_mul_xHatA data a).symm
+
+/-- Fresh-outcome domination follows from preservation of the fresh row block
+in the option-completed QXP layer.
+
+The remaining construction-level task for the monotone-total route is thus
+reduced to proving `XHat_none = X_none` for the concrete positive-Gram
+construction of `XHat`. -/
+lemma fresh_outcome_le_of_xHatA_eq_xa {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData (Option Outcome) ι)
+    (hrow : XHatA data none = Xa data none) :
+    data.qLayer.q.outcome none ≤ Pa data none :=
+  le_of_eq (qa_eq_pa_of_xHatA_eq_xa data none hrow)
 
 /-- **`XHat` squared** (`lem:X-hat-squared`).
 

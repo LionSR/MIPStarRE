@@ -104,14 +104,6 @@ private lemma q_mass_le_total_bound {Outcome : Type*}
             ev_scale ψ (1 + 2 * spectralTruncationError ζ)
               (1 : MIPStarRE.Quantum.Op ι)
 
-private lemma spectralTruncationError_le_zetaQuarterRoot_local (ζ : Error)
-    (hζ : 0 ≤ ζ) (hζq : ζ ≤ 1 / (4 : Error)) :
-    spectralTruncationError ζ ≤ zetaQuarterRoot ζ := by
-  have hζ1 : ζ ≤ 1 := by linarith
-  dsimp [spectralTruncationError, zetaQuarterRoot]
-  exact Real.rpow_le_rpow_of_exponent_ge' hζ hζ1 (by positivity)
-    (by norm_num : (1 : Error) / 2 ≥ 1 / 4)
-
 private lemma sqrt_four_spectralTruncationError (ζ : Error) (hζ : 0 ≤ ζ) :
     Real.sqrt (4 * spectralTruncationError ζ) =
       2 * zetaQuarterRoot ζ := by
@@ -432,7 +424,7 @@ lemma pQApprox {Outcome : Type*}
             nlinarith
       _ = 2 * spectralTruncationError ζ + 28 * zetaQuarterRoot ζ := by ring
       _ ≤ 30 * zetaQuarterRoot ζ := by
-            have hε_le := spectralTruncationError_le_zetaQuarterRoot_local ζ hζ hζ_small
+            have hε_le := spectralTruncationError_le_zetaQuarterRoot ζ hζ hζ_small
             nlinarith
   constructor
   simpa [sddErrorOp, avgOver, uniformDistribution, constOpFamily] using hqSDD_bound
@@ -523,6 +515,64 @@ lemma pQApprox_ofRankReductionSigmaRangePositiveGram
     QXPLayerData.ofSigmaRangeAndSvdIdentities (q := qLayer.q)
       hRank.projective hRank.sum_eq_total xHat hxHat_coisometry hxHat_mixed
   refine ⟨xHat, hxHat_coisometry, hxHat_mixed, data, rfl, rfl, rfl, ?_⟩
+  exact pQApprox ψ A ζ data hψ hζ hζ_small hRank.toSigmaRangeQLayer
+
+/-- Apply `lem:P-Q-approx` to the positive-Gram sigma-space QXP layer, and
+also record coisometry of the original sigma embedding `X`.
+
+The additional hypothesis is the subnormalization of the projective `Q` family.
+Under this hypothesis the range basis vectors chosen for distinct outcomes are
+orthogonal, so the finite sigma-range embedding has orthonormal rows.  This is
+the construction-level coisometry condition later used to preserve the fresh
+option-completion row and hence to obtain residual domination. -/
+lemma pQApprox_ofRankReductionSigmaRangePositiveGram_with_x_coisometry
+    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι)
+    (A : Measurement Outcome ι) (ζ : Error)
+    {qLayer : QLayerData Outcome ι}
+    (hRank : RankReductionWitness ψ A ζ qLayer)
+    (hsum_le_one :
+      (∑ a : Outcome, qLayer.q.outcome a) ≤ (1 : MIPStarRE.Quantum.Op ι))
+    [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (qLayer.q.outcome a).rank))]
+    (hψ : ψ.IsNormalized)
+    (hζ : 0 ≤ ζ) (hζ_small : ζ ≤ 1 / (4 : Error)) :
+    ∃ xHat : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (qLayer.q.outcome a).rank))) ι ℂ,
+      xHat * xHatᴴ =
+          (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
+            (fun a : Outcome => (qLayer.q.outcome a).rank)))) ∧
+        (sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective)ᴴ * xHat =
+            CFC.sqrt (QTotal qLayer) ∧
+          ∃ data : QXPLayerData Outcome ι,
+            ∃ hq : data.qLayer = sigmaRangeQLayer qLayer.q,
+              hq ▸ data.x =
+                  (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from
+                    sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective) ∧
+                hq ▸ data.xHat =
+                    (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from
+                      xHat) ∧
+                  data.x * data.xᴴ =
+                    (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier) ∧
+                    SDDOpRel ψ (uniformDistribution Unit)
+                      (constOpFamily data.qLayer.q)
+                      (constOpFamily (PFamily data))
+                      (30 * zetaQuarterRoot ζ) := by
+  obtain ⟨xHat, hxHat_coisometry, hxHat_mixed⟩ :=
+    exists_xHat_of_sigmaFinRangeEmbedding_positiveGram hRank
+  let data : QXPLayerData Outcome ι :=
+    QXPLayerData.ofSigmaRangeAndSvdIdentities (q := qLayer.q)
+      hRank.projective hRank.sum_eq_total xHat hxHat_coisometry hxHat_mixed
+  have hx_coisometry :
+      data.x * data.xᴴ =
+        (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier) := by
+    simpa [data, QXPLayerData.ofSigmaRangeAndSvdIdentities,
+      QXPLayerData.ofQLayerAndSvdIdentities, sigmaRangeQLayer] using
+      sigmaFinRangeEmbedding_mul_conjTranspose_eq_one_of_sum_le_one
+        qLayer.q.outcome hRank.projective hsum_le_one
+  refine ⟨xHat, hxHat_coisometry, hxHat_mixed, data, rfl, rfl, rfl,
+    hx_coisometry, ?_⟩
   exact pQApprox ψ A ζ data hψ hζ hζ_small hRank.toSigmaRangeQLayer
 
 /-- Apply `lem:P-Q-approx` to the canonical sigma-space QXP layer obtained

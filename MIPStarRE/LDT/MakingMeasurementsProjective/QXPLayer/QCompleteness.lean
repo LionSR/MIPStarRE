@@ -33,7 +33,9 @@ private lemma zeta_le_zetaQuarterRoot (ζ : Error)
   simpa [Real.rpow_one] using
     (Real.rpow_le_rpow_of_exponent_ge' hζ hζ1 (by positivity) (by norm_num : (1 : Error) ≥ 1 / 4))
 
-private lemma spectralTruncationError_le_zetaQuarterRoot (ζ : Error)
+/-- Under the small-error hypothesis `ζ ≤ 1/4`, the spectral truncation error
+is bounded by the fourth-root error scale used in the `Q/X/XHat/P` layer. -/
+lemma spectralTruncationError_le_zetaQuarterRoot (ζ : Error)
     (hζ : 0 ≤ ζ) (hζq : ζ ≤ 1 / (4 : Error)) :
     spectralTruncationError ζ ≤ zetaQuarterRoot ζ := by
   have hζ1 : ζ ≤ 1 := by linarith
