@@ -458,6 +458,7 @@ theorem final_fields_projective_residual_error_le_selfImprovementError
     _ = selfImprovementError params eps delta := by
       rw [selfImprovementError_eq_finalStagePowerSum]
 
+
 /-- Small-alphabet branch for projective residual transport.
 
 When `|F_q| ≤ 8464`, we additionally have `√|F_q| ≤ 92`, and the extra data-processing
