@@ -45,7 +45,7 @@ plus project-local expectation lemmas (`ev_adjoint_self_nonneg`,
 `ev_abs_mul_le_sqrt`).  No external "Cauchy–Schwarz theorem" import is
 needed because the form used is a direct consequence of the
 *sum-of-sqrt-products* inequality, which Mathlib provides in
-`Analysis/Calculus/MeanInequalities`.
+`Mathlib/Data/Real/Sqrt.lean`.
 
 **Pedagogical note**: The key insight is that
 `|∑ a, ψ(X_a Y_a)| ≤ (∑ a, ψ(X_a X_a†))^(1/2) · (∑ a, ψ(Y_a† Y_a))^(1/2)`
@@ -344,13 +344,13 @@ Analogous to Polishchuk–Spielman but for the surface-vs-point test.
 
 ### Matrix Chernoff bound
 
-**Lean declaration**: `chernoffBernoulliMatrix` (internal, in Commutativity/).
+**Lean declaration**: `chernoffBernoulliMatrix` (internal, in
+`Pasting/Bernoulli/MatrixChernoff.lean`).
 
 This is a matrix-version of the Chernoff concentration bound, used for
-Bernoulli matrix sums.  There is a Mathlib gap for the matrix case
-(standard Chernoff exists for scalars but not for matrix-valued random
-variables), so the project has a `*Statement` hypothesis pending
-upstreaming or local proof.
+Bernoulli matrix sums.  The project proves this internal statement locally
+using CFC reduction plus a local scalar Hoeffding step; it is not kept
+as a standing `*Statement` hypothesis.
 
 **Pedagogical note**: The classical Chernoff bound says that the sum of
 independent Bernoulli random variables concentrates exponentially around

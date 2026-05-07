@@ -207,11 +207,6 @@ Some nodes have `\lean{}` but deliberately omit `\leanok`:
   the paper.  The comment in the blueprint explicitly says "no \leanok
   is claimed."
 
-- **`thm:main-induction-public-wrapper`** (ch10): The Lean declarations
-  exist and compile, but the remaining gap (tracked by #931) is to
-  produce the restricted-strategy self-improvement input needed to
-  instantiate the wrapper directly from higher-level applications.
-
 - **`thm:main-formal`** (ch02): The 1 `sorry` in `MainFormal.lean` means
   the proof chain is not yet closed.
 
