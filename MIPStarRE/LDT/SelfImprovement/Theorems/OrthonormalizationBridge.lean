@@ -539,6 +539,47 @@ noncomputable def
       (QXPLayerResidualDomination.of_residual_le <|
         hnone hssc hSpectral)
 
+/-- Upgrade an ordinary QXP-layer repair producer to a residual-dominating one
+when the associated `X` matrix is a coisometry.
+
+The coisometry identity `X X† = I` gives the row equality
+`XHat_none = X_none` for the fresh outcome.  The QXP-layer algebra then
+identifies the fresh `Q` outcome with the corresponding repaired `P` outcome,
+which is precisely the pointwise comparison needed for residual domination. -/
+noncomputable def residualDominatingRepairProducer_of_qxpLayer_and_coisometry
+    {params : Parameters} [FieldModel params.q]
+    {strategy : SymStrat params ι} {eps delta : Error}
+    (hqxp : OrthonormalizationQXPLayerRepairProducer params strategy eps delta)
+    (hsource : ∀ {Hhat : SubMeas (Polynomial params) ι}
+      (hssc : BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily Hhat)
+        (selfImprovementHelperError params eps delta))
+      (hSpectral : SpectralTruncationStatement strategy.state
+        (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
+        (consistencyToAlmostProjectiveError
+          (2 * selfImprovementHelperError params eps delta))),
+        (hqxp hssc hSpectral).data.qLayer.q.outcome none =
+          (optionCompletion Hhat).outcome none)
+    (hcoisometry : ∀ {Hhat : SubMeas (Polynomial params) ι}
+      (hssc : BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily Hhat)
+        (selfImprovementHelperError params eps delta))
+      (hSpectral : SpectralTruncationStatement strategy.state
+        (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
+        (consistencyToAlmostProjectiveError
+          (2 * selfImprovementHelperError params eps delta))),
+        (hqxp hssc hSpectral).data.x * (hqxp hssc hSpectral).data.xᴴ =
+          (1 : MIPStarRE.Quantum.Op
+            (hqxp hssc hSpectral).data.qLayer.auxSpace.carrier)) :
+    OrthonormalizationQXPLayerRepairProducerWithResidualDomination
+      params strategy eps delta :=
+  residualDominatingRepairProducer_of_qxpLayer_and_freshOutcome hqxp hsource
+    (fun hssc hSpectral =>
+      let data := (hqxp hssc hSpectral).data
+      fresh_outcome_le_of_xHatA_eq_xa data
+        (xHatA_eq_xa_of_x_mul_conjTranspose_eq_one data none
+          (hcoisometry hssc hSpectral)))
+
 /-- Convert the QXP-layer locality witness producer into the repair slice of
 `SelfImprovement.OrthonormalizationInput`. -/
 noncomputable def orthonormalizationRepairProducer_of_qxpLayer
