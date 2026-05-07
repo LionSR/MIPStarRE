@@ -473,6 +473,78 @@ theorem matrixSdpCanonicalObjective_trace_primalBlockMatrix_extracted
   rw [matrixSdpCanonicalObjective_trace_primalBlockMatrix]
   rw [matrixSdpCanonicalObjective_trace_extractedPrimalSubmeasurement]
 
+/-- Pairing the canonical dual operator with a feasible canonical primal
+matrix gives the paper dual objective.
+
+The canonical equality constraint says that the sum of the diagonal blocks of
+`X` is the identity.  Since the canonical dual operator has the same block `Z`
+on every summand, the trace pairing collapses to `Tr Z`, exactly the paper
+dual objective. -/
+theorem matrixSdpCanonicalDualOperator_trace_feasible
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (hX : MatrixSdpCanonicalPrimalFeasible params model X)
+    (Z : MatrixOperator model.space) :
+    Complex.re (Matrix.trace
+        (matrixSdpCanonicalDualOperator params model Z * X)) =
+      matrixSdpDualObjective model Z := by
+  have hconstraint :
+      ∑ b : MatrixSdpCanonicalBlockIndex params,
+          matrixSdpCanonicalDiagonalBlock params model X b =
+        (1 : MatrixOperator model.space) := by
+    simpa [matrixSdpCanonicalConstraintOperator] using hX.constraintEqOne
+  rw [matrixSdpCanonicalDualOperator]
+  rw [matrixSdpCanonicalBlockDiagonal_trace_mul_left]
+  simp only [matrixSdpCanonicalDualOperatorBlockFamily_apply]
+  rw [← Matrix.trace_sum]
+  rw [← Finset.mul_sum]
+  rw [hconstraint]
+  simp [matrixSdpDualObjective]
+
+/-- The canonical primal-dual gap is the trace pairing with the canonical dual
+slack operator.
+
+This is the algebraic identity behind weak duality for the canonical SDP: after
+the dual trace pairing is identified with the paper dual objective, subtracting
+the canonical objective leaves the trace pairing against `D(Z)-C`. -/
+theorem matrixSdpCanonicalDualGap_trace
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (hX : MatrixSdpCanonicalPrimalFeasible params model X)
+    (Z : MatrixOperator model.space) :
+    matrixSdpDualObjective model Z -
+        Complex.re (Matrix.trace
+          (matrixSdpCanonicalObjectiveOperator params model * X)) =
+      Complex.re (Matrix.trace
+        ((matrixSdpCanonicalDualOperator params model Z -
+            matrixSdpCanonicalObjectiveOperator params model) * X)) := by
+  rw [Matrix.sub_mul, Matrix.trace_sub, Complex.sub_re]
+  rw [matrixSdpCanonicalDualOperator_trace_feasible params model X hX Z]
+
+/-- Canonical weak duality for the self-improvement SDP.
+
+For a feasible canonical primal matrix \(X\) and a feasible canonical dual
+operator \(D(Z)-C\), the primal-dual gap is the trace pairing of two positive
+semidefinite operators.  The preceding trace identity and positivity of this
+pairing give the usual weak-duality inequality. -/
+theorem matrixSdpCanonicalWeakDuality
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (hX : MatrixSdpCanonicalPrimalFeasible params model X)
+    (Z : MatrixOperator model.space)
+    (hdual :
+      0 ≤ matrixSdpCanonicalDualOperator params model Z -
+        matrixSdpCanonicalObjectiveOperator params model) :
+    Complex.re (Matrix.trace
+        (matrixSdpCanonicalObjectiveOperator params model * X)) ≤
+      matrixSdpDualObjective model Z := by
+  rw [← sub_nonneg]
+  rw [matrixSdpCanonicalDualGap_trace params model X hX Z]
+  exact MIPStarRE.Quantum.trace_mul_nonneg_of_nonneg hdual hX.nonnegative
+
 /-- The diagonal block of a canonical primal-dual slack product is the product
 of the corresponding primal diagonal block and canonical dual slack block. -/
 theorem matrixSdpCanonicalDiagonalBlock_mul_dualSlack
