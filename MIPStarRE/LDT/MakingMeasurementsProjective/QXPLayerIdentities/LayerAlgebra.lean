@@ -210,6 +210,58 @@ lemma paRestated {Outcome : Type*}
       Pa data a = data.xHatᴴ * Ta data.qLayer a * data.xHat := by rfl
       _ = (XHatA data a)ᴴ * data.xHat := by rw [hXHatA]
 
+/-- The `P_a` operator is the right Gram matrix of the corresponding
+`XHat_a` row block.
+
+This is the row-block form of `paRestated`: the auxiliary projector `T_a` is
+idempotent, so inserting the second copy of `T_a` does not change the
+operator. -/
+lemma pa_eq_xHatA_adjoint_mul_xHatA {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) (a : Outcome) :
+    Pa data a = (XHatA data a)ᴴ * XHatA data a := by
+  have hTa : (Ta data.qLayer a)ᴴ = Ta data.qLayer a := by
+    simpa [Ta] using ProjMeas.outcome_hermitian data.qLayer.t a
+  have hTa_proj : Ta data.qLayer a * Ta data.qLayer a = Ta data.qLayer a := by
+    simpa [Ta] using data.qLayer.t.proj a
+  calc
+    Pa data a = data.xHatᴴ * Ta data.qLayer a * data.xHat := by rfl
+    _ = data.xHatᴴ * (Ta data.qLayer a * Ta data.qLayer a) * data.xHat := by
+          rw [hTa_proj]
+    _ = (XHatA data a)ᴴ * XHatA data a := by
+          simp [XHatA, Matrix.conjTranspose_mul, hTa, Matrix.mul_assoc]
+
+/-- If the `XHat` construction preserves one row block, then the corresponding
+`Q` and `P` outcomes agree.
+
+This lemma isolates the construction-level obligation needed for the fresh
+outcome in the option-completed orthonormalization step. -/
+lemma qa_eq_pa_of_xHatA_eq_xa {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) (a : Outcome)
+    (hrow : XHatA data a = Xa data a) :
+    Qa data.qLayer a = Pa data a := by
+  calc
+    Qa data.qLayer a = (Xa data a)ᴴ * Xa data a := (qaRestated data a).1
+    _ = (XHatA data a)ᴴ * XHatA data a := by rw [hrow]
+    _ = Pa data a := (pa_eq_xHatA_adjoint_mul_xHatA data a).symm
+
+/-- Fresh-outcome domination follows from preservation of the fresh row block
+in the option-completed QXP layer.
+
+The remaining construction-level task for the monotone-total route is thus
+reduced to proving `XHat_none = X_none` for the concrete positive-Gram
+construction of `XHat`. -/
+lemma fresh_outcome_le_of_xHatA_eq_xa {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData (Option Outcome) ι)
+    (hrow : XHatA data none = Xa data none) :
+    data.qLayer.q.outcome none ≤ Pa data none :=
+  le_of_eq (qa_eq_pa_of_xHatA_eq_xa data none hrow)
+
 /-- **`XHat` squared** (`lem:X-hat-squared`).
 
 The unitary-part matrix `XHat` has `XHat XHat† = I` on the auxiliary space. -/
