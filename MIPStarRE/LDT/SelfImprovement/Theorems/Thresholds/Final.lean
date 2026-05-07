@@ -447,6 +447,118 @@ theorem final_fields_projective_residual_error_le_selfImprovementError
     _ = selfImprovementError params eps delta := by
       rw [selfImprovementError_eq_finalStagePowerSum]
 
+/-- Small-alphabet branch for projective residual transport.
+
+When `|F_q| ≤ 8464`, we additionally have `√|F_q| ≤ 92`, and the extra data-processing
+overlap contribution is absorbed into the final threshold by the same coefficient bookkeeping
+as in `final_fields_projective_residual_error_le_selfImprovementError`.
+
+The explicit bound `|F_q| ≤ 8464` is a concrete branch condition; it is not implied by
+the standing unit-interval hypotheses and is isolated here so the dependency is explicit.
+-/
+theorem final_fields_projective_residual_error_of_small_alphabet_le_selfImprovementError
+    (params : Parameters) [FieldModel params.q]
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (heps_le_one : eps ≤ 1)
+    (hdelta : 0 ≤ delta) (hdelta_le_one : delta ≤ 1)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
+    (hq_le : Fintype.card (Fq params) ≤ 8464) :
+    selfImprovementHelperError params eps delta +
+        Real.sqrt (selfImprovementDataProcessingError params eps delta) +
+        Real.sqrt ((Fintype.card (Fq params) : Error) *
+          selfImprovementDataProcessingError params eps delta) ≤
+      selfImprovementError params eps delta := by
+  have hdq_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1 :=
+    d_q_ratio_le_one_of_d_le_q params hd_le_q
+  have hhelper_mono :
+      finalStagePowerSum params eps delta (1 / (2 : Error)) ≤
+        finalStagePowerSum params eps delta (1 / (32 : Error)) :=
+    finalStagePowerSum_le_of_exponent_ge params eps delta heps heps_le_one hdelta
+      hdelta_le_one hdq_le_one (by norm_num) (by norm_num)
+  have hhelper :
+      selfImprovementHelperError params eps delta ≤
+        100 * (params.m : Error) * finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+    rw [selfImprovementHelperError_eq_finalStagePowerSum]
+    exact mul_le_mul_of_nonneg_left hhelper_mono (by positivity)
+  have hdata_sqrt :
+      Real.sqrt (selfImprovementDataProcessingError params eps delta) ≤
+        31 * (params.m : Error) *
+          finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+    exact sqrt_selfImprovementDataProcessingError_le_thirty_one_m_powerSum_thirtysecond
+      params eps delta heps heps_le_one hdelta hdelta_le_one hdq_le_one
+  have hhelper_sqrt :
+      selfImprovementHelperError params eps delta +
+          Real.sqrt (selfImprovementDataProcessingError params eps delta) ≤
+        131 * (params.m : Error) *
+          finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+    nlinarith
+  have hsum32_nonneg :
+      0 ≤ finalStagePowerSum params eps delta (1 / (32 : Error)) :=
+    finalStagePowerSum_nonneg params eps delta (1 / (32 : Error)) heps hdelta
+  have hdata_nonneg : 0 ≤ selfImprovementDataProcessingError params eps delta := by
+    rw [selfImprovementDataProcessingError_eq]
+    positivity
+  have hcard_le :
+      (Fintype.card (Fq params) : Error) * selfImprovementDataProcessingError params eps delta ≤
+        (8464 : Error) * selfImprovementDataProcessingError params eps delta := by
+    exact mul_le_mul_of_nonneg_right (by exact_mod_cast hq_le) hdata_nonneg
+  have hsqrt_card_mul :
+      Real.sqrt ((Fintype.card (Fq params) : Error) *
+          selfImprovementDataProcessingError params eps delta) ≤
+        Real.sqrt ((8464 : Error) *
+          selfImprovementDataProcessingError params eps delta) :=
+    Real.sqrt_le_sqrt hcard_le
+  have hsqrt_data :
+      Real.sqrt ((8464 : Error) * selfImprovementDataProcessingError params eps delta) =
+      92 * Real.sqrt (selfImprovementDataProcessingError params eps delta) := by
+    have h8464_nonneg : (0 : Error) ≤ (8464 : Error) := by norm_num
+    calc
+      Real.sqrt ((8464 : Error) * selfImprovementDataProcessingError params eps delta) =
+          Real.sqrt (8464 : Error) *
+            Real.sqrt (selfImprovementDataProcessingError params eps delta) := by
+              rw [Real.sqrt_mul h8464_nonneg]
+      _ = 92 * Real.sqrt (selfImprovementDataProcessingError params eps delta) := by
+        norm_num
+  have hsqrt_card : Real.sqrt ((Fintype.card (Fq params) : Error) *
+      selfImprovementDataProcessingError params eps delta) ≤
+    92 * Real.sqrt (selfImprovementDataProcessingError params eps delta) := by
+    exact hsqrt_card_mul.trans hsqrt_data
+  have hcard_term :
+      Real.sqrt ((Fintype.card (Fq params) : Error) *
+          selfImprovementDataProcessingError params eps delta) ≤
+        2852 * (params.m : Error) *
+          finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+    calc
+      Real.sqrt ((Fintype.card (Fq params) : Error) *
+          selfImprovementDataProcessingError params eps delta) ≤
+          92 * Real.sqrt (selfImprovementDataProcessingError params eps delta) := hsqrt_card
+      _ ≤ 92 * (31 * (params.m : Error) *
+            finalStagePowerSum params eps delta (1 / (32 : Error))) := by
+            have hnonneg : (0 : Error) ≤
+                31 * (params.m : Error) *
+                  finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+              positivity
+            nlinarith
+      _ = 2852 * (params.m : Error) *
+            finalStagePowerSum params eps delta (1 / (32 : Error)) := by ring_nf
+  calc
+    selfImprovementHelperError params eps delta +
+        Real.sqrt (selfImprovementDataProcessingError params eps delta) +
+        Real.sqrt ((Fintype.card (Fq params) : Error) *
+          selfImprovementDataProcessingError params eps delta)
+      ≤ 131 * (params.m : Error) *
+            finalStagePowerSum params eps delta (1 / (32 : Error)) +
+          2852 * (params.m : Error) *
+            finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+              nlinarith [hhelper_sqrt, hcard_term]
+  _ = 2983 * (params.m : Error) *
+      finalStagePowerSum params eps delta (1 / (32 : Error)) := by ring_nf
+  _ ≤ 3000 * (params.m : Error) *
+      finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+        have hm_nonneg : 0 ≤ (params.m : Error) := m_cast_nonneg params
+        nlinarith [hm_nonneg, hsum32_nonneg]
+  _ = selfImprovementError params eps delta := by
+    rw [selfImprovementError_eq_finalStagePowerSum]
 /-- Final completeness threshold absorption (`self_improvement.tex`,
 lines 803--810).
 
