@@ -394,7 +394,7 @@ theorem final_fields_of_helper_outputs_of_residualDominationInput
       ∀ h : Polynomial params,
         T.toSubMeas.outcome h * averagedPointOperator params strategy h =
           T.toSubMeas.outcome h * Z)
-  (htransfer :
+    (htransfer :
       |addInULeftQuantity params strategy
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
           Hhat
@@ -404,7 +404,7 @@ theorem final_fields_of_helper_outputs_of_residualDominationInput
           T.toSubMeas
           (pointConsistencyAddInUSelection params)| ≤
         addInUError params eps delta)
-  (horthInput :
+    (horthInput :
       OrthonormalizationResidualDominationInput params strategy eps delta) :
     ∃ H : ProjSubMeas (Polynomial params) ι,
       SelfImprovementFinalFields params strategy H Z eps delta nu :=
