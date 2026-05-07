@@ -1,6 +1,7 @@
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SdpMatrixBridge
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop
 import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationBridge
+import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationInputConstructors
 
 /-!
 # Matrix SDP helper bridge
