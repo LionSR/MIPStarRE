@@ -361,13 +361,15 @@ theorem final_fields_exists_of_helper_outputs_of_residualDominationInput
     hhelper hhelperCompleteness hhelperSSC hpointSSC hslack htransfer
     (horthInput hhelperSSC)
 
+
 /-- Final-fields producer for residual-domination orthonormalization inputs only.
 
-This wrapper packages `final_fields_exists_of_helper_outputs_of_residual_domination`
+This wrapper packages `final_fields_exists_of_helper_outputs_of_residualDominationInput`
 and returns only the final-fields conclusion used by the self-improvement
-construction. The monotone-total comparison and orthonormalization SDD certificates
-are still established internally from the residual-domination bridge. -/
-theorem final_fields_of_helper_outputs_of_residual_domination
+construction. The monotone-total comparison and orthonormalization SDD
+certificates are still established internally from the residual-domination
+bridge. -/
+theorem final_fields_of_helper_outputs_of_residualDominationInput
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta nu : Error)
@@ -392,7 +394,7 @@ theorem final_fields_of_helper_outputs_of_residual_domination
       ∀ h : Polynomial params,
         T.toSubMeas.outcome h * averagedPointOperator params strategy h =
           T.toSubMeas.outcome h * Z)
-    (htransfer :
+  (htransfer :
       |addInULeftQuantity params strategy
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
           Hhat
@@ -402,13 +404,13 @@ theorem final_fields_of_helper_outputs_of_residual_domination
           T.toSubMeas
           (pointConsistencyAddInUSelection params)| ≤
         addInUError params eps delta)
-    (horthInput :
+  (horthInput :
       OrthonormalizationResidualDominationInput params strategy eps delta) :
     ∃ H : ProjSubMeas (Polynomial params) ι,
       SelfImprovementFinalFields params strategy H Z eps delta nu :=
   by
     obtain ⟨H, hfinal, _, _, _⟩ :=
-      final_fields_exists_of_helper_outputs_of_residual_domination
+      final_fields_exists_of_helper_outputs_of_residualDominationInput
         params strategy eps delta nu heps heps_le_one hdelta hdelta_le_one hd_le_q
         hhelper hhelperCompleteness hhelperSSC hpointSSC hslack htransfer
         (horthInput hhelperSSC)
