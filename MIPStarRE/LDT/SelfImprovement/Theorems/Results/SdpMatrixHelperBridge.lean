@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SdpMatrixBridge
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.Bracketed
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop
 import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationBridge
 
@@ -123,7 +124,7 @@ lemma selfImprovementHelperWithCanonicalOptimalPairSdpSlacknessAndDominance
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
         SelfImprovementHelperConclusionWithSlackness params strategy T H Z eps delta :=
   selfImprovementHelperWithSlackness params strategy eps delta gamma
-    (sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance
+    (sdp_with_slackness
       params strategy X Z hsdp)
     hgood nu G
 

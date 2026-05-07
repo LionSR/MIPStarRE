@@ -539,7 +539,7 @@ This wrapper is the strategy-level counterpart of
 `sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance`.
 The output is `SdpStatementWithSlackness` and therefore includes the
 complementary-slackness equations needed by the strengthened helper wrappers. -/
-lemma sdpWithSlackness
+lemma sdp_with_slackness
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
