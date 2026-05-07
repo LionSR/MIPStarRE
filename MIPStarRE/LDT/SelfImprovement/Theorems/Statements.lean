@@ -382,15 +382,16 @@ structure SelfImprovementSubMeasConclusion (params : Parameters) [FieldModel par
       Gmeas.toSubMeas = G ∧
       SelfImprovementConclusion params strategy Gmeas H Z eps delta gamma nu
 
-/-- The final Section 9 fields not produced directly by the current
-`selfImprovementHelper` and `orthonormalization` arguments.
+/-- Final fields for the Section 9 transport stage.
 
-TODO: replace this temporary bridge data with the actual Section 9 transport
-lemmas once the helper-stage strong self-consistency, data-processing, and
-projective-residual/completeness arguments are formalized. The boundedness field
-is no longer part of this residual package: the current strict SDP witness
-records `1 ≤ Z`, and `final_fields_bounded` derives the `BoundedByOperator`
-conclusion from that operator-monotonicity fact. -/
+The final fields are the Section 9 outputs that remain after combining:
+`SelfImprovementHelper`, orthonormalization, data-processing, and
+`orthonormalization_with_total_le_of_residual_domination`.
+
+The package records completeness, point-consistency, self-closeness, and the
+projective-residual estimate. The boundedness term is not repeated here because
+it is recovered later from the strict SDP witness condition `1 ≤ Z` together
+with monotonicity of the boundedness field. -/
 structure SelfImprovementFinalFields (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (H : ProjSubMeas (Polynomial params) ι)
