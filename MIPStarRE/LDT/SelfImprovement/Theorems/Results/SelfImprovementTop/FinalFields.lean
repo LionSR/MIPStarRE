@@ -361,4 +361,58 @@ theorem final_fields_exists_of_helper_outputs_of_residualDominationInput
     hhelper hhelperCompleteness hhelperSSC hpointSSC hslack htransfer
     (horthInput hhelperSSC)
 
+
+/-- Final-fields producer for residual-domination orthonormalization inputs only.
+
+This wrapper packages `final_fields_exists_of_helper_outputs_of_residualDominationInput`
+and returns only the final-fields conclusion used by the self-improvement
+construction. The monotone-total comparison and orthonormalization SDD
+certificates are still established internally from the residual-domination
+bridge. -/
+theorem final_fields_of_helper_outputs_of_residualDominationInput
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta nu : Error)
+    (heps : 0 ≤ eps) (heps_le_one : eps ≤ 1)
+    (hdelta : 0 ≤ delta) (hdelta_le_one : delta ≤ 1)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
+    {T : Measurement (Polynomial params) ι}
+    {Hhat : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
+    (hhelperCompleteness :
+      CompletenessAtLeast strategy.state Hhat.liftLeft
+        ((1 - nu) - selfImprovementHelperError params eps delta))
+    (hhelperSSC :
+      BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily Hhat)
+        (selfImprovementHelperError params eps delta))
+    (hpointSSC :
+      BipartiteSSCRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta)
+    (hslack :
+      ∀ h : Polynomial params,
+        T.toSubMeas.outcome h * averagedPointOperator params strategy h =
+          T.toSubMeas.outcome h * Z)
+    (htransfer :
+      |addInULeftQuantity params strategy
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          Hhat
+          (pointConsistencyAddInUSelection params) -
+        addInURightQuantity params strategy
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          T.toSubMeas
+          (pointConsistencyAddInUSelection params)| ≤
+        addInUError params eps delta)
+    (horthInput :
+      OrthonormalizationResidualDominationInput params strategy eps delta) :
+    ∃ H : ProjSubMeas (Polynomial params) ι,
+      SelfImprovementFinalFields params strategy H Z eps delta nu := by
+    obtain ⟨H, hfinal, _, _, _⟩ :=
+      final_fields_exists_of_helper_outputs_of_residualDominationInput
+        params strategy eps delta nu heps heps_le_one hdelta hdelta_le_one hd_le_q
+        hhelper hhelperCompleteness hhelperSSC hpointSSC hslack htransfer
+        horthInput
+    exact ⟨H, hfinal⟩
+
 end MIPStarRE.LDT.SelfImprovement
