@@ -653,8 +653,8 @@ noncomputable def residualDominatingRepairProducer_of_qxpLayer_and_coisometry
 /-- Upgrade an ordinary QXP-layer repair producer to a residual-dominating one
 from a pointwise inequality at the residual `none` outcome.
 
-The paper-side input is the operator inequality
-`\widehat H(\mathsf{none}) \preceq P(\mathsf{none})`.
+The paper-side input is the pointwise operator inequality
+`(optionCompletion Hhat).outcome none ≤ (qxpProjSubMeas ...).outcome none`.
 This is the constructor normally needed by callers that already prove the
 pointwise comparison directly. -/
 noncomputable def residualDominatingRepairProducer_of_qxpLayer_and_none_le
