@@ -510,7 +510,7 @@ lemma ldSandwichLineOnePointLeftFamily_zero_eq_endpoint
                 (postprocess
                   (evaluateAt params q.1 ((family.meas (q.2 ⟨0, hk⟩)).toSubMeas))
                   some).outcome none = 0 := by
-              simpa using
+              exact
                 evaluateAt_postprocess_some_outcome_none_eq_zero
                   params family (q.2 ⟨0, hk⟩) q.1
             rw [hleftNone, hrightNone]
@@ -537,7 +537,7 @@ lemma ldSandwichLineOnePointLeftFamily_zero_eq_endpoint
                 (postprocess
                   (evaluateAt params q.1 ((family.meas (q.2 ⟨0, hk⟩)).toSubMeas))
                   some).outcome none = 0 := by
-              simpa using
+              exact
                 evaluateAt_postprocess_some_outcome_none_eq_zero
                   params family (q.2 ⟨0, hk⟩) q.1
             rw [hleftNone, hrightNone]

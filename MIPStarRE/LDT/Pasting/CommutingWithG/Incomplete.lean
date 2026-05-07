@@ -109,12 +109,16 @@ theorem commutingWithGIncomplete
               cases u
               have hq1 :
                   (postprocess ((family.meas q.1).toSubMeas) (fun _ => ())).outcome () =
-                    (postprocess ((family.meas q.1).toSubMeas) (fun _ => ())).total :=
-                postprocess_unit_outcome_eq_total ((family.meas q.1).toSubMeas)
+                    (family.meas q.1).total := by
+                simpa [completePartSubMeas] using
+                  (completePartSubMeas_outcome_unit
+                    (params := params) (family := family) q.1)
               have hq2 :
                   (postprocess ((family.meas q.2).toSubMeas) (fun _ => ())).outcome () =
-                    (postprocess ((family.meas q.2).toSubMeas) (fun _ => ())).total :=
-                postprocess_unit_outcome_eq_total ((family.meas q.2).toSubMeas)
+                    (family.meas q.2).total := by
+                simpa [completePartSubMeas] using
+                  (completePartSubMeas_outcome_unit
+                    (params := params) (family := family) q.2)
               have hdiff :
                   (incompletePartTotalProductLeft params family q).outcome () -
                       (incompletePartTotalProductRight params family q).outcome () =
@@ -143,9 +147,7 @@ theorem commutingWithGIncomplete
                     completePartTotalProductLeft, completePartTotalProductRight,
                     OpFamily.leftPlacedOpFamily, multiplyByTotalOnRight,
                     multiplyByTotalOnLeft, incompletePartSubMeas, completePartSubMeas,
-                    sub_eq_add_neg, leftTensor, hq1, h₂,
-                    (family.meas q.1).sum_eq_total,
-                    (family.meas q.2).sum_eq_total]
+                    sub_eq_add_neg, leftTensor, h₂, (family.meas q.1).sum_eq_total]
               rw [hdiff]
       _ ≤ commutingWithGIncompleteError params gamma zeta := by
           simpa [commutingWithGIncompleteError] using hcomplete_bound

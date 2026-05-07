@@ -174,7 +174,7 @@ private lemma axisFailure_eq_average_directionError
         avgOver (uniformDistribution (Point params.next × Fin params.next.m))
           (fun ui => err (ui.2, ui.1)) := by
     simpa using
-      (CommutativityPoints.avgOver_uniform_equiv
+      (MIPStarRE.LDT.avgOver_uniform_equiv
         (e := Equiv.prodComm (Fin params.next.m) (Point params.next))
         (f := err))
   calc
@@ -222,7 +222,7 @@ private lemma averageRestrictedAxisFailure_eq_embeddedAxisDirections
                           (RestrictedSymStrat.axisParallelLineAnswerFamily
                             (xRestrictedStrategy params strategy x) (iu.2, iu.1))) := by
                               simpa using
-                                (CommutativityPoints.avgOver_uniform_equiv
+                                (MIPStarRE.LDT.avgOver_uniform_equiv
                                   (e := Equiv.prodComm (Point params) (Fin params.m))
                                   (f := fun s : Point params × Fin params.m =>
                                     qBipartiteConsDefect strategy.state
@@ -257,7 +257,7 @@ private lemma averageRestrictedAxisFailure_eq_embeddedAxisDirections
     _ = avgOver (uniformDistribution (Fin params.m × Fq params))
           (fun ix => sliceAxisDirectionError params strategy ix.2 ix.1) := by
             simpa using
-              (CommutativityPoints.avgOver_uniform_equiv
+              (MIPStarRE.LDT.avgOver_uniform_equiv
                 (e := Equiv.prodComm (Fq params) (Fin params.m))
                 (f := fun xi : Fq params × Fin params.m =>
                   sliceAxisDirectionError params strategy xi.1 xi.2))

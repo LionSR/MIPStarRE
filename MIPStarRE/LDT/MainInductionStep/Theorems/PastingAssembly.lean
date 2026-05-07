@@ -384,14 +384,14 @@ private lemma family_pointConsistencyError_eq_avg
           rfl
     _ = avgOver (uniformDistribution (Point params × Fq params))
           (fun ux => g (appendPoint params ux.1 ux.2)) := by
-          simpa [CommutativityPoints.pointNextEquiv] using
-            (CommutativityPoints.avgOver_uniform_equiv
+           simpa [CommutativityPoints.pointNextEquiv] using
+            (MIPStarRE.LDT.avgOver_uniform_equiv
               (e := CommutativityPoints.pointNextEquiv params)
               (f := g))
     _ = avgOver (uniformDistribution (Fq params × Point params))
           (fun xu => g (appendPoint params xu.2 xu.1)) := by
-          simpa using
-            (CommutativityPoints.avgOver_uniform_equiv
+           simpa using
+            (MIPStarRE.LDT.avgOver_uniform_equiv
               (e := Equiv.prodComm (Point params) (Fq params))
               (f := fun ux : Point params × Fq params => g (appendPoint params ux.1 ux.2)))
     _ = avgOver (uniformDistribution (Fq params))

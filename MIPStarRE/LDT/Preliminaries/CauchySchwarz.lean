@@ -31,7 +31,7 @@ private lemma avgOver_gap_le_sqrt_of_pointwise
   calc
     |avgOver 𝒟 lhs - avgOver 𝒟 rhs|
       = |avgOver 𝒟 (fun q => lhs q - rhs q)| := by
-          rw [← avgOver_sub]
+          simp [avgOver, Finset.sum_sub_distrib, mul_sub]
     _ ≤ Real.sqrt (avgOver 𝒟 sdd) := by
           exact
             avgOver_abs_le_sqrt_of_pointwise 𝒟

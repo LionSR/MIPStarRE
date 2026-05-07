@@ -25,6 +25,26 @@ open scoped MatrixOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+private lemma avgOver_uniform_fq_rpow_le_rpow_avg
+    (params : Parameters) [FieldModel params.q]
+    (f : Fq params → Error)
+    (n : ℕ)
+    (hn : 1 ≤ n)
+    (hf : ∀ a, 0 ≤ f a) :
+    avgOver (uniformDistribution (Fq params))
+        (fun a => Real.rpow (f a) (1 / (n : Error))) ≤
+      Real.rpow (avgOver (uniformDistribution (Fq params)) f) (1 / (n : Error)) := by
+  simpa using
+    avgOver_uniform_rpow_one_div_le_rpow_avg
+      (α := Fq params) (f := f) (n := n) hn hf
+
+private lemma avgOver_uniform_fq_nonneg
+    (params : Parameters) [FieldModel params.q]
+    (f : Fq params → Error)
+    (hf : ∀ a, 0 ≤ f a) :
+    0 ≤ avgOver (uniformDistribution (Fq params)) f :=
+  avgOver_nonneg (uniformDistribution (Fq params)) f hf
+
 private lemma restrictedAxisParallelProb_nonneg
     (params : Parameters) [FieldModel params.q]
     (strategy : RestrictedSymStrat params ι) :
@@ -118,8 +138,8 @@ lemma average_sliceSelfImprovementError_le
           (averageRestrictedAxisParallelError params hrestrict.profile)
           (1 / (32 : Error)) := by
     simpa [averageRestrictedAxisParallelError, 𝒟] using
-      avgOver_uniform_rpow_one_div_le_rpow_avg
-        (α := Fq params) (f := hrestrict.profile.axisParallel) (n := 32) (by norm_num)
+      avgOver_uniform_fq_rpow_le_rpow_avg params
+        hrestrict.profile.axisParallel 32 (by norm_num)
         (restricted_axis_nonneg params hrestrict.profile)
   have hself_avg :
       avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.selfConsistency x) (1 / (32 : Error))) ≤
@@ -127,18 +147,18 @@ lemma average_sliceSelfImprovementError_le
           (averageRestrictedSelfConsistencyError params hrestrict.profile)
           (1 / (32 : Error)) := by
     simpa [averageRestrictedSelfConsistencyError, 𝒟] using
-      avgOver_uniform_rpow_one_div_le_rpow_avg
-        (α := Fq params) (f := hrestrict.profile.selfConsistency) (n := 32) (by norm_num)
+      avgOver_uniform_fq_rpow_le_rpow_avg params
+        hrestrict.profile.selfConsistency 32 (by norm_num)
         (restricted_self_nonneg params hrestrict.profile)
   have hm_le_next : (params.m : Error) ≤ (params.next.m : Error) := by
     exact_mod_cast Nat.le_succ params.m
   have haxis_nonneg : 0 ≤ averageRestrictedAxisParallelError params hrestrict.profile := by
     simpa [averageRestrictedAxisParallelError, 𝒟] using
-      avgOver_nonneg 𝒟 hrestrict.profile.axisParallel
+      avgOver_uniform_fq_nonneg params hrestrict.profile.axisParallel
         (restricted_axis_nonneg params hrestrict.profile)
   have hself_nonneg : 0 ≤ averageRestrictedSelfConsistencyError params hrestrict.profile := by
     simpa [averageRestrictedSelfConsistencyError, 𝒟] using
-      avgOver_nonneg 𝒟 hrestrict.profile.selfConsistency
+      avgOver_uniform_fq_nonneg params hrestrict.profile.selfConsistency
         (restricted_self_nonneg params hrestrict.profile)
   have haxis_rpow_le :
       Real.rpow (averageRestrictedAxisParallelError params hrestrict.profile) (1 / (32 : Error)) ≤
@@ -237,8 +257,8 @@ private lemma average_sliceMainInductionNu_le
           (averageRestrictedAxisParallelError params hrestrict.profile)
           (1 / (1024 : Error)) := by
     simpa [averageRestrictedAxisParallelError, 𝒟] using
-      avgOver_uniform_rpow_one_div_le_rpow_avg
-        (α := Fq params) (f := hrestrict.profile.axisParallel) (n := 1024) (by norm_num)
+      avgOver_uniform_fq_rpow_le_rpow_avg params
+        hrestrict.profile.axisParallel 1024 (by norm_num)
         (restricted_axis_nonneg params hrestrict.profile)
   have hself_avg :
       avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.selfConsistency x) (1 / (1024 : Error))) ≤
@@ -246,8 +266,8 @@ private lemma average_sliceMainInductionNu_le
           (averageRestrictedSelfConsistencyError params hrestrict.profile)
           (1 / (1024 : Error)) := by
     simpa [averageRestrictedSelfConsistencyError, 𝒟] using
-      avgOver_uniform_rpow_one_div_le_rpow_avg
-        (α := Fq params) (f := hrestrict.profile.selfConsistency) (n := 1024) (by norm_num)
+      avgOver_uniform_fq_rpow_le_rpow_avg params
+        hrestrict.profile.selfConsistency 1024 (by norm_num)
         (restricted_self_nonneg params hrestrict.profile)
   have hdiag_avg :
       avgOver 𝒟 (fun x => Real.rpow (hrestrict.profile.diagonal x) (1 / (1024 : Error))) ≤
@@ -255,8 +275,8 @@ private lemma average_sliceMainInductionNu_le
           (averageRestrictedDiagonalError params hrestrict.profile)
           (1 / (1024 : Error)) := by
     simpa [averageRestrictedDiagonalError, 𝒟] using
-      avgOver_uniform_rpow_one_div_le_rpow_avg
-        (α := Fq params) (f := hrestrict.profile.diagonal) (n := 1024) (by norm_num)
+      avgOver_uniform_fq_rpow_le_rpow_avg params
+        hrestrict.profile.diagonal 1024 (by norm_num)
         (restricted_diag_nonneg params hrestrict.profile)
   have hm_sq_le_next_sq : ((params.m : Error) ^ (2 : ℕ)) ≤ ((params.next.m : Error) ^ (2 : ℕ)) := by
     have hm_le_next : (params.m : Error) ≤ (params.next.m : Error) := by
@@ -264,15 +284,15 @@ private lemma average_sliceMainInductionNu_le
     nlinarith
   have haxis_nonneg : 0 ≤ averageRestrictedAxisParallelError params hrestrict.profile := by
     simpa [averageRestrictedAxisParallelError, 𝒟] using
-      avgOver_nonneg 𝒟 hrestrict.profile.axisParallel
+      avgOver_uniform_fq_nonneg params hrestrict.profile.axisParallel
         (restricted_axis_nonneg params hrestrict.profile)
   have hself_nonneg : 0 ≤ averageRestrictedSelfConsistencyError params hrestrict.profile := by
     simpa [averageRestrictedSelfConsistencyError, 𝒟] using
-      avgOver_nonneg 𝒟 hrestrict.profile.selfConsistency
+      avgOver_uniform_fq_nonneg params hrestrict.profile.selfConsistency
         (restricted_self_nonneg params hrestrict.profile)
   have hdiag_nonneg : 0 ≤ averageRestrictedDiagonalError params hrestrict.profile := by
     simpa [averageRestrictedDiagonalError, 𝒟] using
-      avgOver_nonneg 𝒟 hrestrict.profile.diagonal
+      avgOver_uniform_fq_nonneg params hrestrict.profile.diagonal
         (restricted_diag_nonneg params hrestrict.profile)
   have haxis_rpow_le :
       Real.rpow

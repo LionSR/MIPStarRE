@@ -422,6 +422,30 @@ private lemma le_one_of_selfImprovementInInductionError_le_one_of_scaled_bound
     linarith [hscaled_le, hzeta_le]
   exact le_one_of_rpow_le_one (by positivity) hroot_le_one
 
+private lemma mainInductionNu_scaled_component_le
+    (params : Parameters) {k : ℕ} {x y z w : Error}
+    (hrest_nonneg : 0 ≤ y + z + w) :
+    1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) * x ≤
+      1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) *
+        (x + y + z + w) := by
+  have hsummono : x ≤ x + y + z + w := by
+    nlinarith [hrest_nonneg]
+  have hcoef_nonneg :
+      0 ≤ 1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) := by
+    positivity
+  exact mul_le_mul_of_nonneg_left hsummono hcoef_nonneg
+
+private lemma selfImprovementInInduction_scaled_component_le
+    (params : Parameters) {x y z : Error}
+    (hrest_nonneg : 0 ≤ y + z) :
+    3000 * (params.next.m : Error) * x ≤
+      3000 * (params.next.m : Error) * (x + y + z) := by
+  have hsummono : x ≤ x + y + z := by
+    nlinarith [hrest_nonneg]
+  have hcoef_nonneg : 0 ≤ 3000 * (params.next.m : Error) := by
+    positivity
+  exact mul_le_mul_of_nonneg_left hsummono hcoef_nonneg
+
 /-- Internal helper: under `mainInductionError < 1`, the axis-parallel error `eps ≤ 1`.
 
 Exposed for cross-module use in `MainTheorems`. -/
@@ -454,18 +478,13 @@ lemma eps_le_one_of_mainInductionError_lt_one
       1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) *
           Real.rpow eps (1 / (1024 : Error)) ≤
         mainInductionNu params.next k eps delta gamma := by
-    have hsummono :
-        Real.rpow eps (1 / (1024 : Error)) ≤
-          Real.rpow eps (1 / (1024 : Error)) +
-            Real.rpow delta (1 / (1024 : Error)) +
-            Real.rpow gamma (1 / (1024 : Error)) +
-            Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) := by
-      nlinarith [hrest_nonneg]
-    have hcoef_nonneg :
-        0 ≤ 1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) := by
-      positivity
-    have hmul := mul_le_mul_of_nonneg_left hsummono hcoef_nonneg
-    simpa [mainInductionNu, Parameters.next, mul_assoc, mul_left_comm, mul_comm] using hmul
+    simpa [mainInductionNu, Parameters.next, mul_assoc, mul_left_comm, mul_comm] using
+      (mainInductionNu_scaled_component_le (params := params) (k := k)
+        (x := Real.rpow eps (1 / (1024 : Error)))
+        (y := Real.rpow delta (1 / (1024 : Error)))
+        (z := Real.rpow gamma (1 / (1024 : Error)))
+        (w := Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)))
+        hrest_nonneg)
   exact
     le_one_of_mainInductionError_lt_one_of_scaled_bound
       params hsmall heps_scaled_le
@@ -502,18 +521,14 @@ lemma delta_le_one_of_mainInductionError_lt_one
       1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) *
           Real.rpow delta (1 / (1024 : Error)) ≤
         mainInductionNu params.next k eps delta gamma := by
-    have hsummono :
-        Real.rpow delta (1 / (1024 : Error)) ≤
-          Real.rpow eps (1 / (1024 : Error)) +
-            Real.rpow delta (1 / (1024 : Error)) +
-            Real.rpow gamma (1 / (1024 : Error)) +
-            Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) := by
-      nlinarith [hrest_nonneg]
-    have hcoef_nonneg :
-        0 ≤ 1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) := by
-      positivity
-    have hmul := mul_le_mul_of_nonneg_left hsummono hcoef_nonneg
-    simpa [mainInductionNu, Parameters.next, mul_assoc, mul_left_comm, mul_comm] using hmul
+    simpa [mainInductionNu, Parameters.next, mul_assoc, mul_left_comm, mul_comm,
+      add_assoc, add_left_comm, add_comm] using
+      (mainInductionNu_scaled_component_le (params := params) (k := k)
+        (x := Real.rpow delta (1 / (1024 : Error)))
+        (y := Real.rpow eps (1 / (1024 : Error)))
+        (z := Real.rpow gamma (1 / (1024 : Error)))
+        (w := Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)))
+        hrest_nonneg)
   exact
     le_one_of_mainInductionError_lt_one_of_scaled_bound
       params hsmall hdelta_scaled_le
@@ -645,18 +660,14 @@ lemma gamma_le_one_of_mainInductionError_lt_one
       1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) *
           Real.rpow gamma (1 / (1024 : Error)) ≤
         mainInductionNu params.next k eps delta gamma := by
-    have hsummono :
-        Real.rpow gamma (1 / (1024 : Error)) ≤
-          Real.rpow eps (1 / (1024 : Error)) +
-            Real.rpow delta (1 / (1024 : Error)) +
-            Real.rpow gamma (1 / (1024 : Error)) +
-            Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) := by
-      nlinarith [hrest_nonneg]
-    have hcoef_nonneg :
-        0 ≤ 1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) := by
-      positivity
-    have hmul := mul_le_mul_of_nonneg_left hsummono hcoef_nonneg
-    simpa [mainInductionNu, Parameters.next, mul_assoc, mul_left_comm, mul_comm] using hmul
+    simpa [mainInductionNu, Parameters.next, mul_assoc, mul_left_comm, mul_comm,
+      add_assoc, add_left_comm, add_comm] using
+      (mainInductionNu_scaled_component_le (params := params) (k := k)
+        (x := Real.rpow gamma (1 / (1024 : Error)))
+        (y := Real.rpow eps (1 / (1024 : Error)))
+        (z := Real.rpow delta (1 / (1024 : Error)))
+        (w := Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)))
+        hrest_nonneg)
   exact
     le_one_of_mainInductionError_lt_one_of_scaled_bound
       params hsmall hgamma_scaled_le
@@ -692,18 +703,14 @@ lemma dq_le_q_of_mainInductionError_lt_one
       1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) *
           Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) ≤
         mainInductionNu params.next k eps delta gamma := by
-    have hsummono :
-        Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) ≤
-          Real.rpow eps (1 / (1024 : Error)) +
-            Real.rpow delta (1 / (1024 : Error)) +
-            Real.rpow gamma (1 / (1024 : Error)) +
-            Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) := by
-      nlinarith [hrest_nonneg]
-    have hcoef_nonneg :
-        0 ≤ 1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) := by
-      positivity
-    have hmul := mul_le_mul_of_nonneg_left hsummono hcoef_nonneg
-    simpa [mainInductionNu, Parameters.next, mul_assoc, mul_left_comm, mul_comm] using hmul
+    simpa [mainInductionNu, Parameters.next, mul_assoc, mul_left_comm, mul_comm,
+      add_assoc, add_left_comm, add_comm] using
+      (mainInductionNu_scaled_component_le (params := params) (k := k)
+        (x := Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)))
+        (y := Real.rpow eps (1 / (1024 : Error)))
+        (z := Real.rpow delta (1 / (1024 : Error)))
+        (w := Real.rpow gamma (1 / (1024 : Error)))
+        hrest_nonneg)
   have hratio_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1 := by
     exact
       le_one_of_mainInductionError_lt_one_of_scaled_bound
@@ -739,17 +746,13 @@ lemma eps_le_one_of_selfImprovementInInductionError_le_one
   have heps_scaled_le :
       3000 * (params.next.m : Error) * Real.rpow eps (1 / (32 : Error)) ≤
         selfImprovementInInductionError params.next eps delta gamma := by
-    have hsummono :
-        Real.rpow eps (1 / (32 : Error)) ≤
-          Real.rpow eps (1 / (32 : Error)) +
-            Real.rpow delta (1 / (32 : Error)) +
-            Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)) := by
-      nlinarith [hrest_nonneg]
-    have hcoef_nonneg : 0 ≤ 3000 * (params.next.m : Error) := by
-      positivity
-    have hmul := mul_le_mul_of_nonneg_left hsummono hcoef_nonneg
     simpa [selfImprovementInInductionError, Parameters.next, mul_assoc, mul_left_comm,
-        mul_comm] using hmul
+        mul_comm] using
+      (selfImprovementInInduction_scaled_component_le (params := params)
+        (x := Real.rpow eps (1 / (32 : Error)))
+        (y := Real.rpow delta (1 / (32 : Error)))
+        (z := Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)))
+        hrest_nonneg)
   exact
     le_one_of_selfImprovementInInductionError_le_one_of_scaled_bound
       params hzeta_le heps_scaled_le
@@ -782,17 +785,13 @@ lemma delta_le_one_of_selfImprovementInInductionError_le_one
   have hdelta_scaled_le :
       3000 * (params.next.m : Error) * Real.rpow delta (1 / (32 : Error)) ≤
         selfImprovementInInductionError params.next eps delta gamma := by
-    have hsummono :
-        Real.rpow delta (1 / (32 : Error)) ≤
-          Real.rpow eps (1 / (32 : Error)) +
-            Real.rpow delta (1 / (32 : Error)) +
-            Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)) := by
-      nlinarith [hrest_nonneg]
-    have hcoef_nonneg : 0 ≤ 3000 * (params.next.m : Error) := by
-      positivity
-    have hmul := mul_le_mul_of_nonneg_left hsummono hcoef_nonneg
     simpa [selfImprovementInInductionError, Parameters.next, mul_assoc, mul_left_comm,
-        mul_comm] using hmul
+        mul_comm, add_assoc, add_left_comm, add_comm] using
+      (selfImprovementInInduction_scaled_component_le (params := params)
+        (x := Real.rpow delta (1 / (32 : Error)))
+        (y := Real.rpow eps (1 / (32 : Error)))
+        (z := Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)))
+        hrest_nonneg)
   exact
     le_one_of_selfImprovementInInductionError_le_one_of_scaled_bound
       params hzeta_le hdelta_scaled_le

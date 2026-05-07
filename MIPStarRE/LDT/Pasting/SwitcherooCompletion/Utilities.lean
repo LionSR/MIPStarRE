@@ -99,16 +99,17 @@ lemma pointWithCompletePart_as_switcheroo_input
                   (Fintype.sum_prod_type' (f := fun g u => F (g, u)))
               have hsingle :
                   (postprocess ((family.meas q.2).toSubMeas) (fun _ => ())).outcome () =
-                    (postprocess ((family.meas q.2).toSubMeas) (fun _ => ())).total :=
-                postprocess_unit_outcome_eq_total ((family.meas q.2).toSubMeas)
+                    (family.meas q.2).total := by
+                simpa [completePartSubMeas] using
+                  (completePartSubMeas_outcome_unit
+                    (params := params) (family := family) q.2)
               rw [hsplit]
               simp [F, switcherooPointProductLeft, switcherooPointProductRight,
                 completePartProjFamily, completePartPointProductLeft,
                 completePartPointProductRight, completePartSubMeas,
                 multiplyByTotalOnRight, multiplyByTotalOnLeft,
                 orderedProductOpFamily, reversedProductOpFamily,
-                OpFamily.leftPlacedOpFamily, postprocess_total, hsingle,
-                (family.meas q.1).sum_eq_total,
+                OpFamily.leftPlacedOpFamily, postprocess_total,
                 (family.meas q.2).sum_eq_total]
     _ ≤ gamma := hcomm
 

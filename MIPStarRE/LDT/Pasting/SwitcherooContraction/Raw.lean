@@ -15,6 +15,92 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+/-- The post-second-`√ζ` left-front expression in the paper's cross-term chain. -/
+noncomputable def switcherooAggregateLeftFrontRaw
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι) : Error :=
+  avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+    ∑ go : Polynomial params × Outcome,
+      ev ψbi
+        (leftTensor (ι₂ := ι)
+          (((family.meas q.1).outcome go.1) *
+            (M q.2).outcome go.2 *
+            (family.meas q.1).outcome go.1 *
+            (M q.2).outcome go.2)))
+
+/-- The split-by-`g` expression that collapses back to the first positive term. -/
+noncomputable def switcherooAggregateFirstSplitRaw
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι) : Error :=
+  avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+    ∑ go : Polynomial params × Outcome,
+      ev ψbi
+        (leftTensor (ι₂ := ι)
+          ((M q.2).outcome go.2 *
+            ((family.meas q.1).outcome go.1 *
+              (M q.2).outcome go.2))))
+
+/-- The post-first-`√χ` raw expression in the fourth-term chain. -/
+noncomputable def switcherooAggregateOnceCommutedRaw
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι) : Error :=
+  avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+    ∑ go : Polynomial params × Outcome,
+      ev ψbi
+        (leftTensor (ι₂ := ι)
+          ((completePartSubMeas params family q.1).total *
+            (M q.2).outcome go.2 *
+            (family.meas q.1).outcome go.1 *
+            (M q.2).outcome go.2 *
+            (family.meas q.1).outcome go.1)))
+
+/-- Repackage the first `sqrt chi` step using the named raw scalar. -/
+lemma switcherooAggregateFourthTerm_close_once_commuted_raw
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (hnorm : ψbi.IsNormalized)
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι)
+    (chi : Error)
+    (hcomm : SDDOpRel ψbi
+      (uniformDistribution (SlicePairQuestion params))
+      (switcherooPointProductLeft params family M)
+      (switcherooPointProductRight params family M)
+      chi) :
+    |switcherooAggregateFourthTerm params ψbi family M -
+        switcherooAggregateOnceCommutedRaw params ψbi family M| ≤
+      Real.sqrt chi := by
+  simpa [switcherooAggregateOnceCommutedRaw] using
+    switcherooAggregateFourthTerm_split_close_once_commuted
+      params ψbi hnorm family M chi hcomm
+
+/-- The post-first-`√ζ` mixed-tensor raw expression in the fourth-term chain. -/
+noncomputable def switcherooAggregateMixedRaw
+    {Outcome : Type*} [Fintype Outcome]
+    (params : Parameters) [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (M : IdxProjSubMeas (Fq params) Outcome ι) : Error :=
+  avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
+    ∑ g : Polynomial params, ∑ o : Outcome,
+      ev ψbi
+        ((leftTensor (ι₂ := ι)
+          ((completePartSubMeas params family q.1).total *
+            (M q.2).outcome o *
+            (family.meas q.1).outcome g *
+            (M q.2).outcome o)) *
+          rightTensor (ι₁ := ι) ((family.meas q.1).outcome g)))
+
 /-- Repackage the second `sqrt zeta` step using the named raw left-front
 scalar. -/
 lemma switcherooAggregateFourthTerm_mixed_close_left_front_raw

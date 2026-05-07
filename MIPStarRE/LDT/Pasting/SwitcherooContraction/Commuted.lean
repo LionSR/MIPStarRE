@@ -39,55 +39,35 @@ lemma switcherooAggregateFourthTerm_once_commuted_contraction_right
   let Gq : Polynomial params → MIPStarRE.Quantum.Op ι := (family.meas q.1).outcome
   let Mo : Outcome → MIPStarRE.Quantum.Op ι := (M q.2).outcome
   let X : Polynomial params → MIPStarRE.Quantum.Op ι :=
-    fun g => ∑ o : Outcome, Mo o * Gq g * Mo o
-  have hGherm : Gᴴ = G :=
-    (Matrix.nonneg_iff_posSemidef.mp
-      (SubMeas.total_nonneg (completePartSubMeas params family q.1))).isHermitian.eq
+    switcherooAggregateFourthTermX params family M q
+  have hGherm : Gᴴ = G := by
+    simpa [G] using switcherooCompletePartTotal_hermitian params family q
   have hGsq : G * G = G := by
-    simpa [G, completePartSubMeas, postprocess_total] using
-      projSubMeas_total_sq (family.meas q.1)
+    simpa [G] using switcherooCompletePartTotal_sq params family q
   have hGle : G ≤ 1 := by
-    simpa [G] using (completePartSubMeas params family q.1).total_le_one
+    simpa [G] using switcherooCompletePartTotal_le_one params family q
   have hMoherm : ∀ o : Outcome, (Mo o)ᴴ = Mo o := by
     intro o
-    exact (Matrix.nonneg_iff_posSemidef.mp ((M q.2).outcome_pos o)).isHermitian.eq
+    simpa [Mo] using switcherooMeasuredOutcome_hermitian params M q o
   have hGqherm : ∀ g : Polynomial params, (Gq g)ᴴ = Gq g := by
     intro g
-    exact (Matrix.nonneg_iff_posSemidef.mp ((family.meas q.1).outcome_pos g)).isHermitian.eq
+    simpa [Gq] using switcherooSliceOutcome_hermitian params family q g
   have hXherm : ∀ g : Polynomial params, (X g)ᴴ = X g := by
     intro g
-    unfold X
-    rw [Matrix.conjTranspose_sum]
-    refine Finset.sum_congr rfl ?_
-    intro o _
-    simp [Matrix.conjTranspose_mul, hMoherm o, hGqherm g, mul_assoc]
+    simpa [X] using switcherooAggregateFourthTermX_hermitian params family M q g
   have hXnonneg : ∀ g : Polynomial params, 0 ≤ X g := by
     intro g
-    unfold X
-    refine Finset.sum_nonneg ?_
-    intro o _
-    exact MIPStarRE.Quantum.sandwich_nonneg ((family.meas q.1).outcome_pos g) (hMoherm o)
+    simpa [X] using switcherooAggregateFourthTermX_nonneg params family M q g
   have hXle : ∀ g : Polynomial params, X g ≤ 1 := by
     intro g
-    exact projSubMeas_sandwich_sum_le_one (M q.2) (Gq g)
-      ((family.meas q.1).outcome_le_one g)
+    simpa [X] using switcherooAggregateFourthTermX_le_one params family M q g
   have hXsq_le : ∀ g : Polynomial params, X g * X g ≤ X g := by
     intro g
-    exact MIPStarRE.Quantum.sq_le_self (hXnonneg g) (hXle g)
+    simpa [X] using switcherooAggregateFourthTermX_sq_le params family M q g
   have hsumX : ∑ g : Polynomial params, X g = ∑ o : Outcome, Mo o * G * Mo o := by
-    unfold X
-    rw [Finset.sum_comm]
-    refine Finset.sum_congr rfl ?_
-    intro o _
-    calc
-      ∑ g : Polynomial params, Mo o * Gq g * Mo o
-        = Mo o * (∑ g : Polynomial params, Gq g) * Mo o := by
-            simp [mul_assoc, Matrix.mul_sum, Finset.sum_mul]
-      _ = Mo o * G * Mo o := by
-            rw [(family.meas q.1).sum_eq_total]
-            simp [G]
+    simpa [X, G, Mo] using switcherooAggregateFourthTermX_sum params family M q
   have hmid_le : ∑ o : Outcome, Mo o * G * Mo o ≤ 1 := by
-    exact projSubMeas_sandwich_sum_le_one (M q.2) G hGle
+    simpa [G, Mo] using switcherooAggregateFourthTerm_middle_sum_le_one params family M q
   have hsingle :
       ∀ g : Polynomial params,
         (∑ o : Outcome,
@@ -121,7 +101,9 @@ lemma switcherooAggregateFourthTerm_once_commuted_contraction_right
               _ = leftTensor (ι₂ := ι) (X g * G * X g) := by
                       congr 1
                       rw [show (∑ o : Outcome, G * Mo o * Gq g * Mo o) = G * X g by
-                        simp [X, mul_assoc, Matrix.mul_sum]]
+                        simpa [X, switcherooAggregateFourthTermX, mul_assoc] using
+                          (Finset.mul_sum (s := Finset.univ) (a := G)
+                            (f := fun o : Outcome => Mo o * Gq g * Mo o)).symm]
                       calc
                         (G * X g)ᴴ * (G * X g)
                           = (X g * G) * (G * X g) := by

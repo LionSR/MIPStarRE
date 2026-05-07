@@ -31,6 +31,21 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+private lemma leftTensor_sandwich_adjoint_normalization_family
+    {Ω α β : Type*} [Fintype α] [Fintype β]
+    (P : Ω → SubMeas α ι) (Q : Ω → ProjSubMeas β ι) :
+    ∀ ω,
+      ∑ a : α,
+          (∑ b : β,
+            leftTensor (ι₂ := ι) ((Q ω).outcome b * (P ω).outcome a * (Q ω).outcome b))ᴴ *
+            (∑ b : β,
+              leftTensor (ι₂ := ι) ((Q ω).outcome b * (P ω).outcome a * (Q ω).outcome b)) ≤
+        1 := by
+  intro ω
+  simpa using
+    leftTensor_normalizationCondition_sandwich_adjoint_bound
+      (ι := ι) (P := P ω) (Q := Q ω)
+
 
 lemma xEvaluatedSliceBABAtensor_to_xEvaluatedFullSliceABABAvg
     (params : Parameters) [FieldModel params.q]
@@ -84,8 +99,8 @@ lemma xEvaluatedSliceBABAtensor_to_xEvaluatedFullSliceABABAvg
               (∑ h : Polynomial params, C ux a h) ≤ 1 := by
     intro ux
     simpa [C, X, Y] using
-      leftTensor_normalizationCondition_sandwich_adjoint_bound
-        (ι := ι) (P := X ux) (Q := family.meas ux.2.2)
+      leftTensor_sandwich_adjoint_normalization_family
+        (ι := ι) (P := X) (Q := fun ux => family.meas ux.2.2) ux
   have hclose :=
     MIPStarRE.LDT.Preliminaries.closenessOfIPAdjoint
       strategy.state hnorm 𝒟 h𝒟 A B C zeta hAB hC
@@ -190,8 +205,8 @@ private lemma xEvaluatedSliceBABAScalar_to_xEvaluatedFullSliceABABtensor
               (∑ a : Fq params, C ux h a) ≤ 1 := by
     intro ux
     simpa [C, X, Y, xEvaluatedFirstProj] using
-      leftTensor_normalizationCondition_sandwich_adjoint_bound
-        (ι := ι) (P := Y ux) (Q := xEvaluatedFirstProj params family ux)
+      leftTensor_sandwich_adjoint_normalization_family
+        (ι := ι) (P := Y) (Q := xEvaluatedFirstProj params family) ux
   have hclose :=
     MIPStarRE.LDT.Preliminaries.closenessOfIPAdjoint
       strategy.state hnorm 𝒟 h𝒟 A B C zeta hAB hC

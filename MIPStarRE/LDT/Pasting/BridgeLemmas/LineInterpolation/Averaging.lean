@@ -61,8 +61,8 @@ lemma avgOver_sub
     {α : Type*}
     (𝒟 : Distribution α)
     (f g : α → Error) :
-    avgOver 𝒟 (fun a => f a - g a) = avgOver 𝒟 f - avgOver 𝒟 g :=
-  MIPStarRE.LDT.avgOver_sub 𝒟 f g
+    avgOver 𝒟 (fun a => f a - g a) = avgOver 𝒟 f - avgOver 𝒟 g := by
+  exact MIPStarRE.LDT.avgOver_sub 𝒟 f g
 
 lemma avgOver_distinct_bounded_le_avgOver_uniform_add_tv
     (params : Parameters) [FieldModel params.q]

@@ -20,6 +20,53 @@ open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+private lemma leftTensor_normalizationConditionSquare_le_one
+    {OutcomeA OutcomeB : Type*} [Fintype OutcomeA] [Fintype OutcomeB]
+    (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι) :
+    ∑ a : OutcomeA,
+        (∑ b : OutcomeB,
+          leftTensor (ι₂ := ι) (Q.outcome b * P.outcome a * Q.outcome b)) *
+        (∑ b : OutcomeB,
+          leftTensor (ι₂ := ι) (Q.outcome b * P.outcome a * Q.outcome b))ᴴ ≤
+      1 := by
+  let T : OutcomeA → MIPStarRE.Quantum.Op ι := fun a =>
+    ∑ b : OutcomeB, Q.outcome b * P.outcome a * Q.outcome b
+  calc
+    ∑ a : OutcomeA,
+        (∑ b : OutcomeB,
+          leftTensor (ι₂ := ι) (Q.outcome b * P.outcome a * Q.outcome b)) *
+        (∑ b : OutcomeB,
+          leftTensor (ι₂ := ι) (Q.outcome b * P.outcome a * Q.outcome b))ᴴ
+      = ∑ a : OutcomeA, leftTensor (ι₂ := ι) (T a * (T a)ᴴ) := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          have hsum :
+              (∑ b : OutcomeB,
+                  leftTensor (ι₂ := ι) (Q.outcome b * P.outcome a * Q.outcome b)) =
+                leftTensor (ι₂ := ι) (T a) := by
+            simp [T, leftTensor_finset_sum]
+          rw [hsum]
+          have hleft_adj :
+              (leftTensor (ι₂ := ι) (T a))ᴴ = leftTensor (ι₂ := ι) ((T a)ᴴ) := by
+            simpa [leftTensor, opTensor] using
+              (conjTranspose_opTensor (ι₁ := ι) (ι₂ := ι)
+                (T a) (1 : MIPStarRE.Quantum.Op ι))
+          rw [hleft_adj, leftTensor_mul_leftTensor]
+    _ = leftTensor (ι₂ := ι) (∑ a : OutcomeA, T a * (T a)ᴴ) := by
+          rw [← leftTensor_finset_sum (ι₂ := ι) Finset.univ (fun a => T a * (T a)ᴴ)]
+    _ = leftTensor (ι₂ := ι) (normalizationConditionSquareOperator P Q) := by
+          simp [T, normalizationConditionSquareOperator,
+            normalizationConditionSquareFamily,
+            normalizationConditionSandwichedTotalOperator,
+            normalizationConditionSandwichedTotalFamily,
+            normalizationConditionSandwichedFamily,
+            normalizationConditionSandwichedOperator, postprocess]
+    _ ≤ 1 := by
+          exact leftTensor_le_one (ι₂ := ι) <| by
+            simpa [normalizationConditionSquareOperator] using
+              (normalizationConditionSquareFamily P Q).total_le_one
+
 /-- Phase-1 `closenessOfIP` side condition for inserting Bob's measurement.
 
 This packages the `lem:normalization-condition` bound for
@@ -36,61 +83,16 @@ private lemma evaluatedSlice_phaseOne_hC
                   ((evaluatedSliceFirstFactor params family q).outcome a))) *
             (∑ a : Fq params,
               leftTensor (ι₂ := ι)
-                (((evaluatedSliceFirstFactor params family q).outcome a) *
+                 (((evaluatedSliceFirstFactor params family q).outcome a) *
                   ((evaluatedSliceSecondFactor params family q).outcome b) *
                   ((evaluatedSliceFirstFactor params family q).outcome a)))ᴴ ≤ 1 := by
   intro q
-  let P : SubMeas (Fq params) ι := evaluatedSliceSecondFactor params family q
-  let Q : ProjSubMeas (Fq params) ι := evaluatedSliceFirstProj params family q
-  let T : Fq params → MIPStarRE.Quantum.Op ι := fun b =>
-    ∑ a : Fq params,
-      ((evaluatedSliceFirstFactor params family q).outcome a) *
-        ((evaluatedSliceSecondFactor params family q).outcome b) *
-        ((evaluatedSliceFirstFactor params family q).outcome a)
-  calc
-    ∑ b : Fq params,
-        (∑ a : Fq params,
-            leftTensor (ι₂ := ι)
-              (((evaluatedSliceFirstFactor params family q).outcome a) *
-                ((evaluatedSliceSecondFactor params family q).outcome b) *
-                ((evaluatedSliceFirstFactor params family q).outcome a))) *
-          (∑ a : Fq params,
-            leftTensor (ι₂ := ι)
-               (((evaluatedSliceFirstFactor params family q).outcome a) *
-                 ((evaluatedSliceSecondFactor params family q).outcome b) *
-                 ((evaluatedSliceFirstFactor params family q).outcome a)))ᴴ
-      = ∑ b : Fq params, leftTensor (ι₂ := ι) (T b * (T b)ᴴ) := by
-          refine Finset.sum_congr rfl ?_
-          intro b _
-          have hsum :
-              (∑ a : Fq params,
-                  leftTensor (ι₂ := ι)
-                    (((evaluatedSliceFirstFactor params family q).outcome a) *
-                      ((evaluatedSliceSecondFactor params family q).outcome b) *
-                      ((evaluatedSliceFirstFactor params family q).outcome a))) =
-                leftTensor (ι₂ := ι) (T b) := by
-            simp [T, leftTensor_finset_sum]
-          rw [hsum]
-          have hleft_adj :
-              (leftTensor (ι₂ := ι) (T b))ᴴ = leftTensor (ι₂ := ι) ((T b)ᴴ) := by
-            simpa [leftTensor, opTensor] using
-              (conjTranspose_opTensor (ι₁ := ι) (ι₂ := ι) (T b) (1 : MIPStarRE.Quantum.Op ι))
-          rw [hleft_adj, leftTensor_mul_leftTensor]
-    _ = leftTensor (ι₂ := ι) (∑ b : Fq params, T b * (T b)ᴴ) := by
-          rw [← leftTensor_finset_sum (ι₂ := ι) Finset.univ (fun b => T b * (T b)ᴴ)]
-    _ = leftTensor (ι₂ := ι) (normalizationConditionSquareOperator P Q) := by
-          simp [T, P, Q, normalizationConditionSquareOperator,
-            normalizationConditionSquareFamily,
-            normalizationConditionSandwichedTotalOperator,
-            normalizationConditionSandwichedTotalFamily,
-            normalizationConditionSandwichedFamily,
-            normalizationConditionSandwichedOperator,
-            evaluatedSliceFirstFactor, evaluatedSliceSecondFactor,
-            evaluatedSliceFirstProj, postprocess]
-    _ ≤ 1 := by
-          exact leftTensor_le_one (ι₂ := ι) <| by
-            simpa [normalizationConditionSquareOperator] using
-              (normalizationConditionSquareFamily P Q).total_le_one
+  simpa [evaluatedSliceFirstFactor, evaluatedSliceSecondFactor,
+    evaluatedSliceFirstProj] using
+    leftTensor_normalizationConditionSquare_le_one
+      (ι := ι)
+      (P := evaluatedSliceSecondFactor params family q)
+      (Q := evaluatedSliceFirstProj params family q)
 
 /-- View the `params.next` point measurement with the outcome type rewritten as
 `Fq params`. -/
@@ -304,43 +306,12 @@ lemma evaluatedSlice_phaseThree_insert_bound
   have hC :
       ∀ q, ∑ a : Fq params, (∑ b : Fq params, C q a b) * (∑ b : Fq params, C q a b)ᴴ ≤ 1 := by
     intro q
-    let P : SubMeas (Fq params) ι := evaluatedSliceFirstFactor params family q
-    let Q : ProjSubMeas (Fq params) ι := evaluatedSliceSecondProj params family q
-    let T : Fq params → MIPStarRE.Quantum.Op ι := fun a =>
-      ∑ b : Fq params,
-        ((evaluatedSliceSecondFactor params family q).outcome b) *
-          ((evaluatedSliceFirstFactor params family q).outcome a) *
-          ((evaluatedSliceSecondFactor params family q).outcome b)
-    calc
-      ∑ a : Fq params,
-          (∑ b : Fq params, C q a b) * (∑ b : Fq params, C q a b)ᴴ
-        = ∑ a : Fq params, leftTensor (ι₂ := ι) (T a * (T a)ᴴ) := by
-            refine Finset.sum_congr rfl ?_
-            intro a _
-            have hsum :
-                (∑ b : Fq params, C q a b) = leftTensor (ι₂ := ι) (T a) := by
-              simp [C, T, leftTensor_finset_sum]
-            rw [hsum]
-            have hleft_adj :
-                (leftTensor (ι₂ := ι) (T a))ᴴ = leftTensor (ι₂ := ι) ((T a)ᴴ) := by
-              simpa [leftTensor, opTensor] using
-                (conjTranspose_opTensor (ι₁ := ι) (ι₂ := ι) (T a) (1 : MIPStarRE.Quantum.Op ι))
-            rw [hleft_adj, leftTensor_mul_leftTensor]
-      _ = leftTensor (ι₂ := ι) (∑ a : Fq params, T a * (T a)ᴴ) := by
-            rw [← leftTensor_finset_sum (ι₂ := ι) Finset.univ (fun a => T a * (T a)ᴴ)]
-      _ = leftTensor (ι₂ := ι) (normalizationConditionSquareOperator P Q) := by
-            simp [T, P, Q, normalizationConditionSquareOperator,
-              normalizationConditionSquareFamily,
-              normalizationConditionSandwichedTotalOperator,
-              normalizationConditionSandwichedTotalFamily,
-              normalizationConditionSandwichedFamily,
-              normalizationConditionSandwichedOperator,
-              evaluatedSliceFirstFactor, evaluatedSliceSecondFactor,
-              evaluatedSliceSecondProj, postprocess]
-      _ ≤ 1 := by
-            exact leftTensor_le_one (ι₂ := ι) <| by
-              simpa [normalizationConditionSquareOperator] using
-                (normalizationConditionSquareFamily P Q).total_le_one
+    simpa [C, evaluatedSliceFirstFactor, evaluatedSliceSecondFactor,
+      evaluatedSliceSecondProj] using
+      leftTensor_normalizationConditionSquare_le_one
+        (ι := ι)
+        (P := evaluatedSliceFirstFactor params family q)
+        (Q := evaluatedSliceSecondProj params family q)
   have hzeta_nonneg : 0 ≤ zeta := by
     have hsdd_nonneg :
         0 ≤ sddError strategy.state

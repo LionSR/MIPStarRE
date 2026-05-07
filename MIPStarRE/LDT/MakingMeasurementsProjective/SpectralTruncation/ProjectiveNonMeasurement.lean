@@ -43,7 +43,7 @@ private lemma truncationCutoff_le_inv_one_sub_mul
     simpa [truncationCutoff, h] using hmul
 
 private lemma continuousOn_outcome_spectrum {Outcome : Type uOutcome}
-    [Fintype Outcome] [DecidableEq Outcome]
+    [Fintype Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
     (A : Measurement Outcome ι) (a : Outcome) (f : Error → Error) :
     ContinuousOn f (spectrum ℝ (A.outcome a)) := by
@@ -62,7 +62,7 @@ private noncomputable def roundedProjectorFamily {Outcome : Type uOutcome}
   total := ∑ a, cfc (truncationCutoff δ) (A.outcome a)
 
 private lemma outcome_spectrum_nonneg {Outcome : Type uOutcome}
-    [Fintype Outcome] [DecidableEq Outcome]
+    [Fintype Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
     (A : Measurement Outcome ι) (a : Outcome) :
     ∀ x ∈ spectrum ℝ (A.outcome a), 0 ≤ x := by
@@ -73,7 +73,7 @@ private lemma outcome_spectrum_nonneg {Outcome : Type uOutcome}
   exact (cfc_nonneg_iff (R := ℝ) (f := id) (a := A.outcome a) (ha := hsa)).mp hnonneg
 
 private lemma outcome_spectrum_le_one {Outcome : Type uOutcome}
-    [Fintype Outcome] [DecidableEq Outcome]
+    [Fintype Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
     (A : Measurement Outcome ι) (a : Outcome) :
     ∀ x ∈ spectrum ℝ (A.outcome a), x ≤ 1 := by
@@ -343,11 +343,12 @@ private lemma roundedProjectorFamily_total_le_one_zero {Outcome : Type uOutcome}
     _ = 1 := by simpa [A.sum_eq_total] using A.total_eq_one
 
 private lemma sourceAlmostProjective_eq_zero_per_outcome {Outcome : Type uOutcome}
-    [Fintype Outcome] [DecidableEq Outcome]
+    [Fintype Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : Measurement Outcome ι)
     (hsource : ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 0) :
     ∀ a : Outcome, ev ψ (A.outcome a - A.outcome a * A.outcome a) = 0 := by
+  classical
   have hsum_nonneg :
       0 ≤ ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) :=
     sourceAlmostProjective_nonneg ψ A
@@ -371,12 +372,13 @@ state-dependent operator distance, and sum the pointwise order bound
 the direct Lean transcription of `references/ldt-paper/orthonormalization.tex`,
 lines 425-529, in the nontrivial regime `0 < ζ ≤ 1/4`. -/
 theorem projectiveNonMeasurement_of_sourceAlmostProjective
-    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
+    {Outcome : Type uOutcome} [Fintype Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error)
     (hζ : 0 < ζ) (hζ_small : ζ ≤ 1 / 4)
     (hsource : ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ) :
     projectiveNonMeasurement ψ A ζ := by
+  classical
   let ε : Error := spectralTruncationError ζ
   have hζ_nonneg : 0 ≤ ζ := le_of_lt hζ
   have hε_pos : 0 < ε := by
@@ -441,11 +443,12 @@ to the spectral projector onto its `1`-eigenspace. The total operator is then
 dominated by `I`, and the finite-spectrum comparison shows that the resulting
 state-dependent operator distance is exactly zero. -/
 theorem projectiveNonMeasurement_of_sourceAlmostProjective_zero
-    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
+    {Outcome : Type uOutcome} [Fintype Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : Measurement Outcome ι)
     (hsource : ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 0) :
     projectiveNonMeasurement ψ A 0 := by
+  classical
   refine ⟨roundedProjectorFamily A 0, ?_⟩
   refine ⟨?_, ?_, rfl, ?_⟩
   · intro a
@@ -635,11 +638,12 @@ The paper treats the surrounding orthonormalization lemma as trivial when
 `ζ > 1/4`. On a normalized state, the zero projector family already satisfies
 the required `2\sqrt{ζ}` state-dependent operator bound in this regime. -/
 theorem projectiveNonMeasurement_of_sourceAlmostProjective_large
-    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
+    {Outcome : Type uOutcome} [Fintype Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error)
     (hψ : ψ.IsNormalized) (hlarge : 1 / 4 < ζ) :
     projectiveNonMeasurement ψ A ζ := by
+  classical
   refine ⟨zeroProjectorFamily (Outcome := Outcome) (ι := ι), ?_⟩
   refine ⟨?_, ?_, zeroProjectorFamily_sum_eq_total (Outcome := Outcome) (ι := ι), ?_⟩
   · intro a
@@ -687,12 +691,13 @@ This theorem combines the exact endpoint `ζ = 0`, the nontrivial spectral proof
 for `0 < ζ ≤ 1/4`, and the trivial large-error branch used in the surrounding
 paper argument. -/
 theorem projectiveNonMeasurement_of_sourceAlmostProjective_full
-    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
+    {Outcome : Type uOutcome} [Fintype Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error)
     (hψ : ψ.IsNormalized)
     (hsource : ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ) :
     projectiveNonMeasurement ψ A ζ := by
+  classical
   by_cases hzero : ζ = 0
   · have hsource0 : ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 0 := by
       simpa [hzero] using hsource

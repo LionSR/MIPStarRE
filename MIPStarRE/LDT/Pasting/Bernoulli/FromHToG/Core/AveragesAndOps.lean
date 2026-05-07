@@ -129,40 +129,6 @@ lemma fromHToG_leftTensor_conjTranspose (A : MIPStarRE.Quantum.Op ι) :
     (leftTensor (ι₂ := ι) A)ᴴ = leftTensor (ι₂ := ι) Aᴴ := by
   simp [leftTensor, Matrix.conjTranspose_kronecker]
 
-/-- An outcome of a projective submeasurement is unchanged by multiplying by the
-total mass on the right. -/
-lemma fromHToG_projSubMeas_outcome_mul_total_eq_outcome {α : Type*} [Fintype α]
-    (A : ProjSubMeas α ι) (a : α) :
-    A.outcome a * A.total = A.outcome a := by
-  simpa using ProjSubMeas.outcome_mul_total_eq_outcome A a
-
-/-- The total of a projective submeasurement is idempotent. -/
-lemma fromHToG_projSubMeas_total_proj {α : Type*} [Fintype α]
-    (A : ProjSubMeas α ι) :
-    A.total * A.total = A.total := by
-  simpa using ProjSubMeas.total_proj A
-
-/-- Each completed `\widehat G` outcome is projective. -/
-lemma fromHToG_gHatIdxMeas_proj
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) (x : Fq params) (g : GHatOutcome params) :
-    (gHatIdxMeas params family x).outcome g * (gHatIdxMeas params family x).outcome g =
-      (gHatIdxMeas params family x).outcome g := by
-  cases g with
-  | none =>
-      let T := (family.meas x).total
-      change (1 - T) * (1 - T) = 1 - T
-      have hTT : T * T = T := by
-        simpa [T] using fromHToG_projSubMeas_total_proj (family.meas x)
-      calc
-        (1 - T) * (1 - T) = 1 - T - T + T * T := by
-          noncomm_ring
-        _ = 1 - T := by
-          rw [hTT]
-          abel
-  | some p =>
-      simp [gHatIdxMeas, completeSubMeas, (family.meas x).proj p]
-
 /-- Summing completed outcomes with `isSome = true` gives the complete branch. -/
 lemma fromHToG_gHatIdxMeas_sum_isSome_true
     (params : Parameters) [FieldModel params.q]
@@ -238,7 +204,7 @@ lemma fromHToG_gHatIdxMeas_sum_isSome_true_weight
           S * (gHatIdxMeas params family x).outcome g := by
           refine Finset.sum_congr rfl ?_
           intro g hg
-          rw [mul_assoc, fromHToG_gHatIdxMeas_proj params family x g]
+          rw [mul_assoc, gHatIdxMeas_proj params family x g]
     _ = S * (∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = true,
           (gHatIdxMeas params family x).outcome g) := by
           rw [Finset.mul_sum]
@@ -262,7 +228,7 @@ lemma fromHToG_gHatIdxMeas_sum_isSome_false_weight
           S * (gHatIdxMeas params family x).outcome g := by
           refine Finset.sum_congr rfl ?_
           intro g hg
-          rw [mul_assoc, fromHToG_gHatIdxMeas_proj params family x g]
+          rw [mul_assoc, gHatIdxMeas_proj params family x g]
     _ = S * (∑ g ∈ (Finset.univ : Finset (GHatOutcome params)) with g.isSome = false,
           (gHatIdxMeas params family x).outcome g) := by
           rw [Finset.mul_sum]
