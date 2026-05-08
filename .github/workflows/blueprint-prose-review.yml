@@ -17,7 +17,7 @@ jobs:
     # Repository variable kill switch:
     #   CLAUDE_REVIEW_ENABLED=false disables Claude-powered blueprint/prose review.
     #   unset or any other value preserves the default enabled behavior.
-    if: vars.CLAUDE_REVIEW_ENABLED != 'false'
+    if: vars.CLAUDE_REVIEW_ENABLED != 'false' && !github.event.pull_request.head.repo.fork
     runs-on: ubuntu-latest
     env:
       CLAUDE_CODE_PROVIDER: ${{ vars.CLAUDE_CODE_PROVIDER || 'anthropic' }}
@@ -60,26 +60,61 @@ jobs:
               ref: context.payload.pull_request.head.sha
             });
             const msg = commit.commit.message;
-            const isBot = /^\[claude-(auto|review)-fix\]/.test(msg);
+            const isBot = /^\[(claude|codex)-(auto|review)-fix\]/.test(msg);
             core.setOutput('skip', isBot ? 'true' : 'false');
             if (isBot) core.notice(`Skipping prose review for bot-fix commit: ${msg.split('\n')[0]}`);
 
-      - name: Checkout repository
+      - name: Check review provider token
         if: steps.claude-switch.outputs.skip != 'true' && steps.bot-check.outputs.skip != 'true'
+        id: provider-token
+        env:
+          CLAUDE_CODE_PROVIDER: ${{ env.CLAUDE_CODE_PROVIDER }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          set -euo pipefail
+          case "$CLAUDE_CODE_PROVIDER" in
+            anthropic) provider_token="$CLAUDE_CODE_OAUTH_TOKEN" ;;
+            deepseek) provider_token="$DEEPSEEK_API_KEY" ;;
+            *)
+              echo "::error::Unsupported review provider: $CLAUDE_CODE_PROVIDER"
+              exit 1
+              ;;
+          esac
+          if [ -n "$provider_token" ]; then
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "reason=$CLAUDE_CODE_PROVIDER token is not configured" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout repository
+        if: steps.claude-switch.outputs.skip != 'true' && steps.bot-check.outputs.skip != 'true' && steps.provider-token.outputs.skip != 'true'
         uses: actions/checkout@v6
         with:
           fetch-depth: 1
 
       - name: Checkout trusted automation
-        if: steps.claude-switch.outputs.skip != 'true' && steps.bot-check.outputs.skip != 'true'
+        if: steps.claude-switch.outputs.skip != 'true' && steps.bot-check.outputs.skip != 'true' && steps.provider-token.outputs.skip != 'true'
         uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.base.ref }}
           path: .trusted-actions
           fetch-depth: 1
 
+      - name: Check trusted provider wrapper
+        if: steps.claude-switch.outputs.skip != 'true' && steps.bot-check.outputs.skip != 'true' && steps.provider-token.outputs.skip != 'true'
+        id: trusted-provider-wrapper
+        run: |
+          if [ -f .trusted-actions/.github/actions/claude-code-with-provider/action.yml ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Skipping blueprint/prose review: trusted base branch does not yet contain claude-code-with-provider."
+          fi
+
       - name: Run Blueprint Sync & Prose Review
-        if: steps.claude-switch.outputs.skip != 'true' && steps.bot-check.outputs.skip != 'true'
+        if: steps.claude-switch.outputs.skip != 'true' && steps.bot-check.outputs.skip != 'true' && steps.provider-token.outputs.skip != 'true' && steps.trusted-provider-wrapper.outputs.available == 'true'
         id: blueprint-prose-review
         uses: ./.trusted-actions/.github/actions/claude-code-with-provider
         with:
