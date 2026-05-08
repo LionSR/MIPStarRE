@@ -6,7 +6,39 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationBridge
 /-!
 # Orthonormalization and completion data
 
-Statement-preserving slice of `MIPStarRE.LDT.Test.MainTheorem`.
+Post-role projectivization and orthonormalization hypotheses for the
+`mainFormal` assembly.  This module packages the data that the
+orthonormalization lemma (`lem:orthonormalization-main-lemma`) and the
+completion theorem (`prop:completing-to-measurement`) require beyond the
+role-register measurement and the unsymmetrization links.  The central
+structures are:
+
+* `MainFormalPostRolePackageProjectiveCompletionResidual` — post-role Step 6
+  witness data with concrete projectivization witnesses (spectral-truncation
+  and locality-preserving repair).
+
+* `MainFormalPostRolePackageDiagonalOrthonormalizationInput` — the diagonal
+  self-consistency and match-mass inputs that feed orthonormalization.
+
+* `MainFormalPostRolePackageDiagonalCompletionResidual` — the final residual
+  that records both the diagonal orthonormalization input and the completion
+  data, ready for consumption by the projective-consistency transport.
+
+The module also proves tight `ζ₁` polynomial-consistency lemmas
+(`leftPolynomialConsistency_with_orthonormalization_loss`,
+`rightPolynomialConsistency_with_orthonormalization_loss`) that avoid
+degradation of the final error exponent by using the match-mass monotonicity
+invariant from `\label{rem:lean-line169-projectivization-match-mass}`.
+
+## References
+
+* Paper: `references/ldt-paper/orthonormalization.tex`,
+  `\Cref{lem:orthonormalization-main-lemma}` at line 282.
+  Applied in `references/ldt-paper/inductive_step.tex` (lines 135–143).
+* Blueprint: `blueprint/src/chapter/ch04_projective.tex`,
+  `\label{rem:lean-line169-projectivization-match-mass}`; and
+  `blueprint/src/chapter/ch10_induction.tex`,
+  `\label{def:main-formal-step6-hypotheses}`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

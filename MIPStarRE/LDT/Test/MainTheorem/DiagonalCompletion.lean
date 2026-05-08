@@ -3,7 +3,25 @@ import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationData
 /-!
 # Diagonal completion inputs
 
-Statement-preserving slice of `MIPStarRE.LDT.Test.MainTheorem`.
+Diagonal consistency and completion inputs for the `mainFormal` assembly.  Once
+the two unsymmetrized role POVMs `Gᴬ` and `Gᴮ` are obtained together with
+their cross-consistency relation `Gᴬ ⊗ I ≃ I ⊗ Gᴮ` at error `ζ₁`, the
+completion theorem (`prop:completing-to-measurement`) needs diagonal
+hypotheses for *both* sides.  This module records the stronger, self-referential
+`ConsRel` form of that missing bridge through
+`MainFormalPostRolePackageDiagonalConsistencyInput`, packages
+the match-mass monotonicity input
+(`MainFormalPostRolePackageDiagonalCompletionInput`), and provides the
+conversion lemmas (`ofDiagonalConsistency`,
+`nonempty_ofDiagonalConsistencyAndMatchMassPreservation`) that close the gap
+between the cross relation and the two self-relations used by orthonormalize-and-complete.
+
+## References
+
+* Paper: `references/ldt-paper/inductive_step.tex`,
+  completing to projective measurements (lines 143–147).
+* Blueprint: `blueprint/src/chapter/ch04_projective.tex`,
+  `\label{rem:lean-line169-projectivization-match-mass}`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

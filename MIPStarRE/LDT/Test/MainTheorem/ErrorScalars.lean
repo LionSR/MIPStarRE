@@ -3,7 +3,42 @@ import MIPStarRE.LDT.Test.MainTheorem.AnswerValuedRestriction
 /-!
 # Main-formal error scalars
 
-Statement-preserving slice of `MIPStarRE.LDT.Test.MainTheorem`.
+Section 3 error cascade for the `mainFormal` assembly.  This module defines
+the five scalars that appear in the paper's error calculation:
+
+* `σ` — the symmetrized induction consistency error
+* `ζ₁` — the cross-consistency error after unsymmetrization
+* `ζ₂` — the orthonormalize-and-complete closeness error
+* `ζ₃` — the projective self-consistency error
+* `ζ₄` — the final point-consistency error
+
+The core structure `MainFormalCascadeScalars` (Prop) bundles the three
+hypotheses needed to invoke the checked Step 8 bound
+`errorCascade_le_mainFormalError`:
+
+* `cascadeHypotheses` — the standing scalar regime (`q > 0`, `k ≥ 1`,
+  `m ≥ 1`, `0 ≤ ε ≤ 1`, `d ≤ q`).
+* `inductionNu_nonneg` — nonnegativity of the symmetrized main-induction
+  `ν` at `(3ε, 3ε, 3ε)`.
+* `inductionNu_bound` — the paper line 71–73 coarsening
+  `ν ≤ 10000 k² m² (ε^{1/1024} + (d/q)^{1/1024})`.
+
+The cascade comparisons `ζ₁ ≤ …`, `ζ₃ ≤ 2·mainFormalError`, etc. are then
+derived in the private theorem `cascadeBounds` via
+`errorCascade_le_mainFormalError`, which calls the already-formalized
+error-cascade estimates from `LDT.Test.ErrorCascade`.  The module also
+provides the vacuous-branch analysis (`mainFormalError_ge_one_of_*`) and
+the coarsening lemma that absorbs `orthonormalizeAndCompleteError` into
+`ζ₂` (`orthonormalizeAndCompleteError_zeta1_le_zeta2`).
+
+## References
+
+* Paper: `references/ldt-paper/inductive_step.tex`,
+  error computations (lines 68–75, 186–234).
+* Blueprint: `blueprint/src/chapter/ch10_induction.tex`,
+  `\label{def:main-formal-error-cascade}`,
+  `\label{thm:sigma-bound-main-formal}`, and
+  `\label{thm:zeta-bounds-main-formal}`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

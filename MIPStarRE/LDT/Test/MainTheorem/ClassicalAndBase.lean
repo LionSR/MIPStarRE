@@ -13,7 +13,23 @@ import MIPStarRE.LDT.Test.Unsymmetrization
 /-!
 # Classical soundness and base case
 
-Statement-preserving slice of `MIPStarRE.LDT.Test.MainTheorem`.
+Classical (non-quantum) soundness of the low individual degree test and the
+base case `m = 1` for the `mainFormal` assembly.  This module defines the
+classical pass conditions (`TwoProverClassicalLIDPassCondition`) and the
+soundness statements for Raz–Safra (`razSafra`) and Polishchuk–Spielman
+(`classicalTestSoundness`).  It also provides the trivial witness
+`mainFormal_trivial_witness` for the vacuous branch where
+`mainFormalError ≥ 1`, and the base case handoff
+`strategySymmetrization_mainInductionBaseCase` that handles `m = 1` via the
+axis-parallel line test directly.
+
+## References
+
+* Paper: `references/ldt-paper/inductive_step.tex`,
+  base case for `m = 1` in the proof of `\Cref{thm:main-induction}`.
+* Blueprint: `blueprint/src/chapter/ch10_induction.tex`,
+  `\label{lem:main-induction-base}` and
+  `\label{lem:main-formal-base-case-handoff}`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

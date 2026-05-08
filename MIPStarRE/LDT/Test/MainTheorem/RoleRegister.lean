@@ -3,7 +3,36 @@ import MIPStarRE.LDT.Test.MainTheorem.RoleRegister.Core
 /-!
 # Role-register residuals
 
-Statement-preserving slice of `MIPStarRE.LDT.Test.MainTheorem`.
+Role-register measurement construction for the `mainFormal` assembly.  This
+module imports `RoleRegister.Core` (defining `MainFormalRoleMeasurementPackage`
+and the predecessor-transport helpers) and introduces the branch-level
+residual structures for producing the Section 6 role package:
+
+* `MainFormalRolePackageSuccessorResidual` — explicit successor-branch data
+  (predecessor decomposition, successor-boundary data, positivity, and `k ≥ 1`)
+  for the ordinary restricted-slice route.
+
+* `MainFormalRolePackageAnswerSuccessorResidual` — the answer-valued
+  counterpart carrying `MainFormalSuccessorAnswerBoundary`.
+
+* `MainFormalRolePackageBranchResidual` (inductive type) — the three
+  alternatives for the role branch: base dimension (`m = 1`), ordinary
+  successor, or answer-valued successor.
+
+Each residual can be converted to a concrete `MainFormalRolePackageResidual`
+via `toRolePackageResidual` once the public `400·m·d ≤ k` side condition
+is supplied.  The constructors (`ofSuccessorBridgeInputs`,
+`ofAnswerSuccessorBridgeInputs`, etc.) are structural and do not call
+`mainFormal`; they stop before the line-130 orthonormalization and
+completion interfaces.
+
+## References
+
+* Paper: `references/ldt-paper/inductive_step.tex`,
+  symmetrization with role register and factor-two block estimates
+  (lines 97–108).
+* Blueprint: `blueprint/src/chapter/ch10_induction.tex`,
+  `\label{rem:main-formal-lean-residual-packages}`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

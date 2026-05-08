@@ -3,7 +3,38 @@ import MIPStarRE.LDT.Test.MainTheorem.NativeTargets
 /-!
 # Main-formal final assembly
 
-Base, successor, and final branch assembly for `thm:main-formal`.
+Base case, successor branch, and final assembly for `thm:main-formal`
+(`\Cref{thm:main-formal}`).  This module contains:
+
+* `MainFormalBaseProjectiveCompletionHypotheses` — the still-unformalized
+  analytic hypotheses needed for the base case `m = 1` (locality-preserving
+  repair witnesses for orthonormalization, distinguished completion outcomes,
+  and match-mass preservation for the orthonormalized projective
+  submeasurements).
+
+* `MainFormalBaseBridgeHypotheses` and
+  `MainFormalBaseRepairedBridgeHypotheses` — intermediate residuals that
+  carry these base-case hypotheses together with the role-register measurement.
+
+* `mainFormal_ofRoleResidualAndRepairedBridge` — the main successor-branch
+  assembly that combines a role-residual, the projective-consistency handoff
+  data, and the orthonormalization/completion inputs into the three final
+  consistency bounds `Gᴬ ≃ I ⊗ Gᴮ`, `Aᴬ ⊗ I ≃ I ⊗ Qᴮ`, `Qᴬ ⊗ I ≃ I ⊗ Aᴮ`.
+
+* `mainFormal` — the top-level theorem, taking a projective strategy that
+  passes the LID test with probability `≥ 1 − ε` and producing the three
+  pointwise consistency targets at error bound `mainFormalError`.
+
+## References
+
+* Paper: `references/ldt-paper/test_definition.tex`,
+  `\Cref{thm:main-formal}` at line 180; its proof is in
+  `references/ldt-paper/inductive_step.tex` (lines 26–236).
+* Blueprint: `blueprint/src/chapter/ch02_test.tex`,
+  `\label{thm:main-formal}`; and
+  `blueprint/src/chapter/ch10_induction.tex`,
+  `\label{def:main-formal-step6-hypotheses}`,
+  `\label{lem:main-formal-successor-handoff}`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

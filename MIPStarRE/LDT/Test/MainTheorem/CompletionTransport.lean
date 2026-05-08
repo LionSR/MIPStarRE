@@ -3,7 +3,34 @@ import MIPStarRE.LDT.Test.MainTheorem.ProjectiveConsistency
 /-!
 # Completion transport residuals
 
-Statement-preserving slice of `MIPStarRE.LDT.Test.MainTheorem`.
+Post-role completion transport residuals for the `mainFormal` assembly.  After
+the Section 6 role-register measurement is obtained and the two
+unsymmetrization links are established, the remaining step is to close the
+projective completion gap: the orthonormalize-and-complete procedure
+(`lem:orthonormalization-main-lemma`, `prop:completing-to-measurement`)
+produces projective measurements at distance `ζ₂` from the unsymmetrized ones.
+This module packages that post-role obligation as a series of nested residual
+structures (`MainFormalCascadeRolePackagedCompletionTransportResidual`,
+`MainFormalPostRolePackageCompletionTransportResidual`,
+`MainFormalPostRolePackageLeftCompletionTransportResidual`, …), each asking
+for progressively more specific inputs.  The farthest-reaching residual is
+`MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual`, whose
+first field is the concrete Section 6 role residual and whose post-role field
+asks only for the left-register completion closeness and the match-mass
+monotonicity invariant.
+
+## References
+
+* Paper: `references/ldt-paper/orthonormalization.tex`,
+  `\Cref{lem:orthonormalization-main-lemma}` at line 282; and
+  `references/ldt-paper/preliminaries.tex`,
+  `\Cref{prop:completing-to-measurement}` at line 1101.
+  These are applied in `references/ldt-paper/inductive_step.tex`
+  (lines 135–143).
+* Blueprint: `blueprint/src/chapter/ch04_projective.tex`,
+  `\label{rem:lean-line169-projectivization-match-mass}`; and
+  `blueprint/src/chapter/ch10_induction.tex`,
+  `\label{def:main-formal-step6-hypotheses}`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

@@ -3,7 +3,31 @@ import MIPStarRE.LDT.Test.MainTheorem.RoleRegister
 /-!
 # Unsymmetrized target packages
 
-Statement-preserving slice of `MIPStarRE.LDT.Test.MainTheorem`.
+Unsymmetrization and projective-stage targets for the `mainFormal` assembly.
+This module records the unsymmetrized POVM targets supplied by the
+existing factor-two unsymmetrization estimates from
+`Test/Unsymmetrization.lean` and applies the checked Step 5
+Schwartz–Zippel bridge in `MainFormalCascadePreProjectiveSelfConsistency`
+to convert an evaluated pre-projective link into the full-polynomial
+self-consistency relation at error `ζ₁`.  The subsequent stage-target
+structures (`MainFormalCascadeUnsymmetrizedPOVMTargets`,
+`MainFormalCascadeTargets`,
+`MainFormalCascadeTransportTargets`,
+`MainFormalCascadeProjectiveStageTargets`,
+`MainFormalCascadeProjectiveAssemblyResidual`) form the cascade that
+carries the unsymmetrized POVMs through the projective-consistency
+handoff to the native `ζ₄` point-consistency targets.
+
+## References
+
+* Paper: `references/ldt-paper/inductive_step.tex`,
+  factor-two unsymmetrization estimates (`\label{eq:cons-a}`,
+  `\label{eq:cons-b}`; lines 104–108), cross-consistency chain
+  (`\label{eq:G-self-consistency}`; lines 109–133), and projective
+  assembly (lines 134–172).
+* Blueprint: `blueprint/src/chapter/ch10_induction.tex`,
+  `\label{rem:main-formal-unsymmetrization-bridge}` and
+  `\label{rem:main-formal-lean-residual-packages}`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
