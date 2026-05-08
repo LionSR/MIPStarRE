@@ -106,7 +106,7 @@ Prefer **proving a real intermediate lemma** — one that the paper also uses
 conclusion). Then use it inside the larger theorem. If the missing content
 can't be formalized yet, keep the `BridgePackage` (so the obligation is
 *named* and trackable) and file a concrete producer sub-issue in
-[#449]/[#451].
+[#1379] (which replaced the closed [#449]/[#451] in 2026-05-01).
 
 A signature passes the smell test if:
 
@@ -509,22 +509,48 @@ Grep for these suffixes: `*Statement`, `*Witness`, `*Claim`,
 
 If any answer is "no", the structure is an unacceptable smuggle.
 
-### Current status (audited 2026-04-18; updated 2026-04-25)
+### Current status (audited 2026-05-08)
 
-All 34 `*Statement` / 9 `*Conclusion` / 8 `*Witness` structures on `main`
-are either grounded (have producer theorems) or are the known tracked
-items in [#449] / [#451]. The former QXP
-`ProjectiveNonMeasurementBridgePackage` offender has been removed from that
-live list (resolved in [#595]), and the old `QXPLayerData` SVD / `pQApprox`
-field-projection offender has been removed by the reduced primitive API and
-real `pQApprox` proof (issue [#652]). No new unacceptable smuggles were found in
-that sweep. If you add a new `*Statement`-style structure to this codebase,
-include a docstring explaining its grounding plan and (if no producer exists
-yet) file a sub-issue in [#449].
+The May 2026 re-audit
+([`audits/2026-05-08_statement-smuggle-reaudit.md`](../blob/main/audits/2026-05-08_statement-smuggle-reaudit.md))
+classified 39 `*Statement` structures (102 declarations total across the
+extended suffix sweep of `*Witness`/`*Conclusion`/`*Input`/etc.).
+
+The live ledger is [#1379], replacing the now-closed [#449] (2026-05-01) and
+[#451] (2026-04-30). Headline counts from the re-audit: 33 grounded, 2 tracked
+smuggle, 2 external citation, 1 paper-faithful packaging, 1 dead. Without a live
+ledger, **5 `*Statement` structures landed between 2026-04-18 and 2026-05-08
+without a tracker entry** — the gap this policy fixes.
+
+If you add a new `*Statement`-style structure to this codebase, include a
+def-site docstring with its paper origin (per the "earn your place" policy in
+[#1379]). If no producer exists yet, file a sub-issue in [#1379] and ship a
+sorry'd producer alongside the structure (preferred) or add an explicit
+`⚠️T` entry in [#1379].
+
+### Merge gate — new `*Statement` / `*Witness` / `*Input` structures
+
+To prevent dead scaffolds from landing unnoticed (the 5-structure gap of
+2026-04-18–2026-05-08), every PR that introduces a new `structure XStatement`,
+`structure XWitness`, `structure XInput`, `abbrev XStatement`, or
+`abbrev XInput` must satisfy **at least one** of these before merge:
+
+1. **Has a producer.** A theorem that constructs a value of this type appears
+   in the same PR or an already-merged ancestor.
+2. **Has a consumer.** A theorem that takes a value of this type as a
+   hypothesis appears in the same PR or an already-merged ancestor.
+3. **Has a ledger entry.** A classification comment (G / E / T / P / D, per
+   the verdict key in [#1379]) is posted on [#1379] as an issue comment, and
+   the structure's def-site docstring links to that comment.
+
+Structures that satisfy none of the above are dead on arrival and must not
+merge.
 
 ### Related issues
 
-- [#449] — hypothesis-smuggle ledger (⚠️H items)
+- [#1379] — live `*Statement` ledger (replaces closed [#449] / [#451])
+- [#449] — historical paper-wide gap tracker (closed 2026-05-01)
+- [#451] — historical bridge-hypothesis tracker (closed 2026-04-30)
 - [#278] — the original "derive `PermInvState` internally" discussion
 
 ---
@@ -555,7 +581,7 @@ result, ask:
       grounding plan (A6)?
 - [ ] **Paper-faithfulness.** Does the Lean signature match the paper's
       statement, or does Lean sneak in extra hypotheses? Flag divergences
-      as ⚠️S in [#449].
+      as ⚠️S in [#1379].
 
 A lemma that passes all of these is a proof. A lemma that fails one is
 scaffolding, and should be labelled and tracked as such (don't tag with
@@ -583,7 +609,7 @@ Mechanical detection is possible for many of these patterns:
   a docstring citing the downstream eligibility precondition.
 - **A4 (default witnesses).** Grep `:= default`, `refine ⟨default`, `exact
   ⟨default`, `Classical.arbitrary` inside proof bodies (not typeclass
-  definitions). Cross-reference to [#449]'s witness ledger.
+  definitions). Cross-reference to [#1379]'s witness ledger.
 - **A5 (Mathlib bypass).** No reliable CI check, but `audits/` reports
   catch it during per-chapter audits.
 - **A6 (external smuggles).** Every new `structure *Statement` without a
@@ -603,6 +629,7 @@ PR [#438]) are the natural home for extensions that add these checks.
 - [`naming.md`](./naming.md) and [`style.md`](./style.md) — Mathlib
   conventions; avoiding A5 (bypassing Mathlib) often starts with using
   Mathlib's names.
+- [#1379] — live `*Statement` ledger (replaces [#449], [#451])
 - [#449], [#451], [#477], [#493], [#494], [#495] — concrete trackers for
   the anti-patterns documented here.
 
@@ -618,3 +645,4 @@ PR [#438]) are the natural home for extensions that add these checks.
 [#652]: https://github.com/LionSR/MIPStarRE/issues/652
 [#494]: https://github.com/LionSR/MIPStarRE/issues/494
 [#495]: https://github.com/LionSR/MIPStarRE/issues/495
+[#1379]: https://github.com/LionSR/MIPStarRE/issues/1379
