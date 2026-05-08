@@ -184,4 +184,81 @@ lemma selfImprovementFromSlacknessResidualDominationBridgeInputs
     hgood G hbridge.helperCompleteness hbridge.helperStrongSelfConsistency
     hbridge.pointConsistencyTransfer hbridge.orthonormalization
 
+/-- Slackness-carrying self-improvement from an ordinary QXP repair producer whose
+fresh outcome is controlled by coisometry.
+
+This is the assembly point for the monotone right-total route identified in issue
+`#1300`: the constructive spectral slice is discharged by
+`orthonormalizationSpectralProducer_of_sourceAlmostProjective`, while
+`residualDominatingRepairProducer_of_qxpLayer_and_coisometry` turns the QXP
+repair plus the construction-level coisometry identity `X X† = I` into the
+residual-domination input consumed by
+`selfImprovementWithSlacknessAndResidualDominationInput`.  Consequently the final
+point-consistency field uses the paper-tight right-register total comparison
+rather than the alphabet-size total-gap route. -/
+lemma selfImprovementWithSlacknessAndQXPRepairAndCoisometry
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma nu : Error)
+    (heps_le_one : eps ≤ 1)
+    (hdelta_le_one : delta ≤ 1)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
+    (hsdp : SdpStatementWithSlackness params strategy)
+    (hgood : strategy.IsGood eps delta gamma)
+    (G : Measurement (Polynomial params) ι)
+    (hhelperCompleteness :
+      ∀ {T : Measurement (Polynomial params) ι}
+        {Hhat : SubMeas (Polynomial params) ι}
+        {Z : MIPStarRE.Quantum.Op ι},
+        SelfImprovementHelperConclusionWithSlackness params strategy T Hhat Z eps delta →
+          CompletenessAtLeast strategy.state Hhat.liftLeft
+            ((1 - nu) - selfImprovementHelperError params eps delta))
+    (hhelperSSCInput : HelperStrongSelfConsistencyInput params strategy eps delta)
+    (htransfer :
+      ∀ {T : Measurement (Polynomial params) ι}
+        {Hhat : SubMeas (Polynomial params) ι}
+        {Z : MIPStarRE.Quantum.Op ι},
+        SelfImprovementHelperConclusionWithSlackness params strategy T Hhat Z eps delta →
+          |addInULeftQuantity params strategy
+              (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+              Hhat
+              (pointConsistencyAddInUSelection params) -
+            addInURightQuantity params strategy
+              (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+              T.toSubMeas
+              (pointConsistencyAddInUSelection params)| ≤
+            addInUError params eps delta)
+    (hqxp : OrthonormalizationQXPLayerRepairProducer params strategy eps delta)
+    (hsource : ∀ {Hhat : SubMeas (Polynomial params) ι}
+      (hssc : BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily Hhat)
+        (selfImprovementHelperError params eps delta))
+      (hSpectral : SpectralTruncationStatement strategy.state
+        (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
+        (consistencyToAlmostProjectiveError
+          (2 * selfImprovementHelperError params eps delta))),
+        (hqxp hssc hSpectral).data.qLayer.q.outcome none =
+          (optionCompletion Hhat).outcome none)
+    (hcoisometry : ∀ {Hhat : SubMeas (Polynomial params) ι}
+      (hssc : BipartiteSSCRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily Hhat)
+        (selfImprovementHelperError params eps delta))
+      (hSpectral : SpectralTruncationStatement strategy.state
+        (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
+        (consistencyToAlmostProjectiveError
+          (2 * selfImprovementHelperError params eps delta))),
+        (hqxp hssc hSpectral).data.x * (hqxp hssc hSpectral).data.xᴴ =
+          (1 : MIPStarRE.Quantum.Op
+            (hqxp hssc hSpectral).data.qLayer.auxSpace.carrier)) :
+    ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+      SelfImprovementConclusion params strategy G H Z eps delta gamma nu :=
+  selfImprovementWithSlacknessAndResidualDominationInput
+    params strategy eps delta gamma nu heps_le_one hdelta_le_one hd_le_q hsdp
+    hgood G hhelperCompleteness hhelperSSCInput htransfer
+    (orthonormalizationResidualDominationInput_of_spectral_qxpLayer_and_coisometry
+      (params := params) (strategy := strategy) (eps := eps) (delta := delta)
+      orthonormalizationSpectralProducer_of_sourceAlmostProjective
+      hqxp hsource hcoisometry)
+
 end MIPStarRE.LDT.SelfImprovement
