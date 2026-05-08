@@ -233,7 +233,7 @@ These are the producers for the two new `mainFormal` hypotheses:
 | G | `LeftLiftedProjectivizationRepairInput` unconditional producer (QXP construction) | #1032 |
 | H | `OrthonormalizationRepairProducer` for the helper families | #1032 (via QXP) |
 
-### 6.3 Dependency dependencies
+### 6.3 Dependency relationships
 
 ```
 #1032 (QXP repair) ──────────────────────────┐
