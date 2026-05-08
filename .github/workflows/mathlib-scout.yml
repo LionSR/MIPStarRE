@@ -1,5 +1,3 @@
-# ci-sync-version: claude-provider-deepseek-v1
-# ci-sync-source: shared Lean automation, prompts externalized under .github/prompts
 name: Mathlib Scout
 
 # Scout Mathlib for formalization issues opened by repository members.

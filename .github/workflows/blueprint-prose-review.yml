@@ -1,6 +1,4 @@
-# ci-sync-version: claude-provider-deepseek-v1
-# ci-sync-source: shared Lean automation, prompts externalized under .github/prompts
-name: Claude Code Review (Lean)
+name: Blueprint Sync & Prose Review
 
 on:
   pull_request:
@@ -8,44 +6,32 @@ on:
     paths:
       - "MIPStarRE/**/*.lean"
       - "MIPStarRE.lean"
-      - "lakefile.toml"
-      - "lean-toolchain"
       - "blueprint/src/**/*.tex"
-      - "docs/paper-gaps/**/*.tex"
-      - "docs/paper-gaps/**/*.bib"
 
 concurrency:
-  group: claude-review-${{ github.event.pull_request.number }}
+  group: blueprint-prose-review-${{ github.event.pull_request.number }}
   cancel-in-progress: false
 
 jobs:
-  claude-review:
-    name: claude-review-${{ matrix.provider }}
-    strategy:
-      fail-fast: false
-      matrix:
-        provider: ${{ fromJson(vars.CLAUDE_CODE_REVIEW_PROVIDERS || format('["{0}"]', vars.CLAUDE_CODE_PROVIDER || 'anthropic')) }}
+  blueprint-and-prose:
     # Repository variable kill switch:
-    #   CLAUDE_REVIEW_ENABLED=false disables Claude-powered PR review.
+    #   CLAUDE_REVIEW_ENABLED=false disables Claude-powered blueprint/prose review.
     #   unset or any other value preserves the default enabled behavior.
-    if: vars.CLAUDE_REVIEW_ENABLED != 'false'
+    if: vars.CLAUDE_REVIEW_ENABLED != 'false' && !github.event.pull_request.head.repo.fork
     runs-on: ubuntu-latest
+    env:
+      CLAUDE_CODE_PROVIDER: ${{ vars.CLAUDE_CODE_PROVIDER || 'anthropic' }}
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+      DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+      ANTHROPIC_BASE_URL: ${{ vars.ANTHROPIC_BASE_URL }}
+      CLAUDE_OPUS_MODEL: ${{ vars.CLAUDE_OPUS_MODEL }}
+      CLAUDE_SONNET_MODEL: ${{ vars.CLAUDE_SONNET_MODEL }}
     permissions:
       contents: read
       pull-requests: write
       actions: read
       issues: write
       id-token: write
-
-    env:
-      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-      DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-      ANTHROPIC_BASE_URL: ${{ vars.ANTHROPIC_BASE_URL }}
-      CLAUDE_OPUS_MODEL: ${{ vars.CLAUDE_OPUS_MODEL }}
-      CLAUDE_SONNET_MODEL: ${{ vars.CLAUDE_SONNET_MODEL }}
-      DEEPSEEK_BASE_URL: https://api.deepseek.com/anthropic
-      CLAUDE_ALLOWED_TOOLS: >
-        Read,Glob,Grep,Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr comment:*),Bash(gh api graphql:*),Bash(lake build),Bash(lake exe cache get),Bash(lake update),Bash(lake env),Bash(lean *),Bash(elan *),Bash(grep *),Bash(git fetch *),Bash(python3 scripts/blueprint_lean_sync.py *),mcp__github__*
 
     steps:
       - name: Check Claude review switch
@@ -55,7 +41,7 @@ jobs:
         run: |
           if [ "$CLAUDE_REVIEW_ENABLED" = "false" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "::notice::Skipping Claude code review: CLAUDE_REVIEW_ENABLED=false"
+            echo "::notice::Skipping Claude blueprint/prose review: CLAUDE_REVIEW_ENABLED=false"
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
@@ -68,9 +54,6 @@ jobs:
           script: |
             // Skip review for auto-fix bot commits to avoid the
             // review → auto-fix → review ping-pong cascade.
-            // The auto-fix workflow will re-trigger review after its
-            // fixes, but we only want to review human-authored pushes
-            // and the final bot-fix result (detected by iteration cap).
             const { data: commit } = await github.rest.repos.getCommit({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -79,22 +62,22 @@ jobs:
             const msg = commit.commit.message;
             const isBot = /^\[(claude|codex)-(auto|review)-fix\]/.test(msg);
             core.setOutput('skip', isBot ? 'true' : 'false');
-            if (isBot) core.notice(`Skipping review for bot-fix commit: ${msg.split('\n')[0]}`);
+            if (isBot) core.notice(`Skipping prose review for bot-fix commit: ${msg.split('\n')[0]}`);
 
       - name: Check review provider token
         if: steps.claude-switch.outputs.skip != 'true' && steps.bot-check.outputs.skip != 'true'
         id: provider-token
         env:
-          REVIEW_PROVIDER: ${{ matrix.provider }}
+          CLAUDE_CODE_PROVIDER: ${{ env.CLAUDE_CODE_PROVIDER }}
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: |
           set -euo pipefail
-          case "$REVIEW_PROVIDER" in
+          case "$CLAUDE_CODE_PROVIDER" in
             anthropic) provider_token="$CLAUDE_CODE_OAUTH_TOKEN" ;;
             deepseek) provider_token="$DEEPSEEK_API_KEY" ;;
             *)
-              echo "::error::Unsupported review provider: $REVIEW_PROVIDER"
+              echo "::error::Unsupported review provider: $CLAUDE_CODE_PROVIDER"
               exit 1
               ;;
           esac
@@ -102,10 +85,10 @@ jobs:
             echo "skip=false" >> "$GITHUB_OUTPUT"
           else
             echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "reason=$REVIEW_PROVIDER token is not configured" >> "$GITHUB_OUTPUT"
+            echo "reason=$CLAUDE_CODE_PROVIDER token is not configured" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Checkout repository under review
+      - name: Checkout repository
         if: steps.claude-switch.outputs.skip != 'true' && steps.bot-check.outputs.skip != 'true' && steps.provider-token.outputs.skip != 'true'
         uses: actions/checkout@v6
         with:
@@ -127,34 +110,23 @@ jobs:
             echo "available=true" >> "$GITHUB_OUTPUT"
           else
             echo "available=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::Skipping Claude code review: trusted base branch does not yet contain claude-code-with-provider."
+            echo "::notice::Skipping blueprint/prose review: trusted base branch does not yet contain claude-code-with-provider."
           fi
 
-      - name: Set up Lean toolchain and cache
+      - name: Run Blueprint Sync & Prose Review
         if: steps.claude-switch.outputs.skip != 'true' && steps.bot-check.outputs.skip != 'true' && steps.provider-token.outputs.skip != 'true' && steps.trusted-provider-wrapper.outputs.available == 'true'
-        uses: ./.trusted-actions/.github/actions/setup-lean
-
-      - name: Run Claude Code Review
-        if: steps.claude-switch.outputs.skip != 'true' && steps.bot-check.outputs.skip != 'true' && steps.provider-token.outputs.skip != 'true' && steps.trusted-provider-wrapper.outputs.available == 'true'
-        id: claude-review
+        id: blueprint-prose-review
         uses: ./.trusted-actions/.github/actions/claude-code-with-provider
         with:
-          provider: ${{ matrix.provider }}
-          model-tier: opus
+          provider: ${{ env.CLAUDE_CODE_PROVIDER }}
+          model-tier: sonnet
+          system-prompt-file: .trusted-actions/.github/prompts/blueprint-prose-review-system-prompt.md
+          allowed_tools_preset: blueprint-prose-review
           allowed-bots: 'claude,chatgpt-codex-connector,cursor[bot],cursor,copilot-pull-request-reviewer'
-          plugin_marketplaces: |
-            https://github.com/anthropics/claude-code.git
-            https://github.com/leanprover/skills.git
-          plugins: |
-            code-review@claude-code-plugins
-            lean@leanprover
-          claude-prompt-file: .trusted-actions/.github/prompts/claude-code-review-prompt.md
+          claude-prompt-file: .trusted-actions/.github/prompts/blueprint-prose-review-prompt.md
           claude-prompt-context: |
             PR number: ${{ github.event.pull_request.number }}
             Repository: ${{ github.repository }}
             Repository owner: ${{ github.repository_owner }}
             Repository name: ${{ github.event.repository.name }}
-            Review this Lean 4 pull request: ${{ github.repository }}/pull/${{ github.event.pull_request.number }}
-            Review provider: ${{ matrix.provider }}
-            Trigger event: ${{ github.event.action }}
-          system-prompt-file: .trusted-actions/.github/prompts/claude-code-review-system-prompt.md
+            Event: ${{ github.event.action }}
