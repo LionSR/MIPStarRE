@@ -133,7 +133,7 @@ jobs:
             const labelText = addedLabels.length > 0
               ? addedLabels.sort().map((label) => `\`${label}\``).join(', ')
               : 'No automatic label was clear from the title or body.';
-            const formalizationText = looksLikeFormalization
+            const formalizationText = addedLabels.includes('formalization')
               ? ' The workflow added `formalization`; after reviewing the mathematical source, a maintainer may request a Mathlib report by adding `scout`.'
               : '';
 
