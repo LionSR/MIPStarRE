@@ -552,6 +552,24 @@ lemma sdp_with_slackness
   sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance
     params strategy X Z hsdp
 
+/-- Paper-origin statement for `lem:sdp` with complementary slackness.
+
+Paper origin: `references/ldt-paper/self_improvement.tex` lines 62--88 state
+`\label{lem:sdp}` for the primal/dual SDP pair and assert optimal witnesses
+`{T_g}`, `Z` with `∑ g, T_g = I` and `T_g Z = T_g A_g`.  Lines 168--190 prove
+this by Slater strong duality and complementary slackness after passing through
+the canonical SDP form.
+
+The proof is deferred to the formalized strong-duality argument for the Section
+9 SDP.  This theorem records the unconditional paper statement used by the
+strengthened self-improvement helper. -/
+theorem sdp_statement_with_slackness
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι) :
+    SdpStatementWithSlackness params strategy := by
+  sorry
+
 /-- Reduced version of `lem:add-in-u`.
 
 This currently keeps only the global-variance consequence used downstream. It

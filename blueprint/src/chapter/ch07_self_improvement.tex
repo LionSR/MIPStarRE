@@ -449,6 +449,16 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   Together with~\eqref{eq:Z-greater-than-A}, this proves \ref{item:self-improvement-boundedness}.
 \end{proof}
 
+\begin{remark}[Slackness-carrying self-improvement helper]\label{rem:self-improvement-helper-with-slackness-theorem}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithSlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.self_improvement_helper_with_slackness_of_sdp_statement_with_slackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness}
+  The formalization also records a strengthened helper theorem whose output
+  carries the complementary-slackness equations used in the completeness chain.
+  This theorem uses the Section~9 statement above. Its proof is not yet complete,
+  because the strong-duality proof for the SDP remains to be formalized.
+\end{remark}
+
 \subsection{A Semidefinite Program}
 
 \begin{lemma}[Uniform SDP feasible witness]\label{lem:sdp-uniform-feasible-witness}
@@ -540,6 +550,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness.toSdpStatementWithSlackness_of_dualDominatesIdentity}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.toSdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalFeasibleComplementarySlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdp_with_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPair_of_dualDominatesIdentity}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPair}
@@ -606,6 +617,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness.primalMeasurement}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness.toSdpStatement}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness.exists_measurement_witness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalBlockIndex}
@@ -706,6 +718,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \end{equation}
 \end{lemma}
 \begin{proof}
+  \notready
   Rewrite~\eqref{eq:primal-objective} in canonical block form. Let $r$ be the dimension of the space on which~$A$ acts, let $M = |\polyfunc{m}{q}{d}|$, and fix an ordering $g_1,\ldots,g_M$ of the polynomials. Consider
   \begin{align}
     \sup &\quad \Tr(C^\dagger X) \label{eq:primal-canonical}\\
