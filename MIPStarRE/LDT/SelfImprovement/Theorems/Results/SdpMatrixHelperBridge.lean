@@ -124,8 +124,7 @@ lemma selfImprovementHelperWithCanonicalOptimalPairSdpSlacknessAndDominance
         SelfImprovementHelperConclusionWithSlackness params strategy T H Z eps delta :=
   self_improvement_helper_with_slackness_of_sdp_statement_with_slackness
     params strategy eps delta gamma
-    (sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance
-      params strategy X Z hsdp)
+    (sdp_with_slackness params strategy X Z hsdp)
     hgood nu G
 
 /-- A saturated canonical optimal pair, together with a separately proved
