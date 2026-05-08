@@ -90,6 +90,43 @@ abbrev MainFormalSuccessorAnswerSliceBridge (params : Parameters) [FieldModel.{0
 
 /-! ### Orthonormalization-input bridge lemmas -/
 
+/-- Narrowed repaired base-case bridge for Step 6 when `params.m = 1`.
+
+This removes the exact line-169 match-mass preservation fields from the base
+bridge.  The repaired pre-completion route needs only the line-130
+orthonormalization inputs and an additional diagonal consistency input for the
+completion theorem on the two unsymmetrized role-block POVMs.  This diagonal
+input is not the paper's line-130 assertion itself; line 130 supplies the
+cross relation between the two unsymmetrized roles. -/
+structure MainFormalBaseRepairedBridgeHypotheses
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (scalars : MainFormalCascadeScalars params eps k)
+    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) where
+  /-- Line-130 orthonormalization inputs: spectral-truncation and locality-preserving
+  repair witnesses for both unsymmetrized POVMs. -/
+  orthonormalizationInput :
+    MainFormalPostRolePackageDiagonalOrthonormalizationInput
+      params strategy eps k scalars (roleResidual.rolePackage scalars)
+  /-- Additional diagonal consistency for the two unsymmetrized role POVMs, used
+  to invoke the completion theorem without the exact match-mass route. -/
+  diagonalConsistency :
+    MainFormalPostRolePackageDiagonalConsistencyInput
+      params strategy eps k scalars (roleResidual.rolePackage scalars)
+
+/-- Generic repaired Step-6 bridge over an already constructed role residual. -/
+abbrev MainFormalRepairedBridgeHypotheses
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (scalars : MainFormalCascadeScalars params eps k)
+    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) :
+    Type _ :=
+  MainFormalBaseRepairedBridgeHypotheses params strategy eps k hpass scalars roleResidual
+
 /-- Assemble the full repaired-bridge hypotheses from a role residual, the two
 locality-preserving repair witnesses, and the diagonal self-consistency input.
 
@@ -333,44 +370,6 @@ theorem baseProjectiveCompletionResidual_ofBaseBridge
       params strategy eps hpass k scalars) := by
   exact baseProjectiveCompletionResidual hsmall roleResidual
     (baseProjectiveCompletionHypotheses_ofBaseBridge bridge)
-
-
-/-- Narrowed repaired base-case bridge for Step 6 when `params.m = 1`.
-
-This removes the exact line-169 match-mass preservation fields from the base
-bridge.  The repaired pre-completion route needs only the line-130
-orthonormalization inputs and an additional diagonal consistency input for the
-completion theorem on the two unsymmetrized role-block POVMs.  This diagonal
-input is not the paper's line-130 assertion itself; line 130 supplies the
-cross relation between the two unsymmetrized roles. -/
-structure MainFormalBaseRepairedBridgeHypotheses
-    (params : Parameters) [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps)
-    (scalars : MainFormalCascadeScalars params eps k)
-    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) where
-  /-- Line-130 orthonormalization inputs: spectral-truncation and locality-preserving
-  repair witnesses for both unsymmetrized POVMs. -/
-  orthonormalizationInput :
-    MainFormalPostRolePackageDiagonalOrthonormalizationInput
-      params strategy eps k scalars (roleResidual.rolePackage scalars)
-  /-- Additional diagonal consistency for the two unsymmetrized role POVMs, used
-  to invoke the completion theorem without the exact match-mass route. -/
-  diagonalConsistency :
-    MainFormalPostRolePackageDiagonalConsistencyInput
-      params strategy eps k scalars (roleResidual.rolePackage scalars)
-
-/-- Generic repaired Step-6 bridge over an already constructed role residual. -/
-abbrev MainFormalRepairedBridgeHypotheses
-    (params : Parameters) [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps)
-    (scalars : MainFormalCascadeScalars params eps k)
-    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) :
-    Type _ :=
-  MainFormalBaseRepairedBridgeHypotheses params strategy eps k hpass scalars roleResidual
 
 /-- Base-case assembly of `mainFormal` through the repaired line-169 route.
 
@@ -703,10 +702,9 @@ theorem mainFormal
       -- `hanswerSliceWitness` and `hanswerSliceBridge` are supplied
       -- externally (tracked by #931, #834, #1036).
       let _hk_pos : 1 ≤ k := Nat.succ_le_of_lt hk0
-      rcases MainFormalRolePackageBranchResidual
-          .rolePackageResidual_ofAnswerSuccessorBridgeInputs
-            hpass hm1 hd _hk_pos hk
-            (hanswerSliceWitness hm1) (hanswerSliceBridge hm1) with
+      rcases MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorBridgeInputs
+        hpass hm1 hd _hk_pos hk
+        (hanswerSliceWitness hm1) (hanswerSliceBridge hm1) with
         ⟨roleResidual⟩
       exact mainFormal_ofRoleResidualAndRepairedBridge herr roleResidual
         (hbaseBridge scalars roleResidual)
