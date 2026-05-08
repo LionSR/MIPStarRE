@@ -39,6 +39,9 @@ jobs:
   lint-blueprint:
     runs-on: ubuntu-latest
     name: Check blueprint compiles without errors
+    permissions:
+      contents: read
+      issues: write  # for posting/updating reverse-coverage PR comments
     steps:
       - uses: actions/checkout@v6
         with:
@@ -131,6 +134,7 @@ jobs:
           ENFORCE_BLUEPRINT_REVERSE_COVERAGE: >-
             ${{ contains(github.event.pull_request.labels.*.name,
             'enforce-blueprint-coverage') }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           python3 - <<'PY'
           import os
@@ -138,6 +142,7 @@ jobs:
 
           base_ref = os.environ["BASE_REF"]
           enforce = os.environ.get("ENFORCE_BLUEPRINT_REVERSE_COVERAGE") == "true"
+          pr_number = os.environ.get("PR_NUMBER", "")
 
           changed = subprocess.check_output(
               [
@@ -158,21 +163,22 @@ jobs:
               print("No changed MIPStarRE/*.lean files in this pull request.")
               raise SystemExit(0)
 
-          subprocess.run(
-              [
-                  "python3",
-                  "scripts/blueprint_lean_sync.py",
-                  "--root",
-                  ".",
-                  "--warn-missing-blueprint",
-                  "--diff-base",
-                  base_ref,
-                  "--changed-files",
-                  *changed_lean_files,
-              ]
-              + (["--fail-on-missing-blueprint"] if enforce else []),
-              check=True,
-          )
+          cmd = [
+              "python3",
+              "scripts/blueprint_lean_sync.py",
+              "--root",
+              ".",
+              "--warn-missing-blueprint",
+              "--diff-base",
+              base_ref,
+              "--changed-files",
+              *changed_lean_files,
+          ]
+          if enforce:
+              cmd.append("--fail-on-missing-blueprint")
+          if pr_number:
+              cmd.extend(["--post-pr-comment", "--pr-number", pr_number])
+          subprocess.run(cmd, check=True)
           PY
 
       - name: Check blueprint Lean declarations
