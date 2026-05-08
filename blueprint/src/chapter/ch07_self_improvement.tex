@@ -449,6 +449,15 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   Together with~\eqref{eq:Z-greater-than-A}, this proves \ref{item:self-improvement-boundedness}.
 \end{proof}
 
+\begin{remark}[Lean slackness-carrying helper wrapper]\label{rem:self-improvement-helper-with-slackness-wrapper}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithSlackness}
+  The Lean development also exposes a strengthened helper wrapper whose output
+  carries the complementary-slackness equations used in the completeness chain.
+  This wrapper now obtains its SDP input from the visible Section~9 producer
+  \texttt{sdpStatementWithSlackness}; it is intentionally not marked
+  kernel-clean until that producer's strong-duality obligation is discharged.
+\end{remark}
+
 \subsection{A Semidefinite Program}
 
 \begin{lemma}[Uniform SDP feasible witness]\label{lem:sdp-uniform-feasible-witness}
@@ -540,6 +549,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness.toSdpStatementWithSlackness_of_dualDominatesIdentity}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.toSdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalFeasibleComplementarySlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdp_with_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPair_of_dualDominatesIdentity}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPair}
@@ -606,6 +616,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness.primalMeasurement}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness.toSdpStatement}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness.exists_measurement_witness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalBlockIndex}
