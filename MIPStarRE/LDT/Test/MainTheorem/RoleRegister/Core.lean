@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Test.MainTheorem.ErrorScalars
+import MIPStarRE.LDT.Test.MainTheorem.OrdinaryRestriction.PublicWrapper
 
 /-!
 # Role-register core residuals
