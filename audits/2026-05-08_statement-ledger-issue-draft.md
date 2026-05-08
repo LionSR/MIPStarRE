@@ -54,11 +54,26 @@ Headline counts:
 
 | Verdict | Count |
 |---|---|
-| G — grounded (producer exists) | 35 |
-| E — genuine external citation | 3 |
-| T — tracked smuggle (open sub-issue) | 2 (Spectral truncation #1032; Naimark full tensor #1361) |
-| P — paper-faithful packaging (no external consumer expected) | 1 |
+| G — grounded (producer exists) | 33 |
+| T — tracked smuggle (open sub-issue) | 2 (`SpectralTruncationStatement` #1032; `NaimarkStatement` deliberate paper-gap #1361) |
+| E — genuine external citation | 2 (`RazSafraSoundnessStatement`, `PolishchukSpielmanClassicalSoundnessStatement`) |
+| P — paper-faithful packaging | 1 (`NormalizationConditionStatement`) |
 | **D — dead** | **1** (`MatrixAddInUTransferStatement`) |
+| **Total** | **39** |
+
+### Strengthened policy (2026-05-08)
+
+Beyond the G/T/E/P/D classification, every `*Statement` must additionally
+**earn its place** by citing:
+
+1. **Paper origin** — `references/ldt-paper/<file>:<lines>` and
+   `\label{…}`, OR
+2. **Paper-gap external** — a `docs/paper-gaps/<topic>.tex` entry per
+   `docs/paper-gaps/policy.tex`.
+
+Audit measurement: only **1 of 36** existing Statements has any paper
+citation (line/section/label) in its def-site docstring. Backfill is ~36
+entries; CI enforcement is straightforward.
 
 ## Open obligations
 

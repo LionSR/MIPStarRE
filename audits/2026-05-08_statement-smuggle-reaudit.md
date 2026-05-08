@@ -75,17 +75,17 @@ explicit tracking entry.
 | 23 | `CommutingWithGIncompleteStatement` | `Pasting/Statements.lean:273` | `CommutingWithG/Incomplete.lean:27`; `Statements.lean:306` | `GHatFacts.lean:122` | — | **G**. |
 | 24 | `GHatFactsStatement` | `Pasting/Statements.lean:294` | `GHatFacts.lean:123`; `BridgeLemmas/HAConsistency.lean:320` | `ContextWrappers.lean:137, 153, 169`; `BridgeLemmas/CommuteGHalfSandwich.lean:33`; `BridgeLemmas/LdSandwichLineOnePoint/Core.lean:351` | — | **G**, connected. |
 | 25 | `CommuteGHalfSandwichStatement` | `Pasting/Statements.lean:321` | `BridgeLemmas/CommuteGHalfSandwich.lean:34` | `ContextWrappers.lean:156, 172`; `BridgeLemmas/LdSandwichLineOnePoint/CSSetup.lean:405, 521`; `BridgeLemmas/LdSandwichLineOnePoint/PrefixMoved.lean:122, 141` | — | **G**, connected. |
-| 26 | `LdSandwichLineOnePointStatement` | `Pasting/Statements.lean:334` | not visible in this scan (likely in `BridgeLemmas/LdSandwichLineOnePoint/`) | `ContextWrappers.lean:122, 140`; `BridgeLemmas/HAConsistency.lean:318`; `BridgeLemmas/LineInterpolation/HBError.lean:243, 307`; `BridgeLemmas/HBConsistency.lean:48, 124` | — | **T?** — heavy consumer footprint; verify producer exists or open a tracker. |
+| 26 | `LdSandwichLineOnePointStatement` | `Pasting/Statements.lean:334` | `BridgeLemmas/LdSandwichLineOnePoint/Core.lean:354` | `ContextWrappers.lean:122, 140`; `BridgeLemmas/HAConsistency.lean:318`; `BridgeLemmas/LineInterpolation/HBError.lean:243, 307`; `BridgeLemmas/HBConsistency.lean:48, 124` | — | **G**, connected (verified 2026-05-08). |
 | 27 | `HBConsistencyStatement` | `Pasting/Statements.lean:348` | `BridgeLemmas/HBConsistency.lean:126` | `ContextWrappers.lean:124`; `BridgeLemmas/HAConsistency.lean:153` | — | **G**. |
 | 28 | `OverAllOutcomesStatement` | `Pasting/Statements.lean:384` | `BridgeLemmas/OverAllOutcomes/Final.lean:409, 438` | `ContextWrappers.lean:108` | — | **G**. |
 | 29 | `FromHToGStatement` | `Pasting/Statements.lean:451` | `Bernoulli/FromHToG.lean:34` | `ContextWrappers.lean:174` | — | **G**. |
-| 30 | `ChernoffBernoulliMatrixStatement` | `Pasting/Statements.lean:468` | `Bernoulli/MatrixChernoff.lean:97` | none external | A6 §"Acceptable" lists it explicitly | **E** — Mathlib matrix-Chernoff gap. |
+| 30 | `ChernoffBernoulliMatrixStatement` | `Pasting/Statements.lean:468` | `Bernoulli/MatrixChernoff.lean:97` | none external | A6 §"Acceptable" lists it explicitly | **G** — internally produced by `chernoffBernoulliMatrix` in `MatrixChernoff.lean:97`. (Originally classified E because A6 names it; the structure now has its own producer, so G is the correct verdict.) |
 | 31 | `LdPastingNCompletenessStatement` | `Pasting/Statements.lean:490` | `Bernoulli/Final.lean:300, 399` | `ContextWrappers.lean:64` | — | **G**. |
 | 32 | `MatrixAddInUTransferStatement` | `SelfImprovement/MatrixRealization.lean:148` | **none** | **none** | only mentioned in `docs/reports/issue-930-session49-selfimprovement-audit.md:164` | **D** — **DEAD**. Defined, never produced, never consumed. The session-49 audit notes "These are …" and the sentence is cut off in the report. Either delete or surface a docstring + tracker explaining its purpose. |
 | 33 | `MatrixSdpStatementWithSlackness` | `SelfImprovement/MatrixRealization/Canonical/Witness.lean:145` | `Canonical/Saturated.lean:143, 175`; `Witness.lean:292`; `SdpMatrixBridge.lean:152` | consumed by `SdpStatementWithSlackness` producer in `SdpMatrixBridge.lean:335, 358, 402` | #1230 | **G** — added 2026-04-30/05-01 (PRs #1346, #1347, #1340). Connected to abstract `SdpStatementWithSlackness` via the matrix bridge. |
 | 34 | `MatrixSdpStatementWithSlacknessAndDominance` | `SelfImprovement/MatrixRealization/Canonical/Witness.lean:159` | `Witness.lean:191, 223`; `SdpMatrixBridge.lean:196` | `Witness.lean:291, 302`; `SdpMatrixBridge.lean:356` | #1230 | **G** — added 2026-04-30. Same comment. |
 | 35 | `AddInUStatement` | `SelfImprovement/Theorems/Statements.lean:276` | `Results/HelperCompleteness/Bracketed.lean:573` | `Statements.lean:308` (internal) | #1230 (indirect) | **G**, connected internally. Verify it's consumed beyond its own helper. |
-| 36 | `SdpStatement` | `SelfImprovement/Theorems/Statements.lean:78` | `Results/HelperCompleteness/Bracketed.lean:520`; `Statements.lean:124` | not visible in scan | #1230 | **T?** — producer exists, consumer chain unclear; verify or open a tracker for the consumer side. |
+| 36 | `SdpStatement` | `SelfImprovement/Theorems/Statements.lean:78` | `Results/HelperCompleteness/Bracketed.lean:520` (`sdp` lemma); forgetful map at `Statements.lean:124` (`toSdpStatement`) | downstream of #1230 helper-completeness chain | #1230 | **G**, connected (verified 2026-05-08). |
 | 37 | `SdpStatementWithSlackness` | `SelfImprovement/Theorems/Statements.lean:89` | `SdpMatrixBridge.lean:335, 358, 402` | downstream of #1230 | #1230 | **G**, connected. |
 | 38 | `PolishchukSpielmanClassicalSoundnessStatement` | `Test/MainTheorem/ClassicalAndBase.lean:112` | external citation | `ClassicalAndBase.lean:149` (consumed by classical-soundness theorem) | A6 §"Acceptable" | **E** — Polishchuk–Spielman external paper. Not to be formalized. Audit-clean. |
 | 39 | `RazSafraSoundnessStatement` | `Test/MainTheorem/ClassicalAndBase.lean:94` | external citation | `ClassicalAndBase.lean:130` (consumed by `razSafra`) | A6 §"Acceptable" | **E** — Raz–Safra external paper. Not to be formalized. Audit-clean. |
@@ -95,27 +95,114 @@ explicit tracking entry.
 | Chapter | Count | Verdicts |
 |---|---|---|
 | Commutativity | 1 | 1 P |
-| ExpansionHypercubeGraph | 4 | 4 G/P |
+| ExpansionHypercubeGraph | 4 | 4 G |
 | GlobalVariance | 6 | 6 G |
 | MainInductionStep | 2 | 2 G |
-| MakingMeasurementsProjective | 5 | 4 G + 1 T (#1032) |
-| Pasting | 13 | 12 G + 1 E |
+| MakingMeasurementsProjective | 5 | 3 G + 2 T (Naimark, SpectralTruncation = #1032) |
+| Pasting | 13 | 13 G |
 | **SelfImprovement** | **6** | 5 G + **1 D** (`MatrixAddInUTransferStatement`) |
 | Test/MainTheorem | 2 | 2 E |
+| **Total** | **39** | **33 G + 2 T + 2 E + 1 P + 1 D** |
 
-## Overall verdict
+## Overall verdict (under A6)
 
-**The pattern is sound; the bookkeeping has lapsed.**
+**Under the existing A6 discipline, the pattern is sound; the bookkeeping has
+lapsed.**
 
 - **38 of 39** Statements are either grounded (producer exists), tracked
   (open issue documents the missing producer), or genuine external citations.
 - **1 of 39** is dead scaffolding: `MatrixAddInUTransferStatement` —
   zero producers, zero consumers. Should be deleted, or have a docstring +
   tracker explaining why it is being kept.
-- **5 entries** (rows 2–5, 26, 36) need a quick verification pass to confirm
-  consumer chain reaches the public API. None of these are blockers.
 
-**Healthy ratio**: 35 G + 1 P + 3 E + 1 T — all sanctioned by A6.
+**Verdict counts** (sum to 39):
+- **G** (grounded): 33 — including row 30 `ChernoffBernoulliMatrixStatement`
+  (re-classified from E to G after PR #1378 review: it has its own producer
+  `chernoffBernoulliMatrix`) and rows 26 / 36 (`LdSandwichLineOnePointStatement`,
+  `SdpStatement`) verified 2026-05-08.
+- **T** (tracked smuggle, no producer yet): 2 — `NaimarkStatement`
+  (deliberate paper-gap noted in #1361) and `SpectralTruncationStatement`
+  (#1032).
+- **E** (genuine external citation): 2 — `RazSafraSoundnessStatement` and
+  `PolishchukSpielmanClassicalSoundnessStatement`.
+- **P** (paper-faithful packaging): 1 — `NormalizationConditionStatement`.
+- **D** (dead): 1 — `MatrixAddInUTransferStatement`.
+
+## Strengthened policy (per maintainer 2026-05-08): "earn your place"
+
+The maintainer policy as of 2026-05-08 is stricter than current §A6:
+
+> Any `*Statement` (and by extension `*Witness`, `*Hypotheses`,
+> `*Conclusion`, etc.) **must earn its place** by either:
+>
+> 1. **Paper origin.** Cite a named lemma / proposition / theorem / claim in
+>    `references/ldt-paper/*.tex` (file path, line range, and `\label{…}`
+>    where available), OR
+> 2. **Paper-gap external.** Cite a `docs/paper-gaps/*.tex` entry following
+>    the policy in `docs/paper-gaps/policy.tex`, justifying the structure as
+>    external mathematics genuinely required to formalize a paper result
+>    (e.g. a Mathlib gap, an ambient external theorem).
+>
+> The previous A6 category **T (tracked smuggle)** is still allowed, but only
+> when the tracker itself names the paper origin or the paper-gap entry. A
+> `*Statement` whose tracker is just "produce this somehow" without paper
+> grounding is rejected.
+
+### Coverage measurement (2026-05-08)
+
+For each of the 36 `*Statement` declarations the script could match cleanly
+(missing the 3 `MatrixSdpStatementWith…` siblings due to a regex
+word-boundary edge case — those carry the same docstring pattern as the
+abstract `SdpStatement*` so do not change the conclusion), the surrounding
+20 lines were checked for any of: a `references/ldt-paper/...` path, a
+`\label{lem:|thm:|prop:|cor:}` cross-reference, an `\eqref/\Cref/\cref`,
+or a "Section/Lemma/Proposition/Theorem N.M" / "paper §" / "paper line N"
+phrase.
+
+| Citation form found in def context | Count |
+|---|---|
+| `references/ldt-paper/...` file path | 0 |
+| `\label{…}` / `\Cref{…}` / `\cref{…}` | 0 |
+| Numbered "Lemma N.M" / "Section N" reference | 1 |
+| **None of the above** | **35 / 36** |
+
+**~97% of existing Statement structures fail the new policy** at the
+def-site level. Most do mention the paper informally ("the paper's …"),
+but without a citable file/line/label, which is what the policy requires
+for review and CI enforcement.
+
+### Implication for ledger and CI
+
+The ledger draft and any future audit script must require, for each new or
+existing `*Statement`, an explicit grounding-metadata field — either:
+
+```lean
+/--
+Paper origin: `references/ldt-paper/<file>.tex:<line-start>-<line-end>`
+  (`\label{lem:foo-bar}`).
+… mathematical prose …
+-/
+structure FooStatement … where …
+```
+
+or:
+
+```lean
+/--
+Paper-gap external: `docs/paper-gaps/<topic>.tex`. This structure encodes
+<external lemma name>, used to discharge <paper step>.
+… mathematical prose …
+-/
+structure FooStatement … where …
+```
+
+A small grep linter can enforce this. The retroactive backfill is
+~36 entries × 5 minutes each ≈ 3 hours of mechanical work.
+
+The strengthened policy does **not** change today's verdict counts (33 G + 2
+T + 2 E + 1 P + 1 D); it changes the **acceptance bar for keeping each
+verdict**. Under the new policy, even a G entry must have its paper-line
+docstring before its producer's PR can land.
 
 ## Specific findings
 
