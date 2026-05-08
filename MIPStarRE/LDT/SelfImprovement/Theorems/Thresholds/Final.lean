@@ -537,7 +537,6 @@ theorem final_fields_projective_residual_error_le_selfImprovementError_of_small_
       _ ≤ 92 * (31 * (params.m : Error) *
           finalStagePowerSum params eps delta (1 / (32 : Error))) := by
         gcongr
-        exact hdata_sqrt
       _ = 2852 * (params.m : Error) *
           finalStagePowerSum params eps delta (1 / (32 : Error)) := by
         ring_nf
