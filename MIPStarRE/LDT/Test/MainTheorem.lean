@@ -42,7 +42,7 @@ The imported modules carry the split proof assembly:
 ## References
 
 * Paper: `references/ldt-paper/inductive_step.tex`, proof of
-  `\Cref{thm:main-formal}` (lines 27–239).
+  `\Cref{thm:main-formal}` (lines 26–236).
 * Blueprint: `blueprint/src/chapter/ch02_test.tex`,
   `\label{thm:main-formal}`; and
   `blueprint/src/chapter/ch10_induction.tex`,

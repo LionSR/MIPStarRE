@@ -4,14 +4,13 @@ import MIPStarRE.LDT.Test.MainTheorem.RoleRegister
 # Unsymmetrized target packages
 
 Unsymmetrization and projective-stage targets for the `mainFormal` assembly.
-This module packages the two factor-two unsymmetrization estimates
-(`qBipartiteConsDefect_extractRoleA_le_two_symm`,
-`qBipartiteConsDefect_extractRoleB_le_two_symm`) and converts them,
-together with the role-register measurement's symmetrized consistency, into
-the pre-projective self-consistency relation at error `ζ₁` via
-`MainFormalCascadePreProjectiveSelfConsistency.fullSelfConsistency`.  The
-subsequent stage-target structures
-(`MainFormalCascadeUnsymmetrizedPOVMTargets`,
+This module records the unsymmetrized POVM targets supplied by the
+existing factor-two unsymmetrization estimates from
+`Test/Unsymmetrization.lean` and applies the checked Step 5
+Schwartz–Zippel bridge in `MainFormalCascadePreProjectiveSelfConsistency`
+to convert an evaluated pre-projective link into the full-polynomial
+self-consistency relation at error `ζ₁`.  The subsequent stage-target
+structures (`MainFormalCascadeUnsymmetrizedPOVMTargets`,
 `MainFormalCascadeTargets`,
 `MainFormalCascadeTransportTargets`,
 `MainFormalCascadeProjectiveStageTargets`,
