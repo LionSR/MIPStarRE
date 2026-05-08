@@ -46,9 +46,14 @@ The paper's full tensor-product Naimark dilation
 `\label{thm:naimark}`) is not formalized as a single statement. Instead this
 structure records the per-question one-measurement dilations of
 `\label{lem:naimark-helper}`
-(`references/ldt-paper/orthonormalization.tex:117-272`) together with the
-single-outcome marginal-preservation conclusions; the global tensor assembly
-is tracked separately, see `docs/paper-gaps/naimark.tex`.
+(`references/ldt-paper/orthonormalization.tex:121-159`) together with the
+single-outcome marginal-preservation conclusions; the proof of
+`\label{thm:naimark}` that tensors the per-question helpers
+(`references/ldt-paper/orthonormalization.tex:161-187`) and the
+state-dependent non-preservation example
+`\label{ex:easy-but-long}`
+(`references/ldt-paper/orthonormalization.tex:189-272`) are tracked
+separately, see `docs/paper-gaps/naimark.tex`.
 
 This records the questionwise one-measurement Naimark dilations used in the
 full theorem: each `A x` and `B y` is equipped with a local projective dilation

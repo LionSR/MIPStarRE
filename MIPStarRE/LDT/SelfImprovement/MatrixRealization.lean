@@ -148,7 +148,7 @@ noncomputable def matrixProjectiveResidualGap (params : Parameters)
 (`\label{lem:add-in-u}`).
 
 Matrix-level version of the `add-in-u` transfer inequality: this is the matrix
-realization of `AddInUStatement`, packaging the `lem:add-in-u` transfer bound on
+realization of `AddInUStatement`, recording the `lem:add-in-u` transfer bound on
 the difference between the left- and right-hand expectations evaluated at a
 selection rule `S`. -/
 structure MatrixAddInUTransferStatement {Outcome : Type*} [Fintype Outcome]

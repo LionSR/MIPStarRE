@@ -185,12 +185,12 @@ structure RestrictedProbabilitiesStatement (params : Parameters)
 /-- Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
 (`\label{lem:restricted-probabilities}`); answer-valued variant carrying the
 same axis-parallel/self-consistency/diagonal restriction bounds for the
-answer-restricted slice profile.  This is an internal repackaging of
+answer-restricted slice profile.  This is an answer-valued variant of
 `RestrictedProbabilitiesStatement` against `xRestrictedAnswerSymStrat` rather
 than `xRestrictedStrategy`; no separate paper anchor exists for the
 answer-valued variant.
 
-Bookkeeping package for the answer-valued restricted-probabilities lemma. -/
+Bookkeeping data for the answer-valued restricted-probabilities lemma. -/
 structure AnswerRestrictedProbabilitiesStatement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
