@@ -2,17 +2,28 @@
 """Check that every ``*Statement`` declaration in ``MIPStarRE/LDT/`` carries a
 paper-origin citation in its def-site docstring.
 
+Scope: this linter only scans ``MIPStarRE/LDT/`` (and excluded build/tmp
+directories) — ``*Statement``-like declarations elsewhere in the repository
+are intentionally not covered.  If statement-like declarations migrate to a
+sibling top-level (e.g. ``MIPStarRE/Quantum/``), update ``_scan_root``.
+
 This implements the linter requested by ledger #1379 and issue #1384 ("Earn
 your place" backfill).  For every ``structure``, ``def``, or ``abbrev`` whose
 identifier ends in ``Statement`` (and similar A6 suffixes ``Witness``,
-``Hypotheses``, ``Conclusion``), we look at the preceding 30 lines for one of
-three citation forms:
+``Hypotheses``, ``Conclusion``), we look at the *immediately preceding
+docstring or comment block* (after skipping blank lines) for one of three
+citation forms:
 
 1. A paper line reference of the form ``references/ldt-paper/.../*.tex``
    optionally followed by a colon and line range.
 2. A LaTeX cross-reference ``\\label{<kind>:...}`` where ``<kind>`` is one of
    ``lem``, ``thm``, ``prop``, ``cor``, ``def``, ``eq``, ``sec``.
 3. A paper-gap reference ``docs/paper-gaps/.../*.tex``.
+
+Restricting the search to the immediately preceding comment block (rather than
+a fixed line window over arbitrary code/comments) prevents a citation in an
+earlier nearby declaration's docstring from spuriously satisfying the
+linter for a later ``*Statement`` declaration.
 
 Run as a non-blocking warning during the backfill (``--warn-only``).  Once
 issue #1384 lands the warning will be promoted to an error by removing the
@@ -59,16 +70,26 @@ SUFFIXES: tuple[str, ...] = (
 
 DECL_KEYWORDS: tuple[str, ...] = ("structure", "def", "abbrev")
 
+# Lean 4 declaration modifiers that may appear before the keyword.  Allow
+# them in any order and any combination so that, e.g., `private noncomputable
+# def FooStatement` is still detected.
+DECL_MODIFIERS: tuple[str, ...] = (
+    "private",
+    "protected",
+    "noncomputable",
+    "partial",
+    "unsafe",
+)
+
 DECL_RE = re.compile(
-    r"^\s*(?:noncomputable\s+)?(?:" + "|".join(DECL_KEYWORDS) + r")\s+"
+    r"^\s*(?:(?:" + "|".join(DECL_MODIFIERS) + r")\s+)*"
+    r"(?:" + "|".join(DECL_KEYWORDS) + r")\s+"
     r"(?P<name>[A-Za-z_][A-Za-z0-9_']*)"
 )
 
 PAPER_PATH_RE = re.compile(r"references/ldt-paper/[^\s`]+\.tex")
 PAPER_GAP_RE = re.compile(r"docs/paper-gaps/[^\s`]+\.tex")
 LATEX_LABEL_RE = re.compile(r"\\label\{(?:lem|thm|prop|cor|def|eq|sec):[^}]+\}")
-
-CONTEXT_LINES: int = 30
 
 EXCLUDE_DIRS: tuple[str, ...] = (".lake", "lake-packages", "tmp")
 
@@ -96,6 +117,51 @@ def _matches_suffix(name: str) -> bool:
     return any(name.endswith(suffix) for suffix in SUFFIXES)
 
 
+def _preceding_docstring(lines: list[str], decl_idx: int) -> str:
+    """Return the text of the docstring/comment block immediately preceding
+    ``decl_idx``, or the empty string if no such block exists.
+
+    The walk skips blank lines, then collects exactly one preceding comment
+    block:
+
+    - a ``/- ... -/`` or ``/-- ... -/`` block that may span multiple lines, or
+    - a contiguous run of ``--`` single-line comments.
+
+    Anything beyond that one block (further comment blocks, or arbitrary code)
+    is *not* included.  This prevents an earlier declaration's docstring from
+    spuriously satisfying the linter for a later declaration that happens to
+    sit within ``CONTEXT_LINES`` lines.
+    """
+    i = decl_idx - 1
+    # Skip blank lines.
+    while i >= 0 and not lines[i].strip():
+        i -= 1
+    if i < 0:
+        return ""
+
+    stripped = lines[i].strip()
+    # Single-line comments first, since a `--` line with `... -/` text would
+    # otherwise be misclassified as a closing `/-...-/` block.
+    if stripped.startswith("--"):
+        end = i
+        while i >= 0 and lines[i].strip().startswith("--"):
+            i -= 1
+        start = i + 1
+        return "\n".join(lines[start:end + 1])
+
+    if stripped.endswith("-/"):
+        end = i
+        # Walk back until we find the opening `/-` (which also covers `/--`
+        # and `/-!`).  Lean 4 does not ship nested doc-blocks, so the first
+        # `/-` we encounter on the way back opens the same block.
+        while i >= 0 and "/-" not in lines[i]:
+            i -= 1
+        start = max(0, i)
+        return "\n".join(lines[start:end + 1])
+
+    return ""
+
+
 def _scan_file(path: Path) -> list[tuple[int, str]]:
     """Return a list of (line, name) for declarations in *path* missing a citation."""
     missing: list[tuple[int, str]] = []
@@ -110,20 +176,30 @@ def _scan_file(path: Path) -> list[tuple[int, str]]:
         if not _matches_suffix(name):
             continue
 
-        start = max(0, idx - CONTEXT_LINES)
-        window = "\n".join(lines[start:idx + 1])
+        window = _preceding_docstring(lines, idx)
         if not _has_origin(window):
             missing.append((idx + 1, name))
 
     return missing
 
 
+class TargetMissingError(RuntimeError):
+    """Raised when the expected scan target ``MIPStarRE/LDT/`` does not exist."""
+
+
 def _scan_root(root: Path) -> dict[str, list[tuple[int, str]]]:
-    """Scan ``root/MIPStarRE/LDT/`` and return a mapping ``rel-path -> missing``."""
+    """Scan ``root/MIPStarRE/LDT/`` and return a mapping ``rel-path -> missing``.
+
+    Raises :class:`TargetMissingError` if ``root/MIPStarRE/LDT/`` does not
+    exist; callers may downgrade this to a warning under ``--warn-only`` so
+    that a misspelled ``--root`` does not silently disable the CI guard.
+    """
     target = root / "MIPStarRE" / "LDT"
-    results: dict[str, list[tuple[int, str]]] = {}
     if not target.is_dir():
-        return results
+        raise TargetMissingError(
+            f"scan target {target} does not exist (is --root correct?)"
+        )
+    results: dict[str, list[tuple[int, str]]] = {}
     for path in sorted(target.rglob("*.lean")):
         if _is_excluded(path, root):
             continue
@@ -158,7 +234,13 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
-    results = _scan_root(args.root)
+    try:
+        results = _scan_root(args.root)
+    except TargetMissingError as exc:
+        label = "warning" if args.warn_only else "error"
+        print(f"{label}: {exc}", file=sys.stderr)
+        return 0 if args.warn_only else 2
+
     if not results:
         print("OK: every *Statement-like declaration in MIPStarRE/LDT/ carries "
               "a paper-origin citation.")
@@ -168,16 +250,15 @@ def main(argv: list[str] | None = None) -> int:
     label = "warning" if args.warn_only else "error"
     print(
         f"{label}: {total} *Statement-like declaration(s) missing a paper-origin "
-        f"citation in their def-site docstring (within {CONTEXT_LINES} preceding "
-        "lines):",
+        "citation in the immediately preceding docstring/comment block:",
         file=sys.stderr,
     )
     for rel, items in results.items():
         for line, name in items:
             print(f"  {rel}:{line}: {name}", file=sys.stderr)
     print(
-        "\nAccepted citation forms (any one of these in the preceding "
-        f"{CONTEXT_LINES} lines):",
+        "\nAccepted citation forms (any one of these in the immediately "
+        "preceding docstring/comment block):",
         file=sys.stderr,
     )
     print("  - references/ldt-paper/<file>.tex  (optionally with :line-range)",

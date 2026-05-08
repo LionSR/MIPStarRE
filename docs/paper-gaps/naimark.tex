@@ -40,7 +40,9 @@
 The formalization isolates two related but distinct theorem forms.
 \begin{enumerate}
   \item \textbf{Source theorem form: Naimark dilation
-  (\Cref{thm:naimark-paper}).}  For every collection of bipartite
+  (\texttt{thm:naimark}, displayed at
+  \path{references/ldt-paper/orthonormalization.tex}, lines~36--115).}
+  For every collection of bipartite
   submeasurements $\{A^x\}_{x\in Q_A}$, $\{B^y\}_{y\in Q_B}$ on a finite
   Hilbert space~$\mathcal H$, there is an enlarged Hilbert space $\widetilde
   {\mathcal H}\supseteq\mathcal H$, an isometry $V:\mathcal H\to\widetilde
@@ -77,11 +79,26 @@ The formalization isolates two related but distinct theorem forms.
 
 \section{The source assertion}
 
-We examine \cite{Ji2020LowIndividualDegree}, Theorem~\ref{thm:naimark}.%
-\footnote{Tracked alongside ledger~\ghissue{1379}.  The paper passage is
-\path{references/ldt-paper/orthonormalization.tex}, lines~36--115, with the
-helper \texttt{lem:naimark-helper} used in the proof at lines~117--272 and the
-genuine non-preservation example \texttt{ex:easy-but-long} at lines~189--272.}
+We examine \cite{Ji2020LowIndividualDegree}, the Naimark dilation theorem
+labelled \texttt{thm:naimark}.%
+\footnote{Tracked alongside ledger~\ghissue{1379}.  The paper passages are
+\path{references/ldt-paper/orthonormalization.tex}, lines~36--115 (the displayed
+theorem statement), 121--159 (the helper lemma \texttt{lem:naimark-helper} and
+its proof), 161--187 (the proof of \texttt{thm:naimark} that tensors the
+per-question helpers), and 189--272 (the genuine non-preservation example
+\texttt{ex:easy-but-long}).}
+
+\medskip
+
+\noindent\emph{Notation.}  We write $X\approx_\delta Y$ on the state $\ket\psi$
+to mean the state-dependent operator distance
+\(
+  \langle\psi|(X-Y)^{\dagger}(X-Y)|\psi\rangle\le\delta,
+\)
+defined as in \cite{Ji2020LowIndividualDegree} at
+\texttt{def:approx\_delta} (\path{references/ldt-paper/preliminaries.tex}, line~348).
+
+\medskip
 
 In the notation of the paper, the source assumes
 \[
@@ -91,9 +108,9 @@ In the notation of the paper, the source assumes
 and concludes the bipartite preservation identity above.  The proof proceeds
 question by question via \texttt{lem:naimark-helper}; the example
 \texttt{ex:easy-but-long} demonstrates that the dilation does \emph{not}
-preserve the state-dependent distance $\approx_\delta$, which is why downstream
-arguments in the LDT paper carry the dilation only as far as the
-single-outcome marginals.
+preserve the state-dependent distance $\approx_\delta$ defined just above,
+which is why downstream arguments in the LDT paper carry the dilation only as
+far as the single-outcome marginals.
 
 \section{Comparison with the formalization}
 
@@ -122,7 +139,8 @@ Three considerations support leaving the bipartite tensor assembly out of the
 formalization:
 \begin{itemize}
   \item \textbf{Distance non-preservation.}  Example~\texttt{ex:easy-but-long}
-  shows that the dilation does not preserve $\approx_\delta$, so any
+  shows that the dilation does not preserve the state-dependent distance
+  $\approx_\delta$ recalled in Section~3, so any
   bipartite statement formulated in terms of state-dependent distances would
   need to track an explicit error inflation that is not used downstream.
   \item \textbf{Downstream redundancy.}  The downstream uses listed above all

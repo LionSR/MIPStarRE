@@ -160,7 +160,7 @@ noncomputable def averageAnswerRestrictedDiagonalError (params : Parameters)
     (profile : AnswerRestrictedFailureProfile params strategy) : Error :=
   avgOver (uniformDistribution (Fq params)) profile.diagonal
 
-/-- Paper origin: `references/ldt-paper/inductive_step.tex:374-625`
+/-- Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
 (`\label{lem:restricted-probabilities}`).
 
 Bookkeeping data for the restricted-probabilities lemma.
@@ -182,11 +182,13 @@ structure RestrictedProbabilitiesStatement (params : Parameters)
         averageRestrictedDiagonalError params profile ≤
           sliceConditioningLoss params * gamma
 
-/-- Paper origin: `references/ldt-paper/inductive_step.tex:374-625`
+/-- Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
 (`\label{lem:restricted-probabilities}`); answer-valued variant carrying the
 same axis-parallel/self-consistency/diagonal restriction bounds for the
-answer-restricted slice profile, mirroring the Section 6 prose on
-answer-restricted question distributions in `references/ldt-paper/expansion.tex`.
+answer-restricted slice profile.  This is an internal repackaging of
+`RestrictedProbabilitiesStatement` against `xRestrictedAnswerSymStrat` rather
+than `xRestrictedStrategy`; no separate paper anchor exists for the
+answer-valued variant.
 
 Bookkeeping package for the answer-valued restricted-probabilities lemma. -/
 structure AnswerRestrictedProbabilitiesStatement (params : Parameters)
