@@ -5,6 +5,8 @@
 ![axioms](https://img.shields.io/endpoint?url=https://sirui-lu.com/MIPStarRE/badges/axioms.json)
 ![Lean](https://img.shields.io/endpoint?url=https://sirui-lu.com/MIPStarRE/badges/lean.json)
 ![Mathlib](https://img.shields.io/endpoint?url=https://sirui-lu.com/MIPStarRE/badges/mathlib.json)
+![blueprint: no \leanok](https://img.shields.io/endpoint?url=https://sirui-lu.com/MIPStarRE/badges/blueprint_no_leanok.json)
+![blueprint: not ready](https://img.shields.io/endpoint?url=https://sirui-lu.com/MIPStarRE/badges/blueprint_not_ready.json)
 
 Formalization project for mathematics around $\mathrm{MIP}^*=\mathrm{RE}$.
 
