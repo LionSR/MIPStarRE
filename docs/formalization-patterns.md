@@ -298,6 +298,11 @@ containing 3–5 related lemmas that share helper definitions and proof
 structure is better than 5 files each with one lemma and duplicate
 helper material.
 
+When splitting does happen, the new leaves, declarations, and module
+names must follow the mathematical naming norm in
+`docs/mathematical_language.md`: name the mathematical boundary, not
+the paper line number, workflow step, or implementation phase.
+
 ### Barrel files
 
 See [Pattern 4: Barrel re-export pattern](#pattern-4-barrel-re-export-pattern)
@@ -412,6 +417,7 @@ with the step it replaces.
 - `docs/PROOF_INTEGRITY.md` — kernel-level proof integrity rules
 - `docs/anti_patterns.md` — catalog of proof-evasion anti-patterns
 - `docs/CONTRIBUTING.md` — overall contributor workflow
+- `docs/mathematical_language.md` — naming norm and shared-helper rules
 - `docs/blueprint_style_guide.md` — blueprint notation conventions
 - `docs/paper-gaps/policy.tex` — paper-gap documentation standards
 - `audits/` — chapter-by-chapter scouting reports

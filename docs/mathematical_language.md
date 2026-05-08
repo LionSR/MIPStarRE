@@ -82,20 +82,70 @@ This is a general rule for the repository, not only a rule for file splits.
 Module names, namespace names, public declarations, theorem fields, docstrings,
 blueprint-facing names, issue titles, and spec documents should name the
 mathematical layer under discussion, not the local workflow step, paper line
-number, or implementation history. For example, prefer names such as
-`DiagonalCompletion`, `CompletionTransport`, or `ProjectiveConsistency` over
-names built from `Line130`, `Line169`, `Step6`, or `FinalAssembly`, unless the
-cited paper itself uses that phrase as the mathematical name.
+number, or implementation history.
+
+### Concrete examples
+
+The table below illustrates the naming norm with examples patterned on the
+codebase and on names seen during review.  Some entries are existing names;
+others are proposed names for future refactors.  The "avoid" column lists
+process-shaped names that encode the history of how the formalization was
+assembled; the "prefer" column lists mathematical names that a reader of the
+paper or blueprint would recognize.
+
+| Avoid (process-shaped)                        | Prefer (mathematical)                     | Rationale                                              |
+|:----------------------------------------------|:------------------------------------------|:-------------------------------------------------------|
+| `Line130`                                     | `ProjectiveConsistency`                   | Paper Lemma 5.13, not "the line-130 identity"          |
+| `Line169`                                     | `CompletionTransport`                     | Paper Lemma 5.16, step that transports completed data  |
+| `Step6`                                       | `Orthonormalization`                      | Paper Section 5, the orthonormalization construction   |
+| `FinalAssembly`                               | `DiagonalCompletion`                      | Paper Lemma 5.17, constructing a diagonal POVM         |
+| `OneShotIneq`                                 | `SelfConsistencyDataProcessing` (or existing module `Preliminaries.SelfConsistency.DataProcessing`)           | Paper's data-processing inequality for self-consistency |
+| `PipelineCheck`                               | `ErrorPropagationBound` (proposed)                   | The bound that propagates error through the test       |
+| `QxpLayerWrapper`                             | `ProjectivePOVMCompletion` (proposed)                | The construction from round-projectors to POVMs        |
+| `RawSpectralTruncation`                       | `SpectralTruncation`                      | The paper's spectral truncation, not an "unwrapped" version |
+| `AddInUStep3To5`                              | `AddInUUpperExcessMass` (proposed)                  | Paper Addendum in §U, the upper excess-mass estimate   |
+| `AddInUStep12`                                | `AddInUCommutationTail` (proposed)                   | Paper Addendum in §U, the commutation tail estimate    |
+
+An avoided name is acceptable only when the cited paper itself uses that
+phrase as the mathematical name (e.g., a lemma the paper calls "Step 2").
+In that case the docstring should cite the paper's phrasing.
 
 File-split PRs are a common place where this rule matters: new leaves should be
 named by the mathematical boundary they isolate, and any public declarations
 exposed by the split should be reviewed under the same standard.
 
-If exact or near-exact helper declarations recur across chapters, do not copy
-the helper into another chapter-local leaf. Confirm that the statements are
-mathematically the same, then move the shared result into an appropriate common
-module with a mathematical name and keep chapter-specific wrappers only when
-they preserve paper-facing terminology.
+### Shared helpers
+
+When the same (or nearly the same) helper declaration appears in two or
+more chapter-local leaves, the copies should be consolidated into a single
+shared helper in an appropriate common module.  This avoids duplication and
+ensures that fixes, generalizations, or upstream replacements apply to all
+call sites at once.  Issue [#1145] tracks this work across the repository.
+
+Procedure:
+
+1. **Confirm equivalence.**  Compare the statement of each copy.  If the
+   types differ only by a chapter-specific parameterization (e.g.,
+   `SubMeas (Polynomial params) ι` vs `SubMeas (Point params) ι`),
+   parameterize the shared helper over that type via a `variable` or
+   explicit argument.
+2. **Find the right home.**  Prefer a module that is already imported by
+   both call sites.  Typical candidates:
+   - `MIPStarRE/LDT/Basic/` for parameter-free operators and bounds,
+   - `MIPStarRE/LDT/Preliminaries/` for polynomial/field/character lemmas,
+   - The highest chapter that is a common dependency of the two sites.
+3. **Name mathematically.**  Give the shared helper a name that describes
+   what it states, not which chapter it originally came from.
+4. **Replace call sites.**  Delete the chapter-local copies and replace
+   their uses with the shared helper.  A thin wrapper is allowed only when it
+   preserves a paper-facing or blueprint-facing name that external readers
+   need to search for; such wrappers should have a docstring or compatibility
+   comment explaining why the alias exists.  Remove the wrapper once that
+   paper-facing name is no longer needed for external reference.
+5. **Document.**  Add a docstring to the shared helper citing the paper or
+   blueprint location it supports.
+
+### Legacy identifier treatment
 
 If a docstring must mention a legacy Lean identifier, cite it in backticks and
 describe the mathematical object in paper terminology. If an old public
@@ -103,11 +153,45 @@ identifier cannot be renamed in the current PR, record the required migration
 in the issue, PR description, or an audit file under `audits/`.
 
 Do not add an empty pass-through abbreviation merely to introduce a second
-public name.
+public name.  This is different from the documented compatibility wrappers
+allowed in the shared-helper procedure above: a wrapper must preserve a
+paper-facing or blueprint-facing term and must say why the alias exists.
 
-## Review Use
+## Review Checklist
 
-Reviewers should flag public names and documentation prose that encode
-historical formalization status rather than mathematical content. Review-fix
-PRs touching a surface covered by an active audit should read the relevant
-audit before changing names or prose.
+Reviewers should use this checklist when examining public names and
+documentation prose.  Flag any item that fails.
+
+- [ ] **Naming.**  Do public declaration names, namespace names, module names,
+      theorem field names, and docstring prose describe a mathematical object,
+      hypothesis, or conclusion?  Or do they encode the history of how the
+      formalization was assembled (paper line numbers, workflow steps,
+      implementation-phase labels)?
+- [ ] **Source alignment.**  For the mathematical content under review, does
+      the prose use the terminology in `references/ldt-paper/` or the
+      blueprint?  Are process words such as `pipeline`, `wrapper`, `package`,
+      `raw`, `oneShot`, or `liveBlock` used as mathematical terms when the
+      source does not use them that way?
+- [ ] **Deviation documented.**  If a Lean name or representation differs from
+      the paper, is the deviation documented in a declaration docstring,
+      module docstring, blueprint paragraph, or `docs/paper-gaps/` note, in
+      that order of preference?
+- [ ] **Auxiliary lemmas.**  Are formalization-only auxiliary lemmas introduced
+      as such, with prose naming the nearby paper equation, theorem, or
+      construction they support?
+- [ ] **Shared helpers.**  Does the PR introduce a helper that already exists
+      (or near-exists) in another chapter-local leaf?  If so, has it been
+      consolidated into a common module with a mathematical name?
+- [ ] **Legacy IDs.**  If a legacy Lean identifier is mentioned, is the
+      mathematical object described in paper terminology?  If an old public
+      identifier cannot be renamed yet, is the required migration recorded in
+      the issue, PR description, or an audit file?
+- [ ] **Pass-through names.**  Does the PR add an empty pass-through
+      abbreviation that introduces a second public name without adding
+      mathematical content?  Reject it unless it is a documented compatibility
+      wrapper preserving paper-facing or blueprint-facing terminology.
+
+Review-fix PRs touching a surface covered by an active audit should read the
+relevant audit before changing names or prose.
+
+[#1145]: https://github.com/LionSR/MIPStarRE/issues/1145
