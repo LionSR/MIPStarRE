@@ -38,6 +38,13 @@ import tomllib
 from collections import defaultdict
 from pathlib import Path
 
+# Allow importing from the scripts/ directory (same directory as this file).
+_SCRIPT_DIR = Path(__file__).resolve().parent
+if str(_SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPT_DIR))
+
+from blueprint_lean_sync import _PROOF_BEARING_ENV_TYPES  # noqa: E402
+
 
 SORRY_RE = re.compile(r"\bsorry\b")
 AXIOM_RE = re.compile(
@@ -154,11 +161,6 @@ def mathlib_version(repo_root: Path) -> str:
 # ---------------------------------------------------------------------------
 # Blueprint badge helpers
 # ---------------------------------------------------------------------------
-
-# Environment types that are expected to carry a proof in the blueprint.
-_PROOF_BEARING_ENV_TYPES: frozenset[str] = frozenset(
-    {"theorem", "lemma", "proposition", "corollary"}
-)
 
 # Environment types that are ignored in the "not ready" denominator because
 # they are auxiliary annotations, not formalization targets.
@@ -280,7 +282,6 @@ def main() -> None:
 
         # Import the blueprint parser (lazy, so the script still works without
         # the blueprint source tree checked out).
-        sys.path.insert(0, str(repo_root / "scripts"))
         from blueprint_lean_sync import collect_blueprint_entries  # noqa: E402
 
         entries = collect_blueprint_entries(blueprint_src)
