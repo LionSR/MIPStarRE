@@ -929,7 +929,7 @@ def _github_api_request(
 
     req = urllib.request.Request(url, data=body, headers=headers, method=method)
     try:
-        with urllib.request.urlopen(req) as resp:
+        with urllib.request.urlopen(req, timeout=30) as resp:
             if resp.status == 204:  # No Content
                 return None
             return _json.loads(resp.read().decode("utf-8"))
@@ -940,28 +940,61 @@ def _github_api_request(
         ) from exc
 
 
+def _github_api_request_paginated(
+    url: str,
+    token: str,
+    *,
+    per_page: int = 100,
+) -> list[dict]:
+    """Make a GET request that follows page-number pagination.
+
+    Returns the concatenated list of all items across pages.  Stops when a
+    page returns fewer than ``per_page`` items (the last page).
+    """
+    items: list[dict] = []
+    page = 1
+    while True:
+        sep = "&" if "?" in url else "?"
+        paged_url = f"{url}{sep}per_page={per_page}&page={page}"
+        resp = _github_api_request("GET", paged_url, token)
+        if resp is None:
+            break
+        if isinstance(resp, dict):
+            resp = [resp]
+        if not isinstance(resp, list) or len(resp) == 0:
+            break
+        items.extend(resp)
+        if len(resp) < per_page:
+            break
+        page += 1
+    return items
+
+
 def _find_bot_pr_comment(
     owner: str,
     repo: str,
     pr_number: int,
     token: str,
 ) -> int | None:
-    """Return the ID of the existing bot comment, or ``None`` if not found."""
+    """Return the ID of the existing bot comment, or ``None`` if not found.
+
+    Only considers comments authored by ``github-actions[bot]`` (the
+    identity used when authenticating with ``GITHUB_TOKEN``) that
+    contain the hidden marker.  This prevents user comments from being
+    overwritten.
+    """
     url = (
         f"https://api.github.com/repos/{owner}/{repo}"
-        f"/issues/{pr_number}/comments?per_page=100"
+        f"/issues/{pr_number}/comments"
     )
-    comments = _github_api_request("GET", url, token)
-    if not comments:
-        return None
-    if isinstance(comments, dict):
-        # Single-comment response (shouldn't happen, but be safe)
-        comments = [comments]
+    comments = _github_api_request_paginated(url, token)
     for comment in comments:
-        if isinstance(comment, dict) and _BLUEPRINT_COVERAGE_COMMENT_MARKER in comment.get(
-            "body", ""
-        ):
-            return comment["id"]
+        if not isinstance(comment, dict):
+            continue
+        user = comment.get("user", {})
+        if isinstance(user, dict) and user.get("login") == "github-actions[bot]":
+            if _BLUEPRINT_COVERAGE_COMMENT_MARKER in comment.get("body", ""):
+                return comment["id"]
     return None
 
 
@@ -980,15 +1013,26 @@ def _create_pr_comment(
     return result["id"]
 
 
-def _update_pr_comment(comment_id: int, body: str, token: str) -> None:
+def _update_pr_comment(
+    owner: str,
+    repo: str,
+    comment_id: int,
+    body: str,
+    token: str,
+) -> None:
     """Update an existing PR comment."""
-    url = f"https://api.github.com/repos/issues/comments/{comment_id}"
+    url = f"https://api.github.com/repos/{owner}/{repo}/issues/comments/{comment_id}"
     _github_api_request("PATCH", url, token, data={"body": body})
 
 
-def _delete_pr_comment(comment_id: int, token: str) -> None:
+def _delete_pr_comment(
+    owner: str,
+    repo: str,
+    comment_id: int,
+    token: str,
+) -> None:
     """Delete an existing PR comment."""
-    url = f"https://api.github.com/repos/issues/comments/{comment_id}"
+    url = f"https://api.github.com/repos/{owner}/{repo}/issues/comments/{comment_id}"
     _github_api_request("DELETE", url, token)
 
 
@@ -1035,7 +1079,7 @@ def _try_post_pr_comment(  # noqa: PLR0913
         if missing:
             body = _pr_comment_body(missing, command=command)
             if existing_id is not None:
-                _update_pr_comment(existing_id, body, token)
+                _update_pr_comment(owner, repo, existing_id, body, token)
                 print(
                     f"info: updated existing PR comment #{existing_id} "
                     "with reverse-coverage warnings",
@@ -1050,7 +1094,7 @@ def _try_post_pr_comment(  # noqa: PLR0913
                 )
         else:
             if existing_id is not None:
-                _delete_pr_comment(existing_id, token)
+                _delete_pr_comment(owner, repo, existing_id, token)
                 print(
                     f"info: deleted PR comment #{existing_id} "
                     "(no reverse-coverage warnings remaining)",

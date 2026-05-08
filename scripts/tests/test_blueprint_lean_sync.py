@@ -857,8 +857,8 @@ class PRCommentTests(unittest.TestCase):
 
     # ── find_bot_pr_comment idempotent selection ──────────────────────────
 
-    def _make_comment(self, cid: int, body: str) -> dict:
-        return {"id": cid, "body": body, "user": {"login": "github-actions[bot]"}}
+    def _make_comment(self, cid: int, body: str, *, user: str = "github-actions[bot]") -> dict:
+        return {"id": cid, "body": body, "user": {"login": user}}
 
     def _mock_api_response(self, status: int = 200, body: object = None) -> mock.MagicMock:
         """Build a mock ``urlopen`` context manager that returns the given status/body."""
@@ -881,8 +881,9 @@ class PRCommentTests(unittest.TestCase):
             self._make_comment(2, f"Bot report {_BLUEPRINT_COVERAGE_COMMENT_MARKER}"),
             self._make_comment(3, "another comment"),
         ]
-        with mock.patch("urllib.request.urlopen") as mock_urlopen:
-            mock_urlopen.return_value = self._mock_api_response(200, comments)
+        with mock.patch(
+            "blueprint_lean_sync._github_api_request_paginated", return_value=comments
+        ):
             cid = _find_bot_pr_comment("o", "r", 1, "tok")
         self.assertEqual(cid, 2)
 
@@ -891,16 +892,45 @@ class PRCommentTests(unittest.TestCase):
             self._make_comment(1, "regular comment"),
             self._make_comment(2, "another regular"),
         ]
-        with mock.patch("urllib.request.urlopen") as mock_urlopen:
-            mock_urlopen.return_value = self._mock_api_response(200, comments)
+        with mock.patch(
+            "blueprint_lean_sync._github_api_request_paginated", return_value=comments
+        ):
             cid = _find_bot_pr_comment("o", "r", 1, "tok")
         self.assertIsNone(cid)
 
     def test_find_bot_comment_returns_none_when_no_comments(self) -> None:
-        with mock.patch("urllib.request.urlopen") as mock_urlopen:
-            mock_urlopen.return_value = self._mock_api_response(200, [])
+        with mock.patch(
+            "blueprint_lean_sync._github_api_request_paginated", return_value=[]
+        ):
             cid = _find_bot_pr_comment("o", "r", 1, "tok")
         self.assertIsNone(cid)
+
+    def test_find_bot_comment_rejects_non_bot_author(self) -> None:
+        """A comment with the marker but authored by a regular user is ignored."""
+        comments = [
+            self._make_comment(
+                1, f"User comment {_BLUEPRINT_COVERAGE_COMMENT_MARKER}",
+                user="some-user",
+            ),
+        ]
+        with mock.patch(
+            "blueprint_lean_sync._github_api_request_paginated", return_value=comments
+        ):
+            cid = _find_bot_pr_comment("o", "r", 1, "tok")
+        self.assertIsNone(cid)
+
+    def test_find_bot_comment_paginates_across_pages(self) -> None:
+        """When first page is full (100 items) but no marker, it queries page 2."""
+        page1 = [self._make_comment(i, f"comment {i}") for i in range(100)]
+        page2 = [
+            self._make_comment(200, f"Bot {_BLUEPRINT_COVERAGE_COMMENT_MARKER}"),
+        ]
+        with mock.patch(
+            "blueprint_lean_sync._github_api_request_paginated",
+            return_value=page1 + page2,
+        ):
+            cid = _find_bot_pr_comment("o", "r", 1, "tok")
+        self.assertEqual(cid, 200)
 
     # ── _try_post_pr_comment orchestration ────────────────────────────────
 
@@ -944,7 +974,7 @@ class PRCommentTests(unittest.TestCase):
                 token="tok",
             )
         mock_find.assert_called_once()
-        mock_update.assert_called_once_with(99, mock.ANY, "tok")
+        mock_update.assert_called_once_with("o", "r", 99, mock.ANY, "tok")
         mock_create.assert_not_called()
         mock_delete.assert_not_called()
 
@@ -966,7 +996,7 @@ class PRCommentTests(unittest.TestCase):
                 token="tok",
             )
         mock_find.assert_called_once()
-        mock_delete.assert_called_once_with(99, "tok")
+        mock_delete.assert_called_once_with("o", "r", 99, "tok")
         mock_create.assert_not_called()
         mock_update.assert_not_called()
 
