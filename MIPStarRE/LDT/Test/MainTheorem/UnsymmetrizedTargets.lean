@@ -22,8 +22,10 @@ handoff to the native `ζ₄` point-consistency targets.
 ## References
 
 * Paper: `references/ldt-paper/inductive_step.tex`,
-  factor-two unsymmetrization estimates (lines 116–130),
-  pre-projective self-consistency and projective assembly (lines 154–172).
+  factor-two unsymmetrization estimates (`\label{eq:cons-a}`,
+  `\label{eq:cons-b}`; lines 104–108), cross-consistency chain
+  (`\label{eq:G-self-consistency}`; lines 109–133), and projective
+  assembly (lines 134–172).
 * Blueprint: `blueprint/src/chapter/ch10_induction.tex`,
   `\label{rem:main-formal-unsymmetrization-bridge}` and
   `\label{rem:main-formal-lean-residual-packages}`.

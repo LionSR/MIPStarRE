@@ -27,8 +27,10 @@ sub-leaves:
 ## References
 
 * Paper: `references/ldt-paper/inductive_step.tex`,
-  `\Cref{def:restricted-strategy}` and
-  `\Cref{lem:restricted-probabilities}` (lines 68–75).
+  `x`-restricted strategy definition and
+  `\Cref{lem:restricted-probabilities}` (lines 363–412).
 * Blueprint: `blueprint/src/chapter/ch10_induction.tex`,
+  `\label{def:restricted-strategy}`,
+  `\label{lem:restricted-probabilities}`, and
   `\label{def:main-formal-successor-boundary}`.
 -/
