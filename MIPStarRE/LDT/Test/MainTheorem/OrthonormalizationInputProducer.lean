@@ -58,7 +58,7 @@ Once those repair witnesses are available, this lemma gives the full
 `MainFormalPostRolePackageDiagonalOrthonormalizationInput` needed by the
 line-130 orthonormalization wrapper
 (`MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalInputs`). -/
-def of_roleResidual
+noncomputable def of_roleResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
