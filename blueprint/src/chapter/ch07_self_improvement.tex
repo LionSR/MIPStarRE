@@ -451,12 +451,12 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
 
 \begin{remark}[Lean slackness-carrying helper theorem]\label{rem:self-improvement-helper-with-slackness-theorem}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithSlackness}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithSlackness_of_sdpStatementWithSlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.self_improvement_helper_with_slackness_of_sdp_statement_with_slackness}
   The Lean development also records a strengthened helper theorem whose output
   carries the complementary-slackness equations used in the completeness chain.
   This theorem uses the Section~9 statement
-  \texttt{sdpStatementWithSlackness}; it is intentionally not marked
-  kernel-clean until the strong-duality proof is formalized.
+  \texttt{sdp_statement_with_slackness}; its blueprint tag intentionally carries
+  no proof-complete status until the strong-duality proof is formalized.
 \end{remark}
 
 \subsection{A Semidefinite Program}
@@ -617,7 +617,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness.primalMeasurement}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness}
-  \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness.toSdpStatement}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness.exists_measurement_witness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalBlockIndex}

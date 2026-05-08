@@ -6,7 +6,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.FinalFi
 
 This module records the abstract self-improvement theorem for the
 monotone-total route.  It gets complementary slackness from the Section 9
-statement `sdpStatementWithSlackness`, assumes the orthonormalization stage
+statement `sdp_statement_with_slackness`, assumes the orthonormalization stage
 supplies residual domination, and then assembles the final projective
 self-improvement conclusion without using the alphabet-size total-gap absorption
 route.
@@ -74,7 +74,7 @@ residual-dominating orthonormalization assemble a full self-improvement
 conclusion.
 
 This is the abstract version of the matrix-specific residual-domination bridge:
-the SDP stage is supplied by `sdpStatementWithSlackness`, while the
+the SDP stage is supplied by `sdp_statement_with_slackness`, while the
 construction-level orthonormalization hypothesis is stated through
 `OrthonormalizationResidualDominationInput`.  The point-consistency field is
 obtained through `final_fields_exists_of_helper_outputs_of_residual_domination`,

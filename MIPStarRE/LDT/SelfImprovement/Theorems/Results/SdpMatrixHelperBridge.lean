@@ -50,7 +50,7 @@ lemma selfImprovementHelperWithMatrixSdpSlacknessAndDominance
     ∃ T : Measurement (Polynomial params) ι,
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
         SelfImprovementHelperConclusionWithSlackness params strategy T H Z eps delta :=
-  selfImprovementHelperWithSlackness_of_sdpStatementWithSlackness
+  self_improvement_helper_with_slackness_of_sdp_statement_with_slackness
     params strategy eps delta gamma
     (MatrixSdpStatementWithSlacknessAndDominance.toSdpStatementWithSlackness
       params strategy hsdp)
@@ -98,7 +98,7 @@ lemma selfImprovementHelperWithCanonicalMatrixSdpSlacknessAndDominance
     ∃ T : Measurement (Polynomial params) ι,
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
         SelfImprovementHelperConclusionWithSlackness params strategy T H Z eps delta :=
-  selfImprovementHelperWithSlackness_of_sdpStatementWithSlackness
+  self_improvement_helper_with_slackness_of_sdp_statement_with_slackness
     params strategy eps delta gamma
     (sdpStatementWithSlackness_of_canonicalFeasibleComplementarySlackness
       params strategy X hX Z hdual hstrong hcanonical hOneLe)
@@ -122,7 +122,7 @@ lemma selfImprovementHelperWithCanonicalOptimalPairSdpSlacknessAndDominance
     ∃ T : Measurement (Polynomial params) ι,
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
         SelfImprovementHelperConclusionWithSlackness params strategy T H Z eps delta :=
-  selfImprovementHelperWithSlackness_of_sdpStatementWithSlackness
+  self_improvement_helper_with_slackness_of_sdp_statement_with_slackness
     params strategy eps delta gamma
     (sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance
       params strategy X Z hsdp)
@@ -148,7 +148,7 @@ lemma selfImprovementHelperWithCanonicalOptimalPairSdpSlackness_of_dualDominates
     ∃ T : Measurement (Polynomial params) ι,
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
         SelfImprovementHelperConclusionWithSlackness params strategy T H Z eps delta :=
-  selfImprovementHelperWithSlackness_of_sdpStatementWithSlackness
+  self_improvement_helper_with_slackness_of_sdp_statement_with_slackness
     params strategy eps delta gamma
     (sdpStatementWithSlackness_of_canonicalOptimalPair_of_dualDominatesIdentity
       params strategy X Z hsdp hOneLe)

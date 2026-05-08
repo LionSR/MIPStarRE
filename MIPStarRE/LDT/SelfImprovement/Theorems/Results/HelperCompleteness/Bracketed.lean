@@ -563,7 +563,7 @@ the canonical SDP form.
 The proof is deferred to the formalized strong-duality argument for the Section
 9 SDP.  This theorem records the unconditional paper statement used by the
 strengthened self-improvement helper. -/
-theorem sdpStatementWithSlackness
+theorem sdp_statement_with_slackness
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι) :

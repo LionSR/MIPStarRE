@@ -114,7 +114,7 @@ This is the paper-facing companion to `selfImprovementHelper` when the Section 9
 strong-duality conclusion has already been supplied as
 `SdpStatementWithSlackness`.  The helper output therefore carries the
 complementary-slackness equations needed by the helper-completeness chain. -/
-lemma selfImprovementHelperWithSlackness_of_sdpStatementWithSlackness
+lemma self_improvement_helper_with_slackness_of_sdp_statement_with_slackness
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -151,7 +151,7 @@ lemma selfImprovementHelperWithSlackness_of_sdpStatementWithSlackness
 slackness.
 
 This is the paper-facing companion to `selfImprovementHelper`: it applies the
-Section 9 statement `sdpStatementWithSlackness`, which records the strong-duality
+Section 9 statement `sdp_statement_with_slackness`, which records the strong-duality
 conclusion with complementary slackness.  The reduced theorem
 `selfImprovementHelper` remains separate, because its current `sdp` input has
 not yet formalized the strong-duality argument. -/
@@ -166,8 +166,8 @@ lemma selfImprovementHelperWithSlackness
     ∃ T : Measurement (Polynomial params) ι,
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
         SelfImprovementHelperConclusionWithSlackness params strategy T H Z eps delta :=
-  selfImprovementHelperWithSlackness_of_sdpStatementWithSlackness
-    params strategy eps delta gamma (sdpStatementWithSlackness params strategy)
+  self_improvement_helper_with_slackness_of_sdp_statement_with_slackness
+    params strategy eps delta gamma (sdp_statement_with_slackness params strategy)
     hgood nu G
 
 /-- `thm:self-improvement`.
