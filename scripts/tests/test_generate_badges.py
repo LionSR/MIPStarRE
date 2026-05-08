@@ -192,5 +192,69 @@ class BlueprintBadgeCountsTests(unittest.TestCase):
         self.assertEqual(not_ready, 1)
 
 
+class BlueprintBadgeCLITests(unittest.TestCase):
+    """CLI-level tests for ``--blueprint-src`` argument validation."""
+
+    def test_invalid_blueprint_src_prints_error_and_exits_nonzero(self) -> None:
+        """Passing a nonexistent --blueprint-src must fail with a clear error."""
+        import subprocess
+
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(SCRIPT_DIR / "generate_badges.py"),
+                "--blueprint-src",
+                "/nonexistent/path",
+                "--output-dir",
+                "/tmp",
+            ],
+            capture_output=True,
+            text=True,
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("--blueprint-src", result.stderr)
+        self.assertIn("does not exist", result.stderr)
+
+    def test_blueprint_src_without_chapter_subdir_fails(self) -> None:
+        """A path without a chapter/ subdirectory must also fail."""
+        import subprocess
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(SCRIPT_DIR / "generate_badges.py"),
+                    "--blueprint-src",
+                    tmp_dir,
+                    "--output-dir",
+                    "/tmp",
+                ],
+                capture_output=True,
+                text=True,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("chapter/", result.stderr)
+
+    def test_valid_blueprint_src_succeeds(self) -> None:
+        """A path with a chapter/ subdirectory must succeed."""
+        import subprocess
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            (Path(tmp_dir) / "chapter").mkdir()
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(SCRIPT_DIR / "generate_badges.py"),
+                    "--blueprint-src",
+                    tmp_dir,
+                    "--output-dir",
+                    "/tmp",
+                ],
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(result.returncode, 0)
+
+
 if __name__ == "__main__":
     unittest.main()

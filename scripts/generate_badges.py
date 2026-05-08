@@ -271,6 +271,13 @@ def main() -> None:
         if not blueprint_src.is_absolute():
             blueprint_src = repo_root / blueprint_src
 
+        chapter_dir = blueprint_src / "chapter"
+        if not blueprint_src.is_dir() or not chapter_dir.is_dir():
+            parser.error(
+                f"--blueprint-src path does not exist or lacks a 'chapter/' "
+                f"subdirectory: {blueprint_src}"
+            )
+
         # Import the blueprint parser (lazy, so the script still works without
         # the blueprint source tree checked out).
         sys.path.insert(0, str(repo_root / "scripts"))
