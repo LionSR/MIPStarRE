@@ -324,8 +324,8 @@ public `Test.mainFormal` theorem.
 
 The explicit `.{u,v}` universe binder decouples the universe of `FieldModel`'s
 carrier `K : Type u` from the universe of the dimension index `ι : Type v`.
-Without this separation, a caller that imposes `FieldModel.{0}` (as many
-`Test.MainTheorem` entry points do) would also force `ι` to `Type 0`,
+Without this separation, a proof that instantiates `FieldModel.{0}` (as many
+`Test.MainTheorem` applications do) would also force `ι` to `Type 0`,
 making it impossible to apply the hypothesis to the role-register space
 `Role × ι` when the index universe exceeds `0`. -/
 def AnswerMainInductionHypothesis.{u,v} (params : Parameters)
