@@ -4,9 +4,9 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.FinalFi
 /-!
 # Self-improvement with residual-dominating orthonormalization
 
-This module records the abstract self-improvement wrapper for the
-monotone-total route.  It gets complementary slackness from the visible Section
-9 producer `sdpStatementWithSlackness`, assumes the orthonormalization stage
+This module records the abstract self-improvement theorem for the
+monotone-total route.  It gets complementary slackness from the Section 9
+statement `sdpStatementWithSlackness`, assumes the orthonormalization stage
 supplies residual domination, and then assembles the final projective
 self-improvement conclusion without using the alphabet-size total-gap absorption
 route.
@@ -69,13 +69,13 @@ structure SelfImprovementSlacknessResidualDominationBridgeInputs
   orthonormalization :
     OrthonormalizationResidualDominationInput params strategy eps delta
 
-/-- The Section 9 SDP producer with complementary slackness and
+/-- The Section 9 SDP statement with complementary slackness and
 residual-dominating orthonormalization assemble a full self-improvement
 conclusion.
 
 This is the abstract version of the matrix-specific residual-domination bridge:
-the SDP stage is supplied by the visible `sdpStatementWithSlackness` producer,
-while the construction-level orthonormalization hypothesis is stated through
+the SDP stage is supplied by `sdpStatementWithSlackness`, while the
+construction-level orthonormalization hypothesis is stated through
 `OrthonormalizationResidualDominationInput`.  The point-consistency field is
 obtained through `final_fields_exists_of_helper_outputs_of_residual_domination`,
 so the proof does not invoke the total-gap term

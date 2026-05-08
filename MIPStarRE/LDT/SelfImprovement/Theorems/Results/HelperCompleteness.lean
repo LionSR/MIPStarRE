@@ -62,10 +62,10 @@ bounds, linearized SDP rewrites, and bracketed mass identities.
 - `helper_hhat_vs_z_of_self_consistency_and_helper_slackness` and
   `helper_completeness_of_self_consistency_helper_slackness_input_consistency`
   use the strengthened helper conclusion directly.
-- `sdp` and `addInU` are the reduced wrappers used by the surrounding
-  self-improvement theorem.
-- `sdpStatementWithSlackness` is the visible Section 9 strong-duality producer
-  obligation carrying complementary slackness.
+- `sdp` and `addInU` are the reduced Section 9 statements used by the
+  surrounding self-improvement theorem.
+- `sdpStatementWithSlackness` is the deferred Section 9 strong-duality statement
+  carrying complementary slackness.
 
 ## References
 

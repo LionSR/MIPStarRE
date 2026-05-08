@@ -552,7 +552,7 @@ lemma sdp_with_slackness
   sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance
     params strategy X Z hsdp
 
-/-- Paper-origin producer for `lem:sdp` with complementary slackness.
+/-- Paper-origin statement for `lem:sdp` with complementary slackness.
 
 Paper origin: `references/ldt-paper/self_improvement.tex` lines 62--88 state
 `\label{lem:sdp}` for the primal/dual SDP pair and assert optimal witnesses
@@ -560,11 +560,9 @@ Paper origin: `references/ldt-paper/self_improvement.tex` lines 62--88 state
 this by Slater strong duality and complementary slackness after passing through
 the canonical SDP form.
 
-This is the ledger `#1379` preferred visible obligation for the Section 9 SDP
-strong-duality producer and tracks issue `#1230`.  The current proof is kept as
-a single named `sorry`; downstream self-improvement wrappers consume this
-producer directly instead of taking `SdpStatementWithSlackness` as a hidden
-extra hypothesis. -/
+The proof is deferred to the formalized strong-duality argument for the Section
+9 SDP.  This theorem records the unconditional paper statement used by the
+strengthened self-improvement helper. -/
 theorem sdpStatementWithSlackness
     (params : Parameters)
     [FieldModel params.q]

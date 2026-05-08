@@ -20,7 +20,7 @@ and the bridge-input variants used to enter the self-improvement theorem.
 - **selfImprovementHelper** — reduced helper producing `T`, `Ĥ`, `Z` and
   `SelfImprovementHelperConclusion` from `sdp` + `addInU`.
 - **selfImprovementHelperWithSlackness** — companion helper producing the
-  slackness-carrying helper conclusion from the visible Section 9 SDP producer.
+  slackness-carrying helper conclusion from the Section 9 SDP statement.
 - **selfImprovement** — `thm:self-improvement`: assembles the full
   pipeline (helper SSC → orthonormalization → data processing →
   final fields) to produce `SelfImprovementConclusion`.
@@ -107,21 +107,19 @@ lemma selfImprovementHelper
   · simpa [T] using hsdp
   · exact addInU params strategy eps delta gamma hgood T
 
-/-- Helper lemma driven by the Section 9 SDP statement with complementary
-slackness.
+/-- Conditional form of the helper lemma from a slackness-carrying SDP
+conclusion.
 
-This is the paper-facing companion to `selfImprovementHelper`: it invokes the
-visible Section 9 producer `sdpStatementWithSlackness`, which records the
-strong-duality conclusion with complementary slackness.  The helper output
-therefore carries the complementary-slackness equations needed by the
-helper-completeness chain.  The reduced theorem `selfImprovementHelper` remains
-separate, because its current `sdp` input has not yet formalized the
-strong-duality argument. -/
-lemma selfImprovementHelperWithSlackness
+This is the paper-facing companion to `selfImprovementHelper` when the Section 9
+strong-duality conclusion has already been supplied as
+`SdpStatementWithSlackness`.  The helper output therefore carries the
+complementary-slackness equations needed by the helper-completeness chain. -/
+lemma selfImprovementHelperWithSlackness_of_sdpStatementWithSlackness
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
+    (hsdp : SdpStatementWithSlackness params strategy)
     (hgood : strategy.IsGood eps delta gamma)
     (_nu : Error)
     -- Kept for API compatibility with the full helper statement, where future
@@ -130,8 +128,7 @@ lemma selfImprovementHelperWithSlackness
     ∃ T : Measurement (Polynomial params) ι,
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
         SelfImprovementHelperConclusionWithSlackness params strategy T H Z eps delta := by
-  obtain ⟨Tsub, Z, hsdpPair⟩ :=
-    (sdpStatementWithSlackness params strategy).witness
+  obtain ⟨Tsub, Z, hsdpPair⟩ := hsdp.witness
   let T : Measurement (Polynomial params) ι :=
     { toSubMeas := Tsub
       total_eq_one := hsdpPair.toSdpOptimalPair.primalTotalOperator }
@@ -149,6 +146,29 @@ lemma selfImprovementHelperWithSlackness
     · exact addInU params strategy eps delta gamma hgood T
   · intro g
     simpa [T] using hsdpPair.complementarySlackness g
+
+/-- Helper lemma driven by the Section 9 SDP statement with complementary
+slackness.
+
+This is the paper-facing companion to `selfImprovementHelper`: it applies the
+Section 9 statement `sdpStatementWithSlackness`, which records the strong-duality
+conclusion with complementary slackness.  The reduced theorem
+`selfImprovementHelper` remains separate, because its current `sdp` input has
+not yet formalized the strong-duality argument. -/
+lemma selfImprovementHelperWithSlackness
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (nu : Error)
+    (G : Measurement (Polynomial params) ι) :
+    ∃ T : Measurement (Polynomial params) ι,
+      ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+        SelfImprovementHelperConclusionWithSlackness params strategy T H Z eps delta :=
+  selfImprovementHelperWithSlackness_of_sdpStatementWithSlackness
+    params strategy eps delta gamma (sdpStatementWithSlackness params strategy)
+    hgood nu G
 
 /-- `thm:self-improvement`.
 
