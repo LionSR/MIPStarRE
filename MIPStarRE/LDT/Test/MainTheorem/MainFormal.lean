@@ -66,7 +66,7 @@ Callers constructing `hbaseBridge` for `mainFormal` should instantiate this lemm
 with their per-role-residual repair witnesses and diagonal self-consistency proofs.
 
 Refs #1359, #1043. -/
-theorem repairedBridgeHypotheses_of_roleResidual
+noncomputable def repairedBridgeHypotheses_of_roleResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
