@@ -320,10 +320,17 @@ This is a Lean-only interface for the induction step in
 `inductive_step.tex`, lines 441--454.  It is deliberately stated at
 `mainInductionError` strength and for `AnswerSymStrat`, so callers can instantiate
 the paper-faithful `xRestrictedAnswerSymStrat` slices without appealing to the
-public `Test.mainFormal` theorem. -/
-def AnswerMainInductionHypothesis (params : Parameters)
-    [FieldModel params.q] : Prop :=
-  ∀ (ι : Type*) [Fintype ι] [DecidableEq ι],
+public `Test.mainFormal` theorem.
+
+The explicit `.{u,v}` universe binder decouples the universe of `FieldModel`'s
+carrier `K : Type u` from the universe of the dimension index `ι : Type v`.
+Without this separation, a proof that instantiates `FieldModel.{0}` (as many
+`Test.MainTheorem` applications do) would also force `ι` to `Type 0`,
+making it impossible to apply the hypothesis to the role-register space
+`Role × ι` when the index universe exceeds `0`. -/
+def AnswerMainInductionHypothesis.{u,v} (params : Parameters)
+    [FieldModel.{u} params.q] : Prop :=
+  ∀ (ι : Type v) [Fintype ι] [DecidableEq ι],
     ∀ (strategy : AnswerSymStrat params ι) (eps delta gamma : Error) (k : ℕ),
       0 < params.d →
         strategy.IsGood eps delta gamma →
