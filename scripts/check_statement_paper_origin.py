@@ -60,6 +60,8 @@ import re
 import sys
 from pathlib import Path
 
+from check_oversized_lean_files import _is_excluded
+
 # Suffixes treated as "statement-like" and thus subject to the paper-origin rule.
 SUFFIXES: tuple[str, ...] = (
     "Statement",
@@ -91,8 +93,6 @@ PAPER_PATH_RE = re.compile(r"references/ldt-paper/[^\s`]+\.tex")
 PAPER_GAP_RE = re.compile(r"docs/paper-gaps/[^\s`]+\.tex")
 LATEX_LABEL_RE = re.compile(r"\\label\{(?:lem|thm|prop|cor|def|eq|sec):[^}]+\}")
 
-EXCLUDE_DIRS: tuple[str, ...] = (".lake", "lake-packages", "tmp")
-
 
 def _has_origin(window: str) -> bool:
     """Return True if *window* contains any of the three accepted citation forms."""
@@ -101,16 +101,6 @@ def _has_origin(window: str) -> bool:
         or PAPER_GAP_RE.search(window)
         or LATEX_LABEL_RE.search(window)
     )
-
-
-def _is_excluded(path: Path, root: Path) -> bool:
-    if path.suffix != ".lean":
-        return True
-    try:
-        rel_parts = path.relative_to(root).parts
-    except ValueError:
-        return True
-    return any(d in rel_parts for d in EXCLUDE_DIRS)
 
 
 def _matches_suffix(name: str) -> bool:
@@ -151,13 +141,14 @@ def _preceding_docstring(lines: list[str], decl_idx: int) -> str:
 
     if stripped.endswith("-/"):
         end = i
-        # Walk back until we find the opening `/-` (which also covers `/--`
-        # and `/-!`).  Lean 4 does not ship nested doc-blocks, so the first
-        # `/-` we encounter on the way back opens the same block.
-        while i >= 0 and "/-" not in lines[i]:
+        # Walk back until the first non-whitespace characters are a block-comment
+        # opener (`/-`, `/--`, or `/-!`).  Literal mentions of `/-` inside the
+        # body of the docstring should not truncate the collected block.
+        while i >= 0 and not lines[i].lstrip().startswith("/-"):
             i -= 1
-        start = max(0, i)
-        return "\n".join(lines[start:end + 1])
+        if i < 0:
+            return ""
+        return "\n".join(lines[i:end + 1])
 
     return ""
 

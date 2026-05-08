@@ -159,6 +159,16 @@ class PrecedingDocstringTests(unittest.TestCase):
         window = _preceding_docstring(lines, 3)
         self.assertIn(r"\label{lem:bar}", window)
 
+    def test_multiline_doc_block_allows_comment_syntax_in_body(self) -> None:
+        lines = [
+            "/-- A citation appears before syntax prose: `\\label{lem:syntax}`.",
+            "  This line mentions Lean's block-comment delimiter `/-` in prose.",
+            "-/",
+            "structure SyntaxMention where",
+        ]
+        window = _preceding_docstring(lines, 3)
+        self.assertIn(r"\label{lem:syntax}", window)
+
     def test_blank_lines_skipped(self) -> None:
         lines = [
             "/-- cite `\\label{lem:baz}` -/",
