@@ -681,9 +681,9 @@ theorem mainFormal
   --   (the `hanswerSliceWitness` hypothesis)
   -- * #1043: construct `hbaseBridge` for base/successor cases
   --
-  -- FIXME: the scalar-cascade reasoning on lines 700–744 is now unused after
-  -- the successor-bridge refactor; it was the previous complex route through
-  -- `MainFormalCascadeRolePackageResidualProjectiveCompletionResidual`.
+  -- Note: the old scalar-cascade route through
+  -- has been replaced by the simple Route A pattern (see commit b4addb4).
+  -- has been replaced by the simple Route A pattern (see commit b4addb4).
 
   by_cases herr : 1 ≤ mainFormalError params k eps
   · exact mainFormal_trivial_witness params strategy eps k herr
@@ -700,10 +700,10 @@ theorem mainFormal
     · -- Successor case (m > 1): role residual from answer-valued
       -- successor bridge inputs.  The two bridge hypotheses
       -- `hanswerSliceWitness` and `hanswerSliceBridge` are supplied
-      -- externally (tracked by #931, #834, #1036).
-      let _hk_pos : 1 ≤ k := Nat.succ_le_of_lt hk0
+      -- externally (tracked by #1035, #1036).
+      let hk_pos : 1 ≤ k := Nat.succ_le_of_lt hk0
       rcases MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorBridgeInputs
-        hpass hm1 hd _hk_pos hk
+        hpass hm1 hd hk_pos hk
         (hanswerSliceWitness hm1) (hanswerSliceBridge hm1) with
         ⟨roleResidual⟩
       exact mainFormal_ofRoleResidualAndRepairedBridge herr roleResidual
