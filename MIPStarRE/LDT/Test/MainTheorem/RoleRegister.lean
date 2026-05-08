@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Test.MainTheorem.RoleRegister.Core
+import MIPStarRE.LDT.Test.MainTheorem.AnswerValuedRestriction
 
 /-!
 # Role-register residuals
