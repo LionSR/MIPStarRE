@@ -235,7 +235,11 @@ noncomputable def matrixGlobalVarianceDeviationAtPolynomial
 
 /-! ## Matrix statement packages -/
 
-/-- Matrix-level version of `lem:generalize-b`. -/
+/-- Paper origin: `references/ldt-paper/expansion.tex:273-291`
+(`\label{lem:generalize-b}`); matrix realization of the abstract
+`GeneralizeBStatement`.
+
+Matrix-level version of `lem:generalize-b`. -/
 structure MatrixGeneralizeBStatement (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params) : Prop where
   /-- Each fixed polynomial satisfies the claimed matrix deviation bound. -/
@@ -246,7 +250,11 @@ structure MatrixGeneralizeBStatement (params : Parameters) [FieldModel params.q]
   averagedDeviationBound :
     matrixGeneralizeBDeviation params model ≤ generalizeBError params
 
-/-- Matrix-level version of `lem:local-variance-of-points`. -/
+/-- Paper origin: `references/ldt-paper/expansion.tex:292-324`
+(`\label{lem:local-variance-of-points}`); matrix realization of the abstract
+`LocalVarianceOfPointsStatement`.
+
+Matrix-level version of `lem:local-variance-of-points`. -/
 structure MatrixLocalVarianceOfPointsStatement (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (eps delta : Error) : Prop where
@@ -260,7 +268,11 @@ structure MatrixLocalVarianceOfPointsStatement (params : Parameters) [FieldModel
     matrixPointConditionedLocalVariance params model ≤
       localVarianceOfPointsError params eps delta
 
-/-- Matrix-level version of `lem:global-variance-of-points`. -/
+/-- Paper origin: `references/ldt-paper/expansion.tex:325-353`
+(`\label{lem:global-variance-of-points}`); matrix realization of the abstract
+`GlobalVarianceOfPointsStatement`.
+
+Matrix-level version of `lem:global-variance-of-points`. -/
 structure MatrixGlobalVarianceOfPointsStatement (params : Parameters) [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (eps delta : Error) : Prop where

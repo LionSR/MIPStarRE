@@ -134,7 +134,12 @@ theorem matrixSdpOptimalWitnessWithDominance_of_canonicalFeasibleComplementarySl
   · exact matrixSdpCanonicalPrimalBlockMatrix_extracted_mul_dualSlack_of_canonical
       params model X hX Z hcanonical
 
-/-- Matrix-level statement of the strong-duality output for the SDP.
+/-- Paper origin: `references/ldt-paper/self_improvement.tex:82-181`
+(`\label{lem:sdp}`), with complementary slackness from
+`eq:complementary-slackness` at line 179; matrix realization of
+`SdpStatementWithSlackness`.
+
+Matrix-level statement of the strong-duality output for the SDP.
 
 This is the concrete matrix analogue of `SdpStatementWithSlackness`: it does
 not assert that the currently formalized reduced `sdp` witness is optimal.
@@ -149,7 +154,14 @@ structure MatrixSdpStatementWithSlackness (params : Parameters) [FieldModel para
       ∃ Z : MatrixOperator model.space,
         MatrixSdpOptimalWitness params model T Z
 
-/-- Matrix-level strong-duality statement with the additional dominance
+/-- Paper origin: `references/ldt-paper/self_improvement.tex:82-181`
+(`\label{lem:sdp}`), with complementary slackness from
+`eq:complementary-slackness` at line 179; matrix realization of
+`SdpStatementWithSlackness` enriched with the `I ≤ Z` dominance step
+(`references/ldt-paper/self_improvement.tex:200-201`,
+`eq:Z-greater-than-A`).
+
+Matrix-level strong-duality statement with the additional dominance
 condition needed by the reduced abstract helper interface.
 
 This is the matrix-side target for the downstream bridge into
