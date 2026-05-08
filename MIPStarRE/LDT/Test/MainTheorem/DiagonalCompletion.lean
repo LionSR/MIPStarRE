@@ -20,7 +20,7 @@ between the cross relation and the two self-relations used by orthonormalize-and
 
 * Paper: `references/ldt-paper/inductive_step.tex`,
   completing to projective measurements (lines 143–147).
-* Blueprint: `blueprint/src/chapter/ch10_induction.tex`,
+* Blueprint: `blueprint/src/chapter/ch04_projective.tex`,
   `\label{rem:lean-line169-projectivization-match-mass}`.
 -/
 

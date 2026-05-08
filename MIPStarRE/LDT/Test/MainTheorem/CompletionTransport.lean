@@ -21,12 +21,16 @@ monotonicity invariant.
 
 ## References
 
-* Paper: `references/ldt-paper/inductive_step.tex`,
-  `\Cref{lem:orthonormalization-main-lemma}` and
-  `\Cref{prop:completing-to-measurement}` (lines 135–143).
-* Blueprint: `blueprint/src/chapter/ch10_induction.tex`,
-  `\label{def:main-formal-step6-hypotheses}` and
-  `\label{rem:lean-line169-projectivization-match-mass}`.
+* Paper: `references/ldt-paper/orthonormalization.tex`,
+  `\Cref{lem:orthonormalization-main-lemma}` at line 282; and
+  `references/ldt-paper/preliminaries.tex`,
+  `\Cref{prop:completing-to-measurement}` at line 1101.
+  These are applied in `references/ldt-paper/inductive_step.tex`
+  (lines 135–143).
+* Blueprint: `blueprint/src/chapter/ch04_projective.tex`,
+  `\label{rem:lean-line169-projectivization-match-mass}`; and
+  `blueprint/src/chapter/ch10_induction.tex`,
+  `\label{def:main-formal-step6-hypotheses}`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

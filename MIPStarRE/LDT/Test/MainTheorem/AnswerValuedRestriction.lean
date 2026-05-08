@@ -6,7 +6,8 @@ import MIPStarRE.LDT.Test.MainTheorem.OrdinaryRestriction
 Answer-valued `x`-restricted successor route for the `mainFormal` assembly.
 This module parallels `OrdinaryRestriction` but works with the answer-side
 (`A`-register) `x`-restricted strategy (defined in
-`references/ldt-paper/inductive_step.tex` around line 363).  It introduces the answer-valued successor
+`references/ldt-paper/inductive_step.tex` around line 363).
+It introduces the answer-valued successor
 boundary (`MainFormalSuccessorAnswerBoundary`), recursive slice data
 (`MainFormalSuccessorAnswerRecursiveSliceData`), per-slice self-improvement
 producers (`MainFormalSuccessorAnswerSelfImprovementProducer`), and the

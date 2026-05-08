@@ -27,10 +27,13 @@ Base case, successor branch, and final assembly for `thm:main-formal`
 
 ## References
 
-* Paper: `references/ldt-paper/inductive_step.tex`,
-  `\Cref{thm:main-formal}` and its proof (lines 27–239).
-* Blueprint: `blueprint/src/chapter/ch10_induction.tex`,
-  `\label{thm:main-formal}`, `\label{def:main-formal-step6-hypotheses}`,
+* Paper: `references/ldt-paper/test_definition.tex`,
+  `\Cref{thm:main-formal}` at line 180; its proof is in
+  `references/ldt-paper/inductive_step.tex` (lines 26–236).
+* Blueprint: `blueprint/src/chapter/ch02_test.tex`,
+  `\label{thm:main-formal}`; and
+  `blueprint/src/chapter/ch10_induction.tex`,
+  `\label{def:main-formal-step6-hypotheses}`,
   `\label{lem:main-formal-successor-handoff}`.
 -/
 

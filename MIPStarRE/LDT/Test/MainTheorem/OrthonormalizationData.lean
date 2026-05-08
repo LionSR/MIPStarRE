@@ -32,11 +32,13 @@ invariant from `\label{rem:lean-line169-projectivization-match-mass}`.
 
 ## References
 
-* Paper: `references/ldt-paper/inductive_step.tex`,
-  `\Cref{lem:orthonormalization-main-lemma}` (lines 135–143).
-* Blueprint: `blueprint/src/chapter/ch10_induction.tex`,
-  `\label{def:main-formal-step6-hypotheses}` and
-  `\label{rem:lean-line169-projectivization-match-mass}`.
+* Paper: `references/ldt-paper/orthonormalization.tex`,
+  `\Cref{lem:orthonormalization-main-lemma}` at line 282.
+  Applied in `references/ldt-paper/inductive_step.tex` (lines 135–143).
+* Blueprint: `blueprint/src/chapter/ch04_projective.tex`,
+  `\label{rem:lean-line169-projectivization-match-mass}`; and
+  `blueprint/src/chapter/ch10_induction.tex`,
+  `\label{def:main-formal-step6-hypotheses}`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

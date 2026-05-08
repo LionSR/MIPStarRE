@@ -12,13 +12,24 @@ the five scalars that appear in the paper's error calculation:
 * `ζ₃` — the projective self-consistency error
 * `ζ₄` — the final point-consistency error
 
-The core structure `MainFormalCascadeScalars` (Prop) packages the standing
-hypotheses (`q > 0`, `k ≥ 1`, `m ≥ 1`, `0 ≤ ε ≤ 1`, `d ≤ q`), the five
-error bounds, and the checked inequalities `ζ₃/2 ≤ mainFormalError` and
-`ζ₄ ≤ mainFormalError`.  It also provides the vacuous-branch analysis
-(`mainFormalError_ge_one_of_*`), the bound on the symmetrized induction
-nu (`mainFormalInductionNu_bound`), and the coarsening lemma that absorbs
-`orthonormalizeAndCompleteError` into `ζ₂` (`orthonormalizeAndCompleteError_zeta1_le_zeta2`).
+The core structure `MainFormalCascadeScalars` (Prop) bundles the three
+hypotheses needed to invoke the checked Step 8 bound
+`errorCascade_le_mainFormalError`:
+
+* `cascadeHypotheses` — the standing scalar regime (`q > 0`, `k ≥ 1`,
+  `m ≥ 1`, `0 ≤ ε ≤ 1`, `d ≤ q`).
+* `inductionNu_nonneg` — nonnegativity of the symmetrized main-induction
+  `ν` at `(3ε, 3ε, 3ε)`.
+* `inductionNu_bound` — the paper line 71–73 coarsening
+  `ν ≤ 10000 k² m² (ε^{1/1024} + (d/q)^{1/1024})`.
+
+The cascade comparisons `ζ₁ ≤ …`, `ζ₃ ≤ 2·mainFormalError`, etc. are then
+derived in the private theorem `cascadeBounds` via
+`errorCascade_le_mainFormalError`, which calls the already-formalized
+error-cascade estimates from `LDT.Test.ErrorCascade`.  The module also
+provides the vacuous-branch analysis (`mainFormalError_ge_one_of_*`) and
+the coarsening lemma that absorbs `orthonormalizeAndCompleteError` into
+`ζ₂` (`orthonormalizeAndCompleteError_zeta1_le_zeta2`).
 
 ## References
 
