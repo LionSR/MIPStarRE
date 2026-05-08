@@ -54,8 +54,7 @@ lemma swapDensity_eq_reindex {ι : Type*}
   rcases y with ⟨j₁, j₂⟩
   rfl
 
-/-- `swapDensity` distributes over matrix multiplication via the reindex algebra
-equivalence. -/
+/-- `swapDensity` preserves matrix multiplication. -/
 lemma swapDensity_mul {ι : Type*} [Fintype ι]
     (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
     swapDensity (X * Y) = swapDensity X * swapDensity Y := by
