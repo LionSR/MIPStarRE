@@ -83,9 +83,16 @@ structure SdpStatement (params : Parameters) [FieldModel params.q]
 
 /-- SDP conclusion strengthened by complementary slackness.
 
-This is the statement shape expected from the paper's strong-duality argument:
-it has the same witnesses as `SdpStatement`, but their optimal-pair data also
-contains complementary slackness. -/
+Paper origin: `references/ldt-paper/self_improvement.tex` lines 62--88
+introduce the Section 9 primal/dual SDP pair and state `\label{lem:sdp}`:
+there is an optimal pair `{T_g}`, `Z` with `∑ g, T_g = I` and
+`T_g Z = T_g A_g` for every polynomial `g`.  Lines 168--190 then invoke
+Slater's condition, strong duality, and complementary slackness to derive these
+same measurement-total and slackness conclusions from the canonical SDP.
+
+This is the statement shape expected from that paper argument: it has the same
+witnesses as `SdpStatement`, but their optimal-pair data also contains
+complementary slackness. -/
 structure SdpStatementWithSlackness (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) : Prop where
   witness :

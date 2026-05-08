@@ -64,6 +64,8 @@ bounds, linearized SDP rewrites, and bracketed mass identities.
   use the strengthened helper conclusion directly.
 - `sdp` and `addInU` are the reduced wrappers used by the surrounding
   self-improvement theorem.
+- `sdpStatementWithSlackness` is the visible Section 9 strong-duality producer
+  obligation carrying complementary slackness.
 
 ## References
 

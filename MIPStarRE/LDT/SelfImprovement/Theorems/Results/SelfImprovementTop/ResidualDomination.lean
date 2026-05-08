@@ -5,10 +5,11 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.FinalFi
 # Self-improvement with residual-dominating orthonormalization
 
 This module records the abstract self-improvement wrapper for the
-monotone-total route.  It assumes the SDP stage already supplies complementary
-slackness and the orthonormalization stage supplies residual domination, and
-then assembles the final projective self-improvement conclusion without using
-the alphabet-size total-gap absorption route.
+monotone-total route.  It gets complementary slackness from the visible Section
+9 producer `sdpStatementWithSlackness`, assumes the orthonormalization stage
+supplies residual domination, and then assembles the final projective
+self-improvement conclusion without using the alphabet-size total-gap absorption
+route.
 
 ## References
 
@@ -68,12 +69,13 @@ structure SelfImprovementSlacknessResidualDominationBridgeInputs
   orthonormalization :
     OrthonormalizationResidualDominationInput params strategy eps delta
 
-/-- An SDP statement with complementary slackness and residual-dominating
-orthonormalization assemble a full self-improvement conclusion.
+/-- The Section 9 SDP producer with complementary slackness and
+residual-dominating orthonormalization assemble a full self-improvement
+conclusion.
 
 This is the abstract version of the matrix-specific residual-domination bridge:
-the SDP hypothesis is `SdpStatementWithSlackness`, while the construction-level
-orthonormalization hypothesis is stated through
+the SDP stage is supplied by the visible `sdpStatementWithSlackness` producer,
+while the construction-level orthonormalization hypothesis is stated through
 `OrthonormalizationResidualDominationInput`.  The point-consistency field is
 obtained through `final_fields_exists_of_helper_outputs_of_residual_domination`,
 so the proof does not invoke the total-gap term
@@ -86,7 +88,6 @@ lemma selfImprovementWithSlacknessAndResidualDominationInput
     (heps_le_one : eps ≤ 1)
     (hdelta_le_one : delta ≤ 1)
     (hd_le_q : (params.d : Error) ≤ (params.q : Error))
-    (hsdp : SdpStatementWithSlackness params strategy)
     (hgood : strategy.IsGood eps delta gamma)
     (G : Measurement (Polynomial params) ι)
     (hhelperCompleteness :
@@ -116,7 +117,7 @@ lemma selfImprovementWithSlacknessAndResidualDominationInput
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu := by
   obtain ⟨T, Hhat, Zout, hhelperWithSlackness⟩ :=
-    selfImprovementHelperWithSlackness params strategy eps delta gamma hsdp
+    selfImprovementHelperWithSlackness params strategy eps delta gamma
       hgood nu G
   let hhelper : SelfImprovementHelperConclusion params strategy T Hhat Zout eps delta :=
     hhelperWithSlackness.toHelperConclusion
@@ -171,7 +172,6 @@ lemma selfImprovementFromSlacknessResidualDominationBridgeInputs
     (heps_le_one : eps ≤ 1)
     (hdelta_le_one : delta ≤ 1)
     (hd_le_q : (params.d : Error) ≤ (params.q : Error))
-    (hsdp : SdpStatementWithSlackness params strategy)
     (hbridge :
       SelfImprovementSlacknessResidualDominationBridgeInputs
         params strategy eps delta nu)
@@ -180,7 +180,7 @@ lemma selfImprovementFromSlacknessResidualDominationBridgeInputs
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu :=
   selfImprovementWithSlacknessAndResidualDominationInput
-    params strategy eps delta gamma nu heps_le_one hdelta_le_one hd_le_q hsdp
+    params strategy eps delta gamma nu heps_le_one hdelta_le_one hd_le_q
     hgood G hbridge.helperCompleteness hbridge.helperStrongSelfConsistency
     hbridge.pointConsistencyTransfer hbridge.orthonormalization
 
@@ -204,7 +204,6 @@ lemma selfImprovementWithSlacknessAndQXPRepairAndCoisometry
     (heps_le_one : eps ≤ 1)
     (hdelta_le_one : delta ≤ 1)
     (hd_le_q : (params.d : Error) ≤ (params.q : Error))
-    (hsdp : SdpStatementWithSlackness params strategy)
     (hgood : strategy.IsGood eps delta gamma)
     (G : Measurement (Polynomial params) ι)
     (hhelperCompleteness :
@@ -254,7 +253,7 @@ lemma selfImprovementWithSlacknessAndQXPRepairAndCoisometry
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu :=
   selfImprovementWithSlacknessAndResidualDominationInput
-    params strategy eps delta gamma nu heps_le_one hdelta_le_one hd_le_q hsdp
+    params strategy eps delta gamma nu heps_le_one hdelta_le_one hd_le_q
     hgood G hhelperCompleteness hhelperSSCInput htransfer
     (orthonormalizationResidualDominationInput_of_spectral_qxpLayer_and_coisometry
       (params := params) (strategy := strategy) (eps := eps) (delta := delta)

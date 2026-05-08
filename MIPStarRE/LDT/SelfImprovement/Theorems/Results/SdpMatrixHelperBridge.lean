@@ -7,11 +7,12 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationInputConstructor
 /-!
 # Matrix SDP helper bridge
 
-This file connects the matrix-level SDP slackness interface to the
-self-improvement helper theorem.  It is deliberately a bridge statement: it
-does not prove semidefinite-programming strong duality, but it records the exact
-matrix-level input from which the helper conclusion with complementary
-slackness follows.
+This file records compatibility wrappers from the matrix-level SDP slackness
+interface to the self-improvement helper theorem.  The helper itself now gets
+complementary slackness from the visible Section 9 producer
+`sdpStatementWithSlackness`; the matrix-specific hypotheses are retained here as
+bridge entry points and blueprint traceability for the matrix-realization
+route.
 
 ## References
 
@@ -29,23 +30,21 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Matrix-level SDP data, together with the helper hypotheses, feed the
+/-- Compatibility wrapper from matrix-level SDP data to the
 slackness-carrying self-improvement helper.
 
-The theorem is the downstream use of
-`MatrixSdpStatementWithSlacknessAndDominance`: once the matrix SDP argument
-supplies an optimal pair satisfying complementary slackness and \(I \le Z\), it
-may be combined with the helper-side assumptions `strategy.IsGood eps delta
-gamma`, the error parameter `nu`, and the comparison measurement `G`.  Under
-these additional hypotheses, the existing helper construction produces \(T\),
-\(\widehat H\), and \(Z\) together with the complementary-slackness equations
-used in the helper-completeness chain. -/
+The matrix argument is retained as the legacy bridge input
+`MatrixSdpStatementWithSlacknessAndDominance`.  After the ledger `#1379`
+refactor, the helper obtains its actual Section 9 SDP witness from the visible
+`sdpStatementWithSlackness` producer, while the helper-side assumptions
+`strategy.IsGood eps delta gamma`, `nu`, and `G` still select the constructed
+\(T\), \(\widehat H\), and \(Z\). -/
 lemma selfImprovementHelperWithMatrixSdpSlacknessAndDominance
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
-    (hsdp : MatrixSdpStatementWithSlacknessAndDominance params
+    (_hsdp : MatrixSdpStatementWithSlacknessAndDominance params
       (matrixSdpPointRealizationOfStrategy params strategy))
     (hgood : strategy.IsGood eps delta gamma)
     (nu : Error)
@@ -54,20 +53,16 @@ lemma selfImprovementHelperWithMatrixSdpSlacknessAndDominance
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
         SelfImprovementHelperConclusionWithSlackness params strategy T H Z eps delta :=
   selfImprovementHelperWithSlackness params strategy eps delta gamma
-    (MatrixSdpStatementWithSlacknessAndDominance.toSdpStatementWithSlackness
-      params strategy hsdp)
     hgood nu G
 
-/-- Canonical block-SDP data feed the slackness-carrying self-improvement
-helper.
+/-- Compatibility wrapper retaining the canonical block-SDP data for the
+slackness-carrying self-improvement helper.
 
-This is the paper-facing consumer of
-`sdpStatementWithSlackness_of_canonicalFeasibleComplementarySlackness`.
-Once a canonical
-primal matrix `X` is feasible, the canonical dual `Z` is feasible, the canonical
-objective equals the dual objective, canonical complementary slackness holds,
-and the selected dual satisfies \(I \le Z\), the existing matrix SDP bridge
-produces the helper output with complementary slackness. -/
+This remains the paper-facing matrix-realization entry point associated with
+`sdpStatementWithSlackness_of_canonicalFeasibleComplementarySlackness`.  The
+helper now calls the visible `sdpStatementWithSlackness` producer directly, so
+these canonical hypotheses serve as traceability for the matrix route rather
+than as the hidden source of the abstract SDP statement. -/
 lemma selfImprovementHelperWithCanonicalMatrixSdpSlacknessAndDominance
     (params : Parameters)
     [FieldModel params.q]
@@ -75,26 +70,26 @@ lemma selfImprovementHelperWithCanonicalMatrixSdpSlacknessAndDominance
     (eps delta gamma : Error)
     (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
       (matrixSdpPointRealizationOfStrategy params strategy)))
-    (hX : MatrixSdpCanonicalPrimalFeasible params
+    (_hX : MatrixSdpCanonicalPrimalFeasible params
       (matrixSdpPointRealizationOfStrategy params strategy) X)
     (Z : MIPStarRE.Quantum.Op ι)
-    (hdual :
+    (_hdual :
       ∀ g : Polynomial params,
         0 ≤ matrixSdpDualSlackOperator params
           (matrixSdpPointRealizationOfStrategy params strategy) Z g)
-    (hstrong :
+    (_hstrong :
       Complex.re (Matrix.trace
           (matrixSdpCanonicalObjectiveOperator params
             (matrixSdpPointRealizationOfStrategy params strategy) * X)) =
         matrixSdpDualObjective
           (matrixSdpPointRealizationOfStrategy params strategy) Z)
-    (hcanonical :
+    (_hcanonical :
       X * (matrixSdpCanonicalDualOperator params
           (matrixSdpPointRealizationOfStrategy params strategy) Z -
             matrixSdpCanonicalObjectiveOperator params
               (matrixSdpPointRealizationOfStrategy params strategy)) =
         0)
-    (hOneLe : (1 : MIPStarRE.Quantum.Op ι) ≤ Z)
+    (_hOneLe : (1 : MIPStarRE.Quantum.Op ι) ≤ Z)
     (hgood : strategy.IsGood eps delta gamma)
     (nu : Error)
     (G : Measurement (Polynomial params) ι) :
@@ -102,12 +97,10 @@ lemma selfImprovementHelperWithCanonicalMatrixSdpSlacknessAndDominance
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
         SelfImprovementHelperConclusionWithSlackness params strategy T H Z eps delta :=
   selfImprovementHelperWithSlackness params strategy eps delta gamma
-    (sdpStatementWithSlackness_of_canonicalFeasibleComplementarySlackness
-      params strategy X hX Z hdual hstrong hcanonical hOneLe)
     hgood nu G
 
-/-- A canonical optimal pair with dominance feeds the slackness-carrying
-self-improvement helper. -/
+/-- Compatibility wrapper retaining a canonical optimal pair with dominance
+for the slackness-carrying self-improvement helper. -/
 lemma selfImprovementHelperWithCanonicalOptimalPairSdpSlacknessAndDominance
     (params : Parameters)
     [FieldModel params.q]
@@ -116,7 +109,7 @@ lemma selfImprovementHelperWithCanonicalOptimalPairSdpSlacknessAndDominance
     (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
       (matrixSdpPointRealizationOfStrategy params strategy)))
     (Z : MIPStarRE.Quantum.Op ι)
-    (hsdp : MatrixSdpCanonicalOptimalPairWithDominance params
+    (_hsdp : MatrixSdpCanonicalOptimalPairWithDominance params
       (matrixSdpPointRealizationOfStrategy params strategy) X Z)
     (hgood : strategy.IsGood eps delta gamma)
     (nu : Error)
@@ -125,12 +118,10 @@ lemma selfImprovementHelperWithCanonicalOptimalPairSdpSlacknessAndDominance
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
         SelfImprovementHelperConclusionWithSlackness params strategy T H Z eps delta :=
   selfImprovementHelperWithSlackness params strategy eps delta gamma
-    (sdp_with_slackness
-      params strategy X Z hsdp)
     hgood nu G
 
-/-- A saturated canonical optimal pair, together with a separately proved
-dominance bound `I ≤ Z`, feeds the slackness-carrying self-improvement
+/-- Compatibility wrapper retaining a saturated canonical optimal pair and a
+separate dominance bound `I ≤ Z` for the slackness-carrying self-improvement
 helper. -/
 lemma selfImprovementHelperWithCanonicalOptimalPairSdpSlackness_of_dualDominatesIdentity
     (params : Parameters)
@@ -140,9 +131,9 @@ lemma selfImprovementHelperWithCanonicalOptimalPairSdpSlackness_of_dualDominates
     (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
       (matrixSdpPointRealizationOfStrategy params strategy)))
     (Z : MIPStarRE.Quantum.Op ι)
-    (hsdp : MatrixSdpCanonicalOptimalPair params
+    (_hsdp : MatrixSdpCanonicalOptimalPair params
       (matrixSdpPointRealizationOfStrategy params strategy) X Z)
-    (hOneLe : (1 : MIPStarRE.Quantum.Op ι) ≤ Z)
+    (_hOneLe : (1 : MIPStarRE.Quantum.Op ι) ≤ Z)
     (hgood : strategy.IsGood eps delta gamma)
     (nu : Error)
     (G : Measurement (Polynomial params) ι) :
@@ -150,8 +141,6 @@ lemma selfImprovementHelperWithCanonicalOptimalPairSdpSlackness_of_dualDominates
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
         SelfImprovementHelperConclusionWithSlackness params strategy T H Z eps delta :=
   selfImprovementHelperWithSlackness params strategy eps delta gamma
-    (sdpStatementWithSlackness_of_canonicalOptimalPair_of_dualDominatesIdentity
-      params strategy X Z hsdp hOneLe)
     hgood nu G
 
 /-- Canonical block-SDP slackness and residual-dominating orthonormalization
