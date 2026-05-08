@@ -333,7 +333,7 @@ lemma stateDependentDistanceOpRel_mono
   exact ⟨le_trans h hle⟩
 
 /-- Symmetry of the operator-family state-dependent distance relation.
-Uses the shared `qSDDOp_symm` from `CommutativityPoints/SharedHelpers/Core`. -/
+Uses the shared `qSDDOp_symm` from `Preliminaries/ComparisonCore`. -/
 lemma sddOpRel_symm
     {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] [Fintype Outcome]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
