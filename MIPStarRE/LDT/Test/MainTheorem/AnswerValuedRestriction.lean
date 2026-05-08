@@ -3,7 +3,25 @@ import MIPStarRE.LDT.Test.MainTheorem.OrdinaryRestriction
 /-!
 # Answer-valued restricted-slice recursion
 
-Statement-preserving slice of `MIPStarRE.LDT.Test.MainTheorem`.
+Answer-valued `x`-restricted successor route for the `mainFormal` assembly.
+This module parallels `OrdinaryRestriction` but works with the answer-side
+(`A`-register) `x`-restricted strategy defined in
+`\Cref{def:restricted-strategy}`.  It introduces the answer-valued successor
+boundary (`MainFormalSuccessorAnswerBoundary`), recursive slice data
+(`MainFormalSuccessorAnswerRecursiveSliceData`), per-slice self-improvement
+producers (`MainFormalSuccessorAnswerSelfImprovementProducer`), and the
+corresponding bridge inputs (`MainFormalSuccessorAnswerSelfImprovementBridgeInputs`).
+The central public-wrapper theorem
+`mainFormalSuccessorAnswerMainInductionPublicWrapper` converts a bundle of
+predecessor answer-sided Section 6 inputs, together with the
+`400·m·d ≤ k` side condition, into a role-register measurement.
+
+## References
+
+* Paper: `references/ldt-paper/inductive_step.tex`,
+  `\Cref{def:restricted-strategy}` and `\Cref{lem:restricted-probabilities}`.
+* Blueprint: `blueprint/src/chapter/ch10_induction.tex`,
+  `\label{def:main-formal-successor-boundary}` (answer-valued aliases).
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
