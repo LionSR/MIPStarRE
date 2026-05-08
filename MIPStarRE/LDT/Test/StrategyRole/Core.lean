@@ -158,38 +158,6 @@ private lemma rolePairCond_nonneg {ι : Type*} [Fintype ι] [DecidableEq ι]
   reindex_nonneg (roleRegisterPairLocalEquiv ι)
     (opTensor_nonneg (rolePairProj_nonneg rL rR) hX)
 
-private lemma swapDensity_eq_reindex {ι : Type*}
-    (X : MIPStarRE.Quantum.Op (ι × ι)) :
-    swapDensity X = Matrix.reindex (Equiv.prodComm ι ι) (Equiv.prodComm ι ι) X := by
-  ext x y
-  rcases x with ⟨i₁, i₂⟩
-  rcases y with ⟨j₁, j₂⟩
-  rfl
-
-@[simp] private lemma swapDensity_swapDensity {ι : Type*}
-    (X : MIPStarRE.Quantum.Op (ι × ι)) :
-    swapDensity (swapDensity X) = X := by
-  ext x y
-  rcases x with ⟨i₁, i₂⟩
-  rcases y with ⟨j₁, j₂⟩
-  rfl
-
-@[simp] private lemma swapDensity_add {ι : Type*}
-    (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
-    swapDensity (X + Y) = swapDensity X + swapDensity Y := by
-  ext x y
-  rcases x with ⟨i₁, i₂⟩
-  rcases y with ⟨j₁, j₂⟩
-  rfl
-
-@[simp] private lemma swapDensity_smul {ι : Type*} (c : ℂ)
-    (X : MIPStarRE.Quantum.Op (ι × ι)) :
-    swapDensity (c • X) = c • swapDensity X := by
-  ext x y
-  rcases x with ⟨i₁, i₂⟩
-  rcases y with ⟨j₁, j₂⟩
-  rfl
-
 @[simp] private lemma swapDensity_real_smul {ι : Type*} (c : Error)
     (X : MIPStarRE.Quantum.Op (ι × ι)) :
     swapDensity (c • X) = c • swapDensity X := by
@@ -287,13 +255,6 @@ private lemma normalizedTrace_reindex {α β : Type*} [Fintype α] [Fintype β]
   simp_rw [Matrix.diag_apply, Matrix.reindex_apply]
   rw [← e.symm.sum_comp (fun i : α => X i i)]
   simp [hcard]
-
-private lemma swapDensity_mul {ι : Type*} [Fintype ι]
-    (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
-    swapDensity (X * Y) = swapDensity X * swapDensity Y := by
-  classical
-  simpa [swapDensity_eq_reindex] using
-    (Matrix.reindexAlgEquiv_mul ℂ ℂ (Equiv.prodComm ι ι) X Y)
 
 lemma normalizedTrace_swapDensity {ι : Type*} [Fintype ι]
     (X : MIPStarRE.Quantum.Op (ι × ι)) :

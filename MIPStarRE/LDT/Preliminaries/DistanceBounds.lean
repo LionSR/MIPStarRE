@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.Core
 import MIPStarRE.LDT.Preliminaries.ComparisonCore
 
 /-!
@@ -143,25 +142,6 @@ lemma stateDependentDistanceRel_mono
     SDDRel ψ 𝒟 A B δ' := by
   intro ⟨h⟩
   exact ⟨le_trans h hle⟩
-
--- NOTE: This private lemma duplicates `conjTranspose_mul_mono_local` in
--- `Pasting/BridgeLemmas/CommuteGHalfSandwich/Setup/Definitions.lean`.  The
--- duplication is intentional: Preliminaries cannot import Pasting (dependency
--- order).  If a shared location is established, this can be deduplicated.
-private lemma conjTranspose_mul_mono
-    {ι : Type*} [Fintype ι]
-    {X Y Z : MIPStarRE.Quantum.Op ι}
-    (hXY : X ≤ Y) :
-    Zᴴ * X * Z ≤ Zᴴ * Y * Z := by
-  apply sub_nonneg.mp
-  have hnonneg : 0 ≤ Zᴴ * (Y - X) * Z := by
-    -- This `simpa` intentionally bridges the PSD-facing matrix lemma with the
-    -- ordered-ring view used by the surrounding inequality proof.
-    simpa [Matrix.conjTranspose_conjTranspose] using
-      (Matrix.PosSemidef.mul_mul_conjTranspose_same
-        (Matrix.nonneg_iff_posSemidef.mp (sub_nonneg.mpr hXY))
-        Zᴴ).nonneg
-  simpa [mul_sub, sub_mul, Matrix.conjTranspose_conjTranspose, mul_assoc] using hnonneg
 
 lemma questionCabApproxDelta
     {Outcome Aux : Type*}
@@ -361,7 +341,7 @@ lemma sddOpRel_symm
     SDDOpRel ψ 𝒟 A B δ → SDDOpRel ψ 𝒟 B A δ := by
   intro ⟨h⟩
   constructor
-  simpa [sddErrorOp, MIPStarRE.LDT.CommutativityPoints.qSDDOp_symm] using h
+  simpa [sddErrorOp, qSDDOp_symm] using h
 
 /-- Transport a local raw-operator state-dependent distance estimate to the
 left tensor factor of a bipartite state.

@@ -154,7 +154,8 @@ lemma gHatReverseHalfProduct_sum_adjoint_mul_le_one
                 simpa [X] using ihr (pointTupleTail xs)
               have hherm : (G g)ᴴ = G g := by
                 simpa [G] using (gHatIdxMeas params family (xs 0)).outcome_hermitian g
-              simpa [X, hherm] using conjTranspose_mul_mono_local (Z := G g) hX
+              simpa [X, hherm] using
+                MIPStarRE.LDT.Preliminaries.conjTranspose_mul_mono (Z := G g) hX
         _ = ∑ g : GHatOutcome params, G g := by
               refine Finset.sum_congr rfl ?_
               intro g _
