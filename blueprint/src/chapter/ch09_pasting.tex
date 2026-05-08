@@ -519,15 +519,16 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 		6\sqrt{\zeta}+6\sqrt{\omega}+4\sqrt{\chi}.
 	\]
 \end{proof}
-\begin{remark}\label{rem:commutativity-switcheroo-permInv}
+\begin{lemma}[Switcheroo's permutation-invariance hypothesis]\label{lem:commutativity-switcheroo-permInv}
 	\lean{MIPStarRE.LDT.Pasting.commutativitySwitcheroo}
 	\leanok
-	The Lean formalization takes an additional hypothesis \texttt{PermInvState ψbi},
-	the permutation-invariance of the strategy state under the players' swap.
-	In the paper this is implicit in the symmetric two-prover strategy, and it is used
-	to identify $\bra{\psi} G \ot M \ket{\psi}$ with $\bra{\psi} M \ot G \ket{\psi}$
-	at the center of the triangle-inequality chain.
-\end{remark}
+	The Lean formalization of the switcheroo estimate takes an additional hypothesis
+	\texttt{PermInvState ψbi}, the permutation-invariance of the strategy state under
+	the players' swap. In the paper this is implicit in the symmetric two-prover
+	strategy, and it is used to identify
+	$\bra{\psi} G \ot M \ket{\psi}$ with $\bra{\psi} M \ot G \ket{\psi}$ at the
+	center of the triangle-inequality chain.
+\end{lemma}
 
 \begin{corollary}[Commutativity of the complete part]\label{cor:commuting-with-G-complete}
 	\lean{MIPStarRE.LDT.Pasting.commutingWithGComplete}
