@@ -399,9 +399,7 @@
 	boundary package.  The ordinary slice bridge records both Alice- and Bob-side
 	compatibility with the restricted point, axis-parallel, and diagonal
 	measurements; in particular, the formal lemmas
-	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedPointAgreement_le_ofSliceData,
-	MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedAxisParallel_le_ofSliceData,
-	MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedDiagonal_le_ofSliceData}
+	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedPointAgreement_le_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedAxisParallel_le_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedDiagonal_le_ofSliceData}
 	extract the restricted point-agreement, axis-parallel, and diagonal branch
 	bounds from the pinned slice's passing hypothesis.  On the answer-register
 	side, the slice bridge data now records
@@ -413,18 +411,9 @@
 \end{definition}
 
 \begin{definition}[Lean base-case Step~6 hypotheses for the Section~3 proof]\label{def:main-formal-step6-hypotheses}
-	\lean{MIPStarRE.LDT.Test.MainFormalBaseProjectiveCompletionHypotheses, MIPStarRE.LDT.Test.baseProjectiveCompletionResidual,
-		MIPStarRE.LDT.Test.MainFormalBaseBridgeHypotheses, MIPStarRE.LDT.Test.baseProjectiveCompletionHypotheses_ofBaseBridge,
-		MIPStarRE.LDT.Test.baseProjectiveCompletionResidual_ofBaseBridge}
-	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalCompletionInput.nonempty_ofDiagonalConsistencyAndMatchMassPreservation,
-		MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualProjectiveCompletionResidual.nonempty_ofRoleResidualAndDiagonalInputsAndMatchMassPreservation,
-		MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRepairInputs,
-		MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofQXPLayerRepairWitnesses,
-		MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofLiftedQXPApproximations}
-	\lean{MIPStarRE.LDT.Test.MainFormalBaseRepairedBridgeHypotheses,
-		MIPStarRE.LDT.Test.MainFormalRepairedBridgeHypotheses,
-		MIPStarRE.LDT.Test.baseMainFormal_ofRepairedBaseBridge,
-		MIPStarRE.LDT.Test.mainFormal_ofRoleResidualAndRepairedBridge}
+	\lean{MIPStarRE.LDT.Test.MainFormalBaseProjectiveCompletionHypotheses, MIPStarRE.LDT.Test.baseProjectiveCompletionResidual, MIPStarRE.LDT.Test.MainFormalBaseBridgeHypotheses, MIPStarRE.LDT.Test.baseProjectiveCompletionHypotheses_ofBaseBridge, MIPStarRE.LDT.Test.baseProjectiveCompletionResidual_ofBaseBridge}
+	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalCompletionInput.nonempty_ofDiagonalConsistencyAndMatchMassPreservation, MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualProjectiveCompletionResidual.nonempty_ofRoleResidualAndDiagonalInputsAndMatchMassPreservation, MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRepairInputs, MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofQXPLayerRepairWitnesses, MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofLiftedQXPApproximations}
+	\lean{MIPStarRE.LDT.Test.MainFormalBaseRepairedBridgeHypotheses, MIPStarRE.LDT.Test.MainFormalRepairedBridgeHypotheses, MIPStarRE.LDT.Test.baseMainFormal_ofRepairedBaseBridge, MIPStarRE.LDT.Test.mainFormal_ofRoleResidualAndRepairedBridge}
 	\leanok
 	\uses{def:main-formal-successor-boundary, thm:orthonormalization}
 	The structure \texttt{MainFormalBaseProjectiveCompletionHypotheses} bundles the still-unformalized
