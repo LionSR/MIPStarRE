@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.Core
 import MIPStarRE.LDT.Preliminaries.ComparisonCore
 
 /-!
@@ -351,30 +352,8 @@ lemma stateDependentDistanceOpRel_mono
   intro ⟨h⟩
   exact ⟨le_trans h hle⟩
 
--- NOTE: This private lemma duplicates the public `qSDDOp_symm` in
--- `CommutativityPoints/SharedHelpers/Core.lean`.  The duplication is
--- intentional: Preliminaries cannot import CommutativityPoints (dependency
--- order).  If a shared location is established, this can be deduplicated.
-private lemma qSDDOp_symm
-    {Outcome : Type*} {ι : Type*}
-    [Fintype ι] [DecidableEq ι] [Fintype Outcome]
-    (ψ : QuantumState ι) (A B : OpFamily Outcome ι) :
-    qSDDOp ψ A B = qSDDOp ψ B A := by
-  let F : Outcome → MIPStarRE.Quantum.Op ι := fun a => A.outcome a - B.outcome a
-  let G : Outcome → MIPStarRE.Quantum.Op ι := fun a => B.outcome a - A.outcome a
-  have hFG : F = fun a => -G a := by
-    funext a
-    dsimp [F, G]
-    abel
-  unfold qSDDOp qSDDCore
-  change ∑ a : Outcome, ev ψ ((F a)ᴴ * F a) = ∑ a : Outcome, ev ψ ((G a)ᴴ * G a)
-  rw [hFG]
-  refine Finset.sum_congr rfl ?_
-  intro a _
-  change ev ψ ((-G a)ᴴ * (-G a)) = ev ψ ((G a)ᴴ * G a)
-  simp
-
-/-- Symmetry of the operator-family state-dependent distance relation. -/
+/-- Symmetry of the operator-family state-dependent distance relation.
+Uses the shared `qSDDOp_symm` from `CommutativityPoints/SharedHelpers/Core`. -/
 lemma sddOpRel_symm
     {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] [Fintype Outcome]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
@@ -382,7 +361,7 @@ lemma sddOpRel_symm
     SDDOpRel ψ 𝒟 A B δ → SDDOpRel ψ 𝒟 B A δ := by
   intro ⟨h⟩
   constructor
-  simpa [sddErrorOp, qSDDOp_symm] using h
+  simpa [sddErrorOp, MIPStarRE.LDT.CommutativityPoints.qSDDOp_symm] using h
 
 /-- Transport a local raw-operator state-dependent distance estimate to the
 left tensor factor of a bipartite state.
