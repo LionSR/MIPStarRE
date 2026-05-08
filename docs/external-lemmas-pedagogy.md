@@ -45,7 +45,9 @@ plus project-local expectation lemmas (`ev_adjoint_self_nonneg`,
 `ev_abs_mul_le_sqrt`).  No external "Cauchy–Schwarz theorem" import is
 needed because the form used is a direct consequence of the
 *sum-of-sqrt-products* inequality, which Mathlib provides in
-`Mathlib/Data/Real/Sqrt.lean`.
+`Mathlib/Data/Real/Sqrt.lean`.  The project uses the `ℝ` version of
+`Real.sum_sqrt_mul_sqrt_le`, with pointwise nonnegativity hypotheses; the
+same file also contains the corresponding `NNReal` statement.
 
 **Pedagogical note**: The key insight is that
 `|∑ a, ψ(X_a Y_a)| ≤ (∑ a, ψ(X_a X_a†))^(1/2) · (∑ a, ψ(Y_a† Y_a))^(1/2)`
@@ -75,7 +77,7 @@ Not a candidate for Mathlib.
 
 **Mathlib source**: `Mathlib.Algebra.MvPolynomial.SchwartzZippel`
 
-The Mathlib lemma `MvPolynomial.schwartz_zippel` gives exactly this bound
+The Mathlib lemma `MvPolynomial.schwartz_zippel_totalDegree` gives exactly this bound
 for polynomials over any integral domain, with zero-probability measured
 as a cardinality ratio over the full product space.  The project wraps it:
 
@@ -85,7 +87,8 @@ abbrev polyFunc (m : ℕ) (K : Type*) [CommSemiring K] (d : ℕ) :
   MvPolynomial.restrictDegree (Fin m) K d
 ```
 
-Then the Schwartz–Zippel bound follows from `MvPolynomial.schwartz_zippel`.
+Then the Schwartz–Zippel bound follows from
+`MvPolynomial.schwartz_zippel_totalDegree`.
 
 **Pedagogical note**: Schwartz–Zippel is a standard result in theoretical
 computer science.  The Mathlib proof follows the classical induction on
@@ -205,9 +208,11 @@ finite-dimensional complex matrices.  Tracked at [#1250].
 
 **Lean files**:
 - `MIPStarRE/Quantum/FiniteMatrix.lean` — `Op d`, `normalizedTrace`,
-  `tauNormSq`, `IsProj`
+  `tauNormSq`, `IsProj`, `sandwich_nonneg`, `sandwich_mono`
 - `MIPStarRE/LDT/Basic/SubMeasurement.lean` — `SubMeas`, `Measurement`,
-  `ProjSubMeas`, `ProjMeas`, tensor-placement lemmas
+  `ProjSubMeas`, `ProjMeas`
+- `MIPStarRE/LDT/Basic/TensorPlacement.lean` — left/right tensor lifts
+- `MIPStarRE/LDT/Basic/QuantumState.lean` — `opTensor_nonneg`
 
 **What the paper assumes**: Standard matrix algebra facts about
 positively semidefinite operators, matrix multiplication, trace
@@ -218,15 +223,23 @@ matrix algebra; `Matrix.le_iff` and `Matrix.nonneg_iff_posSemidef`
 connect the order to PSD; `leftTensor`, `rightTensor`, and `opTensor`
 provide the Kronecker product; `Matrix.trace` provides the trace.
 
-Key Mathlib lemmas used but not reproved:
+Project-local lemmas used in this section, proved in the project:
 
-- `sandwich_nonneg` — PSD is preserved under `M·P·M` when `M` is Hermitian
-  and `P` is PSD
-- `sandwich_mono` — monotonicity under the same sandwich
-- `leftTensor_nonneg` / `rightTensor_nonneg` — PSD lifts through tensor
-  product with identity
-- `leftTensor_le_one` / `rightTensor_le_one` — the identity bound lifts
-- `opTensor_nonneg` — PSD is stable under Kronecker product
+- `sandwich_nonneg` / `sandwich_mono`
+  (`MIPStarRE/Quantum/FiniteMatrix.lean:96,103`) — PSD preservation and
+  monotonicity under `M·P·M` when `M` is Hermitian
+- `leftTensor_nonneg` / `rightTensor_nonneg`
+  (`MIPStarRE/LDT/Basic/TensorPlacement.lean:119,129`) — PSD lifts through
+  tensor product with identity
+- `leftTensor_le_one` / `rightTensor_le_one`
+  (`MIPStarRE/LDT/Basic/TensorPlacement.lean:139,150`) — the identity bound
+  lifts through tensor product with identity
+- `opTensor_nonneg` (`MIPStarRE/LDT/Basic/QuantumState.lean:213`) — PSD is
+  stable under Kronecker product
+
+These are local wrappers around Mathlib's `Matrix.PosSemidef` API, especially
+congruence preservation and Kronecker-product PSD facts; they are not Mathlib
+exports with these project names.
 
 **Pedagogical note**: The matrix order `A ≤ B` is defined as
 `B - A` is PSD.  The sandwich lemma `M·P·M ≥ 0` follows because
@@ -235,11 +248,10 @@ congruence.  Tensor product with identity preserves both PSD and the
 `≤ 1` bound because the eigenvalues of `A ⊗ I` are just the eigenvalues
 of `A`.
 
-**Upstream potential**: Most of these are standard Mathlib facts already.
-The project-local `sandwich_nonneg` and `sandwich_mono` could be
-upstreamed if Mathlib doesn't have the `Matrix`-flavored versions
-(Mathlib's `PosSemidef` API may already cover them under different
-names).
+**Upstream potential**: The project-local lemmas listed above are already used as trusted building
+blocks for PSD transport and tensor-product bounds in the codebase. If Mathlib
+exposes matching statements under standard names, these can be replaced without
+changing any mathematical content.
 
 ---
 
@@ -255,7 +267,7 @@ the `CFC.sqrt` of a PSD operator appears.
 Hermitian matrix via spectral decomposition, specifically `√A` for
 `A ≥ 0`.
 
-**Mathlib source**: `Mathlib.Analysis.CstarAlgebra.ContinuousFunctionalCalculus`
+**Mathlib source**: `Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus`
 provides the CFC.  For `Matrix ι ι ℂ`:
 
 - `CFC.sqrt_nonneg` — `0 ≤ A` ⇒ `0 ≤ √A`
@@ -345,12 +357,15 @@ Analogous to Polishchuk–Spielman but for the surface-vs-point test.
 ### Matrix Chernoff bound
 
 **Lean declaration**: `chernoffBernoulliMatrix` (internal, in
-`Pasting/Bernoulli/MatrixChernoff.lean`).
+`MIPStarRE/LDT/Pasting/Bernoulli/MatrixChernoff.lean`).
 
-This is a matrix-version of the Chernoff concentration bound, used for
-Bernoulli matrix sums.  The project proves this internal statement locally
-using CFC reduction plus a local scalar Hoeffding step; it is not kept
-as a standing `*Statement` hypothesis.
+This is a fully proved lemma — the project supplies a local proof:
+`MIPStarRE/LDT/Pasting/Bernoulli/MatrixChernoff.lean:78`
+establishes `ChernoffBernoulliMatrixStatement` from explicit local hypotheses
+and without any unresolved statement-style (`*Statement`) hypothesis.  No
+pending external `*Statement` premise remains for this lemma.  There remains
+a Mathlib gap for a general matrix Chernoff inequality (beyond this
+project-specific formalization).
 
 **Pedagogical note**: The classical Chernoff bound says that the sum of
 independent Bernoulli random variables concentrates exponentially around
