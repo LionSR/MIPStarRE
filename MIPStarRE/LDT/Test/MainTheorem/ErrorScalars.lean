@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Test.MainTheorem.AnswerValuedRestriction
+import MIPStarRE.LDT.Test.MainTheorem.ClassicalAndBase
 
 /-!
 # Main-formal error scalars

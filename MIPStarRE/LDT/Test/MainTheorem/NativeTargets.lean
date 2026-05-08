@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.Test.MainTheorem.DiagonalCompletion
-import MIPStarRE.LDT.Test.MainTheorem.ProjectiveConsistency
 
 /-!
 # Main-formal native targets

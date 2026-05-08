@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Test.MainTheorem.OrdinaryRestriction
+import MIPStarRE.LDT.Test.MainTheorem.ClassicalAndBase
 
 /-!
 # Answer-valued restricted-slice recursion
