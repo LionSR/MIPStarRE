@@ -1,5 +1,3 @@
-# ci-sync-version: claude-provider-deepseek-v1
-# ci-sync-source: shared Lean automation, prompts externalized under .github/prompts
 name: Issue Tracker
 
 on:
@@ -79,19 +77,8 @@ jobs:
           path: .trusted-actions
           fetch-depth: 1
 
-      - name: Check trusted provider wrapper
-        if: steps.claude-switch.outputs.skip != 'true'
-        id: trusted-provider-wrapper
-        run: |
-          if [ -f .trusted-actions/.github/actions/claude-code-with-provider/action.yml ]; then
-            echo "available=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "available=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::Skipping issue tracker: trusted base branch does not yet contain claude-code-with-provider."
-          fi
-
       - name: Run Claude Code
-        if: steps.claude-switch.outputs.skip != 'true' && steps.trusted-provider-wrapper.outputs.available == 'true'
+        if: steps.claude-switch.outputs.skip != 'true'
         id: claude
         uses: ./.trusted-actions/.github/actions/claude-code-with-provider
         with:
