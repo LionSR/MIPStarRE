@@ -86,10 +86,12 @@ number, or implementation history.
 
 ### Concrete examples
 
-The table below illustrates the naming norm with real examples from the
-codebase.  The "avoid" column lists process-shaped names that encode the
-history of how the formalization was assembled; the "prefer" column lists
-mathematical names that a reader of the paper or blueprint would recognize.
+The table below illustrates the naming norm with examples patterned on the
+codebase and on names seen during review.  Some entries are existing names;
+others are proposed names for future refactors.  The "avoid" column lists
+process-shaped names that encode the history of how the formalization was
+assembled; the "prefer" column lists mathematical names that a reader of the
+paper or blueprint would recognize.
 
 | Avoid (process-shaped)                        | Prefer (mathematical)                     | Rationale                                              |
 |:----------------------------------------------|:------------------------------------------|:-------------------------------------------------------|
@@ -97,12 +99,12 @@ mathematical names that a reader of the paper or blueprint would recognize.
 | `Line169`                                     | `CompletionTransport`                     | Paper Lemma 5.16, step that transports completed data  |
 | `Step6`                                       | `Orthonormalization`                      | Paper Section 5, the orthonormalization construction   |
 | `FinalAssembly`                               | `DiagonalCompletion`                      | Paper Lemma 5.17, constructing a diagonal POVM         |
-| `OneShotIneq`                                 | `SelfConsistencyDataProcessing`           | Paper's data-processing inequality for self-consistency |
-| `PipelineCheck`                               | `ErrorPropagationBound`                   | The bound that propagates error through the test       |
-| `QxpLayerWrapper`                             | `ProjectivePOVMCompletion`                | The construction from round-projectors to POVMs        |
+| `OneShotIneq`                                 | `SelfConsistencyDataProcessing` (or existing module `Preliminaries.SelfConsistency.DataProcessing`)           | Paper's data-processing inequality for self-consistency |
+| `PipelineCheck`                               | `ErrorPropagationBound` (proposed)                   | The bound that propagates error through the test       |
+| `QxpLayerWrapper`                             | `ProjectivePOVMCompletion` (proposed)                | The construction from round-projectors to POVMs        |
 | `RawSpectralTruncation`                       | `SpectralTruncation`                      | The paper's spectral truncation, not an "unwrapped" version |
-| `AddInUStep3To5`                              | `AddInUSupperExcessMass`                  | Paper Addendum in §U, the upper excess-mass estimate   |
-| `AddInUStep12`                                | `AddInUcommutationTail`                   | Paper Addendum in §U, the commutation tail estimate    |
+| `AddInUStep3To5`                              | `AddInUUpperExcessMass` (proposed)                  | Paper Addendum in §U, the upper excess-mass estimate   |
+| `AddInUStep12`                                | `AddInUCommutationTail` (proposed)                   | Paper Addendum in §U, the commutation tail estimate    |
 
 An avoided name is acceptable only when the cited paper itself uses that
 phrase as the mathematical name (e.g., a lemma the paper calls "Step 2").
@@ -135,11 +137,11 @@ Procedure:
 3. **Name mathematically.**  Give the shared helper a name that describes
    what it states, not which chapter it originally came from.
 4. **Replace call sites.**  Delete the chapter-local copies and replace
-   their uses with the shared helper.  If the chapter-local name was a
-   paper-facing term (e.g., "orthogonalization error bound" in Section 5),
-   keep a thin wrapper with the paper-facing name that calls the shared
-   helper.  Remove the wrapper once the paper-facing name is no longer
-   needed for external reference.
+   their uses with the shared helper.  A thin wrapper is allowed only when it
+   preserves a paper-facing or blueprint-facing name that external readers
+   need to search for; such wrappers should have a docstring or compatibility
+   comment explaining why the alias exists.  Remove the wrapper once that
+   paper-facing name is no longer needed for external reference.
 5. **Document.**  Add a docstring to the shared helper citing the paper or
    blueprint location it supports.
 
@@ -151,7 +153,9 @@ identifier cannot be renamed in the current PR, record the required migration
 in the issue, PR description, or an audit file under `audits/`.
 
 Do not add an empty pass-through abbreviation merely to introduce a second
-public name.
+public name.  This is different from the documented compatibility wrappers
+allowed in the shared-helper procedure above: a wrapper must preserve a
+paper-facing or blueprint-facing term and must say why the alias exists.
 
 ## Review Checklist
 
@@ -184,7 +188,8 @@ documentation prose.  Flag any item that fails.
       the issue, PR description, or an audit file?
 - [ ] **Pass-through names.**  Does the PR add an empty pass-through
       abbreviation that introduces a second public name without adding
-      mathematical content?  Reject if so.
+      mathematical content?  Reject it unless it is a documented compatibility
+      wrapper preserving paper-facing or blueprint-facing terminology.
 
 Review-fix PRs touching a surface covered by an active audit should read the
 relevant audit before changing names or prose.
