@@ -38,13 +38,6 @@ import tomllib
 from collections import defaultdict
 from pathlib import Path
 
-# Allow importing from the scripts/ directory (same directory as this file).
-_SCRIPT_DIR = Path(__file__).resolve().parent
-if str(_SCRIPT_DIR) not in sys.path:
-    sys.path.insert(0, str(_SCRIPT_DIR))
-
-from blueprint_lean_sync import _PROOF_BEARING_ENV_TYPES  # noqa: E402
-
 
 SORRY_RE = re.compile(r"\bsorry\b")
 AXIOM_RE = re.compile(
@@ -169,12 +162,18 @@ _SKIP_ENV_TYPES: frozenset[str] = frozenset({"remark", "example"})
 
 def _blueprint_badge_counts(
     entries: list,
+    proof_bearing_env_types: frozenset[str] | set[str],
 ) -> tuple[int, int]:
     """Return ``(no_leanok_count, not_ready_count)`` for **unique declarations**.
 
     The caller must pass a list of objects with attributes ``lean_decl``,
     ``has_leanok``, ``proof_has_leanok``, and ``env_type`` (the
     :class:`blueprint_lean_sync.BlueprintEntry` protocol).
+
+    ``proof_bearing_env_types``
+       The set of environment types (e.g. ``{"theorem", "lemma",
+       "proposition", "corollary"}``) that are expected to carry a proof.
+       Imported from ``blueprint_lean_sync._PROOF_BEARING_ENV_TYPES``.
 
     ``no_leanok_count``
        Number of unique ``lean_decl`` values that have **no** ``\\leanok``
@@ -213,7 +212,7 @@ def _blueprint_badge_counts(
             no_leanok += 1
 
         # --- not-ready: not fully formalized ---
-        is_proof_bearing = bool(env_types & _PROOF_BEARING_ENV_TYPES)
+        is_proof_bearing = bool(env_types & proof_bearing_env_types)
         is_skip_only = env_types <= _SKIP_ENV_TYPES
         if is_skip_only:
             # Remark/example-only: not a formalization target.
@@ -282,10 +281,16 @@ def main() -> None:
 
         # Import the blueprint parser (lazy, so the script still works without
         # the blueprint source tree checked out).
-        from blueprint_lean_sync import collect_blueprint_entries  # noqa: E402
+        sys.path.insert(0, str(repo_root / "scripts"))
+        from blueprint_lean_sync import (  # noqa: E402
+            _PROOF_BEARING_ENV_TYPES,
+            collect_blueprint_entries,
+        )
 
         entries = collect_blueprint_entries(blueprint_src)
-        no_leanok_count, not_ready_count = _blueprint_badge_counts(entries)
+        no_leanok_count, not_ready_count = _blueprint_badge_counts(
+            entries, _PROOF_BEARING_ENV_TYPES
+        )
 
         badge_records["blueprint_no_leanok.json"] = badge(
             r"blueprint: no \leanok",

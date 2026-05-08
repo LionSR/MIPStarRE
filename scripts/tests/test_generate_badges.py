@@ -20,6 +20,12 @@ from generate_badges import (  # noqa: E402
     count_pattern,
 )
 
+# Canonical proof-bearing environment types (must match
+# blueprint_lean_sync._PROOF_BEARING_ENV_TYPES).
+_TST_PROOF_BEARING_ENV_TYPES = frozenset(
+    {"theorem", "lemma", "proposition", "corollary"}
+)
+
 
 # ---------------------------------------------------------------------------
 # Minimal BlueprintEntry-alike for testing _blueprint_badge_counts
@@ -93,7 +99,7 @@ class BlueprintBadgeCountsTests(unittest.TestCase):
             _FakeBlueprintEntry("A"),
             _FakeBlueprintEntry("B"),
         ]
-        no_leanok, not_ready = _blueprint_badge_counts(entries)
+        no_leanok, not_ready = _blueprint_badge_counts(entries, _TST_PROOF_BEARING_ENV_TYPES)
         self.assertEqual(no_leanok, 2)
         self.assertEqual(not_ready, 2)
 
@@ -102,7 +108,7 @@ class BlueprintBadgeCountsTests(unittest.TestCase):
             _FakeBlueprintEntry("A", has_leanok=True, proof_has_leanok=True),
             _FakeBlueprintEntry("B", has_leanok=True, proof_has_leanok=True),
         ]
-        no_leanok, not_ready = _blueprint_badge_counts(entries)
+        no_leanok, not_ready = _blueprint_badge_counts(entries, _TST_PROOF_BEARING_ENV_TYPES)
         self.assertEqual(no_leanok, 0)
         self.assertEqual(not_ready, 0)
 
@@ -111,7 +117,7 @@ class BlueprintBadgeCountsTests(unittest.TestCase):
         entries = [
             _FakeBlueprintEntry("A", has_leanok=True, proof_has_leanok=False),
         ]
-        no_leanok, not_ready = _blueprint_badge_counts(entries)
+        no_leanok, not_ready = _blueprint_badge_counts(entries, _TST_PROOF_BEARING_ENV_TYPES)
         self.assertEqual(no_leanok, 0)  # has statement-level
         self.assertEqual(not_ready, 1)  # proof missing
 
@@ -119,7 +125,7 @@ class BlueprintBadgeCountsTests(unittest.TestCase):
         entries = [
             _FakeBlueprintEntry("A", has_leanok=True, env_type="definition"),
         ]
-        no_leanok, not_ready = _blueprint_badge_counts(entries)
+        no_leanok, not_ready = _blueprint_badge_counts(entries, _TST_PROOF_BEARING_ENV_TYPES)
         self.assertEqual(no_leanok, 0)
         self.assertEqual(not_ready, 0)
 
@@ -127,7 +133,7 @@ class BlueprintBadgeCountsTests(unittest.TestCase):
         entries = [
             _FakeBlueprintEntry("A", has_leanok=False, env_type="definition"),
         ]
-        no_leanok, not_ready = _blueprint_badge_counts(entries)
+        no_leanok, not_ready = _blueprint_badge_counts(entries, _TST_PROOF_BEARING_ENV_TYPES)
         self.assertEqual(no_leanok, 1)
         self.assertEqual(not_ready, 1)
 
@@ -135,7 +141,7 @@ class BlueprintBadgeCountsTests(unittest.TestCase):
         entries = [
             _FakeBlueprintEntry("A", has_leanok=False, env_type="remark"),
         ]
-        no_leanok, not_ready = _blueprint_badge_counts(entries)
+        no_leanok, not_ready = _blueprint_badge_counts(entries, _TST_PROOF_BEARING_ENV_TYPES)
         self.assertEqual(no_leanok, 1)
         self.assertEqual(not_ready, 0)  # remark-only: excluded denominator
 
@@ -145,7 +151,7 @@ class BlueprintBadgeCountsTests(unittest.TestCase):
             _FakeBlueprintEntry("A", has_leanok=True, env_type="remark"),
             _FakeBlueprintEntry("A", has_leanok=True, proof_has_leanok=False, env_type="lemma"),
         ]
-        no_leanok, not_ready = _blueprint_badge_counts(entries)
+        no_leanok, not_ready = _blueprint_badge_counts(entries, _TST_PROOF_BEARING_ENV_TYPES)
         self.assertEqual(no_leanok, 0)  # has statement
         self.assertEqual(not_ready, 1)  # proof-bearing, missing proof
 
@@ -155,7 +161,7 @@ class BlueprintBadgeCountsTests(unittest.TestCase):
             _FakeBlueprintEntry("A", has_leanok=True, proof_has_leanok=False, env_type="lemma"),
             _FakeBlueprintEntry("A", has_leanok=False, proof_has_leanok=True, env_type="remark"),
         ]
-        no_leanok, not_ready = _blueprint_badge_counts(entries)
+        no_leanok, not_ready = _blueprint_badge_counts(entries, _TST_PROOF_BEARING_ENV_TYPES)
         # Has both markers, even though spread across entries.
         self.assertEqual(no_leanok, 0)
         self.assertEqual(not_ready, 0)
@@ -166,7 +172,7 @@ class BlueprintBadgeCountsTests(unittest.TestCase):
             _FakeBlueprintEntry("B", has_leanok=False, env_type="definition"),
             _FakeBlueprintEntry("C", has_leanok=False, env_type="remark"),
         ]
-        no_leanok, not_ready = _blueprint_badge_counts(entries)
+        no_leanok, not_ready = _blueprint_badge_counts(entries, _TST_PROOF_BEARING_ENV_TYPES)
         self.assertEqual(no_leanok, 3)
         # A: lemma missing both → not ready (1)
         # B: def missing stmt → not ready (1)
@@ -185,7 +191,7 @@ class BlueprintBadgeCountsTests(unittest.TestCase):
         entries = [
             _FakeBlueprintEntry("A", has_leanok=False, proof_has_leanok=True),
         ]
-        no_leanok, not_ready = _blueprint_badge_counts(entries)
+        no_leanok, not_ready = _blueprint_badge_counts(entries, _TST_PROOF_BEARING_ENV_TYPES)
         # Has proof-level leanok, so NOT "no leanok".
         self.assertEqual(no_leanok, 0)
         # Proof-bearing, missing statement → not ready
