@@ -45,7 +45,9 @@ plus project-local expectation lemmas (`ev_adjoint_self_nonneg`,
 `ev_abs_mul_le_sqrt`).  No external "Cauchy–Schwarz theorem" import is
 needed because the form used is a direct consequence of the
 *sum-of-sqrt-products* inequality, which Mathlib provides in
-`Mathlib/Data/Real/Sqrt.lean`.
+`Mathlib/Data/Real/Sqrt.lean`.  The project uses the `ℝ` version of
+`Real.sum_sqrt_mul_sqrt_le`, with pointwise nonnegativity hypotheses; the
+same file also contains the corresponding `NNReal` statement.
 
 **Pedagogical note**: The key insight is that
 `|∑ a, ψ(X_a Y_a)| ≤ (∑ a, ψ(X_a X_a†))^(1/2) · (∑ a, ψ(Y_a† Y_a))^(1/2)`
@@ -206,9 +208,11 @@ finite-dimensional complex matrices.  Tracked at [#1250].
 
 **Lean files**:
 - `MIPStarRE/Quantum/FiniteMatrix.lean` — `Op d`, `normalizedTrace`,
-  `tauNormSq`, `IsProj`
+  `tauNormSq`, `IsProj`, `sandwich_nonneg`, `sandwich_mono`
 - `MIPStarRE/LDT/Basic/SubMeasurement.lean` — `SubMeas`, `Measurement`,
-  `ProjSubMeas`, `ProjMeas`, tensor-placement lemmas
+  `ProjSubMeas`, `ProjMeas`
+- `MIPStarRE/LDT/Basic/TensorPlacement.lean` — left/right tensor lifts
+- `MIPStarRE/LDT/Basic/QuantumState.lean` — `opTensor_nonneg`
 
 **What the paper assumes**: Standard matrix algebra facts about
 positively semidefinite operators, matrix multiplication, trace
@@ -221,13 +225,21 @@ provide the Kronecker product; `Matrix.trace` provides the trace.
 
 Project-local lemmas used in this section, proved in the project:
 
-- `sandwich_nonneg` — PSD is preserved under `M·P·M` when `M` is Hermitian
-  and `P` is PSD
-- `sandwich_mono` — monotonicity under the same sandwich
-- `leftTensor_nonneg` / `rightTensor_nonneg` — PSD lifts through tensor
-  product with identity
-- `leftTensor_le_one` / `rightTensor_le_one` — the identity bound lifts
-- `opTensor_nonneg` — PSD is stable under Kronecker product
+- `sandwich_nonneg` / `sandwich_mono`
+  (`MIPStarRE/Quantum/FiniteMatrix.lean:96,103`) — PSD preservation and
+  monotonicity under `M·P·M` when `M` is Hermitian
+- `leftTensor_nonneg` / `rightTensor_nonneg`
+  (`MIPStarRE/LDT/Basic/TensorPlacement.lean:119,129`) — PSD lifts through
+  tensor product with identity
+- `leftTensor_le_one` / `rightTensor_le_one`
+  (`MIPStarRE/LDT/Basic/TensorPlacement.lean:139,150`) — the identity bound
+  lifts through tensor product with identity
+- `opTensor_nonneg` (`MIPStarRE/LDT/Basic/QuantumState.lean:213`) — PSD is
+  stable under Kronecker product
+
+These are local wrappers around Mathlib's `Matrix.PosSemidef` API, especially
+congruence preservation and Kronecker-product PSD facts; they are not Mathlib
+exports with these project names.
 
 **Pedagogical note**: The matrix order `A ≤ B` is defined as
 `B - A` is PSD.  The sandwich lemma `M·P·M ≥ 0` follows because
