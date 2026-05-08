@@ -519,16 +519,17 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 		6\sqrt{\zeta}+6\sqrt{\omega}+4\sqrt{\chi}.
 	\]
 \end{proof}
-\begin{lemma}[Switcheroo's permutation-invariance hypothesis]\label{lem:commutativity-switcheroo-permInv}
-	\lean{MIPStarRE.LDT.Pasting.commutativitySwitcheroo}
-	\leanok
-	The Lean formalization of the switcheroo estimate takes an additional hypothesis
-	\texttt{PermInvState ψbi}, the permutation-invariance of the strategy state under
-	the players' swap. In the paper this is implicit in the symmetric two-prover
-	strategy, and it is used to identify
-	$\bra{\psi} G \ot M \ket{\psi}$ with $\bra{\psi} M \ot G \ket{\psi}$ at the
-	center of the triangle-inequality chain.
-\end{lemma}
+\begin{remark}\label{rem:commutativity-switcheroo-density-swap}
+	The Lean theorem corresponding to Lemma~\ref{lem:commutativity-switcheroo}
+	takes one extra symmetry hypothesis,
+	\texttt{hfix : swapDensity ψbi.density = ψbi.density}. This is the
+	\texttt{density\_swap} component of the paper's permutation-invariance
+	assumption on the symmetric two-prover strategy; the stronger
+	\texttt{swap\_ev} field of \texttt{PermInvState} is not assumed by this
+	theorem. The hypothesis is used to identify
+	$\bra{\psi} G \ot M \ket{\psi}$ with $\bra{\psi} M \ot G \ket{\psi}$
+	at the center of the triangle-inequality chain.
+\end{remark}
 
 \begin{corollary}[Commutativity of the complete part]\label{cor:commuting-with-G-complete}
 	\lean{MIPStarRE.LDT.Pasting.commutingWithGComplete}
