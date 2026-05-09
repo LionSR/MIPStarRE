@@ -451,11 +451,14 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.self_improvement_helper_with_slackness_of_sdp_statement_with_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndResidualDominationInput}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndQXPRepairAndCoisometry}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromSlacknessResidualDominationBridgeInputs}
   The formalization also records a strengthened helper theorem whose output
   carries the complementary-slackness equations used in the completeness chain,
   together with the residual-domination bridge that assembles the full
-  self-improvement conclusion from the slackness-carrying helper.
+  self-improvement conclusion from the slackness-carrying helper.  An
+  intermediate assembly route routes a QXP repair producer plus the
+  construction-level coisometry identity through the same bridge.
   These theorems use the Section~9 statement above. Their proofs are not yet
   complete, because the strong-duality proof for the SDP remains to be formalized.
 \end{remark}
