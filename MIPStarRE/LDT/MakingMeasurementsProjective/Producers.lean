@@ -9,10 +9,11 @@ orthogonalization argument.
 
 ## Scope
 
-The upstream **spectral-truncation stage** is already proved by
+The **spectral-truncation stage** (the first part of the proof of rounding
+to projectors) is already proved by
 `spectralTruncationInput_of_sourceAlmostProjective` in
 `MakingMeasurementsProjective/SpectralTruncation/ProjectiveNonMeasurement.lean`,
-which is fully wired through
+which is fully proved via
 `projectiveNonMeasurement_of_sourceAlmostProjective_full`. Proofs that
 require `SpectralTruncationInput` should call that declaration directly.
 
