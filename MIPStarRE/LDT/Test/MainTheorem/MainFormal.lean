@@ -88,6 +88,54 @@ abbrev MainFormalSuccessorAnswerSliceBridge (params : Parameters) [FieldModel.{0
     (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass successor.pred transportedStrategy eps
       transportedPass)
 
+/-- Producer for the answer-valued successor recursive-slice witnesses used by
+`mainFormal`.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-454`, in the proof of
+`\Cref{thm:main-induction}` inside `\label{sec:proof-of-main-induction}`, applies
+the inductive hypothesis to each $x$-restricted strategy and obtains the
+per-slice measurements $G^x$.
+
+Tracks #1035.  This is intentionally a visible producer declaration, rather than a
+hidden extra hypothesis on the public `mainFormal` theorem, so the remaining
+recursive-slice gap is grep-able. -/
+theorem mainFormalSuccessorAnswerSliceWitnessProducer
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) (eps : Error)
+    (hd : 0 < params.d)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (hk : 400 * params.m * params.d ≤ k)
+    (hm_ne_one : params.m ≠ 1) :
+    MainFormalSuccessorAnswerSliceWitness params strategy eps hpass k hm_ne_one := by
+  sorry
+
+/-- Producer for the answer-valued successor self-improvement bridge inputs used
+by `mainFormal`.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:456-485`, still in
+`\label{sec:proof-of-main-induction}`, applies
+`\Cref{thm:self-improvement-in-induction-section}`
+(`\label{thm:self-improvement-in-induction-section}` and items
+`\label{item:si-inductive-completeness}`,
+`\label{item:si-inductive-A-consistency}`,
+`\label{item:si-inductive-self}`, and
+`\label{item:si-inductive-boundedness}`) to each $G^x$.
+
+Tracks #1036.  The target is data-valued, so this producer is a
+`noncomputable def` rather than a theorem; the intentional proof placeholder is
+the visible Section 9 bridge gap instead of another public hypothesis package. -/
+noncomputable def mainFormalSuccessorAnswerSliceBridgeProducer
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) (eps : Error)
+    (hd : 0 < params.d)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (hk : 400 * params.m * params.d ≤ k)
+    (hm_ne_one : params.m ≠ 1) :
+    MainFormalSuccessorAnswerSliceBridge params strategy eps hpass k hm_ne_one := by
+  sorry
+
 /-! ### Orthonormalization-input bridge lemmas -/
 
 /-- Narrowed repaired base-case bridge for Step 6 when `params.m = 1`.
@@ -598,23 +646,21 @@ side condition is `400 * params.m * params.d ≤ k`. The public theorem therefor
 exposes this stronger hypothesis instead of trying to derive it from the paper's
 printed `params.m * params.d ≤ k` assumption.
 
-The theorem takes three bridge hypotheses that track remaining unformalized
-analytic content:
+The theorem takes one remaining public bridge hypothesis:
 
 * `hbaseBridge`: provides the line-130 orthonormalization input and diagonal
   consistency for both the base and successor dimensions.  (Tracked by #1043.)
-* `hanswerSliceWitness`: for the successor case (m > 1), provides the
-  answer-valued recursive slice witnesses per restricted predecessor slice.
-  (Tracked by #1035.)
-* `hanswerSliceBridge`: for the successor case, provides per-slice Section 9
-  self-improvement bridge inputs for the answer-valued restricted strategies.
-  (Tracked by #1036.)
 
 The base case (m = 1) uses `MainFormalRolePackageResidual.ofBaseCase` (already
-checked) and `hbaseBridge`.  The successor case wires the two answer-valued
-bridge hypotheses through
-`MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorBridgeInputs`
-and then finishes via `mainFormal_ofRoleResidualAndRepairedBridge`, exactly
+checked) and `hbaseBridge`.  The successor case is intentionally wired through
+two visible producer declarations with proof placeholders:
+`mainFormalSuccessorAnswerSliceWitnessProducer` (tracked by #1035) and
+`mainFormalSuccessorAnswerSliceBridgeProducer` (tracked by #1036).  These replace
+the previous extra public `mainFormal` hypotheses, so the missing analytic
+content remains grep-able rather than hidden in the theorem signature.  The
+produced inputs are then passed to
+`MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorBridgeInputs`,
+and the proof finishes via `mainFormal_ofRoleResidualAndRepairedBridge`, exactly
 mirroring the base case.
 
 Universe note: the Lean statement uses `[FieldModel.{0} params.q]`, matching the
@@ -623,7 +669,7 @@ This is a current Lean API limitation, not a paper constraint; once the Section 
 wrapper is universe-polymorphic, this public theorem should be generalized as
 well.
 
-Fixes #137, #239, #906, #1099.  Closes #1363 (the last `sorry` in the file).
+Fixes #137, #239, #906, #1099.  Refs #1035, #1036, #1363.
 -/
 theorem mainFormal
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -636,11 +682,7 @@ theorem mainFormal
     (hk0 : 0 < k)
     (hbaseBridge : (scalars : MainFormalCascadeScalars params eps k) →
       ∀ (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k),
-      MainFormalRepairedBridgeHypotheses params strategy eps k hpass scalars roleResidual)
-    (hanswerSliceWitness : ∀ (hm_ne_one : params.m ≠ 1),
-      MainFormalSuccessorAnswerSliceWitness params strategy eps hpass k hm_ne_one)
-    (hanswerSliceBridge : ∀ (hm_ne_one : params.m ≠ 1),
-      MainFormalSuccessorAnswerSliceBridge params strategy eps hpass k hm_ne_one) :
+      MainFormalRepairedBridgeHypotheses params strategy eps k hpass scalars roleResidual) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
@@ -665,24 +707,24 @@ theorem mainFormal
   -- * vacuous branch: `mainFormal_trivial_witness`.
   --
   -- The base case is fully checked (uses `MainFormalRolePackageResidual.ofBaseCase`).
-  -- The successor case (m > 1) now takes two explicit hypotheses
-  -- (`hanswerSliceWitness` and `hanswerSliceBridge`) that package the
-  -- answer-valued recursive slice witnesses and per-slice
-  -- self-improvement bridge inputs for the predecessor dimension.
-  -- These are wired through
+  -- The successor case (m > 1) uses two visible producer declarations,
+  -- `mainFormalSuccessorAnswerSliceWitnessProducer` (#1035) and
+  -- `mainFormalSuccessorAnswerSliceBridgeProducer` (#1036), instead of adding
+  -- those missing analytic packages as extra public hypotheses to `mainFormal`.
+  -- These producers are wired through
   -- `MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorBridgeInputs`
   -- to produce the role residual, then combined with `hbaseBridge` via
   -- `mainFormal_ofRoleResidualAndRepairedBridge` to finish the proof.
   --
   -- The remaining external obligations are tracked by:
   -- * #1036: construct `SelfImprovement.SelfImprovementBridgeInputs` per slice
-  --   (the `hanswerSliceBridge` hypothesis)
+  --   (the `mainFormalSuccessorAnswerSliceBridgeProducer` placeholder)
   -- * #1035: prove recursive `mainFormal` for successor restricted slices
-  --   (the `hanswerSliceWitness` hypothesis)
+  --   (the `mainFormalSuccessorAnswerSliceWitnessProducer` placeholder)
   -- * #1043: construct `hbaseBridge` for base/successor cases
   --
   -- Note: the old scalar-cascade route through
-  -- has been replaced by the simple Route A pattern (see commit b4addb4).
+  -- `MainFormalCascadeRolePackageResidualProjectiveCompletionResidual`
   -- has been replaced by the simple Route A pattern (see commit b4addb4).
 
   by_cases herr : 1 ≤ mainFormalError params k eps
@@ -698,13 +740,14 @@ theorem mainFormal
       exact mainFormal_ofRoleResidualAndRepairedBridge herr roleResidual
         (hbaseBridge scalars roleResidual)
     · -- Successor case (m > 1): role residual from answer-valued
-      -- successor bridge inputs.  The two bridge hypotheses
-      -- `hanswerSliceWitness` and `hanswerSliceBridge` are supplied
-      -- externally (tracked by #1035, #1036).
+      -- successor bridge inputs produced by the visible #1035/#1036 gaps above.
       let hk_pos : 1 ≤ k := Nat.succ_le_of_lt hk0
+      let hanswerSliceWitness :=
+        mainFormalSuccessorAnswerSliceWitnessProducer params strategy eps hd hpass k hk hm1
+      let hanswerSliceBridge :=
+        mainFormalSuccessorAnswerSliceBridgeProducer params strategy eps hd hpass k hk hm1
       rcases MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorBridgeInputs
-        hpass hm1 hd hk_pos hk
-        (hanswerSliceWitness hm1) (hanswerSliceBridge hm1) with
+        hpass hm1 hd hk_pos hk hanswerSliceWitness hanswerSliceBridge with
         ⟨roleResidual⟩
       exact mainFormal_ofRoleResidualAndRepairedBridge herr roleResidual
         (hbaseBridge scalars roleResidual)
