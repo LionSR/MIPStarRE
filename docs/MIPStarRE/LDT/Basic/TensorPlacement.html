@@ -1,0 +1,306 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../.././style.css"></link><link rel="icon" href="../../.././favicon.svg"></link><link rel="mask-icon" href="../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../.././/declarations/declaration-data.bmp" as="image"></link><title>MIPStarRE.LDT.Basic.TensorPlacement</title><script defer="true" src="../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../.././";</script><script>const MODULE_NAME="MIPStarRE.LDT.Basic.TensorPlacement";</script><script type="module" src="../../.././jump-src.js"></script><script type="module" src="../../.././search.js"></script><script type="module" src="../../.././expand-nav.js"></script><script type="module" src="../../.././how-about.js"></script><script type="module" src="../../.././instances.js"></script><script type="module" src="../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">Basic</span>.<span class="name">TensorPlacement</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/LionSR/MIPStarRE/blob/bb1839c7fc226c565160e0c96bdc1674c70d5f1a/MIPStarRE/LDT/Basic/TensorPlacement.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../.././Init.html">Init</a></li><li><a href="../../.././MIPStarRE/LDT/Basic/OperatorExpectations.html">MIPStarRE.LDT.Basic.OperatorExpectations</a></li><li><a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementCore.html">MIPStarRE.LDT.Basic.SubMeasurementCore</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-MIPStarRE.LDT.Basic.TensorPlacement" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#MIPStarRE.LDT.leftTensor_finset_sum"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">leftTensor_finset_sum</span></a></div><div class="nav_link"><a class="break_within" href="#MIPStarRE.LDT.ev_leftTensor_total_eq_sum_outcome"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">ev_leftTensor_total_eq_sum_outcome</span></a></div><div class="nav_link"><a class="break_within" href="#MIPStarRE.LDT.rightTensor_finset_sum"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">rightTensor_finset_sum</span></a></div><div class="nav_link"><a class="break_within" href="#MIPStarRE.LDT.leftTensor_mul_rightTensor_smul_left"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">leftTensor_mul_rightTensor_smul_left</span></a></div><div class="nav_link"><a class="break_within" href="#MIPStarRE.LDT.leftTensor_mul_rightTensor_smul_right"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">leftTensor_mul_rightTensor_smul_right</span></a></div><div class="nav_link"><a class="break_within" href="#MIPStarRE.LDT.leftTensor_mul_rightTensor_real_smul_left"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">leftTensor_mul_rightTensor_real_smul_left</span></a></div><div class="nav_link"><a class="break_within" href="#MIPStarRE.LDT.leftTensor_mul_rightTensor_real_smul_right"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">leftTensor_mul_rightTensor_real_smul_right</span></a></div><div class="nav_link"><a class="break_within" href="#MIPStarRE.LDT.leftTensor_nonneg"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">leftTensor_nonneg</span></a></div><div class="nav_link"><a class="break_within" href="#MIPStarRE.LDT.rightTensor_nonneg"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">rightTensor_nonneg</span></a></div><div class="nav_link"><a class="break_within" href="#MIPStarRE.LDT.leftTensor_le_one"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">leftTensor_le_one</span></a></div><div class="nav_link"><a class="break_within" href="#MIPStarRE.LDT.rightTensor_le_one"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">rightTensor_le_one</span></a></div><div class="nav_link"><a class="break_within" href="#MIPStarRE.LDT.SubMeas.opTensor_sum_filter_le_one"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">SubMeas</span>.<span class="name">opTensor_sum_filter_le_one</span></a></div><div class="nav_link"><a class="break_within" href="#MIPStarRE.LDT.sandwichTensorSummand_nonneg"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">sandwichTensorSummand_nonneg</span></a></div><div class="nav_link"><a class="break_within" href="#MIPStarRE.LDT.sandwichTensor_residual_sum_le_one"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">sandwichTensor_residual_sum_le_one</span></a></div></nav><main>
+<div class="mod_doc"><h1 id="Tensor-placement-helper-lemmas-and-sandwich-tensor-estimates" class="markdown-heading">Tensor-placement helper lemmas and sandwich tensor estimates <a class="hover-link" href="#Tensor-placement-helper-lemmas-and-sandwich-tensor-estimates">#</a></h1><p>Tensor-sum commutation, positivity/boundedness preservation,
+factoring lemmas, and sandwich-residual estimates used in
+the main induction step and polynomial-agreement arguments.</p></div><div class="mod_doc"><h3 id="Tensor-placement-helper-lemmas" class="markdown-heading">Tensor-placement helper lemmas <a class="hover-link" href="#Tensor-placement-helper-lemmas">#</a></h3></div><div class="decl" id="MIPStarRE.LDT.leftTensor_finset_sum"><div class="theorem"><div class="gh_link"><a href="https://github.com/LionSR/MIPStarRE/blob/bb1839c7fc226c565160e0c96bdc1674c70d5f1a/MIPStarRE/LDT/Basic/TensorPlacement.lean#L18-L30">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././MIPStarRE/LDT/Basic/TensorPlacement.html#MIPStarRE.LDT.leftTensor_finset_sum"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">leftTensor_finset_sum</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι₁</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι₂</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι₂</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn"><a href="../../.././MIPStarRE/Quantum/FiniteMatrix.html#MIPStarRE.Quantum.Op">Quantum.Op</a> <span class="fn">ι₁</span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">∑ <span class="fn">a</span> ∈ <span class="fn">s</span>, <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.leftTensor">leftTensor</a> <span class="fn">(<span class="fn">f</span> <span class="fn">a</span>)</span></span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.leftTensor">leftTensor</a> <span class="fn">(<span class="fn"><span class="fn">s</span>.<a href="../../.././Mathlib/Algebra/BigOperators/Group/Finset/Defs.html#Finset.sum">sum</a></span> <span class="fn">f</span>)</span></span></div></div><p>Left tensor placement commutes with finite sums.</p></div></div><div class="decl" id="MIPStarRE.LDT.ev_leftTensor_total_eq_sum_outcome"><div class="theorem"><div class="gh_link"><a href="https://github.com/LionSR/MIPStarRE/blob/bb1839c7fc226c565160e0c96bdc1674c70d5f1a/MIPStarRE/LDT/Basic/TensorPlacement.lean#L32-L50">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././MIPStarRE/LDT/Basic/TensorPlacement.html#MIPStarRE.LDT.ev_leftTensor_total_eq_sum_outcome"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">ev_leftTensor_total_eq_sum_outcome</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">ψ</span> : <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.QuantumState">QuantumState</a> (<span class="fn">ι</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">ι</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementCore.html#MIPStarRE.LDT.SubMeas">SubMeas</a> <span class="fn">α</span> <span class="fn">ι</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.ev">ev</a> <span class="fn">ψ</span> <span class="fn">(<a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.leftTensor">leftTensor</a> <span class="fn"><span class="fn">A</span>.<a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementCore.html#MIPStarRE.LDT.SubMeas.total">total</a></span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">∑ <span class="fn">a</span> : <span class="fn">α</span>, <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.ev">ev</a> <span class="fn">ψ</span> <span class="fn">(<a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.leftTensor">leftTensor</a> <span class="fn">(<span class="fn"><span class="fn">A</span>.<a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementCore.html#MIPStarRE.LDT.SubMeas.outcome">outcome</a></span> <span class="fn">a</span>)</span>)</span></span></span></div></div><p>Expanding the left-tensor mass of a submeasurement on a bipartite state as
+the sum of per-outcome left-tensor expectations.</p><p>This is a generic identity at the level of <code>ev ψ (leftTensor _)</code>: applying
+<code>SubMeas.sum_eq_total</code>, pulling <code>leftTensor</code> through the finite sum via
+<code><a href="../../.././MIPStarRE/LDT/Basic/TensorPlacement.html#MIPStarRE.LDT.leftTensor_finset_sum">leftTensor_finset_sum</a></code>, and distributing <code>ev</code> through the sum via
+<code>ev_finset_sum</code>. Using the definitional equalities
+<code>subMeasMass ψ A.liftLeft = ev ψ A.liftLeft.total = ev ψ (leftTensor A.total)</code>,
+this immediately yields the helper-stage opening
+<code>subMeasMass ψ A.liftLeft = ∑ a, ev ψ (leftTensor (A.outcome a))</code> used in the
+Section 9 / Section 12 calculations.</p></div></div><div class="decl" id="MIPStarRE.LDT.rightTensor_finset_sum"><div class="theorem"><div class="gh_link"><a href="https://github.com/LionSR/MIPStarRE/blob/bb1839c7fc226c565160e0c96bdc1674c70d5f1a/MIPStarRE/LDT/Basic/TensorPlacement.lean#L52-L64">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././MIPStarRE/LDT/Basic/TensorPlacement.html#MIPStarRE.LDT.rightTensor_finset_sum"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">rightTensor_finset_sum</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι₁</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι₂</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι₂</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Finset/Defs.html#Finset">Finset</a> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn"><a href="../../.././MIPStarRE/Quantum/FiniteMatrix.html#MIPStarRE.Quantum.Op">Quantum.Op</a> <span class="fn">ι₂</span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">∑ <span class="fn">a</span> ∈ <span class="fn">s</span>, <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.rightTensor">rightTensor</a> <span class="fn">(<span class="fn">f</span> <span class="fn">a</span>)</span></span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.rightTensor">rightTensor</a> <span class="fn">(<span class="fn"><span class="fn">s</span>.<a href="../../.././Mathlib/Algebra/BigOperators/Group/Finset/Defs.html#Finset.sum">sum</a></span> <span class="fn">f</span>)</span></span></div></div><p>Right tensor placement commutes with finite sums.</p></div></div><div class="decl" id="MIPStarRE.LDT.leftTensor_mul_rightTensor_smul_left"><div class="theorem"><div class="gh_link"><a href="https://github.com/LionSR/MIPStarRE/blob/bb1839c7fc226c565160e0c96bdc1674c70d5f1a/MIPStarRE/LDT/Basic/TensorPlacement.lean#L66-L77">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././MIPStarRE/LDT/Basic/TensorPlacement.html#MIPStarRE.LDT.leftTensor_mul_rightTensor_smul_left"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">leftTensor_mul_rightTensor_smul_left</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι₁</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι₂</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι₂</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">c</span> : <a href="../../.././MIPStarRE/LDT/Basic/ParametersBase.html#MIPStarRE.LDT.Error">Error</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <span class="fn"><a href="../../.././MIPStarRE/Quantum/FiniteMatrix.html#MIPStarRE.Quantum.Op">Quantum.Op</a> <span class="fn">ι₁</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <span class="fn"><a href="../../.././MIPStarRE/Quantum/FiniteMatrix.html#MIPStarRE.Quantum.Op">Quantum.Op</a> <span class="fn">ι₂</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.leftTensor">leftTensor</a> (<span class="fn">↑<span class="fn">c</span></span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">A</span>)</span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.rightTensor">rightTensor</a> <span class="fn">B</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">↑<span class="fn">c</span></span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> (<span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.leftTensor">leftTensor</a> <span class="fn">A</span></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.rightTensor">rightTensor</a> <span class="fn">B</span></span>)</div></div><p>A complex scalar on the left register factors out of a bipartite tensor product.</p><p>This is the tensor-placement version of bilinearity of <code>opTensor</code>: placing
+<code>c • A</code> on the left and multiplying by the right placement of <code>B</code> equals the
+same scalar multiplying <code>leftTensor A * rightTensor B</code>.</p></div></div><div class="decl" id="MIPStarRE.LDT.leftTensor_mul_rightTensor_smul_right"><div class="theorem"><div class="gh_link"><a href="https://github.com/LionSR/MIPStarRE/blob/bb1839c7fc226c565160e0c96bdc1674c70d5f1a/MIPStarRE/LDT/Basic/TensorPlacement.lean#L79-L90">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././MIPStarRE/LDT/Basic/TensorPlacement.html#MIPStarRE.LDT.leftTensor_mul_rightTensor_smul_right"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">leftTensor_mul_rightTensor_smul_right</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι₁</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι₂</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι₂</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">c</span> : <a href="../../.././MIPStarRE/LDT/Basic/ParametersBase.html#MIPStarRE.LDT.Error">Error</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <span class="fn"><a href="../../.././MIPStarRE/Quantum/FiniteMatrix.html#MIPStarRE.Quantum.Op">Quantum.Op</a> <span class="fn">ι₁</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <span class="fn"><a href="../../.././MIPStarRE/Quantum/FiniteMatrix.html#MIPStarRE.Quantum.Op">Quantum.Op</a> <span class="fn">ι₂</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.leftTensor">leftTensor</a> <span class="fn">A</span></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.rightTensor">rightTensor</a> (<span class="fn">↑<span class="fn">c</span></span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">B</span>)</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">↑<span class="fn">c</span></span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> (<span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.leftTensor">leftTensor</a> <span class="fn">A</span></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.rightTensor">rightTensor</a> <span class="fn">B</span></span>)</div></div><p>A complex scalar on the right register factors out of a bipartite tensor product.</p><p>This is the tensor-placement version of bilinearity of <code>opTensor</code>: placing
+<code>c • B</code> on the right and multiplying by the left placement of <code>A</code> equals the
+same scalar multiplying <code>leftTensor A * rightTensor B</code>.</p></div></div><div class="decl" id="MIPStarRE.LDT.leftTensor_mul_rightTensor_real_smul_left"><div class="theorem"><div class="gh_link"><a href="https://github.com/LionSR/MIPStarRE/blob/bb1839c7fc226c565160e0c96bdc1674c70d5f1a/MIPStarRE/LDT/Basic/TensorPlacement.lean#L92-L103">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././MIPStarRE/LDT/Basic/TensorPlacement.html#MIPStarRE.LDT.leftTensor_mul_rightTensor_real_smul_left"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">leftTensor_mul_rightTensor_real_smul_left</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι₁</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι₂</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι₂</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">c</span> : <a href="../../.././MIPStarRE/LDT/Basic/ParametersBase.html#MIPStarRE.LDT.Error">Error</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <span class="fn"><a href="../../.././MIPStarRE/Quantum/FiniteMatrix.html#MIPStarRE.Quantum.Op">Quantum.Op</a> <span class="fn">ι₁</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <span class="fn"><a href="../../.././MIPStarRE/Quantum/FiniteMatrix.html#MIPStarRE.Quantum.Op">Quantum.Op</a> <span class="fn">ι₂</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.leftTensor">leftTensor</a> (<span class="fn">c</span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">A</span>)</span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.rightTensor">rightTensor</a> <span class="fn">B</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">↑<span class="fn">c</span></span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> (<span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.leftTensor">leftTensor</a> <span class="fn">A</span></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.rightTensor">rightTensor</a> <span class="fn">B</span></span>)</div></div><p>A real scalar on the left register factors out of a bipartite tensor product.</p><p>This restates <code><a href="../../.././MIPStarRE/LDT/Basic/TensorPlacement.html#MIPStarRE.LDT.leftTensor_mul_rightTensor_smul_left">leftTensor_mul_rightTensor_smul_left</a></code> for the real scalar action
+used by <code>averageOperatorOverDistribution</code>, coercing the real scalar to <code>ℂ</code> on
+the tensor product.</p></div></div><div class="decl" id="MIPStarRE.LDT.leftTensor_mul_rightTensor_real_smul_right"><div class="theorem"><div class="gh_link"><a href="https://github.com/LionSR/MIPStarRE/blob/bb1839c7fc226c565160e0c96bdc1674c70d5f1a/MIPStarRE/LDT/Basic/TensorPlacement.lean#L105-L116">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././MIPStarRE/LDT/Basic/TensorPlacement.html#MIPStarRE.LDT.leftTensor_mul_rightTensor_real_smul_right"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">leftTensor_mul_rightTensor_real_smul_right</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι₁</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι₂</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι₂</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">c</span> : <a href="../../.././MIPStarRE/LDT/Basic/ParametersBase.html#MIPStarRE.LDT.Error">Error</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <span class="fn"><a href="../../.././MIPStarRE/Quantum/FiniteMatrix.html#MIPStarRE.Quantum.Op">Quantum.Op</a> <span class="fn">ι₁</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <span class="fn"><a href="../../.././MIPStarRE/Quantum/FiniteMatrix.html#MIPStarRE.Quantum.Op">Quantum.Op</a> <span class="fn">ι₂</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.leftTensor">leftTensor</a> <span class="fn">A</span></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.rightTensor">rightTensor</a> (<span class="fn">c</span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">B</span>)</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">↑<span class="fn">c</span></span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> (<span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.leftTensor">leftTensor</a> <span class="fn">A</span></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.rightTensor">rightTensor</a> <span class="fn">B</span></span>)</div></div><p>A real scalar on the right register factors out of a bipartite tensor product.</p><p>This restates <code><a href="../../.././MIPStarRE/LDT/Basic/TensorPlacement.html#MIPStarRE.LDT.leftTensor_mul_rightTensor_smul_right">leftTensor_mul_rightTensor_smul_right</a></code> for the real scalar action
+used by <code>averageOperatorOverDistribution</code>, coercing the real scalar to <code>ℂ</code> on
+the tensor product.</p></div></div><div class="decl" id="MIPStarRE.LDT.leftTensor_nonneg"><div class="theorem"><div class="gh_link"><a href="https://github.com/LionSR/MIPStarRE/blob/bb1839c7fc226c565160e0c96bdc1674c70d5f1a/MIPStarRE/LDT/Basic/TensorPlacement.lean#L118-L126">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././MIPStarRE/LDT/Basic/TensorPlacement.html#MIPStarRE.LDT.leftTensor_nonneg"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">leftTensor_nonneg</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι₁</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι₂</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../.././MIPStarRE/Quantum/FiniteMatrix.html#MIPStarRE.Quantum.Op">Quantum.Op</a> <span class="fn">ι₁</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hA</span> : <span class="fn">0</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">A</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">0</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.leftTensor">leftTensor</a> <span class="fn">A</span></span></div></div><p>Left tensor placement preserves positivity.</p></div></div><div class="decl" id="MIPStarRE.LDT.rightTensor_nonneg"><div class="theorem"><div class="gh_link"><a href="https://github.com/LionSR/MIPStarRE/blob/bb1839c7fc226c565160e0c96bdc1674c70d5f1a/MIPStarRE/LDT/Basic/TensorPlacement.lean#L128-L136">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././MIPStarRE/LDT/Basic/TensorPlacement.html#MIPStarRE.LDT.rightTensor_nonneg"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">rightTensor_nonneg</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι₁</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι₂</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../.././MIPStarRE/Quantum/FiniteMatrix.html#MIPStarRE.Quantum.Op">Quantum.Op</a> <span class="fn">ι₂</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hA</span> : <span class="fn">0</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">A</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">0</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.rightTensor">rightTensor</a> <span class="fn">A</span></span></div></div><p>Right tensor placement preserves positivity.</p></div></div><div class="decl" id="MIPStarRE.LDT.leftTensor_le_one"><div class="theorem"><div class="gh_link"><a href="https://github.com/LionSR/MIPStarRE/blob/bb1839c7fc226c565160e0c96bdc1674c70d5f1a/MIPStarRE/LDT/Basic/TensorPlacement.lean#L138-L147">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././MIPStarRE/LDT/Basic/TensorPlacement.html#MIPStarRE.LDT.leftTensor_le_one"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">leftTensor_le_one</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι₁</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι₂</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../.././MIPStarRE/Quantum/FiniteMatrix.html#MIPStarRE.Quantum.Op">Quantum.Op</a> <span class="fn">ι₁</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hA</span> : <span class="fn">A</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">1</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.leftTensor">leftTensor</a> <span class="fn">A</span></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">1</span></div></div><p>Left tensor placement preserves the operator bound <code>≤ 1</code>.</p></div></div><div class="decl" id="MIPStarRE.LDT.rightTensor_le_one"><div class="theorem"><div class="gh_link"><a href="https://github.com/LionSR/MIPStarRE/blob/bb1839c7fc226c565160e0c96bdc1674c70d5f1a/MIPStarRE/LDT/Basic/TensorPlacement.lean#L149-L157">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././MIPStarRE/LDT/Basic/TensorPlacement.html#MIPStarRE.LDT.rightTensor_le_one"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">rightTensor_le_one</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι₁</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι₂</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../.././MIPStarRE/Quantum/FiniteMatrix.html#MIPStarRE.Quantum.Op">Quantum.Op</a> <span class="fn">ι₂</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hA</span> : <span class="fn">A</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">1</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.rightTensor">rightTensor</a> <span class="fn">A</span></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">1</span></div></div><p>Right tensor placement preserves the operator bound <code>≤ 1</code>.</p></div></div><div class="decl" id="MIPStarRE.LDT.SubMeas.opTensor_sum_filter_le_one"><div class="theorem"><div class="gh_link"><a href="https://github.com/LionSR/MIPStarRE/blob/bb1839c7fc226c565160e0c96bdc1674c70d5f1a/MIPStarRE/LDT/Basic/TensorPlacement.lean#L161-L184">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././MIPStarRE/LDT/Basic/TensorPlacement.html#MIPStarRE.LDT.SubMeas.opTensor_sum_filter_le_one"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">SubMeas</span>.<span class="name">opTensor_sum_filter_le_one</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">S </span><span class="fn">T</span> : <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementCore.html#MIPStarRE.LDT.SubMeas">SubMeas</a> <span class="fn">α</span> <span class="fn">ι</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">P</span> : <span class="fn"><span class="fn">α</span> → <a href="../../.././foundational_types.html">Prop</a></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidablePred">DecidablePred</a> <span class="fn">P</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn">∑ <span class="fn">x</span> : <span class="fn">α</span> with <span class="fn">P</span> <span class="fn">x</span>, <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.opTensor">opTensor</a> <span class="fn">(<span class="fn"><span class="fn">S</span>.<a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementCore.html#MIPStarRE.LDT.SubMeas.outcome">outcome</a></span> <span class="fn">x</span>)</span> <span class="fn">(<span class="fn"><span class="fn">T</span>.<a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementCore.html#MIPStarRE.LDT.SubMeas.outcome">outcome</a></span> <span class="fn">x</span>)</span></span></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">1</span></div></div><p>A filtered diagonal tensor sum of two submeasurements is a contraction.</p><p>The estimate uses only positivity and the submeasurement total bound on the
+left factor, together with the pointwise <code>≤ 1</code> bound on the right factor.</p></div></div><div class="mod_doc"><h3 id="Sandwich-tensor-estimates" class="markdown-heading">Sandwich tensor estimates <a class="hover-link" href="#Sandwich-tensor-estimates">#</a></h3></div><div class="decl" id="MIPStarRE.LDT.sandwichTensorSummand_nonneg"><div class="theorem"><div class="gh_link"><a href="https://github.com/LionSR/MIPStarRE/blob/bb1839c7fc226c565160e0c96bdc1674c70d5f1a/MIPStarRE/LDT/Basic/TensorPlacement.lean#L190-L210">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././MIPStarRE/LDT/Basic/TensorPlacement.html#MIPStarRE.LDT.sandwichTensorSummand_nonneg"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">sandwichTensorSummand_nonneg</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">γ</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">β</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">γ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">ψ</span> : <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.QuantumState">QuantumState</a> (<span class="fn">ι</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">ι</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">Outer</span> : <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementCore.html#MIPStarRE.LDT.SubMeas">SubMeas</a> <span class="fn">β</span> <span class="fn">ι</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">Inner</span> : <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementCore.html#MIPStarRE.LDT.SubMeas">SubMeas</a> <span class="fn">α</span> <span class="fn">ι</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">Right</span> : <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementCore.html#MIPStarRE.LDT.SubMeas">SubMeas</a> <span class="fn">γ</span> <span class="fn">ι</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">o</span> : <span class="fn">β</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">i</span> : <span class="fn">α</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn">γ</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">0</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.ev">ev</a> <span class="fn">ψ</span> (<span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.leftTensor">leftTensor</a> (<span class="fn"><span class="fn"><span class="fn">Outer</span>.<a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementCore.html#MIPStarRE.LDT.SubMeas.outcome">outcome</a></span> <span class="fn">o</span></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><span class="fn"><span class="fn">Inner</span>.<a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementCore.html#MIPStarRE.LDT.SubMeas.outcome">outcome</a></span> <span class="fn">i</span></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><span class="fn"><span class="fn">Outer</span>.<a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementCore.html#MIPStarRE.LDT.SubMeas.outcome">outcome</a></span> <span class="fn">o</span></span>)</span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.rightTensor">rightTensor</a> <span class="fn">(<span class="fn"><span class="fn">Right</span>.<a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementCore.html#MIPStarRE.LDT.SubMeas.outcome">outcome</a></span> <span class="fn">r</span>)</span></span>)</span></div></div><p>A single tensor summand with a sandwiched left register is nonnegative in
+expectation.</p><p>The left register <code>Outer_o * Inner_i * Outer_o</code> is PSD by sandwich positivity,
+and the right-register outcome is PSD, so their tensor product is PSD.</p></div></div><div class="decl" id="MIPStarRE.LDT.sandwichTensor_residual_sum_le_one"><div class="theorem"><div class="gh_link"><a href="https://github.com/LionSR/MIPStarRE/blob/bb1839c7fc226c565160e0c96bdc1674c70d5f1a/MIPStarRE/LDT/Basic/TensorPlacement.lean#L212-L356">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././MIPStarRE/LDT/Basic/TensorPlacement.html#MIPStarRE.LDT.sandwichTensor_residual_sum_le_one"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">sandwichTensor_residual_sum_le_one</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">γ</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">β</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">γ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">ψ</span> : <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.QuantumState">QuantumState</a> (<span class="fn">ι</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">ι</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hnorm</span> : <span class="fn"><span class="fn">ψ</span>.<a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.QuantumState.IsNormalized">IsNormalized</a></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">Outer</span> : <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementCore.html#MIPStarRE.LDT.SubMeas">SubMeas</a> <span class="fn">β</span> <span class="fn">ι</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">Inner</span> : <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementCore.html#MIPStarRE.LDT.SubMeas">SubMeas</a> <span class="fn">α</span> <span class="fn">ι</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">Right</span> : <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementCore.html#MIPStarRE.LDT.SubMeas">SubMeas</a> <span class="fn">γ</span> <span class="fn">ι</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">∑ <span class="fn">ir</span> : <span class="fn">α</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">γ</span>,
+    <span class="fn">∑ <span class="fn">o</span> : <span class="fn">β</span>,
+      <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.ev">ev</a> <span class="fn">ψ</span> (<span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.leftTensor">leftTensor</a> (<span class="fn"><span class="fn"><span class="fn">Outer</span>.<a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementCore.html#MIPStarRE.LDT.SubMeas.outcome">outcome</a></span> <span class="fn">o</span></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><span class="fn"><span class="fn">Inner</span>.<a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementCore.html#MIPStarRE.LDT.SubMeas.outcome">outcome</a></span> <span class="fn"><span class="fn">ir</span>.1</span></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><span class="fn"><span class="fn">Outer</span>.<a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementCore.html#MIPStarRE.LDT.SubMeas.outcome">outcome</a></span> <span class="fn">o</span></span>)</span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.rightTensor">rightTensor</a> <span class="fn">(<span class="fn"><span class="fn">Right</span>.<a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementCore.html#MIPStarRE.LDT.SubMeas.outcome">outcome</a></span> <span class="fn"><span class="fn">ir</span>.2</span>)</span></span>)</span></span></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a>   <span class="fn">1</span></div></div><p>The residual tensor sum from a sandwiched left-register submeasurement and an
+independent right-register submeasurement is at most one in a normalized state.</p><p>The operator under the sum factors as
+<code>(∑ o, Outer_o * Inner.total * Outer_o) ⊗ Right.total</code>; the first factor is
+bounded by <code>1</code> by the submeasurement axioms and sandwich monotonicity, and the
+second factor is also bounded by <code>1</code>.</p></div></div></main>
+<nav class="nav"><iframe src="../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>
