@@ -10,7 +10,7 @@ the full `MainFormalBaseRepairedBridgeHypotheses` lives in `MainFormal.lean`
 
 ## What's proved
 
-* `MainFormalPostRolePackageDiagonalOrthonormalizationInput.of_roleResidual` —
+* `MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRoleResidual` —
   the orthonormalization input is derivable from the role residual once the two
   locality-preserving repair witnesses are supplied.
 
@@ -58,7 +58,7 @@ Once those repair witnesses are available, this lemma gives the full
 `MainFormalPostRolePackageDiagonalOrthonormalizationInput` needed by the
 line-130 orthonormalization wrapper
 (`MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalInputs`). -/
-noncomputable def of_roleResidual
+noncomputable def ofRoleResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}

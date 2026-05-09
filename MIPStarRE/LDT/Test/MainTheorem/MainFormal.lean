@@ -183,7 +183,7 @@ This produces exactly the `MainFormalBaseRepairedBridgeHypotheses` consumed by
 
 The orthonormalization input uses `spectralTruncationInput_of_sourceAlmostProjective`
 for its spectral fields and takes the repair witnesses as explicit hypotheses
-via `MainFormalPostRolePackageDiagonalOrthonormalizationInput.of_roleResidual`.
+via `MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRoleResidual`.
 
 **Diagonal self-consistency** (`diagonalConsistency`) is NOT derivable from the
 role residual's cross consistency (`G^A ⊗ I ≃ I ⊗ G^B`).  It requires
@@ -195,7 +195,7 @@ Callers constructing `hbaseBridge` for `mainFormal` should instantiate this lemm
 with their per-role-residual repair witnesses and diagonal self-consistency proofs.
 
 Refs #1359, #1043. -/
-noncomputable def repairedBridgeHypotheses_of_roleResidual
+noncomputable def repairedBridgeHypotheses_ofRoleResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
@@ -218,7 +218,7 @@ noncomputable def repairedBridgeHypotheses_of_roleResidual
     MainFormalBaseRepairedBridgeHypotheses params strategy eps k hpass
       scalars roleResidual where
   orthonormalizationInput :=
-    MainFormalPostRolePackageDiagonalOrthonormalizationInput.of_roleResidual
+    MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRoleResidual
       roleResidual leftRepair rightRepair
   diagonalConsistency := diagonalConsistency
 
