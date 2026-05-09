@@ -195,7 +195,12 @@
 \end{proof}
 
 \begin{theorem}[Main induction]\label{thm:main-induction}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper}
 	\uses{def:good-strategy, def:polymeasurements, def:simeq, lem:main-induction-base}
+	% Statement-level formalization marker deliberately omitted: the public
+	% wrapper takes a self-improvement boundary input as an extra hypothesis
+	% (tracked by issue 931), so the unconditional theorem stated here is not
+	% yet produced. See the proof block below for the formalization status.
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge 400\,md$ and set
   \[
     \nu = 1000k^2m^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right)
@@ -399,7 +404,9 @@
 	boundary package.  The ordinary slice bridge records both Alice- and Bob-side
 	compatibility with the restricted point, axis-parallel, and diagonal
 	measurements; in particular, the formal lemmas
-	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedPointAgreement_le_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedAxisParallel_le_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedDiagonal_le_ofSliceData}
+	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedPointAgreement_le_ofSliceData,
+	MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedAxisParallel_le_ofSliceData,
+	MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedDiagonal_le_ofSliceData}
 	extract the restricted point-agreement, axis-parallel, and diagonal branch
 	bounds from the pinned slice's passing hypothesis.  On the answer-register
 	side, the slice bridge data now records
@@ -411,9 +418,20 @@
 \end{definition}
 
 \begin{definition}[Lean base-case Step~6 hypotheses for the Section~3 proof]\label{def:main-formal-step6-hypotheses}
-	\lean{MIPStarRE.LDT.Test.MainFormalBaseProjectiveCompletionHypotheses, MIPStarRE.LDT.Test.baseProjectiveCompletionResidual, MIPStarRE.LDT.Test.MainFormalBaseBridgeHypotheses, MIPStarRE.LDT.Test.baseProjectiveCompletionHypotheses_ofBaseBridge, MIPStarRE.LDT.Test.baseProjectiveCompletionResidual_ofBaseBridge}
-	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalCompletionInput.nonempty_ofDiagonalConsistencyAndMatchMassPreservation, MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualProjectiveCompletionResidual.nonempty_ofRoleResidualAndDiagonalInputsAndMatchMassPreservation, MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRepairInputs, MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofQXPLayerRepairWitnesses, MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofLiftedQXPApproximations}
-	\lean{MIPStarRE.LDT.Test.MainFormalBaseRepairedBridgeHypotheses, MIPStarRE.LDT.Test.MainFormalRepairedBridgeHypotheses, MIPStarRE.LDT.Test.baseMainFormal_ofRepairedBaseBridge, MIPStarRE.LDT.Test.mainFormal_ofRoleResidualAndRepairedBridge}
+	\lean{MIPStarRE.LDT.Test.MainFormalBaseProjectiveCompletionHypotheses}
+	\lean{MIPStarRE.LDT.Test.baseProjectiveCompletionResidual}
+	\lean{MIPStarRE.LDT.Test.MainFormalBaseBridgeHypotheses}
+	\lean{MIPStarRE.LDT.Test.baseProjectiveCompletionHypotheses_ofBaseBridge}
+	\lean{MIPStarRE.LDT.Test.baseProjectiveCompletionResidual_ofBaseBridge}
+	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalCompletionInput.nonempty_ofDiagonalConsistencyAndMatchMassPreservation}
+	\lean{MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualProjectiveCompletionResidual.nonempty_ofRoleResidualAndDiagonalInputsAndMatchMassPreservation}
+	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRepairInputs}
+	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofQXPLayerRepairWitnesses}
+	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofLiftedQXPApproximations}
+	\lean{MIPStarRE.LDT.Test.MainFormalBaseRepairedBridgeHypotheses}
+	\lean{MIPStarRE.LDT.Test.MainFormalRepairedBridgeHypotheses}
+	\lean{MIPStarRE.LDT.Test.baseMainFormal_ofRepairedBaseBridge}
+	\lean{MIPStarRE.LDT.Test.mainFormal_ofRoleResidualAndRepairedBridge}
 	\leanok
 	\uses{def:main-formal-successor-boundary, thm:orthonormalization}
 	The structure \texttt{MainFormalBaseProjectiveCompletionHypotheses} bundles the still-unformalized
