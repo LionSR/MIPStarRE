@@ -126,7 +126,8 @@ jobs:
           fi
 
       - name: Restore docbuild cache
-        uses: actions/cache@v4
+        id: docbuild-cache
+        uses: actions/cache/restore@v5
         with:
           path: docbuild/.lake/build
           key: docbuild-${{ runner.os }}-${{ hashFiles('docbuild/lean-toolchain', 'docbuild/lake-manifest.json') }}
@@ -136,6 +137,13 @@ jobs:
         run: |
           cd docbuild
           lake build MIPStarRE:docs
+
+      - name: Save docbuild cache
+        if: steps.docbuild-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: docbuild/.lake/build
+          key: ${{ steps.docbuild-cache.outputs.cache-primary-key }}
 
       - name: Deploy to gh-pages
         env:
