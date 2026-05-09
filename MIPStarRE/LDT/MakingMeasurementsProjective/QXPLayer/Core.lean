@@ -223,10 +223,14 @@ auxiliary measurement `T = {T_a}` sums to the identity. The other propositional
 fields, including `qa_projective`, are supplied by the caller.
 
 The hypothesis `qa_eq` records exactly the `lem:qa-restated` choice, and the
-two SVD-derived hypotheses are precisely what the paper proves about
-`Xhat = U · I_{m×d} · V†`. The producer therefore feeds directly into
-`QXPLayerData` once a rectangular complex SVD of `X` is available; that SVD
-existence is the only remaining gap and is independent of this producer. -/
+two SVD-derived hypotheses (`xHat_coisometry` and `xHat_mixed`) are precisely
+what the paper proves about `Xhat = U · I_{m×d} · V†`.  These hypotheses are
+supplied by the sigma-range / rectangular polar-decomposition route, which
+provides the unitary and coisometry factors from the positive spectral
+subspace of `Q`.  The paper's `lem:X-squared`, `lem:X-hat-squared`, and
+`lem:X-times-X-hat` are therefore proved given the `QXPLayerData` hypotheses;
+the end-to-end chain through the rounding-to-projectors, rank-reduction, and
+orthogonalization lemmas remains to be closed upstream. -/
 noncomputable def QXPLayerData.ofQLayerAndSvdIdentities
     {Outcome : Type uOutcome} [Fintype Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
