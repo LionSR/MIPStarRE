@@ -1134,7 +1134,7 @@
     Lemma
     </span>
     <span class="lemma_thmlabel">7.8</span>
-    <span class="lemma_thmtitle">Slackness-residual-domination bridge declarations</span>
+    <span class="lemma_thmtitle">Slackness-residual-domination variants of self-improvement</span>
     <div class="thm_header_extras">
 
     
@@ -1160,6 +1160,16 @@
           <li><a href="sec-prelims.html#def:polymeasurements">Definition 3.11</a></li>
           
           <li><a href="sec-prelims.html#def:simeq">Definition 3.16</a></li>
+          
+          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
+          
+          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.34</a></li>
+          
+          <li><a href="chap-self-improvement.html#lem:sdp">Lemma 7.6</a></li>
+          
+          <li><a href="chap-self-improvement.html#lem:self-improvement-helper">Lemma 7.1</a></li>
+          
+          <li><a href="chap-self-improvement.html#thm:self-improvement">Theorem 7.9</a></li>
           
         </ul>
     
@@ -1190,7 +1200,16 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>     These bridge declarations assemble the SDP slackness and residual-domination inputs required by Theorem&#160;<a href="chap-self-improvement.html#thm:self-improvement">7.9</a>. The statements are formalized; the proofs currently depend on an unfinished SDP helper (see the slackness ledger, #1379). </p>
+  <p>     Let \((\psi , A, B, L)\) be a symmetric strategy for the \((m,q,d)\) low individual degree test that is \((\varepsilon ,\delta ,\gamma )\)-good, and let \(G \in \mathrm{PolyMeas}(m,q,d)\) be a measurement. Under any of the following three sets of strengthened hypotheses that incorporate the SDP complementary-slackness statement (Lemma&#160;<a href="chap-self-improvement.html#lem:sdp">7.6</a>), there exist a projective submeasurement \(H \in \mathrm{PolySub}(m,q,d)\) and a positive-semidefinite matrix \(Z\) satisfying the self-improvement conclusion of Theorem&#160;<a href="chap-self-improvement.html#thm:self-improvement">7.9</a>: </p>
+<ol class="enumerate">
+  <li><p><em>Residual-domination input</em>: the helper completeness, strong self-consistency, point-consistency transfer, and residual-domination orthonormalization hypotheses are supplied directly. </p>
+</li>
+  <li><p><em>Projective POVM repair and coisometry</em>: the residual-domination input is built from a projective POVM repair operator and a coisometry condition linking the constructed operator to the identity. </p>
+</li>
+  <li><p><em>Combined strengthened hypotheses</em>: the four hypotheses of the first variant — helper completeness, strong self-consistency, point-consistency transfer, and residual-domination orthonormalization — are assumed as one combined hypothesis. </p>
+</li>
+</ol>
+<p> The statements (but not the proofs) are formalized; the proofs transitively depend on the unfinished SDP strong-duality helper tracked by issue&#160;#1230 (see also the slackness ledger, #1379). </p>
 
   </div>
 </div>
