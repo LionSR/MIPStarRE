@@ -228,7 +228,7 @@ what the paper proves about `Xhat = U · I_{m×d} · V†`.  These hypotheses ar
 supplied by the sigma-range / rectangular polar-decomposition route, which
 provides the unitary and coisometry factors from the positive spectral
 subspace of `Q`.  The paper's `lem:X-squared`, `lem:X-hat-squared`, and
-`lem:X-times-X-hat` are therefore proved given the `QXPLayerData` package;
+`lem:X-times-X-hat` are therefore proved given the `QXPLayerData` hypotheses;
 the end-to-end chain through the rounding-to-projectors, rank-reduction, and
 orthogonalization lemmas remains to be closed upstream. -/
 noncomputable def QXPLayerData.ofQLayerAndSvdIdentities
