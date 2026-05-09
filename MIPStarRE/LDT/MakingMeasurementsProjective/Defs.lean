@@ -87,39 +87,6 @@ noncomputable def matrixExpectation {H : FiniteHilbertSpace}
     (ρ : PositiveMatrixState H) (X : MatrixOperator H) : ℂ :=
   MIPStarRE.Quantum.normalizedTrace (ρ.matrix * X)
 
-/-- The concrete single-outcome probability `τ(ρ A_a)`. -/
-noncomputable def matrixSingleOutcomeProbability {Outcome : Type*}
-    [Fintype Outcome] [DecidableEq Outcome]
-    {H : FiniteHilbertSpace}
-    (ρ : PositiveMatrixState H)
-    (A : MatrixSubmeasurement Outcome H) (a : Outcome) : ℂ :=
-  matrixExpectation ρ (A.effect a)
-
-/-- The concrete joint outcome probability `τ(ρ A_a B_b)` on one ambient algebra. -/
-noncomputable def matrixJointOutcomeProbability {OutcomeA OutcomeB : Type*}
-    [Fintype OutcomeA] [DecidableEq OutcomeA]
-    [Fintype OutcomeB] [DecidableEq OutcomeB]
-    {H : FiniteHilbertSpace}
-    (ρ : PositiveMatrixState H)
-    (A : MatrixSubmeasurement OutcomeA H)
-    (B : MatrixSubmeasurement OutcomeB H)
-    (a : OutcomeA) (b : OutcomeB) : ℂ :=
-  matrixExpectation ρ (A.effect a * B.effect b)
-
-/-- The concrete squared `τ`-distance between two effects. -/
-noncomputable def matrixOutcomeTauDistance {Outcome : Type*}
-    [Fintype Outcome] [DecidableEq Outcome]
-    {H : FiniteHilbertSpace}
-    (A B : MatrixSubmeasurement Outcome H) (a : Outcome) : Error :=
-  Complex.re (MIPStarRE.Quantum.tauNormSq (A.effect a - B.effect a))
-
-/-- The concrete idempotence defect `‖A_a^2 - A_a‖_τ^2`. -/
-noncomputable def matrixIdempotenceDefect {Outcome : Type*}
-    [Fintype Outcome] [DecidableEq Outcome]
-    {H : FiniteHilbertSpace}
-    (A : MatrixMeasurement Outcome H) (a : Outcome) : Error :=
-  Complex.re (MIPStarRE.Quantum.tauNormSq (A.effect a * A.effect a - A.effect a))
-
 /-! ### One-measurement Naimark dilation (Lemma 5.2)
 
 The one-measurement Naimark dilation is the building block for the full
@@ -183,51 +150,6 @@ structure OneMeasNaimarkData (α : Type*) [Fintype α] [DecidableEq α]
       MIPStarRE.Quantum.normalizedTrace
         (oneMeasLiftedDensity α ρ * liftedEffect (some a))
 
-/-- Paper origin: `references/ldt-paper/orthonormalization.tex:117-187`
-(`\label{sec:naimark}`; covers the one-measurement Naimark helper
-`\label{lem:naimark-helper}` at lines 121-159 and the proof of the
-full Naimark dilation theorem `\label{thm:naimark}` at lines 161-187).
-
-Matrix-level witness for the Naimark dilation statement.
-
-This carries separate `originalSpace` and `liftedSpace`, with the lifted
-space being larger. The witness includes projective measurements on the
-lifted space and the key probability preservation identities. -/
-structure MatrixNaimarkWitness (QuestionA OutcomeA QuestionB OutcomeB : Type*)
-    [Fintype OutcomeA] [DecidableEq OutcomeA]
-    [Fintype OutcomeB] [DecidableEq OutcomeB] where
-  originalSpace : FiniteHilbertSpace
-  liftedSpace : FiniteHilbertSpace
-  originalState : DensityMatrixState originalSpace
-  liftedState : DensityMatrixState liftedSpace
-  originalLeft : QuestionA → MatrixSubmeasurement OutcomeA originalSpace
-  originalRight : QuestionB → MatrixSubmeasurement OutcomeB originalSpace
-  liftedLeft : QuestionA → MatrixMeasurement OutcomeA liftedSpace
-  liftedRight : QuestionB → MatrixMeasurement OutcomeB liftedSpace
-  liftedLeftProjective :
-    ∀ x : QuestionA, ∀ a : OutcomeA,
-      MIPStarRE.Quantum.IsProj ((liftedLeft x).effect a)
-  liftedRightProjective :
-    ∀ y : QuestionB, ∀ b : OutcomeB,
-      MIPStarRE.Quantum.IsProj ((liftedRight y).effect b)
-  leftMarginalPreservation :
-    ∀ x : QuestionA, ∀ a : OutcomeA,
-      matrixSingleOutcomeProbability originalState.toPositiveMatrixState (originalLeft x) a =
-        matrixSingleOutcomeProbability liftedState.toPositiveMatrixState
-          ((liftedLeft x).toSubmeasurement) a
-  rightMarginalPreservation :
-    ∀ y : QuestionB, ∀ b : OutcomeB,
-      matrixSingleOutcomeProbability originalState.toPositiveMatrixState (originalRight y) b =
-        matrixSingleOutcomeProbability liftedState.toPositiveMatrixState
-          ((liftedRight y).toSubmeasurement) b
-  jointOutcomePreservation :
-    ∀ x : QuestionA, ∀ y : QuestionB,
-      ∀ a : OutcomeA, ∀ b : OutcomeB,
-        matrixJointOutcomeProbability originalState.toPositiveMatrixState
-          (originalLeft x) (originalRight y) a b =
-          matrixJointOutcomeProbability liftedState.toPositiveMatrixState
-            ((liftedLeft x).toSubmeasurement) ((liftedRight y).toSubmeasurement) a b
-
 /-! ### Full Naimark dilation (Theorem 5.1)
 
 The full Naimark dilation applies one-measurement Naimark independently
@@ -277,7 +199,7 @@ noncomputable def singleOutcomeProbability {Outcome : Type*} {ι : Type*}
   ev ψ (A.outcome a)
 
 /-- The joint outcome probability `Tr(ρ · A_a · B_b)`.
-Uses the operator product on the shared algebra, matching `matrixJointOutcomeProbability`.
+Uses the operator product on the shared algebra.
 When the measurements commute (as guaranteed after Naimark dilation), this
 equals the tensor-product formulation `⟨ψ| (A_a ⊗ B_b) |ψ⟩`. -/
 noncomputable def jointOutcomeProbability {OutcomeA OutcomeB : Type*}
@@ -314,76 +236,5 @@ noncomputable def spectralTruncationError (ζ : Error) : Error :=
 /-- The rounding error when converting an almost-projective POVM to a projective submeasurement. -/
 noncomputable def roundingToProjectiveError (ζ : Error) : Error :=
   12 * Real.rpow ζ (1 / (2 : Error))
-
-/-! ### Almost-projective and rounding witnesses -/
-
-/-- Paper origin: `references/ldt-paper/orthonormalization.tex:396-408`
-(`\label{eq:A-looks-projective}`: the almost-projective estimate
-`∑ₐ ⟨ψ|(Aₐ − Aₐ²)⊗I|ψ⟩ ≤ 2ζ`).
-
-Matrix-level witness for the almost-projective stage. -/
-structure MatrixAlmostProjectiveWitness {Outcome : Type*}
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ζ : Error) where
-  space : FiniteHilbertSpace
-  state : DensityMatrixState space
-  measurement : MatrixMeasurement Outcome space
-  overlapDecomposition :
-    MIPStarRE.Quantum.inconsistency measurement.effect measurement.effect +
-        MIPStarRE.Quantum.diagOverlap measurement.effect measurement.effect = 1
-  pointwiseIdempotence :
-    ∀ a : Outcome,
-      matrixIdempotenceDefect measurement a ≤ ζ
-
-/-- Paper origin: `references/ldt-paper/orthonormalization.tex:414-531`
-(`\label{lem:projective-non-measurement}`; full rounding-to-projectors
-lemma including the `1+2√ζ` total-mass bound).
-
-Matrix-level witness for the rounding-to-projective stage. -/
-structure MatrixRoundedProjectiveWitness {Outcome : Type*}
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ζ : Error) where
-  space : FiniteHilbertSpace
-  state : DensityMatrixState space
-  source : MatrixMeasurement Outcome space
-  target : MatrixSubmeasurement Outcome space
-  targetProjective :
-    ∀ a : Outcome,
-      MIPStarRE.Quantum.IsProj (target.effect a)
-  pointwiseTauDistance :
-    ∀ a : Outcome,
-      matrixOutcomeTauDistance source.toSubmeasurement target a ≤ ζ
-
-/-! ### Truncation witnesses -/
-
-/-- Paper origin: `references/ldt-paper/orthonormalization.tex:434-480`
-(`\label{lem:trunc-inequality}`: truncation-function construction and proof;
-the quantitative bound `(x − trunc_δ(x))² ≤ (x − x²)/δ` controls the
-τ-distance per effect).
-
-Matrix-level witness for truncating a single effect to a projection. -/
-structure MatrixSpectralTruncationWitness {d : Type*}
-    [Fintype d] [DecidableEq d] where
-  source : MIPStarRE.Quantum.Op d
-  target : MIPStarRE.Quantum.Op d
-  truncation : MIPStarRE.Quantum.SpectralTruncation source target
-
-/-- Paper origin: `references/ldt-paper/orthonormalization.tex:434-480`
-(`\label{lem:trunc-inequality}`: truncation function and proof; each effect
-`A_a` is independently spectrally truncated to a projection `P_a`).
-
-Matrix-level witness for rounding every effect of a measurement to a projection.
-The resulting family is not necessarily a measurement, but the τ-distance
-per outcome is controlled by the truncation inequality. -/
-structure MatrixSpectralTruncationMeasurementWitness {Outcome : Type*}
-    [Fintype Outcome] [DecidableEq Outcome] (ζ : Error) where
-  space : FiniteHilbertSpace
-  source : MatrixMeasurement Outcome space
-  target : Outcome → MIPStarRE.Quantum.Op space.carrier
-  perOutcomeTruncation :
-    ∀ a : Outcome,
-      MIPStarRE.Quantum.SpectralTruncation (source.effect a) (target a)
-  perOutcomeProjective :
-    ∀ a : Outcome, MIPStarRE.Quantum.IsProj (target a)
 
 end MIPStarRE.LDT.MakingMeasurementsProjective
