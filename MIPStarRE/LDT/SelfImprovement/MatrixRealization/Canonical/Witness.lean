@@ -23,7 +23,11 @@ open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix
 
-/-- Matrix-level witness for an optimal SDP pair. -/
+/-- Paper origin: `references/ldt-paper/self_improvement.tex:82-88`
+(`\label{lem:sdp}`, `\label{eq:slater}`);
+`docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex` (SDP gap).
+
+Matrix-level witness for an optimal SDP pair. -/
 structure MatrixSdpOptimalWitness (params : Parameters) [FieldModel params.q]
     (model : MatrixSdpRealization params)
     (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)

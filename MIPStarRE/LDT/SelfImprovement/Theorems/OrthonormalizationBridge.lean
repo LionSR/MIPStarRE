@@ -140,7 +140,12 @@ abbrev OrthonormalizationRepairProducer
 
 /-! ### QXP-layer locality-preserving repair witnesses -/
 
-/-- A stronger repair witness for a left-lifted measurement, carried by a
+/-- Paper origin: `references/ldt-paper/orthonormalization.tex:273-282`
+(`\label{sec:orthogonalization}`, `\label{lem:orthonormalization-main-lemma}`)
+and `references/ldt-paper/self_improvement.tex:628-671`
+(`\label{sec:self-improvement-projective}`, `\label{thm:self-improvement}`).
+
+A stronger repair witness for a left-lifted measurement, carried by a
 paper-style Q/X/XHat/P layer.
 
 The data field records the local QXP layer.  The rounded family is not an
@@ -216,7 +221,11 @@ theorem restrictSome_rightTensor_total_ev_le {Outcome : Type*}
   restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le
     (ψ := ψ) A (qxpProjSubMeas W.data) W.residual_domination
 
-/-- Adjoin a residual-domination invariant to an ordinary QXP repair witness
+/-- Paper origin: project-level bridge (cf.
+`references/ldt-paper/self_improvement.tex:628-671`,
+`\label{thm:self-improvement}`).
+
+Adjoin a residual-domination invariant to an ordinary QXP repair witness
 for the option-completed measurement. -/
 def ofRepairWitness {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
