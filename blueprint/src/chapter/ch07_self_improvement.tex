@@ -1032,12 +1032,12 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndResidualDominationInput}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndQXPRepairAndCoisometry}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromSlacknessResidualDominationBridgeInputs}
-  \leanok
+  \notready
   \uses{def:polymeasurements, def:simeq}
   These bridge declarations assemble the SDP slackness and residual-domination
-  inputs required by Theorem~\ref{thm:self-improvement}. The statements
-  are formalized; the proofs currently depend on an unfinished SDP helper
-  (see the slackness ledger, \#1379).
+  inputs required by Theorem~\ref{thm:self-improvement}. Their proofs
+  currently depend on the SDP statement with complementary slackness
+  (Lemma~\ref{lem:sdp}, issue~\#1230).
 \end{lemma}
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement}
