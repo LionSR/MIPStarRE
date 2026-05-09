@@ -58,8 +58,8 @@ fills the base branch of `mainFormal`. -/
 
 /-- Paper origin: `references/ldt-paper/test_definition.tex:180-202`
 (`\label{thm:main-formal}`) and its proof in
-`references/ldt-paper/inductive_step.tex:26-211`
-(Section 3 Step 6 orthonormalization + completion cascade);
+`references/ldt-paper/inductive_step.tex:26-236`
+(orthonormalization and completion cascade in Section 3);
 blueprint `\label{def:main-formal-step6-hypotheses}`.
 
 Analytic hypotheses that are still unformalized for the
@@ -141,7 +141,7 @@ theorem baseProjectiveCompletionResidual
       bridge.leftMatchMassPreservation bridge.rightMatchMassPreservation)
 
 
-/-- Paper origin: `references/ldt-paper/inductive_step.tex:26-211`
+/-- Paper origin: `references/ldt-paper/inductive_step.tex:26-236`
 (proof of `\label{thm:main-formal}`, orthonormalization + completion cascade);
 blueprint `\label{def:main-formal-step6-hypotheses}`.
 
@@ -251,7 +251,7 @@ theorem baseProjectiveCompletionResidual_ofBaseBridge
     (baseProjectiveCompletionHypotheses_ofBaseBridge bridge)
 
 
-/-- Paper origin: `references/ldt-paper/inductive_step.tex:26-211`
+/-- Paper origin: `references/ldt-paper/inductive_step.tex:26-236`
 (proof of `\label{thm:main-formal}`, orthonormalization + completion cascade);
 blueprint `\label{def:main-formal-step6-hypotheses}`.
 
@@ -281,7 +281,7 @@ structure MainFormalBaseRepairedBridgeHypotheses
     MainFormalPostRolePackageDiagonalConsistencyInput
       params strategy eps k scalars (roleResidual.rolePackage scalars)
 
-/-- Paper origin: `references/ldt-paper/inductive_step.tex:26-211`
+/-- Paper origin: `references/ldt-paper/inductive_step.tex:26-236`
 (proof of `\label{thm:main-formal}`, orthonormalization + completion cascade);
 blueprint `\label{def:main-formal-step6-hypotheses}`.
 
