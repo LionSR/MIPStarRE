@@ -682,11 +682,11 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlacknessAndDominance_of_canonicalComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlacknessAndDominance_of_canonicalFeasibleComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.exists_measurement_witness}
-  \notready
   % No statement-level \leanok is attached here: MIPStarRE.LDT.SelfImprovement.sdp
   % proves only the reduced SdpStatement fragment, while the full slackness
   % conclusion is recorded as the visible, deferred theorem
-  % MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness.
+  % MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness, whose proof is
+  % still \notready (see proof block below).
   Let
   \[
     A_g = \E_{u \sim \F_q^m} A^u_{g(u)}.
@@ -708,6 +708,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \end{equation}
 \end{lemma}
 \begin{proof}
+  \notready
   Rewrite~\eqref{eq:primal-objective} in canonical block form. Let $r$ be the dimension of the space on which~$A$ acts, let $M = |\polyfunc{m}{q}{d}|$, and fix an ordering $g_1,\ldots,g_M$ of the polynomials. Consider
   \begin{align}
     \sup &\quad \Tr(C^\dagger X) \label{eq:primal-canonical}\\
