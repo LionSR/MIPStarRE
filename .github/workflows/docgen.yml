@@ -17,6 +17,7 @@ concurrency:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   build_project:
@@ -40,6 +41,33 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ inputs.ref || 'main' }}
+
+      - name: Set up Lean toolchain
+        # Use lean-action (not curl | sh) to install elan safely.
+        # build/use-mathlib-cache/use-github-cache are all disabled so this step
+        # only installs elan and does not touch the cache lifecycle managed by
+        # the Build step below (avoids a partial cache save or restore-then-
+        # overwrite that could negate the ProofWidgets workaround).
+        uses: leanprover/lean-action@v1
+        with:
+          build: false
+          use-mathlib-cache: false
+          use-github-cache: false
+
+      - name: Workaround ProofWidgets prune bug
+        # `lake exe cache get` (inside the Build step) runs `lake update`, whose
+        # mathlib post-update hook tries to prune
+        # .lake/packages/proofwidgets/.lake/build/lib before fetching a new cloud
+        # release.  On a fresh runner the directory does not exist, which causes an
+        # uncaught exception that aborts the whole cache fetch.
+        # Fix: run `lake update` once here (allowing failure), then create the
+        # missing directory *only if* proofwidgets was actually checked out, so the
+        # hook's prune succeeds when `lake update` runs again inside lean-action.
+        run: |
+          lake update 2>&1 || true
+          if [ -d .lake/packages/proofwidgets ]; then
+            mkdir -p .lake/packages/proofwidgets/.lake/build/lib
+          fi
 
       - name: Build project
         uses: leanprover/lean-action@v1
@@ -97,6 +125,13 @@ jobs:
             exit "$cmd_status"
           fi
 
+      - name: Restore docbuild cache
+        uses: actions/cache@v4
+        with:
+          path: docbuild/.lake/build
+          key: docbuild-${{ runner.os }}-${{ hashFiles('docbuild/lean-toolchain', 'docbuild/lake-manifest.json') }}
+          restore-keys: docbuild-${{ runner.os }}-
+
       - name: Generate API docs
         run: |
           cd docbuild
@@ -107,3 +142,40 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: ./scripts/deploy-to-gh-pages.sh --with-docs --ci
+
+      - name: Open issue on failure
+        if: failure()
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const date = new Date().toISOString().split('T')[0];
+            const title = `docgen CI failure — ${date}`;
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            // For workflow_dispatch with a custom ref input, context.ref is the
+            // trigger ref (e.g. refs/heads/main), not the checked-out ref.
+            const builtRef = context.payload.inputs?.ref || context.ref;
+            const body = [
+              `The **Full documentation** workflow failed and the GitHub Pages docs are stale.`,
+              ``,
+              `**Run:** [${context.runId}](${runUrl})`,
+              `**Triggered by:** ${context.eventName}`,
+              `**Built ref:** \`${builtRef}\``,
+            ].join('\n');
+
+            const open = await github.paginate(github.rest.issues.listForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'bug',
+              per_page: 100,
+            });
+            const duplicate = open.find(i => i.title.startsWith('docgen CI failure'));
+            if (!duplicate) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ['bug'],
+              });
+            }
