@@ -291,6 +291,16 @@ class OrphanLeanok:
 
 
 @dataclass
+class HeaderLeanokWithoutProofLeanok:
+    """A statement whose header carries ``\\leanok`` but whose immediately
+    following ``\\begin{proof}...\\end{proof}`` block does not."""
+    file: str
+    line: int
+    env_type: str
+    label: str | None
+
+
+@dataclass
 class SyncReport:
     """Aggregated sync report."""
     blueprint_entries: list[BlueprintEntry] = field(default_factory=list)
@@ -301,6 +311,7 @@ class SyncReport:
     stale_lean_decls: list[str] = field(default_factory=list)
     missing_from_lean_decls_file: list[str] = field(default_factory=list)
     orphan_leanok_tags: list[OrphanLeanok] = field(default_factory=list)
+    header_leanok_without_proof_leanok: list[HeaderLeanokWithoutProofLeanok] = field(default_factory=list)
 
     @property
     def ok(self) -> bool:
@@ -659,9 +670,128 @@ def find_orphan_leanok_tags(blueprint_src: Path) -> list[OrphanLeanok]:
     return orphans
 
 
-# ---------------------------------------------------------------------------
-# Read lean_decls file
-# ---------------------------------------------------------------------------
+def find_header_leanok_without_proof_leanok(
+    blueprint_src: Path,
+) -> list[HeaderLeanokWithoutProofLeanok]:
+    r"""Flag statements whose header-level ``\leanok`` is not matched by
+    a proof-level ``\leanok`` in the immediately following proof block.
+
+    * Only theorem-like environments (lemma, theorem, proposition, corollary)
+      are considered; definitions and remarks never carry proof blocks.
+    * A statement without a following proof block is not flagged.
+    * ``\leanok`` inside TeX ``%`` comments is stripped before checking,
+      so ``% \leanok`` does not count as a marker.
+    * Multiline ``\lean{...}`` blocks that span several brace-balanced lines
+      are handled by scanning the full environment body.
+    """
+    chapter_dir = blueprint_src / "chapter"
+    if not chapter_dir.exists():
+        return []
+
+    env_begin_re = re.compile(
+        r"\\begin\{(lemma|theorem|proposition|corollary)\}"
+        r"(?:\[[^\]]*\])?"
+    )
+    label_re = re.compile(r"\\label\{([^}]+)\}")
+    env_end_re = re.compile(
+        r"\\end\{(lemma|theorem|proposition|corollary)\}"
+    )
+    proof_begin_re = re.compile(r"\\begin\{proof\}")
+    proof_end_re = re.compile(r"\\end\{proof\}")
+    # Generic environment begin: used to skip intervening non-proof envs.
+    _any_env_begin_re = re.compile(r"\\begin\{(\w+)\}")
+
+    def _has_leanok(lines: list[str]) -> bool:
+        r"""Return whether any *line* in the list contains an active
+        ``\leanok`` marker (per ``_line_has_leanok_marker``)."""
+        return any(_line_has_leanok_marker(l) for l in lines)
+
+    mismatches: list[HeaderLeanokWithoutProofLeanok] = []
+    for tex_file in sorted(chapter_dir.glob("*.tex")):
+        rel = str(tex_file.relative_to(blueprint_src.parent))
+        raw_lines = tex_file.read_text(errors="replace").splitlines()
+        lines = [_strip_tex_comment(raw) for raw in raw_lines]
+
+        i = 0
+        while i < len(lines):
+            m = env_begin_re.search(lines[i])
+            if not m:
+                i += 1
+                continue
+
+            env_type = m.group(1)
+            label = None
+            m2 = label_re.search(lines[i])
+            if m2:
+                label = m2.group(1)
+
+            header_lines = [lines[i]]
+            j = i
+            while j < len(lines):
+                if j > i:
+                    header_lines.append(lines[j])
+                    if not label:
+                        m2 = label_re.search(lines[j])
+                        if m2:
+                            label = m2.group(1)
+                if env_end_re.search(lines[j]):
+                    break
+                j += 1
+
+            header_has_leanok = _has_leanok(header_lines)
+
+            # Search ahead for a proof block, skipping blank lines and
+            # intervening non-proof environments (e.g. remarks).
+            k = j + 1
+            proof_lines = None
+            while k < len(lines):
+                if lines[k].strip() == "":
+                    k += 1
+                    continue
+                if proof_begin_re.search(lines[k]):
+                    # Collect the proof body.
+                    p_lines = [lines[k]]
+                    l = k
+                    while l < len(lines):
+                        if l > k:
+                            p_lines.append(lines[l])
+                        if proof_end_re.search(lines[l]):
+                            break
+                        l += 1
+                    proof_lines = p_lines
+                    k = l + 1
+                    break
+                # Skip any intervening non-proof environment.
+                intervening = _any_env_begin_re.search(lines[k])
+                if intervening and intervening.group(1) != "proof":
+                    env_name = intervening.group(1)
+                    end_pat = re.compile(
+                        r"\\end\{" + re.escape(env_name) + r"\}"
+                    )
+                    k += 1
+                    while k < len(lines) and not end_pat.search(lines[k]):
+                        k += 1
+                    k += 1  # skip the \end line
+                    continue
+                # Not blank, not proof, not another env – stop looking.
+                break
+
+            if proof_lines is not None:
+                proof_has_leanok = _has_leanok(proof_lines)
+                if header_has_leanok and not proof_has_leanok:
+                    mismatches.append(
+                        HeaderLeanokWithoutProofLeanok(
+                            file=rel,
+                            line=i + 1,
+                            env_type=env_type,
+                            label=label,
+                        )
+                    )
+                i = k
+            else:
+                i = j + 1
+
+    return mismatches
 
 
 def read_lean_decls_file(path: Path) -> set[str]:
@@ -1187,6 +1317,14 @@ def run_sync(
     report.orphan_leanok_tags = find_orphan_leanok_tags(blueprint_src)
     if report.orphan_leanok_tags:
         print(f"  Flagged {len(report.orphan_leanok_tags)} orphan \\leanok tag(s)")
+    report.header_leanok_without_proof_leanok = find_header_leanok_without_proof_leanok(
+        blueprint_src
+    )
+    if report.header_leanok_without_proof_leanok:
+        print(
+            f"  Flagged {len(report.header_leanok_without_proof_leanok)} "
+            "statement(s) with header \\leanok but no proof \\leanok"
+        )
 
     # 3. Cross-reference
     blueprint_decl_names: set[str] = set()
@@ -1444,6 +1582,20 @@ def _print_report(report: SyncReport, root: Path) -> None:
         for orphan in report.orphan_leanok_tags:
             print(f"  ⚠ {orphan.file}:{orphan.line}  ({orphan.context})")
 
+    # Header leanok without proof leanok
+    if report.header_leanok_without_proof_leanok:
+        print()
+        print(
+            f"WARNING: statements with header \\leanok but no proof \\leanok "
+            f"({len(report.header_leanok_without_proof_leanok)}):"
+        )
+        for mismatch in report.header_leanok_without_proof_leanok:
+            label_str = f" ({mismatch.label})" if mismatch.label else ""
+            print(
+                f"  ⚠ {mismatch.file}:{mismatch.line}"
+                f"  {mismatch.env_type}{label_str}"
+            )
+
     # Summary
     print()
     if report.ok:
@@ -1518,6 +1670,15 @@ def _write_json_report(report: SyncReport, path: Path, root: Path) -> None:
         "orphan_leanok_tags": [
             {"file": orphan.file, "line": orphan.line, "context": orphan.context}
             for orphan in report.orphan_leanok_tags
+        ],
+        "header_leanok_without_proof_leanok": [
+            {
+                "file": m.file,
+                "line": m.line,
+                "env_type": m.env_type,
+                "label": m.label,
+            }
+            for m in report.header_leanok_without_proof_leanok
         ],
         "chapter_stats": _chapter_stats(report),
     }
