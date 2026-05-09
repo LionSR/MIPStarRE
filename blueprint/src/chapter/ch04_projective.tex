@@ -551,11 +551,11 @@
 	\begin{proof}
 		\leanok
 		\uses{lem:projective-non-measurement, lem:small-overlap-averaging, prop:triangle-inequality-for-approx_delta}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_projectors,
-			MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_rank_bound,
-			MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_spectralTruncationStatement,
-			MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_spectralTruncationInput,
-			MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_truncate}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_projectors}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_rank_bound}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_spectralTruncationStatement}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_spectralTruncationInput}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_truncate}
 		Let $\{R_a\}$ be given by \ref{lem:projective-non-measurement}. Write $r_a=\mathrm{rank}(R_a)$ and $r=\sum_a r_a$. If $r \leq d$, take $Q_a=R_a$. Otherwise,
 		\begin{equation}\label{eq:bound-on-r}
 			r
@@ -739,9 +739,9 @@
 
 	\begin{definition}[Matrix decomposition of~$Q_a$]\label{def:matrix-decomposition-Q}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.matrixDecompositionQ, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaProjMeas, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinProjMeas, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaRangeEmbedding, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinRangeEmbedding}
-		\lean{MIPStarRE.Quantum.ProjectorRangeONB.rankOne_mulVec_vec,
-			MIPStarRE.Quantum.ProjectorRangeONB.mulVec_vec,
-			MIPStarRE.Quantum.IsProj.nonneg}
+		\lean{MIPStarRE.Quantum.ProjectorRangeONB.rankOne_mulVec_vec}
+		\lean{MIPStarRE.Quantum.ProjectorRangeONB.mulVec_vec}
+		\lean{MIPStarRE.Quantum.IsProj.nonneg}
 		\leanok
 		\uses{lem:projective-low-rank-sum}
 		For each $a$, let
@@ -874,14 +874,14 @@
 
 	\begin{lemma}[$X$ squared]\label{lem:X-squared}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xSquared, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinRangeEmbedding_gram_right}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_posSemidef_of_x_squared,
-			MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_eigenvalues_nonneg_of_x_squared}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sqrt_eq_sum_sqrt_eigenvalues_vecMulVec,
-			MIPStarRE.LDT.MakingMeasurementsProjective.positiveGramSpectrumRightRows,
-			MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_right_rows_mul_conjTranspose,
-			MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_image_rows_mixed_eq_sqrt,
-			MIPStarRE.LDT.MakingMeasurementsProjective.matrix_image_eq_zero_of_nonpositive_gram_eigenvalue,
-			MIPStarRE.LDT.MakingMeasurementsProjective.adjoint_image_eq_zero_of_orthogonal_positive_gram_images}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_posSemidef_of_x_squared}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_eigenvalues_nonneg_of_x_squared}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sqrt_eq_sum_sqrt_eigenvalues_vecMulVec}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.positiveGramSpectrumRightRows}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_right_rows_mul_conjTranspose}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_image_rows_mixed_eq_sqrt}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.matrix_image_eq_zero_of_nonpositive_gram_eigenvalue}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.adjoint_image_eq_zero_of_orthogonal_positive_gram_images}
 		\leanok
 		\begin{equation*}
 			X^\dagger \cdot X = Q.
