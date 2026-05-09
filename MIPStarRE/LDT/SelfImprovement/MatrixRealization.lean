@@ -144,26 +144,4 @@ noncomputable def matrixProjectiveResidualGap (params : Parameters)
   let total := MIPStarRE.Quantum.Submeasurement.total H
   Complex.re (matrixExpectation model.state (Z * (1 - total)))
 
-/-- Paper origin: `references/ldt-paper/self_improvement.tex:238-343`
-(`\label{lem:add-in-u}`).
-
-Matrix-level version of the `add-in-u` transfer inequality: this is the matrix
-realization of `AddInUStatement`, recording the `lem:add-in-u` transfer bound on
-the difference between the left- and right-hand expectations evaluated at a
-selection rule `S`. -/
-structure MatrixAddInUTransferStatement {Outcome : Type*} [Fintype Outcome]
-    (params : Parameters)
-    [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
-    (M : MatrixIndexedPointOutcomeFamily params Outcome model.space)
-    (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
-    (eps delta : Error) : Prop where
-  transfer :
-    ∀ S : AddInUSelection params Outcome,
-      |matrixAddInULeftQuantity params model M H S -
-          matrixAddInURightQuantity params model M T S| ≤
-        addInUError params eps delta
-
-
 end MIPStarRE.LDT.SelfImprovement
