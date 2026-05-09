@@ -13,17 +13,18 @@ The upstream **spectral-truncation stage** is already proved by
 `spectralTruncationInput_of_sourceAlmostProjective` in
 `MakingMeasurementsProjective/SpectralTruncation/ProjectiveNonMeasurement.lean`,
 which is fully wired through
-`projectiveNonMeasurement_of_sourceAlmostProjective_full`. Consumers that
-need a producer for `SpectralTruncationInput` should call the existing one
-directly.
+`projectiveNonMeasurement_of_sourceAlmostProjective_full`. Proofs that
+require `SpectralTruncationInput` should call that declaration directly.
 
 The remaining obligation recorded here:
 
 - **`leftLiftedProjectivizationRepairProducer`** — paper origin
-  `references/ldt-paper/orthonormalization.tex` lines 534–740 (the late
-  repair stage of the orthogonalization-lemma proof, which produces a genuine
-  projective sub-measurement from a rounded family while preserving the
-  left-lifted product form `P_a ⊗ I`).
+  `references/ldt-paper/orthonormalization.tex` lines 534–772 (rank
+  reduction and the `Q`/`√Q` completeness setup) and 862–1181 (the
+  `X`/`X̂`/`P` algebra producing the lifted projective sub-measurement),
+  i.e. the late repair stage of the orthogonalization-lemma proof, which
+  produces a genuine projective sub-measurement from a rounded family while
+  preserving the left-lifted product form `P_a ⊗ I`.
 
 Once this proof is complete, the hypothesis
 `LeftLiftedProjectivizationRepairInput` required by the orthonormalization
@@ -36,15 +37,20 @@ namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 /-- Producer for `LeftLiftedProjectivizationRepairInput`.
 
-Paper origin: `references/ldt-paper/orthonormalization.tex` lines 534–740 (the
-late repair stage of the orthogonalization-lemma proof).
+Paper origin: `references/ldt-paper/orthonormalization.tex` lines 534–772
+(rank reduction `lem:projective-low-rank-sum` and the `Q`-side setup:
+`lem:Q-completeness`, `lem:sqrt-Q-completeness`, `lem:q-almost-projective`,
+`lem:xa-t`, `lem:qa-restated`) and 862–1181 (the `X`/`X̂`/`P` algebra
+proper: `lem:X-squared`, `lem:X-hat-squared`, `lem:X-times-X-hat`,
+`lem:squared-difference`, `lem:P-projectivity`, `lem:P-Q-approx`). Together
+these constitute the late repair stage of the orthogonalization-lemma proof.
 
 The paper's proof transports the rounded family produced by
 `lem:projective-non-measurement` (already formalized — see
 `spectralTruncationInput_of_sourceAlmostProjective`) through the `Q/X/X̂/P`
 algebra (formalized as `QXPLayerData` and the rectangular polar decomposition
-for the sigma-range embedding, PR #1237 / closed #1117 / closed #1228) to a
-genuine projective sub-measurement `P = {P_a}` with closeness
+for the sigma-range embedding) to a genuine projective sub-measurement
+`P = {P_a}` with closeness
 `A_a ⊗ I ≈_{roundingToProjectiveError ζ} P_a ⊗ I`. The locality-preserving
 form (output `P_a ⊗ I` rather than an arbitrary lifted family) is the
 specialization required by `orthonormalizationMainLemma` and thereby by

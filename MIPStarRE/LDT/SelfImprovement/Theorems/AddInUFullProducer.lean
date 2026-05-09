@@ -8,7 +8,7 @@ This file records the full selection-dependent transfer inequality of
 `lem:add-in-u` (`references/ldt-paper/self_improvement.tex` lines 238–246),
 which is not yet proved in Lean. The existing `addInU` lemma in
 `MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperCompleteness/Bracketed.lean:584`
-formalizes only the variance-bound specialization used downstream. The
+formalizes only the variance-bound specialization used in subsequent arguments. The
 doc-comment on that lemma states:
 
 > "The selection-dependent transfer inequality from the paper, together with
@@ -58,7 +58,7 @@ the inequality rather than taking `H` as an extra parameter, so the structure
 records exactly the paper's transfer inequality.
 
 The reduced `AddInUStatement` (`Statements.lean:293`) only records the
-variance-bound consequence used downstream; this structure records the
+variance-bound consequence used in subsequent arguments; this structure records the
 universally-quantified transfer inequality itself. -/
 structure AddInUFullStatement
     (params : Parameters) [FieldModel params.q]
