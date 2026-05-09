@@ -711,14 +711,14 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 		\[
 			\operatorname{Bad}(\psi;u,\mathbf{x})
 			= \sum_f \bra{\psi}
-			\Bigl(\sum_{\substack{g_1,\dots,g_k\\ \exists i:\, g_i(u)\ne f(x_i)}}
+			\Bigl(\sum_{\substack{g_1,\dots,g_k\\ \exists i:\, g_i\ne\bot,\ g_i(u)\ne f(x_i)}}
 				\widehat H_{g_1,\dots,g_k}^{\mathbf{x}}
 			\Bigr) \ot B_f^u
 			\ket{\psi},
 		\]
 		and $\widehat{H}^{(i)},B^{(i)}$ are the one-point line comparison
 		families (Lemma~\ref{lem:ld-sandwich-line-one-point})
-		restricted to coordinate $i$. Each summand lies in $[0,1]$.
+		restricted to coordinate $i$, and $\operatorname{Bad}(\psi;u,\mathbf{x})\le 1$.
 \end{lemma}
 
 \begin{lemma}[Averaging the line-interpolation defect]\label{lem:line-interpolation-averaging-estimates}
