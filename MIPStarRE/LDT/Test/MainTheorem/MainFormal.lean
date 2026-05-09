@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Test.MainTheorem.NativeTargets
+import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationInputProducer
 
 /-!
 # Main-formal final assembly
@@ -277,6 +278,55 @@ abbrev MainFormalRepairedBridgeHypotheses
     (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) :
     Type _ :=
   MainFormalBaseRepairedBridgeHypotheses params strategy eps k hpass scalars roleResidual
+
+/-! ### Orthonormalization-input bridge lemmas -/
+
+/-- Assemble the full repaired-bridge hypotheses from a role residual, the two
+locality-preserving repair witnesses, and the diagonal self-consistency input.
+
+This produces exactly the `MainFormalBaseRepairedBridgeHypotheses` consumed by
+`baseMainFormal_ofRepairedBaseBridge` and `mainFormal_ofRoleResidualAndRepairedBridge`.
+
+The orthonormalization input uses `spectralTruncationInput_of_sourceAlmostProjective`
+for its spectral fields and takes the repair witnesses as explicit hypotheses
+via `MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRoleResidual`.
+
+**Diagonal self-consistency** (`diagonalConsistency`) is NOT derivable from the
+role residual's cross consistency (`G^A ⊗ I ≃ I ⊗ G^B`).  It requires
+self-consistency (`G^A ⊗ I ≃ G^A ⊗ I` and `G^B ⊗ I ≃ G^B ⊗ I`), which is a
+structurally stronger statement.  Callers must supply it as a separate
+hypothesis.
+
+Callers constructing `hbaseBridge` for `mainFormal` should instantiate this lemma
+with their per-role-residual repair witnesses and diagonal self-consistency proofs.
+
+Refs #1359, #1043. -/
+noncomputable def repairedBridgeHypotheses_ofRoleResidual
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {hpass : strategy.PassesLowIndividualDegreeTest eps}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
+    (leftRepair :
+      MakingMeasurementsProjective.LeftLiftedProjectivizationRepairInput strategy.state
+        (unsymmetrizedLeftPOVM
+          (roleResidual.rolePackage scalars).roleMeasurement)
+        (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1))
+    (rightRepair :
+      MakingMeasurementsProjective.LeftLiftedProjectivizationRepairInput strategy.state
+        (unsymmetrizedRightPOVM
+          (roleResidual.rolePackage scalars).roleMeasurement)
+        (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1))
+    (diagonalConsistency :
+      MainFormalPostRolePackageDiagonalConsistencyInput
+        params strategy eps k scalars (roleResidual.rolePackage scalars)) :
+    MainFormalBaseRepairedBridgeHypotheses params strategy eps k hpass
+      scalars roleResidual where
+  orthonormalizationInput :=
+    MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRoleResidual
+      roleResidual leftRepair rightRepair
+  diagonalConsistency := diagonalConsistency
 
 /-- Base-case assembly of `mainFormal` through the repaired line-169 route.
 
