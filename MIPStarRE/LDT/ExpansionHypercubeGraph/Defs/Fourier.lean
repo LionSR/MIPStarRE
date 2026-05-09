@@ -191,7 +191,8 @@ noncomputable def orthogonalModeProjector (params : Parameters) :
     MIPStarRE.Quantum.Op (Point params) :=
   1 - constantModeProjector params
 
-/-- The trace witness from `lem:local-rewrite`. -/
+/-- Paper origin: `references/ldt-paper/expansion.tex:145-154`
+(`\label{lem:local-rewrite}`); trace witness for the local-variance rewrite. -/
 noncomputable def localVarianceTraceWitness (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : MIPStarRE.Quantum.Op ι :=
   let Acombine := combinedOperator params A
@@ -264,7 +265,8 @@ noncomputable def canonicalGlobalVarianceDecomposition (params : Parameters)
     rw [sub_eq_add_neg]
     abel
 
-/-- The trace witness from `lem:global-rewrite`.
+/-- Paper origin: `references/ldt-paper/expansion.tex:179-190`
+(`\label{lem:global-rewrite}`); trace witness for the global-variance rewrite.
 This uses the orthogonal residual family supplied by the decomposition. -/
 noncomputable def globalVarianceTraceWitness (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι)

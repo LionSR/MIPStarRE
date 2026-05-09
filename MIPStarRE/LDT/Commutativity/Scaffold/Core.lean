@@ -39,7 +39,9 @@ noncomputable def comMainError (params : Parameters) (gamma zeta : Error) : Erro
       Real.rpow zeta (1 / (4 : Error)) +
       Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (4 : Error)))
 
-/-- Output package for `lem:comm-data-processed-g`.
+/-- Paper origin: `references/ldt-paper/commutativity-G.tex:16-47`
+(`\label{lem:comm-data-processed-g}`); output package for the
+commutativity-of-`G`-after-evaluation lemma.
 
 The strategy state is bipartite.  Alice-side measurements are lifted to
 the left tensor factor, while Bob-side postprocessed point measurements
@@ -75,7 +77,8 @@ structure CommDataProcessedGConclusion (params : Parameters)
       (evaluatedSliceProductRight params strategy family)
       (commDataProcessedGError params gamma zeta)
 
-/-- Output package for `thm:com-main`. -/
+/-- Paper origin: `references/ldt-paper/commutativity-G.tex:228-257`
+(`\label{thm:com-main}`); output package for the commutativity-of-`G` theorem. -/
 structure ComMainConclusion (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
