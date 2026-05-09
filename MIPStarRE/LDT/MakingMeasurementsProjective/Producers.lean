@@ -19,12 +19,13 @@ require `SpectralTruncationInput` should call that declaration directly.
 The remaining obligation recorded here:
 
 - **`leftLiftedProjectivizationRepairProducer`** — paper origin
-  `references/ldt-paper/orthonormalization.tex` lines 534–772 (rank
-  reduction and the `Q`/`√Q` completeness setup) and 862–1181 (the
-  `X`/`X̂`/`P` algebra producing the lifted projective sub-measurement),
-  i.e. the late repair stage of the orthogonalization-lemma proof, which
-  produces a genuine projective sub-measurement from a rounded family while
-  preserving the left-lifted product form `P_a ⊗ I`.
+  `references/ldt-paper/orthonormalization.tex` lines 534–860 (rank
+  reduction and the `Q`/`√Q` completeness setup) and 862–1194 (the
+  `X`/`X̂`/`P` algebra producing the lifted projective sub-measurement,
+  including the final triangle-inequality assembly), i.e. the late repair
+  stage of the orthogonalization-lemma proof, which produces a genuine
+  projective sub-measurement from a rounded family while preserving the
+  left-lifted product form `P_a ⊗ I`.
 
 Once this proof is complete, the hypothesis
 `LeftLiftedProjectivizationRepairInput` required by the orthonormalization
@@ -37,13 +38,15 @@ namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 /-- Producer for `LeftLiftedProjectivizationRepairInput`.
 
-Paper origin: `references/ldt-paper/orthonormalization.tex` lines 534–772
+Paper origin: `references/ldt-paper/orthonormalization.tex` lines 534–860
 (rank reduction `lem:projective-low-rank-sum` and the `Q`-side setup:
 `lem:Q-completeness`, `lem:sqrt-Q-completeness`, `lem:q-almost-projective`,
-`lem:xa-t`, `lem:qa-restated`) and 862–1181 (the `X`/`X̂`/`P` algebra
+`lem:xa-t`, `lem:qa-restated`) and 862–1194 (the `X`/`X̂`/`P` algebra
 proper: `lem:X-squared`, `lem:X-hat-squared`, `lem:X-times-X-hat`,
-`lem:squared-difference`, `lem:P-projectivity`, `lem:P-Q-approx`). Together
-these constitute the late repair stage of the orthogonalization-lemma proof.
+`lem:squared-difference`, `lem:P-projectivity`, `lem:P-Q-approx`, plus the
+final triangle-inequality assembly producing the `84 ζ^{1/4}` bound captured
+by `roundingToProjectiveError ζ`). Together these constitute the late
+repair stage of the orthogonalization-lemma proof.
 
 The paper's proof transports the rounded family produced by
 `lem:projective-non-measurement` (already formalized — see
