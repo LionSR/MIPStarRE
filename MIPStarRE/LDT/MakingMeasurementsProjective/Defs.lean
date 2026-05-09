@@ -183,7 +183,11 @@ structure OneMeasNaimarkData (α : Type*) [Fintype α] [DecidableEq α]
       MIPStarRE.Quantum.normalizedTrace
         (oneMeasLiftedDensity α ρ * liftedEffect (some a))
 
-/-- Matrix-level witness for the Naimark dilation statement.
+/-- Paper origin: `references/ldt-paper/orthonormalization.tex:36-63`
+(`\label{thm:naimark}`); proof at lines 161-187
+(`\label{sec:naimark}`).
+
+Matrix-level witness for the Naimark dilation statement.
 
 This carries separate `originalSpace` and `liftedSpace`, with the lifted
 space being larger. The witness includes projective measurements on the
@@ -312,7 +316,10 @@ noncomputable def roundingToProjectiveError (ζ : Error) : Error :=
 
 /-! ### Almost-projective and rounding witnesses -/
 
-/-- Matrix-level witness for the almost-projective stage. -/
+/-- Paper origin: `references/ldt-paper/orthonormalization.tex:395-452`
+(`\label{eq:A-looks-projective}`, `\label{lem:trunc-inequality}`).
+
+Matrix-level witness for the almost-projective stage. -/
 structure MatrixAlmostProjectiveWitness {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
     (ζ : Error) where
@@ -326,7 +333,10 @@ structure MatrixAlmostProjectiveWitness {Outcome : Type*}
     ∀ a : Outcome,
       matrixIdempotenceDefect measurement a ≤ ζ
 
-/-- Matrix-level witness for the rounding-to-projective stage. -/
+/-- Paper origin: `references/ldt-paper/orthonormalization.tex:414-491`
+(`\label{lem:projective-non-measurement}`).
+
+Matrix-level witness for the rounding-to-projective stage. -/
 structure MatrixRoundedProjectiveWitness {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
     (ζ : Error) where
@@ -343,7 +353,10 @@ structure MatrixRoundedProjectiveWitness {Outcome : Type*}
 
 /-! ### Truncation witnesses -/
 
-/-- Matrix-level witness for truncating a single effect to a projection.
+/-- Paper origin: `references/ldt-paper/orthonormalization.tex:434-452`
+(`\label{lem:trunc-inequality}` and the truncation function `trunc_δ`).
+
+Matrix-level witness for truncating a single effect to a projection.
 
 This captures the passage from an almost-projective operator to a genuine projection
 by truncating the spectrum at `1/2`. The key bound is that the τ-distance between
@@ -354,7 +367,11 @@ structure MatrixSpectralTruncationWitness {d : Type*}
   target : MIPStarRE.Quantum.Op d
   truncation : MIPStarRE.Quantum.SpectralTruncation source target
 
-/-- Matrix-level witness for rounding every effect of a measurement to a projection.
+/-- Paper origin: `references/ldt-paper/orthonormalization.tex:434-452`
+(`\label{lem:trunc-inequality}`; per-outcome truncation in the proof of
+`\label{lem:projective-non-measurement}`).
+
+Matrix-level witness for rounding every effect of a measurement to a projection.
 
 Each effect `A_a` is independently spectrally truncated to a projection `P_a`.
 The resulting family is not necessarily a measurement (the projections may not sum

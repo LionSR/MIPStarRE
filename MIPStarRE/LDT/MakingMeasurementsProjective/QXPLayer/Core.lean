@@ -66,7 +66,10 @@ def Ta {Outcome : Type*} [Fintype Outcome]
     MIPStarRE.Quantum.Op data.auxSpace.carrier :=
   data.t.outcome a
 
-/-- Witness structure for the paper's `lem:projective-non-measurement`.
+/-- Paper origin: `references/ldt-paper/orthonormalization.tex:414-491`
+(`\label{lem:projective-non-measurement}`).
+
+Witness structure for the paper's rounding-to-projectors lemma.
 
 A value `RoundingToProjectorsWitness ψ A ζ R` is the honest output consumed by
 this QXP rank-reduction layer: a chosen rounded family `R_a` together with the
@@ -89,7 +92,10 @@ structure RoundingToProjectorsWitness {Outcome : Type*}
     R.total ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
       (1 : MIPStarRE.Quantum.Op ι)
 
-/-- Witness structure for `lem:projective-low-rank-sum`. -/
+/-- Paper origin: `references/ldt-paper/orthonormalization.tex:540-553`
+(`\label{lem:projective-low-rank-sum}`).
+
+Witness structure for the rank-reduction lemma. -/
 structure RankReductionWitness {Outcome : Type*}
     [Fintype Outcome]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

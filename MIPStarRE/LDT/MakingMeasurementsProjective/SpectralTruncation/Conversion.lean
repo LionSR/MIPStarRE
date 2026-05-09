@@ -49,7 +49,10 @@ noncomputable def spectralTruncationStatement_of_witness {Outcome : Type uOutcom
 
 namespace SpectralTruncationStatement
 
-/-- Convert a spectral-truncation statement back to the rounded-projector
+/-- Paper origin: `references/ldt-paper/orthonormalization.tex:414-491`
+(`\label{lem:projective-non-measurement}`).
+
+Convert a spectral-truncation statement back to the rounded-projector
 witness consumed by the QXP rank-reduction layer.
 
 The conversion is structural.  It does not recover the source almost-projective
