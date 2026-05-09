@@ -23,9 +23,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 namespace MIPStarRE.LDT.SelfImprovement
 
 open MIPStarRE.LDT
-open MIPStarRE.LDT.ExpansionHypercubeGraph
-open MIPStarRE.LDT.GlobalVariance
-open MIPStarRE.LDT.MakingMeasurementsProjective
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
