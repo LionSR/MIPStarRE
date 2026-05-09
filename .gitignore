@@ -42,3 +42,4 @@
 blueprint/lean_decls
 .claude/
 .worktrees/
+scripts/__pycache__/

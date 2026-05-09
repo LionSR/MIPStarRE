@@ -111,7 +111,11 @@ private theorem takeCardSubset_card {α : Type*} [DecidableEq α] [LinearOrder �
 
 /-- A canonical `d+1`-element interpolation support together with the proof fields
 that show it lies inside the genuine completed-slice support. The support is built
-by sorting the genuine support and taking its first `d+1` indices. -/
+by sorting the genuine support and taking its first `d+1` indices.
+
+Paper origin: `references/ldt-paper/ld-pasting.tex:473-482`
+(interpolation step of the second construction, requiring `|w| \geq d+1`
+genuine outcomes). -/
 structure InterpolationSupportWitness (params : Parameters) [FieldModel params.q]
     {k : ℕ} (gs : GHatTupleOutcome params k) where
   support : Finset (Fin k)
@@ -119,7 +123,11 @@ structure InterpolationSupportWitness (params : Parameters) [FieldModel params.q
   card_eq : support.card = params.d + 1
 
 /-- Construct an explicit `d+1`-point interpolation support inside the genuine support of
-an interpolation-eligible tuple by taking the first `d+1` indices in sorted order. -/
+an interpolation-eligible tuple by taking the first `d+1` indices in sorted order.
+
+Paper origin: `references/ldt-paper/ld-pasting.tex:473-482`
+(interpolation step of the second construction, requiring `|w| \geq d+1`
+genuine outcomes). -/
 def interpolationSupportWitness {params : Parameters} {k : ℕ}
     [FieldModel params.q] (gs : GHatTupleOutcome params k)
     (hEligible : InterpolationEligible params gs) :

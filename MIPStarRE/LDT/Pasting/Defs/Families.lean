@@ -55,7 +55,10 @@ def nonglobalOutcomesByType (params : Parameters) [FieldModel params.q]
     Set (GHatTupleOutcome params k) :=
   outcomesByType τ \ globallyConsistentOutcomesByType params xs τ
 
-/-- Choose a witness polynomial for a globally consistent tuple. -/
+/-- Choose a witness polynomial for a globally consistent tuple.
+
+Paper origin: `references/ldt-paper/ld-pasting.tex:1131-1135`
+(definition of `\mathsf{Global}_{\tau}(x)`). -/
 noncomputable def globallyConsistentWitness (params : Parameters) [FieldModel params.q]
     {k : ℕ} (xs : PointTuple params k) (gs : GHatTupleOutcome params k)
     (hGlobal : IsGloballyConsistent params xs gs) : Polynomial params.next :=
