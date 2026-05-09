@@ -397,7 +397,9 @@ noncomputable def matrixCombinedColumnOperator (params : Parameters)
       (tensorHilbertSpace (pointHilbertSpace params) model.space) :=
   matrixCombinedOperator params model
 
-/-- The actual trace witness for the local-variance rewrite. -/
+/-- Paper origin: `references/ldt-paper/expansion.tex:145-154`
+(`\label{lem:local-rewrite}`); trace witness for the local-variance
+rewrite, matrix realization. -/
 noncomputable def matrixLocalVarianceTraceWitness (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
     MatrixOperator model.space :=
@@ -410,7 +412,9 @@ noncomputable def matrixLocalVarianceTraceForm (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) : Error :=
   Complex.re (MIPStarRE.Quantum.normalizedTrace (matrixLocalVarianceTraceWitness params model))
 
-/-- The actual trace witness for the global-variance rewrite. -/
+/-- Paper origin: `references/ldt-paper/expansion.tex:179-190`
+(`\label{lem:global-rewrite}`); trace witness for the global-variance
+rewrite, matrix realization. -/
 noncomputable def matrixGlobalVarianceTraceWitness (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
     MatrixOperator model.space :=
