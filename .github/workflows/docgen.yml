@@ -44,11 +44,15 @@ jobs:
 
       - name: Set up Lean toolchain
         # Use lean-action (not curl | sh) to install elan safely.
-        # build/use-mathlib-cache are both disabled here; we handle those below.
+        # build/use-mathlib-cache/use-github-cache are all disabled so this step
+        # only installs elan and does not touch the cache lifecycle managed by
+        # the Build step below (avoids a partial cache save or restore-then-
+        # overwrite that could negate the ProofWidgets workaround).
         uses: leanprover/lean-action@v1
         with:
           build: false
           use-mathlib-cache: false
+          use-github-cache: false
 
       - name: Workaround ProofWidgets prune bug
         # `lake exe cache get` (inside the Build step) runs `lake update`, whose
