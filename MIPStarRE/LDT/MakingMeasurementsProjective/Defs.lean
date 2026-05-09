@@ -87,39 +87,6 @@ noncomputable def matrixExpectation {H : FiniteHilbertSpace}
     (ρ : PositiveMatrixState H) (X : MatrixOperator H) : ℂ :=
   MIPStarRE.Quantum.normalizedTrace (ρ.matrix * X)
 
-/-- The concrete single-outcome probability `τ(ρ A_a)`. -/
-noncomputable def matrixSingleOutcomeProbability {Outcome : Type*}
-    [Fintype Outcome] [DecidableEq Outcome]
-    {H : FiniteHilbertSpace}
-    (ρ : PositiveMatrixState H)
-    (A : MatrixSubmeasurement Outcome H) (a : Outcome) : ℂ :=
-  matrixExpectation ρ (A.effect a)
-
-/-- The concrete joint outcome probability `τ(ρ A_a B_b)` on one ambient algebra. -/
-noncomputable def matrixJointOutcomeProbability {OutcomeA OutcomeB : Type*}
-    [Fintype OutcomeA] [DecidableEq OutcomeA]
-    [Fintype OutcomeB] [DecidableEq OutcomeB]
-    {H : FiniteHilbertSpace}
-    (ρ : PositiveMatrixState H)
-    (A : MatrixSubmeasurement OutcomeA H)
-    (B : MatrixSubmeasurement OutcomeB H)
-    (a : OutcomeA) (b : OutcomeB) : ℂ :=
-  matrixExpectation ρ (A.effect a * B.effect b)
-
-/-- The concrete squared `τ`-distance between two effects. -/
-noncomputable def matrixOutcomeTauDistance {Outcome : Type*}
-    [Fintype Outcome] [DecidableEq Outcome]
-    {H : FiniteHilbertSpace}
-    (A B : MatrixSubmeasurement Outcome H) (a : Outcome) : Error :=
-  Complex.re (MIPStarRE.Quantum.tauNormSq (A.effect a - B.effect a))
-
-/-- The concrete idempotence defect `‖A_a^2 - A_a‖_τ^2`. -/
-noncomputable def matrixIdempotenceDefect {Outcome : Type*}
-    [Fintype Outcome] [DecidableEq Outcome]
-    {H : FiniteHilbertSpace}
-    (A : MatrixMeasurement Outcome H) (a : Outcome) : Error :=
-  Complex.re (MIPStarRE.Quantum.tauNormSq (A.effect a * A.effect a - A.effect a))
-
 /-! ### One-measurement Naimark dilation (Lemma 5.2)
 
 The one-measurement Naimark dilation is the building block for the full
@@ -232,7 +199,7 @@ noncomputable def singleOutcomeProbability {Outcome : Type*} {ι : Type*}
   ev ψ (A.outcome a)
 
 /-- The joint outcome probability `Tr(ρ · A_a · B_b)`.
-Uses the operator product on the shared algebra, matching `matrixJointOutcomeProbability`.
+Uses the operator product on the shared algebra.
 When the measurements commute (as guaranteed after Naimark dilation), this
 equals the tensor-product formulation `⟨ψ| (A_a ⊗ B_b) |ψ⟩`. -/
 noncomputable def jointOutcomeProbability {OutcomeA OutcomeB : Type*}
