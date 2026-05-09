@@ -1092,19 +1092,20 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
 \begin{lemma}[Slackness residual-domination input]\label{lem:slackness-residual-domination-input}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndResidualDominationInput}
   \notready
-  Producer for the slackness-and-residual-domination bridge input.
+  The slackness-and-residual-domination bridge input exists.
   Pending \texttt{sdp\_statement\_with\_slackness} (issue \#1230).
 \end{lemma}
 \begin{lemma}[Slackness QXP repair and coisometry]\label{lem:slackness-qxp-repair-coisometry}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndQXPRepairAndCoisometry}
   \notready
-  Producer for the slackness QXP repair and coisometry input.
+  The slackness QXP repair and coisometry input exists.
   Pending \texttt{sdp\_statement\_with\_slackness} (issue \#1230).
 \end{lemma}
 \begin{lemma}[Slackness residual-domination bridge inputs]\label{lem:slackness-residual-domination-bridge-inputs}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromSlacknessResidualDominationBridgeInputs}
   \notready
-  Assembles the slackness residual-domination bridge inputs from the two producers above.
+  \uses{lem:slackness-residual-domination-input, lem:slackness-qxp-repair-coisometry}
+  The slackness residual-domination bridge inputs exist given the two bridge components.
   Pending \texttt{sdp\_statement\_with\_slackness} (issue \#1230).
 \end{lemma}
 \begin{proof}[Proof of Theorem~\ref{thm:self-improvement}]
