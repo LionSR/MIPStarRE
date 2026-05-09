@@ -197,10 +197,11 @@
 \begin{theorem}[Main induction]\label{thm:main-induction}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper}
 	\uses{def:good-strategy, def:polymeasurements, def:simeq, lem:main-induction-base}
-	% Statement-level formalization marker deliberately omitted: the public
-	% wrapper takes a self-improvement boundary input as an extra hypothesis
-	% (tracked by issue 931), so the unconditional theorem stated here is not
-	% yet produced. See the proof block below for the formalization status.
+	% Statement-level formalization marker deliberately omitted: the Lean
+	% declaration mainInductionPublicWrapper takes a self-improvement boundary
+	% input as an extra hypothesis (tracked by issue 931), so the unconditional
+	% theorem stated here is not yet produced. See the proof block below for
+	% the formalization status.
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge 400\,md$ and set
   \[
     \nu = 1000k^2m^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right)
