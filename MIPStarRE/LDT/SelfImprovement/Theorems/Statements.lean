@@ -347,8 +347,7 @@ structure SelfImprovementHelperConclusionWithSlackness (params : Parameters)
       sdpComplementarySlacknessEquation params strategy T.toSubMeas Z g
 
 /-- Paper origin: `references/ldt-paper/self_improvement.tex:635-671`
-(`\label{thm:self-improvement}`);
-blueprint `\label{thm:self-improvement}`.
+(`\label{thm:self-improvement}`).
 
 Conclusion of `thm:self-improvement`. -/
 structure SelfImprovementConclusion (params : Parameters) [FieldModel params.q]

@@ -100,7 +100,7 @@ noncomputable def sdpStrictPrimalSubMeas (params : Parameters)
 (`\label{lem:sdp}`), strict Slater witness at lines 168-176;
 `docs/paper-gaps/issue-196-sdp-weakening.tex` (submeasurement vs measurement).
 
-The reduced Lean wrapper completes `sdpStrictPrimalSubMeas` at the zero
+The reduced Lean completion form completes `sdpStrictPrimalSubMeas` at the zero
 polynomial so that downstream lemmas can keep using a full measurement.
 
 After this completion, the zero-polynomial outcome is no longer the paper's

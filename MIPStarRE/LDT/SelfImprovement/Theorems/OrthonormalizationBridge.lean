@@ -140,8 +140,7 @@ abbrev OrthonormalizationRepairProducer
 
 /-! ### QXP-layer locality-preserving repair witnesses -/
 
-/-- Paper origin:
-`references/ldt-paper/orthonormalization.tex:273-282`
+/-- Paper origin: `references/ldt-paper/orthonormalization.tex:273-282`
 (`\label{sec:orthogonalization}`, `\label{lem:orthonormalization-main-lemma}`)
 and `references/ldt-paper/self_improvement.tex:628-671`
 (`\label{sec:self-improvement-projective}`, `\label{thm:self-improvement}`).
