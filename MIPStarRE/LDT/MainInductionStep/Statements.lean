@@ -23,7 +23,10 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Conclusion of the induction-level self-improvement theorem.
+/-- Paper origin: `references/ldt-paper/inductive_step.tex:249-286`
+(`\label{thm:self-improvement-in-induction-section}`).
+
+Conclusion of the induction-level self-improvement theorem.
 
 The strategy's state is bipartite (`QuantumState (ι × ι)`). Fields that
 involve bipartite-lifted operators use `leftPlacedSubMeas` /
@@ -65,7 +68,10 @@ structure SelfImprovementInInductionSectionConclusion (params : Parameters)
     ∀ h : Polynomial params,
       IdxPolyFamily.averagedPointEvaluationOperator strategy h ≤ Z
 
-/-- Conclusion of the section-local pasting theorem. -/
+/-- Paper origin: `references/ldt-paper/inductive_step.tex:299-338`
+(`\label{thm:ld-pasting-in-induction-section}`).
+
+Conclusion of the section-local pasting theorem. -/
 structure LdPastingInInductionSectionConclusion (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -308,7 +314,10 @@ structure AnswerPerSliceInductionPackage (params : Parameters)
           (restrictionPkg.profile.selfConsistency x)
           (restrictionPkg.profile.diagonal x)
 
-/-- Main-induction conclusion for a function-answer symmetric strategy.
+/-- Paper origin: `references/ldt-paper/inductive_step.tex:7-18`
+(`\label{thm:main-induction}`); answer-valued analogue.
+
+Main-induction conclusion for a function-answer symmetric strategy.
 
 This is the answer-valued analogue of the conclusion of `thm:main-induction`.
 It is used as the explicit predecessor induction hypothesis for the
