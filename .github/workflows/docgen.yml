@@ -42,23 +42,28 @@ jobs:
           fetch-depth: 0
           ref: ${{ inputs.ref || 'main' }}
 
-      - name: Install elan and pre-initialize packages
-        run: |
-          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf \
-            | sh -s -- --default-toolchain none -y
-          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Set up Lean toolchain
+        # Use lean-action (not curl | sh) to install elan safely.
+        # build/use-mathlib-cache are both disabled here; we handle those below.
+        uses: leanprover/lean-action@v1
+        with:
+          build: false
+          use-mathlib-cache: false
 
       - name: Workaround ProofWidgets prune bug
-        # lake exe cache get (inside lean-action) runs `lake update`, whose mathlib
-        # post-update hook tries to prune .lake/packages/proofwidgets/.lake/build/lib.
-        # On a fresh runner that directory doesn't exist, causing an uncaught exception
-        # that kills the entire cache fetch.  We pre-run `lake update` (ignoring the
-        # hook failure), then create the missing directory so the second `lake update`
-        # inside lean-action finds it and succeeds.
+        # `lake exe cache get` (inside the Build step) runs `lake update`, whose
+        # mathlib post-update hook tries to prune
+        # .lake/packages/proofwidgets/.lake/build/lib before fetching a new cloud
+        # release.  On a fresh runner the directory does not exist, which causes an
+        # uncaught exception that aborts the whole cache fetch.
+        # Fix: run `lake update` once here (allowing failure), then create the
+        # missing directory *only if* proofwidgets was actually checked out, so the
+        # hook's prune succeeds when `lake update` runs again inside lean-action.
         run: |
-          elan show
           lake update 2>&1 || true
-          mkdir -p .lake/packages/proofwidgets/.lake/build/lib
+          if [ -d .lake/packages/proofwidgets ]; then
+            mkdir -p .lake/packages/proofwidgets/.lake/build/lib
+          fi
 
       - name: Build project
         uses: leanprover/lean-action@v1
@@ -136,25 +141,29 @@ jobs:
 
       - name: Open issue on failure
         if: failure()
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const date = new Date().toISOString().split('T')[0];
             const title = `docgen CI failure — ${date}`;
             const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            // For workflow_dispatch with a custom ref input, context.ref is the
+            // trigger ref (e.g. refs/heads/main), not the checked-out ref.
+            const builtRef = context.payload.inputs?.ref || context.ref;
             const body = [
               `The **Full documentation** workflow failed and the GitHub Pages docs are stale.`,
               ``,
               `**Run:** [${context.runId}](${runUrl})`,
               `**Triggered by:** ${context.eventName}`,
-              `**Branch:** \`${context.ref}\``,
+              `**Built ref:** \`${builtRef}\``,
             ].join('\n');
 
-            const { data: open } = await github.rest.issues.listForRepo({
+            const open = await github.paginate(github.rest.issues.listForRepo, {
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
               labels: 'bug',
+              per_page: 100,
             });
             const duplicate = open.find(i => i.title.startsWith('docgen CI failure'));
             if (!duplicate) {
