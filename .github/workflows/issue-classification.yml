@@ -79,36 +79,12 @@ jobs:
       github.event.sender.type != 'Bot' &&
       !contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association)
     runs-on: ubuntu-latest
-    env:
-      # No provider secrets in this job — outside-reporter path cannot access them.
-      CLAUDE_CODE_PROVIDER: ${{ vars.CLAUDE_CODE_PROVIDER || 'anthropic' }}
-      ANTHROPIC_BASE_URL: ${{ vars.ANTHROPIC_BASE_URL }}
-      CLAUDE_OPUS_MODEL: ${{ vars.CLAUDE_OPUS_MODEL }}
-      CLAUDE_SONNET_MODEL: ${{ vars.CLAUDE_SONNET_MODEL }}
 
     permissions:
       contents: read
       issues: write
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 1
-          persist-credentials: false
-
-      - name: Sanitize issue content
-        id: sanitize
-        uses: actions/github-script@v8
-        with:
-          script: |
-            const sanitize = (s) => (s || '')
-              .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '')
-              .replace(/```/g, '\u200B`\u200B`\u200B`');
-            const title = sanitize(context.payload.issue.title).substring(0, 200);
-            const body = sanitize(context.payload.issue.body).substring(0, 5000);
-            return { title, body };
-
       - name: Preliminary classification for outside reports
         uses: actions/github-script@v8
         with:
