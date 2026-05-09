@@ -1033,14 +1033,14 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndQXPRepairAndCoisometry}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromSlacknessResidualDominationBridgeInputs}
   \leanok
-  \uses{def:polymeasurements, def:simeq, def:approx_delta, def:strong-self-consistency, lem:sdp, lem:self-improvement-helper}
+  \uses{def:polymeasurements, def:simeq, def:approx_delta, def:strong-self-consistency, lem:sdp, lem:self-improvement-helper, thm:self-improvement}
   Let $(\psi, A, B, L)$ be a symmetric strategy for the $(m,q,d)$
   low individual degree test that is $(\eps,\delta,\gamma)$-good,
   and let $G \in \polymeas{m}{q}{d}$ be a measurement.  Under any of the
   following three sets of strengthened hypotheses that incorporate the
   SDP complementary-slackness statement (Lemma~\ref{lem:sdp}), there
   exist a projective submeasurement $H \in \polysub{m}{q}{d}$ and a
-  positive-semidefinite operator $Z$ satisfying the self-improvement
+  positive-semidefinite matrix $Z$ satisfying the self-improvement
   conclusion of Theorem~\ref{thm:self-improvement}:
   \begin{enumerate}
     \item \emph{Residual-domination input}: the helper completeness,
@@ -1051,8 +1051,8 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
       residual-domination input is built from a projective POVM repair
       operator and a coisometry condition linking the constructed
       operator to the identity.
-    \item \emph{Single-structure form}: the hypotheses of the first
-      variant are bundled into a single hypothesis structure.
+    \item \emph{Combined strengthened hypotheses}: the three
+      strengthened hypotheses above are assumed together.
   \end{enumerate}
   The statements (but not the proofs) are formalized; the proofs
   transitively depend on the unfinished SDP strong-duality helper
