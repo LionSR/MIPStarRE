@@ -2,7 +2,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.Test.StrategyFailures
 
 /-!
-# Section 7 — Full statement and producer for `lem:add-in-u`
+# Section 7 — Selection-dependent transfer inequality for `lem:add-in-u`
 
 This file records the full selection-dependent transfer inequality of
 `lem:add-in-u` (`references/ldt-paper/self_improvement.tex` lines 238–246),
@@ -86,7 +86,11 @@ structure AddInUFullStatement
         - addInURightQuantity params strategy M T S|
       ≤ addInUError params eps delta
 
-/-- Producer for `AddInUFullStatement`.
+/-- Proves the selection-dependent transfer inequality of `lem:add-in-u`:
+for any auxiliary sub-measurement family `M = {M^u_o}` and selection rule
+`S : Point → Set (Outcome × Polynomial)`, the two indexed expectations agree
+to within `4 √ζ_variance` (the bound `addInUError params eps delta`), given
+strategy self-consistency in the `IsGood eps delta gamma` standing context.
 
 Paper origin: `references/ldt-paper/self_improvement.tex` lines 247–343
 (proof of `\label{lem:add-in-u}`). The paper's proof is a Cauchy–Schwarz

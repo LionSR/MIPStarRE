@@ -1,7 +1,7 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 
 /-!
-# Section 5 — Producer for the locality-preserving repair stage
+# Section 5 — Locality-preserving projectivization repair
 
 This file records one analytic obligation from Section 5 of the paper that
 is not yet proved in Lean: the locality-preserving repair stage of the
@@ -37,7 +37,13 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
-/-- Producer for `LeftLiftedProjectivizationRepairInput`.
+/-- Given a normalized state `ψ`, a measurement `A`, and the
+spectral-truncation output on the left-lifted family `A_a ⊗ I`, produces a
+projective sub-measurement `P = {P_a}` on the underlying space such that
+the lifted family `{P_a ⊗ I}` satisfies
+`A_a ⊗ I ≈_{roundingToProjectiveError ζ} P_a ⊗ I` (paper bound `84 ζ^{1/4}`).
+The locality-preserving form (output `P_a ⊗ I` rather than an arbitrary
+lifted family) is the specialization required by `orthonormalizationMainLemma`.
 
 Paper origin: `references/ldt-paper/orthonormalization.tex` lines 534–860
 (rank reduction `lem:projective-low-rank-sum` and the `Q`-side setup:
