@@ -1092,23 +1092,25 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
 \begin{lemma}[Slackness residual-domination input]\label{lem:slackness-residual-domination-input}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndResidualDominationInput}
   \notready
-  The slackness-and-residual-domination bridge input exists.
-  Pending \texttt{sdp\_statement\_with\_slackness} (issue \#1230).
+  The slackness-and-residual-domination bridge input exists given the SDP statement with
+  complementary slackness (Lemma~\ref{lem:sdp}).  Pending issue~\#1230.
 \end{lemma}
 \begin{lemma}[Slackness QXP repair and coisometry]\label{lem:slackness-qxp-repair-coisometry}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndQXPRepairAndCoisometry}
   \notready
-  The slackness QXP repair and coisometry input exists.
-  Pending \texttt{sdp\_statement\_with\_slackness} (issue \#1230).
+  The slackness QXP repair and coisometry input exists given the SDP statement with
+  complementary slackness (Lemma~\ref{lem:sdp}).  Pending issue~\#1230.
 \end{lemma}
 \begin{lemma}[Slackness residual-domination bridge inputs]\label{lem:slackness-residual-domination-bridge-inputs}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromSlacknessResidualDominationBridgeInputs}
   \notready
   \uses{lem:slackness-residual-domination-input, lem:slackness-qxp-repair-coisometry}
-  The slackness residual-domination bridge inputs exist given the two bridge components.
-  Pending \texttt{sdp\_statement\_with\_slackness} (issue \#1230).
+  The slackness residual-domination bridge inputs exist given the two bridge components
+  and the SDP statement with complementary slackness (Lemma~\ref{lem:sdp}).
+  Pending issue~\#1230.
 \end{lemma}
 \begin{proof}[Proof of Theorem~\ref{thm:self-improvement}]
+  \proves{thm:self-improvement}
   \uses{lem:self-improvement-helper, thm:orthonormalization,
     prop:self-consistency-implies-data-processing,
     prop:completeness-transfer-self-consistent-A, prop:triangle-sub,
