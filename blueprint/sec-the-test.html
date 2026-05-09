@@ -324,12 +324,13 @@
 
   </div>
 </div>
-<div class="remark_thmwrapper theorem-style-remark" id="fig:test">
-  <div class="remark_thmheading">
-    <span class="remark_thmcaption">
-    Remark
+<div class="lemma_thmwrapper theorem-style-plain" id="fig:test">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
     </span>
-    <span class="remark_thmlabel">2.3</span>
+    <span class="lemma_thmlabel">2.3</span>
+    <span class="lemma_thmtitle">Branch-average form of the classical test</span>
     <div class="thm_header_extras">
 
     
@@ -339,6 +340,26 @@
 
     <a class="icon proof" href="sec-the-test.html#fig:test">#</a>
     
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-the-test.html#def:low-individual-degree-test">Definition 2.2</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
     
     
     <button class="modal lean">L∃∀N</button>
@@ -352,6 +373,8 @@
         
         <ul class="uses">
           
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Test.TwoProverClassicalLIDStrategy.lowIndividualDegreeAcceptanceProbability_eq_branchAverage" class="lean_decl">MIPStarRE.LDT.Test.TwoProverClassicalLIDStrategy.lowIndividualDegreeAcceptanceProbability_eq_branchAverage</a></li>
+          
         </ul>
     
       </div>
@@ -360,8 +383,12 @@
     
         </div>
   </div>
-  <div class="remark_thmcontent">
-  <p>  With probability \(\tfrac 13\) each, the verifier performs the axis-parallel lines test, the self-consistency test, or the diagonal lines test from Definition&#160;<a href="sec-the-test.html#def:low-individual-degree-test">2.2</a>. </p>
+  <div class="lemma_thmcontent">
+  <p>   For every classical strategy, the acceptance probability of the low individual degree test is </p>
+<div class="displaymath" id="a0000000025">
+  \[  \frac13\left(\frac{P^{\mathrm{line,point}}_{\mathrm{axis}}+P^{\mathrm{point,line}}_{\mathrm{axis}}}{2} +P_{\mathrm{self}} +\frac{P^{\mathrm{line,point}}_{\mathrm{diag}}+P^{\mathrm{point,line}}_{\mathrm{diag}}}{2}\right),  \]
+</div>
+<p> where the five terms are the acceptance probabilities of the two axis-parallel role orderings, the self-consistency branch, and the two diagonal role orderings. </p>
 
   </div>
 </div>
@@ -611,12 +638,13 @@
 
   </div>
 </div>
-<div class="remark_thmwrapper theorem-style-remark" id="rem:good-strat-characterization">
-  <div class="remark_thmheading">
-    <span class="remark_thmcaption">
-    Remark
+<div class="proposition_thmwrapper theorem-style-plain" id="rem:good-strat-characterization">
+  <div class="proposition_thmheading">
+    <span class="proposition_thmcaption">
+    Proposition
     </span>
-    <span class="remark_thmlabel">2.9</span>
+    <span class="proposition_thmlabel">2.9</span>
+    <span class="proposition_thmtitle">Good-strategy characterization</span>
     <div class="thm_header_extras">
 
     
@@ -659,6 +687,8 @@
         
         <ul class="uses">
           
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Preliminaries.goodStrategyCharacterization" class="lean_decl">MIPStarRE.LDT.Preliminaries.goodStrategyCharacterization</a></li>
+          
         </ul>
     
       </div>
@@ -667,25 +697,25 @@
     
         </div>
   </div>
-  <div class="remark_thmcontent">
+  <div class="proposition_thmcontent">
   <p>   Using notation which will be introduced in Chapter&#160;<a href="sec-prelims.html">3</a> below, a symmetric strategy is \((\varepsilon ,\delta ,\gamma )\)-good if and only if it satisfies the following three conditions. For \(\ell \) and \(u\) as in the axis-parallel lines test, </p>
-<div class="displaymath" id="a0000000025">
+<div class="displaymath" id="a0000000026">
   \[  A_a^u \otimes I \simeq _\varepsilon I \otimes B^\ell _{[f(u)=a]}, \quad \text{and} \quad A_a^u \otimes I \simeq _\delta I \otimes A_a^u.  \]
 </div>
 <p> And for \(\ell \) and \(u\) as in the diagonal lines test, </p>
-<div class="displaymath" id="a0000000026">
+<div class="displaymath" id="a0000000027">
   \[  A_a^u \otimes I \simeq _\gamma I \otimes L^\ell _{[f(u)=a]}.  \]
 </div>
 
   </div>
 </div>
-<div class="remark_thmwrapper theorem-style-remark" id="not:conditioned-on-last-direction">
-  <div class="remark_thmheading">
-    <span class="remark_thmcaption">
-    Remark
+<div class="definition_thmwrapper theorem-style-definition" id="not:conditioned-on-last-direction">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
     </span>
-    <span class="remark_thmlabel">2.10</span>
-    <span class="remark_thmtitle">Notation</span>
+    <span class="definition_thmlabel">2.10</span>
+    <span class="definition_thmtitle">Last-direction line notation</span>
     <div class="thm_header_extras">
 
     
@@ -728,6 +758,10 @@
         
         <ul class="uses">
           
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.lastDirectionLine" class="lean_decl">MIPStarRE.LDT.lastDirectionLine</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.lastDirectionMeasurementFamily" class="lean_decl">MIPStarRE.LDT.lastDirectionMeasurementFamily</a></li>
+          
         </ul>
     
       </div>
@@ -736,12 +770,12 @@
     
         </div>
   </div>
-  <div class="remark_thmcontent">
-  <p>   Our proof is by induction, proving soundness of the \((m+1,q,d)\) low individual degree test from the soundness of the \((m,q,d)\) low individual degree test. To do this, we frequently use the axis-parallel line test in the specific case of the last direction. Let \((\psi ,A,B,L)\) be a symmetric strategy for the \((m+1,q,d)\) low individual degree test. Then for each \(u \in \mathbb {F}_q^m\) we write \(B_f^u\) as shorthand for \(B_f^\ell \), where </p>
-<div class="displaymath" id="a0000000027">
-  \[  \ell = \{ (u,x) \mid x \in \mathbb {F}_q\} .  \]
+  <div class="definition_thmcontent">
+  <p>   For \(u \in \mathbb {F}_q^m\), the last-direction axis-parallel line in \(\mathbb {F}_q^{m+1}\) is </p>
+<div class="displaymath" id="a0000000028">
+  \[  \ell _u = \{ (u,x) \mid x \in \mathbb {F}_q\} .  \]
 </div>
-<p> For a function \(f \colon \ell \to \mathbb {F}_q\), we also sometimes write \(f(x)\) as shorthand for \(f(u,x)\). </p>
+<p> If \((\psi ,A,B,L)\) is a symmetric strategy for the \((m+1,q,d)\) low individual degree test, we write \(B_f^u\) for the operator \(B_f^{\ell _u}\). For a function \(f \colon \ell _u \to \mathbb {F}_q\), we also write \(f(x)\) for \(f(u,x)\). </p>
 
   </div>
 </div>
@@ -806,7 +840,7 @@
 
     <a class="icon proof" href="sec-the-test.html#thm:main-formal">#</a>
     
-    <a class="icon proof" href="sec-induction.html#a0000000028"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-induction.html#a0000000029"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -888,17 +922,17 @@
   </div>
   <div class="theorem_thmcontent">
   <p>   Let \((\psi , A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})\) be a projective strategy that passes the \((m,q,d)\) low individual degree test with probability at least \(1-\varepsilon \). Assume \(d {\gt} 0\). Let \(k {\gt} 0\) with \(k \ge 400\, md\) and set </p>
-<div class="displaymath" id="a0000000029">
+<div class="displaymath" id="a0000000030">
   \[  \nu = 100000 k^2 m^4\left(\varepsilon ^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\right).  \]
 </div>
 <p> Then there exist projective measurements \(G^{\mathrm A}, G^{\mathrm B} \in \mathrm{PolyMeas}(m,q,d)\) with the following properties: </p>
 <ol class="enumerate">
   <li><p>on average over \(u \sim \mathbb {F}_q^m\), </p>
-<div class="displaymath" id="a0000000030">
+<div class="displaymath" id="a0000000031">
   \[  A_a^{\mathrm A,u} \otimes I \simeq _\nu I \otimes G^{\mathrm B}_{[g(u)=a]}, \qquad I \otimes A_a^{\mathrm B,u} \simeq _\nu G^{\mathrm A}_{[g(u)=a]} \otimes I;  \]
 </div>
 </li>
-  <li><div class="displaymath" id="a0000000031">
+  <li><div class="displaymath" id="a0000000032">
   \[  G_g^{\mathrm A} \otimes I \simeq _\nu I \otimes G_g^{\mathrm B}.  \]
 </div>
 </li>
@@ -915,8 +949,6 @@
     <span class="remark_thmtitle">\(k\)-bound boundary for the public theorem</span>
     <div class="thm_header_extras">
 
-    
-    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
