@@ -273,7 +273,7 @@ noncomputable def projectiveBoundednessGap (params : Parameters)
   ev strategy.state
     (projectiveResidualOperator params H Z)
 
-/-- Paper origin: `references/ldt-paper/self_improvement.tex:238-455`
+/-- Paper origin: `references/ldt-paper/self_improvement.tex:238-343`
 (`\label{lem:add-in-u}`).
 
 Reduced conclusion for the currently formalized fragment of `lem:add-in-u`.
