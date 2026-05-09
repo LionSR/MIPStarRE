@@ -46,7 +46,10 @@ the classical result. -/
 noncomputable def razSafraSlackBound (params : Parameters) (eps : Error) : Error :=
   eps + (params.m : Error) * ((params.d : Error) / (params.q : Error))
 
-/-- Overview-level soundness conclusion: a low individual degree polynomial
+/-- Paper origin: `references/ldt-paper/introduction.tex`
+(`\label{thm:raz-safra}`, `\label{thm:classical-test-soundness}`).
+
+Overview-level soundness conclusion: a low individual degree polynomial
 agrees with the point-answer function except on `slack` average mass, with
 explicit bound `slackBound`. -/
 def PointAnswerSoundnessConclusion (params : Parameters) [FieldModel params.q]
