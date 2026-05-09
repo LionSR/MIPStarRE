@@ -22,6 +22,7 @@ sys.path.insert(0, str(SCRIPT_DIR))
 import blueprint_lean_sync  # noqa: E402
 from blueprint_lean_sync import (  # noqa: E402
     BlueprintEntry,
+    HeaderLeanokWithoutProofLeanok,
     LeanDecl,
     SyncReport,
     _BLUEPRINT_COVERAGE_COMMENT_MARKER,
@@ -44,6 +45,7 @@ from blueprint_lean_sync import (  # noqa: E402
     collect_blueprint_entries,
     collect_file_lean_decls,
     find_changed_decls_missing_from_blueprint,
+    find_header_leanok_without_proof_leanok,
     find_orphan_leanok_tags,
     print_missing_blueprint_warnings,
 )
@@ -1170,6 +1172,224 @@ class PRCommentTests(unittest.TestCase):
                 "https://api.github.com/repos/o/r/issues/1/comments", "tok"
             )
         self.assertEqual(result, [{"id": 1}])
+
+
+
+
+class HeaderLeanokWithoutProofLeanokTests(unittest.TestCase):
+    """Tests for the new mismatch category: header \\leanok paired with a
+    proof block that lacks its own \\leanok."""
+
+    def _run_scan(self, tex_source: str) -> list:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            blueprint_src = Path(tmp_dir) / "blueprint" / "src"
+            chapter_dir = blueprint_src / "chapter"
+            chapter_dir.mkdir(parents=True)
+            (chapter_dir / "ch01_test.tex").write_text(tex_source.strip() + "\n")
+            return find_header_leanok_without_proof_leanok(blueprint_src)
+
+    def test_header_leanok_without_proof_leanok_is_reported(self) -> None:
+        """(a) header \\leanok + proof block without proof \\leanok is reported."""
+        mismatches = self._run_scan(
+            r"""
+\begin{lemma}\label{lem:test}
+  \lean{Foo.bar}
+  \leanok
+\end{lemma}
+\begin{proof}
+  Proof text without \leanok.
+\end{proof}
+"""
+        )
+        self.assertEqual(len(mismatches), 1)
+        self.assertEqual(mismatches[0].env_type, "lemma")
+        self.assertEqual(mismatches[0].label, "lem:test")
+
+    def test_header_and_proof_both_leanok_is_ok(self) -> None:
+        """(b) header \\leanok + proof \\leanok is ok."""
+        mismatches = self._run_scan(
+            r"""
+\begin{theorem}\label{thm:ok}
+  \lean{Foo.ok}
+  \leanok
+\end{theorem}
+\begin{proof}\leanok
+  Proof text with \leanok.
+\end{proof}
+"""
+        )
+        self.assertEqual(mismatches, [])
+
+    def test_statement_only_no_proof_block_is_ok(self) -> None:
+        """(c) statement-only entry with no proof remains ok."""
+        mismatches = self._run_scan(
+            r"""
+\begin{lemma}\label{lem:stmt-only}
+  \lean{Foo.stmtOnly}
+  \leanok
+\end{lemma}
+"""
+        )
+        self.assertEqual(mismatches, [])
+
+    def test_multiline_lean_blocks_are_handled(self) -> None:
+        """(d) multiline \\lean{} remains ok when both have \\leanok."""
+        mismatches = self._run_scan(
+            r"""
+\begin{lemma}\label{lem:multi}
+  \lean{Foo.bar, Foo.baz, Foo.qux, Foo.quux, Foo.corge,
+        Foo.grault, Foo.garply, Foo.waldo, Foo.fred, Foo.plugh,
+        Foo.xyzzy, Foo.thud}
+  \leanok
+\end{lemma}
+\begin{proof}\leanok
+  Proof.
+\end{proof}
+"""
+        )
+        self.assertEqual(mismatches, [])
+
+    def test_multiline_lean_missing_proof_leanok_is_reported(self) -> None:
+        """Multiline \\lean{} with header \\leanok but missing proof \\leanok."""
+        mismatches = self._run_scan(
+            r"""
+\begin{lemma}\label{lem:multi-missing}
+  \lean{Foo.bar, Foo.baz, Foo.qux, Foo.quux, Foo.corge,
+        Foo.grault, Foo.garply, Foo.waldo, Foo.fred, Foo.plugh,
+        Foo.xyzzy, Foo.thud}
+  \leanok
+\end{lemma}
+\begin{proof}
+  Proof text without \leanok.
+\end{proof}
+"""
+        )
+        self.assertEqual(len(mismatches), 1)
+        self.assertEqual(mismatches[0].label, "lem:multi-missing")
+
+    def test_comment_leanok_is_ignored(self) -> None:
+        r"""\\leanok inside a TeX ``%`` comment does not count as a marker."""
+        mismatches = self._run_scan(
+            r"""
+\begin{lemma}\label{lem:comment}
+  \lean{Foo.comment}
+  % \leanok was here but is commented out.
+\end{lemma}
+\begin{proof}\leanok
+  Proof.
+\end{proof}
+"""
+        )
+        self.assertEqual(mismatches, [])
+
+    def test_leanok_in_prose_is_ignored(self) -> None:
+        """A prose mention like ``not marked \\leanok`` inside the statement
+        body must not be counted as a real marker."""
+        mismatches = self._run_scan(
+            r"""
+\begin{lemma}\label{lem:prose}
+  \lean{Foo.prose}
+  This lemma is not marked \leanok.
+\end{lemma}
+\begin{proof}
+  Proof.
+\end{proof}
+"""
+        )
+        self.assertEqual(mismatches, [])
+
+    def test_header_no_leanok_proof_has_leanok_is_not_reported(self) -> None:
+        """The check is one-directional: only header-with-\\leanok +
+        proof-without-\\leanok is reported.  The reverse is not flagged."""
+        mismatches = self._run_scan(
+            r"""
+\begin{lemma}\label{lem:reverse}
+  \lean{Foo.reverse}
+\end{lemma}
+\begin{proof}\leanok
+  Proof.
+\end{proof}
+"""
+        )
+        self.assertEqual(mismatches, [])
+
+    def test_intervening_remark_between_statement_and_proof(self) -> None:
+        """A remark between the statement and its proof does not confuse
+        the scanning — the proof is still the immediately-following block."""
+        mismatches = self._run_scan(
+            r"""
+\begin{lemma}\label{lem:intervening}
+  \lean{Foo.intervening}
+  \leanok
+\end{lemma}
+\begin{remark}
+  Intervening remark.
+\end{remark}
+\begin{proof}
+  Proof without \leanok.
+\end{proof}
+"""
+        )
+        self.assertEqual(len(mismatches), 1)
+        self.assertEqual(mismatches[0].label, "lem:intervening")
+
+    def test_corollary_and_proposition_are_also_checked(self) -> None:
+        """Corollary and proposition environments are checked alongside
+        lemma and theorem."""
+        mismatches = self._run_scan(
+            r"""
+\begin{corollary}\label{cor:test}
+  \lean{Foo.cor}
+  \leanok
+\end{corollary}
+\begin{proof}
+  Proof without \leanok.
+\end{proof}
+
+\begin{proposition}\label{prop:test}
+  \lean{Foo.prop}
+  \leanok
+\end{proposition}
+\begin{proof}\leanok
+  Proof with \leanok.
+\end{proof}
+"""
+        )
+        self.assertEqual(len(mismatches), 1)
+        self.assertEqual(mismatches[0].env_type, "corollary")
+
+    def test_escaped_percent_leanok_is_not_a_comment(self) -> None:
+        r"""A literal ``\%leanok`` in the source is not stripped by
+        comment processing and, since it doesn't match ``\\leanok\\b``,
+        should not be treated as a marker."""
+        mismatches = self._run_scan(
+            r"""
+\begin{lemma}\label{lem:escaped}
+  \lean{Foo.escaped}
+  \%leanok is not a real marker.
+\end{lemma}
+\begin{proof}\leanok
+  Proof.
+\end{proof}
+"""
+        )
+        self.assertEqual(mismatches, [])
+
+    def test_no_label_environment_is_still_flagged(self) -> None:
+        """An environment without a \\label should still be flagged."""
+        mismatches = self._run_scan(
+            r"""
+\begin{lemma}
+  \lean{Foo.nolabel}
+  \leanok
+\end{lemma}
+\begin{proof}
+  Proof without \leanok.
+\end{proof}
+"""
+        )
+        self.assertEqual(len(mismatches), 1)
+        self.assertEqual(mismatches[0].label, None)
 
 
 if __name__ == "__main__":
