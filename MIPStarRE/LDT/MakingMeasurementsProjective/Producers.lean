@@ -41,7 +41,12 @@ namespace MIPStarRE.LDT.MakingMeasurementsProjective
 spectral-truncation output on the left-lifted family `A_a ⊗ I`, produces a
 projective sub-measurement `P = {P_a}` on the underlying space such that
 the lifted family `{P_a ⊗ I}` satisfies
-`A_a ⊗ I ≈_{roundingToProjectiveError ζ} P_a ⊗ I` (paper bound `84 ζ^{1/4}`).
+`A_a ⊗ I ≈_{roundingToProjectiveError ζ} P_a ⊗ I`, where the Lean parameter
+`ζ` is the spectral-truncation output and `roundingToProjectiveError ζ
+= 12 ζ^{1/2}`. The paper expresses the final orthonormalization-chain bound
+as `≈_{84 ζ^{1/4}}` for the original orthonormalization-input `ζ`, which
+relates to the Lean parameter via the spectral-truncation + projectivization
+chain.
 The locality-preserving form (output `P_a ⊗ I` rather than an arbitrary
 lifted family) is the specialization required by `orthonormalizationMainLemma`.
 
