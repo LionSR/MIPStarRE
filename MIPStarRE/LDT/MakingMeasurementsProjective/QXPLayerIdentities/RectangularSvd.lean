@@ -166,9 +166,11 @@ The rank-reduction witness supplies the projectivity of each `Q_a` and the
 identity `∑_a Q_a = Q`.  The remaining hypotheses are exactly the local
 matrix-decomposition data for `Q_a = X† T_a X` and the two SVD-derived
 identities for the chosen `Xhat`.  Thus this constructor removes the
-rank-reduction fields from the caller's obligations; the only external
-mathematical input still not produced here is the rectangular SVD/polar
-decomposition that provides `xHat`. -/
+rank-reduction fields from the caller's obligations.  The rectangular
+SVD/polar decomposition that provides `xHat` is now produced by the
+sigma-range route (PR #1237).  The remaining end-to-end gap is the broader
+`SpectralTruncation` / `ProjectivizationRepair` /
+`OrthonormalizationInput` chain (issue #1032, #1359). -/
 noncomputable def QXPLayerData.ofRankReductionAndSvdIdentities
     {Outcome : Type*} [Fintype Outcome]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
