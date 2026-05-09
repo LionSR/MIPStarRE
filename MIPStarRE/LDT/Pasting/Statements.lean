@@ -138,7 +138,11 @@ noncomputable def fromHToGPaperTotalError (params : Parameters)
     (gamma zeta : Error) (k : ℕ) : Error :=
   (k : Error) * fromHToGRecurrenceError params gamma zeta k
 
-/-- Analytic conclusion for `thm:ld-pasting` once a witness `H` has been fixed.
+/-- Paper origin: `references/ldt-paper/ld-pasting.tex:12-50`
+(`\label{thm:ld-pasting}`), conclusion in `\label{item:ld-pasting-N-consistency}`
+(lines 45-49).
+
+Analytic conclusion for `thm:ld-pasting` once a witness `H` has been fixed.
 
 The theorem `ldPasting` separately records that the chosen witness is the
 canonical construction `constructedPastedMeasurement params family k`, so this
@@ -160,7 +164,10 @@ structure LdPastingConclusion (params : Parameters)
       (MainInductionStep.ldPastingInInductionError params k
         eps delta gamma kappa zeta)
 
-/-- Analytic conclusion for `lem:ld-pasting-sub-measurement` once a witness `H`
+/-- Paper origin: `references/ldt-paper/ld-pasting.tex:118-131`
+(`\label{lem:ld-pasting-sub-measurement}`).
+
+Analytic conclusion for `lem:ld-pasting-sub-measurement` once a witness `H`
 has been fixed.
 
 The theorem `ldPastingSubMeas` separately records that the chosen witness is the
