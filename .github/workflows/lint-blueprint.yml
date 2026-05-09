@@ -56,7 +56,15 @@ jobs:
           python-version: '3.12'
 
       - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y graphviz libgraphviz-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            graphviz libgraphviz-dev \
+            texlive-xetex \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            texlive-science \
+            latexmk
 
       - name: Install leanblueprint
         run: |
@@ -68,6 +76,21 @@ jobs:
 
       - name: Check blueprint LaTeX conventions
         run: python3 scripts/check_blueprint_latex.py --root blueprint/src
+
+      - name: Run leanblueprint pdf (catches undefined macros and LaTeX errors)
+        working-directory: blueprint
+        run: |
+          leanblueprint pdf
+          pdf_status=$?
+
+          if [ "$pdf_status" -ne 0 ]; then
+            echo "::error::leanblueprint pdf failed — check for undefined macros or LaTeX errors above"
+            exit "$pdf_status"
+          fi
+          if [ ! -s print/print.pdf ]; then
+            echo "::error::leanblueprint pdf produced no output"
+            exit 1
+          fi
 
       - name: Run leanblueprint web and check for errors
         working-directory: blueprint
