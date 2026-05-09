@@ -59,10 +59,7 @@ for the sigma-range embedding) to a genuine projective sub-measurement
 form (output `P_a ⊗ I` rather than an arbitrary lifted family) is the
 specialization required by `orthonormalizationMainLemma` and thereby by
 `mainFormal`'s base-case bridge.
-
-The companion `leftLiftedProjectivizationRepairInputDischarge` provides
-`LeftLiftedProjectivizationRepairInput` in the form required by
-`orthonormalizationMainLemma`. -/
+-/
 theorem leftLiftedProjectivizationRepairProducer
     {Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι]
@@ -74,16 +71,4 @@ theorem leftLiftedProjectivizationRepairProducer
       RoundedProjMeasStatement ψ (leftLiftedMeasurement (ιB := ι) A)
         (ProjSubMeas.liftLeft P) (roundingToProjectiveError ζ) := by
   sorry
-
-/-- Provides `LeftLiftedProjectivizationRepairInput` in the form required by
-`orthonormalizationMainLemma`, derived from
-`leftLiftedProjectivizationRepairProducer`. -/
-def leftLiftedProjectivizationRepairInputDischarge
-    {Outcome : Type*} {ι : Type*}
-    [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState (ι × ι)) (A : Measurement Outcome ι) (ζ : Error) :
-    LeftLiftedProjectivizationRepairInput ψ A ζ :=
-  fun hSpectral => leftLiftedProjectivizationRepairProducer ψ A ζ hSpectral
-
 end MIPStarRE.LDT.MakingMeasurementsProjective
