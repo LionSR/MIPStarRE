@@ -447,7 +447,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
 \end{proof}
 
 \begin{remark}[Slackness-carrying self-improvement helper]\label{rem:self-improvement-helper-with-slackness-theorem}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithSlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.self_improvement_helper_with_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.self_improvement_helper_with_slackness_of_sdp_statement_with_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndResidualDominationInput}
@@ -1112,11 +1112,6 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \[
     \widehat{\zeta}_{\mathrm{ortho}} = 100 \widehat{\zeta}^{1/4}.
   \]
-  Lean also records an abstract residual-domination wrapper for this final
-  assembly: once the SDP helper carries complementary slackness and the
-  orthonormalization input carries the fresh-outcome residual domination, the
-  final point-consistency field is produced through the monotone-total route,
-  without invoking the alphabet-size total-gap absorption.
   In addition, Lemma~\ref{prop:self-consistency-implies-data-processing} implies that
   \begin{equation}\label{eq:approx-data-processed}
     \widehat{H}_{[h(u)=a]} \ot I \approx_{\widehat{\zeta}_{\mathrm{dataprocess}}} H_{[h(u)=a]} \ot I,

@@ -117,7 +117,7 @@ lemma selfImprovementWithSlacknessAndResidualDominationInput
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu := by
   obtain ⟨T, Hhat, Zout, hhelperWithSlackness⟩ :=
-    selfImprovementHelperWithSlackness params strategy eps delta gamma
+    self_improvement_helper_with_slackness params strategy eps delta gamma
       hgood nu G
   let hhelper : SelfImprovementHelperConclusion params strategy T Hhat Zout eps delta :=
     hhelperWithSlackness.toHelperConclusion
