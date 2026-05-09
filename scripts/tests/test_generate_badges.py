@@ -27,6 +27,18 @@ _TST_PROOF_BEARING_ENV_TYPES = frozenset(
 )
 
 
+class ProofBearingEnvTypesTests(unittest.TestCase):
+    """Guard that the test-suite copy matches the canonical constant."""
+
+    def test_matches_canonical(self) -> None:
+        from blueprint_lean_sync import _PROOF_BEARING_ENV_TYPES
+
+        self.assertEqual(
+            _TST_PROOF_BEARING_ENV_TYPES,
+            frozenset(_PROOF_BEARING_ENV_TYPES),
+        )
+
+
 # ---------------------------------------------------------------------------
 # Minimal BlueprintEntry-alike for testing _blueprint_badge_counts
 # ---------------------------------------------------------------------------
@@ -144,6 +156,19 @@ class BlueprintBadgeCountsTests(unittest.TestCase):
         no_leanok, not_ready = _blueprint_badge_counts(entries, _TST_PROOF_BEARING_ENV_TYPES)
         self.assertEqual(no_leanok, 1)
         self.assertEqual(not_ready, 0)  # remark-only: excluded denominator
+
+    def test_remark_only_with_proof_leanok_is_proof_bearing(self) -> None:
+        """Remark-only with proof \\leanok: treated as proof-bearing (fix #1416 nit)."""
+        entries = [
+            _FakeBlueprintEntry(
+                "A", has_leanok=False, proof_has_leanok=True, env_type="remark"
+            ),
+        ]
+        no_leanok, not_ready = _blueprint_badge_counts(entries, _TST_PROOF_BEARING_ENV_TYPES)
+        # Has proof-level leanok → NOT "no leanok".
+        self.assertEqual(no_leanok, 0)
+        # Proof-bearing (via proof_has_leanok), missing statement → not ready
+        self.assertEqual(not_ready, 1)
 
     def test_mixed_remark_and_lemma_treated_as_proof_bearing(self) -> None:
         """When a decl appears in both remark and lemma, treat as proof-bearing."""

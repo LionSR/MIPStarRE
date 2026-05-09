@@ -212,10 +212,13 @@ def _blueprint_badge_counts(
             no_leanok += 1
 
         # --- not-ready: not fully formalized ---
-        is_proof_bearing = bool(env_types & proof_bearing_env_types)
+        is_proof_bearing = bool(env_types & proof_bearing_env_types) or has_proof
         is_skip_only = env_types <= _SKIP_ENV_TYPES
-        if is_skip_only:
-            # Remark/example-only: not a formalization target.
+        if is_skip_only and not has_proof:
+            # Remark/example-only without a proof marker: not a
+            # formalization target.  (When a proof-level \leanok *is*
+            # present, treat as proof-bearing to stay consistent with
+            # blueprint_lean_sync._is_proof_relevant_entry.)
             continue
         if is_proof_bearing:
             if not (has_stmt and has_proof):
