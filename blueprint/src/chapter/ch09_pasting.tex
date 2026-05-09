@@ -689,8 +689,36 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\uses{lem:vertical-restriction-identities, lem:ld-gbcon}
 	If the tuple of completed slices does not interpolate to the sampled
 	vertical-line value, then some active coordinate witnesses a line-value
-	mismatch. The corresponding single-outcome consistency defects are bounded
-	by the one-point line defect and by the bad interpolation mass.
+	mismatch. Concretely, for every direction $u$ and injective tuple
+	$\mathbf{x}=(x_1,\dots,x_k)$, let $\widehat{H}^{\mathbf{x}}\rvert_u$ be the
+	vertical-line restriction of the pasted interpolation family. Then
+	\[
+		\operatorname{Defect}_\psi\bigl(
+			\widehat{H}^{\mathbf{x}}\rvert_u,\,
+			B^u\bigr)
+		\;\le\;
+		\operatorname{Bad}(\psi;u,\mathbf{x})
+		\;\le\;
+		\sum_{i=1}^k
+		\operatorname{Defect}_\psi\bigl(
+			\widehat{H}^{(i)}(u,\mathbf{x}),\,
+			B^{(i)}(u,\mathbf{x})\bigr),
+	\]
+	where $\operatorname{Defect}_\psi(A,B)$ denotes the bipartite consistency
+	defect $\max\bigl(0,\,
+		\bra{\psi} A_{\mathrm{tot}}\ot B_{\mathrm{tot}}\ket{\psi}
+		- \sum_a \bra{\psi} A_a\ot B_a\ket{\psi}\bigr)$,
+		\[
+			\operatorname{Bad}(\psi;u,\mathbf{x})
+			= \sum_f \bra{\psi}
+			\Bigl(\sum_{\substack{g_1,\dots,g_k\\ \exists i:\, g_i\ne\bot,\ g_i(u)\ne f(x_i)}}
+				\widehat H_{g_1,\dots,g_k}^{\mathbf{x}}
+			\Bigr) \ot B_f^u
+			\ket{\psi},
+		\]
+		and $\widehat{H}^{(i)},B^{(i)}$ are the one-point line comparison
+		families (Lemma~\ref{lem:ld-sandwich-line-one-point})
+		restricted to coordinate $i$, and $\operatorname{Bad}(\psi;u,\mathbf{x})\le 1$.
 \end{lemma}
 
 \begin{lemma}[Averaging the line-interpolation defect]\label{lem:line-interpolation-averaging-estimates}
@@ -698,9 +726,31 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\leanok
 	\uses{prop:ld-dnoteq, lem:line-interpolation-mismatch-estimates}
 	Replacing distinct tuples by independent tuples costs the total-variation
-	error from Proposition~\ref{prop:ld-dnoteq}. After averaging over
-	coordinates and the left-hand submeasurement, the bad interpolation mass is
-	bounded by the one-point sandwich error.
+	error $k^2/q$ from Proposition~\ref{prop:ld-dnoteq}. After averaging over
+	$u$ and $\mathbf{x}\sim\mathsf{Distinct}_k$, the expected bad mass and the
+	expected pasted interpolation defect are bounded by the one-point sandwich
+	error:
+	\[
+		\E_u\;
+		\E_{\mathbf{x}\sim\mathsf{Distinct}_k}\;
+		\operatorname{Bad}(\psi;u,\mathbf{x})
+		\;\le\;
+		k\cdot\nu_5 \;+\; \frac{k^2}{q},
+	\]
+	and consequently
+	\[
+		\E_u\;\E_{\mathbf{x}\sim\mathsf{Distinct}_k}\;
+		\operatorname{Defect}_\psi\bigl(
+			\widehat{H}^{\mathbf{x}}\rvert_u,\,
+			B^u\bigr)
+		\;\le\;
+		k\cdot\nu_5 \;+\; \frac{k^2}{q},
+	\]
+	where $\nu_5 = 43km(\eps^{1/32}+\dots+(d/q)^{1/32})$
+	(Lemma~\ref{lem:ld-sandwich-line-one-point}). Using
+	$1/q \le (d/q)^{1/32}$ and $m\ge 1$, this is further bounded by
+	$44k^2m(\eps^{1/32}+\delta^{1/32}+\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32})$
+	as used in Lemma~\ref{lem:h-b-consistency}.
 \end{lemma}
 
 \begin{lemma}[Consistency of the sandwiched measurement with one line value]\label{lem:ld-sandwich-line-one-point}
