@@ -281,6 +281,22 @@
 	\]
 \end{lemma}
 
+\begin{lemma}[Locality-preserving projectivization repair]\label{lem:left-lifted-projectivization-repair}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer}
+	\uses{lem:projective-non-measurement, def:approx_delta}
+	Paper origin: \texttt{references/ldt-paper/orthonormalization.tex} lines 534--740, the late repair stage of the orthogonalization-lemma proof.
+
+	Let $\ket{\psi}$ be a state on a bipartite space, let $A = \{A_a\}$ be a measurement, and let $\zeta \geq 0$. Given the rounded almost-projective family produced by Lemma~\ref{lem:projective-non-measurement} on the left-lifted family $\{A_a \ot I\}$, there exists a projective sub-measurement $P = \{P_a\}$ on the underlying space such that the lifted family $\{P_a \ot I\}$ satisfies
+	\[
+		A_a \ot I \approx_{\mathsf{roundingToProjectiveError}(\zeta)} P_a \ot I.
+	\]
+	The locality-preserving form -- output $P_a \ot I$ rather than an arbitrary lifted family -- is what \ref{lem:orthonormalization-main-lemma-local} consumes; it is transported through the $Q/X/\widehat X/P$ algebra via the rectangular polar decomposition for the sigma-range embedding.
+\end{lemma}
+\begin{proof}
+	\notready
+	The paper's argument transports the rounded family produced by \ref{lem:projective-non-measurement} through the $Q/X/\widehat X/P$ algebra (\ref{lem:X-squared}, \ref{lem:X-hat-squared}, \ref{lem:X-times-X-hat}, \ref{lem:squared-difference}, \ref{lem:P-projectivity}, \ref{lem:P-Q-approx}) and then descends to the locality-preserving lifted form. The Lean witness \texttt{leftLiftedProjectivizationRepairProducer} records the obligation; the proof remains an upstream analytic obligation tracked by \href{https://github.com/LionSR/MIPStarRE/issues/1032}{issue 1032}.
+\end{proof}
+
 \begin{lemma}[Local orthogonalization lemma for a measurement]\label{lem:orthonormalization-main-lemma-local}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma_local}
 	\leanok
