@@ -414,6 +414,7 @@
 	\lean{MIPStarRE.LDT.Test.MainFormalBaseProjectiveCompletionHypotheses, MIPStarRE.LDT.Test.baseProjectiveCompletionResidual, MIPStarRE.LDT.Test.MainFormalBaseBridgeHypotheses, MIPStarRE.LDT.Test.baseProjectiveCompletionHypotheses_ofBaseBridge, MIPStarRE.LDT.Test.baseProjectiveCompletionResidual_ofBaseBridge}
 	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalCompletionInput.nonempty_ofDiagonalConsistencyAndMatchMassPreservation, MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualProjectiveCompletionResidual.nonempty_ofRoleResidualAndDiagonalInputsAndMatchMassPreservation, MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRepairInputs, MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofQXPLayerRepairWitnesses, MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofLiftedQXPApproximations}
 	\lean{MIPStarRE.LDT.Test.MainFormalBaseRepairedBridgeHypotheses, MIPStarRE.LDT.Test.MainFormalRepairedBridgeHypotheses, MIPStarRE.LDT.Test.baseMainFormal_ofRepairedBaseBridge, MIPStarRE.LDT.Test.mainFormal_ofRoleResidualAndRepairedBridge}
+	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRoleResidual, MIPStarRE.LDT.Test.repairedBridgeHypotheses_ofRoleResidual}
 	\leanok
 	\uses{def:main-formal-successor-boundary, thm:orthonormalization}
 	The structure \texttt{MainFormalBaseProjectiveCompletionHypotheses} bundles the still-unformalized
@@ -461,8 +462,8 @@
 
 
 \begin{proposition}[Lean gap producers for the successor inductive step]\label{prop:main-formal-successor-producers}
-	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSliceWitnessProducer,
-		MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSliceBridgeProducer}
+	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSliceWitnessProducer}
+	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSliceBridgeProducer}
 	\uses{def:main-formal-successor-boundary, thm:main-induction-public-wrapper}
 	The two declarations
 	\texttt{mainFormalSuccessorAnswerSliceWitnessProducer} and
