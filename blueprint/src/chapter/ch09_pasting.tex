@@ -62,7 +62,7 @@
 		\end{cases}
 	\]
 	Then $\sum_h (H_{\mathrm{meas}})_h = H + (I-H) = I$. Moreover,
-	\[
+	\begin{align*}
 		      & \E_u \sum_{a \ne b} \bra{\psi} A_a^u \ot (H_{\mathrm{meas}})_{[h(u)=b]} \ket{\psi}                            \\
 		={}   & \E_u \sum_a \sum_{h:h(u)\ne a} \bra{\psi} A_a^u \ot (H_{\mathrm{meas}})_h \ket{\psi}                          \\
 		={}   & \E_u \sum_a \sum_{h:h(u)\ne a} \bra{\psi} A_a^u \ot H_h \ket{\psi}
@@ -72,7 +72,7 @@
 		\le{} & \nu + \left(\kappa\left(1+\frac{1}{100m}\right) + \nu + e^{-k/(80000m^2)}\right)
 		\tag{by \ref{item:ld-pasting-N-consistency-sub-measurement} and \ref{item:ld-pasting-N-completeness-sub-measurement}} \\
 		={}   & \sigma.
-	\]
+	\end{align*}
 	Thus $A_a^u \ot I \simeq_\sigma I \ot (H_{\mathrm{meas}})_{[h(u)=a]}$.
 \end{proof}
 
@@ -369,13 +369,13 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 		\E_x \sum_g \bra{\psi} G_g^x \ot I \ket{\psi} - \frac{\zeta}{2}.
 	\end{equation}
 	Hence
-	\[
+	\begin{align*}
 		      & \E_x \|(G^x\ot I - I\ot G^x)\ket{\psi}\|^2                                                              \\
 		={}   & 2\E_x \bra{\psi} G^x \ot I \ket{\psi} - 2\E_x \bra{\psi} G^x \ot G^x \ket{\psi}                         \\
 		={}   & 2\E_x \sum_g \bra{\psi} G_g^x \ot I \ket{\psi} - 2\E_x \sum_{g,h} \bra{\psi} G_g^x \ot G_h^x \ket{\psi} \\
 		\le{} & 2\E_x \sum_g \bra{\psi} G_g^x \ot I \ket{\psi} - 2\E_x \sum_g \bra{\psi} G_g^x \ot G_g^x \ket{\psi}
 		\le \zeta
-	\]
+	\end{align*}
 	by \ref{eq:ld-g-self-consistency}.
 \end{proof}
 
@@ -440,7 +440,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	We compare all four terms with $\bra{\psi} G \ot M \ket{\psi}$.
 
 	For the first term in \ref{eq:g-commute-with-gg-error},
-	\[
+	\begin{align*}
 		\E_{x,y} \sum_o \bra{\psi} M_o^y (G^x)^2 M_o^y \ot I \ket{\psi}
 		 & =
 		\E_{x,y} \sum_o \bra{\psi} M_o^y G^x M_o^y \ot I \ket{\psi}               \\
@@ -450,9 +450,9 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 		\tag{by \ref{prop:switch-sandwich} and \ref{eq:M-self-consistent}}        \\
 		 & =
 		\bra{\psi} G \ot M \ket{\psi}.
-	\]
+	\end{align*}
 	For the second term,
-	\[
+	\begin{align*}
 		\E_{x,y} \sum_o \bra{\psi} G^x (M_o^y)^2 G^x \ot I \ket{\psi}
 		 & =
 		\E_{x,y} \sum_o \bra{\psi} G^x M_o^y G^x \ot I \ket{\psi}                     \\
@@ -462,7 +462,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 		\tag{by \ref{prop:switch-sandwich} and \ref{lem:g-complete-self-consistency}} \\
 		 & =
 		\bra{\psi} M \ot G \ket{\psi}.
-	\]
+	\end{align*}
 
 	For the third term, first
 	\begin{align}
@@ -495,7 +495,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 		\label{eq:commute-the-G-yet-again}
 	\end{align}
 	Finally,
-	\[
+	\begin{align*}
 		\eqref{eq:commute-the-G-yet-again}
 		 & =
 		\E_{x,y} \sum_{o,g} \bra{\psi} M_o^y G_g^x M_o^y \ot I \ket{\psi}         \\
@@ -505,7 +505,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 		\tag{by \ref{prop:switch-sandwich} and \ref{eq:M-self-consistent}}        \\
 		 & =
 		\bra{\psi} G \ot M \ket{\psi}.
-	\]
+	\end{align*}
 	Therefore
 	\begin{equation}\label{eq:term-three-for-use-right-now}
 		\E_{x,y} \sum_o \bra{\psi} G^x M_o^y G^x M_o^y \ot I \ket{\psi}
@@ -1363,7 +1363,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 		\label{eq:h-ot-mgg}
 	\end{align}
 	The omitted Cauchy--Schwarz bound reuses the first square root from \ref{eq:call-again-later-part-dos} and the second square root from \ref{eq:call-again-later-part-tres}. Since $\widehat G$ is projective,
-	\[
+	\begin{align*}
 		\eqref{eq:h-ot-mgg}
 		 & =
 		\E_{x_{\ge \ell}} \sum_{\tau_{\ge \ell}} \sum_{(g_\ell,g_{>\ell})\in \mathsf O_{\tau_{\ge \ell}}}
@@ -1386,7 +1386,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 		\widehat H_{g_{>\ell}}^{x_{>\ell}} \ot S_{\tau_{>\ell}}
 		\ket{\psi}
 		\tag{by \ref{eq:S-recurrence}},
-	\]
+	\end{align*}
 	which is exactly \ref{eq:i-think-this-is-what-i'm-supposed-to-prove-2}.
 \end{proof}
 
