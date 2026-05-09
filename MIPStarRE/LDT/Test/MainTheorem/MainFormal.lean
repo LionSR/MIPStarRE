@@ -47,9 +47,11 @@ namespace Test
 
 /-! ## Successor bridge input types
 
-These wrapper types expand the private abbreviations from `RoleRegister.lean`
-so that `mainFormal` can name the successor-bridge hypotheses without
-adding dependencies on private names. -/
+These abbreviations expose, under public names, the types of the
+answer-valued recursive-slice witnesses and self-improvement bridge inputs
+that `mainFormal` requires for the successor dimension (`params.m ≠ 1`).
+They unfold the private `let`-bindings from `RoleRegister.lean` so that
+`mainFormal` can refer to those types without depending on private names. -/
 
 /-- Type of answer-valued successor recursive slice witnesses for `mainFormal`.
 
@@ -124,7 +126,7 @@ Paper origin: `references/ldt-paper/inductive_step.tex:456-485`, still in
 
 Tracks #1036.  The target is data-valued, so this producer is a
 `noncomputable def` rather than a theorem; the intentional proof placeholder is
-the visible Section 9 bridge gap instead of another public hypothesis package. -/
+the visible Section 9 bridge gap instead of another public hypothesis. -/
 noncomputable def mainFormalSuccessorAnswerSliceBridgeProducer
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -188,11 +190,11 @@ via `MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRoleResidual`.
 **Diagonal self-consistency** (`diagonalConsistency`) is NOT derivable from the
 role residual's cross consistency (`G^A ⊗ I ≃ I ⊗ G^B`).  It requires
 self-consistency (`G^A ⊗ I ≃ G^A ⊗ I` and `G^B ⊗ I ≃ G^B ⊗ I`), which is a
-structurally stronger statement.  Callers must supply it as a separate
-hypothesis.
+structurally stronger statement.  This must therefore be supplied as a
+separate hypothesis.
 
-Callers constructing `hbaseBridge` for `mainFormal` should instantiate this lemma
-with their per-role-residual repair witnesses and diagonal self-consistency proofs.
+To construct `hbaseBridge` for `mainFormal`, one must instantiate this lemma
+with the per-role-residual repair witnesses and diagonal self-consistency proofs.
 
 Refs #1359, #1043. -/
 noncomputable def repairedBridgeHypotheses_ofRoleResidual
@@ -710,7 +712,7 @@ theorem mainFormal
   -- The successor case (m > 1) uses two visible producer declarations,
   -- `mainFormalSuccessorAnswerSliceWitnessProducer` (#1035) and
   -- `mainFormalSuccessorAnswerSliceBridgeProducer` (#1036), instead of adding
-  -- those missing analytic packages as extra public hypotheses to `mainFormal`.
+  -- that analytic content as extra public hypotheses to `mainFormal`.
   -- These producers are wired through
   -- `MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorBridgeInputs`
   -- to produce the role residual, then combined with `hbaseBridge` via

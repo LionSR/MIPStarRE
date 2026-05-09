@@ -460,6 +460,32 @@
 \end{definition}
 
 
+\begin{proposition}[Lean gap producers for the successor inductive step]\label{prop:main-formal-successor-producers}
+	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSliceWitnessProducer,
+		MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSliceBridgeProducer}
+	\uses{def:main-formal-successor-boundary, thm:main-induction-public-wrapper}
+	The two declarations
+	\texttt{mainFormalSuccessorAnswerSliceWitnessProducer} and
+	\texttt{mainFormalSuccessorAnswerSliceBridgeProducer} expose, as visible
+	Lean producers, the two analytic gaps that remain in the successor branch
+	of Theorem~\ref{thm:main-formal}.  The first witnesses the answer-valued
+	recursive slice data $G^{x}$ obtained by applying the inductive hypothesis
+	to each $x$-restricted strategy
+	(paper \texttt{references/ldt-paper/inductive\_step.tex}, lines 441--454,
+	in the proof of \Cref{thm:main-induction} inside
+	\texttt{sec:proof-of-main-induction}); the formalization of this step is
+	tracked by issue~\#1035.  The second produces the per-slice
+	self-improvement bridge inputs obtained by applying
+	\Cref{thm:self-improvement-in-induction-section} to each $G^{x}$
+	(paper \texttt{inductive\_step.tex}, lines 456--485); the formalization of
+	this step is tracked by issue~\#1036.  Both declarations are intentionally
+	closed with \texttt{sorry} under the policy of issue~\#1379, which prefers
+	visible producer declarations to additional public hypotheses on
+	\texttt{mainFormal}; consequently this entry intentionally omits
+	\texttt{\textbackslash leanok} on its proof.
+\end{proposition}
+
+
 \begin{proposition}[Lean successor handoff for the Section 3 proof]\label{lem:main-formal-successor-handoff}
 	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorMainInductionPublicWrapper}
 	\leanok

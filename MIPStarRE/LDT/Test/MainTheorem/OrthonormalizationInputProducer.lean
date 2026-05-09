@@ -3,10 +3,10 @@ import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationData
 /-!
 # Orthonormalization input producer from role residual
 
-This file bridges the Section 6 role residual to the line-130 orthonormalization
-inputs consumed by `mainFormal`.  The combining lemma that packages these into
-the full `MainFormalBaseRepairedBridgeHypotheses` lives in `MainFormal.lean`
-(where that structure is defined).
+This file bridges the Section 6 role residual to the orthonormalization inputs
+for the projective-consistency step consumed by `mainFormal`.  The combining
+lemma that assembles these into the full `MainFormalBaseRepairedBridgeHypotheses`
+lives in `MainFormal.lean` (where that structure is defined).
 
 ## What's proved
 
