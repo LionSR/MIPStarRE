@@ -56,7 +56,13 @@ for the remaining work.  When these hypotheses are supplied,
 `baseProjectiveCompletionResidual` provides the checked assembly theorem that
 fills the base branch of `mainFormal`. -/
 
-/-- Analytic hypotheses that are still unformalized for the
+/-- Paper origin: `references/ldt-paper/test_definition.tex:180-202`
+(`\label{thm:main-formal}`) and its proof in
+`references/ldt-paper/inductive_step.tex:26-211`
+(Section 3 Step 6 orthonormalization + completion cascade);
+blueprint `\label{def:main-formal-step6-hypotheses}`.
+
+Analytic hypotheses that are still unformalized for the
 base case (`m = 1`) Step 6 witness residual: orthonormalization
 inputs (spectral truncation and repair witnesses), distinguished
 outcomes, and match-mass preservation for the unsymmetrized POVMs.
@@ -135,7 +141,11 @@ theorem baseProjectiveCompletionResidual
       bridge.leftMatchMassPreservation bridge.rightMatchMassPreservation)
 
 
-/-- Narrowed base-case bridge hypotheses for Step 6 when `params.m = 1`.
+/-- Paper origin: `references/ldt-paper/inductive_step.tex:26-211`
+(proof of `\label{thm:main-formal}`, orthonormalization + completion cascade);
+blueprint `\label{def:main-formal-step6-hypotheses}`.
+
+Narrowed base-case bridge hypotheses for Step 6 when `params.m = 1`.
 
 Compared to `MainFormalBaseProjectiveCompletionHypotheses`, this structure omits the two
 distinguished outcomes `a_A` and `a_B`, which the conversion below fills with
@@ -241,7 +251,11 @@ theorem baseProjectiveCompletionResidual_ofBaseBridge
     (baseProjectiveCompletionHypotheses_ofBaseBridge bridge)
 
 
-/-- Narrowed repaired base-case bridge for Step 6 when `params.m = 1`.
+/-- Paper origin: `references/ldt-paper/inductive_step.tex:26-211`
+(proof of `\label{thm:main-formal}`, orthonormalization + completion cascade);
+blueprint `\label{def:main-formal-step6-hypotheses}`.
+
+Narrowed repaired base-case bridge for Step 6 when `params.m = 1`.
 
 This removes the exact line-169 match-mass preservation fields from the base
 bridge.  The repaired pre-completion route needs only the line-130
@@ -267,7 +281,11 @@ structure MainFormalBaseRepairedBridgeHypotheses
     MainFormalPostRolePackageDiagonalConsistencyInput
       params strategy eps k scalars (roleResidual.rolePackage scalars)
 
-/-- Generic repaired Step-6 bridge over an already constructed role residual. -/
+/-- Paper origin: `references/ldt-paper/inductive_step.tex:26-211`
+(proof of `\label{thm:main-formal}`, orthonormalization + completion cascade);
+blueprint `\label{def:main-formal-step6-hypotheses}`.
+
+Generic repaired Step-6 bridge over an already constructed role residual. -/
 abbrev MainFormalRepairedBridgeHypotheses
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

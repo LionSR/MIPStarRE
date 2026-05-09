@@ -81,7 +81,11 @@ noncomputable def cascadeZeta3 (ζ₁ ζ₂ : Error) : Error :=
 noncomputable def cascadeZeta4 (σ ζ₁ ζ₃ : Error) : Error :=
   2 * σ + 2 * Real.sqrt (ζ₁ + ζ₃ / 2)
 
-/-- Standing numeric regime used throughout the cascade bounds: parameters
+/-- Paper origin: `references/ldt-paper/inductive_step.tex:130-211`
+(`\label{eq:G-self-consistency}` through `\label{eq:another-goal}`, error cascade
+ζ₁–ζ₄); blueprint `\label{def:main-formal-error-cascade}`.
+
+Standing numeric regime used throughout the cascade bounds: parameters
 satisfy the unit scale, and `ε, d/q ∈ [0, 1]`. -/
 structure CascadeHypotheses (params : Parameters) (k : ℕ) (eps : Error) : Prop where
   hk : 1 ≤ (k : Error)
