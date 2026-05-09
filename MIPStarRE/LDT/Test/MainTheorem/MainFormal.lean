@@ -660,8 +660,9 @@ printed `params.m * params.d ≤ k` assumption.
 
 The theorem takes one remaining public bridge hypothesis:
 
-* `hbaseBridge`: provides the line-130 orthonormalization input and diagonal
-  consistency for both the base and successor dimensions.  (Tracked by #1043.)
+* `hbaseBridge`: provides the projective-consistency orthonormalization input
+  and diagonal consistency for both the base and successor dimensions.
+  (Tracked by #1043.)
 
 The base case (m = 1) uses `MainFormalRolePackageResidual.ofBaseCase` (already
 checked) and `hbaseBridge`.  The successor case is intentionally wired through
