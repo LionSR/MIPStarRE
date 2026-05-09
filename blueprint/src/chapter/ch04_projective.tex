@@ -450,6 +450,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:trunc-inequality}
 		Write the eigendecomposition of $A_a$ as
 		\[
@@ -550,7 +551,11 @@
 	\begin{proof}
 		\leanok
 		\uses{lem:projective-non-measurement, lem:small-overlap-averaging, prop:triangle-inequality-for-approx_delta}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_projectors, MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_rank_bound, MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_spectralTruncationStatement, MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_spectralTruncationInput, MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_truncate}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_projectors}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_rank_bound}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_spectralTruncationStatement}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_spectralTruncationInput}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_truncate}
 		Let $\{R_a\}$ be given by \ref{lem:projective-non-measurement}. Write $r_a=\mathrm{rank}(R_a)$ and $r=\sum_a r_a$. If $r \leq d$, take $Q_a=R_a$. Otherwise,
 		\begin{equation}\label{eq:bound-on-r}
 			r
@@ -734,7 +739,9 @@
 
 	\begin{definition}[Matrix decomposition of~$Q_a$]\label{def:matrix-decomposition-Q}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.matrixDecompositionQ, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaProjMeas, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinProjMeas, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaRangeEmbedding, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinRangeEmbedding}
-		\lean{MIPStarRE.Quantum.ProjectorRangeONB.rankOne_mulVec_vec, MIPStarRE.Quantum.ProjectorRangeONB.mulVec_vec, MIPStarRE.Quantum.IsProj.nonneg}
+		\lean{MIPStarRE.Quantum.ProjectorRangeONB.rankOne_mulVec_vec}
+		\lean{MIPStarRE.Quantum.ProjectorRangeONB.mulVec_vec}
+		\lean{MIPStarRE.Quantum.IsProj.nonneg}
 		\leanok
 		\uses{lem:projective-low-rank-sum}
 		For each $a$, let
@@ -789,7 +796,9 @@
 	\end{definition}
 
 	\begin{remark}\label{rem:motivation-for-P}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectorFamily_mul_eq_zero_of_ne_of_sum_le_one, MIPStarRE.LDT.MakingMeasurementsProjective.projectorFamily_rangeONB_dotProduct_eq_zero_of_ne_of_sum_le_one, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinRangeEmbedding_mul_conjTranspose_eq_one_of_sum_le_one}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectorFamily_mul_eq_zero_of_ne_of_sum_le_one}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectorFamily_rangeONB_dotProduct_eq_zero_of_ne_of_sum_le_one}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinRangeEmbedding_mul_conjTranspose_eq_one_of_sum_le_one}
 		If the family $\{Q_a\}$ were a projective measurement, then the vectors
 		$\ket{v_{a,i}}$, over all $a$ and all $1 \leq i \leq m_a$, would be orthonormal.
 		Then \eqref{eq:looks-like-singular-value-decomposition} would already be a singular value
@@ -865,8 +874,14 @@
 
 	\begin{lemma}[$X$ squared]\label{lem:X-squared}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xSquared, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinRangeEmbedding_gram_right}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_posSemidef_of_x_squared, MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_eigenvalues_nonneg_of_x_squared}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sqrt_eq_sum_sqrt_eigenvalues_vecMulVec, MIPStarRE.LDT.MakingMeasurementsProjective.positiveGramSpectrumRightRows, MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_right_rows_mul_conjTranspose, MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_image_rows_mixed_eq_sqrt, MIPStarRE.LDT.MakingMeasurementsProjective.matrix_image_eq_zero_of_nonpositive_gram_eigenvalue, MIPStarRE.LDT.MakingMeasurementsProjective.adjoint_image_eq_zero_of_orthogonal_positive_gram_images}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_posSemidef_of_x_squared}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_eigenvalues_nonneg_of_x_squared}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sqrt_eq_sum_sqrt_eigenvalues_vecMulVec}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.positiveGramSpectrumRightRows}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_right_rows_mul_conjTranspose}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_image_rows_mixed_eq_sqrt}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.matrix_image_eq_zero_of_nonpositive_gram_eigenvalue}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.adjoint_image_eq_zero_of_orthogonal_positive_gram_images}
 		\leanok
 		\begin{equation*}
 			X^\dagger \cdot X = Q.
@@ -958,7 +973,34 @@
 	\end{proof}
 
 	\begin{lemma}[$\widehat{X}$ squared]\label{lem:X-hat-squared}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xHatSquared, Matrix.mul_conjTranspose_eq_one_of_orthonormal_rows, MIPStarRE.LDT.MakingMeasurementsProjective.orthonormal_normalized_image_of_adjoint_comp_eigenvectors, MIPStarRE.LDT.MakingMeasurementsProjective.orthonormal_normalized_matrix_image_of_gram_eigenvectors, MIPStarRE.LDT.MakingMeasurementsProjective.orthonormal_normalized_matrix_image_of_positive_gram_spectrum, MIPStarRE.LDT.MakingMeasurementsProjective.normalizedMatrixImageRows, MIPStarRE.LDT.MakingMeasurementsProjective.positiveGramSpectrumImageRows, MIPStarRE.LDT.MakingMeasurementsProjective.normalized_matrix_image_rows_mul_conjTranspose, MIPStarRE.LDT.MakingMeasurementsProjective.normalized_matrix_image_rows_transpose_mixed, MIPStarRE.LDT.MakingMeasurementsProjective.normalized_matrix_image_rows_mul_conjTranspose_of_positive_gram_spectrum, MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_image_rows_transpose_mixed, MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_card_le_rows, MIPStarRE.LDT.MakingMeasurementsProjective.exists_unitary_rows_extending_orthonormal, MIPStarRE.LDT.MakingMeasurementsProjective.exists_unitary_with_positive_gram_spectrum_rows, MIPStarRE.LDT.MakingMeasurementsProjective.exists_unitary_with_positive_gram_spectrum_rows_of_card, MIPStarRE.LDT.MakingMeasurementsProjective.exists_rectangular_coisometry_extending_orthonormal_rows, MIPStarRE.LDT.MakingMeasurementsProjective.exists_rectangular_coisometry_with_positive_gram_spectrum_right_rows, MIPStarRE.LDT.MakingMeasurementsProjective.transpose_unitary_mul_rectangular_coisometry, MIPStarRE.LDT.MakingMeasurementsProjective.exists_unitary_with_qxp_positive_gram_spectrum_rows, MIPStarRE.LDT.MakingMeasurementsProjective.xHat_of_positive_gram_spectrum_choices, MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_isHermitian_of_x_squared, MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_coisometry, MIPStarRE.LDT.MakingMeasurementsProjective.exists_xHat_of_rectangularSvd, MIPStarRE.LDT.MakingMeasurementsProjective.exists_xHat_of_positive_gram_spectrum, MIPStarRE.LDT.MakingMeasurementsProjective.exists_xHat_of_sigmaFinRangeEmbedding_positiveGram, MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangePositiveGram, MIPStarRE.LDT.MakingMeasurementsProjective.exists_sigmaFin_xHat_coisometry_of_sum_le, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinXHatCoisometry_spec}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xHatSquared}
+		\lean{Matrix.mul_conjTranspose_eq_one_of_orthonormal_rows}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormal_normalized_image_of_adjoint_comp_eigenvectors}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormal_normalized_matrix_image_of_gram_eigenvectors}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormal_normalized_matrix_image_of_positive_gram_spectrum}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.normalizedMatrixImageRows}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.positiveGramSpectrumImageRows}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.normalized_matrix_image_rows_mul_conjTranspose}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.normalized_matrix_image_rows_transpose_mixed}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.normalized_matrix_image_rows_mul_conjTranspose_of_positive_gram_spectrum}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_image_rows_transpose_mixed}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_card_le_rows}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_unitary_rows_extending_orthonormal}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_unitary_with_positive_gram_spectrum_rows}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_unitary_with_positive_gram_spectrum_rows_of_card}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_rectangular_coisometry_extending_orthonormal_rows}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_rectangular_coisometry_with_positive_gram_spectrum_right_rows}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.transpose_unitary_mul_rectangular_coisometry}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_unitary_with_qxp_positive_gram_spectrum_rows}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xHat_of_positive_gram_spectrum_choices}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_isHermitian_of_x_squared}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_coisometry}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_xHat_of_rectangularSvd}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_xHat_of_positive_gram_spectrum}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_xHat_of_sigmaFinRangeEmbedding_positiveGram}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangePositiveGram}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_sigmaFin_xHat_coisometry_of_sum_le}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinXHatCoisometry_spec}
 		\leanok
 		\begin{equation*}
 			\widehat{X} \cdot \widehat{X}^\dagger = I_{m \times m}.
@@ -992,7 +1034,17 @@
 	\end{proof}
 
 	\begin{lemma}[$X$ times $\widehat{X}$]\label{lem:X-times-X-hat}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xTimesXHat, MIPStarRE.LDT.MakingMeasurementsProjective.adjoint_image_eq_zero_of_unitary_positive_gram_completion_row, MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_selected_left_unitary_mixed_column, MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_completion_left_unitary_mixed_column_eq_zero, MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_polar_extension_mixed_eq_positive_rows, MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_polar_extension_mixed_eq_sqrt, MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_mixed_of_sqrtQ, MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_middle_eq_sqrt_of_square, MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndRectangularSvdSquareRoot, MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvdSquareRoot, MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xTimesXHat}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.adjoint_image_eq_zero_of_unitary_positive_gram_completion_row}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_selected_left_unitary_mixed_column}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_completion_left_unitary_mixed_column_eq_zero}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_polar_extension_mixed_eq_positive_rows}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_polar_extension_mixed_eq_sqrt}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_mixed_of_sqrtQ}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_middle_eq_sqrt_of_square}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndRectangularSvdSquareRoot}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvdSquareRoot}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot}
 		\leanok
 		\begin{equation*}
 			X^\dagger \cdot \widehat{X} = \sqrt{Q}.

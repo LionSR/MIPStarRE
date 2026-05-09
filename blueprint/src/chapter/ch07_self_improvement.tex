@@ -450,10 +450,17 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.self_improvement_helper_with_slackness_of_sdp_statement_with_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndResidualDominationInput}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndQXPRepairAndCoisometry}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromSlacknessResidualDominationBridgeInputs}
   The formalization also records a strengthened helper theorem whose output
-  carries the complementary-slackness equations used in the completeness chain.
-  This theorem uses the Section~9 statement above. Its proof is not yet complete,
-  because the strong-duality proof for the SDP remains to be formalized.
+  carries the complementary-slackness equations used in the completeness chain,
+  together with the residual-domination bridge that assembles the full
+  self-improvement conclusion from the slackness-carrying helper.  An
+  intermediate assembly route routes a QXP repair producer plus the
+  construction-level coisometry identity through the same bridge.
+  These theorems use the Section~9 statement above. Their proofs are not yet
+  complete, because the strong-duality proof for the SDP remains to be formalized.
 \end{remark}
 
 \subsection{A Semidefinite Program}
@@ -614,7 +621,6 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness.primalMeasurement}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness}
-  \lean{MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness.toSdpStatement}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness.exists_measurement_witness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalBlockIndex}
@@ -694,6 +700,11 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlacknessAndDominance_of_canonicalComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlacknessAndDominance_of_canonicalFeasibleComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.exists_measurement_witness}
+  % No statement-level \leanok is attached here: MIPStarRE.LDT.SelfImprovement.sdp
+  % proves only the reduced SdpStatement fragment, while the full slackness
+  % conclusion is recorded as the visible, deferred theorem
+  % MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness, whose proof is
+  % still \notready (see proof block below).
   Let
   \[
     A_g = \E_{u \sim \F_q^m} A^u_{g(u)}.

@@ -81,7 +81,8 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 	\end{equation}
 \end{lemma}
 \begin{proof}
-	\uses{def:local-and-variance, lem:local-to-global, lem:equivalent-local-variance}
+	\leanok
+	\uses{def:local-and-variance, lem:local-to-global, lem:local-variance-of-points, lem:equivalent-local-variance}
 	We want to bound
 	\begin{equation}
 		\E_{u,v \sim \F_q^m} \sum_{g \in \polyfunc{m}{q}{d}} \lVert (A^u_{g(u)}-A^v_{g(v)}) \ot (G_g)^{1/2} \ket{\psi} \rVert^2
