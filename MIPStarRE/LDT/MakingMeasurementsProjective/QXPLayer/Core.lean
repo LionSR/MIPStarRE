@@ -66,8 +66,9 @@ def Ta {Outcome : Type*} [Fintype Outcome]
     MIPStarRE.Quantum.Op data.auxSpace.carrier :=
   data.t.outcome a
 
-/-- Paper origin: `references/ldt-paper/orthonormalization.tex:414-491`
-(`\label{lem:projective-non-measurement}`).
+/-- Paper origin: `references/ldt-paper/orthonormalization.tex:414-531`
+(`\label{lem:projective-non-measurement}`; full rounding-to-projectors
+lemma with `2√ζ` closeness and `(1+2√ζ)·I` total bound).
 
 Witness structure for the paper's rounding-to-projectors lemma.
 
@@ -93,7 +94,9 @@ structure RoundingToProjectorsWitness {Outcome : Type*}
       (1 : MIPStarRE.Quantum.Op ι)
 
 /-- Paper origin: `references/ldt-paper/orthonormalization.tex:540-553`
-(`\label{lem:projective-low-rank-sum}`).
+(`\label{lem:projective-low-rank-sum}`; rank-reduction lemma with
+`12√ζ` closeness, `(1+2√ζ)·I` total bound, and rank constraint
+`∑ rank(Q_a) ≤ d`).
 
 Witness structure for the rank-reduction lemma. -/
 structure RankReductionWitness {Outcome : Type*}
