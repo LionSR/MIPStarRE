@@ -31,6 +31,7 @@ from blueprint_lean_sync import (  # noqa: E402
     _delete_pr_comment,
     _find_bot_pr_comment,
     _github_api_request,
+    _github_api_request_paginated,
     _leanok_placement,
     _line_has_leanok_marker,
     _missing_blueprint_summary_command,
@@ -862,8 +863,6 @@ class PRCommentTests(unittest.TestCase):
 
     def _mock_api_response(self, status: int = 200, body: object = None) -> mock.MagicMock:
         """Build a mock ``urlopen`` context manager that returns the given status/body."""
-        import io as _io
-
         if body is None:
             content = b"[]"
         elif isinstance(body, (dict, list)):
@@ -1119,6 +1118,58 @@ class PRCommentTests(unittest.TestCase):
             with self.assertRaises(RuntimeError) as ctx:
                 _github_api_request("GET", "https://api.github.com/test", "tok")
             self.assertIn("404", str(ctx.exception))
+
+    # ── paginated request helper ──────────────────────────────────────────
+
+    def test_paginated_returns_concatenated_pages(self) -> None:
+        """Multiple pages are concatenated."""
+        with mock.patch(
+            "blueprint_lean_sync._github_api_request"
+        ) as mock_req:
+            mock_req.side_effect = [
+                [{"id": i} for i in range(100)],   # page 1 (full)
+                [{"id": i} for i in range(100, 150)],  # page 2 (partial)
+            ]
+            result = _github_api_request_paginated(
+                "https://api.github.com/repos/o/r/issues/1/comments", "tok"
+            )
+        self.assertEqual(len(result), 150)
+
+    def test_paginated_stops_on_empty_page(self) -> None:
+        with mock.patch(
+            "blueprint_lean_sync._github_api_request"
+        ) as mock_req:
+            mock_req.side_effect = [[{"id": 1}], []]
+            result = _github_api_request_paginated(
+                "https://api.github.com/repos/o/r/issues/1/comments", "tok"
+            )
+        self.assertEqual(len(result), 1)
+
+    def test_paginated_stops_on_dict_response(self) -> None:
+        """A dict response (GitHub error object) stops pagination cleanly."""
+        with mock.patch(
+            "blueprint_lean_sync._github_api_request"
+        ) as mock_req:
+            # First request succeeds; second returns an error dict.
+            mock_req.side_effect = [
+                [{"id": 1}],
+                {"message": "Bad credentials", "documentation_url": "..."},
+            ]
+            result = _github_api_request_paginated(
+                "https://api.github.com/repos/o/r/issues/1/comments", "tok"
+            )
+        # Should return only the items from the first (successful) page.
+        self.assertEqual(result, [{"id": 1}])
+
+    def test_paginated_stops_on_none_response(self) -> None:
+        with mock.patch(
+            "blueprint_lean_sync._github_api_request"
+        ) as mock_req:
+            mock_req.side_effect = [[{"id": 1}], None]
+            result = _github_api_request_paginated(
+                "https://api.github.com/repos/o/r/issues/1/comments", "tok"
+            )
+        self.assertEqual(result, [{"id": 1}])
 
 
 if __name__ == "__main__":

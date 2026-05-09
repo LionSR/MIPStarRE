@@ -959,9 +959,13 @@ def _github_api_request_paginated(
         resp = _github_api_request("GET", paged_url, token)
         if resp is None:
             break
-        if isinstance(resp, dict):
-            resp = [resp]
-        if not isinstance(resp, list) or len(resp) == 0:
+        if not isinstance(resp, list):
+            # Non-list response (dict, string, …) is unexpected from the
+            # GitHub API for a collection endpoint; treat as end-of-data
+            # rather than wrapping into a one-item list, which would mask
+            # error responses.
+            break
+        if len(resp) == 0:
             break
         items.extend(resp)
         if len(resp) < per_page:

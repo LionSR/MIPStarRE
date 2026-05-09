@@ -41,7 +41,11 @@ jobs:
     name: Check blueprint compiles without errors
     permissions:
       contents: read
-      issues: write  # for posting/updating reverse-coverage PR comments
+      # issues:write is needed for posting/updating reverse-coverage PR
+      # comments. The comment-posting step is gated on
+      # github.event_name == 'pull_request', so this permission is only
+      # exercised on PR events.
+      issues: write
     steps:
       - uses: actions/checkout@v6
         with:
@@ -135,6 +139,7 @@ jobs:
             ${{ contains(github.event.pull_request.labels.*.name,
             'enforce-blueprint-coverage') }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python3 - <<'PY'
           import os
