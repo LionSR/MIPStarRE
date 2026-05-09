@@ -21,6 +21,47 @@ def swapDensity {ι : Type*} (M : MIPStarRE.Quantum.Op (ι × ι)) :
     MIPStarRE.Quantum.Op (ι × ι) :=
   Matrix.of fun (ij : ι × ι) (kl : ι × ι) => M (ij.2, ij.1) (kl.2, kl.1)
 
+/-- `swapDensity` is equal to reindexing by the product-commutation equivalence. -/
+lemma swapDensity_eq_reindex {ι : Type*}
+    (X : MIPStarRE.Quantum.Op (ι × ι)) :
+    swapDensity X = Matrix.reindex (Equiv.prodComm ι ι) (Equiv.prodComm ι ι) X := by
+  ext x y
+  rcases x with ⟨i₁, i₂⟩
+  rcases y with ⟨j₁, j₂⟩
+  rfl
+
+@[simp] lemma swapDensity_swapDensity {ι : Type*}
+    (X : MIPStarRE.Quantum.Op (ι × ι)) :
+    swapDensity (swapDensity X) = X := by
+  ext x y
+  rcases x with ⟨i₁, i₂⟩
+  rcases y with ⟨j₁, j₂⟩
+  rfl
+
+@[simp] lemma swapDensity_add {ι : Type*}
+    (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
+    swapDensity (X + Y) = swapDensity X + swapDensity Y := by
+  ext x y
+  rcases x with ⟨i₁, i₂⟩
+  rcases y with ⟨j₁, j₂⟩
+  rfl
+
+@[simp] lemma swapDensity_smul {ι : Type*} (c : ℂ)
+    (X : MIPStarRE.Quantum.Op (ι × ι)) :
+    swapDensity (c • X) = c • swapDensity X := by
+  ext x y
+  rcases x with ⟨i₁, i₂⟩
+  rcases y with ⟨j₁, j₂⟩
+  rfl
+
+/-- `swapDensity` preserves matrix multiplication. -/
+lemma swapDensity_mul {ι : Type*} [Fintype ι]
+    (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
+    swapDensity (X * Y) = swapDensity X * swapDensity Y := by
+  classical
+  simpa [swapDensity_eq_reindex] using
+    (Matrix.reindexAlgEquiv_mul ℂ ℂ (Equiv.prodComm ι ι) X Y)
+
 /-- Permutation-invariance for a bipartite state on `ι × ι`.
 
 The primary datum is that the density operator is fixed by the SWAP reindexing,

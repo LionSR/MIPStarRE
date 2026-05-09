@@ -196,7 +196,7 @@ theorem gHatFacts
     -- Alias for the shared `qSDDOp_symm` lemma, specializing to `(ι × ι)`.
     have hqSDDOp_symm_poly
         (A B : OpFamily (Polynomial params) (ι × ι)) :
-        qSDDOp ψbi A B = qSDDOp ψbi B A := qSDDOp_symm ψbi A B
+        qSDDOp ψbi A B = qSDDOp ψbi B A := MIPStarRE.LDT.Preliminaries.qSDDOp_symm ψbi A B
     have hswapIncompleteBound :
         sddErrorOp ψbi
           (uniformDistribution (SlicePairQuestion params))

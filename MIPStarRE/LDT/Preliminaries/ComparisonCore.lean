@@ -545,5 +545,41 @@ lemma consRel_uniform_equiv
               simp [avgOver, uniformDistribution, Finset.mul_sum]
   constructor <;> rintro ⟨h⟩ <;> constructor <;> simpa [hEq] using h
 
+/-- `qSDDOp` is symmetric: swapping the two operator families gives the same
+squared-distance sum. -/
+lemma qSDDOp_symm
+    {Outcome : Type*} {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype Outcome]
+    (ψ : QuantumState ι) (A B : OpFamily Outcome ι) :
+    qSDDOp ψ A B = qSDDOp ψ B A := by
+  let F : Outcome → MIPStarRE.Quantum.Op ι := fun a => A.outcome a - B.outcome a
+  let G : Outcome → MIPStarRE.Quantum.Op ι := fun a => B.outcome a - A.outcome a
+  have hFG : F = fun a => -G a := by
+    funext a
+    dsimp [F, G]
+    abel
+  unfold qSDDOp qSDDCore
+  change ∑ a : Outcome, ev ψ ((F a)ᴴ * F a) = ∑ a : Outcome, ev ψ ((G a)ᴴ * G a)
+  rw [hFG]
+  refine Finset.sum_congr rfl ?_
+  intro a _
+  change ev ψ ((-G a)ᴴ * (-G a)) = ev ψ ((G a)ᴴ * G a)
+  simp
+
+/-- Loewner-order monotonicity of the matrix sandwich `Zᴴ * X * Z`.
+If `X ≤ Y` then `Zᴴ * X * Z ≤ Zᴴ * Y * Z`. -/
+lemma conjTranspose_mul_mono
+    {ι : Type*} [Fintype ι]
+    {X Y Z : MIPStarRE.Quantum.Op ι}
+    (hXY : X ≤ Y) :
+    Zᴴ * X * Z ≤ Zᴴ * Y * Z := by
+  apply sub_nonneg.mp
+  have hnonneg : 0 ≤ Zᴴ * (Y - X) * Z := by
+    simpa [Matrix.conjTranspose_conjTranspose] using
+      (Matrix.PosSemidef.mul_mul_conjTranspose_same
+        (Matrix.nonneg_iff_posSemidef.mp (sub_nonneg.mpr hXY))
+        Zᴴ).nonneg
+  simpa [mul_sub, sub_mul, Matrix.conjTranspose_conjTranspose, mul_assoc] using hnonneg
+
 
 end MIPStarRE.LDT.Preliminaries

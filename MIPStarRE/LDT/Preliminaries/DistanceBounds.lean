@@ -143,25 +143,6 @@ lemma stateDependentDistanceRel_mono
   intro ⟨h⟩
   exact ⟨le_trans h hle⟩
 
--- NOTE: This private lemma duplicates `conjTranspose_mul_mono_local` in
--- `Pasting/BridgeLemmas/CommuteGHalfSandwich/Setup/Definitions.lean`.  The
--- duplication is intentional: Preliminaries cannot import Pasting (dependency
--- order).  If a shared location is established, this can be deduplicated.
-private lemma conjTranspose_mul_mono
-    {ι : Type*} [Fintype ι]
-    {X Y Z : MIPStarRE.Quantum.Op ι}
-    (hXY : X ≤ Y) :
-    Zᴴ * X * Z ≤ Zᴴ * Y * Z := by
-  apply sub_nonneg.mp
-  have hnonneg : 0 ≤ Zᴴ * (Y - X) * Z := by
-    -- This `simpa` intentionally bridges the PSD-facing matrix lemma with the
-    -- ordered-ring view used by the surrounding inequality proof.
-    simpa [Matrix.conjTranspose_conjTranspose] using
-      (Matrix.PosSemidef.mul_mul_conjTranspose_same
-        (Matrix.nonneg_iff_posSemidef.mp (sub_nonneg.mpr hXY))
-        Zᴴ).nonneg
-  simpa [mul_sub, sub_mul, Matrix.conjTranspose_conjTranspose, mul_assoc] using hnonneg
-
 lemma questionCabApproxDelta
     {Outcome Aux : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -350,29 +331,6 @@ lemma stateDependentDistanceOpRel_mono
     SDDOpRel ψ 𝒟 A B δ' := by
   intro ⟨h⟩
   exact ⟨le_trans h hle⟩
-
--- NOTE: This private lemma duplicates the public `qSDDOp_symm` in
--- `CommutativityPoints/SharedHelpers/Core.lean`.  The duplication is
--- intentional: Preliminaries cannot import CommutativityPoints (dependency
--- order).  If a shared location is established, this can be deduplicated.
-private lemma qSDDOp_symm
-    {Outcome : Type*} {ι : Type*}
-    [Fintype ι] [DecidableEq ι] [Fintype Outcome]
-    (ψ : QuantumState ι) (A B : OpFamily Outcome ι) :
-    qSDDOp ψ A B = qSDDOp ψ B A := by
-  let F : Outcome → MIPStarRE.Quantum.Op ι := fun a => A.outcome a - B.outcome a
-  let G : Outcome → MIPStarRE.Quantum.Op ι := fun a => B.outcome a - A.outcome a
-  have hFG : F = fun a => -G a := by
-    funext a
-    dsimp [F, G]
-    abel
-  unfold qSDDOp qSDDCore
-  change ∑ a : Outcome, ev ψ ((F a)ᴴ * F a) = ∑ a : Outcome, ev ψ ((G a)ᴴ * G a)
-  rw [hFG]
-  refine Finset.sum_congr rfl ?_
-  intro a _
-  change ev ψ ((-G a)ᴴ * (-G a)) = ev ψ ((G a)ᴴ * G a)
-  simp
 
 /-- Symmetry of the operator-family state-dependent distance relation. -/
 lemma sddOpRel_symm

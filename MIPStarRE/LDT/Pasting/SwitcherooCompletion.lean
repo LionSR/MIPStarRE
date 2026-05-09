@@ -18,45 +18,13 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-omit [Fintype ι] [DecidableEq ι] in
-private lemma switcheroo_swapDensity_eq_reindex
-    (X : MIPStarRE.Quantum.Op (ι × ι)) :
-    swapDensity X = Matrix.reindex (Equiv.prodComm ι ι) (Equiv.prodComm ι ι) X := by
-  ext x y
-  rcases x with ⟨i₁, i₂⟩
-  rcases y with ⟨j₁, j₂⟩
-  rfl
-
-omit [DecidableEq ι] in
-private lemma switcheroo_swapDensity_mul
-    (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
-    swapDensity (X * Y) = swapDensity X * swapDensity Y := by
-  classical
-  simpa [switcheroo_swapDensity_eq_reindex] using
-    (Matrix.reindexAlgEquiv_mul ℂ ℂ (Equiv.prodComm ι ι) X Y)
-
-private lemma switcheroo_ev_swapDensity_of_density_fixed
-    (ψbi : QuantumState (ι × ι))
-    (hfix : swapDensity ψbi.density = ψbi.density)
-    (Z : MIPStarRE.Quantum.Op (ι × ι)) :
-    ev ψbi (swapDensity Z) = ev ψbi Z := by
-  unfold ev
-  apply congrArg Complex.re
-  calc
-    MIPStarRE.Quantum.normalizedTrace (ψbi.density * swapDensity Z)
-      = MIPStarRE.Quantum.normalizedTrace (swapDensity (ψbi.density * Z)) := by
-          rw [switcheroo_swapDensity_mul]
-          simp [hfix]
-    _ = MIPStarRE.Quantum.normalizedTrace (ψbi.density * Z) :=
-          normalizedTrace_swapDensity _
-
 private lemma switcheroo_ev_opTensor_swap
     (ψbi : QuantumState (ι × ι))
     (hfix : swapDensity ψbi.density = ψbi.density)
     (X Y : MIPStarRE.Quantum.Op ι) :
     ev ψbi (opTensor X Y) = ev ψbi (opTensor Y X) := by
   rw [show opTensor Y X = swapDensity (opTensor X Y) by rw [swapDensity_opTensor]]
-  exact (switcheroo_ev_swapDensity_of_density_fixed ψbi hfix (opTensor X Y)).symm
+  exact (ev_swapDensity_of_density_fixed ψbi hfix (opTensor X Y)).symm
 
 private lemma switcherooCompletePartCenter_eq_target
     {Outcome : Type*} [Fintype Outcome]

@@ -20,27 +20,6 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 open scoped Matrix MatrixOrder ComplexOrder BigOperators
 /-! ## Shared reindexing and tensor-placement helpers -/
 
-/-- `qSDDOp` is symmetric: swapping the two operator families gives the same
-squared-distance sum. -/
-lemma qSDDOp_symm
-    {Outcome : Type*}
-    (ψ : QuantumState ι) [Fintype Outcome]
-    (A B : OpFamily Outcome ι) :
-    qSDDOp ψ A B = qSDDOp ψ B A := by
-  let F : Outcome → MIPStarRE.Quantum.Op ι := fun a => A.outcome a - B.outcome a
-  let G : Outcome → MIPStarRE.Quantum.Op ι := fun a => B.outcome a - A.outcome a
-  have hFG : F = fun a => -G a := by
-    funext a
-    dsimp [F, G]
-    abel
-  unfold qSDDOp qSDDCore
-  change ∑ a : Outcome, ev ψ ((F a)ᴴ * F a) = ∑ a : Outcome, ev ψ ((G a)ᴴ * G a)
-  rw [hFG]
-  refine Finset.sum_congr rfl ?_
-  intro a _
-  change ev ψ ((-G a)ᴴ * (-G a)) = ev ψ ((G a)ᴴ * G a)
-  simp
-
 lemma sddOpRel_symm
     {Question Outcome : Type*}
     [Fintype Outcome]
@@ -50,7 +29,7 @@ lemma sddOpRel_symm
       SDDOpRel ψ 𝒟 B A δ := by
   intro ⟨h⟩
   constructor
-  simpa [sddErrorOp, qSDDOp_symm] using h
+  simpa [sddErrorOp, MIPStarRE.LDT.Preliminaries.qSDDOp_symm] using h
 
 /-- Reindexing the outcome type of both operator families preserves `qSDDOp`. -/
 lemma qSDDOp_reindex
