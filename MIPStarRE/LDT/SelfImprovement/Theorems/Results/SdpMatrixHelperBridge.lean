@@ -9,7 +9,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationInputConstructor
 
 This file connects matrix-level SDP slackness data to the self-improvement
 helper theorem.  When the matrix SDP argument supplies an optimal pair with
-complementary slackness, the theorems below translate that data to the abstract
+complementary slackness, the lemmas below translate that data to the abstract
 `SdpStatementWithSlackness` interface and then apply the conditional helper
 lemma.  Thus the matrix-data route remains available independently of the
 deferred unconditional Section 9 statement.

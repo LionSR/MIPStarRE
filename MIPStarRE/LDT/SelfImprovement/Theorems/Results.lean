@@ -31,7 +31,7 @@ All original declarations remain available under the same namespace.
 - `SdpMatrixBridge` — comparison between the matrix-level slackness interface
   and the abstract SDP statement with slackness
 - `SdpMatrixHelperBridge` — matrix-level SDP slackness and dominance bridge
-  into `selfImprovementHelperWithSlackness`
+  into `self_improvement_helper_with_slackness`
 - `HelperCompleteness` — input-consistency lower bounds, SDP bridge, `sdp`, `addInU`
 - `AddInUDiagonalAndDefs` — diagonal add-in-u specialization, Q₀–Q₄ CS chain defs
 - `AddInUPointConsistency` — off-diagonal add-in-u selection infrastructure for

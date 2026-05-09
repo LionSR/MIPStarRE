@@ -170,7 +170,7 @@ MainInductionStep or MainTheorem:
 
 | Declaration | File | Status |
 |------------|------|--------|
-| `selfImprovementHelperWithSlackness` | `SelfImprovementTop/Core.lean:119` | Proved, orphan |
+| `self_improvement_helper_with_slackness` | `SelfImprovementTop/Core.lean:119` | Proved, orphan |
 | `selfImprovementWithSlacknessAndResidualDominationInput` | `SelfImprovementTop/ResidualDomination.lean:81` | Proved, orphan |
 | `selfImprovementFromSlacknessResidualDominationBridgeInputs` | `SelfImprovementTop/ResidualDomination.lean:166` | Proved, orphan |
 

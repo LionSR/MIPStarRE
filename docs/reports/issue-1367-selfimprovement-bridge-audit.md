@@ -251,7 +251,7 @@ These are the producers for the two new `mainFormal` hypotheses:
 |------|--------|
 | `slackness-carrying helpers` (orphan lemmas, `ResidualDomination.lean`, `SdpMatrixHelperBridge.lean`) | Orphan — tracked by #1230, not blocking |
 | `MatrixAddInUTransferStatement` | Dead scaffolding — tracked by statement-smuggle reaudit |
-| `selfImprovementHelperWithSlackness` variants | Orphan — tracked by #1385, not blocking |
+| `self_improvement_helper_with_slackness` variants | Orphan — tracked by #1385, not blocking |
 | Internal SelfImprovement sub-lemmas (HelperCompleteness, PointConsistency, etc.) | All proved (conditional) |
 | Pasting theorem (`ldPasting`) | Fully proved, fully wired |
 | MainInductionStep bridge (`mainInductionByRecursionOnM`) | Fully proved (conditional on `hselfProducer`) |
@@ -264,7 +264,7 @@ These are the producers for the two new `mainFormal` hypotheses:
 
 | Declaration | File | Callers in MainTest | Verdict |
 |------------|------|---------------------|---------|
-| `selfImprovementHelperWithSlackness` | `SelfImprovementTop/Core.lean:119` | None | Orphan — useful for SDP duality path (#1385) |
+| `self_improvement_helper_with_slackness` | `SelfImprovementTop/Core.lean:119` | None | Orphan — useful for SDP duality path (#1385) |
 | `selfImprovementWithSlacknessAndResidualDominationInput` | `ResidualDomination.lean:81` | None | Orphan — same |
 | ~10 matrix-level SDP bridge lemmas | `SdpMatrixHelperBridge.lean` | None | Orphan — same |
 | `MatrixAddInUTransferStatement` | `MatrixRealization.lean:148` | None (0 consumers) | **DEAD** — should be deleted or documented |

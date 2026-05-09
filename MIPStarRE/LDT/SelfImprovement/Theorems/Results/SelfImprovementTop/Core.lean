@@ -19,7 +19,7 @@ and the bridge-input variants used to enter the self-improvement theorem.
 
 - **selfImprovementHelper** — reduced helper producing `T`, `Ĥ`, `Z` and
   `SelfImprovementHelperConclusion` from `sdp` + `addInU`.
-- **selfImprovementHelperWithSlackness** — companion helper producing the
+- **self_improvement_helper_with_slackness** — companion helper producing the
   slackness-carrying helper conclusion from the Section 9 SDP statement.
 - **selfImprovement** — `thm:self-improvement`: assembles the full
   pipeline (helper SSC → orthonormalization → data processing →
@@ -155,7 +155,7 @@ Section 9 statement `sdp_statement_with_slackness`, which records the strong-dua
 conclusion with complementary slackness.  The reduced theorem
 `selfImprovementHelper` remains separate, because its current `sdp` input has
 not yet formalized the strong-duality argument. -/
-lemma selfImprovementHelperWithSlackness
+lemma self_improvement_helper_with_slackness
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
