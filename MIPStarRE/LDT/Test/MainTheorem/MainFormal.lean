@@ -98,6 +98,10 @@ Paper origin: `references/ldt-paper/inductive_step.tex:441-454`, in the proof of
 the inductive hypothesis to each $x$-restricted strategy and obtains the
 per-slice measurements $G^x$.
 
+The hypotheses `hd` and `hk` are retained here because the eventual proof
+applies the predecessor induction theorem to the successor decomposition; that
+route needs the positive-degree and size assumptions transported from `params`.
+
 Tracks #1035.  This is intentionally a visible producer declaration, rather than a
 hidden extra hypothesis on the public `mainFormal` theorem, so the remaining
 recursive-slice gap is grep-able. -/
@@ -123,6 +127,11 @@ Paper origin: `references/ldt-paper/inductive_step.tex:456-485`, still in
 `\label{item:si-inductive-A-consistency}`,
 `\label{item:si-inductive-self}`, and
 `\label{item:si-inductive-boundedness}`) to each $G^x$.
+
+The hypotheses `hd` and `hk` are retained here because the eventual proof
+applies the predecessor self-improvement bridge after the successor
+decomposition; that route needs the positive-degree and size assumptions
+transported from `params`.
 
 Tracks #1036.  The target is data-valued, so this producer is a
 `noncomputable def` rather than a theorem; the intentional proof placeholder is
@@ -375,7 +384,7 @@ distinguished outcome on both sides.
 
 The distinguished outcomes `a_A` and `a_B` are chosen as the zero polynomial;
 `completeAtOutcomeProj` works for any distinguished outcome, so this choice
-is sound.  Callers that need specific distinguished outcomes should use
+is sound.  Arguments that require specific distinguished outcomes should use
 `MainFormalBaseProjectiveCompletionHypotheses` directly.
 
 Refs #1043. -/
@@ -396,14 +405,14 @@ noncomputable def baseProjectiveCompletionHypotheses_ofBaseBridge
   leftMatchMassPreservation := bridge.leftMatchMassPreservation
   rightMatchMassPreservation := bridge.rightMatchMassPreservation
 
-/-- Convenience wrapper for `baseProjectiveCompletionResidual` using the narrowed
+/-- Convenience theorem for `baseProjectiveCompletionResidual` using the narrowed
 base bridge.
 
 The narrowed `MainFormalBaseBridgeHypotheses` omits `a_A` and `a_B`, which
 are filled with the explicit zero polynomial by
 `baseProjectiveCompletionHypotheses_ofBaseBridge`. The `params.m = 1` hypothesis is consumed
-upstream when constructing the base-case role residual, so this wrapper only
-packages the Step~6 bridge conversion.
+upstream when constructing the base-case role residual, so this declaration only
+performs the orthonormalization bridge conversion.
 
 Refs #1043. -/
 theorem baseProjectiveCompletionResidual_ofBaseBridge
@@ -423,8 +432,9 @@ theorem baseProjectiveCompletionResidual_ofBaseBridge
 
 /-- Base-case assembly of `mainFormal` through the repaired line-169 route.
 
-Starting from the checked base-role residual, this theorem runs the line-130
-orthonormalization wrapper, completes the resulting projective submeasurements
+Starting from the checked base-role residual, this theorem runs the
+projective-consistency orthonormalization theorem, completes the resulting
+projective submeasurements
 using the diagonal consistency input, derives the repaired polynomial line-169
 transport with loss `10 * ζ₁^(1/8)`, and then proves the final point and
 self-consistency goals directly at `mainFormalError`. -/
@@ -666,10 +676,10 @@ and the proof finishes via `mainFormal_ofRoleResidualAndRepairedBridge`, exactly
 mirroring the base case.
 
 Universe note: the Lean statement uses `[FieldModel.{0} params.q]`, matching the
-base-universe field-model assumption of the public Section 6 successor wrapper.
+base-universe field-model assumption of the public Section 6 successor theorem.
 This is a current Lean API limitation, not a paper constraint; once the Section 6
-wrapper is universe-polymorphic, this public theorem should be generalized as
-well.
+declaration is universe-polymorphic, this public theorem should be generalized
+as well.
 
 Fixes #137, #239, #906, #1099.  Refs #1035, #1036, #1363.
 -/
@@ -698,13 +708,13 @@ theorem mainFormal
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  -- TODO(#422): The induction-side handoffs needed by the final
-  -- `mainFormal` assembly are standalone checked declarations:
+  -- The induction-side handoffs needed by the final `mainFormal` assembly are
+  -- standalone checked declarations:
   -- * base branch: `strategySymmetrization_mainInductionBaseCase`,
   -- * weighted successor boundary fields:
   --   `mainFormalSuccessorAxisWeightedBound_ofPass` and
   --   `mainFormalSuccessorDiagonalWeightedBound_ofPass`,
-  -- * successor Section 6 wrapper call:
+  -- * successor Section 6 specialization:
   --   `mainFormalSuccessorMainInductionPublicWrapper`, and
   -- * vacuous branch: `mainFormal_trivial_witness`.
   --
@@ -726,9 +736,9 @@ theorem mainFormal
   -- * #1043: construct `hbaseBridge` for base/successor cases
   --
   -- Note: the old scalar-cascade route through
-  -- `MainFormalCascadeRolePackageResidualProjectiveCompletionResidual`
-  -- has been replaced by the simple Route A pattern (see commit b4addb4).
-
+  -- `MainFormalCascadeRolePackageResidualProjectiveCompletionResidual` is no
+  -- longer used here; the successor branch now follows the same direct
+  -- role-residual assembly shape as the base branch.
   by_cases herr : 1 ≤ mainFormalError params k eps
   · exact mainFormal_trivial_witness params strategy eps k herr
   · have hepsNN : 0 ≤ eps := SameSpaceProjStrat.eps_nonneg_of_passes hpass
@@ -743,8 +753,9 @@ theorem mainFormal
         (hbaseBridge scalars roleResidual)
     · -- Successor case (m > 1): role residual from answer-valued
       -- successor bridge inputs produced by the visible #1035/#1036 gaps above.
-      let hk_pos : 1 ≤ k := Nat.succ_le_of_lt hk0
-      let hanswerSliceWitness :=
+      have hk_pos : 1 ≤ k := Nat.succ_le_of_lt hk0
+      have hanswerSliceWitness :
+          MainFormalSuccessorAnswerSliceWitness params strategy eps hpass k hm1 :=
         mainFormalSuccessorAnswerSliceWitnessProducer params strategy eps hd hpass k hk hm1
       let hanswerSliceBridge :=
         mainFormalSuccessorAnswerSliceBridgeProducer params strategy eps hd hpass k hk hm1

@@ -56,7 +56,7 @@ require QXP-layer data from Section 9.
 
 Once those repair witnesses are available, this lemma gives the full
 `MainFormalPostRolePackageDiagonalOrthonormalizationInput` needed by the
-line-130 orthonormalization wrapper
+projective-consistency orthonormalization theorem
 (`MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalInputs`). -/
 noncomputable def ofRoleResidual
     {params : Parameters} [FieldModel.{0} params.q]
