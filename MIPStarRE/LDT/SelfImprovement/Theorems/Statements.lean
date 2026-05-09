@@ -299,7 +299,11 @@ structure AddInUStatement (params : Parameters)
     pointConditionedGlobalVariance params strategy T.toSubMeas ≤
       selfImprovementVarianceError params eps delta
 
-/-- Reduced conclusion for the SDP and `addInU` stage of
+/-- Paper origin: `references/ldt-paper/self_improvement.tex:24-60`
+(`\label{lem:self-improvement-helper}`);
+`docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex` (SDP gap).
+
+Reduced conclusion for the SDP and `addInU` stage of
 `lem:self-improvement-helper`.
 
 This structure intentionally records only the guarantees produced directly by
@@ -342,7 +346,11 @@ structure SelfImprovementHelperConclusionWithSlackness (params : Parameters)
     ∀ g : Polynomial params,
       sdpComplementarySlacknessEquation params strategy T.toSubMeas Z g
 
-/-- Conclusion of `thm:self-improvement`. -/
+/-- Paper origin: `references/ldt-paper/self_improvement.tex:635-671`
+(`\label{thm:self-improvement}`);
+blueprint `\label{thm:self-improvement}`.
+
+Conclusion of `thm:self-improvement`. -/
 structure SelfImprovementConclusion (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (G : Measurement (Polynomial params) ι)
@@ -388,7 +396,10 @@ structure SelfImprovementConclusion (params : Parameters) [FieldModel params.q]
       (leftTensor (ι₂ := ι) Z)
       (selfImprovementError params eps delta)
 
-/-- Conclusion for the explicit bridge from measurement to submeasurement input. -/
+/-- Paper origin: `references/ldt-paper/self_improvement.tex:635-671`
+(`\label{thm:self-improvement}`).
+
+Conclusion for the explicit bridge from measurement to submeasurement input. -/
 structure SelfImprovementSubMeasConclusion (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (G : SubMeas (Polynomial params) ι)

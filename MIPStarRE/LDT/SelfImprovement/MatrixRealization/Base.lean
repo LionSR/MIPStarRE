@@ -55,7 +55,11 @@ theorem matrixSdpStrictPrimalSubmeasurement_sum_effect (params : Parameters)
     _ = ((1 / 2 : Error) • (1 : MatrixOperator model.space)) :=
         sdpStrictPrimalSubMeas_total (ι := model.space.carrier) params
 
-/-- The paper's matrix-level strict-feasible dual witness `Z = 2I`. -/
+/-- Paper origin: `references/ldt-paper/self_improvement.tex:168-176`
+(`\label{lem:sdp}` strict feasible dual witness `Z = 2I`);
+blueprint `\label{lem:sdp-matrix-feasible-bounds}`.
+
+The paper's matrix-level strict-feasible dual witness `Z = 2I`. -/
 noncomputable def matrixSdpStrictDualWitness {params : Parameters} [FieldModel params.q]
     (model : MatrixSdpRealization params) : MatrixOperator model.space :=
   (2 : Error) • (1 : MatrixOperator model.space)

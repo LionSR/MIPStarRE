@@ -96,7 +96,11 @@ noncomputable def sdpStrictPrimalSubMeas (params : Parameters)
   simpa [sdpStrictPrimalSubMeas] using
     sdpStrictPrimalConstantSum (ι := ι) params
 
-/-- The reduced Lean wrapper completes `sdpStrictPrimalSubMeas` at the zero
+/-- Paper origin: `references/ldt-paper/self_improvement.tex:62-88`
+(`\label{lem:sdp}`), strict Slater witness at lines 168-176;
+`docs/paper-gaps/issue-196-sdp-weakening.tex` (submeasurement vs measurement).
+
+The reduced Lean wrapper completes `sdpStrictPrimalSubMeas` at the zero
 polynomial so that downstream lemmas can keep using a full measurement.
 
 After this completion, the zero-polynomial outcome is no longer the paper's
@@ -109,7 +113,11 @@ noncomputable def sdpPrimalWitness (params : Parameters)
     (sdpStrictPrimalSubMeas (ι := ι) params)
     (sdpDistinguishedPolynomial params)
 
-/-- The paper's strict-feasible dual SDP witness `Z = 2I`. -/
+/-- Paper origin: `references/ldt-paper/self_improvement.tex:168-176`
+(`\label{lem:sdp}` strict feasible dual witness `Z = 2I`);
+blueprint `\label{lem:sdp-uniform-feasible-witness}`.
+
+The paper's strict-feasible dual SDP witness `Z = 2I`. -/
 noncomputable def sdpStrictDualWitness : MIPStarRE.Quantum.Op ι :=
   (2 : Error) • (1 : MIPStarRE.Quantum.Op ι)
 
