@@ -690,12 +690,12 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	If the tuple of completed slices does not interpolate to the sampled
 	vertical-line value, then some active coordinate witnesses a line-value
 	mismatch. Concretely, for every direction $u$ and injective tuple
-	$\mathbf{x}=(x_1,\dots,x_k)$, let $\mathsf{PIF}^u(\mathbf{x})$ be the
+	$\mathbf{x}=(x_1,\dots,x_k)$, let $\widehat{H}^{\mathbf{x}}\rvert_u$ be the
 	vertical-line restriction of the pasted interpolation family and let
 	$\mathsf{V}^u$ be the vertical-line measurement family. Then
 	\[
 		\operatorname{Defect}_\psi\bigl(
-			\mathsf{PIF}^u(\mathbf{x}),\,
+			\widehat{H}^{\mathbf{x}}\rvert_u,\,
 			\mathsf{V}^u\bigr)
 		\;\le\;
 		\mathsf{badMass}(\psi;u,\mathbf{x})
@@ -707,7 +707,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\]
 	where $\operatorname{Defect}_\psi(A,B)$ denotes the bipartite consistency
 	defect $\max\bigl(0,\,
-		\bra{\psi} A_{\mathrm{total}}\ot B_{\mathrm{total}}\ket{\psi}
+		\bra{\psi} A_{\mathrm{tot}}\ot B_{\mathrm{tot}}\ket{\psi}
 		- \sum_a \bra{\psi} A_a\ot B_a\ket{\psi}\bigr)$,
 	$\mathsf{badMass}(\psi;u,\mathbf{x})$ aggregates the outcomes of the
 	completed sandwich family that disagree with $f$ at some active coordinate,
@@ -729,11 +729,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 		\E_{\mathbf{x}\sim\mathsf{Distinct}_k}\;
 		\mathsf{badMass}(\psi;u,\mathbf{x})
 		\;\le\;
-		k\cdot\nu_5
-		\;+\;
-		k^2 m\Bigl(
-			\eps^{1/32}+\delta^{1/32}+\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}
-		\Bigr),
+		k\cdot\nu_5 \;+\; \frac{k^2}{q},
 	\]
 	and consequently
 	\[
@@ -742,14 +738,13 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 			\mathsf{hRestr}_u(\mathsf{constructedPastedSubMeas}),\,
 			\mathsf{V}^u\bigr)
 		\;\le\;
-		k\cdot\nu_5
-		\;+\;
-		k^2 m\Bigl(
-			\eps^{1/32}+\delta^{1/32}+\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}
-		\Bigr),
+		k\cdot\nu_5 \;+\; \frac{k^2}{q},
 	\]
 	where $\nu_5 = 43km(\eps^{1/32}+\dots+(d/q)^{1/32})$
-	(Lemma~\ref{lem:ld-sandwich-line-one-point}).
+	(Lemma~\ref{lem:ld-sandwich-line-one-point}). Using
+	$1/q \le (d/q)^{1/32}$ and $m\ge 1$, this is further bounded by
+	$44k^2m(\eps^{1/32}+\delta^{1/32}+\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32})$
+	as used in Lemma~\ref{lem:h-b-consistency}.
 \end{lemma}
 
 \begin{lemma}[Consistency of the sandwiched measurement with one line value]\label{lem:ld-sandwich-line-one-point}
