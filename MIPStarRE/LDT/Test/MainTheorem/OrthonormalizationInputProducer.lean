@@ -1,9 +1,9 @@
 import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationData
 
 /-!
-# Orthonormalization input producer from role residual
+# Diagonal orthonormalization input from role residual
 
-This file bridges the Section 6 role residual to the line-130 orthonormalization
+This file bridges the Section 6 role residual to the diagonal orthonormalization
 inputs consumed by `mainFormal`.  The combining lemma that packages these into
 the full `MainFormalBaseRepairedBridgeHypotheses` lives in `MainFormal.lean`
 (where that structure is defined).
@@ -55,8 +55,8 @@ these are `LeftLiftedProjectivizationRepairInput` for the unsymmetrized POVMs an
 require QXP-layer data from Section 9.
 
 Once those repair witnesses are available, this lemma gives the full
-`MainFormalPostRolePackageDiagonalOrthonormalizationInput` needed by the
-line-130 orthonormalization wrapper
+`MainFormalPostRolePackageDiagonalOrthonormalizationInput` consumed by the
+diagonal orthonormalization construction
 (`MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalInputs`). -/
 noncomputable def ofRoleResidual
     {params : Parameters} [FieldModel.{0} params.q]
