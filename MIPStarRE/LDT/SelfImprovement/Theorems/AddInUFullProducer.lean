@@ -50,21 +50,21 @@ agree to within `4 √ζ_variance = addInUError params eps delta`. Here `H` is
 **not** an arbitrary sub-measurement: per the paper's construction and the
 existing `SelfImprovementHelperConclusion.averagedConstruction` field, `H` is
 the averaged sandwiched family `H_h = E_u (A^u · T_h · A^u)` derived from the
-SDP measurement `T` supplied by `lem:sdp`. We inline that derivation inside
-the inequality rather than taking `H` as an extra parameter, so the structure
-records exactly the paper's transfer inequality.
+SDP measurement `T` supplied by `lem:sdp`. We substitute that derivation
+directly into the inequality rather than taking `H` as an extra parameter,
+so the structure records exactly the paper's transfer inequality.
 
 The reduced `AddInUStatement` (`Statements.lean:293`) only records the
 variance-bound consequence used in subsequent arguments; this structure
 records the universally-quantified transfer inequality itself.
 
-Note on the typing of `T`: the parameter is `T : SubMeas (Polynomial params) ι`
+Note on the type of `T`: the parameter is `T : SubMeas (Polynomial params) ι`
 because both `addInURightQuantity` (`Statements.lean:209`) and
 `averagedSandwichedPolynomialSubMeas` (`Defs.lean:312`) take a sub-measurement,
 and the paper's `lem:add-in-u` only requires `∑_h T_h ≤ I`. This is the
-canonical typing for `T`. The reduced `AddInUStatement` happens to declare
+canonical type for `T`. The reduced `AddInUStatement` happens to declare
 `T : Measurement` only because its single field calls `T.toSubMeas`; the
-two could be aligned by widening that one to `SubMeas`. -/
+two could be aligned by generalizing that parameter to `SubMeas`. -/
 structure AddInUFullStatement
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)

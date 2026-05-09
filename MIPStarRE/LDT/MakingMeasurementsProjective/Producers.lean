@@ -28,9 +28,9 @@ The remaining obligation recorded here:
   projective sub-measurement from a rounded family while preserving the
   left-lifted product form `P_a ⊗ I`.
 
-Once this proof is complete, the hypothesis
+Once this theorem is proved, the hypothesis
 `LeftLiftedProjectivizationRepairInput` required by the orthonormalization
-main lemma can be discharged by calling this declaration directly.
+main lemma is satisfied by applying this theorem directly.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -63,8 +63,8 @@ for the sigma-range embedding) to a genuine projective sub-measurement
 `P = {P_a}` with closeness
 `A_a ⊗ I ≈_{roundingToProjectiveError ζ} P_a ⊗ I`. The locality-preserving
 form (output `P_a ⊗ I` rather than an arbitrary lifted family) is the
-specialization required by `orthonormalizationMainLemma` and thereby by
-`mainFormal`'s base-case bridge.
+specialization required by `orthonormalizationMainLemma` and by the base
+case of `mainFormal`'s argument.
 -/
 theorem leftLiftedProjectivizationRepairProducer
     {Outcome : Type*} {ι : Type*}
