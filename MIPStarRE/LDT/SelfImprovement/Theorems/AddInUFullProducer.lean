@@ -55,8 +55,16 @@ the inequality rather than taking `H` as an extra parameter, so the structure
 records exactly the paper's transfer inequality.
 
 The reduced `AddInUStatement` (`Statements.lean:293`) only records the
-variance-bound consequence used in subsequent arguments; this structure records the
-universally-quantified transfer inequality itself. -/
+variance-bound consequence used in subsequent arguments; this structure
+records the universally-quantified transfer inequality itself.
+
+Note on the typing of `T`: the parameter is `T : SubMeas (Polynomial params) ι`
+because both `addInURightQuantity` (`Statements.lean:209`) and
+`averagedSandwichedPolynomialSubMeas` (`Defs.lean:312`) take a sub-measurement,
+and the paper's `lem:add-in-u` only requires `∑_h T_h ≤ I`. This is the
+canonical typing for `T`. The reduced `AddInUStatement` happens to declare
+`T : Measurement` only because its single field calls `T.toSubMeas`; the
+two could be aligned by widening that one to `SubMeas`. -/
 structure AddInUFullStatement
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -91,7 +99,13 @@ combining the self-consistency of `A` (giving `√(2δ)` bounds on the
 
 The reduced `addInU` lemma in `Bracketed.lean:584` formalizes the
 specialization of this chain to the variance-bound consequence; the full
-universally-quantified inequality is not yet formalized in Lean. -/
+universally-quantified inequality is not yet formalized in Lean.
+
+The `gamma` parameter and `_hgood : IsGood eps delta gamma` hypothesis carry
+the paper's standing "good strategy" context; `gamma` does not appear in
+`AddInUFullStatement`'s bound (which is `addInUError params eps delta`),
+matching the paper's framing where `lem:add-in-u` is invoked inside a
+`good`-strategy section. -/
 theorem addInUFullProducer
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
