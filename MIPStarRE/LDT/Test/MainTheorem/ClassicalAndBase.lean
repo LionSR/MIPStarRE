@@ -99,7 +99,10 @@ def TwoProverClassicalLIDPassCondition (params : Parameters)
     strategy.pointAnswerA = a ∧
       strategy.ClassicallyPassesLowIndividualDegreeTest eps
 
-/-- Hypothesis-style interface for the classical Raz--Safra
+/-- Paper origin: external citation, Raz–Safra (`\cite{RS97}`), restated as
+`\label{thm:raz-safra}` in `references/ldt-paper/introduction.tex:43-65`.
+
+Hypothesis-style interface for the classical Raz--Safra
 surface-versus-point soundness theorem.
 
 This keeps the quoted classical theorem explicit, rather than making it an
@@ -114,7 +117,11 @@ def RazSafraSoundnessStatement (params : Parameters)
     ∃ slack : Error,
       PointAnswerSoundnessConclusion params a slackBound slack
 
-/-- Hypothesis-style interface for the classical low-individual-degree
+/-- Paper origin: external citation, Polishchuk–Spielman (`\cite{PS94}`),
+restated as `\label{thm:classical-test-soundness}` in
+`references/ldt-paper/introduction.tex:69-92`.
+
+Hypothesis-style interface for the classical low-individual-degree
 soundness result of Polishchuk and Spielman.
 
 This issue-#408 `Prop`-valued interface replaces the earlier ambient axiom with

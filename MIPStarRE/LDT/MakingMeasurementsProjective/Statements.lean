@@ -39,7 +39,21 @@ def OneMeasNaimarkLemma (α : Type*) [Fintype α] [DecidableEq α]
 
 /-! ### Full Naimark dilation statement -/
 
-/-- Statement carried by `NaimarkData`.
+/-- Paper origin: deliberate paper-gap (`docs/paper-gaps/naimark.tex`).
+
+The paper's full tensor-product Naimark dilation
+(`references/ldt-paper/orthonormalization.tex:36-115`,
+`\label{thm:naimark}`) is not formalized as a single statement. Instead this
+structure records the per-question one-measurement dilations of
+`\label{lem:naimark-helper}`
+(`references/ldt-paper/orthonormalization.tex:121-159`) together with the
+single-outcome marginal-preservation conclusions; the proof of
+`\label{thm:naimark}` that tensors the per-question helpers
+(`references/ldt-paper/orthonormalization.tex:161-187`) and the
+state-dependent non-preservation example
+`\label{ex:easy-but-long}`
+(`references/ldt-paper/orthonormalization.tex:189-272`) are tracked
+separately, see `docs/paper-gaps/naimark.tex`.
 
 This records the questionwise one-measurement Naimark dilations used in the
 full theorem: each `A x` and `B y` is equipped with a local projective dilation
@@ -75,7 +89,13 @@ structure NaimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type*}
 
 /-! ### Orthonormalization statements -/
 
-/-- Conclusion of the intermediate almost-projective step. -/
+/-- Paper origin: `references/ldt-paper/preliminaries.tex:348-376`
+(`\label{def:approx_delta}`) and `references/ldt-paper/orthonormalization.tex`
+§4 prose around `\label{lem:projective-non-measurement}` (lines 414-538).
+
+Conclusion of the intermediate almost-projective step: a measurement which is
+ζ-strongly self-consistent and ζ-self-close in the state-dependent distance,
+and whose effects satisfy `Σₐ (Aₐ − Aₐ²) ≤ ζ`. -/
 structure AlmostProjMeasStatement {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -91,7 +111,12 @@ structure AlmostProjMeasStatement {Outcome : Type*}
   sourceAlmostProjective :
     ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ
 
-/-- Conclusion of the truncation-function step in the proof of rounding to
+/-- Paper origin: `references/ldt-paper/orthonormalization.tex:414-538`
+(`\label{lem:projective-non-measurement}`); the truncation-function `trunc_δ`
+itself is introduced inside the proof at lines 434-444, with the supporting
+inequality `\label{lem:trunc-inequality}` at line 447.
+
+Conclusion of the truncation-function step in the proof of rounding to
 projectors. -/
 structure SpectralTruncationStatement {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -125,7 +150,12 @@ abbrev SpectralTruncationInput {Outcome : Type*}
     (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ) →
       SpectralTruncationStatement ψ A ζ
 
-/-- Conclusion of the rounding-to-projective step. -/
+/-- Paper origin: `references/ldt-paper/orthonormalization.tex:414-538`
+(`\label{lem:projective-non-measurement}`).
+
+Conclusion of the rounding-to-projective step: a genuine projective
+sub-measurement `P` which is `ζ`-close to the input measurement `A` in the
+state-dependent operator distance. -/
 structure RoundedProjMeasStatement {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]

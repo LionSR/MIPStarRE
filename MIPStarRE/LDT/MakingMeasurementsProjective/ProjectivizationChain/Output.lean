@@ -20,7 +20,12 @@ open MIPStarRE.LDT.Preliminaries
 /-! ### Output data -/
 
 set_option linter.unusedFintypeInType false in
-/-- Output data for the orthonormalization + completion chain (Step 6 of
+/-- Paper origin: `references/ldt-paper/orthonormalization.tex:282-538`
+(`\label{lem:orthonormalization-main-lemma}`), with the completion-to-measurement
+step from `references/ldt-paper/inductive_step.tex:130-149`
+(`eq:G-with-Q-A`).
+
+Output data for the orthonormalization + completion chain (Step 6 of
 the inductive step).
 
 The chain takes a measurement `A : Measurement Outcome ι` together with a

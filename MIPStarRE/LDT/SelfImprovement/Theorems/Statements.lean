@@ -74,14 +74,21 @@ structure SdpOptimalPairWithSlackness (params : Parameters) [FieldModel params.q
     ∀ g : Polynomial params,
       sdpComplementarySlacknessEquation params strategy T Z g
 
-/-- Reduced conclusion for the currently formalized fragment of `lem:sdp`. -/
+/-- Paper origin: `references/ldt-paper/self_improvement.tex:82-181`
+(`\label{lem:sdp}`).
+
+Reduced conclusion for the currently formalized fragment of `lem:sdp`. -/
 structure SdpStatement (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) : Prop where
   witness :
     ∃ T : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SdpOptimalPair params strategy T Z
 
-/-- SDP conclusion strengthened by complementary slackness.
+/-- Paper origin: `references/ldt-paper/self_improvement.tex:82-181`
+(`\label{lem:sdp}`); the complementary-slackness equation `T_g · Z = T_g · A_g`
+is `eq:complementary-slackness` at line 179.
+
+SDP conclusion strengthened by complementary slackness.
 
 Paper origin: `references/ldt-paper/self_improvement.tex` lines 62--88
 introduce the Section 9 primal/dual SDP pair and state `\label{lem:sdp}`:
@@ -273,7 +280,10 @@ noncomputable def projectiveBoundednessGap (params : Parameters)
   ev strategy.state
     (projectiveResidualOperator params H Z)
 
-/-- Reduced conclusion for the currently formalized fragment of `lem:add-in-u`.
+/-- Paper origin: `references/ldt-paper/self_improvement.tex:238-455`
+(`\label{lem:add-in-u}`).
+
+Reduced conclusion for the currently formalized fragment of `lem:add-in-u`.
 
 The paper statement quantifies over an auxiliary submeasurement `M`, the
 averaged family `H`, and a selection rule `S`, and proves a transfer inequality

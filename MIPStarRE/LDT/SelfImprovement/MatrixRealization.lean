@@ -144,7 +144,13 @@ noncomputable def matrixProjectiveResidualGap (params : Parameters)
   let total := MIPStarRE.Quantum.Submeasurement.total H
   Complex.re (matrixExpectation model.state (Z * (1 - total)))
 
-/-- Matrix-level version of the `add-in-u` transfer inequality. -/
+/-- Paper origin: `references/ldt-paper/self_improvement.tex:238-343`
+(`\label{lem:add-in-u}`).
+
+Matrix-level version of the `add-in-u` transfer inequality: this is the matrix
+realization of `AddInUStatement`, recording the `lem:add-in-u` transfer bound on
+the difference between the left- and right-hand expectations evaluated at a
+selection rule `S`. -/
 structure MatrixAddInUTransferStatement {Outcome : Type*} [Fintype Outcome]
     (params : Parameters)
     [FieldModel params.q]

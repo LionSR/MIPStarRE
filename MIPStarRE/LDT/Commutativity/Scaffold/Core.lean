@@ -182,7 +182,12 @@ abbrev FullSliceCommutationEvaluatedInput (params : Parameters)
         (fullSliceQuestionOfEvaluatedSlice params q))
       (comMainError params gamma zeta)
 
-/-- Output package for `lem:normalization-condition`. -/
+/-- Paper origin: `references/ldt-paper/commutativity-G.tex:309-338`
+(`\label{lem:normalization-condition}`); records the Hermitian-square /
+identity-bound expansion used inside the proof of the commutativity theorem
+`\label{thm:com-main}` (`references/ldt-paper/commutativity-G.tex:228-378`).
+
+Output package for `lem:normalization-condition`. -/
 structure NormalizationConditionStatement {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB]
     (P : SubMeas OutcomeA ι)

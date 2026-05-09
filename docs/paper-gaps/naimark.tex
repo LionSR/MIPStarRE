@@ -1,0 +1,166 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\setlength{\emergencystretch}{2em}
+
+\input{command}
+
+\title{Naimark dilation: deliberate paper-gap for the full bipartite assembly}
+\author{}
+\date{2026-05-08}
+
+\begin{document}
+\maketitle
+
+\section{At a glance}
+
+\begin{itemize}
+  \item \textbf{Difficulty: hard if pursued, low if left as a paper-gap.}  The
+  one-measurement Naimark step is straightforward in finite dimensions, but the
+  full tensor-product assembly of per-question dilations into a single bipartite
+  Naimark statement is left out of this formalization by design.
+  \item \textbf{Estimated weight, if formalized:} roughly \textbf{6--10 theorem
+  interfaces} and \textbf{600--1200 lines}, dominated by tensor-product
+  bookkeeping for ancillary registers and the lifting of states from the small
+  to the enlarged space.
+  \item \textbf{Mathlib/project split, if formalized:} approximately
+  \textbf{30\% Mathlib} and \textbf{70\% project-local}.  Mathlib supplies
+  finite-dimensional Hilbert-space tensor products and orthogonal projection
+  machinery; the project supplies the question-indexed assembly and the
+  bipartite distance-preservation interface.
+  \item \textbf{Key Mathlib inputs, if formalized:} finite-dimensional inner
+  product spaces, tensor products of finite-dimensional Hilbert spaces, and
+  matrix block constructions for projections.
+\end{itemize}
+
+\section{Key theorem forms}
+
+The formalization isolates two related but distinct theorem forms.
+\begin{enumerate}
+  \item \textbf{Source theorem form: Naimark dilation
+  (\texttt{thm:naimark}, displayed at
+  \path{references/ldt-paper/orthonormalization.tex}, lines~36--115).}
+  For every collection of bipartite
+  submeasurements $\{A^x\}_{x\in Q_A}$, $\{B^y\}_{y\in Q_B}$ on a finite
+  Hilbert space~$\mathcal H$, there is an enlarged Hilbert space $\widetilde
+  {\mathcal H}\supseteq\mathcal H$, an isometry $V:\mathcal H\to\widetilde
+  {\mathcal H}$, and projective measurements $\{\widetilde A^x\}$,
+  $\{\widetilde B^y\}$ on $\widetilde{\mathcal H}\otimes\widetilde{\mathcal H}$
+  with
+  \[
+    \langle\psi|A^x_a\otimes B^y_b|\psi\rangle
+    =\langle V\psi|\widetilde A^x_a\otimes \widetilde B^y_b|V\psi\rangle.
+    \tag{\texttt{thm:naimark}}
+  \]
+  This is the displayed paper statement at
+  \path{references/ldt-paper/orthonormalization.tex}, lines~36--115.
+  \item \textbf{Adapter theorem form: per-question one-measurement
+  Naimark.}  For each question $x$ and submeasurement $A^x$ there exists a
+  one-measurement Naimark dilation on the enlarged space
+  $\mathcal H\otimes(\C\oplus\C^{|\textsf{Outcome}|})$ that preserves all
+  single-outcome expectations:
+  \[
+    \tau\bigl(\rho\,A^x_a\bigr)
+    =\widetilde\tau\bigl(\widetilde\rho\,\widetilde A^x_{(a,\mathrm{some})}\bigr).
+  \]
+  This is the form actually formalized; see the Lean structure
+  \leanid{NaimarkStatement}.%
+  \footnote{Defined at
+  \doclink{MIPStarRE/LDT/MakingMeasurementsProjective/Statements.lean}.}
+  \item \textbf{Downstream theorem form.}  The downstream uses inside the LDT
+  pipeline never call the bipartite tensor product of two Naimark dilations;
+  they call the per-question single-outcome marginal-preservation conclusion at
+  Alice or Bob separately, with the unmodified state on the unaffected side.
+  This is supplied directly by \leanid{leftMarginalPreservation} and
+  \leanid{rightMarginalPreservation}.
+\end{enumerate}
+
+\section{The source assertion}
+
+We examine \cite{Ji2020LowIndividualDegree}, the Naimark dilation theorem
+labelled \texttt{thm:naimark}.%
+\footnote{Tracked alongside ledger~\ghissue{1379}.  The paper passages are
+\path{references/ldt-paper/orthonormalization.tex}, lines~36--115 (the displayed
+theorem statement), 121--159 (the helper lemma \texttt{lem:naimark-helper} and
+its proof), 161--187 (the proof of \texttt{thm:naimark} that tensors the
+per-question helpers), and 189--272 (the genuine non-preservation example
+\texttt{ex:easy-but-long}).}
+
+\medskip
+
+\noindent\emph{Notation.}  We write $X\approx_\delta Y$ on the state $\ket\psi$
+to mean the state-dependent operator distance
+\(
+  \langle\psi|(X-Y)^{\dagger}(X-Y)|\psi\rangle\le\delta,
+\)
+defined as in \cite{Ji2020LowIndividualDegree} at
+\texttt{def:approx\_delta} (\path{references/ldt-paper/preliminaries.tex}, line~348).
+
+\medskip
+
+In the notation of the paper, the source assumes
+\[
+  \mathcal H=\text{a finite-dimensional Hilbert space},
+  \quad \{A^x\}_{x\in Q_A},\,\{B^y\}_{y\in Q_B}\text{ submeasurements on }\mathcal H,
+\]
+and concludes the bipartite preservation identity above.  The proof proceeds
+question by question via \texttt{lem:naimark-helper}; the example
+\texttt{ex:easy-but-long} demonstrates that the dilation does \emph{not}
+preserve the state-dependent distance $\approx_\delta$ defined just above,
+which is why downstream arguments in the LDT paper carry the dilation only as
+far as the single-outcome marginals.
+
+\section{Comparison with the formalization}
+
+The blueprint and formal development together record the per-question
+one-measurement dilations and the single-outcome marginal preservation, but
+omit the global tensor-product assembly into one bipartite statement.  The
+formal development proves the adapter form
+\[
+  \forall x,a,\rho,\;
+  \tau\bigl(\rho A^x_a\bigr)
+  =\widetilde\tau\bigl(\widetilde\rho_x\,(\widetilde A^x)_{(a,\mathrm{some})}\bigr),
+\]
+where $\widetilde\rho_x$ is the one-measurement-lifted density at question $x$.
+The corresponding statement for Bob is symmetric.  The bipartite identity
+of the source theorem form is \emph{not} proved.
+
+This is sufficient for downstream LDT use: every consumer reduces to the
+per-side single-outcome marginal-preservation conclusion, applied either to
+Alice's submeasurements with $B$ left untouched or vice versa.  No consumer
+requires the simultaneous bipartite dilation; in particular, no consumer
+requires the global isometry $V$ acting on the joint state.
+
+\section{Why the bipartite assembly remains a recorded paper-gap}
+
+Three considerations support leaving the bipartite tensor assembly out of the
+formalization:
+\begin{itemize}
+  \item \textbf{Distance non-preservation.}  Example~\texttt{ex:easy-but-long}
+  shows that the dilation does not preserve the state-dependent distance
+  $\approx_\delta$ recalled in Section~3, so any
+  bipartite statement formulated in terms of state-dependent distances would
+  need to track an explicit error inflation that is not used downstream.
+  \item \textbf{Downstream redundancy.}  The downstream uses listed above all
+  reduce to one of the per-question marginal-preservation conclusions.  Adding
+  the bipartite assembly would not eliminate any obligation in the rest of the
+  pipeline.
+  \item \textbf{Tensor bookkeeping cost.}  The bipartite assembly is dominated
+  by tensor-product bookkeeping (lifting the joint state, transporting density
+  matrices through the isometry, transporting submeasurements through the
+  enlarged register on each side) which is independent of the LDT-specific
+  content.
+\end{itemize}
+
+\section{Conclusion}
+
+The Lean structure \leanid{NaimarkStatement} records the per-question
+one-measurement Naimark data and the single-outcome marginal-preservation
+conclusions used by downstream LDT lemmas.  The full bipartite tensor-product
+assembly of the paper's Naimark theorem is intentionally not formalized here;
+this note records that deliberate gap at the same paper origin cited by the
+\leanid{NaimarkStatement} declaration site.
+
+\end{document}

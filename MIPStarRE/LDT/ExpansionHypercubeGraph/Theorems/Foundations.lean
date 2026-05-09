@@ -13,13 +13,22 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-! ## Statement packages and matrix realization bridge -/
 
-/-- Output package for `lem:local-rewrite`. -/
+/-- Paper origin: `references/ldt-paper/expansion.tex:145-178`
+(`\label{lem:local-rewrite}`).
+
+Output package for `lem:local-rewrite`: the local variance is rewritten as a
+trace-form expectation in the operator family `A`. -/
 structure LocalRewriteStatement (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : Prop where
   traceFormula :
     localVariance params A ψ = localVarianceTraceForm params A ψ
 
-/-- Output package for `lem:global-rewrite`. -/
+/-- Paper origin: `references/ldt-paper/expansion.tex:179-269`
+(`\label{lem:global-rewrite}`).
+
+Output package for `lem:global-rewrite`: the global variance is rewritten as a
+trace-form expectation along the eigenbasis of the hypercube graph
+Laplacian. -/
 structure GlobalRewriteStatement (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : Prop where
   decomposition :

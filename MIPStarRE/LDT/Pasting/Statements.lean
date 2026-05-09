@@ -188,7 +188,12 @@ structure LdPastingSubMeasConclusion (params : Parameters)
         (MainInductionStep.ldPastingInInductionNu params k
           eps delta gamma zeta) k)
 
-/-- Output package for `lem:g-complete-self-consistency`.
+/-- Paper origin: `references/ldt-paper/ld-pasting.tex:514-536`
+(`\label{lem:g-complete-self-consistency}`); the `\widehat G` rewrite at
+`eq:gselfconall` (`references/ldt-paper/ld-pasting.tex:821`) is the family of
+self-consistency bounds compared against here.
+
+Output package for `lem:g-complete-self-consistency`.
 `ψbi` is the bipartite state on `d * d` (passed as `strategy.state`
 by callers). -/
 structure GCompleteSelfConsistencyStatement (params : Parameters)
@@ -208,7 +213,12 @@ structure GCompleteSelfConsistencyStatement (params : Parameters)
       (IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas))
       zeta
 
-/-- Output package for `cor:g-bot-self-consistency`. -/
+/-- Paper origin: `references/ldt-paper/ld-pasting.tex:537-558`
+(`\label{cor:g-bot-self-consistency}`); incomplete-part complement of
+`\label{lem:g-complete-self-consistency}` and the
+`eq:gselfconall` self-consistency family at line 821.
+
+Output package for `cor:g-bot-self-consistency`. -/
 structure GBotSelfConsistencyStatement (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -222,7 +232,10 @@ structure GBotSelfConsistencyStatement (params : Parameters)
       (incompletePartRightFamily params family)
       zeta
 
-/-- Output package for `lem:commutativity-switcheroo`. -/
+/-- Paper origin: `references/ldt-paper/ld-pasting.tex:560-720`
+(`\label{lem:commutativity-switcheroo}`).
+
+Output package for `lem:commutativity-switcheroo`. -/
 structure CommutativitySwitcherooStatement {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -236,7 +249,10 @@ structure CommutativitySwitcherooStatement {Outcome : Type*} [Fintype Outcome]
       (switcherooAggregateRight params family M)
       (commutativitySwitcherooError zeta omega chi)
 
-/-- Output package for `cor:commuting-with-G-complete`. -/
+/-- Paper origin: `references/ldt-paper/ld-pasting.tex:721-774`
+(`\label{cor:commuting-with-G-complete}`).
+
+Output package for `cor:commuting-with-G-complete`. -/
 structure CommutingWithGCompleteStatement (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -269,7 +285,10 @@ structure CommutingWithGCompleteStatement (params : Parameters)
       (completePartTotalProductRight params family)
       (commutingWithGCompleteError params gamma zeta)
 
-/-- Output package for `cor:commuting-with-G-incomplete`. -/
+/-- Paper origin: `references/ldt-paper/ld-pasting.tex:775-816`
+(`\label{cor:commuting-with-G-incomplete}`).
+
+Output package for `cor:commuting-with-G-incomplete`. -/
 structure CommutingWithGIncompleteStatement (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -290,7 +309,11 @@ structure CommutingWithGIncompleteStatement (params : Parameters)
       (incompletePartTotalProductRight params family)
       (commutingWithGIncompleteError params gamma zeta)
 
-/-- Output package for `cor:G-hat-facts`. -/
+/-- Paper origin: `references/ldt-paper/ld-pasting.tex:817-862`
+(`\label{cor:G-hat-facts}`); the displayed `\widehat G` self-consistency and
+commutation lines `eq:gselfconall` and `eq:gcomall` are at lines 821 and 823.
+
+Output package for `cor:G-hat-facts`. -/
 structure GHatFactsStatement (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -317,7 +340,10 @@ structure GHatFactsStatement (params : Parameters)
       (gHatPairProductRight params family)
       (gHatCommutationError params gamma zeta)
 
-/-- Output package for `lem:commute-g-half-sandwich`. -/
+/-- Paper origin: `references/ldt-paper/ld-pasting.tex:872-917`
+(`\label{lem:commute-g-half-sandwich}`).
+
+Output package for `lem:commute-g-half-sandwich`. -/
 structure CommuteGHalfSandwichStatement (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -330,7 +356,10 @@ structure CommuteGHalfSandwichStatement (params : Parameters)
       (gHatHalfSandwichRight params family k)
       (commuteGHalfSandwichError params gamma zeta k)
 
-/-- Output package for `lem:ld-sandwich-line-one-point`. -/
+/-- Paper origin: `references/ldt-paper/ld-pasting.tex:918-1040`
+(`\label{lem:ld-sandwich-line-one-point}`).
+
+Output package for `lem:ld-sandwich-line-one-point`. -/
 structure LdSandwichLineOnePointStatement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -344,7 +373,10 @@ structure LdSandwichLineOnePointStatement (params : Parameters)
       (ldSandwichLineOnePointRightFamily params strategy family k i)
       (ldSandwichLineOnePointError params eps delta gamma zeta k)
 
-/-- Output package for `lem:h-b-consistency`. -/
+/-- Paper origin: `references/ldt-paper/ld-pasting.tex:1041-1140`
+(`\label{lem:h-b-consistency}`).
+
+Output package for `lem:h-b-consistency`. -/
 structure HBConsistencyStatement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -375,7 +407,10 @@ noncomputable def overAllOutcomesExpansionMass (params : Parameters)
   subMeasMass strategy.state ((IdxSubMeas.liftLeft
     (allOutcomesExpansionFamily params strategy family k)) ())
 
-/-- Output package for `lem:over-all-outcomes`.
+/-- Paper origin: `references/ldt-paper/ld-pasting.tex:1141-1294`
+(`\label{lem:over-all-outcomes}`).
+
+Output package for `lem:over-all-outcomes`.
 
 The paper's displayed statement is a scalar approximation of expectation values,
 not a stronger `≈_δ` relation between already-collapsed `Unit`-indexed
@@ -442,7 +477,10 @@ noncomputable def fromHToGBernoulliTailMass (params : Parameters)
   subMeasMass ψbi ((IdxSubMeas.liftRight
     (bernoulliTailFromFamily params family k)) ())
 
-/-- Output package for `lem:from-H-to-G`.
+/-- Paper origin: `references/ldt-paper/ld-pasting.tex:1295-1670`
+(`\label{lem:from-H-to-G}`).
+
+Output package for `lem:from-H-to-G`.
 
 The paper's displayed statement is a scalar approximation of expectation values,
 not a new `≈_δ` relation between submeasurements.  Accordingly, this bundle
@@ -464,7 +502,13 @@ structure FromHToGStatement (params : Parameters)
         fromHToGBernoulliTailMass params ψbi family k| ≤
       fromHToGError params gamma zeta k
 
-/-- Output package for `lem:chernoff-bernoulli-matrix`. -/
+/-- Paper origin: `references/ldt-paper/ld-pasting.tex:1671-1798`
+(`\label{lem:chernoff-bernoulli-matrix}`); the operator-Chernoff inequality
+needed for this lemma is a Mathlib paper-gap, tracked by the Bernoulli-tail
+contraction work in this repository (placeholder field `tail_le_one`) and the
+matrix-Chernoff inequality `eq:by-chernoff` at line 1739.
+
+Output package for `lem:chernoff-bernoulli-matrix`. -/
 structure ChernoffBernoulliMatrixStatement {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι)
     (theta : Error) (k degree : ℕ) (X : MIPStarRE.Quantum.Op ι) (kappa : Error)
@@ -486,7 +530,10 @@ structure ChernoffBernoulliMatrixStatement {ι : Type*} [Fintype ι] [DecidableE
            exact tail_le_one } : SubMeas Unit ι)
       (1 - kappa / (1 - theta) - Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2))
 
-/-- Output package for `cor:ld-pasting-N-completeness`. -/
+/-- Paper origin: `references/ldt-paper/ld-pasting.tex:1799-1849`
+(`\label{cor:ld-pasting-N-completeness}`).
+
+Output package for `cor:ld-pasting-N-completeness`. -/
 structure LdPastingNCompletenessStatement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
