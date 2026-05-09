@@ -1017,6 +1017,18 @@ Lemma~\ref{lem:self-improvement-helper}. The bookkeeping here is entirely about
 showing that completeness, consistency, self-consistency, and boundedness survive
 the passage from~$\widehat H$ to a projective submeasurement~$H$.
 
+\begin{lemma}[Slackness-residual-domination bridge declarations]\label{lem:self-improvement-slackness-bridge}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndResidualDominationInput}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndQXPRepairAndCoisometry}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromSlacknessResidualDominationBridgeInputs}
+  \leanok
+  \uses{def:polymeasurements, def:simeq}
+  These bridge declarations assemble the SDP slackness and residual-domination
+  inputs required by Theorem~\ref{thm:self-improvement}. The statements
+  are formalized; the proofs currently depend on an unfinished SDP helper
+  (see the slackness ledger, \#1379).
+\end{lemma}
+
 \begin{theorem}[Self-improvement]\label{thm:self-improvement}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovement}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementError_nonneg_of_isGood}
@@ -1029,9 +1041,6 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_exists_of_helper_outputs_of_residual_domination}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_exists_of_helper_outputs_of_residualDominationInput}
   \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementSlacknessResidualDominationBridgeInputs}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndResidualDominationInput}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndQXPRepairAndCoisometry}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromSlacknessResidualDominationBridgeInputs}
   \leanok
   \uses{def:polymeasurements, def:simeq, def:approx_delta, def:strong-self-consistency}
   Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following properties:
