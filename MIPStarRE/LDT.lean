@@ -57,6 +57,7 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkCore
 import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkOneMeas
 import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkFull
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
+import MIPStarRE.LDT.MakingMeasurementsProjective.Producers
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain
 import MIPStarRE.LDT.MainInductionStep.Defs
 import MIPStarRE.LDT.MainInductionStep.Statements
@@ -77,6 +78,7 @@ import MIPStarRE.LDT.GlobalVariance.Theorems.Results
 import MIPStarRE.LDT.SelfImprovement.Defs
 import MIPStarRE.LDT.SelfImprovement.MatrixRealization
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
+import MIPStarRE.LDT.SelfImprovement.Theorems.AddInUFullProducer
 import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationBridge
 import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationInputConstructors
 import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
