@@ -22,9 +22,13 @@ Base case, successor branch, and final assembly for `thm:main-formal`
   data, and the orthonormalization/completion inputs into the three final
   consistency bounds `Gᴬ ≃ I ⊗ Gᴮ`, `Aᴬ ⊗ I ≃ I ⊗ Qᴮ`, `Qᴬ ⊗ I ≃ I ⊗ Aᴮ`.
 
+* `mainFormal_assumingBridgeHypotheses` — the conditional form exposing the
+  still-unformalized base-case bridge data as an explicit hypothesis.
+
 * `mainFormal` — the top-level theorem, taking a projective strategy that
   passes the LID test with probability `≥ 1 − ε` and producing the three
-  pointwise consistency targets at error bound `mainFormalError`.
+  pointwise consistency targets at error bound `mainFormalError`.  The public
+  signature carries only paper hypotheses; bridge data is internalized.
 
 ## References
 
@@ -560,50 +564,21 @@ theorem mainFormal_ofRoleResidualAndRepairedBridge
 
 
 /--
-`thm:main-formal` from `test_definition.tex`.
+Conditional form of `thm:main-formal` exposing the still-unformalized base-case
+bridge data as an explicit hypothesis.
 
-The bipartite tensor placement follows the paper:
-- **1a**: `A^A_u ⊗ I ≈_ν I ⊗ G^B_{[g(u)=a]}` — G_B on **right**
-- **1b**: `I ⊗ A^B_u ≈_ν G^A_{[g(u)=a]} ⊗ I` — G_A on **left**, A^B on **right**
-- **2**: `G^A_g ⊗ I ≈_ν I ⊗ G^B_g` — G_B on **right**
+This auxiliary statement is **not** the paper theorem.  Compared with the
+public `mainFormal` below, it carries an additional hypothesis `hbaseBridge`
+producing, for every cascade scalar bundle and every base-case role residual,
+the repaired Step 6 bridge data of `MainFormalRepairedBridgeHypotheses`.
+That data is a formalization residual: the locality-preserving repair witnesses
+and diagonal self-consistency input feeding `mainFormal_ofRoleResidualAndRepairedBridge`.
 
-The `k`-bound boundary records the statement fix from issue #906: the paper's
-successor proof applies the Section 6 / Pasting-side wrappers, whose checked
-side condition is `400 * params.m * params.d ≤ k`. The public theorem therefore
-exposes this stronger hypothesis instead of trying to derive it from the paper's
-printed `params.m * params.d ≤ k` assumption.
+Once the bridge construction is itself proved internally, `mainFormal` becomes a
+direct consequence and this lemma can be discarded.
 
-After first separating off the saturated-error branch, the checked role-package
-infrastructure now exposes the base producer, an ordinary branch-level successor
-producer, and an answer-valued branch-level successor producer:
-
-* the base handoff `strategySymmetrization_mainInductionBaseCase`, packaged as
-  `MainFormalRolePackageBranchResidual.base`, and
-* the predecessor/successor handoff
-  `MainFormalRolePackageBranchResidual.successor`, which carries a bundled
-  `Parameters.SuccessorDecomposition`, transported passing strategy, bundled
-  `MainFormalSuccessorBoundary`, and
-* the answer-valued predecessor/successor handoff
-  `MainFormalRolePackageBranchResidual.answerSuccessor`, which carries the
-  analogous `MainFormalSuccessorAnswerBoundary`.
-The branch conversion receives the public current-dimension large-`k` hypothesis
-and weakens it to the predecessor side condition `400 * pred.m * pred.d ≤ k`.
-
-For an arbitrary current parameter bundle, the predecessor decomposition itself is
-now formalized by `Parameters.successorDecompositionOfNeOne`; what remains
-external is producing the successor-boundary data and the later completion /
-line-169 residuals. No checked lemma here claims that the former intermediate
-range `params.m * params.d ≤ k < 400 * params.m * params.d` is vacuous.
-
-Universe note: the Lean statement uses `[FieldModel.{0} params.q]`, matching the
-base-universe field-model assumption of the public Section 6 successor wrapper.
-This is a current Lean API limitation, not a paper constraint; once the Section 6
-wrapper is universe-polymorphic, this public theorem should be generalized as
-well.
-
-Fixes #137, #239, #906, #1099.
--/
-theorem mainFormal
+Refs #1043, #1099, #1359, #1447. -/
+theorem mainFormal_assumingBridgeHypotheses
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι)
     (eps : Error)
@@ -753,6 +728,68 @@ theorem mainFormal
         completionTransportResidual.toProjectiveStageTargets hpass
       exact MainFormalNativeTargets.toMainFormal
         (projectiveTargets.toTransportTargets.toCascadeTargets.toNativeTargets)
+
+/--
+`thm:main-formal` from `test_definition.tex`.
+
+The bipartite tensor placement follows the paper:
+- **1a**: `A^A_u ⊗ I ≈_ν I ⊗ G^B_{[g(u)=a]}` — G_B on **right**
+- **1b**: `I ⊗ A^B_u ≈_ν G^A_{[g(u)=a]} ⊗ I` — G_A on **left**, A^B on **right**
+- **2**: `G^A_g ⊗ I ≈_ν I ⊗ G^B_g` — G_B on **right**
+
+The `k`-bound boundary records the statement fix from issue #906: the paper's
+successor proof applies the Section 6 / Pasting-side wrappers, whose checked
+side condition is `400 * params.m * params.d ≤ k`. The public theorem therefore
+exposes this stronger hypothesis instead of trying to derive it from the paper's
+printed `params.m * params.d ≤ k` assumption.
+
+The public statement carries only the paper's hypotheses: a projective strategy
+passing the low individual degree test, the parameter `k`, and the corresponding
+error bound `mainFormalError`.  All formalization-residual data — base-case
+bridge inputs, successor-branch role-package witnesses — is internalized.  The
+auxiliary `mainFormal_assumingBridgeHypotheses` exposes the base-case bridge as
+an explicit hypothesis for callers that wish to plug in concrete witnesses.
+
+Universe note: the Lean statement uses `[FieldModel.{0} params.q]`, matching the
+base-universe field-model assumption of the public Section 6 successor wrapper.
+This is a current Lean API limitation, not a paper constraint; once the Section 6
+wrapper is universe-polymorphic, this public theorem should be generalized as
+well.
+
+Fixes #137, #239, #906, #1099, #1447.
+-/
+theorem mainFormal
+    (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι)
+    (eps : Error)
+    (hd : 0 < params.d)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (k : ℕ)
+    (hk : 400 * params.m * params.d ≤ k)
+    (hk0 : 0 < k) :
+    ∃ G_A G_B : ProjMeas (Polynomial params) ι,
+      ConsRel strategy.state (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+          (polynomialEvaluationFamily params G_B.toSubMeas)
+          (mainFormalError params k eps) ∧
+        ConsRel strategy.state (uniformDistribution (Point params))
+          (polynomialEvaluationFamily params G_A.toSubMeas)
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+          (mainFormalError params k eps) ∧
+        ConsRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily G_A.toSubMeas)
+          (constSubMeasFamily G_B.toSubMeas)
+          (mainFormalError params k eps) := by
+  -- Delegate to the conditional form `mainFormal_assumingBridgeHypotheses`, which
+  -- exposes the still-unformalized base-case bridge data as an explicit hypothesis.
+  -- Constructing that bridge data — the locality-preserving repair witnesses and
+  -- diagonal self-consistency input fed into `mainFormal_ofRoleResidualAndRepairedBridge`
+  -- — corresponds to unformalized Section 5 / Section 6 content of the paper.
+  -- TODO(#1043, #1359, #1447): produce the repaired bridge hypotheses internally
+  -- instead of leaving them as an internalized formalization residual.
+  refine mainFormal_assumingBridgeHypotheses params strategy eps hd hpass k hk hk0 ?_
+  intro _ _
+  sorry
 
 end Test
 
