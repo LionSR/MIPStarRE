@@ -49,27 +49,29 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 	The first, second, fifth, and sixth comparisons use Lemma~\ref{prop:simeq-to-approx} together with Theorem~\ref{prop:cab-approx-delta} and the good-strategy hypotheses, and the middle pair is Lemma~\ref{lem:generalize-b}. Lemma~\ref{prop:triangle-inequality-for-approx_delta} sums these six weighted transports.
 \end{proof}
 
-We note that \ref{eq:local-variance-of-points-equation} is equivalent to the statement that
-\begin{equation}
-	\sum_{g \in \polyfunc{m}{q}{d}} \E_{(u,v)\sim C} \bra{\psi} (A^u_{g(u)}-A^v_{g(v)})^2 \ot G_g \ket{\psi}
-	\le
-	24\left(\eps+\delta+\frac{md}{q}\right).
-	\label{eq:equivalent-local-variance}
-\end{equation}
-\lean{MIPStarRE.LDT.GlobalVariance.localVarianceDeviation_sum_le_localVarianceOfPointsError}
-This can be viewed as a local-variance bound for the point measurements.
+\begin{lemma}[Equivalent local-variance bound]\label{lem:equivalent-local-variance}
+	\lean{MIPStarRE.LDT.GlobalVariance.localVarianceDeviation_sum_le_localVarianceOfPointsError}
+	\leanok
+	\uses{lem:local-variance-of-points}
+	The local-variance bound for the point measurements is
+	\begin{equation}
+		\sum_{g \in \polyfunc{m}{q}{d}} \E_{(u,v)\sim C} \bra{\psi} (A^u_{g(u)}-A^v_{g(v)})^2 \ot G_g \ket{\psi}
+		\le
+		24\left(\eps+\delta+\frac{md}{q}\right).
+		\label{eq:equivalent-local-variance}
+	\end{equation}
+\end{lemma}
 
 \begin{remark}[Polynomial-sum formalization for \ref{eq:equivalent-local-variance}]\label{rem:equivalent-local-variance-formalization-inputs}
 	\lean{MIPStarRE.LDT.GlobalVariance.axisParallelBaseEventApproximation_weighted_sample_sum, MIPStarRE.LDT.GlobalVariance.axisParallelPointLineConsistency_weighted_leftToRightLineQuestion_sum, MIPStarRE.LDT.GlobalVariance.axisParallelPointLineConsistency_weighted_rightToLeftLineQuestion_sum}
-	\leanok
-	\uses{lem:local-variance-of-points, lem:generalize-b}
-	The three referenced declarations and the one attached to \eqref{eq:equivalent-local-variance} above together provide the full polynomial-sum (cardinality-free) chain proving the equation.  The chain assembly lemma \texttt{localVarianceDeviation\_sum\_le\_localVarianceOfPointsError} telescopes the six operator differences via \texttt{ev\_sum\_conjTranspose\_mul\_sum\_le}, sums over~$g$, and applies the six individual \texttt{\_sum} bounds (including the reverse~\texttt{generalizeB} sum) to avoid the per-polynomial cardinality blow-up.
+	\uses{lem:equivalent-local-variance, lem:local-variance-of-points, lem:generalize-b}
+	The three referenced declarations and Lemma~\ref{lem:equivalent-local-variance} together provide the full polynomial-sum (cardinality-free) chain proving the equation.  The chain assembly lemma \texttt{localVarianceDeviation\_sum\_le\_localVarianceOfPointsError} telescopes the six operator differences via \texttt{ev\_sum\_conjTranspose\_mul\_sum\_le}, sums over~$g$, and applies the six individual \texttt{\_sum} bounds (including the reverse~\texttt{generalizeB} sum) to avoid the per-polynomial cardinality blow-up.
 \end{remark}
 
 \begin{lemma}[Global variance of the points measurements]\label{lem:global-variance-of-points}
 	\lean{MIPStarRE.LDT.GlobalVariance.globalVarianceOfPoints, MIPStarRE.LDT.GlobalVariance.globalVarianceDeviation_sum_le_m_mul_localVarianceDeviation_sum, MIPStarRE.LDT.GlobalVariance.globalVarianceDeviation_sum_le_of_localVarianceDeviation_sum_le}
 	\leanok
-	\uses{def:local-and-variance, lem:local-to-global, lem:local-variance-of-points}
+	\uses{def:local-and-variance, lem:local-to-global, lem:equivalent-local-variance}
 	Let $G \in \polysub{m}{q}{d}$. On the uniform distribution over independent $u,v \in \F_q^m$,
 	\begin{equation}
 		A^u_{g(u)} \ot (G_g)^{1/2}
@@ -79,7 +81,7 @@ This can be viewed as a local-variance bound for the point measurements.
 	\end{equation}
 \end{lemma}
 \begin{proof}
-	\uses{def:local-and-variance, lem:local-to-global, lem:local-variance-of-points}
+	\uses{def:local-and-variance, lem:local-to-global, lem:equivalent-local-variance}
 	We want to bound
 	\begin{equation}
 		\E_{u,v \sim \F_q^m} \sum_{g \in \polyfunc{m}{q}{d}} \lVert (A^u_{g(u)}-A^v_{g(v)}) \ot (G_g)^{1/2} \ket{\psi} \rVert^2
@@ -109,5 +111,5 @@ This can be viewed as a local-variance bound for the point measurements.
 		=
 		m \cdot \sum_{g \in \polyfunc{m}{q}{d}} \E_{(u,v)\sim C} \bra{\psi} (A^u_{g(u)}-A^v_{g(v)})^2 \ot G_g \ket{\psi}.
 	\]
-	The last quantity is at most $m \cdot 24\left(\eps+\delta+\frac{md}{q}\right)$ by \eqref{eq:equivalent-local-variance}, which is exactly \ref{eq:global-variance-of-points-equation}.
+	The last quantity is at most $m \cdot 24\left(\eps+\delta+\frac{md}{q}\right)$ by Lemma~\ref{lem:equivalent-local-variance}, which is exactly \ref{eq:global-variance-of-points-equation}.
 \end{proof}

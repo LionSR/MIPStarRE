@@ -201,8 +201,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.addInULeftQuantity_pointConsistencySelection_eq_off_diagonal_avg}
   \leanok
   and
-  \lean{MIPStarRE.LDT.SelfImprovement.addInURightQuantity_pointConsistencySelection_eq_zero}
-  \leanok.
+  \lean{MIPStarRE.LDT.SelfImprovement.addInURightQuantity_pointConsistencySelection_eq_zero}.
   The selected scalar chain for this specialization is recorded by
   \lean{MIPStarRE.LDT.SelfImprovement.pointConsistencyAddInUCSChainQ0}
   \lean{MIPStarRE.LDT.SelfImprovement.pointConsistencyAddInUCSChainQ1}
@@ -213,8 +212,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.pointConsistencyAddInUCSChainQ4_eq_rightQuantity}
   \lean{MIPStarRE.LDT.SelfImprovement.pointConsistencyAddInU_transfer_of_selected_chain_bounds}
   \lean{MIPStarRE.LDT.SelfImprovement.pointConsistencyAddInU_transfer_of_selected_chain_selfConsistency_globalVariance}
-  \lean{MIPStarRE.LDT.SelfImprovement.helper_point_consistency_of_selected_chain_selfConsistency_globalVariance}
-  \leanok.
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_point_consistency_of_selected_chain_selfConsistency_globalVariance}.
   Apply Lemma~\ref{lem:add-in-u} with $\mathcal O=\F_q$, $M=A$, and $S_u=\{(a,h):h(u)\neq a\}$. Then
   \[
     \eqref{eq:consistency-with-A-baby-step}
@@ -382,8 +380,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \leanok
   to recover the final helper-stage self-consistency input. The corresponding
   bridge-package constructor is
-  \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementBridgeInputs.ofHelperStrongSelfConsistencyProducer}
-  \leanok.
+  \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementBridgeInputs.ofHelperStrongSelfConsistencyProducer}.
   The paper's arithmetic shows that the right-hand error is at most
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_error_le_selfImprovementHelperError}
   \leanok
@@ -1020,6 +1017,18 @@ Lemma~\ref{lem:self-improvement-helper}. The bookkeeping here is entirely about
 showing that completeness, consistency, self-consistency, and boundedness survive
 the passage from~$\widehat H$ to a projective submeasurement~$H$.
 
+\begin{lemma}[Slackness-residual-domination bridge declarations]\label{lem:self-improvement-slackness-bridge}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndResidualDominationInput}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndQXPRepairAndCoisometry}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromSlacknessResidualDominationBridgeInputs}
+  \leanok
+  \uses{def:polymeasurements, def:simeq}
+  These bridge declarations assemble the SDP slackness and residual-domination
+  inputs required by Theorem~\ref{thm:self-improvement}. The statements
+  are formalized; the proofs currently depend on an unfinished SDP helper
+  (see the slackness ledger, \#1379).
+\end{lemma}
+
 \begin{theorem}[Self-improvement]\label{thm:self-improvement}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovement}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementError_nonneg_of_isGood}
@@ -1032,9 +1041,6 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_exists_of_helper_outputs_of_residual_domination}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_exists_of_helper_outputs_of_residualDominationInput}
   \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementSlacknessResidualDominationBridgeInputs}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndResidualDominationInput}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndQXPRepairAndCoisometry}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromSlacknessResidualDominationBridgeInputs}
   \leanok
   \uses{def:polymeasurements, def:simeq, def:approx_delta, def:strong-self-consistency}
   Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following properties:

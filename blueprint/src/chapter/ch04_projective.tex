@@ -4,7 +4,7 @@
 % ORPHAN: standalone background theorem; the current downstream blueprint proofs do not call the Naimark dilation node.
 \begin{theorem}[Naimark dilation]\label{thm:naimark}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimark}
-	% The current Lean declaration records questionwise local dilations, not the full tensor-product correlation statement, so no \leanok is claimed.
+	% The current Lean declaration records questionwise local dilations, not the full tensor-product correlation statement, so no formalization marker is claimed.
 	% Unproved — tracked by issue #103 (Ch4 orthonormalization).
 	\uses{def:submeasurement}
 	Let $\ket{\psi}$ be a state in $\mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$.
@@ -790,7 +790,6 @@
 
 	\begin{remark}\label{rem:motivation-for-P}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectorFamily_mul_eq_zero_of_ne_of_sum_le_one, MIPStarRE.LDT.MakingMeasurementsProjective.projectorFamily_rangeONB_dotProduct_eq_zero_of_ne_of_sum_le_one, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinRangeEmbedding_mul_conjTranspose_eq_one_of_sum_le_one}
-		\leanok
 		If the family $\{Q_a\}$ were a projective measurement, then the vectors
 		$\ket{v_{a,i}}$, over all $a$ and all $1 \leq i \leq m_a$, would be orthonormal.
 		Then \eqref{eq:looks-like-singular-value-decomposition} would already be a singular value

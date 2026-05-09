@@ -77,15 +77,16 @@ Fix a prime power $q=p^t$. Write $\omega=e^{2\pi i/p}$, and let $\tr:\F_q\to\F_p
 	Let $\polyfunc{m}{q}{d}$ be the set of polynomials $g \in \F_q[x_1,\dots,x_m]$ whose degree in each variable is at most $d$, viewed as functions $\F_q^m \to \F_q$ via evaluation. (Over finite fields, distinct low-degree polynomials can induce the same function; we identify elements of $\polyfunc{m}{q}{d}$ with their polynomial representatives, not their functional equivalence classes.)
 \end{definition}
 
-\begin{remark}\label{rem:individual-degree-convention}
+\begin{lemma}[Monotonicity of individual-degree classes]\label{rem:individual-degree-convention}
 	\lean{MIPStarRE.LDT.Preliminaries.polyFuncMonotone}
 	\leanok
+	\uses{def:polyfunc}
 	Here, ``individual degree $d$'' means degree at most $d$ in each coordinate. In
 	particular,
 	\[
 		\polyfunc{m}{q}{d} \subseteq \polyfunc{m}{q}{d+1}.
 	\]
-\end{remark}
+\end{lemma}
 
 \begin{lemma}[Schwartz--Zippel lemma~\cite{Sch80,Zip79}]\label{lem:schwartz-zippel-total-degree}
 	\lean{MIPStarRE.LDT.Preliminaries.schwartzZippel_totalDegree}
@@ -440,9 +441,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 
 \begin{remark}[Lean finite-step triangle helpers]\label{rem:lean-finite-step-triangle-helpers}
 	\lean{MIPStarRE.LDT.ev_diff_triangle, MIPStarRE.LDT.normalizedTrace_triangle_three, MIPStarRE.LDT.ev_diff_triangle_three}
-	\leanok
 	\lean{MIPStarRE.LDT.Preliminaries.questionSDD_triangle, MIPStarRE.LDT.Preliminaries.questionSDD_triangle_three, MIPStarRE.LDT.Preliminaries.stateDependentDistanceRel_triangle, MIPStarRE.LDT.Preliminaries.stateDependentDistanceRel_triangle_three}
-	\leanok
 	The general operator-family theorem above is complemented in Lean by reusable
 	binary and three-step helper lemmas for operator expectations, `qSDD`, and
 	`SDDRel`.  The three-step `SDDRel` helper is the specialization used in the
