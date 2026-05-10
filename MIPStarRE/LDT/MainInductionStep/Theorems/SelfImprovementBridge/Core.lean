@@ -539,7 +539,10 @@ self-improvement package.
 The construction assumes the slice strategies and their Section 9 bridge inputs.
 It applies the conditional measurement-input theorem
 `selfImprovementInInductionSection_ofMeasurement` slice-by-slice and transports
-its fields across the recorded equalities to the restricted-slice interface. -/
+its fields across the recorded equalities to the restricted-slice interface. At
+each slice the package supplies the complete measurement
+`inductionPkg.sliceMeasurement x`; the submeasurement-input theorem remains the
+tracked obligation in #1451. -/
 noncomputable def SelfImprovementPackage.ofSliceBridgeInputs
     (params : Parameters)
     [FieldModel params.q]
