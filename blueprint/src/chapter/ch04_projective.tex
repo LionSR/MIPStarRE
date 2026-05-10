@@ -58,9 +58,13 @@
 
 \begin{theorem}[Orthogonalization lemma]\label{thm:orthonormalization}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
-	% The Lean statement no longer exposes the former OrthonormalizationInput
-	% bridge hypothesis.  The remaining late locality-preserving repair proof is
-	% isolated in the Section 5 producer layer.
+	% In Lean, normalization is an explicit hypothesis because the ambient state
+	% record contains positive semidefinite density matrices of arbitrary
+	% normalized trace; this matches the paper's convention that a state is
+	% normalized.
+	% The Lean statement no longer requires explicit spectral-truncation and
+	% locality-preserving repair witnesses as hypotheses; they are supplied
+	% internally by the Section 5 rounding-to-projectors results.
 	\uses{def:strong-self-consistency, def:approx_delta}
 	Let $\ket{\psi}$ be a permutation-invariant state,
 	and let $A = \{A_a\}$ be a sub-measurement with strong self-consistency

@@ -1,4 +1,5 @@
 import Lean
+import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
 import MIPStarRE.LDT.Test.MainTheorem
 
 /-!
@@ -7,6 +8,12 @@ import MIPStarRE.LDT.Test.MainTheorem
 Regression checks for the issue-#408 replacement of the former ambient
 Polishchuk--Spielman axiom by the explicit hypothesis
 `PolishchukSpielmanClassicalSoundnessStatement`.
+
+The audit for `MakingMeasurementsProjective.orthonormalization` records the
+current residual dependency on `sorryAx` through the locality-preserving repair
+obligation in `MakingMeasurementsProjective/Producers.lean`. When that
+obligation is discharged, the allowed axiom set below should be reduced to the
+standard Lean axioms.
 
 This module is built explicitly in CI rather than imported from the umbrella
 library modules, so the axiom audits stay out of normal downstream imports
@@ -18,16 +25,27 @@ open Lean Elab Command
 private def expectedStandardAxioms : Array Name :=
   #[``propext, ``Classical.choice, ``Quot.sound].qsort Name.lt
 
-private def assertUsesOnlyStandardAxioms (declName : Name) : CommandElabM Unit := do
+private def expectedOrthonormalizationAxioms : Array Name :=
+  #[``propext, ``Classical.choice, ``Quot.sound, ``sorryAx].qsort Name.lt
+
+private def assertUsesExactlyAxioms (declName : Name) (expected : Array Name) :
+    CommandElabM Unit := do
   let axioms := (← Lean.collectAxioms declName).qsort Name.lt
-  unless axioms == expectedStandardAxioms do
+  unless axioms == expected do
     throwError
-      m!"'{declName}' depends on axioms {axioms.toList}, expected only " ++
-        m!"{expectedStandardAxioms.toList}"
+      m!"'{declName}' depends on axioms {axioms.toList}, expected exactly " ++
+        m!"{expected.toList}"
+
+private def assertUsesOnlyStandardAxioms (declName : Name) : CommandElabM Unit := do
+  assertUsesExactlyAxioms declName expectedStandardAxioms
 
 elab "assert_standard_axioms " id:ident : command => do
   assertUsesOnlyStandardAxioms id.getId
 
+elab "assert_orthonormalization_axioms " id:ident : command => do
+  assertUsesExactlyAxioms id.getId expectedOrthonormalizationAxioms
+
 assert_standard_axioms MIPStarRE.LDT.Test.razSafra
 assert_standard_axioms MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement
 assert_standard_axioms MIPStarRE.LDT.Test.classicalTestSoundness
+assert_orthonormalization_axioms MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization

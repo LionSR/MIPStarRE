@@ -386,17 +386,14 @@ lemma orthonormalizationMeasurement_of_consistency {Outcome : Type*}
       ζ hζ)⟩
 
 set_option linter.unusedFintypeInType false in
-/-- Bridge-dependent orthonormalization helper.
+/-- Orthonormalization under explicit spectral-truncation and repair data.
 
 The explicit permutation-invariance and normalized-state hypotheses match the
 paper. Once the lifted/local mismatch is discharged by
 `orthonormalizationMainLemma_local`, the only remaining external inputs are the
 truncation and locality-preserving repair witnesses for the
-option-completed measurement `optionCompletion A`.
-
-This is the conditional helper formerly exposed as `thm:orthonormalization`.
-The public theorem `orthonormalization` below discharges these inputs internally,
-so that the paper-facing statement has no bridge hypothesis. -/
+option-completed measurement `optionCompletion A`. This formulation records
+those witnesses as hypotheses rather than deriving them from Section 5. -/
 theorem orthonormalization_ofInput {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -480,11 +477,16 @@ set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
 /-- `thm:orthonormalization`.
 
-This is the paper-facing statement: a strongly self-consistent submeasurement on
-a permutation-invariant normalized state admits a close projective
-submeasurement.  The spectral-truncation and locality-preserving repair data are
-not hypotheses of the theorem; they are supplied internally by the Section 5
-producer declarations. -/
+A strongly self-consistent submeasurement on a permutation-invariant normalized
+state admits a close projective submeasurement. The spectral-truncation and
+locality-preserving repair data are not hypotheses of this theorem; they are
+supplied internally by the Section 5 spectral-truncation and
+rounding-to-projectors results.
+
+Until `leftLiftedProjectivizationRepairProducer` in
+`MIPStarRE/LDT/MakingMeasurementsProjective/Producers.lean` is discharged,
+`#print axioms MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization`
+includes `sorryAx`. -/
 theorem orthonormalization {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -500,8 +502,8 @@ theorem orthonormalization {Outcome : Type*}
           (constSubMeasFamily P.toSubMeas.liftLeft)
           (orthonormalizationError ζ) := by
   intro hssc
-  let Ahat : Measurement (Option Outcome) ι := optionCompletion A
   have hbridge : OrthonormalizationInput ψ A ζ := by
+    let Ahat : Measurement (Option Outcome) ι := optionCompletion A
     refine ⟨?_, ?_⟩
     · exact spectralTruncationInput_of_sourceAlmostProjective ψ
         (leftLiftedMeasurement (ιB := ι) Ahat)

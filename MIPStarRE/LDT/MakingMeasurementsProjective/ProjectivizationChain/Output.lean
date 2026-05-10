@@ -166,7 +166,7 @@ measurement `Q` satisfying the chain bound
 
 The analytic part of the proof is a direct composition of the two existing
 lemmas:
-* `MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization`
+* `MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization_ofInput`
   (Step 6a; `orthonormalization.tex` line 67);
 * `MIPStarRE.LDT.Preliminaries.completingToMeasurement`
   (Step 6b; `preliminaries.tex` line 1101).
