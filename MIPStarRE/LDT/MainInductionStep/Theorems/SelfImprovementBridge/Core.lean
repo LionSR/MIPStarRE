@@ -533,13 +533,13 @@ noncomputable def SelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationR
             (repair x)
         finalFields := finalFields x })
 
-/-- Convert honest per-slice Section 9 bridge inputs into the Section 6
+/-- Convert per-slice Section 9 bridge inputs into the Section 6
 self-improvement package.
 
-This is wiring only: `SliceBridgeInputs` still assumes the honest slice
-`SymStrat`s and their Section 9 bridge inputs. The conversion applies
-`selfImprovementInInductionSection` slice-by-slice and transports its fields
-across the recorded equalities to the restricted-slice bookkeeping interface. -/
+The construction assumes the slice strategies and their Section 9 bridge inputs.
+It applies the conditional measurement-input theorem
+`selfImprovementInInductionSection_ofMeasurement` slice-by-slice and transports
+its fields across the recorded equalities to the restricted-slice interface. -/
 noncomputable def SelfImprovementPackage.ofSliceBridgeInputs
     (params : Parameters)
     [FieldModel params.q]

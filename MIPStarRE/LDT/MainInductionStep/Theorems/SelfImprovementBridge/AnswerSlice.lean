@@ -390,10 +390,10 @@ noncomputable def AnswerSelfImprovementPackage.ofSelfImprovementInInductionSecti
 /-- Convert honest per-slice Section 9 bridge inputs into the answer-valued
 Section 6 self-improvement package.
 
-This is wiring only: `SliceBridgeInputs` still assumes honest ordinary slice
-`SymStrat`s and their Section 9 bridge inputs.  The conversion applies the
-ordinary `selfImprovementInInductionSection` slice-by-slice and transports its
-fields back to the answer-valued restricted-slice interface via the recorded
+The construction assumes ordinary slice strategies and their Section 9 bridge
+inputs. It applies the conditional measurement-input theorem
+`selfImprovementInInductionSection_ofMeasurement` slice-by-slice and transports
+its fields back to the answer-valued restricted-slice interface via the recorded
 state and point-measurement equalities. -/
 noncomputable def AnswerSelfImprovementPackage.ofSliceBridgeInputs
     (params : Parameters)
