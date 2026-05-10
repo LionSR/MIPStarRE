@@ -1,5 +1,6 @@
 import Lean
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 import MIPStarRE.LDT.Test.MainTheorem
 
 /-!
@@ -13,6 +14,11 @@ The audit for `MakingMeasurementsProjective.orthonormalization` now requires
 the standard Lean axioms only: the locality-preserving repair obligation in
 `MakingMeasurementsProjective/Producers.lean` has been discharged, so the
 former `sorryAx` dependency is gone.
+
+The audit for `SelfImprovement.selfImprovement` records the current open
+derivation for `thm:self-improvement`: the statement corresponding to the
+blueprint theorem is present, and the missing derivation from the incoming
+consistency hypothesis is tracked by issue #1453.
 
 The audits for the `Test.mainFormal` proof frontier record the current tracked
 gaps from issue #1458: the successor projective-completion residual has not yet
@@ -33,7 +39,14 @@ private def expectedStandardAxioms : Array Name :=
 private def expectedStandardAxiomsWithSorry : Array Name :=
   #[``propext, ``Classical.choice, ``Quot.sound, ``sorryAx].qsort Name.lt
 
+/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1458 gaps in the
+paper-facing `mainFormal` proof frontier. -/
 private def expectedTrackedSorryAxioms : Array Name :=
+  expectedStandardAxiomsWithSorry
+
+/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1453 derivation
+needed for `selfImprovement`. -/
+private def expectedSelfImprovementAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
 private def assertUsesExactlyAxioms (declName : Name) (expected : Array Name) :
@@ -53,6 +66,9 @@ elab "assert_standard_axioms " id:ident : command => do
 elab "assert_tracked_sorry_axioms " id:ident : command => do
   assertUsesExactlyAxioms id.getId expectedTrackedSorryAxioms
 
+elab "assert_self_improvement_axioms " id:ident : command => do
+  assertUsesExactlyAxioms id.getId expectedSelfImprovementAxioms
+
 assert_standard_axioms MIPStarRE.LDT.Test.razSafra
 assert_standard_axioms MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement
 assert_standard_axioms MIPStarRE.LDT.Test.classicalTestSoundness
@@ -60,3 +76,4 @@ assert_standard_axioms MIPStarRE.LDT.MakingMeasurementsProjective.orthonormaliza
 assert_tracked_sorry_axioms
   MIPStarRE.LDT.Test.mainFormalSuccessorProjectiveCompletionResidualProducer
 assert_tracked_sorry_axioms MIPStarRE.LDT.Test.mainFormal
+assert_self_improvement_axioms MIPStarRE.LDT.SelfImprovement.selfImprovement

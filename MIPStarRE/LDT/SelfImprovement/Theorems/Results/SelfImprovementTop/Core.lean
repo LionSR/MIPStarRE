@@ -12,8 +12,9 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport
 /-!
 # Self-improvement theorem wrappers
 
-The main `selfImprovementHelper` and `selfImprovement` theorems,
-and the bridge-input variants used to enter the self-improvement theorem.
+The main `selfImprovementHelper`, the paper-facing `selfImprovement` theorem,
+and variants with the orthonormalization and final-fields conditions taken as
+explicit hypotheses.
 
 ## Contents
 
@@ -21,9 +22,10 @@ and the bridge-input variants used to enter the self-improvement theorem.
   `SelfImprovementHelperConclusion` from `sdp` + `addInU`.
 - **self_improvement_helper_with_slackness** — companion helper producing the
   slackness-carrying helper conclusion from the Section 9 SDP statement.
-- **selfImprovement** — `thm:self-improvement`: assembles the full
-  pipeline (helper SSC → orthonormalization → data processing →
-  final fields) to produce `SelfImprovementConclusion`.
+- **selfImprovement_assumingFinalFields** — form of `thm:self-improvement` with
+  helper strong self-consistency, orthonormalization, and final-fields
+  conditions taken as explicit hypotheses.
+- **selfImprovement** — the paper-facing statement of `thm:self-improvement`.
 - **selfImprovementFromSubMeas / selfImprovementFromBridgeInputs /
   selfImprovementFromBridgeInputsSubMeas** — bridge-input variants for
   submeasurement and packaged-bridge interfaces.
@@ -170,13 +172,15 @@ lemma self_improvement_helper_with_slackness
     params strategy eps delta gamma (sdp_statement_with_slackness params strategy)
     hgood nu G
 
-/-- `thm:self-improvement`.
+/-- Form of `thm:self-improvement` with helper strong self-consistency,
+orthonormalization, and final-fields conditions taken as explicit hypotheses.
 
-The remaining Section 5/8/9 obligations are exposed as explicit theorem
-hypotheses, rather than bundled behind a dedicated bridge-package structure. The
-evaluation-map data-processing step is now discharged internally using the
-question-dependent preliminaries theorem. -/
-theorem selfImprovement
+This is not the paper-facing theorem statement. It assumes
+the helper strong self-consistency input, the orthonormalization input, and the
+final-fields input as explicit hypotheses. The evaluation-map data-processing
+step is discharged internally using the question-dependent preliminaries
+theorem. -/
+theorem selfImprovement_assumingFinalFields
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -201,7 +205,8 @@ theorem selfImprovement
       MakingMeasurementsProjective.OrthonormalizationInput strategy.state Hhat
         (selfImprovementHelperError params eps delta) :=
     horthonormalization hssc
-  rcases orthonormalization_ofInput strategy.state strategy.permInvState strategy.isNormalized
+  rcases orthonormalization_ofInput
+      strategy.state strategy.permInvState strategy.isNormalized
       Hhat
       (selfImprovementHelperError params eps delta)
       hssc horthBridge with ⟨H, horth⟩
@@ -274,6 +279,39 @@ theorem selfImprovement
           hselfImprovementError_nonneg }
 
 /--
+`thm:self-improvement` from `self_improvement.tex`, with the paper's input
+consistency hypothesis and without additional bridge assumptions.
+
+The theorem assumes a measurement `G` whose polynomial evaluation family is
+consistent with the point measurement at error `nu`. It must produce a
+projective polynomial submeasurement satisfying the four self-improvement
+conclusions. The paper and blueprint impose the `(eps, delta, gamma)`-good
+strategy condition as a standing hypothesis for the self-improvement section
+(`blueprint/src/chapter/ch07_self_improvement.tex`, line 4); Lean records it
+here as the explicit hypothesis `hgood`. The theorem
+`selfImprovement_assumingFinalFields` records the present conditional route.
+Its additional inputs are missing derivations, not hypotheses of this
+paper-facing statement.
+-/
+theorem selfImprovement
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma nu : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (G : Measurement (Polynomial params) ι)
+    (hcons : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params G.toSubMeas) nu) :
+    ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+      SelfImprovementConclusion params strategy G H Z eps delta gamma nu := by
+  -- TODO(#1453): derive the helper strong self-consistency,
+  -- orthonormalization, and final-fields inputs from the paper hypotheses,
+  -- including the incoming consistency hypothesis `hcons`, then invoke
+  -- `selfImprovement_assumingFinalFields`.
+  sorry
+
+/--
 Bridge from the measurement-input version in `self_improvement.tex` to the
 submeasurement-input version used in `inductive_step.tex`.
 -/
@@ -293,7 +331,7 @@ theorem selfImprovementFromSubMeas
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementSubMeasConclusion params strategy G H Z
         eps delta gamma nu := by
-  rcases selfImprovement params strategy eps delta gamma nu
+  rcases selfImprovement_assumingFinalFields params strategy eps delta gamma nu
       hhelperStrongSelfConsistency
       horthonormalization hfinalFields hgood Gmeas
       with ⟨H, Z, hH⟩
@@ -301,8 +339,9 @@ theorem selfImprovementFromSubMeas
   exact
     { measurementBridge := ⟨Gmeas, hbridge, hH⟩ }
 
-/-- `SelfImprovementBridgeInputs` + `IsGood` is sufficient to call
-`selfImprovement` and obtain the full `SelfImprovementConclusion`. -/
+/-- `SelfImprovementBridgeInputs` + `IsGood` is sufficient to call the form of
+`thm:self-improvement` with explicit orthonormalization and final-fields
+hypotheses and obtain the full `SelfImprovementConclusion`. -/
 theorem selfImprovementFromBridgeInputs
     (params : Parameters)
     [FieldModel params.q]
@@ -313,7 +352,7 @@ theorem selfImprovementFromBridgeInputs
     (G : Measurement (Polynomial params) ι) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu :=
-  selfImprovement params strategy eps delta gamma nu
+  selfImprovement_assumingFinalFields params strategy eps delta gamma nu
     hbridge.helperStrongSelfConsistency
     hbridge.orthonormalization hbridge.finalFields hgood G
 

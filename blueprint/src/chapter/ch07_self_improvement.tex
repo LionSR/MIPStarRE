@@ -1043,16 +1043,20 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_of_helper_outputs_of_total_operator_le}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_exists_of_helper_outputs_of_residual_domination}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_exists_of_helper_outputs_of_residualDominationInput}
+  \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementSlacknessResidualDominationBridgeInputs}
   Several auxiliary results are used to prove Theorem~\ref{thm:self-improvement}
   from the helper output and the orthonormalization theorem.  They record
   intermediate proof obligations that do not appear as hypotheses in the paper
-  statement.  The current Lean theorem still takes these obligations as explicit
-  assumptions, so the theorem below is linked to the current Lean statement but
-  is not marked as completely formalized.
+  statement.  The theorem below records the paper-facing conclusion; its proof
+  is not yet complete because the derivation from the input consistency
+  hypothesis is still tracked by issue~\#1453.
 \end{remark}
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovement}
+  \leanok
+  % No proof-level \leanok is attached below: the derivation from the input
+  % consistency hypothesis is not yet complete; see issue #1453.
   \uses{def:polymeasurements, def:simeq, def:approx_delta, def:strong-self-consistency}
   Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following properties:
   \begin{enumerate}
