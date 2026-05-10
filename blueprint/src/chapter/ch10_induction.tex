@@ -195,14 +195,13 @@
 \end{proof}
 
 \begin{theorem}[Main induction]\label{thm:main-induction}
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper}
 	\uses{def:good-strategy, def:polymeasurements, def:simeq, lem:main-induction-base}
-	% Statement-level formalization marker deliberately omitted: the Lean
-	% declaration mainInductionPublicWrapper takes a self-improvement boundary
-	% input as an extra hypothesis (tracked by issue 931), so the unconditional
-	% theorem stated here is not yet produced. See the proof block below for
-	% the formalization status.
-  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge 400\,md$ and set
+	% Statement-level formalization marker deliberately omitted: no Lean
+	% declaration presently has this paper statement as its public type.  The
+	% declaration mainInductionPublicWrapper is a conditional successor-step
+	% assembly lemma with additional proof-stage inputs, and is recorded
+	% separately as Proposition~\ref{prop:main-induction-public-wrapper}.
+  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge md$ and set
   \[
     \nu = 1000k^2m^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right)
   \]
@@ -217,7 +216,7 @@
 \end{theorem}
 \begin{proof}
 	\uses{lem:restricted-probabilities, lem:weighted-restricted-probability-bounds, lem:main-induction-base, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section, def:successor-pasting-data}
-	In Lean, the base case and the internal successor-step assembly are now formalized through
+	In Lean, the base case and several internal successor-step assembly lemmas are now formalized through
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase, MIPStarRE.LDT.MainInductionStep.mainInductionFromPackages, MIPStarRE.LDT.MainInductionStep.mainInductionByRecursionOnM}
 	together with the stage data
 	\lean{MIPStarRE.LDT.MainInductionStep.SliceRestrictionPackage, MIPStarRE.LDT.MainInductionStep.PerSliceInductionPackage, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage, MIPStarRE.LDT.MainInductionStep.AveragedPastingInput}
@@ -225,12 +224,12 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.ofPointMeasurementEq}
 	that mirror the four paper stages $\text{restrict} \to \text{induct} \to \text{self-improve} \to \text{paste}$. For the answer-valued restriction route used in the successor branch of the main formal theorem, Lean now also exposes
 	\lean{MIPStarRE.LDT.MainInductionStep.AnswerMainInductionConclusion, MIPStarRE.LDT.MainInductionStep.AnswerMainInductionHypothesis, MIPStarRE.LDT.MainInductionStep.AnswerPerSliceInductionPackage.ofMainInductionHypothesis},
-	which package the predecessor induction hypothesis for the restricted strategies without appealing to the public theorem `mainFormal`. The weighted restricted-probability boundary is now public via \lean{MIPStarRE.LDT.MainInductionStep.weighted_axisParallel_bound, MIPStarRE.LDT.MainInductionStep.weighted_diagonal_bound, MIPStarRE.LDT.MainInductionStep.restrictedProbabilities}, and the final public successor-step wrapper is formalized as \lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper}. The remaining gap, tracked by issue \#931, is to produce the restricted-strategy self-improvement input needed to instantiate that wrapper directly from higher-level applications, so the displayed theorem is not yet marked as formalized.
+	which package the predecessor induction hypothesis for the restricted strategies without appealing to the public theorem `mainFormal`. The weighted restricted-probability boundary is now public via \lean{MIPStarRE.LDT.MainInductionStep.weighted_axisParallel_bound, MIPStarRE.LDT.MainInductionStep.weighted_diagonal_bound, MIPStarRE.LDT.MainInductionStep.restrictedProbabilities}. The conditional successor-step assembly is formalized as \lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper} and recorded separately in Proposition~\ref{prop:main-induction-public-wrapper}. The remaining gap is to derive its restricted-strategy self-improvement input from the hypotheses of the theorem displayed above, so this paper theorem is not yet linked to a Lean declaration.
 	We may assume $\eps,\delta,\gamma,d/q \le 1$, since otherwise $\nu \ge 1$ and the bound is trivial.
 
 	The proof is by induction on $m$. The base case $m=1$ is Lemma~\ref{lem:main-induction-base}.
 
-	For the step from $m$ to $m+1$, let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ test, and let $k \ge 400(m+1)d$. For each $x \in \F_q$, let $(\psi,A^x,B^x,L^x)$ be the $x$-restricted strategy, with failure parameters $\eps_x,\delta_x,\gamma_x$. Apply the induction hypothesis to each restricted strategy with the same integer $k$ and define
+	For the step from $m$ to $m+1$, let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ test, and let $k \ge (m+1)d$. For each $x \in \F_q$, let $(\psi,A^x,B^x,L^x)$ be the $x$-restricted strategy, with failure parameters $\eps_x,\delta_x,\gamma_x$. Apply the induction hypothesis to each restricted strategy with the same integer $k$ and define
 	\[
 		\nu_x = 1000k^2m^2\left(\eps_x^{1/1024}+\delta_x^{1/1024}+\gamma_x^{1/1024}+(d/q)^{1/1024}\right),
 		\qquad
@@ -344,11 +343,11 @@
 	which is exactly the bound required for dimension $m+1$.
 \end{proof}
 
-\begin{proposition}[Public Lean wrapper for the successor-step assembly]\label{thm:main-induction-public-wrapper}
+\begin{proposition}[Lean-only conditional successor-step assembly]\label{prop:main-induction-public-wrapper}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicRestrictionPackage, MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper}
 	\leanok
 	\uses{lem:restricted-probabilities, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section, thm:main-induction}
-	This Lean-only theorem records the five explicit successor-step ingredients used in the proof of Theorem~\ref{thm:main-induction}: the weighted slice bounds feeding Lemma~\ref{lem:restricted-probabilities}, the extracted slice-restriction data, the per-slice recursive witnesses, the producer for the corresponding self-improvement data, and the recursion-to-pasting assembly. Under those hypotheses it returns a measurement $G \in \polymeas{m+1}{q}{d}$ satisfying the same consistency conclusion as Theorem~\ref{thm:main-induction}, but without exposing the intermediate stage data at the public boundary.
+	This Lean-only proposition records the explicit successor-step ingredients used in the proof of Theorem~\ref{thm:main-induction}: the weighted slice bounds feeding Lemma~\ref{lem:restricted-probabilities}, the extracted slice-restriction data, the per-slice recursive witnesses, the producer for the corresponding self-improvement data, the Section~6 side conditions $1 \le k$ and $400\,m d \le k$, and the recursion-to-pasting assembly. Under those additional hypotheses it returns a measurement $G \in \polymeas{m+1}{q}{d}$ satisfying the same consistency conclusion as Theorem~\ref{thm:main-induction}. It is therefore a conditional assembly result, not the Lean statement of Theorem~\ref{thm:main-induction}.
 \end{proposition}
 \begin{proof}
 	\leanok
@@ -393,10 +392,10 @@
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAnswerRecursiveSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRecursiveSlices_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerBoundary_ofPredecessorInduction}
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAnswerSelfImprovementBridgeInputs, MIPStarRE.LDT.Test.MainFormalSuccessorAnswerSelfImprovementInductionPackage, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofMeasurementEq, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofOrthonormalizationRepair, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSelfImprovementProducer_ofBridgeInputs, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerBoundary_ofBridgeInputs}
 	\leanok
-	\uses{lem:symmetrization-bridge, thm:main-induction-public-wrapper}
+	\uses{lem:symmetrization-bridge, prop:main-induction-public-wrapper}
 	These Lean-only aliases name the successor-case data that
 	Theorem~\ref{thm:main-formal} uses to invoke
-	Proposition~\ref{thm:main-induction-public-wrapper}. The public weighted-bound
+	Proposition~\ref{prop:main-induction-public-wrapper}. The public weighted-bound
 	helper lemmas discharge the weighted restricted-axis and restricted-diagonal
 	fields from the symmetrized passing strategy; the remaining external inputs are
 	the recursive slice witnesses (together with their bridge-data structure
@@ -482,8 +481,8 @@
 \begin{proposition}[Lean successor handoff for the Section 3 proof]\label{lem:main-formal-successor-handoff}
 	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorMainInductionPublicWrapper}
 	\leanok
-	\uses{def:main-formal-successor-boundary, lem:symmetrization-bridge, thm:main-induction-public-wrapper}
-	This Lean-only specialization applies Proposition~\ref{thm:main-induction-public-wrapper}
+	\uses{def:main-formal-successor-boundary, lem:symmetrization-bridge, prop:main-induction-public-wrapper}
+	This Lean-only specialization applies Proposition~\ref{prop:main-induction-public-wrapper}
 	to the role-register symmetrization used in Theorem~\ref{thm:main-formal}. Given
 	the bundled successor boundary, the Section~6 side condition
 	$400\,m d \le k$, and the matching base-universe field-model instance, it
