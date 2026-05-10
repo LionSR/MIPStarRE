@@ -10,11 +10,11 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport
 
 /-!
-# Self-improvement theorem wrappers
+# Self-improvement theorem variants
 
-The main `selfImprovementHelper`, the paper-facing `selfImprovement` theorem,
-and variants with the orthonormalization and final-fields conditions taken as
-explicit hypotheses.
+The main `selfImprovementHelper`, the `selfImprovement` theorem corresponding
+to `thm:self-improvement` in the blueprint, and variants with the
+orthonormalization and final-fields conditions taken as explicit hypotheses.
 
 ## Contents
 
@@ -25,10 +25,10 @@ explicit hypotheses.
 - **selfImprovement_assumingFinalFields** — form of `thm:self-improvement` with
   helper strong self-consistency, orthonormalization, and final-fields
   conditions taken as explicit hypotheses.
-- **selfImprovement** — the paper-facing statement of `thm:self-improvement`.
+- **selfImprovement** — the statement corresponding to `thm:self-improvement`.
 - **selfImprovementFromSubMeas / selfImprovementFromBridgeInputs /
-  selfImprovementFromBridgeInputsSubMeas** — bridge-input variants for
-  submeasurement and packaged-bridge interfaces.
+  selfImprovementFromBridgeInputsSubMeas** — variants for submeasurement inputs
+  and packaged auxiliary hypotheses.
 
 ## References
 
@@ -79,9 +79,9 @@ lemma selfImprovementError_nonneg_of_isGood
 Unlike the paper helper lemma, this theorem does not yet take the consistency
 error `nu` or a hypothesis `hcons`. The current
 `SelfImprovementHelperConclusion` only packages the outputs produced directly by
-the reduced `sdp` + `addInU` pipeline, and those facts do not depend on the
+the reduced `sdp` + `addInU` construction, and those facts do not depend on the
 consistency hypothesis. The `nu`-dependent consistency information will be
-threaded back in when the full pipeline is assembled in `selfImprovement`. -/
+introduced in the proof of `selfImprovement`. -/
 lemma selfImprovementHelper
     (params : Parameters)
     [FieldModel params.q]
@@ -112,7 +112,7 @@ lemma selfImprovementHelper
 /-- Conditional form of the helper lemma from a slackness-carrying SDP
 conclusion.
 
-This is the paper-facing companion to `selfImprovementHelper` when the Section 9
+This is the companion to `selfImprovementHelper` when the Section 9
 strong-duality conclusion has already been supplied as
 `SdpStatementWithSlackness`.  The helper output therefore carries the
 complementary-slackness equations needed by the helper-completeness chain. -/
@@ -152,9 +152,9 @@ lemma self_improvement_helper_with_slackness_of_sdp_statement_with_slackness
 /-- Helper lemma driven by the Section 9 SDP statement with complementary
 slackness.
 
-This is the paper-facing companion to `selfImprovementHelper`: it applies the
-Section 9 statement `sdp_statement_with_slackness`, which records the strong-duality
-conclusion with complementary slackness.  The reduced theorem
+This companion to `selfImprovementHelper` applies the Section 9 statement
+`sdp_statement_with_slackness`, which records the strong-duality conclusion with
+complementary slackness.  The reduced theorem
 `selfImprovementHelper` remains separate, because its current `sdp` input has
 not yet formalized the strong-duality argument. -/
 lemma self_improvement_helper_with_slackness
@@ -175,11 +175,11 @@ lemma self_improvement_helper_with_slackness
 /-- Form of `thm:self-improvement` with helper strong self-consistency,
 orthonormalization, and final-fields conditions taken as explicit hypotheses.
 
-This is not the paper-facing theorem statement. It assumes
-the helper strong self-consistency input, the orthonormalization input, and the
-final-fields input as explicit hypotheses. The evaluation-map data-processing
-step is discharged internally using the question-dependent preliminaries
-theorem. -/
+This is not the statement corresponding to `thm:self-improvement` in the
+blueprint. It assumes the helper strong self-consistency input, the
+orthonormalization input, and the final-fields input explicitly. The
+evaluation-map data-processing step is proved internally using the
+question-dependent preliminaries theorem. -/
 theorem selfImprovement_assumingFinalFields
     (params : Parameters)
     [FieldModel params.q]
@@ -279,8 +279,8 @@ theorem selfImprovement_assumingFinalFields
           hselfImprovementError_nonneg }
 
 /--
-`thm:self-improvement` from `self_improvement.tex`, with the paper's input
-consistency hypothesis and without additional bridge assumptions.
+Formal statement corresponding to the blueprint theorem `thm:self-improvement`,
+with the input consistency hypothesis from the LDT paper.
 
 The theorem assumes a measurement `G` whose polynomial evaluation family is
 consistent with the point measurement at error `nu`. It must produce a
@@ -289,9 +289,10 @@ conclusions. The paper and blueprint impose the `(eps, delta, gamma)`-good
 strategy condition as a standing hypothesis for the self-improvement section
 (`blueprint/src/chapter/ch07_self_improvement.tex`, line 4); Lean records it
 here as the explicit hypothesis `hgood`. The theorem
-`selfImprovement_assumingFinalFields` records the present conditional route.
-Its additional inputs are missing derivations, not hypotheses of this
-paper-facing statement.
+`selfImprovement_assumingFinalFields` records the conditional form currently
+proved in Lean, in which helper strong self-consistency, orthonormalization, and
+final-fields conditions are explicit hypotheses. These conditions are missing
+derivations, not hypotheses of the blueprint theorem.
 -/
 theorem selfImprovement
     (params : Parameters)
@@ -311,10 +312,8 @@ theorem selfImprovement
   -- `selfImprovement_assumingFinalFields`.
   sorry
 
-/--
-Bridge from the measurement-input version in `self_improvement.tex` to the
-submeasurement-input version used in `inductive_step.tex`.
--/
+/-- Passage from the measurement-input version in `self_improvement.tex` to the
+submeasurement-input version used in `inductive_step.tex`. -/
 theorem selfImprovementFromSubMeas
     (params : Parameters)
     [FieldModel params.q]
