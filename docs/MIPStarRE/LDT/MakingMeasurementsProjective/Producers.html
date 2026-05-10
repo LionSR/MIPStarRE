@@ -1,0 +1,69 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../.././style.css"></link><link rel="icon" href="../../.././favicon.svg"></link><link rel="mask-icon" href="../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../.././/declarations/declaration-data.bmp" as="image"></link><title>MIPStarRE.LDT.MakingMeasurementsProjective.Producers</title><script defer="true" src="../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../.././";</script><script>const MODULE_NAME="MIPStarRE.LDT.MakingMeasurementsProjective.Producers";</script><script type="module" src="../../.././jump-src.js"></script><script type="module" src="../../.././search.js"></script><script type="module" src="../../.././expand-nav.js"></script><script type="module" src="../../.././how-about.js"></script><script type="module" src="../../.././instances.js"></script><script type="module" src="../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">MakingMeasurementsProjective</span>.<span class="name">Producers</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/LionSR/MIPStarRE/blob/1354e2654970054b0e719a263794799d29e6a368/MIPStarRE/LDT/MakingMeasurementsProjective/Producers.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../.././Init.html">Init</a></li><li><a href="../../.././MIPStarRE/LDT/MakingMeasurementsProjective/Statements.html">MIPStarRE.LDT.MakingMeasurementsProjective.Statements</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-MIPStarRE.LDT.MakingMeasurementsProjective.Producers" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">MakingMeasurementsProjective</span>.<span class="name">leftLiftedProjectivizationRepairProducer</span></a></div></nav><main>
+<div class="mod_doc"><h1 id="Section-5-Locality-preserving-projectivization-repair" class="markdown-heading">Section 5 — Locality-preserving projectivization repair <a class="hover-link" href="#Section-5-Locality-preserving-projectivization-repair">#</a></h1><p>This file records one analytic obligation from Section 5 of the paper that
+is not yet proved in Lean: the locality-preserving repair stage of the
+orthogonalization argument.</p><h2 id="Scope" class="markdown-heading">Scope <a class="hover-link" href="#Scope">#</a></h2><p>The <strong>spectral-truncation stage</strong> (the first part of the proof of rounding
+to projectors) is already proved by
+<code>spectralTruncationInput_of_sourceAlmostProjective</code> in
+<code><a href="../../.././MakingMeasurementsProjective/SpectralTruncation/ProjectiveNonMeasurement.html">MakingMeasurementsProjective/SpectralTruncation/ProjectiveNonMeasurement.lean</a></code>,
+which is fully proved via
+<code>projectiveNonMeasurement_of_sourceAlmostProjective_full</code>. Proofs that
+require <code>SpectralTruncationInput</code> should call that declaration directly.</p><p>The remaining obligation recorded here:</p><ul><li><strong><code><a href="../../.././MIPStarRE/LDT/MakingMeasurementsProjective/Producers.html#MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer">leftLiftedProjectivizationRepairProducer</a></code></strong> — paper origin
+<code>references/ldt-paper/orthonormalization.tex</code> lines 534–860 (rank
+reduction and the <code>Q</code>/<code>√Q</code> completeness setup) and 862–1194 (the
+<code>X</code>/<code>X̂</code>/<code>P</code> algebra producing the lifted projective sub-measurement,
+including the final triangle-inequality assembly), i.e. the late repair
+stage of the orthogonalization-lemma proof, which produces a genuine
+projective sub-measurement from a rounded family while preserving the
+left-lifted product form <code>P_a ⊗ I</code>.</li></ul><p>Once this theorem is proved, the hypothesis
+<code>LeftLiftedProjectivizationRepairInput</code> required by the orthonormalization
+main lemma is satisfied by applying this theorem directly.</p></div><div class="decl sorried" id="MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer"><div class="theorem"><div class="gh_link"><a href="https://github.com/LionSR/MIPStarRE/blob/1354e2654970054b0e719a263794799d29e6a368/MIPStarRE/LDT/MakingMeasurementsProjective/Producers.lean#L40-L84">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name" title="declaration uses 'sorry'"><a class="break_within" href="../../.././MIPStarRE/LDT/MakingMeasurementsProjective/Producers.html#MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">MakingMeasurementsProjective</span>.<span class="name">leftLiftedProjectivizationRepairProducer</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Outcome</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">Outcome</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">Outcome</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">ψ</span> : <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/QuantumState.html#MIPStarRE.LDT.QuantumState">QuantumState</a> (<span class="fn">ι</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">ι</span>)</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementCore.html#MIPStarRE.LDT.Measurement">Measurement</a> <span class="fn">Outcome</span> <span class="fn">ι</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">ζ</span> : <a href="../../.././MIPStarRE/LDT/Basic/ParametersBase.html#MIPStarRE.LDT.Error">Error</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">_hSpectral</span> : <span class="fn"><a href="../../.././MIPStarRE/LDT/MakingMeasurementsProjective/Statements.html#MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncationStatement">SpectralTruncationStatement</a> <span class="fn">ψ</span> <span class="fn">(<a href="../../.././MIPStarRE/LDT/Basic/MeasurementLift.html#MIPStarRE.LDT.leftLiftedMeasurement">leftLiftedMeasurement</a> <span class="fn">A</span>)</span> <span class="fn">ζ</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">∃ (<span class="fn">P</span> : <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementCore.html#MIPStarRE.LDT.ProjSubMeas">ProjSubMeas</a> <span class="fn">Outcome</span> <span class="fn">ι</span></span>),
+  <span class="fn"><a href="../../.././MIPStarRE/LDT/MakingMeasurementsProjective/Statements.html#MIPStarRE.LDT.MakingMeasurementsProjective.RoundedProjMeasStatement">RoundedProjMeasStatement</a> <span class="fn">ψ</span> <span class="fn">(<a href="../../.././MIPStarRE/LDT/Basic/MeasurementLift.html#MIPStarRE.LDT.leftLiftedMeasurement">leftLiftedMeasurement</a> <span class="fn">A</span>)</span> <span class="fn"><span class="fn">P</span>.<a href="../../.././MIPStarRE/LDT/Basic/SubMeasurementFamilies.html#MIPStarRE.LDT.ProjSubMeas.liftLeft">liftLeft</a></span> <span class="fn">(<a href="../../.././MIPStarRE/LDT/MakingMeasurementsProjective/Defs.html#MIPStarRE.LDT.MakingMeasurementsProjective.roundingToProjectiveError">roundingToProjectiveError</a> <span class="fn">ζ</span>)</span></span></span></div></div><p>Given a normalized state <code>ψ</code>, a measurement <code>A</code>, and the
+spectral-truncation output on the left-lifted family <code>A_a ⊗ I</code>, produces a
+projective sub-measurement <code>P = {P_a}</code> on the underlying space such that
+the lifted family <code>{P_a ⊗ I}</code> satisfies
+<code>A_a ⊗ I ≈_{roundingToProjectiveError ζ} P_a ⊗ I</code>, where the Lean parameter
+<code>ζ</code> is the spectral-truncation output and <code>roundingToProjectiveError ζ = 12 ζ^{1/2}</code>. The paper expresses the final orthonormalization-chain bound
+as <code>≈_{84 ζ^{1/4}}</code> for the original orthonormalization-input <code>ζ</code>, which
+relates to the Lean parameter via the spectral-truncation + projectivization
+chain.
+The locality-preserving form (output <code>P_a ⊗ I</code> rather than an arbitrary
+lifted family) is the specialization required by <code>orthonormalizationMainLemma</code>.</p><p>Paper origin: <code>references/ldt-paper/orthonormalization.tex</code> lines 534–860
+(rank reduction <code>lem:projective-low-rank-sum</code> and the <code>Q</code>-side setup:
+<code>lem:Q-completeness</code>, <code>lem:sqrt-Q-completeness</code>, <code>lem:q-almost-projective</code>,
+<code>lem:xa-t</code>, <code>lem:qa-restated</code>) and 862–1194 (the <code>X</code>/<code>X̂</code>/<code>P</code> algebra
+proper: <code>lem:X-squared</code>, <code>lem:X-hat-squared</code>, <code>lem:X-times-X-hat</code>,
+<code>lem:squared-difference</code>, <code>lem:P-projectivity</code>, <code>lem:P-Q-approx</code>, plus the
+final triangle-inequality assembly producing the <code>84 ζ^{1/4}</code> bound captured
+by <code>roundingToProjectiveError ζ</code>). Together these constitute the late
+repair stage of the orthogonalization-lemma proof.</p><p>The paper's proof transports the rounded family produced by
+<code>lem:projective-non-measurement</code> (already formalized — see
+<code>spectralTruncationInput_of_sourceAlmostProjective</code>) through the <code>Q/X/X̂/P</code>
+algebra (formalized as <code>QXPLayerData</code> and the rectangular polar decomposition
+for the sigma-range embedding) to a genuine projective sub-measurement
+<code>P = {P_a}</code> with closeness
+<code>A_a ⊗ I ≈_{roundingToProjectiveError ζ} P_a ⊗ I</code>. The locality-preserving
+form (output <code>P_a ⊗ I</code> rather than an arbitrary lifted family) is the
+specialization required by <code>orthonormalizationMainLemma</code> and by the base
+case of <code>mainFormal</code>'s argument.</p></div></div></main>
+<nav class="nav"><iframe src="../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>
