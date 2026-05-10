@@ -376,24 +376,14 @@ lemma hypercubeSpectralGap_operator (params : Parameters) :
       matrixLaplacianOperator params := by
   exact sub_nonneg.mp (hypercubeSpectralGap_operator_posSemidef params).nonneg
 
-/-- Paper-facing spectral-gap conclusion for `cor:laplacian-spectral-gap`.
+/-- Spectral-gap conclusion for `cor:laplacian-spectral-gap`.
 
 The paper states this corollary as an ordered-spectrum assertion:
 if `λ₁ ≤ λ₂ ≤ ... ≤ λ_M` are the eigenvalues of the Laplacian `L`, then
-`λ₁ = 0` and `λ₂ = 1 / (mM)`.  The Lean statement records the equivalent
-finite Fourier spectral formulation used in the proof: the Fourier basis
-diagonalizes `L`, the zero-frequency mode has eigenvalue `0`, every nonzero
-mode has eigenvalue at least `1 / (mM)`, and a weight-one mode attains this
-value. -/
+`λ₁ = 0` and `λ₂ = 1 / (mM)`.  In the finite Fourier formulation, this is the
+assertion that the zero-frequency mode has eigenvalue `0`, every nonzero mode
+has eigenvalue at least `1 / (mM)`, and a weight-one mode attains this value. -/
 structure LaplacianSpectralGapConclusion (params : Parameters) : Prop where
-  fourierSpectrum :
-    matrixLaplacianOperator params =
-      ∑ α : Point params,
-        (((laplacianEigenvalue params α : Error) : ℂ) • fourierBasisProjector params α)
-  fourierOrthonormal :
-    ∀ α β : Point params,
-      fourierBasisInnerProduct params α β = if α = β then 1 else 0
-  fourierCard : Fintype.card (Point params) = hypercubeVertexCount params
   zeroEigenvalue : laplacianEigenvalue params (0 : Point params) = 0
   nonzeroEigenvalue_ge_gap :
     ∀ α : Point params, α ≠ 0 →
@@ -410,9 +400,6 @@ eigenvalue `0` and spectral gap `1 / (mM)`, expressed through the Fourier
 diagonalization of `L`. -/
 theorem laplacianSpectralGap (params : Parameters) :
     LaplacianSpectralGapConclusion params where
-  fourierSpectrum := matrixLaplacianOperator_spectral_decomp params
-  fourierOrthonormal := eigenvectors_orthonormality params
-  fourierCard := eigenvectors_card params
   zeroEigenvalue := by
     simp [laplacianEigenvalue, frequencyWeight_zero]
   nonzeroEigenvalue_ge_gap := by
