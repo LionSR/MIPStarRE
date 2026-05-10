@@ -62,7 +62,12 @@ theorem mainInductionOfWitness
 This theorem is not the paper-facing statement: it assumes that the input
 submeasurement is the underlying submeasurement of a complete measurement. The
 paper-facing theorem `selfImprovementInInductionSection` below keeps only the
-submeasurement and its consistency hypothesis. -/
+submeasurement and its consistency hypothesis.
+
+The point-consistency hypothesis `_hcons` is retained because it is part of the
+paper's bookkeeping, although the present proof factors through
+`SelfImprovement.selfImprovementFromSubMeas`, which no longer consumes it
+separately. -/
 theorem selfImprovementInInductionSection_ofMeasurement
     (params : Parameters)
     [FieldModel params.q]
