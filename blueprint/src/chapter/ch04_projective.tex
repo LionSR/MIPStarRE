@@ -58,9 +58,9 @@
 
 \begin{theorem}[Orthogonalization lemma]\label{thm:orthonormalization}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
-	% Lean proof needs additional OrthonormalizationInput hypothesis (spectral-
-	% truncation + locality-preserving repair witnesses) not yet discharged.
-	% Tracked by issues #103 (Ch4 orthonormalization) and #426 (projectivization chain).
+	% The Lean statement no longer exposes the former OrthonormalizationInput
+	% bridge hypothesis.  The remaining late locality-preserving repair proof is
+	% isolated in the Section 5 producer layer.
 	\uses{def:strong-self-consistency, def:approx_delta}
 	Let $\ket{\psi}$ be a permutation-invariant state,
 	and let $A = \{A_a\}$ be a sub-measurement with strong self-consistency

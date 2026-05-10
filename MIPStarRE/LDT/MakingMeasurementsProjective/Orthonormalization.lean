@@ -3,6 +3,8 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization.RestrictSom
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 import MIPStarRE.LDT.Basic.MeasurementLift
 import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
+import MIPStarRE.LDT.MakingMeasurementsProjective.Producers
+import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization.Completion
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization.ErrorBounds
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
@@ -384,14 +386,18 @@ lemma orthonormalizationMeasurement_of_consistency {Outcome : Type*}
       ζ hζ)⟩
 
 set_option linter.unusedFintypeInType false in
-/-- `thm:orthonormalization`.
+/-- Bridge-dependent orthonormalization helper.
 
 The explicit permutation-invariance and normalized-state hypotheses match the
 paper. Once the lifted/local mismatch is discharged by
 `orthonormalizationMainLemma_local`, the only remaining external inputs are the
 truncation and locality-preserving repair witnesses for the
-option-completed measurement `optionCompletion A`. -/
-theorem orthonormalization {Outcome : Type*}
+option-completed measurement `optionCompletion A`.
+
+This is the conditional helper formerly exposed as `thm:orthonormalization`.
+The public theorem `orthonormalization` below discharges these inputs internally,
+so that the paper-facing statement has no bridge hypothesis. -/
+theorem orthonormalization_ofInput {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState (ι × ι))
@@ -469,6 +475,40 @@ theorem orthonormalization {Outcome : Type*}
     constructor
     simpa [sddError, avgOver, uniformDistribution, constSubMeasFamily] using
       hq
+
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+/-- `thm:orthonormalization`.
+
+This is the paper-facing statement: a strongly self-consistent submeasurement on
+a permutation-invariant normalized state admits a close projective
+submeasurement.  The spectral-truncation and locality-preserving repair data are
+not hypotheses of the theorem; they are supplied internally by the Section 5
+producer declarations. -/
+theorem orthonormalization {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState (ι × ι))
+    (hperm : PermInvState ψ)
+    (hψ : ψ.IsNormalized)
+    (A : SubMeas Outcome ι) (ζ : Error) :
+    BipartiteSSCRel ψ (uniformDistribution Unit)
+        (constSubMeasFamily A) ζ →
+      ∃ P : ProjSubMeas Outcome ι,
+        SDDRel ψ (uniformDistribution Unit)
+          (constSubMeasFamily A.liftLeft)
+          (constSubMeasFamily P.toSubMeas.liftLeft)
+          (orthonormalizationError ζ) := by
+  intro hssc
+  let Ahat : Measurement (Option Outcome) ι := optionCompletion A
+  have hbridge : OrthonormalizationInput ψ A ζ := by
+    refine ⟨?_, ?_⟩
+    · exact spectralTruncationInput_of_sourceAlmostProjective ψ
+        (leftLiftedMeasurement (ιB := ι) Ahat)
+        (consistencyToAlmostProjectiveError (2 * ζ))
+    · exact leftLiftedProjectivizationRepairProducer ψ Ahat
+        (consistencyToAlmostProjectiveError (2 * ζ))
+  exact orthonormalization_ofInput ψ hperm hψ A ζ hssc hbridge
 
 /-- Orthonormalization with the residual-domination invariant needed for the
 monotone-total self-improvement route.

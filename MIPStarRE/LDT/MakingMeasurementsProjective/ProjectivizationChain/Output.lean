@@ -195,7 +195,7 @@ theorem orthonormalizeAndComplete
         OrthonormalizeAndCompleteStatement ψ A P Q a0 ζ := by
   -- Step 6a: apply orthonormalization to `A.toSubMeas`.
   obtain ⟨P, hClose⟩ :=
-    orthonormalization (Outcome := Outcome) (ι := ι) ψ hperm hψ
+    orthonormalization_ofInput (Outcome := Outcome) (ι := ι) ψ hperm hψ
       A.toSubMeas ζ hssc hbridge
   -- Step 6b: use the existing completion bound for the canonical completion
   -- of `P`, then repackage that same completed measurement as a `ProjMeas`.
