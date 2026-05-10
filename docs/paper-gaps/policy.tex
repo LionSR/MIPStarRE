@@ -128,6 +128,35 @@ a map, the placement of a tensor factor, the type of an outcome, the distinction
 between a structure and a substructure, or the scalar carried by an approximation
 relation.
 
+A note is required when the only Lean theorem available for a source-labelled
+statement is conditional on an additional hypothesis not present in the cited
+statement, including bridge, residual, repair, producer, or package data.  Such
+a theorem is temporary proof debt, not a replacement for the source theorem.  The
+note must say plainly that the Lean result is conditional, identify the
+source-faithful theorem form that remains to be proved, and give the intended
+producer theorem or removal plan.  The blueprint should not mark the
+source-labelled statement with \verb|\leanok| by pointing to this conditional
+helper.
+
+Changing a Lean theorem away from the statement in
+\path{references/ldt-paper/} is strongly discouraged.  A paper-gap note should
+not make such a change look routine: it should explain the mathematical
+necessity, or else classify the change as proof debt to be removed.
+
+When an existing conditional helper is audited, the first task is to extract any
+argument it already contains into source-faithful lemmas.  If the remaining
+bridge hypothesis cannot be derived from the paper hypotheses, the formal
+development should restore the source theorem statement and record the missing
+proof obligation explicitly, rather than retaining the strengthened statement as
+though it were the paper theorem.
+
+This requirement is not meant to classify every explicit Lean side condition as
+a discrepancy.  Positivity, nonemptiness, decidability, field-model instances,
+and denominator nonvanishing hypotheses may be faithful encodings of the domain
+in which the paper's theorem is stated.  The note should distinguish such
+boundary hypotheses from hypotheses that supply an unproved step of the paper
+argument.
+
 A note is also appropriate when the proof becomes formal only after changing an
 intermediate scalar, weakening a conclusion, strengthening a hypothesis, or
 inserting an additional lemma which is not simply an expansion of the cited

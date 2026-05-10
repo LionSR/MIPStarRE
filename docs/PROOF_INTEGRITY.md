@@ -110,6 +110,53 @@ this?** If the types, instances, and API surface don't align with Mathlib, the
 scaffolding is actively harmful — it creates technical debt that blocks
 progress rather than enabling it.
 
+### Paper-labelled theorem statement drift
+
+A theorem advertised as the Lean formalization of a paper theorem is a blocker
+if its public statement has drifted from the cited paper statement.
+Changing a theorem away from the statement in `references/ldt-paper/` is
+strongly discouraged unless it is forced by faithful formal encoding or by a
+documented mathematical necessity.
+
+The most common failure mode is replacing an unformalized proof step by an
+extra hypothesis on the theorem itself.  This produces a true conditional
+theorem, but it is not the theorem stated in the paper.  In particular, do not
+repair a theorem such as `mainFormal` by adding assumptions named
+`BridgeHypotheses`, `Input`, `Residual`, `Package`, `RepairInput`, `Producer`,
+or similar unless those assumptions are explicitly present in the cited paper
+statement.
+
+Conditional bridge lemmas are exceptional temporary scaffolding.  Before
+introducing one, first try to state the missing intermediate fact as a named
+lemma or theorem to be proved from the paper hypotheses.  A conditional helper
+is acceptable only when it has a paper-gap note, a named producer theorem
+target, and an explicit removal plan.  Its name must show that it is
+conditional, for example with `_of_...`, `_assuming_...`, or `conditional...`.
+It must not be the declaration used by a source-labelled blueprint theorem with
+`\leanok`.
+
+Existing bridge hypotheses should be treated as proof debt.  Mine their proofs
+for reusable arguments, but do not keep a paper-labelled theorem in a
+strengthened form merely because the conditional version compiles.  If the
+bridge data cannot be derived from the paper hypotheses, the correct repair is
+to restore the paper-aligned theorem statement and leave the missing proof as a
+tracked `sorry`, rather than to keep the extra assumption on the theorem.
+
+Not every explicit Lean hypothesis is statement drift.  Side conditions needed
+to encode the paper's domain, such as nonemptiness, decidability, field-model
+instances, positivity of parameters, or denominator nonvanishing, may be
+faithful when the paper uses the corresponding objects without comment.  These
+conditions should still be reviewed.  The issue is whether the hypothesis is
+mathematical domain data implicit in the source, or an unproved intermediate
+step of the source proof.
+
+For every paper-labelled theorem change, require a statement integrity audit:
+
+- paper assumptions versus Lean assumptions;
+- paper conclusion versus Lean conclusion;
+- verdict: exact, faithful boundary hypotheses, extra assumptions, weakened
+  conclusion, or strengthened conclusion.
+
 ---
 
 ## Warnings

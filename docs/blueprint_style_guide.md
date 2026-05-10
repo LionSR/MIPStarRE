@@ -36,6 +36,27 @@ This is the most important rule. Every proof in the blueprint must faithfully de
 - **Don't be more specific than Lean.** If Lean uses `simp` to close a goal, a one-line sketch is fine.
 - **`\uses` in proofs must be accurate.** Only list what the proof actually uses, not what the statement mentions.
 
+## Source-Labelled Statements And Conditional Helpers
+
+If a blueprint theorem, lemma, or proposition carries a source label from the
+paper, the linked Lean declaration must state the same theorem, up to faithful
+formal encoding of the paper's domain.  Do not use `\lean{...}` and `\leanok`
+on the source-labelled statement to point to a conditional helper whose
+additional assumptions supply an unproved part of the paper proof.
+Changing the Lean statement away from `references/ldt-paper/` is strongly
+discouraged unless faithful formal encoding or a documented mathematical
+necessity requires it; the blueprint should make any such necessity explicit.
+
+Boundary hypotheses such as nonemptiness, decidability, field-model instances,
+positivity of parameters, and denominator nonvanishing may be faithful when
+they express the mathematical domain that the paper leaves implicit.  By
+contrast, bridge inputs, residual data, repair hypotheses, producer assumptions,
+or package assumptions are proof obligations.  They should not be added unless
+there is no faithful local proof route yet and the deviation is documented with
+a removal plan.  If they are still present, record the Lean result only as
+temporary subordinate scaffolding, and leave the paper theorem unmarked as fully
+matched until a source-faithful statement exists.
+
 ## Notation Consistency
 Notation must be **internally consistent** across the entire blueprint and **close to what the Lean code expresses**:
 

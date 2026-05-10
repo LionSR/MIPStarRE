@@ -117,6 +117,22 @@ make the issue self-contained:
 - Dependencies: theorem labels, existing Lean declarations, and GitHub
   sub-issues that must precede the statement.
 
+For issues or PRs touching a source-labelled theorem, include a statement
+integrity check.  List the paper assumptions, the Lean assumptions, the paper
+conclusion, the Lean conclusion, and a verdict: exact, faithful boundary
+hypotheses, extra assumptions, weakened conclusion, or strengthened conclusion.
+Changing a Lean theorem away from the statement in `references/ldt-paper/` is
+strongly discouraged unless it is forced by faithful formal encoding or by a
+documented mathematical necessity.
+Faithful boundary hypotheses include formal domain data such as nonemptiness,
+decidability, field-model instances, positivity of parameters, or denominator
+nonvanishing when these are implicit in the source.  Extra bridge, residual,
+repair, producer, or package assumptions are not boundary hypotheses; they make
+the Lean result conditional.  They should not be introduced unless genuinely
+necessary, and then only as temporary scaffolding with a paper-gap note, a
+producer theorem target, and a removal plan.  They must never be attached to the
+paper theorem name.
+
 Do not describe a mathematical issue only as a "cleanup", "follow-up", "blocked
 item", or "Phase N" problem. State the theorem, lemma, definition, or mismatch
 in mathematical terms first; repository labels and scheduling details come
@@ -357,6 +373,13 @@ Every PR touching Lean code should be reviewed against these criteria:
    [blueprint_style_guide.md](blueprint_style_guide.md#recording-formalization-only-lemmas).
    PR descriptions and follow-up issues should cite the corresponding paper or
    blueprint path, line, label, and a short quotation or precise paraphrase.
+   Reviewers should also check for early drift from the source: new hypotheses,
+   weakened conclusions, changed quantifier order, altered error parameters,
+   or renamed data packages that turn a paper theorem into a conditional
+   theorem.  If such drift appears, request a statement integrity audit before
+   reviewing the proof.  A bridge or residual hypothesis should be treated as
+   proof debt to remove, not as evidence that the paper statement has been
+   formalized.
 
 10. **Scaffolding integrity** -- If the PR introduces or modifies scaffolded
    definitions (types, theorem statements with `sorry` proofs), verify that
@@ -379,7 +402,10 @@ Every PR touching Lean code should be reviewed against these criteria:
    [proof_frontier_review.md](proof_frontier_review.md). A PR that only
    repackages an assumption should not be described as proving the corresponding
    paper step; it must name the missing producer theorem or link the native
-   sub-issue that tracks it.
+   sub-issue that tracks it.  For source-labelled theorems, the preferred repair
+   is to extract any usable proof content into source-faithful lemmas and
+   restore the paper-aligned statement, even if the remaining proof is a tracked
+   `sorry` during the cleanup.
 
 ### Semantic scaffold checklist (required for core math objects)
 
