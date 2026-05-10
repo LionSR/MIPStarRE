@@ -139,6 +139,28 @@ private lemma frequencyWeight_pos_of_ne_zero (params : Parameters) {α : Point p
     exact hi
   exact hempty ⟨i, hi_mem⟩
 
+private lemma exists_frequencyWeight_one (params : Parameters) :
+    ∃ α : Point params, frequencyWeight params α = 1 := by
+  classical
+  let i : Fin params.m := ⟨0, params.hm⟩
+  let one : Fq params := ⟨1, params.one_lt_q⟩
+  let α : Point params := Function.update (0 : Point params) i one
+  have hone : one ≠ (0 : Fq params) := by
+    intro h
+    have hval := congrArg Fin.val h
+    simp [one] at hval
+  refine ⟨α, ?_⟩
+  rw [frequencyWeight]
+  have hfilter :
+      (Finset.univ.filter (fun j : Fin params.m => α j ≠ ⟨0, params.hq⟩)) = {i} := by
+    ext j
+    by_cases hji : j = i
+    · subst j
+      simp [α, hone]
+    · simp [α, Function.update, hji]
+  rw [hfilter]
+  simp
+
 private lemma fourierBasis_norm_sq (params : Parameters) :
     (((Real.sqrt (hypercubeVertexCount params : ℝ))⁻¹ : ℂ) *
       star (((Real.sqrt (hypercubeVertexCount params : ℝ))⁻¹ : ℂ))) =
@@ -353,6 +375,59 @@ lemma hypercubeSpectralGap_operator (params : Parameters) :
     ((hypercubeSpectralGap params : ℂ) • orthogonalModeProjectorMatrix params) ≤
       matrixLaplacianOperator params := by
   exact sub_nonneg.mp (hypercubeSpectralGap_operator_posSemidef params).nonneg
+
+/-- Paper-facing spectral-gap conclusion for `cor:laplacian-spectral-gap`.
+
+The paper states this corollary as an ordered-spectrum assertion:
+if `λ₁ ≤ λ₂ ≤ ... ≤ λ_M` are the eigenvalues of the Laplacian `L`, then
+`λ₁ = 0` and `λ₂ = 1 / (mM)`.  The Lean statement records the equivalent
+finite Fourier spectral formulation used in the proof: the Fourier basis
+diagonalizes `L`, the zero-frequency mode has eigenvalue `0`, every nonzero
+mode has eigenvalue at least `1 / (mM)`, and a weight-one mode attains this
+value. -/
+structure LaplacianSpectralGapConclusion (params : Parameters) : Prop where
+  fourierSpectrum :
+    matrixLaplacianOperator params =
+      ∑ α : Point params,
+        (((laplacianEigenvalue params α : Error) : ℂ) • fourierBasisProjector params α)
+  fourierOrthonormal :
+    ∀ α β : Point params,
+      fourierBasisInnerProduct params α β = if α = β then 1 else 0
+  fourierCard : Fintype.card (Point params) = hypercubeVertexCount params
+  zeroEigenvalue : laplacianEigenvalue params (0 : Point params) = 0
+  nonzeroEigenvalue_ge_gap :
+    ∀ α : Point params, α ≠ 0 →
+      hypercubeSpectralGap params ≤ laplacianEigenvalue params α
+  gap_attained :
+    ∃ α : Point params,
+      α ≠ 0 ∧ laplacianEigenvalue params α = hypercubeSpectralGap params
+  gap_eq :
+    hypercubeSpectralGap params =
+      1 / ((params.m : Error) * (hypercubeVertexCount params : Error))
+
+/-- `cor:laplacian-spectral-gap`: the hypercube Laplacian has bottom
+eigenvalue `0` and spectral gap `1 / (mM)`, expressed through the Fourier
+diagonalization of `L`. -/
+theorem laplacianSpectralGap (params : Parameters) :
+    LaplacianSpectralGapConclusion params where
+  fourierSpectrum := matrixLaplacianOperator_spectral_decomp params
+  fourierOrthonormal := eigenvectors_orthonormality params
+  fourierCard := eigenvectors_card params
+  zeroEigenvalue := by
+    simp [laplacianEigenvalue, frequencyWeight_zero]
+  nonzeroEigenvalue_ge_gap := by
+    intro α hα
+    exact hypercubeSpectralGap_le_laplacianEigenvalue params α
+      (frequencyWeight_pos_of_ne_zero params hα)
+  gap_attained := by
+    rcases exists_frequencyWeight_one params with ⟨α, hα_weight⟩
+    have hα_ne : α ≠ 0 := by
+      intro hα_zero
+      have hweight_zero : frequencyWeight params α = 0 := by
+        simpa [hα_zero] using frequencyWeight_zero params
+      omega
+    exact ⟨α, hα_ne, laplacianEigenvalue_of_weight_one params α hα_weight⟩
+  gap_eq := rfl
 
 /-- The quadratic form `τ(ρ (X-Y)^*(X-Y))`. -/
 noncomputable def matrixSquaredDifferenceExpectation {H : FiniteHilbertSpace}
