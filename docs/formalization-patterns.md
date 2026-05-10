@@ -14,7 +14,7 @@ in `audits/` and the proof-integrity rules in `docs/PROOF_INTEGRITY.md`.
 2. [Blueprint–Lean synchronization](#pattern-2-blueprintlean-synchronization)
 3. [Split-module architecture](#pattern-3-split-module-architecture)
 4. [Barrel re-export pattern](#pattern-4-barrel-re-export-pattern)
-5. [Bridge-package pattern](#pattern-5-bridge-package-pattern)
+5. [Temporary bridge-package pattern](#pattern-5-temporary-bridge-package-pattern)
 6. [Paper-gap documentation pattern](#pattern-6-paper-gap-documentation-pattern)
 
 ---
@@ -113,7 +113,12 @@ are being actively removed.
 
    ```lean
    theorem mainFormal_ofRoleResidualAndRepairedBridge
-       (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} ...
+       {params : Parameters} [FieldModel.{0} params.q]
+       {ι : Type*} [Fintype ι] [DecidableEq ι]
+       {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+       {hpass : strategy.PassesLowIndividualDegreeTest eps}
+       {scalars : MainFormalCascadeScalars params eps k}
+       (hsmall : ¬ 1 ≤ mainFormalError params k eps)
        (roleResidual :
          MainFormalRolePackageResidual params strategy eps hpass k)
        (bridge :
