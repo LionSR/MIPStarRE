@@ -84,29 +84,29 @@ which is false for the relevant range of parameters.  The issue is therefore a
 missing side condition, not a notational convention or a peculiarity of the
 formal language.
 
-\section{The corrected hypothesis}
+\section{Current formalization status}
 
-The repair made in the blueprint and in the checked statements is to state
-explicitly the hypothesis used by the proof.  The main induction theorem is
-therefore stated with \(k\ge 400md\), and in the successor step from \(m\) to
-\(m+1\) one assumes \(k\ge 400(m+1)d\).  This immediately supplies the pasting
-hypothesis \(k\ge 400md\) needed for the restricted dimension.
+The current blueprint makes the paper statement visible again: the displayed
+main induction theorem is stated with \(k\ge md\), and the displayed successor
+step assumes \(k\ge (m+1)d\).  This is the statement in the TeX source of the
+paper, but the blueprint does not mark it as proved in Lean.  No present Lean
+declaration has this theorem as its public type.
 
-The main formal theorem is adjusted in the same way: its hypothesis on \(k\) is
-\(k\ge 400md\), rather than \(k\ge md\).  This is a strengthening of the
-statement, not a new derivation from the original hypothesis.  The interval
-\(md\le k<400md\) is not treated as automatically vacuous.  A trivial
-construction is used only when the final error parameter is already at least
-\(1\), in which case the consistency conclusion is saturated.
-\footnote{After pull request \#912, the relevant blueprint statements are
+The checked successor-step assembly is instead recorded as a separate
+Lean-only conditional proposition.  That proposition retains the side
+conditions actually used by the current proof route, including \(1\le k\) and
+\(400md\le k\).  Downstream handoff statements used for the main formal
+assembly also retain the corresponding large-\(k\) hypothesis.  These
+conditional statements are not proofs of the paper theorem in the range
+\(md\le k<400md\); they expose the extra side condition as an open proof
+obligation rather than incorporating it into the paper statement.
+\footnote{The relevant blueprint statements are
 \path{blueprint/src/chapter/ch02_test.tex}, lines 107--140, and
-\path{blueprint/src/chapter/ch10_induction.tex}, lines 179--205.  The Lean
-public theorem \path{MIPStarRE.LDT.Test.mainFormal} assumes \(400\,md\le k\);
-the pasting theorem is \path{MIPStarRE.LDT.Pasting.Bernoulli.ldPasting}, with
-the corresponding large-\(k\) hypothesis.  The final assembly in
-\path{MIPStarRE/LDT/Test/MainTheorem.lean} still contains an unrelated
-unfinished proof; that unfinished proof is not the side-condition discrepancy
-described in this note.}
+\path{blueprint/src/chapter/ch10_induction.tex}, lines 197--245 and
+346--354.  The Lean conditional successor-step wrapper is
+\path{MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper}; the pasting
+theorem is \path{MIPStarRE.LDT.Pasting.Bernoulli.ldPasting}, with the
+corresponding large-\(k\) hypothesis.}
 
 \section{Conclusion}
 
@@ -116,9 +116,12 @@ genuine theorem-level side-condition gap in the stated proof.  The hypothesis
 \(k\ge md\), or in the successor step \(k\ge (m+1)d\), does not imply the
 large-\(k\) hypothesis required by the pasting theorem.  Pull request
 \href{https://github.com/LionSR/MIPStarRE/pull/912}{\#912} repaired the formal
-and blueprint statements by requiring \(k\ge 400md\) in the theorem statement.
+route by strengthening the displayed hypothesis.  The present blueprint policy
+instead keeps the paper theorem statement visible and records the stronger
+condition on the Lean-only conditional wrapper and on the downstream consumers
+that still use the current pasting route.
 
-This correction does not assert that the original theorem is false for
+This conclusion does not assert that the original theorem is false for
 \(md\le k<400md\).  It says that the proof route through the stated pasting
 theorem does not establish that range.  A proof of the smaller-\(k\) range would
 require an additional argument, such as a genuine saturation lemma for that
