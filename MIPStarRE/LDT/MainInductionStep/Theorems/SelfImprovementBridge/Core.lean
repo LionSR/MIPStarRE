@@ -56,13 +56,14 @@ theorem mainInductionOfWitness
   refine ⟨G, ?_⟩
   exact ⟨le_trans hG.offDiagonalBound herror⟩
 
-/-- `thm:self-improvement-in-induction-section`.
+/-- Conditional measurement-input form of
+`thm:self-improvement-in-induction-section`.
 
-The induction-section wrapper keeps the point-consistency hypothesis `_hcons`
-explicit because it is part of the paper's bookkeeping, even though the current
-proof factors through `selfImprovementFromSubMeas`, which no longer consumes it
-separately. -/
-theorem selfImprovementInInductionSection
+This theorem is not the paper-facing statement: it assumes that the input
+submeasurement is the underlying submeasurement of a complete measurement. The
+paper-facing theorem `selfImprovementInInductionSection` below keeps only the
+submeasurement and its consistency hypothesis. -/
+theorem selfImprovementInInductionSection_ofMeasurement
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -152,6 +153,34 @@ theorem selfImprovementInInductionSection
           averageOperatorOverDistribution,
           GlobalVariance.pointConditionedOutcomeOperatorAtPolynomial] at hdom'
         simpa using hdom' }
+
+/-- `thm:self-improvement-in-induction-section`.
+
+The paper statement takes an arbitrary polynomial submeasurement `G` satisfying
+the stated point-consistency hypothesis.  It does not assume that `G` is the
+underlying submeasurement of a complete measurement. -/
+theorem selfImprovementInInductionSection
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma nu : Error)
+    (hhelperStrongSelfConsistency :
+      SelfImprovement.HelperStrongSelfConsistencyInput params strategy eps delta)
+    (horthonormalization :
+      SelfImprovement.OrthonormalizationInput params strategy eps delta)
+    (hfinalFields : SelfImprovement.FinalFieldsInput params strategy eps delta nu)
+    (hgood : strategy.IsGood eps delta gamma)
+    (G : SubMeas (Polynomial params) ι)
+    (hcons : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params G) nu) :
+    ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+      SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
+  -- TODO(#1451): complete the submeasurement-input theorem without assuming
+  -- that `G` is the underlying submeasurement of a complete measurement.
+  -- The current measurement-input route is retained in
+  -- `selfImprovementInInductionSection_ofMeasurement`.
+  sorry
 
 /-- Package the slice-wise outputs feeding `selfImprovementInInductionSection`
 into the bookkeeping object expected by the later induction-step assembly.
@@ -537,7 +566,7 @@ noncomputable def SelfImprovementPackage.ofSliceBridgeInputs
     have hcons := inductionPkg.pointConsistency x
     rw [← hbridge.state_eq x, ← hbridge.pointMeasurement_eq x] at hcons
     simpa [sliceStrategy] using hcons
-  rcases selfImprovementInInductionSection params (hbridge.sliceStrategy x)
+  rcases selfImprovementInInductionSection_ofMeasurement params (hbridge.sliceStrategy x)
       (restrictionPkg.profile.axisParallel x)
       (restrictionPkg.profile.selfConsistency x)
       (restrictionPkg.profile.diagonal x)

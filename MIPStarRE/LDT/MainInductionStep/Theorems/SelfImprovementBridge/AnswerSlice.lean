@@ -422,7 +422,7 @@ noncomputable def AnswerSelfImprovementPackage.ofSliceBridgeInputs
     have hcons := inductionPkg.pointConsistency x
     rw [← hbridge.state_eq x, ← hbridge.pointMeasurement_eq x] at hcons
     simpa [sliceStrategy] using hcons
-  rcases selfImprovementInInductionSection params (hbridge.sliceStrategy x)
+  rcases selfImprovementInInductionSection_ofMeasurement params (hbridge.sliceStrategy x)
       (restrictionPkg.profile.axisParallel x)
       (restrictionPkg.profile.selfConsistency x)
       (restrictionPkg.profile.diagonal x)
