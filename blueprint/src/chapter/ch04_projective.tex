@@ -58,9 +58,13 @@
 
 \begin{theorem}[Orthogonalization lemma]\label{thm:orthonormalization}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
-	% Lean proof needs additional OrthonormalizationInput hypothesis (spectral-
-	% truncation + locality-preserving repair witnesses) not yet discharged.
-	% Tracked by issues #103 (Ch4 orthonormalization) and #426 (projectivization chain).
+	% In Lean, normalization is an explicit hypothesis because the ambient state
+	% record contains positive semidefinite density matrices of arbitrary
+	% normalized trace; this matches the paper's convention that a state is
+	% normalized.
+	% The Lean statement no longer requires explicit spectral-truncation and
+	% locality-preserving repair witnesses as hypotheses; they are supplied
+	% internally by the Section 5 rounding-to-projectors results.
 	\uses{def:strong-self-consistency, def:approx_delta}
 	Let $\ket{\psi}$ be a permutation-invariant state,
 	and let $A = \{A_a\}$ be a sub-measurement with strong self-consistency

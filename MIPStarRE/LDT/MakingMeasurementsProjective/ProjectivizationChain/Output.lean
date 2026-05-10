@@ -166,7 +166,7 @@ measurement `Q` satisfying the chain bound
 
 The analytic part of the proof is a direct composition of the two existing
 lemmas:
-* `MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization`
+* `MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization_ofInput`
   (Step 6a; `orthonormalization.tex` line 67);
 * `MIPStarRE.LDT.Preliminaries.completingToMeasurement`
   (Step 6b; `preliminaries.tex` line 1101).
@@ -195,7 +195,7 @@ theorem orthonormalizeAndComplete
         OrthonormalizeAndCompleteStatement ψ A P Q a0 ζ := by
   -- Step 6a: apply orthonormalization to `A.toSubMeas`.
   obtain ⟨P, hClose⟩ :=
-    orthonormalization (Outcome := Outcome) (ι := ι) ψ hperm hψ
+    orthonormalization_ofInput (Outcome := Outcome) (ι := ι) ψ hperm hψ
       A.toSubMeas ζ hssc hbridge
   -- Step 6b: use the existing completion bound for the canonical completion
   -- of `P`, then repackage that same completed measurement as a `ProjMeas`.

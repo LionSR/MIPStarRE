@@ -201,7 +201,7 @@ theorem selfImprovement
       MakingMeasurementsProjective.OrthonormalizationInput strategy.state Hhat
         (selfImprovementHelperError params eps delta) :=
     horthonormalization hssc
-  rcases orthonormalization strategy.state strategy.permInvState strategy.isNormalized
+  rcases orthonormalization_ofInput strategy.state strategy.permInvState strategy.isNormalized
       Hhat
       (selfImprovementHelperError params eps delta)
       hssc horthBridge with ⟨H, horth⟩
