@@ -37,6 +37,11 @@ The audit for `MainInductionStep.selfImprovementInInductionSection` records
 the current proof obligation for the submeasurement-input statement of
 `thm:self-improvement-in-induction-section`.
 
+The axiom expectation is attached to each declaration separately. A declaration
+using one of the `assert_*_axioms` commands with `sorryAx` in its expected set
+has a named proof obligation still to be discharged; fulfilling one such
+obligation should not change the audit status of the others.
+
 This module is built explicitly in CI rather than imported from the umbrella
 library modules, so the axiom audits stay out of normal downstream imports
 while still acting as regression tests.
