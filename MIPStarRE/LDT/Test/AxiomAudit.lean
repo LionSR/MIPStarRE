@@ -19,7 +19,7 @@ The audits for `Test.mainFormal` and `Test.mainFormal_ofRepairedBridge` record
 the current Section 6 residual obligations: the paper-facing theorem is present
 with its source statement, while the repaired-bridge route still contains the
 successor-case residual. These declarations should move to the standard axiom
-set once the bridge discharge is proved.
+set once the bridge proof obligation is fulfilled.
 
 This module is built explicitly in CI rather than imported from the umbrella
 library modules, so the axiom audits stay out of normal downstream imports
@@ -48,15 +48,12 @@ private def assertUsesOnlyStandardAxioms (declName : Name) : CommandElabM Unit :
 elab "assert_standard_axioms " id:ident : command => do
   assertUsesOnlyStandardAxioms id.getId
 
-elab "assert_orthonormalization_axioms " id:ident : command => do
-  assertUsesExactlyAxioms id.getId expectedStandardPlusSorryAxioms
-
 elab "assert_standard_plus_sorry_axioms " id:ident : command => do
   assertUsesExactlyAxioms id.getId expectedStandardPlusSorryAxioms
 
 assert_standard_axioms MIPStarRE.LDT.Test.razSafra
 assert_standard_axioms MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement
 assert_standard_axioms MIPStarRE.LDT.Test.classicalTestSoundness
-assert_orthonormalization_axioms MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization
+assert_standard_plus_sorry_axioms MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization
 assert_standard_plus_sorry_axioms MIPStarRE.LDT.Test.mainFormal_ofRepairedBridge
 assert_standard_plus_sorry_axioms MIPStarRE.LDT.Test.mainFormal
