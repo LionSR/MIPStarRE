@@ -109,8 +109,9 @@
 
 \begin{theorem}[Quantum soundness of the low individual degree test]\label{thm:main-formal}
 	\lean{MIPStarRE.LDT.Test.mainFormal}
+	\leanok
 	\uses{def:low-individual-degree-test, def:projective-strategy, def:polymeasurements, def:simeq}
-	Let $(\psi, A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})$ be a projective strategy that passes the $(m,q,d)$ low individual degree test with probability at least $1-\eps$. Assume $d > 0$. Let $k > 0$ with $k \ge 400\,md$ and set
+	Let $(\psi, A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})$ be a projective strategy that passes the $(m,q,d)$ low individual degree test with probability at least $1-\eps$. Assume $d > 0$. Let $k$ be an integer with $k \ge md$ and set
 	\[
 		\nu = 100000 k^2 m^4\left(\eps^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\right).
 	\]
@@ -129,15 +130,26 @@
 	\end{enumerate}
 \end{theorem}
 
-\begin{remark}[$k$-bound boundary for the public theorem]\label{rem:main-formal-k-boundary}
+\begin{theorem}[Conditional repaired-bridge form of the main formal theorem]\label{thm:main-formal-of-repaired-bridge}
+	\lean{MIPStarRE.LDT.Test.mainFormal_ofRepairedBridge}
+	\leanok
+	\uses{thm:main-formal, def:projective-strategy, def:polymeasurements, def:simeq}
+	In the setting of Theorem~\ref{thm:main-formal}, assume in addition that
+	$k \ge 400\,md$ and that the repaired bridge data required by the Section~6
+	route is available.  Then the same three consistency conclusions as in
+	Theorem~\ref{thm:main-formal} hold with error parameter~$\nu$.
+\end{theorem}
+
+\begin{remark}[$k$-bound for the conditional helper]\label{rem:main-formal-k-boundary}
 	\lean{MIPStarRE.LDT.Test.mainFormal_trivial_witness}
-	\uses{thm:main-formal, thm:error-cascade-main-formal, def:projective-strategy, def:simeq}
-	The paper statement uses the weaker hypothesis $k \ge md$, but the proof
-	invokes the Section~6 pasting theorem with side condition $k \ge 400\,md$.
-	This side condition is not implied by $k \ge md$. The Lean and blueprint
-	public statement therefore records the stronger large-$k$ assumption required
-	by the pasting step rather than hiding the side-condition gap. The helper
+	\uses{thm:main-formal, thm:main-formal-of-repaired-bridge, thm:error-cascade-main-formal, def:projective-strategy, def:simeq}
+	The paper statement uses the hypothesis $k \ge md$. The present conditional
+	auxiliary theorem \texttt{mainFormal\_ofRepairedBridge} still relies on
+	Section~6 infrastructure with side condition $k \ge 400\,md$, which is not
+	implied by the paper hypothesis. The conditional helper has not yet been
+	proved under the weaker paper hypothesis; the side condition $k \ge 400\,md$
+	is an open assumption of that helper, not of
+	Theorem~\ref{thm:main-formal}. The helper
 	\texttt{mainFormal\_trivial\_witness} remains only for already-saturated
-	branches where $\nu \ge 1$ makes the three $\simeq_\nu$ conclusions vacuous;
-	it is not a replacement for a proof in the interval $md \le k < 400\,md$.
+	branches where $\nu \ge 1$ makes the three $\simeq_\nu$ conclusions vacuous.
 \end{remark}

@@ -813,8 +813,9 @@ Key Lean theorem names:
   `sigma = m^2 (nu + exp(-k/(80000 m^2)))`,
   `nu = 1000 k^2 m^2 (epsilon^(1/1024)+delta^(1/1024)+gamma^(1/1024)+(d/q)^(1/1024))`.
   Issue #906 records that the proof later invokes pasting with the stronger
-  side condition `k >= 400md`; the current blueprint/Lean public statement uses
-  this stronger formal hypothesis rather than treating the intermediate range as
+  side condition `k >= 400md`.  The current blueprint keeps the paper
+  hypothesis `k >= md`; the checked large-`k` route is recorded separately as
+  conditional infrastructure, rather than treating the intermediate range as
   proved.
 
 - Section-level self-improvement theorem:

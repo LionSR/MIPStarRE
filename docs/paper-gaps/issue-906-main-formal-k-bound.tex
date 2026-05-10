@@ -84,29 +84,39 @@ which is false for the relevant range of parameters.  The issue is therefore a
 missing side condition, not a notational convention or a peculiarity of the
 formal language.
 
-\section{The corrected hypothesis}
+\section{The current formalization state}
 
-The repair made in the blueprint and in the checked statements is to state
-explicitly the hypothesis used by the proof.  The main induction theorem is
-therefore stated with \(k\ge 400md\), and in the successor step from \(m\) to
-\(m+1\) one assumes \(k\ge 400(m+1)d\).  This immediately supplies the pasting
-hypothesis \(k\ge 400md\) needed for the restricted dimension.
+The formalization now distinguishes the paper statements from the conditional
+proof route that uses the large-\(k\) pasting theorem.  The blueprint statement
+of the main induction theorem again displays the paper hypothesis \(k\ge md\).
+At present there is no Lean declaration marked as the complete paper-facing
+main induction theorem.  Instead, the Lean-only successor-step statement
+\path{MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper} is recorded
+separately as a conditional result, and its statement includes the Section~6
+side conditions \(1\le k\) and \(400md\le k\).
 
-The main formal theorem is adjusted in the same way: its hypothesis on \(k\) is
-\(k\ge 400md\), rather than \(k\ge md\).  This is a strengthening of the
-statement, not a new derivation from the original hypothesis.  The interval
-\(md\le k<400md\) is not treated as automatically vacuous.  A trivial
-construction is used only when the final error parameter is already at least
-\(1\), in which case the consistency conclusion is saturated.
-\footnote{After pull request \#912, the relevant blueprint statements are
-\path{blueprint/src/chapter/ch02_test.tex}, lines 107--140, and
-\path{blueprint/src/chapter/ch10_induction.tex}, lines 179--205.  The Lean
-public theorem \path{MIPStarRE.LDT.Test.mainFormal} assumes \(400\,md\le k\);
-the pasting theorem is \path{MIPStarRE.LDT.Pasting.Bernoulli.ldPasting}, with
-the corresponding large-\(k\) hypothesis.  The final assembly in
-\path{MIPStarRE/LDT/Test/MainTheorem.lean} still contains an unrelated
-unfinished proof; that unfinished proof is not the side-condition discrepancy
-described in this note.}
+The main formal theorem is treated similarly.  The public Lean theorem
+\path{MIPStarRE.LDT.Test.mainFormal} has the paper-facing \(k\)-hypothesis
+\(k\ge md\), together with the explicit boundary condition \(d>0\).  Its proof
+is not complete: the remaining obligation is to construct the role-package
+residual and repaired bridge producer from the paper hypotheses without
+appealing to the stronger Section~6 side condition.  The previously checked
+large-\(k\) route is preserved as the conditional auxiliary theorem
+\path{MIPStarRE.LDT.Test.mainFormal_ofRepairedBridge}, whose statement still
+assumes \(400md\le k\) and a repaired bridge producer.
+
+Thus the interval \(md\le k<400md\) is neither declared vacuous nor silently
+removed from the paper-facing theorem.  Rather, it is represented by an explicit
+open proof obligation on the source-faithful statement.  A trivial construction
+is used only when the final error parameter is already at least \(1\), in which
+case the consistency conclusion is saturated.
+\footnote{Pull request \#912 temporarily strengthened the formal and blueprint
+statements to \(k\ge 400md\).  The later bridge-debt cleanup restores the
+paper-facing statements in \path{blueprint/src/chapter/ch02_test.tex} and
+\path{blueprint/src/chapter/ch10_induction.tex}, and isolates the stronger
+large-\(k\) route on the conditional Lean declarations just described.  The
+pasting theorem remains \path{MIPStarRE.LDT.Pasting.Bernoulli.ldPasting}, with
+its own large-\(k\) hypothesis.}
 
 \section{Conclusion}
 
@@ -115,14 +125,17 @@ The verdict is that
 genuine theorem-level side-condition gap in the stated proof.  The hypothesis
 \(k\ge md\), or in the successor step \(k\ge (m+1)d\), does not imply the
 large-\(k\) hypothesis required by the pasting theorem.  Pull request
-\href{https://github.com/LionSR/MIPStarRE/pull/912}{\#912} repaired the formal
-and blueprint statements by requiring \(k\ge 400md\) in the theorem statement.
+\href{https://github.com/LionSR/MIPStarRE/pull/912}{\#912} recorded one
+conservative repair by strengthening the public statements to \(k\ge 400md\).
+The current development instead keeps the source statements visible and records
+the large-\(k\) route as conditional infrastructure.
 
-This correction does not assert that the original theorem is false for
+This analysis does not assert that the original theorem is false for
 \(md\le k<400md\).  It says that the proof route through the stated pasting
 theorem does not establish that range.  A proof of the smaller-\(k\) range would
 require an additional argument, such as a genuine saturation lemma for that
-interval or a pasting theorem with a correspondingly weaker size hypothesis.
+interval, a pasting theorem with a correspondingly weaker size hypothesis, or a
+direct derivation of the repaired bridge data from the paper hypotheses.
 
 \bibliographystyle{alpha}
 \bibliography{references}
