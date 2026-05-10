@@ -264,6 +264,23 @@ theorem laplacianRewrite (params : Parameters) :
 
 /-! ## Public theorem wrappers -/
 
+/-- The local variance in the paper's bipartite notation, where the operator
+family acts on the left tensor factor and the right tensor factor carries the
+identity.  Thus the paper expression
+`(A^u - A^v)^2 ⊗ I` is represented by the squared difference of the left-placed
+operators `leftTensor (A u)`. -/
+noncomputable def paperLocalVariance (params : Parameters)
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (A : Point params → MIPStarRE.Quantum.Op ιA) (ψ : QuantumState (ιA × ιB)) : Error :=
+  localVariance params (fun u => leftTensor (ι₂ := ιB) (A u)) ψ
+
+/-- The global variance in the paper's bipartite notation, with `A^u` placed on
+the left tensor factor. -/
+noncomputable def paperGlobalVariance (params : Parameters)
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (A : Point params → MIPStarRE.Quantum.Op ιA) (ψ : QuantumState (ιA × ιB)) : Error :=
+  globalVariance params (fun u => leftTensor (ι₂ := ιB) (A u)) ψ
+
 /-- `lem:local-to-global`. -/
 lemma localToGlobal (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
@@ -275,6 +292,21 @@ lemma localToGlobal (params : Parameters)
   · rw [globalVariance_eq_zero_of_isEmpty hι params A ψ,
       localVariance_eq_zero_of_isEmpty hι params A ψ]
     positivity
+
+/-- `lem:local-to-global`, in the paper's bipartite notation.
+
+The assumptions `hpos` and `hle` record the paper domain condition
+`0 ≤ A^u ≤ I`.  The proof uses the more general analytic theorem
+`localToGlobal`, applied to the left-tensor placement of the family `A`. -/
+lemma localToGlobalPaper (params : Parameters)
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (A : Point params → MIPStarRE.Quantum.Op ιA)
+    (_hpos : ∀ u : Point params, 0 ≤ A u)
+    (_hle : ∀ u : Point params, A u ≤ 1)
+    (ψ : QuantumState (ιA × ιB)) :
+    paperGlobalVariance params A ψ ≤
+      (params.m : Error) * paperLocalVariance params A ψ := by
+  exact localToGlobal params (fun u => leftTensor (ι₂ := ιB) (A u)) ψ
 
 /-- `lem:local-rewrite`. -/
 lemma localRewrite (params : Parameters)
