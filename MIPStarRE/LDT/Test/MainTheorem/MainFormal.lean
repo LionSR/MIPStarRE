@@ -577,7 +577,7 @@ This theorem is not the paper-facing statement of `thm:main-formal`: it assumes
 the additional repaired bridge producer `hbaseBridge` and the stronger
 successor-side inequality `400 * params.m * params.d ≤ k`. It contains an
 intermediate proof of `thm:main-formal` that `mainFormal` below will subsume
-once the bridge discharge is complete.
+once the bridge proof obligation is fulfilled.
 
 After first separating off the saturated-error branch, the role-package
 infrastructure now exposes the base producer, an ordinary branch-level successor
@@ -769,7 +769,7 @@ and the positivity assumption `0 < params.d` explicit. The public theorem uses
 the paper's inequality `params.m * params.d ≤ k`; it does not assume the
 conditional repaired bridge producer used by `mainFormal_ofRepairedBridge`.
 The proof currently reduces to that conditional theorem plus the open bridge
-discharge tracked in #1447.
+proof obligation tracked in #1447.
 -/
 theorem mainFormal
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
