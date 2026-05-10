@@ -3,16 +3,16 @@ import MIPStarRE.LDT.Test.StrategyFailures
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 import MIPStarRE.LDT.Pasting.Bernoulli.Final
 import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationBridge
--- Used by `selfImprovementInInductionSection`.
+-- Used by `selfImprovementInInductionSection_ofMeasurement`.
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results
 
 /-!
 # Section 6 — Ordinary Self-Improvement Bridge
 
 Core public API for the ordinary self-improvement package: constructors for
-`SelfImprovementPackage`, the induction-section wrapper
+`SelfImprovementPackage`, the induction-section theorem
 `selfImprovementInInductionSection`, the monotone-witness cleanup
-`mainInductionOfWitness`, and the pasting wrapper `ldPastingInInductionSection`.
+`mainInductionOfWitness`, and the pasting theorem `ldPastingInInductionSection`.
 
 The answer-valued slice constructors are separated into
 `SelfImprovementBridge.AnswerSlice`.
