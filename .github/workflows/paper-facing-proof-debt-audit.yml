@@ -3,6 +3,14 @@ name: Paper-facing proof-debt audit
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+    paths:
+      - 'MIPStarRE/**/*.lean'
+      - 'blueprint/src/chapter/**/*.tex'
+      - 'scripts/audit_paper_facing_proof_debt.py'
+      - 'scripts/blueprint_lean_sync.py'
+      - 'scripts/lean_header_utils.py'
+      - 'scripts/tests/test_audit_paper_facing_proof_debt.py'
+      - '.github/workflows/paper-facing-proof-debt-audit.yml'
 
 # Runs as a non-blocking warning while the bridge-debt cleanup tracked by
 # issue #1458 is in progress.  Once the tracked paper-facing theorem statements
@@ -27,6 +35,9 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: '3.12'
+
+      - name: Run script regression tests
+        run: python3 -m unittest scripts/tests/test_audit_paper_facing_proof_debt.py
 
       - name: Run paper-facing proof-debt audit (warn-only)
         run: |
