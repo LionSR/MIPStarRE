@@ -334,7 +334,10 @@ structure SelfImprovementHelperConclusion (params : Parameters) [FieldModel para
 Output of the self-improvement helper lemma before projectivization.  The
 submeasurement `H` satisfies the four conclusions stated in the paper:
 completeness, consistency with the point measurement, strong self-consistency,
-and boundedness by a positive semidefinite dual witness `Z`. -/
+and boundedness by a positive semidefinite dual witness `Z`.  The boundedness
+conclusion is represented by the positivity of `Z`, the pointwise domination
+inequality `Z ≥ E_u A^u_{g(u)}`, and the corresponding state-dependent gap
+estimate. -/
 structure SelfImprovementHelperStatement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)

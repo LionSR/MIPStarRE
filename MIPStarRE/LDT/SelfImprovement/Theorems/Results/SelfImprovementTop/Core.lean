@@ -180,7 +180,9 @@ lemma self_improvement_helper_with_slackness
 Self-improvement helper lemma for a polynomial measurement `G` consistent with
 the point measurement. It produces a polynomial submeasurement `H` and a
 positive semidefinite witness `Z` satisfying the four conclusions of the paper:
-completeness, consistency with `A`, strong self-consistency, and boundedness. -/
+completeness, consistency with `A`, strong self-consistency, and boundedness.
+The boundedness conclusion is split into positivity of `Z`, pointwise domination
+of the averaged point measurement, and the state-dependent gap estimate. -/
 lemma selfImprovementHelper
     (params : Parameters)
     [FieldModel params.q]
