@@ -6,9 +6,7 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 
 
 \begin{lemma}[Replacing a line answer by a fixed polynomial]\label{lem:generalize-b}
-	\lean{MIPStarRE.LDT.GlobalVariance.generalizeB, MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual, MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual_eq_seedCollisionExpansion, MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual_le_error, MIPStarRE.LDT.GlobalVariance.generalizeBPointwiseSchwartzZippel, MIPStarRE.LDT.GlobalVariance.generalizeBFromSchwartzZippel}
-	\lean{MIPStarRE.LDT.GlobalVariance.generalizeBSeedCollisionExpansion, MIPStarRE.LDT.GlobalVariance.generalizeBSeedCollisionExpansion_eq_lineCollisionExpansion, MIPStarRE.LDT.GlobalVariance.generalizeBSeedCollisionExpansion_le_error, MIPStarRE.LDT.GlobalVariance.generalizeBLineCollisionExpansion, MIPStarRE.LDT.GlobalVariance.generalizeBLineCollisionExpansion_le_error}
-	\lean{MIPStarRE.LDT.GlobalVariance.generalizeBReversePointwiseBound, MIPStarRE.LDT.GlobalVariance.generalizeBReversePointwiseBound_polysum_le_error, MIPStarRE.LDT.GlobalVariance.generalizeBLineCollisionExpansion_polysum_le_error, MIPStarRE.LDT.GlobalVariance.generalizeBSeedCollisionExpansion_polysum_le_error, MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual_polysum_le_error, MIPStarRE.LDT.GlobalVariance.generalizeBDeviationAtPolynomial_polysum_le_error}
+	\lean{MIPStarRE.LDT.GlobalVariance.generalizeB, MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual, MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual_eq_seedCollisionExpansion, MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual_le_error, MIPStarRE.LDT.GlobalVariance.generalizeBPointwiseSchwartzZippel, MIPStarRE.LDT.GlobalVariance.generalizeBFromSchwartzZippel, MIPStarRE.LDT.GlobalVariance.generalizeBSeedCollisionExpansion, MIPStarRE.LDT.GlobalVariance.generalizeBSeedCollisionExpansion_eq_lineCollisionExpansion, MIPStarRE.LDT.GlobalVariance.generalizeBSeedCollisionExpansion_le_error, MIPStarRE.LDT.GlobalVariance.generalizeBLineCollisionExpansion, MIPStarRE.LDT.GlobalVariance.generalizeBLineCollisionExpansion_le_error, MIPStarRE.LDT.GlobalVariance.generalizeBReversePointwiseBound, MIPStarRE.LDT.GlobalVariance.generalizeBReversePointwiseBound_polysum_le_error, MIPStarRE.LDT.GlobalVariance.generalizeBLineCollisionExpansion_polysum_le_error, MIPStarRE.LDT.GlobalVariance.generalizeBSeedCollisionExpansion_polysum_le_error, MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual_polysum_le_error, MIPStarRE.LDT.GlobalVariance.generalizeBDeviationAtPolynomial_polysum_le_error}
 	\leanok
 	\uses{def:polymeasurements, lem:schwartz-zippel-individual, lem:axis-line-polynomial-agreement-mdq}
 	Let $G \in \polysub{m}{q}{d}$. On the axis-parallel line-test distribution,
@@ -25,11 +23,7 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 \end{proof}
 
 \begin{remark}[Conditional variants for the collision-residual estimate]\label{rem:generalize-b-collision-residual-conditional}
-	\lean{MIPStarRE.LDT.GlobalVariance.generalizeBFromCollisionResidual}
-	\lean{MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual_le_of_seedExpansion_eq}
-	\lean{MIPStarRE.LDT.GlobalVariance.generalizeBFromSeedCollisionExpansion}
-	\lean{MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual_le_of_lineExpansion_eq}
-	\lean{MIPStarRE.LDT.GlobalVariance.generalizeBFromLineCollisionExpansion}
+	\lean{MIPStarRE.LDT.GlobalVariance.generalizeBFromCollisionResidual, MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual_le_of_seedExpansion_eq, MIPStarRE.LDT.GlobalVariance.generalizeBFromSeedCollisionExpansion, MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual_le_of_lineExpansion_eq, MIPStarRE.LDT.GlobalVariance.generalizeBFromLineCollisionExpansion}
 	The paper proof of Lemma~\ref{lem:generalize-b} bounds the collision event
 	directly by the Schwartz--Zippel estimate.  The following conditional variants
 	instead assume this collision estimate, or one of the reindexing identities
