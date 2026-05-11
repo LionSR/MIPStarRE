@@ -358,10 +358,10 @@ noncomputable def repairedBridgeHypotheses_ofRoleResidual
 /-- The checked role-register residual used by the `m = 1` branch of
 `mainFormal`.
 
-The proof of `mainFormal` does not need repaired bridge data for an arbitrary
-role residual in the base case.  It only uses the residual produced by
-`MainFormalRolePackageResidual.ofBaseCase`; this definition names that choice so
-the remaining explicit bridge hypothesis can be stated at the same precision. -/
+Supports the base case (`m = 1`) of the main formal theorem
+`\label{thm:main-formal}` in `references/ldt-paper/inductive_step.tex`.
+The base-case argument uses the residual produced by
+`MainFormalRolePackageResidual.ofBaseCase`; this definition names that choice. -/
 noncomputable def mainFormalBaseRoleResidual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -371,16 +371,16 @@ noncomputable def mainFormalBaseRoleResidual
     MainFormalRolePackageResidual params strategy eps hpass k :=
   Classical.choice (MainFormalRolePackageResidual.ofBaseCase params strategy eps k hpass hm1)
 
-/-- The remaining repaired bridge input for the base branch of `mainFormal`.
+/-- The remaining repaired input for the base case of `mainFormal`.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:26-236`
-(proof of `\label{thm:main-formal}`, base branch of the Step 6
-orthonormalization and completion cascade); blueprint
+(proof of `\label{thm:main-formal}`, base case of the
+orthonormalization and completion argument); blueprint
 `\label{def:main-formal-step6-hypotheses}`.
 
-This is still a conditional bridge input, not a paper hypothesis.  Compared with
-the earlier `hbaseBridge` signature, it is restricted to the checked base-case
-role residual instead of ranging over all possible role residuals. -/
+This type specializes `MainFormalRepairedBridgeHypotheses` to the checked
+role residual for the base case (`m = 1`).  It is a conditional input for the
+current formal proof, not an additional paper hypothesis. -/
 abbrev MainFormalBaseBranchRepairedBridgeHypotheses
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
