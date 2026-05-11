@@ -463,7 +463,7 @@
 	(together with the checked base-case role residual from
 	\texttt{MainFormalRolePackageResidual.ofBaseCase}, where the
 	\texttt{params.m = 1} hypothesis is used) into the Step~6 witness residual
-	consumed by the downstream cascade.
+	used in the final data-processing steps.
 
 	The sharper repaired base route is packaged separately by
 	\texttt{MainFormalBaseRepairedBridgeHypotheses}.  It keeps the same
@@ -478,7 +478,7 @@
 	role-residual form.
 \end{definition}
 
-\begin{definition}[Lean successor-case Step~6 projective-completion obligation]\label{def:main-formal-successor-step6-projective-completion}
+\begin{theorem}[Lean successor-case Step~6 projective-completion obligation]\label{thm:main-formal-successor-step6-projective-completion}
 	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorProjectiveCompletionResidualProducer}
 	\leanok
 	\uses{def:main-formal-step6-hypotheses, def:main-formal-successor-boundary, lem:main-formal-successor-handoff, thm:orthonormalization}
@@ -486,12 +486,11 @@
 	in the proof of Theorem~\ref{thm:main-formal}.  In the non-vacuous branch
 	$m>1$, after the role-register induction data have been obtained, Step~6
 	must orthonormalize the unsymmetrized submeasurements, complete them to
-	projective measurements, and transport the resulting estimates to the final
-	projective-completion residual consumed by the downstream cascade.  The
-	statement is recorded as a separate theorem so that the paper-facing
-	\lean{MIPStarRE.LDT.Test.mainFormal} statement remains unchanged while this
-	successor-case assertion is still being proved.
-\end{definition}
+	projective measurements, and transport the resulting consistency estimates
+	through data processing.  The statement is recorded as a separate theorem so
+	that the statement of Theorem~\ref{thm:main-formal} remains unchanged while
+	this successor-case obligation is still being established.
+\end{theorem}
 
 
 \begin{proposition}[Lean successor handoff for the Section 3 proof]\label{lem:main-formal-successor-handoff}
