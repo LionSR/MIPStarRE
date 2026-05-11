@@ -532,24 +532,23 @@ abbrev FinalFieldsInput (params : Parameters) [FieldModel params.q]
         (selfImprovementDataProcessingError params eps delta) →
       SelfImprovementFinalFields params strategy H Z eps delta nu
 
-/-! ## Conditional self-improvement bridge inputs
+/-! ## Auxiliary hypotheses for conditional self-improvement
 
-This structure is a temporary interface for conditional assembly lemmas.  It is
-not part of the statement of `thm:self-improvement`, and it should not be added
-as a hypothesis to any declaration advertised as the paper theorem.  The
-paper-facing theorem `selfImprovement` must instead obtain these three facts
-from the paper hypotheses, or keep the missing derivation as an explicit proof
-obligation. -/
+This structure records three statements that are not hypotheses of
+`thm:self-improvement`.  They may be assumed only in separately named
+conditional results.  A declaration identified with the paper theorem must
+derive these statements from the hypotheses in the paper, or leave the
+corresponding derivation as an explicit proof obligation. -/
 
-/-- The three remaining Section 9 producer targets for the conditional
-self-improvement assembly.
+/-- The three Section 9 statements assumed by the conditional form of
+self-improvement.
 
-The fields are helper-stage strong self-consistency, the orthonormalization
-input, and the final-fields transport.  They are collected only so that
-separately named conditional lemmas such as `selfImprovementFromBridgeInputs`
-can state their assumptions precisely.  The intended cleanup is to prove
-producer theorems for these fields from the source hypotheses and then call the
-conditional assembly internally. -/
+They assert helper-stage strong self-consistency, the orthonormalization
+hypotheses, and final-fields transport.  Grouping them here only abbreviates the
+hypotheses of separately named conditional results such as
+`selfImprovementFromBridgeInputs`.  The intended mathematical task is to prove
+each field from the source hypotheses and then use the conditional result as an
+intermediate theorem. -/
 structure SelfImprovementBridgeInputs (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (eps delta nu : Error) where
   /-- Helper-stage strong self-consistency: the averaged `Hhat` is
