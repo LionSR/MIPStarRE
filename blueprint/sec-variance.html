@@ -278,8 +278,6 @@
           
           <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.GlobalVariance.generalizeBPointwiseSchwartzZippel" class="lean_decl">MIPStarRE.LDT.GlobalVariance.generalizeBPointwiseSchwartzZippel</a></li>
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.GlobalVariance.generalizeBFromCollisionResidual" class="lean_decl">MIPStarRE.LDT.GlobalVariance.generalizeBFromCollisionResidual</a></li>
-          
           <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.GlobalVariance.generalizeBFromSchwartzZippel" class="lean_decl">MIPStarRE.LDT.GlobalVariance.generalizeBFromSchwartzZippel</a></li>
           
           <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.GlobalVariance.generalizeBSeedCollisionExpansion" class="lean_decl">MIPStarRE.LDT.GlobalVariance.generalizeBSeedCollisionExpansion</a></li>
@@ -288,17 +286,9 @@
           
           <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.GlobalVariance.generalizeBSeedCollisionExpansion_le_error" class="lean_decl">MIPStarRE.LDT.GlobalVariance.generalizeBSeedCollisionExpansion_le_error</a></li>
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual_le_of_seedExpansion_eq" class="lean_decl">MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual_le_of_seedExpansion_eq</a></li>
-          
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.GlobalVariance.generalizeBFromSeedCollisionExpansion" class="lean_decl">MIPStarRE.LDT.GlobalVariance.generalizeBFromSeedCollisionExpansion</a></li>
-          
           <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.GlobalVariance.generalizeBLineCollisionExpansion" class="lean_decl">MIPStarRE.LDT.GlobalVariance.generalizeBLineCollisionExpansion</a></li>
           
           <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.GlobalVariance.generalizeBLineCollisionExpansion_le_error" class="lean_decl">MIPStarRE.LDT.GlobalVariance.generalizeBLineCollisionExpansion_le_error</a></li>
-          
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual_le_of_lineExpansion_eq" class="lean_decl">MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual_le_of_lineExpansion_eq</a></li>
-          
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.GlobalVariance.generalizeBFromLineCollisionExpansion" class="lean_decl">MIPStarRE.LDT.GlobalVariance.generalizeBFromLineCollisionExpansion</a></li>
           
           <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.GlobalVariance.generalizeBReversePointwiseBound" class="lean_decl">MIPStarRE.LDT.GlobalVariance.generalizeBReversePointwiseBound</a></li>
           
@@ -340,12 +330,76 @@
 
   </div>
 </div>
+<div class="remark_thmwrapper theorem-style-remark" id="rem:generalize-b-collision-residual-conditional">
+  <div class="remark_thmheading">
+    <span class="remark_thmcaption">
+    Remark
+    </span>
+    <span class="remark_thmlabel">6.2</span>
+    <span class="remark_thmtitle">Conditional variants for the collision-residual estimate</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-variance.html#rem:generalize-b-collision-residual-conditional">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-variance.html#lem:generalize-b">Lemma 6.1</a></li>
+          
+          <li><a href="sec-prelims.html#lem:schwartz-zippel-individual">Lemma 3.7</a></li>
+          
+          <li><a href="sec-prelims.html#lem:axis-line-polynomial-agreement-mdq">Lemma 3.9</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="remark_thmcontent">
+  <p>   The paper proof of Lemma&#160;<a href="sec-variance.html#lem:generalize-b">6.1</a> bounds the collision event directly by the Schwartz–Zippel estimate. The following conditional variants instead assume this collision estimate, or one of the reindexing identities that implies it, as an explicit hypothesis. These conditional statements record proof obligations to be discharged; they are not additional hypotheses in the paper statement of Lemma&#160;<a href="sec-variance.html#lem:generalize-b">6.1</a>. </p>
+
+  </div>
+</div>
 <div class="lemma_thmwrapper theorem-style-plain" id="lem:local-variance-of-points">
   <div class="lemma_thmheading">
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">6.2</span>
+    <span class="lemma_thmlabel">6.3</span>
     <span class="lemma_thmtitle">Local variance of the points measurements</span>
     <div class="thm_header_extras">
 
@@ -462,7 +516,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">6.3</span>
+    <span class="lemma_thmlabel">6.4</span>
     <span class="lemma_thmtitle">Equivalent local-variance bound</span>
     <div class="thm_header_extras">
 
@@ -486,7 +540,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-variance.html#lem:local-variance-of-points">Lemma 6.2</a></li>
+          <li><a href="sec-variance.html#lem:local-variance-of-points">Lemma 6.3</a></li>
           
         </ul>
     
@@ -534,7 +588,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">6.4</span>
+    <span class="remark_thmlabel">6.5</span>
     <span class="remark_thmtitle">Polynomial-sum formalization for <a href="sec-variance.html#eq:equivalent-local-variance">2</a></span>
     <div class="thm_header_extras">
 
@@ -556,9 +610,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-variance.html#lem:equivalent-local-variance">Lemma 6.3</a></li>
+          <li><a href="sec-variance.html#lem:equivalent-local-variance">Lemma 6.4</a></li>
           
-          <li><a href="sec-variance.html#lem:local-variance-of-points">Lemma 6.2</a></li>
+          <li><a href="sec-variance.html#lem:local-variance-of-points">Lemma 6.3</a></li>
           
           <li><a href="sec-variance.html#lem:generalize-b">Lemma 6.1</a></li>
           
@@ -589,7 +643,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>   The three referenced declarations and Lemma&#160;<a href="sec-variance.html#lem:equivalent-local-variance">6.3</a> together provide the full polynomial-sum (cardinality-free) chain proving the equation. The chain assembly lemma <span class="ttfamily">localVarianceDeviation_sum_le_localVarianceOfPointsError</span> telescopes the six operator differences via <span class="ttfamily">ev_sum_conjTranspose_mul_sum_le</span>, sums over&#160;\(g\), and applies the six individual <span class="ttfamily">_sum</span> bounds (including the reverse&#160;<span class="ttfamily">generalizeB</span> sum) to avoid the per-polynomial cardinality blow-up. </p>
+  <p>   The three referenced declarations and Lemma&#160;<a href="sec-variance.html#lem:equivalent-local-variance">6.4</a> together provide the full polynomial-sum (cardinality-free) chain proving the equation. The chain assembly lemma <span class="ttfamily">localVarianceDeviation_sum_le_localVarianceOfPointsError</span> telescopes the six operator differences via <span class="ttfamily">ev_sum_conjTranspose_mul_sum_le</span>, sums over&#160;\(g\), and applies the six individual <span class="ttfamily">_sum</span> bounds (including the reverse&#160;<span class="ttfamily">generalizeB</span> sum) to avoid the per-polynomial cardinality blow-up. </p>
 
   </div>
 </div>
@@ -598,7 +652,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">6.5</span>
+    <span class="lemma_thmlabel">6.6</span>
     <span class="lemma_thmtitle">Global variance of the points measurements</span>
     <div class="thm_header_extras">
 
@@ -629,15 +683,15 @@
           
           <li><a href="sec-expansion.html#lem:local-to-global">Lemma 5.12</a></li>
           
-          <li><a href="sec-variance.html#lem:equivalent-local-variance">Lemma 6.3</a></li>
+          <li><a href="sec-variance.html#lem:equivalent-local-variance">Lemma 6.4</a></li>
           
           <li><a href="sec-expansion.html#def:local-and-variance">Definition 5.9</a></li>
           
           <li><a href="sec-expansion.html#lem:local-to-global">Lemma 5.12</a></li>
           
-          <li><a href="sec-variance.html#lem:local-variance-of-points">Lemma 6.2</a></li>
+          <li><a href="sec-variance.html#lem:local-variance-of-points">Lemma 6.3</a></li>
           
-          <li><a href="sec-variance.html#lem:equivalent-local-variance">Lemma 6.3</a></li>
+          <li><a href="sec-variance.html#lem:equivalent-local-variance">Lemma 6.4</a></li>
           
         </ul>
     
@@ -713,7 +767,7 @@
 <div class="displaymath" id="a0000000293">
   \[  \eqref{eq:global-variance-target} \le \sum _{g \in \mathcal{P}(m,q,d)} 2m\, \mathbf{Var}_{\mathrm{local}}(A(g),\psi _g) = m \cdot \sum _{g \in \mathcal{P}(m,q,d)} \mathbb {E}_{(u,v)\sim C} \langle \psi  \rvert  (A^u_{g(u)}-A^v_{g(v)})^2 \otimes G_g \lvert \psi  \rangle .  \]
 </div>
-<p> The last quantity is at most \(m \cdot 24\left(\varepsilon +\delta +\frac{md}{q}\right)\) by Lemma&#160;<a href="sec-variance.html#lem:equivalent-local-variance">6.3</a>, which is exactly <a href="sec-variance.html#eq:global-variance-of-points-equation">3</a>. </p>
+<p> The last quantity is at most \(m \cdot 24\left(\varepsilon +\delta +\frac{md}{q}\right)\) by Lemma&#160;<a href="sec-variance.html#lem:equivalent-local-variance">6.4</a>, which is exactly <a href="sec-variance.html#eq:global-variance-of-points-equation">3</a>. </p>
 
   </div>
 </div>
