@@ -706,7 +706,10 @@ the named Section 5 rounding-to-projectors producer.
 
 This removes the repair slice from caller hypotheses.  Until
 `MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer` is
-proved, this producer carries the tracked Section 5 `sorryAx` dependency. -/
+proved, this producer carries the tracked Section 5 `sorryAx` dependency.  The
+strong self-consistency input is not used by the Section 5 producer itself; it
+is retained only because `OrthonormalizationRepairProducer` is the uniform
+self-improvement interface for repair data indexed by helper families. -/
 noncomputable def orthonormalizationRepairProducer_of_projectivizationRepairProducer
     {params : Parameters} [FieldModel params.q]
     {strategy : SymStrat params ι} {eps delta : Error} :

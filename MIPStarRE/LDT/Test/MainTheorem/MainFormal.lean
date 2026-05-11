@@ -275,8 +275,9 @@ structure MainFormalBaseRepairedBridgeHypotheses
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (scalars : MainFormalCascadeScalars params eps k)
     (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) where
-  /-- Line-130 orthonormalization inputs: spectral-truncation and locality-preserving
-  repair witnesses for both unsymmetrized POVMs. -/
+  /-- Line-130 orthonormalization inputs for both unsymmetrized POVMs.  The
+  ordinary repair fields inside this input are obtained from the named Section 5
+  producer rather than supplied by the caller. -/
   orthonormalizationInput :
     MainFormalPostRolePackageDiagonalOrthonormalizationInput
       params strategy eps k scalars (roleResidual.rolePackage scalars)
@@ -661,8 +662,9 @@ theorem mainFormal
   --
   -- 2. **Line-130 orthonormalization inputs**:
   --    - `MainFormalPostRolePackageDiagonalOrthonormalizationInput`:
-  --      spectral-truncation and locality-preserving repair witnesses
-  --      for both unsymmetrized POVMs.
+  --      the spectral fields are supplied by the closed spectral-truncation
+  --      theorem, and the ordinary repair fields are supplied by the named
+  --      Section 5 producer for both unsymmetrized POVMs.
   --
   -- 3. **Completion input** for the two POVMs, derived through
   --    `completingToMeasurement`.  In the repaired base route this is supplied as
