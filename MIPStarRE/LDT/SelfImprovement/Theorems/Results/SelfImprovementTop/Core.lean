@@ -28,7 +28,7 @@ orthonormalization and final-fields conditions taken as explicit hypotheses.
 - **selfImprovement** — the statement corresponding to `thm:self-improvement`.
 - **selfImprovementFromSubMeas / selfImprovementFromBridgeInputs /
   selfImprovementFromBridgeInputsSubMeas** — variants for submeasurement inputs
-  and packaged auxiliary hypotheses.
+  and auxiliary hypotheses supplied explicitly.
 
 ## References
 
@@ -78,7 +78,7 @@ lemma selfImprovementError_nonneg_of_isGood
 
 Unlike the paper helper lemma, this theorem does not yet take the consistency
 error `nu` or a hypothesis `hcons`. The current
-`SelfImprovementHelperConclusion` only packages the outputs produced directly by
+`SelfImprovementHelperConclusion` only records the outputs produced directly by
 the reduced `sdp` + `addInU` construction, and those facts do not depend on the
 consistency hypothesis. The `nu`-dependent consistency information will be
 introduced in the proof of `selfImprovement`. -/
@@ -178,8 +178,8 @@ orthonormalization, and final-fields conditions taken as explicit hypotheses.
 This is not the statement corresponding to `thm:self-improvement` in the
 blueprint. It assumes the helper strong self-consistency input, the
 orthonormalization input, and the final-fields input explicitly. The
-evaluation-map data-processing step is proved internally using the
-question-dependent preliminaries theorem. -/
+evaluation-map data-processing step follows from the question-dependent
+preliminaries theorem. -/
 theorem selfImprovement_assumingFinalFields
     (params : Parameters)
     [FieldModel params.q]
