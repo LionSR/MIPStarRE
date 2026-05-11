@@ -42,10 +42,10 @@ axis that matters:
   omits).
   For a theorem, lemma, or proposition that cites a paper statement,
   an additional bridge, residual, repair, package, producer, or
-  hypothesis input is a mathematical mismatch unless it is a faithful
-  formal encoding of a condition in `references/ldt-paper/`.  Missing
-  proof work belongs in a separately named conditional lemma or remark,
-  not in the source-labelled theorem statement.
+  arbitrary hypothesis input is a mathematical mismatch unless it is a
+  faithful formal encoding of a condition in `references/ldt-paper/`.
+  Missing proof work belongs in a separately named conditional lemma or
+  remark, not in the source-labelled theorem statement.
 - **Conclusion.** Does the blueprint conclusion match the Lean return
   type? Watch for "$X$" vs "$X^\dagger$", "$=$" vs "$\leq$", strict
   vs non-strict inequalities, and conjugate-linear vs linear conventions
