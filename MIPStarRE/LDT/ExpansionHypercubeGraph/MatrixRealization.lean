@@ -428,6 +428,201 @@ lemma laplacianSpectralGap (params : Parameters) :
   gap_eq := by
     simp [hypercubeSpectralGap, hypercubeVertexCount]
 
+private lemma frequencyWeight_eq_zero_iff (params : Parameters) {α : Point params} :
+    (frequencyWeight params α = 0) ↔ α = 0 := by
+  refine ⟨fun hweight => by_contra fun hα =>
+    (frequencyWeight_pos_of_ne_zero params hα).ne' hweight, ?_⟩
+  intro hα
+  simpa [hα] using frequencyWeight_zero params
+
+private lemma laplacianEigenvalue_nonneg (params : Parameters) (α : Point params) :
+    0 ≤ laplacianEigenvalue params α := by
+  simp only [laplacianEigenvalue]
+  positivity
+
+private lemma laplacianEigenvalue_eq_zero_iff (params : Parameters) {α : Point params} :
+    (laplacianEigenvalue params α = 0) ↔ α = 0 := by
+  constructor
+  · intro hlambda
+    have hden_ne :
+        (params.m : Error) * (hypercubeVertexCount params : Error) ≠ 0 := by
+      have hm : (params.m : Error) ≠ 0 := by
+        exact_mod_cast params.hm.ne'
+      have hM : (hypercubeVertexCount params : Error) ≠ 0 := by
+        exact_mod_cast (hypercubeVertexCount_pos params).ne'
+      exact mul_ne_zero hm hM
+    have hweight_cast : (frequencyWeight params α : Error) = 0 := by
+      have hmul := congrArg
+        (fun x : Error => x * ((params.m : Error) * (hypercubeVertexCount params : Error)))
+        hlambda
+      simpa [laplacianEigenvalue, hden_ne] using hmul
+    have hweight : frequencyWeight params α = 0 := by
+      exact_mod_cast hweight_cast
+    exact (frequencyWeight_eq_zero_iff params).mp hweight
+  · intro halpha
+    simp [halpha, laplacianEigenvalue, frequencyWeight_zero]
+
+private lemma orderedSpectrum_first_of_nonneg_zero
+    {N : ℕ} (hNpos : 0 < N)
+    (lambda : Fin N → Error)
+    (hordered : ∀ i j : Fin N, (i : ℕ) ≤ (j : ℕ) → lambda i ≤ lambda j)
+    (hnonneg : ∀ i : Fin N, 0 ≤ lambda i)
+    (hzero : ∃ i : Fin N, lambda i = 0) :
+    lambda ⟨0, hNpos⟩ = 0 := by
+  rcases hzero with ⟨i, hi⟩
+  have hle : lambda ⟨0, hNpos⟩ ≤ 0 := by
+    have hordered_i := hordered ⟨0, hNpos⟩ i (Nat.zero_le (i : ℕ))
+    simpa [hi] using hordered_i
+  exact le_antisymm hle (hnonneg ⟨0, hNpos⟩)
+
+/-- Order-theoretic extraction of the first two entries of an ordered spectrum.
+
+This is the finite-ordering argument in `cor:laplacian-spectral-gap`: once
+the spectrum is ordered, the first value is forced by existence and
+nonnegativity of the zero mode, while the second value is forced by uniqueness
+of that zero mode, the lower bound on every other mode, and gap attainment. -/
+private lemma orderedSpectrum_first_two_of_gap_bounds
+    {N : ℕ} (hNpos : 0 < N) (hNtwo : 1 < N)
+    (lambda : Fin N → Error)
+    (gap : Error)
+    (hordered : ∀ i j : Fin N, (i : ℕ) ≤ (j : ℕ) → lambda i ≤ lambda j)
+    (hnonneg : ∀ i : Fin N, 0 ≤ lambda i)
+    (hzero : ∃ i : Fin N, lambda i = 0)
+    (hgap_lower :
+      ∀ i : Fin N, i ≠ ⟨0, hNpos⟩ → gap ≤ lambda i)
+    (hgap_attained :
+      ∃ i : Fin N, i ≠ ⟨0, hNpos⟩ ∧ lambda i = gap) :
+    lambda ⟨0, hNpos⟩ = 0 ∧ lambda ⟨1, hNtwo⟩ = gap := by
+  let i0 : Fin N := ⟨0, hNpos⟩
+  let i1 : Fin N := ⟨1, hNtwo⟩
+  have hi1_ne_i0 : i1 ≠ i0 := by
+    intro h
+    have hval := congrArg (fun i : Fin N => (i : ℕ)) h
+    simp [i0, i1] at hval
+  have hfirst : lambda i0 = 0 :=
+    orderedSpectrum_first_of_nonneg_zero hNpos lambda hordered hnonneg hzero
+  have hsecond_lower : gap ≤ lambda i1 :=
+    hgap_lower i1 hi1_ne_i0
+  have hsecond_upper : lambda i1 ≤ gap := by
+    rcases hgap_attained with ⟨j, hj_ne_zero, hj_gap⟩
+    have hj_val_ne_zero : (j : ℕ) ≠ 0 := by
+      intro hj0
+      apply hj_ne_zero
+      apply Fin.ext
+      simpa [i0] using hj0
+    have hj_one_le : 1 ≤ (j : ℕ) :=
+      Nat.succ_le_of_lt (Nat.pos_of_ne_zero hj_val_ne_zero)
+    have hordered_j := hordered i1 j hj_one_le
+    simpa [hj_gap] using hordered_j
+  exact ⟨hfirst, le_antisymm hsecond_upper hsecond_lower⟩
+
+/-- Formalization-only criterion for the ordered spectrum in
+`cor:laplacian-spectral-gap`.
+
+This auxiliary lemma records the finite ordering argument used after spectral
+identification.  If an ordered list is nonnegative, has a zero entry, has all
+entries except the first bounded below by the spectral gap, and attains that
+gap, then its first two entries have the values stated in the paper. -/
+lemma laplacianSpectralGapOrdered_of_list_bounds (params : Parameters)
+    (lambda : Fin (hypercubeVertexCount params) → Error)
+    (hordered : ∀ i j : Fin (hypercubeVertexCount params),
+      (i : ℕ) ≤ (j : ℕ) → lambda i ≤ lambda j)
+    (hnonneg : ∀ i : Fin (hypercubeVertexCount params), 0 ≤ lambda i)
+    (hzero : ∃ i : Fin (hypercubeVertexCount params), lambda i = 0)
+    (hgap_lower :
+      ∀ i : Fin (hypercubeVertexCount params),
+        i ≠ ⟨0, hypercubeVertexCount_pos params⟩ →
+          hypercubeSpectralGap params ≤ lambda i)
+    (hgap_attained :
+      ∃ i : Fin (hypercubeVertexCount params),
+        i ≠ ⟨0, hypercubeVertexCount_pos params⟩ ∧
+          lambda i = hypercubeSpectralGap params) :
+    lambda ⟨0, hypercubeVertexCount_pos params⟩ = 0 ∧
+      lambda ⟨1, hypercubeVertexCount_one_lt params⟩ =
+        1 / ((params.m : Error) * (hypercubeVertexCount params : Error)) := by
+  have hfirst_two :=
+    orderedSpectrum_first_two_of_gap_bounds
+      (hypercubeVertexCount_pos params)
+      (hypercubeVertexCount_one_lt params)
+      lambda
+      (hypercubeSpectralGap params)
+      hordered
+      hnonneg
+      hzero
+      hgap_lower
+      hgap_attained
+  exact ⟨hfirst_two.1, by
+    rw [hfirst_two.2]
+    simpa [hypercubeVertexCount] using (laplacianSpectralGap params).gap_eq⟩
+
+/-- Formalization-only criterion from an explicit ordering of the Fourier
+eigenvalues.
+
+This auxiliary lemma supports `cor:laplacian-spectral-gap`.  After the roots of
+the characteristic polynomial have been identified with the Fourier eigenvalues
+of the Laplacian, an enumeration of the Fourier modes whose eigenvalues form
+the ordered list gives the first two ordered eigenvalues stated in the paper. -/
+lemma laplacianSpectralGapOrdered_of_fourier_eigenvalue_order (params : Parameters)
+    (lambda : Fin (hypercubeVertexCount params) → Error)
+    (enum : Fin (hypercubeVertexCount params) ≃ Point params)
+    (hordered : ∀ i j : Fin (hypercubeVertexCount params),
+      (i : ℕ) ≤ (j : ℕ) → lambda i ≤ lambda j)
+    (hlambda : ∀ i : Fin (hypercubeVertexCount params),
+      lambda i = laplacianEigenvalue params (enum i)) :
+    lambda ⟨0, hypercubeVertexCount_pos params⟩ = 0 ∧
+      lambda ⟨1, hypercubeVertexCount_one_lt params⟩ =
+        1 / ((params.m : Error) * (hypercubeVertexCount params : Error)) := by
+  let i0 : Fin (hypercubeVertexCount params) :=
+    ⟨0, hypercubeVertexCount_pos params⟩
+  have hnonneg :
+      ∀ i : Fin (hypercubeVertexCount params), 0 ≤ lambda i := by
+    intro i
+    rw [hlambda i]
+    exact laplacianEigenvalue_nonneg params (enum i)
+  have hzero : ∃ i : Fin (hypercubeVertexCount params), lambda i = 0 := by
+    refine ⟨enum.symm (0 : Point params), ?_⟩
+    rw [hlambda]
+    simpa using (laplacianSpectralGap params).zeroEigenvalue
+  have hfirst : lambda i0 = 0 :=
+    orderedSpectrum_first_of_nonneg_zero
+      (hypercubeVertexCount_pos params) lambda hordered hnonneg hzero
+  have henum_i0 : enum i0 = 0 := by
+    have hL0 : laplacianEigenvalue params (enum i0) = 0 := by
+      rwa [hlambda i0] at hfirst
+    exact (laplacianEigenvalue_eq_zero_iff params).mp hL0
+  have hgap_lower :
+      ∀ i : Fin (hypercubeVertexCount params),
+        i ≠ ⟨0, hypercubeVertexCount_pos params⟩ →
+          hypercubeSpectralGap params ≤ lambda i := by
+    intro i hi_ne_i0
+    have henum_i_ne_zero : enum i ≠ 0 := by
+      intro henum_i
+      apply hi_ne_i0
+      exact enum.injective (by rw [henum_i, henum_i0])
+    have hgap :=
+      (laplacianSpectralGap params).nonzeroEigenvalue_ge_gap
+        (enum i) henum_i_ne_zero
+    simpa [hlambda i] using hgap
+  have hgap_attained :
+      ∃ i : Fin (hypercubeVertexCount params),
+        i ≠ ⟨0, hypercubeVertexCount_pos params⟩ ∧
+          lambda i = hypercubeSpectralGap params := by
+    rcases (laplacianSpectralGap params).gap_attained with
+      ⟨α, hα_ne_zero, hα_gap⟩
+    let j : Fin (hypercubeVertexCount params) := enum.symm α
+    have hj_gap : lambda j = hypercubeSpectralGap params := by
+      rw [hlambda j]
+      simpa [j] using hα_gap
+    have hj_ne_i0 : j ≠ i0 := by
+      intro hj
+      apply hα_ne_zero
+      have henum := congrArg enum hj
+      simpa [j, henum_i0] using henum
+    exact ⟨j, hj_ne_i0, hj_gap⟩
+  exact
+    laplacianSpectralGapOrdered_of_list_bounds params lambda hordered hnonneg hzero
+      hgap_lower hgap_attained
+
 /-- `cor:laplacian-spectral-gap`, in the ordered-eigenvalue form stated in the paper.
 
 Paper origin: `references/ldt-paper/expansion.tex:102-109`.
@@ -452,9 +647,12 @@ theorem laplacianSpectralGapOrdered (params : Parameters)
       lambda ⟨1, hypercubeVertexCount_one_lt params⟩ =
         1 / ((params.m : Error) * (hypercubeVertexCount params : Error)) := by
   -- TODO(#1497): derive the characteristic-polynomial roots of `matrixLaplacianOperator`
-  -- from the Fourier diagonalization and then sort the roots.  The existing theorem
-  -- `laplacianSpectralGap` supplies the zero mode, lower bound for all nonzero modes,
-  -- and attainment by a weight-one mode.
+  -- from the Fourier diagonalization, then invoke
+  -- `laplacianSpectralGapOrdered_of_fourier_eigenvalue_order`.  It remains to
+  -- turn `hroots` into an explicit enumeration of the Fourier Laplacian
+  -- eigenvalues in the ordered list `lambda`; the auxiliary criteria above then
+  -- supply nonnegativity, uniqueness of the zero mode, the lower gap bound, and
+  -- gap attainment.
   sorry
 
 /-- The quadratic form `τ(ρ (X-Y)^*(X-Y))`. -/
