@@ -483,10 +483,12 @@ locality-preserving repair data are not hypotheses of this theorem; they are
 supplied internally by the Section 5 spectral-truncation and
 rounding-to-projectors results.
 
-Until `leftLiftedProjectivizationRepairProducer` in
-`MIPStarRE/LDT/MakingMeasurementsProjective/Producers.lean` is discharged,
-`#print axioms MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization`
-includes `sorryAx`. -/
+The honest Section 5 repair chain currently proved in Lean is the paper-faithful
+`Q/X/XHat/P` route on the completed measurement.  At this wrapper level that
+produces the explicit envelope `120 * ζ^(1/4)`.  The stronger
+input-driven theorem `orthonormalization_ofInput` remains available with the
+public symbolic bound `orthonormalizationError ζ = 100 * ζ^(1/4)` when a
+stronger locality-preserving repair witness is supplied separately. -/
 theorem orthonormalization {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -500,17 +502,98 @@ theorem orthonormalization {Outcome : Type*}
         SDDRel ψ (uniformDistribution Unit)
           (constSubMeasFamily A.liftLeft)
           (constSubMeasFamily P.toSubMeas.liftLeft)
-          (orthonormalizationError ζ) := by
+          (120 * Real.rpow ζ (1 / (4 : Error))) := by
   intro hssc
-  have hbridge : OrthonormalizationInput ψ A ζ := by
-    let Ahat : Measurement (Option Outcome) ι := optionCompletion A
-    refine ⟨?_, ?_⟩
-    · exact spectralTruncationInput_of_sourceAlmostProjective ψ
-        (leftLiftedMeasurement (ιB := ι) Ahat)
-        (consistencyToAlmostProjectiveError (2 * ζ))
-    · exact leftLiftedProjectivizationRepairProducer ψ Ahat
-        (consistencyToAlmostProjectiveError (2 * ζ))
-  exact orthonormalization_ofInput ψ hperm hψ A ζ hssc hbridge
+  have hζ_nonneg : 0 ≤ ζ :=
+    le_trans
+      (bipartiteSSCError_nonneg ψ (uniformDistribution Unit)
+        (constSubMeasFamily A))
+      hssc.overlapBound
+  let Ahat : Measurement (Option Outcome) ι := optionCompletion A
+  have hAhatssc :
+      BipartiteSSCRel ψ (uniformDistribution Unit)
+        (constSubMeasFamily Ahat.toSubMeas)
+        (2 * ζ) := by
+    simpa [Ahat] using
+      Orthonormalization.Completion.optionCompletion_bipartiteSSCRel
+        (ψ := ψ) (hperm := hperm) (hψ := hψ) (A := A) (ζ := ζ) hssc
+  have hCons :
+      ConsRel ψ (uniformDistribution Unit)
+        (constSubMeasFamily Ahat.toSubMeas)
+        (constSubMeasFamily Ahat.toSubMeas)
+        (2 * ζ) :=
+    bipartiteSSCRel_self_of_measurement (ψ := ψ) Ahat (2 * ζ) hAhatssc
+  have hAlmost :
+      MIPStarRE.LDT.MakingMeasurementsProjective.AlmostProjMeasStatement
+        ψ (leftLiftedMeasurement (ιB := ι) Ahat)
+        (consistencyToAlmostProjectiveError (2 * ζ)) := by
+    exact MIPStarRE.LDT.MakingMeasurementsProjective.consistencyToAlmostProjective
+      (ψ := ψ) (A := Ahat) (B := Ahat) (ζ := 2 * ζ) hCons
+  have hSpectral :
+      SpectralTruncationStatement ψ (leftLiftedMeasurement (ιB := ι) Ahat)
+        (consistencyToAlmostProjectiveError (2 * ζ)) := by
+    exact spectralTruncationInput_of_sourceAlmostProjective ψ
+      (leftLiftedMeasurement (ιB := ι) Ahat)
+      (consistencyToAlmostProjectiveError (2 * ζ))
+      hψ hAlmost.sourceAlmostProjective
+  obtain ⟨P, hRounded⟩ :=
+    leftLiftedProjectivizationRepairProducer ψ hψ Ahat
+      (consistencyToAlmostProjectiveError (2 * ζ))
+      hAlmost.sourceAlmostProjective hSpectral
+  have hP_local :
+      SDDRel ψ (uniformDistribution Unit)
+        (constSubMeasFamily Ahat.toSubMeas.liftLeft)
+        (constSubMeasFamily P.toSubMeas.liftLeft)
+        (orthonormalizationMainLemmaError
+          (consistencyToAlmostProjectiveError (2 * ζ))) :=
+    leftLiftedRoundedProjMeasStatement_to_local hRounded
+  have hPq :
+      qSDD ψ Ahat.toSubMeas.liftLeft P.toSubMeas.liftLeft ≤
+        orthonormalizationMainLemmaError (consistencyToAlmostProjectiveError (2 * ζ)) := by
+    simpa [ldt_simp] using hP_local.squaredDistanceBound
+  let Psome : ProjSubMeas Outcome ι := restrictSomeProjSubMeas P
+  have hPsomeq :
+      qSDD ψ A.liftLeft Psome.toSubMeas.liftLeft ≤
+        orthonormalizationMainLemmaError (consistencyToAlmostProjectiveError (2 * ζ)) := by
+    exact le_trans
+      (Orthonormalization.Completion.qSDD_liftLeft_restrictSomeProjSubMeas_le
+        (ψ := ψ) (A := A) (P := P))
+      hPq
+  have hcoeff :
+      orthonormalizationMainLemmaError (consistencyToAlmostProjectiveError (2 * ζ)) ≤
+        120 * Real.rpow ζ (1 / (4 : Error)) := by
+    have hfour_nonneg : 0 ≤ (4 : Error) := by norm_num
+    have hcoeff_num : 84 * Real.rpow (4 : Error) (1 / (4 : Error)) ≤ 120 := by
+      have hs_nonneg : 0 ≤ Real.rpow (4 : Error) (1 / (4 : Error)) := by
+        exact Real.rpow_nonneg (by positivity) _
+      have hs_sq : (Real.rpow (4 : Error) (1 / (4 : Error))) ^ (2 : Nat) = 2 := by
+        calc
+          (Real.rpow (4 : Error) (1 / (4 : Error))) ^ (2 : Nat)
+              = Real.rpow (4 : Error) ((1 / (4 : Error)) * 2) := by
+                  rw [← Real.rpow_natCast]
+                  simpa using (Real.rpow_mul (x := (4 : Error)) (by positivity)
+                    (1 / (4 : Error)) 2).symm
+          _ = 2 := by norm_num [Real.sqrt_eq_rpow]
+      have hs_le : Real.rpow (4 : Error) (1 / (4 : Error)) ≤ 10 / 7 := by
+        have hs_sq_le : (Real.rpow (4 : Error) (1 / (4 : Error))) ^ (2 : Nat) ≤
+            (10 / 7 : Error) ^ (2 : Nat) := by
+          nlinarith [hs_sq]
+        nlinarith
+      nlinarith
+    dsimp [orthonormalizationMainLemmaError, consistencyToAlmostProjectiveError]
+    rw [show 2 * (2 * ζ) = 4 * ζ by ring]
+    rw [Real.mul_rpow hfour_nonneg hζ_nonneg]
+    have hzqr_nonneg : 0 ≤ Real.rpow ζ (1 / (4 : Error)) := Real.rpow_nonneg hζ_nonneg _
+    calc
+      84 * (Real.rpow (4 : Error) (1 / (4 : Error)) * Real.rpow ζ (1 / (4 : Error)))
+          = (84 * Real.rpow (4 : Error) (1 / (4 : Error))) *
+              Real.rpow ζ (1 / (4 : Error)) := by ring
+      _ ≤ 120 * Real.rpow ζ (1 / (4 : Error)) := by
+            exact mul_le_mul_of_nonneg_right hcoeff_num hzqr_nonneg
+  refine ⟨Psome, ?_⟩
+  constructor
+  simpa [sddError, avgOver, uniformDistribution, constSubMeasFamily] using
+    (le_trans hPsomeq hcoeff)
 
 /-- Orthonormalization with the residual-domination invariant needed for the
 monotone-total self-improvement route.
