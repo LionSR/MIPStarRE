@@ -395,7 +395,7 @@ structure LaplacianSpectralGapConclusion (params : Parameters) : Prop where
       α ≠ 0 ∧ laplacianEigenvalue params α = hypercubeSpectralGap params
   gap_eq :
     hypercubeSpectralGap params =
-      1 / ((params.m : Error) * (hypercubeVertexCount params : Error))
+      1 / ((params.m : Error) * ((params.q ^ params.m : ℕ) : Error))
 
 /-- `cor:laplacian-spectral-gap`: the hypercube Laplacian has bottom
 eigenvalue `0` and spectral gap `1 / (mM)`, expressed through the Fourier
@@ -414,9 +414,10 @@ lemma laplacianSpectralGap (params : Parameters) :
       intro hα_zero
       have hweight_zero : frequencyWeight params α = 0 := by
         simpa [hα_zero] using frequencyWeight_zero params
-      omega
+      exact (by decide : (1 : ℕ) ≠ 0) (hα_weight.symm.trans hweight_zero)
     exact ⟨α, hα_ne, laplacianEigenvalue_of_weight_one params α hα_weight⟩
-  gap_eq := rfl
+  gap_eq := by
+    simp [hypercubeSpectralGap, hypercubeVertexCount]
 
 /-- The quadratic form `τ(ρ (X-Y)^*(X-Y))`. -/
 noncomputable def matrixSquaredDifferenceExpectation {H : FiniteHilbertSpace}
