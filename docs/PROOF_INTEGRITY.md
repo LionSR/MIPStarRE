@@ -13,6 +13,17 @@ rather than duplicating the rules inline.
 > witnesses, Mathlib-bypass castles, external `*Statement` smuggles).
 > Consult it alongside this file during review.
 
+> **Paper-realignment exception:** When a PR is explicitly realigning a
+> source-labelled declaration with `references/ldt-paper/`, the `sorry`
+> blocker below may be temporarily relaxed for the affected proof bodies.  The
+> PR must restore the source-faithful public statement, name the remaining proof
+> obligation as a producer or lemma, and cite the paper passage plus the
+> tracking issue or paper-gap note.  A theorem whose proof still depends on a
+> known non-paper bridge, residual, repair input, package, or conditional helper
+> must carry the `**Unfaithful:**` docstring marker described in `AGENTS.md`.
+> Review such PRs against statement faithfulness and the documented discharge
+> plan, not merely against the temporary `sorry` count.
+
 ---
 
 ## Blockers
