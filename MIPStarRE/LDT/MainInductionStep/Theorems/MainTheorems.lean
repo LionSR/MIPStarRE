@@ -292,18 +292,18 @@ noncomputable def mainInductionPublicRestrictionPackage
     (RestrictedProbabilitiesStatement.ofWeightedBounds params strategy eps delta gamma
       hgood haxisWeightedBound hdiagonalWeightedBound)
 
-/-- `thm:main-induction-public-wrapper`.
+/-- `rem:main-induction-successor-assembly`.
 
-This public successor-step wrapper combines the five explicit Section 6 inputs:
+This conditional successor-step assembly combines the five explicit Section 6 inputs:
 1. the weighted restricted-axis and restricted-diagonal bounds,
 2. the resulting `mainInductionPublicRestrictionPackage`,
 3. the slice-wise recursion witnesses used by `PerSliceInductionPackage.ofRecursion`,
-4. the explicit `hselfProducer` boundary input packaging the outputs of
+4. the explicit `hselfProducer` boundary hypothesis supplying the outputs of
    `selfImprovementInInductionSection`, and
 5. `mainInductionByRecursionOnM`.
 
-The theorem deliberately keeps `hselfProducer` as an honest input: the
-self-improvement outputs are packaged by
+The theorem deliberately keeps `hselfProducer` as an explicit conditional input:
+the self-improvement outputs are assembled by
 `SelfImprovementPackage.ofSelfImprovementInInductionSection` once they are
 supplied, while producing those slice-wise outputs belongs to downstream
 `mainFormal` integration. The conclusion exposes only the global measurement
