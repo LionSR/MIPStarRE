@@ -8,6 +8,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport
+import MIPStarRE.LDT.SelfImprovement.Theorems.AddInUFullProducer
 
 /-!
 # Self-improvement theorem variants
@@ -210,6 +211,22 @@ lemma selfImprovementHelper
     exact ⟨by
       simpa [SymStrat.selfConsistencyFailureProbability] using
         hgood.selfConsistencyTest⟩
+  have haddInUFull : AddInUFullStatement params strategy T eps delta :=
+    addInUFullProducer params strategy eps delta gamma hgood T
+  have hpointTransfer :
+      |addInULeftQuantity params strategy
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          Hhat
+          (pointConsistencyAddInUSelection params) -
+        addInURightQuantity params strategy
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          T.toSubMeas
+          (pointConsistencyAddInUSelection params)| ≤ addInUError params eps delta := by
+    have htransfer :=
+      haddInUFull.selectionDependentTransfer
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (pointConsistencyAddInUSelection params)
+    simpa [hhelper.averagedConstruction] using htransfer
   refine ⟨Hhat, Z, ?_⟩
   refine
     { completeness := ?_
@@ -221,18 +238,18 @@ lemma selfImprovementHelper
   · exact
       helper_completeness_of_self_consistency_helper_slackness_input_consistency
         params strategy G eps delta nu heps hdelta hhelperWithSlackness hpointSSC hcons
-  · /- TODO(#1452): Apply
-      `helper_point_consistency_error_le_selfImprovementHelperError` to the
-      selected add-in-`u` chain for the SDP measurement. -/
-    sorry
+  · exact
+      helper_point_consistency_of_pointConsistencyAddInU_transfer
+        params strategy eps delta heps hdelta hpointTransfer
   · /- TODO(#1452): Apply
       `helper_strong_self_consistency_error_le_selfImprovementHelperError` to
       the helper self-consistency chain. -/
     sorry
-  · /- TODO(#1452): Apply
-      `helper_boundedness_gap_le_selfImprovementHelperError` using
-      complementary slackness and the point-consistency add-in-`u` transfer. -/
-    sorry
+  · exact
+      helper_boundedness_gap_le_selfImprovementHelperError_of_helper_outputs
+        params strategy eps delta heps hdelta hhelper hpointSSC
+        (fun h => (hhelperWithSlackness.complementarySlackness h).symm)
+        hpointTransfer
 
 /-- Form of `thm:self-improvement` with helper strong self-consistency,
 orthonormalization, and final-fields conditions taken as explicit hypotheses.

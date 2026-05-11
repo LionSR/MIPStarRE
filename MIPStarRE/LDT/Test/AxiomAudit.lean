@@ -45,9 +45,8 @@ obligation should not change the audit status of the others.
 The audit for `SelfImprovement.selfImprovementHelper` records the present
 state of issue #1452.  The Lean statement now has the input consistency
 hypothesis for the polynomial measurement `G` and the four conclusions stated
-in the paper; the remaining point-consistency, strong self-consistency, and
-boundedness estimates are admitted in the proof rather than assumed in the
-theorem statement.
+in the paper; the remaining helper strong self-consistency estimate is admitted
+in the proof rather than assumed in the theorem statement.
 
 This module is built explicitly in CI rather than imported from the umbrella
 library modules, so the axiom audits stay out of normal downstream imports
