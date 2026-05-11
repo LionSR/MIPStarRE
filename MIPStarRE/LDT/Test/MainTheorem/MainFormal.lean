@@ -664,7 +664,7 @@ noncomputable def mainFormalBaseBranchRepairedBridgeProducer
     (hm1 : params.m = 1)
     (scalars : MainFormalCascadeScalars params eps k) :
     MainFormalBaseBranchRepairedBridgeHypotheses params strategy eps k hpass hm1 scalars := by
-  -- TODO(#1447, #1043, #1359): construct the repaired base-case input from the
+  -- TODO(#1043, #1359): construct the repaired base-case input from the
   -- paper's base-case orthonormalization and completion argument, using the
   -- checked base-case role residual rather than assuming this input in
   -- `mainFormal`.
