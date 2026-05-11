@@ -42,6 +42,13 @@ using one of the `assert_*_axioms` commands with `sorryAx` in its expected set
 has a named proof obligation still to be discharged; fulfilling one such
 obligation should not change the audit status of the others.
 
+The audit for `SelfImprovement.selfImprovementHelper` records the present
+state of issue #1452.  The Lean statement now has the input consistency
+hypothesis for the polynomial measurement `G` and the four conclusions stated
+in the paper; the remaining point-consistency, strong self-consistency, and
+boundedness estimates are admitted in the proof rather than assumed in the
+theorem statement.
+
 This module is built explicitly in CI rather than imported from the umbrella
 library modules, so the axiom audits stay out of normal downstream imports
 while still acting as regression tests.
@@ -75,6 +82,11 @@ needed for `selfImprovementInInductionSection`. -/
 private def expectedInductionSelfImprovementAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
+/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1452 derivation
+needed for `selfImprovementHelper`. -/
+private def expectedSelfImprovementHelperAxioms : Array Name :=
+  expectedStandardAxiomsWithSorry
+
 private def assertUsesExactlyAxioms (declName : Name) (expected : Array Name) :
     CommandElabM Unit := do
   let axioms := (← Lean.collectAxioms declName).qsort Name.lt
@@ -101,6 +113,9 @@ elab "assert_global_variance_axioms " id:ident : command => do
 elab "assert_induction_self_improvement_axioms " id:ident : command => do
   assertUsesExactlyAxioms id.getId expectedInductionSelfImprovementAxioms
 
+elab "assert_self_improvement_helper_axioms " id:ident : command => do
+  assertUsesExactlyAxioms id.getId expectedSelfImprovementHelperAxioms
+
 assert_standard_axioms MIPStarRE.LDT.Test.razSafra
 assert_standard_axioms MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement
 assert_standard_axioms MIPStarRE.LDT.Test.classicalTestSoundness
@@ -112,3 +127,4 @@ assert_self_improvement_axioms MIPStarRE.LDT.SelfImprovement.selfImprovement
 assert_global_variance_axioms MIPStarRE.LDT.GlobalVariance.globalVarianceOfPoints
 assert_induction_self_improvement_axioms
   MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection
+assert_self_improvement_helper_axioms MIPStarRE.LDT.SelfImprovement.selfImprovementHelper
