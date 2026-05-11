@@ -295,19 +295,14 @@ lemma localToGlobal (params : Parameters)
 
 /-- `lem:local-to-global`, in bipartite form.
 
-The assumptions `hpos` and `hle` record the paper domain condition
-`0 ≤ A^u ≤ I`; the conclusion is the local-to-global variance inequality for
-the left tensor placement of the family `A`. -/
+This is the local-to-global variance inequality for the bipartite operator
+family `A^u ⊗ I`. -/
 lemma localToGlobalBipartite (params : Parameters)
     {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (A : Point params → MIPStarRE.Quantum.Op ιA)
-    (hpos : ∀ u : Point params, 0 ≤ A u)
-    (hle : ∀ u : Point params, A u ≤ 1)
     (ψ : QuantumState (ιA × ιB)) :
     bipartiteGlobalVariance params A ψ ≤
       (params.m : Error) * bipartiteLocalVariance params A ψ := by
-  have _ : ∀ u : Point params, 0 ≤ A u := hpos
-  have _ : ∀ u : Point params, A u ≤ 1 := hle
   exact localToGlobal params (fun u => leftTensor (ι₂ := ιB) (A u)) ψ
 
 /-- `lem:local-rewrite`. -/
