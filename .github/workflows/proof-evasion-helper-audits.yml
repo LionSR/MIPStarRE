@@ -1,4 +1,4 @@
-name: Duplicate private-helper audit
+name: Proof-evasion helper audits
 
 on:
   pull_request:
@@ -9,10 +9,12 @@ on:
       - 'scripts/check_duplicate_private_helpers.py'
       - 'scripts/lean_header_utils.py'
       - 'scripts/tests/**'
-      - '.github/workflows/duplicate-private-helper-audit.yml'
+      - '.github/workflows/proof-evasion-helper-audits.yml'
 
-# This is intentionally advisory for #1145.  Exact duplicate proof bodies are
-# review candidates, not proof of semantic duplication.
+# Duplicate private-helper findings remain advisory for #1145: exact duplicate
+# proof bodies are review candidates, not proof of semantic duplication.
+# Conclusion-shaped hypotheses are blocking for #1458/#493: a theorem must not
+# hide its conclusion as an explicit existential hypothesis.
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,8 +24,8 @@ permissions:
   contents: read
 
 jobs:
-  duplicate-private-helpers:
-    name: Report duplicate private helpers
+  proof-evasion-helper-audits:
+    name: Report proof-evasion helper audits
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -35,7 +37,15 @@ jobs:
           python-version: '3.12'
 
       - name: Run script regression tests
-        run: python3 -m unittest scripts/tests/test_check_duplicate_private_helpers.py
+        run: |
+          python3 -m unittest scripts/tests/test_check_duplicate_private_helpers.py
+          python3 -m unittest scripts/tests/test_audit_conclusion_shaped_hypotheses.py
+
+      - name: Run conclusion-shaped hypothesis audit
+        run: |
+          python3 scripts/audit_conclusion_shaped_hypotheses.py \
+            --root . \
+            --ci
 
       - name: Run duplicate private-helper audit
         run: |
