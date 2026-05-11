@@ -162,8 +162,8 @@ private lemma exists_frequencyWeight_one (params : Parameters) :
   simp
 
 lemma hypercubeVertexCount_pos (params : Parameters) :
-    0 < hypercubeVertexCount params := by
-  exact pow_pos params.hq params.m
+    0 < hypercubeVertexCount params :=
+  pow_pos params.hq params.m
 
 lemma hypercubeVertexCount_one_lt (params : Parameters) :
     1 < hypercubeVertexCount params := by
@@ -433,24 +433,28 @@ lemma laplacianSpectralGap (params : Parameters) :
 Paper origin: `references/ldt-paper/expansion.tex:102-109`.
 
 The hypothesis `hordered` records the ordering
-`lambda_1 <= lambda_2 <= ... <= lambda_M`, while `hspectrum` records that the
-multiset of entries of `lambda` is precisely the Laplacian spectrum obtained
-from the Fourier diagonalization, counted with multiplicity.  The conclusion is
-the source statement:
-`lambda_1 = 0` and `lambda_2 = 1 / (mM)`, with `M = q^m`. -/
+`lambda_1 <= lambda_2 <= ... <= lambda_M`, while `hroots` records that the
+entries of `lambda` are the real parts of the roots of the characteristic
+polynomial of the actual Laplacian matrix `L`, counted with multiplicity.  Thus
+`hroots` formalizes the paper phrase "are the eigenvalues of `L`"; it does not
+assume the Fourier diagonalization used in the proof.  The conclusion is the
+source statement: `lambda_1 = 0` and `lambda_2 = 1 / (mM)`, with `M = q^m`.
+Lean indexes the displayed list from `0`, so the first two paper eigenvalues
+are represented by `lambda ⟨0, _⟩` and `lambda ⟨1, _⟩`. -/
 theorem laplacianSpectralGapOrdered (params : Parameters)
     (lambda : Fin (hypercubeVertexCount params) → Error)
     (hordered : ∀ i j : Fin (hypercubeVertexCount params),
       (i : ℕ) ≤ (j : ℕ) → lambda i ≤ lambda j)
-    (hspectrum :
-      (Finset.univ : Finset (Fin (hypercubeVertexCount params))).val.map lambda =
-        (Finset.univ : Finset (Point params)).val.map (laplacianEigenvalue params)) :
+    (hroots :
+      (matrixLaplacianOperator params).charpoly.roots.map Complex.re =
+        (Finset.univ : Finset (Fin (hypercubeVertexCount params))).val.map lambda) :
     lambda ⟨0, hypercubeVertexCount_pos params⟩ = 0 ∧
       lambda ⟨1, hypercubeVertexCount_one_lt params⟩ =
         1 / ((params.m : Error) * (hypercubeVertexCount params : Error)) := by
-  -- TODO(#1454): derive the ordered-spectrum statement from the Fourier diagonalization.
-  -- The existing theorem `laplacianSpectralGap` supplies the zero mode, lower bound
-  -- for all nonzero modes, and attainment by a weight-one mode.
+  -- TODO(#1454): derive the characteristic-polynomial roots of `matrixLaplacianOperator`
+  -- from the Fourier diagonalization and then sort the roots.  The existing theorem
+  -- `laplacianSpectralGap` supplies the zero mode, lower bound for all nonzero modes,
+  -- and attainment by a weight-one mode.
   sorry
 
 /-- The quadratic form `τ(ρ (X-Y)^*(X-Y))`. -/
