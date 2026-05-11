@@ -431,6 +431,8 @@
 	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofLiftedQXPApproximations}
 	\lean{MIPStarRE.LDT.Test.MainFormalBaseRepairedBridgeHypotheses}
 	\lean{MIPStarRE.LDT.Test.MainFormalRepairedBridgeHypotheses}
+	\lean{MIPStarRE.LDT.Test.mainFormalBaseRoleResidual}
+	\lean{MIPStarRE.LDT.Test.MainFormalBaseBranchRepairedBridgeHypotheses}
 	\lean{MIPStarRE.LDT.Test.baseMainFormal_ofRepairedBaseBridge}
 	\lean{MIPStarRE.LDT.Test.mainFormal_ofRoleResidualAndRepairedBridge}
 	\leanok
@@ -475,7 +477,10 @@
 	of \texttt{mainFormal} retains the original final envelope rather than widening
 	to the generic $\zeta_1+\sqrt{\zeta_2}$ scale.  The theorem
 	\texttt{baseMainFormal\_ofRepairedBaseBridge} is the base-case wrapper of this
-	role-residual form.
+	role-residual form.  The top-level conditional bridge used by
+	\texttt{mainFormal} is now restricted to the checked base-case residual
+	\texttt{mainFormalBaseRoleResidual}, rather than ranging over arbitrary role
+	residuals.
 \end{definition}
 
 
