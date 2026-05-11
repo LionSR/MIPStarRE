@@ -22,7 +22,7 @@ former `sorryAx` dependency is gone.
 The audit for `SelfImprovement.selfImprovement` records the current open
 derivation for `thm:self-improvement`: the statement corresponding to the
 blueprint theorem is present, and the missing derivation from the incoming
-consistency hypothesis is tracked by issue #1453.
+consistency hypothesis is tracked by issue #1515.
 
 The audits for the `Test.mainFormal` proof frontier record the current tracked
 gaps from issue #1458: the successor projective-completion residual has not yet
@@ -58,7 +58,7 @@ has a named proof obligation still to be discharged; fulfilling one such
 obligation should not change the audit status of the others.
 
 The audit for `SelfImprovement.selfImprovementHelper` records the present
-state of issue #1452.  The Lean statement now has the input consistency
+state of issue #1514.  The Lean statement now has the input consistency
 hypothesis for the polynomial measurement `G` and the four conclusions stated
 in the paper; the remaining helper strong self-consistency estimate is admitted
 in the proof rather than assumed in the theorem statement.
@@ -87,7 +87,7 @@ paper-facing `mainFormal` proof frontier. -/
 private def expectedTrackedSorryAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
-/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1453 derivation
+/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1515 derivation
 needed for `selfImprovement`. -/
 private def expectedSelfImprovementAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
@@ -107,7 +107,7 @@ needed for `laplacianSpectralGapOrdered`. -/
 private def expectedOrderedLaplacianGapAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
-/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1452 derivation
+/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1514 derivation
 needed for `selfImprovementHelper`. -/
 private def expectedSelfImprovementHelperAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
