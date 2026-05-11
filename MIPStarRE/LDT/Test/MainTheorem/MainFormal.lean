@@ -27,9 +27,10 @@ Base case, successor branch, and conditional reductions for `thm:main-formal`
   the remaining repaired bridge from the role-register output to the final
   projective measurements.
 
-* `mainFormal` — the paper theorem statement, taking only a projective
-  strategy that passes the LID test with probability `≥ 1 − ε` and producing the
-  three pointwise consistency targets at error bound `mainFormalError`.
+* `mainFormal` — the paper theorem statement, taking a projective strategy that
+  passes the LID test with probability `≥ 1 − ε`, together with the explicit
+  boundary hypotheses `0 < d`, `0 < k`, and `400md ≤ k`, and producing the three
+  pointwise consistency targets at error bound `mainFormalError`.
 
 ## References
 
@@ -564,11 +565,11 @@ theorem mainFormal_ofRoleResidualAndRepairedBridge
 
 /-- Successor-case construction of the Section 6 projective-completion residual.
 
-Paper origin: `references/ldt-paper/inductive_step.tex`, lines 26--236, where
-the successor step restricts the strategy to predecessor slices, applies the
-induction hypothesis and the Section 9 self-improvement theorem slice by slice,
-pastes the resulting families, and then transports the Section 6 witness through
-the final projectivization and completion cascade used by `thm:main-formal`.
+Paper origin: `references/ldt-paper/inductive_step.tex`, lines 352--386, where
+the proof of `thm:main-induction` introduces the restricted strategies and their
+failure probabilities, and lines 26--236, where the proof of `thm:main-formal`
+transports the Section 6 witness through the final projectivization and
+completion cascade.
 
 This is not an additional hypothesis of the paper theorem `mainFormal`; it is an
 open construction tracked separately.  The available structural constructors live in
