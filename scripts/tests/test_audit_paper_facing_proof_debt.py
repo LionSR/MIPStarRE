@@ -154,6 +154,31 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
             self.assertEqual(result.scanned_refs, 1)
             self.assertEqual(result.findings, ())
 
+    def test_conditional_declaration_name_in_paper_facing_entry_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem mainFormal_ofRepairedBridge (h : P) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:main-formal}
+                  \lean{MIPStarRE.mainFormal_ofRepairedBridge}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root)
+            self.assertEqual(result.scanned_refs, 1)
+            self.assertEqual(result.findings, ())
+            self.assertEqual(len(result.conditional_decl_findings), 1)
+            self.assertEqual(result.conditional_decl_findings[0].token, "_ofRepairedBridge")
+
     def test_plain_hypotheses_bundle_is_not_a_finding(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
