@@ -326,7 +326,11 @@ The fix in `Final.lean` is identical (adding a missing parenthesis in a `gcongr`
 
 ### 9.2 #1369 vs #1374
 
-Issue #1369 ("Construct answer-valued successor inputs for MainFormal") is an umbrella that covers the same work as #1374's new hypotheses. #1374 moves the gap into `mainFormal`'s hypothesis list; #1375/#1376/#1035 are the actual sub-gaps.
+Issue #1369 ("Construct answer-valued successor inputs for MainFormal") is an
+umbrella for the same mathematical work that #1374 tried to expose through new
+hypotheses.  Under the current policy, that work should instead be represented
+by producer obligations or conditional helpers; #1375/#1376/#1035 are the actual
+sub-gaps.
 
 **Recommendation:** Close #1369 as superseded by the combination of #1374 + #1375 + #1376 + #1035.
 
