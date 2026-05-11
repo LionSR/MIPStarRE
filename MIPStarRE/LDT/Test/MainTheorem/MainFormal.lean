@@ -597,9 +597,11 @@ theorem mainFormal_ofRoleResidualAndRepairedBridge
 
 /-- Base-case orthonormalization input construction for `mainFormal`.
 
-Paper origin: `references/ldt-paper/inductive_step.tex:26-236`
-(proof of `\label{thm:main-formal}`, base case of the
-orthonormalization and completion argument); blueprint
+Paper origin: the orthonormalization and completion step in the proof of
+`\label{thm:main-formal}`,
+`references/ldt-paper/inductive_step.tex:136-160`; the `m = 1` selection
+follows the base case of `\label{thm:main-induction}` at
+`references/ldt-paper/inductive_step.tex:418-432`.  Blueprint:
 `\label{def:main-formal-step6-hypotheses}`.
 
 This construction names the remaining base-case analytic obligation for
