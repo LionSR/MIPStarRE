@@ -12,16 +12,10 @@ Instructions:
    - On an issue: create a new branch `codex/issue-<NUMBER>-<short-description>` from main, edit, build, commit with prefix `[codex]`, push.
 5. Reply via `gh pr comment <num>` or `gh issue comment <num>` summarizing what you did or answering the question. For review-thread triggers, reply directly to the triggering thread.
 6. Do NOT resolve review threads — leave resolution to humans or the automated review workflow.
-7. Changing a source-labelled theorem away from the statement in
-   `references/ldt-paper/` is strongly discouraged unless forced by faithful
-   formal encoding or documented mathematical necessity. Do not add bridge,
-   residual, repair, producer, package, or arbitrary implication hypotheses to a
-   paper theorem; stop and comment if the proof cannot be closed from the paper
-   hypotheses.
 
 Quality bar (your work MUST satisfy ALL of these before committing):
 - Proof integrity (BLOCKER): no `sorry`, `admit`, `native_decide` on non-trivial goals, `unsafeCast`, or new axioms. See docs/PROOF_INTEGRITY.md.
-- Proof correctness (BLOCKER): structured proofs, not brute-force `simp`/`omega`/`ring` chains. If a result looks wrong, too strong, or suspiciously general, scout `references/ldt-paper/` for the original theorem, compare hypotheses/conclusions, and cite the specific path, line, and label.
+- Proof correctness (BLOCKER): structured proofs, not brute-force `simp`/`omega`/`ring` chains. If a result looks wrong, too strong, or suspiciously general, scout `references/ldt-paper/` for the original LDT theorem statements and proofs, compare hypotheses/conclusions, cite the specific paper/section.
 - Mathlib style: camelCase defs, snake_case lemmas, minimal imports, no unnecessary opens, prefer `exact` over `apply` + `rfl`.
 - Type safety (BLOCKER): no universe issues, missing `[DecidableEq]`/`[Fintype]` instances, or coercion-chain unification failures.
 - Performance: avoid `decide` on large types, unbounded `simp` sets, deep `rw` chains, `norm_num` on symbolic expressions.
@@ -30,4 +24,9 @@ Quality bar (your work MUST satisfy ALL of these before committing):
 - Blueprint sync: when adding or completing (removing `sorry` from) theorems/lemmas/defs, update the corresponding `blueprint/src/chapter/` entry — add `\lean{DeclarationName}` and `\leanok` tags for new results, or add `\leanok` to `\begin{proof}` for newly proven results.
 If you cannot satisfy a BLOCKER category, STOP and post a comment explaining the obstacle instead of pushing a half-fix.
 
-Before changing theorem statements, first try to complete the proof using existing lemmas and compare against `references/ldt-paper/`. Do not leave unrelated new sorrys.
+Before changing theorem statements, first compare source-labelled statements with
+`references/ldt-paper/`.  Do not add bridge, residual, repair, package,
+producer, or arbitrary hypothesis inputs to a paper-labelled theorem in order to
+make the proof close.  If such an input is genuinely needed, state a separately
+named conditional helper and report the paper-faithful theorem as the remaining
+proof obligation.  Do not leave unrelated new sorrys.
