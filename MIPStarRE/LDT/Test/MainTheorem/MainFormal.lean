@@ -801,8 +801,10 @@ theorem mainFormal
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
+  refine mainFormal_ofRepairedBridge params strategy eps hd hpass k hk hk0 ?_
   -- TODO(#1458, #422, #931): derive the repaired bridge used by
   -- `mainFormal_ofRepairedBridge` from the hypotheses of the paper theorem.
+  intro scalars roleResidual
   sorry
 
 end Test
