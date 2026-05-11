@@ -36,7 +36,7 @@ The project therefore distinguishes three objects.
 |--------|------------------|------------------|
 | Paper theorem | Matches the cited result in `references/ldt-paper/` | May be linked by the source-labelled `\lean{}`; statement-level `\leanok` only when the statement matches |
 | Producer obligation | Proves a missing intermediate mathematical input from paper hypotheses | May contain a tracked `sorry` while the proof is open |
-| Conditional helper | Uses an additional bridge-like input to prove a useful consequence | Must be named conditionally and must not be advertised as the paper theorem |
+| Conditional helper | Uses an additional bridge-like input to prove a useful consequence | Allowed only as explicitly labelled scaffolding; it must not be advertised as the paper theorem |
 
 It is never allowed to change the public statement of a declaration advertised
 as the formalization of a source-labelled paper theorem.  At the final assembly
@@ -75,10 +75,11 @@ are being actively removed.
    fact not yet formalized, state it as a separate producer obligation.  A
    temporary `sorry` in this producer is preferable to adding the obligation as
    a hypothesis on the paper theorem.
-4. **Use conditional helpers only with conditional names.**  A helper such as
+4. **Use conditional helpers only as local scaffolding.**  A helper such as
    `mainFormal_ofRepairedBridge` or `selfImprovement_assumingBridgeInputs` may
-   be useful during assembly, but it is not the paper theorem and should not
-   receive the source-labelled blueprint `\leanok`.
+   clarify an assembly step, but only if the paper-facing declaration remains
+   source-faithful.  The helper is not the paper theorem and should not receive
+   the source-labelled blueprint `\leanok`.
 5. **Audit the final statement.**  Every PR touching a source-labelled theorem
    should compare paper assumptions and Lean assumptions, paper conclusion and
    Lean conclusion, and report whether the Lean statement is exact, has only
@@ -444,7 +445,7 @@ structure SelfImprovementBridgeInputs (params : Parameters) [FieldModel params.q
     FinalFieldsInput params strategy eps delta nu
 ```
 
-A temporary conditional helper can take
+A separately named conditional helper may take
 `(h : SelfImprovementBridgeInputs params strategy eps delta nu)` as a
 hypothesis and project the needed field inside the proof body.  This does not
 prove the corresponding paper theorem.  The package should be eliminated by
