@@ -218,10 +218,10 @@ noncomputable def orthonormalizationError (ζ : Error) : Error :=
 
 /-- Error bound of the direct completion-route orthonormalization theorem.
 
-The paper proves the sharper `orthonormalizationError ζ`.  The current direct
-completion route first converts the completed measurement's `2ζ`
-self-consistency estimate into a `4ζ` source-almost-projective estimate, and
-therefore uses this weaker named envelope. -/
+The paper proves the sharper `orthonormalizationError ζ`.  The direct completion
+route first converts the completed measurement's `2ζ` self-consistency estimate
+into a `4ζ` source-almost-projective estimate, and therefore uses this weaker
+named envelope. -/
 noncomputable def orthonormalizationCompletionRouteError (ζ : Error) : Error :=
   120 * Real.rpow ζ (1 / (4 : Error))
 

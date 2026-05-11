@@ -75,11 +75,11 @@ lemma orthonormalizationMainLemmaError_two_mul_le_orthonormalizationError
     _ ≤ 100 * Real.rpow ζ (1 / (4 : Error)) := by
           exact mul_le_mul_of_nonneg_right hconst hquart_nonneg
 
-/-- Bookkeeping for the current direct completion route for the submeasurement
-orthonormalization theorem.  Completion gives a `2ζ` self-consistency estimate;
-the formal repair route converts this to a `4ζ` source-almost-projective
-estimate before applying the local `84·ζ^{1/4}` repair theorem, giving the
-weaker named envelope `orthonormalizationCompletionRouteError ζ`. -/
+/-- Error bound for the completion-route proof of the orthonormalization theorem.
+The completion step gives a `2ζ` self-consistency estimate; converting this to
+a source-almost-projective estimate doubles the scalar to `4ζ`, and applying
+the local `84·ζ^{1/4}` repair bound then gives the named envelope
+`orthonormalizationCompletionRouteError ζ`. -/
 lemma completionRouteError_bound
     (ζ : Error) (hζ : 0 ≤ ζ) :
     orthonormalizationMainLemmaError (consistencyToAlmostProjectiveError (2 * ζ)) ≤

@@ -433,7 +433,7 @@ rounding-to-projectors results.
 The direct `Q/X/XHat/P` route on the option-completed measurement produces the
 named envelope `orthonormalizationCompletionRouteError ζ = 120 * ζ^(1/4)`.
 The stronger input-driven theorem `orthonormalization_ofInput` remains
-available with the public symbolic bound
+available with the symbolic bound
 `orthonormalizationError ζ = 100 * ζ^(1/4)` when a stronger
 locality-preserving repair witness is supplied separately. -/
 theorem orthonormalization {Outcome : Type*}
