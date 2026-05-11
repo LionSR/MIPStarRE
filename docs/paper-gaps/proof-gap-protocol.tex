@@ -70,16 +70,16 @@ as an additional theorem hypothesis.
 A conditional helper is a separately named theorem whose statement explicitly
 assumes a proof obligation.  Names such as
 \leanid{mainFormal\_ofRepairedBridge},
-\leanid{orthonormalization\_ofInput}, or \leanid{...\_assuming...} are
-acceptable when the declaration is not presented as the source theorem.  A
-conditional helper is useful because it preserves proof content downstream of a
-gap, but it does not close the source theorem.
+\leanid{orthonormalization\_ofInput}, or names whose suffix advertises the
+assumed obligation are acceptable when the declaration is not presented as the
+source theorem.  A conditional helper is useful because it preserves proof
+content downstream of a gap, but it does not close the source theorem.
 
-\section{Bridge, residual, repair, package}
+\section{Bridge, residual, repair, input, package}
 
-The words \emph{bridge}, \emph{residual}, \emph{repair}, and \emph{package} are
-not inherently bad.  They become dangerous when their mathematical status is
-unclear.
+The words \emph{bridge}, \emph{residual}, \emph{repair}, \emph{input}, and
+\emph{package} are not inherently bad.  They become dangerous when their
+mathematical status is unclear.
 
 \paragraph{Bridge.}
 A bridge should be a transport theorem between two already defined
@@ -96,6 +96,14 @@ It is often a useful way to record the exact missing target after a completed
 construction.  A residual is acceptable as the conclusion of a helper theorem or
 as the input of a conditional helper.  It is not an acceptable new assumption on
 a paper theorem unless the paper itself assumes that residual.
+
+\paragraph{Input.}
+An input is a named bundle of data or hypotheses consumed by a construction or
+conditional helper.  It is acceptable when each load-bearing field is either part
+of the source hypotheses or is produced by an earlier theorem.  It becomes proof
+debt when the bundle is merely assumed because the construction of its fields is
+missing.  It becomes theorem drift when such a bundle is added to the public
+statement of a source theorem.
 
 \paragraph{Repair.}
 A repair is a mathematical construction which replaces an approximate or
@@ -191,11 +199,14 @@ definition error from becoming a global theorem-statement error.
 \textbf{Shape} & \textbf{Allowed use} & \textbf{Forbidden use} \\
 \hline
 Paper-facing theorem & Matches the source statement up to faithful encoding &
-Carries non-paper bridge, residual, repair, producer, or package hypotheses \\
+Carries non-paper bridge, residual, repair, input, producer, or package
+hypotheses \\
 Conditional helper & Assumes a named obligation and has a conditional name &
 Is linked as the source theorem or marked as proof-complete for that theorem \\
 Producer theorem & Constructs the obligation from paper hypotheses & Merely
 repackages the obligation as an assumption \\
+Input bundle & Collects produced data for a local construction & Is assumed by a
+source theorem instead of being produced \\
 Package structure & Bundles constructed data and estimates & Hides unproved
 fields that are then assumed by a source theorem \\
 Paper-gap note & Documents a real mathematical or formal-statement divergence &
@@ -226,26 +237,20 @@ When a source-labelled proof is blocked, use the following order.
   notes, not in the source theorem block.
 \end{enumerate}
 
-\section{Review checklist}
+\section{Review questions}
 
-A reviewer should ask the following questions before accepting a proof-debt
-repair.
-
-\begin{enumerate}
-  \item Does every paper-labelled declaration have the same hypotheses and
-  conclusion as the cited source, up to faithful formal encoding?
-  \item Are bridge, residual, repair, producer, input, or package assumptions
-  absent from paper-facing theorem signatures unless they occur in the paper?
-  \item If a conditional helper remains, is its name explicitly conditional and
-  is it absent from source theorem \verb|\leanok| claims?
-  \item Does each load-bearing package field have a producer, a tracked issue,
-  or an explicit \verb|sorry| at the producer site?
-  \item If a definition changed, has the downstream subtree been rechecked
-  against the corrected definition rather than locally patched?
-  \item If the formal statement differs from the source statement, is there a
-  paper-gap note explaining the mathematical difference and a plan to remove or
-  justify it?
-\end{enumerate}
+A reviewer should first compare every paper-labelled declaration with the cited
+source statement, checking both hypotheses and conclusion up to faithful formal
+encoding.  Bridge, residual, repair, producer, input, and package assumptions
+should be absent from paper-facing theorem signatures unless they occur in the
+paper.  If a conditional helper remains, its name should be explicitly
+conditional and it should not support a source theorem \verb|\leanok| claim.
+Each load-bearing package or input field should have a producer, a tracked issue,
+or an explicit \verb|sorry| at the producer site.  When a definition has changed,
+the downstream subtree should be checked against the corrected definition rather
+than patched locally.  Finally, if the formal statement genuinely differs from
+the source statement, a paper-gap note should explain the mathematical
+difference and give a plan to remove or justify it.
 
 \section{Conclusion}
 
