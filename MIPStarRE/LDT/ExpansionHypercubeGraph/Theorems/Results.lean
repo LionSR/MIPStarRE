@@ -264,7 +264,24 @@ theorem laplacianRewrite (params : Parameters) :
 
 /-! ## Public theorem wrappers -/
 
-/-- `lem:local-to-global`. -/
+/-- The local variance for a bipartite state when the operator family acts on
+the left tensor factor.  The squared difference is represented as
+`(leftTensor (A u) - leftTensor (A v))ᴴ *
+  (leftTensor (A u) - leftTensor (A v))`; for self-adjoint `A u`, this is the
+operator-square expression appearing in the paper. -/
+noncomputable def bipartiteLocalVariance (params : Parameters)
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (A : Point params → MIPStarRE.Quantum.Op ιA) (ψ : QuantumState (ιA × ιB)) : Error :=
+  localVariance params (fun u => leftTensor (ι₂ := ιB) (A u)) ψ
+
+/-- The global variance for a bipartite state when the operator family acts on
+the left tensor factor. -/
+noncomputable def bipartiteGlobalVariance (params : Parameters)
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (A : Point params → MIPStarRE.Quantum.Op ιA) (ψ : QuantumState (ιA × ιB)) : Error :=
+  globalVariance params (fun u => leftTensor (ι₂ := ιB) (A u)) ψ
+
+/-- General local-to-global inequality for an arbitrary operator family. -/
 lemma localToGlobal (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
     globalVariance params A ψ ≤ (params.m : Error) * localVariance params A ψ := by
@@ -275,6 +292,20 @@ lemma localToGlobal (params : Parameters)
   · rw [globalVariance_eq_zero_of_isEmpty hι params A ψ,
       localVariance_eq_zero_of_isEmpty hι params A ψ]
     positivity
+
+/-- `lem:local-to-global`, in bipartite form.
+
+This is the local-to-global variance inequality for the bipartite operator
+family `A^u ⊗ I`.  The surrounding paper section discusses positive
+contractions, but the spectral estimate itself is valid for every operator
+family. -/
+lemma localToGlobalBipartite (params : Parameters)
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (A : Point params → MIPStarRE.Quantum.Op ιA)
+    (ψ : QuantumState (ιA × ιB)) :
+    bipartiteGlobalVariance params A ψ ≤
+      (params.m : Error) * bipartiteLocalVariance params A ψ := by
+  exact localToGlobal params (fun u => leftTensor (ι₂ := ιB) (A u)) ψ
 
 /-- `lem:local-rewrite`. -/
 lemma localRewrite (params : Parameters)

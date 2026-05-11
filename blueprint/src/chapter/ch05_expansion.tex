@@ -301,7 +301,7 @@
 \end{proof}
 
 \begin{lemma}[Local-to-global inequality]\label{lem:local-to-global}
-	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.localToGlobal}
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.localToGlobalBipartite}
 	\leanok
 	\uses{cor:laplacian-spectral-gap, lem:local-rewrite, lem:global-rewrite}
 	For every family $\{A^u\}$,
@@ -311,6 +311,7 @@
 \end{lemma}
 \begin{proof}
 	\leanok
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.localToGlobal}
 	\uses{lem:local-rewrite, cor:laplacian-spectral-gap, lem:global-rewrite}
 	\begin{equation}
 		\begin{aligned}
