@@ -62,9 +62,10 @@
 	% record contains positive semidefinite density matrices of arbitrary
 	% normalized trace; this matches the paper's convention that a state is
 	% normalized.
-	% The Lean statement no longer requires explicit spectral-truncation and
-	% locality-preserving repair witnesses as hypotheses; they are supplied
-	% internally by the Section 5 rounding-to-projectors results.
+	% The Lean wrapper now uses the currently formalized direct local $Q/X/\widehat X/P$
+	% repair route on the completed measurement. That route yields the explicit
+	% envelope $120\zeta^{1/4}$; the stronger symbolic $100\zeta^{1/4}$ bound remains
+	% available in the input-driven theorem `orthonormalization_ofInput`.
 	\uses{def:strong-self-consistency, def:approx_delta}
 	Let $\ket{\psi}$ be a permutation-invariant state,
 	and let $A = \{A_a\}$ be a sub-measurement with strong self-consistency
@@ -75,7 +76,7 @@
 	\]
 	Then there exists a projective sub-measurement $P = \{P_a\}$ such that
 	\[
-		A_a \ot I \approx_{100 \zeta^{1/4}} P_a \ot I.
+		A_a \ot I \approx_{120 \zeta^{1/4}} P_a \ot I.
 	\]
 \end{theorem}
 
@@ -305,9 +306,10 @@
 	Paper origin: \texttt{references/ldt-paper/orthonormalization.tex} lines 534--860 (rank reduction and the $Q$-side setup, including \ref{lem:xa-t} and \ref{lem:qa-restated}) and 862--1194 (the $X/\widehat X/P$ algebra: \ref{lem:X-squared}, \ref{lem:X-hat-squared}, \ref{lem:X-times-X-hat}, \ref{lem:squared-difference}, \ref{lem:P-projectivity}, \ref{lem:P-Q-approx}, plus the final triangle-inequality assembly producing the $84\zeta^{1/4}$ bound). Together these are the late repair stage of the orthogonalization-lemma proof.
 
 	Current Lean status: the declaration proves the direct local $Q/X/\widehat X/P$
-	route under a normalized bipartite state and the source almost-projective estimate
-	for the left-lifted measurement. It therefore yields a locality-preserving repair
-	with the explicit error $84\zeta^{1/4}$, rather than the earlier placeholder
+	route under a normalized bipartite state, the source almost-projective estimate
+	for the left-lifted measurement, and an explicit spectral-truncation witness for
+	that left-lifted family. It therefore yields a locality-preserving repair with
+	the explicit error $84\zeta^{1/4}$, rather than the earlier placeholder
 	interface at error $\mathsf{roundingToProjectiveError}(\zeta)$.
 
 	More precisely, if $\ket{\psi}$ is a normalized bipartite state, if
