@@ -79,11 +79,11 @@
 	\]
 \end{theorem}
 
-\begin{remark}[Lean residual-domination interfaces]\label{rem:lean-residual-domination-interfaces}
+\begin{remark}[Lean auxiliary declarations: residual domination]\label{rem:lean-residual-domination-declarations}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas, MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationInputWithResidualDomination, MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization_with_total_le_of_residual_domination}
-	The following are Lean auxiliary interfaces, not additional hypotheses in the
+	The following are Lean auxiliary declarations, not additional hypotheses in the
 	statement of Theorem~\ref{thm:orthonormalization}.
 	Let \(A=\{A_a\}_{a\in\mathcal A}\) be a sub-measurement, and complete it to
 	\(\widehat A\) on \(\mathcal A\cup\{\bot\}\) by setting
@@ -122,14 +122,14 @@
 	helper compares right- and left-tensor placements at the level of the
 	underlying state-dependent-distance form.  Its submeasurement and indexed
 	wrappers transport state-dependent distance to the right register under the
-	permutation-invariance hypothesis on the state.  The remaining two
-	declarations package this transport with the orthonormalize-and-complete
+		permutation-invariance hypothesis on the state.  The remaining two
+		declarations combine this transport with the orthonormalize-and-complete
 	output so that the line-156 projectivization handoff can later be produced
 	from the two completed measurements without restating the tensor-factor
 	bookkeeping.
 \end{remark}
 
-\begin{remark}[Lean line-169 projectivization match-mass interface]\label{rem:lean-line169-projectivization-match-mass}
+\begin{remark}[Lean line-169 projectivization match-mass declarations]\label{rem:lean-line169-projectivization-match-mass}
 	\uses{thm:orthonormalization, prop:completing-to-measurement, prop:triangle-sub}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.completeAtOutcomeProj_left_matchMass_ge, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_completeAtOutcomeProj}
@@ -281,18 +281,21 @@
 	\]
 \end{lemma}
 
-\begin{remark}[Lean interfaces for the orthogonalization lemma]\label{rem:lean-orthonormalization-main-interfaces}
+\begin{remark}[Lean auxiliary declarations for the orthogonalization lemma]\label{rem:lean-orthonormalization-main-declarations}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma_local}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement}
 	\uses{lem:orthonormalization-main-lemma, lem:left-lifted-projectivization-repair}
 	The current Lean declarations for Lemma~\ref{lem:orthonormalization-main-lemma}
-	are conditional interfaces.  They take explicit spectral-truncation and
-	locality-preserving repair data as inputs, representing the $Q/X/\widehat X/P$
-	part of the paper proof.  These inputs are not hypotheses of the paper lemma;
-	they are construction data that must eventually be produced from the paper's
+	are conditional declarations.  They take explicit spectral-truncation and
+	repair data as inputs, representing the $Q/X/\widehat X/P$ part of the paper
+	proof.  For \texttt{orthonormalizationMainLemma\_local} and
+	\texttt{orthonormalizationMeasurement}, the repair data is
+	locality-preserving, requiring the repaired family to have the form
+	$P_a\otimes I$.  These inputs are not hypotheses of the paper lemma; they are
+	auxiliary hypotheses that must eventually be produced from the paper's
 	assumptions.  Consequently the paper lemma above is not marked as formally
-	completed by these conditional declarations.
+	proved by these conditional declarations.
 \end{remark}
 
 \begin{lemma}[Locality-preserving projectivization repair]\label{lem:left-lifted-projectivization-repair}
@@ -305,16 +308,16 @@
 	\[
 		A_a \ot I \approx_{\mathsf{roundingToProjectiveError}(\zeta)} P_a \ot I.
 	\]
-	The locality-preserving form -- output $P_a \ot I$ rather than an arbitrary lifted family -- is the form recorded in Remark~\ref{rem:lean-orthonormalization-main-interfaces}; it is transported through the $Q/X/\widehat X/P$ algebra via the rectangular polar decomposition for the sigma-range embedding.
+	The locality-preserving form -- output $P_a \ot I$ rather than an arbitrary lifted family -- is the form recorded in Remark~\ref{rem:lean-orthonormalization-main-declarations}; it is transported through the $Q/X/\widehat X/P$ algebra via the rectangular polar decomposition for the sigma-range embedding.
 \end{lemma}
 \begin{proof}
 	The paper's argument transports the rounded family produced by \ref{lem:projective-non-measurement} through the $Q/X/\widehat X/P$ algebra (\ref{lem:X-squared}, \ref{lem:X-hat-squared}, \ref{lem:X-times-X-hat}, \ref{lem:squared-difference}, \ref{lem:P-projectivity}, \ref{lem:P-Q-approx}) and then descends to the locality-preserving lifted form. The proof is not yet complete (tracked by \href{https://github.com/LionSR/MIPStarRE/issues/1032}{issue 1032}).
 \end{proof}
 
-\begin{remark}[Conditional local orthogonalization interface]\label{rem:conditional-orthonormalization-main-lemma-local}
+\begin{remark}[Lean conditional declaration: local orthogonalization]\label{rem:conditional-orthonormalization-main-lemma-local}
 	\uses{def:strong-self-consistency, def:approx_delta}
-	This is the local form of the Lean interface recorded in
-	Remark~\ref{rem:lean-orthonormalization-main-interfaces}.
+	This is the local Lean declaration recorded in
+	Remark~\ref{rem:lean-orthonormalization-main-declarations}.
 	Let $\ket{\psi}$ be a unit vector, let $A = \{A_a\}$ be a measurement, and
 	let $0 \leq \zeta \leq 1$. Assume bipartite strong self-consistency
 	\[
@@ -341,10 +344,10 @@
 	$84\zeta^{1/4}$.
 \end{remark}
 
-\begin{remark}[Conditional measurement-level orthogonalization interface]\label{rem:conditional-orthonormalization-measurement}
+\begin{remark}[Lean conditional declaration: measurement-level orthogonalization]\label{rem:conditional-orthonormalization-measurement}
 	\uses{def:strong-self-consistency, def:approx_delta}
-	This is the measurement-level Lean interface recorded in
-	Remark~\ref{rem:lean-orthonormalization-main-interfaces}.
+	This is the measurement-level Lean declaration recorded in
+	Remark~\ref{rem:lean-orthonormalization-main-declarations}.
 	Let $\ket{\psi}$ be a unit vector, let $A = \{A_a\}$ be a measurement, and
 	let $0 \leq \zeta \leq 1$. Assume bipartite strong self-consistency of $A$
 	together with the spectral-truncation and locality-preserving repair
@@ -353,8 +356,8 @@
 	\[
 		A_a \ot I \approx_{100 \zeta^{1/4}} P_a \ot I.
 	\]
-	Apply Remark~\ref{rem:conditional-orthonormalization-main-lemma-local} and weaken the error
-	using $84 \leq 100$ and $\zeta^{1/4} \geq 0$. No completion step is
+	By the estimate in Remark~\ref{rem:conditional-orthonormalization-main-lemma-local},
+	weaken the error using $84 \leq 100$ and $\zeta^{1/4} \geq 0$. No completion step is
 	needed because $A$ is already a measurement.
 \end{remark}
 
@@ -808,12 +811,12 @@
 		\[
 			X = U \cdot \Sigma_{m \times d} \cdot V^\dagger.
 		\]
-		The formalization has two closely related interfaces.  The reduced data
-		package records the downstream consequences of the choice: the matrices $X$
+		The formalization has two closely related auxiliary declarations.  The reduced
+		datum records the downstream consequences of the choice: the matrices $X$
 		and $\widehat X$, the identities $X^\dagger X=Q$,
 		$\widehat X\widehat X^\dagger=I$, and $X^\dagger\widehat X=\sqrt Q$,
 		together with the $Q_a=X^\dagger T_aX$ restatement.  The rectangular-SVD
-		producers take explicit matrices $U,V,\Sigma,I_{m\times d}$ and derive the
+		lemmas take explicit matrices $U,V,\Sigma,I_{m\times d}$ and derive the
 		two stored $\widehat X$ identities from the matrix calculation below.
 	\end{definition}
 
@@ -839,7 +842,7 @@
 		\[
 			\widehat{X} = U \cdot I_{m \times d} \cdot V^\dagger.
 		\]
-		We take $\widehat X$ to be the reduced matrix supplied by the data package.
+		We take $\widehat X$ to be the reduced matrix supplied by the stored datum.
 		For each $a$, define
 		\[
 			\widehat{X}_a = T_a \cdot \widehat{X},
@@ -1081,7 +1084,7 @@
 		by the QXP construction.  The formal lemma
 		\texttt{rectangularSvd\_middle\_eq\_sqrt\_of\_square} records the spectral
 		step: a positive middle factor whose square is $Q$ is the positive square
-		root of $Q$.  The reduced data package then records this mixed-product
+		root of $Q$.  The reduced datum then records this mixed-product
 		identity as a primitive consequence, which is exactly the part needed in
 		\ref{lem:squared-difference} and \ref{lem:P-Q-approx}.  The companion paper
 		identity for $X\widehat X^\dagger$ is not used downstream.
@@ -1136,7 +1139,7 @@
 		\[
 			\sum_a P_a=\widehat X^\dagger\widehat X,
 		\]
-		and the resulting total-domination interfaces used later in the monotone-total self-improvement route.
+		and the resulting total-domination estimates used later in the monotone-total self-improvement route.
 	\end{proof}
 
 	\begin{lemma}[$P$ is close to~$Q$]\label{lem:P-Q-approx}
@@ -1155,10 +1158,10 @@
 		\uses{lem:projective-low-rank-sum, lem:q-almost-projective, lem:sqrt-Q-completeness, lem:xa-t, lem:qa-restated, lem:X-expression-to-Q-expression, lem:pa-restated, lem:X-hat-squared, lem:X-times-X-hat, lem:squared-difference, lem:P-projectivity}
 		The formal proof follows this argument directly from the primitive
 		$X$, $\widehat X$, and $P$ identities; the $30\zeta^{1/4}$ estimate is
-		derived here rather than stored as part of the data package.  The
-		rectangular-SVD producer combines the same estimate with the positive-square
+		derived here rather than stored as part of the reduced datum.  The
+		rectangular-SVD lemma combines the same estimate with the positive-square
 		identification of the middle factor from \ref{lem:X-times-X-hat}.  The
-		positive-Gram sigma-space producer also records the coisometry
+		positive-Gram sigma-space lemma also records the coisometry
 		\(X X^\dagger=I\) for the original sigma embedding when the projective
 		\(Q\)-family is subnormalized; this is the construction-level hypothesis
 		later used in the residual-domination argument for the fresh completed
