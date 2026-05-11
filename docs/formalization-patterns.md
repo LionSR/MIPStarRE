@@ -229,9 +229,10 @@ appeared non-green there (Ch09 pasting lemmas, Ch10 induction helpers)
 already have `\leanok` in the current blueprint source files.  The web
 build needs regeneration.
 
-### Deliberate absence of `\leanok`
+### Deliberate withholding of `\leanok`
 
-Some nodes have `\lean{}` but deliberately omit `\leanok`:
+Some nodes have `\lean{}` but deliberately omit either statement-level or
+proof-level `\leanok`:
 
 - **`thm:orthonormalization`** (ch04): The Lean statement carries extra
   hypotheses (`OrthonormalizationInput`) that are not yet discharged by
@@ -243,8 +244,10 @@ Some nodes have `\lean{}` but deliberately omit `\leanok`:
   the paper.  The comment in the blueprint explicitly says "no \leanok
   is claimed."
 
-- **`thm:main-formal`** (ch02): The 1 `sorry` in `MainFormal.lean` means
-  the proof chain is not yet closed.
+- **`thm:main-formal`** (ch02): The statement-level `\leanok` records that
+  `MIPStarRE.LDT.Test.mainFormal` is the intended Lean transcription of the
+  theorem statement.  The 1 `sorry` in `MainFormal.lean` means the proof chain
+  is not yet closed, so proof-level `\leanok` is deliberately withheld.
 
 ### The `\uses{}` convention
 
