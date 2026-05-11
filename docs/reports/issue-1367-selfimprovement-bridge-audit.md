@@ -17,7 +17,7 @@
 
 ## Executive Summary
 
-The `SelfImprovementBridgeInputs` package (the three Section 9 hypotheses) and its downstream wiring in `MainInductionStep` and `MainTheorem` are structurally sound. All individual lemmas in `SelfImprovement/` are proved conditional on their explicit hypotheses. The MainInductionStep bridge (`SelfImprovementBridge/Core.lean`) wires SelfImprovement → Pasting correctly. The *only* remaining `sorry` in the entire LDT directory is at `MainFormal.lean:611` (the successor case branch).
+The `SelfImprovementBridgeInputs` package (the three Section 9 hypotheses) and its downstream wiring in `MainInductionStep` and `MainTheorem` are structurally sound. All individual lemmas in `SelfImprovement/` are proved conditional on their explicit hypotheses. The MainInductionStep bridge (`SelfImprovementBridge/Core.lean`) wires SelfImprovement → Pasting correctly. As of 2026-05-08, this report identified the successor-case branch at `MainFormal.lean:611` as the remaining final-theorem `sorry` site.
 
 At the time of this report, PR #1374 proposed adding two new hypotheses to
 `mainFormal` and replacing the `sorry` with a call to existing constructors in
@@ -224,7 +224,7 @@ exact mainFormal_ofRoleResidualAndRepairedBridge herr roleResidual
 | `orthonormalization.repair` (QXP repair) | Hypothesis | New: `of_roleResidual` wraps it | No change | #1032 (QXP construction) |
 | `finalFields` (completeness etc.) | Conditional lemma proved | No change | No change | #1376 (per-slice producer) |
 | `SliceBridgeInputs` wiring | **PROVED** (constructors exist) | No change | No change | #1375 (honest SymStrat) |
-| `MainFormal` successor case | **`sorry`** (line 611) | No change | New: replaced by `hanswerSlice*` hypotheses | #1376 + #1377 + #1035 |
+| `MainFormal` successor case | **Historical, as of 2026-05-08:** `sorry` at line 611 | No change | New: replaced by `hanswerSlice*` hypotheses | #1376 + #1377 + #1035 |
 | `hbaseBridge` construction | Hypothesis | New: `repairedBridgeHypotheses_of_roleResidual` | No change | #1043 |
 
 ---
@@ -378,7 +378,7 @@ sub-gaps.
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/Core.lean` | `SelfImprovementPackage.SliceBridgeInputs`, `ofSliceBridgeInputs`, `selfImprovementInInductionSection` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/AnswerSlice.lean` | `AnswerSelfImprovementPackage.SliceBridgeInputs` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` | `mainInductionByRecursionOnM`, `mainInductionPublicWrapper` |
-| `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | `mainFormal` (1 `sorry` at line 611; closed by #1374) |
+| `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | Historical note: as of 2026-05-08, `mainFormal` had one `sorry` at line 611, which #1374 proposed to close by adding hypotheses |
 | `MIPStarRE/LDT/Test/MainTheorem/RoleRegister.lean` | `successorOfBridgeInputs`, `answerSuccessorOfBridgeInputs`, `rolePackageResidual_ofAnswerSuccessorBridgeInputs` |
 | `MIPStarRE/LDT/Test/MainTheorem/OrdinaryRestriction/Basic.lean` | `MainFormalSuccessorSelfImprovementBridgeInputs` type + constructors |
 | `MIPStarRE/LDT/Test/MainTheorem/AnswerValuedRestriction.lean` | Answer-valued counterpart types + constructors |

@@ -98,11 +98,12 @@ are being actively removed.
        (G : SubMeas (Polynomial params) ι) ... : ...
    ```
 
-3. **Propagation is a warning sign.**  The consumer of a conditional helper
-   should close the hypothesis with a producer theorem as soon as possible.  If
-   the hypothesis propagates upward toward a paper-labelled theorem, the PR
-   should stop and either prove the producer or restore the paper theorem with
-   an explicit unfinished proof.
+3. **Propagation is a warning sign.**  The consumer of
+   `selfImprovementInInductionSection` — typically a
+   `MainInductionStep` wrapper — should close the hypothesis with a producer
+   theorem as soon as possible.  If the hypothesis propagates upward toward a
+   paper-labelled theorem, the PR should stop and either prove the producer or
+   restore the paper theorem with an explicit unfinished proof.
 
 4. **Final closure at the source theorem.**  The theorem `mainFormal` in
    `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` is reserved for the
@@ -163,10 +164,10 @@ construction obligations:
 2. The derivation of `MainFormalRepairedBridgeHypotheses` from the paper
    hypotheses of `mainFormal`.
 
-These are all data-construction obligations.  Once the per-slice
-self-improvement producers and recursive induction packages are threaded
-through, the paper-labelled theorem should call the checked conditional helper
-without adding its bridge inputs to the theorem statement.
+These are data-construction obligations.  Once the per-slice self-improvement
+producers and recursive induction packages are threaded through, the
+paper-labelled theorem should call the conditional helper without adding its
+bridge inputs to the theorem statement.
 
 This is the intended cleanup direction: use the conditional helper only to
 identify reusable proof content, then prove the producers or restore the
