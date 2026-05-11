@@ -40,6 +40,12 @@ axis that matters:
   silent strengthening ("for all $A$" in blueprint vs implicit
   `[Nontrivial A]`/`[Fintype d]`/etc. in Lean that the blueprint
   omits).
+  For a theorem, lemma, or proposition that cites a paper statement,
+  an additional bridge, residual, repair, package, producer, or
+  arbitrary hypothesis input is a mathematical mismatch unless it is a
+  faithful formal encoding of a condition in `references/ldt-paper/`.
+  Missing proof work belongs in a separately named conditional lemma or
+  remark, not in the source-labelled theorem statement.
 - **Conclusion.** Does the blueprint conclusion match the Lean return
   type? Watch for "$X$" vs "$X^\dagger$", "$=$" vs "$\leq$", strict
   vs non-strict inequalities, and conjugate-linear vs linear conventions
@@ -74,8 +80,10 @@ Lean theorem in the diff that should bear one):
   **no `sorry`, `admit`, `native_decide` on non-trivial goals**, and no
   `axiom` introduced in this PR. Read the Lean proof body and check.
   `grep -n 'sorry\|admit' MIPStarRE/...` is a quick first pass.
-- **Missing `\leanok`** is also a sync bug: if the Lean declaration is
-  fully formalized and the blueprint has no `\leanok`, flag it.
+- **Missing `\leanok`** is also a sync bug only when the Lean declaration
+  is fully formalized, contains no proof-evasion device, and is
+  source-faithful under A.1.  Do not recommend `\leanok` for a
+  conditional helper that has extra non-paper hypotheses.
 
 ### A.3 — `\notready` accuracy
 

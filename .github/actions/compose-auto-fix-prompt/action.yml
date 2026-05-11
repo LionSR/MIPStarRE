@@ -89,9 +89,27 @@ runs:
           exit 1
         fi
 
+        source_statement_guard="$(printf '%s\n' \
+          'Source-statement guard:' \
+          '- For any declaration named as, linked to, or documented as a paper theorem,' \
+          '  lemma, or proposition, preserve the statement in `references/ldt-paper/` up to' \
+          '  faithful formal encoding.' \
+          '- Do not repair CI, blueprint sync, or review comments by adding bridge,' \
+          '  residual, repair, package, producer, or arbitrary hypothesis inputs to' \
+          '  a source-labelled theorem unless the cited paper statement contains' \
+          '  that assumption.' \
+          '- If the proof cannot be closed from the paper hypotheses, stop and report' \
+          '  the missing lemma, or create a separately named conditional helper; do not' \
+          '  turn the paper theorem into a conditional theorem.')"
+
         full_prompt="$prompt"
         if [ -n "$PROMPT_CONTEXT" ]; then
           full_prompt="${full_prompt}"$'\n\n'"${PROMPT_CONTEXT}"
+        fi
+        if [[ "$prompt" != *"Statement faithfulness (BLOCKER)"* \
+            && "$prompt" != *"Source-labelled theorem alignment"* \
+            && "$prompt" != *"Source-statement guard:"* ]]; then
+          full_prompt="${full_prompt}"$'\n\n'"${source_statement_guard}"
         fi
         full_prompt="${full_prompt}"$'\n\n'"PR Number: ${PR_NUMBER}"
         full_prompt="${full_prompt}"$'\n'"Repository: ${REPOSITORY}"
