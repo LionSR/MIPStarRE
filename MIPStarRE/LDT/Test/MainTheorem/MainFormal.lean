@@ -321,8 +321,11 @@ structurally stronger statement.  Callers must supply it as a separate
 hypothesis.
 
 Callers constructing `hbaseBridge` for `mainFormal_ofRepairedBridge` should
-instantiate this lemma with their per-role-residual repair witnesses and
-diagonal self-consistency proofs.
+instantiate this lemma with the repair witnesses and diagonal self-consistency
+proofs for the role residual under consideration.  The top-level conditional
+bridge for `mainFormal` uses this constructor only for the checked base-case
+role residual.  Successor-branch bridge data is kept in the separate successor
+residual obligations.
 
 Refs #1359, #1043. -/
 noncomputable def repairedBridgeHypotheses_ofRoleResidual
@@ -351,6 +354,43 @@ noncomputable def repairedBridgeHypotheses_ofRoleResidual
     MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRoleResidual
       roleResidual leftRepair rightRepair
   diagonalConsistency := diagonalConsistency
+
+/-- The checked role-register residual used by the `m = 1` branch of
+`mainFormal`.
+
+Supports the base case (`m = 1`) of the main formal theorem
+`\label{thm:main-formal}` in `references/ldt-paper/inductive_step.tex`.
+The base-case argument uses the residual produced by
+`MainFormalRolePackageResidual.ofBaseCase`; this definition names that choice. -/
+noncomputable def mainFormalBaseRoleResidual
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hm1 : params.m = 1) :
+    MainFormalRolePackageResidual params strategy eps hpass k :=
+  Classical.choice (MainFormalRolePackageResidual.ofBaseCase params strategy eps k hpass hm1)
+
+/-- The remaining repaired input for the base case of `mainFormal`.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:26-236`
+(proof of `\label{thm:main-formal}`, base case of the
+orthonormalization and completion argument); blueprint
+`\label{def:main-formal-step6-hypotheses}`.
+
+This type specializes `MainFormalRepairedBridgeHypotheses` to the checked
+role residual for the base case (`m = 1`).  It records the proof obligation
+left by this specialization, not an additional paper hypothesis. -/
+abbrev MainFormalBaseBranchRepairedBridgeHypotheses
+    (params : Parameters) [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hm1 : params.m = 1)
+    (scalars : MainFormalCascadeScalars params eps k) :
+    Type _ :=
+  MainFormalRepairedBridgeHypotheses params strategy eps k hpass scalars
+    (mainFormalBaseRoleResidual params strategy eps k hpass hm1)
 
 /-- Base-case assembly of `mainFormal` through the repaired line-169 route.
 
@@ -658,8 +698,8 @@ theorem mainFormal_ofRepairedBridge
     (hk : 400 * params.m * params.d ≤ k)
     (hk0 : 0 < k)
     (hbaseBridge : (scalars : MainFormalCascadeScalars params eps k) →
-      ∀ (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k),
-      MainFormalRepairedBridgeHypotheses params strategy eps k hpass scalars roleResidual) :
+      (hm1 : params.m = 1) →
+      MainFormalBaseBranchRepairedBridgeHypotheses params strategy eps k hpass hm1 scalars) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
@@ -736,12 +776,11 @@ theorem mainFormal_ofRepairedBridge
     let scalars : MainFormalCascadeScalars params eps k :=
       MainFormalCascadeScalars.ofNontrivialMainFormal hepsNN hk0 herr
     by_cases hm1 : params.m = 1
-    · -- Base case (m = 1): role residual from checked handoff,
-      -- bridge from the external `hbaseBridge` hypothesis.
-      rcases MainFormalRolePackageResidual.ofBaseCase params strategy eps k hpass hm1 with
-        ⟨roleResidual⟩
+    · -- Base case (m = 1): use the checked base residual and its explicit
+      -- repaired bridge input.
+      let roleResidual := mainFormalBaseRoleResidual params strategy eps k hpass hm1
       exact mainFormal_ofRoleResidualAndRepairedBridge herr roleResidual
-        (hbaseBridge scalars roleResidual)
+        (hbaseBridge scalars hm1)
     · have hprojectiveCompletionResidual :
           Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
             (params := params) (strategy := strategy) (eps := eps)
