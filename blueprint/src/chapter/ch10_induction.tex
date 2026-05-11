@@ -472,8 +472,8 @@
 	\texttt{mainFormal\_ofRoleResidualAndRepairedBridge} combines that diagonal
 	completion input with the checked pre-completion line-169 repair from
 	Remark~\ref{rem:lean-line169-projectivization-match-mass}, so the base branch
-	of \texttt{mainFormal} retains the original final envelope rather than widening
-	to the generic $\zeta_1+\sqrt{\zeta_2}$ scale.  The theorem
+	of \texttt{mainFormal\_ofRepairedBridge} retains the original final envelope
+	rather than widening to the generic $\zeta_1+\sqrt{\zeta_2}$ scale.  The theorem
 	\texttt{baseMainFormal\_ofRepairedBaseBridge} is the base-case wrapper of this
 	role-residual form.
 \end{definition}
@@ -735,7 +735,8 @@ from recursive slice witnesses and answer-side bridge inputs by
 \texttt{MainFormalRolePackageBranchResidual.answerSuccessorOfBridgeInputs}, or
 from a predecessor induction package together with the bridge inputs by
 \texttt{MainFormalRolePackageBranchResidual.answerSuccessorOfInductionPackageAndBridgeInputs}.
-These constructors are structural and do not call \texttt{mainFormal}; the
+These constructors are structural and do not call
+\texttt{mainFormal\_ofRepairedBridge}; the
 line-130 completion interfaces remain separate.  The live completion residual
 carries the concrete role residual rather than a separate decorative branch
 witness; the branch residual types remain the documented base/successor supply
@@ -783,8 +784,10 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 	envelope.  The sharper local pre-completion repair from
 	Remark~\ref{rem:lean-line169-projectivization-match-mass} avoids that
 	widening and is the route used by the present base-case formal assembly.
-	No proof-level completeness tag is claimed here while \texttt{mainFormal}
-	still contains the successor-case completion residual.
+	No proof-level completeness tag is claimed here while
+	\texttt{mainFormal\_ofRepairedBridge} still has an open successor-case
+	completion residual and \texttt{mainFormal} derives the paper theorem via a
+	tracked bridge gap (issue~\#1458).
 
 \end{remark}
 \begin{proof}
