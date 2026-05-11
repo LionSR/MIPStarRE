@@ -532,19 +532,24 @@ abbrev FinalFieldsInput (params : Parameters) [FieldModel params.q]
         (selfImprovementDataProcessingError params eps delta) →
       SelfImprovementFinalFields params strategy H Z eps delta nu
 
-/-! ## Self-improvement bridge inputs
+/-! ## Conditional self-improvement bridge inputs
 
-This structure packages the remaining unproven assumptions of the current
-`selfImprovement` theorem, so that the `mainFormal` chain can name a single
-bridge-package hypothesis rather than three independent `Prop` fields. -/
+This structure is a temporary interface for conditional assembly lemmas.  It is
+not part of the statement of `thm:self-improvement`, and it should not be added
+as a hypothesis to any declaration advertised as the paper theorem.  The
+paper-facing theorem `selfImprovement` must instead obtain these three facts
+from the paper hypotheses, or keep the missing derivation as an explicit proof
+obligation. -/
 
-/-- The three remaining Section 9 assumptions needed by the `selfImprovement` theorem.
+/-- The three remaining Section 9 producer targets for the conditional
+self-improvement assembly.
 
-These are the helper-stage strong self-consistency, the orthonormalization
-bridge input, and the final-fields transport. Grouping them into a named
-structure is the first step toward issue #931: once all three fields are proved,
-replacing this package with a `theorem` (zero-field) closes the remaining
-self-improvement input gap. -/
+The fields are helper-stage strong self-consistency, the orthonormalization
+input, and the final-fields transport.  They are collected only so that
+separately named conditional lemmas such as `selfImprovementFromBridgeInputs`
+can state their assumptions precisely.  The intended cleanup is to prove
+producer theorems for these fields from the source hypotheses and then call the
+conditional assembly internally. -/
 structure SelfImprovementBridgeInputs (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (eps delta nu : Error) where
   /-- Helper-stage strong self-consistency: the averaged `Hhat` is
