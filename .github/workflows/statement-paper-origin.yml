@@ -4,9 +4,9 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
-# Runs as a non-blocking warning during the issue #1384 backfill.
-# Once the backfill lands and zero warnings remain on main, remove
-# ``--warn-only`` to promote this check to a blocking CI guard.
+# Blocking guard for the issue #1379 earn-your-place policy: every
+# Statement/Witness/Hypotheses/Conclusion declaration in MIPStarRE/LDT must
+# cite a paper origin or a documented paper gap at its definition site.
 #
 # See: issue #1413 (CI wiring), ledgers #1379 / #1384 (backfill).
 
@@ -30,27 +30,24 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Run statement paper-origin guard (warn-only)
+      - name: Run statement paper-origin guard
         run: |
+          set -o pipefail
           python3 scripts/check_statement_paper_origin.py \
             --root . \
-            --warn-only \
             2>&1 | tee "$RUNNER_TEMP/statement-paper-origin.log"
-          # tee returns the exit code of the first command (the guard).
-          # --warn-only means violations print to stderr but exit 0.
 
       - name: Surface violations in step summary
         if: always()
         run: |
           {
-            echo "### Statement paper-origin guard (--warn-only)"
+            echo "### Statement paper-origin guard"
             echo
             echo '```text'
             cat "$RUNNER_TEMP/statement-paper-origin.log"
             echo '```'
             echo
-            echo 'This check is **non-blocking**. Once the issue #1384 backfill'
-            echo 'lands and zero violations remain on `main`, remove'
-            echo '`--warn-only` from the workflow to promote it to a'
-            echo 'blocking CI guard.'
+            echo 'This is a blocking check. New statement-like declarations'
+            echo 'must cite either `references/ldt-paper/` or a documented'
+            echo 'paper gap at their definition site.'
           } >> "$GITHUB_STEP_SUMMARY"

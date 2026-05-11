@@ -25,14 +25,11 @@ a fixed line window over arbitrary code/comments) prevents a citation in an
 earlier nearby declaration's docstring from spuriously satisfying the
 linter for a later ``*Statement`` declaration.
 
-Run as a non-blocking warning during the backfill (``--warn-only``).  Once
-issue #1384 lands the warning will be promoted to an error by removing the
-``--warn-only`` flag in the workflow.
+The repository workflow runs this as a blocking guard.  During a future
+backfill or local exploratory audit, pass ``--warn-only`` to print violations
+without failing the command.
 
-Suggested CI wiring (maintainer-provided, since a Claude Code bot cannot
-modify ``.github/workflows/``).  Drop a file
-``.github/workflows/statement-paper-origin.yml`` with the following body to
-run this script on every pull request as a non-blocking warning::
+Suggested CI wiring::
 
     name: Statement paper-origin guard
     on:
@@ -48,9 +45,7 @@ run this script on every pull request as a non-blocking warning::
           - uses: actions/setup-python@v6
             with:
               python-version: '3.12'
-          - run: python3 scripts/check_statement_paper_origin.py --root . --warn-only
-
-Promote to a blocking check by removing ``--warn-only``.
+          - run: python3 scripts/check_statement_paper_origin.py --root .
 """
 
 from __future__ import annotations
