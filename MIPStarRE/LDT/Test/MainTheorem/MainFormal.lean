@@ -595,18 +595,18 @@ theorem mainFormal_ofRoleResidualAndRepairedBridge
           (mainFormalError params k eps) :=
   baseMainFormal_ofRepairedBaseBridge hsmall roleResidual bridge
 
-/-- Base-branch repaired bridge producer for `mainFormal`.
+/-- Base-branch repaired-input producer for `mainFormal`.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:26-236`
 (proof of `\label{thm:main-formal}`, base branch of the Step 6
 orthonormalization and completion cascade); blueprint
 `\label{def:main-formal-step6-hypotheses}`.
 
-This definition names the remaining base-case analytic obligation that was formerly
-an explicit hypothesis of `mainFormal`.  It must construct the line-130
+This opaque definition names the remaining base-case analytic obligation that was
+formerly an explicit hypothesis of `mainFormal`.  It must construct the line-130
 orthonormalization input and the diagonal consistency input for the checked
 base-case role residual. -/
-noncomputable def mainFormalBaseBranchRepairedBridgeProducer
+opaque mainFormalBaseBranchRepairedBridgeProducer
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι)
@@ -616,9 +616,9 @@ noncomputable def mainFormalBaseBranchRepairedBridgeProducer
     (hm1 : params.m = 1)
     (scalars : MainFormalCascadeScalars params eps k) :
     MainFormalBaseBranchRepairedBridgeHypotheses params strategy eps k hpass hm1 scalars := by
-  -- TODO(#1447, #1043, #1359): construct the repaired base-case bridge from the
+  -- TODO(#1447, #1043, #1359): construct the repaired base-case input from the
   -- paper's base Step 6 orthonormalization and completion argument, using the
-  -- checked base-case role residual rather than assuming bridge data in
+  -- checked base-case role residual rather than assuming this input in
   -- `mainFormal`.
   sorry
 
@@ -654,7 +654,7 @@ and weakens it to the predecessor side condition `400 * pred.m * pred.d ≤ k`.
 
 For an arbitrary current parameter bundle, the predecessor decomposition itself is
 now formalized by `Parameters.successorDecompositionOfNeOne`.  The remaining
-base-branch bridge obligation is isolated in
+base-branch repaired-input obligation is isolated in
 `mainFormalBaseBranchRepairedBridgeProducer`, while the successor branch still
 has its own residual obligation.  No checked lemma here claims that the former
 intermediate range `params.m * params.d ≤ k < 400 * params.m * params.d` is
