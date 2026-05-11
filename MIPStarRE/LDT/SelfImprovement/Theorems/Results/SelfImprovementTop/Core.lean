@@ -241,7 +241,7 @@ lemma selfImprovementHelper
   · exact
       helper_point_consistency_of_pointConsistencyAddInU_transfer
         params strategy eps delta heps hdelta hpointTransfer
-  · /- TODO(#1452): Derive `HelperStrongSelfConsistencyProducerInputs` for the
+  · /- TODO(#1514): Derive `HelperStrongSelfConsistencyProducerInputs` for the
       helper output from the Section 9 scalar transport estimates, then prove this
       condition with `helper_strong_self_consistency_of_helper_conclusion` or
       `helper_strong_self_consistency_input_of_producer`.
@@ -395,7 +395,7 @@ theorem selfImprovement
       (polynomialEvaluationFamily params G.toSubMeas) nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu := by
-  -- TODO(#1453): derive the helper strong self-consistency,
+  -- TODO(#1515): derive the helper strong self-consistency,
   -- orthonormalization, and final-fields inputs from the paper hypotheses,
   -- including the incoming consistency hypothesis `hcons`, then invoke
   -- `selfImprovement_assumingFinalFields`.
