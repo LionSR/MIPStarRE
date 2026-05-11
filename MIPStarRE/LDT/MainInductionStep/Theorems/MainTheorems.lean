@@ -204,7 +204,7 @@ theorem mainInduction
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params G.toSubMeas)
         (mainInductionError params k eps delta gamma) := by
-  -- TODO(#1450): prove the paper theorem from `hgood` and `hk` by deriving
+  -- TODO(#1507): prove the paper theorem from `hgood` and `hk` by deriving
   -- the wrapper inputs internally, rather than assuming the successor-stage
   -- packages exposed by `mainInductionPublicWrapper`.
   sorry

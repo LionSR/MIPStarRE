@@ -1,5 +1,7 @@
 import Lean
+import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
 import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
+import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 import MIPStarRE.LDT.Test.MainTheorem
@@ -36,6 +38,17 @@ no longer carries a `sorryAx` dependency.
 The audit for `MainInductionStep.selfImprovementInInductionSection` records
 the current proof obligation for the submeasurement-input statement of
 `thm:self-improvement-in-induction-section`.
+
+The audit for `MainInductionStep.mainInduction` records the current proof
+obligation for `thm:main-induction`: the theorem statement is source-facing, and
+the remaining work is to derive the internal successor-stage inputs from the
+paper hypotheses.  This is tracked by issue #1507.
+
+The audit for `ExpansionHypercubeGraph.laplacianSpectralGapOrdered` records the
+current proof obligation for the ordered-eigenvalue statement of
+`cor:laplacian-spectral-gap`: the theorem statement is source-facing, and the
+remaining work is to connect the Fourier diagonalization to the ordered roots of
+the characteristic polynomial.  This is tracked by issue #1497.
 
 The axiom expectation is attached to each declaration separately. A declaration
 using one of the `assert_*_axioms` commands with `sorryAx` in its expected set
@@ -76,6 +89,16 @@ needed for `selfImprovementInInductionSection`. -/
 private def expectedInductionSelfImprovementAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
+/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1507 derivation
+needed for `mainInduction`. -/
+private def expectedMainInductionAxioms : Array Name :=
+  expectedStandardAxiomsWithSorry
+
+/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1497 derivation
+needed for `laplacianSpectralGapOrdered`. -/
+private def expectedOrderedLaplacianGapAxioms : Array Name :=
+  expectedStandardAxiomsWithSorry
+
 /-- Standard kernel axioms plus `sorryAx`; tracks the issue #1452 derivation
 needed for `selfImprovementHelper`. -/
 private def expectedSelfImprovementHelperAxioms : Array Name :=
@@ -104,6 +127,12 @@ elab "assert_self_improvement_axioms " id:ident : command => do
 elab "assert_induction_self_improvement_axioms " id:ident : command => do
   assertUsesExactlyAxioms id.getId expectedInductionSelfImprovementAxioms
 
+elab "assert_main_induction_axioms " id:ident : command => do
+  assertUsesExactlyAxioms id.getId expectedMainInductionAxioms
+
+elab "assert_ordered_laplacian_gap_axioms " id:ident : command => do
+  assertUsesExactlyAxioms id.getId expectedOrderedLaplacianGapAxioms
+
 elab "assert_self_improvement_helper_axioms " id:ident : command => do
   assertUsesExactlyAxioms id.getId expectedSelfImprovementHelperAxioms
 
@@ -120,4 +149,7 @@ assert_self_improvement_axioms MIPStarRE.LDT.SelfImprovement.selfImprovement
 assert_standard_axioms MIPStarRE.LDT.GlobalVariance.globalVarianceOfPoints
 assert_induction_self_improvement_axioms
   MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection
+assert_main_induction_axioms MIPStarRE.LDT.MainInductionStep.mainInduction
+assert_ordered_laplacian_gap_axioms
+  MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianSpectralGapOrdered
 assert_self_improvement_helper_axioms MIPStarRE.LDT.SelfImprovement.selfImprovementHelper
