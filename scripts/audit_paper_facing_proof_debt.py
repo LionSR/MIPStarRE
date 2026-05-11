@@ -42,6 +42,8 @@ from lean_header_utils import advance_depth, line_number, starts_keyword
 THEOREM_LIKE_ENVS = frozenset({"theorem", "lemma", "proposition", "corollary"})
 
 DEBT_TOKEN_RE = re.compile(
+    r"(?<![A-Za-z0-9_'])"
+    r"(?:"
     r"(?:[A-Za-z_][A-Za-z0-9_']*)?"
     r"(?:Bridge|Residual|Repair|Package|Producer)"
     r"[A-Za-z0-9_']*"
@@ -49,6 +51,8 @@ DEBT_TOKEN_RE = re.compile(
     r"(?:h|has|mk|of)?"
     r"(?:bridge|residual|repair|package|producer)"
     r"[A-Za-z0-9_']*"
+    r")"
+    r"(?![A-Za-z0-9_'])"
 )
 
 @dataclass(frozen=True)
