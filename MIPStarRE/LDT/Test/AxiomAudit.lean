@@ -29,11 +29,14 @@ open Lean Elab Command
 private def expectedStandardAxioms : Array Name :=
   #[``propext, ``Classical.choice, ``Quot.sound].qsort Name.lt
 
-private def expectedOrthonormalizationAxioms : Array Name :=
+private def expectedStandardAxiomsWithSorry : Array Name :=
   #[``propext, ``Classical.choice, ``Quot.sound, ``sorryAx].qsort Name.lt
 
+private def expectedOrthonormalizationAxioms : Array Name :=
+  expectedStandardAxiomsWithSorry
+
 private def expectedTrackedSorryAxioms : Array Name :=
-  #[``propext, ``Classical.choice, ``Quot.sound, ``sorryAx].qsort Name.lt
+  expectedStandardAxiomsWithSorry
 
 private def assertUsesExactlyAxioms (declName : Name) (expected : Array Name) :
     CommandElabM Unit := do
