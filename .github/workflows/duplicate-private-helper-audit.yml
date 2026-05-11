@@ -7,6 +7,7 @@ on:
       - 'MIPStarRE/**/*.lean'
       - 'scripts/audit_conclusion_shaped_hypotheses.py'
       - 'scripts/check_duplicate_private_helpers.py'
+      - 'scripts/lean_header_utils.py'
       - 'scripts/tests/**'
       - '.github/workflows/duplicate-private-helper-audit.yml'
 

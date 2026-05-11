@@ -44,6 +44,7 @@ _LEAN_DECL_RE = re.compile(
     r"(?:\.\{[^}]+\})?",
     re.MULTILINE,
 )
+LEAN_DECL_RE = _LEAN_DECL_RE
 _TRACKED_REVERSE_DECL_KINDS = {"def", "theorem", "lemma"}
 _DIFF_HUNK_RE = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
 _BLUEPRINT_COVERAGE_COMMENT_MARKER = "<!-- blueprint-reverse-coverage-bot -->"
@@ -70,7 +71,7 @@ _TEX_ENV_END_RE = re.compile(
 _TEX_PROOF_BEGIN_RE = re.compile(r"\\begin\{proof\}")
 _TEX_PROOF_END_RE = re.compile(r"\\end\{proof\}")
 
-def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
+def strip_lean_comments_preserve_lines(text: str) -> list[str]:
     """Strip Lean line and block comments while preserving line numbers."""
     stripped: list[str] = []
     block_depth = 0
@@ -222,6 +223,9 @@ def _strip_lean_comments_preserve_lines(text: str) -> list[str]:
     return stripped
 
 
+_strip_lean_comments_preserve_lines = strip_lean_comments_preserve_lines
+
+
 def _line_has_leanok_marker(line: str) -> bool:
     r"""Return whether ``line`` contains an active ``\leanok`` marker.
 
@@ -355,7 +359,7 @@ def _set_proof_has_leanok(entries: list[BlueprintEntry], start: int, end: int) -
 def collect_file_lean_decls(lean_file: Path, lean_root: Path) -> list[LeanDecl]:
     """Parse one Lean file and return its declarations with approximate spans."""
     text = lean_file.read_text(errors="replace")
-    lines = _strip_lean_comments_preserve_lines(text)
+    lines = strip_lean_comments_preserve_lines(text)
     rel = str(lean_file.relative_to(lean_root.parent))
 
     # Track namespace and section stacks separately, plus a combined

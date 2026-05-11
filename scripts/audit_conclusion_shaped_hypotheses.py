@@ -28,6 +28,15 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Iterable, Sequence
 
+from lean_header_utils import (
+    CLOSE_TO_OPEN as _CLOSE_TO_OPEN,
+    OPEN_TO_CLOSE as _OPEN_TO_CLOSE,
+    advance_depth as _advance_depth,
+    identifier_char as _identifier_char,
+    line_number as _line_number,
+    starts_keyword as _starts_keyword,
+)
+
 
 _DECL_RE = re.compile(
     r"(?m)^[ \t]*"
@@ -57,10 +66,6 @@ _TOKEN_STOPLIST = frozenset({
     # Typeclass / framework tokens that occur in nearly every statement.
     "DecidableEq", "Error", "FieldModel", "Fintype", "Nat", "Unit",
 })
-
-_OPEN_TO_CLOSE = {"(": ")", "{": "}", "[": "]", "⦃": "⦄"}
-_CLOSE_TO_OPEN = {v: k for k, v in _OPEN_TO_CLOSE.items()}
-
 
 @dataclass(frozen=True)
 class Binder:
@@ -122,32 +127,6 @@ class AuditResult:
     @property
     def ok(self) -> bool:
         return not self.review_findings
-
-
-def _line_number(text: str, offset: int) -> int:
-    return text.count("\n", 0, offset) + 1
-
-
-def _advance_depth(ch: str, stack: list[str]) -> None:
-    if ch in _OPEN_TO_CLOSE:
-        stack.append(ch)
-    elif ch in _CLOSE_TO_OPEN and stack and stack[-1] == _CLOSE_TO_OPEN[ch]:
-        stack.pop()
-
-
-def _identifier_char(ch: str) -> bool:
-    """Return whether ``ch`` can continue a Lean identifier-like token."""
-    return ch.isalnum() or ch in "_?'"
-
-
-def _starts_keyword(text: str, pos: int, keyword: str) -> bool:
-    """Return whether ``keyword`` starts at ``pos`` as a standalone token."""
-    if not text.startswith(keyword, pos):
-        return False
-    before_ok = pos == 0 or not _identifier_char(text[pos - 1])
-    after = pos + len(keyword)
-    after_ok = after >= len(text) or not _identifier_char(text[after])
-    return before_ok and after_ok
 
 
 def _skip_block_comment(text: str, start: int) -> int | None:

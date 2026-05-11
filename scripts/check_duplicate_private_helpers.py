@@ -22,10 +22,9 @@ from pathlib import Path
 from typing import Iterable, Sequence
 
 from audit_conclusion_shaped_hypotheses import (
-    _line_number,
     _mask_lean_non_code,
-    _starts_keyword,
 )
+from lean_header_utils import line_number, starts_keyword
 
 
 EXCLUDE_DIRS: tuple[str, ...] = (".git", ".lake", "lake-packages", "tmp")
@@ -115,9 +114,9 @@ def _proof_body_span(masked_decl: str, absolute_start: int) -> tuple[int, int] |
         char = masked_decl[i]
         let_keyword_len = None
         if not stack:
-            if _starts_keyword(masked_decl, i, "letI"):
+            if starts_keyword(masked_decl, i, "letI"):
                 let_keyword_len = 4
-            elif _starts_keyword(masked_decl, i, "let"):
+            elif starts_keyword(masked_decl, i, "let"):
                 let_keyword_len = 3
         if let_keyword_len is not None:
             pending_let_assignment = True
@@ -185,7 +184,7 @@ def parse_helper_declarations(
         declarations.append(
             HelperDecl(
                 file=rel,
-                line=_line_number(text, match.start()),
+                line=line_number(text, match.start()),
                 name=match.group("name"),
                 kind=match.group("kind"),
                 is_private="private" in mods,
