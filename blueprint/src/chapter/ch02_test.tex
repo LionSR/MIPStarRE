@@ -129,10 +129,10 @@
 	\end{enumerate}
 \end{theorem}
 
-\begin{remark}[Lean encoding of the conditional soundness theorem]\label{rem:main-formal-conditional}
+\begin{remark}[Conditional form of the soundness theorem]\label{rem:main-formal-conditional}
 	\lean{MIPStarRE.LDT.Test.mainFormal_ofRepairedBridge}
 	\uses{thm:main-formal, def:low-individual-degree-test, def:projective-strategy, def:polymeasurements, def:simeq}
-	The conditional theorem formalized at present assumes a repaired bridge from
+	The conditional theorem currently assumes a repaired bridge from
 	the role-register residual to the final projective-completion hypotheses.
 	This is not a hypothesis of Theorem~\ref{thm:main-formal}; it is the
 	remaining step needed to derive the paper theorem from the pass condition.

@@ -503,15 +503,14 @@
 \begin{remark}[Successor projective-completion producer]\label{rem:main-formal-successor-completion-producer}
 	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorProjectiveCompletionResidualProducer}
 	\uses{lem:main-formal-successor-handoff, thm:main-formal}
-	The Lean declaration named here records the remaining successor-case construction
+	The construction named here records the remaining successor-case construction
 	needed after the Section~6 role-register handoff.  Starting from a projective
 	strategy that passes the low individual degree test, the Section~6 large-\(k\)
 	bound, and the non-base condition \(m \neq 1\), it is expected to produce the
-	projective-completion residual consumed by the checked conditional theorem
+	projective-completion residual consumed by the conditional theorem
 	\texttt{mainFormal\_ofRepairedBridge}.  It is not an additional hypothesis of
 	Theorem~\ref{thm:main-formal}; it is the open construction that should replace
-	the successor-branch residual currently represented by a tracked Lean
-	\texttt{sorry}.
+	the successor-branch residual currently represented by a tracked proof obligation.
 \end{remark}
 
 \begin{remark}[Lean measurement-unsymmetrization bridge]\label{rem:main-formal-unsymmetrization-bridge}
