@@ -3,6 +3,7 @@ import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
 import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
 import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.Bracketed
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 import MIPStarRE.LDT.Test.MainTheorem
 
@@ -27,7 +28,7 @@ The audits for the `Test.mainFormal` proof frontier record the current tracked
 gaps from issue #1458: the successor projective-completion residual has not yet
 been produced from the Section 6 induction data, and the base-case repaired
 orthonormalization input has not yet been produced from the paper's base-case
-argument.  These obligations are admitted by named producers rather than
+argument.  These obligations are isolated as named statements rather than
 assumed in the public statement of the paper theorem.
 
 The audit for `GlobalVariance.globalVarianceOfPoints` now requires the standard
@@ -40,15 +41,16 @@ the current proof obligation for the submeasurement-input statement of
 `thm:self-improvement-in-induction-section`.
 
 The audit for `MainInductionStep.mainInduction` records the current proof
-obligation for `thm:main-induction`: the theorem statement is source-facing, and
-the remaining work is to derive the internal successor-stage inputs from the
-paper hypotheses.  This is tracked by issue #1507.
+obligation for `thm:main-induction`: the theorem statement matches the paper
+statement, and the remaining work is to derive the internal successor-stage
+inputs from the paper hypotheses.  This is tracked by issue #1507.
 
 The audit for `ExpansionHypercubeGraph.laplacianSpectralGapOrdered` records the
 current proof obligation for the ordered-eigenvalue statement of
-`cor:laplacian-spectral-gap`: the theorem statement is source-facing, and the
-remaining work is to connect the Fourier diagonalization to the ordered roots of
-the characteristic polynomial.  This is tracked by issue #1497.
+`cor:laplacian-spectral-gap`: the theorem statement matches the paper
+statement, and the remaining work is to connect the Fourier diagonalization to
+the ordered roots of the characteristic polynomial.  This is tracked by issue
+#1497.
 
 The axiom expectation is attached to each declaration separately. A declaration
 using one of the `assert_*_axioms` commands with `sorryAx` in its expected set
@@ -60,6 +62,12 @@ state of issue #1452.  The Lean statement now has the input consistency
 hypothesis for the polynomial measurement `G` and the four conclusions stated
 in the paper; the remaining helper strong self-consistency estimate is admitted
 in the proof rather than assumed in the theorem statement.
+
+The audit for `SelfImprovement.sdp_statement_with_slackness` records the present
+state of issue #1230.  The theorem states the SDP strong-duality and
+complementary-slackness conclusion of `lem:sdp`; the missing proof is the
+finite-dimensional semidefinite-programming argument, not an additional
+hypothesis on a later paper theorem.
 
 This module is built explicitly in CI rather than imported from the umbrella
 library modules, so the axiom audits stay out of normal downstream imports
@@ -104,6 +112,11 @@ needed for `selfImprovementHelper`. -/
 private def expectedSelfImprovementHelperAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
+/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1230 derivation
+needed for the SDP complementary-slackness statement (`lem:sdp`). -/
+private def expectedSdpSlacknessAxioms : Array Name :=
+  expectedStandardAxiomsWithSorry
+
 private def assertUsesExactlyAxioms (declName : Name) (expected : Array Name) :
     CommandElabM Unit := do
   let axioms := (← Lean.collectAxioms declName).qsort Name.lt
@@ -136,6 +149,9 @@ elab "assert_ordered_laplacian_gap_axioms " id:ident : command => do
 elab "assert_self_improvement_helper_axioms " id:ident : command => do
   assertUsesExactlyAxioms id.getId expectedSelfImprovementHelperAxioms
 
+elab "assert_sdp_slackness_axioms " id:ident : command => do
+  assertUsesExactlyAxioms id.getId expectedSdpSlacknessAxioms
+
 assert_standard_axioms MIPStarRE.LDT.Test.razSafra
 assert_standard_axioms MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement
 assert_standard_axioms MIPStarRE.LDT.Test.classicalTestSoundness
@@ -153,3 +169,4 @@ assert_main_induction_axioms MIPStarRE.LDT.MainInductionStep.mainInduction
 assert_ordered_laplacian_gap_axioms
   MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianSpectralGapOrdered
 assert_self_improvement_helper_axioms MIPStarRE.LDT.SelfImprovement.selfImprovementHelper
+assert_sdp_slackness_axioms MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness

@@ -568,6 +568,9 @@ theorem sdp_statement_with_slackness
     [FieldModel params.q]
     (strategy : SymStrat params ι) :
     SdpStatementWithSlackness params strategy := by
+  -- TODO(#1230): prove the Section 9 SDP strong-duality and complementary-slackness
+  -- statement from the paper hypotheses, rather than treating slackness as an
+  -- external input to the helper completeness argument.
   sorry
 
 /-- Reduced version of `lem:add-in-u`.

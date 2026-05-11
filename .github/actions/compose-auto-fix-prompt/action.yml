@@ -96,8 +96,12 @@ runs:
           '  faithful formal encoding.' \
           '- Do not repair CI, blueprint sync, or review comments by adding bridge,' \
           '  residual, repair, package, producer, or arbitrary hypothesis inputs to' \
-          '  a source-labelled theorem unless the cited paper statement contains' \
-          '  that assumption.' \
+          '  a source-labelled theorem.' \
+          '- The only acceptable extra hypotheses are boundary conditions genuinely' \
+          '  needed to state the same mathematics in Lean, such as positivity for a' \
+          '  division, nonemptiness, decidability, or a field-model instance.' \
+          '- Proof-debt objects are not boundary conditions, even when packaged as' \
+          '  inputs or producers.' \
           '- If the proof cannot be closed from the paper hypotheses, stop and report' \
           '  the missing lemma, or create a separately named conditional helper; do not' \
           '  turn the paper theorem into a conditional theorem.')"

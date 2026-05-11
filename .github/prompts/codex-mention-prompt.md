@@ -16,7 +16,15 @@ Instructions:
 Quality bar (your work MUST satisfy ALL of these before committing):
 - Proof integrity (BLOCKER): no `sorry`, `admit`, `native_decide` on non-trivial goals, `unsafeCast`, or new axioms. See docs/PROOF_INTEGRITY.md.
 - Proof correctness (BLOCKER): structured proofs, not brute-force `simp`/`omega`/`ring` chains. If a result looks wrong, too strong, or suspiciously general, scout `references/ldt-paper/` first, then `blueprint/src/chapter/`, compare hypotheses/conclusions, and cite the specific source path, label, and line.
-- Source-statement fidelity (BLOCKER): paper-labelled or blueprint-linked declarations must preserve the cited statement up to faithful formal encoding. Do not add load-bearing bridge, residual, repair, producer, package, or arbitrary implication hypotheses unless they occur in the cited statement or are a documented Lean boundary condition needed to state the mathematics. If a proof needs such data, report the missing named lemma or producer theorem instead of changing the paper theorem.
+- Source-statement fidelity (BLOCKER): paper-labelled or blueprint-linked
+  declarations must preserve the cited statement up to faithful formal encoding.
+  Do not add load-bearing bridge, residual, repair, producer, package, or
+  arbitrary implication hypotheses. The only acceptable extra hypotheses are
+  boundary conditions genuinely needed to state the same mathematics in Lean,
+  such as positivity for a division, nonemptiness, decidability, or a
+  field-model instance. Proof-debt objects are not boundary conditions. If a
+  proof needs such data, report the missing named lemma or producer theorem
+  instead of changing the paper theorem.
 - Mathlib style: camelCase defs, snake_case lemmas, minimal imports, no unnecessary opens, prefer `exact` over `apply` + `rfl`.
 - Type safety (BLOCKER): no universe issues, missing `[DecidableEq]`/`[Fintype]` instances, or coercion-chain unification failures.
 - Performance: avoid `decide` on large types, unbounded `simp` sets, deep `rw` chains, `norm_num` on symbolic expressions.
