@@ -71,7 +71,7 @@ needed for `selfImprovement`. -/
 private def expectedSelfImprovementAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
-/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1451 derivation
+/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1503 derivation
 needed for `selfImprovementInInductionSection`. -/
 private def expectedInductionSelfImprovementAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
