@@ -315,8 +315,8 @@ bundled SDP witness rather than repeated as helper fields.
 The paper and blueprint state four additional helper-lemma guarantees
 (`completeness`, `pointConsistency`, strong self-consistency, and boundedness).
 Those do not yet come from these arguments alone, so they are not fields here;
-they should be supplied later by separate bridge lemmas that consume this reduced
-conclusion. -/
+they should be proved as separate estimates that consume this SDP-witness
+conclusion together with the paper hypotheses. -/
 structure SelfImprovementHelperConclusion (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (T : Measurement (Polynomial params) ι)
@@ -327,6 +327,42 @@ structure SelfImprovementHelperConclusion (params : Parameters) [FieldModel para
     H = averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas
   addInUVarianceBound :
     AddInUStatement params strategy T eps delta
+
+/-- Paper origin: `references/ldt-paper/self_improvement.tex:24-60`
+(`\label{lem:self-improvement-helper}`).
+
+Output of the self-improvement helper lemma before rounding to projectors.  The
+submeasurement `H` satisfies the four conclusions stated in the paper:
+completeness, consistency with the point measurement, strong self-consistency,
+and boundedness by a positive semidefinite dual witness `Z`.  The boundedness
+conclusion is represented by the positivity of `Z`, the pointwise domination
+inequality `Z ≥ E_u A^u_{g(u)}`, and the corresponding state-dependent gap
+estimate. -/
+structure SelfImprovementHelperStatement (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (H : SubMeas (Polynomial params) ι)
+    (Z : MIPStarRE.Quantum.Op ι) (eps delta nu : Error) : Prop where
+  completeness :
+    CompletenessAtLeast strategy.state H.liftLeft
+      ((1 - nu) - selfImprovementHelperError params eps delta)
+  pointConsistency :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params H)
+      (selfImprovementHelperError params eps delta)
+  strongSelfConsistency :
+    BipartiteSSCRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily H)
+      (selfImprovementHelperError params eps delta)
+  positiveSemidefiniteWitness :
+    0 ≤ Z
+  dualDominatesAveragedPoint :
+    ∀ g : Polynomial params,
+      0 ≤ sdpDualSlackOperator params strategy Z g
+  boundednessGap :
+    helperBoundednessGap params strategy H Z ≤
+      selfImprovementHelperError params eps delta
 
 /-- Helper conclusion strengthened by the SDP complementary-slackness equation.
 

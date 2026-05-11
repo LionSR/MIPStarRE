@@ -18,8 +18,10 @@ orthonormalization and final-fields conditions taken as explicit hypotheses.
 
 ## Contents
 
-- **selfImprovementHelper** — reduced helper producing `T`, `Ĥ`, `Z` and
-  `SelfImprovementHelperConclusion` from `sdp` + `addInU`.
+- **selfImprovementHelperConstruction** — construction lemma producing `T`, `Ĥ`,
+  `Z` and `SelfImprovementHelperConclusion` from `sdp` + `addInU`.
+- **selfImprovementHelper** — `lem:self-improvement-helper`, with the paper's
+  input consistency hypothesis and four helper conclusions.
 - **self_improvement_helper_with_slackness** — companion helper producing the
   slackness-carrying helper conclusion from the Section 9 SDP statement.
 - **selfImprovement_assumingFinalFields** — form of `thm:self-improvement` with
@@ -74,23 +76,23 @@ lemma selfImprovementError_nonneg_of_isGood
   unfold selfImprovementError MainInductionStep.selfImprovementInInductionError
   exact mul_nonneg (mul_nonneg (by norm_num) hm_nonneg) hsum_nonneg
 
-/-- Reduced version of `lem:self-improvement-helper`.
+/-- Construction lemma for the SDP and add-in-`u` stage of
+`lem:self-improvement-helper`.
 
-Unlike the paper helper lemma, this theorem does not yet take the consistency
-error `nu` or a hypothesis `hcons`. The current
-`SelfImprovementHelperConclusion` only records the outputs produced directly by
-the reduced `sdp` + `addInU` construction, and those facts do not depend on the
-consistency hypothesis. The `nu`-dependent consistency information will be
-introduced in the proof of `selfImprovement`. -/
-lemma selfImprovementHelper
+This lemma records the construction of the SDP measurement `T`, the averaged
+sandwiched submeasurement `H`, and the dual witness `Z`. The paper's consistency
+hypothesis for the input measurement is not needed for these three constructed
+objects; it is used by `selfImprovementHelper` to prove the four helper
+conclusions. -/
+lemma selfImprovementHelperConstruction
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (_nu : Error)
-    -- Kept for API compatibility with the full helper statement, where future
-    -- proof obligations will depend on the incoming polynomial measurement.
+    -- These arguments keep this construction lemma aligned with the helper
+    -- theorem; the constructed SDP measurement is independent of `G`.
     (_G : Measurement (Polynomial params) ι) :
     ∃ T : Measurement (Polynomial params) ι,
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
@@ -124,8 +126,8 @@ lemma self_improvement_helper_with_slackness_of_sdp_statement_with_slackness
     (hsdp : SdpStatementWithSlackness params strategy)
     (hgood : strategy.IsGood eps delta gamma)
     (_nu : Error)
-    -- Kept for API compatibility with the full helper statement, where future
-    -- proof obligations will depend on the incoming polynomial measurement.
+    -- These arguments keep the slackness-carrying conclusion aligned with the
+    -- helper theorem; the constructed SDP measurement is independent of `G`.
     (_G : Measurement (Polynomial params) ι) :
     ∃ T : Measurement (Polynomial params) ι,
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
@@ -152,11 +154,11 @@ lemma self_improvement_helper_with_slackness_of_sdp_statement_with_slackness
 /-- Helper lemma driven by the Section 9 SDP statement with complementary
 slackness.
 
-This companion to `selfImprovementHelper` applies the Section 9 statement
-`sdp_statement_with_slackness`, which records the strong-duality conclusion with
-complementary slackness.  The reduced theorem
-`selfImprovementHelper` remains separate, because its current `sdp` input has
-not yet formalized the strong-duality argument. -/
+This is the slackness-carrying companion to `selfImprovementHelperConstruction`:
+it applies the Section 9 statement `sdp_statement_with_slackness`, which records
+the strong-duality conclusion with complementary slackness.  The construction
+lemma remains separate, because its current `sdp` input has not yet formalized
+the strong-duality argument. -/
 lemma self_improvement_helper_with_slackness
     (params : Parameters)
     [FieldModel params.q]
@@ -171,6 +173,66 @@ lemma self_improvement_helper_with_slackness
   self_improvement_helper_with_slackness_of_sdp_statement_with_slackness
     params strategy eps delta gamma (sdp_statement_with_slackness params strategy)
     hgood nu G
+
+/-- Paper origin: `references/ldt-paper/self_improvement.tex:24-60`
+(`\label{lem:self-improvement-helper}`).
+
+Self-improvement helper lemma for a polynomial measurement `G` consistent with
+the point measurement. It produces a polynomial submeasurement `H` and a
+positive semidefinite witness `Z` satisfying the four conclusions of the paper:
+completeness, consistency with `A`, strong self-consistency, and boundedness.
+The boundedness conclusion is split into positivity of `Z`, pointwise domination
+of the averaged point measurement, and the state-dependent gap estimate. -/
+lemma selfImprovementHelper
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (nu : Error)
+    (G : Measurement (Polynomial params) ι)
+    (hcons :
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params G.toSubMeas) nu) :
+    ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+      SelfImprovementHelperStatement params strategy H Z eps delta nu := by
+  rcases self_improvement_helper_with_slackness params strategy eps delta gamma
+      hgood nu G with
+    ⟨T, Hhat, Z, hhelperWithSlackness⟩
+  let hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta :=
+    hhelperWithSlackness.toHelperConclusion
+  have heps : 0 ≤ eps := eps_nonneg_of_isGood params strategy hgood
+  have hdelta : 0 ≤ delta := delta_nonneg_of_isGood params strategy hgood
+  have hpointSSC :
+      BipartiteSSCRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta := by
+    exact ⟨by
+      simpa [SymStrat.selfConsistencyFailureProbability] using
+        hgood.selfConsistencyTest⟩
+  refine ⟨Hhat, Z, ?_⟩
+  refine
+    { completeness := ?_
+      pointConsistency := ?_
+      strongSelfConsistency := ?_
+      positiveSemidefiniteWitness := hhelper.sdpWitness.dualPositive
+      dualDominatesAveragedPoint := hhelper.sdpWitness.dualFeasible
+      boundednessGap := ?_ }
+  · exact
+      helper_completeness_of_self_consistency_helper_slackness_input_consistency
+        params strategy G eps delta nu heps hdelta hhelperWithSlackness hpointSSC hcons
+  · /- TODO(#1452): Apply
+      `helper_point_consistency_error_le_selfImprovementHelperError` to the
+      selected add-in-`u` chain for the SDP measurement. -/
+    sorry
+  · /- TODO(#1452): Apply
+      `helper_strong_self_consistency_error_le_selfImprovementHelperError` to
+      the helper self-consistency chain. -/
+    sorry
+  · /- TODO(#1452): Apply
+      `helper_boundedness_gap_le_selfImprovementHelperError` using
+      complementary slackness and the point-consistency add-in-`u` transfer. -/
+    sorry
 
 /-- Form of `thm:self-improvement` with helper strong self-consistency,
 orthonormalization, and final-fields conditions taken as explicit hypotheses.
@@ -193,7 +255,7 @@ theorem selfImprovement_assumingFinalFields
     (G : Measurement (Polynomial params) ι) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu := by
-  rcases selfImprovementHelper params strategy eps delta gamma hgood nu
+  rcases selfImprovementHelperConstruction params strategy eps delta gamma hgood nu
       G with
     ⟨T, Hhat, Z, hhelper⟩
   have hssc :
