@@ -601,10 +601,29 @@
 
     
     
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection" class="lean_decl">MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
         </div>
   </div>
   <div class="theorem_thmcontent">
-  <p>  Let \((\psi ,A,B,L)\) be an \((\varepsilon ,\delta ,\gamma )\)-good symmetric strategy for the \((m,q,d)\) low individual degree test. Let \(G \in \mathrm{PolySub}(m,q,d)\) be a submeasurement with the following property: </p>
+  <p>   Let \((\psi ,A,B,L)\) be an \((\varepsilon ,\delta ,\gamma )\)-good symmetric strategy for the \((m,q,d)\) low individual degree test. Let \(G \in \mathrm{PolySub}(m,q,d)\) be a submeasurement with the following property: </p>
 <ol class="enumerate">
   <li><p>(Consistency with&#160;\(A\)):  On average over \(u \sim \mathbb {F}_q^m\), </p>
 <div class="displaymath" id="a0000000549">
@@ -664,7 +683,7 @@
     Remark
     </span>
     <span class="remark_thmlabel">10.7</span>
-    <span class="remark_thmtitle">Lean conditional declaration for induction self-improvement</span>
+    <span class="remark_thmtitle">Lean conditional helper for induction self-improvement</span>
     <div class="thm_header_extras">
 
         </div>
@@ -694,7 +713,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>  The current Lean declaration for Theorem&#160;<a href="sec-induction.html#thm:self-improvement-in-induction-section">10.6</a> assumes the helper self-consistency, orthonormalization, and final-field hypotheses that are still explicit in the Chapter&#160;<a href="chap-self-improvement.html">7</a> formalization. It also assumes a measurement whose underlying submeasurement is the given one. These are not hypotheses of the paper theorem; they are proof obligations to be discharged when the Chapter&#160;<a href="chap-self-improvement.html">7</a> statement matches the paper theorem. </p>
+  <p>  The source-facing Lean declaration for Theorem&#160;<a href="sec-induction.html#thm:self-improvement-in-induction-section">10.6</a> has the paper hypotheses. Its proof is still open. The auxiliary declaration displayed in this remark is the older measurement-input assembly: it assumes the Section&#160;<a href="chap-self-improvement.html">7</a> helper self-consistency, orthonormalization, and final-field proof stages, and it assumes that the input submeasurement is the underlying submeasurement of a complete measurement. These are proof-stage inputs, not hypotheses of the paper theorem. </p>
 
   </div>
 </div>
