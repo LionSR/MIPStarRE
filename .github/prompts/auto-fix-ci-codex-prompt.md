@@ -8,6 +8,10 @@ Instructions:
 1. Read the error logs carefully to identify the failing Lean files and error messages.
 2. Common Lean build failures and how to fix them:
    - `sorry` left in proof: Fully close the lemma/theorem — replace `sorry` with a complete proof. Do NOT leave `sorry` behind or add TODO comments as a workaround.
+   - Paper-labelled theorem blocked by a missing proof: do not add bridge, residual,
+     repair, producer, package, or arbitrary implication hypotheses that are absent
+     from the cited statement.  If the source-faithful proof cannot be completed,
+     stop and comment on the PR with the missing named lemma or producer theorem.
    - Type mismatch: Check expected vs actual types and fix the proof term.
    - Unknown identifier / import error: Add the correct `import` statement.
    - Tactic failure: Try alternative tactics (`simp`, `exact`, `apply`, `omega`, etc.).
@@ -20,8 +24,8 @@ Instructions:
 
 Quality bar (your fix MUST satisfy ALL of these before committing):
 - Proof integrity (BLOCKER): no sorry, admit, native_decide on non-trivial goals, unsafeCast, or new axioms. See docs/PROOF_INTEGRITY.md for the full list.
-- Proof correctness (BLOCKER): structured proofs, not brute-force simp/omega/ring chains. If a result looks wrong, too strong, or suspiciously general, scout `references/ldt-paper/` for the original LDT theorem statements and proofs, compare hypotheses/conclusions, cite the specific paper/section.
-- Statement faithfulness (BLOCKER): for any declaration named as, linked to, or documented as a paper theorem, do not fix CI by adding bridge, residual, repair, package, producer, or arbitrary hypothesis inputs unless they are faithful formal encodings of the cited paper statement. If the proof is blocked, stop and report the missing lemma or create a separately named conditional helper; do not change the paper theorem into a conditional theorem.
+- Proof correctness (BLOCKER): structured proofs, not brute-force simp/omega/ring chains. If a result looks wrong, too strong, or suspiciously general, scout `references/ldt-paper/` first, then `blueprint/src/chapter/`, compare hypotheses/conclusions, and cite the specific source path, label, and line.
+- Source-statement fidelity (BLOCKER): paper-labelled or blueprint-linked declarations must preserve the cited statement up to faithful formal encoding. Do not add load-bearing bridge, residual, repair, producer, package, or arbitrary implication hypotheses unless they occur in the cited statement or are a documented Lean boundary condition needed to state the mathematics. If a proof needs such data, report the missing named lemma or producer theorem instead of changing the paper theorem.
 - Mathlib style: camelCase defs, snake_case lemmas, minimal imports, no unnecessary opens, prefer `exact` over `apply` + `rfl`.
 - Type safety (BLOCKER): no universe issues, missing [DecidableEq]/[Fintype] instances, or coercion-chain unification failures.
 - Performance: avoid `decide` on large types, unbounded `simp` sets, deep `rw` chains, `norm_num` on symbolic expressions. Prefer `omega`, `positivity`, explicit `calc`.

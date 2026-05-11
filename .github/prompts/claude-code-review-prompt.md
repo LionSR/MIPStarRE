@@ -19,34 +19,42 @@ that determines whether the PR can be approved with outstanding issues.
    strategy, or are they brute-forced with `simp` / `omega` / `ring` chains? Are `calc` blocks
    and `conv` rewrites correctly chained? Are hypotheses used or dangling?
    If a mathematical result looks wrong, too strong, or suspiciously general, **scout** the
-   LaTeX sources in `references/ldt-paper/` where the original LDT theorem statements and proofs are
-   stored. Read the relevant sections, compare hypotheses and conclusions, and cite the
-   source path, line range, and label when flagging a discrepancy.
-   For a declaration that is named as, linked to, or documented as a paper theorem,
-   adding a bridge, residual, repair, package, producer, or arbitrary hypothesis
-   input is a blocker unless that input is a faithful formal encoding of the cited
-   paper statement.  A conditional helper may be useful, but it must be separately
-   named and must not be reviewed as the paper theorem itself.
-3. 🟡 **Mathlib style**: Does the code follow Mathlib conventions? Check naming (`camelCase` for
+   source hierarchy: first `references/ldt-paper/`, then the corresponding blueprint material
+   in `blueprint/src/chapter/`. Read the relevant sections, compare hypotheses and conclusions,
+   and cite the specific source path, label, and line when flagging a discrepancy.
+3. 🔴 **Source-statement fidelity**: For every changed theorem, lemma, or definition that is
+   named after a paper result, linked from the blueprint by `\lean{...}`, or described as a
+   formalization of a cited result, compare its public Lean statement with the corresponding
+   statement in `references/ldt-paper/`. Flag any added load-bearing hypothesis, weakened
+   conclusion, changed error parameter, or altered quantifier structure. In particular,
+   bridge, residual, repair, producer, package, or arbitrary implication hypotheses are
+   blockers unless they are explicitly part of the paper statement or are documented Lean
+   boundary conditions needed to state the mathematics, such as positivity, nonemptiness,
+   decidability, or field-model hypotheses. Proof-debt bundles are not boundary conditions.
+   If such data are still needed, the paper theorem must remain source-faithful and the
+   missing fact should be exposed as a separately named lemma or producer theorem. Existing
+   conditional helpers must have names that make the conditional nature clear, and they must
+   not be treated as the paper theorem or advertised by `\leanok`.
+4. 🟡 **Mathlib style**: Does the code follow Mathlib conventions? Check naming (`camelCase` for
    defs, `snake_case` for lemmas), tactic style (prefer `exact` over `apply` + `rfl` when
    equivalent), import hygiene (no unnecessary `open`s, minimal imports), and lemma placement.
    Style violations are NOT nits — they must be fixed before approval.
-4. 🔴 **Type safety**: Any type mismatches, universe issues, or coercion problems? Check for
+5. 🔴 **Type safety**: Any type mismatches, universe issues, or coercion problems? Check for
    universe polymorphism issues, missing `[DecidableEq]` or `[Fintype]` instances, and
    coercion chains that may cause unification failures.
-5. 🟡 **Performance**: Will any proofs cause timeouts? Watch for `decide` on large types,
+6. 🟡 **Performance**: Will any proofs cause timeouts? Watch for `decide` on large types,
    `simp` with unbounded lemma sets, deep `rw` chains, and `norm_num` on symbolic expressions.
    Suggest alternatives like `omega`, `positivity`, or explicit `calc` steps.
    Performance issues that will likely cause timeouts must be fixed before approval.
-6. 🟡 **Modularity & duplication**: Are new lemmas general enough? Could any be upstreamed to
+7. 🟡 **Modularity & duplication**: Are new lemmas general enough? Could any be upstreamed to
    Mathlib? Are there lemmas that are overly specialized to the local context but could be
    stated more generally? Is the file structure consistent with the existing module hierarchy?
    Flag duplicated logic or lemmas that restate existing Mathlib results.
    Modularity and duplication issues must be fixed before approval.
-7. 🟡 **Documentation**: Do new definitions and key theorems have docstrings? Are module-level
+8. 🟡 **Documentation**: Do new definitions and key theorems have docstrings? Are module-level
    doc comments present for new files? Do docstrings explain mathematical meaning, not just
    Lean syntax? Missing documentation must be added before approval.
-8. 🟡 **Blueprint coverage for changed declarations**: If the PR has the label
+9. 🟡 **Blueprint coverage for changed declarations**: If the PR has the label
    `enforce-blueprint-coverage` and changes a public paper-facing `def`,
    `theorem`, or `lemma` under `MIPStarRE/`, the corresponding blueprint item
    should carry the appropriate `\lean{...}` tag. You may run
@@ -57,7 +65,7 @@ that determines whether the PR can be approved with outstanding issues.
    declaration is genuinely only an internal helper and the PR explains why it
    should remain outside the blueprint. On unlabelled PRs, mention this only as
    advisory context.
-9. 🟡 **Paper-gap notes**: When the PR changes files under `docs/paper-gaps/`, read
+10. 🟡 **Paper-gap notes**: When the PR changes files under `docs/paper-gaps/`, read
    `docs/paper-gaps/policy.tex` before reviewing the changed note. Check that the note is a
    self-contained mathematical account: it introduces its notation, states the cited assertion,
    isolates the calculation or logical obstruction, compares the cited source with the

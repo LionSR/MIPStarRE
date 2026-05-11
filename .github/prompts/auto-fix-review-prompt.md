@@ -10,6 +10,12 @@ Instructions:
 6. Common fixes:
 
    - Remove `sorry` and fully close the lemma/theorem with a complete proof. Do NOT leave `sorry` behind or replace it with another shortcut.
+   - Do NOT close a proof obligation by changing a paper-labelled theorem statement or by
+     adding bridge, residual, repair, producer, package, or arbitrary implication
+     hypotheses that are not in the cited paper statement.
+   - If a proof cannot be completed without such a statement change, stop and post a PR
+     comment identifying the missing named lemma or producer theorem instead of pushing a
+     weakened paper theorem.
    - Fix naming to match Mathlib conventions.
    - Add missing docstrings where requested.
    - Fix type mismatches or tactic failures.
@@ -38,8 +44,8 @@ Instructions:
 Quality bar (same rubric as Claude Code Review — your fix MUST satisfy ALL of these before committing):
 
 - Proof integrity (BLOCKER): no `sorry`, `admit`, `native_decide` on non-trivial goals, `unsafeCast`, or new axioms. See docs/PROOF_INTEGRITY.md.
-- Proof correctness (BLOCKER): structured proofs, not brute-force `simp`/`omega`/`ring` chains. If a result looks wrong, too strong, or suspiciously general, scout `references/ldt-paper/` for the original LDT theorem statements and proofs, compare hypotheses/conclusions, cite the specific paper/section.
-- Statement faithfulness (BLOCKER): for any declaration named as, linked to, or documented as a paper theorem, do not address review feedback by adding bridge, residual, repair, package, producer, or arbitrary hypothesis inputs unless they are faithful formal encodings of the cited paper statement.  If the proof is blocked, report the missing lemma or create a separately named conditional helper; do not change the paper theorem into a conditional theorem.
+- Proof correctness (BLOCKER): structured proofs, not brute-force `simp`/`omega`/`ring` chains. If a result looks wrong, too strong, or suspiciously general, scout `references/ldt-paper/` first, then `blueprint/src/chapter/`, compare hypotheses/conclusions, and cite the specific source path, label, and line.
+- Source-statement fidelity (BLOCKER): declarations named after paper results or linked by `\lean{...}` must preserve the cited statement up to faithful formal encoding. Do not add load-bearing bridge, residual, repair, producer, package, or arbitrary implication hypotheses unless they occur in the cited statement or are a documented Lean boundary condition needed to state the mathematics. Existing conditional helpers must be separately named and must not be treated as the paper theorem.
 - Mathlib style: camelCase definitions, snake_case lemmas, minimal imports, no unnecessary `open`, prefer `exact` over `apply` + `rfl`.
 - Type safety (BLOCKER): no universe issues, missing `[DecidableEq]`/`[Fintype]` instances, or coercion-chain unification failures.
 - Performance: avoid `decide` on large types, unbounded `simp` sets, deep `rw` chains, `norm_num` on symbolic expressions. Prefer `omega`, `positivity`, explicit `calc`.
