@@ -1,0 +1,254 @@
+\documentclass{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{xurl}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\setlength{\emergencystretch}{2em}
+
+\input{./command}
+
+\title{Proof-Gap Protocol for Source-Faithful Formalization}
+\author{}
+\date{2026-05-11}
+
+\begin{document}
+\maketitle
+
+\section{Purpose}
+
+This note fixes terminology for a recurring failure mode in the formalization
+of the low individual degree test paper, \path{arXiv:2009.12982}.  A proof may be blocked at
+an intermediate mathematical assertion.  If that assertion is added as a new
+hypothesis to a theorem labelled as a paper theorem, the resulting Lean theorem
+may be correct as a conditional statement, but it is no longer the theorem in
+the cited source.  The apparent proof has not closed the paper theorem; it has
+moved a proof obligation into the theorem statement.
+
+The protocol below distinguishes such proof debt from legitimate formal
+boundary conditions and from genuine mathematical corrections.  It is meant for
+contributors and reviewers who must decide whether a bridge, residual, repair,
+package, input, or producer is an acceptable local interface, a tracked proof
+gap, or a statement drift which must be repaired before a theorem may be
+advertised as a source theorem.
+
+\section{Basic objects}
+
+\paragraph{Source theorem.}
+A source theorem is a theorem, lemma, proposition, or corollary in the paper
+source under \path{references/ldt-paper/}.  Its hypotheses and conclusion are
+the mathematical ground truth, subject only to faithful formal encoding and to
+documented paper-gap corrections.
+
+\paragraph{Paper-facing Lean declaration.}
+A Lean declaration is paper-facing when it is named or cited as the
+formalization of a source theorem, for instance through a blueprint
+\verb|\lean{}| link on a theorem environment carrying a paper label.  Such a
+declaration must match the source theorem in its public statement.  In
+particular, it may not add an unproved bridge, residual, repair, producer, or
+package hypothesis which the paper does not assume.
+
+\paragraph{Proof obligation.}
+A proof obligation is an intermediate assertion needed by the proof of a source
+theorem.  It may be a construction, an estimate, a transport lemma, or a
+comparison between two formal representations.  If the paper proves or invokes
+this assertion, then the formalization should state it as a separate lemma or
+producer theorem and prove it from the upstream hypotheses.
+
+\paragraph{Producer.}
+A producer is a theorem or definition which constructs a proof obligation from
+the paper hypotheses already available at that point in the argument.  A
+producer is the preferred representation of missing work.  If the proof is not
+yet complete, the producer may temporarily contain a tracked \verb|sorry|, but
+the paper-facing theorem should call the producer rather than assume its output
+as an additional theorem hypothesis.
+
+\paragraph{Conditional helper.}
+A conditional helper is a separately named theorem whose statement explicitly
+assumes a proof obligation.  Names such as
+\path{mainFormal_ofRepairedBridge}, \path{orthonormalization_ofInput}, or
+\path{..._assuming...} are acceptable when the declaration is not presented as
+the source theorem.  A conditional helper is useful because it preserves proof
+content downstream of a gap, but it does not close the source theorem.
+
+\section{Bridge, residual, repair, package}
+
+The words \emph{bridge}, \emph{residual}, \emph{repair}, and \emph{package} are
+not inherently bad.  They become dangerous when their mathematical status is
+unclear.
+
+\paragraph{Bridge.}
+A bridge should be a transport theorem between two already defined
+mathematical forms: for example, a tensor-placement identity, a conversion
+between two equivalent consistency relations, or a statement translating a
+source object into a formal representation.  A bridge is acceptable when it is
+proved from previously available assumptions.  It becomes proof debt when it is
+assumed because the transport has not yet been proved.  It becomes theorem
+drift when the assumed bridge is added to a paper-facing theorem.
+
+\paragraph{Residual.}
+A residual is a named remainder after part of an argument has been performed.
+It is often a useful way to record the exact missing target after a completed
+construction.  A residual is acceptable as the conclusion of a helper theorem or
+as the input of a conditional helper.  It is not an acceptable new assumption on
+a paper theorem unless the paper itself assumes that residual.
+
+\paragraph{Repair.}
+A repair is a mathematical construction which replaces an approximate or
+partial object by a better object, usually with a quantitative estimate.  In
+the low individual degree test formalization, projectivization and
+orthonormalization repairs are genuine mathematical operations.  A repair
+should therefore appear as a construction or producer.  If a theorem assumes
+the output of the repair instead of constructing it, that theorem is
+conditional on the repair.
+
+\paragraph{Package.}
+A package is a structure bundling data and facts.  It is neutral: it may be the
+right formal shape for a complicated construction.  A package becomes proof
+debt only when its fields are not produced from the source hypotheses.  The
+review question is not whether a structure exists, but whether every
+load-bearing field has a producer or is explicitly tracked as missing.
+
+\section{The main failure mode}
+
+Suppose the paper proves
+\[
+  H \Longrightarrow C.
+\]
+During formalization, the proof may need an intermediate assertion \(B\).  The
+paper theorem should be represented as
+\[
+  H \Longrightarrow B \Longrightarrow C
+  \quad\text{inside the proof,}
+\]
+where \(B\) is obtained by a lemma or producer from \(H\).  The following
+public statement is a different theorem:
+\[
+  H \land B \Longrightarrow C.
+\]
+It is not unsound in Lean, but it is not the paper theorem.  It says that the
+conclusion follows if the missing bridge data is supplied.  Such a theorem is a
+conditional helper, even if its conclusion looks exactly like the paper's
+conclusion.
+
+This is the situation colloquially described as ``adding a bridge
+hypothesis''.  More precisely, an unproved intermediate step has been promoted
+from the proof body to the theorem's assumptions.  The correction is not to hide
+the hypothesis under a different structure name.  The correction is to keep a
+paper-facing theorem with the source statement and move the missing step to a
+named producer obligation.
+
+\section{Faithful boundary hypotheses}
+
+Not every extra formal hypothesis is a theorem drift.  Some hypotheses are
+faithful boundary conditions introduced by formal encoding.  Examples include
+nonnegativity needed for a real power, positivity needed to divide by a
+quantity, finiteness and nonemptiness of an index type, a field-model instance,
+or decidability instances required by Lean.  Such hypotheses are acceptable
+when they express part of the mathematical ambient setting or make explicit a
+condition used implicitly in the paper.
+
+The distinction is load-bearing.  A faithful boundary hypothesis describes the
+domain in which the paper's objects live.  A proof-debt hypothesis supplies a
+mathematical step that the proof should derive.  If removing the hypothesis
+leaves an unproved construction or estimate from the paper proof, then the
+hypothesis is proof debt, not a boundary condition.
+
+\section{Definition drift and subtree repair}
+
+Definition drift is especially dangerous because it propagates.  If a
+definition is changed so that it no longer denotes the object in the paper,
+then every downstream theorem using that definition may continue to compile
+while proving statements about the wrong object.  Downstream theorem statements
+can then be repaired piecemeal, but the development remains unstable because
+the wrong definition is still upstream.
+
+When a definition mismatch is found, the repair should proceed by a subtree
+protocol.
+
+\begin{enumerate}
+  \item Identify the source object and the formal object precisely.
+  \item Freeze a source-faithful definition or state an adapter theorem
+  relating the existing definition to the source object.
+  \item Recheck the downstream theorem chain against that definition or adapter.
+  \item Re-formalize the affected subtree from the corrected interface, rather
+  than adding local hypotheses to each downstream theorem.
+  \item If a downstream proof cannot be completed, record the missing producer
+  at the lowest point where the paper proof needs it.
+\end{enumerate}
+
+This is slower than editing a final theorem signature, but it prevents a local
+definition error from becoming a global theorem-statement error.
+
+\section{Allowed shapes}
+
+\begin{center}
+\begin{tabular}{p{0.24\linewidth}p{0.31\linewidth}p{0.32\linewidth}}
+\textbf{Shape} & \textbf{Allowed use} & \textbf{Forbidden use} \\
+\hline
+Paper-facing theorem & Matches the source statement up to faithful encoding &
+Carries non-paper bridge, residual, repair, producer, or package hypotheses \\
+Conditional helper & Assumes a named obligation and has a conditional name &
+Is linked as the source theorem or marked as proof-complete for that theorem \\
+Producer theorem & Constructs the obligation from paper hypotheses & Merely
+repackages the obligation as an assumption \\
+Package structure & Bundles constructed data and estimates & Hides unproved
+fields that are then assumed by a source theorem \\
+Paper-gap note & Documents a real mathematical or formal-statement divergence &
+Justifies silent statement drift without a repair plan
+\end{tabular}
+\end{center}
+
+\section{Protocol for a blocked proof}
+
+When a source-labelled proof is blocked, use the following order.
+
+\begin{enumerate}
+  \item Read the cited source statement and the proof passage in
+  \path{references/ldt-paper/}.
+  \item Write the paper theorem form, the current Lean theorem form, and the
+  first missing intermediate assertion.
+  \item Decide whether the missing assertion is a faithful boundary condition,
+  a representation adapter, an ordinary lemma from the paper proof, or a real
+  paper-gap discrepancy.
+  \item If it is an ordinary lemma or adapter, create a named producer theorem.
+  Do not add it to the source theorem as a new hypothesis.
+  \item If downstream work can continue, create a conditional helper with a
+  conditional name.  Keep it separate from the paper-facing theorem.
+  \item If the source and formal statements genuinely differ, write or update a
+  note under \path{docs/paper-gaps/} before marking the statement as aligned.
+  \item Update the blueprint so that paper labels point only to paper-facing
+  declarations.  Conditional helpers belong in remarks or implementation
+  notes, not in the source theorem block.
+\end{enumerate}
+
+\section{Review checklist}
+
+A reviewer should ask the following questions before accepting a proof-debt
+repair.
+
+\begin{enumerate}
+  \item Does every paper-labelled declaration have the same hypotheses and
+  conclusion as the cited source, up to faithful formal encoding?
+  \item Are bridge, residual, repair, producer, input, or package assumptions
+  absent from paper-facing theorem signatures unless they occur in the paper?
+  \item If a conditional helper remains, is its name explicitly conditional and
+  is it absent from source theorem \verb|\leanok| claims?
+  \item Does each load-bearing package field have a producer, a tracked issue,
+  or an explicit \verb|sorry| at the producer site?
+  \item If a definition changed, has the downstream subtree been rechecked
+  against the corrected definition rather than locally patched?
+  \item If the formal statement differs from the source statement, is there a
+  paper-gap note explaining the mathematical difference and a plan to remove or
+  justify it?
+\end{enumerate}
+
+\section{Conclusion}
+
+The project should prefer visible proof obligations over invisible statement
+drift.  A tracked \verb|sorry| in a producer theorem is less misleading than a
+source theorem whose assumptions have been strengthened.  Conditional helpers
+are useful, but they must remain conditional.  The paper-facing declaration is
+reserved for the theorem proved by the paper, or for a documented corrected
+version whose mathematical difference is explicit.
+
+\end{document}
