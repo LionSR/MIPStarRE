@@ -161,6 +161,79 @@ Sections must be filled in this dependency order:
 
 Do not start from the final theorem and guess intermediate facts.
 
+## Faithful Formalization Policy
+
+A declaration is a formalization of a paper theorem only when its public Lean
+statement matches the cited paper statement, up to faithful formal encoding.
+Changing a Lean theorem away from the corresponding statement in
+`references/ldt-paper/` is strongly discouraged and should occur only when a
+faithful formal encoding or a documented mathematical necessity requires it.
+The check is on the hypotheses as well as the conclusion.  A theorem whose
+conclusion has the right shape but whose assumptions include an extra
+load-bearing bridge input is a conditional theorem, not the paper theorem.
+The project goal is to eliminate such conditional bridges, not to normalize
+them as permanent infrastructure.
+
+This rule applies especially to declarations named after paper labels such as
+`mainFormal`, `selfImprovement`, `mainInduction`, or other theorem names linked
+from the blueprint by `\lean{...}` and `\leanok`.
+
+Before editing any theorem tagged with a paper label (`thm:*`, `lem:*`,
+`prop:*`):
+
+1. Read the corresponding statement in `references/ldt-paper/`.
+2. Preserve the public Lean theorem statement, except for hypotheses that are
+   genuinely part of the faithful encoding of the paper's domain.
+3. Do not add bridge inputs, residual packages, repair hypotheses, producer
+   assumptions, or arbitrary implication hypotheses to the paper theorem.
+4. If a missing intermediate fact is needed, first state that fact as a named
+   lemma or theorem to be proved from the paper hypotheses.
+5. Add a conditional helper only as a last resort, and only when it has a
+   paper-gap note, a named producer theorem target, and an explicit removal
+   plan.  Its name must show that it is conditional, for example
+   `mainFormal_ofRepairedBridge`, `mainFormal_assumingBridgeHypotheses`, or
+   `conditional...`.
+6. Do not point a source-labelled blueprint theorem to the conditional helper
+   with `\leanok`.
+
+When reviewing an existing bridge, residual, repair, producer, or package
+hypothesis, first try to recover any genuine proof content from its construction
+and turn that content into a source-faithful lemma.  If the bridge does not
+actually follow from the paper hypotheses, do not preserve the paper theorem as
+a strengthened statement.  Restore the paper-aligned theorem statement and leave
+the missing proof obligation explicit, even if that means reintroducing a
+tracked `sorry` during a repair PR.
+
+Some side conditions are not deviations: positivity needed to define a
+division, nonemptiness of a finite type, decidability instances, field-model
+instances, and similar boundary hypotheses may be faithful encodings of
+assumptions that the paper leaves implicit.  These should still be reviewed and
+documented if they are mathematically load-bearing.  The forbidden pattern is
+different: moving an unproved step of the proof into the theorem statement, such
+as a `BridgeHypotheses`, `Input`, `Residual`, `Package`, `RepairInput`, or
+`Producer` assumption that the paper theorem does not assume.  These assumptions
+should not be introduced merely to keep a file compiling or to avoid a `sorry`;
+they require explicit mathematical justification and a planned discharge.
+
+For the current LDT final theorem, `mainFormal` is reserved for the statement of
+`\Cref{thm:main-formal}`: from a projective strategy passing the low individual
+degree test, it produces the three final consistency conclusions.  A theorem
+with an extra hypothesis such as
+`hbaseBridge : ... → MainFormalRepairedBridgeHypotheses ...` is temporary
+scaffolding at best; it must not be the declaration advertised as
+`thm:main-formal`.  The corresponding paper-aligned version should remain
+visible, even if its proof is temporarily unfinished during repair.
+
+Every agent changing a paper-labelled theorem must finish with a statement
+integrity audit:
+
+- paper assumptions;
+- Lean assumptions;
+- paper conclusion;
+- Lean conclusion;
+- verdict: exact, faithful boundary hypotheses, extra assumptions, weakened
+  conclusion, or strengthened conclusion.
+
 ## Code Conventions
 
 ### Imports
@@ -259,7 +332,7 @@ see `docs/external-lemmas-pedagogy.md`. This includes Schwartz–Zippel,
 Fourier orthogonality, Cauchy–Schwarz for approximate measurements, CFC,
 and external result statements (Polishchuk–Spielman, Raz–Safra).
 
-For design patterns like extra-hypothesis discharge and blueprint
+For the policy on temporary conditional scaffolding and blueprint
 synchronization, see `docs/formalization-patterns.md`.
 
 ### Validation ladder
@@ -408,9 +481,14 @@ Every PR touching Lean code should be reviewed against these criteria:
 7. **Modularity** — Are new lemmas general enough to be reused?
 8. **Documentation** — Every new `def` and major `theorem` must have a docstring.
 9. **Blueprint sync and paper origin** — Add `\lean{}` and `\leanok` tags for
-   formalized statements. Record formalization-only auxiliary lemmas explicitly.
+   formalized statements only when the Lean statement matches the source.
+   Record formalization-only auxiliary lemmas explicitly.
 10. **Scaffolding integrity** — Verify scaffolding aligns with Mathlib.
-11. **Proof-evasion anti-patterns** — Review against `docs/anti_patterns.md`.
+11. **Statement drift** — Compare source-labelled theorem statements with the
+   paper and flag new hypotheses, weakened conclusions, changed quantifier
+   order, altered error parameters, or bridge/residual packages moving toward
+   a paper theorem.
+12. **Proof-evasion anti-patterns** — Review against `docs/anti_patterns.md`.
 
 For full details, see `docs/CONTRIBUTING.md` and `docs/pr-review.md`.
 
@@ -426,8 +504,8 @@ If modifying blueprint material:
 
 For blueprint style conventions, see `docs/blueprint_style_guide.md`.
 
-For the extra-hypothesis discharge pattern that underlies `\lean{}`/`\leanok`
-tagging strategy, see `docs/formalization-patterns.md`.
+For temporary conditional scaffolding and the `\lean{}`/`\leanok` tagging
+strategy, see `docs/formalization-patterns.md`.
 
 ## Agent Rule Sources
 
@@ -453,7 +531,7 @@ Use this file together with:
 | `docs/blueprint_style_guide.md` | Blueprint notation and section conventions |
 | `docs/api_surface.md` | Useful obligation-closing lemmas for `SubMeas` |
 | `docs/paper-gaps/policy.tex` | Paper-gap documentation conventions |
-| `docs/formalization-patterns.md` | Design patterns: extra-hypothesis discharge, blueprint sync, split-module architecture, barrel and bridge packages |
+| `docs/formalization-patterns.md` | Temporary conditional scaffolding, blueprint sync, split-module architecture, barrel and bridge packages |
 | `docs/external-lemmas-pedagogy.md` | Register of Mathlib/external lemmas not explained in the paper, with pedagogical notes |
 | `docs/ci-automation.md` | CI/CD workflow details |
 | `docs/pr-review.md` | Mathlib PR review guide |

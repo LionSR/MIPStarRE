@@ -19,13 +19,17 @@ that determines whether the PR can be approved with outstanding issues.
    strategy, or are they brute-forced with `simp` / `omega` / `ring` chains? Are `calc` blocks
    and `conv` rewrites correctly chained? Are hypotheses used or dangling?
    If a mathematical result looks wrong, too strong, or suspiciously general, **scout** the
-   LaTeX sources in `references/ldt-paper/` where the original LDT theorem statements and proofs are
-   stored. Read the relevant sections, compare hypotheses and conclusions, and cite the
-   specific paper/section when flagging a discrepancy.
+   LaTeX sources in `references/ldt-paper/` where the original LDT theorem
+   statements and proofs are stored. Read the relevant sections, compare
+   hypotheses and conclusions, and cite the specific path, line, and label when
+   flagging a discrepancy. Changing a source-labelled theorem away from the
+   paper statement is strongly discouraged unless forced by faithful formal
+   encoding or documented mathematical necessity; extra bridge, residual,
+   repair, producer, or package assumptions should be treated as proof debt.
    For a declaration that is named as, linked to, or documented as a paper theorem,
    adding a bridge, residual, repair, package, producer, or arbitrary hypothesis
    input is a blocker unless that input is a faithful formal encoding of the cited
-   paper statement.  A conditional helper may be useful, but it must be separately
+   paper statement. A conditional helper may be useful, but it must be separately
    named and must not be reviewed as the paper theorem itself.
 3. 🟡 **Mathlib style**: Does the code follow Mathlib conventions? Check naming (`camelCase` for
    defs, `snake_case` for lemmas), tactic style (prefer `exact` over `apply` + `rfl` when

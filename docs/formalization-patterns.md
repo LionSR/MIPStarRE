@@ -10,42 +10,56 @@ in `audits/` and the proof-integrity rules in `docs/PROOF_INTEGRITY.md`.
 
 ## Table of Contents
 
-1. [Extra-hypothesis-then-discharge](#pattern-1-extra-hypothesis-then-discharge)
+1. [Temporary conditional scaffolding](#pattern-1-temporary-conditional-scaffolding)
 2. [Blueprint–Lean synchronization](#pattern-2-blueprintlean-synchronization)
 3. [Split-module architecture](#pattern-3-split-module-architecture)
 4. [Barrel re-export pattern](#pattern-4-barrel-re-export-pattern)
-5. [Bridge-package pattern](#pattern-5-bridge-package-pattern)
+5. [Temporary bridge-package pattern](#pattern-5-temporary-bridge-package-pattern)
 6. [Paper-gap documentation pattern](#pattern-6-paper-gap-documentation-pattern)
 
 ---
 
-## Pattern 1: Extra-hypothesis-then-discharge
+## Pattern 1: Temporary conditional scaffolding
 
 ### The pattern
 
-An individual lemma is proved with explicit extra hypotheses that are not
-part of the paper's statement of that lemma, but which the paper's proof
-*of* that lemma assumes from earlier steps (or from theorems not yet
-formalized).  These hypotheses are threaded as explicit arguments to the
-lemma.  At the final assembly point — typically `mainFormal` in
-`MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` — all the explicit
-hypotheses are collected and discharged (or planned to be discharged).
+Some older intermediate lemmas are proved with explicit extra hypotheses that
+are not part of the paper's statement.  These hypotheses usually name a proof
+obligation that should eventually be proved from earlier paper hypotheses, such
+as an orthonormalization input or a consistency statement.
 
-### Why this pattern
+This is temporary scaffolding, not a preferred proof style.  Do not introduce a
+new bridge, residual, repair, producer, or package hypothesis merely to keep a
+file compiling.  First try to state and prove the missing mathematical lemma
+from the paper hypotheses.  If a conditional helper is unavoidable, it must have
+a paper-gap note, a named producer theorem target, and a removal plan.
+Changing a theorem away from the corresponding statement in
+`references/ldt-paper/` is strongly discouraged unless faithful formal encoding
+or a documented mathematical necessity requires it.
 
-| Benefit | Explanation |
-|---------|-------------|
-| **Modularity** | Each lemma carries exactly the assumptions it genuinely needs from upstream.  No hidden global state. |
-| **Parallelism** | Different submodules can be proved independently; the only coupling is the explicit hypothesis type they require, which is defined in a shared `Statements.lean` file and can be refactored later. |
-| **Compilation speed** | Lean only needs to elaborate the lemma file plus its minimal dependency set.  The full barrel-of-barrels at `MainFormal.lean` can wait. |
-| **Auditability** | Every unformalized dependency is visible as an explicit argument in the lemma signature, not hidden in a `sorry` buried in a proof block.  Tools like `#check` can list them. |
-| **Incremental closure** | When a new producer theorem is proved, the hypothesis it satisfies can simply be removed from the caller's signature.  The refactoring is local. |
+It is never allowed to change the public statement of a declaration advertised
+as the formalization of a source-labelled paper theorem.  At the final assembly
+point, the paper theorem must either discharge the extra hypotheses internally,
+or remain as the paper-aligned statement with an unfinished proof while the
+conditional helper is given a different name.
+
+### Why legacy scaffolding may appear
+
+| Temporary reason | Explanation |
+|------------------|-------------|
+| **Localizing an obstruction** | A conditional helper can isolate the exact missing mathematical input when a proof is already partly understood. |
+| **Recovering useful proof content** | The proof body may contain genuine estimates or constructions that should be extracted into source-faithful lemmas. |
+| **Auditability** | An explicit temporary hypothesis is easier to find than an implicit assumption hidden in prose, provided it is named as proof debt. |
+
+These reasons do not justify strengthening a paper theorem.  They only explain
+why a short-lived helper declaration may exist while its remaining hypotheses
+are being actively removed.
 
 ### How it works
 
-1. **Hypothesis is named.**  A `structure` or `Prop`-valued abbreviation
-   bundles the assumptions needed by a lemma but not yet produced by
-   earlier statements.  Example from
+1. **Hypothesis is named as debt.**  A `structure` or `Prop`-valued
+   abbreviation bundles assumptions needed by a conditional helper but not yet
+   produced by earlier statements.  Example from
    `MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean`:
 
    ```lean
@@ -59,12 +73,12 @@ hypotheses are collected and discharged (or planned to be discharged).
          (selfImprovementHelperError params eps delta)
    ```
 
-   This `abbrev` says: "The self-improvement theorem needs an
+   This `abbrev` says: "The conditional self-improvement helper needs an
    orthonormalization bridge.  For any helper submeasurement `Hhat` that
    is strongly self-consistent, we need a spectral-truncation and
    locality-preserving repair witness."
 
-2. **Lemma takes the hypothesis as an argument.**  A lemma like
+2. **Only a conditional helper takes the hypothesis as an argument.**  A helper like
    `selfImprovementInInductionSection` in
    `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/Core.lean`
    takes `OrthonormalizationInput` (and analogous hypothesis bundles) as
@@ -84,32 +98,42 @@ hypotheses are collected and discharged (or planned to be discharged).
        (G : SubMeas (Polynomial params) ι) ... : ...
    ```
 
-3. **Hypothesis propagates upstream.**  The consumer of
-   `selfImprovementInInductionSection` — typically a
-   `MainInductionStep` wrapper — must itself expose the same hypothesis
-   or close it with a producer.
+3. **Propagation is a warning sign.**  The consumer of a conditional helper
+   should close the hypothesis with a producer theorem as soon as possible.  If
+   the hypothesis propagates upward toward a paper-labelled theorem, the PR
+   should stop and either prove the producer or restore the paper theorem with
+   an explicit unfinished proof.
 
-4. **Final closure at assembly.**  The theorem `mainFormal` in
-   `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` takes a single
-   `hbaseBridge` hypothesis that wraps all remaining unformalized
-   assumptions:
+4. **Final closure at assembly.**  The paper-labelled theorem, for instance
+   `mainFormal` for `\Cref{thm:main-formal}`, must not expose the remaining
+   bridge hypotheses as part of its public statement.  If the corresponding
+   proof step has not yet been formalized, the conditional statement belongs in
+   a helper such as `mainFormal_ofRoleResidualAndRepairedBridge`, whose name
+   records that it assumes additional data:
 
    ```lean
-   theorem mainFormal
-       (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} ...
-       (hbaseBridge : (scalars : MainFormalCascadeScalars params eps k) →
-         ∀ (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k),
-         MainFormalRepairedBridgeHypotheses params strategy eps k hpass scalars roleResidual) :
+   theorem mainFormal_ofRoleResidualAndRepairedBridge
+       {params : Parameters} [FieldModel.{0} params.q]
+       {ι : Type*} [Fintype ι] [DecidableEq ι]
+       {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+       {hpass : strategy.PassesLowIndividualDegreeTest eps}
+       {scalars : MainFormalCascadeScalars params eps k}
+       (hsmall : ¬ 1 ≤ mainFormalError params k eps)
+       (roleResidual :
+         MainFormalRolePackageResidual params strategy eps hpass k)
+       (bridge :
+         MainFormalRepairedBridgeHypotheses
+           params strategy eps k hpass scalars roleResidual) :
        ∃ G_A G_B : ProjMeas (Polynomial params) ι, ... := ...
    ```
 
-   There is exactly one `sorry` remaining in this file (line 611),
-   corresponding to the successor-case schematic assembly that still
-   awaits per-slice induction packages.  Once those are supplied, the
-   final hypothesis bundle can be replaced by a `theorem` with zero
-   extra hypotheses.
+   The paper-labelled `mainFormal` should have the hypotheses of the paper
+   theorem: a projective strategy passing the low individual degree test, the
+   stated parameter bounds, and the faithful formal encoding of the ambient
+   domains.  Bridge, residual, repair, producer, and package inputs must be
+   produced inside its proof rather than added to its statement.
 
-### Known instances
+### Legacy instances to clean up
 
 | Instance | Where defined | What it bundles |
 |----------|---------------|-----------------|
@@ -124,25 +148,25 @@ hypotheses are collected and discharged (or planned to be discharged).
 | `MakingMeasurementsProjective.OrthonormalizationInput` | `MakingMeasurementsProjective/Statements.lean` | Spectral truncation + repair witnesses for the orthonormalization lemma |
 | `LdPastingContext` | `Pasting/Defs/Context.lean` | All auxiliary hypotheses for `ldPasting` (good, scalar bounds, complete, consistent, self-consistent, bounded) |
 
-### The remaining `sorry` in `MainFormal.lean` (line 611)
+### The remaining proof obligation in `MainFormal.lean`
 
-The single remaining `sorry` in the codebase (as of 2026-05-07)
-corresponds to the successor branch of `mainFormal`.  The TODO comments
-list three items:
+The successor branch of `mainFormal` still has a proof obligation whose
+mathematical content is the construction of the intermediate data used in the
+conditional helper.  The TODO comments list three items:
 
 1. A `MainFormalRolePackageBranchResidual` constructed from
    predecessor/successor induction data,
 2. Line-130 orthonormalization inputs (`MainFormalPostRolePackageDiagonalOrthonormalizationInput`),
 3. Completion input derived from `completingToMeasurement`.
 
-These are all **data-construction** obligations, not proof-theory gaps.
-Once the per-slice self-improvement producers and recursive induction
-packages are threaded through, the `sorry` becomes a one-line call to an
-existing checked lemma (`mainFormal_ofRoleResidualAndRepairedBridge`).
+These are all data-construction obligations.  Once the per-slice
+self-improvement producers and recursive induction packages are threaded
+through, the paper-labelled theorem should call the checked conditional helper
+without adding its bridge inputs to the theorem statement.
 
-This is the essence of the pattern: the `sorry` is not "we don't know how
-to prove the theorem", it is "we haven't yet written the constructor that
-assembles the intermediate data from the upstream pieces we already have."
+This is the intended cleanup direction: use the conditional helper only to
+identify reusable proof content, then prove the producers or restore the
+paper-aligned theorem with the remaining obligation visible.
 
 ### Distinction from anti-patterns
 
@@ -151,16 +175,23 @@ A1 in `docs/anti_patterns.md`).  The key distinction:
 
 - **A1**: The hypothesis *is* the theorem's conclusion (or an `∃` that
   directly produces it), and the proof body is a one-line `rcases`/`exact`.
-- **Extra-hypothesis pattern**: The hypothesis names an *intermediate*
+- **Temporary conditional scaffolding**: The hypothesis names an *intermediate*
   mathematical fact that the paper's proof also uses (e.g., "Hhat has
   spectral truncation data"), and the lemma does nontrivial work with it
   (proving error bounds, threading through the rest of the argument, etc.).
 
 Bridge packages that are markers for still-unproved intermediate facts
-(such as `SelfImprovementBridgeInputs`) are acceptable scaffolding under
-this pattern.  They should carry a tracker reference (usually an issue
-like #931 or #422) and their fields should be the *assumptions* of the
-paper's proof, not the *conclusion* of the theorem.
+(such as `SelfImprovementBridgeInputs`) are proof debt under this pattern.  They
+should carry a tracker reference (usually an issue like #931 or #422), and their
+fields should be the *assumptions* of the paper's proof, not the *conclusion* of
+the theorem.
+
+They are acceptable only as temporary hypotheses of conditional helpers or
+intermediate construction theorems.  If such a package appears in the public
+signature of a source-labelled theorem, the theorem has become conditional and
+should not be treated as the paper theorem until the package is produced
+internally or the statement is restored with the missing proof obligation
+explicit.
 
 ---
 
@@ -174,9 +205,13 @@ to link to Lean:
 | Tag | Meaning | Example |
 |-----|---------|---------|
 | `\lean{Name}` | The corresponding Lean declaration exists | `\lean{MIPStarRE.LDT.Test.mainFormal}` |
-| `\leanok` (statement-level) | The Lean declaration compiles; confirms statement synchronization, not proof closure | `\leanok` |
+| `\leanok` (statement-level) | The Lean declaration compiles and its statement matches the source or blueprint statement; it does not certify proof closure | `\leanok` |
 | `\leanok` (proof-level) | The proof block is fully formalized — the theorem or lemma has a complete sorry-free proof | `\lean{...}` plus `\leanok` inside `\begin{proof}` |
 | `\uses{label}` | The statement or proof block depends on the cited result | `\uses{thm:orthonormalization, prop:completing-to-measurement}` |
+
+Do not use statement-level `\leanok` for a source-labelled theorem whose Lean
+declaration is conditional on bridge, residual, repair, producer, or package
+data not present in the source.
 
 ### Why some nodes show white in the dep graph
 
@@ -343,11 +378,12 @@ directly so its API surface doesn't leak.
 
 ---
 
-## Pattern 5: Bridge-package pattern
+## Pattern 5: Temporary bridge-package pattern
 
-A bridge package is a `structure` whose fields are **proof obligations**
-that have not yet been discharged locally but are required by the
-downstream theorem.
+A bridge package is a `structure` whose fields are **proof obligations** that
+have not yet been discharged locally.  It is temporary proof debt.  Do not add a
+new bridge package unless a direct source-faithful proof route has first been
+attempted and the remaining obstruction is documented.
 
 ### Example
 
@@ -364,10 +400,12 @@ structure SelfImprovementBridgeInputs (params : Parameters) [FieldModel params.q
     FinalFieldsInput params strategy eps delta nu
 ```
 
-A caller that needs the self-improvement theorem can take
+A temporary conditional helper can take
 `(h : SelfImprovementBridgeInputs params strategy eps delta nu)` as a
-hypothesis and project the needed field inside the proof body.  This
-keeps the lemma signatures compact while naming all the tracked gaps.
+hypothesis and project the needed field inside the proof body.  This does not
+prove the corresponding paper theorem.  The package should be eliminated by
+producer theorems, or the source-labelled theorem should be restored with the
+remaining proof obligation visible.
 
 ### Rules
 
@@ -377,9 +415,9 @@ keeps the lemma signatures compact while naming all the tracked gaps.
 3. **Fields must be the *assumptions* of the paper's proof, not the
    *conclusion* of the theorem** (see A1 anti-pattern in
    `docs/anti_patterns.md`).
-4. **When all fields are produced**, the bridge package should be
-   replaced by a `theorem` that calls the same proof but with zero
-   bridge arguments.
+4. **A bridge package must not enter a source-labelled theorem statement.**
+5. **When all fields are produced**, the bridge package should be replaced by a
+   theorem that calls the same proof but with zero bridge arguments.
 
 ### Related patterns
 

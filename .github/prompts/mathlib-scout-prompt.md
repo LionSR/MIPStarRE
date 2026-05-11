@@ -11,7 +11,7 @@ Instructions:
    formalized. Check that the issue identifies a mathematical
    source: paper or book citation, theorem/lemma label when available,
    and repository file path plus line number when the source is in
-   `blueprint/`, `Papers/`, or `Notes/`. If this information is
+   `references/ldt-paper/` or `blueprint/`. If this information is
    missing, say so in the report.
 2. Scout Mathlib thoroughly:
    a. Grep Mathlib source files (under .lake/packages/mathlib/) for

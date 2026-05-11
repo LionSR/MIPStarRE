@@ -24,6 +24,12 @@ Instructions:
    - give a precise verdict.
    Compile or verify the edited LaTeX document when practical; otherwise explain why that check was not run.
 8. Your goal is to fully close every incomplete lemma/theorem, not just address minor comments. Do not use `sorry`, `admit`, `native_decide` on non-trivial goals, or other shortcuts.
+8a. Do not fix review comments by changing a source-labelled theorem away from
+    the statement in `references/ldt-paper/`. Such changes are strongly
+    discouraged unless forced by faithful formal encoding or documented
+    mathematical necessity. Do not add bridge, residual, repair, producer,
+    package, or arbitrary implication hypotheses to a paper theorem; stop and
+    comment if the proof cannot be closed from the paper hypotheses.
 9. Run `lake build` to verify your fixes compile with zero errors and zero `sorry`s.
 10. When your fixes add or complete (remove `sorry` from) theorems, lemmas, or definitions, update the corresponding blueprint entry in `blueprint/src/chapter/` — add `\lean{DeclarationName}` and `\leanok` tags for new results, or add `\leanok` to `\begin{proof}` for newly proven results.
 11. Make minimal, targeted fixes. Do not refactor unrelated code.
@@ -38,8 +44,8 @@ Instructions:
 Quality bar (same rubric as Claude Code Review — your fix MUST satisfy ALL of these before committing):
 
 - Proof integrity (BLOCKER): no `sorry`, `admit`, `native_decide` on non-trivial goals, `unsafeCast`, or new axioms. See docs/PROOF_INTEGRITY.md.
-- Proof correctness (BLOCKER): structured proofs, not brute-force `simp`/`omega`/`ring` chains. If a result looks wrong, too strong, or suspiciously general, scout `references/ldt-paper/` for the original LDT theorem statements and proofs, compare hypotheses/conclusions, cite the specific paper/section.
-- Statement faithfulness (BLOCKER): for any declaration named as, linked to, or documented as a paper theorem, do not address review feedback by adding bridge, residual, repair, package, producer, or arbitrary hypothesis inputs unless they are faithful formal encodings of the cited paper statement.  If the proof is blocked, report the missing lemma or create a separately named conditional helper; do not change the paper theorem into a conditional theorem.
+- Proof correctness (BLOCKER): structured proofs, not brute-force `simp`/`omega`/`ring` chains. If a result looks wrong, too strong, or suspiciously general, scout `references/ldt-paper/` for the original theorem, compare hypotheses/conclusions, and cite the specific path, line, and label.
+- Statement faithfulness (BLOCKER): for any declaration named as, linked to, or documented as a paper theorem, do not address review feedback by adding bridge, residual, repair, package, producer, or arbitrary hypothesis inputs unless they are faithful formal encodings of the cited paper statement. If the proof is blocked, report the missing lemma or create a separately named conditional helper; do not change the paper theorem into a conditional theorem.
 - Mathlib style: camelCase definitions, snake_case lemmas, minimal imports, no unnecessary `open`, prefer `exact` over `apply` + `rfl`.
 - Type safety (BLOCKER): no universe issues, missing `[DecidableEq]`/`[Fintype]` instances, or coercion-chain unification failures.
 - Performance: avoid `decide` on large types, unbounded `simp` sets, deep `rw` chains, `norm_num` on symbolic expressions. Prefer `omega`, `positivity`, explicit `calc`.
