@@ -5,8 +5,7 @@ import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationData
 
 This file relates the Section 6 role residual to the diagonal orthonormalization
 inputs consumed by `mainFormal`.  The combining lemma that packages these into
-the full `MainFormalBaseRepairedBridgeHypotheses` lives in `MainFormal.lean`
-(where that structure is defined).
+the base-case match-mass bridge lives in `MainFormal.lean`.
 
 ## What's proved
 
@@ -14,15 +13,14 @@ the full `MainFormalBaseRepairedBridgeHypotheses` lives in `MainFormal.lean`
   the orthonormalization input is derivable from the role residual once the two
   locality-preserving repair witnesses are supplied.
 
-## What's not derivable from the role residual alone
+## What's still not derivable from the role residual alone
 
-* **Diagonal self-consistency** (`MainFormalPostRolePackageDiagonalConsistencyInput`):
-  the structure requires `ConsRel G^A G^A ζ₁` and `ConsRel G^B G^B ζ₁` (each POVM
-  with itself).  The role residual's `diagonalConsistency` gives cross consistency
-  `ConsRel G^A G^B ζ₁` (the two POVMs with each other), which is a different type.
-  Diagonal self-consistency is therefore a **separate hypothesis** that must be
-  supplied alongside the repair witnesses for the base-case repaired-input
-  obligation in `mainFormal`.
+* **Match-mass preservation**:
+  `MainFormalBaseBridgeHypotheses` requires the orthonormalized projective
+  submeasurements to preserve their match mass against the opposite
+  unsymmetrized POVM.  This is the paper-shaped completion route used by the
+  base branch of `mainFormal`; it should not be replaced by diagonal
+  self-consistency assumptions.
 
 * **Locality-preserving repair**: the `LeftLiftedProjectivizationRepairInput`
   parameters require QXP-layer data (a `QXPLayerData` with a projective `P`
@@ -34,7 +32,7 @@ the full `MainFormalBaseRepairedBridgeHypotheses` lives in `MainFormal.lean`
 
 * Issue #1359 — orthonormalization hypothesis chain
 * Issue #931 — self-improvement bridge inputs
-* Issue #1043 — base-case repaired-input construction
+* Issue #1043 — base-case match-mass bridge construction
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

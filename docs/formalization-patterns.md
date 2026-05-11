@@ -76,7 +76,7 @@ are being actively removed.
    temporary `sorry` in this producer is preferable to adding the obligation as
    a hypothesis on the paper theorem.
 4. **Use conditional helpers only as local scaffolding.**  A helper such as
-   `mainFormal_ofRepairedBridge` or `selfImprovement_assumingBridgeInputs` may
+   `mainFormal_ofProducerObligations` or `selfImprovement_assumingBridgeInputs` may
    clarify an assembly step, but only if the paper-facing declaration remains
    source-faithful.  The helper is not the paper theorem and should not receive
    the source-labelled blueprint `\leanok`.
@@ -147,25 +147,12 @@ statement.
 
 4. **Final closure at the source theorem.**  The theorem `mainFormal` in
    `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` is reserved for the
-   paper-shaped statement.  The older strengthened-hypothesis form has
-   been moved to the conditional helper `mainFormal_ofRepairedBridge`,
-   which takes a single `hbaseBridge` hypothesis:
-
-   ```lean
-   theorem mainFormal_ofRepairedBridge
-       (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} ...
-       (hbaseBridge : (scalars : MainFormalCascadeScalars params eps k) →
-         ∀ (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k),
-         MainFormalRepairedBridgeHypotheses params strategy eps k hpass scalars roleResidual) :
-       ∃ G_A G_B : ProjMeas (Polynomial params) ι, ... := ...
-   ```
-
-   The paper-shaped `mainFormal` invokes this helper and leaves the
-   repaired-hypotheses construction as an explicit tracked proof
-   obligation.  There are two direct tracked `sorry` sites in this file:
-   the successor projective-completion residual producer, and the final
-   derivation of `MainFormalRepairedBridgeHypotheses` from the paper
-   hypotheses.
+   paper-shaped statement.  The top-level assembly theorem
+   `mainFormal_ofProducerObligations` has the same public hypotheses and
+   conclusion; the remaining work is isolated in producer declarations such as
+   `mainFormalBaseBranchBridgeProducer` and
+   `mainFormalSuccessorProjectiveCompletionResidualProducer`, rather than
+   assumed as theorem parameters.
 
    The paper-labelled `mainFormal` should have the hypotheses of the paper
    theorem: a projective strategy passing the low individual degree test, the
@@ -186,7 +173,6 @@ When such a declaration remains useful, its role should be one of the following:
 | `SelfImprovement.HelperStrongSelfConsistencyInput` | Conditional input for helper strong self-consistency estimates; keep tracked until produced |
 | `SelfImprovement.SelfImprovementBridgeInputs` | Historical bundle of the preceding inputs; do not introduce as a hypothesis on a paper-labelled theorem |
 | `MainFormalBaseBridgeHypotheses` | Conditional base-case assembly data; do not expose on `mainFormal`, which is reserved for `thm:main-formal` |
-| `MainFormalRepairedBridgeHypotheses` | Conditional repaired base-case assembly data; produce internally or keep only in conditional helpers |
 | `MainFormalBaseProjectiveCompletionHypotheses` | Conditional completion data; do not move it into a paper-facing theorem statement |
 | `MainFormalPostRolePackageDiagonalOrthonormalizationInput` | Internal data for orthonormalization of unsymmetrized POVMs; its repair fields are producer obligations |
 | `MakingMeasurementsProjective.OrthonormalizationInput` | Conditional input for the orthonormalization proof; keep visibly distinct from source-faithful paper statements |
@@ -205,13 +191,14 @@ construction obligations:
    2. Line-130 orthonormalization inputs
       (`MainFormalPostRolePackageDiagonalOrthonormalizationInput`),
    3. Completion input derived from `completingToMeasurement`.
-2. The derivation of `MainFormalRepairedBridgeHypotheses` from the paper
-   hypotheses of `mainFormal`.
+2. The base-case match-mass bridge producer, whose target is
+   `MainFormalBaseBranchBridgeHypotheses` for the checked base-case role
+   residual.
 
 These are data-construction obligations.  Once the per-slice self-improvement
 producers and recursive induction packages are threaded through, the
-paper-labelled theorem should call the conditional helper without adding its
-bridge inputs to the theorem statement.
+paper-labelled theorem should call the producer-obligation assembly without
+adding bridge inputs to the theorem statement.
 
 This is the intended cleanup direction: use the conditional helper only to
 identify reusable proof content, then prove the producers or restore the

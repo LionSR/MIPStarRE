@@ -188,11 +188,14 @@ and its Bob-side mirror.  The corresponding Step-8 absorption is
 \leanid{MIPStarRE.LDT.Test.repairedLine169PointError\_le\_mainFormalError} in
 \doclink{MIPStarRE/LDT/Test/MainTheorem.lean}.}
 
-In the current code, this is the route used by the repaired base-case Step-6
-assembly theorem
-\leanid{MIPStarRE.LDT.Test.mainFormal\_ofRoleResidualAndRepairedBridge}.  The
-generic corrected route $\zeta_1 + \sqrt{\zeta_2}$ remains mathematically
-available, but it is not the active route for the present formal theorem.
+In the current code, the active base-case target is the match-mass bridge
+\leanid{MIPStarRE.LDT.Test.MainFormalBaseBranchBridgeHypotheses}, and the final
+transport is factored through
+\leanid{MIPStarRE.LDT.Test.mainFormal\_ofProjectiveCompletionResidual}.  The
+older repaired base-case assembly theorem has been removed from the live
+MainFormal route.  The generic corrected route
+$\zeta_1 + \sqrt{\zeta_2}$ remains mathematically available, but it is not the
+active route for the present formal theorem.
 
 \section{Conclusion}
 

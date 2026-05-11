@@ -2,6 +2,13 @@
 
 Date: 2026-05-07
 Updated: 2026-05-11, after the source-faithful `mainFormal` repair.
+
+> **Status note, 2026-05-11.**  This report predates the removal of the live
+> `MainFormal*RepairedBridge*` route.  References below to
+> `mainFormal_ofRepairedBridge` and `MainFormalRepairedBridgeHypotheses` are
+> historical descriptions of the earlier conditional assembly.  The current
+> MainFormal route uses producer obligations and the match-mass
+> `MainFormalBaseBranchBridgeHypotheses` target instead.
 Auditor: Research specialist (read-only analysis)
 Scope: `MIPStarRE/LDT/SelfImprovement/` → `MIPStarRE/LDT/Pasting/` →
        `MIPStarRE/LDT/MainInductionStep/` → `MIPStarRE/LDT/Test/MainTheorem/`
