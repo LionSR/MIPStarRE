@@ -11,6 +11,9 @@
 \setlength{\emergencystretch}{2em}
 
 \input{command}
+\providecommand{\Lean}{\textsc{Lean}}
+\providecommand{\ghissue}[1]{%
+  \href{https://github.com/LionSR/MIPStarRE/issues/#1}{GitHub issue \##1}}
 
 \title{Proof-Gap Protocol for Source-Faithful Formalization}
 \author{}
@@ -24,11 +27,11 @@
 This note fixes terminology for a recurring failure mode in the formalization
 of the low individual degree test paper, \path{arXiv:2009.12982}.  It
 complements the note-writing policy in \path{docs/paper-gaps/policy.tex} and
-the source-statement audit tracked in
-\href{https://github.com/LionSR/MIPStarRE/issues/1458}{GitHub issue \#1458}.
+the source-statement audit tracked in \ghissue{1458}.
 A proof may be blocked at
 an intermediate mathematical assertion.  If that assertion is added as a new
-hypothesis to a theorem labelled as a paper theorem, the resulting Lean theorem
+hypothesis to a theorem labelled as a paper theorem, the resulting \Lean{}
+theorem
 may be correct as a conditional statement, but it is no longer the theorem in
 the cited source.  The apparent proof has not closed the paper theorem; it has
 moved a proof obligation into the theorem statement.
@@ -48,8 +51,8 @@ source under \path{references/ldt-paper/}.  Its hypotheses and conclusion are
 the mathematical ground truth, subject only to faithful formal encoding and to
 documented paper-gap corrections.
 
-\paragraph{Paper-facing Lean declaration.}
-A Lean declaration is paper-facing when it is named or cited as the
+\paragraph{Paper-facing declaration.}
+A \Lean{} declaration is paper-facing when it is named or cited as the
 formalization of a source theorem, for instance through a blueprint
 \verb|\lean{}| link on a theorem environment carrying a paper label.  Such a
 declaration must match the source theorem in its public statement.  In
@@ -134,7 +137,7 @@ public statement is a different theorem:
 \[
   H \land B \Longrightarrow C.
 \]
-It is not unsound in Lean, but it is not the paper theorem.  It says that the
+It is not unsound in \Lean{}, but it is not the paper theorem.  It says that the
 conclusion follows if the missing bridge data is supplied.  Such a theorem is a
 conditional helper, even if its conclusion looks exactly like the paper's
 conclusion.
@@ -152,7 +155,7 @@ Not every extra formal hypothesis is a theorem drift.  Some hypotheses are
 faithful boundary conditions introduced by formal encoding.  Examples include
 nonnegativity needed for a real power, positivity needed to divide by a
 quantity, finiteness and nonemptiness of an index type, a field-model instance,
-or decidability instances required by Lean.  Such hypotheses are acceptable
+or decidability instances required by \Lean{}.  Such hypotheses are acceptable
 when they express part of the mathematical ambient setting or make explicit a
 condition used implicitly in the paper.
 
@@ -214,7 +217,7 @@ When a source-labelled proof is blocked, use the following order.
 \begin{enumerate}
   \item Read the cited source statement and the proof passage in
   \path{references/ldt-paper/}.
-  \item Write the paper theorem form, the current Lean theorem form, and the
+  \item Write the paper theorem form, the current \Lean{} theorem form, and the
   first missing intermediate assertion.
   \item Decide whether the missing assertion is a faithful boundary condition,
   a representation adapter, an ordinary lemma from the paper proof, or a real
