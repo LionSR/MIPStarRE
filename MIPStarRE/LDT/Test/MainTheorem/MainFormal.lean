@@ -562,7 +562,41 @@ theorem mainFormal_ofRoleResidualAndRepairedBridge
           (mainFormalError params k eps) :=
   baseMainFormal_ofRepairedBaseBridge hsmall roleResidual bridge
 
+/-- Successor-case producer for the Step 6 projective-completion residual.
 
+Paper origin: `references/ldt-paper/inductive_step.tex`, lines 26--236, where
+the successor step restricts the strategy to predecessor slices, applies the
+induction hypothesis and the Section 9 self-improvement theorem slice by slice,
+pastes the resulting families, and then transports the Section 6 witness through
+the final projectivization and completion cascade used by `thm:main-formal`.
+
+This is a producer obligation, not an additional hypothesis of the paper-facing
+theorem `mainFormal`.  The available structural constructors live in
+`RoleRegister.lean` (`successorOfBridgeInputs` and the answer-valued variants);
+the missing work is to produce the predecessor induction data and the per-slice
+self-improvement inputs from the paper hypotheses, then assemble the resulting
+role residual and completion residual.
+
+Tracked by #1433, #1363, #422, and #1458. -/
+noncomputable def mainFormalSuccessorProjectiveCompletionResidualProducer
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hd : 0 < params.d)
+    (hk : 400 * params.m * params.d ≤ k)
+    (hk0 : 0 < k)
+    (hm_ne_one : params.m ≠ 1)
+    (scalars : MainFormalCascadeScalars params eps k) :
+    MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
+      (params := params) (strategy := strategy) (eps := eps)
+      (hpass := hpass) (k := k) (scalars := scalars) := by
+  -- TODO(#1433, #1363, #422, #1458): produce the ordinary or answer-valued
+  -- successor role residual and the post-role projective-completion residual
+  -- from the predecessor induction package and the per-slice self-improvement
+  -- producers.  This should call the structural constructors in
+  -- `RoleRegister.lean`, not add those inputs to `mainFormal`.
+  sorry
 
 /--
 Conditional assembly for `thm:main-formal` from `test_definition.tex`.
@@ -695,7 +729,6 @@ theorem mainFormal_ofRepairedBridge
   -- targets is already checked; once the residual above is supplied, the
   -- remaining proof is trivial.  Item 4 replaces the older generic `triangleSub`
   -- route whose loss was `ζ₁ + sqrt ζ₂` rather than the printed `ζ₁`.
-
   by_cases herr : 1 ≤ mainFormalError params k eps
   · exact mainFormal_trivial_witness params strategy eps k herr
   · have hepsNN : 0 ≤ eps := SameSpaceProjStrat.eps_nonneg_of_passes hpass
@@ -712,12 +745,8 @@ theorem mainFormal_ofRepairedBridge
           Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
             (params := params) (strategy := strategy) (eps := eps)
             (hpass := hpass) (k := k) (scalars := scalars)) := by
-        -- Successor case (m > 1): the answer-valued recursive-slice adapter is
-        -- available, but this theorem still has no predecessor per-slice induction
-        -- package or answer-side self-improvement bridge inputs in scope.
-        -- TODO(#931, #834, #422): supply those successor inputs and assemble the
-        -- resulting role residual into a Step 6 witness residual.
-        sorry
+        exact ⟨mainFormalSuccessorProjectiveCompletionResidualProducer
+          hpass hd hk hk0 hm1 scalars⟩
       rcases hprojectiveCompletionResidual with ⟨projectiveCompletionResidual⟩
       let rolePackage := projectiveCompletionResidual.roleResidual.rolePackage scalars
       have hpre : ConsRel strategy.state (uniformDistribution Unit)

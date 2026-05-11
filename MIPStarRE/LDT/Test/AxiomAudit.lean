@@ -15,9 +15,11 @@ obligation in `MakingMeasurementsProjective/Producers.lean`. When that
 obligation is discharged, the allowed axiom set below should be reduced to the
 standard Lean axioms.
 
-The audit for `Test.mainFormal` records the current tracked gap from issue
-#1458: the repaired bridge used by `mainFormal_ofRepairedBridge` has not yet
-been derived from the hypotheses of the paper theorem.
+The audits for the `Test.mainFormal` proof frontier record the current tracked
+gaps from issue #1458: the successor projective-completion residual has not yet
+been produced from the Section 6 induction data, and the repaired bridge used by
+`mainFormal_ofRepairedBridge` has not yet been derived from the hypotheses of
+the paper theorem.
 
 This module is built explicitly in CI rather than imported from the umbrella
 library modules, so the axiom audits stay out of normal downstream imports
@@ -62,4 +64,6 @@ assert_standard_axioms MIPStarRE.LDT.Test.razSafra
 assert_standard_axioms MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement
 assert_standard_axioms MIPStarRE.LDT.Test.classicalTestSoundness
 assert_orthonormalization_axioms MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization
+assert_tracked_sorry_axioms
+  MIPStarRE.LDT.Test.mainFormalSuccessorProjectiveCompletionResidualProducer
 assert_tracked_sorry_axioms MIPStarRE.LDT.Test.mainFormal
