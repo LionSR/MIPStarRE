@@ -36,6 +36,7 @@ from blueprint_lean_sync import (  # noqa: E402
     collect_lean_decls,
     strip_lean_comments_preserve_lines,
 )
+from lean_header_utils import advance_depth, line_number, starts_keyword
 
 
 THEOREM_LIKE_ENVS = frozenset({"theorem", "lemma", "proposition", "corollary"})
@@ -49,10 +50,6 @@ DEBT_TOKEN_RE = re.compile(
     r"(?:bridge|residual|repair|package|producer)"
     r"[A-Za-z0-9_']*"
 )
-
-OPEN_TO_CLOSE = {"(": ")", "{": "}", "[": "]", "⦃": "⦄"}
-CLOSE_TO_OPEN = {close: open_ for open_, close in OPEN_TO_CLOSE.items()}
-
 
 @dataclass(frozen=True)
 class DebtFinding:
@@ -92,30 +89,6 @@ def paper_facing_entries(blueprint_src: Path) -> list[BlueprintEntry]:
     ]
 
 
-def _identifier_char(ch: str) -> bool:
-    return ch.isalnum() or ch in "_?'"
-
-
-def _starts_keyword(text: str, pos: int, keyword: str) -> bool:
-    if not text.startswith(keyword, pos):
-        return False
-    before_ok = pos == 0 or not _identifier_char(text[pos - 1])
-    after = pos + len(keyword)
-    after_ok = after >= len(text) or not _identifier_char(text[after])
-    return before_ok and after_ok
-
-
-def _advance_depth(ch: str, stack: list[str]) -> None:
-    if ch in OPEN_TO_CLOSE:
-        stack.append(ch)
-    elif ch in CLOSE_TO_OPEN and stack and stack[-1] == CLOSE_TO_OPEN[ch]:
-        stack.pop()
-
-
-def _line_number(text: str, offset: int) -> int:
-    return text.count("\n", 0, offset) + 1
-
-
 def _header_after_decl_name(text: str) -> str:
     """Remove the declaration keyword and name from a Lean declaration header."""
     match = LEAN_DECL_RE.match(text)
@@ -140,10 +113,10 @@ def _public_header_after_name(source: str, decl: LeanDecl) -> tuple[str, int]:
         if candidate.startswith(":=", i) and not stack:
             end = i
             break
-        if _starts_keyword(candidate, i, "where") and not stack:
+        if starts_keyword(candidate, i, "where") and not stack:
             end = i
             break
-        _advance_depth(candidate[i], stack)
+        advance_depth(candidate[i], stack)
         i += 1
 
     header = candidate[:end]
@@ -170,7 +143,7 @@ def _findings_for_entry(
 
     findings: list[DebtFinding] = []
     for match in DEBT_TOKEN_RE.finditer(header):
-        token_line = header_start_line + _line_number(header, match.start()) - 1
+        token_line = header_start_line + line_number(header, match.start()) - 1
         findings.append(
             DebtFinding(
                 blueprint_file=entry.file,
@@ -182,7 +155,7 @@ def _findings_for_entry(
                 lean_line=decl.line,
                 token=match.group(0),
                 token_line=token_line,
-                header_excerpt=_line_excerpt(header, _line_number(header, match.start())),
+                header_excerpt=_line_excerpt(header, line_number(header, match.start())),
             )
         )
     return findings
