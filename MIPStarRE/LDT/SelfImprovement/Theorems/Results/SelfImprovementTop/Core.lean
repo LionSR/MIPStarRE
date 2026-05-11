@@ -126,8 +126,8 @@ lemma self_improvement_helper_with_slackness_of_sdp_statement_with_slackness
     (hsdp : SdpStatementWithSlackness params strategy)
     (hgood : strategy.IsGood eps delta gamma)
     (_nu : Error)
-    -- These arguments keep this construction lemma aligned with the helper
-    -- theorem; the constructed SDP measurement is independent of `G`.
+    -- These arguments keep the slackness-carrying conclusion aligned with the
+    -- helper theorem; the constructed SDP measurement is independent of `G`.
     (_G : Measurement (Polynomial params) ι) :
     ∃ T : Measurement (Polynomial params) ι,
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
