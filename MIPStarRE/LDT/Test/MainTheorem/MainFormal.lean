@@ -13,19 +13,16 @@ Base case, successor branch, and conditional reductions for `thm:main-formal`
   and match-mass preservation for the orthonormalized projective
   submeasurements).
 
-* `MainFormalBaseBridgeHypotheses` and
-  `MainFormalBaseRepairedBridgeHypotheses` — intermediate residuals that
-  carry these base-case hypotheses together with the role-register measurement.
+* `MainFormalBaseBridgeHypotheses` — the remaining base-case analytic data,
+  stated in the match-mass form used by the paper's line-130 completion route.
 
-* `mainFormal_ofRoleResidualAndRepairedBridge` — the successor-branch theorem
-  that combines a role-residual, the projective-consistency handoff
-  data, and the orthonormalization/completion inputs into the three final
-  consistency bounds `Gᴬ ≃ I ⊗ Gᴮ`, `Aᴬ ⊗ I ≃ I ⊗ Qᴮ`, and
-  `Qᴬ ⊗ I ≃ I ⊗ Aᴮ`.
+* `mainFormal_ofProjectiveCompletionResidual` — derives the three consistency
+  conclusions of `thm:main-formal` from a constructed Section 6
+  projective-completion residual.
 
-* `mainFormal_ofRepairedBridge` — the conditional top-level theorem, assuming
-  the remaining repaired bridge from the role-register output to the final
-  projective measurements.
+* `mainFormal_ofProducerObligations` — the top-level theorem that keeps the
+  paper-facing statement fixed while the remaining base and successor
+  construction obligations are isolated as producer declarations.
 
 * `mainFormal` — the paper theorem statement, taking a projective strategy that
   passes the LID test with probability `≥ 1 − ε`, together with the explicit
@@ -257,104 +254,6 @@ theorem baseProjectiveCompletionResidual_ofBaseBridge
     (baseProjectiveCompletionHypotheses_ofBaseBridge bridge)
 
 
-/-- Paper origin: `references/ldt-paper/inductive_step.tex:26-236`
-(proof of `\label{thm:main-formal}`, orthonormalization + completion cascade);
-blueprint `\label{def:main-formal-step6-hypotheses}`.
-
-Narrowed repaired base-case bridge for Step 6 when `params.m = 1`.
-
-This removes the exact line-169 match-mass preservation fields from the base
-bridge.  The repaired pre-completion route needs only the line-130
-orthonormalization inputs and an additional diagonal consistency input for the
-completion theorem on the two unsymmetrized role-block POVMs.  This diagonal
-input is not the paper's line-130 assertion itself; line 130 supplies the
-cross relation between the two unsymmetrized roles. -/
-structure MainFormalBaseRepairedBridgeHypotheses
-    (params : Parameters) [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps)
-    (scalars : MainFormalCascadeScalars params eps k)
-    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) where
-  /-- Line-130 orthonormalization inputs: spectral-truncation and locality-preserving
-  repair witnesses for both unsymmetrized POVMs. -/
-  orthonormalizationInput :
-    MainFormalPostRolePackageDiagonalOrthonormalizationInput
-      params strategy eps k scalars (roleResidual.rolePackage scalars)
-  /-- Additional diagonal consistency for the two unsymmetrized role POVMs, used
-  to invoke the completion theorem without the exact match-mass route. -/
-  diagonalConsistency :
-    MainFormalPostRolePackageDiagonalConsistencyInput
-      params strategy eps k scalars (roleResidual.rolePackage scalars)
-
-/-- Paper origin: `references/ldt-paper/inductive_step.tex:26-236`
-(proof of `\label{thm:main-formal}`, orthonormalization + completion cascade);
-blueprint `\label{def:main-formal-step6-hypotheses}`.
-
-Generic repaired Step-6 bridge over an already constructed role residual. -/
-abbrev MainFormalRepairedBridgeHypotheses
-    (params : Parameters) [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps)
-    (scalars : MainFormalCascadeScalars params eps k)
-    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) :
-    Type _ :=
-  MainFormalBaseRepairedBridgeHypotheses params strategy eps k hpass scalars roleResidual
-
-/-! ### Orthonormalization-input bridge lemmas -/
-
-/-- Assemble the full repaired-bridge hypotheses from a role residual, the two
-locality-preserving repair witnesses, and the diagonal self-consistency input.
-
-This produces exactly the `MainFormalBaseRepairedBridgeHypotheses` consumed by
-`baseMainFormal_ofRepairedBaseBridge` and `mainFormal_ofRoleResidualAndRepairedBridge`.
-
-The orthonormalization input uses `spectralTruncationInput_of_sourceAlmostProjective`
-for its spectral fields and takes the repair witnesses as explicit hypotheses
-via `MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRoleResidual`.
-
-**Diagonal self-consistency** (`diagonalConsistency`) is NOT derivable from the
-role residual's cross consistency (`G^A ⊗ I ≃ I ⊗ G^B`).  It requires
-self-consistency (`G^A ⊗ I ≃ G^A ⊗ I` and `G^B ⊗ I ≃ G^B ⊗ I`), which is a
-structurally stronger statement.  Callers must supply it as a separate
-hypothesis.
-
-Callers constructing `hbaseBridge` for `mainFormal_ofRepairedBridge` should
-instantiate this lemma with the repair witnesses and diagonal self-consistency
-proofs for the role residual under consideration.  The top-level conditional
-bridge for `mainFormal` uses this constructor only for the checked base-case
-role residual.  Successor-branch bridge data is kept in the separate successor
-residual obligations.
-
-Refs #1359, #1043. -/
-noncomputable def repairedBridgeHypotheses_ofRoleResidual
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {hpass : strategy.PassesLowIndividualDegreeTest eps}
-    {scalars : MainFormalCascadeScalars params eps k}
-    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
-    (leftRepair :
-      MakingMeasurementsProjective.LeftLiftedProjectivizationRepairInput strategy.state
-        (unsymmetrizedLeftPOVM
-          (roleResidual.rolePackage scalars).roleMeasurement)
-        (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1))
-    (rightRepair :
-      MakingMeasurementsProjective.LeftLiftedProjectivizationRepairInput strategy.state
-        (unsymmetrizedRightPOVM
-          (roleResidual.rolePackage scalars).roleMeasurement)
-        (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1))
-    (diagonalConsistency :
-      MainFormalPostRolePackageDiagonalConsistencyInput
-        params strategy eps k scalars (roleResidual.rolePackage scalars)) :
-    MainFormalBaseRepairedBridgeHypotheses params strategy eps k hpass
-      scalars roleResidual where
-  orthonormalizationInput :=
-    MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRoleResidual
-      roleResidual leftRepair rightRepair
-  diagonalConsistency := diagonalConsistency
-
 /-- The checked role-register residual used by the `m = 1` branch of
 `mainFormal`.
 
@@ -371,17 +270,18 @@ noncomputable def mainFormalBaseRoleResidual
     MainFormalRolePackageResidual params strategy eps hpass k :=
   Classical.choice (MainFormalRolePackageResidual.ofBaseCase params strategy eps k hpass hm1)
 
-/-- The remaining repaired input for the base case of `mainFormal`.
+/-- The remaining match-mass bridge input for the base case of `mainFormal`.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:26-236`
 (proof of `\label{thm:main-formal}`, base case of the
 orthonormalization and completion argument); blueprint
 `\label{def:main-formal-step6-hypotheses}`.
 
-This type specializes `MainFormalRepairedBridgeHypotheses` to the checked
-role residual for the base case (`m = 1`).  It records the proof obligation
-left by this specialization, not an additional paper hypothesis. -/
-abbrev MainFormalBaseBranchRepairedBridgeHypotheses
+This type specializes `MainFormalBaseBridgeHypotheses` to the checked role
+residual for the base case (`m = 1`).  Its fields are the line-130
+orthonormalization input and match-mass preservation obligations, not diagonal
+self-consistency assumptions. -/
+abbrev MainFormalBaseBranchBridgeHypotheses
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
@@ -389,26 +289,25 @@ abbrev MainFormalBaseBranchRepairedBridgeHypotheses
     (hm1 : params.m = 1)
     (scalars : MainFormalCascadeScalars params eps k) :
     Type _ :=
-  MainFormalRepairedBridgeHypotheses params strategy eps k hpass scalars
+  MainFormalBaseBridgeHypotheses params strategy eps k hpass scalars
     (mainFormalBaseRoleResidual params strategy eps k hpass hm1)
 
-/-- Base-case assembly of `mainFormal` through the repaired line-169 route.
+/-- Derives the three consistency conclusions of `thm:main-formal` from a
+constructed Section 6 projective-completion residual.
 
-Starting from the checked base-role residual, this theorem runs the line-130
-orthonormalization wrapper, completes the resulting projective submeasurements
-using the diagonal consistency input, derives the repaired polynomial line-169
-transport with loss `10 * ζ₁^(1/8)`, and then proves the final point and
-self-consistency goals directly at `mainFormalError`. -/
-theorem baseMainFormal_ofRepairedBaseBridge
+The residual contains the role-register output and the post-role completion
+data.  This theorem performs only the already-formalized final transport and
+scalar absorption steps; it does not introduce additional bridge hypotheses. -/
+theorem mainFormal_ofProjectiveCompletionResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
     (hsmall : ¬ 1 ≤ mainFormalError params k eps)
-    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
-    (bridge : MainFormalBaseRepairedBridgeHypotheses params strategy eps k hpass
-      scalars roleResidual) :
+    (projectiveCompletionResidual :
+      MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
+        params strategy eps hpass k scalars) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
@@ -422,186 +321,48 @@ theorem baseMainFormal_ofRepairedBaseBridge
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  let rolePackage := roleResidual.rolePackage scalars
-  let unsym := rolePackage.toUnsymmetrizationBridge
+  let rolePackage := projectiveCompletionResidual.roleResidual.rolePackage scalars
   have hpre : ConsRel strategy.state (uniformDistribution Unit)
       (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
       (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
       scalars.zeta1 := by
-    simpa [rolePackage] using roleResidual.diagonalConsistency scalars
-  rcases MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalInputs
-      hsmall hpre bridge.orthonormalizationInput with ⟨orthResidual⟩
-  let a0 : Polynomial params :=
-    { poly := 0
-      lowIndividualDegree := by intro i; simp [MvPolynomial.degreeOf_zero] }
-  let diagonalSSC : MainFormalPostRolePackageDiagonalSSCInput
-      params strategy eps k scalars rolePackage :=
-    MainFormalPostRolePackageDiagonalSSCInput.ofDiagonalConsistency
-      bridge.diagonalConsistency
-  obtain ⟨C_A, hC_A, hC_Astmt⟩ :=
-    Preliminaries.completingToMeasurement
-      (Outcome := Polynomial params) (ι := ι) strategy.state strategy.permInvState
-      strategy.isNormalized (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
-      orthResidual.P_A.toSubMeas a0
-      (MakingMeasurementsProjective.orthonormalizationError scalars.zeta1)
-      scalars.zeta1 diagonalSSC.leftSelfConsistency orthResidual.leftCloseness
-  obtain ⟨C_B, hC_B, hC_Bstmt⟩ :=
-    Preliminaries.completingToMeasurement
-      (Outcome := Polynomial params) (ι := ι) strategy.state strategy.permInvState
-      strategy.isNormalized (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
-      orthResidual.P_B.toSubMeas a0
-      (MakingMeasurementsProjective.orthonormalizationError scalars.zeta1)
-      scalars.zeta1 diagonalSSC.rightSelfConsistency orthResidual.rightCloseness
-  let Q_A : ProjMeas (Polynomial params) ι :=
-    Preliminaries.completeAtOutcomeProj orthResidual.P_A a0
-  let Q_B : ProjMeas (Polynomial params) ι :=
-    Preliminaries.completeAtOutcomeProj orthResidual.P_B a0
-  have leftCompletedCloseness :
-      SDDRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas.liftLeft)
-        (constSubMeasFamily Q_A.toSubMeas.liftLeft)
-        (MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1) := by
-    simpa [Q_A, MakingMeasurementsProjective.orthonormalizeAndCompleteError, hC_A] using
-      hC_Astmt.closenessAfterCompletion
-  have rightCompletedClosenessLeft :
-      SDDRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas.liftLeft)
-        (constSubMeasFamily Q_B.toSubMeas.liftLeft)
-        (MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1) := by
-    simpa [Q_B, MakingMeasurementsProjective.orthonormalizeAndCompleteError, hC_B] using
-      hC_Bstmt.closenessAfterCompletion
-  have leftStmt : MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement
-      strategy.state (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
-      orthResidual.P_A Q_A a0 scalars.zeta1 := by
-    exact
-      { orthonormalizationCloseness := orthResidual.leftCloseness
-        completedCloseness := leftCompletedCloseness }
-  have rightStmt : MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement
-      strategy.state (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
-      orthResidual.P_B Q_B a0 scalars.zeta1 := by
-    exact
-      { orthonormalizationCloseness := orthResidual.rightCloseness
-        completedCloseness := rightCompletedClosenessLeft }
-  have hζ2 : MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1 ≤
-      scalars.zeta2 :=
-    MainFormalCascadeScalars.orthonormalizeAndCompleteError_zeta1_le_zeta2 scalars hsmall
-  have hline156Handoff :=
-    (open MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff in
-      ofOrthonormalizeAndCompleteStatements strategy.permInvState hpre leftStmt rightStmt hζ2)
-  have hline156 : Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily Q_A.toSubMeas)
-      (constSubMeasFamily Q_B.toSubMeas)
-      scalars.zeta3 := by
-    simpa [Q_A, Q_B, MainFormalCascadeScalars.zeta3, cascadeZeta3] using
-      MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.fullPolynomialConsistency
-        hline156Handoff
-  have hself : ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily Q_A.toSubMeas)
-      (constSubMeasFamily Q_B.toSubMeas)
-      (scalars.zeta3 / 2) := by
-    let leftConst : IdxProjMeas Unit (Polynomial params) ι := fun _ => Q_A
-    let rightConst : IdxProjMeas Unit (Polynomial params) ι := fun _ => Q_B
-    have happrox : Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
-        (IdxProjMeas.toIdxSubMeas leftConst)
-        (IdxProjMeas.toIdxSubMeas rightConst)
-        (2 * (scalars.zeta3 / 2)) := by
-      change Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily Q_A.toSubMeas) (constSubMeasFamily Q_B.toSubMeas)
-        (2 * (scalars.zeta3 / 2))
-      convert hline156 using 1
-      ring
-    have hcons :=
-      Preliminaries.approxToSimeq strategy.state (uniformDistribution Unit)
-        leftConst rightConst (scalars.zeta3 / 2) happrox
-    simpa [Q_A, Q_B, leftConst, rightConst, constSubMeasFamily, IdxProjMeas.toIdxSubMeas]
-      using hcons
-  have hleftPoly : ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily Q_A.toSubMeas)
-      (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
-      (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error))) := by
-    simpa [Q_A] using
-      (open MainFormalPostRolePackageDiagonalOrthonormalizationResidual in
-        leftPolynomialConsistency_with_orthonormalization_loss orthResidual a0 hpre)
-  have hrightPre : ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
-      (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
-      scalars.zeta1 :=
-    consRel_symm_of_density_fixed strategy.state strategy.densityFixed
-      (uniformDistribution Unit)
-      (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
-      (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
-      scalars.zeta1 hpre
-  have hrightPoly : ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily Q_B.toSubMeas)
-      (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
-      (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error))) := by
-    simpa [Q_B] using
-      (open MainFormalPostRolePackageDiagonalOrthonormalizationResidual in
-        rightPolynomialConsistency_with_orthonormalization_loss orthResidual a0 hrightPre)
-  have hprojEval : ConsRel strategy.state (uniformDistribution (Point params))
-      (polynomialEvaluationFamily params Q_A.toSubMeas)
-      (polynomialEvaluationFamily params Q_B.toSubMeas)
-      (scalars.zeta3 / 2) := by
-    simpa [Q_A, Q_B] using
-      projectiveEvaluationConsistency_ofFullPolynomialConsistency Q_A Q_B hline156
-  have hleftEval : ConsRel strategy.state (uniformDistribution (Point params))
-      (polynomialEvaluationFamily params Q_A.toSubMeas)
-      (polynomialEvaluationFamily params
-        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
-      (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error))) := by
-    simpa [Q_A] using
-      consRel_constPolynomialEvaluation strategy.state Q_A.toMeasurement
-        (unsymmetrizedRightPOVM rolePackage.roleMeasurement) hleftPoly
-  have hrightEval : ConsRel strategy.state (uniformDistribution (Point params))
-      (polynomialEvaluationFamily params Q_B.toSubMeas)
-      (polynomialEvaluationFamily params
-        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
-      (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error))) := by
-    simpa [Q_B] using
-      consRel_constPolynomialEvaluation strategy.state Q_B.toMeasurement
-        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement) hrightPoly
-  have hpointA : ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      (polynomialEvaluationFamily params Q_B.toSubMeas)
-      (mainFormalError params k eps) :=
-    MainFormalCascadeProjectiveCompletionTransportResidual.pointAConsistency_of_repairedLine169
-      rolePackage.roleMeasurement Q_A Q_B
-      unsym.pointAConsistency hleftEval hprojEval
-  have hpointB : ConsRel strategy.state (uniformDistribution (Point params))
-      (polynomialEvaluationFamily params Q_A.toSubMeas)
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-      (mainFormalError params k eps) :=
-    MainFormalCascadeProjectiveCompletionTransportResidual.pointBConsistency_of_repairedLine169
-      rolePackage.roleMeasurement Q_A Q_B
-      unsym.pointBConsistency hrightEval hprojEval
-  exact ⟨Q_A, Q_B, hpointA, hpointB,
-    ConsRel.mono (MainFormalCascadeScalars.zeta3_div_two_le_mainFormalError scalars) hself⟩
-
-/-- Generic repaired Step-6 assembly once the concrete role residual is known. -/
-theorem mainFormal_ofRoleResidualAndRepairedBridge
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {hpass : strategy.PassesLowIndividualDegreeTest eps}
-    {scalars : MainFormalCascadeScalars params eps k}
-    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
-    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
-    (bridge : MainFormalRepairedBridgeHypotheses params strategy eps k hpass
-      scalars roleResidual) :
-    ∃ G_A G_B : ProjMeas (Polynomial params) ι,
-      ConsRel strategy.state (uniformDistribution (Point params))
-          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-          (polynomialEvaluationFamily params G_B.toSubMeas)
-          (mainFormalError params k eps) ∧
-        ConsRel strategy.state (uniformDistribution (Point params))
-          (polynomialEvaluationFamily params G_A.toSubMeas)
-          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-          (mainFormalError params k eps) ∧
-        ConsRel strategy.state (uniformDistribution Unit)
-          (constSubMeasFamily G_A.toSubMeas)
-          (constSubMeasFamily G_B.toSubMeas)
-          (mainFormalError params k eps) :=
-  baseMainFormal_ofRepairedBaseBridge hsmall roleResidual bridge
+    simpa [rolePackage] using
+      projectiveCompletionResidual.roleResidual.diagonalConsistency scalars
+  let rolePackageResidualLeftCompletionTransportResidual :
+      MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual
+        (params := params) (strategy := strategy) (eps := eps)
+        (hpass := hpass) (k := k) (scalars := scalars) :=
+    projectiveCompletionResidual.toLeftCompletionTransportResidual hsmall
+  have hpreForResidual : ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily
+        (unsymmetrizedLeftPOVM
+          (rolePackageResidualLeftCompletionTransportResidual.roleResidual.rolePackage
+            scalars).roleMeasurement).toSubMeas)
+      (constSubMeasFamily
+        (unsymmetrizedRightPOVM
+          (rolePackageResidualLeftCompletionTransportResidual.roleResidual.rolePackage
+            scalars).roleMeasurement).toSubMeas)
+      scalars.zeta1 := by
+    open MainFormalCascadeRolePackageResidualProjectiveCompletionResidual in
+    simpa [rolePackage, rolePackageResidualLeftCompletionTransportResidual,
+      toLeftCompletionTransportResidual] using hpre
+  have rolePackageResidualCompletionTransportResidual :
+      MainFormalCascadeRolePackageResidualCompletionTransportResidual
+        (params := params) (strategy := strategy) (eps := eps)
+        (hpass := hpass) (k := k) (scalars := scalars) :=
+    rolePackageResidualLeftCompletionTransportResidual
+      |>.toRolePackageResidualCompletionTransportResidual hpreForResidual
+  have rolePackagedCompletionTransportResidual :
+      MainFormalCascadeRolePackagedCompletionTransportResidual params strategy eps k scalars :=
+    rolePackageResidualCompletionTransportResidual.toRolePackagedCompletionTransportResidual
+  have completionTransportResidual :
+      MainFormalCascadeProjectiveCompletionTransportResidual params strategy eps k scalars :=
+    rolePackagedCompletionTransportResidual.toCompletionTransportResidual
+  have projectiveTargets :
+      MainFormalCascadeProjectiveStageTargets params strategy eps k scalars :=
+    completionTransportResidual.toProjectiveStageTargets hpass
+  exact MainFormalNativeTargets.toMainFormal
+    (projectiveTargets.toTransportTargets.toCascadeTargets.toNativeTargets)
 
 /-- Successor-case construction of the Section 6 projective-completion residual.
 
@@ -649,12 +410,13 @@ follows the base case of `\label{thm:main-induction}` at
 `\label{def:main-formal-step6-hypotheses}`.
 
 This definition names the remaining base-case analytic obligation for
-`mainFormal`.  It must construct the diagonal orthonormalization input
+`mainFormal`.  It must construct the line-130 orthonormalization input
 (spectral-truncation and locality-preserving repair witnesses for both
-unsymmetrized role POVMs) and the diagonal consistency input (self-consistency
-relations for the two unsymmetrized role POVMs) for the checked base-case role
-residual. -/
-noncomputable def mainFormalBaseBranchRepairedBridgeProducer
+unsymmetrized role POVMs) and match-mass preservation for the orthonormalized
+projective submeasurements of the checked base-case role residual.
+
+This is the tracked data-producing proof obligation for the base branch. -/
+noncomputable def mainFormalBaseBranchBridgeProducer
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι)
@@ -663,20 +425,18 @@ noncomputable def mainFormalBaseBranchRepairedBridgeProducer
     (k : ℕ)
     (hm1 : params.m = 1)
     (scalars : MainFormalCascadeScalars params eps k) :
-    MainFormalBaseBranchRepairedBridgeHypotheses params strategy eps k hpass hm1 scalars := by
-  -- TODO(#1043, #1359): construct the repaired base-case input from the
-  -- paper's base-case orthonormalization and completion argument, using the
-  -- checked base-case role residual rather than assuming this input in
-  -- `mainFormal`.
+    MainFormalBaseBranchBridgeHypotheses params strategy eps k hpass hm1 scalars := by
+  -- TODO(#1043, #1359): construct the base-case match-mass bridge from the
+  -- paper's base-case orthonormalization and completion argument.  Do not
+  -- replace this obligation by diagonal self-consistency assumptions.
   sorry
 
 /--
-Conditional soundness theorem for `thm:main-formal` from `test_definition.tex`.
+Producer-obligation theorem for `thm:main-formal` from `test_definition.tex`.
 
-This theorem is not itself the paper theorem: it assumes the repaired bridge
-from the role-register residual to the final projective-completion hypotheses.
-The theorem `mainFormal` below gives the paper theorem statement. Deriving this
-bridge from its hypotheses is the remaining step.
+This theorem has the same public hypotheses and conclusion as `mainFormal`.
+Its proof body isolates the remaining construction work in producer
+declarations rather than adding bridge data to the theorem statement.
 
 The bipartite tensor placement follows the paper:
 - **1a**: `A^A_u ⊗ I ≈_ν I ⊗ G^B_{[g(u)=a]}` — G_B on **right**
@@ -707,9 +467,9 @@ and weakens it to the predecessor side condition `400 * pred.m * pred.d ≤ k`.
 
 For an arbitrary current parameter bundle, the predecessor decomposition itself is
 now formalized by `Parameters.successorDecompositionOfNeOne`.  The remaining
-base-case repaired-input obligation is isolated in
-`mainFormalBaseBranchRepairedBridgeProducer`, while the successor branch still
-has its own residual obligation.  No checked lemma here claims that the former
+base-case match-mass obligation is isolated in
+`mainFormalBaseBranchBridgeProducer`, while the successor branch still has its
+own residual obligation.  No checked lemma here claims that the former
 intermediate range `params.m * params.d ≤ k < 400 * params.m * params.d` is
 vacuous.
 
@@ -719,9 +479,19 @@ This is a current formalization limitation, not a paper constraint; once the
 Section 6 wrapper is universe-polymorphic, this theorem should be generalized
 as well.
 
+**Unfaithful:** the public statement is source-shaped, but the proof still
+depends on admitted producer declarations:
+`mainFormalBaseBranchBridgeProducer` for the base-case match-mass construction
+and `mainFormalSuccessorProjectiveCompletionResidualProducer` for the successor
+projective-completion residual.  These are tracked proof obligations for
+#1043, #1359, and #1458; see also
+`docs/paper-gaps/issue-1099-sharper-local-fix.tex` for the local repair used in
+the final completion transport.  They must be proved from the paper hypotheses,
+not turned into hypotheses of `mainFormal`.
+
 Addresses #137, #239, #906, #1099, #1458.
 -/
-theorem mainFormal_ofRepairedBridge
+theorem mainFormal_ofProducerObligations
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι)
     (eps : Error)
@@ -744,7 +514,7 @@ theorem mainFormal_ofRepairedBridge
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
   -- TODO(#422, #1458): The induction-side handoffs needed by
-  -- `mainFormal_ofRepairedBridge` are standalone formal theorems:
+  -- `mainFormal_ofProducerObligations` are standalone formal theorems:
   -- * base branch: `strategySymmetrization_mainInductionBaseCase`,
   -- * weighted successor boundary fields:
   --   `mainFormalSuccessorAxisWeightedBound_ofPass` and
@@ -758,19 +528,16 @@ theorem mainFormal_ofRepairedBridge
   -- pre-projective consistency field inside the projectivization handoff, the
   -- unused Section 6 consistency field inside the unsymmetrization package, the
   -- line-171--173 data-processing step for the `ζ₁` links, and the final `ζ₄`
-  -- point-triangle assembly to the paper-shaped Step 6 witness residual
+  -- point-triangle argument leading to the paper-shaped Step 6 witness residual
   -- `MainFormalCascadeRolePackageResidualProjectiveCompletionResidual`.  The scalar
   -- cascade side conditions are discharged below: if `mainFormalError ≥ 1`, the
   -- theorem is vacuous; otherwise the pass condition gives `0 ≤ ε`, while
   -- `mainFormalError < 1` rules out `ε > 1` and `d > q`.
   --
-  -- The repaired line-169 transport is now formalized: once a concrete
-  -- `roleResidual` and repaired bridge input are available,
-  -- `mainFormal_ofRoleResidualAndRepairedBridge` finishes the base Step-6
-  -- assembly using the sharper pre-completion loss
-  -- `ζ₁ + 10 * ζ₁^(1/8)`.  The self-improvement assumptions are packaged as
-  -- `SelfImprovement.SelfImprovementBridgeInputs`.  The remaining
-  -- `mainFormal_ofRepairedBridge` hole still needs:
+  -- The remaining base and successor obligations are producer declarations,
+  -- not additional hypotheses of the paper theorem.  The self-improvement
+  -- assumptions are packaged as `SelfImprovement.SelfImprovementBridgeInputs`.
+  -- The remaining `mainFormal_ofProducerObligations` hole still needs:
   --
   -- 1. **Section 6 role residual** via base/successor branch:
   --    - `MainFormalRolePackageBranchResidual` constructed from either
@@ -784,11 +551,10 @@ theorem mainFormal_ofRepairedBridge
   --      spectral-truncation and locality-preserving repair witnesses
   --      for both unsymmetrized POVMs.
   --
-  -- 3. **Completion input** for the two POVMs, derived through
-  --    `completingToMeasurement`.  In the repaired base route this is supplied as
-  --    additional diagonal consistency for the two unsymmetrized POVMs, beyond
-  --    the line-130 cross relation, and is converted to the `BipartiteSSCRel`
-  --    hypotheses consumed by the completion theorem.
+  -- 3. **Completion input** for the two POVMs, derived through the paper's
+  --    match-mass preservation route.  The base branch must produce the
+  --    match-mass fields in `MainFormalBaseBridgeHypotheses`; it must not be
+  --    closed by adding diagonal self-consistency assumptions.
   --
   -- 4. **Repaired line-169 transport**.  The paper's exact `ζ₁` replacement step
   --    is false as printed; the checked local repair compares with the
@@ -806,11 +572,17 @@ theorem mainFormal_ofRepairedBridge
     let scalars : MainFormalCascadeScalars params eps k :=
       MainFormalCascadeScalars.ofNontrivialMainFormal hepsNN hk0 herr
     by_cases hm1 : params.m = 1
-    · -- Base case (m = 1): use the checked base residual and its explicit
-      -- repaired bridge input.
+    · -- Base case (m = 1): use the checked base residual and the paper-shaped
+      -- match-mass bridge input.
       let roleResidual := mainFormalBaseRoleResidual params strategy eps k hpass hm1
-      exact mainFormal_ofRoleResidualAndRepairedBridge herr roleResidual
-        (mainFormalBaseBranchRepairedBridgeProducer params strategy eps hpass k hm1 scalars)
+      have hprojectiveCompletionResidual :
+          Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
+            (params := params) (strategy := strategy) (eps := eps)
+            (hpass := hpass) (k := k) (scalars := scalars)) := by
+        exact baseProjectiveCompletionResidual_ofBaseBridge herr roleResidual
+          (mainFormalBaseBranchBridgeProducer params strategy eps hpass k hm1 scalars)
+      rcases hprojectiveCompletionResidual with ⟨projectiveCompletionResidual⟩
+      exact mainFormal_ofProjectiveCompletionResidual herr projectiveCompletionResidual
     · have hprojectiveCompletionResidual :
           Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
             (params := params) (strategy := strategy) (eps := eps)
@@ -818,50 +590,7 @@ theorem mainFormal_ofRepairedBridge
         exact ⟨mainFormalSuccessorProjectiveCompletionResidualProducer
           hpass hd hk hk0 hm1 scalars⟩
       rcases hprojectiveCompletionResidual with ⟨projectiveCompletionResidual⟩
-      let rolePackage := projectiveCompletionResidual.roleResidual.rolePackage scalars
-      have hpre : ConsRel strategy.state (uniformDistribution Unit)
-          (constSubMeasFamily
-            (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
-          (constSubMeasFamily
-            (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
-          scalars.zeta1 := by
-        simpa [rolePackage] using
-          projectiveCompletionResidual.roleResidual.diagonalConsistency scalars
-      let rolePackageResidualLeftCompletionTransportResidual :
-          MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual
-            (params := params) (strategy := strategy) (eps := eps)
-            (hpass := hpass) (k := k) (scalars := scalars) :=
-        projectiveCompletionResidual.toLeftCompletionTransportResidual herr
-      have hpreForResidual : ConsRel strategy.state (uniformDistribution Unit)
-          (constSubMeasFamily
-            (unsymmetrizedLeftPOVM
-              (rolePackageResidualLeftCompletionTransportResidual.roleResidual.rolePackage
-                scalars).roleMeasurement).toSubMeas)
-          (constSubMeasFamily
-            (unsymmetrizedRightPOVM
-              (rolePackageResidualLeftCompletionTransportResidual.roleResidual.rolePackage
-                scalars).roleMeasurement).toSubMeas)
-          scalars.zeta1 := by
-        open MainFormalCascadeRolePackageResidualProjectiveCompletionResidual in
-        simpa [rolePackage, rolePackageResidualLeftCompletionTransportResidual,
-          toLeftCompletionTransportResidual] using hpre
-      have rolePackageResidualCompletionTransportResidual :
-          MainFormalCascadeRolePackageResidualCompletionTransportResidual
-            (params := params) (strategy := strategy) (eps := eps)
-            (hpass := hpass) (k := k) (scalars := scalars) :=
-        rolePackageResidualLeftCompletionTransportResidual
-          |>.toRolePackageResidualCompletionTransportResidual hpreForResidual
-      have rolePackagedCompletionTransportResidual :
-          MainFormalCascadeRolePackagedCompletionTransportResidual params strategy eps k scalars :=
-        rolePackageResidualCompletionTransportResidual.toRolePackagedCompletionTransportResidual
-      have completionTransportResidual :
-          MainFormalCascadeProjectiveCompletionTransportResidual params strategy eps k scalars :=
-        rolePackagedCompletionTransportResidual.toCompletionTransportResidual
-      have projectiveTargets :
-          MainFormalCascadeProjectiveStageTargets params strategy eps k scalars :=
-        completionTransportResidual.toProjectiveStageTargets hpass
-      exact MainFormalNativeTargets.toMainFormal
-        (projectiveTargets.toTransportTargets.toCascadeTargets.toNativeTargets)
+      exact mainFormal_ofProjectiveCompletionResidual herr projectiveCompletionResidual
 
 /--
 `thm:main-formal` from `test_definition.tex`.
@@ -877,6 +606,13 @@ records the strengthened boundary from issue #906 and
 `rem:main-formal-k-boundary`; the paper states the weaker condition `k ≥ md`.
 The field model is presently fixed at universe level `0`, matching the current
 Section 6 successor theorem rather than an additional mathematical restriction.
+
+**Unfaithful:** this theorem delegates to `mainFormal_ofProducerObligations`,
+whose proof uses the admitted producers `mainFormalBaseBranchBridgeProducer` and
+`mainFormalSuccessorProjectiveCompletionResidualProducer`.  The remaining
+obligations are tracked by #1043, #1359, and #1458 and must be discharged inside
+the proof, rather than exposed as extra bridge, residual, repair, producer, or
+package hypotheses.
 -/
 theorem mainFormal
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -900,7 +636,7 @@ theorem mainFormal
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  exact mainFormal_ofRepairedBridge params strategy eps hd hpass k hk hk0
+  exact mainFormal_ofProducerObligations params strategy eps hd hpass k hk hk0
 
 end Test
 

@@ -455,13 +455,10 @@
 	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRepairInputs}
 	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofQXPLayerRepairWitnesses}
 	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofLiftedQXPApproximations}
-	\lean{MIPStarRE.LDT.Test.MainFormalBaseRepairedBridgeHypotheses}
-	\lean{MIPStarRE.LDT.Test.MainFormalRepairedBridgeHypotheses}
 	\lean{MIPStarRE.LDT.Test.mainFormalBaseRoleResidual}
-	\lean{MIPStarRE.LDT.Test.MainFormalBaseBranchRepairedBridgeHypotheses}
-	\lean{MIPStarRE.LDT.Test.baseMainFormal_ofRepairedBaseBridge}
-	\lean{MIPStarRE.LDT.Test.mainFormal_ofRoleResidualAndRepairedBridge}
-	\lean{MIPStarRE.LDT.Test.mainFormalBaseBranchRepairedBridgeProducer}
+	\lean{MIPStarRE.LDT.Test.MainFormalBaseBranchBridgeHypotheses}
+	\lean{MIPStarRE.LDT.Test.mainFormal_ofProjectiveCompletionResidual}
+	\lean{MIPStarRE.LDT.Test.mainFormalBaseBranchBridgeProducer}
 	\leanok
 	\uses{def:main-formal-successor-boundary, thm:orthonormalization}
 	The structure \texttt{MainFormalBaseProjectiveCompletionHypotheses} bundles the still-unformalized
@@ -481,34 +478,29 @@
 	repair witnesses, and the latter consumes explicit QXP-layer data together
 	with the corresponding left-placed state-dependent approximation.  The base
 	bridge structures still accept a full orthonormalization input until a later
-	assembly step routes them through these constructors.  The line-130 cross
+	theorem routes them through these constructors.  The line-130 cross
 	consistency relation is reconstructed internally from the checked role residual
 	and used directly in the completion step, so no separate diagonal strong
 	self-consistency package remains in this bridge.  The narrowed alias
 	\texttt{MainFormalBaseBridgeHypotheses} omits the two distinguished outcomes;
-	\texttt{baseProjectiveCompletionHypotheses\_ofBaseBridge} fills both with the explicit zero
-	polynomial.  The assembly theorems \texttt{baseProjectiveCompletionResidual} and
+	\texttt{baseProjectiveCompletionHypotheses\_ofBaseBridge} fills both with the
+	explicit zero polynomial.  The theorems \texttt{baseProjectiveCompletionResidual} and
 	\texttt{baseProjectiveCompletionResidual\_ofBaseBridge} turn these hypotheses
 	(together with the checked base-case role residual from
 	\texttt{MainFormalRolePackageResidual.ofBaseCase}, where the
 	\texttt{params.m = 1} hypothesis is used) into the Step~6 witness residual
 	consumed by the downstream cascade.
 
-	The sharper repaired base route is packaged separately by
-	\texttt{MainFormalBaseRepairedBridgeHypotheses}.  It keeps the same
-	orthonormalization inputs but replaces the exact match-mass fields by the
-	diagonal self-consistency input needed for completion.  The generic theorem
-	\texttt{mainFormal\_ofRoleResidualAndRepairedBridge} combines that diagonal
-	completion input with the checked pre-completion line-169 repair from
-	Remark~\ref{rem:lean-line169-projectivization-match-mass}, so the base branch
-	of \texttt{mainFormal\_ofRepairedBridge} retains the original final envelope
-	rather than widening to the generic $\zeta_1+\sqrt{\zeta_2}$ scale.  The theorem
-	\texttt{baseMainFormal\_ofRepairedBaseBridge} is the base-case wrapper of this
-	role-residual form.  The base-case construction
-	\texttt{mainFormalBaseBranchRepairedBridgeProducer} names the remaining
-	obligation for the checked base-case residual
-	\texttt{mainFormalBaseRoleResidual}; it is an open proof obligation, not an
-	additional hypothesis in the public statement of Theorem~\ref{thm:main-formal}.
+	The base-case construction
+	\texttt{mainFormalBaseBranchBridgeProducer} names the remaining obligation for
+	the checked base-case residual \texttt{mainFormalBaseRoleResidual}.  It must
+	produce the match-mass fields in \texttt{MainFormalBaseBridgeHypotheses}; it is
+	not a license to replace the paper's completion route by diagonal
+	self-consistency assumptions.  The theorem
+	\texttt{mainFormal\_ofProjectiveCompletionResidual} then derives the three
+	consistency conclusions from any constructed Step~6 projective-completion
+	residual for Theorem~\ref{thm:main-formal}.  These are open proof obligations, not
+	additional hypotheses in the public statement.
 \end{definition}
 
 
@@ -541,8 +533,8 @@
 	strategy that passes the low individual degree test, the large-\(k\) bound
 	\(k \ge 400md\) from Section~6, the positivity condition \(d > 0\), and the
 	non-base condition \(m \neq 1\), it is expected to produce the
-	projective-completion residual consumed by the conditional theorem
-	\texttt{mainFormal\_ofRepairedBridge}.  It is not an additional hypothesis of
+	projective-completion residual consumed by the producer-obligation theorem
+	\texttt{mainFormal\_ofProducerObligations}.  It is not an additional hypothesis of
 	Theorem~\ref{thm:main-formal}; it is the open construction that should replace
 	the successor-branch residual currently tracked separately.
 \end{remark}
@@ -783,7 +775,7 @@ from recursive slice witnesses and answer-side bridge inputs by
 from a predecessor induction package together with the bridge inputs by
 \texttt{MainFormalRolePackageBranchResidual.answerSuccessorOfInductionPackageAndBridgeInputs}.
 These constructors are structural and do not call
-\texttt{mainFormal\_ofRepairedBridge}; the
+\texttt{mainFormal\_ofProducerObligations}; the
 line-130 completion interfaces remain separate.  The live completion residual
 carries the concrete role residual rather than a separate decorative branch
 witness; the branch residual types remain the documented base/successor supply
@@ -830,9 +822,9 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 	error to scale $t^{1/65536}$, outside the current \texttt{mainFormalError}
 	envelope.  The sharper local pre-completion repair from
 	Remark~\ref{rem:lean-line169-projectivization-match-mass} avoids that
-	widening and is the route used by the present base-case formal proof.
+	widening and is part of the match-mass residual route.
 	No proof-level completeness tag is claimed here while
-	\texttt{mainFormal\_ofRepairedBridge} still has an open successor-case
+	\texttt{mainFormal\_ofProducerObligations} still has an open successor-case
 	completion residual and \texttt{mainFormal} derives the paper theorem via a
 	tracked open step (issue~\#1458).
 

@@ -7,9 +7,11 @@
 > **Status note, 2026-05-11.**  This report predates the source-faithful
 > `mainFormal` repair.  References to an external `hbaseBridge` hypothesis at
 > the final theorem should now be understood as references to the conditional
-> helper `mainFormal_ofRepairedBridge`, not to the paper-facing theorem
-> `mainFormal`.  The current cleanup direction is to prove producer theorems for
-> these inputs, not to add them to source-labelled theorem statements.
+> helper that existed at the time of the report, not to the paper-facing theorem
+> `mainFormal`.  The subsequent MainFormal cleanup removes the live repaired
+> bridge route; the current cleanup direction is to prove producer theorems for
+> the match-mass base bridge and successor residual, not to add these inputs to
+> source-labelled theorem statements.
 
 ## Executive Summary
 

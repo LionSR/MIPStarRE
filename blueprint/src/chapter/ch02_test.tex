@@ -129,13 +129,13 @@
 	\end{enumerate}
 \end{theorem}
 
-\begin{remark}[Conditional form of the soundness theorem]\label{rem:main-formal-conditional}
-	\lean{MIPStarRE.LDT.Test.mainFormal_ofRepairedBridge}
+\begin{remark}[Producer-obligation form of the soundness theorem]\label{rem:main-formal-conditional}
+	\lean{MIPStarRE.LDT.Test.mainFormal_ofProducerObligations}
 	\uses{thm:main-formal, def:low-individual-degree-test, def:projective-strategy, def:polymeasurements, def:simeq}
-	The conditional theorem currently assumes a repaired bridge from
-	the role-register residual to the final projective-completion hypotheses.
-	This is not a hypothesis of Theorem~\ref{thm:main-formal}; it is the
-	remaining step needed to derive the paper theorem from the pass condition.
+	The producer-obligation theorem has the same public hypotheses and conclusion
+	as Theorem~\ref{thm:main-formal}.  Its proof body isolates the remaining base
+	and successor constructions as named producer declarations, rather than
+	adding bridge data to the theorem statement.
 \end{remark}
 
 \begin{remark}[$k$-bound boundary for the public theorem]\label{rem:main-formal-k-boundary}
