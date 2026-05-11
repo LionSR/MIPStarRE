@@ -34,7 +34,15 @@ Instructions:
 Quality bar (your fix MUST satisfy ALL of these before committing):
 - Proof integrity (BLOCKER): no sorry, admit, native_decide on non-trivial goals, unsafeCast, or new axioms. See docs/PROOF_INTEGRITY.md.
 - Proof correctness (BLOCKER): structured proofs, not brute-force tactic chains. If a result looks wrong, scout `references/ldt-paper/` first, then `blueprint/src/chapter/`, and cite the specific source path, label, and line.
-- Source-statement fidelity (BLOCKER): declarations named after paper results or linked by `\lean{...}` must preserve the cited statement up to faithful formal encoding. Do not add load-bearing bridge, residual, repair, producer, package, or arbitrary implication hypotheses unless they occur in the cited statement or are a documented Lean boundary condition needed to state the mathematics. Existing conditional helpers must be separately named and must not be treated as the paper theorem.
+- Source-statement fidelity (BLOCKER): declarations named after paper results or
+  linked by `\lean{...}` must preserve the cited statement up to faithful formal
+  encoding. Do not add load-bearing bridge, residual, repair, producer, package,
+  or arbitrary implication hypotheses. The only acceptable extra hypotheses are
+  boundary conditions genuinely needed to state the same mathematics in Lean,
+  such as positivity for a division, nonemptiness, decidability, or a
+  field-model instance. Proof-debt objects are not boundary conditions. Existing
+  conditional helpers must be separately named and must not be treated as the
+  paper theorem.
 - Mathlib style: camelCase defs, snake_case lemmas, minimal imports, no unnecessary opens.
 - Type safety (BLOCKER): no universe issues, missing instances, or coercion failures.
 - Performance: avoid `decide` on large types, unbounded `simp`, deep `rw` chains.

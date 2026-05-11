@@ -3,6 +3,7 @@ import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
 import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
 import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.Bracketed
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 import MIPStarRE.LDT.Test.MainTheorem
 
@@ -61,6 +62,12 @@ hypothesis for the polynomial measurement `G` and the four conclusions stated
 in the paper; the remaining helper strong self-consistency estimate is admitted
 in the proof rather than assumed in the theorem statement.
 
+The audit for `SelfImprovement.sdp_statement_with_slackness` records the present
+state of issue #1230.  The theorem states the source-facing SDP strong-duality
+and complementary-slackness producer for `lem:sdp`; the missing proof is the
+finite-dimensional semidefinite-programming argument, not an additional
+hypothesis on a later paper theorem.
+
 This module is built explicitly in CI rather than imported from the umbrella
 library modules, so the axiom audits stay out of normal downstream imports
 while still acting as regression tests.
@@ -104,6 +111,11 @@ needed for `selfImprovementHelper`. -/
 private def expectedSelfImprovementHelperAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
+/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1230 derivation
+needed for the slackness-carrying SDP producer. -/
+private def expectedSdpSlacknessAxioms : Array Name :=
+  expectedStandardAxiomsWithSorry
+
 private def assertUsesExactlyAxioms (declName : Name) (expected : Array Name) :
     CommandElabM Unit := do
   let axioms := (← Lean.collectAxioms declName).qsort Name.lt
@@ -136,6 +148,9 @@ elab "assert_ordered_laplacian_gap_axioms " id:ident : command => do
 elab "assert_self_improvement_helper_axioms " id:ident : command => do
   assertUsesExactlyAxioms id.getId expectedSelfImprovementHelperAxioms
 
+elab "assert_sdp_slackness_axioms " id:ident : command => do
+  assertUsesExactlyAxioms id.getId expectedSdpSlacknessAxioms
+
 assert_standard_axioms MIPStarRE.LDT.Test.razSafra
 assert_standard_axioms MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement
 assert_standard_axioms MIPStarRE.LDT.Test.classicalTestSoundness
@@ -153,3 +168,4 @@ assert_main_induction_axioms MIPStarRE.LDT.MainInductionStep.mainInduction
 assert_ordered_laplacian_gap_axioms
   MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianSpectralGapOrdered
 assert_self_improvement_helper_axioms MIPStarRE.LDT.SelfImprovement.selfImprovementHelper
+assert_sdp_slackness_axioms MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness

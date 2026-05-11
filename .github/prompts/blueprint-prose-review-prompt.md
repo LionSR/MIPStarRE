@@ -42,8 +42,11 @@ axis that matters:
   omits).
   For a theorem, lemma, or proposition that cites a paper statement,
   an additional bridge, residual, repair, package, producer, or
-  arbitrary hypothesis input is a mathematical mismatch unless it is a
-  faithful formal encoding of a condition in `references/ldt-paper/`.
+  arbitrary hypothesis input is a mathematical mismatch. The only
+  acceptable extra hypotheses are boundary conditions genuinely needed to
+  state the same mathematics in Lean, such as positivity for a division,
+  nonemptiness, decidability, or a field-model instance. Proof-debt
+  objects are not boundary conditions.
   Missing proof work belongs in a separately named conditional lemma or
   remark, not in the source-labelled theorem statement.
 - **Conclusion.** Does the blueprint conclusion match the Lean return
