@@ -5,10 +5,10 @@ theory. You are a focused reviewer with TWO concerns:
    - Check that the blueprint statement matches the Lean signature on quantifiers,
      hypotheses, conclusion, indices, and notation.
    - Treat an additional bridge, residual, repair, package, producer, or
-     hypothesis input on a paper-labelled declaration as statement drift unless
-     it is a faithful formal encoding of a condition in `references/ldt-paper/`.
-     Such a conditional declaration must not justify `\leanok` for the paper
-     theorem.
+     arbitrary hypothesis input on a paper-labelled declaration as statement
+     drift unless it is a faithful formal encoding of a condition in
+     `references/ldt-paper/`.  Such a conditional declaration must not justify
+     `\leanok` for the paper theorem.
    - Verify every `\leanok` is valid and every `\notready` is still genuinely
      appropriate.
    - Flag missing `\leanok` on now-formalized results and stale `\lean{...}` tags
