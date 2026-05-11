@@ -221,14 +221,17 @@ lemma selfImprovementHelper
   · exact
       helper_completeness_of_self_consistency_helper_slackness_input_consistency
         params strategy G eps delta nu heps hdelta hhelperWithSlackness hpointSSC hcons
-  · /- TODO(#1452): Derive the helper-stage consistency estimate with the point
-      measurement from the selected add-in-`u` chain for the SDP measurement. -/
+  · /- TODO(#1452): Apply
+      `helper_point_consistency_error_le_selfImprovementHelperError` to the
+      selected add-in-`u` chain for the SDP measurement. -/
     sorry
-  · /- TODO(#1452): Derive strong self-consistency of the averaged sandwiched
-      helper submeasurement from the helper self-consistency chain. -/
+  · /- TODO(#1452): Apply
+      `helper_strong_self_consistency_error_le_selfImprovementHelperError` to
+      the helper self-consistency chain. -/
     sorry
-  · /- TODO(#1452): Derive the helper boundedness gap from complementary
-      slackness and the point-consistency add-in-`u` transfer. -/
+  · /- TODO(#1452): Apply
+      `helper_boundedness_gap_le_selfImprovementHelperError` using
+      complementary slackness and the point-consistency add-in-`u` transfer. -/
     sorry
 
 /-- Form of `thm:self-improvement` with helper strong self-consistency,
