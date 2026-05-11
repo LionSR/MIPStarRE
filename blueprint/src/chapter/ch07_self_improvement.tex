@@ -1031,7 +1031,7 @@ Lemma~\ref{lem:self-improvement-helper}. The bookkeeping here is entirely about
 showing that completeness, consistency, self-consistency, and boundedness survive
 the passage from~$\widehat H$ to a projective submeasurement~$H$.
 
-\begin{remark}[Auxiliary self-improvement interfaces]\label{rem:self-improvement-lean-interfaces}
+\begin{remark}[Auxiliary self-improvement lemmas]\label{rem:self-improvement-lean-interfaces}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementError_nonneg_of_isGood}
   \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementBridgeInputs}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromBridgeInputs}
@@ -1041,16 +1041,16 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_of_helper_outputs_of_total_operator_le}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_exists_of_helper_outputs_of_residual_domination}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_exists_of_helper_outputs_of_residualDominationInput}
-  The Lean development records several interfaces used to assemble
-  Theorem~\ref{thm:self-improvement} from the helper output and the
-  orthonormalization theorem.  These declarations are auxiliary formalization
-  boundaries: they are not additional hypotheses in the statement of
-  Theorem~\ref{thm:self-improvement}.
+  Several auxiliary results are used to prove Theorem~\ref{thm:self-improvement}
+  from the helper output and the orthonormalization theorem.  They record
+  intermediate proof obligations that do not appear as hypotheses in the paper
+  statement.  The current Lean theorem still takes these obligations as explicit
+  assumptions, so the theorem below is linked to the current Lean statement but
+  is not marked as completely formalized.
 \end{remark}
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovement}
-  \leanok
   \uses{def:polymeasurements, def:simeq, def:approx_delta, def:strong-self-consistency}
   Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following properties:
   \begin{enumerate}
