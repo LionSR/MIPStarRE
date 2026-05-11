@@ -28,11 +28,10 @@ orthonormalization input has not yet been produced from the paper's base-case
 argument.  These obligations are admitted by named producers rather than
 assumed in the public statement of the paper theorem.
 
-The audit for `GlobalVariance.globalVarianceOfPoints` records the remaining
-issue-#1456 step. The paper theorem has the correct hypotheses, and the
-six-step local transport estimate from `lem:local-variance-of-points` is the
-sole unproved claim, admitted by `sorry` rather than assumed as an extra
-hypothesis.
+The audit for `GlobalVariance.globalVarianceOfPoints` now requires the standard
+Lean axioms only: the issue-#1456 six-step local transport estimate is supplied
+by `GlobalVariance.localVarianceTransportChainBound`, so the paper-facing theorem
+no longer carries a `sorryAx` dependency.
 
 The audit for `MainInductionStep.selfImprovementInInductionSection` records
 the current proof obligation for the submeasurement-input statement of
@@ -73,11 +72,6 @@ needed for `selfImprovement`. -/
 private def expectedSelfImprovementAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
-/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1456 derivation
-needed for `globalVarianceOfPoints`. -/
-private def expectedGlobalVarianceAxioms : Array Name :=
-  expectedStandardAxiomsWithSorry
-
 /-- Standard kernel axioms plus `sorryAx`; tracks the issue #1451 derivation
 needed for `selfImprovementInInductionSection`. -/
 private def expectedInductionSelfImprovementAxioms : Array Name :=
@@ -108,9 +102,6 @@ elab "assert_tracked_sorry_axioms " id:ident : command => do
 elab "assert_self_improvement_axioms " id:ident : command => do
   assertUsesExactlyAxioms id.getId expectedSelfImprovementAxioms
 
-elab "assert_global_variance_axioms " id:ident : command => do
-  assertUsesExactlyAxioms id.getId expectedGlobalVarianceAxioms
-
 elab "assert_induction_self_improvement_axioms " id:ident : command => do
   assertUsesExactlyAxioms id.getId expectedInductionSelfImprovementAxioms
 
@@ -127,7 +118,7 @@ assert_tracked_sorry_axioms
   MIPStarRE.LDT.Test.mainFormalSuccessorProjectiveCompletionResidualProducer
 assert_tracked_sorry_axioms MIPStarRE.LDT.Test.mainFormal
 assert_self_improvement_axioms MIPStarRE.LDT.SelfImprovement.selfImprovement
-assert_global_variance_axioms MIPStarRE.LDT.GlobalVariance.globalVarianceOfPoints
+assert_standard_axioms MIPStarRE.LDT.GlobalVariance.globalVarianceOfPoints
 assert_induction_self_improvement_axioms
   MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection
 assert_self_improvement_helper_axioms MIPStarRE.LDT.SelfImprovement.selfImprovementHelper
