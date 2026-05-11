@@ -22,7 +22,8 @@ the full `MainFormalBaseRepairedBridgeHypotheses` lives in `MainFormal.lean`
   with itself).  The role residual's `diagonalConsistency` gives cross consistency
   `ConsRel G^A G^B ζ₁` (the two POVMs with each other), which is a different type.
   Diagonal self-consistency is therefore a **separate hypothesis** that must be
-  supplied alongside the repair witnesses when constructing `hbaseBridge`.
+  supplied alongside the role residual, after the orthonormalization input has
+  been derived from the named Section 5 producer.
 
 * **Locality-preserving repair**: the ordinary repair fields are supplied by
   `MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer`.

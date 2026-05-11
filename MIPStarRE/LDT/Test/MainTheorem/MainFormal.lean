@@ -10,8 +10,10 @@ Base case, successor branch, and final assembly for `thm:main-formal`
 * `MainFormalBaseProjectiveCompletionHypotheses` — the still-unformalized
   analytic hypotheses needed for the base case `m = 1` (distinguished
   completion outcomes and match-mass preservation for the orthonormalized
-  projective submeasurements).  The ordinary locality-preserving repair fields
-  for orthonormalization are supplied by the named Section 5 producer.
+  projective submeasurements).  The structure still carries the full diagonal
+  orthonormalization input for the base branch; the ordinary
+  locality-preserving repair fields inside that input are obtained from the
+  named Section 5 producer, whose proof obligation remains tracked there.
 
 * `MainFormalBaseBridgeHypotheses` and
   `MainFormalBaseRepairedBridgeHypotheses` — intermediate residuals that
@@ -47,13 +49,13 @@ namespace Test
 /-! ### Base (m = 1) Step 6 analytic hypotheses
 
 The base case (`m = 1`) generation of the Step 6 witness residual still
-requires the same analytic content as the successor case: spectral
-truncation and locality-preserving repair witnesses for the unsymmetrized
-POVMs and match-mass preservation for the orthonormalized projective
-submeasurements. These are proof obligations whose formalization
-corresponds to unformalized content in Section 5 and Section 6 of the
-paper; they are bundled as a single structure to give a single target
-for the remaining work.  When these hypotheses are supplied,
+requires the diagonal orthonormalization input for the unsymmetrized POVMs and
+match-mass preservation for the orthonormalized projective submeasurements. The
+ordinary locality-preserving repair fields inside the orthonormalization input
+are no longer caller-supplied witnesses; they are obtained through the named
+Section 5 producer, whose proof remains a tracked obligation. The remaining
+base-case data are bundled as a single structure to give a single target for the
+remaining work.  When these hypotheses are supplied,
 `baseProjectiveCompletionResidual` provides the checked assembly theorem that
 fills the base branch of `mainFormal`. -/
 
@@ -63,10 +65,11 @@ fills the base branch of `mainFormal`. -/
 (orthonormalization and completion cascade in Section 3);
 blueprint `\label{def:main-formal-step6-hypotheses}`.
 
-Analytic hypotheses that are still unformalized for the
-base case (`m = 1`) Step 6 witness residual: orthonormalization
-inputs (spectral truncation and repair witnesses), distinguished
-outcomes, and match-mass preservation for the unsymmetrized POVMs.
+Analytic hypotheses that are still unformalized for the base case (`m = 1`)
+Step 6 witness residual: the diagonal orthonormalization input, distinguished
+outcomes, and match-mass preservation for the unsymmetrized POVMs.  The
+ordinary repair component of the orthonormalization input is provided through
+the named Section 5 producer rather than as a separate caller hypothesis.
 
 Supplying these hypotheses yields a complete `baseProjectiveCompletionResidual`
 for the base branch of `mainFormal`; the remaining successor-case
