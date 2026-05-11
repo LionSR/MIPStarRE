@@ -9,6 +9,7 @@ import MIPStarRE.LDT.Test.MainTheorem.CompletionTransport
 import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationData
 import MIPStarRE.LDT.Test.MainTheorem.DiagonalCompletion
 import MIPStarRE.LDT.Test.MainTheorem.NativeTargets
+import MIPStarRE.LDT.Test.MainTheorem.Producers
 import MIPStarRE.LDT.Test.MainTheorem.MainFormal
 
 /-!
@@ -37,6 +38,7 @@ The imported modules carry the split proof assembly:
 * `OrthonormalizationData` — orthonormalization and completion hypotheses
 * `DiagonalCompletion` — diagonal consistency inputs for completing each side
 * `NativeTargets` — the final `ζ₄` native consistency targets
+* `Producers` — named producer obligations used by the final assembly
 * `MainFormal` — base, successor, and final branch assembly for `thm:main-formal`
 
 ## References

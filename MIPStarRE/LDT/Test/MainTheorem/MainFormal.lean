@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Test.MainTheorem.NativeTargets
+import MIPStarRE.LDT.Test.MainTheorem.Producers
 import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationInputProducer
 
 /-!
@@ -685,7 +685,6 @@ theorem mainFormal
   -- targets is already checked; once the residual above is supplied, the
   -- remaining proof is trivial.  Item 4 replaces the older generic `triangleSub`
   -- route whose loss was `ζ₁ + sqrt ζ₂` rather than the printed `ζ₁`.
-
   by_cases herr : 1 ≤ mainFormalError params k eps
   · exact mainFormal_trivial_witness params strategy eps k herr
   · have hepsNN : 0 ≤ eps := SameSpaceProjStrat.eps_nonneg_of_passes hpass
@@ -702,12 +701,8 @@ theorem mainFormal
           Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
             (params := params) (strategy := strategy) (eps := eps)
             (hpass := hpass) (k := k) (scalars := scalars)) := by
-        -- Successor case (m > 1): the answer-valued recursive-slice adapter is
-        -- available, but this theorem still has no predecessor per-slice induction
-        -- package or answer-side self-improvement bridge inputs in scope.
-        -- TODO(#931, #834, #422): supply those successor inputs and assemble the
-        -- resulting role residual into a Step 6 witness residual.
-        sorry
+        exact mainFormalSuccessorProjectiveCompletionResidualProducer
+          params strategy eps hd hpass k hk hk0 hepsNN herr hm1 scalars
       rcases hprojectiveCompletionResidual with ⟨projectiveCompletionResidual⟩
       let rolePackage := projectiveCompletionResidual.roleResidual.rolePackage scalars
       have hpre : ConsRel strategy.state (uniformDistribution Unit)
