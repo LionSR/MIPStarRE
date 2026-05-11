@@ -757,7 +757,7 @@ witness; the branch residual types remain the documented base/successor supply
 paths.  Once the role package is obtained,
 Lean proves the two factor-two unsymmetrization links from
 its symmetrized consistency estimate.  The subsequent checked wrappers use the
-proved Step~5 Schwartz--Zippel theorem to convert evaluated pre-projective
+proved Section~5 Schwartz--Zippel theorem to convert evaluated pre-projective
 consistency to full-polynomial consistency at $\zeta_1$, prove the paper
 line-116 triangle step, and reconstruct the line-156 $\approx_{\zeta_3}$
 projectivization bridge from pre-projective consistency plus left/right
@@ -780,7 +780,7 @@ It no longer asks for an arbitrary role package or an arbitrary raw Section~6
 witness as an independent field.  It also no longer asks for the two factor-two
 role-block estimates, the unused Section~6 consistency field inside
 \texttt{UnsymmetrizationBridgePackage}, or the duplicated pre-projective
-consistency field inside the Step~6 handoff; those are rebuilt from the concrete
+consistency field inside the Section~6 handoff; those are rebuilt from the concrete
 role residual, the selected role package, and \texttt{hpass}.  Lean then converts
 the resulting projective self-consistency to
 \texttt{MainFormalCascadeTransportTargets} using the projective converse of
@@ -797,11 +797,11 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 	error to scale $t^{1/65536}$, outside the current \texttt{mainFormalError}
 	envelope.  The sharper local pre-completion repair from
 	Remark~\ref{rem:lean-line169-projectivization-match-mass} avoids that
-	widening and is the route used by the present base-case formal assembly.
-	No proof-level completeness tag is claimed here while
-	\texttt{mainFormal\_ofRepairedBridge} still has an open successor-case
-	completion residual and \texttt{mainFormal} derives the paper theorem via a
-	tracked bridge gap (issue~\#1458).
+		widening and is the route used by the present base-case formal proof.
+		No proof-level completeness tag is claimed here while
+		\texttt{mainFormal\_ofRepairedBridge} still has an open successor-case
+		completion residual and \texttt{mainFormal} derives the paper theorem via a
+		tracked repaired-hypotheses proof obligation (issue~\#1458).
 
 \end{remark}
 \begin{proof}
