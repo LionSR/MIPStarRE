@@ -19,6 +19,12 @@ Instructions:
    Compile or otherwise verify the edited LaTeX document when this is practical, and
    otherwise state why that check was not run.
 6. Your goal is to fully close every incomplete lemma/theorem. Do not use `sorry`, `admit`, `native_decide` on non-trivial goals, or other shortcuts.
+6a. Do not fix review comments by changing a source-labelled theorem away from
+    the statement in `references/ldt-paper/`. Such changes are strongly
+    discouraged unless forced by faithful formal encoding or documented
+    mathematical necessity. Do not add bridge, residual, repair, producer,
+    package, or arbitrary implication hypotheses to a paper theorem; stop and
+    comment if the proof cannot be closed from the paper hypotheses.
 7. Run `lake build` to verify your fixes compile with zero errors and zero `sorry`s.
 8. When fixes add or complete (remove sorry from) theorems, update the corresponding blueprint entry in `blueprint/src/chapter/`.
 9. Make minimal, targeted fixes. Do not refactor unrelated code.
@@ -27,7 +33,7 @@ Instructions:
 
 Quality bar (your fix MUST satisfy ALL of these before committing):
 - Proof integrity (BLOCKER): no sorry, admit, native_decide on non-trivial goals, unsafeCast, or new axioms. See docs/PROOF_INTEGRITY.md.
-- Proof correctness (BLOCKER): structured proofs, not brute-force tactic chains. If a result looks wrong, scout Papers/ and Notes/ and cite the specific paper/section.
+- Proof correctness (BLOCKER): structured proofs, not brute-force tactic chains. If a result looks wrong, scout `references/ldt-paper/` and cite the specific path, line, and label.
 - Mathlib style: camelCase defs, snake_case lemmas, minimal imports, no unnecessary opens.
 - Type safety (BLOCKER): no universe issues, missing instances, or coercion failures.
 - Performance: avoid `decide` on large types, unbounded `simp`, deep `rw` chains.

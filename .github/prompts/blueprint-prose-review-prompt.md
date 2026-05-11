@@ -108,8 +108,8 @@ authoritative source for:
 
 Apply judgment for context-sensitive entries (the doc lists which).
 Scope: blueprint `.tex` and Lean docstrings/comments/`section`
-`/`namespace` names. Out of scope: `docs/`, workflow YAML, `Papers/`,
-`Notes/`.
+`/`namespace` names. Out of scope: `docs/`, workflow YAML, and
+`references/ldt-paper/`.
 
 For each finding, cite the exact phrase, link to the line, and propose
 a concrete replacement from the table (or "drop").
