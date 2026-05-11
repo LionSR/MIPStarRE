@@ -180,6 +180,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helper_completeness_of_self_consistency_complementary_slackness_input_consistency}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_completeness_of_self_consistency_helper_slackness_input_consistency}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_completeness_error_le_selfImprovementHelperError}
+  \leanok
   Since $G$ is a measurement,~\eqref{eq:Z-greater-than-A} and Lemma~\ref{prop:simeq-for-measurements} give
   \[
     \bra{\psi} Z \ot I \ket{\psi}
@@ -198,6 +199,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.pointConsistencyAddInUSelection}, and the
   corresponding left/right quantity wrappers are
   \lean{MIPStarRE.LDT.SelfImprovement.addInULeftQuantity_pointConsistencySelection_eq_off_diagonal_avg}
+  \leanok
   and
   \lean{MIPStarRE.LDT.SelfImprovement.addInURightQuantity_pointConsistencySelection_eq_zero}.
   The selected scalar chain for this specialization is recorded by
@@ -223,10 +225,15 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \end{equation}
   Since
   \lean{MIPStarRE.LDT.SelfImprovement.pointConsistencyAddInU_off_diagonal_avg_le_helper_error_of_transfer}
+  \leanok
   \lean{MIPStarRE.LDT.SelfImprovement.helper_point_consistency_error_eq_off_diagonal_avg}
+  \leanok
   \lean{MIPStarRE.LDT.SelfImprovement.helper_point_consistency_of_pointConsistencyAddInU_transfer}
+  \leanok
   \lean{MIPStarRE.LDT.SelfImprovement.helper_point_consistency_of_selected_chain_selfConsistency_globalVariance}
+  \leanok
   \lean{MIPStarRE.LDT.SelfImprovement.helper_point_consistency_error_le_selfImprovementHelperError}
+  \leanok
   \[
     4\sqrt{\zeta_{\mathrm{variance}}}
     = 4 \sqrt{24 m \cdot\Big(\eps + \delta + \frac{md}{q}\Big)}
@@ -244,6 +251,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.pointConditioned_sandwichedPolynomialOutcome_outer_eq_ite}
   \lean{MIPStarRE.LDT.SelfImprovement.ev_opTensor_pointConditioned_sandwichedPolynomialOutcome_outer_eq_indicator}
   \lean{MIPStarRE.LDT.SelfImprovement.polynomial_off_diagonal_outer_sandwich_eq_indicator_avg}
+  \leanok
   The strong self-consistency expression is
   \begin{equation}\label{eq:self-consistency-baby-step}
     \sum_{h\in\polyfunc{m}{q}{d}} \bra{\psi} H_h \ot H_h \ket{\psi}
@@ -305,6 +313,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalIndicatorQuantity_le_swapped_of_abs_transports}
   \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalOuterSandwichQuantity_le_two_sqrt_variance_add_mdq}
   \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalOuterSandwichQuantity_le_two_sqrt_variance_add_mdq_of_abs_transports}
+  \leanok
 
   Using~\eqref{eq:h-blt}, the right-hand side of~\eqref{eq:threw-in-h-prime} is
   \begin{equation}\label{eq:delete-an-A}
@@ -316,6 +325,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helperDeleteAQuantity}
   \lean{MIPStarRE.LDT.SelfImprovement.helperFullOuterSandwichQuantity_eq_release_add_offDiagonalOuterSandwichQuantity}
   \lean{MIPStarRE.LDT.SelfImprovement.helperFullOuterSandwichQuantity_eq_deleteAQuantity}
+  \leanok
   Replace the remaining copy of $A^u_{h(u)}$ by $A^v_{h(v)}$:
   \begin{equation}\label{eq:swap-u-for-v-attack-of-the-clones}
     \eqref{eq:delete-an-A}
@@ -332,6 +342,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helperMoveOverVQuantity}
   \lean{MIPStarRE.LDT.SelfImprovement.helperDeleteAQuantity_le_moveOverV_of_abs_transports}
   \lean{MIPStarRE.LDT.SelfImprovement.helperMoveOverVQuantity_le_deleteA_of_abs_transports}
+  \leanok
   Substituting~\eqref{eq:swap-Z-for-A}, then~\eqref{eq:Z-greater-than-A}, and finally the already proved bound~\eqref{eq:explicit-bound-for-A-consistency}, one obtains
   \[
     \eqref{eq:move-over-v}
@@ -357,16 +368,22 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance_offDiagonal}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance_paperChain}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_producer_inputs_of_selfConsistency_localVariance_scalarTransports}
+  \leanok
   and then uses the proved wrappers
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_of_helper_conclusion}
+  \leanok
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance}
+  \leanok
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_input_of_producer}
+  \leanok
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_input_of_selfConsistency_localVariance}
+  \leanok
   to recover the final helper-stage self-consistency input. The corresponding
   bridge-package constructor is
   \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementBridgeInputs.ofHelperStrongSelfConsistencyProducer}.
   The paper's arithmetic shows that the right-hand error is at most
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_error_le_selfImprovementHelperError}
+  \leanok
   \[
     57m\cdot \Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big)
     \le \zeta,
@@ -380,11 +397,13 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \]
   The reindexing of the sum by~$h$ is the algebraic identity
   \lean{MIPStarRE.LDT.SelfImprovement.helperAgreementOperatorAtPoint_eq_sum_polynomial}
+  \leanok
   \[
     \sum_a A^u_a \ot H_{[h(u)=a]} = \sum_h A^u_{h(u)} \ot H_h,
   \]
   whose averaged scalar form reads
   \lean{MIPStarRE.LDT.SelfImprovement.helper_agreement_average_ev_eq_polynomial_sum}
+  \leanok
   \[
     \E_u \sum_a \bra{\psi}\,A^u_a \ot H_{[h(u)=a]}\,\ket{\psi}
       = \E_u \sum_h \bra{\psi}\,A^u_{h(u)} \ot H_h\,\ket{\psi}.
@@ -393,12 +412,14 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   total $I \ot H.\mathrm{total} = \sum_h I \ot H_h$ and the helper-agreement
   operator at $u$ reindexes as the off-diagonal sum
   \lean{MIPStarRE.LDT.SelfImprovement.helperAgreementOperatorAtPoint_off_diagonal_decomposition}
+  \leanok
   \[
     \sum_h I \ot H_h - \sum_a A^u_a \ot H_{[h(u)=a]}
       = \sum_h \sum_{a \neq h(u)} A^u_a \ot H_h,
   \]
   whose averaged scalar form reads
   \lean{MIPStarRE.LDT.SelfImprovement.helper_boundedness_slack_average_ev_eq_off_diagonal_avg}
+  \leanok
   \[
     \sum_h \bra{\psi}\,I \ot H_h\,\ket{\psi}
         - \E_u \sum_a \bra{\psi}\,A^u_a \ot H_{[h(u)=a]}\,\ket{\psi}
@@ -410,6 +431,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helper_boundedness_gap_le_selfImprovementHelperError_of_pointConsistencyAddInU_transfer}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_upper_gap_rightTensor_le_three_sqrt_delta_of_helper_outputs}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_boundedness_gap_le_selfImprovementHelperError_of_helper_outputs}
+  \leanok
   \[
     \bra{\psi} Z \ot I \ket{\psi}
     -\E_{u} \sum_a \bra{\psi}  A^{u}_{a} \ot H_{[h(u)=a]} \ket{\psi}
