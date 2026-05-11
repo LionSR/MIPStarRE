@@ -1,0 +1,53 @@
+name: Paper-facing proof-debt audit
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+# Runs as a non-blocking warning while the bridge-debt cleanup tracked by
+# issue #1458 is in progress.  Once the tracked paper-facing theorem statements
+# are clean, remove ``--warn-only`` to promote this to a blocking guard.
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Paper-facing proof-debt audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Run paper-facing proof-debt audit (warn-only)
+        run: |
+          python3 scripts/audit_paper_facing_proof_debt.py \
+            --root . \
+            --ci \
+            --warn-only \
+            2>&1 | tee "$RUNNER_TEMP/paper-facing-proof-debt-audit.log"
+
+      - name: Surface findings in step summary
+        if: always()
+        run: |
+          {
+            echo "### Paper-facing proof-debt audit (--warn-only)"
+            echo
+            echo '```text'
+            cat "$RUNNER_TEMP/paper-facing-proof-debt-audit.log"
+            echo '```'
+            echo
+            echo 'This check is **non-blocking** while issue #1458 is being'
+            echo 'repaired.  After the paper-facing theorem statements are clean,'
+            echo 'remove `--warn-only` to make new bridge, residual, repair,'
+            echo 'package, producer, or hypotheses inputs block the pull request.'
+          } >> "$GITHUB_STEP_SUMMARY"
