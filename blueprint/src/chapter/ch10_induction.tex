@@ -478,6 +478,21 @@
 	role-residual form.
 \end{definition}
 
+\begin{definition}[Lean successor-case Step~6 projective-completion obligation]\label{def:main-formal-successor-step6-projective-completion}
+	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorProjectiveCompletionResidualProducer}
+	\leanok
+	\uses{def:main-formal-step6-hypotheses, def:main-formal-successor-boundary, lem:main-formal-successor-handoff, thm:orthonormalization}
+	This Lean declaration isolates the remaining successor-case Step~6 assertion
+	in the proof of Theorem~\ref{thm:main-formal}.  In the non-vacuous branch
+	$m>1$, after the role-register induction data have been obtained, Step~6
+	must orthonormalize the unsymmetrized submeasurements, complete them to
+	projective measurements, and transport the resulting estimates to the final
+	projective-completion residual consumed by the downstream cascade.  The
+	statement is recorded as a separate theorem so that the paper-facing
+	\lean{MIPStarRE.LDT.Test.mainFormal} statement remains unchanged while this
+	successor-case assertion is still being proved.
+\end{definition}
+
 
 \begin{proposition}[Lean successor handoff for the Section 3 proof]\label{lem:main-formal-successor-handoff}
 	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorMainInductionPublicWrapper}

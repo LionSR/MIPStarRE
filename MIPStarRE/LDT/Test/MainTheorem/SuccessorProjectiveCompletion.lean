@@ -1,15 +1,16 @@
 import MIPStarRE.LDT.Test.MainTheorem.NativeTargets
 
 /-!
-# Main-formal producers
+# Successor projective completion
 
-Named producer obligations used by the final `mainFormal` assembly.
+Successor-case projective-completion obligation used by the final `mainFormal`
+assembly.
 
 ## Main declarations
 
-* `mainFormalSuccessorProjectiveCompletionResidualProducer` — the named
-  successor-case obligation that produces the projective-completion residual
-  for the non-vacuous `m > 1` branch of `mainFormal`.
+* `mainFormalSuccessorProjectiveCompletionResidualProducer` — the successor-case
+  obligation that produces the projective-completion residual for the
+  non-vacuous `m > 1` branch of `mainFormal`.
 
 ## References
 
@@ -23,7 +24,7 @@ namespace MIPStarRE.LDT
 
 namespace Test
 
-/-- Successor-case producer for the projective-completion residual feeding the
+/-- Successor-case theorem for the projective-completion residual feeding the
 non-vacuous `m > 1` branch of `mainFormal`.
 
 Paper origin: `references/ldt-paper/inductive_step.tex`, Step 6 of the proof of
@@ -33,9 +34,9 @@ unsymmetrized role measurements, completes the resulting projective
 submeasurements to projective measurements, and transports the resulting
 consistency estimates through data processing.
 
-This declaration records the remaining successor-case obligation as a named
-producer rather than an anonymous proof hole inside `mainFormal`.  The missing
-mathematical inputs are the predecessor per-slice induction package and the
+This declaration names the remaining successor-case obligation as a standalone
+theorem rather than leaving it as an unfilled gap inside `mainFormal`.  The missing
+mathematical inputs are the predecessor per-slice induction data and the
 answer-side self-improvement bridge data needed to build the Section 6 role
 residual and then the Step 6 projective-completion residual.
 
@@ -58,7 +59,7 @@ theorem mainFormalSuccessorProjectiveCompletionResidualProducer
       (hpass := hpass) (k := k) (scalars := scalars)) := by
   -- Successor case (`params.m > 1`): the answer-valued recursive-slice adapter is
   -- available, but the top-level theorem still has no predecessor per-slice
-  -- induction package or answer-side self-improvement bridge inputs in scope.
+  -- induction data or answer-side self-improvement bridge inputs in scope.
   -- TODO(#931, #834, #422): supply those successor inputs and assemble the
   -- resulting role residual into a Step 6 projective-completion residual.
   sorry

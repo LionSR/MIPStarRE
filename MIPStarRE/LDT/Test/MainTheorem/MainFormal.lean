@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Test.MainTheorem.Producers
+import MIPStarRE.LDT.Test.MainTheorem.SuccessorProjectiveCompletion
 import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationInputProducer
 
 /-!
