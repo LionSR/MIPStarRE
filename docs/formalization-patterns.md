@@ -10,7 +10,7 @@ in `audits/` and the proof-integrity rules in `docs/PROOF_INTEGRITY.md`.
 
 ## Table of Contents
 
-1. [Temporary conditional scaffolding](#pattern-1-temporary-conditional-scaffolding)
+1. [Source-faithful statements and producer obligations](#pattern-1-source-faithful-statements-and-producer-obligations)
 2. [Blueprint–Lean synchronization](#pattern-2-blueprintlean-synchronization)
 3. [Split-module architecture](#pattern-3-split-module-architecture)
 4. [Barrel re-export pattern](#pattern-4-barrel-re-export-pattern)
@@ -19,29 +19,35 @@ in `audits/` and the proof-integrity rules in `docs/PROOF_INTEGRITY.md`.
 
 ---
 
-## Pattern 1: Temporary conditional scaffolding
+## Pattern 1: Source-faithful statements and producer obligations
 
-### The pattern
+### The rule
 
-Some older intermediate lemmas are proved with explicit extra hypotheses that
-are not part of the paper's statement.  These hypotheses usually name a proof
-obligation that should eventually be proved from earlier paper hypotheses, such
-as an orthonormalization input or a consistency statement.
+A declaration advertised as the formalization of a paper theorem, lemma,
+proposition, or corollary must state the paper result, up to faithful formal
+encoding of the mathematical domain.  Its public hypotheses and conclusion are
+both part of the statement.  Adding a load-bearing bridge, residual, repair,
+producer, package, or hypothesis bundle not present in the cited statement
+changes the theorem into a conditional helper.
 
-This is temporary scaffolding, not a preferred proof style.  Do not introduce a
-new bridge, residual, repair, producer, or package hypothesis merely to keep a
-file compiling.  First try to state and prove the missing mathematical lemma
-from the paper hypotheses.  If a conditional helper is unavoidable, it must have
-a paper-gap note, a named producer theorem target, and a removal plan.
-Changing a theorem away from the corresponding statement in
-`references/ldt-paper/` is strongly discouraged unless faithful formal encoding
-or a documented mathematical necessity requires it.
+The project therefore distinguishes three objects.
+
+| Object | Public statement | Blueprint status |
+|--------|------------------|------------------|
+| Paper theorem | Matches the cited result in `references/ldt-paper/` | May be linked by the source-labelled `\lean{}`; statement-level `\leanok` only when the statement matches |
+| Producer obligation | Proves a missing intermediate mathematical input from paper hypotheses | May contain a tracked `sorry` while the proof is open |
+| Conditional helper | Uses an additional bridge-like input to prove a useful consequence | Allowed only as explicitly labelled scaffolding; it must not be advertised as the paper theorem |
 
 It is never allowed to change the public statement of a declaration advertised
 as the formalization of a source-labelled paper theorem.  At the final assembly
 point, the paper theorem must either discharge the extra hypotheses internally,
 or remain as the paper-aligned statement with an unfinished proof while the
 conditional helper is given a different name.
+
+The preferred way to expose unfinished work is a named producer theorem or
+definition with a precise paper-origin docstring and, if necessary, a tracked
+`sorry`.  This makes the proof frontier visible without weakening the statement
+of a source-labelled theorem.
 
 ### Why legacy scaffolding may appear
 
@@ -55,7 +61,31 @@ These reasons do not justify strengthening a paper theorem.  They only explain
 why a short-lived helper declaration may exist while its remaining hypotheses
 are being actively removed.
 
-### How it works
+### How to proceed when a proof needs an extra input
+
+1. **Check the source statement.**  Read the corresponding TeX in
+   `references/ldt-paper/` before changing a theorem linked from the blueprint.
+2. **Keep the paper-facing declaration source-faithful.**  Boundary hypotheses
+   such as positivity, nonemptiness, decidability, field-model instances, or
+   type-class assumptions may be faithful encodings when they are needed to
+   state the mathematics in Lean.  Proof data such as `BridgeInputs`,
+   `RepairInput`, `Residual`, `Package`, or `Hypotheses` is different: it is
+   not a paper assumption unless the cited statement says so.
+3. **Name the missing intermediate result.**  If the proof uses a mathematical
+   fact not yet formalized, state it as a separate producer obligation.  A
+   temporary `sorry` in this producer is preferable to adding the obligation as
+   a hypothesis on the paper theorem.
+4. **Use conditional helpers only as local scaffolding.**  A helper such as
+   `mainFormal_ofRepairedBridge` or `selfImprovement_assumingBridgeInputs` may
+   clarify an assembly step, but only if the paper-facing declaration remains
+   source-faithful.  The helper is not the paper theorem and should not receive
+   the source-labelled blueprint `\leanok`.
+5. **Audit the final statement.**  Every PR touching a source-labelled theorem
+   should compare paper assumptions and Lean assumptions, paper conclusion and
+   Lean conclusion, and report whether the Lean statement is exact, has only
+   faithful boundary hypotheses, or has extra assumptions.
+
+### Conditional helper shape
 
 1. **Hypothesis is named as debt.**  A `structure` or `Prop`-valued
    abbreviation bundles assumptions needed by a conditional helper but not yet
@@ -133,20 +163,24 @@ are being actively removed.
    domains.  Bridge, residual, repair, producer, and package inputs must be
    produced inside its proof rather than added to its statement.
 
-### Legacy instances to clean up
+### Existing bridge-like declarations
 
-| Instance | Where defined | What it bundles |
-|----------|---------------|-----------------|
-| `SelfImprovement.OrthonormalizationInput` | `SelfImprovement/Theorems/Statements.lean` | Spectral-truncation and locality-preserving repair witnesses for `Hhat` |
-| `SelfImprovement.FinalFieldsInput` | `SelfImprovement/Theorems/Statements.lean` | Completeness, point-consistency, self-closeness, projective-residual estimate |
-| `SelfImprovement.HelperStrongSelfConsistencyInput` | `SelfImprovement/Theorems/Statements.lean` | The helper `Hhat` is strongly self-consistent |
-| `SelfImprovement.SelfImprovementBridgeInputs` | `SelfImprovement/Theorems/Statements.lean` | All three above, bundled as a single structure |
-| `MainFormalBaseBridgeHypotheses` | `Test/MainTheorem/MainFormal.lean` | Orthonormalization inputs + match-mass preservation for the base case |
-| `MainFormalRepairedBridgeHypotheses` | `Test/MainTheorem/MainFormal.lean` | Ditto for the repaired base-case route |
-| `MainFormalBaseProjectiveCompletionHypotheses` | `Test/MainTheorem/MainFormal.lean` | Bridges + distinguished outcomes + match-mass preservation |
-| `MainFormalPostRolePackageDiagonalOrthonormalizationInput` | `Test/MainTheorem/OrthonormalizationData.lean` | Spectral-truncation and repair for unsymmetrized POVMs |
-| `MakingMeasurementsProjective.OrthonormalizationInput` | `MakingMeasurementsProjective/Statements.lean` | Spectral truncation + repair witnesses for the orthonormalization lemma |
-| `LdPastingContext` | `Pasting/Defs/Context.lean` | All auxiliary hypotheses for `ldPasting` (good, scalar bounds, complete, consistent, self-consistent, bounded) |
+Several older declarations still name proof obligations explicitly.  They are
+transitional proof debt, not a pattern to extend to paper theorem statements.
+When such a declaration remains useful, its role should be one of the following:
+
+| Declaration | Status to maintain |
+|-------------|--------------------|
+| `SelfImprovement.OrthonormalizationInput` | Conditional input for the Section 5 orthonormalization construction; discharge through producer obligations such as the QXP repair witness |
+| `SelfImprovement.FinalFieldsInput` | Conditional input for final Section 9 estimates; replace at the paper theorem boundary by source-faithful statements or named producer obligations |
+| `SelfImprovement.HelperStrongSelfConsistencyInput` | Conditional input for helper strong self-consistency estimates; keep tracked until produced |
+| `SelfImprovement.SelfImprovementBridgeInputs` | Historical bundle of the preceding inputs; do not introduce as a hypothesis on a paper-labelled theorem |
+| `MainFormalBaseBridgeHypotheses` | Conditional base-case assembly data; do not expose on `mainFormal`, which is reserved for `thm:main-formal` |
+| `MainFormalRepairedBridgeHypotheses` | Conditional repaired base-case assembly data; produce internally or keep only in conditional helpers |
+| `MainFormalBaseProjectiveCompletionHypotheses` | Conditional completion data; do not move it into a paper-facing theorem statement |
+| `MainFormalPostRolePackageDiagonalOrthonormalizationInput` | Internal data for orthonormalization of unsymmetrized POVMs; its repair fields are producer obligations |
+| `MakingMeasurementsProjective.OrthonormalizationInput` | Conditional input for the orthonormalization proof; keep visibly distinct from source-faithful paper statements |
+| `LdPastingContext` | Faithfulness-sensitive context for `ldPasting`; audit each field against the Section 12 hypotheses and boundary conditions |
 
 ### The remaining proof obligations in `MainFormal.lean`
 
@@ -175,15 +209,16 @@ paper-aligned theorem with the remaining obligation visible.
 
 ### Distinction from anti-patterns
 
-This pattern is **not** conclusion-shaped-hypothesis smuggling (anti-pattern
-A1 in `docs/anti_patterns.md`).  The key distinction:
+This rule addresses the same risk as conclusion-shaped-hypothesis smuggling
+(anti-pattern A1 in `docs/anti_patterns.md`), but it is stricter for
+paper-labelled declarations:
 
-- **A1**: The hypothesis *is* the theorem's conclusion (or an `∃` that
-  directly produces it), and the proof body is a one-line `rcases`/`exact`.
-- **Temporary conditional scaffolding**: The hypothesis names an *intermediate*
-  mathematical fact that the paper's proof also uses (e.g., "Hhat has
-  spectral truncation data"), and the lemma does nontrivial work with it
-  (proving error bounds, threading through the rest of the argument, etc.).
+- A conclusion-shaped hypothesis is always unacceptable.
+- A genuine intermediate fact may be a legitimate input to a separately named
+  conditional helper.
+- That same intermediate fact is still unacceptable as an added hypothesis on
+  the public statement of the paper theorem, unless it is a faithful encoding
+  of a hypothesis present in the cited source.
 
 Bridge packages that are markers for still-unproved intermediate facts
 (such as `SelfImprovementBridgeInputs`) are proof debt under this pattern.  They
@@ -410,7 +445,7 @@ structure SelfImprovementBridgeInputs (params : Parameters) [FieldModel params.q
     FinalFieldsInput params strategy eps delta nu
 ```
 
-A temporary conditional helper can take
+A separately named conditional helper may take
 `(h : SelfImprovementBridgeInputs params strategy eps delta nu)` as a
 hypothesis and project the needed field inside the proof body.  This does not
 prove the corresponding paper theorem.  The package should be eliminated by
