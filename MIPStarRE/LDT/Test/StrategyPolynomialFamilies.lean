@@ -332,9 +332,14 @@ structure Bounded {params : Parameters} [FieldModel params.q]
 
 /-- Paper-faithful boundedness input for slice-indexed polynomial families.
 
-This extends `IdxPolyFamily.Bounded` with the missing source-side identification
-between the abstract domination target and the averaged point operator
-`E_u A^{u,x}_{g(u)}`. -/
+This structure encodes the boundedness item in
+`references/ldt-paper/commutativity-G.tex` and `references/ldt-paper/ld-pasting.tex`.
+It consists of positive witnesses `Z^x`, the averaged residual bound
+`E_x <psi| (I - G^x) tensor Z^x |psi> <= zeta`, and the domination condition
+`Z^x >= E_u A^{u,x}_{g(u)}`.
+
+The structure extends `IdxPolyFamily.Bounded` with the source-side identification between
+the abstract domination target and the averaged point operator `E_u A^{u,x}_{g(u)}`. -/
 structure SliceBoundednessInput {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params.next ι)
