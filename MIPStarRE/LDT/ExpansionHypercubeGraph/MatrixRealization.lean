@@ -398,7 +398,7 @@ structure LaplacianSpectralGapConclusion (params : Parameters) : Prop where
 /-- `cor:laplacian-spectral-gap`: the hypercube Laplacian has bottom
 eigenvalue `0` and spectral gap `1 / (mM)`, expressed through the Fourier
 diagonalization of `L`. -/
-theorem laplacianSpectralGap (params : Parameters) :
+lemma laplacianSpectralGap (params : Parameters) :
     LaplacianSpectralGapConclusion params where
   zeroEigenvalue := by
     simp [laplacianEigenvalue, frequencyWeight_zero]
