@@ -23,59 +23,6 @@ open MIPStarRE.LDT
 
 /-! ### Local helpers for the large-error branch -/
 
-/-- The zero family is a projective submeasurement. This supplies the trivial
-large-`ζ` branch of `orthonormalization`, where the target error bound is already
-bigger than the universal `qSDD ≤ 1` estimate. -/
-private def zeroProjSubMeas {Outcome : Type*} {ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι] :
-    ProjSubMeas Outcome ι where
-  toSubMeas :=
-    { outcome := fun _ => 0
-      total := 0
-      outcome_pos := fun _ => le_rfl
-      sum_eq_total := by simp
-      total_le_one := zero_le_one }
-  proj := fun _ => by simp
-
-/-- The zero projective submeasurement is within unit `qSDD` of any lifted
-submeasurement on a normalized state. -/
-private lemma qSDD_liftLeft_zeroProjSubMeas_le_one {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized)
-    (A : SubMeas Outcome ι) :
-    qSDD ψ A.liftLeft
-      ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft) ≤ 1 := by
-  have hq :
-      qSDD ψ A.liftLeft
-          ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft) =
-        ∑ a : Outcome, ev ψ ((A.liftLeft.outcome a) * (A.liftLeft.outcome a)) := by
-    unfold qSDD qSDDCore
-    refine Finset.sum_congr rfl ?_
-    intro a _
-    let Z : MIPStarRE.Quantum.Op (ι × ι) := A.liftLeft.outcome a
-    have hzero :
-        ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft).outcome a = 0 := by
-      ext i j
-      rcases i with ⟨i₁, i₂⟩
-      rcases j with ⟨j₁, j₂⟩
-      by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
-        simp [zeroProjSubMeas, SubMeas.liftLeft, leftTensor, h₁, h₂]
-    calc
-      ev ψ
-          ((Z -
-              ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft).outcome a)ᴴ *
-            (Z - ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft).outcome a))
-        = ev ψ (Zᴴ * Z) := by
-            rw [hzero]
-            simp
-      _ = ev ψ (Z * Z) := by
-            rw [SubMeas.outcome_hermitian A.liftLeft a]
-      _ = ev ψ ((A.liftLeft.outcome a) * (A.liftLeft.outcome a)) := by
-            rfl
-  rw [hq]
-  simpa using MIPStarRE.LDT.Preliminaries.subMeas_diagMass_le_one ψ hψ A.liftLeft
-
 /-- In the large-`ζ` branch, the zero projective submeasurement satisfies the
 orthonormalization SDD bound. -/
 private lemma qSDD_liftLeft_zeroProjSubMeas_le_orthonormalizationError
@@ -483,10 +430,12 @@ locality-preserving repair data are not hypotheses of this theorem; they are
 supplied internally by the Section 5 spectral-truncation and
 rounding-to-projectors results.
 
-Until `leftLiftedProjectivizationRepairProducer` in
-`MIPStarRE/LDT/MakingMeasurementsProjective/Producers.lean` is discharged,
-`#print axioms MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization`
-includes `sorryAx`. -/
+The direct `Q/X/XHat/P` route on the option-completed measurement produces the
+named envelope `orthonormalizationCompletionRouteError ζ = 120 * ζ^(1/4)`.
+The stronger input-driven theorem `orthonormalization_ofInput` remains
+available with the symbolic bound
+`orthonormalizationError ζ = 100 * ζ^(1/4)` when a stronger
+locality-preserving repair witness is supplied separately. -/
 theorem orthonormalization {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -500,17 +449,65 @@ theorem orthonormalization {Outcome : Type*}
         SDDRel ψ (uniformDistribution Unit)
           (constSubMeasFamily A.liftLeft)
           (constSubMeasFamily P.toSubMeas.liftLeft)
-          (orthonormalizationError ζ) := by
+          (orthonormalizationCompletionRouteError ζ) := by
   intro hssc
-  have hbridge : OrthonormalizationInput ψ A ζ := by
-    let Ahat : Measurement (Option Outcome) ι := optionCompletion A
-    refine ⟨?_, ?_⟩
-    · exact spectralTruncationInput_of_sourceAlmostProjective ψ
-        (leftLiftedMeasurement (ιB := ι) Ahat)
-        (consistencyToAlmostProjectiveError (2 * ζ))
-    · exact leftLiftedProjectivizationRepairProducer ψ Ahat
-        (consistencyToAlmostProjectiveError (2 * ζ))
-  exact orthonormalization_ofInput ψ hperm hψ A ζ hssc hbridge
+  have hζ_nonneg : 0 ≤ ζ :=
+    le_trans
+      (bipartiteSSCError_nonneg ψ (uniformDistribution Unit)
+        (constSubMeasFamily A))
+      hssc.overlapBound
+  let Ahat : Measurement (Option Outcome) ι := optionCompletion A
+  have hAhatssc :
+      BipartiteSSCRel ψ (uniformDistribution Unit)
+        (constSubMeasFamily Ahat.toSubMeas)
+        (2 * ζ) := by
+    simpa [Ahat] using
+      Orthonormalization.Completion.optionCompletion_bipartiteSSCRel
+        (ψ := ψ) (hperm := hperm) (hψ := hψ) (A := A) (ζ := ζ) hssc
+  have hCons :
+      ConsRel ψ (uniformDistribution Unit)
+        (constSubMeasFamily Ahat.toSubMeas)
+        (constSubMeasFamily Ahat.toSubMeas)
+        (2 * ζ) :=
+    bipartiteSSCRel_self_of_measurement (ψ := ψ) Ahat (2 * ζ) hAhatssc
+  have hAlmost :
+      MIPStarRE.LDT.MakingMeasurementsProjective.AlmostProjMeasStatement
+        ψ (leftLiftedMeasurement (ιB := ι) Ahat)
+        (consistencyToAlmostProjectiveError (2 * ζ)) := by
+    exact MIPStarRE.LDT.MakingMeasurementsProjective.consistencyToAlmostProjective
+      (ψ := ψ) (A := Ahat) (B := Ahat) (ζ := 2 * ζ) hCons
+  obtain ⟨P, hRounded⟩ :=
+    leftLiftedProjectivizationRepairProducer ψ hψ Ahat
+      (consistencyToAlmostProjectiveError (2 * ζ))
+      hAlmost.sourceAlmostProjective
+  have hP_local :
+      SDDRel ψ (uniformDistribution Unit)
+        (constSubMeasFamily Ahat.toSubMeas.liftLeft)
+        (constSubMeasFamily P.toSubMeas.liftLeft)
+        (orthonormalizationMainLemmaError
+          (consistencyToAlmostProjectiveError (2 * ζ))) :=
+    leftLiftedRoundedProjMeasStatement_to_local hRounded
+  have hPq :
+      qSDD ψ Ahat.toSubMeas.liftLeft P.toSubMeas.liftLeft ≤
+        orthonormalizationMainLemmaError (consistencyToAlmostProjectiveError (2 * ζ)) := by
+    simpa [ldt_simp] using hP_local.squaredDistanceBound
+  let Psome : ProjSubMeas Outcome ι := restrictSomeProjSubMeas P
+  have hPsomeq :
+      qSDD ψ A.liftLeft Psome.toSubMeas.liftLeft ≤
+        orthonormalizationMainLemmaError (consistencyToAlmostProjectiveError (2 * ζ)) := by
+    exact le_trans
+      (Orthonormalization.Completion.qSDD_liftLeft_restrictSomeProjSubMeas_le
+        (ψ := ψ) (A := A) (P := P))
+      hPq
+  have hcoeff :
+      orthonormalizationMainLemmaError (consistencyToAlmostProjectiveError (2 * ζ)) ≤
+        orthonormalizationCompletionRouteError ζ := by
+    exact
+      Orthonormalization.ErrorBounds.completionRouteError_bound ζ hζ_nonneg
+  refine ⟨Psome, ?_⟩
+  constructor
+  simpa [sddError, avgOver, uniformDistribution, constSubMeasFamily] using
+    (le_trans hPsomeq hcoeff)
 
 /-- Orthonormalization with the residual-domination invariant needed for the
 monotone-total self-improvement route.

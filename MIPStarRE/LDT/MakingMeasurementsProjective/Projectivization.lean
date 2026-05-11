@@ -441,4 +441,57 @@ lemma roundedProjMeasStatement_mono {Outcome : Type*}
     RoundedProjMeasStatement ψ A P ζ₂ := by
   exact ⟨⟨le_trans h.closeness.squaredDistanceBound hζ⟩⟩
 
+/-- The zero family is a projective submeasurement. This supplies trivial
+large-error branches where the target error bound is already at least the
+universal `qSDD ≤ 1` estimate. -/
+def zeroProjSubMeas {Outcome : Type*} {ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι] :
+    ProjSubMeas Outcome ι where
+  toSubMeas :=
+    { outcome := fun _ => 0
+      total := 0
+      outcome_pos := fun _ => le_rfl
+      sum_eq_total := by simp
+      total_le_one := zero_le_one }
+  proj := fun _ => by simp
+
+/-- The zero projective submeasurement is within unit `qSDD` of any lifted
+submeasurement on a normalized state. -/
+lemma qSDD_liftLeft_zeroProjSubMeas_le_one {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized)
+    (A : SubMeas Outcome ι) :
+    qSDD ψ A.liftLeft
+      ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft) ≤ 1 := by
+  have hq :
+      qSDD ψ A.liftLeft
+          ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft) =
+        ∑ a : Outcome, ev ψ ((A.liftLeft.outcome a) * (A.liftLeft.outcome a)) := by
+    unfold qSDD qSDDCore
+    refine Finset.sum_congr rfl ?_
+    intro a _
+    let Z : MIPStarRE.Quantum.Op (ι × ι) := A.liftLeft.outcome a
+    have hzero :
+        ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft).outcome a = 0 := by
+      ext i j
+      rcases i with ⟨i₁, i₂⟩
+      rcases j with ⟨j₁, j₂⟩
+      by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
+        simp [zeroProjSubMeas, SubMeas.liftLeft, leftTensor, h₁, h₂]
+    calc
+      ev ψ
+          ((Z -
+              ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft).outcome a)ᴴ *
+            (Z - ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft).outcome a))
+        = ev ψ (Zᴴ * Z) := by
+            rw [hzero]
+            simp
+      _ = ev ψ (Z * Z) := by
+            rw [SubMeas.outcome_hermitian A.liftLeft a]
+      _ = ev ψ ((A.liftLeft.outcome a) * (A.liftLeft.outcome a)) := by
+            rfl
+  rw [hq]
+  simpa using MIPStarRE.LDT.Preliminaries.subMeas_diagMass_le_one ψ hψ A.liftLeft
+
 end MIPStarRE.LDT.MakingMeasurementsProjective

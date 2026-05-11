@@ -58,13 +58,18 @@
 
 \begin{theorem}[Orthogonalization lemma]\label{thm:orthonormalization}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
+	\leanok
 	% In Lean, normalization is an explicit hypothesis because the ambient state
 	% record contains positive semidefinite density matrices of arbitrary
 	% normalized trace; this matches the paper's convention that a state is
 	% normalized.
-	% The Lean statement no longer requires explicit spectral-truncation and
-	% locality-preserving repair witnesses as hypotheses; they are supplied
-	% internally by the Section 5 rounding-to-projectors results.
+	% The paper states the sharper constant $100\zeta^{1/4}$.
+	% The present direct local $Q/X/\widehat X/P$ route on the completed
+	% measurement yields $120\zeta^{1/4}$ because it first converts the
+	% $2\zeta$ self-consistency error to a $4\zeta$ source-almost-projective
+	% error.  In Lean this bound is named
+	% `orthonormalizationCompletionRouteError`.
+	% See docs/paper-gaps/issue-1032-orthonormalization-constant.tex.
 	\uses{def:strong-self-consistency, def:approx_delta}
 	Let $\ket{\psi}$ be a permutation-invariant state,
 	and let $A = \{A_a\}$ be a sub-measurement with strong self-consistency
@@ -75,7 +80,7 @@
 	\]
 	Then there exists a projective sub-measurement $P = \{P_a\}$ such that
 	\[
-		A_a \ot I \approx_{100 \zeta^{1/4}} P_a \ot I.
+		A_a \ot I \approx_{120 \zeta^{1/4}} P_a \ot I.
 	\]
 \end{theorem}
 
@@ -305,14 +310,37 @@
 	\leanok
 	Paper origin: \texttt{references/ldt-paper/orthonormalization.tex} lines 534--860 (rank reduction and the $Q$-side setup, including \ref{lem:xa-t} and \ref{lem:qa-restated}) and 862--1194 (the $X/\widehat X/P$ algebra: \ref{lem:X-squared}, \ref{lem:X-hat-squared}, \ref{lem:X-times-X-hat}, \ref{lem:squared-difference}, \ref{lem:P-projectivity}, \ref{lem:P-Q-approx}, plus the final triangle-inequality assembly producing the $84\zeta^{1/4}$ bound). Together these are the late repair stage of the orthogonalization-lemma proof.
 
-	Let $\ket{\psi}$ be a state on a bipartite space, let $A = \{A_a\}$ be a measurement, and let $\zeta \geq 0$. Given the rounded almost-projective family produced by Lemma~\ref{lem:projective-non-measurement} on the left-lifted family $\{A_a \ot I\}$, there exists a projective sub-measurement $P = \{P_a\}$ on the underlying space such that the lifted family $\{P_a \ot I\}$ satisfies
+	Given a normalized bipartite state $\ket{\psi}$, a measurement
+	$A = \{A_a\}$, and the source almost-projective estimate for the
+	left-lifted family $\{A_a \ot I\}$, there exists a locality-preserving
+	projective sub-measurement with error $84\zeta^{1/4}$.
+
+	More precisely, if $\ket{\psi}$ is a normalized bipartite state, if
+	$A = \{A_a\}$ is a measurement, and if
 	\[
-		A_a \ot I \approx_{\mathsf{roundingToProjectiveError}(\zeta)} P_a \ot I.
+		\sum_a \bra{\psi} \bigl((A_a \ot I) - (A_a \ot I)^2\bigr) \ket{\psi} \le \zeta,
 	\]
-	The locality-preserving form -- output $P_a \ot I$ rather than an arbitrary lifted family -- is the form recorded in Remark~\ref{rem:lean-orthonormalization-main-declarations}; it is transported through the $Q/X/\widehat X/P$ algebra via the rectangular polar decomposition for the sigma-range embedding.
+	then there exists a projective sub-measurement $P = \{P_a\}$ on the underlying
+	space such that
+	\[
+		A_a \ot I \approx_{84\zeta^{1/4}} P_a \ot I.
+	\]
+	The locality-preserving form -- output $P_a \ot I$ rather than an arbitrary
+	lifted family -- is recorded in
+	Remark~\ref{rem:lean-orthonormalization-main-declarations} and is the form
+	required by the unconditional orthonormalization theorem
+	(\ref{thm:orthonormalization}).
 \end{lemma}
 \begin{proof}
-	The paper's argument transports the rounded family produced by \ref{lem:projective-non-measurement} through the $Q/X/\widehat X/P$ algebra (\ref{lem:X-squared}, \ref{lem:X-hat-squared}, \ref{lem:X-times-X-hat}, \ref{lem:squared-difference}, \ref{lem:P-projectivity}, \ref{lem:P-Q-approx}) and then descends to the locality-preserving lifted form. The proof is not yet complete (tracked by \href{https://github.com/LionSR/MIPStarRE/issues/1032}{issue 1032}).
+	\leanok
+	\uses{lem:projective-non-measurement, lem:projective-low-rank-sum,
+		lem:X-squared, lem:X-hat-squared, lem:X-times-X-hat,
+		lem:squared-difference, lem:P-projectivity, lem:P-Q-approx,
+		prop:triangle-inequality-for-approx_delta}
+	Pass to the left marginal state, apply the rank-reduction and
+	$Q/X/\widehat X/P$ construction there, and transport the resulting
+	$\approx_{84\zeta^{1/4}}$ estimate back to left lifts via the left-marginal
+	expectation formula.
 \end{proof}
 
 \begin{remark}[Lean conditional declaration: local orthogonalization]\label{rem:conditional-orthonormalization-main-lemma-local}
@@ -363,9 +391,11 @@
 	needed because $A$ is already a measurement.
 \end{remark}
 
-\begin{proof}[Proof of \ref{thm:orthonormalization} assuming \ref{lem:orthonormalization-main-lemma}]
+\begin{proof}[Proof of \ref{thm:orthonormalization} assuming \ref{lem:left-lifted-projectivization-repair}]
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
+	\leanok
 	\proves{thm:orthonormalization}
-	\uses{prop:other-two-notions-of-self-consistency, lem:orthonormalization-main-lemma}
+	\uses{prop:other-two-notions-of-self-consistency, lem:left-lifted-projectivization-repair}
 
 	Let $A = \{A_a\}$ be a sub-measurement with outcomes in $\mathcal A$. Write $A=\sum_a A_a$. The strong self-consistency assumption implies
 	\[
@@ -384,19 +414,22 @@
 		\bra{\psi} (I-A) \ot I \ket{\psi} - \zeta.
 	\]
 
-	Complete $A$ to the measurement $\widehat A=\{\widehat A_a\}_{a \in \widehat{\mathcal A}}$ on $\widehat{\mathcal A}=\mathcal A \cup \{\bot\}$ by setting $\widehat A_a=A_a$ for $a \in \mathcal A$ and $\widehat A_{\bot}=I-A$. Adding the two preceding inequalities shows that $\widehat A$ is $2\zeta$-strongly self-consistent. By \ref{prop:other-two-notions-of-self-consistency}, this is equivalent to
+	Complete $A$ to the measurement $\widehat A=\{\widehat A_a\}_{a \in \widehat{\mathcal A}}$ on $\widehat{\mathcal A}=\mathcal A \cup \{\bot\}$ by setting $\widehat A_a=A_a$ for $a \in \mathcal A$ and $\widehat A_{\bot}=I-A$. Adding the two preceding inequalities shows that $\widehat A$ is $2\zeta$-strongly self-consistent. By \ref{prop:other-two-notions-of-self-consistency}, this gives the source almost-projective estimate
 	\[
-		\widehat A_a \ot I \simeq_{2\zeta} I \ot \widehat A_a.
+		\sum_a \bra{\psi}
+		\bigl((\widehat A_a\ot I)-(\widehat A_a\ot I)^2\bigr)
+		\ket{\psi}
+		\le 4\zeta.
 	\]
-	Apply \ref{lem:orthonormalization-main-lemma} to obtain a projective sub-measurement $\widehat P$ such that
+	Apply \ref{lem:left-lifted-projectivization-repair} to obtain a projective sub-measurement $\widehat P$ such that
 	\[
-		\widehat A_a \ot I \approx_{84(2\zeta)^{1/4}} \widehat P_a \ot I.
+		\widehat A_a \ot I \approx_{84(4\zeta)^{1/4}} \widehat P_a \ot I.
 	\]
 	Discard the extra outcome and set $P_a=\widehat P_a$ for $a \in \mathcal A$. Then
 	\[
-		A_a \ot I \approx_{84(2\zeta)^{1/4}} P_a \ot I,
+		A_a \ot I \approx_{84(4\zeta)^{1/4}} P_a \ot I,
 	\]
-	and $84 \cdot 2^{1/4} \leq 100$, so the claimed bound follows.
+	and $84 \cdot 4^{1/4} \leq 120$, so the stated bound follows.
 \end{proof}
 
 \begin{proof}[Proof of \ref{lem:orthonormalization-main-lemma}]
