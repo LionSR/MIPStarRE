@@ -109,6 +109,7 @@
 
 \begin{theorem}[Quantum soundness of the low individual degree test]\label{thm:main-formal}
 	\lean{MIPStarRE.LDT.Test.mainFormal}
+	\leanok
 	\uses{def:low-individual-degree-test, def:projective-strategy, def:polymeasurements, def:simeq}
 	Let $(\psi, A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})$ be a projective strategy that passes the $(m,q,d)$ low individual degree test with probability at least $1-\eps$. Assume $d > 0$. Let $k > 0$ with $k \ge 400\,md$ and set
 	\[
@@ -129,14 +130,13 @@
 	\end{enumerate}
 \end{theorem}
 
-\begin{remark}[Lean conditional declaration for the final assembly]\label{rem:main-formal-conditional}
+\begin{remark}[Lean encoding of the conditional soundness theorem]\label{rem:main-formal-conditional}
 	\lean{MIPStarRE.LDT.Test.mainFormal_ofRepairedBridge}
 	\uses{thm:main-formal, def:low-individual-degree-test, def:projective-strategy, def:polymeasurements, def:simeq}
-	The declaration currently carrying the checked final assembly assumes a
-	repaired bridge from the role-register residual to the final
-	projective-completion hypotheses.  This is not a hypothesis of
-	Theorem~\ref{thm:main-formal}; it is the remaining proof obligation needed to
-	turn the conditional assembly into the paper theorem.
+	The conditional theorem formalized at present assumes a repaired bridge from
+	the role-register residual to the final projective-completion hypotheses.
+	This is not a hypothesis of Theorem~\ref{thm:main-formal}; it is the
+	remaining step needed to derive the paper theorem from the pass condition.
 \end{remark}
 
 \begin{remark}[$k$-bound boundary for the public theorem]\label{rem:main-formal-k-boundary}

@@ -2,9 +2,9 @@ import MIPStarRE.LDT.Test.MainTheorem.NativeTargets
 import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationInputProducer
 
 /-!
-# Main-formal final assembly
+# Main-formal soundness theorem
 
-Base case, successor branch, and final assembly for `thm:main-formal`
+Base case, successor branch, and conditional reductions for `thm:main-formal`
 (`\Cref{thm:main-formal}`).  This module contains:
 
 * `MainFormalBaseProjectiveCompletionHypotheses` — the still-unformalized
@@ -17,19 +17,19 @@ Base case, successor branch, and final assembly for `thm:main-formal`
   `MainFormalBaseRepairedBridgeHypotheses` — intermediate residuals that
   carry these base-case hypotheses together with the role-register measurement.
 
-* `mainFormal_ofRoleResidualAndRepairedBridge` — the main successor-branch
-  assembly that combines a role-residual, the projective-consistency handoff
+* `mainFormal_ofRoleResidualAndRepairedBridge` — the successor-branch theorem
+  that combines a role-residual, the projective-consistency handoff
   data, and the orthonormalization/completion inputs into the three final
-  consistency bounds `Gᴬ ≃ I ⊗ Gᴮ`, `Aᴬ ⊗ I ≃ I ⊗ Qᴮ`, `Qᴬ ⊗ I ≃ I ⊗ Aᴮ`.
+  consistency bounds `Gᴬ ≃ I ⊗ Gᴮ`, `Aᴬ ⊗ I ≃ I ⊗ Qᴮ`, and
+  `Qᴬ ⊗ I ≃ I ⊗ Aᴮ`.
 
-* `mainFormal_ofRepairedBridge` — the conditional top-level assembly, assuming
+* `mainFormal_ofRepairedBridge` — the conditional top-level theorem, assuming
   the remaining repaired bridge from the role-register output to the final
   projective measurements.
 
-* `mainFormal` — the paper-facing theorem statement, taking only a projective
+* `mainFormal` — the paper theorem statement, taking only a projective
   strategy that passes the LID test with probability `≥ 1 − ε` and producing the
-  three pointwise consistency targets at error bound `mainFormalError`. Its proof
-  remains open until the repaired bridge is derived from the paper hypotheses.
+  three pointwise consistency targets at error bound `mainFormalError`.
 
 ## References
 
@@ -55,12 +55,11 @@ The base case (`m = 1`) generation of the Step 6 witness residual still
 requires the same analytic content as the successor case: spectral
 truncation and locality-preserving repair witnesses for the unsymmetrized
 POVMs and match-mass preservation for the orthonormalized projective
-submeasurements. These are proof obligations whose formalization
-corresponds to unformalized content in Section 5 and Section 6 of the
-paper; they are bundled as a single structure to give a single target
-for the remaining work.  When these hypotheses are supplied,
-`baseProjectiveCompletionResidual` provides the checked assembly theorem that
-fills the base branch of `mainFormal`. -/
+submeasurements. These are remaining steps whose formalization corresponds to
+unformalized content in Section 5 and Section 6 of the paper; they are collected
+as a single structure to give a single target for the remaining work.  When
+these hypotheses are supplied, `baseProjectiveCompletionResidual` provides the
+formal theorem that fills the base branch of `mainFormal`. -/
 
 /-- Paper origin: `references/ldt-paper/test_definition.tex:180-202`
 (`\label{thm:main-formal}`) and its proof in
@@ -74,8 +73,8 @@ inputs (spectral truncation and repair witnesses), distinguished
 outcomes, and match-mass preservation for the unsymmetrized POVMs.
 
 Supplying these hypotheses yields a complete `baseProjectiveCompletionResidual`
-for the base branch of `mainFormal`; the remaining successor-case
-proof obligations are tracked separately. -/
+for the base branch of `mainFormal`; the remaining successor-case steps are
+tracked separately. -/
 structure MainFormalBaseProjectiveCompletionHypotheses
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -570,8 +569,8 @@ Conditional assembly for `thm:main-formal` from `test_definition.tex`.
 
 This theorem is not itself the paper theorem: it assumes the repaired bridge
 from the role-register residual to the final projective-completion hypotheses.
-The public theorem `mainFormal` below records the paper-facing statement with
-that bridge as a remaining proof obligation.
+The theorem `mainFormal` below gives the paper theorem statement. Deriving this
+bridge from its hypotheses is the remaining step.
 
 The bipartite tensor placement follows the paper:
 - **1a**: `A^A_u ⊗ I ≈_ν I ⊗ G^B_{[g(u)=a]}` — G_B on **right**
@@ -603,14 +602,14 @@ and weakens it to the predecessor side condition `400 * pred.m * pred.d ≤ k`.
 For an arbitrary current parameter bundle, the predecessor decomposition itself is
 now formalized by `Parameters.successorDecompositionOfNeOne`; what remains
 external is producing the successor-boundary data and the later completion /
-line-169 residuals. No checked lemma here claims that the former intermediate
+line-169 residuals. The formal statements here do not claim that the former intermediate
 range `params.m * params.d ≤ k < 400 * params.m * params.d` is vacuous.
 
-Universe note: the Lean statement uses `[FieldModel.{0} params.q]`, matching the
+Universe note: the formal statement uses `[FieldModel.{0} params.q]`, matching the
 base-universe field-model assumption of the public Section 6 successor wrapper.
-This is a current Lean API limitation, not a paper constraint; once the Section 6
-wrapper is universe-polymorphic, this public theorem should be generalized as
-well.
+This is a current formalization limitation, not a paper constraint; once the
+Section 6 wrapper is universe-polymorphic, this theorem should be generalized
+as well.
 
 Addresses #137, #239, #906, #1099, #1458.
 -/
@@ -639,8 +638,8 @@ theorem mainFormal_ofRepairedBridge
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  -- TODO(#422, #1458): The induction-side handoffs needed by the final
-  -- `mainFormal_ofRepairedBridge` assembly are standalone checked declarations:
+  -- TODO(#422, #1458): The induction-side handoffs needed by
+  -- `mainFormal_ofRepairedBridge` are standalone formal theorems:
   -- * base branch: `strategySymmetrization_mainInductionBaseCase`,
   -- * weighted successor boundary fields:
   --   `mainFormalSuccessorAxisWeightedBound_ofPass` and
@@ -768,11 +767,11 @@ theorem mainFormal_ofRepairedBridge
 /--
 `thm:main-formal` from `test_definition.tex`.
 
-This is the public paper-facing statement. The Lean statement records the
-large-`k` and positive-boundary hypotheses currently needed by the formal
-encoding, but it does not assume the repaired bridge, residual package, or final
-projective-completion data. Those remain proof obligations to be derived from
-the pass condition and the preceding sections.
+This is the paper theorem statement. The statement includes the large-`k` and
+positive-boundary hypotheses currently needed by the formalization, but it does
+not assume the repaired bridge, role-register residual data, or final
+projective-completion hypotheses. Those remain open steps to be derived from the
+pass condition and the preceding sections.
 -/
 theorem mainFormal
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
