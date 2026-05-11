@@ -264,24 +264,24 @@ theorem laplacianRewrite (params : Parameters) :
 
 /-! ## Public theorem wrappers -/
 
-/-- The local variance in the paper's bipartite notation, where the operator
-family acts on the left tensor factor and the right tensor factor carries the
-identity.  Thus the paper expression
-`(A^u - A^v)^2 ⊗ I` is represented by the squared difference of the left-placed
-operators `leftTensor (A u)`. -/
-noncomputable def paperLocalVariance (params : Parameters)
+/-- The local variance for a bipartite state when the operator family acts on
+the left tensor factor.  The squared difference is represented as
+`(leftTensor (A u) - leftTensor (A v))ᴴ *
+  (leftTensor (A u) - leftTensor (A v))`; for self-adjoint `A u`, this is the
+operator-square expression appearing in the paper. -/
+noncomputable def bipartiteLocalVariance (params : Parameters)
     {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (A : Point params → MIPStarRE.Quantum.Op ιA) (ψ : QuantumState (ιA × ιB)) : Error :=
   localVariance params (fun u => leftTensor (ι₂ := ιB) (A u)) ψ
 
-/-- The global variance in the paper's bipartite notation, with `A^u` placed on
+/-- The global variance for a bipartite state when the operator family acts on
 the left tensor factor. -/
-noncomputable def paperGlobalVariance (params : Parameters)
+noncomputable def bipartiteGlobalVariance (params : Parameters)
     {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (A : Point params → MIPStarRE.Quantum.Op ιA) (ψ : QuantumState (ιA × ιB)) : Error :=
   globalVariance params (fun u => leftTensor (ι₂ := ιB) (A u)) ψ
 
-/-- `lem:local-to-global`. -/
+/-- General local-to-global inequality for an arbitrary operator family. -/
 lemma localToGlobal (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
     globalVariance params A ψ ≤ (params.m : Error) * localVariance params A ψ := by
@@ -293,19 +293,21 @@ lemma localToGlobal (params : Parameters)
       localVariance_eq_zero_of_isEmpty hι params A ψ]
     positivity
 
-/-- `lem:local-to-global`, in the paper's bipartite notation.
+/-- `lem:local-to-global`, in bipartite form.
 
 The assumptions `hpos` and `hle` record the paper domain condition
-`0 ≤ A^u ≤ I`.  The proof uses the more general analytic theorem
-`localToGlobal`, applied to the left-tensor placement of the family `A`. -/
-lemma localToGlobalPaper (params : Parameters)
+`0 ≤ A^u ≤ I`; the conclusion is the local-to-global variance inequality for
+the left tensor placement of the family `A`. -/
+lemma localToGlobalBipartite (params : Parameters)
     {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (A : Point params → MIPStarRE.Quantum.Op ιA)
-    (_hpos : ∀ u : Point params, 0 ≤ A u)
-    (_hle : ∀ u : Point params, A u ≤ 1)
+    (hpos : ∀ u : Point params, 0 ≤ A u)
+    (hle : ∀ u : Point params, A u ≤ 1)
     (ψ : QuantumState (ιA × ιB)) :
-    paperGlobalVariance params A ψ ≤
-      (params.m : Error) * paperLocalVariance params A ψ := by
+    bipartiteGlobalVariance params A ψ ≤
+      (params.m : Error) * bipartiteLocalVariance params A ψ := by
+  have _ : ∀ u : Point params, 0 ≤ A u := hpos
+  have _ : ∀ u : Point params, A u ≤ 1 := hle
   exact localToGlobal params (fun u => leftTensor (ι₂ := ιB) (A u)) ψ
 
 /-- `lem:local-rewrite`. -/
