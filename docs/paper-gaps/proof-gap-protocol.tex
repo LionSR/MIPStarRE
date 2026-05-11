@@ -1,19 +1,11 @@
-\documentclass{article}
+\documentclass[11pt]{article}
 
 \usepackage{amsmath,amssymb}
 \usepackage{xurl}
-\usepackage[
-  colorlinks=true,
-  linkcolor=blue,
-  citecolor=blue,
-  urlcolor=blue
-]{hyperref}
+\usepackage[hidelinks]{hyperref}
 \setlength{\emergencystretch}{2em}
 
 \input{command}
-\providecommand{\Lean}{\textsc{Lean}}
-\providecommand{\ghissue}[1]{%
-  \href{https://github.com/LionSR/MIPStarRE/issues/#1}{GitHub issue \##1}}
 
 \title{Proof-Gap Protocol for Source-Faithful Formalization}
 \author{}
@@ -77,10 +69,11 @@ as an additional theorem hypothesis.
 \paragraph{Conditional helper.}
 A conditional helper is a separately named theorem whose statement explicitly
 assumes a proof obligation.  Names such as
-\path{mainFormal_ofRepairedBridge}, \path{orthonormalization_ofInput}, or
-\path{..._assuming...} are acceptable when the declaration is not presented as
-the source theorem.  A conditional helper is useful because it preserves proof
-content downstream of a gap, but it does not close the source theorem.
+\leanid{mainFormal\_ofRepairedBridge},
+\leanid{orthonormalization\_ofInput}, or \leanid{...\_assuming...} are
+acceptable when the declaration is not presented as the source theorem.  A
+conditional helper is useful because it preserves proof content downstream of a
+gap, but it does not close the source theorem.
 
 \section{Bridge, residual, repair, package}
 
