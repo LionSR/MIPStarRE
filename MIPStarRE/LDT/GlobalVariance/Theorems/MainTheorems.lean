@@ -455,10 +455,7 @@ lemma globalVarianceOfPoints
     globalVarianceOfPointsFromTransportChainBound
       params strategy eps delta gamma hgood G ?_
   intro g
-  /- TODO(#1456): prove the six-step local transport estimate appearing in
-  the proof of `lem:local-variance-of-points`, rather than assuming it as a
-  hypothesis of the source theorem. -/
-  sorry
+  exact localVarianceTransportChainBound params strategy eps delta gamma hgood G g
 
 /-! ## Matrix wrappers -/
 
