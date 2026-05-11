@@ -227,6 +227,30 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
                 {"hbaseBridge", "BaseBridgeHypotheses", "residualDomination"},
             )
 
+    def test_debt_vocabulary_in_result_type_is_not_an_input_finding(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem collisionResidualBound (h : P) :
+                    generalizeBCollisionResidual params strategy G g ≤ error := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{lemma}\label{lem:collision}
+                  \lean{MIPStarRE.collisionResidualBound}
+                \end{lemma}
+                """,
+            )
+            result = audit.run_audit(root)
+            self.assertEqual(result.scanned_refs, 1)
+            self.assertEqual(result.findings, ())
+
 
 if __name__ == "__main__":
     unittest.main()

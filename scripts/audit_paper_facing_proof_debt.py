@@ -9,8 +9,8 @@ review aid for that boundary:
 
 * read theorem-like ``\lean{...}`` references from the active blueprint;
 * resolve those references to public Lean declarations under ``MIPStarRE/``;
-* inspect only the declaration header after the declaration name and before
-  the proof body;
+* inspect only the public input portion of the declaration header after the
+  declaration name and before the result type;
 * report occurrences of proof-debt vocabulary such as ``BridgeHypotheses``,
   ``Residual``, ``RepairInput``, ``Package``, or ``Producer``.
 
@@ -129,6 +129,22 @@ def _public_header_after_name(source: str, decl: LeanDecl) -> tuple[str, int]:
     return after_name, decl.line + skipped_lines
 
 
+def _public_inputs_before_result_type(header_after_name: str) -> str:
+    """Return the public input part before the declaration result type.
+
+    The audit is meant to detect extra hypotheses or input data on
+    paper-facing declarations.  Mathematical result types may legitimately
+    mention words such as ``Residual``; those are handled by statement review,
+    not by this input-debt scanner.
+    """
+    stack: list[str] = []
+    for i, char in enumerate(header_after_name):
+        if char == ":" and not stack:
+            return header_after_name[:i]
+        advance_depth(char, stack)
+    return header_after_name
+
+
 def _line_excerpt(text: str, one_based_line: int) -> str:
     lines = text.splitlines()
     if one_based_line < 1 or one_based_line > len(lines):
@@ -144,10 +160,11 @@ def _findings_for_entry(
     lean_path = root / decl.file
     source = lean_path.read_text(encoding="utf-8", errors="replace")
     header, header_start_line = _public_header_after_name(source, decl)
+    public_inputs = _public_inputs_before_result_type(header)
 
     findings: list[DebtFinding] = []
-    for match in DEBT_TOKEN_RE.finditer(header):
-        token_line = header_start_line + line_number(header, match.start()) - 1
+    for match in DEBT_TOKEN_RE.finditer(public_inputs):
+        token_line = header_start_line + line_number(public_inputs, match.start()) - 1
         findings.append(
             DebtFinding(
                 blueprint_file=entry.file,
@@ -159,7 +176,9 @@ def _findings_for_entry(
                 lean_line=decl.line,
                 token=match.group(0),
                 token_line=token_line,
-                header_excerpt=_line_excerpt(header, line_number(header, match.start())),
+                header_excerpt=_line_excerpt(
+                    public_inputs, line_number(public_inputs, match.start())
+                ),
             )
         )
     return findings
