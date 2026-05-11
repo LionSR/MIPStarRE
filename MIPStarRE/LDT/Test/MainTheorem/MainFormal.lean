@@ -22,7 +22,8 @@ Base case, successor branch, and final assembly for `thm:main-formal`
 * `mainFormal_ofRoleResidualAndRepairedBridge` — the main successor-branch
   assembly that combines a role-residual, the projective-consistency handoff
   data, and the orthonormalization/completion inputs into the three final
-  consistency bounds `Gᴬ ≃ I ⊗ Gᴮ`, `Aᴬ ⊗ I ≃ I ⊗ Qᴮ`, `Qᴬ ⊗ I ≃ I ⊗ Aᴮ`.
+  consistency bounds `Gᴬ ≃ I ⊗ Gᴮ`, `Aᴬ ⊗ I ≃ I ⊗ Qᴮ`, and
+  `Qᴬ ⊗ I ≃ I ⊗ Aᴮ`.
 
 * `mainFormal` — the top-level theorem, taking a projective strategy that
   passes the LID test with probability `≥ 1 − ε` and producing the three
@@ -93,8 +94,7 @@ structure MainFormalBaseProjectiveCompletionHypotheses
   /-- Bob-side distinguished outcome for the completion step. -/
   a_B : Polynomial params
   /-- Alice-side match-mass preservation: for each projective-consistency
-  orthonormalization
-  residual, the projective submeasurement `P_A` preserves match mass against
+  orthonormalization residual, the projective submeasurement `P_A` preserves match mass against
   Bob's unsymmetrized POVM. -/
   leftMatchMassPreservation :
     ∀ orthResidual : MainFormalPostRolePackageDiagonalOrthonormalizationResidual
@@ -107,8 +107,7 @@ structure MainFormalBaseProjectiveCompletionHypotheses
         (unsymmetrizedRightPOVM
           (roleResidual.rolePackage scalars).roleMeasurement)
   /-- Bob-side match-mass preservation: for each projective-consistency
-  orthonormalization
-  residual, the projective submeasurement `P_B` preserves match mass against
+  orthonormalization residual, the projective submeasurement `P_B` preserves match mass against
   Alice's unsymmetrized POVM. -/
   rightMatchMassPreservation :
     ∀ orthResidual : MainFormalPostRolePackageDiagonalOrthonormalizationResidual
@@ -181,8 +180,7 @@ structure MainFormalBaseBridgeHypotheses
     MainFormalPostRolePackageDiagonalOrthonormalizationInput
       params strategy eps k scalars (roleResidual.rolePackage scalars)
   /-- Alice-side match-mass preservation: for each projective-consistency
-  orthonormalization
-  residual, the projective submeasurement `P_A` preserves match mass against
+  orthonormalization residual, the projective submeasurement `P_A` preserves match mass against
   Bob's unsymmetrized POVM. -/
   leftMatchMassPreservation :
     ∀ orthResidual : MainFormalPostRolePackageDiagonalOrthonormalizationResidual
@@ -195,8 +193,7 @@ structure MainFormalBaseBridgeHypotheses
         (unsymmetrizedRightPOVM
           (roleResidual.rolePackage scalars).roleMeasurement)
   /-- Bob-side match-mass preservation: for each projective-consistency
-  orthonormalization
-  residual, the projective submeasurement `P_B` preserves match mass against
+  orthonormalization residual, the projective submeasurement `P_B` preserves match mass against
   Alice's unsymmetrized POVM. -/
   rightMatchMassPreservation :
     ∀ orthResidual : MainFormalPostRolePackageDiagonalOrthonormalizationResidual
@@ -213,9 +210,9 @@ structure MainFormalBaseBridgeHypotheses
 `MainFormalBaseProjectiveCompletionHypotheses` by providing the explicit zero polynomial as the
 distinguished outcome on both sides.
 
-The distinguished outcomes `a_A` and `a_B` are chosen as the zero polynomial;
-`completeAtOutcomeProj` works for any distinguished outcome, so this choice
-is sound.  Callers that need specific distinguished outcomes should use
+The distinguished outcomes `a_A` and `a_B` are chosen as the zero polynomial.
+Since `completeAtOutcomeProj` applies to any distinguished outcome, constructions
+that require specific distinguished outcomes should use
 `MainFormalBaseProjectiveCompletionHypotheses` directly.
 
 Refs #1043. -/
@@ -268,9 +265,8 @@ blueprint `\label{def:main-formal-step6-hypotheses}`.
 
 Narrowed repaired base-case bridge for Step 6 when `params.m = 1`.
 
-This removes the exact line-169 match-mass preservation fields from the base
-bridge.  The repaired pre-completion construction needs only the
-projective-consistency
+This removes the exact match-mass preservation fields from the base bridge.
+The repaired pre-completion construction needs only the projective-consistency
 orthonormalization inputs and an additional diagonal consistency input for the
 completion theorem on the two unsymmetrized role-block POVMs.  This diagonal
 input is not the paper's ProjectiveConsistency assertion itself; that assertion
@@ -325,11 +321,11 @@ for its spectral fields and the named Section 5
 **Diagonal self-consistency** (`diagonalConsistency`) is NOT derivable from the
 role residual's cross consistency (`G^A ⊗ I ≃ I ⊗ G^B`).  It requires
 self-consistency (`G^A ⊗ I ≃ G^A ⊗ I` and `G^B ⊗ I ≃ G^B ⊗ I`), which is a
-structurally stronger statement.  Callers must supply it as a separate
+structurally stronger statement.  It must therefore be supplied as a separate
 hypothesis.
 
-Callers constructing `hbaseBridge` for `mainFormal` should instantiate this lemma
-with their per-role-residual diagonal self-consistency proofs.
+When constructing `hbaseBridge` for `mainFormal`, supply the per-role-residual
+diagonal self-consistency proof as the argument here.
 
 Refs #1359, #1043. -/
 noncomputable def repairedBridgeHypotheses_ofRoleResidual
