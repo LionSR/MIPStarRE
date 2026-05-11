@@ -254,8 +254,9 @@ constructive orthonormalization repair producer.
 
 As in the ordinary slice bridge, the spectral part of the orthonormalization
 input is supplied by the closed source-almost-projective spectral truncation
-theorem.  The caller supplies only the locality-preserving repair producer,
-besides the helper strong self-consistency and final-fields inputs. -/
+theorem, and the repair part is supplied by the named Section 5
+rounding-to-projectors producer.  The caller supplies only the helper strong
+self-consistency and final-fields inputs. -/
 noncomputable def AnswerSelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationRepair
     (params : Parameters)
     [FieldModel params.q]
@@ -289,11 +290,6 @@ noncomputable def AnswerSelfImprovementPackage.SliceBridgeInputs.ofOrthonormaliz
         SelfImprovement.HelperStrongSelfConsistencyInput params (sliceStrategy x)
           (restrictionPkg.profile.axisParallel x)
           (restrictionPkg.profile.selfConsistency x))
-    (repair :
-      ∀ x,
-        SelfImprovement.OrthonormalizationRepairProducer params (sliceStrategy x)
-          (restrictionPkg.profile.axisParallel x)
-          (restrictionPkg.profile.selfConsistency x))
     (finalFields :
       ∀ x,
         SelfImprovement.FinalFieldsInput params (sliceStrategy x)
@@ -310,7 +306,7 @@ noncomputable def AnswerSelfImprovementPackage.SliceBridgeInputs.ofOrthonormaliz
         orthonormalization :=
           SelfImprovement.orthonormalizationInput_of_producers
             SelfImprovement.orthonormalizationSpectralProducer_of_sourceAlmostProjective
-            (repair x)
+            SelfImprovement.orthonormalizationRepairProducer_of_projectivizationRepairProducer
         finalFields := finalFields x })
 
 /-- Package the slice-wise outputs feeding the answer-valued restricted-strategy

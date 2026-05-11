@@ -11,8 +11,9 @@ the full `MainFormalBaseRepairedBridgeHypotheses` lives in `MainFormal.lean`
 ## What's proved
 
 * `MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRoleResidual` —
-  the orthonormalization input is derivable from the role residual once the two
-  locality-preserving repair witnesses are supplied.
+  the orthonormalization input is derivable from the role residual by using the
+  closed spectral-truncation theorem and the named Section 5
+  rounding-to-projectors producer.
 
 ## What's not derivable from the role residual alone
 
@@ -23,11 +24,10 @@ the full `MainFormalBaseRepairedBridgeHypotheses` lives in `MainFormal.lean`
   Diagonal self-consistency is therefore a **separate hypothesis** that must be
   supplied alongside the repair witnesses when constructing `hbaseBridge`.
 
-* **Locality-preserving repair**: the `LeftLiftedProjectivizationRepairInput`
-  parameters require QXP-layer data (a `QXPLayerData` with a projective `P`
-  family close to the source `G` family), which is the output of Section 9
-  (self-improvement).  Until the self-improvement theorem is applied at the
-  current level, these are honest hypotheses.
+* **Locality-preserving repair**: the ordinary repair fields are supplied by
+  `MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer`.
+  Until that Section 5 producer is proved, the resulting orthonormalization
+  input carries its tracked `sorryAx` dependency.
 
 ## References
 
@@ -45,16 +45,13 @@ namespace Test
 
 namespace MainFormalPostRolePackageDiagonalOrthonormalizationInput
 
-/-- Produce the orthonormalization input from a role residual and the two
-locality-preserving repair witnesses.
+/-- Produce the orthonormalization input from a role residual.
 
 The spectral-truncation fields are supplied by
 `spectralTruncationInput_of_sourceAlmostProjective` (via `ofRepairInputs`).
-The remaining two fields are the `leftRepair` and `rightRepair` parameters —
-these are `LeftLiftedProjectivizationRepairInput` for the unsymmetrized POVMs and
-require QXP-layer data from Section 9.
-
-Once those repair witnesses are available, this lemma gives the full
+The repair fields are supplied by the named Section 5
+`leftLiftedProjectivizationRepairProducer`, so the remaining proof obligation is
+located at that producer rather than in this caller signature.  This lemma gives the full
 `MainFormalPostRolePackageDiagonalOrthonormalizationInput` consumed by the
 diagonal orthonormalization construction
 (`MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalInputs`). -/
@@ -64,21 +61,18 @@ noncomputable def ofRoleResidual
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
-    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
-    (leftRepair :
-      LeftLiftedProjectivizationRepairInput strategy.state
-        (unsymmetrizedLeftPOVM
-          (roleResidual.rolePackage scalars).roleMeasurement)
-        (consistencyToAlmostProjectiveError scalars.zeta1))
-    (rightRepair :
-      LeftLiftedProjectivizationRepairInput strategy.state
-        (unsymmetrizedRightPOVM
-          (roleResidual.rolePackage scalars).roleMeasurement)
-        (consistencyToAlmostProjectiveError scalars.zeta1)) :
+    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) :
     MainFormalPostRolePackageDiagonalOrthonormalizationInput
       params strategy eps k scalars (roleResidual.rolePackage scalars) :=
   MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRepairInputs
-    leftRepair rightRepair
+    (leftLiftedProjectivizationRepairProducer strategy.state
+      (unsymmetrizedLeftPOVM
+        (roleResidual.rolePackage scalars).roleMeasurement)
+      (consistencyToAlmostProjectiveError scalars.zeta1))
+    (leftLiftedProjectivizationRepairProducer strategy.state
+      (unsymmetrizedRightPOVM
+        (roleResidual.rolePackage scalars).roleMeasurement)
+      (consistencyToAlmostProjectiveError scalars.zeta1))
 
 end MainFormalPostRolePackageDiagonalOrthonormalizationInput
 

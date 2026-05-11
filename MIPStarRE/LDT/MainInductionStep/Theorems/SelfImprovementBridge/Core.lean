@@ -450,9 +450,9 @@ noncomputable def SelfImprovementPackage.SliceBridgeInputs.ofMeasurementEq
 orthonormalization repair producer.
 
 The spectral part of the orthonormalization input is supplied by the closed
-source-almost-projective spectral truncation theorem. Thus the caller need only
-provide, for each slice, the locality-preserving repair producer together with
-the other two Section 9 inputs. -/
+source-almost-projective spectral truncation theorem, and the repair part is
+supplied by the named Section 5 rounding-to-projectors producer. Thus the caller
+only provides the two remaining Section 9 inputs. -/
 noncomputable def SelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationRepair
     (params : Parameters)
     [FieldModel params.q]
@@ -480,11 +480,6 @@ noncomputable def SelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationR
         SelfImprovement.HelperStrongSelfConsistencyInput params (sliceStrategy x)
           (restrictionPkg.profile.axisParallel x)
           (restrictionPkg.profile.selfConsistency x))
-    (repair :
-      ∀ x,
-        SelfImprovement.OrthonormalizationRepairProducer params (sliceStrategy x)
-          (restrictionPkg.profile.axisParallel x)
-          (restrictionPkg.profile.selfConsistency x))
     (finalFields :
       ∀ x,
         SelfImprovement.FinalFieldsInput params (sliceStrategy x)
@@ -501,7 +496,7 @@ noncomputable def SelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationR
         orthonormalization :=
           SelfImprovement.orthonormalizationInput_of_producers
             SelfImprovement.orthonormalizationSpectralProducer_of_sourceAlmostProjective
-            (repair x)
+            SelfImprovement.orthonormalizationRepairProducer_of_projectivizationRepairProducer
         finalFields := finalFields x })
 
 /-- Convert honest per-slice Section 9 bridge inputs into the Section 6

@@ -8,10 +8,10 @@ Base case, successor branch, and final assembly for `thm:main-formal`
 (`\Cref{thm:main-formal}`).  This module contains:
 
 * `MainFormalBaseProjectiveCompletionHypotheses` — the still-unformalized
-  analytic hypotheses needed for the base case `m = 1` (locality-preserving
-  repair witnesses for orthonormalization, distinguished completion outcomes,
-  and match-mass preservation for the orthonormalized projective
-  submeasurements).
+  analytic hypotheses needed for the base case `m = 1` (distinguished
+  completion outcomes and match-mass preservation for the orthonormalized
+  projective submeasurements).  The ordinary locality-preserving repair fields
+  for orthonormalization are supplied by the named Section 5 producer.
 
 * `MainFormalBaseBridgeHypotheses` and
   `MainFormalBaseRepairedBridgeHypotheses` — intermediate residuals that
@@ -78,8 +78,9 @@ structure MainFormalBaseProjectiveCompletionHypotheses
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (scalars : MainFormalCascadeScalars params eps k)
     (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) where
-  /-- Line-130 orthonormalization inputs: spectral-truncation and
-  locality-preserving repair witnesses for both unsymmetrized POVMs. -/
+  /-- Line-130 orthonormalization inputs for both unsymmetrized POVMs.  The
+  ordinary producer route obtains these from spectral truncation and the named
+  Section 5 repair producer. -/
   orthonormalizationInput :
     MainFormalPostRolePackageDiagonalOrthonormalizationInput
       params strategy eps k scalars (roleResidual.rolePackage scalars)
@@ -150,10 +151,10 @@ Narrowed base-case bridge hypotheses for Step 6 when `params.m = 1`.
 
 Compared to `MainFormalBaseProjectiveCompletionHypotheses`, this structure omits the two
 distinguished outcomes `a_A` and `a_B`, which the conversion below fills with
-the explicit zero polynomial at `m = 1`.  The remaining three fields
-— orthonormalization inputs and match-mass preservation — are the genuinely
-analytic obligations that must be supplied
-by the caller.
+the explicit zero polynomial at `m = 1`.  The remaining fields are the line-130
+orthonormalization input and match-mass preservation hypotheses.  In the
+repaired route below, the ordinary orthonormalization input is produced from the
+role residual; match-mass preservation remains an explicit analytic obligation.
 
 A conversion theorem `baseProjectiveCompletionHypotheses_ofBaseBridge` constructs the full
 `MainFormalBaseProjectiveCompletionHypotheses` from a `MainFormalBaseBridgeHypotheses` by
@@ -167,8 +168,8 @@ structure MainFormalBaseBridgeHypotheses
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (scalars : MainFormalCascadeScalars params eps k)
     (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) where
-  /-- Line-130 orthonormalization inputs: spectral-truncation and
-  locality-preserving repair witnesses for both unsymmetrized POVMs. -/
+  /-- Line-130 orthonormalization inputs for both unsymmetrized POVMs.  The
+  repaired route below produces this field from the role residual. -/
   orthonormalizationInput :
     MainFormalPostRolePackageDiagonalOrthonormalizationInput
       params strategy eps k scalars (roleResidual.rolePackage scalars)
@@ -299,15 +300,16 @@ abbrev MainFormalRepairedBridgeHypotheses
 
 /-! ### Orthonormalization-input bridge lemmas -/
 
-/-- Assemble the full repaired-bridge hypotheses from a role residual, the two
-locality-preserving repair witnesses, and the diagonal self-consistency input.
+/-- Assemble the full repaired-bridge hypotheses from a role residual and the
+diagonal self-consistency input.
 
 This produces exactly the `MainFormalBaseRepairedBridgeHypotheses` consumed by
 `baseMainFormal_ofRepairedBaseBridge` and `mainFormal_ofRoleResidualAndRepairedBridge`.
 
 The orthonormalization input uses `spectralTruncationInput_of_sourceAlmostProjective`
-for its spectral fields and takes the repair witnesses as explicit hypotheses
-via `MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRoleResidual`.
+for its spectral fields and the named Section 5
+`leftLiftedProjectivizationRepairProducer` for its repair fields, via
+`MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRoleResidual`.
 
 **Diagonal self-consistency** (`diagonalConsistency`) is NOT derivable from the
 role residual's cross consistency (`G^A ⊗ I ≃ I ⊗ G^B`).  It requires
@@ -316,7 +318,7 @@ structurally stronger statement.  Callers must supply it as a separate
 hypothesis.
 
 Callers constructing `hbaseBridge` for `mainFormal` should instantiate this lemma
-with their per-role-residual repair witnesses and diagonal self-consistency proofs.
+with their per-role-residual diagonal self-consistency proofs.
 
 Refs #1359, #1043. -/
 noncomputable def repairedBridgeHypotheses_ofRoleResidual
@@ -326,16 +328,6 @@ noncomputable def repairedBridgeHypotheses_ofRoleResidual
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
     (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
-    (leftRepair :
-      MakingMeasurementsProjective.LeftLiftedProjectivizationRepairInput strategy.state
-        (unsymmetrizedLeftPOVM
-          (roleResidual.rolePackage scalars).roleMeasurement)
-        (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1))
-    (rightRepair :
-      MakingMeasurementsProjective.LeftLiftedProjectivizationRepairInput strategy.state
-        (unsymmetrizedRightPOVM
-          (roleResidual.rolePackage scalars).roleMeasurement)
-        (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1))
     (diagonalConsistency :
       MainFormalPostRolePackageDiagonalConsistencyInput
         params strategy eps k scalars (roleResidual.rolePackage scalars)) :
@@ -343,7 +335,7 @@ noncomputable def repairedBridgeHypotheses_ofRoleResidual
       scalars roleResidual where
   orthonormalizationInput :=
     MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRoleResidual
-      roleResidual leftRepair rightRepair
+      roleResidual
   diagonalConsistency := diagonalConsistency
 
 /-- Base-case assembly of `mainFormal` through the repaired line-169 route.

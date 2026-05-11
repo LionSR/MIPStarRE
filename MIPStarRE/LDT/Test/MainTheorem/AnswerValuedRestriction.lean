@@ -408,8 +408,9 @@ noncomputable def mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofMeasure
       (diagonalZeroCoord_eq hinduction) (bridgeInputs hinduction)
 
 /-- Assemble answer-valued successor self-improvement bridge inputs from the
-three named Section 9 producers, using the closed spectral truncation input for
-the orthonormalization stage. -/
+three named Section 9 producers.  The orthonormalization repair slice is
+supplied by the named Section 5 rounding-to-projectors producer, so callers do
+not carry it as a separate hypothesis. -/
 noncomputable def mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofOrthonormalizationRepair
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -452,14 +453,6 @@ noncomputable def mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofOrthono
             haxisWeightedBound hdiagonalWeightedBound).profile.axisParallel x)
           ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
             haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x))
-    (repair :
-      ∀ hinduction x,
-        SelfImprovement.OrthonormalizationRepairProducer params
-          (sliceStrategy hinduction x)
-          ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
-            haxisWeightedBound hdiagonalWeightedBound).profile.axisParallel x)
-          ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
-            haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x))
     (finalFields :
       ∀ hinduction x,
         SelfImprovement.FinalFieldsInput params (sliceStrategy hinduction x)
@@ -480,7 +473,7 @@ noncomputable def mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofOrthono
       hrestrict hinduction (sliceStrategy hinduction) (state_eq hinduction)
       (pointMeasurement_eq hinduction) (axisParallelMeasurement_eq hinduction)
       (diagonalZeroCoord_eq hinduction) (helperStrongSelfConsistency hinduction)
-      (repair hinduction) (finalFields hinduction)
+      (finalFields hinduction)
 
 /-- Convert answer-valued successor-case bridge inputs into the self-improvement
 producer expected by the public answer-valued Section 6 boundary wrapper. -/

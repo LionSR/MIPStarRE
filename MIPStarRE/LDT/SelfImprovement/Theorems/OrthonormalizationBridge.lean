@@ -19,10 +19,12 @@ paper-faithful pieces from `references/ldt-paper/orthonormalization.tex`:
 
 The split mirrors `MakingMeasurementsProjective.OrthonormalizationInput`, which
 is itself the structure left after `orthonormalizationMainLemma_local` was
-proved internally.  At present the spectral and repair pieces are still the
-opaque external inputs called out by the `#931` blocker; this bridge does *not*
-discharge them, but it lets a downstream caller close `OrthonormalizationInput`
-by independently supplying the two pieces.
+proved internally.  The spectral piece is supplied by the closed
+source-almost-projective spectral truncation theorem.  The ordinary repair
+piece is supplied by the named Section 5 producer
+`MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer`, so the
+remaining gap is visible as that producer's tracked proof obligation rather
+than as an extra caller hypothesis.
 
 In addition, `orthonormalizationSpectralProducer_of_roundingWitnesses` composes
 the spectral-truncation conversion established in `#1042`
@@ -37,6 +39,8 @@ extra assumption.
 * `OrthonormalizationSpectralProducer` — the spectral slice of
   `SelfImprovement.OrthonormalizationInput`, isolated.
 * `OrthonormalizationRepairProducer` — the locality-preserving repair slice.
+* `orthonormalizationRepairProducer_of_projectivizationRepairProducer` —
+  builds the ordinary repair slice from the named Section 5 producer.
 * `LeftLiftedQXPLayerRepairWitness` — a stronger QXP-layer repair witness
   whose rounded family is canonically `ProjSubMeas.liftLeft P`.
 * `LeftLiftedQXPLayerRepairWitnessWithResidualDomination` — the same witness,
@@ -696,6 +700,22 @@ noncomputable def orthonormalizationRepairProducer_of_qxpLayer
     OrthonormalizationRepairProducer params strategy eps delta :=
   fun hssc =>
     leftLiftedProjectivizationRepairInput_of_qxpLayer (hqxp hssc)
+
+/-- Build the repair slice of `SelfImprovement.OrthonormalizationInput` from
+the named Section 5 rounding-to-projectors producer.
+
+This removes the repair slice from caller hypotheses.  Until
+`MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer` is
+proved, this producer carries the tracked Section 5 `sorryAx` dependency. -/
+noncomputable def orthonormalizationRepairProducer_of_projectivizationRepairProducer
+    {params : Parameters} [FieldModel params.q]
+    {strategy : SymStrat params ι} {eps delta : Error} :
+    OrthonormalizationRepairProducer params strategy eps delta :=
+  fun {Hhat} _hssc =>
+    MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer strategy.state
+      (optionCompletion Hhat)
+      (consistencyToAlmostProjectiveError
+        (2 * selfImprovementHelperError params eps delta))
 
 /-- SelfImprovement-level strengthened orthonormalization input carrying the
 residual-domination invariant. -/

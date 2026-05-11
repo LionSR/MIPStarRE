@@ -241,8 +241,9 @@ noncomputable def mainFormalSuccessorSelfImprovementBridgeInputs_ofMeasurementEq
       (diagonalMeasurement_eq hinduction) (bridgeInputs hinduction)
 
 /-- Assemble ordinary successor self-improvement bridge inputs from the three
-named Section 9 producers, using the closed spectral truncation input for the
-orthonormalization stage. -/
+named Section 9 producers.  The orthonormalization repair slice is supplied by
+the named Section 5 rounding-to-projectors producer, so callers do not carry it
+as a separate hypothesis. -/
 noncomputable def mainFormalSuccessorSelfImprovementBridgeInputs_ofOrthonormalizationRepair
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -281,14 +282,6 @@ noncomputable def mainFormalSuccessorSelfImprovementBridgeInputs_ofOrthonormaliz
             haxisWeightedBound hdiagonalWeightedBound).profile.axisParallel x)
           ((mainFormalSuccessorRestrictionPackage params strategy eps hpass
             haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x))
-    (repair :
-      ∀ hinduction x,
-        SelfImprovement.OrthonormalizationRepairProducer params
-          (sliceStrategy hinduction x)
-          ((mainFormalSuccessorRestrictionPackage params strategy eps hpass
-            haxisWeightedBound hdiagonalWeightedBound).profile.axisParallel x)
-          ((mainFormalSuccessorRestrictionPackage params strategy eps hpass
-            haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x))
     (finalFields :
       ∀ hinduction x,
         SelfImprovement.FinalFieldsInput params (sliceStrategy hinduction x)
@@ -309,7 +302,7 @@ noncomputable def mainFormalSuccessorSelfImprovementBridgeInputs_ofOrthonormaliz
       hrestrict hinduction (sliceStrategy hinduction) (state_eq hinduction)
       (pointMeasurement_eq hinduction) (axisParallelMeasurement_eq hinduction)
       (diagonalMeasurement_eq hinduction) (helperStrongSelfConsistency hinduction)
-      (repair hinduction) (finalFields hinduction)
+      (finalFields hinduction)
 
 /-- Convert successor-case bridge inputs into the self-improvement producer
 expected by the public Section 6 boundary wrapper.
