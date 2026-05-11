@@ -296,12 +296,12 @@ lemma localToGlobal (params : Parameters)
 /-- `lem:local-to-global`, in bipartite form.
 
 This is the local-to-global variance inequality for the bipartite operator
-family `A^u ⊗ I`, under the paper's standing hypotheses `0 ≤ A^u ≤ I`. -/
+family `A^u ⊗ I`.  The surrounding paper section discusses positive
+contractions, but the spectral estimate itself is valid for every operator
+family. -/
 lemma localToGlobalBipartite (params : Parameters)
     {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (A : Point params → MIPStarRE.Quantum.Op ιA)
-    (_hA_nonneg : ∀ u : Point params, 0 ≤ A u)
-    (_hA_le_one : ∀ u : Point params, A u ≤ 1)
     (ψ : QuantumState (ιA × ιB)) :
     bipartiteGlobalVariance params A ψ ≤
       (params.m : Error) * bipartiteLocalVariance params A ψ := by
