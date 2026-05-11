@@ -79,11 +79,13 @@
 	\]
 \end{theorem}
 
-\begin{lemma}[Residual domination implies retained-total domination]\label{lem:residual-total-domination}
+\begin{remark}[Lean residual-domination interfaces]\label{rem:lean-residual-domination-interfaces}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas, MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationInputWithResidualDomination, MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization_with_total_le_of_residual_domination}
 	\leanok
+	The following are Lean auxiliary interfaces, not additional hypotheses in the
+	statement of Theorem~\ref{thm:orthonormalization}.
 	Let \(A=\{A_a\}_{a\in\mathcal A}\) be a sub-measurement, and complete it to
 	\(\widehat A\) on \(\mathcal A\cup\{\bot\}\) by setting
 	\(\widehat A_\bot=I-A_{\mathrm{tot}}\).  Let \(\widehat P\) be a projective
@@ -109,7 +111,7 @@
 	the option-completed measurement carries this residual-domination invariant,
 	then the orthonormalized restriction satisfies both the usual
 	state-dependent-distance conclusion and the displayed total comparisons.
-\end{lemma}
+\end{remark}
 
 \begin{remark}[Lean right-register completion helpers]\label{rem:lean-right-register-completion-helpers}
 	\uses{thm:orthonormalization, prop:completing-to-measurement}
@@ -268,11 +270,6 @@
 \subsection{Orthogonalization lemma}\label{sec:orthogonalization}
 
 \begin{lemma}[Orthogonalization lemma for measurements]\label{lem:orthonormalization-main-lemma}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}
-	% Lean proof needs explicit SpectralTruncationInput + ProjectivizationRepairInput
-	% hypotheses (representing spectral-truncation and late-repair stages in the
-	% paper's Q/X/XHat/P argument) not yet constructed.
-	% Tracked by issues #103 (Ch4 orthonormalization) and #426 (projectivization chain).
 	\uses{def:simeq, def:approx_delta}
 	Let $\ket{\psi}$ be a state, and let $A = \{A_a\}$ and $B = \{B_a\}$ be measurements such that
 	\[
@@ -285,6 +282,20 @@
 	\]
 \end{lemma}
 
+\begin{remark}[Lean interfaces for the orthogonalization lemma]\label{rem:lean-orthonormalization-main-interfaces}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma_local}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement}
+	\uses{lem:orthonormalization-main-lemma, lem:left-lifted-projectivization-repair}
+	The current Lean declarations for Lemma~\ref{lem:orthonormalization-main-lemma}
+	are conditional interfaces.  They take explicit spectral-truncation and
+	locality-preserving repair data as inputs, representing the $Q/X/\widehat X/P$
+	part of the paper proof.  These inputs are not hypotheses of the paper lemma;
+	they are construction data that must eventually be produced from the paper's
+	assumptions.  Consequently the paper lemma above is not marked as formally
+	completed by these conditional declarations.
+\end{remark}
+
 \begin{lemma}[Locality-preserving projectivization repair]\label{lem:left-lifted-projectivization-repair}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer}
 	\uses{lem:projective-non-measurement, def:approx_delta}
@@ -295,16 +306,16 @@
 	\[
 		A_a \ot I \approx_{\mathsf{roundingToProjectiveError}(\zeta)} P_a \ot I.
 	\]
-	The locality-preserving form -- output $P_a \ot I$ rather than an arbitrary lifted family -- is the form Lemma~\ref{lem:orthonormalization-main-lemma-local} uses; it is transported through the $Q/X/\widehat X/P$ algebra via the rectangular polar decomposition for the sigma-range embedding.
+	The locality-preserving form -- output $P_a \ot I$ rather than an arbitrary lifted family -- is the form recorded in Remark~\ref{rem:lean-orthonormalization-main-interfaces}; it is transported through the $Q/X/\widehat X/P$ algebra via the rectangular polar decomposition for the sigma-range embedding.
 \end{lemma}
 \begin{proof}
 	The paper's argument transports the rounded family produced by \ref{lem:projective-non-measurement} through the $Q/X/\widehat X/P$ algebra (\ref{lem:X-squared}, \ref{lem:X-hat-squared}, \ref{lem:X-times-X-hat}, \ref{lem:squared-difference}, \ref{lem:P-projectivity}, \ref{lem:P-Q-approx}) and then descends to the locality-preserving lifted form. The proof is not yet complete (tracked by \href{https://github.com/LionSR/MIPStarRE/issues/1032}{issue 1032}).
 \end{proof}
 
-\begin{lemma}[Local orthogonalization lemma for a measurement]\label{lem:orthonormalization-main-lemma-local}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma_local}
-	\leanok
+\begin{remark}[Conditional local orthogonalization interface]\label{rem:conditional-orthonormalization-main-lemma-local}
 	\uses{def:strong-self-consistency, def:approx_delta}
+	This is the local form of the Lean interface recorded in
+	Remark~\ref{rem:lean-orthonormalization-main-interfaces}.
 	Let $\ket{\psi}$ be a unit vector, let $A = \{A_a\}$ be a measurement, and
 	let $0 \leq \zeta \leq 1$. Assume bipartite strong self-consistency
 	\[
@@ -320,10 +331,6 @@
 	\[
 		A_a \ot I \approx_{84 \zeta^{1/4}} P_a \ot I.
 	\]
-\end{lemma}
-\begin{proof}
-	\leanok
-	\uses{lem:orthonormalization-main-lemma}
 	Since $A$ is a measurement, $\sum_a A_a = I$, so bipartite strong
 	self-consistency of $A$ with itself is equivalent to bipartite consistency
 	of $A$ with itself. Feed this consistency hypothesis, together with the
@@ -333,12 +340,12 @@
 	$P_a \ot I$, so the conclusion descends to a local projective
 	sub-measurement $P = \{P_a\}$ on the space of $A$ with error bound
 	$84\zeta^{1/4}$.
-\end{proof}
+\end{remark}
 
-\begin{theorem}[Orthogonalization for a measurement]\label{thm:orthonormalization-measurement}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement}
-	\leanok
+\begin{remark}[Conditional measurement-level orthogonalization interface]\label{rem:conditional-orthonormalization-measurement}
 	\uses{def:strong-self-consistency, def:approx_delta}
+	This is the measurement-level Lean interface recorded in
+	Remark~\ref{rem:lean-orthonormalization-main-interfaces}.
 	Let $\ket{\psi}$ be a unit vector, let $A = \{A_a\}$ be a measurement, and
 	let $0 \leq \zeta \leq 1$. Assume bipartite strong self-consistency of $A$
 	together with the spectral-truncation and locality-preserving repair
@@ -347,14 +354,10 @@
 	\[
 		A_a \ot I \approx_{100 \zeta^{1/4}} P_a \ot I.
 	\]
-\end{theorem}
-\begin{proof}
-	\leanok
-	\uses{lem:orthonormalization-main-lemma-local}
-	Apply \ref{lem:orthonormalization-main-lemma-local} and weaken the error
+	Apply Remark~\ref{rem:conditional-orthonormalization-main-lemma-local} and weaken the error
 	using $84 \leq 100$ and $\zeta^{1/4} \geq 0$. No completion step is
 	needed because $A$ is already a measurement.
-\end{proof}
+\end{remark}
 
 \begin{proof}[Proof of \ref{thm:orthonormalization} assuming \ref{lem:orthonormalization-main-lemma}]
 	\proves{thm:orthonormalization}
