@@ -460,6 +460,7 @@
 	\lean{MIPStarRE.LDT.Test.MainFormalBaseBranchRepairedBridgeHypotheses}
 	\lean{MIPStarRE.LDT.Test.baseMainFormal_ofRepairedBaseBridge}
 	\lean{MIPStarRE.LDT.Test.mainFormal_ofRoleResidualAndRepairedBridge}
+	\lean{MIPStarRE.LDT.Test.mainFormalBaseBranchRepairedBridgeProducer}
 	\leanok
 	\uses{def:main-formal-successor-boundary, thm:orthonormalization}
 	The structure \texttt{MainFormalBaseProjectiveCompletionHypotheses} bundles the still-unformalized
@@ -495,17 +496,18 @@
 	The sharper repaired base route is packaged separately by
 	\texttt{MainFormalBaseRepairedBridgeHypotheses}.  It keeps the same
 	orthonormalization inputs but replaces the exact match-mass fields by the
-	diagonal line-130 consistency input needed for completion.  The generic theorem
+	diagonal self-consistency input needed for completion.  The generic theorem
 	\texttt{mainFormal\_ofRoleResidualAndRepairedBridge} combines that diagonal
 	completion input with the checked pre-completion line-169 repair from
 	Remark~\ref{rem:lean-line169-projectivization-match-mass}, so the base branch
 	of \texttt{mainFormal\_ofRepairedBridge} retains the original final envelope
 	rather than widening to the generic $\zeta_1+\sqrt{\zeta_2}$ scale.  The theorem
 	\texttt{baseMainFormal\_ofRepairedBaseBridge} is the base-case wrapper of this
-	role-residual form.  The top-level conditional bridge used by
-	\texttt{mainFormal} is restricted to the checked base-case residual
-	\texttt{mainFormalBaseRoleResidual}, rather than ranging over arbitrary role
-	residuals.
+	role-residual form.  The base-case construction
+	\texttt{mainFormalBaseBranchRepairedBridgeProducer} names the remaining
+	obligation for the checked base-case residual
+	\texttt{mainFormalBaseRoleResidual}; it is an open proof obligation, not an
+	additional hypothesis in the public statement of Theorem~\ref{thm:main-formal}.
 \end{definition}
 
 
