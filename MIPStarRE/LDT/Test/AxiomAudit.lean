@@ -23,9 +23,10 @@ consistency hypothesis is tracked by issue #1453.
 
 The audits for the `Test.mainFormal` proof frontier record the current tracked
 gaps from issue #1458: the successor projective-completion residual has not yet
-been produced from the Section 6 induction data, and the repaired bridge used by
-`mainFormal_ofRepairedBridge` has not yet been derived from the hypotheses of
-the paper theorem.
+been produced from the Section 6 induction data, and the base-case repaired
+orthonormalization input has not yet been produced from the paper's base-case
+argument.  These obligations are admitted by named producers rather than
+assumed in the public statement of the paper theorem.
 
 The audit for `GlobalVariance.globalVarianceOfPoints` records the remaining
 issue-#1456 step. The paper theorem has the correct hypotheses, and the
@@ -120,6 +121,8 @@ assert_standard_axioms MIPStarRE.LDT.Test.razSafra
 assert_standard_axioms MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement
 assert_standard_axioms MIPStarRE.LDT.Test.classicalTestSoundness
 assert_standard_axioms MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization
+assert_tracked_sorry_axioms
+  MIPStarRE.LDT.Test.mainFormalBaseBranchRepairedBridgeProducer
 assert_tracked_sorry_axioms
   MIPStarRE.LDT.Test.mainFormalSuccessorProjectiveCompletionResidualProducer
 assert_tracked_sorry_axioms MIPStarRE.LDT.Test.mainFormal
