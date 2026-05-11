@@ -9,11 +9,10 @@ Regression checks for the issue-#408 replacement of the former ambient
 Polishchuk--Spielman axiom by the explicit hypothesis
 `PolishchukSpielmanClassicalSoundnessStatement`.
 
-The audit for `MakingMeasurementsProjective.orthonormalization` records the
-current residual dependency on `sorryAx` through the locality-preserving repair
-obligation in `MakingMeasurementsProjective/Producers.lean`. When that
-obligation is discharged, the allowed axiom set below should be reduced to the
-standard Lean axioms.
+The audit for `MakingMeasurementsProjective.orthonormalization` now requires
+the standard Lean axioms only: the locality-preserving repair obligation in
+`MakingMeasurementsProjective/Producers.lean` has been discharged, so the
+former `sorryAx` dependency is gone.
 
 The audits for the `Test.mainFormal` proof frontier record the current tracked
 gaps from issue #1458: the successor projective-completion residual has not yet
@@ -34,9 +33,6 @@ private def expectedStandardAxioms : Array Name :=
 private def expectedStandardAxiomsWithSorry : Array Name :=
   #[``propext, ``Classical.choice, ``Quot.sound, ``sorryAx].qsort Name.lt
 
-private def expectedOrthonormalizationAxioms : Array Name :=
-  expectedStandardAxiomsWithSorry
-
 private def expectedTrackedSorryAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
@@ -54,16 +50,13 @@ private def assertUsesOnlyStandardAxioms (declName : Name) : CommandElabM Unit :
 elab "assert_standard_axioms " id:ident : command => do
   assertUsesOnlyStandardAxioms id.getId
 
-elab "assert_orthonormalization_axioms " id:ident : command => do
-  assertUsesExactlyAxioms id.getId expectedOrthonormalizationAxioms
-
 elab "assert_tracked_sorry_axioms " id:ident : command => do
   assertUsesExactlyAxioms id.getId expectedTrackedSorryAxioms
 
 assert_standard_axioms MIPStarRE.LDT.Test.razSafra
 assert_standard_axioms MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement
 assert_standard_axioms MIPStarRE.LDT.Test.classicalTestSoundness
-assert_orthonormalization_axioms MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization
+assert_standard_axioms MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization
 assert_tracked_sorry_axioms
   MIPStarRE.LDT.Test.mainFormalSuccessorProjectiveCompletionResidualProducer
 assert_tracked_sorry_axioms MIPStarRE.LDT.Test.mainFormal
