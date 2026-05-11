@@ -62,6 +62,8 @@
 \section{The inductive construction}
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement-in-induction-section}
+	\lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection}
+	\leanok
   \uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $G \in \polysub{m}{q}{d}$ be a submeasurement with the following property:
   \begin{enumerate}
@@ -103,15 +105,17 @@
 	Complete $G$ to a measurement by adjoining an extra outcome $\bot$. Apply Theorem~\ref{thm:self-improvement} to the completed measurement, then discard the $\bot$ outcome. By Lemma~\ref{prop:completing-to-measurement}, the completeness, consistency, strong self-consistency, and boundedness estimates transfer back to the original polynomial outcomes with an additive error from the missing mass $\bra{\psi} (I - \sum_g G_g) \ot I \ket{\psi}$. Since the output is projective, Lemma~\ref{prop:two-notions-of-self-consistency} converts the strong self-consistency statement to the usual bipartite formulation.
 \end{proof}
 
-\begin{remark}[Lean conditional declaration for induction self-improvement]\label{rem:self-improvement-in-induction-section-conditional}
-	\lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection}
-	The current Lean declaration for Theorem~\ref{thm:self-improvement-in-induction-section}
-	assumes the helper self-consistency, orthonormalization, and final-field
-	hypotheses that are still explicit in the Chapter~\ref{chap:self-improvement}
-	formalization.  It also assumes a measurement whose underlying submeasurement
-	is the given one.  These are not hypotheses of the paper theorem; they are
-	proof obligations to be discharged when the Chapter~\ref{chap:self-improvement}
-	statement matches the paper theorem.
+\begin{remark}[Lean conditional helper for induction self-improvement]\label{rem:self-improvement-in-induction-section-conditional}
+	\lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection_ofMeasurement}
+	The source-facing Lean declaration for
+	Theorem~\ref{thm:self-improvement-in-induction-section} has the paper
+	hypotheses.  Its proof is still open.  The auxiliary declaration displayed
+	in this remark is the older measurement-input assembly: it assumes the
+	Section~\ref{chap:self-improvement} helper self-consistency,
+	orthonormalization, and final-field proof stages, and it assumes that the
+	input submeasurement is the underlying submeasurement of a complete
+	measurement.  These are proof-stage inputs, not hypotheses of the paper
+	theorem.
 \end{remark}
 
 \begin{theorem}[Pasting]\label{thm:ld-pasting-in-induction-section}
