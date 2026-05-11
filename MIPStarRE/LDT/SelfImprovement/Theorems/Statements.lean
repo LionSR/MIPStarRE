@@ -331,7 +331,7 @@ structure SelfImprovementHelperConclusion (params : Parameters) [FieldModel para
 /-- Paper origin: `references/ldt-paper/self_improvement.tex:24-60`
 (`\label{lem:self-improvement-helper}`).
 
-Output of the self-improvement helper lemma before projectivization.  The
+Output of the self-improvement helper lemma before rounding to projectors.  The
 submeasurement `H` satisfies the four conclusions stated in the paper:
 completeness, consistency with the point measurement, strong self-consistency,
 and boundedness by a positive semidefinite dual witness `Z`.  The boundedness
