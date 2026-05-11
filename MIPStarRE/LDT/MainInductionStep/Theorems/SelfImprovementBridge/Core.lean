@@ -3,16 +3,16 @@ import MIPStarRE.LDT.Test.StrategyFailures
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 import MIPStarRE.LDT.Pasting.Bernoulli.Final
 import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationBridge
--- Used by `selfImprovementInInductionSection`.
+-- Used by `selfImprovementInInductionSection_ofMeasurement`.
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results
 
 /-!
 # Section 6 — Ordinary Self-Improvement Bridge
 
 Core public API for the ordinary self-improvement package: constructors for
-`SelfImprovementPackage`, the induction-section wrapper
+`SelfImprovementPackage`, the induction-section theorem
 `selfImprovementInInductionSection`, the monotone-witness cleanup
-`mainInductionOfWitness`, and the pasting wrapper `ldPastingInInductionSection`.
+`mainInductionOfWitness`, and the pasting theorem `ldPastingInInductionSection`.
 
 The answer-valued slice constructors are separated into
 `SelfImprovementBridge.AnswerSlice`.
@@ -56,13 +56,19 @@ theorem mainInductionOfWitness
   refine ⟨G, ?_⟩
   exact ⟨le_trans hG.offDiagonalBound herror⟩
 
-/-- `thm:self-improvement-in-induction-section`.
+/-- Conditional measurement-input form of
+`thm:self-improvement-in-induction-section`.
 
-The induction-section wrapper keeps the point-consistency hypothesis `_hcons`
-explicit because it is part of the paper's bookkeeping, even though the current
-proof factors through `selfImprovementFromSubMeas`, which no longer consumes it
+This theorem is not the paper-facing statement: it assumes that the input
+submeasurement is the underlying submeasurement of a complete measurement. The
+paper-facing theorem `selfImprovementInInductionSection` below keeps only the
+submeasurement and its consistency hypothesis.
+
+The point-consistency hypothesis `_hcons` is retained because it is part of the
+paper's bookkeeping, although the present proof factors through
+`SelfImprovement.selfImprovementFromSubMeas`, which no longer consumes it
 separately. -/
-theorem selfImprovementInInductionSection
+theorem selfImprovementInInductionSection_ofMeasurement
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -152,6 +158,34 @@ theorem selfImprovementInInductionSection
           averageOperatorOverDistribution,
           GlobalVariance.pointConditionedOutcomeOperatorAtPolynomial] at hdom'
         simpa using hdom' }
+
+/-- `thm:self-improvement-in-induction-section`.
+
+The paper statement takes an arbitrary polynomial submeasurement `G` satisfying
+the stated point-consistency hypothesis.  It does not assume that `G` is the
+underlying submeasurement of a complete measurement. -/
+theorem selfImprovementInInductionSection
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma nu : Error)
+    (hhelperStrongSelfConsistency :
+      SelfImprovement.HelperStrongSelfConsistencyInput params strategy eps delta)
+    (horthonormalization :
+      SelfImprovement.OrthonormalizationInput params strategy eps delta)
+    (hfinalFields : SelfImprovement.FinalFieldsInput params strategy eps delta nu)
+    (hgood : strategy.IsGood eps delta gamma)
+    (G : SubMeas (Polynomial params) ι)
+    (hcons : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params G) nu) :
+    ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+      SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
+  -- TODO(#1451): complete the submeasurement-input theorem without assuming
+  -- that `G` is the underlying submeasurement of a complete measurement.
+  -- The current measurement-input route is retained in
+  -- `selfImprovementInInductionSection_ofMeasurement`.
+  sorry
 
 /-- Package the slice-wise outputs feeding `selfImprovementInInductionSection`
 into the bookkeeping object expected by the later induction-step assembly.
@@ -504,13 +538,16 @@ noncomputable def SelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationR
             (repair x)
         finalFields := finalFields x })
 
-/-- Convert honest per-slice Section 9 bridge inputs into the Section 6
+/-- Convert per-slice Section 9 bridge inputs into the Section 6
 self-improvement package.
 
-This is wiring only: `SliceBridgeInputs` still assumes the honest slice
-`SymStrat`s and their Section 9 bridge inputs. The conversion applies
-`selfImprovementInInductionSection` slice-by-slice and transports its fields
-across the recorded equalities to the restricted-slice bookkeeping interface. -/
+The construction assumes the slice strategies and their Section 9 bridge inputs.
+It applies the conditional measurement-input theorem
+`selfImprovementInInductionSection_ofMeasurement` slice-by-slice and transports
+its fields across the recorded equalities to the restricted-slice interface. At
+each slice the package supplies the complete measurement
+`inductionPkg.sliceMeasurement x`; the submeasurement-input theorem remains the
+tracked obligation in #1451. -/
 noncomputable def SelfImprovementPackage.ofSliceBridgeInputs
     (params : Parameters)
     [FieldModel params.q]
@@ -537,7 +574,7 @@ noncomputable def SelfImprovementPackage.ofSliceBridgeInputs
     have hcons := inductionPkg.pointConsistency x
     rw [← hbridge.state_eq x, ← hbridge.pointMeasurement_eq x] at hcons
     simpa [sliceStrategy] using hcons
-  rcases selfImprovementInInductionSection params (hbridge.sliceStrategy x)
+  rcases selfImprovementInInductionSection_ofMeasurement params (hbridge.sliceStrategy x)
       (restrictionPkg.profile.axisParallel x)
       (restrictionPkg.profile.selfConsistency x)
       (restrictionPkg.profile.diagonal x)

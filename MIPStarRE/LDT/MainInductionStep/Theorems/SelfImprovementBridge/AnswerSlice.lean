@@ -390,11 +390,13 @@ noncomputable def AnswerSelfImprovementPackage.ofSelfImprovementInInductionSecti
 /-- Convert honest per-slice Section 9 bridge inputs into the answer-valued
 Section 6 self-improvement package.
 
-This is wiring only: `SliceBridgeInputs` still assumes honest ordinary slice
-`SymStrat`s and their Section 9 bridge inputs.  The conversion applies the
-ordinary `selfImprovementInInductionSection` slice-by-slice and transports its
-fields back to the answer-valued restricted-slice interface via the recorded
-state and point-measurement equalities. -/
+The construction assumes ordinary slice strategies and their Section 9 bridge
+inputs. It applies the conditional measurement-input theorem
+`selfImprovementInInductionSection_ofMeasurement` slice-by-slice and transports
+its fields back to the answer-valued restricted-slice interface via the recorded
+state and point-measurement equalities. At each slice the package supplies the
+complete measurement `inductionPkg.sliceMeasurement x`; the submeasurement-input
+theorem remains the tracked obligation in #1451. -/
 noncomputable def AnswerSelfImprovementPackage.ofSliceBridgeInputs
     (params : Parameters)
     [FieldModel params.q]
@@ -422,7 +424,7 @@ noncomputable def AnswerSelfImprovementPackage.ofSliceBridgeInputs
     have hcons := inductionPkg.pointConsistency x
     rw [← hbridge.state_eq x, ← hbridge.pointMeasurement_eq x] at hcons
     simpa [sliceStrategy] using hcons
-  rcases selfImprovementInInductionSection params (hbridge.sliceStrategy x)
+  rcases selfImprovementInInductionSection_ofMeasurement params (hbridge.sliceStrategy x)
       (restrictionPkg.profile.axisParallel x)
       (restrictionPkg.profile.selfConsistency x)
       (restrictionPkg.profile.diagonal x)
