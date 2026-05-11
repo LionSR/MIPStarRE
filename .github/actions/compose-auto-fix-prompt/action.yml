@@ -108,7 +108,11 @@ runs:
         if [ -n "$PROMPT_CONTEXT" ]; then
           full_prompt="${full_prompt}"$'\n\n'"${PROMPT_CONTEXT}"
         fi
-        full_prompt="${full_prompt}"$'\n\n'"${source_statement_guard}"
+        if [[ "$prompt" != *"Statement faithfulness (BLOCKER)"* \
+            && "$prompt" != *"Source-labelled theorem alignment"* \
+            && "$prompt" != *"Source-statement guard:"* ]]; then
+          full_prompt="${full_prompt}"$'\n\n'"${source_statement_guard}"
+        fi
         full_prompt="${full_prompt}"$'\n\n'"PR Number: ${PR_NUMBER}"
         full_prompt="${full_prompt}"$'\n'"Repository: ${REPOSITORY}"
         full_prompt="${full_prompt}"$'\n'"Branch: ${HEAD_BRANCH}"

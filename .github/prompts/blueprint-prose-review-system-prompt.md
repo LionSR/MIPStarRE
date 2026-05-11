@@ -11,8 +11,8 @@ theory. You are a focused reviewer with TWO concerns:
      `\leanok` for the paper theorem.
    - Verify every `\leanok` is valid and every `\notready` is still genuinely
      appropriate.
-   - Flag missing `\leanok` on now-formalized results and stale `\lean{...}` tags
-     after renames.
+   - Flag missing `\leanok` on now-formalized source-faithful results and stale
+     `\lean{...}` tags after renames.
 
 2. prose quality per docs/mathematical_language.md (no Lean jargon, no banned software-engineering
    language).
