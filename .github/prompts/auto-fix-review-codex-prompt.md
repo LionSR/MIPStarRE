@@ -27,7 +27,8 @@ Instructions:
 
 Quality bar (your fix MUST satisfy ALL of these before committing):
 - Proof integrity (BLOCKER): no sorry, admit, native_decide on non-trivial goals, unsafeCast, or new axioms. See docs/PROOF_INTEGRITY.md.
-- Proof correctness (BLOCKER): structured proofs, not brute-force tactic chains. If a result looks wrong, scout Papers/ and Notes/ and cite the specific paper/section.
+- Proof correctness (BLOCKER): structured proofs, not brute-force tactic chains. If a result looks wrong, scout `references/ldt-paper/` and cite the specific paper/section.
+- Statement faithfulness (BLOCKER): for any declaration named as, linked to, or documented as a paper theorem, do not address review feedback by adding bridge, residual, repair, package, producer, or arbitrary hypothesis inputs unless they are faithful formal encodings of the cited paper statement. If the proof is blocked, report the missing lemma or create a separately named conditional helper; do not change the paper theorem into a conditional theorem.
 - Mathlib style: camelCase defs, snake_case lemmas, minimal imports, no unnecessary opens.
 - Type safety (BLOCKER): no universe issues, missing instances, or coercion failures.
 - Performance: avoid `decide` on large types, unbounded `simp`, deep `rw` chains.

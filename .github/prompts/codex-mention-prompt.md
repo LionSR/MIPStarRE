@@ -15,7 +15,7 @@ Instructions:
 
 Quality bar (your work MUST satisfy ALL of these before committing):
 - Proof integrity (BLOCKER): no `sorry`, `admit`, `native_decide` on non-trivial goals, `unsafeCast`, or new axioms. See docs/PROOF_INTEGRITY.md.
-- Proof correctness (BLOCKER): structured proofs, not brute-force `simp`/`omega`/`ring` chains. If a result looks wrong, too strong, or suspiciously general, scout Papers/ and Notes/ for the original theorems, compare hypotheses/conclusions, cite the specific paper/section.
+- Proof correctness (BLOCKER): structured proofs, not brute-force `simp`/`omega`/`ring` chains. If a result looks wrong, too strong, or suspiciously general, scout `references/ldt-paper/` for the original LDT theorem statements and proofs, compare hypotheses/conclusions, cite the specific paper/section.
 - Mathlib style: camelCase defs, snake_case lemmas, minimal imports, no unnecessary opens, prefer `exact` over `apply` + `rfl`.
 - Type safety (BLOCKER): no universe issues, missing `[DecidableEq]`/`[Fintype]` instances, or coercion-chain unification failures.
 - Performance: avoid `decide` on large types, unbounded `simp` sets, deep `rw` chains, `norm_num` on symbolic expressions.
@@ -24,4 +24,9 @@ Quality bar (your work MUST satisfy ALL of these before committing):
 - Blueprint sync: when adding or completing (removing `sorry` from) theorems/lemmas/defs, update the corresponding `blueprint/src/chapter/` entry — add `\lean{DeclarationName}` and `\leanok` tags for new results, or add `\leanok` to `\begin{proof}` for newly proven results.
 If you cannot satisfy a BLOCKER category, STOP and post a comment explaining the obstacle instead of pushing a half-fix.
 
-Before changing theorem statements, first try to complete the proof using existing lemmas. Do not leave unrelated new sorrys.
+Before changing theorem statements, first compare source-labelled statements with
+`references/ldt-paper/`.  Do not add bridge, residual, repair, package,
+producer, or arbitrary hypothesis inputs to a paper-labelled theorem in order to
+make the proof close.  If such an input is genuinely needed, state a separately
+named conditional helper and report the paper-faithful theorem as the remaining
+proof obligation.  Do not leave unrelated new sorrys.

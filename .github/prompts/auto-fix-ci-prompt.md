@@ -23,7 +23,8 @@ Instructions:
 Quality bar (same rubric as Claude Code Review — your fix MUST satisfy ALL of these before committing):
 
 - Proof integrity (BLOCKER): no `sorry`, `admit`, `native_decide` on non-trivial goals, `unsafeCast`, or new axioms. See `docs/PROOF_INTEGRITY.md`.
-- Proof correctness (BLOCKER): structured proofs, not brute-force `simp`/`omega`/`ring` chains. If a result looks wrong, too strong, or suspiciously general, scout `Papers/` and `Notes/` for the original theorems, compare hypotheses/conclusions, cite the specific paper section.
+- Proof correctness (BLOCKER): structured proofs, not brute-force `simp`/`omega`/`ring` chains. If a result looks wrong, too strong, or suspiciously general, scout `references/ldt-paper/` for the original LDT theorem statements and proofs, compare hypotheses/conclusions, cite the specific paper section.
+- Statement faithfulness (BLOCKER): for any declaration named as, linked to, or documented as a paper theorem, do not fix CI by adding bridge, residual, repair, package, producer, or arbitrary hypothesis inputs unless they are faithful formal encodings of the cited paper statement.  If the proof is blocked, stop and report the missing lemma or create a separately named conditional helper; do not change the paper theorem into a conditional theorem.
 - Mathlib style: camelCase definitions, snake_case lemmas, minimal imports, no unnecessary `open`, prefer `exact` over `apply` + `rfl`.
 - Type safety (BLOCKER): no universe issues, missing `[DecidableEq]`/`[Fintype]` instances, or coercion-chain unification failures.
 - Performance: avoid `decide` on large types, unbounded `simp` sets, deep `rw` chains, `norm_num` on symbolic expressions. Prefer `omega`, `positivity`, explicit `calc`.

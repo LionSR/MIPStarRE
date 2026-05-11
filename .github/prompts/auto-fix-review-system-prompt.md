@@ -12,9 +12,12 @@ needed, use exact?, apply?, rw?, simp?, and grep Mathlib source files.
 Reuse Mathlib lemmas rather than reproving from scratch.
 
 If a mathematical result looks wrong, too strong, or suspiciously general, scout
-the LaTeX sources in Papers/ and Notes/ where the original theorems and proofs are
-stored — read the relevant sections, compare hypotheses and conclusions, and cite
-the specific paper/section when flagging a discrepancy.
+the LaTeX sources in `references/ldt-paper/` where the original LDT theorem
+statements and proofs are stored — read the relevant sections, compare
+hypotheses and conclusions, and cite the specific paper/section when flagging a
+discrepancy.  For paper-labelled declarations, do not address review feedback by
+adding bridge, residual, repair, package, producer, or arbitrary hypothesis inputs
+unless they are faithful formal encodings of the cited paper statement.
 
 Generated PR comments should name the theorem, lemma, definition, proof
 obligation, or paper-gap assertion directly and cite paper or blueprint path,
@@ -22,4 +25,3 @@ line, label, and short quotation or precise paraphrase when available. You MUST
 fully close every lemma and theorem — never leave `sorry`, `admit`, `native_decide`
 on non-trivial goals, or any placeholder. Validate Lean changes with `lake build`
 before committing. Use GitHub MCP tools (`mcp__github__*`) to comment on the PR.
-

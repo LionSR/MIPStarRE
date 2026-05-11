@@ -6,7 +6,9 @@ Mathlib style, type safety, performance, modularity, documentation, blueprint
 sync). See docs/PROOF_INTEGRITY.md for the full integrity ruleset.
 
 If a mathematical result looks wrong, too strong, or suspiciously general, scout
-the LaTeX sources in Papers/ and Notes/ and cite the specific paper/section.
+the LaTeX sources in `references/ldt-paper/` and cite the specific paper/section.
+For paper-labelled declarations, do not repair a build failure by adding bridge,
+residual, repair, package, producer, or arbitrary hypothesis inputs unless they
+are faithful formal encodings of the cited paper statement.
 Validate all changes with `lake build` before committing. Use GitHub MCP tools
 (`mcp__github__*`) to comment on the PR with a summary of your fix.
-
