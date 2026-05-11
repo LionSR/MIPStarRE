@@ -244,10 +244,11 @@ proof-level `\leanok`:
   the paper.  The comment in the blueprint explicitly says "no \leanok
   is claimed."
 
-- **`thm:main-formal`** (ch02): The statement-level `\leanok` records that
-  `MIPStarRE.LDT.Test.mainFormal` is the intended Lean transcription of the
+- **`thm:main-formal`** (ch02): The blueprint links to
+  `MIPStarRE.LDT.Test.mainFormal`, the intended Lean transcription of the
   theorem statement.  The 1 `sorry` in `MainFormal.lean` means the proof chain
-  is not yet closed, so proof-level `\leanok` is deliberately withheld.
+  is not yet closed, so `\leanok` is deliberately withheld for this theorem
+  until the repaired-hypotheses proof obligation is discharged.
 
 ### The `\uses{}` convention
 
