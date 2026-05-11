@@ -152,9 +152,7 @@
 \end{proof}
 
 \begin{lemma}[Spectral gap of the Laplacian]\label{cor:laplacian-spectral-gap}
-	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianEigenvalue_eq}
-	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.hypercubeSpectralGap_le_laplacianEigenvalue}
-	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianEigenvalue_of_weight_one}
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianSpectralGap}
 	\leanok
 	\uses{prop:eigenvectors}
 	If $\lambda_1 \le \lambda_2 \le \cdots \le \lambda_{q^m}$ are the eigenvalues of $L$, then
@@ -166,6 +164,9 @@
 \end{lemma}
 \begin{proof}
 	\leanok
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianEigenvalue_eq}
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.hypercubeSpectralGap_le_laplacianEigenvalue}
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianEigenvalue_of_weight_one}
 	\uses{prop:eigenvectors}
 	Lemma~\ref{prop:eigenvectors} identifies the two largest eigenvalues of $K$, hence the two smallest eigenvalues of $L=(1/q^m)I-K$.
 \end{proof}
