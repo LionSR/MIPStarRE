@@ -66,6 +66,17 @@ FAITHFUL_BOUNDARY_TOKENS = {
     ),
 }
 
+CONDITIONAL_DECL_NAME_RE = re.compile(
+    r"(?:"
+    r"FromBridgeInputs"
+    r"|BridgeHypotheses"
+    r"|BridgeInputs"
+    r"|(?:^|_)ofRepaired[A-Za-z0-9_']*"
+    r"|(?:^|_)assuming[A-Za-z0-9_']*"
+    r"|Assuming[A-Za-z0-9_']*"
+    r")"
+)
+
 @dataclass(frozen=True)
 class DebtFinding:
     """One proof-debt token in a paper-facing Lean declaration header."""
@@ -100,17 +111,36 @@ class FaithfulBoundaryFinding:
 
 
 @dataclass(frozen=True)
+class ConditionalDeclarationNameFinding:
+    """One conditional declaration name used for a paper-facing blueprint entry."""
+
+    blueprint_file: str
+    blueprint_line: int
+    env_type: str
+    label: str | None
+    lean_decl: str
+    lean_file: str
+    lean_line: int
+    token: str
+
+
+@dataclass(frozen=True)
 class AuditResult:
     """Summary of the paper-facing proof-debt audit."""
 
     scanned_refs: int
     missing_refs: tuple[str, ...]
     findings: tuple[DebtFinding, ...]
+    conditional_decl_findings: tuple[ConditionalDeclarationNameFinding, ...]
     faithful_boundary_findings: tuple[FaithfulBoundaryFinding, ...]
 
     @property
     def ok(self) -> bool:
-        return not self.findings and not self.missing_refs
+        return (
+            not self.findings
+            and not self.conditional_decl_findings
+            and not self.missing_refs
+        )
 
 
 def paper_facing_entries(blueprint_src: Path) -> list[BlueprintEntry]:
@@ -186,6 +216,27 @@ def _faithful_boundary_reason(token: str) -> str | None:
     return FAITHFUL_BOUNDARY_TOKENS.get(token)
 
 
+def _conditional_decl_name_finding(
+    entry: BlueprintEntry,
+    decl: LeanDecl,
+) -> ConditionalDeclarationNameFinding | None:
+    """Return a finding when a paper-facing entry references a conditional name."""
+    basename = entry.lean_decl.rsplit(".", 1)[-1]
+    match = CONDITIONAL_DECL_NAME_RE.search(basename)
+    if match is None:
+        return None
+    return ConditionalDeclarationNameFinding(
+        blueprint_file=entry.file,
+        blueprint_line=entry.line,
+        env_type=entry.env_type,
+        label=entry.label,
+        lean_decl=entry.lean_decl,
+        lean_file=decl.file,
+        lean_line=decl.line,
+        token=match.group(0),
+    )
+
+
 def _findings_for_entry(
     root: Path,
     entry: BlueprintEntry,
@@ -249,12 +300,15 @@ def run_audit(root: Path) -> AuditResult:
 
     missing: list[str] = []
     findings: list[DebtFinding] = []
+    conditional_decl_findings: list[ConditionalDeclarationNameFinding] = []
     faithful_boundary_findings: list[FaithfulBoundaryFinding] = []
     for entry in entries:
         decl = decls.get(entry.lean_decl)
         if decl is None:
             missing.append(entry.lean_decl)
             continue
+        if conditional_finding := _conditional_decl_name_finding(entry, decl):
+            conditional_decl_findings.append(conditional_finding)
         entry_findings, entry_faithful = _findings_for_entry(root, entry, decl)
         findings.extend(entry_findings)
         faithful_boundary_findings.extend(entry_faithful)
@@ -263,6 +317,7 @@ def run_audit(root: Path) -> AuditResult:
         scanned_refs=len(entries),
         missing_refs=tuple(sorted(set(missing))),
         findings=tuple(findings),
+        conditional_decl_findings=tuple(conditional_decl_findings),
         faithful_boundary_findings=tuple(faithful_boundary_findings),
     )
 
@@ -290,6 +345,18 @@ def print_text_report(result: AuditResult) -> None:
         )
         if finding.header_excerpt:
             print(f"    {finding.header_excerpt}")
+
+    print(f"Conditional declaration-name findings: {len(result.conditional_decl_findings)}")
+    for finding in result.conditional_decl_findings:
+        label = f" label={finding.label}" if finding.label else ""
+        print(
+            f"  - {finding.lean_file}:{finding.lean_line}: "
+            f"{finding.lean_decl} has conditional name token {finding.token!r}"
+        )
+        print(
+            f"    blueprint {finding.blueprint_file}:{finding.blueprint_line} "
+            f"env={finding.env_type}{label}"
+        )
 
     print(f"Faithful boundary input findings: {len(result.faithful_boundary_findings)}")
     for finding in result.faithful_boundary_findings:

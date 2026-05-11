@@ -241,9 +241,19 @@ lemma selfImprovementHelper
   · exact
       helper_point_consistency_of_pointConsistencyAddInU_transfer
         params strategy eps delta heps hdelta hpointTransfer
-  · /- TODO(#1452): Apply
-      `helper_strong_self_consistency_error_le_selfImprovementHelperError` to
-      the helper self-consistency chain. -/
+  · /- TODO(#1452): Derive `HelperStrongSelfConsistencyProducerInputs` for the
+      helper output from the Section 9 scalar transport estimates, then prove this
+      condition with `helper_strong_self_consistency_of_helper_conclusion` or
+      `helper_strong_self_consistency_input_of_producer`.
+
+      This route currently uses the five estimates required by
+      `helper_producer_inputs_of_selfConsistency_localVariance_scalarTransports`:
+      the two off-diagonal variance swaps, the two post-`delete-an-A` transports,
+      and the final lower bound on the `move-over-v` endpoint.  Its final
+      absorption also uses the small-error condition `(params.d : Error) ≤
+      (params.q : Error)`.  This boundary must be justified from the paper
+      hypotheses or handled by a separate saturated-error branch; it should not be
+      added as an extra hypothesis to `selfImprovementHelper`. -/
     sorry
   · exact
       helper_boundedness_gap_le_selfImprovementHelperError_of_helper_outputs
