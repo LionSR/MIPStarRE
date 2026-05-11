@@ -167,11 +167,16 @@ Complete wiring functions exist (all proved):
 - `answerSuccessorOfInductionPackageAndBridgeInputs` (line 628): Takes `PerSliceInductionPackage` + bridge → branch residual
 - `rolePackageResidual_ofAnswerSuccessorBridgeInputs` (line 602): Wraps → `Nonempty (MainFormalRolePackageResidual)`
 
-These functions are **not called** from `mainFormal` because `mainFormal` lacks the successor induction/bridge hypotheses.
+These functions were not called from the older final assembly because the
+successor induction and bridge data had not been produced.  Under the current
+policy, that data should be supplied by producer theorems or isolated in a
+conditional helper, not added as new hypotheses to the paper-facing theorem.
 
-### 4.2 MainFormal successor-case hypotheses (PR #1374 additions)
+### 4.2 Historical MainFormal successor-case hypotheses (PR #1374 additions)
 
-**PR #1374** (`issue1036-successor-slice-bridge`) adds two hypotheses to `mainFormal`:
+**Historical PR #1374** (`issue1036-successor-slice-bridge`) proposed the
+following two additional hypotheses for `mainFormal`; the current #1458 policy
+does not permit this as the paper-facing theorem shape:
 
 ```lean
 (hanswerSliceWitness : ∀ (hm_ne_one : params.m ≠ 1),

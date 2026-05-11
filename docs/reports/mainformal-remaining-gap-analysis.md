@@ -243,9 +243,14 @@ None of the active PRs directly fills the gap. They are building the self-improv
 
 ### Gap 3 (INFRA): Base-case bridge construction
 
-**What:** `mainFormal` takes `hbaseBridge` as an unproven hypothesis. #1043 tracks constructing this hypothesis.
+**Historical what:** the older conditional theorem shape took `hbaseBridge` as
+an unproved hypothesis.  In the current repair, this hypothesis belongs to
+`mainFormal_ofRepairedBridge`, while #1043 tracks the corresponding producer
+obligation.
 
-**Status:** `hbaseBridge` is used by both base and successor cases. It's an orthogonal gap to the successor case — it needs to be discharged regardless of which successor route is chosen.
+**Status:** the repaired bridge is orthogonal to the successor case.  It needs to
+be produced from the paper hypotheses regardless of which successor route is
+chosen.
 
 **Tracked by:** #1043
 
