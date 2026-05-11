@@ -24,6 +24,7 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 
 \begin{remark}[Conditional variants for the collision-residual estimate]\label{rem:generalize-b-collision-residual-conditional}
 	\lean{MIPStarRE.LDT.GlobalVariance.generalizeBFromCollisionResidual, MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual_le_of_seedExpansion_eq, MIPStarRE.LDT.GlobalVariance.generalizeBFromSeedCollisionExpansion, MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual_le_of_lineExpansion_eq, MIPStarRE.LDT.GlobalVariance.generalizeBFromLineCollisionExpansion}
+	\uses{lem:generalize-b, lem:schwartz-zippel-individual, lem:axis-line-polynomial-agreement-mdq}
 	The paper proof of Lemma~\ref{lem:generalize-b} bounds the collision event
 	directly by the Schwartz--Zippel estimate.  The following conditional variants
 	instead assume this collision estimate, or one of the reindexing identities
