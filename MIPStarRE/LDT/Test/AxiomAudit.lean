@@ -28,7 +28,7 @@ The audits for the `Test.mainFormal` proof frontier record the current tracked
 gaps from issue #1458: the successor projective-completion residual has not yet
 been produced from the Section 6 induction data, and the base-case repaired
 orthonormalization input has not yet been produced from the paper's base-case
-argument.  These obligations are admitted by named producers rather than
+argument.  These obligations are isolated as named statements rather than
 assumed in the public statement of the paper theorem.
 
 The audit for `GlobalVariance.globalVarianceOfPoints` now requires the standard
@@ -41,15 +41,16 @@ the current proof obligation for the submeasurement-input statement of
 `thm:self-improvement-in-induction-section`.
 
 The audit for `MainInductionStep.mainInduction` records the current proof
-obligation for `thm:main-induction`: the theorem statement is source-facing, and
-the remaining work is to derive the internal successor-stage inputs from the
-paper hypotheses.  This is tracked by issue #1507.
+obligation for `thm:main-induction`: the theorem statement matches the paper
+statement, and the remaining work is to derive the internal successor-stage
+inputs from the paper hypotheses.  This is tracked by issue #1507.
 
 The audit for `ExpansionHypercubeGraph.laplacianSpectralGapOrdered` records the
 current proof obligation for the ordered-eigenvalue statement of
-`cor:laplacian-spectral-gap`: the theorem statement is source-facing, and the
-remaining work is to connect the Fourier diagonalization to the ordered roots of
-the characteristic polynomial.  This is tracked by issue #1497.
+`cor:laplacian-spectral-gap`: the theorem statement matches the paper
+statement, and the remaining work is to connect the Fourier diagonalization to
+the ordered roots of the characteristic polynomial.  This is tracked by issue
+#1497.
 
 The axiom expectation is attached to each declaration separately. A declaration
 using one of the `assert_*_axioms` commands with `sorryAx` in its expected set
@@ -112,7 +113,7 @@ private def expectedSelfImprovementHelperAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
 /-- Standard kernel axioms plus `sorryAx`; tracks the issue #1230 derivation
-needed for the slackness-carrying SDP statement. -/
+needed for the SDP complementary-slackness statement (`lem:sdp`). -/
 private def expectedSdpSlacknessAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
