@@ -161,6 +161,15 @@ private lemma exists_frequencyWeight_one (params : Parameters) :
   rw [hfilter]
   simp
 
+lemma hypercubeVertexCount_pos (params : Parameters) :
+    0 < hypercubeVertexCount params := by
+  exact pow_pos params.hq params.m
+
+lemma hypercubeVertexCount_one_lt (params : Parameters) :
+    1 < hypercubeVertexCount params := by
+  rw [hypercubeVertexCount]
+  exact Nat.one_lt_pow params.hm.ne' params.one_lt_q
+
 private lemma fourierBasis_norm_sq (params : Parameters) :
     (((Real.sqrt (hypercubeVertexCount params : ℝ))⁻¹ : ℂ) *
       star (((Real.sqrt (hypercubeVertexCount params : ℝ))⁻¹ : ℂ))) =
@@ -376,7 +385,7 @@ lemma hypercubeSpectralGap_operator (params : Parameters) :
       matrixLaplacianOperator params := by
   exact sub_nonneg.mp (hypercubeSpectralGap_operator_posSemidef params).nonneg
 
-/-- Spectral-gap conclusion for `cor:laplacian-spectral-gap`.
+/-- Fourier-indexed spectral-gap conclusion supporting `cor:laplacian-spectral-gap`.
 
 Paper origin: `references/ldt-paper/expansion.tex:102-109`.
 
@@ -418,6 +427,31 @@ lemma laplacianSpectralGap (params : Parameters) :
     exact ⟨α, hα_ne, laplacianEigenvalue_of_weight_one params α hα_weight⟩
   gap_eq := by
     simp [hypercubeSpectralGap, hypercubeVertexCount]
+
+/-- `cor:laplacian-spectral-gap`, in the ordered-eigenvalue form stated in the paper.
+
+Paper origin: `references/ldt-paper/expansion.tex:102-109`.
+
+The hypothesis `hordered` records the ordering
+`lambda_1 <= lambda_2 <= ... <= lambda_M`, while `hspectrum` records that the
+multiset of entries of `lambda` is precisely the Laplacian spectrum obtained
+from the Fourier diagonalization, counted with multiplicity.  The conclusion is
+the source statement:
+`lambda_1 = 0` and `lambda_2 = 1 / (mM)`, with `M = q^m`. -/
+theorem laplacianSpectralGapOrdered (params : Parameters)
+    (lambda : Fin (hypercubeVertexCount params) → Error)
+    (hordered : ∀ i j : Fin (hypercubeVertexCount params),
+      (i : ℕ) ≤ (j : ℕ) → lambda i ≤ lambda j)
+    (hspectrum :
+      (Finset.univ : Finset (Fin (hypercubeVertexCount params))).val.map lambda =
+        (Finset.univ : Finset (Point params)).val.map (laplacianEigenvalue params)) :
+    lambda ⟨0, hypercubeVertexCount_pos params⟩ = 0 ∧
+      lambda ⟨1, hypercubeVertexCount_one_lt params⟩ =
+        1 / ((params.m : Error) * (hypercubeVertexCount params : Error)) := by
+  -- TODO(#1454): derive the ordered-spectrum statement from the Fourier diagonalization.
+  -- The existing theorem `laplacianSpectralGap` supplies the zero mode, lower bound
+  -- for all nonzero modes, and attainment by a weight-one mode.
+  sorry
 
 /-- The quadratic form `τ(ρ (X-Y)^*(X-Y))`. -/
 noncomputable def matrixSquaredDifferenceExpectation {H : FiniteHilbertSpace}
