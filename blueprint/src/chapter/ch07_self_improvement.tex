@@ -566,12 +566,6 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithCanonicalMatrixSdpSlacknessAndDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithCanonicalOptimalPairSdpSlacknessAndDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithCanonicalOptimalPairSdpSlackness_of_dualDominatesIdentity}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDomination}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDominationInput}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDomination}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDominationInput}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairAndQXPResidualDomination}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairAndQXPRepairAndResidualDomination}
   \leanok
   From a matrix-level strong-duality witness with complementary slackness of the
   shape asserted by Lemma~\ref{lem:sdp}, one obtains a complete measurement
@@ -579,25 +573,17 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   objectives, and the equations \(T_gZ=T_gA_g\) for all \(g\).  The formal
   bridge to the current abstract helper interface is conditional on the
   additional reduced-interface bound \(I\leq Z\) for this selected dual witness.
-  Lean also records a successor matrix package in which this dominance condition
-  is bundled with the same optimal witness.  Together with the usual helper
-  hypotheses that the strategy is good, the error parameter \(\nu\), and the
-  comparison measurement \(G\), that package feeds the slackness-carrying
-  self-improvement helper.  Combined with the residual-dominating
-  orthonormalization input, the canonical form of the same bridge gives the
-  full self-improvement conclusion, including the projective residual bound.
-  The formalization records both the per-helper orthonormalization form and the
-  bundled SelfImprovement-level input form of this conclusion.
-  The residual-domination hypothesis can be supplied either as an intrinsic
-  self-improvement orthonormalization input or by a QXP repair producer carrying
-  the fresh-outcome domination invariant.
+  The same optimal witness can also be considered together with this dominance
+  condition.  With the usual helper hypotheses that the strategy is good, the
+  error parameter \(\nu\), and the comparison measurement \(G\), this datum feeds
+  the slackness-carrying self-improvement helper.
   Lean also isolates the saturated canonical optimal-pair output still required
   from strong duality: a feasible canonical primal matrix, a dual-feasible
   operator with equal objective value, canonical complementary slackness, and
-  vanishing of the extra canonical slack block.  This package gives the
+  vanishing of the extra canonical slack block.  This datum gives the
   displayed measurement witness without assuming \(I \le Z\).  Lean also proves
-  the converse saturation step for the dominance-carrying package: the canonical
-  complementary-slackness equation on the extra block gives
+  the converse saturation step for the dominance-carrying optimal pair: the
+  canonical complementary-slackness equation on the extra block gives
   \(X_{\mathrm{none},\mathrm{none}}Z=0\), and the lower bound \(I\leq Z\)
   forces \(X_{\mathrm{none},\mathrm{none}}=0\).  Thus the
   dominance-carrying optimal pair canonically determines the saturated optimal
@@ -613,6 +599,22 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   measurement.  The zero-defect form \(T_g(Z-A_g)=0\) is equivalent, by
   distributivity, to the displayed equation \(T_gZ=T_gA_g\).
 \end{proof}
+
+\begin{remark}[Residual-dominating self-improvement assembly]\label{rem:sdp-matrix-residual-domination-assembly}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDomination}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDominationInput}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDomination}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDominationInput}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairAndQXPResidualDomination}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairAndQXPRepairAndResidualDomination}
+  These auxiliary results combine the matrix slackness output with a
+  residual-dominating orthonormalization input.  The residual-domination
+  hypothesis can be supplied either as an intrinsic self-improvement
+  orthonormalization input or by a QXP repair construction carrying the
+  fresh-outcome domination invariant.  These are intermediate proof obligations
+  for the projective-output step, not part of the paper statement of
+  Lemma~\ref{lem:sdp-matrix-slackness-output}.
+\end{remark}
 
 \begin{lemma}[Dual SDP and complementary slackness]\label{lem:sdp}
   \lean{MIPStarRE.LDT.SelfImprovement.sdp}
