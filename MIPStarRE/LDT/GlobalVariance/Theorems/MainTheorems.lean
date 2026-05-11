@@ -192,14 +192,12 @@ lemma localVarianceOfPointsFromEdgeDeviation
               exact pointConditionedLocalVarianceAtPolynomial_le_of_deviation
                 params strategy G (hedge g)) }
 
-/-- Strict reduction for `lem:global-variance-of-points` on the strategy state.
+/-- Reduction for `lem:global-variance-of-points` on the strategy state.
 
-The legacy wrapper `globalVarianceOfPoints` still accepts an already-proved
-independent-points norm bound. This reduction proves that bound from the local
-edge norm estimate by applying `lem:local-to-global` to the weighted state and
-using the exact norm/variance identities above. The remaining missing analytic
-input is therefore only the local edge transport estimate from
-`lem:local-variance-of-points`. -/
+This theorem proves the independent-points norm bound from the local edge norm
+estimate by applying `lem:local-to-global` to the weighted state and using the
+exact norm/variance identities above. The remaining analytic input is the local
+edge transport estimate from `lem:local-variance-of-points`. -/
 lemma globalVarianceOfPointsFromLocalDeviation
     (params : Parameters)
     [FieldModel params.q]
@@ -370,13 +368,14 @@ lemma globalVarianceOfPointsFromTransportChainBound
     (localVarianceTransportChainError_le_localVarianceOfPointsError
       params strategy hgood)
 
-/-- Legacy wrapper for `lem:global-variance-of-points` with arbitrary bipartite
-state and the independent-points norm bound supplied explicitly.
+/-- Auxiliary wrapper for `lem:global-variance-of-points` with arbitrary
+bipartite state and the independent-points norm bound supplied explicitly.
 
-For the paper-faithful strategy state, prefer
-`globalVarianceOfPointsFromLocalDeviation`, which derives the global norm and
-variance consequences from the local edgewise weighted norm estimate. -/
-lemma globalVarianceOfPoints
+This is not the source statement of `lem:global-variance-of-points`, since the
+paper does not assume the local and global variance estimates. It is kept only
+as a reusable assembly lemma for callers that have already proved those
+estimates. -/
+lemma globalVarianceOfPoints_ofSuppliedBounds
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -435,6 +434,31 @@ lemma globalVarianceOfPoints
           avgOver_polynomialDistribution_le_of_pointwise params
             (fun g => pointConditionedGlobalVarianceAtPolynomial params strategy G g)
             (globalVarianceOfPointsError params eps delta) hglobal }
+
+/-- Paper origin: `references/ldt-paper/expansion.tex:325-353`
+(`\label{lem:global-variance-of-points}`).
+
+Source-faithful statement of the global variance lemma for the point
+measurements.  The paper assumes a good projective strategy and a polynomial
+submeasurement `G`, and proves the independent-points comparison with error
+`24m(ε + δ + md/q)`.  In particular, the local and global variance estimates
+are proof obligations, not additional hypotheses of the theorem. -/
+lemma globalVarianceOfPoints
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (G : SubMeas (Polynomial params) ι) :
+    GlobalVarianceOfPointsStatement params strategy strategy.state G eps delta := by
+  refine
+    globalVarianceOfPointsFromTransportChainBound
+      params strategy eps delta gamma hgood G ?_
+  intro g
+  /- TODO(#1456): prove the six-step local transport estimate appearing in
+  the proof of `lem:local-variance-of-points`, rather than assuming it as a
+  hypothesis of the source theorem. -/
+  sorry
 
 /-! ## Matrix wrappers -/
 

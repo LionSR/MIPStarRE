@@ -1,4 +1,5 @@
 import Lean
+import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 import MIPStarRE.LDT.Test.MainTheorem
@@ -26,6 +27,12 @@ been produced from the Section 6 induction data, and the repaired bridge used by
 `mainFormal_ofRepairedBridge` has not yet been derived from the hypotheses of
 the paper theorem.
 
+The audit for `GlobalVariance.globalVarianceOfPoints` records the issue-#1456
+proof obligation: the paper theorem has been restored without the former
+conclusion-shaped supplied bounds, and the remaining local transport estimate
+is visible as an unresolved proof obligation rather than as an extra
+hypothesis.
+
 This module is built explicitly in CI rather than imported from the umbrella
 library modules, so the axiom audits stay out of normal downstream imports
 while still acting as regression tests.
@@ -49,6 +56,11 @@ needed for `selfImprovement`. -/
 private def expectedSelfImprovementAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
+/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1456 derivation
+needed for `globalVarianceOfPoints`. -/
+private def expectedGlobalVarianceAxioms : Array Name :=
+  expectedStandardAxiomsWithSorry
+
 private def assertUsesExactlyAxioms (declName : Name) (expected : Array Name) :
     CommandElabM Unit := do
   let axioms := (← Lean.collectAxioms declName).qsort Name.lt
@@ -69,6 +81,9 @@ elab "assert_tracked_sorry_axioms " id:ident : command => do
 elab "assert_self_improvement_axioms " id:ident : command => do
   assertUsesExactlyAxioms id.getId expectedSelfImprovementAxioms
 
+elab "assert_global_variance_axioms " id:ident : command => do
+  assertUsesExactlyAxioms id.getId expectedGlobalVarianceAxioms
+
 assert_standard_axioms MIPStarRE.LDT.Test.razSafra
 assert_standard_axioms MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement
 assert_standard_axioms MIPStarRE.LDT.Test.classicalTestSoundness
@@ -77,3 +92,4 @@ assert_tracked_sorry_axioms
   MIPStarRE.LDT.Test.mainFormalSuccessorProjectiveCompletionResidualProducer
 assert_tracked_sorry_axioms MIPStarRE.LDT.Test.mainFormal
 assert_self_improvement_axioms MIPStarRE.LDT.SelfImprovement.selfImprovement
+assert_global_variance_axioms MIPStarRE.LDT.GlobalVariance.globalVarianceOfPoints
