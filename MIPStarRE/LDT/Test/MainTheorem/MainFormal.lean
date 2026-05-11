@@ -562,7 +562,7 @@ theorem mainFormal_ofRoleResidualAndRepairedBridge
           (mainFormalError params k eps) :=
   baseMainFormal_ofRepairedBaseBridge hsmall roleResidual bridge
 
-/-- Successor-case producer for the Section 6 projective-completion residual.
+/-- Successor-case construction of the Section 6 projective-completion residual.
 
 Paper origin: `references/ldt-paper/inductive_step.tex`, lines 26--236, where
 the successor step restricts the strategy to predecessor slices, applies the
@@ -570,8 +570,8 @@ induction hypothesis and the Section 9 self-improvement theorem slice by slice,
 pastes the resulting families, and then transports the Section 6 witness through
 the final projectivization and completion cascade used by `thm:main-formal`.
 
-This is a tracked proof obligation, not an additional hypothesis of the paper
-theorem `mainFormal`.  The available structural constructors live in
+This is not an additional hypothesis of the paper theorem `mainFormal`; it is an
+open construction tracked separately.  The available structural constructors live in
 `RoleRegister.lean` (`successorOfBridgeInputs` and the answer-valued variants);
 the missing work is to produce the predecessor induction data and the per-slice
 self-improvement inputs from the paper hypotheses, then assemble the resulting

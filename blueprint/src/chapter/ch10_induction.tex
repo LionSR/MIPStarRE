@@ -500,7 +500,7 @@
 	$(3\eps,3\eps,3\eps)$ and unpacking the bundled successor-boundary fields.
 \end{proof}
 
-\begin{remark}[Successor projective-completion producer]\label{rem:main-formal-successor-completion-producer}
+\begin{remark}[Successor projective-completion construction]\label{rem:main-formal-successor-completion-producer}
 	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorProjectiveCompletionResidualProducer}
 	\uses{lem:main-formal-successor-handoff, thm:main-formal}
 	The construction named here records the remaining successor-case construction
@@ -511,7 +511,7 @@
 	projective-completion residual consumed by the conditional theorem
 	\texttt{mainFormal\_ofRepairedBridge}.  It is not an additional hypothesis of
 	Theorem~\ref{thm:main-formal}; it is the open construction that should replace
-	the successor-branch residual currently represented by a tracked proof obligation.
+	the successor-branch residual currently tracked separately.
 \end{remark}
 
 \begin{remark}[Lean measurement-unsymmetrization bridge]\label{rem:main-formal-unsymmetrization-bridge}
@@ -801,7 +801,7 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 	No proof-level completeness tag is claimed here while
 	\texttt{mainFormal\_ofRepairedBridge} still has an open successor-case
 	completion residual and \texttt{mainFormal} derives the paper theorem via a
-	tracked repaired-hypotheses proof obligation (issue~\#1458).
+	tracked open step (issue~\#1458).
 
 \end{remark}
 \begin{proof}
