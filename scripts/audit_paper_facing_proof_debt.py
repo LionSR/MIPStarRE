@@ -30,10 +30,11 @@ from typing import Sequence
 
 from blueprint_lean_sync import (  # noqa: E402
     BlueprintEntry,
+    LEAN_DECL_RE,
     LeanDecl,
-    _strip_lean_comments_preserve_lines,
     collect_blueprint_entries,
     collect_lean_decls,
+    strip_lean_comments_preserve_lines,
 )
 
 
@@ -47,13 +48,6 @@ DEBT_TOKEN_RE = re.compile(
     r"(?:h|has|mk|of)?"
     r"(?:bridge|residual|repair|package|producer)"
     r"[A-Za-z0-9_']*"
-)
-
-DECL_START_RE = re.compile(
-    r"^\s*(?:@\[.*?\]\s*)?"
-    r"(?:(?:noncomputable|protected|private|unsafe|nonrec|opaque)\s+)*"
-    r"(?:def|theorem|lemma|abbrev|instance|class|structure|inductive|axiom|opaque)\s+"
-    r"([\w'+]+(?:\.[\w'+]+)*)"
 )
 
 OPEN_TO_CLOSE = {"(": ")", "{": "}", "[": "]", "⦃": "⦄"}
@@ -124,7 +118,7 @@ def _line_number(text: str, offset: int) -> int:
 
 def _header_after_decl_name(text: str) -> str:
     """Remove the declaration keyword and name from a Lean declaration header."""
-    match = DECL_START_RE.match(text)
+    match = LEAN_DECL_RE.match(text)
     if not match:
         return text
     return text[match.end() :]
@@ -136,7 +130,7 @@ def _public_header_after_name(source: str, decl: LeanDecl) -> tuple[str, int]:
     The returned line number is the line of the first character in the returned
     text, so token line numbers can be computed without reparsing the file.
     """
-    stripped_lines = _strip_lean_comments_preserve_lines(source)
+    stripped_lines = strip_lean_comments_preserve_lines(source)
     candidate = "\n".join(stripped_lines[decl.line - 1 : decl.end_line])
 
     stack: list[str] = []
