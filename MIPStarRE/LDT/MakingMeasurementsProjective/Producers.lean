@@ -38,9 +38,9 @@ The main result recorded here:
 
 The theorem proved here is the direct output of that route under a normalized
 bipartite state and the source almost-projective estimate for the left-lifted
-measurement. It is therefore stronger in hypotheses than the older placeholder
-`LeftLiftedProjectivizationRepairInput` interface, but it provides the
-unconditional repair step used by the public orthonormalization theorem.
+measurement. It is stated directly in terms of this estimate, rather than in
+terms of `LeftLiftedProjectivizationRepairInput`, and provides the
+unconditional repair step used by the orthonormalization theorem.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

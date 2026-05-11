@@ -308,11 +308,10 @@
 	\leanok
 	Paper origin: \texttt{references/ldt-paper/orthonormalization.tex} lines 534--860 (rank reduction and the $Q$-side setup, including \ref{lem:xa-t} and \ref{lem:qa-restated}) and 862--1194 (the $X/\widehat X/P$ algebra: \ref{lem:X-squared}, \ref{lem:X-hat-squared}, \ref{lem:X-times-X-hat}, \ref{lem:squared-difference}, \ref{lem:P-projectivity}, \ref{lem:P-Q-approx}, plus the final triangle-inequality assembly producing the $84\zeta^{1/4}$ bound). Together these are the late repair stage of the orthogonalization-lemma proof.
 
-	The declaration proves the direct local $Q/X/\widehat X/P$ route under a
-	normalized bipartite state and the source almost-projective estimate for
-	the left-lifted measurement. It therefore yields a locality-preserving repair
-	with the explicit error $84\zeta^{1/4}$, rather than the earlier placeholder
-	interface at error $\mathsf{roundingToProjectiveError}(\zeta)$.
+	Given a normalized bipartite state $\ket{\psi}$, a measurement
+	$A = \{A_a\}$, and the source almost-projective estimate for the
+	left-lifted family $\{A_a \ot I\}$, there exists a locality-preserving
+	projective sub-measurement with error $84\zeta^{1/4}$.
 
 	More precisely, if $\ket{\psi}$ is a normalized bipartite state, if
 	$A = \{A_a\}$ is a measurement, and if
@@ -386,11 +385,11 @@
 	needed because $A$ is already a measurement.
 \end{remark}
 
-\begin{proof}[Proof of \ref{thm:orthonormalization} assuming \ref{lem:orthonormalization-main-lemma}]
+\begin{proof}[Proof of \ref{thm:orthonormalization} assuming \ref{lem:left-lifted-projectivization-repair}]
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
 	\leanok
 	\proves{thm:orthonormalization}
-	\uses{prop:other-two-notions-of-self-consistency, lem:orthonormalization-main-lemma}
+	\uses{prop:other-two-notions-of-self-consistency, lem:left-lifted-projectivization-repair}
 
 	Let $A = \{A_a\}$ be a sub-measurement with outcomes in $\mathcal A$. Write $A=\sum_a A_a$. The strong self-consistency assumption implies
 	\[
@@ -409,19 +408,22 @@
 		\bra{\psi} (I-A) \ot I \ket{\psi} - \zeta.
 	\]
 
-	Complete $A$ to the measurement $\widehat A=\{\widehat A_a\}_{a \in \widehat{\mathcal A}}$ on $\widehat{\mathcal A}=\mathcal A \cup \{\bot\}$ by setting $\widehat A_a=A_a$ for $a \in \mathcal A$ and $\widehat A_{\bot}=I-A$. Adding the two preceding inequalities shows that $\widehat A$ is $2\zeta$-strongly self-consistent. By \ref{prop:other-two-notions-of-self-consistency}, this is equivalent to
+	Complete $A$ to the measurement $\widehat A=\{\widehat A_a\}_{a \in \widehat{\mathcal A}}$ on $\widehat{\mathcal A}=\mathcal A \cup \{\bot\}$ by setting $\widehat A_a=A_a$ for $a \in \mathcal A$ and $\widehat A_{\bot}=I-A$. Adding the two preceding inequalities shows that $\widehat A$ is $2\zeta$-strongly self-consistent. By \ref{prop:other-two-notions-of-self-consistency}, this gives the source almost-projective estimate
 	\[
-		\widehat A_a \ot I \simeq_{2\zeta} I \ot \widehat A_a.
+		\sum_a \bra{\psi}
+		\bigl((\widehat A_a\ot I)-(\widehat A_a\ot I)^2\bigr)
+		\ket{\psi}
+		\le 4\zeta.
 	\]
-	Apply \ref{lem:orthonormalization-main-lemma} to obtain a projective sub-measurement $\widehat P$ such that
+	Apply \ref{lem:left-lifted-projectivization-repair} to obtain a projective sub-measurement $\widehat P$ such that
 	\[
-		\widehat A_a \ot I \approx_{84(2\zeta)^{1/4}} \widehat P_a \ot I.
+		\widehat A_a \ot I \approx_{84(4\zeta)^{1/4}} \widehat P_a \ot I.
 	\]
 	Discard the extra outcome and set $P_a=\widehat P_a$ for $a \in \mathcal A$. Then
 	\[
-		A_a \ot I \approx_{84(2\zeta)^{1/4}} P_a \ot I,
+		A_a \ot I \approx_{84(4\zeta)^{1/4}} P_a \ot I,
 	\]
-	and $84 \cdot 2^{1/4} \leq 100 \leq 120$, so the stated bound follows.
+	and $84 \cdot 4^{1/4} \leq 120$, so the stated bound follows.
 \end{proof}
 
 \begin{proof}[Proof of \ref{lem:orthonormalization-main-lemma}]
