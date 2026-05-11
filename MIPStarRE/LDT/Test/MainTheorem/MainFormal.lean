@@ -618,7 +618,7 @@ the missing work is to produce the predecessor induction data and the per-slice
 self-improvement inputs from the paper hypotheses, then assemble the resulting
 role residual and completion residual.
 
-Tracked by #1433, #1363, #422, and #1458. -/
+Tracked by #1363, #422, and #1458. -/
 noncomputable def mainFormalSuccessorProjectiveCompletionResidualProducer
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -632,7 +632,7 @@ noncomputable def mainFormalSuccessorProjectiveCompletionResidualProducer
     MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
       (params := params) (strategy := strategy) (eps := eps)
       (hpass := hpass) (k := k) (scalars := scalars) := by
-  -- TODO(#1433, #1363, #422, #1458): produce the ordinary or answer-valued
+  -- TODO(#1363, #422, #1458): produce the ordinary or answer-valued
   -- successor role residual and the post-role projective-completion residual
   -- from the predecessor induction package and the per-slice self-improvement
   -- producers.  This should call the structural constructors in
