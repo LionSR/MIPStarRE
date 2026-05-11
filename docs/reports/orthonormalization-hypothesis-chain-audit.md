@@ -1,8 +1,15 @@
-# OrthonormalizationInput Extra-Hypothesis Chain Audit
+# Historical OrthonormalizationInput Extra-Hypothesis Chain Audit
 
 **Issue:** #1359  
 **Date:** 2026-05-07  
 **Scope:** Read-only trace from `MakingMeasurementsProjective/Orthonormalization.lean` through `SelfImprovement`, `MainInductionStep`, to final assembly in `Test/MainTheorem/MainFormal.lean`.
+
+> **Status note, 2026-05-11.**  This report predates the source-faithful
+> `mainFormal` repair.  References to an external `hbaseBridge` hypothesis at
+> the final theorem should now be understood as references to the conditional
+> helper `mainFormal_ofRepairedBridge`, not to the paper-facing theorem
+> `mainFormal`.  The current cleanup direction is to prove producer theorems for
+> these inputs, not to add them to source-labelled theorem statements.
 
 ## Executive Summary
 

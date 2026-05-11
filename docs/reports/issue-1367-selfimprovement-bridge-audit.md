@@ -1,9 +1,17 @@
-# Issue #1367 — SelfImprovement Bridge Audit: Input-Consistency Orphans
+# Historical Issue #1367 — SelfImprovement Bridge Audit: Input-Consistency Orphans
 
 **Date:** 2026-05-08
 **Scope:** `MIPStarRE/LDT/SelfImprovement/` → `MainInductionStep/` → `Test/MainTheorem/`
 **Active PRs:** #1373 (orthonormalization-input producer), #1374 (successor bridge hypotheses)
 **Related issues:** #1385 (SDP slackness), #1375/#1376/#1377 (#1036 sub-gaps), #1043 (hbaseBridge), #1035 (recursive mainFormal)
+
+> **Status note, 2026-05-11.**  This report records the pre-#1458 and pre-#1482
+> state of the final theorem.  Its statements about making `mainFormal`
+> sorry-free by adding new hypotheses are historical, not current project
+> guidance.  The current policy is that `mainFormal` remains the paper-facing
+> theorem statement; bridge, residual, repair, input, package, or producer
+> assumptions belong only in separately named conditional helpers or in producer
+> obligations tracked by #1458.
 
 ---
 
@@ -11,7 +19,12 @@
 
 The `SelfImprovementBridgeInputs` package (the three Section 9 hypotheses) and its downstream wiring in `MainInductionStep` and `MainTheorem` are structurally sound. All individual lemmas in `SelfImprovement/` are proved conditional on their explicit hypotheses. The MainInductionStep bridge (`SelfImprovementBridge/Core.lean`) wires SelfImprovement → Pasting correctly. The *only* remaining `sorry` in the entire LDT directory is at `MainFormal.lean:611` (the successor case branch).
 
-**This `sorry` is addressed by PR #1374**, which adds two new hypotheses to `mainFormal` and replaces the `sorry` with a call to existing constructors in `RoleRegister.lean`. After #1374 lands, `mainFormal` will be sorry-free — but with additional "tracked smuggles" (extra hypotheses) that name the remaining unformalized analytic content.
+At the time of this report, PR #1374 proposed adding two new hypotheses to
+`mainFormal` and replacing the `sorry` with a call to existing constructors in
+`RoleRegister.lean`.  Under the current #1458 policy, that route is historical:
+the source-facing theorem should instead keep the paper statement and discharge
+the missing analytic content through producer theorems or separately named
+conditional helpers.
 
 **This audit report confirms that #1367 can be closed** once #1374 and #1373 land (or this report is merged), because:
 - The remaining gaps are individually tracked by open issues (#1375, #1376, #1377, #1043, #1035, #1385)
