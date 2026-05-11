@@ -378,6 +378,8 @@ lemma hypercubeSpectralGap_operator (params : Parameters) :
 
 /-- Spectral-gap conclusion for `cor:laplacian-spectral-gap`.
 
+Paper origin: `references/ldt-paper/expansion.tex:102-109`.
+
 The paper states this corollary as an ordered-spectrum assertion:
 if `λ₁ ≤ λ₂ ≤ ... ≤ λ_M` are the eigenvalues of the Laplacian `L`, then
 `λ₁ = 0` and `λ₂ = 1 / (mM)`.  In the finite Fourier formulation, this is the
