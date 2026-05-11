@@ -75,6 +75,43 @@ lemma orthonormalizationMainLemmaError_two_mul_le_orthonormalizationError
     _ ≤ 100 * Real.rpow ζ (1 / (4 : Error)) := by
           exact mul_le_mul_of_nonneg_right hconst hquart_nonneg
 
+/-- Bookkeeping for the current direct completion route for the submeasurement
+orthonormalization theorem.  Completion gives a `2ζ` self-consistency estimate;
+the formal repair route converts this to a `4ζ` source-almost-projective
+estimate before applying the local `84·ζ^{1/4}` repair theorem, giving the
+weaker named envelope `orthonormalizationCompletionRouteError ζ`. -/
+lemma completionRouteError_bound
+    (ζ : Error) (hζ : 0 ≤ ζ) :
+    orthonormalizationMainLemmaError (consistencyToAlmostProjectiveError (2 * ζ)) ≤
+      orthonormalizationCompletionRouteError ζ := by
+  dsimp [orthonormalizationMainLemmaError, consistencyToAlmostProjectiveError,
+    orthonormalizationCompletionRouteError]
+  rw [show 2 * (2 * ζ) = 4 * ζ by ring]
+  rw [Real.mul_rpow (by positivity : 0 ≤ (4 : Error)) hζ]
+  have hcoeff_num : 84 * Real.rpow (4 : Error) (1 / (4 : Error)) ≤ 120 := by
+    have hs_sq : (Real.rpow (4 : Error) (1 / (4 : Error))) ^ (2 : Nat) = 2 := by
+      calc
+        (Real.rpow (4 : Error) (1 / (4 : Error))) ^ (2 : Nat)
+            = Real.rpow (4 : Error) ((1 / (4 : Error)) * 2) := by
+                rw [← Real.rpow_natCast]
+                simpa using (Real.rpow_mul (x := (4 : Error)) (by positivity)
+                  (1 / (4 : Error)) 2).symm
+        _ = 2 := by norm_num [Real.sqrt_eq_rpow]
+    have hs_le : Real.rpow (4 : Error) (1 / (4 : Error)) ≤ 10 / 7 := by
+      have hs_sq_le : (Real.rpow (4 : Error) (1 / (4 : Error))) ^ (2 : Nat) ≤
+          (10 / 7 : Error) ^ (2 : Nat) := by
+        nlinarith [hs_sq]
+      nlinarith
+    nlinarith
+  have hzqr_nonneg : 0 ≤ Real.rpow ζ (1 / (4 : Error)) := Real.rpow_nonneg hζ _
+  calc
+    84 * (Real.rpow (4 : Error) (1 / (4 : Error)) *
+        Real.rpow ζ (1 / (4 : Error)))
+        = (84 * Real.rpow (4 : Error) (1 / (4 : Error))) *
+            Real.rpow ζ (1 / (4 : Error)) := by ring
+    _ ≤ 120 * Real.rpow ζ (1 / (4 : Error)) := by
+          exact mul_le_mul_of_nonneg_right hcoeff_num hzqr_nonneg
+
 /-- In the large-`ζ` branch `ζ > 1/2`, the target bound `100·ζ^{1/4}` already
 exceeds `1`, so the trivial zero projective submeasurement suffices. -/
 lemma orthonormalizationError_ge_one_of_half_lt (ζ : Error)

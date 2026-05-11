@@ -430,11 +430,12 @@ locality-preserving repair data are not hypotheses of this theorem; they are
 supplied internally by the Section 5 spectral-truncation and
 rounding-to-projectors results.
 
-The paper-faithful `Q/X/XHat/P` route on the option-completed measurement
-produces the explicit envelope `120 * ζ^(1/4)`.  The stronger
-input-driven theorem `orthonormalization_ofInput` remains available with the
-public symbolic bound `orthonormalizationError ζ = 100 * ζ^(1/4)` when a
-stronger locality-preserving repair witness is supplied separately. -/
+The direct `Q/X/XHat/P` route on the option-completed measurement produces the
+named envelope `orthonormalizationCompletionRouteError ζ = 120 * ζ^(1/4)`.
+The stronger input-driven theorem `orthonormalization_ofInput` remains
+available with the public symbolic bound
+`orthonormalizationError ζ = 100 * ζ^(1/4)` when a stronger
+locality-preserving repair witness is supplied separately. -/
 theorem orthonormalization {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -448,7 +449,7 @@ theorem orthonormalization {Outcome : Type*}
         SDDRel ψ (uniformDistribution Unit)
           (constSubMeasFamily A.liftLeft)
           (constSubMeasFamily P.toSubMeas.liftLeft)
-          (120 * Real.rpow ζ (1 / (4 : Error))) := by
+          (orthonormalizationCompletionRouteError ζ) := by
   intro hssc
   have hζ_nonneg : 0 ≤ ζ :=
     le_trans
@@ -500,35 +501,9 @@ theorem orthonormalization {Outcome : Type*}
       hPq
   have hcoeff :
       orthonormalizationMainLemmaError (consistencyToAlmostProjectiveError (2 * ζ)) ≤
-        120 * Real.rpow ζ (1 / (4 : Error)) := by
-    have hfour_nonneg : 0 ≤ (4 : Error) := by norm_num
-    have hcoeff_num : 84 * Real.rpow (4 : Error) (1 / (4 : Error)) ≤ 120 := by
-      have hs_nonneg : 0 ≤ Real.rpow (4 : Error) (1 / (4 : Error)) := by
-        exact Real.rpow_nonneg (by positivity) _
-      have hs_sq : (Real.rpow (4 : Error) (1 / (4 : Error))) ^ (2 : Nat) = 2 := by
-        calc
-          (Real.rpow (4 : Error) (1 / (4 : Error))) ^ (2 : Nat)
-              = Real.rpow (4 : Error) ((1 / (4 : Error)) * 2) := by
-                  rw [← Real.rpow_natCast]
-                  simpa using (Real.rpow_mul (x := (4 : Error)) (by positivity)
-                    (1 / (4 : Error)) 2).symm
-          _ = 2 := by norm_num [Real.sqrt_eq_rpow]
-      have hs_le : Real.rpow (4 : Error) (1 / (4 : Error)) ≤ 10 / 7 := by
-        have hs_sq_le : (Real.rpow (4 : Error) (1 / (4 : Error))) ^ (2 : Nat) ≤
-            (10 / 7 : Error) ^ (2 : Nat) := by
-          nlinarith [hs_sq]
-        nlinarith
-      nlinarith
-    dsimp [orthonormalizationMainLemmaError, consistencyToAlmostProjectiveError]
-    rw [show 2 * (2 * ζ) = 4 * ζ by ring]
-    rw [Real.mul_rpow hfour_nonneg hζ_nonneg]
-    have hzqr_nonneg : 0 ≤ Real.rpow ζ (1 / (4 : Error)) := Real.rpow_nonneg hζ_nonneg _
-    calc
-      84 * (Real.rpow (4 : Error) (1 / (4 : Error)) * Real.rpow ζ (1 / (4 : Error)))
-          = (84 * Real.rpow (4 : Error) (1 / (4 : Error))) *
-              Real.rpow ζ (1 / (4 : Error)) := by ring
-      _ ≤ 120 * Real.rpow ζ (1 / (4 : Error)) := by
-            exact mul_le_mul_of_nonneg_right hcoeff_num hzqr_nonneg
+        orthonormalizationCompletionRouteError ζ := by
+    exact
+      Orthonormalization.ErrorBounds.completionRouteError_bound ζ hζ_nonneg
   refine ⟨Psome, ?_⟩
   constructor
   simpa [sddError, avgOver, uniformDistribution, constSubMeasFamily] using

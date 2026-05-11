@@ -31,6 +31,22 @@
 
 \section{Key theorem forms}
 
+Throughout, \(\ket{\psi}\) denotes a normalized bipartite state on
+\(\mathcal H_A\otimes\mathcal H_A\), \(A=\{A_a\}_{a\in\mathcal A}\)
+is a submeasurement on \(\mathcal H_A\) with strong self-consistency error
+\(\zeta\ge 0\), and \(P=\{P_a\}_{a\in\mathcal A}\) is a projective
+submeasurement on \(\mathcal H_A\).  The relation
+\(\{X_a\}\approx_\delta\{Y_a\}\), in the tensor-placement used here, abbreviates
+the state-dependent squared-distance estimate
+\[
+  \sum_a
+  \bra{\psi}
+    (X_a\otimes I-Y_a\otimes I)^\dagger
+    (X_a\otimes I-Y_a\otimes I)
+  \ket{\psi}
+  \le \delta.
+\]
+
 The paper states the orthonormalization theorem with the estimate
 \[
   A_a \otimes I \approx_{100\zeta^{1/4}} P_a \otimes I.
@@ -41,7 +57,9 @@ The present formal theorem proves the same conclusion with the estimate
 \]
 The input-driven theorem, in which the stronger repair input is supplied
 separately, still has the symbolic \(100\zeta^{1/4}\) envelope.%
-\footnote{The relevant declarations are
+\footnote{The source theorem is
+\path{references/ldt-paper/orthonormalization.tex:67-75}
+(\path{thm:orthonormalization}).  The relevant declarations are
 \path{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization},
 \path{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization_ofInput},
 and \path{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer}.
@@ -50,23 +68,36 @@ This note is attached to \ghissue{1032} and \ghpr{1480}.}
 \section{The source assertion}
 
 In the source proof of the orthonormalization lemma, the submeasurement \(A\)
-is first completed to a measurement \(\widehat A\).  The completed measurement
+is first completed to a measurement \(\widehat A\) on
+\(\mathcal A\cup\{\bot\}\), by setting \(\widehat A_a=A_a\) for
+\(a\in\mathcal A\) and
+\(\widehat A_\bot=I-\sum_{a\in\mathcal A} A_a\).  The completed measurement
 has bipartite strong self-consistency error \(2\zeta\).  The paper then applies
-the main orthonormalization lemma directly at this error level, obtaining
+the main orthonormalization lemma directly at this error level.  The relevant
+source passages are the main lemma statement at
+\path{references/ldt-paper/orthonormalization.tex:282-293}
+(\path{lem:orthonormalization-main-lemma}) and the completion-and-apply
+argument at \path{references/ldt-paper/orthonormalization.tex:304-369}.
+This gives
 \[
   \widehat A_a \otimes I
     \approx_{84(2\zeta)^{1/4}}
   \widehat P_a \otimes I.
 \]
-Since \(84\cdot 2^{1/4} < 100\), this gives the advertised
-\(100\zeta^{1/4}\) bound after discarding the completion outcome.
+The displayed estimate occurs at line \(358\), and the closing scalar
+calculation \(84\cdot 2^{1/4}\simeq 99.89 \le 100\) occurs at line \(368\).
+Thus the paper obtains the advertised \(100\zeta^{1/4}\) bound after
+discarding the completion outcome.
 
 \section{Comparison with the formalization}
 
 The formalized unconditional theorem follows a slightly different route.  After
 completion it converts the \(2\zeta\) self-consistency estimate into a
 source-almost-projective estimate before invoking the locality-preserving
-\(Q/X/\widehat X/P\) repair theorem.  The conversion doubles the scalar:
+\(Q/X/\widehat X/P\) repair theorem.  This route is recorded by the named
+Lean error function
+\(\mathsf{orthonormalizationCompletionRouteError}(\zeta)=120\zeta^{1/4}\).
+The conversion doubles the scalar:
 \[
   \operatorname{consistencyToAlmostProjectiveError}(2\zeta)=4\zeta.
 \]

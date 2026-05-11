@@ -216,6 +216,15 @@ noncomputable def jointOutcomeProbability {OutcomeA OutcomeB : Type*}
 noncomputable def orthonormalizationError (ζ : Error) : Error :=
   100 * Real.rpow ζ (1 / (4 : Error))
 
+/-- Error bound of the direct completion-route orthonormalization theorem.
+
+The paper proves the sharper `orthonormalizationError ζ`.  The current direct
+completion route first converts the completed measurement's `2ζ`
+self-consistency estimate into a `4ζ` source-almost-projective estimate, and
+therefore uses this weaker named envelope. -/
+noncomputable def orthonormalizationCompletionRouteError (ζ : Error) : Error :=
+  120 * Real.rpow ζ (1 / (4 : Error))
+
 /-- The strong self-consistency error after completing a submeasurement to a measurement. -/
 def orthonormalizationCompletionError (ζ : Error) : Error :=
   2 * ζ
