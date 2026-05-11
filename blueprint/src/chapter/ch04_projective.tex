@@ -106,8 +106,9 @@
 	This isolates the order-theoretic invariant needed to pass from the
 	option-completed orthonormalization output to the monotone-total route used in
 	the self-improvement theorem.  The formal development also records the
-	corresponding strengthened orthonormalization wrapper: if the repair input for
-	the option-completed measurement carries this residual-domination invariant,
+	corresponding strengthened orthonormalization statement: if the repair
+	hypothesis for the option-completed measurement carries this
+	residual-domination invariant,
 	then the orthonormalized restriction satisfies both the usual
 	state-dependent-distance conclusion and the displayed total comparisons.
 \end{remark}
@@ -122,8 +123,8 @@
 	helper compares right- and left-tensor placements at the level of the
 	underlying state-dependent-distance form.  Its submeasurement and indexed
 	wrappers transport state-dependent distance to the right register under the
-		permutation-invariance hypothesis on the state.  The remaining two
-		declarations combine this transport with the orthonormalize-and-complete
+	permutation-invariance hypothesis on the state.  The remaining two
+	declarations combine this transport with the orthonormalize-and-complete
 	output so that the line-156 projectivization handoff can later be produced
 	from the two completed measurements without restating the tensor-factor
 	bookkeeping.
@@ -287,15 +288,15 @@
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement}
 	\uses{lem:orthonormalization-main-lemma, lem:left-lifted-projectivization-repair}
 	The current Lean declarations for Lemma~\ref{lem:orthonormalization-main-lemma}
-	are conditional declarations.  They take explicit spectral-truncation and
-	repair data as inputs, representing the $Q/X/\widehat X/P$ part of the paper
-	proof.  For \texttt{orthonormalizationMainLemma\_local} and
-	\texttt{orthonormalizationMeasurement}, the repair data is
-	locality-preserving, requiring the repaired family to have the form
-	$P_a\otimes I$.  These inputs are not hypotheses of the paper lemma; they are
-	auxiliary hypotheses that must eventually be produced from the paper's
-	assumptions.  Consequently the paper lemma above is not marked as formally
-	proved by these conditional declarations.
+	are conditional.  They assume explicit spectral-truncation and repair
+	hypotheses for the $Q/X/\widehat X/P$ part of the paper proof.  The declaration
+	\texttt{orthonormalizationMainLemma} uses the general repair hypothesis on the
+	product space, whereas \texttt{orthonormalizationMainLemma\_local} and
+	\texttt{orthonormalizationMeasurement} use the locality-preserving repair
+	hypothesis, requiring the repaired family to have the form $P_a\otimes I$.
+	These hypotheses are not present in the paper lemma and must be proved from
+	its assumptions.  Consequently these conditional declarations do not yet
+	prove the paper lemma.
 \end{remark}
 
 \begin{lemma}[Locality-preserving projectivization repair]\label{lem:left-lifted-projectivization-repair}
@@ -356,8 +357,9 @@
 	\[
 		A_a \ot I \approx_{100 \zeta^{1/4}} P_a \ot I.
 	\]
-	By the estimate in Remark~\ref{rem:conditional-orthonormalization-main-lemma-local},
-	weaken the error using $84 \leq 100$ and $\zeta^{1/4} \geq 0$. No completion step is
+	Using the bound stated in
+	Remark~\ref{rem:conditional-orthonormalization-main-lemma-local}, weaken the
+	error using $84 \leq 100$ and $\zeta^{1/4} \geq 0$. No completion step is
 	needed because $A$ is already a measurement.
 \end{remark}
 
@@ -1037,10 +1039,10 @@
 		$U$ and $V$.  In Lean, the dimension hypothesis $m\leq d$ already gives a
 		rectangular matrix with orthonormal rows on the sigma auxiliary space; the
 		chosen matrix \texttt{sigmaFinXHatCoisometry} and its specification record this
-		existence result as an input for the future construction.  The formal lemma
+		existence result as a hypothesis for the future construction.  The formal lemma
 		\texttt{orthonormal\_normalized\_image\_of\_adjoint\_comp\_eigenvectors}
-		records the singular-vector normalization calculation,
-		\texttt{normalized\_matrix\_image\_rows\_mul\_conjTranspose} packages the
+		records the singular-vector normalization calculation, while
+		\texttt{normalized\_matrix\_image\_rows\_mul\_conjTranspose} combines the
 		corresponding row-coisometry identity, and
 		\texttt{positive\_gram\_spectrum\_image\_rows\_transpose\_mixed} records the
 		adjoint action $X^\dagger(\lambda^{-1/2}Xv)=\lambda^{1/2}v$ on the positive
@@ -1053,7 +1055,7 @@
 		records the analogous rectangular completion for prescribed right rows
 		when the dimension bound permits it.  The formal lemma
 		\texttt{rectangularSvd\_xHat\_coisometry} records the corresponding matrix
-		calculation, and \texttt{exists\_xHat\_of\_rectangularSvd} packages the
+		calculation, and \texttt{exists\_xHat\_of\_rectangularSvd} gives the
 		resulting choice of $\widehat X$ together with the mixed square-root identity
 		below.
 	\end{proof}
