@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import re
 import sys
 import tempfile
 import textwrap
@@ -32,6 +33,11 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
         self.assertIn("scripts/audit_paper_facing_proof_debt.py", text)
         self.assertIn("--ci", text)
         self.assertNotIn("--warn-only", text)
+        propagates_pipeline_status = (
+            re.search(r"(?m)^\s*set\s+-[^\n#]*\bpipefail\b", text) is not None
+            or "${PIPESTATUS[0]}" in text
+        )
+        self.assertTrue(propagates_pipeline_status)
 
     def test_clean_paper_facing_theorem_has_no_findings(self) -> None:
         with tempfile.TemporaryDirectory() as td:

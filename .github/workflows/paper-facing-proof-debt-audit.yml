@@ -41,6 +41,7 @@ jobs:
 
       - name: Run paper-facing proof-debt audit
         run: |
+          set -o pipefail
           python3 scripts/audit_paper_facing_proof_debt.py \
             --root . \
             --ci \
