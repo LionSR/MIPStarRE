@@ -2,14 +2,17 @@ This is a Lean 4 / Mathlib formalization project for quantum complexity theory
 (MIP* = RE and low-degree tests). Review with mathematical rigor. Flag any
 sorry that is not clearly marked as a known TODO.
 
-Reviewers must also catch early drift from the paper. For every changed
-source-labelled theorem or blueprint-linked declaration, compare the paper
-statement with the Lean statement: hypotheses, conclusion, quantifier order,
-parameter bounds, and error terms. Extra bridge, residual, repair, producer, or
-package assumptions are proof debt, not a formalization of the paper theorem.
-They should not be introduced unless unavoidable and documented with a
-paper-gap note, a producer target, and a removal plan. They must never be used
-to justify `\leanok` for a source-labelled theorem.
+Reviewers must catch early drift from the paper.  For every changed
+source-labelled theorem or blueprint-linked declaration, the source of truth is
+`references/ldt-paper/`, followed by `blueprint/src/chapter/`.  Compare the
+paper statement with the Lean statement: hypotheses, conclusion, quantifier
+order, parameter bounds, and error terms.  A Lean declaration is not the cited
+paper theorem if it adds a load-bearing bridge, residual, repair, producer,
+package, or arbitrary implication hypothesis not present in the cited statement.
+Flag such source-statement drift as a blocker unless the added hypothesis is a
+documented Lean boundary condition needed to state the mathematics, such as
+positivity, nonemptiness, decidability, or a field-model instance.  Proof-debt
+bundles are not boundary conditions.
 
 Generated review prose should name the theorem, lemma, definition, proof
 obligation, or paper-gap assertion directly and cite paper or blueprint path,
