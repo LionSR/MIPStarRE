@@ -1020,6 +1020,20 @@ Lemma~\ref{lem:self-improvement-helper}. The bookkeeping here is entirely about
 showing that completeness, consistency, self-consistency, and boundedness survive
 the passage from~$\widehat H$ to a projective submeasurement~$H$.
 
+\begin{proposition}[Slackness residual-domination interfaces for self-improvement]\label{prop:self-improvement-slackness-residual-domination-interfaces}
+  \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementSlacknessResidualDominationBridgeInputs}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndResidualDominationInput}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndQXPRepairAndCoisometry}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromSlacknessResidualDominationBridgeInputs}
+  \uses{lem:self-improvement-helper, thm:orthonormalization}
+  The Lean development also records a slackness-and-residual-domination route
+  for the final projective output.  These declarations expose the additional
+  Section~9 inputs needed to combine the SDP slackness data with
+  orthonormalization and QXP repair data.  They currently depend on the
+  unresolved SDP slackness producer boundary tracked by issue~\#1385, so this entry
+  intentionally carries no \texttt{\textbackslash leanok} tag.
+\end{proposition}
+
 \begin{theorem}[Self-improvement]\label{thm:self-improvement}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovement}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementError_nonneg_of_isGood}
@@ -1031,10 +1045,6 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_of_helper_outputs_of_total_operator_le}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_exists_of_helper_outputs_of_residual_domination}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_exists_of_helper_outputs_of_residualDominationInput}
-  \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementSlacknessResidualDominationBridgeInputs}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndResidualDominationInput}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndQXPRepairAndCoisometry}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromSlacknessResidualDominationBridgeInputs}
   \leanok
   \uses{def:polymeasurements, def:simeq, def:approx_delta, def:strong-self-consistency}
   Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following properties:

@@ -50,8 +50,9 @@ namespace Test
 These abbreviations expose, under public names, the types of the
 answer-valued recursive-slice witnesses and self-improvement bridge inputs
 that `mainFormal` requires for the successor dimension (`params.m ≠ 1`).
-They unfold the private `let`-bindings from `RoleRegister.lean` so that
-`mainFormal` can refer to those types without depending on private names. -/
+They make explicit the successor-induction witness types defined locally in
+`RoleRegister.lean`, so that `mainFormal` can refer to those types without
+depending on private names. -/
 
 /-- Type of answer-valued successor recursive slice witnesses for `mainFormal`.
 
@@ -102,9 +103,8 @@ The hypotheses `hd` and `hk` are retained here because the eventual proof
 applies the predecessor induction theorem to the successor decomposition; that
 route needs the positive-degree and size assumptions transported from `params`.
 
-Tracks #1035.  This is intentionally a visible producer declaration, rather than a
-hidden extra hypothesis on the public `mainFormal` theorem, so the remaining
-recursive-slice gap is grep-able. -/
+Tracks #1035.  This obligation is stated as a separately named theorem, rather
+than as an extra hypothesis on the public `mainFormal` theorem. -/
 theorem mainFormalSuccessorAnswerSliceWitnessProducer
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -134,8 +134,8 @@ decomposition; that route needs the positive-degree and size assumptions
 transported from `params`.
 
 Tracks #1036.  The target is data-valued, so this producer is a
-`noncomputable def` rather than a theorem; the intentional proof placeholder is
-the visible Section 9 bridge gap instead of another public hypothesis. -/
+`noncomputable def` rather than a theorem; it records the Section 9 bridge
+obligation rather than adding another public hypothesis to `mainFormal`. -/
 noncomputable def mainFormalSuccessorAnswerSliceBridgeProducer
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -665,13 +665,13 @@ The theorem takes one remaining public bridge hypothesis:
   (Tracked by #1043.)
 
 The base case (m = 1) uses `MainFormalRolePackageResidual.ofBaseCase` (already
-checked) and `hbaseBridge`.  The successor case is intentionally wired through
-two visible producer declarations with proof placeholders:
+checked) and `hbaseBridge`.  The successor case uses two named producer
+declarations, each with an open proof obligation:
 `mainFormalSuccessorAnswerSliceWitnessProducer` (tracked by #1035) and
 `mainFormalSuccessorAnswerSliceBridgeProducer` (tracked by #1036).  These replace
 the previous extra public `mainFormal` hypotheses, so the missing analytic
-content remains grep-able rather than hidden in the theorem signature.  The
-produced inputs are then passed to
+content remains recorded as named obligations rather than placed in the theorem
+signature.  The produced inputs are then passed to
 `MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorBridgeInputs`,
 and the proof finishes via `mainFormal_ofRoleResidualAndRepairedBridge`, exactly
 mirroring the base case.
@@ -720,20 +720,20 @@ theorem mainFormal
   -- * vacuous branch: `mainFormal_trivial_witness`.
   --
   -- The base case is fully checked (uses `MainFormalRolePackageResidual.ofBaseCase`).
-  -- The successor case (m > 1) uses two visible producer declarations,
+  -- The successor case (m > 1) uses two named producer declarations,
   -- `mainFormalSuccessorAnswerSliceWitnessProducer` (#1035) and
   -- `mainFormalSuccessorAnswerSliceBridgeProducer` (#1036), instead of adding
-  -- that analytic content as extra public hypotheses to `mainFormal`.
-  -- These producers are wired through
+  -- that analytic content as extra hypotheses to `mainFormal`.
+  -- These producers are passed to
   -- `MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorBridgeInputs`
   -- to produce the role residual, then combined with `hbaseBridge` via
   -- `mainFormal_ofRoleResidualAndRepairedBridge` to finish the proof.
   --
   -- The remaining external obligations are tracked by:
   -- * #1036: construct `SelfImprovement.SelfImprovementBridgeInputs` per slice
-  --   (the `mainFormalSuccessorAnswerSliceBridgeProducer` placeholder)
+  --   (the open `mainFormalSuccessorAnswerSliceBridgeProducer` obligation)
   -- * #1035: prove recursive `mainFormal` for successor restricted slices
-  --   (the `mainFormalSuccessorAnswerSliceWitnessProducer` placeholder)
+  --   (the open `mainFormalSuccessorAnswerSliceWitnessProducer` obligation)
   -- * #1043: construct `hbaseBridge` for base/successor cases
   --
   -- Note: the old scalar-cascade route through

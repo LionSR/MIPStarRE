@@ -461,30 +461,28 @@
 \end{definition}
 
 
-\begin{proposition}[Lean gap producers for the successor inductive step]\label{prop:main-formal-successor-producers}
+\begin{proposition}[Successor recursive-slice witness]\label{prop:main-formal-successor-witness}
 	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSliceWitnessProducer}
-	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSliceBridgeProducer}
 	\uses{def:main-formal-successor-boundary, thm:main-induction-public-wrapper}
-	The two declarations
-	\texttt{mainFormalSuccessorAnswerSliceWitnessProducer} and
-	\texttt{mainFormalSuccessorAnswerSliceBridgeProducer} expose, as visible
-	Lean producers, the two analytic gaps that remain in the successor branch
-	of Theorem~\ref{thm:main-formal}.  The first witnesses the answer-valued
-	recursive slice data $G^{x}$ obtained by applying the inductive hypothesis
-	to each $x$-restricted strategy
+	The declaration \texttt{mainFormalSuccessorAnswerSliceWitnessProducer}
+	states the answer-valued recursive slice data $G^{x}$ obtained by applying
+	the inductive hypothesis to each $x$-restricted strategy
 	(paper \texttt{references/ldt-paper/inductive\_step.tex}, lines 441--454,
 	in the proof of Theorem~\ref{thm:main-induction} inside
-	\texttt{sec:proof-of-main-induction}); the formalization of this step is
-	tracked by issue~\#1035.  The second produces the per-slice
+	\texttt{sec:proof-of-main-induction}).  The formalization of this step is
+	tracked by issue~\#1035.
+\end{proposition}
+
+\begin{definition}[Successor self-improvement bridge data]\label{def:main-formal-successor-bridge-data}
+	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSliceBridgeProducer}
+	\uses{def:main-formal-successor-boundary, thm:self-improvement-in-induction-section}
+	The definition \texttt{mainFormalSuccessorAnswerSliceBridgeProducer} records
+	the per-slice
 	self-improvement bridge inputs obtained by applying
 	Theorem~\ref{thm:self-improvement-in-induction-section} to each $G^{x}$
-	(paper \texttt{inductive\_step.tex}, lines 456--485); the formalization of
-	this step is tracked by issue~\#1036.  Both declarations are intentionally
-	closed with \texttt{sorry} under the policy of issue~\#1379, which prefers
-	visible producer declarations to additional public hypotheses on
-	\texttt{mainFormal}; consequently this entry intentionally omits
-	\texttt{\textbackslash leanok} on its proof.
-\end{proposition}
+	(paper \texttt{inductive\_step.tex}, lines 456--485).  The formalization of
+	this step is tracked by issue~\#1036.
+\end{definition}
 
 
 \begin{proposition}[Lean successor handoff for the Section 3 proof]\label{lem:main-formal-successor-handoff}
