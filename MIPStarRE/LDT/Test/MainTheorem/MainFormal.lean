@@ -22,9 +22,14 @@ Base case, successor branch, and final assembly for `thm:main-formal`
   data, and the orthonormalization/completion inputs into the three final
   consistency bounds `Gᴬ ≃ I ⊗ Gᴮ`, `Aᴬ ⊗ I ≃ I ⊗ Qᴮ`, `Qᴬ ⊗ I ≃ I ⊗ Aᴮ`.
 
-* `mainFormal` — the top-level theorem, taking a projective strategy that
-  passes the LID test with probability `≥ 1 − ε` and producing the three
-  pointwise consistency targets at error bound `mainFormalError`.
+* `mainFormal_ofRepairedBridge` — the conditional top-level assembly, assuming
+  the remaining repaired bridge from the role-register output to the final
+  projective measurements.
+
+* `mainFormal` — the paper-facing theorem statement, taking only a projective
+  strategy that passes the LID test with probability `≥ 1 − ε` and producing the
+  three pointwise consistency targets at error bound `mainFormalError`. Its proof
+  remains open until the repaired bridge is derived from the paper hypotheses.
 
 ## References
 
@@ -315,8 +320,9 @@ self-consistency (`G^A ⊗ I ≃ G^A ⊗ I` and `G^B ⊗ I ≃ G^B ⊗ I`), whic
 structurally stronger statement.  Callers must supply it as a separate
 hypothesis.
 
-Callers constructing `hbaseBridge` for `mainFormal` should instantiate this lemma
-with their per-role-residual repair witnesses and diagonal self-consistency proofs.
+Callers constructing `hbaseBridge` for `mainFormal_ofRepairedBridge` should
+instantiate this lemma with their per-role-residual repair witnesses and
+diagonal self-consistency proofs.
 
 Refs #1359, #1043. -/
 noncomputable def repairedBridgeHypotheses_ofRoleResidual
@@ -560,7 +566,12 @@ theorem mainFormal_ofRoleResidualAndRepairedBridge
 
 
 /--
-`thm:main-formal` from `test_definition.tex`.
+Conditional assembly for `thm:main-formal` from `test_definition.tex`.
+
+This theorem is not itself the paper theorem: it assumes the repaired bridge
+from the role-register residual to the final projective-completion hypotheses.
+The public theorem `mainFormal` below records the paper-facing statement with
+that bridge as a remaining proof obligation.
 
 The bipartite tensor placement follows the paper:
 - **1a**: `A^A_u ⊗ I ≈_ν I ⊗ G^B_{[g(u)=a]}` — G_B on **right**
@@ -601,9 +612,9 @@ This is a current Lean API limitation, not a paper constraint; once the Section 
 wrapper is universe-polymorphic, this public theorem should be generalized as
 well.
 
-Fixes #137, #239, #906, #1099.
+Addresses #137, #239, #906, #1099, #1458.
 -/
-theorem mainFormal
+theorem mainFormal_ofRepairedBridge
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι)
     (eps : Error)
@@ -628,8 +639,8 @@ theorem mainFormal
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  -- TODO(#422): The induction-side handoffs needed by the final
-  -- `mainFormal` assembly are standalone checked declarations:
+  -- TODO(#422, #1458): The induction-side handoffs needed by the final
+  -- `mainFormal_ofRepairedBridge` assembly are standalone checked declarations:
   -- * base branch: `strategySymmetrization_mainInductionBaseCase`,
   -- * weighted successor boundary fields:
   --   `mainFormalSuccessorAxisWeightedBound_ofPass` and
@@ -654,8 +665,8 @@ theorem mainFormal
   -- `mainFormal_ofRoleResidualAndRepairedBridge` finishes the base Step-6
   -- assembly using the sharper pre-completion loss
   -- `ζ₁ + 10 * ζ₁^(1/8)`.  The self-improvement assumptions are packaged as
-  -- `SelfImprovement.SelfImprovementBridgeInputs`.  The remaining `mainFormal`
-  -- hole still needs:
+  -- `SelfImprovement.SelfImprovementBridgeInputs`.  The remaining
+  -- `mainFormal_ofRepairedBridge` hole still needs:
   --
   -- 1. **Section 6 role residual** via base/successor branch:
   --    - `MainFormalRolePackageBranchResidual` constructed from either
@@ -753,6 +764,41 @@ theorem mainFormal
         completionTransportResidual.toProjectiveStageTargets hpass
       exact MainFormalNativeTargets.toMainFormal
         (projectiveTargets.toTransportTargets.toCascadeTargets.toNativeTargets)
+
+/--
+`thm:main-formal` from `test_definition.tex`.
+
+This is the public paper-facing statement. The Lean statement records the
+large-`k` and positive-boundary hypotheses currently needed by the formal
+encoding, but it does not assume the repaired bridge, residual package, or final
+projective-completion data. Those remain proof obligations to be derived from
+the pass condition and the preceding sections.
+-/
+theorem mainFormal
+    (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι)
+    (eps : Error)
+    (hd : 0 < params.d)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (k : ℕ)
+    (hk : 400 * params.m * params.d ≤ k)
+    (hk0 : 0 < k) :
+    ∃ G_A G_B : ProjMeas (Polynomial params) ι,
+      ConsRel strategy.state (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+          (polynomialEvaluationFamily params G_B.toSubMeas)
+          (mainFormalError params k eps) ∧
+        ConsRel strategy.state (uniformDistribution (Point params))
+          (polynomialEvaluationFamily params G_A.toSubMeas)
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+          (mainFormalError params k eps) ∧
+        ConsRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily G_A.toSubMeas)
+          (constSubMeasFamily G_B.toSubMeas)
+          (mainFormalError params k eps) := by
+  -- TODO(#1458): derive the repaired bridge used by
+  -- `mainFormal_ofRepairedBridge` from the hypotheses of the paper theorem.
+  sorry
 
 end Test
 

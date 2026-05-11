@@ -129,6 +129,15 @@
 	\end{enumerate}
 \end{theorem}
 
+\begin{remark}[Lean conditional declaration for the final assembly]\label{rem:main-formal-conditional}
+	\lean{MIPStarRE.LDT.Test.mainFormal_ofRepairedBridge}
+	The declaration currently carrying the checked final assembly assumes a
+	repaired bridge from the role-register residual to the final
+	projective-completion hypotheses.  This is not a hypothesis of
+	Theorem~\ref{thm:main-formal}; it is the remaining proof obligation needed to
+	turn the conditional assembly into the paper theorem.
+\end{remark}
+
 \begin{remark}[$k$-bound boundary for the public theorem]\label{rem:main-formal-k-boundary}
 	\lean{MIPStarRE.LDT.Test.mainFormal_trivial_witness}
 	\uses{thm:main-formal, thm:error-cascade-main-formal, def:projective-strategy, def:simeq}
