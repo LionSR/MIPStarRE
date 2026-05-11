@@ -12,9 +12,9 @@ on:
       - 'scripts/tests/test_audit_paper_facing_proof_debt.py'
       - '.github/workflows/paper-facing-proof-debt-audit.yml'
 
-# Runs as a non-blocking warning while the bridge-debt cleanup tracked by
-# issue #1458 is in progress.  Once the tracked paper-facing theorem statements
-# are clean, remove ``--warn-only`` to promote this to a blocking guard.
+# Blocking guard for issue #1458: paper-facing theorem-like blueprint entries
+# must not acquire non-paper bridge, residual, repair, package, producer, input,
+# or visibly conditional declaration-name dependencies.
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -39,26 +39,24 @@ jobs:
       - name: Run script regression tests
         run: python3 -m unittest scripts/tests/test_audit_paper_facing_proof_debt.py
 
-      - name: Run paper-facing proof-debt audit (warn-only)
+      - name: Run paper-facing proof-debt audit
         run: |
           python3 scripts/audit_paper_facing_proof_debt.py \
             --root . \
             --ci \
-            --warn-only \
             2>&1 | tee "$RUNNER_TEMP/paper-facing-proof-debt-audit.log"
 
       - name: Surface findings in step summary
         if: always()
         run: |
           {
-            echo "### Paper-facing proof-debt audit (--warn-only)"
+            echo "### Paper-facing proof-debt audit"
             echo
             echo '```text'
             cat "$RUNNER_TEMP/paper-facing-proof-debt-audit.log"
             echo '```'
             echo
-            echo 'This check is **non-blocking** while issue #1458 is being'
-            echo 'repaired.  After the paper-facing theorem statements are clean,'
-            echo 'remove `--warn-only` to make new bridge, residual, repair,'
-            echo 'package, producer, or hypotheses inputs block the pull request.'
+            echo 'This check is blocking: new bridge, residual, repair,'
+            echo 'package, producer, input, or visibly conditional theorem links'
+            echo 'on paper-facing declarations must be repaired before merge.'
           } >> "$GITHUB_STEP_SUMMARY"
