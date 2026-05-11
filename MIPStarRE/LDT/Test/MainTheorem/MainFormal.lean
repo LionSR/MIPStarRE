@@ -599,7 +599,7 @@ noncomputable def mainFormalSuccessorProjectiveCompletionResidualProducer
   sorry
 
 /--
-Conditional assembly for `thm:main-formal` from `test_definition.tex`.
+Conditional soundness theorem for `thm:main-formal` from `test_definition.tex`.
 
 This theorem is not itself the paper theorem: it assumes the repaired bridge
 from the role-register residual to the final projective-completion hypotheses.
