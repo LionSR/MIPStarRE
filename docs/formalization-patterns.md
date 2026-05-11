@@ -85,6 +85,16 @@ are being actively removed.
    Lean conclusion, and report whether the Lean statement is exact, has only
    faithful boundary hypotheses, or has extra assumptions.
 
+If a paper-facing declaration is temporarily proved by calling a conditional
+helper whose load-bearing input has not yet been produced from the paper
+hypotheses, the proof frontier must be marked explicitly.  The declaration
+should carry an `**Unfaithful:**` docstring section naming the non-paper
+dependency, citing the paper-gap note or tracking issue, and identifying the
+producer theorem that will remove the dependency.  A named producer theorem
+with a tracked `sorry` is preferred whenever possible, because it makes the
+missing mathematical assertion visible without adding it to the paper theorem
+statement.
+
 ### Conditional helper shape
 
 1. **Hypothesis is named as debt.**  A `structure` or `Prop`-valued

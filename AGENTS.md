@@ -234,6 +234,65 @@ integrity audit:
 - verdict: exact, faithful boundary hypotheses, extra assumptions, weakened
   conclusion, or strengthened conclusion.
 
+### Paper-realignment mode
+
+When a theorem, definition, or hypothesis field has already drifted away from
+`references/ldt-paper/`, a repair PR may temporarily reintroduce `sorry` in
+order to restore the source-faithful statement.  In this mode, statement
+faithfulness is the first invariant: keeping a divergent proof intact merely to
+avoid `sorry` preserves a theorem that the paper does not state.
+
+Paper-realignment mode is narrow.  It applies only to edits whose purpose is to
+remove wrong hypotheses, delete divergent fields, restore a paper theorem
+statement, or replace a conditional theorem by a paper-facing statement plus a
+named proof obligation.  Such a PR must:
+
+1. cite the paper passage by label or line range in the relevant docstring;
+2. cite the paper-gap note or tracking issue that records the divergence;
+3. identify every introduced or retained `sorry` and the producer theorem or
+   source-faithful lemma expected to discharge it;
+4. avoid unrelated refactors, notation changes, or proof-engineering churn.
+
+During paper realignment, every restated definition, hypothesis field, or
+paper-facing theorem must have a docstring that lets a reviewer tell whether
+the statement is present in the paper or is a Lean-only proof obligation.  A
+name such as `Bridge`, `Residual`, `Repair`, `Package`, `Input`, or `Producer`
+is not by itself a mathematical source citation.
+
+### Unfaithful dependency markers
+
+A theorem or lemma is **unfaithful** when its proof relies on a hypothesis,
+helper, bridge, residual, repair input, or conditional theorem that is known not
+to follow from the cited paper statement.  This includes the case where the
+public theorem statement is source-shaped but the proof calls a conditional
+helper whose load-bearing hypothesis is not yet derived from the paper
+hypotheses.
+
+Such a declaration must carry a docstring section beginning with
+`**Unfaithful:**`.  The marker must name the load-bearing deviation, cite the
+paper-gap note or issue that documents it, and state the planned discharge.  A
+minimal form is:
+
+```text
+**Unfaithful:** This proof currently relies on `<hypothesis or helper>`,
+which is not derived from `<paper label or line range>`.  Documented in
+`docs/paper-gaps/<note>.tex` or issue `#N`.  Elimination: prove
+`<producer theorem>` from the paper hypotheses.
+```
+
+The marker propagates through dependencies: a theorem whose proof transitively
+uses an unfaithful declaration is itself unfaithful until the dependency is
+replaced by a source-faithful proof.  Remove the marker only when the cited
+deviation has been discharged.
+
+Not every discrepancy requires the full `**Unfaithful:**` marker.  If the paper
+has a local typo, a documented numerical strengthening, or a genuine scope
+restriction, use a lighter docstring marker such as `**Local fix:**` or
+`**Scope restriction:**`, citing the relevant paper-gap note.  These lighter
+markers are for mathematically correct local corrections; `**Unfaithful:**` is
+reserved for load-bearing assumptions or proof steps still missing from the
+paper hypotheses.
+
 ## Code Conventions
 
 ### Imports
