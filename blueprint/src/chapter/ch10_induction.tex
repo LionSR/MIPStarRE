@@ -62,8 +62,6 @@
 \section{The inductive construction}
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement-in-induction-section}
-  \lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection}
-	\leanok
   \uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $G \in \polysub{m}{q}{d}$ be a submeasurement with the following property:
   \begin{enumerate}
@@ -104,6 +102,17 @@
 	\uses{thm:self-improvement, prop:completing-to-measurement, prop:simeq-data-processing, prop:triangle-sub, prop:two-notions-of-self-consistency}
 	Complete $G$ to a measurement by adjoining an extra outcome $\bot$. Apply Theorem~\ref{thm:self-improvement} to the completed measurement, then discard the $\bot$ outcome. By Lemma~\ref{prop:completing-to-measurement}, the completeness, consistency, strong self-consistency, and boundedness estimates transfer back to the original polynomial outcomes with an additive error from the missing mass $\bra{\psi} (I - \sum_g G_g) \ot I \ket{\psi}$. Since the output is projective, Lemma~\ref{prop:two-notions-of-self-consistency} converts the strong self-consistency statement to the usual bipartite formulation.
 \end{proof}
+
+\begin{remark}[Lean conditional declaration for induction self-improvement]\label{rem:self-improvement-in-induction-section-conditional}
+	\lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection}
+	The current Lean declaration for Theorem~\ref{thm:self-improvement-in-induction-section}
+	assumes the helper self-consistency, orthonormalization, and final-field
+	hypotheses that are still explicit in the Chapter~\ref{chap:self-improvement}
+	formalization.  It also assumes a measurement whose underlying submeasurement
+	is the given one.  These are not hypotheses of the paper theorem; they are
+	proof obligations to be discharged when the Chapter~\ref{chap:self-improvement}
+	statement is made source-faithful.
+\end{remark}
 
 \begin{theorem}[Pasting]\label{thm:ld-pasting-in-induction-section}
   \lean{MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection}
@@ -195,11 +204,10 @@
 \end{proof}
 
 \begin{theorem}[Main induction]\label{thm:main-induction}
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper}
 	\uses{def:good-strategy, def:polymeasurements, def:simeq, lem:main-induction-base}
 	% Statement-level formalization marker deliberately omitted: the Lean
-	% declaration mainInductionPublicWrapper takes a self-improvement boundary
-	% input as an extra hypothesis (tracked by issue 931), so the unconditional
+	% declaration mainInductionPublicWrapper takes an auxiliary self-improvement
+	% hypothesis (tracked by issue 931), so the unconditional
 	% theorem stated here is not yet produced. See the proof block below for
 	% the formalization status.
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge 400\,md$ and set
@@ -225,7 +233,7 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.ofPointMeasurementEq}
 	that mirror the four paper stages $\text{restrict} \to \text{induct} \to \text{self-improve} \to \text{paste}$. For the answer-valued restriction route used in the successor branch of the main formal theorem, Lean now also exposes
 	\lean{MIPStarRE.LDT.MainInductionStep.AnswerMainInductionConclusion, MIPStarRE.LDT.MainInductionStep.AnswerMainInductionHypothesis, MIPStarRE.LDT.MainInductionStep.AnswerPerSliceInductionPackage.ofMainInductionHypothesis},
-	which package the predecessor induction hypothesis for the restricted strategies without appealing to the public theorem `mainFormal`. The weighted restricted-probability boundary is now public via \lean{MIPStarRE.LDT.MainInductionStep.weighted_axisParallel_bound, MIPStarRE.LDT.MainInductionStep.weighted_diagonal_bound, MIPStarRE.LDT.MainInductionStep.restrictedProbabilities}, and the final public successor-step wrapper is formalized as \lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper}. The remaining gap, tracked by issue \#931, is to produce the restricted-strategy self-improvement input needed to instantiate that wrapper directly from higher-level applications, so the displayed theorem is not yet marked as formalized.
+	which record the predecessor induction hypothesis for the restricted strategies without appealing to the public theorem `mainFormal`. The weighted restricted-probability estimates are now public via \lean{MIPStarRE.LDT.MainInductionStep.weighted_axisParallel_bound, MIPStarRE.LDT.MainInductionStep.weighted_diagonal_bound, MIPStarRE.LDT.MainInductionStep.restrictedProbabilities}, and the final public successor-step assembly is formalized as \lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper}. The remaining gap, tracked by issue \#931, is to prove the restricted-strategy self-improvement hypotheses needed to instantiate that assembly directly from higher-level applications, so the displayed theorem is not yet marked as formalized.
 	We may assume $\eps,\delta,\gamma,d/q \le 1$, since otherwise $\nu \ge 1$ and the bound is trivial.
 
 	The proof is by induction on $m$. The base case $m=1$ is Lemma~\ref{lem:main-induction-base}.
@@ -344,31 +352,49 @@
 	which is exactly the bound required for dimension $m+1$.
 \end{proof}
 
-\begin{proposition}[Public Lean wrapper for the successor-step assembly]\label{thm:main-induction-public-wrapper}
+\begin{remark}[Lean conditional declaration for the successor-step assembly]\label{rem:main-induction-successor-assembly}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicRestrictionPackage, MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper}
-	\leanok
 	\uses{lem:restricted-probabilities, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section, thm:main-induction}
-	This Lean-only theorem records the five explicit successor-step ingredients used in the proof of Theorem~\ref{thm:main-induction}: the weighted slice bounds feeding Lemma~\ref{lem:restricted-probabilities}, the extracted slice-restriction data, the per-slice recursive witnesses, the producer for the corresponding self-improvement data, and the recursion-to-pasting assembly. Under those hypotheses it returns a measurement $G \in \polymeas{m+1}{q}{d}$ satisfying the same consistency conclusion as Theorem~\ref{thm:main-induction}, but without exposing the intermediate stage data at the public boundary.
-\end{proposition}
-\begin{proof}
-	\leanok
+	This auxiliary Lean statement records the five explicit successor-step
+	ingredients used in the proof of Theorem~\ref{thm:main-induction}: the weighted
+	slice bounds feeding Lemma~\ref{lem:restricted-probabilities}, the extracted
+	slice-restriction data, the per-slice recursive witnesses, the corresponding
+	self-improvement data, and the recursion-to-pasting assembly.  These are not
+	extra hypotheses in the paper theorem; they are intermediate proof obligations
+	in the current formalization.  Under those hypotheses the Lean statement
+	returns a measurement $G \in \polymeas{m+1}{q}{d}$ satisfying the same
+	consistency conclusion as Theorem~\ref{thm:main-induction}.
+
 	\uses{lem:restricted-probabilities}
-	This is a Lean-only assembly corollary. One first applies Lemma~\ref{lem:restricted-probabilities} to the weighted slice bounds in order to extract the restricted failure profile, records the recursive slice witnesses, invokes the explicit self-improvement producer on that slice data, and then applies \lean{MIPStarRE.LDT.MainInductionStep.mainInductionByRecursionOnM}, which already returns the displayed error parameter directly.
-\end{proof}
+	One first applies Lemma~\ref{lem:restricted-probabilities} to the weighted
+	slice bounds in order to extract the restricted failure profile, records the
+	recursive slice witnesses, uses the explicit self-improvement data on that
+	slice data, and then applies
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionByRecursionOnM}, which
+	already returns the displayed error parameter directly.
+\end{remark}
 
 \section{Proof of the main formal theorem}
 
 \begin{lemma}[Role-register symmetrization bridge]\label{lem:symmetrization-bridge}
-	\lean{MIPStarRE.LDT.SameSpaceProjStrat.strategySymmetrization, MIPStarRE.LDT.SameSpaceProjStrat.strategySymmetrization_isGood_three_mul, MIPStarRE.LDT.SameSpaceProjStrat.strategySymmetrization_isNormalized, MIPStarRE.LDT.SameSpaceProjStrat.StrategySymmetrizationPackage, MIPStarRE.LDT.SameSpaceProjStrat.StrategySymmetrizationPackage.strategySymmetrization_isGood, MIPStarRE.LDT.SameSpaceProjStrat.StrategySymmetrizationPackage.strategySymmetrization_isNormalized, MIPStarRE.LDT.SameSpaceProjStrat.strategySymmetrizationPackage}
+	\lean{MIPStarRE.LDT.SameSpaceProjStrat.strategySymmetrization, MIPStarRE.LDT.SameSpaceProjStrat.strategySymmetrization_isGood_three_mul, MIPStarRE.LDT.SameSpaceProjStrat.strategySymmetrization_isNormalized}
 	\leanok
 	\uses{def:projective-strategy, def:symmetric-projective-strategy, def:good-strategy}
-	Let $(\psi,A^{\mathrm A},B^{\mathrm A},L^{\mathrm A},A^{\mathrm B},B^{\mathrm B},L^{\mathrm B})$ be a projective strategy passing the $(m,q,d)$ low individual degree test with probability at least $1-\eps$. Introducing a two-dimensional role register on each side and taking $(\psi_{\mathrm{sym}}, A_{\mathrm{sym}}, B_{\mathrm{sym}}, L_{\mathrm{sym}})$ as in paper Section~3 yields a symmetric projective strategy that is $(3\eps,3\eps,3\eps)$-good. The Lean package records this symmetrized strategy together with its goodness and normalization proofs for later use by the proof of Theorem~\ref{thm:main-formal}.
+	Let $(\psi,A^{\mathrm A},B^{\mathrm A},L^{\mathrm A},A^{\mathrm B},B^{\mathrm B},L^{\mathrm B})$ be a projective strategy passing the $(m,q,d)$ low individual degree test with probability at least $1-\eps$. Introducing a two-dimensional role register on each side and taking $(\psi_{\mathrm{sym}}, A_{\mathrm{sym}}, B_{\mathrm{sym}}, L_{\mathrm{sym}})$ as in paper Section~3 yields a symmetric projective strategy that is $(3\eps,3\eps,3\eps)$-good.
 \end{lemma}
 \begin{proof}
 	\leanok
 	\uses{def:projective-strategy, def:good-strategy}
 	Each of the three subtests (axis-parallel, self-consistency, diagonal) occurs with probability $1/3$, so the total failure probability at most $\eps$ implies each branch is at most $3\eps$. Block-diagonalizing the measurements over the role register preserves the axis-parallel and diagonal branch averages exactly, and the cross-register self-consistency branch of the symmetrized strategy equals the original point-agreement defect, which is itself bounded by $3\eps$.
 \end{proof}
+
+\begin{remark}[Lean auxiliary data for role-register symmetrization]\label{rem:symmetrization-data}
+	\lean{MIPStarRE.LDT.SameSpaceProjStrat.StrategySymmetrizationPackage, MIPStarRE.LDT.SameSpaceProjStrat.StrategySymmetrizationPackage.strategySymmetrization_isGood, MIPStarRE.LDT.SameSpaceProjStrat.StrategySymmetrizationPackage.strategySymmetrization_isNormalized, MIPStarRE.LDT.SameSpaceProjStrat.strategySymmetrizationPackage}
+	The formal proof of Theorem~\ref{thm:main-formal} also uses a named datum
+	containing the symmetrized strategy, its goodness proof, and its normalization
+	proof.  This datum is auxiliary structure for the final assembly, not an
+	additional hypothesis in Lemma~\ref{lem:symmetrization-bridge}.
+\end{remark}
 
 \begin{proposition}[Lean base-case handoff for the Section 3 proof]\label{lem:main-formal-base-case-handoff}
 	\lean{MIPStarRE.LDT.Test.strategySymmetrization_mainInductionBaseCase}
@@ -393,10 +419,10 @@
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAnswerRecursiveSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRecursiveSlices_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerBoundary_ofPredecessorInduction}
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAnswerSelfImprovementBridgeInputs, MIPStarRE.LDT.Test.MainFormalSuccessorAnswerSelfImprovementInductionPackage, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofMeasurementEq, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofOrthonormalizationRepair, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSelfImprovementProducer_ofBridgeInputs, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerBoundary_ofBridgeInputs}
 	\leanok
-	\uses{lem:symmetrization-bridge, thm:main-induction-public-wrapper}
+	\uses{lem:symmetrization-bridge, rem:main-induction-successor-assembly}
 	These Lean-only aliases name the successor-case data that
 	Theorem~\ref{thm:main-formal} uses to invoke
-	Proposition~\ref{thm:main-induction-public-wrapper}. The public weighted-bound
+	Remark~\ref{rem:main-induction-successor-assembly}. The public weighted-bound
 	helper lemmas discharge the weighted restricted-axis and restricted-diagonal
 	fields from the symmetrized passing strategy; the remaining external inputs are
 	the recursive slice witnesses (together with their bridge-data structure
@@ -482,8 +508,8 @@
 \begin{proposition}[Lean successor handoff for the Section 3 proof]\label{lem:main-formal-successor-handoff}
 	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorMainInductionPublicWrapper}
 	\leanok
-	\uses{def:main-formal-successor-boundary, lem:symmetrization-bridge, thm:main-induction-public-wrapper}
-	This Lean-only specialization applies Proposition~\ref{thm:main-induction-public-wrapper}
+	\uses{def:main-formal-successor-boundary, lem:symmetrization-bridge, rem:main-induction-successor-assembly}
+	This Lean-only specialization applies Remark~\ref{rem:main-induction-successor-assembly}
 	to the role-register symmetrization used in Theorem~\ref{thm:main-formal}. Given
 	the bundled successor boundary, the Section~6 side condition
 	$400\,m d \le k$, and the matching base-universe field-model instance, it
