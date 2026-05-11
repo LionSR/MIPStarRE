@@ -648,13 +648,13 @@ follows the base case of `\label{thm:main-induction}` at
 `references/ldt-paper/inductive_step.tex:418-432`.  Blueprint:
 `\label{def:main-formal-step6-hypotheses}`.
 
-This construction names the remaining base-case analytic obligation for
+This definition names the remaining base-case analytic obligation for
 `mainFormal`.  It must construct the diagonal orthonormalization input
 (spectral-truncation and locality-preserving repair witnesses for both
 unsymmetrized role POVMs) and the diagonal consistency input (self-consistency
 relations for the two unsymmetrized role POVMs) for the checked base-case role
 residual. -/
-opaque mainFormalBaseBranchRepairedBridgeProducer
+noncomputable def mainFormalBaseBranchRepairedBridgeProducer
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι)
