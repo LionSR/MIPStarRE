@@ -63,8 +63,8 @@ in the paper; the remaining helper strong self-consistency estimate is admitted
 in the proof rather than assumed in the theorem statement.
 
 The audit for `SelfImprovement.sdp_statement_with_slackness` records the present
-state of issue #1230.  The theorem states the source-facing SDP strong-duality
-and complementary-slackness producer for `lem:sdp`; the missing proof is the
+state of issue #1230.  The theorem states the SDP strong-duality and
+complementary-slackness conclusion of `lem:sdp`; the missing proof is the
 finite-dimensional semidefinite-programming argument, not an additional
 hypothesis on a later paper theorem.
 
@@ -112,7 +112,7 @@ private def expectedSelfImprovementHelperAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
 /-- Standard kernel axioms plus `sorryAx`; tracks the issue #1230 derivation
-needed for the slackness-carrying SDP producer. -/
+needed for the slackness-carrying SDP statement. -/
 private def expectedSdpSlacknessAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
