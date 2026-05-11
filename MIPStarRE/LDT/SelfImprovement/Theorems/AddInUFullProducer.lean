@@ -2,7 +2,6 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.Test.StrategyFailures
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer.Transfer
 import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
-import MIPStarRE.LDT.GlobalVariance.Theorems.TransportChain.SumForm
 
 /-!
 # Section 7 — Selection-dependent transfer inequality for `lem:add-in-u`
@@ -11,16 +10,11 @@ This file proves the full selection-dependent transfer inequality of
 `lem:add-in-u` (`references/ldt-paper/self_improvement.tex` lines 238–246).
 The existing `addInU` lemma in
 `MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperCompleteness/Bracketed.lean:584`
-formalizes only the variance-bound specialization used in subsequent arguments. The
-doc-comment on that lemma states:
+formalizes only the variance-bound specialization used in subsequent arguments.
 
-> "The selection-dependent transfer inequality from the paper, together with
->  its dependence on an auxiliary family `M` and the averaged family `H`, is
->  not yet formalized here."
-
-The theorem below packages the already formalized selected Cauchy--Schwarz
-chain and the six-step cardinality-free local-variance transport bound into the
-paper's fully quantified producer statement.
+The theorem below combines the already formalized selected Cauchy--Schwarz
+chain with the six-step cardinality-free local-variance transport bound to
+establish the paper's fully quantified transfer inequality.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -104,11 +98,11 @@ combining the self-consistency of `A` (giving `√(2δ)` bounds on the
 "insertion" steps) with the global-variance bound (giving
 `√globalVarianceDeviationSum` bounds on the "averaging" steps).
 
-The reduced `addInU` lemma in `Bracketed.lean:584` formalizes the
-specialization of this chain to the variance-bound consequence; the full
-universally-quantified inequality is not yet formalized in Lean.
+The reduced `addInU` lemma in `Bracketed.lean:584` records the specialization
+of this chain to the variance-bound consequence used later.  The theorem below
+formalizes the full universally quantified inequality.
 
-The `gamma` parameter and `_hgood : IsGood eps delta gamma` hypothesis carry
+The `gamma` parameter and `hgood : IsGood eps delta gamma` hypothesis carry
 the paper's standing "good strategy" context; `gamma` does not appear in
 `AddInUFullStatement`'s bound (which is `addInUError params eps delta`),
 matching the paper's framing where `lem:add-in-u` is invoked inside a
