@@ -92,7 +92,7 @@ runs:
         source_statement_guard="$(cat <<'EOF'
         Source-statement guard:
         - For any declaration named as, linked to, or documented as a paper theorem,
-          lemma, or proposition, preserve the statement in references/ldt-paper/ up to
+          lemma, or proposition, preserve the statement in `references/ldt-paper/` up to
           faithful formal encoding.
         - Do not repair CI, blueprint sync, or review comments by adding bridge,
           residual, repair, package, producer, or arbitrary hypothesis inputs to
