@@ -177,6 +177,32 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
             self.assertEqual(result.scanned_refs, 1)
             self.assertEqual(result.findings, ())
 
+    def test_input_bundle_in_paper_facing_header_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem (hinput : OrthonormalizationInput params) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:paper}
+                  \lean{MIPStarRE.paperTheorem}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root)
+            self.assertEqual(result.scanned_refs, 1)
+            self.assertEqual(
+                {finding.token for finding in result.findings},
+                {"hinput", "OrthonormalizationInput"},
+            )
+
     def test_debt_vocabulary_is_not_reported_inside_unrelated_identifiers(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

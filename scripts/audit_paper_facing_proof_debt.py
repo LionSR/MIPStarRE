@@ -12,7 +12,8 @@ review aid for that boundary:
 * inspect only the public input portion of the declaration header after the
   declaration name and before the result type;
 * report occurrences of proof-debt vocabulary such as ``BridgeHypotheses``,
-  ``Residual``, ``RepairInput``, ``Package``, or ``Producer``.
+  ``Residual``, ``RepairInput``, ``Package``, ``Producer``, or an ``Input``
+  bundle.
 
 The audit is report-only by default.  With ``--ci`` it exits non-zero when a
 finding is present, unless ``--warn-only`` is also supplied.
@@ -45,11 +46,11 @@ DEBT_TOKEN_RE = re.compile(
     r"(?<![A-Za-z0-9_'])"
     r"(?:"
     r"(?:[A-Za-z_][A-Za-z0-9_']*)?"
-    r"(?:Bridge|Residual|Repair|Package|Producer)"
+    r"(?:Bridge|Residual|Repair|Package|Producer|Input)"
     r"[A-Za-z0-9_']*"
     r"|"
     r"(?:h|has|mk|of)?"
-    r"(?:bridge|residual|repair|package|producer)"
+    r"(?:bridge|residual|repair|package|producer|input)"
     r"[A-Za-z0-9_']*"
     r")"
     r"(?![A-Za-z0-9_'])"
