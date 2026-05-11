@@ -203,6 +203,32 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
                 {"hinput", "OrthonormalizationInput"},
             )
 
+    def test_slice_boundedness_input_is_classified_as_faithful_boundary(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem (hbound : SliceBoundednessInput strategy family zeta) :
+                    Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:paper}
+                  \lean{MIPStarRE.paperTheorem}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root)
+            self.assertEqual(result.scanned_refs, 1)
+            self.assertEqual(result.findings, ())
+            self.assertEqual(len(result.faithful_boundary_findings), 1)
+            self.assertEqual(result.faithful_boundary_findings[0].token, "SliceBoundednessInput")
+
     def test_debt_vocabulary_is_not_reported_inside_unrelated_identifiers(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

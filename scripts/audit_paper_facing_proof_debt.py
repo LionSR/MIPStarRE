@@ -14,6 +14,8 @@ review aid for that boundary:
 * report occurrences of proof-debt vocabulary such as ``BridgeHypotheses``,
   ``Residual``, ``RepairInput``, ``Package``, ``Producer``, or an ``Input``
   bundle.
+* classify known faithful boundary-input packages separately, with paper
+  citations, so they do not become indistinguishable from proof debt.
 
 The audit is report-only by default.  With ``--ci`` it exits non-zero when a
 finding is present, unless ``--warn-only`` is also supplied.
@@ -56,6 +58,14 @@ DEBT_TOKEN_RE = re.compile(
     r"(?![A-Za-z0-9_'])"
 )
 
+FAITHFUL_BOUNDARY_TOKENS = {
+    "SliceBoundednessInput": (
+        "faithful encoding of the paper boundedness hypothesis; see "
+        "references/ldt-paper/commutativity-G.tex:29-36 and "
+        "references/ldt-paper/ld-pasting.tex:28-35"
+    ),
+}
+
 @dataclass(frozen=True)
 class DebtFinding:
     """One proof-debt token in a paper-facing Lean declaration header."""
@@ -73,12 +83,30 @@ class DebtFinding:
 
 
 @dataclass(frozen=True)
+class FaithfulBoundaryFinding:
+    """One detected token classified as faithful paper boundary data."""
+
+    blueprint_file: str
+    blueprint_line: int
+    env_type: str
+    label: str | None
+    lean_decl: str
+    lean_file: str
+    lean_line: int
+    token: str
+    token_line: int
+    header_excerpt: str
+    reason: str
+
+
+@dataclass(frozen=True)
 class AuditResult:
     """Summary of the paper-facing proof-debt audit."""
 
     scanned_refs: int
     missing_refs: tuple[str, ...]
     findings: tuple[DebtFinding, ...]
+    faithful_boundary_findings: tuple[FaithfulBoundaryFinding, ...]
 
     @property
     def ok(self) -> bool:
@@ -153,19 +181,46 @@ def _line_excerpt(text: str, one_based_line: int) -> str:
     return " ".join(lines[one_based_line - 1].strip().split())
 
 
+def _faithful_boundary_reason(token: str) -> str | None:
+    """Return the paper citation when ``token`` is a faithful boundary input."""
+    return FAITHFUL_BOUNDARY_TOKENS.get(token)
+
+
 def _findings_for_entry(
     root: Path,
     entry: BlueprintEntry,
     decl: LeanDecl,
-) -> list[DebtFinding]:
+) -> tuple[list[DebtFinding], list[FaithfulBoundaryFinding]]:
     lean_path = root / decl.file
     source = lean_path.read_text(encoding="utf-8", errors="replace")
     header, header_start_line = _public_header_after_name(source, decl)
     public_inputs = _public_inputs_before_result_type(header)
 
     findings: list[DebtFinding] = []
+    faithful_boundary_findings: list[FaithfulBoundaryFinding] = []
     for match in DEBT_TOKEN_RE.finditer(public_inputs):
+        token = match.group(0)
         token_line = header_start_line + line_number(public_inputs, match.start()) - 1
+        local_line = line_number(public_inputs, match.start())
+        header_excerpt = _line_excerpt(public_inputs, local_line)
+        reason = _faithful_boundary_reason(token)
+        if reason is not None:
+            faithful_boundary_findings.append(
+                FaithfulBoundaryFinding(
+                    blueprint_file=entry.file,
+                    blueprint_line=entry.line,
+                    env_type=entry.env_type,
+                    label=entry.label,
+                    lean_decl=entry.lean_decl,
+                    lean_file=decl.file,
+                    lean_line=decl.line,
+                    token=token,
+                    token_line=token_line,
+                    header_excerpt=header_excerpt,
+                    reason=reason,
+                )
+            )
+            continue
         findings.append(
             DebtFinding(
                 blueprint_file=entry.file,
@@ -175,14 +230,12 @@ def _findings_for_entry(
                 lean_decl=entry.lean_decl,
                 lean_file=decl.file,
                 lean_line=decl.line,
-                token=match.group(0),
+                token=token,
                 token_line=token_line,
-                header_excerpt=_line_excerpt(
-                    public_inputs, line_number(public_inputs, match.start())
-                ),
+                header_excerpt=header_excerpt,
             )
         )
-    return findings
+    return findings, faithful_boundary_findings
 
 
 def run_audit(root: Path) -> AuditResult:
@@ -196,17 +249,21 @@ def run_audit(root: Path) -> AuditResult:
 
     missing: list[str] = []
     findings: list[DebtFinding] = []
+    faithful_boundary_findings: list[FaithfulBoundaryFinding] = []
     for entry in entries:
         decl = decls.get(entry.lean_decl)
         if decl is None:
             missing.append(entry.lean_decl)
             continue
-        findings.extend(_findings_for_entry(root, entry, decl))
+        entry_findings, entry_faithful = _findings_for_entry(root, entry, decl)
+        findings.extend(entry_findings)
+        faithful_boundary_findings.extend(entry_faithful)
 
     return AuditResult(
         scanned_refs=len(entries),
         missing_refs=tuple(sorted(set(missing))),
         findings=tuple(findings),
+        faithful_boundary_findings=tuple(faithful_boundary_findings),
     )
 
 
@@ -231,6 +288,21 @@ def print_text_report(result: AuditResult) -> None:
             f"    blueprint {finding.blueprint_file}:{finding.blueprint_line} "
             f"env={finding.env_type}{label}"
         )
+        if finding.header_excerpt:
+            print(f"    {finding.header_excerpt}")
+
+    print(f"Faithful boundary input findings: {len(result.faithful_boundary_findings)}")
+    for finding in result.faithful_boundary_findings:
+        label = f" label={finding.label}" if finding.label else ""
+        print(
+            f"  - {finding.lean_file}:{finding.token_line}: "
+            f"{finding.lean_decl} contains {finding.token!r}"
+        )
+        print(
+            f"    blueprint {finding.blueprint_file}:{finding.blueprint_line} "
+            f"env={finding.env_type}{label}"
+        )
+        print(f"    {finding.reason}")
         if finding.header_excerpt:
             print(f"    {finding.header_excerpt}")
 
