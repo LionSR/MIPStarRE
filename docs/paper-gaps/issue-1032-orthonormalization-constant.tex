@@ -1,0 +1,94 @@
+\documentclass{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{xurl}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\setlength{\emergencystretch}{2em}
+
+\input{./command}
+
+\title{The Constant in the Formalized Orthonormalization Theorem}
+\author{}
+\date{2026-05-11}
+
+\begin{document}
+\maketitle
+
+\section{At a glance}
+
+\begin{itemize}
+  \item \textbf{Difficulty.} Medium.  The discrepancy is a scalar loss, but
+  recovering the paper constant requires aligning the local repair lemma with
+  the bipartite self-consistency hypothesis used in the source proof.
+  \item \textbf{Estimated weight.} One reformulated repair theorem, with a
+  moderate amount of project-local scalar and transport work.
+  \item \textbf{Mathlib/project split.} Mostly project-local; Mathlib supplies
+  the elementary real-power inequalities and matrix order infrastructure.
+  \item \textbf{Key inputs.} The Section~5 completion step, the conversion from
+  consistency to almost-projectivity, and the local \(Q/X/\widehat X/P\) repair
+  theorem.
+\end{itemize}
+
+\section{Key theorem forms}
+
+The paper states the orthonormalization theorem with the estimate
+\[
+  A_a \otimes I \approx_{100\zeta^{1/4}} P_a \otimes I.
+\]
+The present formal theorem proves the same conclusion with the estimate
+\[
+  A_a \otimes I \approx_{120\zeta^{1/4}} P_a \otimes I.
+\]
+The input-driven theorem, in which the stronger repair input is supplied
+separately, still has the symbolic \(100\zeta^{1/4}\) envelope.%
+\footnote{The relevant declarations are
+\path{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization},
+\path{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization_ofInput},
+and \path{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer}.
+This note is attached to \ghissue{1032} and \ghpr{1480}.}
+
+\section{The source assertion}
+
+In the source proof of the orthonormalization lemma, the submeasurement \(A\)
+is first completed to a measurement \(\widehat A\).  The completed measurement
+has bipartite strong self-consistency error \(2\zeta\).  The paper then applies
+the main orthonormalization lemma directly at this error level, obtaining
+\[
+  \widehat A_a \otimes I
+    \approx_{84(2\zeta)^{1/4}}
+  \widehat P_a \otimes I.
+\]
+Since \(84\cdot 2^{1/4} < 100\), this gives the advertised
+\(100\zeta^{1/4}\) bound after discarding the completion outcome.
+
+\section{Comparison with the formalization}
+
+The formalized unconditional theorem follows a slightly different route.  After
+completion it converts the \(2\zeta\) self-consistency estimate into a
+source-almost-projective estimate before invoking the locality-preserving
+\(Q/X/\widehat X/P\) repair theorem.  The conversion doubles the scalar:
+\[
+  \operatorname{consistencyToAlmostProjectiveError}(2\zeta)=4\zeta.
+\]
+The local repair theorem then gives
+\[
+  84(4\zeta)^{1/4}
+    = 84\cdot 4^{1/4}\zeta^{1/4}
+    \le 120\zeta^{1/4}.
+\]
+Thus the formalized theorem has the same mathematical shape as the paper
+theorem, but its constant is weaker by the extra factor \(2^{1/4}\) introduced
+by this conversion step.
+
+\section{Conclusion}
+
+The present statement is a documented weakening of the paper constant, not a
+new hypothesis.  To recover the \(100\zeta^{1/4}\) estimate, the local repair
+theorem should be reformulated so that it consumes the completed measurement's
+bipartite strong self-consistency estimate directly, avoiding the intermediate
+conversion to source almost-projectivity.
+
+\bibliographystyle{alpha}
+\bibliography{references}
+
+\end{document}

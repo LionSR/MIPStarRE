@@ -4,6 +4,7 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation.ProjectiveN
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.LayerAlgebra
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.ProjectorApprox
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.PositiveGram.Sigma
+import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 import MIPStarRE.LDT.Preliminaries.CompletionTransfer
 import MIPStarRE.LDT.Preliminaries.DistanceBounds
@@ -11,8 +12,8 @@ import MIPStarRE.LDT.Preliminaries.DistanceBounds
 /-!
 # Section 5 — Locality-preserving projectivization repair
 
-This file proves the currently formalized locality-preserving repair route for
-the late Section 5 `Q/X/XHat/P` argument.
+This file proves the locality-preserving repair route for the late Section 5
+`Q/X/XHat/P` argument.
 
 ## Scope
 
@@ -35,11 +36,11 @@ The main result recorded here:
   constructing the local projective family there, and transporting the final
   estimate back to left lifts.
 
-The theorem proved here is the honest direct output of that route under a
-normalized bipartite state and the source almost-projective estimate for the
-left-lifted measurement. It is therefore stronger in hypotheses than the older
-placeholder `LeftLiftedProjectivizationRepairInput` interface, but it provides
-the unconditional repair step used by the public orthonormalization wrapper.
+The theorem proved here is the direct output of that route under a normalized
+bipartite state and the source almost-projective estimate for the left-lifted
+measurement. It is therefore stronger in hypotheses than the older placeholder
+`LeftLiftedProjectivizationRepairInput` interface, but it provides the
+unconditional repair step used by the public orthonormalization theorem.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -146,48 +147,6 @@ private lemma leftMarginal_ev_eq {ι : Type*} [Fintype ι] [DecidableEq ι] [Non
   rw [← Complex.ofReal_inj]
   simp [normalizedTrace_leftMarginalDensity_mul_eq (ρ := ψ.density) (X := X),
     leftMarginalState]
-
-private def zeroProjSubMeas {Outcome : Type*} {ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι] :
-    ProjSubMeas Outcome ι where
-  toSubMeas :=
-    { outcome := fun _ => 0
-      total := 0
-      outcome_pos := fun _ => le_rfl
-      sum_eq_total := by simp
-      total_le_one := zero_le_one }
-  proj := fun _ => by simp
-
-private lemma qSDD_liftLeft_zeroProjSubMeas_le_one {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι] [Fintype Outcome]
-    (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized)
-    (A : Measurement Outcome ι) :
-    qSDD ψ A.toSubMeas.liftLeft
-      ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft) ≤ 1 := by
-  have hq :
-      qSDD ψ A.toSubMeas.liftLeft
-          ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft) =
-        ∑ a : Outcome, ev ψ ((A.toSubMeas.liftLeft.outcome a) *
-          (A.toSubMeas.liftLeft.outcome a)) := by
-    unfold qSDD qSDDCore
-    refine Finset.sum_congr rfl ?_
-    intro a _
-    have hzero :
-        ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft).outcome a = 0 := by
-      simp [zeroProjSubMeas, SubMeas.liftLeft, leftTensor]
-    calc
-      ev ψ
-          (((A.toSubMeas.liftLeft.outcome a -
-              ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft).outcome a)ᴴ) *
-            (A.toSubMeas.liftLeft.outcome a -
-              ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft).outcome a))
-        = ev ψ ((A.toSubMeas.liftLeft.outcome a)ᴴ * A.toSubMeas.liftLeft.outcome a) := by
-            rw [hzero]
-            simp
-      _ = ev ψ ((A.toSubMeas.liftLeft.outcome a) * A.toSubMeas.liftLeft.outcome a) := by
-            rw [SubMeas.outcome_hermitian A.toSubMeas.liftLeft a]
-  rw [hq]
-  simpa using MIPStarRE.LDT.Preliminaries.subMeas_diagMass_le_one ψ hψ A.toSubMeas.liftLeft
 
 private lemma projectivizationRepair_small_error_bound {ζ : Error}
     (hζ : 0 ≤ ζ) (hζ_small : ζ ≤ 1 / (4 : Error)) :
@@ -305,7 +264,7 @@ The proof follows the paper's late repair stage: rank reduction to `Q`, the
 `Q`/`sqrt Q` completeness estimates, the `X/XHat/P` construction, and the final
 triangle-inequality assembly. The locality-preserving form (output `P_a ⊗ I`
 rather than an arbitrary lifted family) is the form used in the unconditional
-wrapper for `thm:orthonormalization`.
+orthonormalization theorem.
 
 Paper origin: `references/ldt-paper/orthonormalization.tex` lines 534–860
 (rank reduction `lem:projective-low-rank-sum` and the `Q`-side setup:
@@ -314,7 +273,7 @@ Paper origin: `references/ldt-paper/orthonormalization.tex` lines 534–860
 proper: `lem:X-squared`, `lem:X-hat-squared`, `lem:X-times-X-hat`,
 `lem:squared-difference`, `lem:P-projectivity`, `lem:P-Q-approx`, plus the
 final triangle-inequality assembly producing the `84 ζ^{1/4}` bound captured
-by `roundingToProjectiveError ζ`). Together these constitute the late
+by `orthonormalizationMainLemmaError ζ`). Together these constitute the late
 repair stage of the orthogonalization-lemma proof.
 
 The paper's proof transports the rounded family produced by
@@ -324,8 +283,8 @@ algebra (formalized as `QXPLayerData` and the sigma-range positive-Gram
 construction) to a genuine projective sub-measurement `P = {P_a}` with
 closeness `A_a ⊗ I ≈_{orthonormalizationMainLemmaError ζ} P_a ⊗ I`. The
 locality-preserving form (output `P_a ⊗ I` rather than an arbitrary lifted
-family) is the specialization used by the unconditional wrapper around
-`thm:orthonormalization`.
+family) is the specialization used by the unconditional orthonormalization
+theorem.
 -/
 theorem leftLiftedProjectivizationRepairProducer
     {Outcome : Type*} {ι : Type*}
@@ -337,9 +296,7 @@ theorem leftLiftedProjectivizationRepairProducer
       ∑ a, ev ψ
         ((leftLiftedMeasurement (ιB := ι) A).outcome a -
           (leftLiftedMeasurement (ιB := ι) A).outcome a *
-            (leftLiftedMeasurement (ιB := ι) A).outcome a) ≤ ζ)
-    (_hSpectral :
-      SpectralTruncationStatement ψ (leftLiftedMeasurement (ιB := ι) A) ζ) :
+            (leftLiftedMeasurement (ιB := ι) A).outcome a) ≤ ζ) :
     ∃ P : ProjSubMeas Outcome ι,
       RoundedProjMeasStatement ψ (leftLiftedMeasurement (ιB := ι) A)
         (ProjSubMeas.liftLeft P) (orthonormalizationMainLemmaError ζ) := by
@@ -450,7 +407,7 @@ theorem leftLiftedProjectivizationRepairProducer
     have hzero :
         qSDD ψ A.toSubMeas.liftLeft
           ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft) ≤ 1 :=
-      qSDD_liftLeft_zeroProjSubMeas_le_one ψ hψ A
+      qSDD_liftLeft_zeroProjSubMeas_le_one ψ hψ A.toSubMeas
     have hbound : 1 ≤ orthonormalizationMainLemmaError ζ :=
       one_le_orthonormalizationMainLemmaError_of_quarter_lt (lt_of_not_ge hζ_small)
     constructor

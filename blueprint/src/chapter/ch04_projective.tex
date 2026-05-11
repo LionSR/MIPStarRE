@@ -58,14 +58,16 @@
 
 \begin{theorem}[Orthogonalization lemma]\label{thm:orthonormalization}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
+	\leanok
 	% In Lean, normalization is an explicit hypothesis because the ambient state
 	% record contains positive semidefinite density matrices of arbitrary
 	% normalized trace; this matches the paper's convention that a state is
 	% normalized.
-	% The Lean wrapper now uses the currently formalized direct local $Q/X/\widehat X/P$
-	% repair route on the completed measurement. That route yields the explicit
-	% envelope $120\zeta^{1/4}$; the stronger symbolic $100\zeta^{1/4}$ bound remains
-	% available in the input-driven theorem `orthonormalization_ofInput`.
+	% The paper states the sharper constant $100\zeta^{1/4}$.
+	% The present direct local $Q/X/\widehat X/P$ route on the completed
+	% measurement yields $120\zeta^{1/4}$ because it first converts the
+	% $2\zeta$ self-consistency error to a $4\zeta$ source-almost-projective
+	% error. See docs/paper-gaps/issue-1032-orthonormalization-constant.tex.
 	\uses{def:strong-self-consistency, def:approx_delta}
 	Let $\ket{\psi}$ be a permutation-invariant state,
 	and let $A = \{A_a\}$ be a sub-measurement with strong self-consistency
@@ -306,11 +308,10 @@
 	\leanok
 	Paper origin: \texttt{references/ldt-paper/orthonormalization.tex} lines 534--860 (rank reduction and the $Q$-side setup, including \ref{lem:xa-t} and \ref{lem:qa-restated}) and 862--1194 (the $X/\widehat X/P$ algebra: \ref{lem:X-squared}, \ref{lem:X-hat-squared}, \ref{lem:X-times-X-hat}, \ref{lem:squared-difference}, \ref{lem:P-projectivity}, \ref{lem:P-Q-approx}, plus the final triangle-inequality assembly producing the $84\zeta^{1/4}$ bound). Together these are the late repair stage of the orthogonalization-lemma proof.
 
-	Current Lean status: the declaration proves the direct local $Q/X/\widehat X/P$
-	route under a normalized bipartite state, the source almost-projective estimate
-	for the left-lifted measurement, and an explicit spectral-truncation witness for
-	that left-lifted family. It therefore yields a locality-preserving repair with
-	the explicit error $84\zeta^{1/4}$, rather than the earlier placeholder
+	The declaration proves the direct local $Q/X/\widehat X/P$ route under a
+	normalized bipartite state and the source almost-projective estimate for
+	the left-lifted measurement. It therefore yields a locality-preserving repair
+	with the explicit error $84\zeta^{1/4}$, rather than the earlier placeholder
 	interface at error $\mathsf{roundingToProjectiveError}(\zeta)$.
 
 	More precisely, if $\ket{\psi}$ is a normalized bipartite state, if
@@ -325,14 +326,16 @@
 	\]
 	The locality-preserving form -- output $P_a \ot I$ rather than an arbitrary
 	lifted family -- is recorded in
-	Remark~\ref{rem:lean-orthonormalization-main-declarations} and is what the
-	unconditional Lean orthonormalization wrapper uses.
+	Remark~\ref{rem:lean-orthonormalization-main-declarations} and is the form
+	required by the unconditional orthonormalization theorem
+	(\ref{thm:orthonormalization}).
 \end{lemma}
 \begin{proof}
-	Lean proves this by passing to the left marginal state, applying the local
-	rank-reduction and $Q/X/\widehat X/P$ construction there, and transporting the
-	resulting $\approx_{84\zeta^{1/4}}$ estimate back to left lifts. This is the
-	honest output of the currently formalized late-repair chain.
+	\leanok
+	Pass to the left marginal state, apply the rank-reduction and
+	$Q/X/\widehat X/P$ construction there, and transport the resulting
+	$\approx_{84\zeta^{1/4}}$ estimate back to left lifts via the left-marginal
+	expectation formula.
 \end{proof}
 
 \begin{remark}[Lean conditional declaration: local orthogonalization]\label{rem:conditional-orthonormalization-main-lemma-local}
@@ -384,6 +387,8 @@
 \end{remark}
 
 \begin{proof}[Proof of \ref{thm:orthonormalization} assuming \ref{lem:orthonormalization-main-lemma}]
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
+	\leanok
 	\proves{thm:orthonormalization}
 	\uses{prop:other-two-notions-of-self-consistency, lem:orthonormalization-main-lemma}
 
@@ -416,7 +421,7 @@
 	\[
 		A_a \ot I \approx_{84(2\zeta)^{1/4}} P_a \ot I,
 	\]
-	and $84 \cdot 2^{1/4} \leq 100$, so the claimed bound follows.
+	and $84 \cdot 2^{1/4} \leq 100 \leq 120$, so the stated bound follows.
 \end{proof}
 
 \begin{proof}[Proof of \ref{lem:orthonormalization-main-lemma}]
