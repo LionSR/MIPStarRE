@@ -111,7 +111,7 @@
 	formalization.  It also assumes a measurement whose underlying submeasurement
 	is the given one.  These are not hypotheses of the paper theorem; they are
 	proof obligations to be discharged when the Chapter~\ref{chap:self-improvement}
-	statement is made source-faithful.
+	statement matches the paper theorem.
 \end{remark}
 
 \begin{theorem}[Pasting]\label{thm:ld-pasting-in-induction-section}
@@ -389,9 +389,9 @@
 
 \begin{remark}[Lean auxiliary data for role-register symmetrization]\label{rem:symmetrization-data}
 	\lean{MIPStarRE.LDT.SameSpaceProjStrat.StrategySymmetrizationPackage, MIPStarRE.LDT.SameSpaceProjStrat.StrategySymmetrizationPackage.strategySymmetrization_isGood, MIPStarRE.LDT.SameSpaceProjStrat.StrategySymmetrizationPackage.strategySymmetrization_isNormalized, MIPStarRE.LDT.SameSpaceProjStrat.strategySymmetrizationPackage}
-	The formal proof of Theorem~\ref{thm:main-formal} also uses a named datum
+	The formal proof of Theorem~\ref{thm:main-formal} also uses auxiliary bundled data
 	containing the symmetrized strategy, its goodness proof, and its normalization
-	proof.  This datum is auxiliary structure for the final assembly, not an
+	proof.  This auxiliary data supports the final assembly, not an
 	additional hypothesis in Lemma~\ref{lem:symmetrization-bridge}.
 \end{remark}
 
