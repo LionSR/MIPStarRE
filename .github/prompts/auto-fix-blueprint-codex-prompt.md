@@ -14,6 +14,11 @@ Instructions:
      internal helper, do not add a misleading tag; instead leave a clear PR
      comment explaining why the public helper should not be represented in the
      blueprint.
+   - Source-labelled theorem alignment: do not fix blueprint sync by pointing a
+     paper theorem, lemma, or proposition to a conditional helper with bridge,
+     residual, repair, package, producer, or arbitrary hypothesis inputs that
+     are not in `references/ldt-paper/`. Such helpers may be mentioned only as
+     conditional implementation lemmas, without `\leanok` for the source theorem.
    - Malformed LaTeX: Missing closing braces, unescaped special characters, etc.
    - plasTeX parse errors: These often point to unsupported LaTeX commands. Simplify or wrap in \ifplastex guards.
 3. GitHub annotations titled "Blueprint update suggested" are actionable
