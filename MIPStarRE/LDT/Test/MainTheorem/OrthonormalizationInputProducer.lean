@@ -3,7 +3,7 @@ import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationData
 /-!
 # Diagonal orthonormalization input from role residual
 
-This file bridges the Section 6 role residual to the diagonal orthonormalization
+This file relates the Section 6 role residual to the diagonal orthonormalization
 inputs consumed by `mainFormal`.  The combining lemma that packages these into
 the full `MainFormalBaseRepairedBridgeHypotheses` lives in `MainFormal.lean`
 (where that structure is defined).
@@ -21,7 +21,8 @@ the full `MainFormalBaseRepairedBridgeHypotheses` lives in `MainFormal.lean`
   with itself).  The role residual's `diagonalConsistency` gives cross consistency
   `ConsRel G^A G^B ζ₁` (the two POVMs with each other), which is a different type.
   Diagonal self-consistency is therefore a **separate hypothesis** that must be
-  supplied alongside the repair witnesses when constructing `hbaseBridge`.
+  supplied alongside the repair witnesses for the base-case repaired-input
+  obligation in `mainFormal`.
 
 * **Locality-preserving repair**: the `LeftLiftedProjectivizationRepairInput`
   parameters require QXP-layer data (a `QXPLayerData` with a projective `P`
@@ -33,7 +34,7 @@ the full `MainFormalBaseRepairedBridgeHypotheses` lives in `MainFormal.lean`
 
 * Issue #1359 — orthonormalization hypothesis chain
 * Issue #931 — self-improvement bridge inputs
-* Issue #1043 — base-case bridge construction (`hbaseBridge`)
+* Issue #1043 — base-case repaired-input construction
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
