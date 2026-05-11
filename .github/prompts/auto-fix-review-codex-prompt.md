@@ -8,6 +8,12 @@ Instructions:
 4. If the review state is "APPROVED" with no comments requiring changes, do nothing.
 5. Common fixes:
    - Remove `sorry` and fully close the lemma/theorem.
+   - Do not close a proof obligation by changing a paper-labelled theorem statement or
+     adding bridge, residual, repair, producer, package, or arbitrary implication
+     hypotheses absent from the cited statement.
+   - If the proof cannot be completed without such a change, stop and post a PR comment
+     naming the missing lemma or producer theorem instead of pushing a weakened paper
+     theorem.
    - Fix naming to match Mathlib conventions.
    - Add missing docstrings where requested.
    - Fix type mismatches or tactic failures.
@@ -27,8 +33,8 @@ Instructions:
 
 Quality bar (your fix MUST satisfy ALL of these before committing):
 - Proof integrity (BLOCKER): no sorry, admit, native_decide on non-trivial goals, unsafeCast, or new axioms. See docs/PROOF_INTEGRITY.md.
-- Proof correctness (BLOCKER): structured proofs, not brute-force tactic chains. If a result looks wrong, scout `references/ldt-paper/` and cite the specific paper/section.
-- Statement faithfulness (BLOCKER): for any declaration named as, linked to, or documented as a paper theorem, do not address review feedback by adding bridge, residual, repair, package, producer, or arbitrary hypothesis inputs unless they are faithful formal encodings of the cited paper statement. If the proof is blocked, report the missing lemma or create a separately named conditional helper; do not change the paper theorem into a conditional theorem.
+- Proof correctness (BLOCKER): structured proofs, not brute-force tactic chains. If a result looks wrong, scout `references/ldt-paper/` first, then `blueprint/src/chapter/`, and cite the specific source path, label, and line.
+- Statement faithfulness (BLOCKER): for any declaration named as, linked to, or documented as a paper theorem, do not address review feedback by adding bridge, residual, repair, package, producer, or arbitrary hypothesis inputs unless they occur in the cited statement or are documented Lean boundary conditions needed to state the mathematics. If the proof is blocked, report the missing lemma or create a separately named conditional helper; do not change the paper theorem into a conditional theorem.
 - Mathlib style: camelCase defs, snake_case lemmas, minimal imports, no unnecessary opens.
 - Type safety (BLOCKER): no universe issues, missing instances, or coercion failures.
 - Performance: avoid `decide` on large types, unbounded `simp`, deep `rw` chains.
