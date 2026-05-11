@@ -242,11 +242,11 @@ lemma selfImprovementHelper
       helper_point_consistency_of_pointConsistencyAddInU_transfer
         params strategy eps delta heps hdelta hpointTransfer
   · /- TODO(#1452): Derive `HelperStrongSelfConsistencyProducerInputs` for the
-      helper output from the Section 9 scalar transport estimates, then close this
-      field with `helper_strong_self_consistency_of_helper_conclusion` or
+      helper output from the Section 9 scalar transport estimates, then prove this
+      condition with `helper_strong_self_consistency_of_helper_conclusion` or
       `helper_strong_self_consistency_input_of_producer`.
 
-      The named producer path currently requires the five estimates packaged by
+      This route currently uses the five estimates required by
       `helper_producer_inputs_of_selfConsistency_localVariance_scalarTransports`:
       the two off-diagonal variance swaps, the two post-`delete-an-A` transports,
       and the final lower bound on the `move-over-v` endpoint.  Its final
