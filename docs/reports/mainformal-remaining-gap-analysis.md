@@ -1,6 +1,13 @@
-# MainFormal Remaining `sorry` — Gap Analysis
+# Historical MainFormal Remaining `sorry` — Gap Analysis
 
 Date: 2026-05-07
+
+> **Status note, 2026-05-11.**  This report describes the older conditional
+> `mainFormal` shape.  It should be read as historical analysis of the missing
+> producers, not as a recommendation to add hypotheses to the paper-facing
+> theorem.  The current repair keeps `mainFormal` aligned with
+> `thm:main-formal` and places bridge assumptions only in
+> `mainFormal_ofRepairedBridge` or in producer obligations tracked by #1458.
 
 ## 1. Exact sorry site
 
@@ -214,7 +221,11 @@ None of the active PRs directly fills the gap. They are building the self-improv
 **Why blocked:** `mainFormal` lacks the successor induction hypotheses needed to invoke any of the existing successor role-residual constructors.
 
 **Resolution options:**
-- **(a)** Add `answerSuccessorPerSliceInductionPackageInput` and `answerSuccessorSelfImprovementBridgeInput` as additional hypotheses to `mainFormal`
+- **(a, historical)** Add `answerSuccessorPerSliceInductionPackageInput` and
+  `answerSuccessorSelfImprovementBridgeInput` as additional hypotheses to
+  `mainFormal`.  This route is no longer acceptable for the source-facing
+  theorem; the same data must be produced internally or isolated in a conditional
+  helper.
 - **(b)** Embed `mainFormal` in a recursive induction that provides these from an outer induction hypothesis
 - **(c)** Add `successorRecursiveSlicesInput` and `successorSelfImprovementBridgeInput` as hypotheses and use the ordinary successor route
 
@@ -232,15 +243,23 @@ None of the active PRs directly fills the gap. They are building the self-improv
 
 ### Gap 3 (INFRA): Base-case bridge construction
 
-**What:** `mainFormal` takes `hbaseBridge` as an unproven hypothesis. #1043 tracks constructing this hypothesis.
+**Historical what:** the older conditional theorem shape took `hbaseBridge` as
+an unproved hypothesis.  In the current repair, this hypothesis belongs to
+`mainFormal_ofRepairedBridge`, while #1043 tracks the corresponding producer
+obligation.
 
-**Status:** `hbaseBridge` is used by both base and successor cases. It's an orthogonal gap to the successor case — it needs to be discharged regardless of which successor route is chosen.
+**Status:** the repaired bridge is orthogonal to the successor case.  It needs to
+be produced from the paper hypotheses regardless of which successor route is
+chosen.
 
 **Tracked by:** #1043
 
 ## 8. Which approach makes the single `sorry` disappear?
 
-**Minimum closure:** Add the missing hypotheses to `mainFormal` (Gap 1) and use Route A (simple). This replaces the `sorry` with a call to the existing constructors, making `mainFormal` "sorry-free" — but now with additional hypotheses that track the remaining unformalized analytic content (the successor bridge inputs and per-slice induction package).
+**Historical minimum closure:** Add the missing hypotheses to `mainFormal`
+(Gap 1) and use Route A.  This would replace the `sorry` with a call to the
+existing constructors, but it would also strengthen the source-facing theorem by
+adding non-paper assumptions.  The current repair policy rejects this route.
 
 **Complete closure:** Discharge `hbaseBridge` (#1043), then prove the successor bridge inputs (#931), then prove the per-slice induction package (which itself would need a recursive application of `mainFormal`). This closes `mainFormal` completely without extra hypotheses but requires a well-founded recursion setup.
 

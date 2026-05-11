@@ -98,38 +98,38 @@ are being actively removed.
        (G : SubMeas (Polynomial params) ι) ... : ...
    ```
 
-3. **Propagation is a warning sign.**  The consumer of a conditional helper
-   should close the hypothesis with a producer theorem as soon as possible.  If
-   the hypothesis propagates upward toward a paper-labelled theorem, the PR
-   should stop and either prove the producer or restore the paper theorem with
-   an explicit unfinished proof.
+3. **Propagation is a warning sign.**  The consumer of
+   `selfImprovementInInductionSection` — typically a
+   `MainInductionStep` wrapper — should close the hypothesis with a producer
+   theorem as soon as possible.  If the hypothesis propagates upward toward a
+   paper-labelled theorem, the PR should stop and either prove the producer or
+   restore the paper theorem with an explicit unfinished proof.
 
-4. **Final closure at assembly.**  The paper-labelled theorem, for instance
-   `mainFormal` for `\Cref{thm:main-formal}`, must not expose the remaining
-   bridge hypotheses as part of its public statement.  If the corresponding
-   proof step has not yet been formalized, the conditional statement belongs in
-   a helper such as `mainFormal_ofRoleResidualAndRepairedBridge`, whose name
-   records that it assumes additional data:
+4. **Final closure at the source theorem.**  The theorem `mainFormal` in
+   `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` is reserved for the
+   paper-shaped statement.  The older strengthened-hypothesis form has
+   been moved to the conditional helper `mainFormal_ofRepairedBridge`,
+   which takes a single `hbaseBridge` hypothesis:
 
    ```lean
-   theorem mainFormal_ofRoleResidualAndRepairedBridge
-       {params : Parameters} [FieldModel.{0} params.q]
-       {ι : Type*} [Fintype ι] [DecidableEq ι]
-       {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-       {hpass : strategy.PassesLowIndividualDegreeTest eps}
-       {scalars : MainFormalCascadeScalars params eps k}
-       (hsmall : ¬ 1 ≤ mainFormalError params k eps)
-       (roleResidual :
-         MainFormalRolePackageResidual params strategy eps hpass k)
-       (bridge :
-         MainFormalRepairedBridgeHypotheses
-           params strategy eps k hpass scalars roleResidual) :
+   theorem mainFormal_ofRepairedBridge
+       (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} ...
+       (hbaseBridge : (scalars : MainFormalCascadeScalars params eps k) →
+         ∀ (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k),
+         MainFormalRepairedBridgeHypotheses params strategy eps k hpass scalars roleResidual) :
        ∃ G_A G_B : ProjMeas (Polynomial params) ι, ... := ...
    ```
 
+   The paper-shaped `mainFormal` invokes this helper and leaves the
+   repaired-hypotheses construction as an explicit tracked proof
+   obligation.  There are two direct tracked `sorry` sites in this file:
+   the successor projective-completion residual producer, and the final
+   derivation of `MainFormalRepairedBridgeHypotheses` from the paper
+   hypotheses.
+
    The paper-labelled `mainFormal` should have the hypotheses of the paper
    theorem: a projective strategy passing the low individual degree test, the
-   stated parameter bounds, and the faithful formal encoding of the ambient
+   stated parameter bounds, and the faithful formalization of the ambient
    domains.  Bridge, residual, repair, producer, and package inputs must be
    produced inside its proof rather than added to its statement.
 
@@ -148,21 +148,26 @@ are being actively removed.
 | `MakingMeasurementsProjective.OrthonormalizationInput` | `MakingMeasurementsProjective/Statements.lean` | Spectral truncation + repair witnesses for the orthonormalization lemma |
 | `LdPastingContext` | `Pasting/Defs/Context.lean` | All auxiliary hypotheses for `ldPasting` (good, scalar bounds, complete, consistent, self-consistent, bounded) |
 
-### The remaining proof obligation in `MainFormal.lean`
+### The remaining proof obligations in `MainFormal.lean`
 
-The successor branch of `mainFormal` still has a proof obligation whose
-mathematical content is the construction of the intermediate data used in the
-conditional helper.  The TODO comments list three items:
+The direct tracked `sorry` sites in `MainFormal.lean` record two remaining
+construction obligations:
 
-1. A `MainFormalRolePackageBranchResidual` constructed from
+1. The successor projective-completion residual producer, whose TODO comments
+   list three items:
+
+   1. A `MainFormalRolePackageBranchResidual` constructed from
    predecessor/successor induction data,
-2. Line-130 orthonormalization inputs (`MainFormalPostRolePackageDiagonalOrthonormalizationInput`),
-3. Completion input derived from `completingToMeasurement`.
+   2. Line-130 orthonormalization inputs
+      (`MainFormalPostRolePackageDiagonalOrthonormalizationInput`),
+   3. Completion input derived from `completingToMeasurement`.
+2. The derivation of `MainFormalRepairedBridgeHypotheses` from the paper
+   hypotheses of `mainFormal`.
 
-These are all data-construction obligations.  Once the per-slice
-self-improvement producers and recursive induction packages are threaded
-through, the paper-labelled theorem should call the checked conditional helper
-without adding its bridge inputs to the theorem statement.
+These are data-construction obligations.  Once the per-slice self-improvement
+producers and recursive induction packages are threaded through, the
+paper-labelled theorem should call the conditional helper without adding its
+bridge inputs to the theorem statement.
 
 This is the intended cleanup direction: use the conditional helper only to
 identify reusable proof content, then prove the producers or restore the
@@ -229,9 +234,10 @@ appeared non-green there (Ch09 pasting lemmas, Ch10 induction helpers)
 already have `\leanok` in the current blueprint source files.  The web
 build needs regeneration.
 
-### Deliberate absence of `\leanok`
+### Deliberate withholding of `\leanok`
 
-Some nodes have `\lean{}` but deliberately omit `\leanok`:
+Some nodes have `\lean{}` but deliberately omit either statement-level or
+proof-level `\leanok`:
 
 - **`thm:orthonormalization`** (ch04): The Lean statement carries extra
   hypotheses (`OrthonormalizationInput`) that are not yet discharged by
@@ -243,8 +249,12 @@ Some nodes have `\lean{}` but deliberately omit `\leanok`:
   the paper.  The comment in the blueprint explicitly says "no \leanok
   is claimed."
 
-- **`thm:main-formal`** (ch02): The 1 `sorry` in `MainFormal.lean` means
-  the proof chain is not yet closed.
+- **`thm:main-formal`** (ch02): The blueprint links to
+  `MIPStarRE.LDT.Test.mainFormal`, the intended Lean transcription of the
+  theorem statement.  The tracked `sorry` sites in `MainFormal.lean` mean the
+  proof chain is not yet closed, so `\leanok` is deliberately withheld for this
+  theorem until the repaired-hypotheses and successor-residual obligations are
+  discharged.
 
 ### The `\uses{}` convention
 

@@ -1,6 +1,7 @@
 # SelfImprovement Bridge Integrity Audit
 
 Date: 2026-05-07
+Updated: 2026-05-11, after the source-faithful `mainFormal` repair.
 Auditor: Research specialist (read-only analysis)
 Scope: `MIPStarRE/LDT/SelfImprovement/` → `MIPStarRE/LDT/Pasting/` →
        `MIPStarRE/LDT/MainInductionStep/` → `MIPStarRE/LDT/Test/MainTheorem/`
@@ -9,19 +10,24 @@ Scope: `MIPStarRE/LDT/SelfImprovement/` → `MIPStarRE/LDT/Pasting/` →
 
 ## Executive Summary
 
-**The user's concern is valid.**  "东西没连起来…一开始lean，然后分别放了假设" (things
-aren't connected … initially Lean, then they put assumptions separately).
+The bridge-debt concern is valid.  Several formal interfaces still record
+intermediate mathematical obligations as explicit inputs to conditional helper
+theorems.  Such helpers may preserve useful downstream proof content, but they
+must not be presented as theorems from the paper.
 
 The SelfImprovement module compiles with all its lemmas, the Pasting module
 compiles independently, and the MainInductionStep module wires them together in
-principle — but the **final assembly at `mainFormal` has one `sorry` in the
-successor branch** (line 611 of `MainFormal.lean`).  The individual pieces are
-proved, but the "last mile" of the dependency chain — producing the
-self-improvement bridge inputs for the successor case — is not yet written.
+principle.  The remaining gap is now represented in the correct place:
+`mainFormal` is again the paper-facing theorem statement, while
+`mainFormal_ofRepairedBridge` is the conditional assembly theorem.  The public
+`mainFormal` theorem does not take the repaired bridge as an additional
+hypothesis; instead it contains a tracked proof obligation to produce that
+bridge from the paper hypotheses.
 
-The architecture is _not_ broken: the wiring functions exist.  The gap is that
-`mainFormal` does not take the hypotheses those wiring functions need, and nobody
-calls the wiring functions from within `mainFormal`.
+The architecture is therefore incomplete, but the theorem boundary is no longer
+misstated.  The remaining work is to turn the bridge inputs and residual
+packages into producer theorems, and then call those producers from the
+paper-facing theorem.
 
 ---
 
@@ -116,19 +122,26 @@ this hypothesis through to its callers.
 
 **Module:** `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean`
 
-`mainFormal` (line 507) takes:
+The current source-facing theorem `mainFormal` takes the paper hypotheses,
+together with the large-`k` and positivity boundary hypotheses tracked elsewhere
+in the project.  It does **not** take `hbaseBridge`, role residual data, or final
+projective-completion inputs.
 
-- `hbaseBridge`: provides `MainFormalRepairedBridgeHypotheses` for the base case
-- A successor branch that is `sorry` (line 611)
+The conditional helper `mainFormal_ofRepairedBridge` takes:
 
-**Base case (m=1):** Works.  `hbaseBridge` provides orthonormalization +
-diagonal consistency inputs, and `mainFormal_ofRoleResidualAndRepairedBridge`
-completes the proof.
+- `hbaseBridge`: a producer-shaped assumption for
+  `MainFormalRepairedBridgeHypotheses`;
+- a successor branch whose residual construction is still a tracked `sorry`.
 
-**Successor case (m>1):** `sorry`.  The comment says:
+**Base case (m=1):** Works inside the conditional helper.  The base role
+residual is produced by the checked handoff, and `hbaseBridge` supplies the
+orthonormalization and diagonal-consistency inputs needed by
+`mainFormal_ofRoleResidualAndRepairedBridge`.
 
-> TODO(#931, #834, #422): supply those successor inputs and assemble the
-> resulting role residual into a Step 6 witness residual.
+**Successor case (m>1):** incomplete.  The comment in `MainFormal.lean`
+identifies the missing work as supplying the ordinary or answer-valued recursive
+induction witnesses, the per-slice self-improvement package producers, and the
+resulting Step 6 witness residual.
 
 #### What's needed in the successor case:
 
@@ -139,12 +152,12 @@ completes the proof.
    `MainFormalSuccessorSelfImprovementBridgeInputs` (typed by
    `successorSelfImprovementBridgeInput` in `RoleRegister.lean`).
 
-Both are "just" type aliases for `Prop`-valued functions asking for:
+Both are type aliases for `Prop`-valued functions asking for:
 - Per-slice induction conclusions (`ConsRel` with bounded error) for the
   predecessor's restricted strategies
 - Per-slice `SelfImprovementBridgeInputs` for the honest slice strategies
 
-#### What exists but isn't called:
+#### What exists but is not yet connected:
 
 The assembly functions in `RoleRegister.lean` are all ready:
 
@@ -155,9 +168,11 @@ The assembly functions in `RoleRegister.lean` are all ready:
 - Their corresponding `rolePackageResidual_of*` wrappers produce
   `MainFormalRolePackageResidual`
 
-**The gap is in `mainFormal`:** it doesn't take these hypotheses.  The successor
-branch says "`hprojectiveCompletionResidual := sorry`" because it has no
-successor induction package or self-improvement bridge inputs in scope.
+The gap is now a producer gap rather than a statement-signature gap.  The
+successor branch in `mainFormal_ofRepairedBridge` still has
+`hprojectiveCompletionResidual := sorry` because the proof has not yet produced
+the successor induction package and self-improvement bridge inputs from the
+paper hypotheses.
 
 ---
 
@@ -255,18 +270,23 @@ theorem.
 `AveragedPastingInput.output` (in `PackageConstructors.lean:357`) calls
 `ldPastingInInductionSection`, which calls `Pasting.ldPasting`.
 
-### 3.6. mainInductionByRecursionOnM → mainFormal successor bridge: ❌ INCOMPLETE
+### 3.6. mainInductionByRecursionOnM → mainFormal bridge producer: INCOMPLETE
 
-This is the `sorry` at `MainFormal.lean:611`.  The gap is that `mainFormal`
-needs:
+The conditional helper `mainFormal_ofRepairedBridge` still has a tracked `sorry`
+in the successor branch.  The source-facing theorem `mainFormal` also has a
+tracked proof obligation whose purpose is to derive the repaired bridge consumed
+by that helper.  These are not new assumptions on the paper theorem.
+
+The missing successor construction needs:
+
 - A recursive per-slice induction package for the predecessor
 - Self-improvement bridge inputs for the predecessor slices
+- The ordinary or answer-valued role residual used by the final Step 6 assembly
 
-Neither of these is provided to `mainFormal` as a hypothesis, nor produced
-internally.
-
-The wiring functions (`successorOfBridgeInputs`, etc.) exist in `RoleRegister.lean`
-but are not called from `mainFormal`.
+The wiring functions (`successorOfBridgeInputs`, `answerSuccessorOfBridgeInputs`,
+and their residual constructors) exist in `RoleRegister.lean`, but the
+source-facing theorem still lacks the producer theorem that constructs their
+inputs from the paper hypotheses.
 
 ---
 
@@ -277,7 +297,7 @@ but are not called from `mainFormal`.
 | SelfImprovement | ~50 theorems/lemmas | 3 public theorems (`selfImprovementHelper`, `selfImprovement`, `selfImprovementFromBridgeInputs`) | All three take explicit hypotheses; internal sub-lemmas are proved but the bridge inputs are not discharged internally |
 | SelfImprovement sub-lemmas (slackness, matrix bridge) | ~15 proved lemmas | 0 called from MI or MT | Entirely orphan |
 | MainInductionStep | `selfImprovementInInductionSection`, `SelfImprovementPackage.ofSliceBridgeInputs`, `ldPastingInInductionSection`, `mainInductionByRecursionOnM` | All wired together in `MainTheorems.lean` | `mainInductionByRecursionOnM` takes `hselfProducer` as hypothesis; `mainInductionPublicWrapper` passes this through |
-| MainTheorem | `mainFormal` | Base case wired via `hbaseBridge` | Successor case: 1 `sorry` at `MainFormal.lean:611` |
+| MainTheorem | `mainFormal`, `mainFormal_ofRepairedBridge` | Paper-facing theorem separated from conditional bridge assembly | Repaired bridge producer and successor residual remain tracked proof obligations |
 
 ---
 
@@ -285,48 +305,48 @@ but are not called from `mainFormal`.
 
 ### Is the concern real?
 
-**Yes.** The user's characterization "一开始lean，然后分别放了假设" is accurate:
+**Yes.** The earlier formalization pattern really did risk replacing proof work
+by additional hypotheses:
 
 1. **Lean compiles** — all individual lemmas in SelfImprovement, Pasting, and
-   MainInductionStep compile successfully.  There is only 1 `sorry` in the
-   entire LDT directory (`MainFormal.lean:611`).
+   MainInductionStep compile successfully, while the final theorem still has
+   tracked proof obligations in `MainFormal.lean`.
 
-2. **"然后分别放了假设"** — the three bridge inputs
+2. The three bridge inputs
    (`helperStrongSelfConsistency`, `orthonormalization`, `finalFields`) are
-   separately stated as hypotheses.  They are proved in isolation within
-   SelfImprovement's submodules (the internal lemmas are all proved), but
-   these are `Type`-valued structures that produce the hypotheses as
-   conditional implications.  The *assertion* that the bridge inputs are
-   unconditionally satisfied for every good strategy is not proved.
+   separately stated as hypotheses for conditional interfaces.  Some components
+   are proved in isolation within SelfImprovement's submodules, but the
+   assertion that the full bridge input package is produced from every good
+   strategy is not yet available at the source-facing call site.
 
-3. **The successor gap** is the concrete manifestation: `mainFormal` needs
-   `SelfImprovementBridgeInputs` for each predecessor slice, but it doesn't
-   have a predecessor induction package to feed them with.
+3. The successor gap is the concrete manifestation: the final assembly needs
+   `SelfImprovementBridgeInputs` for each predecessor slice, together with the
+   corresponding predecessor induction package.
 
 ### Is the architecture broken?
 
-**No.** The architecture is sound.  The wiring functions from
-`RoleRegister.lean` are complete and would close the gap if called.  The
-pattern (take extra hypotheses as parameters, discharge them at the top-level
-assembly point) is a legitimate mathematical design, documented in session 49's
-blueprint audit.  What's missing is the actual call site in `mainFormal`.
+The architecture is usable but incomplete.  The wiring functions from
+`RoleRegister.lean` describe the intended assembly, and conditional helpers are
+legitimate local proof-frontier objects.  The source theorem itself, however,
+must not acquire non-paper bridge hypotheses.  What remains missing is a
+producer theorem that supplies the conditional inputs from the paper hypotheses.
 
 ### What would close the gap?
 
-One of:
-1. Add `mainFormal` hypotheses for the successor case (recursive induction
-   package + self-improvement bridge inputs) and call
-   `rolePackageResidual_ofSuccessorBridgeInputs` / the answer-valued variant.
-2. Restructure `mainFormal` as an induction that calls itself recursively on
-   the predecessor, providing its own `hrec` and `hbridge` inputs.
+The correct closure route is to prove producer theorems for the missing
+recursive induction package, self-improvement bridge inputs, and repaired
+completion bridge, then call those producers from `mainFormal`.  Adding these
+objects as new hypotheses to `mainFormal` would reintroduce the statement drift
+which this audit is meant to prevent.
 
 ---
 
 ## 6. Recommendations
 
-1. **Track the successor gap explicitly.**  Create an issue reporting that
-   `mainFormal.lean:611` is a `sorry` blocking the successor branch.  The
-   wiring functions exist; the gap is producing the hypotheses.
+1. **Track the producer obligations explicitly.**  The tracking issue should
+   distinguish the paper-facing theorem from the conditional helper, and should
+   record that the remaining work is to produce the repaired bridge and
+   successor residuals from the paper hypotheses.
 
 2. **Decide fate of orphan lemmas.**  The ~15 slackness-carrying and
    matrix-bridge lemmas in `SdpMatrixHelperBridge.lean` and
@@ -335,13 +355,15 @@ One of:
    proof, (b) mark them with `@[deprecated]` or move them to a
    `FutureWork/` directory, (c) delete them.
 
-3. **Do NOT overlap with active PRs.**  PRs #1355, #1353, #1352 are
-   actively changing SelfImprovement files.  Any bridge surgery should wait
-   until those land.
+3. **Coordinate with the bridge-debt tracking issue.**  New repair work should
+   be linked from #1458 and should state whether it discharges a producer
+   obligation, restores a paper-facing theorem statement, or only records a
+   conditional helper.
 
-4. **Update blueprint tags.**  The `\leanok` tag on `thm:self-improvement`
-   should note that the theorem takes explicit hypotheses.  The blueprint
-   dep graph (session 49 findings) is stale and needs regeneration.
+4. **Keep blueprint tags source-facing.**  A theorem block with a paper label
+   should point to the paper-facing declaration.  Conditional helpers belong in
+   remarks or implementation notes, and should not be used to justify a
+   `\leanok` claim for the paper theorem.
 
 ---
 
@@ -363,7 +385,7 @@ One of:
 | `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` | `mainInductionByRecursionOnM`, `mainInductionPublicWrapper` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/PackageConstructors.lean` | `AveragedPastingInput.output`, `mainInductionFromPackages` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly.lean` | `assembleAveragedPastingInput` |
-| `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | `mainFormal` — **1 `sorry` at line 611** |
-| `MIPStarRE/LDT/Test/MainTheorem/RoleRegister.lean` | Assembly functions `successorOfBridgeInputs`, etc. (not called from `mainFormal`) |
+| `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | `mainFormal` and `mainFormal_ofRepairedBridge`; paper-facing theorem plus conditional bridge assembly |
+| `MIPStarRE/LDT/Test/MainTheorem/RoleRegister.lean` | Assembly functions `successorOfBridgeInputs`, etc., awaiting source-level producers |
 | `MIPStarRE/LDT/Test/MainTheorem/OrdinaryRestriction/Basic.lean` | `MainFormalSuccessorSelfImprovementBridgeInputs` type definition and constructors |
 | `MIPStarRE/LDT/Test/MainTheorem/AnswerValuedRestriction.lean` | Answer-valued counterpart |

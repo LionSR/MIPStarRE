@@ -2,9 +2,9 @@ import MIPStarRE.LDT.Test.MainTheorem.NativeTargets
 import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationInputProducer
 
 /-!
-# Main-formal final assembly
+# Main-formal soundness theorem
 
-Base case, successor branch, and final assembly for `thm:main-formal`
+Base case, successor branch, and conditional reductions for `thm:main-formal`
 (`\Cref{thm:main-formal}`).  This module contains:
 
 * `MainFormalBaseProjectiveCompletionHypotheses` — the still-unformalized
@@ -17,13 +17,19 @@ Base case, successor branch, and final assembly for `thm:main-formal`
   `MainFormalBaseRepairedBridgeHypotheses` — intermediate residuals that
   carry these base-case hypotheses together with the role-register measurement.
 
-* `mainFormal_ofRoleResidualAndRepairedBridge` — the main successor-branch
-  assembly that combines a role-residual, the projective-consistency handoff
+* `mainFormal_ofRoleResidualAndRepairedBridge` — the successor-branch theorem
+  that combines a role-residual, the projective-consistency handoff
   data, and the orthonormalization/completion inputs into the three final
-  consistency bounds `Gᴬ ≃ I ⊗ Gᴮ`, `Aᴬ ⊗ I ≃ I ⊗ Qᴮ`, `Qᴬ ⊗ I ≃ I ⊗ Aᴮ`.
+  consistency bounds `Gᴬ ≃ I ⊗ Gᴮ`, `Aᴬ ⊗ I ≃ I ⊗ Qᴮ`, and
+  `Qᴬ ⊗ I ≃ I ⊗ Aᴮ`.
 
-* `mainFormal` — the top-level theorem, taking a projective strategy that
-  passes the LID test with probability `≥ 1 − ε` and producing the three
+* `mainFormal_ofRepairedBridge` — the conditional top-level theorem, assuming
+  the remaining repaired bridge from the role-register output to the final
+  projective measurements.
+
+* `mainFormal` — the paper theorem statement, taking a projective strategy that
+  passes the LID test with probability `≥ 1 − ε`, together with the explicit
+  boundary hypotheses `0 < d`, `0 < k`, and `400md ≤ k`, and producing the three
   pointwise consistency targets at error bound `mainFormalError`.
 
 ## References
@@ -50,12 +56,11 @@ The base case (`m = 1`) generation of the Step 6 witness residual still
 requires the same analytic content as the successor case: spectral
 truncation and locality-preserving repair witnesses for the unsymmetrized
 POVMs and match-mass preservation for the orthonormalized projective
-submeasurements. These are proof obligations whose formalization
-corresponds to unformalized content in Section 5 and Section 6 of the
-paper; they are bundled as a single structure to give a single target
-for the remaining work.  When these hypotheses are supplied,
-`baseProjectiveCompletionResidual` provides the checked assembly theorem that
-fills the base branch of `mainFormal`. -/
+submeasurements. These are remaining steps whose formalization corresponds to
+unformalized content in Section 5 and Section 6 of the paper; they are collected
+as a single structure to give a single target for the remaining work.  When
+these hypotheses are supplied, `baseProjectiveCompletionResidual` provides the
+formal theorem that fills the base branch of `mainFormal`. -/
 
 /-- Paper origin: `references/ldt-paper/test_definition.tex:180-202`
 (`\label{thm:main-formal}`) and its proof in
@@ -69,8 +74,8 @@ inputs (spectral truncation and repair witnesses), distinguished
 outcomes, and match-mass preservation for the unsymmetrized POVMs.
 
 Supplying these hypotheses yields a complete `baseProjectiveCompletionResidual`
-for the base branch of `mainFormal`; the remaining successor-case
-proof obligations are tracked separately. -/
+for the base branch of `mainFormal`; the remaining successor-case steps are
+tracked separately. -/
 structure MainFormalBaseProjectiveCompletionHypotheses
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -315,8 +320,9 @@ self-consistency (`G^A ⊗ I ≃ G^A ⊗ I` and `G^B ⊗ I ≃ G^B ⊗ I`), whic
 structurally stronger statement.  Callers must supply it as a separate
 hypothesis.
 
-Callers constructing `hbaseBridge` for `mainFormal` should instantiate this lemma
-with their per-role-residual repair witnesses and diagonal self-consistency proofs.
+Callers constructing `hbaseBridge` for `mainFormal_ofRepairedBridge` should
+instantiate this lemma with their per-role-residual repair witnesses and
+diagonal self-consistency proofs.
 
 Refs #1359, #1043. -/
 noncomputable def repairedBridgeHypotheses_ofRoleResidual
@@ -557,10 +563,49 @@ theorem mainFormal_ofRoleResidualAndRepairedBridge
           (mainFormalError params k eps) :=
   baseMainFormal_ofRepairedBaseBridge hsmall roleResidual bridge
 
+/-- Successor-case construction of the Section 6 projective-completion residual.
 
+Paper origin: `references/ldt-paper/inductive_step.tex`, lines 352--386, where
+the proof of `thm:main-induction` introduces the restricted strategies and their
+failure probabilities, and lines 26--236, where the proof of `thm:main-formal`
+transports the Section 6 witness through the final projectivization and
+completion cascade.
+
+This is not an additional hypothesis of the paper theorem `mainFormal`; it is an
+open construction tracked separately.  The available structural constructors live in
+`RoleRegister.lean` (`successorOfBridgeInputs` and the answer-valued variants);
+the missing work is to produce the predecessor induction data and the per-slice
+self-improvement inputs from the paper hypotheses, then assemble the resulting
+role residual and completion residual.
+
+Tracked by #1433, #1363, #422, and #1458. -/
+noncomputable def mainFormalSuccessorProjectiveCompletionResidualProducer
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hd : 0 < params.d)
+    (hk : 400 * params.m * params.d ≤ k)
+    (hk0 : 0 < k)
+    (hm_ne_one : params.m ≠ 1)
+    (scalars : MainFormalCascadeScalars params eps k) :
+    MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
+      (params := params) (strategy := strategy) (eps := eps)
+      (hpass := hpass) (k := k) (scalars := scalars) := by
+  -- TODO(#1433, #1363, #422, #1458): produce the ordinary or answer-valued
+  -- successor role residual and the post-role projective-completion residual
+  -- from the predecessor induction package and the per-slice self-improvement
+  -- producers.  This should call the structural constructors in
+  -- `RoleRegister.lean`, not add those inputs to `mainFormal`.
+  sorry
 
 /--
-`thm:main-formal` from `test_definition.tex`.
+Conditional soundness theorem for `thm:main-formal` from `test_definition.tex`.
+
+This theorem is not itself the paper theorem: it assumes the repaired bridge
+from the role-register residual to the final projective-completion hypotheses.
+The theorem `mainFormal` below gives the paper theorem statement. Deriving this
+bridge from its hypotheses is the remaining step.
 
 The bipartite tensor placement follows the paper:
 - **1a**: `A^A_u ⊗ I ≈_ν I ⊗ G^B_{[g(u)=a]}` — G_B on **right**
@@ -592,18 +637,18 @@ and weakens it to the predecessor side condition `400 * pred.m * pred.d ≤ k`.
 For an arbitrary current parameter bundle, the predecessor decomposition itself is
 now formalized by `Parameters.successorDecompositionOfNeOne`; what remains
 external is producing the successor-boundary data and the later completion /
-line-169 residuals. No checked lemma here claims that the former intermediate
+line-169 residuals. The formal statements here do not claim that the former intermediate
 range `params.m * params.d ≤ k < 400 * params.m * params.d` is vacuous.
 
-Universe note: the Lean statement uses `[FieldModel.{0} params.q]`, matching the
+Universe note: the formal statement uses `[FieldModel.{0} params.q]`, matching the
 base-universe field-model assumption of the public Section 6 successor wrapper.
-This is a current Lean API limitation, not a paper constraint; once the Section 6
-wrapper is universe-polymorphic, this public theorem should be generalized as
-well.
+This is a current formalization limitation, not a paper constraint; once the
+Section 6 wrapper is universe-polymorphic, this theorem should be generalized
+as well.
 
-Fixes #137, #239, #906, #1099.
+Addresses #137, #239, #906, #1099, #1458.
 -/
-theorem mainFormal
+theorem mainFormal_ofRepairedBridge
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι)
     (eps : Error)
@@ -628,8 +673,8 @@ theorem mainFormal
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  -- TODO(#422): The induction-side handoffs needed by the final
-  -- `mainFormal` assembly are standalone checked declarations:
+  -- TODO(#422, #1458): The induction-side handoffs needed by
+  -- `mainFormal_ofRepairedBridge` are standalone formal theorems:
   -- * base branch: `strategySymmetrization_mainInductionBaseCase`,
   -- * weighted successor boundary fields:
   --   `mainFormalSuccessorAxisWeightedBound_ofPass` and
@@ -654,8 +699,8 @@ theorem mainFormal
   -- `mainFormal_ofRoleResidualAndRepairedBridge` finishes the base Step-6
   -- assembly using the sharper pre-completion loss
   -- `ζ₁ + 10 * ζ₁^(1/8)`.  The self-improvement assumptions are packaged as
-  -- `SelfImprovement.SelfImprovementBridgeInputs`.  The remaining `mainFormal`
-  -- hole still needs:
+  -- `SelfImprovement.SelfImprovementBridgeInputs`.  The remaining
+  -- `mainFormal_ofRepairedBridge` hole still needs:
   --
   -- 1. **Section 6 role residual** via base/successor branch:
   --    - `MainFormalRolePackageBranchResidual` constructed from either
@@ -685,7 +730,6 @@ theorem mainFormal
   -- targets is already checked; once the residual above is supplied, the
   -- remaining proof is trivial.  Item 4 replaces the older generic `triangleSub`
   -- route whose loss was `ζ₁ + sqrt ζ₂` rather than the printed `ζ₁`.
-
   by_cases herr : 1 ≤ mainFormalError params k eps
   · exact mainFormal_trivial_witness params strategy eps k herr
   · have hepsNN : 0 ≤ eps := SameSpaceProjStrat.eps_nonneg_of_passes hpass
@@ -702,12 +746,8 @@ theorem mainFormal
           Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
             (params := params) (strategy := strategy) (eps := eps)
             (hpass := hpass) (k := k) (scalars := scalars)) := by
-        -- Successor case (m > 1): the answer-valued recursive-slice adapter is
-        -- available, but this theorem still has no predecessor per-slice induction
-        -- package or answer-side self-improvement bridge inputs in scope.
-        -- TODO(#931, #834, #422): supply those successor inputs and assemble the
-        -- resulting role residual into a Step 6 witness residual.
-        sorry
+        exact ⟨mainFormalSuccessorProjectiveCompletionResidualProducer
+          hpass hd hk hk0 hm1 scalars⟩
       rcases hprojectiveCompletionResidual with ⟨projectiveCompletionResidual⟩
       let rolePackage := projectiveCompletionResidual.roleResidual.rolePackage scalars
       have hpre : ConsRel strategy.state (uniformDistribution Unit)
@@ -753,6 +793,49 @@ theorem mainFormal
         completionTransportResidual.toProjectiveStageTargets hpass
       exact MainFormalNativeTargets.toMainFormal
         (projectiveTargets.toTransportTargets.toCascadeTargets.toNativeTargets)
+
+/--
+`thm:main-formal` from `test_definition.tex`.
+
+This is the paper theorem statement. The statement includes the large-`k` and
+positive-boundary hypotheses currently needed by the formalization, but it does
+not assume the repaired bridge, role-register residual data, or final
+projective-completion hypotheses. Those remain open steps to be derived from the
+pass condition and the preceding sections.
+
+The hypothesis `hk : 400 * params.m * params.d ≤ k`, together with `hk0`,
+records the strengthened boundary from issue #906 and
+`rem:main-formal-k-boundary`; the paper states the weaker condition `k ≥ md`.
+The field model is presently fixed at universe level `0`, matching the current
+Section 6 successor theorem rather than an additional mathematical restriction.
+-/
+theorem mainFormal
+    (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι)
+    (eps : Error)
+    (hd : 0 < params.d)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (k : ℕ)
+    (hk : 400 * params.m * params.d ≤ k)
+    (hk0 : 0 < k) :
+    ∃ G_A G_B : ProjMeas (Polynomial params) ι,
+      ConsRel strategy.state (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+          (polynomialEvaluationFamily params G_B.toSubMeas)
+          (mainFormalError params k eps) ∧
+        ConsRel strategy.state (uniformDistribution (Point params))
+          (polynomialEvaluationFamily params G_A.toSubMeas)
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+          (mainFormalError params k eps) ∧
+        ConsRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily G_A.toSubMeas)
+          (constSubMeasFamily G_B.toSubMeas)
+          (mainFormalError params k eps) := by
+  refine mainFormal_ofRepairedBridge params strategy eps hd hpass k hk hk0 ?_
+  -- TODO(#1458, #422, #931): derive the repaired bridge used by
+  -- `mainFormal_ofRepairedBridge` from the hypotheses of the paper theorem.
+  intro scalars roleResidual
+  sorry
 
 end Test
 

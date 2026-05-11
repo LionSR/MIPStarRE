@@ -1,17 +1,30 @@
-# Issue #1367 — SelfImprovement Bridge Audit: Input-Consistency Orphans
+# Historical Issue #1367 — SelfImprovement Bridge Audit: Input-Consistency Orphans
 
 **Date:** 2026-05-08
 **Scope:** `MIPStarRE/LDT/SelfImprovement/` → `MainInductionStep/` → `Test/MainTheorem/`
 **Active PRs:** #1373 (orthonormalization-input producer), #1374 (successor bridge hypotheses)
 **Related issues:** #1385 (SDP slackness), #1375/#1376/#1377 (#1036 sub-gaps), #1043 (hbaseBridge), #1035 (recursive mainFormal)
 
+> **Status note, 2026-05-11.**  This report records the pre-#1458 and pre-#1482
+> state of the final theorem.  Its statements about making `mainFormal`
+> sorry-free by adding new hypotheses are historical, not current project
+> guidance.  The current policy is that `mainFormal` remains the paper-facing
+> theorem statement; bridge, residual, repair, input, package, or producer
+> assumptions belong only in separately named conditional helpers or in producer
+> obligations tracked by #1458.
+
 ---
 
 ## Executive Summary
 
-The `SelfImprovementBridgeInputs` package (the three Section 9 hypotheses) and its downstream wiring in `MainInductionStep` and `MainTheorem` are structurally sound. All individual lemmas in `SelfImprovement/` are proved conditional on their explicit hypotheses. The MainInductionStep bridge (`SelfImprovementBridge/Core.lean`) wires SelfImprovement → Pasting correctly. The *only* remaining `sorry` in the entire LDT directory is at `MainFormal.lean:611` (the successor case branch).
+The `SelfImprovementBridgeInputs` package (the three Section 9 hypotheses) and its downstream wiring in `MainInductionStep` and `MainTheorem` are structurally sound. All individual lemmas in `SelfImprovement/` are proved conditional on their explicit hypotheses. The MainInductionStep bridge (`SelfImprovementBridge/Core.lean`) wires SelfImprovement → Pasting correctly. As of 2026-05-08, this report identified the successor-case branch at `MainFormal.lean:611` as the remaining final-theorem `sorry` site.
 
-**This `sorry` is addressed by PR #1374**, which adds two new hypotheses to `mainFormal` and replaces the `sorry` with a call to existing constructors in `RoleRegister.lean`. After #1374 lands, `mainFormal` will be sorry-free — but with additional "tracked smuggles" (extra hypotheses) that name the remaining unformalized analytic content.
+At the time of this report, PR #1374 proposed adding two new hypotheses to
+`mainFormal` and replacing the `sorry` with a call to existing constructors in
+`RoleRegister.lean`.  Under the current #1458 policy, that route is historical:
+the source-facing theorem should instead keep the paper statement and discharge
+the missing analytic content through producer theorems or separately named
+conditional helpers.
 
 **This audit report confirms that #1367 can be closed** once #1374 and #1373 land (or this report is merged), because:
 - The remaining gaps are individually tracked by open issues (#1375, #1376, #1377, #1043, #1035, #1385)
@@ -154,11 +167,16 @@ Complete wiring functions exist (all proved):
 - `answerSuccessorOfInductionPackageAndBridgeInputs` (line 628): Takes `PerSliceInductionPackage` + bridge → branch residual
 - `rolePackageResidual_ofAnswerSuccessorBridgeInputs` (line 602): Wraps → `Nonempty (MainFormalRolePackageResidual)`
 
-These functions are **not called** from `mainFormal` because `mainFormal` lacks the successor induction/bridge hypotheses.
+These functions were not called from the older final assembly because the
+successor induction and bridge data had not been produced.  Under the current
+policy, that data should be supplied by producer theorems or isolated in a
+conditional helper, not added as new hypotheses to the paper-facing theorem.
 
-### 4.2 MainFormal successor-case hypotheses (PR #1374 additions)
+### 4.2 Historical MainFormal successor-case hypotheses (PR #1374 additions)
 
-**PR #1374** (`issue1036-successor-slice-bridge`) adds two hypotheses to `mainFormal`:
+**Historical PR #1374** (`issue1036-successor-slice-bridge`) proposed the
+following two additional hypotheses for `mainFormal`; the current #1458 policy
+does not permit this as the paper-facing theorem shape:
 
 ```lean
 (hanswerSliceWitness : ∀ (hm_ne_one : params.m ≠ 1),
@@ -206,7 +224,7 @@ exact mainFormal_ofRoleResidualAndRepairedBridge herr roleResidual
 | `orthonormalization.repair` (QXP repair) | Hypothesis | New: `of_roleResidual` wraps it | No change | #1032 (QXP construction) |
 | `finalFields` (completeness etc.) | Conditional lemma proved | No change | No change | #1376 (per-slice producer) |
 | `SliceBridgeInputs` wiring | **PROVED** (constructors exist) | No change | No change | #1375 (honest SymStrat) |
-| `MainFormal` successor case | **`sorry`** (line 611) | No change | New: replaced by `hanswerSlice*` hypotheses | #1376 + #1377 + #1035 |
+| `MainFormal` successor case | **Historical, as of 2026-05-08:** `sorry` at line 611 | No change | New: replaced by `hanswerSlice*` hypotheses | #1376 + #1377 + #1035 |
 | `hbaseBridge` construction | Hypothesis | New: `repairedBridgeHypotheses_of_roleResidual` | No change | #1043 |
 
 ---
@@ -308,7 +326,11 @@ The fix in `Final.lean` is identical (adding a missing parenthesis in a `gcongr`
 
 ### 9.2 #1369 vs #1374
 
-Issue #1369 ("Construct answer-valued successor inputs for MainFormal") is an umbrella that covers the same work as #1374's new hypotheses. #1374 moves the gap into `mainFormal`'s hypothesis list; #1375/#1376/#1035 are the actual sub-gaps.
+Issue #1369 ("Construct answer-valued successor inputs for MainFormal") is an
+umbrella for the same mathematical work that #1374 tried to expose through new
+hypotheses.  Under the current policy, that work should instead be represented
+by producer obligations or conditional helpers; #1375/#1376/#1035 are the actual
+sub-gaps.
 
 **Recommendation:** Close #1369 as superseded by the combination of #1374 + #1375 + #1376 + #1035.
 
@@ -356,7 +378,7 @@ Issue #1369 ("Construct answer-valued successor inputs for MainFormal") is an um
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/Core.lean` | `SelfImprovementPackage.SliceBridgeInputs`, `ofSliceBridgeInputs`, `selfImprovementInInductionSection` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/AnswerSlice.lean` | `AnswerSelfImprovementPackage.SliceBridgeInputs` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` | `mainInductionByRecursionOnM`, `mainInductionPublicWrapper` |
-| `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | `mainFormal` (1 `sorry` at line 611; closed by #1374) |
+| `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | Historical note: as of 2026-05-08, `mainFormal` had one `sorry` at line 611, which #1374 proposed to close by adding hypotheses |
 | `MIPStarRE/LDT/Test/MainTheorem/RoleRegister.lean` | `successorOfBridgeInputs`, `answerSuccessorOfBridgeInputs`, `rolePackageResidual_ofAnswerSuccessorBridgeInputs` |
 | `MIPStarRE/LDT/Test/MainTheorem/OrdinaryRestriction/Basic.lean` | `MainFormalSuccessorSelfImprovementBridgeInputs` type + constructors |
 | `MIPStarRE/LDT/Test/MainTheorem/AnswerValuedRestriction.lean` | Answer-valued counterpart types + constructors |

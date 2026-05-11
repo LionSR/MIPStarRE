@@ -129,6 +129,15 @@
 	\end{enumerate}
 \end{theorem}
 
+\begin{remark}[Conditional form of the soundness theorem]\label{rem:main-formal-conditional}
+	\lean{MIPStarRE.LDT.Test.mainFormal_ofRepairedBridge}
+	\uses{thm:main-formal, def:low-individual-degree-test, def:projective-strategy, def:polymeasurements, def:simeq}
+	The conditional theorem currently assumes a repaired bridge from
+	the role-register residual to the final projective-completion hypotheses.
+	This is not a hypothesis of Theorem~\ref{thm:main-formal}; it is the
+	remaining step needed to derive the paper theorem from the pass condition.
+\end{remark}
+
 \begin{remark}[$k$-bound boundary for the public theorem]\label{rem:main-formal-k-boundary}
 	\lean{MIPStarRE.LDT.Test.mainFormal_trivial_witness}
 	\uses{thm:main-formal, thm:error-cascade-main-formal, def:projective-strategy, def:simeq}
