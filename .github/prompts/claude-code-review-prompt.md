@@ -21,7 +21,7 @@ that determines whether the PR can be approved with outstanding issues.
    If a mathematical result looks wrong, too strong, or suspiciously general, **scout** the
    LaTeX sources in `references/ldt-paper/` where the original LDT theorem statements and proofs are
    stored. Read the relevant sections, compare hypotheses and conclusions, and cite the
-   specific paper/section when flagging a discrepancy.
+   source path, line range, and label when flagging a discrepancy.
    For a declaration that is named as, linked to, or documented as a paper theorem,
    adding a bridge, residual, repair, package, producer, or arbitrary hypothesis
    input is a blocker unless that input is a faithful formal encoding of the cited

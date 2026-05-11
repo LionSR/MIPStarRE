@@ -14,8 +14,8 @@ Reuse Mathlib lemmas rather than reproving from scratch.
 If a mathematical result looks wrong, too strong, or suspiciously general, scout
 the LaTeX sources in `references/ldt-paper/` where the original LDT theorem
 statements and proofs are stored — read the relevant sections, compare
-hypotheses and conclusions, and cite the specific paper/section when flagging a
-discrepancy.  For paper-labelled declarations, do not address review feedback by
+hypotheses and conclusions, and cite the source path, line range, and label when
+flagging a discrepancy.  For paper-labelled declarations, do not address review feedback by
 adding bridge, residual, repair, package, producer, or arbitrary hypothesis inputs
 unless they are faithful formal encodings of the cited paper statement.
 
