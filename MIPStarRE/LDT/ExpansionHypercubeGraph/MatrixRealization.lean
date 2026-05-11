@@ -451,7 +451,7 @@ theorem laplacianSpectralGapOrdered (params : Parameters)
     lambda ⟨0, hypercubeVertexCount_pos params⟩ = 0 ∧
       lambda ⟨1, hypercubeVertexCount_one_lt params⟩ =
         1 / ((params.m : Error) * (hypercubeVertexCount params : Error)) := by
-  -- TODO(#1454): derive the characteristic-polynomial roots of `matrixLaplacianOperator`
+  -- TODO(#1497): derive the characteristic-polynomial roots of `matrixLaplacianOperator`
   -- from the Fourier diagonalization and then sort the roots.  The existing theorem
   -- `laplacianSpectralGap` supplies the zero mode, lower bound for all nonzero modes,
   -- and attainment by a weight-one mode.

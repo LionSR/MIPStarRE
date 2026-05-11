@@ -178,7 +178,7 @@ theorem selfImprovementInInductionSection
         (polynomialEvaluationFamily params G) nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
-  -- TODO(#1451): prove the induction-section theorem from the paper hypotheses.
+  -- TODO(#1503): prove the induction-section theorem from the paper hypotheses.
   -- The current measurement-input assembly is retained separately as
   -- `selfImprovementInInductionSection_ofMeasurement`.
   sorry
@@ -543,7 +543,7 @@ It applies the conditional measurement-input theorem
 its fields across the recorded equalities to the restricted-slice interface. At
 each slice the package supplies the complete measurement
 `inductionPkg.sliceMeasurement x`; the submeasurement-input theorem remains the
-tracked obligation in #1451. -/
+tracked obligation in #1503. -/
 noncomputable def SelfImprovementPackage.ofSliceBridgeInputs
     (params : Parameters)
     [FieldModel params.q]
