@@ -4,6 +4,17 @@ import MIPStarRE.LDT.Test.MainTheorem.NativeTargets
 # Main-formal producers
 
 Named producer obligations used by the final `mainFormal` assembly.
+
+## Main declarations
+
+* `mainFormalSuccessorProjectiveCompletionResidualProducer` — the named
+  successor-case obligation that produces the projective-completion residual
+  for the non-vacuous `m > 1` branch of `mainFormal`.
+
+## References
+
+* `references/ldt-paper/inductive_step.tex`, lines 136--173, for Step 6 of the
+  proof of `\Cref{thm:main-formal}`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
