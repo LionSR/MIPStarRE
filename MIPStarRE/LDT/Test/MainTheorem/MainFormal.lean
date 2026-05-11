@@ -379,8 +379,8 @@ orthonormalization and completion argument); blueprint
 `\label{def:main-formal-step6-hypotheses}`.
 
 This type specializes `MainFormalRepairedBridgeHypotheses` to the checked
-role residual for the base case (`m = 1`).  It is a conditional input for the
-current formal proof, not an additional paper hypothesis. -/
+role residual for the base case (`m = 1`).  It records the proof obligation
+left by this specialization, not an additional paper hypothesis. -/
 abbrev MainFormalBaseBranchRepairedBridgeHypotheses
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
