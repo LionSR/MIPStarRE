@@ -451,8 +451,9 @@ orthonormalization repair producer.
 
 The spectral part of the orthonormalization input is supplied by the closed
 source-almost-projective spectral truncation theorem, and the repair part is
-supplied by the named Section 5 rounding-to-projectors producer. Thus the caller
-only provides the two remaining Section 9 inputs. -/
+supplied by the Section 5 rounding-to-projectors theorem.  Thus the two
+remaining explicit inputs are the Section 9 helper strong self-consistency and
+final-fields data. -/
 noncomputable def SelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationRepair
     (params : Parameters)
     [FieldModel params.q]

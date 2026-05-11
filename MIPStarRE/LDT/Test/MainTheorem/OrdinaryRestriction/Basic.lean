@@ -105,7 +105,8 @@ def MainFormalSuccessorRecursiveSlices (params : Parameters)
 /-- A Section 6 per-slice induction package supplies the recursive slice
 witnesses needed by the `mainFormal` successor boundary.
 
-This constructor is only a package adapter: the caller must still provide the
+This constructor is only a package adapter: the surrounding construction must
+still provide the
 `PerSliceInductionPackage` from a genuine predecessor induction hypothesis. It
 does not invoke the public `mainFormal` theorem. -/
 theorem mainFormalSuccessorRecursiveSlices_ofInductionPackage
@@ -242,8 +243,8 @@ noncomputable def mainFormalSuccessorSelfImprovementBridgeInputs_ofMeasurementEq
 
 /-- Assemble ordinary successor self-improvement bridge inputs from the three
 named Section 9 producers.  The orthonormalization repair slice is supplied by
-the named Section 5 rounding-to-projectors producer, so callers do not carry it
-as a separate hypothesis. -/
+the Section 5 rounding-to-projectors theorem, so it is not a separate
+hypothesis of this construction. -/
 noncomputable def mainFormalSuccessorSelfImprovementBridgeInputs_ofOrthonormalizationRepair
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

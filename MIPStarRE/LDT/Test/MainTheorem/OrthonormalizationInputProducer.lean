@@ -13,7 +13,7 @@ the full `MainFormalBaseRepairedBridgeHypotheses` lives in `MainFormal.lean`
 * `MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRoleResidual` —
   the orthonormalization input is derivable from the role residual by using the
   closed spectral-truncation theorem and the named Section 5
-  rounding-to-projectors producer.
+  rounding-to-projectors theorem.
 
 ## What's not derivable from the role residual alone
 
@@ -23,12 +23,12 @@ the full `MainFormalBaseRepairedBridgeHypotheses` lives in `MainFormal.lean`
   `ConsRel G^A G^B ζ₁` (the two POVMs with each other), which is a different type.
   Diagonal self-consistency is therefore a **separate hypothesis** that must be
   supplied alongside the role residual, after the orthonormalization input has
-  been derived from the named Section 5 producer.
+  been derived from the Section 5 rounding-to-projectors theorem.
 
 * **Locality-preserving repair**: the ordinary repair fields are supplied by
   `MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer`.
-  Until that Section 5 producer is proved, the resulting orthonormalization
-  input carries its tracked `sorryAx` dependency.
+  Until the corresponding Section 5 rounding-to-projectors theorem is proved,
+  the resulting orthonormalization input carries an open proof obligation.
 
 ## References
 
@@ -50,11 +50,12 @@ namespace MainFormalPostRolePackageDiagonalOrthonormalizationInput
 
 The spectral-truncation fields are supplied by
 `spectralTruncationInput_of_sourceAlmostProjective` (via `ofRepairInputs`).
-The repair fields are supplied by the named Section 5
-`leftLiftedProjectivizationRepairProducer`, so the remaining proof obligation is
-located at that producer rather than in this caller signature.  This lemma gives the full
-`MainFormalPostRolePackageDiagonalOrthonormalizationInput` consumed by the
-diagonal orthonormalization construction
+The repair fields are supplied by `leftLiftedProjectivizationRepairProducer`,
+the Lean form of the Section 5 rounding-to-projectors theorem.  Thus the
+remaining proof obligation is located in Section 5 rather than in the
+hypotheses of this construction.  This lemma gives the full
+`MainFormalPostRolePackageDiagonalOrthonormalizationInput` consumed by the diagonal
+orthonormalization construction
 (`MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalInputs`). -/
 noncomputable def ofRoleResidual
     {params : Parameters} [FieldModel.{0} params.q]

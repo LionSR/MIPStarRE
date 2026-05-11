@@ -255,8 +255,8 @@ constructive orthonormalization repair producer.
 As in the ordinary slice bridge, the spectral part of the orthonormalization
 input is supplied by the closed source-almost-projective spectral truncation
 theorem, and the repair part is supplied by the named Section 5
-rounding-to-projectors producer.  The caller supplies only the helper strong
-self-consistency and final-fields inputs. -/
+rounding-to-projectors theorem.  The remaining explicit inputs are the helper
+strong self-consistency and final-fields data. -/
 noncomputable def AnswerSelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationRepair
     (params : Parameters)
     [FieldModel params.q]

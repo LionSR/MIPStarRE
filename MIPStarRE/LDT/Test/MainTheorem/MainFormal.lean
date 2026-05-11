@@ -13,7 +13,7 @@ Base case, successor branch, and final assembly for `thm:main-formal`
   projective submeasurements).  The structure still carries the full diagonal
   orthonormalization input for the base branch; the ordinary
   locality-preserving repair fields inside that input are obtained from the
-  named Section 5 producer, whose proof obligation remains tracked there.
+  Section 5 rounding-to-projectors theorem, whose proof remains open.
 
 * `MainFormalBaseBridgeHypotheses` and
   `MainFormalBaseRepairedBridgeHypotheses` — intermediate residuals that
@@ -52,8 +52,8 @@ The base case (`m = 1`) generation of the Step 6 witness residual still
 requires the diagonal orthonormalization input for the unsymmetrized POVMs and
 match-mass preservation for the orthonormalized projective submeasurements. The
 ordinary locality-preserving repair fields inside the orthonormalization input
-are no longer caller-supplied witnesses; they are obtained through the named
-Section 5 producer, whose proof remains a tracked obligation. The remaining
+are no longer separate explicit hypotheses; they are obtained through the
+Section 5 rounding-to-projectors theorem, whose proof remains open. The remaining
 base-case data are bundled as a single structure to give a single target for the
 remaining work.  When these hypotheses are supplied,
 `baseProjectiveCompletionResidual` provides the checked assembly theorem that
@@ -69,11 +69,12 @@ Analytic hypotheses that are still unformalized for the base case (`m = 1`)
 Step 6 witness residual: the diagonal orthonormalization input, distinguished
 outcomes, and match-mass preservation for the unsymmetrized POVMs.  The
 ordinary repair component of the orthonormalization input is provided through
-the named Section 5 producer rather than as a separate caller hypothesis.
+the Section 5 rounding-to-projectors theorem rather than as a separate
+hypothesis of this construction.
 
 Supplying these hypotheses yields a complete `baseProjectiveCompletionResidual`
 for the base branch of `mainFormal`; the remaining successor-case
-proof obligations are tracked separately. -/
+proof obligations are recorded separately. -/
 structure MainFormalBaseProjectiveCompletionHypotheses
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -81,9 +82,9 @@ structure MainFormalBaseProjectiveCompletionHypotheses
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (scalars : MainFormalCascadeScalars params eps k)
     (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) where
-  /-- Line-130 orthonormalization inputs for both unsymmetrized POVMs.  The
-  ordinary producer route obtains these from spectral truncation and the named
-  Section 5 repair producer. -/
+  /-- Projective-consistency orthonormalization inputs for both unsymmetrized
+  POVMs.  The ordinary repair fields are obtained from the Section 5
+  rounding-to-projectors theorem. -/
   orthonormalizationInput :
     MainFormalPostRolePackageDiagonalOrthonormalizationInput
       params strategy eps k scalars (roleResidual.rolePackage scalars)
@@ -91,7 +92,8 @@ structure MainFormalBaseProjectiveCompletionHypotheses
   a_A : Polynomial params
   /-- Bob-side distinguished outcome for the completion step. -/
   a_B : Polynomial params
-  /-- Alice-side match-mass preservation: for each line-130 orthonormalization
+  /-- Alice-side match-mass preservation: for each projective-consistency
+  orthonormalization
   residual, the projective submeasurement `P_A` preserves match mass against
   Bob's unsymmetrized POVM. -/
   leftMatchMassPreservation :
@@ -104,7 +106,8 @@ structure MainFormalBaseProjectiveCompletionHypotheses
         orthResidual.P_A
         (unsymmetrizedRightPOVM
           (roleResidual.rolePackage scalars).roleMeasurement)
-  /-- Bob-side match-mass preservation: for each line-130 orthonormalization
+  /-- Bob-side match-mass preservation: for each projective-consistency
+  orthonormalization
   residual, the projective submeasurement `P_B` preserves match mass against
   Alice's unsymmetrized POVM. -/
   rightMatchMassPreservation :
@@ -154,10 +157,11 @@ Narrowed base-case bridge hypotheses for Step 6 when `params.m = 1`.
 
 Compared to `MainFormalBaseProjectiveCompletionHypotheses`, this structure omits the two
 distinguished outcomes `a_A` and `a_B`, which the conversion below fills with
-the explicit zero polynomial at `m = 1`.  The remaining fields are the line-130
-orthonormalization input and match-mass preservation hypotheses.  In the
-repaired route below, the ordinary orthonormalization input is produced from the
-role residual; match-mass preservation remains an explicit analytic obligation.
+the explicit zero polynomial at `m = 1`.  The remaining fields are the
+projective-consistency orthonormalization input and match-mass preservation
+hypotheses.  Using the Section 5 rounding-to-projectors theorem, the ordinary
+orthonormalization input is produced from the role residual; match-mass
+preservation remains an explicit analytic obligation.
 
 A conversion theorem `baseProjectiveCompletionHypotheses_ofBaseBridge` constructs the full
 `MainFormalBaseProjectiveCompletionHypotheses` from a `MainFormalBaseBridgeHypotheses` by
@@ -171,12 +175,13 @@ structure MainFormalBaseBridgeHypotheses
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (scalars : MainFormalCascadeScalars params eps k)
     (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) where
-  /-- Line-130 orthonormalization inputs for both unsymmetrized POVMs.  The
-  repaired route below produces this field from the role residual. -/
+  /-- Projective-consistency orthonormalization inputs for both unsymmetrized
+  POVMs.  The construction below produces this field from the role residual. -/
   orthonormalizationInput :
     MainFormalPostRolePackageDiagonalOrthonormalizationInput
       params strategy eps k scalars (roleResidual.rolePackage scalars)
-  /-- Alice-side match-mass preservation: for each line-130 orthonormalization
+  /-- Alice-side match-mass preservation: for each projective-consistency
+  orthonormalization
   residual, the projective submeasurement `P_A` preserves match mass against
   Bob's unsymmetrized POVM. -/
   leftMatchMassPreservation :
@@ -189,7 +194,8 @@ structure MainFormalBaseBridgeHypotheses
         orthResidual.P_A
         (unsymmetrizedRightPOVM
           (roleResidual.rolePackage scalars).roleMeasurement)
-  /-- Bob-side match-mass preservation: for each line-130 orthonormalization
+  /-- Bob-side match-mass preservation: for each projective-consistency
+  orthonormalization
   residual, the projective submeasurement `P_B` preserves match mass against
   Alice's unsymmetrized POVM. -/
   rightMatchMassPreservation :
@@ -263,11 +269,12 @@ blueprint `\label{def:main-formal-step6-hypotheses}`.
 Narrowed repaired base-case bridge for Step 6 when `params.m = 1`.
 
 This removes the exact line-169 match-mass preservation fields from the base
-bridge.  The repaired pre-completion route needs only the line-130
+bridge.  The repaired pre-completion construction needs only the
+projective-consistency
 orthonormalization inputs and an additional diagonal consistency input for the
 completion theorem on the two unsymmetrized role-block POVMs.  This diagonal
-input is not the paper's line-130 assertion itself; line 130 supplies the
-cross relation between the two unsymmetrized roles. -/
+input is not the paper's ProjectiveConsistency assertion itself; that assertion
+supplies the cross relation between the two unsymmetrized roles. -/
 structure MainFormalBaseRepairedBridgeHypotheses
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -275,9 +282,9 @@ structure MainFormalBaseRepairedBridgeHypotheses
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (scalars : MainFormalCascadeScalars params eps k)
     (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) where
-  /-- Line-130 orthonormalization inputs for both unsymmetrized POVMs.  The
-  ordinary repair fields inside this input are obtained from the named Section 5
-  producer rather than supplied by the caller. -/
+  /-- Projective-consistency orthonormalization inputs for both unsymmetrized
+  POVMs.  The ordinary repair fields inside this input are obtained from the
+  Section 5 rounding-to-projectors theorem. -/
   orthonormalizationInput :
     MainFormalPostRolePackageDiagonalOrthonormalizationInput
       params strategy eps k scalars (roleResidual.rolePackage scalars)
@@ -344,11 +351,12 @@ noncomputable def repairedBridgeHypotheses_ofRoleResidual
 
 /-- Base-case assembly of `mainFormal` through the repaired line-169 route.
 
-Starting from the checked base-role residual, this theorem runs the line-130
-orthonormalization wrapper, completes the resulting projective submeasurements
-using the diagonal consistency input, derives the repaired polynomial line-169
-transport with loss `10 * ζ₁^(1/8)`, and then proves the final point and
-self-consistency goals directly at `mainFormalError`. -/
+Starting from the checked base-role residual, this theorem runs the
+projective-consistency orthonormalization wrapper, completes the resulting
+projective submeasurements using the diagonal consistency input, derives the
+repaired polynomial line-169 transport with loss `10 * ζ₁^(1/8)`, and then
+proves the final point and self-consistency goals directly at
+`mainFormalError`. -/
 theorem baseMainFormal_ofRepairedBaseBridge
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -660,17 +668,17 @@ theorem mainFormal
   --    - ordinary or answer-valued recursive induction witnesses,
   --    - ordinary or answer-valued per-slice self-improvement package producers.
   --
-  -- 2. **Line-130 orthonormalization inputs**:
+  -- 2. **Projective-consistency orthonormalization inputs**:
   --    - `MainFormalPostRolePackageDiagonalOrthonormalizationInput`:
   --      the spectral fields are supplied by the closed spectral-truncation
-  --      theorem, and the ordinary repair fields are supplied by the named
-  --      Section 5 producer for both unsymmetrized POVMs.
+  --      theorem, and the ordinary repair fields are supplied by the Section 5
+  --      rounding-to-projectors theorem for both unsymmetrized POVMs.
   --
   -- 3. **Completion input** for the two POVMs, derived through
   --    `completingToMeasurement`.  In the repaired base route this is supplied as
   --    additional diagonal consistency for the two unsymmetrized POVMs, beyond
-  --    the line-130 cross relation, and is converted to the `BipartiteSSCRel`
-  --    hypotheses consumed by the completion theorem.
+  --    the projective-consistency cross relation, and is converted to the
+  --    `BipartiteSSCRel` hypotheses consumed by the completion theorem.
   --
   -- 4. **Repaired line-169 transport**.  The paper's exact `ζ₁` replacement step
   --    is false as printed; the checked local repair compares with the

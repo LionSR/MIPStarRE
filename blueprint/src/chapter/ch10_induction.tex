@@ -437,23 +437,24 @@
 	\uses{def:main-formal-successor-boundary, thm:orthonormalization}
 	The structure \texttt{MainFormalBaseProjectiveCompletionHypotheses} bundles the still-unformalized
 	analytic hypotheses needed for the base case ($m=1$) of
-	Theorem~\ref{thm:main-formal}: the locality-preserving repair witnesses used
-	by orthonormalization, distinguished completion outcomes, and match-mass
+	Theorem~\ref{thm:main-formal}: the diagonal orthonormalization input,
+	distinguished completion outcomes, and match-mass
 	preservation for the orthonormalized projective submeasurements against the
 	opposite unsymmetrized POVM.  The auxiliary constructor
 	\texttt{MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRepairInputs}
 	is available to fill the spectral-truncation fields from the Section~5
-	spectral-truncation producer applied to the two unsymmetrized role measurements
-	after left tensor placement.  Thus the spectral half of the line-130
-	orthonormalization input has a constructive producer.  The constructors
+	spectral-truncation theorem applied to the two unsymmetrized role measurements
+	after left tensor placement.  The ordinary repair fields are supplied by the
+	Section~5 rounding-to-projectors theorem, whose proof obligation remains open.
+	The constructors
 	\texttt{ofQXPLayerRepairWitnesses} and
-	\texttt{ofLiftedQXPApproximations} also give constructive producers for the
+	\texttt{ofLiftedQXPApproximations} also give constructive routes to the
 	locality-preserving repair half: the former consumes the Section~9 QXP-layer
 	repair witnesses, and the latter consumes explicit QXP-layer data together
 	with the corresponding left-placed state-dependent approximation.  The base
 	bridge structures still accept a full orthonormalization input until a later
-	assembly step routes them through these constructors.  The line-130 cross
-	consistency relation is reconstructed internally from the checked role residual
+	assembly step routes them through these constructors.  The projective-consistency
+	relation is reconstructed internally from the checked role residual
 	and used directly in the completion step, so no separate diagonal strong
 	self-consistency package remains in this bridge.  The narrowed alias
 	\texttt{MainFormalBaseBridgeHypotheses} omits the two distinguished outcomes;
@@ -468,7 +469,7 @@
 	The sharper repaired base route is packaged separately by
 	\texttt{MainFormalBaseRepairedBridgeHypotheses}.  It keeps the same
 	orthonormalization inputs but replaces the exact match-mass fields by the
-	diagonal line-130 consistency input needed for completion.  The generic theorem
+	diagonal projective-consistency input needed for completion.  The generic theorem
 	\texttt{mainFormal\_ofRoleResidualAndRepairedBridge} combines that diagonal
 	completion input with the checked pre-completion line-169 repair from
 	Remark~\ref{rem:lean-line169-projectivization-match-mass}, so the base branch
@@ -736,7 +737,7 @@ from recursive slice witnesses and answer-side bridge inputs by
 from a predecessor induction package together with the bridge inputs by
 \texttt{MainFormalRolePackageBranchResidual.answerSuccessorOfInductionPackageAndBridgeInputs}.
 These constructors are structural and do not call \texttt{mainFormal}; the
-line-130 completion interfaces remain separate.  The live completion residual
+projective-consistency completion interfaces remain separate.  The live completion residual
 carries the concrete role residual rather than a separate decorative branch
 witness; the branch residual types remain the documented base/successor supply
 paths.  Once the role package is obtained,

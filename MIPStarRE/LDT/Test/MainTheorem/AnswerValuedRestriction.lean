@@ -52,7 +52,7 @@ strategy.  This route is preferred over the ordinary successor route because:
 These declarations feed into the
 `MainFormalRolePackageBranchResidual.answerSuccessor` constructor.  The
 ordinary route (`MainFormalRolePackageBranchResidual.successor`) is retained as
-a compatibility path for callers already working with ordinary restriction data.
+a compatibility path for applications already working with ordinary restriction data.
 -/
 
 /-- Answer-valued successor-case weighted restricted-axis input for the
@@ -315,7 +315,7 @@ self-improvement producer.
 
 This is the answer-register counterpart of
 `MainFormalSuccessorSelfImprovementBridgeInputs`: for each possible answer-side
-per-slice induction package, callers supply the narrow
+per-slice induction package, one supplies the narrow
 `AnswerSelfImprovementPackage.SliceBridgeInputs` assumptions. -/
 def MainFormalSuccessorAnswerSelfImprovementBridgeInputs (params : Parameters)
     [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -409,8 +409,8 @@ noncomputable def mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofMeasure
 
 /-- Assemble answer-valued successor self-improvement bridge inputs from the
 three named Section 9 producers.  The orthonormalization repair slice is
-supplied by the named Section 5 rounding-to-projectors producer, so callers do
-not carry it as a separate hypothesis. -/
+supplied by the Section 5 rounding-to-projectors theorem, so it is not a
+separate hypothesis of this construction. -/
 noncomputable def mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofOrthonormalizationRepair
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

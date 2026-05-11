@@ -21,10 +21,10 @@ The split mirrors `MakingMeasurementsProjective.OrthonormalizationInput`, which
 is itself the structure left after `orthonormalizationMainLemma_local` was
 proved internally.  The spectral piece is supplied by the closed
 source-almost-projective spectral truncation theorem.  The ordinary repair
-piece is supplied by the named Section 5 producer
+piece is supplied by the Section 5 rounding-to-projectors theorem
 `MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer`, so the
-remaining gap is visible as that producer's tracked proof obligation rather
-than as an extra caller hypothesis.
+remaining gap is exactly the open proof obligation of that theorem, rather
+than an explicit hypothesis of this construction.
 
 In addition, `orthonormalizationSpectralProducer_of_roundingWitnesses` composes
 the spectral-truncation conversion established in `#1042`
@@ -40,7 +40,8 @@ extra assumption.
   `SelfImprovement.OrthonormalizationInput`, isolated.
 * `OrthonormalizationRepairProducer` — the locality-preserving repair slice.
 * `orthonormalizationRepairProducer_of_projectivizationRepairProducer` —
-  builds the ordinary repair slice from the named Section 5 producer.
+  builds the ordinary repair slice from the Section 5 rounding-to-projectors
+  theorem.
 * `LeftLiftedQXPLayerRepairWitness` — a stronger QXP-layer repair witness
   whose rounded family is canonically `ProjSubMeas.liftLeft P`.
 * `LeftLiftedQXPLayerRepairWitnessWithResidualDomination` — the same witness,
@@ -668,7 +669,7 @@ from a pointwise inequality at the residual `none` outcome.
 
 The paper-side input is the pointwise operator inequality
 `(optionCompletion Hhat).outcome none ≤ (qxpProjSubMeas ...).outcome none`.
-This is the constructor normally needed by callers that already prove the
+This is the constructor normally needed in applications that already prove the
 pointwise comparison directly. -/
 noncomputable def residualDominatingRepairProducer_of_qxpLayer_and_none_le
     {params : Parameters} [FieldModel params.q]
@@ -702,13 +703,14 @@ noncomputable def orthonormalizationRepairProducer_of_qxpLayer
     leftLiftedProjectivizationRepairInput_of_qxpLayer (hqxp hssc)
 
 /-- Build the repair slice of `SelfImprovement.OrthonormalizationInput` from
-the named Section 5 rounding-to-projectors producer.
+the Section 5 rounding-to-projectors theorem.
 
-This removes the repair slice from caller hypotheses.  Until
+This removes the repair slice from the explicit hypotheses.  Until
 `MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer` is
-proved, this producer carries the tracked Section 5 `sorryAx` dependency.  The
-strong self-consistency input is not used by the Section 5 producer itself; it
-is retained only because `OrthonormalizationRepairProducer` is the uniform
+proved, this construction carries the open proof obligation from Section 5
+(rounding to projectors).  The strong self-consistency input is not used by the
+Section 5 theorem itself; it is retained only because
+`OrthonormalizationRepairProducer` is the uniform
 self-improvement interface for repair data indexed by helper families. -/
 noncomputable def orthonormalizationRepairProducer_of_projectivizationRepairProducer
     {params : Parameters} [FieldModel params.q]
@@ -846,7 +848,7 @@ left-lifted helper measurement.
 This is the SelfImprovement-level analogue of `#1042`: it lifts the existing
 field-for-field conversion `spectralTruncationStatement_of_witness` to the
 quantification used by `OrthonormalizationSpectralProducer`.  The honest
-mathematical content — actually building `R` — remains the caller's
+mathematical content — actually building `R` — remains an external
 responsibility, exactly as in `#1042`.  Combined with
 `orthonormalizationInput_of_producers` and a separate repair producer, this
 turns a `RoundingToProjectorsWitness` producer into the full
@@ -878,7 +880,7 @@ the named QXP-layer `projectiveNonMeasurement` statement.
 
 Compared with `orthonormalizationSpectralProducer_of_roundingWitnesses`, this
 version exposes the remaining constructive obligation at the paper-facing
-statement `lem:projective-non-measurement` instead of asking callers to provide
+statement `lem:projective-non-measurement` instead of requiring applications to provide
 the dependent pair of rounded-family data directly. -/
 noncomputable def orthonormalizationSpectralProducer_of_projectiveNonMeasurement
     {params : Parameters} [FieldModel params.q]
