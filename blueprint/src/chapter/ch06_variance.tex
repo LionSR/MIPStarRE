@@ -24,18 +24,18 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 	Expand the $\approx_{md/q}$ norm on the weighted vector $(I\ot (G_g)^{1/2})\ket{\psi}$. Because $B^\ell$ is a projective measurement, only those line polynomials $f$ with $f\ne g|_\ell$ and $f(u)=g(u)$ contribute. Lemma~\ref{lem:axis-line-polynomial-agreement-mdq} is the univariate Schwartz--Zippel wrapper used in Lean for this line-restriction event; it supplies the paper's $md/q$ loss, and the remaining operator sum is bounded by the fact that $G$ is a submeasurement.
 \end{proof}
 
-\begin{remark}[Compatibility routes for the collision-residual estimate]\label{rem:generalize-b-collision-residual-compatibility}
+\begin{remark}[Conditional variants for the collision-residual estimate]\label{rem:generalize-b-collision-residual-conditional}
 	\lean{MIPStarRE.LDT.GlobalVariance.generalizeBFromCollisionResidual}
 	\lean{MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual_le_of_seedExpansion_eq}
 	\lean{MIPStarRE.LDT.GlobalVariance.generalizeBFromSeedCollisionExpansion}
 	\lean{MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual_le_of_lineExpansion_eq}
 	\lean{MIPStarRE.LDT.GlobalVariance.generalizeBFromLineCollisionExpansion}
 	The paper proof of Lemma~\ref{lem:generalize-b} bounds the collision event
-	directly by the Schwartz--Zippel estimate.  The Lean development also records
-	compatibility routes in which this collision estimate, or one of the
-	reindexing identities that implies it, is supplied as an explicit input.
-	These auxiliary routes are useful for older callers, but they are not
-	additional hypotheses in the paper statement of Lemma~\ref{lem:generalize-b}.
+	directly by the Schwartz--Zippel estimate.  The following conditional variants
+	instead assume this collision estimate, or one of the reindexing identities
+	that implies it, as an explicit hypothesis.  These conditional statements
+	record proof obligations to be discharged; they are not additional hypotheses
+	in the paper statement of Lemma~\ref{lem:generalize-b}.
 \end{remark}
 
 \begin{lemma}[Local variance of the points measurements]\label{lem:local-variance-of-points}
