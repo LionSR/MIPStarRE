@@ -315,7 +315,7 @@ bundled SDP witness rather than repeated as helper fields.
 The paper and blueprint state four additional helper-lemma guarantees
 (`completeness`, `pointConsistency`, strong self-consistency, and boundedness).
 Those do not yet come from these arguments alone, so they are not fields here;
-they should be proved as separate estimates that consume this reduced
+they should be proved as separate estimates that consume this SDP-witness
 conclusion together with the paper hypotheses. -/
 structure SelfImprovementHelperConclusion (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
