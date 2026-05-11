@@ -500,6 +500,20 @@
 	$(3\eps,3\eps,3\eps)$ and unpacking the bundled successor-boundary fields.
 \end{proof}
 
+\begin{remark}[Successor projective-completion producer]\label{rem:main-formal-successor-completion-producer}
+	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorProjectiveCompletionResidualProducer}
+	\uses{lem:main-formal-successor-handoff, thm:main-formal}
+	The Lean declaration named here records the remaining successor-case construction
+	needed after the Section~6 role-register handoff.  Starting from a projective
+	strategy that passes the low individual degree test, the Section~6 large-\(k\)
+	bound, and the non-base condition \(m \neq 1\), it is expected to produce the
+	projective-completion residual consumed by the checked conditional theorem
+	\texttt{mainFormal\_ofRepairedBridge}.  It is not an additional hypothesis of
+	Theorem~\ref{thm:main-formal}; it is the open construction that should replace
+	the successor-branch residual currently represented by a tracked Lean
+	\texttt{sorry}.
+\end{remark}
+
 \begin{remark}[Lean measurement-unsymmetrization bridge]\label{rem:main-formal-unsymmetrization-bridge}
 	\lean{MIPStarRE.LDT.extractRoleBlock, MIPStarRE.LDT.extractRoleBlock_apply, MIPStarRE.LDT.extractRoleBlock_zero, MIPStarRE.LDT.extractRoleBlock_add, MIPStarRE.LDT.extractRoleBlock_sub, MIPStarRE.LDT.extractRoleBlock_smul}
 	\lean{MIPStarRE.LDT.extractRoleBlock_finset_sum, MIPStarRE.LDT.extractRoleBlock_univ_sum, MIPStarRE.LDT.extractRoleBlock_one, MIPStarRE.LDT.extractRoleBlock_nonneg, MIPStarRE.LDT.extractRoleBlock_le}
