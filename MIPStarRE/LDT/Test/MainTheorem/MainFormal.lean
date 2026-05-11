@@ -363,7 +363,7 @@ role residual in the base case.  It only uses the residual produced by
 `MainFormalRolePackageResidual.ofBaseCase`; this definition names that choice so
 the remaining explicit bridge hypothesis can be stated at the same precision. -/
 noncomputable def mainFormalBaseRoleResidual
-    (params : Parameters) [FieldModel params.q]
+    (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
