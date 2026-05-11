@@ -18,7 +18,7 @@ orthonormalization and final-fields conditions taken as explicit hypotheses.
 
 ## Contents
 
-- **selfImprovementHelper_reduced** — construction lemma producing `T`, `Ĥ`,
+- **selfImprovementHelperConstruction** — construction lemma producing `T`, `Ĥ`,
   `Z` and `SelfImprovementHelperConclusion` from `sdp` + `addInU`.
 - **selfImprovementHelper** — `lem:self-improvement-helper`, with the paper's
   input consistency hypothesis and four helper conclusions.
@@ -84,7 +84,7 @@ sandwiched submeasurement `H`, and the dual witness `Z`. The paper's consistency
 hypothesis for the input measurement is not needed for these three constructed
 objects; it is used by `selfImprovementHelper` to prove the four helper
 conclusions. -/
-lemma selfImprovementHelper_reduced
+lemma selfImprovementHelperConstruction
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -154,11 +154,11 @@ lemma self_improvement_helper_with_slackness_of_sdp_statement_with_slackness
 /-- Helper lemma driven by the Section 9 SDP statement with complementary
 slackness.
 
-This is the slackness-carrying companion to `selfImprovementHelper_reduced`: it
-applies the Section 9 statement `sdp_statement_with_slackness`, which records
-the strong-duality conclusion with complementary slackness. The reduced theorem
-`selfImprovementHelper_reduced` remains separate, because its current `sdp` input has
-not yet formalized the strong-duality argument. -/
+This is the slackness-carrying companion to `selfImprovementHelperConstruction`:
+it applies the Section 9 statement `sdp_statement_with_slackness`, which records
+the strong-duality conclusion with complementary slackness.  The construction
+lemma remains separate, because its current `sdp` input has not yet formalized
+the strong-duality argument. -/
 lemma self_improvement_helper_with_slackness
     (params : Parameters)
     [FieldModel params.q]
@@ -252,7 +252,7 @@ theorem selfImprovement_assumingFinalFields
     (G : Measurement (Polynomial params) ι) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu := by
-  rcases selfImprovementHelper_reduced params strategy eps delta gamma hgood nu
+  rcases selfImprovementHelperConstruction params strategy eps delta gamma hgood nu
       G with
     ⟨T, Hhat, Z, hhelper⟩
   have hssc :
