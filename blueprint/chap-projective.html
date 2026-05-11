@@ -377,21 +377,19 @@
 
   </div>
 </div>
-<div class="lemma_thmwrapper theorem-style-plain" id="lem:residual-total-domination">
-  <div class="lemma_thmheading">
-    <span class="lemma_thmcaption">
-    Lemma
+<div class="remark_thmwrapper theorem-style-remark" id="rem:lean-residual-domination-declarations">
+  <div class="remark_thmheading">
+    <span class="remark_thmcaption">
+    Remark
     </span>
-    <span class="lemma_thmlabel">4.3</span>
-    <span class="lemma_thmtitle">Residual domination implies retained-total domination</span>
+    <span class="remark_thmlabel">4.3</span>
+    <span class="remark_thmtitle">Lean auxiliary declarations: residual domination</span>
     <div class="thm_header_extras">
 
-    
-    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="chap-projective.html#lem:residual-total-domination">#</a>
+    <a class="icon proof" href="chap-projective.html#rem:lean-residual-domination-declarations">#</a>
     
     
     
@@ -406,10 +404,6 @@
         
         <ul class="uses">
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationInputWithResidualDomination" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationInputWithResidualDomination</a></li>
-          
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization_with_total_le_of_residual_domination" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization_with_total_le_of_residual_domination</a></li>
-          
         </ul>
     
       </div>
@@ -418,8 +412,8 @@
     
         </div>
   </div>
-  <div class="lemma_thmcontent">
-  <p>    Let \(A=\{ A_a\} _{a\in \mathcal A}\) be a sub-measurement, and complete it to \(\widehat A\) on \(\mathcal A\cup \{ \bot \} \) by setting \(\widehat A_\bot =I-A_{\mathrm{tot}}\). Let \(\widehat P\) be a projective sub-measurement on the completed outcome set. If the completed projective family puts at least the original residual mass on the fresh outcome, </p>
+  <div class="remark_thmcontent">
+  <p>    The following are Lean auxiliary declarations, not hypotheses in Theorem&#160;<a href="chap-projective.html#thm:orthonormalization">4.2</a>. Let \(A=\{ A_a\} _{a\in \mathcal A}\) be a sub-measurement, and complete it to \(\widehat A\) on \(\mathcal A\cup \{ \bot \} \) by setting \(\widehat A_\bot =I-A_{\mathrm{tot}}\). Let \(\widehat P\) be a projective sub-measurement on the completed outcome set. If the completed projective family puts at least the original residual mass on the fresh outcome, </p>
 <div class="displaymath" id="a0000000130">
   \[  \widehat A_\bot \leq \widehat P_\bot ,  \]
 </div>
@@ -431,7 +425,7 @@
 <div class="displaymath" id="a0000000132">
   \[  \langle \psi ,\,  I\otimes P_{\mathrm{tot}}\rangle \leq \langle \psi ,\,  I\otimes A_{\mathrm{tot}}\rangle .  \]
 </div>
-<p> This isolates the order-theoretic invariant needed to pass from the option-completed orthonormalization output to the monotone-total route used in the self-improvement theorem. The formal development also records the corresponding strengthened orthonormalization wrapper: if the repair input for the option-completed measurement carries this residual-domination invariant, then the orthonormalized restriction satisfies both the usual state-dependent-distance conclusion and the displayed total comparisons. </p>
+<p> This isolates the order-theoretic invariant needed to pass from the option-completed orthonormalization output to the monotone-total route used in the self-improvement theorem. The formal development also records the corresponding strengthened orthonormalization statement: if the repair hypothesis for the option-completed measurement carries this residual-domination invariant, then the orthonormalized restriction satisfies both the usual state-dependent-distance conclusion and the displayed total comparisons. </p>
 
   </div>
 </div>
@@ -493,7 +487,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>    The inductive-step application of the orthogonalization lemma uses completion on both tensor factors. The formal development records the analytic completion statement on the left register; the shared preliminary helper compares right- and left-tensor placements at the level of the underlying state-dependent-distance form. Its submeasurement and indexed wrappers transport state-dependent distance to the right register under the permutation-invariance hypothesis on the state. The remaining two declarations package this transport with the orthonormalize-and-complete output so that the line-156 projectivization handoff can later be produced from the two completed measurements without restating the tensor-factor bookkeeping. </p>
+  <p>    The inductive-step application of the orthogonalization lemma uses completion on both tensor factors. The formal development records the analytic completion statement on the left register; the shared preliminary helper compares right- and left-tensor placements at the level of the underlying state-dependent-distance form. Its submeasurement and indexed wrappers transport state-dependent distance to the right register under the permutation-invariance hypothesis on the state. The remaining two declarations combine this transport with the orthonormalize-and-complete output so that the line-156 projectivization handoff can later be produced from the two completed measurements without restating the tensor-factor bookkeeping. </p>
 
   </div>
 </div>
@@ -503,7 +497,7 @@
     Remark
     </span>
     <span class="remark_thmlabel">4.5</span>
-    <span class="remark_thmtitle">Lean line-169 projectivization match-mass interface</span>
+    <span class="remark_thmtitle">Lean line-169 projectivization match-mass declarations</span>
     <div class="thm_header_extras">
 
         </div>
@@ -719,37 +713,89 @@
           
           <li><a href="sec-prelims.html#prop:simeq-for-measurements">Lemma 3.18</a></li>
           
-          <li><a href="chap-projective.html#lem:projective-non-measurement">Lemma 4.13</a></li>
+          <li><a href="chap-projective.html#lem:projective-non-measurement">Lemma 4.14</a></li>
           
-          <li><a href="chap-projective.html#lem:projective-low-rank-sum">Lemma 4.15</a></li>
+          <li><a href="chap-projective.html#lem:projective-low-rank-sum">Lemma 4.16</a></li>
           
-          <li><a href="chap-projective.html#lem:Q-completeness">Lemma 4.16</a></li>
+          <li><a href="chap-projective.html#lem:Q-completeness">Lemma 4.17</a></li>
           
-          <li><a href="chap-projective.html#lem:sqrt-Q-completeness">Lemma 4.17</a></li>
+          <li><a href="chap-projective.html#lem:sqrt-Q-completeness">Lemma 4.18</a></li>
           
-          <li><a href="chap-projective.html#lem:q-almost-projective">Lemma 4.18</a></li>
+          <li><a href="chap-projective.html#lem:q-almost-projective">Lemma 4.19</a></li>
           
-          <li><a href="chap-projective.html#lem:xa-t">Lemma 4.23</a></li>
+          <li><a href="chap-projective.html#lem:xa-t">Lemma 4.24</a></li>
           
-          <li><a href="chap-projective.html#lem:qa-restated">Lemma 4.24</a></li>
+          <li><a href="chap-projective.html#lem:qa-restated">Lemma 4.25</a></li>
           
-          <li><a href="chap-projective.html#lem:X-squared">Lemma 4.25</a></li>
+          <li><a href="chap-projective.html#lem:X-squared">Lemma 4.26</a></li>
           
-          <li><a href="chap-projective.html#lem:X-expression-to-Q-expression">Lemma 4.26</a></li>
+          <li><a href="chap-projective.html#lem:X-expression-to-Q-expression">Lemma 4.27</a></li>
           
-          <li><a href="chap-projective.html#lem:pa-restated">Lemma 4.27</a></li>
+          <li><a href="chap-projective.html#lem:pa-restated">Lemma 4.28</a></li>
           
-          <li><a href="chap-projective.html#lem:X-hat-squared">Lemma 4.28</a></li>
+          <li><a href="chap-projective.html#lem:X-hat-squared">Lemma 4.29</a></li>
           
-          <li><a href="chap-projective.html#lem:X-times-X-hat">Lemma 4.29</a></li>
+          <li><a href="chap-projective.html#lem:X-times-X-hat">Lemma 4.30</a></li>
           
-          <li><a href="chap-projective.html#lem:squared-difference">Lemma 4.30</a></li>
+          <li><a href="chap-projective.html#lem:squared-difference">Lemma 4.31</a></li>
           
-          <li><a href="chap-projective.html#lem:P-projectivity">Lemma 4.31</a></li>
+          <li><a href="chap-projective.html#lem:P-projectivity">Lemma 4.32</a></li>
           
-          <li><a href="chap-projective.html#lem:P-Q-approx">Lemma 4.32</a></li>
+          <li><a href="chap-projective.html#lem:P-Q-approx">Lemma 4.33</a></li>
           
           <li><a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">Lemma 3.27</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>  Let \(\lvert \psi  \rangle \) be a state, and let \(A = \{ A_a\} \) and \(B = \{ B_a\} \) be measurements such that </p>
+<div class="displaymath" id="a0000000144">
+  \[  A_a \otimes I \simeq _\zeta I \otimes B_a  \]
+</div>
+<p> on state \(\lvert \psi  \rangle \). Here \(\lvert \psi  \rangle \) is not assumed to be permutation-invariant. Then there exists a projective sub-measurement \(P = \{ P_a\} \) such that </p>
+<div class="displaymath" id="a0000000145">
+  \[  A_a \otimes I \approx _{84 \zeta ^{1/4}} P_a \otimes I.  \]
+</div>
+
+  </div>
+</div>
+<div class="remark_thmwrapper theorem-style-remark" id="rem:lean-orthonormalization-main-declarations">
+  <div class="remark_thmheading">
+    <span class="remark_thmcaption">
+    Remark
+    </span>
+    <span class="remark_thmlabel">4.9</span>
+    <span class="remark_thmtitle">Lean auxiliary declarations for the orthogonalization lemma</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#rem:lean-orthonormalization-main-declarations">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap-projective.html#lem:orthonormalization-main-lemma">Lemma 4.8</a></li>
+          
+          <li><a href="chap-projective.html#lem:left-lifted-projectivization-repair">Lemma 4.10</a></li>
           
         </ul>
     
@@ -769,8 +815,6 @@
         
         <ul class="uses">
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma</a></li>
-          
         </ul>
     
       </div>
@@ -779,15 +823,8 @@
     
         </div>
   </div>
-  <div class="lemma_thmcontent">
-  <p>   Let \(\lvert \psi  \rangle \) be a state, and let \(A = \{ A_a\} \) and \(B = \{ B_a\} \) be measurements such that </p>
-<div class="displaymath" id="a0000000144">
-  \[  A_a \otimes I \simeq _\zeta I \otimes B_a  \]
-</div>
-<p> on state \(\lvert \psi  \rangle \). Here \(\lvert \psi  \rangle \) is not assumed to be permutation-invariant. Then there exists a projective sub-measurement \(P = \{ P_a\} \) such that </p>
-<div class="displaymath" id="a0000000145">
-  \[  A_a \otimes I \approx _{84 \zeta ^{1/4}} P_a \otimes I.  \]
-</div>
+  <div class="remark_thmcontent">
+  <p>     The current Lean declarations for Lemma&#160;<a href="chap-projective.html#lem:orthonormalization-main-lemma">4.8</a> are conditional. They assume explicit spectral-truncation and repair hypotheses for the \(Q/X/\widehat X/P\) part of the paper proof. The declaration <span class="ttfamily">orthonormalizationMainLemma</span> uses the general repair hypothesis on the product space, whereas <span class="ttfamily">orthonormalizationMainLemma_local</span> and <span class="ttfamily">orthonormalizationMeasurement</span> use the locality-preserving repair hypothesis, requiring the repaired family to have the form \(P_a\otimes I\). These hypotheses are not present in the paper lemma and must be proved from its assumptions. Consequently these conditional declarations do not yet prove the paper lemma. </p>
 
   </div>
 </div>
@@ -796,7 +833,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.9</span>
+    <span class="lemma_thmlabel">4.10</span>
     <span class="lemma_thmtitle">Locality-preserving projectivization repair</span>
     <div class="thm_header_extras">
 
@@ -821,7 +858,7 @@
         
         <ul class="uses">
           
-          <li><a href="chap-projective.html#lem:projective-non-measurement">Lemma 4.13</a></li>
+          <li><a href="chap-projective.html#lem:projective-non-measurement">Lemma 4.14</a></li>
           
           <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
           
@@ -854,12 +891,12 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>   Paper origin: <span class="ttfamily">references/ldt-paper/orthonormalization.tex</span> lines 534–860 (rank reduction and the \(Q\)-side setup, including <a href="chap-projective.html#lem:xa-t">4.23</a> and <a href="chap-projective.html#lem:qa-restated">4.24</a>) and 862–1194 (the \(X/\widehat X/P\) algebra: <a href="chap-projective.html#lem:X-squared">4.25</a>, <a href="chap-projective.html#lem:X-hat-squared">4.28</a>, <a href="chap-projective.html#lem:X-times-X-hat">4.29</a>, <a href="chap-projective.html#lem:squared-difference">4.30</a>, <a href="chap-projective.html#lem:P-projectivity">4.31</a>, <a href="chap-projective.html#lem:P-Q-approx">4.32</a>, plus the final triangle-inequality assembly producing the \(84\zeta ^{1/4}\) bound). Together these are the late repair stage of the orthogonalization-lemma proof. </p>
-<p>Let \(\lvert \psi  \rangle \) be a state on a bipartite space, let \(A = \{ A_a\} \) be a measurement, and let \(\zeta \geq 0\). Given the rounded almost-projective family produced by Lemma&#160;<a href="chap-projective.html#lem:projective-non-measurement">4.13</a> on the left-lifted family \(\{ A_a \otimes I\} \), there exists a projective sub-measurement \(P = \{ P_a\} \) on the underlying space such that the lifted family \(\{ P_a \otimes I\} \) satisfies </p>
+  <p>   Paper origin: <span class="ttfamily">references/ldt-paper/orthonormalization.tex</span> lines 534–860 (rank reduction and the \(Q\)-side setup, including <a href="chap-projective.html#lem:xa-t">4.24</a> and <a href="chap-projective.html#lem:qa-restated">4.25</a>) and 862–1194 (the \(X/\widehat X/P\) algebra: <a href="chap-projective.html#lem:X-squared">4.26</a>, <a href="chap-projective.html#lem:X-hat-squared">4.29</a>, <a href="chap-projective.html#lem:X-times-X-hat">4.30</a>, <a href="chap-projective.html#lem:squared-difference">4.31</a>, <a href="chap-projective.html#lem:P-projectivity">4.32</a>, <a href="chap-projective.html#lem:P-Q-approx">4.33</a>, plus the final triangle-inequality assembly producing the \(84\zeta ^{1/4}\) bound). Together these are the late repair stage of the orthogonalization-lemma proof. </p>
+<p>Let \(\lvert \psi  \rangle \) be a state on a bipartite space, let \(A = \{ A_a\} \) be a measurement, and let \(\zeta \geq 0\). Given the rounded almost-projective family produced by Lemma&#160;<a href="chap-projective.html#lem:projective-non-measurement">4.14</a> on the left-lifted family \(\{ A_a \otimes I\} \), there exists a projective sub-measurement \(P = \{ P_a\} \) on the underlying space such that the lifted family \(\{ P_a \otimes I\} \) satisfies </p>
 <div class="displaymath" id="a0000000147">
   \[  A_a \otimes I \approx _{\mathsf{roundingToProjectiveError}(\zeta )} P_a \otimes I.  \]
 </div>
-<p> The locality-preserving form – output \(P_a \otimes I\) rather than an arbitrary lifted family – is the form Lemma&#160;<a href="chap-projective.html#lem:orthonormalization-main-lemma-local">4.10</a> uses; it is transported through the \(Q/X/\widehat X/P\) algebra via the rectangular polar decomposition for the sigma-range embedding. </p>
+<p> The locality-preserving form – output \(P_a \otimes I\) rather than an arbitrary lifted family – is the form recorded in Remark&#160;<a href="chap-projective.html#rem:lean-orthonormalization-main-declarations">4.9</a>; it is transported through the \(Q/X/\widehat X/P\) algebra via the rectangular polar decomposition for the sigma-range embedding. </p>
 
   </div>
 </div>
@@ -871,28 +908,23 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>The paper’s argument transports the rounded family produced by <a href="chap-projective.html#lem:projective-non-measurement">4.13</a> through the \(Q/X/\widehat X/P\) algebra (<a href="chap-projective.html#lem:X-squared">4.25</a>, <a href="chap-projective.html#lem:X-hat-squared">4.28</a>, <a href="chap-projective.html#lem:X-times-X-hat">4.29</a>, <a href="chap-projective.html#lem:squared-difference">4.30</a>, <a href="chap-projective.html#lem:P-projectivity">4.31</a>, <a href="chap-projective.html#lem:P-Q-approx">4.32</a>) and then descends to the locality-preserving lifted form. The proof is not yet complete (tracked by <a href ="https://github.com/LionSR/MIPStarRE/issues/1032">issue 1032</a>). </p>
+  <p>The paper’s argument transports the rounded family produced by <a href="chap-projective.html#lem:projective-non-measurement">4.14</a> through the \(Q/X/\widehat X/P\) algebra (<a href="chap-projective.html#lem:X-squared">4.26</a>, <a href="chap-projective.html#lem:X-hat-squared">4.29</a>, <a href="chap-projective.html#lem:X-times-X-hat">4.30</a>, <a href="chap-projective.html#lem:squared-difference">4.31</a>, <a href="chap-projective.html#lem:P-projectivity">4.32</a>, <a href="chap-projective.html#lem:P-Q-approx">4.33</a>) and then descends to the locality-preserving lifted form. The proof is not yet complete (tracked by <a href ="https://github.com/LionSR/MIPStarRE/issues/1032">issue 1032</a>). </p>
 
   </div>
 </div>
-<div class="lemma_thmwrapper theorem-style-plain" id="lem:orthonormalization-main-lemma-local">
-  <div class="lemma_thmheading">
-    <span class="lemma_thmcaption">
-    Lemma
+<div class="remark_thmwrapper theorem-style-remark" id="rem:conditional-orthonormalization-main-lemma-local">
+  <div class="remark_thmheading">
+    <span class="remark_thmcaption">
+    Remark
     </span>
-    <span class="lemma_thmlabel">4.10</span>
-    <span class="lemma_thmtitle">Local orthogonalization lemma for a measurement</span>
+    <span class="remark_thmlabel">4.11</span>
+    <span class="remark_thmtitle">Lean conditional declaration: local orthogonalization</span>
     <div class="thm_header_extras">
 
-    
-    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="chap-projective.html#lem:orthonormalization-main-lemma-local">#</a>
-    
-    <a class="icon proof" href="chap-projective.html#a0000000148"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
-</a>
+    <a class="icon proof" href="chap-projective.html#rem:conditional-orthonormalization-main-lemma-local">#</a>
     
     
     <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
@@ -920,69 +952,34 @@
 
     
     
-    <button class="modal lean">L∃∀N</button>
-        <div class="modal-container">
-      <div class="modal-content">
-        <header>
-          <h1>Lean declarations</h1>
-          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
-</button>
-        </header>
-        
-        <ul class="uses">
-          
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma_local" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma_local</a></li>
-          
-        </ul>
-    
-      </div>
-    </div>
-
-    
         </div>
   </div>
-  <div class="lemma_thmcontent">
-  <p>   Let \(\lvert \psi  \rangle \) be a unit vector, let \(A = \{ A_a\} \) be a measurement, and let \(0 \leq \zeta \leq 1\). Assume bipartite strong self-consistency </p>
-<div class="displaymath" id="a0000000149">
+  <div class="remark_thmcontent">
+  <p>  This is the local Lean declaration recorded in Remark&#160;<a href="chap-projective.html#rem:lean-orthonormalization-main-declarations">4.9</a>. Let \(\lvert \psi  \rangle \) be a unit vector, let \(A = \{ A_a\} \) be a measurement, and let \(0 \leq \zeta \leq 1\). Assume bipartite strong self-consistency </p>
+<div class="displaymath" id="a0000000148">
   \[  \sum _a \langle \psi  \rvert  A_a \otimes A_a \lvert \psi  \rangle  \geq \sum _a \langle \psi  \rvert  A_a \otimes I \lvert \psi  \rangle  - \zeta ,  \]
 </div>
 <p> together with a spectral-truncation witness for the left-lifted family \(\{ A_a \otimes I\} \) and a locality-preserving repair witness producing projective families of the form \(\widehat P_a = P_a \otimes I\). Then there exists a projective sub-measurement \(P = \{ P_a\} \) on the same space as \(A\) such that </p>
-<div class="displaymath" id="a0000000150">
+<div class="displaymath" id="a0000000149">
   \[  A_a \otimes I \approx _{84 \zeta ^{1/4}} P_a \otimes I.  \]
 </div>
+<p> Since \(A\) is a measurement, \(\sum _a A_a = I\), so bipartite strong self-consistency of \(A\) with itself is equivalent to bipartite consistency of \(A\) with itself. Feed this consistency hypothesis, together with the spectral-truncation and locality-preserving repair witnesses, into the measurement variant of <a href="chap-projective.html#lem:orthonormalization-main-lemma">4.8</a> with \(B = A\). The repair witness chooses the repaired family of the form \(P_a \otimes I\), so the conclusion descends to a local projective sub-measurement \(P = \{ P_a\} \) on the space of \(A\) with error bound \(84\zeta ^{1/4}\). </p>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000148">
-  <div class="proof_heading">
-    <span class="proof_caption">
-    Proof
+<div class="remark_thmwrapper theorem-style-remark" id="rem:conditional-orthonormalization-measurement">
+  <div class="remark_thmheading">
+    <span class="remark_thmcaption">
+    Remark
     </span>
-    <span class="expand-proof">▶</span>
-  </div>
-  <div class="proof_content">
-  <p> Since \(A\) is a measurement, \(\sum _a A_a = I\), so bipartite strong self-consistency of \(A\) with itself is equivalent to bipartite consistency of \(A\) with itself. Feed this consistency hypothesis, together with the spectral-truncation and locality-preserving repair witnesses, into the measurement variant of <a href="chap-projective.html#lem:orthonormalization-main-lemma">4.8</a> with \(B = A\). The repair witness chooses the repaired family of the form \(P_a \otimes I\), so the conclusion descends to a local projective sub-measurement \(P = \{ P_a\} \) on the space of \(A\) with error bound \(84\zeta ^{1/4}\). </p>
-
-  </div>
-</div>
-<div class="theorem_thmwrapper theorem-style-plain" id="thm:orthonormalization-measurement">
-  <div class="theorem_thmheading">
-    <span class="theorem_thmcaption">
-    Theorem
-    </span>
-    <span class="theorem_thmlabel">4.11</span>
-    <span class="theorem_thmtitle">Orthogonalization for a measurement</span>
+    <span class="remark_thmlabel">4.12</span>
+    <span class="remark_thmtitle">Lean conditional declaration: measurement-level orthogonalization</span>
     <div class="thm_header_extras">
 
-    
-    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="chap-projective.html#thm:orthonormalization-measurement">#</a>
-    
-    <a class="icon proof" href="chap-projective.html#a0000000151"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
-</a>
+    <a class="icon proof" href="chap-projective.html#rem:conditional-orthonormalization-measurement">#</a>
     
     
     <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
@@ -1001,53 +998,21 @@
           
           <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
           
-          <li><a href="chap-projective.html#lem:orthonormalization-main-lemma-local">Lemma 4.10</a></li>
-          
         </ul>
     
       </div>
     </div>
 
     
-    
-    <button class="modal lean">L∃∀N</button>
-        <div class="modal-container">
-      <div class="modal-content">
-        <header>
-          <h1>Lean declarations</h1>
-          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
-</button>
-        </header>
-        
-        <ul class="uses">
-          
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement</a></li>
-          
-        </ul>
-    
-      </div>
-    </div>
-
     
         </div>
   </div>
-  <div class="theorem_thmcontent">
-  <p>   Let \(\lvert \psi  \rangle \) be a unit vector, let \(A = \{ A_a\} \) be a measurement, and let \(0 \leq \zeta \leq 1\). Assume bipartite strong self-consistency of \(A\) together with the spectral-truncation and locality-preserving repair witnesses for the left-lifted family \(\{ A_a \otimes I\} \). Then there exists a projective sub-measurement \(P = \{ P_a\} \) such that </p>
-<div class="displaymath" id="a0000000152">
+  <div class="remark_thmcontent">
+  <p>  This is the measurement-level Lean declaration recorded in Remark&#160;<a href="chap-projective.html#rem:lean-orthonormalization-main-declarations">4.9</a>. Let \(\lvert \psi  \rangle \) be a unit vector, let \(A = \{ A_a\} \) be a measurement, and let \(0 \leq \zeta \leq 1\). Assume bipartite strong self-consistency of \(A\) together with the spectral-truncation and locality-preserving repair witnesses for the left-lifted family \(\{ A_a \otimes I\} \). Then there exists a projective sub-measurement \(P = \{ P_a\} \) such that </p>
+<div class="displaymath" id="a0000000150">
   \[  A_a \otimes I \approx _{100 \zeta ^{1/4}} P_a \otimes I.  \]
 </div>
-
-  </div>
-</div>
-<div class="proof_wrapper" id="a0000000151">
-  <div class="proof_heading">
-    <span class="proof_caption">
-    Proof
-    </span>
-    <span class="expand-proof">▶</span>
-  </div>
-  <div class="proof_content">
-  <p> Apply <a href="chap-projective.html#lem:orthonormalization-main-lemma-local">4.10</a> and weaken the error using \(84 \leq 100\) and \(\zeta ^{1/4} \geq 0\). No completion step is needed because \(A\) is already a measurement. </p>
+<p> Using the bound stated in Remark&#160;<a href="chap-projective.html#rem:conditional-orthonormalization-main-lemma-local">4.11</a>, weaken the error using \(84 \leq 100\) and \(\zeta ^{1/4} \geq 0\). No completion step is needed because \(A\) is already a measurement. </p>
 
   </div>
 </div>
@@ -1061,27 +1026,27 @@
   <div class="proof_content">
   
 <p>Let \(A = \{ A_a\} \) be a sub-measurement with outcomes in \(\mathcal A\). Write \(A=\sum _a A_a\). The strong self-consistency assumption implies </p>
-<div class="displaymath" id="a0000000153">
+<div class="displaymath" id="a0000000151">
   \[  \langle \psi  \rvert  A \otimes A \lvert \psi  \rangle  \geq \langle \psi  \rvert  A \otimes I \lvert \psi  \rangle  - \zeta ,  \]
 </div>
 <p> so </p>
-<div class="displaymath" id="a0000000154">
+<div class="displaymath" id="a0000000152">
   \[  \langle \psi  \rvert  A \otimes (I-A) \lvert \psi  \rangle  \leq \zeta .  \]
 </div>
 <p> Rearranging once more gives </p>
-<div class="displaymath" id="a0000000155">
+<div class="displaymath" id="a0000000153">
   \[  \langle \psi  \rvert  (I-A) \otimes (I-A) \lvert \psi  \rangle  \geq \langle \psi  \rvert  (I-A) \otimes I \lvert \psi  \rangle  - \zeta .  \]
 </div>
 <p>Complete \(A\) to the measurement \(\widehat A=\{ \widehat A_a\} _{a \in \widehat{\mathcal A}}\) on \(\widehat{\mathcal A}=\mathcal A \cup \{ \bot \} \) by setting \(\widehat A_a=A_a\) for \(a \in \mathcal A\) and \(\widehat A_{\bot }=I-A\). Adding the two preceding inequalities shows that \(\widehat A\) is \(2\zeta \)-strongly self-consistent. By <a href="sec-prelims.html#prop:other-two-notions-of-self-consistency">3.35</a>, this is equivalent to </p>
-<div class="displaymath" id="a0000000156">
+<div class="displaymath" id="a0000000154">
   \[  \widehat A_a \otimes I \simeq _{2\zeta } I \otimes \widehat A_a.  \]
 </div>
 <p> Apply <a href="chap-projective.html#lem:orthonormalization-main-lemma">4.8</a> to obtain a projective sub-measurement \(\widehat P\) such that </p>
-<div class="displaymath" id="a0000000157">
+<div class="displaymath" id="a0000000155">
   \[  \widehat A_a \otimes I \approx _{84(2\zeta )^{1/4}} \widehat P_a \otimes I.  \]
 </div>
 <p> Discard the extra outcome and set \(P_a=\widehat P_a\) for \(a \in \mathcal A\). Then </p>
-<div class="displaymath" id="a0000000158">
+<div class="displaymath" id="a0000000156">
   \[  A_a \otimes I \approx _{84(2\zeta )^{1/4}} P_a \otimes I,  \]
 </div>
 <p> and \(84 \cdot 2^{1/4} \leq 100\), so the claimed bound follows. </p>
@@ -1106,15 +1071,15 @@
 </p>
 </div>
 <p> By <a href="sec-prelims.html#prop:simeq-for-measurements">3.18</a>, </p>
-<div class="displaymath" id="a0000000159">
+<div class="displaymath" id="a0000000157">
   \[  \sum _a \langle \psi  \rvert  A_a \otimes B_a \lvert \psi  \rangle  \geq 1-\zeta .  \]
 </div>
 <p> Apply Cauchy–Schwarz to </p>
-<div class="displaymath" id="a0000000160">
+<div class="displaymath" id="a0000000158">
   \[  \sum _a \langle \psi  \rvert  (A_a \otimes I)\cdot (I \otimes B_a)\lvert \psi  \rangle   \]
 </div>
 <p> to obtain </p>
-<div class="displaymath" id="a0000000161">
+<div class="displaymath" id="a0000000159">
   \[  \sum _a \langle \psi  \rvert  (A_a)^2 \otimes I \lvert \psi  \rangle  \geq (1-\zeta )^2 \geq 1-2\zeta .  \]
 </div>
 <p> Because \(A\) is a measurement, this rewrites as </p>
@@ -1131,7 +1096,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.12</span>
+    <span class="lemma_thmlabel">4.13</span>
     <div class="thm_header_extras">
 
     
@@ -1141,7 +1106,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:trunc-inequality">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000162"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000160"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1169,13 +1134,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>  For any \(x \in [0, 1]\), </p>
-<div class="displaymath" id="a0000000163">
+<div class="displaymath" id="a0000000161">
   \begin{equation*}  (x - \mathsf{trunc}_\delta (x))^2 \leq \frac{1}{\delta } \cdot (x - x^2). \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000162">
+<div class="proof_wrapper" id="a0000000160">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1184,11 +1149,11 @@
   </div>
   <div class="proof_content">
   <p>If \(x \geq 1-\delta \), then \(\mathsf{trunc}_\delta (x)=1\). Since \(\delta \leq 1/2\) below, one also has \(x \geq \delta \), so </p>
-<div class="displaymath" id="a0000000164">
+<div class="displaymath" id="a0000000162">
   \[  (x-\mathsf{trunc}_\delta (x))^2 = (1-x)^2 \leq (1-x)\frac{x}{\delta } = \frac{1}{\delta }(x-x^2).  \]
 </div>
 <p> If \(x {\lt} 1-\delta \), then \(\mathsf{trunc}_\delta (x)=0\), and similarly </p>
-<div class="displaymath" id="a0000000165">
+<div class="displaymath" id="a0000000163">
   \[  (x-\mathsf{trunc}_\delta (x))^2 = x^2 \leq x\frac{1-x}{\delta } = \frac{1}{\delta }(x-x^2).  \]
 </div>
 
@@ -1199,7 +1164,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.13</span>
+    <span class="lemma_thmlabel">4.14</span>
     <span class="lemma_thmtitle">Rounding to projectors</span>
     <div class="thm_header_extras">
 
@@ -1210,7 +1175,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:projective-non-measurement">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000166"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000164"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1238,17 +1203,17 @@
   </div>
   <div class="lemma_thmcontent">
   <p>           There exists a set of projective matrices \(\{ R_a\} \) such that </p>
-<div class="displaymath" id="a0000000167">
+<div class="displaymath" id="a0000000165">
   \begin{equation*}  A_a \otimes I \approx _{2\sqrt{\zeta }} R_a \otimes I. \end{equation*}
 </div>
 <p> and </p>
-<div class="displaymath" id="a0000000168">
+<div class="displaymath" id="a0000000166">
   \begin{equation*}  R:= \sum _a R_a \leq (1+2\sqrt{\zeta }) \cdot I. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000166">
+<div class="proof_wrapper" id="a0000000164">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1257,7 +1222,7 @@
   </div>
   <div class="proof_content">
   <p> Write the eigendecomposition of \(A_a\) as </p>
-<div class="displaymath" id="a0000000169">
+<div class="displaymath" id="a0000000167">
   \[  A_a = \sum _i \lambda _{a,i}\lvert u_{a,i} \rangle \langle u_{a,i} \rvert .  \]
 </div>
 <p> Choose </p>
@@ -1270,24 +1235,24 @@
 </p>
 </div>
 <p> define \(\mathsf{trunc}_\delta :[0,1] \to \{ 0,1\} \) by \(\mathsf{trunc}_\delta (x)=1\) when \(x \geq 1-\delta \) and \(0\) otherwise, and set </p>
-<div class="displaymath" id="a0000000170">
+<div class="displaymath" id="a0000000168">
   \[  R_a = \mathsf{trunc}_\delta (A_a) = \sum _i \mathsf{trunc}_\delta (\lambda _{a,i}) \lvert u_{a,i} \rangle \langle u_{a,i} \rvert .  \]
 </div>
-<p> By <a href="chap-projective.html#lem:trunc-inequality">4.12</a>, </p>
-<div class="displaymath" id="a0000000171">
+<p> By <a href="chap-projective.html#lem:trunc-inequality">4.13</a>, </p>
+<div class="displaymath" id="a0000000169">
   \[  (A_a-R_a)^2 \leq \frac{1}{\delta }(A_a-(A_a)^2).  \]
 </div>
 <p> Summing expectations and using <a href="chap-projective.html#eq:A-looks-projective">2</a> gives </p>
-<div class="displaymath" id="a0000000172">
+<div class="displaymath" id="a0000000170">
   \[  \sum _a \Vert (A_a-R_a)\otimes I \lvert \psi  \rangle \Vert ^2 \leq \frac{2\zeta }{\delta },  \]
 </div>
 <p> so \(A_a \otimes I \approx _{2\zeta /\delta } R_a \otimes I\). </p>
 <p>For every \(x \in [0,1]\), one has \(\mathsf{trunc}_\delta (x) \leq x/(1-\delta )\), hence </p>
-<div class="displaymath" id="a0000000173">
+<div class="displaymath" id="a0000000171">
   \[  R_a \leq \frac{1}{1-\delta } A_a.  \]
 </div>
 <p> Summing over \(a\) and using that \(A\) is a measurement, </p>
-<div class="displaymath" id="a0000000174">
+<div class="displaymath" id="a0000000172">
   \[  R = \sum _a R_a \leq \frac{1}{1-\delta } I \leq (1+2\delta )I,  \]
 </div>
 <p> where the last estimate uses \(\delta \leq 1/2\). Setting \(\delta =\sqrt{\zeta }\) gives the claim, and <a href="chap-projective.html#eq:assumption-on-zeta">1</a> ensures \(\delta \leq 1/2\). </p>
@@ -1299,7 +1264,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.14</span>
+    <span class="lemma_thmlabel">4.15</span>
     <span class="lemma_thmtitle">Combinatorial averaging for the \(r {\gt} d\) branch</span>
     <div class="thm_header_extras">
 
@@ -1310,7 +1275,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:small-overlap-averaging">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000175"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000173"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1338,21 +1303,21 @@
   </div>
   <div class="lemma_thmcontent">
   <p>     Let \(f : \alpha \to \mathbb {R}\) be a function on a finite index set \(\alpha \) with \(|\alpha | = r\), and let \(L \subseteq \alpha \) with \(|L| = d\) and \(d {\lt} r\). Write \(S = L^\complement \) and assume \(f(s) \leq f(l)\) for every \(s \in S\) and \(l \in L\). Then the pairwise double-counting inequality </p>
-<div class="displaymath" id="a0000000176">
+<div class="displaymath" id="a0000000174">
   \[  |L|\,  \sum _{s \in S} f(s) \leq |S|\,  \sum _{l \in L} f(l)  \]
 </div>
 <p> holds, and hence also </p>
-<div class="displaymath" id="a0000000177">
+<div class="displaymath" id="a0000000175">
   \[  r\,  \sum _{s \in S} f(s) \leq |S|\,  \sum _{x \in \alpha } f(x).  \]
 </div>
 <p> If in addition \(r \leq (1+2\sqrt{\zeta })\, d\), \(\sum _{x \in \alpha } f(x) \leq 1 + 2\sqrt{\zeta }\), and \(0 \leq \zeta \leq 1/4\), then </p>
-<div class="displaymath" id="a0000000178">
+<div class="displaymath" id="a0000000176">
   \[  \sum _{s \in S} f(s) \leq 4\sqrt{\zeta }.  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000175">
+<div class="proof_wrapper" id="a0000000173">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1361,15 +1326,15 @@
   </div>
   <div class="proof_content">
   <p>Choose \(L\) to be a set of \(d\) indices on which the sum of \(f\) is maximal. If some \(s \in S\) and \(l \in L\) satisfied \(f(l) {\lt} f(s)\), replacing \(l\) by \(s\) would increase this sum, so every small index is bounded by every large index. Summing the inequalities \(f(s) \leq f(l)\) over all pairs \((s,l) \in S \times L\) gives </p>
-<div class="displaymath" id="a0000000179">
+<div class="displaymath" id="a0000000177">
   \[  |L|\sum _{s \in S} f(s) \leq |S|\sum _{l \in L} f(l).  \]
 </div>
 <p> Since \(\alpha \) is the disjoint union of \(L\) and \(S\), adding \(|S|\sum _{s \in S} f(s)\) to both sides yields </p>
-<div class="displaymath" id="a0000000180">
+<div class="displaymath" id="a0000000178">
   \[  r\sum _{s \in S} f(s) \leq |S|\sum _{x \in \alpha } f(x).  \]
 </div>
 <p> The hypotheses \(|L|=d\) and \(r \leq (1+2\sqrt{\zeta })d\) imply \(|S|/r \leq 2\sqrt{\zeta }\). Dividing by \(r\) and using \(\sum _{x \in \alpha } f(x) \leq 1+2\sqrt{\zeta }\) gives </p>
-<div class="displaymath" id="a0000000181">
+<div class="displaymath" id="a0000000179">
   \[  \sum _{s \in S} f(s) \leq 2\sqrt{\zeta }(1+2\sqrt{\zeta }).  \]
 </div>
 <p> Finally, \(\zeta \leq 1/4\) implies \(\sqrt{\zeta } \leq 1/2\), and hence \(2\sqrt{\zeta }(1+2\sqrt{\zeta }) \leq 4\sqrt{\zeta }\). </p>
@@ -1381,7 +1346,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.15</span>
+    <span class="lemma_thmlabel">4.16</span>
     <span class="lemma_thmtitle">Rank reduction</span>
     <div class="thm_header_extras">
 
@@ -1392,7 +1357,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:projective-low-rank-sum">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000182"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000180"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1420,21 +1385,21 @@
   </div>
   <div class="lemma_thmcontent">
   <p>  There exists a set of projection matrices \(\{ Q_a\} \) such that </p>
-<div class="displaymath" id="a0000000183">
+<div class="displaymath" id="a0000000181">
   \begin{equation*}  A_a \otimes I \approx _{12\sqrt{\zeta }} Q_a \otimes I. \end{equation*}
 </div>
 <p> and </p>
-<div class="displaymath" id="a0000000184">
+<div class="displaymath" id="a0000000182">
   \begin{equation*}  Q:= \sum _a Q_a \leq (1+2\sqrt{\zeta }) \cdot I. \end{equation*}
 </div>
 <p> Furthermore, </p>
-<div class="displaymath" id="a0000000185">
+<div class="displaymath" id="a0000000183">
   \begin{equation*}  \sum _a \mathrm{rank}(Q_a) \leq d. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000182">
+<div class="proof_wrapper" id="a0000000180">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1442,7 +1407,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>      Let \(\{ R_a\} \) be given by <a href="chap-projective.html#lem:projective-non-measurement">4.13</a>. Write \(r_a=\mathrm{rank}(R_a)\) and \(r=\sum _a r_a\). If \(r \leq d\), take \(Q_a=R_a\). Otherwise, </p>
+  <p>      Let \(\{ R_a\} \) be given by <a href="chap-projective.html#lem:projective-non-measurement">4.14</a>. Write \(r_a=\mathrm{rank}(R_a)\) and \(r=\sum _a r_a\). If \(r \leq d\), take \(Q_a=R_a\). Otherwise, </p>
 <div class="equation" id="eq:bound-on-r">
 <p>
   <div class="equation_content">
@@ -1452,11 +1417,11 @@
 </p>
 </div>
 <p> Let \(\lvert v_{a,1} \rangle ,\ldots ,\lvert v_{a,r_a} \rangle \) be an orthonormal basis for the range of \(R_a\), so </p>
-<div class="displaymath" id="a0000000186">
+<div class="displaymath" id="a0000000184">
   \[  R_a = \sum _{i=1}^{r_a} \lvert v_{a,i} \rangle \langle v_{a,i} \rvert .  \]
 </div>
 <p> Define the overlaps </p>
-<div class="displaymath" id="a0000000187">
+<div class="displaymath" id="a0000000185">
   \[  o_{a,i} = \langle \psi  \rvert  (\lvert v_{a,i} \rangle \langle v_{a,i} \rvert  \otimes I)\lvert \psi  \rangle .  \]
 </div>
 <p> Their total satisfies </p>
@@ -1488,35 +1453,35 @@
 </div>
 <p> using <a href="chap-projective.html#eq:size-of-small-is-small">6</a>, <a href="chap-projective.html#eq:total-overlap">5</a>, and <a href="chap-projective.html#eq:assumption-on-zeta">1</a>. </p>
 <p>For each \(a\), let \(\mathsf{Large}_a=\{ i : (a,i)\in \mathsf{Large}\} \) and define </p>
-<div class="displaymath" id="a0000000188">
+<div class="displaymath" id="a0000000186">
   \[  Q_a = \sum _{i \in \mathsf{Large}_a} \lvert v_{a,i} \rangle \langle v_{a,i} \rvert .  \]
 </div>
 <p> Then \(\sum _a \mathrm{rank}(Q_a)=|\mathsf{Large}| \leq d\), and \(Q_a \leq R_a\) for every \(a\), so </p>
-<div class="displaymath" id="a0000000189">
+<div class="displaymath" id="a0000000187">
   \[  Q = \sum _a Q_a \leq \sum _a R_a = R \leq (1+2\sqrt{\zeta })I.  \]
 </div>
 <p> Also, </p>
-<div class="displaymath" id="a0000000190">
+<div class="displaymath" id="a0000000188">
   \[  R_a-Q_a = \sum _{i \in \mathsf{Small}_a} \lvert v_{a,i} \rangle \langle v_{a,i} \rvert   \]
 </div>
 <p> is a projector, hence </p>
-<div class="displaymath" id="a0000000191">
+<div class="displaymath" id="a0000000189">
   \[  \sum _a \Vert (R_a-Q_a)\otimes I \lvert \psi  \rangle \Vert ^2 = \sum _{(a,i)\in \mathsf{Small}} o_{a,i} \leq 4\sqrt{\zeta }  \]
 </div>
-<p> by <a href="chap-projective.html#eq:small-overlaps">7</a>. Therefore \(R_a \otimes I \approx _{4\sqrt{\zeta }} Q_a \otimes I\). Combining this with <a href="chap-projective.html#lem:projective-non-measurement">4.13</a> and the triangle inequality for \(\approx _\delta \) gives </p>
-<div class="displaymath" id="a0000000192">
+<p> by <a href="chap-projective.html#eq:small-overlaps">7</a>. Therefore \(R_a \otimes I \approx _{4\sqrt{\zeta }} Q_a \otimes I\). Combining this with <a href="chap-projective.html#lem:projective-non-measurement">4.14</a> and the triangle inequality for \(\approx _\delta \) gives </p>
+<div class="displaymath" id="a0000000190">
   \[  A_a \otimes I \approx _{12\sqrt{\zeta }} Q_a \otimes I.  \]
 </div>
 
   </div>
 </div>
-<p>Henceforth let \(Q=\{ Q_a\} \) be the family given by <a href="chap-projective.html#lem:projective-low-rank-sum">4.15</a>. </p>
+<p>Henceforth let \(Q=\{ Q_a\} \) be the family given by <a href="chap-projective.html#lem:projective-low-rank-sum">4.16</a>. </p>
 <div class="lemma_thmwrapper theorem-style-plain" id="lem:Q-completeness">
   <div class="lemma_thmheading">
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.16</span>
+    <span class="lemma_thmlabel">4.17</span>
     <span class="lemma_thmtitle">Completeness of&#160;\(Q\)</span>
     <div class="thm_header_extras">
 
@@ -1527,7 +1492,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:Q-completeness">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000193"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000191"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1555,13 +1520,13 @@
   </div>
   <div class="lemma_thmcontent">
   
-<div class="displaymath" id="a0000000194">
+<div class="displaymath" id="a0000000192">
   \begin{equation*}  \langle \psi  \rvert  Q \otimes I \lvert \psi  \rangle  \geq 1 - 11 \zeta ^{1/4}. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000193">
+<div class="proof_wrapper" id="a0000000191">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1579,10 +1544,10 @@
 </p>
 </div>
 <p> By Cauchy–Schwarz, </p>
-<div class="displaymath" id="a0000000195">
+<div class="displaymath" id="a0000000193">
   \[  \sum _a \langle \psi  \rvert  (Q_a)^2 \otimes I \lvert \psi  \rangle  \leq 1+2\sqrt{\zeta } \quad \text{and}\quad \sum _a \langle \psi  \rvert  (Q_a-A_a)^2 \otimes I \lvert \psi  \rangle  \leq 12\sqrt{\zeta }  \]
 </div>
-<p> from <a href="chap-projective.html#lem:projective-low-rank-sum">4.15</a>. A second Cauchy–Schwarz estimate yields </p>
+<p> from <a href="chap-projective.html#lem:projective-low-rank-sum">4.16</a>. A second Cauchy–Schwarz estimate yields </p>
 <div class="equation" id="eq:another-Q-for-A">
 <p>
   <div class="equation_content">
@@ -1592,7 +1557,7 @@
 </p>
 </div>
 <p> Combining <a href="chap-projective.html#eq:Q-for-an-A">8</a> and <a href="chap-projective.html#eq:another-Q-for-A">9</a> with <a href="chap-projective.html#eq:A-looks-projective">2</a> gives </p>
-<div class="displaymath" id="a0000000196">
+<div class="displaymath" id="a0000000194">
   \[  \langle \psi  \rvert  Q \otimes I \lvert \psi  \rangle  \geq \sum _a \langle \psi  \rvert  A_a \otimes I \lvert \psi  \rangle  - 2\zeta - 9\zeta ^{1/4} = 1 - 11\zeta ^{1/4},  \]
 </div>
 <p> since \(\zeta \leq \zeta ^{1/4}\) under <a href="chap-projective.html#eq:assumption-on-zeta">1</a>. </p>
@@ -1604,7 +1569,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.17</span>
+    <span class="lemma_thmlabel">4.18</span>
     <span class="lemma_thmtitle">Completeness of&#160;\(\sqrt{Q}\)</span>
     <div class="thm_header_extras">
 
@@ -1615,7 +1580,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:sqrt-Q-completeness">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000197"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000195"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1643,13 +1608,13 @@
   </div>
   <div class="lemma_thmcontent">
   
-<div class="displaymath" id="a0000000198">
+<div class="displaymath" id="a0000000196">
   \begin{equation*}  \langle \psi  \rvert  \sqrt{Q} \otimes I \lvert \psi  \rangle  \geq 1 - 12 \zeta ^{1/4}. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000197">
+<div class="proof_wrapper" id="a0000000195">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1657,16 +1622,16 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> Diagonalize \(Q=\sum _i \nu _i \lvert u_i \rangle \langle u_i \rvert \). Because \(Q \leq (1+2\sqrt{\zeta })I\) by <a href="chap-projective.html#lem:projective-low-rank-sum">4.15</a>, each \(\nu _i\) is at most \(1+2\sqrt{\zeta }\). Therefore </p>
-<div class="displaymath" id="a0000000199">
+  <p> Diagonalize \(Q=\sum _i \nu _i \lvert u_i \rangle \langle u_i \rvert \). Because \(Q \leq (1+2\sqrt{\zeta })I\) by <a href="chap-projective.html#lem:projective-low-rank-sum">4.16</a>, each \(\nu _i\) is at most \(1+2\sqrt{\zeta }\). Therefore </p>
+<div class="displaymath" id="a0000000197">
   \[  \sqrt{Q} = \sum _i \sqrt{\nu _i}\lvert u_i \rangle \langle u_i \rvert  \geq \frac{1}{\sqrt{1+2\sqrt{\zeta }}} Q.  \]
 </div>
 <p> The scalar estimate </p>
-<div class="displaymath" id="a0000000200">
+<div class="displaymath" id="a0000000198">
   \[  \frac{1}{\sqrt{1+2\sqrt{\zeta }}} \geq 1-\sqrt{\zeta }  \]
 </div>
-<p> gives \(\sqrt{Q} \geq (1-\sqrt{\zeta })Q\). Hence <a href="chap-projective.html#lem:Q-completeness">4.16</a> implies </p>
-<div class="displaymath" id="a0000000201">
+<p> gives \(\sqrt{Q} \geq (1-\sqrt{\zeta })Q\). Hence <a href="chap-projective.html#lem:Q-completeness">4.17</a> implies </p>
+<div class="displaymath" id="a0000000199">
   \[  \langle \psi  \rvert  \sqrt{Q} \otimes I \lvert \psi  \rangle  \geq (1-\sqrt{\zeta })(1-11\zeta ^{1/4}) \geq 1-12\zeta ^{1/4}.  \]
 </div>
 
@@ -1677,7 +1642,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.18</span>
+    <span class="lemma_thmlabel">4.19</span>
     <span class="lemma_thmtitle">\(Q\) is almost projective</span>
     <div class="thm_header_extras">
 
@@ -1688,7 +1653,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:q-almost-projective">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000202"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000200"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1716,13 +1681,13 @@
   </div>
   <div class="lemma_thmcontent">
   
-<div class="displaymath" id="a0000000203">
+<div class="displaymath" id="a0000000201">
   \begin{equation*}  \sum _a (Q_a \cdot Q \cdot Q_a - Q_a) \leq 4\sqrt{\zeta } \cdot I. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000202">
+<div class="proof_wrapper" id="a0000000200">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1730,8 +1695,8 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> Since \(Q \leq (1+2\sqrt{\zeta })I\) by <a href="chap-projective.html#lem:projective-low-rank-sum">4.15</a>, </p>
-<div class="displaymath" id="a0000000204">
+  <p> Since \(Q \leq (1+2\sqrt{\zeta })I\) by <a href="chap-projective.html#lem:projective-low-rank-sum">4.16</a>, </p>
+<div class="displaymath" id="a0000000202">
   \begin{align*}  \sum _a Q_a \cdot Q \cdot Q_a - \sum _a Q_a &  \leq (1+2\sqrt{\zeta }) \sum _a Q_a \cdot I \cdot Q_a - \sum _a Q_a \\ &  = (1+2\sqrt{\zeta })Q - Q \\ &  = 2\sqrt{\zeta }\, Q \\ &  \leq 2\sqrt{\zeta }(1+2\sqrt{\zeta })I \\ &  \leq 4\sqrt{\zeta }\, I, \end{align*}
 </div>
 <p> using <a href="chap-projective.html#eq:assumption-on-zeta">1</a> in the last step. </p>
@@ -1743,7 +1708,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">4.19</span>
+    <span class="definition_thmlabel">4.20</span>
     <span class="definition_thmtitle">Matrix decomposition of&#160;\(Q_a\)</span>
     <div class="thm_header_extras">
 
@@ -1767,7 +1732,7 @@
         
         <ul class="uses">
           
-          <li><a href="chap-projective.html#lem:projective-low-rank-sum">Lemma 4.15</a></li>
+          <li><a href="chap-projective.html#lem:projective-low-rank-sum">Lemma 4.16</a></li>
           
         </ul>
     
@@ -1799,19 +1764,19 @@
   </div>
   <div class="definition_thmcontent">
   <p>      For each \(a\), let </p>
-<div class="displaymath" id="a0000000205">
+<div class="displaymath" id="a0000000203">
   \[  m_a = \mathrm{rank}(Q_a),  \]
 </div>
 <p> and let \(\lvert v_{a,1} \rangle ,\ldots ,\lvert v_{a,m_a} \rangle \) be an orthonormal basis for the range of \(Q_a\), so that </p>
-<div class="displaymath" id="a0000000206">
+<div class="displaymath" id="a0000000204">
   \[  Q_a = \sum _{i=1}^{m_a} \lvert v_{a,i} \rangle \langle v_{a,i} \rvert .  \]
 </div>
 <p> Let </p>
-<div class="displaymath" id="a0000000207">
+<div class="displaymath" id="a0000000205">
   \[  m = \sum _a m_a,  \]
 </div>
 <p> and let \(\{ \lvert a,i \rangle \} \) be an orthonormal basis of \(\mathbb {C}^m\), indexed by all \(a\) and all \(1 \leq i \leq m_a\). For each \(a\), define </p>
-<div class="displaymath" id="a0000000208">
+<div class="displaymath" id="a0000000206">
   \[  X_a = \sum _{i=1}^{m_a} \lvert a,i \rangle \langle v_{a,i} \rvert , \qquad T_a = \sum _{i=1}^{m_a} \lvert a,i \rangle \langle a,i \rvert ,  \]
 </div>
 <p> and define </p>
@@ -1832,7 +1797,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">4.20</span>
+    <span class="definition_thmlabel">4.21</span>
     <span class="definition_thmtitle">SVD of&#160;\(X\)</span>
     <div class="thm_header_extras">
 
@@ -1856,7 +1821,7 @@
         
         <ul class="uses">
           
-          <li><a href="chap-projective.html#def:matrix-decomposition-Q">Definition 4.19</a></li>
+          <li><a href="chap-projective.html#def:matrix-decomposition-Q">Definition 4.20</a></li>
           
         </ul>
     
@@ -1888,10 +1853,10 @@
   </div>
   <div class="definition_thmcontent">
   <p>       The paper presents this step by choosing a singular value decomposition </p>
-<div class="displaymath" id="a0000000209">
+<div class="displaymath" id="a0000000207">
   \[  X = U \cdot \Sigma _{m \times d} \cdot V^\dagger .  \]
 </div>
-<p> The formalization has two closely related interfaces. The reduced data package records the downstream consequences of the choice: the matrices \(X\) and \(\widehat X\), the identities \(X^\dagger X=Q\), \(\widehat X\widehat X^\dagger =I\), and \(X^\dagger \widehat X=\sqrt Q\), together with the \(Q_a=X^\dagger T_aX\) restatement. The rectangular-SVD producers take explicit matrices \(U,V,\Sigma ,I_{m\times d}\) and derive the two stored \(\widehat X\) identities from the matrix calculation below. </p>
+<p> The formalization has two closely related auxiliary declarations. The reduced datum records the downstream consequences of the choice: the matrices \(X\) and \(\widehat X\), the identities \(X^\dagger X=Q\), \(\widehat X\widehat X^\dagger =I\), and \(X^\dagger \widehat X=\sqrt Q\), together with the \(Q_a=X^\dagger T_aX\) restatement. The rectangular-SVD lemmas take explicit matrices \(U,V,\Sigma ,I_{m\times d}\) and derive the two stored \(\widehat X\) identities from the matrix calculation below. </p>
 
   </div>
 </div>
@@ -1900,7 +1865,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">4.21</span>
+    <span class="remark_thmlabel">4.22</span>
     <div class="thm_header_extras">
 
         </div>
@@ -1931,7 +1896,7 @@
   </div>
   <div class="remark_thmcontent">
   <p>    If the family \(\{ Q_a\} \) were a projective measurement, then the vectors \(\lvert v_{a,i} \rangle \), over all \(a\) and all \(1 \leq i \leq m_a\), would be orthonormal. Then <a href="chap-projective.html#eq:looks-like-singular-value-decomposition" class="eqref">10</a> would already be a singular value decomposition of \(X\), with \(\Sigma = I_{m \times d}\). Equivalently, </p>
-<div class="displaymath" id="a0000000210">
+<div class="displaymath" id="a0000000208">
   \[  X = U \cdot I_{m \times d} \cdot V^\dagger .  \]
 </div>
 <p> This motivates replacing \(\Sigma \) by \(I\) in the definition of \(\widehat X\) and \(P\). </p>
@@ -1943,7 +1908,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">4.22</span>
+    <span class="definition_thmlabel">4.23</span>
     <span class="definition_thmtitle">Definition of&#160;\(P\)</span>
     <div class="thm_header_extras">
 
@@ -1967,9 +1932,9 @@
         
         <ul class="uses">
           
-          <li><a href="chap-projective.html#def:matrix-decomposition-Q">Definition 4.19</a></li>
+          <li><a href="chap-projective.html#def:matrix-decomposition-Q">Definition 4.20</a></li>
           
-          <li><a href="chap-projective.html#def:svd-of-X">Definition 4.20</a></li>
+          <li><a href="chap-projective.html#def:svd-of-X">Definition 4.21</a></li>
           
         </ul>
     
@@ -2001,11 +1966,11 @@
   </div>
   <div class="definition_thmcontent">
   <p>   The paper defines </p>
-<div class="displaymath" id="a0000000211">
+<div class="displaymath" id="a0000000209">
   \[  \widehat{X} = U \cdot I_{m \times d} \cdot V^\dagger .  \]
 </div>
-<p> We take \(\widehat X\) to be the reduced matrix supplied by the data package. For each \(a\), define </p>
-<div class="displaymath" id="a0000000212">
+<p> We take \(\widehat X\) to be the reduced matrix supplied by the stored datum. For each \(a\), define </p>
+<div class="displaymath" id="a0000000210">
   \[  \widehat{X}_a = T_a \cdot \widehat{X}, \qquad P_a = \widehat{X}_a^\dagger \cdot \widehat{X}_a.  \]
 </div>
 
@@ -2016,7 +1981,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.23</span>
+    <span class="lemma_thmlabel">4.24</span>
     <div class="thm_header_extras">
 
     
@@ -2026,7 +1991,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:xa-t">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000213"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000211"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2054,13 +2019,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>  For each \(a\), </p>
-<div class="displaymath" id="a0000000214">
+<div class="displaymath" id="a0000000212">
   \[  X_a = T_a \cdot X.  \]
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000213">
+<div class="proof_wrapper" id="a0000000211">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2069,7 +2034,7 @@
   </div>
   <div class="proof_content">
   <p>Multiply the definition of \(X\) by \(T_a\) on the left and use that \(T_a\) selects exactly the basis vectors \(\lvert a,i \rangle \): </p>
-<div class="displaymath" id="a0000000215">
+<div class="displaymath" id="a0000000213">
   \[  T_a \cdot X = \Big(\sum _{i=1}^{m_a} \lvert a,i \rangle \langle a,i \rvert \Big) \Big(\sum _b \sum _{j=1}^{m_b} \lvert b,j \rangle \langle v_{b,j} \rvert \Big) = \sum _{i=1}^{m_a} \lvert a,i \rangle \langle v_{a,i} \rvert  = X_a.  \]
 </div>
 
@@ -2080,7 +2045,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.24</span>
+    <span class="lemma_thmlabel">4.25</span>
     <span class="lemma_thmtitle">\(Q_a\) restated</span>
     <div class="thm_header_extras">
 
@@ -2091,7 +2056,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:qa-restated">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000216"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000214"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2123,13 +2088,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>  For each \(a\), </p>
-<div class="displaymath" id="a0000000217">
+<div class="displaymath" id="a0000000215">
   \begin{equation*}  Q_a = X_a^\dagger \cdot X_a = X^\dagger \cdot T_a \cdot X = X_a^\dagger \cdot X. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000216">
+<div class="proof_wrapper" id="a0000000214">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2137,8 +2102,8 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The identity \(X_a^\dagger X_a = Q_a\) follows by expanding the basis sums. The remaining equalities come from <a href="chap-projective.html#lem:xa-t">4.23</a> and the projectivity of \(T\): </p>
-<div class="displaymath" id="a0000000218">
+  <p> The identity \(X_a^\dagger X_a = Q_a\) follows by expanding the basis sums. The remaining equalities come from <a href="chap-projective.html#lem:xa-t">4.24</a> and the projectivity of \(T\): </p>
+<div class="displaymath" id="a0000000216">
   \[  X_a^\dagger \cdot X_a = (X^\dagger \cdot T_a)(T_a \cdot X) = X^\dagger \cdot T_a \cdot X = X_a^\dagger \cdot X.  \]
 </div>
 
@@ -2149,7 +2114,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.25</span>
+    <span class="lemma_thmlabel">4.26</span>
     <span class="lemma_thmtitle">\(X\) squared</span>
     <div class="thm_header_extras">
 
@@ -2158,7 +2123,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:X-squared">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000219"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000217"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2186,13 +2151,13 @@
   </div>
   <div class="lemma_thmcontent">
   
-<div class="displaymath" id="a0000000220">
+<div class="displaymath" id="a0000000218">
   \begin{equation*}  X^\dagger \cdot X = Q. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000219">
+<div class="proof_wrapper" id="a0000000217">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2200,8 +2165,8 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> Use that \(T\) is a measurement and then <a href="chap-projective.html#lem:qa-restated">4.24</a>: </p>
-<div class="displaymath" id="a0000000221">
+  <p> Use that \(T\) is a measurement and then <a href="chap-projective.html#lem:qa-restated">4.25</a>: </p>
+<div class="displaymath" id="a0000000219">
   \[  X^\dagger \cdot X = \sum _a X^\dagger \cdot T_a \cdot X = \sum _a Q_a = Q.  \]
 </div>
 <p> The additional paper identities involving \(U,V,\Sigma \) are the usual SVD computations. The Lean development also records the spectral calculation which will identify the mixed positive-Gram-image product with \(\sqrt Q\): the positive eigenvalues give the nonzero columns, while the zero eigenspace has zero coefficient in the square-root expansion and is killed by \(X\). The conjugate right-eigenvector rows over the positive spectrum are also orthonormal. Equivalently, any row-space vector orthogonal to the positive Gram images is killed by \(X^\dagger \). </p>
@@ -2213,7 +2178,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.26</span>
+    <span class="lemma_thmlabel">4.27</span>
     <div class="thm_header_extras">
 
     
@@ -2223,7 +2188,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:X-expression-to-Q-expression">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000222"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000220"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2251,13 +2216,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>  For each \(a\), </p>
-<div class="displaymath" id="a0000000223">
+<div class="displaymath" id="a0000000221">
   \begin{equation*}  X_a^\dagger \cdot (X \cdot X^\dagger - I_{m \times m})^2 \cdot X_a = Q_a \cdot Q \cdot Q_a - Q_a. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000222">
+<div class="proof_wrapper" id="a0000000220">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2265,16 +2230,16 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> Expand the square and apply <a href="chap-projective.html#lem:X-squared">4.25</a> and <a href="chap-projective.html#lem:qa-restated">4.24</a> term by term: </p>
-<div class="displaymath" id="a0000000224">
+  <p> Expand the square and apply <a href="chap-projective.html#lem:X-squared">4.26</a> and <a href="chap-projective.html#lem:qa-restated">4.25</a> term by term: </p>
+<div class="displaymath" id="a0000000222">
   \[  X_a^\dagger (X \cdot X^\dagger \cdot X \cdot X^\dagger ) X_a = Q_a \cdot Q \cdot Q_a,  \]
 </div>
 <p> while </p>
-<div class="displaymath" id="a0000000225">
+<div class="displaymath" id="a0000000223">
   \[  X_a^\dagger (X \cdot X^\dagger ) X_a = (X_a^\dagger \cdot X)(X^\dagger \cdot X_a) = Q_a \cdot Q_a = Q_a,  \]
 </div>
 <p> and \(X_a^\dagger I_{m \times m} X_a = X_a^\dagger X_a = Q_a\). Substituting these identities into </p>
-<div class="displaymath" id="a0000000226">
+<div class="displaymath" id="a0000000224">
   \[  (X \cdot X^\dagger - I_{m \times m})^2 = X \cdot X^\dagger \cdot X \cdot X^\dagger - 2X \cdot X^\dagger + I_{m \times m}  \]
 </div>
 <p> gives the claim. </p>
@@ -2286,7 +2251,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.27</span>
+    <span class="lemma_thmlabel">4.28</span>
     <span class="lemma_thmtitle">\(P_a\) restated</span>
     <div class="thm_header_extras">
 
@@ -2297,7 +2262,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:pa-restated">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000227"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000225"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2325,13 +2290,13 @@
   </div>
   <div class="lemma_thmcontent">
   <p>  For each \(a\), </p>
-<div class="displaymath" id="a0000000228">
+<div class="displaymath" id="a0000000226">
   \begin{equation*}  P_a = \widehat{X}^\dagger \cdot T_a \cdot \widehat{X} = \widehat{X}_a^\dagger \cdot \widehat{X}. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000227">
+<div class="proof_wrapper" id="a0000000225">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2340,7 +2305,7 @@
   </div>
   <div class="proof_content">
   <p> Since \(T\) is projective, </p>
-<div class="displaymath" id="a0000000229">
+<div class="displaymath" id="a0000000227">
   \[  P_a = \widehat{X}_a^\dagger \cdot \widehat{X}_a = (\widehat{X}^\dagger \cdot T_a)(T_a \cdot \widehat{X}) = \widehat{X}^\dagger \cdot T_a \cdot \widehat{X} = \widehat{X}_a^\dagger \cdot \widehat{X}.  \]
 </div>
 
@@ -2351,7 +2316,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.28</span>
+    <span class="lemma_thmlabel">4.29</span>
     <span class="lemma_thmtitle">\(\widehat{X}\) squared</span>
     <div class="thm_header_extras">
 
@@ -2360,7 +2325,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:X-hat-squared">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000230"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000228"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2388,13 +2353,13 @@
   </div>
   <div class="lemma_thmcontent">
   
-<div class="displaymath" id="a0000000231">
+<div class="displaymath" id="a0000000229">
   \begin{equation*}  \widehat{X} \cdot \widehat{X}^\dagger = I_{m \times m}. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000230">
+<div class="proof_wrapper" id="a0000000228">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2402,7 +2367,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>The paper proves this by multiplying out \(\widehat{X}=U\cdot I_{m\times d}\cdot V^\dagger \) and using the unitarity of \(U\) and \(V\). In Lean, the dimension hypothesis \(m\leq d\) already gives a rectangular matrix with orthonormal rows on the sigma auxiliary space; the chosen matrix <span class="ttfamily">sigmaFinXHatCoisometry</span> and its specification record this existence result as an input for the future construction. The formal lemma <span class="ttfamily">orthonormal_normalized_image_of_adjoint_comp_eigenvectors</span> records the singular-vector normalization calculation, <span class="ttfamily">normalized_matrix_image_rows_mul_conjTranspose</span> packages the corresponding row-coisometry identity, and <span class="ttfamily">positive_gram_spectrum_image_rows_transpose_mixed</span> records the adjoint action \(X^\dagger (\lambda ^{-1/2}Xv)=\lambda ^{1/2}v\) on the positive spectral part of the Gram operator. The formal lemma <span class="ttfamily">exists_unitary_with_positive_gram_spectrum_rows</span> records the next finite-dimensional step: after choosing distinct row positions for the positive spectrum, these normalized image rows extend to a square unitary matrix on the row space. The companion lemma <span class="ttfamily">exists_rectangular_coisometry_extending_orthonormal_rows</span> records the analogous rectangular completion for prescribed right rows when the dimension bound permits it. The formal lemma <span class="ttfamily">rectangularSvd_xHat_coisometry</span> records the corresponding matrix calculation, and <span class="ttfamily">exists_xHat_of_rectangularSvd</span> packages the resulting choice of \(\widehat X\) together with the mixed square-root identity below. </p>
+  <p>The paper proves this by multiplying out \(\widehat{X}=U\cdot I_{m\times d}\cdot V^\dagger \) and using the unitarity of \(U\) and \(V\). In Lean, the dimension hypothesis \(m\leq d\) already gives a rectangular matrix with orthonormal rows on the sigma auxiliary space; the chosen matrix <span class="ttfamily">sigmaFinXHatCoisometry</span> and its specification record this existence result as a hypothesis for the future construction. The formal lemma <span class="ttfamily">orthonormal_normalized_image_of_adjoint_comp_eigenvectors</span> records the singular-vector normalization calculation, while <span class="ttfamily">normalized_matrix_image_rows_mul_conjTranspose</span> combines the corresponding row-coisometry identity, and <span class="ttfamily">positive_gram_spectrum_image_rows_transpose_mixed</span> records the adjoint action \(X^\dagger (\lambda ^{-1/2}Xv)=\lambda ^{1/2}v\) on the positive spectral part of the Gram operator. The formal lemma <span class="ttfamily">exists_unitary_with_positive_gram_spectrum_rows</span> records the next finite-dimensional step: after choosing distinct row positions for the positive spectrum, these normalized image rows extend to a square unitary matrix on the row space. The companion lemma <span class="ttfamily">exists_rectangular_coisometry_extending_orthonormal_rows</span> records the analogous rectangular completion for prescribed right rows when the dimension bound permits it. The formal lemma <span class="ttfamily">rectangularSvd_xHat_coisometry</span> records the corresponding matrix calculation, and <span class="ttfamily">exists_xHat_of_rectangularSvd</span> gives the resulting choice of \(\widehat X\) together with the mixed square-root identity below. </p>
 
   </div>
 </div>
@@ -2411,7 +2376,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.29</span>
+    <span class="lemma_thmlabel">4.30</span>
     <span class="lemma_thmtitle">\(X\) times \(\widehat{X}\)</span>
     <div class="thm_header_extras">
 
@@ -2420,7 +2385,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:X-times-X-hat">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000232"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000230"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2448,13 +2413,13 @@
   </div>
   <div class="lemma_thmcontent">
   
-<div class="displaymath" id="a0000000233">
+<div class="displaymath" id="a0000000231">
   \begin{equation*}  X^\dagger \cdot \widehat{X} = \sqrt{Q}. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000232">
+<div class="proof_wrapper" id="a0000000230">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2462,7 +2427,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The paper obtains this from the SVD formula for \(X\) and the definition of \(\widehat X\). The formal lemma <span class="ttfamily">rectangularSvd_xHat_mixed_of_sqrtQ</span> is the corresponding matrix calculation in the form whose square-root target is the operator \(Q\) supplied by the QXP construction. The formal lemma <span class="ttfamily">rectangularSvd_middle_eq_sqrt_of_square</span> records the spectral step: a positive middle factor whose square is \(Q\) is the positive square root of \(Q\). The reduced data package then records this mixed-product identity as a primitive consequence, which is exactly the part needed in <a href="chap-projective.html#lem:squared-difference">4.30</a> and <a href="chap-projective.html#lem:P-Q-approx">4.32</a>. The companion paper identity for \(X\widehat X^\dagger \) is not used downstream. </p>
+  <p> The paper obtains this from the SVD formula for \(X\) and the definition of \(\widehat X\). The formal lemma <span class="ttfamily">rectangularSvd_xHat_mixed_of_sqrtQ</span> is the corresponding matrix calculation in the form whose square-root target is the operator \(Q\) supplied by the QXP construction. The formal lemma <span class="ttfamily">rectangularSvd_middle_eq_sqrt_of_square</span> records the spectral step: a positive middle factor whose square is \(Q\) is the positive square root of \(Q\). The reduced datum then records this mixed-product identity as a primitive consequence, which is exactly the part needed in <a href="chap-projective.html#lem:squared-difference">4.31</a> and <a href="chap-projective.html#lem:P-Q-approx">4.33</a>. The companion paper identity for \(X\widehat X^\dagger \) is not used downstream. </p>
 
   </div>
 </div>
@@ -2471,7 +2436,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.30</span>
+    <span class="lemma_thmlabel">4.31</span>
     <span class="lemma_thmtitle">Squared difference</span>
     <div class="thm_header_extras">
 
@@ -2482,7 +2447,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:squared-difference">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000234"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000232"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2510,13 +2475,13 @@
   </div>
   <div class="lemma_thmcontent">
   
-<div class="displaymath" id="a0000000235">
+<div class="displaymath" id="a0000000233">
   \begin{equation*}  (X - \widehat{X}) \cdot (X - \widehat{X})^\dagger \leq (X \cdot X^\dagger - I_{m \times m})^2. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000234">
+<div class="proof_wrapper" id="a0000000232">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2533,7 +2498,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.31</span>
+    <span class="lemma_thmlabel">4.32</span>
     <span class="lemma_thmtitle">Projectivity of&#160;\(P\)</span>
     <div class="thm_header_extras">
 
@@ -2544,7 +2509,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:P-projectivity">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000236"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000234"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2575,7 +2540,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000236">
+<div class="proof_wrapper" id="a0000000234">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2584,14 +2549,14 @@
   </div>
   <div class="proof_content">
   <p> For outcomes \(a,b\), </p>
-<div class="displaymath" id="a0000000237">
+<div class="displaymath" id="a0000000235">
   \begin{align*}  P_a \cdot P_b &  = (\widehat{X}^\dagger \cdot T_a \cdot \widehat{X}) (\widehat{X}^\dagger \cdot T_b \cdot \widehat{X}) \\ &  = \widehat{X}^\dagger \cdot T_a \cdot I_{m \times m} \cdot T_b \cdot \widehat{X} \\ &  = \widehat{X}^\dagger \cdot T_a \cdot \widehat{X} \cdot \mathbf{1}\! \left[[\right]a=b] \\ &  = P_a \cdot \mathbf{1}\! \left[[\right]a=b], \end{align*}
 </div>
-<p> where the second line uses <a href="chap-projective.html#lem:X-hat-squared">4.28</a>, the third uses that \(T\) is projective, and the last uses <a href="chap-projective.html#lem:pa-restated">4.27</a>. Summing over \(a\) shows \(\sum _a P_a \leq I\), so \(P\) is a projective sub-measurement. The formalization also records the sharper identity </p>
-<div class="displaymath" id="a0000000238">
+<p> where the second line uses <a href="chap-projective.html#lem:X-hat-squared">4.29</a>, the third uses that \(T\) is projective, and the last uses <a href="chap-projective.html#lem:pa-restated">4.28</a>. Summing over \(a\) shows \(\sum _a P_a \leq I\), so \(P\) is a projective sub-measurement. The formalization also records the sharper identity </p>
+<div class="displaymath" id="a0000000236">
   \[  \sum _a P_a=\widehat X^\dagger \widehat X,  \]
 </div>
-<p> and the resulting total-domination interfaces used later in the monotone-total self-improvement route. </p>
+<p> and the resulting total-domination estimates used later in the monotone-total self-improvement route. </p>
 
   </div>
 </div>
@@ -2600,7 +2565,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.32</span>
+    <span class="lemma_thmlabel">4.33</span>
     <span class="lemma_thmtitle">\(P\) is close to&#160;\(Q\)</span>
     <div class="thm_header_extras">
 
@@ -2609,7 +2574,7 @@
 
     <a class="icon proof" href="chap-projective.html#lem:P-Q-approx">#</a>
     
-    <a class="icon proof" href="chap-projective.html#a0000000239"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap-projective.html#a0000000237"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -2637,13 +2602,13 @@
   </div>
   <div class="lemma_thmcontent">
   
-<div class="displaymath" id="a0000000240">
+<div class="displaymath" id="a0000000238">
   \begin{equation*}  Q_a \otimes I \approx _{30\zeta ^{1/4}} P_a \otimes I. \end{equation*}
 </div>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000239">
+<div class="proof_wrapper" id="a0000000237">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -2651,7 +2616,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The formal proof follows this argument directly from the primitive \(X\), \(\widehat X\), and \(P\) identities; the \(30\zeta ^{1/4}\) estimate is derived here rather than stored as part of the data package. The rectangular-SVD producer combines the same estimate with the positive-square identification of the middle factor from <a href="chap-projective.html#lem:X-times-X-hat">4.29</a>. The positive-Gram sigma-space producer also records the coisometry \(X X^\dagger =I\) for the original sigma embedding when the projective \(Q\)-family is subnormalized; this is the construction-level hypothesis later used in the residual-domination argument for the fresh completed outcome. The quantity to bound is </p>
+  <p> The formal proof follows this argument directly from the primitive \(X\), \(\widehat X\), and \(P\) identities; the \(30\zeta ^{1/4}\) estimate is derived here rather than stored as part of the reduced datum. The rectangular-SVD lemma combines the same estimate with the positive-square identification of the middle factor from <a href="chap-projective.html#lem:X-times-X-hat">4.30</a>. The positive-Gram sigma-space lemma also records the coisometry \(X X^\dagger =I\) for the original sigma embedding when the projective \(Q\)-family is subnormalized; this is the construction-level hypothesis later used in the residual-domination argument for the fresh completed outcome. The quantity to bound is </p>
 <div class="equation" id="eq:P-Q-thing-to-bound">
 <p>
   <div class="equation_content">
@@ -2660,7 +2625,7 @@
   <span class="equation_label">11</span>
 </p>
 </div>
-<p> using the projectivity of \(Q\) and \(P\). The first term is at most \(1+2\sqrt{\zeta }\) by <a href="chap-projective.html#lem:projective-low-rank-sum">4.15</a>, and the second is at most \(1\) because \(P\) is a sub-measurement. </p>
+<p> using the projectivity of \(Q\) and \(P\). The first term is at most \(1+2\sqrt{\zeta }\) by <a href="chap-projective.html#lem:projective-low-rank-sum">4.16</a>, and the second is at most \(1\) because \(P\) is a sub-measurement. </p>
 <p>For the last two terms, </p>
 <div class="equation" id="eq:complex-conjugates">
 <p>
@@ -2670,8 +2635,8 @@
   <span class="equation_label">12</span>
 </p>
 </div>
-<p> By <a href="chap-projective.html#lem:qa-restated">4.24</a>, </p>
-<div class="displaymath" id="a0000000241">
+<p> By <a href="chap-projective.html#lem:qa-restated">4.25</a>, </p>
+<div class="displaymath" id="a0000000239">
   \[  \sum _a \langle \psi  \rvert  Q_aP_a \otimes I \lvert \psi  \rangle  = \sum _a \langle \psi  \rvert  (X_a^\dagger \cdot X \cdot P_a) \otimes I \lvert \psi  \rangle .  \]
 </div>
 <p> The main estimate is </p>
@@ -2684,39 +2649,39 @@
 </p>
 </div>
 <p> This follows by Cauchy–Schwarz: </p>
-<div class="displaymath" id="a0000000242">
+<div class="displaymath" id="a0000000240">
   \[  \Big|\sum _a \langle \psi  \rvert  ((X_a^\dagger \cdot (X-\widehat X)) \otimes I)\cdot (P_a \otimes I)\lvert \psi  \rangle \Big|  \]
 </div>
 <p> is bounded by the square root of </p>
-<div class="displaymath" id="a0000000243">
+<div class="displaymath" id="a0000000241">
   \[  \sum _a \langle \psi  \rvert  \big(X_a^\dagger \cdot (X-\widehat X)(X-\widehat X)^\dagger \cdot X_a\big)\otimes I \lvert \psi  \rangle ,  \]
 </div>
-<p> times the square root of \(\sum _a \langle \psi  \rvert (P_a)^2 \otimes I \lvert \psi  \rangle  \leq 1\). The first factor is at most \(4\sqrt{\zeta }\) by <a href="chap-projective.html#lem:squared-difference">4.30</a>, <a href="chap-projective.html#lem:X-expression-to-Q-expression">4.26</a>, and <a href="chap-projective.html#lem:q-almost-projective">4.18</a>, so the total error is at most \(2\zeta ^{1/4}\). </p>
+<p> times the square root of \(\sum _a \langle \psi  \rvert (P_a)^2 \otimes I \lvert \psi  \rangle  \leq 1\). The first factor is at most \(4\sqrt{\zeta }\) by <a href="chap-projective.html#lem:squared-difference">4.31</a>, <a href="chap-projective.html#lem:X-expression-to-Q-expression">4.27</a>, and <a href="chap-projective.html#lem:q-almost-projective">4.19</a>, so the total error is at most \(2\zeta ^{1/4}\). </p>
 <p>The right-hand side of <a href="chap-projective.html#eq:add-a-hat">13</a> is real, because </p>
-<div class="displaymath" id="a0000000244">
+<div class="displaymath" id="a0000000242">
   \[  \sum _a \langle \psi  \rvert  (X_a^\dagger \cdot \widehat{X} \cdot P_a)\otimes I \lvert \psi  \rangle  = \langle \psi  \rvert  (X^\dagger \cdot \widehat{X}) \otimes I \lvert \psi  \rangle  = \langle \psi  \rvert  \sqrt{Q} \otimes I \lvert \psi  \rangle ,  \]
 </div>
-<p> where the first equality uses <a href="chap-projective.html#lem:xa-t">4.23</a>, <a href="chap-projective.html#lem:pa-restated">4.27</a>, and <a href="chap-projective.html#lem:X-hat-squared">4.28</a> and that \(T\) is a measurement, and the second uses <a href="chap-projective.html#lem:X-times-X-hat">4.29</a>. Hence <a href="chap-projective.html#lem:sqrt-Q-completeness">4.17</a> and <a href="chap-projective.html#eq:add-a-hat">13</a> imply </p>
-<div class="displaymath" id="a0000000245">
+<p> where the first equality uses <a href="chap-projective.html#lem:xa-t">4.24</a>, <a href="chap-projective.html#lem:pa-restated">4.28</a>, and <a href="chap-projective.html#lem:X-hat-squared">4.29</a> and that \(T\) is a measurement, and the second uses <a href="chap-projective.html#lem:X-times-X-hat">4.30</a>. Hence <a href="chap-projective.html#lem:sqrt-Q-completeness">4.18</a> and <a href="chap-projective.html#eq:add-a-hat">13</a> imply </p>
+<div class="displaymath" id="a0000000243">
   \[  \mathfrak {R}\Big(\sum _a \langle \psi  \rvert  Q_aP_a \otimes I \lvert \psi  \rangle \Big) \geq 1-14\zeta ^{1/4}.  \]
 </div>
 <p> Substituting this into <a href="chap-projective.html#eq:complex-conjugates">12</a> and then into <a href="chap-projective.html#eq:P-Q-thing-to-bound">11</a> gives </p>
-<div class="displaymath" id="a0000000246">
+<div class="displaymath" id="a0000000244">
   \[  \sum _a \langle \psi  \rvert  (Q_a-P_a)^2 \otimes I \lvert \psi  \rangle  \leq (1+2\sqrt{\zeta }) + 1 - 2(1-14\zeta ^{1/4}) = 2\sqrt{\zeta } + 28\zeta ^{1/4} \leq 30\zeta ^{1/4}.  \]
 </div>
 
   </div>
 </div>
-<p>Finally, <a href="chap-projective.html#lem:projective-low-rank-sum">4.15</a> gives </p>
-<div class="displaymath" id="a0000000247">
+<p>Finally, <a href="chap-projective.html#lem:projective-low-rank-sum">4.16</a> gives </p>
+<div class="displaymath" id="a0000000245">
   \[  A_a \otimes I \approx _{12\sqrt{\zeta }} Q_a \otimes I,  \]
 </div>
-<p> and <a href="chap-projective.html#lem:P-Q-approx">4.32</a> gives </p>
-<div class="displaymath" id="a0000000248">
+<p> and <a href="chap-projective.html#lem:P-Q-approx">4.33</a> gives </p>
+<div class="displaymath" id="a0000000246">
   \[  Q_a \otimes I \approx _{30\zeta ^{1/4}} P_a \otimes I.  \]
 </div>
 <p> The triangle inequality for \(\approx _\delta \) yields </p>
-<div class="displaymath" id="a0000000249">
+<div class="displaymath" id="a0000000247">
   \[  A_a \otimes I \approx _{84\zeta ^{1/4}} P_a \otimes I.  \]
 </div>
 
