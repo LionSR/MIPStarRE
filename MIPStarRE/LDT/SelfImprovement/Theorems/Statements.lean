@@ -478,7 +478,9 @@ structure SelfImprovementFinalFields (params : Parameters) [FieldModel params.q]
     projectiveBoundednessGap params strategy H Z ≤
       selfImprovementError params eps delta
 
-/-- The helper-stage strong self-consistency assumption used in the reduced
+/-- Paper origin: `references/ldt-paper/self_improvement.tex:679-690`.
+
+The helper-stage strong self-consistency assumption used in the reduced
 theorem chain. -/
 abbrev HelperStrongSelfConsistencyInput (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (eps delta : Error) : Prop :=
@@ -490,7 +492,11 @@ abbrev HelperStrongSelfConsistencyInput (params : Parameters) [FieldModel params
         (constSubMeasFamily Hhat)
         (selfImprovementHelperError params eps delta)
 
-/-- The final orthonormalization input required by the reduced theorem chain.
+/-- Paper origin: `references/ldt-paper/self_improvement.tex:690-705`
+and `references/ldt-paper/orthonormalization.tex:67-76`
+(`\label{thm:orthonormalization}`).
+
+The final orthonormalization input required by the reduced theorem chain.
 
 In the paper's notation, this is the local wrapper produced by the
 `completion-to-`Option` reduction that supplies:
@@ -509,7 +515,9 @@ abbrev OrthonormalizationInput (params : Parameters) [FieldModel params.q]
     MakingMeasurementsProjective.OrthonormalizationInput strategy.state Hhat
       (selfImprovementHelperError params eps delta)
 
-/-- The remaining Section 9 output fields still not produced directly by the
+/-- Paper origin: `references/ldt-paper/self_improvement.tex:708-770`.
+
+The remaining Section 9 output fields still not produced directly by the
 reduced helper and orthonormalization theorems.
 
 The final `BoundedByOperator` conclusion is produced internally from the SDP

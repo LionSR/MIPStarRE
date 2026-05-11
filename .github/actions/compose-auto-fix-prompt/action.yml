@@ -95,7 +95,8 @@ runs:
           '  lemma, or proposition, preserve the statement in `references/ldt-paper/` up to' \
           '  faithful formal encoding.' \
           '- Do not repair CI, blueprint sync, or review comments by adding bridge,' \
-          '  residual, repair, package, producer, or arbitrary hypothesis inputs to' \
+          '  residual, repair, package, producer, hypotheses bundle, assumptions bundle,' \
+          '  or arbitrary hypothesis inputs to' \
           '  a source-labelled theorem.' \
           '- The only acceptable extra hypotheses are boundary conditions genuinely' \
           '  needed to state the same mathematics in Lean, such as positivity for a' \

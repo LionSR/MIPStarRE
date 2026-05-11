@@ -192,7 +192,7 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
             self.assertEqual(len(result.conditional_decl_findings), 1)
             self.assertEqual(result.conditional_decl_findings[0].token, "_ofRepairedBridge")
 
-    def test_plain_hypotheses_bundle_is_not_a_finding(self) -> None:
+    def test_plain_hypotheses_bundle_in_paper_facing_header_is_reported(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             _write_repo(
@@ -200,7 +200,7 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
                 """
                 namespace MIPStarRE
 
-                theorem cascadeBound (h : CascadeHypotheses params k eps) : Q := by
+                theorem cascadeBound (h : ExtraHypotheses params k eps) : Q := by
                   sorry
 
                 end MIPStarRE
@@ -213,7 +213,10 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
             )
             result = audit.run_audit(root)
             self.assertEqual(result.scanned_refs, 1)
-            self.assertEqual(result.findings, ())
+            self.assertEqual(
+                {finding.token for finding in result.findings},
+                {"ExtraHypotheses"},
+            )
 
     def test_input_bundle_in_paper_facing_header_is_reported(self) -> None:
         with tempfile.TemporaryDirectory() as td:
@@ -266,6 +269,59 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
             self.assertEqual(result.findings, ())
             self.assertEqual(len(result.faithful_boundary_findings), 1)
             self.assertEqual(result.faithful_boundary_findings[0].token, "SliceBoundednessInput")
+
+    def test_cascade_hypotheses_is_classified_as_faithful_boundary(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem (h : CascadeHypotheses params k eps) :
+                    Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:paper}
+                  \lean{MIPStarRE.paperTheorem}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root)
+            self.assertEqual(result.scanned_refs, 1)
+            self.assertEqual(result.findings, ())
+            self.assertEqual(len(result.faithful_boundary_findings), 1)
+            self.assertEqual(result.faithful_boundary_findings[0].token, "CascadeHypotheses")
+
+    def test_assumptions_bundle_in_paper_facing_header_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem
+                    (hasExtraAssumptions : ExtraAssumptions params) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:paper}
+                  \lean{MIPStarRE.paperTheorem}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root)
+            self.assertEqual(result.scanned_refs, 1)
+            self.assertEqual(
+                {finding.token for finding in result.findings},
+                {"hasExtraAssumptions", "ExtraAssumptions"},
+            )
 
     def test_debt_vocabulary_is_not_reported_inside_unrelated_identifiers(self) -> None:
         with tempfile.TemporaryDirectory() as td:

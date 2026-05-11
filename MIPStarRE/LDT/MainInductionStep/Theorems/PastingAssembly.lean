@@ -412,7 +412,11 @@ private lemma family_pointConsistencyError_eq_avg
 set_option maxHeartbeats 1000000 in
 -- The averaged slice-to-pasting assembly generates several large nonlinear
 -- arithmetic goals in the final telescoping estimate.
-/-- The remaining averaged step from per-slice self-improvement data to the
+/-- Paper origin: `references/ldt-paper/ld-pasting.tex:12-50`
+(`\label{thm:ld-pasting}`) and
+`references/ldt-paper/inductive_step.tex:239-342`.
+
+The remaining averaged step from per-slice self-improvement data to the
 pasting hypotheses.
 
 This is where the paper's `E_x[σ_x]`, `E_x[ζ_x]`, and

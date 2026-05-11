@@ -170,7 +170,8 @@ Changing a Lean theorem away from the corresponding statement in
 faithful formal encoding or a documented mathematical necessity requires it.
 The check is on the hypotheses as well as the conclusion.  A theorem whose
 conclusion has the right shape but whose assumptions include an extra
-load-bearing bridge input is a conditional theorem, not the paper theorem.
+load-bearing bridge input or hypotheses bundle is a conditional theorem, not
+the paper theorem.
 The project goal is to eliminate such conditional bridges, not to normalize
 them as permanent infrastructure.
 
@@ -185,7 +186,8 @@ Before editing any theorem tagged with a paper label (`thm:*`, `lem:*`,
 2. Preserve the public Lean theorem statement, except for hypotheses that are
    genuinely part of the faithful encoding of the paper's domain.
 3. Do not add bridge inputs, residual packages, repair hypotheses, producer
-   assumptions, or arbitrary implication hypotheses to the paper theorem.
+   assumptions, generic hypotheses or assumptions bundles, or arbitrary
+   implication hypotheses to the paper theorem.
 4. If a missing intermediate fact is needed, first state that fact as a named
    lemma or theorem to be proved from the paper hypotheses.
 5. Add a conditional helper only as a last resort, and only when it has a
@@ -210,8 +212,9 @@ instances, and similar boundary hypotheses may be faithful encodings of
 assumptions that the paper leaves implicit.  These should still be reviewed and
 documented if they are mathematically load-bearing.  The forbidden pattern is
 different: moving an unproved step of the proof into the theorem statement, such
-as a `BridgeHypotheses`, `Input`, `Residual`, `Package`, `RepairInput`, or
-`Producer` assumption that the paper theorem does not assume.  These assumptions
+as a `BridgeHypotheses`, `Input`, `Residual`, `Package`, `RepairInput`,
+`Producer`, generic `Hypotheses`, or generic `Assumptions` assumption that the
+paper theorem does not assume.  These assumptions
 should not be introduced merely to keep a file compiling or to avoid a `sorry`;
 they require explicit mathematical justification and a planned discharge.
 

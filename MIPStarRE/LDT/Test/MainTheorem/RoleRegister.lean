@@ -67,7 +67,10 @@ structure MainFormalRolePackageSuccessorResidual
   /-- The positive-`k` side condition used by the Section 6 wrapper. -/
   kPositive : 1 ≤ k
 
-/-- Type of recursive slice witnesses for the predecessor determined by a
+/-- Paper origin: `references/ldt-paper/inductive_step.tex:26-149`
+and `references/ldt-paper/inductive_step.tex:300-342`.
+
+Type of recursive slice witnesses for the predecessor determined by a
 non-base current parameter bundle.  This private abbreviation keeps the three
 successor-assembly entry points below from repeating the transported predecessor
 setup in every binder. -/
@@ -87,7 +90,11 @@ private abbrev successorRecursiveSlicesInput
     (mainFormalSuccessorDiagonalWeightedBound_ofPass
       successor.pred transportedStrategy eps transportedPass)
 
-/-- Type of self-improvement bridge inputs for the predecessor determined by a
+/-- Paper origin: `references/ldt-paper/inductive_step.tex:250-315`
+and `references/ldt-paper/self_improvement.tex:628-770`
+(`\label{thm:self-improvement}`).
+
+Type of self-improvement bridge inputs for the predecessor determined by a
 non-base current parameter bundle. -/
 private abbrev successorSelfImprovementBridgeInput
     {params : Parameters} [FieldModel.{0} params.q]
@@ -217,7 +224,10 @@ structure MainFormalRolePackageAnswerSuccessorResidual
   /-- The positive-`k` side condition used by the Section 6 wrapper. -/
   kPositive : 1 ≤ k
 
-/-- Type of answer-valued recursive slice witnesses for the predecessor
+/-- Paper origin: `references/ldt-paper/inductive_step.tex:26-149`
+and `references/ldt-paper/inductive_step.tex:300-342`.
+
+Type of answer-valued recursive slice witnesses for the predecessor
 determined by a non-base current parameter bundle. -/
 private abbrev answerSuccessorRecursiveSlicesInput
     {params : Parameters} [FieldModel.{0} params.q]
@@ -235,7 +245,11 @@ private abbrev answerSuccessorRecursiveSlicesInput
     (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass
       successor.pred transportedStrategy eps transportedPass)
 
-/-- Type of answer-valued self-improvement producers for the predecessor
+/-- Paper origin: `references/ldt-paper/inductive_step.tex:250-315`
+and `references/ldt-paper/self_improvement.tex:628-770`
+(`\label{thm:self-improvement}`).
+
+Type of answer-valued self-improvement producers for the predecessor
 determined by a non-base current parameter bundle. -/
 private abbrev answerSuccessorSelfImprovementInput
     {params : Parameters} [FieldModel.{0} params.q]
@@ -254,7 +268,11 @@ private abbrev answerSuccessorSelfImprovementInput
     (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass
       successor.pred transportedStrategy eps transportedPass)
 
-/-- Type of answer-valued self-improvement bridge inputs for the predecessor
+/-- Paper origin: `references/ldt-paper/inductive_step.tex:250-315`
+and `references/ldt-paper/self_improvement.tex:628-770`
+(`\label{thm:self-improvement}`).
+
+Type of answer-valued self-improvement bridge inputs for the predecessor
 determined by a non-base current parameter bundle.
 
 This is the load-bearing companion to `answerSuccessorSelfImprovementInput`: it
@@ -279,7 +297,10 @@ private abbrev answerSuccessorSelfImprovementBridgeInput
     (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass
       successor.pred transportedStrategy eps transportedPass)
 
-/-- Type of answer-valued per-slice induction packages for the predecessor
+/-- Paper origin: `references/ldt-paper/inductive_step.tex:239-342`
+(`\label{thm:main-induction}`).
+
+Type of answer-valued per-slice induction packages for the predecessor
 determined by a non-base current parameter bundle.
 
 The recursive slice witnesses produced by

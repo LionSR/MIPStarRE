@@ -7,10 +7,10 @@ Core operating rules:
 - Keep declarations, proofs, and naming aligned with existing project
   conventions.
 - Read `references/ldt-paper/` before changing a paper-facing theorem.
-- Do not add bridge, residual, repair, producer, package, or arbitrary
-  implication hypotheses to a source-labelled theorem. Missing proof work should
-  become a named lemma obligation or an existing tracked issue, not a stronger
-  theorem statement.
+- Do not add bridge, residual, repair, producer, package, hypotheses bundle,
+  assumptions bundle, or arbitrary implication hypotheses to a source-labelled
+  theorem. Missing proof work should become a named lemma obligation or an
+  existing tracked issue, not a stronger theorem statement.
 - Never leave `sorry`, `admit`, `native_decide` on non-trivial goals, or other
   placeholders.
 - Validate edits with `lake build` when the task requires code changes.
