@@ -181,6 +181,34 @@ theorem mainInductionBaseCase
     mainInductionOfWitness params strategy eps delta gamma k
       ⟨strategy.axisParallelFailureProbability, G, hconsG, herror_le⟩
 
+/-- `thm:main-induction`.
+
+This is the source-facing statement from
+`references/ldt-paper/inductive_step.tex`: a good symmetric strategy and an
+integer `k ≥ m d` produce a polynomial measurement consistent with the point
+measurement at error `mainInductionError`.
+
+The checked successor-step assembly below currently uses the stronger auxiliary
+side condition `400 * m * d ≤ k` and explicit proof-stage packages. Those are
+internal proof obligations, not hypotheses of this theorem. -/
+theorem mainInduction
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hk : params.m * params.d ≤ k) :
+    ∃ G : Measurement (Polynomial params) ι,
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params G.toSubMeas)
+        (mainInductionError params k eps delta gamma) := by
+  -- TODO(#1450): prove the paper theorem from `hgood` and `hk` by deriving
+  -- the wrapper inputs internally, rather than assuming the successor-stage
+  -- packages exposed by `mainInductionPublicWrapper`.
+  sorry
+
 /-- Successor-step recursion entry point for the main-induction conclusion.
 
 Given the slice restriction package, a recursive producer for the slice-level

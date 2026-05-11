@@ -208,13 +208,10 @@
 \end{proof}
 
 \begin{theorem}[Main induction]\label{thm:main-induction}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction}
+	\leanok
 	\uses{def:good-strategy, def:polymeasurements, def:simeq, lem:main-induction-base}
-	% Statement-level formalization marker deliberately omitted: the Lean
-	% declaration mainInductionPublicWrapper takes an auxiliary self-improvement
-	% hypothesis (tracked by issue 931), so the unconditional
-	% theorem stated here is not yet produced. See the proof block below for
-	% the formalization status.
-  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge 400\,md$ and set
+  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge md$ and set
   \[
     \nu = 1000k^2m^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right)
   \]
@@ -237,7 +234,7 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.ofPointMeasurementEq}
 	that mirror the four paper stages $\text{restrict} \to \text{induct} \to \text{self-improve} \to \text{paste}$. For the answer-valued restriction route used in the successor branch of the main formal theorem, Lean now also exposes
 	\lean{MIPStarRE.LDT.MainInductionStep.AnswerMainInductionConclusion, MIPStarRE.LDT.MainInductionStep.AnswerMainInductionHypothesis, MIPStarRE.LDT.MainInductionStep.AnswerPerSliceInductionPackage.ofMainInductionHypothesis},
-	which record the predecessor induction hypothesis for the restricted strategies without appealing to the public theorem `mainFormal`. The weighted restricted-probability estimates are now public via \lean{MIPStarRE.LDT.MainInductionStep.weighted_axisParallel_bound, MIPStarRE.LDT.MainInductionStep.weighted_diagonal_bound, MIPStarRE.LDT.MainInductionStep.restrictedProbabilities}, and the final public successor-step assembly is formalized as \lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper}. The remaining gap, tracked by issue \#931, is to prove the restricted-strategy self-improvement hypotheses needed to instantiate that assembly directly from higher-level applications, so the displayed theorem is not yet marked as formalized.
+	which record the predecessor induction hypothesis for the restricted strategies without appealing to the public theorem `mainFormal`. The weighted restricted-probability estimates are now public via \lean{MIPStarRE.LDT.MainInductionStep.weighted_axisParallel_bound, MIPStarRE.LDT.MainInductionStep.weighted_diagonal_bound, MIPStarRE.LDT.MainInductionStep.restrictedProbabilities}, and the final public successor-step assembly is formalized as \lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper}. The remaining proof gap for the source-facing theorem is to derive those wrapper inputs, including the restricted-strategy self-improvement hypotheses tracked by issue \#931, from the paper hypotheses; hence no proof-level \leanok is attached here.
 	We may assume $\eps,\delta,\gamma,d/q \le 1$, since otherwise $\nu \ge 1$ and the bound is trivial.
 
 	The proof is by induction on $m$. The base case $m=1$ is Lemma~\ref{lem:main-induction-base}.
