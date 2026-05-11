@@ -6,7 +6,8 @@ on:
 
 # Blocking guard for the issue #1379 earn-your-place policy: every
 # Statement/Witness/Hypotheses/Conclusion declaration in MIPStarRE/LDT must
-# cite a paper origin or a documented paper gap at its definition site.
+# cite a paper path, paper label, or documented paper gap at its definition
+# site.
 #
 # See: issue #1413 (CI wiring), ledgers #1379 / #1384 (backfill).
 
@@ -48,6 +49,6 @@ jobs:
             echo '```'
             echo
             echo 'This is a blocking check. New statement-like declarations'
-            echo 'must cite either `references/ldt-paper/` or a documented'
-            echo 'paper gap at their definition site.'
+            echo 'must cite `references/ldt-paper/`, a paper `\label{...}`,'
+            echo 'or a documented paper gap at their definition site.'
           } >> "$GITHUB_STEP_SUMMARY"
