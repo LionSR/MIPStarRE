@@ -27,10 +27,10 @@ been produced from the Section 6 induction data, and the repaired bridge used by
 `mainFormal_ofRepairedBridge` has not yet been derived from the hypotheses of
 the paper theorem.
 
-The audit for `GlobalVariance.globalVarianceOfPoints` records the issue-#1456
-proof obligation: the paper theorem has been restored without the former
-conclusion-shaped supplied bounds, and the remaining local transport estimate
-is visible as an unresolved proof obligation rather than as an extra
+The audit for `GlobalVariance.globalVarianceOfPoints` records the remaining
+issue-#1456 step. The paper theorem has the correct hypotheses, and the
+six-step local transport estimate from `lem:local-variance-of-points` is the
+sole unproved claim, admitted by `sorry` rather than assumed as an extra
 hypothesis.
 
 This module is built explicitly in CI rather than imported from the umbrella
