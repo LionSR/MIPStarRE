@@ -250,9 +250,9 @@
           
           <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.34</a></li>
           
-          <li><a href="chap-self-improvement.html#lem:sdp">Lemma 7.6</a></li>
+          <li><a href="chap-self-improvement.html#lem:sdp">Lemma 7.7</a></li>
           
-          <li><a href="chap-self-improvement.html#lem:add-in-u">Lemma 7.7</a></li>
+          <li><a href="chap-self-improvement.html#lem:add-in-u">Lemma 7.8</a></li>
           
           <li><a href="sec-variance.html#lem:global-variance-of-points">Lemma 6.5</a></li>
           
@@ -339,7 +339,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> Let \(T=\{ T_g\} \) and \(Z\) be the optimal solutions to the SDPs&#160;<a href="chap-self-improvement.html#eq:primal-objective" class="eqref">25</a> and&#160;<a href="chap-self-improvement.html#eq:dual-objective" class="eqref">26</a> given by Lemma&#160;<a href="chap-self-improvement.html#lem:sdp">7.6</a>. Then \(T\) is a measurement, and </p>
+  <p> Let \(T=\{ T_g\} \) and \(Z\) be the optimal solutions to the SDPs&#160;<a href="chap-self-improvement.html#eq:primal-objective" class="eqref">25</a> and&#160;<a href="chap-self-improvement.html#eq:dual-objective" class="eqref">26</a> given by Lemma&#160;<a href="chap-self-improvement.html#lem:sdp">7.7</a>. Then \(T\) is a measurement, and </p>
 <div class="displaymath" id="eq:Z-greater-than-A">
   \begin{align}  \forall g \in \mathcal{P}(m,q,d): \qquad Z & \geq \left(\mathbb {E}_{u} A^{u}_{g(u)}\right), \label{eq:Z-greater-than-A}\\ T_g \cdot Z & = T_g \cdot \left(\mathbb {E}_{u} A^{u}_{g(u)}\right). \label{eq:swap-Z-for-A} \end{align}
 </div>
@@ -364,7 +364,7 @@
 <div class="displaymath" id="a0000000306">
   \[  \zeta _{\mathrm{variance}} = 24m\cdot \Big(\varepsilon + \delta + \frac{md}{q}\Big).  \]
 </div>
-<p> Lemma&#160;<a href="chap-self-improvement.html#lem:add-in-u">7.7</a> below is the technical transfer from the averaged family&#160;\(H\) back to the sandwiched operators \(A^u_{h(u)}T_hA^u_{h(u)}\). We use it in the completeness, consistency, strong self-consistency, and boundedness estimates that follow. </p>
+<p> Lemma&#160;<a href="chap-self-improvement.html#lem:add-in-u">7.8</a> below is the technical transfer from the averaged family&#160;\(H\) back to the sandwiched operators \(A^u_{h(u)}T_hA^u_{h(u)}\). We use it in the completeness, consistency, strong self-consistency, and boundedness estimates that follow. </p>
 <p>We now verify the four conclusions of Lemma&#160;<a href="chap-self-improvement.html#lem:self-improvement-helper">7.1</a>. </p>
 <p><em>Proof of <a href="chap-self-improvement.html#item:self-improvement-completeness">1</a>.</em> The completeness of&#160;\(H\) is </p>
 <div class="displaymath" id="a0000000307">
@@ -428,7 +428,7 @@
   <span class="equation_label">8</span>
 </p>
 </div>
-<p> The theorem-side off-diagonal selection used for this ‘add-in-u‘ application is , and the corresponding left/right quantity wrappers are  and . The selected scalar chain for this specialization is recorded by          . Apply Lemma&#160;<a href="chap-self-improvement.html#lem:add-in-u">7.7</a> with \(\mathcal O=\mathbb {F}_q\), \(M=A\), and \(S_u=\{ (a,h):h(u)\neq a\} \). Then </p>
+<p> The theorem-side off-diagonal selection used for this ‘add-in-u‘ application is , and the corresponding left/right quantity wrappers are  and . The selected scalar chain for this specialization is recorded by          . Apply Lemma&#160;<a href="chap-self-improvement.html#lem:add-in-u">7.8</a> with \(\mathcal O=\mathbb {F}_q\), \(M=A\), and \(S_u=\{ (a,h):h(u)\neq a\} \). Then </p>
 <div class="displaymath" id="a0000000311">
   \[  \eqref{eq:consistency-with-A-baby-step} \approx _{4 \sqrt{\zeta _{\mathrm{variance}}}} \mathbb {E}_{u} \sum _{a, h: h(u) \neq a} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot A^{u}_a \cdot A^{u}_{h(u)}\bigr)\otimes T_h \lvert \psi  \rangle ,  \]
 </div>
@@ -459,7 +459,7 @@
   <span class="equation_label">12</span>
 </p>
 </div>
-<p> Apply Lemma&#160;<a href="chap-self-improvement.html#lem:add-in-u">7.7</a> with \(\mathcal O=\mathcal{P}(m,q,d)\), \(M=H\), and \(S_u=\{ (h,h):h\in \mathcal{P}(m,q,d)\} \). This gives </p>
+<p> Apply Lemma&#160;<a href="chap-self-improvement.html#lem:add-in-u">7.8</a> with \(\mathcal O=\mathcal{P}(m,q,d)\), \(M=H\), and \(S_u=\{ (h,h):h\in \mathcal{P}(m,q,d)\} \). This gives </p>
 <div class="equation" id="eq:release-the-kraken">
 <p>
   <div class="equation_content">
@@ -622,7 +622,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>       The formalization also records a strengthened helper theorem whose output carries the complementary-slackness equations used in the completeness chain, together with the residual-domination bridge that assembles the full self-improvement conclusion from the slackness-carrying helper. An intermediate assembly route routes a QXP repair producer plus the construction-level coisometry identity through the same bridge. These theorems use the Section&#160;9 statement above. Their proofs are not yet complete, because the strong-duality proof for the SDP remains to be formalized. </p>
+  <p>        The formalization also records a strengthened helper theorem whose output carries the complementary-slackness equations used in the completeness chain, together with the residual-domination bridge that assembles the full self-improvement conclusion from the slackness-carrying helper. An intermediate assembly route routes a QXP repair producer plus the construction-level coisometry identity through the same bridge. These theorems use the Section&#160;9 statement above. Their proofs are not yet complete, because the strong-duality proof for the SDP remains to be formalized. </p>
 
   </div>
 </div>
@@ -797,7 +797,7 @@
         
         <ul class="uses">
           
-          <li><a href="chap-self-improvement.html#lem:sdp">Lemma 7.6</a></li>
+          <li><a href="chap-self-improvement.html#lem:sdp">Lemma 7.7</a></li>
           
         </ul>
     
@@ -817,7 +817,7 @@
         
         <ul class="uses">
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairAndQXPRepairAndResidualDomination" class="lean_decl">MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairAndQXPRepairAndResidualDomination</a></li>
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithCanonicalOptimalPairSdpSlackness_of_dualDominatesIdentity" class="lean_decl">MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithCanonicalOptimalPairSdpSlackness_of_dualDominatesIdentity</a></li>
           
         </ul>
     
@@ -828,7 +828,7 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>                                                 From a matrix-level strong-duality witness with complementary slackness of the shape asserted by Lemma&#160;<a href="chap-self-improvement.html#lem:sdp">7.6</a>, one obtains a complete measurement \(\{ T_g\} \), a feasible dual operator \(Z\), equality of the primal and dual objectives, and the equations \(T_gZ=T_gA_g\) for all \(g\). The formal bridge to the current abstract helper interface is conditional on the additional reduced-interface bound \(I\leq Z\) for this selected dual witness. Lean also records a successor matrix package in which this dominance condition is bundled with the same optimal witness. Together with the usual helper hypotheses that the strategy is good, the error parameter \(\nu \), and the comparison measurement \(G\), that package feeds the slackness-carrying self-improvement helper. Combined with the residual-dominating orthonormalization input, the canonical form of the same bridge gives the full self-improvement conclusion, including the projective residual bound. The formalization records both the per-helper orthonormalization form and the bundled SelfImprovement-level input form of this conclusion. The residual-domination hypothesis can be supplied either as an intrinsic self-improvement orthonormalization input or by a QXP repair producer carrying the fresh-outcome domination invariant. Lean also isolates the saturated canonical optimal-pair output still required from strong duality: a feasible canonical primal matrix, a dual-feasible operator with equal objective value, canonical complementary slackness, and vanishing of the extra canonical slack block. This package gives the displayed measurement witness without assuming \(I \le Z\). Lean also proves the converse saturation step for the dominance-carrying package: the canonical complementary-slackness equation on the extra block gives \(X_{\mathrm{none},\mathrm{none}}Z=0\), and the lower bound \(I\leq Z\) forces \(X_{\mathrm{none},\mathrm{none}}=0\). Thus the dominance-carrying optimal pair canonically determines the saturated optimal pair, and hence also the matrix slackness statement without the dominance field. The remaining bridge is first stated as an abstract SDP statement, and then as a direct helper input, for a canonical feasible primal matrix satisfying objective equality and canonical complementary slackness together with the auxiliary dominance hypothesis. </p>
+  <p>                                           From a matrix-level strong-duality witness with complementary slackness of the shape asserted by Lemma&#160;<a href="chap-self-improvement.html#lem:sdp">7.7</a>, one obtains a complete measurement \(\{ T_g\} \), a feasible dual operator \(Z\), equality of the primal and dual objectives, and the equations \(T_gZ=T_gA_g\) for all \(g\). The formal bridge to the current abstract helper interface is conditional on the additional reduced-interface bound \(I\leq Z\) for this selected dual witness. The same optimal witness can also be considered together with this dominance condition. With the usual helper hypotheses that the strategy is good, the error parameter \(\nu \), and the comparison measurement \(G\), this datum feeds the slackness-carrying self-improvement helper. Lean also isolates the saturated canonical optimal-pair output still required from strong duality: a feasible canonical primal matrix, a dual-feasible operator with equal objective value, canonical complementary slackness, and vanishing of the extra canonical slack block. This datum gives the displayed measurement witness without assuming \(I \le Z\). Lean also proves the converse saturation step for the dominance-carrying optimal pair: the canonical complementary-slackness equation on the extra block gives \(X_{\mathrm{none},\mathrm{none}}Z=0\), and the lower bound \(I\leq Z\) forces \(X_{\mathrm{none},\mathrm{none}}=0\). Thus the dominance-carrying optimal pair canonically determines the saturated optimal pair, and hence also the matrix slackness statement without the dominance field. The remaining bridge is first stated as an abstract SDP statement, and then as a direct helper input, for a canonical feasible primal matrix satisfying objective equality and canonical complementary slackness together with the auxiliary dominance hypothesis. </p>
 
   </div>
 </div>
@@ -844,12 +844,52 @@
 
   </div>
 </div>
+<div class="remark_thmwrapper theorem-style-remark" id="rem:sdp-matrix-residual-domination-assembly">
+  <div class="remark_thmheading">
+    <span class="remark_thmcaption">
+    Remark
+    </span>
+    <span class="remark_thmlabel">7.6</span>
+    <span class="remark_thmtitle">Residual-dominating self-improvement assembly</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-self-improvement.html#rem:sdp-matrix-residual-domination-assembly">#</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="remark_thmcontent">
+  <p>       These auxiliary results combine the matrix slackness output with a residual-dominating orthonormalization input. The residual-domination hypothesis can be supplied either as an intrinsic self-improvement orthonormalization input or by a QXP repair construction carrying the fresh-outcome domination invariant. These are intermediate proof obligations for the projective-output step, not part of the paper statement of Lemma&#160;<a href="chap-self-improvement.html#lem:sdp-matrix-slackness-output">7.5</a>. </p>
+
+  </div>
+</div>
 <div class="lemma_thmwrapper theorem-style-plain" id="lem:sdp">
   <div class="lemma_thmheading">
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">7.6</span>
+    <span class="lemma_thmlabel">7.7</span>
     <span class="lemma_thmtitle">Dual SDP and complementary slackness</span>
     <div class="thm_header_extras">
 
@@ -969,7 +1009,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">7.7</span>
+    <span class="lemma_thmlabel">7.8</span>
     <span class="lemma_thmtitle">Averaging over the evaluation point</span>
     <div class="thm_header_extras">
 
@@ -1128,54 +1168,20 @@
 <h1 id="sec:self-improvement-projective">7.2 Projective Output</h1>
 
 <p>This final step applies orthonormalization to the non-projective family produced by Lemma&#160;<a href="chap-self-improvement.html#lem:self-improvement-helper">7.1</a>. The bookkeeping here is entirely about showing that completeness, consistency, self-consistency, and boundedness survive the passage from&#160;\(\widehat H\) to a projective submeasurement&#160;\(H\). </p>
-<div class="lemma_thmwrapper theorem-style-plain" id="lem:self-improvement-slackness-bridge">
-  <div class="lemma_thmheading">
-    <span class="lemma_thmcaption">
-    Lemma
+<div class="remark_thmwrapper theorem-style-remark" id="rem:self-improvement-lean-interfaces">
+  <div class="remark_thmheading">
+    <span class="remark_thmcaption">
+    Remark
     </span>
-    <span class="lemma_thmlabel">7.8</span>
-    <span class="lemma_thmtitle">Slackness-residual-domination variants of self-improvement</span>
+    <span class="remark_thmlabel">7.9</span>
+    <span class="remark_thmtitle">Auxiliary self-improvement lemmas</span>
     <div class="thm_header_extras">
 
-    
-    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="chap-self-improvement.html#lem:self-improvement-slackness-bridge">#</a>
+    <a class="icon proof" href="chap-self-improvement.html#rem:self-improvement-lean-interfaces">#</a>
     
-    
-    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
-</button>
-        <div class="modal-container">
-      <div class="modal-content">
-        <header>
-          <h1>Uses</h1>
-          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
-</button>
-        </header>
-        
-        <ul class="uses">
-          
-          <li><a href="sec-prelims.html#def:polymeasurements">Definition 3.11</a></li>
-          
-          <li><a href="sec-prelims.html#def:simeq">Definition 3.16</a></li>
-          
-          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
-          
-          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.34</a></li>
-          
-          <li><a href="chap-self-improvement.html#lem:sdp">Lemma 7.6</a></li>
-          
-          <li><a href="chap-self-improvement.html#lem:self-improvement-helper">Lemma 7.1</a></li>
-          
-          <li><a href="chap-self-improvement.html#thm:self-improvement">Theorem 7.9</a></li>
-          
-        </ul>
-    
-      </div>
-    </div>
-
     
     
     <button class="modal lean">L∃∀N</button>
@@ -1189,8 +1195,6 @@
         
         <ul class="uses">
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.SelfImprovement.selfImprovementFromSlacknessResidualDominationBridgeInputs" class="lean_decl">MIPStarRE.LDT.SelfImprovement.selfImprovementFromSlacknessResidualDominationBridgeInputs</a></li>
-          
         </ul>
     
       </div>
@@ -1199,17 +1203,8 @@
     
         </div>
   </div>
-  <div class="lemma_thmcontent">
-  <p>     Let \((\psi , A, B, L)\) be a symmetric strategy for the \((m,q,d)\) low individual degree test that is \((\varepsilon ,\delta ,\gamma )\)-good, and let \(G \in \mathrm{PolyMeas}(m,q,d)\) be a measurement. Under any of the following three sets of strengthened hypotheses that incorporate the SDP complementary-slackness statement (Lemma&#160;<a href="chap-self-improvement.html#lem:sdp">7.6</a>), there exist a projective submeasurement \(H \in \mathrm{PolySub}(m,q,d)\) and a positive-semidefinite matrix \(Z\) satisfying the self-improvement conclusion of Theorem&#160;<a href="chap-self-improvement.html#thm:self-improvement">7.9</a>: </p>
-<ol class="enumerate">
-  <li><p><em>Residual-domination input</em>: the helper completeness, strong self-consistency, point-consistency transfer, and residual-domination orthonormalization hypotheses are supplied directly. </p>
-</li>
-  <li><p><em>Projective POVM repair and coisometry</em>: the residual-domination input is built from a projective POVM repair operator and a coisometry condition linking the constructed operator to the identity. </p>
-</li>
-  <li><p><em>Combined strengthened hypotheses</em>: the four hypotheses of the first variant — helper completeness, strong self-consistency, point-consistency transfer, and residual-domination orthonormalization — are assumed as one combined hypothesis. </p>
-</li>
-</ol>
-<p> The statements (but not the proofs) are formalized; the proofs transitively depend on the unfinished SDP strong-duality helper tracked by issue&#160;#1230 (see also the slackness ledger, #1379). </p>
+  <div class="remark_thmcontent">
+  <p>          Several auxiliary results are used to prove Theorem&#160;<a href="chap-self-improvement.html#thm:self-improvement">7.10</a> from the helper output and the orthonormalization theorem. They record intermediate proof obligations that do not appear as hypotheses in the paper statement. The current Lean theorem still takes these obligations as explicit assumptions, so the theorem below is linked to the current Lean statement but is not marked as completely formalized. </p>
 
   </div>
 </div>
@@ -1218,12 +1213,10 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">7.9</span>
+    <span class="theorem_thmlabel">7.10</span>
     <span class="theorem_thmtitle">Self-improvement</span>
     <div class="thm_header_extras">
 
-    
-    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
@@ -1287,7 +1280,7 @@
         
         <ul class="uses">
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.SelfImprovement.SelfImprovementSlacknessResidualDominationBridgeInputs" class="lean_decl">MIPStarRE.LDT.SelfImprovement.SelfImprovementSlacknessResidualDominationBridgeInputs</a></li>
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.SelfImprovement.selfImprovement" class="lean_decl">MIPStarRE.LDT.SelfImprovement.selfImprovement</a></li>
           
         </ul>
     
@@ -1298,7 +1291,7 @@
         </div>
   </div>
   <div class="theorem_thmcontent">
-  <p>             Let \(G \in \mathrm{PolyMeas}(m,q,d)\) be a measurement with the following properties: </p>
+  <p>   Let \(G \in \mathrm{PolyMeas}(m,q,d)\) be a measurement with the following properties: </p>
 <ol class="enumerate">
   <li><p>(Consistency with&#160;\(A\)):  On average over \(u \sim \mathbb {F}_q^{m}\), </p>
 <div class="displaymath" id="a0000000347">
