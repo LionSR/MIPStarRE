@@ -772,6 +772,12 @@ positive-boundary hypotheses currently needed by the formalization, but it does
 not assume the repaired bridge, role-register residual data, or final
 projective-completion hypotheses. Those remain open steps to be derived from the
 pass condition and the preceding sections.
+
+The hypothesis `hk : 400 * params.m * params.d ≤ k`, together with `hk0`,
+records the strengthened boundary from issue #906 and
+`rem:main-formal-k-boundary`; the paper states the weaker condition `k ≥ md`.
+The field model is presently fixed at universe level `0`, matching the current
+Section 6 successor theorem rather than an additional mathematical restriction.
 -/
 theorem mainFormal
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -795,7 +801,7 @@ theorem mainFormal
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  -- TODO(#1458): derive the repaired bridge used by
+  -- TODO(#1458, #422, #931): derive the repaired bridge used by
   -- `mainFormal_ofRepairedBridge` from the hypotheses of the paper theorem.
   sorry
 
