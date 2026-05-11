@@ -163,17 +163,14 @@ theorem selfImprovementInInductionSection_ofMeasurement
 
 The paper statement takes an arbitrary polynomial submeasurement `G` satisfying
 the stated point-consistency hypothesis.  It does not assume that `G` is the
-underlying submeasurement of a complete measurement. -/
+underlying submeasurement of a complete measurement, and it does not assume the
+Section 7 helper, orthonormalization, or final-field proof stages as external
+inputs. -/
 theorem selfImprovementInInductionSection
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hhelperStrongSelfConsistency :
-      SelfImprovement.HelperStrongSelfConsistencyInput params strategy eps delta)
-    (horthonormalization :
-      SelfImprovement.OrthonormalizationInput params strategy eps delta)
-    (hfinalFields : SelfImprovement.FinalFieldsInput params strategy eps delta nu)
     (hgood : strategy.IsGood eps delta gamma)
     (G : SubMeas (Polynomial params) ι)
     (hcons : ConsRel strategy.state (uniformDistribution (Point params))
@@ -181,9 +178,8 @@ theorem selfImprovementInInductionSection
         (polynomialEvaluationFamily params G) nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
-  -- TODO(#1451): complete the submeasurement-input theorem without assuming
-  -- that `G` is the underlying submeasurement of a complete measurement.
-  -- The current measurement-input route is retained in
+  -- TODO(#1451): prove the induction-section theorem from the paper hypotheses.
+  -- The current measurement-input assembly is retained separately as
   -- `selfImprovementInInductionSection_ofMeasurement`.
   sorry
 
