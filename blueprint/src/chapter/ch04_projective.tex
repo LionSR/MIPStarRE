@@ -333,6 +333,10 @@
 \end{lemma}
 \begin{proof}
 	\leanok
+	\uses{lem:projective-non-measurement, lem:projective-low-rank-sum,
+		lem:X-squared, lem:X-hat-squared, lem:X-times-X-hat,
+		lem:squared-difference, lem:P-projectivity, lem:P-Q-approx,
+		prop:triangle-inequality-for-approx_delta}
 	Pass to the left marginal state, apply the rank-reduction and
 	$Q/X/\widehat X/P$ construction there, and transport the resulting
 	$\approx_{84\zeta^{1/4}}$ estimate back to left lifts via the left-marginal
