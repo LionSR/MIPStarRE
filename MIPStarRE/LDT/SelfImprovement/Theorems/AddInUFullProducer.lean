@@ -1,12 +1,15 @@
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.Test.StrategyFailures
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer.Transfer
+import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
+import MIPStarRE.LDT.GlobalVariance.Theorems.TransportChain.SumForm
 
 /-!
 # Section 7 — Selection-dependent transfer inequality for `lem:add-in-u`
 
-This file records the full selection-dependent transfer inequality of
-`lem:add-in-u` (`references/ldt-paper/self_improvement.tex` lines 238–246),
-which is not yet proved in Lean. The existing `addInU` lemma in
+This file proves the full selection-dependent transfer inequality of
+`lem:add-in-u` (`references/ldt-paper/self_improvement.tex` lines 238–246).
+The existing `addInU` lemma in
 `MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperCompleteness/Bracketed.lean:584`
 formalizes only the variance-bound specialization used in subsequent arguments. The
 doc-comment on that lemma states:
@@ -15,7 +18,9 @@ doc-comment on that lemma states:
 >  its dependence on an auxiliary family `M` and the averaged family `H`, is
 >  not yet formalized here."
 
-The following declaration records this obligation explicitly.
+The theorem below packages the already formalized selected Cauchy--Schwarz
+chain and the six-step cardinality-free local-variance transport bound into the
+paper's fully quantified producer statement.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -23,6 +28,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 namespace MIPStarRE.LDT.SelfImprovement
 
 open MIPStarRE.LDT
+open MIPStarRE.LDT.GlobalVariance
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
@@ -58,17 +64,14 @@ The reduced `AddInUStatement` (`Statements.lean:293`) only records the
 variance-bound consequence used in subsequent arguments; this structure
 records the universally-quantified transfer inequality itself.
 
-Note on the type of `T`: the parameter is `T : SubMeas (Polynomial params) ι`
-because both `addInURightQuantity` (`Statements.lean:209`) and
-`averagedSandwichedPolynomialSubMeas` (`Defs.lean:312`) take a sub-measurement,
-and the paper's `lem:add-in-u` only requires `∑_h T_h ≤ I`. This is the
-canonical type for `T`. The reduced `AddInUStatement` happens to declare
-`T : Measurement` only because its single field calls `T.toSubMeas`; the
-two could be aligned by generalizing that parameter to `SubMeas`. -/
+The Lean parameter `T` is kept as a `Measurement`, matching the paper's fixed
+SDP-optimal family. The operators appearing in the transfer inequality depend
+only on `T.toSubMeas`, and the proof below passes to that submeasurement layer
+internally for the selected Cauchy--Schwarz chain and global-variance bounds. -/
 structure AddInUFullStatement
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
-    (T : SubMeas (Polynomial params) ι)
+    (T : Measurement (Polynomial params) ι)
     (eps delta : Error) : Prop where
   /-- The selection-dependent transfer inequality from `lem:add-in-u`, with
   the paper's `4 √ζ_variance` bound. Universally quantified over the
@@ -82,8 +85,8 @@ structure AddInUFullStatement
       (M : IdxSubMeas (Point params) Outcome ι)
       (S : AddInUSelection params Outcome),
     |addInULeftQuantity params strategy M
-          (averagedSandwichedPolynomialSubMeas params strategy T) S
-        - addInURightQuantity params strategy M T S|
+          (averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas) S
+        - addInURightQuantity params strategy M T.toSubMeas S|
       ≤ addInUError params eps delta
 
 /-- Proves the selection-dependent transfer inequality of `lem:add-in-u`:
@@ -114,9 +117,69 @@ theorem addInUFullProducer
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)
-    (_hgood : strategy.IsGood eps delta gamma)
-    (T : SubMeas (Polynomial params) ι) :
+    (hgood : strategy.IsGood eps delta gamma)
+    (T : Measurement (Polynomial params) ι) :
     AddInUFullStatement params strategy T eps delta := by
-  sorry
+  refine ⟨?_⟩
+  intro Outcome _instOutcome M S
+  have heps : 0 ≤ eps := eps_nonneg_of_isGood params strategy hgood
+  have hdelta : 0 ≤ delta := delta_nonneg_of_isGood params strategy hgood
+  have hssc :
+      BipartiteSSCRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta := by
+    constructor
+    simpa [SymStrat.selfConsistencyFailureProbability] using
+      hgood.selfConsistencyTest
+  have hlocal :
+      (∑ g : Polynomial params,
+        localVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g) ≤
+        localVarianceOfPointsError params eps delta :=
+    localVarianceDeviation_sum_le_localVarianceOfPointsError
+      params strategy eps delta gamma hgood T.toSubMeas
+  have hglobal :
+      (∑ g : Polynomial params,
+        globalVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g) ≤
+        selfImprovementVarianceError params eps delta := by
+    simpa [selfImprovementVarianceError] using
+      globalVarianceDeviation_sum_le_of_localVarianceDeviation_sum_le
+        params strategy eps delta T.toSubMeas hlocal
+  let ηsc : Error := Real.sqrt (2 * delta)
+  let ηgv : Error := Real.sqrt (selfImprovementVarianceError params eps delta)
+  have h01 :
+      |addInUSelectedCSChainQ0 params strategy M T.toSubMeas S -
+        addInUSelectedCSChainQ1 params strategy M T.toSubMeas S| ≤ ηsc := by
+    simpa [ηsc] using
+      addInU_selected_cs_chain_step1_abs_le_sqrt_two_delta
+        (params := params) (strategy := strategy) (M := M) (T := T.toSubMeas) (S := S)
+        (delta := delta) hssc
+  have h12 :
+      |addInUSelectedCSChainQ1 params strategy M T.toSubMeas S -
+        addInUSelectedCSChainQ2 params strategy M T.toSubMeas S| ≤ ηsc := by
+    simpa [ηsc] using
+      addInU_selected_cs_chain_step2_abs_le_sqrt_two_delta
+        (params := params) (strategy := strategy) (M := M) (T := T.toSubMeas) (S := S)
+        (delta := delta) hssc
+  obtain ⟨hsteps3, hsteps4⟩ :=
+    addInU_selected_cs_chain_step34_abs_le_sqrt_of_globalVarianceDeviation_sum_le
+      (params := params) (strategy := strategy) (M := M) (T := T.toSubMeas) (S := S) hglobal
+  have h23 :
+      |addInUSelectedCSChainQ2 params strategy M T.toSubMeas S -
+        addInUSelectedCSChainQ3 params strategy M T.toSubMeas S| ≤ ηgv := by
+    simpa [ηgv] using hsteps3
+  have h34 :
+      |addInUSelectedCSChainQ3 params strategy M T.toSubMeas S -
+        addInUSelectedCSChainQ4 params strategy M T.toSubMeas S| ≤ ηgv := by
+    simpa [ηgv] using hsteps4
+  have hsum : ηsc + ηsc + ηgv + ηgv ≤ addInUError params eps delta := by
+    have h :=
+      two_sqrt_two_delta_add_two_sqrt_selfImprovementVarianceError_le_addInUError
+        params eps delta heps hdelta
+    dsimp [ηsc, ηgv] at h ⊢
+    linarith
+  exact add_in_u_selected_transfer_of_cs_chain
+    (params := params) (strategy := strategy) (eps := eps) (delta := delta)
+    (M := M) (T := T.toSubMeas) (S := S)
+    (η01 := ηsc) (η12 := ηsc) (η23 := ηgv) (η34 := ηgv)
+    h01 h12 h23 h34 hsum
 
 end MIPStarRE.LDT.SelfImprovement

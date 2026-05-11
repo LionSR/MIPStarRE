@@ -804,7 +804,6 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
 \end{proof}
 
 \begin{lemma}[Averaging over the evaluation point]\label{lem:add-in-u}
-  \lean{MIPStarRE.LDT.SelfImprovement.addInU}
   \lean{MIPStarRE.LDT.SelfImprovement.AddInUFullStatement}
   \lean{MIPStarRE.LDT.SelfImprovement.addInUFullProducer}
   \lean{MIPStarRE.LDT.SelfImprovement.selfConsistencyAddInUSelection}
@@ -898,6 +897,10 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
     \E_{u} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot M^{u}_o \cdot A^{u}_{h(u)}\bigr) \ot T_h \ket{\psi}.
   \]
 \end{lemma}
+The reduced downstream wrapper
+\lean{MIPStarRE.LDT.SelfImprovement.addInU}
+keeps only the variance-bound consequence used later in the helper theorem; it
+is not itself the full formal counterpart of Lemma~\ref{lem:add-in-u}.
 \begin{proof}
   We begin by expanding
   \begin{align}
