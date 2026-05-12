@@ -206,7 +206,7 @@ structure MainFormalBaseBridgeHypotheses
 distinguished outcome on both sides.
 
 Paper origin: the base case of `thm:main-induction` at
-`references/ldt-paper/inductive_step.tex:418-432` and the final
+`references/ldt-paper/inductive_step.tex:418-427` and the final
 orthonormalization/completion cascade at
 `references/ldt-paper/inductive_step.tex:136-160`.
 

@@ -528,8 +528,8 @@ noncomputable def leftLiftedProjectivizationRepairInput_of_lifted_qxp_sddOpRel
 helper submeasurement.
 
 Paper origin: the same orthonormalization step in
-`references/ldt-paper/self_improvement.tex:10-13`, formalized through the
-QXP-layer repair route for `references/ldt-paper/orthonormalization.tex:273-282`. -/
+`references/ldt-paper/self_improvement.tex:10-13`, via the QXP-layer repair
+route for `references/ldt-paper/orthonormalization.tex:273-282`. -/
 abbrev OrthonormalizationQXPLayerRepairProducer
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (eps delta : Error) :=

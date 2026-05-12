@@ -137,8 +137,8 @@ theorem mainFormalSuccessorRecursiveSlices_ofInductionPackage
 public Section 6 boundary wrapper.
 
 Paper origin: the successor branch of `thm:main-induction` in
-`references/ldt-paper/inductive_step.tex:352-386`, where the restricted
-strategies are improved slice by slice before the pasting step. -/
+`references/ldt-paper/inductive_step.tex:352-386` and the slice-wise
+self-improvement step in `references/ldt-paper/inductive_step.tex:441-490`. -/
 def MainFormalSuccessorSelfImprovementProducer (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)

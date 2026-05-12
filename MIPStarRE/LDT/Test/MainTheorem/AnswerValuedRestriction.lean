@@ -300,7 +300,7 @@ theorem mainFormalSuccessorAnswerRecursiveSlices_ofSliceData
 
 Paper origin: the successor branch of `thm:main-induction` in
 `references/ldt-paper/inductive_step.tex:352-386`, with the answer-valued
-slice recursion corresponding to the restricted-strategy invocation at
+slice recursion corresponding to the restricted-strategy application at
 `references/ldt-paper/inductive_step.tex:441-454`. -/
 def MainFormalSuccessorAnswerSelfImprovementProducer (params : Parameters)
     [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
