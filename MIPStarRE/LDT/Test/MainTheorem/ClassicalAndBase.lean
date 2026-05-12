@@ -1,6 +1,4 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems
-import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
-import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain
+import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems
 import MIPStarRE.LDT.Preliminaries.ComparisonProjective
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.Core
 import MIPStarRE.LDT.Preliminaries.Triangles

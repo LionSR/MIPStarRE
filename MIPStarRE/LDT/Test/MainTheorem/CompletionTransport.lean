@@ -1,4 +1,7 @@
 import MIPStarRE.LDT.Test.MainTheorem.ProjectiveConsistency
+import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
+import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.MatchMass
+import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Output
 
 /-!
 # Completion transport residuals
