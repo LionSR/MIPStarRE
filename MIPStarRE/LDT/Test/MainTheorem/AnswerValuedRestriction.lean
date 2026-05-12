@@ -3,7 +3,7 @@ import MIPStarRE.LDT.Test.MainTheorem.ClassicalAndBase
 /-!
 # Answer-valued restricted-slice recursion
 
-Answer-valued `x`-restricted successor route for the `mainFormal` assembly.
+Answer-valued `x`-restricted successor route for the `mainFormal` construction.
 This module parallels `OrdinaryRestriction` but works with the answer-side
 (`A`-register) specialization of the `x`-restricted strategy
 (paper `references/ldt-paper/inductive_step.tex` defines the single
@@ -52,7 +52,7 @@ strategy.  This route is preferred over the ordinary successor route because:
 These declarations feed into the
 `MainFormalRolePackageBranchResidual.answerSuccessor` constructor.  The
 ordinary route (`MainFormalRolePackageBranchResidual.successor`) is retained as
-a compatibility path for callers already working with ordinary restriction data.
+a compatibility path for proofs already working with ordinary restriction data.
 -/
 
 /-- Answer-valued successor-case weighted restricted-axis input for the
@@ -173,7 +173,16 @@ When supplied together with a recursive induction hypothesis (see
 `MainFormalSuccessorAnswerBoundary`.  The proof currently consumes only the
 state and Alice point-measurement fields; the Bob-side, axis, and diagonal
 compatibility fields are retained so a later recursive-induction argument can
-make `slicePasses` depend on the actual restricted answer slice. -/
+make `slicePasses` depend on the actual restricted answer slice.
+
+**Unfaithful:** this data structure records honest answer-valued slice
+strategies, compatibility fields, and passing hypotheses that are not yet
+constructed from the successor proof of `thm:main-formal`
+(`references/ldt-paper/test_definition.tex:180-202`) and `thm:main-induction`
+(`references/ldt-paper/inductive_step.tex:441-551`).  This is tracked by
+#1375, #1369, #1363, and #1458.  Elimination: prove the honest answer-valued
+slice strategy construction from the paper hypotheses, then use this structure
+only as the internal representation for that construction. -/
 structure MainFormalSuccessorAnswerRecursiveSliceData (params : Parameters)
     [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -324,8 +333,16 @@ self-improvement obligation.
 
 This is the answer-register counterpart of
 `MainFormalSuccessorSelfImprovementObligations`: for each possible answer-side
-per-slice induction package, callers supply the narrow
-`AnswerSelfImprovementPackage.SliceObligations` assumptions. -/
+per-slice induction package, the proof supplies the narrow
+`AnswerSelfImprovementPackage.SliceObligations` assumptions.
+
+**Unfaithful:** this obligation type records answer-side per-slice Section 9
+data that is not yet derived from the successor proof of `thm:main-formal`
+(`references/ldt-paper/test_definition.tex:180-202`) and
+`thm:main-induction` (`references/ldt-paper/inductive_step.tex:441-551`).
+This is tracked by #1376, #1369, #1503, #1515, and #1458.  Elimination:
+prove the answer-valued slice obligations from the paper hypotheses, then use
+this type only as an internal package consumed by the successor proof. -/
 def MainFormalSuccessorAnswerSelfImprovementObligations (params : Parameters)
     [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -363,7 +380,16 @@ abbrev MainFormalSuccessorAnswerSelfImprovementInductionPackage (params : Parame
 
 /-- Assemble answer-valued successor self-improvement obligations from honest
 slice strategies, verifier-visible measurement transports, and the remaining
-Section 9 obligations. -/
+Section 9 obligations.
+
+**Unfaithful:** this helper assumes honest answer-valued slice strategies,
+measurement transport fields, and `SelfImprovementObligations` for each slice,
+rather than deriving them from
+`references/ldt-paper/inductive_step.tex:441-551` and
+`references/ldt-paper/self_improvement.tex:628-770`.  This is tracked by
+#1375, #1376, #1369, #1503, #1515, and #1458.  Elimination: prove those
+slice strategies and Section 9 obligations from the paper hypotheses, then use
+this declaration only to record their combination. -/
 noncomputable def mainFormalSuccessorAnswerSelfImprovementObligations_ofMeasurementEq
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -421,7 +447,16 @@ noncomputable def mainFormalSuccessorAnswerSelfImprovementObligations_ofMeasurem
 
 /-- Assemble answer-valued successor self-improvement obligations from the
 three named Section 9 inputs, using the closed spectral truncation input for
-the orthonormalization stage. -/
+the orthonormalization stage.
+
+**Unfaithful:** this helper assumes helper strong self-consistency,
+orthonormalization repair, and final-fields inputs for every answer-valued
+restricted slice; these are not derived here from
+`references/ldt-paper/self_improvement.tex:628-770` or the successor induction
+proof in `references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by
+#1376, #1514, #1515, #1503, and #1458.  Elimination: discharge the answer-side
+Section 9 obligations and use this declaration only to combine those proved
+inputs. -/
 noncomputable def mainFormalSuccessorAnswerSelfImprovementObligations_ofOrthonormalizationRepair
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -495,7 +530,14 @@ noncomputable def mainFormalSuccessorAnswerSelfImprovementObligations_ofOrthonor
       (repair hinduction) (finalFields hinduction)
 
 /-- Convert answer-valued successor-case obligations into the self-improvement
-obligation expected by the public answer-valued Section 6 boundary. -/
+obligation expected by the public answer-valued Section 6 boundary.
+
+**Unfaithful:** this helper consumes
+`MainFormalSuccessorAnswerSelfImprovementObligations`, whose answer-side
+Section 9 fields are not derived from the cited successor proof
+(`references/ldt-paper/inductive_step.tex:441-551`).  This is tracked by
+#1376, #1369, #1503, #1515, and #1458.  Elimination: prove those obligations
+from the paper hypotheses and retain this as a technical conversion. -/
 noncomputable def mainFormalSuccessorAnswerSelfImprovementObligation_ofObligations
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -518,7 +560,17 @@ noncomputable def mainFormalSuccessorAnswerSelfImprovementObligation_ofObligatio
       strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
       hrestrict hinduction (obligations hinduction)
 
-/-- Answer-valued successor-case Section 6 boundary inputs for `mainFormal`. -/
+/-- Answer-valued successor-case Section 6 boundary inputs for `mainFormal`.
+
+**Unfaithful:** as a supplied boundary this structure contains
+answer-valued recursive slice witnesses and a self-improvement obligation that
+are not hypotheses of `thm:main-formal`
+(`references/ldt-paper/test_definition.tex:180-202`).  They must be produced
+inside `mainFormalSuccessorProjectiveCompletionObligation`, using the successor
+proof of `thm:main-induction`
+(`references/ldt-paper/inductive_step.tex:441-551`).  This is tracked by
+#1375, #1376, #1369, #1363, and #1458.  Elimination: prove the recursive-slice
+and self-improvement fields internally before invoking this boundary record. -/
 structure MainFormalSuccessorAnswerBoundary (params : Parameters)
     [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -561,7 +613,15 @@ theorem mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass
       (strategy := strategy) (eps := eps) hpass)
 
 /-- Build the answer-valued successor boundary once the two still-external slice
-recursion and restricted-strategy self-improvement inputs are supplied. -/
+recursion and restricted-strategy self-improvement inputs are supplied.
+
+**Unfaithful:** this conditional constructor assumes answer-valued recursive
+slice data and a self-improvement obligation rather than deriving them from
+`references/ldt-paper/test_definition.tex:180-202` and
+`references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by #1375,
+#1376, #1369, #1363, and #1458.  Elimination: construct these inputs inside
+`mainFormalSuccessorProjectiveCompletionObligation` and use this constructor
+only after the inputs have been proved. -/
 def mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -583,14 +643,22 @@ def mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement
     selfImprovementObligation := hself }
 
 /-- Build the answer-valued successor boundary from obligations instead of an
-already assembled self-improvement obligation.
+already constructed self-improvement obligation.
 
 This is the answer-register counterpart of
 `mainFormalSuccessorBoundary_ofObligations`: it sends the answer-valued
 per-slice Section 9 obligations through
-`mainFormalSuccessorAnswerSelfImprovementObligation_ofObligations` and assembles
+`mainFormalSuccessorAnswerSelfImprovementObligation_ofObligations` and combines
 that obligation with the recursive slice witnesses and the weighted
-restricted-probability fields. -/
+restricted-probability fields.
+
+**Unfaithful:** this constructor assumes recursive slice witnesses and
+answer-side per-slice Section 9 obligations, rather than deriving them from
+`references/ldt-paper/test_definition.tex:180-202` and
+`references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by #1375,
+#1376, #1369, #1363, and #1458.  Elimination: prove the answer-valued
+predecessor induction data and the Section 9 slice obligations inside the
+successor proof, then use this declaration only to record their combination. -/
 noncomputable def mainFormalSuccessorAnswerBoundary_ofObligations
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -618,7 +686,17 @@ induction hypothesis and an answer-valued self-improvement obligation.
 This is the answer-register counterpart of
 `mainFormalSuccessorBoundary_ofPredecessorInduction`. The predecessor hypothesis
 is already at restricted-profile `mainInductionError` strength; the construction
-only performs the recorded answer-slice transports and assembles the boundary. -/
+only performs the recorded answer-slice transports and combines the boundary
+fields.
+
+**Unfaithful:** this helper assumes answer-valued slice data, predecessor
+induction witnesses, and an answer-valued self-improvement obligation, none of
+which are hypotheses of `thm:main-formal`
+(`references/ldt-paper/test_definition.tex:180-202`).  This is tracked by
+#1375, #1376, #1369, #1363, and #1458.  Elimination: derive the predecessor
+witnesses and answer-side slice obligations from the successor proof of
+`thm:main-induction` (`references/ldt-paper/inductive_step.tex:441-551`) before
+using this transport helper. -/
 noncomputable def mainFormalSuccessorAnswerBoundary_ofPredecessorInduction
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -663,7 +741,7 @@ obligation rather than deriving them from the hypotheses of `thm:main-formal`
 This is tracked by #1369, #1363, #1507, #1503, and #1458.  Elimination: prove
 `mainFormalSuccessorProjectiveCompletionObligation` from the paper hypotheses,
 constructing the answer-valued successor boundary internally before invoking
-this wrapper. -/
+this helper. -/
 theorem mainFormalSuccessorAnswerMainInductionPublicWrapper
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

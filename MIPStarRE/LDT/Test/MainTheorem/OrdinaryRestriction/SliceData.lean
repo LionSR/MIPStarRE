@@ -26,7 +26,16 @@ connecting it to the restricted slice from
 When supplied together with a recursive induction hypothesis (see
 `mainFormalSuccessorRecursiveSlices_ofSliceData`), this data can close the
 `MainFormalSuccessorRecursiveSlices` requirement needed by
-`MainFormalSuccessorBoundary`. -/
+`MainFormalSuccessorBoundary`.
+
+**Unfaithful:** this structure records honest same-space slice strategies and
+passing hypotheses for restricted slices that are not yet constructed from the
+successor proof of `thm:main-formal`
+(`references/ldt-paper/test_definition.tex:180-202`) and `thm:main-induction`
+(`references/ldt-paper/inductive_step.tex:441-551`).  This is tracked by
+#1035, #1363, and #1458.  Elimination: construct these slice strategies and
+transport fields from the paper hypotheses, then use this structure only as the
+internal representation for that construction. -/
 structure MainFormalSuccessorRecursiveSliceData (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -44,14 +53,14 @@ structure MainFormalSuccessorRecursiveSliceData (params : Parameters)
     (MainInductionStep.xRestrictedStrategy params
       strategy.strategySymmetrization x).pointMeasurement
   /-- The slice strategy's Alice axis-parallel line measurement (underlying
-  projective family, without the transport-covariant wrapper) matches the
+  projective family, without the transport-covariant formulation) matches the
   restricted axis-parallel measurement from the main induction step. -/
   sliceAxisParallelA_eq : ∀ x,
     (sliceStrategy x).axisParallelMeasurementA.toIdxProjMeas =
     (MainInductionStep.xRestrictedStrategy params
       strategy.strategySymmetrization x).axisParallelMeasurement.toIdxProjMeas
   /-- The slice strategy's Alice diagonal-line measurement (underlying
-  projective family, without the transport-covariant wrapper) matches the
+  projective family, without the transport-covariant formulation) matches the
   restricted diagonal measurement from the main induction step. -/
   sliceDiagonalA_eq : ∀ x,
     (sliceStrategy x).diagonalMeasurementA.toIdxProjMeas =
@@ -66,14 +75,14 @@ structure MainFormalSuccessorRecursiveSliceData (params : Parameters)
     (MainInductionStep.xRestrictedStrategy params
       strategy.strategySymmetrization x).pointMeasurement
   /-- The slice strategy's Bob axis-parallel line measurement (underlying
-  projective family, without the transport-covariant wrapper) matches the
+  projective family, without the transport-covariant formulation) matches the
   restricted axis-parallel measurement from the main induction step. -/
   sliceAxisParallelB_eq : ∀ x,
     (sliceStrategy x).axisParallelMeasurementB.toIdxProjMeas =
     (MainInductionStep.xRestrictedStrategy params
       strategy.strategySymmetrization x).axisParallelMeasurement.toIdxProjMeas
   /-- The slice strategy's Bob diagonal-line measurement (underlying projective
-  family, without the transport-covariant wrapper) matches the restricted
+  family, without the transport-covariant formulation) matches the restricted
   diagonal measurement from the main induction step. -/
   sliceDiagonalB_eq : ∀ x,
     (sliceStrategy x).diagonalMeasurementB.toIdxProjMeas =
@@ -341,7 +350,7 @@ theorem mainFormalSuccessorRecursiveSlices_ofSliceData
   -- Rewrite the state and point measurement using the slice-data compatibilities
   simpa [sliceData.sliceState_eq x, sliceData.slicePoint_eq x] using hG
 /-- Build the successor boundary from obligations instead of the
-already-assembled self-improvement obligation.
+already constructed self-improvement obligation.
 
 This is the public-facing constructor for issue #1020: it wires the
 honest per-slice Section 9 obligations through the existing
@@ -351,7 +360,16 @@ the recursive slice witnesses into a `MainFormalSuccessorBoundary`.
 
 The weighted restricted-probability fields are discharged from `hpass`
 by the public Section 6 weighted-bound lemmas, matching the pattern of
-`mainFormalSuccessorBoundary_ofRecursiveSelfImprovement`. -/
+`mainFormalSuccessorBoundary_ofRecursiveSelfImprovement`.
+
+**Unfaithful:** this constructor assumes recursive slice witnesses and
+per-slice self-improvement obligations, rather than deriving them from
+`references/ldt-paper/test_definition.tex:180-202` and
+`references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by #1035,
+#1036, #1363, and #1458.  Elimination: prove the recursive predecessor
+induction data and the Section 9 slice obligations inside
+`mainFormalSuccessorProjectiveCompletionObligation`, then use this declaration
+only to record their combination. -/
 noncomputable def mainFormalSuccessorBoundary_ofObligations
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -380,9 +398,18 @@ hypothesis and the Section 9 obligations.
 The predecessor hypothesis is stated at the exact Section 6 strength consumed by
 `MainFormalSuccessorRecursiveSlices`: for each restricted slice it supplies a
 polynomial measurement bounded by the restricted-profile
-`mainInductionError`. This wrapper is non-recursive; it only transports those
+`mainInductionError`. This helper is non-recursive; it only transports those
 slice witnesses across `MainFormalSuccessorRecursiveSliceData` and then reuses
-`mainFormalSuccessorBoundary_ofObligations`. -/
+`mainFormalSuccessorBoundary_ofObligations`.
+
+**Unfaithful:** this helper assumes the predecessor induction witnesses,
+same-space slice data, and per-slice Section 9 obligations, none of which are
+hypotheses of `thm:main-formal`
+(`references/ldt-paper/test_definition.tex:180-202`).  This is tracked by
+#1035, #1036, #1363, and #1458.  Elimination: derive the predecessor witnesses
+and slice obligations from the successor proof of `thm:main-induction`
+(`references/ldt-paper/inductive_step.tex:441-551`) before using this transport
+helper. -/
 noncomputable def mainFormalSuccessorBoundary_ofPredecessorInduction
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
