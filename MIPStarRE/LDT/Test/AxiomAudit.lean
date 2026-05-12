@@ -27,7 +27,7 @@ consistency hypothesis is tracked by issue #1515.
 The audits for the `Test.mainFormal` proof frontier record the current tracked
 gaps from issue #1458: the successor projective-completion residual has not yet
 been produced from the Section 6 induction data, and the base-case match-mass
-bridge has not yet been produced from the paper's base-case
+completion data has not yet been produced from the paper's base-case
 argument.  These obligations are isolated as named statements rather than
 assumed in the public statement of the paper theorem.
 
@@ -157,9 +157,9 @@ assert_standard_axioms MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessSt
 assert_standard_axioms MIPStarRE.LDT.Test.classicalTestSoundness
 assert_standard_axioms MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization
 assert_tracked_sorry_axioms
-  MIPStarRE.LDT.Test.mainFormalBaseBranchBridgeProducer
+  MIPStarRE.LDT.Test.mainFormalBaseBranchCompletionObligations_ofBaseCase
 assert_tracked_sorry_axioms
-  MIPStarRE.LDT.Test.mainFormalSuccessorProjectiveCompletionResidualProducer
+  MIPStarRE.LDT.Test.mainFormalSuccessorProjectiveCompletionObligation
 assert_tracked_sorry_axioms MIPStarRE.LDT.Test.mainFormal
 assert_self_improvement_axioms MIPStarRE.LDT.SelfImprovement.selfImprovement
 assert_standard_axioms MIPStarRE.LDT.GlobalVariance.globalVarianceOfPoints

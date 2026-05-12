@@ -148,10 +148,10 @@ Same pattern but with `diagonalZeroCoord_eq` instead of `diagonalMeasurement_eq`
 
 **File:** `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean`
 
-- `mainInductionByRecursionOnM` (line 200): Takes `hselfProducer` (a function `PerSliceInductionPackage → SelfImprovementPackage`) as hypothesis, then assembles `AveragedPastingInput` → `mainInductionFromPackages`
-- `mainInductionPublicWrapper` (line 311): Passes `hselfProducer` through to callers
+- `mainInductionByRecursionOnM` (line 200): Takes `hselfObligation` (a function `PerSliceInductionPackage → SelfImprovementPackage`) as an internal wrapper input, then assembles `AveragedPastingInput` → `mainInductionFromPackages`
+- `mainInductionPublicWrapper` (line 311): Passes `hselfObligation` through to callers
 
-**Status:** The MainInductionStep wiring is complete (no `sorry`s). The gap is at the `mainFormal` level: nobody calls `mainInductionByRecursionOnM` with a concrete `hselfProducer`.
+**Status:** The MainInductionStep wiring is complete (no `sorry`s). The gap is at the `mainFormal` level: nobody calls `mainInductionByRecursionOnM` with a concrete `hselfObligation`.
 
 ---
 
@@ -272,7 +272,7 @@ These are the producers for the two new `mainFormal` hypotheses:
 | `self_improvement_helper_with_slackness` variants | Orphan — tracked by #1385, not blocking |
 | Internal SelfImprovement sub-lemmas (HelperCompleteness, PointConsistency, etc.) | All proved (conditional) |
 | Pasting theorem (`ldPasting`) | Fully proved, fully wired |
-| MainInductionStep bridge (`mainInductionByRecursionOnM`) | Fully proved (conditional on `hselfProducer`) |
+| MainInductionStep bridge (`mainInductionByRecursionOnM`) | Fully proved (conditional on `hselfObligation`) |
 
 ---
 
@@ -329,8 +329,8 @@ The fix in `Final.lean` is identical (adding a missing parenthesis in a `gcongr`
 Issue #1369 ("Construct answer-valued successor inputs for MainFormal") is an
 umbrella for the same mathematical work that #1374 tried to expose through new
 hypotheses.  Under the current policy, that work should instead be represented
-by producer obligations or conditional helpers; #1375/#1376/#1035 are the actual
-sub-gaps.
+by internal proof obligations or conditional helpers; #1375/#1376/#1035 are the
+actual sub-gaps.
 
 **Recommendation:** Close #1369 as superseded by the combination of #1374 + #1375 + #1376 + #1035.
 

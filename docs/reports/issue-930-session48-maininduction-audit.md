@@ -49,7 +49,7 @@ The diagonal restriction has two formal interfaces. The legacy `xRestrictedStrat
 
 The paper’s induction-section self-improvement theorem is restated in `SelfImprovementInInductionSectionConclusion` (`Statements.lean:32-67`) and proved by `selfImprovementInInductionSection` (`Theorems.lean:66-155`). The conclusion fields match the source theorem: completeness, point consistency, strong self-consistency, left/right closeness, boundedness by a positive witness, and domination of the averaged point operator.
 
-The Lean theorem has explicit inputs from the Section 9 self-improvement pipeline: helper strong self-consistency, orthonormalization, final-fields data, and a measurement/submeasurement bridge for the input `G`. Those inputs are not silent repairs inside `MainInductionStep`; they are the known externally supplied bridge data tracked by #931 and by the `SliceBridgeInputs` package added in PR #1008. I did not audit or attempt to close these producer obligations.
+The Lean theorem has explicit inputs from the Section 9 self-improvement pipeline: helper strong self-consistency, orthonormalization, final-fields data, and a measurement/submeasurement bridge for the input `G`. Those inputs are not silent repairs inside `MainInductionStep`; they are the known externally supplied bridge data tracked by #931 and by the `SliceBridgeInputs` package added in PR #1008. I did not audit or attempt to close these proof obligations.
 
 ## Finding 3: the induction-section pasting wrapper matches the audited pasting theorem
 

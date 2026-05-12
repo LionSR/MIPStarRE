@@ -12,9 +12,9 @@ Lean-side adaptation restricted to the `A`-register).  It introduces the
 answer-valued successor
 boundary (`MainFormalSuccessorAnswerBoundary`), recursive slice data
 (`MainFormalSuccessorAnswerRecursiveSliceData`), per-slice self-improvement
-producers (`MainFormalSuccessorAnswerSelfImprovementProducer`), and the
+obligations (`MainFormalSuccessorAnswerSelfImprovementObligation`), and the
 corresponding bridge inputs (`MainFormalSuccessorAnswerSelfImprovementBridgeInputs`).
-The central public-wrapper theorem
+The central public theorem
 `mainFormalSuccessorAnswerMainInductionPublicWrapper` converts a bundle of
 predecessor answer-sided Section 6 inputs, together with the
 `400·m·d ≤ k` side condition, into a role-register measurement.
@@ -160,7 +160,7 @@ theorem mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage
 
 This is the answer-register counterpart of
 `MainFormalSuccessorRecursiveSliceData`.  For each field element `x`, it
-packages a same-space projective strategy on the role-register space together
+records a same-space projective strategy on the role-register space together
 with compatibility proofs connecting its point and line measurements on both
 registers to the answer-restricted strategy.  The diagonal-line measurements
 have different answer alphabets on the two sides, so this package records the
@@ -172,8 +172,8 @@ When supplied together with a recursive induction hypothesis (see
 `MainFormalSuccessorAnswerRecursiveSlices` requirement needed by
 `MainFormalSuccessorAnswerBoundary`.  The proof currently consumes only the
 state and Alice point-measurement fields; the Bob-side, axis, and diagonal
-compatibility fields are carried so a later wiring of the recursive induction
-call can make `slicePasses` depend on the actual restricted answer slice. -/
+compatibility fields are retained so a later recursive-induction argument can
+make `slicePasses` depend on the actual restricted answer slice. -/
 structure MainFormalSuccessorAnswerRecursiveSliceData (params : Parameters)
     [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -257,7 +257,7 @@ field needed by `MainFormalSuccessorAnswerBoundary`.
 The additional Bob-side, axis-parallel, and diagonal readout compatibility
 fields in `MainFormalSuccessorAnswerRecursiveSliceData` are not needed for this
 point-consistency target yet; they are retained by the data package so the later
-recursive-call wiring can require `slicePasses` for slices whose line
+recursive call can require `slicePasses` for slices whose line
 measurements are pinned to the answer restriction on both registers.
 
 The induction hypothesis `hrecSlice` mirrors what the answer-valued
@@ -296,13 +296,13 @@ theorem mainFormalSuccessorAnswerRecursiveSlices_ofSliceData
   refine ⟨error, G, ?_, herr⟩
   -- Rewrite the state and point measurement using the slice-data compatibilities
   simpa [sliceData.sliceState_eq x, sliceData.slicePoint_eq x] using hG
-/-- Successor-case answer-valued restricted-strategy self-improvement producer.
+/-- Successor-case answer-valued restricted-strategy self-improvement obligation.
 
 Paper origin: the successor branch of `thm:main-induction` in
 `references/ldt-paper/inductive_step.tex:352-386`, with the answer-valued
 slice recursion corresponding to the restricted-strategy application at
 `references/ldt-paper/inductive_step.tex:441-454`. -/
-def MainFormalSuccessorAnswerSelfImprovementProducer (params : Parameters)
+def MainFormalSuccessorAnswerSelfImprovementObligation (params : Parameters)
     [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
@@ -320,7 +320,7 @@ def MainFormalSuccessorAnswerSelfImprovementProducer (params : Parameters)
       hrestrict hinduction
 
 /-- Answer-valued successor-case bridge inputs for the restricted-strategy
-self-improvement producer.
+self-improvement obligation.
 
 This is the answer-register counterpart of
 `MainFormalSuccessorSelfImprovementBridgeInputs`: for each possible answer-side
@@ -420,7 +420,7 @@ noncomputable def mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofMeasure
       (diagonalZeroCoord_eq hinduction) (bridgeInputs hinduction)
 
 /-- Assemble answer-valued successor self-improvement bridge inputs from the
-three named Section 9 producers, using the closed spectral truncation input for
+three named Section 9 inputs, using the closed spectral truncation input for
 the orthonormalization stage. -/
 noncomputable def mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofOrthonormalizationRepair
     (params : Parameters) [FieldModel.{0} params.q]
@@ -495,8 +495,8 @@ noncomputable def mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofOrthono
       (repair hinduction) (finalFields hinduction)
 
 /-- Convert answer-valued successor-case bridge inputs into the self-improvement
-producer expected by the public answer-valued Section 6 boundary wrapper. -/
-noncomputable def mainFormalSuccessorAnswerSelfImprovementProducer_ofBridgeInputs
+obligation expected by the public answer-valued Section 6 boundary. -/
+noncomputable def mainFormalSuccessorAnswerSelfImprovementObligation_ofBridgeInputs
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -507,7 +507,7 @@ noncomputable def mainFormalSuccessorAnswerSelfImprovementProducer_ofBridgeInput
     (hbridge :
       MainFormalSuccessorAnswerSelfImprovementBridgeInputs params strategy eps hpass k
         haxisWeightedBound hdiagonalWeightedBound) :
-    MainFormalSuccessorAnswerSelfImprovementProducer params strategy eps hpass k
+    MainFormalSuccessorAnswerSelfImprovementObligation params strategy eps hpass k
       haxisWeightedBound hdiagonalWeightedBound := by
   let hrestrict :=
     mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
@@ -530,8 +530,8 @@ structure MainFormalSuccessorAnswerBoundary (params : Parameters)
   recursiveSlices :
     MainFormalSuccessorAnswerRecursiveSlices params strategy eps hpass k
       axisWeightedBound diagonalWeightedBound
-  selfImprovementProducer :
-    MainFormalSuccessorAnswerSelfImprovementProducer params strategy eps hpass k
+  selfImprovementObligation :
+    MainFormalSuccessorAnswerSelfImprovementObligation params strategy eps hpass k
       axisWeightedBound diagonalWeightedBound
 
 /-- The answer-valued restricted-probabilities theorem supplies the successor-case
@@ -570,7 +570,7 @@ def mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement
     (hrec : MainFormalSuccessorAnswerRecursiveSlices params strategy eps hpass k
       (mainFormalSuccessorAnswerAxisWeightedBound_ofPass params strategy eps hpass)
       (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass params strategy eps hpass))
-    (hself : MainFormalSuccessorAnswerSelfImprovementProducer params strategy eps hpass k
+    (hself : MainFormalSuccessorAnswerSelfImprovementObligation params strategy eps hpass k
       (mainFormalSuccessorAnswerAxisWeightedBound_ofPass params strategy eps hpass)
       (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass params strategy eps hpass)) :
     MainFormalSuccessorAnswerBoundary params strategy eps hpass k :=
@@ -580,16 +580,16 @@ def mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement
   { axisWeightedBound := axisBound
     diagonalWeightedBound := diagonalBound
     recursiveSlices := hrec
-    selfImprovementProducer := hself }
+    selfImprovementObligation := hself }
 
 /-- Build the answer-valued successor boundary from bridge inputs instead of an
-already-packaged self-improvement producer.
+already assembled self-improvement obligation.
 
 This is the answer-register counterpart of
-`mainFormalSuccessorBoundary_ofBridgeInputs`: it wires the answer-valued
+`mainFormalSuccessorBoundary_ofBridgeInputs`: it sends the answer-valued
 per-slice Section 9 bridge inputs through
-`mainFormalSuccessorAnswerSelfImprovementProducer_ofBridgeInputs` and packages
-that producer together with recursive slice witnesses and the weighted
+`mainFormalSuccessorAnswerSelfImprovementObligation_ofBridgeInputs` and assembles
+that obligation with the recursive slice witnesses and the weighted
 restricted-probability fields. -/
 noncomputable def mainFormalSuccessorAnswerBoundary_ofBridgeInputs
     (params : Parameters) [FieldModel.{0} params.q]
@@ -606,19 +606,19 @@ noncomputable def mainFormalSuccessorAnswerBoundary_ofBridgeInputs
     MainFormalSuccessorAnswerBoundary params strategy eps hpass k :=
   mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement params strategy eps hpass k
     hrec
-    (mainFormalSuccessorAnswerSelfImprovementProducer_ofBridgeInputs params strategy eps
+    (mainFormalSuccessorAnswerSelfImprovementObligation_ofBridgeInputs params strategy eps
       hpass k
       (mainFormalSuccessorAnswerAxisWeightedBound_ofPass params strategy eps hpass)
       (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass params strategy eps hpass)
       hbridge)
 
 /-- Build the answer-valued successor boundary from an explicit predecessor
-induction hypothesis and an answer-valued self-improvement producer.
+induction hypothesis and an answer-valued self-improvement obligation.
 
 This is the answer-register counterpart of
 `mainFormalSuccessorBoundary_ofPredecessorInduction`. The predecessor hypothesis
-is already at restricted-profile `mainInductionError` strength; the wrapper only
-performs the recorded answer-slice transports and packages the boundary. -/
+is already at restricted-profile `mainInductionError` strength; the construction
+only performs the recorded answer-slice transports and assembles the boundary. -/
 noncomputable def mainFormalSuccessorAnswerBoundary_ofPredecessorInduction
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -641,7 +641,7 @@ noncomputable def mainFormalSuccessorAnswerBoundary_ofPredecessorInduction
             (hrestrict.profile.axisParallel x)
             (hrestrict.profile.selfConsistency x)
             (hrestrict.profile.diagonal x))
-    (hself : MainFormalSuccessorAnswerSelfImprovementProducer params strategy eps hpass k
+    (hself : MainFormalSuccessorAnswerSelfImprovementObligation params strategy eps hpass k
       (mainFormalSuccessorAnswerAxisWeightedBound_ofPass params strategy eps hpass)
       (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass params strategy eps hpass)) :
     MainFormalSuccessorAnswerBoundary params strategy eps hpass k :=
@@ -678,7 +678,7 @@ theorem mainFormalSuccessorAnswerMainInductionPublicWrapper
     boundary.axisWeightedBound
     boundary.diagonalWeightedBound
     boundary.recursiveSlices
-    boundary.selfImprovementProducer
+    boundary.selfImprovementObligation
     hk_pos hk
 
 

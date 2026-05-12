@@ -103,7 +103,7 @@ The overview-level classical wrappers `razSafra` and `classicalTestSoundness` in
 
 ## Finding 7: submeasurement/projective conventions are locally consistent
 
-The public `thm:main-formal` target returns projective measurements (`ProjMeas (Polynomial params) ι`) as in the paper. Intermediate Section 6 and pasting interfaces often use projective submeasurements or submeasurements because the paper itself passes through incomplete measurements before completion. In the audited Test slice, those intermediate APIs are exposed as residual packages rather than silently weakening the final theorem. The live completion and match-mass producer obligations remain exactly in the excluded #931/#834/#422 proof area; I did not audit or change them here.
+The public `thm:main-formal` target returns projective measurements (`ProjMeas (Polynomial params) ι`) as in the paper. Intermediate Section 6 and pasting interfaces often use projective submeasurements or submeasurements because the paper itself passes through incomplete measurements before completion. In the audited Test slice, those intermediate APIs are exposed as residual packages rather than silently weakening the final theorem. The live completion and match-mass proof obligations remain exactly in the excluded #931/#834/#422 proof area; I did not audit or change them here.
 
 ## Validation
 

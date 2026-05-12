@@ -413,11 +413,11 @@
 \end{proof}
 
 \begin{definition}[Lean successor-boundary aliases for the Section 3 proof]\label{def:main-formal-successor-boundary}
-	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAxisWeightedBound, MIPStarRE.LDT.Test.MainFormalSuccessorDiagonalWeightedBound, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictionPackage, MIPStarRE.LDT.Test.MainFormalSuccessorRecursiveSlices, MIPStarRE.LDT.Test.MainFormalSuccessorSelfImprovementProducer, MIPStarRE.LDT.Test.MainFormalSuccessorBoundary, MIPStarRE.LDT.Test.mainFormalSuccessorAxisWeightedBound_ofPass, MIPStarRE.LDT.Test.mainFormalSuccessorDiagonalWeightedBound_ofPass, MIPStarRE.LDT.Test.mainFormalSuccessorBoundary_ofRecursiveSelfImprovement}
-	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorSelfImprovementBridgeInputs, MIPStarRE.LDT.Test.MainFormalSuccessorSelfImprovementInductionPackage, MIPStarRE.LDT.Test.mainFormalSuccessorSelfImprovementBridgeInputs_ofMeasurementEq, MIPStarRE.LDT.Test.mainFormalSuccessorSelfImprovementBridgeInputs_ofOrthonormalizationRepair, MIPStarRE.LDT.Test.mainFormalSuccessorSelfImprovementProducer_ofBridgeInputs, MIPStarRE.LDT.Test.mainFormalSuccessorBoundary_ofBridgeInputs, MIPStarRE.LDT.Test.mainFormalSuccessorBoundary_ofPredecessorInduction}
+	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAxisWeightedBound, MIPStarRE.LDT.Test.MainFormalSuccessorDiagonalWeightedBound, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictionPackage, MIPStarRE.LDT.Test.MainFormalSuccessorRecursiveSlices, MIPStarRE.LDT.Test.MainFormalSuccessorSelfImprovementObligation, MIPStarRE.LDT.Test.MainFormalSuccessorBoundary, MIPStarRE.LDT.Test.mainFormalSuccessorAxisWeightedBound_ofPass, MIPStarRE.LDT.Test.mainFormalSuccessorDiagonalWeightedBound_ofPass, MIPStarRE.LDT.Test.mainFormalSuccessorBoundary_ofRecursiveSelfImprovement}
+	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorSelfImprovementBridgeInputs, MIPStarRE.LDT.Test.MainFormalSuccessorSelfImprovementInductionPackage, MIPStarRE.LDT.Test.mainFormalSuccessorSelfImprovementBridgeInputs_ofMeasurementEq, MIPStarRE.LDT.Test.mainFormalSuccessorSelfImprovementBridgeInputs_ofOrthonormalizationRepair, MIPStarRE.LDT.Test.mainFormalSuccessorSelfImprovementObligation_ofBridgeInputs, MIPStarRE.LDT.Test.mainFormalSuccessorBoundary_ofBridgeInputs, MIPStarRE.LDT.Test.mainFormalSuccessorBoundary_ofPredecessorInduction}
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorRecursiveSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedPointAgreement_le_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedAxisParallel_le_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedDiagonal_le_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRecursiveSlices_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRecursiveSlices_ofInductionPackage}
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAnswerRecursiveSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRecursiveSlices_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerBoundary_ofPredecessorInduction}
-	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAnswerSelfImprovementBridgeInputs, MIPStarRE.LDT.Test.MainFormalSuccessorAnswerSelfImprovementInductionPackage, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofMeasurementEq, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofOrthonormalizationRepair, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSelfImprovementProducer_ofBridgeInputs, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerBoundary_ofBridgeInputs}
+	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAnswerSelfImprovementBridgeInputs, MIPStarRE.LDT.Test.MainFormalSuccessorAnswerSelfImprovementInductionPackage, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofMeasurementEq, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofOrthonormalizationRepair, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSelfImprovementObligation_ofBridgeInputs, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerBoundary_ofBridgeInputs}
 	\leanok
 	\uses{lem:symmetrization-bridge, rem:main-induction-successor-assembly}
 	These Lean-only aliases name the successor-case data that
@@ -427,7 +427,7 @@
 	fields from the symmetrized passing strategy; the remaining external inputs are
 	the recursive slice witnesses (together with their bridge-data structure
 	and conversion theorem), the restricted-strategy self-improvement
-	producer (together with its bridge-input packaging), and their bundled
+	obligation (together with its bridge-input packaging), and their bundled
 	boundary package.  The ordinary slice bridge records both Alice- and Bob-side
 	compatibility with the restricted point, axis-parallel, and diagonal
 	measurements; in particular, the formal lemmas
@@ -444,64 +444,72 @@
 	externally supplied by the recursive slice strategy.
 \end{definition}
 
-\begin{definition}[Lean base-case Step~6 hypotheses for the Section~3 proof]\label{def:main-formal-step6-hypotheses}
-	\lean{MIPStarRE.LDT.Test.MainFormalBaseProjectiveCompletionHypotheses}
+\begin{definition}[Lean base-case Step~6 obligations for the Section~3 proof]\label{def:main-formal-step6-hypotheses}
+	\lean{MIPStarRE.LDT.Test.MainFormalBaseProjectiveCompletionObligations}
 	\lean{MIPStarRE.LDT.Test.baseProjectiveCompletionResidual}
-	\lean{MIPStarRE.LDT.Test.MainFormalBaseBridgeHypotheses}
-	\lean{MIPStarRE.LDT.Test.baseProjectiveCompletionHypotheses_ofBaseBridge}
-	\lean{MIPStarRE.LDT.Test.baseProjectiveCompletionResidual_ofBaseBridge}
+	\lean{MIPStarRE.LDT.Test.MainFormalBaseCompletionObligations}
+	\lean{MIPStarRE.LDT.Test.baseProjectiveCompletionObligations_ofBaseCompletionObligations}
+	\lean{MIPStarRE.LDT.Test.baseProjectiveCompletionResidual_ofBaseCompletionObligations}
 	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalCompletionInput.nonempty_ofDiagonalConsistencyAndMatchMassPreservation}
 	\lean{MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualProjectiveCompletionResidual.nonempty_ofRoleResidualAndDiagonalInputsAndMatchMassPreservation}
 	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRepairInputs}
 	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofQXPLayerRepairWitnesses}
 	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofLiftedQXPApproximations}
 	\lean{MIPStarRE.LDT.Test.mainFormalBaseRoleResidual}
-	\lean{MIPStarRE.LDT.Test.MainFormalBaseBranchBridgeHypotheses}
+	\lean{MIPStarRE.LDT.Test.MainFormalBaseBranchCompletionObligations}
 	\lean{MIPStarRE.LDT.Test.mainFormal_ofProjectiveCompletionResidual}
-	\lean{MIPStarRE.LDT.Test.mainFormalBaseBranchBridgeProducer}
 	\leanok
 	\uses{def:main-formal-successor-boundary, thm:orthonormalization}
-	The structure \texttt{MainFormalBaseProjectiveCompletionHypotheses} bundles the still-unformalized
-	analytic hypotheses needed for the base case ($m=1$) of
-	Theorem~\ref{thm:main-formal}: the locality-preserving repair witnesses used
-	by orthonormalization, distinguished completion outcomes, and match-mass
-	preservation for the orthonormalized projective submeasurements against the
-	opposite unsymmetrized POVM.  The auxiliary constructor
-	\texttt{MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRepairInputs}
-	is available to fill the spectral-truncation fields from the Section~5
-	spectral-truncation producer applied to the two unsymmetrized role measurements
+		The structure \texttt{MainFormalBaseProjectiveCompletionObligations} bundles the still-unformalized
+		analytic obligations needed for the base case ($m=1$) of
+		Theorem~\ref{thm:main-formal}: the locality-preserving repair witnesses used
+		by orthonormalization, distinguished completion outcomes, and match-mass
+		preservation for the orthonormalized projective submeasurements against the
+		opposite unsymmetrized POVM.  The auxiliary constructor
+		\texttt{MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRepairInputs}
+		is available to fill the spectral-truncation fields from the Section~5
+		spectral-truncation theorem applied to the two unsymmetrized role measurements
 	after left tensor placement.  Thus the spectral half of the line-130
-	orthonormalization input has a constructive producer.  The constructors
+	orthonormalization input is constructively supplied.  The constructors
 	\texttt{ofQXPLayerRepairWitnesses} and
-	\texttt{ofLiftedQXPApproximations} also give constructive producers for the
+	\texttt{ofLiftedQXPApproximations} also construct the inputs for the
 	locality-preserving repair half: the former consumes the Section~9 QXP-layer
 	repair witnesses, and the latter consumes explicit QXP-layer data together
 	with the corresponding left-placed state-dependent approximation.  The base
-	bridge structures still accept a full orthonormalization input until a later
+	obligation structures still accept a full orthonormalization input until a later
 	theorem routes them through these constructors.  The line-130 cross
 	consistency relation is reconstructed internally from the checked role residual
 	and used directly in the completion step, so no separate diagonal strong
-	self-consistency package remains in this bridge.  The narrowed alias
-	\texttt{MainFormalBaseBridgeHypotheses} omits the two distinguished outcomes;
-	\texttt{baseProjectiveCompletionHypotheses\_ofBaseBridge} fills both with the
+	self-consistency package remains in this construction.  The narrowed alias
+	\texttt{MainFormalBaseCompletionObligations} omits the two distinguished outcomes;
+	\texttt{baseProjectiveCompletionObligations\_ofBaseCompletionObligations} fills both with the
 	explicit zero polynomial.  The theorems \texttt{baseProjectiveCompletionResidual} and
-	\texttt{baseProjectiveCompletionResidual\_ofBaseBridge} turn these hypotheses
+	\texttt{baseProjectiveCompletionResidual\_ofBaseCompletionObligations} turn these obligations
 	(together with the checked base-case role residual from
 	\texttt{MainFormalRolePackageResidual.ofBaseCase}, where the
 	\texttt{params.m = 1} hypothesis is used) into the Step~6 witness residual
 	consumed by the downstream cascade.
 
-	The base-case construction
-	\texttt{mainFormalBaseBranchBridgeProducer} names the remaining obligation for
-	the checked base-case residual \texttt{mainFormalBaseRoleResidual}.  It must
-	produce the match-mass fields in \texttt{MainFormalBaseBridgeHypotheses}; it is
-	not a license to replace the paper's completion route by diagonal
+		The base-case construction
+		\texttt{mainFormalBaseBranchCompletionObligations\_ofBaseCase} names the remaining obligation for
+		the checked base-case residual \texttt{mainFormalBaseRoleResidual}.  It must
+		construct the match-mass fields in \texttt{MainFormalBaseCompletionObligations}; it is
+		not a license to replace the paper's completion route by diagonal
 	self-consistency assumptions.  The theorem
 	\texttt{mainFormal\_ofProjectiveCompletionResidual} then derives the three
 	consistency conclusions from any constructed Step~6 projective-completion
 	residual for Theorem~\ref{thm:main-formal}.  These are open proof obligations, not
 	additional hypotheses in the public statement.
-\end{definition}
+	\end{definition}
+
+	\begin{remark}[Open base-case Step~6 construction]\label{rem:main-formal-base-step6-open-construction}
+		\lean{MIPStarRE.LDT.Test.mainFormalBaseBranchCompletionObligations_ofBaseCase}
+		The declaration
+		\texttt{mainFormalBaseBranchCompletionObligations\_ofBaseCase} is linked here
+		only as an open internal construction target.  It still contains a tracked
+		\texttt{sorry}, and therefore is not included in the preceding \texttt{\textbackslash leanok}
+		definition block.
+	\end{remark}
 
 
 \begin{proposition}[Lean successor handoff for the Section 3 proof]\label{lem:main-formal-successor-handoff}
@@ -525,16 +533,16 @@
 	$(3\eps,3\eps,3\eps)$ and unpacking the bundled successor-boundary fields.
 \end{proof}
 
-\begin{remark}[Successor projective-completion construction]\label{rem:main-formal-successor-completion-producer}
-	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorProjectiveCompletionResidualProducer}
+\begin{remark}[Successor projective-completion construction]\label{rem:main-formal-successor-completion-obligation}
+	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorProjectiveCompletionObligation}
 	\uses{lem:main-formal-successor-handoff, thm:main-formal}
 	The construction named here records the remaining successor-case construction
 	needed after the Section~6 role-register handoff.  Starting from a projective
 	strategy that passes the low individual degree test, the large-\(k\) bound
 	\(k \ge 400md\) from Section~6, the positivity condition \(d > 0\), and the
 	non-base condition \(m \neq 1\), it is expected to produce the
-	projective-completion residual consumed by the producer-obligation theorem
-	\texttt{mainFormal\_ofProducerObligations}.  It is not an additional hypothesis of
+	projective-completion residual consumed by the internal-obligation theorem
+	\texttt{mainFormal\_ofInternalObligations}.  It is not an additional hypothesis of
 	Theorem~\ref{thm:main-formal}; it is the open construction that should replace
 	the successor-branch residual currently tracked separately.
 \end{remark}
@@ -768,14 +776,14 @@ recursive slice witnesses and self-improvement bridge inputs by
 \texttt{MainFormalRolePackageBranchResidual.successorOfBridgeInputs}; the
 answer-valued successor branch records the parallel routes.  It can be assembled
 from answer recursive slice witnesses and an answer-valued self-improvement
-producer by
+obligation by
 \texttt{MainFormalRolePackageBranchResidual.answerSuccessorOfRecursiveSelfImprovement},
 from recursive slice witnesses and answer-side bridge inputs by
 \texttt{MainFormalRolePackageBranchResidual.answerSuccessorOfBridgeInputs}, or
 from a predecessor induction package together with the bridge inputs by
 \texttt{MainFormalRolePackageBranchResidual.answerSuccessorOfInductionPackageAndBridgeInputs}.
 These constructors are structural and do not call
-\texttt{mainFormal\_ofProducerObligations}; the
+\texttt{mainFormal\_ofInternalObligations}; the
 line-130 completion interfaces remain separate.  The live completion residual
 carries the concrete role residual rather than a separate decorative branch
 witness; the branch residual types remain the documented base/successor supply
@@ -824,7 +832,7 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 	Remark~\ref{rem:lean-line169-projectivization-match-mass} avoids that
 	widening and is part of the match-mass residual route.
 	No proof-level completeness tag is claimed here while
-	\texttt{mainFormal\_ofProducerObligations} still has an open successor-case
+	\texttt{mainFormal\_ofInternalObligations} still has an open successor-case
 	completion residual and \texttt{mainFormal} derives the paper theorem via a
 	tracked open step (issue~\#1458).
 

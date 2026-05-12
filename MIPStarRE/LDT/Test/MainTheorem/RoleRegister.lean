@@ -257,7 +257,7 @@ private abbrev answerSuccessorRecursiveSlicesInput
 and `references/ldt-paper/self_improvement.tex:628-770`
 (`\label{thm:self-improvement}`).
 
-Type of answer-valued self-improvement producers for the predecessor
+Type of answer-valued self-improvement obligations for the predecessor
 determined by a non-base current parameter bundle. -/
 private abbrev answerSuccessorSelfImprovementInput
     {params : Parameters} [FieldModel.{0} params.q]
@@ -269,7 +269,7 @@ private abbrev answerSuccessorSelfImprovementInput
   letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
   let transportedStrategy := projStratTransportSuccessor strategy successor
   let transportedPass := passesLowIndividualDegreeTest_transportSuccessor hpass successor
-  MainFormalSuccessorAnswerSelfImprovementProducer
+  MainFormalSuccessorAnswerSelfImprovementObligation
     successor.pred transportedStrategy eps transportedPass k
     (mainFormalSuccessorAnswerAxisWeightedBound_ofPass
       successor.pred transportedStrategy eps transportedPass)
@@ -285,7 +285,7 @@ determined by a non-base current parameter bundle.
 
 This is the load-bearing companion to `answerSuccessorSelfImprovementInput`: it
 supplies exactly the per-slice Section 9 bridge data, and its conversion into a
-self-improvement producer is performed internally by the
+self-improvement obligation is performed internally by the
 `MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorBridgeInputs`
 constructor below. -/
 private abbrev answerSuccessorSelfImprovementBridgeInput
@@ -388,7 +388,7 @@ def ofSyntacticSuccessor
   kPositive := hk_pos
 
 /-- Assemble the answer-valued successor role-package residual from recursive
-answer slices and an answer-valued self-improvement producer.
+answer slices and an answer-valued self-improvement obligation.
 
 This is the answer-register counterpart of the ordinary successor role assembly.
 It packages exactly the answer-side Section 6 inputs through
@@ -425,9 +425,9 @@ answer slices and answer-side self-improvement bridge inputs.
 This is the bridge-inputs counterpart of
 `ofAnswerSuccessorRecursiveSelfImprovement` and the answer-side counterpart of
 `MainFormalRolePackageSuccessorResidual.ofSuccessorBridgeInputs`.  Instead of an
-already-built self-improvement producer the caller supplies the per-slice
+already-built self-improvement obligation the caller supplies the per-slice
 Section 9 bridge data, which is converted internally through
-`mainFormalSuccessorAnswerSelfImprovementProducer_ofBridgeInputs` and
+`mainFormalSuccessorAnswerSelfImprovementObligation_ofBridgeInputs` and
 `mainFormalSuccessorAnswerBoundary_ofBridgeInputs`.  This packages the
 answer-side adapters merged in #1062–#1069 into a single Test-level constructor
 that does not call `mainFormal` and leaves the line-130 completion and line-169
@@ -550,7 +550,7 @@ theorem toRolePackageResidual
 /-- Successor branch constructor from the answer-valued successor inputs.
 
 This packages answer-valued recursive slice witnesses and the corresponding
-self-improvement producer for the transported predecessor into the branch-level
+self-improvement obligation for the transported predecessor into the branch-level
 role residual. It stops before the line-130 completion and line-169 transport
 interfaces. -/
 noncomputable def answerSuccessorOfRecursiveSelfImprovement
@@ -571,7 +571,7 @@ noncomputable def answerSuccessorOfRecursiveSelfImprovement
 /-- Direct role-package residual corollary for the answer-valued successor
 branch.
 
-Given answer-valued recursive slices, the matching self-improvement producer,
+Given answer-valued recursive slices, the matching self-improvement obligation,
 and the public large-`k` side condition, this produces the isolated Section 6
 role residual consumed by the downstream `mainFormal` cascade. -/
 theorem rolePackageResidual_ofAnswerSuccessorRecursiveSelfImprovement

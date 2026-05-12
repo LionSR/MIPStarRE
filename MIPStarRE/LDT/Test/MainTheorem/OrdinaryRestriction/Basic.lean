@@ -133,13 +133,13 @@ theorem mainFormalSuccessorRecursiveSlices_ofInductionPackage
     ⟨hinduction.sliceError x, hinduction.sliceMeasurement x,
       hinduction.pointConsistency x, hinduction.error_le x⟩
 
-/-- Successor-case restricted-strategy self-improvement producer expected by the
-public Section 6 boundary wrapper.
+/-- Successor-case restricted-strategy self-improvement obligation expected by the
+public Section 6 boundary.
 
 Paper origin: the successor branch of `thm:main-induction` in
 `references/ldt-paper/inductive_step.tex:352-386` and the slice-wise
 self-improvement step in `references/ldt-paper/inductive_step.tex:441-490`. -/
-def MainFormalSuccessorSelfImprovementProducer (params : Parameters)
+def MainFormalSuccessorSelfImprovementObligation (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
@@ -157,7 +157,7 @@ def MainFormalSuccessorSelfImprovementProducer (params : Parameters)
       hrestrict hinduction
 
 /-- Successor-case bridge-input package for the restricted-strategy
-self-improvement producer.
+self-improvement obligation.
 
 For each possible per-slice induction package, this asks for the narrow
 `SelfImprovementPackage.SliceBridgeInputs` assumptions: honest per-slice
@@ -251,7 +251,7 @@ noncomputable def mainFormalSuccessorSelfImprovementBridgeInputs_ofMeasurementEq
       (diagonalMeasurement_eq hinduction) (bridgeInputs hinduction)
 
 /-- Assemble ordinary successor self-improvement bridge inputs from the three
-named Section 9 producers, using the closed spectral truncation input for the
+named Section 9 inputs, using the closed spectral truncation input for the
 orthonormalization stage. -/
 noncomputable def mainFormalSuccessorSelfImprovementBridgeInputs_ofOrthonormalizationRepair
     (params : Parameters) [FieldModel params.q]
@@ -321,12 +321,12 @@ noncomputable def mainFormalSuccessorSelfImprovementBridgeInputs_ofOrthonormaliz
       (diagonalMeasurement_eq hinduction) (helperStrongSelfConsistency hinduction)
       (repair hinduction) (finalFields hinduction)
 
-/-- Convert successor-case bridge inputs into the self-improvement producer
-expected by the public Section 6 boundary wrapper.
+/-- Convert successor-case bridge inputs into the self-improvement obligation
+expected by the public Section 6 boundary.
 
-This does not discharge the bridge-input fields; it only packages them into the
-existing `MainFormalSuccessorSelfImprovementProducer` API. -/
-noncomputable def mainFormalSuccessorSelfImprovementProducer_ofBridgeInputs
+This does not discharge the bridge-input fields; it only assembles them into the
+existing `MainFormalSuccessorSelfImprovementObligation` API. -/
+noncomputable def mainFormalSuccessorSelfImprovementObligation_ofBridgeInputs
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -337,7 +337,7 @@ noncomputable def mainFormalSuccessorSelfImprovementProducer_ofBridgeInputs
     (hbridge :
       MainFormalSuccessorSelfImprovementBridgeInputs params strategy eps hpass k
         haxisWeightedBound hdiagonalWeightedBound) :
-    MainFormalSuccessorSelfImprovementProducer params strategy eps hpass k
+    MainFormalSuccessorSelfImprovementObligation params strategy eps hpass k
       haxisWeightedBound hdiagonalWeightedBound := by
   let hrestrict :=
     mainFormalSuccessorRestrictionPackage params strategy eps hpass
@@ -356,7 +356,7 @@ symmetrization `strategy.strategySymmetrization`. The public Section 6 wrapper
 expects:
 1. weighted restricted-axis and restricted-diagonal bounds,
 2. recursive slice witnesses for the restricted strategies, and
-3. a restricted-strategy self-improvement producer.
+3. a restricted-strategy self-improvement obligation.
 
 The helper lemmas below now discharge the weighted fields from `hpass`; bundling
 all fields into a single named package still gives the successor branch of
@@ -373,8 +373,8 @@ structure MainFormalSuccessorBoundary (params : Parameters)
   recursiveSlices :
     MainFormalSuccessorRecursiveSlices params strategy eps hpass k
       axisWeightedBound diagonalWeightedBound
-  selfImprovementProducer :
-    MainFormalSuccessorSelfImprovementProducer params strategy eps hpass k
+  selfImprovementObligation :
+    MainFormalSuccessorSelfImprovementObligation params strategy eps hpass k
       axisWeightedBound diagonalWeightedBound
 
 /-- The public restricted-probabilities theorem supplies the successor-case
@@ -417,7 +417,7 @@ def mainFormalSuccessorBoundary_ofRecursiveSelfImprovement
     (hrec : MainFormalSuccessorRecursiveSlices params strategy eps hpass k
       (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
       (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass))
-    (hself : MainFormalSuccessorSelfImprovementProducer params strategy eps hpass k
+    (hself : MainFormalSuccessorSelfImprovementObligation params strategy eps hpass k
       (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
       (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass)) :
     MainFormalSuccessorBoundary params strategy eps hpass k :=
@@ -427,7 +427,7 @@ def mainFormalSuccessorBoundary_ofRecursiveSelfImprovement
   { axisWeightedBound := axisBound
     diagonalWeightedBound := diagonalBound
     recursiveSlices := hrec
-    selfImprovementProducer := hself }
+    selfImprovementObligation := hself }
 
 end Test
 

@@ -5,7 +5,7 @@ import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationData
 
 This file relates the Section 6 role residual to the diagonal orthonormalization
 inputs consumed by `mainFormal`.  The combining lemma that packages these into
-the base-case match-mass bridge lives in `MainFormal.lean`.
+the base-case match-mass completion obligation lives in `MainFormal.lean`.
 
 ## What's proved
 
@@ -16,7 +16,7 @@ the base-case match-mass bridge lives in `MainFormal.lean`.
 ## What's still not derivable from the role residual alone
 
 * **Match-mass preservation**:
-  `MainFormalBaseBridgeHypotheses` requires the orthonormalized projective
+  `MainFormalBaseCompletionObligations` requires the orthonormalized projective
   submeasurements to preserve their match mass against the opposite
   unsymmetrized POVM.  This is the paper-shaped completion route used by the
   base branch of `mainFormal`; it should not be replaced by diagonal
@@ -26,13 +26,13 @@ the base-case match-mass bridge lives in `MainFormal.lean`.
   parameters require QXP-layer data (a `QXPLayerData` with a projective `P`
   family close to the source `G` family), which is the output of Section 9
   (self-improvement).  Until the self-improvement theorem is applied at the
-  current level, these are honest hypotheses.
+  current level, these are explicit proof obligations.
 
 ## References
 
 * Issue #1359 — orthonormalization hypothesis chain
 * Issue #931 — self-improvement bridge inputs
-* Issue #1043 — base-case match-mass bridge construction
+* Issue #1043 — base-case match-mass completion construction
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

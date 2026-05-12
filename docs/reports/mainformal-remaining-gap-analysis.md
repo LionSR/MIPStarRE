@@ -8,7 +8,7 @@ Date: 2026-05-07
 > theorem.  The current repair keeps `mainFormal` aligned with
 > `thm:main-formal`.  The subsequent MainFormal cleanup removes the live
 > repaired-bridge route and keeps the remaining base and successor work as
-> producer obligations tracked by #1458.
+> internal proof obligations tracked by #1458.
 
 ## 1. Exact sorry site
 

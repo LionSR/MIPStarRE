@@ -58,7 +58,7 @@ with a suffix such as `Input`, `Residual`, `BridgeInputs`, `Witness`,
 6. **Size follow-up tasks by proof leaves.** Prefer issues such as "prove the
    raw Step 3 Cauchy--Schwarz estimate" to issues such as "close the
    self-improvement inputs" when the latter contains several independent
-   producer obligations.
+   proof obligations.
 7. **Use native sub-issues.** Missing producers should be linked under the
    correct parent tracker instead of being left only in a PR comment.
 
@@ -113,4 +113,3 @@ status of the paper theorem whose proof will eventually consume it.
 These examples are not special exceptions. They are the model for future review:
 identify the mathematical producer, name the residual when it remains, and keep
 the public prose faithful to that distinction.
-

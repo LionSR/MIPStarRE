@@ -1,14 +1,15 @@
 # SelfImprovement Bridge Integrity Audit
 
 Date: 2026-05-07
-Updated: 2026-05-11, after the source-faithful `mainFormal` repair.
+Updated: 2026-05-12, after the source-faithful `mainFormal` repair and
+internal-obligation renaming.
 
-> **Status note, 2026-05-11.**  This report predates the removal of the live
+> **Status note, 2026-05-12.**  This report predates the removal of the live
 > `MainFormal*RepairedBridge*` route.  References below to
 > `mainFormal_ofRepairedBridge` and `MainFormalRepairedBridgeHypotheses` are
 > historical descriptions of the earlier conditional assembly.  The current
-> MainFormal route uses producer obligations and the match-mass
-> `MainFormalBaseBranchBridgeHypotheses` target instead.
+> MainFormal route uses internal proof obligations and the match-mass
+> `MainFormalBaseBranchCompletionObligations` target instead.
 Auditor: Research specialist (read-only analysis)
 Scope: `MIPStarRE/LDT/SelfImprovement/` → `MIPStarRE/LDT/Pasting/` →
        `MIPStarRE/LDT/MainInductionStep/` → `MIPStarRE/LDT/Test/MainTheorem/`
@@ -26,15 +27,15 @@ The SelfImprovement module compiles with all its lemmas, the Pasting module
 compiles independently, and the MainInductionStep module wires them together in
 principle.  The remaining gap is now represented in the correct place:
 `mainFormal` is again the paper-facing theorem statement, while
-`mainFormal_ofRepairedBridge` is the conditional assembly theorem.  The public
-`mainFormal` theorem does not take the repaired bridge as an additional
-hypothesis; instead it contains a tracked proof obligation to produce that
-bridge from the paper hypotheses.
+`mainFormal_ofInternalObligations` is the internal-obligation assembly theorem.
+The public `mainFormal` theorem does not take completion data as an additional
+hypothesis; instead it contains tracked proof obligations to produce that data
+from the paper hypotheses.
 
 The architecture is therefore incomplete, but the theorem boundary is no longer
 misstated.  The remaining work is to turn the bridge inputs and residual
-packages into producer theorems, and then call those producers from the
-paper-facing theorem.
+packages into internal proof obligations, and then discharge those obligations
+from the paper-facing theorem.
 
 ---
 
@@ -111,7 +112,7 @@ ldPastingInInductionSection   (Core.lean:577)
 ```
 mainInductionByRecursionOnM   (MainTheorems.lean:200)
   └─ Calls PerSliceInductionPackage.ofRecursion (induction)
-  └─ Calls hselfProducer : PerSliceInductionPackage → SelfImprovementPackage
+  └─ Calls hselfObligation : PerSliceInductionPackage → SelfImprovementPackage
   └─ Calls assembleAveragedPastingInput (builds AveragedPastingInput from SelfImprovementPackage)
   └─ Calls mainInductionFromPackages
        └─ Calls AveragedPastingInput.output
@@ -119,11 +120,11 @@ mainInductionByRecursionOnM   (MainTheorems.lean:200)
                  └─ Calls Pasting.ldPasting
 ```
 
-**The key observation:** `mainInductionByRecursionOnM` takes `hselfProducer` as
-a hypothesis — it does NOT produce it internally.  This `hselfProducer` must
+**The key observation:** `mainInductionByRecursionOnM` takes `hselfObligation`
+as an internal wrapper input.  This `hselfObligation` must
 produce a `SelfImprovementPackage` from a `PerSliceInductionPackage`.  The
 published wrapper `mainInductionPublicWrapper` (MainTheorems.lean:311) passes
-this hypothesis through to its callers.
+this input through to its callers.
 
 ### 1.4. MainFormal (Final Assembly)
 
@@ -134,16 +135,13 @@ together with the large-`k` and positivity boundary hypotheses tracked elsewhere
 in the project.  It does **not** take `hbaseBridge`, role residual data, or final
 projective-completion inputs.
 
-The conditional helper `mainFormal_ofRepairedBridge` takes:
+The internal-obligation helper `mainFormal_ofInternalObligations` is closed
+except for two tracked proof obligations: the base-branch completion data and
+the successor projective-completion residual.
 
-- `hbaseBridge`: a producer-shaped assumption for
-  `MainFormalRepairedBridgeHypotheses`;
-- a successor branch whose residual construction is still a tracked `sorry`.
-
-**Base case (m=1):** Works inside the conditional helper.  The base role
-residual is produced by the checked handoff, and `hbaseBridge` supplies the
-orthonormalization and diagonal-consistency inputs needed by
-`mainFormal_ofRoleResidualAndRepairedBridge`.
+**Base case (m=1):** Works inside the internal-obligation helper.  The base
+role residual is produced by the checked handoff; the remaining completion data
+is isolated as `MainFormalBaseBranchCompletionObligations`.
 
 **Successor case (m>1):** incomplete.  The comment in `MainFormal.lean`
 identifies the missing work as supplying the ordinary or answer-valued recursive
@@ -303,8 +301,8 @@ inputs from the paper hypotheses.
 |-------|------------------------|--------------------------------------|-----|
 | SelfImprovement | ~50 theorems/lemmas | 3 public theorems (`selfImprovementHelper`, `selfImprovement`, `selfImprovementFromBridgeInputs`) | All three take explicit hypotheses; internal sub-lemmas are proved but the bridge inputs are not discharged internally |
 | SelfImprovement sub-lemmas (slackness, matrix bridge) | ~15 proved lemmas | 0 called from MI or MT | Entirely orphan |
-| MainInductionStep | `selfImprovementInInductionSection`, `SelfImprovementPackage.ofSliceBridgeInputs`, `ldPastingInInductionSection`, `mainInductionByRecursionOnM` | All wired together in `MainTheorems.lean` | `mainInductionByRecursionOnM` takes `hselfProducer` as hypothesis; `mainInductionPublicWrapper` passes this through |
-| MainTheorem | `mainFormal`, `mainFormal_ofRepairedBridge` | Paper-facing theorem separated from conditional bridge assembly | Repaired bridge producer and successor residual remain tracked proof obligations |
+| MainInductionStep | `selfImprovementInInductionSection`, `SelfImprovementPackage.ofSliceBridgeInputs`, `ldPastingInInductionSection`, `mainInductionByRecursionOnM` | All wired together in `MainTheorems.lean` | `mainInductionByRecursionOnM` takes `hselfObligation` as an internal wrapper input; `mainInductionPublicWrapper` passes this through |
+| MainTheorem | `mainFormal`, `mainFormal_ofInternalObligations` | Paper-facing theorem separated from internal-obligation assembly | Completion obligations and the successor residual remain tracked proof obligations |
 
 ---
 
@@ -335,14 +333,14 @@ by additional hypotheses:
 The architecture is usable but incomplete.  The wiring functions from
 `RoleRegister.lean` describe the intended assembly, and conditional helpers are
 legitimate local proof-frontier objects.  The source theorem itself, however,
-must not acquire non-paper bridge hypotheses.  What remains missing is a
-producer theorem that supplies the conditional inputs from the paper hypotheses.
+must not acquire non-paper bridge hypotheses.  What remains missing is an
+internal proof that supplies the conditional inputs from the paper hypotheses.
 
 ### What would close the gap?
 
-The correct closure route is to prove producer theorems for the missing
-recursive induction package, self-improvement bridge inputs, and repaired
-completion bridge, then call those producers from `mainFormal`.  Adding these
+The correct closure route is to prove the missing recursive induction package,
+self-improvement bridge inputs, and repaired completion data from the paper
+hypotheses, then call those internal obligations from `mainFormal`.  Adding these
 objects as new hypotheses to `mainFormal` would reintroduce the statement drift
 which this audit is meant to prevent.
 
@@ -350,7 +348,7 @@ which this audit is meant to prevent.
 
 ## 6. Recommendations
 
-1. **Track the producer obligations explicitly.**  The tracking issue should
+1. **Track the internal obligations explicitly.**  The tracking issue should
    distinguish the paper-facing theorem from the conditional helper, and should
    record that the remaining work is to produce the repaired bridge and
    successor residuals from the paper hypotheses.
@@ -363,7 +361,7 @@ which this audit is meant to prevent.
    `FutureWork/` directory, (c) delete them.
 
 3. **Coordinate with the bridge-debt tracking issue.**  New repair work should
-   be linked from #1458 and should state whether it discharges a producer
+   be linked from #1458 and should state whether it discharges an internal
    obligation, restores a paper-facing theorem statement, or only records a
    conditional helper.
 

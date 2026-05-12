@@ -305,25 +305,6 @@ noncomputable def ofLiftedQXPApproximations
 
 end MainFormalPostRolePackageDiagonalOrthonormalizationInput
 
-/-- Type alias for line-130 orthonormalization inputs that serves as a named
-landing point for future formalizations of the orthonormalization lemma's
-truncation and repair steps.
-See `MainFormalPostRolePackageDiagonalOrthonormalizationInput` for the
-individual fields.
-
-**Status:** currently unused (no callers).  Kept as a documented entry point for
-callers that prefer the `…BridgeInputs` name, but the underlying
-`MainFormalPostRolePackageDiagonalOrthonormalizationInput` is the authoritative
-type. -/
-abbrev MainFormalPostRolePackageDiagonalOrthonormalizationBridgeInputs
-    (params : Parameters) [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
-    (scalars : MainFormalCascadeScalars params eps k)
-    (rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars) :
-    Type _ :=
-  MainFormalPostRolePackageDiagonalOrthonormalizationInput
-    params strategy eps k scalars rolePackage
 /-- The pre-completion projective submeasurements obtained from line 130 by the
 cross-consistency orthonormalization wrapper.
 
