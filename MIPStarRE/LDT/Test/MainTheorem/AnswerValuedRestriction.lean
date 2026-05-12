@@ -652,7 +652,18 @@ noncomputable def mainFormalSuccessorAnswerBoundary_ofPredecessorInduction
       sliceData hpredecessor)
     hself
 
-/-- Answer-valued successor-case Section 6 handoff for `mainFormal`. -/
+/-- Answer-valued successor-case Section 6 handoff for `mainFormal`.
+
+**Unfaithful:** this conditional handoff assumes
+`boundary : MainFormalSuccessorAnswerBoundary`, whose fields include
+answer-valued recursive slice witnesses and the slice-wise self-improvement
+obligation rather than deriving them from the hypotheses of `thm:main-formal`
+(`references/ldt-paper/test_definition.tex:180-202`) and the successor case of
+`thm:main-induction` (`references/ldt-paper/inductive_step.tex:441-551`).
+This is tracked by #1369, #1363, #1507, #1503, and #1458.  Elimination: prove
+`mainFormalSuccessorProjectiveCompletionObligation` from the paper hypotheses,
+constructing the answer-valued successor boundary internally before invoking
+this wrapper. -/
 theorem mainFormalSuccessorAnswerMainInductionPublicWrapper
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
