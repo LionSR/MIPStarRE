@@ -427,7 +427,7 @@ noncomputable def AnswerSelfImprovementPackage.ofSliceObligations
     (restrictionPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma)
     (inductionPkg :
       AnswerPerSliceInductionPackage params strategy eps delta gamma restrictionPkg k)
-    (hbridge :
+    (sliceObligations :
       AnswerSelfImprovementPackage.SliceObligations params strategy eps delta gamma k
         restrictionPkg inductionPkg) :
     AnswerSelfImprovementPackage params strategy eps delta gamma k restrictionPkg inductionPkg := by
@@ -436,24 +436,24 @@ noncomputable def AnswerSelfImprovementPackage.ofSliceObligations
     AnswerSelfImprovementPackage.ofSelfImprovementInInductionSection
       params strategy eps delta gamma k restrictionPkg inductionPkg ?_
   intro x
-  let sliceStrategy := hbridge.sliceStrategy x
+  let sliceStrategy := sliceObligations.sliceStrategy x
   have hconsSlice :
       ConsRel sliceStrategy.state (uniformDistribution (Point params))
         (IdxProjMeas.toIdxSubMeas sliceStrategy.pointMeasurement)
         (polynomialEvaluationFamily params (inductionPkg.sliceMeasurement x).toSubMeas)
         (inductionPkg.sliceError x) := by
     have hcons := inductionPkg.pointConsistency x
-    rw [← hbridge.state_eq x, ← hbridge.pointMeasurement_eq x] at hcons
+    rw [← sliceObligations.state_eq x, ← sliceObligations.pointMeasurement_eq x] at hcons
     simpa [sliceStrategy] using hcons
-  rcases selfImprovementInInductionSection_ofMeasurement params (hbridge.sliceStrategy x)
+  rcases selfImprovementInInductionSection_ofMeasurement params (sliceObligations.sliceStrategy x)
       (restrictionPkg.profile.axisParallel x)
       (restrictionPkg.profile.selfConsistency x)
       (restrictionPkg.profile.diagonal x)
       (inductionPkg.sliceError x)
-      (hbridge.obligations x).helperStrongSelfConsistency
-      (hbridge.obligations x).orthonormalization
-      (hbridge.obligations x).finalFields
-      (hbridge.good x)
+      (sliceObligations.obligations x).helperStrongSelfConsistency
+      (sliceObligations.obligations x).orthonormalization
+      (sliceObligations.obligations x).finalFields
+      (sliceObligations.good x)
       (inductionPkg.sliceMeasurement x).toSubMeas
       (inductionPkg.sliceMeasurement x)
       rfl
@@ -461,21 +461,21 @@ noncomputable def AnswerSelfImprovementPackage.ofSliceObligations
     ⟨H, Z, hH⟩
   refine ⟨H, Z, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · have hcomp := hH.completeness
-    rw [hbridge.state_eq x] at hcomp
+    rw [sliceObligations.state_eq x] at hcomp
     simpa [answerSliceSelfImprovementError] using hcomp
   · have hpoint := hH.pointConsistency
-    rw [hbridge.state_eq x, hbridge.pointMeasurement_eq x] at hpoint
+    rw [sliceObligations.state_eq x, sliceObligations.pointMeasurement_eq x] at hpoint
     simpa [answerSliceSelfImprovementError] using hpoint
   · have hssc := hH.strongSelfConsistency
-    rw [hbridge.state_eq x] at hssc
+    rw [sliceObligations.state_eq x] at hssc
     simpa [answerSliceSelfImprovementError] using hssc
   · have hclose := hH.selfCloseness
-    rw [hbridge.state_eq x] at hclose
+    rw [sliceObligations.state_eq x] at hclose
     simpa [answerSliceSelfImprovementError] using hclose
   · have hbounded := hH.bounded
-    rw [hbridge.state_eq x] at hbounded
+    rw [sliceObligations.state_eq x] at hbounded
     simpa [answerSliceSelfImprovementError] using hbounded
   · intro h
-    simpa [hbridge.averagedPoint_eq x h] using hH.dominatesAveragePointOperator h
+    simpa [sliceObligations.averagedPoint_eq x h] using hH.dominatesAveragePointOperator h
 
 end MIPStarRE.LDT.MainInductionStep

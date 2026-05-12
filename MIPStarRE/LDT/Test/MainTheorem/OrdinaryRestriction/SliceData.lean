@@ -360,7 +360,7 @@ noncomputable def mainFormalSuccessorBoundary_ofObligations
     (hrec : MainFormalSuccessorRecursiveSlices params strategy eps hpass k
       (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
       (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass))
-    (hbridge : MainFormalSuccessorSelfImprovementObligations params strategy eps hpass k
+    (obligations : MainFormalSuccessorSelfImprovementObligations params strategy eps hpass k
       (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
       (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass)) :
     MainFormalSuccessorBoundary params strategy eps hpass k :=
@@ -372,7 +372,7 @@ noncomputable def mainFormalSuccessorBoundary_ofObligations
     recursiveSlices := hrec
     selfImprovementObligation :=
       mainFormalSuccessorSelfImprovementObligation_ofObligations params strategy eps hpass k
-        axisBound diagonalBound hbridge }
+        axisBound diagonalBound obligations }
 
 /-- Build the successor boundary from an explicit predecessor induction
 hypothesis and the Section 9 obligations.
@@ -405,7 +405,7 @@ noncomputable def mainFormalSuccessorBoundary_ofPredecessorInduction
             (hrestrict.profile.axisParallel x)
             (hrestrict.profile.selfConsistency x)
             (hrestrict.profile.diagonal x))
-    (hbridge : MainFormalSuccessorSelfImprovementObligations params strategy eps hpass k
+    (obligations : MainFormalSuccessorSelfImprovementObligations params strategy eps hpass k
       (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
       (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass)) :
     MainFormalSuccessorBoundary params strategy eps hpass k :=
@@ -414,7 +414,7 @@ noncomputable def mainFormalSuccessorBoundary_ofPredecessorInduction
       (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
       (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass)
       sliceData hpredecessor)
-    hbridge
+    obligations
 
 end Test
 

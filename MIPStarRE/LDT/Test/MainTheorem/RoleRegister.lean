@@ -189,7 +189,7 @@ noncomputable def ofSuccessorObligations
     (hd : 0 < params.d)
     (hk_pos : 1 ≤ k)
     (hrec : successorRecursiveSlicesInput (k := k) hpass hm_ne_one)
-    (hbridge : successorSelfImprovementObligations (k := k) hpass hm_ne_one) :
+    (obligations : successorSelfImprovementObligations (k := k) hpass hm_ne_one) :
     MainFormalRolePackageSuccessorResidual params strategy eps hpass k := by
   let successor := Parameters.successorDecompositionOfNeOne params hm_ne_one
   letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
@@ -202,7 +202,7 @@ noncomputable def ofSuccessorObligations
       kPositive := hk_pos }
   · exact
       mainFormalSuccessorBoundary_ofObligations successor.pred transportedStrategy eps
-        transportedPass k hrec hbridge
+        transportedPass k hrec obligations
   · rcases successor with ⟨pred, hnext⟩
     subst params
     simpa [Parameters.next] using hd
@@ -441,7 +441,7 @@ noncomputable def ofAnswerSuccessorObligations
     (hd : 0 < params.d)
     (hk_pos : 1 ≤ k)
     (hrec : answerSuccessorRecursiveSlicesInput (k := k) hpass hm_ne_one)
-    (hbridge : answerSuccessorSelfImprovementObligations (k := k) hpass hm_ne_one) :
+    (obligations : answerSuccessorSelfImprovementObligations (k := k) hpass hm_ne_one) :
     MainFormalRolePackageAnswerSuccessorResidual params strategy eps hpass k :=
   let successor := Parameters.successorDecompositionOfNeOne params hm_ne_one
   letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
@@ -450,7 +450,7 @@ noncomputable def ofAnswerSuccessorObligations
   { successor := successor
     boundary :=
       mainFormalSuccessorAnswerBoundary_ofObligations successor.pred
-        transportedStrategy eps transportedPass k hrec hbridge
+        transportedStrategy eps transportedPass k hrec obligations
     dimensionPositive := by
       rcases successor with ⟨pred, hnext⟩
       subst params
@@ -480,7 +480,7 @@ noncomputable def ofAnswerSuccessorInductionPackageAndObligations
     (hk_pos : 1 ≤ k)
     (hinduction :
       answerSuccessorPerSliceInductionPackageInput (k := k) hpass hm_ne_one)
-    (hbridge : answerSuccessorSelfImprovementObligations (k := k) hpass hm_ne_one) :
+    (obligations : answerSuccessorSelfImprovementObligations (k := k) hpass hm_ne_one) :
     MainFormalRolePackageAnswerSuccessorResidual params strategy eps hpass k :=
   let successor := Parameters.successorDecompositionOfNeOne params hm_ne_one
   letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
@@ -495,7 +495,7 @@ noncomputable def ofAnswerSuccessorInductionPackageAndObligations
       (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass
         successor.pred transportedStrategy eps transportedPass)
       hinduction)
-    hbridge
+    obligations
 
 end MainFormalRolePackageAnswerSuccessorResidual
 
@@ -603,11 +603,11 @@ noncomputable def successorOfObligations
     (hd : 0 < params.d)
     (hk_pos : 1 ≤ k)
     (hrec : successorRecursiveSlicesInput (k := k) hpass hm_ne_one)
-    (hbridge : successorSelfImprovementObligations (k := k) hpass hm_ne_one) :
+    (obligations : successorSelfImprovementObligations (k := k) hpass hm_ne_one) :
     MainFormalRolePackageBranchResidual params strategy eps hpass k :=
   .successor
     (MainFormalRolePackageSuccessorResidual.ofSuccessorObligations
-      hpass hm_ne_one hd hk_pos hrec hbridge)
+      hpass hm_ne_one hd hk_pos hrec obligations)
 
 /-- Direct role-package residual corollary for the successor branch.
 
@@ -624,9 +624,9 @@ theorem rolePackageResidual_ofSuccessorObligations
     (hk_pos : 1 ≤ k)
     (hk_large : 400 * params.m * params.d ≤ k)
     (hrec : successorRecursiveSlicesInput (k := k) hpass hm_ne_one)
-    (hbridge : successorSelfImprovementObligations (k := k) hpass hm_ne_one) :
+    (obligations : successorSelfImprovementObligations (k := k) hpass hm_ne_one) :
     Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) :=
-  (successorOfObligations hpass hm_ne_one hd hk_pos hrec hbridge).toRolePackageResidual
+  (successorOfObligations hpass hm_ne_one hd hk_pos hrec obligations).toRolePackageResidual
     hk_large
 
 /-- Answer-side successor branch constructor from recursive answer slices and
@@ -647,11 +647,11 @@ noncomputable def answerSuccessorOfObligations
     (hd : 0 < params.d)
     (hk_pos : 1 ≤ k)
     (hrec : answerSuccessorRecursiveSlicesInput (k := k) hpass hm_ne_one)
-    (hbridge : answerSuccessorSelfImprovementObligations (k := k) hpass hm_ne_one) :
+    (obligations : answerSuccessorSelfImprovementObligations (k := k) hpass hm_ne_one) :
     MainFormalRolePackageBranchResidual params strategy eps hpass k :=
   .answerSuccessor
     (MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorObligations
-      hpass hm_ne_one hd hk_pos hrec hbridge)
+      hpass hm_ne_one hd hk_pos hrec obligations)
 
 /-- Direct role-package residual corollary for the answer-side successor branch
 when the analytic inputs are supplied as recursive slice witnesses and
@@ -668,9 +668,9 @@ theorem rolePackageResidual_ofAnswerSuccessorObligations
     (hk_pos : 1 ≤ k)
     (hk_large : 400 * params.m * params.d ≤ k)
     (hrec : answerSuccessorRecursiveSlicesInput (k := k) hpass hm_ne_one)
-    (hbridge : answerSuccessorSelfImprovementObligations (k := k) hpass hm_ne_one) :
+    (obligations : answerSuccessorSelfImprovementObligations (k := k) hpass hm_ne_one) :
     Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) :=
-  (answerSuccessorOfObligations hpass hm_ne_one hd hk_pos hrec hbridge)
+  (answerSuccessorOfObligations hpass hm_ne_one hd hk_pos hrec obligations)
     |>.toRolePackageResidual hk_large
 
 /-- Answer-side successor branch constructor from a predecessor
@@ -694,11 +694,11 @@ noncomputable def answerSuccessorOfInductionPackageAndObligations
     (hk_pos : 1 ≤ k)
     (hinduction :
       answerSuccessorPerSliceInductionPackageInput (k := k) hpass hm_ne_one)
-    (hbridge : answerSuccessorSelfImprovementObligations (k := k) hpass hm_ne_one) :
+    (obligations : answerSuccessorSelfImprovementObligations (k := k) hpass hm_ne_one) :
     MainFormalRolePackageBranchResidual params strategy eps hpass k :=
   .answerSuccessor
     (MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorInductionPackageAndObligations
-      hpass hm_ne_one hd hk_pos hinduction hbridge)
+      hpass hm_ne_one hd hk_pos hinduction obligations)
 
 /-- Direct role-package residual corollary for the answer-side successor branch
 when the analytic inputs are supplied as a predecessor per-slice induction
@@ -719,10 +719,10 @@ theorem rolePackageResidual_ofAnswerSuccessorInductionPackageAndObligations
     (hk_large : 400 * params.m * params.d ≤ k)
     (hinduction :
       answerSuccessorPerSliceInductionPackageInput (k := k) hpass hm_ne_one)
-    (hbridge : answerSuccessorSelfImprovementObligations (k := k) hpass hm_ne_one) :
+    (obligations : answerSuccessorSelfImprovementObligations (k := k) hpass hm_ne_one) :
     Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) :=
   (answerSuccessorOfInductionPackageAndObligations hpass hm_ne_one hd hk_pos
-    hinduction hbridge)
+    hinduction obligations)
     |>.toRolePackageResidual hk_large
 
 end MainFormalRolePackageBranchResidual

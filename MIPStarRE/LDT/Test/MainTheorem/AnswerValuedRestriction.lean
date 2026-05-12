@@ -504,7 +504,7 @@ noncomputable def mainFormalSuccessorAnswerSelfImprovementObligation_ofObligatio
     (haxisWeightedBound : MainFormalSuccessorAnswerAxisWeightedBound params strategy eps)
     (hdiagonalWeightedBound :
       MainFormalSuccessorAnswerDiagonalWeightedBound params strategy eps)
-    (hbridge :
+    (obligations :
       MainFormalSuccessorAnswerSelfImprovementObligations params strategy eps hpass k
         haxisWeightedBound hdiagonalWeightedBound) :
     MainFormalSuccessorAnswerSelfImprovementObligation params strategy eps hpass k
@@ -516,7 +516,7 @@ noncomputable def mainFormalSuccessorAnswerSelfImprovementObligation_ofObligatio
   exact
     MainInductionStep.AnswerSelfImprovementPackage.ofSliceObligations params
       strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
-      hrestrict hinduction (hbridge hinduction)
+      hrestrict hinduction (obligations hinduction)
 
 /-- Answer-valued successor-case Section 6 boundary inputs for `mainFormal`. -/
 structure MainFormalSuccessorAnswerBoundary (params : Parameters)
@@ -599,7 +599,7 @@ noncomputable def mainFormalSuccessorAnswerBoundary_ofObligations
     (hrec : MainFormalSuccessorAnswerRecursiveSlices params strategy eps hpass k
       (mainFormalSuccessorAnswerAxisWeightedBound_ofPass params strategy eps hpass)
       (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass params strategy eps hpass))
-    (hbridge :
+    (obligations :
       MainFormalSuccessorAnswerSelfImprovementObligations params strategy eps hpass k
         (mainFormalSuccessorAnswerAxisWeightedBound_ofPass params strategy eps hpass)
         (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass params strategy eps hpass)) :
@@ -610,7 +610,7 @@ noncomputable def mainFormalSuccessorAnswerBoundary_ofObligations
       hpass k
       (mainFormalSuccessorAnswerAxisWeightedBound_ofPass params strategy eps hpass)
       (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass params strategy eps hpass)
-      hbridge)
+      obligations)
 
 /-- Build the answer-valued successor boundary from an explicit predecessor
 induction hypothesis and an answer-valued self-improvement obligation.

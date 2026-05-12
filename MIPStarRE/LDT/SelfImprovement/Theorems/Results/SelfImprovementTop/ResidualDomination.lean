@@ -172,7 +172,7 @@ lemma selfImprovementFromSlacknessResidualDominationObligations
     (heps_le_one : eps ≤ 1)
     (hdelta_le_one : delta ≤ 1)
     (hd_le_q : (params.d : Error) ≤ (params.q : Error))
-    (hbridge :
+    (obligations :
       SelfImprovementSlacknessResidualDominationObligations
         params strategy eps delta nu)
     (hgood : strategy.IsGood eps delta gamma)
@@ -181,8 +181,8 @@ lemma selfImprovementFromSlacknessResidualDominationObligations
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu :=
   selfImprovementWithSlacknessAndResidualDominationInput
     params strategy eps delta gamma nu heps_le_one hdelta_le_one hd_le_q
-    hgood G hbridge.helperCompleteness hbridge.helperStrongSelfConsistency
-    hbridge.pointConsistencyTransfer hbridge.orthonormalization
+    hgood G obligations.helperCompleteness obligations.helperStrongSelfConsistency
+    obligations.pointConsistencyTransfer obligations.orthonormalization
 
 /-- Slackness-carrying self-improvement from an ordinary QXP repair obligation whose
 fresh outcome is controlled by coisometry.

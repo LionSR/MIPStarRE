@@ -434,14 +434,14 @@ theorem selfImprovementFromObligations
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hbridge : SelfImprovementObligations params strategy eps delta nu)
+    (obligations : SelfImprovementObligations params strategy eps delta nu)
     (hgood : strategy.IsGood eps delta gamma)
     (G : Measurement (Polynomial params) ι) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu :=
   selfImprovement_assumingFinalFields params strategy eps delta gamma nu
-    hbridge.helperStrongSelfConsistency
-    hbridge.orthonormalization hbridge.finalFields hgood G
+    obligations.helperStrongSelfConsistency
+    obligations.orthonormalization obligations.finalFields hgood G
 
 /-- `SelfImprovementObligations` + `IsGood` also suffice for the
 submeasurement-input interface used by Section 6, once a measurement completion

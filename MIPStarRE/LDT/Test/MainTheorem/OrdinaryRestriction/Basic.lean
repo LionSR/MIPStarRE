@@ -334,7 +334,7 @@ noncomputable def mainFormalSuccessorSelfImprovementObligation_ofObligations
     (haxisWeightedBound : MainFormalSuccessorAxisWeightedBound params strategy eps)
     (hdiagonalWeightedBound :
       MainFormalSuccessorDiagonalWeightedBound params strategy eps)
-    (hbridge :
+    (obligations :
       MainFormalSuccessorSelfImprovementObligations params strategy eps hpass k
         haxisWeightedBound hdiagonalWeightedBound) :
     MainFormalSuccessorSelfImprovementObligation params strategy eps hpass k
@@ -346,7 +346,7 @@ noncomputable def mainFormalSuccessorSelfImprovementObligation_ofObligations
   exact
     MainInductionStep.SelfImprovementPackage.ofSliceObligations params
       strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
-      hrestrict hinduction (hbridge hinduction)
+      hrestrict hinduction (obligations hinduction)
 
 /-- Successor-case Section 6 boundary inputs for `mainFormal`.
 
