@@ -4,7 +4,7 @@ import MIPStarRE.LDT.Test.MainTheorem.ClassicalAndBase
 # Ordinary restricted-slice recursion: basic inputs
 
 This module contains the ordinary successor-route input types, obligation
-constructors, and the successor boundary package used by the Section 6 main
+constructors, and the successor boundary record used by the Section 6 main
 theorem wrapper.
 -/
 
@@ -58,7 +58,7 @@ def MainFormalSuccessorDiagonalWeightedBound (params : Parameters)
         strategy.strategySymmetrization x).diagonalFailureProbability) ≤
     3 * eps
 
-/-- The restricted-probability package on the role-register symmetrization used
+/-- The restricted-probability record on the role-register symmetrization used
 in the successor branch of `mainFormal`.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
@@ -106,10 +106,10 @@ def MainFormalSuccessorRecursiveSlices (params : Parameters)
           (hrestrict.profile.selfConsistency x)
           (hrestrict.profile.diagonal x)
 
-/-- A Section 6 per-slice induction package supplies the recursive slice
+/-- A Section 6 per-slice induction record supplies the recursive slice
 witnesses needed by the `mainFormal` successor boundary.
 
-This constructor is only a package adapter: the caller must still provide the
+This constructor is only an adapter: the caller must still provide the
 `PerSliceInductionPackage` from a genuine predecessor induction hypothesis. It
 does not invoke the public `mainFormal` theorem. -/
 theorem mainFormalSuccessorRecursiveSlices_ofInductionPackage
@@ -180,7 +180,7 @@ def MainFormalSuccessorSelfImprovementObligations (params : Parameters)
       strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
       hrestrict hinduction
 
-/-- The per-slice induction package type used by the ordinary successor
+/-- The per-slice induction record type used by the ordinary successor
 self-improvement bridge.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:441-454`. -/

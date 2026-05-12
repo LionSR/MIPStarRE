@@ -20,7 +20,7 @@ Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, the
 projectivization/completion and line-169 handoff in the proof of
 `\label{thm:main-formal}`.
 
-This package is strictly weaker than
+This residual record is strictly weaker than
 `MainFormalCascadeProjectiveEvaluationHandoffResidual`.  It no longer asks for the
 unused Section 6 consistency field inside `UnsymmetrizationBridgePackage`, and it
 no longer asks for the pre-projective consistency field inside
@@ -112,7 +112,7 @@ noncomputable def ofProjectiveEvaluationHandoffResidual
   rightProjectiveLeftPOVMPolynomialConsistency :=
     residual.rightProjectiveLeftPOVMPolynomialConsistency
 
-/-- View the factor-two role-block fields as the pre-projective target package. -/
+/-- View the factor-two role-block fields as the pre-projective target record. -/
 noncomputable def toUnsymmetrizedPOVMTargets
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

@@ -4,7 +4,7 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Handoff
 /-!
 # Projective handoff residuals
 
-This module contains the projective handoff residual which packages the
+This module contains the projective handoff residual which records the
 line-156 projectivization handoff together with the two evaluated line-172
 links to the unsymmetrized role measurements.
 -/
@@ -15,13 +15,13 @@ namespace MIPStarRE.LDT
 
 namespace Test
 
-/-- Residual after wiring the merged Step 3 and line-156 projectivization packages.
+/-- Residual after wiring the merged Step 3 and line-156 projectivization data.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:150-185`, the
 projective handoff and final two point-consistency estimates in the proof of
 `\label{thm:main-formal}`.
 
-This package is narrower than `MainFormalCascadeProjectiveAssemblyResidual`:
+This residual record is narrower than `MainFormalCascadeProjectiveAssemblyResidual`:
 
 * the unsymmetrized POVMs must be the actual role blocks of a role-register
   measurement `G`, with the two factor-two bounds supplied by

@@ -4,7 +4,7 @@ import MIPStarRE.LDT.Test.MainTheorem.OrdinaryRestriction.PublicWrapper
 /-!
 # Role-register core residuals
 
-Core role-register packages and predecessor-transport helpers used by the
+Core role-register records and predecessor-transport helpers used by the
 `mainFormal` assembly.
 -/
 
@@ -140,8 +140,8 @@ This isolates the first field of the former role-register completion residual:
 it asks only for the Section 6 role-register polynomial measurement and its
 symmetrized consistency estimate at the pre-cascade main-induction error.  The
 constructors below show how the already-checked base case and the syntactic
-successor wrapper produce this residual. For an arbitrary current parameter
-bundle, the inverse predecessor transport needed to apply the successor wrapper
+successor wrapper produce this residual. For arbitrary current parameters,
+the inverse predecessor transport needed to apply the successor wrapper
 remains explicit upstream work; the public large-`k` hypothesis is supplied to
 the successor-branch conversion instead of being hidden in this residual. -/
 structure MainFormalRolePackageResidual
@@ -162,8 +162,8 @@ structure MainFormalRolePackageResidual
 
 namespace MainFormalRolePackageResidual
 
-/-- Repackage a raw Section 6 main-induction witness as the isolated role-package
-residual consumed by the final `mainFormal` assembly. -/
+/-- View a raw Section 6 main-induction witness as the isolated role residual
+consumed by the final `mainFormal` assembly. -/
 theorem ofMainInductionWitness
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -229,8 +229,8 @@ theorem ofSuccessorBoundary
     (mainFormalSuccessorMainInductionPublicWrapper params strategy eps hpass k hd boundary
       hk_pos hk_large)
 
-/-- Build the role-register measurement package produced by a concrete
-role-package residual.
+/-- Build the role-register measurement record produced by a concrete
+role residual.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:68-109`. -/
 def rolePackage
@@ -262,7 +262,7 @@ noncomputable def fieldModelOfSuccessorDecomposition
   h ▸ inferInstance
 
 /-- View a strategy over `params` as a strategy over the syntactic successor in a
-bundled predecessor decomposition.
+predecessor decomposition.
 
 This helper is intentionally aligned with the base-universe field-model API used
 by the current Section 6 public successor wrapper. -/
@@ -278,7 +278,7 @@ noncomputable def projStratTransportSuccessor
   subst params
   exact strategy
 
-/-- Transport the low-individual-degree passing proof across a bundled predecessor
+/-- Transport the low-individual-degree passing proof across a predecessor
 identity, using the same base-universe field-model transport as
 `projStratTransportSuccessor`. -/
 theorem passesLowIndividualDegreeTest_transportSuccessor

@@ -34,7 +34,7 @@ The imported modules carry the split proof assembly:
 * `UnsymmetrizedTargets` — factor-two unsymmetrization and projective assembly
 * `ProjectiveConsistency` — projective-consistency transport through lines 154–172
 * `CompletionTransport` — post-role completion transport residuals
-* `OrthonormalizationData` — orthonormalization and completion hypotheses
+* `OrthonormalizationData` — orthonormalization and completion data
 * `DiagonalCompletion` — diagonal consistency inputs for completing each side
 * `NativeTargets` — the final `ζ₄` native consistency targets
 * `MainFormal` — base, successor, and final branch assembly for `thm:main-formal`
@@ -46,5 +46,5 @@ The imported modules carry the split proof assembly:
 * Blueprint: `blueprint/src/chapter/ch02_test.tex`,
   `\label{thm:main-formal}`; and
   `blueprint/src/chapter/ch10_induction.tex`,
-  `\label{rem:main-formal-lean-residual-packages}`.
+  `\label{rem:main-formal-lean-residual-records}`.
 -/

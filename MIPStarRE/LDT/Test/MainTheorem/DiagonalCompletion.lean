@@ -9,7 +9,7 @@ their cross-consistency relation `Gᴬ ⊗ I ≃ I ⊗ Gᴮ` at error `ζ₁`, t
 completion theorem (`prop:completing-to-measurement`) needs diagonal
 hypotheses for *both* sides.  This module records the stronger, self-referential
 `ConsRel` form of that missing bridge through
-`MainFormalPostRolePackageDiagonalConsistencyInput`, packages
+`MainFormalPostRolePackageDiagonalConsistencyInput`, records
 the match-mass monotonicity input
 (`MainFormalPostRolePackageDiagonalCompletionInput`), and provides the
 conversion lemmas (`ofDiagonalConsistency`,
@@ -39,7 +39,7 @@ The diagonal consistency handoff supplies only the cross relation `G^A ⊗ I ≃
 completion theorem used at lines 143--147 needs the diagonal hypotheses for each
 completed side. This structure records the stronger, self-referential `ConsRel`
 form of that missing bridge, keeping the obligation tied to the concrete role
-package rather than to the public `mainFormal` statement. -/
+record rather than to the public `mainFormal` statement. -/
 structure MainFormalPostRolePackageDiagonalConsistencyInput
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -430,7 +430,7 @@ private lemma completedCloseness_of_consistency_and_matchMassPreservation
 consistency statement and the orthonormalization match-mass data.
 
 This argument does not invoke `Preliminaries.completingToMeasurement`.
-Instead, the role package already reconstructs line 130 as a cross `ConsRel`
+Instead, the role-measurement record already reconstructs line 130 as a cross `ConsRel`
 `G^A \simeq_{\zeta_1} G^B`, the orthonormalization residual already carries the
 projective submeasurements `P^A,P^B`, and the remaining completion bound is
 derived directly from the construction-level match-mass preservation facts for
@@ -501,10 +501,10 @@ theorem nonempty_ofDiagonalConsistencyAndMatchMassPreservation
 
 /-- Produce explicit completion witnesses from the analytic completion theorem.
 
-The only analytic hypotheses are exactly the two strong self-consistency facts
+The only analytic inputs are exactly the two strong self-consistency facts
 for the unsymmetrized role POVMs.  The line-130 orthonormalization residual
 provides the `A ≈ P` closeness input to `completingToMeasurement`; the returned
-completed-closeness statements are repackaged for the canonical projective
+completed-closeness statements are rewritten for the canonical projective
 completions `completeAtOutcomeProj`. -/
 theorem nonempty_ofCompletingToMeasurementInputs
     {params : Parameters} [FieldModel.{0} params.q]
@@ -576,10 +576,10 @@ theorem nonempty_ofCompletingToMeasurementInputs
     leftMatchMassPreservation := leftMatchMassPreservation
     rightMatchMassPreservation := rightMatchMassPreservation }⟩
 
-/-- Produce completion witnesses from the additional diagonal SSC package.
+/-- Produce completion witnesses from the additional diagonal SSC record.
 
 This is the same construction as `nonempty_ofCompletingToMeasurementInputs`, but
-the two self-consistency inputs are bundled under
+the two self-consistency inputs are collected in
 `MainFormalPostRolePackageDiagonalSSCInput`, the extra diagonal data needed
 after the paper's line-130 cross relation has been reconstructed. -/
 theorem nonempty_ofDiagonalSSCInput

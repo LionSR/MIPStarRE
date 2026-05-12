@@ -19,7 +19,7 @@ namespace Test
 Paper origin: `references/ldt-paper/inductive_step.tex:150-173`, from
 `\label{eq:G-with-Q-A}` through the point-evaluation data-processing step.
 
-This package is narrower than `MainFormalCascadeProjectiveHandoffResidual`: the
+This residual record is narrower than `MainFormalCascadeProjectiveHandoffResidual`: the
 line-172 evaluated `ζ₁` links are no longer fields.  Instead it asks for the
 polynomial-level statements from `inductive_step.tex` lines 167--173,
 

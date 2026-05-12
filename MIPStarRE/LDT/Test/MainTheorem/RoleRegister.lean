@@ -7,7 +7,7 @@ import MIPStarRE.LDT.Test.MainTheorem.AnswerValuedRestriction
 Role-register measurement construction for the `mainFormal` assembly.  This
 module imports `RoleRegister.Core` (defining `MainFormalRoleMeasurementPackage`
 and the predecessor-transport helpers) and introduces the branch-level
-residual structures for producing the Section 6 role package:
+residual structures for producing the Section 6 role measurement:
 
 * `MainFormalRolePackageSuccessorResidual` — explicit successor-branch data
   (predecessor decomposition, successor-boundary data, positivity, and `k ≥ 1`)
@@ -33,7 +33,7 @@ completion interfaces.
   symmetrization with role register and factor-two block estimates
   (lines 97–108).
 * Blueprint: `blueprint/src/chapter/ch10_induction.tex`,
-  `\label{rem:main-formal-lean-residual-packages}`.
+  `\label{rem:main-formal-lean-residual-records}`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -42,7 +42,7 @@ namespace MIPStarRE.LDT
 
 namespace Test
 
-/-- Successor-branch data for producing the Section 6 role package.
+/-- Successor-branch data for producing the Section 6 role measurement.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:68-83` and the
 successor branch of the Section 6 induction proof in
@@ -58,9 +58,9 @@ structure MainFormalRolePackageSuccessorResidual
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ) where
-  /-- A predecessor whose successor is the current parameter bundle. -/
+  /-- A predecessor whose successor is the current parameter choice. -/
   successor : Parameters.SuccessorDecomposition params
-  /-- The bundled successor-boundary inputs for the transported strategy. -/
+  /-- The successor-boundary inputs for the transported strategy. -/
   boundary :
     letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
     MainFormalSuccessorBoundary successor.pred
@@ -75,7 +75,7 @@ structure MainFormalRolePackageSuccessorResidual
 and `references/ldt-paper/inductive_step.tex:300-342`.
 
 Type of recursive slice witnesses for the predecessor determined by a
-non-base current parameter bundle.  This private abbreviation keeps the three
+non-base current parameter choice.  This private abbreviation keeps the three
 successor-assembly entry points below from repeating the transported predecessor
 setup in every binder. -/
 private abbrev successorRecursiveSlicesInput
@@ -99,7 +99,7 @@ and `references/ldt-paper/self_improvement.tex:628-770`
 (`\label{thm:self-improvement}`).
 
 Type of self-improvement obligations for the predecessor determined by a
-non-base current parameter bundle. -/
+non-base current parameter choice. -/
 private abbrev successorSelfImprovementObligations
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -120,7 +120,7 @@ private abbrev successorSelfImprovementObligations
 namespace MainFormalRolePackageSuccessorResidual
 
 /-- Convert explicit successor-branch data into the isolated Section 6 role
-package residual, using the public current-dimension large-`k` hypothesis. -/
+residual, using the public current-dimension large-`k` hypothesis. -/
 theorem toRolePackageResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -171,14 +171,14 @@ def ofSyntacticSuccessor
   dimensionPositive := hd
   kPositive := hk_pos
 
-/-- Assemble the successor role-package residual from recursive slices and
+/-- Assemble the successor role residual from recursive slices and
 self-improvement obligations.
 
 This is the non-base branch constructor used by the live `mainFormal` split.  It
 does not assume a raw Section 6 witness: the caller supplies exactly the two
 analytic successor inputs for the transported predecessor, namely recursive
-slice witnesses and the self-improvement obligations.  This constructor packages
-them through `mainFormalSuccessorBoundary_ofObligations`; line-130
+slice witnesses and the self-improvement obligations.  This constructor
+assembles them through `mainFormalSuccessorBoundary_ofObligations`; line-130
 orthonormalization and completion inputs remain downstream hypotheses. -/
 noncomputable def ofSuccessorObligations
     {params : Parameters} [FieldModel.{0} params.q]
@@ -209,7 +209,7 @@ noncomputable def ofSuccessorObligations
 
 end MainFormalRolePackageSuccessorResidual
 
-/-- Answer-valued successor-branch data for producing the Section 6 role package.
+/-- Answer-valued successor-branch data for producing the Section 6 role measurement.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:68-83` and the
 successor branch of the Section 6 induction proof in
@@ -219,9 +219,9 @@ structure MainFormalRolePackageAnswerSuccessorResidual
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ) where
-  /-- A predecessor whose successor is the current parameter bundle. -/
+  /-- A predecessor whose successor is the current parameter choice. -/
   successor : Parameters.SuccessorDecomposition params
-  /-- The bundled answer-valued successor-boundary inputs for the transported strategy. -/
+  /-- The answer-valued successor-boundary inputs for the transported strategy. -/
   boundary :
     letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
     MainFormalSuccessorAnswerBoundary successor.pred
@@ -236,7 +236,7 @@ structure MainFormalRolePackageAnswerSuccessorResidual
 and `references/ldt-paper/inductive_step.tex:300-342`.
 
 Type of answer-valued recursive slice witnesses for the predecessor
-determined by a non-base current parameter bundle. -/
+determined by a non-base current parameter choice. -/
 private abbrev answerSuccessorRecursiveSlicesInput
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -258,7 +258,7 @@ and `references/ldt-paper/self_improvement.tex:628-770`
 (`\label{thm:self-improvement}`).
 
 Type of answer-valued self-improvement obligations for the predecessor
-determined by a non-base current parameter bundle. -/
+determined by a non-base current parameter choice. -/
 private abbrev answerSuccessorSelfImprovementInput
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -281,7 +281,7 @@ and `references/ldt-paper/self_improvement.tex:628-770`
 (`\label{thm:self-improvement}`).
 
 Type of answer-valued self-improvement obligations for the predecessor
-determined by a non-base current parameter bundle.
+determined by a non-base current parameter choice.
 
 This is the load-bearing companion to `answerSuccessorSelfImprovementInput`: it
 supplies exactly the per-slice Section 9 obligations, and its conversion into a
@@ -308,12 +308,12 @@ private abbrev answerSuccessorSelfImprovementObligations
 /-- Paper origin: `references/ldt-paper/inductive_step.tex:239-342`
 (`\label{thm:main-induction}`).
 
-Type of answer-valued per-slice induction packages for the predecessor
-determined by a non-base current parameter bundle.
+Type of answer-valued per-slice induction records for the predecessor
+determined by a non-base current parameter choice.
 
 The recursive slice witnesses produced by
 `mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage` consume exactly an
-input of this shape.  This is an adapter package for the predecessor Section 6
+input of this shape.  This is an adapter record for the predecessor Section 6
 induction hypothesis, not the direct output of a recursive call to
 `mainFormal`. -/
 private abbrev answerSuccessorPerSliceInductionPackageInput
@@ -339,7 +339,7 @@ private abbrev answerSuccessorPerSliceInductionPackageInput
 namespace MainFormalRolePackageAnswerSuccessorResidual
 
 /-- Convert explicit answer-valued successor-branch data into the isolated Section 6
-role-package residual, using the public current-dimension large-`k` hypothesis. -/
+role residual, using the public current-dimension large-`k` hypothesis. -/
 theorem toRolePackageResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -387,11 +387,11 @@ def ofSyntacticSuccessor
   dimensionPositive := hd
   kPositive := hk_pos
 
-/-- Assemble the answer-valued successor role-package residual from recursive
+/-- Assemble the answer-valued successor role residual from recursive
 answer slices and an answer-valued self-improvement obligation.
 
 This is the answer-register counterpart of the ordinary successor role assembly.
-It packages exactly the answer-side Section 6 inputs through
+It assembles exactly the answer-side Section 6 inputs through
 `mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement`; it does not call
 `mainFormal` and it leaves the completion and line-169 interfaces downstream. -/
 noncomputable def ofAnswerSuccessorRecursiveSelfImprovement
@@ -419,7 +419,7 @@ noncomputable def ofAnswerSuccessorRecursiveSelfImprovement
       simpa [Parameters.next] using hd
     kPositive := hk_pos }
 
-/-- Assemble the answer-valued successor role-package residual from recursive
+/-- Assemble the answer-valued successor role residual from recursive
 answer slices and answer-side self-improvement obligations.
 
 This is the obligations counterpart of
@@ -428,7 +428,7 @@ This is the obligations counterpart of
 already-built self-improvement obligation the caller supplies the per-slice
 Section 9 obligations, which is converted internally through
 `mainFormalSuccessorAnswerSelfImprovementObligation_ofObligations` and
-`mainFormalSuccessorAnswerBoundary_ofObligations`.  This packages the
+`mainFormalSuccessorAnswerBoundary_ofObligations`.  This assembles the
 answer-side adapters merged in #1062–#1069 into a single Test-level constructor
 that does not call `mainFormal` and leaves the line-130 completion and line-169
 interfaces downstream. -/
@@ -457,14 +457,14 @@ noncomputable def ofAnswerSuccessorObligations
       simpa [Parameters.next] using hd
     kPositive := hk_pos }
 
-/-- Assemble the answer-valued successor role-package residual from a
+/-- Assemble the answer-valued successor role residual from a
 predecessor `AnswerPerSliceInductionPackage` and answer-side self-improvement
 obligations.
 
-This adapter route starts from a packaged predecessor per-slice induction
+This adapter route starts from a predecessor per-slice induction
 hypothesis together with the Section 9 obligations on the answer side.  It
 composes `mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage` (which
-produces the recursive slice witnesses from the per-slice induction package)
+produces the recursive slice witnesses from the per-slice induction record)
 with `ofAnswerSuccessorObligations`.  Like the other constructors in this
 namespace it is pure structural composition over the answer-side adapters
 already merged on `main`; it does not call `mainFormal`, does not introduce any
@@ -499,7 +499,7 @@ noncomputable def ofAnswerSuccessorInductionPackageAndObligations
 
 end MainFormalRolePackageAnswerSuccessorResidual
 
-/-- Branch-level residual for producing the Section 6 role package.
+/-- Branch-level residual for producing the Section 6 role measurement.
 
 The three constructors expose the real alternatives in the current proof state:
 base dimension, an ordinary successor dimension, or an answer-valued successor
@@ -507,7 +507,7 @@ dimension, each with explicit predecessor transport and successor-boundary data.
 The answer-valued successor constructor records the paper-faithful
 answer-restricted route separately from the ordinary restriction route. The
 large-`k` condition is supplied once, from the public theorem hypothesis, when
-converting the branch to a concrete role-package residual. -/
+converting the branch to a concrete role residual. -/
 inductive MainFormalRolePackageBranchResidual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -529,7 +529,7 @@ inductive MainFormalRolePackageBranchResidual
 
 namespace MainFormalRolePackageBranchResidual
 
-/-- Convert the branch-level role residual into the isolated Section 6 role-package
+/-- Convert the branch-level role residual into the isolated Section 6 role
 residual consumed by the downstream assembly. -/
 theorem toRolePackageResidual
     {params : Parameters} [FieldModel.{0} params.q]
@@ -549,7 +549,7 @@ theorem toRolePackageResidual
 
 /-- Successor branch constructor from the answer-valued successor inputs.
 
-This packages answer-valued recursive slice witnesses and the corresponding
+This records answer-valued recursive slice witnesses and the corresponding
 self-improvement obligation for the transported predecessor into the branch-level
 role residual. It stops before the line-130 completion and line-169 transport
 interfaces. -/
@@ -568,7 +568,7 @@ noncomputable def answerSuccessorOfRecursiveSelfImprovement
     (MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorRecursiveSelfImprovement
       hpass hm_ne_one hd hk_pos hrec hself)
 
-/-- Direct role-package residual corollary for the answer-valued successor
+/-- Direct role-residual corollary for the answer-valued successor
 branch.
 
 Given answer-valued recursive slices, the matching self-improvement obligation,
@@ -591,7 +591,7 @@ theorem rolePackageResidual_ofAnswerSuccessorRecursiveSelfImprovement
 
 /-- Successor branch constructor from the two analytic successor inputs.
 
-This packages recursive slice witnesses and self-improvement obligations for
+This records recursive slice witnesses and self-improvement obligations for
 the transported predecessor into the branch-level role residual.  It deliberately
 stops before the line-130 orthonormalization and completion interfaces. -/
 noncomputable def successorOfObligations
@@ -609,7 +609,7 @@ noncomputable def successorOfObligations
     (MainFormalRolePackageSuccessorResidual.ofSuccessorObligations
       hpass hm_ne_one hd hk_pos hrec obligations)
 
-/-- Direct role-package residual corollary for the successor branch.
+/-- Direct role-residual corollary for the successor branch.
 
 Given recursive slices, self-improvement obligations, and the public large-`k`
 side condition, this produces the isolated Section 6 role residual consumed by
@@ -633,7 +633,7 @@ theorem rolePackageResidual_ofSuccessorObligations
 self-improvement obligations.
 
 This is the answer-register counterpart of `successorOfObligations`: it
-packages the answer-valued recursive slice witnesses and the matching
+records the answer-valued recursive slice witnesses and the matching
 per-slice Section 9 obligations through
 `MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorObligations`,
 then injects into the branch residual.  It does not call `mainFormal` and stops
@@ -653,7 +653,7 @@ noncomputable def answerSuccessorOfObligations
     (MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorObligations
       hpass hm_ne_one hd hk_pos hrec obligations)
 
-/-- Direct role-package residual corollary for the answer-side successor branch
+/-- Direct role-residual corollary for the answer-side successor branch
 when the analytic inputs are supplied as recursive slice witnesses and
 per-slice Section 9 obligations.
 
@@ -676,7 +676,7 @@ theorem rolePackageResidual_ofAnswerSuccessorObligations
 /-- Answer-side successor branch constructor from a predecessor
 `AnswerPerSliceInductionPackage` and per-slice Section 9 obligations.
 
-This preferred answer-side adapter route consumes a packaged per-slice
+This preferred answer-side adapter route consumes a per-slice
 induction hypothesis for the transported predecessor together with the
 answer-side self-improvement obligations, and composes them through
 `mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage` and
@@ -700,9 +700,9 @@ noncomputable def answerSuccessorOfInductionPackageAndObligations
     (MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorInductionPackageAndObligations
       hpass hm_ne_one hd hk_pos hinduction obligations)
 
-/-- Direct role-package residual corollary for the answer-side successor branch
+/-- Direct role-residual corollary for the answer-side successor branch
 when the analytic inputs are supplied as a predecessor per-slice induction
-package and per-slice Section 9 obligations.
+record and per-slice Section 9 obligations.
 
 This is the most direct route from the load-bearing answer-side adapters to the
 isolated Section 6 role residual consumed by the downstream `mainFormal`

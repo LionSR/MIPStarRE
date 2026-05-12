@@ -362,7 +362,7 @@
 	slice-restriction data, the per-slice recursive witnesses, the corresponding
 	self-improvement data, and the recursion-to-pasting assembly.  These are not
 	extra hypotheses in the paper theorem; they are intermediate proof obligations
-	in the current formalization.  Under those hypotheses the Lean statement
+	in the current formalization.  With those proof obligations supplied, the Lean statement
 	returns a measurement $G \in \polymeas{m+1}{q}{d}$ satisfying the same
 	consistency conclusion as Theorem~\ref{thm:main-induction}.
 
@@ -390,7 +390,7 @@
 
 \begin{remark}[Lean auxiliary data for role-register symmetrization]\label{rem:symmetrization-data}
 	\lean{MIPStarRE.LDT.SameSpaceProjStrat.StrategySymmetrizationPackage, MIPStarRE.LDT.SameSpaceProjStrat.StrategySymmetrizationPackage.strategySymmetrization_isGood, MIPStarRE.LDT.SameSpaceProjStrat.StrategySymmetrizationPackage.strategySymmetrization_isNormalized, MIPStarRE.LDT.SameSpaceProjStrat.strategySymmetrizationPackage}
-	The formal proof of Theorem~\ref{thm:main-formal} also uses auxiliary bundled data
+	The formal proof of Theorem~\ref{thm:main-formal} also uses auxiliary data
 	containing the symmetrized strategy, its goodness proof, and its normalization
 	proof.  This auxiliary data supports the final assembly, not an
 	additional hypothesis in Lemma~\ref{lem:symmetrization-bridge}.
@@ -424,10 +424,10 @@
 	Theorem~\ref{thm:main-formal} uses to invoke
 	Remark~\ref{rem:main-induction-successor-assembly}. The public weighted-bound
 	helper lemmas discharge the weighted restricted-axis and restricted-diagonal
-	fields from the symmetrized passing strategy; the remaining external inputs are
+	fields from the symmetrized passing strategy; the remaining proof obligations are
 	the recursive slice witnesses (together with their obligation structure
 	and conversion theorem), the restricted-strategy self-improvement
-	obligation (together with its conversion theorem), and their bundled
+	obligation (together with its conversion theorem), and their corresponding
 	boundary structure.  The ordinary slice structure records both Alice- and Bob-side
 	compatibility with the restricted point, axis-parallel, and diagonal
 	measurements; in particular, the formal lemmas
@@ -436,7 +436,7 @@
 	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedDiagonal_le_ofSliceData}
 	extract the restricted point-agreement, axis-parallel, and diagonal branch
 	bounds from the pinned slice's passing hypothesis.  On the answer-register
-	side, the slice obligations now records
+	side, the slice obligations record
 	both Alice- and Bob-side compatibility for the restricted point and
 	axis-parallel measurements, together with the common zero-coordinate readout of
 	the diagonal measurement on both registers.  The symmetry proofs of the
@@ -444,7 +444,7 @@
 	externally supplied by the recursive slice strategy.
 \end{definition}
 
-\begin{definition}[Lean base-case Step~6 obligations for the Section~3 proof]\label{def:main-formal-step6-hypotheses}
+\begin{definition}[Lean base-case Step~6 obligations for the Section~3 proof]\label{def:main-formal-step6-obligations}
 	\lean{MIPStarRE.LDT.Test.MainFormalBaseProjectiveCompletionObligations}
 	\lean{MIPStarRE.LDT.Test.baseProjectiveCompletionResidual}
 	\lean{MIPStarRE.LDT.Test.MainFormalBaseCompletionObligations}
@@ -459,7 +459,7 @@
 	\lean{MIPStarRE.LDT.Test.mainFormal_ofProjectiveCompletionResidual}
 	\leanok
 	\uses{def:main-formal-successor-boundary, thm:orthonormalization}
-		The structure \texttt{MainFormalBaseProjectiveCompletionObligations} bundles the still-unformalized
+		The structure \texttt{MainFormalBaseProjectiveCompletionObligations} records the still-unformalized
 		analytic obligations needed for the base case ($m=1$) of
 		Theorem~\ref{thm:main-formal}: distinguished completion outcomes and
 		match-mass preservation for the orthonormalized projective submeasurements
@@ -469,7 +469,7 @@
 		\texttt{orthonormalizationMeasurement\_of\_consistency\_from\_projectivizationRepair} then
 		applies the Section~5 locality-preserving repair construction directly, so the
 		base-case structures no longer accept separate spectral-truncation or
-		repair-input hypotheses for orthonormalization.  The narrowed alias
+		repair-input data for orthonormalization.  The narrowed alias
 	\texttt{MainFormalBaseCompletionObligations} omits the two distinguished outcomes;
 	\texttt{baseProjectiveCompletionObligations\_ofBaseCompletionObligations} fills both with the
 	explicit zero polynomial.  The theorems \texttt{baseProjectiveCompletionResidual} and
@@ -488,7 +488,7 @@
 	\texttt{mainFormal\_ofProjectiveCompletionResidual} then derives the three
 	consistency conclusions from any constructed Step~6 projective-completion
 	residual for Theorem~\ref{thm:main-formal}.  These are open proof obligations, not
-	additional hypotheses in the public statement.
+	additional assumptions in the public statement.
 	\end{definition}
 
 	\begin{remark}[Open base-case Step~6 construction]\label{rem:main-formal-base-step6-open-construction}
@@ -507,7 +507,7 @@
 	\uses{def:main-formal-successor-boundary, lem:symmetrization-bridge, rem:main-induction-successor-assembly}
 	This Lean-only specialization applies Remark~\ref{rem:main-induction-successor-assembly}
 	to the role-register symmetrization used in Theorem~\ref{thm:main-formal}. Given
-	the bundled successor boundary, the Section~6 side condition
+	the successor boundary, the Section~6 side condition
 	$400\,m d \le k$, and the matching base-universe field-model instance, it
 	returns the symmetrized global polynomial measurement that the later
 	unsymmetrization and completion transports consume.  The base-universe
@@ -519,7 +519,7 @@
 	It is the direct application of
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper} after
 	instantiating Lemma~\ref{lem:symmetrization-bridge} at
-	$(3\eps,3\eps,3\eps)$ and unpacking the bundled successor-boundary fields.
+	$(3\eps,3\eps,3\eps)$ and unpacking the successor-boundary fields.
 \end{proof}
 
 \begin{remark}[Successor projective-completion construction]\label{rem:main-formal-successor-completion-obligation}
@@ -702,7 +702,7 @@
 	takes the expansion statement as an external hypothesis.
 \end{remark}
 
-\begin{remark}[Lean residual structures for the main-formal assembly]\label{rem:main-formal-lean-residual-packages}
+\begin{remark}[Lean residual structures for the main-formal assembly]\label{rem:main-formal-lean-residual-records}
 \uses{thm:error-cascade-main-formal, thm:main-formal-envelope-basics}
 The following Lean declarations are bookkeeping infrastructure for the final
 assembly residual:
@@ -749,8 +749,8 @@ assembly residual:
 \lean{MIPStarRE.LDT.Test.MainFormalNativeTargets, MIPStarRE.LDT.Test.MainFormalNativeTargets.toMainFormal}
 They split off the vacuous branch where the theorem error is at least $1$,
 derive the Step~8 scalar hypotheses in the non-vacuous branch, and isolate the
-role-register Section~6 measurement behind a concrete role-package residual.
-Lean now records that every non-base parameter bundle has a predecessor via
+role-register Section~6 measurement behind a concrete role-residual record.
+Lean now records that every non-base parameter choice has a predecessor via
 \texttt{Parameters.successorDecompositionOfNeOne}, transports the strategy and
 passing proof across that predecessor equality, and records the two role-production
 branches in \texttt{MainFormalRolePackageBranchResidual}: the checked base handoff,
@@ -776,7 +776,7 @@ These constructors are structural and do not call
 line-130 completion interfaces remain separate.  The live completion residual
 carries the concrete role residual rather than a separate decorative branch
 witness; the branch residual types remain the documented base/successor supply
-paths.  Once the role package is obtained,
+paths.  Once the role-measurement record is obtained,
 Lean proves the two factor-two unsymmetrization links from
 its symmetrized consistency estimate.  The subsequent checked wrappers use the
 proved Section~5 Schwartz--Zippel theorem to convert evaluated pre-projective
@@ -798,12 +798,12 @@ Lean reconstructs pre-projective full-polynomial consistency from the role
 residual and then uses the match-mass invariant to derive the two line-169 links;
 it also transports the Bob-side left-register completion estimate to the line-147
 right-register form before applying the older wrappers.
-It no longer asks for an arbitrary role package or an arbitrary raw Section~6
-witness as an independent field.  It also no longer asks for the two factor-two
+It no longer asks for an arbitrary role-measurement record or an arbitrary
+raw Section~6 witness as an independent field.  It also no longer asks for the two factor-two
 role-block estimates, the unused Section~6 consistency field inside
 \texttt{UnsymmetrizationBridgePackage}, or the duplicated pre-projective
 consistency field inside the Section~6 handoff; those are rebuilt from the concrete
-role residual, the selected role package, and \texttt{hpass}.  Lean then converts
+role residual, the selected role-measurement record, and \texttt{hpass}.  Lean then converts
 the resulting projective self-consistency to
 \texttt{MainFormalCascadeTransportTargets} using the projective converse of
 \texttt{simeq-to-approx}.
@@ -965,7 +965,7 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 		I \ot A_a^{\mathrm B,u} \simeq_{\zeta_4} Q_{[g(u)=a]}^{\mathrm A} \ot I.
 	\end{equation}
 
-	Remark~\ref{rem:main-formal-lean-residual-packages} records the Lean residual
+	Remark~\ref{rem:main-formal-lean-residual-records} records the Lean residual
 	structures that separate the scalar cascade and the Step~5 Schwartz--Zippel
 	handoff from the remaining projective-stage transport work.  The scalar side
 	discharges the paper's line~71--73 coarsening and the Step~8 hypotheses in the

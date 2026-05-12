@@ -341,12 +341,12 @@ theorem mainFormalSuccessorRecursiveSlices_ofSliceData
   -- Rewrite the state and point measurement using the slice-data compatibilities
   simpa [sliceData.sliceState_eq x, sliceData.slicePoint_eq x] using hG
 /-- Build the successor boundary from obligations instead of the
-already-packaged self-improvement obligation.
+already-assembled self-improvement obligation.
 
 This is the public-facing constructor for issue #1020: it wires the
 honest per-slice Section 9 obligations through the existing
 `mainFormalSuccessorSelfImprovementObligation_ofObligations` conversion and
-packages them together with the weighted restricted-probability fields and
+records them together with the weighted restricted-probability fields and
 the recursive slice witnesses into a `MainFormalSuccessorBoundary`.
 
 The weighted restricted-probability fields are discharged from `hpass`

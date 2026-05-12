@@ -33,7 +33,7 @@ monotonicity invariant.
 * Blueprint: `blueprint/src/chapter/ch04_projective.tex`,
   `\label{rem:lean-line169-projectivization-match-mass}`; and
   `blueprint/src/chapter/ch10_induction.tex`,
-  `\label{def:main-formal-step6-hypotheses}`.
+  `\label{def:main-formal-step6-obligations}`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

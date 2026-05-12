@@ -227,7 +227,7 @@ theorem cascadeHypotheses_of_not_mainFormalError_ge_one
 
 /-- Scalar hypotheses for the Section 3 error cascade of `mainFormal`.
 
-This package is intentionally scalar-only. It does not assert any measurement
+This record is intentionally scalar-only. It does not assert any measurement
 transport. Its fields are precisely the hypotheses needed to invoke the already
 formalized Step 8 bound `errorCascade_le_mainFormalError` on the
 main-induction `ν` produced after symmetrization (paper lines 68--75). The

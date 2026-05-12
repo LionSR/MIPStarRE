@@ -37,7 +37,7 @@ invariant from `\label{rem:lean-line169-projectivization-match-mass}`.
 * Blueprint: `blueprint/src/chapter/ch04_projective.tex`,
   `\label{rem:lean-line169-projectivization-match-mass}`; and
   `blueprint/src/chapter/ch10_induction.tex`,
-  `\label{def:main-formal-step6-hypotheses}`.
+  `\label{def:main-formal-step6-obligations}`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -53,7 +53,7 @@ Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, using
 `references/ldt-paper/orthonormalization.tex:282`
 (`\label{lem:orthonormalization-main-lemma}`) and completion.
 
-This package corresponds to `inductive_step.tex` lines 135--149 after the
+This record corresponds to `inductive_step.tex` lines 135--149 after the
 role-register Section 6 output has already been produced and unsymmetrized.  It
 stores the concrete projective submeasurements `P^A,P^B`, the distinguished
 completion outcomes, and the two orthonormalize-and-complete statements giving
