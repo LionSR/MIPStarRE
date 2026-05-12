@@ -6,7 +6,8 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementBridge.Core
 This file contains the answer-valued analogues of the Section 6 slice-obligation
 constructors.  The ordinary construction, including `selfImprovementInInductionSection`,
 lives in `SelfImprovementBridge.Core` and is imported here so that the
-answer-valued package can reuse the same Section 9 self-improvement theorem.
+answer-valued construction can reuse the same Section 9 self-improvement
+theorem.
 
 ## References
 
@@ -20,7 +21,7 @@ open scoped MatrixOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Obligations for producing the answer-valued self-improvement package from
+/-- Obligations for producing the answer-valued self-improvement data from
 honest per-slice symmetric strategies.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
@@ -328,7 +329,7 @@ noncomputable def AnswerSelfImprovementPackage.SliceObligations.ofOrthonormaliza
             (repair x)
         finalFields := finalFields x })
 
-/-- Package the slice-wise outputs feeding the answer-valued restricted-strategy
+/-- Assemble the slice-wise outputs feeding the answer-valued restricted-strategy
 self-improvement stage into the bookkeeping object expected by answer-valued
 Section 6 assembly.
 
@@ -406,7 +407,7 @@ noncomputable def AnswerSelfImprovementPackage.ofSelfImprovementInInductionSecti
       dominatesAveragePointOperator := fun x h => (hslice_props x).2.2.2.2.2 h }
 
 /-- Convert honest per-slice Section 9 obligations into the answer-valued
-Section 6 self-improvement package.
+Section 6 self-improvement data.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
 `references/ldt-paper/self_improvement.tex:631-811`.
@@ -415,7 +416,7 @@ The construction assumes ordinary slice strategies and their Section 9
 obligations. It applies the conditional measurement-input theorem
 `selfImprovementInInductionSection_ofMeasurement` slice-by-slice and transports
 its fields back to the answer-valued restricted-slice interface via the recorded
-state and point-measurement equalities. At each slice the package supplies the
+state and point-measurement equalities. At each slice the record supplies the
 complete measurement `inductionPkg.sliceMeasurement x`; the submeasurement-input
 theorem remains the tracked obligation in #1503. -/
 noncomputable def AnswerSelfImprovementPackage.ofSliceObligations

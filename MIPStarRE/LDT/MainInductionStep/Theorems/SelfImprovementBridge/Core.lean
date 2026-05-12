@@ -7,9 +7,9 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationBridge
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 
 /-!
-# Section 6 — Ordinary Self-Improvement Bridge
+# Section 6 — Ordinary Self-Improvement Assembly
 
-Core public API for the ordinary self-improvement package: constructors for
+Core public API for the ordinary self-improvement data: constructors for
 `SelfImprovementPackage`, the induction-section theorem
 `selfImprovementInInductionSection`, the monotone-witness cleanup
 `mainInductionOfWitness`, and the pasting theorem `ldPastingInInductionSection`.
@@ -183,7 +183,7 @@ theorem selfImprovementInInductionSection
   -- `selfImprovementInInductionSection_ofMeasurement`.
   sorry
 
-/-- Package the slice-wise outputs feeding `selfImprovementInInductionSection`
+/-- Assemble the slice-wise outputs feeding `selfImprovementInInductionSection`
 into the bookkeeping object expected by the later induction-step assembly.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551`, using the
@@ -262,7 +262,7 @@ noncomputable def SelfImprovementPackage.ofSelfImprovementInInductionSection
       bounded := fun x => (hslice_props x).2.2.2.2.1
       dominatesAveragePointOperator := fun x h => (hslice_props x).2.2.2.2.2 h }
 
-/-- Narrow assumption package for running the Section 9 self-improvement bridge
+/-- Narrow obligation record for running the Section 9 self-improvement theorem
 on each Section 6 slice.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
@@ -270,7 +270,7 @@ Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
 formalization boundary needed to run the Section 9 theorem on honest slice
 strategies.
 
-The package deliberately keeps the remaining mathematical obligations explicit:
+The record deliberately keeps the remaining mathematical obligations explicit:
 for every slice it asks for an honest `SymStrat params ι` whose state,
 point-measurement interface, and averaged point operator agree with the
 restricted-slice bookkeeping used by Section 6, together with the Section 9
@@ -555,7 +555,7 @@ noncomputable def SelfImprovementPackage.SliceObligations.ofOrthonormalizationRe
         finalFields := finalFields x })
 
 /-- Convert per-slice Section 9 obligations into the Section 6
-self-improvement package.
+self-improvement data.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
 `references/ldt-paper/self_improvement.tex:631-811`.
@@ -564,7 +564,7 @@ The construction assumes the slice strategies and their Section 9 obligations.
 It applies the conditional measurement-input theorem
 `selfImprovementInInductionSection_ofMeasurement` slice-by-slice and transports
 its fields across the recorded equalities to the restricted-slice interface. At
-each slice the package supplies the complete measurement
+each slice the record supplies the complete measurement
 `inductionPkg.sliceMeasurement x`; the submeasurement-input theorem remains the
 tracked obligation in #1503. -/
 noncomputable def SelfImprovementPackage.ofSliceObligations
