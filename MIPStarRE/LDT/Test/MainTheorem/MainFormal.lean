@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.Test.MainTheorem.NativeTargets
-import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationInputProducer
 
 /-!
 # Main-formal soundness theorem
@@ -8,10 +7,9 @@ Base case, successor branch, and conditional reductions for `thm:main-formal`
 (`\Cref{thm:main-formal}`).  This module contains:
 
 * `MainFormalBaseProjectiveCompletionObligations` — the still-unformalized
-  analytic hypotheses needed for the base case `m = 1` (locality-preserving
-  repair witnesses for orthonormalization, distinguished completion outcomes,
-  and match-mass preservation for the orthonormalized projective
-  submeasurements).
+  analytic obligations needed for the base case `m = 1` (distinguished
+  completion outcomes and match-mass preservation for the orthonormalized
+  projective submeasurements).
 
 * `MainFormalBaseCompletionObligations` — the remaining base-case analytic data,
   stated in the match-mass form used by the paper's line-130 completion route.
@@ -26,7 +24,7 @@ Base case, successor branch, and conditional reductions for `thm:main-formal`
 
 * `mainFormal` — the paper theorem statement, taking a projective strategy that
   passes the LID test with probability `≥ 1 − ε`, together with the explicit
-  boundary hypotheses `0 < d`, `0 < k`, and `400md ≤ k`, and producing the three
+  boundary conditions `0 < d`, `0 < k`, and `400md ≤ k`, and producing the three
   pointwise consistency targets at error bound `mainFormalError`.
 
 ## References
@@ -37,7 +35,7 @@ Base case, successor branch, and conditional reductions for `thm:main-formal`
 * Blueprint: `blueprint/src/chapter/ch02_test.tex`,
   `\label{thm:main-formal}`; and
   `blueprint/src/chapter/ch10_induction.tex`,
-  `\label{def:main-formal-step6-hypotheses}`,
+  `\label{def:main-formal-step6-obligations}`,
   `\label{lem:main-formal-successor-handoff}`.
 -/
 
@@ -47,15 +45,13 @@ namespace MIPStarRE.LDT
 
 namespace Test
 
-/-! ### Base (m = 1) Step 6 analytic hypotheses
+/-! ### Base (m = 1) Step 6 analytic obligations
 
 The base case (`m = 1`) generation of the Step 6 witness residual still
-requires the same analytic content as the successor case: spectral
-truncation and locality-preserving repair witnesses for the unsymmetrized
-POVMs and match-mass preservation for the orthonormalized projective
-submeasurements. These are remaining steps whose formalization corresponds to
-unformalized content in Section 5 and Section 6 of the paper; they are collected
-as a single structure to give a single target for the remaining work.  When
+requires the analytic completion content after orthonormalization: distinguished
+completion outcomes and match-mass preservation for the orthonormalized
+projective submeasurements.  The line-130 orthonormalization itself is now
+derived from the checked role residual by the Section 5 repair construction.  When
 these obligations are supplied, `baseProjectiveCompletionResidual` provides the
 formal theorem that fills the base branch of `mainFormal`. -/
 
@@ -63,12 +59,11 @@ formal theorem that fills the base branch of `mainFormal`. -/
 (`\label{thm:main-formal}`) and its proof in
 `references/ldt-paper/inductive_step.tex:26-236`
 (orthonormalization and completion cascade in Section 3);
-blueprint `\label{def:main-formal-step6-hypotheses}`.
+blueprint `\label{def:main-formal-step6-obligations}`.
 
 Analytic obligations that are still unformalized for the
-base case (`m = 1`) Step 6 witness residual: orthonormalization
-inputs (spectral truncation and repair witnesses), distinguished
-outcomes, and match-mass preservation for the unsymmetrized POVMs.
+base case (`m = 1`) Step 6 witness residual: distinguished
+outcomes and match-mass preservation for the unsymmetrized POVMs.
 
 Supplying these obligations yields a complete `baseProjectiveCompletionResidual`
 for the base branch of `mainFormal`; the remaining successor-case steps are
@@ -78,13 +73,8 @@ structure MainFormalBaseProjectiveCompletionObligations
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
-    (scalars : MainFormalCascadeScalars params eps k)
-    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) where
-  /-- Line-130 orthonormalization inputs: spectral-truncation and
-  locality-preserving repair witnesses for both unsymmetrized POVMs. -/
-  orthonormalizationInput :
-    MainFormalPostRolePackageDiagonalOrthonormalizationInput
-      params strategy eps k scalars (roleResidual.rolePackage scalars)
+  (scalars : MainFormalCascadeScalars params eps k)
+  (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) where
   /-- Alice-side distinguished outcome for the completion step. -/
   a_A : Polynomial params
   /-- Bob-side distinguished outcome for the completion step. -/
@@ -116,14 +106,14 @@ structure MainFormalBaseProjectiveCompletionObligations
         (unsymmetrizedLeftPOVM
           (roleResidual.rolePackage scalars).roleMeasurement)
 
-/-- Assemble the Step 6 witness residual from the bundled analytic hypotheses.
+/-- Assemble the Step 6 witness residual from the named analytic obligations.
 
 This theorem takes an explicit `roleResidual` (obtainable from either
 `MainFormalRolePackageResidual.ofBaseCase` or the successor-branch
 handoff) and the `MainFormalBaseProjectiveCompletionObligations` record, then
 assembles the Step 6 witness residual through
 `MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
-  .nonempty_ofRoleResidualAndDiagonalInputsAndMatchMassPreservation`.
+  .nonempty_ofRoleResidualAndMatchMassPreservation`.
 
 Refs #1009, #422. -/
 theorem baseProjectiveCompletionResidual
@@ -132,30 +122,27 @@ theorem baseProjectiveCompletionResidual
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
-    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
     (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
     (obligations : MainFormalBaseProjectiveCompletionObligations params strategy eps k
       hpass scalars roleResidual) :
     Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
       params strategy eps hpass k scalars) := by
   exact (open MainFormalCascadeRolePackageResidualProjectiveCompletionResidual in
-    nonempty_ofRoleResidualAndDiagonalInputsAndMatchMassPreservation
-      hsmall roleResidual obligations.orthonormalizationInput obligations.a_A obligations.a_B
+    nonempty_ofRoleResidualAndMatchMassPreservation
+      roleResidual obligations.a_A obligations.a_B
       obligations.leftMatchMassPreservation obligations.rightMatchMassPreservation)
 
 
 /-- Paper origin: `references/ldt-paper/inductive_step.tex:26-236`
 (proof of `\label{thm:main-formal}`, orthonormalization + completion cascade);
-blueprint `\label{def:main-formal-step6-hypotheses}`.
+blueprint `\label{def:main-formal-step6-obligations}`.
 
 Narrowed base-case completion obligations for Step 6 when `params.m = 1`.
 
 Compared to `MainFormalBaseProjectiveCompletionObligations`, this structure
 omits the two distinguished outcomes `a_A` and `a_B`, which the conversion below
-fills with the explicit zero polynomial at `m = 1`.  The remaining three fields
-— orthonormalization inputs and match-mass preservation — are the genuinely
-analytic obligations that must be supplied
-by the caller.
+fills with the explicit zero polynomial at `m = 1`.  The remaining fields are
+the match-mass preservation obligations that must be supplied by the caller.
 
 A conversion theorem `baseProjectiveCompletionObligations_ofBaseCompletionObligations`
 constructs the full `MainFormalBaseProjectiveCompletionObligations` from
@@ -168,13 +155,8 @@ structure MainFormalBaseCompletionObligations
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
-    (scalars : MainFormalCascadeScalars params eps k)
-    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) where
-  /-- Line-130 orthonormalization inputs: spectral-truncation and
-  locality-preserving repair witnesses for both unsymmetrized POVMs. -/
-  orthonormalizationInput :
-    MainFormalPostRolePackageDiagonalOrthonormalizationInput
-      params strategy eps k scalars (roleResidual.rolePackage scalars)
+  (scalars : MainFormalCascadeScalars params eps k)
+  (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) where
   /-- Alice-side match-mass preservation: for each line-130 orthonormalization
   residual, the projective submeasurement `P_A` preserves match mass against
   Bob's unsymmetrized POVM. -/
@@ -228,7 +210,6 @@ noncomputable def baseProjectiveCompletionObligations_ofBaseCompletionObligation
       scalars roleResidual) :
     MainFormalBaseProjectiveCompletionObligations params strategy eps k hpass scalars
       roleResidual where
-  orthonormalizationInput := obligations.orthonormalizationInput
   a_A := { poly := 0, lowIndividualDegree := by intro i; simp [MvPolynomial.degreeOf_zero] }
   a_B := { poly := 0, lowIndividualDegree := by intro i; simp [MvPolynomial.degreeOf_zero] }
   leftMatchMassPreservation := obligations.leftMatchMassPreservation
@@ -250,13 +231,12 @@ theorem baseProjectiveCompletionResidual_ofBaseCompletionObligations
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
-    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
     (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
     (obligations : MainFormalBaseCompletionObligations params strategy eps k hpass
       scalars roleResidual) :
     Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
       params strategy eps hpass k scalars) := by
-  exact baseProjectiveCompletionResidual hsmall roleResidual
+  exact baseProjectiveCompletionResidual roleResidual
     (baseProjectiveCompletionObligations_ofBaseCompletionObligations obligations)
 
 
@@ -281,12 +261,11 @@ noncomputable def mainFormalBaseRoleResidual
 Paper origin: `references/ldt-paper/inductive_step.tex:26-236`
 (proof of `\label{thm:main-formal}`, base case of the
 orthonormalization and completion argument); blueprint
-`\label{def:main-formal-step6-hypotheses}`.
+`\label{def:main-formal-step6-obligations}`.
 
 This type specializes `MainFormalBaseCompletionObligations` to the checked role
 residual for the base case (`m = 1`).  Its fields are the line-130
-orthonormalization input and match-mass preservation obligations, not diagonal
-self-consistency assumptions. -/
+match-mass preservation obligations, not diagonal self-consistency assumptions. -/
 abbrev MainFormalBaseBranchCompletionObligations
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -294,7 +273,7 @@ abbrev MainFormalBaseBranchCompletionObligations
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (hm1 : params.m = 1)
     (scalars : MainFormalCascadeScalars params eps k) :
-    Type _ :=
+    Prop :=
   MainFormalBaseCompletionObligations params strategy eps k hpass scalars
     (mainFormalBaseRoleResidual params strategy eps k hpass hm1)
 
@@ -380,7 +359,7 @@ completion cascade.
 
 This is not an additional hypothesis of the paper theorem `mainFormal`; it is an
 open construction tracked separately.  The available structural constructors live in
-`RoleRegister.lean` (`successorOfBridgeInputs` and the answer-valued variants);
+`RoleRegister.lean` (`successorOfObligations` and the answer-valued variants);
 the missing work is to produce the predecessor induction data and the per-slice
 self-improvement inputs from the paper hypotheses, then assemble the resulting
 role residual and completion residual.
@@ -406,20 +385,21 @@ noncomputable def mainFormalSuccessorProjectiveCompletionObligation
   -- `RoleRegister.lean`, not add those inputs to `mainFormal`.
   sorry
 
-/-- Base-case orthonormalization input construction for `mainFormal`.
+/-- Base-case completion-input construction for `mainFormal`.
 
 Paper origin: the orthonormalization and completion step in the proof of
 `\label{thm:main-formal}`,
 `references/ldt-paper/inductive_step.tex:136-160`; the `m = 1` selection
 follows the base case of `\label{thm:main-induction}` at
 `references/ldt-paper/inductive_step.tex:418-432`.  Blueprint:
-`\label{def:main-formal-step6-hypotheses}`.
+`\label{def:main-formal-step6-obligations}`.
 
 This definition names the remaining base-case analytic obligation for
-`mainFormal`.  It must construct the line-130 orthonormalization input
-(spectral-truncation and locality-preserving repair witnesses for both
-unsymmetrized role POVMs) and match-mass preservation for the orthonormalized
-projective submeasurements of the checked base-case role residual.
+`mainFormal`.  It must construct match-mass preservation for the
+orthonormalized projective submeasurements of the checked base-case role
+residual.  The line-130 orthonormalization residual itself is derived from the
+role residual by the Section 5 repair construction, not supplied as an extra
+assumption.
 
 This is the tracked proof obligation for the base branch. -/
 noncomputable def mainFormalBaseBranchCompletionObligations_ofBaseCase
@@ -432,7 +412,7 @@ noncomputable def mainFormalBaseBranchCompletionObligations_ofBaseCase
     (hm1 : params.m = 1)
     (scalars : MainFormalCascadeScalars params eps k) :
     MainFormalBaseBranchCompletionObligations params strategy eps k hpass hm1 scalars := by
-  -- TODO(#1043, #1359): construct the base-case match-mass data from the
+  -- TODO(#1043): construct the base-case match-mass data from the
   -- paper's base-case orthonormalization and completion argument.  Do not
   -- replace this obligation by diagonal self-consistency assumptions.
   sorry
@@ -442,7 +422,7 @@ Internal-obligation theorem for `thm:main-formal` from `test_definition.tex`.
 
 This theorem has the same public hypotheses and conclusion as `mainFormal`.
 Its proof body isolates the remaining construction work in internal obligation
-declarations rather than adding bridge data to the theorem statement.
+declarations rather than adding obligations to the theorem statement.
 
 The bipartite tensor placement follows the paper:
 - **1a**: `A^A_u ⊗ I ≈_ν I ⊗ G^B_{[g(u)=a]}` — G_B on **right**
@@ -455,15 +435,15 @@ side condition is `400 * params.m * params.d ≤ k`. The public theorem therefor
 exposes this stronger hypothesis instead of trying to derive it from the paper's
 printed `params.m * params.d ≤ k` assumption.
 
-After first separating off the saturated-error branch, the checked role-package
+After first separating off the saturated-error branch, the checked role-register
 infrastructure now exposes the base-case input construction, an ordinary
 successor construction, and an answer-valued successor construction:
 
-* the base handoff `strategySymmetrization_mainInductionBaseCase`, packaged as
+* the base handoff `strategySymmetrization_mainInductionBaseCase`, recorded as
   `MainFormalRolePackageBranchResidual.base`, and
 * the predecessor/successor handoff
-  `MainFormalRolePackageBranchResidual.successor`, which carries a bundled
-  `Parameters.SuccessorDecomposition`, transported passing strategy, bundled
+  `MainFormalRolePackageBranchResidual.successor`, which carries a structured
+  `Parameters.SuccessorDecomposition`, transported passing strategy,
   `MainFormalSuccessorBoundary`, and
 * the answer-valued predecessor/successor handoff
   `MainFormalRolePackageBranchResidual.answerSuccessor`, which carries the
@@ -471,7 +451,7 @@ successor construction, and an answer-valued successor construction:
 The branch conversion receives the public current-dimension large-`k` hypothesis
 and weakens it to the predecessor side condition `400 * pred.m * pred.d ≤ k`.
 
-For an arbitrary current parameter bundle, the predecessor decomposition itself is
+For arbitrary current parameters, the predecessor decomposition itself is
 now formalized by `Parameters.successorDecompositionOfNeOne`.  The remaining
 base-case match-mass obligation is isolated in
 `mainFormalBaseBranchCompletionObligations_ofBaseCase`, while the successor branch still has its
@@ -542,7 +522,7 @@ theorem mainFormal_ofInternalObligations
   --
   -- The remaining base and successor obligations are internal declarations,
   -- not additional hypotheses of the paper theorem.  The self-improvement
-  -- assumptions are packaged as `SelfImprovement.SelfImprovementBridgeInputs`.
+  -- assumptions are collected in `SelfImprovement.SelfImprovementObligations`.
   -- The remaining `mainFormal_ofInternalObligations` proof still needs:
   --
   -- 1. **Section 6 role residual** via base/successor branch:
@@ -550,25 +530,20 @@ theorem mainFormal_ofInternalObligations
   --      `base` (if `params.m = 1`), `successor`, or the answer-valued
   --      `answerSuccessor`,
   --    - ordinary or answer-valued recursive induction witnesses,
-  --    - ordinary or answer-valued per-slice self-improvement package obligations.
+  --    - ordinary or answer-valued per-slice self-improvement obligations.
   --
-  -- 2. **Line-130 orthonormalization inputs**:
-  --    - `MainFormalPostRolePackageDiagonalOrthonormalizationInput`:
-  --      spectral-truncation and locality-preserving repair witnesses
-  --      for both unsymmetrized POVMs.
-  --
-  -- 3. **Completion input** for the two POVMs, derived through the paper's
+  -- 2. **Completion input** for the two POVMs, derived through the paper's
   --    match-mass preservation route.  The base branch must produce the
   --    match-mass fields in `MainFormalBaseCompletionObligations`; it must not be
   --    closed by adding diagonal self-consistency assumptions.
   --
-  -- 4. **Repaired line-169 transport**.  The paper's exact `ζ₁` replacement step
+  -- 3. **Repaired line-169 transport**.  The paper's exact `ζ₁` replacement step
   --    is false as printed; the checked local repair compares with the
   --    orthonormalized submeasurement before completion and incurs the smaller
   --    loss `ζ₁ + 10 * ζ₁^(1/8)`, which is still absorbed by
   --    `mainFormalError`.
   --
-  -- The full downstream cascade from the role package through the projective
+  -- The full downstream cascade from the role-measurement record through the projective
   -- targets is already checked; once the residual above is supplied, the
   -- remaining proof is trivial.  Item 4 replaces the older generic `triangleSub`
   -- route whose loss was `ζ₁ + sqrt ζ₂` rather than the printed `ζ₁`.
@@ -585,7 +560,7 @@ theorem mainFormal_ofInternalObligations
           Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
             (params := params) (strategy := strategy) (eps := eps)
             (hpass := hpass) (k := k) (scalars := scalars)) := by
-        exact baseProjectiveCompletionResidual_ofBaseCompletionObligations herr roleResidual
+        exact baseProjectiveCompletionResidual_ofBaseCompletionObligations roleResidual
           (mainFormalBaseBranchCompletionObligations_ofBaseCase
             params strategy eps hpass k hm1 scalars)
       rcases hprojectiveCompletionResidual with ⟨projectiveCompletionResidual⟩
@@ -603,7 +578,7 @@ theorem mainFormal_ofInternalObligations
 `thm:main-formal` from `test_definition.tex`.
 
 This is the paper theorem statement. The statement includes the large-`k` and
-positive-boundary hypotheses currently needed by the formalization, but it does
+positive-boundary conditions currently needed by the formalization, but it does
 not assume the repaired bridge, role-register residual data, or final
 projective-completion hypotheses. Those remain open steps to be derived from the
 pass condition and the preceding sections.
@@ -619,8 +594,7 @@ whose proof uses the admitted obligation declarations
 `mainFormalBaseBranchCompletionObligations_ofBaseCase` and
 `mainFormalSuccessorProjectiveCompletionObligation`.  The remaining
 obligations are tracked by #1043, #1359, and #1458 and must be discharged inside
-the proof, rather than exposed as extra bridge, residual, repair, producer, or
-package hypotheses.
+the proof, rather than exposed as extra non-paper assumptions.
 -/
 theorem mainFormal
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]

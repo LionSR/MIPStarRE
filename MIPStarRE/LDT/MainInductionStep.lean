@@ -5,6 +5,6 @@ import MIPStarRE.LDT.MainInductionStep.Theorems
 /-!
 # Section 6 — MainInductionStep
 
-Barrel module re-exporting the induction-step definitions, statements, and
+Compatibility module re-exporting the induction-step definitions, statements, and
 theorems.
 -/

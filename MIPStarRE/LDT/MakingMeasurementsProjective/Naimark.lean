@@ -5,5 +5,5 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkFull
 /-!
 # Section 5 — Naimark
 
-Barrel module re-exporting the concrete Naimark submodules.
+Compatibility module re-exporting the concrete Naimark submodules.
 -/

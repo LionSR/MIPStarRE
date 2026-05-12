@@ -745,7 +745,7 @@ theorem projectiveNonMeasurement_of_almostProjMeasStatement_full
 
 This integrates the new witness producer with the existing route used by
 `spectralTruncateAlmostProjective` and, downstream, the
-`OrthonormalizationSpectralProducer` APIs. -/
+`OrthonormalizationSpectralObligation` APIs. -/
 noncomputable def spectralTruncationInput_of_sourceAlmostProjective
     {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]

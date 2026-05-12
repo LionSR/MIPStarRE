@@ -228,7 +228,7 @@ theorem mainFormal_trivial_witness
 If the ambient test dimension is `m = 1`, Step 1 symmetrizes the original
 projective strategy and `MainInductionStep.mainInductionBaseCase` supplies the
 Section 6 global polynomial measurement on the role-register symmetrized
-strategy. This packages that handoff in the exact form consumed later by
+strategy. This records that handoff in the exact form consumed later by
 `mainFormal`. -/
 theorem strategySymmetrization_mainInductionBaseCase
     (params : Parameters) [FieldModel params.q]

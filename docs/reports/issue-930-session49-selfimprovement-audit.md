@@ -28,7 +28,7 @@ The only open PR at audit start was draft #889.
 **Verdict: One new `docs/paper-gaps/` note is warranted.**
 The Lean `selfImprovement` theorem (`thm:self-improvement`) is missing the
 paper's `≃_ν` consistency hypothesis for the input measurement G. While this
-gap is explicitly surfaced by the bridge-input system and tracked by #931,
+gap is explicitly surfaced by the obligation system and tracked by #931,
 the `\leanok` annotation on the blueprint node could mislead readers.
 
 ## Coordination and non-overlap
@@ -39,7 +39,7 @@ that upgrade.
 
 Issue #931 remains open and assigned to `jizhengfeng`; it owns the
 self-improvement input producers. This audit does not construct or edit
-any bridge-input proofs.
+any obligation proofs.
 
 The audit was performed directly in the main workspace on a clean `main`
 at `5e18073d`. No source files were modified; only documentation files
@@ -111,7 +111,7 @@ with completeness, consistency, strong self-consistency (≈_ζ), and boundednes
 (⟨ψ|Z⊗(I-H)|ψ⟩ ≤ ζ, Z ≥ E_u A^u_{h(u)}).
 
 **Lean** (Results.lean:172--262): The `selfImprovement` theorem takes three
-explicit bridge-input hypotheses (`HelperStrongSelfConsistencyInput`,
+explicit obligation hypotheses (`HelperStrongSelfConsistencyInput`,
 `OrthonormalizationInput`, `FinalFieldsInput`) and does **not** include the
 paper's `≃_ν` consistency hypothesis. The parameter `nu` is unconstrained.
 The input `G` is passed to `selfImprovementHelper` as `_G` (explicitly
@@ -119,7 +119,7 @@ unused).
 
 **Discrepancy**: The paper's key hypothesis (`G` is `ν`-consistent with `A`)
 is absent from the Lean statement. The Lean theorem is logically correct
-(its conclusions follow from the bridge-input hypotheses), but the paper
+(its conclusions follow from the obligation hypotheses), but the paper
 statement and the Lean statement differ in their hypotheses. The
 `MainInductionStep.selfImprovementInInductionSection` wrapper includes the
 `≃_ν` hypothesis as `_hcons` but marks it unused and delegates to
@@ -142,7 +142,7 @@ apparent from the blueprint alone.
 
 ### Bridge input system
 
-The `SelfImprovementBridgeInputs` structure (Statements.lean:363--378)
+The `SelfImprovementObligations` structure (Statements.lean:363--378)
 packages the three remaining unproven assumptions:
 - `helperStrongSelfConsistency`: The averaged `Hhat` is bipartite strongly
   self-consistent at level `selfImprovementHelperError`.
@@ -152,8 +152,8 @@ packages the three remaining unproven assumptions:
   projective-residual, and boundedness conclusions follow from the helper +
   orthonormalization + data-processing outputs.
 
-The `selfImprovementFromBridgeInputs` and
-`selfImprovementFromBridgeInputsSubMeas` theorems (Results.lean:294--326)
+The `selfImprovementFromObligations` and
+`selfImprovementFromObligationsSubMeas` theorems (Results.lean:294--326)
 unpack these assumptions and call the main `selfImprovement` theorem.
 This bridge system is progress toward #931 and is explicitly documented.
 
@@ -168,7 +168,7 @@ the matrix-level definitions mirror the operator-level ones structurally.
 
 ## Existing documented bookkeeping
 
-- The bridge-input system (`SelfImprovementBridgeInputs`) and its three
+- The obligation system (`SelfImprovementObligations`) and its three
   sub-components are themselves the primary documentation of the
   self-improvement formalization gap.
 - Issue #931 explicitly tracks the self-improvement input producer work.
@@ -187,11 +187,11 @@ files of `MIPStarRE/LDT/SelfImprovement/`. The module compiles cleanly.
 ## Follow-up
 
 The new paper-gap note `issue-930-self-improvement-missing-nu-consistency.tex`
-should be resolved by #931: once the bridge-input fields are proved, the
+should be resolved by #931: once the obligation fields are proved, the
 `selfImprovement` theorem can either:
 1. Add the `≃_ν` hypothesis and use it in a proper proof (matching the
    paper statement); or
-2. Document in the blueprint that the Lean version takes bridge inputs
+2. Document in the blueprint that the Lean version takes obligations
    instead of the paper's ν consistency hypothesis.
 
 ## Validation
@@ -228,7 +228,7 @@ A scratch `#check` file was also run for the audited public declarations:
 `selfImprovementHelperError`, `selfImprovementOrthogonalizationError`,
 `selfImprovementDataProcessingError`, `selfImprovementError`, `sdp`,
 `addInU`, `selfImprovementHelper`, `selfImprovement`,
-`selfImprovementFromSubMeas`, `selfImprovementFromBridgeInputs`,
-`selfImprovementFromBridgeInputsSubMeas`, `SelfImprovementBridgeInputs`,
+`selfImprovementFromSubMeas`, `selfImprovementFromObligations`,
+`selfImprovementFromObligationsSubMeas`, `SelfImprovementObligations`,
 `SelfImprovementConclusion`, `SelfImprovementHelperConclusion`.
 All compiled without error.

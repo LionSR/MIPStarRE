@@ -6,5 +6,5 @@ import MIPStarRE.LDT.Pasting.Defs.Context
 /-!
 # Section 12 — Definitions
 
-Barrel module re-exporting the concrete Section 12 definition leaves.
+Compatibility module re-exporting the concrete Section 12 definition leaves.
 -/

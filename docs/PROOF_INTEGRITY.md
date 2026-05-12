@@ -17,9 +17,10 @@ rather than duplicating the rules inline.
 > source-labelled declaration with `references/ldt-paper/`, the `sorry`
 > blocker below may be temporarily relaxed for the affected proof bodies.  The
 > PR must restore the source-faithful public statement, name the remaining proof
-> obligation as a producer or lemma, and cite the paper passage plus the
+> obligation as a theorem or lemma, and cite the paper passage plus the
 > tracking issue or paper-gap note.  A theorem whose proof still depends on a
-> known non-paper bridge, residual, repair input, package, or conditional helper
+> known non-paper bridge, residual, repair input, obligation structure, or
+> conditional helper
 > must carry the `**Unfaithful:**` docstring marker described in `AGENTS.md`.
 > Review such PRs against statement faithfulness and the documented discharge
 > plan, not merely against the temporary `sorry` count.
@@ -137,14 +138,14 @@ repair a theorem such as `mainFormal` by adding assumptions named
 generic `Hypotheses` or `Assumptions` bundles, or similar, unless those
 assumptions are explicitly present in the cited paper statement.
 
-Conditional bridge lemmas are exceptional temporary scaffolding.  Before
-introducing one, first try to state the missing intermediate fact as a named
-lemma or theorem to be proved from the paper hypotheses.  A conditional helper
-is acceptable only when it has a paper-gap note, a named producer theorem
-target, and an explicit removal plan.  Its name must show that it is
-conditional, for example with `_of_...`, `_assuming_...`, or `conditional...`.
-It must not be the declaration used by a source-labelled blueprint theorem with
-`\leanok`.
+Conditional helpers are a last-resort quarantine for proof work that cannot yet
+be closed.  Before introducing one, state the missing intermediate fact as a
+named lemma or theorem to be proved from the paper hypotheses.  A conditional
+helper is permitted only when it has a paper-gap note or tracking issue, a named
+obligation-discharger target, and an explicit removal plan.  Its name must show
+that it is conditional, for example with `_of_...`, `_assuming_...`, or
+`conditional...`.  It must not be the declaration used by a source-labelled
+blueprint theorem with `\leanok`.
 
 Existing bridge hypotheses should be treated as proof debt.  Mine their proofs
 for reusable arguments, but do not keep a paper-labelled theorem in a

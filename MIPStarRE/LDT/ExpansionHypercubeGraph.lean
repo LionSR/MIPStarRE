@@ -6,7 +6,7 @@ import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Matrix
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Results
 
 /-!
-# LDT/ExpansionHypercubeGraph — barrel
+# LDT/ExpansionHypercubeGraph — imports
 
 This module re-exports the ExpansionHypercubeGraph development:
 - `Defs/Core` for the hypercube parameters, operators, and statement structures

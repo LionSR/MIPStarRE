@@ -4,7 +4,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 
 /-!
-# Final-fields completeness producer
+# Final-fields completeness construction
 
 This module contains the completeness transport used to fill the `completeness`
 field of `SelfImprovementFinalFields`.  The statements formalize the passage
@@ -20,7 +20,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-! ## Final-fields completeness producer (issue #931)
+/-! ## Final-fields completeness construction (issue #931)
 
 The reduced `FinalFieldsInput` lumps four distinct paper-side obligations into a
 single residual. The lemmas below isolate the **completeness** field, exposing
@@ -69,7 +69,7 @@ orthonormalization SDD step, for the `Unit`-indexed constant-family setting
 used by the self-improvement pipeline.
 
 This is the orthonormalization transport ingredient of the final-fields
-completeness producer for `thm:self-improvement` (issue #931). Given:
+completeness construction for `thm:self-improvement` (issue #931). Given:
 
 * `hcomplete` — completeness of the *helper-stage* submeasurement `A` at level
   `m`, expressed as `subMeasMass ψ A.liftLeft ≥ m`. This is the still-missing
@@ -128,7 +128,7 @@ theorem completeness_transport_through_orthonormalization
   -- `htransfer : subMeasMass ψ A.liftLeft - δ - 2 √ε ≤ subMeasMass ψ B.liftLeft`
   linarith
 
-/-- Final-fields completeness producer (issue #931).
+/-- Final-fields completeness construction (issue #931).
 
 Given the still-missing helper-stage completeness lower bound on `Hhat.liftLeft`
 together with the helper-stage strong self-consistency of `Hhat` and the
@@ -159,7 +159,7 @@ blueprint mirror is `blueprint/src/chapter/ch07_self_improvement.tex` lines
 
 The hypothesis uses the weaker `(1 - nu) - selfImprovementHelperError`
 bookkeeping expected by the final-fields chain. A future helper-completeness
-producer may prove the paper's tighter `1 - ν - 3√δ` bound and then weaken it
+construction may prove the paper's tighter `1 - ν - 3√δ` bound and then weaken it
 to this threshold.
 
 It does **not** assume the projective completeness it produces, and it does
@@ -207,7 +207,7 @@ theorem final_fields_completeness_of_helper_completeness
   rcases hresult with ⟨hresult⟩
   linarith
 
-/-- Literal-threshold completeness producer under the standard unit-interval
+/-- Literal-threshold completeness construction under the standard unit-interval
 hypotheses.
 
 This wraps `final_fields_completeness_of_helper_completeness` with the

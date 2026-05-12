@@ -5,7 +5,7 @@ import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.Reindexin
 /-!
 # Basic helpers for the evaluated-slice paper chain
 
-Compatibility barrel for the normalization, point-swap, and finite-reindexing
+Compatibility module for the normalization, point-swap, and finite-reindexing
 helpers used by the paper-faithful scalar chain for `lem:comm-data-processed-g`.
 
 ## References

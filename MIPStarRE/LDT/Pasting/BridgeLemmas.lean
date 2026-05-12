@@ -8,7 +8,7 @@ import MIPStarRE.LDT.Pasting.BridgeLemmas.LineInterpolation.Final
 /-!
 # Section 12 pasting: bridge lemmas
 
-Compatibility barrel re-exporting the concrete bridge-lemma leaves.
+Compatibility module re-exporting the concrete bridge-lemma leaves.
 
 ## References
 

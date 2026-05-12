@@ -32,7 +32,7 @@ development only consumes the weaker facts recorded here: the primal witness is
 a full measurement (`T.total = 1`), the dual witness dominates the identity,
 and it dominates every averaged point operator. Positivity of the dual witness
 is derivable from dual feasibility and positivity of the averaged point
-operators. Despite the historical name, this reduced package does not assert
+operators. Despite the historical name, this reduced record does not assert
 SDP optimality. -/
 structure SdpOptimalPair (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -61,10 +61,10 @@ end SdpOptimalPair
 /-- SDP optimal-pair data strengthened by complementary slackness.
 
 The reduced `SdpOptimalPair` interface above contains only the feasibility and
-normalization facts already produced by the current Lean wrapper for `lem:sdp`.
+normalization facts already produced by the current Lean theorem for `lem:sdp`.
 The paper's strong-duality argument also gives complementary slackness.  This
 successor interface records that additional conclusion without claiming that
-the reduced wrapper has already proved it. -/
+the reduced theorem has already proved it. -/
 structure SdpOptimalPairWithSlackness (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (T : SubMeas (Polynomial params) ι) (Z : MIPStarRE.Quantum.Op ι) : Prop where
@@ -143,7 +143,7 @@ theorem toSdpStatement {params : Parameters} [FieldModel params.q]
 measurement and dual witness.
 
 This is the abstract analogue of the matrix-level witness extractors: the
-existential SDP package contains a complete primal measurement, a positive dual
+existential SDP statement contains a complete primal measurement, a positive dual
 operator dominating the identity and every averaged point operator, and the
 complementary-slackness equations. -/
 theorem exists_measurement_witness {params : Parameters} [FieldModel params.q]
@@ -451,7 +451,7 @@ The final fields are the Section 9 outputs that remain after combining:
 `SelfImprovementHelper`, orthonormalization, data-processing, and
 `orthonormalization_with_total_le_of_residual_domination`.
 
-The package records completeness, point-consistency, self-closeness, and the
+This record contains completeness, point-consistency, self-closeness, and the
 projective-residual estimate. The boundedness term is not repeated here because
 it is recovered later from the strict SDP witness condition `1 ≤ Z` together
 with monotonicity of the boundedness field. -/
@@ -496,16 +496,17 @@ abbrev HelperStrongSelfConsistencyInput (params : Parameters) [FieldModel params
 and `references/ldt-paper/orthonormalization.tex:67-76`
 (`\label{thm:orthonormalization}`).
 
-The final orthonormalization input required by the reduced theorem chain.
+The orthonormalization proof obligation required by the reduced theorem chain.
 
-In the paper's notation, this is the local wrapper produced by the
-`completion-to-`Option` reduction that supplies:
-
-- a spectral truncation family on `leftLiftedMeasurement` of `optionCompletion Hhat`;
-- a locality-preserving repair family for the same helper submeasurement;
-- and the monotone-total domination data on the residual branch.
-
-The bridge now uses only these primitives. -/
+This is not a hypothesis of `thm:self-improvement`. It records the current
+missing proof obligation for the sharp Section 9 orthonormalization step: for
+each helper submeasurement `Hhat`, one must construct the spectral-truncation
+and locality-preserving repair data used by the Section 5 orthonormalization
+route at the paper's `100 * ζ^(1/4)` envelope. The unconditional
+completion-route theorem available for submeasurements has a wider envelope, so
+this obligation must be discharged by proving the sharper construction theorem
+or by reworking the error cascade, not by adding it to the paper theorem
+statement. -/
 abbrev OrthonormalizationInput (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (eps delta : Error) :=
   ∀ {Hhat : SubMeas (Polynomial params) ι},
@@ -554,18 +555,18 @@ self-improvement.
 They assert helper-stage strong self-consistency, the orthonormalization
 hypotheses, and final-fields transport.  Grouping them here only abbreviates the
 hypotheses of separately named conditional results such as
-`selfImprovementFromBridgeInputs`.  The intended mathematical task is to prove
+`selfImprovementFromObligations`.  The intended mathematical task is to prove
 each field from the source hypotheses and then use the conditional result as an
 intermediate theorem. -/
-structure SelfImprovementBridgeInputs (params : Parameters) [FieldModel params.q]
+structure SelfImprovementObligations (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (eps delta nu : Error) where
   /-- Helper-stage strong self-consistency: the averaged `Hhat` is
   strongly self-consistent at level `selfImprovementHelperError`. -/
   helperStrongSelfConsistency :
     HelperStrongSelfConsistencyInput params strategy eps delta
-  /-- Orthonormalization bridge: the strongly self-consistent `Hhat`
-  has the spectral-truncation and locality-preserving repair witnesses
-  required by the orthonormalization theorem. -/
+  /-- Orthonormalization obligation: the strongly self-consistent `Hhat`
+  has the spectral-truncation and locality-preserving repair witnesses required
+  by the sharp orthonormalization route. -/
   orthonormalization :
     OrthonormalizationInput params strategy eps delta
   /-- Final-fields transport: the remaining completeness, point-consistency,

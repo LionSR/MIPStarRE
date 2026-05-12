@@ -22,7 +22,7 @@ The old dependency list in the nearby TODO is now partly stale.  In particular,
 #601, #707, #672, #714, #715, #732, and #759 are closed on GitHub and no longer
 explain the live local proof hole.  The actionable blockers are now:
 
-1. **Section 6 / role-residual producer:** PR #924 is open and depends on #931 for
+1. **Section 6 / role-residual construction:** PR #924 is open and depends on #931 for
    closed self-improvement inputs.  It touches `MIPStarRE/LDT/Test/MainTheorem.lean`,
    so this report deliberately avoids editing that file.
 2. **Exact line-169 match-mass input:** PR #950 is open.  It supplies the P-level
@@ -96,11 +96,11 @@ Existing downstream conversions are already checked:
 
 - `MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual.toRolePackageResidualCompletionLine169Residual`
   (`MainTheorem.lean:2679-2704`) reconstructs pre-projective consistency from the
-  concrete role package, transports Bob's left-register completion estimate to the
+  concrete role-measurement record, transports Bob's left-register completion estimate to the
   paper's right-register form using the #869 helper, and derives the two line-169
   consistency links from `line169MatchMassMonotonicity`.
 - `MainFormalCascadeRolePackagedCompletionLine169Residual.toCompletionLine169Residual`
-  (`MainTheorem.lean:2395-2414`) expands the role package through
+  (`MainTheorem.lean:2395-2414`) expands the role-measurement record through
   `UnsymmetrizationBridgePackage.ofSymConsistency`.
 - `MainFormalCascadeProjectiveCompletionLine169Residual.toProjectiveStageTargets`
   (`MainTheorem.lean:2313-2334`) reconstructs line 156 and the two `ζ₄` point
@@ -134,8 +134,8 @@ The live residual corresponds to the proof of `thm:main-formal` in
 
 | Paper lines | Paper step | Current Lean status |
 | --- | --- | --- |
-| 107-108 | `eq:cons-a` / `eq:cons-b`, the factor-two unsymmetrization estimates. | No longer residual fields; reconstructed from the concrete role package by `UnsymmetrizationBridgePackage.ofSymConsistency`. |
-| 130-133 | `eq:G-self-consistency`, polynomial $G^{\mathrm A}$ / $G^{\mathrm B}$ consistency at `ζ₁`. | Reconstructed from Step 5 wrappers and role package data before line 156. |
+| 107-108 | `eq:cons-a` / `eq:cons-b`, the factor-two unsymmetrization estimates. | No longer residual fields; reconstructed from the concrete role-measurement record by `UnsymmetrizationBridgePackage.ofSymConsistency`. |
+| 130-133 | `eq:G-self-consistency`, polynomial $G^{\mathrm A}$ / $G^{\mathrm B}$ consistency at `ζ₁`. | Reconstructed from Step 5 wrappers and role-measurement data before line 156. |
 | 146-147 | `eq:G-with-Q-A`, completion closeness from $G$ to $Q$ at `ζ₂`. | Still part of `postRoleResidual`: Alice in left-register form, Bob in the left-register form returned by orthonormalize-and-complete. The #869 conversion to Bob's right-register paper form is already checked. |
 | 160-166 | `eq:third-goal` and data processing to evaluated $Q$ consistency. | Downstream conversions are checked once the residual fields are supplied. |
 | 167-173 | `prop:triangle-sub` line-169 transport to $Q^{\mathrm A}_g \otimes I \simeq_{ζ₁} I\otimes G^{\mathrm B}_g`, then data processing. | The paper's printed `ζ₁` cannot be obtained from generic `triangleSub` plus completion closeness without an extra `sqrt ζ₂`; the Lean residual therefore requires `ProjectivizationMatchMassMonotonicity`. |
@@ -214,7 +214,7 @@ Step 6 witness residual.  It explicitly remains blocked on #931.
 Issue #931 is open and asks for closed self-improvement inputs for Section 6.  In
 current `main`, `MainFormalRolePackageResidual` can be produced from the checked
 base handoff or a syntactic successor boundary, but the general successor-boundary
-producer still needs the Section 6 self-improvement/recursion inputs that #931
+construction still needs the Section 6 self-improvement/recursion inputs that #931
 tracks.  Therefore the first field of the live residual should not be attacked in
 parallel with #924 unless #924 closes or merges.
 
@@ -262,8 +262,8 @@ least expect nontrivial rebase work.
    witness residual tied to answer-valued Section 6 data.
 3. Refresh the stale TODO block in `MainTheorem.lean` to remove #601/#707/#672/#714/#715/#732/#759
    and to name the actual post-merge blockers, if any.
-4. Construct the role residual from the merged Section 6 bridge rather than from an
-   arbitrary `Classical.choice` role package.  Preserve the current design principle:
+4. Construct the role residual from the merged Section 6 construction rather than from an
+   arbitrary `Classical.choice` role-measurement record.  Preserve the current design principle:
    keep the concrete role-register measurement visible.
 5. Build the post-role residual in paper order:
    - use the reconstructed pre-projective `G^A/G^B` consistency at `ζ₁`;

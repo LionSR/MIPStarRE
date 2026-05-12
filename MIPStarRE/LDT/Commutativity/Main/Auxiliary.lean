@@ -4,7 +4,7 @@ import MIPStarRE.LDT.Commutativity.Main.Auxiliary.HEvalTransport
 /-!
 # Section 11 commutativity: auxiliary transport lemmas
 
-Compatibility barrel re-exporting `Auxiliary.ScalarMarginalization`
+Compatibility module re-exporting `Auxiliary.ScalarMarginalization`
 and `Auxiliary.HEvalTransport`.
 
 The split preserves the original public API (`fullSlice_scalar_marginalize_x`,

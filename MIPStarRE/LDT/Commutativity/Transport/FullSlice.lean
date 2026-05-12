@@ -6,7 +6,7 @@ import MIPStarRE.LDT.Commutativity.Transport.FullSlice.ZeroBounds
 /-!
 # Section 11 commutativity: full-slice transport
 
-Barrel module re-exporting the full-slice transport sub-modules:
+Compatibility module re-exporting the full-slice transport sub-modules:
 
 - `Averages`: zero-family definition, scalar/tensor averages, data indices
 - `ZeroBounds`: zero-family SDDOpRel bounds
@@ -27,7 +27,7 @@ Import direction: `Averages` is the shared base leaf for FullSlice-specific
 Fubini, symmetry, and data-reindexing helpers.  `ZeroBounds`, `Machinery.*`,
 and `Bridges.QSDD` depend on that base.  `Bridges.Closeness` depends on
 `Averages` plus the two machinery leaves.  FullSlice leaves should not import
-these compatibility barrels.
+these compatibility modules.
 
 Ex-private definitions are tensor-form machinery per architecture decision
 #713; downstream code should use the scalar public API.

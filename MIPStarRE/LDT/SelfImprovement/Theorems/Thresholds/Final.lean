@@ -7,7 +7,7 @@ This module contains the final-stage arithmetic comparisons which absorb the nat
 projective-output error terms into the literal `selfImprovementError` threshold.
 The estimates formalize the exponent-monotonicity bookkeeping in
 `references/ldt-paper/self_improvement.tex`, lines 803--810, and are used by the
-final-field producer statements in the self-improvement theorem.
+final-field construction theorems in the self-improvement theorem.
 
 The helper-stage estimates, including the square-root bound on the global-variance
 error, are in `Thresholds.Helper`.
@@ -424,7 +424,7 @@ private theorem final_fields_projective_residual_error_le_131_times_finalStagePo
 /-- Final projective-residual threshold absorption (`self_improvement.tex`,
 lines 803--810).
 
-The natural error emitted by the projective residual producer is
+The natural error emitted by the projective residual construction is
 `ζ̂ + √ζ̂_dataprocess`. Under the standard unit-interval hypotheses for
 `ε`, `δ`, and `d/q`, this theorem absorbs that natural error into the literal
 `selfImprovementError` threshold used by `SelfImprovementConclusion`.  Lean
@@ -496,7 +496,8 @@ theorem final_fields_projective_residual_error_le_selfImprovementError_of_small_
   have hdata_nonneg : 0 ≤ selfImprovementDataProcessingError params eps delta := by
     have hhelper_nonneg : 0 ≤ selfImprovementHelperError params eps delta :=
       selfImprovementHelperError_nonneg params eps delta
-    have horth_sqrt_nonneg : 0 ≤ Real.sqrt (selfImprovementOrthogonalizationError params eps delta) :=
+    have horth_sqrt_nonneg :
+        0 ≤ Real.sqrt (selfImprovementOrthogonalizationError params eps delta) :=
       Real.sqrt_nonneg _
     rw [selfImprovementDataProcessingError_eq]
     nlinarith
@@ -691,8 +692,8 @@ parameters.
 
 This formalizes the leading exponent-monotonicity step of the paper's chained
 absorption in `self_improvement.tex`, lines 803--810. It is the foundational
-final-stage threshold from which the producer-side projective-output
-absorptions are derived.  The hypothesis `hd_le_q` records the paper's
+final-stage threshold from which the projective-output absorptions are
+derived.  The hypothesis `hd_le_q` records the paper's
 small-error branch `d/q ≤ 1`, using positivity of `q`. -/
 theorem thirty_selfImprovementHelperError_le_selfImprovementError
     (params : Parameters) [FieldModel params.q]

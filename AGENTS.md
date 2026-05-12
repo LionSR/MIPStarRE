@@ -168,12 +168,22 @@ statement matches the cited paper statement, up to faithful formal encoding.
 Changing a Lean theorem away from the corresponding statement in
 `references/ldt-paper/` is strongly discouraged and should occur only when a
 faithful formal encoding or a documented mathematical necessity requires it.
-The check is on the hypotheses as well as the conclusion.  A theorem whose
+This applies to every declaration advertised as a formalization of a paper
+result, not only to theorems currently undergoing repair.  The check is on the
+hypotheses as well as the conclusion.  A theorem whose
 conclusion has the right shape but whose assumptions include an extra
 load-bearing bridge input or hypotheses bundle is a conditional theorem, not
 the paper theorem.
 The project goal is to eliminate such conditional bridges, not to normalize
 them as permanent infrastructure.
+
+If the only available Lean theorem has extra assumptions, the blueprint must
+not mark the source-labelled paper entry as matched by that theorem.  Either
+leave the source-labelled entry without `\leanok`, or state the restricted or
+conditional result as a separate Lean-only blueprint entry whose hypotheses are
+displayed explicitly.  A scope-restricted theorem may be marked `\leanok` only
+against a blueprint statement that explicitly states the restriction; it must
+not be presented as the unrestricted source theorem.
 
 This rule applies especially to declarations named after paper labels such as
 `mainFormal`, `selfImprovement`, `mainInduction`, or other theorem names linked
@@ -190,11 +200,13 @@ Before editing any theorem tagged with a paper label (`thm:*`, `lem:*`,
    implication hypotheses to the paper theorem.
 4. If a missing intermediate fact is needed, first state that fact as a named
    lemma or theorem to be proved from the paper hypotheses.
-5. Add a conditional helper only as a last resort, and only when it has a
-   paper-gap note, a named producer theorem target, and an explicit removal
-   plan.  Its name must show that it is conditional, for example
-   `mainFormal_ofRepairedBridge`, `mainFormal_assumingBridgeHypotheses`, or
-   `conditional...`.
+5. Do not add a conditional helper merely to keep a file compiling.  A
+   conditional helper is acceptable only when the proof content it preserves is
+   mathematically useful, the source-faithful theorem remains visible, and the
+   helper has a paper-gap note, a named construction theorem or
+   proof-obligation target, and an explicit removal plan.  Its name must show
+   that it is conditional, for example `mainFormal_ofRepairedBridge`,
+   `mainFormal_assumingBridgeHypotheses`, or `conditional...`.
 6. Do not point a source-labelled blueprint theorem to the conditional helper
    with `\leanok`.
 
@@ -252,8 +264,8 @@ named proof obligation.  Such a PR must:
 
 1. cite the paper passage by label or line range in the relevant docstring;
 2. cite the paper-gap note or tracking issue that records the divergence;
-3. identify every introduced or retained `sorry` and the producer theorem or
-   source-faithful lemma expected to discharge it;
+3. identify every introduced or retained `sorry` and the construction theorem,
+   proof-obligation theorem, or source-faithful lemma expected to discharge it;
 4. avoid unrelated refactors, notation changes, or proof-engineering churn.
 
 During paper realignment, every restated definition, hypothesis field, or
@@ -280,7 +292,7 @@ minimal form is:
 **Unfaithful:** This proof currently relies on `<hypothesis or helper>`,
 which is not derived from `<paper label or line range>`.  Documented in
 `docs/paper-gaps/<note>.tex` or issue `#N`.  Elimination: prove
-`<producer theorem>` from the paper hypotheses.
+`<construction theorem>` from the paper hypotheses.
 ```
 
 The marker propagates through dependencies: a theorem whose proof transitively
@@ -304,9 +316,9 @@ paper hypotheses.
 - One import per line
 - Follow existing local import style
 - Prefer the smallest correct import set, but do not churn imports unnecessarily
-- Preserve barrel-file structure: `MIPStarRE.lean`, `MIPStarRE/LDT.lean`
+- Preserve re-export-file structure: `MIPStarRE.lean`, `MIPStarRE/LDT.lean`
 - Before adding a new import, check whether the needed declaration already
-  comes from an existing local barrel import
+  comes from an existing local re-export import
 
 ### File structure
 
@@ -585,7 +597,7 @@ Use this file together with:
 | `docs/CONTRIBUTING.md` | PR format, issue templates, label taxonomy, review checklist |
 | `docs/PROOF_INTEGRITY.md` | Blocker / warning patterns for proof correctness |
 | `docs/anti_patterns.md` | Subtler proof-evasion patterns |
-| `docs/proof_frontier_review.md` | Review checklist for producer theorems versus residual inputs |
+| `docs/proof_frontier_review.md` | Review checklist for construction theorems and residual inputs |
 | `docs/style.md` | Mathlib code style (line length, indentation, tactic formatting) |
 | `docs/naming.md` | Mathlib naming conventions |
 | `docs/doc.md` | Mathlib documentation standards |
@@ -593,8 +605,8 @@ Use this file together with:
 | `docs/blueprint_style_guide.md` | Blueprint notation and section conventions |
 | `docs/api_surface.md` | Useful obligation-closing lemmas for `SubMeas` |
 | `docs/paper-gaps/policy.tex` | Paper-gap documentation conventions |
-| `docs/formalization-patterns.md` | Temporary conditional scaffolding, blueprint sync, split-module architecture, barrel and bridge packages |
-| `docs/external-lemmas-pedagogy.md` | Register of Mathlib/external lemmas not explained in the paper, with pedagogical notes |
+| `docs/formalization-patterns.md` | Conditional scaffolding, blueprint sync, split imports, and bridge records |
+| `docs/external-lemmas-pedagogy.md` | Pedagogical notes on Mathlib and external lemmas |
 | `docs/ci-automation.md` | CI/CD workflow details |
 | `docs/pr-review.md` | Mathlib PR review guide |
 | `docs/pr_review_management.md` | Review thread workflow and bot integration |

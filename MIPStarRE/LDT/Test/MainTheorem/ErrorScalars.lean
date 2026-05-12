@@ -227,7 +227,7 @@ theorem cascadeHypotheses_of_not_mainFormalError_ge_one
 
 /-- Scalar hypotheses for the Section 3 error cascade of `mainFormal`.
 
-This package is intentionally scalar-only. It does not assert any measurement
+This record is intentionally scalar-only. It does not assert any measurement
 transport. Its fields are precisely the hypotheses needed to invoke the already
 formalized Step 8 bound `errorCascade_le_mainFormalError` on the
 main-induction `ν` produced after symmetrization (paper lines 68--75). The
@@ -247,7 +247,7 @@ structure MainFormalCascadeScalars (params : Parameters) (eps : Error) (k : ℕ)
 
 namespace MainFormalCascadeScalars
 
-/-- Build the scalar package once the standing cascade hypotheses hold; the
+/-- Build the scalar data once the standing cascade hypotheses hold; the
 main-induction `ν` nonnegativity and paper line 71--73 coarsening are discharged
 by the checked scalar lemmas above. -/
 theorem ofCascadeHypotheses {params : Parameters} {eps : Error} {k : ℕ}
@@ -257,7 +257,7 @@ theorem ofCascadeHypotheses {params : Parameters} {eps : Error} {k : ℕ}
   inductionNu_nonneg := mainFormalInductionNu_nonneg h
   inductionNu_bound := mainFormalInductionNu_bound h
 
-/-- Build the scalar package in the non-vacuous branch of `mainFormal`.
+/-- Build the scalar data in the non-vacuous branch of `mainFormal`.
 
 The branch hypothesis `¬ 1 ≤ mainFormalError params k eps` rules out the
 non-paper regimes `ε > 1` and `d > q`, while `hepsNN` and `hk0` supply the

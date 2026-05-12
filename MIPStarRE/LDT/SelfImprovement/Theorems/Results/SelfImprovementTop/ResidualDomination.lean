@@ -27,16 +27,16 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Bridge data for the slackness and residual-domination route through
+/-- Obligation data for the slackness and residual-domination route through
 self-improvement.
 
-The package contains exactly the non-SDP inputs needed after the helper stage
+The structure contains exactly the non-SDP inputs needed after the helper stage
 has produced a slackness-carrying conclusion: helper strong self-consistency,
 helper completeness, the selected point-consistency `add-in-u` transfer, and
-the residual-dominating orthonormalization input.  The final-fields producer
+the residual-dominating orthonormalization input.  The final-fields obligation
 then uses the monotone-total comparison supplied by residual domination, rather
 than the alphabet-size total-gap estimate. -/
-structure SelfImprovementSlacknessResidualDominationBridgeInputs
+structure SelfImprovementSlacknessResidualDominationObligations
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (eps delta nu : Error) where
   /-- Helper-stage strong self-consistency for the averaged helper family. -/
@@ -162,9 +162,9 @@ lemma selfImprovementWithSlacknessAndResidualDominationInput
         final_fields_bounded strategy.state H.toSubMeas
           hhelper.sdpWitness.dualDominatesIdentity hselfImprovementError_nonneg }
 
-/-- Packaged bridge-input form of
+/-- Obligation form of
 `selfImprovementWithSlacknessAndResidualDominationInput`. -/
-lemma selfImprovementFromSlacknessResidualDominationBridgeInputs
+lemma selfImprovementFromSlacknessResidualDominationObligations
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -172,8 +172,8 @@ lemma selfImprovementFromSlacknessResidualDominationBridgeInputs
     (heps_le_one : eps ≤ 1)
     (hdelta_le_one : delta ≤ 1)
     (hd_le_q : (params.d : Error) ≤ (params.q : Error))
-    (hbridge :
-      SelfImprovementSlacknessResidualDominationBridgeInputs
+    (obligations :
+      SelfImprovementSlacknessResidualDominationObligations
         params strategy eps delta nu)
     (hgood : strategy.IsGood eps delta gamma)
     (G : Measurement (Polynomial params) ι) :
@@ -181,16 +181,16 @@ lemma selfImprovementFromSlacknessResidualDominationBridgeInputs
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu :=
   selfImprovementWithSlacknessAndResidualDominationInput
     params strategy eps delta gamma nu heps_le_one hdelta_le_one hd_le_q
-    hgood G hbridge.helperCompleteness hbridge.helperStrongSelfConsistency
-    hbridge.pointConsistencyTransfer hbridge.orthonormalization
+    hgood G obligations.helperCompleteness obligations.helperStrongSelfConsistency
+    obligations.pointConsistencyTransfer obligations.orthonormalization
 
-/-- Slackness-carrying self-improvement from an ordinary QXP repair producer whose
+/-- Slackness-carrying self-improvement from an ordinary QXP repair obligation whose
 fresh outcome is controlled by coisometry.
 
 This is the assembly point for the monotone right-total route identified in issue
 `#1300`: the constructive spectral slice is discharged by
-`orthonormalizationSpectralProducer_of_sourceAlmostProjective`, while
-`residualDominatingRepairProducer_of_qxpLayer_and_coisometry` turns the QXP
+`orthonormalizationSpectralObligation_of_sourceAlmostProjective`, while
+`residualDominatingRepairObligation_of_qxpLayer_and_coisometry` turns the QXP
 repair plus the construction-level coisometry identity `X X† = I` into the
 residual-domination input consumed by
 `selfImprovementWithSlacknessAndResidualDominationInput`.  Consequently the final
@@ -228,7 +228,7 @@ lemma selfImprovementWithSlacknessAndQXPRepairAndCoisometry
               T.toSubMeas
               (pointConsistencyAddInUSelection params)| ≤
             addInUError params eps delta)
-    (hqxp : OrthonormalizationQXPLayerRepairProducer params strategy eps delta)
+    (hqxp : OrthonormalizationQXPLayerRepairObligation params strategy eps delta)
     (hsource : ∀ {Hhat : SubMeas (Polynomial params) ι}
       (hssc : BipartiteSSCRel strategy.state (uniformDistribution Unit)
         (constSubMeasFamily Hhat)
@@ -257,7 +257,7 @@ lemma selfImprovementWithSlacknessAndQXPRepairAndCoisometry
     hgood G hhelperCompleteness hhelperSSCInput htransfer
     (orthonormalizationResidualDominationInput_of_spectral_qxpLayer_and_coisometry
       (params := params) (strategy := strategy) (eps := eps) (delta := delta)
-      orthonormalizationSpectralProducer_of_sourceAlmostProjective
+      orthonormalizationSpectralObligation_of_sourceAlmostProjective
       hqxp hsource hcoisometry)
 
 end MIPStarRE.LDT.SelfImprovement

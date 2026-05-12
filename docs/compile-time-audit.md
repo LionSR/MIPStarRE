@@ -34,7 +34,7 @@ All timings measured with `lake env lean` (prebuilt dependencies). Real/user/sys
 | File | Lines | Real | User | Heartbeats | Imports | Notes |
 |------|-------|------|------|------------|---------|-------|
 | `Test/StrategyRoleAverage.lean` | 422 | 31.6 | 47.2 | 2× 1,000,000 | 1 | Massive `calc` blocks with `ev_add`, `abel_nf` expansions |
-| `MainInductionStep/Theorems.lean` | 3,484 | 26.1 | 71.4 | 1× 1,000,000 | 9 | 71 `positivity` calls, 6 `field_simp`, barrel file |
+| `MainInductionStep/Theorems.lean` | 3,484 | 26.1 | 71.4 | 1× 1,000,000 | 9 | 71 `positivity` calls, 6 `field_simp`, re-export file |
 | `Pasting/SwitcherooCompletion.lean` | 1,673 | 23.1 | 34.8 | 1× 1,000,000 | 2 | Heavy sqrt/rpow chain |
 | `Pasting/BridgeLemmas/LdSandwichLineOnePoint.lean` | 3,827 | 22.3 | 41.9 | 1× 400,000 | 1 | **Largest file** (3,827 lines), 137 `simp` calls |
 | `Pasting/Bernoulli/FromHToG/Core.lean` | 1,339 | 20.6 | 24.3 | 1× 800,000 | 7 | 54 `simp`, rpow expansions |
@@ -92,7 +92,9 @@ Files sorted by heartbeat override magnitude:
 
 3. **Large `calc` blocks with `ev_add`** — `StrategyRoleAverage.lean` uses `repeat rw [ev_add]; abel_nf` inside large `calc` chains, which is extremely expensive.
 
-4. **Barrel files with many `positivity` calls** — `MainInductionStep/Theorems.lean` has 71 `positivity` calls, each of which spawns a tactic search.
+4. **Re-export files with many `positivity` calls** —
+   `MainInductionStep/Theorems.lean` has 71 `positivity` calls, each of which
+   spawns a tactic search.
 
 ---
 
@@ -121,7 +123,7 @@ Files sorted by heartbeat override magnitude:
 
 ---
 
-## Barrel / Aggregator Files
+## Re-Export / Aggregator Files
 
 These files import many submodules and are natural compile-time bottlenecks in a clean build:
 
@@ -133,9 +135,12 @@ These files import many submodules and are natural compile-time bottlenecks in a
 | `GlobalVariance/Theorems/Results.lean` | 2,950 | 10 | 8.6s |
 | `Test/MainTheorem.lean` | 2,971 | 9 | 8.8s |
 | `MainInductionStep/Theorems.lean` | 3,484 | 9 | 26.1s |
-| `MIPStarRE/LDT.lean` (root barrel) | 133 | 133 | 6.5s |
+| `MIPStarRE/LDT.lean` (root re-export module) | 133 | 133 | 6.5s |
 
-**Note:** The barrel files at 25 line/18 imports are fast individually (they just re-export) but the 133-import root barrel forces all modules to stay in the compilation graph, making any downstream change trigger a large rebuild.
+**Note:** The compatibility module files at 25 line/18 imports are fast
+individually (they just re-export), but the 133-import root re-export file
+forces all modules to stay in the compilation graph, making any downstream
+change trigger a large rebuild.
 
 ---
 
@@ -191,9 +196,11 @@ These files import many submodules and are natural compile-time bottlenecks in a
 
 ### P2 — Nice to Have
 
-8. **Consider splitting the 133-import root barrel (`MIPStarRE/LDT.lean`)**
+8. **Consider splitting the 133-import root re-export file (`MIPStarRE/LDT.lean`)**
    - Currently imports every module, forcing monolithic rebuilds.
-   - Could split into sub-barrels (`LDT/Basic.lean`, `LDT/Preliminaries.lean`, etc.) that downstream consumers import selectively.
+   - Could split into subsystem re-export files (`LDT/Basic.lean`,
+     `LDT/Preliminaries.lean`, etc.) that downstream consumers import
+     selectively.
    - **Expected benefit:** Better incremental compilation when only one subsystem changes.
 
 9. **Add `set_option linter.unusedSimpArgs false` globally for large files that already use it**

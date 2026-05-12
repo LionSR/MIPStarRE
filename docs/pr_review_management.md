@@ -14,8 +14,8 @@ pinned: true
 4. **Closing a PR loses its unique code.** Before closing, verify that all definitions/theorems from that PR exist elsewhere (on main or in another open PR). PR #100's `permuteConjBlockMap`/`orbitUnitaryPow` were lost.
 5. **Source-level holes are not the whole proof frontier.** For PRs that add or
    thread structure fields, use
-   [`proof_frontier_review.md`](proof_frontier_review.md) to distinguish producer
-   theorems from residual inputs and bookkeeping conversions.
+   [`proof_frontier_review.md`](proof_frontier_review.md) to distinguish
+   construction theorems from residual inputs and bookkeeping conversions.
 
 ## Process for PR Review
 

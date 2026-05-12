@@ -5,7 +5,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 
 /-!
-# Final-fields self-closeness producer
+# Final-fields self-closeness construction
 
 This module contains the self-closeness transport used to fill the `selfCloseness`
 field of `SelfImprovementFinalFields`.  The statements formalize the triangle
@@ -21,7 +21,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-! ## Final-fields self-closeness producer (issue #931)
+/-! ## Final-fields self-closeness construction (issue #931)
 
 Same playbook as `final_fields_completeness_of_helper_completeness`, but for
 the `selfCloseness` field. Unlike completeness, this field is closed
@@ -40,7 +40,7 @@ giving the final `3 * (ε + 2δ + ε)` bound. The remaining gap to the literal
 `selfImprovementError` threshold used inside `SelfImprovementFinalFields` is a
 separate numerical comparison on the explicit error definitions.
 
-This is **not** a raw residual: the producer derives the entire
+This is **not** a raw residual: this construction derives the entire
 `selfCloseness` field from data already present in the `selfImprovement`
 proof. It does not assume the projective self-closeness it produces and does
 not restate `FinalFieldsInput`.
@@ -123,7 +123,7 @@ theorem self_closeness_transport_through_orthonormalization
   -- Reshape the IdxSubMeas.liftLeft/liftRight wrappers back to constSubMeasFamily form.
   simpa [IdxSubMeas.liftLeft, IdxSubMeas.liftRight, constSubMeasFamily] using htri
 
-/-- Final-fields self-closeness producer (issue #931).
+/-- Final-fields self-closeness construction (issue #931).
 
 Specializes `self_closeness_transport_through_orthonormalization` to the
 self-improvement parameters. Given the helper-stage bipartite SSC of `Hhat`
@@ -135,7 +135,7 @@ checked theorem derives the `selfCloseness` field of
       2 * selfImprovementHelperError +
       selfImprovementOrthogonalizationError)`.
 
-Crucially, this producer adds **no** new analytic hypothesis: both `hssc` and
+Crucially, this construction adds **no** new analytic hypothesis: both `hssc` and
 `horth` are already supplied to `selfImprovement`, so the `selfCloseness`
 field of `SelfImprovementFinalFields` is now fully derivable up to a numerical
 threshold comparison. -/
@@ -182,7 +182,7 @@ theorem final_fields_self_closeness
   simpa [SubMeas.liftLeft, SubMeas.liftRight,
     leftPlacedSubMeas, rightPlacedSubMeas, constSubMeasFamily] using hresult
 
-/-- Literal-threshold self-closeness producer under the standard
+/-- Literal-threshold self-closeness construction under the standard
 unit-interval hypotheses.
 
 This wraps `final_fields_self_closeness` with the numerical absorption

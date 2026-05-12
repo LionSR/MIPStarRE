@@ -78,7 +78,7 @@ import MIPStarRE.LDT.GlobalVariance.Theorems.Results
 import MIPStarRE.LDT.SelfImprovement.Defs
 import MIPStarRE.LDT.SelfImprovement.MatrixRealization
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
-import MIPStarRE.LDT.SelfImprovement.Theorems.AddInUFullProducer
+import MIPStarRE.LDT.SelfImprovement.Theorems.AddInUFullStatement
 import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationBridge
 import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationInputConstructors
 import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds

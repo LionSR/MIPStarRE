@@ -5,7 +5,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUDiagonalAndDefs.Scal
 /-!
 # Diagonal add-in-u specialization and CS chain definitions
 
-Compatibility barrel for the diagonal add-in-`u` selection, off-diagonal residual
+Compatibility module for the diagonal add-in-`u` selection, off-diagonal residual
 estimates, and scalar-chain endpoint identities used in the self-improvement
 helper strong-self-consistency argument.
 

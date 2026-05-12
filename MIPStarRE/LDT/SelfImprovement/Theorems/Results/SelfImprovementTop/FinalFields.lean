@@ -10,7 +10,7 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
 This module contains the final-fields assembler which uses the monotone
 right-total point-consistency route.  It combines the already isolated
 completeness, point-consistency, self-closeness, and projective-residual
-producers into `SelfImprovementFinalFields`.
+constructions into `SelfImprovementFinalFields`.
 -/
 
 namespace MIPStarRE.LDT.SelfImprovement
@@ -21,10 +21,10 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Final-fields producer using the monotone-total point-consistency route.
+/-- Final-fields construction using the monotone-total point-consistency route.
 
 This theorem assembles the four fields of `SelfImprovementFinalFields` from the
-already isolated helper-output producers.  The point-consistency field is
+already isolated helper-output constructions.  The point-consistency field is
 obtained from
 `final_fields_point_consistency_of_total_expectation_le_of_small_errors`, rather
 than from the total-gap data-processing wrapper; consequently the proof uses the
@@ -119,7 +119,7 @@ theorem final_fields_of_helper_outputs_of_total_expectation_le
         params strategy eps delta heps heps_le_one hdelta hdelta_le_one hd_le_q
         hhelper hpointSSC hslack htransfer hdata
 
-/-- Final-fields producer using operator monotonicity of the projective total.
+/-- Final-fields construction using operator monotonicity of the projective total.
 
 This is the operator-order form of
 `final_fields_of_helper_outputs_of_total_expectation_le`.  The hypothesis
@@ -182,7 +182,7 @@ theorem final_fields_of_helper_outputs_of_total_operator_le
       horth hdata
       (ev_mono strategy.state _ _ (MIPStarRE.LDT.rightTensor_mono hTotalLe))
 
-/-- Final-fields producer from helper outputs and residual-dominating
+/-- Final-fields construction from helper outputs and residual-dominating
 orthonormalization.
 
 This theorem composes the strengthened orthonormalization theorem with the
@@ -301,13 +301,13 @@ theorem final_fields_exists_of_helper_outputs_of_residual_domination
       hhelper hhelperCompleteness hhelperSSC hpointSSC hslack htransfer
       horth hdata hTotalLe
 
-/-- Final-fields producer from the SelfImprovement-level residual-domination
+/-- Final-fields construction from the SelfImprovement-level residual-domination
 orthonormalization input.
 
 This is the final assembly form matched to
 `OrthonormalizationResidualDominationInput`: once helper strong
 self-consistency supplies the particular helper submeasurement `Hhat`, the
-producer gives the concrete residual-domination input consumed by
+construction gives the concrete residual-domination input consumed by
 `final_fields_exists_of_helper_outputs_of_residual_domination`. -/
 theorem final_fields_exists_of_helper_outputs_of_residualDominationInput
     (params : Parameters) [FieldModel params.q]
@@ -362,7 +362,7 @@ theorem final_fields_exists_of_helper_outputs_of_residualDominationInput
     (horthInput hhelperSSC)
 
 
-/-- Final-fields producer for residual-domination orthonormalization inputs only.
+/-- Final-fields construction for residual-domination orthonormalization inputs only.
 
 This wrapper packages `final_fields_exists_of_helper_outputs_of_residualDominationInput`
 and returns only the final-fields conclusion used by the self-improvement

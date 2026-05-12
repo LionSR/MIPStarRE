@@ -4,7 +4,7 @@ import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich.Setup.StepLemmas.
 /-!
 # Section 12 pasting: commute G half-sandwich setup step lemmas
 
-Compatibility barrel for the split and move-chain lemmas used in the
+Compatibility module for the split and move-chain lemmas used in the
 half-sandwich commutation setup.
 
 ## References

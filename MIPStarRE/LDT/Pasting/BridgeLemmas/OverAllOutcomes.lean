@@ -5,7 +5,7 @@ import MIPStarRE.LDT.Pasting.BridgeLemmas.OverAllOutcomes.Final
 /-!
 # Section 12 pasting: over all outcomes
 
-Compatibility barrel re-exporting the overall-outcome bridge-lemma leaves:
+Compatibility module re-exporting the overall-outcome bridge-lemma leaves:
 `ErrorAndMass`, `NonglobalDecomposition`, and `Final`.
 
 ## References

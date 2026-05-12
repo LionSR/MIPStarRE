@@ -107,7 +107,7 @@ the paper's standing "good strategy" context; `gamma` does not appear in
 `AddInUFullStatement`'s bound (which is `addInUError params eps delta`),
 matching the paper's framing where `lem:add-in-u` is invoked inside a
 `good`-strategy section. -/
-theorem addInUFullProducer
+theorem addInUFullStatement_of_isGood
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma : Error)

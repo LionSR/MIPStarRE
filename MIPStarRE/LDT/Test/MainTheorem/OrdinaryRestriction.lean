@@ -3,14 +3,14 @@ import MIPStarRE.LDT.Test.MainTheorem.OrdinaryRestriction.PublicWrapper
 /-!
 # Ordinary restricted-slice recursion
 
-Compatibility barrel for the ordinary `x`-restricted successor route in the
+Compatibility module for the ordinary `x`-restricted successor route in the
 `mainFormal` assembly.  This module re-exports declarations from three
 sub-leaves:
 
 * `OrdinaryRestriction.Basic` — successor weighted bounds
   (`MainFormalSuccessorAxisWeightedBound`, `MainFormalSuccessorDiagonalWeightedBound`),
-  recursive slice producers (`MainFormalSuccessorRecursiveSlices`),
-  self-improvement bridge inputs (`MainFormalSuccessorSelfImprovementBridgeInputs`),
+  recursive slice witnesses (`MainFormalSuccessorRecursiveSlices`),
+  self-improvement obligations (`MainFormalSuccessorSelfImprovementObligations`),
   and the successor boundary structure (`MainFormalSuccessorBoundary`).
 
 * `OrdinaryRestriction.SliceData` — per-slice recursive data

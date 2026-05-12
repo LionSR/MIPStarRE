@@ -6,7 +6,7 @@ import MIPStarRE.LDT.SelfImprovement.Defs
 # Section 9 — helper-stage numerical threshold absorptions
 
 Reusable arithmetic threshold lemmas that compare the *natural* paper sums of
-errors emitted by the helper-stage self-improvement producers against the
+errors emitted by the helper-stage self-improvement constructions against the
 literal `selfImprovementHelperError` threshold used by the final-field
 statements (`SelfImprovementFinalFields` in `Statements.lean`).
 

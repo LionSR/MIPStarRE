@@ -192,6 +192,81 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
             self.assertEqual(len(result.conditional_decl_findings), 1)
             self.assertEqual(result.conditional_decl_findings[0].token, "_ofRepairedBridge")
 
+    def test_internal_obligation_name_in_paper_facing_entry_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem mainFormal_ofInternalObligations (h : P) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:paper}
+                  \lean{MIPStarRE.mainFormal_ofInternalObligations}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root)
+            self.assertEqual(result.scanned_refs, 1)
+            self.assertEqual(result.findings, ())
+            self.assertEqual(len(result.conditional_decl_findings), 1)
+            self.assertEqual(result.conditional_decl_findings[0].token, "_ofInternalObligations")
+
+    def test_residual_constructor_name_in_paper_facing_entry_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem_ofCompletionResidual (h : P) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{lemma}\label{lem:paper}
+                  \lean{MIPStarRE.paperTheorem_ofCompletionResidual}
+                \end{lemma}
+                """,
+            )
+            result = audit.run_audit(root)
+            self.assertEqual(result.scanned_refs, 1)
+            self.assertEqual(result.findings, ())
+            self.assertEqual(len(result.conditional_decl_findings), 1)
+            self.assertEqual(result.conditional_decl_findings[0].token, "_ofCompletionResidual")
+
+    def test_conditional_prefix_name_in_paper_facing_entry_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem conditionalPaperTheorem (h : P) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{corollary}\label{cor:paper}
+                  \lean{MIPStarRE.conditionalPaperTheorem}
+                \end{corollary}
+                """,
+            )
+            result = audit.run_audit(root)
+            self.assertEqual(result.scanned_refs, 1)
+            self.assertEqual(result.findings, ())
+            self.assertEqual(len(result.conditional_decl_findings), 1)
+            self.assertEqual(result.conditional_decl_findings[0].token, "conditionalPaperTheorem")
+
     def test_plain_hypotheses_bundle_in_paper_facing_header_is_reported(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

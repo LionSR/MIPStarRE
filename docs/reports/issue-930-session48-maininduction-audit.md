@@ -26,7 +26,7 @@ I also removed a stale blueprint warning on the restated induction-section pasti
 
 The audit intentionally stops at the Section 6 interfaces that are already checked. In particular:
 
-- The explicit self-improvement bridge inputs in `SelfImprovementPackage.SliceBridgeInputs` and the remaining producers of those inputs are #931-owned. I recorded their presence but did not try to discharge them.
+- The explicit self-improvement obligations in `SelfImprovementPackage.SliceObligations` and the remaining producers of those inputs are #931-owned. I recorded their presence but did not try to discharge them.
 - The answer-valued successor-boundary aliases in `MIPStarRE/LDT/Test/MainTheorem.lean` are outside this slice, even though they consume the answer-valued Section 6 wrappers.
 - The pasting theorem itself was audited in PR #1007; here I only checked the Section 6 wrapper and the way the main induction assembly supplies its hypotheses.
 - The large-`k` strengthening from the paper’s printed `k >= md` to the formal/blueprint `k >= 400 md` is already documented in `docs/paper-gaps/issue-906-main-formal-k-bound.tex` and was not counted as a new discrepancy.
@@ -49,7 +49,7 @@ The diagonal restriction has two formal interfaces. The legacy `xRestrictedStrat
 
 The paper’s induction-section self-improvement theorem is restated in `SelfImprovementInInductionSectionConclusion` (`Statements.lean:32-67`) and proved by `selfImprovementInInductionSection` (`Theorems.lean:66-155`). The conclusion fields match the source theorem: completeness, point consistency, strong self-consistency, left/right closeness, boundedness by a positive witness, and domination of the averaged point operator.
 
-The Lean theorem has explicit inputs from the Section 9 self-improvement pipeline: helper strong self-consistency, orthonormalization, final-fields data, and a measurement/submeasurement bridge for the input `G`. Those inputs are not silent repairs inside `MainInductionStep`; they are the known externally supplied bridge data tracked by #931 and by the `SliceBridgeInputs` package added in PR #1008. I did not audit or attempt to close these proof obligations.
+The Lean theorem has explicit inputs from the Section 9 self-improvement pipeline: helper strong self-consistency, orthonormalization, final-fields data, and a measurement/submeasurement bridge for the input `G`. Those inputs are not silent repairs inside `MainInductionStep`; they are the known externally supplied obligations tracked by #931 and by the `SliceObligations` package added in PR #1008. I did not audit or attempt to close these proof obligations.
 
 ## Finding 3: the induction-section pasting wrapper matches the audited pasting theorem
 

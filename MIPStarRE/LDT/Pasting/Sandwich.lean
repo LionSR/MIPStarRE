@@ -5,5 +5,5 @@ import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
 /-!
 # Section 12 — Sandwich constructions
 
-Barrel module re-exporting the concrete sandwich-construction leaves.
+Compatibility module re-exporting the concrete sandwich-construction leaves.
 -/

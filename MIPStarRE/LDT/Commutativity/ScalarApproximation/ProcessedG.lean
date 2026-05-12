@@ -35,7 +35,7 @@ The formerly monolithic file has been split into focused leaf modules:
   (`evaluatedSlicePhaseFiveStabilityDefect`, fiber-collapse helpers)
 - `ProcessedG.MainChain`: The main `evaluatedSlice_scalar_chain_bound` assembly
 
-This file remains as a compatibility barrel exporting `commDataProcessedG`.
+This file remains as a compatibility module exporting `commDataProcessedG`.
 -/
 
 namespace MIPStarRE.LDT.Commutativity

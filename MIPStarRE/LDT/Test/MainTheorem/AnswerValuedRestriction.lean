@@ -13,7 +13,7 @@ answer-valued successor
 boundary (`MainFormalSuccessorAnswerBoundary`), recursive slice data
 (`MainFormalSuccessorAnswerRecursiveSliceData`), per-slice self-improvement
 obligations (`MainFormalSuccessorAnswerSelfImprovementObligation`), and the
-corresponding bridge inputs (`MainFormalSuccessorAnswerSelfImprovementBridgeInputs`).
+corresponding obligations (`MainFormalSuccessorAnswerSelfImprovementObligations`).
 The central public theorem
 `mainFormalSuccessorAnswerMainInductionPublicWrapper` converts a bundle of
 predecessor answer-sided Section 6 inputs, together with the
@@ -155,7 +155,7 @@ theorem mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage
       hinduction.pointConsistency x, hinduction.error_le x⟩
 
 
-/-- Answer-side slice-recursion bridge data for the successor branch of
+/-- Answer-side slice-recursion obligations for the successor branch of
 `mainFormal`.
 
 This is the answer-register counterpart of
@@ -319,14 +319,14 @@ def MainFormalSuccessorAnswerSelfImprovementObligation (params : Parameters)
       strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
       hrestrict hinduction
 
-/-- Answer-valued successor-case bridge inputs for the restricted-strategy
+/-- Answer-valued successor-case obligations for the restricted-strategy
 self-improvement obligation.
 
 This is the answer-register counterpart of
-`MainFormalSuccessorSelfImprovementBridgeInputs`: for each possible answer-side
+`MainFormalSuccessorSelfImprovementObligations`: for each possible answer-side
 per-slice induction package, callers supply the narrow
-`AnswerSelfImprovementPackage.SliceBridgeInputs` assumptions. -/
-def MainFormalSuccessorAnswerSelfImprovementBridgeInputs (params : Parameters)
+`AnswerSelfImprovementPackage.SliceObligations` assumptions. -/
+def MainFormalSuccessorAnswerSelfImprovementObligations (params : Parameters)
     [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
@@ -339,7 +339,7 @@ def MainFormalSuccessorAnswerSelfImprovementBridgeInputs (params : Parameters)
   ∀ hinduction :
     MainInductionStep.AnswerPerSliceInductionPackage params
       strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) hrestrict k,
-    MainInductionStep.AnswerSelfImprovementPackage.SliceBridgeInputs params
+    MainInductionStep.AnswerSelfImprovementPackage.SliceObligations params
       strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
       hrestrict hinduction
 
@@ -361,10 +361,10 @@ abbrev MainFormalSuccessorAnswerSelfImprovementInductionPackage (params : Parame
   MainInductionStep.AnswerPerSliceInductionPackage params
     strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) hrestrict k
 
-/-- Assemble answer-valued successor self-improvement bridge inputs from honest
+/-- Assemble answer-valued successor self-improvement obligations from honest
 slice strategies, verifier-visible measurement transports, and the remaining
-Section 9 bridge data. -/
-noncomputable def mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofMeasurementEq
+Section 9 obligations. -/
+noncomputable def mainFormalSuccessorAnswerSelfImprovementObligations_ofMeasurementEq
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -398,31 +398,31 @@ noncomputable def mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofMeasure
             (((MainInductionStep.xRestrictedAnswerSymStrat params
               strategy.strategySymmetrization x).diagonalMeasurement.toIdxProjMeas ℓ).toSubMeas)
             (fun f : DiagonalLineAnswer params => f zeroCoord))
-    (bridgeInputs :
+    (obligations :
       ∀ hinduction x,
-        SelfImprovement.SelfImprovementBridgeInputs params (sliceStrategy hinduction x)
+        SelfImprovement.SelfImprovementObligations params (sliceStrategy hinduction x)
           ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
             haxisWeightedBound hdiagonalWeightedBound).profile.axisParallel x)
           ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
             haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x)
           (hinduction.sliceError x)) :
-    MainFormalSuccessorAnswerSelfImprovementBridgeInputs params strategy eps hpass k
+    MainFormalSuccessorAnswerSelfImprovementObligations params strategy eps hpass k
       haxisWeightedBound hdiagonalWeightedBound := by
   let hrestrict :=
     mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
       haxisWeightedBound hdiagonalWeightedBound
   intro hinduction
   exact
-    MainInductionStep.AnswerSelfImprovementPackage.SliceBridgeInputs.ofMeasurementEq
+    MainInductionStep.AnswerSelfImprovementPackage.SliceObligations.ofMeasurementEq
       params strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
       hrestrict hinduction (sliceStrategy hinduction) (state_eq hinduction)
       (pointMeasurement_eq hinduction) (axisParallelMeasurement_eq hinduction)
-      (diagonalZeroCoord_eq hinduction) (bridgeInputs hinduction)
+      (diagonalZeroCoord_eq hinduction) (obligations hinduction)
 
-/-- Assemble answer-valued successor self-improvement bridge inputs from the
+/-- Assemble answer-valued successor self-improvement obligations from the
 three named Section 9 inputs, using the closed spectral truncation input for
 the orthonormalization stage. -/
-noncomputable def mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofOrthonormalizationRepair
+noncomputable def mainFormalSuccessorAnswerSelfImprovementObligations_ofOrthonormalizationRepair
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -466,7 +466,7 @@ noncomputable def mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofOrthono
             haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x))
     (repair :
       ∀ hinduction x,
-        SelfImprovement.OrthonormalizationRepairProducer params
+        SelfImprovement.OrthonormalizationRepairObligation params
           (sliceStrategy hinduction x)
           ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
             haxisWeightedBound hdiagonalWeightedBound).profile.axisParallel x)
@@ -480,23 +480,23 @@ noncomputable def mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofOrthono
           ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
             haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x)
           (hinduction.sliceError x)) :
-    MainFormalSuccessorAnswerSelfImprovementBridgeInputs params strategy eps hpass k
+    MainFormalSuccessorAnswerSelfImprovementObligations params strategy eps hpass k
       haxisWeightedBound hdiagonalWeightedBound := by
   let hrestrict :=
     mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
       haxisWeightedBound hdiagonalWeightedBound
   intro hinduction
   exact
-    MainInductionStep.AnswerSelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationRepair
+    MainInductionStep.AnswerSelfImprovementPackage.SliceObligations.ofOrthonormalizationRepair
       params strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
       hrestrict hinduction (sliceStrategy hinduction) (state_eq hinduction)
       (pointMeasurement_eq hinduction) (axisParallelMeasurement_eq hinduction)
       (diagonalZeroCoord_eq hinduction) (helperStrongSelfConsistency hinduction)
       (repair hinduction) (finalFields hinduction)
 
-/-- Convert answer-valued successor-case bridge inputs into the self-improvement
+/-- Convert answer-valued successor-case obligations into the self-improvement
 obligation expected by the public answer-valued Section 6 boundary. -/
-noncomputable def mainFormalSuccessorAnswerSelfImprovementObligation_ofBridgeInputs
+noncomputable def mainFormalSuccessorAnswerSelfImprovementObligation_ofObligations
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -504,8 +504,8 @@ noncomputable def mainFormalSuccessorAnswerSelfImprovementObligation_ofBridgeInp
     (haxisWeightedBound : MainFormalSuccessorAnswerAxisWeightedBound params strategy eps)
     (hdiagonalWeightedBound :
       MainFormalSuccessorAnswerDiagonalWeightedBound params strategy eps)
-    (hbridge :
-      MainFormalSuccessorAnswerSelfImprovementBridgeInputs params strategy eps hpass k
+    (obligations :
+      MainFormalSuccessorAnswerSelfImprovementObligations params strategy eps hpass k
         haxisWeightedBound hdiagonalWeightedBound) :
     MainFormalSuccessorAnswerSelfImprovementObligation params strategy eps hpass k
       haxisWeightedBound hdiagonalWeightedBound := by
@@ -514,9 +514,9 @@ noncomputable def mainFormalSuccessorAnswerSelfImprovementObligation_ofBridgeInp
       haxisWeightedBound hdiagonalWeightedBound
   intro hinduction
   exact
-    MainInductionStep.AnswerSelfImprovementPackage.ofSliceBridgeInputs params
+    MainInductionStep.AnswerSelfImprovementPackage.ofSliceObligations params
       strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
-      hrestrict hinduction (hbridge hinduction)
+      hrestrict hinduction (obligations hinduction)
 
 /-- Answer-valued successor-case Section 6 boundary inputs for `mainFormal`. -/
 structure MainFormalSuccessorAnswerBoundary (params : Parameters)
@@ -582,16 +582,16 @@ def mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement
     recursiveSlices := hrec
     selfImprovementObligation := hself }
 
-/-- Build the answer-valued successor boundary from bridge inputs instead of an
+/-- Build the answer-valued successor boundary from obligations instead of an
 already assembled self-improvement obligation.
 
 This is the answer-register counterpart of
-`mainFormalSuccessorBoundary_ofBridgeInputs`: it sends the answer-valued
-per-slice Section 9 bridge inputs through
-`mainFormalSuccessorAnswerSelfImprovementObligation_ofBridgeInputs` and assembles
+`mainFormalSuccessorBoundary_ofObligations`: it sends the answer-valued
+per-slice Section 9 obligations through
+`mainFormalSuccessorAnswerSelfImprovementObligation_ofObligations` and assembles
 that obligation with the recursive slice witnesses and the weighted
 restricted-probability fields. -/
-noncomputable def mainFormalSuccessorAnswerBoundary_ofBridgeInputs
+noncomputable def mainFormalSuccessorAnswerBoundary_ofObligations
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -599,18 +599,18 @@ noncomputable def mainFormalSuccessorAnswerBoundary_ofBridgeInputs
     (hrec : MainFormalSuccessorAnswerRecursiveSlices params strategy eps hpass k
       (mainFormalSuccessorAnswerAxisWeightedBound_ofPass params strategy eps hpass)
       (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass params strategy eps hpass))
-    (hbridge :
-      MainFormalSuccessorAnswerSelfImprovementBridgeInputs params strategy eps hpass k
+    (obligations :
+      MainFormalSuccessorAnswerSelfImprovementObligations params strategy eps hpass k
         (mainFormalSuccessorAnswerAxisWeightedBound_ofPass params strategy eps hpass)
         (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass params strategy eps hpass)) :
     MainFormalSuccessorAnswerBoundary params strategy eps hpass k :=
   mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement params strategy eps hpass k
     hrec
-    (mainFormalSuccessorAnswerSelfImprovementObligation_ofBridgeInputs params strategy eps
+    (mainFormalSuccessorAnswerSelfImprovementObligation_ofObligations params strategy eps
       hpass k
       (mainFormalSuccessorAnswerAxisWeightedBound_ofPass params strategy eps hpass)
       (mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass params strategy eps hpass)
-      hbridge)
+      obligations)
 
 /-- Build the answer-valued successor boundary from an explicit predecessor
 induction hypothesis and an answer-valued self-improvement obligation.

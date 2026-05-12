@@ -13,8 +13,8 @@ in `audits/` and the proof-integrity rules in `docs/PROOF_INTEGRITY.md`.
 1. [Source-faithful statements and internal proof obligations](#pattern-1-source-faithful-statements-and-internal-proof-obligations)
 2. [Blueprint–Lean synchronization](#pattern-2-blueprintlean-synchronization)
 3. [Split-module architecture](#pattern-3-split-module-architecture)
-4. [Barrel re-export pattern](#pattern-4-barrel-re-export-pattern)
-5. [Temporary bridge-package pattern](#pattern-5-temporary-bridge-package-pattern)
+4. [Compatibility re-export pattern](#pattern-4-compatibility-re-export-pattern)
+5. [Temporary obligation-structure pattern](#pattern-5-temporary-obligation-structure-pattern)
 6. [Paper-gap documentation pattern](#pattern-6-paper-gap-documentation-pattern)
 
 ---
@@ -27,8 +27,8 @@ A declaration advertised as the formalization of a paper theorem, lemma,
 proposition, or corollary must state the paper result, up to faithful formal
 encoding of the mathematical domain.  Its public hypotheses and conclusion are
 both part of the statement.  Adding a load-bearing bridge, residual, repair,
-package, proof-obligation input, hypotheses bundle, or assumptions bundle not
-present in the cited statement changes the theorem into a conditional helper.
+obligation-structure input, hypotheses bundle, or assumptions bundle not present
+in the cited statement changes the theorem into a conditional helper.
 
 The project therefore distinguishes three objects.
 
@@ -36,7 +36,7 @@ The project therefore distinguishes three objects.
 |--------|------------------|------------------|
 | Paper theorem | Matches the cited result in `references/ldt-paper/` | May be linked by source-labelled `\lean{}`; statement-level `\leanok` only when the statement matches |
 | Internal proof obligation | Proves a missing intermediate mathematical input from paper hypotheses | May contain a tracked `sorry` while the proof is open |
-| Conditional helper | Uses an additional bridge-like input to prove a useful consequence | Explicit scaffolding only; it must not be advertised as the paper theorem |
+| Conditional helper | Quarantines an unproved intermediate obligation | Not a paper theorem; no source-labelled `\leanok` |
 
 It is never allowed to change the public statement of a declaration advertised
 as the formalization of a source-labelled paper theorem.  At the final assembly
@@ -49,11 +49,11 @@ definition with a precise paper-origin docstring and, if necessary, a tracked
 `sorry`.  This makes the proof frontier visible without weakening the statement
 of a source-labelled theorem.
 
-### Why legacy scaffolding may appear
+### Why legacy scaffolding may remain temporarily
 
 | Temporary reason | Explanation |
 |------------------|-------------|
-| **Localizing an obstruction** | A conditional helper can isolate the exact missing mathematical input when a proof is already partly understood. |
+| **Localizing an obstruction** | A conditional helper can isolate the exact missing mathematical input while the obligation discharger is being proved. |
 | **Recovering useful proof content** | The proof body may contain genuine estimates or constructions that should be extracted into source-faithful lemmas. |
 | **Auditability** | An explicit temporary hypothesis is easier to find than an implicit assumption hidden in prose, provided it is named as proof debt. |
 
@@ -76,11 +76,12 @@ are being actively removed.
    fact not yet formalized, state it as a separate proof obligation.  A
    temporary `sorry` in this declaration is preferable to adding the obligation as
    a hypothesis on the paper theorem.
-4. **Use conditional helpers only as local scaffolding.**  A helper such as
-   `mainFormal_ofInternalObligations` or `selfImprovement_assumingBridgeInputs` may
-   clarify an assembly step, but only if the paper-facing declaration remains
-   source-faithful.  The helper is not the paper theorem and should not receive
-   the source-labelled blueprint `\leanok`.
+4. **Use conditional helpers only as quarantine.**  A helper such as
+   `mainFormal_ofInternalObligations` or `selfImprovement_assumingBridgeInputs`
+   is allowed only to preserve downstream proof content while the missing
+   obligation discharger is being proved.  It must have a conditional name, a tracked
+   removal target, and no source-labelled blueprint `\leanok`.  The
+   paper-facing declaration must remain source-faithful.
 5. **Audit the final statement.**  Every PR touching a source-labelled theorem
    should compare paper assumptions and Lean assumptions, paper conclusion and
    Lean conclusion, and report whether the Lean statement is exact, has only
@@ -119,11 +120,12 @@ statement.
    is strongly self-consistent, we need a spectral-truncation and
    locality-preserving repair witness."
 
-2. **Only a conditional helper takes the hypothesis as an argument.**  A helper like
+2. **Only a quarantined conditional helper takes the hypothesis as an argument.**  A helper like
    `selfImprovementInInductionSection` in
    `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/Core.lean`
-   takes `OrthonormalizationInput` (and analogous hypothesis bundles) as
-   explicit arguments:
+   takes `OrthonormalizationInput` and analogous proof-obligation structures as
+   explicit arguments.  This is not the paper theorem; it is the temporary
+   surface where the remaining obligations are isolated:
 
    ```lean
    theorem selfImprovementInInductionSection
@@ -158,7 +160,7 @@ statement.
    The paper-labelled `mainFormal` should have the hypotheses of the paper
    theorem: a projective strategy passing the low individual degree test, the
    stated parameter bounds, and the faithful formalization of the ambient
-   domains.  Bridge, residual, repair, package, and proof-obligation inputs must be
+   domains.  Bridge, residual, repair, and proof-obligation inputs must be
    produced inside its proof rather than added to its statement.
 
 ### Existing bridge-like declarations
@@ -172,10 +174,10 @@ When such a declaration remains useful, its role should be one of the following:
 | `SelfImprovement.OrthonormalizationInput` | Conditional input for the Section 5 orthonormalization construction; discharge through internal proof obligations such as the QXP repair witness |
 | `SelfImprovement.FinalFieldsInput` | Conditional input for final Section 9 estimates; replace at the paper theorem boundary by source-faithful statements or named internal proof obligations |
 | `SelfImprovement.HelperStrongSelfConsistencyInput` | Conditional input for helper strong self-consistency estimates; keep tracked until produced |
-| `SelfImprovement.SelfImprovementBridgeInputs` | Historical bundle of the preceding inputs; do not introduce as a hypothesis on a paper-labelled theorem |
+| `SelfImprovement.SelfImprovementObligations` | Historical bundle of the preceding inputs; do not introduce as a hypothesis on a paper-labelled theorem |
 | `MainFormalBaseCompletionObligations` | Base-case assembly obligations; do not expose on `mainFormal`, which is reserved for `thm:main-formal` |
 | `MainFormalBaseProjectiveCompletionObligations` | Completion obligations; do not move them into a paper-facing theorem statement |
-| `MainFormalPostRolePackageDiagonalOrthonormalizationInput` | Internal data for orthonormalization of unsymmetrized POVMs; its repair fields are proof obligations |
+| `MainFormalPostRolePackageDiagonalOrthonormalizationResidual` | Internal residual produced from line-130 cross consistency; do not replace it by an orthonormalization-input hypothesis on `mainFormal` |
 | `MakingMeasurementsProjective.OrthonormalizationInput` | Conditional input for the orthonormalization proof; keep visibly distinct from source-faithful paper statements |
 | `LdPastingContext` | Faithfulness-sensitive context for `ldPasting`; audit each field against the Section 12 hypotheses and boundary conditions |
 
@@ -184,22 +186,18 @@ When such a declaration remains useful, its role should be one of the following:
 The direct tracked `sorry` sites in `MainFormal.lean` record two remaining
 construction obligations:
 
-1. The successor projective-completion obligation, whose TODO comments
-   list three items:
-
-   1. A `MainFormalRolePackageBranchResidual` constructed from
-   predecessor/successor induction data,
-   2. Line-130 orthonormalization inputs
-      (`MainFormalPostRolePackageDiagonalOrthonormalizationInput`),
-   3. Completion input derived from `completingToMeasurement`.
+1. The successor projective-completion obligation.  It must construct the
+   predecessor/successor role residual, obtain the line-130 orthonormalization
+   residual from cross consistency, and supply the completion data used after
+   `completingToMeasurement`.
 2. The base-case match-mass completion obligation, whose target is
    `MainFormalBaseBranchCompletionObligations` for the checked base-case role
    residual.
 
 These are data-construction obligations.  Once the per-slice self-improvement
-proof obligations and recursive induction packages are threaded through, the
+proof obligations and recursive induction data are threaded through, the
 paper-labelled theorem should call the internal-obligation assembly without
-adding bridge inputs to the theorem statement.
+adding obligations to the theorem statement.
 
 This is the intended cleanup direction: use the conditional helper only to
 identify reusable proof content, then prove the internal obligations or restore the
@@ -212,24 +210,24 @@ This rule addresses the same risk as conclusion-shaped-hypothesis smuggling
 paper-labelled declarations:
 
 - A conclusion-shaped hypothesis is always unacceptable.
-- A genuine intermediate fact may be a legitimate input to a separately named
-  conditional helper.
+- A genuine intermediate fact may appear only in a separately named conditional
+  helper while its obligation discharger is being proved.
 - That same intermediate fact is still unacceptable as an added hypothesis on
   the public statement of the paper theorem, unless it is a faithful encoding
   of a hypothesis present in the cited source.
 
-Bridge packages that are markers for still-unproved intermediate facts
-(such as `SelfImprovementBridgeInputs`) are proof debt under this pattern.  They
+Obligation structures that are markers for still-unproved intermediate facts
+(such as `SelfImprovementObligations`) are proof debt under this pattern.  They
 should carry a tracker reference (usually an issue like #931 or #422), and their
 fields should be the *assumptions* of the paper's proof, not the *conclusion* of
 the theorem.
 
-They are acceptable only as temporary hypotheses of conditional helpers or
-intermediate construction theorems.  If such a package appears in the public
-signature of a source-labelled theorem, the theorem has become conditional and
-should not be treated as the paper theorem until the package is produced
-internally or the statement is restored with the missing proof obligation
-explicit.
+They are permitted only as temporary hypotheses of conditional helpers or
+intermediate construction theorems.  If such an obligation structure appears in
+the public signature of a source-labelled theorem, the theorem has become
+conditional and should not be treated as the paper theorem until the structure is
+produced internally or the statement is restored with the missing proof
+obligation explicit.
 
 ---
 
@@ -248,8 +246,8 @@ to link to Lean:
 | `\uses{label}` | The statement or proof block depends on the cited result | `\uses{thm:orthonormalization, prop:completing-to-measurement}` |
 
 Do not use statement-level `\leanok` for a source-labelled theorem whose Lean
-declaration is conditional on bridge, residual, repair, package,
-proof-obligation input, generic hypotheses bundle, or generic assumptions bundle
+declaration is conditional on bridge, residual, repair, proof-obligation input,
+generic hypotheses bundle, or generic assumptions bundle
 data not present in the source.
 
 ### Why some nodes show white in the dep graph
@@ -351,17 +349,17 @@ Each subdirectory follows a consistent internal layout:
 SubModule/
 ├── Defs.lean        # New structures, type abbreviations, error-term definitions
 ├── Statements.lean   # Statement-level types (hypothesis bundles, conclusion shapes)
-├── Theorems.lean     # Barrel re-export
+├── Theorems.lean     # Compatibility re-export
 └── Theorems/
     ├── Core.lean     # Main proof of the chapter's theorem
     ├── ...           # Supporting proof leaves
-    └── Results.lean  # Barrel for the proof leaves
+    └── Results.lean  # Re-export file for the proof leaves
 ```
 
 Some larger chapters (like `Pasting/` and `SelfImprovement/`) have more
 internal subdivisions (e.g., `Pasting/Bernoulli/`, `Pasting/Sandwich/`,
-`SelfImprovement/Theorems/Results/`).  The outer `Theorems.lean` barrel
-imports all the proof leaves.
+`SelfImprovement/Theorems/Results/`).  The outer `Theorems.lean`
+compatibility module imports all the proof leaves.
 
 ### Why split instead of monolithic files?
 
@@ -385,17 +383,17 @@ names must follow the mathematical naming norm in
 `docs/mathematical_language.md`: name the mathematical boundary, not
 the paper line number, workflow step, or implementation phase.
 
-### Barrel files
+### Re-export files
 
-See [Pattern 4: Barrel re-export pattern](#pattern-4-barrel-re-export-pattern)
+See [Pattern 4: Compatibility re-export pattern](#pattern-4-compatibility-re-export-pattern)
 below.
 
 ---
 
-## Pattern 4: Barrel re-export pattern
+## Pattern 4: Compatibility re-export pattern
 
 Each subdirectory with multiple internal proof leaves has a root-level
-barrel file (e.g., `Theorems.lean`) that imports all the leaves:
+re-export file (e.g., `Theorems.lean`) that imports all the leaves:
 
 ```lean
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
@@ -405,28 +403,28 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results
 ```
 
-The barrel file itself contains no new declarations — it is purely a
+The compatibility module file itself contains no new declarations — it is purely a
 re-export convenience so downstream consumers can write
 `import MIPStarRE.LDT.SelfImprovement.Theorems` instead of importing
 each leaf individually.
 
-The top-level barrel is `MIPStarRE.lean`, which imports all
+The top-level re-export file is `MIPStarRE.lean`, which imports all
 subdirectories.  `MIPStarRE/LDT.lean` imports all LDT subdirectories.
 
-**When to add to a barrel file**: When a new proof leaf is added to a
-subdirectory's `Theorems/` subdirectory, add its import to the barrel.
+**When to add to a re-export file**: When a new proof leaf is added to a
+subdirectory's `Theorems/` subdirectory, add its import to the compatibility module.
 
 **When not to add**: If a leaf is only used by one other leaf (internal
-helper), don't add it to the barrel — let the consumer import it
+helper), don't add it to the compatibility module — let the consumer import it
 directly so its API surface doesn't leak.
 
 ---
 
-## Pattern 5: Temporary bridge-package pattern
+## Pattern 5: Temporary obligation-structure pattern
 
-A bridge package is a `structure` whose fields are **proof obligations** that
+An obligation structure is a `structure` whose fields are **proof obligations** that
 have not yet been discharged locally.  It is temporary proof debt.  Do not add a
-new bridge package unless a direct source-faithful proof route has first been
+new obligation structure unless a direct source-faithful proof route has first been
 attempted and the remaining obstruction is documented.
 
 ### Example
@@ -434,7 +432,7 @@ attempted and the remaining obstruction is documented.
 From `MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean`:
 
 ```lean
-structure SelfImprovementBridgeInputs (params : Parameters) [FieldModel params.q]
+structure SelfImprovementObligations (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (eps delta nu : Error) where
   helperStrongSelfConsistency :
     HelperStrongSelfConsistencyInput params strategy eps delta
@@ -445,30 +443,30 @@ structure SelfImprovementBridgeInputs (params : Parameters) [FieldModel params.q
 ```
 
 A separately named conditional helper may take
-`(h : SelfImprovementBridgeInputs params strategy eps delta nu)` as a
+`(h : SelfImprovementObligations params strategy eps delta nu)` as a
 hypothesis and project the needed field inside the proof body.  This does not
-prove the corresponding paper theorem.  The package should be eliminated by
+prove the corresponding paper theorem.  The structure should be eliminated by
 internal theorems, or the source-labelled theorem should be restored with the
 remaining proof obligation visible.
 
 ### Rules
 
-1. **Every bridge field must have a theorem that produces it somewhere**, or a
+1. **Every obligation field must have a theorem that produces it somewhere**, or a
    tracking issue (#931, #422, etc.) explaining when it will be produced.
 2. **Docstrings must name the tracking issue and paper source.**
 3. **Fields must be the *assumptions* of the paper's proof, not the
    *conclusion* of the theorem** (see A1 anti-pattern in
    `docs/anti_patterns.md`).
-4. **A bridge package must not enter a source-labelled theorem statement.**
-5. **When all fields are produced**, the bridge package should be replaced by a
-   theorem that calls the same proof but with zero bridge arguments.
+4. **An obligation structure must not enter a source-labelled theorem statement.**
+5. **When all fields are produced**, the obligation structure should be replaced by a
+   theorem that calls the same proof without non-paper obligations.
 
 ### Related patterns
 
 - `docs/anti_patterns.md` — A1 (conclusion-shaped hypothesis), A4
   (trivial default witnesses), A6 (external `*Statement` smuggles)
 - Issue [#449] — hypothesis-smuggle ledger
-- Issue [#451] — historical bridge-package catalogue
+- Issue [#451] — historical bridge-hypothesis catalogue
 
 ---
 
@@ -507,7 +505,7 @@ with the step it replaces.
 - `docs/paper-gaps/policy.tex` — paper-gap documentation standards
 - `audits/` — chapter-by-chapter scouting reports
 - Issue [#449] — hypothesis-smuggle ledger
-- Issue [#451] — historical bridge-package catalogue
+- Issue [#451] — historical bridge-hypothesis catalogue
 - Issue [#931] — main-induction input gap tracker
 - Issue [#422] — main-formal assembly gap tracker
 

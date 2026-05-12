@@ -8,7 +8,7 @@ import MIPStarRE.LDT.Pasting.BridgeLemmas.LineInterpolation.Final
 /-!
 # Section 12 pasting: line interpolation bridge helpers
 
-Compatibility barrel re-exporting the line-interpolation leaves:
+Compatibility module re-exporting the line-interpolation leaves:
 `Core`, `BadLine`, `BadMass`, `Averaging`, `HBError`, and `Final`.
 
 Interpolation-support, bad-line, bad-mass, and distribution-comparison helpers used by the line-

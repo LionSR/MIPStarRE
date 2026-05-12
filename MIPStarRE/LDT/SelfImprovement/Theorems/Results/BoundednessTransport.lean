@@ -13,7 +13,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUPointConsistency
 
 Off-diagonal decomposition of the helper boundedness slack,
 data-processing transport of the boundedness gap, and the standalone
-`final_fields_bounded` producer.
+`final_fields_bounded` constructor.
 
 ## Contents
 
@@ -68,9 +68,9 @@ data-processing transport of the boundedness gap, and the standalone
 - **final_fields_projective_residual_bound** — literal-threshold wrapper
   absorbing the natural error into `selfImprovementError`.
 - **final_fields_projective_residual_bound_of_helper_outputs**
-  — final projective-residual producer from helper outputs, data processing,
+  — final projective-residual construction from helper outputs, data processing,
   complementary slackness, and the off-diagonal `add-in-u` transfer.
-- **final_fields_bounded** — standalone producer: if `1 ≤ Z` then
+- **final_fields_bounded** — standalone constructor: if `1 ≤ Z` then
   any submeasurement is `BoundedByOperator` relative to `Z ⊗ I`.
 
 ## References
@@ -1482,7 +1482,7 @@ theorem projective_boundedness_gap_le_helper_boundedness_gap
   rw [hprojective_eq, hhelper_eq]
   linarith
 
-/-- Natural-error projective-residual producer.
+/-- Natural-error projective-residual construction.
 
 Given the helper-stage boundedness estimate for `Hhat`, the dual-slack
 comparator above and the existing data-processing transport produce the final
@@ -1518,7 +1518,7 @@ theorem final_fields_projective_residual_bound_natural
       (selfImprovementDataProcessingError params eps delta) hdata
   linarith
 
-/-- Literal-threshold projective-residual producer.
+/-- Literal-threshold projective-residual construction.
 
 This wraps `final_fields_projective_residual_bound_natural` with a separately
 named numerical absorption lemma. The analytic inputs are only the helper-stage
@@ -1552,7 +1552,7 @@ theorem final_fields_projective_residual_bound
       hhelper hhelperBounded hdata)
     habsorb
 
-/-- Literal-threshold projective-residual producer under the standard
+/-- Literal-threshold projective-residual construction under the standard
 unit-interval smallness hypotheses.
 
 This is the convenience wrapper around
@@ -1587,7 +1587,7 @@ theorem final_fields_projective_residual_bound_of_small_errors
     (final_fields_projective_residual_error_le_selfImprovementError params eps delta
       heps heps_le_one hdelta hdelta_le_one hd_le_q)
 
-/-- Final projective-residual producer from helper outputs and the
+/-- Final projective-residual construction from helper outputs and the
 point-consistency `add-in-u` transfer.
 
 The theorem performs the boundedness part of the final-fields assembly once the
@@ -1640,14 +1640,14 @@ theorem final_fields_projective_residual_bound_of_helper_outputs
       params strategy eps delta heps heps_le_one hdelta hdelta_le_one hd_le_q
       hhelper hhelperBounded hdata
 
-/-- Final-fields producer for the `BoundedByOperator` conclusion.
+/-- Final-fields constructor for the `BoundedByOperator` conclusion.
 
 If the SDP dual witness dominates the identity, then the left-placed mass of any
 submeasurement is dominated by `Z ⊗ I`: the total bound `A.total ≤ 1 ≤ Z` lifts
 by monotonicity to `leftTensor A.total ≤ leftTensor Z`, and evaluation against
 the state preserves this order. Consequently `bndError ψ A.liftLeft (Z ⊗ I) = 0`,
 so the boundedness statement holds at any nonnegative tolerance. The
-`selfImprovement` assembly uses this producer instead of requiring the
+`selfImprovement` assembly uses this constructor instead of requiring the
 boundedness field from `FinalFieldsInput`. -/
 theorem final_fields_bounded
     {α : Type*} [Fintype α]

@@ -14,7 +14,7 @@ namespace MIPStarRE.LDT
 
 namespace Test
 
-/-- Slice-recursion bridge data for the successor branch of `mainFormal`.
+/-- Slice-recursion obligations for the successor branch of `mainFormal`.
 
 For each field element `x`, this package names the induction-hypothesis transport
 fields that the `MainFormalSuccessorRecursiveSlices` definition currently hides:
@@ -340,19 +340,19 @@ theorem mainFormalSuccessorRecursiveSlices_ofSliceData
   refine ⟨error, G, ?_, herr⟩
   -- Rewrite the state and point measurement using the slice-data compatibilities
   simpa [sliceData.sliceState_eq x, sliceData.slicePoint_eq x] using hG
-/-- Build the successor boundary from bridge inputs instead of the
-already-packaged self-improvement obligation.
+/-- Build the successor boundary from obligations instead of the
+already-assembled self-improvement obligation.
 
 This is the public-facing constructor for issue #1020: it wires the
-honest per-slice Section 9 bridge inputs through the existing
-`mainFormalSuccessorSelfImprovementObligation_ofBridgeInputs` conversion and
-packages them together with the weighted restricted-probability fields and
+honest per-slice Section 9 obligations through the existing
+`mainFormalSuccessorSelfImprovementObligation_ofObligations` conversion and
+records them together with the weighted restricted-probability fields and
 the recursive slice witnesses into a `MainFormalSuccessorBoundary`.
 
 The weighted restricted-probability fields are discharged from `hpass`
 by the public Section 6 weighted-bound lemmas, matching the pattern of
 `mainFormalSuccessorBoundary_ofRecursiveSelfImprovement`. -/
-noncomputable def mainFormalSuccessorBoundary_ofBridgeInputs
+noncomputable def mainFormalSuccessorBoundary_ofObligations
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -360,7 +360,7 @@ noncomputable def mainFormalSuccessorBoundary_ofBridgeInputs
     (hrec : MainFormalSuccessorRecursiveSlices params strategy eps hpass k
       (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
       (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass))
-    (hbridge : MainFormalSuccessorSelfImprovementBridgeInputs params strategy eps hpass k
+    (obligations : MainFormalSuccessorSelfImprovementObligations params strategy eps hpass k
       (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
       (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass)) :
     MainFormalSuccessorBoundary params strategy eps hpass k :=
@@ -371,18 +371,18 @@ noncomputable def mainFormalSuccessorBoundary_ofBridgeInputs
     diagonalWeightedBound := diagonalBound
     recursiveSlices := hrec
     selfImprovementObligation :=
-      mainFormalSuccessorSelfImprovementObligation_ofBridgeInputs params strategy eps hpass k
-        axisBound diagonalBound hbridge }
+      mainFormalSuccessorSelfImprovementObligation_ofObligations params strategy eps hpass k
+        axisBound diagonalBound obligations }
 
 /-- Build the successor boundary from an explicit predecessor induction
-hypothesis and the Section 9 bridge inputs.
+hypothesis and the Section 9 obligations.
 
 The predecessor hypothesis is stated at the exact Section 6 strength consumed by
 `MainFormalSuccessorRecursiveSlices`: for each restricted slice it supplies a
 polynomial measurement bounded by the restricted-profile
 `mainInductionError`. This wrapper is non-recursive; it only transports those
 slice witnesses across `MainFormalSuccessorRecursiveSliceData` and then reuses
-`mainFormalSuccessorBoundary_ofBridgeInputs`. -/
+`mainFormalSuccessorBoundary_ofObligations`. -/
 noncomputable def mainFormalSuccessorBoundary_ofPredecessorInduction
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -405,16 +405,16 @@ noncomputable def mainFormalSuccessorBoundary_ofPredecessorInduction
             (hrestrict.profile.axisParallel x)
             (hrestrict.profile.selfConsistency x)
             (hrestrict.profile.diagonal x))
-    (hbridge : MainFormalSuccessorSelfImprovementBridgeInputs params strategy eps hpass k
+    (obligations : MainFormalSuccessorSelfImprovementObligations params strategy eps hpass k
       (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
       (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass)) :
     MainFormalSuccessorBoundary params strategy eps hpass k :=
-  mainFormalSuccessorBoundary_ofBridgeInputs params strategy eps hpass k
+  mainFormalSuccessorBoundary_ofObligations params strategy eps hpass k
     (mainFormalSuccessorRecursiveSlices_ofSliceData params strategy eps hpass k
       (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
       (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass)
       sliceData hpredecessor)
-    hbridge
+    obligations
 
 end Test
 

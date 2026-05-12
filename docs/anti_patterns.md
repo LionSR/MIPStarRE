@@ -104,9 +104,12 @@ that suggests the paper result has been proved.
 Prefer **proving a real intermediate lemma** — one that the paper also uses
 — and stating its signature with the paper's hypotheses (not the theorem's
 conclusion). Then use it inside the larger theorem. If the missing content
-can't be formalized yet, keep the `BridgePackage` (so the obligation is
-*named* and trackable) and file a concrete producer sub-issue in
-[#1379] (which replaced the closed [#449]/[#451] in 2026-05-01).
+cannot be formalized yet, state the missing assertion as a named obligation
+to be proved from the paper hypotheses, and leave the corresponding proof open
+under a tracker. Do not put that obligation on the source-labelled theorem as
+an extra hypothesis. Existing `BridgePackage`-style declarations are proof
+debt to be removed or converted into source-faithful obligations; they are not
+the preferred shape for new work.
 
 A signature passes the smell test if:
 
@@ -385,10 +388,10 @@ after a paper result*.
 - Keep the existential statement, but strengthen the conclusion so that
   `x := default` no longer satisfies it (e.g., "there exists `x` *with*
   rank `m`", not merely "there exists `x`").
-- If the theorem is a scaffold that will later consume a producer, consider
-  making that producer an explicit bridge hypothesis (A1-grade placeholder)
-  rather than silently picking `default`. The bridge at least appears in
-  [#451].
+- If the witness cannot yet be constructed, keep the source-facing existential
+  statement and expose the missing construction as a named proof obligation.
+  Replacing `default` by an explicit bridge hypothesis is still an A1-grade
+  placeholder, not a proof of the paper theorem.
 
 ### Related issues
 
@@ -467,8 +470,9 @@ lemma X", it belongs in a specific `audits/*.md` file for that chapter.
 
 **Smell.** A theorem takes a hypothesis of type `SomeStatement` (or
 `SomeWitness`, `SomeOutput`, etc.) that is defined elsewhere and intended
-to represent an external mathematical result — but the external result
-has no producer and no plan for one. The Lean statement is then:
+to represent an external mathematical result, but there is no theorem
+constructing it from the hypotheses under which the paper uses it. The Lean
+statement is then:
 "assuming the external result, the Lean conclusion holds." That is
 sometimes legitimate (e.g., a cite to a book whose formalization we don't
 plan to do), and sometimes a cover for locally-unwanted work.
@@ -483,8 +487,9 @@ happens to unblock the current proof.
   cites the Polishchuk–Spielman theorem; we don't plan to formalize it.
 - **Mathlib gaps we can't fill.** `hMatrixChernoff` in `chernoffBernoulliMatrix`
   is a Mathlib matrix-Chernoff-type statement; we flagged the gap upstream.
-- **Placeholder interfaces with a named tracking issue.** A `*Statement`
-  that has an open sub-issue saying "produce this" is trackable.
+- **Tracked internal obligations.** A `*Statement` that has an open sub-issue
+  and a named construction theorem target is trackable proof debt. It is still
+  not an acceptable extra hypothesis on a source-labelled paper theorem.
 
 ### Unacceptable external smuggles
 
@@ -502,7 +507,8 @@ Grep for these suffixes: `*Statement`, `*Witness`, `*Claim`,
 `*Conclusion`, `*Output`, `*Input`, `*Hypothesis`, `*Requirement`,
 `*Assumption`, `*Package` (that isn't a `*BridgePackage`). For each, ask:
 
-- Is there a theorem anywhere that **produces** a value of this type?
+- Is there a theorem anywhere that **constructs** a value of this type from the
+  paper hypotheses?
 - If not, is the absence explained in a docstring / tracking issue /
   `audits/` entry?
 - Does the paper depend on an external theorem of this shape?
@@ -524,9 +530,10 @@ without a tracker entry** — the gap this policy fixes.
 
 If you add a new `*Statement`-style structure to this codebase, include a
 def-site docstring with its paper origin (per the "earn your place" policy in
-[#1379]). If no producer exists yet, file a sub-issue in [#1379] and ship a
-sorry'd producer alongside the structure (preferred) or add an explicit
-`⚠️T` entry in [#1379].
+[#1379]). If no construction theorem exists yet, file a sub-issue in [#1379]
+and ship the source-faithful construction theorem with an explicit unfinished
+proof obligation. Do not add the structure as a new source-theorem hypothesis
+merely to keep downstream declarations compiling.
 
 ### Merge gate — new `*Statement` / `*Witness` / `*Input` structures
 
@@ -535,8 +542,11 @@ To prevent dead scaffolds from landing unnoticed (the 5-structure gap of
 `structure XWitness`, `structure XInput`, `abbrev XStatement`, or
 `abbrev XInput` must satisfy **at least one** of these before merge:
 
-1. **Has a producer.** A theorem that constructs a value of this type appears
-   in the same PR or an already-merged ancestor.
+1. **Has a construction theorem.** A theorem that constructs a value of this
+   type from the appropriate paper hypotheses appears in the same PR or an
+   already-merged ancestor. If the proof is not finished, the theorem must carry
+   the explicit tracked proof obligation rather than moving the assertion into a
+   paper-facing theorem's hypotheses.
 2. **Has a consumer.** A theorem that takes a value of this type as a
    hypothesis appears in the same PR or an already-merged ancestor.
 3. **Has a ledger entry.** A classification comment (G / E / T / P / D, per

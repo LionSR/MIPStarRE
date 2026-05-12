@@ -3,7 +3,7 @@ import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Marginalization
 /-!
 # Full-slice tensor marginalization machinery
 
-Compatibility barrel re-exporting the collision/postprocessing core and the
+Compatibility module re-exporting the collision/postprocessing core and the
 y-marginalization endpoint for the full-slice tensor marginalization estimates.
 
 ## References

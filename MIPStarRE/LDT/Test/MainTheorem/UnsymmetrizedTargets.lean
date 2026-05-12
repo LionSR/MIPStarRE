@@ -1,7 +1,7 @@
 import MIPStarRE.LDT.Test.MainTheorem.RoleRegister
 
 /-!
-# Unsymmetrized target packages
+# Unsymmetrized target records
 
 Unsymmetrization and projective-stage targets for the `mainFormal` assembly.
 This module records the unsymmetrized POVM targets supplied by the
@@ -27,7 +27,7 @@ handoff to the native `ζ₄` point-consistency targets.
   assembly (lines 134–172).
 * Blueprint: `blueprint/src/chapter/ch10_induction.tex`,
   `\label{rem:main-formal-unsymmetrization-bridge}` and
-  `\label{rem:main-formal-lean-residual-packages}`.
+  `\label{rem:main-formal-lean-residual-records}`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -88,7 +88,7 @@ structure MainFormalCascadeUnsymmetrizedPOVMTargets
 namespace MainFormalCascadeUnsymmetrizedPOVMTargets
 
 /-- Build the line-97--109 unsymmetrized POVM target package from the standalone
-Step 3 bridge package.
+Step 3 bridge data.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:97-109`.
 
@@ -187,7 +187,7 @@ structure MainFormalCascadeTransportTargets
 
 /-- The pre-projectivization Step 5 handoff for `mainFormal`.
 
-This package stops at paper line 116, before the Schwartz--Zippel expansion.  The
+This record stops at paper line 116, before the Schwartz--Zippel expansion.  The
 field `evaluatedSelfConsistency` is the evaluated consistency estimate
 
 `G^A_[g(u)=a] \otimes I \simeq_{2σ + 2√(3ε+2σ)} I \otimes G^B_[g(u)=a]`.
@@ -310,7 +310,7 @@ namespace MainFormalRolePackageResidual
 /-- Reconstruct paper line 130 directly from a concrete Section 6 role residual.
 
 This names the paper-order handoff used several times below: first extract the
-role package, then unsymmetrize it, prove line 116 by the point-measurement
+role-measurement record, then unsymmetrize it, prove line 116 by the point-measurement
 triangle, and finally apply the checked Schwartz--Zippel Step 5 bridge. -/
 noncomputable def diagonalConsistency
     {params : Parameters} [FieldModel params.q]
@@ -435,7 +435,7 @@ triangle step has been factored out.
 Paper origin: `references/ldt-paper/inductive_step.tex:97-185`, from
 unsymmetrization through the projective stage of `\label{thm:main-formal}`.
 
-This package asks for the unsymmetrized `G^A,G^B` POVMs with their two `2σ`
+This residual asks for the unsymmetrized `G^A,G^B` POVMs with their two `2σ`
 links (`inductive_step.tex` lines 97--109), then records the still-open
 projectivization/completion and point-transport outputs from lines 135--185:
 the line-156 `≈_{ζ₃}` bridge and the two native `ζ₄` point-consistency goals.

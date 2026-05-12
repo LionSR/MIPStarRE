@@ -6,7 +6,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport
-import MIPStarRE.LDT.SelfImprovement.Theorems.AddInUFullProducer
+import MIPStarRE.LDT.SelfImprovement.Theorems.AddInUFullStatement
 
 /-!
 # Self-improvement theorem variants
@@ -27,8 +27,8 @@ orthonormalization and final-fields conditions taken as explicit hypotheses.
   helper strong self-consistency, orthonormalization, and final-fields
   conditions taken as explicit hypotheses.
 - **selfImprovement** — the statement corresponding to `thm:self-improvement`.
-- **selfImprovementFromSubMeas / selfImprovementFromBridgeInputs /
-  selfImprovementFromBridgeInputsSubMeas** — variants for submeasurement inputs
+- **selfImprovementFromSubMeas / selfImprovementFromObligations /
+  selfImprovementFromObligationsSubMeas** — variants for submeasurement inputs
   and auxiliary hypotheses supplied explicitly.
 
 ## References
@@ -210,7 +210,7 @@ lemma selfImprovementHelper
       simpa [SymStrat.selfConsistencyFailureProbability] using
         hgood.selfConsistencyTest⟩
   have haddInUFull : AddInUFullStatement params strategy T eps delta :=
-    addInUFullProducer params strategy eps delta gamma hgood T
+    addInUFullStatement_of_isGood params strategy eps delta gamma hgood T
   have hpointTransfer :
       |addInULeftQuantity params strategy
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
@@ -239,13 +239,14 @@ lemma selfImprovementHelper
   · exact
       helper_point_consistency_of_pointConsistencyAddInU_transfer
         params strategy eps delta heps hdelta hpointTransfer
-  · /- TODO(#1514): Derive `HelperStrongSelfConsistencyProducerInputs` for the
+  · /- TODO(#1514): Derive `HelperStrongSelfConsistencyObligations` for the
       helper output from the Section 9 scalar transport estimates, then prove this
       condition with `helper_strong_self_consistency_of_helper_conclusion` or
-      `helper_strong_self_consistency_input_of_producer`.
+      `helper_strong_self_consistency_input_of_obligations`.
 
       This route currently uses the five estimates required by
-      `helper_producer_inputs_of_selfConsistency_localVariance_scalarTransports`:
+      the scalar-transport constructor for
+      `HelperStrongSelfConsistencyObligations`:
       the two off-diagonal variance swaps, the two post-`delete-an-A` transports,
       and the final lower bound on the `move-over-v` endpoint.  Its final
       absorption also uses the small-error condition `(params.d : Error) ≤
@@ -425,32 +426,32 @@ theorem selfImprovementFromSubMeas
   exact
     { measurementBridge := ⟨Gmeas, hbridge, hH⟩ }
 
-/-- `SelfImprovementBridgeInputs` + `IsGood` is sufficient to call the form of
+/-- `SelfImprovementObligations` + `IsGood` is sufficient to call the form of
 `thm:self-improvement` with explicit orthonormalization and final-fields
 hypotheses and obtain the full `SelfImprovementConclusion`. -/
-theorem selfImprovementFromBridgeInputs
+theorem selfImprovementFromObligations
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hbridge : SelfImprovementBridgeInputs params strategy eps delta nu)
+    (obligations : SelfImprovementObligations params strategy eps delta nu)
     (hgood : strategy.IsGood eps delta gamma)
     (G : Measurement (Polynomial params) ι) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu :=
   selfImprovement_assumingFinalFields params strategy eps delta gamma nu
-    hbridge.helperStrongSelfConsistency
-    hbridge.orthonormalization hbridge.finalFields hgood G
+    obligations.helperStrongSelfConsistency
+    obligations.orthonormalization obligations.finalFields hgood G
 
-/-- `SelfImprovementBridgeInputs` + `IsGood` also suffice for the
+/-- `SelfImprovementObligations` + `IsGood` also suffice for the
 submeasurement-input interface used by Section 6, once a measurement completion
 of the input submeasurement is supplied explicitly. -/
-theorem selfImprovementFromBridgeInputsSubMeas
+theorem selfImprovementFromObligationsSubMeas
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hinputs : SelfImprovementBridgeInputs params strategy eps delta nu)
+    (hinputs : SelfImprovementObligations params strategy eps delta nu)
     (hgood : strategy.IsGood eps delta gamma)
     (G : SubMeas (Polynomial params) ι)
     (Gmeas : Measurement (Polynomial params) ι)

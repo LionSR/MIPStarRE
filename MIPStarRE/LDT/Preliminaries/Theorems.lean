@@ -20,6 +20,6 @@ import MIPStarRE.LDT.Preliminaries.CompletionTransfer
 /-!
 # Preliminary comparison theorems
 
-This module is a pure re-export barrel for the concrete preliminaries theorem
+This module is a pure compatibility re-export for the concrete preliminaries theorem
 submodules.
 -/

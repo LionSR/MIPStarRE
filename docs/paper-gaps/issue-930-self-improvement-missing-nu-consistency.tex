@@ -53,14 +53,14 @@ The Lean development provides the corresponding theorem but does not
 include the $\simeq_{\nu}$ consistency hypothesis \eqref{eq:paper-nu-consistency}.%
 \footnote{The Lean declaration is \leanid{MIPStarRE.LDT.SelfImprovement.selfImprovement}
 in \doclink{MIPStarRE/LDT/SelfImprovement/Theorems/Results.lean}, lines~172--262.}
-Instead it takes three explicit bridge-input hypotheses:\footnote{The
-bridge-input structure is \leanid{SelfImprovementBridgeInputs}
+Instead it takes three explicit obligation hypotheses:\footnote{The
+obligation structure is \leanid{SelfImprovementObligations}
 in \doclink{MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean},
 lines~363--378.}
 \begin{itemize}
   \item a strong-self-consistency input for the averaged helper measurement,
   \item an orthonormalization input, and
-  \item a final-fields input packaging the remaining conclusions.
+  \item a final-fields input that records the remaining conclusions.
 \end{itemize}
 The parameter $\nu$ appears in the theorem's conclusion---the completeness
 bound is $(1-\nu)-\zeta$---but there is no hypothesis
@@ -71,7 +71,7 @@ In the induction-step wrapper%
 \footnote{\leanid{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection}
 in \doclink{MIPStarRE/LDT/MainInductionStep/Theorems.lean}, lines~66--155.}
 the $\simeq_{\nu}$ hypothesis does appear as a formal parameter, but the
-proof immediately delegates to a bridge-input-based theorem that ignores it.
+proof immediately delegates to an obligation-based theorem that ignores it.
 The hypothesis is thus vestigial at both the standalone and the
 induction-section level.
 
@@ -85,10 +85,10 @@ demands on $\nu$ and do not relate $\nu$ to any property of $G$, a call
 site is free to supply $\nu=1$; the bound then reads $-\mathrm{error}$,
 which is mathematically trivial. More generally, the theorem does not
 construct a small $\nu$ from $G$ and $A$; it merely accepts an arbitrary
-$\nu$ and promises that \emph{if} the bridge-input hypotheses are supplied,
+$\nu$ and promises that \emph{if} the obligation hypotheses are supplied,
 the conclusions follow. This is a genuine logical gap between the paper
-statement and the formal statement, not a notational convention. The bridge
-inputs record the missing proof obligations explicitly, but they do not
+statement and the formal statement, not a notational convention. The
+obligations record the missing proof work explicitly, but they do not
 restore a hypothesis on $G$ to the statement.
 
 \section{Blueprint status}
@@ -109,7 +109,7 @@ The paper's helper lemma carries its own error parameter
 $\widehat\zeta = 100\,m\,(\eps^{1/2}+\delta^{1/2}+(d/q)^{1/2})$;
 the orthonormalization step contributes a further error
 $\widehat\zeta_{\text{ortho}} = 100\,\widehat\zeta^{\,1/4}$.
-All error constants match the paper when the bridge inputs are discharged.
+All error constants match the paper when the obligations are discharged.
 The helper error matches
 $\widehat\zeta$; the orthogonalization error delegates to the
 orthonormalization infrastructure, which uses the paper's $100\widehat\zeta^{\,1/4}$;
@@ -121,8 +121,8 @@ $\zeta = 3000\,m\,(\eps^{1/32}+\delta^{1/32}+(d/q)^{1/32})$ matches the paper.
 
 The paper's self-improvement theorem requires an approximation hypothesis
 $\simeq_{\nu}$ linking the input measurement $G$ to the parent measurement
-$A$. The formal theorem omits this hypothesis and instead accepts a
-package of bridge inputs. Until the bridge inputs are discharged in a way
+$A$. The formal theorem omits this hypothesis and instead accepts explicit
+obligation hypotheses. Until the obligations are discharged in a way
 that recovers the missing $\simeq_{\nu}$ constraint on $G$, or the
 blueprint is amended to document the changed statement, the formal theorem
 does not match the paper's self-improvement theorem.
