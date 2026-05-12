@@ -181,6 +181,38 @@ theorem mainInductionBaseCase
     mainInductionOfWitness params strategy eps delta gamma k
       ⟨strategy.axisParallelFailureProbability, G, hconsG, herror_le⟩
 
+/-- Successor-branch obligation for the source-facing main induction theorem.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, the non-base
+case of `\label{thm:main-induction}`.  The checked conditional assembly is
+`mainInductionPublicWrapper`, which additionally requires restricted weighted
+probability bounds, recursive slice witnesses, self-improvement outputs for the
+restricted slices, and the stronger `400md ≤ k` pasting side condition.
+
+This declaration is not a paper theorem and should not be linked as
+`\label{thm:main-induction}`.  It is the named proof obligation that remains
+after the already-proved base case has been separated from the public theorem.
+Tracked by #1507 and #1458. -/
+theorem mainInductionSuccessorObligation
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hk : params.m * params.d ≤ k)
+    (hm_ne_one : params.m ≠ 1) :
+    ∃ G : Measurement (Polynomial params) ι,
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params G.toSubMeas)
+        (mainInductionError params k eps delta gamma) := by
+  -- TODO(#1507, #1458): derive the restricted weighted bounds, recursive
+  -- slice witnesses, slice-wise self-improvement outputs, and the checked
+  -- pasting side condition from the paper hypotheses.  These inputs belong
+  -- inside the proof, not as hypotheses of `mainInduction`.
+  sorry
+
 /-- `thm:main-induction`.
 
 This is the source-facing statement from
@@ -190,7 +222,13 @@ measurement at error `mainInductionError`.
 
 The checked successor-step assembly below currently uses the stronger auxiliary
 side condition `400 * m * d ≤ k` and explicit proof-stage data. Those are
-internal proof obligations, not hypotheses of this theorem. -/
+internal proof obligations, not hypotheses of this theorem.
+
+**Unfaithful:** the public statement is source-shaped, but the non-base branch
+still depends on the admitted obligation
+`mainInductionSuccessorObligation`.  This obligation is tracked by #1507 and
+#1458 and must be proved from the paper hypotheses rather than added to the
+theorem statement. -/
 theorem mainInduction
     (params : Parameters)
     [FieldModel params.q]
@@ -204,10 +242,9 @@ theorem mainInduction
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params G.toSubMeas)
         (mainInductionError params k eps delta gamma) := by
-  -- TODO(#1507): prove the paper theorem from `hgood` and `hk` by deriving
-  -- the auxiliary inputs internally, rather than assuming the successor-stage
-  -- data exposed by `mainInductionPublicWrapper`.
-  sorry
+  by_cases hm1 : params.m = 1
+  · exact mainInductionBaseCase params strategy eps delta gamma k hm1 hgood
+  · exact mainInductionSuccessorObligation params strategy eps delta gamma k hgood hk hm1
 
 /-- Successor-step recursion entry point for the main-induction conclusion.
 
