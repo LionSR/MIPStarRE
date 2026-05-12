@@ -436,7 +436,7 @@ Key Lean theorem names:
 - `addInU`
 - `selfImprovementHelper`
 - `selfImprovement`
-- `selfImprovementFromSubMeas`
+- `selfImprovementFromObligations`
 
 **Key definitions**
 

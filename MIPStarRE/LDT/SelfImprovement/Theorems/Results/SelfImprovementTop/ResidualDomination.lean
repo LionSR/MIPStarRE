@@ -79,7 +79,13 @@ construction-level orthonormalization hypothesis is stated through
 `OrthonormalizationResidualDominationInput`.  The point-consistency field is
 obtained through `final_fields_exists_of_helper_outputs_of_residual_domination`,
 so the proof does not invoke the total-gap term
-`sqrt (#F_q * selfImprovementDataProcessingError)`. -/
+`sqrt (#F_q * selfImprovementDataProcessingError)`.
+
+**Unfaithful:** this auxiliary route is not a formalization of
+`thm:self-improvement`.  It assumes helper completeness, helper strong
+self-consistency, the selected `add-in-u` transfer, and a residual-dominating
+orthonormalization input that are not yet derived from the paper hypotheses.
+This proof debt is tracked by #1515. -/
 lemma selfImprovementWithSlacknessAndResidualDominationInput
     (params : Parameters)
     [FieldModel params.q]
@@ -163,7 +169,12 @@ lemma selfImprovementWithSlacknessAndResidualDominationInput
           hhelper.sdpWitness.dualDominatesIdentity hselfImprovementError_nonneg }
 
 /-- Obligation form of
-`selfImprovementWithSlacknessAndResidualDominationInput`. -/
+`selfImprovementWithSlacknessAndResidualDominationInput`.
+
+**Unfaithful:** the bundled
+`SelfImprovementSlacknessResidualDominationObligations` are not hypotheses of
+`thm:self-improvement`.  This helper is a conditional assembly lemma for the
+residual-domination route; #1515 tracks the source-facing discharge. -/
 lemma selfImprovementFromSlacknessResidualDominationObligations
     (params : Parameters)
     [FieldModel params.q]
@@ -195,7 +206,13 @@ repair plus the construction-level coisometry identity `X X† = I` into the
 residual-domination input consumed by
 `selfImprovementWithSlacknessAndResidualDominationInput`.  Consequently the final
 point-consistency field uses the paper-tight right-register total comparison
-rather than the alphabet-size total-gap route. -/
+rather than the alphabet-size total-gap route.
+
+**Unfaithful:** this auxiliary route assumes the QXP repair/coisometry data and
+the same helper-stage inputs as
+`selfImprovementWithSlacknessAndResidualDominationInput`.  These are proof
+obligations, not assumptions of `thm:self-improvement`; #1515 tracks the
+source-facing theorem. -/
 lemma selfImprovementWithSlacknessAndQXPRepairAndCoisometry
     (params : Parameters)
     [FieldModel params.q]

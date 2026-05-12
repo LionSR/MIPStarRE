@@ -431,20 +431,6 @@ structure SelfImprovementConclusion (params : Parameters) [FieldModel params.q]
       (leftTensor (ι₂ := ι) Z)
       (selfImprovementError params eps delta)
 
-/-- Paper origin: `references/ldt-paper/self_improvement.tex:635-671`
-(`\label{thm:self-improvement}`).
-
-Conclusion for the explicit bridge from measurement to submeasurement input. -/
-structure SelfImprovementSubMeasConclusion (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (G : SubMeas (Polynomial params) ι)
-    (H : ProjSubMeas (Polynomial params) ι)
-    (Z : MIPStarRE.Quantum.Op ι) (eps delta gamma nu : Error) : Prop where
-  measurementBridge :
-    ∃ Gmeas : Measurement (Polynomial params) ι,
-      Gmeas.toSubMeas = G ∧
-      SelfImprovementConclusion params strategy Gmeas H Z eps delta gamma nu
-
 /-- Final fields for the Section 9 transport stage.
 
 The final fields are the Section 9 outputs that remain after combining:

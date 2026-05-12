@@ -6,7 +6,8 @@ gap between paper-level mathematics and a compilable Lean proof.
 This document is intended for contributors who need to understand *why* the
 Lean code is structured as it is, and for reviewers who need to recognize
 these patterns when reading PRs.  It complements the individual chapter audits
-in `audits/` and the proof-integrity rules in `docs/PROOF_INTEGRITY.md`.
+in `audits/`, the proof-integrity rules in `docs/PROOF_INTEGRITY.md`, and the
+proof-gap protocol in `docs/paper-gaps/proof-gap-protocol.tex`.
 
 ## Table of Contents
 
@@ -121,22 +122,21 @@ statement.
    locality-preserving repair witness."
 
 2. **Only a quarantined conditional helper takes the hypothesis as an argument.**  A helper like
-   `selfImprovementInInductionSection` in
+   `selfImprovementInInductionSection_ofObligations` in
    `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/Core.lean`
-   takes `OrthonormalizationInput` and analogous proof-obligation structures as
-   explicit arguments.  This is not the paper theorem; it is the temporary
+   takes `SelfImprovementObligations`, whose fields include
+   `OrthonormalizationInput` and analogous proof-obligation structures, as an
+   explicit argument.  This is not the paper theorem; it is the temporary
    surface where the remaining obligations are isolated:
 
    ```lean
-   theorem selfImprovementInInductionSection
+   theorem selfImprovementInInductionSection_ofObligations
        (params : Parameters)
        [FieldModel params.q]
        (strategy : SymStrat params ι)
        (eps delta gamma nu : Error)
-       (hhelperStrongSelfConsistency : ...)
-       (horthonormalization :
-         SelfImprovement.OrthonormalizationInput params strategy eps delta)
-       (hfinalFields : SelfImprovement.FinalFieldsInput params strategy eps delta nu)
+       (hobligations :
+         SelfImprovement.SelfImprovementObligations params strategy eps delta nu)
        ...
        (G : SubMeas (Polynomial params) ι) ... : ...
    ```

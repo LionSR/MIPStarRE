@@ -163,7 +163,13 @@ orthonormalization input then supplies the projective measurement and the
 monotone-total comparison.  The projective residual bound is not assumed as a
 final field: it is derived from `final_fields_exists_of_helper_outputs_of_residual_domination`
 using the helper-output boundedness obligation and the complementary-slackness
-equations. -/
+equations.
+
+**Unfaithful:** this auxiliary route is not a formalization of
+`thm:self-improvement`.  It assumes helper completeness, helper strong
+self-consistency, the selected `add-in-u` transfer, and residual-dominating
+orthonormalization data that are not yet derived from the paper hypotheses.
+#1515 tracks the source-facing theorem. -/
 lemma selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDomination
     (params : Parameters)
     [FieldModel params.q]
@@ -283,7 +289,13 @@ the orthonormalization hypothesis stated in the SelfImprovement-level form
 `OrthonormalizationResidualDominationInput`.  The helper strong
 self-consistency input selects the helper submeasurement \(\widehat H\), and
 the bundled input then gives the residual-dominating orthonormalization datum
-for that particular \(\widehat H\). -/
+for that particular \(\widehat H\).
+
+**Unfaithful:** this auxiliary route is not a formalization of
+`thm:self-improvement`.  It assumes helper completeness, helper strong
+self-consistency, the selected `add-in-u` transfer, and residual-dominating
+orthonormalization data that are not yet derived from the paper hypotheses.
+#1515 tracks the source-facing theorem. -/
 lemma selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDominationInput
     (params : Parameters)
     [FieldModel params.q]
@@ -349,7 +361,11 @@ lemma selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDominationInput
       horthInput (hhelperSSCInput hhelperWithSlackness.toHelperConclusion))
 
 /-- A canonical optimal pair with dominance and residual-dominating
-orthonormalization assemble a full self-improvement conclusion. -/
+orthonormalization assemble a full self-improvement conclusion.
+
+**Unfaithful:** this is a conditional matrix-SDP assembly lemma, not the
+source theorem `thm:self-improvement`.  It still assumes helper-stage and
+residual-dominating orthonormalization inputs; #1515 tracks their discharge. -/
 lemma selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDomination
     (params : Parameters)
     [FieldModel params.q]
@@ -403,7 +419,11 @@ lemma selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDomination
     hhelperCompleteness hhelperSSCInput htransfer horthonormalization
 
 /-- A canonical optimal pair with dominance and a bundled residual-domination
-input assemble a full self-improvement conclusion. -/
+input assemble a full self-improvement conclusion.
+
+**Unfaithful:** this is a conditional matrix-SDP assembly lemma, not the
+source theorem `thm:self-improvement`.  It still assumes helper-stage and
+residual-dominating orthonormalization inputs; #1515 tracks their discharge. -/
 lemma selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDominationInput
     (params : Parameters)
     [FieldModel params.q]
@@ -456,7 +476,12 @@ obligation assemble a full self-improvement conclusion.
 The spectral-truncation slice is discharged by
 `orthonormalizationSpectralObligation_of_sourceAlmostProjective`; hence the
 remaining orthonormalization hypothesis is exactly the QXP repair obligation with
-fresh-outcome residual domination. -/
+fresh-outcome residual domination.
+
+**Unfaithful:** this is a conditional matrix-SDP assembly lemma, not the
+source theorem `thm:self-improvement`.  The QXP residual-domination obligation
+and helper-stage inputs remain external proof obligations; #1515 tracks the
+source-facing discharge. -/
 lemma selfImprovementWithCanonicalOptimalPairAndQXPResidualDomination
     (params : Parameters)
     [FieldModel params.q]
@@ -507,7 +532,12 @@ lemma selfImprovementWithCanonicalOptimalPairAndQXPResidualDomination
 
 /-- A canonical optimal pair, an ordinary QXP repair obligation, and a separate
 fresh-outcome residual-domination proof assemble a full self-improvement
-conclusion. -/
+conclusion.
+
+**Unfaithful:** this is a conditional matrix-SDP assembly lemma, not the
+source theorem `thm:self-improvement`.  The QXP repair, fresh-outcome
+residual-domination proof, and helper-stage inputs are still external proof
+obligations; #1515 tracks the source-facing discharge. -/
 lemma selfImprovementWithCanonicalOptimalPairAndQXPRepairAndResidualDomination
     (params : Parameters)
     [FieldModel params.q]

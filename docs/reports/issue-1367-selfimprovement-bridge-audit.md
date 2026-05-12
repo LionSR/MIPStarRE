@@ -12,6 +12,16 @@
 > theorem statement; bridge, residual, repair, input, or obligation-structure
 > assumptions belong only in separately named conditional helpers or in named
 > obligations tracked by #1458.
+>
+> **Status note, 2026-05-12.**  This report also predates #1525.  Its local
+> table entries saying that `selfImprovement` itself takes the three explicit
+> Section 9 bridge hypotheses, and that `selfImprovementFromSubMeas` is a live
+> bridge wrapper, are historical.  The current source-facing theorem
+> `selfImprovement` has the paper-shaped consistency hypothesis and a tracked
+> proof gap #1515.  The old submeasurement wrappers
+> `selfImprovementFromSubMeas` and `selfImprovementFromObligationsSubMeas` have
+> been removed; the remaining conditional Section 6 helper is
+> `selfImprovementInInductionSection_ofObligations`.
 
 ---
 

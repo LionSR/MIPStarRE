@@ -128,15 +128,15 @@ a map, the placement of a tensor factor, the type of an outcome, the distinction
 between a structure and a substructure, or the scalar carried by an approximation
 relation.
 
-A note is required when the only Lean theorem available for a source-labelled
-statement is conditional on an additional hypothesis not present in the cited
-statement, including bridge, residual, repair, or obligation-structure data.
-Such a theorem is temporary proof debt, not a replacement for the source
-theorem.  The note must say plainly that the Lean result is conditional, identify the
-source-faithful theorem form that remains to be proved, and give the intended
-obligation discharger or removal plan.  The blueprint should not mark the
-source-labelled statement with \verb|\leanok| by pointing to this conditional
-helper.
+A note is required when an audit finds that a Lean declaration associated with a
+source-labelled statement has acquired an extra non-source hypothesis, such as
+bridge, residual, repair, producer, or obligation-structure data.  Such a
+declaration is temporary proof debt, not a replacement for the source theorem,
+and should not be introduced merely to avoid a \verb|sorry|.  The note must say
+plainly that the Lean result is conditional, identify the source-faithful theorem
+form that remains to be proved, and give the intended obligation discharger or
+removal plan.  The blueprint should not mark the source-labelled statement with
+\verb|\leanok| by pointing to this conditional helper.
 
 Changing a Lean theorem away from the statement in
 \path{references/ldt-paper/} is strongly discouraged.  A paper-gap note should
