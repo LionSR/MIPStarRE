@@ -3,13 +3,13 @@
 **Date:** 2026-05-08
 **Scope:** `MIPStarRE/LDT/SelfImprovement/` → `MainInductionStep/` → `Test/MainTheorem/`
 **Active PRs:** #1373 (orthonormalization-input obligation), #1374 (successor bridge hypotheses)
-**Related issues:** #1385 (SDP slackness), #1375/#1376/#1377 (#1036 sub-gaps), #1043 (hbaseBridge), #1035 (recursive mainFormal)
+**Related issues:** #1385 (SDP slackness), #1375/#1376/#1377 (#1036 sub-gaps), #1043 (base completion), #1035 (recursive mainFormal)
 
 > **Status note, 2026-05-11.**  This report records the pre-#1458 and pre-#1482
 > state of the final theorem.  Its statements about making `mainFormal`
 > sorry-free by adding new hypotheses are historical, not current project
 > guidance.  The current policy is that `mainFormal` remains the paper-facing
-> theorem statement; bridge, residual, repair, input, package, or proof-obligation
+> theorem statement; bridge, residual, repair, input, or obligation-structure
 > assumptions belong only in separately named conditional helpers or in named
 > obligations tracked by #1458.
 
@@ -17,7 +17,13 @@
 
 ## Executive Summary
 
-The `SelfImprovementObligations` package (the three Section 9 hypotheses) and its downstream wiring in `MainInductionStep` and `MainTheorem` are structurally sound. All individual lemmas in `SelfImprovement/` are proved conditional on their explicit hypotheses. The MainInductionStep bridge (`SelfImprovementBridge/Core.lean`) wires SelfImprovement → Pasting correctly. As of 2026-05-08, this report identified the successor-case branch at `MainFormal.lean:611` as the remaining final-theorem `sorry` site.
+The `SelfImprovementObligations` record (the three Section 9 hypotheses) and
+its downstream wiring in `MainInductionStep` and `MainTheorem` are structurally
+sound. All individual lemmas in `SelfImprovement/` are proved conditional on
+their explicit hypotheses. The MainInductionStep bridge
+(`SelfImprovementBridge/Core.lean`) wires SelfImprovement to Pasting correctly.
+As of 2026-05-08, this report identified the successor-case branch at
+`MainFormal.lean:611` as the remaining final-theorem `sorry` site.
 
 At the time of this report, PR #1374 proposed adding two new hypotheses to
 `mainFormal` and replacing the `sorry` with a call to existing constructors in
@@ -46,7 +52,8 @@ structure SelfImprovementObligations (params) (strategy) (eps delta nu) where
   finalFields                : FinalFieldsInput params strategy eps delta nu
 ```
 
-Three `Prop`-valued fields packaging the remaining Section 9 unformalized hypotheses:
+Three `Prop`-valued fields record the remaining Section 9 unformalized
+hypotheses:
 
 | Field | Type | Meaning | Paper Reference |
 |-------|------|---------|-----------------|
@@ -187,30 +194,30 @@ does not permit this as the paper-facing theorem shape:
 
 Where:
 - **`MainFormalSuccessorAnswerSliceWitness`** (new `abbrev`, line ~23): Expands `answerSuccessorRecursiveSlicesInput` from `RoleRegister.lean` — a `Prop` asserting per-slice induction conclusions for the transported predecessor
-- **`MainFormalSuccessorAnswerSliceBridge`** (new `abbrev`, line ~41): Expands `answerSuccessorSelfImprovementObligations` from `RoleRegister.lean` — a `Type` packaging per-slice self-improvement obligations
+- **`MainFormalSuccessorAnswerSliceBridge`** (new `abbrev`, line ~41): Expands `answerSuccessorSelfImprovementObligations` from `RoleRegister.lean` — a type recording per-slice self-improvement obligations
 
-The successor branch then becomes:
-```lean
-rcases MainFormalRolePackageBranchResidual
-    .rolePackageResidual_ofAnswerSuccessorInductionPackageAndObligations
-    hpass hm1 hd hk0 hk
-    (hanswerSliceWitness hm1) (hanswerSliceBridge hm1) with
-  ⟨roleResidual⟩
-exact mainFormal_ofRoleResidualAndRepairedBridge herr roleResidual
-  (hbaseBridge scalars roleResidual)
-```
+The historical branch then used these two new parameters to construct a role
+residual and call the old conditional assembly route.
 
-**Impact:** After #1374, `mainFormal` is sorry-free. The unformalized analytic content is pushed into the two new "extra" hypotheses.
+**Impact:** Under the historical #1374 route, `mainFormal` became sorry-free by
+pushing unformalized analytic content into two new hypotheses.  This is now
+rejected for the paper-facing theorem.
 
 ### 4.3 Orthonormalization-input obligation (PR #1373 additions)
 
 **PR #1373** (`issue1359-orthonormalization-input-obligation`) adds:
 - New file `OrthonormalizationInputObligation.lean`:
-  - `MainFormalPostRolePackageDiagonalOrthonormalizationInput.of_roleResidual` — builds the line-130 orthonormalization input from a role residual + two `LeftLiftedProjectivizationRepairInput` witnesses
+  - a historical constructor for the former line-130 orthonormalization input
+    from a role residual and two `LeftLiftedProjectivizationRepairInput`
+    witnesses
 - In `MainFormal.lean`:
-  - `repairedBridgeHypotheses_of_roleResidual` — builds `MainFormalBaseRepairedBridgeHypotheses` from role residual + leftRepair + rightRepair + diagonalConsistency
+  - a historical bridge constructor from role residual, left/right repair
+    witnesses, and diagonal consistency
 
-**Impact:** The `hbaseBridge` constructor is now explicit: callers need `leftRepair`, `rightRepair` (QXP repair witnesses) and `diagonalConsistency` (diagonal self-consistency). This is exactly the target for #1043.
+**Historical impact:** the proposed bridge-style constructor made the missing
+left/right repair witnesses and diagonal consistency explicit.  The current
+cleanup does not add this data to `mainFormal`; #1043 tracks the corresponding
+base-case completion obligation.
 
 ---
 
@@ -225,7 +232,7 @@ exact mainFormal_ofRoleResidualAndRepairedBridge herr roleResidual
 | `finalFields` (completeness etc.) | Conditional lemma proved | No change | No change | #1376 (per-slice obligation) |
 | `SliceObligations` wiring | **PROVED** (constructors exist) | No change | No change | #1375 (honest SymStrat) |
 | `MainFormal` successor case | **Historical, as of 2026-05-08:** `sorry` at line 611 | No change | New: replaced by `hanswerSlice*` hypotheses | #1376 + #1377 + #1035 |
-| `hbaseBridge` construction | Hypothesis | New: `repairedBridgeHypotheses_of_roleResidual` | No change | #1043 |
+| Historical bridge-style base/successor construction | Hypothesis | New conditional constructor | No change | #1043 |
 
 ---
 
@@ -242,7 +249,7 @@ These were the obligation constructors for the two historical proposed
 | B | `SelfImprovementObligations` per honest slice | Per-slice helperSSC + orthonormalization + finalFields | #1376 | Depends on A |
 | C | Universe mismatch `AnswerMainInductionHypothesis` at `Role × ι` | Fix type-level application | #1377 | Blocks per-slice induction |
 | D | Recursive `mainFormal` for successor restricted slices | `MainFormalSuccessorAnswerRecursiveSlices` (= per-slice induction conclusion) | #1035 | Needs C fixed |
-| E | `hbaseBridge` for base/successor cases | `MainFormalRepairedBridgeHypotheses` (leftRepair + rightRepair + diagonalConsistency) | #1043 | Needs QXP repair (#1032) |
+| E | Historical bridge-style base/successor input | left/right repair witnesses + diagonal consistency | #1043 | Needs QXP repair (#1032) |
 
 ### 6.2 Blockers for SelfImprovement internal closure
 
@@ -256,7 +263,7 @@ These were the obligation constructors for the two historical proposed
 
 ```
 #1032 (QXP repair) ──────────────────────────┐
-                                               ├─→ #1043 (hbaseBridge)
+                                               ├─→ #1043 (base completion)
 #1385/#1230 (SDP slackness) ───→               │
                                     #1376 (per-slice obligations) ──→ mainFormal closure
 #1375 (honest SymStrat) ─────────→              │
@@ -306,7 +313,7 @@ The following open issues directly address the remaining gaps identified in this
 | #1376 | Prove `SelfImprovementObligations` unconditionally for answer-valued restricted slices | B | Open, untouched |
 | #1377 | `Role × ι` universe mismatch in `AnswerMainInductionHypothesis` | C | Open, diagnosed |
 | #1035 | Prove recursive `mainFormal` for successor restricted slices | D | Open, blocked by #1377 |
-| #1043 | Construct `hbaseBridge` for base/successor cases | E | Open, blocked by #1032 |
+| #1043 | Construct base/successor completion data | E | Open, blocked by #1032 |
 | #1032 | QXP repair / spectral-truncation + locality-preserving repair lemmas | G, H | Open, core gap |
 | #1385 | `SdpStatementWithSlackness` obligation | F | Open, epic tracking |
 | #1369 | Construct answer-valued successor inputs for MainFormal | A–D (umbrella) | Open |
@@ -347,7 +354,9 @@ actual sub-gaps.
 
 3. **Close #1363** and **#1369** as superseded by the sub-issues opened by #1374 (#1375, #1376, #1377, #1035, #1043).
 
-4. **Delete or justify `MatrixAddInUTransferStatement`** — the only dead `*Statement` structure (0 consumers, 0 producers). Either open a sub-issue under #1385 or delete.
+4. **Delete or justify `MatrixAddInUTransferStatement`** — the only dead
+   `*Statement` structure in this audit (no consumers or construction callers).
+   Either open a sub-issue under #1385 or delete.
 
 ### 10.2 Next proof cycle
 
@@ -359,7 +368,7 @@ actual sub-gaps.
 
 8. **Prove #1035** (recursive `mainFormal`) — the fixed-point that ties the induction together.
 
-9. **Prove #1043** (`hbaseBridge`) — the base-case orthonormalization + diagonal-consistency bridge.
+9. **Prove #1043** — the base-case completion construction.
 
 10. **Prove #1385** (`SdpStatementWithSlackness`) — the strong-duality SDP bridge.
 
@@ -384,7 +393,7 @@ actual sub-gaps.
 | `MIPStarRE/LDT/Test/MainTheorem/OrdinaryRestriction/Basic.lean` | `MainFormalSuccessorSelfImprovementObligations` type + constructors |
 | `MIPStarRE/LDT/Test/MainTheorem/AnswerValuedRestriction.lean` | Answer-valued counterpart types + constructors |
 | `MIPStarRE/LDT/Test/MainTheorem/OrthonormalizationInputObligation.lean` | **New in #1373** — `of_roleResidual` lemma |
-| `MIPStarRE/LDT/Test/MainTheorem/OrthonormalizationData.lean` | `MainFormalPostRolePackageDiagonalOrthonormalizationInput` |
+| `MIPStarRE/LDT/Test/MainTheorem/OrthonormalizationData.lean` | Current line-130 orthonormalization residual construction |
 
 ---
 

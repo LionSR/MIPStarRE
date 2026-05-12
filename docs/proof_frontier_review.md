@@ -2,17 +2,17 @@
 
 This document gives a checklist for reviewing Lean changes that introduce or
 thread structure fields in the formalization. Its purpose is to prevent a
-well-typed bookkeeping layer from being mistaken for a mathematical producer
+well-typed bookkeeping layer from being mistaken for a mathematical construction
 theorem.
 
 The central distinction is this:
 
-- A **producer theorem** derives a mathematical object or relation from the
-  hypotheses appearing in the paper or blueprint.
-- An **external residual** records a missing producer explicitly, with a named
-  issue and a statement of the mathematical obstruction.
-- A **bookkeeping conversion** changes the form, namespace, or packaging of an
-  already available object without deriving a new mathematical fact.
+- An **obligation discharger** derives a mathematical object or relation from
+  the hypotheses appearing in the paper or blueprint.
+- An **external residual** records a missing obligation discharger explicitly,
+  with a named issue and a statement of the mathematical obstruction.
+- A **bookkeeping conversion** changes the form or namespace of an already
+  available object without deriving a new mathematical fact.
 
 All three forms can be legitimate. The review problem is to identify which one
 has been added, and to make sure the prose, blueprint tags, and issue status say
@@ -29,37 +29,37 @@ theorem by projecting that field.
 For the LDT development this distinction matters most near the main theorem,
 the main induction step, self-improvement, orthonormalization, and
 projectivization. In these regions, a single displayed statement in the paper
-usually depends on several producer theorems. Closing one local source hole may
-only move the remaining obligation into an input structure.
+usually depends on several intermediate constructions. Closing one local source
+hole may only move the remaining obligation into an input structure.
 
 ## Reviewer Checklist
 
 Before approving a PR that adds or modifies a structure field in a type named
 with a suffix such as `Input`, `Residual`, `BridgeInputs`, `Witness`,
-`Statement`, `Conclusion`, or `Package`, check the following points.
+`Statement`, `Conclusion`, or `Obligations`, check the following points.
 
 1. **Classify each new field.** State whether the field is produced in the PR,
    remains an external residual, or is only a bookkeeping conversion.
-2. **Name the producer theorem.** If the field is produced, cite the exact Lean
-   theorem that produces it from the paper hypotheses. If no such theorem
+2. **Name the obligation discharger.** If the field is produced, cite the exact
+   Lean theorem that derives it from the paper hypotheses. If no such theorem
    exists, keep the parent mathematical issue open and link a native sub-issue
-   for the missing producer.
+   for the missing obligation.
 3. **Check the blueprint frontier.** For work near `mainFormal`, Section 6,
    self-improvement, orthonormalization, or projectivization, inspect
    `blueprint/dep_graph_document.html` after building the blueprint. The
    remaining open vertices are part of the review context, even when the source
    diff contains no `sorry`.
 4. **Reject hidden residual drift.** A theorem that merely moves an assumption
-   into a structure field should be described as an input alignment or
-   conditional bridge, not as proving the paper step.
+   into a structure field should be described as a conditional helper or a
+   remaining obligation, not as proving the paper step.
 5. **Review public prose.** Docstrings, module text, PR descriptions, and
-   blueprint paragraphs should distinguish the words producer, input,
-   residual, conditional theorem, and bookkeeping conversion.
+   blueprint paragraphs should distinguish obligations proved from the paper
+   hypotheses from inputs of conditional helpers and bookkeeping conversions.
 6. **Size follow-up tasks by proof leaves.** Prefer issues such as "prove the
    raw Step 3 Cauchy--Schwarz estimate" to issues such as "close the
    self-improvement inputs" when the latter contains several independent
    proof obligations.
-7. **Use native sub-issues.** Missing producers should be linked under the
+7. **Use native sub-issues.** Missing obligations should be linked under the
    correct parent tracker instead of being left only in a PR comment.
 
 ## Diagonal and Completion Data
@@ -88,7 +88,7 @@ Use `\leanok` only when the Lean declaration proves the mathematical assertion
 of the blueprint node under the stated hypotheses. If the Lean declaration is a
 conditional wrapper or input splitter, then the blueprint should say so
 explicitly. It may still cite the declaration with `\lean{...}`, but the prose
-must identify the remaining producer.
+must identify the remaining obligation.
 
 When a PR introduces a public auxiliary lemma that is not a named paper
 statement, the blueprint should either omit it or cite it as a subordinate
@@ -99,17 +99,17 @@ status of the paper theorem whose proof will eventually consume it.
 
 - Issue #1110 and the surrounding Section 6 work showed that diagonal and
   line-130 inputs can be made type-correct without proving the diagonal
-  producer. Such declarations must be described as conditional inputs.
+  obligation. Such declarations must be described as conditional inputs.
 - Issue #1109 concerned final-field boundedness. The generalized theorem
-  `final_fields_bounded` is a genuine producer once the SDP dual witness
-  satisfies `I <= Z`; the blueprint prose was updated to state that hypothesis
-  and the theorem's actual generality.
+  `final_fields_bounded` is a genuine obligation discharger once the SDP dual
+  witness satisfies `I <= Z`; the blueprint prose was updated to state that
+  hypothesis and the theorem's actual generality.
 - Issues #1070 and #1072 are examples of proof-frontier work where individual
-  structure fields had to be separated from the mathematical producer still
+  structure fields had to be separated from the mathematical obligation still
   tracked by the parent self-improvement issue.
 - Issue #1081 and parent issue #931 illustrate why a parent tracker should stay
-  open when a PR only supplies a bridge or residual package.
+  open when a PR only supplies a conditional helper or residual record.
 
 These examples are not special exceptions. They are the model for future review:
-identify the mathematical producer, name the residual when it remains, and keep
-the public prose faithful to that distinction.
+identify the mathematical obligation, name the residual when it remains, and
+keep the public prose faithful to that distinction.

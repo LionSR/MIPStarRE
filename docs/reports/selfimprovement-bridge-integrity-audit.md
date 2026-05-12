@@ -1,15 +1,9 @@
-# SelfImprovement Bridge Integrity Audit
+# SelfImprovement Proof-Obligation Integrity Audit
 
 Date: 2026-05-07
 Updated: 2026-05-12, after the source-faithful `mainFormal` repair and
 internal-obligation renaming.
 
-> **Status note, 2026-05-12.**  This report predates the removal of the live
-> `MainFormal*RepairedBridge*` route.  References below to
-> `mainFormal_ofRepairedBridge` and `MainFormalRepairedBridgeHypotheses` are
-> historical descriptions of the earlier conditional assembly.  The current
-> MainFormal route uses internal proof obligations and the match-mass
-> `MainFormalBaseBranchCompletionObligations` target instead.
 Auditor: Research specialist (read-only analysis)
 Scope: `MIPStarRE/LDT/SelfImprovement/` → `MIPStarRE/LDT/Pasting/` →
        `MIPStarRE/LDT/MainInductionStep/` → `MIPStarRE/LDT/Test/MainTheorem/`
@@ -18,7 +12,7 @@ Scope: `MIPStarRE/LDT/SelfImprovement/` → `MIPStarRE/LDT/Pasting/` →
 
 ## Executive Summary
 
-The bridge-debt concern is valid.  Several formal interfaces still record
+The proof-debt concern is valid.  Several formal interfaces still record
 intermediate mathematical obligations as explicit inputs to conditional helper
 theorems.  Such helpers may preserve useful downstream proof content, but they
 must not be presented as theorems from the paper.
@@ -33,9 +27,9 @@ hypothesis; instead it contains tracked proof obligations to produce that data
 from the paper hypotheses.
 
 The architecture is therefore incomplete, but the theorem boundary is no longer
-misstated.  The remaining work is to turn the obligations and residual
-packages into internal proof obligations, and then discharge those obligations
-from the paper-facing theorem.
+misstated.  The remaining work is to derive the obligations and residual records
+inside the proof, and then discharge those obligations from the paper-facing
+theorem.
 
 ---
 
@@ -53,7 +47,7 @@ Main theorems:
 | `selfImprovement` | `SelfImprovementTop/Core.lean:158` | `SelfImprovementConclusion` (full output) | `helperStrongSelfConsistency`, `orthonormalization`, `finalFields`, `IsGood`, `G` |
 | `selfImprovementFromObligations` | `SelfImprovementTop/Core.lean:285` | `SelfImprovementConclusion` | `SelfImprovementObligations` + `IsGood` + `G` |
 
-The three hypotheses packaged by `SelfImprovementObligations` (defined in
+The three hypotheses recorded by `SelfImprovementObligations` (defined in
 `Theorems/Statements.lean:481`):
 
 1. **`helperStrongSelfConsistency`**: `HelperStrongSelfConsistencyInput` — the
@@ -95,7 +89,7 @@ is `Theorems/SelfImprovementBridge/Core.lean`.
 ```
 selfImprovementInInductionSection    (Core.lean:65)
   └─ calls SelfImprovement.selfImprovementFromSubMeas
-       └─ calls selfImprovement with the three bridge input hypotheses
+       └─ calls selfImprovement with the three explicit obligation hypotheses
 ```
 
 ```
@@ -132,7 +126,7 @@ this input through to its callers.
 
 The current source-facing theorem `mainFormal` takes the paper hypotheses,
 together with the large-`k` and positivity boundary hypotheses tracked elsewhere
-in the project.  It does **not** take `hbaseBridge`, role residual data, or final
+in the project.  It does **not** take bridge-style data, role residual data, or final
 projective-completion inputs.
 
 The internal-obligation helper `mainFormal_ofInternalObligations` is closed
@@ -145,12 +139,12 @@ is isolated as `MainFormalBaseBranchCompletionObligations`.
 
 **Successor case (m>1):** incomplete.  The comment in `MainFormal.lean`
 identifies the missing work as supplying the ordinary or answer-valued recursive
-induction witnesses, the per-slice self-improvement package producers, and the
+induction witnesses, the per-slice self-improvement obligations, and the
 resulting Step 6 witness residual.
 
 #### What's needed in the successor case:
 
-1. A recursive per-slice induction package for the predecessor —
+1. Recursive per-slice induction data for the predecessor —
    `MainFormalSuccessorRecursiveSlices` (typed by
    `successorRecursiveSlicesInput` in `RoleRegister.lean`).
 2. Self-improvement obligations for the predecessor —
@@ -173,11 +167,10 @@ The assembly functions in `RoleRegister.lean` are all ready:
 - Their corresponding `rolePackageResidual_of*` wrappers produce
   `MainFormalRolePackageResidual`
 
-The gap is now a producer gap rather than a statement-signature gap.  The
-successor branch in `mainFormal_ofRepairedBridge` still has
-`hprojectiveCompletionResidual := sorry` because the proof has not yet produced
-the successor induction package and self-improvement obligations from the
-paper hypotheses.
+The gap is now a construction gap rather than a statement-signature gap.  The
+successor branch in `mainFormal_ofInternalObligations` still has a tracked
+proof obligation because the proof has not yet derived the successor induction
+data and self-improvement obligations from the paper hypotheses.
 
 ---
 
@@ -256,7 +249,7 @@ Then `hhelper` feeds into the three explicit hypotheses.
 ### 3.2. selfImprovement → selfImprovementInInductionSection: ✅ Complete
 
 `selfImprovementInInductionSection` calls `SelfImprovement.selfImprovementFromSubMeas`
-directly, which calls `selfImprovement` with the bridge input hypotheses.
+directly, which calls `selfImprovement` with explicit obligation hypotheses.
 
 ### 3.3. selfImprovementInInductionSection → SelfImprovementPackage: ✅ Complete
 
@@ -275,23 +268,23 @@ theorem.
 `AveragedPastingInput.output` (in `PackageConstructors.lean:357`) calls
 `ldPastingInInductionSection`, which calls `Pasting.ldPasting`.
 
-### 3.6. mainInductionByRecursionOnM → mainFormal bridge producer: INCOMPLETE
+### 3.6. mainInductionByRecursionOnM → mainFormal completion obligations: INCOMPLETE
 
-The conditional helper `mainFormal_ofRepairedBridge` still has a tracked `sorry`
-in the successor branch.  The source-facing theorem `mainFormal` also has a
-tracked proof obligation whose purpose is to derive the repaired bridge consumed
-by that helper.  These are not new assumptions on the paper theorem.
+The internal helper `mainFormal_ofInternalObligations` still has tracked proof
+obligations in the successor and base-completion branches.  The source-facing
+theorem `mainFormal` keeps those obligations inside the proof.  They are not new
+assumptions on the paper theorem.
 
 The missing successor construction needs:
 
-- A recursive per-slice induction package for the predecessor
+- Recursive per-slice induction data for the predecessor
 - Self-improvement obligations for the predecessor slices
 - The ordinary or answer-valued role residual used by the final Step 6 assembly
 
 The wiring functions (`successorOfObligations`, `answerSuccessorOfObligations`,
 and their residual constructors) exist in `RoleRegister.lean`, but the
-source-facing theorem still lacks the producer theorem that constructs their
-inputs from the paper hypotheses.
+source-facing theorem still lacks the obligation discharger that constructs
+their inputs from the paper hypotheses.
 
 ---
 
@@ -321,12 +314,12 @@ by additional hypotheses:
    (`helperStrongSelfConsistency`, `orthonormalization`, `finalFields`) are
    separately stated as hypotheses for conditional interfaces.  Some components
    are proved in isolation within SelfImprovement's submodules, but the
-   assertion that the full bridge input package is produced from every good
-   strategy is not yet available at the source-facing call site.
+   assertion that the full `SelfImprovementObligations` record is derived from
+   every good strategy is not yet available at the source-facing call site.
 
 3. The successor gap is the concrete manifestation: the final assembly needs
    `SelfImprovementObligations` for each predecessor slice, together with the
-   corresponding predecessor induction package.
+   corresponding predecessor induction data.
 
 ### Is the architecture broken?
 
@@ -338,7 +331,7 @@ internal proof that supplies the conditional inputs from the paper hypotheses.
 
 ### What would close the gap?
 
-The correct closure route is to prove the missing recursive induction package,
+The correct closure route is to prove the missing recursive induction data,
 self-improvement obligations, and repaired completion data from the paper
 hypotheses, then call those internal obligations from `mainFormal`.  Adding these
 objects as new hypotheses to `mainFormal` would reintroduce the statement drift
@@ -350,7 +343,7 @@ which this audit is meant to prevent.
 
 1. **Track the internal obligations explicitly.**  The tracking issue should
    distinguish the paper-facing theorem from the conditional helper, and should
-   record that the remaining work is to produce the repaired bridge and
+   record that the remaining work is to produce the completion data and
    successor residuals from the paper hypotheses.
 
 2. **Decide fate of orphan lemmas.**  The ~15 slackness-carrying and
@@ -360,7 +353,7 @@ which this audit is meant to prevent.
    proof, (b) mark them with `@[deprecated]` or move them to a
    `FutureWork/` directory, (c) delete them.
 
-3. **Coordinate with the bridge-debt tracking issue.**  New repair work should
+3. **Coordinate with the proof-debt tracking issue.**  New repair work should
    be linked from #1458 and should state whether it discharges an internal
    obligation, restores a paper-facing theorem statement, or only records a
    conditional helper.
@@ -390,7 +383,7 @@ which this audit is meant to prevent.
 | `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` | `mainInductionByRecursionOnM`, `mainInductionPublicWrapper` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/PackageConstructors.lean` | `AveragedPastingInput.output`, `mainInductionFromPackages` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly.lean` | `assembleAveragedPastingInput` |
-| `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | `mainFormal` and `mainFormal_ofRepairedBridge`; paper-facing theorem plus conditional bridge assembly |
-| `MIPStarRE/LDT/Test/MainTheorem/RoleRegister.lean` | Assembly functions `successorOfObligations`, etc., awaiting source-level producers |
+| `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | `mainFormal` and `mainFormal_ofInternalObligations`; paper-facing theorem plus internal-obligation assembly |
+| `MIPStarRE/LDT/Test/MainTheorem/RoleRegister.lean` | Assembly functions `successorOfObligations`, etc., awaiting source-level obligation dischargers |
 | `MIPStarRE/LDT/Test/MainTheorem/OrdinaryRestriction/Basic.lean` | `MainFormalSuccessorSelfImprovementObligations` type definition and constructors |
 | `MIPStarRE/LDT/Test/MainTheorem/AnswerValuedRestriction.lean` | Answer-valued counterpart |

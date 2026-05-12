@@ -27,8 +27,8 @@ A declaration advertised as the formalization of a paper theorem, lemma,
 proposition, or corollary must state the paper result, up to faithful formal
 encoding of the mathematical domain.  Its public hypotheses and conclusion are
 both part of the statement.  Adding a load-bearing bridge, residual, repair,
-package, proof-obligation input, hypotheses bundle, or assumptions bundle not
-present in the cited statement changes the theorem into a conditional helper.
+obligation-structure input, hypotheses bundle, or assumptions bundle not present
+in the cited statement changes the theorem into a conditional helper.
 
 The project therefore distinguishes three objects.
 
@@ -53,7 +53,7 @@ of a source-labelled theorem.
 
 | Temporary reason | Explanation |
 |------------------|-------------|
-| **Localizing an obstruction** | A conditional helper can isolate the exact missing mathematical input while the producer is being proved. |
+| **Localizing an obstruction** | A conditional helper can isolate the exact missing mathematical input while the obligation discharger is being proved. |
 | **Recovering useful proof content** | The proof body may contain genuine estimates or constructions that should be extracted into source-faithful lemmas. |
 | **Auditability** | An explicit temporary hypothesis is easier to find than an implicit assumption hidden in prose, provided it is named as proof debt. |
 
@@ -79,7 +79,7 @@ are being actively removed.
 4. **Use conditional helpers only as quarantine.**  A helper such as
    `mainFormal_ofInternalObligations` or `selfImprovement_assumingBridgeInputs`
    is allowed only to preserve downstream proof content while the missing
-   producer is being proved.  It must have a conditional name, a tracked
+   obligation discharger is being proved.  It must have a conditional name, a tracked
    removal target, and no source-labelled blueprint `\leanok`.  The
    paper-facing declaration must remain source-faithful.
 5. **Audit the final statement.**  Every PR touching a source-labelled theorem
@@ -123,9 +123,9 @@ statement.
 2. **Only a quarantined conditional helper takes the hypothesis as an argument.**  A helper like
    `selfImprovementInInductionSection` in
    `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/Core.lean`
-   takes `OrthonormalizationInput` and analogous proof-obligation bundles as
+   takes `OrthonormalizationInput` and analogous proof-obligation structures as
    explicit arguments.  This is not the paper theorem; it is the temporary
-   surface where the remaining producers are isolated:
+   surface where the remaining obligations are isolated:
 
    ```lean
    theorem selfImprovementInInductionSection
@@ -160,7 +160,7 @@ statement.
    The paper-labelled `mainFormal` should have the hypotheses of the paper
    theorem: a projective strategy passing the low individual degree test, the
    stated parameter bounds, and the faithful formalization of the ambient
-   domains.  Bridge, residual, repair, package, and proof-obligation inputs must be
+   domains.  Bridge, residual, repair, and proof-obligation inputs must be
    produced inside its proof rather than added to its statement.
 
 ### Existing bridge-like declarations
@@ -177,7 +177,7 @@ When such a declaration remains useful, its role should be one of the following:
 | `SelfImprovement.SelfImprovementObligations` | Historical bundle of the preceding inputs; do not introduce as a hypothesis on a paper-labelled theorem |
 | `MainFormalBaseCompletionObligations` | Base-case assembly obligations; do not expose on `mainFormal`, which is reserved for `thm:main-formal` |
 | `MainFormalBaseProjectiveCompletionObligations` | Completion obligations; do not move them into a paper-facing theorem statement |
-| `MainFormalPostRolePackageDiagonalOrthonormalizationInput` | Internal data for orthonormalization of unsymmetrized POVMs; its repair fields are proof obligations |
+| `MainFormalPostRolePackageDiagonalOrthonormalizationResidual` | Internal residual produced from line-130 cross consistency; do not replace it by an orthonormalization-input hypothesis on `mainFormal` |
 | `MakingMeasurementsProjective.OrthonormalizationInput` | Conditional input for the orthonormalization proof; keep visibly distinct from source-faithful paper statements |
 | `LdPastingContext` | Faithfulness-sensitive context for `ldPasting`; audit each field against the Section 12 hypotheses and boundary conditions |
 
@@ -186,20 +186,16 @@ When such a declaration remains useful, its role should be one of the following:
 The direct tracked `sorry` sites in `MainFormal.lean` record two remaining
 construction obligations:
 
-1. The successor projective-completion obligation, whose TODO comments
-   list three items:
-
-   1. A `MainFormalRolePackageBranchResidual` constructed from
-   predecessor/successor induction data,
-   2. Line-130 orthonormalization inputs
-      (`MainFormalPostRolePackageDiagonalOrthonormalizationInput`),
-   3. Completion input derived from `completingToMeasurement`.
+1. The successor projective-completion obligation.  It must construct the
+   predecessor/successor role residual, obtain the line-130 orthonormalization
+   residual from cross consistency, and supply the completion data used after
+   `completingToMeasurement`.
 2. The base-case match-mass completion obligation, whose target is
    `MainFormalBaseBranchCompletionObligations` for the checked base-case role
    residual.
 
 These are data-construction obligations.  Once the per-slice self-improvement
-proof obligations and recursive induction packages are threaded through, the
+proof obligations and recursive induction data are threaded through, the
 paper-labelled theorem should call the internal-obligation assembly without
 adding obligations to the theorem statement.
 
@@ -215,7 +211,7 @@ paper-labelled declarations:
 
 - A conclusion-shaped hypothesis is always unacceptable.
 - A genuine intermediate fact may appear only in a separately named conditional
-  helper while its producer theorem is being proved.
+  helper while its obligation discharger is being proved.
 - That same intermediate fact is still unacceptable as an added hypothesis on
   the public statement of the paper theorem, unless it is a faithful encoding
   of a hypothesis present in the cited source.
@@ -227,11 +223,11 @@ fields should be the *assumptions* of the paper's proof, not the *conclusion* of
 the theorem.
 
 They are permitted only as temporary hypotheses of conditional helpers or
-intermediate construction theorems.  If such a package appears in the public
-signature of a source-labelled theorem, the theorem has become conditional and
-should not be treated as the paper theorem until the package is produced
-internally or the statement is restored with the missing proof obligation
-explicit.
+intermediate construction theorems.  If such an obligation structure appears in
+the public signature of a source-labelled theorem, the theorem has become
+conditional and should not be treated as the paper theorem until the structure is
+produced internally or the statement is restored with the missing proof
+obligation explicit.
 
 ---
 
@@ -250,8 +246,8 @@ to link to Lean:
 | `\uses{label}` | The statement or proof block depends on the cited result | `\uses{thm:orthonormalization, prop:completing-to-measurement}` |
 
 Do not use statement-level `\leanok` for a source-labelled theorem whose Lean
-declaration is conditional on bridge, residual, repair, package,
-proof-obligation input, generic hypotheses bundle, or generic assumptions bundle
+declaration is conditional on bridge, residual, repair, proof-obligation input,
+generic hypotheses bundle, or generic assumptions bundle
 data not present in the source.
 
 ### Why some nodes show white in the dep graph

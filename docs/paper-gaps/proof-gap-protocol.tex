@@ -31,11 +31,11 @@ moved a proof obligation into the theorem statement.
 The protocol below distinguishes such proof debt from legitimate formal
 boundary conditions and from genuine mathematical corrections.  It is meant for
 contributors and reviewers who must decide whether a bridge, residual, repair,
-package, or input is a proved local construction, a tracked proof gap, or
-statement drift which must be repaired before a theorem may be advertised as a
-source theorem.  The default rule is restrictive: such data must not be added
-to a paper-facing theorem unless it is part of the cited source statement or a
-documented faithful encoding of its ambient hypotheses.
+input, or obligation structure is a proved local construction, a tracked proof
+gap, or statement drift which must be repaired before a theorem may be
+advertised as a source theorem.  The default rule is restrictive: such data
+must not be added to a paper-facing theorem unless it is part of the cited
+source statement or a documented faithful encoding of its ambient hypotheses.
 
 \section{Basic objects}
 
@@ -50,8 +50,9 @@ A \Lean{} declaration is paper-facing when it is named or cited as the
 formalization of a source theorem, for instance through a blueprint
 \verb|\lean{}| link on a theorem environment carrying a paper label.  Such a
 declaration must match the source theorem in its public statement.  In
-particular, it may not add an unproved bridge, residual, repair, input, package,
-or other proof-obligation hypothesis which the paper does not assume.
+particular, it may not add an unproved bridge, residual, repair, input,
+obligation structure, or other proof-obligation hypothesis which the paper does
+not assume.
 
 \paragraph{Proof obligation.}
 A proof obligation is an intermediate assertion needed by the proof of a source
@@ -77,11 +78,12 @@ assumed obligation are permitted only when the declaration is not presented as
 the source theorem.  A conditional helper is a quarantine for downstream proof
 content; it does not close the source theorem.
 
-\section{Bridge, residual, repair, input, package}
+\section{Bridge, residual, repair, input, and obligation structures}
 
 The words \emph{bridge}, \emph{residual}, \emph{repair}, \emph{input}, and
-\emph{package} are not inherently bad.  They become dangerous when their
-mathematical status is unclear.
+\emph{obligation structure} name possible formal shapes.  They become dangerous
+when their mathematical status is unclear or when their names make unproved
+data look like acceptable hypotheses of a source theorem.
 
 \paragraph{Bridge.}
 A bridge should be a transport theorem between two already defined
@@ -116,13 +118,14 @@ should therefore appear as a construction or as a theorem discharging the
 corresponding obligation.  If a theorem assumes the output of the repair instead
 of constructing it, that theorem is conditional on the repair.
 
-\paragraph{Package.}
-A package is a structure bundling data and facts.  It is neutral: it may be the
-right formal shape for a complicated construction.  A package becomes proof
-debt only when its fields are not produced from the source hypotheses.  The
-review question is not whether a structure exists, but whether every
-load-bearing field is proved from the source hypotheses or is explicitly
-tracked as missing.
+\paragraph{Obligation structure.}
+An obligation structure is a record whose fields are the data and estimates
+needed by a later construction.  This is acceptable only as an internal target
+or as a hypothesis of a conditional helper.  Such a structure becomes statement
+drift if it is added to a paper-facing theorem instead of being constructed
+inside the proof.  The review question is whether every load-bearing field is
+proved from the source hypotheses or is explicitly tracked as a missing
+obligation.
 
 \section{The main failure mode}
 
@@ -202,15 +205,15 @@ definition error from becoming a global theorem-statement error.
 \textbf{Shape} & \textbf{Allowed use} & \textbf{Forbidden use} \\
 \hline
 Paper-facing theorem & Matches the source statement up to faithful encoding &
-Carries non-paper bridge, residual, repair, input, package, or proof-obligation
-hypotheses \\
+Carries non-paper bridge, residual, repair, input, obligation-structure, or
+proof-obligation hypotheses \\
 Conditional helper & Assumes a named obligation and has a conditional name &
 Is linked as the source theorem or marked as proof-complete for that theorem \\
 Obligation discharger theorem & Constructs the obligation from paper hypotheses &
 Merely restates the obligation as an assumption \\
 Input bundle & Collects produced data for a local construction & Is assumed by a
 source theorem instead of being produced \\
-Package structure & Bundles constructed data and estimates & Hides unproved
+Obligation structure & Bundles constructed data and estimates & Hides unproved
 fields that are then assumed by a source theorem \\
 Paper-gap note & Documents a real mathematical or formal-statement divergence &
 Justifies silent statement drift without a repair plan
@@ -234,7 +237,7 @@ When a source-labelled proof is blocked, use the following order.
   hypothesis.
   \item If downstream work would otherwise be lost, create a conditional helper
   with a conditional name.  Keep it separate from the paper-facing theorem, and
-  record the producer theorem that must eliminate it.
+  record the obligation discharger that must eliminate it.
   \item If the source and formal statements genuinely differ, write or update a
   note under \path{docs/paper-gaps/} before marking the statement as aligned.
   \item Update the blueprint so that paper labels point only to paper-facing
@@ -246,16 +249,18 @@ When a source-labelled proof is blocked, use the following order.
 
 A reviewer should first compare every paper-labelled declaration with the cited
 source statement, checking both hypotheses and conclusion up to faithful formal
-encoding.  Bridge, residual, repair, input, package, and proof-obligation
-assumptions should be absent from paper-facing theorem signatures unless they
-occur in the paper.  If a conditional helper remains, its name should be explicitly
-conditional and it should not support a source theorem \verb|\leanok| claim.
-Each load-bearing package or input field should have a theorem discharging it, a
-tracked issue, or an explicit \verb|sorry| at the obligation site.  When a
-definition has changed, the downstream subtree should be checked against the
-corrected definition rather than patched locally.  Finally, if the formal
-statement genuinely differs from the source statement, a paper-gap note should
-explain the mathematical difference and give a plan to remove or justify it.
+encoding.  Bridge, residual, repair, input, obligation-structure, and
+proof-obligation assumptions should be absent from paper-facing theorem
+signatures unless they occur in the paper.  If a conditional helper remains,
+its name should be explicitly conditional and it should not support a source
+theorem \verb|\leanok| claim.
+Each load-bearing obligation-structure or input field should have a theorem
+discharging it, a tracked issue, or an explicit \verb|sorry| at the obligation
+site.  When a definition has changed, the downstream subtree should be checked
+against the corrected definition rather than patched locally.  Finally, if the
+formal statement genuinely differs from the source statement, a paper-gap note
+should explain the mathematical difference and give a plan to remove or justify
+it.
 
 \section{Conclusion}
 

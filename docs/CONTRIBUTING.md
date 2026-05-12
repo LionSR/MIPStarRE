@@ -127,11 +127,11 @@ documented mathematical necessity.
 Faithful boundary hypotheses include formal domain data such as nonemptiness,
 decidability, field-model instances, positivity of parameters, or denominator
 nonvanishing when these are implicit in the source.  Extra bridge, residual,
-repair, producer, or package assumptions are not boundary hypotheses; they make
-the Lean result conditional.  Do not attach them to a paper-facing theorem.
+repair, or obligation-structure assumptions are not boundary hypotheses; they
+make the Lean result conditional.  Do not attach them to a paper-facing theorem.
 If they are unavoidable while preserving downstream proof work, quarantine them
 in a separately named conditional helper, cite the paper-gap note or tracking
-issue, name the producer theorem that must remove them, and keep the source
+issue, name the obligation discharger that must remove them, and keep the source
 theorem statement visible even if its proof contains a tracked `sorry`.
 
 Do not describe a mathematical issue only as a "cleanup", "follow-up", "blocked
@@ -376,7 +376,7 @@ Every PR touching Lean code should be reviewed against these criteria:
    blueprint path, line, label, and a short quotation or precise paraphrase.
    Reviewers should also check for early drift from the source: new hypotheses,
    weakened conclusions, changed quantifier order, altered error parameters,
-   or renamed data packages that turn a paper theorem into a conditional
+   or renamed obligation structures that turn a paper theorem into a conditional
    theorem.  If such drift appears, request a statement integrity audit before
    reviewing the proof.  A bridge or residual hypothesis should be treated as
    proof debt to remove, not as evidence that the paper statement has been
@@ -402,7 +402,7 @@ Every PR touching Lean code should be reviewed against these criteria:
    `*Statement`, `*Conclusion`, or `*Package`, review it against
    [proof_frontier_review.md](proof_frontier_review.md). A PR that only
    repackages an assumption should not be described as proving the corresponding
-   paper step; it must name the missing producer theorem or link the native
+   paper step; it must name the missing obligation discharger or link the native
    sub-issue that tracks it.  For source-labelled theorems, the preferred repair
    is to extract any usable proof content into source-faithful lemmas and
    restore the paper-aligned statement, even if the remaining proof is a tracked

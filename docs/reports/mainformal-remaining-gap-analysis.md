@@ -2,9 +2,9 @@
 
 Date: 2026-05-07
 
-> **Status note, 2026-05-11.**  This report describes the older conditional
+> **Status note, 2026-05-12.**  This report describes the older conditional
 > `mainFormal` shape.  It should be read as historical analysis of the missing
-> producers, not as a recommendation to add hypotheses to the paper-facing
+> constructions, not as a recommendation to add hypotheses to the paper-facing
 > theorem.  The current repair keeps `mainFormal` aligned with
 > `thm:main-formal`.  The subsequent MainFormal cleanup removes the live
 > repaired-bridge route and keeps the remaining base and successor work as
@@ -38,23 +38,24 @@ Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
 - `hk : 400 * params.m * params.d ≤ k` — large-k hypothesis
 
 ### Available hypotheses
-- `scalars : MainFormalCascadeScalars params eps k` — constructed from `hepsNN`, `hk0`, `herr`
-- `hbaseBridge : (scalars : MainFormalCascadeScalars params eps k) → ∀ (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k), MainFormalRepairedBridgeHypotheses params strategy eps k hpass scalars roleResidual`
+- `scalars : MainFormalCascadeScalars params eps k` — constructed from
+  `hepsNN`, `hk0`, `herr`.
+- The current theorem statement has no bridge-style hypothesis.  The
+  role residual, line-130 orthonormalization residual, and completion data are
+  internal proof obligations.
 
-The `hbaseBridge` provides, for any concrete role residual:
-- `MainFormalPostRolePackageDiagonalOrthonormalizationInput` — line-130 spectral truncation + repair witnesses
-- `MainFormalPostRolePackageDiagonalConsistencyInput` — diagonal consistency for the two unsymmetrized POVMs
-
-These two are exactly the inputs needed to construct Field 2 (the `postRoleDiagonalCompletion`).
+The line-130 orthonormalization residual is now obtained from cross consistency
+through the Section 5 repair construction.  The remaining completion work is
+match-mass preservation and the successor role-residual construction.
 
 ### What's NOT in scope
 
-The comment on line 606-610 states explicitly:
-
-> "the answer-valued recursive-slice adapter is available, but this theorem still has no predecessor per-slice induction package or answer-side self-improvement obligations in scope."
+The comment at the historical `sorry` site states that the answer-valued
+recursive-slice adapter is available, but the predecessor per-slice induction
+data and answer-side self-improvement obligations are not in scope.
 
 The missing inputs are:
-1. **Predecessor per-slice induction package** — providing a Section 6 witness for each restricted slice of the predecessor parameter
+1. **Predecessor per-slice induction data** — providing a Section 6 witness for each restricted slice of the predecessor parameter
 2. **Answer-side self-improvement obligations** — providing the Section 9 self-improvement data for the predecessor
 
 These are NOT hypotheses of `mainFormal`. The base case avoids them entirely by using `MainFormalRolePackageResidual.ofBaseCase` (which calls the already-checked `strategySymmetrization_mainInductionBaseCase`).
@@ -75,14 +76,14 @@ structure MainFormalRolePackageResidual ... where
       (MainInductionStep.mainInductionError params k (3 * eps) (3 * eps) (3 * eps))
 ```
 
-**Existing producer for base case:** `MainFormalRolePackageResidual.ofBaseCase` (RoleRegister/Core.lean:187-196)
+**Existing construction theorem for base case:** `MainFormalRolePackageResidual.ofBaseCase` (RoleRegister/Core.lean:187-196)
 - Calls `strategySymmetrization_mainInductionBaseCase` — already checked ✅
 
-**Existing producer for successor case:** `MainFormalRolePackageResidual.ofSuccessorBoundary` (RoleRegister/Core.lean:205-216)
+**Existing construction theorem for successor case:** `MainFormalRolePackageResidual.ofSuccessorBoundary` (RoleRegister/Core.lean:205-216)
 - Requires `params.next`, `MainFormalSuccessorBoundary`, etc.
 - The successor boundary is NOT available in `mainFormal`'s context.
 
-**Alternative successor producers** (all in RoleRegister.lean):
+**Alternative successor construction theorems** (all in RoleRegister.lean):
 
 | Constructor | Required inputs | Status |
 |------------|----------------|--------|
@@ -91,7 +92,8 @@ structure MainFormalRolePackageResidual ... where
 | `MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorRecursiveSelfImprovement` | `answerSuccessorRecursiveSlicesInput` + `answerSuccessorSelfImprovementInput` | Neither in scope |
 | `MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorInductionPackageAndObligations` | `answerSuccessorPerSliceInductionPackageInput` + `answerSuccessorSelfImprovementObligations` | Neither in scope |
 
-**Status:** ❌ NO producer available in scope. This is the primary gap.
+**Status:** no construction theorem is available in scope. This is the primary
+gap.
 
 ### Field 2: `postRoleDiagonalCompletion : MainFormalPostRolePackageDiagonalCompletionResidual`
 
@@ -106,50 +108,50 @@ structure MainFormalPostRolePackageDiagonalCompletionResidual ... where
   rightMatchMass : qBipartiteMatchMass ...
 ```
 
-**Existing producers** (all in NativeTargets.lean):
+**Existing construction theorems** (all in NativeTargets.lean):
 
 | Constructor | Required inputs | Status |
 |------------|----------------|--------|
 | `nonempty_ofRoleResidualAndCompletion` | `roleResidual` + `Nonempty MainFormalPostRolePackageDiagonalCompletionResidual` | Circular (needs itself) |
 | `nonempty_ofRoleResidualAndCompletionObligation` | `roleResidual` + `completionObligation : OrthResidual → CompletionResidual` | Completion obligation missing |
-| `nonempty_ofRoleResidualAndDiagonalInputsAndMatchMassPreservation` | `roleResidual` + `OrthonormalizationInput` + `a_A a_B` + match-mass for both sides | Match-mass unproven |
-| `nonempty_ofRoleResidualAndDiagonalInputsAndCompletingToMeasurementInputs` | `roleResidual` + `OrthonormalizationInput` + `a_A a_B` + `BipartiteSSCRel` (left + right) + match-mass | All four missing |
+| `nonempty_ofRoleResidualAndDiagonalInputsAndMatchMassPreservation` | Historical route through role-level orthonormalization data plus match-mass | Match-mass unproven |
+| `nonempty_ofRoleResidualAndDiagonalInputsAndCompletingToMeasurementInputs` | Historical route through role-level orthonormalization data, self-consistency, and match-mass | All fields missing |
 
-**Given `hbaseBridge`:** Once Field 1 (`roleResidual`) is produced, `hbaseBridge scalars roleResidual` provides:
-- `orthonormalizationInput` ✅
-- `diagonalConsistency` ✅
+**Current route:** Once Field 1 (`roleResidual`) is produced, the proof must
+derive the line-130 orthonormalization residual from cross consistency and then
+prove the match-mass/completion estimates.  These are internal obligations, not
+public inputs to `mainFormal`.
 
-The `diagonalConsistency` already packages:
-- A diagonal consistency input (`MainFormalPostRolePackageDiagonalConsistencyInput`)
-- Which can be used to produce the `orthResidual` via `MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalInputs`
+The line-130 consistency data supplies the orthonormalization residual via
+`MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalConsistency`.
 
 The remaining pieces for a `MainFormalPostRolePackageDiagonalCompletionResidual` are:
 - `a_A a_B` — distinguished outcomes (can use zero polynomial)
 - `leftCompletedCloseness`, `rightCompletedCloseness` — completion closeness (can derive from `completingToMeasurement`)
 - `leftMatchMass`, `rightMatchMass` — match-mass preservation (needs `OrthonormalizationMatchMassPreservation`)
 
-There are also the `BipartiteSSCRel` strong self-consistency packages. The `diagonalConsistency` provides `ConsRel` (cross correlation), not `BipartiteSSCRel` (self-consistency). But some theorems derive `BipartiteSSCRel` from `ConsRel` under `PermInvState` (see `lines 297-308` of MainFormal.lean).
+There are also `BipartiteSSCRel` strong self-consistency records. The
+historical diagonal-consistency input provided `ConsRel` (cross correlation),
+not `BipartiteSSCRel` (self-consistency). Some theorems derive
+`BipartiteSSCRel` from `ConsRel` under `PermInvState`.
 
-**Status:** ⚠️ Partially producible once Field 1 is obtained, but may require additional auxiliary lemmas (match-mass, self-consistency derivation). However, note that the alternative `baseMainFormal_ofRepairedBaseBridge` theorem builds the final result directly from the bridge without constructing a separate `CompletionResidual` — see Section 4.
+**Status:** partially derivable once Field 1 is obtained, but it still requires
+the match-mass and self-consistency derivations.
 
-## 4. Two possible resolution routes
+## 4. Historical resolution routes
 
-### Route A: Simple (mirror the base case)
+### Historical Route A: Mirror the base case
 
-Replace the entire successor branch (lines 602-656) with the same pattern as the base case:
-```lean
--- Produce role residual for successor case
-rcases produceRoleResidualForSuccessor ... with ⟨roleResidual⟩
--- Use same mainFormal_ofRoleResidualAndRepairedBridge as base case
-exact mainFormal_ofRoleResidualAndRepairedBridge herr roleResidual
-  (hbaseBridge scalars roleResidual)
-```
+The older proposed route was to replace the successor branch with the same
+shape as the base case: first construct a role residual, then call a conditional
+assembly theorem that also consumed bridge-style completion data.
 
-This avoids the complicated `MainFormalCascadeRolePackageResidualProjectiveCompletionResidual` → `toLeftCompletionTransportResidual` → ... → `MainFormalNativeTargets.toMainFormal` cascade (lines 612-656), replacing it with the already-proven `mainFormal_ofRoleResidualAndRepairedBridge`.
+This was the historical simple route.  It is rejected for the paper-facing
+theorem because it relies on additional non-paper inputs.
 
 **What's needed:** Only Field 1 (`MainFormalRolePackageResidual` for successor case).
 
-### Route B: Keep the native-targets cascade
+### Current Route B: Keep the native-targets cascade
 
 Keep lines 612-656 and fill the `sorry` at line 611 to produce:
 ```lean
@@ -160,13 +162,15 @@ This requires BOTH Field 1 and Field 2.
 
 **Comparison:** Route A is simpler and more faithful to the base case structure. Route B requires more construction but preserves existing downstream code. Either route ultimately needs Field 1.
 
-## 5. What needs to be added to `mainFormal`'s hypotheses
+## 5. What must be proved internally
 
-The successor case needs inputs that are currently absent from `mainFormal`'s parameter list:
+The successor case needs data that must be constructed inside the proof of
+`mainFormal`, not added to its parameter list.
 
-### Option: Add successor-bridge hypotheses
+### Historical rejected option: Add successor hypotheses
 
-Add parameters providing the predecessor induction data:
+Historical rejected route: add parameters providing the predecessor induction
+data:
 
 ```lean
 (hanswerBridgeInputs : answerSuccessorSelfImprovementObligations (k := k) hpass hm_one_ne)
@@ -174,18 +178,11 @@ Add parameters providing the predecessor induction data:
 ```
 
 Where:
-- `answerSuccessorSelfImprovementObligations` — per-slice Section 9 obligations (Type-valued, wraps each slice's self-improvement inputs)
-- `answerSuccessorPerSliceInductionPackageInput` — per-slice induction package (Type-valued, wraps predecessor `mainFormal` result per restricted slice)
+- `answerSuccessorSelfImprovementObligations` — per-slice Section 9 obligations
+- `answerSuccessorPerSliceInductionPackageInput` — per-slice induction data
 
-Then use:
-```lean
-rcases MainFormalRolePackageBranchResidual
-  .rolePackageResidual_ofAnswerSuccessorInductionPackageAndObligations
-    hpass hm1 hd hk0 hk hinductionPackage hanswerBridgeInputs
-  with ⟨roleResidual⟩
-exact mainFormal_ofRoleResidualAndRepairedBridge herr roleResidual
-  (hbaseBridge scalars roleResidual)
-```
+This is useful only as a description of the missing internal obligations.  It
+should not be the public statement of `mainFormal`.
 
 ### Alternative: Use ordinary (non-answer) successor route
 
@@ -193,7 +190,7 @@ The ordinary route needs:
 - `successorRecursiveSlicesInput`
 - `successorSelfImprovementObligations`
 
-With producers:
+With construction theorems:
 ```lean
 MainFormalRolePackageBranchResidual.rolePackageResidual_ofSuccessorObligations
   hpass hm1 hd hk0 hk hrec hbridge
@@ -209,9 +206,13 @@ The paper uses the answer-restricted induction (Section 6 of the LDT paper goes 
 |----|-------------|----------------------|
 | #1355 | Absorb small-alphabet data-processing gap in SelfImprovement | ❌ Orthogonal (self-improvement pipeline — needed to eventually prove the obligations but doesn't provide them directly) |
 | #1353 | Residual-domination wrappers for SelfImprovement orthonormalization | ❌ Orthogonal (helps discharge orthonormalization obligations but doesn't provide the obligations themselves) |
-| #1352 | Slackness bridge for strong-duality producer | ❌ Orthogonal (SDP infrastructure for self-improvement) |
+| #1352 | Slackness bridge for strong duality | Orthogonal (SDP infrastructure for self-improvement) |
 
-None of the active PRs directly fills the gap. They are building the self-improvement infrastructure that would eventually be consumed by `answerSuccessorSelfImprovementObligations` / `successorSelfImprovementObligations` producers, but these producers are not yet constructed.
+None of the active PRs directly fills the gap. They are building the
+self-improvement infrastructure that would eventually be consumed by
+`answerSuccessorSelfImprovementObligations` /
+`successorSelfImprovementObligations`, but the source-level obligation
+dischargers are not yet constructed.
 
 ## 7. Summary of actionable sub-gaps
 
@@ -232,26 +233,30 @@ None of the active PRs directly fills the gap. They are building the self-improv
 
 **Tracked by:** #931 (successor-obligations), #834 (remaining witness residual), #422 (main-formal completion epic)
 
-### Gap 2 (MINOR, follows from Gap 1): Post-role diagonal completion
+### Gap 2 (follows from Gap 1): Post-role diagonal completion
 
-**What:** Need to derive `MainFormalPostRolePackageDiagonalCompletionResidual` from the bridge hypothesis `hbaseBridge` and the role residual.
+**What:** Need to derive `MainFormalPostRolePackageDiagonalCompletionResidual`
+from the role residual and the paper's line-130 consistency data.
 
-**Why blocked:** Depends on Gap 1. Once the role residual is available, `hbaseBridge` provides the orthonormalization input. Remaining pieces (match-mass, self-consistency) may need new lemmas.
+**Why blocked:** Depends on Gap 1. Once the role residual is available, the
+current route derives the orthonormalization residual from cross consistency.
+The remaining pieces are the match-mass preservation and completion estimates.
 
 **Resolution options:**
-- Use Route A (simple): skip `CompletionResidual` entirely and call `mainFormal_ofRoleResidualAndRepairedBridge` (no separate completion residual needed)
-- Use Route B (native targets): build the completion residual from the bridge using existing theorems in `NativeTargets.lean`, possibly requiring new lemmas for match-mass and bipartite SSC derivation
+- Build the completion residual directly from the role residual, the
+  line-130 orthonormalization residual, and match-mass preservation.
+- Keep the missing match-mass argument as an internal obligation until it is
+  proved from the paper hypotheses.
 
-### Gap 3 (INFRA): Base-case bridge construction
+### Gap 3 (INFRA): Base-case completion construction
 
-**Historical what:** the older conditional theorem shape took `hbaseBridge` as
-an unproved hypothesis.  In the current repair, this hypothesis belongs to
-`mainFormal_ofRepairedBridge`, while #1043 tracks the corresponding producer
-obligation.
+**Historical what:** the older conditional theorem shape took a bridge-style
+hypothesis as an unproved input.  In the current repair, no such input belongs
+to `mainFormal`; #1043 tracks the remaining base-case completion obligation.
 
-**Status:** the repaired bridge is orthogonal to the successor case.  It needs to
-be produced from the paper hypotheses regardless of which successor route is
-chosen.
+**Status:** the base completion construction is orthogonal to the successor
+case.  It must be produced from the paper hypotheses regardless of which
+successor route is chosen.
 
 **Tracked by:** #1043
 
@@ -262,9 +267,15 @@ chosen.
 existing constructors, but it would also strengthen the source-facing theorem by
 adding non-paper assumptions.  The current repair policy rejects this route.
 
-**Complete closure:** Discharge `hbaseBridge` (#1043), then prove the successor obligations (#931), then prove the per-slice induction package (which itself would need a recursive application of `mainFormal`). This closes `mainFormal` completely without extra hypotheses but requires a well-founded recursion setup.
+**Complete closure:** Prove the base completion obligation (#1043), then prove
+the successor obligations (#931), then prove the per-slice induction data
+(which itself would need a recursive application of `mainFormal`). This closes
+`mainFormal` completely without extra hypotheses but requires a well-founded
+recursion setup.
 
-The "extra-hypothesis" pattern (documented in the memory) is the expected approach: prove the main theorem with explicit hypotheses, then separately prove that those hypotheses are satisfiable.
+The old "extra-hypothesis" route is rejected for the paper-facing theorem.
+Missing work should appear as internal proof obligations, not as new assumptions
+of `mainFormal`.
 
 ## 9. Existing tracking issues
 
@@ -276,9 +287,9 @@ Several issues already cover the sub-gaps identified above:
 | #1035 | Prove recursive mainFormal for successor restricted slices | `MainFormalSuccessorRecursiveSlices` |
 | #1036 | Construct successor-case self-improvement obligations | `MainFormalSuccessorSelfImprovementObligations` |
 | #1041 | Assemble successor-case mainFormal branch | Final wiring of #1035 + #1036 |
-| #1043 | Construct `hbaseBridge` for base case | Base-case bridge |
-| #1103 | SelfImprovement: assemble closed obligations from producers | Self-improvement closure |
-| #1104 | LDT/Test: assemble successor Step-6 witness from proved producers | Step-6 assembly |
+| #1043 | Construct base-case completion data | Base-case completion |
+| #1103 | SelfImprovement: assemble closed obligations | Self-improvement closure |
+| #1104 | LDT/Test: assemble successor Step-6 witness from proved obligations | Step-6 assembly |
 | #931 | Close self-improvement inputs for Section 6 | Self-improvement → main induction bridge |
 | #1367 | SelfImprovement bridge: audit and close input-consistency orphans blocking mainFormal | Self-improvement audit |
 | #1359 | Trace OrthonormalizationInput extra-hypothesis chain | Orthonormalization hypothesis chain |
