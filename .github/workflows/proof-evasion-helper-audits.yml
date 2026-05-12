@@ -6,6 +6,7 @@ on:
     paths:
       - 'MIPStarRE/**/*.lean'
       - 'scripts/audit_conclusion_shaped_hypotheses.py'
+      - 'scripts/audit_unfaithful_markers.py'
       - 'scripts/check_duplicate_private_helpers.py'
       - 'scripts/lean_header_utils.py'
       - 'scripts/tests/**'
@@ -40,10 +41,17 @@ jobs:
         run: |
           python3 -m unittest scripts/tests/test_check_duplicate_private_helpers.py
           python3 -m unittest scripts/tests/test_audit_conclusion_shaped_hypotheses.py
+          python3 -m unittest scripts/tests/test_audit_unfaithful_markers.py
 
       - name: Run conclusion-shaped hypothesis audit
         run: |
           python3 scripts/audit_conclusion_shaped_hypotheses.py \
+            --root . \
+            --ci
+
+      - name: Run unfaithful-marker audit
+        run: |
+          python3 scripts/audit_unfaithful_markers.py \
             --root . \
             --ci
 
