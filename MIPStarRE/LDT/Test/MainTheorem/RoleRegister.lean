@@ -179,7 +179,15 @@ does not assume a raw Section 6 witness: the caller supplies exactly the two
 analytic successor inputs for the transported predecessor, namely recursive
 slice witnesses and the self-improvement obligations.  This constructor
 assembles them through `mainFormalSuccessorBoundary_ofObligations`; line-130
-orthonormalization and completion inputs remain downstream hypotheses. -/
+orthonormalization and completion inputs remain downstream hypotheses.
+
+**Unfaithful:** this constructor assumes recursive slice witnesses and
+successor self-improvement obligations that are not derived from
+`references/ldt-paper/test_definition.tex:180-202` or the successor case of
+`thm:main-induction` (`references/ldt-paper/inductive_step.tex:441-551`).  This
+is tracked by #1035, #1036, #1363, and #1458.  Elimination: prove those inputs
+inside `mainFormalSuccessorProjectiveCompletionObligation` and keep this
+constructor as structural role-residual assembly. -/
 noncomputable def ofSuccessorObligations
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -431,7 +439,15 @@ Section 9 obligations, which is converted internally through
 `mainFormalSuccessorAnswerBoundary_ofObligations`.  This assembles the
 answer-side adapters merged in #1062–#1069 into a single Test-level constructor
 that does not call `mainFormal` and leaves the line-130 completion and line-169
-interfaces downstream. -/
+interfaces downstream.
+
+**Unfaithful:** this constructor assumes answer-valued recursive slice
+witnesses and answer-side Section 9 obligations that are not derived from
+`references/ldt-paper/test_definition.tex:180-202` or
+`references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by #1375,
+#1376, #1369, #1363, and #1458.  Elimination: prove those inputs inside
+`mainFormalSuccessorProjectiveCompletionObligation` and keep this constructor as
+structural role-residual assembly. -/
 noncomputable def ofAnswerSuccessorObligations
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -469,7 +485,16 @@ with `ofAnswerSuccessorObligations`.  Like the other constructors in this
 namespace it is pure structural composition over the answer-side adapters
 already merged on `main`; it does not call `mainFormal`, does not introduce any
 new analytic step, and leaves downstream completion and line-169 interfaces
-untouched. -/
+untouched.
+
+**Unfaithful:** this adapter assumes a predecessor
+`AnswerPerSliceInductionPackage` and answer-side Section 9 obligations, rather
+than deriving them from the successor proof of `thm:main-formal`
+(`references/ldt-paper/test_definition.tex:180-202`) and `thm:main-induction`
+(`references/ldt-paper/inductive_step.tex:441-551`).  This is tracked by
+#1375, #1376, #1369, #1363, and #1458.  Elimination: derive the predecessor
+induction package and slice obligations internally, then retain this declaration
+as a structural adapter. -/
 noncomputable def ofAnswerSuccessorInductionPackageAndObligations
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -552,7 +577,14 @@ theorem toRolePackageResidual
 This records answer-valued recursive slice witnesses and the corresponding
 self-improvement obligation for the transported predecessor into the branch-level
 role residual. It stops before the line-130 completion and line-169 transport
-interfaces. -/
+interfaces.
+
+**Unfaithful:** this branch constructor assumes answer-valued recursive slice
+witnesses and a self-improvement obligation that are not derived from
+`references/ldt-paper/test_definition.tex:180-202` or
+`references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by #1369,
+#1363, and #1458.  Elimination: derive the answer-valued boundary internally in
+the successor proof before using this constructor. -/
 noncomputable def answerSuccessorOfRecursiveSelfImprovement
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -593,7 +625,14 @@ theorem rolePackageResidual_ofAnswerSuccessorRecursiveSelfImprovement
 
 This records recursive slice witnesses and self-improvement obligations for
 the transported predecessor into the branch-level role residual.  It deliberately
-stops before the line-130 orthonormalization and completion interfaces. -/
+stops before the line-130 orthonormalization and completion interfaces.
+
+**Unfaithful:** this constructor assumes recursive slice witnesses and
+slice-wise self-improvement obligations, rather than deriving them from
+`references/ldt-paper/test_definition.tex:180-202` and
+`references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by #1035,
+#1036, #1363, and #1458.  Elimination: prove those inputs inside the successor
+proof and keep this declaration as structural assembly only. -/
 noncomputable def successorOfObligations
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -637,7 +676,14 @@ records the answer-valued recursive slice witnesses and the matching
 per-slice Section 9 obligations through
 `MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorObligations`,
 then injects into the branch residual.  It does not call `mainFormal` and stops
-before the line-130 completion and line-169 transport interfaces. -/
+before the line-130 completion and line-169 transport interfaces.
+
+**Unfaithful:** this constructor assumes answer-valued recursive slice
+witnesses and answer-side Section 9 obligations, rather than deriving them from
+`references/ldt-paper/test_definition.tex:180-202` and
+`references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by #1375,
+#1376, #1369, #1363, and #1458.  Elimination: prove those inputs in the
+successor proof and retain this declaration as structural assembly only. -/
 noncomputable def answerSuccessorOfObligations
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -683,7 +729,16 @@ answer-side self-improvement obligations, and composes them through
 `mainFormalSuccessorAnswerBoundary_ofObligations`.  It is pure structural
 composition over the answer-side adapters merged on `main`; it does not call
 `mainFormal`, introduces no new analytic step, and leaves the line-130
-completion and line-169 transport interfaces untouched. -/
+completion and line-169 transport interfaces untouched.
+
+**Unfaithful:** this constructor assumes a predecessor answer-valued induction
+package and answer-side Section 9 obligations, rather than deriving them from
+the paper hypotheses of `thm:main-formal`
+(`references/ldt-paper/test_definition.tex:180-202`) and
+`thm:main-induction` (`references/ldt-paper/inductive_step.tex:441-551`).
+This is tracked by #1375, #1376, #1369, #1363, and #1458.  Elimination:
+derive the predecessor package and slice obligations internally before using
+this adapter. -/
 noncomputable def answerSuccessorOfInductionPackageAndObligations
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

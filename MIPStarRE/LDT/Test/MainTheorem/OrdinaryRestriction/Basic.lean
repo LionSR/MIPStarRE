@@ -162,7 +162,16 @@ self-improvement obligation.
 For each possible per-slice induction package, this asks for the narrow
 `SelfImprovementPackage.SliceObligations` assumptions: honest per-slice
 `SymStrat`s, equality transports to the restricted-slice interfaces, and the
-remaining Section 9 obligations for those honest slice strategies. -/
+remaining Section 9 obligations for those honest slice strategies.
+
+**Unfaithful:** this obligation type records slice-wise Section 9 data that is
+not yet derived from the successor case of `thm:main-formal`
+(`references/ldt-paper/test_definition.tex:180-202`) and
+`thm:main-induction` (`references/ldt-paper/inductive_step.tex:441-551`).
+This is tracked by #1036, #1503, #1515, #1363, and #1458.  Elimination: prove
+the honest restricted-slice strategies and their Section 9 obligations from the
+paper hypotheses, then use this type only as an internal package consumed by the
+successor proof. -/
 def MainFormalSuccessorSelfImprovementObligations (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -198,7 +207,16 @@ abbrev MainFormalSuccessorSelfImprovementInductionPackage (params : Parameters)
     strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) hrestrict k
 
 /-- Assemble ordinary successor self-improvement obligations from honest slice
-strategies, measurement transports, and the remaining Section 9 obligations. -/
+strategies, measurement transports, and the remaining Section 9 obligations.
+
+**Unfaithful:** this helper assumes the honest slice strategies, measurement
+transport equalities, and `SelfImprovementObligations` for each restricted
+slice, rather than deriving them from
+`references/ldt-paper/inductive_step.tex:441-551` and
+`references/ldt-paper/self_improvement.tex:628-770`.  This is tracked by
+#1036, #1503, #1515, and #1458.  Elimination: prove those slice strategies and
+Section 9 obligations from the paper hypotheses, then keep this declaration as
+a structural constructor only. -/
 noncomputable def mainFormalSuccessorSelfImprovementObligations_ofMeasurementEq
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -252,7 +270,16 @@ noncomputable def mainFormalSuccessorSelfImprovementObligations_ofMeasurementEq
 
 /-- Assemble ordinary successor self-improvement obligations from the three
 named Section 9 inputs, using the closed spectral truncation input for the
-orthonormalization stage. -/
+orthonormalization stage.
+
+**Unfaithful:** this helper assumes helper strong self-consistency,
+orthonormalization repair, and final-fields inputs for every restricted slice;
+these are not derived here from `references/ldt-paper/self_improvement.tex:628-770`
+or the successor induction proof in
+`references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by #1036,
+#1514, #1515, #1503, and #1458.  Elimination: discharge the Section 9
+obligations for the restricted slices and use this declaration only as the
+structural assembly of those proved inputs. -/
 noncomputable def mainFormalSuccessorSelfImprovementObligations_ofOrthonormalizationRepair
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -325,7 +352,14 @@ noncomputable def mainFormalSuccessorSelfImprovementObligations_ofOrthonormaliza
 expected by the public Section 6 boundary.
 
 This does not discharge the obligation fields; it only assembles them into the
-existing `MainFormalSuccessorSelfImprovementObligation` API. -/
+existing `MainFormalSuccessorSelfImprovementObligation` API.
+
+**Unfaithful:** this helper consumes
+`MainFormalSuccessorSelfImprovementObligations`, whose load-bearing Section 9
+fields are not derived from the cited successor proof
+(`references/ldt-paper/inductive_step.tex:441-551`).  This is tracked by
+#1036, #1503, #1515, and #1458.  Elimination: prove those obligations from the
+paper hypotheses and retain this as a bookkeeping conversion. -/
 noncomputable def mainFormalSuccessorSelfImprovementObligation_ofObligations
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -361,7 +395,16 @@ expects:
 The helper lemmas below now discharge the weighted fields from `hpass`; grouping
 all fields into a single named structure still gives the successor branch of
 `mainFormal` one honest issue-#634 interface, rather than four independent
-hypothesis holes. -/
+hypothesis holes.
+
+**Unfaithful:** as a caller-supplied boundary this structure contains recursive
+slice witnesses and a self-improvement obligation that are not hypotheses of
+`thm:main-formal` (`references/ldt-paper/test_definition.tex:180-202`).  They
+must be produced inside `mainFormalSuccessorProjectiveCompletionObligation`,
+using the successor proof of `thm:main-induction`
+(`references/ldt-paper/inductive_step.tex:441-551`).  This is tracked by
+#1035, #1036, #1363, and #1458.  Elimination: prove the recursive-slice and
+self-improvement fields internally before invoking this boundary record. -/
 structure MainFormalSuccessorBoundary (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -408,7 +451,15 @@ theorem mainFormalSuccessorDiagonalWeightedBound_ofPass
 /-- Build the successor boundary once the two still-external slice-recursion and
 restricted-strategy self-improvement inputs are supplied. The weighted
 restricted-probability fields are now discharged from `hpass` by the public
-Section 6 weighted-bound lemmas. -/
+Section 6 weighted-bound lemmas.
+
+**Unfaithful:** this conditional constructor assumes the recursive slice data
+and self-improvement obligation rather than deriving them from
+`references/ldt-paper/test_definition.tex:180-202` and
+`references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by #1035,
+#1036, #1363, and #1458.  Elimination: construct these inputs inside
+`mainFormalSuccessorProjectiveCompletionObligation` and use this constructor
+only after the inputs have been proved. -/
 def mainFormalSuccessorBoundary_ofRecursiveSelfImprovement
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

@@ -26,7 +26,16 @@ connecting it to the restricted slice from
 When supplied together with a recursive induction hypothesis (see
 `mainFormalSuccessorRecursiveSlices_ofSliceData`), this data can close the
 `MainFormalSuccessorRecursiveSlices` requirement needed by
-`MainFormalSuccessorBoundary`. -/
+`MainFormalSuccessorBoundary`.
+
+**Unfaithful:** this structure records honest same-space slice strategies and
+passing hypotheses for restricted slices that are not yet constructed from the
+successor proof of `thm:main-formal`
+(`references/ldt-paper/test_definition.tex:180-202`) and `thm:main-induction`
+(`references/ldt-paper/inductive_step.tex:441-551`).  This is tracked by
+#1035, #1363, and #1458.  Elimination: construct these slice strategies and
+transport fields from the paper hypotheses, then use this structure only as the
+internal carrier for that construction. -/
 structure MainFormalSuccessorRecursiveSliceData (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -351,7 +360,16 @@ the recursive slice witnesses into a `MainFormalSuccessorBoundary`.
 
 The weighted restricted-probability fields are discharged from `hpass`
 by the public Section 6 weighted-bound lemmas, matching the pattern of
-`mainFormalSuccessorBoundary_ofRecursiveSelfImprovement`. -/
+`mainFormalSuccessorBoundary_ofRecursiveSelfImprovement`.
+
+**Unfaithful:** this constructor assumes recursive slice witnesses and
+per-slice self-improvement obligations, rather than deriving them from
+`references/ldt-paper/test_definition.tex:180-202` and
+`references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by #1035,
+#1036, #1363, and #1458.  Elimination: prove the recursive predecessor
+induction data and the Section 9 slice obligations inside
+`mainFormalSuccessorProjectiveCompletionObligation`, then keep this declaration
+as structural assembly only. -/
 noncomputable def mainFormalSuccessorBoundary_ofObligations
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -382,7 +400,16 @@ The predecessor hypothesis is stated at the exact Section 6 strength consumed by
 polynomial measurement bounded by the restricted-profile
 `mainInductionError`. This wrapper is non-recursive; it only transports those
 slice witnesses across `MainFormalSuccessorRecursiveSliceData` and then reuses
-`mainFormalSuccessorBoundary_ofObligations`. -/
+`mainFormalSuccessorBoundary_ofObligations`.
+
+**Unfaithful:** this helper assumes the predecessor induction witnesses,
+same-space slice data, and per-slice Section 9 obligations, none of which are
+hypotheses of `thm:main-formal`
+(`references/ldt-paper/test_definition.tex:180-202`).  This is tracked by
+#1035, #1036, #1363, and #1458.  Elimination: derive the predecessor witnesses
+and slice obligations from the successor proof of `thm:main-induction`
+(`references/ldt-paper/inductive_step.tex:441-551`) before invoking this
+transport wrapper. -/
 noncomputable def mainFormalSuccessorBoundary_ofPredecessorInduction
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
