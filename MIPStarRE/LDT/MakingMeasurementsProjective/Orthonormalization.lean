@@ -332,6 +332,58 @@ lemma orthonormalizationMeasurement_of_consistency {Outcome : Type*}
     (Orthonormalization.ErrorBounds.orthonormalizationMainLemmaError_le_orthonormalizationError
       ζ hζ)⟩
 
+/-- Measurement-level orthonormalization from cross consistency, using the
+locality-preserving Section 5 repair producer directly.
+
+This is the source-faithful form needed by the final Step 6 assembly: a
+cross-consistency estimate for the two unsymmetrized role measurements gives the
+projective submeasurement without an additional spectral-truncation or
+repair-input hypothesis. -/
+lemma orthonormalizationMeasurement_of_consistency_from_producer {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι))
+    (hψ : ψ.IsNormalized)
+    (A B : Measurement Outcome ι) (ζ : Error)
+    (hζ : 0 ≤ ζ) :
+    ConsRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A.toSubMeas)
+      (constSubMeasFamily B.toSubMeas) ζ →
+      ∃ P : ProjSubMeas Outcome ι,
+        SDDRel ψ (uniformDistribution Unit)
+          (constSubMeasFamily A.toSubMeas.liftLeft)
+          (constSubMeasFamily P.toSubMeas.liftLeft)
+          (orthonormalizationError ζ) := by
+  classical
+  intro hCons
+  have hAlmost :
+      MIPStarRE.LDT.MakingMeasurementsProjective.AlmostProjMeasStatement
+        ψ (leftLiftedMeasurement (ιB := ι) A)
+        (consistencyToAlmostProjectiveError ζ) := by
+    exact MIPStarRE.LDT.MakingMeasurementsProjective.consistencyToAlmostProjective
+      (ψ := ψ) (A := A) (B := B) (ζ := ζ) hCons
+  obtain ⟨P, hRounded⟩ :=
+    leftLiftedProjectivizationRepairProducer ψ hψ A
+      (consistencyToAlmostProjectiveError ζ) hAlmost.sourceAlmostProjective
+  have hP :
+      SDDRel ψ (uniformDistribution Unit)
+        (constSubMeasFamily A.toSubMeas.liftLeft)
+        (constSubMeasFamily P.toSubMeas.liftLeft)
+        (orthonormalizationMainLemmaError (consistencyToAlmostProjectiveError ζ)) :=
+    leftLiftedRoundedProjMeasStatement_to_local hRounded
+  have hbound :
+      orthonormalizationMainLemmaError (consistencyToAlmostProjectiveError ζ) ≤
+        orthonormalizationError ζ := by
+    have htwo :
+        orthonormalizationMainLemmaError (2 * ζ) ≤ orthonormalizationError ζ :=
+      open Orthonormalization.ErrorBounds in
+      orthonormalizationMainLemmaError_two_mul_le_orthonormalizationError ζ hζ
+    simpa [consistencyToAlmostProjectiveError] using
+      htwo
+  refine ⟨P, ?_⟩
+  rcases hP with ⟨hP⟩
+  exact ⟨hP.trans hbound⟩
+
 set_option linter.unusedFintypeInType false in
 /-- Orthonormalization under explicit spectral-truncation and repair data.
 

@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Test.MainTheorem.CompletionTransport
+import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Line169Repair
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Output
@@ -16,14 +17,10 @@ role-register measurement and the unsymmetrization links.  The central
 structures are:
 
 * `MainFormalPostRolePackageProjectiveCompletionResidual` — post-role Step 6
-  witness data with concrete projectivization witnesses (spectral-truncation
-  and locality-preserving repair).
-
-* `MainFormalPostRolePackageDiagonalOrthonormalizationInput` — the diagonal
-  self-consistency and match-mass inputs that feed orthonormalization.
+  witness data with concrete projectivization witnesses.
 
 * `MainFormalPostRolePackageDiagonalCompletionResidual` — the final residual
-  that records both the diagonal orthonormalization input and the completion
+  that records both the diagonal orthonormalization residual and the completion
   data, ready for consumption by the projective-consistency transport.
 
 The module also proves tight `ζ₁` polynomial-consistency lemmas
@@ -129,184 +126,6 @@ noncomputable def toPostRolePackageLeftCompletionTransportResidual
 
 end MainFormalPostRolePackageProjectiveCompletionResidual
 
-/-- Paper origin: `references/ldt-paper/inductive_step.tex:130-142`
-(`\label{eq:G-self-consistency}`) and
-`references/ldt-paper/orthonormalization.tex:67-76`
-(`\label{thm:orthonormalization}`).
-
-Explicit obligations for applying the paper's cross-consistency
-orthonormalization lemma to the two unsymmetrized role measurements.
-
-The fields expose the remaining spectral-truncation and locality-preserving
-repair witnesses.  The constructor below consumes line 130's `ConsRel`
-`G^A ⊗ I ≃ I ⊗ G^B` and applies it in the forward and symmetry-reversed
-directions, instead of asking for independent `BipartiteSSCRel` inputs. -/
-structure MainFormalPostRolePackageDiagonalOrthonormalizationInput
-    (params : Parameters) [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
-    (scalars : MainFormalCascadeScalars params eps k)
-    (rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars) where
-  /-- Spectral-truncation input for `G^A`. -/
-  leftSpectral :
-    MakingMeasurementsProjective.SpectralTruncationInput strategy.state
-      (leftLiftedMeasurement (ιB := ι)
-        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement))
-      (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)
-  /-- Locality-preserving repair input for `G^A`. -/
-  leftRepair :
-    MakingMeasurementsProjective.LeftLiftedProjectivizationRepairInput strategy.state
-      (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
-      (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)
-  /-- Spectral-truncation input for `G^B`. -/
-  rightSpectral :
-    MakingMeasurementsProjective.SpectralTruncationInput strategy.state
-      (leftLiftedMeasurement (ιB := ι)
-        (unsymmetrizedRightPOVM rolePackage.roleMeasurement))
-      (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)
-  /-- Locality-preserving repair input for `G^B`. -/
-  rightRepair :
-    MakingMeasurementsProjective.LeftLiftedProjectivizationRepairInput strategy.state
-      (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
-      (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)
-
-namespace MainFormalPostRolePackageDiagonalOrthonormalizationInput
-
-/-- Build the line-130 orthonormalization input once the two locality-preserving
-repair inputs are available.
-
-This constructor supplies the spectral-truncation fields from the constructive
-theorem `spectralTruncationInput_of_sourceAlmostProjective`, applied to the two
-unsymmetrized role measurements after left tensor placement.  Callers that use
-this constructor therefore supply only the Alice- and Bob-side repair steps,
-which preserve the local form of the repaired projective submeasurements.  The
-existing obligation structures still accept a full orthonormalization input;
-routing those structures through this constructor is a separate assembly step. -/
-noncomputable def ofRepairInputs
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {scalars : MainFormalCascadeScalars params eps k}
-    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
-    (leftRepair :
-      MakingMeasurementsProjective.LeftLiftedProjectivizationRepairInput strategy.state
-        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
-        (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1))
-    (rightRepair :
-      MakingMeasurementsProjective.LeftLiftedProjectivizationRepairInput strategy.state
-        (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
-        (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)) :
-    MainFormalPostRolePackageDiagonalOrthonormalizationInput
-      params strategy eps k scalars rolePackage where
-  leftSpectral :=
-    MakingMeasurementsProjective.spectralTruncationInput_of_sourceAlmostProjective
-      strategy.state
-      (leftLiftedMeasurement (ιB := ι)
-        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement))
-      (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)
-  leftRepair := leftRepair
-  rightSpectral :=
-    MakingMeasurementsProjective.spectralTruncationInput_of_sourceAlmostProjective
-      strategy.state
-      (leftLiftedMeasurement (ιB := ι)
-        (unsymmetrizedRightPOVM rolePackage.roleMeasurement))
-      (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)
-  rightRepair := rightRepair
-
-/-- Build the line-130 orthonormalization input from QXP-layer repair witnesses.
-
-The spectral-truncation fields are still supplied by
-`spectralTruncationInput_of_sourceAlmostProjective`.  The two remaining repair
-fields are obtained by choosing the canonical local projective submeasurement
-attached to each QXP layer, so the repaired lifted family has the required form
-`P_a ⊗ I`.  As for `ofRepairInputs`, this records a constructive obligation for
-the orthonormalization input; wiring the downstream main-theorem assembly to
-this theorem is a separate step. -/
-noncomputable def ofQXPLayerRepairWitnesses
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {scalars : MainFormalCascadeScalars params eps k}
-    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
-    (leftWitness :
-      MakingMeasurementsProjective.SpectralTruncationStatement strategy.state
-        (leftLiftedMeasurement (ιB := ι)
-          (unsymmetrizedLeftPOVM rolePackage.roleMeasurement))
-        (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1) →
-      MIPStarRE.LDT.SelfImprovement.LeftLiftedQXPLayerRepairWitness strategy.state
-        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
-        (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1))
-    (rightWitness :
-      MakingMeasurementsProjective.SpectralTruncationStatement strategy.state
-        (leftLiftedMeasurement (ιB := ι)
-          (unsymmetrizedRightPOVM rolePackage.roleMeasurement))
-        (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1) →
-      MIPStarRE.LDT.SelfImprovement.LeftLiftedQXPLayerRepairWitness strategy.state
-        (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
-        (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)) :
-    MainFormalPostRolePackageDiagonalOrthonormalizationInput
-      params strategy eps k scalars rolePackage :=
-  ofRepairInputs
-    (MIPStarRE.LDT.SelfImprovement.leftLiftedProjectivizationRepairInput_of_qxpLayer
-      leftWitness)
-    (MIPStarRE.LDT.SelfImprovement.leftLiftedProjectivizationRepairInput_of_qxpLayer
-      rightWitness)
-
-/-- Build the line-130 orthonormalization input from lifted QXP approximations.
-
-This is a more concrete form of `ofQXPLayerRepairWitnesses`: each side supplies
-a QXP layer whose `q` family is the corresponding unsymmetrized POVM, together
-with the lifted state-dependent approximation to the associated `P` family.
-The constructor turns these approximations into locality-preserving repair
-inputs for the Alice and Bob unsymmetrized measurements.  It supplies the same
-line-130 input structure as `ofRepairInputs`; the later obligation structures
-still consume an already assembled orthonormalization input. -/
-noncomputable def ofLiftedQXPApproximations
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {scalars : MainFormalCascadeScalars params eps k}
-    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
-    (leftData :
-      MakingMeasurementsProjective.QXPLayerData (Polynomial params) ι)
-    (leftMatches :
-      ∀ g : Polynomial params,
-        leftData.qLayer.q.outcome g =
-          (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).outcome g)
-    (leftClose :
-      SDDOpRel strategy.state (uniformDistribution Unit)
-        (constOpFamily
-          (OpFamily.leftPlacedOpFamily (ιB := ι) leftData.qLayer.q))
-        (constOpFamily
-          (OpFamily.leftPlacedOpFamily (ιB := ι)
-            (MakingMeasurementsProjective.PFamily leftData)))
-        (MakingMeasurementsProjective.roundingToProjectiveError
-          (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1)))
-    (rightData :
-      MakingMeasurementsProjective.QXPLayerData (Polynomial params) ι)
-    (rightMatches :
-      ∀ g : Polynomial params,
-        rightData.qLayer.q.outcome g =
-          (unsymmetrizedRightPOVM rolePackage.roleMeasurement).outcome g)
-    (rightClose :
-      SDDOpRel strategy.state (uniformDistribution Unit)
-        (constOpFamily
-          (OpFamily.leftPlacedOpFamily (ιB := ι) rightData.qLayer.q))
-        (constOpFamily
-          (OpFamily.leftPlacedOpFamily (ιB := ι)
-            (MakingMeasurementsProjective.PFamily rightData)))
-        (MakingMeasurementsProjective.roundingToProjectiveError
-          (MakingMeasurementsProjective.consistencyToAlmostProjectiveError scalars.zeta1))) :
-    MainFormalPostRolePackageDiagonalOrthonormalizationInput
-      params strategy eps k scalars rolePackage :=
-  ofRepairInputs
-    (MIPStarRE.LDT.SelfImprovement.leftLiftedProjectivizationRepairInput_of_lifted_qxp_sddOpRel
-      leftData leftMatches leftClose)
-    (MIPStarRE.LDT.SelfImprovement.leftLiftedProjectivizationRepairInput_of_lifted_qxp_sddOpRel
-      rightData rightMatches rightClose)
-
-end MainFormalPostRolePackageDiagonalOrthonormalizationInput
-
 /-- The pre-completion projective submeasurements obtained from line 130 by the
 cross-consistency orthonormalization wrapper.
 
@@ -343,33 +162,31 @@ structure MainFormalPostRolePackageDiagonalOrthonormalizationResidual
 
 namespace MainFormalPostRolePackageDiagonalOrthonormalizationResidual
 
-/-- Apply the cross-consistency orthonormalization wrapper to the line-130
-`G^A/G^B` consistency proof, producing the two pre-completion projective
-submeasurements in the non-vacuous scalar regime. -/
-theorem nonempty_ofDiagonalInputs
+/-- Apply the source-faithful cross-consistency orthonormalization wrapper to
+the line-130 `G^A/G^B` consistency proof, producing the two pre-completion
+projective submeasurements in the non-vacuous scalar regime.
+
+The proof uses the Section 5 locality-preserving repair producer directly, so
+there is no additional orthonormalization-input hypothesis. -/
+theorem nonempty_ofDiagonalConsistency
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
-    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
     (hpre : ConsRel strategy.state (uniformDistribution Unit)
       (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
       (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
-      scalars.zeta1)
-    (input : MainFormalPostRolePackageDiagonalOrthonormalizationInput
-      params strategy eps k scalars rolePackage) :
+      scalars.zeta1) :
     Nonempty (MainFormalPostRolePackageDiagonalOrthonormalizationResidual
       params strategy eps k scalars rolePackage) := by
   have hζ0 : 0 ≤ scalars.zeta1 := MainFormalCascadeScalars.zeta1_nonneg scalars
-  have hζ1 : scalars.zeta1 ≤ 1 :=
-    MainFormalCascadeScalars.zeta1_le_one_of_not_mainFormalError_ge_one scalars hsmall
   obtain ⟨P_A, hP_A⟩ :=
-    MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency
+    MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_producer
       (ψ := strategy.state) (hψ := strategy.isNormalized)
       (A := unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
       (B := unsymmetrizedRightPOVM rolePackage.roleMeasurement)
-      (ζ := scalars.zeta1) hζ0 hζ1 input.leftSpectral input.leftRepair hpre
+      (ζ := scalars.zeta1) hζ0 hpre
   have hpre_symm : ConsRel strategy.state (uniformDistribution Unit)
       (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
       (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
@@ -380,11 +197,11 @@ theorem nonempty_ofDiagonalInputs
       (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
       scalars.zeta1 hpre
   obtain ⟨P_B, hP_B⟩ :=
-    MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency
+    MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_producer
       (ψ := strategy.state) (hψ := strategy.isNormalized)
       (A := unsymmetrizedRightPOVM rolePackage.roleMeasurement)
       (B := unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
-      (ζ := scalars.zeta1) hζ0 hζ1 input.rightSpectral input.rightRepair hpre_symm
+      (ζ := scalars.zeta1) hζ0 hpre_symm
   exact ⟨{
     P_A := P_A
     P_B := P_B

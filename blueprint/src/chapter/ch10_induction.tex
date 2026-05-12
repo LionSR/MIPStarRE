@@ -451,11 +451,9 @@
 	\lean{MIPStarRE.LDT.Test.baseProjectiveCompletionObligations_ofBaseCompletionObligations}
 	\lean{MIPStarRE.LDT.Test.baseProjectiveCompletionResidual_ofBaseCompletionObligations}
 	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalCompletionInput.nonempty_ofDiagonalConsistencyAndMatchMassPreservation}
-	\lean{MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualProjectiveCompletionResidual.nonempty_ofRoleResidualAndDiagonalInputsAndMatchMassPreservation}
-	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRepairInputs}
-	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofQXPLayerRepairWitnesses}
-	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofLiftedQXPApproximations}
-	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRoleResidual}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_producer}
+	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalConsistency}
+	\lean{MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualProjectiveCompletionResidual.nonempty_ofRoleResidualAndMatchMassPreservation}
 	\lean{MIPStarRE.LDT.Test.mainFormalBaseRoleResidual}
 	\lean{MIPStarRE.LDT.Test.MainFormalBaseBranchCompletionObligations}
 	\lean{MIPStarRE.LDT.Test.mainFormal_ofProjectiveCompletionResidual}
@@ -463,25 +461,15 @@
 	\uses{def:main-formal-successor-boundary, thm:orthonormalization}
 		The structure \texttt{MainFormalBaseProjectiveCompletionObligations} bundles the still-unformalized
 		analytic obligations needed for the base case ($m=1$) of
-		Theorem~\ref{thm:main-formal}: the locality-preserving repair witnesses used
-		by orthonormalization, distinguished completion outcomes, and match-mass
-		preservation for the orthonormalized projective submeasurements against the
-		opposite unsymmetrized POVM.  The auxiliary constructor
-		\texttt{MainFormalPostRolePackageDiagonalOrthonormalizationInput.ofRepairInputs}
-		is available to fill the spectral-truncation fields from the Section~5
-		spectral-truncation theorem applied to the two unsymmetrized role measurements
-	after left tensor placement.  Thus the spectral half of the line-130
-	orthonormalization input is constructively supplied.  The constructors
-	\texttt{ofQXPLayerRepairWitnesses} and
-	\texttt{ofLiftedQXPApproximations} also construct the inputs for the
-	locality-preserving repair half: the former consumes the Section~9 QXP-layer
-	repair witnesses, and the latter consumes explicit QXP-layer data together
-	with the corresponding left-placed state-dependent approximation.  The base
-	obligation structures still accept a full orthonormalization input until a later
-	theorem routes them through these constructors.  The line-130 cross
-	consistency relation is reconstructed internally from the checked role residual
-	and used directly in the completion step, so no separate diagonal strong
-	self-consistency package remains in this construction.  The narrowed alias
+		Theorem~\ref{thm:main-formal}: distinguished completion outcomes and
+		match-mass preservation for the orthonormalized projective submeasurements
+		against the opposite unsymmetrized POVM.  The line-130 cross-consistency
+		relation is reconstructed internally from the checked role residual.  The
+		measurement-level orthonormalization theorem
+		\texttt{orthonormalizationMeasurement\_of\_consistency\_from\_producer} then
+		applies the Section~5 locality-preserving repair producer directly, so the
+		base-case structures no longer accept separate spectral-truncation or
+		repair-input hypotheses for orthonormalization.  The narrowed alias
 	\texttt{MainFormalBaseCompletionObligations} omits the two distinguished outcomes;
 	\texttt{baseProjectiveCompletionObligations\_ofBaseCompletionObligations} fills both with the
 	explicit zero polynomial.  The theorems \texttt{baseProjectiveCompletionResidual} and

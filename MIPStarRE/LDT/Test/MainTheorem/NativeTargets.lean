@@ -54,23 +54,19 @@ theorem nonempty_ofRoleResidualAndCompletion
   rcases hcompletion with ⟨completion⟩
   exact ⟨{ roleResidual := roleResidual, postRoleDiagonalCompletion := completion }⟩
 
-/-- Assemble the final live residual from a concrete Section 6 role residual, the
-line-130 orthonormalization obligations, and a construction of the remaining
-completion/match-mass obligations for the projective submeasurements obtained from
-line 130.
+/-- Assemble the final live residual from a concrete Section 6 role residual and
+a construction of the remaining completion/match-mass obligations for the
+projective submeasurements obtained from line 130.
 
 This is the precise remaining shape of the final `mainFormal` hole after the
 paper-order handoffs have been named. -/
-theorem nonempty_ofRoleResidualAndDiagonalInputs
+theorem nonempty_ofRoleResidualAndCompletionProducer
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
-    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
     (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
-    (input : MainFormalPostRolePackageDiagonalOrthonormalizationInput
-      params strategy eps k scalars (roleResidual.rolePackage scalars))
     (completionProducer :
       MainFormalPostRolePackageDiagonalOrthonormalizationResidual
           params strategy eps k scalars (roleResidual.rolePackage scalars) →
@@ -79,34 +75,30 @@ theorem nonempty_ofRoleResidualAndDiagonalInputs
     Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
       params strategy eps hpass k scalars) := by
   have hpre := roleResidual.diagonalConsistency scalars
-  rcases MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalInputs
-      hsmall hpre input with ⟨orthResidual⟩
+  rcases MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalConsistency
+      hpre with ⟨orthResidual⟩
   exact nonempty_ofRoleResidualAndCompletion roleResidual ⟨completionProducer orthResidual⟩
 
 /-- Assemble the final live residual using explicit completion inputs rather than
 an opaque `completionProducer`.
 
 A caller supplies, for each line-130 orthonormalization residual produced from
-the obligations, the concrete distinguished outcomes, completed-closeness
-proofs, and orthonormalization match-mass preservation facts packaged as
+the role residual, the concrete distinguished outcomes, completed-closeness
+proofs, and orthonormalization match-mass preservation facts recorded as
 `MainFormalPostRolePackageDiagonalCompletionInput`.  This theorem converts that
 package into the old producer shape by `toCompletionResidual`.
 
 **Status:** currently unused (no callers).  The more analytic variant
-`nonempty_ofRoleResidualAndDiagonalInputsAndCompletingToMeasurementInputs` (and
-its alias `nonempty_ofRoleResidualAndBridgeInputsAndCompletingToMeasurementInputs`)
-expose the same endpoint with explicit `BipartiteSSCRel` and match-mass inputs
-instead of a pre-packaged `CompletionInput`. -/
-theorem nonempty_ofRoleResidualAndDiagonalInputsAndCompletionInputs
+`nonempty_ofRoleResidualAndCompletingToMeasurementInputs` exposes the same
+endpoint with explicit `BipartiteSSCRel` and match-mass inputs instead of a
+pre-recorded `CompletionInput`. -/
+theorem nonempty_ofRoleResidualAndCompletionInputs
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
-    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
     (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
-    (input : MainFormalPostRolePackageDiagonalOrthonormalizationInput
-      params strategy eps k scalars (roleResidual.rolePackage scalars))
     (completionInputProducer :
       ∀ orthResidual : MainFormalPostRolePackageDiagonalOrthonormalizationResidual
           params strategy eps k scalars (roleResidual.rolePackage scalars),
@@ -114,7 +106,7 @@ theorem nonempty_ofRoleResidualAndDiagonalInputsAndCompletionInputs
           params strategy eps k scalars (roleResidual.rolePackage scalars) orthResidual) :
     Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
       params strategy eps hpass k scalars) :=
-  nonempty_ofRoleResidualAndDiagonalInputs hsmall roleResidual input fun orthResidual =>
+  nonempty_ofRoleResidualAndCompletionProducer roleResidual fun orthResidual =>
     (completionInputProducer orthResidual).toCompletionResidual
 
 /-- Assemble the final live residual from the exact analytic completion witnesses.
@@ -129,16 +121,13 @@ line 130 produces `P^A` and `P^B`, the caller provides
 The proof invokes `completingToMeasurement` to derive the two completed-closeness
 fields and then packages them through
 `MainFormalPostRolePackageDiagonalCompletionInput.toCompletionResidual`. -/
-theorem nonempty_ofRoleResidualAndDiagonalInputsAndCompletingToMeasurementInputs
+theorem nonempty_ofRoleResidualAndCompletingToMeasurementInputs
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
-    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
     (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
-    (input : MainFormalPostRolePackageDiagonalOrthonormalizationInput
-      params strategy eps k scalars (roleResidual.rolePackage scalars))
     (a_A a_B : Polynomial params)
     (leftSelfConsistency :
       BipartiteSSCRel strategy.state (uniformDistribution Unit)
@@ -173,8 +162,8 @@ theorem nonempty_ofRoleResidualAndDiagonalInputsAndCompletingToMeasurementInputs
     Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
       params strategy eps hpass k scalars) := by
   have hpre := roleResidual.diagonalConsistency scalars
-  rcases MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalInputs
-      hsmall hpre input with ⟨orthResidual⟩
+  rcases MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalConsistency
+      hpre with ⟨orthResidual⟩
   rcases MainFormalPostRolePackageDiagonalCompletionInput.nonempty_ofCompletingToMeasurementInputs
       orthResidual a_A a_B
         leftSelfConsistency rightSelfConsistency
@@ -184,23 +173,20 @@ theorem nonempty_ofRoleResidualAndDiagonalInputsAndCompletingToMeasurementInputs
     ⟨completionInput.toCompletionResidual⟩
 
 /-- Assemble the final live residual from the paper line-130 cross consistency,
-the orthonormalization inputs, and the P-level match-mass preservation data.
+and the P-level match-mass preservation data.
 
 This is the live Lean Step 6 route: the checked role residual
 reconstructs line 130 as a cross `ConsRel`, the orthonormalization wrapper
 produces `P^A,P^B`, and the remaining completion step is discharged directly from
 that cross relation plus the construction-level match-mass preservation facts,
 without asking callers for separate diagonal strong self-consistency packages. -/
-theorem nonempty_ofRoleResidualAndDiagonalInputsAndMatchMassPreservation
+theorem nonempty_ofRoleResidualAndMatchMassPreservation
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
-    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
     (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
-    (input : MainFormalPostRolePackageDiagonalOrthonormalizationInput
-      params strategy eps k scalars (roleResidual.rolePackage scalars))
     (a_A a_B : Polynomial params)
     (leftMatchMassPreservation :
       ∀ orthResidual : MainFormalPostRolePackageDiagonalOrthonormalizationResidual
@@ -223,8 +209,8 @@ theorem nonempty_ofRoleResidualAndDiagonalInputsAndMatchMassPreservation
     Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
       params strategy eps hpass k scalars) := by
   have hpre := roleResidual.diagonalConsistency scalars
-  rcases MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalInputs
-      hsmall hpre input with ⟨orthResidual⟩
+  rcases MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalConsistency
+      hpre with ⟨orthResidual⟩
   have hcompletion :
       Nonempty (MainFormalPostRolePackageDiagonalCompletionInput
         params strategy eps k scalars (roleResidual.rolePackage scalars) orthResidual) :=
@@ -236,20 +222,6 @@ theorem nonempty_ofRoleResidualAndDiagonalInputsAndMatchMassPreservation
   rcases hcompletion with ⟨completionInput⟩
   exact nonempty_ofRoleResidualAndCompletion roleResidual
     ⟨completionInput.toCompletionResidual⟩
-
-/-- Bridge-shape alias for
-`nonempty_ofRoleResidualAndDiagonalInputsAndCompletingToMeasurementInputs`
-accepting the orthonormalization inputs under the `…BridgeInputs` name.
-
-The alias is definitional (the bridge `abbrev` unfolds in-place) and exists
-only as a documented entry point for callers that carry the bridge wrapper.
-
-**Status:** currently unused (no callers).  The underlying theorem
-`nonempty_ofRoleResidualAndDiagonalInputsAndCompletingToMeasurementInputs` is the
-canonical form; this alias is retained for callers that hold the bridge-wrapper
-type. -/
-alias nonempty_ofRoleResidualAndBridgeInputsAndCompletingToMeasurementInputs :=
-  nonempty_ofRoleResidualAndDiagonalInputsAndCompletingToMeasurementInputs
 
 /-- Convert the combined residual to the left-completion residual after the paper
 line-130 consistency has been derived separately.
