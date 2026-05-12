@@ -115,11 +115,12 @@ runs:
           '- A source-aligned theorem with a tracked `sorry` in its proof is preferable' \
           '  to a theorem whose public statement has been weakened by non-paper' \
           '  assumptions.' \
-          '- Do not introduce a new conditional helper merely to keep CI green. If an' \
-          '  existing conditional helper is unavoidable for preserving downstream proof' \
-          '  content, keep it separately named as conditional, keep it out of' \
-          '  source-labelled `\leanok`, and identify the exact obligation that will' \
-          '  remove it.' \
+          '- Do not introduce a conditional helper, proof-debt bundle, producer, or' \
+          '  obligation package as a CI-fix strategy. Existing conditional helpers may' \
+          '  be edited only to reduce proof debt, preserve already separated proof' \
+          '  content, or improve traceability; keep them separately named as' \
+          '  conditional, keep them out of source-labelled `\leanok`, and identify' \
+          '  the exact obligation that will remove them.' \
           '- When in doubt, restore the paper-aligned theorem statement and expose the' \
           '  missing proof obligation; do not turn the paper theorem into a conditional' \
           '  theorem.')"
