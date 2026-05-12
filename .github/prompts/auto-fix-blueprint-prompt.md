@@ -20,8 +20,9 @@ Instructions:
      paper theorem, lemma, or proposition to a conditional helper with bridge,
      residual, repair, package, proof-obligation input, hypotheses bundle,
      assumptions bundle, or arbitrary hypothesis inputs that are not in
-     `references/ldt-paper/`. Such helpers may be mentioned only as conditional
-     implementation lemmas, without `\leanok` for the source theorem.
+     `references/ldt-paper/`. Such helpers may be mentioned only in separate
+     non-`\leanok` notes, and only when they are already useful quarantined
+     proof content with an explicit unresolved source obligation.
    - Do not add `\leanok` merely because a renamed Lean declaration exists.  If
      the declaration is an open internal obligation, contains `sorry`, or is a
      conditional helper, mention it separately with `\lean{...}` and no

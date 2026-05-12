@@ -34,13 +34,15 @@ that determines whether the PR can be approved with outstanding issues.
    mathematics, such as positivity, nonemptiness, decidability, or field-model hypotheses.
    Proof-debt bundles are not boundary conditions.
    If such data are still needed, the paper theorem must remain source-faithful and the
-   missing fact should be exposed as a separately named internal obligation or lemma.
+   missing fact should be exposed as a separately named internal obligation, lemma target,
+   or paper-gap report.  Do not accept a conditional helper as the default repair path.
    Existing conditional helpers must have names that make the conditional nature clear,
-   and they must not be treated as the paper theorem or advertised by `\leanok`.
+   cite the unresolved source obligation, state a removal plan, and must not be treated as
+   the paper theorem or advertised by `\leanok`.
    A newly introduced conditional helper, proof-debt bundle, producer, or obligation
-   package is itself a blocker unless the PR is explicitly a paper-realignment change
-   and the new object reduces an already existing statement drift while leaving the
-   paper-facing theorem source-faithful.
+   package is itself a blocker unless the PR is explicitly a paper-realignment change,
+   the new object preserves useful proof content from an already drifting statement, and
+   the paper-facing theorem remains source-faithful.
 4. 🟡 **Mathlib style**: Does the code follow Mathlib conventions? Check naming (`camelCase` for
    defs, `snake_case` for lemmas), tactic style (prefer `exact` over `apply` + `rfl` when
    equivalent), import hygiene (no unnecessary `open`s, minimal imports), and lemma placement.

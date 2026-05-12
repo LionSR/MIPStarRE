@@ -48,8 +48,12 @@ axis that matters:
   mathematics in Lean, such as positivity for a division, nonemptiness,
   decidability, or a field-model instance. Proof-debt objects are not
   boundary conditions.
-  Missing proof work belongs in a separately named conditional lemma or
-  remark, not in the source-labelled theorem statement.
+  Missing proof work belongs in a named internal obligation, source-faithful
+  lemma target, or paper-gap report, not in the source-labelled theorem
+  statement.  Do not recommend adding a conditional helper merely to make a
+  blueprint link pass; a conditional helper is acceptable only as quarantine for
+  already useful proof content, with an explicit removal plan, and it must stay
+  off the paper theorem's `\leanok` path.
 - **Conclusion.** Does the blueprint conclusion match the Lean return
   type? Watch for "$X$" vs "$X^\dagger$", "$=$" vs "$\leq$", strict
   vs non-strict inequalities, and conjugate-linear vs linear conventions
