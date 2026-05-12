@@ -367,9 +367,8 @@ per-slice self-improvement obligations, rather than deriving them from
 `references/ldt-paper/test_definition.tex:180-202` and
 `references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by #1035,
 #1036, #1363, and #1458.  Elimination: prove the recursive predecessor
-induction data and the Section 9 slice obligations inside
-`mainFormalSuccessorProjectiveCompletionObligation`, then use this declaration
-only to record their combination. -/
+induction data and the Section 9 slice obligations inside the successor branch
+of `mainFormal`, then use this declaration only to record their combination. -/
 noncomputable def mainFormalSuccessorBoundary_ofObligations
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

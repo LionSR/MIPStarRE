@@ -450,60 +450,34 @@
 \end{definition}
 
 \begin{definition}[Lean base-case Step~6 obligations for the Section~3 proof]\label{def:main-formal-step6-obligations}
-	\lean{MIPStarRE.LDT.Test.MainFormalBaseProjectiveCompletionObligations}
-	\lean{MIPStarRE.LDT.Test.baseProjectiveCompletionResidual}
-	\lean{MIPStarRE.LDT.Test.MainFormalBaseCompletionObligations}
-	\lean{MIPStarRE.LDT.Test.baseProjectiveCompletionObligations_ofBaseCompletionObligations}
-	\lean{MIPStarRE.LDT.Test.baseProjectiveCompletionResidual_ofBaseCompletionObligations}
 	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalCompletionInput.nonempty_ofDiagonalConsistencyAndMatchMassPreservation}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair}
 	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalConsistency}
 	\lean{MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualProjectiveCompletionResidual.nonempty_ofRoleResidualAndMatchMassPreservation}
 	\lean{MIPStarRE.LDT.Test.mainFormalBaseRoleResidual}
-	\lean{MIPStarRE.LDT.Test.MainFormalBaseBranchCompletionObligations}
 	\lean{MIPStarRE.LDT.Test.mainFormal_ofProjectiveCompletionResidual}
 	\leanok
 	\uses{def:main-formal-successor-boundary, thm:orthonormalization}
-		The structure \texttt{MainFormalBaseProjectiveCompletionObligations} records the still-unformalized
-		analytic obligations needed for the base case ($m=1$) of
-		Theorem~\ref{thm:main-formal}: distinguished completion outcomes and
-		match-mass preservation for the orthonormalized projective submeasurements
-		against the opposite unsymmetrized POVM.  The line-130 cross-consistency
-		relation is reconstructed internally from the checked role residual.  The
-		measurement-level orthonormalization theorem
-		\texttt{orthonormalizationMeasurement\_of\_consistency\_from\_projectivizationRepair} then
-		applies the Section~5 locality-preserving repair construction directly, so the
-		base-case structures no longer accept separate spectral-truncation or
-		repair-input data for orthonormalization.  The narrowed alias
-	\texttt{MainFormalBaseCompletionObligations} omits the two distinguished outcomes;
-	\texttt{baseProjectiveCompletionObligations\_ofBaseCompletionObligations} fills both with the
-	explicit zero polynomial.  The theorems \texttt{baseProjectiveCompletionResidual} and
-	\texttt{baseProjectiveCompletionResidual\_ofBaseCompletionObligations} turn these obligations
-	(together with the checked base-case role residual from
-	\texttt{MainFormalRolePackageResidual.ofBaseCase}, where the
-	\texttt{params.m = 1} hypothesis is used) into the Step~6 witness residual
-	consumed by the downstream cascade.
+	The base-case role residual \texttt{mainFormalBaseRoleResidual} names the
+	Section~6 base handoff used when $m=1$.  From a line-130 consistency
+	relation, the theorem
+	\texttt{MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty\_ofDiagonalConsistency}
+	constructs the pre-completion projective submeasurements using the Section~5
+	locality-preserving repair construction.  The completion lemma
+	\texttt{MainFormalPostRolePackageDiagonalCompletionInput.nonempty\_ofDiagonalConsistencyAndMatchMassPreservation}
+	then records the exact remaining analytic inputs: completion outcomes and
+	match-mass preservation for the produced projective submeasurements.
 
-		The base-case construction
-		\texttt{mainFormalBaseBranchCompletionObligations\_ofBaseCase} names the remaining obligation for
-		the checked base-case residual \texttt{mainFormalBaseRoleResidual}.  It must
-		construct the match-mass fields in \texttt{MainFormalBaseCompletionObligations}; it is
-		not a license to replace the paper's completion route by diagonal
-	self-consistency assumptions.  The theorem
-	\texttt{mainFormal\_ofProjectiveCompletionResidual} then derives the three
-	consistency conclusions from any constructed Step~6 projective-completion
-	residual for Theorem~\ref{thm:main-formal}.  These are open proof obligations, not
-	additional assumptions in the public statement.
-	\end{definition}
-
-	\begin{remark}[Open base-case Step~6 construction]\label{rem:main-formal-base-step6-open-construction}
-		\lean{MIPStarRE.LDT.Test.mainFormalBaseBranchCompletionObligations_ofBaseCase}
-		The declaration
-		\texttt{mainFormalBaseBranchCompletionObligations\_ofBaseCase} is linked here
-		only as an open internal construction target.  It still contains a tracked
-		\texttt{sorry}, and therefore is not included in the preceding \texttt{\textbackslash leanok}
-		definition block.
-	\end{remark}
+	The remaining proof gap is no longer represented by a universal bundle of
+	match-mass hypotheses.  The paper-facing theorem itself remains unfinished.
+	Once a
+	\texttt{MainFormalCascadeRolePackageResidualProjectiveCompletionResidual} has
+	been constructed from the paper hypotheses, the proved theorem
+	\texttt{mainFormal\_ofProjectiveCompletionResidual} derives the three
+	consistency conclusions for Theorem~\ref{thm:main-formal}.  The residual is a
+	construction target inside the proof, not an additional assumption in the
+	public statement.
+\end{definition}
 
 
 \begin{proposition}[Lean successor handoff for the Section 3 proof]\label{lem:main-formal-successor-handoff}
@@ -528,17 +502,16 @@
 \end{proof}
 
 \begin{remark}[Successor projective-completion construction]\label{rem:main-formal-successor-completion-obligation}
-	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorProjectiveCompletionObligation}
 	\uses{lem:main-formal-successor-handoff, thm:main-formal}
-	The construction named here records the remaining successor-case construction
-	needed after the Section~6 role-register handoff.  Starting from a projective
+	The remaining successor-case proof work is not named as an additional Lean
+	hypothesis of Theorem~\ref{thm:main-formal}.  Starting from a projective
 	strategy that passes the low individual degree test, the large-\(k\) bound
 	\(k \ge 400md\) from Section~6, the positivity condition \(d > 0\), and the
-	non-base condition \(m \neq 1\), it is expected to prove nonemptiness of the
-	projective-completion residual type consumed by the internal-obligation theorem
-	\texttt{mainFormal\_ofInternalObligations}.  It is not an additional hypothesis of
-	Theorem~\ref{thm:main-formal}; it is the open construction that should replace
-	the successor-branch residual currently tracked separately.
+	non-base condition \(m \neq 1\), the proof must construct the
+	projective-completion residual consumed by
+	\texttt{mainFormal\_ofProjectiveCompletionResidual}.  This is part of the
+	unfinished proof of the paper theorem, not a separate assumption in its
+	statement.
 \end{remark}
 
 \begin{remark}[Lean measurement-unsymmetrization bridge]\label{rem:main-formal-unsymmetrization-bridge}
@@ -758,7 +731,7 @@ role-register Section~6 measurement behind a concrete role-residual record.
 Lean now records that every non-base parameter choice has a predecessor via
 \texttt{Parameters.successorDecompositionOfNeOne}, transports the strategy and
 passing proof across that predecessor equality, and records the two role-production
-branches in \texttt{MainFormalRolePackageBranchResidual}: the checked base handoff,
+branches in \texttt{MainFormalRolePackageBranchResidual}: the proved base handoff,
 an ordinary successor branch carrying \texttt{MainFormalSuccessorBoundary}, or
 an answer-valued successor branch carrying
 \texttt{MainFormalSuccessorAnswerBoundary}.  The
@@ -776,14 +749,13 @@ from recursive slice witnesses and answer-side obligations by
 \texttt{MainFormalRolePackageBranchResidual.answerSuccessorOfObligations}, or
 from a predecessor induction package together with the obligations by
 \texttt{MainFormalRolePackageBranchResidual.answerSuccessorOfInductionPackageAndObligations}.
-These constructors are structural and do not call
-\texttt{mainFormal\_ofInternalObligations}; the
-line-130 completion interfaces remain separate.  The live completion residual
+These constructors are structural and do not call the paper-facing theorem
+\texttt{mainFormal}; the line-130 completion interfaces remain separate.  The current completion residual
 carries the concrete role residual rather than a separate decorative branch
 witness; the branch residual types remain the documented base/successor supply
 paths.  Once the role-measurement record is obtained,
 Lean proves the two factor-two unsymmetrization links from
-its symmetrized consistency estimate.  The subsequent checked wrappers use the
+its symmetrized consistency estimate.  The subsequent proved wrappers use the
 proved Section~5 Schwartz--Zippel theorem to convert evaluated pre-projective
 consistency to full-polynomial consistency at $\zeta_1$, prove the paper
 line-116 triangle step, and reconstruct the line-156 $\approx_{\zeta_3}$
@@ -825,10 +797,10 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 	envelope.  The sharper local pre-completion repair from
 	Remark~\ref{rem:lean-line169-projectivization-match-mass} avoids that
 	widening and is part of the match-mass residual route.
-	No proof-level completeness tag is claimed here while
-	\texttt{mainFormal\_ofInternalObligations} still has an open successor-case
-	completion residual and \texttt{mainFormal} derives the paper theorem via a
-	tracked open step (issue~\#1458).
+	No proof-level completeness tag is claimed here while \texttt{mainFormal}
+	itself has a tracked proof gap for constructing the Section~6 role residual
+	and the projective-completion residual from the paper hypotheses
+	(issue~\#1458).
 
 \end{remark}
 \begin{proof}
@@ -903,7 +875,7 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 	\lean{MIPStarRE.LDT.Test.MainFormalStep5ExpansionResidual}
 	\lean{MIPStarRE.LDT.Test.mainFormalStep5_expansionResidual}
 	\lean{MIPStarRE.LDT.Test.mainFormalStep5_selfConsistency_ofExpansionResidual}
-	formalizes this expansion/reindexing step and combines it with the checked
+	formalizes this expansion/reindexing step and combines it with the proved
 	Schwartz--Zippel tensor bound
 	\lean{MIPStarRE.LDT.Preliminaries.polynomialCollisionMass_le_mdq}.
 

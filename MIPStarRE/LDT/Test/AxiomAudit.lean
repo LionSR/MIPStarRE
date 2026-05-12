@@ -24,12 +24,12 @@ derivation for `thm:self-improvement`: the statement corresponding to the
 blueprint theorem is present, and the missing derivation from the incoming
 consistency hypothesis is tracked by issue #1515.
 
-The audits for the `Test.mainFormal` proof frontier record the current tracked
-gaps separately: issue #1043 for the base-case match-mass completion data,
-issues #1363 and #1369 for the successor projective-completion residual, and
-issue #1458 as the umbrella tracking issue.  These obligations are isolated as
-named statements rather than assumed in the public statement of the paper
-theorem.
+The audit for `Test.mainFormal` records the current tracked proof gap directly:
+the paper-facing statement has no bridge, residual, repair, package, or
+obligation hypotheses, and its proof is still admitted.  Issue #1043 tracks the
+base-case projective-completion construction, issues #1363 and #1369 track the
+successor projective-completion construction, and issue #1458 is the umbrella
+tracking issue.
 
 The audit for `GlobalVariance.globalVarianceOfPoints` now requires the standard
 Lean axioms only: the issue-#1456 six-step local transport estimate is supplied
@@ -81,19 +81,8 @@ private def expectedStandardAxioms : Array Name :=
 private def expectedStandardAxiomsWithSorry : Array Name :=
   #[``propext, ``Classical.choice, ``Quot.sound, ``sorryAx].qsort Name.lt
 
-/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1043 base-case
-match-mass completion obligation for the `mainFormal` proof frontier. -/
-private def expectedMainFormalBaseAxioms : Array Name :=
-  expectedStandardAxiomsWithSorry
-
-/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1363/#1369
-successor projective-completion obligation for the `mainFormal` proof frontier. -/
-private def expectedMainFormalSuccessorAxioms : Array Name :=
-  expectedStandardAxiomsWithSorry
-
-/-- Standard kernel axioms plus `sorryAx`; tracks the paper-facing
-`mainFormal` assembly depending on the issue #1043 and #1363/#1369
-obligations, with issue #1458 as the umbrella tracker. -/
+/-- Standard kernel axioms plus `sorryAx`; tracks the paper-facing `mainFormal`
+proof gap for issues #1043, #1363, #1369, and #1458. -/
 private def expectedMainFormalAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
@@ -141,12 +130,6 @@ private def assertUsesOnlyStandardAxioms (declName : Name) : CommandElabM Unit :
 elab "assert_standard_axioms " id:ident : command => do
   assertUsesOnlyStandardAxioms id.getId
 
-elab "assert_main_formal_base_axioms " id:ident : command => do
-  assertUsesExactlyAxioms id.getId expectedMainFormalBaseAxioms
-
-elab "assert_main_formal_successor_axioms " id:ident : command => do
-  assertUsesExactlyAxioms id.getId expectedMainFormalSuccessorAxioms
-
 elab "assert_main_formal_axioms " id:ident : command => do
   assertUsesExactlyAxioms id.getId expectedMainFormalAxioms
 
@@ -172,11 +155,6 @@ assert_standard_axioms MIPStarRE.LDT.Test.razSafra
 assert_standard_axioms MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement
 assert_standard_axioms MIPStarRE.LDT.Test.classicalTestSoundness
 assert_standard_axioms MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization
-assert_main_formal_base_axioms
-  MIPStarRE.LDT.Test.mainFormalBaseBranchCompletionObligations_ofBaseCase
-assert_main_formal_successor_axioms
-  MIPStarRE.LDT.Test.mainFormalSuccessorProjectiveCompletionObligation
-assert_main_formal_axioms MIPStarRE.LDT.Test.mainFormal_ofInternalObligations
 assert_main_formal_axioms MIPStarRE.LDT.Test.mainFormal
 assert_self_improvement_axioms MIPStarRE.LDT.SelfImprovement.selfImprovement
 assert_standard_axioms MIPStarRE.LDT.GlobalVariance.globalVarianceOfPoints

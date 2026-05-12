@@ -78,7 +78,7 @@ are being actively removed.
    temporary `sorry` in this declaration is preferable to adding the obligation as
    a hypothesis on the paper theorem.
 4. **Use conditional helpers only as quarantine.**  A helper such as
-   `mainFormal_ofInternalObligations` or `selfImprovementFromObligations`
+   `mainFormal_ofProjectiveCompletionResidual` or `selfImprovementFromObligations`
    is allowed only to preserve downstream proof content while the missing
    obligation discharger is being proved.  It must have a conditional name, a tracked
    removal target, and no source-labelled blueprint `\leanok`.  The
@@ -150,18 +150,20 @@ statement.
 
 4. **Final closure at the source theorem.**  The theorem `mainFormal` in
    `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` is reserved for the
-   paper-shaped statement.  The top-level assembly theorem
-   `mainFormal_ofInternalObligations` has the same public hypotheses and
-   conclusion; the remaining work is isolated in internal obligation declarations
-   such as `mainFormalBaseBranchCompletionObligations_ofBaseCase` and
-   `mainFormalSuccessorProjectiveCompletionObligation`, rather than
-   assumed as theorem parameters.
+   paper-shaped statement.  If the residual needed by the final transport has
+   not yet been constructed from the paper hypotheses, the theorem should remain
+   an explicit unfinished proof.  Do not replace the missing construction by
+   extra bridge, residual, repair, package, or obligation hypotheses, and do not
+   proliferate named obligation declarations merely to avoid a direct `sorry`.
 
    The paper-labelled `mainFormal` should have the hypotheses of the paper
    theorem: a projective strategy passing the low individual degree test, the
    stated parameter bounds, and the faithful formalization of the ambient
    domains.  Bridge, residual, repair, and proof-obligation inputs must be
-   produced inside its proof rather than added to its statement.
+   produced inside its proof rather than added to its statement.  Reusable proof
+   content may remain in a plainly conditional helper, such as
+   `mainFormal_ofProjectiveCompletionResidual`, whose statement displays the
+   residual it assumes.
 
 ### Existing bridge-like declarations
 
@@ -175,33 +177,36 @@ When such a declaration remains useful, its role should be one of the following:
 | `SelfImprovement.FinalFieldsInput` | Conditional input for final Section 9 estimates; replace at the paper theorem boundary by source-faithful statements or named internal proof obligations |
 | `SelfImprovement.HelperStrongSelfConsistencyInput` | Conditional input for helper strong self-consistency estimates; keep tracked until produced |
 | `SelfImprovement.SelfImprovementObligations` | Historical bundle of the preceding inputs; do not introduce as a hypothesis on a paper-labelled theorem |
-| `MainFormalBaseCompletionObligations` | Base-case assembly obligations; do not expose on `mainFormal`, which is reserved for `thm:main-formal` |
-| `MainFormalBaseProjectiveCompletionObligations` | Completion obligations; do not move them into a paper-facing theorem statement |
+| `mainFormal_ofProjectiveCompletionResidual` | Conditional final-transport theorem; keep as reusable proof content, but do not present it as the paper theorem |
 | `MainFormalPostRolePackageDiagonalOrthonormalizationResidual` | Internal residual produced from line-130 cross consistency; do not replace it by an orthonormalization-input hypothesis on `mainFormal` |
 | `MakingMeasurementsProjective.OrthonormalizationInput` | Conditional input for the orthonormalization proof; keep visibly distinct from source-faithful paper statements |
 | `LdPastingContext` | Faithfulness-sensitive context for `ldPasting`; audit each field against the Section 12 hypotheses and boundary conditions |
 
 ### The remaining proof obligations in `MainFormal.lean`
 
-The direct tracked `sorry` sites in `MainFormal.lean` record two remaining
-construction obligations:
+The direct tracked `sorry` in `MainFormal.lean` records the remaining
+construction obligation for the paper theorem.  The proof must construct, from
+the hypotheses of `thm:main-formal`, the Section 6 role residual and the
+projective-completion residual consumed by
+`mainFormal_ofProjectiveCompletionResidual`.  This includes:
 
 1. The successor projective-completion obligation.  It must construct the
    predecessor/successor role residual, obtain the line-130 orthonormalization
    residual from cross consistency, and supply the completion data used after
    `completingToMeasurement`.
-2. The base-case match-mass completion obligation, whose target is
-   `MainFormalBaseBranchCompletionObligations` for the checked base-case role
-   residual.
+2. The base-case projective-completion residual obligation, whose target is the
+   direct `Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
+   ...)` needed by the final transport.
 
 These are data-construction obligations.  Once the per-slice self-improvement
 proof obligations and recursive induction data are threaded through, the
-paper-labelled theorem should call the internal-obligation assembly without
-adding obligations to the theorem statement.
+paper-labelled theorem should construct the residual and call
+`mainFormal_ofProjectiveCompletionResidual`, without adding obligations to the
+theorem statement.
 
 This is the intended cleanup direction: use the conditional helper only to
-identify reusable proof content, then prove the internal obligations or restore the
-paper-aligned theorem with the remaining obligation visible.
+identify reusable proof content, then prove the residual construction or keep
+the paper-aligned theorem with the remaining proof gap visible.
 
 ### Distinction from anti-patterns
 

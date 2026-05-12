@@ -400,11 +400,12 @@ hypothesis holes.
 **Unfaithful:** as a supplied boundary this structure contains recursive
 slice witnesses and a self-improvement obligation that are not hypotheses of
 `thm:main-formal` (`references/ldt-paper/test_definition.tex:180-202`).  They
-must be produced inside `mainFormalSuccessorProjectiveCompletionObligation`,
-using the successor proof of `thm:main-induction`
+must be produced inside the proof of `mainFormal`, using the successor proof of
+`thm:main-induction`
 (`references/ldt-paper/inductive_step.tex:441-551`).  This is tracked by
 #1035, #1036, #1363, and #1458.  Elimination: prove the recursive-slice and
-self-improvement fields internally before invoking this boundary record. -/
+self-improvement fields before using this boundary record in the successor
+branch of `mainFormal`. -/
 structure MainFormalSuccessorBoundary (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -457,9 +458,9 @@ Section 6 weighted-bound lemmas.
 and self-improvement obligation rather than deriving them from
 `references/ldt-paper/test_definition.tex:180-202` and
 `references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by #1035,
-#1036, #1363, and #1458.  Elimination: construct these inputs inside
-`mainFormalSuccessorProjectiveCompletionObligation` and use this constructor
-only after the inputs have been proved. -/
+#1036, #1363, and #1458.  Elimination: construct these inputs inside the
+successor branch of `mainFormal` and use this constructor only after the inputs
+have been proved. -/
 def mainFormalSuccessorBoundary_ofRecursiveSelfImprovement
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

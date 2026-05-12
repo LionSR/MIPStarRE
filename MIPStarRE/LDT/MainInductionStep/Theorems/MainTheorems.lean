@@ -181,38 +181,6 @@ theorem mainInductionBaseCase
     mainInductionOfWitness params strategy eps delta gamma k
       ⟨strategy.axisParallelFailureProbability, G, hconsG, herror_le⟩
 
-/-- Successor-branch obligation for the source-facing main induction theorem.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, the non-base
-case of `\label{thm:main-induction}`.  The checked conditional assembly is
-`mainInductionPublicWrapper`, which additionally requires restricted weighted
-probability bounds, recursive slice witnesses, self-improvement outputs for the
-restricted slices, and the stronger `400md ≤ k` pasting side condition.
-
-This declaration is not a paper theorem and should not be linked as
-`\label{thm:main-induction}`.  It is the named proof obligation that remains
-after the already-proved base case has been separated from the public theorem.
-Tracked by #1507 and #1458. -/
-theorem mainInductionSuccessorObligation
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta gamma : Error)
-    (k : ℕ)
-    (hgood : strategy.IsGood eps delta gamma)
-    (hk : params.m * params.d ≤ k)
-    (hm_ne_one : params.m ≠ 1) :
-    ∃ G : Measurement (Polynomial params) ι,
-      ConsRel strategy.state (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params G.toSubMeas)
-        (mainInductionError params k eps delta gamma) := by
-  -- TODO(#1507, #1458): derive the restricted weighted bounds, recursive
-  -- slice witnesses, slice-wise self-improvement outputs, and the checked
-  -- pasting side condition from the paper hypotheses.  These inputs belong
-  -- inside the proof, not as hypotheses of `mainInduction`.
-  sorry
-
 /-- `thm:main-induction`.
 
 This is the source-facing statement from
@@ -220,17 +188,17 @@ This is the source-facing statement from
 integer `k ≥ m d` produce a polynomial measurement consistent with the point
 measurement at error `mainInductionError`.
 
-The checked successor-step assembly below currently uses the stronger auxiliary
-side condition `400 * m * d ≤ k` and explicit proof-stage data. Those are
+The proved successor-step assembly below currently uses the stronger auxiliary
+side condition `400 * m * d ≤ k` and explicit proof-stage data. These are
 internal proof obligations, not hypotheses of this theorem.
 
-**Unfaithful:** the public statement is source-shaped, but the non-base branch
-still depends on the admitted obligation
-`mainInductionSuccessorObligation`.  This obligation is tracked by #1507 and
-#1458 and must be proved from the paper hypotheses rather than added to the
-theorem statement.  Elimination: prove `mainInductionSuccessorObligation` from
-the hypotheses of `thm:main-induction`, including the paper successor-case
-construction. -/
+**Proof gap:** the base case is proved by `mainInductionBaseCase`. The
+successor case, corresponding to
+`references/ldt-paper/inductive_step.tex:441-551`, remains to be proved from
+the paper hypotheses. This gap is tracked by #1507 and #1458.  The proof should
+derive the restricted probability estimates, recursive slice witnesses,
+slice-wise self-improvement outputs, and pasting side condition internally,
+rather than adding any of them to the theorem statement. -/
 theorem mainInduction
     (params : Parameters)
     [FieldModel params.q]
@@ -246,7 +214,11 @@ theorem mainInduction
         (mainInductionError params k eps delta gamma) := by
   by_cases hm1 : params.m = 1
   · exact mainInductionBaseCase params strategy eps delta gamma k hm1 hgood
-  · exact mainInductionSuccessorObligation params strategy eps delta gamma k hgood hk hm1
+  · -- TODO(#1507, #1458): prove the successor branch of
+    -- `thm:main-induction` from the paper hypotheses.  The conditional
+    -- assembly theorems below record useful proof content, but their inputs
+    -- must be derived here rather than added as assumptions.
+    sorry
 
 /-- Successor-step recursion entry point for the main-induction conclusion.
 
@@ -269,10 +241,10 @@ as tracked by #1507, #1503, and #1458.
 `hrestrict`, `hrec`, and `hselfObligation`, including the slice-wise
 self-improvement package that is not derived here from the hypotheses of
 `thm:main-induction` (`references/ldt-paper/inductive_step.tex:441-551`).
-This is tracked by #1507, #1503, and #1458.  Elimination: prove
-`mainInductionSuccessorObligation` from the hypotheses of `thm:main-induction`,
-deriving the restricted probabilities, recursive slice witnesses, and
-self-improvement packages internally. -/
+This is tracked by #1507, #1503, and #1458.  Elimination: prove the successor
+branch of `thm:main-induction` from the paper hypotheses, deriving the
+restricted probabilities, recursive slice witnesses, and self-improvement
+packages internally. -/
 theorem mainInductionByRecursionOnM
     (params : Parameters)
     [FieldModel.{0} params.q]
@@ -394,9 +366,9 @@ witness needed downstream by `MIPStarRE.LDT.Test.MainTheorem`.
 `haxisWeightedBound`, `hdiagonalWeightedBound`, `hrec`, and `hselfObligation`
 instead of deriving them from the successor case of `thm:main-induction`
 (`references/ldt-paper/inductive_step.tex:441-551`).  This is tracked by
-#1507, #1503, and #1458.  Elimination: prove
-`mainInductionSuccessorObligation` from the paper hypotheses and use this
-wrapper only as the internal assembly step. -/
+#1507, #1503, and #1458.  Elimination: prove the successor branch of
+`thm:main-induction` from the paper hypotheses and use this wrapper only as the
+internal assembly step. -/
 theorem mainInductionPublicWrapper
     (params : Parameters)
     [FieldModel.{0} params.q]
@@ -471,7 +443,7 @@ theorem mainInductionPublicWrapper
 
 This theorem keeps the paper-facing restricted strategy interface
 `xRestrictedAnswerSymStrat`, then explicitly forgets that extra diagonal
-answer structure to reuse the checked legacy assembly.
+answer structure to reuse the proved legacy assembly.
 
 **Unfaithful:** this conditional assembly assumes the answer-valued proof-stage
 inputs `hrestrict`, `hrec`, and `hselfObligation`, including slice-wise
