@@ -508,7 +508,6 @@ theorem orthonormalization {Outcome : Type*}
   constructor
   simpa [sddError, avgOver, uniformDistribution, constSubMeasFamily] using
     (le_trans hPsomeq hcoeff)
-
 /-- Orthonormalization with the residual-domination invariant needed for the
 monotone-total self-improvement route.
 

@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.LayerAlgebra
-import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
+import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization.RestrictSome
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 
 /-!
