@@ -266,7 +266,15 @@ This is not the statement corresponding to `thm:self-improvement` in the
 blueprint. It assumes the helper strong self-consistency input, the
 orthonormalization input, and the final-fields input explicitly. The
 evaluation-map data-processing step follows from the question-dependent
-preliminaries theorem. -/
+preliminaries theorem.
+
+**Unfaithful:** this helper assumes the explicit hypotheses
+`hhelperStrongSelfConsistency : HelperStrongSelfConsistencyInput`,
+`horthonormalization : OrthonormalizationInput`, and
+`hfinalFields : FinalFieldsInput`, which are not derived from the hypotheses of
+`thm:self-improvement`.  This proof debt is tracked by #1515.  Elimination:
+prove the source-facing `selfImprovement` theorem from the paper hypotheses,
+discharging these three inputs internally. -/
 theorem selfImprovement_assumingFinalFields
     (params : Parameters)
     [FieldModel params.q]
