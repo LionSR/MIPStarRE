@@ -713,7 +713,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>  The source-facing Lean declaration for Theorem&#160;<a href="sec-induction.html#thm:self-improvement-in-induction-section">10.6</a> has the paper hypotheses. Its proof is still open. The auxiliary declaration displayed in this remark is the older measurement-input assembly: it assumes the Section&#160;<a href="chap-self-improvement.html">7</a> helper self-consistency, orthonormalization, and final-field proof stages, and it assumes that the input submeasurement is the underlying submeasurement of a complete measurement. These are proof-stage inputs, not hypotheses of the paper theorem. </p>
+  <p>  The source-facing Lean declaration for Theorem&#160;<a href="sec-induction.html#thm:self-improvement-in-induction-section">10.6</a> has the paper hypotheses. Its proof is still open. The ordinary and answer-valued slice-package constructors now use <span class="ttfamily">selfImprovementInInductionSection_ofObligations</span>: this helper completes the input submeasurement internally and assumes only the remaining Section&#160;<a href="chap-self-improvement.html">7</a> proof obligations. No complete-measurement bridge is exposed as a Lean helper for downstream package assembly. </p>
 
   </div>
 </div>
@@ -914,7 +914,7 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>      The successor step records the slice-wise self-improvement output in <span class="ttfamily">SelfImprovementPackage</span>, and the answer-valued route records the analogous output in <span class="ttfamily">AnswerSelfImprovementPackage</span>. The Lean-only <span class="ttfamily">SliceObligations</span> structures are narrow formal interfaces: they assume honest per-slice symmetric strategies and Section&#160;<a href="chap-self-improvement.html">7</a> obligations, while averaged point-operator compatibility is derived structurally from point-measurement transport. They then convert the remaining data into the ordinary or answer-valued self-improvement package. </p>
+  <p>       The successor step records the slice-wise self-improvement output in <span class="ttfamily">SelfImprovementPackage</span>, and the answer-valued route records the analogous output in <span class="ttfamily">AnswerSelfImprovementPackage</span>. The Lean-only <span class="ttfamily">selfImprovementInInductionSection_ofObligations</span> completes the input submeasurement internally at a distinguished polynomial outcome, so the ordinary route no longer needs a separate measurement-completion bridge. It is still conditional on the Section&#160;<a href="chap-self-improvement.html">7</a> obligations. The <span class="ttfamily">SliceObligations</span> structures are narrow formal interfaces: they assume honest per-slice symmetric strategies and Section&#160;<a href="chap-self-improvement.html">7</a> obligations, while averaged point-operator compatibility is derived structurally from point-measurement transport. They then convert the remaining data into the ordinary or answer-valued self-improvement package. </p>
 
   </div>
 </div>
@@ -1861,7 +1861,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>   The construction named here records the remaining successor-case construction needed after the Section&#160;6 role-register handoff. Starting from a projective strategy that passes the low individual degree test, the large-\(k\) bound \(k \ge 400md\) from Section&#160;6, the positivity condition \(d {\gt} 0\), and the non-base condition \(m \neq 1\), it is expected to produce the projective-completion residual consumed by the internal-obligation theorem <span class="ttfamily">mainFormal_ofInternalObligations</span>. It is not an additional hypothesis of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>; it is the open construction that should replace the successor-branch residual currently tracked separately. </p>
+  <p>   The construction named here records the remaining successor-case construction needed after the Section&#160;6 role-register handoff. Starting from a projective strategy that passes the low individual degree test, the large-\(k\) bound \(k \ge 400md\) from Section&#160;6, the positivity condition \(d {\gt} 0\), and the non-base condition \(m \neq 1\), it is expected to prove nonemptiness of the projective-completion residual type consumed by the internal-obligation theorem <span class="ttfamily">mainFormal_ofInternalObligations</span>. It is not an additional hypothesis of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>; it is the open construction that should replace the successor-branch residual currently tracked separately. </p>
 
   </div>
 </div>
