@@ -5,7 +5,7 @@ import MIPStarRE.LDT.Test.MainTheorem.ClassicalAndBase
 
 This module contains the ordinary successor-route input types, obligation
 constructors, and the successor boundary record used by the Section 6 main
-theorem wrapper.
+theorem interface.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -19,7 +19,7 @@ namespace Test
 The declarations in this section form the **ordinary successor route**, which
 uses `xRestrictedStrategy` (ordinary diagonal restriction) as the per-slice
 recursive strategy.  This route is kept as a compatibility interface: it
-provides `MainFormalSuccessorBoundary` and the associated wrappers, which feed
+provides `MainFormalSuccessorBoundary` and the associated helper declarations, which feed
 into the `MainFormalRolePackageBranchResidual.successor` constructor.
 
 **Note:** `xRestrictedStrategy` uses `restrictDiagonalMeasurement`, which
@@ -80,7 +80,7 @@ noncomputable def mainFormalSuccessorRestrictionPackage
     haxisWeightedBound hdiagonalWeightedBound
 
 /-- Successor-case recursive slice witnesses expected by the public Section 6
-boundary wrapper. -/
+boundary interface. -/
 def MainFormalSuccessorRecursiveSlices (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -109,7 +109,7 @@ def MainFormalSuccessorRecursiveSlices (params : Parameters)
 /-- A Section 6 per-slice induction record supplies the recursive slice
 witnesses needed by the `mainFormal` successor boundary.
 
-This constructor is only an adapter: the caller must still provide the
+This constructor is only a translation: the proof must still provide the
 `PerSliceInductionPackage` from a genuine predecessor induction hypothesis. It
 does not invoke the public `mainFormal` theorem. -/
 theorem mainFormalSuccessorRecursiveSlices_ofInductionPackage
@@ -278,8 +278,8 @@ these are not derived here from `references/ldt-paper/self_improvement.tex:628-7
 or the successor induction proof in
 `references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by #1036,
 #1514, #1515, #1503, and #1458.  Elimination: discharge the Section 9
-obligations for the restricted slices and use this declaration only as the
-structural assembly of those proved inputs. -/
+obligations for the restricted slices and use this declaration only to combine
+those proved inputs. -/
 noncomputable def mainFormalSuccessorSelfImprovementObligations_ofOrthonormalizationRepair
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -351,7 +351,7 @@ noncomputable def mainFormalSuccessorSelfImprovementObligations_ofOrthonormaliza
 /-- Convert successor-case obligations into the self-improvement obligation
 expected by the public Section 6 boundary.
 
-This does not discharge the obligation fields; it only assembles them into the
+This does not discharge the obligation fields; it only combines them into the
 existing `MainFormalSuccessorSelfImprovementObligation` API.
 
 **Unfaithful:** this helper consumes
@@ -359,7 +359,7 @@ existing `MainFormalSuccessorSelfImprovementObligation` API.
 fields are not derived from the cited successor proof
 (`references/ldt-paper/inductive_step.tex:441-551`).  This is tracked by
 #1036, #1503, #1515, and #1458.  Elimination: prove those obligations from the
-paper hypotheses and retain this as a bookkeeping conversion. -/
+paper hypotheses and retain this as a technical conversion. -/
 noncomputable def mainFormalSuccessorSelfImprovementObligation_ofObligations
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -386,7 +386,7 @@ noncomputable def mainFormalSuccessorSelfImprovementObligation_ofObligations
 
 Assume the ambient projective strategy lives over `params.next`. Step 1 already
 turns `hpass` into the `(3 * eps, 3 * eps, 3 * eps)`-good role-register
-symmetrization `strategy.strategySymmetrization`. The public Section 6 wrapper
+symmetrization `strategy.strategySymmetrization`. The public Section 6 interface
 expects:
 1. weighted restricted-axis and restricted-diagonal bounds,
 2. recursive slice witnesses for the restricted strategies, and
@@ -397,7 +397,7 @@ all fields into a single named structure still gives the successor branch of
 `mainFormal` one honest issue-#634 interface, rather than four independent
 hypothesis holes.
 
-**Unfaithful:** as a caller-supplied boundary this structure contains recursive
+**Unfaithful:** as a supplied boundary this structure contains recursive
 slice witnesses and a self-improvement obligation that are not hypotheses of
 `thm:main-formal` (`references/ldt-paper/test_definition.tex:180-202`).  They
 must be produced inside `mainFormalSuccessorProjectiveCompletionObligation`,
