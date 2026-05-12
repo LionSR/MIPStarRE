@@ -459,7 +459,7 @@ After first separating off the saturated-error branch, the checked role-package
 infrastructure now exposes the base-case input construction, an ordinary
 successor construction, and an answer-valued successor construction:
 
-* the base handoff `strategySymmetrization_mainInductionBaseCase`, packaged as
+* the base handoff `strategySymmetrization_mainInductionBaseCase`, recorded as
   `MainFormalRolePackageBranchResidual.base`, and
 * the predecessor/successor handoff
   `MainFormalRolePackageBranchResidual.successor`, which carries a bundled
@@ -542,7 +542,7 @@ theorem mainFormal_ofInternalObligations
   --
   -- The remaining base and successor obligations are internal declarations,
   -- not additional hypotheses of the paper theorem.  The self-improvement
-  -- assumptions are packaged as `SelfImprovement.SelfImprovementObligations`.
+  -- assumptions are collected in `SelfImprovement.SelfImprovementObligations`.
   -- The remaining `mainFormal_ofInternalObligations` proof still needs:
   --
   -- 1. **Section 6 role residual** via base/successor branch:
@@ -550,7 +550,7 @@ theorem mainFormal_ofInternalObligations
   --      `base` (if `params.m = 1`), `successor`, or the answer-valued
   --      `answerSuccessor`,
   --    - ordinary or answer-valued recursive induction witnesses,
-  --    - ordinary or answer-valued per-slice self-improvement package obligations.
+  --    - ordinary or answer-valued per-slice self-improvement obligations.
   --
   -- 2. **Line-130 orthonormalization inputs**:
   --    - `MainFormalPostRolePackageDiagonalOrthonormalizationInput`:

@@ -695,7 +695,7 @@
 \end{theorem}
 \begin{proof}
 	\leanok
-	This is the direct packaging of Theorem~\ref{thm:sigma-bound-main-formal} and Theorem~\ref{thm:zeta-bounds-main-formal}. The Lean declaration uses the explicit equalities naming $\sigma,\zeta_1,\zeta_2,\zeta_3$ as the corresponding cascade expressions.
+	This is the direct combination of Theorem~\ref{thm:sigma-bound-main-formal} and Theorem~\ref{thm:zeta-bounds-main-formal}. The Lean declaration uses the explicit equalities naming $\sigma,\zeta_1,\zeta_2,\zeta_3$ as the corresponding cascade expressions.
 \end{proof}
 
 \begin{remark}[Lean Step 5 expansion theorem]\label{rem:main-formal-step5-sz-residual}
@@ -714,7 +714,7 @@
 	takes the expansion statement as an external hypothesis.
 \end{remark}
 
-\begin{remark}[Lean residual packages for the main-formal assembly]\label{rem:main-formal-lean-residual-packages}
+\begin{remark}[Lean residual structures for the main-formal assembly]\label{rem:main-formal-lean-residual-packages}
 \uses{thm:error-cascade-main-formal, thm:main-formal-envelope-basics}
 The following Lean declarations are bookkeeping infrastructure for the final
 assembly residual:
@@ -764,15 +764,15 @@ derive the Step~8 scalar hypotheses in the non-vacuous branch, and isolate the
 role-register Section~6 measurement behind a concrete role-package residual.
 Lean now records that every non-base parameter bundle has a predecessor via
 \texttt{Parameters.successorDecompositionOfNeOne}, transports the strategy and
-passing proof across that predecessor equality, and packages the two role-production
-branches as \texttt{MainFormalRolePackageBranchResidual}: the checked base handoff,
+passing proof across that predecessor equality, and records the two role-production
+branches in \texttt{MainFormalRolePackageBranchResidual}: the checked base handoff,
 an ordinary successor branch carrying \texttt{MainFormalSuccessorBoundary}, or
 an answer-valued successor branch carrying
 \texttt{MainFormalSuccessorAnswerBoundary}.  The
 public large-$k$ hypothesis supplies the Section~6 side condition
 $400m_{\mathrm{pred}}d\le k$; the remaining role work is the
-successor-boundary package, the completion handoff, and the line-169 transport
-data.  The ordinary successor-boundary package can now be assembled from
+successor-boundary data, the completion handoff, and the line-169 transport
+data.  The ordinary successor-boundary structure can now be assembled from
 recursive slice witnesses and self-improvement obligations by
 \texttt{MainFormalRolePackageBranchResidual.successorOfObligations}; the
 answer-valued successor branch records the parallel routes.  It can be assembled
@@ -978,7 +978,7 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 	\end{equation}
 
 	Remark~\ref{rem:main-formal-lean-residual-packages} records the Lean residual
-	packages that separate the scalar cascade and the Step~5 Schwartz--Zippel
+	structures that separate the scalar cascade and the Step~5 Schwartz--Zippel
 	handoff from the remaining projective-stage transport work.  The scalar side
 	discharges the paper's line~71--73 coarsening and the Step~8 hypotheses in the
 	non-vacuous branch; the Step~5 wrapper now turns the evaluated estimate at
@@ -992,7 +992,7 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 	line-169 links to line~172 and derives the two $\zeta_4$ point goals and the
 	$\zeta_3/2$ self-consistency target.
 
-	With $E$ as in Definition~\ref{def:main-formal-envelope}, the quantities $\sigma,\zeta_1,\zeta_2,\zeta_3,\zeta_4$ form the cascade of Definition~\ref{def:main-formal-error-cascade}. Theorem~\ref{thm:sigma-bound-main-formal} and Theorem~\ref{thm:zeta-bounds-main-formal} package the final inflation to the scale $100000k^2m^4 E$. The underlying estimates, with the formal widened $\zeta_2$, are:
+	With $E$ as in Definition~\ref{def:main-formal-envelope}, the quantities $\sigma,\zeta_1,\zeta_2,\zeta_3,\zeta_4$ form the cascade of Definition~\ref{def:main-formal-error-cascade}. Theorem~\ref{thm:sigma-bound-main-formal} and Theorem~\ref{thm:zeta-bounds-main-formal} give the final inflation to the scale $100000k^2m^4 E$. The underlying estimates, with the formal widened $\zeta_2$, are:
 	\[
 		\sigma \le 10000k^2m^4\left(\eps^{1/1024}+(d/q)^{1/1024}+e^{-k/(80000m^2)}\right).
 	\]

@@ -9,7 +9,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationBridge
 # Orthonormalization and completion data
 
 Post-role projectivization and orthonormalization hypotheses for the
-`mainFormal` assembly.  This module packages the data that the
+`mainFormal` assembly.  This module records the data that the
 orthonormalization lemma (`lem:orthonormalization-main-lemma`) and the
 completion theorem (`prop:completing-to-measurement`) require beyond the
 role-register measurement and the unsymmetrization links.  The central
@@ -180,8 +180,8 @@ theorem `spectralTruncationInput_of_sourceAlmostProjective`, applied to the two
 unsymmetrized role measurements after left tensor placement.  Callers that use
 this constructor therefore supply only the Alice- and Bob-side repair steps,
 which preserve the local form of the repaired projective submeasurements.  The
-existing bridge structures still accept a full orthonormalization input; routing
-those bridges through this constructor is a separate assembly step. -/
+existing obligation structures still accept a full orthonormalization input;
+routing those structures through this constructor is a separate assembly step. -/
 noncomputable def ofRepairInputs
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -257,10 +257,10 @@ noncomputable def ofQXPLayerRepairWitnesses
 This is a more concrete form of `ofQXPLayerRepairWitnesses`: each side supplies
 a QXP layer whose `q` family is the corresponding unsymmetrized POVM, together
 with the lifted state-dependent approximation to the associated `P` family.
-The constructor packages these approximations as locality-preserving repair
+The constructor turns these approximations into locality-preserving repair
 inputs for the Alice and Bob unsymmetrized measurements.  It supplies the same
-line-130 input package as `ofRepairInputs`; the later bridge structures still
-consume an already assembled orthonormalization input. -/
+line-130 input structure as `ofRepairInputs`; the later obligation structures
+still consume an already assembled orthonormalization input. -/
 noncomputable def ofLiftedQXPApproximations
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -502,10 +502,10 @@ structure MainFormalPostRolePackageDiagonalCompletionResidual
 
 namespace MainFormalPostRolePackageProjectiveCompletionResidual
 
-/-- Build the fixed Step 6 witness package from a line-130 orthonormalization
+/-- Build the fixed Step 6 witness data from a line-130 orthonormalization
 residual plus the still-external completion estimates.
 
-This constructor is the honest bridge from the new cross-consistency
+This constructor is the honest passage from the new cross-consistency
 orthonormalization wrapper to the existing orthonormalize-and-complete residual:
 the projective submeasurements and their line-138 closeness now come from
 `ConsRel G^A G^B ζ₁`; only the completion-to-measurement closeness and
