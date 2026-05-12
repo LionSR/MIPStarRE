@@ -496,7 +496,8 @@ theorem final_fields_projective_residual_error_le_selfImprovementError_of_small_
   have hdata_nonneg : 0 ≤ selfImprovementDataProcessingError params eps delta := by
     have hhelper_nonneg : 0 ≤ selfImprovementHelperError params eps delta :=
       selfImprovementHelperError_nonneg params eps delta
-    have horth_sqrt_nonneg : 0 ≤ Real.sqrt (selfImprovementOrthogonalizationError params eps delta) :=
+    have horth_sqrt_nonneg :
+        0 ≤ Real.sqrt (selfImprovementOrthogonalizationError params eps delta) :=
       Real.sqrt_nonneg _
     rw [selfImprovementDataProcessingError_eq]
     nlinarith
