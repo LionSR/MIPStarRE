@@ -547,7 +547,7 @@
 <div class="displaymath" id="a0000000315">
   \[  \sum _h \langle \psi  \rvert  H_h \otimes H_h \lvert \psi  \rangle  \ge \sum _h \langle \psi  \rvert  H_h \otimes I \lvert \psi  \rangle  - 11 \sqrt{\zeta _{\mathrm{variance}}} - \sqrt{2\delta } - \frac{md}{q}.  \]
 </div>
-<p> The Lean producer-side packaging of this step starts with the input structure  and the exact residual-side expansion          and then uses the proved wrappers     to recover the final helper-stage self-consistency input. The corresponding bridge-package constructor is . The paper’s arithmetic shows that the right-hand error is at most  </p>
+<p> The Lean formalization records this step as a named proof obligation, starting with the input structure  and the exact residual-side expansion          and then uses the proved wrappers     to recover the final helper-stage self-consistency input. The corresponding obligation constructor is . The paper’s arithmetic shows that the right-hand error is at most  </p>
 <div class="displaymath" id="a0000000316">
   \[  57m\cdot \Big(\varepsilon ^{1/2} + \delta ^{1/2} + (d/q)^{1/2}\Big) \le \zeta ,  \]
 </div>
@@ -620,7 +620,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>        The formalization also records a strengthened helper theorem whose output carries the complementary-slackness equations used in the completeness chain, together with the residual-domination bridge that assembles the full self-improvement conclusion from the slackness-carrying helper. An intermediate assembly route routes a QXP repair producer plus the construction-level coisometry identity through the same bridge. These theorems use the Section&#160;9 statement above. Their proofs are not yet complete, because the strong-duality proof for the SDP remains to be formalized. </p>
+  <p>        The formalization also records a strengthened helper theorem whose output carries the complementary-slackness equations used in the completeness chain, together with the residual-domination bridge that assembles the full self-improvement conclusion from the slackness-carrying helper. An intermediate assembly route uses a QXP repair obligation plus the construction-level coisometry identity through the same bridge. These theorems use the Section&#160;9 statement above. Their proofs are not yet complete, because the strong-duality proof for the SDP remains to be formalized. </p>
 
   </div>
 </div>
