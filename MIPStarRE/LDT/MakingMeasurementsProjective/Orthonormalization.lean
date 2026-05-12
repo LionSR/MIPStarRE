@@ -332,7 +332,8 @@ lemma orthonormalizationMeasurement_of_consistency {Outcome : Type*}
     (Orthonormalization.ErrorBounds.orthonormalizationMainLemmaError_le_orthonormalizationError
       ζ hζ)⟩
 
--- Keep explicit decidability to match the neighboring measurement-level API.
+-- `[DecidableEq Outcome]` is retained for API consistency with neighboring
+-- measurement-level lemmas; the delegated Section 5 repair lemmas use `classical`.
 set_option linter.unusedDecidableInType false in
 /-- Measurement-level orthonormalization from cross consistency, using the
 locality-preserving Section 5 repair construction directly.
