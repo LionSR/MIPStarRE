@@ -13,8 +13,9 @@ Instructions:
      assumptions bundle, or arbitrary implication hypotheses absent from the
      cited statement.
    - If the proof cannot be completed without such a change, stop and post a PR comment
-     naming the missing lemma or internal obligation instead of pushing a weakened paper
-     theorem.
+     naming the missing lemma, internal obligation, or paper-gap note instead of pushing a
+     weakened paper theorem. Do not introduce a new conditional helper, producer, repair
+     bundle, or obligation package merely to satisfy the review.
    - Fix naming to match Mathlib conventions.
    - Add missing docstrings where requested.
    - Fix type mismatches or tactic failures.
@@ -44,8 +45,10 @@ Quality bar (your fix MUST satisfy ALL of these before committing):
   boundary conditions genuinely needed to state the same mathematics in Lean,
   such as positivity for a division, nonemptiness, decidability, or a
   field-model instance. Proof-debt objects are not boundary conditions. Existing
-  conditional helpers must be separately named and must not be treated as the
-  paper theorem.
+  conditional helpers are quarantined proof-debt objects: they must be separately
+  named, cite the unresolved source obligation, state a removal plan, and must
+  not be treated as the paper theorem. Do not add a new conditional helper as a
+  substitute for proving or naming the missing source-faithful lemma.
 - Mathlib style: camelCase defs, snake_case lemmas, minimal imports, no unnecessary opens.
 - Type safety (BLOCKER): no universe issues, missing instances, or coercion failures.
 - Performance: avoid `decide` on large types, unbounded `simp`, deep `rw` chains.

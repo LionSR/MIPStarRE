@@ -15,8 +15,9 @@ Instructions:
      assumptions bundle, or arbitrary implication hypotheses that are not in the
      cited paper statement.
    - If a proof cannot be completed without such a statement change, stop and post a PR
-     comment identifying the missing named lemma or internal obligation instead of
-     pushing a weakened paper theorem.
+     comment identifying the missing named lemma, internal obligation, or paper-gap note
+     instead of pushing a weakened paper theorem. Do not introduce a new conditional
+     helper, producer, repair bundle, or obligation package merely to satisfy the review.
    - Fix naming to match Mathlib conventions.
    - Add missing docstrings where requested.
    - Fix type mismatches or tactic failures.
@@ -55,8 +56,10 @@ Quality bar (same rubric as Claude Code Review — your fix MUST satisfy ALL of 
   boundary conditions genuinely needed to state the same mathematics in Lean,
   such as positivity for a division, nonemptiness, decidability, or a
   field-model instance. Proof-debt objects are not boundary conditions. Existing
-  conditional helpers must be separately named and must not be treated as the
-  paper theorem.
+  conditional helpers are quarantined proof-debt objects: they must be separately
+  named, cite the unresolved source obligation, state a removal plan, and must
+  not be treated as the paper theorem. Do not add a new conditional helper as a
+  substitute for proving or naming the missing source-faithful lemma.
 - Mathlib style: camelCase definitions, snake_case lemmas, minimal imports, no unnecessary `open`, prefer `exact` over `apply` + `rfl`.
 - Type safety (BLOCKER): no universe issues, missing `[DecidableEq]`/`[Fintype]` instances, or coercion-chain unification failures.
 - Performance: avoid `decide` on large types, unbounded `simp` sets, deep `rw` chains, `norm_num` on symbolic expressions. Prefer `omega`, `positivity`, explicit `calc`.
