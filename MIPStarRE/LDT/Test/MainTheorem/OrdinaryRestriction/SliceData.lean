@@ -90,7 +90,7 @@ structure MainFormalSuccessorRecursiveSliceData (params : Parameters)
   the one-register restricted strategy does not itself carry separate
   same-space symmetry witnesses to compare against.
 
-  TODO(#1037, #834, #422): the successor-case `mainFormal` proof will need
+  TODO(#1363, #834, #422): the successor-case `mainFormal` proof will need
   a consumer of these compatibility fields (or their `.toIdxProjMeas`-free
   counterparts) to close the recursive call. -/
   slicePasses : ∀ x, (sliceStrategy x).PassesLowIndividualDegreeTest (3 * eps)

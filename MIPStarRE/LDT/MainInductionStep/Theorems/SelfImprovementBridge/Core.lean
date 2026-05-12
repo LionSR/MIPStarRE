@@ -414,9 +414,9 @@ noncomputable def SelfImprovementPackage.SliceObligations.ofPointMeasurementEq
 state and the measurements used by the three LDT subtests agree with
 `xRestrictedStrategy`.
 
-This is a structural #931 helper: it uses the `restrictedGood` field already
-stored in `SliceRestrictionPackage.profile` and does not touch the remaining
-Section 9 analytic obligations. -/
+This is a structural helper for the #1503 successor route: it uses the
+`restrictedGood` field already stored in `SliceRestrictionPackage.profile` and
+does not touch the remaining Section 9 analytic obligations. -/
 theorem SelfImprovementPackage.SliceObligations.good_of_restrictedGood
     (params : Parameters)
     [FieldModel params.q]

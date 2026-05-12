@@ -260,8 +260,8 @@ exposed separately via `restrictedProbabilities`, and
 `SelfImprovementPackage.ofSelfImprovementInInductionSection` forms the
 slice-wise restricted-strategy self-improvement output once it is supplied. This
 theorem therefore keeps `hselfObligation` as an explicit input; the remaining
-self-improvement proof belongs to the final `mainFormal` integration tracked by
-#931, #834, and #422. -/
+self-improvement proof must be derived inside the source-facing successor theorem,
+as tracked by #1507, #1503, and #1458. -/
 theorem mainInductionByRecursionOnM
     (params : Parameters)
     [FieldModel.{0} params.q]

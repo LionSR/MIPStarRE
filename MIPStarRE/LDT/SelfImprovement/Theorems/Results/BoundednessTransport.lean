@@ -96,7 +96,7 @@ but this file still contains duplicated theorems and private helpers (see #1127)
 Once the split is complete, the private helpers below and the duplicated theorems
 can be removed and replaced by imports of the sub-modules. -/
 
-/-! ## Final-fields projective-residual boundedness transport (issue #931)
+/-! ## Final-fields projective-residual boundedness transport
 
 The boundedness paragraph of `thm:self-improvement` first compares the
 projective residual against the point-agreement average and then replaces the
