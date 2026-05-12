@@ -31,7 +31,7 @@ the base-case match-mass completion obligation lives in `MainFormal.lean`.
 ## References
 
 * Issue #1359 — orthonormalization hypothesis chain
-* Issue #931 — self-improvement bridge inputs
+* Issue #931 — self-improvement obligations
 * Issue #1043 — base-case match-mass completion construction
 -/
 

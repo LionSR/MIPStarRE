@@ -380,7 +380,7 @@ completion cascade.
 
 This is not an additional hypothesis of the paper theorem `mainFormal`; it is an
 open construction tracked separately.  The available structural constructors live in
-`RoleRegister.lean` (`successorOfBridgeInputs` and the answer-valued variants);
+`RoleRegister.lean` (`successorOfObligations` and the answer-valued variants);
 the missing work is to produce the predecessor induction data and the per-slice
 self-improvement inputs from the paper hypotheses, then assemble the resulting
 role residual and completion residual.
@@ -442,7 +442,7 @@ Internal-obligation theorem for `thm:main-formal` from `test_definition.tex`.
 
 This theorem has the same public hypotheses and conclusion as `mainFormal`.
 Its proof body isolates the remaining construction work in internal obligation
-declarations rather than adding bridge data to the theorem statement.
+declarations rather than adding obligations to the theorem statement.
 
 The bipartite tensor placement follows the paper:
 - **1a**: `A^A_u ⊗ I ≈_ν I ⊗ G^B_{[g(u)=a]}` — G_B on **right**
@@ -542,7 +542,7 @@ theorem mainFormal_ofInternalObligations
   --
   -- The remaining base and successor obligations are internal declarations,
   -- not additional hypotheses of the paper theorem.  The self-improvement
-  -- assumptions are packaged as `SelfImprovement.SelfImprovementBridgeInputs`.
+  -- assumptions are packaged as `SelfImprovement.SelfImprovementObligations`.
   -- The remaining `mainFormal_ofInternalObligations` proof still needs:
   --
   -- 1. **Section 6 role residual** via base/successor branch:

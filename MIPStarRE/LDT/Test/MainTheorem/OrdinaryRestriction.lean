@@ -10,7 +10,7 @@ sub-leaves:
 * `OrdinaryRestriction.Basic` — successor weighted bounds
   (`MainFormalSuccessorAxisWeightedBound`, `MainFormalSuccessorDiagonalWeightedBound`),
   recursive slice producers (`MainFormalSuccessorRecursiveSlices`),
-  self-improvement bridge inputs (`MainFormalSuccessorSelfImprovementBridgeInputs`),
+  self-improvement obligations (`MainFormalSuccessorSelfImprovementObligations`),
   and the successor boundary structure (`MainFormalSuccessorBoundary`).
 
 * `OrdinaryRestriction.SliceData` — per-slice recursive data

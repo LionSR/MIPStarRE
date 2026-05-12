@@ -364,8 +364,8 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_input_of_obligations}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_input_of_selfConsistency_localVariance}
   to recover the final helper-stage self-consistency input. The corresponding
-  bridge-package constructor is
-  \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementBridgeInputs.ofHelperStrongSelfConsistencyObligations}.
+  obligation constructor is
+  \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementObligations.ofHelperStrongSelfConsistencyObligations}.
   The paper's arithmetic shows that the right-hand error is at most
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_error_le_selfImprovementHelperError}
   \[
@@ -431,8 +431,8 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndResidualDominationInput}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndQXPRepairAndCoisometry}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromSlacknessResidualDominationBridgeInputs}
-  \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementSlacknessResidualDominationBridgeInputs}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromSlacknessResidualDominationObligations}
+  \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementSlacknessResidualDominationObligations}
   The formalization also records a strengthened helper theorem whose output
   carries the complementary-slackness equations used in the completeness chain,
   together with the residual-domination bridge that assembles the full
@@ -1018,15 +1018,15 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
 
 \begin{remark}[Auxiliary self-improvement lemmas]\label{rem:self-improvement-lean-interfaces}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementError_nonneg_of_isGood}
-  \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementBridgeInputs}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromBridgeInputs}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromBridgeInputsSubMeas}
+  \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementObligations}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromObligations}
+  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromObligationsSubMeas}
   \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationSpectralObligation_of_projectiveNonMeasurement}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_of_helper_outputs_of_total_expectation_le}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_of_helper_outputs_of_total_operator_le}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_exists_of_helper_outputs_of_residual_domination}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_exists_of_helper_outputs_of_residualDominationInput}
-  \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementSlacknessResidualDominationBridgeInputs}
+  \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementSlacknessResidualDominationObligations}
   Several auxiliary results are used to prove Theorem~\ref{thm:self-improvement}
   from the helper output and the orthonormalization theorem.  They record
   intermediate proof obligations that do not appear as hypotheses in the paper

@@ -36,7 +36,7 @@ helper completeness, the selected point-consistency `add-in-u` transfer, and
 the residual-dominating orthonormalization input.  The final-fields obligation
 then uses the monotone-total comparison supplied by residual domination, rather
 than the alphabet-size total-gap estimate. -/
-structure SelfImprovementSlacknessResidualDominationBridgeInputs
+structure SelfImprovementSlacknessResidualDominationObligations
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (eps delta nu : Error) where
   /-- Helper-stage strong self-consistency for the averaged helper family. -/
@@ -162,9 +162,9 @@ lemma selfImprovementWithSlacknessAndResidualDominationInput
         final_fields_bounded strategy.state H.toSubMeas
           hhelper.sdpWitness.dualDominatesIdentity hselfImprovementError_nonneg }
 
-/-- Packaged bridge-input form of
+/-- Packaged obligation form of
 `selfImprovementWithSlacknessAndResidualDominationInput`. -/
-lemma selfImprovementFromSlacknessResidualDominationBridgeInputs
+lemma selfImprovementFromSlacknessResidualDominationObligations
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -173,7 +173,7 @@ lemma selfImprovementFromSlacknessResidualDominationBridgeInputs
     (hdelta_le_one : delta ≤ 1)
     (hd_le_q : (params.d : Error) ≤ (params.q : Error))
     (hbridge :
-      SelfImprovementSlacknessResidualDominationBridgeInputs
+      SelfImprovementSlacknessResidualDominationObligations
         params strategy eps delta nu)
     (hgood : strategy.IsGood eps delta gamma)
     (G : Measurement (Polynomial params) ι) :

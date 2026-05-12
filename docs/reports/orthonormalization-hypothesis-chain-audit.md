@@ -18,7 +18,7 @@
 
 The `thm:orthonormalization` theorem at `MakingMeasurementsProjective/Orthonormalization.lean:394` takes `OrthonormalizationInput ψ A ζ` as an extra hypothesis beyond the paper statement (which only requires `BipartiteSSCRel`). The spectral-truncation slice of this input is **fully proved**; the repair slice (locality-preserving QXP repair) is **still a hypothesis** at all levels up to the final `mainFormal` assembly.
 
-At the final assembly (`MainFormal.lean:507`), the base case (m=1) is discharged through the external `hbaseBridge` hypothesis, while the successor case (m>1) has a single `sorry` (line 611). This `sorry` represents the lack of a predecessor per-slice induction package and per-slice self-improvement bridge inputs.
+At the final assembly (`MainFormal.lean:507`), the base case (m=1) is discharged through the external `hbaseBridge` hypothesis, while the successor case (m>1) has a single `sorry` (line 611). This `sorry` represents the lack of a predecessor per-slice induction package and per-slice self-improvement obligations.
 
 ---
 
@@ -68,7 +68,7 @@ This lifts the per-submeasurement `OrthonormalizationInput` to a `∀`-quantifie
 
 **`selfImprovementInInductionSection`** (line 65) takes `SelfImprovement.OrthonormalizationInput` as hypothesis and calls `selfImprovementFromSubMeas`.
 
-**`SelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationRepair`** (line 456-505) builds per-slice bridge from:
+**`SelfImprovementPackage.SliceObligations.ofOrthonormalizationRepair`** (line 456-505) builds per-slice bridge from:
 - `HelperStrongSelfConsistencyInput` — hypothesis
 - `OrthonormalizationRepairObligation` — hypothesis (= `repair x`)
 - `FinalFieldsInput` — hypothesis
@@ -123,7 +123,7 @@ have hprojectiveCompletionResidual :
       ... params strategy eps hpass k scalars) := by
   -- Successor case (m > 1): the answer-valued recursive-slice adapter is
   -- available, but this theorem still has no predecessor per-slice induction
-  -- package or answer-side self-improvement bridge inputs in scope.
+  -- package or answer-side self-improvement obligations in scope.
   -- TODO(#931, #834, #422): supply those successor inputs and assemble the
   -- resulting role residual into a Step 6 witness residual.
   sorry
@@ -153,13 +153,13 @@ To fill the `sorry`, the successor branch needs:
 | Missing Input | Type | Description |
 |---|---|---|
 | Per-slice induction package | `MainInductionStep.PerSliceInductionPackage params strategy (3*eps) (3*eps) (3*eps) restriction k` | The recursive induction data for each Fq-slice of the restricted strategy |
-| Per-slice self-improvement bridge | `MainInductionStep.SelfImprovementPackage params ...` or equivalently `SelfImprovementPackage.SliceBridgeInputs params ...` | Honest slice strategies, measurement transport, and Section 9 bridge inputs (helper SSC + orthonormalization + finalFields) |
+| Per-slice self-improvement bridge | `MainInductionStep.SelfImprovementPackage params ...` or equivalently `SelfImprovementPackage.SliceObligations params ...` | Honest slice strategies, measurement transport, and Section 9 obligations (helper SSC + orthonormalization + finalFields) |
 | Orthonormalization repair inputs | `LeftLiftedProjectivizationRepairInput` × 2 | Locality-preserving QXP repair for both unsymmetrized POVMs (one per side) |
 | Match-mass preservation | `OrthonormalizationMatchMassPreservation` × 2 | For both Alice and Bob sides |
 
 Equivalent higher-level packaging: `MainFormalSuccessorBoundary` which bundles:
 - `MainFormalSuccessorRecursiveSlices` (per-slice induction packages)
-- `MainFormalSuccessorSelfImprovementObligation` (per-slice self-improvement bridge data)
+- `MainFormalSuccessorSelfImprovementObligation` (per-slice self-improvement obligations)
 
 Plus the former `MainFormalRepairedBridgeHypotheses` route, now replaced by
 `MainFormalBaseCompletionObligations`, which bundles the orthonormalization and
@@ -181,7 +181,7 @@ MainFormal.lean (line 611 → sorry)
   │   │           ├─ MainFormalSuccessorRecursiveSlices ← MISSING
   │   │           └─ MainFormalSuccessorSelfImprovementObligation ← MISSING
   │   │               └─ ∀ perSliceInduction,
-  │   │                   SelfImprovementPackage.SliceBridgeInputs
+  │   │                   SelfImprovementPackage.SliceObligations
   │   │                   └─ helper SSC + OrthonormalizationInput + finalFields
   │   │                       └─ OrthonormalizationInput
   │   │                           ├─ SpectralTruncationInput ← PROVED
@@ -215,7 +215,7 @@ MainFormal.lean (line 611 → sorry)
 
 1. **QXP repair witness** (`LeftLiftedProjectivizationRepairInput` at all levels) — this requires producing a canonical local projective family `qxpProjSubMeas` whose left lift is rounding-close to the source measurement. This corresponds to unformalized content in Section 5 of the paper (Lemmas 5.8–5.10, the QXP construction).
 2. **Per-slice induction packages** for the successor case — the recursive per-Fq-slice induction data (corresponding to the Section 6 slice recursion)
-3. **Per-slice self-improvement bridge inputs** — honest slice strategies, their Section 9 bridge inputs (helper SSC, orthonormalization repair, final fields)
+3. **Per-slice self-improvement obligations** — honest slice strategies, their Section 9 obligations (helper SSC, orthonormalization repair, final fields)
 4. **Orthonormalization match-mass preservation** — the P_A/P_B match-mass invariant used by `completingToMeasurement`
 
 ### The Bridge Structures That Accept These Inputs
@@ -224,8 +224,8 @@ Several "bridge hypothesis" structures exist as named targets:
 - `MainFormalBaseProjectiveCompletionObligations` — full package for `baseProjectiveCompletionResidual`
 - `MainFormalBaseCompletionObligations` — narrowed, omits a_A/a_B
 - `MainFormalRepairedBridgeHypotheses` (MainFormal.lean:240) — alias for the base repaired bridge
-- `SelfImprovement.SelfImprovementBridgeInputs` — packages the three Section 9 inputs
-- `SelfImprovementPackage.SliceBridgeInputs` — per-slice bridge for Section 6
+- `SelfImprovement.SelfImprovementObligations` — packages the three Section 9 inputs
+- `SelfImprovementPackage.SliceObligations` — per-slice bridge for Section 6
 - `MainFormalSuccessorBoundary` — successor-case boundary data
 
 ---
@@ -236,13 +236,13 @@ Several "bridge hypothesis" structures exist as named targets:
 
 1. **Construct per-slice induction packages** — For each Fq slice, build `MainInductionStep.PerSliceInductionPackage`. This is the recursive call to `mainInduction` at the predecessor parameter set.
 
-2. **Build slice-bridge inputs** — For each slice, construct `SelfImprovementPackage.SliceBridgeInputs`:
+2. **Build slice-obligations** — For each slice, construct `SelfImprovementPackage.SliceObligations`:
    - Honest slice strategies matching the restricted interfaces
    - `HelperStrongSelfConsistencyInput` — the helper SSC
    - `OrthonormalizationInput` — containing the QXP repair witness
    - `FinalFieldsInput` — for completeness/point-consistency/self-closeness
 
-3. **Construct `MainFormalSuccessorSelfImprovementObligation`** — from the slice-bridge inputs
+3. **Construct `MainFormalSuccessorSelfImprovementObligation`** — from the slice-obligations
 
 4. **Construct `MainFormalSuccessorBoundary`** — via `mainFormalSuccessorBoundary_ofRecursiveSelfImprovement`
 

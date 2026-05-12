@@ -554,10 +554,10 @@ self-improvement.
 They assert helper-stage strong self-consistency, the orthonormalization
 hypotheses, and final-fields transport.  Grouping them here only abbreviates the
 hypotheses of separately named conditional results such as
-`selfImprovementFromBridgeInputs`.  The intended mathematical task is to prove
+`selfImprovementFromObligations`.  The intended mathematical task is to prove
 each field from the source hypotheses and then use the conditional result as an
 intermediate theorem. -/
-structure SelfImprovementBridgeInputs (params : Parameters) [FieldModel params.q]
+structure SelfImprovementObligations (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (eps delta nu : Error) where
   /-- Helper-stage strong self-consistency: the averaged `Hhat` is
   strongly self-consistent at level `selfImprovementHelperError`. -/

@@ -118,7 +118,7 @@ git log --since="14 days ago" --name-only --pretty=format: -- 'MIPStarRE/**/*.le
 
 For each new `.lean` file or significantly changed file, check if corresponding blueprint items should gain `\leanok` or `\lean{}` annotations. Specifically:
 
-- If a blueprint item has `\lean{X}` but no `\leanok`, and the Lean declaration `X` now exists and is fully proven (not `sorry`), add `\leanok`.
+- If a blueprint item has `\lean{X}` but no `\leanok`, add `\leanok` only when the Lean declaration `X` exists, is fully proven (not `sorry`), and its public statement matches the cited paper or blueprint statement up to faithful boundary hypotheses.
 - If a new Lean declaration matches a blueprint item that has no `\lean{}` yet, add the `\lean{NewDecl}` annotation.
 
 To check for `sorry` in declarations:
@@ -146,7 +146,7 @@ When you make updates, create a PR that includes:
 
 ## Safety and quality constraints
 
-- Never add `\leanok` unless you have confirmed the Lean declaration exists AND does not contain `sorry`.
+- Never add `\leanok` unless you have confirmed the Lean declaration exists, does not contain `sorry`, and does not prove the source statement only after adding a bridge, residual, repair, package, proof-obligation input, hypotheses bundle, assumptions bundle, or arbitrary implication hypothesis absent from the cited source statement.
 - Never remove mathematical content from `.tex` files.
 - When unsure about a rename, prefer leaving the annotation as-is and noting it in the PR description rather than guessing.
 - If too many issues exist to safely resolve in one PR, fix the clear cases and note the ambiguous ones.

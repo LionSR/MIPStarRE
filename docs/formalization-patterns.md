@@ -14,7 +14,7 @@ in `audits/` and the proof-integrity rules in `docs/PROOF_INTEGRITY.md`.
 2. [Blueprint–Lean synchronization](#pattern-2-blueprintlean-synchronization)
 3. [Split-module architecture](#pattern-3-split-module-architecture)
 4. [Barrel re-export pattern](#pattern-4-barrel-re-export-pattern)
-5. [Temporary bridge-package pattern](#pattern-5-temporary-bridge-package-pattern)
+5. [Temporary obligation-structure pattern](#pattern-5-temporary-obligation-structure-pattern)
 6. [Paper-gap documentation pattern](#pattern-6-paper-gap-documentation-pattern)
 
 ---
@@ -172,7 +172,7 @@ When such a declaration remains useful, its role should be one of the following:
 | `SelfImprovement.OrthonormalizationInput` | Conditional input for the Section 5 orthonormalization construction; discharge through internal proof obligations such as the QXP repair witness |
 | `SelfImprovement.FinalFieldsInput` | Conditional input for final Section 9 estimates; replace at the paper theorem boundary by source-faithful statements or named internal proof obligations |
 | `SelfImprovement.HelperStrongSelfConsistencyInput` | Conditional input for helper strong self-consistency estimates; keep tracked until produced |
-| `SelfImprovement.SelfImprovementBridgeInputs` | Historical bundle of the preceding inputs; do not introduce as a hypothesis on a paper-labelled theorem |
+| `SelfImprovement.SelfImprovementObligations` | Historical bundle of the preceding inputs; do not introduce as a hypothesis on a paper-labelled theorem |
 | `MainFormalBaseCompletionObligations` | Base-case assembly obligations; do not expose on `mainFormal`, which is reserved for `thm:main-formal` |
 | `MainFormalBaseProjectiveCompletionObligations` | Completion obligations; do not move them into a paper-facing theorem statement |
 | `MainFormalPostRolePackageDiagonalOrthonormalizationInput` | Internal data for orthonormalization of unsymmetrized POVMs; its repair fields are proof obligations |
@@ -199,7 +199,7 @@ construction obligations:
 These are data-construction obligations.  Once the per-slice self-improvement
 proof obligations and recursive induction packages are threaded through, the
 paper-labelled theorem should call the internal-obligation assembly without
-adding bridge inputs to the theorem statement.
+adding obligations to the theorem statement.
 
 This is the intended cleanup direction: use the conditional helper only to
 identify reusable proof content, then prove the internal obligations or restore the
@@ -218,8 +218,8 @@ paper-labelled declarations:
   the public statement of the paper theorem, unless it is a faithful encoding
   of a hypothesis present in the cited source.
 
-Bridge packages that are markers for still-unproved intermediate facts
-(such as `SelfImprovementBridgeInputs`) are proof debt under this pattern.  They
+Obligation structures that are markers for still-unproved intermediate facts
+(such as `SelfImprovementObligations`) are proof debt under this pattern.  They
 should carry a tracker reference (usually an issue like #931 or #422), and their
 fields should be the *assumptions* of the paper's proof, not the *conclusion* of
 the theorem.
@@ -422,11 +422,11 @@ directly so its API surface doesn't leak.
 
 ---
 
-## Pattern 5: Temporary bridge-package pattern
+## Pattern 5: Temporary obligation-structure pattern
 
-A bridge package is a `structure` whose fields are **proof obligations** that
+An obligation structure is a `structure` whose fields are **proof obligations** that
 have not yet been discharged locally.  It is temporary proof debt.  Do not add a
-new bridge package unless a direct source-faithful proof route has first been
+new obligation structure unless a direct source-faithful proof route has first been
 attempted and the remaining obstruction is documented.
 
 ### Example
@@ -434,7 +434,7 @@ attempted and the remaining obstruction is documented.
 From `MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean`:
 
 ```lean
-structure SelfImprovementBridgeInputs (params : Parameters) [FieldModel params.q]
+structure SelfImprovementObligations (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (eps delta nu : Error) where
   helperStrongSelfConsistency :
     HelperStrongSelfConsistencyInput params strategy eps delta
@@ -445,30 +445,30 @@ structure SelfImprovementBridgeInputs (params : Parameters) [FieldModel params.q
 ```
 
 A separately named conditional helper may take
-`(h : SelfImprovementBridgeInputs params strategy eps delta nu)` as a
+`(h : SelfImprovementObligations params strategy eps delta nu)` as a
 hypothesis and project the needed field inside the proof body.  This does not
-prove the corresponding paper theorem.  The package should be eliminated by
+prove the corresponding paper theorem.  The structure should be eliminated by
 internal theorems, or the source-labelled theorem should be restored with the
 remaining proof obligation visible.
 
 ### Rules
 
-1. **Every bridge field must have a theorem that produces it somewhere**, or a
+1. **Every obligation field must have a theorem that produces it somewhere**, or a
    tracking issue (#931, #422, etc.) explaining when it will be produced.
 2. **Docstrings must name the tracking issue and paper source.**
 3. **Fields must be the *assumptions* of the paper's proof, not the
    *conclusion* of the theorem** (see A1 anti-pattern in
    `docs/anti_patterns.md`).
-4. **A bridge package must not enter a source-labelled theorem statement.**
-5. **When all fields are produced**, the bridge package should be replaced by a
-   theorem that calls the same proof but with zero bridge arguments.
+4. **An obligation structure must not enter a source-labelled theorem statement.**
+5. **When all fields are produced**, the obligation structure should be replaced by a
+   theorem that calls the same proof without non-paper obligations.
 
 ### Related patterns
 
 - `docs/anti_patterns.md` — A1 (conclusion-shaped hypothesis), A4
   (trivial default witnesses), A6 (external `*Statement` smuggles)
 - Issue [#449] — hypothesis-smuggle ledger
-- Issue [#451] — historical bridge-package catalogue
+- Issue [#451] — historical bridge-hypothesis catalogue
 
 ---
 
@@ -507,7 +507,7 @@ with the step it replaces.
 - `docs/paper-gaps/policy.tex` — paper-gap documentation standards
 - `audits/` — chapter-by-chapter scouting reports
 - Issue [#449] — hypothesis-smuggle ledger
-- Issue [#451] — historical bridge-package catalogue
+- Issue [#451] — historical bridge-hypothesis catalogue
 - Issue [#931] — main-induction input gap tracker
 - Issue [#422] — main-formal assembly gap tracker
 

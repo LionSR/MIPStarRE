@@ -55,7 +55,7 @@ theorem nonempty_ofRoleResidualAndCompletion
   exact ⟨{ roleResidual := roleResidual, postRoleDiagonalCompletion := completion }⟩
 
 /-- Assemble the final live residual from a concrete Section 6 role residual, the
-line-130 orthonormalization bridge inputs, and a producer for the remaining
+line-130 orthonormalization obligations, and a construction of the remaining
 completion/match-mass obligations for the projective submeasurements obtained from
 line 130.
 
@@ -87,7 +87,7 @@ theorem nonempty_ofRoleResidualAndDiagonalInputs
 an opaque `completionProducer`.
 
 A caller supplies, for each line-130 orthonormalization residual produced from
-the bridge inputs, the concrete distinguished outcomes, completed-closeness
+the obligations, the concrete distinguished outcomes, completed-closeness
 proofs, and orthonormalization match-mass preservation facts packaged as
 `MainFormalPostRolePackageDiagonalCompletionInput`.  This theorem converts that
 package into the old producer shape by `toCompletionResidual`.

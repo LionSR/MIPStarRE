@@ -167,19 +167,19 @@
 	This is exactly Theorem~\ref{thm:ld-pasting}, restated in the induction chapter because it is the pasting input used in the proof of Theorem~\ref{thm:main-induction}.
 \end{proof}
 
-\begin{definition}[Self-improvement bridge data for the successor step]\label{def:self-improvement-bridge-data}
+\begin{definition}[Self-improvement obligations for the successor step]\label{def:self-improvement-obligation}
 	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.ofSelfImprovementInInductionSection}
-	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.ofSliceBridgeInputs}
-	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceBridgeInputs, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceBridgeInputs.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceBridgeInputs.ofPointMeasurementEq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceBridgeInputs.good_of_restrictedGood, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceBridgeInputs.ofMeasurementEq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationRepair, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.ofSliceBridgeInputs}
-	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.ofPointMeasurementEq, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.good_of_restrictedGood, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.ofMeasurementEq, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationRepair}
+	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.ofSliceObligations}
+	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceObligations, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceObligations.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceObligations.ofPointMeasurementEq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceObligations.good_of_restrictedGood, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceObligations.ofMeasurementEq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceObligations.ofOrthonormalizationRepair, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.ofSliceObligations}
+	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.ofPointMeasurementEq, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.good_of_restrictedGood, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.ofMeasurementEq, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.ofOrthonormalizationRepair}
 	\leanok
 	\uses{thm:self-improvement-in-induction-section}
 	The successor step records the slice-wise self-improvement output in
 	\texttt{SelfImprovementPackage}, and the answer-valued route records the analogous
 	output in \texttt{AnswerSelfImprovementPackage}.  The Lean-only
-	\texttt{SliceBridgeInputs} packages are narrow wiring interfaces: they assume
+	\texttt{SliceObligations} structures are narrow formal interfaces: they assume
 	honest per-slice symmetric strategies and Section~\ref{chap:self-improvement}
-	bridge inputs, while averaged point-operator compatibility is derived
+	obligations, while averaged point-operator compatibility is derived
 	structurally from point-measurement transport.  They then convert the remaining
 	data into the ordinary or answer-valued self-improvement package.
 \end{definition}
@@ -230,8 +230,8 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase, MIPStarRE.LDT.MainInductionStep.mainInductionFromPackages, MIPStarRE.LDT.MainInductionStep.mainInductionByRecursionOnM}
 	together with the stage data
 	\lean{MIPStarRE.LDT.MainInductionStep.SliceRestrictionPackage, MIPStarRE.LDT.MainInductionStep.PerSliceInductionPackage, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage, MIPStarRE.LDT.MainInductionStep.AveragedPastingInput}
-	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.ofSliceBridgeInputs}
-	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.ofPointMeasurementEq}
+	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.ofSliceObligations}
+	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.ofPointMeasurementEq}
 	that mirror the four paper stages $\text{restrict} \to \text{induct} \to \text{self-improve} \to \text{paste}$. For the answer-valued restriction route used in the successor branch of the main formal theorem, Lean now also exposes
 	\lean{MIPStarRE.LDT.MainInductionStep.AnswerMainInductionConclusion, MIPStarRE.LDT.MainInductionStep.AnswerMainInductionHypothesis, MIPStarRE.LDT.MainInductionStep.AnswerPerSliceInductionPackage.ofMainInductionHypothesis},
 	which record the predecessor induction hypothesis for the restricted strategies without appealing to the public theorem `mainFormal`. The weighted restricted-probability estimates are now public via \lean{MIPStarRE.LDT.MainInductionStep.weighted_axisParallel_bound, MIPStarRE.LDT.MainInductionStep.weighted_diagonal_bound, MIPStarRE.LDT.MainInductionStep.restrictedProbabilities}, and the final public successor-step assembly is formalized as \lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper}. The remaining proof gap for the source-facing theorem is to derive those wrapper inputs, including the restricted-strategy self-improvement hypotheses tracked by issue \#931, from the paper hypotheses; hence no proof-level \leanok is attached here.
@@ -414,10 +414,10 @@
 
 \begin{definition}[Lean successor-boundary aliases for the Section 3 proof]\label{def:main-formal-successor-boundary}
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAxisWeightedBound, MIPStarRE.LDT.Test.MainFormalSuccessorDiagonalWeightedBound, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictionPackage, MIPStarRE.LDT.Test.MainFormalSuccessorRecursiveSlices, MIPStarRE.LDT.Test.MainFormalSuccessorSelfImprovementObligation, MIPStarRE.LDT.Test.MainFormalSuccessorBoundary, MIPStarRE.LDT.Test.mainFormalSuccessorAxisWeightedBound_ofPass, MIPStarRE.LDT.Test.mainFormalSuccessorDiagonalWeightedBound_ofPass, MIPStarRE.LDT.Test.mainFormalSuccessorBoundary_ofRecursiveSelfImprovement}
-	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorSelfImprovementBridgeInputs, MIPStarRE.LDT.Test.MainFormalSuccessorSelfImprovementInductionPackage, MIPStarRE.LDT.Test.mainFormalSuccessorSelfImprovementBridgeInputs_ofMeasurementEq, MIPStarRE.LDT.Test.mainFormalSuccessorSelfImprovementBridgeInputs_ofOrthonormalizationRepair, MIPStarRE.LDT.Test.mainFormalSuccessorSelfImprovementObligation_ofBridgeInputs, MIPStarRE.LDT.Test.mainFormalSuccessorBoundary_ofBridgeInputs, MIPStarRE.LDT.Test.mainFormalSuccessorBoundary_ofPredecessorInduction}
+	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorSelfImprovementObligations, MIPStarRE.LDT.Test.MainFormalSuccessorSelfImprovementInductionPackage, MIPStarRE.LDT.Test.mainFormalSuccessorSelfImprovementObligations_ofMeasurementEq, MIPStarRE.LDT.Test.mainFormalSuccessorSelfImprovementObligations_ofOrthonormalizationRepair, MIPStarRE.LDT.Test.mainFormalSuccessorSelfImprovementObligation_ofObligations, MIPStarRE.LDT.Test.mainFormalSuccessorBoundary_ofObligations, MIPStarRE.LDT.Test.mainFormalSuccessorBoundary_ofPredecessorInduction}
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorRecursiveSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedPointAgreement_le_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedAxisParallel_le_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedDiagonal_le_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRecursiveSlices_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRecursiveSlices_ofInductionPackage}
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAnswerRecursiveSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRecursiveSlices_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerBoundary_ofPredecessorInduction}
-	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAnswerSelfImprovementBridgeInputs, MIPStarRE.LDT.Test.MainFormalSuccessorAnswerSelfImprovementInductionPackage, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofMeasurementEq, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofOrthonormalizationRepair, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSelfImprovementObligation_ofBridgeInputs, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerBoundary_ofBridgeInputs}
+	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAnswerSelfImprovementObligations, MIPStarRE.LDT.Test.MainFormalSuccessorAnswerSelfImprovementInductionPackage, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSelfImprovementObligations_ofMeasurementEq, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSelfImprovementObligations_ofOrthonormalizationRepair, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerSelfImprovementObligation_ofObligations, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerBoundary_ofObligations}
 	\leanok
 	\uses{lem:symmetrization-bridge, rem:main-induction-successor-assembly}
 	These Lean-only aliases name the successor-case data that
@@ -425,10 +425,10 @@
 	Remark~\ref{rem:main-induction-successor-assembly}. The public weighted-bound
 	helper lemmas discharge the weighted restricted-axis and restricted-diagonal
 	fields from the symmetrized passing strategy; the remaining external inputs are
-	the recursive slice witnesses (together with their bridge-data structure
+	the recursive slice witnesses (together with their obligation structure
 	and conversion theorem), the restricted-strategy self-improvement
-	obligation (together with its bridge-input packaging), and their bundled
-	boundary package.  The ordinary slice bridge records both Alice- and Bob-side
+	obligation (together with its conversion theorem), and their bundled
+	boundary structure.  The ordinary slice structure records both Alice- and Bob-side
 	compatibility with the restricted point, axis-parallel, and diagonal
 	measurements; in particular, the formal lemmas
 	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedPointAgreement_le_ofSliceData}
@@ -436,7 +436,7 @@
 	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedDiagonal_le_ofSliceData}
 	extract the restricted point-agreement, axis-parallel, and diagonal branch
 	bounds from the pinned slice's passing hypothesis.  On the answer-register
-	side, the slice bridge data now records
+	side, the slice obligations now records
 	both Alice- and Bob-side compatibility for the restricted point and
 	axis-parallel measurements, together with the common zero-coordinate readout of
 	the diagonal measurement on both registers.  The symmetry proofs of the
@@ -729,11 +729,11 @@ assembly residual:
 \lean{MIPStarRE.LDT.Test.MainFormalRolePackageResidual, MIPStarRE.LDT.Test.MainFormalRolePackageResidual.toRoleMeasurementPackage, MIPStarRE.LDT.Test.MainFormalRolePackageResidual.ofBaseCase, MIPStarRE.LDT.Test.MainFormalRolePackageResidual.ofSuccessorBoundary, MIPStarRE.LDT.Test.MainFormalRolePackageResidual.rolePackage}
 \lean{MIPStarRE.LDT.Parameters.next, MIPStarRE.LDT.Parameters.previous, MIPStarRE.LDT.Parameters.previous_next_eq, MIPStarRE.LDT.Parameters.SuccessorDecomposition, MIPStarRE.LDT.Parameters.successorDecompositionOfOneLtM, MIPStarRE.LDT.Parameters.one_lt_m_of_ne_one, MIPStarRE.LDT.Parameters.successorDecompositionOfNeOne}
 \lean{MIPStarRE.LDT.Test.fieldModelOfSuccessorDecomposition, MIPStarRE.LDT.Test.projStratTransportSuccessor, MIPStarRE.LDT.Test.passesLowIndividualDegreeTest_transportSuccessor}
-\lean{MIPStarRE.LDT.Test.MainFormalRolePackageSuccessorResidual, MIPStarRE.LDT.Test.MainFormalRolePackageSuccessorResidual.toRolePackageResidual, MIPStarRE.LDT.Test.MainFormalRolePackageSuccessorResidual.ofSyntacticSuccessor, MIPStarRE.LDT.Test.MainFormalRolePackageSuccessorResidual.ofSuccessorBridgeInputs}
+\lean{MIPStarRE.LDT.Test.MainFormalRolePackageSuccessorResidual, MIPStarRE.LDT.Test.MainFormalRolePackageSuccessorResidual.toRolePackageResidual, MIPStarRE.LDT.Test.MainFormalRolePackageSuccessorResidual.ofSyntacticSuccessor, MIPStarRE.LDT.Test.MainFormalRolePackageSuccessorResidual.ofSuccessorObligations}
 \lean{MIPStarRE.LDT.Test.MainFormalRolePackageAnswerSuccessorResidual, MIPStarRE.LDT.Test.MainFormalRolePackageAnswerSuccessorResidual.toRolePackageResidual, MIPStarRE.LDT.Test.MainFormalRolePackageAnswerSuccessorResidual.ofSyntacticSuccessor, MIPStarRE.LDT.Test.MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorRecursiveSelfImprovement}
-\lean{MIPStarRE.LDT.Test.MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorBridgeInputs, MIPStarRE.LDT.Test.MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorInductionPackageAndBridgeInputs}
-\lean{MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual, MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual.toRolePackageResidual, MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual.successorOfBridgeInputs, MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual.rolePackageResidual_ofSuccessorBridgeInputs, MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual.answerSuccessorOfRecursiveSelfImprovement, MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorRecursiveSelfImprovement}
-\lean{MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual.answerSuccessorOfBridgeInputs, MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorBridgeInputs, MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual.answerSuccessorOfInductionPackageAndBridgeInputs, MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorInductionPackageAndBridgeInputs}
+\lean{MIPStarRE.LDT.Test.MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorObligations, MIPStarRE.LDT.Test.MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorInductionPackageAndObligations}
+\lean{MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual, MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual.toRolePackageResidual, MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual.successorOfObligations, MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual.rolePackageResidual_ofSuccessorObligations, MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual.answerSuccessorOfRecursiveSelfImprovement, MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorRecursiveSelfImprovement}
+\lean{MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual.answerSuccessorOfObligations, MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorObligations, MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual.answerSuccessorOfInductionPackageAndObligations, MIPStarRE.LDT.Test.MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorInductionPackageAndObligations}
 \lean{MIPStarRE.LDT.roleCond, MIPStarRE.LDT.roleBlock, MIPStarRE.LDT.opTensor_roleCond_sum, MIPStarRE.LDT.ev_classicalRoleSymmState_one, MIPStarRE.LDT.ev_classicalRoleSymmState_rolePair_AB, MIPStarRE.LDT.ev_classicalRoleSymmState_rolePair_BA, MIPStarRE.LDT.ev_classicalRoleSymmState_rolePair_AA, MIPStarRE.LDT.ev_classicalRoleSymmState_rolePair_BB, MIPStarRE.LDT.ev_classicalRoleSymmState_opTensor_roleCond_A, MIPStarRE.LDT.ev_classicalRoleSymmState_opTensor_roleCond_B}
 \lean{MIPStarRE.LDT.classicalRoleSymmState_isNormalized, MIPStarRE.LDT.roleSymmetrizedMeasurement, MIPStarRE.LDT.roleSymmetrizedMeasurement_outcome, MIPStarRE.LDT.roleSymmetrizedMeasurement_total}
 \lean{MIPStarRE.LDT.qBipartiteConsDefect_of_measurements, MIPStarRE.LDT.qBipartiteMatchMass_roleSymmetrizedMeasurement_left, MIPStarRE.LDT.qBipartiteConsDefect_roleSymmetrizedMeasurement_left}
@@ -772,16 +772,16 @@ public large-$k$ hypothesis supplies the Section~6 side condition
 $400m_{\mathrm{pred}}d\le k$; the remaining role work is the
 successor-boundary package, the completion handoff, and the line-169 transport
 data.  The ordinary successor-boundary package can now be assembled from
-recursive slice witnesses and self-improvement bridge inputs by
-\texttt{MainFormalRolePackageBranchResidual.successorOfBridgeInputs}; the
+recursive slice witnesses and self-improvement obligations by
+\texttt{MainFormalRolePackageBranchResidual.successorOfObligations}; the
 answer-valued successor branch records the parallel routes.  It can be assembled
 from answer recursive slice witnesses and an answer-valued self-improvement
 obligation by
 \texttt{MainFormalRolePackageBranchResidual.answerSuccessorOfRecursiveSelfImprovement},
-from recursive slice witnesses and answer-side bridge inputs by
-\texttt{MainFormalRolePackageBranchResidual.answerSuccessorOfBridgeInputs}, or
-from a predecessor induction package together with the bridge inputs by
-\texttt{MainFormalRolePackageBranchResidual.answerSuccessorOfInductionPackageAndBridgeInputs}.
+from recursive slice witnesses and answer-side obligations by
+\texttt{MainFormalRolePackageBranchResidual.answerSuccessorOfObligations}, or
+from a predecessor induction package together with the obligations by
+\texttt{MainFormalRolePackageBranchResidual.answerSuccessorOfInductionPackageAndObligations}.
 These constructors are structural and do not call
 \texttt{mainFormal\_ofInternalObligations}; the
 line-130 completion interfaces remain separate.  The live completion residual

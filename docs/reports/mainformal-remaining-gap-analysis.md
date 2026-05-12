@@ -51,11 +51,11 @@ These two are exactly the inputs needed to construct Field 2 (the `postRoleDiago
 
 The comment on line 606-610 states explicitly:
 
-> "the answer-valued recursive-slice adapter is available, but this theorem still has no predecessor per-slice induction package or answer-side self-improvement bridge inputs in scope."
+> "the answer-valued recursive-slice adapter is available, but this theorem still has no predecessor per-slice induction package or answer-side self-improvement obligations in scope."
 
 The missing inputs are:
 1. **Predecessor per-slice induction package** — providing a Section 6 witness for each restricted slice of the predecessor parameter
-2. **Answer-side self-improvement bridge inputs** — providing the Section 9 self-improvement data for the predecessor
+2. **Answer-side self-improvement obligations** — providing the Section 9 self-improvement data for the predecessor
 
 These are NOT hypotheses of `mainFormal`. The base case avoids them entirely by using `MainFormalRolePackageResidual.ofBaseCase` (which calls the already-checked `strategySymmetrization_mainInductionBaseCase`).
 
@@ -86,10 +86,10 @@ structure MainFormalRolePackageResidual ... where
 
 | Constructor | Required inputs | Status |
 |------------|----------------|--------|
-| `MainFormalRolePackageBranchResidual.rolePackageResidual_ofSuccessorBridgeInputs` | `successorRecursiveSlicesInput` + `successorSelfImprovementBridgeInput` | Neither in scope |
-| `MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorBridgeInputs` | `answerSuccessorRecursiveSlicesInput` + `answerSuccessorSelfImprovementBridgeInput` | Neither in scope |
+| `MainFormalRolePackageBranchResidual.rolePackageResidual_ofSuccessorObligations` | `successorRecursiveSlicesInput` + `successorSelfImprovementObligations` | Neither in scope |
+| `MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorObligations` | `answerSuccessorRecursiveSlicesInput` + `answerSuccessorSelfImprovementObligations` | Neither in scope |
 | `MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorRecursiveSelfImprovement` | `answerSuccessorRecursiveSlicesInput` + `answerSuccessorSelfImprovementInput` | Neither in scope |
-| `MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorInductionPackageAndBridgeInputs` | `answerSuccessorPerSliceInductionPackageInput` + `answerSuccessorSelfImprovementBridgeInput` | Neither in scope |
+| `MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorInductionPackageAndObligations` | `answerSuccessorPerSliceInductionPackageInput` + `answerSuccessorSelfImprovementObligations` | Neither in scope |
 
 **Status:** ❌ NO producer available in scope. This is the primary gap.
 
@@ -169,18 +169,18 @@ The successor case needs inputs that are currently absent from `mainFormal`'s pa
 Add parameters providing the predecessor induction data:
 
 ```lean
-(hanswerBridgeInputs : answerSuccessorSelfImprovementBridgeInput (k := k) hpass hm_one_ne)
+(hanswerBridgeInputs : answerSuccessorSelfImprovementObligations (k := k) hpass hm_one_ne)
 (hinductionPackage : answerSuccessorPerSliceInductionPackageInput (k := k) hpass hm_one_ne)
 ```
 
 Where:
-- `answerSuccessorSelfImprovementBridgeInput` — per-slice Section 9 bridge data (Type-valued, wraps each slice's self-improvement inputs)
+- `answerSuccessorSelfImprovementObligations` — per-slice Section 9 obligations (Type-valued, wraps each slice's self-improvement inputs)
 - `answerSuccessorPerSliceInductionPackageInput` — per-slice induction package (Type-valued, wraps predecessor `mainFormal` result per restricted slice)
 
 Then use:
 ```lean
 rcases MainFormalRolePackageBranchResidual
-  .rolePackageResidual_ofAnswerSuccessorInductionPackageAndBridgeInputs
+  .rolePackageResidual_ofAnswerSuccessorInductionPackageAndObligations
     hpass hm1 hd hk0 hk hinductionPackage hanswerBridgeInputs
   with ⟨roleResidual⟩
 exact mainFormal_ofRoleResidualAndRepairedBridge herr roleResidual
@@ -191,11 +191,11 @@ exact mainFormal_ofRoleResidualAndRepairedBridge herr roleResidual
 
 The ordinary route needs:
 - `successorRecursiveSlicesInput`
-- `successorSelfImprovementBridgeInput`
+- `successorSelfImprovementObligations`
 
 With producers:
 ```lean
-MainFormalRolePackageBranchResidual.rolePackageResidual_ofSuccessorBridgeInputs
+MainFormalRolePackageBranchResidual.rolePackageResidual_ofSuccessorObligations
   hpass hm1 hd hk0 hk hrec hbridge
 ```
 
@@ -207,11 +207,11 @@ The paper uses the answer-restricted induction (Section 6 of the LDT paper goes 
 
 | PR | Description | Overlap with this gap? |
 |----|-------------|----------------------|
-| #1355 | Absorb small-alphabet data-processing gap in SelfImprovement | ❌ Orthogonal (self-improvement pipeline — needed to eventually prove the bridge inputs but doesn't provide them directly) |
-| #1353 | Residual-domination wrappers for SelfImprovement orthonormalization | ❌ Orthogonal (helps discharge orthonormalization bridge inputs but doesn't provide the bridge inputs themselves) |
+| #1355 | Absorb small-alphabet data-processing gap in SelfImprovement | ❌ Orthogonal (self-improvement pipeline — needed to eventually prove the obligations but doesn't provide them directly) |
+| #1353 | Residual-domination wrappers for SelfImprovement orthonormalization | ❌ Orthogonal (helps discharge orthonormalization obligations but doesn't provide the obligations themselves) |
 | #1352 | Slackness bridge for strong-duality producer | ❌ Orthogonal (SDP infrastructure for self-improvement) |
 
-None of the active PRs directly fills the gap. They are building the self-improvement infrastructure that would eventually be consumed by `answerSuccessorSelfImprovementBridgeInput` / `successorSelfImprovementBridgeInput` producers, but these producers are not yet constructed.
+None of the active PRs directly fills the gap. They are building the self-improvement infrastructure that would eventually be consumed by `answerSuccessorSelfImprovementObligations` / `successorSelfImprovementObligations` producers, but these producers are not yet constructed.
 
 ## 7. Summary of actionable sub-gaps
 
@@ -223,14 +223,14 @@ None of the active PRs directly fills the gap. They are building the self-improv
 
 **Resolution options:**
 - **(a, historical)** Add `answerSuccessorPerSliceInductionPackageInput` and
-  `answerSuccessorSelfImprovementBridgeInput` as additional hypotheses to
+  `answerSuccessorSelfImprovementObligations` as additional hypotheses to
   `mainFormal`.  This route is no longer acceptable for the source-facing
   theorem; the same data must be produced internally or isolated in a conditional
   helper.
 - **(b)** Embed `mainFormal` in a recursive induction that provides these from an outer induction hypothesis
-- **(c)** Add `successorRecursiveSlicesInput` and `successorSelfImprovementBridgeInput` as hypotheses and use the ordinary successor route
+- **(c)** Add `successorRecursiveSlicesInput` and `successorSelfImprovementObligations` as hypotheses and use the ordinary successor route
 
-**Tracked by:** #931 (successor-bridge inputs), #834 (remaining witness residual), #422 (main-formal completion epic)
+**Tracked by:** #931 (successor-obligations), #834 (remaining witness residual), #422 (main-formal completion epic)
 
 ### Gap 2 (MINOR, follows from Gap 1): Post-role diagonal completion
 
@@ -262,7 +262,7 @@ chosen.
 existing constructors, but it would also strengthen the source-facing theorem by
 adding non-paper assumptions.  The current repair policy rejects this route.
 
-**Complete closure:** Discharge `hbaseBridge` (#1043), then prove the successor bridge inputs (#931), then prove the per-slice induction package (which itself would need a recursive application of `mainFormal`). This closes `mainFormal` completely without extra hypotheses but requires a well-founded recursion setup.
+**Complete closure:** Discharge `hbaseBridge` (#1043), then prove the successor obligations (#931), then prove the per-slice induction package (which itself would need a recursive application of `mainFormal`). This closes `mainFormal` completely without extra hypotheses but requires a well-founded recursion setup.
 
 The "extra-hypothesis" pattern (documented in the memory) is the expected approach: prove the main theorem with explicit hypotheses, then separately prove that those hypotheses are satisfiable.
 
@@ -274,13 +274,13 @@ Several issues already cover the sub-gaps identified above:
 |-------|-------------|------------|
 | #1363 | Close the sole remaining `sorry` in MainFormal (successor-case projective completion) | Primary tracker |
 | #1035 | Prove recursive mainFormal for successor restricted slices | `MainFormalSuccessorRecursiveSlices` |
-| #1036 | Construct successor-case self-improvement bridge inputs | `MainFormalSuccessorSelfImprovementBridgeInputs` |
+| #1036 | Construct successor-case self-improvement obligations | `MainFormalSuccessorSelfImprovementObligations` |
 | #1041 | Assemble successor-case mainFormal branch | Final wiring of #1035 + #1036 |
 | #1043 | Construct `hbaseBridge` for base case | Base-case bridge |
-| #1103 | SelfImprovement: assemble closed bridge inputs from producers | Self-improvement closure |
+| #1103 | SelfImprovement: assemble closed obligations from producers | Self-improvement closure |
 | #1104 | LDT/Test: assemble successor Step-6 witness from proved producers | Step-6 assembly |
 | #931 | Close self-improvement inputs for Section 6 | Self-improvement → main induction bridge |
 | #1367 | SelfImprovement bridge: audit and close input-consistency orphans blocking mainFormal | Self-improvement audit |
 | #1359 | Trace OrthonormalizationInput extra-hypothesis chain | Orthonormalization hypothesis chain |
 
-One **missing piece**: the **answer-valued** successor route (`MainFormalSuccessorAnswerRecursiveSlices` + `MainFormalSuccessorAnswerSelfImprovementBridgeInputs`, or `AnswerPerSliceInductionPackage` + answer bridge inputs) is not yet tracked by a dedicated issue. This is the paper-faithful route (using answer alphabet restriction). Tracked in #1369.
+One **missing piece**: the **answer-valued** successor route (`MainFormalSuccessorAnswerRecursiveSlices` + `MainFormalSuccessorAnswerSelfImprovementObligations`, or `AnswerPerSliceInductionPackage` + answer obligations) is not yet tracked by a dedicated issue. This is the paper-faithful route (using answer alphabet restriction). Tracked in #1369.

@@ -27,8 +27,8 @@ orthonormalization and final-fields conditions taken as explicit hypotheses.
   helper strong self-consistency, orthonormalization, and final-fields
   conditions taken as explicit hypotheses.
 - **selfImprovement** — the statement corresponding to `thm:self-improvement`.
-- **selfImprovementFromSubMeas / selfImprovementFromBridgeInputs /
-  selfImprovementFromBridgeInputsSubMeas** — variants for submeasurement inputs
+- **selfImprovementFromSubMeas / selfImprovementFromObligations /
+  selfImprovementFromObligationsSubMeas** — variants for submeasurement inputs
   and auxiliary hypotheses supplied explicitly.
 
 ## References
@@ -426,15 +426,15 @@ theorem selfImprovementFromSubMeas
   exact
     { measurementBridge := ⟨Gmeas, hbridge, hH⟩ }
 
-/-- `SelfImprovementBridgeInputs` + `IsGood` is sufficient to call the form of
+/-- `SelfImprovementObligations` + `IsGood` is sufficient to call the form of
 `thm:self-improvement` with explicit orthonormalization and final-fields
 hypotheses and obtain the full `SelfImprovementConclusion`. -/
-theorem selfImprovementFromBridgeInputs
+theorem selfImprovementFromObligations
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hbridge : SelfImprovementBridgeInputs params strategy eps delta nu)
+    (hbridge : SelfImprovementObligations params strategy eps delta nu)
     (hgood : strategy.IsGood eps delta gamma)
     (G : Measurement (Polynomial params) ι) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
@@ -443,15 +443,15 @@ theorem selfImprovementFromBridgeInputs
     hbridge.helperStrongSelfConsistency
     hbridge.orthonormalization hbridge.finalFields hgood G
 
-/-- `SelfImprovementBridgeInputs` + `IsGood` also suffice for the
+/-- `SelfImprovementObligations` + `IsGood` also suffice for the
 submeasurement-input interface used by Section 6, once a measurement completion
 of the input submeasurement is supplied explicitly. -/
-theorem selfImprovementFromBridgeInputsSubMeas
+theorem selfImprovementFromObligationsSubMeas
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hinputs : SelfImprovementBridgeInputs params strategy eps delta nu)
+    (hinputs : SelfImprovementObligations params strategy eps delta nu)
     (hgood : strategy.IsGood eps delta gamma)
     (G : SubMeas (Polynomial params) ι)
     (Gmeas : Measurement (Polynomial params) ι)

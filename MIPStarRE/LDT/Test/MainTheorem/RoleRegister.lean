@@ -22,8 +22,8 @@ residual structures for producing the Section 6 role package:
 
 Each residual can be converted to a concrete `MainFormalRolePackageResidual`
 via `toRolePackageResidual` once the public `400·m·d ≤ k` side condition
-is supplied.  The constructors (`ofSuccessorBridgeInputs`,
-`ofAnswerSuccessorBridgeInputs`, etc.) are structural and do not call
+is supplied.  The constructors (`ofSuccessorObligations`,
+`ofAnswerSuccessorObligations`, etc.) are structural and do not call
 `mainFormal`; they stop before the line-130 orthonormalization and
 completion interfaces.
 
@@ -98,9 +98,9 @@ private abbrev successorRecursiveSlicesInput
 and `references/ldt-paper/self_improvement.tex:628-770`
 (`\label{thm:self-improvement}`).
 
-Type of self-improvement bridge inputs for the predecessor determined by a
+Type of self-improvement obligations for the predecessor determined by a
 non-base current parameter bundle. -/
-private abbrev successorSelfImprovementBridgeInput
+private abbrev successorSelfImprovementObligations
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
@@ -110,7 +110,7 @@ private abbrev successorSelfImprovementBridgeInput
   letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
   let transportedStrategy := projStratTransportSuccessor strategy successor
   let transportedPass := passesLowIndividualDegreeTest_transportSuccessor hpass successor
-  MainFormalSuccessorSelfImprovementBridgeInputs
+  MainFormalSuccessorSelfImprovementObligations
     successor.pred transportedStrategy eps transportedPass k
     (mainFormalSuccessorAxisWeightedBound_ofPass
       successor.pred transportedStrategy eps transportedPass)
@@ -172,15 +172,15 @@ def ofSyntacticSuccessor
   kPositive := hk_pos
 
 /-- Assemble the successor role-package residual from recursive slices and
-self-improvement bridge inputs.
+self-improvement obligations.
 
 This is the non-base branch constructor used by the live `mainFormal` split.  It
 does not assume a raw Section 6 witness: the caller supplies exactly the two
 analytic successor inputs for the transported predecessor, namely recursive
-slice witnesses and the self-improvement bridge data.  This constructor packages
-them through `mainFormalSuccessorBoundary_ofBridgeInputs`; line-130
+slice witnesses and the self-improvement obligations.  This constructor packages
+them through `mainFormalSuccessorBoundary_ofObligations`; line-130
 orthonormalization and completion inputs remain downstream hypotheses. -/
-noncomputable def ofSuccessorBridgeInputs
+noncomputable def ofSuccessorObligations
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
@@ -189,7 +189,7 @@ noncomputable def ofSuccessorBridgeInputs
     (hd : 0 < params.d)
     (hk_pos : 1 ≤ k)
     (hrec : successorRecursiveSlicesInput (k := k) hpass hm_ne_one)
-    (hbridge : successorSelfImprovementBridgeInput (k := k) hpass hm_ne_one) :
+    (hbridge : successorSelfImprovementObligations (k := k) hpass hm_ne_one) :
     MainFormalRolePackageSuccessorResidual params strategy eps hpass k := by
   let successor := Parameters.successorDecompositionOfNeOne params hm_ne_one
   letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
@@ -201,7 +201,7 @@ noncomputable def ofSuccessorBridgeInputs
       dimensionPositive := ?_
       kPositive := hk_pos }
   · exact
-      mainFormalSuccessorBoundary_ofBridgeInputs successor.pred transportedStrategy eps
+      mainFormalSuccessorBoundary_ofObligations successor.pred transportedStrategy eps
         transportedPass k hrec hbridge
   · rcases successor with ⟨pred, hnext⟩
     subst params
@@ -280,15 +280,15 @@ private abbrev answerSuccessorSelfImprovementInput
 and `references/ldt-paper/self_improvement.tex:628-770`
 (`\label{thm:self-improvement}`).
 
-Type of answer-valued self-improvement bridge inputs for the predecessor
+Type of answer-valued self-improvement obligations for the predecessor
 determined by a non-base current parameter bundle.
 
 This is the load-bearing companion to `answerSuccessorSelfImprovementInput`: it
-supplies exactly the per-slice Section 9 bridge data, and its conversion into a
+supplies exactly the per-slice Section 9 obligations, and its conversion into a
 self-improvement obligation is performed internally by the
-`MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorBridgeInputs`
+`MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorObligations`
 constructor below. -/
-private abbrev answerSuccessorSelfImprovementBridgeInput
+private abbrev answerSuccessorSelfImprovementObligations
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
@@ -298,7 +298,7 @@ private abbrev answerSuccessorSelfImprovementBridgeInput
   letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
   let transportedStrategy := projStratTransportSuccessor strategy successor
   let transportedPass := passesLowIndividualDegreeTest_transportSuccessor hpass successor
-  MainFormalSuccessorAnswerSelfImprovementBridgeInputs
+  MainFormalSuccessorAnswerSelfImprovementObligations
     successor.pred transportedStrategy eps transportedPass k
     (mainFormalSuccessorAnswerAxisWeightedBound_ofPass
       successor.pred transportedStrategy eps transportedPass)
@@ -420,19 +420,19 @@ noncomputable def ofAnswerSuccessorRecursiveSelfImprovement
     kPositive := hk_pos }
 
 /-- Assemble the answer-valued successor role-package residual from recursive
-answer slices and answer-side self-improvement bridge inputs.
+answer slices and answer-side self-improvement obligations.
 
-This is the bridge-inputs counterpart of
+This is the obligations counterpart of
 `ofAnswerSuccessorRecursiveSelfImprovement` and the answer-side counterpart of
-`MainFormalRolePackageSuccessorResidual.ofSuccessorBridgeInputs`.  Instead of an
+`MainFormalRolePackageSuccessorResidual.ofSuccessorObligations`.  Instead of an
 already-built self-improvement obligation the caller supplies the per-slice
-Section 9 bridge data, which is converted internally through
-`mainFormalSuccessorAnswerSelfImprovementObligation_ofBridgeInputs` and
-`mainFormalSuccessorAnswerBoundary_ofBridgeInputs`.  This packages the
+Section 9 obligations, which is converted internally through
+`mainFormalSuccessorAnswerSelfImprovementObligation_ofObligations` and
+`mainFormalSuccessorAnswerBoundary_ofObligations`.  This packages the
 answer-side adapters merged in #1062–#1069 into a single Test-level constructor
 that does not call `mainFormal` and leaves the line-130 completion and line-169
 interfaces downstream. -/
-noncomputable def ofAnswerSuccessorBridgeInputs
+noncomputable def ofAnswerSuccessorObligations
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
@@ -441,7 +441,7 @@ noncomputable def ofAnswerSuccessorBridgeInputs
     (hd : 0 < params.d)
     (hk_pos : 1 ≤ k)
     (hrec : answerSuccessorRecursiveSlicesInput (k := k) hpass hm_ne_one)
-    (hbridge : answerSuccessorSelfImprovementBridgeInput (k := k) hpass hm_ne_one) :
+    (hbridge : answerSuccessorSelfImprovementObligations (k := k) hpass hm_ne_one) :
     MainFormalRolePackageAnswerSuccessorResidual params strategy eps hpass k :=
   let successor := Parameters.successorDecompositionOfNeOne params hm_ne_one
   letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
@@ -449,7 +449,7 @@ noncomputable def ofAnswerSuccessorBridgeInputs
   let transportedPass := passesLowIndividualDegreeTest_transportSuccessor hpass successor
   { successor := successor
     boundary :=
-      mainFormalSuccessorAnswerBoundary_ofBridgeInputs successor.pred
+      mainFormalSuccessorAnswerBoundary_ofObligations successor.pred
         transportedStrategy eps transportedPass k hrec hbridge
     dimensionPositive := by
       rcases successor with ⟨pred, hnext⟩
@@ -459,18 +459,18 @@ noncomputable def ofAnswerSuccessorBridgeInputs
 
 /-- Assemble the answer-valued successor role-package residual from a
 predecessor `AnswerPerSliceInductionPackage` and answer-side self-improvement
-bridge inputs.
+obligations.
 
 This adapter route starts from a packaged predecessor per-slice induction
-hypothesis together with the Section 9 bridge data on the answer side.  It
+hypothesis together with the Section 9 obligations on the answer side.  It
 composes `mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage` (which
 produces the recursive slice witnesses from the per-slice induction package)
-with `ofAnswerSuccessorBridgeInputs`.  Like the other constructors in this
+with `ofAnswerSuccessorObligations`.  Like the other constructors in this
 namespace it is pure structural composition over the answer-side adapters
 already merged on `main`; it does not call `mainFormal`, does not introduce any
 new analytic step, and leaves downstream completion and line-169 interfaces
 untouched. -/
-noncomputable def ofAnswerSuccessorInductionPackageAndBridgeInputs
+noncomputable def ofAnswerSuccessorInductionPackageAndObligations
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
@@ -480,13 +480,13 @@ noncomputable def ofAnswerSuccessorInductionPackageAndBridgeInputs
     (hk_pos : 1 ≤ k)
     (hinduction :
       answerSuccessorPerSliceInductionPackageInput (k := k) hpass hm_ne_one)
-    (hbridge : answerSuccessorSelfImprovementBridgeInput (k := k) hpass hm_ne_one) :
+    (hbridge : answerSuccessorSelfImprovementObligations (k := k) hpass hm_ne_one) :
     MainFormalRolePackageAnswerSuccessorResidual params strategy eps hpass k :=
   let successor := Parameters.successorDecompositionOfNeOne params hm_ne_one
   letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
   let transportedStrategy := projStratTransportSuccessor strategy successor
   let transportedPass := passesLowIndividualDegreeTest_transportSuccessor hpass successor
-  ofAnswerSuccessorBridgeInputs (params := params) (strategy := strategy)
+  ofAnswerSuccessorObligations (params := params) (strategy := strategy)
     hpass hm_ne_one hd hk_pos
     (mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage successor.pred
       transportedStrategy eps transportedPass k
@@ -591,10 +591,10 @@ theorem rolePackageResidual_ofAnswerSuccessorRecursiveSelfImprovement
 
 /-- Successor branch constructor from the two analytic successor inputs.
 
-This packages recursive slice witnesses and self-improvement bridge inputs for
+This packages recursive slice witnesses and self-improvement obligations for
 the transported predecessor into the branch-level role residual.  It deliberately
 stops before the line-130 orthonormalization and completion interfaces. -/
-noncomputable def successorOfBridgeInputs
+noncomputable def successorOfObligations
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
@@ -603,18 +603,18 @@ noncomputable def successorOfBridgeInputs
     (hd : 0 < params.d)
     (hk_pos : 1 ≤ k)
     (hrec : successorRecursiveSlicesInput (k := k) hpass hm_ne_one)
-    (hbridge : successorSelfImprovementBridgeInput (k := k) hpass hm_ne_one) :
+    (hbridge : successorSelfImprovementObligations (k := k) hpass hm_ne_one) :
     MainFormalRolePackageBranchResidual params strategy eps hpass k :=
   .successor
-    (MainFormalRolePackageSuccessorResidual.ofSuccessorBridgeInputs
+    (MainFormalRolePackageSuccessorResidual.ofSuccessorObligations
       hpass hm_ne_one hd hk_pos hrec hbridge)
 
 /-- Direct role-package residual corollary for the successor branch.
 
-Given recursive slices, self-improvement bridge inputs, and the public large-`k`
+Given recursive slices, self-improvement obligations, and the public large-`k`
 side condition, this produces the isolated Section 6 role residual consumed by
 the downstream `mainFormal` cascade. -/
-theorem rolePackageResidual_ofSuccessorBridgeInputs
+theorem rolePackageResidual_ofSuccessorObligations
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
@@ -624,21 +624,21 @@ theorem rolePackageResidual_ofSuccessorBridgeInputs
     (hk_pos : 1 ≤ k)
     (hk_large : 400 * params.m * params.d ≤ k)
     (hrec : successorRecursiveSlicesInput (k := k) hpass hm_ne_one)
-    (hbridge : successorSelfImprovementBridgeInput (k := k) hpass hm_ne_one) :
+    (hbridge : successorSelfImprovementObligations (k := k) hpass hm_ne_one) :
     Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) :=
-  (successorOfBridgeInputs hpass hm_ne_one hd hk_pos hrec hbridge).toRolePackageResidual
+  (successorOfObligations hpass hm_ne_one hd hk_pos hrec hbridge).toRolePackageResidual
     hk_large
 
 /-- Answer-side successor branch constructor from recursive answer slices and
-self-improvement bridge inputs.
+self-improvement obligations.
 
-This is the answer-register counterpart of `successorOfBridgeInputs`: it
+This is the answer-register counterpart of `successorOfObligations`: it
 packages the answer-valued recursive slice witnesses and the matching
-per-slice Section 9 bridge inputs through
-`MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorBridgeInputs`,
+per-slice Section 9 obligations through
+`MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorObligations`,
 then injects into the branch residual.  It does not call `mainFormal` and stops
 before the line-130 completion and line-169 transport interfaces. -/
-noncomputable def answerSuccessorOfBridgeInputs
+noncomputable def answerSuccessorOfObligations
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
@@ -647,18 +647,18 @@ noncomputable def answerSuccessorOfBridgeInputs
     (hd : 0 < params.d)
     (hk_pos : 1 ≤ k)
     (hrec : answerSuccessorRecursiveSlicesInput (k := k) hpass hm_ne_one)
-    (hbridge : answerSuccessorSelfImprovementBridgeInput (k := k) hpass hm_ne_one) :
+    (hbridge : answerSuccessorSelfImprovementObligations (k := k) hpass hm_ne_one) :
     MainFormalRolePackageBranchResidual params strategy eps hpass k :=
   .answerSuccessor
-    (MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorBridgeInputs
+    (MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorObligations
       hpass hm_ne_one hd hk_pos hrec hbridge)
 
 /-- Direct role-package residual corollary for the answer-side successor branch
 when the analytic inputs are supplied as recursive slice witnesses and
-per-slice Section 9 bridge inputs.
+per-slice Section 9 obligations.
 
-This composes `answerSuccessorOfBridgeInputs` with `toRolePackageResidual`. -/
-theorem rolePackageResidual_ofAnswerSuccessorBridgeInputs
+This composes `answerSuccessorOfObligations` with `toRolePackageResidual`. -/
+theorem rolePackageResidual_ofAnswerSuccessorObligations
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
@@ -668,23 +668,23 @@ theorem rolePackageResidual_ofAnswerSuccessorBridgeInputs
     (hk_pos : 1 ≤ k)
     (hk_large : 400 * params.m * params.d ≤ k)
     (hrec : answerSuccessorRecursiveSlicesInput (k := k) hpass hm_ne_one)
-    (hbridge : answerSuccessorSelfImprovementBridgeInput (k := k) hpass hm_ne_one) :
+    (hbridge : answerSuccessorSelfImprovementObligations (k := k) hpass hm_ne_one) :
     Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) :=
-  (answerSuccessorOfBridgeInputs hpass hm_ne_one hd hk_pos hrec hbridge)
+  (answerSuccessorOfObligations hpass hm_ne_one hd hk_pos hrec hbridge)
     |>.toRolePackageResidual hk_large
 
 /-- Answer-side successor branch constructor from a predecessor
-`AnswerPerSliceInductionPackage` and per-slice Section 9 bridge inputs.
+`AnswerPerSliceInductionPackage` and per-slice Section 9 obligations.
 
 This preferred answer-side adapter route consumes a packaged per-slice
 induction hypothesis for the transported predecessor together with the
-answer-side self-improvement bridge data, and composes them through
+answer-side self-improvement obligations, and composes them through
 `mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage` and
-`mainFormalSuccessorAnswerBoundary_ofBridgeInputs`.  It is pure structural
+`mainFormalSuccessorAnswerBoundary_ofObligations`.  It is pure structural
 composition over the answer-side adapters merged on `main`; it does not call
 `mainFormal`, introduces no new analytic step, and leaves the line-130
 completion and line-169 transport interfaces untouched. -/
-noncomputable def answerSuccessorOfInductionPackageAndBridgeInputs
+noncomputable def answerSuccessorOfInductionPackageAndObligations
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
@@ -694,21 +694,21 @@ noncomputable def answerSuccessorOfInductionPackageAndBridgeInputs
     (hk_pos : 1 ≤ k)
     (hinduction :
       answerSuccessorPerSliceInductionPackageInput (k := k) hpass hm_ne_one)
-    (hbridge : answerSuccessorSelfImprovementBridgeInput (k := k) hpass hm_ne_one) :
+    (hbridge : answerSuccessorSelfImprovementObligations (k := k) hpass hm_ne_one) :
     MainFormalRolePackageBranchResidual params strategy eps hpass k :=
   .answerSuccessor
-    (MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorInductionPackageAndBridgeInputs
+    (MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorInductionPackageAndObligations
       hpass hm_ne_one hd hk_pos hinduction hbridge)
 
 /-- Direct role-package residual corollary for the answer-side successor branch
 when the analytic inputs are supplied as a predecessor per-slice induction
-package and per-slice Section 9 bridge inputs.
+package and per-slice Section 9 obligations.
 
 This is the most direct route from the load-bearing answer-side adapters to the
 isolated Section 6 role residual consumed by the downstream `mainFormal`
-cascade.  It composes `answerSuccessorOfInductionPackageAndBridgeInputs` with
+cascade.  It composes `answerSuccessorOfInductionPackageAndObligations` with
 `toRolePackageResidual`. -/
-theorem rolePackageResidual_ofAnswerSuccessorInductionPackageAndBridgeInputs
+theorem rolePackageResidual_ofAnswerSuccessorInductionPackageAndObligations
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
@@ -719,9 +719,9 @@ theorem rolePackageResidual_ofAnswerSuccessorInductionPackageAndBridgeInputs
     (hk_large : 400 * params.m * params.d ≤ k)
     (hinduction :
       answerSuccessorPerSliceInductionPackageInput (k := k) hpass hm_ne_one)
-    (hbridge : answerSuccessorSelfImprovementBridgeInput (k := k) hpass hm_ne_one) :
+    (hbridge : answerSuccessorSelfImprovementObligations (k := k) hpass hm_ne_one) :
     Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) :=
-  (answerSuccessorOfInductionPackageAndBridgeInputs hpass hm_ne_one hd hk_pos
+  (answerSuccessorOfInductionPackageAndObligations hpass hm_ne_one hd hk_pos
     hinduction hbridge)
     |>.toRolePackageResidual hk_large
 

@@ -699,10 +699,10 @@ theorem helper_strong_self_consistency_input_of_selfConsistency_localVariance
 self-consistency field is supplied by named obligations.
 
 This constructor isolates the first of the three residual Section 9 inputs in
-`SelfImprovementBridgeInputs`. The helper-stage field is derived from the
+`SelfImprovementObligations`. The helper-stage field is derived from the
 actual helper output and the add-in-`u`/variance obligations, while the
 orthonormalization and final-fields inputs remain explicit hypotheses. -/
-def SelfImprovementBridgeInputs.ofHelperStrongSelfConsistencyObligations
+def SelfImprovementObligations.ofHelperStrongSelfConsistencyObligations
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta nu : Error)
@@ -717,7 +717,7 @@ def SelfImprovementBridgeInputs.ofHelperStrongSelfConsistencyObligations
             params strategy T Hhat eps delta)
     (horthonormalization : OrthonormalizationInput params strategy eps delta)
     (hfinalFields : FinalFieldsInput params strategy eps delta nu) :
-    SelfImprovementBridgeInputs params strategy eps delta nu where
+    SelfImprovementObligations params strategy eps delta nu where
   helperStrongSelfConsistency :=
     helper_strong_self_consistency_input_of_obligations
       params strategy eps delta heps hdelta hd_le_q hobligations

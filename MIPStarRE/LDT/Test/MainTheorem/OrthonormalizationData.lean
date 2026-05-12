@@ -134,7 +134,7 @@ end MainFormalPostRolePackageProjectiveCompletionResidual
 `references/ldt-paper/orthonormalization.tex:67-76`
 (`\label{thm:orthonormalization}`).
 
-Explicit bridge inputs for applying the paper's cross-consistency
+Explicit obligations for applying the paper's cross-consistency
 orthonormalization lemma to the two unsymmetrized role measurements.
 
 The fields expose the remaining spectral-truncation and locality-preserving

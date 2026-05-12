@@ -3,7 +3,7 @@ import MIPStarRE.LDT.Test.MainTheorem.ClassicalAndBase
 /-!
 # Ordinary restricted-slice recursion: basic inputs
 
-This module contains the ordinary successor-route input types, bridge-input
+This module contains the ordinary successor-route input types, obligation
 constructors, and the successor boundary package used by the Section 6 main
 theorem wrapper.
 -/
@@ -156,14 +156,14 @@ def MainFormalSuccessorSelfImprovementObligation (params : Parameters)
       strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
       hrestrict hinduction
 
-/-- Successor-case bridge-input package for the restricted-strategy
+/-- Successor-case obligation structure for the restricted-strategy
 self-improvement obligation.
 
 For each possible per-slice induction package, this asks for the narrow
-`SelfImprovementPackage.SliceBridgeInputs` assumptions: honest per-slice
+`SelfImprovementPackage.SliceObligations` assumptions: honest per-slice
 `SymStrat`s, equality transports to the restricted-slice interfaces, and the
-remaining Section 9 bridge inputs for those honest slice strategies. -/
-def MainFormalSuccessorSelfImprovementBridgeInputs (params : Parameters)
+remaining Section 9 obligations for those honest slice strategies. -/
+def MainFormalSuccessorSelfImprovementObligations (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
@@ -176,7 +176,7 @@ def MainFormalSuccessorSelfImprovementBridgeInputs (params : Parameters)
   ∀ hinduction :
     MainInductionStep.PerSliceInductionPackage params
       strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) hrestrict k,
-    MainInductionStep.SelfImprovementPackage.SliceBridgeInputs params
+    MainInductionStep.SelfImprovementPackage.SliceObligations params
       strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
       hrestrict hinduction
 
@@ -197,9 +197,9 @@ abbrev MainFormalSuccessorSelfImprovementInductionPackage (params : Parameters)
   MainInductionStep.PerSliceInductionPackage params
     strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) hrestrict k
 
-/-- Assemble ordinary successor self-improvement bridge inputs from honest slice
-strategies, measurement transports, and the remaining Section 9 bridge data. -/
-noncomputable def mainFormalSuccessorSelfImprovementBridgeInputs_ofMeasurementEq
+/-- Assemble ordinary successor self-improvement obligations from honest slice
+strategies, measurement transports, and the remaining Section 9 obligations. -/
+noncomputable def mainFormalSuccessorSelfImprovementObligations_ofMeasurementEq
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -229,31 +229,31 @@ noncomputable def mainFormalSuccessorSelfImprovementBridgeInputs_ofMeasurementEq
         (sliceStrategy hinduction x).diagonalMeasurement.toIdxProjMeas =
           (MainInductionStep.xRestrictedStrategy params
             strategy.strategySymmetrization x).diagonalMeasurement)
-    (bridgeInputs :
+    (obligations :
       ∀ hinduction x,
-        SelfImprovement.SelfImprovementBridgeInputs params (sliceStrategy hinduction x)
+        SelfImprovement.SelfImprovementObligations params (sliceStrategy hinduction x)
           ((mainFormalSuccessorRestrictionPackage params strategy eps hpass
             haxisWeightedBound hdiagonalWeightedBound).profile.axisParallel x)
           ((mainFormalSuccessorRestrictionPackage params strategy eps hpass
             haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x)
           (hinduction.sliceError x)) :
-    MainFormalSuccessorSelfImprovementBridgeInputs params strategy eps hpass k
+    MainFormalSuccessorSelfImprovementObligations params strategy eps hpass k
       haxisWeightedBound hdiagonalWeightedBound := by
   let hrestrict :=
     mainFormalSuccessorRestrictionPackage params strategy eps hpass
       haxisWeightedBound hdiagonalWeightedBound
   intro hinduction
   exact
-    MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.ofMeasurementEq
+    MainInductionStep.SelfImprovementPackage.SliceObligations.ofMeasurementEq
       params strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
       hrestrict hinduction (sliceStrategy hinduction) (state_eq hinduction)
       (pointMeasurement_eq hinduction) (axisParallelMeasurement_eq hinduction)
-      (diagonalMeasurement_eq hinduction) (bridgeInputs hinduction)
+      (diagonalMeasurement_eq hinduction) (obligations hinduction)
 
-/-- Assemble ordinary successor self-improvement bridge inputs from the three
+/-- Assemble ordinary successor self-improvement obligations from the three
 named Section 9 inputs, using the closed spectral truncation input for the
 orthonormalization stage. -/
-noncomputable def mainFormalSuccessorSelfImprovementBridgeInputs_ofOrthonormalizationRepair
+noncomputable def mainFormalSuccessorSelfImprovementObligations_ofOrthonormalizationRepair
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -307,26 +307,26 @@ noncomputable def mainFormalSuccessorSelfImprovementBridgeInputs_ofOrthonormaliz
           ((mainFormalSuccessorRestrictionPackage params strategy eps hpass
             haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x)
           (hinduction.sliceError x)) :
-    MainFormalSuccessorSelfImprovementBridgeInputs params strategy eps hpass k
+    MainFormalSuccessorSelfImprovementObligations params strategy eps hpass k
       haxisWeightedBound hdiagonalWeightedBound := by
   let hrestrict :=
     mainFormalSuccessorRestrictionPackage params strategy eps hpass
       haxisWeightedBound hdiagonalWeightedBound
   intro hinduction
   exact
-    MainInductionStep.SelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationRepair
+    MainInductionStep.SelfImprovementPackage.SliceObligations.ofOrthonormalizationRepair
       params strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
       hrestrict hinduction (sliceStrategy hinduction) (state_eq hinduction)
       (pointMeasurement_eq hinduction) (axisParallelMeasurement_eq hinduction)
       (diagonalMeasurement_eq hinduction) (helperStrongSelfConsistency hinduction)
       (repair hinduction) (finalFields hinduction)
 
-/-- Convert successor-case bridge inputs into the self-improvement obligation
+/-- Convert successor-case obligations into the self-improvement obligation
 expected by the public Section 6 boundary.
 
-This does not discharge the bridge-input fields; it only assembles them into the
+This does not discharge the obligation fields; it only assembles them into the
 existing `MainFormalSuccessorSelfImprovementObligation` API. -/
-noncomputable def mainFormalSuccessorSelfImprovementObligation_ofBridgeInputs
+noncomputable def mainFormalSuccessorSelfImprovementObligation_ofObligations
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -335,7 +335,7 @@ noncomputable def mainFormalSuccessorSelfImprovementObligation_ofBridgeInputs
     (hdiagonalWeightedBound :
       MainFormalSuccessorDiagonalWeightedBound params strategy eps)
     (hbridge :
-      MainFormalSuccessorSelfImprovementBridgeInputs params strategy eps hpass k
+      MainFormalSuccessorSelfImprovementObligations params strategy eps hpass k
         haxisWeightedBound hdiagonalWeightedBound) :
     MainFormalSuccessorSelfImprovementObligation params strategy eps hpass k
       haxisWeightedBound hdiagonalWeightedBound := by
@@ -344,7 +344,7 @@ noncomputable def mainFormalSuccessorSelfImprovementObligation_ofBridgeInputs
       haxisWeightedBound hdiagonalWeightedBound
   intro hinduction
   exact
-    MainInductionStep.SelfImprovementPackage.ofSliceBridgeInputs params
+    MainInductionStep.SelfImprovementPackage.ofSliceObligations params
       strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
       hrestrict hinduction (hbridge hinduction)
 
@@ -358,8 +358,8 @@ expects:
 2. recursive slice witnesses for the restricted strategies, and
 3. a restricted-strategy self-improvement obligation.
 
-The helper lemmas below now discharge the weighted fields from `hpass`; bundling
-all fields into a single named package still gives the successor branch of
+The helper lemmas below now discharge the weighted fields from `hpass`; grouping
+all fields into a single named structure still gives the successor branch of
 `mainFormal` one honest issue-#634 interface, rather than four independent
 hypothesis holes. -/
 structure MainFormalSuccessorBoundary (params : Parameters)
