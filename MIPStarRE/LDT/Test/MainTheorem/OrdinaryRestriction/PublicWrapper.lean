@@ -25,7 +25,18 @@ unsymmetrization / Schwartz--Zippel / projectivization cascade.
 Universe note: the explicit `[FieldModel.{0} params.q]` matches the Section 6
 wrapper's universe; the eventual `mainFormal` residual closure must transport or
 instantiate this same base-universe field model when choosing predecessor
-parameters. -/
+parameters.
+
+**Unfaithful:** this conditional handoff assumes
+`boundary : MainFormalSuccessorBoundary`, whose fields include recursive slice
+witnesses and the slice-wise self-improvement obligation rather than deriving
+them from the hypotheses of `thm:main-formal`
+(`references/ldt-paper/test_definition.tex:180-202`) and the successor case of
+`thm:main-induction` (`references/ldt-paper/inductive_step.tex:441-551`).
+This is tracked by #1363, #1507, #1503, and #1458.  Elimination: prove
+`mainFormalSuccessorProjectiveCompletionObligation` from the paper hypotheses,
+constructing the ordinary successor boundary internally before invoking this
+wrapper. -/
 theorem mainFormalSuccessorMainInductionPublicWrapper
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

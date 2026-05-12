@@ -263,7 +263,16 @@ exposed separately via `restrictedProbabilities`, and
 slice-wise restricted-strategy self-improvement output once it is supplied. This
 theorem therefore keeps `hselfObligation` as an explicit input; the remaining
 self-improvement proof must be derived inside the source-facing successor theorem,
-as tracked by #1507, #1503, and #1458. -/
+as tracked by #1507, #1503, and #1458.
+
+**Unfaithful:** this conditional assembly assumes the proof-stage inputs
+`hrestrict`, `hrec`, and `hselfObligation`, including the slice-wise
+self-improvement package that is not derived here from the hypotheses of
+`thm:main-induction` (`references/ldt-paper/inductive_step.tex:441-551`).
+This is tracked by #1507, #1503, and #1458.  Elimination: prove
+`mainInductionSuccessorObligation` from the hypotheses of `thm:main-induction`,
+deriving the restricted probabilities, recursive slice witnesses, and
+self-improvement packages internally. -/
 theorem mainInductionByRecursionOnM
     (params : Parameters)
     [FieldModel.{0} params.q]
@@ -379,7 +388,15 @@ the self-improvement outputs are assembled by
 `SelfImprovementPackage.ofSelfImprovementInInductionSection` once they are
 supplied, while producing those slice-wise outputs belongs to downstream
 `mainFormal` integration. The conclusion exposes only the global measurement
-witness needed downstream by `MIPStarRE.LDT.Test.MainTheorem`. -/
+witness needed downstream by `MIPStarRE.LDT.Test.MainTheorem`.
+
+**Unfaithful:** this conditional wrapper assumes the proof-stage inputs
+`haxisWeightedBound`, `hdiagonalWeightedBound`, `hrec`, and `hselfObligation`
+instead of deriving them from the successor case of `thm:main-induction`
+(`references/ldt-paper/inductive_step.tex:441-551`).  This is tracked by
+#1507, #1503, and #1458.  Elimination: prove
+`mainInductionSuccessorObligation` from the paper hypotheses and use this
+wrapper only as the internal assembly step. -/
 theorem mainInductionPublicWrapper
     (params : Parameters)
     [FieldModel.{0} params.q]
@@ -453,8 +470,17 @@ theorem mainInductionPublicWrapper
 /-- Answer-valued successor-step recursion entry point.
 
 This theorem keeps the paper-facing restricted strategy interface
-`xRestrictedAnswerSymStrat`, then explicitly forgets that extra diagonal answer
-structure to reuse the checked legacy assembly. -/
+`xRestrictedAnswerSymStrat`, then explicitly forgets that extra diagonal
+answer structure to reuse the checked legacy assembly.
+
+**Unfaithful:** this conditional assembly assumes the answer-valued proof-stage
+inputs `hrestrict`, `hrec`, and `hselfObligation`, including slice-wise
+self-improvement outputs that are not derived here from the successor case of
+`thm:main-induction` (`references/ldt-paper/inductive_step.tex:441-551`).
+This is tracked by #1507, #1503, #1369, and #1458.  Elimination: derive the
+answer-valued restriction, recursive slice witnesses, and self-improvement
+packages inside the source-facing successor proof, then use this theorem only
+as an internal assembly step. -/
 theorem answerMainInductionByRecursionOnM
     (params : Parameters)
     [FieldModel.{0} params.q]
@@ -554,7 +580,15 @@ noncomputable def answerMainInductionPublicRestrictionPackage
 
 The external recursive and self-improvement inputs are stated against
 `xRestrictedAnswerSymStrat`; internally, the verified legacy pasting assembly is
-reused via explicit answer-to-legacy package bridges. -/
+reused via explicit answer-to-legacy package bridges.
+
+**Unfaithful:** this conditional wrapper assumes the answer-valued proof-stage
+inputs `haxisWeightedBound`, `hdiagonalWeightedBound`, `hrec`, and
+`hselfObligation` instead of deriving them from the successor case of
+`thm:main-induction` (`references/ldt-paper/inductive_step.tex:441-551`).
+This is tracked by #1507, #1503, #1369, and #1458.  Elimination: derive these
+inputs inside the source-facing successor proof and keep this wrapper as an
+internal assembly theorem. -/
 theorem answerMainInductionPublicWrapper
     (params : Parameters)
     [FieldModel.{0} params.q]
