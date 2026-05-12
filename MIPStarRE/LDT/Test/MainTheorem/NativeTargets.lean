@@ -3,7 +3,7 @@ import MIPStarRE.LDT.Test.MainTheorem.DiagonalCompletion
 /-!
 # Main-formal native targets
 
-Target and residual packages used by the final `mainFormal` assembly.
+Target and residual data used by the final `mainFormal` assembly.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -18,7 +18,7 @@ Paper origin: `references/ldt-paper/inductive_step.tex:68-173`, the
 role-register, unsymmetrization, and projectivization/completion part of
 `\label{thm:main-formal}`.
 
-The proof body consumes this package in paper order: first it reads the concrete
+The proof body consumes this record in paper order: first it reads the concrete
 role residual, then derives the unsymmetrized POVMs, line-116 evaluated
 consistency, and Step-5 full `G^A/G^B` consistency, and only then consumes the
 post-role Step 6 completion data whose `P^A/P^B` provenance is tied to that
@@ -60,14 +60,14 @@ projective submeasurements obtained from line 130.
 
 This is the precise remaining shape of the final `mainFormal` hole after the
 paper-order handoffs have been named. -/
-theorem nonempty_ofRoleResidualAndCompletionProducer
+theorem nonempty_ofRoleResidualAndCompletionObligation
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
     (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
-    (completionProducer :
+    (completionObligation :
       MainFormalPostRolePackageDiagonalOrthonormalizationResidual
           params strategy eps k scalars (roleResidual.rolePackage scalars) →
         MainFormalPostRolePackageDiagonalCompletionResidual
@@ -77,16 +77,16 @@ theorem nonempty_ofRoleResidualAndCompletionProducer
   have hpre := roleResidual.diagonalConsistency scalars
   rcases MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalConsistency
       hpre with ⟨orthResidual⟩
-  exact nonempty_ofRoleResidualAndCompletion roleResidual ⟨completionProducer orthResidual⟩
+  exact nonempty_ofRoleResidualAndCompletion roleResidual ⟨completionObligation orthResidual⟩
 
 /-- Assemble the final live residual using explicit completion inputs rather than
-an opaque `completionProducer`.
+an opaque completion obligation.
 
 A caller supplies, for each line-130 orthonormalization residual produced from
 the role residual, the concrete distinguished outcomes, completed-closeness
 proofs, and orthonormalization match-mass preservation facts recorded as
 `MainFormalPostRolePackageDiagonalCompletionInput`.  This theorem converts that
-package into the old producer shape by `toCompletionResidual`.
+input record into the completion-obligation shape by `toCompletionResidual`.
 
 **Status:** currently unused (no callers).  The more analytic variant
 `nonempty_ofRoleResidualAndCompletingToMeasurementInputs` exposes the same
@@ -99,27 +99,27 @@ theorem nonempty_ofRoleResidualAndCompletionInputs
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
     (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
-    (completionInputProducer :
+    (completionInputObligation :
       ∀ orthResidual : MainFormalPostRolePackageDiagonalOrthonormalizationResidual
           params strategy eps k scalars (roleResidual.rolePackage scalars),
         MainFormalPostRolePackageDiagonalCompletionInput
           params strategy eps k scalars (roleResidual.rolePackage scalars) orthResidual) :
     Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
       params strategy eps hpass k scalars) :=
-  nonempty_ofRoleResidualAndCompletionProducer roleResidual fun orthResidual =>
-    (completionInputProducer orthResidual).toCompletionResidual
+  nonempty_ofRoleResidualAndCompletionObligation roleResidual fun orthResidual =>
+    (completionInputObligation orthResidual).toCompletionResidual
 
 /-- Assemble the final live residual from the exact analytic completion witnesses.
 
-This is the paper-shaped replacement for the generic `completionProducer`: after
-line 130 produces `P^A` and `P^B`, the caller provides
+This is the paper-shaped replacement for the generic completion obligation:
+after line 130 produces `P^A` and `P^B`, the caller provides
 * distinguished completion outcomes `a_A`, `a_B`,
 * strong self-consistency for the two unsymmetrized role POVMs, and
 * orthonormalization match-mass preservation for the two produced
   submeasurements.
 
 The proof invokes `completingToMeasurement` to derive the two completed-closeness
-fields and then packages them through
+fields and then assembles them into
 `MainFormalPostRolePackageDiagonalCompletionInput.toCompletionResidual`. -/
 theorem nonempty_ofRoleResidualAndCompletingToMeasurementInputs
     {params : Parameters} [FieldModel.{0} params.q]
@@ -179,7 +179,7 @@ This is the live Lean Step 6 route: the checked role residual
 reconstructs line 130 as a cross `ConsRel`, the orthonormalization wrapper
 produces `P^A,P^B`, and the remaining completion step is discharged directly from
 that cross relation plus the construction-level match-mass preservation facts,
-without asking callers for separate diagonal strong self-consistency packages. -/
+without asking callers for separate diagonal strong self-consistency assumptions. -/
 theorem nonempty_ofRoleResidualAndMatchMassPreservation
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -248,7 +248,7 @@ end MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
 
 namespace MainFormalCascadeTransportTargets
 
-/-- Add the already-discharged scalar package back to the transport-only targets. -/
+/-- Add the already-discharged scalar data back to the transport-only targets. -/
 noncomputable def toCascadeTargets {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
@@ -280,10 +280,10 @@ three consistency fields are exactly the native conclusions reached in
   $Q^{\mathrm A}_g \otimes I \simeq_{\zeta_3/2} I \otimes Q^{\mathrm B}_g$.
 
 The two bound fields record the already-formalized Step 8 absorption of
-`\zeta_4` and `\zeta_3/2` into `mainFormalError`. Constructing this package from
+`\zeta_4` and `\zeta_3/2` into `mainFormalError`. Constructing this data from
 Section 6 and the unsymmetrization / Schwartz--Zippel / projectivization chain is
 the live residual; the projection theorem below is only the final paper-faithful
-packaging step. -/
+assembly step. -/
 structure MainFormalNativeTargets
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

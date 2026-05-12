@@ -111,7 +111,7 @@ structure MainFormalPostRolePackageDiagonalCompletionResidual ... where
 | Constructor | Required inputs | Status |
 |------------|----------------|--------|
 | `nonempty_ofRoleResidualAndCompletion` | `roleResidual` + `Nonempty MainFormalPostRolePackageDiagonalCompletionResidual` | Circular (needs itself) |
-| `nonempty_ofRoleResidualAndDiagonalInputs` | `roleResidual` + `OrthonormalizationInput` + `completionProducer : OrthResidual → CompletionResidual` | CompletionProducer missing |
+| `nonempty_ofRoleResidualAndCompletionObligation` | `roleResidual` + `completionObligation : OrthResidual → CompletionResidual` | Completion obligation missing |
 | `nonempty_ofRoleResidualAndDiagonalInputsAndMatchMassPreservation` | `roleResidual` + `OrthonormalizationInput` + `a_A a_B` + match-mass for both sides | Match-mass unproven |
 | `nonempty_ofRoleResidualAndDiagonalInputsAndCompletingToMeasurementInputs` | `roleResidual` + `OrthonormalizationInput` + `a_A a_B` + `BipartiteSSCRel` (left + right) + match-mass | All four missing |
 

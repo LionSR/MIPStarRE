@@ -190,10 +190,10 @@ consumed by the live Step 6 assembly.
 Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, with
 completion supplied by `references/ldt-paper/preliminaries.tex:1095-1140`.
 
-This is the checked data-valued constructor for the old generic
-`completionProducer`: callers may supply a function returning this input for each
-line-130 orthonormalization residual and then use `toCompletionResidual` as the
-producer. -/
+This is the checked data-valued constructor for the generic completion
+obligation: callers may supply a function returning this input for each line-130
+orthonormalization residual and then use `toCompletionResidual` to produce the
+residual consumed by the final assembly. -/
 noncomputable def toCompletionResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
