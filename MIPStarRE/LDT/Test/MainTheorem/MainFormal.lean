@@ -475,7 +475,9 @@ projective-completion residual.  These are tracked proof obligations for
 #1043, #1363, and #1458; see also
 `docs/paper-gaps/issue-1099-sharper-local-fix.tex` for the local repair used in
 the final completion transport.  They must be proved from the paper hypotheses,
-not turned into hypotheses of `mainFormal`.
+not turned into hypotheses of `mainFormal`.  Elimination: prove the two named
+obligation declarations from the hypotheses of `thm:main-formal`, then keep this
+theorem as a checked internal assembly step.
 
 Addresses #137, #239, #906, #1099, #1458.
 -/
@@ -596,7 +598,9 @@ whose proof uses the admitted obligation declarations
 `mainFormalBaseBranchCompletionObligations_ofBaseCase` and
 `mainFormalSuccessorProjectiveCompletionObligation`.  The remaining
 obligations are tracked by #1043, #1363, and #1458 and must be discharged inside
-the proof, rather than exposed as extra non-paper assumptions.
+the proof, rather than exposed as extra non-paper assumptions.  Elimination:
+prove those two obligation declarations from the hypotheses of
+`thm:main-formal`.
 -/
 theorem mainFormal
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
