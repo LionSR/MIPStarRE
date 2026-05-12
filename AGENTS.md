@@ -168,12 +168,22 @@ statement matches the cited paper statement, up to faithful formal encoding.
 Changing a Lean theorem away from the corresponding statement in
 `references/ldt-paper/` is strongly discouraged and should occur only when a
 faithful formal encoding or a documented mathematical necessity requires it.
-The check is on the hypotheses as well as the conclusion.  A theorem whose
+This applies to every declaration advertised as a formalization of a paper
+result, not only to theorems currently undergoing repair.  The check is on the
+hypotheses as well as the conclusion.  A theorem whose
 conclusion has the right shape but whose assumptions include an extra
 load-bearing bridge input or hypotheses bundle is a conditional theorem, not
 the paper theorem.
 The project goal is to eliminate such conditional bridges, not to normalize
 them as permanent infrastructure.
+
+If the only available Lean theorem has extra assumptions, the blueprint must
+not mark the source-labelled paper entry as matched by that theorem.  Either
+leave the source-labelled entry without `\leanok`, or state the restricted or
+conditional result as a separate Lean-only blueprint entry whose hypotheses are
+displayed explicitly.  A scope-restricted theorem may be marked `\leanok` only
+against a blueprint statement that explicitly states the restriction; it must
+not be presented as the unrestricted source theorem.
 
 This rule applies especially to declarations named after paper labels such as
 `mainFormal`, `selfImprovement`, `mainInduction`, or other theorem names linked

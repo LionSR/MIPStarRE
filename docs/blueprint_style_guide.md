@@ -58,6 +58,15 @@ with a paper source, a tracking issue, and a removal plan.  The blueprint should
 leave the paper theorem unmarked as fully matched until a source-faithful Lean
 statement exists.
 
+If a Lean theorem proves only a restricted version of a source theorem, the
+blueprint entry carrying `\leanok` must state that restriction in the theorem
+statement itself.  It must not be cited as the unrestricted source theorem.
+When the only Lean declaration available for a source label has extra
+non-paper assumptions, remove the `\leanok` claim from the source-labelled
+entry or move the restricted statement to a separate Lean-only entry.  The
+unrestricted paper theorem remains unformalized until a Lean statement with
+the source's hypothesis set exists.
+
 ## Notation Consistency
 Notation must be **internally consistent** across the entire blueprint and **close to what the Lean code expresses**:
 

@@ -104,6 +104,10 @@ runs:
           '  division, nonemptiness, decidability, or a field-model instance.' \
           '- Proof-debt objects are not boundary conditions, even when packaged as' \
           '  inputs or producers.' \
+          '- If the available Lean theorem proves only a restricted or conditional' \
+          '  version of the paper theorem, do not mark the unrestricted source label' \
+          '  with `\leanok`; put the restricted statement in a separate entry whose' \
+          '  extra assumptions are stated explicitly.' \
           '- If the proof cannot be closed from the paper hypotheses, state the missing' \
           '  intermediate result as a named obligation to be proved from those hypotheses,' \
           '  and leave that obligation explicit rather than adding it to the source' \
