@@ -1,7 +1,5 @@
 import MIPStarRE.LDT.Basic.SubMeasurementFamilies
-import MIPStarRE.LDT.GlobalVariance.Theorems.Results
-import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
-import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain
+import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
 import MIPStarRE.LDT.Preliminaries.Triangles
 import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds

@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Test.MainTheorem.ProjectiveConsistency.Evaluation
+import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Handoff
 
 /-!
 # Projective handoff residuals

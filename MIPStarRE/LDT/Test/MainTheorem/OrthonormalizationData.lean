@@ -1,5 +1,7 @@
 import MIPStarRE.LDT.Test.MainTheorem.CompletionTransport
-import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain
+import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
+import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Line169Repair
+import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Output
 import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation
 import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationBridge
 

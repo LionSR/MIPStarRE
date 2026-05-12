@@ -1,6 +1,7 @@
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
-import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
+import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization.RestrictSome
 import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation
+import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities
 import MIPStarRE.LDT.Preliminaries.DistanceBounds
 

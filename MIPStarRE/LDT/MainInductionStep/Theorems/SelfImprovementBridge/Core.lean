@@ -4,7 +4,7 @@ import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 import MIPStarRE.LDT.Pasting.Bernoulli.Final
 import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationBridge
 -- Used by `selfImprovementInInductionSection_ofMeasurement`.
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 
 /-!
 # Section 6 — Ordinary Self-Improvement Bridge

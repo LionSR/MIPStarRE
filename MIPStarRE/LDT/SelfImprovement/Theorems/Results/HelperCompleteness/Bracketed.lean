@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.Linearized
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SdpMatrixBridge
+import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
 
 /-!
 # Helper completeness: bracketed mass identities and reduced wrappers
