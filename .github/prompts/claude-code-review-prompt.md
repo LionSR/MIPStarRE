@@ -37,6 +37,10 @@ that determines whether the PR can be approved with outstanding issues.
    missing fact should be exposed as a separately named internal obligation or lemma.
    Existing conditional helpers must have names that make the conditional nature clear,
    and they must not be treated as the paper theorem or advertised by `\leanok`.
+   A newly introduced conditional helper, proof-debt bundle, producer, or obligation
+   package is itself a blocker unless the PR is explicitly a paper-realignment change
+   and the new object reduces an already existing statement drift while leaving the
+   paper-facing theorem source-faithful.
 4. 🟡 **Mathlib style**: Does the code follow Mathlib conventions? Check naming (`camelCase` for
    defs, `snake_case` for lemmas), tactic style (prefer `exact` over `apply` + `rfl` when
    equivalent), import hygiene (no unnecessary `open`s, minimal imports), and lemma placement.

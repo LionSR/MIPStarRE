@@ -15,7 +15,8 @@ Instructions:
      arbitrary implication hypotheses that are absent
      from the cited statement.  If the source-faithful proof cannot be completed,
      stop and comment on the PR with the missing named lemma or internal
-     obligation to discharge.
+     obligation to discharge.  Do not create a new conditional helper,
+     proof-debt bundle, producer, or obligation package as the fix.
    - Type mismatch: check expected vs actual types and fix the proof term.
    - Unknown identifier / import error: add the correct `import` statement.
    - Tactic failure: try alternative tactics (`simp`, `exact`, `apply`, `omega`, etc.).
@@ -39,7 +40,8 @@ Quality bar (same rubric as Claude Code Review — your fix MUST satisfy ALL of 
   such as positivity for a division, nonemptiness, decidability, or a
   field-model instance. Proof-debt objects are not boundary conditions. If a
   proof needs such data, report the missing named lemma or internal obligation
-  instead of changing the paper theorem.
+  instead of changing the paper theorem. Do not introduce a new conditional
+  helper or packaged obligation merely to keep the branch compiling.
 - Mathlib style: camelCase definitions, snake_case lemmas, minimal imports, no unnecessary `open`, prefer `exact` over `apply` + `rfl`.
 - Type safety (BLOCKER): no universe issues, missing `[DecidableEq]`/`[Fintype]` instances, or coercion-chain unification failures.
 - Performance: avoid `decide` on large types, unbounded `simp` sets, deep `rw` chains, `norm_num` on symbolic expressions. Prefer `omega`, `positivity`, explicit `calc`.

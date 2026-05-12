@@ -25,11 +25,11 @@ blueprint theorem is present, and the missing derivation from the incoming
 consistency hypothesis is tracked by issue #1515.
 
 The audits for the `Test.mainFormal` proof frontier record the current tracked
-gaps from issue #1458: the successor projective-completion residual has not yet
-been produced from the Section 6 induction data, and the base-case match-mass
-completion data has not yet been produced from the paper's base-case
-argument.  These obligations are isolated as named statements rather than
-assumed in the public statement of the paper theorem.
+gaps separately: issue #1043 for the base-case match-mass completion data,
+issues #1363 and #1369 for the successor projective-completion residual, and
+issue #1458 as the umbrella tracking issue.  These obligations are isolated as
+named statements rather than assumed in the public statement of the paper
+theorem.
 
 The audit for `GlobalVariance.globalVarianceOfPoints` now requires the standard
 Lean axioms only: the issue-#1456 six-step local transport estimate is supplied
@@ -81,9 +81,20 @@ private def expectedStandardAxioms : Array Name :=
 private def expectedStandardAxiomsWithSorry : Array Name :=
   #[``propext, ``Classical.choice, ``Quot.sound, ``sorryAx].qsort Name.lt
 
-/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1458 gaps in the
-paper-facing `mainFormal` proof frontier. -/
-private def expectedTrackedSorryAxioms : Array Name :=
+/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1043 base-case
+match-mass completion obligation for the `mainFormal` proof frontier. -/
+private def expectedMainFormalBaseAxioms : Array Name :=
+  expectedStandardAxiomsWithSorry
+
+/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1363/#1369
+successor projective-completion obligation for the `mainFormal` proof frontier. -/
+private def expectedMainFormalSuccessorAxioms : Array Name :=
+  expectedStandardAxiomsWithSorry
+
+/-- Standard kernel axioms plus `sorryAx`; tracks the paper-facing
+`mainFormal` assembly depending on the issue #1043 and #1363/#1369
+obligations, with issue #1458 as the umbrella tracker. -/
+private def expectedMainFormalAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
 /-- Standard kernel axioms plus `sorryAx`; tracks the issue #1515 derivation
@@ -130,8 +141,14 @@ private def assertUsesOnlyStandardAxioms (declName : Name) : CommandElabM Unit :
 elab "assert_standard_axioms " id:ident : command => do
   assertUsesOnlyStandardAxioms id.getId
 
-elab "assert_tracked_sorry_axioms " id:ident : command => do
-  assertUsesExactlyAxioms id.getId expectedTrackedSorryAxioms
+elab "assert_main_formal_base_axioms " id:ident : command => do
+  assertUsesExactlyAxioms id.getId expectedMainFormalBaseAxioms
+
+elab "assert_main_formal_successor_axioms " id:ident : command => do
+  assertUsesExactlyAxioms id.getId expectedMainFormalSuccessorAxioms
+
+elab "assert_main_formal_axioms " id:ident : command => do
+  assertUsesExactlyAxioms id.getId expectedMainFormalAxioms
 
 elab "assert_self_improvement_axioms " id:ident : command => do
   assertUsesExactlyAxioms id.getId expectedSelfImprovementAxioms
@@ -155,11 +172,12 @@ assert_standard_axioms MIPStarRE.LDT.Test.razSafra
 assert_standard_axioms MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement
 assert_standard_axioms MIPStarRE.LDT.Test.classicalTestSoundness
 assert_standard_axioms MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization
-assert_tracked_sorry_axioms
+assert_main_formal_base_axioms
   MIPStarRE.LDT.Test.mainFormalBaseBranchCompletionObligations_ofBaseCase
-assert_tracked_sorry_axioms
+assert_main_formal_successor_axioms
   MIPStarRE.LDT.Test.mainFormalSuccessorProjectiveCompletionObligation
-assert_tracked_sorry_axioms MIPStarRE.LDT.Test.mainFormal
+assert_main_formal_axioms MIPStarRE.LDT.Test.mainFormal_ofInternalObligations
+assert_main_formal_axioms MIPStarRE.LDT.Test.mainFormal
 assert_self_improvement_axioms MIPStarRE.LDT.SelfImprovement.selfImprovement
 assert_standard_axioms MIPStarRE.LDT.GlobalVariance.globalVarianceOfPoints
 assert_induction_self_improvement_axioms
