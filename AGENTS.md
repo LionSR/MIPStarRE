@@ -191,8 +191,8 @@ Before editing any theorem tagged with a paper label (`thm:*`, `lem:*`,
 4. If a missing intermediate fact is needed, first state that fact as a named
    lemma or theorem to be proved from the paper hypotheses.
 5. Add a conditional helper only as a last resort, and only when it has a
-   paper-gap note, a named producer theorem target, and an explicit removal
-   plan.  Its name must show that it is conditional, for example
+   paper-gap note, a named construction theorem or proof-obligation target, and
+   an explicit removal plan.  Its name must show that it is conditional, for example
    `mainFormal_ofRepairedBridge`, `mainFormal_assumingBridgeHypotheses`, or
    `conditional...`.
 6. Do not point a source-labelled blueprint theorem to the conditional helper
@@ -252,8 +252,8 @@ named proof obligation.  Such a PR must:
 
 1. cite the paper passage by label or line range in the relevant docstring;
 2. cite the paper-gap note or tracking issue that records the divergence;
-3. identify every introduced or retained `sorry` and the producer theorem or
-   source-faithful lemma expected to discharge it;
+3. identify every introduced or retained `sorry` and the construction theorem,
+   proof-obligation theorem, or source-faithful lemma expected to discharge it;
 4. avoid unrelated refactors, notation changes, or proof-engineering churn.
 
 During paper realignment, every restated definition, hypothesis field, or
@@ -280,7 +280,7 @@ minimal form is:
 **Unfaithful:** This proof currently relies on `<hypothesis or helper>`,
 which is not derived from `<paper label or line range>`.  Documented in
 `docs/paper-gaps/<note>.tex` or issue `#N`.  Elimination: prove
-`<producer theorem>` from the paper hypotheses.
+`<construction theorem>` from the paper hypotheses.
 ```
 
 The marker propagates through dependencies: a theorem whose proof transitively
@@ -585,7 +585,7 @@ Use this file together with:
 | `docs/CONTRIBUTING.md` | PR format, issue templates, label taxonomy, review checklist |
 | `docs/PROOF_INTEGRITY.md` | Blocker / warning patterns for proof correctness |
 | `docs/anti_patterns.md` | Subtler proof-evasion patterns |
-| `docs/proof_frontier_review.md` | Review checklist for producer theorems versus residual inputs |
+| `docs/proof_frontier_review.md` | Review checklist for construction theorems versus residual inputs |
 | `docs/style.md` | Mathlib code style (line length, indentation, tactic formatting) |
 | `docs/naming.md` | Mathlib naming conventions |
 | `docs/doc.md` | Mathlib documentation standards |

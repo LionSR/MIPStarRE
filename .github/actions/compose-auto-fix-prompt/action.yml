@@ -104,11 +104,18 @@ runs:
           '  division, nonemptiness, decidability, or a field-model instance.' \
           '- Proof-debt objects are not boundary conditions, even when packaged as' \
           '  inputs or producers.' \
-          '- If the proof cannot be closed from the paper hypotheses, stop and report' \
-          '  the missing lemma. Create a separately named conditional helper only' \
-          '  as a quarantine for downstream proof content, with a tracked producer' \
-          '  theorem that will remove it; do not turn the paper theorem into a' \
-          '  conditional theorem.')"
+          '- If the proof cannot be closed from the paper hypotheses, state the missing' \
+          '  intermediate result as a named obligation to be proved from those hypotheses,' \
+          '  and leave that obligation explicit rather than adding it to the source' \
+          '  theorem.' \
+          '- Do not introduce a new conditional helper merely to keep CI green. If an' \
+          '  existing conditional helper is unavoidable for preserving downstream proof' \
+          '  content, keep it separately named as conditional, keep it out of' \
+          '  source-labelled `\leanok`, and identify the exact obligation that will' \
+          '  remove it.' \
+          '- When in doubt, restore the paper-aligned theorem statement and expose the' \
+          '  missing proof obligation; do not turn the paper theorem into a conditional' \
+          '  theorem.')"
 
         full_prompt="$prompt"
         if [ -n "$PROMPT_CONTEXT" ]; then

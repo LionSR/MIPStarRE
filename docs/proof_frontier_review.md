@@ -64,10 +64,11 @@ with a suffix such as `Input`, `Residual`, `BridgeInputs`, `Witness`,
 
 ## Diagonal and Completion Data
 
-The recent Section 6 and self-improvement work produced several legitimate
-bridge structures. It also exposed a recurring ambiguity: a theorem may mention
-diagonal data, completion data, or restricted strategy data while only
-repackaging such data as an explicit input.
+The recent Section 6 and self-improvement work exposed several tracked
+proof-obligation structures. They should be reviewed as debt to remove, not as
+new source hypotheses to normalize. The recurring ambiguity is that a theorem
+may mention diagonal data, completion data, or restricted strategy data while
+only repackaging such data as an explicit input.
 
 For any theorem whose name or docstring mentions diagonal consistency,
 line-130 data, completion, restricted strategies, or repaired strategy data,
