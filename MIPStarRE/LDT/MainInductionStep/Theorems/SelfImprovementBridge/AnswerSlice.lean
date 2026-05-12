@@ -1,7 +1,7 @@
 import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementBridge.Core
 
 /-!
-# Section 6 -- Answer-Valued Self-Improvement Slice Obligations
+# Section 6 — Answer-Valued Self-Improvement Slice Obligations
 
 This file contains the answer-valued analogues of the Section 6 slice-obligation
 constructors.  The ordinary construction, including `selfImprovementInInductionSection`,
