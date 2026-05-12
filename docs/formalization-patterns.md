@@ -10,7 +10,7 @@ in `audits/` and the proof-integrity rules in `docs/PROOF_INTEGRITY.md`.
 
 ## Table of Contents
 
-1. [Source-faithful statements and producer obligations](#pattern-1-source-faithful-statements-and-producer-obligations)
+1. [Source-faithful statements and internal proof obligations](#pattern-1-source-faithful-statements-and-internal-proof-obligations)
 2. [Blueprint–Lean synchronization](#pattern-2-blueprintlean-synchronization)
 3. [Split-module architecture](#pattern-3-split-module-architecture)
 4. [Barrel re-export pattern](#pattern-4-barrel-re-export-pattern)
@@ -19,7 +19,7 @@ in `audits/` and the proof-integrity rules in `docs/PROOF_INTEGRITY.md`.
 
 ---
 
-## Pattern 1: Source-faithful statements and producer obligations
+## Pattern 1: Source-faithful statements and internal proof obligations
 
 ### The rule
 
@@ -34,9 +34,9 @@ The project therefore distinguishes three objects.
 
 | Object | Public statement | Blueprint status |
 |--------|------------------|------------------|
-| Paper theorem | Matches the cited result in `references/ldt-paper/` | May be linked by the source-labelled `\lean{}`; statement-level `\leanok` only when the statement matches |
-| Producer obligation | Proves a missing intermediate mathematical input from paper hypotheses | May contain a tracked `sorry` while the proof is open |
-| Conditional helper | Uses an additional bridge-like input to prove a useful consequence | Allowed only as explicitly labelled scaffolding; it must not be advertised as the paper theorem |
+| Paper theorem | Matches the cited result in `references/ldt-paper/` | May be linked by source-labelled `\lean{}`; statement-level `\leanok` only when the statement matches |
+| Internal proof obligation | Proves a missing intermediate mathematical input from paper hypotheses | May contain a tracked `sorry` while the proof is open |
+| Conditional helper | Uses an additional bridge-like input to prove a useful consequence | Explicit scaffolding only; it must not be advertised as the paper theorem |
 
 It is never allowed to change the public statement of a declaration advertised
 as the formalization of a source-labelled paper theorem.  At the final assembly
@@ -44,7 +44,7 @@ point, the paper theorem must either discharge the extra hypotheses internally,
 or remain as the paper-aligned statement with an unfinished proof while the
 conditional helper is given a different name.
 
-The preferred way to expose unfinished work is a named producer theorem or
+The preferred way to expose unfinished work is a named internal theorem or
 definition with a precise paper-origin docstring and, if necessary, a tracked
 `sorry`.  This makes the proof frontier visible without weakening the statement
 of a source-labelled theorem.
@@ -73,11 +73,11 @@ are being actively removed.
    `Assumptions` is different: it is not a paper assumption unless the cited
    statement says so.
 3. **Name the missing intermediate result.**  If the proof uses a mathematical
-   fact not yet formalized, state it as a separate producer obligation.  A
-   temporary `sorry` in this producer is preferable to adding the obligation as
+   fact not yet formalized, state it as a separate proof obligation.  A
+   temporary `sorry` in this declaration is preferable to adding the obligation as
    a hypothesis on the paper theorem.
 4. **Use conditional helpers only as local scaffolding.**  A helper such as
-   `mainFormal_ofProducerObligations` or `selfImprovement_assumingBridgeInputs` may
+   `mainFormal_ofInternalObligations` or `selfImprovement_assumingBridgeInputs` may
    clarify an assembly step, but only if the paper-facing declaration remains
    source-faithful.  The helper is not the paper theorem and should not receive
    the source-labelled blueprint `\leanok`.
@@ -91,7 +91,7 @@ helper whose load-bearing input has not yet been produced from the paper
 hypotheses, the proof frontier must be marked explicitly.  The declaration
 should carry an `**Unfaithful:**` docstring section naming the non-paper
 dependency, citing the paper-gap note or tracking issue, and identifying the
-producer theorem that will remove the dependency.  A named producer theorem
+internal theorem that will remove the dependency.  A named proof obligation
 with a tracked `sorry` is preferred whenever possible, because it makes the
 missing mathematical assertion visible without adding it to the paper theorem
 statement.
@@ -141,18 +141,18 @@ statement.
 
 3. **Propagation is a warning sign.**  The consumer of
    `selfImprovementInInductionSection` — typically a
-   `MainInductionStep` wrapper — should close the hypothesis with a producer
+   `MainInductionStep` wrapper — should close the hypothesis with an internal
    theorem as soon as possible.  If the hypothesis propagates upward toward a
-   paper-labelled theorem, the PR should stop and either prove the producer or
+   paper-labelled theorem, the PR should stop and either prove the obligation or
    restore the paper theorem with an explicit unfinished proof.
 
 4. **Final closure at the source theorem.**  The theorem `mainFormal` in
    `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` is reserved for the
    paper-shaped statement.  The top-level assembly theorem
-   `mainFormal_ofProducerObligations` has the same public hypotheses and
-   conclusion; the remaining work is isolated in producer declarations such as
-   `mainFormalBaseBranchBridgeProducer` and
-   `mainFormalSuccessorProjectiveCompletionResidualProducer`, rather than
+   `mainFormal_ofInternalObligations` has the same public hypotheses and
+   conclusion; the remaining work is isolated in internal obligation declarations
+   such as `mainFormalBaseBranchCompletionObligations_ofBaseCase` and
+   `mainFormalSuccessorProjectiveCompletionObligation`, rather than
    assumed as theorem parameters.
 
    The paper-labelled `mainFormal` should have the hypotheses of the paper
@@ -169,13 +169,13 @@ When such a declaration remains useful, its role should be one of the following:
 
 | Declaration | Status to maintain |
 |-------------|--------------------|
-| `SelfImprovement.OrthonormalizationInput` | Conditional input for the Section 5 orthonormalization construction; discharge through producer obligations such as the QXP repair witness |
-| `SelfImprovement.FinalFieldsInput` | Conditional input for final Section 9 estimates; replace at the paper theorem boundary by source-faithful statements or named producer obligations |
+| `SelfImprovement.OrthonormalizationInput` | Conditional input for the Section 5 orthonormalization construction; discharge through internal proof obligations such as the QXP repair witness |
+| `SelfImprovement.FinalFieldsInput` | Conditional input for final Section 9 estimates; replace at the paper theorem boundary by source-faithful statements or named internal proof obligations |
 | `SelfImprovement.HelperStrongSelfConsistencyInput` | Conditional input for helper strong self-consistency estimates; keep tracked until produced |
 | `SelfImprovement.SelfImprovementBridgeInputs` | Historical bundle of the preceding inputs; do not introduce as a hypothesis on a paper-labelled theorem |
-| `MainFormalBaseBridgeHypotheses` | Conditional base-case assembly data; do not expose on `mainFormal`, which is reserved for `thm:main-formal` |
-| `MainFormalBaseProjectiveCompletionHypotheses` | Conditional completion data; do not move it into a paper-facing theorem statement |
-| `MainFormalPostRolePackageDiagonalOrthonormalizationInput` | Internal data for orthonormalization of unsymmetrized POVMs; its repair fields are producer obligations |
+| `MainFormalBaseCompletionObligations` | Base-case assembly obligations; do not expose on `mainFormal`, which is reserved for `thm:main-formal` |
+| `MainFormalBaseProjectiveCompletionObligations` | Completion obligations; do not move them into a paper-facing theorem statement |
+| `MainFormalPostRolePackageDiagonalOrthonormalizationInput` | Internal data for orthonormalization of unsymmetrized POVMs; its repair fields are proof obligations |
 | `MakingMeasurementsProjective.OrthonormalizationInput` | Conditional input for the orthonormalization proof; keep visibly distinct from source-faithful paper statements |
 | `LdPastingContext` | Faithfulness-sensitive context for `ldPasting`; audit each field against the Section 12 hypotheses and boundary conditions |
 
@@ -184,7 +184,7 @@ When such a declaration remains useful, its role should be one of the following:
 The direct tracked `sorry` sites in `MainFormal.lean` record two remaining
 construction obligations:
 
-1. The successor projective-completion residual producer, whose TODO comments
+1. The successor projective-completion obligation, whose TODO comments
    list three items:
 
    1. A `MainFormalRolePackageBranchResidual` constructed from
@@ -192,17 +192,17 @@ construction obligations:
    2. Line-130 orthonormalization inputs
       (`MainFormalPostRolePackageDiagonalOrthonormalizationInput`),
    3. Completion input derived from `completingToMeasurement`.
-2. The base-case match-mass bridge producer, whose target is
-   `MainFormalBaseBranchBridgeHypotheses` for the checked base-case role
+2. The base-case match-mass completion obligation, whose target is
+   `MainFormalBaseBranchCompletionObligations` for the checked base-case role
    residual.
 
 These are data-construction obligations.  Once the per-slice self-improvement
-producers and recursive induction packages are threaded through, the
-paper-labelled theorem should call the producer-obligation assembly without
+proof obligations and recursive induction packages are threaded through, the
+paper-labelled theorem should call the internal-obligation assembly without
 adding bridge inputs to the theorem statement.
 
 This is the intended cleanup direction: use the conditional helper only to
-identify reusable proof content, then prove the producers or restore the
+identify reusable proof content, then prove the internal obligations or restore the
 paper-aligned theorem with the remaining obligation visible.
 
 ### Distinction from anti-patterns
@@ -448,12 +448,12 @@ A separately named conditional helper may take
 `(h : SelfImprovementBridgeInputs params strategy eps delta nu)` as a
 hypothesis and project the needed field inside the proof body.  This does not
 prove the corresponding paper theorem.  The package should be eliminated by
-producer theorems, or the source-labelled theorem should be restored with the
+internal theorems, or the source-labelled theorem should be restored with the
 remaining proof obligation visible.
 
 ### Rules
 
-1. **Every bridge field must have a producer theorem somewhere**, or a
+1. **Every bridge field must have a theorem that produces it somewhere**, or a
    tracking issue (#931, #422, etc.) explaining when it will be produced.
 2. **Docstrings must name the tracking issue and paper source.**
 3. **Fields must be the *assumptions* of the paper's proof, not the

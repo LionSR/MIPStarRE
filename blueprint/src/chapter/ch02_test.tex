@@ -129,12 +129,12 @@
 	\end{enumerate}
 \end{theorem}
 
-\begin{remark}[Producer-obligation form of the soundness theorem]\label{rem:main-formal-conditional}
-	\lean{MIPStarRE.LDT.Test.mainFormal_ofProducerObligations}
+\begin{remark}[Internal-obligation form of the soundness theorem]\label{rem:main-formal-conditional}
+	\lean{MIPStarRE.LDT.Test.mainFormal_ofInternalObligations}
 	\uses{thm:main-formal, def:low-individual-degree-test, def:projective-strategy, def:polymeasurements, def:simeq}
-	The producer-obligation theorem has the same public hypotheses and conclusion
+	The internal-obligation theorem has the same public hypotheses and conclusion
 	as Theorem~\ref{thm:main-formal}.  Its proof body isolates the remaining base
-	and successor constructions as named producer declarations, rather than
+	and successor constructions as named internal obligations, rather than
 	adding bridge data to the theorem statement.
 \end{remark}
 

@@ -51,7 +51,7 @@ theorem mainFormalSuccessorMainInductionPublicWrapper
     boundary.axisWeightedBound
     boundary.diagonalWeightedBound
     boundary.recursiveSlices
-    boundary.selfImprovementProducer
+    boundary.selfImprovementObligation
     hk_pos hk
 
 

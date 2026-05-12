@@ -103,7 +103,7 @@ namespace ProjectivizationSelfConsistencyHandoff
 /-- Build the projective self-consistency handoff from the two
 orthonormalize-and-complete statements.
 
-This records the exact Step 6 producer obligations for the current
+This records the exact Step 6 proof obligations for the current
 `mainFormal` residual outside `Test/MainTheorem.lean`: a pre-projective
 consistency proof, the Alice-side completion statement, and the Bob-side
 completion statement. The Bob-side statement is transported from left lifts to

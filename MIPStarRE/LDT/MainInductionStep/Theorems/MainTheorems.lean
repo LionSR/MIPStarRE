@@ -189,7 +189,7 @@ integer `k ≥ m d` produce a polynomial measurement consistent with the point
 measurement at error `mainInductionError`.
 
 The checked successor-step assembly below currently uses the stronger auxiliary
-side condition `400 * m * d ≤ k` and explicit proof-stage packages. Those are
+side condition `400 * m * d ≤ k` and explicit proof-stage data. Those are
 internal proof obligations, not hypotheses of this theorem. -/
 theorem mainInduction
     (params : Parameters)
@@ -205,25 +205,25 @@ theorem mainInduction
         (polynomialEvaluationFamily params G.toSubMeas)
         (mainInductionError params k eps delta gamma) := by
   -- TODO(#1507): prove the paper theorem from `hgood` and `hk` by deriving
-  -- the wrapper inputs internally, rather than assuming the successor-stage
-  -- packages exposed by `mainInductionPublicWrapper`.
+  -- the auxiliary inputs internally, rather than assuming the successor-stage
+  -- data exposed by `mainInductionPublicWrapper`.
   sorry
 
 /-- Successor-step recursion entry point for the main-induction conclusion.
 
-Given the slice restriction package, a recursive producer for the slice-level
-main-induction conclusions, and a producer for the corresponding slice-wise
+Given the slice restriction package, recursive witnesses for the slice-level
+main-induction conclusions, and an obligation for the corresponding slice-wise
 self-improvement package, this theorem executes the remaining
 `restrict → induct → self-improve → paste` assembly and returns the
 higher-dimensional point-consistency conclusion.
 
-Note: this is the internal assembly theorem. The public boundary wrapper is
+Note: this is the internal assembly theorem. The public boundary theorem is
 `mainInductionPublicWrapper`. The restricted-probabilities boundary is already
 exposed separately via `restrictedProbabilities`, and
-`SelfImprovementPackage.ofSelfImprovementInInductionSection` packages the
+`SelfImprovementPackage.ofSelfImprovementInInductionSection` forms the
 slice-wise restricted-strategy self-improvement output once it is supplied. This
-theorem therefore keeps `hselfProducer` as an explicit input; the remaining
-producer/wiring work belongs to the final `mainFormal` integration tracked by
+theorem therefore keeps `hselfObligation` as an explicit input; the remaining
+self-improvement proof belongs to the final `mainFormal` integration tracked by
 #931, #834, and #422. -/
 theorem mainInductionByRecursionOnM
     (params : Parameters)
@@ -246,7 +246,7 @@ theorem mainInductionByRecursionOnM
               (hrestrict.profile.axisParallel x)
               (hrestrict.profile.selfConsistency x)
               (hrestrict.profile.diagonal x))
-    (hselfProducer :
+    (hselfObligation :
       ∀ hinduction :
         PerSliceInductionPackage params strategy eps delta gamma hrestrict k,
       SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
@@ -263,7 +263,7 @@ theorem mainInductionByRecursionOnM
   · let hinduction :=
       PerSliceInductionPackage.ofRecursion params strategy eps delta gamma k
         hrestrict hrec
-    let hself := hselfProducer hinduction
+    let hself := hselfObligation hinduction
     have heps_le_one : eps ≤ 1 := by
       exact eps_le_one_of_mainInductionError_lt_one params strategy hgood hsmall
     have hdelta_le_one : delta ≤ 1 := by
@@ -331,11 +331,11 @@ This conditional successor-step assembly combines the five explicit Section 6 in
 1. the weighted restricted-axis and restricted-diagonal bounds,
 2. the resulting `mainInductionPublicRestrictionPackage`,
 3. the slice-wise recursion witnesses used by `PerSliceInductionPackage.ofRecursion`,
-4. the explicit `hselfProducer` boundary hypothesis supplying the outputs of
+4. the explicit `hselfObligation` boundary supplying the outputs of
    `selfImprovementInInductionSection`, and
 5. `mainInductionByRecursionOnM`.
 
-The theorem deliberately keeps `hselfProducer` as an explicit conditional input:
+The theorem deliberately keeps `hselfObligation` as an explicit conditional input:
 the self-improvement outputs are assembled by
 `SelfImprovementPackage.ofSelfImprovementInInductionSection` once they are
 supplied, while producing those slice-wise outputs belongs to downstream
@@ -372,7 +372,7 @@ theorem mainInductionPublicWrapper
               (hrestrict.profile.axisParallel x)
               (hrestrict.profile.selfConsistency x)
               (hrestrict.profile.diagonal x))
-    (hselfProducer :
+    (hselfObligation :
       let hrestrict : SliceRestrictionPackage params strategy eps delta gamma :=
         mainInductionPublicRestrictionPackage params strategy eps delta gamma
           hgood haxisWeightedBound hdiagonalWeightedBound
@@ -402,18 +402,18 @@ theorem mainInductionPublicWrapper
               (hrestrict.profile.diagonal x) := by
     intro x
     exact hrec x
-  have hselfProducer' :
+  have hselfObligation' :
       ∀ hinduction : PerSliceInductionPackage params strategy eps delta gamma hrestrict k,
         SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction := by
     intro hinduction
-    exact hselfProducer hinduction
+    exact hselfObligation hinduction
   exact
     mainInductionByRecursionOnM params strategy eps delta gamma k hgood hd hrestrict hrec'
-      hselfProducer' hk_pos hk
+      hselfObligation' hk_pos hk
 
 /-- Answer-valued successor-step recursion entry point.
 
-This wrapper keeps the paper-facing restricted strategy interface
+This theorem keeps the paper-facing restricted strategy interface
 `xRestrictedAnswerSymStrat`, then explicitly forgets that extra diagonal answer
 structure to reuse the checked legacy assembly. -/
 theorem answerMainInductionByRecursionOnM
@@ -438,7 +438,7 @@ theorem answerMainInductionByRecursionOnM
               (hrestrict.profile.axisParallel x)
               (hrestrict.profile.selfConsistency x)
               (hrestrict.profile.diagonal x))
-    (hselfProducer :
+    (hselfObligation :
       ∀ hinduction :
         AnswerPerSliceInductionPackage params strategy eps delta gamma hrestrict k,
         AnswerSelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
@@ -468,7 +468,7 @@ theorem answerMainInductionByRecursionOnM
     refine ⟨error, G, ?_, ?_⟩
     · simpa using hcons
     · simpa [legacyRestrict, SliceRestrictionPackage.ofAnswer] using herror
-  have hselfProducer' :
+  have hselfObligation' :
       ∀ hinduction : PerSliceInductionPackage params strategy eps delta gamma legacyRestrict k,
         SelfImprovementPackage params strategy eps delta gamma k legacyRestrict hinduction := by
     intro hinduction
@@ -477,13 +477,13 @@ theorem answerMainInductionByRecursionOnM
       AnswerPerSliceInductionPackage.ofLegacy params strategy eps delta gamma k hrestrict hinduction
     let answerSelf :
         AnswerSelfImprovementPackage params strategy eps delta gamma k hrestrict answerInduction :=
-      hselfProducer answerInduction
+      hselfObligation answerInduction
     exact
       SelfImprovementPackage.ofAnswerForLegacy params strategy eps delta gamma k hrestrict
         hinduction answerSelf
   exact
     mainInductionByRecursionOnM params strategy eps delta gamma k hgood hd legacyRestrict hrec'
-      hselfProducer' hk_pos hk
+      hselfObligation' hk_pos hk
 
 /-- Answer-valued restricted-probabilities package built from explicit weighted
 answer-valued slice bounds.
@@ -511,7 +511,7 @@ noncomputable def answerMainInductionPublicRestrictionPackage
     (AnswerRestrictedProbabilitiesStatement.ofWeightedBounds params strategy eps delta gamma
       hgood haxisWeightedBound hdiagonalWeightedBound)
 
-/-- Answer-valued public successor-step wrapper for `thm:main-induction`.
+/-- Answer-valued public successor-step theorem for `thm:main-induction`.
 
 The external recursive and self-improvement inputs are stated against
 `xRestrictedAnswerSymStrat`; internally, the verified legacy pasting assembly is
@@ -548,7 +548,7 @@ theorem answerMainInductionPublicWrapper
               (hrestrict.profile.axisParallel x)
               (hrestrict.profile.selfConsistency x)
               (hrestrict.profile.diagonal x))
-    (hselfProducer :
+    (hselfObligation :
       let hrestrict : AnswerSliceRestrictionPackage params strategy eps delta gamma :=
         answerMainInductionPublicRestrictionPackage params strategy eps delta gamma
           hgood haxisWeightedBound hdiagonalWeightedBound
@@ -579,13 +579,13 @@ theorem answerMainInductionPublicWrapper
               (hrestrict.profile.diagonal x) := by
     intro x
     exact hrec x
-  have hselfProducer' :
+  have hselfObligation' :
       ∀ hinduction : AnswerPerSliceInductionPackage params strategy eps delta gamma hrestrict k,
         AnswerSelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction := by
     intro hinduction
-    exact hselfProducer hinduction
+    exact hselfObligation hinduction
   exact
     answerMainInductionByRecursionOnM params strategy eps delta gamma k hgood hd hrestrict hrec'
-      hselfProducer' hk_pos hk
+      hselfObligation' hk_pos hk
 
 end MIPStarRE.LDT.MainInductionStep

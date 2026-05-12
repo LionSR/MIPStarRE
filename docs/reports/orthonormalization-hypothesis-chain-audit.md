@@ -9,8 +9,9 @@
 > the final theorem should now be understood as references to the conditional
 > helper that existed at the time of the report, not to the paper-facing theorem
 > `mainFormal`.  The subsequent MainFormal cleanup removes the live repaired
-> bridge route; the current cleanup direction is to prove producer theorems for
-> the match-mass base bridge and successor residual, not to add these inputs to
+> bridge route; the current cleanup direction is to prove the internal
+> obligations for the match-mass base bridge and successor residual, not to add
+> these inputs to
 > source-labelled theorem statements.
 
 ## Executive Summary
@@ -110,7 +111,7 @@ structure MainFormalPostRolePackageDiagonalOrthonormalizationInput ... where
 
 | Level | Definition | Status |
 |---|---|---|
-| MainTheorem | `OrthonormalizationMatchMassPreservation` | **HYPOTHESIS** — bundled in `MainFormalBaseProjectiveCompletionHypotheses` / `MainFormalBaseBridgeHypotheses` |
+| MainTheorem | `OrthonormalizationMatchMassPreservation` | **OBLIGATION** — bundled in `MainFormalBaseProjectiveCompletionObligations` / `MainFormalBaseCompletionObligations` |
 
 ---
 
@@ -139,7 +140,7 @@ have hprojectiveCompletionResidual :
    - For successor case: needs `mainFormalSuccessorMainInductionPublicWrapper` which requires:
      - `MainFormalSuccessorBoundary` containing:
        - `MainFormalSuccessorRecursiveSlices` — per-slice induction packages
-       - `MainFormalSuccessorSelfImprovementProducer` — per-slice self-improvement inputs
+       - `MainFormalSuccessorSelfImprovementObligation` — per-slice self-improvement inputs
 
 2. **`postRoleDiagonalCompletion : MainFormalPostRolePackageDiagonalCompletionResidual`** — the completion residual:
    - Built from `MainFormalPostRolePackageDiagonalOrthonormalizationInput` (contains the QXP repair hypotheses)
@@ -158,9 +159,11 @@ To fill the `sorry`, the successor branch needs:
 
 Equivalent higher-level packaging: `MainFormalSuccessorBoundary` which bundles:
 - `MainFormalSuccessorRecursiveSlices` (per-slice induction packages)
-- `MainFormalSuccessorSelfImprovementProducer` (per-slice self-improvement bridge data)
+- `MainFormalSuccessorSelfImprovementObligation` (per-slice self-improvement bridge data)
 
-Plus `MainFormalRepairedBridgeHypotheses` (or `MainFormalBaseBridgeHypotheses`) which bundles the orthonormalization and match-mass inputs.
+Plus the former `MainFormalRepairedBridgeHypotheses` route, now replaced by
+`MainFormalBaseCompletionObligations`, which bundles the orthonormalization and
+match-mass inputs.
 
 ---
 
@@ -176,7 +179,7 @@ MainFormal.lean (line 611 → sorry)
   │   │   └─ ofSuccessorBoundary / mainFormalSuccessorMainInductionPublicWrapper
   │   │       └─ MainFormalSuccessorBoundary
   │   │           ├─ MainFormalSuccessorRecursiveSlices ← MISSING
-  │   │           └─ MainFormalSuccessorSelfImprovementProducer ← MISSING
+  │   │           └─ MainFormalSuccessorSelfImprovementObligation ← MISSING
   │   │               └─ ∀ perSliceInduction,
   │   │                   SelfImprovementPackage.SliceBridgeInputs
   │   │                   └─ helper SSC + OrthonormalizationInput + finalFields
@@ -218,8 +221,8 @@ MainFormal.lean (line 611 → sorry)
 ### The Bridge Structures That Accept These Inputs
 
 Several "bridge hypothesis" structures exist as named targets:
-- `MainFormalBaseProjectiveCompletionHypotheses` (MainFormal.lean:36) — full package for `baseProjectiveCompletionResidual`
-- `MainFormalBaseBridgeHypotheses` (MainFormal.lean:121) — narrowed, omits a_A/a_B
+- `MainFormalBaseProjectiveCompletionObligations` — full package for `baseProjectiveCompletionResidual`
+- `MainFormalBaseCompletionObligations` — narrowed, omits a_A/a_B
 - `MainFormalRepairedBridgeHypotheses` (MainFormal.lean:240) — alias for the base repaired bridge
 - `SelfImprovement.SelfImprovementBridgeInputs` — packages the three Section 9 inputs
 - `SelfImprovementPackage.SliceBridgeInputs` — per-slice bridge for Section 6
@@ -239,7 +242,7 @@ Several "bridge hypothesis" structures exist as named targets:
    - `OrthonormalizationInput` — containing the QXP repair witness
    - `FinalFieldsInput` — for completeness/point-consistency/self-closeness
 
-3. **Construct `MainFormalSuccessorSelfImprovementProducer`** — from the slice-bridge inputs
+3. **Construct `MainFormalSuccessorSelfImprovementObligation`** — from the slice-bridge inputs
 
 4. **Construct `MainFormalSuccessorBoundary`** — via `mainFormalSuccessorBoundary_ofRecursiveSelfImprovement`
 
@@ -277,7 +280,7 @@ The `leftLiftedProjectivizationRepairInput_of_lifted_qxp_sddOpRel` and related c
 | `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | Final assembly with 1 `sorry` (line 611) |
 | `MIPStarRE/LDT/Test/MainTheorem/OrthonormalizationData.lean` | `MainFormalPostRolePackageDiagonalOrthonormalizationInput` and residual |
 | `MIPStarRE/LDT/Test/MainTheorem/NativeTargets.lean` | `MainFormalCascadeRolePackageResidualProjectiveCompletionResidual` |
-| `MIPStarRE/LDT/Test/MainTheorem/OrdinaryRestriction/Basic.lean` | `MainFormalSuccessorBoundary` and successor self-improvement producers |
+| `MIPStarRE/LDT/Test/MainTheorem/OrdinaryRestriction/Basic.lean` | `MainFormalSuccessorBoundary` and successor self-improvement obligations |
 | `MIPStarRE/LDT/Test/MainTheorem/RoleRegister/Core.lean` | `MainFormalRolePackageResidual` (base and successor constructors) |
 
 ---

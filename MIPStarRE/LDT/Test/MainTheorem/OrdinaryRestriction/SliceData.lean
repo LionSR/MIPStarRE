@@ -341,11 +341,11 @@ theorem mainFormalSuccessorRecursiveSlices_ofSliceData
   -- Rewrite the state and point measurement using the slice-data compatibilities
   simpa [sliceData.sliceState_eq x, sliceData.slicePoint_eq x] using hG
 /-- Build the successor boundary from bridge inputs instead of the
-already-packaged self-improvement producer.
+already-packaged self-improvement obligation.
 
 This is the public-facing constructor for issue #1020: it wires the
 honest per-slice Section 9 bridge inputs through the existing
-`mainFormalSuccessorSelfImprovementProducer_ofBridgeInputs` conversion and
+`mainFormalSuccessorSelfImprovementObligation_ofBridgeInputs` conversion and
 packages them together with the weighted restricted-probability fields and
 the recursive slice witnesses into a `MainFormalSuccessorBoundary`.
 
@@ -370,8 +370,8 @@ noncomputable def mainFormalSuccessorBoundary_ofBridgeInputs
   { axisWeightedBound := axisBound
     diagonalWeightedBound := diagonalBound
     recursiveSlices := hrec
-    selfImprovementProducer :=
-      mainFormalSuccessorSelfImprovementProducer_ofBridgeInputs params strategy eps hpass k
+    selfImprovementObligation :=
+      mainFormalSuccessorSelfImprovementObligation_ofBridgeInputs params strategy eps hpass k
         axisBound diagonalBound hbridge }
 
 /-- Build the successor boundary from an explicit predecessor induction
