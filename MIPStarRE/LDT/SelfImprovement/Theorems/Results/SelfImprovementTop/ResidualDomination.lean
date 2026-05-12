@@ -27,10 +27,10 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Bridge data for the slackness and residual-domination route through
+/-- Obligation data for the slackness and residual-domination route through
 self-improvement.
 
-The package contains exactly the non-SDP inputs needed after the helper stage
+The structure contains exactly the non-SDP inputs needed after the helper stage
 has produced a slackness-carrying conclusion: helper strong self-consistency,
 helper completeness, the selected point-consistency `add-in-u` transfer, and
 the residual-dominating orthonormalization input.  The final-fields obligation
@@ -162,7 +162,7 @@ lemma selfImprovementWithSlacknessAndResidualDominationInput
         final_fields_bounded strategy.state H.toSubMeas
           hhelper.sdpWitness.dualDominatesIdentity hselfImprovementError_nonneg }
 
-/-- Packaged obligation form of
+/-- Obligation form of
 `selfImprovementWithSlacknessAndResidualDominationInput`. -/
 lemma selfImprovementFromSlacknessResidualDominationObligations
     (params : Parameters)
