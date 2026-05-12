@@ -403,13 +403,13 @@ steps of the `mainFormal` proof.
 The first field is the actual Section 6 role residual: it carries the concrete
 role-register measurement and its symmetrized consistency proof.  The second
 field contains only the projectivization/completion and line-169 data for the
-role-measurement record obtained from that concrete residual.  Thus the live
-`mainFormal` hole no longer asks for an arbitrary
+role-measurement record obtained from that concrete residual.  Thus the
+`mainFormal` obligation no longer asks for an arbitrary
 `MainFormalRoleMeasurementPackage`, an arbitrary Section 6 witness, or a branch
 witness not tied to the concrete measurement. The branch-level base, ordinary
 successor, and answer-valued
 successor constructors remain available on `MainFormalRolePackageResidual` and
-`MainFormalRolePackageBranchResidual` as the intended ways to supply this field;
+`MainFormalRolePackageBranchResidual` as the intended ways to prove this field;
 their branch conversion consumes the public large-`k` hypothesis directly rather
 than storing it as residual data. -/
 structure MainFormalCascadeRolePackageResidualCompletionTransportResidual
@@ -455,7 +455,7 @@ Paper origin: `references/ldt-paper/inductive_step.tex:68-173`, with Bob-side
 completion transport recorded as a formalization-level register-placement step.
 
 Compared with `MainFormalCascadeRolePackageResidualCompletionTransportResidual`,
-this residual no longer asks the live hole to provide the right-register
+this residual no longer asks the `mainFormal` obligation to provide the right-register
 completion closeness directly.  Instead the post-role field records the
 left-register Bob-side completion estimate returned by the
 orthonormalize-and-complete chain, and the conversion below transports it to the

@@ -395,7 +395,7 @@ expects:
 The helper lemmas below now discharge the weighted fields from `hpass`; grouping
 all fields into a single named structure still gives the successor branch of
 `mainFormal` one honest issue-#634 interface, rather than four independent
-hypothesis holes.
+untracked hypotheses.
 
 **Unfaithful:** as a supplied boundary this structure contains recursive
 slice witnesses and a self-improvement obligation that are not hypotheses of
@@ -448,8 +448,8 @@ theorem mainFormalSuccessorDiagonalWeightedBound_ofPass
     (SameSpaceProjStrat.strategySymmetrization_isGood_three_mul
       (strategy := strategy) (eps := eps) hpass)
 
-/-- Build the successor boundary once the two still-external slice-recursion and
-restricted-strategy self-improvement inputs are supplied. The weighted
+/-- Build the successor boundary once the two remaining slice-recursion and
+restricted-strategy self-improvement inputs have been proved. The weighted
 restricted-probability fields are now discharged from `hpass` by the public
 Section 6 weighted-bound lemmas.
 

@@ -612,8 +612,8 @@ theorem mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass
     (SameSpaceProjStrat.strategySymmetrization_isGood_three_mul
       (strategy := strategy) (eps := eps) hpass)
 
-/-- Build the answer-valued successor boundary once the two still-external slice
-recursion and restricted-strategy self-improvement inputs are supplied.
+/-- Build the answer-valued successor boundary once the two remaining slice
+recursion and restricted-strategy self-improvement inputs have been proved.
 
 **Unfaithful:** this conditional constructor assumes answer-valued recursive
 slice data and a self-improvement obligation rather than deriving them from

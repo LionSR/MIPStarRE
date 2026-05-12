@@ -47,7 +47,7 @@ namespace MainFormalRoleMeasurementPackage
 /-- View a Section 6 main-induction witness as a
 `MainFormalRoleMeasurementPackage`.
 
-The only proof step is scalar bookkeeping: `scalars.sigma` is definitionally
+The only proof step is the scalar identity: `scalars.sigma` is definitionally
 `cascadeSigma params k (mainFormalInductionNu params k eps)`, and
 `mainFormalCascadeSigma_eq_mainInductionError` identifies that quantity with the
 `MainInductionStep.mainInductionError` returned by the Section 6 theorem at the
@@ -250,7 +250,7 @@ successor decomposition.
 
 If `successor.pred.next = params`, then `successor.pred.q = params.q`; this helper
 transports the ambient base-universe field model along that cardinality equality.
-The explicit equality cast keeps the transport visible to callers, rather than
+The explicit equality cast keeps the transport visible to later arguments, rather than
 hiding it behind a tactic-mode `rw; infer_instance` definition. -/
 noncomputable def fieldModelOfSuccessorDecomposition
     {params : Parameters} [FieldModel.{0} params.q]

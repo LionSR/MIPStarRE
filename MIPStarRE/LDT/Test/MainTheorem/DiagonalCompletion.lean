@@ -8,12 +8,12 @@ the two unsymmetrized role POVMs `Gᴬ` and `Gᴮ` are obtained together with
 their cross-consistency relation `Gᴬ ⊗ I ≃ I ⊗ Gᴮ` at error `ζ₁`, the
 completion theorem (`prop:completing-to-measurement`) needs diagonal
 hypotheses for *both* sides.  This module records the stronger, self-referential
-`ConsRel` form of that missing bridge through
+`ConsRel` form of that internal diagonal obligation through
 `MainFormalPostRolePackageDiagonalConsistencyInput`, records
 the match-mass monotonicity input
 (`MainFormalPostRolePackageDiagonalCompletionInput`), and provides the
 conversion lemmas (`ofDiagonalConsistency`,
-`nonempty_ofDiagonalConsistencyAndMatchMassPreservation`) that close the gap
+`nonempty_ofDiagonalConsistencyAndMatchMassPreservation`) that identify the step
 between the cross relation and the two self-relations used by orthonormalize-and-complete.
 
 ## References
@@ -35,11 +35,12 @@ namespace Test
 
 Additional diagonal consistency input for the two unsymmetrized role POVMs.
 
-The diagonal consistency handoff supplies only the cross relation `G^A ⊗ I ≃ I ⊗ G^B`. The
-completion theorem used at lines 143--147 needs the diagonal hypotheses for each
-completed side. This structure records the stronger, self-referential `ConsRel`
-form of that missing bridge, keeping the obligation tied to the concrete role
-record rather than to the public `mainFormal` statement. -/
+The diagonal consistency handoff supplies only the cross relation
+`G^A ⊗ I ≃ I ⊗ G^B`.  The completion theorem used at lines 143--147 needs the
+diagonal hypotheses for each completed side.  This structure records the
+stronger, self-referential `ConsRel` form of that internal obligation, keeping it
+tied to the concrete role record rather than to the public `mainFormal`
+statement. -/
 structure MainFormalPostRolePackageDiagonalConsistencyInput
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -92,7 +93,7 @@ namespace MainFormalPostRolePackageDiagonalSSCInput
 /-- Convert the diagonal self-`ConsRel` completion input into the
 `BipartiteSSCRel` form required by the completion theorem.
 
-This is a checked bookkeeping step only: the real mathematical gap remains
+This is only a formal conversion: the real mathematical gap remains
 proving the two diagonal consistency fields from the paper's cross `G^A/G^B`
 relation or from a stronger role-residual package. -/
 theorem ofDiagonalConsistency
@@ -191,9 +192,9 @@ Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, with
 completion supplied by `references/ldt-paper/preliminaries.tex:1095-1140`.
 
 This is the checked data-valued constructor for the generic completion
-obligation: callers may supply a function returning this input for each line-130
-orthonormalization residual and then use `toCompletionResidual` to produce the
-residual consumed by the final assembly. -/
+obligation: a proof of the surrounding branch obligation may construct this
+input for each line-130 orthonormalization residual and then use
+`toCompletionResidual` to produce the residual consumed by the final theorem. -/
 noncomputable def toCompletionResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -220,11 +221,11 @@ line-169 `ζ₁` links.
 
 This exposes the role of
 `ProjectivizationMatchMassMonotonicity.of_submeasurement_match_mass_and_completion`
-for callers that reason directly with completed projective measurements, while
+for later arguments that reason directly with completed projective measurements, while
 `toCompletionResidual` keeps the older residual's P-level match-mass fields.
 
-**Status:** currently unused (no callers).  Kept as a named interface for
-downstream consumers that need the `ProjectivizationMatchMassMonotonicity`
+**Status:** currently unused.  Kept as a named interface for
+later arguments that need the `ProjectivizationMatchMassMonotonicity`
 witness directly rather than going through `toCompletionResidual`. -/
 theorem toProjectivizationMatchMassMonotonicity
     {params : Parameters} [FieldModel.{0} params.q]
@@ -580,7 +581,7 @@ theorem nonempty_ofCompletingToMeasurementInputs
 
 This is the same construction as `nonempty_ofCompletingToMeasurementInputs`, but
 the two self-consistency inputs are collected in
-`MainFormalPostRolePackageDiagonalSSCInput`, the extra diagonal data needed
+`MainFormalPostRolePackageDiagonalSSCInput`, the diagonal data needed
 after the paper's line-130 cross relation has been reconstructed. -/
 theorem nonempty_ofDiagonalSSCInput
     {params : Parameters} [FieldModel.{0} params.q]
@@ -612,7 +613,7 @@ theorem nonempty_ofDiagonalSSCInput
 extra completion obligation.
 
 This theorem makes the exact remaining paper lemma usable in the native
-`≃`/`ConsRel` form: once callers prove diagonal consistency for `G^A` and
+`≃`/`ConsRel` form: once diagonal consistency is proved for `G^A` and
 `G^B`, in addition to the paper's line-130 cross relation, the conversion to
 `BipartiteSSCRel` and the completion theorem are both checked. -/
 theorem nonempty_ofDiagonalConsistencyInput

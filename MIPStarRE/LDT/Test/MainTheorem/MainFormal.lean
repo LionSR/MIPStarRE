@@ -65,7 +65,7 @@ Analytic obligations that are still unformalized for the
 base case (`m = 1`) Step 6 witness residual: distinguished
 outcomes and match-mass preservation for the unsymmetrized POVMs.
 
-Supplying these obligations yields a complete `baseProjectiveCompletionResidual`
+Proving these obligations yields a complete `baseProjectiveCompletionResidual`
 for the base branch of `mainFormal`; the remaining successor-case steps are
 tracked separately. -/
 structure MainFormalBaseProjectiveCompletionObligations
@@ -142,7 +142,8 @@ Narrowed base-case completion obligations for Step 6 when `params.m = 1`.
 Compared to `MainFormalBaseProjectiveCompletionObligations`, this structure
 omits the two distinguished outcomes `a_A` and `a_B`, which the conversion below
 fills with the explicit zero polynomial at `m = 1`.  The remaining fields are
-the match-mass preservation obligations that must be supplied by the caller.
+the match-mass preservation obligations that must be proved by the base-case
+branch argument.
 
 A conversion theorem `baseProjectiveCompletionObligations_ofBaseCompletionObligations`
 constructs the full `MainFormalBaseProjectiveCompletionObligations` from
@@ -195,7 +196,7 @@ orthonormalization/completion cascade at
 
 The distinguished outcomes `a_A` and `a_B` are chosen as the zero polynomial;
 `completeAtOutcomeProj` works for any distinguished outcome, so this choice
-is sound.  Callers that need specific distinguished outcomes should use
+is sound.  Arguments that need specific distinguished outcomes should use
 `MainFormalBaseProjectiveCompletionObligations` directly.
 
 Refs #1043. -/

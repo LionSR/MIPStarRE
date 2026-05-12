@@ -320,13 +320,13 @@ structure MainFormalPostRolePackageDiagonalCompletionResidual
 namespace MainFormalPostRolePackageProjectiveCompletionResidual
 
 /-- Build the fixed Step 6 witness data from a line-130 orthonormalization
-residual plus the still-external completion estimates.
+residual plus the remaining completion estimates.
 
 This constructor is the honest passage from the new cross-consistency
 orthonormalization wrapper to the existing orthonormalize-and-complete residual:
 the projective submeasurements and their line-138 closeness now come from
 `ConsRel G^A G^B ζ₁`; only the completion-to-measurement closeness and
-match-mass monotonicity remain supplied separately. -/
+match-mass monotonicity remain as downstream obligations. -/
 noncomputable def ofDiagonalOrthonormalizationAndCompletion
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

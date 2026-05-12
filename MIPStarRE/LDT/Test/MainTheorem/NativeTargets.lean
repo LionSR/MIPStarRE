@@ -12,7 +12,7 @@ namespace MIPStarRE.LDT
 
 namespace Test
 
-/-- Paper-shaped residual for the still-external data in the non-vacuous branch.
+/-- Paper-shaped residual for the remaining internal data in the non-vacuous branch.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:68-173`, the
 role-register, unsymmetrization, and projectivization/completion part of
@@ -58,7 +58,7 @@ theorem nonempty_ofRoleResidualAndCompletion
 a construction of the remaining completion/match-mass obligations for the
 projective submeasurements obtained from line 130.
 
-This is the precise remaining shape of the final `mainFormal` hole after the
+This is the precise remaining shape of the final `mainFormal` obligation after the
 paper-order handoffs have been named. -/
 theorem nonempty_ofRoleResidualAndCompletionObligation
     {params : Parameters} [FieldModel.{0} params.q]
@@ -80,15 +80,15 @@ theorem nonempty_ofRoleResidualAndCompletionObligation
   exact nonempty_ofRoleResidualAndCompletion roleResidual ⟨completionObligation orthResidual⟩
 
 /-- Assemble the final live residual using explicit completion inputs rather than
-an opaque completion obligation.
+an unexpanded completion obligation.
 
-A caller supplies, for each line-130 orthonormalization residual produced from
-the role residual, the concrete distinguished outcomes, completed-closeness
-proofs, and orthonormalization match-mass preservation facts recorded as
-`MainFormalPostRolePackageDiagonalCompletionInput`.  This theorem converts that
-input record into the completion-obligation shape by `toCompletionResidual`.
+The inputs are, for each line-130 orthonormalization residual produced from the
+role residual, the concrete distinguished outcomes, completed-closeness proofs,
+and orthonormalization match-mass preservation facts recorded as
+`MainFormalPostRolePackageDiagonalCompletionInput`.  This theorem converts those
+records into the completion-obligation shape by `toCompletionResidual`.
 
-**Status:** currently unused (no callers).  The more analytic variant
+**Status:** currently unused.  The more analytic variant
 `nonempty_ofRoleResidualAndCompletingToMeasurementInputs` exposes the same
 endpoint with explicit `BipartiteSSCRel` and match-mass inputs instead of a
 pre-recorded `CompletionInput`. -/
@@ -112,7 +112,7 @@ theorem nonempty_ofRoleResidualAndCompletionInputs
 /-- Assemble the final live residual from the exact analytic completion witnesses.
 
 This is the paper-shaped replacement for the generic completion obligation:
-after line 130 produces `P^A` and `P^B`, the caller provides
+after line 130 produces `P^A` and `P^B`, the remaining inputs are
 * distinguished completion outcomes `a_A`, `a_B`,
 * strong self-consistency for the two unsymmetrized role POVMs, and
 * orthonormalization match-mass preservation for the two produced
@@ -179,7 +179,7 @@ This is the live Lean Step 6 route: the checked role residual
 reconstructs line 130 as a cross `ConsRel`, the orthonormalization wrapper
 produces `P^A,P^B`, and the remaining completion step is discharged directly from
 that cross relation plus the construction-level match-mass preservation facts,
-without asking callers for separate diagonal strong self-consistency assumptions. -/
+without assuming separate diagonal strong self-consistency data. -/
 theorem nonempty_ofRoleResidualAndMatchMassPreservation
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
