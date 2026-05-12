@@ -1,9 +1,10 @@
 import MIPStarRE.LDT.MainInductionStep.Statements
+import MIPStarRE.LDT.Preliminaries.Defs
 import MIPStarRE.LDT.Test.StrategyFailures
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 import MIPStarRE.LDT.Pasting.Bernoulli.Final
 import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationBridge
--- Used by `selfImprovementInInductionSection_ofMeasurement`.
+-- Used by `selfImprovementInInductionSection_ofObligations`.
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 
 /-!
@@ -56,45 +57,28 @@ theorem mainInductionOfWitness
   refine ⟨G, ?_⟩
   exact ⟨le_trans hG.offDiagonalBound herror⟩
 
-/-- Conditional measurement-input form of
-`thm:self-improvement-in-induction-section`.
+/-- Convert the Section 9 self-improvement conclusion into the Section 6
+induction-level self-improvement conclusion.
 
-This theorem is not the paper-facing statement: it assumes that the input
-submeasurement is the underlying submeasurement of a complete measurement. The
-paper-facing theorem `selfImprovementInInductionSection` below keeps only the
-submeasurement and its consistency hypothesis.
-
-The point-consistency hypothesis `_hcons` is retained because it is part of the
-paper's bookkeeping, although the present proof factors through
-`SelfImprovement.selfImprovementFromSubMeas`, which no longer consumes it
-separately. -/
-theorem selfImprovementInInductionSection_ofMeasurement
+The Section 6 conclusion records the original input submeasurement only as a
+parameter; its six mathematical fields concern the output projective
+submeasurement and the dual witness.  This lemma isolates that transport, so
+the remaining proof obligation is not confused with measurement-completion
+bookkeeping. -/
+theorem selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
-    (hhelperStrongSelfConsistency :
-      SelfImprovement.HelperStrongSelfConsistencyInput params strategy eps delta)
-    (horthonormalization :
-      SelfImprovement.OrthonormalizationInput params strategy eps delta)
-    (hfinalFields : SelfImprovement.FinalFieldsInput params strategy eps delta nu)
-    (hgood : strategy.IsGood eps delta gamma)
     (G : SubMeas (Polynomial params) ι)
     (Gmeas : Measurement (Polynomial params) ι)
-    (hbridge : Gmeas.toSubMeas = G)
-    (_hcons : ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params G) nu) :
-    ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
-      SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
-  rcases SelfImprovement.selfImprovementFromSubMeas
-      params strategy eps delta gamma nu
-      hhelperStrongSelfConsistency
-      horthonormalization hfinalFields
-      hgood G Gmeas hbridge with
-    ⟨H, Z, hH⟩
-  rcases hH.measurementBridge with ⟨_, _, hfinal⟩
-  refine ⟨H, Z, ?_⟩
+    (H : ProjSubMeas (Polynomial params) ι)
+    (Z : MIPStarRE.Quantum.Op ι)
+    (hfinal :
+      SelfImprovement.SelfImprovementConclusion params strategy Gmeas H Z
+        eps delta gamma nu) :
+    SelfImprovementInInductionSectionConclusion params strategy G H Z
+      eps delta gamma nu := by
   refine
     { completeness := by
         simpa [SelfImprovement.selfImprovementError, selfImprovementInInductionError] using
@@ -159,6 +143,45 @@ theorem selfImprovementInInductionSection_ofMeasurement
           GlobalVariance.pointConditionedOutcomeOperatorAtPolynomial] at hdom'
         simpa using hdom' }
 
+/-- Conditional form of `thm:self-improvement-in-induction-section` with the
+input submeasurement completed internally.
+
+This is still not the paper-facing theorem: it assumes the Section 9
+`SelfImprovementObligations`. It avoids exposing a complete-measurement bridge:
+the input submeasurement is completed inside the proof by applying
+`Preliminaries.completeAtOutcome` to `SelfImprovement.sdpDistinguishedPolynomial`.
+The remaining external assumptions are exactly the unrecovered Section 9 proof
+obligations.
+
+**Unfaithful:** this helper assumes `SelfImprovementObligations`, whose helper
+strong self-consistency, orthonormalization, and final-fields components are not
+yet derived from the hypotheses of `thm:self-improvement-in-induction-section`.
+This proof debt is tracked by #1503.  Elimination: prove the source-facing
+`selfImprovementInInductionSection` theorem from the paper hypotheses. -/
+theorem selfImprovementInInductionSection_ofObligations
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma nu : Error)
+    (hobligations :
+      SelfImprovement.SelfImprovementObligations params strategy eps delta nu)
+    (hgood : strategy.IsGood eps delta gamma)
+    (G : SubMeas (Polynomial params) ι)
+    (_hcons : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params G) nu) :
+    ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+      SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
+  let Gmeas : Measurement (Polynomial params) ι :=
+    Preliminaries.completeAtOutcome G (SelfImprovement.sdpDistinguishedPolynomial params)
+  rcases SelfImprovement.selfImprovementFromObligations
+      params strategy eps delta gamma nu hobligations hgood Gmeas with
+    ⟨H, Z, hfinal⟩
+  exact
+    ⟨H, Z,
+      selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion
+        params strategy eps delta gamma nu G Gmeas H Z hfinal⟩
+
 /-- `thm:self-improvement-in-induction-section`.
 
 The paper statement takes an arbitrary polynomial submeasurement `G` satisfying
@@ -179,8 +202,10 @@ theorem selfImprovementInInductionSection
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
   -- TODO(#1503): prove the induction-section theorem from the paper hypotheses.
-  -- The current measurement-input assembly is retained separately as
-  -- `selfImprovementInInductionSection_ofMeasurement`.
+  -- The current conditional assembly with internal completion is retained
+  -- separately as `selfImprovementInInductionSection_ofObligations`; the older
+  -- measurement-input helper must not be propagated into public theorem
+  -- statements.
   sorry
 
 /-- Assemble the slice-wise outputs feeding `selfImprovementInInductionSection`
@@ -561,12 +586,12 @@ Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
 `references/ldt-paper/self_improvement.tex:631-811`.
 
 The construction assumes the slice strategies and their Section 9 obligations.
-It applies the conditional measurement-input theorem
-`selfImprovementInInductionSection_ofMeasurement` slice-by-slice and transports
-its fields across the recorded equalities to the restricted-slice interface. At
-each slice the record supplies the complete measurement
-`inductionPkg.sliceMeasurement x`; the submeasurement-input theorem remains the
-tracked obligation in #1503. -/
+It applies the conditional obligation-input theorem
+`selfImprovementInInductionSection_ofObligations` slice-by-slice and transports
+its fields across the recorded equalities to the restricted-slice interface.
+The input submeasurement is completed internally by that helper, so this package
+constructor no longer needs a separate measurement-completion bridge.  The
+source-facing theorem remains the tracked obligation in #1503. -/
 noncomputable def SelfImprovementPackage.ofSliceObligations
     (params : Parameters)
     [FieldModel params.q]
@@ -593,18 +618,15 @@ noncomputable def SelfImprovementPackage.ofSliceObligations
     have hcons := inductionPkg.pointConsistency x
     rw [← sliceObligations.state_eq x, ← sliceObligations.pointMeasurement_eq x] at hcons
     simpa [sliceStrategy] using hcons
-  rcases selfImprovementInInductionSection_ofMeasurement params (sliceObligations.sliceStrategy x)
+  rcases selfImprovementInInductionSection_ofObligations params
+      (sliceObligations.sliceStrategy x)
       (restrictionPkg.profile.axisParallel x)
       (restrictionPkg.profile.selfConsistency x)
       (restrictionPkg.profile.diagonal x)
       (inductionPkg.sliceError x)
-      (sliceObligations.obligations x).helperStrongSelfConsistency
-      (sliceObligations.obligations x).orthonormalization
-      (sliceObligations.obligations x).finalFields
+      (sliceObligations.obligations x)
       (sliceObligations.good x)
       (inductionPkg.sliceMeasurement x).toSubMeas
-      (inductionPkg.sliceMeasurement x)
-      rfl
       hconsSlice with
     ⟨H, Z, hH⟩
   refine ⟨H, Z, ?_⟩

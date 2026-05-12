@@ -358,14 +358,16 @@ transports the Section 6 witness through the final projectivization and
 completion cascade.
 
 This is not an additional hypothesis of the paper theorem `mainFormal`; it is an
-open construction tracked separately.  The available structural constructors live in
+open construction tracked separately.  The statement proves nonemptiness rather
+than returning an arbitrary residual object, so the remaining gap is not hidden
+as fabricated data.  The available structural constructors live in
 `RoleRegister.lean` (`successorOfObligations` and the answer-valued variants);
 the missing work is to produce the predecessor induction data and the per-slice
 self-improvement inputs from the paper hypotheses, then assemble the resulting
 role residual and completion residual.
 
 Tracked by #1363, #422, and #1458. -/
-noncomputable def mainFormalSuccessorProjectiveCompletionObligation
+theorem mainFormalSuccessorProjectiveCompletionObligation
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
@@ -375,9 +377,9 @@ noncomputable def mainFormalSuccessorProjectiveCompletionObligation
     (hk0 : 0 < k)
     (hm_ne_one : params.m ≠ 1)
     (scalars : MainFormalCascadeScalars params eps k) :
-    MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
+    Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
       (params := params) (strategy := strategy) (eps := eps)
-      (hpass := hpass) (k := k) (scalars := scalars) := by
+      (hpass := hpass) (k := k) (scalars := scalars)) := by
   -- TODO(#1363, #422, #1458): produce the ordinary or answer-valued
   -- successor role residual and the post-role projective-completion residual
   -- from the predecessor induction package and the per-slice self-improvement
@@ -394,7 +396,7 @@ follows the base case of `\label{thm:main-induction}` at
 `references/ldt-paper/inductive_step.tex:418-432`.  Blueprint:
 `\label{def:main-formal-step6-obligations}`.
 
-This definition names the remaining base-case analytic obligation for
+This theorem names the remaining base-case analytic obligation for
 `mainFormal`.  It must construct match-mass preservation for the
 orthonormalized projective submeasurements of the checked base-case role
 residual.  The line-130 orthonormalization residual itself is derived from the
@@ -402,7 +404,7 @@ role residual by the Section 5 repair construction, not supplied as an extra
 assumption.
 
 This is the tracked proof obligation for the base branch. -/
-noncomputable def mainFormalBaseBranchCompletionObligations_ofBaseCase
+theorem mainFormalBaseBranchCompletionObligations_ofBaseCase
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι)
@@ -569,8 +571,8 @@ theorem mainFormal_ofInternalObligations
           Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
             (params := params) (strategy := strategy) (eps := eps)
             (hpass := hpass) (k := k) (scalars := scalars)) := by
-        exact ⟨mainFormalSuccessorProjectiveCompletionObligation
-          hpass hd hk hk0 hm1 scalars⟩
+        exact mainFormalSuccessorProjectiveCompletionObligation
+          hpass hd hk hk0 hm1 scalars
       rcases hprojectiveCompletionResidual with ⟨projectiveCompletionResidual⟩
       exact mainFormal_ofProjectiveCompletionResidual herr projectiveCompletionResidual
 

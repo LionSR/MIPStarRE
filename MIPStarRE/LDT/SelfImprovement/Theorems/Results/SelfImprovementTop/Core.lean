@@ -27,9 +27,8 @@ orthonormalization and final-fields conditions taken as explicit hypotheses.
   helper strong self-consistency, orthonormalization, and final-fields
   conditions taken as explicit hypotheses.
 - **selfImprovement** — the statement corresponding to `thm:self-improvement`.
-- **selfImprovementFromSubMeas / selfImprovementFromObligations /
-  selfImprovementFromObligationsSubMeas** — variants for submeasurement inputs
-  and auxiliary hypotheses supplied explicitly.
+- **selfImprovementFromObligations** — measurement-level conditional helper
+  with the remaining Section 9 proof obligations supplied explicitly.
 
 ## References
 
@@ -400,35 +399,15 @@ theorem selfImprovement
   -- `selfImprovement_assumingFinalFields`.
   sorry
 
-/-- Passage from the measurement-input version in `self_improvement.tex` to the
-submeasurement-input version used in `inductive_step.tex`. -/
-theorem selfImprovementFromSubMeas
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta gamma nu : Error)
-    (hhelperStrongSelfConsistency :
-      HelperStrongSelfConsistencyInput params strategy eps delta)
-    (horthonormalization : OrthonormalizationInput params strategy eps delta)
-    (hfinalFields : FinalFieldsInput params strategy eps delta nu)
-    (hgood : strategy.IsGood eps delta gamma)
-    (G : SubMeas (Polynomial params) ι)
-    (Gmeas : Measurement (Polynomial params) ι)
-    (hbridge : Gmeas.toSubMeas = G) :
-    ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
-      SelfImprovementSubMeasConclusion params strategy G H Z
-        eps delta gamma nu := by
-  rcases selfImprovement_assumingFinalFields params strategy eps delta gamma nu
-      hhelperStrongSelfConsistency
-      horthonormalization hfinalFields hgood Gmeas
-      with ⟨H, Z, hH⟩
-  refine ⟨H, Z, ?_⟩
-  exact
-    { measurementBridge := ⟨Gmeas, hbridge, hH⟩ }
-
 /-- `SelfImprovementObligations` + `IsGood` is sufficient to call the form of
 `thm:self-improvement` with explicit orthonormalization and final-fields
-hypotheses and obtain the full `SelfImprovementConclusion`. -/
+hypotheses and obtain the full `SelfImprovementConclusion`.
+
+**Unfaithful:** this helper assumes `SelfImprovementObligations`, whose helper
+strong self-consistency, orthonormalization, and final-fields components are not
+yet derived from the hypotheses of `thm:self-improvement`.  This proof debt is
+tracked by #1515.  Elimination: prove the source-facing `selfImprovement`
+theorem from the paper hypotheses. -/
 theorem selfImprovementFromObligations
     (params : Parameters)
     [FieldModel params.q]
@@ -442,26 +421,6 @@ theorem selfImprovementFromObligations
   selfImprovement_assumingFinalFields params strategy eps delta gamma nu
     obligations.helperStrongSelfConsistency
     obligations.orthonormalization obligations.finalFields hgood G
-
-/-- `SelfImprovementObligations` + `IsGood` also suffice for the
-submeasurement-input interface used by Section 6, once a measurement completion
-of the input submeasurement is supplied explicitly. -/
-theorem selfImprovementFromObligationsSubMeas
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta gamma nu : Error)
-    (hinputs : SelfImprovementObligations params strategy eps delta nu)
-    (hgood : strategy.IsGood eps delta gamma)
-    (G : SubMeas (Polynomial params) ι)
-    (Gmeas : Measurement (Polynomial params) ι)
-    (hbridge : Gmeas.toSubMeas = G) :
-    ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
-      SelfImprovementSubMeasConclusion params strategy G H Z
-        eps delta gamma nu :=
-  selfImprovementFromSubMeas params strategy eps delta gamma nu
-    hinputs.helperStrongSelfConsistency
-    hinputs.orthonormalization hinputs.finalFields hgood G Gmeas hbridge
 
 
 end MIPStarRE.LDT.SelfImprovement

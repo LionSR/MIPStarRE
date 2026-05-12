@@ -413,12 +413,13 @@ Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
 `references/ldt-paper/self_improvement.tex:631-811`.
 
 The construction assumes ordinary slice strategies and their Section 9
-obligations. It applies the conditional measurement-input theorem
-`selfImprovementInInductionSection_ofMeasurement` slice-by-slice and transports
+obligations. It applies the conditional obligation-input theorem
+`selfImprovementInInductionSection_ofObligations` slice-by-slice and transports
 its fields back to the answer-valued restricted-slice interface via the recorded
-state and point-measurement equalities. At each slice the record supplies the
-complete measurement `inductionPkg.sliceMeasurement x`; the submeasurement-input
-theorem remains the tracked obligation in #1503. -/
+state and point-measurement equalities. The input submeasurement is completed
+internally by that helper, so this package constructor no longer needs a
+separate measurement-completion bridge. The source-facing theorem remains the
+tracked obligation in #1503. -/
 noncomputable def AnswerSelfImprovementPackage.ofSliceObligations
     (params : Parameters)
     [FieldModel params.q]
@@ -446,18 +447,15 @@ noncomputable def AnswerSelfImprovementPackage.ofSliceObligations
     have hcons := inductionPkg.pointConsistency x
     rw [← sliceObligations.state_eq x, ← sliceObligations.pointMeasurement_eq x] at hcons
     simpa [sliceStrategy] using hcons
-  rcases selfImprovementInInductionSection_ofMeasurement params (sliceObligations.sliceStrategy x)
+  rcases selfImprovementInInductionSection_ofObligations params
+      (sliceObligations.sliceStrategy x)
       (restrictionPkg.profile.axisParallel x)
       (restrictionPkg.profile.selfConsistency x)
       (restrictionPkg.profile.diagonal x)
       (inductionPkg.sliceError x)
-      (sliceObligations.obligations x).helperStrongSelfConsistency
-      (sliceObligations.obligations x).orthonormalization
-      (sliceObligations.obligations x).finalFields
+      (sliceObligations.obligations x)
       (sliceObligations.good x)
       (inductionPkg.sliceMeasurement x).toSubMeas
-      (inductionPkg.sliceMeasurement x)
-      rfl
       hconsSlice with
     ⟨H, Z, hH⟩
   refine ⟨H, Z, ?_, ?_, ?_, ?_, ?_, ?_⟩
