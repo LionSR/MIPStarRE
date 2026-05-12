@@ -27,8 +27,8 @@ A declaration advertised as the formalization of a paper theorem, lemma,
 proposition, or corollary must state the paper result, up to faithful formal
 encoding of the mathematical domain.  Its public hypotheses and conclusion are
 both part of the statement.  Adding a load-bearing bridge, residual, repair,
-producer, package, hypotheses bundle, or assumptions bundle not present in the
-cited statement changes the theorem into a conditional helper.
+package, proof-obligation input, hypotheses bundle, or assumptions bundle not
+present in the cited statement changes the theorem into a conditional helper.
 
 The project therefore distinguishes three objects.
 
@@ -158,7 +158,7 @@ statement.
    The paper-labelled `mainFormal` should have the hypotheses of the paper
    theorem: a projective strategy passing the low individual degree test, the
    stated parameter bounds, and the faithful formalization of the ambient
-   domains.  Bridge, residual, repair, producer, and package inputs must be
+   domains.  Bridge, residual, repair, package, and proof-obligation inputs must be
    produced inside its proof rather than added to its statement.
 
 ### Existing bridge-like declarations
@@ -248,9 +248,9 @@ to link to Lean:
 | `\uses{label}` | The statement or proof block depends on the cited result | `\uses{thm:orthonormalization, prop:completing-to-measurement}` |
 
 Do not use statement-level `\leanok` for a source-labelled theorem whose Lean
-declaration is conditional on bridge, residual, repair, producer, package,
-generic hypotheses bundle, or generic assumptions bundle data not present in the
-source.
+declaration is conditional on bridge, residual, repair, package,
+proof-obligation input, generic hypotheses bundle, or generic assumptions bundle
+data not present in the source.
 
 ### Why some nodes show white in the dep graph
 
@@ -468,7 +468,7 @@ remaining proof obligation visible.
 - `docs/anti_patterns.md` — A1 (conclusion-shaped hypothesis), A4
   (trivial default witnesses), A6 (external `*Statement` smuggles)
 - Issue [#449] — hypothesis-smuggle ledger
-- Issue [#451] — bridge-package producer catalogue
+- Issue [#451] — historical bridge-package catalogue
 
 ---
 
@@ -507,7 +507,7 @@ with the step it replaces.
 - `docs/paper-gaps/policy.tex` — paper-gap documentation standards
 - `audits/` — chapter-by-chapter scouting reports
 - Issue [#449] — hypothesis-smuggle ledger
-- Issue [#451] — bridge-package producer catalogue
+- Issue [#451] — historical bridge-package catalogue
 - Issue [#931] — main-induction input gap tracker
 - Issue [#422] — main-formal assembly gap tracker
 

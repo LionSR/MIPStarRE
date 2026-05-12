@@ -18,10 +18,14 @@ Instructions:
      blueprint.
    - Source-labelled theorem alignment: do not fix blueprint sync by pointing a
      paper theorem, lemma, or proposition to a conditional helper with bridge,
-     residual, repair, package, producer, hypotheses bundle,
+     residual, repair, package, proof-obligation input, hypotheses bundle,
      assumptions bundle, or arbitrary hypothesis inputs that are not in
      `references/ldt-paper/`. Such helpers may be mentioned only as conditional
      implementation lemmas, without `\leanok` for the source theorem.
+   - Do not add `\leanok` merely because a renamed Lean declaration exists.  If
+     the declaration is an open internal obligation, contains `sorry`, or is a
+     conditional helper, mention it separately with `\lean{...}` and no
+     `\leanok` rather than inserting it into a source-labelled completed block.
    - Malformed LaTeX: missing closing braces, unescaped special characters, etc.
    - `plasTeX` parse errors: these often indicate unsupported LaTeX commands. Simplify or wrap in `\ifplastex` guards.
    - `ERROR` lines about unresolved references: find the `\uses{}` or `\ref{}` referencing a non-existent label and fix the label name.

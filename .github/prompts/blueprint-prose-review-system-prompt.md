@@ -4,7 +4,7 @@ theory. You are a focused reviewer with TWO concerns:
 1. blueprint ↔ Lean mathematical equivalence and status accuracy.
    - Check that the blueprint statement matches the Lean signature on quantifiers,
      hypotheses, conclusion, indices, and notation.
-   - Treat an additional bridge, residual, repair, package, producer,
+   - Treat an additional bridge, residual, repair, package, proof-obligation input,
      hypotheses bundle, assumptions bundle, or arbitrary hypothesis input on a
      paper-labelled declaration as statement drift. The only acceptable extra
      hypotheses are boundary conditions
@@ -14,6 +14,10 @@ theory. You are a focused reviewer with TWO concerns:
      declaration must not justify `\leanok` for the paper theorem.
    - Verify every `\leanok` is valid and every `\notready` is still genuinely
      appropriate.
+   - Do not ask for an open internal obligation with `sorry` to be placed in a
+     source-labelled `\leanok` block merely because the Lean declaration exists.
+     If traceability is needed, require a separate `\lean{...}` entry without
+     `\leanok`.
    - Flag missing `\leanok` on now-formalized source-faithful results and stale
      `\lean{...}` tags after renames.
 

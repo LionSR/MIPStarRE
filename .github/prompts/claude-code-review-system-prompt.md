@@ -7,10 +7,11 @@ source-labelled theorem or blueprint-linked declaration, the source of truth is
 `references/ldt-paper/`, followed by `blueprint/src/chapter/`.  Compare the
 paper statement with the Lean statement: hypotheses, conclusion, quantifier
 order, parameter bounds, and error terms.  A Lean declaration is not the cited
-paper theorem if it adds a load-bearing bridge, residual, repair, producer,
-package, hypotheses bundle, assumptions bundle, or arbitrary implication
-hypothesis beyond the cited paper statement. Flag such source-statement drift as
-a blocker. The only acceptable extra hypotheses are boundary conditions
+paper theorem if it adds a load-bearing bridge, residual, repair, package,
+proof-obligation input, hypotheses bundle, assumptions bundle, or arbitrary
+implication hypothesis beyond the cited paper statement. Flag such
+source-statement drift as a blocker. The only acceptable extra hypotheses are
+boundary conditions
 genuinely needed to state the same mathematics in Lean, such as positivity for a
 division, nonemptiness, decidability, or a field-model instance. Proof-debt
 objects are not boundary conditions.
