@@ -36,7 +36,7 @@ The project therefore distinguishes three objects.
 |--------|------------------|------------------|
 | Paper theorem | Matches the cited result in `references/ldt-paper/` | May be linked by source-labelled `\lean{}`; statement-level `\leanok` only when the statement matches |
 | Internal proof obligation | Proves a missing intermediate mathematical input from paper hypotheses | May contain a tracked `sorry` while the proof is open |
-| Conditional helper | Uses an additional bridge-like input to prove a useful consequence | Explicit scaffolding only; it must not be advertised as the paper theorem |
+| Conditional helper | Quarantines an unproved intermediate obligation | Not a paper theorem; no source-labelled `\leanok` |
 
 It is never allowed to change the public statement of a declaration advertised
 as the formalization of a source-labelled paper theorem.  At the final assembly
@@ -49,11 +49,11 @@ definition with a precise paper-origin docstring and, if necessary, a tracked
 `sorry`.  This makes the proof frontier visible without weakening the statement
 of a source-labelled theorem.
 
-### Why legacy scaffolding may appear
+### Why legacy scaffolding may remain temporarily
 
 | Temporary reason | Explanation |
 |------------------|-------------|
-| **Localizing an obstruction** | A conditional helper can isolate the exact missing mathematical input when a proof is already partly understood. |
+| **Localizing an obstruction** | A conditional helper can isolate the exact missing mathematical input while the producer is being proved. |
 | **Recovering useful proof content** | The proof body may contain genuine estimates or constructions that should be extracted into source-faithful lemmas. |
 | **Auditability** | An explicit temporary hypothesis is easier to find than an implicit assumption hidden in prose, provided it is named as proof debt. |
 
@@ -76,11 +76,12 @@ are being actively removed.
    fact not yet formalized, state it as a separate proof obligation.  A
    temporary `sorry` in this declaration is preferable to adding the obligation as
    a hypothesis on the paper theorem.
-4. **Use conditional helpers only as local scaffolding.**  A helper such as
-   `mainFormal_ofInternalObligations` or `selfImprovement_assumingBridgeInputs` may
-   clarify an assembly step, but only if the paper-facing declaration remains
-   source-faithful.  The helper is not the paper theorem and should not receive
-   the source-labelled blueprint `\leanok`.
+4. **Use conditional helpers only as quarantine.**  A helper such as
+   `mainFormal_ofInternalObligations` or `selfImprovement_assumingBridgeInputs`
+   is allowed only to preserve downstream proof content while the missing
+   producer is being proved.  It must have a conditional name, a tracked
+   removal target, and no source-labelled blueprint `\leanok`.  The
+   paper-facing declaration must remain source-faithful.
 5. **Audit the final statement.**  Every PR touching a source-labelled theorem
    should compare paper assumptions and Lean assumptions, paper conclusion and
    Lean conclusion, and report whether the Lean statement is exact, has only
@@ -119,11 +120,12 @@ statement.
    is strongly self-consistent, we need a spectral-truncation and
    locality-preserving repair witness."
 
-2. **Only a conditional helper takes the hypothesis as an argument.**  A helper like
+2. **Only a quarantined conditional helper takes the hypothesis as an argument.**  A helper like
    `selfImprovementInInductionSection` in
    `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/Core.lean`
-   takes `OrthonormalizationInput` (and analogous hypothesis bundles) as
-   explicit arguments:
+   takes `OrthonormalizationInput` and analogous proof-obligation bundles as
+   explicit arguments.  This is not the paper theorem; it is the temporary
+   surface where the remaining producers are isolated:
 
    ```lean
    theorem selfImprovementInInductionSection
@@ -212,8 +214,8 @@ This rule addresses the same risk as conclusion-shaped-hypothesis smuggling
 paper-labelled declarations:
 
 - A conclusion-shaped hypothesis is always unacceptable.
-- A genuine intermediate fact may be a legitimate input to a separately named
-  conditional helper.
+- A genuine intermediate fact may appear only in a separately named conditional
+  helper while its producer theorem is being proved.
 - That same intermediate fact is still unacceptable as an added hypothesis on
   the public statement of the paper theorem, unless it is a faithful encoding
   of a hypothesis present in the cited source.
@@ -224,7 +226,7 @@ should carry a tracker reference (usually an issue like #931 or #422), and their
 fields should be the *assumptions* of the paper's proof, not the *conclusion* of
 the theorem.
 
-They are acceptable only as temporary hypotheses of conditional helpers or
+They are permitted only as temporary hypotheses of conditional helpers or
 intermediate construction theorems.  If such a package appears in the public
 signature of a source-labelled theorem, the theorem has become conditional and
 should not be treated as the paper theorem until the package is produced

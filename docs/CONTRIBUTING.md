@@ -128,10 +128,11 @@ Faithful boundary hypotheses include formal domain data such as nonemptiness,
 decidability, field-model instances, positivity of parameters, or denominator
 nonvanishing when these are implicit in the source.  Extra bridge, residual,
 repair, producer, or package assumptions are not boundary hypotheses; they make
-the Lean result conditional.  They should not be introduced unless genuinely
-necessary, and then only as temporary scaffolding with a paper-gap note, a
-producer theorem target, and a removal plan.  They must never be attached to the
-paper theorem name.
+the Lean result conditional.  Do not attach them to a paper-facing theorem.
+If they are unavoidable while preserving downstream proof work, quarantine them
+in a separately named conditional helper, cite the paper-gap note or tracking
+issue, name the producer theorem that must remove them, and keep the source
+theorem statement visible even if its proof contains a tracked `sorry`.
 
 Do not describe a mathematical issue only as a "cleanup", "follow-up", "blocked
 item", or "Phase N" problem. State the theorem, lemma, definition, or mismatch

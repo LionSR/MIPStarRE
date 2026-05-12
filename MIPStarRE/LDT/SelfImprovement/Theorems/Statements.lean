@@ -496,16 +496,16 @@ abbrev HelperStrongSelfConsistencyInput (params : Parameters) [FieldModel params
 and `references/ldt-paper/orthonormalization.tex:67-76`
 (`\label{thm:orthonormalization}`).
 
-The final orthonormalization input required by the reduced theorem chain.
+The orthonormalization proof obligation required by the reduced theorem chain.
 
-In the paper's notation, this is the local wrapper produced by the
-`completion-to-`Option` reduction that supplies:
-
-- a spectral truncation family on `leftLiftedMeasurement` of `optionCompletion Hhat`;
-- a locality-preserving repair family for the same helper submeasurement;
-- and the monotone-total domination data on the residual branch.
-
-The bridge now uses only these primitives. -/
+This is not a hypothesis of `thm:self-improvement`. It records the current
+missing producer for the sharp Section 9 orthonormalization step: for each
+helper submeasurement `Hhat`, one must construct the spectral-truncation and
+locality-preserving repair data used by the Section 5 orthonormalization route
+at the paper's `100 * ζ^(1/4)` envelope. The unconditional completion-route
+theorem available for submeasurements has a wider envelope, so this obligation
+must be discharged by proving the sharper producer or by reworking the error
+cascade, not by adding it to the paper theorem statement. -/
 abbrev OrthonormalizationInput (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (eps delta : Error) :=
   ∀ {Hhat : SubMeas (Polynomial params) ι},
@@ -563,9 +563,9 @@ structure SelfImprovementObligations (params : Parameters) [FieldModel params.q]
   strongly self-consistent at level `selfImprovementHelperError`. -/
   helperStrongSelfConsistency :
     HelperStrongSelfConsistencyInput params strategy eps delta
-  /-- Orthonormalization bridge: the strongly self-consistent `Hhat`
-  has the spectral-truncation and locality-preserving repair witnesses
-  required by the orthonormalization theorem. -/
+  /-- Orthonormalization obligation: the strongly self-consistent `Hhat`
+  has the spectral-truncation and locality-preserving repair witnesses required
+  by the sharp orthonormalization route. -/
   orthonormalization :
     OrthonormalizationInput params strategy eps delta
   /-- Final-fields transport: the remaining completeness, point-consistency,

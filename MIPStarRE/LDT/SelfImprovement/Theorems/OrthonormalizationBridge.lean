@@ -21,9 +21,10 @@ paper-faithful pieces from `references/ldt-paper/orthonormalization.tex`:
 The split mirrors `MakingMeasurementsProjective.OrthonormalizationInput`, which
 is itself the structure left after `orthonormalizationMainLemma_local` was
 proved internally.  At present the spectral and repair pieces are still the
-opaque external inputs called out by the `#931` blocker; this bridge does *not*
-discharge them, but it lets a downstream caller close `OrthonormalizationInput`
-by independently supplying the two pieces.
+opaque external inputs called out by the `#931` blocker; this file does *not*
+discharge them. It only narrows the missing producer to the two constructive
+Section 5 witnesses, and any paper-facing theorem must obtain those witnesses
+from the source hypotheses before using this interface.
 
 In addition, `orthonormalizationSpectralObligation_of_roundingWitnesses`
 composes the spectral-truncation conversion established in `#1042`
@@ -49,7 +50,7 @@ extra assumption.
   QXP approximation through a left marginal identity before applying the lifted
   witness constructor.
 * `leftLiftedProjectivizationRepairInput_of_lifted_qxp_sddOpRel` — composes
-  the same approximation with the existing repair-input bridge.
+  the same approximation with the existing repair-input conversion.
 * `orthonormalizationInput_of_obligations` — combines the two slices into the
   full `SelfImprovement.OrthonormalizationInput`.
 * `orthonormalizationResidualDominationInput_of_obligations` — the corresponding
@@ -76,7 +77,7 @@ extra assumption.
   (`lem:projective-low-rank-sum`) for the option-completion reduction and
   rounded sub-measurement repair.
 * `references/ldt-paper/orthonormalization.tex` line 67
-  (`thm:orthonormalization`) for the overall theorem this bridge feeds.
+  (`thm:orthonormalization`) for the overall theorem this obligation feeds.
 * `references/ldt-paper/self_improvement.tex` lines 679–697
   (helper output `\widehat{H}` is fed to `thm:orthonormalization`).
 * Issue `#931`, comment by `claude` (2026-05-02): the orthonormalization
@@ -232,7 +233,7 @@ theorem restrictSome_rightTensor_total_ev_le {Outcome : Type*}
   restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le
     (ψ := ψ) A (qxpProjSubMeas W.data) W.residual_domination
 
-/-- Paper origin: project-level bridge (cf.
+/-- Paper origin: project-level conversion (cf.
 `references/ldt-paper/self_improvement.tex:628-671`,
 `\label{thm:self-improvement}`).
 

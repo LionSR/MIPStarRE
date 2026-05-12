@@ -98,14 +98,17 @@ runs:
           '  residual, repair, package, producer, hypotheses bundle, assumptions bundle,' \
           '  or arbitrary hypothesis inputs to' \
           '  a source-labelled theorem.' \
-          '- The only acceptable extra hypotheses are boundary conditions genuinely' \
+          '- The only extra hypotheses allowed on a paper-facing theorem are' \
+          '  boundary conditions genuinely' \
           '  needed to state the same mathematics in Lean, such as positivity for a' \
           '  division, nonemptiness, decidability, or a field-model instance.' \
           '- Proof-debt objects are not boundary conditions, even when packaged as' \
           '  inputs or producers.' \
           '- If the proof cannot be closed from the paper hypotheses, stop and report' \
-          '  the missing lemma, or create a separately named conditional helper; do not' \
-          '  turn the paper theorem into a conditional theorem.')"
+          '  the missing lemma. Create a separately named conditional helper only' \
+          '  as a quarantine for downstream proof content, with a tracked producer' \
+          '  theorem that will remove it; do not turn the paper theorem into a' \
+          '  conditional theorem.')"
 
         full_prompt="$prompt"
         if [ -n "$PROMPT_CONTEXT" ]; then
