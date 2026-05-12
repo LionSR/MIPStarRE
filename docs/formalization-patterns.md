@@ -27,8 +27,8 @@ A declaration advertised as the formalization of a paper theorem, lemma,
 proposition, or corollary must state the paper result, up to faithful formal
 encoding of the mathematical domain.  Its public hypotheses and conclusion are
 both part of the statement.  Adding a load-bearing bridge, residual, repair,
-producer, package, or hypothesis bundle not present in the cited statement
-changes the theorem into a conditional helper.
+producer, package, hypotheses bundle, or assumptions bundle not present in the
+cited statement changes the theorem into a conditional helper.
 
 The project therefore distinguishes three objects.
 
@@ -69,8 +69,9 @@ are being actively removed.
    such as positivity, nonemptiness, decidability, field-model instances, or
    type-class assumptions may be faithful encodings when they are needed to
    state the mathematics in Lean.  Proof data such as `BridgeInputs`,
-   `RepairInput`, `Residual`, `Package`, or `Hypotheses` is different: it is
-   not a paper assumption unless the cited statement says so.
+   `RepairInput`, `Residual`, `Package`, generic `Hypotheses`, or generic
+   `Assumptions` is different: it is not a paper assumption unless the cited
+   statement says so.
 3. **Name the missing intermediate result.**  If the proof uses a mathematical
    fact not yet formalized, state it as a separate producer obligation.  A
    temporary `sorry` in this producer is preferable to adding the obligation as
@@ -247,8 +248,9 @@ to link to Lean:
 | `\uses{label}` | The statement or proof block depends on the cited result | `\uses{thm:orthonormalization, prop:completing-to-measurement}` |
 
 Do not use statement-level `\leanok` for a source-labelled theorem whose Lean
-declaration is conditional on bridge, residual, repair, producer, or package
-data not present in the source.
+declaration is conditional on bridge, residual, repair, producer, package,
+generic hypotheses bundle, or generic assumptions bundle data not present in the
+source.
 
 ### Why some nodes show white in the dep graph
 

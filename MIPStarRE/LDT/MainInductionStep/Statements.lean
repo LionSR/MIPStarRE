@@ -607,7 +607,11 @@ noncomputable def family {params : Parameters}
 
 end AnswerSelfImprovementPackage
 
-/-- Averaged pasting inputs distilled from the per-slice self-improvement data.
+/-- Paper origin: `references/ldt-paper/ld-pasting.tex:12-50`
+(`\label{thm:ld-pasting}`) and
+`references/ldt-paper/inductive_step.tex:239-342`.
+
+Averaged pasting inputs distilled from the per-slice self-improvement data.
 
 This records exactly the hypotheses needed to invoke
 `thm:ld-pasting-in-induction-section` after the slice-wise self-improvement

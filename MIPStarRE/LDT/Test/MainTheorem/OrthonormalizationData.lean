@@ -121,7 +121,12 @@ noncomputable def toPostRolePackageLeftCompletionTransportResidual
 
 end MainFormalPostRolePackageProjectiveCompletionResidual
 
-/-- Explicit bridge inputs for applying the paper's cross-consistency
+/-- Paper origin: `references/ldt-paper/inductive_step.tex:130-142`
+(`\label{eq:G-self-consistency}`) and
+`references/ldt-paper/orthonormalization.tex:67-76`
+(`\label{thm:orthonormalization}`).
+
+Explicit bridge inputs for applying the paper's cross-consistency
 orthonormalization lemma to the two unsymmetrized role measurements.
 
 The fields expose the remaining spectral-truncation and locality-preserving

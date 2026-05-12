@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
-"""Check that every ``*Statement`` declaration in ``MIPStarRE/LDT/`` carries a
+"""Check that every statement-like declaration in ``MIPStarRE/LDT/`` carries a
 paper-origin citation in its def-site docstring.
 
 Scope: this linter only scans ``MIPStarRE/LDT/`` (and excluded build/tmp
-directories) — ``*Statement``-like declarations elsewhere in the repository
+directories) — statement-like declarations elsewhere in the repository
 are intentionally not covered.  If statement-like declarations migrate to a
 sibling top-level (e.g. ``MIPStarRE/Quantum/``), update ``_scan_root``.
 
 This implements the linter requested by ledger #1379 and issue #1384 ("Earn
 your place" backfill).  For every ``structure``, ``def``, or ``abbrev`` whose
 identifier ends in ``Statement`` (and similar A6 suffixes ``Witness``,
-``Hypotheses``, ``Conclusion``), we look at the *immediately preceding
-docstring or comment block* (after skipping blank lines) for one of three
-citation forms:
+``Hypotheses``, ``Conclusion``, ``Input``, ``Assumptions``), we look at the
+*immediately preceding docstring or comment block* (after skipping blank lines)
+for one of three citation forms:
 
 1. A paper line reference of the form ``references/ldt-paper/.../*.tex``
    optionally followed by a colon and line range.
@@ -23,7 +23,7 @@ citation forms:
 Restricting the search to the immediately preceding comment block (rather than
 a fixed line window over arbitrary code/comments) prevents a citation in an
 earlier nearby declaration's docstring from spuriously satisfying the
-linter for a later ``*Statement`` declaration.
+linter for a later declaration.
 
 The repository workflow runs this as a blocking guard.  During a future
 backfill or local exploratory audit, pass ``--warn-only`` to print violations
@@ -63,6 +63,8 @@ SUFFIXES: tuple[str, ...] = (
     "Witness",
     "Hypotheses",
     "Conclusion",
+    "Input",
+    "Assumptions",
 )
 
 DECL_KEYWORDS: tuple[str, ...] = ("structure", "def", "abbrev")
@@ -199,9 +201,9 @@ def _scan_root(root: Path) -> dict[str, list[tuple[int, str]]]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description=(
-            "Check that *Statement / *Witness / *Hypotheses / *Conclusion "
-            "structures and definitions in MIPStarRE/LDT/ carry a paper-origin "
-            "citation in their def-site docstring."
+            "Check that statement-like structures and definitions in "
+            "MIPStarRE/LDT/ carry a paper-origin citation in their def-site "
+            "docstring."
         )
     )
     parser.add_argument(
@@ -228,14 +230,14 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if args.warn_only else 2
 
     if not results:
-        print("OK: every *Statement-like declaration in MIPStarRE/LDT/ carries "
+        print("OK: every statement-like declaration in MIPStarRE/LDT/ carries "
               "a paper-origin citation.")
         return 0
 
     total = sum(len(items) for items in results.values())
     label = "warning" if args.warn_only else "error"
     print(
-        f"{label}: {total} *Statement-like declaration(s) missing a paper-origin "
+        f"{label}: {total} statement-like declaration(s) missing a paper-origin "
         "citation in the immediately preceding docstring/comment block:",
         file=sys.stderr,
     )

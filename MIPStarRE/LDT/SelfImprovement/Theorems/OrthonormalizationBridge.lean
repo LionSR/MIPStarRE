@@ -697,7 +697,10 @@ noncomputable def orthonormalizationRepairProducer_of_qxpLayer
   fun hssc =>
     leftLiftedProjectivizationRepairInput_of_qxpLayer (hqxp hssc)
 
-/-- SelfImprovement-level strengthened orthonormalization input carrying the
+/-- Paper origin: `references/ldt-paper/self_improvement.tex:690-705`
+and `references/ldt-paper/orthonormalization.tex:533-627`.
+
+SelfImprovement-level strengthened orthonormalization input carrying the
 residual-domination invariant. -/
 abbrev OrthonormalizationResidualDominationInput
     (params : Parameters) [FieldModel params.q]
@@ -744,7 +747,10 @@ noncomputable def repairInput_of_repairInputWithResidualDomination
     let ⟨P, hRounded, _hResidual⟩ := H.repair hSpectral
     ⟨P, hRounded⟩
 
-/-- Forget the residual-domination field of the strengthened input, yielding
+/-- Paper origin: `references/ldt-paper/self_improvement.tex:690-705`
+and `references/ldt-paper/orthonormalization.tex:533-627`.
+
+Forget the residual-domination field of the strengthened input, yielding
 the ordinary orthonormalization input required by the reduced self-improvement
 theorem. -/
 noncomputable def orthonormalizationInput_of_residualDominationInput

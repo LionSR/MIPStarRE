@@ -134,8 +134,8 @@ extra hypothesis on the theorem itself.  This produces a true conditional
 theorem, but it is not the theorem stated in the paper.  In particular, do not
 repair a theorem such as `mainFormal` by adding assumptions named
 `BridgeHypotheses`, `Input`, `Residual`, `Package`, `RepairInput`, `Producer`,
-or similar unless those assumptions are explicitly present in the cited paper
-statement.
+generic `Hypotheses` or `Assumptions` bundles, or similar, unless those
+assumptions are explicitly present in the cited paper statement.
 
 Conditional bridge lemmas are exceptional temporary scaffolding.  Before
 introducing one, first try to state the missing intermediate fact as a named

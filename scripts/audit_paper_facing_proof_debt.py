@@ -12,8 +12,8 @@ review aid for that boundary:
 * inspect only the public input portion of the declaration header after the
   declaration name and before the result type;
 * report occurrences of proof-debt vocabulary such as ``BridgeHypotheses``,
-  ``Residual``, ``RepairInput``, ``Package``, ``Producer``, or an ``Input``
-  bundle.
+  ``Residual``, ``RepairInput``, ``Package``, ``Producer``, an ``Input``
+  bundle, or a generic ``Hypotheses`` / ``Assumptions`` bundle.
 * classify known faithful boundary-input packages separately, with paper
   citations, so they do not become indistinguishable from proof debt.
 
@@ -48,17 +48,22 @@ DEBT_TOKEN_RE = re.compile(
     r"(?<![A-Za-z0-9_'])"
     r"(?:"
     r"(?:[A-Za-z_][A-Za-z0-9_']*)?"
-    r"(?:Bridge|Residual|Repair|Package|Producer|Input)"
+    r"(?:Bridge|Residual|Repair|Package|Producer|Input|Hypotheses|Assumptions)"
     r"[A-Za-z0-9_']*"
     r"|"
     r"(?:h|has|mk|of)?"
-    r"(?:bridge|residual|repair|package|producer|input)"
+    r"(?:bridge|residual|repair|package|producer|input|hypotheses|assumptions)"
     r"[A-Za-z0-9_']*"
     r")"
     r"(?![A-Za-z0-9_'])"
 )
 
 FAITHFUL_BOUNDARY_TOKENS = {
+    "CascadeHypotheses": (
+        "faithful encoding of the standing numeric regime for the error cascade; "
+        "see blueprint/src/chapter/ch10_induction.tex:588-689 and "
+        "references/ldt-paper/inductive_step.tex:187-234"
+    ),
     "SliceBoundednessInput": (
         "faithful encoding of the paper boundedness hypothesis; see "
         "references/ldt-paper/commutativity-G.tex:29-36 and "

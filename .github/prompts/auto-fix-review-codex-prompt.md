@@ -9,8 +9,9 @@ Instructions:
 5. Common fixes:
    - Remove `sorry` and fully close the lemma/theorem.
    - Do not close a proof obligation by changing a paper-labelled theorem statement or
-     adding bridge, residual, repair, producer, package, or arbitrary implication
-     hypotheses absent from the cited statement.
+     adding bridge, residual, repair, producer, package, hypotheses bundle,
+     assumptions bundle, or arbitrary implication hypotheses absent from the
+     cited statement.
    - If the proof cannot be completed without such a change, stop and post a PR comment
      naming the missing lemma or producer theorem instead of pushing a weakened paper
      theorem.
@@ -37,7 +38,8 @@ Quality bar (your fix MUST satisfy ALL of these before committing):
 - Source-statement fidelity (BLOCKER): declarations named after paper results or
   linked by `\lean{...}` must preserve the cited statement up to faithful formal
   encoding. Do not add load-bearing bridge, residual, repair, producer, package,
-  or arbitrary implication hypotheses. The only acceptable extra hypotheses are
+  hypotheses bundle, assumptions bundle, or arbitrary implication hypotheses.
+  The only acceptable extra hypotheses are
   boundary conditions genuinely needed to state the same mathematics in Lean,
   such as positivity for a division, nonemptiness, decidability, or a
   field-model instance. Proof-debt objects are not boundary conditions. Existing

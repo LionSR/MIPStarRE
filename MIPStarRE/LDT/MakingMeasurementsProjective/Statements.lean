@@ -141,7 +141,10 @@ structure SpectralTruncationStatement {Outcome : Type*}
     roundedFamily.total ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
       (1 : MIPStarRE.Quantum.Op ι)
 
-/-- Explicit input exposing the paper's truncation-function stage. -/
+/-- Paper origin: `references/ldt-paper/orthonormalization.tex:414-531`
+(`\label{lem:projective-non-measurement}`).
+
+Explicit input exposing the paper's truncation-function stage. -/
 abbrev SpectralTruncationInput {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -167,7 +170,9 @@ structure RoundedProjMeasStatement {Outcome : Type*}
       (constSubMeasFamily P.toSubMeas)
       ζ
 
-/-- Explicit input exposing the late repair from a rounded family to a genuine
+/-- Paper origin: `references/ldt-paper/orthonormalization.tex:533-627`.
+
+Explicit input exposing the late repair from a rounded family to a genuine
 projective submeasurement. -/
 abbrev ProjectivizationRepairInput {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -177,7 +182,10 @@ abbrev ProjectivizationRepairInput {Outcome : Type*}
     ∃ P : ProjSubMeas Outcome ι,
       RoundedProjMeasStatement ψ A P (roundingToProjectiveError ζ)
 
-/-- Locality-preserving repair input for a left-lifted measurement.
+/-- Paper origin: `references/ldt-paper/orthonormalization.tex:533-627`
+and `references/ldt-paper/self_improvement.tex:690-705`.
+
+Locality-preserving repair input for a left-lifted measurement.
 
 This is the structural invariant needed to descend the lifted-space output of
 `orthonormalizationMainLemma` back to a local projective submeasurement: when
@@ -232,7 +240,10 @@ noncomputable def optionCompletion {Outcome : Type*}
     (A : SubMeas Outcome ι) (a : Outcome) :
     (optionCompletion A).outcome (some a) = A.outcome a := rfl
 
-/-- Explicit input exposing only the remaining truncation-function and
+/-- Paper origin: `references/ldt-paper/orthonormalization.tex:380-627`
+(`\label{thm:orthonormalization}`).
+
+Explicit input exposing only the remaining truncation-function and
 locality-preserving repair witnesses needed for the submeasurement version of
 `thm:orthonormalization`.
 

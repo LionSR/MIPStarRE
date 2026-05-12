@@ -9,7 +9,8 @@ Instructions:
 2. Common Lean build failures and how to fix them:
    - `sorry` left in proof: Fully close the lemma/theorem — replace `sorry` with a complete proof. Do NOT leave `sorry` behind or add TODO comments as a workaround.
    - Paper-labelled theorem blocked by a missing proof: do not add bridge, residual,
-     repair, producer, package, or arbitrary implication hypotheses that are absent
+     repair, producer, package, hypotheses bundle, assumptions bundle, or
+     arbitrary implication hypotheses that are absent
      from the cited statement.  If the source-faithful proof cannot be completed,
      stop and comment on the PR with the missing named lemma or producer theorem.
    - Type mismatch: Check expected vs actual types and fix the proof term.
@@ -27,8 +28,9 @@ Quality bar (your fix MUST satisfy ALL of these before committing):
 - Proof correctness (BLOCKER): structured proofs, not brute-force simp/omega/ring chains. If a result looks wrong, too strong, or suspiciously general, scout `references/ldt-paper/` first, then `blueprint/src/chapter/`, compare hypotheses/conclusions, and cite the specific source path, label, and line.
 - Source-statement fidelity (BLOCKER): paper-labelled or blueprint-linked
   declarations must preserve the cited statement up to faithful formal encoding.
-  Do not add load-bearing bridge, residual, repair, producer, package, or
-  arbitrary implication hypotheses. The only acceptable extra hypotheses are
+  Do not add load-bearing bridge, residual, repair, producer, package,
+  hypotheses bundle, assumptions bundle, or arbitrary implication hypotheses.
+  The only acceptable extra hypotheses are
   boundary conditions genuinely needed to state the same mathematics in Lean,
   such as positivity for a division, nonemptiness, decidability, or a
   field-model instance. Proof-debt objects are not boundary conditions. If a

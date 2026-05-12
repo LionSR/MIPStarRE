@@ -30,7 +30,10 @@ namespace MIPStarRE.LDT
 
 namespace Test
 
-/-- Additional diagonal consistency input for the two unsymmetrized role POVMs.
+/-- Paper origin: `references/ldt-paper/inductive_step.tex:130-149`
+(`\label{eq:G-self-consistency}`).
+
+Additional diagonal consistency input for the two unsymmetrized role POVMs.
 
 The diagonal consistency handoff supplies only the cross relation `G^A ⊗ I ≃ I ⊗ G^B`. The
 completion theorem used at lines 143--147 needs the diagonal hypotheses for each
@@ -60,7 +63,10 @@ structure MainFormalPostRolePackageDiagonalConsistencyInput
         (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
       scalars.zeta1
 
-/-- The `BipartiteSSCRel` form of the additional diagonal obligation consumed
+/-- Paper origin: `references/ldt-paper/inductive_step.tex:130-149`
+(`\label{eq:G-self-consistency}`).
+
+The `BipartiteSSCRel` form of the additional diagonal obligation consumed
 by `completingToMeasurement`. -/
 structure MainFormalPostRolePackageDiagonalSSCInput
     (params : Parameters) [FieldModel.{0} params.q]
@@ -122,7 +128,9 @@ theorem ofDiagonalConsistency
 
 end MainFormalPostRolePackageDiagonalSSCInput
 
-/-- Explicit completion witnesses for a fixed line-130 orthonormalization residual.
+/-- Paper origin: `references/ldt-paper/inductive_step.tex:135-149`.
+
+Explicit completion witnesses for a fixed line-130 orthonormalization residual.
 
 This is the data-valued version of the remaining Step 6 completion producer: it
 records the distinguished completion outcomes, the two completed-closeness

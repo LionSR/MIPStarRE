@@ -95,6 +95,12 @@ class SuffixTests(unittest.TestCase):
     def test_hypotheses_suffix(self) -> None:
         self.assertTrue(_matches_suffix("FooHypotheses"))
 
+    def test_input_suffix(self) -> None:
+        self.assertTrue(_matches_suffix("FooInput"))
+
+    def test_assumptions_suffix(self) -> None:
+        self.assertTrue(_matches_suffix("FooAssumptions"))
+
     def test_conclusion_suffix(self) -> None:
         self.assertTrue(_matches_suffix("FooConclusion"))
 
@@ -305,6 +311,27 @@ class ScanFileTests(unittest.TestCase):
             ))
             misses = _scan_file(path)
             self.assertEqual(misses, [(2, "FooStatement")])
+
+    def test_input_package_requires_origin(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "F.lean"
+            _write(path, (
+                "/-- prose -/\n"
+                "abbrev FooInput := True\n"
+            ))
+            misses = _scan_file(path)
+            self.assertEqual(misses, [(2, "FooInput")])
+
+    def test_assumptions_package_requires_origin(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "F.lean"
+            _write(path, (
+                "/-- prose -/\n"
+                "structure FooAssumptions where\n"
+                "  h : True\n"
+            ))
+            misses = _scan_file(path)
+            self.assertEqual(misses, [(2, "FooAssumptions")])
 
 
 # ── _scan_root: missing target handling ────────────────────────────────────

@@ -1,13 +1,13 @@
-name: Statement paper-origin guard
+name: Statement-like paper-origin guard
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
 
 # Blocking guard for the issue #1379 earn-your-place policy: every
-# Statement/Witness/Hypotheses/Conclusion declaration in MIPStarRE/LDT must
-# cite a paper path, paper label, or documented paper gap at its definition
-# site.
+# Statement/Witness/Hypotheses/Conclusion/Input/Assumptions declaration in
+# MIPStarRE/LDT must cite a paper path, paper label, or documented paper gap at
+# its definition site.
 #
 # See: issue #1413 (CI wiring), ledgers #1379 / #1384 (backfill).
 
@@ -20,7 +20,7 @@ permissions:
 
 jobs:
   guard:
-    name: Paper-origin citations for *Statement declarations
+    name: Paper-origin citations for statement-like declarations
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -42,7 +42,7 @@ jobs:
         if: always()
         run: |
           {
-            echo "### Statement paper-origin guard"
+            echo "### Statement-like paper-origin guard"
             echo
             echo '```text'
             cat "$RUNNER_TEMP/statement-paper-origin.log"
