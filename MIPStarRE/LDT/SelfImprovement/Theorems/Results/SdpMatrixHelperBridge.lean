@@ -162,7 +162,7 @@ the complementary-slackness equations.  The residual-dominating
 orthonormalization input then supplies the projective measurement and the
 monotone-total comparison.  The projective residual bound is not assumed as a
 final field: it is derived from `final_fields_exists_of_helper_outputs_of_residual_domination`
-using the helper-output boundedness producer and the complementary-slackness
+using the helper-output boundedness obligation and the complementary-slackness
 equations. -/
 lemma selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDomination
     (params : Parameters)
@@ -451,11 +451,11 @@ lemma selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDominationIn
     hhelperCompleteness hhelperSSCInput htransfer horthInput
 
 /-- A canonical optimal pair with dominance and a residual-dominating QXP repair
-producer assemble a full self-improvement conclusion.
+obligation assemble a full self-improvement conclusion.
 
 The spectral-truncation slice is discharged by
-`orthonormalizationSpectralProducer_of_sourceAlmostProjective`; hence the
-remaining orthonormalization hypothesis is exactly the QXP repair producer with
+`orthonormalizationSpectralObligation_of_sourceAlmostProjective`; hence the
+remaining orthonormalization hypothesis is exactly the QXP repair obligation with
 fresh-outcome residual domination. -/
 lemma selfImprovementWithCanonicalOptimalPairAndQXPResidualDomination
     (params : Parameters)
@@ -495,7 +495,7 @@ lemma selfImprovementWithCanonicalOptimalPairAndQXPResidualDomination
               (pointConsistencyAddInUSelection params)| ≤
             addInUError params eps delta)
     (hqxp :
-      OrthonormalizationQXPLayerRepairProducerWithResidualDomination
+      OrthonormalizationQXPLayerRepairObligationWithResidualDomination
         params strategy eps delta) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu :=
@@ -505,7 +505,7 @@ lemma selfImprovementWithCanonicalOptimalPairAndQXPResidualDomination
     (orthonormalizationResidualDominationInput_of_sourceAlmostProjectiveAndQXPLayerRepair
       hqxp)
 
-/-- A canonical optimal pair, an ordinary QXP repair producer, and a separate
+/-- A canonical optimal pair, an ordinary QXP repair obligation, and a separate
 fresh-outcome residual-domination proof assemble a full self-improvement
 conclusion. -/
 lemma selfImprovementWithCanonicalOptimalPairAndQXPRepairAndResidualDomination
@@ -545,7 +545,7 @@ lemma selfImprovementWithCanonicalOptimalPairAndQXPRepairAndResidualDomination
               T.toSubMeas
               (pointConsistencyAddInUSelection params)| ≤
             addInUError params eps delta)
-    (hqxp : OrthonormalizationQXPLayerRepairProducer params strategy eps delta)
+    (hqxp : OrthonormalizationQXPLayerRepairObligation params strategy eps delta)
     (hdom : ∀ {Hhat : SubMeas (Polynomial params) ι}
       (hssc : BipartiteSSCRel strategy.state (uniformDistribution Unit)
         (constSubMeasFamily Hhat)
@@ -560,6 +560,6 @@ lemma selfImprovementWithCanonicalOptimalPairAndQXPRepairAndResidualDomination
   selfImprovementWithCanonicalOptimalPairAndQXPResidualDomination
     params strategy eps delta gamma nu heps_le_one hdelta_le_one hd_le_q
     X Z hsdp hgood G hhelperCompleteness hhelperSSCInput htransfer
-    (residualDominatingRepairProducer_of_qxpLayer_and_residualDomination hqxp hdom)
+    (residualDominatingRepairObligation_of_qxpLayer_and_residualDomination hqxp hdom)
 
 end MIPStarRE.LDT.SelfImprovement

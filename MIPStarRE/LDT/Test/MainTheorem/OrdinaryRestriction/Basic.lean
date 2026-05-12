@@ -293,7 +293,7 @@ noncomputable def mainFormalSuccessorSelfImprovementBridgeInputs_ofOrthonormaliz
             haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x))
     (repair :
       ∀ hinduction x,
-        SelfImprovement.OrthonormalizationRepairProducer params
+        SelfImprovement.OrthonormalizationRepairObligation params
           (sliceStrategy hinduction x)
           ((mainFormalSuccessorRestrictionPackage params strategy eps hpass
             haxisWeightedBound hdiagonalWeightedBound).profile.axisParallel x)

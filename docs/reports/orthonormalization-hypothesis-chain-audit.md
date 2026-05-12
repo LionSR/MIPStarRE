@@ -59,10 +59,10 @@ abbrev OrthonormalizationInput (params) (strategy) (eps delta) :=
 
 This lifts the per-submeasurement `OrthonormalizationInput` to a `∀`-quantified input for each helper family `Hhat`.
 
-**Bridge producers** (`OrthonormalizationBridge.lean`):
-- **`orthonormalizationInput_of_producers`** (line 684): combines `OrthonormalizationSpectralProducer` + `OrthonormalizationRepairProducer` → full `OrthonormalizationInput`
-- **Spectral producer**: `orthonormalizationSpectralProducer_of_sourceAlmostProjective` (line 851) — **FULLY PROVED** via `spectralTruncationInput_of_sourceAlmostProjective`
-- **Repair producer**: `OrthonormalizationRepairProducer` (line 129-139) — **STILL HYPOTHESIS**: calls `LeftLiftedProjectivizationRepairInput` on `optionCompletion Hhat`
+**Bridge obligations** (`OrthonormalizationBridge.lean`):
+- **`orthonormalizationInput_of_obligations`** (line 684): combines `OrthonormalizationSpectralObligation` + `OrthonormalizationRepairObligation` → full `OrthonormalizationInput`
+- **Spectral obligation**: `orthonormalizationSpectralObligation_of_sourceAlmostProjective` (line 851) — **FULLY PROVED** via `spectralTruncationInput_of_sourceAlmostProjective`
+- **Repair obligation**: `OrthonormalizationRepairObligation` (line 129-139) — **STILL HYPOTHESIS**: calls `LeftLiftedProjectivizationRepairInput` on `optionCompletion Hhat`
 
 ### Level 3: MainInductionStep (`SelfImprovementBridge/Core.lean`)
 
@@ -70,7 +70,7 @@ This lifts the per-submeasurement `OrthonormalizationInput` to a `∀`-quantifie
 
 **`SelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationRepair`** (line 456-505) builds per-slice bridge from:
 - `HelperStrongSelfConsistencyInput` — hypothesis
-- `OrthonormalizationRepairProducer` — hypothesis (= `repair x`)
+- `OrthonormalizationRepairObligation` — hypothesis (= `repair x`)
 - `FinalFieldsInput` — hypothesis
 
 ### Level 4: Test/MainTheorem (MainFormal)
@@ -95,7 +95,7 @@ structure MainFormalPostRolePackageDiagonalOrthonormalizationInput ... where
 | Level | Definition | Status |
 |---|---|---|
 | MakingMeasurementsProjective | `SpectralTruncationInput` | **Proved** via `spectralTruncationInput_of_sourceAlmostProjective` (`ProjectiveNonMeasurement.lean:749`) |
-| SelfImprovement | `OrthonormalizationSpectralProducer` | **Proved** via `orthonormalizationSpectralProducer_of_sourceAlmostProjective` (`OrthonormalizationBridge.lean:851`) |
+| SelfImprovement | `OrthonormalizationSpectralObligation` | **Proved** via `orthonormalizationSpectralObligation_of_sourceAlmostProjective` (`OrthonormalizationBridge.lean:851`) |
 | MainTheorem | `leftSpectral / rightSpectral` | **Proved** via `spectralTruncationInput_of_sourceAlmostProjective` applied to unsymmetrized POVMs (`OrthonormalizationData.lean:156-169`) |
 
 ### Locality-Preserving Repair (QXP Repair)
@@ -103,7 +103,7 @@ structure MainFormalPostRolePackageDiagonalOrthonormalizationInput ... where
 | Level | Definition | Status |
 |---|---|---|
 | MakingMeasurementsProjective | `LeftLiftedProjectivizationRepairInput` | **HYPOTHESIS** — takes `SpectralTruncationStatement` → returns `ProjSubMeas` with `RoundedProjMeasStatement` on `ProjSubMeas.liftLeft P` |
-| SelfImprovement | `OrthonormalizationRepairProducer` | **HYPOTHESIS** — `∀ Hhat, BipartiteSSCRel ... → LeftLiftedProjectivizationRepairInput ... (optionCompletion Hhat)` |
+| SelfImprovement | `OrthonormalizationRepairObligation` | **HYPOTHESIS** — `∀ Hhat, BipartiteSSCRel ... → LeftLiftedProjectivizationRepairInput ... (optionCompletion Hhat)` |
 | MainInductionStep | `SelfImprovement.OrthonormalizationInput` | **HYPOTHESIS** — flows through `selfImprovementInInductionSection` → `selfImprovement` → `orthonormalization` |
 | MainTheorem | `leftRepair / rightRepair` | **HYPOTHESIS** — bundled in `MainFormalPostRolePackageDiagonalOrthonormalizationInput` |
 
@@ -273,8 +273,8 @@ The `leftLiftedProjectivizationRepairInput_of_lifted_qxp_sddOpRel` and related c
 | `MIPStarRE/LDT/MakingMeasurementsProjective/Statements.lean` | Defines `OrthonormalizationInput`, `SpectralTruncationInput`, `LeftLiftedProjectivizationRepairInput` |
 | `MIPStarRE/LDT/MakingMeasurementsProjective/Orthonormalization.lean` | Theorem `orthonormalization` consuming `OrthonormalizationInput` |
 | `MIPStarRE/LDT/MakingMeasurementsProjective/SpectralTruncation/ProjectiveNonMeasurement.lean` | Proved: `spectralTruncationInput_of_sourceAlmostProjective` |
-| `MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean` | Defines `SelfImprovement.OrthonormalizationInput`, `OrthonormalizationRepairProducer` |
-| `MIPStarRE/LDT/SelfImprovement/Theorems/OrthonormalizationBridge.lean` | Bridge: spectral/repair producers, QXP repair witness constructors |
+| `MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean` | Defines `SelfImprovement.OrthonormalizationInput`, `OrthonormalizationRepairObligation` |
+| `MIPStarRE/LDT/SelfImprovement/Theorems/OrthonormalizationBridge.lean` | Bridge: spectral/repair obligations, QXP repair witness constructors |
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/Core.lean` | `selfImprovement` theorem (uses `orthonormalization` from MMProj) |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/Core.lean` | `selfImprovementInInductionSection`, `SelfImprovementPackage` |
 | `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | Final assembly with 1 `sorry` (line 611) |

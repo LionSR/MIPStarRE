@@ -345,8 +345,9 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
       - \sqrt{2\delta}
       - \frac{md}{q}.
   \]
-  The Lean producer-side packaging of this step starts with the input structure
-  \lean{MIPStarRE.LDT.SelfImprovement.HelperStrongSelfConsistencyProducerInputs}
+  The Lean formalization records this step as a named proof obligation, starting
+  with the input structure
+  \lean{MIPStarRE.LDT.SelfImprovement.HelperStrongSelfConsistencyObligations}
   and the exact residual-side expansion
   \lean{MIPStarRE.LDT.SelfImprovement.helper_mass_sub_release_eq_polynomial_off_diagonal}
   \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalBareQuantity}
@@ -354,17 +355,17 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helper_residualLowerBound_of_offDiagonal_bound}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_residualLowerBound_of_paper_chain_bound}
   \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalBareQuantity_le_paper_chain_of_scalar_transports}
-  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance_offDiagonal}
-  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance_paperChain}
-  \lean{MIPStarRE.LDT.SelfImprovement.helper_producer_inputs_of_selfConsistency_localVariance_scalarTransports}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_offDiagonal}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_paperChain}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_scalarTransports}
   and then uses the proved wrappers
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_of_helper_conclusion}
-  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance}
-  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_input_of_producer}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_obligations_of_selfConsistency_localVariance}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_input_of_obligations}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_input_of_selfConsistency_localVariance}
   to recover the final helper-stage self-consistency input. The corresponding
   bridge-package constructor is
-  \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementBridgeInputs.ofHelperStrongSelfConsistencyProducer}.
+  \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementBridgeInputs.ofHelperStrongSelfConsistencyObligations}.
   The paper's arithmetic shows that the right-hand error is at most
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_error_le_selfImprovementHelperError}
   \[
@@ -436,7 +437,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   carries the complementary-slackness equations used in the completeness chain,
   together with the residual-domination bridge that assembles the full
   self-improvement conclusion from the slackness-carrying helper.  An
-  intermediate assembly route routes a QXP repair producer plus the
+  intermediate assembly route uses a QXP repair obligation plus the
   construction-level coisometry identity through the same bridge.
   These theorems use the Section~9 statement above. Their proofs are not yet
   complete, because the strong-duality proof for the SDP remains to be formalized.
@@ -805,7 +806,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
 
 \begin{lemma}[Averaging over the evaluation point]\label{lem:add-in-u}
   \lean{MIPStarRE.LDT.SelfImprovement.AddInUFullStatement}
-  \lean{MIPStarRE.LDT.SelfImprovement.addInUFullProducer}
+  \lean{MIPStarRE.LDT.SelfImprovement.addInUFullStatement_of_isGood}
   \lean{MIPStarRE.LDT.SelfImprovement.selfConsistencyAddInUSelection}
   \lean{MIPStarRE.LDT.SelfImprovement.addInULeftQuantity_selfConsistencySelection_eq_matchMass}
   \lean{MIPStarRE.LDT.SelfImprovement.addInURightQuantity_selfConsistencySelection_eq_release}
@@ -1020,7 +1021,7 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementBridgeInputs}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromBridgeInputs}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromBridgeInputsSubMeas}
-  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationSpectralProducer_of_projectiveNonMeasurement}
+  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationSpectralObligation_of_projectiveNonMeasurement}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_of_helper_outputs_of_total_expectation_le}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_of_helper_outputs_of_total_operator_le}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_exists_of_helper_outputs_of_residual_domination}
@@ -1167,11 +1168,11 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \lean{MIPStarRE.LDT.SelfImprovement.leftLiftedQXPLayerRepairWitnessWithResidualDomination_of_lifted_qxp_sddOpRel_fresh_outcome_le}
   \lean{MIPStarRE.LDT.SelfImprovement.leftLiftedQXPLayerRepairWitnessWithResidualDomination_of_local_qxp_sddOpRel_fresh_outcome_le}
   \lean{MIPStarRE.LDT.SelfImprovement.leftLiftedProjectivizationRepairInputWithResidualDomination_of_qxpLayer}
-  \lean{MIPStarRE.LDT.SelfImprovement.OrthonormalizationQXPLayerRepairProducerWithResidualDomination}
-  \lean{MIPStarRE.LDT.SelfImprovement.residualDominatingRepairProducer_of_qxpLayer_and_freshOutcome}
+  \lean{MIPStarRE.LDT.SelfImprovement.OrthonormalizationQXPLayerRepairObligationWithResidualDomination}
+  \lean{MIPStarRE.LDT.SelfImprovement.residualDominatingRepairObligation_of_qxpLayer_and_freshOutcome}
   \lean{MIPStarRE.LDT.SelfImprovement.OrthonormalizationResidualDominationInput}
   \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationInput_of_residualDominationInput}
-  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationResidualDominationInput_of_producers}
+  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationResidualDominationInput_of_obligations}
   \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationInput_of_sourceAlmostProjectiveAndQXPLayerRepair}
   \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationResidualDominationInput_of_sourceAlmostProjectiveAndQXPLayerRepair}
   \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationResidualDominationInput_of_sourceQXPRepairAndResidualDomination}

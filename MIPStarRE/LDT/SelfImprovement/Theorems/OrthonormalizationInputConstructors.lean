@@ -4,7 +4,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationBridge
 # Section 9 — Orthonormalization input constructors
 
 This file contains the final constructor forms built from the spectral and
-repair producers in `OrthonormalizationBridge.lean`.
+repair obligations in `OrthonormalizationBridge.lean`.
 
 ## References
 
@@ -21,23 +21,23 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- Build `SelfImprovement.OrthonormalizationInput` from the constructive
-spectral-truncation theorem and a QXP-layer repair producer.
+spectral-truncation theorem and a QXP-layer repair obligation.
 
 The spectral slice is supplied by
-`orthonormalizationSpectralProducer_of_sourceAlmostProjective`; the remaining
+`orthonormalizationSpectralObligation_of_sourceAlmostProjective`; the remaining
 caller obligation is therefore only the locality-preserving QXP repair
-producer. -/
+obligation. -/
 noncomputable def orthonormalizationInput_of_sourceAlmostProjectiveAndQXPLayerRepair
     {params : Parameters} [FieldModel params.q]
     {strategy : SymStrat params ι} {eps delta : Error}
-    (hqxp : OrthonormalizationQXPLayerRepairProducer params strategy eps delta) :
+    (hqxp : OrthonormalizationQXPLayerRepairObligation params strategy eps delta) :
     OrthonormalizationInput params strategy eps delta :=
-  orthonormalizationInput_of_producers
-    orthonormalizationSpectralProducer_of_sourceAlmostProjective
-    (orthonormalizationRepairProducer_of_qxpLayer hqxp)
+  orthonormalizationInput_of_obligations
+    orthonormalizationSpectralObligation_of_sourceAlmostProjective
+    (orthonormalizationRepairObligation_of_qxpLayer hqxp)
 
 /-- Build the residual-domination orthonormalization input from the constructive
-spectral-truncation theorem and a residual-dominating QXP repair producer.
+spectral-truncation theorem and a residual-dominating QXP repair obligation.
 
 This is the monotone-total analogue of
 `orthonormalizationInput_of_sourceAlmostProjectiveAndQXPLayerRepair`: after the
@@ -49,15 +49,15 @@ noncomputable def
     {params : Parameters} [FieldModel params.q]
     {strategy : SymStrat params ι} {eps delta : Error}
     (hqxp :
-      OrthonormalizationQXPLayerRepairProducerWithResidualDomination
+      OrthonormalizationQXPLayerRepairObligationWithResidualDomination
         params strategy eps delta) :
     OrthonormalizationResidualDominationInput params strategy eps delta :=
-  orthonormalizationResidualDominationInput_of_producers
-    orthonormalizationSpectralProducer_of_sourceAlmostProjective
+  orthonormalizationResidualDominationInput_of_obligations
+    orthonormalizationSpectralObligation_of_sourceAlmostProjective
     hqxp
 
 /-- Build the residual-domination orthonormalization input from an ordinary QXP
-repair producer and a separate residual-domination proof for the same canonical
+repair obligation and a separate residual-domination proof for the same canonical
 QXP layer.
 
 This is useful when the `P`-versus-`Q` approximation and the fresh-outcome
@@ -66,7 +66,7 @@ noncomputable def
     orthonormalizationResidualDominationInput_of_sourceQXPRepairAndResidualDomination
     {params : Parameters} [FieldModel params.q]
     {strategy : SymStrat params ι} {eps delta : Error}
-    (hqxp : OrthonormalizationQXPLayerRepairProducer params strategy eps delta)
+    (hqxp : OrthonormalizationQXPLayerRepairObligation params strategy eps delta)
     (hdom : ∀ {Hhat : SubMeas (Polynomial params) ι}
       (hssc : BipartiteSSCRel strategy.state (uniformDistribution Unit)
         (constSubMeasFamily Hhat)
@@ -78,17 +78,17 @@ noncomputable def
         QXPLayerResidualDomination (hqxp hssc hSpectral).data Hhat) :
     OrthonormalizationResidualDominationInput params strategy eps delta :=
   orthonormalizationResidualDominationInput_of_sourceAlmostProjectiveAndQXPLayerRepair
-    (residualDominatingRepairProducer_of_qxpLayer_and_residualDomination hqxp hdom)
+    (residualDominatingRepairObligation_of_qxpLayer_and_residualDomination hqxp hdom)
 
 /-- Build `SelfImprovement.OrthonormalizationInput` from the two constructive
-Section 5 witness producers exposed by the current formalization:
+Section 5 witness obligations exposed by the current formalization:
 
 * per-helper rounding witnesses, which supply the spectral-truncation slice;
 * per-helper QXP-layer repair witnesses, whose canonical projective family is
   a left lift of a local `ProjSubMeas`.
 
 The remaining mathematical content is exactly the construction of those two
-witness producers; this theorem only composes the already-formalized
+witness obligations; this theorem only composes the already-formalized
 conversions. -/
 noncomputable def orthonormalizationInput_of_roundingAndQXPLayerRepair
     {params : Parameters} [FieldModel params.q]
@@ -102,15 +102,15 @@ noncomputable def orthonormalizationInput_of_roundingAndQXPLayerRepair
           (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
           (consistencyToAlmostProjectiveError
             (2 * selfImprovementHelperError params eps delta)) R)
-    (hqxp : OrthonormalizationQXPLayerRepairProducer params strategy eps delta) :
+    (hqxp : OrthonormalizationQXPLayerRepairObligation params strategy eps delta) :
     OrthonormalizationInput params strategy eps delta :=
-  orthonormalizationInput_of_producers
-    (orthonormalizationSpectralProducer_of_roundingWitnesses hround)
-    (orthonormalizationRepairProducer_of_qxpLayer hqxp)
+  orthonormalizationInput_of_obligations
+    (orthonormalizationSpectralObligation_of_roundingWitnesses hround)
+    (orthonormalizationRepairObligation_of_qxpLayer hqxp)
 
 /-- Build the strengthened residual-domination orthonormalization input from
 the same spectral rounding witnesses as the ordinary constructor, together
-with a QXP-layer repair producer that also proves domination of the completed
+with a QXP-layer repair obligation that also proves domination of the completed
 residual outcome. -/
 noncomputable def
     orthonormalizationResidualDominationInput_of_roundingAndQXPLayerRepair
@@ -126,11 +126,11 @@ noncomputable def
           (consistencyToAlmostProjectiveError
             (2 * selfImprovementHelperError params eps delta)) R)
     (hqxp :
-      OrthonormalizationQXPLayerRepairProducerWithResidualDomination
+      OrthonormalizationQXPLayerRepairObligationWithResidualDomination
         params strategy eps delta) :
     OrthonormalizationResidualDominationInput params strategy eps delta :=
-  orthonormalizationResidualDominationInput_of_producers
-    (orthonormalizationSpectralProducer_of_roundingWitnesses hround)
+  orthonormalizationResidualDominationInput_of_obligations
+    (orthonormalizationSpectralObligation_of_roundingWitnesses hround)
     hqxp
 
 /-- Build the strengthened residual-domination orthonormalization input from
@@ -152,7 +152,7 @@ noncomputable def
           (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
           (consistencyToAlmostProjectiveError
             (2 * selfImprovementHelperError params eps delta)) R)
-    (hqxp : OrthonormalizationQXPLayerRepairProducer params strategy eps delta)
+    (hqxp : OrthonormalizationQXPLayerRepairObligation params strategy eps delta)
     (hdom : ∀ {Hhat : SubMeas (Polynomial params) ι}
       (hssc : BipartiteSSCRel strategy.state (uniformDistribution Unit)
         (constSubMeasFamily Hhat)
@@ -165,10 +165,10 @@ noncomputable def
     OrthonormalizationResidualDominationInput params strategy eps delta :=
   orthonormalizationResidualDominationInput_of_roundingAndQXPLayerRepair
     hround
-    (residualDominatingRepairProducer_of_qxpLayer_and_residualDomination hqxp hdom)
+    (residualDominatingRepairObligation_of_qxpLayer_and_residualDomination hqxp hdom)
 
 /-- Build the residual-domination orthonormalization input from an ordinary QXP
-repair producer and a pointwise residual-outcome inequality.
+repair obligation and a pointwise residual-outcome inequality.
 
 The spectral slice is fixed to the canonical `sourceAlmostProjective` branch; the
 remaining obligation is exactly that the completed residual outcome is dominated by
@@ -178,7 +178,7 @@ noncomputable def
     orthonormalizationResidualDominationInput_of_sourceQXPRepairAnd_none_le
     {params : Parameters} [FieldModel params.q]
     {strategy : SymStrat params ι} {eps delta : Error}
-    (hqxp : OrthonormalizationQXPLayerRepairProducer params strategy eps delta)
+    (hqxp : OrthonormalizationQXPLayerRepairObligation params strategy eps delta)
     (hnone : ∀ {Hhat : SubMeas (Polynomial params) ι}
       (hssc : BipartiteSSCRel strategy.state (uniformDistribution Unit)
         (constSubMeasFamily Hhat)
@@ -195,7 +195,7 @@ noncomputable def
       QXPLayerResidualDomination.of_residual_le (hnone hssc hSpectral)
 
 /-- Build the residual-domination orthonormalization input from spectral rounding and
-an ordinary QXP repair producer together with the residual-outcome inequality. -/
+an ordinary QXP repair obligation together with the residual-outcome inequality. -/
 noncomputable def
     orthonormalizationResidualDominationInput_of_roundingAndQXPLayerRepairAnd_none_le
     {params : Parameters} [FieldModel params.q]
@@ -209,7 +209,7 @@ noncomputable def
           (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
           (consistencyToAlmostProjectiveError
             (2 * selfImprovementHelperError params eps delta)) R)
-    (hqxp : OrthonormalizationQXPLayerRepairProducer params strategy eps delta)
+    (hqxp : OrthonormalizationQXPLayerRepairObligation params strategy eps delta)
     (hnone : ∀ {Hhat : SubMeas (Polynomial params) ι}
       (hssc : BipartiteSSCRel strategy.state (uniformDistribution Unit)
         (constSubMeasFamily Hhat)

@@ -6,7 +6,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport
-import MIPStarRE.LDT.SelfImprovement.Theorems.AddInUFullProducer
+import MIPStarRE.LDT.SelfImprovement.Theorems.AddInUFullStatement
 
 /-!
 # Self-improvement theorem variants
@@ -210,7 +210,7 @@ lemma selfImprovementHelper
       simpa [SymStrat.selfConsistencyFailureProbability] using
         hgood.selfConsistencyTest⟩
   have haddInUFull : AddInUFullStatement params strategy T eps delta :=
-    addInUFullProducer params strategy eps delta gamma hgood T
+    addInUFullStatement_of_isGood params strategy eps delta gamma hgood T
   have hpointTransfer :
       |addInULeftQuantity params strategy
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
@@ -239,13 +239,14 @@ lemma selfImprovementHelper
   · exact
       helper_point_consistency_of_pointConsistencyAddInU_transfer
         params strategy eps delta heps hdelta hpointTransfer
-  · /- TODO(#1514): Derive `HelperStrongSelfConsistencyProducerInputs` for the
+  · /- TODO(#1514): Derive `HelperStrongSelfConsistencyObligations` for the
       helper output from the Section 9 scalar transport estimates, then prove this
       condition with `helper_strong_self_consistency_of_helper_conclusion` or
-      `helper_strong_self_consistency_input_of_producer`.
+      `helper_strong_self_consistency_input_of_obligations`.
 
       This route currently uses the five estimates required by
-      `helper_producer_inputs_of_selfConsistency_localVariance_scalarTransports`:
+      the scalar-transport constructor for
+      `HelperStrongSelfConsistencyObligations`:
       the two off-diagonal variance swaps, the two post-`delete-an-A` transports,
       and the final lower bound on the `move-over-v` endpoint.  Its final
       absorption also uses the small-error condition `(params.d : Error) ≤

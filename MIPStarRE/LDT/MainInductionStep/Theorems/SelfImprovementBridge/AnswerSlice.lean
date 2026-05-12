@@ -261,7 +261,7 @@ noncomputable def AnswerSelfImprovementPackage.SliceBridgeInputs.ofMeasurementEq
     bridgeInputs
 
 /-- Build answer-valued `SliceBridgeInputs` from honest slice strategies and the
-constructive orthonormalization repair producer.
+constructive orthonormalization repair obligation.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551`,
 `references/ldt-paper/self_improvement.tex:631-811`, and
@@ -269,7 +269,7 @@ Paper origin: `references/ldt-paper/inductive_step.tex:461-551`,
 
 As in the ordinary slice bridge, the spectral part of the orthonormalization
 input is supplied by the closed source-almost-projective spectral truncation
-theorem.  The caller supplies only the locality-preserving repair producer,
+theorem.  The caller supplies only the locality-preserving repair obligation,
 besides the helper strong self-consistency and final-fields inputs. -/
 noncomputable def AnswerSelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationRepair
     (params : Parameters)
@@ -306,7 +306,7 @@ noncomputable def AnswerSelfImprovementPackage.SliceBridgeInputs.ofOrthonormaliz
           (restrictionPkg.profile.selfConsistency x))
     (repair :
       ∀ x,
-        SelfImprovement.OrthonormalizationRepairProducer params (sliceStrategy x)
+        SelfImprovement.OrthonormalizationRepairObligation params (sliceStrategy x)
           (restrictionPkg.profile.axisParallel x)
           (restrictionPkg.profile.selfConsistency x))
     (finalFields :
@@ -323,8 +323,8 @@ noncomputable def AnswerSelfImprovementPackage.SliceBridgeInputs.ofOrthonormaliz
     (fun x =>
       { helperStrongSelfConsistency := helperStrongSelfConsistency x
         orthonormalization :=
-          SelfImprovement.orthonormalizationInput_of_producers
-            SelfImprovement.orthonormalizationSpectralProducer_of_sourceAlmostProjective
+          SelfImprovement.orthonormalizationInput_of_obligations
+            SelfImprovement.orthonormalizationSpectralObligation_of_sourceAlmostProjective
             (repair x)
         finalFields := finalFields x })
 

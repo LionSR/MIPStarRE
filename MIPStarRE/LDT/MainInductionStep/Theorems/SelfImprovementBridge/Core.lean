@@ -493,7 +493,7 @@ noncomputable def SelfImprovementPackage.SliceBridgeInputs.ofMeasurementEq
     bridgeInputs
 
 /-- Build `SliceBridgeInputs` from honest slice strategies and the constructive
-orthonormalization repair producer.
+orthonormalization repair obligation.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551`,
 `references/ldt-paper/self_improvement.tex:631-811`, and
@@ -501,7 +501,7 @@ Paper origin: `references/ldt-paper/inductive_step.tex:461-551`,
 
 The spectral part of the orthonormalization input is supplied by the closed
 source-almost-projective spectral truncation theorem. Thus the caller need only
-provide, for each slice, the locality-preserving repair producer together with
+provide, for each slice, the locality-preserving repair obligation together with
 the other two Section 9 inputs. -/
 noncomputable def SelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationRepair
     (params : Parameters)
@@ -532,7 +532,7 @@ noncomputable def SelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationR
           (restrictionPkg.profile.selfConsistency x))
     (repair :
       ∀ x,
-        SelfImprovement.OrthonormalizationRepairProducer params (sliceStrategy x)
+        SelfImprovement.OrthonormalizationRepairObligation params (sliceStrategy x)
           (restrictionPkg.profile.axisParallel x)
           (restrictionPkg.profile.selfConsistency x))
     (finalFields :
@@ -549,8 +549,8 @@ noncomputable def SelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationR
     (fun x =>
       { helperStrongSelfConsistency := helperStrongSelfConsistency x
         orthonormalization :=
-          SelfImprovement.orthonormalizationInput_of_producers
-            SelfImprovement.orthonormalizationSpectralProducer_of_sourceAlmostProjective
+          SelfImprovement.orthonormalizationInput_of_obligations
+            SelfImprovement.orthonormalizationSpectralObligation_of_sourceAlmostProjective
             (repair x)
         finalFields := finalFields x })
 

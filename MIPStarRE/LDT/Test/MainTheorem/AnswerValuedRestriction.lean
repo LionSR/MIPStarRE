@@ -466,7 +466,7 @@ noncomputable def mainFormalSuccessorAnswerSelfImprovementBridgeInputs_ofOrthono
             haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x))
     (repair :
       ∀ hinduction x,
-        SelfImprovement.OrthonormalizationRepairProducer params
+        SelfImprovement.OrthonormalizationRepairObligation params
           (sliceStrategy hinduction x)
           ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
             haxisWeightedBound hdiagonalWeightedBound).profile.axisParallel x)

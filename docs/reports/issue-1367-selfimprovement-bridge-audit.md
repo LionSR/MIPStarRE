@@ -2,15 +2,15 @@
 
 **Date:** 2026-05-08
 **Scope:** `MIPStarRE/LDT/SelfImprovement/` → `MainInductionStep/` → `Test/MainTheorem/`
-**Active PRs:** #1373 (orthonormalization-input producer), #1374 (successor bridge hypotheses)
+**Active PRs:** #1373 (orthonormalization-input obligation), #1374 (successor bridge hypotheses)
 **Related issues:** #1385 (SDP slackness), #1375/#1376/#1377 (#1036 sub-gaps), #1043 (hbaseBridge), #1035 (recursive mainFormal)
 
 > **Status note, 2026-05-11.**  This report records the pre-#1458 and pre-#1482
 > state of the final theorem.  Its statements about making `mainFormal`
 > sorry-free by adding new hypotheses are historical, not current project
 > guidance.  The current policy is that `mainFormal` remains the paper-facing
-> theorem statement; bridge, residual, repair, input, package, or producer
-> assumptions belong only in separately named conditional helpers or in producer
+> theorem statement; bridge, residual, repair, input, package, or proof-obligation
+> assumptions belong only in separately named conditional helpers or in named
 > obligations tracked by #1458.
 
 ---
@@ -23,7 +23,7 @@ At the time of this report, PR #1374 proposed adding two new hypotheses to
 `mainFormal` and replacing the `sorry` with a call to existing constructors in
 `RoleRegister.lean`.  Under the current #1458 policy, that route is historical:
 the source-facing theorem should instead keep the paper statement and discharge
-the missing analytic content through producer theorems or separately named
+the missing analytic content through named obligation theorems or separately named
 conditional helpers.
 
 **This audit report confirms that #1367 can be closed** once #1374 and #1373 land (or this report is merged), because:
@@ -62,7 +62,7 @@ Three `Prop`-valued fields packaging the remaining Section 9 unformalized hypoth
 
 ---
 
-## 2. Producer Chain: SelfImprovement Module
+## 2. Obligation Chain: SelfImprovement Module
 
 ### 2.1 Main theorems
 
@@ -75,14 +75,14 @@ Three `Prop`-valued fields packaging the remaining Section 9 unformalized hypoth
 | `selfImprovementFromBridgeInputs` | 285 | `SelfImprovementBridgeInputs` + `IsGood` + `G` | `SelfImprovementConclusion` | **PROVED** (pure wiring) |
 | `selfImprovementFromSubMeas` | 259 | Same as above | SubMeas version | **PROVED** (pure wiring) |
 
-### 2.2 Internal lemma producers for each bridge field
+### 2.2 Internal obligations for each bridge field
 
 #### `helperStrongSelfConsistency` — PROVED (conditional)
 
 **File:** `MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperSSC.lean`
 
-- **`helper_strong_self_consistency_input_of_producer`** (line 663): Takes `HelperStrongSelfConsistencyProducerInputs` (a `∀` requiring local-variance and residual bounds for each `SelfImprovementHelperConclusion` output) → produces `HelperStrongSelfConsistencyInput`
-- **The actual derivation** (`helper_strong_self_consistency_producer_inputs_of_selfConsistency_localVariance`, line 611): From a `BipartiteSSCRel` hypothesis on the helper output + local-variance/residual bounds → `HelperStrongSelfConsistencyProducerInputs`
+- **`helper_strong_self_consistency_input_of_obligations`** (line 663): Takes `HelperStrongSelfConsistencyObligations` (a `∀` requiring local-variance and residual bounds for each `SelfImprovementHelperConclusion` output) → produces `HelperStrongSelfConsistencyInput`
+- **The actual derivation** (`helper_strong_self_consistency_obligations_of_selfConsistency_localVariance`, line 611): From a `BipartiteSSCRel` hypothesis on the helper output + local-variance/residual bounds → `HelperStrongSelfConsistencyObligations`
 - **End-to-end wrapper** (`ofBipartiteSSC_and_localVariance`, line 669): From `hssc : BipartiteSSCRel ...` + `hlocal` + `hresidual` → `HelperStrongSelfConsistencyInput`
 
 **Status:** The conditional lemma is proved. The unconditional gap is: the `BipartiteSSCRel` hypothesis itself must be discharged at each call site. This is exactly the helper-SSC step that Section 8 of the paper characterizes.
@@ -97,9 +97,9 @@ The `OrthonormalizationInput` is an `abbrev` that maps `BipartiteSSCRel` → `Ma
 2. **`repair`** (`LeftLiftedProjectivizationRepairInput`): **HYPOTHESIS** — requires QXP-layer data (`QXPLayerData` with a projective `P` family rounding-close to the source submeasurement)
 
 Bridge constructors:
-- `orthonormalizationSpectralProducer_of_sourceAlmostProjective` (line 851): **PROVED**
-- `OrthonormalizationRepairProducer` (line 129-139): **HYPOTHESIS** — defined as a type `∀ Hhat, BipartiteSSCRel ... → LeftLiftedProjectivizationRepairInput ... (optionCompletion Hhat)`
-- `orthonormalizationInput_of_producers` (line 684): Combines spectral + repair → full input
+- `orthonormalizationSpectralObligation_of_sourceAlmostProjective` (line 851): **PROVED**
+- `OrthonormalizationRepairObligation` (line 129-139): **HYPOTHESIS** — defined as a type `∀ Hhat, BipartiteSSCRel ... → LeftLiftedProjectivizationRepairInput ... (optionCompletion Hhat)`
+- `orthonormalizationInput_of_obligations` (line 684): Combines spectral + repair → full input
 
 **Status:** Spectral ✓, repair ✗. The repair gap is the QXP construction (Sections 5.8–5.10 of the paper). Tracked by #1032.
 
@@ -140,7 +140,7 @@ Same pattern but with `diagonalZeroCoord_eq` instead of `diagonalMeasurement_eq`
 | Constructor | File:line | What it takes | What it produces |
 |-------------|-----------|---------------|-----------------|
 | `SliceBridgeInputs.ofMeasurementEq` | Core.lean:411 | Honest strategies + measurement transport + bridge inputs | `SliceBridgeInputs` |
-| `SliceBridgeInputs.ofOrthonormalizationRepair` | Core.lean:456 | Above + separate `helperStrongSelfConsistency` + `OrthonormalizationRepairProducer` + `FinalFieldsInput` | `SliceBridgeInputs` (fills orthonormalization via `orthonormalizationInput_of_producers`) |
+| `SliceBridgeInputs.ofOrthonormalizationRepair` | Core.lean:456 | Above + separate `helperStrongSelfConsistency` + `OrthonormalizationRepairObligation` + `FinalFieldsInput` | `SliceBridgeInputs` (fills orthonormalization via `orthonormalizationInput_of_obligations`) |
 | `AnswerSliceBridgeInputs.ofMeasurementEq` | AnswerSlice.lean:… | Same pattern, answer-valued | Answer counterpart |
 | `SelfImprovementPackage.ofSliceBridgeInputs` | Core.lean:514 | `SliceBridgeInputs` | Full `SelfImprovementPackage` |
 
@@ -169,7 +169,7 @@ Complete wiring functions exist (all proved):
 
 These functions were not called from the older final assembly because the
 successor induction and bridge data had not been produced.  Under the current
-policy, that data should be supplied by producer theorems or isolated in a
+policy, that data should be supplied by named obligation theorems or isolated in a
 conditional helper, not added as new hypotheses to the paper-facing theorem.
 
 ### 4.2 Historical MainFormal successor-case hypotheses (PR #1374 additions)
@@ -202,10 +202,10 @@ exact mainFormal_ofRoleResidualAndRepairedBridge herr roleResidual
 
 **Impact:** After #1374, `mainFormal` is sorry-free. The unformalized analytic content is pushed into the two new "extra" hypotheses.
 
-### 4.3 Orthonormalization-input producer (PR #1373 additions)
+### 4.3 Orthonormalization-input obligation (PR #1373 additions)
 
-**PR #1373** (`issue1359-orthonormalization-input-producer`) adds:
-- New file `OrthonormalizationInputProducer.lean`:
+**PR #1373** (`issue1359-orthonormalization-input-obligation`) adds:
+- New file `OrthonormalizationInputObligation.lean`:
   - `MainFormalPostRolePackageDiagonalOrthonormalizationInput.of_roleResidual` — builds the line-130 orthonormalization input from a role residual + two `LeftLiftedProjectivizationRepairInput` witnesses
 - In `MainFormal.lean`:
   - `repairedBridgeHypotheses_of_roleResidual` — builds `MainFormalBaseRepairedBridgeHypotheses` from role residual + leftRepair + rightRepair + diagonalConsistency
@@ -219,10 +219,10 @@ exact mainFormal_ofRoleResidualAndRepairedBridge herr roleResidual
 | Component | What's proved right now | After #1373 | After #1374 | Issue tracking final gap |
 |-----------|------------------------|-------------|-------------|--------------------------|
 | `selfImprovementHelper` (SDP + addInU) | Conditional on `sdp` witness | No change | No change | #1385 (SDP slackness), #1230 |
-| `helperStrongSelfConsistency` (helper SSC) | Conditional lemma proved | No change | No change | #1376 (per-slice producer) |
+| `helperStrongSelfConsistency` (helper SSC) | Conditional lemma proved | No change | No change | #1376 (per-slice obligation) |
 | `orthonormalization.spec` (spectral) | **PROVED** unconditionally | No change | No change | — |
 | `orthonormalization.repair` (QXP repair) | Hypothesis | New: `of_roleResidual` wraps it | No change | #1032 (QXP construction) |
-| `finalFields` (completeness etc.) | Conditional lemma proved | No change | No change | #1376 (per-slice producer) |
+| `finalFields` (completeness etc.) | Conditional lemma proved | No change | No change | #1376 (per-slice obligation) |
 | `SliceBridgeInputs` wiring | **PROVED** (constructors exist) | No change | No change | #1375 (honest SymStrat) |
 | `MainFormal` successor case | **Historical, as of 2026-05-08:** `sorry` at line 611 | No change | New: replaced by `hanswerSlice*` hypotheses | #1376 + #1377 + #1035 |
 | `hbaseBridge` construction | Hypothesis | New: `repairedBridgeHypotheses_of_roleResidual` | No change | #1043 |
@@ -233,7 +233,8 @@ exact mainFormal_ofRoleResidualAndRepairedBridge herr roleResidual
 
 ### 6.1 Blockers for `mainFormal` closure (after #1373/#1374)
 
-These are the producers for the two new `mainFormal` hypotheses:
+These were the obligation constructors for the two historical proposed
+`mainFormal` hypotheses:
 
 | # | Gap | What it produces | Tracked by | Dependency chain |
 |---|-----|-----------------|------------|-----------------|
@@ -247,9 +248,9 @@ These are the producers for the two new `mainFormal` hypotheses:
 
 | # | Gap | Tracked by |
 |---|-----|------------|
-| F | `SdpStatementWithSlackness` unconditional producer (strong duality) | #1385, #1230 |
-| G | `LeftLiftedProjectivizationRepairInput` unconditional producer (QXP construction) | #1032 |
-| H | `OrthonormalizationRepairProducer` for the helper families | #1032 (via QXP) |
+| F | `SdpStatementWithSlackness` unconditional obligation (strong duality) | #1385, #1230 |
+| G | `LeftLiftedProjectivizationRepairInput` unconditional obligation (QXP construction) | #1032 |
+| H | `OrthonormalizationRepairObligation` for the helper families | #1032 (via QXP) |
 
 ### 6.3 Dependency relationships
 
@@ -307,7 +308,7 @@ The following open issues directly address the remaining gaps identified in this
 | #1035 | Prove recursive `mainFormal` for successor restricted slices | D | Open, blocked by #1377 |
 | #1043 | Construct `hbaseBridge` for base/successor cases | E | Open, blocked by #1032 |
 | #1032 | QXP repair / spectral-truncation + locality-preserving repair lemmas | G, H | Open, core gap |
-| #1385 | `SdpStatementWithSlackness` producer | F | Open, epic tracking |
+| #1385 | `SdpStatementWithSlackness` obligation | F | Open, epic tracking |
 | #1369 | Construct answer-valued successor inputs for MainFormal | A–D (umbrella) | Open |
 
 **Completeness check:** Every sub-gap identified in Section 6 has a corresponding open issue. No new gaps need new issues.
@@ -370,9 +371,9 @@ actual sub-gaps.
 |------|------|
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean` | `SelfImprovementBridgeInputs`, `HelperStrongSelfConsistencyInput`, `OrthonormalizationInput`, `FinalFieldsInput` definitions |
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/Core.lean` | `selfImprovementHelper`, `selfImprovement`, `selfImprovementFromBridgeInputs` |
-| `MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperSSC.lean` | `helperStrongSelfConsistency` conditional producer |
-| `MIPStarRE/LDT/SelfImprovement/Theorems/OrthonormalizationBridge.lean` | Spectral producer (proved), repair producer (hypothesis) |
-| `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/FinalFields.lean` | `finalFields` conditional producer |
+| `MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperSSC.lean` | `helperStrongSelfConsistency` conditional obligation |
+| `MIPStarRE/LDT/SelfImprovement/Theorems/OrthonormalizationBridge.lean` | Spectral obligation (proved), repair obligation (hypothesis) |
+| `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/FinalFields.lean` | `finalFields` conditional obligation |
 | `MIPStarRE/LDT/MakingMeasurementsProjective/Statements.lean` | `MMProj.OrthonormalizationInput`, `SpectralTruncationInput`, `LeftLiftedProjectivizationRepairInput` |
 | `MIPStarRE/LDT/MakingMeasurementsProjective/SpectralTruncation/ProjectiveNonMeasurement.lean` | `spectralTruncationInput_of_sourceAlmostProjective` (PROVED) |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/Core.lean` | `SelfImprovementPackage.SliceBridgeInputs`, `ofSliceBridgeInputs`, `selfImprovementInInductionSection` |
@@ -382,7 +383,7 @@ actual sub-gaps.
 | `MIPStarRE/LDT/Test/MainTheorem/RoleRegister.lean` | `successorOfBridgeInputs`, `answerSuccessorOfBridgeInputs`, `rolePackageResidual_ofAnswerSuccessorBridgeInputs` |
 | `MIPStarRE/LDT/Test/MainTheorem/OrdinaryRestriction/Basic.lean` | `MainFormalSuccessorSelfImprovementBridgeInputs` type + constructors |
 | `MIPStarRE/LDT/Test/MainTheorem/AnswerValuedRestriction.lean` | Answer-valued counterpart types + constructors |
-| `MIPStarRE/LDT/Test/MainTheorem/OrthonormalizationInputProducer.lean` | **New in #1373** — `of_roleResidual` lemma |
+| `MIPStarRE/LDT/Test/MainTheorem/OrthonormalizationInputObligation.lean` | **New in #1373** — `of_roleResidual` lemma |
 | `MIPStarRE/LDT/Test/MainTheorem/OrthonormalizationData.lean` | `MainFormalPostRolePackageDiagonalOrthonormalizationInput` |
 
 ---

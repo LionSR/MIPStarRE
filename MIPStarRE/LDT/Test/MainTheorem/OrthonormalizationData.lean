@@ -176,7 +176,7 @@ namespace MainFormalPostRolePackageDiagonalOrthonormalizationInput
 repair inputs are available.
 
 This constructor supplies the spectral-truncation fields from the constructive
-producer `spectralTruncationInput_of_sourceAlmostProjective`, applied to the two
+theorem `spectralTruncationInput_of_sourceAlmostProjective`, applied to the two
 unsymmetrized role measurements after left tensor placement.  Callers that use
 this constructor therefore supply only the Alice- and Bob-side repair steps,
 which preserve the local form of the repaired projective submeasurements.  The
@@ -219,9 +219,9 @@ The spectral-truncation fields are still supplied by
 `spectralTruncationInput_of_sourceAlmostProjective`.  The two remaining repair
 fields are obtained by choosing the canonical local projective submeasurement
 attached to each QXP layer, so the repaired lifted family has the required form
-`P_a ⊗ I`.  As for `ofRepairInputs`, this records a constructive producer for
+`P_a ⊗ I`.  As for `ofRepairInputs`, this records a constructive obligation for
 the orthonormalization input; wiring the downstream main-theorem assembly to
-this producer is a separate step. -/
+this theorem is a separate step. -/
 noncomputable def ofQXPLayerRepairWitnesses
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

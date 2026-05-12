@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.Test.MainTheorem.NativeTargets
-import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationInputProducer
+import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationInputObligation
 
 /-!
 # Main-formal soundness theorem
