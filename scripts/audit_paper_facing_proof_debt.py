@@ -13,7 +13,11 @@ review aid for that boundary:
   declaration name and before the result type;
 * report occurrences of proof-debt vocabulary such as ``BridgeHypotheses``,
   ``Residual``, ``RepairInput``, ``Package``, ``Producer``, an ``Input``
-  bundle, or a generic ``Hypotheses`` / ``Assumptions`` bundle.
+  bundle, or a generic ``Hypotheses`` / ``Assumptions`` bundle;
+* reject paper-facing blueprint entries that point to declaration names of the
+  form ``*_of...Obligations``, ``*_of...Residual``, ``*_of...Repair``, or
+  ``conditional...``, even when the declaration header itself has no suspicious
+  public input.
 * classify known faithful boundary-input packages separately, with paper
   citations, so they do not become indistinguishable from proof debt.
 
@@ -76,9 +80,14 @@ CONDITIONAL_DECL_NAME_RE = re.compile(
     r"FromBridgeInputs"
     r"|BridgeHypotheses"
     r"|BridgeInputs"
+    r"|(?:^|_)of(?:[A-Z][A-Za-z0-9_']*)?"
+    r"(?:Bridge|Obligations|Residual|Repair|Package|Input|Hypotheses|Assumptions)"
+    r"[A-Za-z0-9_']*"
     r"|(?:^|_)ofRepaired[A-Za-z0-9_']*"
     r"|(?:^|_)assuming[A-Za-z0-9_']*"
     r"|Assuming[A-Za-z0-9_']*"
+    r"|(?:^|_)conditional[A-Za-z0-9_']*"
+    r"|Conditional[A-Za-z0-9_']*"
     r")"
 )
 
