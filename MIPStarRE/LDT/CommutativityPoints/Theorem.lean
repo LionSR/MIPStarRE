@@ -7,5 +7,5 @@ import MIPStarRE.LDT.CommutativityPoints.BridgeTheorems.DropBridges
 /-!
 # Section 10 — Theorems
 
-Barrel module re-exporting the concrete commutativity-at-points theorem submodules.
+Compatibility module re-exporting the concrete commutativity-at-points theorem submodules.
 -/

@@ -4,6 +4,6 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.AlmostProjective
 /-!
 # Section 5 — Q/X/XHat/P completeness bounds
 
-Barrel module re-exporting the `Q`-completeness and almost-projectivity
+Compatibility module re-exporting the `Q`-completeness and almost-projectivity
 submodules.
 -/

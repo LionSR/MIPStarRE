@@ -6,7 +6,7 @@ import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.QSDD
 /-!
 # Full-slice bridges and main result
 
-Compatibility barrel re-exporting the full-slice bridge leaves:
+Compatibility module re-exporting the full-slice bridge leaves:
 
 - `Bridges.QSDD`: `qSDDOp` expansion and
   `fullSliceCommutation_qSDDOp_avg_eq`.

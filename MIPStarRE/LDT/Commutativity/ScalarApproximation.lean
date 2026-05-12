@@ -5,5 +5,5 @@ import MIPStarRE.LDT.Commutativity.ScalarApproximation.Pointwise
 /-!
 # Section 11 commutativity: scalar approximation
 
-Barrel module re-exporting the concrete scalar approximation submodules.
+Compatibility module re-exporting the concrete scalar approximation submodules.
 -/

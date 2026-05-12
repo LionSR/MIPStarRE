@@ -20,5 +20,5 @@ import MIPStarRE.LDT.Commutativity.Main.Results
 /-!
 # Section 11 commutativity theorems
 
-Barrel module re-exporting the concrete commutativity theorem submodules.
+Compatibility module re-exporting the concrete commutativity theorem submodules.
 -/

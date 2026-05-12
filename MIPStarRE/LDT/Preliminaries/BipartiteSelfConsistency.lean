@@ -5,5 +5,5 @@ import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Local
 /-!
 # Preliminary comparison theorems: bipartite self-consistency
 
-Barrel module re-exporting the concrete bipartite self-consistency submodules.
+Compatibility module re-exporting the concrete bipartite self-consistency submodules.
 -/

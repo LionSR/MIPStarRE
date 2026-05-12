@@ -7,5 +7,5 @@ import MIPStarRE.LDT.Basic.LowDegreePolynomial
 /-!
 # Basic parameters and types for the low individual degree test
 
-Barrel module re-exporting the core parameter, line, and polynomial infrastructure.
+Compatibility module re-exporting the core parameter, line, and polynomial infrastructure.
 -/

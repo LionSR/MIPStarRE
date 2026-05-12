@@ -7,5 +7,5 @@ import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.Second
 /-!
 # Section 11 commutativity: scalar stability bounds
 
-Barrel module re-exporting the scalar stability estimates.
+Compatibility module re-exporting the scalar stability estimates.
 -/

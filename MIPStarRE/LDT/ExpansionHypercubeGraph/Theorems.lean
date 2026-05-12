@@ -5,5 +5,5 @@ import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Results
 /-!
 # Section 7 — Theorems
 
-Barrel module re-exporting the concrete Section 7 theorem leaves.
+Compatibility module re-exporting the concrete Section 7 theorem leaves.
 -/

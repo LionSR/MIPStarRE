@@ -7,5 +7,5 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results
 /-!
 # Section 9 — Theorems
 
-Barrel module re-exporting the concrete Section 9 theorem leaves.
+Compatibility module re-exporting the concrete Section 9 theorem leaves.
 -/

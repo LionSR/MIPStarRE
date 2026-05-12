@@ -3,7 +3,7 @@ import MIPStarRE.LDT.Test.MainTheorem.OrdinaryRestriction.PublicWrapper
 /-!
 # Ordinary restricted-slice recursion
 
-Compatibility barrel for the ordinary `x`-restricted successor route in the
+Compatibility module for the ordinary `x`-restricted successor route in the
 `mainFormal` assembly.  This module re-exports declarations from three
 sub-leaves:
 

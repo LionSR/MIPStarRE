@@ -5,5 +5,5 @@ import MIPStarRE.LDT.Commutativity.Defs.Normalization
 /-!
 # Section 11 commutativity: definitions
 
-Barrel module re-exporting the concrete commutativity definition submodules.
+Compatibility module re-exporting the concrete commutativity definition submodules.
 -/

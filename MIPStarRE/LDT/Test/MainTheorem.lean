@@ -14,7 +14,7 @@ import MIPStarRE.LDT.Test.MainTheorem.MainFormal
 /-!
 # Section 3 — Main theorem
 
-Compatibility barrel that imports the twelve split modules under
+Compatibility module that imports the twelve split modules under
 `MIPStarRE.LDT.Test.MainTheorem` and presents them as a single import target.
 The assembly proves `thm:main-formal` (`\Cref{thm:main-formal}`), the main
 theorem of Section 3, following the proof given in

@@ -6,5 +6,5 @@ import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
 /-!
 # Section 3 — Strategy
 
-Barrel module re-exporting the concrete strategy submodules.
+Compatibility module re-exporting the concrete strategy submodules.
 -/

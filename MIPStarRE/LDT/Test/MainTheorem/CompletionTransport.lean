@@ -12,7 +12,7 @@ unsymmetrization links are established, the remaining step is to close the
 projective completion gap: the orthonormalize-and-complete procedure
 (`lem:orthonormalization-main-lemma`, `prop:completing-to-measurement`)
 produces projective measurements at distance `ζ₂` from the unsymmetrized ones.
-This module packages that post-role obligation as a series of nested residual
+This module records that post-role obligation as a series of nested residual
 structures (`MainFormalCascadeRolePackagedCompletionTransportResidual`,
 `MainFormalPostRolePackageCompletionTransportResidual`,
 `MainFormalPostRolePackageLeftCompletionTransportResidual`, …), each asking
@@ -42,13 +42,14 @@ namespace MIPStarRE.LDT
 
 namespace Test
 
-/-- Residual after consuming the checked role-register Section 6 package.
+/-- Residual after consuming the checked role-register Section 6 record.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, applying
 `references/ldt-paper/orthonormalization.tex:282`
 (`\label{lem:orthonormalization-main-lemma}`) and completion.
 
-This package is narrower than `MainFormalCascadeProjectiveCompletionTransportResidual`:
+This residual record is narrower than
+`MainFormalCascadeProjectiveCompletionTransportResidual`:
 the role-register measurement and both factor-two unsymmetrization estimates are
 no longer independent fields.  They are supplied by
 `MainFormalRoleMeasurementPackage`, whose symmetrized consistency field feeds the
@@ -98,7 +99,8 @@ structure MainFormalCascadeRolePackagedCompletionTransportResidual
 
 namespace MainFormalCascadeRolePackagedCompletionTransportResidual
 
-/-- Convert the role-packaged residual to the previous completion-transport shape.
+/-- Convert the residual carrying the role-measurement record to the previous
+completion-transport shape.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:135-173`.
 
@@ -128,8 +130,8 @@ noncomputable def toCompletionTransportResidual
 
 end MainFormalCascadeRolePackagedCompletionTransportResidual
 
-/-- Projectivization/completion and line-169 residual after a concrete role package
-has already been produced.
+/-- Projectivization/completion and line-169 residual after a concrete
+role-measurement record has already been produced.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, applying
 `references/ldt-paper/orthonormalization.tex:282`
@@ -181,8 +183,8 @@ structure MainFormalPostRolePackageCompletionTransportResidual
 
 namespace MainFormalPostRolePackageCompletionTransportResidual
 
-/-- Reinsert the already-produced role package into the older role-packaged
-completion-transport residual.
+/-- Reinsert the already-produced role-measurement record into the older
+completion-transport residual carrying that record.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:135-173`. -/
 noncomputable def toRolePackagedCompletionTransportResidual
@@ -392,7 +394,7 @@ noncomputable def toPostRolePackageCompletionTransportResidual
 
 end MainFormalPostRolePackageLeftCompletionTransportResidual
 
-/-- Combined live residual after isolating concrete role-package production.
+/-- Combined live residual after isolating the concrete role-register output.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:68-173`, combining the
 role-register Section 6 output, unsymmetrization, and projectivization/completion
@@ -400,11 +402,12 @@ steps of the `mainFormal` proof.
 
 The first field is the actual Section 6 role residual: it carries the concrete
 role-register measurement and its symmetrized consistency proof.  The second
-field contains only the projectivization/completion and line-169 data for the role
-package obtained from that concrete residual.  Thus the live `mainFormal` hole no
-longer asks for an arbitrary `MainFormalRoleMeasurementPackage`, an arbitrary raw
-Section 6 witness, or a decorative branch witness not tied to the concrete
-measurement. The branch-level base, ordinary successor, and answer-valued
+field contains only the projectivization/completion and line-169 data for the
+role-measurement record obtained from that concrete residual.  Thus the live
+`mainFormal` hole no longer asks for an arbitrary
+`MainFormalRoleMeasurementPackage`, an arbitrary Section 6 witness, or a branch
+witness not tied to the concrete measurement. The branch-level base, ordinary
+successor, and answer-valued
 successor constructors remain available on `MainFormalRolePackageResidual` and
 `MainFormalRolePackageBranchResidual` as the intended ways to supply this field;
 their branch conversion consumes the public large-`k` hypothesis directly rather
@@ -425,8 +428,8 @@ structure MainFormalCascadeRolePackageResidualCompletionTransportResidual
 
 namespace MainFormalCascadeRolePackageResidualCompletionTransportResidual
 
-/-- Convert the split role-residual/post-role package back to the role-packaged
-completion-transport residual consumed by the existing downstream wrappers.
+/-- Convert the split role-residual/post-role record back to the
+completion-transport residual carrying the role-measurement record.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:68-173`.
 
@@ -445,18 +448,19 @@ noncomputable def toRolePackagedCompletionTransportResidual
 
 end MainFormalCascadeRolePackageResidualCompletionTransportResidual
 
-/-- Combined live residual after isolating concrete role-package production
+/-- Combined live residual after isolating the concrete role-register output
 and the #869 Bob-side completion transport.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:68-173`, with Bob-side
 completion transport recorded as a formalization-level register-placement step.
 
-Compared with `MainFormalCascadeRolePackageResidualCompletionTransportResidual`, this
-package no longer asks the live hole to provide the right-register completion
-closeness directly.  Instead the post-role field records the left-register
-Bob-side completion estimate returned by the orthonormalize-and-complete chain,
-and the conversion below transports it to the right register using permutation
-invariance of the strategy state.  The concrete role residual and the
+Compared with `MainFormalCascadeRolePackageResidualCompletionTransportResidual`,
+this residual no longer asks the live hole to provide the right-register
+completion closeness directly.  Instead the post-role field records the
+left-register Bob-side completion estimate returned by the
+orthonormalize-and-complete chain, and the conversion below transports it to the
+right register using permutation invariance of the strategy state.  The concrete
+role residual and the
 construction-level match-mass invariant for the exact paper line-169 `ζ₁` links
 remain explicit. -/
 structure MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual

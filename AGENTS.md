@@ -304,9 +304,9 @@ paper hypotheses.
 - One import per line
 - Follow existing local import style
 - Prefer the smallest correct import set, but do not churn imports unnecessarily
-- Preserve barrel-file structure: `MIPStarRE.lean`, `MIPStarRE/LDT.lean`
+- Preserve re-export-file structure: `MIPStarRE.lean`, `MIPStarRE/LDT.lean`
 - Before adding a new import, check whether the needed declaration already
-  comes from an existing local barrel import
+  comes from an existing local re-export import
 
 ### File structure
 
@@ -585,7 +585,7 @@ Use this file together with:
 | `docs/CONTRIBUTING.md` | PR format, issue templates, label taxonomy, review checklist |
 | `docs/PROOF_INTEGRITY.md` | Blocker / warning patterns for proof correctness |
 | `docs/anti_patterns.md` | Subtler proof-evasion patterns |
-| `docs/proof_frontier_review.md` | Review checklist for construction theorems versus residual inputs |
+| `docs/proof_frontier_review.md` | Review checklist for construction theorems and residual inputs |
 | `docs/style.md` | Mathlib code style (line length, indentation, tactic formatting) |
 | `docs/naming.md` | Mathlib naming conventions |
 | `docs/doc.md` | Mathlib documentation standards |
@@ -593,8 +593,8 @@ Use this file together with:
 | `docs/blueprint_style_guide.md` | Blueprint notation and section conventions |
 | `docs/api_surface.md` | Useful obligation-closing lemmas for `SubMeas` |
 | `docs/paper-gaps/policy.tex` | Paper-gap documentation conventions |
-| `docs/formalization-patterns.md` | Temporary conditional scaffolding, blueprint sync, split-module architecture, barrel and bridge packages |
-| `docs/external-lemmas-pedagogy.md` | Register of Mathlib/external lemmas not explained in the paper, with pedagogical notes |
+| `docs/formalization-patterns.md` | Conditional scaffolding, blueprint sync, split imports, and bridge records |
+| `docs/external-lemmas-pedagogy.md` | Pedagogical notes on Mathlib and external lemmas |
 | `docs/ci-automation.md` | CI/CD workflow details |
 | `docs/pr-review.md` | Mathlib PR review guide |
 | `docs/pr_review_management.md` | Review thread workflow and bot integration |

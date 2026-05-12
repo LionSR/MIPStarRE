@@ -7,15 +7,16 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.PastingAssembly
 import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems
 
 /-!
-# Section 6 — Theorems (Barrel)
+# Section 6 — Theorem imports
 
-Compatibility barrel re-exporting all induction-step theorem leaf modules:
+Compatibility module re-exporting all induction-step theorem leaf modules:
 
 - `SelfImprovementBridge`: ordinary and answer-valued self-improvement bridge API,
-  with the Section 6 pasting wrapper
+  with the Section 6 pasting theorem
 - `InductionParameterBounds`: parameter-bound helpers for `mainInductionError < 1`
 - `RestrictedProbabilities`: restricted failure probability bookkeeping
-- `PackageConstructors`: package constructors and skeletal assembly
+- `PackageConstructors`: constructors for the structured induction data and
+  skeletal assembly
 - `AvgSliceErrors`: averaged slice-error bounds
 - `PastingAssembly`: pasting assembly and `assembleAveragedPastingInput`
 - `MainTheorems`: top-level induction theorems

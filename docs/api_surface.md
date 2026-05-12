@@ -8,7 +8,7 @@ Focused on the declarations that help prove the usual `SubMeas` goals:
 
 ## `MIPStarRE/Quantum.lean`
 
-`Quantum.lean` itself defines no declarations. It is a barrel file:
+`Quantum.lean` itself defines no declarations. It is a re-export file:
 
 ```lean
 import MIPStarRE.Quantum.FiniteMatrix

@@ -13,7 +13,7 @@ appear through the unsymmetrization → Schwartz–Zippel → orthonormalization
 completion chain, and shows that each is absorbed by the final
 `mainFormalError` envelope.
 
-This is a barrel module re-exporting the leaf modules:
+This is a compatibility module re-exporting the leaf modules:
 
 - `Definitions`: `mainFormalError`, `mainFormalEnvelope`, cascade variables,
   and `CascadeHypotheses`.

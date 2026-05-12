@@ -3,7 +3,7 @@ import MIPStarRE.LDT.Test.MainTheorem.ProjectiveConsistency.CompletionTransport
 /-!
 # Projective consistency transport
 
-Compatibility barrel for the projective-consistency part of the `mainFormal`
+Compatibility module for the projective-consistency part of the `mainFormal`
 assembly, covering the paper's `ζ₃ = 6ζ₁ + 6ζ₂` step
 (`\Cref{eq:third-goal}`).  The underlying declarations are split into four
 sub-leaves:

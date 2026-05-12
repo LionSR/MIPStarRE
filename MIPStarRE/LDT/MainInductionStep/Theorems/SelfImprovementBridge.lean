@@ -4,7 +4,7 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementBridge.AnswerSlic
 /-!
 # Section 6 — Self-Improvement Bridge
 
-Compatibility barrel for the self-improvement bridge used by the main induction
+Compatibility module for the self-improvement bridge used by the main induction
 step.  The ordinary Section 6 bridge and pasting wrapper are in
 `SelfImprovementBridge.Core`; the answer-valued slice bridge is in
 `SelfImprovementBridge.AnswerSlice`.

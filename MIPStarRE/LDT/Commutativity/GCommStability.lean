@@ -5,5 +5,5 @@ import MIPStarRE.LDT.Commutativity.GCommStability.Scalar
 /-!
 # Section 11 commutativity: stability bounds
 
-Barrel module re-exporting the concrete commutativity stability submodules.
+Compatibility module re-exporting the concrete commutativity stability submodules.
 -/

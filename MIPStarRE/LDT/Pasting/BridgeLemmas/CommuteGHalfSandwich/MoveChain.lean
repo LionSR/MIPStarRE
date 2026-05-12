@@ -19,7 +19,7 @@ self-consistency edges. Thus the composed chain has `3r + 1 = 3k - 5` edges
 and total elementary error `4r * ζ + (r + 1) * ν₃`, matching the bookkeeping in
 `lem:commute-g-half-sandwich`.
 
-This file is a compatibility barrel re-exporting all submodules. The original
+This file is a compatibility module re-exporting all submodules. The original
 file (>2400 lines) is now split into:
 - `MoveChain/FlatChainStep.lean` — flat-chain step lemmas
 - `MoveChain/Lifting.lean` — lifting families for the half-sandwich chain

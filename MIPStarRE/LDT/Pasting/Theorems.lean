@@ -15,5 +15,5 @@ import MIPStarRE.LDT.Pasting.Bernoulli.Final
 /-!
 # Section 12 — Theorems
 
-Barrel module re-exporting the concrete pasting theorem submodules.
+Compatibility module re-exporting the concrete pasting theorem submodules.
 -/

@@ -6,7 +6,7 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.SelfImp
 /-!
 # Section 6 — Induction Parameter Bounds
 
-Compatibility barrel for the scalar parameter bounds used in the proof of the
+Compatibility module for the scalar parameter bounds used in the proof of the
 main induction step.  The estimates follow the notation of
 `references/ldt-paper/inductive_step.tex`, in particular the error terms
 `mainInductionError`, `mainInductionNu`, and `selfImprovementInInductionError`.

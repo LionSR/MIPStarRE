@@ -13,7 +13,7 @@ in `audits/` and the proof-integrity rules in `docs/PROOF_INTEGRITY.md`.
 1. [Source-faithful statements and internal proof obligations](#pattern-1-source-faithful-statements-and-internal-proof-obligations)
 2. [Blueprint–Lean synchronization](#pattern-2-blueprintlean-synchronization)
 3. [Split-module architecture](#pattern-3-split-module-architecture)
-4. [Barrel re-export pattern](#pattern-4-barrel-re-export-pattern)
+4. [Compatibility re-export pattern](#pattern-4-compatibility-re-export-pattern)
 5. [Temporary obligation-structure pattern](#pattern-5-temporary-obligation-structure-pattern)
 6. [Paper-gap documentation pattern](#pattern-6-paper-gap-documentation-pattern)
 
@@ -349,17 +349,17 @@ Each subdirectory follows a consistent internal layout:
 SubModule/
 ├── Defs.lean        # New structures, type abbreviations, error-term definitions
 ├── Statements.lean   # Statement-level types (hypothesis bundles, conclusion shapes)
-├── Theorems.lean     # Barrel re-export
+├── Theorems.lean     # Compatibility re-export
 └── Theorems/
     ├── Core.lean     # Main proof of the chapter's theorem
     ├── ...           # Supporting proof leaves
-    └── Results.lean  # Barrel for the proof leaves
+    └── Results.lean  # Re-export file for the proof leaves
 ```
 
 Some larger chapters (like `Pasting/` and `SelfImprovement/`) have more
 internal subdivisions (e.g., `Pasting/Bernoulli/`, `Pasting/Sandwich/`,
-`SelfImprovement/Theorems/Results/`).  The outer `Theorems.lean` barrel
-imports all the proof leaves.
+`SelfImprovement/Theorems/Results/`).  The outer `Theorems.lean`
+compatibility module imports all the proof leaves.
 
 ### Why split instead of monolithic files?
 
@@ -383,17 +383,17 @@ names must follow the mathematical naming norm in
 `docs/mathematical_language.md`: name the mathematical boundary, not
 the paper line number, workflow step, or implementation phase.
 
-### Barrel files
+### Re-export files
 
-See [Pattern 4: Barrel re-export pattern](#pattern-4-barrel-re-export-pattern)
+See [Pattern 4: Compatibility re-export pattern](#pattern-4-compatibility-re-export-pattern)
 below.
 
 ---
 
-## Pattern 4: Barrel re-export pattern
+## Pattern 4: Compatibility re-export pattern
 
 Each subdirectory with multiple internal proof leaves has a root-level
-barrel file (e.g., `Theorems.lean`) that imports all the leaves:
+re-export file (e.g., `Theorems.lean`) that imports all the leaves:
 
 ```lean
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
@@ -403,19 +403,19 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results
 ```
 
-The barrel file itself contains no new declarations — it is purely a
+The compatibility module file itself contains no new declarations — it is purely a
 re-export convenience so downstream consumers can write
 `import MIPStarRE.LDT.SelfImprovement.Theorems` instead of importing
 each leaf individually.
 
-The top-level barrel is `MIPStarRE.lean`, which imports all
+The top-level re-export file is `MIPStarRE.lean`, which imports all
 subdirectories.  `MIPStarRE/LDT.lean` imports all LDT subdirectories.
 
-**When to add to a barrel file**: When a new proof leaf is added to a
-subdirectory's `Theorems/` subdirectory, add its import to the barrel.
+**When to add to a re-export file**: When a new proof leaf is added to a
+subdirectory's `Theorems/` subdirectory, add its import to the compatibility module.
 
 **When not to add**: If a leaf is only used by one other leaf (internal
-helper), don't add it to the barrel — let the consumer import it
+helper), don't add it to the compatibility module — let the consumer import it
 directly so its API surface doesn't leak.
 
 ---

@@ -4,7 +4,7 @@ import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core.StageMass
 import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core.FactBundles
 
 /-!
-# Section 12 pasting: from-H-to-G bridge (compatibility barrel)
+# Section 12 pasting: from-H-to-G bridge (compatibility module)
 
 This file re-exports all `fromHToG` core lemmas from four submodules:
 

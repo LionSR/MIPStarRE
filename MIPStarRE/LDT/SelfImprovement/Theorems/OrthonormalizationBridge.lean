@@ -23,8 +23,8 @@ is itself the structure left after `orthonormalizationMainLemma_local` was
 proved internally.  At present the spectral and repair pieces are still the
 opaque external inputs called out by the `#931` blocker; this file does *not*
 discharge them. It only narrows the missing proof obligations to the two
-constructive Section 5 witnesses, and any paper-facing theorem must obtain those witnesses
-from the source hypotheses before using this interface.
+constructive Section 5 witnesses, and any paper-facing theorem must obtain
+those witnesses from the source hypotheses before using this interface.
 
 In addition, `orthonormalizationSpectralObligation_of_roundingWitnesses`
 composes the spectral-truncation conversion established in `#1042`

@@ -15,7 +15,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SdpMatrixHelperBridge
 
 Reduced theorem wrappers for the self-improvement pipeline.
 
-This module is a compatibility barrel re-exporting the split leaf modules.
+This module is a compatibility module re-exporting the split leaf modules.
 All original declarations remain available under the same namespace.
 
 ## Leaf modules

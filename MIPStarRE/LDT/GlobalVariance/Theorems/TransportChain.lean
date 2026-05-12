@@ -1,7 +1,7 @@
 import MIPStarRE.LDT.GlobalVariance.Theorems.TransportChain.Core
 import MIPStarRE.LDT.GlobalVariance.Theorems.TransportChain.SumForm
 
-/-! # TransportChain — compatibility barrel
+/-! # TransportChain — compatibility module
 
 Re-exports all declarations from the two leaf sub-modules so that
 downstream files that import

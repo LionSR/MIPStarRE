@@ -4,7 +4,7 @@ import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Normalization
 /-!
 # Full-slice machinery
 
-Compatibility barrel re-exporting the full-slice machinery leaves:
+Compatibility module re-exporting the full-slice machinery leaves:
 
 - `Machinery.Marginalization`: collision residuals, postprocessing expansions,
   and tensor marginalization bounds.

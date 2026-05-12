@@ -5,7 +5,7 @@ import MIPStarRE.LDT.Preliminaries.SwitchSandwichMain.Completeness
 /-!
 # Preliminary comparison theorems: switch-sandwich main estimates
 
-Barrel module re-exporting the concrete switch-sandwich main submodules.
+Compatibility module re-exporting the concrete switch-sandwich main submodules.
 
 ## Paper alignment
 
@@ -19,7 +19,8 @@ E_x Σ_a ⟨ψ| A_a B A_a ⊗ I |ψ⟩
 ```
 
 where:
-* `leftSandwichExpectation`  = `leftTensor(A_a) * leftTensor(B) * leftTensor(A_a)` = `A_a B A_a ⊗ I`
+* `leftSandwichExpectation` =
+  `leftTensor(A_a) * leftTensor(B) * leftTensor(A_a)` = `A_a B A_a ⊗ I`
 * `middleSandwichExpectation` = `leftTensor(B) * rightTensor(A_a)` = `B ⊗ A_a`
 * `rightSandwichExpectation`  = `leftTensor(B * A_a)` = `B A_a ⊗ I`
 

@@ -4,5 +4,5 @@ import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.SharedLine
 /-!
 # Section 10 — shared-line reindexing helpers
 
-Barrel module re-exporting the concrete shared-helper submodules.
+Compatibility module re-exporting the concrete shared-helper submodules.
 -/

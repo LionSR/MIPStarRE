@@ -7,7 +7,7 @@ import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
 import MIPStarRE.LDT.GlobalVariance.Theorems.PolynomialSumBounds
 
 /-!
-# GlobalVariance Theorems — Results barrel
+# GlobalVariance Theorems — Results imports
 
 This module re-exports all GlobalVariance theorem results from the
 sub-modules:
@@ -29,5 +29,5 @@ sub-modules:
   Schwartz-Zippel transport step underlying `eq:equivalent-local-variance`
 
 Backward-compatibility: all theorems previously in `Results.lean` remain
-available through this barrel import.
+available through this re-export import.
 -/

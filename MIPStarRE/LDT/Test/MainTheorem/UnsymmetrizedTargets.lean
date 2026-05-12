@@ -88,7 +88,7 @@ structure MainFormalCascadeUnsymmetrizedPOVMTargets
 namespace MainFormalCascadeUnsymmetrizedPOVMTargets
 
 /-- Build the line-97--109 unsymmetrized POVM target package from the standalone
-Step 3 bridge package.
+Step 3 bridge data.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:97-109`.
 

@@ -3,7 +3,7 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities.AnswerVa
 /-!
 # Section 6 -- Restricted Probability Bookkeeping
 
-Compatibility barrel for the restricted-probability bookkeeping used in the
+Compatibility module for the restricted-probability bookkeeping used in the
 main induction step.
 
 The component modules separate the common averaging lemmas, the axis-parallel

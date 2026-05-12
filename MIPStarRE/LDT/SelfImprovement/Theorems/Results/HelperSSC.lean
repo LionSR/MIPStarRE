@@ -25,7 +25,8 @@ a smaller review unit.
 - **helperOffDiagonalBareQuantity_le_paper_chain_of_scalar_transports** —
   assembly of the residual-chain estimate from the displayed scalar transport
   bounds.
-- **helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_scalarTransports** —
+- **helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_scalarTransports**
+  —
   obligation construction from the displayed scalar transport estimates.
 - **helperOffDiagonalBareQuantity_le_one** — the submeasurement contraction
   bound for the bare off-diagonal polynomial-pair mass.
@@ -412,10 +413,10 @@ theorem helperOffDiagonalBareQuantity_le_paper_chain_of_scalar_transports
   rw [helper_mass_sub_release_eq_polynomial_off_diagonal] at hresidual
   simpa [release, ζsqrt, sqrtTwoDelta, mdq, helperOffDiagonalBareQuantity] using hresidual
 
-/-- Construct the helper-stage obligations from local variance and a
-named off-diagonal residual estimate.
+/-- Construct the helper-stage obligations from local variance and a named
+off-diagonal residual estimate.
 
-This is the same collection of obligations as
+This produces the same named obligations as
 `helper_strong_self_consistency_obligations_of_selfConsistency_localVariance`,
 but its final input is the concrete off-diagonal polynomial-pair bound obtained
 after expanding the released residual. -/
@@ -531,9 +532,9 @@ lemma helper_strong_self_consistency_obligations_of_selfConsistency_localVarianc
 helper construction together with the named add-in-`u`/variance transports.
 
 The theorem consumes the reduced helper output
-`SelfImprovementHelperConclusion params strategy T Hhat Z eps delta` and a
-obligations consisting of the four scalar chain bounds plus the final lower
-bound on the released right-hand side. It then assembles the diagonal transfer
+`SelfImprovementHelperConclusion params strategy T Hhat Z eps delta` and the
+four named scalar chain obligations together with the final lower bound on the
+released right-hand side. It then assembles the diagonal transfer
 using `add_in_u_simplified_transfer_of_cs_chain_sqrt_form`, upgrades it to the
 paper's released right-hand side via
 `selfConsistencyDiagonalAddInU_of_simplifiedTransfer`, and applies the closing
@@ -542,7 +543,7 @@ arithmetic absorption
 
 This is the first complete route from the actual helper construction to the
 `HelperStrongSelfConsistencyInput` surface. The remaining analytic work is
-therefore stated as named obligations, rather than left as a raw
+therefore stated as named obligations, rather than left as an unstructured
 `BipartiteSSCRel` assumption. -/
 theorem helper_strong_self_consistency_of_helper_conclusion
     (params : Parameters) [FieldModel params.q]
@@ -654,7 +655,7 @@ self-consistency, local-variance, and residual estimates which remain after the
 helper construction has been fixed.
 
 This theorem composes the already formalized `Q₀ → Q₁ → Q₂ → Q₃ → Q₄` chain
-with the closing helper-SSC wrapper. It is the paper-facing form needed when
+with the closing helper-SSC theorem. It is the paper-facing form needed when
 the self-improvement theorem is applied on a restricted slice: the caller
 supplies the point self-consistency relation once, and supplies the local
 variance and released-residual estimates for each helper output. -/
@@ -695,7 +696,7 @@ theorem helper_strong_self_consistency_input_of_selfConsistency_localVariance
   exact helper_strong_self_consistency_obligations_of_selfConsistency_localVariance
     params strategy eps delta hssc (hlocal hhelper) (hresidual hhelper)
 
-/-- Build the full self-improvement bridge input when the helper strong
+/-- Build the full self-improvement obligation record when the helper strong
 self-consistency field is supplied by named obligations.
 
 This constructor isolates the first of the three residual Section 9 inputs in
