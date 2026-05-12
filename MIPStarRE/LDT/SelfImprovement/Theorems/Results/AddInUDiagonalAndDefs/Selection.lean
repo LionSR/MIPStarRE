@@ -1,8 +1,6 @@
 import MIPStarRE.LDT.Basic.SubMeasurementFamilies
 import MIPStarRE.LDT.Basic.Distribution
-import MIPStarRE.LDT.GlobalVariance.Theorems.Results
-import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
-import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain
+import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
 import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
