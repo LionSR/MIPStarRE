@@ -228,7 +228,9 @@ internal proof obligations, not hypotheses of this theorem.
 still depends on the admitted obligation
 `mainInductionSuccessorObligation`.  This obligation is tracked by #1507 and
 #1458 and must be proved from the paper hypotheses rather than added to the
-theorem statement. -/
+theorem statement.  Elimination: prove `mainInductionSuccessorObligation` from
+the hypotheses of `thm:main-induction`, including the paper successor-case
+construction. -/
 theorem mainInduction
     (params : Parameters)
     [FieldModel params.q]

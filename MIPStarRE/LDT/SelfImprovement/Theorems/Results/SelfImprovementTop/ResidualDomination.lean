@@ -82,10 +82,11 @@ so the proof does not invoke the total-gap term
 `sqrt (#F_q * selfImprovementDataProcessingError)`.
 
 **Unfaithful:** this auxiliary route is not a formalization of
-`thm:self-improvement`.  It assumes helper completeness, helper strong
-self-consistency, the selected `add-in-u` transfer, and a residual-dominating
-orthonormalization input that are not yet derived from the paper hypotheses.
-This proof debt is tracked by #1515. -/
+`thm:self-improvement`.  It assumes `hhelperCompleteness`, `hhelperSSCInput`,
+`htransfer`, and `horthonormalization`, which are not yet derived from the paper
+hypotheses.  This proof debt is tracked by #1515.  Elimination: prove the
+source-facing `selfImprovement` theorem from the paper hypotheses, discharging
+these inputs internally. -/
 lemma selfImprovementWithSlacknessAndResidualDominationInput
     (params : Parameters)
     [FieldModel params.q]
@@ -174,7 +175,9 @@ lemma selfImprovementWithSlacknessAndResidualDominationInput
 **Unfaithful:** the bundled
 `SelfImprovementSlacknessResidualDominationObligations` are not hypotheses of
 `thm:self-improvement`.  This helper is a conditional assembly lemma for the
-residual-domination route; #1515 tracks the source-facing discharge. -/
+residual-domination route.  This proof debt is tracked by #1515.  Elimination:
+prove the source-facing `selfImprovement` theorem from the paper hypotheses,
+discharging the bundled obligations internally. -/
 lemma selfImprovementFromSlacknessResidualDominationObligations
     (params : Parameters)
     [FieldModel params.q]
@@ -212,7 +215,10 @@ rather than the alphabet-size total-gap route.
 the same helper-stage inputs as
 `selfImprovementWithSlacknessAndResidualDominationInput`.  These are proof
 obligations, not assumptions of `thm:self-improvement`; #1515 tracks the
-source-facing theorem. -/
+source-facing theorem.  Elimination: prove the source-facing `selfImprovement`
+theorem from the paper hypotheses, discharging `hhelperCompleteness`,
+`hhelperSSCInput`, `htransfer`, `hqxp`, `hsource`, and `hcoisometry`
+internally. -/
 lemma selfImprovementWithSlacknessAndQXPRepairAndCoisometry
     (params : Parameters)
     [FieldModel params.q]
