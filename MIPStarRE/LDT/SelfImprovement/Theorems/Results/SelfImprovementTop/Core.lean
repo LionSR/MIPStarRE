@@ -268,9 +268,11 @@ orthonormalization input, and the final-fields input explicitly. The
 evaluation-map data-processing step follows from the question-dependent
 preliminaries theorem.
 
-**Unfaithful:** this helper is conditional on proof-stage inputs that the paper
-does not assume.  The source-facing theorem `selfImprovement` must derive these
-inputs from the paper hypotheses; that proof obligation is tracked by #1515. -/
+**Unfaithful:** this helper is conditional on the explicit hypotheses
+`hhelperStrongSelfConsistency`, `horthonormalization`, and `hfinalFields`,
+which are not hypotheses of the paper theorem.  The source-facing theorem
+`selfImprovement` must derive these inputs from the paper hypotheses.  Tracked
+by #1515.  Elimination: prove `selfImprovement` without these extra inputs. -/
 theorem selfImprovement_assumingFinalFields
     (params : Parameters)
     [FieldModel params.q]
