@@ -78,7 +78,7 @@ are being actively removed.
    temporary `sorry` in this declaration is preferable to adding the obligation as
    a hypothesis on the paper theorem.
 4. **Use conditional helpers only as quarantine.**  A helper such as
-   `mainFormal_ofInternalObligations` or `selfImprovement_assumingBridgeInputs`
+   `mainFormal_ofInternalObligations` or `selfImprovementFromObligations`
    is allowed only to preserve downstream proof content while the missing
    obligation discharger is being proved.  It must have a conditional name, a tracked
    removal target, and no source-labelled blueprint `\leanok`.  The
