@@ -14,6 +14,10 @@ namespace Test
 
 /-- Paper-shaped residual for the still-external data in the non-vacuous branch.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:68-173`, the
+role-register, unsymmetrization, and projectivization/completion part of
+`\label{thm:main-formal}`.
+
 The proof body consumes this package in paper order: first it reads the concrete
 role residual, then derives the unsymmetrized POVMs, line-116 evaluated
 consistency, and Step-5 full `G^A/G^B` consistency, and only then consumes the
@@ -248,7 +252,9 @@ alias nonempty_ofRoleResidualAndBridgeInputsAndCompletingToMeasurementInputs :=
   nonempty_ofRoleResidualAndDiagonalInputsAndCompletingToMeasurementInputs
 
 /-- Convert the combined residual to the left-completion residual after the paper
-line-130 consistency has been derived separately. -/
+line-130 consistency has been derived separately.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:130-173`. -/
 noncomputable def toLeftCompletionTransportResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

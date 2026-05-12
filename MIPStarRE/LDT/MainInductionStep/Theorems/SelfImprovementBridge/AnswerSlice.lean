@@ -23,6 +23,10 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 /-- Bridge inputs for producing the answer-valued self-improvement package from
 honest per-slice symmetric strategies.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
+`references/ldt-paper/self_improvement.tex:631-811`; this is the answer-valued
+restricted-slice interface for the same self-improvement step.
+
 The answer-valued restriction `xRestrictedAnswerSymStrat` has the paper-faithful
 answer-valued diagonal interface, while the existing Section 9 self-improvement
 theorem is stated for ordinary `SymStrat`s.  This structure records honest
@@ -93,6 +97,10 @@ theorem AnswerSelfImprovementPackage.SliceBridgeInputs.averagedPoint_eq_of_point
 
 /-- Build answer-valued `SliceBridgeInputs` without separately assuming averaged
 point-operator compatibility.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:461-551`; the averaged
+point-operator compatibility is a formal transport between the answer-valued
+restricted slice interface and the Section 9 interface.
 
 The structural averaged-point field is derived from `pointMeasurement_eq`; the
 remaining inputs are the honest slice strategies, their state transport,
@@ -201,6 +209,9 @@ theorem AnswerSelfImprovementPackage.SliceBridgeInputs.good_of_restrictedGood
 /-- Build answer-valued `SliceBridgeInputs` from honest slice strategies,
 verifier-visible measurement transport, and Section 9 bridge inputs.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
+`references/ldt-paper/self_improvement.tex:631-811`.
+
 This constructor fills both structural fields forced by the answer-restricted
 interface: averaged point compatibility follows from point-measurement transport,
 and goodness follows from the answer-restricted failure profile plus state,
@@ -251,6 +262,10 @@ noncomputable def AnswerSelfImprovementPackage.SliceBridgeInputs.ofMeasurementEq
 
 /-- Build answer-valued `SliceBridgeInputs` from honest slice strategies and the
 constructive orthonormalization repair producer.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:461-551`,
+`references/ldt-paper/self_improvement.tex:631-811`, and
+`references/ldt-paper/orthonormalization.tex:273-282`.
 
 As in the ordinary slice bridge, the spectral part of the orthonormalization
 input is supplied by the closed source-almost-projective spectral truncation
@@ -315,7 +330,10 @@ noncomputable def AnswerSelfImprovementPackage.SliceBridgeInputs.ofOrthonormaliz
 
 /-- Package the slice-wise outputs feeding the answer-valued restricted-strategy
 self-improvement stage into the bookkeeping object expected by answer-valued
-Section 6 assembly. -/
+Section 6 assembly.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
+`references/ldt-paper/self_improvement.tex:631-811`. -/
 noncomputable def AnswerSelfImprovementPackage.ofSelfImprovementInInductionSection
     (params : Parameters)
     [FieldModel params.q]
@@ -389,6 +407,9 @@ noncomputable def AnswerSelfImprovementPackage.ofSelfImprovementInInductionSecti
 
 /-- Convert honest per-slice Section 9 bridge inputs into the answer-valued
 Section 6 self-improvement package.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
+`references/ldt-paper/self_improvement.tex:631-811`.
 
 The construction assumes ordinary slice strategies and their Section 9 bridge
 inputs. It applies the conditional measurement-input theorem

@@ -186,6 +186,10 @@ theorem selfImprovementInInductionSection
 /-- Package the slice-wise outputs feeding `selfImprovementInInductionSection`
 into the bookkeeping object expected by the later induction-step assembly.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:461-551`, using the
+self-improvement theorem restated in
+`references/ldt-paper/self_improvement.tex:631-811`.
+
 Because `xRestrictedStrategy params strategy x` is only a
 `RestrictedSymStrat params ι` rather than a full `SymStrat params ι`, the
 restricted-strategy outputs are supplied directly as the six paper-faithful
@@ -261,6 +265,11 @@ noncomputable def SelfImprovementPackage.ofSelfImprovementInInductionSection
 /-- Narrow assumption package for running the Section 9 self-improvement bridge
 on each Section 6 slice.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
+`references/ldt-paper/self_improvement.tex:631-811`; this records the
+formalization boundary needed to run the Section 9 theorem on honest slice
+strategies.
+
 The package deliberately keeps the remaining mathematical obligations explicit:
 for every slice it asks for an honest `SymStrat params ι` whose state,
 point-measurement interface, and averaged point operator agree with the
@@ -330,6 +339,10 @@ theorem SelfImprovementPackage.SliceBridgeInputs.averagedPoint_eq_of_pointMeasur
 
 /-- Build `SliceBridgeInputs` without separately assuming averaged point-operator
 compatibility.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:461-551`; the averaged
+point-operator compatibility is a formal transport between the restricted slice
+interface and the Section 9 interface.
 
 The only structural equality needed for that field is `pointMeasurement_eq`; the
 constructor leaves the genuinely remaining inputs unchanged: the honest slice
@@ -433,6 +446,9 @@ theorem SelfImprovementPackage.SliceBridgeInputs.good_of_restrictedGood
 /-- Build `SliceBridgeInputs` from honest slice strategies, measurement
 transport, and Section 9 bridge inputs.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
+`references/ldt-paper/self_improvement.tex:631-811`.
+
 This constructor fills both structural fields that are forced by the restricted
 slice interface: `averagedPoint_eq` follows from point-measurement transport and
 `good` follows from the restricted failure profile plus state/axis/diagonal
@@ -478,6 +494,10 @@ noncomputable def SelfImprovementPackage.SliceBridgeInputs.ofMeasurementEq
 
 /-- Build `SliceBridgeInputs` from honest slice strategies and the constructive
 orthonormalization repair producer.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:461-551`,
+`references/ldt-paper/self_improvement.tex:631-811`, and
+`references/ldt-paper/orthonormalization.tex:273-282`.
 
 The spectral part of the orthonormalization input is supplied by the closed
 source-almost-projective spectral truncation theorem. Thus the caller need only
@@ -536,6 +556,9 @@ noncomputable def SelfImprovementPackage.SliceBridgeInputs.ofOrthonormalizationR
 
 /-- Convert per-slice Section 9 bridge inputs into the Section 6
 self-improvement package.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
+`references/ldt-paper/self_improvement.tex:631-811`.
 
 The construction assumes the slice strategies and their Section 9 bridge inputs.
 It applies the conditional measurement-input theorem

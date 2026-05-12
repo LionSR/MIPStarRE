@@ -16,6 +16,10 @@ namespace Test
 
 /-- Residual after wiring the merged Step 3 and line-156 projectivization packages.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:150-185`, the
+projective handoff and final two point-consistency estimates in the proof of
+`\label{thm:main-formal}`.
+
 This package is narrower than `MainFormalCascadeProjectiveAssemblyResidual`:
 
 * the unsymmetrized POVMs must be the actual role blocks of a role-register
@@ -218,7 +222,9 @@ theorem pointBConsistency
   simpa [pointB, leftG, rightQ, leftQ, polynomialEvaluationMeasurementFamily] using htarget
 
 /-- Assemble the previous projective-assembly residual from the narrower handoff
-residual using the checked Step 3, line-156, and point-triangle wrappers above. -/
+residual using the checked Step 3, line-156, and point-triangle wrappers above.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:150-185`. -/
 noncomputable def toProjectiveAssemblyResidual
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

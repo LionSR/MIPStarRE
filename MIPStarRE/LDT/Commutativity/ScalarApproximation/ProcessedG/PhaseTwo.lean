@@ -527,6 +527,9 @@ lemma evaluatedSlice_phaseTwo_avg_diff_eq_neg_questionDefect
 
 /-- Exact finite reindexing residual for the phase-2 scalar bridge.
 
+Paper origin: `references/ldt-paper/commutativity-G.tex:60-83`, the finite
+averaging and reindexing step leading to the scalar `eq:add-an-a` bridge.
+
 This statement contains no analytic estimate.  It says that the question-level
 phase-2 defect averages to the one-dimensional scalar defect bounded by
 `gCommStability_scalar`.  Proving it amounts to the marginalization/fiber

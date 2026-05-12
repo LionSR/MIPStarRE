@@ -78,7 +78,11 @@ def MainFormalSuccessorAnswerDiagonalWeightedBound (params : Parameters)
     3 * eps
 
 /-- The answer-valued restricted-probability package on the role-register
-symmetrization used in the successor branch of `mainFormal`. -/
+symmetrization used in the successor branch of `mainFormal`.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
+(`\label{lem:restricted-probabilities}`), used in the recursive slice step
+`references/ldt-paper/inductive_step.tex:441-454`. -/
 noncomputable def mainFormalSuccessorAnswerRestrictionPackage
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -292,7 +296,12 @@ theorem mainFormalSuccessorAnswerRecursiveSlices_ofSliceData
   refine ⟨error, G, ?_, herr⟩
   -- Rewrite the state and point measurement using the slice-data compatibilities
   simpa [sliceData.sliceState_eq x, sliceData.slicePoint_eq x] using hG
-/-- Successor-case answer-valued restricted-strategy self-improvement producer. -/
+/-- Successor-case answer-valued restricted-strategy self-improvement producer.
+
+Paper origin: the successor branch of `thm:main-induction` in
+`references/ldt-paper/inductive_step.tex:352-386`, with the answer-valued
+slice recursion corresponding to the restricted-strategy application at
+`references/ldt-paper/inductive_step.tex:441-454`. -/
 def MainFormalSuccessorAnswerSelfImprovementProducer (params : Parameters)
     [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -335,7 +344,10 @@ def MainFormalSuccessorAnswerSelfImprovementBridgeInputs (params : Parameters)
       hrestrict hinduction
 
 /-- The per-slice induction package type used by the answer-valued successor
-self-improvement bridge. -/
+self-improvement bridge.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-454`, with the
+answer-valued restricted-slice interface. -/
 abbrev MainFormalSuccessorAnswerSelfImprovementInductionPackage (params : Parameters)
     [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)

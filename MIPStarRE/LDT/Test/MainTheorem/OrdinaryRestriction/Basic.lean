@@ -59,7 +59,11 @@ def MainFormalSuccessorDiagonalWeightedBound (params : Parameters)
     3 * eps
 
 /-- The restricted-probability package on the role-register symmetrization used
-in the successor branch of `mainFormal`. -/
+in the successor branch of `mainFormal`.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
+(`\label{lem:restricted-probabilities}`), used in the recursive slice step
+`references/ldt-paper/inductive_step.tex:441-454`. -/
 noncomputable def mainFormalSuccessorRestrictionPackage
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -130,7 +134,11 @@ theorem mainFormalSuccessorRecursiveSlices_ofInductionPackage
       hinduction.pointConsistency x, hinduction.error_le x⟩
 
 /-- Successor-case restricted-strategy self-improvement producer expected by the
-public Section 6 boundary wrapper. -/
+public Section 6 boundary wrapper.
+
+Paper origin: the successor branch of `thm:main-induction` in
+`references/ldt-paper/inductive_step.tex:352-386` and the slice-wise
+self-improvement step in `references/ldt-paper/inductive_step.tex:441-490`. -/
 def MainFormalSuccessorSelfImprovementProducer (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -173,7 +181,9 @@ def MainFormalSuccessorSelfImprovementBridgeInputs (params : Parameters)
       hrestrict hinduction
 
 /-- The per-slice induction package type used by the ordinary successor
-self-improvement bridge. -/
+self-improvement bridge.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-454`. -/
 abbrev MainFormalSuccessorSelfImprovementInductionPackage (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)

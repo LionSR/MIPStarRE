@@ -41,6 +41,10 @@ namespace Test
 
 /-- Residual after consuming the checked role-register Section 6 package.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, applying
+`references/ldt-paper/orthonormalization.tex:282`
+(`\label{lem:orthonormalization-main-lemma}`) and completion.
+
 This package is narrower than `MainFormalCascadeProjectiveCompletionTransportResidual`:
 the role-register measurement and both factor-two unsymmetrization estimates are
 no longer independent fields.  They are supplied by
@@ -93,6 +97,8 @@ namespace MainFormalCascadeRolePackagedCompletionTransportResidual
 
 /-- Convert the role-packaged residual to the previous completion-transport shape.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:135-173`.
+
 The only work is to expand `MainFormalRoleMeasurementPackage` into the
 role-register measurement and the two Step 3 factor-two estimates using the
 checked unsymmetrization constructor. -/
@@ -121,6 +127,10 @@ end MainFormalCascadeRolePackagedCompletionTransportResidual
 
 /-- Projectivization/completion and line-169 residual after a concrete role package
 has already been produced.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, applying
+`references/ldt-paper/orthonormalization.tex:282`
+(`\label{lem:orthonormalization-main-lemma}`).
 
 This is the post-role part of
 `MainFormalCascadeRolePackagedCompletionTransportResidual`: the role-register
@@ -169,7 +179,9 @@ structure MainFormalPostRolePackageCompletionTransportResidual
 namespace MainFormalPostRolePackageCompletionTransportResidual
 
 /-- Reinsert the already-produced role package into the older role-packaged
-completion-transport residual. -/
+completion-transport residual.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:135-173`. -/
 noncomputable def toRolePackagedCompletionTransportResidual
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -193,6 +205,10 @@ end MainFormalPostRolePackageCompletionTransportResidual
 
 /-- Post-role residual whose Bob-side completion estimate is still in the
 left-register form returned by the orthonormalize-and-complete chain.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, with the
+right-register transport formalized separately from the paper's line-147
+completion estimate.
 
 This is the paper Step 6 boundary just before applying the permutation-invariant
 right-register transport from #869.  The Alice completion field already matches
@@ -411,6 +427,10 @@ theorem nonempty_ofOrthonormalizeAndCompleteInputs
 /-- Transport the Bob-side completion estimate from the left-register form to the
 right-register form and recover the previous post-role residual.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:135-173`; the transport
+is a formalization-level register-placement step for the paper's line-147
+estimate.
+
 This is the local `mainFormal` consumer of the right-register completion helper
 added in #869. -/
 noncomputable def toPostRolePackageCompletionTransportResidual
@@ -475,6 +495,10 @@ end MainFormalPostRolePackageLeftCompletionTransportResidual
 
 /-- Combined live residual after isolating concrete role-package production.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:68-173`, combining the
+role-register Section 6 output, unsymmetrization, and projectivization/completion
+steps of the `mainFormal` proof.
+
 The first field is the actual Section 6 role residual: it carries the concrete
 role-register measurement and its symmetrized consistency proof.  The second
 field contains only the projectivization/completion and line-169 data for the role
@@ -505,6 +529,8 @@ namespace MainFormalCascadeRolePackageResidualCompletionTransportResidual
 /-- Convert the split role-residual/post-role package back to the role-packaged
 completion-transport residual consumed by the existing downstream wrappers.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:68-173`.
+
 The conversion uses the explicit `roleResidual` field, so the role-register
 measurement remains visible to the post-role residual. -/
 noncomputable def toRolePackagedCompletionTransportResidual
@@ -522,6 +548,9 @@ end MainFormalCascadeRolePackageResidualCompletionTransportResidual
 
 /-- Combined live residual after isolating concrete role-package production
 and the #869 Bob-side completion transport.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:68-173`, with Bob-side
+completion transport recorded as a formalization-level register-placement step.
 
 Compared with `MainFormalCascadeRolePackageResidualCompletionTransportResidual`, this
 package no longer asks the live hole to provide the right-register completion
@@ -659,7 +688,9 @@ theorem nonempty_ofRoleResidualAndOrthonormalizeAndCompleteInputs
 /-- Convert the left-completion residual to the previous role-residual completion
 line-169 shape by applying the #869 right-register transport to the Bob-side
 completion estimate, using the separately reconstructed paper line-130
-`G^A/G^B` consistency proof. -/
+`G^A/G^B` consistency proof.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:135-173`. -/
 noncomputable def toRolePackageResidualCompletionTransportResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -685,6 +716,10 @@ end MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual
 
 /-- Live residual after role production and before eliminating the existential
 outputs of the orthonormalize-and-complete theorem.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, especially
+the orthonormalization/completion passage from lines 135--149 and the line-169
+transport links.
 
 This is the paper Step 6 input boundary: a concrete Section 6 role residual, the
 distinguished completion outcomes, strong self-consistency for the two

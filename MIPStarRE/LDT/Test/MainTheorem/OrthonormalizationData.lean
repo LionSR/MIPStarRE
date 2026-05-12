@@ -50,6 +50,10 @@ namespace Test
 
 /-- Post-role Step 6 witness data with the actual projectivization witnesses fixed.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, using
+`references/ldt-paper/orthonormalization.tex:282`
+(`\label{lem:orthonormalization-main-lemma}`) and completion.
+
 This package corresponds to `inductive_step.tex` lines 135--149 after the
 role-register Section 6 output has already been produced and unsymmetrized.  It
 stores the concrete projective submeasurements `P^A,P^B`, the distinguished
@@ -103,7 +107,9 @@ structure MainFormalPostRolePackageProjectiveCompletionResidual
 namespace MainFormalPostRolePackageProjectiveCompletionResidual
 
 /-- Consume the post-role Step 6 witness residual and recover the checked
-left-completion line-169 residual. -/
+left-completion line-169 residual.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:135-173`. -/
 noncomputable def toPostRolePackageLeftCompletionTransportResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -321,6 +327,9 @@ abbrev MainFormalPostRolePackageDiagonalOrthonormalizationBridgeInputs
 /-- The pre-completion projective submeasurements obtained from line 130 by the
 cross-consistency orthonormalization wrapper.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:130-149`, with
+orthonormalization supplied by `references/ldt-paper/orthonormalization.tex:282`.
+
 This stops before `completeAtOutcome`: the honest paper-shaped boundary records
 only the part now derivable from the `G^A/G^B` `ConsRel`; completion closeness is
 kept as a separate downstream obligation. -/
@@ -460,7 +469,10 @@ end MainFormalPostRolePackageDiagonalOrthonormalizationResidual
 
 /-- Post-orthonormalization Step 6 residual that keeps the line-130 provenance
 for `P^A,P^B` and exposes only the completion and match-mass obligations still
-not produced by the cross-consistency wrapper. -/
+not produced by the cross-consistency wrapper.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, with
+completion supplied by `references/ldt-paper/preliminaries.tex:1095-1140`. -/
 structure MainFormalPostRolePackageDiagonalCompletionResidual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

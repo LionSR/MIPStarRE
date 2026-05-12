@@ -216,7 +216,10 @@ noncomputable def generalizeBDeviation (params : Parameters) [FieldModel params.
 /-- The line-collision residual obtained after expanding the projective line
 measurement in `lem:generalize-b` and moving the polynomial weight from
 `(G_g)^{1/2}` to `G_g`.  The remaining unproved analytic step is to bound this
-quantity by Schwartz--Zippel and the submeasurement property of `G`. -/
+quantity by Schwartz--Zippel and the submeasurement property of `G`.
+
+Paper origin: `references/ldt-paper/expansion.tex:273-288`
+(`\label{lem:generalize-b}`). -/
 noncomputable def generalizeBCollisionResidual (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)

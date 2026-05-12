@@ -26,7 +26,10 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 /-! ## Package constructors and skeletal assembly -/
 
 /-- Extract a concrete slice-restriction package from
-`lem:restricted-probabilities`. -/
+`lem:restricted-probabilities`.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
+(`\label{lem:restricted-probabilities}`). -/
 noncomputable def SliceRestrictionPackage.ofRestrictedProbabilities
     (params : Parameters)
     [FieldModel params.q]
@@ -45,7 +48,11 @@ noncomputable def SliceRestrictionPackage.ofRestrictedProbabilities
       diagonalAverageBound := hdiagonalAverage }
 
 /-- Extract a concrete answer-valued slice-restriction package from the
-answer-valued restricted-probabilities bookkeeping statement. -/
+answer-valued restricted-probabilities bookkeeping statement.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
+(`\label{lem:restricted-probabilities}`), with the answer-valued restriction
+interface used for the recursive slice call. -/
 noncomputable def AnswerSliceRestrictionPackage.ofRestrictedProbabilities
     (params : Parameters)
     [FieldModel params.q]
@@ -65,7 +72,11 @@ noncomputable def AnswerSliceRestrictionPackage.ofRestrictedProbabilities
 
 /-- Forget the answer-valued diagonal alphabet after recording the verifier-visible
 failure probabilities.  The three tests agree with the legacy restricted strategy
-at the sampled answer level. -/
+at the sampled answer level.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-454`; this is a
+formalization-only transport between two encodings of the same restricted slice
+call. -/
 noncomputable def SliceRestrictionPackage.ofAnswer
     (params : Parameters)
     [FieldModel params.q]
@@ -101,7 +112,9 @@ noncomputable def SliceRestrictionPackage.ofAnswer
       using answerPkg.diagonalAverageBound
 
 /-- Turn the recursive family of slice-wise induction witnesses into explicit
-slice data `x ↦ (σ_x, G^x)`. -/
+slice data `x ↦ (σ_x, G^x)`.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-454`. -/
 noncomputable def PerSliceInductionPackage.ofRecursion
     (params : Parameters)
     [FieldModel params.q]
@@ -147,7 +160,9 @@ noncomputable def PerSliceInductionPackage.ofRecursion
       error_le := fun x => (hslice x).2 }
 
 /-- Turn answer-valued recursive slice-wise induction witnesses into explicit
-slice data `x ↦ (σ_x, G^x)`. -/
+slice data `x ↦ (σ_x, G^x)`.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-454`. -/
 noncomputable def AnswerPerSliceInductionPackage.ofRecursion
     (params : Parameters)
     [FieldModel params.q]
@@ -197,6 +212,8 @@ noncomputable def AnswerPerSliceInductionPackage.ofRecursion
 /-- Build an answer-valued per-slice induction package from exact
 main-induction conclusions for the answer-restricted slices.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:441-454`.
+
 This is the package form of the paper's invocation of the induction hypothesis in
 `inductive_step.tex`, lines 441--454.  The hypotheses already have the exact
 restricted-profile `mainInductionError` bound, so the proof only records those
@@ -226,6 +243,8 @@ noncomputable def AnswerPerSliceInductionPackage.ofMainInductionConclusions
 /-- Build an answer-valued per-slice induction package from a predecessor
 answer-valued main-induction hypothesis.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:441-454`.
+
 The restriction package already records that every `xRestrictedAnswerSymStrat`
 is good with the slice profile.  The large-`k` side condition is the predecessor
 side condition `400 * params.m * params.d ≤ k`, matching the application of the
@@ -252,6 +271,10 @@ noncomputable def AnswerPerSliceInductionPackage.ofMainInductionHypothesis
 
 /-- View an answer-valued per-slice induction package as a legacy package after
 forgetting the answer-valued restriction boundary.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-454`; this is a
+formalization-only conversion between answer-valued and legacy restricted-slice
+interfaces for the same recursive induction call.
 
 **Status:** currently unused (no callers).  The inverse direction
 `AnswerPerSliceInductionPackage.ofLegacy` and the combined
@@ -284,7 +307,11 @@ noncomputable def PerSliceInductionPackage.ofAnswer
     simpa [SliceRestrictionPackage.ofAnswer] using answerInduction.error_le x
 
 /-- View a legacy per-slice induction package over an answer-forgotten restriction
-package as an answer-valued package. -/
+package as an answer-valued package.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-454`; this is a
+formalization-only conversion between answer-valued and legacy restricted-slice
+interfaces for the same recursive induction call. -/
 noncomputable def AnswerPerSliceInductionPackage.ofLegacy
     (params : Parameters)
     [FieldModel params.q]
@@ -306,7 +333,11 @@ noncomputable def AnswerPerSliceInductionPackage.ofLegacy
     simpa [SliceRestrictionPackage.ofAnswer] using legacyInduction.error_le x
 
 /-- Forget an answer-valued self-improvement package when the target legacy
-induction package is the one used by the legacy assembly. -/
+induction package is the one used by the legacy assembly.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:461-551`; this is a
+formalization-only conversion between answer-valued and legacy restricted-slice
+self-improvement packages. -/
 noncomputable def SelfImprovementPackage.ofAnswerForLegacy
     (params : Parameters)
     [FieldModel params.q]

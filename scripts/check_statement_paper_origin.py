@@ -9,8 +9,9 @@ sibling top-level (e.g. ``MIPStarRE/Quantum/``), update ``_scan_root``.
 
 This implements the linter requested by ledger #1379 and issue #1384 ("Earn
 your place" backfill).  For every ``structure``, ``def``, or ``abbrev`` whose
-identifier ends in ``Statement`` (and similar A6 suffixes ``Witness``,
-``Hypotheses``, ``Conclusion``, ``Input``, ``Assumptions``), we look at the
+identifier ends in ``Statement`` (and similar proof-obligation suffixes
+``Witness``, ``Hypotheses``, ``Conclusion``, ``Input``, ``Assumptions``,
+``Bridge``, ``Producer``, ``Package``, ``Residual``), we look at the
 *immediately preceding docstring or comment block* (after skipping blank lines)
 for one of three citation forms:
 
@@ -65,6 +66,10 @@ SUFFIXES: tuple[str, ...] = (
     "Conclusion",
     "Input",
     "Assumptions",
+    "Bridge",
+    "Producer",
+    "Package",
+    "Residual",
 )
 
 DECL_KEYWORDS: tuple[str, ...] = ("structure", "def", "abbrev")

@@ -403,6 +403,9 @@ theorem qBipartiteConsDefect_extractRoleA_le_two_symm {Outcome ι : Type*}
 
 /-- Named residual package for the Step 3 measurement-unsymmetrization bridge.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:84-109`
+(`\label{eq:cons-a}` and `\label{eq:cons-b}`).
+
 The extracted POVMs are not additional fields: they are definitionally
 `unsymmetrizedLeftPOVM G` and `unsymmetrizedRightPOVM G`, i.e. the two principal
 role blocks of the role-register measurement `G`.  The two remaining proof fields
