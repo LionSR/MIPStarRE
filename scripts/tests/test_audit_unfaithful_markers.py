@@ -19,7 +19,7 @@ def write_lean(root: Path, text: str) -> None:
     """Create a minimal LDT Lean file for an audit fixture."""
     path = root / "MIPStarRE" / "LDT" / "Fixture.lean"
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text)
+    path.write_text(text, encoding="utf-8")
 
 
 class UnfaithfulMarkerAuditTests(unittest.TestCase):
@@ -34,6 +34,32 @@ class UnfaithfulMarkerAuditTests(unittest.TestCase):
             result = run_audit(root)
 
         self.assertEqual(result.scanned_markers, 1)
+        self.assertEqual(result.findings, ())
+
+    def test_accepts_complete_marker_in_module_docstring(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_lean(
+                root,
+                """/-!\n**Unfaithful:** this helper assumes `hbridge`, which is not derived\nfrom `thm:main-formal`.  This proof debt is tracked by #1458.\nElimination: prove `bridgeProducer` from the paper hypotheses. -/\ntheorem ok : True := by trivial\n""",
+            )
+
+            result = run_audit(root)
+
+        self.assertEqual(result.scanned_markers, 1)
+        self.assertEqual(result.findings, ())
+
+    def test_ignores_non_doc_comments_and_strings(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_lean(
+                root,
+                """/- **Unfaithful:** this ordinary comment is not a docstring. -/\ndef s := \"**Unfaithful:** this string is not a docstring\"\ntheorem ok : True := by trivial\n""",
+            )
+
+            result = run_audit(root)
+
+        self.assertEqual(result.scanned_markers, 0)
         self.assertEqual(result.findings, ())
 
     def test_flags_missing_elimination(self) -> None:

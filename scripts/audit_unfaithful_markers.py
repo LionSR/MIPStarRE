@@ -67,22 +67,40 @@ def line_number(text: str, offset: int) -> int:
     return text.count("\n", 0, offset) + 1
 
 
-def marker_blocks(text: str) -> list[tuple[int, str]]:
-    """Return ``(**Unfaithful:** offset, enclosing comment suffix)`` pairs."""
+def doc_comment_blocks(text: str) -> list[tuple[int, str]]:
+    """Return Lean doc-comment blocks, with their source offsets."""
     blocks: list[tuple[int, str]] = []
     start = 0
-    marker = "**Unfaithful:**"
     while True:
-        offset = text.find(marker, start)
-        if offset == -1:
+        candidates = [
+            offset for offset in (text.find("/--", start), text.find("/-!", start))
+            if offset != -1
+        ]
+        if not candidates:
             return blocks
+        offset = min(candidates)
         end = text.find("-/", offset)
         if end == -1:
-            end = min(len(text), offset + 1000)
-        else:
-            end += len("-/")
+            return blocks
+        end += len("-/")
         blocks.append((offset, text[offset:end]))
-        start = offset + len(marker)
+        start = end
+
+
+def marker_blocks(text: str) -> list[tuple[int, str]]:
+    """Return ``(**Unfaithful:** offset, enclosing doc-comment suffix)`` pairs."""
+    blocks: list[tuple[int, str]] = []
+    marker = "**Unfaithful:**"
+    for comment_offset, comment in doc_comment_blocks(text):
+        start = 0
+        while True:
+            relative = comment.find(marker, start)
+            if relative == -1:
+                break
+            offset = comment_offset + relative
+            blocks.append((offset, comment[relative:]))
+            start = relative + len(marker)
+    return blocks
 
 
 def audit_marker_block(block: str) -> tuple[str, ...]:
@@ -102,7 +120,7 @@ def run_audit(root: Path) -> MarkerAuditResult:
     findings: list[MarkerFinding] = []
     scanned = 0
     for path in lean_files(root):
-        text = path.read_text()
+        text = path.read_text(encoding="utf-8", errors="replace")
         for offset, block in marker_blocks(text):
             scanned += 1
             missing = audit_marker_block(block)
