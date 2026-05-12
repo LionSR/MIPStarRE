@@ -209,6 +209,10 @@ private lemma avg_localCollisionMass_eval_eq_polynomialCollisionMass
 
 /-- The exact algebraic expansion/reindexing statement used in `mainFormal` Step 5.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:119-130`
+(`\label{eq:G-self-consistency}`), with the collision estimate supplied by the
+Schwartz--Zippel lemma.
+
 Paper lines 119--128 compare the evaluated consistency defect
 
 `E_u ∑_{a ≠ b} ⟨ψ| G^A_[g(u)=a] ⊗ G^B_[h(u)=b] |ψ⟩`

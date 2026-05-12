@@ -212,6 +212,10 @@ structure AnswerRestrictedProbabilitiesStatement (params : Parameters)
 
 /-- Bookkeeping data for the slice-restriction step of `thm:main-induction`.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
+(`\label{lem:restricted-probabilities}`) and
+`references/ldt-paper/inductive_step.tex:441-454`.
+
 This records an explicit restricted failure profile together with the averaged
 bounds extracted from `lem:restricted-probabilities`. -/
 structure SliceRestrictionPackage (params : Parameters)
@@ -232,7 +236,11 @@ structure SliceRestrictionPackage (params : Parameters)
     averageRestrictedDiagonalError params profile ≤
       sliceConditioningLoss params * gamma
 
-/-- Answer-valued slice-restriction package for the Section 6 induction step. -/
+/-- Answer-valued slice-restriction package for the Section 6 induction step.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
+(`\label{lem:restricted-probabilities}`) and the recursive slice application in
+`references/ldt-paper/inductive_step.tex:441-454`. -/
 structure AnswerSliceRestrictionPackage (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -252,6 +260,8 @@ structure AnswerSliceRestrictionPackage (params : Parameters)
       sliceConditioningLoss params * gamma
 
 /-- Explicit per-slice output of the inductive hypothesis.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-454`.
 
 This is the recursion-entry data: given slice-restriction data, a proof of
 `thm:main-induction` in dimension `m` is expected to produce a measurement `G^x`
@@ -283,6 +293,9 @@ structure PerSliceInductionPackage (params : Parameters)
           (restrictionPkg.profile.diagonal x)
 
 /-- Explicit per-slice output of the inductive hypothesis for answer-valued slices.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-454`; answer-valued
+restriction interface for the same recursive call.
 
 This is the function-answer recursion-entry package: the recursive call is made on
 `xRestrictedAnswerSymStrat`, whose diagonal answers retain the whole restricted
@@ -383,6 +396,10 @@ noncomputable def answerSliceSelfImprovementError (params : Parameters)
     (restrictionPkg.profile.diagonal x)
 
 /-- Slice-wise output of the induction-level self-improvement stage.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:461-551`
+(`\label{thm:self-improvement-in-induction-section}` in use inside the proof of
+`\label{thm:main-induction}`).
 
 Because `xRestrictedStrategy` is a section-local restricted strategy rather than
 literally a `SymStrat params` interface—it does not carry the ambient
@@ -495,6 +512,9 @@ end SelfImprovementPackage
 
 /-- Slice-wise output of the induction-level self-improvement stage for
 answer-valued restricted strategies.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:461-551`;
+answer-valued restriction interface for the same self-improvement stage.
 
 This mirrors `SelfImprovementPackage`, but its point-consistency field is stated
 against `xRestrictedAnswerSymStrat`, the function-answer restricted strategy. -/

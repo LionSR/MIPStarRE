@@ -432,6 +432,9 @@ end MainFormalCascadeProjectiveStageTargets
 /-- Paper-faithful residual for the projective assembly after the line-116
 triangle step has been factored out.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:97-185`, from
+unsymmetrization through the projective stage of `\label{thm:main-formal}`.
+
 This package asks for the unsymmetrized `G^A,G^B` POVMs with their two `2σ`
 links (`inductive_step.tex` lines 97--109), then records the still-open
 projectivization/completion and point-transport outputs from lines 135--185:

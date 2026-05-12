@@ -47,6 +47,9 @@ namespace MainFormalPostRolePackageDiagonalOrthonormalizationInput
 /-- Produce the orthonormalization input from a role residual and the two
 locality-preserving repair witnesses.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:130-149` and
+`references/ldt-paper/orthonormalization.tex:273-282`.
+
 The spectral-truncation fields are supplied by
 `spectralTruncationInput_of_sourceAlmostProjective` (via `ofRepairInputs`).
 The remaining two fields are the `leftRepair` and `rightRepair` parameters —

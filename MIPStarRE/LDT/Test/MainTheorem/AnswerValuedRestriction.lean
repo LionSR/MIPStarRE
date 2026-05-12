@@ -78,7 +78,11 @@ def MainFormalSuccessorAnswerDiagonalWeightedBound (params : Parameters)
     3 * eps
 
 /-- The answer-valued restricted-probability package on the role-register
-symmetrization used in the successor branch of `mainFormal`. -/
+symmetrization used in the successor branch of `mainFormal`.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
+(`\label{lem:restricted-probabilities}`), used in the recursive slice step
+`references/ldt-paper/inductive_step.tex:441-454`. -/
 noncomputable def mainFormalSuccessorAnswerRestrictionPackage
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -340,7 +344,10 @@ def MainFormalSuccessorAnswerSelfImprovementBridgeInputs (params : Parameters)
       hrestrict hinduction
 
 /-- The per-slice induction package type used by the answer-valued successor
-self-improvement bridge. -/
+self-improvement bridge.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-454`, with the
+answer-valued restricted-slice interface. -/
 abbrev MainFormalSuccessorAnswerSelfImprovementInductionPackage (params : Parameters)
     [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)

@@ -44,6 +44,10 @@ namespace Test
 
 /-- Successor-branch data for producing the Section 6 role package.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:68-83` and the
+successor branch of the Section 6 induction proof in
+`references/ldt-paper/inductive_step.tex:429-568`.
+
 This is narrower than an arbitrary `MainFormalRolePackageResidual`: it contains an
 explicit predecessor `pred` with `pred.next = params` and the successor-boundary
 data for the transported strategy over `pred.next`. The Section 6 large-`k`
@@ -205,7 +209,11 @@ noncomputable def ofSuccessorBridgeInputs
 
 end MainFormalRolePackageSuccessorResidual
 
-/-- Answer-valued successor-branch data for producing the Section 6 role package. -/
+/-- Answer-valued successor-branch data for producing the Section 6 role package.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:68-83` and the
+successor branch of the Section 6 induction proof in
+`references/ldt-paper/inductive_step.tex:429-568`. -/
 structure MainFormalRolePackageAnswerSuccessorResidual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

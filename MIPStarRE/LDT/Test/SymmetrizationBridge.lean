@@ -167,6 +167,9 @@ end StrategySymmetrizationPackage
 
 /-- Construct the Step 1 package from the low individual degree test hypothesis.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:26-68`, the
+role-register symmetrization step in the proof of `\label{thm:main-formal}`.
+
 This is the paper-faithful bridge needed by the final `mainFormal` assembly: the
 only input is the original strategy's test-passing assumption, and the output is
 the role-register symmetrized strategy together with its `(3ε,3ε,3ε)` goodness and

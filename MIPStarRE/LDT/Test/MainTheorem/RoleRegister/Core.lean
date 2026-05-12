@@ -16,6 +16,10 @@ namespace Test
 
 /-- Section 6 role-register induction output used by the `mainFormal` assembly.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:68-83`, where
+`\label{thm:main-induction}` is applied to the symmetrized role-register
+strategy.
+
 The main-induction call is applied to `strategy.strategySymmetrization`, whose
 local Hilbert space is indexed by `Role × ι`. This structure records exactly the
 piece of that call needed by the later unsymmetrization step: a polynomial POVM
@@ -128,6 +132,10 @@ end MainFormalRoleMeasurementPackage
 
 /-- Residual Section 6 role-register induction witness for `mainFormal`.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:68-83`, where
+`\label{thm:main-induction}` is applied to the symmetrized role-register
+strategy.
+
 This isolates the first field of the former role-register completion residual:
 it asks only for the Section 6 role-register polynomial measurement and its
 symmetrized consistency estimate at the pre-cascade main-induction error.  The
@@ -174,7 +182,9 @@ theorem ofMainInductionWitness
   exact ⟨{ roleMeasurement := G, section6Consistency := hG }⟩
 
 /-- Convert the isolated Section 6 role-register residual into the output consumed
-by unsymmetrization. -/
+by unsymmetrization.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:68-109`. -/
 def toRoleMeasurementPackage
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -220,7 +230,9 @@ theorem ofSuccessorBoundary
       hk_pos hk_large)
 
 /-- Build the role-register measurement package produced by a concrete
-role-package residual. -/
+role-package residual.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:68-109`. -/
 def rolePackage
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

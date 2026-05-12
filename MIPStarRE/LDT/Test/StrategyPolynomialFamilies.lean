@@ -354,6 +354,10 @@ namespace SliceBoundednessInput
 
 /-- The boundedness residual obtained from a concrete slice family `G`.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:461-551`
+(`\label{thm:self-improvement-in-induction-section}`), especially the boundedness
+field of the slice-wise self-improvement output.
+
 This is the induction-oriented `Z^x ⊗ (I - G^x)` term after replacing the
 abstract slice family by the concrete `G`, written in the paper's
 `(I - G^x) ⊗ Z^x` orientation. -/

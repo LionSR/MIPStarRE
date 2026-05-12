@@ -187,6 +187,9 @@ namespace MainFormalPostRolePackageDiagonalCompletionInput
 /-- Convert explicit line-130 completion witnesses into the residual shape
 consumed by the live Step 6 assembly.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, with
+completion supplied by `references/ldt-paper/preliminaries.tex:1095-1140`.
+
 This is the checked data-valued constructor for the old generic
 `completionProducer`: callers may supply a function returning this input for each
 line-130 orthonormalization residual and then use `toCompletionResidual` as the
@@ -644,7 +647,9 @@ end MainFormalPostRolePackageDiagonalCompletionInput
 namespace MainFormalPostRolePackageDiagonalCompletionResidual
 
 /-- Forget only the provenance wrapper after constructing the fixed Step 6
-witness package from line-130 orthonormalization plus completion closeness. -/
+witness package from line-130 orthonormalization plus completion closeness.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:135-173`. -/
 noncomputable def toProjectiveCompletionResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

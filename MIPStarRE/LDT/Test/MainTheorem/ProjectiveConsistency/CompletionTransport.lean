@@ -16,6 +16,10 @@ namespace Test
 
 /-- Finer residual for the projective completion and paper line-169 handoff.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, the
+projectivization/completion and line-169 handoff in the proof of
+`\label{thm:main-formal}`.
+
 This package is strictly weaker than
 `MainFormalCascadeProjectiveEvaluationHandoffResidual`.  It no longer asks for the
 unused Section 6 consistency field inside `UnsymmetrizationBridgePackage`, and it
@@ -85,7 +89,9 @@ namespace MainFormalCascadeProjectiveCompletionTransportResidual
 
 /-- The older line-169 residual contains all fields needed by the finer
 completion-transport residual; this coercion documents that the new target is a
-strict weakening of the previous one. -/
+strict weakening of the previous one.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:135-173`. -/
 noncomputable def ofProjectiveEvaluationHandoffResidual
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

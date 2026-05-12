@@ -146,6 +146,9 @@ lemma evaluatedSlicePhaseFiveRemoved_sumBabTerm_avg
 /-- The one-sided form of the remaining first-coordinate reverse `eq:add-an-a`
 endpoint.
 
+Paper origin: `references/ldt-paper/commutativity-G.tex:60-83`
+(`\label{eq:add-an-a}` and `\label{eq:apply-add-an-a-once}`).
+
 By `evaluatedSlicePhaseFiveRemoved_sumBabTerm_avg`, the absolute-value endpoint
 residual is equivalent to controlling the nonnegative missing mass from inserting
 the right-register first-coordinate outcome.
@@ -171,6 +174,9 @@ def evaluatedSlicePhase67FirstReverseGapResidual
     2 * Real.sqrt zeta
 
 /-- The historical first-coordinate reverse `eq:add-an-a` residual.
+
+Paper origin: `references/ldt-paper/commutativity-G.tex:60-83`
+(`\label{eq:add-an-a}` and `\label{eq:apply-add-an-a-once}`).
 
 Formal scalar shape:
 `|avgBAB - evaluatedSlicePhaseFiveRemoved| ≤ 2 * Real.sqrt zeta`, where

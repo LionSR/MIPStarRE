@@ -300,7 +300,12 @@ theorem mainInductionByRecursionOnM
         ⟨1, G, hcons, le_of_not_gt hsmall⟩
 
 /-- Restricted-probabilities package built from the explicit weighted bounds fed
-into `mainInductionPublicWrapper`. -/
+into `mainInductionPublicWrapper`.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
+(`\label{lem:restricted-probabilities}`), used in the proof of
+`\label{thm:main-induction}` at
+`references/ldt-paper/inductive_step.tex:441-454`. -/
 noncomputable def mainInductionPublicRestrictionPackage
     (params : Parameters)
     [FieldModel.{0} params.q]
@@ -481,7 +486,12 @@ theorem answerMainInductionByRecursionOnM
       hselfProducer' hk_pos hk
 
 /-- Answer-valued restricted-probabilities package built from explicit weighted
-answer-valued slice bounds. -/
+answer-valued slice bounds.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
+(`\label{lem:restricted-probabilities}`), used in the proof of
+`\label{thm:main-induction}` at
+`references/ldt-paper/inductive_step.tex:441-454`. -/
 noncomputable def answerMainInductionPublicRestrictionPackage
     (params : Parameters)
     [FieldModel.{0} params.q]

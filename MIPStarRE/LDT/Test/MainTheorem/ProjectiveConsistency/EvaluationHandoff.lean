@@ -16,6 +16,9 @@ namespace Test
 
 /-- Polynomial-level line-169 residual before the line-172 data-processing step.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:150-173`, from
+`\label{eq:G-with-Q-A}` through the point-evaluation data-processing step.
+
 This package is narrower than `MainFormalCascadeProjectiveHandoffResidual`: the
 line-172 evaluated `ζ₁` links are no longer fields.  Instead it asks for the
 polynomial-level statements from `inductive_step.tex` lines 167--173,
@@ -62,7 +65,9 @@ structure MainFormalCascadeProjectiveEvaluationHandoffResidual
 namespace MainFormalCascadeProjectiveEvaluationHandoffResidual
 
 /-- Apply the paper's line-171--173 data-processing step to the two polynomial
-`ζ₁` links and recover the previous evaluated handoff residual. -/
+`ζ₁` links and recover the previous evaluated handoff residual.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:167-173`. -/
 noncomputable def toProjectiveHandoffResidual
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
