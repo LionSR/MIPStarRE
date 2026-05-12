@@ -6,6 +6,9 @@ import MIPStarRE.LDT.Test.MainTheorem.NativeTargets
 Base handoff, final projective-completion transport, and the paper-facing proof
 gap for `thm:main-formal` (`\Cref{thm:main-formal}`).  This module contains:
 
+* `mainFormalBaseRoleResidual` — names the Section 6 role-register residual
+  used by the base case `m = 1`.
+
 * `mainFormal_ofProjectiveCompletionResidual` — derives the three consistency
   conclusions of `thm:main-formal` from a constructed Section 6
   projective-completion residual.
