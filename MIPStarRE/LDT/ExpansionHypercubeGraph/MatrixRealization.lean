@@ -330,6 +330,131 @@ private lemma matrixLaplacianOperator_spectral_decomp (params : Parameters) :
           intro α _
           rw [hrel α]
 
+/-- The Fourier change-of-basis matrix whose columns are the basis states `|φ_α⟩`. -/
+private noncomputable def fourierBasisChangeMatrix (params : Parameters) :
+    MatrixOperator (pointHilbertSpace params) :=
+  fun u α => fourierBasisState params α u
+
+private lemma fourierBasisChangeMatrix_star_mul_self (params : Parameters) :
+    star (fourierBasisChangeMatrix params) * fourierBasisChangeMatrix params =
+      (1 : MatrixOperator (pointHilbertSpace params)) := by
+  ext α β
+  simpa [fourierBasisChangeMatrix, Matrix.mul_apply, Matrix.one_apply] using
+    fourierBasisState_inner_product params α β
+
+private noncomputable def fourierBasisChangeUnitary (params : Parameters) :
+    Matrix.unitaryGroup (Point params) ℂ :=
+  ⟨fourierBasisChangeMatrix params, by
+    rw [Matrix.mem_unitaryGroup_iff']
+    exact fourierBasisChangeMatrix_star_mul_self params⟩
+
+private lemma matrixLaplacianOperator_mul_fourierBasisState (params : Parameters)
+    (α : Point params) :
+    (matrixLaplacianOperator params).mulVec (fourierBasisState params α) =
+      (((laplacianEigenvalue params α : Error) : ℂ) • fourierBasisState params α) := by
+  have hscalar :
+      (((laplacianEigenvalue params α : Error) : ℂ)) =
+        (hypercubeVertexCount params : ℂ)⁻¹ -
+          (((adjacencyEigenvalue params α : Error) : ℂ)) := by
+    simpa [one_div] using
+      congrArg (fun x : Error => (x : ℂ)) (laplacianEigenvalue_eq params α)
+  calc
+    (matrixLaplacianOperator params).mulVec (fourierBasisState params α)
+      = ((((hypercubeVertexCount params : ℂ)⁻¹) •
+            (1 : MatrixOperator (pointHilbertSpace params))) -
+          matrixAdjacencyOperator params).mulVec (fourierBasisState params α) := by
+            rfl
+    _ = ((hypercubeVertexCount params : ℂ)⁻¹) • fourierBasisState params α -
+          (((adjacencyEigenvalue params α : Error) : ℂ) • fourierBasisState params α) := by
+            rw [Matrix.sub_mulVec, Matrix.smul_mulVec, Matrix.one_mulVec, eigenvectors params α]
+    _ = (((hypercubeVertexCount params : ℂ)⁻¹ -
+            (((adjacencyEigenvalue params α : Error) : ℂ))) • fourierBasisState params α) := by
+            rw [← sub_smul]
+    _ = (((laplacianEigenvalue params α : Error) : ℂ) • fourierBasisState params α) := by
+            rw [hscalar]
+
+private lemma fourierBasisChange_conj_laplacian (params : Parameters) :
+    star (fourierBasisChangeMatrix params) * matrixLaplacianOperator params *
+        fourierBasisChangeMatrix params =
+      Matrix.diagonal (fun α => ((laplacianEigenvalue params α : Error) : ℂ)) := by
+  ext α β
+  have hμβ :
+      ∀ u : Point params,
+        (matrixLaplacianOperator params * fourierBasisChangeMatrix params) u β =
+          (((laplacianEigenvalue params β : Error) : ℂ) * fourierBasisState params β u) := by
+    intro u
+    have hβ := congrFun (matrixLaplacianOperator_mul_fourierBasisState params β) u
+    simpa [fourierBasisChangeMatrix, Matrix.mul_apply, Matrix.mulVec, dotProduct,
+      Pi.smul_apply, smul_eq_mul] using hβ
+  calc
+    (star (fourierBasisChangeMatrix params) * matrixLaplacianOperator params *
+        fourierBasisChangeMatrix params) α β
+      = (star (fourierBasisChangeMatrix params) *
+          (matrixLaplacianOperator params * fourierBasisChangeMatrix params)) α β := by
+            rw [← Matrix.mul_assoc]
+    _ = ∑ u : Point params,
+          star (fourierBasisState params α u) *
+            ((matrixLaplacianOperator params * fourierBasisChangeMatrix params) u β) := by
+            rfl
+    _
+      = ∑ u : Point params,
+          star (fourierBasisState params α u) *
+            ((((laplacianEigenvalue params β : Error) : ℂ) *
+              fourierBasisState params β u)) := by
+              simp [hμβ]
+    _ = ∑ u : Point params,
+          (((laplacianEigenvalue params β : Error) : ℂ) *
+            (star (fourierBasisState params α u) * fourierBasisState params β u)) := by
+            refine Finset.sum_congr rfl ?_
+            intro u _
+            ring
+    _ = (((laplacianEigenvalue params β : Error) : ℂ) *
+          ∑ u : Point params,
+            star (fourierBasisState params α u) * fourierBasisState params β u) := by
+            simpa using
+              (Finset.mul_sum
+                (s := (Finset.univ : Finset (Point params)))
+                (a := (((laplacianEigenvalue params β : Error) : ℂ)))
+                (f := fun u =>
+                  star (fourierBasisState params α u) * fourierBasisState params β u)).symm
+    _ = (((laplacianEigenvalue params β : Error) : ℂ) *
+          (if α = β then 1 else 0)) := by
+            rw [fourierBasisState_inner_product params α β]
+    _ = Matrix.diagonal (fun γ => ((laplacianEigenvalue params γ : Error) : ℂ)) α β := by
+            by_cases hαβ : α = β
+            · subst hαβ
+              simp
+            · simp [hαβ]
+
+private lemma matrixLaplacianOperator_charpoly_roots_eq_fourier (params : Parameters) :
+    (matrixLaplacianOperator params).charpoly.roots.map Complex.re =
+      (Finset.univ : Finset (Point params)).val.map (laplacianEigenvalue params) := by
+  let U := fourierBasisChangeUnitary params
+  let d : Point params → ℂ := fun α => ((laplacianEigenvalue params α : Error) : ℂ)
+  let F : Matrix (Point params) (Point params) ℂ := fun u α => fourierBasisState params α u
+  let L : Matrix (Point params) (Point params) ℂ := fun u v => matrixLaplacianOperator params u v
+  have hF_mul_star : F * star F = 1 := by
+    simpa [U, F, fourierBasisChangeUnitary] using U.2.2
+  have hdiagMatrix :
+      star F * L * F = Matrix.diagonal d := by
+    simpa [F, L, d, fourierBasisChangeMatrix] using
+      fourierBasisChange_conj_laplacian params
+  have hcharpoly :
+      (matrixLaplacianOperator params).charpoly = (Matrix.diagonal d).charpoly := by
+    calc
+      (matrixLaplacianOperator params).charpoly
+        = (star F * L * F).charpoly := by
+              simpa [L] using (show L.charpoly = (star F * L * F).charpoly from by
+                rw [Matrix.charpoly_mul_comm, ← mul_assoc, hF_mul_star, one_mul])
+      _ = (Matrix.diagonal d).charpoly := by rw [hdiagMatrix]
+  calc
+    (matrixLaplacianOperator params).charpoly.roots.map Complex.re
+      = (Matrix.diagonal d).charpoly.roots.map Complex.re := by rw [hcharpoly]
+    _ = (Finset.univ : Finset (Point params)).val.map (laplacianEigenvalue params) := by
+          rw [Matrix.charpoly_diagonal, Polynomial.roots_prod]
+          · simp [d]
+          · exact Finset.prod_ne_zero_iff.mpr fun i _ => Polynomial.X_sub_C_ne_zero (d i)
+
 set_option linter.unnecessarySimpa false in
 set_option linter.unreachableTactic false in
 set_option linter.unusedTactic false in
@@ -646,14 +771,132 @@ theorem laplacianSpectralGapOrdered (params : Parameters)
     lambda ⟨0, hypercubeVertexCount_pos params⟩ = 0 ∧
       lambda ⟨1, hypercubeVertexCount_one_lt params⟩ =
         1 / ((params.m : Error) * (hypercubeVertexCount params : Error)) := by
-  -- TODO(#1497): derive the characteristic-polynomial roots of `matrixLaplacianOperator`
-  -- from the Fourier diagonalization, then invoke
-  -- `laplacianSpectralGapOrdered_of_fourier_eigenvalue_order`.  It remains to
-  -- turn `hroots` into an explicit enumeration of the Fourier Laplacian
-  -- eigenvalues in the ordered list `lambda`; the auxiliary criteria above then
-  -- supply nonnegativity, uniqueness of the zero mode, the lower gap bound, and
-  -- gap attainment.
-  sorry
+  let M : ℕ := hypercubeVertexCount params
+  let baseEnum : Fin M ≃ Point params :=
+    (Fintype.equivFinOfCardEq (eigenvectors_card params)).symm
+  let raw : Fin M → Error := fun i => laplacianEigenvalue params (baseEnum i)
+  have hrawRoots :
+      (matrixLaplacianOperator params).charpoly.roots.map Complex.re =
+        (Finset.univ : Finset (Fin M)).val.map raw := by
+    calc
+      (matrixLaplacianOperator params).charpoly.roots.map Complex.re
+        = (Finset.univ : Finset (Point params)).val.map (laplacianEigenvalue params) :=
+            matrixLaplacianOperator_charpoly_roots_eq_fourier params
+      _ = ((Finset.univ : Finset (Fin M)).map baseEnum.toEmbedding).val.map
+            (laplacianEigenvalue params) := by
+              rw [Finset.map_univ_equiv baseEnum]
+      _ = (Finset.univ : Finset (Fin M)).val.map raw := by
+            rw [Finset.map_val, Multiset.map_map]
+            rfl
+  let pairRaw : Fin M → Error × Fin M := fun i => (raw i, i)
+  let sortedPairs : List (Error × Fin M) :=
+    (List.ofFn pairRaw).mergeSort (fun a b => a.1 ≤ b.1)
+  let sortedIdxList : List (Fin M) := sortedPairs.map Prod.snd
+  have hsortedPairs_perm : List.Perm sortedPairs (List.ofFn pairRaw) := by
+    simpa [sortedPairs] using
+      (List.mergeSort_perm (List.ofFn pairRaw) (fun a b : Error × Fin M => a.1 ≤ b.1))
+  have hsortedPairs_pairwise :
+      sortedPairs.Pairwise (fun a b : Error × Fin M => a.1 ≤ b.1) := by
+    simpa [sortedPairs] using
+      ((List.ofFn pairRaw).pairwise_mergeSort
+        (le := fun a b : Error × Fin M => decide (a.1 ≤ b.1))
+        (fun a b c ↦ by
+          simpa using
+            (le_trans : a.1 ≤ b.1 → b.1 ≤ c.1 → a.1 ≤ c.1))
+        (fun a b ↦ by simpa using le_total a.1 b.1))
+  have hsortedPairs_sorted : (sortedPairs.map Prod.fst).SortedLE := by
+    have hpairwise : (sortedPairs.map Prod.fst).Pairwise (· ≤ ·) := by
+      grind [List.pairwise_iff_getElem]
+    exact hpairwise.sortedLE
+  have hsortedIdx_perm : List.Perm sortedIdxList (List.ofFn id) := by
+    simpa [sortedIdxList, pairRaw] using hsortedPairs_perm.map Prod.snd
+  have hsortedIdx_nodup : sortedIdxList.Nodup := by
+    exact hsortedIdx_perm.nodup_iff.mpr (List.nodup_ofFn_ofInjective fun i j h => h)
+  have hsortedIdx_mem : ∀ i : Fin M, i ∈ sortedIdxList := by
+    intro i
+    rw [hsortedIdx_perm.mem_iff]
+    exact (List.mem_ofFn' id i).2 ⟨i, rfl⟩
+  let idxEquiv : Fin sortedIdxList.length ≃ Fin M :=
+    List.Nodup.getEquivOfForallMemList sortedIdxList hsortedIdx_nodup hsortedIdx_mem
+  have hsortedIdx_len : sortedIdxList.length = M := by
+    simpa [M] using Fintype.card_congr idxEquiv
+  have hsortedPairs_len : sortedPairs.length = M := by
+    simpa [sortedIdxList] using hsortedIdx_len
+  let castPos : Fin M ≃ Fin sortedIdxList.length := finCongr hsortedIdx_len.symm
+  let mu : Fin M → Error := fun i => (sortedPairs.get (finCongr hsortedPairs_len.symm i)).1
+  let enum : Fin M ≃ Point params := ((castPos.trans idxEquiv).trans baseEnum)
+  have hmu_list : List.ofFn mu = sortedPairs.map Prod.fst := by
+    calc
+      List.ofFn mu
+        = List.ofFn (fun i : Fin sortedPairs.length => (sortedPairs.get i).1) := by
+            simpa [mu] using
+              (List.ofFn_congr hsortedPairs_len.symm
+                (fun i : Fin M => (sortedPairs.get (finCongr hsortedPairs_len.symm i)).1))
+      _ = sortedPairs.map Prod.fst := by
+            exact List.ofFn_getElem_eq_map sortedPairs Prod.fst
+  have hmu_ordered :
+      ∀ i j : Fin M, (i : ℕ) ≤ (j : ℕ) → mu i ≤ mu j := by
+    intro i j hij
+    have hmu_sorted : (List.ofFn mu).SortedLE := by
+      rw [hmu_list]
+      exact hsortedPairs_sorted
+    have hi : (i : ℕ) < (List.ofFn mu).length := by
+      simp [List.length_ofFn, i.isLt]
+    have hj : (j : ℕ) < (List.ofFn mu).length := by
+      simp [List.length_ofFn, j.isLt]
+    simpa [List.getElem_ofFn] using
+      (hmu_sorted.getElem_le_getElem_of_le (i := (i : ℕ)) (j := (j : ℕ))
+        (hi := hi) (hj := hj) hij)
+  have hpair_mem_of_get :
+      ∀ i : Fin M, sortedPairs.get (finCongr hsortedPairs_len.symm i) ∈ sortedPairs := by
+    intro i
+    exact List.get_mem _ _
+  have hpair_property :
+      ∀ p ∈ sortedPairs, p.1 = laplacianEigenvalue params (baseEnum p.2) := by
+    intro p hp
+    have hp' : p ∈ List.ofFn pairRaw := by
+      rw [← hsortedPairs_perm.mem_iff]
+      exact hp
+    rcases (List.mem_ofFn' pairRaw p).1 hp' with ⟨i, rfl⟩
+    rfl
+  have hmu_eq : ∀ i : Fin M, mu i = laplacianEigenvalue params (enum i) := by
+    intro i
+    have hpair := hpair_property (sortedPairs.get (finCongr hsortedPairs_len.symm i)) (by
+      exact List.get_mem _ _)
+    simpa [mu, enum, castPos, idxEquiv, sortedIdxList] using hpair
+  have hmu_gap :
+      mu ⟨0, hypercubeVertexCount_pos params⟩ = 0 ∧
+        mu ⟨1, hypercubeVertexCount_one_lt params⟩ =
+          1 / ((params.m : Error) * (hypercubeVertexCount params : Error)) := by
+    simpa [M, mu] using
+      laplacianSpectralGapOrdered_of_fourier_eigenvalue_order params mu enum hmu_ordered hmu_eq
+  have hperm_lambda_raw : List.Perm (List.ofFn lambda) (List.ofFn raw) := by
+    exact Multiset.coe_eq_coe.mp (by
+      simpa [Fin.univ_val_map, M] using hroots.symm.trans hrawRoots)
+  have hperm_mu_raw : List.Perm (List.ofFn mu) (List.ofFn raw) := by
+    rw [hmu_list]
+    refine (hsortedPairs_perm.map Prod.fst).trans ?_
+    have hmap : (List.ofFn pairRaw).map Prod.fst = List.ofFn raw := by
+      simpa [pairRaw] using (List.ofFn_getElem_eq_map (List.ofFn pairRaw) Prod.fst).symm
+    rw [hmap]
+  have hperm_lambda_mu : List.Perm (List.ofFn lambda) (List.ofFn mu) :=
+    hperm_lambda_raw.trans hperm_mu_raw.symm
+  have hlambda_sorted : (List.ofFn lambda).SortedLE := by
+    exact (show Monotone lambda from fun i j hij => hordered i j hij).sortedLE_ofFn
+  have hmu_sorted : (List.ofFn mu).SortedLE := by
+    exact (show Monotone mu from fun i j hij => hmu_ordered i j hij).sortedLE_ofFn
+  have hlists_eq : List.ofFn lambda = List.ofFn mu :=
+    hperm_lambda_mu.eq_of_sortedLE hlambda_sorted hmu_sorted
+  have hfun_eq : lambda = mu := List.ofFn_inj.mp hlists_eq
+  have hzero_eq :
+      lambda ⟨0, hypercubeVertexCount_pos params⟩ =
+        mu ⟨0, hypercubeVertexCount_pos params⟩ := by
+    rw [hfun_eq]
+  have hone_eq :
+      lambda ⟨1, hypercubeVertexCount_one_lt params⟩ =
+        mu ⟨1, hypercubeVertexCount_one_lt params⟩ := by
+    rw [hfun_eq]
+  exact ⟨hzero_eq.trans hmu_gap.1, hone_eq.trans hmu_gap.2⟩
 
 /-- The quadratic form `τ(ρ (X-Y)^*(X-Y))`. -/
 noncomputable def matrixSquaredDifferenceExpectation {H : FiniteHilbertSpace}
