@@ -45,12 +45,11 @@ obligation for `thm:main-induction`: the theorem statement matches the paper
 statement, and the remaining work is to derive the internal successor-stage
 inputs from the paper hypotheses.  This is tracked by issue #1507.
 
-The audit for `ExpansionHypercubeGraph.laplacianSpectralGapOrdered` records the
-current proof obligation for the ordered-eigenvalue statement of
-`cor:laplacian-spectral-gap`: the theorem statement matches the paper
-statement, and the remaining work is to connect the Fourier diagonalization to
-the ordered roots of the characteristic polynomial.  This is tracked by issue
-#1497.
+The audit for `ExpansionHypercubeGraph.laplacianSpectralGapOrdered` now
+requires the standard Lean axioms only: the ordered-eigenvalue statement of
+`cor:laplacian-spectral-gap` is proved by connecting the Fourier
+diagonalization to the ordered roots of the characteristic polynomial, so the
+former issue-#1497 `sorryAx` dependency is gone.
 
 The axiom expectation is attached to each declaration separately. A declaration
 using one of the `assert_*_axioms` commands with `sorryAx` in its expected set
@@ -102,10 +101,10 @@ needed for `mainInduction`. -/
 private def expectedMainInductionAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
-/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1497 derivation
-needed for `laplacianSpectralGapOrdered`. -/
+/-- Standard kernel axioms only: the issue #1497 derivation for
+`laplacianSpectralGapOrdered` has been discharged. -/
 private def expectedOrderedLaplacianGapAxioms : Array Name :=
-  expectedStandardAxiomsWithSorry
+  expectedStandardAxioms
 
 /-- Standard kernel axioms plus `sorryAx`; tracks the issue #1514 derivation
 needed for `selfImprovementHelper`. -/
