@@ -26,7 +26,7 @@ a smaller review unit.
   assembly of the residual-chain estimate from the displayed scalar transport
   bounds.
 - **helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_scalarTransports** —
-  obligation packaging from the displayed scalar transport estimates.
+  obligation construction from the displayed scalar transport estimates.
 - **helperOffDiagonalBareQuantity_le_one** — the submeasurement contraction
   bound for the bare off-diagonal polynomial-pair mass.
 - **helper_strong_self_consistency_of_helper_conclusion** — assembly of the

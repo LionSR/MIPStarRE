@@ -4,7 +4,7 @@ import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationData
 # Diagonal orthonormalization input from role residual
 
 This file relates the Section 6 role residual to the diagonal orthonormalization
-inputs consumed by `mainFormal`.  The combining lemma that packages these into
+inputs consumed by `mainFormal`.  The combining lemma that assembles these into
 the base-case match-mass completion obligation lives in `MainFormal.lean`.
 
 ## What's proved

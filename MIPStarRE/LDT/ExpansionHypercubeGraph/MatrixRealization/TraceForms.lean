@@ -132,7 +132,7 @@ lemma normalizedTrace_re_mono {H : FiniteHilbertSpace}
 /-- Paper origin: `references/ldt-paper/expansion.tex:145-178`
 (`\label{lem:local-rewrite}`); matrix realization of `LocalRewriteStatement`.
 
-Matrix-level rewrite package for the local variance. -/
+Matrix-level rewrite identity for the local variance. -/
 structure MatrixLocalRewriteStatement (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) : Prop where
   traceFormula :
@@ -141,7 +141,7 @@ structure MatrixLocalRewriteStatement (params : Parameters)
 /-- Paper origin: `references/ldt-paper/expansion.tex:179-269`
 (`\label{lem:global-rewrite}`); matrix realization of `GlobalRewriteStatement`.
 
-Matrix-level rewrite package for the global variance. -/
+Matrix-level rewrite identity for the global variance. -/
 structure MatrixGlobalRewriteStatement (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) : Prop where
   traceFormula :
