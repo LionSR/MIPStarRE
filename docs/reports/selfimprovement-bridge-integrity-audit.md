@@ -43,9 +43,9 @@ Main theorems:
 
 | Theorem | Location | Produces | Hypotheses |
 |---------|----------|----------|------------|
-| `selfImprovementHelper` | `SelfImprovementTop/Core.lean:84` | `SelfImprovementHelperConclusion` (T, H, Z) | `IsGood`, SDP |
-| `selfImprovement` | `SelfImprovementTop/Core.lean:158` | `SelfImprovementConclusion` (full output) | `helperStrongSelfConsistency`, `orthonormalization`, `finalFields`, `IsGood`, `G` |
-| `selfImprovementFromObligations` | `SelfImprovementTop/Core.lean:285` | `SelfImprovementConclusion` | `SelfImprovementObligations` + `IsGood` + `G` |
+| `selfImprovementHelper` | `SelfImprovementTop/Core.lean` | `SelfImprovementHelperConclusion` (T, Hhat, Z) | `IsGood`, input consistency, tracked helper obligations |
+| `selfImprovement` | `SelfImprovementTop/Core.lean` | `SelfImprovementConclusion` (full output) | paper-shaped hypotheses: `IsGood`, `G`, input consistency |
+| `selfImprovementFromObligations` | `SelfImprovementTop/Core.lean` | `SelfImprovementConclusion` | conditional helper: `SelfImprovementObligations` + `IsGood` + `G` |
 
 The three hypotheses recorded by `SelfImprovementObligations` (defined in
 `Theorems/Statements.lean:481`):
@@ -60,10 +60,10 @@ The three hypotheses recorded by `SelfImprovementObligations` (defined in
    point-consistency, self-closeness, and projective-residual conclusions are
    derivable from the helper+orthonormalization+data-processing outputs.
 
-These three inputs are proved individually within SelfImprovement's leaf
-submodules (e.g., `HelperSSC`, `BoundednessTransport`), but they are **not
-unconditionally provided** — each is a `Prop` that must be discharged by the
-caller of `selfImprovement`.
+These three inputs are no longer hypotheses of the paper-facing theorem
+`selfImprovement`.  They are the fields of the conditional helper
+`selfImprovementFromObligations`, and the source-facing theorem currently leaves
+the derivation from the paper hypotheses as the tracked proof obligation #1515.
 
 ### 1.2. Pasting (Section 9/10 bridge)
 
@@ -87,24 +87,24 @@ is `Theorems/SelfImprovementBridge/Core.lean`.
 **Wiring chain:**
 
 ```
-selfImprovementInInductionSection    (Core.lean:65)
-  └─ calls SelfImprovement.selfImprovementFromSubMeas
-       └─ calls selfImprovement with the three explicit obligation hypotheses
+selfImprovementInInductionSection    (Core.lean)
+  └─ paper-facing statement with tracked proof obligation #1503
 ```
 
 ```
-SelfImprovementPackage.ofSliceObligations   (Core.lean:514)
-  └─ calls selfImprovementInInductionSection per slice
-       └─ using SelfImprovement.SelfImprovementObligations per slice
+SelfImprovementPackage.ofSliceObligations   (Core.lean)
+  └─ calls selfImprovementInInductionSection_ofObligations per slice
+       └─ internally completes the input submeasurement
+       └─ uses SelfImprovement.SelfImprovementObligations per slice
 ```
 
 ```
-ldPastingInInductionSection   (Core.lean:577)
+ldPastingInInductionSection   (Core.lean)
   └─ calls Pasting.ldPasting  (INDEPENDENT of SelfImprovement call)
 ```
 
 ```
-mainInductionByRecursionOnM   (MainTheorems.lean:200)
+mainInductionByRecursionOnM   (MainTheorems.lean)
   └─ Calls PerSliceInductionPackage.ofRecursion (induction)
   └─ Calls hselfObligation : PerSliceInductionPackage → SelfImprovementPackage
   └─ Calls assembleAveragedPastingInput (builds AveragedPastingInput from SelfImprovementPackage)
@@ -115,10 +115,10 @@ mainInductionByRecursionOnM   (MainTheorems.lean:200)
 ```
 
 **The key observation:** `mainInductionByRecursionOnM` takes `hselfObligation`
-as an internal wrapper input.  This `hselfObligation` must
-produce a `SelfImprovementPackage` from a `PerSliceInductionPackage`.  The
-published wrapper `mainInductionPublicWrapper` (MainTheorems.lean:311) passes
-this input through to its callers.
+as an internal wrapper input.  This `hselfObligation` must produce a
+`SelfImprovementPackage` from a `PerSliceInductionPackage`.  It is not a
+hypothesis of the source-facing `mainInduction` theorem; that theorem retains
+the paper-shaped statement and the non-base branch is tracked by #1507.
 
 ### 1.4. MainFormal (Final Assembly)
 
@@ -236,26 +236,32 @@ submodules.
 
 ## 3. Bridge Points — Complete vs. Incomplete
 
-### 3.1. selfImprovementHelper → selfImprovement: ✅ Complete
+### 3.1. selfImprovementHelper → selfImprovement: Incomplete source proof
 
 `selfImprovementHelper` produces `SelfImprovementHelperConclusion`, which
-`selfImprovement` consumes via:
-```lean
-rcases selfImprovementHelper params strategy eps delta gamma hgood nu G with
-  ⟨T, Hhat, Z, hhelper⟩
-```
-Then `hhelper` feeds into the three explicit hypotheses.
+the conditional assembly uses as the first stage of the Section 9 proof.  The
+remaining missing step is to derive the helper strong self-consistency,
+orthonormalization, and final-fields inputs from the hypotheses of the paper
+theorem.  The source-facing theorem `selfImprovement` now leaves this as the
+tracked proof obligation #1515, rather than taking those three inputs as
+hypotheses.  The helper-stage strong self-consistency derivation is separately
+tracked by #1514.
 
-### 3.2. selfImprovement → selfImprovementInInductionSection: ✅ Complete
+### 3.2. selfImprovement → selfImprovementInInductionSection: Conditional only
 
-`selfImprovementInInductionSection` calls `SelfImprovement.selfImprovementFromSubMeas`
-directly, which calls `selfImprovement` with explicit obligation hypotheses.
+The paper-facing theorem `selfImprovementInInductionSection` has the expected
+submeasurement input and leaves the induction-section proof as #1503.  The
+conditional helper `selfImprovementInInductionSection_ofObligations` performs
+the current checked assembly: it internally completes the submeasurement to a
+measurement and then calls `SelfImprovement.selfImprovementFromObligations`.
 
-### 3.3. selfImprovementInInductionSection → SelfImprovementPackage: ✅ Complete
+### 3.3. selfImprovementInInductionSection → SelfImprovementPackage: Conditional only
 
 `SelfImprovementPackage.ofSliceObligations` calls
-`selfImprovementInInductionSection` per slice, using the slice-level obligations
-from `SelfImprovementPackage.SliceObligations`.
+`selfImprovementInInductionSection_ofObligations` per slice, using the
+slice-level obligations from `SelfImprovementPackage.SliceObligations`.  This
+keeps the proof-stage assumptions inside the conditional package constructor;
+they should not be reintroduced into the paper-facing theorem.
 
 ### 3.4. SelfImprovementPackage → AveragedPastingInput: ✅ Complete
 
