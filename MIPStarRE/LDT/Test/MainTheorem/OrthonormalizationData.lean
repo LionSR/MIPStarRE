@@ -166,7 +166,7 @@ namespace MainFormalPostRolePackageDiagonalOrthonormalizationResidual
 the line-130 `G^A/G^B` consistency proof, producing the two pre-completion
 projective submeasurements in the non-vacuous scalar regime.
 
-The proof uses the Section 5 locality-preserving repair producer directly, so
+The proof uses the Section 5 locality-preserving repair construction directly, so
 there is no additional orthonormalization-input hypothesis. -/
 theorem nonempty_ofDiagonalConsistency
     {params : Parameters} [FieldModel.{0} params.q]
@@ -182,7 +182,7 @@ theorem nonempty_ofDiagonalConsistency
       params strategy eps k scalars rolePackage) := by
   have hζ0 : 0 ≤ scalars.zeta1 := MainFormalCascadeScalars.zeta1_nonneg scalars
   obtain ⟨P_A, hP_A⟩ :=
-    MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_producer
+    orthonormalizationMeasurement_of_consistency_from_projectivizationRepair
       (ψ := strategy.state) (hψ := strategy.isNormalized)
       (A := unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
       (B := unsymmetrizedRightPOVM rolePackage.roleMeasurement)
@@ -197,7 +197,7 @@ theorem nonempty_ofDiagonalConsistency
       (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
       scalars.zeta1 hpre
   obtain ⟨P_B, hP_B⟩ :=
-    MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_producer
+    orthonormalizationMeasurement_of_consistency_from_projectivizationRepair
       (ψ := strategy.state) (hψ := strategy.isNormalized)
       (A := unsymmetrizedRightPOVM rolePackage.roleMeasurement)
       (B := unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
