@@ -25,6 +25,8 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Sequence
 
+from lean_header_utils import line_number
+
 
 PAPER_CITATION_RE = re.compile(
     r"(?:\b(?:thm|lem|prop|cor|def|rem):[A-Za-z0-9_.:-]+|references/ldt-paper/)"
@@ -60,11 +62,6 @@ def lean_files(root: Path) -> list[Path]:
     if not base.exists():
         return []
     return sorted(p for p in base.rglob("*.lean") if p.is_file())
-
-
-def line_number(text: str, offset: int) -> int:
-    """Return the 1-indexed line number containing ``offset``."""
-    return text.count("\n", 0, offset) + 1
 
 
 def doc_comment_blocks(text: str) -> list[tuple[int, str]]:
