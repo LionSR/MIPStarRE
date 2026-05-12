@@ -5,9 +5,9 @@ on:
     types: [opened, synchronize, reopened]
 
 # Blocking guard for the issue #1379 earn-your-place policy: every
-# Statement/Witness/Hypotheses/Conclusion/Input/Assumptions declaration in
-# MIPStarRE/LDT must cite a paper path, paper label, or documented paper gap at
-# its definition site.
+# Statement/Witness/Hypotheses/Conclusion/Input/Assumptions/Bridge/Producer
+# declaration in MIPStarRE/LDT must cite a paper path, paper label, or documented
+# paper gap at its definition site.
 #
 # See: issue #1413 (CI wiring), ledgers #1379 / #1384 (backfill).
 

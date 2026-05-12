@@ -90,6 +90,8 @@ namespace MainFormalCascadeUnsymmetrizedPOVMTargets
 /-- Build the line-97--109 unsymmetrized POVM target package from the standalone
 Step 3 bridge package.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:97-109`.
+
 The extracted POVMs are definitionally the principal role blocks
 `unsymmetrizedLeftPOVM G` and `unsymmetrizedRightPOVM G` supplied by
 `MIPStarRE.LDT.Test.Unsymmetrization`; the two consistency fields are exactly the

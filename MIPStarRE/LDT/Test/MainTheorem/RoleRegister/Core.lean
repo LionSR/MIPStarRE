@@ -107,6 +107,9 @@ theorem ofSuccessorBoundary
 /-- Build the formal unsymmetrization bridge from the role-register Section 6
 measurement output.
 
+Paper origin: the unsymmetrization step in the proof of `thm:main-formal`,
+`references/ldt-paper/inductive_step.tex:97-109`.
+
 The lower-level Step 3 theorem
 `UnsymmetrizationBridgePackage.ofSymConsistency` proves the two factor-two
 principal-block estimates directly from the symmetrized consistency field, so no

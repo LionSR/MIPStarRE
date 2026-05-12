@@ -104,6 +104,12 @@ class SuffixTests(unittest.TestCase):
     def test_conclusion_suffix(self) -> None:
         self.assertTrue(_matches_suffix("FooConclusion"))
 
+    def test_bridge_suffix(self) -> None:
+        self.assertTrue(_matches_suffix("FooBridge"))
+
+    def test_producer_suffix(self) -> None:
+        self.assertTrue(_matches_suffix("FooProducer"))
+
     def test_other_suffix_skipped(self) -> None:
         self.assertFalse(_matches_suffix("FooBar"))
         self.assertFalse(_matches_suffix("FooStatementHelper"))
@@ -332,6 +338,26 @@ class ScanFileTests(unittest.TestCase):
             ))
             misses = _scan_file(path)
             self.assertEqual(misses, [(2, "FooAssumptions")])
+
+    def test_bridge_requires_origin(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "F.lean"
+            _write(path, (
+                "/-- prose -/\n"
+                "def FooBridge : Prop := True\n"
+            ))
+            misses = _scan_file(path)
+            self.assertEqual(misses, [(2, "FooBridge")])
+
+    def test_producer_requires_origin(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "F.lean"
+            _write(path, (
+                "/-- prose -/\n"
+                "abbrev FooProducer := True\n"
+            ))
+            misses = _scan_file(path)
+            self.assertEqual(misses, [(2, "FooProducer")])
 
 
 # ── _scan_root: missing target handling ────────────────────────────────────

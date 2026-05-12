@@ -205,6 +205,11 @@ structure MainFormalBaseBridgeHypotheses
 `MainFormalBaseProjectiveCompletionHypotheses` by providing the explicit zero polynomial as the
 distinguished outcome on both sides.
 
+Paper origin: the base case of `thm:main-induction` at
+`references/ldt-paper/inductive_step.tex:418-432` and the final
+orthonormalization/completion cascade at
+`references/ldt-paper/inductive_step.tex:136-160`.
+
 The distinguished outcomes `a_A` and `a_B` are chosen as the zero polynomial;
 `completeAtOutcomeProj` works for any distinguished outcome, so this choice
 is sound.  Callers that need specific distinguished outcomes should use

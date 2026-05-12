@@ -130,7 +130,11 @@ theorem mainFormalSuccessorRecursiveSlices_ofInductionPackage
       hinduction.pointConsistency x, hinduction.error_le x⟩
 
 /-- Successor-case restricted-strategy self-improvement producer expected by the
-public Section 6 boundary wrapper. -/
+public Section 6 boundary wrapper.
+
+Paper origin: the successor branch of `thm:main-induction` in
+`references/ldt-paper/inductive_step.tex:352-386`, where the restricted
+strategies are improved slice by slice before the pasting step. -/
 def MainFormalSuccessorSelfImprovementProducer (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)

@@ -292,7 +292,12 @@ theorem mainFormalSuccessorAnswerRecursiveSlices_ofSliceData
   refine ⟨error, G, ?_, herr⟩
   -- Rewrite the state and point measurement using the slice-data compatibilities
   simpa [sliceData.sliceState_eq x, sliceData.slicePoint_eq x] using hG
-/-- Successor-case answer-valued restricted-strategy self-improvement producer. -/
+/-- Successor-case answer-valued restricted-strategy self-improvement producer.
+
+Paper origin: the successor branch of `thm:main-induction` in
+`references/ldt-paper/inductive_step.tex:352-386`, with the answer-valued
+slice recursion corresponding to the restricted-strategy invocation at
+`references/ldt-paper/inductive_step.tex:441-454`. -/
 def MainFormalSuccessorAnswerSelfImprovementProducer (params : Parameters)
     [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)

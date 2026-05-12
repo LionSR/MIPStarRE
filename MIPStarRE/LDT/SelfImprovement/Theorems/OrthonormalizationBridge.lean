@@ -99,6 +99,11 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 /-- Producer of the **spectral-truncation** slice of
 `SelfImprovement.OrthonormalizationInput`.
 
+Paper origin: the projective-output passage in
+`references/ldt-paper/self_improvement.tex:10-13`, using the
+orthonormalization theorem from
+`references/ldt-paper/orthonormalization.tex:273-282`.
+
 For every helper sub-measurement `Hhat` satisfying the helper-stage bipartite
 strong-self-consistency hypothesis (`BipartiteSSCRel ... ζ_helper`), this
 yields the `SpectralTruncationInput` for the *option-completed* left-lifted
@@ -121,6 +126,11 @@ abbrev OrthonormalizationSpectralProducer
 
 /-- Producer of the **locality-preserving repair** slice of
 `SelfImprovement.OrthonormalizationInput`.
+
+Paper origin: the projective-output passage in
+`references/ldt-paper/self_improvement.tex:10-13`, using the
+orthonormalization theorem from
+`references/ldt-paper/orthonormalization.tex:273-282`.
 
 For every helper sub-measurement `Hhat` satisfying the helper-stage bipartite
 strong-self-consistency hypothesis, this yields the
@@ -515,7 +525,11 @@ noncomputable def leftLiftedProjectivizationRepairInput_of_lifted_qxp_sddOpRel
     (fun _ => leftLiftedQXPLayerRepairWitness_of_lifted_qxp_sddOpRel data hA hclose)
 
 /-- SelfImprovement-level producer of QXP-layer repair witnesses for each
-helper submeasurement. -/
+helper submeasurement.
+
+Paper origin: the same orthonormalization step in
+`references/ldt-paper/self_improvement.tex:10-13`, formalized through the
+QXP-layer repair route for `references/ldt-paper/orthonormalization.tex:273-282`. -/
 abbrev OrthonormalizationQXPLayerRepairProducer
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (eps delta : Error) :=
