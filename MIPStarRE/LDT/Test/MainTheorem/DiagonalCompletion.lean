@@ -132,7 +132,7 @@ end MainFormalPostRolePackageDiagonalSSCInput
 
 Explicit completion witnesses for a fixed line-130 orthonormalization residual.
 
-This is the data-valued version of the remaining Step 6 completion producer: it
+This is the data-valued form of the remaining Step 6 completion obligation: it
 records the distinguished completion outcomes, the two completed-closeness
 statements, and the construction-level orthonormalization match-mass preservation
 facts for the chosen line-130 projective submeasurements.  The self-consistency

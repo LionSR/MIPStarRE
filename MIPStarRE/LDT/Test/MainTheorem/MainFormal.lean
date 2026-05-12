@@ -51,7 +51,7 @@ The base case (`m = 1`) generation of the Step 6 witness residual still
 requires the analytic completion content after orthonormalization: distinguished
 completion outcomes and match-mass preservation for the orthonormalized
 projective submeasurements.  The line-130 orthonormalization itself is now
-derived from the checked role residual by the Section 5 repair producer.  When
+derived from the checked role residual by the Section 5 repair construction.  When
 these obligations are supplied, `baseProjectiveCompletionResidual` provides the
 formal theorem that fills the base branch of `mainFormal`. -/
 
@@ -398,7 +398,7 @@ This definition names the remaining base-case analytic obligation for
 `mainFormal`.  It must construct match-mass preservation for the
 orthonormalized projective submeasurements of the checked base-case role
 residual.  The line-130 orthonormalization residual itself is derived from the
-role residual by the Section 5 repair producer, not supplied as an extra
+role residual by the Section 5 repair construction, not supplied as an extra
 assumption.
 
 This is the tracked proof obligation for the base branch. -/
