@@ -198,7 +198,7 @@ private lemma addInU_step1_C_contraction
 
 Proves the paper's `eq:move-one` bound from
 `references/ldt-paper/self_improvement.tex`, lines 255--277, as a completed
-producer.  The proof combines the algebraic alignment
+construction.  The proof combines the algebraic alignment
 `addInU_cs_chain_step1_diff_eq` with the weighted Cauchy--Schwarz inner-product
 bound `Preliminaries.closenessOfInnerProduct_right`, the `A^v` self-consistency
 input via `addInU_pointMeasurement_snd_selfConsistency`, and the
@@ -518,7 +518,7 @@ private lemma addInU_step2_C_contraction
 
 Proves the paper's `eq:move-another` bound from
 `references/ldt-paper/self_improvement.tex`, lines 279--297, as a completed
-producer.  The proof combines the algebraic alignment
+construction.  The proof combines the algebraic alignment
 `addInU_cs_chain_step2_diff_eq` with the weighted Cauchy--Schwarz inner-product
 bound `Preliminaries.closenessOfInnerProduct_left`, the `A^v` self-consistency
 input via `addInU_pointMeasurement_snd_selfConsistency`, and the
