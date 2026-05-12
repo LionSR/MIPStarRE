@@ -41,7 +41,7 @@ axis that matters:
   `[Nontrivial A]`/`[Fintype d]`/etc. in Lean that the blueprint
   omits).
   For a theorem, lemma, or proposition that cites a paper statement,
-  an additional bridge, residual, repair, package, producer, or
+  an additional bridge, residual, repair, package, proof-obligation input, or
   generic hypotheses bundle, generic assumptions bundle, or arbitrary
   hypothesis input is a mathematical mismatch. The only acceptable extra
   hypotheses are boundary conditions genuinely needed to state the same
@@ -88,6 +88,11 @@ Lean theorem in the diff that should bear one):
   is fully formalized, contains no proof-evasion device, and is
   source-faithful under A.1.  Do not recommend `\leanok` for a
   conditional helper that has extra non-paper hypotheses.
+- **Open internal obligations** may be linked by `\lean{...}` for
+  traceability, but must not be placed inside an existing `\leanok` block
+  when they contain `sorry`, depend on `sorryAx`, or intentionally represent
+  proof debt.  If a renamed declaration is still an open obligation, prefer a
+  separate remark or implementation note with `\lean{...}` and no `\leanok`.
 
 ### A.3 — `\notready` accuracy
 
@@ -106,6 +111,10 @@ matches — the blueprint clearly *is* ready and the tag is stale.
 - **Removed or renamed Lean declaration**: blueprint must drop or
   rename the corresponding `\lean{...}` tag; otherwise
   `leanblueprint checkdecls` will fail.
+  If the renamed declaration is an open internal obligation with `sorry`, do
+  not demand that it be added to a source-labelled theorem block carrying
+  `\leanok`; require only a non-`\leanok` traceability entry when the
+  declaration is mathematically useful to mention.
 - **`\uses{...}` accuracy**: a proof's `\uses` must match the lemmas the
   Lean proof actually invokes. Do not list everything the statement
   mentions; do not omit lemmas the proof uses.

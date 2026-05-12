@@ -11,10 +11,11 @@ Instructions:
 
    - `sorry` left in proof: fully close the lemma/theorem — replace `sorry` with a complete proof. Do NOT leave `sorry` behind or add TODO comments as a workaround.
    - Paper-labelled theorem blocked by a missing proof: do NOT add bridge, residual,
-     repair, producer, package, hypotheses bundle, assumptions bundle, or
+     repair, package, proof-obligation input, hypotheses bundle, assumptions bundle, or
      arbitrary implication hypotheses that are absent
      from the cited statement.  If the source-faithful proof cannot be completed,
-     stop and comment on the PR with the missing named lemma or producer theorem.
+     stop and comment on the PR with the missing named lemma or internal
+     obligation to discharge.
    - Type mismatch: check expected vs actual types and fix the proof term.
    - Unknown identifier / import error: add the correct `import` statement.
    - Tactic failure: try alternative tactics (`simp`, `exact`, `apply`, `omega`, etc.).
@@ -31,13 +32,13 @@ Quality bar (same rubric as Claude Code Review — your fix MUST satisfy ALL of 
 - Proof correctness (BLOCKER): structured proofs, not brute-force `simp`/`omega`/`ring` chains. If a result looks wrong, too strong, or suspiciously general, scout `references/ldt-paper/` first, then `blueprint/src/chapter/`, compare hypotheses/conclusions, and cite the specific source path, label, and line.
 - Source-statement fidelity (BLOCKER): paper-labelled or blueprint-linked
   declarations must preserve the cited statement up to faithful formal encoding.
-  Do not add load-bearing bridge, residual, repair, producer, package,
+  Do not add load-bearing bridge, residual, repair, package, proof-obligation input,
   hypotheses bundle, assumptions bundle, or arbitrary implication hypotheses.
   The only acceptable extra hypotheses are
   boundary conditions genuinely needed to state the same mathematics in Lean,
   such as positivity for a division, nonemptiness, decidability, or a
   field-model instance. Proof-debt objects are not boundary conditions. If a
-  proof needs such data, report the missing named lemma or producer theorem
+  proof needs such data, report the missing named lemma or internal obligation
   instead of changing the paper theorem.
 - Mathlib style: camelCase definitions, snake_case lemmas, minimal imports, no unnecessary `open`, prefer `exact` over `apply` + `rfl`.
 - Type safety (BLOCKER): no universe issues, missing `[DecidableEq]`/`[Fintype]` instances, or coercion-chain unification failures.

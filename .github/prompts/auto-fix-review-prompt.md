@@ -11,12 +11,12 @@ Instructions:
 
    - Remove `sorry` and fully close the lemma/theorem with a complete proof. Do NOT leave `sorry` behind or replace it with another shortcut.
    - Do NOT close a proof obligation by changing a paper-labelled theorem statement or by
-     adding bridge, residual, repair, producer, package, hypotheses bundle,
+     adding bridge, residual, repair, package, proof-obligation input, hypotheses bundle,
      assumptions bundle, or arbitrary implication hypotheses that are not in the
      cited paper statement.
    - If a proof cannot be completed without such a statement change, stop and post a PR
-     comment identifying the missing named lemma or producer theorem instead of pushing a
-     weakened paper theorem.
+     comment identifying the missing named lemma or internal obligation instead of
+     pushing a weakened paper theorem.
    - Fix naming to match Mathlib conventions.
    - Add missing docstrings where requested.
    - Fix type mismatches or tactic failures.
@@ -48,7 +48,8 @@ Quality bar (same rubric as Claude Code Review — your fix MUST satisfy ALL of 
 - Proof correctness (BLOCKER): structured proofs, not brute-force `simp`/`omega`/`ring` chains. If a result looks wrong, too strong, or suspiciously general, scout `references/ldt-paper/` first, then `blueprint/src/chapter/`, compare hypotheses/conclusions, and cite the specific source path, label, and line.
 - Source-statement fidelity (BLOCKER): declarations named after paper results or
   linked by `\lean{...}` must preserve the cited statement up to faithful formal
-  encoding. Do not add load-bearing bridge, residual, repair, producer, package,
+  encoding. Do not add load-bearing bridge, residual, repair, package,
+  proof-obligation input,
   hypotheses bundle, assumptions bundle, or arbitrary implication hypotheses.
   The only acceptable extra hypotheses are
   boundary conditions genuinely needed to state the same mathematics in Lean,
