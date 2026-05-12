@@ -205,8 +205,9 @@ Before editing any theorem tagged with a paper label (`thm:*`, `lem:*`,
    mathematically useful, the source-faithful theorem remains visible, and the
    helper has a paper-gap note, a named construction theorem or
    proof-obligation target, and an explicit removal plan.  Its name must show
-   that it is conditional, for example `mainFormal_ofRepairedBridge`,
-   `mainFormal_assumingBridgeHypotheses`, or `conditional...`.
+   that it is conditional without making the assumption look like an acceptable
+   source hypothesis, for example `mainFormal_ofInternalObligations`,
+   `selfImprovementFromObligations`, or a name ending in `_ofObligations`.
 6. Do not point a source-labelled blueprint theorem to the conditional helper
    with `\leanok`.
 
@@ -441,8 +442,11 @@ without having read the agent conversation that produced the change.
 
 ### Paper-gap notes
 
-For documentation of discrepancies between the cited paper, the blueprint, and
-Lean, follow `docs/paper-gaps/policy.tex`. In particular, such notes should be
+For the proof-gap terminology used to distinguish source theorems, internal
+proof obligations, and conditional helpers, follow
+`docs/paper-gaps/proof-gap-protocol.tex`.  For documentation of discrepancies
+between the cited paper, the blueprint, and Lean, follow
+`docs/paper-gaps/policy.tex`. In particular, such notes should be
 mathematical prose for mathematicians and mathematical physicists who have not
 read the issue discussion: introduce notation, state the cited assertion,
 isolate the calculation or logical obstruction, compare with the blueprint and
@@ -605,6 +609,7 @@ Use this file together with:
 | `docs/blueprint_style_guide.md` | Blueprint notation and section conventions |
 | `docs/api_surface.md` | Useful obligation-closing lemmas for `SubMeas` |
 | `docs/paper-gaps/policy.tex` | Paper-gap documentation conventions |
+| `docs/paper-gaps/proof-gap-protocol.tex` | Protocol distinguishing source theorems, proof obligations, and conditional helpers |
 | `docs/formalization-patterns.md` | Conditional scaffolding, blueprint sync, split imports, and bridge records |
 | `docs/external-lemmas-pedagogy.md` | Pedagogical notes on Mathlib and external lemmas |
 | `docs/ci-automation.md` | CI/CD workflow details |

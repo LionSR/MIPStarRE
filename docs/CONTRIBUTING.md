@@ -133,6 +133,8 @@ If they are unavoidable while preserving downstream proof work, quarantine them
 in a separately named conditional helper, cite the paper-gap note or tracking
 issue, name the obligation discharger that must remove them, and keep the source
 theorem statement visible even if its proof contains a tracked `sorry`.
+For the terminology used here, see the proof-gap protocol in
+[paper-gaps/proof-gap-protocol.tex](paper-gaps/proof-gap-protocol.tex).
 
 Do not describe a mathematical issue only as a "cleanup", "follow-up", "blocked
 item", or "Phase N" problem. State the theorem, lemma, definition, or mismatch
@@ -406,7 +408,9 @@ Every PR touching Lean code should be reviewed against these criteria:
    sub-issue that tracks it.  For source-labelled theorems, the preferred repair
    is to extract any usable proof content into source-faithful lemmas and
    restore the paper-aligned statement, even if the remaining proof is a tracked
-   `sorry` during the cleanup.
+   `sorry` during the cleanup.  For source-labelled proof gaps, also use the
+   protocol in
+   [paper-gaps/proof-gap-protocol.tex](paper-gaps/proof-gap-protocol.tex).
 
 ### Semantic scaffold checklist (required for core math objects)
 
