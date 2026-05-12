@@ -122,7 +122,7 @@ For each new `.lean` file or significantly changed file, check if corresponding 
   the Lean declaration `X` exists, is fully proven (not `sorry`), and its
   public statement matches the cited paper or blueprint statement up to faithful
   boundary conditions. Do not count bridge, residual, repair, package,
-  producer, proof-obligation, hypotheses-bundle, assumptions-bundle, or
+  producer, proof-obligation input, hypotheses bundle, assumptions bundle, or
   arbitrary implication inputs as boundary conditions.
 - If a new Lean declaration matches a blueprint item that has no `\lean{}` yet, add the `\lean{NewDecl}` annotation.
 
