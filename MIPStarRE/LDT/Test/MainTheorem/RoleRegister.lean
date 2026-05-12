@@ -186,8 +186,8 @@ successor self-improvement obligations that are not derived from
 `references/ldt-paper/test_definition.tex:180-202` or the successor case of
 `thm:main-induction` (`references/ldt-paper/inductive_step.tex:441-551`).  This
 is tracked by #1035, #1036, #1363, and #1458.  Elimination: prove those inputs
-inside `mainFormalSuccessorProjectiveCompletionObligation` and keep this
-constructor only as the combination producing the role residual. -/
+inside the successor branch of `mainFormal` and keep this constructor only as
+the combination producing the role residual. -/
 noncomputable def ofSuccessorObligations
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -445,9 +445,9 @@ interfaces downstream.
 witnesses and answer-side Section 9 obligations that are not derived from
 `references/ldt-paper/test_definition.tex:180-202` or
 `references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by #1375,
-#1376, #1369, #1363, and #1458.  Elimination: prove those inputs inside
-`mainFormalSuccessorProjectiveCompletionObligation` and keep this constructor as
-the combination producing the role residual. -/
+#1376, #1369, #1363, and #1458.  Elimination: prove those inputs inside the
+successor branch of `mainFormal` and keep this constructor as the combination
+producing the role residual. -/
 noncomputable def ofAnswerSuccessorObligations
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

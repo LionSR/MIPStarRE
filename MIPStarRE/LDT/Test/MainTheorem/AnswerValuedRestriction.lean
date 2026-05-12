@@ -566,11 +566,12 @@ noncomputable def mainFormalSuccessorAnswerSelfImprovementObligation_ofObligatio
 answer-valued recursive slice witnesses and a self-improvement obligation that
 are not hypotheses of `thm:main-formal`
 (`references/ldt-paper/test_definition.tex:180-202`).  They must be produced
-inside `mainFormalSuccessorProjectiveCompletionObligation`, using the successor
-proof of `thm:main-induction`
+inside the proof of `mainFormal`, using the successor proof of
+`thm:main-induction`
 (`references/ldt-paper/inductive_step.tex:441-551`).  This is tracked by
 #1375, #1376, #1369, #1363, and #1458.  Elimination: prove the recursive-slice
-and self-improvement fields internally before invoking this boundary record. -/
+and self-improvement fields before using this boundary record in the
+successor branch of `mainFormal`. -/
 structure MainFormalSuccessorAnswerBoundary (params : Parameters)
     [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -619,9 +620,9 @@ recursion and restricted-strategy self-improvement inputs are supplied.
 slice data and a self-improvement obligation rather than deriving them from
 `references/ldt-paper/test_definition.tex:180-202` and
 `references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by #1375,
-#1376, #1369, #1363, and #1458.  Elimination: construct these inputs inside
-`mainFormalSuccessorProjectiveCompletionObligation` and use this constructor
-only after the inputs have been proved. -/
+#1376, #1369, #1363, and #1458.  Elimination: construct these inputs inside the
+successor branch of `mainFormal` and use this constructor only after the inputs
+have been proved. -/
 def mainFormalSuccessorAnswerBoundary_ofRecursiveSelfImprovement
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -738,10 +739,9 @@ answer-valued recursive slice witnesses and the slice-wise self-improvement
 obligation rather than deriving them from the hypotheses of `thm:main-formal`
 (`references/ldt-paper/test_definition.tex:180-202`) and the successor case of
 `thm:main-induction` (`references/ldt-paper/inductive_step.tex:441-551`).
-This is tracked by #1369, #1363, #1507, #1503, and #1458.  Elimination: prove
-`mainFormalSuccessorProjectiveCompletionObligation` from the paper hypotheses,
-constructing the answer-valued successor boundary internally before invoking
-this helper. -/
+This is tracked by #1369, #1363, #1507, #1503, and #1458.  Elimination:
+construct the answer-valued successor boundary from the paper hypotheses before
+invoking this helper in the proof of `mainFormal`. -/
 theorem mainFormalSuccessorAnswerMainInductionPublicWrapper
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

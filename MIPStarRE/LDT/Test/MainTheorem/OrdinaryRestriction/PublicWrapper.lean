@@ -33,10 +33,9 @@ witnesses and the slice-wise self-improvement obligation rather than deriving
 them from the hypotheses of `thm:main-formal`
 (`references/ldt-paper/test_definition.tex:180-202`) and the successor case of
 `thm:main-induction` (`references/ldt-paper/inductive_step.tex:441-551`).
-This is tracked by #1363, #1507, #1503, and #1458.  Elimination: prove
-`mainFormalSuccessorProjectiveCompletionObligation` from the paper hypotheses,
-constructing the ordinary successor boundary internally before invoking this
-wrapper. -/
+This is tracked by #1363, #1507, #1503, and #1458.  Elimination: construct the
+ordinary successor boundary from the paper hypotheses before invoking this
+wrapper in the proof of `mainFormal`. -/
 theorem mainFormalSuccessorMainInductionPublicWrapper
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

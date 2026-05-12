@@ -129,13 +129,15 @@
 	\end{enumerate}
 \end{theorem}
 
-\begin{remark}[Internal-obligation form of the soundness theorem]\label{rem:main-formal-conditional}
-	\lean{MIPStarRE.LDT.Test.mainFormal_ofInternalObligations}
+\begin{remark}[Residual form of the final transport]\label{rem:main-formal-conditional}
+	\lean{MIPStarRE.LDT.Test.mainFormal_ofProjectiveCompletionResidual}
 	\uses{thm:main-formal, def:low-individual-degree-test, def:projective-strategy, def:polymeasurements, def:simeq}
-	The internal-obligation theorem has the same public hypotheses and conclusion
-	as Theorem~\ref{thm:main-formal}.  Its proof body isolates the remaining base
-	and successor constructions as named internal obligations, rather than
-	adding bridge data to the theorem statement.
+	The residual theorem is a Lean-only formally verified final-transport result: once the
+	Section~6 role residual and the post-role projective-completion residual have
+	been constructed from the hypotheses of Theorem~\ref{thm:main-formal}, it
+	derives the three consistency conclusions of the theorem.  It is not a
+	replacement statement for Theorem~\ref{thm:main-formal}, and it supplies no
+	additional hypothesis to the paper theorem.
 \end{remark}
 
 \begin{remark}[$k$-bound boundary for the public theorem]\label{rem:main-formal-k-boundary}
