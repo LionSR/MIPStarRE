@@ -472,7 +472,7 @@ depends on admitted obligation declarations:
 `mainFormalBaseBranchCompletionObligations_ofBaseCase` for the base-case match-mass construction
 and `mainFormalSuccessorProjectiveCompletionObligation` for the successor
 projective-completion residual.  These are tracked proof obligations for
-#1043, #1359, and #1458; see also
+#1043, #1363, and #1458; see also
 `docs/paper-gaps/issue-1099-sharper-local-fix.tex` for the local repair used in
 the final completion transport.  They must be proved from the paper hypotheses,
 not turned into hypotheses of `mainFormal`.
@@ -595,7 +595,7 @@ Section 6 successor theorem rather than an additional mathematical restriction.
 whose proof uses the admitted obligation declarations
 `mainFormalBaseBranchCompletionObligations_ofBaseCase` and
 `mainFormalSuccessorProjectiveCompletionObligation`.  The remaining
-obligations are tracked by #1043, #1359, and #1458 and must be discharged inside
+obligations are tracked by #1043, #1363, and #1458 and must be discharged inside
 the proof, rather than exposed as extra non-paper assumptions.
 -/
 theorem mainFormal

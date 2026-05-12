@@ -20,7 +20,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-! ## Final-fields completeness construction (issue #931)
+/-! ## Final-fields completeness construction
 
 The reduced `FinalFieldsInput` lumps four distinct paper-side obligations into a
 single residual. The lemmas below isolate the **completeness** field, exposing
@@ -69,7 +69,7 @@ orthonormalization SDD step, for the `Unit`-indexed constant-family setting
 used by the self-improvement pipeline.
 
 This is the orthonormalization transport ingredient of the final-fields
-completeness construction for `thm:self-improvement` (issue #931). Given:
+completeness construction for `thm:self-improvement`. Given:
 
 * `hcomplete` — completeness of the *helper-stage* submeasurement `A` at level
   `m`, expressed as `subMeasMass ψ A.liftLeft ≥ m`. This is the still-missing
@@ -128,7 +128,7 @@ theorem completeness_transport_through_orthonormalization
   -- `htransfer : subMeasMass ψ A.liftLeft - δ - 2 √ε ≤ subMeasMass ψ B.liftLeft`
   linarith
 
-/-- Final-fields completeness construction (issue #931).
+/-- Final-fields completeness construction.
 
 Given the still-missing helper-stage completeness lower bound on `Hhat.liftLeft`
 together with the helper-stage strong self-consistency of `Hhat` and the

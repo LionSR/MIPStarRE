@@ -112,6 +112,9 @@ runs:
           '  intermediate result as a named obligation to be proved from those hypotheses,' \
           '  and leave that obligation explicit rather than adding it to the source' \
           '  theorem.' \
+          '- A source-aligned theorem with a tracked `sorry` in its proof is preferable' \
+          '  to a theorem whose public statement has been weakened by non-paper' \
+          '  assumptions.' \
           '- Do not introduce a new conditional helper merely to keep CI green. If an' \
           '  existing conditional helper is unavoidable for preserving downstream proof' \
           '  content, keep it separately named as conditional, keep it out of' \

@@ -21,7 +21,7 @@ paper-faithful pieces from `references/ldt-paper/orthonormalization.tex`:
 The split mirrors `MakingMeasurementsProjective.OrthonormalizationInput`, which
 is itself the structure left after `orthonormalizationMainLemma_local` was
 proved internally.  At present the spectral and repair pieces are still the
-opaque external inputs called out by the `#931` blocker; this file does *not*
+open Section 5 inputs tracked by #1515 and #1458; this file does *not*
 discharge them. It only narrows the missing proof obligations to the two
 constructive Section 5 witnesses, and any paper-facing theorem must obtain
 those witnesses from the source hypotheses before using this interface.
@@ -80,9 +80,9 @@ extra assumption.
   (`thm:orthonormalization`) for the overall theorem this obligation feeds.
 * `references/ldt-paper/self_improvement.tex` lines 679–697
   (helper output `\widehat{H}` is fed to `thm:orthonormalization`).
-* Issue `#931`, comment by `claude` (2026-05-02): the orthonormalization
-  obligation reduces to the two constructive Section 5 witnesses on
-  `optionCompletion Hhat`.
+* The current source-facing self-improvement tracker #1515: the
+  orthonormalization obligation reduces to the two constructive Section 5
+  witnesses on `optionCompletion Hhat`.
 -/
 
 namespace MIPStarRE.LDT.SelfImprovement
@@ -733,10 +733,10 @@ abbrev OrthonormalizationResidualDominationInput
 /-- Combine the spectral and repair slice obligations into a full
 `SelfImprovement.OrthonormalizationInput`.
 
-This is the narrowed bridge advertised by issue `#931`: it converts two
-independent paper-faithful slice obligations into the bundled input that the
-reduced self-improvement theorem expects.  No mathematical content is added or
-discharged here; the bridge is structural. -/
+This is the narrowed conditional interface used by the #1515 repair route: it
+converts two independent paper-faithful slice obligations into the bundled input
+that the reduced self-improvement theorem expects.  No mathematical content is
+added or discharged here; the interface is structural. -/
 def orthonormalizationInput_of_obligations
     {params : Parameters} [FieldModel params.q]
     {strategy : SymStrat params ι} {eps delta : Error}
