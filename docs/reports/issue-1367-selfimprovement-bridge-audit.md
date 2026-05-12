@@ -169,9 +169,12 @@ Same pattern but with `diagonalZeroCoord_eq` instead of `diagonalMeasurement_eq`
 **File:** `MIPStarRE/LDT/Test/MainTheorem/RoleRegister.lean`
 
 Complete wiring functions exist (all proved):
-- `successorOfObligations` (line 547): Takes `hrec` + `hbridge` → branch residual
+- `successorOfObligations` (line 547): takes `hrec` and the corresponding
+  self-improvement obligations to produce the branch residual
 - `answerSuccessorOfObligations` (line 582): Answer-valued counterpart
-- `answerSuccessorOfInductionPackageAndObligations` (line 628): Takes `PerSliceInductionPackage` + bridge → branch residual
+- `answerSuccessorOfInductionPackageAndObligations` (line 628): takes a
+  `PerSliceInductionPackage` and the corresponding obligations to produce the
+  branch residual
 - `rolePackageResidual_ofAnswerSuccessorObligations` (line 602): Wraps → `Nonempty (MainFormalRolePackageResidual)`
 
 These functions were not called from the older final assembly because the

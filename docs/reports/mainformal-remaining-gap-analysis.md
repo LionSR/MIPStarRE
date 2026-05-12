@@ -173,7 +173,7 @@ Historical rejected route: add parameters providing the predecessor induction
 data:
 
 ```lean
-(hanswerBridgeInputs : answerSuccessorSelfImprovementObligations (k := k) hpass hm_one_ne)
+(hanswerObligations : answerSuccessorSelfImprovementObligations (k := k) hpass hm_one_ne)
 (hinductionPackage : answerSuccessorPerSliceInductionPackageInput (k := k) hpass hm_one_ne)
 ```
 
@@ -193,7 +193,7 @@ The ordinary route needs:
 With construction theorems:
 ```lean
 MainFormalRolePackageBranchResidual.rolePackageResidual_ofSuccessorObligations
-  hpass hm1 hd hk0 hk hrec hbridge
+  hpass hm1 hd hk0 hk hrec obligations
 ```
 
 ### Which route is paper-faithful?
@@ -222,14 +222,14 @@ dischargers are not yet constructed.
 
 **Why blocked:** `mainFormal` lacks the successor induction hypotheses needed to invoke any of the existing successor role-residual constructors.
 
-**Resolution options:**
-- **(a, historical)** Add `answerSuccessorPerSliceInductionPackageInput` and
-  `answerSuccessorSelfImprovementObligations` as additional hypotheses to
-  `mainFormal`.  This route is no longer acceptable for the source-facing
-  theorem; the same data must be produced internally or isolated in a conditional
-  helper.
-- **(b)** Embed `mainFormal` in a recursive induction that provides these from an outer induction hypothesis
-- **(c)** Add `successorRecursiveSlicesInput` and `successorSelfImprovementObligations` as hypotheses and use the ordinary successor route
+**Resolution:** prove the recursive induction data and the corresponding
+self-improvement obligations inside the `mainFormal` proof, for example by
+embedding the final theorem in a recursion that supplies them from the
+predecessor induction hypothesis.  Adding
+`answerSuccessorPerSliceInductionPackageInput`,
+`answerSuccessorSelfImprovementObligations`, `successorRecursiveSlicesInput`, or
+`successorSelfImprovementObligations` to the public `mainFormal` statement is
+the rejected historical route, not an acceptable repair.
 
 **Tracked by:** #931 (successor-obligations), #834 (remaining witness residual), #422 (main-formal completion epic)
 

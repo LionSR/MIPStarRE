@@ -160,10 +160,10 @@ Both are type aliases for `Prop`-valued functions asking for:
 
 The assembly functions in `RoleRegister.lean` are all ready:
 
-- `successorOfObligations` (line 538) — takes `hrec` + `hbridge` →
+- `successorOfObligations` (line 538) — takes `hrec` + `obligations` →
   `MainFormalRolePackageBranchResidual.successor`
 - `answerSuccessorOfInductionPackageAndObligations` (line 628) — takes
-  `hinduction` + `hbridge` → `MainFormalRolePackageBranchResidual.answerSuccessor`
+  `hinduction` + `obligations` → `MainFormalRolePackageBranchResidual.answerSuccessor`
 - Their corresponding `rolePackageResidual_of*` wrappers produce
   `MainFormalRolePackageResidual`
 
@@ -323,11 +323,12 @@ by additional hypotheses:
 
 ### Is the architecture broken?
 
-The architecture is usable but incomplete.  The wiring functions from
-`RoleRegister.lean` describe the intended assembly, and conditional helpers are
-legitimate local proof-frontier objects.  The source theorem itself, however,
+The architecture is usable but incomplete.  The assembly functions from
+`RoleRegister.lean` describe the intended construction.  A conditional helper is
+acceptable only as an explicitly named proof-frontier object with a discharge
+plan; it must not be advertised as the paper theorem.  The source theorem itself
 must not acquire non-paper bridge hypotheses.  What remains missing is an
-internal proof that supplies the conditional inputs from the paper hypotheses.
+internal proof that supplies these inputs from the paper hypotheses.
 
 ### What would close the gap?
 
