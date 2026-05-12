@@ -14,7 +14,10 @@ hypotheses are boundary conditions genuinely needed to state the same
 mathematics in Lean, such as positivity for a division, nonemptiness,
 decidability, or a field-model instance. Proof-debt objects are not boundary
 conditions. Do not introduce a new conditional helper, proof-debt bundle,
-producer, or obligation package merely to keep the branch compiling; report the
-missing source-faithful lemma or internal obligation instead.
+producer, or obligation package merely to keep the branch compiling. If the
+source-faithful proof is not available, keep the paper statement intact and
+leave the missing proof as a tracked `sorry`; a separately named target is
+acceptable only when it is itself a theorem to prove from the paper hypotheses,
+not a hypothesis bundle consumed downstream.
 Validate all changes with `lake build` before committing. Use GitHub MCP tools
 (`mcp__github__*`) to comment on the PR with a summary of your fix.

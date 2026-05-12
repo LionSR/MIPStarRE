@@ -34,8 +34,9 @@ that determines whether the PR can be approved with outstanding issues.
    mathematics, such as positivity, nonemptiness, decidability, or field-model hypotheses.
    Proof-debt bundles are not boundary conditions.
    If such data are still needed, the paper theorem must remain source-faithful and the
-   missing fact should be exposed as a separately named internal obligation, lemma target,
-   or paper-gap report.  Do not accept a conditional helper as the default repair path.
+   missing proof should remain as a tracked `sorry`, a source-faithful lemma target to be
+   proved from the same hypotheses, or a paper-gap report.  Do not accept a conditional
+   helper as the default repair path.
    Existing conditional helpers must have names that make the conditional nature clear,
    cite the unresolved source obligation, state a removal plan, and must not be treated as
    the paper theorem or advertised by `\leanok`.

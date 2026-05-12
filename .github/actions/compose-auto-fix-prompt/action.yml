@@ -108,10 +108,11 @@ runs:
           '  version of the paper theorem, do not mark the unrestricted source label' \
           '  with `\leanok`; put the restricted statement in a separate entry whose' \
           '  extra assumptions are stated explicitly.' \
-          '- If the proof cannot be closed from the paper hypotheses, state the missing' \
-          '  intermediate result as a named obligation to be proved from those hypotheses,' \
-          '  and leave that obligation explicit rather than adding it to the source' \
-          '  theorem.' \
+          '- If the proof cannot be closed from the paper hypotheses, keep the source' \
+          '  theorem statement paper-aligned and leave the missing proof as a tracked' \
+          '  `sorry`. A separately named target is allowed only when it is a theorem' \
+          '  to be proved from the same source hypotheses, not a bundled hypothesis' \
+          '  consumed by downstream code.' \
           '- A source-aligned theorem with a tracked `sorry` in its proof is preferable' \
           '  to a theorem whose public statement has been weakened by non-paper' \
           '  assumptions.' \

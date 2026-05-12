@@ -156,22 +156,24 @@ def MainFormalSuccessorSelfImprovementObligation (params : Parameters)
       strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
       hrestrict hinduction
 
-/-- Successor-case obligation structure for the restricted-strategy
+/-- Successor-case structural input for the restricted-strategy
 self-improvement obligation.
 
 For each possible per-slice induction package, this asks for the narrow
 `SelfImprovementPackage.SliceObligations` assumptions: honest per-slice
-`SymStrat`s, equality transports to the restricted-slice interfaces, and the
-remaining Section 9 obligations for those honest slice strategies.
+`SymStrat`s and equality transports to the restricted-slice interfaces.  It no
+longer carries Section 9 proof-obligation bundles; those are represented by the
+tracked proof gap in `selfImprovementInInductionSection`.
 
-**Unfaithful:** this obligation type records slice-wise Section 9 data that is
-not yet derived from the successor case of `thm:main-formal`
+**Unfaithful:** this obligation type records the honest restricted-slice
+strategies and transport data that are not yet derived from the successor case
+of `thm:main-formal`
 (`references/ldt-paper/test_definition.tex:180-202`) and
 `thm:main-induction` (`references/ldt-paper/inductive_step.tex:441-551`).
 This is tracked by #1036, #1503, #1515, #1363, and #1458.  Elimination: prove
-the honest restricted-slice strategies and their Section 9 obligations from the
-paper hypotheses, then use this type only as an internal package consumed by the
-successor proof. -/
+the honest restricted-slice strategies from the paper hypotheses and discharge
+the source-facing self-improvement theorem, then use this type only as an
+internal package consumed by the successor proof. -/
 def MainFormalSuccessorSelfImprovementObligations (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -206,17 +208,17 @@ abbrev MainFormalSuccessorSelfImprovementInductionPackage (params : Parameters)
   MainInductionStep.PerSliceInductionPackage params
     strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) hrestrict k
 
-/-- Assemble ordinary successor self-improvement obligations from honest slice
-strategies, measurement transports, and the remaining Section 9 obligations.
+/-- Assemble ordinary successor self-improvement inputs from honest slice
+strategies and measurement transports.
 
-**Unfaithful:** this helper assumes the honest slice strategies, measurement
-transport equalities, and `SelfImprovementObligations` for each restricted
-slice, rather than deriving them from
+**Unfaithful:** this helper assumes the honest slice strategies and measurement
+transport equalities for each restricted slice, rather than deriving them from
 `references/ldt-paper/inductive_step.tex:441-551` and
-`references/ldt-paper/self_improvement.tex:628-770`.  This is tracked by
-#1036, #1503, #1515, and #1458.  Elimination: prove those slice strategies and
-Section 9 obligations from the paper hypotheses, then keep this declaration as
-a structural constructor only. -/
+`references/ldt-paper/self_improvement.tex:628-770`.  The Section 9 analytic
+gap is centralized in the source-facing `selfImprovementInInductionSection`.
+This is tracked by #1036, #1503, #1515, and #1458.  Elimination: prove those
+slice strategies from the paper hypotheses, then keep this declaration as a
+structural constructor only. -/
 noncomputable def mainFormalSuccessorSelfImprovementObligations_ofMeasurementEq
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -246,15 +248,7 @@ noncomputable def mainFormalSuccessorSelfImprovementObligations_ofMeasurementEq
       ∀ hinduction x,
         (sliceStrategy hinduction x).diagonalMeasurement.toIdxProjMeas =
           (MainInductionStep.xRestrictedStrategy params
-            strategy.strategySymmetrization x).diagonalMeasurement)
-    (obligations :
-      ∀ hinduction x,
-        SelfImprovement.SelfImprovementObligations params (sliceStrategy hinduction x)
-          ((mainFormalSuccessorRestrictionPackage params strategy eps hpass
-            haxisWeightedBound hdiagonalWeightedBound).profile.axisParallel x)
-          ((mainFormalSuccessorRestrictionPackage params strategy eps hpass
-            haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x)
-          (hinduction.sliceError x)) :
+            strategy.strategySymmetrization x).diagonalMeasurement) :
     MainFormalSuccessorSelfImprovementObligations params strategy eps hpass k
       haxisWeightedBound hdiagonalWeightedBound := by
   let hrestrict :=
@@ -266,87 +260,7 @@ noncomputable def mainFormalSuccessorSelfImprovementObligations_ofMeasurementEq
       params strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
       hrestrict hinduction (sliceStrategy hinduction) (state_eq hinduction)
       (pointMeasurement_eq hinduction) (axisParallelMeasurement_eq hinduction)
-      (diagonalMeasurement_eq hinduction) (obligations hinduction)
-
-/-- Assemble ordinary successor self-improvement obligations from the three
-named Section 9 inputs, using the closed spectral truncation input for the
-orthonormalization stage.
-
-**Unfaithful:** this helper assumes helper strong self-consistency,
-orthonormalization repair, and final-fields inputs for every restricted slice;
-these are not derived here from `references/ldt-paper/self_improvement.tex:628-770`
-or the successor induction proof in
-`references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by #1036,
-#1514, #1515, #1503, and #1458.  Elimination: discharge the Section 9
-obligations for the restricted slices and use this declaration only to combine
-those proved inputs. -/
-noncomputable def mainFormalSuccessorSelfImprovementObligations_ofOrthonormalizationRepair
-    (params : Parameters) [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
-    (haxisWeightedBound : MainFormalSuccessorAxisWeightedBound params strategy eps)
-    (hdiagonalWeightedBound :
-      MainFormalSuccessorDiagonalWeightedBound params strategy eps)
-    (sliceStrategy :
-      MainFormalSuccessorSelfImprovementInductionPackage params strategy eps hpass k
-        haxisWeightedBound hdiagonalWeightedBound →
-        Fq params → SymStrat params (Role × ι))
-    (state_eq :
-      ∀ hinduction x, (sliceStrategy hinduction x).state =
-        strategy.strategySymmetrization.state)
-    (pointMeasurement_eq :
-      ∀ hinduction x,
-        (sliceStrategy hinduction x).pointMeasurement =
-          (MainInductionStep.xRestrictedStrategy params
-            strategy.strategySymmetrization x).pointMeasurement)
-    (axisParallelMeasurement_eq :
-      ∀ hinduction x,
-        (sliceStrategy hinduction x).axisParallelMeasurement.toIdxProjMeas =
-          (MainInductionStep.xRestrictedStrategy params
-            strategy.strategySymmetrization x).axisParallelMeasurement.toIdxProjMeas)
-    (diagonalMeasurement_eq :
-      ∀ hinduction x,
-        (sliceStrategy hinduction x).diagonalMeasurement.toIdxProjMeas =
-          (MainInductionStep.xRestrictedStrategy params
-            strategy.strategySymmetrization x).diagonalMeasurement)
-    (helperStrongSelfConsistency :
-      ∀ hinduction x,
-        SelfImprovement.HelperStrongSelfConsistencyInput params
-          (sliceStrategy hinduction x)
-          ((mainFormalSuccessorRestrictionPackage params strategy eps hpass
-            haxisWeightedBound hdiagonalWeightedBound).profile.axisParallel x)
-          ((mainFormalSuccessorRestrictionPackage params strategy eps hpass
-            haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x))
-    (repair :
-      ∀ hinduction x,
-        SelfImprovement.OrthonormalizationRepairObligation params
-          (sliceStrategy hinduction x)
-          ((mainFormalSuccessorRestrictionPackage params strategy eps hpass
-            haxisWeightedBound hdiagonalWeightedBound).profile.axisParallel x)
-          ((mainFormalSuccessorRestrictionPackage params strategy eps hpass
-            haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x))
-    (finalFields :
-      ∀ hinduction x,
-        SelfImprovement.FinalFieldsInput params (sliceStrategy hinduction x)
-          ((mainFormalSuccessorRestrictionPackage params strategy eps hpass
-            haxisWeightedBound hdiagonalWeightedBound).profile.axisParallel x)
-          ((mainFormalSuccessorRestrictionPackage params strategy eps hpass
-            haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x)
-          (hinduction.sliceError x)) :
-    MainFormalSuccessorSelfImprovementObligations params strategy eps hpass k
-      haxisWeightedBound hdiagonalWeightedBound := by
-  let hrestrict :=
-    mainFormalSuccessorRestrictionPackage params strategy eps hpass
-      haxisWeightedBound hdiagonalWeightedBound
-  intro hinduction
-  exact
-    MainInductionStep.SelfImprovementPackage.SliceObligations.ofOrthonormalizationRepair
-      params strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
-      hrestrict hinduction (sliceStrategy hinduction) (state_eq hinduction)
-      (pointMeasurement_eq hinduction) (axisParallelMeasurement_eq hinduction)
-      (diagonalMeasurement_eq hinduction) (helperStrongSelfConsistency hinduction)
-      (repair hinduction) (finalFields hinduction)
+      (diagonalMeasurement_eq hinduction)
 
 /-- Convert successor-case obligations into the self-improvement obligation
 expected by the public Section 6 boundary.
@@ -355,11 +269,11 @@ This does not discharge the obligation fields; it only combines them into the
 existing `MainFormalSuccessorSelfImprovementObligation` API.
 
 **Unfaithful:** this helper consumes
-`MainFormalSuccessorSelfImprovementObligations`, whose load-bearing Section 9
-fields are not derived from the cited successor proof
+`MainFormalSuccessorSelfImprovementObligations`, whose restricted-slice
+strategy and transport fields are not derived from the cited successor proof
 (`references/ldt-paper/inductive_step.tex:441-551`).  This is tracked by
-#1036, #1503, #1515, and #1458.  Elimination: prove those obligations from the
-paper hypotheses and retain this as a technical conversion. -/
+#1036, #1503, #1515, and #1458.  Elimination: prove those structural slice
+inputs from the paper hypotheses and retain this as a technical conversion. -/
 noncomputable def mainFormalSuccessorSelfImprovementObligation_ofObligations
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

@@ -13,7 +13,8 @@ answer-valued successor
 boundary (`MainFormalSuccessorAnswerBoundary`), recursive slice data
 (`MainFormalSuccessorAnswerRecursiveSliceData`), per-slice self-improvement
 obligations (`MainFormalSuccessorAnswerSelfImprovementObligation`), and the
-corresponding obligations (`MainFormalSuccessorAnswerSelfImprovementObligations`).
+corresponding structural inputs
+(`MainFormalSuccessorAnswerSelfImprovementObligations`).
 The central public theorem
 `mainFormalSuccessorAnswerMainInductionPublicWrapper` converts a bundle of
 predecessor answer-sided Section 6 inputs, together with the
@@ -328,20 +329,23 @@ def MainFormalSuccessorAnswerSelfImprovementObligation (params : Parameters)
       strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
       hrestrict hinduction
 
-/-- Answer-valued successor-case obligations for the restricted-strategy
+/-- Answer-valued successor-case structural inputs for the restricted-strategy
 self-improvement obligation.
 
 This is the answer-register counterpart of
 `MainFormalSuccessorSelfImprovementObligations`: for each possible answer-side
 per-slice induction package, the proof supplies the narrow
-`AnswerSelfImprovementPackage.SliceObligations` assumptions.
+`AnswerSelfImprovementPackage.SliceObligations` assumptions.  It no longer
+carries Section 9 proof-obligation bundles; those are represented by the
+tracked proof gap in `selfImprovementInInductionSection`.
 
-**Unfaithful:** this obligation type records answer-side per-slice Section 9
+**Unfaithful:** this obligation type records answer-side per-slice structural
 data that is not yet derived from the successor proof of `thm:main-formal`
 (`references/ldt-paper/test_definition.tex:180-202`) and
 `thm:main-induction` (`references/ldt-paper/inductive_step.tex:441-551`).
 This is tracked by #1376, #1369, #1503, #1515, and #1458.  Elimination:
-prove the answer-valued slice obligations from the paper hypotheses, then use
+prove the answer-valued slice strategies and transports from the paper
+hypotheses and discharge the source-facing self-improvement theorem, then use
 this type only as an internal package consumed by the successor proof. -/
 def MainFormalSuccessorAnswerSelfImprovementObligations (params : Parameters)
     [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -378,18 +382,17 @@ abbrev MainFormalSuccessorAnswerSelfImprovementInductionPackage (params : Parame
   MainInductionStep.AnswerPerSliceInductionPackage params
     strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) hrestrict k
 
-/-- Assemble answer-valued successor self-improvement obligations from honest
-slice strategies, verifier-visible measurement transports, and the remaining
-Section 9 obligations.
+/-- Assemble answer-valued successor self-improvement inputs from honest slice
+strategies and verifier-visible measurement transports.
 
-**Unfaithful:** this helper assumes honest answer-valued slice strategies,
-measurement transport fields, and `SelfImprovementObligations` for each slice,
-rather than deriving them from
+**Unfaithful:** this helper assumes honest answer-valued slice strategies and
+measurement transport fields for each slice, rather than deriving them from
 `references/ldt-paper/inductive_step.tex:441-551` and
-`references/ldt-paper/self_improvement.tex:628-770`.  This is tracked by
-#1375, #1376, #1369, #1503, #1515, and #1458.  Elimination: prove those
-slice strategies and Section 9 obligations from the paper hypotheses, then use
-this declaration only to record their combination. -/
+`references/ldt-paper/self_improvement.tex:628-770`.  The Section 9 analytic
+gap is centralized in the source-facing `selfImprovementInInductionSection`.
+This is tracked by #1375, #1376, #1369, #1503, #1515, and #1458.  Elimination:
+prove those slice strategies from the paper hypotheses, then use this
+declaration only to record their combination. -/
 noncomputable def mainFormalSuccessorAnswerSelfImprovementObligations_ofMeasurementEq
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -423,15 +426,7 @@ noncomputable def mainFormalSuccessorAnswerSelfImprovementObligations_ofMeasurem
           postprocess
             (((MainInductionStep.xRestrictedAnswerSymStrat params
               strategy.strategySymmetrization x).diagonalMeasurement.toIdxProjMeas ℓ).toSubMeas)
-            (fun f : DiagonalLineAnswer params => f zeroCoord))
-    (obligations :
-      ∀ hinduction x,
-        SelfImprovement.SelfImprovementObligations params (sliceStrategy hinduction x)
-          ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
-            haxisWeightedBound hdiagonalWeightedBound).profile.axisParallel x)
-          ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
-            haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x)
-          (hinduction.sliceError x)) :
+            (fun f : DiagonalLineAnswer params => f zeroCoord)) :
     MainFormalSuccessorAnswerSelfImprovementObligations params strategy eps hpass k
       haxisWeightedBound hdiagonalWeightedBound := by
   let hrestrict :=
@@ -443,101 +438,19 @@ noncomputable def mainFormalSuccessorAnswerSelfImprovementObligations_ofMeasurem
       params strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
       hrestrict hinduction (sliceStrategy hinduction) (state_eq hinduction)
       (pointMeasurement_eq hinduction) (axisParallelMeasurement_eq hinduction)
-      (diagonalZeroCoord_eq hinduction) (obligations hinduction)
-
-/-- Assemble answer-valued successor self-improvement obligations from the
-three named Section 9 inputs, using the closed spectral truncation input for
-the orthonormalization stage.
-
-**Unfaithful:** this helper assumes helper strong self-consistency,
-orthonormalization repair, and final-fields inputs for every answer-valued
-restricted slice; these are not derived here from
-`references/ldt-paper/self_improvement.tex:628-770` or the successor induction
-proof in `references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by
-#1376, #1514, #1515, #1503, and #1458.  Elimination: discharge the answer-side
-Section 9 obligations and use this declaration only to combine those proved
-inputs. -/
-noncomputable def mainFormalSuccessorAnswerSelfImprovementObligations_ofOrthonormalizationRepair
-    (params : Parameters) [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
-    (haxisWeightedBound : MainFormalSuccessorAnswerAxisWeightedBound params strategy eps)
-    (hdiagonalWeightedBound :
-      MainFormalSuccessorAnswerDiagonalWeightedBound params strategy eps)
-    (sliceStrategy :
-      MainFormalSuccessorAnswerSelfImprovementInductionPackage params strategy eps hpass k
-        haxisWeightedBound hdiagonalWeightedBound →
-        Fq params → SymStrat params (Role × ι))
-    (state_eq :
-      ∀ hinduction x, (sliceStrategy hinduction x).state =
-        strategy.strategySymmetrization.state)
-    (pointMeasurement_eq :
-      ∀ hinduction x,
-        (sliceStrategy hinduction x).pointMeasurement =
-          (MainInductionStep.xRestrictedAnswerSymStrat params
-            strategy.strategySymmetrization x).pointMeasurement)
-    (axisParallelMeasurement_eq :
-      ∀ hinduction x,
-        (sliceStrategy hinduction x).axisParallelMeasurement.toIdxProjMeas =
-          (MainInductionStep.xRestrictedAnswerSymStrat params
-            strategy.strategySymmetrization x).axisParallelMeasurement.toIdxProjMeas)
-    (diagonalZeroCoord_eq :
-      ∀ hinduction x ℓ,
-        postprocess
-            (((sliceStrategy hinduction x).diagonalMeasurement.toIdxProjMeas ℓ).toSubMeas)
-            (fun f : DiagonalLinePolynomial params => f zeroCoord) =
-          postprocess
-            (((MainInductionStep.xRestrictedAnswerSymStrat params
-              strategy.strategySymmetrization x).diagonalMeasurement.toIdxProjMeas ℓ).toSubMeas)
-            (fun f : DiagonalLineAnswer params => f zeroCoord))
-    (helperStrongSelfConsistency :
-      ∀ hinduction x,
-        SelfImprovement.HelperStrongSelfConsistencyInput params
-          (sliceStrategy hinduction x)
-          ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
-            haxisWeightedBound hdiagonalWeightedBound).profile.axisParallel x)
-          ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
-            haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x))
-    (repair :
-      ∀ hinduction x,
-        SelfImprovement.OrthonormalizationRepairObligation params
-          (sliceStrategy hinduction x)
-          ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
-            haxisWeightedBound hdiagonalWeightedBound).profile.axisParallel x)
-          ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
-            haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x))
-    (finalFields :
-      ∀ hinduction x,
-        SelfImprovement.FinalFieldsInput params (sliceStrategy hinduction x)
-          ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
-            haxisWeightedBound hdiagonalWeightedBound).profile.axisParallel x)
-          ((mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
-            haxisWeightedBound hdiagonalWeightedBound).profile.selfConsistency x)
-          (hinduction.sliceError x)) :
-    MainFormalSuccessorAnswerSelfImprovementObligations params strategy eps hpass k
-      haxisWeightedBound hdiagonalWeightedBound := by
-  let hrestrict :=
-    mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
-      haxisWeightedBound hdiagonalWeightedBound
-  intro hinduction
-  exact
-    MainInductionStep.AnswerSelfImprovementPackage.SliceObligations.ofOrthonormalizationRepair
-      params strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
-      hrestrict hinduction (sliceStrategy hinduction) (state_eq hinduction)
-      (pointMeasurement_eq hinduction) (axisParallelMeasurement_eq hinduction)
-      (diagonalZeroCoord_eq hinduction) (helperStrongSelfConsistency hinduction)
-      (repair hinduction) (finalFields hinduction)
+      (diagonalZeroCoord_eq hinduction)
 
 /-- Convert answer-valued successor-case obligations into the self-improvement
 obligation expected by the public answer-valued Section 6 boundary.
 
 **Unfaithful:** this helper consumes
 `MainFormalSuccessorAnswerSelfImprovementObligations`, whose answer-side
-Section 9 fields are not derived from the cited successor proof
+restricted-slice strategy and transport fields are not derived from the cited
+successor proof
 (`references/ldt-paper/inductive_step.tex:441-551`).  This is tracked by
-#1376, #1369, #1503, #1515, and #1458.  Elimination: prove those obligations
-from the paper hypotheses and retain this as a technical conversion. -/
+#1376, #1369, #1503, #1515, and #1458.  Elimination: prove those structural
+slice inputs from the paper hypotheses and retain this as a technical
+conversion. -/
 noncomputable def mainFormalSuccessorAnswerSelfImprovementObligation_ofObligations
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -648,17 +561,17 @@ already constructed self-improvement obligation.
 
 This is the answer-register counterpart of
 `mainFormalSuccessorBoundary_ofObligations`: it sends the answer-valued
-per-slice Section 9 obligations through
+per-slice restricted-strategy transport data through
 `mainFormalSuccessorAnswerSelfImprovementObligation_ofObligations` and combines
 that obligation with the recursive slice witnesses and the weighted
 restricted-probability fields.
 
 **Unfaithful:** this constructor assumes recursive slice witnesses and
-answer-side per-slice Section 9 obligations, rather than deriving them from
+answer-side per-slice restricted-strategy transport data, rather than deriving them from
 `references/ldt-paper/test_definition.tex:180-202` and
 `references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by #1375,
 #1376, #1369, #1363, and #1458.  Elimination: prove the answer-valued
-predecessor induction data and the Section 9 slice obligations inside the
+predecessor induction data and the restricted-slice transports inside the
 successor proof, then use this declaration only to record their combination. -/
 noncomputable def mainFormalSuccessorAnswerBoundary_ofObligations
     (params : Parameters) [FieldModel.{0} params.q]

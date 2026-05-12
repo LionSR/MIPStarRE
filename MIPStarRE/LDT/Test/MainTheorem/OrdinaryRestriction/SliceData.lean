@@ -352,8 +352,8 @@ theorem mainFormalSuccessorRecursiveSlices_ofSliceData
 /-- Build the successor boundary from obligations instead of the
 already constructed self-improvement obligation.
 
-This is the public-facing constructor for issue #1020: it wires the
-honest per-slice Section 9 obligations through the existing
+This is the public-facing constructor for issue #1020: it wires the honest
+per-slice restricted-strategy transport data through the existing
 `mainFormalSuccessorSelfImprovementObligation_ofObligations` conversion and
 records them together with the weighted restricted-probability fields and
 the recursive slice witnesses into a `MainFormalSuccessorBoundary`.
@@ -367,7 +367,7 @@ per-slice self-improvement obligations, rather than deriving them from
 `references/ldt-paper/test_definition.tex:180-202` and
 `references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by #1035,
 #1036, #1363, and #1458.  Elimination: prove the recursive predecessor
-induction data and the Section 9 slice obligations inside the successor branch
+induction data and the restricted-slice transports inside the successor branch
 of `mainFormal`, then use this declaration only to record their combination. -/
 noncomputable def mainFormalSuccessorBoundary_ofObligations
     (params : Parameters) [FieldModel params.q]
@@ -392,7 +392,7 @@ noncomputable def mainFormalSuccessorBoundary_ofObligations
         axisBound diagonalBound obligations }
 
 /-- Build the successor boundary from an explicit predecessor induction
-hypothesis and the Section 9 obligations.
+hypothesis and the restricted-slice structural inputs.
 
 The predecessor hypothesis is stated at the exact Section 6 strength consumed by
 `MainFormalSuccessorRecursiveSlices`: for each restricted slice it supplies a
@@ -402,11 +402,11 @@ slice witnesses across `MainFormalSuccessorRecursiveSliceData` and then reuses
 `mainFormalSuccessorBoundary_ofObligations`.
 
 **Unfaithful:** this helper assumes the predecessor induction witnesses,
-same-space slice data, and per-slice Section 9 obligations, none of which are
+same-space slice data, and restricted-slice transport data, none of which are
 hypotheses of `thm:main-formal`
 (`references/ldt-paper/test_definition.tex:180-202`).  This is tracked by
 #1035, #1036, #1363, and #1458.  Elimination: derive the predecessor witnesses
-and slice obligations from the successor proof of `thm:main-induction`
+and slice transports from the successor proof of `thm:main-induction`
 (`references/ldt-paper/inductive_step.tex:441-551`) before using this transport
 helper. -/
 noncomputable def mainFormalSuccessorBoundary_ofPredecessorInduction

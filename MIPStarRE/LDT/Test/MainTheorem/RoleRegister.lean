@@ -98,7 +98,7 @@ private abbrev successorRecursiveSlicesInput
 and `references/ldt-paper/self_improvement.tex:628-770`
 (`\label{thm:self-improvement}`).
 
-Type of self-improvement obligations for the predecessor determined by a
+Type of self-improvement structural inputs for the predecessor determined by a
 non-base current parameter choice. -/
 private abbrev successorSelfImprovementObligations
     {params : Parameters} [FieldModel.{0} params.q]
@@ -288,12 +288,12 @@ private abbrev answerSuccessorSelfImprovementInput
 and `references/ldt-paper/self_improvement.tex:628-770`
 (`\label{thm:self-improvement}`).
 
-Type of answer-valued self-improvement obligations for the predecessor
+Type of answer-valued self-improvement structural inputs for the predecessor
 determined by a non-base current parameter choice.
 
 This is the load-bearing companion to `answerSuccessorSelfImprovementInput`: it
-supplies exactly the per-slice Section 9 obligations, and its conversion into a
-self-improvement obligation is performed internally by the
+supplies exactly the per-slice restricted-strategy transport data, and its
+conversion into a self-improvement obligation is performed internally by the
 `MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorObligations`
 constructor below. -/
 private abbrev answerSuccessorSelfImprovementObligations
@@ -430,11 +430,11 @@ noncomputable def ofAnswerSuccessorRecursiveSelfImprovement
 /-- Assemble the answer-valued successor role residual from recursive
 answer slices and answer-side self-improvement obligations.
 
-This is the obligations counterpart of
+This is the structural-input counterpart of
 `ofAnswerSuccessorRecursiveSelfImprovement` and the answer-side counterpart of
 `MainFormalRolePackageSuccessorResidual.ofSuccessorObligations`.  Instead of an
 already-built self-improvement obligation the proof supplies the per-slice
-Section 9 obligations, which is converted internally through
+restricted-strategy transport data, which is converted internally through
 `mainFormalSuccessorAnswerSelfImprovementObligation_ofObligations` and
 `mainFormalSuccessorAnswerBoundary_ofObligations`.  This combines the
 answer-side translations merged in #1062–#1069 into a single Test-level constructor
@@ -442,7 +442,7 @@ that does not call `mainFormal` and leaves the line-130 completion and line-169
 interfaces downstream.
 
 **Unfaithful:** this constructor assumes answer-valued recursive slice
-witnesses and answer-side Section 9 obligations that are not derived from
+witnesses and answer-side restricted-slice transport data that are not derived from
 `references/ldt-paper/test_definition.tex:180-202` or
 `references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by #1375,
 #1376, #1369, #1363, and #1458.  Elimination: prove those inputs inside the
@@ -475,10 +475,10 @@ noncomputable def ofAnswerSuccessorObligations
 
 /-- Assemble the answer-valued successor role residual from a
 predecessor `AnswerPerSliceInductionPackage` and answer-side self-improvement
-obligations.
+structural inputs.
 
 This translation route starts from a predecessor per-slice induction
-hypothesis together with the Section 9 obligations on the answer side.  It
+hypothesis together with the restricted-slice transport data on the answer side.  It
 composes `mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage` (which
 produces the recursive slice witnesses from the per-slice induction record)
 with `ofAnswerSuccessorObligations`.  Like the other constructors in this
@@ -488,12 +488,12 @@ new analytic step, and leaves downstream completion and line-169 interfaces
 untouched.
 
 **Unfaithful:** this translation assumes a predecessor
-`AnswerPerSliceInductionPackage` and answer-side Section 9 obligations, rather
-than deriving them from the successor proof of `thm:main-formal`
+`AnswerPerSliceInductionPackage` and answer-side restricted-slice transport
+data, rather than deriving them from the successor proof of `thm:main-formal`
 (`references/ldt-paper/test_definition.tex:180-202`) and `thm:main-induction`
 (`references/ldt-paper/inductive_step.tex:441-551`).  This is tracked by
 #1375, #1376, #1369, #1363, and #1458.  Elimination: derive the predecessor
-induction package and slice obligations internally, then retain this declaration
+induction package and slice transports internally, then retain this declaration
 as a translation. -/
 noncomputable def ofAnswerSuccessorInductionPackageAndObligations
     {params : Parameters} [FieldModel.{0} params.q]
@@ -673,13 +673,13 @@ self-improvement obligations.
 
 This is the answer-register counterpart of `successorOfObligations`: it
 records the answer-valued recursive slice witnesses and the matching
-per-slice Section 9 obligations through
+per-slice restricted-strategy transport data through
 `MainFormalRolePackageAnswerSuccessorResidual.ofAnswerSuccessorObligations`,
 then injects into the branch residual.  It does not call `mainFormal` and stops
 before the line-130 completion and line-169 transport interfaces.
 
 **Unfaithful:** this constructor assumes answer-valued recursive slice
-witnesses and answer-side Section 9 obligations, rather than deriving them from
+witnesses and answer-side restricted-slice transport data, rather than deriving them from
 `references/ldt-paper/test_definition.tex:180-202` and
 `references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by #1375,
 #1376, #1369, #1363, and #1458.  Elimination: prove those inputs in the
@@ -701,7 +701,7 @@ noncomputable def answerSuccessorOfObligations
 
 /-- Direct role-residual corollary for the answer-side successor branch
 when the analytic inputs are supplied as recursive slice witnesses and
-per-slice Section 9 obligations.
+per-slice restricted-strategy transport data.
 
 This composes `answerSuccessorOfObligations` with `toRolePackageResidual`. -/
 theorem rolePackageResidual_ofAnswerSuccessorObligations
@@ -720,11 +720,11 @@ theorem rolePackageResidual_ofAnswerSuccessorObligations
     |>.toRolePackageResidual hk_large
 
 /-- Answer-side successor branch constructor from a predecessor
-`AnswerPerSliceInductionPackage` and per-slice Section 9 obligations.
+`AnswerPerSliceInductionPackage` and per-slice restricted-strategy transport data.
 
 This preferred answer-side translation route consumes a per-slice
 induction hypothesis for the transported predecessor together with the
-answer-side self-improvement obligations, and composes them through
+answer-side self-improvement structural inputs, and composes them through
 `mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage` and
 `mainFormalSuccessorAnswerBoundary_ofObligations`.  It is only a composition
 of the answer-side translations merged on `main`; it does not call
@@ -732,7 +732,7 @@ of the answer-side translations merged on `main`; it does not call
 completion and line-169 transport interfaces untouched.
 
 **Unfaithful:** this constructor assumes a predecessor answer-valued induction
-package and answer-side Section 9 obligations, rather than deriving them from
+package and answer-side restricted-slice transport data, rather than deriving them from
 the paper hypotheses of `thm:main-formal`
 (`references/ldt-paper/test_definition.tex:180-202`) and
 `thm:main-induction` (`references/ldt-paper/inductive_step.tex:441-551`).
@@ -757,7 +757,7 @@ noncomputable def answerSuccessorOfInductionPackageAndObligations
 
 /-- Direct role-residual corollary for the answer-side successor branch
 when the analytic inputs are supplied as a predecessor per-slice induction
-record and per-slice Section 9 obligations.
+record and per-slice restricted-strategy transport data.
 
 This is the most direct route from the load-bearing answer-side translations to the
 isolated Section 6 role residual consumed by the downstream `mainFormal`

@@ -33,7 +33,12 @@ answer-valued diagonal interface, while the existing Section 9 self-improvement
 theorem is stated for ordinary `SymStrat`s.  This structure records honest
 ordinary slice strategies on which Section 9 can run, together with the state
 and point-measurement transports needed to move the resulting conclusions back
-to the answer-valued restricted bookkeeping. -/
+to the answer-valued restricted bookkeeping.
+
+The Section 9 analytic proof debt is not stored in this record.  The package
+constructor below calls the source-facing
+`selfImprovementInInductionSection`, whose present proof gap is the tracked
+place where that work belongs. -/
 structure AnswerSelfImprovementPackage.SliceObligations
     (params : Parameters)
     [FieldModel params.q]
@@ -65,13 +70,6 @@ structure AnswerSelfImprovementPackage.SliceObligations
         (restrictionPkg.profile.axisParallel x)
         (restrictionPkg.profile.selfConsistency x)
         (restrictionPkg.profile.diagonal x)
-  /-- The remaining Section 9 obligations for each honest slice strategy. -/
-  obligations :
-    ∀ x,
-      SelfImprovement.SelfImprovementObligations params (sliceStrategy x)
-        (restrictionPkg.profile.axisParallel x)
-        (restrictionPkg.profile.selfConsistency x)
-        (inductionPkg.sliceError x)
 
 /-- The averaged point-operator compatibility for answer-valued slices follows
 from point-measurement transport.
@@ -104,8 +102,8 @@ point-operator compatibility is a formal transport between the answer-valued
 restricted slice interface and the Section 9 interface.
 
 The structural averaged-point field is derived from `pointMeasurement_eq`; the
-remaining inputs are the honest slice strategies, their state transport,
-restricted-profile goodness, and their Section 9 obligation structures. -/
+remaining inputs are the honest slice strategies, their state transport, and
+their restricted-profile goodness. -/
 noncomputable def AnswerSelfImprovementPackage.SliceObligations.ofPointMeasurementEq
     (params : Parameters)
     [FieldModel params.q]
@@ -126,13 +124,7 @@ noncomputable def AnswerSelfImprovementPackage.SliceObligations.ofPointMeasureme
         (sliceStrategy x).IsGood
           (restrictionPkg.profile.axisParallel x)
           (restrictionPkg.profile.selfConsistency x)
-          (restrictionPkg.profile.diagonal x))
-    (obligations :
-      ∀ x,
-        SelfImprovement.SelfImprovementObligations params (sliceStrategy x)
-          (restrictionPkg.profile.axisParallel x)
-          (restrictionPkg.profile.selfConsistency x)
-          (inductionPkg.sliceError x)) :
+          (restrictionPkg.profile.diagonal x)) :
     AnswerSelfImprovementPackage.SliceObligations params strategy eps delta gamma k
       restrictionPkg inductionPkg where
   sliceStrategy := sliceStrategy
@@ -142,7 +134,6 @@ noncomputable def AnswerSelfImprovementPackage.SliceObligations.ofPointMeasureme
     AnswerSelfImprovementPackage.SliceObligations.averagedPoint_eq_of_pointMeasurement_eq
       params strategy sliceStrategy pointMeasurement_eq
   good := good
-  obligations := obligations
 
 /-- Transport answer-restricted goodness to an honest slice strategy once the
 state and verifier-visible measurements agree with `xRestrictedAnswerSymStrat`.
@@ -207,8 +198,8 @@ theorem AnswerSelfImprovementPackage.SliceObligations.good_of_restrictedGood
       simp [state_eq x, pointMeasurement_eq x, diagonalZeroCoord_eq x]
     simpa [hfail] using hgood.diagonalLineTest
 
-/-- Build answer-valued `SliceObligations` from honest slice strategies,
-verifier-visible measurement transport, and Section 9 obligations.
+/-- Build answer-valued `SliceObligations` from honest slice strategies and
+verifier-visible measurement transport.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
 `references/ldt-paper/self_improvement.tex:631-811`.
@@ -244,13 +235,7 @@ noncomputable def AnswerSelfImprovementPackage.SliceObligations.ofMeasurementEq
           postprocess
             (((xRestrictedAnswerSymStrat params strategy x).diagonalMeasurement.toIdxProjMeas
               ℓ).toSubMeas)
-            (fun f : DiagonalLineAnswer params => f zeroCoord))
-    (obligations :
-      ∀ x,
-        SelfImprovement.SelfImprovementObligations params (sliceStrategy x)
-          (restrictionPkg.profile.axisParallel x)
-          (restrictionPkg.profile.selfConsistency x)
-          (inductionPkg.sliceError x)) :
+            (fun f : DiagonalLineAnswer params => f zeroCoord)) :
     AnswerSelfImprovementPackage.SliceObligations params strategy eps delta gamma k
       restrictionPkg inductionPkg :=
   AnswerSelfImprovementPackage.SliceObligations.ofPointMeasurementEq
@@ -259,75 +244,6 @@ noncomputable def AnswerSelfImprovementPackage.SliceObligations.ofMeasurementEq
     (AnswerSelfImprovementPackage.SliceObligations.good_of_restrictedGood
       params strategy eps delta gamma restrictionPkg sliceStrategy state_eq
       pointMeasurement_eq axisParallelMeasurement_eq diagonalZeroCoord_eq)
-    obligations
-
-/-- Build answer-valued `SliceObligations` from honest slice strategies and the
-constructive orthonormalization repair obligation.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:461-551`,
-`references/ldt-paper/self_improvement.tex:631-811`, and
-`references/ldt-paper/orthonormalization.tex:273-282`.
-
-As in the ordinary slice bridge, the spectral part of the orthonormalization
-input is supplied by the closed source-almost-projective spectral truncation
-theorem.  The caller supplies only the locality-preserving repair obligation,
-besides the helper strong self-consistency and final-fields inputs. -/
-noncomputable def AnswerSelfImprovementPackage.SliceObligations.ofOrthonormalizationRepair
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (k : ℕ)
-    (restrictionPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma)
-    (inductionPkg :
-      AnswerPerSliceInductionPackage params strategy eps delta gamma restrictionPkg k)
-    (sliceStrategy : Fq params → SymStrat params ι)
-    (state_eq : ∀ x, (sliceStrategy x).state = strategy.state)
-    (pointMeasurement_eq :
-      ∀ x,
-        (sliceStrategy x).pointMeasurement =
-          (xRestrictedAnswerSymStrat params strategy x).pointMeasurement)
-    (axisParallelMeasurement_eq :
-      ∀ x,
-        (sliceStrategy x).axisParallelMeasurement.toIdxProjMeas =
-          (xRestrictedAnswerSymStrat params strategy x).axisParallelMeasurement.toIdxProjMeas)
-    (diagonalZeroCoord_eq :
-      ∀ x ℓ,
-        postprocess
-            (((sliceStrategy x).diagonalMeasurement.toIdxProjMeas ℓ).toSubMeas)
-            (fun f : DiagonalLinePolynomial params => f zeroCoord) =
-          postprocess
-            (((xRestrictedAnswerSymStrat params strategy x).diagonalMeasurement.toIdxProjMeas
-              ℓ).toSubMeas)
-            (fun f : DiagonalLineAnswer params => f zeroCoord))
-    (helperStrongSelfConsistency :
-      ∀ x,
-        SelfImprovement.HelperStrongSelfConsistencyInput params (sliceStrategy x)
-          (restrictionPkg.profile.axisParallel x)
-          (restrictionPkg.profile.selfConsistency x))
-    (repair :
-      ∀ x,
-        SelfImprovement.OrthonormalizationRepairObligation params (sliceStrategy x)
-          (restrictionPkg.profile.axisParallel x)
-          (restrictionPkg.profile.selfConsistency x))
-    (finalFields :
-      ∀ x,
-        SelfImprovement.FinalFieldsInput params (sliceStrategy x)
-          (restrictionPkg.profile.axisParallel x)
-          (restrictionPkg.profile.selfConsistency x)
-          (inductionPkg.sliceError x)) :
-    AnswerSelfImprovementPackage.SliceObligations params strategy eps delta gamma k
-      restrictionPkg inductionPkg :=
-  AnswerSelfImprovementPackage.SliceObligations.ofMeasurementEq
-    params strategy eps delta gamma k restrictionPkg inductionPkg sliceStrategy state_eq
-    pointMeasurement_eq axisParallelMeasurement_eq diagonalZeroCoord_eq
-    (fun x =>
-      { helperStrongSelfConsistency := helperStrongSelfConsistency x
-        orthonormalization :=
-          SelfImprovement.orthonormalizationInput_of_obligations
-            SelfImprovement.orthonormalizationSpectralObligation_of_sourceAlmostProjective
-            (repair x)
-        finalFields := finalFields x })
 
 /-- Assemble the slice-wise outputs feeding the answer-valued restricted-strategy
 self-improvement stage into the bookkeeping object expected by answer-valued
@@ -406,20 +322,19 @@ noncomputable def AnswerSelfImprovementPackage.ofSelfImprovementInInductionSecti
       bounded := fun x => (hslice_props x).2.2.2.2.1
       dominatesAveragePointOperator := fun x h => (hslice_props x).2.2.2.2.2 h }
 
-/-- Convert honest per-slice Section 9 obligations into the answer-valued
-Section 6 self-improvement data.
+/-- Convert honest per-slice structural data into the answer-valued Section 6
+self-improvement data.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
 `references/ldt-paper/self_improvement.tex:631-811`.
 
-The construction assumes ordinary slice strategies and their Section 9
-obligations. It applies the conditional obligation-input theorem
-`selfImprovementInInductionSection_ofObligations` slice-by-slice and transports
-its fields back to the answer-valued restricted-slice interface via the recorded
-state and point-measurement equalities. The input submeasurement is completed
-internally by that helper, so this package constructor no longer needs a
-separate measurement-completion bridge. The source-facing theorem remains the
-tracked obligation in #1503. -/
+The construction assumes ordinary slice strategies and their structural
+measurement transports. It applies the source-facing theorem
+`selfImprovementInInductionSection` slice-by-slice and transports its fields
+back to the answer-valued restricted-slice interface via the recorded state and
+point-measurement equalities. The theorem itself is currently a tracked proof
+gap (#1503); this constructor does not carry the Section 9 proof debt as an
+additional package hypothesis. -/
 noncomputable def AnswerSelfImprovementPackage.ofSliceObligations
     (params : Parameters)
     [FieldModel params.q]
@@ -447,13 +362,12 @@ noncomputable def AnswerSelfImprovementPackage.ofSliceObligations
     have hcons := inductionPkg.pointConsistency x
     rw [← sliceObligations.state_eq x, ← sliceObligations.pointMeasurement_eq x] at hcons
     simpa [sliceStrategy] using hcons
-  rcases selfImprovementInInductionSection_ofObligations params
+  rcases selfImprovementInInductionSection params
       (sliceObligations.sliceStrategy x)
       (restrictionPkg.profile.axisParallel x)
       (restrictionPkg.profile.selfConsistency x)
       (restrictionPkg.profile.diagonal x)
       (inductionPkg.sliceError x)
-      (sliceObligations.obligations x)
       (sliceObligations.good x)
       (inductionPkg.sliceMeasurement x).toSubMeas
       hconsSlice with

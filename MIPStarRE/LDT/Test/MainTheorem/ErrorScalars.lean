@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Test.MainTheorem.ClassicalAndBase
+import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
 
 /-!
 # Main-formal error scalars

@@ -39,8 +39,8 @@ Before changing theorem statements, first compare source-labelled statements wit
 proof-obligation input, hypotheses bundle, assumptions bundle, or arbitrary
 hypothesis inputs to a paper-labelled theorem in order to make the proof close.
 If such data seem necessary, leave the paper theorem source-faithful and report
-the missing named lemma, internal obligation, or paper-gap note.  Introduce a
-conditional helper only when it preserves already useful proof content, is named
-as conditional, cites the unresolved source obligation, states a removal plan,
-and remains off the paper theorem's `\leanok` path. Do not leave unrelated new
-sorrys.
+the missing named lemma or paper-gap note.  Do not introduce a conditional
+helper or proof-debt bundle as a substitute for the source proof. Existing
+conditional helpers may be edited only to reduce proof debt or preserve already
+separated proof content, and must remain off the paper theorem's `\leanok` path.
+Do not leave unrelated new sorrys.
