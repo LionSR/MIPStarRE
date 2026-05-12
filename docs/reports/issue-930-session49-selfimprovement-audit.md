@@ -6,6 +6,19 @@ Base commit: `5e18073d` (`origin/main` at audit start)
 
 Branch: `gpt55/issue-930-selfimprovement-audit`
 
+> **Status note, 2026-05-12.** This report records the pre-#1458 and
+> pre-#1525 state of the Section 9 self-improvement interface.  Its statements
+> that the paper-facing theorem `selfImprovement` takes the three explicit
+> obligation hypotheses, and that Section 6 calls `selfImprovementFromSubMeas`,
+> are historical.  The current source-facing theorem `selfImprovement` has the
+> paper-shaped input-consistency hypothesis and leaves the derivation of the
+> helper strong self-consistency, orthonormalization, and final-fields inputs as
+> the tracked proof obligation #1515.  The old Section 9 submeasurement wrappers
+> `selfImprovementFromSubMeas` and `selfImprovementFromObligationsSubMeas` have
+> been removed; the current conditional Section 6 route is
+> `selfImprovementInInductionSection_ofObligations`, which internally completes
+> the input submeasurement.
+
 ## Executive summary
 
 I audited the self-improvement formalization in
