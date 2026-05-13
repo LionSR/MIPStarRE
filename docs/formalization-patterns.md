@@ -193,14 +193,16 @@ When such a declaration remains useful, its role should be one of the following:
 
 The direct tracked `sorry` in `MainFormal.lean` records the remaining
 construction obligation for the paper theorem.  The proof must construct, from
-the hypotheses of `thm:main-formal`, the Section 6 role residual and the
-projective-completion residual consumed by
-`mainFormal_ofProjectiveCompletionResidual`.  This includes:
+the hypotheses of `thm:main-formal`, the projective-completion residual consumed
+by `mainFormal_ofProjectiveCompletionResidual`.  The Section 6 role residual is
+now obtained by applying the source-facing theorem `MainInductionStep.mainInduction`
+through `MainFormalRolePackageResidual.ofMainInductionLargeK`; the successor
+branch of that call remains the tracked `sorry` in the source Section 6 theorem,
+not an added hypothesis of `mainFormal`.  The remaining Section 3 work includes:
 
 1. The successor projective-completion obligation.  It must construct the
-   predecessor/successor role residual, obtain the line-130 orthonormalization
-   residual from cross consistency, and supply the completion data used after
-   `completingToMeasurement`.
+   line-130 orthonormalization residual from cross consistency and supply the
+   completion data used after `completingToMeasurement`.
 2. The base-case projective-completion residual obligation, whose target is the
    direct `Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
    ...)` needed by the final transport.

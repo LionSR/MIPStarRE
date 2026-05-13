@@ -181,6 +181,41 @@ theorem ofMainInductionWitness
   rcases hsection6 with ⟨G, hG⟩
   exact ⟨{ roleMeasurement := G, section6Consistency := hG }⟩
 
+/-- Source-facing constructor for the isolated role-register residual.
+
+This calls `MainInductionStep.mainInduction` through
+`strategySymmetrization_mainInduction`.  Thus the Section 3 role measurement is
+not conditional on a successor-boundary package; any remaining Section 6 proof
+gap is the tracked `sorry` in the source theorem `mainInduction` itself. -/
+theorem ofMainInduction
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hk : params.m * params.d ≤ k) :
+    Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) := by
+  exact ofMainInductionWitness params strategy eps k hpass
+    (strategySymmetrization_mainInduction params strategy eps hpass k hk)
+
+/-- Large-`k` constructor for the isolated role-register residual.
+
+The public Section 3 theorem currently assumes `400 * m * d ≤ k`.  This lemma
+uses only the weaker consequence `m * d ≤ k` needed by the source-facing
+Section 6 theorem. -/
+theorem ofMainInductionLargeK
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hk_large : 400 * params.m * params.d ≤ k) :
+    Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) := by
+  have hk : params.m * params.d ≤ k := by
+    have hfactor : params.m * params.d ≤ 400 * params.m * params.d := by
+      have hmul := Nat.mul_le_mul_right (params.m * params.d) (by norm_num : 1 ≤ 400)
+      simpa [Nat.mul_assoc, Nat.mul_comm, Nat.mul_left_comm] using hmul
+    exact le_trans hfactor hk_large
+  exact ofMainInduction params strategy eps k hpass hk
+
 /-- Convert the isolated Section 6 role-register residual into the output consumed
 by unsymmetrization.
 
