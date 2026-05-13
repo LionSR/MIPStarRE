@@ -133,61 +133,6 @@ private lemma leftLiftedRoundedProjMeasStatement_to_local {Outcome : Type*}
   simpa [leftLiftedMeasurement, leftPlacedSubMeas, SubMeas.liftLeft,
     ProjSubMeas.liftLeft] using h.closeness
 
-/-- Internal local orthogonalization under explicit spectral-truncation and
-left-lifted repair inputs.
-
-This isolates the exact descent needed for issue #450: once the repair step for
-`leftLiftedMeasurement A` is known to return a left-lifted local projective
-submeasurement, the paper's local conclusion follows formally.
-
-This is not the source statement of
-`lem:orthonormalization-main-lemma`; its extra inputs are proof obligations for
-the paper lemma. -/
-lemma localOrthonormalization_ofInternalInputs {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState (ι × ι))
-    (hψ : ψ.IsNormalized)
-    (A : Measurement Outcome ι) (ζ : Error)
-    (hζ : 0 ≤ ζ) (hζ1 : ζ ≤ 1)
-    (hspectral : SpectralTruncationInput
-      ψ (leftLiftedMeasurement (ιB := ι) A)
-      (consistencyToAlmostProjectiveError ζ))
-    (hrepair : LeftLiftedProjectivizationRepairInput
-      ψ A (consistencyToAlmostProjectiveError ζ)) :
-    BipartiteSSCRel ψ (uniformDistribution Unit)
-      (constSubMeasFamily A.toSubMeas) ζ →
-      ∃ P : ProjSubMeas Outcome ι,
-        SDDRel ψ (uniformDistribution Unit)
-          (constSubMeasFamily A.toSubMeas.liftLeft)
-          (constSubMeasFamily P.toSubMeas.liftLeft)
-          (orthonormalizationMainLemmaError ζ) := by
-  intro hssc
-  have hCons :
-      ConsRel ψ (uniformDistribution Unit)
-        (constSubMeasFamily A.toSubMeas)
-        (constSubMeasFamily A.toSubMeas)
-        ζ :=
-    bipartiteSSCRel_self_of_measurement (ψ := ψ) A ζ hssc
-  have hAlmost :
-      MIPStarRE.LDT.MakingMeasurementsProjective.AlmostProjMeasStatement
-        ψ (leftLiftedMeasurement (ιB := ι) A)
-        (consistencyToAlmostProjectiveError ζ) := by
-    exact MIPStarRE.LDT.MakingMeasurementsProjective.consistencyToAlmostProjective
-      (ψ := ψ) (A := A) (B := A) (ζ := ζ) hCons
-  have hSpectral :
-      SpectralTruncationStatement ψ (leftLiftedMeasurement (ιB := ι) A)
-        (consistencyToAlmostProjectiveError ζ) := by
-    exact MIPStarRE.LDT.MakingMeasurementsProjective.spectralTruncateAlmostProjective
-      (ψ := ψ) (hψ := hψ) (A := leftLiftedMeasurement (ιB := ι) A)
-      (ζ := consistencyToAlmostProjectiveError ζ) hAlmost hspectral
-  obtain ⟨P, hRounded⟩ := hrepair hSpectral
-  refine ⟨P, ?_⟩
-  exact leftLiftedRoundedProjMeasStatement_to_local <|
-    MIPStarRE.LDT.MakingMeasurementsProjective.roundedProjMeasStatement_mono
-      hRounded
-      (Orthonormalization.ErrorBounds.orthonormalizationMainLemma_error_bound ζ hζ hζ1)
-
 /-- Measurement-level orthonormalization from a cross-consistency hypothesis.
 
 This is the measurement analogue of
