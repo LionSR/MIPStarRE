@@ -63,7 +63,7 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 the Section 9 orthonormalization construction.
 
 Paper origin: the projective-output passage in
-`references/ldt-paper/self_improvement.tex:10-13`, using the
+`references/ldt-paper/self_improvement.tex:679-697`, using the
 orthonormalization theorem from
 `references/ldt-paper/orthonormalization.tex:273-282`.
 
