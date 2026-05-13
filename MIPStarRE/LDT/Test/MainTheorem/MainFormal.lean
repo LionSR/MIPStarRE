@@ -18,7 +18,10 @@ gap for `thm:main-formal` (`\Cref{thm:main-formal}`).  This module contains:
   boundary conditions `0 < d`, `0 < k`, and `400md ≤ k`, and producing the three
   pointwise consistency targets at error bound `mainFormalError`.  Its proof is
   currently a direct proof gap rather than a theorem with extra bridge
-  hypotheses.
+  hypotheses.  The role-register Section 6 measurement itself is available from
+  `MainFormalRolePackageResidual.ofMainInductionLargeK`; the successor part of
+  that construction is the tracked `sorry` in the source theorem
+  `MainInductionStep.mainInduction`, not an added hypothesis of `mainFormal`.
 
 ## References
 
@@ -151,11 +154,13 @@ The field model is presently fixed at universe level `0`, matching the current
 Section 6 successor theorem rather than an additional mathematical restriction.
 
 **Proof gap:** the paper-facing statement is restored without bridge, residual,
-repair, or obligation hypotheses.  The remaining work is to construct the
-Section 6 role residual and the post-role projective-completion residual from
-the hypotheses of `thm:main-formal`, then apply
-`mainFormal_ofProjectiveCompletionResidual` for the already-proved final
-transport.  This is tracked by #1043, #1363, and #1458.
+repair, or obligation hypotheses.  The Section 6 role-register residual is now
+obtained by applying the source-facing theorem `MainInductionStep.mainInduction`
+through `MainFormalRolePackageResidual.ofMainInductionLargeK`; its successor
+case remains the tracked `sorry` in Section 6.  The remaining Section 3 work is
+to construct the post-role projective-completion residual from the paper
+hypotheses, then apply `mainFormal_ofProjectiveCompletionResidual` for the
+already-proved final transport.  This is tracked by #1043, #1363, and #1458.
 -/
 theorem mainFormal
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]

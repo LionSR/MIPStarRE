@@ -122,24 +122,31 @@ statement.
    locality-preserving repair witness."
 
 2. **Only a quarantined conditional helper takes the hypothesis as an argument.**  A helper like
-   `selfImprovementInInductionSection_ofObligations` in
-   `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/Core.lean`
+   `selfImprovementFromObligations` in
+   `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/Core.lean`
    takes `SelfImprovementObligations`, whose fields include
    `OrthonormalizationInput` and analogous proof-obligation structures, as an
    explicit argument.  This is not the paper theorem; it is the temporary
    surface where the remaining obligations are isolated:
 
    ```lean
-   theorem selfImprovementInInductionSection_ofObligations
+   theorem selfImprovementFromObligations
        (params : Parameters)
        [FieldModel params.q]
        (strategy : SymStrat params ι)
        (eps delta gamma nu : Error)
-       (hobligations :
+       (obligations :
          SelfImprovement.SelfImprovementObligations params strategy eps delta nu)
        ...
-       (G : SubMeas (Polynomial params) ι) ... : ...
+       (G : Measurement (Polynomial params) ι) ... : ...
    ```
+
+   The former induction-section helper
+   `selfImprovementInInductionSection_ofObligations` was removed because it
+   encouraged propagation of the Section 9 bundle into the Section 6 successor
+   packages.  Those packages now call the source-facing
+   `selfImprovementInInductionSection` directly; its current proof gap is the
+   correct place for the missing work.
 
 3. **Propagation is a warning sign.**  The consumer of
    `selfImprovementInInductionSection` — typically a
@@ -186,14 +193,16 @@ When such a declaration remains useful, its role should be one of the following:
 
 The direct tracked `sorry` in `MainFormal.lean` records the remaining
 construction obligation for the paper theorem.  The proof must construct, from
-the hypotheses of `thm:main-formal`, the Section 6 role residual and the
-projective-completion residual consumed by
-`mainFormal_ofProjectiveCompletionResidual`.  This includes:
+the hypotheses of `thm:main-formal`, the projective-completion residual consumed
+by `mainFormal_ofProjectiveCompletionResidual`.  The Section 6 role residual is
+now obtained by applying the source-facing theorem `MainInductionStep.mainInduction`
+through `MainFormalRolePackageResidual.ofMainInductionLargeK`; the successor
+branch of that call remains the tracked `sorry` in the source Section 6 theorem,
+not an added hypothesis of `mainFormal`.  The remaining Section 3 work includes:
 
 1. The successor projective-completion obligation.  It must construct the
-   predecessor/successor role residual, obtain the line-130 orthonormalization
-   residual from cross consistency, and supply the completion data used after
-   `completingToMeasurement`.
+   line-130 orthonormalization residual from cross consistency and supply the
+   completion data used after `completingToMeasurement`.
 2. The base-case projective-completion residual obligation, whose target is the
    direct `Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
    ...)` needed by the final transport.
@@ -228,11 +237,11 @@ fields should be the *assumptions* of the paper's proof, not the *conclusion* of
 the theorem.
 
 They are permitted only as temporary hypotheses of conditional helpers or
-intermediate construction theorems.  If such an obligation structure appears in
-the public signature of a source-labelled theorem, the theorem has become
-conditional and should not be treated as the paper theorem until the structure is
-produced internally or the statement is restored with the missing proof
-obligation explicit.
+intermediate construction theorems, and only while the helper preserves useful
+mathematical proof content.  If such an obligation structure appears in the
+public signature of a source-labelled theorem, or if it starts propagating
+through downstream source-facing packages, the statement should be restored and
+the missing proof should be represented by an explicit `sorry`.
 
 ---
 
@@ -449,10 +458,11 @@ structure SelfImprovementObligations (params : Parameters) [FieldModel params.q]
 
 A separately named conditional helper may take
 `(h : SelfImprovementObligations params strategy eps delta nu)` as a
-hypothesis and project the needed field inside the proof body.  This does not
-prove the corresponding paper theorem.  The structure should be eliminated by
-internal theorems, or the source-labelled theorem should be restored with the
-remaining proof obligation visible.
+hypothesis and project the needed field inside the proof body only if the helper
+records reusable proof content.  This does not prove the corresponding paper
+theorem.  The structure should be eliminated by internal theorems, or the
+source-labelled theorem should be restored with the remaining proof obligation
+visible as `sorry`.
 
 ### Rules
 

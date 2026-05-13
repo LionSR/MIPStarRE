@@ -250,6 +250,35 @@ theorem strategySymmetrization_mainInductionBaseCase
       (SameSpaceProjStrat.strategySymmetrization_isGood_three_mul
         (strategy := strategy) (eps := eps) hpass)
 
+/-- Step 1 followed by the source-facing Section 6 theorem.
+
+This is the role-register handoff used by the paper proof of
+`\label{thm:main-formal}` at `references/ldt-paper/inductive_step.tex:68-83`.
+It calls the restored paper-facing theorem `MainInductionStep.mainInduction`
+directly.  Consequently the remaining successor proof gap is the `sorry` inside
+that source theorem, rather than an extra successor-boundary hypothesis in the
+Section 3 theorem. -/
+theorem strategySymmetrization_mainInduction
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SameSpaceProjStrat params ι) (eps : Error)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
+    (hk : params.m * params.d ≤ k) :
+    ∃ G : Measurement (Polynomial params) (Role × ι),
+      ConsRel (strategy.strategySymmetrization).state
+        (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas (strategy.strategySymmetrization).pointMeasurement)
+        (polynomialEvaluationFamily params G.toSubMeas)
+        (MainInductionStep.mainInductionError params k
+          (3 * eps) (3 * eps) (3 * eps)) := by
+  exact
+    MainInductionStep.mainInduction params
+      (strategy := strategy.strategySymmetrization)
+      (eps := 3 * eps) (delta := 3 * eps) (gamma := 3 * eps) (k := k)
+      (SameSpaceProjStrat.strategySymmetrization_isGood_three_mul
+        (strategy := strategy) (eps := eps) hpass)
+      hk
+
 
 end Test
 
