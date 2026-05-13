@@ -149,16 +149,16 @@ conclusions.
 
 ---
 
-## 2. Orphan Lemmas
+## 2. Internal and Orphan Helper Lemmas
 
-These are proved within SelfImprovement but **never called** by anything in
-MainInductionStep or MainTheorem:
+These are proved within SelfImprovement but are not public substitutes for the
+paper-facing `selfImprovement`, `mainInduction`, or `mainFormal` statements:
 
 ### 2.1. Slackness-carrying helpers
 
 | Declaration | File | Status |
 |------------|------|--------|
-| `self_improvement_helper_with_slackness` | `SelfImprovementTop/Core.lean:119` | Proved, orphan |
+| `self_improvement_helper_with_slackness` | `SelfImprovementTop/Core.lean:119` | Internal dependency of `selfImprovementHelper`; rests on `sdp_statement_with_slackness` |
 
 The former full-conclusion residual-domination variants
 `selfImprovementWithSlacknessAndResidualDominationInput` and
@@ -166,36 +166,30 @@ The former full-conclusion residual-domination variants
 #1539.  The remaining slackness-carrying helper is not a theorem-level
 substitute for `selfImprovement`.
 
-These are variants that assume the SDP carries complementary slackness
-(`SdpStatementWithSlackness`).  The main pipeline uses
-`selfImprovementHelper` (without slackness) because the current SDP wrapper
-(`sdp`) does not yet prove strong duality.
-
-### 2.2. SDP matrix helper bridge
-
-The entire module `SelfImprovement/Theorems/Results/SdpMatrixHelperBridge.lean`
-contains the following lemmas that are **never imported or called** from
-MainInductionStep or MainTheorem:
-
-| Declaration | Line |
-|------------|------|
-| `selfImprovementHelperWithMatrixSdpSlacknessAndDominance` | 42 |
-| `selfImprovementHelperWithCanonicalMatrixSdpSlacknessAndDominance` | 70 |
-| `selfImprovementHelperWithCanonicalOptimalPairSdpSlacknessAndDominance` | 110 |
-| `selfImprovementHelperWithCanonicalOptimalPairSdpSlackness_of_dualDominatesIdentity` | 134 |
-
-These bridge the matrix-level SDP (in `MatrixRealization/`) with the
-slackness-carrying helper conclusion.  PR #1539 removed the former
-full-conclusion matrix-SDP residual-domination variants, so this module no
-longer produces `selfImprovement` from additional residual, repair, or QXP
+These variants assume the SDP carries complementary slackness
+(`SdpStatementWithSlackness`).  They are useful proof content only insofar as
+the Section 9 SDP slackness theorem is eventually proved from the paper
 hypotheses.
 
-### 2.3. OrthonormalizationInputConstructors
+### 2.2. Removed orphan helper-bridge modules
 
-The submodule `SelfImprovement/Theorems/OrthonormalizationInputConstructors/` is
-imported by the barrel `Theorems.lean` but **never imported by MainInductionStep
-or MainTheorem**.  Its declarations are used only within SelfImprovement's own
-submodules.
+The former module
+`SelfImprovement/Theorems/Results/SdpMatrixHelperBridge.lean` contained direct
+adapters from matrix-level SDP slackness data to the slackness-carrying
+self-improvement helper conclusion.  These declarations were never imported or
+called from MainInductionStep or MainTheorem.  They have been removed; the
+retained proof content stops at the abstract SDP comparison lemmas in
+`SdpMatrixBridge.lean`, and the paper-facing helper consumes the abstract
+`SdpStatementWithSlackness` interface directly.
+
+The former module
+`SelfImprovement/Theorems/OrthonormalizationInputConstructors.lean` contained
+thin constructors that combined QXP repair obligations and residual-domination
+obligations into larger orthonormalization input packages.  These constructors
+were not used outside their own module and have been removed so that the
+Section 9 API does not normalize unused proof-debt packages.
+
+### 2.3. Remaining orthonormalization bridge layer
 
 ### 2.4. Used (NOT orphan)
 
@@ -320,14 +314,12 @@ which this audit is meant to prevent.
    record that the remaining work is to produce the completion data and
    successor residuals from the paper hypotheses.
 
-2. **Decide fate of the remaining orphan helper lemmas.**  The
-   slackness-carrying helper and the matrix-to-helper lemmas in
-   `SdpMatrixHelperBridge.lean` are fully proved but not yet used by the
-   main induction.  The top-level residual-domination variants have already
-   been deleted.  Options for the remaining helper route are: (a) keep it as
-   future proof content for strong duality, (b) mark it with `@[deprecated]`
-   or move it to a future-work namespace, (c) delete it if the paper proof
-   will not use this route.
+2. **Keep only source-relevant helper content in the public Section 9 API.**
+   The direct matrix-to-helper wrappers from the former
+   `SdpMatrixHelperBridge.lean` module and the unused orthonormalization input
+   constructor wrappers have been deleted.  The remaining slackness-carrying
+   helper route should be extended only by proving source-derived construction
+   theorems, not by reintroducing unused proof-debt packages.
 
 3. **Coordinate with the proof-debt tracking issue.**  New repair work should
    be linked from #1458 and should state whether it discharges an internal
@@ -350,9 +342,9 @@ which this audit is meant to prevent.
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/Core.lean` | `selfImprovementHelper`, `selfImprovement`; the former `selfImprovementFromObligations` theorem has been removed |
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperSSC/` | Proof of `helperStrongSelfConsistency` (internal) |
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/BoundednessTransport.lean` | Proof of `finalFields` (internal) |
-| `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SdpMatrixHelperBridge.lean` | **ORPHAN** — matrix-level SDP bridges |
+| `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SdpMatrixHelperBridge.lean` | Removed orphan module; direct SDP-to-helper wrappers no longer exist |
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/ResidualDomination.lean` | Removed compatibility module; top-level residual-domination variants no longer exist |
-| `MIPStarRE/LDT/SelfImprovement/Theorems/OrthonormalizationInputConstructors/` | **ORPHAN** — unused outside barrel import |
+| `MIPStarRE/LDT/SelfImprovement/Theorems/OrthonormalizationInputConstructors.lean` | Removed orphan module; unused obligation-package constructors no longer exist |
 | `MIPStarRE/LDT/SelfImprovement/MatrixRealization.lean` | Matrix-level SDP realization (used by orphan SDP bridges only) |
 | `MIPStarRE/LDT/Pasting/Core.lean` | `ldPasting` — consumed by `ldPastingInInductionSection` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/Core.lean` | `selfImprovementInInductionSection`, `SelfImprovementPackage.ofSliceObligations`, `ldPastingInInductionSection` |

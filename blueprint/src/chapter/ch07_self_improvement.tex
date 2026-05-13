@@ -535,22 +535,15 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPairWithDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPair_of_dualDominatesIdentity}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithMatrixSdpSlacknessAndDominance}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithCanonicalMatrixSdpSlacknessAndDominance}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithCanonicalOptimalPairSdpSlacknessAndDominance}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithCanonicalOptimalPairSdpSlackness_of_dualDominatesIdentity}
   \leanok
   From a matrix-level strong-duality witness with complementary slackness of the
   shape asserted by Lemma~\ref{lem:sdp}, one obtains a complete measurement
   \(\{T_g\}\), a feasible dual operator \(Z\), equality of the primal and dual
   objectives, and the equations \(T_gZ=T_gA_g\) for all \(g\).  The formal
-  bridge to the current abstract helper interface is conditional on the
-  additional reduced-interface bound \(I\leq Z\) for this selected dual witness.
+  comparison with the abstract SDP interface is conditional on the additional
+  reduced-interface bound \(I\leq Z\) for this selected dual witness.
   The same optimal witness can also be considered together with this dominance
-  condition.  With the usual helper hypotheses that the strategy is good, the
-  error parameter \(\nu\), and the comparison measurement \(G\), this datum feeds
-  the slackness-carrying self-improvement helper.
-  Lean also isolates the saturated canonical optimal-pair output still required
+  condition.  Lean also isolates the saturated canonical optimal-pair output still required
   from strong duality: a feasible canonical primal matrix, a dual-feasible
   operator with equal objective value, canonical complementary slackness, and
   vanishing of the extra canonical slack block.  This datum gives the
@@ -561,10 +554,9 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   forces \(X_{\mathrm{none},\mathrm{none}}=0\).  Thus the
   dominance-carrying optimal pair canonically determines the saturated optimal
   pair, and hence also the matrix slackness statement without the dominance
-  field.  The remaining bridge is first stated as an abstract SDP statement, and
-  then as a direct helper input, for a canonical feasible primal matrix
-  satisfying objective equality and canonical complementary slackness together
-  with the auxiliary dominance hypothesis.
+  field.  The retained Lean comparison stops at the abstract SDP statement; the
+  paper-facing self-improvement helper consumes that abstract statement rather
+  than a separate direct helper-input wrapper.
 \end{lemma}
 \begin{proof}
   \leanok
@@ -1157,10 +1149,6 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \lean{MIPStarRE.LDT.SelfImprovement.OrthonormalizationResidualDominationInput}
   \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationInput_of_residualDominationInput}
   \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationResidualDominationInput_of_obligations}
-  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationInput_of_sourceAlmostProjectiveAndQXPLayerRepair}
-  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationResidualDominationInput_of_sourceAlmostProjectiveAndQXPLayerRepair}
-  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationResidualDominationInput_of_sourceQXPRepairAndResidualDomination}
-  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationResidualDominationInput_of_roundingAndQXPLayerRepair}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap_natural}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap_natural_of_total_difference}
