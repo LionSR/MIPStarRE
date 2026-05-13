@@ -453,7 +453,7 @@ private lemma gCommStabilityTwo_raw_scalar_pointwise_bound
     apply ev_nonneg_of_psd
     rw [leftTensor_mul_rightTensor_eq_opTensor]
     simpa [B, Gg, T, opTensor] using
-      MIPStarRE.Quantum.kronecker_nonneg hleft_pos (hbound.bounded.sliceOpPSD x)
+      MIPStarRE.Quantum.kronecker_nonneg hleft_pos (hbound.sliceOpPSD x)
   have hfirst_point : ∀ vy : Point params.next,
       ∑ gb : Polynomial params × Fq params, xDiag vy gb =
         ev strategy.state
@@ -580,7 +580,7 @@ private lemma gCommStabilityTwo_raw_scalar_pointwise_bound
                 leftTensor_mul_rightTensor_eq_opTensor]
               exact opTensor_mono_left
                 (gCommStabilityTwo_raw_left_sum_le params family G hG x vy)
-                (hbound.bounded.sliceOpPSD x)
+                (hbound.sliceOpPSD x)
       _ = hbound.storedResidual G x := rfl
   have hsecond :
       avgOver 𝒟V (fun vy => ∑ gb : Polynomial params × Fq params, yDiag vy gb) ≤

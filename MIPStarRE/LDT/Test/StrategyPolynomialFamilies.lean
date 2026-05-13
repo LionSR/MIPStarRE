@@ -338,17 +338,26 @@ It consists of positive witnesses `Z^x`, the averaged residual bound
 `E_x <psi| (I - G^x) tensor Z^x |psi> <= zeta`, and the domination condition
 `Z^x >= E_u A^{u,x}_{g(u)}`.
 
-The structure extends `IdxPolyFamily.Bounded` with the source-side identification between
-the abstract domination target and the averaged point operator `E_u A^{u,x}_{g(u)}`. -/
+The domination condition is stated directly against the averaged point operator
+from the strategy.  It is not mediated through `family.dominationTarget`, so this
+public input does not contain an additional identification bridge. -/
 structure SliceBoundednessInput {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι) (zeta : Error) : Prop where
-  bounded : family.Bounded strategy.state zeta
-  dominationTargetAgrees :
+  /-- Positivity of the slice witnesses `Z^x`. -/
+  sliceOpPSD : ∀ x, 0 ≤ family.witness x
+  /-- Averaged residual bound `E_x <psi| (I - G^x) tensor Z^x |psi> <= zeta`. -/
+  sliceBoundedness :
+    avgOver (uniformDistribution (Fq params))
+      (fun x =>
+        ev strategy.state <|
+          leftTensor (ι₂ := ι) (1 - (family.meas x).toSubMeas.total) *
+            rightTensor (ι₁ := ι) (family.witness x)) ≤ zeta
+  /-- Paper domination condition `E_u A^{u,x}_{g(u)} <= Z^x`. -/
+  sliceDominatesAveragedPoint :
     ∀ x : Fq params, ∀ g : Polynomial params,
-      family.dominationTarget x g =
-        averagedSlicePointEvaluationOperator strategy x g
+      averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x
 
 namespace SliceBoundednessInput
 
@@ -385,7 +394,7 @@ theorem storedBoundedResidualBound {params : Parameters} [FieldModel params.q]
     (hG : ∀ x, G x = (family.meas x).toSubMeas) :
     avgOver (uniformDistribution (Fq params))
       (fun x => hbound.storedResidual G x) ≤ zeta := by
-  simpa [storedResidual, hG] using hbound.bounded.sliceBoundedness
+  simpa [storedResidual, hG] using hbound.sliceBoundedness
 
 /-- Paper-faithful domination half of the boundedness hypothesis.
 
@@ -397,11 +406,8 @@ theorem averagedPoint_le_witness {params : Parameters} [FieldModel params.q]
     {family : IdxPolyFamily params ι} {zeta : Error}
     (hbound : SliceBoundednessInput strategy family zeta) :
     ∀ x : Fq params, ∀ g : Polynomial params,
-      averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x := by
-  intro x g
-  have hdom : family.dominationTarget x g ≤ family.witness x :=
-    sub_nonneg.mp (hbound.bounded.sliceDominatesTarget x g)
-  simpa [hbound.dominationTargetAgrees x g] using hdom
+      averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x :=
+  hbound.sliceDominatesAveragedPoint
 
 end SliceBoundednessInput
 
