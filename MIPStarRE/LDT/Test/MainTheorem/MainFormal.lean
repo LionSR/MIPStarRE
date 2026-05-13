@@ -96,8 +96,7 @@ theorem mainFormal_ofProjectiveCompletionResidual
   have projectiveTargets :
       MainFormalCascadeProjectiveStageTargets params strategy eps k scalars :=
     projectiveCompletionResidual.toProjectiveStageTargets hpass
-  exact MainFormalNativeTargets.toMainFormal
-    (projectiveTargets.toTransportTargets.toCascadeTargets.toNativeTargets)
+  exact MainFormalCascadeTransportTargets.toMainFormal projectiveTargets.toTransportTargets
 
 /--
 `thm:main-formal` from `test_definition.tex`.

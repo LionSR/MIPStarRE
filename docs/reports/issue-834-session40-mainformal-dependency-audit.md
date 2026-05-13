@@ -105,7 +105,7 @@ Existing downstream conversions are already checked:
 - `MainFormalCascadeProjectiveCompletionLine169Residual.toProjectiveStageTargets`
   (`MainTheorem.lean:2313-2334`) reconstructs line 156 and the two `ζ₄` point
   goals.
-- `MainFormalNativeTargets.toMainFormal` (`MainTheorem.lean:2787-2807`) only weakens
+- `MainFormalCascadeTransportTargets.toMainFormal` only weakens
   the native `ζ₄` and `ζ₃/2` estimates to `mainFormalError`.
 
 Thus the live proof work is upstream data construction, not downstream triangle or
@@ -140,7 +140,7 @@ The live residual corresponds to the proof of `thm:main-formal` in
 | 160-166 | `eq:third-goal` and data processing to evaluated $Q$ consistency. | Downstream conversions are checked once the residual fields are supplied. |
 | 167-173 | `prop:triangle-sub` line-169 transport to $Q^{\mathrm A}_g \otimes I \simeq_{ζ₁} I\otimes G^{\mathrm B}_g`, then data processing. | The paper's printed `ζ₁` cannot be obtained from generic `triangleSub` plus completion closeness without an extra `sqrt ζ₂`; the Lean residual therefore requires `ProjectivizationMatchMassMonotonicity`. |
 | 175-185 | Final two `ζ₄` point goals `eq:one-goal` and `eq:another-goal`. | Already formalized by the residual conversions and triangle wrapper. |
-| 186-234 | Error cascade into the theorem's `ν`. | Already formalized by `MainFormalCascadeScalars` and `MainFormalNativeTargets.toMainFormal`. |
+| 186-234 | Error cascade into the theorem's `ν`. | Already formalized by `MainFormalCascadeScalars` and `MainFormalCascadeTransportTargets.toMainFormal`. |
 
 The exact line-169 constraint is the reason this report does not recommend a quick
 `triangleSub` proof: that route is mathematically weaker than the paper's displayed
@@ -194,7 +194,7 @@ Two open older trackers are also not direct fields of the present residual:
   explicit residual fields; the current route obtains them from
   `MainFormalRoleMeasurementPackage.toUnsymmetrizationBridge`.
 - #427 is still open, but the scalar cascade bounds and final weakening are already
-  checked in `MainFormalCascadeScalars` and `MainFormalNativeTargets`; the local TODO
+  checked in `MainFormalCascadeScalars` and `MainFormalCascadeTransportTargets.toMainFormal`; the local TODO
   marker `TODO(#427)` is stale as a description of the remaining proof term.
 
 A future PR that edits `MainTheorem.lean` should refresh these TODO comments after
