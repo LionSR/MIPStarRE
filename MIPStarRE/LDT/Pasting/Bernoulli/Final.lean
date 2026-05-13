@@ -225,7 +225,8 @@ private lemma fromHToGBernoulliTailMass_lower_bound
              intro _
              exact bernoulliTailOperator_nonneg k params.d X hXpsd hXle
            sum_eq_total := by simp
-           total_le_one := hchern.tail_le_one } : SubMeas Unit (ι × ι)) =
+           total_le_one := bernoulliTailOperator_le_one k params.d X hXpsd hXle } :
+          SubMeas Unit (ι × ι)) =
         fromHToGBernoulliTailMass params strategy.state family k := by
     have hswap :
         ev strategy.state

@@ -510,10 +510,9 @@ structure FromHToGStatement (params : Parameters)
       fromHToGError params gamma zeta k
 
 /-- Paper origin: `references/ldt-paper/ld-pasting.tex:1671-1798`
-(`\label{lem:chernoff-bernoulli-matrix}`); the operator-Chernoff inequality
-needed for this lemma is a Mathlib paper-gap, tracked by the Bernoulli-tail
-contraction work in this repository (placeholder field `tail_le_one`) and the
-matrix-Chernoff inequality `eq:by-chernoff` at line 1739.
+(`\label{lem:chernoff-bernoulli-matrix}`); the operator-Chernoff inequality is
+proved by applying continuous functional calculus to the scalar tail polynomial
+and the scalar Chernoff bound `eq:by-chernoff` at line 1739.
 
 Output package for `lem:chernoff-bernoulli-matrix`. -/
 structure ChernoffBernoulliMatrixStatement {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -521,9 +520,6 @@ structure ChernoffBernoulliMatrixStatement {ι : Type*} [Fintype ι] [DecidableE
     (theta : Error) (k degree : ℕ) (X : MIPStarRE.Quantum.Op ι) (kappa : Error)
     (hXpsd : 0 ≤ X)
     (hXleOne : X ≤ 1) : Prop where
-  /-- Temporary field while the Bernoulli-tail contraction bound is still
-  deferred rather than derived inside the matrix Chernoff proof. -/
-  tail_le_one : bernoulliTailOperator k degree X ≤ 1
   matrixTailBound :
     CompletenessAtLeast ψ
       ({ outcome := fun _ => bernoulliTailOperator k degree X
@@ -534,7 +530,7 @@ structure ChernoffBernoulliMatrixStatement {ι : Type*} [Fintype ι] [DecidableE
          sum_eq_total := by
            simp
          total_le_one := by
-           exact tail_le_one } : SubMeas Unit ι)
+           exact bernoulliTailOperator_le_one k degree X hXpsd hXleOne } : SubMeas Unit ι)
       (1 - kappa / (1 - theta) - Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2))
 
 /-- Paper origin: `references/ldt-paper/ld-pasting.tex:1799-1849`
