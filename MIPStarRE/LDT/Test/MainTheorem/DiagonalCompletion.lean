@@ -362,6 +362,62 @@ private theorem nonempty_ofCompletingToMeasurementInputs
     leftMatchMass := leftMatchMassPreservation.matchMassPreservation
     rightMatchMass := rightMatchMassPreservation.matchMassPreservation }⟩
 
+/-- Alice-side match-mass preservation still needed from the concrete
+orthonormalization construction.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:135-169`, where the
+paper replaces the pre-projective measurement \(G^{\mathrm A}\) by the
+orthonormalized projective submeasurement \(P^{\mathrm A}\) and later applies
+the line-169 transport.  The analytic source of the submeasurement is
+`references/ldt-paper/orthonormalization.tex:282`.
+
+This is a construction theorem for issue #1566.  It is deliberately not a
+hypothesis of `mainFormal`: callers provide only the line-130 consistency
+relation and the orthonormalization residual. -/
+theorem leftMatchMassPreservation_ofDiagonalConsistency
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
+    (orthResidual : MainFormalPostRolePackageDiagonalOrthonormalizationResidual
+      params strategy eps k scalars rolePackage)
+    (hpre : ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+      (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+      scalars.zeta1) :
+    MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
+      (unsymmetrizedLeftPOVM rolePackage.roleMeasurement) orthResidual.P_A
+      (unsymmetrizedRightPOVM rolePackage.roleMeasurement) := by
+  -- TODO(#1566): prove the QXP orthonormalization construction preserves the
+  -- diagonal match mass against the opposite role measurement.
+  sorry
+
+/-- Bob-side mirror of
+`leftMatchMassPreservation_ofDiagonalConsistency`.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:135-169`, with the two
+roles interchanged.  This is the corresponding construction theorem for issue
+#1566 and is not a hypothesis in the statement of `mainFormal`. -/
+theorem rightMatchMassPreservation_ofDiagonalConsistency
+    {params : Parameters} [FieldModel.{0} params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
+    (orthResidual : MainFormalPostRolePackageDiagonalOrthonormalizationResidual
+      params strategy eps k scalars rolePackage)
+    (hpre : ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+      (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+      scalars.zeta1) :
+    MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
+      (unsymmetrizedRightPOVM rolePackage.roleMeasurement) orthResidual.P_B
+      (unsymmetrizedLeftPOVM rolePackage.roleMeasurement) := by
+  -- TODO(#1566): prove the role-reversed QXP orthonormalization construction
+  -- preserves the diagonal match mass against the opposite role measurement.
+  sorry
+
 /-- Direct completion construction from the paper line-130 cross consistency.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:130-149`, where the
@@ -371,9 +427,10 @@ This is the source-shaped internal construction target for the `mainFormal`
 proof.  It does not ask callers for a diagonal-consistency record, a
 strong-self-consistency record, or match-mass preservation as an extra input.
 Those facts must be proved from the role-block construction and the
-orthonormalization argument.  The checked conditional lemmas above record useful
-analytic subarguments; this declaration records the remaining construction as an
-explicit proof obligation. -/
+orthonormalization argument.  The checked lemmas above prove the completion
+argument from the two named match-mass preservation obligations, so this
+declaration no longer hides the remaining construction as an additional
+assumption. -/
 theorem nonempty_ofDiagonalConsistency
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -388,10 +445,15 @@ theorem nonempty_ofDiagonalConsistency
       scalars.zeta1) :
     Nonempty (MainFormalPostRolePackageDiagonalCompletionResidual
       params strategy eps k scalars rolePackage) := by
-  -- TODO(#1043, #1359, #1458): choose the completion outcomes and derive the
-  -- self-consistency and match-mass preservation estimates from the paper
-  -- hypotheses, rather than requiring them as separate assumptions.
-  sorry
+  let a0 : Polynomial params :=
+    { poly := 0
+      lowIndividualDegree := by
+        intro i
+        simp }
+  exact nonempty_ofDiagonalConsistencyAndMatchMassPreservation
+    orthResidual a0 a0 hpre
+    (leftMatchMassPreservation_ofDiagonalConsistency orthResidual hpre)
+    (rightMatchMassPreservation_ofDiagonalConsistency orthResidual hpre)
 
 end MainFormalPostRolePackageDiagonalCompletionResidual
 
