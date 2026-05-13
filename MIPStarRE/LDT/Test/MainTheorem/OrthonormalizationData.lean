@@ -237,13 +237,13 @@ structure MainFormalPostRolePackageDiagonalCompletionResidual
 namespace MainFormalPostRolePackageDiagonalCompletionResidual
 
 /-- Convert the line-130 diagonal completion residual directly to the checked
-left-completion line-169 residual.
+projective completion-transport residual.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:135-173`.  The
 orthonormalize-and-complete statements used by the transport theorem are formed
 from the diagonal orthonormalization residual and the two completion estimates;
 no additional projective-completion record is introduced. -/
-noncomputable def toPostRolePackageLeftCompletionTransportResidual
+noncomputable def toProjectiveCompletionTransportResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
@@ -251,11 +251,14 @@ noncomputable def toPostRolePackageLeftCompletionTransportResidual
     {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
     (residual : MainFormalPostRolePackageDiagonalCompletionResidual
       params strategy eps k scalars rolePackage)
-    (hsmall : ¬ 1 ≤ mainFormalError params k eps) :
-    MainFormalPostRolePackageLeftCompletionTransportResidual
-      params strategy eps k scalars rolePackage :=
-  MainFormalPostRolePackageLeftCompletionTransportResidual.ofCompleteAtOutcomeStatements
-    hsmall residual.orthResidual.P_A residual.orthResidual.P_B residual.a_A residual.a_B
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
+    (hpre : ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+      (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+      scalars.zeta1) :
+    MainFormalCascadeProjectiveCompletionTransportResidual params strategy eps k scalars :=
+  mainFormalProjectiveCompletionTransportResidualOfCompleteAtOutcomeStatements
+    hsmall hpre residual.orthResidual.P_A residual.orthResidual.P_B residual.a_A residual.a_B
     { orthonormalizationCloseness := residual.orthResidual.leftCloseness
       completedCloseness := residual.leftCompletedCloseness }
     { orthonormalizationCloseness := residual.orthResidual.rightCloseness
