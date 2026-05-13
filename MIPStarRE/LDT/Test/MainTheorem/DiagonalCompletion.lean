@@ -214,40 +214,6 @@ noncomputable def toCompletionResidual
   leftMatchMass := input.leftMatchMassPreservation.matchMassPreservation
   rightMatchMass := input.rightMatchMassPreservation.matchMassPreservation
 
-/-- The completed measurements obtained from a completion input satisfy the
-construction-level match-mass monotonicity invariant used for the exact paper
-line-169 `ζ₁` links.
-
-This exposes the role of
-`ProjectivizationMatchMassMonotonicity.of_submeasurement_match_mass_and_completion`
-for callers that reason directly with completed projective measurements, while
-`toCompletionResidual` keeps the older residual's P-level match-mass fields.
-
-**Status:** currently unused (no callers).  Kept as a named interface for
-downstream consumers that need the `ProjectivizationMatchMassMonotonicity`
-witness directly rather than going through `toCompletionResidual`. -/
-theorem toProjectivizationMatchMassMonotonicity
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {scalars : MainFormalCascadeScalars params eps k}
-    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
-    {orthResidual : MainFormalPostRolePackageDiagonalOrthonormalizationResidual
-      params strategy eps k scalars rolePackage}
-    (input : MainFormalPostRolePackageDiagonalCompletionInput
-      params strategy eps k scalars rolePackage orthResidual) :
-    MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity strategy.state
-      (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
-      (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
-      (Preliminaries.completeAtOutcomeProj orthResidual.P_A input.a_A)
-      (Preliminaries.completeAtOutcomeProj orthResidual.P_B input.a_B) := by
-  open MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity in
-    exact of_submeasurement_match_mass_and_completion
-      orthResidual.P_A orthResidual.P_B input.a_A input.a_B
-      (Preliminaries.completeAtOutcomeProj orthResidual.P_A input.a_A)
-      (Preliminaries.completeAtOutcomeProj orthResidual.P_B input.a_B)
-      rfl rfl input.leftMatchMassPreservation input.rightMatchMassPreservation
-
 /-- Completing after lifting to the left tensor agrees with lifting the
 completion of the original submeasurement.
 
