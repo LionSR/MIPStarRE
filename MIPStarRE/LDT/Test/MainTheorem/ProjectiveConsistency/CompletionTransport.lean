@@ -1,4 +1,5 @@
-import MIPStarRE.LDT.Test.MainTheorem.ProjectiveConsistency.EvaluationHandoff
+import MIPStarRE.LDT.Test.MainTheorem.ProjectiveConsistency.Evaluation
+import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Handoff
 
 /-!
 # Projective completion transport residuals
@@ -20,14 +21,14 @@ Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, the
 projectivization/completion and line-169 handoff in the proof of
 `\label{thm:main-formal}`.
 
-This residual record is strictly weaker than
-`MainFormalCascadeProjectiveEvaluationHandoffResidual`.  It no longer asks for the
-unused Section 6 consistency field inside `UnsymmetrizationBridgePackage`, and it
-no longer asks for the pre-projective consistency field inside
-`ProjectivizationSelfConsistencyHandoff`: both are reconstructed downstream from the two
-paper factor-two role-block estimates and `hpass` via the checked line-116
-triangle and Step 5 Schwartz--Zippel wrapper.  The remaining open data are exactly
-what is still missing after those mechanical steps:
+This residual records only the data that remains after the checked
+role-unsymmetrization and pre-projective consistency steps.  The Section 6
+consistency field of `UnsymmetrizationBridgePackage` and the pre-projective
+consistency field of `ProjectivizationSelfConsistencyHandoff` are reconstructed
+downstream from the two paper factor-two role-block estimates and `hpass` via
+the checked line-116 triangle and Step 5 Schwartz--Zippel theorem.
+The remaining open data are exactly what is still missing after those mechanical
+steps:
 
 * the role-register measurement and the two factor-two estimates from
   `inductive_step.tex` lines 97--108;
@@ -86,31 +87,6 @@ structure MainFormalCascadeProjectiveCompletionTransportResidual
       scalars.zeta1
 
 namespace MainFormalCascadeProjectiveCompletionTransportResidual
-
-/-- The older line-169 residual contains all fields needed by the finer
-completion-transport residual; this coercion documents that the new target is a
-strict weakening of the previous one.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:135-173`. -/
-noncomputable def ofProjectiveEvaluationHandoffResidual
-    {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {scalars : MainFormalCascadeScalars params eps k}
-    (residual : MainFormalCascadeProjectiveEvaluationHandoffResidual
-      params strategy eps k scalars) :
-    MainFormalCascadeProjectiveCompletionTransportResidual params strategy eps k scalars where
-  roleMeasurement := residual.roleMeasurement
-  pointARightPOVMConsistency := residual.unsymmetrization.pointAConsistency
-  leftPOVMPointBConsistency := residual.unsymmetrization.pointBConsistency
-  leftMeasurement := residual.leftMeasurement
-  rightMeasurement := residual.rightMeasurement
-  leftCompletionCloseness := residual.projectivization.leftCompletionCloseness
-  rightCompletionCloseness := residual.projectivization.rightCompletionCloseness
-  leftProjectiveRightPOVMPolynomialConsistency :=
-    residual.leftProjectiveRightPOVMPolynomialConsistency
-  rightProjectiveLeftPOVMPolynomialConsistency :=
-    residual.rightProjectiveLeftPOVMPolynomialConsistency
 
 /-- View the factor-two role-block fields as the pre-projective target record. -/
 noncomputable def toUnsymmetrizedPOVMTargets
