@@ -49,59 +49,36 @@ tracked for resolution in \ghissue{931}.}
 
 \section{The formal statement}
 
-The Lean development provides the corresponding theorem but does not
-include the $\simeq_{\nu}$ consistency hypothesis \eqref{eq:paper-nu-consistency}.%
-\footnote{The Lean declaration is \leanid{MIPStarRE.LDT.SelfImprovement.selfImprovement}
-in \doclink{MIPStarRE/LDT/SelfImprovement/Theorems/Results.lean}, lines~172--262.}
-Instead it takes three explicit obligation hypotheses:\footnote{The
-obligation structure is \leanid{SelfImprovementObligations}
-in \doclink{MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean},
-lines~363--378.}
-\begin{itemize}
-  \item a strong-self-consistency input for the averaged helper measurement,
-  \item an orthonormalization input, and
-  \item a final-fields input that records the remaining conclusions.
-\end{itemize}
-The parameter $\nu$ appears in the theorem's conclusion---the completeness
-bound is $(1-\nu)-\zeta$---but there is no hypothesis
-tying $\nu$ to the input measurement $G$. The argument $G$ is passed to the
-helper lemma as an explicit unused parameter.
+The Lean declaration \leanid{MIPStarRE.LDT.SelfImprovement.selfImprovement}
+now includes the consistency hypothesis
+\eqref{eq:paper-nu-consistency}.  The former obligation bundle
+\leanid{SelfImprovementObligations} and the conditional theorem that used it
+have been removed.  Thus the discrepancy recorded in this note has been
+resolved at the level of the public theorem statement.
 
-In the induction-step wrapper%
-\footnote{\leanid{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection}
-in \doclink{MIPStarRE/LDT/MainInductionStep/Theorems.lean}, lines~66--155.}
-the $\simeq_{\nu}$ hypothesis does appear as a formal parameter, but the
-proof immediately delegates to an obligation-based theorem that ignores it.
-The hypothesis is thus vestigial at both the standalone and the
-induction-section level.
+The proof is still incomplete.  The missing work is now represented by an
+explicit \leanid{sorry} in the source-facing theorem, rather than by extra
+hypotheses on a conditional substitute for the theorem.
+
+The induction-step wrapper
+\leanid{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection}
+has the same status: its statement includes the input consistency hypothesis,
+and its remaining Section~9 work is a direct proof gap.
 
 \section{Mathematical consequence}
 
-The omission of $\simeq_{\nu}$ weakens the mathematical content of the
-formal theorem. In the type of the Lean theorem, $\nu$ is a free real
-parameter with no constraint beyond its appearance in the error expression
-$(1-\nu)-\mathrm{error}$. Because the Lean theorem's hypotheses make no
-demands on $\nu$ and do not relate $\nu$ to any property of $G$, a call
-site is free to supply $\nu=1$; the bound then reads $-\mathrm{error}$,
-which is mathematically trivial. More generally, the theorem does not
-construct a small $\nu$ from $G$ and $A$; it merely accepts an arbitrary
-$\nu$ and promises that \emph{if} the obligation hypotheses are supplied,
-the conclusions follow. This is a genuine logical gap between the paper
-statement and the formal statement, not a notational convention. The
-obligations record the missing proof work explicitly, but they do not
-restore a hypothesis on $G$ to the statement.
+The previous theorem statement was too weak to express the paper's claim,
+because $\nu$ was not related to the input measurement.  The present theorem
+statement no longer has that defect.  The remaining mathematical problem is to
+derive the helper strong self-consistency estimate, the orthonormalization
+input, and the final-field transport from the paper hypotheses.
 
 \section{Blueprint status}
 
-The blueprint entry for the self-improvement theorem%
-\footnote{\path{blueprint/src/chapter/ch07_self_improvement.tex},
-lines~490--495.}
-lists the four Lean declarations and marks them \leanid{\textbackslash leanok}.
-While all four compile without \leanid{sorry}, the blueprint does not
-make the hypothesis discrepancy apparent. The Lean statement and the paper
-statement differ, and the blueprint's \leanid{\textbackslash leanok}
-annotation could be read as asserting that the full paper theorem is
-formalized without additional hypotheses.
+The blueprint entry now points to the source-facing theorem
+\leanid{selfImprovement}.  No top-level conditional obligation theorem is
+advertised as the formalization of the paper theorem.  The proof-level gap is
+tracked by issue~\#1515.
 
 \section{Error coefficients}
 
@@ -121,11 +98,9 @@ $\zeta = 3000\,m\,(\eps^{1/32}+\delta^{1/32}+(d/q)^{1/32})$ matches the paper.
 
 The paper's self-improvement theorem requires an approximation hypothesis
 $\simeq_{\nu}$ linking the input measurement $G$ to the parent measurement
-$A$. The formal theorem omits this hypothesis and instead accepts explicit
-obligation hypotheses. Until the obligations are discharged in a way
-that recovers the missing $\simeq_{\nu}$ constraint on $G$, or the
-blueprint is amended to document the changed statement, the formal theorem
-does not match the paper's self-improvement theorem.
+$A$.  The Lean statement now contains this hypothesis.  The remaining task is
+to complete the proof of the source-facing theorem, not to reintroduce the
+missing work as auxiliary hypotheses.
 
 \bibliographystyle{alpha}
 \bibliography{references}

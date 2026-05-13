@@ -77,12 +77,14 @@ are being actively removed.
    fact not yet formalized, state it as a separate proof obligation.  A
    temporary `sorry` in this declaration is preferable to adding the obligation as
    a hypothesis on the paper theorem.
-4. **Use conditional helpers only as quarantine.**  A helper such as
-   `mainFormal_ofProjectiveCompletionResidual` or `selfImprovementFromObligations`
-   is allowed only to preserve downstream proof content while the missing
-   obligation discharger is being proved.  It must have a conditional name, a tracked
-   removal target, and no source-labelled blueprint `\leanok`.  The
-   paper-facing declaration must remain source-faithful.
+4. **Do not introduce conditional helpers by default.**  A helper such as
+   `mainFormal_ofProjectiveCompletionResidual` is a quarantine device, not a
+   normal formalization pattern.  It is acceptable only when it preserves
+   substantial proof content that cannot yet be connected to the paper
+   hypotheses, has a tracked removal target, and has no source-labelled
+   blueprint `\leanok`.  If the helper would merely package missing work as an
+   extra hypothesis, restore the source-facing theorem and leave a tracked
+   `sorry` instead.
 5. **Audit the final statement.**  Every PR touching a source-labelled theorem
    should compare paper assumptions and Lean assumptions, paper conclusion and
    Lean conclusion, and report whether the Lean statement is exact, has only
@@ -98,11 +100,11 @@ with a tracked `sorry` is preferred whenever possible, because it makes the
 missing mathematical assertion visible without adding it to the paper theorem
 statement.
 
-### Conditional helper shape
+### Conditional helper boundary
 
-1. **Hypothesis is named as debt.**  A `structure` or `Prop`-valued
-   abbreviation bundles assumptions needed by a conditional helper but not yet
-   produced by earlier statements.  Example from
+1. **Hypothesis is named as debt.**  A `Prop`-valued abbreviation may name a
+   single mathematical construction that has not yet been produced by earlier
+   statements.  Example from
    `MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean`:
 
    ```lean
@@ -116,30 +118,17 @@ statement.
          (selfImprovementHelperError params eps delta)
    ```
 
-   This `abbrev` says: "The conditional self-improvement helper needs an
-   orthonormalization bridge.  For any helper submeasurement `Hhat` that
-   is strongly self-consistent, we need a spectral-truncation and
-   locality-preserving repair witness."
+   This `abbrev` says: "For any helper submeasurement `Hhat` that is strongly
+   self-consistent, we still need the spectral-truncation and
+   locality-preserving repair witness required by orthonormalization."
 
-2. **Only a quarantined conditional helper takes the hypothesis as an argument.**  A helper like
-   `selfImprovementFromObligations` in
-   `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/Core.lean`
-   takes `SelfImprovementObligations`, whose fields include
-   `OrthonormalizationInput` and analogous proof-obligation structures, as an
-   explicit argument.  This is not the paper theorem; it is the temporary
-   surface where the remaining obligations are isolated:
-
-   ```lean
-   theorem selfImprovementFromObligations
-       (params : Parameters)
-       [FieldModel params.q]
-       (strategy : SymStrat params ι)
-       (eps delta gamma nu : Error)
-       (obligations :
-         SelfImprovement.SelfImprovementObligations params strategy eps delta nu)
-       ...
-       (G : Measurement (Polynomial params) ι) ... : ...
-   ```
+2. **Do not bundle several missing theorem-level steps into one hypothesis.**
+   The former Section 9 bundle `SelfImprovementObligations` and the helper
+   `selfImprovementFromObligations` were removed because they packaged
+   helper strong self-consistency, orthonormalization, and final-field transport
+   into a single route to the full self-improvement conclusion.  The correct
+   boundary is now the source-facing theorem `selfImprovement`, whose missing
+   proof is an explicit `sorry`.
 
    The former induction-section helper
    `selfImprovementInInductionSection_ofObligations` was removed because it
@@ -183,7 +172,6 @@ When such a declaration remains useful, its role should be one of the following:
 | `SelfImprovement.OrthonormalizationInput` | Conditional input for the Section 5 orthonormalization construction; discharge through internal proof obligations such as the QXP repair witness |
 | `SelfImprovement.FinalFieldsInput` | Conditional input for final Section 9 estimates; replace at the paper theorem boundary by source-faithful statements or named internal proof obligations |
 | `SelfImprovement.HelperStrongSelfConsistencyInput` | Conditional input for helper strong self-consistency estimates; keep tracked until produced |
-| `SelfImprovement.SelfImprovementObligations` | Historical bundle of the preceding inputs; do not introduce as a hypothesis on a paper-labelled theorem |
 | `mainFormal_ofProjectiveCompletionResidual` | Conditional final-transport theorem; keep as reusable proof content, but do not present it as the paper theorem |
 | `MainFormalPostRolePackageDiagonalOrthonormalizationResidual` | Internal residual produced from line-130 cross consistency; do not replace it by an orthonormalization-input hypothesis on `mainFormal` |
 | `MakingMeasurementsProjective.OrthonormalizationInput` | Conditional input for the orthonormalization proof; keep visibly distinct from source-faithful paper statements |
@@ -230,18 +218,11 @@ paper-labelled declarations:
   the public statement of the paper theorem, unless it is a faithful encoding
   of a hypothesis present in the cited source.
 
-Obligation structures that are markers for still-unproved intermediate facts
-(such as `SelfImprovementObligations`) are proof debt under this pattern.  They
-should carry a live tracker reference (for example #1458 or #422), and their
-fields should be the *assumptions* of the paper's proof, not the *conclusion* of
-the theorem.
-
-They are permitted only as temporary hypotheses of conditional helpers or
-intermediate construction theorems, and only while the helper preserves useful
-mathematical proof content.  If such an obligation structure appears in the
-public signature of a source-labelled theorem, or if it starts propagating
-through downstream source-facing packages, the statement should be restored and
-the missing proof should be represented by an explicit `sorry`.
+Obligation structures that bundle still-unproved theorem-level steps are proof
+debt under this pattern.  They should not be introduced merely because a proof
+is blocked.  The preferred repair is to keep the paper-labelled statement
+source-faithful and make the exact missing mathematical step visible as a named
+lemma or as a `sorry` in the source-facing theorem.
 
 ---
 
@@ -441,28 +422,14 @@ have not yet been discharged locally.  It is temporary proof debt.  Do not add a
 new obligation structure unless a direct source-faithful proof route has first been
 attempted and the remaining obstruction is documented.
 
-### Example
+### Removed anti-example
 
-From `MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean`:
-
-```lean
-structure SelfImprovementObligations (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι) (eps delta nu : Error) where
-  helperStrongSelfConsistency :
-    HelperStrongSelfConsistencyInput params strategy eps delta
-  orthonormalization :
-    OrthonormalizationInput params strategy eps delta
-  finalFields :
-    FinalFieldsInput params strategy eps delta nu
-```
-
-A separately named conditional helper may take
-`(h : SelfImprovementObligations params strategy eps delta nu)` as a
-hypothesis and project the needed field inside the proof body only if the helper
-records reusable proof content.  This does not prove the corresponding paper
-theorem.  The structure should be eliminated by internal theorems, or the
-source-labelled theorem should be restored with the remaining proof obligation
-visible as `sorry`.
+The old Section 9 interface bundled helper strong self-consistency,
+orthonormalization, and final-field transport into a structure named
+`SelfImprovementObligations`, then used a conditional theorem to obtain the
+full self-improvement conclusion.  That made the formalization look more
+complete than it was.  The current code removes that bundle and leaves the
+proof gap in `MIPStarRE.LDT.SelfImprovement.selfImprovement`.
 
 ### Rules
 

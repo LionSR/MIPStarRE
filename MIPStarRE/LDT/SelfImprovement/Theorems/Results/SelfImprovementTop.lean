@@ -12,5 +12,6 @@ final-fields constructors.  The theorem wrappers are in `SelfImprovementTop.Core
 the completeness constructor is in `SelfImprovementTop.Completeness`, the
 self-closeness constructor is in `SelfImprovementTop.SelfCloseness`, and the
 monotone-total final-fields assembler is in `SelfImprovementTop.FinalFields`.
-The residual-domination wrapper is in `SelfImprovementTop.ResidualDomination`.
+`SelfImprovementTop.ResidualDomination` remains as a compatibility module
+marking the removal of top-level conditional residual-domination wrappers.
 -/

@@ -162,8 +162,8 @@ theorem selfImprovementInInductionSection
       SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
   -- TODO(#1503): prove the induction-section theorem from the paper hypotheses.
   -- In particular, do not replace the input-submeasurement completion and
-  -- Section 9 derivation by `SelfImprovementObligations`; those were conditional
-  -- proof debt, not hypotheses of the paper statement.
+  -- Section 9 derivation by a bundled obligation hypothesis; such assumptions
+  -- are proof debt, not hypotheses of the paper statement.
   sorry
 
 /-- Assemble the slice-wise outputs feeding `selfImprovementInInductionSection`

@@ -696,33 +696,4 @@ theorem helper_strong_self_consistency_input_of_selfConsistency_localVariance
   exact helper_strong_self_consistency_obligations_of_selfConsistency_localVariance
     params strategy eps delta hssc (hlocal hhelper) (hresidual hhelper)
 
-/-- Build the full self-improvement obligation record when the helper strong
-self-consistency field is supplied by named obligations.
-
-This constructor isolates the first of the three residual Section 9 inputs in
-`SelfImprovementObligations`. The helper-stage field is derived from the
-actual helper output and the add-in-`u`/variance obligations, while the
-orthonormalization and final-fields inputs remain explicit hypotheses. -/
-def SelfImprovementObligations.ofHelperStrongSelfConsistencyObligations
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta nu : Error)
-    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
-    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
-    (hobligations :
-      ∀ {T : Measurement (Polynomial params) ι}
-        {Hhat : SubMeas (Polynomial params) ι}
-        {Z : MIPStarRE.Quantum.Op ι},
-        SelfImprovementHelperConclusion params strategy T Hhat Z eps delta →
-          HelperStrongSelfConsistencyObligations
-            params strategy T Hhat eps delta)
-    (horthonormalization : OrthonormalizationInput params strategy eps delta)
-    (hfinalFields : FinalFieldsInput params strategy eps delta nu) :
-    SelfImprovementObligations params strategy eps delta nu where
-  helperStrongSelfConsistency :=
-    helper_strong_self_consistency_input_of_obligations
-      params strategy eps delta heps hdelta hd_le_q hobligations
-  orthonormalization := horthonormalization
-  finalFields := hfinalFields
-
 end MIPStarRE.LDT.SelfImprovement

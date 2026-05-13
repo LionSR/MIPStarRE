@@ -363,9 +363,9 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_obligations_of_selfConsistency_localVariance}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_input_of_obligations}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_input_of_selfConsistency_localVariance}
-  to recover the final helper-stage self-consistency input. The corresponding
-  obligation constructor is
-  \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementObligations.ofHelperStrongSelfConsistencyObligations}.
+  to recover the final helper-stage self-consistency input.  The remaining
+  theorem-level derivation is not packaged as an additional hypothesis; it is
+  the proof gap in the source-facing theorem below.
   The paper's arithmetic shows that the right-hand error is at most
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_error_le_selfImprovementHelperError}
   \[
@@ -429,18 +429,12 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.self_improvement_helper_with_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.self_improvement_helper_with_slackness_of_sdp_statement_with_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndResidualDominationInput}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithSlacknessAndQXPRepairAndCoisometry}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromSlacknessResidualDominationObligations}
-  \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementSlacknessResidualDominationObligations}
-  The formalization also records a strengthened helper theorem whose output
-  carries the complementary-slackness equations used in the completeness chain,
-  together with the residual-domination bridge that assembles the full
-  self-improvement conclusion from the slackness-carrying helper.  An
-  intermediate assembly route uses a QXP repair obligation plus the
-  construction-level coisometry identity through the same bridge.
-  These theorems use the Section~9 statement above. Their proofs are not yet
-  complete, because the strong-duality proof for the SDP remains to be formalized.
+  The formalization records a strengthened helper theorem whose output carries
+  the complementary-slackness equations used in the completeness chain.  The
+  previous top-level residual-domination assembly wrappers have been removed:
+  the full self-improvement conclusion is now advertised only by the
+  source-facing theorem below, whose incomplete proof explicitly records the
+  remaining Section~9 work.
 \end{remark}
 
 \subsection{A Semidefinite Program}
@@ -579,20 +573,14 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   distributivity, to the displayed equation \(T_gZ=T_gA_g\).
 \end{proof}
 
-\begin{remark}[Residual-dominating self-improvement assembly]\label{rem:sdp-matrix-residual-domination-assembly}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDomination}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDominationInput}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDomination}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDominationInput}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairAndQXPResidualDomination}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementWithCanonicalOptimalPairAndQXPRepairAndResidualDomination}
-  These auxiliary results combine the matrix slackness output with a
-  residual-dominating orthonormalization input.  The residual-domination
-  hypothesis can be supplied either as an intrinsic self-improvement
-  orthonormalization input or by a QXP repair construction carrying the
-  fresh-outcome domination invariant.  These are intermediate proof obligations
-  for the projective-output step, not part of the paper statement of
-  Lemma~\ref{lem:sdp-matrix-slackness-output}.
+\begin{remark}[Removed residual-dominating assembly wrappers]\label{rem:sdp-matrix-residual-domination-assembly}
+  Earlier Lean versions exposed top-level conditional assembly theorems that
+  combined the matrix slackness output with residual-dominating
+  orthonormalization and QXP-repair inputs.  These declarations have been
+  removed.  The matrix slackness material is retained only up to the
+  slackness-carrying helper output, and the full projective-output conclusion is
+  represented by the source-facing theorem
+  \texttt{MIPStarRE.LDT.SelfImprovement.selfImprovement}.
 \end{remark}
 
 \begin{lemma}[Dual SDP and complementary slackness]\label{lem:sdp}
@@ -1018,20 +1006,17 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
 
 \begin{remark}[Auxiliary self-improvement lemmas]\label{rem:self-improvement-lean-interfaces}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementError_nonneg_of_isGood}
-  \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementObligations}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementFromObligations}
   \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationSpectralObligation_of_projectiveNonMeasurement}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_of_helper_outputs_of_total_expectation_le}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_of_helper_outputs_of_total_operator_le}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_exists_of_helper_outputs_of_residual_domination}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_exists_of_helper_outputs_of_residualDominationInput}
-  \lean{MIPStarRE.LDT.SelfImprovement.SelfImprovementSlacknessResidualDominationObligations}
   Several auxiliary results are used to prove Theorem~\ref{thm:self-improvement}
   from the helper output and the orthonormalization theorem.  They record
-  intermediate proof obligations that do not appear as hypotheses in the paper
-  statement.  The theorem below records the paper-facing conclusion; its proof
-  is not yet complete because the derivation from the input consistency
-  hypothesis is still tracked by issue~\#1515.
+  local intermediate estimates and final-field assembly lemmas.  The theorem
+  below records the paper-facing conclusion; its proof is not yet complete
+  because the derivation from the input consistency hypothesis is still tracked
+  by issue~\#1515.
 \end{remark}
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement}
