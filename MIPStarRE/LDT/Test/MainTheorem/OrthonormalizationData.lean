@@ -12,15 +12,12 @@ Post-role projectivization and orthonormalization hypotheses for the
 `mainFormal` assembly.  This module records the data that the
 orthonormalization lemma (`lem:orthonormalization-main-lemma`) and the
 completion theorem (`prop:completing-to-measurement`) require beyond the
-role-register measurement and the unsymmetrization links.  The central
-structures are:
+role-register measurement and the unsymmetrization links.
 
-* `MainFormalPostRolePackageProjectiveCompletionResidual` — post-role Step 6
-  witness data with concrete projectivization witnesses.
-
-* `MainFormalPostRolePackageDiagonalCompletionResidual` — the final residual
-  that records both the diagonal orthonormalization residual and the completion
-  data, ready for consumption by the projective-consistency transport.
+The central residual is `MainFormalPostRolePackageDiagonalCompletionResidual`.
+It records the line-130 provenance of the projective submeasurements, the
+completion estimates, and the construction-level match-mass obligations, and it
+converts directly to the checked projective-consistency transport residual.
 
 The module also proves tight `ζ₁` polynomial-consistency lemmas
 (`leftPolynomialConsistency_with_orthonormalization_loss`,
@@ -45,85 +42,6 @@ open MIPStarRE.LDT.MakingMeasurementsProjective
 namespace MIPStarRE.LDT
 
 namespace Test
-
-/-- Post-role Step 6 witness data with the actual projectivization witnesses fixed.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, using
-`references/ldt-paper/orthonormalization.tex:282`
-(`\label{lem:orthonormalization-main-lemma}`) and completion.
-
-This record corresponds to `inductive_step.tex` lines 135--149 after the
-role-register Section 6 output has already been produced and unsymmetrized.  It
-stores the concrete projective submeasurements `P^A,P^B`, the distinguished
-completion outcomes, and the two orthonormalize-and-complete statements giving
-the completed measurements `Q^A,Q^B`.
-
-The match-mass fields are the construction-level line-169 supplement: they are
-tied to these chosen witnesses, rather than universally quantified over every
-possible orthonormalize-and-complete output. -/
-structure MainFormalPostRolePackageProjectiveCompletionResidual
-    (params : Parameters) [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
-    (scalars : MainFormalCascadeScalars params eps k)
-    (rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars) where
-  /-- Alice-side projective submeasurement from paper line 138. -/
-  P_A : ProjSubMeas (Polynomial params) ι
-  /-- Bob-side projective submeasurement from paper line 138. -/
-  P_B : ProjSubMeas (Polynomial params) ι
-  /-- Alice-side distinguished outcome receiving the completion residual. -/
-  a_A : Polynomial params
-  /-- Bob-side distinguished outcome receiving the completion residual. -/
-  a_B : Polynomial params
-  /-- Alice-side orthonormalize-and-complete statement, paper lines 140 and 146. -/
-  leftStatement :
-    MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement strategy.state
-      (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
-      P_A (Preliminaries.completeAtOutcomeProj P_A a_A) a_A scalars.zeta1
-  /-- Bob-side orthonormalize-and-complete statement, paper lines 141 and 147. -/
-  rightStatement :
-    MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement strategy.state
-      (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
-      P_B (Preliminaries.completeAtOutcomeProj P_B a_B) a_B scalars.zeta1
-  /-- Alice-side construction-level match-mass monotonicity for the chosen
-  orthonormalization witness. -/
-  leftMatchMass :
-    qBipartiteMatchMass strategy.state P_A.toSubMeas
-        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas ≥
-      qBipartiteMatchMass strategy.state
-        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas
-        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas
-  /-- Bob-side construction-level match-mass monotonicity for the chosen
-  orthonormalization witness. -/
-  rightMatchMass :
-    qBipartiteMatchMass strategy.state P_B.toSubMeas
-        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas ≥
-      qBipartiteMatchMass strategy.state
-        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas
-        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas
-
-namespace MainFormalPostRolePackageProjectiveCompletionResidual
-
-/-- Consume the post-role Step 6 witness residual and recover the checked
-left-completion line-169 residual.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:135-173`. -/
-noncomputable def toPostRolePackageLeftCompletionTransportResidual
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {scalars : MainFormalCascadeScalars params eps k}
-    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
-    (residual : MainFormalPostRolePackageProjectiveCompletionResidual
-      params strategy eps k scalars rolePackage)
-    (hsmall : ¬ 1 ≤ mainFormalError params k eps) :
-    MainFormalPostRolePackageLeftCompletionTransportResidual
-      params strategy eps k scalars rolePackage :=
-  MainFormalPostRolePackageLeftCompletionTransportResidual.ofCompleteAtOutcomeStatements
-    hsmall residual.P_A residual.P_B residual.a_A residual.a_B
-    residual.leftStatement residual.rightStatement residual.leftMatchMass residual.rightMatchMass
-
-end MainFormalPostRolePackageProjectiveCompletionResidual
 
 /-- The pre-completion projective submeasurements obtained from line 130 by the
 cross-consistency orthonormalization wrapper.
@@ -316,67 +234,35 @@ structure MainFormalPostRolePackageDiagonalCompletionResidual
         (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas
         (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas
 
-namespace MainFormalPostRolePackageProjectiveCompletionResidual
+namespace MainFormalPostRolePackageDiagonalCompletionResidual
 
-/-- Build the fixed Step 6 witness data from a line-130 orthonormalization
-residual plus the still-external completion estimates.
+/-- Convert the line-130 diagonal completion residual directly to the checked
+left-completion line-169 residual.
 
-This constructor is the honest passage from the new cross-consistency
-orthonormalization wrapper to the existing orthonormalize-and-complete residual:
-the projective submeasurements and their line-138 closeness now come from
-`ConsRel G^A G^B ζ₁`; only the completion-to-measurement closeness and
-match-mass monotonicity remain supplied separately. -/
-noncomputable def ofDiagonalOrthonormalizationAndCompletion
+Paper origin: `references/ldt-paper/inductive_step.tex:135-173`.  The
+orthonormalize-and-complete statements used by the transport theorem are formed
+from the diagonal orthonormalization residual and the two completion estimates;
+no additional projective-completion record is introduced. -/
+noncomputable def toPostRolePackageLeftCompletionTransportResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
-    (orthResidual : MainFormalPostRolePackageDiagonalOrthonormalizationResidual
+    (residual : MainFormalPostRolePackageDiagonalCompletionResidual
       params strategy eps k scalars rolePackage)
-    (a_A a_B : Polynomial params)
-    (leftCompletedCloseness :
-      SDDRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily
-          (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas.liftLeft)
-        (constSubMeasFamily
-          (Preliminaries.completeAtOutcomeProj orthResidual.P_A a_A).toSubMeas.liftLeft)
-        (MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1))
-    (rightCompletedCloseness :
-      SDDRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily
-          (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas.liftLeft)
-        (constSubMeasFamily
-          (Preliminaries.completeAtOutcomeProj orthResidual.P_B a_B).toSubMeas.liftLeft)
-        (MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1))
-    (leftMatchMass :
-      qBipartiteMatchMass strategy.state orthResidual.P_A.toSubMeas
-          (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas ≥
-        qBipartiteMatchMass strategy.state
-          (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas
-          (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
-    (rightMatchMass :
-      qBipartiteMatchMass strategy.state orthResidual.P_B.toSubMeas
-          (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas ≥
-        qBipartiteMatchMass strategy.state
-          (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas
-          (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas) :
-    MainFormalPostRolePackageProjectiveCompletionResidual
-      params strategy eps k scalars rolePackage where
-  P_A := orthResidual.P_A
-  P_B := orthResidual.P_B
-  a_A := a_A
-  a_B := a_B
-  leftStatement :=
-    { orthonormalizationCloseness := orthResidual.leftCloseness
-      completedCloseness := leftCompletedCloseness }
-  rightStatement :=
-    { orthonormalizationCloseness := orthResidual.rightCloseness
-      completedCloseness := rightCompletedCloseness }
-  leftMatchMass := leftMatchMass
-  rightMatchMass := rightMatchMass
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps) :
+    MainFormalPostRolePackageLeftCompletionTransportResidual
+      params strategy eps k scalars rolePackage :=
+  MainFormalPostRolePackageLeftCompletionTransportResidual.ofCompleteAtOutcomeStatements
+    hsmall residual.orthResidual.P_A residual.orthResidual.P_B residual.a_A residual.a_B
+    { orthonormalizationCloseness := residual.orthResidual.leftCloseness
+      completedCloseness := residual.leftCompletedCloseness }
+    { orthonormalizationCloseness := residual.orthResidual.rightCloseness
+      completedCloseness := residual.rightCompletedCloseness }
+    residual.leftMatchMass residual.rightMatchMass
 
-end MainFormalPostRolePackageProjectiveCompletionResidual
+end MainFormalPostRolePackageDiagonalCompletionResidual
 
 end Test
 

@@ -12,14 +12,10 @@ and the two unsymmetrization links are established, the remaining step is to
 close the projective completion gap: the orthonormalize-and-complete procedure
 (`lem:orthonormalization-main-lemma`, `prop:completing-to-measurement`)
 produces projective measurements at distance `ζ₂` from the unsymmetrized ones.
-This module records that post-role obligation at the current proof boundary.
-The live residual is
-`MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual`: its first
-field is the concrete Section 6 role residual, and its post-role field asks only
-for the left-register completion estimates and the match-mass monotonicity
-invariant needed to recover the paper line-169 polynomial links.  It then
-converts directly to the projective completion residual consumed by the
-culminating `mainFormal` step.
+This module records the post-role residual that asks only for the left-register
+completion estimates and the match-mass monotonicity invariant needed to recover
+the paper line-169 polynomial links.  It then converts directly to the projective
+completion residual consumed by the culminating `mainFormal` step.
 
 ## References
 
@@ -233,104 +229,6 @@ noncomputable def toCompletionTransportResidual
           residual.completionTransportMatchMassMonotonicity hpre_symm }
 
 end MainFormalPostRolePackageLeftCompletionTransportResidual
-
-/-- Combined live residual after isolating the concrete role-register output
-and the #869 Bob-side completion transport.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:68-173`, with Bob-side
-completion transport recorded as a formalization-level register-placement step.
-
-The post-role field records the left-register Bob-side completion estimate
-returned by the orthonormalize-and-complete chain, and the conversion below
-transports it to the right register using permutation invariance of the strategy
-state.  The concrete role residual and the construction-level match-mass
-invariant for the exact paper line-169 `ζ₁` links remain explicit. -/
-structure MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual
-    (params : Parameters) [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) (eps : Error)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
-    (scalars : MainFormalCascadeScalars params eps k) where
-  /-- The explicit isolated Section 6 residual.  Keeping this field concrete avoids
-  hiding the role-register measurement behind `Classical.choice`. -/
-  roleResidual : MainFormalRolePackageResidual params strategy eps hpass k
-  /-- The remaining projectivization/completion and line-169 data after role production,
-  with Bob-side completion still left-lifted. -/
-  postRoleResidual :
-    MainFormalPostRolePackageLeftCompletionTransportResidual params strategy eps k scalars
-      (roleResidual.rolePackage scalars)
-
-namespace MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual
-
-/-- Combine a concrete Section 6 role residual with the checked post-role
-orthonormalize-and-complete constructor.
-
-This is the direct constructor for the current live residual once role production,
-completion statements, and the construction-level line-169 match-mass monotonicity
-inputs are available. -/
-noncomputable def ofRoleResidualAndCompleteAtOutcomeStatements
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {hpass : strategy.PassesLowIndividualDegreeTest eps}
-    {scalars : MainFormalCascadeScalars params eps k}
-    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
-    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
-    (P_A P_B : ProjSubMeas (Polynomial params) ι)
-    (a_A a_B : Polynomial params)
-    (leftStmt :
-      MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement strategy.state
-        (unsymmetrizedLeftPOVM (roleResidual.rolePackage scalars).roleMeasurement)
-        P_A (Preliminaries.completeAtOutcomeProj P_A a_A) a_A scalars.zeta1)
-    (rightStmt :
-      MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement strategy.state
-        (unsymmetrizedRightPOVM (roleResidual.rolePackage scalars).roleMeasurement)
-        P_B (Preliminaries.completeAtOutcomeProj P_B a_B) a_B scalars.zeta1)
-    (hleftMass :
-      qBipartiteMatchMass strategy.state P_A.toSubMeas
-          (unsymmetrizedRightPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas ≥
-        qBipartiteMatchMass strategy.state
-          (unsymmetrizedLeftPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas
-          (unsymmetrizedRightPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
-    (hrightMass :
-      qBipartiteMatchMass strategy.state P_B.toSubMeas
-          (unsymmetrizedLeftPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas ≥
-        qBipartiteMatchMass strategy.state
-          (unsymmetrizedRightPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas
-          (unsymmetrizedLeftPOVM (roleResidual.rolePackage scalars).roleMeasurement).toSubMeas) :
-    MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual
-      params strategy eps hpass k scalars where
-  roleResidual := roleResidual
-  postRoleResidual :=
-    MainFormalPostRolePackageLeftCompletionTransportResidual.ofCompleteAtOutcomeStatements
-      hsmall P_A P_B a_A a_B leftStmt rightStmt hleftMass hrightMass
-
-/-- Convert the left-completion residual directly to the projective completion
-transport residual by applying the #869 right-register transport to the Bob-side
-completion estimate, using the separately reconstructed paper line-130
-`G^A/G^B` consistency proof.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:135-173`. -/
-noncomputable def toCompletionTransportResidual
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {hpass : strategy.PassesLowIndividualDegreeTest eps}
-    {scalars : MainFormalCascadeScalars params eps k}
-    (residual : MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual
-      params strategy eps hpass k scalars)
-    (hpre : ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily
-        (unsymmetrizedLeftPOVM
-          (residual.roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
-      (constSubMeasFamily
-        (unsymmetrizedRightPOVM
-          (residual.roleResidual.rolePackage scalars).roleMeasurement).toSubMeas)
-      scalars.zeta1) :
-    MainFormalCascadeProjectiveCompletionTransportResidual params strategy eps k scalars :=
-  residual.postRoleResidual.toCompletionTransportResidual hpre
-
-end MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual
 
 end Test
 

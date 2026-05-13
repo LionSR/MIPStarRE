@@ -95,34 +95,9 @@ theorem mainFormal_ofProjectiveCompletionResidual
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  let rolePackage := projectiveCompletionResidual.roleResidual.rolePackage scalars
-  have hpre : ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
-      (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
-      scalars.zeta1 := by
-    simpa [rolePackage] using
-      projectiveCompletionResidual.roleResidual.diagonalConsistency scalars
-  let rolePackageResidualLeftCompletionTransportResidual :
-      MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual
-        (params := params) (strategy := strategy) (eps := eps)
-        (hpass := hpass) (k := k) (scalars := scalars) :=
-    projectiveCompletionResidual.toLeftCompletionTransportResidual hsmall
-  have hpreForResidual : ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily
-        (unsymmetrizedLeftPOVM
-          (rolePackageResidualLeftCompletionTransportResidual.roleResidual.rolePackage
-            scalars).roleMeasurement).toSubMeas)
-      (constSubMeasFamily
-        (unsymmetrizedRightPOVM
-          (rolePackageResidualLeftCompletionTransportResidual.roleResidual.rolePackage
-            scalars).roleMeasurement).toSubMeas)
-      scalars.zeta1 := by
-    open MainFormalCascadeRolePackageResidualProjectiveCompletionResidual in
-    simpa [rolePackage, rolePackageResidualLeftCompletionTransportResidual,
-      toLeftCompletionTransportResidual] using hpre
   have completionTransportResidual :
       MainFormalCascadeProjectiveCompletionTransportResidual params strategy eps k scalars :=
-    rolePackageResidualLeftCompletionTransportResidual.toCompletionTransportResidual hpreForResidual
+    projectiveCompletionResidual.toCompletionTransportResidual hsmall
   have projectiveTargets :
       MainFormalCascadeProjectiveStageTargets params strategy eps k scalars :=
     completionTransportResidual.toProjectiveStageTargets hpass

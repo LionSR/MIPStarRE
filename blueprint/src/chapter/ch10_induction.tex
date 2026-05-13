@@ -696,7 +696,7 @@ assembly residual:
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.projectivizationSelfConsistencyHandoff, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.fullPolynomialConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.projectiveEvaluationConsistency}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.pointAConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.pointBConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.toProjectiveStageTargets}
 \lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageLeftCompletionTransportResidual, MIPStarRE.LDT.Test.MainFormalPostRolePackageLeftCompletionTransportResidual.toCompletionTransportResidual}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual, MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual.toCompletionTransportResidual}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualProjectiveCompletionResidual.toCompletionTransportResidual}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeTransportTargets, MIPStarRE.LDT.Test.MainFormalCascadeTransportTargets.toCascadeTargets, MIPStarRE.LDT.Test.MainFormalCascadeTargets.toNativeTargets}
 \lean{MIPStarRE.LDT.Test.MainFormalNativeTargets, MIPStarRE.LDT.Test.MainFormalNativeTargets.toMainFormal}
 They split off the vacuous branch where the theorem error is at least $1$,
@@ -726,16 +726,14 @@ completion closeness at $\zeta_2$.  Lean also derives the evaluated line-164
 projective consistency, data-processes the two polynomial line-169 $\zeta_1$
 links to the evaluated line-172 links, and proves the two native $\zeta_4$ point
 goals via \texttt{simeq-triangle-inequality}.  After the \#869 right-register
-completion transport, the remaining active residual is now the split
-\texttt{MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual}: its
-first field is the concrete Section~6 role residual, and its post-role field asks
-only for Alice's line-146 completion closeness, Bob's left-register completion
-closeness as returned by orthonormalize-and-complete, and the construction-level
+completion transport, the remaining active post-role residual asks only for
+Alice's line-146 completion closeness, Bob's left-register completion closeness
+as returned by orthonormalize-and-complete, and the construction-level
 match-mass monotonicity invariant needed for the exact polynomial-level
 $\zeta_1$ transport links from paper line~169 and its role-reversed analogue.
-Lean reconstructs pre-projective full-polynomial consistency from the role
-residual, uses the match-mass invariant to derive the two line-169 links, and
-transports the Bob-side left-register completion estimate to the line-147
+Lean reconstructs pre-projective full-polynomial consistency from the concrete
+role residual, uses the match-mass invariant to derive the two line-169 links,
+and transports the Bob-side left-register completion estimate to the line-147
 right-register form before converting directly to the projective completion
 residual used by the final assembly.
 It no longer asks for an arbitrary role-measurement record or an arbitrary
