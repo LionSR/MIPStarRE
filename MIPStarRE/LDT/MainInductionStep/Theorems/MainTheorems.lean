@@ -8,9 +8,9 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.PastingAssembly
 /-!
 # Section 6 — Main Induction Theorems
 
-The top-level induction theorems: `mainInductionBaseCase`,
-`mainInductionByRecursionOnM`, `mainInductionPublicWrapper`, and their
-answer-valued analogues.
+The top-level induction theorem `mainInduction`, its proved base case
+`mainInductionBaseCase`, and the internal successor-step assembly theorem
+`mainInductionByRecursionOnM`.
 
 ## References
 
@@ -183,7 +183,7 @@ theorem mainInductionBaseCase
 
 /-- `thm:main-induction`.
 
-This is the source-facing statement from
+This is the statement from
 `references/ldt-paper/inductive_step.tex`: a good symmetric strategy and an
 integer `k ≥ m d` produce a polynomial measurement consistent with the point
 measurement at error `mainInductionError`.
@@ -229,12 +229,13 @@ self-improvement package, this theorem executes the remaining
 higher-dimensional point-consistency conclusion.
 
 Note: this is the internal assembly theorem. The public boundary theorem is
-`mainInductionPublicWrapper`. The restricted-probabilities boundary is already
-exposed separately via `restrictedProbabilities`, and
+`mainInduction`, whose successor case remains the tracked proof gap. The
+restricted-probabilities boundary is already exposed separately via
+`restrictedProbabilities`, and
 `SelfImprovementPackage.ofSelfImprovementInInductionSection` forms the
 slice-wise restricted-strategy self-improvement output once it is supplied. This
 theorem therefore keeps `hselfObligation` as an explicit input; the remaining
-self-improvement proof must be derived inside the source-facing successor theorem,
+self-improvement proof must be derived inside the successor theorem,
 as tracked by #1507, #1503, and #1458.
 
 **Unfaithful:** this conditional assembly assumes the proof-stage inputs
@@ -319,8 +320,8 @@ theorem mainInductionByRecursionOnM
       mainInductionOfWitness params.next strategy eps delta gamma k
         ⟨1, G, hcons, le_of_not_gt hsmall⟩
 
-/-- Restricted-probabilities package built from the explicit weighted bounds fed
-into `mainInductionPublicWrapper`.
+/-- Restricted-probabilities data built from the explicit weighted bounds in the
+successor proof of `thm:main-induction`.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
 (`\label{lem:restricted-probabilities}`), used in the proof of
@@ -345,100 +346,6 @@ noncomputable def mainInductionPublicRestrictionPackage
     (RestrictedProbabilitiesStatement.ofWeightedBounds params strategy eps delta gamma
       hgood haxisWeightedBound hdiagonalWeightedBound)
 
-/-- `rem:main-induction-successor-assembly`.
-
-This conditional successor-step assembly combines the five explicit Section 6 inputs:
-1. the weighted restricted-axis and restricted-diagonal bounds,
-2. the resulting `mainInductionPublicRestrictionPackage`,
-3. the slice-wise recursion witnesses used by `PerSliceInductionPackage.ofRecursion`,
-4. the explicit `hselfObligation` boundary supplying the outputs of
-   `selfImprovementInInductionSection`, and
-5. `mainInductionByRecursionOnM`.
-
-The theorem deliberately keeps `hselfObligation` as an explicit conditional input:
-the self-improvement outputs are assembled by
-`SelfImprovementPackage.ofSelfImprovementInInductionSection` once they are
-supplied, while producing those slice-wise outputs belongs to downstream
-`mainFormal` integration. The conclusion exposes only the global measurement
-witness needed downstream by `MIPStarRE.LDT.Test.MainTheorem`.
-
-**Unfaithful:** this conditional wrapper assumes the proof-stage inputs
-`haxisWeightedBound`, `hdiagonalWeightedBound`, `hrec`, and `hselfObligation`
-instead of deriving them from the successor case of `thm:main-induction`
-(`references/ldt-paper/inductive_step.tex:441-551`).  This is tracked by
-#1507, #1503, and #1458.  Elimination: prove the successor branch of
-`thm:main-induction` from the paper hypotheses and use this wrapper only as the
-internal assembly step. -/
-theorem mainInductionPublicWrapper
-    (params : Parameters)
-    [FieldModel.{0} params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (k : ℕ)
-    (hgood : strategy.IsGood eps delta gamma)
-    (hd : 0 < params.d)
-    (haxisWeightedBound :
-      avgOver (uniformDistribution (Fq params))
-          (fun x => sliceTransverseDirectionWeight params *
-            (xRestrictedStrategy params strategy x).axisParallelFailureProbability) ≤ eps)
-    (hdiagonalWeightedBound :
-      avgOver (uniformDistribution (Fq params))
-          (fun x => sliceTransverseDirectionWeight params *
-            (xRestrictedStrategy params strategy x).diagonalFailureProbability) ≤ gamma)
-    (hrec :
-      let hrestrict : SliceRestrictionPackage params strategy eps delta gamma :=
-        mainInductionPublicRestrictionPackage params strategy eps delta gamma
-          hgood haxisWeightedBound hdiagonalWeightedBound
-      ∀ x,
-        ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
-          ConsRel strategy.state (uniformDistribution (Point params))
-            (IdxProjMeas.toIdxSubMeas (xRestrictedStrategy params strategy x).pointMeasurement)
-            (polynomialEvaluationFamily params G.toSubMeas)
-            error ∧
-          error ≤
-            mainInductionError params k
-              (hrestrict.profile.axisParallel x)
-              (hrestrict.profile.selfConsistency x)
-              (hrestrict.profile.diagonal x))
-    (hselfObligation :
-      let hrestrict : SliceRestrictionPackage params strategy eps delta gamma :=
-        mainInductionPublicRestrictionPackage params strategy eps delta gamma
-          hgood haxisWeightedBound hdiagonalWeightedBound
-      ∀ hinduction : PerSliceInductionPackage params strategy eps delta gamma hrestrict k,
-        SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
-    (hk_pos : 1 ≤ k)
-    (hk : 400 * params.m * params.d ≤ k) :
-    ∃ G : Measurement (Polynomial params.next) ι,
-      ConsRel strategy.state (uniformDistribution (Point params.next))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params.next G.toSubMeas)
-        (mainInductionError params.next k eps delta gamma) := by
-  let hrestrict : SliceRestrictionPackage params strategy eps delta gamma :=
-    mainInductionPublicRestrictionPackage params strategy eps delta gamma
-      hgood haxisWeightedBound hdiagonalWeightedBound
-  have hrec' :
-      ∀ x,
-        ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
-          ConsRel strategy.state (uniformDistribution (Point params))
-            (IdxProjMeas.toIdxSubMeas (xRestrictedStrategy params strategy x).pointMeasurement)
-            (polynomialEvaluationFamily params G.toSubMeas)
-            error ∧
-          error ≤
-            mainInductionError params k
-              (hrestrict.profile.axisParallel x)
-              (hrestrict.profile.selfConsistency x)
-              (hrestrict.profile.diagonal x) := by
-    intro x
-    exact hrec x
-  have hselfObligation' :
-      ∀ hinduction : PerSliceInductionPackage params strategy eps delta gamma hrestrict k,
-        SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction := by
-    intro hinduction
-    exact hselfObligation hinduction
-  exact
-    mainInductionByRecursionOnM params strategy eps delta gamma k hgood hd hrestrict hrec'
-      hselfObligation' hk_pos hk
-
 /-- Answer-valued successor-step recursion entry point.
 
 This theorem keeps the paper-facing restricted strategy interface
@@ -451,7 +358,7 @@ self-improvement outputs that are not derived here from the successor case of
 `thm:main-induction` (`references/ldt-paper/inductive_step.tex:441-551`).
 This is tracked by #1507, #1503, #1369, and #1458.  Elimination: derive the
 answer-valued restriction, recursive slice witnesses, and self-improvement
-packages inside the source-facing successor proof, then use this theorem only
+packages inside the successor proof, then use this theorem only
 as an internal assembly step. -/
 theorem answerMainInductionByRecursionOnM
     (params : Parameters)
@@ -547,90 +454,5 @@ noncomputable def answerMainInductionPublicRestrictionPackage
   AnswerSliceRestrictionPackage.ofRestrictedProbabilities params strategy eps delta gamma
     (AnswerRestrictedProbabilitiesStatement.ofWeightedBounds params strategy eps delta gamma
       hgood haxisWeightedBound hdiagonalWeightedBound)
-
-/-- Answer-valued public successor-step theorem for `thm:main-induction`.
-
-The external recursive and self-improvement inputs are stated against
-`xRestrictedAnswerSymStrat`; internally, the verified legacy pasting assembly is
-reused via explicit answer-to-legacy package bridges.
-
-**Unfaithful:** this conditional wrapper assumes the answer-valued proof-stage
-inputs `haxisWeightedBound`, `hdiagonalWeightedBound`, `hrec`, and
-`hselfObligation` instead of deriving them from the successor case of
-`thm:main-induction` (`references/ldt-paper/inductive_step.tex:441-551`).
-This is tracked by #1507, #1503, #1369, and #1458.  Elimination: derive these
-inputs inside the source-facing successor proof and keep this wrapper as an
-internal assembly theorem. -/
-theorem answerMainInductionPublicWrapper
-    (params : Parameters)
-    [FieldModel.{0} params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (k : ℕ)
-    (hgood : strategy.IsGood eps delta gamma)
-    (hd : 0 < params.d)
-    (haxisWeightedBound :
-      avgOver (uniformDistribution (Fq params))
-          (fun x => sliceTransverseDirectionWeight params *
-            (xRestrictedAnswerSymStrat params strategy x).axisParallelFailureProbability) ≤ eps)
-    (hdiagonalWeightedBound :
-      avgOver (uniformDistribution (Fq params))
-          (fun x => sliceTransverseDirectionWeight params *
-            (xRestrictedAnswerSymStrat params strategy x).diagonalFailureProbability) ≤ gamma)
-    (hrec :
-      let hrestrict : AnswerSliceRestrictionPackage params strategy eps delta gamma :=
-        answerMainInductionPublicRestrictionPackage params strategy eps delta gamma
-          hgood haxisWeightedBound hdiagonalWeightedBound
-      ∀ x,
-        ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
-          ConsRel strategy.state (uniformDistribution (Point params))
-            (IdxProjMeas.toIdxSubMeas
-              (xRestrictedAnswerSymStrat params strategy x).pointMeasurement)
-            (polynomialEvaluationFamily params G.toSubMeas)
-            error ∧
-          error ≤
-            mainInductionError params k
-              (hrestrict.profile.axisParallel x)
-              (hrestrict.profile.selfConsistency x)
-              (hrestrict.profile.diagonal x))
-    (hselfObligation :
-      let hrestrict : AnswerSliceRestrictionPackage params strategy eps delta gamma :=
-        answerMainInductionPublicRestrictionPackage params strategy eps delta gamma
-          hgood haxisWeightedBound hdiagonalWeightedBound
-      ∀ hinduction : AnswerPerSliceInductionPackage params strategy eps delta gamma hrestrict k,
-        AnswerSelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
-    (hk_pos : 1 ≤ k)
-    (hk : 400 * params.m * params.d ≤ k) :
-    ∃ G : Measurement (Polynomial params.next) ι,
-      ConsRel strategy.state (uniformDistribution (Point params.next))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params.next G.toSubMeas)
-        (mainInductionError params.next k eps delta gamma) := by
-  let hrestrict : AnswerSliceRestrictionPackage params strategy eps delta gamma :=
-    answerMainInductionPublicRestrictionPackage params strategy eps delta gamma
-      hgood haxisWeightedBound hdiagonalWeightedBound
-  have hrec' :
-      ∀ x,
-        ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
-          ConsRel strategy.state (uniformDistribution (Point params))
-            (IdxProjMeas.toIdxSubMeas
-              (xRestrictedAnswerSymStrat params strategy x).pointMeasurement)
-            (polynomialEvaluationFamily params G.toSubMeas)
-            error ∧
-          error ≤
-            mainInductionError params k
-              (hrestrict.profile.axisParallel x)
-              (hrestrict.profile.selfConsistency x)
-              (hrestrict.profile.diagonal x) := by
-    intro x
-    exact hrec x
-  have hselfObligation' :
-      ∀ hinduction : AnswerPerSliceInductionPackage params strategy eps delta gamma hrestrict k,
-        AnswerSelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction := by
-    intro hinduction
-    exact hselfObligation hinduction
-  exact
-    answerMainInductionByRecursionOnM params strategy eps delta gamma k hgood hd hrestrict hrec'
-      hselfObligation' hk_pos hk
 
 end MIPStarRE.LDT.MainInductionStep

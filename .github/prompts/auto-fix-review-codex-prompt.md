@@ -7,15 +7,21 @@ Instructions:
 3. Fix each issue in the relevant file at the indicated line.
 4. If the review state is "APPROVED" with no comments requiring changes, do nothing.
 5. Common fixes:
-   - Remove `sorry` and fully close the lemma/theorem.
+   - For an ordinary proof hole not involving source-statement realignment,
+     remove `sorry` and fully close the lemma/theorem.
    - Do not close a proof obligation by changing a paper-labelled theorem statement or
      adding bridge, residual, repair, package, proof-obligation input, hypotheses bundle,
      assumptions bundle, or arbitrary implication hypotheses absent from the
      cited statement.
-   - If the proof cannot be completed without such a change, stop and post a PR comment
-     naming the missing lemma, internal obligation, or paper-gap note instead of pushing a
-     weakened paper theorem. Do not introduce a new conditional helper, producer, repair
-     bundle, or obligation package merely to satisfy the review.
+   - If a paper-labelled theorem was previously weakened by such a change,
+     restore the paper statement and leave the missing proof as a tracked
+     `sorry`, with a TODO, issue or paper-gap citation, and statement audit.
+     This is preferable to preserving a theorem with non-paper hypotheses.
+   - If the proof cannot be completed from the paper hypotheses and the source
+     statement is already faithful, stop and post a PR comment naming the
+     missing lemma, internal obligation, or paper-gap note. Do not introduce a
+     new conditional helper, producer, repair bundle, or obligation package
+     merely to satisfy the review.
    - Fix naming to match Mathlib conventions.
    - Add missing docstrings where requested.
    - Fix type mismatches or tactic failures.
@@ -26,15 +32,23 @@ Instructions:
    compare with the blueprint and Lean statement when relevant, and give a precise verdict.
    Compile or otherwise verify the edited LaTeX document when this is practical, and
    otherwise state why that check was not run.
-6. Your goal is to fully close every incomplete lemma/theorem. Do not use `sorry`, `admit`, `native_decide` on non-trivial goals, or other shortcuts.
-7. Run `lake build` to verify your fixes compile with zero errors and zero `sorry`s.
+6. Your goal is to fully close incomplete lemmas and theorems when this can be
+   done without changing the mathematical statement. Do not use `admit`,
+   `native_decide` on non-trivial goals, or other shortcuts. Do not introduce
+   untracked `sorry`; a tracked `sorry` is allowed only in the
+   paper-realignment case above.
+7. Run `lake build` to verify your fixes compile with zero errors and no
+   unexpected `sorry`.
 8. When fixes add or complete (remove sorry from) theorems, update the corresponding blueprint entry in `blueprint/src/chapter/`.
 9. Make minimal, targeted fixes. Do not refactor unrelated code.
 10. Commit and push your fix to the current branch. Prefix commit messages with `[codex-review-fix]`.
 11. After pushing, use the PR number from the runtime context to post a summary of which review items were addressed. For paper-gap note changes, state the revised mathematical verdict and the cited source passage that was checked.
 
 Quality bar (your fix MUST satisfy ALL of these before committing):
-- Proof integrity (BLOCKER): no sorry, admit, native_decide on non-trivial goals, unsafeCast, or new axioms. See docs/PROOF_INTEGRITY.md.
+- Proof integrity (BLOCKER): no untracked sorry, no admit, no native_decide on
+  non-trivial goals, no unsafeCast, and no new axioms. A tracked sorry is
+  allowed only when restoring a paper-aligned theorem statement under the
+  paper-realignment policy in docs/PROOF_INTEGRITY.md.
 - Proof correctness (BLOCKER): structured proofs, not brute-force tactic chains. If a result looks wrong, scout `references/ldt-paper/` first, then `blueprint/src/chapter/`, and cite the specific source path, label, and line.
 - Source-statement fidelity (BLOCKER): declarations named after paper results or
   linked by `\lean{...}` must preserve the cited statement up to faithful formal

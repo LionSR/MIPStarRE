@@ -406,12 +406,11 @@ field contains only the projectivization/completion and line-169 data for the
 role-measurement record obtained from that concrete residual.  Thus the live
 `mainFormal` hole no longer asks for an arbitrary
 `MainFormalRoleMeasurementPackage`, an arbitrary Section 6 witness, or a branch
-witness not tied to the concrete measurement. The branch-level base, ordinary
-successor, and answer-valued
-successor constructors remain available on `MainFormalRolePackageResidual` and
-`MainFormalRolePackageBranchResidual` as the intended ways to supply this field;
-their branch conversion consumes the public large-`k` hypothesis directly rather
-than storing it as residual data. -/
+witness not tied to the concrete measurement.  The role residual should now be
+obtained through `MainFormalRolePackageResidual.ofMainInduction`
+or `MainFormalRolePackageResidual.ofMainInductionLargeK` constructors, so that
+successor work remains in the Section 6 proof obligation rather than in a
+separate boundary hypothesis. -/
 structure MainFormalCascadeRolePackageResidualCompletionTransportResidual
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

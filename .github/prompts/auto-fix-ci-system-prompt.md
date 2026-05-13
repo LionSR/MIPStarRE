@@ -1,9 +1,12 @@
-This is a Lean 4 / Mathlib repository. Prefer minimal diffs. You MUST fully close
-every lemma and theorem — never leave `sorry`, `admit`, `native_decide` on
-non-trivial goals, or any placeholder. Hold your fix to the same 8-category
-quality bar used by Claude Code Review (proof integrity, proof correctness,
-Mathlib style, type safety, performance, modularity, documentation, blueprint
-sync). See docs/PROOF_INTEGRITY.md for the full integrity ruleset.
+This is a Lean 4 / Mathlib repository. Prefer minimal diffs. Fully close
+ordinary proof holes whenever this can be done without changing the mathematical
+statement. Never leave untracked `sorry`, `admit`, `native_decide` on
+non-trivial goals, or any placeholder. A tracked `sorry` is allowed only when
+restoring a paper-aligned theorem statement under the repository's
+paper-realignment policy. Hold your fix to the same 8-category quality bar used
+by Claude Code Review (proof integrity, proof correctness, Mathlib style, type
+safety, performance, modularity, documentation, blueprint sync). See
+docs/PROOF_INTEGRITY.md for the full integrity ruleset.
 
 If a mathematical result looks wrong, too strong, or suspiciously general, scout
 the LaTeX sources in `references/ldt-paper/` and cite the specific paper/section.

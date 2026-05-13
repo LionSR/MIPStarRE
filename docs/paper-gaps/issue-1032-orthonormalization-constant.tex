@@ -7,7 +7,7 @@
 
 \input{./command}
 
-\title{The Constant in the Formalized Orthonormalization Theorem}
+\title{The Constant in the Completion-Route Orthonormalization Theorem}
 \author{}
 \date{2026-05-11}
 
@@ -51,7 +51,12 @@ The paper states the orthonormalization theorem with the estimate
 \[
   A_a \otimes I \approx_{100\zeta^{1/4}} P_a \otimes I.
 \]
-The present formal theorem proves the same conclusion with the estimate
+The Lean declaration named
+\(\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}\)
+now keeps this paper statement and records the remaining proof gap directly.
+The proved completion-route theorem
+\(\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationCompletionRoute}\)
+establishes the same conclusion with the weaker estimate
 \[
   A_a \otimes I \approx_{120\zeta^{1/4}} P_a \otimes I.
 \]
@@ -61,9 +66,11 @@ separately, still has the symbolic \(100\zeta^{1/4}\) envelope.%
 \path{references/ldt-paper/orthonormalization.tex:67-75}
 (\path{thm:orthonormalization}).  The relevant declarations are
 \path{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization},
+\path{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationCompletionRoute},
 \path{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization_ofInput},
 and \path{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer}.
-This note is attached to \ghissue{1032} and \ghpr{1480}.}
+This note is attached to \ghissue{1032}; \ghpr{1539} restores the source theorem
+statement and keeps the weaker proved construction under a separate name.}
 
 \section{The source assertion}
 
@@ -86,16 +93,18 @@ This gives
 \]
 The displayed estimate occurs at line \(358\), and the closing scalar
 calculation \(84\cdot 2^{1/4}\simeq 99.89 \le 100\) occurs at line \(368\).
-Thus the paper obtains the advertised \(100\zeta^{1/4}\) bound after
+Thus the paper obtains the stated \(100\zeta^{1/4}\) bound after
 discarding the completion outcome.
 
 \section{Comparison with the formalization}
 
-The formalized unconditional theorem follows a slightly different route.  After
+The proved completion-route theorem follows a slightly different route.  After
 completion it converts the \(2\zeta\) self-consistency estimate into a
 source-almost-projective estimate before invoking the locality-preserving
 \(Q/X/\widehat X/P\) repair theorem.  This route is recorded by the named
-Lean error function
+Lean declaration
+\(\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationCompletionRoute}\)
+and the error function
 \(\mathsf{orthonormalizationCompletionRouteError}(\zeta)=120\zeta^{1/4}\).
 The conversion doubles the scalar:
 \[
@@ -107,17 +116,22 @@ The local repair theorem then gives
     = 84\cdot 4^{1/4}\zeta^{1/4}
     \le 120\zeta^{1/4}.
 \]
-Thus the formalized theorem has the same mathematical shape as the paper
+Thus the completion-route theorem has the same mathematical shape as the paper
 theorem, but its constant is weaker by the extra factor \(2^{1/4}\) introduced
-by this conversion step.
+by this conversion step.  It is kept as useful proof content, but it is no
+longer the declaration presented as the paper theorem.
 
 \section{Conclusion}
 
-The present statement is a documented weakening of the paper constant, not a
-new hypothesis.  To recover the \(100\zeta^{1/4}\) estimate, the local repair
-theorem should be reformulated so that it consumes the completed measurement's
-bipartite strong self-consistency estimate directly, avoiding the intermediate
-conversion to source almost-projectivity.
+The source theorem statement has been restored under the declaration
+\(\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}\),
+with the missing \(100\zeta^{1/4}\) proof recorded as an explicit proof gap
+rather than as a weakened theorem statement.  To discharge this gap, the local
+repair theorem should be reformulated so that it consumes the completed
+measurement's bipartite strong self-consistency estimate directly, avoiding the
+intermediate conversion to source almost-projectivity.  The proved
+completion-route theorem remains available under the separate name
+\(\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationCompletionRoute}\).
 
 \bibliographystyle{alpha}
 \bibliography{references}

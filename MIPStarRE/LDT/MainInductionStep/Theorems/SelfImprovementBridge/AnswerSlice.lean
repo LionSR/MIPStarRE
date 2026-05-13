@@ -22,7 +22,7 @@ open scoped MatrixOrder
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- Obligations for producing the answer-valued self-improvement data from
-honest per-slice symmetric strategies.
+concrete per-slice symmetric strategies.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
 `references/ldt-paper/self_improvement.tex:631-811`; this is the answer-valued
@@ -30,13 +30,13 @@ restricted-slice interface for the same self-improvement step.
 
 The answer-valued restriction `xRestrictedAnswerSymStrat` has the paper-faithful
 answer-valued diagonal interface, while the existing Section 9 self-improvement
-theorem is stated for ordinary `SymStrat`s.  This structure records honest
+theorem is stated for ordinary `SymStrat`s.  This structure records concrete
 ordinary slice strategies on which Section 9 can run, together with the state
 and point-measurement transports needed to move the resulting conclusions back
 to the answer-valued restricted bookkeeping.
 
 The Section 9 analytic proof debt is not stored in this record.  The package
-constructor below calls the source-facing
+constructor below calls
 `selfImprovementInInductionSection`, whose present proof gap is the tracked
 place where that work belongs. -/
 structure AnswerSelfImprovementPackage.SliceObligations
@@ -48,9 +48,9 @@ structure AnswerSelfImprovementPackage.SliceObligations
     (restrictionPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma)
     (inductionPkg :
       AnswerPerSliceInductionPackage params strategy eps delta gamma restrictionPkg k) where
-  /-- Honest symmetric strategies realizing the answer-restricted slice interfaces. -/
+  /-- Concrete symmetric strategies realizing the answer-restricted slice interfaces. -/
   sliceStrategy : Fq params → SymStrat params ι
-  /-- Each honest slice strategy uses the ambient state. -/
+  /-- Each concrete slice strategy uses the ambient state. -/
   state_eq : ∀ x, (sliceStrategy x).state = strategy.state
   /-- Its point measurement agrees with the answer-valued restricted-slice point interface. -/
   pointMeasurement_eq :
@@ -63,7 +63,7 @@ structure AnswerSelfImprovementPackage.SliceObligations
     ∀ x h,
       IdxPolyFamily.averagedPointEvaluationOperator (sliceStrategy x) h =
         IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x h
-  /-- The honest slice strategy is good with the answer-restricted failure profile. -/
+  /-- The concrete slice strategy is good with the answer-restricted failure profile. -/
   good :
     ∀ x,
       (sliceStrategy x).IsGood
@@ -75,7 +75,7 @@ structure AnswerSelfImprovementPackage.SliceObligations
 from point-measurement transport.
 
 Both sides unfold to the same average over `strategy.pointMeasurement
-(appendPoint params u x)` once the honest slice point measurement is identified
+(appendPoint params u x)` once the concrete slice point measurement is identified
 with `xRestrictedAnswerSymStrat`. -/
 theorem AnswerSelfImprovementPackage.SliceObligations.averagedPoint_eq_of_pointMeasurement_eq
     (params : Parameters)
@@ -102,7 +102,7 @@ point-operator compatibility is a formal transport between the answer-valued
 restricted slice interface and the Section 9 interface.
 
 The structural averaged-point field is derived from `pointMeasurement_eq`; the
-remaining inputs are the honest slice strategies, their state transport, and
+remaining inputs are the concrete slice strategies, their state transport, and
 their restricted-profile goodness. -/
 noncomputable def AnswerSelfImprovementPackage.SliceObligations.ofPointMeasurementEq
     (params : Parameters)
@@ -135,7 +135,7 @@ noncomputable def AnswerSelfImprovementPackage.SliceObligations.ofPointMeasureme
       params strategy sliceStrategy pointMeasurement_eq
   good := good
 
-/-- Transport answer-restricted goodness to an honest slice strategy once the
+/-- Transport answer-restricted goodness to a concrete slice strategy once the
 state and verifier-visible measurements agree with `xRestrictedAnswerSymStrat`.
 
 The diagonal compatibility is stated only after postprocessing both diagonal
@@ -198,7 +198,7 @@ theorem AnswerSelfImprovementPackage.SliceObligations.good_of_restrictedGood
       simp [state_eq x, pointMeasurement_eq x, diagonalZeroCoord_eq x]
     simpa [hfail] using hgood.diagonalLineTest
 
-/-- Build answer-valued `SliceObligations` from honest slice strategies and
+/-- Build answer-valued `SliceObligations` from concrete slice strategies and
 verifier-visible measurement transport.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
@@ -322,14 +322,14 @@ noncomputable def AnswerSelfImprovementPackage.ofSelfImprovementInInductionSecti
       bounded := fun x => (hslice_props x).2.2.2.2.1
       dominatesAveragePointOperator := fun x h => (hslice_props x).2.2.2.2.2 h }
 
-/-- Convert honest per-slice structural data into the answer-valued Section 6
+/-- Convert concrete per-slice structural data into the answer-valued Section 6
 self-improvement data.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
 `references/ldt-paper/self_improvement.tex:631-811`.
 
 The construction assumes ordinary slice strategies and their structural
-measurement transports. It applies the source-facing theorem
+measurement transports. It applies the theorem
 `selfImprovementInInductionSection` slice-by-slice and transports its fields
 back to the answer-valued restricted-slice interface via the recorded state and
 point-measurement equalities. The theorem itself is currently a tracked proof

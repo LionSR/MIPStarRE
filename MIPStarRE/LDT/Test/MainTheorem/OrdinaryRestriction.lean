@@ -1,17 +1,16 @@
-import MIPStarRE.LDT.Test.MainTheorem.OrdinaryRestriction.PublicWrapper
+import MIPStarRE.LDT.Test.MainTheorem.OrdinaryRestriction.SliceData
 
 /-!
 # Ordinary restricted-slice recursion
 
 Compatibility module for the ordinary `x`-restricted successor route in the
-`mainFormal` assembly.  This module re-exports declarations from three
-sub-leaves:
+`mainFormal` construction.  This module re-exports declarations from two
+submodules:
 
 * `OrdinaryRestriction.Basic` — successor weighted bounds
   (`MainFormalSuccessorAxisWeightedBound`, `MainFormalSuccessorDiagonalWeightedBound`),
-  recursive slice witnesses (`MainFormalSuccessorRecursiveSlices`),
-  the self-improvement input (`MainFormalSuccessorSelfImprovementObligation`),
-  and the successor boundary structure (`MainFormalSuccessorBoundary`).
+  the restricted-probability package, and recursive slice witnesses
+  (`MainFormalSuccessorRecursiveSlices`).
 
 * `OrdinaryRestriction.SliceData` — per-slice recursive data
   (`MainFormalSuccessorRecursiveSliceData`) and the probabilistic bounds on
@@ -19,10 +18,6 @@ sub-leaves:
   (`mainFormalSuccessorRestrictedPointAgreement_le_ofSliceData`,
   `mainFormalSuccessorRestrictedAxisParallel_le_ofSliceData`,
   `mainFormalSuccessorRestrictedDiagonal_le_ofSliceData`).
-
-* `OrdinaryRestriction.PublicWrapper` — the public theorem
-  `mainFormalSuccessorMainInductionPublicWrapper` that converts a bundle of
-  predecessor Section 6 inputs into a role-register measurement.
 
 ## References
 

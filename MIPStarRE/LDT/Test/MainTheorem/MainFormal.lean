@@ -155,7 +155,7 @@ Section 6 successor theorem rather than an additional mathematical restriction.
 
 **Proof gap:** the paper-facing statement is restored without bridge, residual,
 repair, or obligation hypotheses.  The Section 6 role-register residual is now
-obtained by applying the source-facing theorem `MainInductionStep.mainInduction`
+obtained by applying the theorem `MainInductionStep.mainInduction`
 through `MainFormalRolePackageResidual.ofMainInductionLargeK`; its successor
 case remains the tracked `sorry` in Section 6.  The remaining Section 3 work is
 to construct the post-role projective-completion residual from the paper

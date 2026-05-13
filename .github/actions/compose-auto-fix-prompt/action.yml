@@ -95,14 +95,15 @@ runs:
           '  lemma, or proposition, preserve the statement in `references/ldt-paper/` up to' \
           '  faithful formal encoding.' \
           '- Do not repair CI, blueprint sync, or review comments by adding bridge,' \
-          '  residual, repair, package, producer, hypotheses bundle, assumptions bundle,' \
+          '  residual, repair, package, producer, proof-obligation input,' \
+          '  hypotheses bundle, assumptions bundle,' \
           '  or arbitrary hypothesis inputs to' \
           '  a source-labelled theorem.' \
           '- The only extra hypotheses allowed on a paper-facing theorem are' \
           '  boundary conditions genuinely' \
           '  needed to state the same mathematics in Lean, such as positivity for a' \
           '  division, nonemptiness, decidability, or a field-model instance.' \
-          '- Proof-debt objects are not boundary conditions, even when packaged as' \
+          '- Proof-debt objects are not boundary conditions, even when recorded as' \
           '  inputs or producers.' \
           '- If the available Lean theorem proves only a restricted or conditional' \
           '  version of the paper theorem, do not mark the unrestricted source label' \
@@ -117,11 +118,11 @@ runs:
           '  to a theorem whose public statement has been weakened by non-paper' \
           '  assumptions.' \
           '- Do not introduce a conditional helper, proof-debt bundle, producer, or' \
-          '  obligation package as a CI-fix strategy. Existing conditional helpers may' \
-          '  be edited only to reduce proof debt, preserve already separated proof' \
-          '  content, or improve traceability; keep them separately named as' \
-          '  conditional, keep them out of source-labelled `\leanok`, and identify' \
-          '  the exact obligation that will remove them.' \
+          '  obligation package as a CI-fix strategy. Existing conditional helpers' \
+          '  should be deleted, replaced by theorems with the paper statement and tracked' \
+          '  `sorry`, or retained only when a maintainer has identified a specific' \
+          '  mathematical construction theorem whose proof content they preserve.' \
+          '  They must stay out of source-labelled `\leanok`.' \
           '- When in doubt, restore the paper-aligned theorem statement and expose the' \
           '  missing proof obligation; do not turn the paper theorem into a conditional' \
           '  theorem.')"

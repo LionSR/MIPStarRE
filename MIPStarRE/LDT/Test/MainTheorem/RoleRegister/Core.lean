@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.Test.MainTheorem.ErrorScalars
-import MIPStarRE.LDT.Test.MainTheorem.OrdinaryRestriction.PublicWrapper
+import MIPStarRE.LDT.Test.MainTheorem.OrdinaryRestriction.SliceData
 
 /-!
 # Role-register core residuals
@@ -87,27 +87,6 @@ theorem ofBaseCase
   ofMainInductionWitness params strategy eps k scalars
     (strategySymmetrization_mainInductionBaseCase params strategy eps hpass k hm1)
 
-/-- Successor-case constructor for the role-register Section 6 induction output.
-
-In the large-dimension branch, the public successor wrapper applies to the
-role-register symmetrization once the honest `MainFormalSuccessorBoundary` data
-and the Section 6 side condition `400 * params.m * params.d ≤ k` are available.
-This lemma exposes the resulting global polynomial measurement in the exact
-`σ`-normalized form consumed by the later unsymmetrization bridge. -/
-theorem ofSuccessorBoundary
-    (params : Parameters) [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params.next ι) (eps : Error) (k : ℕ)
-    (scalars : MainFormalCascadeScalars params.next eps k)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps)
-    (hd : 0 < params.d)
-    (boundary : MainFormalSuccessorBoundary params strategy eps hpass k)
-    (hk_pos : 1 ≤ k) (hk_large : 400 * params.m * params.d ≤ k) :
-    Nonempty (MainFormalRoleMeasurementPackage params.next strategy eps k scalars) :=
-  ofMainInductionWitness params.next strategy eps k scalars
-    (mainFormalSuccessorMainInductionPublicWrapper params strategy eps hpass k hd boundary
-      hk_pos hk_large)
-
 /-- Build the formal unsymmetrization bridge from the role-register Section 6
 measurement output.
 
@@ -139,11 +118,10 @@ strategy.
 This isolates the first field of the former role-register completion residual:
 it asks only for the Section 6 role-register polynomial measurement and its
 symmetrized consistency estimate at the pre-cascade main-induction error.  The
-constructors below show how the already-checked base case and the syntactic
-successor wrapper produce this residual. For arbitrary current parameters,
-the inverse predecessor transport needed to apply the successor wrapper
-remains explicit upstream work; the public large-`k` hypothesis is supplied to
-the successor-branch conversion instead of being hidden in this residual. -/
+constructors below show how to view either a raw Section 6 witness or the
+`mainInduction` theorem as this residual.  The former syntactic
+successor wrapper was removed because it asked for non-paper boundary data
+instead of leaving the successor case as a proof obligation in Section 6. -/
 structure MainFormalRolePackageResidual
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -200,7 +178,7 @@ theorem ofMainInduction
 /-- Large-`k` constructor for the isolated role-register residual.
 
 The public Section 3 theorem currently assumes `400 * m * d ≤ k`.  This lemma
-uses only the weaker consequence `m * d ≤ k` needed by the source-facing
+uses only the weaker consequence `m * d ≤ k` needed by the
 Section 6 theorem. -/
 theorem ofMainInductionLargeK
     (params : Parameters) [FieldModel params.q]
@@ -244,26 +222,6 @@ theorem ofBaseCase
   exact ofMainInductionWitness params strategy eps k hpass
     (strategySymmetrization_mainInductionBaseCase params strategy eps hpass k hm1)
 
-/-- Successor constructor for the isolated role-register residual in the syntactic
-`params.next` case.
-
-This exposes the exact remaining Section 6 data for the large-`k` branch:
-`MainFormalSuccessorBoundary` plus the side condition
-`400 * params.m * params.d ≤ k`.  Turning an arbitrary non-base `params` into this
-syntactic successor form still requires a separate predecessor-transport theorem. -/
-theorem ofSuccessorBoundary
-    (params : Parameters) [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params.next ι) (eps : Error) (k : ℕ)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps)
-    (hd : 0 < params.d)
-    (boundary : MainFormalSuccessorBoundary params strategy eps hpass k)
-    (hk_pos : 1 ≤ k) (hk_large : 400 * params.m * params.d ≤ k) :
-    Nonempty (MainFormalRolePackageResidual params.next strategy eps hpass k) := by
-  exact ofMainInductionWitness params.next strategy eps k hpass
-    (mainFormalSuccessorMainInductionPublicWrapper params strategy eps hpass k hd boundary
-      hk_pos hk_large)
-
 /-- Build the role-register measurement record produced by a concrete
 role residual.
 
@@ -299,8 +257,8 @@ noncomputable def fieldModelOfSuccessorDecomposition
 /-- View a strategy over `params` as a strategy over the syntactic successor in a
 predecessor decomposition.
 
-This helper is intentionally aligned with the base-universe field-model API used
-by the current Section 6 public successor wrapper. -/
+This helper keeps the predecessor transport explicit at the base universe used
+by the current Section 6 API. -/
 noncomputable def projStratTransportSuccessor
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

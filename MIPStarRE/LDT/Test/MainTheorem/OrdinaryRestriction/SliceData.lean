@@ -4,8 +4,8 @@ import MIPStarRE.LDT.Test.MainTheorem.OrdinaryRestriction.Basic
 # Ordinary restricted-slice recursion: slice data
 
 This module contains the same-space slice-data package and the transport lemmas
-which convert predecessor slice witnesses into the ordinary successor boundary
-interfaces.
+which convert predecessor slice witnesses into the ordinary recursive-slice
+target.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -25,10 +25,12 @@ connecting it to the restricted slice from
 
 When supplied together with a recursive induction hypothesis (see
 `mainFormalSuccessorRecursiveSlices_ofSliceData`), this data can close the
-`MainFormalSuccessorRecursiveSlices` requirement needed by
-`MainFormalSuccessorBoundary`.
+`MainFormalSuccessorRecursiveSlices` target.  The former boundary constructor
+which combined this target with an unproved self-improvement input has been
+removed; that missing proof step is now represented only by the
+Section 6 theorem.
 
-**Unfaithful:** this structure records honest same-space slice strategies and
+**Unfaithful:** this structure records concrete same-space slice strategies and
 passing hypotheses for restricted slices that are not yet constructed from the
 successor proof of `thm:main-formal`
 (`references/ldt-paper/test_definition.tex:180-202`) and `thm:main-induction`
@@ -307,17 +309,17 @@ theorem mainFormalSuccessorRestrictedDiagonal_le_ofSliceData
 /-- Convert per-slice induction-hypothesis data into a
 `MainFormalSuccessorRecursiveSlices` witness.
 
-This is the abstract induction-step lemma for #1021.  Given the honest
+This is the abstract induction-step lemma for #1021.  Given the concrete
 `MainFormalSuccessorRecursiveSliceData` together with a recursive induction
 hypothesis that delivers `mainInductionError`-bounded polynomial measurements
 for each slice strategy, this rewrites the state and point-measurement
-compatibilities to produce the exact `MainFormalSuccessorRecursiveSlices` field
-needed by `MainFormalSuccessorBoundary`.
+compatibilities to produce the exact `MainFormalSuccessorRecursiveSlices`
+target.
 
-The induction hypothesis `hrecSlice` mirrors what `mainInductionPublicWrapper`
-(or, equivalently, a recursive call to `mainFormal`) returns for the predecessor
-dimension: a polynomial measurement on the role-register space with consistency
-bounded by the main induction error evaluated at the restricted-profile bounds. -/
+The induction hypothesis `hrecSlice` mirrors what the predecessor induction
+statement returns for the predecessor dimension: a polynomial measurement on
+the role-register space with consistency bounded by the main induction error
+evaluated at the restricted-profile bounds. -/
 theorem mainFormalSuccessorRecursiveSlices_ofSliceData
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -347,57 +349,8 @@ theorem mainFormalSuccessorRecursiveSlices_ofSliceData
   intro x
   rcases hrecSlice x with ⟨error, G, hG, herr⟩
   refine ⟨error, G, ?_, herr⟩
-  -- Rewrite the state and point measurement using the slice-data compatibilities
+  -- Rewrite the state and point measurement using the slice-data compatibilities.
   simpa [sliceData.sliceState_eq x, sliceData.slicePoint_eq x] using hG
-/-- Build the successor boundary from an explicit predecessor induction
-hypothesis and a self-improvement input.
-
-The predecessor hypothesis is stated at the exact Section 6 strength consumed by
-`MainFormalSuccessorRecursiveSlices`: for each restricted slice it supplies a
-polynomial measurement bounded by the restricted-profile
-`mainInductionError`.  This helper is non-recursive; it only transports those
-slice witnesses across `MainFormalSuccessorRecursiveSliceData` and combines the
-result with the supplied self-improvement input.
-
-**Unfaithful:** this helper assumes the predecessor induction witnesses,
-same-space slice data, and the self-improvement input, none of which are
-hypotheses of `thm:main-formal`
-(`references/ldt-paper/test_definition.tex:180-202`).  This is tracked by
-#1035, #1036, #1363, and #1458.  Elimination: derive the predecessor witnesses
-and self-improvement input from the successor proof of `thm:main-induction`
-(`references/ldt-paper/inductive_step.tex:441-551`). -/
-noncomputable def mainFormalSuccessorBoundary_ofPredecessorInduction
-    (params : Parameters) [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
-    (sliceData : MainFormalSuccessorRecursiveSliceData params strategy eps hpass)
-    (hpredecessor : ∀ (x : Fq params),
-      ∃ error : Error, ∃ G : Measurement (Polynomial params) (Role × ι),
-        ConsRel (sliceData.sliceStrategy x).state
-          (uniformDistribution (Point params))
-          (IdxProjMeas.toIdxSubMeas (sliceData.sliceStrategy x).pointMeasurementA)
-          (polynomialEvaluationFamily params G.toSubMeas)
-          error ∧
-        error ≤
-          let hrestrict :=
-            mainFormalSuccessorRestrictionPackage params strategy eps hpass
-              (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
-              (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass)
-          MainInductionStep.mainInductionError params k
-            (hrestrict.profile.axisParallel x)
-            (hrestrict.profile.selfConsistency x)
-            (hrestrict.profile.diagonal x))
-    (hself : MainFormalSuccessorSelfImprovementObligation params strategy eps hpass k
-      (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
-      (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass)) :
-    MainFormalSuccessorBoundary params strategy eps hpass k :=
-  mainFormalSuccessorBoundary_ofRecursiveSelfImprovement params strategy eps hpass k
-    (mainFormalSuccessorRecursiveSlices_ofSliceData params strategy eps hpass k
-      (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
-      (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass)
-      sliceData hpredecessor)
-    hself
 
 end Test
 

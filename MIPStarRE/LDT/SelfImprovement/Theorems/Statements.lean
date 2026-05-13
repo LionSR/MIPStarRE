@@ -527,38 +527,4 @@ abbrev FinalFieldsInput (params : Parameters) [FieldModel params.q]
         (selfImprovementDataProcessingError params eps delta) →
       SelfImprovementFinalFields params strategy H Z eps delta nu
 
-/-! ## Auxiliary hypotheses for conditional self-improvement
-
-This structure records three statements that are not hypotheses of
-`thm:self-improvement`.  They may be assumed only in separately named
-conditional results.  A declaration identified with the paper theorem must
-derive these statements from the hypotheses in the paper, or leave the
-corresponding derivation as an explicit proof obligation. -/
-
-/-- The three Section 9 statements assumed by the conditional form of
-self-improvement.
-
-They assert helper-stage strong self-consistency, the orthonormalization
-hypotheses, and final-fields transport.  Grouping them here only abbreviates the
-hypotheses of separately named conditional results such as
-`selfImprovementFromObligations`.  The intended mathematical task is to prove
-each field from the source hypotheses and then use the conditional result as an
-intermediate theorem. -/
-structure SelfImprovementObligations (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι) (eps delta nu : Error) where
-  /-- Helper-stage strong self-consistency: the averaged `Hhat` is
-  strongly self-consistent at level `selfImprovementHelperError`. -/
-  helperStrongSelfConsistency :
-    HelperStrongSelfConsistencyInput params strategy eps delta
-  /-- Orthonormalization obligation: the strongly self-consistent `Hhat`
-  has the spectral-truncation and locality-preserving repair witnesses required
-  by the sharp orthonormalization route. -/
-  orthonormalization :
-    OrthonormalizationInput params strategy eps delta
-  /-- Final-fields transport: the remaining completeness, point-consistency,
-  self-closeness, and projective-residual conclusions are derivable from the
-  helper+orthonormalization+data-processing outputs. -/
-  finalFields :
-    FinalFieldsInput params strategy eps delta nu
-
 end MIPStarRE.LDT.SelfImprovement

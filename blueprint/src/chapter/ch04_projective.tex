@@ -63,13 +63,11 @@
 	% record contains positive semidefinite density matrices of arbitrary
 	% normalized trace; this matches the paper's convention that a state is
 	% normalized.
-	% The paper states the sharper constant $100\zeta^{1/4}$.
-	% The present direct local $Q/X/\widehat X/P$ route on the completed
-	% measurement yields $120\zeta^{1/4}$ because it first converts the
-	% $2\zeta$ self-consistency error to a $4\zeta$ source-almost-projective
-	% error.  In Lean this bound is named
-	% `orthonormalizationCompletionRouteError`.
-	% See docs/paper-gaps/issue-1032-orthonormalization-constant.tex.
+	% The paper states the constant $100\zeta^{1/4}$.  Lean keeps this
+	% statement under the source theorem name; its proof is the tracked
+	% issue-#1032 gap.  The proved completion-route variant with the weaker
+	% $120\zeta^{1/4}$ bound is recorded separately as
+	% `orthonormalizationCompletionRoute`.
 	\uses{def:strong-self-consistency, def:approx_delta}
 	Let $\ket{\psi}$ be a permutation-invariant state,
 	and let $A = \{A_a\}$ be a sub-measurement with strong self-consistency
@@ -80,7 +78,7 @@
 	\]
 	Then there exists a projective sub-measurement $P = \{P_a\}$ such that
 	\[
-		A_a \ot I \approx_{120 \zeta^{1/4}} P_a \ot I.
+		A_a \ot I \approx_{100 \zeta^{1/4}} P_a \ot I.
 	\]
 \end{theorem}
 
@@ -127,10 +125,10 @@
 	analytic completion statement on the left register; the shared preliminary
 	helper compares right- and left-tensor placements at the level of the
 	underlying state-dependent-distance form.  Its submeasurement and indexed
-	wrappers transport state-dependent distance to the right register under the
+	lemmas transport state-dependent distance to the right register under the
 	permutation-invariance hypothesis on the state.  The remaining two
 	declarations combine this transport with the orthonormalize-and-complete
-	output so that the line-156 projectivization handoff can later be produced
+	output so that the line-156 projectivization transition can later be produced
 	from the two completed measurements without restating the tensor-factor
 	bookkeeping.
 \end{remark}
@@ -147,16 +145,16 @@
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_with_orthonormalization_loss, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_with_orthonormalization_loss}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.leftConsistency, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.rightConsistency}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.leftConsistency_with_triangleSub_loss, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.rightConsistency_with_triangleSub_loss}
-	Lean exposes the quantitative obstruction at the projectivization handoff used
-	in the inductive step.  The existing line-156 handoff gives only the generic
+	Lean exposes the quantitative obstruction at the projectivization transition used
+	in the inductive step.  The existing line-156 transition gives only the generic
 	consequence of Proposition~\ref{prop:triangle-sub}: from
 	$G^{\mathrm A}\simeq_{\zeta_1}G^{\mathrm B}$ and
 	$G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ one obtains
 	$Q^{\mathrm A}\simeq_{\zeta_1+\sqrt{\zeta_2}}G^{\mathrm B}$, and similarly
 	on the other tensor factor.  The declarations
 	\texttt{leftConsistency\_with\_triangleSub\_loss} and
-	\texttt{rightConsistency\_with\_triangleSub\_loss} are checked wrappers for
-	this honest square-root-loss route.
+	\texttt{rightConsistency\_with\_triangleSub\_loss} are checked lemmas for
+	this direct square-root-loss route.
 
 	Lean also proves a more local repaired transport that keeps the comparison at
 	the pre-completion stage.  If $P^{\mathrm A}$ is the orthonormalized
@@ -308,7 +306,7 @@
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer}
 	\uses{lem:projective-non-measurement, def:approx_delta}
 	\leanok
-	Paper origin: \texttt{references/ldt-paper/orthonormalization.tex} lines 534--860 (rank reduction and the $Q$-side setup, including \ref{lem:xa-t} and \ref{lem:qa-restated}) and 862--1194 (the $X/\widehat X/P$ algebra: \ref{lem:X-squared}, \ref{lem:X-hat-squared}, \ref{lem:X-times-X-hat}, \ref{lem:squared-difference}, \ref{lem:P-projectivity}, \ref{lem:P-Q-approx}, plus the final triangle-inequality assembly producing the $84\zeta^{1/4}$ bound). Together these are the late repair stage of the orthogonalization-lemma proof.
+	Paper origin: \texttt{references/ldt-paper/orthonormalization.tex} lines 534--860 (rank reduction and the $Q$-side setup, including \ref{lem:xa-t} and \ref{lem:qa-restated}) and 862--1194 (the $X/\widehat X/P$ algebra: \ref{lem:X-squared}, \ref{lem:X-hat-squared}, \ref{lem:X-times-X-hat}, \ref{lem:squared-difference}, \ref{lem:P-projectivity}, \ref{lem:P-Q-approx}, plus the final triangle-inequality calculation producing the $84\zeta^{1/4}$ bound). Together these are the late repair stage of the orthogonalization-lemma proof.
 
 	Given a normalized bipartite state $\ket{\psi}$, a measurement
 	$A = \{A_a\}$, and the source almost-projective estimate for the
@@ -391,11 +389,17 @@
 	needed because $A$ is already a measurement.
 \end{remark}
 
-\begin{proof}[Proof of \ref{thm:orthonormalization} assuming \ref{lem:left-lifted-projectivization-repair}]
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
+\begin{remark}[Lean completion-route orthonormalization]\label{rem:orthonormalization-completion-route}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationCompletionRoute}
 	\leanok
-	\proves{thm:orthonormalization}
 	\uses{prop:other-two-notions-of-self-consistency, lem:left-lifted-projectivization-repair}
+
+	The paper theorem \ref{thm:orthonormalization} remains stated in Lean with the
+	\(100\zeta^{1/4}\) constant and a tracked proof gap.  The declaration checked
+	here is the completion-route theorem with the weaker bound
+	\(120\zeta^{1/4}\), recorded in
+	\texttt{orthonormalizationCompletionRouteError}.  See
+	\texttt{docs/paper-gaps/issue-1032-orthonormalization-constant.tex}.
 
 	Let $A = \{A_a\}$ be a sub-measurement with outcomes in $\mathcal A$. Write $A=\sum_a A_a$. The strong self-consistency assumption implies
 	\[
@@ -429,8 +433,8 @@
 	\[
 		A_a \ot I \approx_{84(4\zeta)^{1/4}} P_a \ot I,
 	\]
-	and $84 \cdot 4^{1/4} \leq 120$, so the stated bound follows.
-\end{proof}
+	and \(84 \cdot 4^{1/4} \leq 120\), so the completion-route bound follows.
+\end{remark}
 
 \begin{proof}[Proof of \ref{lem:orthonormalization-main-lemma}]
 	\proves{lem:orthonormalization-main-lemma}

@@ -11,9 +11,8 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.AddInUFullStatement
 /-!
 # Self-improvement theorem variants
 
-The main `selfImprovementHelper`, the `selfImprovement` theorem corresponding
-to `thm:self-improvement` in the blueprint, and variants with the
-orthonormalization and final-fields conditions taken as explicit hypotheses.
+The main `selfImprovementHelper` and the `selfImprovement` theorem corresponding
+to `thm:self-improvement` in the blueprint.
 
 ## Contents
 
@@ -23,12 +22,7 @@ orthonormalization and final-fields conditions taken as explicit hypotheses.
   input consistency hypothesis and four helper conclusions.
 - **self_improvement_helper_with_slackness** — companion helper producing the
   slackness-carrying helper conclusion from the Section 9 SDP statement.
-- **selfImprovement_assumingFinalFields** — form of `thm:self-improvement` with
-  helper strong self-consistency, orthonormalization, and final-fields
-  conditions taken as explicit hypotheses.
 - **selfImprovement** — the statement corresponding to `thm:self-improvement`.
-- **selfImprovementFromObligations** — measurement-level conditional helper
-  with the remaining Section 9 proof obligations supplied explicitly.
 
 ## References
 
@@ -259,120 +253,6 @@ lemma selfImprovementHelper
         (fun h => (hhelperWithSlackness.complementarySlackness h).symm)
         hpointTransfer
 
-/-- Form of `thm:self-improvement` with helper strong self-consistency,
-orthonormalization, and final-fields conditions taken as explicit hypotheses.
-
-This is not the statement corresponding to `thm:self-improvement` in the
-blueprint. It assumes the helper strong self-consistency input, the
-orthonormalization input, and the final-fields input explicitly. The
-evaluation-map data-processing step follows from the question-dependent
-preliminaries theorem.
-
-**Unfaithful:** this helper assumes the explicit hypotheses
-`hhelperStrongSelfConsistency : HelperStrongSelfConsistencyInput`,
-`horthonormalization : OrthonormalizationInput`, and
-`hfinalFields : FinalFieldsInput`, which are not derived from the hypotheses of
-`thm:self-improvement`.  This proof debt is tracked by #1515.  Elimination:
-prove the source-facing `selfImprovement` theorem from the paper hypotheses,
-discharging these three inputs internally. -/
-theorem selfImprovement_assumingFinalFields
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta gamma nu : Error)
-    (hhelperStrongSelfConsistency :
-      HelperStrongSelfConsistencyInput params strategy eps delta)
-    (horthonormalization : OrthonormalizationInput params strategy eps delta)
-    (hfinalFields : FinalFieldsInput params strategy eps delta nu)
-    (hgood : strategy.IsGood eps delta gamma)
-    (G : Measurement (Polynomial params) ι) :
-    ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
-      SelfImprovementConclusion params strategy G H Z eps delta gamma nu := by
-  rcases selfImprovementHelperConstruction params strategy eps delta gamma hgood nu
-      G with
-    ⟨T, Hhat, Z, hhelper⟩
-  have hssc :
-      BipartiteSSCRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily Hhat)
-        (selfImprovementHelperError params eps delta) :=
-    hhelperStrongSelfConsistency hhelper
-  have horthBridge :
-      MakingMeasurementsProjective.OrthonormalizationInput strategy.state Hhat
-        (selfImprovementHelperError params eps delta) :=
-    horthonormalization hssc
-  rcases orthonormalization_ofInput
-      strategy.state strategy.permInvState strategy.isNormalized
-      Hhat
-      (selfImprovementHelperError params eps delta)
-      hssc horthBridge with ⟨H, horth⟩
-  have hsscPoint :
-      BipartiteSSCRel strategy.state
-        (uniformDistribution (Point params))
-        (fun _ : Point params => Hhat)
-        (selfImprovementHelperError params eps delta) :=
-    bipartiteSSCRel_uniform_const strategy.state Hhat
-      (selfImprovementHelperError params eps delta) hssc
-  have horthPoint :
-      SDDRel strategy.state
-        (uniformDistribution (Point params))
-        (fun _ : Point params => H.toSubMeas.liftLeft)
-        (fun _ : Point params => Hhat.liftLeft)
-        (selfImprovementOrthogonalizationError params eps delta) := by
-    apply sddRel_uniform_const (ψ := strategy.state)
-    exact Preliminaries.sddRel_symm strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily Hhat.liftLeft)
-      (constSubMeasFamily H.toSubMeas.liftLeft)
-      (selfImprovementOrthogonalizationError params eps delta) horth
-  have hdata' :
-      SDDRel strategy.state (uniformDistribution (Point params))
-        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
-        ((polynomialEvaluationFamily params Hhat).liftLeft)
-        (selfImprovementDataProcessingError params eps delta) := by
-    change SDDRel strategy.state (uniformDistribution (Point params))
-      (IdxSubMeas.liftLeft (fun q => postprocess H.toSubMeas (fun h => h q)))
-      (IdxSubMeas.liftLeft (fun q => postprocess Hhat (fun h => h q)))
-      (8 * selfImprovementHelperError params eps delta +
-        8 * Real.rpow (selfImprovementOrthogonalizationError params eps delta)
-          (1 / (2 : Error)))
-    simpa [Real.sqrt_eq_rpow] using
-      Preliminaries.selfConsistencyImpliesDataProcessing
-        strategy.state strategy.permInvState strategy.isNormalized
-        (uniformDistribution (Point params))
-        (uniformDistribution_weight_sum_le_one (Point params))
-        (fun _ : Point params => Hhat)
-        (fun _ : Point params => H)
-        (selfImprovementHelperError params eps delta)
-        (selfImprovementOrthogonalizationError params eps delta)
-        (fun (u : Point params) (h : Polynomial params) => h u)
-        hsscPoint horthPoint
-  have hdata :
-      SDDRel strategy.state (uniformDistribution (Point params))
-        ((polynomialEvaluationFamily params Hhat).liftLeft)
-        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
-        (selfImprovementDataProcessingError params eps delta) :=
-    Preliminaries.sddRel_symm strategy.state (uniformDistribution (Point params))
-      ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
-      ((polynomialEvaluationFamily params Hhat).liftLeft)
-      (selfImprovementDataProcessingError params eps delta) hdata'
-  have hfinal :
-      SelfImprovementFinalFields params strategy H Z eps delta nu :=
-    hfinalFields hhelper horth hdata
-  have hselfImprovementError_nonneg :
-      0 ≤ selfImprovementError params eps delta :=
-    selfImprovementError_nonneg_of_isGood params strategy hgood
-  refine ⟨H, Z, ?_⟩
-  exact
-    { witness := ⟨T, Hhat, hhelper, horth, hdata⟩
-      completeness := hfinal.completeness
-      pointConsistency := hfinal.pointConsistency
-      selfCloseness := hfinal.selfCloseness
-      positiveSemidefiniteWitness := hhelper.sdpWitness.dualPositive
-      dualDominatesAveragedPoint := hhelper.sdpWitness.dualFeasible
-      projectiveResidualBound := hfinal.projectiveResidualBound
-      bounded :=
-        final_fields_bounded strategy.state H.toSubMeas hhelper.sdpWitness.dualDominatesIdentity
-          hselfImprovementError_nonneg }
-
 /--
 Formal statement corresponding to the blueprint theorem `thm:self-improvement`,
 with the input consistency hypothesis from the LDT paper.
@@ -383,11 +263,9 @@ projective polynomial submeasurement satisfying the four self-improvement
 conclusions. The paper and blueprint impose the `(eps, delta, gamma)`-good
 strategy condition as a standing hypothesis for the self-improvement section
 (`blueprint/src/chapter/ch07_self_improvement.tex`, line 4); Lean records it
-here as the explicit hypothesis `hgood`. The theorem
-`selfImprovement_assumingFinalFields` records the conditional form currently
-proved in Lean, in which helper strong self-consistency, orthonormalization, and
-final-fields conditions are explicit hypotheses. These conditions are missing
-derivations, not hypotheses of the blueprint theorem.
+here as the explicit hypothesis `hgood`.  The missing derivation is left as an
+explicit proof gap in the theorem with the paper statement, rather than being
+hidden in a conditional theorem with extra obligation hypotheses.
 -/
 theorem selfImprovement
     (params : Parameters)
@@ -401,34 +279,9 @@ theorem selfImprovement
       (polynomialEvaluationFamily params G.toSubMeas) nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementConclusion params strategy G H Z eps delta gamma nu := by
-  -- TODO(#1515): derive the helper strong self-consistency,
-  -- orthonormalization, and final-fields inputs from the paper hypotheses,
-  -- including the incoming consistency hypothesis `hcons`, then invoke
-  -- `selfImprovement_assumingFinalFields`.
+  -- TODO(#1515): derive helper strong self-consistency, orthonormalization,
+  -- and final-fields transport from the paper hypotheses, including the
+  -- incoming consistency hypothesis `hcons`.
   sorry
-
-/-- `SelfImprovementObligations` + `IsGood` is sufficient to call the form of
-`thm:self-improvement` with explicit orthonormalization and final-fields
-hypotheses and obtain the full `SelfImprovementConclusion`.
-
-**Unfaithful:** this helper assumes `SelfImprovementObligations`, whose helper
-strong self-consistency, orthonormalization, and final-fields components are not
-yet derived from the hypotheses of `thm:self-improvement`.  This proof debt is
-tracked by #1515.  Elimination: prove the source-facing `selfImprovement`
-theorem from the paper hypotheses. -/
-theorem selfImprovementFromObligations
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta gamma nu : Error)
-    (obligations : SelfImprovementObligations params strategy eps delta nu)
-    (hgood : strategy.IsGood eps delta gamma)
-    (G : Measurement (Polynomial params) ι) :
-    ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
-      SelfImprovementConclusion params strategy G H Z eps delta gamma nu :=
-  selfImprovement_assumingFinalFields params strategy eps delta gamma nu
-    obligations.helperStrongSelfConsistency
-    obligations.orthonormalization obligations.finalFields hgood G
-
 
 end MIPStarRE.LDT.SelfImprovement
