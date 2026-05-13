@@ -2,6 +2,10 @@ The automated code review found issues in this PR. Your task is to fix them.
 
 Instructions:
 0. First, use the PR number and repository from the runtime context to read the full PR diff and all review threads yourself. The thread summaries above are seeds; read the actual threads for complete context.
+0a. Before changing a paper-facing theorem statement, a blueprint `\leanok`
+    link, or a proof-debt record, read `AGENTS.md`, `docs/PROOF_INTEGRITY.md`,
+    and `docs/paper-gaps/proof-gap-protocol.tex`. The repair must preserve the
+    cited statement in `references/ldt-paper/` up to faithful formal encoding.
 1. Use your judgment on whether Mathlib scouting is needed. For proof-level review comments, read PR/issue comments for existing **Mathlib Scouting Reports**. For cosmetic comments (naming, docstrings, style), skip scouting.
 2. Read each review thread conversation and understand the issue raised, including any follow-up replies.
 3. Fix each issue in the relevant file at the indicated line.

@@ -3,6 +3,10 @@ The automated code review found issues in this PR. Your task is to fix them.
 Instructions:
 
 1. First, use the GitHub MCP tools to read the full PR diff and all review threads yourself. Treat the thread summaries from this workflow as seeds only.
+1a. Before changing a paper-facing theorem statement, a blueprint `\leanok`
+    link, or a proof-debt record, read `AGENTS.md`, `docs/PROOF_INTEGRITY.md`,
+    and `docs/paper-gaps/proof-gap-protocol.tex`. The repair must preserve the
+    cited statement in `references/ldt-paper/` up to faithful formal encoding.
 2. Use your judgment on whether Mathlib scouting is needed for this fix. For review comments about proofs (`sorry` removal, tactic suggestions, proof restructuring), read PR/issue comments for existing **Mathlib Scouting Reports** and use them to inform your fix. For cosmetic comments (naming, docstrings, style), skip scouting and fix directly.
 3. Read each review thread conversation and understand the issue being raised, including follow-up replies that may refine the original comment.
 4. Fix each issue in the relevant file at the indicated line.

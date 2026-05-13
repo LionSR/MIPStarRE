@@ -91,6 +91,9 @@ runs:
 
         source_statement_guard="$(printf '%s\n' \
           'Source-statement guard:' \
+          '- Read `AGENTS.md`, `docs/PROOF_INTEGRITY.md`, and' \
+          '  `docs/paper-gaps/proof-gap-protocol.tex` before changing a theorem' \
+          '  statement, a blueprint `\leanok` link, or a proof-debt record.' \
           '- For any declaration named as, linked to, or documented as a paper theorem,' \
           '  lemma, or proposition, preserve the statement in `references/ldt-paper/` up to' \
           '  faithful formal encoding.' \
