@@ -423,6 +423,33 @@ For a one-off bypass, set `MIPSTARRE_SKIP_HOOKS=1`.  A bypass should be used
 only to recover from a local tooling problem; it is not a substitute for the
 corresponding PR checks.
 
+### Hook-to-CI Coverage Map
+
+Local hooks are designed to reject common failures before a push, while CI
+remains the authoritative merge gate.  The responsibilities are:
+
+| Invariant | Local hook | CI owner | Notes |
+|---|---|---|---|
+| Whitespace in staged patches | `pre-commit`: `git diff --cached --check` | ordinary PR review / workflow logs | Fast local-only guard. |
+| Statement-like declarations cite paper origin | `pre-commit`: `check_statement_paper_origin.py` | `statement-paper-origin.yml` | Blocking CI, path-filtered to LDT Lean files and the guard implementation. |
+| Lean files stay below the oversized-file limit | none by default | `oversized-lean-files.yml` | Path-filtered to Lean files and the guard implementation. |
+| Paper-facing theorem headers avoid bridge-debt vocabulary | `pre-commit`: `audit_paper_facing_proof_debt.py --ci` | `paper-facing-proof-debt-audit.yml` | Blocking CI for Lean and blueprint statement surfaces. |
+| Conclusion-shaped hypotheses are rejected | `pre-commit`: `audit_conclusion_shaped_hypotheses.py --ci` | `proof-evasion-helper-audits.yml` | Blocking CI. |
+| `**Unfaithful:**` markers carry citations and an elimination plan | `pre-commit`: `audit_unfaithful_markers.py --ci` | `proof-evasion-helper-audits.yml` | Blocking CI. |
+| Edited Lean files type-check | `pre-push`: `lake env lean` on changed Lean files | `lean_action_ci.yml` | CI remains the full repository authority. |
+| Blueprint declarations and `blueprint/lean_decls` stay synchronized | `pre-push`: regenerate, diff, `blueprint_lean_sync.py --ci`, `checkdecls` | `blueprint-sync.yml`; best-effort checks in `lint-blueprint.yml` | The PR workflow is the authoritative check. |
+| Proof-level `\leanok` entries do not depend on `sorryAx` | `pre-push` full mode: `blueprint_leanok_axioms.py --ci` | `blueprint-sync.yml` | The axiom audit needs compiled local `.olean` artifacts on a cold runner, so this workflow keeps one explicit `lake build` before the audit. |
+| Whole-project Lean compilation | `pre-push` full mode: `lake build` | `lean_action_ci.yml` | Lean CI remains the merge authority for compilation; the blueprint-sync build is the proof-status audit prerequisite. |
+| Blueprint LaTeX/PDF/web build | `pre-push` full mode: `leanblueprint web` when installed | `lint-blueprint.yml` and `blueprint.yml` | Only blueprint workflows own LaTeX rendering. |
+
+This split keeps the proof-status audit separate from ordinary compilation.
+`blueprint-sync.yml` still builds the repository once because `#print axioms`
+requires compiled local imports on a cold runner.  It is not a second
+compilation authority; it exists to support the blueprint `\leanok` audit.
+Path filters prevent documentation-only audit prose from starting this heavy
+workflow unless the Lean source, blueprint Lean references, declaration
+manifest, toolchain, or the audit scripts themselves changed.
+
 ---
 
 ## Safety Mechanisms
