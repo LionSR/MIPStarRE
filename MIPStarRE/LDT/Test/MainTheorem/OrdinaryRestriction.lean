@@ -20,7 +20,7 @@ sub-leaves:
   `mainFormalSuccessorRestrictedDiagonal_le_ofSliceData`).
 
 * `OrdinaryRestriction.PublicWrapper` — a compatibility import.  Its former
-  conditional handoff has been removed because it took non-paper successor data
+  conditional transition has been removed because it took non-paper successor data
   as hypotheses; the remaining Section 6 proof obligation is now the
   `mainInduction` theorem with the paper statement.
 

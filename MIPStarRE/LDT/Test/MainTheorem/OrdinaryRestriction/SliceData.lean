@@ -30,7 +30,7 @@ which combined this target with an unproved self-improvement input has been
 removed; that missing proof step is now represented only by the
 Section 6 theorem.
 
-**Unfaithful:** this structure records honest same-space slice strategies and
+**Unfaithful:** this structure records concrete same-space slice strategies and
 passing hypotheses for restricted slices that are not yet constructed from the
 successor proof of `thm:main-formal`
 (`references/ldt-paper/test_definition.tex:180-202`) and `thm:main-induction`
@@ -309,7 +309,7 @@ theorem mainFormalSuccessorRestrictedDiagonal_le_ofSliceData
 /-- Convert per-slice induction-hypothesis data into a
 `MainFormalSuccessorRecursiveSlices` witness.
 
-This is the abstract induction-step lemma for #1021.  Given the honest
+This is the abstract induction-step lemma for #1021.  Given the concrete
 `MainFormalSuccessorRecursiveSliceData` together with a recursive induction
 hypothesis that delivers `mainInductionError`-bounded polynomial measurements
 for each slice strategy, this rewrites the state and point-measurement

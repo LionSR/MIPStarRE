@@ -40,7 +40,7 @@ construction in the paper because:
 
 * `xRestrictedAnswerSymStrat` preserves the full answer-valued diagonal
   restriction and its transport invariant, so the restricted strategy can serve
-  as an honest input to Section 9 self-improvement.
+  as a concrete input to Section 9 self-improvement.
 * It maps directly to the paper's answer-register construction, with the
   diagonal outcome function carried end-to-end rather than truncated to
   `zeroCoord`.
@@ -169,12 +169,12 @@ and diagonal
 compatibility fields are retained so a later recursive-induction argument can
 make `slicePasses` depend on the actual restricted answer slice.
 
-**Unfaithful:** this data structure records honest answer-valued slice
+**Unfaithful:** this data structure records concrete answer-valued slice
 strategies, compatibility fields, and passing hypotheses that are not yet
 constructed from the successor proof of `thm:main-formal`
 (`references/ldt-paper/test_definition.tex:180-202`) and `thm:main-induction`
 (`references/ldt-paper/inductive_step.tex:441-551`).  This is tracked by
-#1375, #1369, #1363, and #1458.  Elimination: prove the honest answer-valued
+#1375, #1369, #1363, and #1458.  Elimination: construct the answer-valued
 slice strategy construction from the paper hypotheses, then use this structure
 only as the internal representation for that construction. -/
 structure MainFormalSuccessorAnswerRecursiveSliceData (params : Parameters)
@@ -250,7 +250,7 @@ structure MainFormalSuccessorAnswerRecursiveSliceData (params : Parameters)
 /-- Convert per-slice answer-register induction-hypothesis data into a
 `MainFormalSuccessorAnswerRecursiveSlices` witness.
 
-This is the abstract induction-step lemma for #1038.  Given the honest
+This is the abstract induction-step lemma for #1038.  Given the concrete
 `MainFormalSuccessorAnswerRecursiveSliceData` together with a recursive induction
 hypothesis that delivers `mainInductionError`-bounded polynomial measurements
 for each slice strategy, this rewrites the state and point-measurement
