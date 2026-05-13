@@ -173,11 +173,12 @@ This bridge system is progress toward #931 and is explicitly documented.
 ### Matrix realization (`MatrixRealization.lean`)
 
 The matrix realization module provides concrete finite-dimensional matrix
-versions of the SDP data (`MatrixSdpRealization`,
-`MatrixSdpOptimalWitness`, `MatrixAddInUTransferStatement`). These are
-auxiliary definitions not directly referenced by the main theorem chain.
-No paper-against-formalization discrepancies were found in this module;
-the matrix-level definitions mirror the operator-level ones structurally.
+versions of the SDP data, including `MatrixSdpRealization` and
+`MatrixSdpOptimalWitness`. These are auxiliary definitions not directly
+referenced by the main theorem chain.  The former
+`MatrixAddInUTransferStatement` scaffold is no longer a live Lean declaration.
+No paper-against-formalization discrepancies were found in the retained
+matrix-level definitions; they mirror the operator-level ones structurally.
 
 ## Existing documented bookkeeping
 

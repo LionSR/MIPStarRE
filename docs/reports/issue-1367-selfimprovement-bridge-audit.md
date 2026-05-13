@@ -299,9 +299,9 @@ These were the obligation constructors for the two historical proposed
 
 | Item | Status |
 |------|--------|
-| Remaining slackness-carrying helper route (`self_improvement_helper_with_slackness` and matrix-to-helper lemmas) | Orphan — tracked by #1230 and #1385, not blocking |
-| `MatrixAddInUTransferStatement` | Dead scaffolding — tracked by statement-smuggle reaudit |
-| `self_improvement_helper_with_slackness` variants | Orphan — tracked by #1385, not blocking |
+| Remaining slackness-carrying helper route (`self_improvement_helper_with_slackness`) | Internal SelfImprovement dependency; tracked by #1230 and #1385 |
+| Former `MatrixAddInUTransferStatement` | Removed; no live Lean declaration remains |
+| `self_improvement_helper_with_slackness` variants | Internal SelfImprovement route; not a public substitute for `selfImprovement` |
 | Internal SelfImprovement sub-lemmas (HelperCompleteness, PointConsistency, etc.) | All proved (conditional) |
 | Pasting theorem (`ldPasting`) | Fully proved, fully wired |
 | MainInductionStep assembly (`mainInductionByRecursionOnM`) | Proved only after the internal proof-stage inputs are supplied; the paper-facing theorem keeps the corresponding successor proof gap |
@@ -314,16 +314,19 @@ These were the obligation constructors for the two historical proposed
 
 | Declaration | File | Callers in MainTest | Verdict |
 |------------|------|---------------------|---------|
-| `self_improvement_helper_with_slackness` | `SelfImprovementTop/Core.lean:119` | None | Orphan — useful for SDP duality path (#1385) |
+| `self_improvement_helper_with_slackness` | `SelfImprovementTop/Core.lean:119` | `selfImprovementHelper` | Internal route resting on SDP slackness (#1230, #1385) |
 | Former full-conclusion residual-domination variants | `ResidualDomination.lean` | None | Removed by PR #1539; no longer a live theorem-level route |
-| Matrix-to-helper SDP lemmas | `SdpMatrixHelperBridge.lean` | None | Orphan — useful only if the SDP duality path is revived |
-| `MatrixAddInUTransferStatement` | `MatrixRealization.lean:148` | None (0 consumers) | **DEAD** — should be deleted or documented |
+| Matrix-to-helper SDP lemmas | `SdpMatrixHelperBridge.lean` | None | Removed orphan module; revive only as source-derived proof content if the SDP duality path is completed |
+| Former `MatrixAddInUTransferStatement` | `MatrixRealization.lean` | None | Removed; no live Lean declaration remains |
 
 ### 7.2 OrthonormalizationInputConstructors
 
 **File:** `SelfImprovement/Theorems/OrthonormalizationInputConstructors/`
 
-Imported by barrel `Theorems.lean` but **never by MainInductionStep or MainTheorem**. These are internal helper lemmas used within SelfImprovement's own submodules. Not orphan — they serve the internal pipeline.
+Formerly imported by the barrel `Theorems.lean` but never by MainInductionStep
+or MainTheorem.  The module has been removed; the remaining orthonormalization
+bridge layer stops at named source obligations rather than re-exporting unused
+constructors from those obligations to larger input packages.
 
 ---
 
@@ -383,9 +386,9 @@ hypotheses.
 3. **Close or retarget #1363 and #1369** as historical bridge-route issues if
    they no longer describe live Lean declarations.
 
-4. **Delete or justify `MatrixAddInUTransferStatement`** — the only dead
-   `*Statement` structure in this audit (no consumers or construction callers).
-   Either open a sub-issue under #1385 or delete.
+4. **Do not reintroduce `MatrixAddInUTransferStatement`** as a standalone
+   proof-debt structure.  If the add-in-\(u\) transfer is needed again, state it
+   as a source-derived theorem with a paper citation and a proof obligation.
 
 ### 10.2 Next proof cycle
 
