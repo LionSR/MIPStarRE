@@ -32,7 +32,7 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 This helper is the final `error ≤ mainInductionError` cleanup step only; the
 actual Section 6 assembly is carried by `mainInductionBaseCase`,
-`mainInductionFromPackages`, and `mainInductionByRecursionOnM`. -/
+`mainInduction` and its successor proof gap. -/
 theorem mainInductionOfWitness
     (params : Parameters)
     [FieldModel params.q]
