@@ -125,10 +125,10 @@
 	analytic completion statement on the left register; the shared preliminary
 	helper compares right- and left-tensor placements at the level of the
 	underlying state-dependent-distance form.  Its submeasurement and indexed
-	wrappers transport state-dependent distance to the right register under the
+	lemmas transport state-dependent distance to the right register under the
 	permutation-invariance hypothesis on the state.  The remaining two
 	declarations combine this transport with the orthonormalize-and-complete
-	output so that the line-156 projectivization handoff can later be produced
+	output so that the line-156 projectivization transition can later be produced
 	from the two completed measurements without restating the tensor-factor
 	bookkeeping.
 \end{remark}
@@ -145,16 +145,16 @@
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_with_orthonormalization_loss, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_with_orthonormalization_loss}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.leftConsistency, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.rightConsistency}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.leftConsistency_with_triangleSub_loss, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.rightConsistency_with_triangleSub_loss}
-	Lean exposes the quantitative obstruction at the projectivization handoff used
-	in the inductive step.  The existing line-156 handoff gives only the generic
+	Lean exposes the quantitative obstruction at the projectivization transition used
+	in the inductive step.  The existing line-156 transition gives only the generic
 	consequence of Proposition~\ref{prop:triangle-sub}: from
 	$G^{\mathrm A}\simeq_{\zeta_1}G^{\mathrm B}$ and
 	$G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ one obtains
 	$Q^{\mathrm A}\simeq_{\zeta_1+\sqrt{\zeta_2}}G^{\mathrm B}$, and similarly
 	on the other tensor factor.  The declarations
 	\texttt{leftConsistency\_with\_triangleSub\_loss} and
-	\texttt{rightConsistency\_with\_triangleSub\_loss} are checked wrappers for
-	this honest square-root-loss route.
+	\texttt{rightConsistency\_with\_triangleSub\_loss} are checked lemmas for
+	this direct square-root-loss route.
 
 	Lean also proves a more local repaired transport that keeps the comparison at
 	the pre-completion stage.  If $P^{\mathrm A}$ is the orthonormalized
@@ -306,7 +306,7 @@
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer}
 	\uses{lem:projective-non-measurement, def:approx_delta}
 	\leanok
-	Paper origin: \texttt{references/ldt-paper/orthonormalization.tex} lines 534--860 (rank reduction and the $Q$-side setup, including \ref{lem:xa-t} and \ref{lem:qa-restated}) and 862--1194 (the $X/\widehat X/P$ algebra: \ref{lem:X-squared}, \ref{lem:X-hat-squared}, \ref{lem:X-times-X-hat}, \ref{lem:squared-difference}, \ref{lem:P-projectivity}, \ref{lem:P-Q-approx}, plus the final triangle-inequality assembly producing the $84\zeta^{1/4}$ bound). Together these are the late repair stage of the orthogonalization-lemma proof.
+	Paper origin: \texttt{references/ldt-paper/orthonormalization.tex} lines 534--860 (rank reduction and the $Q$-side setup, including \ref{lem:xa-t} and \ref{lem:qa-restated}) and 862--1194 (the $X/\widehat X/P$ algebra: \ref{lem:X-squared}, \ref{lem:X-hat-squared}, \ref{lem:X-times-X-hat}, \ref{lem:squared-difference}, \ref{lem:P-projectivity}, \ref{lem:P-Q-approx}, plus the final triangle-inequality calculation producing the $84\zeta^{1/4}$ bound). Together these are the late repair stage of the orthogonalization-lemma proof.
 
 	Given a normalized bipartite state $\ket{\psi}$, a measurement
 	$A = \{A_a\}$, and the source almost-projective estimate for the

@@ -222,7 +222,7 @@ lemma orthonormalizationMainLemma_local {Outcome : Type*}
 /-- Local version of `orthonormalizationMainLemma` from the paper's cross
 consistency hypothesis.
 
-Unlike `orthonormalizationMainLemma_local`, this wrapper consumes
+Unlike `orthonormalizationMainLemma_local`, this theorem consumes
 `A_a ⊗ I ≃ I ⊗ B_a` directly.  The locality-preserving repair input still says
 that the rounded left-lifted family can be chosen as a left-lift of a local
 projective submeasurement. -/
@@ -338,7 +338,7 @@ set_option linter.unusedDecidableInType false in
 /-- Measurement-level orthonormalization from cross consistency, using the
 locality-preserving Section 5 repair construction directly.
 
-This is the source-faithful form needed by the final Step 6 assembly: a
+This is the source-faithful form needed by the final Step 6 construction: a
 cross-consistency estimate for the two unsymmetrized role measurements gives the
 projective submeasurement without an additional spectral-truncation or
 repair-input hypothesis. -/
@@ -598,7 +598,7 @@ theorem orthonormalization {Outcome : Type*}
 /-- Orthonormalization with the residual-domination invariant needed for the
 monotone-total self-improvement route.
 
-This is a strengthened wrapper around the submeasurement orthonormalization
+This is a strengthened form of the submeasurement orthonormalization
 argument.  Its additional input is not derived from SDD closeness: it says that
 the option-completed repair preserves at least the original residual mass on
 the fresh `none` outcome.  Under that construction-level invariant, discarding
