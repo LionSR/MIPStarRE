@@ -240,20 +240,22 @@ noncomputable def optionCompletion {Outcome : Type*}
     (A : SubMeas Outcome ι) (a : Outcome) :
     (optionCompletion A).outcome (some a) = A.outcome a := rfl
 
-/-- Paper origin: `references/ldt-paper/orthonormalization.tex:380-627`
-(`\label{thm:orthonormalization}`).
+/-- Legacy internal construction record for the Section 5 submeasurement
+orthonormalization proof.
 
-Explicit input exposing only the remaining truncation-function and
-locality-preserving repair witnesses needed for the submeasurement version of
-`thm:orthonormalization`.
+Paper origin: `references/ldt-paper/orthonormalization.tex:380-627`
+(`\label{thm:orthonormalization}`), where these are proof steps rather than
+theorem hypotheses.
 
-The lifted/local descent is formalized by the internal conditional lemma
-`localOrthonormalization_ofInternalInputs`; the still-opaque inputs are the
-truncation-function and late repair steps for the option-completed measurement
-`optionCompletion A`. Both fields live at error
-`consistencyToAlmostProjectiveError (2 * ζ)` because completing a
-`ζ`-strongly-self-consistent submeasurement to a measurement doubles the defect,
-exactly as in the paper's `1 - 2ζ` lower bound for the completed family. -/
+This structure is not part of the public statement of `thm:orthonormalization`,
+`orthonormalizationMainLemma`, or `orthonormalizeAndComplete`. It records two
+construction obligations for the option-completed measurement `optionCompletion
+A`: the truncation-function step and the locality-preserving repair step. Both
+fields live at error `consistencyToAlmostProjectiveError (2 * ζ)` because
+completing a `ζ`-strongly-self-consistent submeasurement to a measurement
+doubles the defect, as in the paper's `1 - 2ζ` lower bound for the completed
+family.  The source-facing theorem keeps the missing construction as a tracked
+proof gap instead of consuming this record as an additional assumption. -/
 structure OrthonormalizationInput {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
