@@ -102,25 +102,11 @@ statement.
 
 ### Conditional helper boundary
 
-1. **Hypothesis is named as debt.**  A `Prop`-valued abbreviation may name a
-   single mathematical construction that has not yet been produced by earlier
-   statements.  Example from
-   `MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean`:
-
-   ```lean
-   abbrev OrthonormalizationInput (params : Parameters) [FieldModel params.q]
-       (strategy : SymStrat params ι) (eps delta : Error) :=
-     ∀ {Hhat : SubMeas (Polynomial params) ι},
-       BipartiteSSCRel strategy.state (uniformDistribution Unit)
-         (constSubMeasFamily Hhat)
-         (selfImprovementHelperError params eps delta) →
-       MakingMeasurementsProjective.OrthonormalizationInput strategy.state Hhat
-         (selfImprovementHelperError params eps delta)
-   ```
-
-   This `abbrev` says: "For any helper submeasurement `Hhat` that is strongly
-   self-consistent, we still need the spectral-truncation and
-   locality-preserving repair witness required by orthonormalization."
+1. **Prefer a source theorem with a tracked `sorry`.**  If a proof requires a
+   construction that is not yet available from the paper hypotheses, the first
+   repair is to restore the source theorem statement and leave the missing proof
+   open.  Do not introduce a new `Input`, `Obligation`, `Residual`, `Repair`,
+   `Producer`, or `Package` merely to avoid that `sorry`.
 
 2. **Do not bundle several missing theorem-level steps into one hypothesis.**
    The former Section 9 bundle `SelfImprovementObligations` and the helper
@@ -169,12 +155,12 @@ When such a declaration remains useful, its role should be one of the following:
 
 | Declaration | Status to maintain |
 |-------------|--------------------|
-| `SelfImprovement.OrthonormalizationInput` | Conditional input for the Section 5 orthonormalization construction; discharge through internal proof obligations such as the QXP repair witness |
+| `SelfImprovement.OrthonormalizationInput` | Legacy conditional input for the Section 5 construction. Do not propagate it to paper-facing statements; prefer the source theorem with `sorry` unless a PR is actually proving the construction theorem that removes it |
 | `SelfImprovement.FinalFieldsInput` | Conditional input for final Section 9 estimates; replace at the paper theorem boundary by source-faithful statements or named internal proof obligations |
 | `SelfImprovement.HelperStrongSelfConsistencyInput` | Conditional input for helper strong self-consistency estimates; keep tracked until produced |
 | `mainFormal_ofProjectiveCompletionResidual` | Conditional final-transport theorem; keep as reusable proof content, but do not present it as the paper theorem |
 | `MainFormalPostRolePackageDiagonalOrthonormalizationResidual` | Internal residual produced from line-130 cross consistency; do not replace it by an orthonormalization-input hypothesis on `mainFormal` |
-| `MakingMeasurementsProjective.OrthonormalizationInput` | Conditional input for the orthonormalization proof; keep visibly distinct from source-faithful paper statements |
+| `MakingMeasurementsProjective.OrthonormalizationInput` | Legacy internal construction data for Section 5. It is not a hypothesis of `orthonormalization`, `orthonormalizationMainLemma`, or `orthonormalizeAndComplete`; delete rather than propagate unless it is being used to prove a source-faithful construction theorem |
 | `LdPastingContext` | Faithfulness-sensitive context for `ldPasting`; audit each field against the Section 12 hypotheses and boundary conditions |
 
 ### The remaining proof obligations in `MainFormal.lean`
@@ -266,10 +252,9 @@ build needs regeneration.
 Some nodes have `\lean{}` but deliberately omit either statement-level or
 proof-level `\leanok`:
 
-- **`thm:orthonormalization`** (ch04): The Lean statement carries extra
-  hypotheses (`OrthonormalizationInput`) that are not yet discharged by
-  all callers.  Until the full hypothesis chain is closed at
-  `mainFormal`, `\leanok` is withheld.
+- **`thm:orthonormalization`** (ch04): The Lean statement is source-facing.
+  Its proof still contains the tracked issue-#1032 `sorry` for the sharp
+  `100 * ζ^(1/4)` constant, so proof-level `\leanok` is withheld.
 
 - **`thm:naimark`** (ch04): The Lean declaration records questionwise
   local dilations, not the full tensor-product correlation statement in

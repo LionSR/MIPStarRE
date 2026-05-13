@@ -434,8 +434,8 @@ structure SelfImprovementConclusion (params : Parameters) [FieldModel params.q]
 /-- Final fields for the Section 9 transport stage.
 
 The final fields are the Section 9 outputs that remain after combining:
-`SelfImprovementHelper`, orthonormalization, data-processing, and
-`orthonormalization_with_total_le_of_residual_domination`.
+`SelfImprovementHelper`, orthonormalization, data-processing, and the
+monotone-total transport used in the projective-output step.
 
 This record contains completeness, point-consistency, self-closeness, and the
 projective-residual estimate. The boundedness term is not repeated here because

@@ -8,10 +8,10 @@ import MIPStarRE.LDT.Preliminaries.DistanceBounds
 /-!
 # Section 9 — `OrthonormalizationInput` obligations
 
-This file provides a *narrowed* constructor for the
-`SelfImprovement.OrthonormalizationInput` requirement of the reduced
-self-improvement theorem (`Theorems/Results.lean`), splitting it into the two
-paper-faithful pieces from `references/ldt-paper/orthonormalization.tex`:
+This file records legacy internal constructors for
+`SelfImprovement.OrthonormalizationInput`, splitting that construction input
+into the two paper-faithful pieces from
+`references/ldt-paper/orthonormalization.tex`:
 
 * the **spectral-truncation** step (`lem:projective-non-measurement`) on the
   option-completed, left-lifted helper measurement, and
@@ -19,12 +19,12 @@ paper-faithful pieces from `references/ldt-paper/orthonormalization.tex`:
   measurement.
 
 The split mirrors `MakingMeasurementsProjective.OrthonormalizationInput`, which
-is itself the structure left after `orthonormalizationMainLemma_local` was
-proved internally.  At present the spectral and repair pieces are still the
-open Section 5 inputs tracked by #1515 and #1458; this file does *not*
-discharge them. It only narrows the missing proof obligations to the two
-constructive Section 5 witnesses, and any paper-facing theorem must obtain
-those witnesses from the source hypotheses before using this interface.
+is an internal proof-obligation structure for the Section 5 construction.
+At present the spectral and repair pieces are still the open Section 5 inputs
+tracked by #1515 and #1458; this file does *not* discharge them. It only narrows
+the missing proof obligations to the two constructive Section 5 witnesses.
+Paper-facing theorems should use the source statement with a tracked `sorry`
+until these witnesses are actually proved from the source hypotheses.
 
 In addition, `orthonormalizationSpectralObligation_of_roundingWitnesses`
 composes the spectral-truncation conversion established in `#1042`
@@ -32,7 +32,7 @@ composes the spectral-truncation conversion established in `#1042`
 Together with a separate locality-preserving repair obligation, this gives a
 path from the honest QXP-layer rounding witnesses to
 `SelfImprovement.OrthonormalizationInput`, without restating the full input as an
-extra assumption.
+extra assumption of a paper-facing theorem.
 
 ## What this file provides
 
@@ -179,8 +179,9 @@ The underlying repaired family is still the canonical local family
 `qxpProjSubMeas data`.  The additional field is the construction-level
 inequality isolated in issue `#1300`: after completing `A` by the residual
 operator `I - A.total`, the QXP repair assigns at least that operator to the
-fresh `none` outcome.  This is precisely the hypothesis needed by
-`orthonormalization_with_total_le_of_residual_domination`. -/
+fresh `none` outcome.  This is precisely the order-theoretic input needed by
+the monotone-total final-field route; it is not an additional hypothesis of
+the paper orthonormalization theorem. -/
 structure LeftLiftedQXPLayerRepairWitnessWithResidualDomination {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
