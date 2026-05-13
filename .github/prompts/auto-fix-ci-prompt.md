@@ -6,6 +6,10 @@ Instructions:
    failures (`sorry`, tactic errors, type mismatches in proofs), read PR/issue comments for
    existing **Mathlib Scouting Reports** and use them to inform your fix. For simple failures
    (import errors, syntax issues, naming), skip scouting and fix directly.
+0a. Before changing a paper-facing theorem statement, a blueprint `\leanok`
+   link, or a proof-debt record, read `AGENTS.md`, `docs/PROOF_INTEGRITY.md`,
+   and `docs/paper-gaps/proof-gap-protocol.tex`. The repair must preserve the
+   cited statement in `references/ldt-paper/` up to faithful formal encoding.
 1. Read the error logs carefully to identify the failing Lean files and error messages.
 2. Common Lean build failures and how to fix them:
 

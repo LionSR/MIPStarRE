@@ -390,8 +390,9 @@ Unset that Git config value to return to Git's default hook directory.
 ### Pre-commit hook
 
 The pre-commit hook first runs `git diff --cached --check`.  When the staged
-files touch Lean, blueprint, paper-gap, proof-integrity, or review-policy
-surfaces, it also runs the fast statement-integrity audits:
+files touch Lean, blueprint, paper-gap, proof-integrity, review-policy, or
+agent-prompt surfaces under `.github/actions/`, `.github/prompts/`, or
+`.github/workflows/`, it also runs the fast statement-integrity audits:
 
 ```bash
 python3 scripts/check_statement_paper_origin.py --root .
@@ -406,9 +407,11 @@ GitHub runner time.  They do not replace mathematical review.
 ### Pre-push hook
 
 The pre-push hook examines the refs being pushed.  For changed Lean files it
-runs `lake env lean` on each changed file.  When blueprint or Lean declaration
-surfaces changed, it regenerates `blueprint/lean_decls`, verifies that the file
-has not drifted, and then runs:
+runs `lake env lean` on each changed file.  When the pushed range touches Lean,
+blueprint, paper-gap, proof-integrity, review-policy, or agent-prompt surfaces,
+it repeats the fast statement-integrity audits.  When blueprint or Lean
+declaration surfaces changed, it regenerates `blueprint/lean_decls`, verifies
+that the file has not drifted, and then runs:
 
 ```bash
 python3 scripts/blueprint_lean_sync.py --root . --ci
@@ -431,11 +434,11 @@ remains the authoritative merge gate.  The responsibilities are:
 | Invariant | Local hook | CI owner | Notes |
 |---|---|---|---|
 | Whitespace in staged patches | `pre-commit`: `git diff --cached --check` | ordinary PR review / workflow logs | Fast local-only guard. |
-| Statement-like declarations cite paper origin | `pre-commit`: `check_statement_paper_origin.py` | `statement-paper-origin.yml` | Blocking CI, path-filtered to LDT Lean files and the guard implementation. |
+| Statement-like declarations cite paper origin | `pre-commit` and relevant `pre-push`: `check_statement_paper_origin.py` | `statement-paper-origin.yml` | Blocking CI, path-filtered to LDT Lean files and the guard implementation. |
 | Lean files stay below the oversized-file limit | none by default | `oversized-lean-files.yml` | Path-filtered to Lean files and the guard implementation. |
-| Paper-facing theorem headers avoid bridge-debt vocabulary | `pre-commit`: `audit_paper_facing_proof_debt.py --ci` | `paper-facing-proof-debt-audit.yml` | Blocking CI for Lean and blueprint statement surfaces. |
-| Conclusion-shaped hypotheses are rejected | `pre-commit`: `audit_conclusion_shaped_hypotheses.py --ci` | `proof-evasion-helper-audits.yml` | Blocking CI. |
-| `**Unfaithful:**` markers carry citations and an elimination plan | `pre-commit`: `audit_unfaithful_markers.py --ci` | `proof-evasion-helper-audits.yml` | Blocking CI. |
+| Paper-facing theorem headers avoid bridge-debt vocabulary | `pre-commit` and relevant `pre-push`: `audit_paper_facing_proof_debt.py --ci` | `paper-facing-proof-debt-audit.yml` | Blocking CI for Lean and blueprint statement surfaces. |
+| Conclusion-shaped hypotheses are rejected | `pre-commit` and relevant `pre-push`: `audit_conclusion_shaped_hypotheses.py --ci` | `proof-evasion-helper-audits.yml` | Blocking CI. |
+| `**Unfaithful:**` markers carry citations and an elimination plan | `pre-commit` and relevant `pre-push`: `audit_unfaithful_markers.py --ci` | `proof-evasion-helper-audits.yml` | Blocking CI. |
 | Edited Lean files type-check | `pre-push`: `lake env lean` on changed Lean files | `lean_action_ci.yml` | CI remains the full repository authority. |
 | Blueprint declarations and `blueprint/lean_decls` stay synchronized | `pre-push`: regenerate, diff, `blueprint_lean_sync.py --ci`, `checkdecls` | `blueprint-sync.yml`; best-effort checks in `lint-blueprint.yml` | The PR workflow is the authoritative check. |
 | Proof-level `\leanok` entries do not depend on `sorryAx` | `pre-push` full mode: `blueprint_leanok_axioms.py --ci` | `blueprint-sync.yml` | The axiom audit needs compiled local `.olean` artifacts on a cold runner, so this workflow keeps one explicit `lake build` before the audit. |
@@ -518,8 +521,9 @@ CI logs and review comments are untrusted input — they could contain text desi
 1. Run `scripts/install_git_hooks.sh` from the repository root.
 2. Commit normally.  The pre-commit hook runs the fast statement-integrity
    audits only when staged paths touch relevant files.
-3. Push normally.  The pre-push hook checks changed Lean files and blueprint
-   declaration synchronization.
+3. Push normally.  The pre-push hook checks changed Lean files, repeats the fast
+   statement-integrity audits for relevant policy or prompt surfaces, and checks
+   blueprint declaration synchronization.
 4. Use `MIPSTARRE_HOOK_FULL=1 git push` before a larger Lean or blueprint PR
    when local resources allow the full gate.
 

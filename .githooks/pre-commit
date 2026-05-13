@@ -18,7 +18,7 @@ echo "MIPStarRE pre-commit: checking staged whitespace."
 git diff --cached --check
 
 if ! printf '%s\n' "$STAGED_FILES" | grep -Eq \
-  '^(MIPStarRE/|MIPStarRE\.lean|blueprint/src/|blueprint/lean_decls|scripts/(audit_paper_facing_proof_debt|audit_conclusion_shaped_hypotheses|audit_unfaithful_markers|check_statement_paper_origin|blueprint_lean_sync)\.py|docs/(CONTRIBUTING|PROOF_INTEGRITY|anti_patterns|blueprint_style_guide|formalization-patterns|proof_frontier_review)\.md|docs/paper-gaps/|\.github/(prompts|workflows)/|AGENTS\.md)'; then
+  '^(MIPStarRE/|MIPStarRE\.lean|blueprint/src/|blueprint/lean_decls|scripts/(audit_paper_facing_proof_debt|audit_conclusion_shaped_hypotheses|audit_unfaithful_markers|check_statement_paper_origin|blueprint_lean_sync)\.py|docs/(CONTRIBUTING|PROOF_INTEGRITY|anti_patterns|blueprint_style_guide|formalization-patterns|proof_frontier_review)\.md|docs/paper-gaps/|\.github/(actions|prompts|workflows)/|AGENTS\.md)'; then
   echo "MIPStarRE pre-commit: no statement-integrity files staged."
   exit 0
 fi
