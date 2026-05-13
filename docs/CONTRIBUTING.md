@@ -74,6 +74,7 @@ and blueprint-sync failures before they reach CI:
 
 ```bash
 scripts/install_git_hooks.sh
+scripts/install_git_hooks.sh --check
 ```
 
 The pre-commit hook runs whitespace and proof-debt audits on relevant staged

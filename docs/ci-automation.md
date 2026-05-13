@@ -385,6 +385,12 @@ scripts/install_git_hooks.sh
 ```
 
 The installer sets `core.hooksPath` to `.githooks` for the local clone.
+Verify a fresh worktree with:
+
+```bash
+scripts/install_git_hooks.sh --check
+```
+
 Unset that Git config value to return to Git's default hook directory.
 
 ### Pre-commit hook
@@ -519,12 +525,14 @@ CI logs and review comments are untrusted input — they could contain text desi
 ### To enable local hooks
 
 1. Run `scripts/install_git_hooks.sh` from the repository root.
-2. Commit normally.  The pre-commit hook runs the fast statement-integrity
+2. Run `scripts/install_git_hooks.sh --check` in each fresh worktree used for a
+   PR.
+3. Commit normally.  The pre-commit hook runs the fast statement-integrity
    audits only when staged paths touch relevant files.
-3. Push normally.  The pre-push hook checks changed Lean files, repeats the fast
+4. Push normally.  The pre-push hook checks changed Lean files, repeats the fast
    statement-integrity audits for relevant policy or prompt surfaces, and checks
    blueprint declaration synchronization.
-4. Use `MIPSTARRE_HOOK_FULL=1 git push` before a larger Lean or blueprint PR
+5. Use `MIPSTARRE_HOOK_FULL=1 git push` before a larger Lean or blueprint PR
    when local resources allow the full gate.
 
 ### For any PR (automatic)
