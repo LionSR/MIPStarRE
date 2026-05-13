@@ -390,11 +390,11 @@ theorem nonempty_ofDiagonalConsistency
       params strategy eps k scalars rolePackage) := by
   -- TODO(#1043, #1359, #1458): choose the completion outcomes and derive the
   -- self-consistency and match-mass preservation estimates from the paper
-  -- hypotheses, rather than requiring them as a separate input package.
+  -- hypotheses, rather than requiring them as separate assumptions.
   sorry
 
-/-- Forget only the provenance wrapper after constructing the fixed Step 6
-witness package from line-130 orthonormalization plus completion closeness.
+/-- Convert the line-130 diagonal completion residual into the projective
+completion residual used by the Step 6 assembly.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:135-173`. -/
 noncomputable def toProjectiveCompletionResidual
