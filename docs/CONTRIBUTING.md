@@ -82,6 +82,9 @@ files, including agent prompts and actions under `.github/`.  The pre-push hook
 checks changed Lean files with `lake env lean`, repeats the fast
 statement-integrity audits for relevant policy or prompt surfaces, and checks
 blueprint declaration synchronization when Lean or blueprint surfaces changed.
+These hooks also reject explicit `axiom` and `constant` declarations in the LDT
+tree; use a tracked `sorry` for an unfinished source-faithful proof instead of
+turning the missing proof into a new ambient assumption.
 For larger PRs, `MIPSTARRE_HOOK_FULL=1 git push` also runs the full local gate.
 Use `MIPSTARRE_SKIP_HOOKS=1` only for a one-off local-tooling bypass, and still
 report the corresponding validation in the PR body.
