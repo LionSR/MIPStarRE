@@ -44,9 +44,7 @@ theorem nonempty_ofRoleResidual
     MainFormalPostRolePackageDiagonalCompletionResidual.nonempty_ofDiagonalConsistency
       orthResidual hpre
   rcases hcompletion with ⟨completion⟩
-  let postRoleResidual :=
-    completion.toPostRolePackageLeftCompletionTransportResidual hsmall
-  exact ⟨postRoleResidual.toCompletionTransportResidual hpre⟩
+  exact ⟨completion.toProjectiveCompletionTransportResidual hsmall hpre⟩
 
 end MainFormalCascadeProjectiveCompletionTransportResidual
 
