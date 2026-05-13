@@ -62,6 +62,23 @@ DEBT_TOKEN_RE = re.compile(
     r"(?![A-Za-z0-9_'])"
 )
 
+# The following tokens are deliberately not treated as proof-debt findings.
+# Each entry is a small public structure whose fields are visible in the
+# corresponding source statement, or are scalar side conditions used to make an
+# implicit paper regime explicit.
+#
+# * CascadeHypotheses contains only the numeric regime used by the final error
+#   cascade: k >= 1, m >= 1, 0 <= eps <= 1, d <= q, and q > 0.  These are not
+#   bridge data.  The paper calculation at inductive_step.tex:187-234 uses the
+#   unit-scale assumptions when comparing fractional powers and absorbing lower
+#   powers into k^2 m^4; the blueprint states them explicitly in
+#   ch10_induction.tex:545-564.
+# * SliceBoundednessInput contains the boundedness item from
+#   commutativity-G.tex:29-36 and ld-pasting.tex:28-35: positive witnesses Z^x,
+#   the averaged residual bound, and the pointwise domination
+#   Z^x >= E_u A^{u,x}_{g(u)}.  It must not contain an additional Lean-only
+#   identification field; issue #1556 removed the former
+#   dominationTargetAgrees bridge from this public input.
 FAITHFUL_BOUNDARY_TOKENS = {
     "CascadeHypotheses": (
         "faithful encoding of the standing numeric regime for the error cascade; "
