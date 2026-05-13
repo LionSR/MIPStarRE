@@ -155,13 +155,16 @@ When such a declaration remains useful, its role should be one of the following:
 
 | Declaration | Status to maintain |
 |-------------|--------------------|
-| `SelfImprovement.OrthonormalizationInput` | Legacy conditional input for the Section 5 construction. Do not propagate it to paper-facing statements; prefer the source theorem with `sorry` unless a PR is actually proving the construction theorem that removes it |
-| `SelfImprovement.FinalFieldsInput` | Conditional input for final Section 9 estimates; replace at the paper theorem boundary by source-faithful statements or named internal proof obligations |
-| `SelfImprovement.HelperStrongSelfConsistencyInput` | Conditional input for helper strong self-consistency estimates; keep tracked until produced |
 | `mainFormal_ofProjectiveCompletionResidual` | Conditional final-transport theorem; keep as reusable proof content, but do not present it as the paper theorem |
 | `MainFormalPostRolePackageDiagonalOrthonormalizationResidual` | Internal residual produced from line-130 cross consistency; do not replace it by an orthonormalization-input hypothesis on `mainFormal` |
-| `MakingMeasurementsProjective.OrthonormalizationInput` | Legacy internal construction data for Section 5. It is not a hypothesis of `orthonormalization`, `orthonormalizationMainLemma`, or `orthonormalizeAndComplete`; delete rather than propagate unless it is being used to prove a source-faithful construction theorem |
 | `LdPastingContext` | Faithfulness-sensitive context for `ldPasting`; audit each field against the Section 12 hypotheses and boundary conditions |
+
+The former `SelfImprovement.HelperStrongSelfConsistencyInput`,
+`SelfImprovement.OrthonormalizationInput`, `SelfImprovement.FinalFieldsInput`, and
+`MakingMeasurementsProjective.OrthonormalizationInput` bundles have been removed.
+Useful proof content should be kept as named construction lemmas, while missing
+orthonormalization or final-field arguments remain direct proof gaps on the
+source-facing theorem until proved from the paper hypotheses.
 
 ### The remaining proof obligations in `MainFormal.lean`
 
@@ -377,7 +380,7 @@ re-export file (e.g., `Theorems.lean`) that imports all the leaves:
 
 ```lean
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
-import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationBridge
+import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationSpectral
 import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results
 ```

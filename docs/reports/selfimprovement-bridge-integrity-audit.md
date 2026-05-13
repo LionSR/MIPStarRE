@@ -15,6 +15,14 @@ the theorem with the paper statement.  The present paper-alignment policy is to
 preserve the theorem statements from the paper and to leave the remaining
 derivations as tracked `sorry` sites until they are proved.
 
+Status note, 2026-05-13 after PR #1547 and the follow-up orthonormalization
+cleanup: the residual-domination orthonormalization route and the bundled
+`OrthonormalizationInput` records have also been removed.  The retained Section
+9 orthonormalization proof content is the spectral-truncation conversion in
+`SelfImprovement/Theorems/OrthonormalizationSpectral.lean`; the
+locality-preserving repair argument remains a proof gap on the source-facing
+self-improvement theorem, not an extra theorem input.
+
 Auditor: Research specialist (read-only analysis)
 Scope: `MIPStarRE/LDT/SelfImprovement/` → `MIPStarRE/LDT/Pasting/` →
        `MIPStarRE/LDT/MainInductionStep/` → `MIPStarRE/LDT/Test/MainTheorem/`
@@ -59,15 +67,21 @@ Main theorems:
 Historically, the deleted `SelfImprovementObligations` bundle recorded three
 proof-stage inputs:
 
-1. **`helperStrongSelfConsistency`**: `HelperStrongSelfConsistencyInput` — the
-   averaged `Hhat` is stably self-consistent (`BipartiteSSCRel` at level
-   `selfImprovementHelperError`).
-2. **`orthonormalization`**: `OrthonormalizationInput` — converts
-   `BipartiteSSCRel` into `OrthonormalizationInput` (spectral-truncation +
-   locality-preserving repair witnesses).
-3. **`finalFields`**: `FinalFieldsInput` — the remaining completeness,
-   point-consistency, self-closeness, and projective-residual conclusions are
-   derivable from the helper+orthonormalization+data-processing outputs.
+1. **`helperStrongSelfConsistency`**: the former
+   `HelperStrongSelfConsistencyInput` has been removed.  The helper SSC
+   conclusion is now produced by
+   `helper_strong_self_consistency_of_helper_conclusion` from the named scalar
+   obligations, and any remaining derivation is a direct proof gap rather than
+   an input bundle.
+2. **`orthonormalization`**: the former `OrthonormalizationInput` bundle has
+   been removed.  The retained Section 9 API records only the proved
+   spectral-truncation conversion; the locality-preserving repair construction
+   remains a proof obligation on the source-facing theorem, not a supplied
+   theorem hypothesis.
+3. **`finalFields`**: the former `FinalFieldsInput` bundle has been removed.
+   The completeness, point-consistency, self-closeness, and
+   projective-residual estimates must be derived in the proof of
+   `selfImprovement`, or left as the tracked proof gap there until proved.
 
 These three inputs are no longer hypotheses of the paper-facing theorem
 `selfImprovement`.  The former conditional helper
@@ -189,13 +203,20 @@ obligations into larger orthonormalization input packages.  These constructors
 were not used outside their own module and have been removed so that the
 Section 9 API does not normalize unused proof-debt packages.
 
-### 2.3. Remaining orthonormalization bridge layer
+### 2.3. Remaining orthonormalization spectral layer
+
+The former `SelfImprovement/Theorems/OrthonormalizationBridge.lean` module has
+been narrowed and renamed to
+`SelfImprovement/Theorems/OrthonormalizationSpectral.lean`.  It no longer
+exports repair-obligation or full-orthonormalization-input constructors.  Its
+only retained role is to record the spectral-truncation conversion for the
+option-completed helper measurement.
 
 ### 2.4. Used (NOT orphan)
 
 | Module | Used by |
 |--------|---------|
-| `SelfImprovement/Theorems/OrthonormalizationBridge` | `MainInductionStep/SelfImprovementBridge/Core.lean`, `Test/MainTheorem/OrthonormalizationData.lean` |
+| `SelfImprovement/Theorems/OrthonormalizationSpectral` | Re-exported by `SelfImprovement/Theorems.lean`; linked from the Section 9 auxiliary blueprint remark |
 | `SelfImprovement/Theorems/Results/HelperSSC` | `SelfImprovementTop/Core.lean` (via `selfImprovement`) |
 | `SelfImprovement/Theorems/Results/BoundednessTransport` | `SelfImprovementTop/Core.lean` (via `selfImprovement`) |
 | `SelfImprovement/Theorems/Results/SelfImprovementTop/Core.lean` | `MainInductionStep/SelfImprovementBridge/Core.lean` |

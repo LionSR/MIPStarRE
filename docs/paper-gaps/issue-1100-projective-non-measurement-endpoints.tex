@@ -131,16 +131,23 @@ The current \Lean{} declarations make this distinction explicit.\footnote{The
 constructive small-error branch is formalized by
 \leanid{projectiveNonMeasurement\_of\_sourceAlmostProjective} and
 \leanid{projectiveNonMeasurement\_of\_almostProjMeasStatement} in
-\doclink{MIPStarRE/LDT/MakingMeasurementsProjective/SpectralTruncation.lean}. The
-downstream SelfImprovement wrapper is
+\doclink{MIPStarRE/LDT/MakingMeasurementsProjective/SpectralTruncation.lean}.
+The unconditional spectral-truncation producer
+\leanid{projectiveNonMeasurement\_of\_sourceAlmostProjective\_full} combines
+that branch with the exact $\zeta = 0$ endpoint and the trivial large-error
+case, and
+\leanid{spectralTruncationInput\_of\_sourceAlmostProjective} packages the
+result as the input needed by the later Section~5 construction.  The downstream
+SelfImprovement wrapper is
 \leanid{orthonormalizationSpectralObligation\_of\_sourceAlmostProjective} in
-\doclink{MIPStarRE/LDT/SelfImprovement/Theorems/OrthonormalizationBridge.lean}.}
-These declarations prove the nontrivial paper branch under the hypotheses
-$0 < \zeta$ and $\zeta \le 1/4$.  This matches the part of the cited argument in
-which one may set $\delta = \sqrt{\zeta}$ and still satisfy
-\path{eq:bound-on-delta}.  The remaining unconditional theorem-level packaging
-still needs two additional branches: the trivial large-error case and the exact
-$\zeta = 0$ endpoint described above.
+\doclink{MIPStarRE/LDT/SelfImprovement/Theorems/OrthonormalizationSpectral.lean}.}
+Thus the present formal development has discharged the unconditional
+spectral-truncation packaging.  The small-error proof still corresponds to the
+part of the cited argument in which one may set $\delta = \sqrt{\zeta}$ and
+satisfy \path{eq:bound-on-delta}; the zero and large-error regimes are supplied
+by separate formal branches.  The remaining Section~5 work lies in the later
+locality-preserving repair and completion arguments, not in the endpoint
+packaging isolated in this note.
 
 In other words, the formal development has not discovered a contradiction in the
 paper statement.  It has isolated the exact places where the cited proof uses

@@ -358,12 +358,11 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_offDiagonal}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_paperChain}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_scalarTransports}
-  and then uses the proved lemmas
+  and then uses the proved lemma
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_of_helper_conclusion}
+  together with
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_obligations_of_selfConsistency_localVariance}
-  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_input_of_obligations}
-  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_input_of_selfConsistency_localVariance}
-  to recover the final helper-stage self-consistency input.  The remaining
+  to recover the final helper-stage self-consistency conclusion.  The remaining
   theorem-level derivation is not moved into an additional hypothesis; it is
   the proof gap in the paper theorem below.
   The paper's arithmetic shows that the right-hand error is at most

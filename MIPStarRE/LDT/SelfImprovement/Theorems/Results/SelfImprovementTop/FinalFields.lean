@@ -1,7 +1,6 @@
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Completeness
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.SelfCloseness
-import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationBridge
 
 /-!
 # Final-fields assembly with monotone total transport

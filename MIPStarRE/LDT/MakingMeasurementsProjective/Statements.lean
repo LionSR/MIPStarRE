@@ -170,36 +170,6 @@ structure RoundedProjMeasStatement {Outcome : Type*}
       (constSubMeasFamily P.toSubMeas)
       ζ
 
-/-- Paper origin: `references/ldt-paper/orthonormalization.tex:533-627`.
-
-Explicit input exposing the late repair from a rounded family to a genuine
-projective submeasurement. -/
-abbrev ProjectivizationRepairInput {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :=
-  SpectralTruncationStatement ψ A ζ →
-    ∃ P : ProjSubMeas Outcome ι,
-      RoundedProjMeasStatement ψ A P (roundingToProjectiveError ζ)
-
-/-- Paper origin: `references/ldt-paper/orthonormalization.tex:533-627`
-and `references/ldt-paper/self_improvement.tex:690-705`.
-
-Locality-preserving repair input for a left-lifted measurement.
-
-This is the structural invariant needed to descend the lifted-space output of
-`orthonormalizationMainLemma` back to a local projective submeasurement: when
-the input measurement already has the form `A_a ⊗ I`, the repaired family can
-be chosen in the same form `P_a ⊗ I`. -/
-abbrev LeftLiftedProjectivizationRepairInput {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState (ι × ι)) (A : Measurement Outcome ι) (ζ : Error) :=
-  SpectralTruncationStatement ψ (leftLiftedMeasurement (ιB := ι) A) ζ →
-    ∃ P : ProjSubMeas Outcome ι,
-      RoundedProjMeasStatement ψ (leftLiftedMeasurement (ιB := ι) A)
-        (ProjSubMeas.liftLeft P) (roundingToProjectiveError ζ)
-
 /-- Complete a submeasurement by adjoining the residual `I - ∑ₐ Aₐ` at the
 fresh `none` outcome.
 
@@ -239,36 +209,5 @@ noncomputable def optionCompletion {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
     (A : SubMeas Outcome ι) (a : Outcome) :
     (optionCompletion A).outcome (some a) = A.outcome a := rfl
-
-/-- Legacy internal construction record for the Section 5 submeasurement
-orthonormalization proof.
-
-Paper origin: `references/ldt-paper/orthonormalization.tex:380-627`
-(`\label{thm:orthonormalization}`), where these are proof steps rather than
-theorem hypotheses.
-
-This structure is not part of the public statement of `thm:orthonormalization`,
-`orthonormalizationMainLemma`, or `orthonormalizeAndComplete`. It records two
-construction obligations for the option-completed measurement `optionCompletion
-A`: the truncation-function step and the locality-preserving repair step. Both
-fields live at error `consistencyToAlmostProjectiveError (2 * ζ)` because
-completing a `ζ`-strongly-self-consistent submeasurement to a measurement
-doubles the defect, as in the paper's `1 - 2ζ` lower bound for the completed
-family.  The source-facing theorem keeps the missing construction as a tracked
-proof gap instead of consuming this record as an additional assumption. -/
-structure OrthonormalizationInput {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) (ζ : Error) where
-  /-- Truncation-function step on the option-completed measurement. -/
-  spectral :
-    let Ahat : Measurement (Option Outcome) ι := optionCompletion A
-    SpectralTruncationInput ψ (leftLiftedMeasurement (ιB := ι) Ahat)
-      (consistencyToAlmostProjectiveError (2 * ζ))
-  /-- Locality-preserving repair on the option-completed measurement. -/
-  repair :
-    let Ahat : Measurement (Option Outcome) ι := optionCompletion A
-    LeftLiftedProjectivizationRepairInput ψ Ahat
-      (consistencyToAlmostProjectiveError (2 * ζ))
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

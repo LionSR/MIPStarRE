@@ -161,8 +161,8 @@ The hypothesis is exactly the scalar transfer inequality supplied by the paper's
 `S_u = {(h,h) : h ∈ \polyfunc{m}{q}{d}}`. The conclusion rewrites that
 transfer into the paper's displayed step `eq:release-the-kraken`; the remaining
 work for #1514 and #1515 is to prove the hypothesis from the full
-Cauchy--Schwarz/global variance argument, not to assume
-`HelperStrongSelfConsistencyInput`. -/
+Cauchy--Schwarz/global variance argument, not to assume the final helper
+strong self-consistency conclusion. -/
 lemma selfConsistencyDiagonalAddInU_of_transfer
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)

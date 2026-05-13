@@ -54,56 +54,34 @@ theorem nonempty_ofRoleResidualAndCompletion
   rcases hcompletion with ⟨completion⟩
   exact ⟨{ roleResidual := roleResidual, postRoleDiagonalCompletion := completion }⟩
 
-/-- Assemble the final live residual from the paper line-130 cross consistency,
-and the P-level match-mass preservation data.
+/-- Construct the final residual from a concrete role-register residual.
 
-This is the live Lean Step 6 route: the checked role residual
-reconstructs line 130 as a cross `ConsRel`, the orthonormalization wrapper
-produces `P^A,P^B`, and the remaining completion step is discharged directly from
-that cross relation plus the construction-level match-mass preservation facts,
-without asking callers for separate diagonal strong self-consistency assumptions. -/
-theorem nonempty_ofRoleResidualAndMatchMassPreservation
+Paper origin: `references/ldt-paper/inductive_step.tex:130-173`.
+
+This is the source-shaped internal construction target for the non-vacuous
+branch of `mainFormal`.  It reconstructs the paper line-130 cross consistency
+from the role residual and constructs the line-130 orthonormalization residual.
+The remaining completion step is the explicit proof obligation in
+`MainFormalPostRolePackageDiagonalCompletionResidual.nonempty_ofDiagonalConsistency`;
+no match-mass or diagonal-consistency data is accepted as an extra input. -/
+theorem nonempty_ofRoleResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
-    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
-    (a_A a_B : Polynomial params)
-    (leftMatchMassPreservation :
-      ∀ orthResidual : MainFormalPostRolePackageDiagonalOrthonormalizationResidual
-          params strategy eps k scalars (roleResidual.rolePackage scalars),
-        MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
-          (unsymmetrizedLeftPOVM
-            (roleResidual.rolePackage scalars).roleMeasurement)
-          orthResidual.P_A
-          (unsymmetrizedRightPOVM
-            (roleResidual.rolePackage scalars).roleMeasurement))
-    (rightMatchMassPreservation :
-      ∀ orthResidual : MainFormalPostRolePackageDiagonalOrthonormalizationResidual
-          params strategy eps k scalars (roleResidual.rolePackage scalars),
-        MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
-          (unsymmetrizedRightPOVM
-            (roleResidual.rolePackage scalars).roleMeasurement)
-          orthResidual.P_B
-          (unsymmetrizedLeftPOVM
-            (roleResidual.rolePackage scalars).roleMeasurement)) :
+    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) :
     Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
       params strategy eps hpass k scalars) := by
   have hpre := roleResidual.diagonalConsistency scalars
   rcases MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalConsistency
       hpre with ⟨orthResidual⟩
   have hcompletion :
-      Nonempty (MainFormalPostRolePackageDiagonalCompletionInput
-        params strategy eps k scalars (roleResidual.rolePackage scalars) orthResidual) :=
-    (open MainFormalPostRolePackageDiagonalCompletionInput in
-      nonempty_ofDiagonalConsistencyAndMatchMassPreservation)
-        orthResidual a_A a_B hpre
-        (leftMatchMassPreservation orthResidual)
-        (rightMatchMassPreservation orthResidual)
-  rcases hcompletion with ⟨completionInput⟩
-  exact nonempty_ofRoleResidualAndCompletion roleResidual
-    ⟨completionInput.toCompletionResidual⟩
+      Nonempty (MainFormalPostRolePackageDiagonalCompletionResidual
+        params strategy eps k scalars (roleResidual.rolePackage scalars)) :=
+    MainFormalPostRolePackageDiagonalCompletionResidual.nonempty_ofDiagonalConsistency
+      orthResidual hpre
+  exact nonempty_ofRoleResidualAndCompletion roleResidual hcompletion
 
 /-- Convert the combined residual to the left-completion residual after the paper
 line-130 consistency has been derived separately.

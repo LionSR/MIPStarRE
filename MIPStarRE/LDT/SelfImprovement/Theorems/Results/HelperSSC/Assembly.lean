@@ -712,10 +712,10 @@ paper's released right-hand side via
 arithmetic absorption
 `helper_strong_self_consistency_error_le_selfImprovementHelperError`.
 
-This is the first complete route from the actual helper construction to the
-`HelperStrongSelfConsistencyInput` surface. The remaining analytic work is
-therefore stated as named obligations, rather than left as an unstructured
-`BipartiteSSCRel` assumption. -/
+This is the complete route from the actual helper construction and the named
+scalar obligations to helper-stage strong self-consistency. The remaining
+analytic work is therefore stated as named obligations, rather than left as an
+unstructured `BipartiteSSCRel` assumption. -/
 theorem helper_strong_self_consistency_of_helper_conclusion
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -796,76 +796,5 @@ theorem helper_strong_self_consistency_of_helper_conclusion
   simpa [bipartiteSSCError, avgOver, uniformDistribution, constSubMeasFamily,
     qBipartiteSSCDefect, subMeasMass, SubMeas.liftLeft] using
     (max_le hhelperErr_nonneg hhelperGap_absorbed)
-
-/-- Promote the four add-in-`u`/variance helper-SSC obligations to the
-`HelperStrongSelfConsistencyInput` surface consumed by `selfImprovement`.
-
-This theorem does not alter the `selfImprovement` statement. It narrows the
-remaining hypothesis from the final `BipartiteSSCRel` conclusion to the named
-intermediate transport and residual bounds for the actual helper output. -/
-theorem helper_strong_self_consistency_input_of_obligations
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta : Error)
-    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
-    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
-    (hobligations :
-      ∀ {T : Measurement (Polynomial params) ι}
-        {Hhat : SubMeas (Polynomial params) ι}
-        {Z : MIPStarRE.Quantum.Op ι},
-        SelfImprovementHelperConclusion params strategy T Hhat Z eps delta →
-          HelperStrongSelfConsistencyObligations
-            params strategy T Hhat eps delta) :
-    HelperStrongSelfConsistencyInput params strategy eps delta := by
-  intro T Hhat Z hhelper
-  exact helper_strong_self_consistency_of_helper_conclusion
-    params strategy eps delta heps hdelta hd_le_q hhelper (hobligations hhelper)
-
-/-- Construct the helper-stage strong self-consistency input from the point
-self-consistency, local-variance, and residual estimates which remain after the
-helper construction has been fixed.
-
-This theorem composes the already formalized `Q₀ → Q₁ → Q₂ → Q₃ → Q₄` chain
-with the closing helper-SSC theorem. It is the paper-facing form needed when
-the self-improvement theorem is applied on a restricted slice: the caller
-supplies the point self-consistency relation once, and supplies the local
-variance and released-residual estimates for each helper output. -/
-theorem helper_strong_self_consistency_input_of_selfConsistency_localVariance
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta : Error)
-    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
-    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
-    (hssc : BipartiteSSCRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta)
-    (hlocal :
-      ∀ {T : Measurement (Polynomial params) ι}
-        {Hhat : SubMeas (Polynomial params) ι}
-        {Z : MIPStarRE.Quantum.Op ι},
-        SelfImprovementHelperConclusion params strategy T Hhat Z eps delta →
-          (∑ g : Polynomial params,
-            localVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g) ≤
-            localVarianceOfPointsError params eps delta)
-    (hresidual :
-      ∀ {T : Measurement (Polynomial params) ι}
-        {Hhat : SubMeas (Polynomial params) ι}
-        {Z : MIPStarRE.Quantum.Op ι},
-        SelfImprovementHelperConclusion params strategy T Hhat Z eps delta →
-          subMeasMass strategy.state Hhat.liftLeft -
-              addInURightQuantity params strategy
-                (sandwichedPolynomialSubMeasAt params strategy T.toSubMeas)
-                T.toSubMeas
-                (selfConsistencyAddInUSelection params) ≤
-            (11 * Real.sqrt (selfImprovementVarianceError params eps delta) +
-                Real.sqrt (2 * delta) +
-                ((params.m : Error) * (params.d : Error) / (params.q : Error))) -
-              addInUError params eps delta) :
-    HelperStrongSelfConsistencyInput params strategy eps delta := by
-  refine helper_strong_self_consistency_input_of_obligations
-    params strategy eps delta heps hdelta hd_le_q ?_
-  intro T Hhat Z hhelper
-  exact helper_strong_self_consistency_obligations_of_selfConsistency_localVariance
-    params strategy eps delta hssc (hlocal hhelper) (hresidual hhelper)
-
 
 end MIPStarRE.LDT.SelfImprovement
