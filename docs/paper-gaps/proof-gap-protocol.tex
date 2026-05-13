@@ -207,8 +207,13 @@ definition error from becoming a global theorem-statement error.
 Paper-facing theorem & Matches the source statement up to faithful encoding &
 Carries non-paper bridge, residual, repair, input, obligation-structure, or
 proof-obligation hypotheses \\
-Conditional helper & Assumes a named obligation and has a conditional name &
-Is linked as the source theorem or marked as proof-complete for that theorem \\
+Source-shaped theorem with a tracked \verb|sorry| & Default repair when the
+source proof is blocked but the statement is known & Replaced by a strengthened
+theorem statement merely to keep the file compiling \\
+Conditional helper & Temporary quarantine for substantial proof content whose
+remaining named obligation has not yet been discharged & Introduced merely to
+avoid a \verb|sorry|, or linked as the source theorem or marked as
+proof-complete for that theorem \\
 Obligation discharger theorem & Constructs the obligation from paper hypotheses &
 Merely restates the obligation as an assumption \\
 Input bundle & Collects produced data for a local construction & Is assumed by a
