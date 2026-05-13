@@ -450,6 +450,26 @@ Path filters prevent documentation-only audit prose from starting this heavy
 workflow unless the Lean source, blueprint Lean references, declaration
 manifest, toolchain, or the audit scripts themselves changed.
 
+### Adding or Changing a Guard
+
+Every PR that adds or changes a proof-integrity, statement-integrity, or
+blueprint-synchronization guard should record its local-hook tier in the
+`Testing` section of the PR body.  The tier should be one of the following.
+
+- `pre-commit`: deterministic and fast enough to run on ordinary commits, such
+  as theorem-statement audits over source text.
+- `pre-push`: depends on changed files, local generated manifests, or
+  single-file Lean type-checking.
+- `full pre-push`: useful before a larger PR, but expensive enough that it
+  should remain behind `MIPSTARRE_HOOK_FULL=1`.
+- `CI-only`: requires a clean runner state, expensive whole-repository
+  compilation, external workflow context, or artifacts that local hooks should
+  not require.
+
+When the tier changes, update `.githooks/`, `scripts/install_git_hooks.sh`, and
+this coverage map in the same PR.  If the guard stays CI-only, the PR should
+say why the local hook would be too expensive or unreliable.
+
 ---
 
 ## Safety Mechanisms
