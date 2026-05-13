@@ -27,7 +27,7 @@ When supplied together with a recursive induction hypothesis (see
 `mainFormalSuccessorRecursiveSlices_ofSliceData`), this data can close the
 `MainFormalSuccessorRecursiveSlices` target.  The former boundary constructor
 which combined this target with an unproved self-improvement input has been
-removed; that missing proof step is now represented only by the source-facing
+removed; that missing proof step is now represented only by the
 Section 6 theorem.
 
 **Unfaithful:** this structure records honest same-space slice strategies and

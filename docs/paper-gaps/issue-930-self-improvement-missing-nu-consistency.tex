@@ -7,12 +7,18 @@
 
 \input{command}
 
-\title{Missing $\nu$-Consistency Hypothesis in the Self-Improvement Theorem}
+\title{Resolved Missing $\nu$-Consistency Hypothesis in the Self-Improvement Theorem}
 \author{}
 \date{2026-05-01}
 
 \begin{document}
 \maketitle
+
+\noindent\textbf{Verdict (2026-05-13).}
+The statement-level discrepancy is resolved: the Lean theorem
+\leanid{selfImprovement} contains the paper's $\nu$-consistency hypothesis.
+The remaining work is the proof of that theorem from the paper hypotheses,
+tracked by issue~\#1515.
 
 \section{The assertion}
 
@@ -42,7 +48,7 @@ $\bra\psi H\ot I\ket\psi \ge (1-\nu)-\zeta$, point consistency of $H$,
 strong self-consistency of $H$ at level $\zeta$, and the operator bound
 $\bra\psi Z\ot(I-H)\ket\psi \le \zeta$.\footnote{The paper passages are
 \path{references/ldt-paper/self_improvement.tex}, lines~635--671 (theorem)
-and lines~24--60 (helper lemma); the induction-section wrapper is in
+and lines~24--60 (helper lemma); the corresponding induction-section theorem is in
 \path{references/ldt-paper/inductive_step.tex}, lines~249--286. This note
 is part of the retrospective audit in \ghissue{930}. The discrepancy is
 tracked for resolution in \ghissue{931}.}
@@ -57,10 +63,10 @@ have been removed.  Thus the discrepancy recorded in this note has been
 resolved at the level of the public theorem statement.
 
 The proof is still incomplete.  The missing work is now represented by an
-explicit \leanid{sorry} in the source-facing theorem, rather than by extra
-hypotheses on a conditional substitute for the theorem.
+explicit \leanid{sorry} in the theorem with the paper statement, rather than by
+extra hypotheses on a conditional substitute for the theorem.
 
-The induction-step wrapper
+The induction-step theorem
 \leanid{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection}
 has the same status: its statement includes the input consistency hypothesis,
 and its remaining Section~9 work is a direct proof gap.
@@ -75,10 +81,9 @@ input, and the final-field transport from the paper hypotheses.
 
 \section{Blueprint status}
 
-The blueprint entry now points to the source-facing theorem
-\leanid{selfImprovement}.  No top-level conditional obligation theorem is
-advertised as the formalization of the paper theorem.  The proof-level gap is
-tracked by issue~\#1515.
+The blueprint entry now points to the theorem \leanid{selfImprovement}.  No
+top-level conditional obligation theorem is recorded as the formalization of
+the paper theorem.  The proof-level gap is tracked by issue~\#1515.
 
 \section{Error coefficients}
 
@@ -99,8 +104,8 @@ $\zeta = 3000\,m\,(\eps^{1/32}+\delta^{1/32}+(d/q)^{1/32})$ matches the paper.
 The paper's self-improvement theorem requires an approximation hypothesis
 $\simeq_{\nu}$ linking the input measurement $G$ to the parent measurement
 $A$.  The Lean statement now contains this hypothesis.  The remaining task is
-to complete the proof of the source-facing theorem, not to reintroduce the
-missing work as auxiliary hypotheses.
+to complete the proof of the theorem with the paper statement, not to
+reintroduce the missing work as auxiliary hypotheses.
 
 \bibliographystyle{alpha}
 \bibliography{references}

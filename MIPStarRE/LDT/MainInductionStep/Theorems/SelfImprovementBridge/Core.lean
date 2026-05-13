@@ -262,7 +262,7 @@ derive the extra `SymStrat` fields (`permInvState`, `densityFixed`, or
 honest slice strategies.
 
 The Section 9 analytic proof debt is not stored in this record.  The package
-constructor below calls the source-facing
+constructor below calls
 `selfImprovementInInductionSection`, whose present proof gap is the tracked
 place where that work belongs. -/
 structure SelfImprovementPackage.SliceObligations
@@ -464,7 +464,7 @@ Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
 `references/ldt-paper/self_improvement.tex:631-811`.
 
 The construction assumes the honest slice strategies and their structural
-measurement transports. It applies the source-facing theorem
+measurement transports. It applies the theorem
 `selfImprovementInInductionSection` slice-by-slice and transports its fields
 across the recorded equalities to the restricted-slice interface.  The theorem
 itself is currently a tracked proof gap (#1503); this constructor does not carry

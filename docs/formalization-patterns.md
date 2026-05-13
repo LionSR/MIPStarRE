@@ -24,7 +24,7 @@ proof-gap protocol in `docs/paper-gaps/proof-gap-protocol.tex`.
 
 ### The rule
 
-A declaration advertised as the formalization of a paper theorem, lemma,
+A declaration presented as the formalization of a paper theorem, lemma,
 proposition, or corollary must state the paper result, up to faithful formal
 encoding of the mathematical domain.  Its public hypotheses and conclusion are
 both part of the statement.  Adding a load-bearing bridge, residual, repair,
@@ -39,7 +39,7 @@ The project therefore distinguishes three objects.
 | Internal proof obligation | Proves a missing intermediate mathematical input from paper hypotheses | May contain a tracked `sorry` while the proof is open |
 | Conditional helper | Quarantines an unproved intermediate obligation | Not a paper theorem; no source-labelled `\leanok` |
 
-It is never allowed to change the public statement of a declaration advertised
+It is never allowed to change the public statement of a declaration presented
 as the formalization of a source-labelled paper theorem.  At the final assembly
 point, the paper theorem must either discharge the extra hypotheses internally,
 or remain as the paper-aligned statement with an unfinished proof while the
@@ -83,7 +83,7 @@ are being actively removed.
    substantial proof content that cannot yet be connected to the paper
    hypotheses, has a tracked removal target, and has no source-labelled
    blueprint `\leanok`.  If the helper would merely package missing work as an
-   extra hypothesis, restore the source-facing theorem and leave a tracked
+   extra hypothesis, restore the theorem with the paper statement and leave a tracked
    `sorry` instead.
 5. **Audit the final statement.**  Every PR touching a source-labelled theorem
    should compare paper assumptions and Lean assumptions, paper conclusion and
@@ -124,27 +124,27 @@ statement.
 
 2. **Do not bundle several missing theorem-level steps into one hypothesis.**
    The former Section 9 bundle `SelfImprovementObligations` and the helper
-   `selfImprovementFromObligations` were removed because they packaged
+   `selfImprovementFromObligations` were removed because they bundled
    helper strong self-consistency, orthonormalization, and final-field transport
    into a single route to the full self-improvement conclusion.  The correct
-   boundary is now the source-facing theorem `selfImprovement`, whose missing
+   boundary is now the theorem `selfImprovement`, whose missing
    proof is an explicit `sorry`.
 
    The former induction-section helper
    `selfImprovementInInductionSection_ofObligations` was removed because it
    encouraged propagation of the Section 9 bundle into the Section 6 successor
-   packages.  Those packages now call the source-facing
+   constructors.  Those constructors now call the theorem
    `selfImprovementInInductionSection` directly; its current proof gap is the
    correct place for the missing work.
 
 3. **Propagation is a warning sign.**  The consumer of
    `selfImprovementInInductionSection` — typically a
-   `MainInductionStep` wrapper — should close the hypothesis with an internal
+   `MainInductionStep` theorem — should close the hypothesis with an internal
    theorem as soon as possible.  If the hypothesis propagates upward toward a
    paper-labelled theorem, the PR should stop and either prove the obligation or
    restore the paper theorem with an explicit unfinished proof.
 
-4. **Final closure at the source theorem.**  The theorem `mainFormal` in
+4. **Final closure at the paper theorem.**  The theorem `mainFormal` in
    `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` is reserved for the
    paper-shaped statement.  If the residual needed by the final transport has
    not yet been constructed from the paper hypotheses, the theorem should remain
@@ -183,7 +183,7 @@ The direct tracked `sorry` in `MainFormal.lean` records the remaining
 construction obligation for the paper theorem.  The proof must construct, from
 the hypotheses of `thm:main-formal`, the projective-completion residual consumed
 by `mainFormal_ofProjectiveCompletionResidual`.  The Section 6 role residual is
-now obtained by applying the source-facing theorem `MainInductionStep.mainInduction`
+now obtained by applying the theorem `MainInductionStep.mainInduction`
 through `MainFormalRolePackageResidual.ofMainInductionLargeK`; the successor
 branch of that call remains the tracked `sorry` in the source Section 6 theorem,
 not an added hypothesis of `mainFormal`.  The remaining Section 3 work includes:
@@ -222,7 +222,7 @@ Obligation structures that bundle still-unproved theorem-level steps are proof
 debt under this pattern.  They should not be introduced merely because a proof
 is blocked.  The preferred repair is to keep the paper-labelled statement
 source-faithful and make the exact missing mathematical step visible as a named
-lemma or as a `sorry` in the source-facing theorem.
+lemma or as a `sorry` in the theorem with the paper statement.
 
 ---
 
@@ -326,7 +326,7 @@ MIPStarRE/LDT/
 ├── Test/                     # Test definitions, main theorem, error cascade
 ├── Preliminaries/            # Polynomials, finite fields, Cauchy–Schwarz, Fourier
 ├── MakingMeasurementsProjective/   # Orthonormalization, projective completion
-├── MainInductionStep/        # Section 6 induction wrapper
+├── MainInductionStep/        # Section 6 induction theorem
 ├── ExpansionHypercubeGraph/  # Section 7–8 expansion, global variance
 ├── GlobalVariance/           # Section 8.5 (and related global variance machinery)
 ├── SelfImprovement/          # Section 9 self-improvement
@@ -489,7 +489,7 @@ with the step it replaces.
 - Issue [#449] — hypothesis-smuggle ledger
 - Issue [#451] — historical bridge-hypothesis catalogue
 - Issue [#1458] — source-statement bridge-debt tracker
-- Issue [#1507] — source-facing main-induction successor obligation
+- Issue [#1507] — main-induction successor proof obligation
 - Issue [#422] — main-formal assembly gap tracker
 
 [#449]: https://github.com/LionSR/MIPStarRE/issues/449

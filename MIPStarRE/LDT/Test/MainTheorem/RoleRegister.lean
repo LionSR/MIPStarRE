@@ -10,7 +10,7 @@ Earlier versions of this module exported branch residual records for ordinary
 and answer-valued successor cases.  Those records allowed the final theorem
 assembly to be supplied with recursive slice witnesses and self-improvement
 inputs that are not hypotheses of `thm:main-formal`.  They have been removed.
-The source-facing route now obtains the role-register residual from
+The paper-theorem route now obtains the role-register residual from
 `MainInductionStep.mainInduction` through
 `MainFormalRolePackageResidual.ofMainInductionLargeK`; any remaining successor
 work is therefore an explicit `sorry` in the Section 6 theorem rather than an

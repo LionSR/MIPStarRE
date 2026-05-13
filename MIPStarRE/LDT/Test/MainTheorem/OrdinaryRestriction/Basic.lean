@@ -22,7 +22,7 @@ recursive strategy.  This route is kept only at the level of the source
 mathematics that remains useful: weighted restricted-probability targets and
 recursive-slice targets.  The former conditional boundary record, which bundled
 unproved self-improvement input into a Section 3 handoff, has been removed; the
-missing successor proof is represented by the source-facing `mainInduction`
+missing successor proof is represented by the `mainInduction`
 proof obligation instead.
 
 **Note:** `xRestrictedStrategy` uses `restrictDiagonalMeasurement`, which

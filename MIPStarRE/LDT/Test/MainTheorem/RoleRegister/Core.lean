@@ -119,7 +119,7 @@ This isolates the first field of the former role-register completion residual:
 it asks only for the Section 6 role-register polynomial measurement and its
 symmetrized consistency estimate at the pre-cascade main-induction error.  The
 constructors below show how to view either a raw Section 6 witness or the
-source-facing `mainInduction` theorem as this residual.  The former syntactic
+`mainInduction` theorem as this residual.  The former syntactic
 successor wrapper was removed because it asked for non-paper boundary data
 instead of leaving the successor case as a proof obligation in Section 6. -/
 structure MainFormalRolePackageResidual
@@ -178,7 +178,7 @@ theorem ofMainInduction
 /-- Large-`k` constructor for the isolated role-register residual.
 
 The public Section 3 theorem currently assumes `400 * m * d ≤ k`.  This lemma
-uses only the weaker consequence `m * d ≤ k` needed by the source-facing
+uses only the weaker consequence `m * d ≤ k` needed by the
 Section 6 theorem. -/
 theorem ofMainInductionLargeK
     (params : Parameters) [FieldModel params.q]

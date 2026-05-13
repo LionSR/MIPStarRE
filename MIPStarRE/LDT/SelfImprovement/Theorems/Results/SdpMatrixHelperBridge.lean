@@ -13,8 +13,8 @@ helper lemma.
 
 Top-level conditional theorems which assembled the full self-improvement
 conclusion from additional residual-domination and repair hypotheses have been
-removed.  The full projective-output theorem is now represented only by the
-source-facing theorem `selfImprovement`, with its remaining proof gap explicit.
+removed.  The theorem `selfImprovement` retains the paper statement, with its
+remaining proof gap explicit.
 
 ## References
 
@@ -25,8 +25,6 @@ source-facing theorem `selfImprovement`, with its remaining proof gap explicit.
 namespace MIPStarRE.LDT.SelfImprovement
 
 open MIPStarRE.LDT
-open MIPStarRE.LDT.ExpansionHypercubeGraph
-open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

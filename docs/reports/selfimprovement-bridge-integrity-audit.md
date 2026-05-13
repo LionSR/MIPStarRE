@@ -4,6 +4,14 @@ Date: 2026-05-07
 Updated: 2026-05-12, after the source-faithful `mainFormal` repair and
 internal-obligation renaming.
 
+Status note, 2026-05-13: this report predates PR #1539.  The
+`SelfImprovementObligations` record, the top-level
+`selfImprovementFromObligations` theorem, the matrix-SDP residual-domination
+assembly theorems, and the Section 3/6 successor-boundary conditional API have
+been removed.  The present paper-alignment policy is to preserve the theorem
+statements from the paper and to leave the remaining derivations as tracked
+`sorry` sites until they are proved.
+
 Auditor: Research specialist (read-only analysis)
 Scope: `MIPStarRE/LDT/SelfImprovement/` → `MIPStarRE/LDT/Pasting/` →
        `MIPStarRE/LDT/MainInductionStep/` → `MIPStarRE/LDT/Test/MainTheorem/`

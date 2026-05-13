@@ -407,7 +407,7 @@ role-measurement record obtained from that concrete residual.  Thus the live
 `mainFormal` hole no longer asks for an arbitrary
 `MainFormalRoleMeasurementPackage`, an arbitrary Section 6 witness, or a branch
 witness not tied to the concrete measurement.  The role residual should now be
-obtained through the source-facing `MainFormalRolePackageResidual.ofMainInduction`
+obtained through `MainFormalRolePackageResidual.ofMainInduction`
 or `MainFormalRolePackageResidual.ofMainInductionLargeK` constructors, so that
 successor work remains in the Section 6 proof obligation rather than in a
 separate boundary hypothesis. -/

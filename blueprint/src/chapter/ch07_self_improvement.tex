@@ -196,7 +196,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \end{equation}
   The theorem-side off-diagonal selection used for this `add-in-u` application is
   \lean{MIPStarRE.LDT.SelfImprovement.pointConsistencyAddInUSelection}, and the
-  corresponding left/right quantity wrappers are
+  corresponding left/right scalar quantities are
   \lean{MIPStarRE.LDT.SelfImprovement.addInULeftQuantity_pointConsistencySelection_eq_off_diagonal_avg}
   and
   \lean{MIPStarRE.LDT.SelfImprovement.addInURightQuantity_pointConsistencySelection_eq_zero}.
@@ -358,14 +358,14 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_offDiagonal}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_paperChain}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_scalarTransports}
-  and then uses the proved wrappers
+  and then uses the proved lemmas
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_of_helper_conclusion}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_obligations_of_selfConsistency_localVariance}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_input_of_obligations}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_input_of_selfConsistency_localVariance}
   to recover the final helper-stage self-consistency input.  The remaining
-  theorem-level derivation is not packaged as an additional hypothesis; it is
-  the proof gap in the source-facing theorem below.
+  theorem-level derivation is not moved into an additional hypothesis; it is
+  the proof gap in the paper theorem below.
   The paper's arithmetic shows that the right-hand error is at most
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_error_le_selfImprovementHelperError}
   \[
@@ -431,10 +431,10 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness}
   The formalization records a strengthened helper theorem whose output carries
   the complementary-slackness equations used in the completeness chain.  The
-  previous top-level residual-domination assembly wrappers have been removed:
-  the full self-improvement conclusion is now advertised only by the
-  source-facing theorem below, whose incomplete proof explicitly records the
-  remaining Section~9 work.
+  previous top-level residual-domination assembly theorems have been removed:
+  the full self-improvement conclusion is now stated only by the paper theorem
+  below, whose incomplete proof explicitly records the remaining Section~9
+  work.
 \end{remark}
 
 \subsection{A Semidefinite Program}
@@ -573,13 +573,13 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   distributivity, to the displayed equation \(T_gZ=T_gA_g\).
 \end{proof}
 
-\begin{remark}[Removed residual-dominating assembly wrappers]\label{rem:sdp-matrix-residual-domination-assembly}
+\begin{remark}[Removed residual-dominating assembly theorems]\label{rem:sdp-matrix-residual-domination-assembly}
   Earlier Lean versions exposed top-level conditional assembly theorems that
   combined the matrix slackness output with residual-dominating
   orthonormalization and QXP-repair inputs.  These declarations have been
   removed.  The matrix slackness material is retained only up to the
   slackness-carrying helper output, and the full projective-output conclusion is
-  represented by the source-facing theorem
+  represented by the paper theorem
   \texttt{MIPStarRE.LDT.SelfImprovement.selfImprovement}.
 \end{remark}
 

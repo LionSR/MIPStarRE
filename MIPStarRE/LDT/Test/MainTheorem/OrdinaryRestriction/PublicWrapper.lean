@@ -9,7 +9,7 @@ recursive slice witnesses and a self-improvement input that are not hypotheses
 of `thm:main-formal`.  The conditional handoff has been removed; the remaining
 ordinary successor route exports only the restricted-probability and
 recursive-slice targets from the imported modules, while the missing successor
-argument is the explicit proof obligation in the source-facing Section 6
+argument is the explicit proof obligation in the Section 6 theorem
 theorem.
 -/
 

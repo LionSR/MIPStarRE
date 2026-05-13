@@ -36,7 +36,7 @@ and point-measurement transports needed to move the resulting conclusions back
 to the answer-valued restricted bookkeeping.
 
 The Section 9 analytic proof debt is not stored in this record.  The package
-constructor below calls the source-facing
+constructor below calls
 `selfImprovementInInductionSection`, whose present proof gap is the tracked
 place where that work belongs. -/
 structure AnswerSelfImprovementPackage.SliceObligations
@@ -329,7 +329,7 @@ Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
 `references/ldt-paper/self_improvement.tex:631-811`.
 
 The construction assumes ordinary slice strategies and their structural
-measurement transports. It applies the source-facing theorem
+measurement transports. It applies the theorem
 `selfImprovementInInductionSection` slice-by-slice and transports its fields
 back to the answer-valued restricted-slice interface via the recorded state and
 point-measurement equalities. The theorem itself is currently a tracked proof

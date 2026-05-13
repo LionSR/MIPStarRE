@@ -22,6 +22,14 @@
 > `selfImprovementFromSubMeas` and `selfImprovementFromObligationsSubMeas` have
 > been removed; the remaining conditional Section 6 helper is
 > `selfImprovementInInductionSection_ofObligations`.
+>
+> **Status note, 2026-05-13.**  This report also predates PR #1539.  The
+> `SelfImprovementObligations` record, the top-level
+> `selfImprovementFromObligations` theorem, the matrix-SDP
+> residual-domination assembly theorems, and the Section 3/6 successor-boundary
+> conditional API have been removed.  The current repair direction is to keep
+> the paper theorem statements visible and to represent the remaining analytic
+> derivations by tracked `sorry` sites until they are proved.
 
 ---
 

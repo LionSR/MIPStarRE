@@ -183,7 +183,7 @@ theorem mainInductionBaseCase
 
 /-- `thm:main-induction`.
 
-This is the source-facing statement from
+This is the statement from
 `references/ldt-paper/inductive_step.tex`: a good symmetric strategy and an
 integer `k ≥ m d` produce a polynomial measurement consistent with the point
 measurement at error `mainInductionError`.
@@ -234,7 +234,7 @@ exposed separately via `restrictedProbabilities`, and
 `SelfImprovementPackage.ofSelfImprovementInInductionSection` forms the
 slice-wise restricted-strategy self-improvement output once it is supplied. This
 theorem therefore keeps `hselfObligation` as an explicit input; the remaining
-self-improvement proof must be derived inside the source-facing successor theorem,
+self-improvement proof must be derived inside the successor theorem,
 as tracked by #1507, #1503, and #1458.
 
 **Unfaithful:** this conditional assembly assumes the proof-stage inputs
@@ -451,7 +451,7 @@ self-improvement outputs that are not derived here from the successor case of
 `thm:main-induction` (`references/ldt-paper/inductive_step.tex:441-551`).
 This is tracked by #1507, #1503, #1369, and #1458.  Elimination: derive the
 answer-valued restriction, recursive slice witnesses, and self-improvement
-packages inside the source-facing successor proof, then use this theorem only
+packages inside the successor proof, then use this theorem only
 as an internal assembly step. -/
 theorem answerMainInductionByRecursionOnM
     (params : Parameters)
@@ -559,7 +559,7 @@ inputs `haxisWeightedBound`, `hdiagonalWeightedBound`, `hrec`, and
 `hselfObligation` instead of deriving them from the successor case of
 `thm:main-induction` (`references/ldt-paper/inductive_step.tex:441-551`).
 This is tracked by #1507, #1503, #1369, and #1458.  Elimination: derive these
-inputs inside the source-facing successor proof and keep this wrapper as an
+inputs inside the successor proof and keep this wrapper as an
 internal assembly theorem. -/
 theorem answerMainInductionPublicWrapper
     (params : Parameters)

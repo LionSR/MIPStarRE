@@ -46,7 +46,7 @@ construction in the paper because:
   `zeroCoord`.
 
 These declarations no longer feed a conditional role-residual constructor.  The
-missing successor argument is represented by the source-facing Section 6 proof
+missing successor argument is represented by the Section 6 proof
 obligation, not by an additional hypothesis on a Section 3 theorem.
 -/
 

@@ -106,15 +106,14 @@
 \end{proof}
 
 \begin{remark}[Lean proof gap for induction self-improvement]\label{rem:self-improvement-in-induction-section-conditional}
-	The source-facing Lean declaration for
+	The Lean declaration for
 	Theorem~\ref{thm:self-improvement-in-induction-section} has the paper
 	hypotheses, and its proof is still open.  The conditional helper that used
 	to assume a bundle of Section~\ref{chap:self-improvement} obligations has
-	been removed from the successor-package assembly.  The ordinary and
-	answer-valued slice-package constructors now call the source-facing theorem
-	directly, so the missing Section~\ref{chap:self-improvement} work remains a
-	tracked proof gap on the paper statement rather than an additional package
-	hypothesis.
+	been removed from the successor-step assembly.  The ordinary and
+	answer-valued slice constructors now call this theorem directly, so the
+	missing Section~\ref{chap:self-improvement} work remains a tracked proof
+	gap on the paper statement rather than an additional hypothesis.
 \end{remark}
 
 \begin{theorem}[Pasting]\label{thm:ld-pasting-in-induction-section}
@@ -176,15 +175,14 @@
 	\uses{thm:self-improvement-in-induction-section}
 	The successor step records the slice-wise self-improvement output in
 	\texttt{SelfImprovementPackage}, and the answer-valued route records the analogous
-	output in \texttt{AnswerSelfImprovementPackage}.  Their constructors call the
-	source-facing \texttt{selfImprovementInInductionSection}; they no longer
-	carry a separate bundle of Section~\ref{chap:self-improvement} obligations
-	as slice-package input.
+	output in \texttt{AnswerSelfImprovementPackage}.  Their constructors call
+	\texttt{selfImprovementInInductionSection}; they no longer carry a separate
+	bundle of Section~\ref{chap:self-improvement} obligations as an input.
 	The \texttt{SliceObligations} structures are narrow formal interfaces: they
 	assume honest per-slice symmetric strategies and measurement-transport data,
 	while averaged point-operator compatibility is derived structurally from
 	point-measurement transport.  They then convert the remaining data into the
-	ordinary or answer-valued self-improvement package.
+	ordinary or answer-valued self-improvement output.
 \end{definition}
 
 \begin{definition}[Pasting data for the successor step]\label{def:successor-pasting-data}
@@ -237,7 +235,16 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.ofPointMeasurementEq}
 	that mirror the four paper stages $\text{restrict} \to \text{induct} \to \text{self-improve} \to \text{paste}$. For the answer-valued restriction route used in the successor branch of the main formal theorem, Lean now also exposes
 	\lean{MIPStarRE.LDT.MainInductionStep.AnswerMainInductionConclusion, MIPStarRE.LDT.MainInductionStep.AnswerMainInductionHypothesis, MIPStarRE.LDT.MainInductionStep.AnswerPerSliceInductionPackage.ofMainInductionHypothesis},
-	which record the predecessor induction hypothesis for the restricted strategies without appealing to the public theorem `mainFormal`. The weighted restricted-probability estimates are now public via \lean{MIPStarRE.LDT.MainInductionStep.weighted_axisParallel_bound, MIPStarRE.LDT.MainInductionStep.weighted_diagonal_bound, MIPStarRE.LDT.MainInductionStep.restrictedProbabilities}, and the final public successor-step assembly is formalized as \lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper}. The remaining proof gap for the source-facing theorem is to derive those wrapper inputs, including the restricted-strategy self-improvement obligations tracked by issues \#1507 and \#1503 under the bridge-debt tracker \#1458, from the paper hypotheses; hence no proof-level \leanok is attached here.
+	which record the predecessor induction hypothesis for the restricted
+	strategies without appealing to the public theorem `mainFormal`. The weighted
+	restricted-probability estimates are now public via
+	\lean{MIPStarRE.LDT.MainInductionStep.weighted_axisParallel_bound, MIPStarRE.LDT.MainInductionStep.weighted_diagonal_bound, MIPStarRE.LDT.MainInductionStep.restrictedProbabilities},
+	and the final public successor-step assembly is formalized as
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper}. The
+	remaining proof gap for Theorem~\ref{thm:main-induction} is to derive those
+	inputs, including the restricted-strategy self-improvement obligations
+	tracked by issues \#1507 and \#1503 under the bridge-debt tracker \#1458,
+	from the paper hypotheses; hence no proof-level \leanok is attached here.
 	We may assume $\eps,\delta,\gamma,d/q \le 1$, since otherwise $\nu \ge 1$ and the bound is trivial.
 
 	The proof is by induction on $m$. The base case $m=1$ is Lemma~\ref{lem:main-induction-base}.
@@ -410,7 +417,7 @@
 \end{proposition}
 \begin{proof}
 	\leanok
-	This is a Lean-only wrapper: combine Lemma~\ref{lem:symmetrization-bridge}
+	This is a Lean-only assembly theorem: combine Lemma~\ref{lem:symmetrization-bridge}
 	with the $m=1$ clause of Theorem~\ref{thm:main-induction}, formalized as
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase}.
 \end{proof}
@@ -428,7 +435,7 @@
 	helper lemmas discharge the weighted restricted-axis and restricted-diagonal
 	fields from the symmetrized passing strategy.  The former Lean boundary records,
 	which also required a supplied self-improvement input, have been removed:
-	that missing work is part of the source-facing proof of
+	that missing work is part of the proof of
 	Theorem~\ref{thm:main-induction}, not an additional assumption in
 	Theorem~\ref{thm:main-formal}.  The ordinary slice structure records both
 	Alice- and Bob-side
@@ -461,7 +468,7 @@
 	role-register symmetrization.  The Lean constructors
 	\texttt{MainFormalRolePackageResidual.ofMainInduction} and
 	\texttt{MainFormalRolePackageResidual.ofMainInductionLargeK} record this
-	source-facing handoff; any successor proof gap is the tracked gap in
+	application of the paper theorem; any successor proof gap is the tracked gap in
 	\texttt{mainInduction} itself, not an added hypothesis of
 	Theorem~\ref{thm:main-formal}.  The base-case role residual
 	\texttt{mainFormalBaseRoleResidual} remains a named specialization for
@@ -662,7 +669,7 @@
 	mass, proves its $md/q$ bound by specializing the existing tensor
 	Schwartz--Zippel helper, and proves the algebraic expansion/reindexing
 	statement comparing the evaluated consistency defect with the full-polynomial
-	defect plus that collision mass. The wrapper for Step~5 therefore no longer
+	defect plus that collision mass. The theorem for Step~5 therefore no longer
 	takes the expansion statement as an external hypothesis.
 \end{remark}
 
@@ -709,7 +716,7 @@ assembly residual:
 They split off the vacuous branch where the theorem error is at least $1$,
 derive the Step~8 scalar hypotheses in the non-vacuous branch, and isolate the
 role-register Section~6 measurement behind a concrete role-residual record.
-That record can now be obtained directly from the source-facing
+That record can now be obtained directly from the
 \texttt{mainInduction} theorem by
 \texttt{MainFormalRolePackageResidual.ofMainInductionLargeK}; the successor
 case is therefore a tracked \texttt{sorry} in Section~6, not a separate
@@ -720,11 +727,11 @@ transport helpers for the strategy and passing proof across that predecessor
 equality.  The older branch-residual records, which assembled ordinary or
 answer-valued successor data from recursive slice witnesses and supplied
 self-improvement inputs, have been removed.  The current completion residual
-carries the concrete role residual obtained from the source-facing Section~6
+carries the concrete role residual obtained from the Section~6
 theorem rather than a separate decorative branch witness.  Once the
 role-measurement record is obtained,
 Lean proves the two factor-two unsymmetrization links from
-its symmetrized consistency estimate.  The subsequent proved wrappers use the
+its symmetrized consistency estimate.  The subsequent proved lemmas use the
 proved Section~5 Schwartz--Zippel theorem to convert evaluated pre-projective
 consistency to full-polynomial consistency at $\zeta_1$, prove the paper
 line-116 triangle step, and reconstruct the line-156 $\approx_{\zeta_3}$
@@ -743,7 +750,7 @@ $\zeta_1$ transport links from paper line~169 and its role-reversed analogue.
 Lean reconstructs pre-projective full-polynomial consistency from the role
 residual and then uses the match-mass invariant to derive the two line-169 links;
 it also transports the Bob-side left-register completion estimate to the line-147
-right-register form before applying the older wrappers.
+right-register form before applying the older transport lemmas.
 It no longer asks for an arbitrary role-measurement record or an arbitrary
 raw Section~6 witness as an independent field.  It also no longer asks for the two factor-two
 role-block estimates, the unused Section~6 consistency field inside
@@ -841,7 +848,7 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 	\[
 		\zeta_1 = 2\sigma + 2\sqrt{3\eps+2\sigma} + \frac{md}{q}.
 	\]
-	The Lean Step~5 wrapper
+	The Lean Step~5 theorem
 	\lean{MIPStarRE.LDT.Test.MainFormalStep5ExpansionResidual}
 	\lean{MIPStarRE.LDT.Test.mainFormalStep5_expansionResidual}
 	\lean{MIPStarRE.LDT.Test.mainFormalStep5_selfConsistency_ofExpansionResidual}
@@ -916,7 +923,7 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 	structures that separate the scalar cascade and the Step~5 Schwartz--Zippel
 	handoff from the remaining projective-stage transport work.  The scalar side
 	discharges the paper's line~71--73 coarsening and the Step~8 hypotheses in the
-	non-vacuous branch; the Step~5 wrapper now turns the evaluated estimate at
+	non-vacuous branch; the Step~5 theorem now turns the evaluated estimate at
 	line~116 into full-polynomial consistency at $\zeta_1$.  The remaining Lean
 	residual is the completion-and-line-169 construction: supply the actual
 	role-register measurement, Alice's line-146 completion estimate, Bob's

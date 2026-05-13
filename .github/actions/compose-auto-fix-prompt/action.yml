@@ -102,7 +102,7 @@ runs:
           '  boundary conditions genuinely' \
           '  needed to state the same mathematics in Lean, such as positivity for a' \
           '  division, nonemptiness, decidability, or a field-model instance.' \
-          '- Proof-debt objects are not boundary conditions, even when packaged as' \
+          '- Proof-debt objects are not boundary conditions, even when recorded as' \
           '  inputs or producers.' \
           '- If the available Lean theorem proves only a restricted or conditional' \
           '  version of the paper theorem, do not mark the unrestricted source label' \
@@ -118,7 +118,7 @@ runs:
           '  assumptions.' \
           '- Do not introduce a conditional helper, proof-debt bundle, producer, or' \
           '  obligation package as a CI-fix strategy. Existing conditional helpers' \
-          '  should be deleted, replaced by source-facing theorems with tracked' \
+          '  should be deleted, replaced by theorems with the paper statement and tracked' \
           '  `sorry`, or retained only when a maintainer has identified a specific' \
           '  mathematical construction theorem whose proof content they preserve.' \
           '  They must stay out of source-labelled `\leanok`.' \
