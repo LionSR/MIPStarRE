@@ -93,10 +93,8 @@ theorem mainFormal_ofProjectiveCompletionResidual
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  have projectiveTargets :
-      MainFormalCascadeProjectiveStageTargets params strategy eps k scalars :=
-    projectiveCompletionResidual.toProjectiveStageTargets hpass
-  exact MainFormalCascadeTransportTargets.toMainFormal projectiveTargets.toTransportTargets
+  exact MainFormalCascadeProjectiveCompletionTransportResidual.toMainFormal
+    projectiveCompletionResidual hpass
 
 /--
 `thm:main-formal` from `test_definition.tex`.

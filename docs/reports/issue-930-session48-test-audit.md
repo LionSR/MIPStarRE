@@ -90,12 +90,13 @@ ConsRel strategy.state (uniformDistribution (Point params))
 ```
 
 The same target is now obtained by the final weakening theorem
-`MainFormalCascadeTransportTargets.toMainFormal`.  Since the first `ConsRel`
-family acts on the left tensor factor and the second on the right tensor factor,
-this expresses exactly the paper's three conclusions: Alice's point measurement
-versus Bob's polynomial measurement, Alice's polynomial measurement versus Bob's
-point measurement, and the two polynomial measurements against each other. I did
-not find a new tensor-placement discrepancy here.
+`MainFormalCascadeProjectiveCompletionTransportResidual.toMainFormal`.  Since
+the first `ConsRel` family acts on the left tensor factor and the second on the
+right tensor factor, this expresses exactly the paper's three conclusions:
+Alice's point measurement versus Bob's polynomial measurement, Alice's
+polynomial measurement versus Bob's point measurement, and the two polynomial
+measurements against each other. I did not find a new tensor-placement
+discrepancy here.
 
 ## Finding 5: line parametrization and covariance are faithful bookkeeping
 
