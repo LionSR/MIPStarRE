@@ -477,21 +477,17 @@ theorem orthonormalization_ofInput {Outcome : Type*}
 
 set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
-/-- `thm:orthonormalization`.
+/-- Completion-route orthonormalization with the documented weakened constant.
 
-A strongly self-consistent submeasurement on a permutation-invariant normalized
-state admits a close projective submeasurement. The spectral-truncation and
-locality-preserving repair data are not hypotheses of this theorem; they are
-supplied internally by the Section 5 spectral-truncation and
-rounding-to-projectors results.
+This theorem preserves the proved construction obtained by completing the
+submeasurement first and then applying the concrete `Q/X/XHat/P` repair route to
+the option-completed measurement.  The conversion introduces the
+`orthonormalizationCompletionRouteError ζ = 120 * ζ^(1/4)` envelope.
 
-The direct `Q/X/XHat/P` route on the option-completed measurement produces the
-named envelope `orthonormalizationCompletionRouteError ζ = 120 * ζ^(1/4)`.
-The stronger input-driven theorem `orthonormalization_ofInput` remains
-available with the symbolic bound
-`orthonormalizationError ζ = 100 * ζ^(1/4)` when a stronger
-locality-preserving repair witness is supplied separately. -/
-theorem orthonormalization {Outcome : Type*}
+This is not the source theorem `thm:orthonormalization`; the source theorem has
+the sharper `orthonormalizationError ζ = 100 * ζ^(1/4)` bound and is stated below
+with its remaining proof gap exposed directly. -/
+theorem orthonormalizationCompletionRoute {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState (ι × ι))
@@ -563,6 +559,41 @@ theorem orthonormalization {Outcome : Type*}
   constructor
   simpa [sddError, avgOver, uniformDistribution, constSubMeasFamily] using
     (le_trans hPsomeq hcoeff)
+
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+/-- `thm:orthonormalization`.
+
+A strongly self-consistent submeasurement on a permutation-invariant normalized
+state admits a close projective submeasurement with the paper's
+`100 * ζ^(1/4)` error envelope.
+
+Paper origin: `references/ldt-paper/orthonormalization.tex:67-76`
+(`\label{thm:orthonormalization}`).  The earlier proved completion-route
+construction remains available as `orthonormalizationCompletionRoute`, but its
+`120 * ζ^(1/4)` conclusion is weaker than this source theorem.  The missing
+proof work is tracked by issue #1032: reformulate the repair stage so the
+completed measurement's `2ζ` self-consistency estimate feeds the measurement
+orthonormalization lemma directly, recovering the paper's scalar constant. -/
+theorem orthonormalization {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState (ι × ι))
+    (hperm : PermInvState ψ)
+    (hψ : ψ.IsNormalized)
+    (A : SubMeas Outcome ι) (ζ : Error) :
+    BipartiteSSCRel ψ (uniformDistribution Unit)
+        (constSubMeasFamily A) ζ →
+      ∃ P : ProjSubMeas Outcome ι,
+        SDDRel ψ (uniformDistribution Unit)
+          (constSubMeasFamily A.liftLeft)
+          (constSubMeasFamily P.toSubMeas.liftLeft)
+          (orthonormalizationError ζ) := by
+  intro _hssc
+  -- TODO(#1032): recover the paper constant `100 * ζ^(1/4)` from the completed
+  -- measurement's `2ζ` self-consistency estimate, rather than using the proved
+  -- completion-route theorem with the weaker `120 * ζ^(1/4)` envelope.
+  sorry
 
 /-- Orthonormalization with the residual-domination invariant needed for the
 monotone-total self-improvement route.

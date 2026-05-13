@@ -14,10 +14,13 @@ Regression checks for the issue-#408 replacement of the former ambient
 Polishchuk--Spielman axiom by the explicit hypothesis
 `PolishchukSpielmanClassicalSoundnessStatement`.
 
-The audit for `MakingMeasurementsProjective.orthonormalization` now requires
-the standard Lean axioms only: the locality-preserving repair obligation in
-`MakingMeasurementsProjective/Producers.lean` has been discharged, so the
-former `sorryAx` dependency is gone.
+The audit for
+`MakingMeasurementsProjective.orthonormalizationCompletionRoute` requires the
+standard Lean axioms only: the locality-preserving repair obligation in
+`MakingMeasurementsProjective/Producers.lean` has been discharged for the
+documented completion-route construction.  The source theorem
+`MakingMeasurementsProjective.orthonormalization` records the remaining issue
+#1032 proof obligation for the paper's sharper constant.
 
 The audit for `SelfImprovement.selfImprovement` records the current open
 derivation for `thm:self-improvement`: the statement corresponding to the
@@ -86,6 +89,11 @@ proof gap for issues #1043, #1363, #1369, and #1458. -/
 private def expectedMainFormalAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
+/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1032 derivation
+needed for the paper constant in `thm:orthonormalization`. -/
+private def expectedOrthonormalizationAxioms : Array Name :=
+  expectedStandardAxiomsWithSorry
+
 /-- Standard kernel axioms plus `sorryAx`; tracks the issue #1515 derivation
 needed for `selfImprovement`. -/
 private def expectedSelfImprovementAxioms : Array Name :=
@@ -133,6 +141,9 @@ elab "assert_standard_axioms " id:ident : command => do
 elab "assert_main_formal_axioms " id:ident : command => do
   assertUsesExactlyAxioms id.getId expectedMainFormalAxioms
 
+elab "assert_orthonormalization_axioms " id:ident : command => do
+  assertUsesExactlyAxioms id.getId expectedOrthonormalizationAxioms
+
 elab "assert_self_improvement_axioms " id:ident : command => do
   assertUsesExactlyAxioms id.getId expectedSelfImprovementAxioms
 
@@ -154,7 +165,10 @@ elab "assert_sdp_slackness_axioms " id:ident : command => do
 assert_standard_axioms MIPStarRE.LDT.Test.razSafra
 assert_standard_axioms MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement
 assert_standard_axioms MIPStarRE.LDT.Test.classicalTestSoundness
-assert_standard_axioms MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization
+assert_standard_axioms
+  MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationCompletionRoute
+assert_orthonormalization_axioms
+  MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization
 assert_main_formal_axioms MIPStarRE.LDT.Test.mainFormal
 assert_self_improvement_axioms MIPStarRE.LDT.SelfImprovement.selfImprovement
 assert_standard_axioms MIPStarRE.LDT.GlobalVariance.globalVarianceOfPoints

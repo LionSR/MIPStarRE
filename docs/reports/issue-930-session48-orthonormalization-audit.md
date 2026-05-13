@@ -6,6 +6,20 @@ Base commit: `68e3a1d9` (`origin/main` when this worktree was created)
 
 Branch: `gpt55/session48-930-orthonormalization-audit`
 
+## 2026-05-13 update
+
+This historical audit is superseded on the theorem-statement point by
+`docs/paper-gaps/issue-1032-orthonormalization-constant.tex` and PR #1539.  The
+declaration named `MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization`
+now again states the paper constant `100 * ζ^(1/4)` and carries the tracked
+issue-#1032 proof gap.  The previously proved completion-route construction with
+the weaker `120 * ζ^(1/4)` conclusion has been moved to
+`MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationCompletionRoute`.
+Accordingly, the older statements below saying that the public theorem was
+proved with the paper constant, or that no theorem statement needed to change,
+should be read as a record of the May 1 audit state rather than as current
+guidance.
+
 ## Executive summary
 
 I audited the already-formalized orthonormalization/projective-completion slice against:

@@ -63,13 +63,11 @@
 	% record contains positive semidefinite density matrices of arbitrary
 	% normalized trace; this matches the paper's convention that a state is
 	% normalized.
-	% The paper states the sharper constant $100\zeta^{1/4}$.
-	% The present direct local $Q/X/\widehat X/P$ route on the completed
-	% measurement yields $120\zeta^{1/4}$ because it first converts the
-	% $2\zeta$ self-consistency error to a $4\zeta$ source-almost-projective
-	% error.  In Lean this bound is named
-	% `orthonormalizationCompletionRouteError`.
-	% See docs/paper-gaps/issue-1032-orthonormalization-constant.tex.
+	% The paper states the constant $100\zeta^{1/4}$.  Lean keeps this
+	% statement under the source theorem name; its proof is the tracked
+	% issue-#1032 gap.  The proved completion-route variant with the weaker
+	% $120\zeta^{1/4}$ bound is recorded separately as
+	% `orthonormalizationCompletionRoute`.
 	\uses{def:strong-self-consistency, def:approx_delta}
 	Let $\ket{\psi}$ be a permutation-invariant state,
 	and let $A = \{A_a\}$ be a sub-measurement with strong self-consistency
@@ -80,7 +78,7 @@
 	\]
 	Then there exists a projective sub-measurement $P = \{P_a\}$ such that
 	\[
-		A_a \ot I \approx_{120 \zeta^{1/4}} P_a \ot I.
+		A_a \ot I \approx_{100 \zeta^{1/4}} P_a \ot I.
 	\]
 \end{theorem}
 
@@ -391,11 +389,17 @@
 	needed because $A$ is already a measurement.
 \end{remark}
 
-\begin{proof}[Proof of \ref{thm:orthonormalization} assuming \ref{lem:left-lifted-projectivization-repair}]
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
+\begin{remark}[Lean completion-route orthonormalization]\label{rem:orthonormalization-completion-route}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationCompletionRoute}
 	\leanok
-	\proves{thm:orthonormalization}
 	\uses{prop:other-two-notions-of-self-consistency, lem:left-lifted-projectivization-repair}
+
+	The paper theorem \ref{thm:orthonormalization} remains stated in Lean with the
+	\(100\zeta^{1/4}\) constant and a tracked proof gap.  The declaration checked
+	here is the completion-route theorem with the weaker bound
+	\(120\zeta^{1/4}\), recorded in
+	\texttt{orthonormalizationCompletionRouteError}.  See
+	\texttt{docs/paper-gaps/issue-1032-orthonormalization-constant.tex}.
 
 	Let $A = \{A_a\}$ be a sub-measurement with outcomes in $\mathcal A$. Write $A=\sum_a A_a$. The strong self-consistency assumption implies
 	\[
@@ -429,8 +433,8 @@
 	\[
 		A_a \ot I \approx_{84(4\zeta)^{1/4}} P_a \ot I,
 	\]
-	and $84 \cdot 4^{1/4} \leq 120$, so the stated bound follows.
-\end{proof}
+	and \(84 \cdot 4^{1/4} \leq 120\), so the completion-route bound follows.
+\end{remark}
 
 \begin{proof}[Proof of \ref{lem:orthonormalization-main-lemma}]
 	\proves{lem:orthonormalization-main-lemma}
