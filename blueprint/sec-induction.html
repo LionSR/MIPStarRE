@@ -1158,7 +1158,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> In Lean, the base case and the internal successor-step assembly are now formalized through  together with the stage data    that mirror the four paper stages \(\text{restrict} \to \text{induct} \to \text{self-improve} \to \text{paste}\). For the answer-valued restriction route used in the successor branch of the main formal theorem, Lean now also exposes , which record the predecessor induction hypothesis for the restricted strategies without appealing to the public theorem ‘mainFormal‘. The weighted restricted-probability estimates are now public via , The remaining proof gap for Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.12</a> is to derive those inputs, including the restricted-strategy self-improvement obligations tracked by issues #1507 and #1503 under the bridge-debt tracker #1458, from the paper hypotheses; hence no proof-level is attached here. We may assume \(\varepsilon ,\delta ,\gamma ,d/q \le 1\), since otherwise \(\nu \ge 1\) and the bound is trivial. </p>
+  <p> In Lean, the base case is formalized through . The successor branch of  remains an explicit proof gap on the source statement. The nearby formalization still names the stage data    that mirror the four paper stages \(\text{restrict} \to \text{induct} \to \text{self-improve} \to \text{paste}\), but no theorem with these data as additional source-level hypotheses is advertised as Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.12</a>. For the answer-valued restriction route used in the successor branch of the main formal theorem, Lean now also exposes , which record the predecessor induction hypothesis for the restricted strategies without appealing to the public theorem ‘mainFormal‘. The weighted restricted-probability estimates are now public via , The remaining proof gap for Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.12</a> is to derive the successor-step constructions, including the restricted-strategy self-improvement obligations tracked by issues #1507 and #1503 under the bridge-debt tracker #1458, from the paper hypotheses; hence no proof-level is attached here. We may assume \(\varepsilon ,\delta ,\gamma ,d/q \le 1\), since otherwise \(\nu \ge 1\) and the bound is trivial. </p>
 <p>The proof is by induction on \(m\). The base case \(m=1\) is Lemma&#160;<a href="sec-induction.html#lem:main-induction-base">10.11</a>. </p>
 <p>For the step from \(m\) to \(m+1\), let \((\psi ,A,B,L)\) be an \((\varepsilon ,\delta ,\gamma )\)-good symmetric strategy for the \((m+1,q,d)\) test, and let \(k \ge 400(m+1)d\). For each \(x \in \mathbb {F}_q\), let \((\psi ,A^x,B^x,L^x)\) be the \(x\)-restricted strategy, with failure parameters \(\varepsilon _x,\delta _x,\gamma _x\). Apply the induction hypothesis to each restricted strategy with the same integer \(k\) and define </p>
 <div class="displaymath" id="a0000000570">
@@ -1256,7 +1256,7 @@
     Remark
     </span>
     <span class="remark_thmlabel">10.13</span>
-    <span class="remark_thmtitle">Lean conditional declarations for the successor-step assembly</span>
+    <span class="remark_thmtitle">Lean proof gap for the successor-step assembly</span>
     <div class="thm_header_extras">
 
         </div>
@@ -1312,8 +1312,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>   The Lean declarations record the explicit successor-step ingredients used in the proof of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.12</a>: the weighted slice bounds feeding Lemma&#160;<a href="sec-induction.html#lem:restricted-probabilities">10.3</a>, the extracted slice-restriction data, the per-slice recursive witnesses, the corresponding self-improvement data, and the recursion-to-pasting assembly. These are not extra hypotheses in the paper theorem; they are intermediate proof obligations in the current formalization. </p>
-<p>One first applies Lemma&#160;<a href="sec-induction.html#lem:restricted-probabilities">10.3</a> to the weighted slice bounds in order to extract the restricted failure profile, records the recursive slice witnesses, uses the explicit self-improvement data on that slice data, and then applies , which already returns the displayed error parameter directly. </p>
+  <p>   The Lean declaration for Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.12</a> has the source hypotheses and carries a <span class="ttfamily">sorry</span> in the successor branch. The weighted slice bounds feeding Lemma&#160;<a href="sec-induction.html#lem:restricted-probabilities">10.3</a> are still exposed through the public restriction-package constructor above, but the recursive slice witnesses, the slice-wise self-improvement outputs, and the pasting comparison must be derived inside the successor proof itself. They are not represented by a separate theorem whose assumptions are added to the paper statement. </p>
 
   </div>
 </div>
@@ -1581,7 +1580,17 @@
         
         <ul class="uses">
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedDiagonal_le_ofSliceData" class="lean_decl">MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedDiagonal_le_ofSliceData</a></li>
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Test.MainFormalSuccessorAnswerAxisWeightedBound" class="lean_decl">MIPStarRE.LDT.Test.MainFormalSuccessorAnswerAxisWeightedBound</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Test.MainFormalSuccessorAnswerDiagonalWeightedBound" class="lean_decl">MIPStarRE.LDT.Test.MainFormalSuccessorAnswerDiagonalWeightedBound</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRestrictionPackage" class="lean_decl">MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRestrictionPackage</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Test.MainFormalSuccessorAnswerRecursiveSlices" class="lean_decl">MIPStarRE.LDT.Test.MainFormalSuccessorAnswerRecursiveSlices</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Test.mainFormalSuccessorAnswerAxisWeightedBound_ofPass" class="lean_decl">MIPStarRE.LDT.Test.mainFormalSuccessorAnswerAxisWeightedBound_ofPass</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Test.mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass" class="lean_decl">MIPStarRE.LDT.Test.mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass</a></li>
           
         </ul>
     
@@ -1592,7 +1601,7 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>      These Lean-only declarations name the restricted-probability and recursive-slice targets appearing in the successor comparison with Remark&#160;<a href="sec-induction.html#rem:main-induction-successor-assembly">10.13</a>. The public weighted-bound helper lemmas discharge the weighted restricted-axis and restricted-diagonal fields from the symmetrized passing strategy. The former Lean boundary records, which also required a supplied self-improvement input, have been removed: that missing work is part of the proof of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.12</a>, not an additional assumption in Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>. The ordinary slice structure records both Alice- and Bob-side compatibility with the restricted point, axis-parallel, and diagonal measurements; in particular, the formal lemmas    extract the restricted point-agreement, axis-parallel, and diagonal branch bounds from the pinned slice’s passing hypothesis. On the answer-register side, the slice-data record carries both Alice- and Bob-side compatibility for the restricted point and axis-parallel measurements, together with the common zero-coordinate readout of the diagonal measurement on both registers. The symmetry proofs of the same-space slice, and any stronger full diagonal-family comparison, remain externally supplied by the recursive slice strategy. </p>
+  <p>      These Lean-only declarations name the restricted-probability and recursive-slice targets appearing in the successor comparison with Remark&#160;<a href="sec-induction.html#rem:main-induction-successor-assembly">10.13</a>. The public weighted-bound helper lemmas discharge the weighted restricted-axis and restricted-diagonal fields from the symmetrized passing strategy. The former Lean boundary records, which also required a supplied self-improvement input, have been removed: that missing work is part of the proof of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.12</a>, not an additional assumption in Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>. The former slice-data records, which supplied concrete pinned same-space slice strategies and passing hypotheses as Lean inputs, have also been removed. The construction of those slices and the transport of their restricted point, axis-parallel, and diagonal measurements should be proved in the successor branch rather than represented as a source-level hypothesis. </p>
 
   </div>
 </div>
