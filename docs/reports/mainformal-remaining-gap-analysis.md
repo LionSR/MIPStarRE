@@ -13,6 +13,12 @@ Date: 2026-05-07
 > `MainFormalCascadeRolePackageResidualProjectiveCompletionResidual`; the active
 > construction target is now
 > `MainFormalCascadeProjectiveCompletionTransportResidual`.
+>
+> **Status note, 2026-05-13.**  The post-role diagonal completion theorem now
+> reduces to two named match-mass preservation obligations,
+> `leftMatchMassPreservation_ofDiagonalConsistency` and
+> `rightMatchMassPreservation_ofDiagonalConsistency`, tracked by #1566.  The
+> broader completion residual construction is tracked by #1565.
 
 ## 1. Exact sorry site
 
@@ -117,34 +123,32 @@ structure MainFormalPostRolePackageDiagonalCompletionResidual ... where
   rightMatchMass : qBipartiteMatchMass ...
 ```
 
-**Existing construction theorems** (all in NativeTargets.lean):
+**Existing construction theorems**:
 
 | Constructor | Required inputs | Status |
 |------------|----------------|--------|
-| `nonempty_ofRoleResidualAndCompletion` | `roleResidual` + `Nonempty MainFormalPostRolePackageDiagonalCompletionResidual` | Internal assembly once the completion residual is constructed |
-| `nonempty_ofRoleResidual` | `roleResidual` only | Source-shaped internal construction target; the diagonal-completion step is a direct `sorry` until the completion outcomes, self-consistency estimates, and match-mass preservation are proved from the paper hypotheses |
+| `MainFormalCascadeProjectiveCompletionTransportResidual.nonempty_ofRoleResidual` | `roleResidual` only | Source-shaped internal construction target; delegates the completion step to `MainFormalPostRolePackageDiagonalCompletionResidual.nonempty_ofDiagonalConsistency` |
+| `MainFormalPostRolePackageDiagonalCompletionResidual.nonempty_ofDiagonalConsistency` | line-130 orthonormalization residual + cross consistency | Constructs the completion residual from the two named match-mass preservation obligations |
+| `leftMatchMassPreservation_ofDiagonalConsistency` / `rightMatchMassPreservation_ofDiagonalConsistency` | line-130 orthonormalization residual + cross consistency | Named `sorry` obligations directly required for the line-169 route in the paper |
 
 **Current route:** Once Field 1 (`roleResidual`) is produced, the proof must
 derive the line-130 orthonormalization residual from cross consistency and then
-prove the completion outcomes, self-consistency estimates, and match-mass
-preservation.  These are internal obligations, not public inputs to
-`mainFormal`.
+prove the two match-mass preservation obligations.  These are internal
+obligations, not public inputs to `mainFormal`.
 
 The line-130 consistency data supplies the orthonormalization residual via
 `MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalConsistency`.
 
-The remaining pieces for a `MainFormalPostRolePackageDiagonalCompletionResidual` are:
-- `a_A a_B` — distinguished outcomes (can use zero polynomial)
-- `leftCompletedCloseness`, `rightCompletedCloseness` — completion closeness (can derive from `completingToMeasurement`)
-- `leftMatchMass`, `rightMatchMass` — match-mass preservation (needs `OrthonormalizationMatchMassPreservation`)
+The completion theorem now fixes the distinguished completion outcome to the
+zero polynomial and derives the completion-closeness fields from the checked
+analytic completion argument.  The remaining pieces are exactly:
 
-There are also `BipartiteSSCRel` strong self-consistency records. The
-historical diagonal-consistency input provided `ConsRel` (cross correlation),
-not `BipartiteSSCRel` (self-consistency). Some theorems derive
-`BipartiteSSCRel` from `ConsRel` under `PermInvState`.
+- `leftMatchMassPreservation_ofDiagonalConsistency`;
+- `rightMatchMassPreservation_ofDiagonalConsistency`.
 
-**Status:** partially derivable once Field 1 is obtained, but it still requires
-the match-mass and self-consistency derivations.
+**Status:** partially derivable once Field 1 is obtained.  The only remaining
+line-130 completion content is the orthonormalization match-mass preservation
+needed for line 169.
 
 ## 4. Historical resolution routes
 
@@ -252,7 +256,10 @@ from the role residual and the paper's line-130 consistency data.
 
 **Why blocked:** Depends on Gap 1. Once the role residual is available, the
 current route derives the orthonormalization residual from cross consistency.
-The remaining pieces are the match-mass preservation and completion estimates.
+The remaining pieces are the two match-mass preservation obligations.  The
+completion outcome and completion-closeness estimates are now produced by
+`MainFormalPostRolePackageDiagonalCompletionResidual.nonempty_ofDiagonalConsistency`
+from those obligations.
 
 **Resolution options:**
 - Build the completion residual directly from the role residual, the
@@ -272,10 +279,10 @@ successor route is chosen.
 
 **Tracked by:** #1043
 
-## 8. Which approach makes the single `sorry` disappear?
+## 8. Which approach discharges the remaining obligations?
 
 **Historical minimum closure:** Add the missing hypotheses to `mainFormal`
-(Gap 1) and use Route A.  This would replace the `sorry` with a call to the
+(Gap 1) and use Route A.  This would replace the proof holes with a call to the
 existing constructors, but it would also strengthen the source-facing theorem by
 adding non-paper assumptions.  The current repair policy rejects this route.
 
@@ -295,7 +302,9 @@ Several issues already cover the sub-gaps identified above:
 
 | Issue | Description | Covers Gap |
 |-------|-------------|------------|
-| #1363 | Close the sole remaining `sorry` in MainFormal (successor-case projective completion) | Primary tracker |
+| #1363 | Historical tracker for closing the MainFormal successor-case projective completion gap | Primary tracker |
+| #1565 | Discharge the line-130 diagonal completion residual for `mainFormal` | Current post-role completion tracker |
+| #1566 | Prove line-169 match-mass preservation for the chosen `mainFormal` witnesses | Current lowest match-mass obligations |
 | #1035 | Prove recursive mainFormal for successor restricted slices | `MainFormalSuccessorRecursiveSlices` |
 | #1036 | Construct successor-case self-improvement obligations | `MainFormalSuccessorSelfImprovementObligations` |
 | #1041 | Assemble successor-case mainFormal branch | Final wiring of #1035 + #1036 |
