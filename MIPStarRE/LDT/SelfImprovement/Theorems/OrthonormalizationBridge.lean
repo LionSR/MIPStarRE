@@ -53,8 +53,6 @@ extra assumption.
   the same approximation with the existing repair-input conversion.
 * `orthonormalizationInput_of_obligations` — combines the two slices into the
   full `SelfImprovement.OrthonormalizationInput`.
-* `orthonormalizationResidualDominationInput_of_obligations` — the corresponding
-  strengthened input for the residual-domination orthonormalization theorem.
 * `orthonormalizationSpectralObligation_of_roundingWitnesses` — narrows the
   spectral slice down to an obligation for `RoundingToProjectorsWitness`es for the
   option-completed left-lifted helper measurement, using the conversion
@@ -63,11 +61,6 @@ extra assumption.
   the same slice to the named QXP-layer statement
   `projectiveNonMeasurement`, i.e. the Lean form of
   `lem:projective-non-measurement`.
-* `residualDominatingRepairObligation_of_qxpLayer_and_coisometry` — obtains the
-  residual-domination invariant from coisometry of the QXP-layer `X` matrix.
-* `orthonormalizationResidualDominationInput_of_spectral_qxpLayer_and_coisometry`
-  — combines the spectral slice, the QXP repair slice, and the same coisometry
-  hypothesis into the strengthened orthonormalization input.
 
 ## References
 
@@ -635,47 +628,6 @@ noncomputable def residualDominatingRepairObligation_of_qxpLayer_and_freshOutcom
         (hsource hssc hSpectral) (hfresh hssc hSpectral))
 
 /-- Upgrade an ordinary QXP-layer repair obligation to a residual-dominating one
-when the associated `X` matrix is a coisometry.
-
-The coisometry identity `X X† = I` gives the row equality
-`XHat_none = X_none` for the fresh outcome.  The QXP-layer algebra then
-identifies the fresh `Q` outcome with the corresponding repaired `P` outcome,
-which is precisely the pointwise comparison needed for residual domination. -/
-noncomputable def residualDominatingRepairObligation_of_qxpLayer_and_coisometry
-    {params : Parameters} [FieldModel params.q]
-    {strategy : SymStrat params ι} {eps delta : Error}
-    (hqxp : OrthonormalizationQXPLayerRepairObligation params strategy eps delta)
-    (hsource : ∀ {Hhat : SubMeas (Polynomial params) ι}
-      (hssc : BipartiteSSCRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily Hhat)
-        (selfImprovementHelperError params eps delta))
-      (hSpectral : SpectralTruncationStatement strategy.state
-        (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
-        (consistencyToAlmostProjectiveError
-          (2 * selfImprovementHelperError params eps delta))),
-        (hqxp hssc hSpectral).data.qLayer.q.outcome none =
-          (optionCompletion Hhat).outcome none)
-    (hcoisometry : ∀ {Hhat : SubMeas (Polynomial params) ι}
-      (hssc : BipartiteSSCRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily Hhat)
-        (selfImprovementHelperError params eps delta))
-      (hSpectral : SpectralTruncationStatement strategy.state
-        (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
-        (consistencyToAlmostProjectiveError
-          (2 * selfImprovementHelperError params eps delta))),
-        (hqxp hssc hSpectral).data.x * (hqxp hssc hSpectral).data.xᴴ =
-          (1 : MIPStarRE.Quantum.Op
-            (hqxp hssc hSpectral).data.qLayer.auxSpace.carrier)) :
-    OrthonormalizationQXPLayerRepairObligationWithResidualDomination
-      params strategy eps delta :=
-  residualDominatingRepairObligation_of_qxpLayer_and_freshOutcome hqxp hsource
-    (fun hssc hSpectral =>
-      let data := (hqxp hssc hSpectral).data
-      fresh_outcome_le_of_xHatA_eq_xa data
-        (xHatA_eq_xa_of_x_mul_conjTranspose_eq_one data none
-          (hcoisometry hssc hSpectral)))
-
-/-- Upgrade an ordinary QXP-layer repair obligation to a residual-dominating one
 from a pointwise inequality at the residual `none` outcome.
 
 The paper-side input is the pointwise operator inequality
@@ -713,21 +665,6 @@ noncomputable def orthonormalizationRepairObligation_of_qxpLayer
   fun hssc =>
     leftLiftedProjectivizationRepairInput_of_qxpLayer (hqxp hssc)
 
-/-- Paper origin: `references/ldt-paper/self_improvement.tex:690-705`
-and `references/ldt-paper/orthonormalization.tex:533-627`.
-
-SelfImprovement-level strengthened orthonormalization input carrying the
-residual-domination invariant. -/
-abbrev OrthonormalizationResidualDominationInput
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι) (eps delta : Error) :=
-  ∀ {Hhat : SubMeas (Polynomial params) ι},
-    BipartiteSSCRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily Hhat)
-      (selfImprovementHelperError params eps delta) →
-    MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationInputWithResidualDomination
-      strategy.state Hhat (selfImprovementHelperError params eps delta)
-
 /-! ### Combining slice obligations -/
 
 /-- Combine the spectral and repair slice obligations into a full
@@ -746,95 +683,6 @@ def orthonormalizationInput_of_obligations
   fun {_Hhat} hssc =>
     { spectral := hspectral hssc
       repair := hrepair hssc }
-
-/-- Forget the residual domination conclusion from one strengthened
-orthonormalization repair input. -/
-noncomputable def repairInput_of_repairInputWithResidualDomination
-    {params : Parameters} [FieldModel params.q]
-    {strategy : SymStrat params ι} {eps delta : Error}
-    {Hhat : SubMeas (Polynomial params) ι}
-    (H :
-      MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationInputWithResidualDomination
-        strategy.state Hhat (selfImprovementHelperError params eps delta)) :
-    LeftLiftedProjectivizationRepairInput strategy.state (optionCompletion Hhat)
-      (consistencyToAlmostProjectiveError
-        (2 * selfImprovementHelperError params eps delta)) :=
-  fun hSpectral =>
-    let ⟨P, hRounded, _hResidual⟩ := H.repair hSpectral
-    ⟨P, hRounded⟩
-
-/-- Paper origin: `references/ldt-paper/self_improvement.tex:690-705`
-and `references/ldt-paper/orthonormalization.tex:533-627`.
-
-Forget the residual-domination field of the strengthened input, yielding
-the ordinary orthonormalization input required by the reduced self-improvement
-theorem. -/
-noncomputable def orthonormalizationInput_of_residualDominationInput
-    {params : Parameters} [FieldModel params.q]
-    {strategy : SymStrat params ι} {eps delta : Error}
-    (hinput :
-      OrthonormalizationResidualDominationInput params strategy eps delta) :
-    OrthonormalizationInput params strategy eps delta :=
-  fun {_Hhat} hssc =>
-    let H := hinput hssc
-    { spectral := H.spectral
-      repair := repairInput_of_repairInputWithResidualDomination H }
-
-/-- Combine the spectral slice and the residual-dominating QXP repair slice into
-the strengthened orthonormalization input used by the monotone-total route. -/
-noncomputable def orthonormalizationResidualDominationInput_of_obligations
-    {params : Parameters} [FieldModel params.q]
-    {strategy : SymStrat params ι} {eps delta : Error}
-    (hspectral : OrthonormalizationSpectralObligation params strategy eps delta)
-    (hrepair :
-      OrthonormalizationQXPLayerRepairObligationWithResidualDomination
-        params strategy eps delta) :
-    OrthonormalizationResidualDominationInput params strategy eps delta :=
-  fun {_Hhat} hssc =>
-    { spectral := hspectral hssc
-      repair :=
-        leftLiftedProjectivizationRepairInputWithResidualDomination_of_qxpLayer
-          (hrepair hssc) }
-
-/-- Combine the spectral slice, an ordinary QXP-layer repair obligation, and
-coisometry of the corresponding `X` matrices into the strengthened
-orthonormalization input.
-
-The source-identification hypothesis states that the fresh `Q` outcome in the
-QXP layer is the residual outcome of `optionCompletion Hhat`.  The coisometry
-hypothesis then gives the fresh-outcome comparison by
-`residualDominatingRepairObligation_of_qxpLayer_and_coisometry`, and the usual
-slice-combination theorem turns this residual-dominating repair obligation into
-the full strengthened input. -/
-noncomputable def orthonormalizationResidualDominationInput_of_spectral_qxpLayer_and_coisometry
-    {params : Parameters} [FieldModel params.q]
-    {strategy : SymStrat params ι} {eps delta : Error}
-    (hspectral : OrthonormalizationSpectralObligation params strategy eps delta)
-    (hqxp : OrthonormalizationQXPLayerRepairObligation params strategy eps delta)
-    (hsource : ∀ {Hhat : SubMeas (Polynomial params) ι}
-      (hssc : BipartiteSSCRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily Hhat)
-        (selfImprovementHelperError params eps delta))
-      (hSpectral : SpectralTruncationStatement strategy.state
-        (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
-        (consistencyToAlmostProjectiveError
-          (2 * selfImprovementHelperError params eps delta))),
-        (hqxp hssc hSpectral).data.qLayer.q.outcome none =
-          (optionCompletion Hhat).outcome none)
-    (hcoisometry : ∀ {Hhat : SubMeas (Polynomial params) ι}
-      (hssc : BipartiteSSCRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily Hhat)
-        (selfImprovementHelperError params eps delta))
-      (hSpectral : SpectralTruncationStatement strategy.state
-        (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
-        (consistencyToAlmostProjectiveError
-          (2 * selfImprovementHelperError params eps delta))),
-        (hqxp hssc hSpectral).data.x * (hqxp hssc hSpectral).data.xᴴ =
-          (1 : MIPStarRE.Quantum.Op
-            (hqxp hssc hSpectral).data.qLayer.auxSpace.carrier)) :
-    OrthonormalizationResidualDominationInput params strategy eps delta :=
-  orthonormalizationResidualDominationInput_of_obligations hspectral
-    (residualDominatingRepairObligation_of_qxpLayer_and_coisometry hqxp hsource hcoisometry)
 
 /-! ### Spectral slice from per-`Hhat` rounding witnesses -/
 
