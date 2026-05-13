@@ -263,10 +263,9 @@ point-consistency target yet; they are retained by the data package so the later
 recursive call can require `slicePasses` for slices whose line
 measurements are pinned to the answer restriction on both registers.
 
-The induction hypothesis `hrecSlice` mirrors what the answer-valued
-`mainInductionPublicWrapper` (or, equivalently, a recursive call to
-`mainFormal`) returns for the predecessor dimension: a polynomial measurement
-on the role-register space with consistency bounded by the main induction error
+The induction hypothesis `hrecSlice` mirrors what the predecessor induction
+statement returns for the predecessor dimension: a polynomial measurement on
+the role-register space with consistency bounded by the main induction error
 evaluated at the answer-restricted-profile bounds. -/
 theorem mainFormalSuccessorAnswerRecursiveSlices_ofSliceData
     (params : Parameters) [FieldModel.{0} params.q]

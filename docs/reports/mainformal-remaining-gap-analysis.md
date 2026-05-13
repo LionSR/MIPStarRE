@@ -112,10 +112,8 @@ structure MainFormalPostRolePackageDiagonalCompletionResidual ... where
 
 | Constructor | Required inputs | Status |
 |------------|----------------|--------|
-| `nonempty_ofRoleResidualAndCompletion` | `roleResidual` + `Nonempty MainFormalPostRolePackageDiagonalCompletionResidual` | Circular (needs itself) |
-| `nonempty_ofRoleResidualAndCompletionObligation` | `roleResidual` + `completionObligation : OrthResidual → CompletionResidual` | Completion obligation missing |
-| `nonempty_ofRoleResidualAndDiagonalInputsAndMatchMassPreservation` | Historical route through role-level orthonormalization data plus match-mass | Match-mass unproven |
-| `nonempty_ofRoleResidualAndDiagonalInputsAndCompletingToMeasurementInputs` | Historical route through role-level orthonormalization data, self-consistency, and match-mass | All fields missing |
+| `nonempty_ofRoleResidualAndCompletion` | `roleResidual` + `Nonempty MainFormalPostRolePackageDiagonalCompletionResidual` | Internal assembly once the completion residual is constructed |
+| `nonempty_ofRoleResidualAndMatchMassPreservation` | `roleResidual` + distinguished outcomes + match-mass preservation for the two orthonormalized submeasurements | Live concrete completion route; the match-mass preservation facts remain to be proved |
 
 **Current route:** Once Field 1 (`roleResidual`) is produced, the proof must
 derive the line-130 orthonormalization residual from cross consistency and then

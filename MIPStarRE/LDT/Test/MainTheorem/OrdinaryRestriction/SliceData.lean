@@ -316,10 +316,10 @@ for each slice strategy, this rewrites the state and point-measurement
 compatibilities to produce the exact `MainFormalSuccessorRecursiveSlices`
 target.
 
-The induction hypothesis `hrecSlice` mirrors what `mainInductionPublicWrapper`
-(or, equivalently, a recursive call to `mainFormal`) returns for the predecessor
-dimension: a polynomial measurement on the role-register space with consistency
-bounded by the main induction error evaluated at the restricted-profile bounds. -/
+The induction hypothesis `hrecSlice` mirrors what the predecessor induction
+statement returns for the predecessor dimension: a polynomial measurement on
+the role-register space with consistency bounded by the main induction error
+evaluated at the restricted-profile bounds. -/
 theorem mainFormalSuccessorRecursiveSlices_ofSliceData
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

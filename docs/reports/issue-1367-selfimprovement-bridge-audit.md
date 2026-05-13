@@ -27,9 +27,12 @@
 > `SelfImprovementObligations` record, the top-level
 > `selfImprovementFromObligations` theorem, the matrix-SDP
 > residual-domination assembly theorems, and the Section 3/6 successor-boundary
-> conditional API have been removed.  The current repair direction is to keep
-> the paper theorem statements visible and to represent the remaining analytic
-> derivations by tracked `sorry` sites until they are proved.
+> conditional API have been removed.  The later 2026-05-13 PR update also
+> removes `mainInductionPublicWrapper` and `answerMainInductionPublicWrapper`,
+> leaving `mainInductionByRecursionOnM` as internal proof content and
+> `mainInduction` as the theorem with the paper statement.  The current repair
+> direction is to keep the paper theorem statements visible and to represent the
+> remaining analytic derivations by tracked `sorry` sites until they are proved.
 
 ---
 
@@ -173,10 +176,10 @@ Same pattern but with `diagonalZeroCoord_eq` instead of `diagonalMeasurement_eq`
 
 **File:** `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean`
 
-- `mainInductionByRecursionOnM` (line 200): Takes `hselfObligation` (a function `PerSliceInductionPackage → SelfImprovementPackage`) as an internal wrapper input, then assembles `AveragedPastingInput` → `mainInductionFromPackages`
-- `mainInductionPublicWrapper` (line 311): Passes `hselfObligation` through to callers
+- `mainInductionByRecursionOnM` (line 200): Takes `hselfObligation` (a function `PerSliceInductionPackage → SelfImprovementPackage`) as an internal proof-stage input, then assembles `AveragedPastingInput` → `mainInductionFromPackages`
+- Historical `mainInductionPublicWrapper`: removed in the 2026-05-13 PR #1539 update, so this proof-stage input is no longer exposed as a theorem adjacent to the source theorem.
 
-**Status:** The MainInductionStep wiring is complete (no `sorry`s). The gap is at the `mainFormal` level: nobody calls `mainInductionByRecursionOnM` with a concrete `hselfObligation`.
+**Status:** The conditional assembly proof is still useful proof content, but the paper-facing theorem `mainInduction` now carries the successor proof gap directly.  The missing work is to derive the restricted-slice data, recursive witnesses, and self-improvement packages from the hypotheses of `thm:main-induction`, not to expose them as assumptions near the source theorem.
 
 ---
 
@@ -301,7 +304,7 @@ These were the obligation constructors for the two historical proposed
 | `self_improvement_helper_with_slackness` variants | Orphan — tracked by #1385, not blocking |
 | Internal SelfImprovement sub-lemmas (HelperCompleteness, PointConsistency, etc.) | All proved (conditional) |
 | Pasting theorem (`ldPasting`) | Fully proved, fully wired |
-| MainInductionStep bridge (`mainInductionByRecursionOnM`) | Fully proved (conditional on `hselfObligation`) |
+| MainInductionStep assembly (`mainInductionByRecursionOnM`) | Proved only after the internal proof-stage inputs are supplied; the source-facing theorem keeps the corresponding successor proof gap |
 
 ---
 
@@ -408,7 +411,7 @@ actual sub-gaps.
 | `MIPStarRE/LDT/MakingMeasurementsProjective/SpectralTruncation/ProjectiveNonMeasurement.lean` | `spectralTruncationInput_of_sourceAlmostProjective` (PROVED) |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/Core.lean` | `SelfImprovementPackage.SliceObligations`, `ofSliceObligations`, `selfImprovementInInductionSection` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/AnswerSlice.lean` | `AnswerSelfImprovementPackage.SliceObligations` |
-| `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` | `mainInductionByRecursionOnM`, `mainInductionPublicWrapper` |
+| `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` | `mainInduction`, `mainInductionBaseCase`, `mainInductionByRecursionOnM` |
 | `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | Historical note: as of 2026-05-08, `mainFormal` had one `sorry` at line 611, which #1374 proposed to close by adding hypotheses |
 | `MIPStarRE/LDT/Test/MainTheorem/RoleRegister.lean` | `successorOfObligations`, `answerSuccessorOfObligations`, `rolePackageResidual_ofAnswerSuccessorObligations` |
 | `MIPStarRE/LDT/Test/MainTheorem/OrdinaryRestriction/Basic.lean` | `MainFormalSuccessorSelfImprovementObligations` type + constructors |

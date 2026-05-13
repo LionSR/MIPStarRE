@@ -8,9 +8,12 @@ Status note, 2026-05-13: this report predates PR #1539.  The
 `SelfImprovementObligations` record, the top-level
 `selfImprovementFromObligations` theorem, the matrix-SDP residual-domination
 assembly theorems, and the Section 3/6 successor-boundary conditional API have
-been removed.  The present paper-alignment policy is to preserve the theorem
-statements from the paper and to leave the remaining derivations as tracked
-`sorry` sites until they are proved.
+been removed.  The later 2026-05-13 PR update also removes
+`mainInductionPublicWrapper` and `answerMainInductionPublicWrapper`, leaving
+`mainInductionByRecursionOnM` as internal proof content and `mainInduction` as
+the theorem with the paper statement.  The present paper-alignment policy is to
+preserve the theorem statements from the paper and to leave the remaining
+derivations as tracked `sorry` sites until they are proved.
 
 Auditor: Research specialist (read-only analysis)
 Scope: `MIPStarRE/LDT/SelfImprovement/` → `MIPStarRE/LDT/Pasting/` →
@@ -123,7 +126,7 @@ mainInductionByRecursionOnM   (MainTheorems.lean)
 ```
 
 **The key observation:** `mainInductionByRecursionOnM` takes `hselfObligation`
-as an internal wrapper input.  This `hselfObligation` must produce a
+as an internal proof-stage input.  This `hselfObligation` must produce a
 `SelfImprovementPackage` from a `PerSliceInductionPackage`.  It is not a
 hypothesis of the source-facing `mainInduction` theorem; that theorem retains
 the paper-shaped statement and the non-base branch is tracked by #1507.
@@ -306,9 +309,9 @@ their inputs from the paper hypotheses.
 
 | Layer | Declarations with proofs | Declarations that wire to downstream | Gap |
 |-------|------------------------|--------------------------------------|-----|
-| SelfImprovement | ~50 theorems/lemmas | 3 public theorems (`selfImprovementHelper`, `selfImprovement`, `selfImprovementFromObligations`) | All three take explicit hypotheses; internal sub-lemmas are proved but the obligations are not discharged internally |
+| SelfImprovement | ~50 theorems/lemmas | 2 paper theorem statements (`selfImprovementHelper`, `selfImprovement`) | The paper statements are visible; their remaining derivations are tracked proof gaps |
 | SelfImprovement sub-lemmas (slackness, matrix bridge) | ~15 proved lemmas | 0 called from MI or MT | Entirely orphan |
-| MainInductionStep | `selfImprovementInInductionSection`, `SelfImprovementPackage.ofSliceObligations`, `ldPastingInInductionSection`, `mainInductionByRecursionOnM` | All wired together in `MainTheorems.lean` | `mainInductionByRecursionOnM` takes `hselfObligation` as an internal wrapper input; `mainInductionPublicWrapper` passes this through |
+| MainInductionStep | `selfImprovementInInductionSection`, `SelfImprovementPackage.ofSliceObligations`, `ldPastingInInductionSection`, `mainInductionByRecursionOnM` | Internal assembly remains in `MainTheorems.lean` | `mainInductionByRecursionOnM` takes `hselfObligation` as an internal input; the public wrapper has been removed |
 | MainTheorem | `mainFormal`, `mainFormal_ofInternalObligations` | Paper-facing theorem separated from internal-obligation assembly | Completion obligations and the successor residual remain tracked proof obligations |
 
 ---
@@ -395,7 +398,7 @@ which this audit is meant to prevent.
 | `MIPStarRE/LDT/SelfImprovement/MatrixRealization.lean` | Matrix-level SDP realization (used by orphan SDP bridges only) |
 | `MIPStarRE/LDT/Pasting/Core.lean` | `ldPasting` — consumed by `ldPastingInInductionSection` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/Core.lean` | `selfImprovementInInductionSection`, `SelfImprovementPackage.ofSliceObligations`, `ldPastingInInductionSection` |
-| `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` | `mainInductionByRecursionOnM`, `mainInductionPublicWrapper` |
+| `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` | `mainInduction`, `mainInductionBaseCase`, `mainInductionByRecursionOnM` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/PackageConstructors.lean` | `AveragedPastingInput.output`, `mainInductionFromPackages` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly.lean` | `assembleAveragedPastingInput` |
 | `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | `mainFormal` and `mainFormal_ofInternalObligations`; paper-facing theorem plus internal-obligation assembly |

@@ -239,9 +239,7 @@
 	strategies without appealing to the public theorem `mainFormal`. The weighted
 	restricted-probability estimates are now public via
 	\lean{MIPStarRE.LDT.MainInductionStep.weighted_axisParallel_bound, MIPStarRE.LDT.MainInductionStep.weighted_diagonal_bound, MIPStarRE.LDT.MainInductionStep.restrictedProbabilities},
-	and the final public successor-step assembly is formalized as
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper}. The
-	remaining proof gap for Theorem~\ref{thm:main-induction} is to derive those
+	The remaining proof gap for Theorem~\ref{thm:main-induction} is to derive those
 	inputs, including the restricted-strategy self-improvement obligations
 	tracked by issues \#1507 and \#1503 under the bridge-debt tracker \#1458,
 	from the paper hypotheses; hence no proof-level \leanok is attached here.
@@ -363,18 +361,16 @@
 	which is exactly the bound required for dimension $m+1$.
 \end{proof}
 
-\begin{remark}[Lean conditional declaration for the successor-step assembly]\label{rem:main-induction-successor-assembly}
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicRestrictionPackage, MIPStarRE.LDT.MainInductionStep.mainInductionPublicWrapper}
+\begin{remark}[Lean conditional declarations for the successor-step assembly]\label{rem:main-induction-successor-assembly}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicRestrictionPackage}
 	\uses{lem:restricted-probabilities, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section, thm:main-induction}
-	This auxiliary Lean statement records the five explicit successor-step
-	ingredients used in the proof of Theorem~\ref{thm:main-induction}: the weighted
-	slice bounds feeding Lemma~\ref{lem:restricted-probabilities}, the extracted
+	The Lean declarations record the explicit successor-step ingredients used in
+	the proof of Theorem~\ref{thm:main-induction}: the weighted slice bounds
+	feeding Lemma~\ref{lem:restricted-probabilities}, the extracted
 	slice-restriction data, the per-slice recursive witnesses, the corresponding
 	self-improvement data, and the recursion-to-pasting assembly.  These are not
 	extra hypotheses in the paper theorem; they are intermediate proof obligations
-	in the current formalization.  With those proof obligations supplied, the Lean statement
-	returns a measurement $G \in \polymeas{m+1}{q}{d}$ satisfying the same
-	consistency conclusion as Theorem~\ref{thm:main-induction}.
+	in the current formalization.
 
 	One first applies Lemma~\ref{lem:restricted-probabilities} to the weighted
 	slice bounds in order to extract the restricted failure profile, records the
