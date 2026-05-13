@@ -420,8 +420,8 @@
 
 \begin{definition}[Lean successor restricted-recursion targets for the Section 3 proof]\label{def:main-formal-successor-boundary}
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAxisWeightedBound, MIPStarRE.LDT.Test.MainFormalSuccessorDiagonalWeightedBound, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictionPackage, MIPStarRE.LDT.Test.MainFormalSuccessorRecursiveSlices, MIPStarRE.LDT.Test.mainFormalSuccessorAxisWeightedBound_ofPass, MIPStarRE.LDT.Test.mainFormalSuccessorDiagonalWeightedBound_ofPass}
-	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorRecursiveSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedPointAgreement_le_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedAxisParallel_le_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedDiagonal_le_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRecursiveSlices_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorRecursiveSlices_ofInductionPackage}
-	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAnswerRecursiveSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRecursiveSlices_ofSliceData, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage}
+	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorRecursiveSlices_ofInductionPackage}
+	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage}
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAnswerAxisWeightedBound, MIPStarRE.LDT.Test.MainFormalSuccessorAnswerDiagonalWeightedBound, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRestrictionPackage, MIPStarRE.LDT.Test.MainFormalSuccessorAnswerRecursiveSlices, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerAxisWeightedBound_ofPass, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass}
 	\leanok
 	\uses{lem:symmetrization-bridge, rem:main-induction-successor-assembly}
@@ -433,21 +433,12 @@
 	which also required a supplied self-improvement input, have been removed:
 	that missing work is part of the proof of
 	Theorem~\ref{thm:main-induction}, not an additional assumption in
-	Theorem~\ref{thm:main-formal}.  The ordinary slice structure records both
-	Alice- and Bob-side
-	compatibility with the restricted point, axis-parallel, and diagonal
-	measurements; in particular, the formal lemmas
-	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedPointAgreement_le_ofSliceData}
-	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedAxisParallel_le_ofSliceData}
-	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorRestrictedDiagonal_le_ofSliceData}
-	extract the restricted point-agreement, axis-parallel, and diagonal branch
-	bounds from the pinned slice's passing hypothesis.  On the answer-register
-	side, the slice-data record carries
-	both Alice- and Bob-side compatibility for the restricted point and
-	axis-parallel measurements, together with the common zero-coordinate readout of
-	the diagonal measurement on both registers.  The symmetry proofs of the
-	same-space slice, and any stronger full diagonal-family comparison, remain
-	externally supplied by the recursive slice strategy.
+	Theorem~\ref{thm:main-formal}.  The former slice-data records, which supplied
+	concrete pinned same-space slice strategies and passing hypotheses as Lean
+	inputs, have also been removed.  The construction of those slices and the
+	transport of their restricted point, axis-parallel, and diagonal measurements
+	should be proved in the successor branch rather than represented as a
+	source-level hypothesis.
 \end{definition}
 
 \begin{definition}[Lean base-case Step~6 obligations for the Section~3 proof]\label{def:main-formal-step6-obligations}
