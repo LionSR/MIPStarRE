@@ -71,7 +71,7 @@ lemma orthonormalizationMainLemma {Outcome : Type*}
           (constSubMeasFamily (leftPlacedSubMeas (ιB := ιB) P.toSubMeas))
           (orthonormalizationMainLemmaError ζ) := by
   intro _hCons
-  -- TODO: formalize the spectral truncation and locality-preserving repair
+  -- TODO(#1032): formalize the spectral truncation and locality-preserving repair
   -- construction in the proof of `lem:orthonormalization-main-lemma`, rather
   -- than assuming these proof steps as theorem hypotheses.
   sorry
@@ -188,47 +188,6 @@ lemma localOrthonormalization_ofInternalInputs {Outcome : Type*}
       hRounded
       (Orthonormalization.ErrorBounds.orthonormalizationMainLemma_error_bound ζ hζ hζ1)
 
-/-- Measurement-level orthonormalization for a complete measurement.
-
-This is a source-shaped corollary of `lem:orthonormalization-main-lemma`; it
-does not assume the proof-stage spectral-truncation or repair data. -/
-lemma orthonormalizationMeasurement {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState (ι × ι))
-    (hψ : ψ.IsNormalized)
-    (A : Measurement Outcome ι) (ζ : Error)
-    (hζ : 0 ≤ ζ) :
-    BipartiteSSCRel ψ (uniformDistribution Unit)
-      (constSubMeasFamily A.toSubMeas) ζ →
-      ∃ P : ProjSubMeas Outcome ι,
-        SDDRel ψ (uniformDistribution Unit)
-          (constSubMeasFamily A.toSubMeas.liftLeft)
-          (constSubMeasFamily P.toSubMeas.liftLeft)
-          (orthonormalizationError ζ) := by
-  intro hssc
-  have hCons :
-      ConsRel ψ (uniformDistribution Unit)
-        (constSubMeasFamily A.toSubMeas)
-        (constSubMeasFamily A.toSubMeas)
-        ζ :=
-    bipartiteSSCRel_self_of_measurement (ψ := ψ) A ζ hssc
-  obtain ⟨P, hP⟩ :=
-    orthonormalizationMainLemma (ψ := ψ) (hψ := hψ) (A := A) (B := A)
-      (ζ := ζ) hζ hCons
-  refine ⟨P, ?_⟩
-  rcases hP with ⟨hP⟩
-  have hP' :
-      sddError ψ (uniformDistribution Unit)
-        (constSubMeasFamily A.toSubMeas.liftLeft)
-        (constSubMeasFamily P.toSubMeas.liftLeft) ≤
-        orthonormalizationMainLemmaError ζ := by
-    simpa [SubMeas.liftLeft] using hP
-  constructor
-  exact hP'.trans
-    (Orthonormalization.ErrorBounds.orthonormalizationMainLemmaError_le_orthonormalizationError
-      ζ hζ)
-
 /-- Measurement-level orthonormalization from a cross-consistency hypothesis.
 
 This is the measurement analogue of
@@ -266,8 +225,31 @@ lemma orthonormalizationMeasurement_of_consistency {Outcome : Type*}
     (Orthonormalization.ErrorBounds.orthonormalizationMainLemmaError_le_orthonormalizationError
       ζ hζ)
 
--- `[DecidableEq Outcome]` is retained for API consistency with neighboring
--- measurement-level lemmas; the delegated Section 5 repair lemmas use `classical`.
+/-- Measurement-level orthonormalization for a complete measurement.
+
+This is a source-shaped corollary of `lem:orthonormalization-main-lemma`; it
+does not assume the proof-stage spectral-truncation or repair data. -/
+lemma orthonormalizationMeasurement {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState (ι × ι))
+    (hψ : ψ.IsNormalized)
+    (A : Measurement Outcome ι) (ζ : Error)
+    (hζ : 0 ≤ ζ) :
+    BipartiteSSCRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A.toSubMeas) ζ →
+      ∃ P : ProjSubMeas Outcome ι,
+        SDDRel ψ (uniformDistribution Unit)
+          (constSubMeasFamily A.toSubMeas.liftLeft)
+          (constSubMeasFamily P.toSubMeas.liftLeft)
+          (orthonormalizationError ζ) := by
+  intro hssc
+  exact orthonormalizationMeasurement_of_consistency (ψ := ψ) (hψ := hψ)
+    (A := A) (B := A) (ζ := ζ) hζ
+    (bipartiteSSCRel_self_of_measurement (ψ := ψ) A ζ hssc)
+
+-- The direct repair-producer route below still uses `[DecidableEq Outcome]`
+-- through the concrete QXP-layer construction.
 set_option linter.unusedDecidableInType false in
 /-- Measurement-level orthonormalization from cross consistency, using the
 locality-preserving Section 5 repair construction directly.
