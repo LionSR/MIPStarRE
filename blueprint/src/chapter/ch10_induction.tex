@@ -695,11 +695,8 @@ assembly residual:
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.ofProjectiveEvaluationHandoffResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.toUnsymmetrizedPOVMTargets, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.toPreProjectiveSelfConsistency}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.projectivizationSelfConsistencyHandoff, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.fullPolynomialConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.projectiveEvaluationConsistency}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.pointAConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.pointBConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.toProjectiveStageTargets}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeRolePackagedCompletionTransportResidual, MIPStarRE.LDT.Test.MainFormalCascadeRolePackagedCompletionTransportResidual.toCompletionTransportResidual}
-\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageCompletionTransportResidual, MIPStarRE.LDT.Test.MainFormalPostRolePackageCompletionTransportResidual.toRolePackagedCompletionTransportResidual}
-\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageLeftCompletionTransportResidual, MIPStarRE.LDT.Test.MainFormalPostRolePackageLeftCompletionTransportResidual.toPostRolePackageCompletionTransportResidual}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualCompletionTransportResidual, MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualCompletionTransportResidual.toRolePackagedCompletionTransportResidual}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual, MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual.toRolePackageResidualCompletionTransportResidual}
+\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageLeftCompletionTransportResidual, MIPStarRE.LDT.Test.MainFormalPostRolePackageLeftCompletionTransportResidual.toCompletionTransportResidual}
+\lean{MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual, MIPStarRE.LDT.Test.MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual.toCompletionTransportResidual}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeTransportTargets, MIPStarRE.LDT.Test.MainFormalCascadeTransportTargets.toCascadeTargets, MIPStarRE.LDT.Test.MainFormalCascadeTargets.toNativeTargets}
 \lean{MIPStarRE.LDT.Test.MainFormalNativeTargets, MIPStarRE.LDT.Test.MainFormalNativeTargets.toMainFormal}
 They split off the vacuous branch where the theorem error is at least $1$,
@@ -737,9 +734,10 @@ closeness as returned by orthonormalize-and-complete, and the construction-level
 match-mass monotonicity invariant needed for the exact polynomial-level
 $\zeta_1$ transport links from paper line~169 and its role-reversed analogue.
 Lean reconstructs pre-projective full-polynomial consistency from the role
-residual and then uses the match-mass invariant to derive the two line-169 links;
-it also transports the Bob-side left-register completion estimate to the line-147
-right-register form before applying the older transport lemmas.
+residual, uses the match-mass invariant to derive the two line-169 links, and
+transports the Bob-side left-register completion estimate to the line-147
+right-register form before converting directly to the projective completion
+residual used by the final assembly.
 It no longer asks for an arbitrary role-measurement record or an arbitrary
 raw Section~6 witness as an independent field.  It also no longer asks for the two factor-two
 role-block estimates, the unused Section~6 consistency field inside
