@@ -732,11 +732,11 @@
           
           <li><a href="chap-projective.html#lem:X-times-X-hat">Lemma 4.32</a></li>
           
-          <li><a href="chap-projective.html#lem:squared-difference">Lemma 4.33</a></li>
+          <li><a href="chap-projective.html#lem:squared-difference">Lemma 4.34</a></li>
           
-          <li><a href="chap-projective.html#lem:P-projectivity">Lemma 4.34</a></li>
+          <li><a href="chap-projective.html#lem:P-projectivity">Lemma 4.35</a></li>
           
-          <li><a href="chap-projective.html#lem:P-Q-approx">Lemma 4.35</a></li>
+          <li><a href="chap-projective.html#lem:P-Q-approx">Lemma 4.36</a></li>
           
           <li><a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">Lemma 3.27</a></li>
           
@@ -951,11 +951,11 @@
           
           <li><a href="chap-projective.html#lem:X-times-X-hat">Lemma 4.32</a></li>
           
-          <li><a href="chap-projective.html#lem:squared-difference">Lemma 4.33</a></li>
+          <li><a href="chap-projective.html#lem:squared-difference">Lemma 4.34</a></li>
           
-          <li><a href="chap-projective.html#lem:P-projectivity">Lemma 4.34</a></li>
+          <li><a href="chap-projective.html#lem:P-projectivity">Lemma 4.35</a></li>
           
-          <li><a href="chap-projective.html#lem:P-Q-approx">Lemma 4.35</a></li>
+          <li><a href="chap-projective.html#lem:P-Q-approx">Lemma 4.36</a></li>
           
           <li><a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">Lemma 3.27</a></li>
           
@@ -988,7 +988,7 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>   Paper origin: <span class="ttfamily">references/ldt-paper/orthonormalization.tex</span> lines 534–860 (rank reduction and the \(Q\)-side setup, including <a href="chap-projective.html#lem:xa-t">4.26</a> and <a href="chap-projective.html#lem:qa-restated">4.27</a>) and 862–1194 (the \(X/\widehat X/P\) algebra: <a href="chap-projective.html#lem:X-squared">4.28</a>, <a href="chap-projective.html#lem:X-hat-squared">4.31</a>, <a href="chap-projective.html#lem:X-times-X-hat">4.32</a>, <a href="chap-projective.html#lem:squared-difference">4.33</a>, <a href="chap-projective.html#lem:P-projectivity">4.34</a>, <a href="chap-projective.html#lem:P-Q-approx">4.35</a>, plus the final triangle-inequality calculation producing the \(84\zeta ^{1/4}\) bound). Together these are the late repair stage of the orthogonalization-lemma proof. </p>
+  <p>   Paper origin: <span class="ttfamily">references/ldt-paper/orthonormalization.tex</span> lines 534–860 (rank reduction and the \(Q\)-side setup, including <a href="chap-projective.html#lem:xa-t">4.26</a> and <a href="chap-projective.html#lem:qa-restated">4.27</a>) and 862–1194 (the \(X/\widehat X/P\) algebra: <a href="chap-projective.html#lem:X-squared">4.28</a>, <a href="chap-projective.html#lem:X-hat-squared">4.31</a>, <a href="chap-projective.html#lem:X-times-X-hat">4.32</a>, <a href="chap-projective.html#lem:squared-difference">4.34</a>, <a href="chap-projective.html#lem:P-projectivity">4.35</a>, <a href="chap-projective.html#lem:P-Q-approx">4.36</a>, plus the final triangle-inequality calculation producing the \(84\zeta ^{1/4}\) bound). Together these are the late repair stage of the orthogonalization-lemma proof. </p>
 <p>Given a normalized bipartite state \(\lvert \psi  \rangle \), a measurement \(A = \{ A_a\} \), and the source almost-projective estimate for the left-lifted family \(\{ A_a \otimes I\} \), there exists a locality-preserving projective sub-measurement with error \(84\zeta ^{1/4}\). </p>
 <p>More precisely, if \(\lvert \psi  \rangle \) is a normalized bipartite state, if \(A = \{ A_a\} \) is a measurement, and if </p>
 <div class="displaymath" id="a0000000148">
@@ -2582,7 +2582,30 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The paper obtains this from the SVD formula for \(X\) and the definition of \(\widehat X\). The formal lemma <span class="ttfamily">rectangularSvd_xHat_mixed_of_sqrtQ</span> is the corresponding matrix calculation in the form whose square-root target is the operator \(Q\) supplied by the QXP construction. The formal lemma <span class="ttfamily">rectangularSvd_middle_eq_sqrt_of_square</span> records the spectral step: a positive middle factor whose square is \(Q\) is the positive square root of \(Q\). The reduced datum then records this mixed-product identity as a primitive consequence, which is exactly the part needed in <a href="chap-projective.html#lem:squared-difference">4.33</a> and <a href="chap-projective.html#lem:P-Q-approx">4.35</a>. The companion paper identity for \(X\widehat X^\dagger \) is not used downstream. </p>
+  <p> The paper obtains this from the SVD formula for \(X\) and the definition of \(\widehat X\). The formal lemma <span class="ttfamily">rectangularSvd_xHat_mixed_of_sqrtQ</span> is the corresponding matrix calculation in the form whose square-root target is the operator \(Q\) supplied by the QXP construction. The formal lemma <span class="ttfamily">rectangularSvd_middle_eq_sqrt_of_square</span> records the spectral step: a positive middle factor whose square is \(Q\) is the positive square root of \(Q\). The reduced datum then records this mixed-product identity as a primitive consequence, which is exactly the part needed in <a href="chap-projective.html#lem:squared-difference">4.34</a> and <a href="chap-projective.html#lem:P-Q-approx">4.36</a>. The companion paper identity for \(X\widehat X^\dagger \) is not used downstream. </p>
+
+  </div>
+</div>
+<div class="remark_thmwrapper theorem-style-remark" id="rem:qxp-layer-lean-status">
+  <div class="remark_thmheading">
+    <span class="remark_thmcaption">
+    Remark
+    </span>
+    <span class="remark_thmlabel">4.33</span>
+    <span class="remark_thmtitle">Lean status for the QXP algebra</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-projective.html#rem:qxp-layer-lean-status">#</a>
+    
+    
+    
+        </div>
+  </div>
+  <div class="remark_thmcontent">
+  <p> The Lean declarations linked in Lemmas&#160;<a href="chap-projective.html#lem:X-squared">4.28</a>, <a href="chap-projective.html#lem:X-hat-squared">4.31</a>, and&#160;<a href="chap-projective.html#lem:X-times-X-hat">4.32</a> record useful parts of the paper’s \(X,\widehat X,P\) algebra. The small lemmas named after these paper labels are projections from the structure <span class="ttfamily">QXPLayerData</span>; the accompanying construction lemmas build such data from sigma-range and rectangular-SVD ingredients. The blueprint therefore does not mark these three entries as source-complete formalizations until the cited identities are exposed as source-faithful construction theorems rather than hidden as fields of the data package. </p>
 
   </div>
 </div>
@@ -2591,7 +2614,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.33</span>
+    <span class="lemma_thmlabel">4.34</span>
     <span class="lemma_thmtitle">Squared difference</span>
     <div class="thm_header_extras">
 
@@ -2653,7 +2676,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.34</span>
+    <span class="lemma_thmlabel">4.35</span>
     <span class="lemma_thmtitle">Projectivity of&#160;\(P\)</span>
     <div class="thm_header_extras">
 
@@ -2720,7 +2743,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">4.35</span>
+    <span class="lemma_thmlabel">4.36</span>
     <span class="lemma_thmtitle">\(P\) is close to&#160;\(Q\)</span>
     <div class="thm_header_extras">
 
@@ -2771,7 +2794,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The formal proof follows this argument directly from the primitive \(X\), \(\widehat X\), and \(P\) identities; the \(30\zeta ^{1/4}\) estimate is derived here rather than stored as part of the reduced datum. The rectangular-SVD lemma combines the same estimate with the positive-square identification of the middle factor from <a href="chap-projective.html#lem:X-times-X-hat">4.32</a>. The positive-Gram sigma-space lemma also records the coisometry \(X X^\dagger =I\) for the original sigma embedding when the projective \(Q\)-family is subnormalized; this is the construction-level hypothesis later used in the residual-domination argument for the fresh completed outcome. The quantity to bound is </p>
+  <p> The formal proof follows this argument directly from the primitive \(X\), \(\widehat X\), and \(P\) identities; the \(30\zeta ^{1/4}\) estimate is derived here rather than stored as part of the reduced datum. The rectangular-SVD lemma combines the same estimate with the positive-square identification of the middle factor from <a href="chap-projective.html#lem:X-times-X-hat">4.32</a>. The positive-Gram sigma-space lemma also records the coisometry \(X X^\dagger =I\) for the original sigma embedding when the projective \(Q\)-family is subnormalized; this is the construction-level hypothesis later used in the residual-domination argument for the fresh completed outcome. As in Remark&#160;<a href="chap-projective.html#rem:qxp-layer-lean-status">4.33</a>, the statement is left without a source-complete formalization marker while the QXP package still hides some of the displayed SVD identities as structure fields. The quantity to bound is </p>
 <div class="equation" id="eq:P-Q-thing-to-bound">
 <p>
   <div class="equation_content">
@@ -2811,7 +2834,7 @@
 <div class="displaymath" id="a0000000243">
   \[  \sum _a \langle \psi  \rvert  \big(X_a^\dagger \cdot (X-\widehat X)(X-\widehat X)^\dagger \cdot X_a\big)\otimes I \lvert \psi  \rangle ,  \]
 </div>
-<p> times the square root of \(\sum _a \langle \psi  \rvert (P_a)^2 \otimes I \lvert \psi  \rangle  \leq 1\). The first factor is at most \(4\sqrt{\zeta }\) by <a href="chap-projective.html#lem:squared-difference">4.33</a>, <a href="chap-projective.html#lem:X-expression-to-Q-expression">4.29</a>, and <a href="chap-projective.html#lem:q-almost-projective">4.21</a>, so the total error is at most \(2\zeta ^{1/4}\). </p>
+<p> times the square root of \(\sum _a \langle \psi  \rvert (P_a)^2 \otimes I \lvert \psi  \rangle  \leq 1\). The first factor is at most \(4\sqrt{\zeta }\) by <a href="chap-projective.html#lem:squared-difference">4.34</a>, <a href="chap-projective.html#lem:X-expression-to-Q-expression">4.29</a>, and <a href="chap-projective.html#lem:q-almost-projective">4.21</a>, so the total error is at most \(2\zeta ^{1/4}\). </p>
 <p>The right-hand side of <a href="chap-projective.html#eq:add-a-hat">13</a> is real, because </p>
 <div class="displaymath" id="a0000000244">
   \[  \sum _a \langle \psi  \rvert  (X_a^\dagger \cdot \widehat{X} \cdot P_a)\otimes I \lvert \psi  \rangle  = \langle \psi  \rvert  (X^\dagger \cdot \widehat{X}) \otimes I \lvert \psi  \rangle  = \langle \psi  \rvert  \sqrt{Q} \otimes I \lvert \psi  \rangle ,  \]
@@ -2831,7 +2854,7 @@
 <div class="displaymath" id="a0000000247">
   \[  A_a \otimes I \approx _{12\sqrt{\zeta }} Q_a \otimes I,  \]
 </div>
-<p> and <a href="chap-projective.html#lem:P-Q-approx">4.35</a> gives </p>
+<p> and <a href="chap-projective.html#lem:P-Q-approx">4.36</a> gives </p>
 <div class="displaymath" id="a0000000248">
   \[  Q_a \otimes I \approx _{30\zeta ^{1/4}} P_a \otimes I.  \]
 </div>
