@@ -25,7 +25,14 @@ objects are not boundary conditions.
 
 Generated PR comments should name the theorem, lemma, definition, proof
 obligation, or paper-gap assertion directly and cite paper or blueprint path,
-line, label, and short quotation or precise paraphrase when available. You MUST
-fully close every lemma and theorem — never leave `sorry`, `admit`, `native_decide`
-on non-trivial goals, or any placeholder. Validate Lean changes with `lake build`
-before committing. Use GitHub MCP tools (`mcp__github__*`) to comment on the PR.
+line, label, and short quotation or precise paraphrase when available. Fully
+close ordinary proof holes whenever this can be done without changing the
+mathematical statement.  If a paper-labelled declaration has drifted away from
+the cited source statement, restore the source-faithful statement and leave the
+missing proof as a tracked `sorry` with a TODO and issue or paper-gap citation.
+This is preferable to preserving a theorem whose public statement contains
+non-paper bridge, residual, repair, package, producer, obligation, hypotheses,
+or assumptions data.  Never leave untracked `sorry`, `admit`,
+`native_decide` on non-trivial goals, or any placeholder. Validate Lean changes
+with `lake build` before committing. Use GitHub MCP tools (`mcp__github__*`) to
+comment on the PR.
