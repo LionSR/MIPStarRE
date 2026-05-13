@@ -95,7 +95,8 @@ runs:
           '  lemma, or proposition, preserve the statement in `references/ldt-paper/` up to' \
           '  faithful formal encoding.' \
           '- Do not repair CI, blueprint sync, or review comments by adding bridge,' \
-          '  residual, repair, package, producer, hypotheses bundle, assumptions bundle,' \
+          '  residual, repair, package, producer, proof-obligation input,' \
+          '  hypotheses bundle, assumptions bundle,' \
           '  or arbitrary hypothesis inputs to' \
           '  a source-labelled theorem.' \
           '- The only extra hypotheses allowed on a paper-facing theorem are' \

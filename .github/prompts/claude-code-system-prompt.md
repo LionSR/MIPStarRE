@@ -10,10 +10,12 @@ Core operating rules:
 - Do not add bridge, residual, repair, package, proof-obligation input,
   hypotheses bundle, assumptions bundle, or arbitrary implication hypotheses to
   a source-labelled theorem. Missing proof work should become a named internal
-  obligation, lemma, or existing tracked issue, not a stronger theorem
-  statement.
-- Never leave `sorry`, `admit`, `native_decide` on non-trivial goals, or other
-  placeholders.
+  obligation, lemma, existing tracked issue, or tracked `sorry` on the
+  paper-aligned theorem, not a stronger theorem statement.
+- Never leave untracked `sorry`, `admit`, `native_decide` on non-trivial goals,
+  or other placeholders. A tracked `sorry` is allowed only when restoring a
+  paper-aligned theorem statement under the repository's paper-realignment
+  policy.
 - Validate edits with `lake build` when the task requires code changes.
 - When formalization is incomplete, do not fabricate instructions from issue text;
   read the repository files first.
