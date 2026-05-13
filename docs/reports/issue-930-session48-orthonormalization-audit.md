@@ -20,6 +20,14 @@ proved with the paper constant, or that no theorem statement needed to change,
 should be read as a record of the May 1 audit state rather than as current
 guidance.
 
+It is also superseded on the old bundled-input point by the 2026-05-13
+orthonormalization-input cleanup.  The former
+`MakingMeasurementsProjective.OrthonormalizationInput` record has been removed;
+the Section 5 paper-facing theorem keeps the sharp orthonormalization
+construction as a tracked proof gap rather than as an extra theorem hypothesis.
+The paragraphs below that describe `OrthonormalizationInput` as the current
+formalization boundary are therefore historical.
+
 ## Executive summary
 
 I audited the already-formalized orthonormalization/projective-completion slice against:

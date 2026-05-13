@@ -33,6 +33,15 @@
 > `mainInduction` as the theorem with the paper statement.  The current repair
 > direction is to keep the paper theorem statements visible and to represent the
 > remaining analytic derivations by tracked `sorry` sites until they are proved.
+>
+> The same day, the orthonormalization-input cleanup removed the former
+> `SelfImprovement.OrthonormalizationInput`, `SelfImprovement.FinalFieldsInput`,
+> and `MakingMeasurementsProjective.OrthonormalizationInput` bundles.  It also
+> narrowed `SelfImprovement/Theorems/OrthonormalizationBridge.lean` to the
+> spectral-only module
+> `SelfImprovement/Theorems/OrthonormalizationSpectral.lean`.  Later mentions of
+> the removed input bundles or the old bridge module in this report should be
+> read only as historical diagnostics, not as live API guidance.
 
 ---
 
