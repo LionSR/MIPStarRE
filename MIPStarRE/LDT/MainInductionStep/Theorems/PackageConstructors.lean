@@ -269,43 +269,6 @@ noncomputable def AnswerPerSliceInductionPackage.ofMainInductionHypothesis
         (restrictionPkg.profile.diagonal x)
         k hd (restrictionPkg.profile.restrictedGood x) hk_pos hk
 
-/-- View an answer-valued per-slice induction package as a legacy package after
-forgetting the answer-valued restriction boundary.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:441-454`; this is a
-formalization-only conversion between answer-valued and legacy restricted-slice
-interfaces for the same recursive induction call.
-
-**Status:** currently unused (no callers).  The inverse direction
-`AnswerPerSliceInductionPackage.ofLegacy` and the combined
-`SelfImprovementPackage.ofAnswerForLegacy` are the live conversions used by the
-answer-valued self-improvement route.  This direction is retained for future
-callers that need to recover an ordinary `PerSliceInductionPackage` from an
-answer-valued one.
-
-**Route note:** the answer-valued route (using `xRestrictedAnswerSymStrat`) is
-the preferred paper-faithful route; see the section comment in
-`MIPStarRE.LDT.Test.MainTheorem` for context. -/
-noncomputable def PerSliceInductionPackage.ofAnswer
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (k : ℕ)
-    (restrictionPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma)
-    (answerInduction :
-      AnswerPerSliceInductionPackage params strategy eps delta gamma restrictionPkg k) :
-    PerSliceInductionPackage params strategy eps delta gamma
-      (SliceRestrictionPackage.ofAnswer params strategy eps delta gamma restrictionPkg) k where
-  sliceError := answerInduction.sliceError
-  sliceMeasurement := answerInduction.sliceMeasurement
-  pointConsistency := by
-    intro x
-    simpa using answerInduction.pointConsistency x
-  error_le := by
-    intro x
-    simpa [SliceRestrictionPackage.ofAnswer] using answerInduction.error_le x
-
 /-- View a legacy per-slice induction package over an answer-forgotten restriction
 package as an answer-valued package.
 
