@@ -5,6 +5,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperSSC
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport
 import MIPStarRE.LDT.SelfImprovement.Theorems.AddInUFullStatement
 
@@ -232,21 +233,78 @@ lemma selfImprovementHelper
   · exact
       helper_point_consistency_of_pointConsistencyAddInU_transfer
         params strategy eps delta heps hdelta hpointTransfer
-  · /- TODO(#1514): Derive `HelperStrongSelfConsistencyObligations` for the
-      helper output from the Section 9 scalar transport estimates, then prove this
-      condition with `helper_strong_self_consistency_of_helper_conclusion` or
-      `helper_strong_self_consistency_input_of_obligations`.
-
-      This route currently uses the five estimates required by
-      the scalar-transport constructor for
-      `HelperStrongSelfConsistencyObligations`:
-      the two off-diagonal variance swaps, the two post-`delete-an-A` transports,
-      and the final lower bound on the `move-over-v` endpoint.  Its final
-      absorption also uses the small-error condition `(params.d : Error) ≤
-      (params.q : Error)`.  This boundary must be justified from the paper
-      hypotheses or handled by a separate saturated-error branch; it should not be
-      added as an extra hypothesis to `selfImprovementHelper`. -/
-    sorry
+  · by_cases hd_le_q : (params.d : Error) ≤ (params.q : Error)
+    · have hlocal :
+          (∑ g : Polynomial params,
+            localVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g) ≤
+            localVarianceOfPointsError params eps delta :=
+        localVarianceDeviation_sum_le_localVarianceOfPointsError
+          params strategy eps delta gamma hgood T.toSubMeas
+      have hclone :
+          |helperDeleteAQuantity params strategy T.toSubMeas -
+            helperDeleteAClonedQuantity params strategy T.toSubMeas| ≤
+              Real.sqrt (selfImprovementVarianceError params eps delta) :=
+        helperDeleteAQuantity_abs_sub_clonedQuantity_le_sqrt
+          params strategy eps delta T.toSubMeas hlocal
+      have hmove :
+          |helperDeleteAClonedQuantity params strategy T.toSubMeas -
+            helperMoveOverVQuantity params strategy T.toSubMeas| ≤
+              Real.sqrt (2 * delta) :=
+        helperDeleteAClonedQuantity_abs_sub_moveOverVQuantity_le_sqrt_two_delta
+          params strategy delta T.toSubMeas hpointSSC
+      have hsscObligations :
+          HelperStrongSelfConsistencyObligations params strategy T Hhat eps delta :=
+        helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_scalarTransports_pointTransfer
+          params strategy eps delta hhelper hpointSSC hlocal hclone hmove
+          (fun h => helper_slackness_eq_of_helper_with_slackness
+            params strategy eps delta hhelperWithSlackness h)
+          hpointTransfer
+      exact
+        helper_strong_self_consistency_of_helper_conclusion
+          params strategy eps delta heps hdelta hd_le_q hhelper hsscObligations
+    · have hhelperError_ge_one : 1 ≤ selfImprovementHelperError params eps delta := by
+        have hdq_ge_one : 1 ≤ ((params.d : Error) / (params.q : Error)) := by
+          exact (one_le_div₀ params.q_cast_pos).2 (le_of_lt (lt_of_not_ge hd_le_q))
+        have hsqrt_dq_ge_one : 1 ≤ Real.sqrt ((params.d : Error) / (params.q : Error)) := by
+          have hdq_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) :=
+            d_q_ratio_nonneg params
+          have hsqrt_nonneg : 0 ≤ Real.sqrt ((params.d : Error) / (params.q : Error)) :=
+            Real.sqrt_nonneg _
+          have hsq :
+              Real.sqrt ((params.d : Error) / (params.q : Error)) *
+                Real.sqrt ((params.d : Error) / (params.q : Error)) =
+                ((params.d : Error) / (params.q : Error)) := by
+            simpa [sq] using Real.sq_sqrt hdq_nonneg
+          nlinarith
+        have hsqrt_eps_nn : 0 ≤ Real.sqrt eps := Real.sqrt_nonneg _
+        have hsqrt_delta_nn : 0 ≤ Real.sqrt delta := Real.sqrt_nonneg _
+        rw [selfImprovementHelperError_eq]
+        nlinarith [one_le_m_cast params, hsqrt_dq_ge_one, hsqrt_eps_nn, hsqrt_delta_nn]
+      have hmatch_nonneg : 0 ≤ qBipartiteMatchMass strategy.state Hhat Hhat := by
+        unfold qBipartiteMatchMass
+        exact Finset.sum_nonneg fun h _ =>
+          ev_nonneg_of_psd strategy.state _ <|
+            opTensor_nonneg (Hhat.outcome_pos h) (Hhat.outcome_pos h)
+      have hmass_le_one : subMeasMass strategy.state Hhat.liftLeft ≤ 1 := by
+        unfold subMeasMass SubMeas.liftLeft
+        have hle : leftTensor (ι₂ := ι) Hhat.total ≤
+            (1 : MIPStarRE.Quantum.Op (ι × ι)) :=
+          leftTensor_le_one (ι₂ := ι) Hhat.total_le_one
+        simpa [ev_one_of_isNormalized strategy.state strategy.isNormalized] using
+          ev_mono strategy.state _ _ hle
+      have hssc_defect_le_one : qBipartiteSSCDefect strategy.state Hhat ≤ 1 := by
+        unfold qBipartiteSSCDefect
+        have hinner :
+            subMeasMass strategy.state Hhat.liftLeft -
+                qBipartiteMatchMass strategy.state Hhat Hhat ≤ 1 := by
+          linarith
+        exact max_le_iff.mpr ⟨by positivity, hinner⟩
+      have hssc_le_one :
+          bipartiteSSCError strategy.state (uniformDistribution Unit)
+            (constSubMeasFamily Hhat) ≤ 1 := by
+        simpa [bipartiteSSCError, avgOver, uniformDistribution, constSubMeasFamily] using
+          hssc_defect_le_one
+      exact ⟨le_trans hssc_le_one hhelperError_ge_one⟩
   · exact
       helper_boundedness_gap_le_selfImprovementHelperError_of_helper_outputs
         params strategy eps delta heps hdelta hhelper hpointSSC
