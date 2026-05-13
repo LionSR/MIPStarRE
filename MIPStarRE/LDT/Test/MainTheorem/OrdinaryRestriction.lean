@@ -9,9 +9,8 @@ sub-leaves:
 
 * `OrdinaryRestriction.Basic` — successor weighted bounds
   (`MainFormalSuccessorAxisWeightedBound`, `MainFormalSuccessorDiagonalWeightedBound`),
-  recursive slice witnesses (`MainFormalSuccessorRecursiveSlices`),
-  the self-improvement input (`MainFormalSuccessorSelfImprovementObligation`),
-  and the successor boundary structure (`MainFormalSuccessorBoundary`).
+  the restricted-probability package, and recursive slice witnesses
+  (`MainFormalSuccessorRecursiveSlices`).
 
 * `OrdinaryRestriction.SliceData` — per-slice recursive data
   (`MainFormalSuccessorRecursiveSliceData`) and the probabilistic bounds on
@@ -20,9 +19,10 @@ sub-leaves:
   `mainFormalSuccessorRestrictedAxisParallel_le_ofSliceData`,
   `mainFormalSuccessorRestrictedDiagonal_le_ofSliceData`).
 
-* `OrdinaryRestriction.PublicWrapper` — the public theorem
-  `mainFormalSuccessorMainInductionPublicWrapper` that converts a bundle of
-  predecessor Section 6 inputs into a role-register measurement.
+* `OrdinaryRestriction.PublicWrapper` — a compatibility import.  Its former
+  conditional handoff has been removed because it took non-paper successor data
+  as hypotheses; the remaining Section 6 proof obligation is now the
+  source-facing `mainInduction` theorem.
 
 ## References
 

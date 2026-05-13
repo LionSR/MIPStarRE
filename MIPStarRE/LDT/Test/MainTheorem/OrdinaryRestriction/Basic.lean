@@ -3,8 +3,9 @@ import MIPStarRE.LDT.Test.MainTheorem.ClassicalAndBase
 /-!
 # Ordinary restricted-slice recursion: basic inputs
 
-This module contains the ordinary successor-route input types and the successor
-boundary record used by the Section 6 main theorem interface.
+This module contains the ordinary successor-route restricted-probability and
+recursive-slice targets used when comparing the Section 3 proof with the
+successor case of Section 6.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -17,9 +18,12 @@ namespace Test
 
 The declarations in this section form the **ordinary successor route**, which
 uses `xRestrictedStrategy` (ordinary diagonal restriction) as the per-slice
-recursive strategy.  This route is kept as a compatibility interface: it
-provides `MainFormalSuccessorBoundary` and the associated helper declarations, which feed
-into the `MainFormalRolePackageBranchResidual.successor` constructor.
+recursive strategy.  This route is kept only at the level of the source
+mathematics that remains useful: weighted restricted-probability targets and
+recursive-slice targets.  The former conditional boundary record, which bundled
+unproved self-improvement input into a Section 3 handoff, has been removed; the
+missing successor proof is represented by the source-facing `mainInduction`
+proof obligation instead.
 
 **Note:** `xRestrictedStrategy` uses `restrictDiagonalMeasurement`, which
 post-processes the diagonal outcome to the `zeroCoord` readout and re-embeds it
@@ -79,7 +83,7 @@ noncomputable def mainFormalSuccessorRestrictionPackage
     haxisWeightedBound hdiagonalWeightedBound
 
 /-- Successor-case recursive slice witnesses expected by the public Section 6
-boundary interface. -/
+successor analysis. -/
 def MainFormalSuccessorRecursiveSlices (params : Parameters)
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -105,8 +109,8 @@ def MainFormalSuccessorRecursiveSlices (params : Parameters)
           (hrestrict.profile.selfConsistency x)
           (hrestrict.profile.diagonal x)
 
-/-- A Section 6 per-slice induction record supplies the recursive slice
-witnesses needed by the `mainFormal` successor boundary.
+/-- A Section 6 per-slice induction record supplies the ordinary recursive
+slice witnesses used in the successor analysis.
 
 This constructor is only a translation: the proof must still provide the
 `PerSliceInductionPackage` from a genuine predecessor induction hypothesis. It
@@ -131,68 +135,6 @@ theorem mainFormalSuccessorRecursiveSlices_ofInductionPackage
   exact
     ⟨hinduction.sliceError x, hinduction.sliceMeasurement x,
       hinduction.pointConsistency x, hinduction.error_le x⟩
-
-/-- Successor-case restricted-strategy self-improvement obligation expected by the
-public Section 6 boundary.
-
-Paper origin: the successor branch of `thm:main-induction` in
-`references/ldt-paper/inductive_step.tex:352-386` and the slice-wise
-self-improvement step in `references/ldt-paper/inductive_step.tex:441-490`. -/
-def MainFormalSuccessorSelfImprovementObligation (params : Parameters)
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
-    (haxisWeightedBound : MainFormalSuccessorAxisWeightedBound params strategy eps)
-    (hdiagonalWeightedBound :
-      MainFormalSuccessorDiagonalWeightedBound params strategy eps) : Type _ :=
-  let hrestrict :=
-    mainFormalSuccessorRestrictionPackage params strategy eps hpass
-      haxisWeightedBound hdiagonalWeightedBound
-  ∀ hinduction :
-    MainInductionStep.PerSliceInductionPackage params
-      strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) hrestrict k,
-    MainInductionStep.SelfImprovementPackage params
-      strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) k
-      hrestrict hinduction
-
-/-- Successor-case Section 6 boundary inputs for `mainFormal`.
-
-Assume the ambient projective strategy lives over `params.next`. Step 1 already
-turns `hpass` into the `(3 * eps, 3 * eps, 3 * eps)`-good role-register
-symmetrization `strategy.strategySymmetrization`. The public Section 6 interface
-expects:
-1. weighted restricted-axis and restricted-diagonal bounds,
-2. recursive slice witnesses for the restricted strategies, and
-3. a restricted-strategy self-improvement obligation.
-
-The helper lemmas below now discharge the weighted fields from `hpass`; grouping
-all fields into a single named structure still gives the successor branch of
-`mainFormal` one honest issue-#634 interface, rather than four independent
-hypothesis holes.
-
-**Unfaithful:** as a supplied boundary this structure contains recursive
-slice witnesses and a self-improvement obligation that are not hypotheses of
-`thm:main-formal` (`references/ldt-paper/test_definition.tex:180-202`).  They
-must be produced inside the proof of `mainFormal`, using the successor proof of
-`thm:main-induction`
-(`references/ldt-paper/inductive_step.tex:441-551`).  This is tracked by
-#1035, #1036, #1363, and #1458.  Elimination: prove the recursive-slice and
-self-improvement fields before using this boundary record in the successor
-branch of `mainFormal`. -/
-structure MainFormalSuccessorBoundary (params : Parameters)
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ) where
-  axisWeightedBound :
-    MainFormalSuccessorAxisWeightedBound params strategy eps
-  diagonalWeightedBound :
-    MainFormalSuccessorDiagonalWeightedBound params strategy eps
-  recursiveSlices :
-    MainFormalSuccessorRecursiveSlices params strategy eps hpass k
-      axisWeightedBound diagonalWeightedBound
-  selfImprovementObligation :
-    MainFormalSuccessorSelfImprovementObligation params strategy eps hpass k
-      axisWeightedBound diagonalWeightedBound
 
 /-- The public restricted-probabilities theorem supplies the successor-case
 weighted axis-parallel input for the role-register symmetrization used by
@@ -221,38 +163,6 @@ theorem mainFormalSuccessorDiagonalWeightedBound_ofPass
     strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps)
     (SameSpaceProjStrat.strategySymmetrization_isGood_three_mul
       (strategy := strategy) (eps := eps) hpass)
-
-/-- Build the successor boundary once the two still-external slice-recursion and
-restricted-strategy self-improvement inputs are supplied. The weighted
-restricted-probability fields are now discharged from `hpass` by the public
-Section 6 weighted-bound lemmas.
-
-**Unfaithful:** this conditional constructor assumes the recursive slice data
-and self-improvement obligation rather than deriving them from
-`references/ldt-paper/test_definition.tex:180-202` and
-`references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by #1035,
-#1036, #1363, and #1458.  Elimination: construct these inputs inside the
-successor branch of `mainFormal` and use this constructor only after the inputs
-have been proved. -/
-def mainFormalSuccessorBoundary_ofRecursiveSelfImprovement
-    (params : Parameters) [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
-    (hrec : MainFormalSuccessorRecursiveSlices params strategy eps hpass k
-      (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
-      (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass))
-    (hself : MainFormalSuccessorSelfImprovementObligation params strategy eps hpass k
-      (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
-      (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass)) :
-    MainFormalSuccessorBoundary params strategy eps hpass k :=
-  let axisBound := mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass
-  let diagonalBound :=
-    mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass
-  { axisWeightedBound := axisBound
-    diagonalWeightedBound := diagonalBound
-    recursiveSlices := hrec
-    selfImprovementObligation := hself }
 
 end Test
 

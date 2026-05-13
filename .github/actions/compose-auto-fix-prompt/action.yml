@@ -117,11 +117,11 @@ runs:
           '  to a theorem whose public statement has been weakened by non-paper' \
           '  assumptions.' \
           '- Do not introduce a conditional helper, proof-debt bundle, producer, or' \
-          '  obligation package as a CI-fix strategy. Existing conditional helpers may' \
-          '  be edited only to reduce proof debt, preserve already separated proof' \
-          '  content, or improve traceability; keep them separately named as' \
-          '  conditional, keep them out of source-labelled `\leanok`, and identify' \
-          '  the exact obligation that will remove them.' \
+          '  obligation package as a CI-fix strategy. Existing conditional helpers' \
+          '  should be deleted, replaced by source-facing theorems with tracked' \
+          '  `sorry`, or retained only when a maintainer has identified a specific' \
+          '  mathematical construction theorem whose proof content they preserve.' \
+          '  They must stay out of source-labelled `\leanok`.' \
           '- When in doubt, restore the paper-aligned theorem statement and expose the' \
           '  missing proof obligation; do not turn the paper theorem into a conditional' \
           '  theorem.')"

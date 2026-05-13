@@ -534,6 +534,44 @@ theorem helper_point_consistency_of_pointConsistencyAddInU_transfer
     pointConsistencyAddInU_off_diagonal_avg_le_helper_error_of_transfer
       params strategy eps delta heps hdelta T Hhat htransfer
 
+/-- Helper-stage point consistency obtained directly from the selected
+add-in-`u` chain.
+
+The hypotheses are the two analytic inputs used by the selected four-step
+chain: bipartite self-consistency for the point measurement, and the
+global-variance sum bound for the polynomial submeasurement `T`.  The helper
+submeasurement is the averaged sandwiched polynomial submeasurement built from
+`T`, exactly as in the helper-stage application. -/
+theorem helper_point_consistency_of_selected_chain_selfConsistency_globalVariance
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
+    (T : SubMeas (Polynomial params) ι)
+    (hssc : BipartiteSSCRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta)
+    (hglobal :
+      (∑ g : Polynomial params,
+        globalVarianceDeviationAtPolynomial params strategy strategy.state T g) ≤
+          selfImprovementVarianceError params eps delta) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params
+        (averagedSandwichedPolynomialSubMeas params strategy T))
+      (selfImprovementHelperError params eps delta) := by
+  exact
+    helper_point_consistency_of_pointConsistencyAddInU_transfer
+      (params := params)
+      (strategy := strategy)
+      (eps := eps)
+      (delta := delta)
+      (heps := heps)
+      (hdelta := hdelta)
+      (T := T)
+      (Hhat := averagedSandwichedPolynomialSubMeas params strategy T)
+      (pointConsistencyAddInU_transfer_of_selected_chain_selfConsistency_globalVariance
+        params strategy eps delta heps hdelta T hssc hglobal)
+
 /-- Natural-error transport of point consistency from the helper output to the
 projective output, with the submeasurement total-overlap displacement stated
 explicitly.
@@ -1072,6 +1110,77 @@ theorem final_fields_point_consistency_of_total_expectation_le_of_small_errors
     (final_fields_projective_residual_error_le_selfImprovementError
       params eps delta heps heps_le_one hdelta hdelta_le_one hd_le_q)
     (final_fields_point_consistency_natural_of_total_expectation_le
+      params strategy eps delta hhelperPoint hdata hTotalLe)
+
+/-- Natural-error point-consistency transport from operator right-total
+monotonicity.
+
+The operator inequality `H.total ≤ Hhat.total` implies the scalar right-total
+comparison after placing both operators on the right tensor factor and taking
+expectation in the shared state. -/
+theorem final_fields_point_consistency_natural_of_total_operator_le
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    {Hhat : SubMeas (Polynomial params) ι}
+    {H : ProjSubMeas (Polynomial params) ι}
+    (hhelperPoint :
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params Hhat)
+        (selfImprovementHelperError params eps delta))
+    (hdata :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftLeft)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+        (selfImprovementDataProcessingError params eps delta))
+    (hTotalLe : H.toSubMeas.total ≤ Hhat.total) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params H.toSubMeas)
+      (selfImprovementHelperError params eps delta +
+        Real.sqrt (selfImprovementDataProcessingError params eps delta)) := by
+  have hTotalExpectationLe :
+      ev strategy.state (rightTensor (ι₁ := ι) H.toSubMeas.total) ≤
+        ev strategy.state (rightTensor (ι₁ := ι) Hhat.total) := by
+    exact ev_mono strategy.state _ _ (MIPStarRE.LDT.rightTensor_mono hTotalLe)
+  exact
+    final_fields_point_consistency_natural_of_total_expectation_le
+      params strategy eps delta hhelperPoint hdata hTotalExpectationLe
+
+/-- Literal-threshold point-consistency transport from operator right-total
+monotonicity and the standard small-error hypotheses.
+
+This is the operator-order version of
+`final_fields_point_consistency_of_total_expectation_le_of_small_errors`. -/
+theorem final_fields_point_consistency_of_total_operator_le_of_small_errors
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (heps_le_one : eps ≤ 1)
+    (hdelta : 0 ≤ delta) (hdelta_le_one : delta ≤ 1)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error))
+    {Hhat : SubMeas (Polynomial params) ι}
+    {H : ProjSubMeas (Polynomial params) ι}
+    (hhelperPoint :
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params Hhat)
+        (selfImprovementHelperError params eps delta))
+    (hdata :
+      SDDRel strategy.state (uniformDistribution (Point params))
+        ((polynomialEvaluationFamily params Hhat).liftLeft)
+        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
+        (selfImprovementDataProcessingError params eps delta))
+    (hTotalLe : H.toSubMeas.total ≤ Hhat.total) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params H.toSubMeas)
+      (selfImprovementError params eps delta) :=
+  MIPStarRE.LDT.ConsRel.mono
+    (final_fields_projective_residual_error_le_selfImprovementError
+      params eps delta heps heps_le_one hdelta hdelta_le_one hd_le_q)
+    (final_fields_point_consistency_natural_of_total_operator_le
       params strategy eps delta hhelperPoint hdata hTotalLe)
 
 /-- Literal-threshold point-consistency transport with the data-processing
