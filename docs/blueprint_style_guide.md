@@ -53,10 +53,14 @@ they express the mathematical domain that the paper leaves implicit.  By
 contrast, bridge inputs, residual data, repair hypotheses, producer
 assumptions, proof-obligation inputs, or package assumptions are proof debt.
 They must not be added to a source-labelled theorem statement.  If such data is
-temporarily useful, record it only in a separately named conditional helper,
-with a paper source, a tracking issue, and a removal plan.  The blueprint should
-leave the paper theorem unmarked as fully matched until a source-faithful Lean
-statement exists.
+still unproved, the source-labelled Lean theorem should keep the source-shaped
+statement and carry a tracked `sorry`, or the missing assertion should appear
+as the lowest named internal obligation with a tracked `sorry`.  A separately
+named conditional helper is acceptable only as a temporary quarantine for
+substantial proof content that already exists; it needs a paper source, a
+tracking issue, and a removal plan.  The blueprint should leave the paper
+theorem unmarked as proof-complete until the source-faithful Lean statement has
+a source-faithful proof.
 
 If a Lean theorem proves only a restricted version of a source theorem, the
 blueprint entry carrying `\leanok` must state that restriction in the theorem
