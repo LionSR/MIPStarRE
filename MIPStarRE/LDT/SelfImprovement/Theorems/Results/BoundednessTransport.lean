@@ -105,7 +105,8 @@ SDD bound. The lemma below isolates the second step: it transports the scalar
 helper boundedness gap across
 `selfConsistencyImpliesDataProcessing`.
 
-This is not a raw residual assumption and does not restate a bundled final-fields input;
+This is not an additional residual hypothesis and does not restate a combined
+final-fields hypothesis block;
 it is the checked `easy-approx-from-approx-delta` part of
 `references/ldt-paper/self_improvement.tex` lines 747--755, mirrored in
 `blueprint/src/chapter/ch07_self_improvement.tex` lines 609--618. -/
@@ -1755,8 +1756,8 @@ submeasurement is dominated by `Z ⊗ I`: the total bound `A.total ≤ 1 ≤ Z` 
 by monotonicity to `leftTensor A.total ≤ leftTensor Z`, and evaluation against
 the state preserves this order. Consequently `bndError ψ A.liftLeft (Z ⊗ I) = 0`,
 so the boundedness statement holds at any nonnegative tolerance. The
-`selfImprovement` assembly uses this constructor instead of requiring a bundled
-boundedness-field input. -/
+`selfImprovement` assembly uses this constructor instead of requiring a combined
+boundedness-field hypothesis. -/
 theorem final_fields_bounded
     {α : Type*} [Fintype α]
     (ψ : QuantumState (ι × ι))

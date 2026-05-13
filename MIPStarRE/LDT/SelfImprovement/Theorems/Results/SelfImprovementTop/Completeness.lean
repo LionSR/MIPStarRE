@@ -22,8 +22,8 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-! ## Final-fields completeness construction
 
-Earlier scaffolding bundled several paper-side final-field obligations into one
-residual. The lemmas below isolate the **completeness** field, exposing
+The earlier interface combined several paper-side final-field obligations into
+one hypothesis block. The lemmas below isolate the **completeness** field, exposing
 the precise analytic ingredient that remains — the helper-stage
 completeness lower bound on `Hhat.liftLeft` — and discharging the rest of the
 transport algebra (orthonormalization SDD step) with a checked proof.
@@ -36,7 +36,7 @@ proved in `Preliminaries.SelfConsistency.Extensions`) to the
 self-improvement parameters and yields the precise `(1 - nu) - δ - 2 √ε`
 target on `H.toSubMeas.liftLeft`.
 
-This does **not** add a raw residual: the residual hypothesis has been narrowed
+This does **not** add an additional residual hypothesis: the hypothesis has been narrowed
 to the single named paper obligation
 `hhelperCompleteness`, which corresponds to `self_improvement.tex` lines
 351--414 (helper completeness, especially the Cauchy--Schwarz step at lines
@@ -163,7 +163,7 @@ construction may prove the paper's tighter `1 - ν - 3√δ` bound and then weak
 to this threshold.
 
 It does **not** assume the projective completeness it produces, and it does
-**not** restate a bundled final-fields input. -/
+**not** restate a combined final-fields hypothesis block. -/
 theorem final_fields_completeness_of_helper_completeness
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)

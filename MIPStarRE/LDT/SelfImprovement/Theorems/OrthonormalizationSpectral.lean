@@ -14,11 +14,11 @@ one isolated in `references/ldt-paper/orthonormalization.tex`:
 * the **spectral-truncation** step (`lem:projective-non-measurement`) on the
   option-completed, left-lifted helper measurement.
 
-This module deliberately does not expose a bundled `OrthonormalizationInput` or
-a locality-preserving repair hypothesis.  The paper-facing self-improvement
-theorem keeps the remaining orthonormalization construction as the tracked proof
-gap in `selfImprovement`, rather than replacing it by an extra theorem
-hypothesis.
+This module deliberately does not state a single `OrthonormalizationInput`
+hypothesis or a locality-preserving repair hypothesis.  The paper-facing
+self-improvement theorem keeps the remaining orthonormalization construction as
+an unproved obligation in `selfImprovement`, rather than replacing it by an
+extra theorem hypothesis.
 
 ## What this file provides
 
@@ -42,8 +42,9 @@ hypothesis.
 * `references/ldt-paper/self_improvement.tex` lines 679–697
   (helper output `\widehat{H}` is fed to `thm:orthonormalization`).
 * The current source-facing self-improvement tracker #1515: the remaining
-  orthonormalization construction is kept as a proof gap on the paper-facing
-  theorem, with only the spectral-truncation conversion recorded here.
+  orthonormalization construction is left as an unproved obligation on the
+  paper-facing theorem, with only the spectral-truncation conversion recorded
+  here.
 -/
 
 namespace MIPStarRE.LDT.SelfImprovement
@@ -74,8 +75,8 @@ measurement `optionCompletion Hhat`, at error
 `consistencyToAlmostProjectiveError (2 * ζ_helper)`.
 
 This isolates only the spectral-truncation part of the construction; the
-remaining locality-preserving repair is left inside the tracked proof gap for
-the paper-facing theorem. -/
+remaining locality-preserving repair remains an unproved obligation in the
+paper-facing theorem. -/
 abbrev OrthonormalizationSpectralObligation
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (eps delta : Error) :=

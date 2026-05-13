@@ -40,10 +40,10 @@ giving the final `3 * (ε + 2δ + ε)` bound. The remaining gap to the literal
 `selfImprovementError` threshold used inside `SelfImprovementFinalFields` is a
 separate numerical comparison on the explicit error definitions.
 
-This is **not** a raw residual: this construction derives the entire
+This is **not** an additional residual hypothesis: this construction derives the entire
 `selfCloseness` field from data already present in the `selfImprovement`
 proof. It does not assume the projective self-closeness it produces and does
-not restate a bundled final-fields input.
+not restate a combined final-fields hypothesis block.
 
 Paper anchors:
 * `references/ldt-paper/self_improvement.tex` lines 727--741 — projective
