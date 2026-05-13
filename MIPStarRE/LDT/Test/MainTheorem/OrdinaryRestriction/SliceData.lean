@@ -349,66 +349,23 @@ theorem mainFormalSuccessorRecursiveSlices_ofSliceData
   refine ⟨error, G, ?_, herr⟩
   -- Rewrite the state and point measurement using the slice-data compatibilities
   simpa [sliceData.sliceState_eq x, sliceData.slicePoint_eq x] using hG
-/-- Build the successor boundary from obligations instead of the
-already constructed self-improvement obligation.
-
-This is the public-facing constructor for issue #1020: it wires the honest
-per-slice restricted-strategy transport data through the existing
-`mainFormalSuccessorSelfImprovementObligation_ofObligations` conversion and
-records them together with the weighted restricted-probability fields and
-the recursive slice witnesses into a `MainFormalSuccessorBoundary`.
-
-The weighted restricted-probability fields are discharged from `hpass`
-by the public Section 6 weighted-bound lemmas, matching the pattern of
-`mainFormalSuccessorBoundary_ofRecursiveSelfImprovement`.
-
-**Unfaithful:** this constructor assumes recursive slice witnesses and
-per-slice self-improvement obligations, rather than deriving them from
-`references/ldt-paper/test_definition.tex:180-202` and
-`references/ldt-paper/inductive_step.tex:441-551`.  This is tracked by #1035,
-#1036, #1363, and #1458.  Elimination: prove the recursive predecessor
-induction data and the restricted-slice transports inside the successor branch
-of `mainFormal`, then use this declaration only to record their combination. -/
-noncomputable def mainFormalSuccessorBoundary_ofObligations
-    (params : Parameters) [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
-    (hrec : MainFormalSuccessorRecursiveSlices params strategy eps hpass k
-      (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
-      (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass))
-    (obligations : MainFormalSuccessorSelfImprovementObligations params strategy eps hpass k
-      (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
-      (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass)) :
-    MainFormalSuccessorBoundary params strategy eps hpass k :=
-  let axisBound := mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass
-  let diagonalBound :=
-    mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass
-  { axisWeightedBound := axisBound
-    diagonalWeightedBound := diagonalBound
-    recursiveSlices := hrec
-    selfImprovementObligation :=
-      mainFormalSuccessorSelfImprovementObligation_ofObligations params strategy eps hpass k
-        axisBound diagonalBound obligations }
-
 /-- Build the successor boundary from an explicit predecessor induction
-hypothesis and the restricted-slice structural inputs.
+hypothesis and a self-improvement input.
 
 The predecessor hypothesis is stated at the exact Section 6 strength consumed by
 `MainFormalSuccessorRecursiveSlices`: for each restricted slice it supplies a
 polynomial measurement bounded by the restricted-profile
-`mainInductionError`. This helper is non-recursive; it only transports those
-slice witnesses across `MainFormalSuccessorRecursiveSliceData` and then reuses
-`mainFormalSuccessorBoundary_ofObligations`.
+`mainInductionError`.  This helper is non-recursive; it only transports those
+slice witnesses across `MainFormalSuccessorRecursiveSliceData` and combines the
+result with the supplied self-improvement input.
 
 **Unfaithful:** this helper assumes the predecessor induction witnesses,
-same-space slice data, and restricted-slice transport data, none of which are
+same-space slice data, and the self-improvement input, none of which are
 hypotheses of `thm:main-formal`
 (`references/ldt-paper/test_definition.tex:180-202`).  This is tracked by
 #1035, #1036, #1363, and #1458.  Elimination: derive the predecessor witnesses
-and slice transports from the successor proof of `thm:main-induction`
-(`references/ldt-paper/inductive_step.tex:441-551`) before using this transport
-helper. -/
+and self-improvement input from the successor proof of `thm:main-induction`
+(`references/ldt-paper/inductive_step.tex:441-551`). -/
 noncomputable def mainFormalSuccessorBoundary_ofPredecessorInduction
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -431,16 +388,16 @@ noncomputable def mainFormalSuccessorBoundary_ofPredecessorInduction
             (hrestrict.profile.axisParallel x)
             (hrestrict.profile.selfConsistency x)
             (hrestrict.profile.diagonal x))
-    (obligations : MainFormalSuccessorSelfImprovementObligations params strategy eps hpass k
+    (hself : MainFormalSuccessorSelfImprovementObligation params strategy eps hpass k
       (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
       (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass)) :
     MainFormalSuccessorBoundary params strategy eps hpass k :=
-  mainFormalSuccessorBoundary_ofObligations params strategy eps hpass k
+  mainFormalSuccessorBoundary_ofRecursiveSelfImprovement params strategy eps hpass k
     (mainFormalSuccessorRecursiveSlices_ofSliceData params strategy eps hpass k
       (mainFormalSuccessorAxisWeightedBound_ofPass params strategy eps hpass)
       (mainFormalSuccessorDiagonalWeightedBound_ofPass params strategy eps hpass)
       sliceData hpredecessor)
-    obligations
+    hself
 
 end Test
 
