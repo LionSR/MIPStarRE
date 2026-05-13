@@ -3,6 +3,12 @@ name: Statement-like paper-origin guard
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+    paths:
+      - 'MIPStarRE/LDT/**/*.lean'
+      - 'scripts/check_statement_paper_origin.py'
+      - 'scripts/check_oversized_lean_files.py'
+      - 'scripts/tests/test_check_statement_paper_origin.py'
+      - '.github/workflows/statement-paper-origin.yml'
 
 # Blocking guard for the issue #1379 earn-your-place policy: every
 # Statement/Witness/Hypotheses/Conclusion/Input/Assumptions/Bridge/Producer/
