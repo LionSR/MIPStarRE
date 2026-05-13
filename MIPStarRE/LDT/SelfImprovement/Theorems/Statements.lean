@@ -29,18 +29,15 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 The paper's `lem:sdp` eventually supplies strong duality, complementary
 slackness, and a concrete matrix-level optimal witness. The current Lean
 development only consumes the weaker facts recorded here: the primal witness is
-a full measurement (`T.total = 1`), the dual witness dominates the identity,
-and it dominates every averaged point operator. Positivity of the dual witness
-is derivable from dual feasibility and positivity of the averaged point
-operators. Despite the historical name, this reduced record does not assert
-SDP optimality. -/
+a full measurement (`T.total = 1`), and the dual witness dominates every
+averaged point operator. Positivity of the dual witness is derivable from dual
+feasibility and positivity of the averaged point operators. Despite the
+historical name, this reduced record does not assert SDP optimality. -/
 structure SdpOptimalPair (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (T : SubMeas (Polynomial params) ι) (Z : MIPStarRE.Quantum.Op ι) : Prop where
   primalTotalOperator :
     T.total = 1
-  dualDominatesIdentity :
-    (1 : MIPStarRE.Quantum.Op ι) ≤ Z
   dualFeasible :
     ∀ g : Polynomial params,
       0 ≤ sdpDualSlackOperator params strategy Z g
@@ -143,8 +140,8 @@ theorem toSdpStatement {params : Parameters} [FieldModel params.q]
 measurement and dual witness.
 
 This is the abstract analogue of the matrix-level witness extractors: the
-existential SDP statement contains a complete primal measurement, a positive dual
-operator dominating the identity and every averaged point operator, and the
+existential SDP statement contains a complete primal measurement, a positive
+dual operator dominating every averaged point operator, and the
 complementary-slackness equations. -/
 theorem exists_measurement_witness {params : Parameters} [FieldModel params.q]
     {strategy : SymStrat params ι}
@@ -152,13 +149,11 @@ theorem exists_measurement_witness {params : Parameters} [FieldModel params.q]
     ∃ T : Measurement (Polynomial params) ι,
       ∃ Z : MIPStarRE.Quantum.Op ι,
         0 ≤ Z ∧
-        (1 : MIPStarRE.Quantum.Op ι) ≤ Z ∧
         (∀ g : Polynomial params, 0 ≤ sdpDualSlackOperator params strategy Z g) ∧
         ∀ g : Polynomial params,
           sdpComplementarySlacknessEquation params strategy T.toSubMeas Z g := by
   obtain ⟨Tsub, Z, hpair⟩ := h.witness
   exact ⟨hpair.primalMeasurement, Z, hpair.toSdpOptimalPair.dualPositive,
-    hpair.toSdpOptimalPair.dualDominatesIdentity,
     hpair.toSdpOptimalPair.dualFeasible, hpair.complementarySlackness⟩
 
 end SdpStatementWithSlackness
@@ -308,9 +303,9 @@ Reduced conclusion for the SDP and `addInU` stage of
 
 This structure intentionally records only the guarantees produced directly by
 the current `sdp` and `addInU` arguments: the SDP witness, the averaged
-construction of `H`, and the reduced `addInU` variance bound. Positivity,
-identity domination, and pointwise dual feasibility of `Z` are read from the
-bundled SDP witness rather than repeated as helper fields.
+construction of `H`, and the reduced `addInU` variance bound. Positivity and
+pointwise dual feasibility of `Z` are read from the bundled SDP witness rather
+than repeated as helper fields.
 
 The paper and blueprint state four additional helper-lemma guarantees
 (`completeness`, `pointConsistency`, strong self-consistency, and boundedness).
@@ -385,7 +380,10 @@ structure SelfImprovementHelperConclusionWithSlackness (params : Parameters)
 /-- Paper origin: `references/ldt-paper/self_improvement.tex:635-671`
 (`\label{thm:self-improvement}`).
 
-Conclusion of `thm:self-improvement`. -/
+Conclusion of `thm:self-improvement`.
+
+The paper's boundedness output is the projective residual estimate
+`⟨ψ, Z ⊗ (I - H)⟩ ≤ ζ`, recorded here as `projectiveResidualBound`. -/
 structure SelfImprovementConclusion (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (G : Measurement (Polynomial params) ι)
@@ -426,10 +424,6 @@ structure SelfImprovementConclusion (params : Parameters) [FieldModel params.q]
   projectiveResidualBound :
     projectiveBoundednessGap params strategy H Z ≤
       selfImprovementError params eps delta
-  bounded :
-    BoundedByOperator strategy.state H.toSubMeas.liftLeft
-      (leftTensor (ι₂ := ι) Z)
-      (selfImprovementError params eps delta)
 
 /-- Final fields for the Section 9 transport stage.
 
@@ -438,9 +432,8 @@ The final fields are the Section 9 outputs that remain after combining:
 monotone-total transport used in the projective-output step.
 
 This record contains completeness, point-consistency, self-closeness, and the
-projective-residual estimate. The boundedness term is not repeated here because
-it is recovered later from the strict SDP witness condition `1 ≤ Z` together
-with monotonicity of the boundedness field. -/
+projective-residual estimate. This projective residual is already the
+paper-facing boundedness quantity carried into `SelfImprovementConclusion`. -/
 structure SelfImprovementFinalFields (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (H : ProjSubMeas (Polynomial params) ι)
@@ -507,9 +500,9 @@ abbrev OrthonormalizationInput (params : Parameters) [FieldModel params.q]
 The remaining Section 9 output fields still not produced directly by the
 reduced helper and orthonormalization theorems.
 
-The final `BoundedByOperator` conclusion is produced internally from the SDP
-witness bound `1 ≤ Z`, so this residual input now contains only completeness,
-point-consistency, self-closeness, and the projective-residual estimate. -/
+The projective-residual estimate is the boundedness field used downstream, so
+this residual input contains completeness, point-consistency, self-closeness,
+and the projective-residual estimate. -/
 abbrev FinalFieldsInput (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (eps delta nu : Error) : Prop :=
   ∀ {T : Measurement (Polynomial params) ι}
