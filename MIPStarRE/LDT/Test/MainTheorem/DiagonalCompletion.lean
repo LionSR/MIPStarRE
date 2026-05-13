@@ -1,20 +1,20 @@
 import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationData
 
 /-!
-# Diagonal completion inputs
+# Diagonal completion construction
 
-Diagonal consistency and completion inputs for the `mainFormal` assembly.  Once
+Diagonal completion data for the `mainFormal` assembly.  Once
 the two unsymmetrized role POVMs `Gᴬ` and `Gᴮ` are obtained together with
 their cross-consistency relation `Gᴬ ⊗ I ≃ I ⊗ Gᴮ` at error `ζ₁`, the
-completion theorem (`prop:completing-to-measurement`) needs diagonal
-hypotheses for *both* sides.  This module records the stronger, self-referential
-`ConsRel` form of that missing bridge through
-`MainFormalPostRolePackageDiagonalConsistencyInput`, records
-the match-mass monotonicity input
-(`MainFormalPostRolePackageDiagonalCompletionInput`), and provides the
-conversion lemmas (`ofDiagonalConsistency`,
-`nonempty_ofDiagonalConsistencyAndMatchMassPreservation`) that close the gap
-between the cross relation and the two self-relations used by orthonormalize-and-complete.
+remaining construction of completed projective measurements is an internal
+proof obligation.  The source-facing construction theorem below is therefore
+left unfinished rather than represented by additional diagonal-consistency or
+match-mass hypotheses in the public `mainFormal` statement.
+
+The checked auxiliary lemmas in this file keep useful analytic content: they
+show how completion follows once the relevant match-mass preservation and
+self-consistency estimates have been proved.  They are not source-level
+assumptions for the paper theorem.
 
 ## References
 
@@ -30,104 +30,6 @@ namespace MIPStarRE.LDT
 
 namespace Test
 
-/-- Paper origin: `references/ldt-paper/inductive_step.tex:130-149`
-(`\label{eq:G-self-consistency}`).
-
-Additional diagonal consistency input for the two unsymmetrized role POVMs.
-
-The diagonal consistency handoff supplies only the cross relation `G^A ⊗ I ≃ I ⊗ G^B`. The
-completion theorem used at lines 143--147 needs the diagonal hypotheses for each
-completed side. This structure records the stronger, self-referential `ConsRel`
-form of that missing bridge, keeping the obligation tied to the concrete role
-record rather than to the public `mainFormal` statement. -/
-structure MainFormalPostRolePackageDiagonalConsistencyInput
-    (params : Parameters) [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
-    (scalars : MainFormalCascadeScalars params eps k)
-    (rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars) where
-  /-- Alice-role diagonal version of paper line 130. -/
-  leftDiagonalConsistency :
-    ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily
-        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
-      (constSubMeasFamily
-        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
-      scalars.zeta1
-  /-- Bob-role diagonal version of paper line 130. -/
-  rightDiagonalConsistency :
-    ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily
-        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
-      (constSubMeasFamily
-        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
-      scalars.zeta1
-
-/-- Paper origin: `references/ldt-paper/inductive_step.tex:130-149`
-(`\label{eq:G-self-consistency}`).
-
-The `BipartiteSSCRel` form of the additional diagonal obligation consumed
-by `completingToMeasurement`. -/
-structure MainFormalPostRolePackageDiagonalSSCInput
-    (params : Parameters) [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
-    (scalars : MainFormalCascadeScalars params eps k)
-    (rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars) where
-  /-- Strong self-consistency for the Alice-role unsymmetrized POVM. -/
-  leftSelfConsistency :
-    BipartiteSSCRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily
-        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
-      scalars.zeta1
-  /-- Strong self-consistency for the Bob-role unsymmetrized POVM. -/
-  rightSelfConsistency :
-    BipartiteSSCRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily
-        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
-      scalars.zeta1
-
-namespace MainFormalPostRolePackageDiagonalSSCInput
-
-/-- Convert the diagonal self-`ConsRel` completion input into the
-`BipartiteSSCRel` form required by the completion theorem.
-
-This is a checked bookkeeping step only: the real mathematical gap remains
-proving the two diagonal consistency fields from the paper's cross `G^A/G^B`
-relation or from a stronger role-residual package. -/
-theorem ofDiagonalConsistency
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {scalars : MainFormalCascadeScalars params eps k}
-    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
-    (input : MainFormalPostRolePackageDiagonalConsistencyInput
-      params strategy eps k scalars rolePackage) :
-    MainFormalPostRolePackageDiagonalSSCInput
-      params strategy eps k scalars rolePackage where
-  leftSelfConsistency := by
-    let GLeft : IdxMeas Unit (Polynomial params) ι :=
-      fun _ => unsymmetrizedLeftPOVM rolePackage.roleMeasurement
-    have hleft :=
-      Preliminaries.bipartiteSSCRel_of_consRel_self_measurement
-        strategy.state (uniformDistribution Unit) GLeft scalars.zeta1
-        (by
-          simpa [GLeft, IdxMeas.toIdxSubMeas, constSubMeasFamily] using
-            input.leftDiagonalConsistency)
-    simpa [GLeft, IdxMeas.toIdxSubMeas, constSubMeasFamily] using hleft
-  rightSelfConsistency := by
-    let GRight : IdxMeas Unit (Polynomial params) ι :=
-      fun _ => unsymmetrizedRightPOVM rolePackage.roleMeasurement
-    have hright :=
-      Preliminaries.bipartiteSSCRel_of_consRel_self_measurement
-        strategy.state (uniformDistribution Unit) GRight scalars.zeta1
-        (by
-          simpa [GRight, IdxMeas.toIdxSubMeas, constSubMeasFamily] using
-            input.rightDiagonalConsistency)
-    simpa [GRight, IdxMeas.toIdxSubMeas, constSubMeasFamily] using hright
-
-end MainFormalPostRolePackageDiagonalSSCInput
-
 /-- Paper origin: `references/ldt-paper/inductive_step.tex:135-149`.
 
 Explicit completion witnesses for a fixed line-130 orthonormalization residual.
@@ -137,9 +39,9 @@ records the distinguished completion outcomes, the two completed-closeness
 statements, and the construction-level orthonormalization match-mass preservation
 facts for the chosen line-130 projective submeasurements.  The self-consistency
 hypotheses used by `completingToMeasurement` are not stored here after the
-completed-closeness fields have been produced; see
-`nonempty_ofCompletingToMeasurementInputs` below for the proposition-valued
-constructor that derives these fields from `BipartiteSSCRel`. -/
+completed-closeness fields have been produced; the private auxiliary
+calculations below show how those fields follow once the corresponding
+estimates have been proved. -/
 structure MainFormalPostRolePackageDiagonalCompletionInput
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -401,7 +303,7 @@ Instead, the role-measurement record already reconstructs line 130 as a cross `C
 projective submeasurements `P^A,P^B`, and the remaining completion bound is
 derived directly from the construction-level match-mass preservation facts for
 those `P`-families. -/
-theorem nonempty_ofDiagonalConsistencyAndMatchMassPreservation
+private theorem nonempty_ofDiagonalConsistencyAndMatchMassPreservation
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
@@ -472,7 +374,7 @@ for the unsymmetrized role POVMs.  The line-130 orthonormalization residual
 provides the `A ≈ P` closeness input to `completingToMeasurement`; the returned
 completed-closeness statements are rewritten for the canonical projective
 completions `completeAtOutcomeProj`. -/
-theorem nonempty_ofCompletingToMeasurementInputs
+private theorem nonempty_ofCompletingToMeasurementInputs
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
@@ -542,13 +444,19 @@ theorem nonempty_ofCompletingToMeasurementInputs
     leftMatchMassPreservation := leftMatchMassPreservation
     rightMatchMassPreservation := rightMatchMassPreservation }⟩
 
-/-- Produce completion witnesses from the additional diagonal SSC record.
+/-- Direct completion construction from the paper line-130 cross consistency.
 
-This is the same construction as `nonempty_ofCompletingToMeasurementInputs`, but
-the two self-consistency inputs are collected in
-`MainFormalPostRolePackageDiagonalSSCInput`, the extra diagonal data needed
-after the paper's line-130 cross relation has been reconstructed. -/
-theorem nonempty_ofDiagonalSSCInput
+Paper origin: `references/ldt-paper/inductive_step.tex:130-149`, where the
+role-block cross consistency is followed by orthonormalization and completion.
+
+This is the source-shaped internal construction target for the `mainFormal`
+proof.  It does not ask callers for a diagonal-consistency record, a
+strong-self-consistency record, or match-mass preservation as an extra input.
+Those facts must be proved from the role-block construction and the
+orthonormalization argument.  The checked conditional lemmas above record useful
+analytic subarguments; this declaration records the remaining construction as an
+explicit proof obligation. -/
+theorem nonempty_ofDiagonalConsistency
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
@@ -556,57 +464,16 @@ theorem nonempty_ofDiagonalSSCInput
     {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
     (orthResidual : MainFormalPostRolePackageDiagonalOrthonormalizationResidual
       params strategy eps k scalars rolePackage)
-    (a_A a_B : Polynomial params)
-    (diagonalSSC :
-      MainFormalPostRolePackageDiagonalSSCInput
-        params strategy eps k scalars rolePackage)
-    (leftMatchMassPreservation :
-      MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
-        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement) orthResidual.P_A
-        (unsymmetrizedRightPOVM rolePackage.roleMeasurement))
-    (rightMatchMassPreservation :
-      MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
-        (unsymmetrizedRightPOVM rolePackage.roleMeasurement) orthResidual.P_B
-        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)) :
+    (hpre : ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+      (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+      scalars.zeta1) :
     Nonempty (MainFormalPostRolePackageDiagonalCompletionInput
-      params strategy eps k scalars rolePackage orthResidual) :=
-  nonempty_ofCompletingToMeasurementInputs orthResidual a_A a_B
-    diagonalSSC.leftSelfConsistency diagonalSSC.rightSelfConsistency
-    leftMatchMassPreservation rightMatchMassPreservation
-
-/-- Produce completion witnesses from the diagonal self-`ConsRel` version of the
-extra completion obligation.
-
-This theorem makes the exact remaining paper lemma usable in the native
-`≃`/`ConsRel` form: once callers prove diagonal consistency for `G^A` and
-`G^B`, in addition to the paper's line-130 cross relation, the conversion to
-`BipartiteSSCRel` and the completion theorem are both checked. -/
-theorem nonempty_ofDiagonalConsistencyInput
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {scalars : MainFormalCascadeScalars params eps k}
-    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
-    (orthResidual : MainFormalPostRolePackageDiagonalOrthonormalizationResidual
-      params strategy eps k scalars rolePackage)
-    (a_A a_B : Polynomial params)
-    (diagonalConsistency :
-      MainFormalPostRolePackageDiagonalConsistencyInput
-        params strategy eps k scalars rolePackage)
-    (leftMatchMassPreservation :
-      MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
-        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement) orthResidual.P_A
-        (unsymmetrizedRightPOVM rolePackage.roleMeasurement))
-    (rightMatchMassPreservation :
-      MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
-        (unsymmetrizedRightPOVM rolePackage.roleMeasurement) orthResidual.P_B
-        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)) :
-    Nonempty (MainFormalPostRolePackageDiagonalCompletionInput
-      params strategy eps k scalars rolePackage orthResidual) :=
-  nonempty_ofDiagonalSSCInput orthResidual a_A a_B
-    (MainFormalPostRolePackageDiagonalSSCInput.ofDiagonalConsistency
-      diagonalConsistency)
-    leftMatchMassPreservation rightMatchMassPreservation
+      params strategy eps k scalars rolePackage orthResidual) := by
+  -- TODO(#1043, #1359, #1458): choose the completion outcomes and derive the
+  -- self-consistency and match-mass preservation estimates from the paper
+  -- hypotheses, rather than requiring them as separate inputs.
+  sorry
 
 end MainFormalPostRolePackageDiagonalCompletionInput
 
