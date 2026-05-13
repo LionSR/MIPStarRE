@@ -73,12 +73,15 @@ proof-stage inputs:
    `helper_strong_self_consistency_of_helper_conclusion` from the named scalar
    obligations, and any remaining derivation is a direct proof gap rather than
    an input bundle.
-2. **`orthonormalization`**: `OrthonormalizationInput` — converts
-   `BipartiteSSCRel` into `OrthonormalizationInput` (spectral-truncation +
-   locality-preserving repair witnesses).
-3. **`finalFields`**: `FinalFieldsInput` — the remaining completeness,
-   point-consistency, self-closeness, and projective-residual conclusions are
-   derivable from the helper+orthonormalization+data-processing outputs.
+2. **`orthonormalization`**: the former `OrthonormalizationInput` bundle has
+   been removed.  The retained Section 9 API records only the proved
+   spectral-truncation conversion; the locality-preserving repair construction
+   remains a proof obligation on the source-facing theorem, not a supplied
+   theorem hypothesis.
+3. **`finalFields`**: the former `FinalFieldsInput` bundle has been removed.
+   The completeness, point-consistency, self-closeness, and
+   projective-residual estimates must be derived in the proof of
+   `selfImprovement`, or left as the tracked proof gap there until proved.
 
 These three inputs are no longer hypotheses of the paper-facing theorem
 `selfImprovement`.  The former conditional helper

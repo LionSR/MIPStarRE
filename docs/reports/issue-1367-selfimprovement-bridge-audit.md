@@ -54,10 +54,17 @@
 
 ## Executive Summary
 
-The `SelfImprovementObligations` record (the three Section 9 hypotheses) and
-its downstream wiring in `MainInductionStep` and `MainTheorem` are structurally
-sound. All individual lemmas in `SelfImprovement/` are proved conditional on
-their explicit hypotheses. The MainInductionStep bridge
+This executive summary is historical.  The
+`SelfImprovementObligations` record, its top-level conditional theorem, and the
+old downstream Section 3/6 wiring have been removed.  The current invariant is
+that paper-facing theorem statements retain the paper hypotheses, and missing
+Section 9 derivations appear as tracked proof gaps until they are proved.
+
+In the audited snapshot, the `SelfImprovementObligations` record (the three
+Section 9 hypotheses) and its downstream wiring in `MainInductionStep` and
+`MainTheorem` were structurally sound as conditional declarations.  All
+individual lemmas in `SelfImprovement/` were proved conditional on their
+explicit hypotheses. The MainInductionStep bridge
 (`SelfImprovementBridge/Core.lean`) wires SelfImprovement to Pasting correctly.
 As of 2026-05-08, this report identified the successor-case branch at
 `MainFormal.lean:611` as the remaining final-theorem `sorry` site.
@@ -78,7 +85,7 @@ conditional helpers.
 
 ## 1. SelfImprovementObligations Decomposition
 
-### 1.1 Definition
+### 1.1 Historical Definition
 
 **File:** `MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean:485-500`
 
@@ -89,8 +96,8 @@ structure SelfImprovementObligations (params) (strategy) (eps delta nu) where
   finalFields                : FinalFieldsInput params strategy eps delta nu
 ```
 
-Three `Prop`-valued fields record the remaining Section 9 unformalized
-hypotheses:
+This structure has been removed.  In the audited snapshot, three
+`Prop`-valued fields recorded the remaining Section 9 unformalized hypotheses:
 
 | Field | Type | Meaning | Paper Reference |
 |-------|------|---------|-----------------|
@@ -98,11 +105,19 @@ hypotheses:
 | `orthonormalization` | `∀ Hhat, BipartiteSSCRel ... → MakingMeasurementsProjective.OrthonormalizationInput ...` | Spectral-truncation + repair witnesses exist for `optionCompletion Hhat` | Section 9 orthonormalization |
 | `finalFields` | `∀ T Hhat H Z, ... → SelfImprovementFinalFields ...` | Completeness, point-consistency, self-closeness, projective-residual bound | Sections 9.2–9.4 |
 
-### 1.2 Sub-hypothesis types
+### 1.2 Historical Sub-hypothesis Types
 
-- **`HelperStrongSelfConsistencyInput`** (line 420-428): A `∀` wrapper over `SelfImprovementHelperConclusion` that asserts `BipartiteSSCRel` at the helper error level
-- **`OrthonormalizationInput`** (line 440-447): An `abbrev` converting `BipartiteSSCRel` on `Hhat` into `MakingMeasurementsProjective.OrthonormalizationInput` at helper error
-- **`FinalFieldsInput`** (line 455-470): A `∀` wrapper that, given `SelfImprovementHelperConclusion`, orthonormalization closeness, and data-processing closeness, produces `SelfImprovementFinalFields`
+- **`HelperStrongSelfConsistencyInput`** (line 420-428 in the audited
+  snapshot): a `∀` wrapper over `SelfImprovementHelperConclusion` asserting
+  `BipartiteSSCRel` at the helper error level.  This wrapper has been removed.
+- **`OrthonormalizationInput`** (line 440-447 in the audited snapshot): an
+  `abbrev` converting `BipartiteSSCRel` on `Hhat` into
+  `MakingMeasurementsProjective.OrthonormalizationInput` at helper error.  This
+  input bundle has been removed.
+- **`FinalFieldsInput`** (line 455-470 in the audited snapshot): a `∀` wrapper
+  that, given `SelfImprovementHelperConclusion`, orthonormalization closeness,
+  and data-processing closeness, produced `SelfImprovementFinalFields`.  This
+  wrapper has been removed.
 
 ---
 
@@ -118,9 +133,14 @@ hypotheses:
 | `selfImprovement` | current `SelfImprovementTop/Core.lean` | paper hypotheses `IsGood`, `G`, and input consistency | `SelfImprovementConclusion` (H, Z) | paper-facing statement with tracked proof gap |
 | Historical `selfImprovementFromObligations` | removed | `SelfImprovementObligations` + `IsGood` + `G` | `SelfImprovementConclusion` | removed by PR #1539 |
 
-### 2.2 Internal obligations for each bridge field
+### 2.2 Historical Internal Obligations for Each Bridge Field
 
-#### `helperStrongSelfConsistency` — PROVED (conditional)
+The following three subsections describe the old bridge-field decomposition.
+They should not be read as current API: the input wrappers named here have
+been removed, and the remaining derivations are now either direct construction
+theorems or tracked `sorry` sites on source-facing statements.
+
+#### `helperStrongSelfConsistency` — historical conditional route
 
 **File:** `MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperSSC.lean`
 
@@ -128,13 +148,19 @@ hypotheses:
 - **The actual derivation** (`helper_strong_self_consistency_obligations_of_selfConsistency_localVariance`, line 611): From a `BipartiteSSCRel` hypothesis on the helper output + local-variance/residual bounds → `HelperStrongSelfConsistencyObligations`
 - **End-to-end wrapper** (`ofBipartiteSSC_and_localVariance`, line 669): From `hssc : BipartiteSSCRel ...` + `hlocal` + `hresidual` → `HelperStrongSelfConsistencyInput`
 
-**Status:** The conditional lemma is proved. The unconditional gap is: the `BipartiteSSCRel` hypothesis itself must be discharged at each call site. This is exactly the helper-SSC step that Section 8 of the paper characterizes.
+**Historical status:** the conditional lemma was proved in the audited
+snapshot.  The wrapper has since been removed; the helper strong
+self-consistency conclusion is now stated directly from named scalar
+obligations, and any missing derivation remains a proof gap rather than an
+input bundle.
 
-#### `orthonormalization` — PARTIAL (spectral proved, repair unproven)
+#### `orthonormalization` — historical spectral/repair split
 
-**File:** `MIPStarRE/LDT/SelfImprovement/Theorems/OrthonormalizationBridge.lean`
+**Historical file:** `MIPStarRE/LDT/SelfImprovement/Theorems/OrthonormalizationBridge.lean`
 
-The `OrthonormalizationInput` is an `abbrev` that maps `BipartiteSSCRel` → `MakingMeasurementsProjective.OrthonormalizationInput`. The latter has two sub-fields:
+In the audited snapshot, `OrthonormalizationInput` was an `abbrev` that mapped
+`BipartiteSSCRel` to `MakingMeasurementsProjective.OrthonormalizationInput`.
+The latter had two sub-fields:
 
 1. **`spectral`** (`SpectralTruncationInput`): **PROVED** via `spectralTruncationInput_of_sourceAlmostProjective` in `ProjectiveNonMeasurement.lean:749`
 2. **`repair`** (`LeftLiftedProjectivizationRepairInput`): **HYPOTHESIS** — requires QXP-layer data (`QXPLayerData` with a projective `P` family rounding-close to the source submeasurement)
@@ -144,17 +170,29 @@ Bridge constructors:
 - `OrthonormalizationRepairObligation` (line 129-139): **HYPOTHESIS** — defined as a type `∀ Hhat, BipartiteSSCRel ... → LeftLiftedProjectivizationRepairInput ... (optionCompletion Hhat)`
 - `orthonormalizationInput_of_obligations` (line 684): Combines spectral + repair → full input
 
-**Status:** Spectral ✓, repair ✗. The repair gap is the QXP construction (Sections 5.8–5.10 of the paper). Tracked by #1032.
+**Current status:** the full input bundle and the old bridge module have been
+removed.  The retained file is
+`SelfImprovement/Theorems/OrthonormalizationSpectral.lean`, which records the
+proved spectral-truncation conversion.  The locality-preserving QXP repair
+construction from Sections 5.8-5.10 remains tracked by #1032 and should be
+proved directly, not supplied as a theorem hypothesis.
 
-#### `finalFields` — PROVED (conditional)
+#### `finalFields` — historical conditional route
 
 **File:** `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/FinalFields.lean`
 
 - **`final_fields_of_helper_outputs_of_total_expectation_le`** (line 44): Takes `SelfImprovementHelperConclusion`, helper completeness, helper SSC, point SSC, orthonormalization closeness, data-processing closeness, and right-total monotonicity → produces `SelfImprovementFinalFields`
-- This is a conditional lemma: all sub-hypotheses are available in the `selfImprovement` theorem's context (produced by helper SSC, orthonormalization, and data-processing steps)
-- The `FinalFieldsInput` `abbrev` wraps this conditional lemma into the `∀`-quantified form consumed by `selfImprovement`
+- In the audited snapshot this was used as a conditional lemma: all
+  sub-hypotheses were expected to be available in the `selfImprovement`
+  theorem's context.
+- The former `FinalFieldsInput` `abbrev` wrapped this conditional lemma into
+  the `∀`-quantified form consumed by `selfImprovement`; that wrapper has been
+  removed.
 
-**Status:** The conditional lemma is fully proved. The SDP-related hypotheses (helper completeness, right-total monotonicity) derive from the `selfImprovementHelper` output. This field is effectively discharged within the `selfImprovement` theorem's context.
+**Current status:** the useful final-fields lemma remains proof content, but
+there is no longer a `FinalFieldsInput` theorem hypothesis.  Any missing
+transport from the helper and orthonormalization outputs belongs inside the
+proof of `selfImprovement`.
 
 ---
 
