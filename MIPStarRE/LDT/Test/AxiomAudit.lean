@@ -27,12 +27,13 @@ derivation for `thm:self-improvement`: the statement corresponding to the
 blueprint theorem is present, and the missing derivation from the incoming
 consistency hypothesis is tracked by issue #1515.
 
-The audit for `Test.mainFormal` records the current tracked proof gap directly:
-the paper-facing statement has no bridge, residual, repair, package, or
-obligation hypotheses, and its proof is still admitted.  Issue #1043 tracks the
-base-case projective-completion construction, issues #1363 and #1369 track the
-successor projective-completion construction, and issue #1458 is the umbrella
-tracking issue.
+The audit for `Test.mainFormal` records the current tracked proof gap
+transitively: the paper-facing statement has no bridge, residual, repair,
+package, or obligation hypotheses, and its proof is assembled from named
+construction targets.  Issue #1043 tracks the base-case projective-completion
+construction, issues #1363 and #1369 track the successor projective-completion
+construction, issue #1566 tracks the match-mass preservation obligations in the
+completion step, and issue #1458 is the umbrella tracking issue.
 
 The audit for `GlobalVariance.globalVarianceOfPoints` now requires the standard
 Lean axioms only: the issue-#1456 six-step local transport estimate is supplied
@@ -84,8 +85,9 @@ private def expectedStandardAxioms : Array Name :=
 private def expectedStandardAxiomsWithSorry : Array Name :=
   #[``propext, ``Classical.choice, ``Quot.sound, ``sorryAx].qsort Name.lt
 
-/-- Standard kernel axioms plus `sorryAx`; tracks the paper-facing `mainFormal`
-proof gap for issues #1043, #1363, #1369, and #1458. -/
+/-- Standard kernel axioms plus `sorryAx`; tracks the transitive
+`mainFormal` construction gaps for issues #1043, #1363, #1369, #1458, and
+#1566. -/
 private def expectedMainFormalAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 

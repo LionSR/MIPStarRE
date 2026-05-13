@@ -16,12 +16,13 @@ gap for `thm:main-formal` (`\Cref{thm:main-formal}`).  This module contains:
 * `mainFormal` — the paper theorem statement, taking a projective strategy that
   passes the LID test with probability `≥ 1 − ε`, together with the explicit
   boundary conditions `0 < d`, `0 < k`, and `400md ≤ k`, and producing the three
-  pointwise consistency targets at error bound `mainFormalError`.  Its proof is
-  currently a direct proof gap rather than a theorem with extra bridge
-  hypotheses.  The role-register Section 6 measurement itself is available from
-  `MainFormalRolePackageResidual.ofMainInductionLargeK`; the successor part of
-  that construction is the tracked `sorry` in the source theorem
-  `MainInductionStep.mainInduction`, not an added hypothesis of `mainFormal`.
+  pointwise consistency targets at error bound `mainFormalError`.  Its proof now
+  follows the checked branch structure: the vacuous branch is closed by
+  `mainFormal_trivial_witness`, the non-vacuous branch invokes the Section 6
+  role-register residual, the post-role projective-completion construction
+  target, and the final transport.  The remaining proof gaps are the named
+  construction theorems used by this chain, not additional hypotheses of
+  `mainFormal`.
 
 ## References
 
@@ -111,20 +112,21 @@ records the strengthened boundary from issue #906 and
 The field model is presently fixed at universe level `0`, matching the current
 Section 6 successor theorem rather than an additional mathematical restriction.
 
-**Proof gap:** the paper-facing statement is restored without bridge, residual,
-repair, or obligation hypotheses.  The Section 6 role-register residual is now
-obtained by applying the theorem `MainInductionStep.mainInduction`
-through `MainFormalRolePackageResidual.ofMainInductionLargeK`; its successor
-case remains the tracked `sorry` in Section 6.  The remaining Section 3 work is
-to construct the post-role projective-completion residual from the paper
-hypotheses, then apply `mainFormal_ofProjectiveCompletionResidual` for the
-already-proved final transport.  This is tracked by #1043, #1363, and #1458.
+**Proof gap:** the paper-facing statement has no bridge, residual, repair, or
+obligation hypotheses.  In the non-vacuous branch the proof constructs the
+scalar cascade and role-register residual from the paper hypotheses, then calls
+`MainFormalCascadeProjectiveCompletionTransportResidual.nonempty_ofRoleResidual`
+and the already proved final transport.  The transitive proof gaps are therefore
+localized in the named construction theorems: the Section 6 successor proof
+inside `MainInductionStep.mainInduction`, and the two match-mass preservation
+obligations in the post-role completion step.  These are tracked by #1043,
+#1363, #1369, #1458, #1507, and #1566.
 -/
 theorem mainFormal
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι)
     (eps : Error)
-    (hd : 0 < params.d)
+    (_hd : 0 < params.d)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
     (hk : 400 * params.m * params.d ≤ k)
@@ -142,11 +144,19 @@ theorem mainFormal
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  -- TODO(#1043, #1363, #1458): construct the Section 6 role residual and the
-  -- projective-completion residual from the paper hypotheses.  Once that
-  -- residual is available, the proved final transport is
-  -- `mainFormal_ofProjectiveCompletionResidual`.
-  sorry
+  by_cases hlarge : 1 ≤ mainFormalError params k eps
+  · exact mainFormal_trivial_witness params strategy eps k hlarge
+  · have hepsNN : 0 ≤ eps := SameSpaceProjStrat.eps_nonneg_of_passes hpass
+    let scalars : MainFormalCascadeScalars params eps k :=
+      MainFormalCascadeScalars.ofNontrivialMainFormal hepsNN hk0 hlarge
+    rcases MainFormalRolePackageResidual.ofMainInductionLargeK
+        params strategy eps k hpass hk with ⟨roleResidual⟩
+    rcases
+        MainFormalCascadeProjectiveCompletionTransportResidual.nonempty_ofRoleResidual
+          (scalars := scalars) hlarge roleResidual with
+      ⟨projectiveCompletionResidual⟩
+    exact mainFormal_ofProjectiveCompletionResidual (hpass := hpass)
+      projectiveCompletionResidual
 
 end Test
 

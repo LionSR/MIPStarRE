@@ -52,6 +52,15 @@ if grep -Eq '^(MIPStarRE/.*\.lean|MIPStarRE\.lean)$' "$CHANGED_FILE_LIST"; then
     done
 fi
 
+if grep -Eq '^(MIPStarRE/LDT/.*\.lean|MIPStarRE/LDT\.lean|MIPStarRE\.lean)$' "$CHANGED_FILE_LIST"; then
+  if grep -Fxq 'MIPStarRE/LDT/Test/AxiomAudit.lean' "$CHANGED_FILE_LIST"; then
+    echo "MIPStarRE pre-push: axiom audit already checked as a changed Lean file."
+  else
+    echo "MIPStarRE pre-push: checking LDT axiom audit."
+    lake env lean MIPStarRE/LDT/Test/AxiomAudit.lean
+  fi
+fi
+
 if grep -Eq '^(MIPStarRE/|MIPStarRE\.lean$|blueprint/src/|blueprint/lean_decls|scripts/(audit_paper_facing_proof_debt|audit_conclusion_shaped_hypotheses|audit_unfaithful_markers|check_statement_paper_origin|blueprint_lean_sync)\.py|docs/(CONTRIBUTING|PROOF_INTEGRITY|anti_patterns|blueprint_style_guide|formalization-patterns|proof_frontier_review)\.md|docs/paper-gaps/|\.github/(actions|prompts|workflows)/|AGENTS\.md)' "$CHANGED_FILE_LIST"; then
   echo "MIPStarRE pre-push: checking statement-integrity audits."
   python3 scripts/check_statement_paper_origin.py --root .
