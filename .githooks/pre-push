@@ -1,0 +1,84 @@
+#!/bin/sh
+set -eu
+
+if [ "${MIPSTARRE_SKIP_HOOKS:-}" = "1" ]; then
+  echo "MIPStarRE pre-push hook skipped by MIPSTARRE_SKIP_HOOKS=1."
+  exit 0
+fi
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+CHANGED_FILE_LIST="$(mktemp)"
+trap 'rm -f "$CHANGED_FILE_LIST"' EXIT
+
+ZERO_SHA="0000000000000000000000000000000000000000"
+
+while read LOCAL_REF LOCAL_SHA REMOTE_REF REMOTE_SHA
+do
+  if [ -z "${LOCAL_SHA:-}" ] || [ "$LOCAL_SHA" = "$ZERO_SHA" ]; then
+    continue
+  fi
+
+  if [ "$REMOTE_SHA" = "$ZERO_SHA" ]; then
+    if git rev-parse --verify origin/main >/dev/null 2>&1; then
+      BASE_SHA="$(git merge-base "$LOCAL_SHA" origin/main)"
+    else
+      BASE_SHA="$(git rev-list --max-parents=0 "$LOCAL_SHA" | tail -n 1)"
+    fi
+  else
+    BASE_SHA="$REMOTE_SHA"
+  fi
+
+  git diff --name-only --diff-filter=ACMR "$BASE_SHA" "$LOCAL_SHA" -- >> "$CHANGED_FILE_LIST"
+done
+
+sort -u "$CHANGED_FILE_LIST" -o "$CHANGED_FILE_LIST"
+
+if [ ! -s "$CHANGED_FILE_LIST" ]; then
+  echo "MIPStarRE pre-push: no changed tracked files detected."
+  exit 0
+fi
+
+if grep -Eq '^(MIPStarRE/.*\.lean|MIPStarRE\.lean)$' "$CHANGED_FILE_LIST"; then
+  echo "MIPStarRE pre-push: checking changed Lean files."
+  grep -E '^(MIPStarRE/.*\.lean|MIPStarRE\.lean)$' "$CHANGED_FILE_LIST" |
+    while read LEAN_FILE
+    do
+      if [ -f "$LEAN_FILE" ]; then
+        echo "  lake env lean $LEAN_FILE"
+        lake env lean "$LEAN_FILE"
+      fi
+    done
+fi
+
+if grep -Eq '^(MIPStarRE/|MIPStarRE\.lean$|blueprint/|scripts/(blueprint_lean_sync|blueprint_leanok_axioms|check_blueprint_latex|check_blueprint_sync|tex_utils)\.py$)' "$CHANGED_FILE_LIST"; then
+  echo "MIPStarRE pre-push: regenerating blueprint/lean_decls."
+  python3 scripts/blueprint_lean_sync.py --root . --update-lean-decls
+  if ! git diff --quiet -- blueprint/lean_decls; then
+    echo "MIPStarRE pre-push: blueprint/lean_decls changed; stage and commit it before pushing."
+    git diff -- blueprint/lean_decls
+    exit 1
+  fi
+
+  echo "MIPStarRE pre-push: checking blueprint and Lean declaration sync."
+  python3 scripts/blueprint_lean_sync.py --root . --ci
+  lake exe checkdecls blueprint/lean_decls
+fi
+
+if [ "${MIPSTARRE_HOOK_FULL:-}" = "1" ]; then
+  echo "MIPStarRE pre-push full mode: running lake build."
+  lake build
+
+  echo "MIPStarRE pre-push full mode: checking blueprint proof-level leanok closure."
+  python3 scripts/blueprint_leanok_axioms.py --ci
+
+  if command -v leanblueprint >/dev/null 2>&1; then
+    echo "MIPStarRE pre-push full mode: running leanblueprint web."
+    (cd blueprint && leanblueprint web)
+  else
+    echo "MIPStarRE pre-push full mode: leanblueprint not found; skipping web build."
+  fi
+fi
+
+echo "MIPStarRE pre-push: ok."

@@ -67,6 +67,22 @@ A PR template (`.github/pull_request_template.md`) auto-fills the
 Motivation / Description / Testing sections. Fill in the placeholders — do not
 delete the headings.
 
+### Local hooks
+
+The repository includes opt-in Git hooks for catching fast statement-integrity
+and blueprint-sync failures before they reach CI:
+
+```bash
+scripts/install_git_hooks.sh
+```
+
+The pre-commit hook runs whitespace and proof-debt audits on relevant staged
+files.  The pre-push hook checks changed Lean files with `lake env lean` and
+checks blueprint declaration synchronization when Lean or blueprint surfaces
+changed.  For larger PRs, `MIPSTARRE_HOOK_FULL=1 git push` also runs the full
+local gate.  Use `MIPSTARRE_SKIP_HOOKS=1` only for a one-off local-tooling
+bypass, and still report the corresponding validation in the PR body.
+
 ### Labels
 
 Apply all relevant labels from the taxonomy in [Section 4](#4-label-taxonomy).

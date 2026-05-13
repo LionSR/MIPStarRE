@@ -1,0 +1,38 @@
+#!/bin/sh
+set -eu
+
+if [ "${MIPSTARRE_SKIP_HOOKS:-}" = "1" ]; then
+  echo "MIPStarRE pre-commit hook skipped by MIPSTARRE_SKIP_HOOKS=1."
+  exit 0
+fi
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+STAGED_FILES="$(git diff --cached --name-only --diff-filter=ACMR)"
+if [ -z "$STAGED_FILES" ]; then
+  exit 0
+fi
+
+echo "MIPStarRE pre-commit: checking staged whitespace."
+git diff --cached --check
+
+if ! printf '%s\n' "$STAGED_FILES" | grep -Eq \
+  '^(MIPStarRE/|MIPStarRE\.lean|blueprint/src/|blueprint/lean_decls|scripts/(audit_paper_facing_proof_debt|audit_conclusion_shaped_hypotheses|audit_unfaithful_markers|check_statement_paper_origin|blueprint_lean_sync)\.py|docs/(CONTRIBUTING|PROOF_INTEGRITY|anti_patterns|blueprint_style_guide|formalization-patterns|proof_frontier_review)\.md|docs/paper-gaps/|\.github/(prompts|workflows)/|AGENTS\.md)'; then
+  echo "MIPStarRE pre-commit: no statement-integrity files staged."
+  exit 0
+fi
+
+echo "MIPStarRE pre-commit: checking statement-like paper-origin citations."
+python3 scripts/check_statement_paper_origin.py --root .
+
+echo "MIPStarRE pre-commit: checking paper-facing proof-debt headers."
+python3 scripts/audit_paper_facing_proof_debt.py --root . --ci
+
+echo "MIPStarRE pre-commit: checking conclusion-shaped hypotheses."
+python3 scripts/audit_conclusion_shaped_hypotheses.py --root . --ci
+
+echo "MIPStarRE pre-commit: checking unfaithful-dependency markers."
+python3 scripts/audit_unfaithful_markers.py --root . --ci
+
+echo "MIPStarRE pre-commit: ok."

@@ -19,6 +19,7 @@ This repository uses [Claude Code](https://docs.anthropic.com/en/docs/claude-cod
   - [Review Comment Auto-Fix](#review-comment-auto-fix-auto-fixyml)
   - [Claude Mention Handler](#claude-mention-handler-claudeyml)
   - [Shared CI Auto-Fix Template](#shared-ci-auto-fix-template-_ci-auto-fix-sharedyml)
+- [Local Hook Gates](#local-hook-gates)
 - [Safety Mechanisms](#safety-mechanisms)
 - [How to Use](#how-to-use)
 - [Commit Message Conventions](#commit-message-conventions)
@@ -374,6 +375,56 @@ This is not triggered directly — it is called via `workflow_call` by the two C
 
 ---
 
+## Local Hook Gates
+
+The repository also provides opt-in Git hooks under `.githooks/`.  They are not
+enabled by checkout alone; install them with:
+
+```bash
+scripts/install_git_hooks.sh
+```
+
+The installer sets `core.hooksPath` to `.githooks` for the local clone.
+Unset that Git config value to return to Git's default hook directory.
+
+### Pre-commit hook
+
+The pre-commit hook first runs `git diff --cached --check`.  When the staged
+files touch Lean, blueprint, paper-gap, proof-integrity, or review-policy
+surfaces, it also runs the fast statement-integrity audits:
+
+```bash
+python3 scripts/check_statement_paper_origin.py --root .
+python3 scripts/audit_paper_facing_proof_debt.py --root . --ci
+python3 scripts/audit_conclusion_shaped_hypotheses.py --root . --ci
+python3 scripts/audit_unfaithful_markers.py --root . --ci
+```
+
+These checks are intended to catch theorem-statement drift before a PR spends
+GitHub runner time.  They do not replace mathematical review.
+
+### Pre-push hook
+
+The pre-push hook examines the refs being pushed.  For changed Lean files it
+runs `lake env lean` on each changed file.  When blueprint or Lean declaration
+surfaces changed, it regenerates `blueprint/lean_decls`, verifies that the file
+has not drifted, and then runs:
+
+```bash
+python3 scripts/blueprint_lean_sync.py --root . --ci
+lake exe checkdecls blueprint/lean_decls
+```
+
+For a heavier local gate, set `MIPSTARRE_HOOK_FULL=1` while pushing.  Full mode
+also runs `lake build`, `python3 scripts/blueprint_leanok_axioms.py --ci`, and
+`leanblueprint web` when `leanblueprint` is installed.
+
+For a one-off bypass, set `MIPSTARRE_SKIP_HOOKS=1`.  A bypass should be used
+only to recover from a local tooling problem; it is not a substitute for the
+corresponding PR checks.
+
+---
+
 ## Safety Mechanisms
 
 These workflows have several safeguards to prevent runaway automation:
@@ -414,6 +465,16 @@ CI logs and review comments are untrusted input — they could contain text desi
 ---
 
 ## How to Use
+
+### To enable local hooks
+
+1. Run `scripts/install_git_hooks.sh` from the repository root.
+2. Commit normally.  The pre-commit hook runs the fast statement-integrity
+   audits only when staged paths touch relevant files.
+3. Push normally.  The pre-push hook checks changed Lean files and blueprint
+   declaration synchronization.
+4. Use `MIPSTARRE_HOOK_FULL=1 git push` before a larger Lean or blueprint PR
+   when local resources allow the full gate.
 
 ### For any PR (automatic)
 
