@@ -393,25 +393,6 @@ theorem nonempty_ofDiagonalConsistency
   -- hypotheses, rather than requiring them as separate assumptions.
   sorry
 
-/-- Convert the line-130 diagonal completion residual into the projective
-completion residual used by the Step 6 assembly.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:135-173`. -/
-noncomputable def toProjectiveCompletionResidual
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {scalars : MainFormalCascadeScalars params eps k}
-    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
-    (residual : MainFormalPostRolePackageDiagonalCompletionResidual
-      params strategy eps k scalars rolePackage) :
-    MainFormalPostRolePackageProjectiveCompletionResidual
-      params strategy eps k scalars rolePackage :=
-  MainFormalPostRolePackageProjectiveCompletionResidual.ofDiagonalOrthonormalizationAndCompletion
-    residual.orthResidual residual.a_A residual.a_B
-    residual.leftCompletedCloseness residual.rightCompletedCloseness
-    residual.leftMatchMass residual.rightMatchMass
-
 end MainFormalPostRolePackageDiagonalCompletionResidual
 
 end Test

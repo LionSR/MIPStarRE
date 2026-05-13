@@ -101,8 +101,7 @@ noncomputable def toLeftCompletionTransportResidual
   open MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual in
   { roleResidual := residual.roleResidual
     postRoleResidual :=
-      residual.postRoleDiagonalCompletion.toProjectiveCompletionResidual
-        |>.toPostRolePackageLeftCompletionTransportResidual hsmall }
+      residual.postRoleDiagonalCompletion.toPostRolePackageLeftCompletionTransportResidual hsmall }
 
 end MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
 
