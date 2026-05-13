@@ -79,12 +79,12 @@ are being actively removed.
    a hypothesis on the paper theorem.
 4. **Do not introduce conditional helpers by default.**  A helper such as
    `mainFormal_ofProjectiveCompletionResidual` is a quarantine device, not a
-   normal formalization pattern.  It is acceptable only when it preserves
-   substantial proof content that cannot yet be connected to the paper
-   hypotheses, has a tracked removal target, and has no source-labelled
-   blueprint `\leanok`.  If the helper would merely package missing work as an
-   extra hypothesis, restore the theorem with the paper statement and leave a tracked
-   `sorry` instead.
+   normal formalization pattern.  It may remain temporarily only when it
+   preserves substantial proof content that cannot yet be connected to the paper
+   hypotheses, has a tracked discharge or deletion target, and has no
+   source-labelled blueprint `\leanok`.  If the helper would merely package
+   missing work as an extra hypothesis, restore the theorem with the paper
+   statement and leave a tracked `sorry` instead.
 5. **Audit the final statement.**  Every PR touching a source-labelled theorem
    should compare paper assumptions and Lean assumptions, paper conclusion and
    Lean conclusion, and report whether the Lean statement is exact, has only
