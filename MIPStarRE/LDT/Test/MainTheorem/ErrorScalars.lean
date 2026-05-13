@@ -364,19 +364,6 @@ theorem zeta4_le_mainFormalError {params : Parameters} {eps : Error} {k : ℕ}
     scalars.zeta4 ≤ mainFormalError params k eps :=
   (cascadeBounds scalars).2.2.2.2
 
-/-- Step 8 absorption for the repaired line-169 point-transport error
-`2σ + 2√(ζ₁ + 10ζ₁^{1/8} + ζ₃/2)`. -/
-theorem repairedLine169PointError_le_mainFormalError
-    {params : Parameters} {eps : Error} {k : ℕ}
-    (scalars : MainFormalCascadeScalars params eps k) :
-    2 * scalars.sigma +
-        2 * Real.sqrt
-          (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error)) +
-            scalars.zeta3 / 2) ≤
-      mainFormalError params k eps := by
-  exact repairedLine169PointError_bound scalars.cascadeHypotheses
-    scalars.inductionNu_nonneg scalars.inductionNu_bound rfl rfl rfl rfl
-
 /-- Step 8 absorption for the native `ζ₃/2` self-consistency target. -/
 theorem zeta3_div_two_le_mainFormalError {params : Parameters} {eps : Error} {k : ℕ}
     (scalars : MainFormalCascadeScalars params eps k) :
