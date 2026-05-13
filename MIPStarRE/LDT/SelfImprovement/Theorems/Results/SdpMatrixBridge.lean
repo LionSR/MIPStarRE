@@ -278,27 +278,20 @@ end MatrixSdpCanonicalOptimalPair
 
 namespace MatrixSdpOptimalWitness
 
-/-- A matrix optimal witness gives an abstract SDP optimal pair with slackness,
-provided the additional reduced-interface bound `I ≤ Z` is supplied.
-
-The extra hypothesis is not part of `MatrixSdpOptimalWitness`; this theorem
-therefore isolates the precise additional fact needed to pass from the
-matrix-level strong-duality output to the current abstract helper interface. -/
-theorem toSdpOptimalPairWithSlackness_of_dualDominatesIdentity
+/-- A matrix optimal witness gives the abstract slackness-carrying SDP pair. -/
+theorem toSdpOptimalPairWithSlackness
     {params : Parameters} [FieldModel params.q]
     {strategy : SymStrat params ι}
     {T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params)
       (matrixSdpPointRealizationOfStrategy params strategy).space}
     {Z : MIPStarRE.Quantum.Op ι}
     (h : MatrixSdpOptimalWitness params
-      (matrixSdpPointRealizationOfStrategy params strategy) T Z)
-    (hdom : (1 : MIPStarRE.Quantum.Op ι) ≤ Z) :
+      (matrixSdpPointRealizationOfStrategy params strategy) T Z) :
     SdpOptimalPairWithSlackness params strategy (matrixSubmeasurementToSubMeas T) Z where
   toSdpOptimalPair := {
     primalTotalOperator := by
       simpa [matrixSubmeasurementToSubMeas, MIPStarRE.Quantum.Submeasurement.total] using
         h.primalTotalEqOne
-    dualDominatesIdentity := hdom
     dualFeasible := by
       intro g
       simpa [matrixSdpDualSlackOperator_ofPointRealization] using h.dualFeasible g
@@ -315,23 +308,13 @@ end MatrixSdpOptimalWitness
 namespace MatrixSdpStatementWithSlackness
 
 /-- A matrix strong-duality statement for the point-measurement realization of
-a strategy implies the abstract slackness statement, assuming the chosen matrix
-optimal dual witness also dominates the identity.
-
-The dominance hypothesis records the remaining mismatch between the matrix SDP
-output and the reduced abstract interface used by the helper proof.  It is
-asked only for the concrete witness supplied by `h.witness`, not for all
-possible matrix optimal witnesses. -/
-theorem toSdpStatementWithSlackness_of_dualDominatesIdentity
+a strategy implies the abstract slackness statement. -/
+theorem toSdpStatementWithSlackness
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (h : MatrixSdpStatementWithSlackness params
-      (matrixSdpPointRealizationOfStrategy params strategy))
-    (hdom :
-      let hTZ := Classical.choose_spec h.witness
-      let Z := Classical.choose hTZ
-      (1 : MIPStarRE.Quantum.Op ι) ≤ Z) :
+      (matrixSdpPointRealizationOfStrategy params strategy)) :
     SdpStatementWithSlackness params strategy := by
   let T := Classical.choose h.witness
   let hTZ := Classical.choose_spec h.witness
@@ -341,7 +324,40 @@ theorem toSdpStatementWithSlackness_of_dualDominatesIdentity
         (matrixSdpPointRealizationOfStrategy params strategy) T Z :=
     Classical.choose_spec hTZ
   exact ⟨matrixSubmeasurementToSubMeas T, Z,
-    hopt.toSdpOptimalPairWithSlackness_of_dualDominatesIdentity hdom⟩
+    hopt.toSdpOptimalPairWithSlackness⟩
+
+/-- A saturated matrix SDP statement for the point realization of a strategy gives
+the paper-form abstract SDP measurement witness.
+
+This translation deliberately avoids the auxiliary dominance condition `I ≤ Z`:
+it records only the saturated primal measurement, positivity and feasibility of
+the dual operator, and the complementary-slackness equations. -/
+theorem toSdpMeasurementWitness
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (h : MatrixSdpStatementWithSlackness params
+      (matrixSdpPointRealizationOfStrategy params strategy)) :
+    ∃ T : Measurement (Polynomial params) ι,
+      ∃ Z : MIPStarRE.Quantum.Op ι,
+        0 ≤ Z ∧
+        (∀ g : Polynomial params, 0 ≤ sdpDualSlackOperator params strategy Z g) ∧
+        ∀ g : Polynomial params,
+          sdpComplementarySlacknessEquation params strategy T.toSubMeas Z g := by
+  obtain ⟨Tsub, Z, hopt⟩ := h.witness
+  have htotal : (matrixSubmeasurementToSubMeas Tsub).total = 1 := by
+    simpa [matrixSubmeasurementToSubMeas, MIPStarRE.Quantum.Submeasurement.total] using
+      hopt.primalTotalEqOne
+  let T : Measurement (Polynomial params) ι :=
+    (matrixSubmeasurementToSubMeas Tsub).toMeasurement htotal
+  refine ⟨T, Z, hopt.dualPositive, ?_, ?_⟩
+  · intro g
+    simpa [matrixSdpDualSlackOperator_ofPointRealization] using hopt.dualFeasible g
+  · intro g
+    simpa [T, matrixSubmeasurementToSubMeas, sdpComplementarySlacknessEquation,
+      matrixSdpComplementarySlacknessEquation,
+      matrixAveragedPointOperator_ofPointRealization] using
+        hopt.complementarySlacknessEquation g
 
 end MatrixSdpStatementWithSlackness
 
@@ -358,8 +374,7 @@ theorem toSdpStatementWithSlackness
     SdpStatementWithSlackness params strategy := by
   obtain ⟨T, Z, hopt⟩ := h.witness
   exact ⟨matrixSubmeasurementToSubMeas T, Z,
-    hopt.toMatrixSdpOptimalWitness.toSdpOptimalPairWithSlackness_of_dualDominatesIdentity
-      hopt.dualDominatesIdentity⟩
+    hopt.toMatrixSdpOptimalWitness.toSdpOptimalPairWithSlackness⟩
 
 end MatrixSdpStatementWithSlacknessAndDominance
 
@@ -420,6 +435,21 @@ theorem sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance
     SdpStatementWithSlackness params strategy :=
   MatrixSdpStatementWithSlacknessAndDominance.toSdpStatementWithSlackness
     params strategy h.toMatrixSdpStatementWithSlacknessAndDominance
+
+/-- A saturated canonical optimal pair gives the abstract Section 9 SDP
+statement with complementary slackness. -/
+theorem sdpStatementWithSlackness_of_canonicalOptimalPair
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
+      (matrixSdpPointRealizationOfStrategy params strategy)))
+    (Z : MIPStarRE.Quantum.Op ι)
+    (h : MatrixSdpCanonicalOptimalPair params
+      (matrixSdpPointRealizationOfStrategy params strategy) X Z) :
+    SdpStatementWithSlackness params strategy :=
+  MatrixSdpStatementWithSlackness.toSdpStatementWithSlackness
+    params strategy h.toMatrixSdpStatementWithSlackness
 
 /-- A saturated canonical optimal pair, together with a separately proved
 dominance bound `I ≤ Z`, gives the abstract Section 9 SDP statement with
@@ -532,11 +562,9 @@ theorem sdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness
       params model X hX Z hdual hstrong hcanonical hOneLe
   let hpair :
       SdpOptimalPairWithSlackness params strategy (matrixSubmeasurementToSubMeas Tsub) Z :=
-    hopt.toMatrixSdpOptimalWitness.toSdpOptimalPairWithSlackness_of_dualDominatesIdentity
-      hopt.dualDominatesIdentity
+    hopt.toMatrixSdpOptimalWitness.toSdpOptimalPairWithSlackness
   exact ⟨hpair.primalMeasurement, hpair.toSdpOptimalPair.dualPositive,
-    hpair.toSdpOptimalPair.dualDominatesIdentity, hpair.toSdpOptimalPair.dualFeasible,
-    hpair.complementarySlackness⟩
+    hOneLe, hpair.toSdpOptimalPair.dualFeasible, hpair.complementarySlackness⟩
 
 /-- A canonical optimal pair with dominance gives the displayed abstract SDP
 measurement witness. -/

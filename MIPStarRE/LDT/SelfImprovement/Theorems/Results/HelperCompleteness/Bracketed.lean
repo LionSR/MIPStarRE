@@ -524,8 +524,6 @@ lemma sdp
   refine ⟨T.toSubMeas, Z, ?_⟩
   refine
     { primalTotalOperator := T.total_eq_one
-      dualDominatesIdentity := by
-        simpa [Z] using one_le_sdpStrictDualWitness (ι := ι)
       dualFeasible := ?_ }
   intro g
   simpa [Z, sdpDualSlackOperator] using
@@ -536,10 +534,8 @@ lemma sdp
 /-- Canonical block-SDP data yields the complementary-slackness variant of
 `lem:sdp`.
 
-This wrapper is the strategy-level counterpart of
-`sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance`.
-The output is `SdpStatementWithSlackness` and therefore includes the
-complementary-slackness equations needed by the strengthened helper wrappers. -/
+From a saturated canonical optimal pair in matrix SDP form, one obtains the
+abstract Section 9 SDP statement with complementary slackness. -/
 lemma sdp_with_slackness
     (params : Parameters)
     [FieldModel params.q]
@@ -547,10 +543,10 @@ lemma sdp_with_slackness
     (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
       (matrixSdpPointRealizationOfStrategy params strategy)))
     (Z : MIPStarRE.Quantum.Op ι)
-    (hsdp : MatrixSdpCanonicalOptimalPairWithDominance params
+    (hsdp : MatrixSdpCanonicalOptimalPair params
       (matrixSdpPointRealizationOfStrategy params strategy) X Z) :
     SdpStatementWithSlackness params strategy :=
-  sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance
+  sdpStatementWithSlackness_of_canonicalOptimalPair
     params strategy X Z hsdp
 
 /-- Paper-origin statement for `lem:sdp` with complementary slackness.
