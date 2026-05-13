@@ -250,16 +250,16 @@ on each Section 6 slice.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
 `references/ldt-paper/self_improvement.tex:631-811`; this records the
-formalization boundary needed to run the Section 9 theorem on honest slice
+formalization boundary needed to run the Section 9 theorem on concrete slice
 strategies.
 
 The record deliberately keeps the remaining mathematical obligations explicit:
-for every slice it asks for an honest `SymStrat params ι` whose state,
+for every slice it asks for a concrete `SymStrat params ι` whose state,
 point-measurement interface, and averaged point operator agree with the
 restricted-slice bookkeeping used by Section 6.  The equalities below do not
 derive the extra `SymStrat` fields (`permInvState`, `densityFixed`, or
 `isNormalized`) from the restricted strategy; those remain part of the supplied
-honest slice strategies.
+concrete slice strategies.
 
 The Section 9 analytic proof debt is not stored in this record.  The package
 constructor below calls
@@ -274,9 +274,9 @@ structure SelfImprovementPackage.SliceObligations
     (restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma)
     (inductionPkg : PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k)
     where
-  /-- Honest symmetric strategies realizing the slice interfaces. -/
+  /-- Concrete symmetric strategies realizing the slice interfaces. -/
   sliceStrategy : Fq params → SymStrat params ι
-  /-- Each honest slice strategy uses the ambient state. -/
+  /-- Each concrete slice strategy uses the ambient state. -/
   state_eq : ∀ x, (sliceStrategy x).state = strategy.state
   /-- Its point measurement agrees with the restricted-slice point interface. -/
   pointMeasurement_eq :
@@ -289,7 +289,7 @@ structure SelfImprovementPackage.SliceObligations
     ∀ x h,
       IdxPolyFamily.averagedPointEvaluationOperator (sliceStrategy x) h =
         IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x h
-  /-- The honest slice strategy is good with the restricted failure profile. -/
+  /-- The concrete slice strategy is good with the restricted failure profile. -/
   good :
     ∀ x,
       (sliceStrategy x).IsGood
@@ -298,7 +298,7 @@ structure SelfImprovementPackage.SliceObligations
         (restrictionPkg.profile.diagonal x)
 
 /-- The averaged slice point-operator compatibility is structural: once an
-honest slice strategy's point measurement agrees with the restricted-slice point
+concrete slice strategy's point measurement agrees with the restricted-slice point
 measurement, the averaged point operators agree by unfolding the two averages. -/
 theorem SelfImprovementPackage.SliceObligations.averagedPoint_eq_of_pointMeasurement_eq
     (params : Parameters)
@@ -325,7 +325,7 @@ point-operator compatibility is a formal transport between the restricted slice
 interface and the Section 9 interface.
 
 The only structural equality needed for that field is `pointMeasurement_eq`.
-The remaining inputs are the honest slice strategies, their state transport, and
+The remaining inputs are the concrete slice strategies, their state transport, and
 their restricted-profile goodness. -/
 noncomputable def SelfImprovementPackage.SliceObligations.ofPointMeasurementEq
     (params : Parameters)
@@ -357,7 +357,7 @@ noncomputable def SelfImprovementPackage.SliceObligations.ofPointMeasurementEq
       params strategy sliceStrategy pointMeasurement_eq
   good := good
 
-/-- Transport restricted-slice goodness to an honest slice strategy once the
+/-- Transport restricted-slice goodness to a concrete slice strategy once the
 state and the measurements used by the three LDT subtests agree with
 `xRestrictedStrategy`.
 
@@ -415,7 +415,7 @@ theorem SelfImprovementPackage.SliceObligations.good_of_restrictedGood
       simp [state_eq x, pointMeasurement_eq x, diagonalMeasurement_eq x]
     simpa [hfail] using hgood.diagonalLineTest
 
-/-- Build `SliceObligations` from honest slice strategies and measurement
+/-- Build `SliceObligations` from concrete slice strategies and measurement
 transport.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
@@ -424,7 +424,7 @@ Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
 This constructor fills both structural fields that are forced by the restricted
 slice interface: `averagedPoint_eq` follows from point-measurement transport and
 `good` follows from the restricted failure profile plus state/axis/diagonal
-measurement transport.  The remaining non-structural inputs are the honest
+measurement transport.  The remaining non-structural inputs are the concrete
 slice strategies themselves. -/
 noncomputable def SelfImprovementPackage.SliceObligations.ofMeasurementEq
     (params : Parameters)
@@ -463,7 +463,7 @@ self-improvement data.
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
 `references/ldt-paper/self_improvement.tex:631-811`.
 
-The construction assumes the honest slice strategies and their structural
+The construction assumes the concrete slice strategies and their structural
 measurement transports. It applies the theorem
 `selfImprovementInInductionSection` slice-by-slice and transports its fields
 across the recorded equalities to the restricted-slice interface.  The theorem

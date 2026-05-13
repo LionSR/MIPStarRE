@@ -31,16 +31,15 @@ must not be presented as theorems from the paper.
 The SelfImprovement module compiles with all its lemmas, the Pasting module
 compiles independently, and the MainInductionStep module wires them together in
 principle.  The remaining gap is now represented in the correct place:
-`mainFormal` is again the paper-facing theorem statement, while
-`mainFormal_ofInternalObligations` is the internal-obligation assembly theorem.
-The public `mainFormal` theorem does not take completion data as an additional
-hypothesis; instead it contains tracked proof obligations to produce that data
-from the paper hypotheses.
+`mainFormal` is again the paper-facing theorem statement, and its proof contains
+the tracked construction gap directly.  The proved final-transport theorem
+`mainFormal_ofProjectiveCompletionResidual` is retained as useful proof content,
+but no public theorem supplies completion data as an additional hypothesis.
 
 The architecture is therefore incomplete, but the theorem boundary is no longer
-misstated.  The remaining work is to derive the obligations and residual records
-inside the proof, and then discharge those obligations from the paper-facing
-theorem.
+misstated.  The remaining work is to derive the Section 6 role residual and the
+post-role projective-completion residual inside the proof, and then apply the
+already-proved final transport.
 
 ---
 
@@ -56,10 +55,9 @@ Main theorems:
 |---------|----------|----------|------------|
 | `selfImprovementHelper` | `SelfImprovementTop/Core.lean` | `SelfImprovementHelperConclusion` (T, Hhat, Z) | `IsGood`, input consistency, tracked helper obligations |
 | `selfImprovement` | `SelfImprovementTop/Core.lean` | `SelfImprovementConclusion` (full output) | paper-shaped hypotheses: `IsGood`, `G`, input consistency |
-| `selfImprovementFromObligations` | `SelfImprovementTop/Core.lean` | `SelfImprovementConclusion` | conditional helper: `SelfImprovementObligations` + `IsGood` + `G` |
 
-The three hypotheses recorded by `SelfImprovementObligations` (defined in
-`Theorems/Statements.lean:481`):
+Historically, the deleted `SelfImprovementObligations` bundle recorded three
+proof-stage inputs:
 
 1. **`helperStrongSelfConsistency`**: `HelperStrongSelfConsistencyInput` — the
    averaged `Hhat` is stably self-consistent (`BipartiteSSCRel` at level
@@ -72,9 +70,9 @@ The three hypotheses recorded by `SelfImprovementObligations` (defined in
    derivable from the helper+orthonormalization+data-processing outputs.
 
 These three inputs are no longer hypotheses of the paper-facing theorem
-`selfImprovement`.  They are the fields of the conditional helper
-`selfImprovementFromObligations`, and the source-facing theorem currently leaves
-the derivation from the paper hypotheses as the tracked proof obligation #1515.
+`selfImprovement`.  The former conditional helper
+`selfImprovementFromObligations` has been removed; the derivation from the paper
+hypotheses is the tracked proof obligation #1515 in `selfImprovement` itself.
 
 ### 1.2. Pasting (Section 9/10 bridge)
 
@@ -104,9 +102,9 @@ selfImprovementInInductionSection    (Core.lean)
 
 ```
 SelfImprovementPackage.ofSliceObligations   (Core.lean)
-  └─ calls selfImprovementInInductionSection_ofObligations per slice
-       └─ internally completes the input submeasurement
-       └─ uses SelfImprovement.SelfImprovementObligations per slice
+  └─ calls selfImprovementInInductionSection per slice
+       └─ uses SliceObligations only for concrete slice strategies
+          and measurement transport
 ```
 
 ```
@@ -128,60 +126,26 @@ mainInductionByRecursionOnM   (MainTheorems.lean)
 **The key observation:** `mainInductionByRecursionOnM` takes `hselfObligation`
 as an internal proof-stage input.  This `hselfObligation` must produce a
 `SelfImprovementPackage` from a `PerSliceInductionPackage`.  It is not a
-hypothesis of the source-facing `mainInduction` theorem; that theorem retains
+hypothesis of the paper-facing `mainInduction` theorem; that theorem retains
 the paper-shaped statement and the non-base branch is tracked by #1507.
 
 ### 1.4. MainFormal (Final Assembly)
 
 **Module:** `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean`
 
-The current source-facing theorem `mainFormal` takes the paper hypotheses,
+The current paper-facing theorem `mainFormal` takes the paper hypotheses,
 together with the large-`k` and positivity boundary hypotheses tracked elsewhere
 in the project.  It does **not** take bridge-style data, role residual data, or final
 projective-completion inputs.
 
-The internal-obligation helper `mainFormal_ofInternalObligations` is closed
-except for two tracked proof obligations: the base-branch completion data and
-the successor projective-completion residual.
-
-**Base case (m=1):** Works inside the internal-obligation helper.  The base
-role residual is produced by the checked handoff; the remaining completion data
-is isolated as `MainFormalBaseBranchCompletionObligations`.
-
-**Successor case (m>1):** incomplete.  The comment in `MainFormal.lean`
-identifies the missing work as supplying the ordinary or answer-valued recursive
-induction witnesses, the per-slice self-improvement obligations, and the
-resulting Step 6 witness residual.
-
-#### What's needed in the successor case:
-
-1. Recursive per-slice induction data for the predecessor —
-   `MainFormalSuccessorRecursiveSlices` (typed by
-   `successorRecursiveSlicesInput` in `RoleRegister.lean`).
-2. Self-improvement obligations for the predecessor —
-   `MainFormalSuccessorSelfImprovementObligations` (typed by
-   `successorSelfImprovementObligations` in `RoleRegister.lean`).
-
-Both are type aliases for `Prop`-valued functions asking for:
-- Per-slice induction conclusions (`ConsRel` with bounded error) for the
-  predecessor's restricted strategies
-- Per-slice `SelfImprovementObligations` for the honest slice strategies
-
-#### What exists but is not yet connected:
-
-The assembly functions in `RoleRegister.lean` are all ready:
-
-- `successorOfObligations` (line 538) — takes `hrec` + `obligations` →
-  `MainFormalRolePackageBranchResidual.successor`
-- `answerSuccessorOfInductionPackageAndObligations` (line 628) — takes
-  `hinduction` + `obligations` → `MainFormalRolePackageBranchResidual.answerSuccessor`
-- Their corresponding `rolePackageResidual_of*` wrappers produce
-  `MainFormalRolePackageResidual`
-
-The gap is now a construction gap rather than a statement-signature gap.  The
-successor branch in `mainFormal_ofInternalObligations` still has a tracked
-proof obligation because the proof has not yet derived the successor induction
-data and self-improvement obligations from the paper hypotheses.
+The current proof gap is direct: `mainFormal` must construct the Section 6 role
+residual and the post-role projective-completion residual from the paper
+hypotheses.  The Section 6 role residual is routed through
+`MainFormalRolePackageResidual.ofMainInductionLargeK`, whose successor branch is
+the tracked `sorry` in `MainInductionStep.mainInduction`.  Once the role
+residual and post-role completion residual are available, the proved theorem
+`mainFormal_ofProjectiveCompletionResidual` supplies the final three consistency
+conclusions.
 
 ---
 
@@ -195,8 +159,12 @@ MainInductionStep or MainTheorem:
 | Declaration | File | Status |
 |------------|------|--------|
 | `self_improvement_helper_with_slackness` | `SelfImprovementTop/Core.lean:119` | Proved, orphan |
-| `selfImprovementWithSlacknessAndResidualDominationInput` | `SelfImprovementTop/ResidualDomination.lean:81` | Proved, orphan |
-| `selfImprovementFromSlacknessResidualDominationObligations` | `SelfImprovementTop/ResidualDomination.lean:166` | Proved, orphan |
+
+The former full-conclusion residual-domination variants
+`selfImprovementWithSlacknessAndResidualDominationInput` and
+`selfImprovementFromSlacknessResidualDominationObligations` were removed by PR
+#1539.  The remaining slackness-carrying helper is not a theorem-level
+substitute for `selfImprovement`.
 
 These are variants that assume the SDP carries complementary slackness
 (`SdpStatementWithSlackness`).  The main pipeline uses
@@ -215,16 +183,12 @@ MainInductionStep or MainTheorem:
 | `selfImprovementHelperWithCanonicalMatrixSdpSlacknessAndDominance` | 70 |
 | `selfImprovementHelperWithCanonicalOptimalPairSdpSlacknessAndDominance` | 110 |
 | `selfImprovementHelperWithCanonicalOptimalPairSdpSlackness_of_dualDominatesIdentity` | 134 |
-| `selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDomination` | 167 |
-| `selfImprovementWithCanonicalMatrixSdpSlacknessAndResidualDominationInput` | 287 |
-| `selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDomination` | 353 |
-| `selfImprovementWithCanonicalOptimalPairSdpSlacknessAndResidualDominationInput` | 407 |
-| `selfImprovementWithCanonicalOptimalPairAndQXPResidualDomination` | 460 |
-| `selfImprovementWithCanonicalOptimalPairAndQXPRepairAndResidualDomination` | 511 |
 
-These bridge the matrix-level SDP (in `MatrixRealization/`) with the abstract
-`selfImprovement` theorem.  They are **designed for a matrix-based proof path**
-that is not yet wired into the main induction.
+These bridge the matrix-level SDP (in `MatrixRealization/`) with the
+slackness-carrying helper conclusion.  PR #1539 removed the former
+full-conclusion matrix-SDP residual-domination variants, so this module no
+longer produces `selfImprovement` from additional residual, repair, or QXP
+hypotheses.
 
 ### 2.3. OrthonormalizationInputConstructors
 
@@ -253,26 +217,26 @@ submodules.
 the conditional assembly uses as the first stage of the Section 9 proof.  The
 remaining missing step is to derive the helper strong self-consistency,
 orthonormalization, and final-fields inputs from the hypotheses of the paper
-theorem.  The source-facing theorem `selfImprovement` now leaves this as the
+theorem.  The paper-facing theorem `selfImprovement` now leaves this as the
 tracked proof obligation #1515, rather than taking those three inputs as
 hypotheses.  The helper-stage strong self-consistency derivation is separately
 tracked by #1514.
 
-### 3.2. selfImprovement → selfImprovementInInductionSection: Conditional only
+### 3.2. selfImprovement → selfImprovementInInductionSection: Proof gap
 
 The paper-facing theorem `selfImprovementInInductionSection` has the expected
-submeasurement input and leaves the induction-section proof as #1503.  The
-conditional helper `selfImprovementInInductionSection_ofObligations` performs
-the current checked assembly: it internally completes the submeasurement to a
-measurement and then calls `SelfImprovement.selfImprovementFromObligations`.
+submeasurement input and leaves the induction-section proof as #1503.  It does
+not take a measurement-completion package or Section 9 obligation bundle as an
+extra hypothesis.
 
-### 3.3. selfImprovementInInductionSection → SelfImprovementPackage: Conditional only
+### 3.3. selfImprovementInInductionSection → SelfImprovementPackage: Internal assembly
 
 `SelfImprovementPackage.ofSliceObligations` calls
-`selfImprovementInInductionSection_ofObligations` per slice, using the
-slice-level obligations from `SelfImprovementPackage.SliceObligations`.  This
-keeps the proof-stage assumptions inside the conditional package constructor;
-they should not be reintroduced into the paper-facing theorem.
+`selfImprovementInInductionSection` per slice, using
+`SelfImprovementPackage.SliceObligations` only for the concrete restricted-slice
+strategies and measurement transports.  The theorem-level Section 9 proof debt
+remains in `selfImprovementInInductionSection`, not in an additional package
+hypothesis.
 
 ### 3.4. SelfImprovementPackage → AveragedPastingInput: ✅ Complete
 
@@ -287,21 +251,15 @@ theorem.
 
 ### 3.6. mainInductionByRecursionOnM → mainFormal completion obligations: INCOMPLETE
 
-The internal helper `mainFormal_ofInternalObligations` still has tracked proof
-obligations in the successor and base-completion branches.  The source-facing
-theorem `mainFormal` keeps those obligations inside the proof.  They are not new
-assumptions on the paper theorem.
+The theorem `mainFormal` carries the remaining construction gap directly.  It
+does not expose recursive-slice data, self-improvement obligations, or a role
+residual as hypotheses.
 
 The missing successor construction needs:
 
-- Recursive per-slice induction data for the predecessor
-- Self-improvement obligations for the predecessor slices
-- The ordinary or answer-valued role residual used by the final Step 6 assembly
-
-The wiring functions (`successorOfObligations`, `answerSuccessorOfObligations`,
-and their residual constructors) exist in `RoleRegister.lean`, but the
-source-facing theorem still lacks the obligation discharger that constructs
-their inputs from the paper hypotheses.
+- the Section 6 role residual, via `MainFormalRolePackageResidual.ofMainInductionLargeK`;
+- the post-role projective-completion residual, from the line-130
+  orthonormalization and completion estimates.
 
 ---
 
@@ -312,7 +270,7 @@ their inputs from the paper hypotheses.
 | SelfImprovement | ~50 theorems/lemmas | 2 paper theorem statements (`selfImprovementHelper`, `selfImprovement`) | The paper statements are visible; their remaining derivations are tracked proof gaps |
 | SelfImprovement sub-lemmas (slackness, matrix bridge) | ~15 proved lemmas | 0 called from MI or MT | Entirely orphan |
 | MainInductionStep | `selfImprovementInInductionSection`, `SelfImprovementPackage.ofSliceObligations`, `ldPastingInInductionSection`, `mainInductionByRecursionOnM` | Internal assembly remains in `MainTheorems.lean` | `mainInductionByRecursionOnM` takes `hselfObligation` as an internal input; the public wrapper has been removed |
-| MainTheorem | `mainFormal`, `mainFormal_ofInternalObligations` | Paper-facing theorem separated from internal-obligation assembly | Completion obligations and the successor residual remain tracked proof obligations |
+| MainTheorem | `mainFormal`, `mainFormal_ofProjectiveCompletionResidual` | Paper-facing theorem plus proved final transport from a constructed completion residual | Role-residual and post-role completion constructions remain tracked proof gaps |
 
 ---
 
@@ -327,16 +285,14 @@ by additional hypotheses:
    MainInductionStep compile successfully, while the final theorem still has
    tracked proof obligations in `MainFormal.lean`.
 
-2. The three obligations
-   (`helperStrongSelfConsistency`, `orthonormalization`, `finalFields`) are
-   separately stated as hypotheses for conditional interfaces.  Some components
-   are proved in isolation within SelfImprovement's submodules, but the
-   assertion that the full `SelfImprovementObligations` record is derived from
-   every good strategy is not yet available at the source-facing call site.
+2. The former top-level obligation bundle has been removed.  Some components
+   such as helper strong self-consistency, orthonormalization, and final-fields
+   assembly are still proved or stated in isolation, but the paper-facing
+   theorems keep their missing derivations as tracked proof gaps.
 
-3. The successor gap is the concrete manifestation: the final assembly needs
-   `SelfImprovementObligations` for each predecessor slice, together with the
-   corresponding predecessor induction data.
+3. The successor gap is the concrete manifestation: the Section 6 theorem must
+   derive the restricted-slice recursion and self-improvement outputs from the
+   paper hypotheses, rather than receiving them through a public wrapper.
 
 ### Is the architecture broken?
 
@@ -364,19 +320,21 @@ which this audit is meant to prevent.
    record that the remaining work is to produce the completion data and
    successor residuals from the paper hypotheses.
 
-2. **Decide fate of orphan lemmas.**  The ~15 slackness-carrying and
-   matrix-bridge lemmas in `SdpMatrixHelperBridge.lean` and
-   `SelfImprovementTop/ResidualDomination.lean` are fully proved but never
-   called.  Options: (a) keep them as future-proofing for the strong-duality
-   proof, (b) mark them with `@[deprecated]` or move them to a
-   `FutureWork/` directory, (c) delete them.
+2. **Decide fate of the remaining orphan helper lemmas.**  The
+   slackness-carrying helper and the matrix-to-helper lemmas in
+   `SdpMatrixHelperBridge.lean` are fully proved but not yet used by the
+   main induction.  The top-level residual-domination variants have already
+   been deleted.  Options for the remaining helper route are: (a) keep it as
+   future proof content for strong duality, (b) mark it with `@[deprecated]`
+   or move it to a future-work namespace, (c) delete it if the paper proof
+   will not use this route.
 
 3. **Coordinate with the proof-debt tracking issue.**  New repair work should
    be linked from #1458 and should state whether it discharges an internal
    obligation, restores a paper-facing theorem statement, or only records a
    conditional helper.
 
-4. **Keep blueprint tags source-facing.**  A theorem block with a paper label
+4. **Keep blueprint tags paper-facing.**  A theorem block with a paper label
    should point to the paper-facing declaration.  Conditional helpers belong in
    remarks or implementation notes, and should not be used to justify a
    `\leanok` claim for the paper theorem.
@@ -388,12 +346,12 @@ which this audit is meant to prevent.
 | File | Role |
 |------|------|
 | `MIPStarRE/LDT/SelfImprovement/Defs.lean` | SDP witnesses, error functions, `averagedSandwichedPolynomialSubMeas` |
-| `MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean` | `SelfImprovementObligations`, `SelfImprovementHelperConclusion`, `SelfImprovementConclusion`, etc. |
-| `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/Core.lean` | `selfImprovementHelper`, `selfImprovement`, `selfImprovementFromObligations` |
+| `MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean` | `SelfImprovementHelperConclusion`, `SelfImprovementConclusion`, etc.; the former `SelfImprovementObligations` bundle has been removed |
+| `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/Core.lean` | `selfImprovementHelper`, `selfImprovement`; the former `selfImprovementFromObligations` theorem has been removed |
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperSSC/` | Proof of `helperStrongSelfConsistency` (internal) |
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/BoundednessTransport.lean` | Proof of `finalFields` (internal) |
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SdpMatrixHelperBridge.lean` | **ORPHAN** — matrix-level SDP bridges |
-| `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/ResidualDomination.lean` | **ORPHAN** — slackness-carrying self-improvement variants |
+| `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/ResidualDomination.lean` | Compatibility note marking the removal of top-level residual-domination variants |
 | `MIPStarRE/LDT/SelfImprovement/Theorems/OrthonormalizationInputConstructors/` | **ORPHAN** — unused outside barrel import |
 | `MIPStarRE/LDT/SelfImprovement/MatrixRealization.lean` | Matrix-level SDP realization (used by orphan SDP bridges only) |
 | `MIPStarRE/LDT/Pasting/Core.lean` | `ldPasting` — consumed by `ldPastingInInductionSection` |
@@ -401,7 +359,7 @@ which this audit is meant to prevent.
 | `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` | `mainInduction`, `mainInductionBaseCase`, `mainInductionByRecursionOnM` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/PackageConstructors.lean` | `AveragedPastingInput.output`, `mainInductionFromPackages` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly.lean` | `assembleAveragedPastingInput` |
-| `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | `mainFormal` and `mainFormal_ofInternalObligations`; paper-facing theorem plus internal-obligation assembly |
-| `MIPStarRE/LDT/Test/MainTheorem/RoleRegister.lean` | Assembly functions `successorOfObligations`, etc., awaiting source-level obligation dischargers |
-| `MIPStarRE/LDT/Test/MainTheorem/OrdinaryRestriction/Basic.lean` | `MainFormalSuccessorSelfImprovementObligations` type definition and constructors |
-| `MIPStarRE/LDT/Test/MainTheorem/AnswerValuedRestriction.lean` | Answer-valued counterpart |
+| `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | `mainFormal` and `mainFormal_ofProjectiveCompletionResidual`; paper theorem plus proved final transport |
+| `MIPStarRE/LDT/Test/MainTheorem/RoleRegister.lean` | Role-register residual constructors routed through Section 6 `mainInduction` |
+| `MIPStarRE/LDT/Test/MainTheorem/OrdinaryRestriction/Basic.lean` | Ordinary restricted-slice weighted bounds and recursive-slice targets |
+| `MIPStarRE/LDT/Test/MainTheorem/AnswerValuedRestriction.lean` | Answer-valued restricted-slice weighted bounds and recursive-slice targets |
