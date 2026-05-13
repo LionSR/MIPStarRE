@@ -43,7 +43,7 @@ separate numerical comparison on the explicit error definitions.
 This is **not** a raw residual: this construction derives the entire
 `selfCloseness` field from data already present in the `selfImprovement`
 proof. It does not assume the projective self-closeness it produces and does
-not restate `FinalFieldsInput`.
+not restate a bundled final-fields input.
 
 Paper anchors:
 * `references/ldt-paper/self_improvement.tex` lines 727--741 — projective

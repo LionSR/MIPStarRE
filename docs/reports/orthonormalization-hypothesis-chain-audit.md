@@ -2,15 +2,15 @@
 
 **Issue:** #1359
 **Original audit date:** 2026-05-07
-**Revised:** 2026-05-12
+**Revised:** 2026-05-13
 **Scope:** `MakingMeasurementsProjective/Orthonormalization.lean` through
 `SelfImprovement`, `MainInductionStep`, and `Test/MainTheorem/MainFormal.lean`.
 
 This note replaces the obsolete 2026-05-07 description of the old
 conditional route into the final theorem.  The current `mainFormal` statement
 is source-facing: it has no non-paper proof-obligation input in its public
-theorem statement.  The remaining work is recorded as internal proof
-obligations.
+theorem statement.  The remaining work is recorded either as named construction
+lemmas or as direct tracked proof gaps on source-facing theorems.
 
 ## Current Verdict
 
@@ -38,13 +38,10 @@ remain.
 
 ## Layer 1: Section 5 Orthonormalization
 
-`MakingMeasurementsProjective.OrthonormalizationInput` still exists as the
-general Section 5 interface for the internal theorem
-`orthonormalization`.  It consists of a spectral-truncation input and a
-locality-preserving repair input for the option-completed measurement.
-
-This is a conditional internal interface, not the paper-facing endpoint used by
-`mainFormal`.
+The former `MakingMeasurementsProjective.OrthonormalizationInput` record has
+been removed.  The paper-facing Section 5 statements now keep the missing sharp
+orthonormalization construction as tracked proof gaps rather than as an extra
+record-valued theorem hypothesis.
 
 The source-facing wrapper used by the final theorem route is
 `orthonormalizationMeasurement_of_consistency_from_projectivizationRepair`.
@@ -55,25 +52,19 @@ submeasurement and SDD closeness required by the line-130 construction.
 
 ## Layer 2: Section 9 Self-Improvement
 
-`SelfImprovement.OrthonormalizationInput` remains a real proof obligation for
-the source-facing self-improvement theorem.  It is obtained from:
-
-- `OrthonormalizationSpectralObligation`, whose source-almost-projective route
-  is proved; and
-- `OrthonormalizationRepairObligation`, the locality-preserving repair slice
-  for the option-completed helper submeasurement.
-
-The current naming makes this status explicit.  The open repair and final-field
-work belongs to the self-improvement proof obligations #1514 and #1515, not to
-the public statement of `mainFormal`.
+The former `SelfImprovement.OrthonormalizationInput` bundle has also been
+removed.  The useful retained construction is
+`OrthonormalizationSpectralObligation`, whose source-almost-projective route is
+proved.  The locality-preserving repair and final-field arguments are no longer
+presented as bundled theorem inputs; the source-facing self-improvement theorem
+keeps them as tracked proof gaps under #1514 and #1515.
 
 ## Layer 3: Section 6 Induction
 
-`selfImprovementInInductionSection` and the slice assembly records consume
-Section 9 obligations.  They should not be read as additional assumptions of
-the paper theorem.  The open Section 6 obligation is to construct the per-slice
-induction data and self-improvement data from the recursive induction
-hypothesis and the restricted strategies.
+`selfImprovementInInductionSection` and the slice assembly records now call the
+source-facing Section 9 theorem directly.  The open Section 6 obligation is to
+construct the per-slice induction data and self-improvement data from the
+recursive induction hypothesis and the restricted strategies.
 
 This is tracked by #1503 and #1507.
 
@@ -111,6 +102,8 @@ This is tracked by #1043 and #1359.
 
 - The final assembly no longer depends on the obsolete conditional route.
 - The role-level orthonormalization input record has been removed.
+- The Section 5 and Section 9 bundled orthonormalization input records have
+  been removed.
 - The line-130 projective submeasurements are produced from cross consistency
   by the Section 5 repair construction.
 - Blueprint and documentation now describe these objects as obligations rather
@@ -118,8 +111,9 @@ This is tracked by #1043 and #1359.
 
 ## What Remains Open
 
-- The Section 9 locality-preserving repair obligation for helper
-  submeasurements remains part of the self-improvement proof frontier.
+- The Section 9 locality-preserving repair argument for helper submeasurements
+  remains part of the self-improvement proof frontier, but it is no longer
+  represented as an extra input bundle.
 - The source-facing `selfImprovementHelper`, `selfImprovement`,
   `selfImprovementInInductionSection`, and `mainInduction` proofs still contain
   tracked `sorry` obligations.
