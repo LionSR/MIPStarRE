@@ -1843,7 +1843,6 @@ lemma helper_strong_self_consistency_obligations_of_selfConsistency_localVarianc
       (helperOffDiagonalBareQuantity_le_paper_chain_of_scalar_transports
         params strategy eps delta hhelper hleft hright hclone hmove hmoveLower)
 
-set_option linter.style.longLine false in
 /-- Construct the helper-stage obligations from the paper's scalar transports and
 the point-consistency add-in-`u` transfer.
 
@@ -1854,7 +1853,7 @@ the final `move-over-v` lower-bound input from complementary slackness, dual
 feasibility, and the point-consistency transfer. It packages the paper lines
 after `eq:move-over-v` together with the two post-`delete-an-A` scalar
 transports. -/
-lemma helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_scalarTransports_pointTransfer
+lemma helper_ssc_obligations_of_scalarTransports_pointTransfer
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta : Error)

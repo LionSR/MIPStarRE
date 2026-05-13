@@ -254,7 +254,7 @@ lemma selfImprovementHelper
           params strategy delta T.toSubMeas hpointSSC
       have hsscObligations :
           HelperStrongSelfConsistencyObligations params strategy T Hhat eps delta :=
-        helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_scalarTransports_pointTransfer
+        helper_ssc_obligations_of_scalarTransports_pointTransfer
           params strategy eps delta hhelper hpointSSC hlocal hclone hmove
           (fun h => helper_slackness_eq_of_helper_with_slackness
             params strategy eps delta hhelperWithSlackness h)
