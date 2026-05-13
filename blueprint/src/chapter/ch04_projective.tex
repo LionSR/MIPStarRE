@@ -962,7 +962,6 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_image_rows_mixed_eq_sqrt}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.matrix_image_eq_zero_of_nonpositive_gram_eigenvalue}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.adjoint_image_eq_zero_of_orthogonal_positive_gram_images}
-		\leanok
 		\begin{equation*}
 			X^\dagger \cdot X = Q.
 		\end{equation*}
@@ -1081,7 +1080,6 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangePositiveGram}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_sigmaFin_xHat_coisometry_of_sum_le}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinXHatCoisometry_spec}
-		\leanok
 		\begin{equation*}
 			\widehat{X} \cdot \widehat{X}^\dagger = I_{m \times m}.
 		\end{equation*}
@@ -1125,7 +1123,6 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndRectangularSvdSquareRoot}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvdSquareRoot}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot}
-		\leanok
 		\begin{equation*}
 			X^\dagger \cdot \widehat{X} = \sqrt{Q}.
 		\end{equation*}
@@ -1144,6 +1141,18 @@
 		\ref{lem:squared-difference} and \ref{lem:P-Q-approx}.  The companion paper
 		identity for $X\widehat X^\dagger$ is not used downstream.
 	\end{proof}
+
+	\begin{remark}[Lean status for the QXP algebra]\label{rem:qxp-layer-lean-status}
+		The Lean declarations linked in Lemmas~\ref{lem:X-squared},
+		\ref{lem:X-hat-squared}, and~\ref{lem:X-times-X-hat} record useful parts of
+		the paper's \(X,\widehat X,P\) algebra.  The small lemmas named after these
+		paper labels are projections from the structure \texttt{QXPLayerData};
+		the accompanying construction lemmas build such data from sigma-range and
+		rectangular-SVD ingredients.  The blueprint therefore does not mark these
+		three entries as source-complete formalizations until the cited identities
+		are exposed as source-faithful construction theorems rather than hidden as
+		fields of the data package.
+	\end{remark}
 
 	\begin{lemma}[Squared difference]\label{lem:squared-difference}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.squaredDifference}
@@ -1199,12 +1208,10 @@
 
 	\begin{lemma}[$P$ is close to~$Q$]\label{lem:P-Q-approx}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox}
-		\leanok
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndSvdIdentities}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangePositiveGram}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangePositiveGram_with_x_coisometry}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot}
-		\leanok
 		\begin{equation*}
 			Q_a \ot I \approx_{30\zeta^{1/4}} P_a \ot I.
 		\end{equation*}
@@ -1220,7 +1227,9 @@
 		\(X X^\dagger=I\) for the original sigma embedding when the projective
 		\(Q\)-family is subnormalized; this is the construction-level hypothesis
 		later used in the residual-domination argument for the fresh completed
-		outcome.
+		outcome.  As in Remark~\ref{rem:qxp-layer-lean-status}, the statement is
+		left without a source-complete formalization marker while the QXP package
+		still hides some of the displayed SVD identities as structure fields.
 		The quantity to bound is
 		\begin{equation}\label{eq:P-Q-thing-to-bound}
 			\sum_a \bra{\psi} (Q_a-P_a)^2 \ot I \ket{\psi}
