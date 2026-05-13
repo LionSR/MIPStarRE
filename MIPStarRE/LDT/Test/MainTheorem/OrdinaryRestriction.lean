@@ -1,11 +1,11 @@
-import MIPStarRE.LDT.Test.MainTheorem.OrdinaryRestriction.PublicWrapper
+import MIPStarRE.LDT.Test.MainTheorem.OrdinaryRestriction.SliceData
 
 /-!
 # Ordinary restricted-slice recursion
 
 Compatibility module for the ordinary `x`-restricted successor route in the
-`mainFormal` assembly.  This module re-exports declarations from three
-sub-leaves:
+`mainFormal` construction.  This module re-exports declarations from two
+submodules:
 
 * `OrdinaryRestriction.Basic` — successor weighted bounds
   (`MainFormalSuccessorAxisWeightedBound`, `MainFormalSuccessorDiagonalWeightedBound`),
@@ -18,11 +18,6 @@ sub-leaves:
   (`mainFormalSuccessorRestrictedPointAgreement_le_ofSliceData`,
   `mainFormalSuccessorRestrictedAxisParallel_le_ofSliceData`,
   `mainFormalSuccessorRestrictedDiagonal_le_ofSliceData`).
-
-* `OrdinaryRestriction.PublicWrapper` — a compatibility import.  Its former
-  conditional transition has been removed because it took non-paper successor data
-  as hypotheses; the remaining Section 6 proof obligation is now the
-  `mainInduction` theorem with the paper statement.
 
 ## References
 
