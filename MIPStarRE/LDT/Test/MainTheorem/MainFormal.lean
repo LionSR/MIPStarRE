@@ -78,10 +78,8 @@ theorem mainFormal_ofProjectiveCompletionResidual
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
-    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
     (projectiveCompletionResidual :
-      MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
-        params strategy eps hpass k scalars) :
+      MainFormalCascadeProjectiveCompletionTransportResidual params strategy eps k scalars) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
@@ -95,12 +93,9 @@ theorem mainFormal_ofProjectiveCompletionResidual
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  have completionTransportResidual :
-      MainFormalCascadeProjectiveCompletionTransportResidual params strategy eps k scalars :=
-    projectiveCompletionResidual.toCompletionTransportResidual hsmall
   have projectiveTargets :
       MainFormalCascadeProjectiveStageTargets params strategy eps k scalars :=
-    completionTransportResidual.toProjectiveStageTargets hpass
+    projectiveCompletionResidual.toProjectiveStageTargets hpass
   exact MainFormalNativeTargets.toMainFormal
     (projectiveTargets.toTransportTargets.toCascadeTargets.toNativeTargets)
 

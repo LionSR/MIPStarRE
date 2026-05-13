@@ -75,9 +75,9 @@ The current final assembly has two explicit internal obligations.
 
 ### Successor Branch
 
-`mainFormalSuccessorProjectiveCompletionObligation` must construct a
-`MainFormalCascadeRolePackageResidualProjectiveCompletionResidual` in the
-non-base case.  The missing ingredients are:
+The successor branch must construct a
+`MainFormalCascadeProjectiveCompletionTransportResidual` in the non-base case.
+The missing ingredients are:
 
 - recursive slice witnesses for the predecessor;
 - the corresponding per-slice self-improvement obligations;

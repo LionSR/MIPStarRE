@@ -13,8 +13,7 @@ self-consistency relation at error `ζ₁`.  The subsequent stage-target
 structures (`MainFormalCascadeUnsymmetrizedPOVMTargets`,
 `MainFormalCascadeTargets`,
 `MainFormalCascadeTransportTargets`,
-`MainFormalCascadeProjectiveStageTargets`,
-`MainFormalCascadeProjectiveAssemblyResidual`) form the cascade that
+`MainFormalCascadeProjectiveStageTargets`) form the cascade that
 carries the unsymmetrized POVMs through the projective-consistency
 handoff to the native `ζ₄` point-consistency targets.
 
@@ -428,82 +427,6 @@ noncomputable def toTransportTargets {params : Parameters} [FieldModel params.q]
       using hcons
 
 end MainFormalCascadeProjectiveStageTargets
-
-/-- Paper-faithful residual for the projective assembly after the line-116
-triangle step has been factored out.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:97-185`, from
-unsymmetrization through the projective stage of `\label{thm:main-formal}`.
-
-This residual asks for the unsymmetrized `G^A,G^B` POVMs with their two `2σ`
-links (`inductive_step.tex` lines 97--109), then records the still-open
-projectivization/completion and point-transport outputs from lines 135--185:
-the line-156 `≈_{ζ₃}` bridge and the two native `ζ₄` point-consistency goals.
-The theorem `toProjectiveStageTargets` proves the line-116 pre-projective
-self-consistency from these fields and the low-individual-degree pass hypothesis. -/
-structure MainFormalCascadeProjectiveAssemblyResidual
-    (params : Parameters) [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
-    (scalars : MainFormalCascadeScalars params eps k) where
-  /-- Unsymmetrized POVMs and the two paper `2σ` consistency estimates. -/
-  unsymmetrized :
-    MainFormalCascadeUnsymmetrizedPOVMTargets params strategy eps k scalars
-  /-- The projective measurement denoted $Q^{\mathrm A}$ in the paper. -/
-  leftMeasurement : ProjMeas (Polynomial params) ι
-  /-- The projective measurement denoted $Q^{\mathrm B}$ in the paper. -/
-  rightMeasurement : ProjMeas (Polynomial params) ι
-  /-- Native form of `eq:one-goal` at the paper-defined `ζ₄`. -/
-  pointAConsistency :
-    ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      (polynomialEvaluationFamily params rightMeasurement.toSubMeas)
-      scalars.zeta4
-  /-- Native form of `eq:another-goal` at the paper-defined `ζ₄`. -/
-  pointBConsistency :
-    ConsRel strategy.state (uniformDistribution (Point params))
-      (polynomialEvaluationFamily params leftMeasurement.toSubMeas)
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-      scalars.zeta4
-  /-- Paper line 156, produced by orthogonalization, completion,
-  `prop:simeq-to-approx`, and the `≈_δ` triangle inequality. -/
-  fullPolynomialConsistency :
-    ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily unsymmetrized.leftPOVM.toSubMeas)
-      (constSubMeasFamily unsymmetrized.rightPOVM.toSubMeas)
-      scalars.zeta1 →
-    Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily leftMeasurement.toSubMeas)
-      (constSubMeasFamily rightMeasurement.toSubMeas)
-      scalars.zeta3
-
-namespace MainFormalCascadeProjectiveAssemblyResidual
-
-/-- Assemble the previous projective-stage target from the finer residual package.
-
-The proved work here is exactly paper lines 110--117: the two unsymmetrized `2σ`
-links and the original `3ε` point agreement are combined by
-`prop:simeq-triangle-inequality` to produce the evaluated pre-projective
-self-consistency consumed by Step 5. -/
-noncomputable def toProjectiveStageTargets
-    {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {scalars : MainFormalCascadeScalars params eps k}
-    (residual : MainFormalCascadeProjectiveAssemblyResidual params strategy eps k scalars)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
-    MainFormalCascadeProjectiveStageTargets params strategy eps k scalars where
-  preSelfConsistency :=
-    residual.unsymmetrized.toPreProjectiveSelfConsistency hpass
-  leftMeasurement := residual.leftMeasurement
-  rightMeasurement := residual.rightMeasurement
-  pointAConsistency := residual.pointAConsistency
-  pointBConsistency := residual.pointBConsistency
-  fullPolynomialConsistency := by
-    intro hpre
-    exact residual.fullPolynomialConsistency hpre
-
-end MainFormalCascadeProjectiveAssemblyResidual
 
 end Test
 

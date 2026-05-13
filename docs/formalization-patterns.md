@@ -180,9 +180,10 @@ not an added hypothesis of `mainFormal`.  The remaining Section 3 work includes:
 1. The successor projective-completion obligation.  It must construct the
    line-130 orthonormalization residual from cross consistency and supply the
    completion data used after `completingToMeasurement`.
-2. The base-case projective-completion residual obligation, whose target is the
-   direct `Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
-   ...)` needed by the final transport.
+2. The base-case projective-completion residual obligation, whose active target
+   is a direct
+   `Nonempty (MainFormalCascadeProjectiveCompletionTransportResidual ...)`
+   needed by the final transport.
 
 These are data-construction obligations.  Once the per-slice self-improvement
 proof obligations and recursive induction data are threaded through, the

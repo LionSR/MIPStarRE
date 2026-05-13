@@ -8,20 +8,29 @@ Date: 2026-05-07
 > theorem.  The current repair keeps `mainFormal` aligned with
 > `thm:main-formal`.  The subsequent MainFormal cleanup removes the live
 > repaired-bridge route and keeps the remaining base and successor work as
-> internal proof obligations tracked by #1458.
+> internal proof obligations tracked by #1458.  The later projective-layer
+> cleanup also removed
+> `MainFormalCascadeRolePackageResidualProjectiveCompletionResidual`; the active
+> construction target is now
+> `MainFormalCascadeProjectiveCompletionTransportResidual`.
 
 ## 1. Exact sorry site
 
 **File:** `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean:611`
 
-**Goal type at the sorry:**
+**Historical goal type at the sorry:**
 ```lean
 Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
   (params := params) (strategy := strategy) (eps := eps)
   (hpass := hpass) (k := k) (scalars := scalars))
 ```
 
-**The structure `MainFormalCascadeRolePackageResidualProjectiveCompletionResidual` has two fields** (defined in `NativeTargets.lean:23-34`):
+This intermediate structure has since been removed.  The corresponding active
+internal target is now a direct construction of
+`MainFormalCascadeProjectiveCompletionTransportResidual` from the role residual
+and the post-role diagonal completion theorem.
+
+**The removed structure had two fields**:
 
 | Field | Type | Paper Reference |
 |-------|------|-----------------|
@@ -150,16 +159,20 @@ theorem because it relies on additional non-paper inputs.
 
 **What's needed:** Only Field 1 (`MainFormalRolePackageResidual` for successor case).
 
-### Current Route B: Keep the native-targets cascade
+### Historical Route B: Keep the native-targets cascade
 
-Keep lines 612-656 and fill the `sorry` at line 611 to produce:
+The older cascade filled the `sorry` by producing:
 ```lean
 Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual ...)
 ```
 
-This requires BOTH Field 1 and Field 2.
+This required both Field 1 and Field 2.  The current cleanup eliminates this
+intermediate record and constructs the active
+`MainFormalCascadeProjectiveCompletionTransportResidual` directly.
 
-**Comparison:** Route A is simpler and more faithful to the base case structure. Route B requires more construction but preserves existing downstream code. Either route ultimately needs Field 1.
+**Comparison:** Route A was simpler and more faithful to the base-case
+structure.  Route B required more construction and preserved downstream code
+that has since been simplified.  Either route ultimately needs Field 1.
 
 ## 5. What must be proved internally
 

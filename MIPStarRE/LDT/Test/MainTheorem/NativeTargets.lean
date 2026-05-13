@@ -12,49 +12,10 @@ namespace MIPStarRE.LDT
 
 namespace Test
 
-/-- Paper-shaped residual for the still-external data in the non-vacuous branch.
+namespace MainFormalCascadeProjectiveCompletionTransportResidual
 
-Paper origin: `references/ldt-paper/inductive_step.tex:68-173`, the
-role-register, unsymmetrization, and projectivization/completion part of
-`\label{thm:main-formal}`.
-
-The proof body consumes this record in paper order: first it reads the concrete
-role residual, then derives the unsymmetrized POVMs, line-116 evaluated
-consistency, and Step-5 full `G^A/G^B` consistency, and only then consumes the
-post-role Step 6 completion data whose `P^A/P^B` provenance is tied to that
-line-130 consistency. -/
-structure MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
-    (params : Parameters) [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) (eps : Error)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
-    (scalars : MainFormalCascadeScalars params eps k) where
-  /-- The explicit isolated Section 6 residual. -/
-  roleResidual : MainFormalRolePackageResidual params strategy eps hpass k
-  /-- Step 6 completion data after line-130 orthonormalization of the role blocks. -/
-  postRoleDiagonalCompletion :
-    MainFormalPostRolePackageDiagonalCompletionResidual params strategy eps k scalars
-      (roleResidual.rolePackage scalars)
-
-namespace MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
-
-/-- Assemble the final live residual once the concrete Section 6 role residual and
-the post-role line-130 completion residual have both been produced. -/
-theorem nonempty_ofRoleResidualAndCompletion
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {hpass : strategy.PassesLowIndividualDegreeTest eps}
-    {scalars : MainFormalCascadeScalars params eps k}
-    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
-    (hcompletion : Nonempty (MainFormalPostRolePackageDiagonalCompletionResidual
-      params strategy eps k scalars (roleResidual.rolePackage scalars))) :
-    Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
-      params strategy eps hpass k scalars) := by
-  rcases hcompletion with ⟨completion⟩
-  exact ⟨{ roleResidual := roleResidual, postRoleDiagonalCompletion := completion }⟩
-
-/-- Construct the final residual from a concrete role-register residual.
+/-- Construct the final projective completion-transport residual from a concrete
+role-register residual.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:130-173`.
 
@@ -70,9 +31,10 @@ theorem nonempty_ofRoleResidual
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
     (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) :
-    Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
-      params strategy eps hpass k scalars) := by
+    Nonempty (MainFormalCascadeProjectiveCompletionTransportResidual
+      params strategy eps k scalars) := by
   have hpre := roleResidual.diagonalConsistency scalars
   rcases MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalConsistency
       hpre with ⟨orthResidual⟩
@@ -81,35 +43,12 @@ theorem nonempty_ofRoleResidual
         params strategy eps k scalars (roleResidual.rolePackage scalars)) :=
     MainFormalPostRolePackageDiagonalCompletionResidual.nonempty_ofDiagonalConsistency
       orthResidual hpre
-  exact nonempty_ofRoleResidualAndCompletion roleResidual hcompletion
-
-/-- Convert the combined residual directly to the projective completion
-transport residual.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:130-173`.  The proof
-reconstructs paper line 130 from the role residual and then applies the
-post-role completion transport. -/
-noncomputable def toCompletionTransportResidual
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {hpass : strategy.PassesLowIndividualDegreeTest eps}
-    {scalars : MainFormalCascadeScalars params eps k}
-    (residual : MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
-      params strategy eps hpass k scalars)
-    (hsmall : ¬ 1 ≤ mainFormalError params k eps) :
-    MainFormalCascadeProjectiveCompletionTransportResidual params strategy eps k scalars :=
-  let rolePackage := residual.roleResidual.rolePackage scalars
+  rcases hcompletion with ⟨completion⟩
   let postRoleResidual :=
-    residual.postRoleDiagonalCompletion.toPostRolePackageLeftCompletionTransportResidual hsmall
-  have hpre : ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
-      (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
-      scalars.zeta1 := by
-    simpa [rolePackage] using residual.roleResidual.diagonalConsistency scalars
-  postRoleResidual.toCompletionTransportResidual hpre
+    completion.toPostRolePackageLeftCompletionTransportResidual hsmall
+  exact ⟨postRoleResidual.toCompletionTransportResidual hpre⟩
 
-end MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
+end MainFormalCascadeProjectiveCompletionTransportResidual
 
 namespace MainFormalCascadeTransportTargets
 
