@@ -1,7 +1,6 @@
 import MIPStarRE.LDT.Test.MainTheorem.CompletionTransport
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
-import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Line169Repair
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Output
 import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation
 
@@ -19,11 +18,10 @@ It records the line-130 provenance of the projective submeasurements, the
 completion estimates, and the construction-level match-mass obligations, and it
 converts directly to the checked projective-consistency transport residual.
 
-The module also proves tight `ζ₁` polynomial-consistency lemmas
-(`leftPolynomialConsistency_with_orthonormalization_loss`,
-`rightPolynomialConsistency_with_orthonormalization_loss`) that avoid
-degradation of the final error exponent by using the match-mass monotonicity
-invariant from `\label{rem:lean-line169-projectivization-match-mass}`.
+The active route uses the match-mass monotonicity invariant from
+`\label{rem:lean-line169-projectivization-match-mass}` to obtain the exact
+paper line-169 estimates, rather than a repaired line-169 helper with an
+additional loss term.
 
 ## References
 
@@ -124,63 +122,6 @@ theorem nonempty_ofDiagonalConsistency
     P_B := P_B
     leftCloseness := hP_A
     rightCloseness := hP_B }⟩
-
-end MainFormalPostRolePackageDiagonalOrthonormalizationResidual
-
-namespace MainFormalPostRolePackageDiagonalOrthonormalizationResidual
-
-/-- Repaired Alice-side polynomial line-169 transport from the line-130
-orthonormalization residual.
-
-This uses the checked pre-completion replacement theorem from
-`ProjectivizationLine169Repair`: the orthonormalized submeasurement is compared
-to the source POVM before completion, so the additive loss is only
-`10 * ζ₁^(1/8)`. -/
-theorem leftPolynomialConsistency_with_orthonormalization_loss
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {scalars : MainFormalCascadeScalars params eps k}
-    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
-    (orthResidual : MainFormalPostRolePackageDiagonalOrthonormalizationResidual
-      params strategy eps k scalars rolePackage)
-    (a_A : Polynomial params)
-    (hpre : ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
-      (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
-      scalars.zeta1) :
-    ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily (Preliminaries.completeAtOutcomeProj orthResidual.P_A a_A).toSubMeas)
-      (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
-      (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error))) := by
-  have hraw :=
-    ProjectivizationLine169Repair.leftConsistency_with_orthonormalization_loss
-      strategy.state strategy.isNormalized orthResidual.P_A a_A hpre orthResidual.leftCloseness
-  simpa using hraw
-
-/-- Repaired Bob-side polynomial line-169 transport from the line-130
-orthonormalization residual. -/
-theorem rightPolynomialConsistency_with_orthonormalization_loss
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {scalars : MainFormalCascadeScalars params eps k}
-    {rolePackage : MainFormalRoleMeasurementPackage params strategy eps k scalars}
-    (orthResidual : MainFormalPostRolePackageDiagonalOrthonormalizationResidual
-      params strategy eps k scalars rolePackage)
-    (a_B : Polynomial params)
-    (hpre : ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
-      (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
-      scalars.zeta1) :
-    ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily (Preliminaries.completeAtOutcomeProj orthResidual.P_B a_B).toSubMeas)
-      (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
-      (scalars.zeta1 + 10 * Real.rpow scalars.zeta1 (1 / (8 : Error))) := by
-  have hraw :=
-    ProjectivizationLine169Repair.rightConsistency_with_orthonormalization_loss
-      strategy.state strategy.isNormalized orthResidual.P_B a_B hpre orthResidual.rightCloseness
-  simpa using hraw
 
 end MainFormalPostRolePackageDiagonalOrthonormalizationResidual
 
