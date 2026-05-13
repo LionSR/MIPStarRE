@@ -77,8 +77,8 @@ completeness construction for `thm:self-improvement`. Given:
   Cauchy--Schwarz argument in `references/ldt-paper/self_improvement.tex`
   lines 351--414, especially lines 366--414, which uses the incoming
   consistency hypothesis on `G` and `nu`.
-* `hssc` — bipartite strong self-consistency of `A` (the helper SSC supplied
-  by `HelperStrongSelfConsistencyInput`).
+* `hssc` — bipartite strong self-consistency of `A`, proved by the helper-SSC
+  construction.
 * `hsdd` — the orthonormalization SDD bound between the left lifts of `A` and
   `B` (the SDD bound supplied by the orthonormalization step inside
   `selfImprovement`).

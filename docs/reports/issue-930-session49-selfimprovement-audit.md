@@ -13,6 +13,7 @@ Branch: `gpt55/issue-930-selfimprovement-audit`
 > Section 6 calls `selfImprovementFromSubMeas`, are historical.  The current
 > source-facing theorem `selfImprovement` has the paper-shaped input-consistency
 > hypothesis.  The former `SelfImprovementObligations`,
+> `SelfImprovement.HelperStrongSelfConsistencyInput`,
 > `SelfImprovement.OrthonormalizationInput`, and `SelfImprovement.FinalFieldsInput`
 > bundles have been removed.  The old Section 9 submeasurement wrappers
 > `selfImprovementFromSubMeas` and `selfImprovementFromObligationsSubMeas` have

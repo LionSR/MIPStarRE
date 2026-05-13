@@ -32,10 +32,9 @@ These fields isolate the remaining paper-side obligations in the proof of
 2. the final lower bound on the released right-hand side before the arithmetic
    absorption into `selfImprovementHelperError`.
 
-This structure is intentionally narrower than
-`HelperStrongSelfConsistencyInput`: it records the actual intermediate estimates
-still needed from the add-in-`u`, self-consistency, and variance calculations,
-rather than restating the final `BipartiteSSCRel` conclusion. -/
+This structure records the actual intermediate estimates still needed from the
+add-in-`u`, self-consistency, and variance calculations, rather than restating
+the final `BipartiteSSCRel` conclusion as an input. -/
 structure HelperStrongSelfConsistencyObligations
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)

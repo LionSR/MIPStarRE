@@ -155,13 +155,12 @@ When such a declaration remains useful, its role should be one of the following:
 
 | Declaration | Status to maintain |
 |-------------|--------------------|
-| `SelfImprovement.HelperStrongSelfConsistencyInput` | Conditional input for helper strong self-consistency estimates; keep tracked until produced |
 | `mainFormal_ofProjectiveCompletionResidual` | Conditional final-transport theorem; keep as reusable proof content, but do not present it as the paper theorem |
 | `MainFormalPostRolePackageDiagonalOrthonormalizationResidual` | Internal residual produced from line-130 cross consistency; do not replace it by an orthonormalization-input hypothesis on `mainFormal` |
 | `LdPastingContext` | Faithfulness-sensitive context for `ldPasting`; audit each field against the Section 12 hypotheses and boundary conditions |
 
-The former `SelfImprovement.OrthonormalizationInput`,
-`SelfImprovement.FinalFieldsInput`, and
+The former `SelfImprovement.HelperStrongSelfConsistencyInput`,
+`SelfImprovement.OrthonormalizationInput`, `SelfImprovement.FinalFieldsInput`, and
 `MakingMeasurementsProjective.OrthonormalizationInput` bundles have been removed.
 Useful proof content should be kept as named construction lemmas, while missing
 orthonormalization or final-field arguments remain direct proof gaps on the

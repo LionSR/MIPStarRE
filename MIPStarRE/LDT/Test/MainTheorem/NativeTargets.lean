@@ -62,7 +62,7 @@ This is the source-shaped internal construction target for the non-vacuous
 branch of `mainFormal`.  It reconstructs the paper line-130 cross consistency
 from the role residual and constructs the line-130 orthonormalization residual.
 The remaining completion step is the explicit proof obligation in
-`MainFormalPostRolePackageDiagonalCompletionInput.nonempty_ofDiagonalConsistency`;
+`MainFormalPostRolePackageDiagonalCompletionResidual.nonempty_ofDiagonalConsistency`;
 no match-mass or diagonal-consistency data is accepted as an extra input. -/
 theorem nonempty_ofRoleResidual
     {params : Parameters} [FieldModel.{0} params.q]
@@ -77,13 +77,11 @@ theorem nonempty_ofRoleResidual
   rcases MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalConsistency
       hpre with ⟨orthResidual⟩
   have hcompletion :
-      Nonempty (MainFormalPostRolePackageDiagonalCompletionInput
-        params strategy eps k scalars (roleResidual.rolePackage scalars) orthResidual) :=
-    MainFormalPostRolePackageDiagonalCompletionInput.nonempty_ofDiagonalConsistency
+      Nonempty (MainFormalPostRolePackageDiagonalCompletionResidual
+        params strategy eps k scalars (roleResidual.rolePackage scalars)) :=
+    MainFormalPostRolePackageDiagonalCompletionResidual.nonempty_ofDiagonalConsistency
       orthResidual hpre
-  rcases hcompletion with ⟨completionInput⟩
-  exact nonempty_ofRoleResidualAndCompletion roleResidual
-    ⟨completionInput.toCompletionResidual⟩
+  exact nonempty_ofRoleResidualAndCompletion roleResidual hcompletion
 
 /-- Convert the combined residual to the left-completion residual after the paper
 line-130 consistency has been derived separately.

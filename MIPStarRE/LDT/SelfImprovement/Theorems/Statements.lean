@@ -457,18 +457,4 @@ structure SelfImprovementFinalFields (params : Parameters) [FieldModel params.q]
     projectiveBoundednessGap params strategy H Z ≤
       selfImprovementError params eps delta
 
-/-- Paper origin: `references/ldt-paper/self_improvement.tex:679-690`.
-
-The helper-stage strong self-consistency assumption used in the reduced
-theorem chain. -/
-abbrev HelperStrongSelfConsistencyInput (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι) (eps delta : Error) : Prop :=
-  ∀ {T : Measurement (Polynomial params) ι}
-    {Hhat : SubMeas (Polynomial params) ι}
-    {Z : MIPStarRE.Quantum.Op ι},
-    SelfImprovementHelperConclusion params strategy T Hhat Z eps delta →
-      BipartiteSSCRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily Hhat)
-        (selfImprovementHelperError params eps delta)
-
 end MIPStarRE.LDT.SelfImprovement

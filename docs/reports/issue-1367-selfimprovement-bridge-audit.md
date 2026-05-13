@@ -35,6 +35,7 @@
 > remaining analytic derivations by tracked `sorry` sites until they are proved.
 >
 > The same day, the orthonormalization-input cleanup removed the former
+> `SelfImprovement.HelperStrongSelfConsistencyInput`,
 > `SelfImprovement.OrthonormalizationInput`, `SelfImprovement.FinalFieldsInput`,
 > and `MakingMeasurementsProjective.OrthonormalizationInput` bundles.  It also
 > narrowed `SelfImprovement/Theorems/OrthonormalizationBridge.lean` to the

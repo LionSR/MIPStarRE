@@ -67,9 +67,12 @@ Main theorems:
 Historically, the deleted `SelfImprovementObligations` bundle recorded three
 proof-stage inputs:
 
-1. **`helperStrongSelfConsistency`**: `HelperStrongSelfConsistencyInput` — the
-   averaged `Hhat` is stably self-consistent (`BipartiteSSCRel` at level
-   `selfImprovementHelperError`).
+1. **`helperStrongSelfConsistency`**: the former
+   `HelperStrongSelfConsistencyInput` has been removed.  The helper SSC
+   conclusion is now produced by
+   `helper_strong_self_consistency_of_helper_conclusion` from the named scalar
+   obligations, and any remaining derivation is a direct proof gap rather than
+   an input bundle.
 2. **`orthonormalization`**: `OrthonormalizationInput` — converts
    `BipartiteSSCRel` into `OrthonormalizationInput` (spectral-truncation +
    locality-preserving repair witnesses).
