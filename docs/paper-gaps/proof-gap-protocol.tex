@@ -207,8 +207,13 @@ definition error from becoming a global theorem-statement error.
 Paper-facing theorem & Matches the source statement up to faithful encoding &
 Carries non-paper bridge, residual, repair, input, obligation-structure, or
 proof-obligation hypotheses \\
-Conditional helper & Assumes a named obligation and has a conditional name &
-Is linked as the source theorem or marked as proof-complete for that theorem \\
+Source-shaped theorem with a tracked \verb|sorry| & Default repair when the
+source proof is blocked but the statement is known & Replaced by a strengthened
+theorem statement merely to keep the file compiling \\
+Conditional helper & Temporary quarantine for substantial proof content whose
+remaining named obligation has not yet been discharged & Introduced merely to
+avoid a \verb|sorry|, or linked as the source theorem or marked as
+proof-complete for that theorem \\
 Obligation discharger theorem & Constructs the obligation from paper hypotheses &
 Merely restates the obligation as an assumption \\
 Input bundle & Collects produced data for a local construction & Is assumed by a
@@ -235,9 +240,15 @@ When a source-labelled proof is blocked, use the following order.
   \item If it is an ordinary lemma or adapter, create a named theorem which
   discharges that obligation.  Do not add it to the source theorem as a new
   hypothesis.
-  \item If downstream work would otherwise be lost, create a conditional helper
-  with a conditional name.  Keep it separate from the paper-facing theorem, and
-  record the obligation discharger that must eliminate it.
+  \item Keep the source-labelled theorem itself in the source form, even if its
+  proof must contain a tracked \verb|sorry|.  This is the default repair when
+  the missing assertion has not yet been proved.
+  \item Create a conditional helper only to quarantine substantial proof content
+  that already exists and would otherwise be lost.  Do not create such a helper
+  merely to avoid a \verb|sorry| or to keep making progress.  If a conditional
+  helper remains, give it a conditional name, keep it separate from the
+  paper-facing theorem, and record the obligation discharger that must eliminate
+  it.
   \item If the source and formal statements genuinely differ, write or update a
   note under \path{docs/paper-gaps/} before marking the statement as aligned.
   \item Update the blueprint so that paper labels point only to paper-facing
@@ -265,10 +276,13 @@ it.
 \section{Conclusion}
 
 The project should prefer visible proof obligations over invisible statement
-drift.  A tracked \verb|sorry| at the site of an internal obligation is less
-misleading than a source theorem whose assumptions have been strengthened.
-Conditional helpers are useful, but they must remain conditional.  The
-paper-facing declaration is reserved for the theorem proved by the paper, or for
-a documented corrected version whose mathematical difference is explicit.
+drift.  A tracked \verb|sorry| in the source-shaped theorem, or in the lowest
+named internal obligation needed by its proof, is less misleading than a source
+theorem whose assumptions have been strengthened.  Conditional helpers are not a
+normal substitute for unfinished proofs; they are temporary quarantines for
+substantial proof content, and they must remain conditional until the missing
+obligation is discharged.  The paper-facing declaration is reserved for the
+theorem proved by the paper, or for a documented corrected version whose
+mathematical difference is explicit.
 
 \end{document}

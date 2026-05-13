@@ -95,9 +95,13 @@ Lean theorem in the diff that should bear one):
   source-faithful under A.1.  Do not recommend `\leanok` for a
   conditional helper that has extra non-paper hypotheses.
 - **Open internal obligations** may be linked by `\lean{...}` for
-  traceability, but must not be placed inside an existing `\leanok` block
-  when they contain `sorry`, depend on `sorryAx`, or intentionally represent
-  proof debt.  If a renamed declaration is still an open obligation, prefer a
+  traceability only when the link clarifies a genuine proof frontier.  They
+  must not be placed inside an existing `\leanok` block when they contain
+  `sorry`, depend on `sorryAx`, or intentionally represent proof debt.  Do not
+  ask authors to create or link conditional helpers merely to avoid a `sorry`;
+  the preferred source-realignment repair is the source statement with a
+  tracked `sorry`, or the lowest named internal obligation with a tracked
+  `sorry`.  If a renamed declaration is still an open obligation, prefer a
   separate remark or implementation note with `\lean{...}` and no `\leanok`.
 
 ### A.3 — `\notready` accuracy
