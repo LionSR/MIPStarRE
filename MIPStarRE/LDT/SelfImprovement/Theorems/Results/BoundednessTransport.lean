@@ -90,11 +90,11 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-! NOTE: This file has not yet been fully split.  Sub-module extractions exist in
-`BoundednessTransport/Agreement.lean` and `BoundednessTransport/PointConsistency.lean`
-but this file still contains duplicated theorems and private helpers (see #1127).
-Once the split is complete, the private helpers below and the duplicated theorems
-can be removed and replaced by imports of the sub-modules. -/
+/-! NOTE: This file has not yet been fully split.  The
+`BoundednessTransport/Agreement.lean` extraction exists, but the point-consistency
+declarations currently live in this file (see #1127).  Once the split is
+complete, the private helpers below can be removed and replaced by imports of the
+submodules. -/
 
 /-! ## Final-fields projective-residual boundedness transport
 
@@ -334,10 +334,9 @@ theorem helperAgreementOperatorAtPoint_ev_slack_eq_off_diagonal_sum
     ev_sum]
   simp only [ev_finset_sum]
 
--- TODO(#1127): These three private lemmas are duplicated in
--- `BoundednessTransport/PointConsistency.lean` (made public there).
--- Once the parent file is fully split, remove these private copies and
--- import the sub-module instead.
+-- TODO(#1127): These three private lemmas are local to the point-consistency
+-- transport block.  Once the parent file is fully split, move them to the
+-- corresponding submodule.
 private lemma opTensor_one_left_eq_rightTensor
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     (B : MIPStarRE.Quantum.Op ι₂) :
