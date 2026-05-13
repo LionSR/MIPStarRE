@@ -11,7 +11,6 @@ Schwartz–Zippel bridge in `MainFormalCascadePreProjectiveSelfConsistency`
 to convert an evaluated pre-projective link into the full-polynomial
 self-consistency relation at error `ζ₁`.  The subsequent stage-target
 structures (`MainFormalCascadeUnsymmetrizedPOVMTargets`,
-`MainFormalCascadeTargets`,
 `MainFormalCascadeTransportTargets`,
 `MainFormalCascadeProjectiveStageTargets`) form the cascade that
 carries the unsymmetrized POVMs through the projective-consistency
@@ -110,51 +109,13 @@ noncomputable def ofUnsymmetrizationBridge
 
 end MainFormalCascadeUnsymmetrizedPOVMTargets
 
-/-- The geometry/transport part of the remaining Section 3 assembly at the exact
-cascade errors.
-
-Compared with `MainFormalNativeTargets`, this package removes the final Step 8
-weakening obligations: the point and self-consistency errors are fixed to the
-paper's cascade quantities derived from `MainFormalCascadeScalars`. Constructing
-this package is still the substantive unsymmetrization, Schwartz--Zippel, and
-projectivization work of `inductive_step.tex` lines 84--185. -/
-structure MainFormalCascadeTargets
-    (params : Parameters) [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ) where
-  /-- Scalar side conditions and the paper-defined `ν, σ, ζᵢ` cascade. -/
-  scalars : MainFormalCascadeScalars params eps k
-  /-- The projective measurement denoted $Q^{\mathrm A}$ in the paper. -/
-  leftMeasurement : ProjMeas (Polynomial params) ι
-  /-- The projective measurement denoted $Q^{\mathrm B}$ in the paper. -/
-  rightMeasurement : ProjMeas (Polynomial params) ι
-  /-- Native form of `eq:one-goal` at the paper-defined `ζ₄`. -/
-  pointAConsistency :
-    ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      (polynomialEvaluationFamily params rightMeasurement.toSubMeas)
-      scalars.zeta4
-  /-- Native form of `eq:another-goal` at the paper-defined `ζ₄`. -/
-  pointBConsistency :
-    ConsRel strategy.state (uniformDistribution (Point params))
-      (polynomialEvaluationFamily params leftMeasurement.toSubMeas)
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-      scalars.zeta4
-  /-- Native form of `eq:third-goal` at the paper-defined `ζ₃/2`. -/
-  selfConsistency :
-    ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily leftMeasurement.toSubMeas)
-      (constSubMeasFamily rightMeasurement.toSubMeas)
-      (scalars.zeta3 / 2)
-
 /-- The transport-only part of the remaining Section 3 assembly once the scalar
 cascade has been discharged.
 
-Compared with `MainFormalCascadeTargets`, this package is parameterized by an
-already-constructed `MainFormalCascadeScalars`. The field shapes intentionally
-mirror the transport fields of `MainFormalCascadeTargets`, so downstream changes
-to the native `ConsRel` targets should keep the two records synchronized. It
-therefore records only the unsymmetrization, Schwartz--Zippel, and
+This package is parameterized by an already-constructed
+`MainFormalCascadeScalars`.  Its fields are the three paper cascade conclusions
+before the final Step 8 weakening to `mainFormalError`.  It therefore records
+only the unsymmetrization, Schwartz--Zippel, and
 projectivization targets from `inductive_step.tex` lines 84--185. -/
 structure MainFormalCascadeTransportTargets
     (params : Parameters) [FieldModel params.q]
