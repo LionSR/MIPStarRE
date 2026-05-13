@@ -48,10 +48,64 @@ theorem nonempty_ofRoleResidual
 
 end MainFormalCascadeProjectiveCompletionTransportResidual
 
-namespace MainFormalCascadeTransportTargets
+namespace MainFormalCascadeProjectiveCompletionTransportResidual
 
-/-- Final packaging step for `thm:main-formal` once the cascade transport
-targets have been constructed.
+/-- Convert the reconstructed line-156 projective approximation into the native
+`eq:third-goal` self-consistency estimate.
+
+The only mathematical step performed here is the projective converse of
+`prop:simeq-to-approx`: for projective measurements, an `≈_{ζ₃}` relation gives
+`≃_{ζ₃/2}`, which is exactly paper `eq:third-goal`
+(`references/ldt-paper/inductive_step.tex:159-162`). -/
+theorem selfConsistency
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (residual : MainFormalCascadeProjectiveCompletionTransportResidual
+      params strategy eps k scalars)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
+    ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily residual.leftMeasurement.toSubMeas)
+      (constSubMeasFamily residual.rightMeasurement.toSubMeas)
+      (scalars.zeta3 / 2) := by
+  let leftConst : IdxProjMeas Unit (Polynomial params) ι := fun _ => residual.leftMeasurement
+  let rightConst : IdxProjMeas Unit (Polynomial params) ι := fun _ => residual.rightMeasurement
+  let pre := residual.toPreProjectiveSelfConsistency hpass
+  have hpre : ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily (unsymmetrizedLeftPOVM residual.roleMeasurement).toSubMeas)
+      (constSubMeasFamily (unsymmetrizedRightPOVM residual.roleMeasurement).toSubMeas)
+      scalars.zeta1 := by
+    simpa [
+      pre,
+      MainFormalCascadeProjectiveCompletionTransportResidual.toPreProjectiveSelfConsistency,
+      MainFormalCascadeProjectiveCompletionTransportResidual.toUnsymmetrizedPOVMTargets
+    ] using pre.fullSelfConsistency
+  have happroxLine := residual.fullPolynomialConsistency hpre
+  have happroxAtZeta :
+      Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
+        (IdxProjMeas.toIdxSubMeas leftConst)
+        (IdxProjMeas.toIdxSubMeas rightConst)
+        scalars.zeta3 := by
+    change Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily residual.leftMeasurement.toSubMeas)
+      (constSubMeasFamily residual.rightMeasurement.toSubMeas)
+      scalars.zeta3
+    exact happroxLine
+  have happrox :
+      Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
+        (IdxProjMeas.toIdxSubMeas leftConst)
+        (IdxProjMeas.toIdxSubMeas rightConst)
+        (2 * (scalars.zeta3 / 2)) := by
+    convert happroxAtZeta using 1
+    ring
+  have hcons :=
+    Preliminaries.approxToSimeq strategy.state (uniformDistribution Unit)
+      leftConst rightConst (scalars.zeta3 / 2) happrox
+  simpa [leftConst, rightConst, constSubMeasFamily, IdxProjMeas.toIdxSubMeas] using hcons
+
+/-- Final packaging step for `thm:main-formal` once the projective-completion
+transport residual has been constructed.
 
 * `eq:one-goal` (lines 175--181):
   $A^{\mathrm A,u}_a \otimes I \simeq_{\zeta_4}
@@ -64,12 +118,14 @@ targets have been constructed.
 
 This theorem performs only the Step 8 weakening from the paper cascade errors
 to `mainFormalError` using `ConsRel.mono`; the substantive construction is in
-the transport-target data. -/
+the projective-completion transport residual. -/
 theorem toMainFormal {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
-    (targets : MainFormalCascadeTransportTargets params strategy eps k scalars) :
+    (residual : MainFormalCascadeProjectiveCompletionTransportResidual
+      params strategy eps k scalars)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
@@ -83,18 +139,18 @@ theorem toMainFormal {params : Parameters} [FieldModel params.q]
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  refine ⟨targets.leftMeasurement, targets.rightMeasurement, ?_, ?_, ?_⟩
+  refine ⟨residual.leftMeasurement, residual.rightMeasurement, ?_, ?_, ?_⟩
   · exact ConsRel.mono
       (MainFormalCascadeScalars.zeta4_le_mainFormalError scalars)
-      targets.pointAConsistency
+      (residual.pointAConsistency hpass)
   · exact ConsRel.mono
       (MainFormalCascadeScalars.zeta4_le_mainFormalError scalars)
-      targets.pointBConsistency
+      (residual.pointBConsistency hpass)
   · exact ConsRel.mono
       (MainFormalCascadeScalars.zeta3_div_two_le_mainFormalError scalars)
-      targets.selfConsistency
+      (residual.selfConsistency hpass)
 
-end MainFormalCascadeTransportTargets
+end MainFormalCascadeProjectiveCompletionTransportResidual
 
 end Test
 

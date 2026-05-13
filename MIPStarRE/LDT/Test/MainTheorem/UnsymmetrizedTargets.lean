@@ -9,12 +9,9 @@ existing factor-two unsymmetrization estimates from
 `Test/Unsymmetrization.lean` and applies the checked Step 5
 Schwartz–Zippel bridge in `MainFormalCascadePreProjectiveSelfConsistency`
 to convert an evaluated pre-projective link into the full-polynomial
-self-consistency relation at error `ζ₁`.  The subsequent stage-target
-structures (`MainFormalCascadeUnsymmetrizedPOVMTargets`,
-`MainFormalCascadeTransportTargets`,
-`MainFormalCascadeProjectiveStageTargets`) form the cascade that
-carries the unsymmetrized POVMs through the projective-consistency
-handoff to the native `ζ₄` point-consistency targets.
+self-consistency relation at error `ζ₁`.  The later projective-completion
+residual carries the completed measurements through the line-156 handoff and
+the native `ζ₄` point-consistency targets.
 
 ## References
 
@@ -108,42 +105,6 @@ noncomputable def ofUnsymmetrizationBridge
   pointARightPOVMConsistency := bridge.pointAConsistency
 
 end MainFormalCascadeUnsymmetrizedPOVMTargets
-
-/-- The transport-only part of the remaining Section 3 assembly once the scalar
-cascade has been discharged.
-
-This package is parameterized by an already-constructed
-`MainFormalCascadeScalars`.  Its fields are the three paper cascade conclusions
-before the final Step 8 weakening to `mainFormalError`.  It therefore records
-only the unsymmetrization, Schwartz--Zippel, and
-projectivization targets from `inductive_step.tex` lines 84--185. -/
-structure MainFormalCascadeTransportTargets
-    (params : Parameters) [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
-    (scalars : MainFormalCascadeScalars params eps k) where
-  /-- The projective measurement denoted $Q^{\mathrm A}$ in the paper. -/
-  leftMeasurement : ProjMeas (Polynomial params) ι
-  /-- The projective measurement denoted $Q^{\mathrm B}$ in the paper. -/
-  rightMeasurement : ProjMeas (Polynomial params) ι
-  /-- Native form of `eq:one-goal` at the paper-defined `ζ₄`. -/
-  pointAConsistency :
-    ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      (polynomialEvaluationFamily params rightMeasurement.toSubMeas)
-      scalars.zeta4
-  /-- Native form of `eq:another-goal` at the paper-defined `ζ₄`. -/
-  pointBConsistency :
-    ConsRel strategy.state (uniformDistribution (Point params))
-      (polynomialEvaluationFamily params leftMeasurement.toSubMeas)
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-      scalars.zeta4
-  /-- Native form of `eq:third-goal` at the paper-defined `ζ₃/2`. -/
-  selfConsistency :
-    ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily leftMeasurement.toSubMeas)
-      (constSubMeasFamily rightMeasurement.toSubMeas)
-      (scalars.zeta3 / 2)
 
 /-- The pre-projectivization Step 5 handoff for `mainFormal`.
 
@@ -294,100 +255,6 @@ noncomputable def diagonalConsistency
   simpa [rolePackage, pre] using pre.fullSelfConsistency
 
 end MainFormalRolePackageResidual
-
-/-- The remaining projective-stage transport package for `mainFormal`.
-
-Compared with `MainFormalCascadeTransportTargets`, this package has already
-split off the Step 5 Schwartz--Zippel handoff.  It asks for the line-156
-projective approximation as a bridge out of the proved pre-projective
-self-consistency at `ζ₁`; the conversion from that `≈_{ζ₃}` statement to the
-native `eq:third-goal` consistency statement is proved by
-`toTransportTargets` using the projective converse of `prop:simeq-to-approx`.
-The two point-consistency targets remain explicit residual fields at the paper's
-`ζ₄`, corresponding to `eq:one-goal` and `eq:another-goal`. -/
-structure MainFormalCascadeProjectiveStageTargets
-    (params : Parameters) [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
-    (scalars : MainFormalCascadeScalars params eps k) where
-  /-- Pre-projective `G^A,G^B` data through the Step 5 evaluated estimate. -/
-  preSelfConsistency :
-    MainFormalCascadePreProjectiveSelfConsistency params strategy eps k scalars
-  /-- The projective measurement denoted $Q^{\mathrm A}$ in the paper. -/
-  leftMeasurement : ProjMeas (Polynomial params) ι
-  /-- The projective measurement denoted $Q^{\mathrm B}$ in the paper. -/
-  rightMeasurement : ProjMeas (Polynomial params) ι
-  /-- Native form of `eq:one-goal` at the paper-defined `ζ₄`. -/
-  pointAConsistency :
-    ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      (polynomialEvaluationFamily params rightMeasurement.toSubMeas)
-      scalars.zeta4
-  /-- Native form of `eq:another-goal` at the paper-defined `ζ₄`. -/
-  pointBConsistency :
-    ConsRel strategy.state (uniformDistribution (Point params))
-      (polynomialEvaluationFamily params leftMeasurement.toSubMeas)
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-      scalars.zeta4
-  /-- Paper line 156, produced from the Step 5 full-polynomial consistency at `ζ₁`
-  and the projectivization/completion approximation chain. -/
-  fullPolynomialConsistency :
-    ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily preSelfConsistency.leftPOVM.toSubMeas)
-      (constSubMeasFamily preSelfConsistency.rightPOVM.toSubMeas)
-      scalars.zeta1 →
-    Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily leftMeasurement.toSubMeas)
-      (constSubMeasFamily rightMeasurement.toSubMeas)
-      scalars.zeta3
-
-namespace MainFormalCascadeProjectiveStageTargets
-
-/-- Convert the line-156 projective approximation package into the transport-only
-cascade targets.
-
-The only mathematical step performed here is the projective converse of
-`prop:simeq-to-approx`: for projective measurements, an `≈_{ζ₃}` relation gives
-`≃_{ζ₃/2}`, which is exactly paper `eq:third-goal` (lines 159--162). -/
-noncomputable def toTransportTargets {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {scalars : MainFormalCascadeScalars params eps k}
-    (targets : MainFormalCascadeProjectiveStageTargets params strategy eps k scalars) :
-    MainFormalCascadeTransportTargets params strategy eps k scalars where
-  leftMeasurement := targets.leftMeasurement
-  rightMeasurement := targets.rightMeasurement
-  pointAConsistency := targets.pointAConsistency
-  pointBConsistency := targets.pointBConsistency
-  selfConsistency := by
-    let leftConst : IdxProjMeas Unit (Polynomial params) ι := fun _ => targets.leftMeasurement
-    let rightConst : IdxProjMeas Unit (Polynomial params) ι := fun _ => targets.rightMeasurement
-    have hpre := targets.preSelfConsistency.fullSelfConsistency
-    have happroxLine := targets.fullPolynomialConsistency hpre
-    have happroxAtZeta :
-        Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
-          (IdxProjMeas.toIdxSubMeas leftConst)
-          (IdxProjMeas.toIdxSubMeas rightConst)
-          scalars.zeta3 := by
-      change Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily targets.leftMeasurement.toSubMeas)
-        (constSubMeasFamily targets.rightMeasurement.toSubMeas)
-        scalars.zeta3
-      exact happroxLine
-    have happrox :
-        Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
-          (IdxProjMeas.toIdxSubMeas leftConst)
-          (IdxProjMeas.toIdxSubMeas rightConst)
-          (2 * (scalars.zeta3 / 2)) := by
-      convert happroxAtZeta using 1
-      ring
-    have hcons :=
-      Preliminaries.approxToSimeq strategy.state (uniformDistribution Unit)
-        leftConst rightConst (scalars.zeta3 / 2) happrox
-    simpa [leftConst, rightConst, constSubMeasFamily, IdxProjMeas.toIdxSubMeas]
-      using hcons
-
-end MainFormalCascadeProjectiveStageTargets
 
 end Test
 

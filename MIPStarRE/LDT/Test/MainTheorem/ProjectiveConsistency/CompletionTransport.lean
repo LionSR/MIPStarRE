@@ -445,33 +445,6 @@ theorem pointBConsistency
       (IdxMeas.toIdxSubMeas leftQ) scalars.zeta4 htriangle
   simpa [pointB, leftG, rightQ, leftQ, polynomialEvaluationMeasurementFamily] using htarget
 
-/-- Assemble the projective-stage targets directly from the finer residual.  This
-reconstructs the duplicated pre-projective consistency field from the factor-two
-role-block estimates and `hpass`, then combines it with the completion-closeness
-fields for line 156. -/
-noncomputable def toProjectiveStageTargets
-    {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {scalars : MainFormalCascadeScalars params eps k}
-    (residual : MainFormalCascadeProjectiveCompletionTransportResidual
-      params strategy eps k scalars)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
-    MainFormalCascadeProjectiveStageTargets params strategy eps k scalars where
-  preSelfConsistency := residual.toPreProjectiveSelfConsistency hpass
-  leftMeasurement := residual.leftMeasurement
-  rightMeasurement := residual.rightMeasurement
-  pointAConsistency := residual.pointAConsistency hpass
-  pointBConsistency := residual.pointBConsistency hpass
-  fullPolynomialConsistency := by
-    intro hpre
-    have hpre' : ConsRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily (unsymmetrizedLeftPOVM residual.roleMeasurement).toSubMeas)
-        (constSubMeasFamily (unsymmetrizedRightPOVM residual.roleMeasurement).toSubMeas)
-        scalars.zeta1 := by
-      simpa [toPreProjectiveSelfConsistency, toUnsymmetrizedPOVMTargets] using hpre
-    exact residual.fullPolynomialConsistency hpre'
-
 end MainFormalCascadeProjectiveCompletionTransportResidual
 
 end Test
