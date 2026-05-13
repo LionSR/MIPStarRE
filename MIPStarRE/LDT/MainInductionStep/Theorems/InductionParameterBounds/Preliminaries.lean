@@ -2,16 +2,13 @@ import Mathlib.Analysis.Convex.SpecificFunctions.Pow
 import Mathlib.Analysis.MeanInequalitiesPow
 import MIPStarRE.LDT.MainInductionStep.Statements
 import MIPStarRE.LDT.Test.StrategyFailures
--- Provides `Nonempty (Polynomial params)` instance for `trivialPolynomialMeasurement`.
-import MIPStarRE.LDT.GlobalVariance.Defs.Core
 
 /-!
 # Section 6 — Induction Parameter Bound Preliminaries
 
 This file is one leaf of `InductionParameterBounds`. It contains the elementary
 point-line reduction for the base case, the real-variable comparison lemmas used
-by the small-parameter estimates, the bound `d/q ≤ 1`, and the trivial
-polynomial measurement used in the vacuous large-error branch.
+by the small-parameter estimates, and the bound `d/q ≤ 1`.
 
 ## References
 
@@ -164,15 +161,5 @@ lemma min_eps_one_le_mainInductionError_of_m_eq_one
             linarith
       _ = mainInductionError params k eps delta gamma := by
             simp [mainInductionError, mainInductionNu, hm1]
-
-/-- Throwaway polynomial measurement used only as a witness in the vacuous
-`mainInductionError ≥ 1` fallback branch of `mainInductionByRecursionOnM`.
-All mass is concentrated on `default : Polynomial params`. -/
-noncomputable def trivialPolynomialMeasurement
-    (params : Parameters) [FieldModel params.q] : Measurement (Polynomial params) ι := by
-  classical
-  haveI : Inhabited (Polynomial params) :=
-    ⟨Classical.choice (inferInstance : Nonempty (Polynomial params))⟩
-  exact default
 
 end MIPStarRE.LDT.MainInductionStep

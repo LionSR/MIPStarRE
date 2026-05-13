@@ -227,20 +227,27 @@
 \end{theorem}
 \begin{proof}
 	\uses{lem:restricted-probabilities, lem:weighted-restricted-probability-bounds, lem:main-induction-base, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section, def:successor-pasting-data}
-	In Lean, the base case and the internal successor-step assembly are now formalized through
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase, MIPStarRE.LDT.MainInductionStep.mainInductionFromPackages, MIPStarRE.LDT.MainInductionStep.mainInductionByRecursionOnM}
-	together with the stage data
+	In Lean, the base case is formalized through
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase}.
+	The successor branch of
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction} remains an explicit
+	proof gap on the source statement.  The nearby formalization still names
+	the stage data
 	\lean{MIPStarRE.LDT.MainInductionStep.SliceRestrictionPackage, MIPStarRE.LDT.MainInductionStep.PerSliceInductionPackage, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage, MIPStarRE.LDT.MainInductionStep.AveragedPastingInput}
 	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.ofSliceObligations}
 	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.ofPointMeasurementEq}
-	that mirror the four paper stages $\text{restrict} \to \text{induct} \to \text{self-improve} \to \text{paste}$. For the answer-valued restriction route used in the successor branch of the main formal theorem, Lean now also exposes
+	that mirror the four paper stages $\text{restrict} \to \text{induct} \to
+	\text{self-improve} \to \text{paste}$, but no theorem with these data as
+	additional source-level hypotheses is advertised as
+	Theorem~\ref{thm:main-induction}. For the answer-valued restriction route
+	used in the successor branch of the main formal theorem, Lean now also exposes
 	\lean{MIPStarRE.LDT.MainInductionStep.AnswerMainInductionConclusion, MIPStarRE.LDT.MainInductionStep.AnswerMainInductionHypothesis, MIPStarRE.LDT.MainInductionStep.AnswerPerSliceInductionPackage.ofMainInductionHypothesis},
 	which record the predecessor induction hypothesis for the restricted
 	strategies without appealing to the public theorem `mainFormal`. The weighted
 	restricted-probability estimates are now public via
 	\lean{MIPStarRE.LDT.MainInductionStep.weighted_axisParallel_bound, MIPStarRE.LDT.MainInductionStep.weighted_diagonal_bound, MIPStarRE.LDT.MainInductionStep.restrictedProbabilities},
-	The remaining proof gap for Theorem~\ref{thm:main-induction} is to derive those
-	inputs, including the restricted-strategy self-improvement obligations
+	The remaining proof gap for Theorem~\ref{thm:main-induction} is to derive the
+	successor-step constructions, including the restricted-strategy self-improvement obligations
 	tracked by issues \#1507 and \#1503 under the bridge-debt tracker \#1458,
 	from the paper hypotheses; hence no proof-level \leanok is attached here.
 	We may assume $\eps,\delta,\gamma,d/q \le 1$, since otherwise $\nu \ge 1$ and the bound is trivial.
@@ -361,23 +368,17 @@
 	which is exactly the bound required for dimension $m+1$.
 \end{proof}
 
-\begin{remark}[Lean conditional declarations for the successor-step assembly]\label{rem:main-induction-successor-assembly}
+\begin{remark}[Lean proof gap for the successor-step assembly]\label{rem:main-induction-successor-assembly}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicRestrictionPackage}
 	\uses{lem:restricted-probabilities, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section, thm:main-induction}
-	The Lean declarations record the explicit successor-step ingredients used in
-	the proof of Theorem~\ref{thm:main-induction}: the weighted slice bounds
-	feeding Lemma~\ref{lem:restricted-probabilities}, the extracted
-	slice-restriction data, the per-slice recursive witnesses, the corresponding
-	self-improvement data, and the recursion-to-pasting assembly.  These are not
-	extra hypotheses in the paper theorem; they are intermediate proof obligations
-	in the current formalization.
-
-	One first applies Lemma~\ref{lem:restricted-probabilities} to the weighted
-	slice bounds in order to extract the restricted failure profile, records the
-	recursive slice witnesses, uses the explicit self-improvement data on that
-	slice data, and then applies
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionByRecursionOnM}, which
-	already returns the displayed error parameter directly.
+	The Lean declaration for Theorem~\ref{thm:main-induction} has the source
+	hypotheses and carries a \texttt{sorry} in the successor branch.  The
+	weighted slice bounds feeding Lemma~\ref{lem:restricted-probabilities} are
+	still exposed through the public restriction-package constructor above, but
+	the recursive slice witnesses, the slice-wise self-improvement outputs, and
+	the pasting comparison must be derived inside the successor proof itself.
+	They are not represented by a separate theorem whose assumptions are added
+	to the paper statement.
 \end{remark}
 
 \section{Proof of the main formal theorem}
