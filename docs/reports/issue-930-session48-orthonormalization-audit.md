@@ -28,6 +28,11 @@ construction as a tracked proof gap rather than as an extra theorem hypothesis.
 The paragraphs below that describe `OrthonormalizationInput` as the current
 formalization boundary are therefore historical.
 
+The same cleanup later removed the older `ProjectivizationRepairInput` and
+`LeftLiftedProjectivizationRepairInput` abbreviations and the conditional
+rounding lemmas that consumed them.  The current Section 5 repair route uses the
+proved theorem `leftLiftedProjectivizationRepairProducer` directly.
+
 ## Executive summary
 
 I audited the already-formalized orthonormalization/projective-completion slice against:

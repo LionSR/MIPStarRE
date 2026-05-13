@@ -16,8 +16,8 @@ lemmas or as direct tracked proof gaps on source-facing theorems.
 
 The role-level orthonormalization input that used to feed `mainFormal` has been
 removed.  The final theorem no longer asks for the former role-level
-orthonormalization input record, nor for explicit left/right
-`LeftLiftedProjectivizationRepairInput` fields at the role residual.  Instead,
+orthonormalization input record, nor for explicit left/right repair-input
+fields at the role residual.  Instead,
 `MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalConsistency`
 derives the pre-completion projective submeasurements directly from the
 line-130 cross consistency using
@@ -39,7 +39,8 @@ remain.
 ## Layer 1: Section 5 Orthonormalization
 
 The former `MakingMeasurementsProjective.OrthonormalizationInput` record has
-been removed.  The paper-facing Section 5 statements now keep the missing sharp
+been removed, as have the older projectivization repair-input abbreviations.
+The paper-facing Section 5 statements now keep the missing sharp
 orthonormalization construction as tracked proof gaps rather than as an extra
 record-valued theorem hypothesis.
 

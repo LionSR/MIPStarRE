@@ -743,8 +743,7 @@ theorem projectiveNonMeasurement_of_almostProjMeasStatement_full
 /-- Package the constructive spectral truncation proof directly as the
 `SpectralTruncationInput` consumed by the orthonormalization pipeline.
 
-This integrates the new witness producer with the existing route used by
-`spectralTruncateAlmostProjective` and, downstream, the
+This integrates the constructive witness theorem with the
 `OrthonormalizationSpectralObligation` APIs. -/
 noncomputable def spectralTruncationInput_of_sourceAlmostProjective
     {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]

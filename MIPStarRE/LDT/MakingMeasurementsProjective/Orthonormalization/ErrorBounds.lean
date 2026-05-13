@@ -136,15 +136,15 @@ lemma orthonormalizationError_ge_one_of_half_lt (ζ : Error)
     nlinarith
   exact (by norm_num : (1 : Error) ≤ 50).trans h50_le
 
-/-- Error bookkeeping for the composition of `consistencyToAlmostProjective`
-and `roundAlmostProjMeas`. -/
+/-- Error bookkeeping for the composition of the consistency-to-almost-projective
+estimate and the rounding-to-projective envelope. -/
 lemma orthonormalizationMainLemma_error_bound (ζ : Error)
     (hζ : 0 ≤ ζ) (hζ1 : ζ ≤ 1) :
     roundingToProjectiveError (consistencyToAlmostProjectiveError ζ) ≤
       orthonormalizationMainLemmaError ζ := by
   /-
-  The theorem below is structurally just the composition of
-  `consistencyToAlmostProjective` and `roundAlmostProjMeas`.
+  The theorem below is structurally just the scalar comparison between the
+  consistency-to-almost-projective estimate and the rounded-projective envelope.
   The remaining bookkeeping is the scalar inequality comparing the composed
   rounding bound with the named `orthonormalizationMainLemmaError`.
   -/

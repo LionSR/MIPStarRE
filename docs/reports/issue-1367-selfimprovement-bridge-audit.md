@@ -43,6 +43,12 @@
 > `SelfImprovement/Theorems/OrthonormalizationSpectral.lean`.  Later mentions of
 > the removed input bundles or the old bridge module in this report should be
 > read only as historical diagnostics, not as live API guidance.
+>
+> The Section 5 projectivization cleanup also removed the former
+> `ProjectivizationRepairInput` and `LeftLiftedProjectivizationRepairInput`
+> abbreviations.  Mentions of those names below are historical descriptions of
+> the old formalization boundary; the current construction uses
+> `leftLiftedProjectivizationRepairProducer` directly.
 
 ---
 

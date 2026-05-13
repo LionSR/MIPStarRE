@@ -170,36 +170,6 @@ structure RoundedProjMeasStatement {Outcome : Type*}
       (constSubMeasFamily P.toSubMeas)
       ζ
 
-/-- Paper origin: `references/ldt-paper/orthonormalization.tex:533-627`.
-
-Explicit input exposing the late repair from a rounded family to a genuine
-projective submeasurement. -/
-abbrev ProjectivizationRepairInput {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :=
-  SpectralTruncationStatement ψ A ζ →
-    ∃ P : ProjSubMeas Outcome ι,
-      RoundedProjMeasStatement ψ A P (roundingToProjectiveError ζ)
-
-/-- Paper origin: `references/ldt-paper/orthonormalization.tex:533-627`
-and `references/ldt-paper/self_improvement.tex:690-705`.
-
-Locality-preserving repair input for a left-lifted measurement.
-
-This is the structural invariant needed to descend the lifted-space output of
-`orthonormalizationMainLemma` back to a local projective submeasurement: when
-the input measurement already has the form `A_a ⊗ I`, the repaired family can
-be chosen in the same form `P_a ⊗ I`. -/
-abbrev LeftLiftedProjectivizationRepairInput {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState (ι × ι)) (A : Measurement Outcome ι) (ζ : Error) :=
-  SpectralTruncationStatement ψ (leftLiftedMeasurement (ιB := ι) A) ζ →
-    ∃ P : ProjSubMeas Outcome ι,
-      RoundedProjMeasStatement ψ (leftLiftedMeasurement (ιB := ι) A)
-        (ProjSubMeas.liftLeft P) (roundingToProjectiveError ζ)
-
 /-- Complete a submeasurement by adjoining the residual `I - ∑ₐ Aₐ` at the
 fresh `none` outcome.
 
