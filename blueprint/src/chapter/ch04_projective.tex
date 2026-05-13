@@ -281,17 +281,41 @@
 	\]
 \end{lemma}
 
+\begin{lemma}[Formalized orthogonalization envelope for measurements]\label{lem:orthonormalization-main-lemma-formalized-envelope}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair}
+	\leanok
+	\uses{lem:orthonormalization-main-lemma, lem:left-lifted-projectivization-repair, def:simeq, def:approx_delta}
+	The formalized measurement-level version of Lemma~\ref{lem:orthonormalization-main-lemma}
+	has the same hypotheses as the paper lemma and the corrected public
+	orthonormalization envelope \(100\zeta^{1/4}\).  Thus, if \(A=\{A_a\}\) and
+	\(B=\{B_a\}\) are measurements satisfying
+	\[
+		A_a \ot I \simeq_\zeta I \ot B_a
+	\]
+	on a normalized bipartite state \(\ket{\psi}\), then there exists a projective
+	sub-measurement \(P=\{P_a\}\) such that
+	\[
+		A_a \ot I \approx_{100\zeta^{1/4}} P_a \ot I .
+	\]
+	This is the corrected Lean theorem proved from the Section~5
+	projectivization repair construction; it is not a replacement for the
+	sharper source statement \(84\zeta^{1/4}\) in
+	Lemma~\ref{lem:orthonormalization-main-lemma}.
+\end{lemma}
+
 \begin{remark}[Lean auxiliary declarations for the orthogonalization lemma]\label{rem:lean-orthonormalization-main-declarations}
-	\uses{lem:orthonormalization-main-lemma, lem:left-lifted-projectivization-repair}
+	\uses{lem:orthonormalization-main-lemma, lem:orthonormalization-main-lemma-formalized-envelope, lem:left-lifted-projectivization-repair}
 	The Lean declaration
 	\texttt{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}
 	now states Lemma~\ref{lem:orthonormalization-main-lemma} without adding
 	spectral-truncation or repair hypotheses.  Those construction steps belong to
 	the proof of the lemma, not to its assumptions.  The current Lean proof is
-	therefore recorded as a tracked proof gap.  Internal conditional lemmas may still
-	record the already-formalized descent from explicit construction data to the
-	local conclusion, but they are not advertised as formalizations of the paper
-	lemma.
+	therefore recorded as a tracked proof gap.  The separate
+	Lemma~\ref{lem:orthonormalization-main-lemma-formalized-envelope} records the
+	already proved measurement-level statement with the corrected
+	\(100\zeta^{1/4}\) envelope.  Internal conditional lemmas may still record
+	the already-formalized descent from explicit construction data to the local
+	conclusion, but they are not advertised as formalizations of the paper lemma.
 \end{remark}
 
 \begin{lemma}[Locality-preserving projectivization repair]\label{lem:left-lifted-projectivization-repair}
