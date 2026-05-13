@@ -242,7 +242,7 @@ left-completion line-169 residual.
 Paper origin: `references/ldt-paper/inductive_step.tex:135-173`.  The
 orthonormalize-and-complete statements used by the transport theorem are formed
 from the diagonal orthonormalization residual and the two completion estimates;
-no separate projective-completion wrapper is introduced. -/
+no additional projective-completion record is introduced. -/
 noncomputable def toPostRolePackageLeftCompletionTransportResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

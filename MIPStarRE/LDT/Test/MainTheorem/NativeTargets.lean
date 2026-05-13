@@ -83,11 +83,13 @@ theorem nonempty_ofRoleResidual
       orthResidual hpre
   exact nonempty_ofRoleResidualAndCompletion roleResidual hcompletion
 
-/-- Convert the combined residual to the left-completion residual after the paper
-line-130 consistency has been derived separately.
+/-- Convert the combined residual directly to the projective completion
+transport residual.
 
-Paper origin: `references/ldt-paper/inductive_step.tex:130-173`. -/
-noncomputable def toLeftCompletionTransportResidual
+Paper origin: `references/ldt-paper/inductive_step.tex:130-173`.  The proof
+reconstructs paper line 130 from the role residual and then applies the
+post-role completion transport. -/
+noncomputable def toCompletionTransportResidual
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
@@ -96,12 +98,16 @@ noncomputable def toLeftCompletionTransportResidual
     (residual : MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
       params strategy eps hpass k scalars)
     (hsmall : ¬ 1 ≤ mainFormalError params k eps) :
-    MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual
-      params strategy eps hpass k scalars :=
-  open MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual in
-  { roleResidual := residual.roleResidual
-    postRoleResidual :=
-      residual.postRoleDiagonalCompletion.toPostRolePackageLeftCompletionTransportResidual hsmall }
+    MainFormalCascadeProjectiveCompletionTransportResidual params strategy eps k scalars :=
+  let rolePackage := residual.roleResidual.rolePackage scalars
+  let postRoleResidual :=
+    residual.postRoleDiagonalCompletion.toPostRolePackageLeftCompletionTransportResidual hsmall
+  have hpre : ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
+      (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
+      scalars.zeta1 := by
+    simpa [rolePackage] using residual.roleResidual.diagonalConsistency scalars
+  postRoleResidual.toCompletionTransportResidual hpre
 
 end MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
 
