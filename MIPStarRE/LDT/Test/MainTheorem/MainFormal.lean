@@ -120,18 +120,9 @@ theorem mainFormal_ofProjectiveCompletionResidual
     open MainFormalCascadeRolePackageResidualProjectiveCompletionResidual in
     simpa [rolePackage, rolePackageResidualLeftCompletionTransportResidual,
       toLeftCompletionTransportResidual] using hpre
-  have rolePackageResidualCompletionTransportResidual :
-      MainFormalCascadeRolePackageResidualCompletionTransportResidual
-        (params := params) (strategy := strategy) (eps := eps)
-        (hpass := hpass) (k := k) (scalars := scalars) :=
-    rolePackageResidualLeftCompletionTransportResidual
-      |>.toRolePackageResidualCompletionTransportResidual hpreForResidual
-  have rolePackagedCompletionTransportResidual :
-      MainFormalCascadeRolePackagedCompletionTransportResidual params strategy eps k scalars :=
-    rolePackageResidualCompletionTransportResidual.toRolePackagedCompletionTransportResidual
   have completionTransportResidual :
       MainFormalCascadeProjectiveCompletionTransportResidual params strategy eps k scalars :=
-    rolePackagedCompletionTransportResidual.toCompletionTransportResidual
+    rolePackageResidualLeftCompletionTransportResidual.toCompletionTransportResidual hpreForResidual
   have projectiveTargets :
       MainFormalCascadeProjectiveStageTargets params strategy eps k scalars :=
     completionTransportResidual.toProjectiveStageTargets hpass
