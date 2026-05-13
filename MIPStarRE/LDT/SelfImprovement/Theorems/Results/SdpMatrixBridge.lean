@@ -303,20 +303,6 @@ theorem toSdpOptimalPairWithSlackness
       matrixAveragedPointOperator_ofPointRealization] using
         h.complementarySlacknessEquation g
 
-/-- Compatibility wrapper retaining the extra dominance hypothesis for
-conditional callers. -/
-theorem toSdpOptimalPairWithSlackness_of_dualDominatesIdentity
-    {params : Parameters} [FieldModel params.q]
-    {strategy : SymStrat params ι}
-    {T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params)
-      (matrixSdpPointRealizationOfStrategy params strategy).space}
-    {Z : MIPStarRE.Quantum.Op ι}
-    (h : MatrixSdpOptimalWitness params
-      (matrixSdpPointRealizationOfStrategy params strategy) T Z)
-    (_hdom : (1 : MIPStarRE.Quantum.Op ι) ≤ Z) :
-    SdpOptimalPairWithSlackness params strategy (matrixSubmeasurementToSubMeas T) Z :=
-  h.toSdpOptimalPairWithSlackness
-
 end MatrixSdpOptimalWitness
 
 namespace MatrixSdpStatementWithSlackness
@@ -339,21 +325,6 @@ theorem toSdpStatementWithSlackness
     Classical.choose_spec hTZ
   exact ⟨matrixSubmeasurementToSubMeas T, Z,
     hopt.toSdpOptimalPairWithSlackness⟩
-
-/-- Compatibility wrapper retaining the extra dominance hypothesis for
-conditional callers. -/
-theorem toSdpStatementWithSlackness_of_dualDominatesIdentity
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (h : MatrixSdpStatementWithSlackness params
-      (matrixSdpPointRealizationOfStrategy params strategy))
-    (_hdom :
-      let hTZ := Classical.choose_spec h.witness
-      let Z := Classical.choose hTZ
-      (1 : MIPStarRE.Quantum.Op ι) ≤ Z) :
-    SdpStatementWithSlackness params strategy :=
-  h.toSdpStatementWithSlackness params strategy
 
 /-- A saturated matrix SDP statement for the point realization of a strategy gives
 the paper-form abstract SDP measurement witness.

@@ -534,10 +534,8 @@ lemma sdp
 /-- Canonical block-SDP data yields the complementary-slackness variant of
 `lem:sdp`.
 
-This wrapper is the strategy-level counterpart of
-`sdpStatementWithSlackness_of_canonicalOptimalPair`.
-The output is `SdpStatementWithSlackness` and therefore includes the
-complementary-slackness equations needed by the strengthened helper wrappers. -/
+From a saturated canonical optimal pair in matrix SDP form, one obtains the
+abstract Section 9 SDP statement with complementary slackness. -/
 lemma sdp_with_slackness
     (params : Parameters)
     [FieldModel params.q]
