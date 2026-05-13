@@ -157,8 +157,6 @@ Given:
   (paper: `inductive_step.tex` line 130, `eq:G-self-consistency`);
 * a distinguished outcome `a₀ : Outcome` to absorb the residual mass during
   completion (paper: line 143, `prop:completing-to-measurement`);
-* the orthonormalization bridge data carrying the truncation and
-  locality-preserving repair witnesses for the option-completed measurement,
 
 we obtain a projective sub-measurement `P` together with a projective
 measurement `Q` satisfying the chain bound
@@ -167,7 +165,7 @@ measurement `Q` satisfying the chain bound
 
 The analytic part of the proof is a direct composition of the two existing
 lemmas:
-* `MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization_ofInput`
+* `MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization`
   (Step 6a; `orthonormalization.tex` line 67);
 * `MIPStarRE.LDT.Preliminaries.completingToMeasurement`
   (Step 6b; `preliminaries.tex` line 1101).
@@ -189,15 +187,14 @@ theorem orthonormalizeAndComplete
     (A : Measurement Outcome ι) (a0 : Outcome) (ζ : Error)
     (hssc :
       BipartiteSSCRel ψ (uniformDistribution Unit)
-        (constSubMeasFamily A.toSubMeas) ζ)
-    (hbridge : OrthonormalizationInput ψ A.toSubMeas ζ) :
+        (constSubMeasFamily A.toSubMeas) ζ) :
     ∃ P : ProjSubMeas Outcome ι, ∃ Q : ProjMeas Outcome ι,
       Q.toMeasurement = completeAtOutcome P.toSubMeas a0 ∧
         OrthonormalizeAndCompleteStatement ψ A P Q a0 ζ := by
   -- Step 6a: apply orthonormalization to `A.toSubMeas`.
   obtain ⟨P, hClose⟩ :=
-    orthonormalization_ofInput (Outcome := Outcome) (ι := ι) ψ hperm hψ
-      A.toSubMeas ζ hssc hbridge
+    orthonormalization (Outcome := Outcome) (ι := ι) ψ hperm hψ
+      A.toSubMeas ζ hssc
   -- Step 6b: use the existing completion bound for the canonical completion
   -- of `P`, then repackage that same completed measurement as a `ProjMeas`.
   have hCompletedCloseness :

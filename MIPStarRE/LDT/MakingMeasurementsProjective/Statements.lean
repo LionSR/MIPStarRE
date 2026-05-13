@@ -240,20 +240,22 @@ noncomputable def optionCompletion {Outcome : Type*}
     (A : SubMeas Outcome ι) (a : Outcome) :
     (optionCompletion A).outcome (some a) = A.outcome a := rfl
 
-/-- Paper origin: `references/ldt-paper/orthonormalization.tex:380-627`
-(`\label{thm:orthonormalization}`).
+/-- Legacy internal construction record for the Section 5 submeasurement
+orthonormalization proof.
 
-Explicit input exposing only the remaining truncation-function and
-locality-preserving repair witnesses needed for the submeasurement version of
-`thm:orthonormalization`.
+Paper origin: `references/ldt-paper/orthonormalization.tex:380-627`
+(`\label{thm:orthonormalization}`), where these are proof steps rather than
+theorem hypotheses.
 
-The lifted/local descent is now formalized by
-`orthonormalizationMainLemma_local`; the only still-opaque inputs are the
-truncation-function and late repair steps for the option-completed measurement
-`optionCompletion A`. Both fields live at error
-`consistencyToAlmostProjectiveError (2 * ζ)` because completing a
-`ζ`-strongly-self-consistent submeasurement to a measurement doubles the defect,
-exactly as in the paper's `1 - 2ζ` lower bound for the completed family. -/
+This structure is not part of the public statement of `thm:orthonormalization`,
+`orthonormalizationMainLemma`, or `orthonormalizeAndComplete`. It records two
+construction obligations for the option-completed measurement `optionCompletion
+A`: the truncation-function step and the locality-preserving repair step. Both
+fields live at error `consistencyToAlmostProjectiveError (2 * ζ)` because
+completing a `ζ`-strongly-self-consistent submeasurement to a measurement
+doubles the defect, as in the paper's `1 - 2ζ` lower bound for the completed
+family.  The source-facing theorem keeps the missing construction as a tracked
+proof gap instead of consuming this record as an additional assumption. -/
 structure OrthonormalizationInput {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -268,36 +270,5 @@ structure OrthonormalizationInput {Outcome : Type*}
     let Ahat : Measurement (Option Outcome) ι := optionCompletion A
     LeftLiftedProjectivizationRepairInput ψ Ahat
       (consistencyToAlmostProjectiveError (2 * ζ))
-
-/-- Strengthened orthonormalization input carrying residual domination through
-the option-completed repair.
-
-The ordinary `OrthonormalizationInput` only asks that the repair of
-`optionCompletion A` can be chosen as a left-lifted local projective
-submeasurement.  For the monotone-total route in self-improvement one needs an
-additional construction-level fact: the repaired projective family on
-`Option Outcome` assigns at least the original residual `1 - A.total` to the
-fresh `none` outcome.  This invariant is deliberately stated as extra input,
-since it is not a consequence of state-dependent-distance closeness alone. -/
-structure OrthonormalizationInputWithResidualDomination {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) (ζ : Error) where
-  /-- Truncation-function step on the option-completed measurement. -/
-  spectral :
-    let Ahat : Measurement (Option Outcome) ι := optionCompletion A
-    SpectralTruncationInput ψ (leftLiftedMeasurement (ιB := ι) Ahat)
-      (consistencyToAlmostProjectiveError (2 * ζ))
-  /-- Locality-preserving repair, strengthened by domination of the completed
-  residual outcome. -/
-  repair :
-    let Ahat : Measurement (Option Outcome) ι := optionCompletion A
-    SpectralTruncationStatement ψ (leftLiftedMeasurement (ιB := ι) Ahat)
-        (consistencyToAlmostProjectiveError (2 * ζ)) →
-      ∃ P : ProjSubMeas (Option Outcome) ι,
-        RoundedProjMeasStatement ψ (leftLiftedMeasurement (ιB := ι) Ahat)
-          (ProjSubMeas.liftLeft P)
-          (roundingToProjectiveError (consistencyToAlmostProjectiveError (2 * ζ))) ∧
-        (optionCompletion A).outcome none ≤ P.outcome none
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

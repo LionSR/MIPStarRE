@@ -52,10 +52,10 @@ axis that matters:
   theorem, as a source-faithful lemma target to be proved from the same
   hypotheses, or as a paper-gap report; it must not become a bundled hypothesis
   consumed by downstream code.  Do not recommend adding a conditional helper
-  merely to make a blueprint link pass; an existing conditional helper is
-  acceptable only as quarantine for already useful proof content, with an
-  explicit removal plan, and it must stay off the paper theorem's `\leanok`
-  path.
+  merely to make a blueprint link pass.  An existing conditional helper may
+  remain only as temporary quarantine for already useful proof content, with an
+  explicit discharge or deletion plan, and it must stay off the paper theorem's
+  `\leanok` path.
 - **Conclusion.** Does the blueprint conclusion match the Lean return
   type? Watch for "$X$" vs "$X^\dagger$", "$=$" vs "$\leq$", strict
   vs non-strict inequalities, and conjugate-linear vs linear conventions

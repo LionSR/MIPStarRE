@@ -34,10 +34,10 @@ cascade uses the slightly widened absorbed scalar
 
 ## Status
 
-- The orthonormalization step is mediated by
-  `OrthonormalizationInput`, which now carries only the truncation
-  and locality-preserving repair witnesses for the option-completed
-  measurement used in the paper's reduction.
+- The orthonormalization step uses the source theorem `orthonormalization`.
+  The theorem has a tracked proof gap for the sharp paper constant; this file
+  no longer exposes its proof-stage construction data as a hypothesis of the
+  Step 6 output statement.
 - The completion step uses the **fully-formalized** `completingToMeasurement`
   (`\leanok` in `blueprint/src/chapter/ch03_preliminaries.tex`), so no new
   bridge is introduced here.

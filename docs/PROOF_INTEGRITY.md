@@ -212,9 +212,9 @@ These should be flagged for review but may be acceptable with justification.
 **For source-statement proof gaps**: Read
 [`paper-gaps/proof-gap-protocol.tex`](paper-gaps/proof-gap-protocol.tex) when a
 proof is blocked by a bridge, residual, repair, input, package, or obligation
-structure.  It explains when to introduce an internal obligation theorem, when a
-conditional helper is acceptable, and why a tracked `sorry` is preferable to a
-strengthened source theorem statement.
+structure.  It explains when to introduce an internal obligation theorem, why
+conditional helpers are exceptional temporary quarantine objects, and why a
+tracked `sorry` is preferable to a strengthened source theorem statement.
 
 **In CI review prompts**: Reference this file instead of inlining the rules:
 ```

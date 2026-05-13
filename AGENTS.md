@@ -201,13 +201,14 @@ Before editing any theorem tagged with a paper label (`thm:*`, `lem:*`,
 4. If a missing intermediate fact is needed, first state that fact as a named
    lemma or theorem to be proved from the paper hypotheses.
 5. Do not add a conditional helper merely to keep a file compiling.  A
-   conditional helper is acceptable only when the proof content it preserves is
-   mathematically useful, the source-faithful theorem remains visible, and the
-   helper has a paper-gap note, a named construction theorem or
-   proof-obligation target, and an explicit removal plan.  Its name must show
-   that it is conditional without making the assumption look like an acceptable
-   source hypothesis, for example `mainFormal_ofInternalObligations`,
-   `selfImprovementFromObligations`, or a name ending in `_ofObligations`.
+   conditional helper may remain temporarily only when the proof content it
+   preserves is mathematically useful, the source-faithful theorem remains
+   visible, and the helper has a paper-gap note, a named construction theorem
+   or proof-obligation target, and an explicit discharge or deletion plan.  Its
+   name must show that it is conditional without making the assumption look like
+   an acceptable source hypothesis, for example
+   `mainFormal_ofInternalObligations`, `selfImprovementFromObligations`, or a
+   name ending in `_ofObligations`.
 6. Do not point a source-labelled blueprint theorem to the conditional helper
    with `\leanok`.
 
