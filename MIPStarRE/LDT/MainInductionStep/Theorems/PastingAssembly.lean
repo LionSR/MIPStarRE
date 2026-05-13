@@ -540,56 +540,51 @@ noncomputable def assembleAveragedPastingInput
                     params strategy eps delta gamma hgood hrestrict)
       bounded := by
         refine
-          { bounded := ?_
-            dominationTargetAgrees := ?_ }
-        · refine
-            { sliceOpPSD := ?_
-              sliceBoundedness := ?_
-              sliceDominatesTarget := ?_ }
-          · intro x
-            let g0 : Polynomial params :=
-              Classical.choice (inferInstance : Nonempty (Polynomial params))
-            have htarget_nonneg :
-                0 ≤ IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g0 := by
-              unfold IdxPolyFamily.averagedSlicePointEvaluationOperator
-              exact Finset.sum_nonneg fun u hu =>
-                smul_nonneg ((uniformDistribution (Point params)).nonnegative u)
-                  ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome_pos
-                    (g0 u))
-            exact le_trans htarget_nonneg (hself.dominatesAveragePointOperator x g0)
-          · have hswap :
-                avgOver 𝒟
-                    (fun x =>
-                      ev strategy.state
-                        (leftTensor (ι₂ := ι) (1 - (hself.family.meas x).toSubMeas.total) *
-                          rightTensor (ι₁ := ι) (hself.family.witness x))) =
-                  avgOver 𝒟
-                    (fun x =>
-                      tensorFailureExpectation strategy.state (hself.sliceWitness x)
-                        (hself.sliceProj x).toSubMeas) := by
-              apply avgOver_congr
-              intro x
-              simpa [tensorFailureExpectation, SelfImprovementPackage.family,
-                leftTensor_mul_rightTensor_eq_opTensor] using
-                (ev_opTensor_swap_of_density_fixed strategy.state
-                  strategy.permInvState.density_swap
-                  (1 - (hself.sliceProj x).toSubMeas.total) (hself.sliceWitness x))
-            rw [hswap]
-            calc
+          { sliceOpPSD := ?_
+            sliceBoundedness := ?_
+            sliceDominatesAveragedPoint := ?_ }
+        · intro x
+          let g0 : Polynomial params :=
+            Classical.choice (inferInstance : Nonempty (Polynomial params))
+          have htarget_nonneg :
+              0 ≤ IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g0 := by
+            unfold IdxPolyFamily.averagedSlicePointEvaluationOperator
+            exact Finset.sum_nonneg fun u hu =>
+              smul_nonneg ((uniformDistribution (Point params)).nonnegative u)
+                ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome_pos
+                  (g0 u))
+          exact le_trans htarget_nonneg (hself.dominatesAveragePointOperator x g0)
+        · have hswap :
               avgOver 𝒟
                   (fun x =>
+                    ev strategy.state
+                      (leftTensor (ι₂ := ι) (1 - (hself.family.meas x).toSubMeas.total) *
+                        rightTensor (ι₁ := ι) (hself.family.witness x))) =
+                avgOver 𝒟
+                  (fun x =>
                     tensorFailureExpectation strategy.state (hself.sliceWitness x)
-                      (hself.sliceProj x).toSubMeas)
-                ≤ avgOver 𝒟 (fun x => sliceSelfImprovementError params hrestrict x) := by
-                    exact avgOver_mono 𝒟 _ _ hself.bounded
-              _ ≤ zeta := by
-                    simpa [zeta, 𝒟] using
-                      (average_sliceSelfImprovementError_le
-                        params strategy eps delta gamma hgood hrestrict)
-          · intro x g
-            simpa [sub_nonneg] using hself.dominatesAveragePointOperator x g
+                      (hself.sliceProj x).toSubMeas) := by
+            apply avgOver_congr
+            intro x
+            simpa [tensorFailureExpectation, SelfImprovementPackage.family,
+              leftTensor_mul_rightTensor_eq_opTensor] using
+              (ev_opTensor_swap_of_density_fixed strategy.state
+                strategy.permInvState.density_swap
+                (1 - (hself.sliceProj x).toSubMeas.total) (hself.sliceWitness x))
+          rw [hswap]
+          calc
+            avgOver 𝒟
+                (fun x =>
+                  tensorFailureExpectation strategy.state (hself.sliceWitness x)
+                    (hself.sliceProj x).toSubMeas)
+              ≤ avgOver 𝒟 (fun x => sliceSelfImprovementError params hrestrict x) := by
+                  exact avgOver_mono 𝒟 _ _ hself.bounded
+            _ ≤ zeta := by
+                  simpa [zeta, 𝒟] using
+                    (average_sliceSelfImprovementError_le
+                      params strategy eps delta gamma hgood hrestrict)
         · intro x g
-          exact SelfImprovementPackage.family_dominationTarget (pkg := hself) x g
+          exact hself.dominatesAveragePointOperator x g
       error_le := by
         have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
         have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood

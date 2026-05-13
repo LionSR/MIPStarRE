@@ -95,7 +95,7 @@ lemma storedResidual_nonneg
   simpa [opTensor] using
     MIPStarRE.Quantum.kronecker_nonneg
       (sub_nonneg.mpr (G x).total_le_one)
-      (hbound.bounded.sliceOpPSD x)
+      (hbound.sliceOpPSD x)
 
 /-- Common pointwise Cauchy--Schwarz estimate for the scalar `G`-commutativity
 stability bounds.
@@ -303,7 +303,7 @@ lemma scalar_pointwise_cauchy_schwarz_bound
                       (1 - T) * 1 * (1 - T) = (1 - T) * (1 - T) := by simp
                       _ = 1 - T - T + T * T := by noncomm_ring
                       _ = 1 - T := by simp [hT_proj])
-              (hbound.bounded.sliceOpPSD x)
+              (hbound.sliceOpPSD x)
       _ = hbound.storedResidual G x := by
             rfl
   have hcs := MIPStarRE.LDT.Preliminaries.sum_ev_mul_le_sqrt strategy.state X Y
