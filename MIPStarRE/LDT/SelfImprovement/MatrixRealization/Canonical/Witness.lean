@@ -46,6 +46,8 @@ structure MatrixSdpOptimalWitness (params : Parameters) [FieldModel params.q]
 /-- Matrix-level optimal SDP witness together with the dominance condition
 required by the reduced abstract helper interface.
 
+Paper-gap note: `docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`.
+
 The paper's dual SDP feasibility gives \(Z \ge A_g\).  The current reduced
 abstract interface also asks for \(I \le Z\), because boundedness is expressed
 against this dual operator.  This successor package records that extra

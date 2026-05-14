@@ -159,6 +159,8 @@ end MatrixSdpCanonicalOptimalPair
 /-- Canonical primal-dual data with complementary slackness and dual
 dominance.
 
+Paper-gap note: `docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`.
+
 This is the finite-dimensional SDP output needed by the reduced abstract helper
 interface: a feasible canonical primal matrix, a dual-feasible operator with
 the same objective value, canonical complementary slackness, and \(I \le Z\). -/

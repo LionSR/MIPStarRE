@@ -11,9 +11,10 @@ review aid for that boundary:
 * resolve those references to public Lean declarations under ``MIPStarRE/``;
 * inspect only the public input portion of the declaration header after the
   declaration name and before the result type;
-* report occurrences of proof-debt vocabulary such as ``BridgeHypotheses``,
-  ``Residual``, ``RepairInput``, ``Package``, ``Producer``, an ``Input``
-  bundle, or a generic ``Hypotheses`` / ``Assumptions`` bundle;
+* report occurrences of blocking proof-debt vocabulary such as
+  ``BridgeHypotheses``, ``Residual``, ``RepairInput``, ``Package``,
+  ``Producer``, ``Obligation``, an ``Input`` bundle, a wrapper, or a generic
+  ``Hypotheses`` / ``Assumptions`` bundle;
 * reject paper-facing blueprint entries that point to declaration names of the
   form ``*_of...Obligations``, ``*_of...Residual``, ``*_of...Repair``, or
   ``conditional...``, even when the declaration header itself has no suspicious
@@ -52,11 +53,17 @@ DEBT_TOKEN_RE = re.compile(
     r"(?<![A-Za-z0-9_'])"
     r"(?:"
     r"(?:[A-Za-z_][A-Za-z0-9_']*)?"
-    r"(?:Bridge|Residual|Repair|Package|Producer|Input|Hypotheses|Assumptions)"
+    r"(?:"
+    r"Bridge|Residual|Repair|Package|Producer|Input|Hypotheses|Assumptions"
+    r"|Hypothesis|Obligation|Obligations|Wrapper|CompletionTransport"
+    r")"
     r"[A-Za-z0-9_']*"
     r"|"
     r"(?:h|has|mk|of)?"
-    r"(?:bridge|residual|repair|package|producer|input|hypotheses|assumptions)"
+    r"(?:"
+    r"bridge|residual|repair|package|producer|input|hypotheses|assumptions"
+    r"|hypothesis|obligation|obligations|wrapper|completionTransport"
+    r")"
     r"[A-Za-z0-9_']*"
     r")"
     r"(?![A-Za-z0-9_'])"
@@ -98,7 +105,10 @@ CONDITIONAL_DECL_NAME_RE = re.compile(
     r"|BridgeHypotheses"
     r"|BridgeInputs"
     r"|(?:^|_)of(?:[A-Z][A-Za-z0-9_']*)?"
-    r"(?:Bridge|Obligations|Residual|Repair|Package|Input|Hypotheses|Assumptions)"
+    r"(?:"
+    r"Bridge|Obligations|Obligation|Residual|Repair|Package|Input|Hypotheses"
+    r"|Assumptions|Statement|Output|Conclusion|Witness|Wrapper|Slackness|Dominance"
+    r")"
     r"[A-Za-z0-9_']*"
     r"|(?:^|_)ofRepaired[A-Za-z0-9_']*"
     r"|(?:^|_)assuming[A-Za-z0-9_']*"
