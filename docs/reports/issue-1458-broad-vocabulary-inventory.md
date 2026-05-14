@@ -36,6 +36,17 @@ residual, repair, package, witness, data, output, or conclusion package.  The
 correct response remains mathematical comparison with the paper source, not
 renaming data merely to make the scan silent.
 
+An optional informational scan of blueprint definitions, remarks, and examples
+finds a larger frontier: 144 proof-debt header occurrences and 11 conditional
+declaration-name occurrences.  These entries are not source theorem statements,
+and they are not failures of the default theorem-boundary gate.  They should be
+used as a triage list for issues #1558, #1571, and #1586.  When an
+informational entry names a construction record that can be derived from the
+paper hypotheses, extract the derivation as a source-shaped theorem or a named
+construction theorem.  When it cannot yet be derived, leave the corresponding
+source theorem unfinished rather than promoting the record to a public
+hypothesis.
+
 ## Chapter 4 Projectivization
 
 The names `QLayerData`, `QXPLayerData`, and `RankReductionWitness` are
@@ -69,6 +80,25 @@ complementary-slackness statement from the paper's canonical SDP argument.  The
 current repair makes that obligation visible as a source-facing theorem with a
 specific measurement-and-slackness consequence; it no longer appears as an
 extra public hypothesis on later paper theorems.
+
+## Chapter 10 Main Induction
+
+The successor branch of `thm:main-induction` is now isolated as the theorem
+`mainInductionSuccessor`.  Its statement contains the source assumptions of
+the successor case and the branch condition \(m\ne1\).  It does not take
+`SliceRestrictionPackage`, `PerSliceInductionPackage`, `SelfImprovementPackage`,
+or `AveragedPastingInput` as hypotheses.  Those records remain useful internal
+stage objects, but the proof obligation is to construct them from
+`references/ldt-paper/inductive_step.tex:441-551` and then apply
+`mainInductionFromStageData`.  This makes the Section 6 bridge debt a
+self-contained mathematical target for #1507 rather than an implicit proof gap
+inside `mainInduction`.
+
+The optional informational scan still reports the Section 6 stage records in
+the blueprint definition `def:self-improvement-slice-transport`.  This is
+expected: the definition records formal intermediate objects for the successor
+proof.  The review task is to ensure that these objects are never advertised as
+extra assumptions of `thm:main-induction` or `thm:main-formal`.
 
 ## Chapter 9 Pasting
 
@@ -138,11 +168,19 @@ theorem, lemma, proposition, or corollary entries.
 1. Continue the #1230 SDP discharge path.  Prove
    `sdp_statement_with_slackness`, and hence `sdp_slackness_measurement`, from
    the canonical SDP strong-duality and complementary-slackness argument.
-2. Continue the Chapter 4 source-construction audit for `QLayerData`,
+2. Discharge the Section 6 successor target `mainInductionSuccessor` by
+   constructing the restricted-probability package, recursive slice
+   measurements, self-improvement outputs, and averaged pasting input from the
+   paper hypotheses, then applying `mainInductionFromStageData`.
+3. Continue the Chapter 4 source-construction audit for `QLayerData`,
    `QXPLayerData`, and `RankReductionWitness`, checking that each public input
    represents a fixed object introduced by the paper rather than an unproved
    proof step.
-3. Keep the Chapter 1 external theorem interfaces unmarked by `\leanok` until
+4. Use the optional informational scan to triage definition, remark, and
+   example entries.  Do not silence the scan by renaming mathematical objects;
+   either classify a record as a genuine source construction or turn the
+   missing derivation into a source-shaped theorem with a tracked proof.
+5. Keep the Chapter 1 external theorem interfaces unmarked by `\leanok` until
    the external theorem itself is formalized or imported as a justified
    source-facing theorem.
 
@@ -160,3 +198,15 @@ python3 scripts/audit_paper_facing_proof_debt.py \
 
 This command is a reproducible way to obtain the list above.  It is not a
 substitute for the mathematical comparison with the paper source.
+
+The informational frontier is reproduced by adding
+`--include-informational-envs`:
+
+```bash
+python3 scripts/audit_paper_facing_proof_debt.py \
+  --root . \
+  --broad-vocabulary \
+  --warn-only \
+  --ci \
+  --include-informational-envs
+```

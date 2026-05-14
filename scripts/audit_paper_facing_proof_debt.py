@@ -32,6 +32,11 @@ review aid for that boundary:
   suspicious public input.
 * classify known faithful boundary-input packages separately, with paper
   citations, so they do not become indistinguishable from proof debt.
+* optionally, with ``--include-informational-envs``, scan ``definition``,
+  ``remark``, and ``example`` entries as a report-only frontier.  This mode is
+  useful for finding Lean-only construction records advertised near a paper
+  proof without turning those construction records into paper theorem
+  statements.
 
 The audit is report-only by default.  With ``--ci`` it exits non-zero when a
 finding is present, unless ``--warn-only`` is also supplied.
@@ -59,6 +64,7 @@ from lean_header_utils import advance_depth, line_number, starts_keyword
 
 
 THEOREM_LIKE_ENVS = frozenset({"theorem", "lemma", "proposition", "corollary"})
+INFORMATIONAL_ENVS = frozenset({"definition", "remark", "example"})
 
 STRICT_UPPER_TOKENS = (
     "Bridge",
@@ -313,12 +319,19 @@ class AuditResult:
         )
 
 
-def paper_facing_entries(blueprint_src: Path) -> list[BlueprintEntry]:
-    """Return theorem-like blueprint entries that carry a Lean reference."""
+def paper_facing_entries(
+    blueprint_src: Path,
+    *,
+    include_informational_envs: bool = False,
+) -> list[BlueprintEntry]:
+    """Return paper-facing blueprint entries that carry a Lean reference."""
+    envs = THEOREM_LIKE_ENVS
+    if include_informational_envs:
+        envs = envs | INFORMATIONAL_ENVS
     return [
         entry
         for entry in collect_blueprint_entries(blueprint_src)
-        if entry.env_type in THEOREM_LIKE_ENVS
+        if entry.env_type in envs
     ]
 
 
@@ -537,13 +550,21 @@ def _findings_for_entry(
     )
 
 
-def run_audit(root: Path, *, broad_vocabulary: bool = False) -> AuditResult:
+def run_audit(
+    root: Path,
+    *,
+    broad_vocabulary: bool = False,
+    include_informational_envs: bool = False,
+) -> AuditResult:
     """Run the paper-facing proof-debt audit for ``root``."""
     root = root.resolve()
     blueprint_src = root / "blueprint" / "src"
     lean_root = root / "MIPStarRE"
 
-    entries = paper_facing_entries(blueprint_src)
+    entries = paper_facing_entries(
+        blueprint_src,
+        include_informational_envs=include_informational_envs,
+    )
     decls = collect_lean_decls(lean_root)
 
     missing: list[str] = []
@@ -673,12 +694,25 @@ def _build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="with --ci, report findings but keep exit code 0",
     )
+    parser.add_argument(
+        "--include-informational-envs",
+        action="store_true",
+        help=(
+            "also scan blueprint definition, remark, and example entries; this "
+            "is intended for report-only frontier audits, not for the default "
+            "paper-theorem blocking gate"
+        ),
+    )
     return parser
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
-    result = run_audit(args.root, broad_vocabulary=args.broad_vocabulary)
+    result = run_audit(
+        args.root,
+        broad_vocabulary=args.broad_vocabulary,
+        include_informational_envs=args.include_informational_envs,
+    )
 
     if args.json:
         print(json.dumps(asdict(result), indent=2, sort_keys=True, default=_json_default))

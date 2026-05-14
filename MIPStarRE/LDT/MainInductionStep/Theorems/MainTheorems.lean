@@ -179,6 +179,45 @@ theorem mainInductionBaseCase
     mainInductionOfWitness params strategy eps delta gamma k
       ⟨strategy.axisParallelFailureProbability, G, hconsG, herror_le⟩
 
+/-- Successor branch of `thm:main-induction`.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, the induction
+step after the restricted-probability estimates and the slice-wise recursive
+calls have been set up.
+
+This theorem is the self-contained mathematical obligation left by the
+successor case.  Its assumptions are the source assumptions of
+`thm:main-induction`, together with the branch condition `params.m ≠ 1`; it
+does not accept restricted-probability records, per-slice induction data,
+self-improvement data, pasting data, bridge hypotheses, residual inputs, or
+package hypotheses.  The intended proof is to construct these objects internally
+from the paper hypotheses, then apply the already checked assembly theorem
+`mainInductionFromStageData`.
+
+**Proof obligation:** Prove the successor branch from the paper hypotheses by
+deriving the restricted slice profiles, the recursive slice measurements, the
+slice-wise self-improvement conclusions, and the averaged pasting input inside
+the proof.  This is tracked by issues #1507 and #1458.  Discharge: construct the
+four stage objects from `references/ldt-paper/inductive_step.tex:441-551` and
+close the scalar comparison using `mainInductionFromStageData`. -/
+theorem mainInductionSuccessor
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hk : params.m * params.d ≤ k)
+    (_hm1 : params.m ≠ 1) :
+    ∃ G : Measurement (Polynomial params) ι,
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params G.toSubMeas)
+        (mainInductionError params k eps delta gamma) := by
+  -- TODO(#1507, #1458): derive the successor-stage constructions from the
+  -- source hypotheses, rather than adding them as theorem assumptions.
+  sorry
+
 /-- `thm:main-induction`.
 
 This is the statement from
@@ -187,12 +226,13 @@ integer `k ≥ m d` produce a polynomial measurement consistent with the point
 measurement at error `mainInductionError`.
 
 **Proof gap:** the base case is proved by `mainInductionBaseCase`. The
-successor case, corresponding to
-`references/ldt-paper/inductive_step.tex:441-551`, remains to be proved from
-the paper hypotheses. This gap is tracked by #1507 and #1458.  The proof should
-derive the restricted probability estimates, recursive slice witnesses,
-slice-wise self-improvement outputs, and pasting side condition internally,
-rather than adding any of them to the theorem statement. -/
+successor case is isolated as the source-shaped theorem
+`mainInductionSuccessor`, corresponding to
+`references/ldt-paper/inductive_step.tex:441-551`.  This gap is tracked by
+#1507 and #1458.  The proof should derive the restricted probability estimates,
+recursive slice measurements, slice-wise self-improvement outputs, and pasting
+side condition internally, rather than adding any of them to the theorem
+statement. -/
 theorem mainInduction
     (params : Parameters)
     [FieldModel params.q]
@@ -208,12 +248,7 @@ theorem mainInduction
         (mainInductionError params k eps delta gamma) := by
   by_cases hm1 : params.m = 1
   · exact mainInductionBaseCase params strategy eps delta gamma k hm1 hgood
-  · -- TODO(#1507, #1458): prove the successor branch of
-    -- `thm:main-induction` from the paper hypotheses.  The restricted
-    -- probabilities, recursive slice witnesses, self-improvement outputs, and
-    -- pasting side conditions must be derived here, not supplied as theorem
-    -- hypotheses.
-    sorry
+  · exact mainInductionSuccessor params strategy eps delta gamma k hgood hk hm1
 
 /-- Restricted-probabilities data built from the explicit weighted bounds in the
 successor proof of `thm:main-induction`.

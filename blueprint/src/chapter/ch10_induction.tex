@@ -240,9 +240,13 @@
 	In Lean, the base case is formalized through
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase}.
 	The successor branch of
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction} remains an explicit
-	proof gap on the source statement.  The nearby formalization still names
-	the stage data
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction} is isolated as the
+	source-shaped proof obligation
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessor}.  This
+	declaration has the source assumptions of the successor branch, together with
+	the branch condition \(m\ne1\); it does not take restricted-probability,
+	recursive-slice, self-improvement, or pasting records as hypotheses.  The
+	nearby formalization still names the stage data
 	\lean{MIPStarRE.LDT.MainInductionStep.SliceRestrictionPackage, MIPStarRE.LDT.MainInductionStep.PerSliceInductionPackage, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage, MIPStarRE.LDT.MainInductionStep.AveragedPastingInput}
 	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceStrategyTransport, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.ofSliceStrategyTransport}
 	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceStrategyTransport.ofPointMeasurementEq}

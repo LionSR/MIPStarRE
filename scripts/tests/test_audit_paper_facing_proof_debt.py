@@ -114,6 +114,36 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
             self.assertEqual(result.scanned_refs, 0)
             self.assertEqual(result.findings, ())
 
+    def test_informational_blueprint_environment_can_be_scanned_on_request(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                def bridgeDefinition (hBridge : SomeBridgeHypotheses) : Q := q
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{definition}\label{def:bridge}
+                  \lean{MIPStarRE.bridgeDefinition}
+                \end{definition}
+                """,
+            )
+            default_result = audit.run_audit(root)
+            self.assertEqual(default_result.scanned_refs, 0)
+            self.assertEqual(default_result.findings, ())
+
+            result = audit.run_audit(root, include_informational_envs=True)
+            self.assertEqual(result.scanned_refs, 1)
+            self.assertEqual(len(result.findings), 2)
+            self.assertEqual(
+                {finding.token for finding in result.findings},
+                {"hBridge", "SomeBridgeHypotheses"},
+            )
+
     def test_comma_separated_lean_references_are_scanned(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
