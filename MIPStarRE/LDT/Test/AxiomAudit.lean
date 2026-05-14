@@ -34,8 +34,9 @@ data, or obligation hypotheses, and its proof is assembled from named
 construction targets.  Issue #1043 tracks the base-case projective-completion
 construction, issues #1363 and #1369 track the successor projective-completion
 construction, issue #1566 tracks the match-mass preservation obligations in the
-completion step, issue #1507 tracks the Section 6 main-induction proof, and
-issue #1458 is the umbrella tracking issue.
+completion step, issue #1610 tracks the QXP outcome-expectation preservation
+sub-obligation inside that completion step, issue #1507 tracks the Section 6
+main-induction proof, and issue #1458 is the umbrella tracking issue.
 
 The audit for `GlobalVariance.globalVarianceOfPoints` now requires the standard
 Lean axioms only: the issue-#1456 six-step local transport estimate is supplied
@@ -96,7 +97,7 @@ private def expectedStandardAxiomsWithSorry : Array Name :=
 
 /-- Standard kernel axioms plus `sorryAx`; tracks the transitive
 `mainFormal` construction gaps for issues #1043, #1363, #1369, #1458, #1507,
-and #1566. -/
+#1566, and #1610. -/
 private def expectedMainFormalAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 

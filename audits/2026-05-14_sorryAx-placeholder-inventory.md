@@ -36,7 +36,8 @@ following declarations intentionally allow `sorryAx` because their proofs still
 have named obligations:
 
 - `MIPStarRE.LDT.Test.mainFormal`: final-theorem construction gaps, tracked by
-  #1043, #1363, #1369, #1458, and #1566.
+  #1043, #1363, #1369, #1458, #1566, and the #1610 match-mass
+  preservation sub-obligation.
 - `MIPStarRE.LDT.SelfImprovement.selfImprovement`: issue #1515,
   source-facing self-improvement derivation.
 - `MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection`: issue

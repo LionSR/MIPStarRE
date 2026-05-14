@@ -58,6 +58,24 @@ intentionally records this closure.  In particular:
   `SelfImprovement.selfImprovement` inherit their direct `sorry` sites listed
   above.
 
+## Current Native Issue Tree
+
+The current GitHub sub-issue tree keeps the active obligations below the
+source-statement bridge-debt tracker #1458, rather than recording them as body
+checkboxes.  The relevant open branches are:
+
+| Parent | Current open children | Role in the proof debt |
+|---|---|---|
+| #1558 | #1566 | Final-theorem residual and package audit; the open child is the line-169 match-mass preservation target for the chosen `mainFormal` witnesses. |
+| #1566 | #1610 | QXP outcome-expectation preservation for the projectivization data used by the line-169 match-mass route. |
+| #1571 | #1584 | Definition-drift audit; the open child records downstream theorem subtrees that must be repaired from the source object, not patched downstream. |
+| #1596 | #1435 | Helper strong-self-consistency and projectivization obligation bundles; the open child records removal of obsolete spectral-truncation and repair-input abbreviations after the #1032 consumer rewire. |
+| #1601 | #1622 | Unrestricted low-degree pasting; the open child is the degree-zero complementary branch that cannot be replaced by adding `0 < d` to `thm:ld-pasting`. |
+
+Several other direct `sorry` sites remain first-level children of #1458:
+#1230, #1503, #1507, and #1515.  They should stay as proof obligations until
+the corresponding paper arguments are formalized.
+
 The public theorem `MakingMeasurementsProjective.orthonormalization` is no
 longer on this list: PR #1632 restored the paper constant without making the
 theorem depend on the still-unproved heterogeneous
