@@ -482,6 +482,32 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
                 {"hasExtraAssumptions", "ExtraAssumptions"},
             )
 
+    def test_singular_assumption_in_paper_facing_header_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem
+                    (hasExtraAssumption : ExtraAssumption params) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:paper}
+                  \lean{MIPStarRE.paperTheorem}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root)
+            self.assertEqual(
+                {finding.token for finding in result.findings},
+                {"hasExtraAssumption", "ExtraAssumption"},
+            )
+
     def test_obligation_wrapper_in_paper_facing_header_is_reported(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
