@@ -154,6 +154,11 @@ EXTERNAL_CITATION_TOKENS = {
     ),
 }
 
+# Broad mode should classify mathematical interfaces, not double-count a local
+# variable name whose type is already reported, for example
+# ``(data : QXPLayerData Outcome ι)``.
+IGNORED_BROAD_BINDER_TOKENS = frozenset({"data"})
+
 CONDITIONAL_DECL_NAME_RE = re.compile(
     r"(?:"
     r"FromBridgeInputs"
@@ -337,6 +342,11 @@ def _external_citation_reason(token: str) -> str | None:
     return EXTERNAL_CITATION_TOKENS.get(token)
 
 
+def _is_ignored_broad_binder_token(token: str, *, broad_vocabulary: bool) -> bool:
+    """Return whether ``token`` is only a broad-mode local binder name."""
+    return broad_vocabulary and token in IGNORED_BROAD_BINDER_TOKENS
+
+
 def _conditional_decl_name_finding(
     entry: BlueprintEntry,
     decl: LeanDecl,
@@ -376,6 +386,8 @@ def _findings_for_entry(
     debt_token_re = BROAD_DEBT_TOKEN_RE if broad_vocabulary else STRICT_DEBT_TOKEN_RE
     for match in debt_token_re.finditer(public_inputs):
         token = match.group(0)
+        if _is_ignored_broad_binder_token(token, broad_vocabulary=broad_vocabulary):
+            continue
         token_line = header_start_line + line_number(public_inputs, match.start()) - 1
         local_line = line_number(public_inputs, match.start())
         header_excerpt = _line_excerpt(public_inputs, local_line)

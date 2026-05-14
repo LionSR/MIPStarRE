@@ -613,6 +613,32 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
                 {"CompletionCompatibilityData"},
             )
 
+    def test_lowercase_data_binder_is_not_double_counted_in_broad_mode(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem
+                    (data : QXPLayerData Outcome ι) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:paper}
+                  \lean{MIPStarRE.paperTheorem}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root, broad_vocabulary=True)
+            self.assertEqual(
+                {finding.token for finding in result.findings},
+                {"QXPLayerData"},
+            )
+
     def test_external_statement_interface_is_classified_in_broad_mode(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

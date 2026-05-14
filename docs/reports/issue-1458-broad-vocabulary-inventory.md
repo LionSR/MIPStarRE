@@ -25,12 +25,12 @@ python3 scripts/audit_paper_facing_proof_debt.py \
   --ci
 ```
 
-Result: 94 unresolved broad vocabulary findings, 2 external-citation
+Result: 69 unresolved broad vocabulary findings, 2 external-citation
 classifications, and zero findings in the ordinary blocking mode.
 
 ## Concentration by Area
 
-**Chapter 4 projectivization and QXP layer.**  There are 65 findings, mainly
+**Chapter 4 projectivization and QXP layer.**  There are 40 findings, namely
 `QLayerData`, `QXPLayerData`, `RankReductionWitness`, and
 `RoundingToProjectorsWitness`.  Audit whether the blueprint paper labels point
 to source-shaped lemmas or only to internal layer-data lemmas.  Where the paper
@@ -64,7 +64,6 @@ the explicit external hypothesis by a source-facing theorem.
 
 | Token | Count |
 |---|---:|
-| `data` | 25 |
 | `QXPLayerData` | 20 |
 | `QLayerData` | 11 |
 | `RankReductionWitness` | 8 |
