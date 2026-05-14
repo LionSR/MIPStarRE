@@ -21,6 +21,9 @@ review aid for that boundary:
   ``Compatibility`` in public inputs.  This mode is an inventory tool while
   those broad occurrences are classified and reduced; it is deliberately not
   the default blocking gate.
+* classify quoted external theorem interfaces separately in broad mode, so
+  external citations from the overview are not conflated with internal proof
+  obligations.
 * reject paper-facing blueprint entries that point to declaration names with
   conditional proof-debt forms such as ``*_of...Obligations``,
   ``*_of...Residual``, ``*_of...Repair``, ``*_of...Bundle``,
@@ -133,6 +136,24 @@ FAITHFUL_BOUNDARY_TOKENS = {
     ),
 }
 
+# These broad-mode findings are not internal bridge debt.  They are explicit
+# interfaces for the external classical theorems quoted in the overview.  The
+# corresponding blueprint entries must remain unmarked by \leanok unless the
+# external theorem itself is formalized, but they should not be counted with
+# internal proof obligations such as witnesses, data packages, or wrappers.
+EXTERNAL_CITATION_TOKENS = {
+    "RazSafraSoundnessStatement": (
+        "external Raz--Safra theorem quoted in "
+        "references/ldt-paper/introduction.tex:43-65; the blueprint entry is "
+        "not marked as formalized"
+    ),
+    "PolishchukSpielmanClassicalSoundnessStatement": (
+        "external Polishchuk--Spielman theorem quoted in "
+        "references/ldt-paper/introduction.tex:69-92; the blueprint entry is "
+        "not marked as formalized"
+    ),
+}
+
 CONDITIONAL_DECL_NAME_RE = re.compile(
     r"(?:"
     r"FromBridgeInputs"
@@ -188,6 +209,23 @@ class FaithfulBoundaryFinding:
 
 
 @dataclass(frozen=True)
+class ExternalCitationFinding:
+    """One broad-mode token classified as a quoted external theorem."""
+
+    blueprint_file: str
+    blueprint_line: int
+    env_type: str
+    label: str | None
+    lean_decl: str
+    lean_file: str
+    lean_line: int
+    token: str
+    token_line: int
+    header_excerpt: str
+    reason: str
+
+
+@dataclass(frozen=True)
 class ConditionalDeclarationNameFinding:
     """One conditional declaration name used for a paper-facing blueprint entry."""
 
@@ -210,6 +248,7 @@ class AuditResult:
     findings: tuple[DebtFinding, ...]
     conditional_decl_findings: tuple[ConditionalDeclarationNameFinding, ...]
     faithful_boundary_findings: tuple[FaithfulBoundaryFinding, ...]
+    external_citation_findings: tuple[ExternalCitationFinding, ...]
 
     @property
     def ok(self) -> bool:
@@ -293,6 +332,11 @@ def _faithful_boundary_reason(token: str) -> str | None:
     return FAITHFUL_BOUNDARY_TOKENS.get(token)
 
 
+def _external_citation_reason(token: str) -> str | None:
+    """Return the citation when ``token`` names an external theorem interface."""
+    return EXTERNAL_CITATION_TOKENS.get(token)
+
+
 def _conditional_decl_name_finding(
     entry: BlueprintEntry,
     decl: LeanDecl,
@@ -320,7 +364,7 @@ def _findings_for_entry(
     decl: LeanDecl,
     *,
     broad_vocabulary: bool,
-) -> tuple[list[DebtFinding], list[FaithfulBoundaryFinding]]:
+) -> tuple[list[DebtFinding], list[FaithfulBoundaryFinding], list[ExternalCitationFinding]]:
     lean_path = root / decl.file
     source = lean_path.read_text(encoding="utf-8", errors="replace")
     header, header_start_line = _public_header_after_name(source, decl)
@@ -328,6 +372,7 @@ def _findings_for_entry(
 
     findings: list[DebtFinding] = []
     faithful_boundary_findings: list[FaithfulBoundaryFinding] = []
+    external_citation_findings: list[ExternalCitationFinding] = []
     debt_token_re = BROAD_DEBT_TOKEN_RE if broad_vocabulary else STRICT_DEBT_TOKEN_RE
     for match in debt_token_re.finditer(public_inputs):
         token = match.group(0)
@@ -352,6 +397,24 @@ def _findings_for_entry(
                 )
             )
             continue
+        external_reason = _external_citation_reason(token)
+        if broad_vocabulary and external_reason is not None:
+            external_citation_findings.append(
+                ExternalCitationFinding(
+                    blueprint_file=entry.file,
+                    blueprint_line=entry.line,
+                    env_type=entry.env_type,
+                    label=entry.label,
+                    lean_decl=entry.lean_decl,
+                    lean_file=decl.file,
+                    lean_line=decl.line,
+                    token=token,
+                    token_line=token_line,
+                    header_excerpt=header_excerpt,
+                    reason=external_reason,
+                )
+            )
+            continue
         findings.append(
             DebtFinding(
                 blueprint_file=entry.file,
@@ -366,7 +429,7 @@ def _findings_for_entry(
                 header_excerpt=header_excerpt,
             )
         )
-    return findings, faithful_boundary_findings
+    return findings, faithful_boundary_findings, external_citation_findings
 
 
 def run_audit(root: Path, *, broad_vocabulary: bool = False) -> AuditResult:
@@ -382,6 +445,7 @@ def run_audit(root: Path, *, broad_vocabulary: bool = False) -> AuditResult:
     findings: list[DebtFinding] = []
     conditional_decl_findings: list[ConditionalDeclarationNameFinding] = []
     faithful_boundary_findings: list[FaithfulBoundaryFinding] = []
+    external_citation_findings: list[ExternalCitationFinding] = []
     for entry in entries:
         decl = decls.get(entry.lean_decl)
         if decl is None:
@@ -389,7 +453,7 @@ def run_audit(root: Path, *, broad_vocabulary: bool = False) -> AuditResult:
             continue
         if conditional_finding := _conditional_decl_name_finding(entry, decl):
             conditional_decl_findings.append(conditional_finding)
-        entry_findings, entry_faithful = _findings_for_entry(
+        entry_findings, entry_faithful, entry_external = _findings_for_entry(
             root,
             entry,
             decl,
@@ -397,6 +461,7 @@ def run_audit(root: Path, *, broad_vocabulary: bool = False) -> AuditResult:
         )
         findings.extend(entry_findings)
         faithful_boundary_findings.extend(entry_faithful)
+        external_citation_findings.extend(entry_external)
 
     return AuditResult(
         scanned_refs=len(entries),
@@ -404,6 +469,7 @@ def run_audit(root: Path, *, broad_vocabulary: bool = False) -> AuditResult:
         findings=tuple(findings),
         conditional_decl_findings=tuple(conditional_decl_findings),
         faithful_boundary_findings=tuple(faithful_boundary_findings),
+        external_citation_findings=tuple(external_citation_findings),
     )
 
 
@@ -445,6 +511,21 @@ def print_text_report(result: AuditResult) -> None:
 
     print(f"Faithful boundary input findings: {len(result.faithful_boundary_findings)}")
     for finding in result.faithful_boundary_findings:
+        label = f" label={finding.label}" if finding.label else ""
+        print(
+            f"  - {finding.lean_file}:{finding.token_line}: "
+            f"{finding.lean_decl} contains {finding.token!r}"
+        )
+        print(
+            f"    blueprint {finding.blueprint_file}:{finding.blueprint_line} "
+            f"env={finding.env_type}{label}"
+        )
+        print(f"    {finding.reason}")
+        if finding.header_excerpt:
+            print(f"    {finding.header_excerpt}")
+
+    print(f"External citation input findings: {len(result.external_citation_findings)}")
+    for finding in result.external_citation_findings:
         label = f" label={finding.label}" if finding.label else ""
         print(
             f"  - {finding.lean_file}:{finding.token_line}: "

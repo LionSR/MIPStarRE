@@ -613,6 +613,60 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
                 {"CompletionCompatibilityData"},
             )
 
+    def test_external_statement_interface_is_classified_in_broad_mode(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem razSafra
+                    (hRS : RazSafraSoundnessStatement params a eps slackBound) :
+                    Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:raz-safra}
+                  \lean{MIPStarRE.razSafra}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root, broad_vocabulary=True)
+            self.assertEqual(result.findings, ())
+            self.assertEqual(len(result.external_citation_findings), 1)
+            self.assertEqual(
+                result.external_citation_findings[0].token,
+                "RazSafraSoundnessStatement",
+            )
+
+    def test_external_statement_interface_is_not_hidden_in_strict_mode(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem classicalTestSoundness
+                    (hPS : PolishchukSpielmanClassicalSoundnessStatement params a eps kappa) :
+                    Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:classical-test-soundness}
+                  \lean{MIPStarRE.classicalTestSoundness}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root)
+            self.assertEqual(result.findings, ())
+            self.assertEqual(result.external_citation_findings, ())
+
     def test_bundle_constructor_name_in_paper_facing_entry_is_reported(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

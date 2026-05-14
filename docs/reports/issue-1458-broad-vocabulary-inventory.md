@@ -25,8 +25,8 @@ python3 scripts/audit_paper_facing_proof_debt.py \
   --ci
 ```
 
-Result: 96 broad vocabulary findings, with zero findings in the ordinary
-blocking mode.
+Result: 94 unresolved broad vocabulary findings, 2 external-citation
+classifications, and zero findings in the ordinary blocking mode.
 
 ## Concentration by Area
 
@@ -50,11 +50,15 @@ statement.
 ordinary hypotheses between source lemmas or whether they hide construction
 obligations.  Restore source-facing theorem forms where needed.
 
-**Chapter 1 external classical soundness assumptions.**  There are 2 findings:
-`RazSafraSoundnessStatement` and
-`PolishchukSpielmanClassicalSoundnessStatement`.  Classify these as external
-theorem assumptions or replace them by source-facing imported theorem
-statements; do not let the `Statement` wrapper obscure what is assumed.
+**Chapter 1 external classical soundness assumptions.**  The broad scan also
+sees `RazSafraSoundnessStatement` and
+`PolishchukSpielmanClassicalSoundnessStatement`, but these are now classified
+separately as quoted external theorems from
+`references/ldt-paper/introduction.tex:43-65` and
+`references/ldt-paper/introduction.tex:69-92`.  The corresponding blueprint
+entries are deliberately not marked as formalized.  They are not internal bridge
+debt, but any future formalization of these classical results should replace
+the explicit external hypothesis by a source-facing theorem.
 
 ## Token Counts
 
@@ -69,16 +73,17 @@ statements; do not let the `Statement` wrapper obscure what is assumed.
 | `GCompleteSelfConsistencyStatement` | 4 |
 | `MatrixSdpStatementWithSlackness` | 3 |
 | `LdSandwichLineOnePointStatement` | 3 |
-| `SdpStatementWithSlackness` | 2 |
 | `MatrixSdpStatementWithSlacknessAndDominance` | 2 |
+| `SdpStatementWithSlackness` | 2 |
 | `CommutingWithGCompleteStatement` | 2 |
 | `CommuteGHalfSandwichStatement` | 2 |
-| Singletons | 6 |
+| Singletons | 4 |
 
-The singleton tokens are `RoundingToProjectorsWitness`,
-`RazSafraSoundnessStatement`, `PolishchukSpielmanClassicalSoundnessStatement`,
+The singleton unresolved tokens are `RoundingToProjectorsWitness`,
 `GBotSelfConsistencyStatement`, `CommutingWithGIncompleteStatement`, and
-`ComMainConclusion`.
+`ComMainConclusion`.  The two external-citation classifications are
+`RazSafraSoundnessStatement` and
+`PolishchukSpielmanClassicalSoundnessStatement`.
 
 ## Next Cleanup Batches
 
@@ -95,8 +100,10 @@ The singleton tokens are `RoundingToProjectorsWitness`,
    pasting proof tree and #1601/#1622.  Some wrappers may be ordinary theorem
    conclusions threaded into later lemmas; others may need source-facing
    statements with tracked `sorry` obligations.
-4. The Chapter 1 external theorem assumptions should be documented as external
-   theorem imports or converted to explicit source-facing theorem declarations.
+4. The Chapter 1 external theorem assumptions are classified as quoted external
+   citations, not as internal proof debt.  They should stay unmarked by
+   `\leanok` until the external theorem itself is formalized or imported as a
+   justified source-facing theorem.
 
 The broad vocabulary mode should become a blocking gate only after these
 findings are classified or reduced.  Until then it is a fast way to reproduce
