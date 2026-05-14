@@ -512,6 +512,33 @@ lemma ldPasting_of_one_le_error
       (polynomialEvaluationFamily params.next H.toSubMeas))
     herror⟩
 
+/-- Trivial consistency conclusion from the complementary scalar branches.
+
+If `k` is positive, it suffices to show that the `ν` term in the pasting error
+is at least `1`; if `k = 0`, the exponential term already gives the trivial
+bound. -/
+lemma ldPasting_of_one_le_nu_or_zero_k
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma kappa zeta : Error)
+    (family : IdxPolyFamily params ι)
+    (hcomplete : family.Complete strategy.state kappa)
+    (k : ℕ)
+    (hnu :
+      1 ≤ k →
+        1 ≤ MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta) :
+    ∃ H : Measurement (Polynomial params.next) ι,
+      LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
+  exact ldPasting_of_one_le_error params strategy eps delta gamma kappa zeta family k (by
+    have hkappa_nonneg := kappa_nonneg_of_complete params strategy family hcomplete
+    by_cases hk_pos : 1 ≤ k
+    · exact one_le_ldPastingError_of_one_le_nu params k eps delta gamma kappa zeta
+        hkappa_nonneg (hnu hk_pos)
+    · have hk_zero : k = 0 := by omega
+      exact one_le_ldPastingError_of_k_eq_zero params k eps delta gamma kappa zeta
+        hkappa_nonneg hk_zero)
+
 /-- Complementary branch for `thm:ld-pasting` when `gamma > 1`.
 
 Paper origin: `references/ldt-paper/ld-pasting.tex:52-55`, where this is one
@@ -533,16 +560,10 @@ theorem ldPastingLargeGammaBranch
     (hgamma : 1 < gamma) :
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
-  exact ldPasting_of_one_le_error params strategy eps delta gamma kappa zeta family k (by
-    have hkappa_nonneg := kappa_nonneg_of_complete params strategy family hcomplete
-    by_cases hk_pos : 1 ≤ k
-    · exact one_le_ldPastingError_of_one_le_nu params k eps delta gamma kappa zeta
-        hkappa_nonneg
-        (one_le_ldPastingNu_of_large_gamma params strategy eps delta gamma zeta
-          hgood family hcons k hk_pos hgamma)
-    · have hk_zero : k = 0 := by omega
-      exact one_le_ldPastingError_of_k_eq_zero params k eps delta gamma kappa zeta
-        hkappa_nonneg hk_zero)
+  exact ldPasting_of_one_le_nu_or_zero_k params strategy eps delta gamma kappa zeta
+    family hcomplete k (fun hk_pos =>
+      one_le_ldPastingNu_of_large_gamma params strategy eps delta gamma zeta
+        hgood family hcons k hk_pos hgamma)
 
 /-- Complementary branch for `thm:ld-pasting` when `zeta > 1`.
 
@@ -565,16 +586,10 @@ theorem ldPastingLargeZetaBranch
     (hzeta : 1 < zeta) :
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
-  exact ldPasting_of_one_le_error params strategy eps delta gamma kappa zeta family k (by
-    have hkappa_nonneg := kappa_nonneg_of_complete params strategy family hcomplete
-    by_cases hk_pos : 1 ≤ k
-    · exact one_le_ldPastingError_of_one_le_nu params k eps delta gamma kappa zeta
-        hkappa_nonneg
-        (one_le_ldPastingNu_of_large_zeta params strategy eps delta gamma zeta
-          hgood k hk_pos hzeta)
-    · have hk_zero : k = 0 := by omega
-      exact one_le_ldPastingError_of_k_eq_zero params k eps delta gamma kappa zeta
-        hkappa_nonneg hk_zero)
+  exact ldPasting_of_one_le_nu_or_zero_k params strategy eps delta gamma kappa zeta
+    family hcomplete k (fun hk_pos =>
+      one_le_ldPastingNu_of_large_zeta params strategy eps delta gamma zeta
+        hgood k hk_pos hzeta)
 
 /-- Complementary branch for `thm:ld-pasting` when `d > q`.
 
@@ -597,16 +612,10 @@ theorem ldPastingLargeDegreeRatioBranch
     (hdq : params.q < params.d) :
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
-  exact ldPasting_of_one_le_error params strategy eps delta gamma kappa zeta family k (by
-    have hkappa_nonneg := kappa_nonneg_of_complete params strategy family hcomplete
-    by_cases hk_pos : 1 ≤ k
-    · exact one_le_ldPastingError_of_one_le_nu params k eps delta gamma kappa zeta
-        hkappa_nonneg
-        (one_le_ldPastingNu_of_large_degreeRatio params strategy eps delta gamma zeta
-          hgood family hcons k hk_pos hdq)
-    · have hk_zero : k = 0 := by omega
-      exact one_le_ldPastingError_of_k_eq_zero params k eps delta gamma kappa zeta
-        hkappa_nonneg hk_zero)
+  exact ldPasting_of_one_le_nu_or_zero_k params strategy eps delta gamma kappa zeta
+    family hcomplete k (fun hk_pos =>
+      one_le_ldPastingNu_of_large_degreeRatio params strategy eps delta gamma zeta
+        hgood family hcons k hk_pos hdq)
 
 /-- Complementary branch for `thm:ld-pasting` when `k = 0`.
 
