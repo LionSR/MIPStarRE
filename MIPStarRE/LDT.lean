@@ -134,6 +134,7 @@ import MIPStarRE.LDT.Pasting.GHatFacts
 import MIPStarRE.LDT.Pasting.BridgeLemmas
 import MIPStarRE.LDT.Pasting.Bernoulli.TruncatedSums
 import MIPStarRE.LDT.Pasting.Bernoulli.Recurrence
+import MIPStarRE.LDT.Pasting.Bernoulli.ScalarBounds
 import MIPStarRE.LDT.Pasting.Bernoulli.Final
 import MIPStarRE.LDT.Pasting.ContextWrappers
 import MIPStarRE.LDT.Preliminaries.Polynomials
