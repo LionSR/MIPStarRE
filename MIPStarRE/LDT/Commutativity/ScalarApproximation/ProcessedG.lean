@@ -102,16 +102,10 @@ lemma commDataProcessedG
         zeta :=
     evaluatedPointFamily_selfConsistency_of_stronglySelfConsistent
       params strategy family zeta hself
-  refine
-    { familyG := hG
-      postprocessedPointConsistency := ?_
-      postprocessedSelfConsistency := hpostSSC
-      evaluatedSliceCommutation := by
-        refine ⟨?_⟩
-        rw [evaluatedSliceCommutation_qSDDOp_avg_eq params strategy family]
-        exact evaluatedSlice_scalar_chain_bound
-          params strategy eps delta gamma zeta
-          hnorm hgood family G hG hcons hself hbound hpostSSC }
-  simpa [evaluatedPointFamily] using hcons.pointConsistency
+  refine ⟨?_⟩
+  rw [evaluatedSliceCommutation_qSDDOp_avg_eq params strategy family]
+  exact evaluatedSlice_scalar_chain_bound
+    params strategy eps delta gamma zeta
+    hnorm hgood family G hG hcons hself hbound hpostSSC
 
 end MIPStarRE.LDT.Commutativity

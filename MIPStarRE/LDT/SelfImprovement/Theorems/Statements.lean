@@ -389,18 +389,6 @@ structure SelfImprovementConclusion (params : Parameters) [FieldModel params.q]
     (G : Measurement (Polynomial params) ι)
     (H : ProjSubMeas (Polynomial params) ι)
     (Z : MIPStarRE.Quantum.Op ι) (eps delta gamma nu : Error) : Prop where
-  witness :
-    ∃ T : Measurement (Polynomial params) ι,
-      ∃ Hhat : SubMeas (Polynomial params) ι,
-        SelfImprovementHelperConclusion params strategy T Hhat Z eps delta ∧
-        SDDRel strategy.state (uniformDistribution Unit)
-          (constSubMeasFamily Hhat.liftLeft)
-          (constSubMeasFamily H.toSubMeas.liftLeft)
-          (selfImprovementOrthogonalizationError params eps delta) ∧
-        SDDRel strategy.state (uniformDistribution (Point params))
-          ((polynomialEvaluationFamily params Hhat).liftLeft)
-          ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
-          (selfImprovementDataProcessingError params eps delta)
   completeness :
     CompletenessAtLeast strategy.state H.toSubMeas.liftLeft
       ((1 - nu) - selfImprovementError params eps delta)

@@ -88,7 +88,7 @@ theorem comMain
         (commDataProcessedGError params gamma zeta) := by
     constructor
     rw [evaluationSpecialization_sddErrorOp_eq]
-    exact hEval.evaluatedSliceCommutation.squaredDistanceBound
+    exact hEval.squaredDistanceBound
   have hzeta_nonneg : 0 ≤ zeta :=
     le_trans (sddError_nonneg _ _ _ _)
       hself.sliceSelfConsistency.squaredDistanceBound
@@ -99,15 +99,11 @@ theorem comMain
         (Finset.sum_nonneg fun j _ =>
           bipartiteConsError_nonneg strategy.state _ _ _)
     exact le_trans this hgood.diagonalLineTest
-  refine
-    { evaluatedCommutation := hEval
-      evaluationSpecialization := hSpecialized
-      fullSliceCommutation := by
-        exact
-          fullSliceCommutation_of_evaluated
-            params strategy family gamma zeta
-            hnorm hgamma_nonneg hzeta_nonneg
-            hself hSpecialized }
+  exact
+    fullSliceCommutation_of_evaluated
+      params strategy family gamma zeta
+      hnorm hgamma_nonneg hzeta_nonneg
+      hself hSpecialized
 
 /-- `lem:normalization-condition`. -/
 lemma normalizationCondition {OutcomeA OutcomeB : Type*}

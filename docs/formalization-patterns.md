@@ -260,10 +260,10 @@ proof-level `\leanok`:
   Its proof still contains the tracked issue-#1032 `sorry` for the sharp
   `100 * ζ^(1/4)` constant, so proof-level `\leanok` is withheld.
 
-- **`thm:naimark`** (ch04): The Lean declaration records questionwise
-  local dilations, not the full tensor-product correlation statement in
-  the paper.  The comment in the blueprint explicitly says "no \leanok
-  is claimed."
+- **`thm:naimark`** (ch04): The full tensor-product correlation theorem has
+  no attached Lean declaration.  The formalized questionwise local interface is
+  recorded separately in the restricted Lean remark
+  `rem:lean-questionwise-naimark`.
 
 - **`thm:main-formal`** (ch02): The blueprint links to
   `MIPStarRE.LDT.Test.mainFormal`, the intended Lean transcription of the

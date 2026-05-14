@@ -24,6 +24,10 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- Named obligations for the helper-stage strong self-consistency proof.
 
+Paper origin: `references/ldt-paper/self_improvement.tex:255-603`
+(`\label{item:self-improvement-self}` and the subsequent add-in-`u`,
+self-consistency, and variance-swap chain).
+
 These fields isolate the remaining paper-side obligations in the proof of
 `item:self-improvement-self` once the reduced helper conclusion is fixed:
 
