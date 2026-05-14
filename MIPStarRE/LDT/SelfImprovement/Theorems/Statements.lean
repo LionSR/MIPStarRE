@@ -57,6 +57,10 @@ end SdpOptimalPair
 
 /-- SDP optimal-pair data strengthened by complementary slackness.
 
+Paper origin: `references/ldt-paper/self_improvement.tex:82-181`
+(`\label{lem:sdp}`); paper-gap note:
+`docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`.
+
 The reduced `SdpOptimalPair` interface above contains only the feasibility and
 normalization facts already produced by the current Lean theorem for `lem:sdp`.
 The paper's strong-duality argument also gives complementary slackness.  This
@@ -360,6 +364,11 @@ structure SelfImprovementHelperStatement (params : Parameters)
       selfImprovementHelperError params eps delta
 
 /-- Helper conclusion strengthened by the SDP complementary-slackness equation.
+
+Paper origin: `references/ldt-paper/self_improvement.tex:82-181`
+(`\label{lem:sdp}`) and `references/ldt-paper/self_improvement.tex:635-671`
+(`\label{thm:self-improvement}`); paper-gap note:
+`docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`.
 
 This is the paper-facing successor to `SelfImprovementHelperConclusion` needed
 by the helper-completeness chain: it keeps all fields of the reduced helper
