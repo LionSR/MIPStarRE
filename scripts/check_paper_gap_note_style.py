@@ -214,7 +214,7 @@ def main(argv: list[str] | None = None) -> int:
         print("Paper-gap note style findings:", file=sys.stderr)
         for finding in findings:
             print(f"  {finding.file}: {finding.message}", file=sys.stderr)
-        return 1
+        return 1 if args.ci else 0
 
     if args.ci:
         checked = sum(1 for path in changed_files if _is_note_file(path))

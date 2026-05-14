@@ -219,42 +219,8 @@ class DebtFinding:
 
 
 @dataclass(frozen=True)
-class FaithfulBoundaryFinding:
-    """One detected token classified as faithful paper boundary data."""
-
-    blueprint_file: str
-    blueprint_line: int
-    env_type: str
-    label: str | None
-    lean_decl: str
-    lean_file: str
-    lean_line: int
-    token: str
-    token_line: int
-    header_excerpt: str
-    reason: str
-
-
-@dataclass(frozen=True)
-class ExternalCitationFinding:
-    """One broad-mode token classified as a quoted external theorem."""
-
-    blueprint_file: str
-    blueprint_line: int
-    env_type: str
-    label: str | None
-    lean_decl: str
-    lean_file: str
-    lean_line: int
-    token: str
-    token_line: int
-    header_excerpt: str
-    reason: str
-
-
-@dataclass(frozen=True)
-class SourceContextFinding:
-    """One broad-mode token classified as source construction context."""
+class ClassifiedFinding:
+    """One detected token with a mathematical classification and citation."""
 
     blueprint_file: str
     blueprint_line: int
@@ -291,9 +257,9 @@ class AuditResult:
     missing_refs: tuple[str, ...]
     findings: tuple[DebtFinding, ...]
     conditional_decl_findings: tuple[ConditionalDeclarationNameFinding, ...]
-    faithful_boundary_findings: tuple[FaithfulBoundaryFinding, ...]
-    external_citation_findings: tuple[ExternalCitationFinding, ...]
-    source_context_findings: tuple[SourceContextFinding, ...]
+    faithful_boundary_findings: tuple[ClassifiedFinding, ...]
+    external_citation_findings: tuple[ClassifiedFinding, ...]
+    source_context_findings: tuple[ClassifiedFinding, ...]
 
     @property
     def ok(self) -> bool:
@@ -392,6 +358,31 @@ def _is_ignored_broad_binder_token(token: str, *, broad_vocabulary: bool) -> boo
     return broad_vocabulary and token in IGNORED_BROAD_BINDER_TOKENS
 
 
+def _classified_finding(
+    entry: BlueprintEntry,
+    decl: LeanDecl,
+    *,
+    token: str,
+    token_line: int,
+    header_excerpt: str,
+    reason: str,
+) -> ClassifiedFinding:
+    """Return a classified finding for a detected public-input token."""
+    return ClassifiedFinding(
+        blueprint_file=entry.file,
+        blueprint_line=entry.line,
+        env_type=entry.env_type,
+        label=entry.label,
+        lean_decl=entry.lean_decl,
+        lean_file=decl.file,
+        lean_line=decl.line,
+        token=token,
+        token_line=token_line,
+        header_excerpt=header_excerpt,
+        reason=reason,
+    )
+
+
 def _conditional_decl_name_finding(
     entry: BlueprintEntry,
     decl: LeanDecl,
@@ -421,9 +412,9 @@ def _findings_for_entry(
     broad_vocabulary: bool,
 ) -> tuple[
     list[DebtFinding],
-    list[FaithfulBoundaryFinding],
-    list[ExternalCitationFinding],
-    list[SourceContextFinding],
+    list[ClassifiedFinding],
+    list[ClassifiedFinding],
+    list[ClassifiedFinding],
 ]:
     lean_path = root / decl.file
     source = lean_path.read_text(encoding="utf-8", errors="replace")
@@ -431,9 +422,9 @@ def _findings_for_entry(
     public_inputs = _public_inputs_before_result_type(header)
 
     findings: list[DebtFinding] = []
-    faithful_boundary_findings: list[FaithfulBoundaryFinding] = []
-    external_citation_findings: list[ExternalCitationFinding] = []
-    source_context_findings: list[SourceContextFinding] = []
+    faithful_boundary_findings: list[ClassifiedFinding] = []
+    external_citation_findings: list[ClassifiedFinding] = []
+    source_context_findings: list[ClassifiedFinding] = []
     debt_token_re = BROAD_DEBT_TOKEN_RE if broad_vocabulary else STRICT_DEBT_TOKEN_RE
     for match in debt_token_re.finditer(public_inputs):
         token = match.group(0)
@@ -445,14 +436,9 @@ def _findings_for_entry(
         reason = _faithful_boundary_reason(token)
         if reason is not None:
             faithful_boundary_findings.append(
-                FaithfulBoundaryFinding(
-                    blueprint_file=entry.file,
-                    blueprint_line=entry.line,
-                    env_type=entry.env_type,
-                    label=entry.label,
-                    lean_decl=entry.lean_decl,
-                    lean_file=decl.file,
-                    lean_line=decl.line,
+                _classified_finding(
+                    entry,
+                    decl,
                     token=token,
                     token_line=token_line,
                     header_excerpt=header_excerpt,
@@ -463,14 +449,9 @@ def _findings_for_entry(
         source_context_reason = _source_context_reason(token)
         if broad_vocabulary and source_context_reason is not None:
             source_context_findings.append(
-                SourceContextFinding(
-                    blueprint_file=entry.file,
-                    blueprint_line=entry.line,
-                    env_type=entry.env_type,
-                    label=entry.label,
-                    lean_decl=entry.lean_decl,
-                    lean_file=decl.file,
-                    lean_line=decl.line,
+                _classified_finding(
+                    entry,
+                    decl,
                     token=token,
                     token_line=token_line,
                     header_excerpt=header_excerpt,
@@ -481,14 +462,9 @@ def _findings_for_entry(
         external_reason = _external_citation_reason(token)
         if broad_vocabulary and external_reason is not None:
             external_citation_findings.append(
-                ExternalCitationFinding(
-                    blueprint_file=entry.file,
-                    blueprint_line=entry.line,
-                    env_type=entry.env_type,
-                    label=entry.label,
-                    lean_decl=entry.lean_decl,
-                    lean_file=decl.file,
-                    lean_line=decl.line,
+                _classified_finding(
+                    entry,
+                    decl,
                     token=token,
                     token_line=token_line,
                     header_excerpt=header_excerpt,
@@ -530,9 +506,9 @@ def run_audit(root: Path, *, broad_vocabulary: bool = False) -> AuditResult:
     missing: list[str] = []
     findings: list[DebtFinding] = []
     conditional_decl_findings: list[ConditionalDeclarationNameFinding] = []
-    faithful_boundary_findings: list[FaithfulBoundaryFinding] = []
-    external_citation_findings: list[ExternalCitationFinding] = []
-    source_context_findings: list[SourceContextFinding] = []
+    faithful_boundary_findings: list[ClassifiedFinding] = []
+    external_citation_findings: list[ClassifiedFinding] = []
+    source_context_findings: list[ClassifiedFinding] = []
     for entry in entries:
         decl = decls.get(entry.lean_decl)
         if decl is None:
@@ -560,6 +536,24 @@ def run_audit(root: Path, *, broad_vocabulary: bool = False) -> AuditResult:
         external_citation_findings=tuple(external_citation_findings),
         source_context_findings=tuple(source_context_findings),
     )
+
+
+def _print_classified_findings(title: str, findings: tuple[ClassifiedFinding, ...]) -> None:
+    """Print findings that carry a mathematical classification."""
+    print(f"{title}: {len(findings)}")
+    for finding in findings:
+        label = f" label={finding.label}" if finding.label else ""
+        print(
+            f"  - {finding.lean_file}:{finding.token_line}: "
+            f"{finding.lean_decl} contains {finding.token!r}"
+        )
+        print(
+            f"    blueprint {finding.blueprint_file}:{finding.blueprint_line} "
+            f"env={finding.env_type}{label}"
+        )
+        print(f"    {finding.reason}")
+        if finding.header_excerpt:
+            print(f"    {finding.header_excerpt}")
 
 
 def print_text_report(result: AuditResult) -> None:
@@ -598,50 +592,18 @@ def print_text_report(result: AuditResult) -> None:
             f"env={finding.env_type}{label}"
         )
 
-    print(f"Faithful boundary input findings: {len(result.faithful_boundary_findings)}")
-    for finding in result.faithful_boundary_findings:
-        label = f" label={finding.label}" if finding.label else ""
-        print(
-            f"  - {finding.lean_file}:{finding.token_line}: "
-            f"{finding.lean_decl} contains {finding.token!r}"
-        )
-        print(
-            f"    blueprint {finding.blueprint_file}:{finding.blueprint_line} "
-            f"env={finding.env_type}{label}"
-        )
-        print(f"    {finding.reason}")
-        if finding.header_excerpt:
-            print(f"    {finding.header_excerpt}")
-
-    print(f"External citation input findings: {len(result.external_citation_findings)}")
-    for finding in result.external_citation_findings:
-        label = f" label={finding.label}" if finding.label else ""
-        print(
-            f"  - {finding.lean_file}:{finding.token_line}: "
-            f"{finding.lean_decl} contains {finding.token!r}"
-        )
-        print(
-            f"    blueprint {finding.blueprint_file}:{finding.blueprint_line} "
-            f"env={finding.env_type}{label}"
-        )
-        print(f"    {finding.reason}")
-        if finding.header_excerpt:
-            print(f"    {finding.header_excerpt}")
-
-    print(f"Source construction context findings: {len(result.source_context_findings)}")
-    for finding in result.source_context_findings:
-        label = f" label={finding.label}" if finding.label else ""
-        print(
-            f"  - {finding.lean_file}:{finding.token_line}: "
-            f"{finding.lean_decl} contains {finding.token!r}"
-        )
-        print(
-            f"    blueprint {finding.blueprint_file}:{finding.blueprint_line} "
-            f"env={finding.env_type}{label}"
-        )
-        print(f"    {finding.reason}")
-        if finding.header_excerpt:
-            print(f"    {finding.header_excerpt}")
+    _print_classified_findings(
+        "Faithful boundary input findings",
+        result.faithful_boundary_findings,
+    )
+    _print_classified_findings(
+        "External citation input findings",
+        result.external_citation_findings,
+    )
+    _print_classified_findings(
+        "Source construction context findings",
+        result.source_context_findings,
+    )
 
 
 def _json_default(value: object) -> object:

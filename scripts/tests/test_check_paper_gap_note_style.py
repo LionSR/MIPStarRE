@@ -14,6 +14,7 @@ sys.path.insert(0, str(SCRIPT_DIR))
 from check_paper_gap_note_style import (  # noqa: E402
     _is_note_file,
     _scan_note_text,
+    main,
     scan_changed_notes,
 )
 
@@ -149,6 +150,47 @@ class PaperGapNoteStyleTests(unittest.TestCase):
                 ],
             )
             self.assertEqual(findings, [])
+
+    def test_main_is_report_only_without_ci(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            note = root / "docs" / "paper-gaps" / "issue-9999-example.tex"
+            note.parent.mkdir(parents=True)
+            note.write_text(
+                GOOD_NOTE.replace(r"\section{At a glance}", r"\section{Source statement}"),
+                encoding="utf-8",
+            )
+
+            code = main(
+                [
+                    "--root",
+                    str(root),
+                    "--changed-files",
+                    "docs/paper-gaps/issue-9999-example.tex",
+                ]
+            )
+            self.assertEqual(code, 0)
+
+    def test_main_blocks_with_ci(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            note = root / "docs" / "paper-gaps" / "issue-9999-example.tex"
+            note.parent.mkdir(parents=True)
+            note.write_text(
+                GOOD_NOTE.replace(r"\section{At a glance}", r"\section{Source statement}"),
+                encoding="utf-8",
+            )
+
+            code = main(
+                [
+                    "--root",
+                    str(root),
+                    "--changed-files",
+                    "docs/paper-gaps/issue-9999-example.tex",
+                    "--ci",
+                ]
+            )
+            self.assertEqual(code, 1)
 
 
 if __name__ == "__main__":
