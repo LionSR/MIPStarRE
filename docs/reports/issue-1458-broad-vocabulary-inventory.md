@@ -20,14 +20,14 @@ case is a statement-drift problem for the paper theorem itself.
 
 ## Summary
 
-The current scan reports 29 unresolved theorem boundaries.  It also records 39
+The current scan reports 27 unresolved theorem boundaries.  It also records 39
 uses of source-construction context and 2 quoted external theorem interfaces.
 The stricter paper-facing proof-debt check finds no remaining occurrence of the
 agreed bridge, residual, repair, package, producer, input, hypothesis,
 assumption, obligation, wrapper, bundle, or conditional vocabulary in
 source-labelled public inputs.
 
-This is not a proof that the 29 unresolved declarations are unfaithful.  It is
+This is not a proof that the 27 unresolved declarations are unfaithful.  It is
 the remaining statement-comparison frontier for issue #1458.  The correct
 response is to compare each item with the cited source statement and its proof,
 not to rename the data merely to make the scan silent.
@@ -62,7 +62,7 @@ the self-improvement argument.
 
 ## Chapter 9 Pasting
 
-There are 18 unresolved pasting boundaries, mainly
+There are 16 unresolved pasting boundaries, mainly
 `GCompleteSelfConsistencyStatement`, `GHatFactsStatement`,
 `LdSandwichLineOnePointStatement`, `CommuteGHalfSandwichStatement`, and
 `ComMainConclusion`.  These require a theorem-by-theorem comparison with the
@@ -100,17 +100,17 @@ hypothesis by a source-facing theorem or by a justified imported result.
 |---|---:|
 | `MatrixSdpOptimalWitness` | 4 |
 | `GHatFactsStatement` | 4 |
-| `GCompleteSelfConsistencyStatement` | 4 |
+| `GCompleteSelfConsistencyStatement` | 3 |
 | `MatrixSdpStatementWithSlackness` | 3 |
 | `LdSandwichLineOnePointStatement` | 3 |
 | `MatrixSdpStatementWithSlacknessAndDominance` | 2 |
 | `SdpStatementWithSlackness` | 2 |
-| `CommutingWithGCompleteStatement` | 2 |
 | `CommuteGHalfSandwichStatement` | 2 |
-| Singletons | 3 |
+| Singletons | 4 |
 
 The singleton unresolved tokens are `GBotSelfConsistencyStatement`,
-`CommutingWithGIncompleteStatement`, and `ComMainConclusion`.
+`CommutingWithGCompleteStatement`, `CommutingWithGIncompleteStatement`, and
+`ComMainConclusion`.
 
 ## Repair Order
 

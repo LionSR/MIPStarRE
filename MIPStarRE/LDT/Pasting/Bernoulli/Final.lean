@@ -322,7 +322,7 @@ theorem ldPastingNCompleteness_of_tailLowerBound
       strategy.permInvState hself
   have hselfIncomplete :=
     gBotSelfConsistency params strategy.state family zeta
-      strategy.permInvState hselfComplete
+      strategy.permInvState hself
   have hcomMain :=
     Commutativity.comMain params strategy eps delta gamma zeta
       strategy.isNormalized hgood family hcons hself hbound
@@ -330,7 +330,7 @@ theorem ldPastingNCompleteness_of_tailLowerBound
     commutingWithGComplete params strategy family gamma zeta
       hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le hcomMain hselfComplete
   have hcommIncomplete :=
-    commutingWithGIncomplete params strategy.state family gamma zeta hcommComplete
+    commutingWithGIncomplete_ofComplete params strategy.state family gamma zeta hcommComplete
   have hfacts := gHatFacts params strategy.state family gamma zeta
     hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le
     hselfComplete hselfIncomplete hcommComplete hcommIncomplete

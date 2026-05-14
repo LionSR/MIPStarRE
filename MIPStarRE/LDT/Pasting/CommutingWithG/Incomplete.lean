@@ -1,5 +1,5 @@
-import MIPStarRE.LDT.Pasting.Core
-import MIPStarRE.LDT.Pasting.Sandwich.Switcheroo
+import MIPStarRE.LDT.Commutativity.Main.Results
+import MIPStarRE.LDT.Pasting.CommutingWithG.Complete
 
 /-!
 # Section 12 pasting: commuting-with-G incomplete part
@@ -16,8 +16,15 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- `cor:commuting-with-G-incomplete`. -/
-theorem commutingWithGIncomplete
+/-- Internal form of `cor:commuting-with-G-incomplete` after applying
+`cor:commuting-with-G-complete`.
+
+**Source:** The proof in `references/ldt-paper/ld-pasting.tex:775-816`
+uses `cor:commuting-with-G-complete` internally.  The paper-facing theorem
+`commutingWithGIncomplete` below derives that complete-part commutation
+statement from the source hypotheses rather than exposing it as a public
+hypothesis. -/
+theorem commutingWithGIncomplete_ofComplete
     (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -150,5 +157,29 @@ theorem commutingWithGIncomplete
               rw [hdiff]
       _ ≤ commutingWithGIncompleteError params gamma zeta := by
           simpa [commutingWithGIncompleteError] using hcomplete_bound
+
+/-- `cor:commuting-with-G-incomplete`, source-facing form. -/
+theorem commutingWithGIncomplete
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (eps delta gamma zeta : Error)
+    (hgamma_nonneg : 0 ≤ gamma) (hgamma : gamma ≤ 1)
+    (hzeta_nonneg : 0 ≤ zeta) (hzeta : zeta ≤ 1)
+    (hd_le_q : params.d ≤ params.q)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    CommutingWithGIncompleteStatement params strategy.state family gamma zeta := by
+  let hcom : Commutativity.ComMainConclusion params strategy family gamma zeta :=
+    Commutativity.comMain params strategy eps delta gamma zeta
+      strategy.isNormalized hgood family hcons hself hbound
+  let hselfComplete : GCompleteSelfConsistencyStatement params strategy.state family zeta :=
+    gCompleteSelfConsistency params strategy.state family zeta strategy.permInvState hself
+  exact commutingWithGIncomplete_ofComplete params strategy.state family gamma zeta
+    (commutingWithGComplete params strategy family gamma zeta
+      hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q hcom hselfComplete)
 
 end MIPStarRE.LDT.Pasting
