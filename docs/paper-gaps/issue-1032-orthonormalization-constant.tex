@@ -53,7 +53,8 @@ The paper states the orthonormalization theorem with the estimate
 \]
 The Lean declaration named
 \(\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}\)
-now proves this paper statement.
+now proves this paper statement and its axiom audit requires only the standard
+Lean axioms.
 The proved completion-route theorem
 \(\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationCompletionRoute}\)
 establishes the same conclusion with the weaker estimate
@@ -71,9 +72,10 @@ with a separate proved completion-route comparison.%
 \path{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationCompletionRoute},
 and \path{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer\_of\_sourceAlmostProjective\_two\_mul}.
 This note is attached to \ghissue{1032}; the constant discrepancy is resolved
-by proving the source-aligned theorem statement, while the heterogeneous
-\path{lem:orthonormalization-main-lemma} proof remains a tracked obligation in
-the same issue.  The weaker completion-route construction stays under a
+by proving the source-aligned theorem statement.  The heterogeneous
+\path{lem:orthonormalization-main-lemma} proof remains a separate tracked
+obligation, but the public orthonormalization theorem no longer depends on that
+unfinished lemma.  The weaker completion-route construction stays under a
 separate name.}
 
 \section{The source assertion}
@@ -137,13 +139,14 @@ proof.  The weaker completion-route theorem remains available under the
 separate name
 \(\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationCompletionRoute}\).
 
-This does not close the whole Section~5 proof obligation.  The declaration
+This does not close every Section~5 proof obligation.  The heterogeneous
+\(\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}\)
+still remains as a tracked \texttt{sorry}; it should either be proved directly
+from the paper argument or kept unmarked as an unfinished auxiliary lemma.  The
+public theorem
 \(\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}\)
-still depends on the heterogeneous
-\(\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}\),
-whose proof remains a tracked \texttt{sorry} under \ghissue{1032}.  Thus the
-constant part is repaired, but the source theorem is not yet a proof-complete
-\leanok{} entry.
+does not depend on that unfinished lemma, and its scalar constant is now the
+paper constant.
 
 \bibliographystyle{alpha}
 \bibliography{references}

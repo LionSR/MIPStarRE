@@ -33,7 +33,8 @@ data, or obligation hypotheses, and its proof is assembled from named
 construction targets.  Issue #1043 tracks the base-case projective-completion
 construction, issues #1363 and #1369 track the successor projective-completion
 construction, issue #1566 tracks the match-mass preservation obligations in the
-completion step, and issue #1458 is the umbrella tracking issue.
+completion step, issue #1507 tracks the Section 6 main-induction proof, and
+issue #1458 is the umbrella tracking issue.
 
 The audit for `GlobalVariance.globalVarianceOfPoints` now requires the standard
 Lean axioms only: the issue-#1456 six-step local transport estimate is supplied
@@ -88,19 +89,16 @@ private def expectedStandardAxiomsWithSorry : Array Name :=
   #[``propext, ``Classical.choice, ``Quot.sound, ``sorryAx].qsort Name.lt
 
 /-- Standard kernel axioms plus `sorryAx`; tracks the transitive
-`mainFormal` construction gaps for issues #1043, #1363, #1369, #1458, and
-#1566. -/
+`mainFormal` construction gaps for issues #1043, #1363, #1369, #1458, #1507,
+and #1566. -/
 private def expectedMainFormalAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
-/-- Standard kernel axioms plus `sorryAx`; tracks the remaining issue-#1032
-proof of `orthonormalizationMainLemma`.
-
-The scalar constant comparison for `thm:orthonormalization` has been repaired,
-but the theorem still depends on the heterogeneous main lemma, whose proof is
-not yet complete. -/
+/-- Standard kernel axioms only: the issue-#1032 scalar discrepancy for
+`thm:orthonormalization` has been repaired without making the theorem depend on
+the still-unproved heterogeneous `orthonormalizationMainLemma`. -/
 private def expectedOrthonormalizationAxioms : Array Name :=
-  expectedStandardAxiomsWithSorry
+  expectedStandardAxioms
 
 /-- Standard kernel axioms plus `sorryAx`; tracks the issue #1515 derivation
 needed for `selfImprovement`. -/
