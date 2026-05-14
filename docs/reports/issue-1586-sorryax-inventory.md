@@ -23,11 +23,10 @@ currently reports the following direct proof holes.
 | `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean:216` | `MainInductionStep.mainInduction` | #1507 | Prove the successor branch of `thm:main-induction` from the paper hypotheses, deriving the restricted probabilities, slice witnesses, self-improvement outputs, and pasting side conditions internally. |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/Core.lean:167` | `MainInductionStep.selfImprovementInInductionSection` | #1503 | Prove the induction-section self-improvement theorem without adding a completion or Section 9 obligation bundle to the public statement. |
 | `MIPStarRE/LDT/MakingMeasurementsProjective/Orthonormalization.lean:77` | `MakingMeasurementsProjective.orthonormalizationMainLemma` | #1032 | Formalize the spectral truncation and locality-preserving repair construction for `lem:orthonormalization-main-lemma`. |
-| `MIPStarRE/LDT/MakingMeasurementsProjective/Orthonormalization.lean:434` | `MakingMeasurementsProjective.orthonormalization` | #1032 | Recover the paper constant `100 * zeta^(1/4)` from the completed-measurement route, rather than using the proved weaker completion-route envelope. |
-| `MIPStarRE/LDT/MakingMeasurementsProjective/Producers.lean:487` | `MakingMeasurementsProjective.leftLiftedProjectivizationRepairWithMatchMass` | #1610 | Prove the QXP outcome-expectation preservation inequality for the same projectivization data returned by the repair construction. |
+| `MIPStarRE/LDT/MakingMeasurementsProjective/Producers.lean:522` | `MakingMeasurementsProjective.leftLiftedProjectivizationRepairWithMatchMass` | #1610 | Prove the QXP outcome-expectation preservation inequality for the same projectivization data returned by the repair construction. |
+| `MIPStarRE/LDT/Pasting/Bernoulli/Final.lean:679` | `Pasting.ldPastingDegreeZeroBranch` | #1601, #1622 | Prove the degree-zero complementary branch of the unrestricted low-degree pasting theorem without adding `0 < d` to the source theorem. |
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperCompleteness/Bracketed.lean:571` | `SelfImprovement.sdp_statement_with_slackness` | #1230 | Prove the Section 9 SDP strong-duality and complementary-slackness statement. |
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/Core.lean:362` | `SelfImprovement.selfImprovement` | #1515 | Derive helper strong self-consistency, orthonormalization, and final-field transport from the paper hypotheses. |
-| `MIPStarRE/LDT/Pasting/Bernoulli/Final.lean:512` | `Pasting.ldPasting` | #1601, #1622, #1627 | Prove the complementary cases for the unrestricted low-degree pasting theorem. |
 
 The command
 
@@ -52,11 +51,17 @@ intentionally records this closure.  In particular:
   including #1043, #1363, #1369, #1458, #1566, and #1610.
 - `SelfImprovement.selfImprovementHelper` inherits the SDP complementary
   slackness gap #1230.
+- `Pasting.ldPasting` inherits the degree-zero complementary branch gap #1622
+  through `Pasting.ldPastingDegreeZeroBranch`.
 - `MainInductionStep.mainInduction`,
   `MainInductionStep.selfImprovementInInductionSection`,
-  `MakingMeasurementsProjective.orthonormalization`, and
   `SelfImprovement.selfImprovement` inherit their direct `sorry` sites listed
   above.
+
+The public theorem `MakingMeasurementsProjective.orthonormalization` is no
+longer on this list: PR #1632 restored the paper constant without making the
+theorem depend on the still-unproved heterogeneous
+`orthonormalizationMainLemma`.
 
 The repair direction is therefore not to remove `sorryAx` by adding new
 assumptions.  The correct cleanup is to prove the listed construction theorems,

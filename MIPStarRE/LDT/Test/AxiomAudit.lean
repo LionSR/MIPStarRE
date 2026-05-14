@@ -3,6 +3,7 @@ import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
 import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
 import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
+import MIPStarRE.LDT.Pasting.Bernoulli.Final
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.Bracketed
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 import MIPStarRE.LDT.Test.MainTheorem
@@ -49,6 +50,11 @@ The audit for `MainInductionStep.mainInduction` records the current proof
 obligation for `thm:main-induction`: the theorem statement matches the paper
 statement, and the remaining work is to derive the internal successor-stage
 inputs from the paper hypotheses.  This is tracked by issue #1507.
+
+The audit for `Pasting.ldPasting` records the current proof obligation for
+`thm:ld-pasting`: the theorem statement matches the unrestricted paper
+statement, and the remaining direct `sorry` is the degree-zero complementary
+branch tracked by issue #1622.
 
 The audit for `ExpansionHypercubeGraph.laplacianSpectralGapOrdered` now
 requires the standard Lean axioms only: the ordered-eigenvalue statement of
@@ -115,6 +121,11 @@ needed for `mainInduction`. -/
 private def expectedMainInductionAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
+/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1622 degree-zero
+branch needed for unrestricted `ldPasting`. -/
+private def expectedLdPastingAxioms : Array Name :=
+  expectedStandardAxiomsWithSorry
+
 /-- Standard kernel axioms only: the issue #1497 derivation for
 `laplacianSpectralGapOrdered` has been discharged. -/
 private def expectedOrderedLaplacianGapAxioms : Array Name :=
@@ -159,6 +170,9 @@ elab "assert_induction_self_improvement_axioms " id:ident : command => do
 elab "assert_main_induction_axioms " id:ident : command => do
   assertUsesExactlyAxioms id.getId expectedMainInductionAxioms
 
+elab "assert_ld_pasting_axioms " id:ident : command => do
+  assertUsesExactlyAxioms id.getId expectedLdPastingAxioms
+
 elab "assert_ordered_laplacian_gap_axioms " id:ident : command => do
   assertUsesExactlyAxioms id.getId expectedOrderedLaplacianGapAxioms
 
@@ -181,6 +195,7 @@ assert_standard_axioms MIPStarRE.LDT.GlobalVariance.globalVarianceOfPoints
 assert_induction_self_improvement_axioms
   MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection
 assert_main_induction_axioms MIPStarRE.LDT.MainInductionStep.mainInduction
+assert_ld_pasting_axioms MIPStarRE.LDT.Pasting.ldPasting
 assert_ordered_laplacian_gap_axioms
   MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianSpectralGapOrdered
 assert_standard_axioms

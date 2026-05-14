@@ -1,0 +1,114 @@
+\documentclass{article}
+\usepackage{amsmath,amssymb}
+\usepackage{hyperref}
+\usepackage{fullpage}
+
+\title{Issue \#1622: the degree-zero branch of low-degree pasting}
+\author{MIPStarRE formalization notes}
+\date{2026-05-14}
+
+\begin{document}
+\maketitle
+
+\section{Source statement}
+
+The source theorem is \texttt{references/ldt-paper/ld-pasting.tex},
+lines 12--50, labelled \texttt{thm:ld-pasting}.  It assumes an
+$(\varepsilon,\delta,\gamma)$-good symmetric strategy for the
+$(m+1,q,d)$ low individual degree test, a family of projective
+submeasurements
+\[
+  \{G^x\}_{x\in\mathbb F_q}\subseteq \mathrm{PolySub}(m,q,d),
+\]
+the four displayed completeness, consistency, strong self-consistency, and
+boundedness hypotheses, and an integer \(k\geq 400md\).  It concludes that
+there is a pasted measurement \(H\in\mathrm{PolyMeas}(m+1,q,d)\) satisfying the
+final point-consistency estimate with error
+\[
+  \sigma=\kappa\left(1+\frac{1}{100m}\right)+2\nu+
+  \exp\left(-\frac{k}{80000m^2}\right),
+\]
+where
+\[
+  \nu=100k^2m\left(\varepsilon^{1/32}+\delta^{1/32}
+    +\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}\right).
+\]
+
+The theorem does not state \(0<d\).  The following paragraph of the paper,
+lines 52--55, only says that the proof may assume that
+\(\varepsilon,\delta,\gamma,\zeta,d/q\leq 1\), since the bound is trivial when
+one of these quantities is at least \(1\).
+
+\section{Lean status}
+
+The source-facing Lean theorem is
+\[
+  \texttt{MIPStarRE.LDT.Pasting.ldPasting}.
+\]
+Its public statement keeps the paper's unrestricted boundary.  The restricted
+nontrivial construction theorem
+\[
+  \texttt{MIPStarRE.LDT.Pasting.ldPastingNontrivial}
+\]
+assumes the proof-regime hypotheses
+\[
+  \gamma\leq 1,\qquad \zeta\leq 1,\qquad d\leq q,\qquad 0<d,\qquad 1\leq k.
+\]
+The unrestricted theorem dispatches the large-\(\gamma\), large-\(\zeta\),
+large-\(d/q\), \(k=0\), and nontrivial positive-degree branches.  The remaining
+branch is
+\[
+  d=0,\qquad 1\leq k,
+\]
+recorded as
+\[
+  \texttt{MIPStarRE.LDT.Pasting.ldPastingDegreeZeroBranch}.
+\]
+That declaration currently contains the direct tracked \texttt{sorry} for
+issue \#1622.
+
+\section{Why the existing proof does not specialize}
+
+The existing nontrivial proof uses the sampled distinct-tuple construction from
+\texttt{ld-pasting.tex}.  In the proof of \texttt{lem:h-b-consistency}, lines
+1073--1087, and again in the proof of \texttt{lem:over-all-outcomes}, lines
+1192--1199 and 1276--1286, the argument passes between independent sampled
+heights and distinct sampled heights.  Each such passage costs a
+distinctness error of order \(k^2/q\).
+
+For \(0<d\), the formal proof absorbs this cost through the displayed
+\((d/q)^{1/32}\) term.  Concretely, the scalar step uses \(1/q\leq d/q\) and
+then \(d/q\leq (d/q)^{1/32}\) in the small-error regime.  This is exactly the
+role of the Lean hypothesis \(0<d\) in the scalar aggregation lemmas such as
+\[
+  \texttt{one\_div\_q\_le\_rpow\_degreeRatio}
+\]
+and its downstream uses in the pasting proof.
+
+When \(d=0\), this absorption is unavailable: the term
+\((d/q)^{1/32}\) is zero.  Thus the positive-degree proof cannot be reused by
+specialization, and adding \(0<d\) to \texttt{ldPasting} would change the source
+theorem rather than prove the missing branch.
+
+\section{Obligation}
+
+The remaining construction theorem should prove the degree-zero branch from the
+paper hypotheses:
+\[
+  d=0,\qquad 1\leq k,\qquad k\geq 400md.
+\]
+Mathematically, one expects a proof which uses the fact that a degree-zero
+polynomial is constant and obtains point-consistency through the line-test and
+slice-consistency hypotheses, without paying a distinct-tuple loss that must be
+absorbed by \(d/q\).  The precise formal target is
+\[
+  \texttt{MIPStarRE.LDT.Pasting.ldPastingDegreeZeroBranch}.
+\]
+
+Until that theorem is proved, the project should keep the source-facing theorem
+\texttt{ldPasting} visible and should keep the missing work as the tracked
+\texttt{sorry} in this branch.  It should not add \(0<d\), a bridge hypothesis,
+a residual package, or any other non-paper assumption to
+\texttt{thm:ld-pasting}.
+
+\end{document}

@@ -37,14 +37,14 @@ have named obligations:
 
 - `MIPStarRE.LDT.Test.mainFormal`: final-theorem construction gaps, tracked by
   #1043, #1363, #1369, #1458, and #1566.
-- `MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization`: issue
-  #1032, the paper's sharper projectivization constant.
 - `MIPStarRE.LDT.SelfImprovement.selfImprovement`: issue #1515,
   source-facing self-improvement derivation.
 - `MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection`: issue
   #1503, induction-section self-improvement derivation.
 - `MIPStarRE.LDT.MainInductionStep.mainInduction`: issue #1507, derivation of
   successor-stage inputs from the paper hypotheses.
+- `MIPStarRE.LDT.Pasting.ldPasting`: issue #1622, the degree-zero
+  complementary branch of the unrestricted pasting theorem.
 - `MIPStarRE.LDT.SelfImprovement.selfImprovementHelper`: transitive dependency
   on issue #1230 through `sdp_statement_with_slackness`.  The former #1514
   helper strong self-consistency estimate is now discharged locally.
@@ -55,7 +55,11 @@ Several other audited declarations now require only the standard Lean axioms
 `propext`, `Classical.choice`, and `Quot.sound`.  In particular, the current
 audit records that `globalVarianceOfPoints`,
 `laplacianSpectralGapOrdered`, `classicalTestSoundness`, and the
-orthonormalization completion route do not depend on `sorryAx`.
+orthonormalization completion route do not depend on `sorryAx`.  The public
+theorem `MakingMeasurementsProjective.orthonormalization` also no longer
+depends on `sorryAx`: PR #1632 restored the paper constant while leaving the
+heterogeneous `orthonormalizationMainLemma` as the remaining issue-#1032 direct
+proof obligation.
 
 ## Verdict
 
