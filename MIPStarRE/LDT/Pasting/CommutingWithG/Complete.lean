@@ -218,7 +218,7 @@ theorem commutingWithGComplete_ofComMainAndSelfConsistency
       CommutativitySwitcherooStatement params strategy.state family family.meas
         zeta zeta (pairwiseCompletePartCommutationError params gamma zeta) := by
     simpa [pairwiseCompletePartCommutationError] using
-      commutativitySwitcheroo params strategy.state strategy.isNormalized
+      commutativitySwitcheroo_ofCompleteSelfConsistency params strategy.state strategy.isNormalized
         strategy.densityFixed
         family family.meas zeta zeta
         (Commutativity.comMainError params gamma zeta)
@@ -271,8 +271,8 @@ theorem commutingWithGComplete_ofComMainAndSelfConsistency
         zeta zeta
         (commutativitySwitcherooError zeta zeta
           (pairwiseCompletePartCommutationError params gamma zeta)) := by
-    apply commutativitySwitcheroo params strategy.state strategy.isNormalized
-      strategy.densityFixed family
+    apply commutativitySwitcheroo_ofCompleteSelfConsistency params strategy.state
+      strategy.isNormalized strategy.densityFixed family
       (completePartProjFamily params family) zeta zeta
       (commutativitySwitcherooError zeta zeta
         (pairwiseCompletePartCommutationError params gamma zeta))
