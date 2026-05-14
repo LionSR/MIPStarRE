@@ -591,13 +591,13 @@ lemma fromHToG_recurrenceStep_of_paperMoveChain
   exact fromHToGAdjacentStage_paperMoveChain params ψbi hnorm family gamma zeta
     hgamma_nonneg hzeta_nonneg hfacts hhalf hstageExact k ℓ hℓ
 
-/-- The paper-total telescope bridge for `fromHToG`.
+/-- The paper-total stage-mass telescope for `fromHToG`.
 
 This follows the iteration in `ld-pasting.tex:1354--1372`: applying the adjacent-stage
 estimate over all `k` stages gives `k` copies of the per-stage error.  Lean records
 that literal telescope before the final scalar bound `fromHToGPaperTotalError_le`
 absorbs it into `fromHToGError`. -/
-lemma fromHToG_stageMassBridge_of_paperTelescope
+lemma fromHToG_stageMassTelescope_of_paperMoveChain
     (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))

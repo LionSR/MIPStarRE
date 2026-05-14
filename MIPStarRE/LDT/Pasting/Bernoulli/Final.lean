@@ -449,8 +449,8 @@ Lines 52--55 explain that the proof may assume the nontrivial regime
 `eps, delta, gamma, zeta, d / q ≤ 1`, since the complementary cases are
 trivial.  This declaration currently exposes the public assumptions
 `gamma ≤ 1`, `zeta ≤ 1`, `params.d ≤ params.q`, `0 < params.d`, and `1 ≤ k`.
-The trivial complementary cases remain to be formalized before this theorem can
-serve as the unrestricted source-facing pasting theorem. -/
+The unrestricted source-facing statement is `ldPasting`; its complementary
+trivial cases are tracked by issue #1601. -/
 theorem ldPastingNontrivial
     (params : Parameters)
     [FieldModel params.q]
@@ -486,5 +486,33 @@ theorem ldPastingNontrivial
       family k hsubmeasConsistency hcompleteness.completenessBound
   exact
     { pointConsistency := hconsistency }
+
+/-- Source-facing form of `thm:ld-pasting`.
+
+Paper origin: `references/ldt-paper/ld-pasting.tex`, lines 12--50.  The
+following lines 52--55 explain that the proof may restrict to the regime
+`eps, delta, gamma, zeta, d / q ≤ 1`, because the complementary cases are
+trivial.  The restricted theorem `ldPastingNontrivial` proves the nontrivial
+regime.  The formal proof of the complementary trivial branches is tracked by
+issue #1601, so this declaration keeps the unrestricted paper statement visible
+without adding the non-paper assumptions from the restricted helper. -/
+theorem ldPasting
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma kappa zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (hcomplete : family.Complete strategy.state kappa)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (k : ℕ)
+    (hk : 400 * params.m * params.d ≤ k) :
+    ∃ H : Measurement (Polynomial params.next) ι,
+      LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
+  -- Issue #1601: prove the five trivial complementary branches and then call
+  -- `ldPastingNontrivial` in the remaining case.
+  sorry
 
 end MIPStarRE.LDT.Pasting

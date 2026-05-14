@@ -3,6 +3,7 @@
 \label{sec:ld-pasting}
 
 \begin{theorem}[Pasting]\label{thm:ld-pasting}
+	\lean{MIPStarRE.LDT.Pasting.ldPasting}
 	\uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
 	Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test. Let $\{G^x\}_{x \in \F_q}$ be projective submeasurements in $\polysub{m}{q}{d}$ with the following properties:
 	\begin{enumerate}
@@ -49,6 +50,8 @@
 \end{theorem}
 \begin{proof}
 	\uses{lem:ld-pasting-sub-measurement}
+	The Lean proof of the unrestricted source theorem is the tracked proof gap in
+	issue~\#1601.  The argument below is the paper proof.
 	Let $H$ be the submeasurement from Lemma~\ref{lem:ld-pasting-sub-measurement}, and fix an arbitrary polynomial $h^* \in \polyfunc{m+1}{q}{d}$. Define a measurement $H_{\mathrm{meas}} \in \polymeas{m+1}{q}{d}$ by
 	\[
 		(H_{\mathrm{meas}})_h
@@ -86,8 +89,9 @@
 	\texttt{references/ldt-paper/ld-pasting.tex}, lines 12--50.  Lines 52--55
 	explain that the proof may restrict to
 	\(\eps,\delta,\gamma,\zeta,d/q\le 1\), since the complementary cases are
-	trivial.  The formalization of these complementary cases, and hence of the
-	unrestricted source theorem, remains to be supplied.
+	trivial.  The unrestricted source statement is linked from
+	Theorem~\ref{thm:ld-pasting}; the formal proof of these complementary cases
+	remains tracked by issue~\#1601.
 \end{remark}
 
 The bound is trivial when at least one of $\eps$, $\delta$, $\gamma$, $\zeta$, or $d/q$ is at least $1$, since then $\nu \ge 1$. In the remainder of the chapter we therefore assume

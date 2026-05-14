@@ -1,7 +1,7 @@
 import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.PaperMoveChain
 
 /-!
-# Section 12 pasting: from-H-to-G bridge
+# Section 12 pasting: from-H-to-G theorem
 
 Compatibility module exposing the public `fromHToG` theorem.
 -/
@@ -39,7 +39,7 @@ lemma fromHToG
       |fromHToGStageMass params ψbi family k 0 -
           fromHToGStageMass params ψbi family k k| ≤
         fromHToGPaperTotalError params gamma zeta k :=
-    fromHToG_stageMassBridge_of_paperTelescope params ψbi hnorm family gamma zeta
+    fromHToG_stageMassTelescope_of_paperMoveChain params ψbi hnorm family gamma zeta
       hgamma_nonneg hzeta_nonneg hfacts hhalf hstageExact k
   have hstage0 := fromHToGStageMass_zero_eq params strategy ψbi family k
   have hstagek := fromHToGStageMass_terminal_eq params ψbi family k

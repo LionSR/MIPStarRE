@@ -620,11 +620,11 @@ noncomputable def ldSandwichLineOnePointCS_secondTargetRaw
         (ldSandwichLineOnePointCS_Csecond params strategy family hi q gs u *
           (ldSandwichLineOnePointCS_Arot params family hi q gs)ᴴ))
 
-/-- Exact low-level inputs needed to turn the generic `closenessOfIP*` lemmas into
+/-- Exact low-level facts needed to turn the generic `closenessOfIP*` lemmas into
 `ld-pasting.tex:964--1010` for the line-one-point bridge.
 
-This package separates the generic CS theorem instantiation (proved below) from
-the paper-specific inputs:
+This record separates the generic CS theorem instantiation (proved below) from
+the paper-specific facts:
 
 * the adjoint-oriented raw square-distance bound corresponding to the first square
   root in lines 974--985 and reused in lines 1005--1010;
@@ -632,9 +632,10 @@ the paper-specific inputs:
 * the algebraic regrouping/reindexing that identifies the raw CS scalars with the
   existing source, intermediate, and moved outcome sums.
 
-The assembly lemma below now proves the unit bounds and regrouping equalities;
-the remaining live residual is the adjoint-oriented raw-core bridge. -/
-structure LdSandwichLineOnePointCSInputFacts
+The construction lemma below proves the unit bounds and regrouping equalities;
+the remaining live analytic endpoint is the adjoint-oriented raw-core estimate
+recorded by `LdSandwichLineOnePointAdjointRawCoreBound`. -/
+structure LdSandwichLineOnePointCSFacts
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -691,7 +692,7 @@ structure LdSandwichLineOnePointAdjointRawCoreBound
           (ldSandwichLineOnePointCS_Arot params family hi q gs)ᴴ)) ≤
       commuteGHalfSandwichError params gamma zeta (i + 1)
 
-/-- The adjoint orientation bridge for the paper's `eq:add-in-the-bot` input.
+/-- The adjoint-oriented estimate for the paper's `eq:add-in-the-bot` term.
 
 The generic `closenessOfIP*` applications need the adjoint-oriented
 $D D^\dagger$ square-distance term that appears in `ld-pasting.tex:980--985`
