@@ -525,7 +525,16 @@ noncomputable def SelfImprovementPackage.ofSliceObligations
   · intro h
     simpa [sliceObligations.averagedPoint_eq x h] using hH.dominatesAveragePointOperator h
 
-/-- `thm:ld-pasting-in-induction-section`. -/
+/-- Restricted nontrivial-regime Lean restatement of
+`thm:ld-pasting-in-induction-section`.
+
+This theorem calls `Pasting.ldPasting`.  Its public assumptions therefore
+include `gamma ≤ 1`, `zeta ≤ 1`, `params.d ≤ params.q`, `0 < params.d`, and
+`1 ≤ k`, in addition to the hypotheses of the source theorem.  The paper
+statement is `references/ldt-paper/ld-pasting.tex`, lines 12--50; lines 52--55
+record these inequalities only as a proof reduction to the nontrivial regime.
+The trivial complementary cases remain to be formalized before this declaration
+can serve as the unrestricted induction-section pasting theorem. -/
 -- NOTE: `FieldModel.{0}` is needed to match the universe at which
 -- `Pasting.ldPasting` was elaborated. See PR #288 discussion.
 theorem ldPastingInInductionSection
