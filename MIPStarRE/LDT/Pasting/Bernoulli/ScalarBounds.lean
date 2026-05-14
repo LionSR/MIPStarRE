@@ -51,6 +51,55 @@ lemma ldPasting_degreeRatio_nonneg
     0 ≤ ((params.d : Error) / (params.q : Error)) := by
   exact div_nonneg (by exact_mod_cast Nat.zero_le params.d) (le_of_lt params.q_cast_pos)
 
+/-- The scalar coefficient multiplying the five small error terms is at least one
+when the number of sampled coordinates is positive. -/
+lemma one_le_ldPastingNu_coefficient
+    (params : Parameters)
+    (k : ℕ)
+    (hk_pos : 1 ≤ k) :
+    1 ≤ 100 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) := by
+  have hkE_one : (1 : Error) ≤ (k : Error) := by exact_mod_cast hk_pos
+  have hmE_one : (1 : Error) ≤ (params.m : Error) := by exact_mod_cast params.hm
+  nlinarith [sq_nonneg (k : Error)]
+
+/-- A unit lower bound on the five-term scalar sum gives a unit lower bound on
+the section-local pasting parameter `ν`. -/
+lemma one_le_ldPastingNu_of_one_le_sum
+    (params : Parameters)
+    (k : ℕ)
+    (eps delta gamma zeta : Error)
+    (hk_pos : 1 ≤ k)
+    (hsum :
+      1 ≤ Real.rpow eps (1 / (32 : Error)) +
+        Real.rpow delta (1 / (32 : Error)) +
+        Real.rpow gamma (1 / (32 : Error)) +
+        Real.rpow zeta (1 / (32 : Error)) +
+        Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error))) :
+    1 ≤ MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta := by
+  have hcoeff_one : 1 ≤ 100 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) :=
+    one_le_ldPastingNu_coefficient params k hk_pos
+  have hcoeff_nonneg :
+      0 ≤ 100 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) :=
+    le_trans zero_le_one hcoeff_one
+  have hprod :
+      (1 : Error) ≤
+        (100 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error)) *
+          (Real.rpow eps (1 / (32 : Error)) +
+            Real.rpow delta (1 / (32 : Error)) +
+            Real.rpow gamma (1 / (32 : Error)) +
+            Real.rpow zeta (1 / (32 : Error)) +
+            Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error))) := by
+    simpa using
+      (mul_le_mul hcoeff_one hsum zero_le_one hcoeff_nonneg :
+        (1 : Error) * 1 ≤
+          (100 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error)) *
+            (Real.rpow eps (1 / (32 : Error)) +
+              Real.rpow delta (1 / (32 : Error)) +
+              Real.rpow gamma (1 / (32 : Error)) +
+              Real.rpow zeta (1 / (32 : Error)) +
+              Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error))))
+  simpa [MainInductionStep.ldPastingInInductionNu] using hprod
+
 /-- A unit lower bound on `ν` gives a unit lower bound on the final pasting error. -/
 lemma one_le_ldPastingError_of_one_le_nu
     (params : Parameters)
@@ -106,54 +155,23 @@ lemma one_le_ldPastingNu_of_large_gamma
     (hk_pos : 1 ≤ k)
     (hgamma : 1 < gamma) :
     1 ≤ MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta := by
-  let kE : Error := (k : Error)
-  let mE : Error := (params.m : Error)
-  let ratio : Error := (params.d : Error) / (params.q : Error)
-  let epsTerm : Error := Real.rpow eps (1 / (32 : Error))
-  let deltaTerm : Error := Real.rpow delta (1 / (32 : Error))
-  let gammaTerm : Error := Real.rpow gamma (1 / (32 : Error))
-  let zetaTerm : Error := Real.rpow zeta (1 / (32 : Error))
-  let dqTerm : Error := Real.rpow ratio (1 / (32 : Error))
-  let fullSum : Error := epsTerm + deltaTerm + gammaTerm + zetaTerm + dqTerm
-  let coeff : Error := 100 * (kE ^ (2 : ℕ)) * mE
-  have hkE_one : (1 : Error) ≤ kE := by
-    dsimp [kE]
-    exact_mod_cast hk_pos
-  have hmE_one : (1 : Error) ≤ mE := by
-    dsimp [mE]
-    exact_mod_cast params.hm
-  have hcoeff_one : (1 : Error) ≤ coeff := by
-    dsimp [coeff]
-    nlinarith [sq_nonneg kE, hkE_one, hmE_one]
-  have hcoeff_nonneg : 0 ≤ coeff := le_trans zero_le_one hcoeff_one
   have heps_nonneg : 0 ≤ eps := eps_nonneg_of_isGood params.next strategy hgood
   have hdelta_nonneg : 0 ≤ delta := delta_nonneg_of_isGood params.next strategy hgood
   have hzeta_nonneg : 0 ≤ zeta :=
     IdxPolyFamily.zeta_nonneg_of_consistentWithPoints strategy family hcons
-  have hepsTerm_nonneg : 0 ≤ epsTerm := by
-    dsimp [epsTerm]
+  have hepsTerm_nonneg : 0 ≤ Real.rpow eps (1 / (32 : Error)) := by
     exact Real.rpow_nonneg heps_nonneg _
-  have hdeltaTerm_nonneg : 0 ≤ deltaTerm := by
-    dsimp [deltaTerm]
+  have hdeltaTerm_nonneg : 0 ≤ Real.rpow delta (1 / (32 : Error)) := by
     exact Real.rpow_nonneg hdelta_nonneg _
-  have hgammaTerm_one : 1 ≤ gammaTerm := by
-    dsimp [gammaTerm]
+  have hgammaTerm_one : 1 ≤ Real.rpow gamma (1 / (32 : Error)) := by
     exact le_of_lt (Real.one_lt_rpow hgamma (by norm_num))
-  have hzetaTerm_nonneg : 0 ≤ zetaTerm := by
-    dsimp [zetaTerm]
+  have hzetaTerm_nonneg : 0 ≤ Real.rpow zeta (1 / (32 : Error)) := by
     exact Real.rpow_nonneg hzeta_nonneg _
-  have hdqTerm_nonneg : 0 ≤ dqTerm := by
-    dsimp [dqTerm, ratio]
+  have hdqTerm_nonneg :
+      0 ≤ Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)) := by
     exact Real.rpow_nonneg (ldPasting_degreeRatio_nonneg params) _
-  have hfullSum_one : (1 : Error) ≤ fullSum := by
-    dsimp [fullSum]
-    nlinarith
-  have hprod : (1 : Error) ≤ coeff * fullSum := by
-    simpa using
-      (mul_le_mul hcoeff_one hfullSum_one zero_le_one hcoeff_nonneg :
-        (1 : Error) * 1 ≤ coeff * fullSum)
-  simpa [MainInductionStep.ldPastingInInductionNu, coeff, fullSum, epsTerm,
-    deltaTerm, gammaTerm, zetaTerm, dqTerm, ratio, kE, mE] using hprod
+  exact one_le_ldPastingNu_of_one_le_sum params k eps delta gamma zeta hk_pos (by
+    nlinarith)
 
 /-- The `ν` term is at least one when `ζ > 1` and `k ≥ 1`. -/
 lemma one_le_ldPastingNu_of_large_zeta
@@ -166,53 +184,22 @@ lemma one_le_ldPastingNu_of_large_zeta
     (hk_pos : 1 ≤ k)
     (hzeta : 1 < zeta) :
     1 ≤ MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta := by
-  let kE : Error := (k : Error)
-  let mE : Error := (params.m : Error)
-  let ratio : Error := (params.d : Error) / (params.q : Error)
-  let epsTerm : Error := Real.rpow eps (1 / (32 : Error))
-  let deltaTerm : Error := Real.rpow delta (1 / (32 : Error))
-  let gammaTerm : Error := Real.rpow gamma (1 / (32 : Error))
-  let zetaTerm : Error := Real.rpow zeta (1 / (32 : Error))
-  let dqTerm : Error := Real.rpow ratio (1 / (32 : Error))
-  let fullSum : Error := epsTerm + deltaTerm + gammaTerm + zetaTerm + dqTerm
-  let coeff : Error := 100 * (kE ^ (2 : ℕ)) * mE
-  have hkE_one : (1 : Error) ≤ kE := by
-    dsimp [kE]
-    exact_mod_cast hk_pos
-  have hmE_one : (1 : Error) ≤ mE := by
-    dsimp [mE]
-    exact_mod_cast params.hm
-  have hcoeff_one : (1 : Error) ≤ coeff := by
-    dsimp [coeff]
-    nlinarith [sq_nonneg kE, hkE_one, hmE_one]
-  have hcoeff_nonneg : 0 ≤ coeff := le_trans zero_le_one hcoeff_one
   have heps_nonneg : 0 ≤ eps := eps_nonneg_of_isGood params.next strategy hgood
   have hdelta_nonneg : 0 ≤ delta := delta_nonneg_of_isGood params.next strategy hgood
   have hgamma_nonneg : 0 ≤ gamma := gamma_nonneg_of_isGood params.next strategy hgood
-  have hepsTerm_nonneg : 0 ≤ epsTerm := by
-    dsimp [epsTerm]
+  have hepsTerm_nonneg : 0 ≤ Real.rpow eps (1 / (32 : Error)) := by
     exact Real.rpow_nonneg heps_nonneg _
-  have hdeltaTerm_nonneg : 0 ≤ deltaTerm := by
-    dsimp [deltaTerm]
+  have hdeltaTerm_nonneg : 0 ≤ Real.rpow delta (1 / (32 : Error)) := by
     exact Real.rpow_nonneg hdelta_nonneg _
-  have hgammaTerm_nonneg : 0 ≤ gammaTerm := by
-    dsimp [gammaTerm]
+  have hgammaTerm_nonneg : 0 ≤ Real.rpow gamma (1 / (32 : Error)) := by
     exact Real.rpow_nonneg hgamma_nonneg _
-  have hzetaTerm_one : 1 ≤ zetaTerm := by
-    dsimp [zetaTerm]
+  have hzetaTerm_one : 1 ≤ Real.rpow zeta (1 / (32 : Error)) := by
     exact le_of_lt (Real.one_lt_rpow hzeta (by norm_num))
-  have hdqTerm_nonneg : 0 ≤ dqTerm := by
-    dsimp [dqTerm, ratio]
+  have hdqTerm_nonneg :
+      0 ≤ Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)) := by
     exact Real.rpow_nonneg (ldPasting_degreeRatio_nonneg params) _
-  have hfullSum_one : (1 : Error) ≤ fullSum := by
-    dsimp [fullSum]
-    nlinarith
-  have hprod : (1 : Error) ≤ coeff * fullSum := by
-    simpa using
-      (mul_le_mul hcoeff_one hfullSum_one zero_le_one hcoeff_nonneg :
-        (1 : Error) * 1 ≤ coeff * fullSum)
-  simpa [MainInductionStep.ldPastingInInductionNu, coeff, fullSum, epsTerm,
-    deltaTerm, gammaTerm, zetaTerm, dqTerm, ratio, kE, mE] using hprod
+  exact one_le_ldPastingNu_of_one_le_sum params k eps delta gamma zeta hk_pos (by
+    nlinarith)
 
 /-- The `ν` term is at least one when `d / q > 1` and `k ≥ 1`. -/
 lemma one_le_ldPastingNu_of_large_degreeRatio
@@ -227,58 +214,26 @@ lemma one_le_ldPastingNu_of_large_degreeRatio
     (hk_pos : 1 ≤ k)
     (hdq : params.q < params.d) :
     1 ≤ MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta := by
-  let kE : Error := (k : Error)
-  let mE : Error := (params.m : Error)
-  let ratio : Error := (params.d : Error) / (params.q : Error)
-  let epsTerm : Error := Real.rpow eps (1 / (32 : Error))
-  let deltaTerm : Error := Real.rpow delta (1 / (32 : Error))
-  let gammaTerm : Error := Real.rpow gamma (1 / (32 : Error))
-  let zetaTerm : Error := Real.rpow zeta (1 / (32 : Error))
-  let dqTerm : Error := Real.rpow ratio (1 / (32 : Error))
-  let fullSum : Error := epsTerm + deltaTerm + gammaTerm + zetaTerm + dqTerm
-  let coeff : Error := 100 * (kE ^ (2 : ℕ)) * mE
-  have hkE_one : (1 : Error) ≤ kE := by
-    dsimp [kE]
-    exact_mod_cast hk_pos
-  have hmE_one : (1 : Error) ≤ mE := by
-    dsimp [mE]
-    exact_mod_cast params.hm
-  have hcoeff_one : (1 : Error) ≤ coeff := by
-    dsimp [coeff]
-    nlinarith [sq_nonneg kE, hkE_one, hmE_one]
-  have hcoeff_nonneg : 0 ≤ coeff := le_trans zero_le_one hcoeff_one
   have heps_nonneg : 0 ≤ eps := eps_nonneg_of_isGood params.next strategy hgood
   have hdelta_nonneg : 0 ≤ delta := delta_nonneg_of_isGood params.next strategy hgood
   have hgamma_nonneg : 0 ≤ gamma := gamma_nonneg_of_isGood params.next strategy hgood
   have hzeta_nonneg : 0 ≤ zeta :=
     IdxPolyFamily.zeta_nonneg_of_consistentWithPoints strategy family hcons
-  have hratio_gt_one : 1 < ratio := by
-    dsimp [ratio]
+  have hratio_gt_one : 1 < ((params.d : Error) / (params.q : Error)) := by
     have hdq_cast : (params.q : Error) < (params.d : Error) := by exact_mod_cast hdq
     exact (one_lt_div params.q_cast_pos).2 hdq_cast
-  have hepsTerm_nonneg : 0 ≤ epsTerm := by
-    dsimp [epsTerm]
+  have hepsTerm_nonneg : 0 ≤ Real.rpow eps (1 / (32 : Error)) := by
     exact Real.rpow_nonneg heps_nonneg _
-  have hdeltaTerm_nonneg : 0 ≤ deltaTerm := by
-    dsimp [deltaTerm]
+  have hdeltaTerm_nonneg : 0 ≤ Real.rpow delta (1 / (32 : Error)) := by
     exact Real.rpow_nonneg hdelta_nonneg _
-  have hgammaTerm_nonneg : 0 ≤ gammaTerm := by
-    dsimp [gammaTerm]
+  have hgammaTerm_nonneg : 0 ≤ Real.rpow gamma (1 / (32 : Error)) := by
     exact Real.rpow_nonneg hgamma_nonneg _
-  have hzetaTerm_nonneg : 0 ≤ zetaTerm := by
-    dsimp [zetaTerm]
+  have hzetaTerm_nonneg : 0 ≤ Real.rpow zeta (1 / (32 : Error)) := by
     exact Real.rpow_nonneg hzeta_nonneg _
-  have hdqTerm_one : 1 ≤ dqTerm := by
-    dsimp [dqTerm]
+  have hdqTerm_one :
+      1 ≤ Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)) := by
     exact le_of_lt (Real.one_lt_rpow hratio_gt_one (by norm_num))
-  have hfullSum_one : (1 : Error) ≤ fullSum := by
-    dsimp [fullSum]
-    nlinarith
-  have hprod : (1 : Error) ≤ coeff * fullSum := by
-    simpa using
-      (mul_le_mul hcoeff_one hfullSum_one zero_le_one hcoeff_nonneg :
-        (1 : Error) * 1 ≤ coeff * fullSum)
-  simpa [MainInductionStep.ldPastingInInductionNu, coeff, fullSum, epsTerm,
-    deltaTerm, gammaTerm, zetaTerm, dqTerm, ratio, kE, mE] using hprod
+  exact one_le_ldPastingNu_of_one_le_sum params k eps delta gamma zeta hk_pos (by
+    nlinarith)
 
 end MIPStarRE.LDT.Pasting

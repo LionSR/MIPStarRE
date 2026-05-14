@@ -516,7 +516,7 @@ lemma ldPasting_of_one_le_error
 
 Paper origin: `references/ldt-paper/ld-pasting.tex:52-55`, where this is one
 of the large-error cases in which the final consistency bound is trivial.
-Issue #1601 tracks the remaining scalar lower-bound calculation. -/
+This is one of the proved complementary cases for `thm:ld-pasting`. -/
 theorem ldPastingLargeGammaBranch
     (params : Parameters)
     [FieldModel params.q]
@@ -548,7 +548,7 @@ theorem ldPastingLargeGammaBranch
 
 Paper origin: `references/ldt-paper/ld-pasting.tex:52-55`, where this is one
 of the large-error cases in which the final consistency bound is trivial.
-Issue #1601 tracks the remaining scalar lower-bound calculation. -/
+This is one of the proved complementary cases for `thm:ld-pasting`. -/
 theorem ldPastingLargeZetaBranch
     (params : Parameters)
     [FieldModel params.q]
@@ -579,8 +579,8 @@ theorem ldPastingLargeZetaBranch
 /-- Complementary branch for `thm:ld-pasting` when `d > q`.
 
 Paper origin: `references/ldt-paper/ld-pasting.tex:52-55`, where this is the
-large-error case `(d/q) ≥ 1`.  Issue #1601 tracks the remaining scalar
-lower-bound calculation. -/
+large-error case `(d/q) ≥ 1`.  This is one of the proved complementary cases
+for `thm:ld-pasting`. -/
 theorem ldPastingLargeDegreeRatioBranch
     (params : Parameters)
     [FieldModel params.q]
@@ -611,8 +611,8 @@ theorem ldPastingLargeDegreeRatioBranch
 /-- Complementary branch for `thm:ld-pasting` when `k = 0`.
 
 This branch is a boundary case for the reduction to the nontrivial theorem,
-whose proof assumes `1 ≤ k`.  Issue #1601 tracks the scalar calculation showing
-that the exponential term gives the trivial bound. -/
+whose proof assumes `1 ≤ k`.  The scalar calculation showing that the
+exponential term gives the trivial bound is proved in `ScalarBounds.lean`. -/
 theorem ldPastingZeroKBranch
     (params : Parameters)
     [FieldModel params.q]
@@ -695,7 +695,7 @@ theorem ldPastingNontrivialPublicBranch
       family hcomplete hcons hself hbound k hk_pos hk
   exact ⟨H, hH⟩
 
-/-- Source-facing form of `thm:ld-pasting`.
+/-- Paper-aligned form of `thm:ld-pasting`.
 
 Paper origin: `references/ldt-paper/ld-pasting.tex`, lines 12--50.  The
 following lines 52--55 explain that the proof may restrict to the regime
