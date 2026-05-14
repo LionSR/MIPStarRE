@@ -88,6 +88,18 @@ class HeaderExtractionTests(unittest.TestCase):
         )
         self.assertEqual(_header_from_lines(lines, 1), "structure Foo (α : Type)")
 
+    def test_header_keeps_top_level_letI_return_type(self) -> None:
+        lines = strip_lean_comments_preserve_lines(
+            "theorem foo :\n"
+            "    letI inst : Decidable True := inferInstance\n"
+            "    True := by\n"
+            "  trivial\n"
+        )
+        self.assertEqual(
+            _header_from_lines(lines, 1),
+            "theorem foo : letI inst : Decidable True := inferInstance True",
+        )
+
 
 class BlueprintSourceRefsTests(unittest.TestCase):
     def test_source_labelled_refs_keep_theorem_labels(self) -> None:
@@ -147,6 +159,33 @@ class GitComparisonTests(unittest.TestCase):
                 find_header_changes(root, "HEAD", ["MIPStarRE/LDT/Foo.lean"]),
                 [],
             )
+
+    def test_letI_return_type_change_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = _make_repo(Path(td))
+            _write_blueprint(root)
+            _write_lean(
+                root,
+                ":\n"
+                "    letI inst : Decidable True := inferInstance\n"
+                "    True",
+            )
+            _git(root, "add", ".")
+            _git(root, "commit", "-m", "base")
+
+            _write_lean(
+                root,
+                ":\n"
+                "    letI inst : Decidable True := inferInstance\n"
+                "    True ∧ True",
+            )
+            findings = find_header_changes(
+                root,
+                "HEAD",
+                ["MIPStarRE/LDT/Foo.lean"],
+            )
+            self.assertEqual(len(findings), 1)
+            self.assertIn("True ∧ True", findings[0].new_header)
 
     def test_main_warn_only_returns_zero_for_changed_header(self) -> None:
         with tempfile.TemporaryDirectory() as td:

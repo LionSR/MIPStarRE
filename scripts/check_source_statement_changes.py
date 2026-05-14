@@ -70,10 +70,25 @@ def _header_from_lines(lines: list[str], start_line: int) -> str:
 
     stack: list[str] = []
     pieces: list[str] = []
+    pending_let_assignment = False
     for line in lines[start_line - 1 :]:
         i = 0
         while i < len(line):
+            let_keyword_len = None
+            if not stack:
+                if starts_keyword(line, i, "letI"):
+                    let_keyword_len = len("letI")
+                elif starts_keyword(line, i, "let"):
+                    let_keyword_len = len("let")
+            if let_keyword_len is not None:
+                pending_let_assignment = True
+                i += let_keyword_len
+                continue
             if not stack and line.startswith(":=", i):
+                if pending_let_assignment:
+                    pending_let_assignment = False
+                    i += len(":=")
+                    continue
                 pieces.append(line[:i])
                 return _normalize_header("\n".join(pieces))
             if not stack and starts_keyword(line, i, "where"):
