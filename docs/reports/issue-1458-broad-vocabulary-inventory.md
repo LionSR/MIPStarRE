@@ -20,18 +20,21 @@ case is a statement-drift problem for the paper theorem itself.
 
 ## Summary
 
-The current scan reports 11 unresolved theorem boundaries.  It also records 39
-uses of source-construction context and 2 quoted external theorem interfaces.
+The current broad scan reports no unresolved proof-debt theorem boundaries.  It
+also records 39 uses of source-construction context and 2 quoted external
+theorem interfaces.
 The stricter paper-facing proof-debt check finds no remaining proof-debt header
 occurrence of the agreed bridge, residual, repair, package, producer,
 hypothesis, assumption, obligation, wrapper, bundle, or conditional vocabulary
 in source-labelled public inputs.  It separately classifies 28 faithful boundary
 inputs, such as the boundedness hypothesis and the error-cascade regime.
 
-This is not a proof that the 11 unresolved declarations are unfaithful.  It is
-the remaining statement-comparison frontier for issue #1458.  The correct
-response is to compare each item with the cited source statement and its proof,
-not to rename the data merely to make the scan silent.
+This is not a proof that every remaining source-construction context is already
+faithful.  It says that the current source-labelled theorem entries no longer
+advertise public hypotheses whose names suggest an undisclosed bridge,
+residual, repair, package, witness, data, output, or conclusion package.  The
+correct response remains mathematical comparison with the paper source, not
+renaming data merely to make the scan silent.
 
 ## Chapter 4 Projectivization
 
@@ -53,13 +56,19 @@ the source lemma.
 
 ## Chapter 7 Self-Improvement
 
-There are 11 unresolved semidefinite-programming boundaries, mainly
-`SdpStatementWithSlackness`, `MatrixSdpStatementWithSlackness`, and
-`MatrixSdpOptimalWitness`.  These should remain tied to #1230.  The
-paper-facing self-improvement theorem is not proved by assuming an optimal
-witness or a complementary-slackness statement.  The missing formal theorem must
-produce the required semidefinite-programming data from the hypotheses used in
-the self-improvement argument.
+The former semidefinite-programming projection boundaries have been discharged
+from the paper-facing blueprint entries.  The blueprint no longer advertises
+record projections such as `SdpStatementWithSlackness.exists_measurement_witness`
+or `MatrixSdpOptimalWitness.dualPositive` as if they were independent parts of
+the paper statement.  Instead, `lem:sdp` points to the source-shaped theorem
+`sdp_statement_with_slackness` and to the displayed consequence
+`sdp_slackness_measurement`, whose proof is explicitly tied to #1230.
+
+The #1230 mathematical obligation remains: prove the SDP strong-duality and
+complementary-slackness statement from the paper's canonical SDP argument.  The
+current repair makes that obligation visible as a source-facing theorem with a
+specific measurement-and-slackness consequence; it no longer appears as an
+extra public hypothesis on later paper theorems.
 
 ## Chapter 9 Pasting
 
@@ -121,19 +130,19 @@ hypothesis by a source-facing theorem or by a justified imported result.
 
 ## Unresolved Tokens
 
-| Token | Count |
-|---|---:|
-| `MatrixSdpOptimalWitness` | 4 |
-| `MatrixSdpStatementWithSlackness` | 3 |
-| `MatrixSdpStatementWithSlacknessAndDominance` | 2 |
-| `SdpStatementWithSlackness` | 2 |
+No unresolved broad proof-debt tokens remain in public inputs of paper-facing
+theorem, lemma, proposition, or corollary entries.
 
 ## Repair Order
 
-1. Continue the #1230 SDP discharge path.  Preserve useful intermediate proof
-   content where it exists, but do not present a slackness-witness assumption
-   as the paper theorem.
-2. Keep the Chapter 1 external theorem interfaces unmarked by `\leanok` until
+1. Continue the #1230 SDP discharge path.  Prove
+   `sdp_statement_with_slackness`, and hence `sdp_slackness_measurement`, from
+   the canonical SDP strong-duality and complementary-slackness argument.
+2. Continue the Chapter 4 source-construction audit for `QLayerData`,
+   `QXPLayerData`, and `RankReductionWitness`, checking that each public input
+   represents a fixed object introduced by the paper rather than an unproved
+   proof step.
+3. Keep the Chapter 1 external theorem interfaces unmarked by `\leanok` until
    the external theorem itself is formalized or imported as a justified
    source-facing theorem.
 
