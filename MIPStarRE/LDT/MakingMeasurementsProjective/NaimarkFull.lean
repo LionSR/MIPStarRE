@@ -1,9 +1,10 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkOneMeas
 
 /-!
-# Section 5 — full Naimark packaging
+# Section 5 — questionwise Naimark interface
 
-Questionwise packaging of one-measurement Naimark data for the full theorem.
+Questionwise one-measurement Naimark data.  This is the restricted
+Lean interface recorded below the paper's full tensor-product Naimark theorem.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -12,15 +13,15 @@ namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 open MIPStarRE.LDT
 
-/-! ### Full Naimark dilation (Theorem 5.1) -/
+/-! ### Questionwise Naimark dilation interface -/
 
-/-- **Naimark dilation theorem** (Theorem 5.1, `thm:naimark`).
+/-- Questionwise one-measurement Naimark data.
 
 For each question on each side, apply `oneMeasNaimark` to the corresponding
 submeasurement. This records the local projective dilations and their
 single-measurement expectation-preservation identities; the full tensor-product
 assembly is left for a future strengthening of the statement layer. -/
-private lemma exists_fullNaimarkData
+private lemma exists_questionwiseNaimarkData
     {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     {ι : Type*}
     [Fintype QuestionA] [DecidableEq QuestionA]
@@ -73,9 +74,12 @@ private lemma exists_fullNaimarkData
   · intro y ρ b
     simpa [rightData, hright y] using (rightData y).expectation_preservation ρ b
 
-/-- Assemble the questionwise one-measurement dilations on both sides into the
-paper's full Naimark statement. -/
-theorem naimark {QuestionA OutcomeA QuestionB OutcomeB : Type*}
+/-- Lean-only questionwise Naimark interface.
+
+This theorem proves `NaimarkStatement`, the restricted interface consisting of
+per-question local dilations and single-outcome marginal preservation.  It is
+not the full tensor-product preservation statement of `thm:naimark`. -/
+theorem questionwiseNaimark {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     {ι : Type*}
     [Fintype QuestionA] [DecidableEq QuestionA]
     [Fintype OutcomeA] [DecidableEq OutcomeA]
@@ -87,6 +91,6 @@ theorem naimark {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     (B : IdxSubMeas QuestionB OutcomeB ι) :
     ∃ data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB ι,
       NaimarkStatement ψ A B data :=
-  exists_fullNaimarkData ψ A B
+  exists_questionwiseNaimarkData ψ A B
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

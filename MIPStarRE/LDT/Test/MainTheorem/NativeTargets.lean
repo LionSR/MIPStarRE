@@ -1,9 +1,9 @@
 import MIPStarRE.LDT.Test.MainTheorem.DiagonalCompletion
 
 /-!
-# Main-formal native targets
+# Main-formal final target assembly
 
-Target and residual data used by the final `mainFormal` assembly.
+Final target projection used by the `mainFormal` assembly.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -12,123 +12,100 @@ namespace MIPStarRE.LDT
 
 namespace Test
 
-/-- Paper-shaped residual for the still-external data in the non-vacuous branch.
+namespace MainFormalProjectiveCompletionTransportWitness
 
-Paper origin: `references/ldt-paper/inductive_step.tex:68-173`, the
-role-register, unsymmetrization, and projectivization/completion part of
-`\label{thm:main-formal}`.
-
-The proof body consumes this record in paper order: first it reads the concrete
-role residual, then derives the unsymmetrized POVMs, line-116 evaluated
-consistency, and Step-5 full `G^A/G^B` consistency, and only then consumes the
-post-role Step 6 completion data whose `P^A/P^B` provenance is tied to that
-line-130 consistency. -/
-structure MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
-    (params : Parameters) [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) (eps : Error)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
-    (scalars : MainFormalCascadeScalars params eps k) where
-  /-- The explicit isolated Section 6 residual. -/
-  roleResidual : MainFormalRolePackageResidual params strategy eps hpass k
-  /-- Step 6 completion data after line-130 orthonormalization of the role blocks. -/
-  postRoleDiagonalCompletion :
-    MainFormalPostRolePackageDiagonalCompletionResidual params strategy eps k scalars
-      (roleResidual.rolePackage scalars)
-
-namespace MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
-
-/-- Assemble the final live residual once the concrete Section 6 role residual and
-the post-role line-130 completion residual have both been produced. -/
-theorem nonempty_ofRoleResidualAndCompletion
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {hpass : strategy.PassesLowIndividualDegreeTest eps}
-    {scalars : MainFormalCascadeScalars params eps k}
-    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k)
-    (hcompletion : Nonempty (MainFormalPostRolePackageDiagonalCompletionResidual
-      params strategy eps k scalars (roleResidual.rolePackage scalars))) :
-    Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
-      params strategy eps hpass k scalars) := by
-  rcases hcompletion with ⟨completion⟩
-  exact ⟨{ roleResidual := roleResidual, postRoleDiagonalCompletion := completion }⟩
-
-/-- Construct the final residual from a concrete role-register residual.
+/-- Construct the final projective completion-transport witness from a concrete
+role-register witness.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:130-173`.
 
 This is the source-shaped internal construction target for the non-vacuous
 branch of `mainFormal`.  It reconstructs the paper line-130 cross consistency
-from the role residual and constructs the line-130 orthonormalization residual.
+from the role witness and constructs the line-130 orthonormalization witness.
 The remaining completion step is the explicit proof obligation in
-`MainFormalPostRolePackageDiagonalCompletionResidual.nonempty_ofDiagonalConsistency`;
+`MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency`;
 no match-mass or diagonal-consistency data is accepted as an extra input. -/
-theorem nonempty_ofRoleResidual
+theorem nonempty_ofRoleWitness
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
-    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) :
-    Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
-      params strategy eps hpass k scalars) := by
-  have hpre := roleResidual.diagonalConsistency scalars
-  rcases MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalConsistency
-      hpre with ⟨orthResidual⟩
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps)
+    (roleInductionWitness : MainFormalRoleInductionWitness params strategy eps hpass k) :
+    Nonempty (MainFormalProjectiveCompletionTransportWitness
+      params strategy eps k scalars) := by
+  have hpre := roleInductionWitness.diagonalConsistency scalars
+  rcases MainFormalDiagonalOrthonormalizationWitness.nonempty_ofDiagonalConsistency
+      hpre with ⟨orthWitness⟩
   have hcompletion :
-      Nonempty (MainFormalPostRolePackageDiagonalCompletionResidual
-        params strategy eps k scalars (roleResidual.rolePackage scalars)) :=
-    MainFormalPostRolePackageDiagonalCompletionResidual.nonempty_ofDiagonalConsistency
-      orthResidual hpre
-  exact nonempty_ofRoleResidualAndCompletion roleResidual hcompletion
+      Nonempty (MainFormalDiagonalCompletionWitness
+        params strategy eps k scalars (roleInductionWitness.roleWitness scalars)) :=
+    MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency
+      orthWitness hpre
+  rcases hcompletion with ⟨completion⟩
+  exact ⟨completion.toProjectiveCompletionTransportWitness hsmall hpre⟩
 
-/-- Convert the combined residual to the left-completion residual after the paper
-line-130 consistency has been derived separately.
+end MainFormalProjectiveCompletionTransportWitness
 
-Paper origin: `references/ldt-paper/inductive_step.tex:130-173`. -/
-noncomputable def toLeftCompletionTransportResidual
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {hpass : strategy.PassesLowIndividualDegreeTest eps}
-    {scalars : MainFormalCascadeScalars params eps k}
-    (residual : MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
-      params strategy eps hpass k scalars)
-    (hsmall : ¬ 1 ≤ mainFormalError params k eps) :
-    MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual
-      params strategy eps hpass k scalars :=
-  open MainFormalCascadeRolePackageResidualLeftCompletionTransportResidual in
-  { roleResidual := residual.roleResidual
-    postRoleResidual :=
-      residual.postRoleDiagonalCompletion.toProjectiveCompletionResidual
-        |>.toPostRolePackageLeftCompletionTransportResidual hsmall }
+namespace MainFormalProjectiveCompletionTransportWitness
 
-end MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
+/-- Convert the reconstructed line-156 projective approximation into the native
+`eq:third-goal` self-consistency estimate.
 
-namespace MainFormalCascadeTransportTargets
-
-/-- Add the already-discharged scalar data back to the transport-only targets. -/
-noncomputable def toCascadeTargets {params : Parameters} [FieldModel params.q]
+The only mathematical step performed here is the projective converse of
+`prop:simeq-to-approx`: for projective measurements, an `≈_{ζ₃}` relation gives
+`≃_{ζ₃/2}`, which is exactly paper `eq:third-goal`
+(`references/ldt-paper/inductive_step.tex:159-162`). -/
+theorem selfConsistency
+    {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
-    (targets : MainFormalCascadeTransportTargets params strategy eps k scalars) :
-    MainFormalCascadeTargets params strategy eps k where
-  scalars := scalars
-  leftMeasurement := targets.leftMeasurement
-  rightMeasurement := targets.rightMeasurement
-  pointAConsistency := targets.pointAConsistency
-  pointBConsistency := targets.pointBConsistency
-  selfConsistency := targets.selfConsistency
+    (witness : MainFormalProjectiveCompletionTransportWitness
+      params strategy eps k scalars)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
+    ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily witness.leftMeasurement.toSubMeas)
+      (constSubMeasFamily witness.rightMeasurement.toSubMeas)
+      (scalars.zeta3 / 2) := by
+  let leftConst : IdxProjMeas Unit (Polynomial params) ι := fun _ => witness.leftMeasurement
+  let rightConst : IdxProjMeas Unit (Polynomial params) ι := fun _ => witness.rightMeasurement
+  let pre := witness.toPreProjectiveSelfConsistency hpass
+  have hpre : ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily (unsymmetrizedLeftPOVM witness.roleMeasurement).toSubMeas)
+      (constSubMeasFamily (unsymmetrizedRightPOVM witness.roleMeasurement).toSubMeas)
+      scalars.zeta1 := by
+    simpa [
+      pre,
+      MainFormalProjectiveCompletionTransportWitness.toPreProjectiveSelfConsistency,
+      MainFormalProjectiveCompletionTransportWitness.toUnsymmetrizedPOVMTargets
+    ] using pre.fullSelfConsistency
+  have happroxLine := witness.fullPolynomialConsistency hpre
+  have happroxAtZeta :
+      Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
+        (IdxProjMeas.toIdxSubMeas leftConst)
+        (IdxProjMeas.toIdxSubMeas rightConst)
+        scalars.zeta3 := by
+    change Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily witness.leftMeasurement.toSubMeas)
+      (constSubMeasFamily witness.rightMeasurement.toSubMeas)
+      scalars.zeta3
+    exact happroxLine
+  have happrox :
+      Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
+        (IdxProjMeas.toIdxSubMeas leftConst)
+        (IdxProjMeas.toIdxSubMeas rightConst)
+        (2 * (scalars.zeta3 / 2)) := by
+    convert happroxAtZeta using 1
+    ring
+  have hcons :=
+    Preliminaries.approxToSimeq strategy.state (uniformDistribution Unit)
+      leftConst rightConst (scalars.zeta3 / 2) happrox
+  simpa [leftConst, rightConst, constSubMeasFamily, IdxProjMeas.toIdxSubMeas] using hcons
 
-end MainFormalCascadeTransportTargets
-
-/-- Paper-native final targets for the remaining `mainFormal` assembly.
-
-This structure deliberately stops before the final error-envelope weakening. Its
-three consistency fields are exactly the native conclusions reached in
-`references/ldt-paper/inductive_step.tex`:
+/-- Final packaging step for `thm:main-formal` once the projective-completion
+transport witness has been constructed.
 
 * `eq:one-goal` (lines 175--181):
   $A^{\mathrm A,u}_a \otimes I \simeq_{\zeta_4}
@@ -139,56 +116,16 @@ three consistency fields are exactly the native conclusions reached in
 * `eq:third-goal` (lines 160--162):
   $Q^{\mathrm A}_g \otimes I \simeq_{\zeta_3/2} I \otimes Q^{\mathrm B}_g$.
 
-The two bound fields record the already-formalized Step 8 absorption of
-`\zeta_4` and `\zeta_3/2` into `mainFormalError`. Constructing this data from
-Section 6 and the unsymmetrization / Schwartz--Zippel / projectivization chain is
-the live residual; the projection theorem below is only the final paper-faithful
-assembly step. -/
-structure MainFormalNativeTargets
-    (params : Parameters) [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ) where
-  /-- The projective measurement denoted $Q^{\mathrm A}$ in the paper. -/
-  leftMeasurement : ProjMeas (Polynomial params) ι
-  /-- The projective measurement denoted $Q^{\mathrm B}$ in the paper. -/
-  rightMeasurement : ProjMeas (Polynomial params) ι
-  /-- The paper's self-consistency error `\zeta_3`. -/
-  zeta3 : Error
-  /-- The paper's two point-consistency error `\zeta_4`. -/
-  zeta4 : Error
-  /-- Native form of `eq:one-goal`, before weakening to `mainFormalError`. -/
-  pointAConsistency :
-    ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      (polynomialEvaluationFamily params rightMeasurement.toSubMeas)
-      zeta4
-  /-- Native form of `eq:another-goal`, before weakening to `mainFormalError`. -/
-  pointBConsistency :
-    ConsRel strategy.state (uniformDistribution (Point params))
-      (polynomialEvaluationFamily params leftMeasurement.toSubMeas)
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-      zeta4
-  /-- Native form of `eq:third-goal`, before its point-evaluation data processing. -/
-  selfConsistency :
-    ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily leftMeasurement.toSubMeas)
-      (constSubMeasFamily rightMeasurement.toSubMeas)
-      (zeta3 / 2)
-  /-- Step 8 scalar absorption for the two point-consistency targets. -/
-  pointErrorLe : zeta4 ≤ mainFormalError params k eps
-  /-- Step 8 scalar absorption for the self-consistency target. -/
-  selfErrorLe : zeta3 / 2 ≤ mainFormalError params k eps
-
-namespace MainFormalNativeTargets
-
-/-- Final packaging step for `thm:main-formal` once the formal native targets have
-been constructed. This only weakens the native `\zeta_4` and `\zeta_3/2` bounds to
-`mainFormalError` using `ConsRel.mono`; all substantive transport work is in the
-construction of `MainFormalNativeTargets`. -/
+This theorem performs only the Step 8 weakening from the paper cascade errors
+to `mainFormalError` using `ConsRel.mono`; the substantive construction is in
+the projective-completion transport witness. -/
 theorem toMainFormal {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    (targets : MainFormalNativeTargets params strategy eps k) :
+    {scalars : MainFormalCascadeScalars params eps k}
+    (witness : MainFormalProjectiveCompletionTransportWitness
+      params strategy eps k scalars)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
@@ -202,38 +139,18 @@ theorem toMainFormal {params : Parameters} [FieldModel params.q]
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  refine ⟨targets.leftMeasurement, targets.rightMeasurement, ?_, ?_, ?_⟩
-  · exact ConsRel.mono targets.pointErrorLe targets.pointAConsistency
-  · exact ConsRel.mono targets.pointErrorLe targets.pointBConsistency
-  · exact ConsRel.mono targets.selfErrorLe targets.selfConsistency
+  refine ⟨witness.leftMeasurement, witness.rightMeasurement, ?_, ?_, ?_⟩
+  · exact ConsRel.mono
+      (MainFormalCascadeScalars.zeta4_le_mainFormalError scalars)
+      (witness.pointAConsistency hpass)
+  · exact ConsRel.mono
+      (MainFormalCascadeScalars.zeta4_le_mainFormalError scalars)
+      (witness.pointBConsistency hpass)
+  · exact ConsRel.mono
+      (MainFormalCascadeScalars.zeta3_div_two_le_mainFormalError scalars)
+      (witness.selfConsistency hpass)
 
-end MainFormalNativeTargets
-
-namespace MainFormalCascadeTargets
-
-/-- Convert exact cascade-error targets into `MainFormalNativeTargets` by applying
-the already-formalized Step 8 scalar absorption lemmas.
-
-This is still only packaging: the assumptions are the `eq:one-goal`,
-`eq:another-goal`, and `eq:third-goal` statements at the formal cascade errors
-from `inductive_step.tex` lines 159--185, with the Step 6 `ζ₂` scalar widened
-as documented in `ErrorCascade.lean`. -/
-noncomputable def toNativeTargets {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    (targets : MainFormalCascadeTargets params strategy eps k) :
-    MainFormalNativeTargets params strategy eps k where
-  leftMeasurement := targets.leftMeasurement
-  rightMeasurement := targets.rightMeasurement
-  zeta3 := targets.scalars.zeta3
-  zeta4 := targets.scalars.zeta4
-  pointAConsistency := targets.pointAConsistency
-  pointBConsistency := targets.pointBConsistency
-  selfConsistency := targets.selfConsistency
-  pointErrorLe := MainFormalCascadeScalars.zeta4_le_mainFormalError targets.scalars
-  selfErrorLe := MainFormalCascadeScalars.zeta3_div_two_le_mainFormalError targets.scalars
-
-end MainFormalCascadeTargets
+end MainFormalProjectiveCompletionTransportWitness
 
 end Test
 

@@ -11,13 +11,17 @@ review aid for that boundary:
 * resolve those references to public Lean declarations under ``MIPStarRE/``;
 * inspect only the public input portion of the declaration header after the
   declaration name and before the result type;
-* report occurrences of proof-debt vocabulary such as ``BridgeHypotheses``,
-  ``Residual``, ``RepairInput``, ``Package``, ``Producer``, an ``Input``
-  bundle, or a generic ``Hypotheses`` / ``Assumptions`` bundle;
-* reject paper-facing blueprint entries that point to declaration names of the
-  form ``*_of...Obligations``, ``*_of...Residual``, ``*_of...Repair``, or
-  ``conditional...``, even when the declaration header itself has no suspicious
-  public input.
+* report occurrences of blocking proof-debt vocabulary such as
+  ``BridgeHypotheses``, ``Residual``, ``RepairInput``, ``Package``,
+  ``Bundle``, ``Conditional``, ``Producer``, ``Obligation``, an ``Input``
+  bundle, a wrapper, an ``Unfaithful`` marker type, or a generic
+  ``Hypotheses`` / ``Assumptions`` bundle;
+* reject paper-facing blueprint entries that point to declaration names with
+  conditional proof-debt forms such as ``*_of...Obligations``,
+  ``*_of...Residual``, ``*_of...Repair``, ``*_of...Bundle``,
+  ``*_of...Unfaithful``, ``*_assuming...``, ``conditional...``, or
+  ``Conditional...``, even when the declaration header itself has no
+  suspicious public input.
 * classify known faithful boundary-input packages separately, with paper
   citations, so they do not become indistinguishable from proof debt.
 
@@ -52,16 +56,41 @@ DEBT_TOKEN_RE = re.compile(
     r"(?<![A-Za-z0-9_'])"
     r"(?:"
     r"(?:[A-Za-z_][A-Za-z0-9_']*)?"
-    r"(?:Bridge|Residual|Repair|Package|Producer|Input|Hypotheses|Assumptions)"
+    r"(?:"
+    r"Bridge|Residual|Repair|Package|Producer|Input|Hypotheses|Assumptions"
+    r"|Hypothesis|Obligation|Obligations|Wrapper|Bundle|Conditional"
+    r"|Unfaithful|CompletionTransport"
+    r")"
     r"[A-Za-z0-9_']*"
     r"|"
     r"(?:h|has|mk|of)?"
-    r"(?:bridge|residual|repair|package|producer|input|hypotheses|assumptions)"
+    r"(?:"
+    r"bridge|residual|repair|package|producer|input|hypotheses|assumptions"
+    r"|hypothesis|obligation|obligations|wrapper|bundle|conditional"
+    r"|unfaithful|completionTransport"
+    r")"
     r"[A-Za-z0-9_']*"
     r")"
     r"(?![A-Za-z0-9_'])"
 )
 
+# The following tokens are deliberately not treated as proof-debt findings.
+# Each entry is a small public structure whose fields are visible in the
+# corresponding source statement, or are scalar side conditions used to make an
+# implicit paper regime explicit.
+#
+# * CascadeHypotheses contains only the numeric regime used by the final error
+#   cascade: k >= 1, m >= 1, 0 <= eps <= 1, d <= q, and q > 0.  These are not
+#   bridge data.  The paper calculation at inductive_step.tex:187-234 uses the
+#   unit-scale assumptions when comparing fractional powers and absorbing lower
+#   powers into k^2 m^4; the blueprint states them explicitly in
+#   ch10_induction.tex:545-564.
+# * SliceBoundednessInput contains the boundedness item from
+#   commutativity-G.tex:29-36 and ld-pasting.tex:28-35: positive witnesses Z^x,
+#   the averaged residual bound, and the pointwise domination
+#   Z^x >= E_u A^{u,x}_{g(u)}.  It must not contain an additional Lean-only
+#   identification field; issue #1556 removed the former
+#   dominationTargetAgrees bridge from this public input.
 FAITHFUL_BOUNDARY_TOKENS = {
     "CascadeHypotheses": (
         "faithful encoding of the standing numeric regime for the error cascade; "
@@ -81,7 +110,11 @@ CONDITIONAL_DECL_NAME_RE = re.compile(
     r"|BridgeHypotheses"
     r"|BridgeInputs"
     r"|(?:^|_)of(?:[A-Z][A-Za-z0-9_']*)?"
-    r"(?:Bridge|Obligations|Residual|Repair|Package|Input|Hypotheses|Assumptions)"
+    r"(?:"
+    r"Bridge|Obligations|Obligation|Residual|Repair|Package|Input|Hypotheses"
+    r"|Assumptions|Statement|Output|Conclusion|Witness|Wrapper|Bundle|Unfaithful"
+    r"|Slackness|Dominance"
+    r")"
     r"[A-Za-z0-9_']*"
     r"|(?:^|_)ofRepaired[A-Za-z0-9_']*"
     r"|(?:^|_)assuming[A-Za-z0-9_']*"

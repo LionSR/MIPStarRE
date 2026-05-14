@@ -62,7 +62,12 @@ private lemma fullSliceCommutation_of_evaluated
         params strategy family gamma zeta
         hnorm hgamma_nonneg hzeta_nonneg _hself hEval)
 
-/-- `thm:com-main`. -/
+/-- Paper origin: `references/ldt-paper/commutativity-G.tex`
+(`\label{thm:com-main}`).
+
+The paper theorem is formulated directly for the family `family.meas`; any
+explicit auxiliary family used by the scalar approximation proof is internal to
+the proof. -/
 theorem comMain
     (params : Parameters)
     [FieldModel params.q]
@@ -71,15 +76,13 @@ theorem comMain
     (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (hG : ∀ x, G x = (family.meas x).toSubMeas)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
-    ComMainConclusion params strategy family G gamma zeta := by
+    ComMainConclusion params strategy family gamma zeta := by
   let hEval :=
-    commDataProcessedG params strategy eps delta gamma zeta hnorm hgood family G
-      hG hcons hself hbound
+    commDataProcessedG params strategy eps delta gamma zeta hnorm hgood family
+      hcons hself hbound
   have hSpecialized :
       SDDOpRel strategy.state
         (uniformDistribution (EvaluatedSliceQuestion params))
@@ -88,7 +91,7 @@ theorem comMain
         (commDataProcessedGError params gamma zeta) := by
     constructor
     rw [evaluationSpecialization_sddErrorOp_eq]
-    exact hEval.evaluatedSliceCommutation.squaredDistanceBound
+    exact hEval.squaredDistanceBound
   have hzeta_nonneg : 0 ≤ zeta :=
     le_trans (sddError_nonneg _ _ _ _)
       hself.sliceSelfConsistency.squaredDistanceBound
@@ -99,15 +102,11 @@ theorem comMain
         (Finset.sum_nonneg fun j _ =>
           bipartiteConsError_nonneg strategy.state _ _ _)
     exact le_trans this hgood.diagonalLineTest
-  refine
-    { evaluatedCommutation := hEval
-      evaluationSpecialization := hSpecialized
-      fullSliceCommutation := by
-        exact
-          fullSliceCommutation_of_evaluated
-            params strategy family gamma zeta
-            hnorm hgamma_nonneg hzeta_nonneg
-            hself hSpecialized }
+  exact
+    fullSliceCommutation_of_evaluated
+      params strategy family gamma zeta
+      hnorm hgamma_nonneg hzeta_nonneg
+      hself hSpecialized
 
 /-- `lem:normalization-condition`. -/
 lemma normalizationCondition {OutcomeA OutcomeB : Type*}

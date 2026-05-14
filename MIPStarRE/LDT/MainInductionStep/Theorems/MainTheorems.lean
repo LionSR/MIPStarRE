@@ -1,7 +1,7 @@
 import MIPStarRE.LDT.Basic.LinePolynomialEmbedding
-import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementBridge
+import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly
 import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds
-import MIPStarRE.LDT.MainInductionStep.Theorems.PackageConstructors
+import MIPStarRE.LDT.MainInductionStep.Theorems.StageDataConstructors
 
 /-!
 # Section 6 — Main Induction Theorems

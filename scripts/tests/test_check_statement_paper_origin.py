@@ -116,6 +116,19 @@ class SuffixTests(unittest.TestCase):
     def test_residual_suffix(self) -> None:
         self.assertTrue(_matches_suffix("FooResidual"))
 
+    def test_extended_proof_debt_suffixes(self) -> None:
+        for suffix in (
+            "Output",
+            "Repair",
+            "Obligation",
+            "Obligations",
+            "Wrapper",
+            "Slackness",
+            "Dominance",
+            "CompletionTransport",
+        ):
+            self.assertTrue(_matches_suffix(f"Foo{suffix}"))
+
     def test_other_suffix_skipped(self) -> None:
         self.assertFalse(_matches_suffix("FooBar"))
         self.assertFalse(_matches_suffix("FooStatementHelper"))

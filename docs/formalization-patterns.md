@@ -78,7 +78,7 @@ are being actively removed.
    temporary `sorry` in this declaration is preferable to adding the obligation as
    a hypothesis on the paper theorem.
 4. **Do not introduce conditional helpers by default.**  A helper such as
-   `mainFormal_ofProjectiveCompletionResidual` is a quarantine device, not a
+   `mainFormal_ofProjectiveCompletionTransportWitness` is a quarantine device, not a
    normal formalization pattern.  It may remain temporarily only when it
    preserves substantial proof content that cannot yet be connected to the paper
    hypotheses, has a tracked discharge or deletion target, and has no
@@ -99,6 +99,31 @@ internal theorem that will remove the dependency.  A named proof obligation
 with a tracked `sorry` is preferred whenever possible, because it makes the
 missing mathematical assertion visible without adding it to the paper theorem
 statement.
+
+### Required metadata for new proof-obligation declarations
+
+A new declaration whose name contains a proof-debt token such as `Bridge`,
+`Residual`, `Repair`, `Package`, `Producer`, `Input`, `Hypotheses`,
+`Assumptions`, `Obligation`, or `Witness` must explain its mathematical role in
+the def-site docstring.  A paper citation alone is not enough, because the
+reviewer must be able to tell whether the declaration is part of the paper
+statement or a Lean-only proof obligation.
+
+Use one of the following markers.
+
+| Marker | Use |
+|--------|-----|
+| `**Source:**`, `**Paper source:**`, or `**Source statement:**` | The declaration is a faithful formal encoding of a cited source statement or a field of that statement |
+| `**Faithful encoding:**` | The declaration records boundary data or domain data that the paper uses implicitly |
+| `**Proof obligation:**` or `**Internal proof obligation:**` | The declaration is a theorem or record that must be proved from the paper hypotheses before a source theorem is complete |
+| `**Conditional:**` | The declaration is a conditional helper; it must not be linked as the source theorem |
+| `**Unfaithful:**` | The declaration or proof currently depends on a load-bearing assumption not yet derived from the paper hypotheses |
+
+Proof-obligation, conditional, and unfaithful markers must cite a paper-gap note
+or tracking issue and must state the planned discharge or elimination theorem.
+If such a declaration would merely package missing work as an added hypothesis
+to a source theorem, do not introduce it; restore the source theorem statement
+and leave the missing proof as a tracked `sorry`.
 
 ### Conditional helper boundary
 
@@ -132,7 +157,7 @@ statement.
 
 4. **Final closure at the paper theorem.**  The theorem `mainFormal` in
    `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` is reserved for the
-   paper-shaped statement.  If the residual needed by the final transport has
+   paper-shaped statement.  If the witness needed by the final transport has
    not yet been constructed from the paper hypotheses, the theorem should remain
    an explicit unfinished proof.  Do not replace the missing construction by
    extra bridge, residual, repair, package, or obligation hypotheses, and do not
@@ -144,8 +169,8 @@ statement.
    domains.  Bridge, residual, repair, and proof-obligation inputs must be
    produced inside its proof rather than added to its statement.  Reusable proof
    content may remain in a plainly conditional helper, such as
-   `mainFormal_ofProjectiveCompletionResidual`, whose statement displays the
-   residual it assumes.
+   `mainFormal_ofProjectiveCompletionTransportWitness`, whose statement displays the
+   witness it assumes.
 
 ### Existing bridge-like declarations
 
@@ -155,9 +180,11 @@ When such a declaration remains useful, its role should be one of the following:
 
 | Declaration | Status to maintain |
 |-------------|--------------------|
-| `mainFormal_ofProjectiveCompletionResidual` | Conditional final-transport theorem; keep as reusable proof content, but do not present it as the paper theorem |
-| `MainFormalPostRolePackageDiagonalOrthonormalizationResidual` | Internal residual produced from line-130 cross consistency; do not replace it by an orthonormalization-input hypothesis on `mainFormal` |
-| `LdPastingContext` | Faithfulness-sensitive context for `ldPasting`; audit each field against the Section 12 hypotheses and boundary conditions |
+| `mainFormal_ofProjectiveCompletionTransportWitness` | Conditional final-transport theorem; keep as reusable proof content, but do not present it as the paper theorem |
+| `MainFormalDiagonalOrthonormalizationWitness` | Internal witness produced from line-130 cross consistency; do not replace it by an orthonormalization-input hypothesis on `mainFormal` |
+| `LdPastingNontrivialContext` | Nontrivial-regime context for `ldPastingNontrivial`; do not present it as the unrestricted `thm:ld-pasting` context |
+| `Pasting.ldPastingNontrivial` | Restricted nontrivial-regime form of `thm:ld-pasting`; link only from a Lean-only remark until the complementary trivial cases in `references/ldt-paper/ld-pasting.tex`, lines 52--55, are formalized |
+| `MainInductionStep.ldPastingInInductionSectionNontrivial` | Restricted nontrivial-regime restatement of the pasting theorem for Section 6; do not present it as the unrestricted source theorem |
 
 The former `SelfImprovement.HelperStrongSelfConsistencyInput`,
 `SelfImprovement.OrthonormalizationInput`, `SelfImprovement.FinalFieldsInput`, and
@@ -170,28 +197,29 @@ source-facing theorem until proved from the paper hypotheses.
 
 The direct tracked `sorry` in `MainFormal.lean` records the remaining
 construction obligation for the paper theorem.  The proof must construct, from
-the hypotheses of `thm:main-formal`, the projective-completion residual consumed
-by `mainFormal_ofProjectiveCompletionResidual`.  The Section 6 role residual is
+the hypotheses of `thm:main-formal`, the projective-completion witness consumed
+by `mainFormal_ofProjectiveCompletionTransportWitness`.  The Section 6 role witness is
 now obtained by applying the theorem `MainInductionStep.mainInduction`
-through `MainFormalRolePackageResidual.ofMainInductionLargeK`; the successor
+through `MainFormalRoleInductionWitness.ofMainInductionLargeK`; the successor
 branch of that call remains the tracked `sorry` in the source Section 6 theorem,
 not an added hypothesis of `mainFormal`.  The remaining Section 3 work includes:
 
 1. The successor projective-completion obligation.  It must construct the
-   line-130 orthonormalization residual from cross consistency and supply the
+   line-130 orthonormalization witness from cross consistency and supply the
    completion data used after `completingToMeasurement`.
-2. The base-case projective-completion residual obligation, whose target is the
-   direct `Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
-   ...)` needed by the final transport.
+2. The base-case projective-completion witness obligation, whose active target
+   is a direct
+   `Nonempty (MainFormalProjectiveCompletionTransportWitness ...)`
+   needed by the final transport.
 
 These are data-construction obligations.  Once the per-slice self-improvement
 proof obligations and recursive induction data are threaded through, the
-paper-labelled theorem should construct the residual and call
-`mainFormal_ofProjectiveCompletionResidual`, without adding obligations to the
+paper-labelled theorem should construct the witness and call
+`mainFormal_ofProjectiveCompletionTransportWitness`, without adding obligations to the
 theorem statement.
 
 This is the intended cleanup direction: use the conditional helper only to
-identify reusable proof content, then prove the residual construction or keep
+identify reusable proof content, then prove the witness construction or keep
 the paper-aligned theorem with the remaining proof gap visible.
 
 ### Distinction from anti-patterns
@@ -259,10 +287,10 @@ proof-level `\leanok`:
   Its proof still contains the tracked issue-#1032 `sorry` for the sharp
   `100 * ζ^(1/4)` constant, so proof-level `\leanok` is withheld.
 
-- **`thm:naimark`** (ch04): The Lean declaration records questionwise
-  local dilations, not the full tensor-product correlation statement in
-  the paper.  The comment in the blueprint explicitly says "no \leanok
-  is claimed."
+- **`thm:naimark`** (ch04): The full tensor-product correlation theorem has
+  no attached Lean declaration.  The formalized questionwise local interface is
+  recorded separately in the restricted Lean remark
+  `rem:lean-questionwise-naimark`.
 
 - **`thm:main-formal`** (ch02): The blueprint links to
   `MIPStarRE.LDT.Test.mainFormal`, the intended Lean transcription of the
@@ -270,6 +298,19 @@ proof-level `\leanok`:
   proof chain is not yet closed, so `\leanok` is deliberately withheld for this
   theorem until the repaired-hypotheses and successor-residual obligations are
   discharged.
+
+- **`thm:ld-pasting`** (ch09) and
+  **`thm:ld-pasting-in-induction-section`** (ch10): The paper theorem in
+  `references/ldt-paper/ld-pasting.tex`, lines 12--50, assumes
+  `k >= 400md` but does not state the nontrivial-regime inequalities as
+  hypotheses.  The current Lean declarations `Pasting.ldPastingNontrivial` and
+  `MainInductionStep.ldPastingInInductionSectionNontrivial` prove restricted forms with
+  the additional public assumptions `gamma <= 1`, `zeta <= 1`, `d <= q`,
+  `0 < d`, and `1 <= k`.  Lines 52--55 of the paper explain the reduction to
+  the nontrivial regime, but the complementary trivial cases have not yet been
+  formalized.  The source theorem nodes therefore do not carry primary
+  `\lean{}` links or statement-level `\leanok`; the checked restricted
+  declarations are linked from nearby Lean-only remarks.
 
 ### The `\uses{}` convention
 

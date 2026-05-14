@@ -68,7 +68,13 @@ Run commands from the repository root unless noted otherwise.
 ```bash
 lake exe cache get
 lake build
+scripts/install_git_hooks.sh
+scripts/install_git_hooks.sh --check
 ```
+
+Run the hook check in every fresh worktree before preparing a PR.  The hooks
+move fast statement-integrity, proof-debt, changed-file Lean, and blueprint-sync
+checks to the local workflow so CI is not spent on preventable statement drift.
 
 ### Full project build (CI-equivalent)
 

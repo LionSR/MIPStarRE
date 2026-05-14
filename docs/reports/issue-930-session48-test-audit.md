@@ -89,7 +89,14 @@ ConsRel strategy.state (uniformDistribution (Point params))
   (mainFormalError params k eps)
 ```
 
-(`MainTheorem.lean:4013-4025`; the same target is packaged by `MainFormalNativeTargets.toMainFormal` at `MainTheorem.lean:3913-3929`.) Since the first `ConsRel` family acts on the left tensor factor and the second on the right tensor factor, this expresses exactly the paper's three conclusions: Alice's point measurement versus Bob's polynomial measurement, Alice's polynomial measurement versus Bob's point measurement, and the two polynomial measurements against each other. I did not find a new tensor-placement discrepancy here.
+The same target is now obtained by the final weakening theorem
+`MainFormalProjectiveCompletionTransportWitness.toMainFormal`.  Since
+the first `ConsRel` family acts on the left tensor factor and the second on the
+right tensor factor, this expresses exactly the paper's three conclusions:
+Alice's point measurement versus Bob's polynomial measurement, Alice's
+polynomial measurement versus Bob's point measurement, and the two polynomial
+measurements against each other. I did not find a new tensor-placement
+discrepancy here.
 
 ## Finding 5: line parametrization and covariance are faithful bookkeeping
 
@@ -127,7 +134,12 @@ lake env lean MIPStarRE/LDT/Test/AxiomAudit.lean
 
 `MainTheorem.lean` emitted the expected warning that `mainFormal` uses `sorry`; the other targeted files were clean. A scratch check confirmed the key type signatures used in this audit: `ProjStrat` is two-space, `SameSpaceProjStrat` is same-space, `ProjStrat.PassesLowIndividualDegreeTest` is available from `StrategyBiProj`, and `mainFormal` takes `SameSpaceProjStrat`, `0 < params.d`, `400 * params.m * params.d ≤ k`, and `0 < k`.
 
-Scratch `#print axioms` checks showed only `[propext, Classical.choice, Quot.sound]` for `razSafra`, `classicalTestSoundness`, `mainFormal_trivial_witness`, `MainFormalNativeTargets.toMainFormal`, `SameSpaceProjStrat.strategySymmetrization_isGood_three_mul`, and `SameSpaceProjStrat.strategySymmetrizationPackage`. The same scratch file showed `sorryAx` for `mainFormal`, exactly as expected from the excluded live residual.
+Scratch `#print axioms` checks showed only `[propext, Classical.choice,
+Quot.sound]` for `razSafra`, `classicalTestSoundness`,
+`mainFormal_trivial_witness`, the final main-formal target weakening theorem,
+`SameSpaceProjStrat.strategySymmetrization_isGood_three_mul`, and
+`SameSpaceProjStrat.strategySymmetrizationPackage`. The same scratch file showed
+`sorryAx` for `mainFormal`, exactly as expected from the excluded live residual.
 
 The audited-scope grep
 

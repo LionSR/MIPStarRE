@@ -1,6 +1,6 @@
 import Mathlib.Analysis.Convex.SpecificFunctions.Pow
 import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds
-import MIPStarRE.LDT.MainInductionStep.Theorems.PackageConstructors
+import MIPStarRE.LDT.MainInductionStep.Theorems.StageDataConstructors
 
 /-!
 # Section 6 — Averaged Slice Error Bounds

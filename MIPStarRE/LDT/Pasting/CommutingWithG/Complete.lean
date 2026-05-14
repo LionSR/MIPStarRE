@@ -18,9 +18,10 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- The paper's scalar inequality
-`12·√ζ + 4·√θ₁ ≤ ν₂`, where `θ₁ = θ(ζ, ζ, comMainError)` is the first switcheroo
-error. The proof uses `firstSwitcherooError_le_eighth_stage` to bound `θ₁` by
-`36m · eighthSum`, then a sqrt/rpow chain to land on `ν₂ = commutingWithGCompleteError`. -/
+`12·√ζ + 4·√θ₁ ≤ ν₂`, where `θ₁ = θ(ζ, ζ, comMainError)` is the first
+switcheroo error. The proof uses `firstSwitcherooError_le_eighth_stage` to bound
+`θ₁` by `36m · eighthSum`, then a sqrt/rpow chain to land on
+`ν₂ = commutingWithGCompleteError`. -/
 private lemma secondSwitcherooError_le_commutingWithGCompleteError
     (params : Parameters) [FieldModel params.q]
     (gamma zeta : Error)
@@ -152,7 +153,8 @@ private lemma secondSwitcherooError_le_commutingWithGCompleteError
           Real.rpow gamma (1 / (16 : Error)) + Real.rpow zeta (1 / (16 : Error)) := by
       linarith
     have hsum2 :
-        Real.rpow gamma (1 / (16 : Error)) + Real.rpow zeta (1 / (16 : Error)) ≤ sixteenthSum := by
+        Real.rpow gamma (1 / (16 : Error)) + Real.rpow zeta (1 / (16 : Error)) ≤
+          sixteenthSum := by
       have hsum2' :
           Real.rpow gamma (1 / (16 : Error)) + Real.rpow zeta (1 / (16 : Error)) ≤
             Real.rpow gamma (1 / (16 : Error)) + Real.rpow zeta (1 / (16 : Error)) +
@@ -197,12 +199,11 @@ theorem commutingWithGComplete
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
     (gamma zeta : Error)
     (hgamma_nonneg : 0 ≤ gamma) (hgamma : gamma ≤ 1)
     (hzeta_nonneg : 0 ≤ zeta) (hzeta : zeta ≤ 1)
     (hd_le_q : params.d ≤ params.q)
-    (hcom : Commutativity.ComMainConclusion params strategy family G gamma zeta)
+    (hcom : Commutativity.ComMainConclusion params strategy family gamma zeta)
     (hself : GCompleteSelfConsistencyStatement params strategy.state family zeta) :
     CommutingWithGCompleteStatement params strategy.state family gamma zeta := by
   have hswitch₁ :
@@ -213,7 +214,7 @@ theorem commutingWithGComplete
         strategy.densityFixed
         family family.meas zeta zeta
         (Commutativity.comMainError params gamma zeta)
-        hself hself.completePartSelfConsistency hcom.fullSliceCommutation
+        hself hself.completePartSelfConsistency hcom
   have hpoint_raw :
       SDDOpRel strategy.state
         (uniformDistribution (SlicePairQuestion params))
@@ -289,7 +290,7 @@ theorem commutingWithGComplete
     { pairwiseCompletePartCommutation := by
         simpa [pairwiseCompletePartCommutationError,
           Commutativity.fullSliceProductLeft, Commutativity.fullSliceProductRight,
-          Commutativity.leftOrderedProductOpFamily] using hcom.fullSliceCommutation
+          Commutativity.leftOrderedProductOpFamily] using hcom
       pointWithCompletePartCommutation := hpoint
       completePartCommutation :=
         MIPStarRE.LDT.Preliminaries.sddOpRel_mono strategy.state

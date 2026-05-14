@@ -15,9 +15,10 @@ The **one-measurement Naimark lemma** (`OneMeasNaimarkLemma`) is the
 building block: any submeasurement can be dilated to a projective
 submeasurement on a space enlarged by one auxiliary register.
 
-The full **Naimark dilation** (`NaimarkStatement`) combines per-question
-one-measurement dilations into a single statement about bipartite
-correlations on the fully enlarged space.
+The questionwise **Naimark interface** (`NaimarkStatement`) records the
+per-question one-measurement dilations and their single-outcome marginal
+preservation identities.  It is not the full tensor-product statement of
+`\label{thm:naimark}`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -37,7 +38,7 @@ def OneMeasNaimarkLemma (α : Type*) [Fintype α] [DecidableEq α]
     (M : MIPStarRE.Quantum.Submeasurement α d) : Prop :=
   ∃ data : OneMeasNaimarkData α d, data.source = M
 
-/-! ### Full Naimark dilation statement -/
+/-! ### Questionwise Naimark interface -/
 
 /-- Paper origin: deliberate paper-gap (`docs/paper-gaps/naimark.tex`).
 
@@ -55,10 +56,10 @@ state-dependent non-preservation example
 (`references/ldt-paper/orthonormalization.tex:189-272`) are tracked
 separately, see `docs/paper-gaps/naimark.tex`.
 
-This records the questionwise one-measurement Naimark dilations used in the
-full theorem: each `A x` and `B y` is equipped with a local projective dilation
-preserving all single-outcome expectations. The full tensor-product assembly is
-tracked separately. -/
+This records the questionwise one-measurement Naimark dilations that appear in
+the proof of the full theorem: each `A x` and `B y` is equipped with a local
+projective dilation preserving all single-outcome expectations. The
+tensor-product assembly of the paper theorem is tracked separately. -/
 structure NaimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     {ι : Type*}
     [Fintype QuestionA] [DecidableEq QuestionA]

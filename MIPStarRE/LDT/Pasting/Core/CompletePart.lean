@@ -165,7 +165,8 @@ lemma qSDD_completePart_le_slice
               have hLherm : (leftTensor (ι₂ := ι) T)ᴴ = leftTensor (ι₂ := ι) T := by
                 exact
                   (Matrix.nonneg_iff_posSemidef.mp
-                    (leftTensor_nonneg (ι₂ := ι) (SubMeas.total_nonneg P.toSubMeas))).isHermitian.eq
+                    (leftTensor_nonneg (ι₂ := ι)
+                      (SubMeas.total_nonneg P.toSubMeas))).isHermitian.eq
               have hRherm : (rightTensor (ι₁ := ι) T)ᴴ = rightTensor (ι₁ := ι) T := by
                 exact
                   (Matrix.nonneg_iff_posSemidef.mp
@@ -323,7 +324,6 @@ theorem gBotSelfConsistency
     (hcomplete : GCompleteSelfConsistencyStatement params ψbi family zeta) :
     GBotSelfConsistencyStatement params ψbi family zeta := by
   refine {
-    completePartWitness := hcomplete
     incompletePartSelfConsistency := ?_
   }
   rcases hcomplete.completePartSelfConsistency with ⟨hcomplete_bound⟩
@@ -398,9 +398,11 @@ theorem gBotSelfConsistency
                     (((leftTensor (ι₂ := ι) T - rightTensor (ι₁ := ι) T)ᴴ) *
                       (leftTensor (ι₂ := ι) T - rightTensor (ι₁ := ι) T)) := by
                           have hswap :
-                              ((rightTensor (ι₁ := ι) T)ᴴ - (leftTensor (ι₂ := ι) T)ᴴ) *
+                              ((rightTensor (ι₁ := ι) T)ᴴ -
+                                  (leftTensor (ι₂ := ι) T)ᴴ) *
                                   (rightTensor (ι₁ := ι) T - leftTensor (ι₂ := ι) T) =
-                                ((leftTensor (ι₂ := ι) T)ᴴ - (rightTensor (ι₁ := ι) T)ᴴ) *
+                                ((leftTensor (ι₂ := ι) T)ᴴ -
+                                    (rightTensor (ι₁ := ι) T)ᴴ) *
                                   (leftTensor (ι₂ := ι) T - rightTensor (ι₁ := ι) T) := by
                             noncomm_ring
                           simpa [sub_eq_add_neg] using congrArg (ev ψbi) hswap

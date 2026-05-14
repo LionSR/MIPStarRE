@@ -5,6 +5,7 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.LayerAlgebr
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.ProjectorApprox
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.PositiveGram.Sigma
 import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
+import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.MatchMass
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 import MIPStarRE.LDT.Preliminaries.CompletionTransfer
 import MIPStarRE.LDT.Preliminaries.DistanceBounds
@@ -429,6 +430,76 @@ theorem leftLiftedProjectivizationRepairProducer
     exact hsource.trans hζ_le
   exact leftLiftedProjectivizationRepairProducer_of_sourceAlmostProjective_two_mul
     ψ hψ A ζ hsource_two
+
+/-- Source-facing name for the locality-preserving projectivization repair.
+
+This is the same theorem as `leftLiftedProjectivizationRepairProducer`, recorded
+under a name suitable for the blueprint entry
+`lem:left-lifted-projectivization-repair`.  The statement is the Section 5
+construction theorem: from the source almost-projective estimate for the
+left-lifted family, it constructs a local projective submeasurement whose left
+lift is close with the `84 ζ^(1/4)` envelope.  The historical `Producer` name
+is retained for compatibility with existing Section 5 declarations; it is not a
+separate source hypothesis. -/
+theorem leftLiftedProjectivizationRepair
+    {Outcome : Type*} {ι : Type*}
+    [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized)
+    (A : Measurement Outcome ι) (ζ : Error)
+    (hsource :
+      ∑ a, ev ψ
+        ((leftLiftedMeasurement (ιB := ι) A).outcome a -
+          (leftLiftedMeasurement (ιB := ι) A).outcome a *
+            (leftLiftedMeasurement (ιB := ι) A).outcome a) ≤ ζ) :
+    ∃ P : ProjSubMeas Outcome ι,
+      RoundedProjMeasStatement ψ (leftLiftedMeasurement (ιB := ι) A)
+        (ProjSubMeas.liftLeft P) (orthonormalizationMainLemmaError ζ) :=
+  leftLiftedProjectivizationRepairProducer ψ hψ A ζ hsource
+
+/-- Locality-preserving projectivization repair with the exact line-169
+match-mass preservation obligation kept at the QXP construction point.
+
+This is the producer-level obligation isolated by #1610.  The ordinary repair
+producer above proves the state-dependent-distance estimate and returns only
+the projective submeasurement, thereby forgetting the QXP data.  The final
+Step 6 line-169 argument needs the stronger fact that the same QXP data
+preserves every diagonal outcome expectation against the fixed opposite
+measurement `B`.  Until the QXP calculation is formalized, the remaining
+`sorry` is kept here, where the construction data belongs, rather than in the
+final theorem layer.
+
+Paper origin: `references/ldt-paper/orthonormalization.tex:862-1194` for the
+`Q/X/XHat/P` construction and `references/ldt-paper/inductive_step.tex:135-169`
+for the match-mass use in the main induction.
+
+**Unfaithful:** This proof currently contains the #1610 proof obligation: the
+QXP outcome-expectation preservation calculation has not yet been derived from
+`references/ldt-paper/orthonormalization.tex:862-1194` and
+`references/ldt-paper/inductive_step.tex:135-169`.  Elimination: prove the
+outcome-expectation preservation inequality for the same `Q/X/XHat/P` data
+returned by the repair construction, and remove the local `sorry`. -/
+theorem leftLiftedProjectivizationRepairWithMatchMass
+    {Outcome : Type*} {ι : Type*}
+    [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized)
+    (A B : Measurement Outcome ι) (ζ : Error)
+    (hsource :
+      ∑ a, ev ψ
+        ((leftLiftedMeasurement (ιB := ι) A).outcome a -
+          (leftLiftedMeasurement (ιB := ι) A).outcome a *
+            (leftLiftedMeasurement (ιB := ι) A).outcome a) ≤ ζ) :
+    ∃ data : QXPLayerData Outcome ι,
+      RoundedProjMeasStatement ψ (leftLiftedMeasurement (ιB := ι) A)
+          (ProjSubMeas.liftLeft (qxpProjSubMeas data))
+          (orthonormalizationMainLemmaError ζ) ∧
+        OrthonormalizationMatchMassPreservation.QXPLayerOutcomeExpectationPreservation
+          ψ A B data := by
+  -- TODO(#1610): prove the QXP outcome-expectation preservation calculation
+  -- for the projectors `P_a = XHat† T_a XHat` produced by the concrete repair
+  -- construction, and return the same data used for the rounded family.
+  sorry
 
 end
 

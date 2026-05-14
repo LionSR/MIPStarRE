@@ -1,11 +1,11 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementBridge.Core
+import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly.Core
 
 /-!
-# Section 6 — Answer-Valued Self-Improvement Slice Obligations
+# Section 6 — Answer-Valued Self-Improvement Slice Transport
 
-This file contains the answer-valued analogues of the Section 6 slice-obligation
+This file contains the answer-valued analogues of the Section 6 slice-transport
 constructors.  The ordinary construction, including `selfImprovementInInductionSection`,
-lives in `SelfImprovementBridge.Core` and is imported here so that the
+lives in `SelfImprovementAssembly.Core` and is imported here so that the
 answer-valued construction can reuse the same Section 9 self-improvement
 theorem.
 
@@ -21,7 +21,7 @@ open scoped MatrixOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Obligations for producing the answer-valued self-improvement data from
+/-- Transport data for producing the answer-valued self-improvement data from
 concrete per-slice symmetric strategies.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
@@ -39,7 +39,7 @@ The Section 9 analytic proof debt is not stored in this record.  The package
 constructor below calls
 `selfImprovementInInductionSection`, whose present proof gap is the tracked
 place where that work belongs. -/
-structure AnswerSelfImprovementPackage.SliceObligations
+structure AnswerSelfImprovementPackage.SliceStrategyTransport
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -77,7 +77,7 @@ from point-measurement transport.
 Both sides unfold to the same average over `strategy.pointMeasurement
 (appendPoint params u x)` once the concrete slice point measurement is identified
 with `xRestrictedAnswerSymStrat`. -/
-theorem AnswerSelfImprovementPackage.SliceObligations.averagedPoint_eq_of_pointMeasurement_eq
+theorem AnswerSelfImprovementPackage.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -94,7 +94,7 @@ theorem AnswerSelfImprovementPackage.SliceObligations.averagedPoint_eq_of_pointM
     IdxPolyFamily.averagedSlicePointEvaluationOperator, hpoint x,
     xRestrictedAnswerSymStrat_pointMeasurement_apply]
 
-/-- Build answer-valued `SliceObligations` without separately assuming averaged
+/-- Build answer-valued `SliceStrategyTransport` without separately assuming averaged
 point-operator compatibility.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551`; the averaged
@@ -104,7 +104,7 @@ restricted slice interface and the Section 9 interface.
 The structural averaged-point field is derived from `pointMeasurement_eq`; the
 remaining inputs are the concrete slice strategies, their state transport, and
 their restricted-profile goodness. -/
-noncomputable def AnswerSelfImprovementPackage.SliceObligations.ofPointMeasurementEq
+noncomputable def AnswerSelfImprovementPackage.SliceStrategyTransport.ofPointMeasurementEq
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -125,13 +125,13 @@ noncomputable def AnswerSelfImprovementPackage.SliceObligations.ofPointMeasureme
           (restrictionPkg.profile.axisParallel x)
           (restrictionPkg.profile.selfConsistency x)
           (restrictionPkg.profile.diagonal x)) :
-    AnswerSelfImprovementPackage.SliceObligations params strategy eps delta gamma k
+    AnswerSelfImprovementPackage.SliceStrategyTransport params strategy eps delta gamma k
       restrictionPkg inductionPkg where
   sliceStrategy := sliceStrategy
   state_eq := state_eq
   pointMeasurement_eq := pointMeasurement_eq
   averagedPoint_eq :=
-    AnswerSelfImprovementPackage.SliceObligations.averagedPoint_eq_of_pointMeasurement_eq
+    AnswerSelfImprovementPackage.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq
       params strategy sliceStrategy pointMeasurement_eq
   good := good
 
@@ -142,7 +142,7 @@ The diagonal compatibility is stated only after postprocessing both diagonal
 answer alphabets to their `zeroCoord` value; this is the comparison used by the
 LDT diagonal subtest and avoids claiming a false equality between
 `DiagonalLinePolynomial` and `DiagonalLineAnswer` families. -/
-theorem AnswerSelfImprovementPackage.SliceObligations.good_of_restrictedGood
+theorem AnswerSelfImprovementPackage.SliceStrategyTransport.good_of_restrictedGood
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -198,7 +198,7 @@ theorem AnswerSelfImprovementPackage.SliceObligations.good_of_restrictedGood
       simp [state_eq x, pointMeasurement_eq x, diagonalZeroCoord_eq x]
     simpa [hfail] using hgood.diagonalLineTest
 
-/-- Build answer-valued `SliceObligations` from concrete slice strategies and
+/-- Build answer-valued `SliceStrategyTransport` from concrete slice strategies and
 verifier-visible measurement transport.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
@@ -208,7 +208,7 @@ This constructor fills both structural fields forced by the answer-restricted
 interface: averaged point compatibility follows from point-measurement transport,
 and goodness follows from the answer-restricted failure profile plus state,
 axis-parallel, and diagonal zero-coordinate transport. -/
-noncomputable def AnswerSelfImprovementPackage.SliceObligations.ofMeasurementEq
+noncomputable def AnswerSelfImprovementPackage.SliceStrategyTransport.ofMeasurementEq
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -236,12 +236,12 @@ noncomputable def AnswerSelfImprovementPackage.SliceObligations.ofMeasurementEq
             (((xRestrictedAnswerSymStrat params strategy x).diagonalMeasurement.toIdxProjMeas
               ℓ).toSubMeas)
             (fun f : DiagonalLineAnswer params => f zeroCoord)) :
-    AnswerSelfImprovementPackage.SliceObligations params strategy eps delta gamma k
+    AnswerSelfImprovementPackage.SliceStrategyTransport params strategy eps delta gamma k
       restrictionPkg inductionPkg :=
-  AnswerSelfImprovementPackage.SliceObligations.ofPointMeasurementEq
+  AnswerSelfImprovementPackage.SliceStrategyTransport.ofPointMeasurementEq
     params strategy eps delta gamma k restrictionPkg inductionPkg sliceStrategy state_eq
     pointMeasurement_eq
-    (AnswerSelfImprovementPackage.SliceObligations.good_of_restrictedGood
+    (AnswerSelfImprovementPackage.SliceStrategyTransport.good_of_restrictedGood
       params strategy eps delta gamma restrictionPkg sliceStrategy state_eq
       pointMeasurement_eq axisParallelMeasurement_eq diagonalZeroCoord_eq)
 
@@ -335,7 +335,7 @@ back to the answer-valued restricted-slice interface via the recorded state and
 point-measurement equalities. The theorem itself is currently a tracked proof
 gap (#1503); this constructor does not carry the Section 9 proof debt as an
 additional package hypothesis. -/
-noncomputable def AnswerSelfImprovementPackage.ofSliceObligations
+noncomputable def AnswerSelfImprovementPackage.ofSliceStrategyTransport
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -344,8 +344,8 @@ noncomputable def AnswerSelfImprovementPackage.ofSliceObligations
     (restrictionPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma)
     (inductionPkg :
       AnswerPerSliceInductionPackage params strategy eps delta gamma restrictionPkg k)
-    (sliceObligations :
-      AnswerSelfImprovementPackage.SliceObligations params strategy eps delta gamma k
+    (sliceTransport :
+      AnswerSelfImprovementPackage.SliceStrategyTransport params strategy eps delta gamma k
         restrictionPkg inductionPkg) :
     AnswerSelfImprovementPackage params strategy eps delta gamma k restrictionPkg inductionPkg := by
   classical
@@ -353,42 +353,42 @@ noncomputable def AnswerSelfImprovementPackage.ofSliceObligations
     AnswerSelfImprovementPackage.ofSelfImprovementInInductionSection
       params strategy eps delta gamma k restrictionPkg inductionPkg ?_
   intro x
-  let sliceStrategy := sliceObligations.sliceStrategy x
+  let sliceStrategy := sliceTransport.sliceStrategy x
   have hconsSlice :
       ConsRel sliceStrategy.state (uniformDistribution (Point params))
         (IdxProjMeas.toIdxSubMeas sliceStrategy.pointMeasurement)
         (polynomialEvaluationFamily params (inductionPkg.sliceMeasurement x).toSubMeas)
         (inductionPkg.sliceError x) := by
     have hcons := inductionPkg.pointConsistency x
-    rw [← sliceObligations.state_eq x, ← sliceObligations.pointMeasurement_eq x] at hcons
+    rw [← sliceTransport.state_eq x, ← sliceTransport.pointMeasurement_eq x] at hcons
     simpa [sliceStrategy] using hcons
   rcases selfImprovementInInductionSection params
-      (sliceObligations.sliceStrategy x)
+      (sliceTransport.sliceStrategy x)
       (restrictionPkg.profile.axisParallel x)
       (restrictionPkg.profile.selfConsistency x)
       (restrictionPkg.profile.diagonal x)
       (inductionPkg.sliceError x)
-      (sliceObligations.good x)
+      (sliceTransport.good x)
       (inductionPkg.sliceMeasurement x).toSubMeas
       hconsSlice with
     ⟨H, Z, hH⟩
   refine ⟨H, Z, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · have hcomp := hH.completeness
-    rw [sliceObligations.state_eq x] at hcomp
+    rw [sliceTransport.state_eq x] at hcomp
     simpa [answerSliceSelfImprovementError] using hcomp
   · have hpoint := hH.pointConsistency
-    rw [sliceObligations.state_eq x, sliceObligations.pointMeasurement_eq x] at hpoint
+    rw [sliceTransport.state_eq x, sliceTransport.pointMeasurement_eq x] at hpoint
     simpa [answerSliceSelfImprovementError] using hpoint
   · have hssc := hH.strongSelfConsistency
-    rw [sliceObligations.state_eq x] at hssc
+    rw [sliceTransport.state_eq x] at hssc
     simpa [answerSliceSelfImprovementError] using hssc
   · have hclose := hH.selfCloseness
-    rw [sliceObligations.state_eq x] at hclose
+    rw [sliceTransport.state_eq x] at hclose
     simpa [answerSliceSelfImprovementError] using hclose
   · have hbounded := hH.bounded
-    rw [sliceObligations.state_eq x] at hbounded
+    rw [sliceTransport.state_eq x] at hbounded
     simpa [answerSliceSelfImprovementError] using hbounded
   · intro h
-    simpa [sliceObligations.averagedPoint_eq x h] using hH.dominatesAveragePointOperator h
+    simpa [sliceTransport.averagedPoint_eq x h] using hH.dominatesAveragePointOperator h
 
 end MIPStarRE.LDT.MainInductionStep
