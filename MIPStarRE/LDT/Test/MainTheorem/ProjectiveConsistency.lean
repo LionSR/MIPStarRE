@@ -13,7 +13,7 @@ submodules:
   evaluation at a sampled point (`consRel_constPolynomialEvaluation`).
 
 * `ProjectiveConsistency.CompletionTransport` — the finer completion-transport
-  residual that reconstructs the line-156 handoff from completion closeness
+  witness that reconstructs the line-156 handoff from completion closeness
   and transports the repaired line-169 consistency estimates to the two
   final point-consistency targets at `ζ₄`.
 

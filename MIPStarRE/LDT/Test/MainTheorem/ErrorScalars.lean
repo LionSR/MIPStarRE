@@ -281,7 +281,7 @@ noncomputable def zeta1 {params : Parameters} {eps : Error} {k : ℕ}
 
 /-- The formal Step 6 scalar
 `ζ₂ = 200ζ₁^(1/4) + 42ζ₁^(1/8)`, widening the paper's printed coefficient
-`40` to absorb the residual completion term. -/
+`40` to absorb the extra completion term. -/
 noncomputable def zeta2 {params : Parameters} {eps : Error} {k : ℕ}
     (scalars : MainFormalCascadeScalars params eps k) : Error :=
   cascadeZeta2 scalars.zeta1

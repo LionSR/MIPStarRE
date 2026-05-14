@@ -6,12 +6,12 @@ import MIPStarRE.LDT.Test.MainTheorem.NativeTargets
 Base handoff, final projective-completion transport, and the paper-facing proof
 gap for `thm:main-formal` (`\Cref{thm:main-formal}`).  This module contains:
 
-* `mainFormalBaseRoleResidual` — names the Section 6 role-register residual
+* `mainFormalBaseRoleInductionWitness` — names the Section 6 role-register witness
   used by the base case `m = 1`.
 
-* `mainFormal_ofProjectiveCompletionResidual` — derives the three consistency
+* `mainFormal_ofProjectiveCompletionTransportWitness` — derives the three consistency
   conclusions of `thm:main-formal` from a constructed Section 6
-  projective-completion residual.
+  projective-completion witness.
 
 * `mainFormal` — the paper theorem statement, taking a projective strategy that
   passes the LID test with probability `≥ 1 − ε`, together with the explicit
@@ -19,7 +19,7 @@ gap for `thm:main-formal` (`\Cref{thm:main-formal}`).  This module contains:
   pointwise consistency targets at error bound `mainFormalError`.  Its proof now
   follows the checked branch structure: the vacuous branch is closed by
   `mainFormal_trivial_witness`, the non-vacuous branch invokes the Section 6
-  role-register residual, the post-role projective-completion construction
+  role-register witness, the post-role projective-completion construction
   target, and the final transport.  The remaining proof gaps are the named
   construction theorems used by this chain, not additional hypotheses of
   `mainFormal`.
@@ -44,43 +44,43 @@ namespace Test
 
 /-! ### Base handoff and final projective-completion transport
 
-The base branch of `mainFormal` needs a concrete Section 6 role residual and one
-post-role projective-completion residual.  Earlier scaffolding expressed this
+The base branch of `mainFormal` needs a concrete Section 6 role witness and one
+post-role projective-completion witness.  Earlier scaffolding expressed this
 through separate bridge and obligation packages.  The current public theorem below
 does not keep such packages as hypotheses: the theorem remains paper-shaped, and
 the missing construction is represented by a direct proof gap. -/
 
 
-/-- The role-register residual used by the `m = 1` branch of
+/-- The role-register witness used by the `m = 1` branch of
 `mainFormal`.
 
 Supports the base case (`m = 1`) of the main formal theorem
 `\label{thm:main-formal}` in `references/ldt-paper/inductive_step.tex`.
-The base-case argument uses the residual produced by
-`MainFormalRolePackageResidual.ofBaseCase`; this definition names that choice. -/
-noncomputable def mainFormalBaseRoleResidual
+The base-case argument uses the witness produced by
+`MainFormalRoleInductionWitness.ofBaseCase`; this definition names that choice. -/
+noncomputable def mainFormalBaseRoleInductionWitness
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (hm1 : params.m = 1) :
-    MainFormalRolePackageResidual params strategy eps hpass k :=
-  Classical.choice (MainFormalRolePackageResidual.ofBaseCase params strategy eps k hpass hm1)
+    MainFormalRoleInductionWitness params strategy eps hpass k :=
+  Classical.choice (MainFormalRoleInductionWitness.ofBaseCase params strategy eps k hpass hm1)
 
 /-- Derives the three consistency conclusions of `thm:main-formal` from a
-constructed Section 6 projective-completion residual.
+constructed Section 6 projective-completion witness.
 
-The residual contains the role-register output and the post-role completion
+The witness contains the role-register output and the post-role completion
 data.  This theorem performs only the already-formalized final transport and
 scalar absorption steps; it does not introduce additional bridge hypotheses. -/
-theorem mainFormal_ofProjectiveCompletionResidual
+theorem mainFormal_ofProjectiveCompletionTransportWitness
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
-    (projectiveCompletionResidual :
-      MainFormalCascadeProjectiveCompletionTransportResidual params strategy eps k scalars) :
+    (projectiveCompletionWitness :
+      MainFormalProjectiveCompletionTransportWitness params strategy eps k scalars) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
@@ -94,15 +94,15 @@ theorem mainFormal_ofProjectiveCompletionResidual
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  exact MainFormalCascadeProjectiveCompletionTransportResidual.toMainFormal
-    projectiveCompletionResidual hpass
+  exact MainFormalProjectiveCompletionTransportWitness.toMainFormal
+    projectiveCompletionWitness hpass
 
 /--
 `thm:main-formal` from `test_definition.tex`.
 
 This is the paper theorem statement. The statement includes the large-`k` and
 positive-boundary conditions currently needed by the formalization, but it does
-not assume the repaired bridge, role-register residual data, or final
+not assume repaired bridge data, role-register witness data, or final
 projective-completion hypotheses. Those remain open steps to be derived from the
 pass condition and the preceding sections.
 
@@ -114,8 +114,8 @@ Section 6 successor theorem rather than an additional mathematical restriction.
 
 **Proof gap:** the paper-facing statement has no bridge, residual, repair, or
 obligation hypotheses.  In the non-vacuous branch the proof constructs the
-scalar cascade and role-register residual from the paper hypotheses, then calls
-`MainFormalCascadeProjectiveCompletionTransportResidual.nonempty_ofRoleResidual`
+scalar cascade and role-register witness from the paper hypotheses, then calls
+`MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness`
 and the already proved final transport.  The transitive proof gaps are therefore
 localized in the named construction theorems: the Section 6 successor proof
 inside `MainInductionStep.mainInduction`, and the two match-mass preservation
@@ -149,14 +149,14 @@ theorem mainFormal
   · have hepsNN : 0 ≤ eps := SameSpaceProjStrat.eps_nonneg_of_passes hpass
     let scalars : MainFormalCascadeScalars params eps k :=
       MainFormalCascadeScalars.ofNontrivialMainFormal hepsNN hk0 hlarge
-    rcases MainFormalRolePackageResidual.ofMainInductionLargeK
-        params strategy eps k hpass hk with ⟨roleResidual⟩
+    rcases MainFormalRoleInductionWitness.ofMainInductionLargeK
+        params strategy eps k hpass hk with ⟨roleInductionWitness⟩
     rcases
-        MainFormalCascadeProjectiveCompletionTransportResidual.nonempty_ofRoleResidual
-          (scalars := scalars) hlarge roleResidual with
-      ⟨projectiveCompletionResidual⟩
-    exact mainFormal_ofProjectiveCompletionResidual (hpass := hpass)
-      projectiveCompletionResidual
+        MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness
+          (scalars := scalars) hlarge roleInductionWitness with
+      ⟨projectiveCompletionWitness⟩
+    exact mainFormal_ofProjectiveCompletionTransportWitness (hpass := hpass)
+      projectiveCompletionWitness
 
 end Test
 

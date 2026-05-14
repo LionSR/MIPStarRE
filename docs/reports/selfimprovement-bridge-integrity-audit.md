@@ -41,7 +41,7 @@ compiles independently, and the MainInductionStep module wires them together in
 principle.  The remaining gap is now represented in the correct place:
 `mainFormal` is again the paper-facing theorem statement, and its proof contains
 the tracked construction gap directly.  The proved final-transport theorem
-`mainFormal_ofProjectiveCompletionResidual` is retained as useful proof content,
+`mainFormal_ofProjectiveCompletionTransportWitness` is retained as useful proof content,
 but no public theorem supplies completion data as an additional hypothesis.
 
 The architecture is therefore incomplete, but the theorem boundary is no longer
@@ -155,10 +155,10 @@ projective-completion inputs.
 The current proof gap is direct: `mainFormal` must construct the Section 6 role
 residual and the post-role projective-completion residual from the paper
 hypotheses.  The Section 6 role residual is routed through
-`MainFormalRolePackageResidual.ofMainInductionLargeK`, whose successor branch is
+`MainFormalRoleInductionWitness.ofMainInductionLargeK`, whose successor branch is
 the tracked `sorry` in `MainInductionStep.mainInduction`.  Once the role
 residual and post-role completion residual are available, the proved theorem
-`mainFormal_ofProjectiveCompletionResidual` supplies the final three consistency
+`mainFormal_ofProjectiveCompletionTransportWitness` supplies the final three consistency
 conclusions.
 
 ---
@@ -272,7 +272,7 @@ residual as hypotheses.
 
 The missing successor construction needs:
 
-- the Section 6 role residual, via `MainFormalRolePackageResidual.ofMainInductionLargeK`;
+- the Section 6 role residual, via `MainFormalRoleInductionWitness.ofMainInductionLargeK`;
 - the post-role projective-completion residual, from the line-130
   orthonormalization and completion estimates.
 
@@ -285,7 +285,7 @@ The missing successor construction needs:
 | SelfImprovement | ~50 theorems/lemmas | 2 paper theorem statements (`selfImprovementHelper`, `selfImprovement`) | The paper statements are visible; their remaining derivations are tracked proof gaps |
 | SelfImprovement sub-lemmas (slackness, matrix bridge) | ~15 proved lemmas | 0 called from MI or MT | Entirely orphan |
 | MainInductionStep | `selfImprovementInInductionSection`, `SelfImprovementPackage.ofSliceObligations`, `ldPastingInInductionSection`, `mainInductionByRecursionOnM` | Internal assembly remains in `MainTheorems.lean` | `mainInductionByRecursionOnM` takes `hselfObligation` as an internal input; the public wrapper has been removed |
-| MainTheorem | `mainFormal`, `mainFormal_ofProjectiveCompletionResidual` | Paper-facing theorem plus proved final transport from a constructed completion residual | Role-residual and post-role completion constructions remain tracked proof gaps |
+| MainTheorem | `mainFormal`, `mainFormal_ofProjectiveCompletionTransportWitness` | Paper-facing theorem plus proved final transport from a constructed completion residual | Role-residual and post-role completion constructions remain tracked proof gaps |
 
 ---
 
@@ -372,7 +372,7 @@ which this audit is meant to prevent.
 | `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` | `mainInduction`, `mainInductionBaseCase`, `mainInductionByRecursionOnM` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/PackageConstructors.lean` | `AveragedPastingInput.output`, `mainInductionFromPackages` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly.lean` | `assembleAveragedPastingInput` |
-| `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | `mainFormal` and `mainFormal_ofProjectiveCompletionResidual`; paper theorem plus proved final transport |
+| `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | `mainFormal` and `mainFormal_ofProjectiveCompletionTransportWitness`; paper theorem plus proved final transport |
 | `MIPStarRE/LDT/Test/MainTheorem/RoleRegister.lean` | Role-register residual constructors routed through Section 6 `mainInduction` |
 | `MIPStarRE/LDT/Test/MainTheorem/OrdinaryRestriction/Basic.lean` | Ordinary restricted-slice weighted bounds and recursive-slice targets |
 | `MIPStarRE/LDT/Test/MainTheorem/AnswerValuedRestriction.lean` | Answer-valued restricted-slice weighted bounds and recursive-slice targets |

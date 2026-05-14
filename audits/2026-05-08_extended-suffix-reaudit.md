@@ -115,7 +115,7 @@ consumer pair on inspection. Similarly:
   dead.
 - All 15 `*Package` structures are heavily used
   (`SelfImprovementPackage` → 54, `SliceRestrictionPackage` → 53,
-  `MainFormalRoleMeasurementPackage` → 44, etc.).
+  `MainFormalRoleMeasurementWitness` → 44, etc.).
 - All 6 `*Hypothesis(es)` structures are connected.
 
 ## Pattern analysis

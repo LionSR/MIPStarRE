@@ -10,7 +10,7 @@ existing factor-two unsymmetrization estimates from
 Schwartz–Zippel bridge in `MainFormalCascadePreProjectiveSelfConsistency`
 to convert an evaluated pre-projective link into the full-polynomial
 self-consistency relation at error `ζ₁`.  The later projective-completion
-residual carries the completed measurements through the line-156 handoff and
+witness carries the completed measurements through the line-156 handoff and
 the native `ζ₄` point-consistency targets.
 
 ## References
@@ -22,7 +22,7 @@ the native `ζ₄` point-consistency targets.
   assembly (lines 134–172).
 * Blueprint: `blueprint/src/chapter/ch10_induction.tex`,
   `\label{rem:main-formal-unsymmetrization-bridge}` and
-  `\label{rem:main-formal-lean-residual-records}`.
+  `\label{rem:main-formal-lean-witness-records}`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -152,7 +152,7 @@ theorem fullSelfConsistency {params : Parameters} [FieldModel params.q]
       scalars.zeta1 := by
   simpa [MainFormalCascadeScalars.zeta1, cascadeZeta1, Nat.cast_mul, add_assoc,
     add_left_comm, add_comm] using
-    (mainFormalStep5_selfConsistency_ofExpansionResidual params strategy.state
+    (mainFormalStep5_selfConsistency_ofExpansionBound params strategy.state
       strategy.isNormalized pre.leftPOVM.toSubMeas pre.rightPOVM.toSubMeas
       (2 * scalars.sigma + 2 * Real.sqrt (3 * eps + 2 * scalars.sigma))
       pre.evaluatedSelfConsistency)
@@ -226,9 +226,9 @@ noncomputable def toPreProjectiveSelfConsistency
 
 end MainFormalCascadeUnsymmetrizedPOVMTargets
 
-namespace MainFormalRolePackageResidual
+namespace MainFormalRoleInductionWitness
 
-/-- Reconstruct paper line 130 directly from a concrete Section 6 role residual.
+/-- Reconstruct paper line 130 directly from a concrete Section 6 role witness.
 
 This names the paper-order handoff used several times below: first extract the
 role-measurement record, then unsymmetrize it, prove line 116 by the point-measurement
@@ -238,23 +238,23 @@ noncomputable def diagonalConsistency
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
-    (residual : MainFormalRolePackageResidual params strategy eps hpass k)
+    (witness : MainFormalRoleInductionWitness params strategy eps hpass k)
     (scalars : MainFormalCascadeScalars params eps k) :
     ConsRel strategy.state (uniformDistribution Unit)
       (constSubMeasFamily
-        (unsymmetrizedLeftPOVM (residual.rolePackage scalars).roleMeasurement).toSubMeas)
+        (unsymmetrizedLeftPOVM (witness.roleWitness scalars).roleMeasurement).toSubMeas)
       (constSubMeasFamily
-        (unsymmetrizedRightPOVM (residual.rolePackage scalars).roleMeasurement).toSubMeas)
+        (unsymmetrizedRightPOVM (witness.roleWitness scalars).roleMeasurement).toSubMeas)
       scalars.zeta1 := by
-  let rolePackage := residual.rolePackage scalars
-  let bridge := rolePackage.toUnsymmetrizationBridge
+  let roleWitness := witness.roleWitness scalars
+  let bridge := roleWitness.toUnsymmetrizationBridge
   let targets : MainFormalCascadeUnsymmetrizedPOVMTargets params strategy eps k scalars :=
     MainFormalCascadeUnsymmetrizedPOVMTargets.ofUnsymmetrizationBridge
-      rolePackage.roleMeasurement bridge
+      roleWitness.roleMeasurement bridge
   let pre := targets.toPreProjectiveSelfConsistency hpass
-  simpa [rolePackage, pre] using pre.fullSelfConsistency
+  simpa [roleWitness, pre] using pre.fullSelfConsistency
 
-end MainFormalRolePackageResidual
+end MainFormalRoleInductionWitness
 
 end Test
 

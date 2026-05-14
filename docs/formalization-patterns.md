@@ -78,7 +78,7 @@ are being actively removed.
    temporary `sorry` in this declaration is preferable to adding the obligation as
    a hypothesis on the paper theorem.
 4. **Do not introduce conditional helpers by default.**  A helper such as
-   `mainFormal_ofProjectiveCompletionResidual` is a quarantine device, not a
+   `mainFormal_ofProjectiveCompletionTransportWitness` is a quarantine device, not a
    normal formalization pattern.  It may remain temporarily only when it
    preserves substantial proof content that cannot yet be connected to the paper
    hypotheses, has a tracked discharge or deletion target, and has no
@@ -132,7 +132,7 @@ statement.
 
 4. **Final closure at the paper theorem.**  The theorem `mainFormal` in
    `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` is reserved for the
-   paper-shaped statement.  If the residual needed by the final transport has
+   paper-shaped statement.  If the witness needed by the final transport has
    not yet been constructed from the paper hypotheses, the theorem should remain
    an explicit unfinished proof.  Do not replace the missing construction by
    extra bridge, residual, repair, package, or obligation hypotheses, and do not
@@ -144,8 +144,8 @@ statement.
    domains.  Bridge, residual, repair, and proof-obligation inputs must be
    produced inside its proof rather than added to its statement.  Reusable proof
    content may remain in a plainly conditional helper, such as
-   `mainFormal_ofProjectiveCompletionResidual`, whose statement displays the
-   residual it assumes.
+   `mainFormal_ofProjectiveCompletionTransportWitness`, whose statement displays the
+   witness it assumes.
 
 ### Existing bridge-like declarations
 
@@ -155,8 +155,8 @@ When such a declaration remains useful, its role should be one of the following:
 
 | Declaration | Status to maintain |
 |-------------|--------------------|
-| `mainFormal_ofProjectiveCompletionResidual` | Conditional final-transport theorem; keep as reusable proof content, but do not present it as the paper theorem |
-| `MainFormalPostRolePackageDiagonalOrthonormalizationResidual` | Internal residual produced from line-130 cross consistency; do not replace it by an orthonormalization-input hypothesis on `mainFormal` |
+| `mainFormal_ofProjectiveCompletionTransportWitness` | Conditional final-transport theorem; keep as reusable proof content, but do not present it as the paper theorem |
+| `MainFormalDiagonalOrthonormalizationWitness` | Internal witness produced from line-130 cross consistency; do not replace it by an orthonormalization-input hypothesis on `mainFormal` |
 | `LdPastingNontrivialContext` | Nontrivial-regime context for `ldPastingNontrivial`; do not present it as the unrestricted `thm:ld-pasting` context |
 | `Pasting.ldPastingNontrivial` | Restricted nontrivial-regime form of `thm:ld-pasting`; link only from a Lean-only remark until the complementary trivial cases in `references/ldt-paper/ld-pasting.tex`, lines 52--55, are formalized |
 | `MainInductionStep.ldPastingInInductionSectionNontrivial` | Restricted nontrivial-regime restatement of the pasting theorem for Section 6; do not present it as the unrestricted source theorem |
@@ -172,29 +172,29 @@ source-facing theorem until proved from the paper hypotheses.
 
 The direct tracked `sorry` in `MainFormal.lean` records the remaining
 construction obligation for the paper theorem.  The proof must construct, from
-the hypotheses of `thm:main-formal`, the projective-completion residual consumed
-by `mainFormal_ofProjectiveCompletionResidual`.  The Section 6 role residual is
+the hypotheses of `thm:main-formal`, the projective-completion witness consumed
+by `mainFormal_ofProjectiveCompletionTransportWitness`.  The Section 6 role witness is
 now obtained by applying the theorem `MainInductionStep.mainInduction`
-through `MainFormalRolePackageResidual.ofMainInductionLargeK`; the successor
+through `MainFormalRoleInductionWitness.ofMainInductionLargeK`; the successor
 branch of that call remains the tracked `sorry` in the source Section 6 theorem,
 not an added hypothesis of `mainFormal`.  The remaining Section 3 work includes:
 
 1. The successor projective-completion obligation.  It must construct the
-   line-130 orthonormalization residual from cross consistency and supply the
+   line-130 orthonormalization witness from cross consistency and supply the
    completion data used after `completingToMeasurement`.
-2. The base-case projective-completion residual obligation, whose active target
+2. The base-case projective-completion witness obligation, whose active target
    is a direct
-   `Nonempty (MainFormalCascadeProjectiveCompletionTransportResidual ...)`
+   `Nonempty (MainFormalProjectiveCompletionTransportWitness ...)`
    needed by the final transport.
 
 These are data-construction obligations.  Once the per-slice self-improvement
 proof obligations and recursive induction data are threaded through, the
-paper-labelled theorem should construct the residual and call
-`mainFormal_ofProjectiveCompletionResidual`, without adding obligations to the
+paper-labelled theorem should construct the witness and call
+`mainFormal_ofProjectiveCompletionTransportWitness`, without adding obligations to the
 theorem statement.
 
 This is the intended cleanup direction: use the conditional helper only to
-identify reusable proof content, then prove the residual construction or keep
+identify reusable proof content, then prove the witness construction or keep
 the paper-aligned theorem with the remaining proof gap visible.
 
 ### Distinction from anti-patterns

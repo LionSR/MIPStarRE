@@ -12,7 +12,7 @@ Date: 2026-05-07
 > cleanup also removed
 > `MainFormalCascadeRolePackageResidualProjectiveCompletionResidual`; the active
 > construction target is now
-> `MainFormalCascadeProjectiveCompletionTransportResidual`.
+> `MainFormalProjectiveCompletionTransportWitness`.
 >
 > **Status note, 2026-05-13.**  The post-role diagonal completion theorem now
 > reduces to two named match-mass preservation obligations,
@@ -40,15 +40,15 @@ Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
 
 This intermediate structure has since been removed.  The corresponding active
 internal target is now a direct construction of
-`MainFormalCascadeProjectiveCompletionTransportResidual` from the role residual
+`MainFormalProjectiveCompletionTransportWitness` from the role residual
 and the post-role diagonal completion theorem.
 
 **The removed structure had two fields**:
 
 | Field | Type | Paper Reference |
 |-------|------|-----------------|
-| `roleResidual` | `MainFormalRolePackageResidual params strategy eps hpass k` | Section 6 witness |
-| `postRoleDiagonalCompletion` | `MainFormalPostRolePackageDiagonalCompletionResidual params strategy eps k scalars (roleResidual.rolePackage scalars)` | Post-role line-130 completion |
+| `roleInductionWitness` | `MainFormalRoleInductionWitness params strategy eps hpass k` | Section 6 witness |
+| `postRoleDiagonalCompletion` | `MainFormalDiagonalCompletionWitness params strategy eps k scalars (roleInductionWitness.roleWitness scalars)` | Post-role line-130 completion |
 
 ## 2. Context at the sorry site
 
@@ -80,15 +80,15 @@ The missing inputs are:
 1. **Predecessor per-slice induction data** — providing a Section 6 witness for each restricted slice of the predecessor parameter
 2. **Answer-side self-improvement obligations** — providing the Section 9 self-improvement data for the predecessor
 
-These are NOT hypotheses of `mainFormal`. The base case avoids them entirely by using `MainFormalRolePackageResidual.ofBaseCase` (which calls the already-checked `strategySymmetrization_mainInductionBaseCase`).
+These are NOT hypotheses of `mainFormal`. The base case avoids them entirely by using `MainFormalRoleInductionWitness.ofBaseCase` (which calls the already-checked `strategySymmetrization_mainInductionBaseCase`).
 
 ## 3. Field analysis
 
-### Field 1: `roleResidual : MainFormalRolePackageResidual`
+### Field 1: `roleInductionWitness : MainFormalRoleInductionWitness`
 
 This is a Section 6 witness:
 ```lean
-structure MainFormalRolePackageResidual ... where
+structure MainFormalRoleInductionWitness ... where
   roleMeasurement : Measurement (Polynomial params) (Role × ι)
   section6Consistency :
     ConsRel (strategy.strategySymmetrization).state
@@ -98,10 +98,10 @@ structure MainFormalRolePackageResidual ... where
       (MainInductionStep.mainInductionError params k (3 * eps) (3 * eps) (3 * eps))
 ```
 
-**Existing construction theorem for base case:** `MainFormalRolePackageResidual.ofBaseCase` (RoleRegister/Core.lean:187-196)
+**Existing construction theorem for base case:** `MainFormalRoleInductionWitness.ofBaseCase` (RoleRegister/Core.lean:187-196)
 - Calls `strategySymmetrization_mainInductionBaseCase` — already checked ✅
 
-**Existing construction theorem for successor case:** `MainFormalRolePackageResidual.ofSuccessorBoundary` (RoleRegister/Core.lean:205-216)
+**Existing construction theorem for successor case:** `MainFormalRoleInductionWitness.ofSuccessorBoundary` (RoleRegister/Core.lean:205-216)
 - Requires `params.next`, `MainFormalSuccessorBoundary`, etc.
 - The successor boundary is NOT available in `mainFormal`'s context.
 
@@ -109,44 +109,44 @@ structure MainFormalRolePackageResidual ... where
 
 | Constructor | Required inputs | Status |
 |------------|----------------|--------|
-| `MainFormalRolePackageBranchResidual.rolePackageResidual_ofSuccessorObligations` | `successorRecursiveSlicesInput` + `successorSelfImprovementObligations` | Neither in scope |
-| `MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorObligations` | `answerSuccessorRecursiveSlicesInput` + `answerSuccessorSelfImprovementObligations` | Neither in scope |
-| `MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorRecursiveSelfImprovement` | `answerSuccessorRecursiveSlicesInput` + `answerSuccessorSelfImprovementInput` | Neither in scope |
-| `MainFormalRolePackageBranchResidual.rolePackageResidual_ofAnswerSuccessorInductionPackageAndObligations` | `answerSuccessorPerSliceInductionPackageInput` + `answerSuccessorSelfImprovementObligations` | Neither in scope |
+| `MainFormalRolePackageBranchResidual.roleWitnessResidual_ofSuccessorObligations` | `successorRecursiveSlicesInput` + `successorSelfImprovementObligations` | Neither in scope |
+| `MainFormalRolePackageBranchResidual.roleWitnessResidual_ofAnswerSuccessorObligations` | `answerSuccessorRecursiveSlicesInput` + `answerSuccessorSelfImprovementObligations` | Neither in scope |
+| `MainFormalRolePackageBranchResidual.roleWitnessResidual_ofAnswerSuccessorRecursiveSelfImprovement` | `answerSuccessorRecursiveSlicesInput` + `answerSuccessorSelfImprovementInput` | Neither in scope |
+| `MainFormalRolePackageBranchResidual.roleWitnessResidual_ofAnswerSuccessorInductionPackageAndObligations` | `answerSuccessorPerSliceInductionPackageInput` + `answerSuccessorSelfImprovementObligations` | Neither in scope |
 
 **Status:** no construction theorem is available in scope. This is the primary
 gap.
 
-### Field 2: `postRoleDiagonalCompletion : MainFormalPostRolePackageDiagonalCompletionResidual`
+### Field 2: `postRoleDiagonalCompletion : MainFormalDiagonalCompletionWitness`
 
 This structure contains the line-130 orthonormalization residual plus completion data:
 ```lean
-structure MainFormalPostRolePackageDiagonalCompletionResidual ... where
-  orthResidual : MainFormalPostRolePackageDiagonalOrthonormalizationResidual ...
+structure MainFormalDiagonalCompletionWitness ... where
+  orthWitness : MainFormalDiagonalOrthonormalizationWitness ...
   a_A a_B : Polynomial params
   leftCompletedCloseness : SDDRel ...
   rightCompletedCloseness : SDDRel ...
 ```
 The match-mass preservation proofs now live in
-`MainFormalPostRolePackageDiagonalOrthonormalizationResidual`, together with the
+`MainFormalDiagonalOrthonormalizationWitness`, together with the
 projective submeasurements they concern.
 
 **Existing construction theorems**:
 
 | Constructor | Required inputs | Status |
 |------------|----------------|--------|
-| `MainFormalCascadeProjectiveCompletionTransportResidual.nonempty_ofRoleResidual` | `roleResidual` only | Source-shaped internal construction target; delegates the completion step to `MainFormalPostRolePackageDiagonalCompletionResidual.nonempty_ofDiagonalConsistency` |
-| `MainFormalPostRolePackageDiagonalCompletionResidual.nonempty_ofDiagonalConsistency` | line-130 orthonormalization residual + cross consistency | Constructs the completion residual from the retained match-mass preservation proofs |
+| `MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness` | `roleInductionWitness` only | Source-shaped internal construction target; delegates the completion step to `MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency` |
+| `MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency` | line-130 orthonormalization residual + cross consistency | Constructs the completion residual from the retained match-mass preservation proofs |
 | `leftMatchMassPreservation_ofDiagonalConsistency` / `rightMatchMassPreservation_ofDiagonalConsistency` | line-130 orthonormalization residual + cross consistency | Projection theorems exposing the retained match-mass proofs |
 | `leftLiftedProjectivizationRepairWithMatchMass` | QXP repair construction with partner measurement | Lowest current `sorry`; must prove QXP outcome-expectation preservation while the QXP data is visible |
 
-**Current route:** Once Field 1 (`roleResidual`) is produced, the proof must
+**Current route:** Once Field 1 (`roleInductionWitness`) is produced, the proof must
 derive the line-130 orthonormalization residual from cross consistency and then
 prove the two match-mass preservation obligations.  These are internal
 obligations, not public inputs to `mainFormal`.
 
 The line-130 consistency data supplies the orthonormalization residual via
-`MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalConsistency`.
+`MainFormalDiagonalOrthonormalizationWitness.nonempty_ofDiagonalConsistency`.
 
 The completion theorem now fixes the distinguished completion outcome to the
 zero polynomial and derives the completion-closeness fields from the checked
@@ -168,7 +168,7 @@ assembly theorem that also consumed bridge-style completion data.
 This was the historical simple route.  It is rejected for the paper-facing
 theorem because it relies on additional non-paper inputs.
 
-**What's needed:** Only Field 1 (`MainFormalRolePackageResidual` for successor case).
+**What's needed:** Only Field 1 (`MainFormalRoleInductionWitness` for successor case).
 
 ### Historical Route B: Keep the native-targets cascade
 
@@ -179,7 +179,7 @@ Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual ...)
 
 This required both Field 1 and Field 2.  The current cleanup eliminates this
 intermediate record and constructs the active
-`MainFormalCascadeProjectiveCompletionTransportResidual` directly.
+`MainFormalProjectiveCompletionTransportWitness` directly.
 
 **Comparison:** Route A was simpler and more faithful to the base-case
 structure.  Route B required more construction and preserved downstream code
@@ -215,7 +215,7 @@ The ordinary route needs:
 
 With construction theorems:
 ```lean
-MainFormalRolePackageBranchResidual.rolePackageResidual_ofSuccessorObligations
+MainFormalRolePackageBranchResidual.roleWitnessResidual_ofSuccessorObligations
   hpass hm1 hd hk0 hk hrec obligations
 ```
 
@@ -241,7 +241,7 @@ dischargers are not yet constructed.
 
 ### Gap 1 (CRITICAL): Successor role residual construction
 
-**What:** Need to produce `MainFormalRolePackageResidual` for the `params.m ≠ 1` branch.
+**What:** Need to produce `MainFormalRoleInductionWitness` for the `params.m ≠ 1` branch.
 
 **Why blocked:** `mainFormal` lacks the successor induction hypotheses needed to invoke any of the existing successor role-residual constructors.
 
@@ -258,14 +258,14 @@ the rejected historical route, not an acceptable repair.
 
 ### Gap 2 (follows from Gap 1): Post-role diagonal completion
 
-**What:** Need to derive `MainFormalPostRolePackageDiagonalCompletionResidual`
+**What:** Need to derive `MainFormalDiagonalCompletionWitness`
 from the role residual and the paper's line-130 consistency data.
 
 **Why blocked:** Depends on Gap 1. Once the role residual is available, the
 current route derives the orthonormalization residual from cross consistency.
 The remaining pieces are the two match-mass preservation obligations.  The
 completion outcome and completion-closeness estimates are now produced by
-`MainFormalPostRolePackageDiagonalCompletionResidual.nonempty_ofDiagonalConsistency`
+`MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency`
 from those obligations.
 
 **Resolution options:**

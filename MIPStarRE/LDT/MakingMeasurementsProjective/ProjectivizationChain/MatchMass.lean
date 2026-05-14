@@ -346,7 +346,7 @@ projective measurements `Q_A`, `Q_B` are the canonical completions of `P_A`,
 
 Together with `leftConsistency` and `rightConsistency`, this fills the
 `completionTransportMatchMassMonotonicity` field of
-`MainFormalCascadeProjectiveCompletionTransportResidual`. -/
+`MainFormalProjectiveCompletionTransportWitness`. -/
 theorem of_submeasurement_match_mass_and_completion
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
