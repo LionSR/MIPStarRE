@@ -25,7 +25,7 @@ from pathlib import Path
 THRESHOLD: int = 1000  # lines — files exceeding this fail the check
 
 # Directories to exclude from scanning (matched against relative-to-root parts)
-EXCLUDE_DIRS: tuple[str, ...] = (".lake", "lake-packages", "tmp")
+EXCLUDE_DIRS: tuple[str, ...] = (".lake", ".worktrees", "lake-packages", "tmp")
 
 
 # ---------------------------------------------------------------------------
