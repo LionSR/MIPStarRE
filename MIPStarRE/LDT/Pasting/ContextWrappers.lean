@@ -116,20 +116,15 @@ lemma overAllOutcomes_of_context
     ctx.good ctx.gamma_le_one ctx.zeta_le_one ctx.dq_le_q ctx.d_pos
     ctx.family ctx.consistent ctx.selfConsistent ctx.bounded ctx.k
 
-/-- `lem:h-b-consistency` restated against the nontrivial-regime pasting context.
-
-The per-`i` sandwich-line input is passed through unchanged — discharging
-it is the job of the caller. -/
+/-- `lem:h-b-consistency` restated against the nontrivial-regime pasting context. -/
 lemma hBConsistency_of_context
     (params : Parameters) [FieldModel params.q]
-    (ctx : LdPastingNontrivialContext params ι)
-    (hline : ∀ i : ℕ, i < ctx.k →
-      LdSandwichLineOnePointStatement params ctx.strategy ctx.family
-        ctx.eps ctx.delta ctx.gamma ctx.zeta ctx.k i) :
+    (ctx : LdPastingNontrivialContext params ι) :
     HBConsistencyStatement params ctx.strategy ctx.family
       ctx.eps ctx.delta ctx.gamma ctx.zeta ctx.k :=
   hBConsistency params ctx.strategy ctx.eps ctx.delta ctx.gamma ctx.zeta
-    ctx.good ctx.d_pos ctx.family ctx.consistent ctx.selfConsistent ctx.bounded ctx.k hline
+    ctx.good ctx.gamma_le_one ctx.zeta_le_one ctx.dq_le_q ctx.d_pos
+    ctx.family ctx.consistent ctx.selfConsistent ctx.bounded ctx.k
 
 /-- `lem:ld-sandwich-line-one-point` restated against the nontrivial-regime pasting
 context. -/

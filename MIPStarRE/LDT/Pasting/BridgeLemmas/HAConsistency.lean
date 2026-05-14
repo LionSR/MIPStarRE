@@ -314,15 +314,8 @@ theorem hAConsistency_submeas
           (constructedPastedSubMeas params family k))
         (MainInductionStep.ldPastingInInductionNu params k
           eps delta gamma zeta) := by
-  have hline : ∀ i : ℕ, i < k →
-      LdSandwichLineOnePointStatement params strategy family
-        eps delta gamma zeta k i := by
-    intro i hi
-    exact ldSandwichLineOnePoint params strategy eps delta gamma zeta
-      hgood hgamma_le hzeta_le hdq_le
-      family hcons hself hbound k i hi
   have hHB := hBConsistency params strategy eps delta gamma zeta
-    hgood hd family hcons hself hbound k hline
+    hgood hgamma_le hzeta_le hdq_le hd family hcons hself hbound k
   have hgamma_nonneg : 0 ≤ gamma := by
     have : 0 ≤ strategy.diagonalFailureProbability := by
       unfold SymStrat.diagonalFailureProbability
