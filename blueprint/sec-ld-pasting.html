@@ -254,10 +254,29 @@
 
     
     
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Pasting.ldPasting" class="lean_decl">MIPStarRE.LDT.Pasting.ldPasting</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
         </div>
   </div>
   <div class="theorem_thmcontent">
-  <p>  Let \((\psi ,A,B,L)\) be an \((\varepsilon ,\delta ,\gamma )\)-good symmetric strategy for the \((m+1,q,d)\) low individual degree test. Let \(\{ G^x\} _{x \in \mathbb {F}_q}\) be projective submeasurements in \(\mathrm{PolySub}(m,q,d)\) with the following properties: </p>
+  <p>   Let \((\psi ,A,B,L)\) be an \((\varepsilon ,\delta ,\gamma )\)-good symmetric strategy for the \((m+1,q,d)\) low individual degree test. Let \(\{ G^x\} _{x \in \mathbb {F}_q}\) be projective submeasurements in \(\mathrm{PolySub}(m,q,d)\) with the following properties: </p>
 <ol class="enumerate">
   <li><p>(Completeness):  If \(G = \mathbb {E}_x \sum _g G_g^x\), then </p>
 <div class="displaymath" id="a0000000412">
@@ -310,7 +329,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> Let \(H\) be the submeasurement from Lemma&#160;<a href="sec-ld-pasting.html#lem:ld-pasting-sub-measurement">9.5</a>, and fix an arbitrary polynomial \(h^* \in \mathcal{P}(m+1,q,d)\). Define a measurement \(H_{\mathrm{meas}} \in \mathrm{PolyMeas}(m+1,q,d)\) by </p>
+  <p> The Lean proof of the unrestricted source theorem is the tracked proof gap in issue&#160;#1601. The argument below is the paper proof. Let \(H\) be the submeasurement from Lemma&#160;<a href="sec-ld-pasting.html#lem:ld-pasting-sub-measurement">9.5</a>, and fix an arbitrary polynomial \(h^* \in \mathcal{P}(m+1,q,d)\). Define a measurement \(H_{\mathrm{meas}} \in \mathrm{PolyMeas}(m+1,q,d)\) by </p>
 <div class="displaymath" id="a0000000420">
   \[  (H_{\mathrm{meas}})_h = \begin{cases}  H_{h^*} + (I-H) &  \text{if } h=h^*, \\ H_h &  \text{otherwise.} \end{cases}  \]
 </div>
@@ -364,7 +383,7 @@
 <div class="displaymath" id="a0000000422">
   \[  \gamma \le 1,\qquad \zeta \le 1,\qquad d \le q,\qquad 0{\lt}d,\qquad 1\le k.  \]
 </div>
-<p> The paper theorem is stated in <span class="ttfamily">references/ldt-paper/ld-pasting.tex</span>, lines 12–50. Lines 52–55 explain that the proof may restrict to \(\varepsilon ,\delta ,\gamma ,\zeta ,d/q\le 1\), since the complementary cases are trivial. The formalization of these complementary cases, and hence of the unrestricted source theorem, remains to be supplied. </p>
+<p> The paper theorem is stated in <span class="ttfamily">references/ldt-paper/ld-pasting.tex</span>, lines 12–50. Lines 52–55 explain that the proof may restrict to \(\varepsilon ,\delta ,\gamma ,\zeta ,d/q\le 1\), since the complementary cases are trivial. The unrestricted source statement is linked from Theorem&#160;<a href="sec-ld-pasting.html#thm:ld-pasting">9.1</a>; the formal proof of these complementary cases remains tracked by issue&#160;#1601. </p>
 
   </div>
 </div>
