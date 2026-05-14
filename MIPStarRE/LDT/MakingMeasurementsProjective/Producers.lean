@@ -416,6 +416,32 @@ theorem leftLiftedProjectivizationRepairProducer
       leftLiftedMeasurement, leftPlacedSubMeas, SubMeas.liftLeft, ProjSubMeas.liftLeft]
       using (le_trans hzero hbound)
 
+/-- Source-facing name for the locality-preserving projectivization repair.
+
+This is the same theorem as `leftLiftedProjectivizationRepairProducer`, recorded
+under a name suitable for the blueprint entry
+`lem:left-lifted-projectivization-repair`.  The statement is the Section 5
+construction theorem: from the source almost-projective estimate for the
+left-lifted family, it constructs a local projective submeasurement whose left
+lift is close with the `84 ζ^(1/4)` envelope.  The historical `Producer` name
+is retained for compatibility with existing Section 5 declarations; it is not a
+separate source hypothesis. -/
+theorem leftLiftedProjectivizationRepair
+    {Outcome : Type*} {ι : Type*}
+    [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized)
+    (A : Measurement Outcome ι) (ζ : Error)
+    (hsource :
+      ∑ a, ev ψ
+        ((leftLiftedMeasurement (ιB := ι) A).outcome a -
+          (leftLiftedMeasurement (ιB := ι) A).outcome a *
+            (leftLiftedMeasurement (ιB := ι) A).outcome a) ≤ ζ) :
+    ∃ P : ProjSubMeas Outcome ι,
+      RoundedProjMeasStatement ψ (leftLiftedMeasurement (ιB := ι) A)
+        (ProjSubMeas.liftLeft P) (orthonormalizationMainLemmaError ζ) :=
+  leftLiftedProjectivizationRepairProducer ψ hψ A ζ hsource
+
 /-- Locality-preserving projectivization repair with the exact line-169
 match-mass preservation obligation kept at the QXP construction point.
 
