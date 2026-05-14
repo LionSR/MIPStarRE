@@ -99,16 +99,24 @@ The bound is trivial when at least one of $\eps$, $\delta$, $\gamma$, $\zeta$, o
 	\eps,\delta,\gamma,\zeta,d/q \le 1.
 \]
 
-\begin{definition}[Standing pasting context]\label{def:ld-pasting-context}
-	\lean{MIPStarRE.LDT.Pasting.LdPastingContext}
+\begin{definition}[Nontrivial-regime pasting context]\label{def:ld-pasting-context}
+	\lean{MIPStarRE.LDT.Pasting.LdPastingNontrivialContext}
 	\leanok
 	\uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
-	The standing pasting context consists of the data and hypotheses from
+	The Lean context linked here is the nontrivial-regime context used after the
+	reduction explained above.  It consists of the data and hypotheses from
 	Theorem~\ref{thm:ld-pasting}: an $(\eps,\delta,\gamma)$-good symmetric strategy
 	$(\psi,A,B,L)$ for the $(m+1,q,d)$ low individual degree test, a family of
 	projective submeasurements $\{G^x\}_{x \in \F_q}$ in $\polysub{m}{q}{d}$
 	satisfying \ref{item:ld-pasting-completeness}--\ref{item:ld-pasting-boundedness},
 	an integer $k \ge 400md$, and the quantities $\nu$ and $\sigma$ defined there.
+	It also records the nontrivial-regime assumptions
+	\[
+		\gamma \le 1,\qquad \zeta \le 1,\qquad d \le q,\qquad 0<d,\qquad 1\le k.
+	\]
+	These extra fields are not assumptions of the unrestricted source theorem;
+	they belong to the restricted proof stage.  The unrestricted paper-facing Lean
+	theorem remains \texttt{MIPStarRE.LDT.Pasting.ldPasting}.
 \end{definition}
 
 \subsection{From Measurements to Submeasurements}
@@ -116,7 +124,7 @@ The bound is trivial when at least one of $\eps$, $\delta$, $\gamma$, $\zeta$, o
 In the remainder of the chapter we only use the axis-parallel lines test in the
 last coordinate direction. We therefore write $B_f^u$ for the line measurement
 on the line $\{(u,x)\mid x\in\F_q\}$ and first record the consistency relations
-that follow formally from the standing pasting context of
+that follow formally from the nontrivial-regime pasting context of
 Definition~\ref{def:ld-pasting-context}.
 
 Conditioning the low individual degree test on the last coordinate direction gives, on average over $(u,x) \sim \F_q^{m+1}$,
@@ -157,7 +165,7 @@ where
 	\leanok
 	\uses{def:ld-pasting-context, prop:simeq-to-approx,
 	      prop:triangle-inequality-for-approx_delta, prop:triangle-sub}
-	In the standing pasting context of Definition~\ref{def:ld-pasting-context}, set
+	In the nontrivial-regime pasting context of Definition~\ref{def:ld-pasting-context}, set
 	\[
 		\nu_1 = \zeta + \sqrt{8m\eps+4\delta}.
 	\]
@@ -175,7 +183,7 @@ where
 	\leanok
 	\uses{def:ld-pasting-context, def:polymeasurements, def:simeq,
 	      def:pasted-measurement}
-	In the standing pasting context of Definition~\ref{def:ld-pasting-context},
+	In the nontrivial-regime pasting context of Definition~\ref{def:ld-pasting-context},
 	there exists a submeasurement $H \in \polysub{m+1}{q}{d}$ with the following
 	properties.
 	\begin{enumerate}
@@ -373,7 +381,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\lean{MIPStarRE.LDT.Pasting.gCompleteSelfConsistency}
 	\leanok
 	\uses{def:ld-pasting-context, prop:two-notions-of-self-consistency}
-	In the standing pasting context of Definition~\ref{def:ld-pasting-context},
+	In the nontrivial-regime pasting context of Definition~\ref{def:ld-pasting-context},
 	\[
 		G^x \ot I \approx_\zeta I \ot G^x.
 	\]
@@ -401,7 +409,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\lean{MIPStarRE.LDT.Pasting.gBotSelfConsistency}
 	\leanok
 	\uses{def:ld-pasting-context, lem:g-complete-self-consistency}
-	In the standing pasting context of Definition~\ref{def:ld-pasting-context},
+	In the nontrivial-regime pasting context of Definition~\ref{def:ld-pasting-context},
 	\[
 		G_\bot^x \ot I \approx_\zeta I \ot G_\bot^x.
 	\]
@@ -554,7 +562,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\leanok
 	\uses{def:ld-pasting-context, thm:com-main, lem:commutativity-switcheroo,
 	      lem:g-complete-self-consistency}
-	In the standing pasting context of Definition~\ref{def:ld-pasting-context},
+	In the nontrivial-regime pasting context of Definition~\ref{def:ld-pasting-context},
 	the following commutation relations hold:
 	\[
 		G_g^x G^y \ot I \approx_{\nu_2} G^y G_g^x \ot I,
@@ -595,7 +603,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\lean{MIPStarRE.LDT.Pasting.commutingWithGIncomplete}
 	\leanok
 	\uses{def:ld-pasting-context, cor:commuting-with-G-complete}
-	In the standing pasting context of Definition~\ref{def:ld-pasting-context},
+	In the nontrivial-regime pasting context of Definition~\ref{def:ld-pasting-context},
 	\[
 		G_g^x G_\bot^y \ot I \approx_{\nu_2} G_\bot^y G_g^x \ot I,
 		\qquad
@@ -1412,7 +1420,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\lean{MIPStarRE.LDT.Pasting.hAConsistency_submeas_of_context, MIPStarRE.LDT.Pasting.fromHToG_of_context}
 	\leanok
 	\uses{def:ld-pasting-context, cor:h-a-consistency, lem:from-H-to-G}
-	The standing pasting context specializes the consistency of $H$ with $A$ and
+	The nontrivial-regime pasting context specializes the consistency of $H$ with $A$ and
 	the conversion from the pasted sum to the polynomial in $G$ to the parameters
 	and error bounds fixed in Definition~\ref{def:ld-pasting-context}.
 \end{lemma}

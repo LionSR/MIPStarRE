@@ -157,7 +157,7 @@ When such a declaration remains useful, its role should be one of the following:
 |-------------|--------------------|
 | `mainFormal_ofProjectiveCompletionResidual` | Conditional final-transport theorem; keep as reusable proof content, but do not present it as the paper theorem |
 | `MainFormalPostRolePackageDiagonalOrthonormalizationResidual` | Internal residual produced from line-130 cross consistency; do not replace it by an orthonormalization-input hypothesis on `mainFormal` |
-| `LdPastingContext` | Faithfulness-sensitive context for `ldPastingNontrivial`; audit each field against the Section 12 hypotheses and boundary conditions |
+| `LdPastingNontrivialContext` | Nontrivial-regime context for `ldPastingNontrivial`; do not present it as the unrestricted `thm:ld-pasting` context |
 | `Pasting.ldPastingNontrivial` | Restricted nontrivial-regime form of `thm:ld-pasting`; link only from a Lean-only remark until the complementary trivial cases in `references/ldt-paper/ld-pasting.tex`, lines 52--55, are formalized |
 | `MainInductionStep.ldPastingInInductionSectionNontrivial` | Restricted nontrivial-regime restatement of the pasting theorem for Section 6; do not present it as the unrestricted source theorem |
 
