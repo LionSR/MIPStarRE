@@ -76,7 +76,7 @@ theorem comMain
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
-    ComMainConclusion params strategy family G gamma zeta := by
+    ComMainConclusion params strategy family gamma zeta := by
   let hEval :=
     commDataProcessedG params strategy eps delta gamma zeta hnorm hgood family G
       hG hcons hself hbound

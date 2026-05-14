@@ -157,9 +157,9 @@ When such a declaration remains useful, its role should be one of the following:
 |-------------|--------------------|
 | `mainFormal_ofProjectiveCompletionResidual` | Conditional final-transport theorem; keep as reusable proof content, but do not present it as the paper theorem |
 | `MainFormalPostRolePackageDiagonalOrthonormalizationResidual` | Internal residual produced from line-130 cross consistency; do not replace it by an orthonormalization-input hypothesis on `mainFormal` |
-| `LdPastingContext` | Faithfulness-sensitive context for `ldPasting`; audit each field against the Section 12 hypotheses and boundary conditions |
-| `Pasting.ldPasting` | Restricted nontrivial-regime form of `thm:ld-pasting`; link only from a Lean-only remark until the complementary trivial cases in `references/ldt-paper/ld-pasting.tex`, lines 52--55, are formalized |
-| `MainInductionStep.ldPastingInInductionSection` | Restricted nontrivial-regime restatement of the pasting theorem for Section 6; do not present it as the unrestricted source theorem |
+| `LdPastingContext` | Faithfulness-sensitive context for `ldPastingNontrivial`; audit each field against the Section 12 hypotheses and boundary conditions |
+| `Pasting.ldPastingNontrivial` | Restricted nontrivial-regime form of `thm:ld-pasting`; link only from a Lean-only remark until the complementary trivial cases in `references/ldt-paper/ld-pasting.tex`, lines 52--55, are formalized |
+| `MainInductionStep.ldPastingInInductionSectionNontrivial` | Restricted nontrivial-regime restatement of the pasting theorem for Section 6; do not present it as the unrestricted source theorem |
 
 The former `SelfImprovement.HelperStrongSelfConsistencyInput`,
 `SelfImprovement.OrthonormalizationInput`, `SelfImprovement.FinalFieldsInput`, and
@@ -278,8 +278,8 @@ proof-level `\leanok`:
   **`thm:ld-pasting-in-induction-section`** (ch10): The paper theorem in
   `references/ldt-paper/ld-pasting.tex`, lines 12--50, assumes
   `k >= 400md` but does not state the nontrivial-regime inequalities as
-  hypotheses.  The current Lean declarations `Pasting.ldPasting` and
-  `MainInductionStep.ldPastingInInductionSection` prove restricted forms with
+  hypotheses.  The current Lean declarations `Pasting.ldPastingNontrivial` and
+  `MainInductionStep.ldPastingInInductionSectionNontrivial` prove restricted forms with
   the additional public assumptions `gamma <= 1`, `zeta <= 1`, `d <= q`,
   `0 < d`, and `1 <= k`.  Lines 52--55 of the paper explain the reduction to
   the nontrivial regime, but the complementary trivial cases have not yet been

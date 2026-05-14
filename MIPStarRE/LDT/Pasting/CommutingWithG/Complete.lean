@@ -199,12 +199,11 @@ theorem commutingWithGComplete
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
     (gamma zeta : Error)
     (hgamma_nonneg : 0 ≤ gamma) (hgamma : gamma ≤ 1)
     (hzeta_nonneg : 0 ≤ zeta) (hzeta : zeta ≤ 1)
     (hd_le_q : params.d ≤ params.q)
-    (hcom : Commutativity.ComMainConclusion params strategy family G gamma zeta)
+    (hcom : Commutativity.ComMainConclusion params strategy family gamma zeta)
     (hself : GCompleteSelfConsistencyStatement params strategy.state family zeta) :
     CommutingWithGCompleteStatement params strategy.state family gamma zeta := by
   have hswitch₁ :

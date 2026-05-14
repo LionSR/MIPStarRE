@@ -50,7 +50,6 @@ abbrev CommDataProcessedGConclusion (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
-    (_G : Fq params → SubMeas (Polynomial params) ι)
     (gamma zeta : Error) : Prop :=
   SDDOpRel strategy.state
     (uniformDistribution (EvaluatedSliceQuestion params))
@@ -66,7 +65,6 @@ abbrev ComMainConclusion (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
-    (_G : Fq params → SubMeas (Polynomial params) ι)
     (gamma zeta : Error) : Prop :=
   SDDOpRel strategy.state
     (uniformDistribution (FullSliceQuestion params))

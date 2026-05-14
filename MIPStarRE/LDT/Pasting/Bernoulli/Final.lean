@@ -330,7 +330,7 @@ theorem ldPastingNCompleteness_of_tailLowerBound
     Commutativity.comMain params strategy eps delta gamma zeta
       strategy.isNormalized hgood family G hG hcons hself hbound
   have hcommComplete :=
-    commutingWithGComplete params strategy family G gamma zeta
+    commutingWithGComplete params strategy family gamma zeta
       hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le hcomMain hselfComplete
   have hcommIncomplete :=
     commutingWithGIncomplete params strategy.state family gamma zeta hcommComplete
@@ -451,7 +451,7 @@ trivial.  This declaration currently exposes the public assumptions
 `gamma ≤ 1`, `zeta ≤ 1`, `params.d ≤ params.q`, `0 < params.d`, and `1 ≤ k`.
 The trivial complementary cases remain to be formalized before this theorem can
 serve as the unrestricted source-facing pasting theorem. -/
-theorem ldPasting
+theorem ldPastingNontrivial
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)

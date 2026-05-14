@@ -93,7 +93,7 @@ lemma commDataProcessedG
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
-    CommDataProcessedGConclusion params strategy family G gamma zeta := by
+    CommDataProcessedGConclusion params strategy family gamma zeta := by
   have hpostSSC :
       SDDRel strategy.state
         (uniformDistribution (Point params.next))

@@ -11,7 +11,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 Core public API for the ordinary self-improvement data: constructors for
 `SelfImprovementPackage`, the induction-section theorem
 `selfImprovementInInductionSection`, the monotone-witness cleanup
-`mainInductionOfWitness`, and the pasting theorem `ldPastingInInductionSection`.
+`mainInductionOfWitness`, and the pasting theorem `ldPastingInInductionSectionNontrivial`.
 
 The answer-valued slice constructors are separated into
 `SelfImprovementBridge.AnswerSlice`.
@@ -528,7 +528,7 @@ noncomputable def SelfImprovementPackage.ofSliceObligations
 /-- Restricted nontrivial-regime Lean restatement of
 `thm:ld-pasting-in-induction-section`.
 
-This theorem calls `Pasting.ldPasting`.  Its public assumptions therefore
+This theorem calls `Pasting.ldPastingNontrivial`.  Its public assumptions therefore
 include `gamma ≤ 1`, `zeta ≤ 1`, `params.d ≤ params.q`, `0 < params.d`, and
 `1 ≤ k`, in addition to the hypotheses of the source theorem.  The paper
 statement is `references/ldt-paper/ld-pasting.tex`, lines 12--50; lines 52--55
@@ -536,8 +536,8 @@ record these inequalities only as a proof reduction to the nontrivial regime.
 The trivial complementary cases remain to be formalized before this declaration
 can serve as the unrestricted induction-section pasting theorem. -/
 -- NOTE: `FieldModel.{0}` is needed to match the universe at which
--- `Pasting.ldPasting` was elaborated. See PR #288 discussion.
-theorem ldPastingInInductionSection
+-- `Pasting.ldPastingNontrivial` was elaborated. See PR #288 discussion.
+theorem ldPastingInInductionSectionNontrivial
     (params : Parameters)
     [FieldModel.{0} params.q]
     (strategy : SymStrat params.next ι)
@@ -558,11 +558,11 @@ theorem ldPastingInInductionSection
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingInInductionSectionConclusion params strategy family H
         eps delta gamma kappa zeta k := by
-  have hldPasting :=
-    Pasting.ldPasting params strategy eps delta gamma kappa zeta
+  have hldPastingNontrivial :=
+    Pasting.ldPastingNontrivial params strategy eps delta gamma kappa zeta
       hgood _hgamma_le _hzeta_le _hdq_le hd
       family hcomplete hcons hself hbound k hk_pos hk
-  obtain ⟨H, _hHdef, hH⟩ := hldPasting
+  obtain ⟨H, _hHdef, hH⟩ := hldPastingNontrivial
   refine ⟨H, ?_⟩
   exact ⟨hH.pointConsistency⟩
 
