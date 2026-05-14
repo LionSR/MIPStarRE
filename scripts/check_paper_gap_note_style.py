@@ -116,7 +116,7 @@ def _scan_note_text(rel_path: str, text: str) -> list[Finding]:
     if not XURL_RE.search(text):
         add("missing `\\usepackage{xurl}`")
     if not COMMAND_INPUT_RE.search(text):
-        add("missing shared paper-gap macros: `\\input{./command}`")
+        add("missing shared paper-gap macros: `\\input{command}`")
     if "\\begin{document}" not in text or "\\end{document}" not in text:
         add("missing document body delimiters")
 
@@ -137,6 +137,17 @@ def _scan_note_text(rel_path: str, text: str) -> list[Finding]:
             add("the `At a glance` section should state the difficulty")
         if "estimated weight" not in first_body:
             add("the `At a glance` section should state the estimated weight")
+        if "mathlib/project split" not in first_body:
+            add("the `At a glance` section should state the Mathlib/project split")
+        has_key_inputs = (
+            "key mathlib inputs" in first_body
+            or "key mathematical inputs" in first_body
+        )
+        if not has_key_inputs:
+            add(
+                "the `At a glance` section should state the key Mathlib or "
+                "mathematical inputs"
+            )
 
     if "\\section{Conclusion}" not in text:
         add("missing `Conclusion` section")

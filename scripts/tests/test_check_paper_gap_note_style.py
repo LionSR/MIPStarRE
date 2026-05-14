@@ -26,7 +26,7 @@ GOOD_NOTE = r"""
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \setlength{\emergencystretch}{2em}
 
-\input{./command}
+\input{command}
 
 \title{Issue 9999: A Model Paper-Gap Note}
 \author{}
@@ -40,6 +40,9 @@ GOOD_NOTE = r"""
 \begin{itemize}
   \item \textbf{Difficulty.} Medium.
   \item \textbf{Estimated weight.} One local theorem.
+  \item \textbf{Mathlib/project split.} Mostly project-local.
+  \item \textbf{Key mathematical inputs.} The source estimate and a local
+  comparison lemma.
 \end{itemize}
 
 \section{Key theorem forms}
@@ -90,10 +93,24 @@ class PaperGapNoteStyleTests(unittest.TestCase):
     def test_requires_at_a_glance_difficulty_and_weight(self) -> None:
         bad = GOOD_NOTE.replace(r"\item \textbf{Difficulty.} Medium.", "")
         bad = bad.replace(r"\item \textbf{Estimated weight.} One local theorem.", "")
+        bad = bad.replace(
+            r"\item \textbf{Mathlib/project split.} Mostly project-local.",
+            "",
+        )
+        bad = bad.replace(
+            "\\item \\textbf{Key mathematical inputs.} The source estimate and a local\n"
+            "  comparison lemma.",
+            "",
+        )
         findings = _scan_note_text("docs/paper-gaps/issue-9999-example.tex", bad)
         messages = [finding.message for finding in findings]
         self.assertIn("the `At a glance` section should state the difficulty", messages)
         self.assertIn("the `At a glance` section should state the estimated weight", messages)
+        self.assertIn("the `At a glance` section should state the Mathlib/project split", messages)
+        self.assertIn(
+            "the `At a glance` section should state the key Mathlib or mathematical inputs",
+            messages,
+        )
 
     def test_rejects_raw_traceability_texttt(self) -> None:
         bad = GOOD_NOTE.replace(
