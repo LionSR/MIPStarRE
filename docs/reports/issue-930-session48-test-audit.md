@@ -90,7 +90,7 @@ ConsRel strategy.state (uniformDistribution (Point params))
 ```
 
 The same target is now obtained by the final weakening theorem
-`MainFormalCascadeProjectiveCompletionTransportResidual.toMainFormal`.  Since
+`MainFormalProjectiveCompletionTransportWitness.toMainFormal`.  Since
 the first `ConsRel` family acts on the left tensor factor and the second on the
 right tensor factor, this expresses exactly the paper's three conclusions:
 Alice's point measurement versus Bob's polynomial measurement, Alice's

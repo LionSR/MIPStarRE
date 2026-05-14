@@ -12,43 +12,43 @@ namespace MIPStarRE.LDT
 
 namespace Test
 
-namespace MainFormalCascadeProjectiveCompletionTransportResidual
+namespace MainFormalProjectiveCompletionTransportWitness
 
-/-- Construct the final projective completion-transport residual from a concrete
-role-register residual.
+/-- Construct the final projective completion-transport witness from a concrete
+role-register witness.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:130-173`.
 
 This is the source-shaped internal construction target for the non-vacuous
 branch of `mainFormal`.  It reconstructs the paper line-130 cross consistency
-from the role residual and constructs the line-130 orthonormalization residual.
+from the role witness and constructs the line-130 orthonormalization witness.
 The remaining completion step is the explicit proof obligation in
-`MainFormalPostRolePackageDiagonalCompletionResidual.nonempty_ofDiagonalConsistency`;
+`MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency`;
 no match-mass or diagonal-consistency data is accepted as an extra input. -/
-theorem nonempty_ofRoleResidual
+theorem nonempty_ofRoleWitness
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
     {scalars : MainFormalCascadeScalars params eps k}
     (hsmall : ¬ 1 ≤ mainFormalError params k eps)
-    (roleResidual : MainFormalRolePackageResidual params strategy eps hpass k) :
-    Nonempty (MainFormalCascadeProjectiveCompletionTransportResidual
+    (roleInductionWitness : MainFormalRoleInductionWitness params strategy eps hpass k) :
+    Nonempty (MainFormalProjectiveCompletionTransportWitness
       params strategy eps k scalars) := by
-  have hpre := roleResidual.diagonalConsistency scalars
-  rcases MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalConsistency
-      hpre with ⟨orthResidual⟩
+  have hpre := roleInductionWitness.diagonalConsistency scalars
+  rcases MainFormalDiagonalOrthonormalizationWitness.nonempty_ofDiagonalConsistency
+      hpre with ⟨orthWitness⟩
   have hcompletion :
-      Nonempty (MainFormalPostRolePackageDiagonalCompletionResidual
-        params strategy eps k scalars (roleResidual.rolePackage scalars)) :=
-    MainFormalPostRolePackageDiagonalCompletionResidual.nonempty_ofDiagonalConsistency
-      orthResidual hpre
+      Nonempty (MainFormalDiagonalCompletionWitness
+        params strategy eps k scalars (roleInductionWitness.roleWitness scalars)) :=
+    MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency
+      orthWitness hpre
   rcases hcompletion with ⟨completion⟩
-  exact ⟨completion.toProjectiveCompletionTransportResidual hsmall hpre⟩
+  exact ⟨completion.toProjectiveCompletionTransportWitness hsmall hpre⟩
 
-end MainFormalCascadeProjectiveCompletionTransportResidual
+end MainFormalProjectiveCompletionTransportWitness
 
-namespace MainFormalCascadeProjectiveCompletionTransportResidual
+namespace MainFormalProjectiveCompletionTransportWitness
 
 /-- Convert the reconstructed line-156 projective approximation into the native
 `eq:third-goal` self-consistency estimate.
@@ -62,34 +62,34 @@ theorem selfConsistency
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
-    (residual : MainFormalCascadeProjectiveCompletionTransportResidual
+    (witness : MainFormalProjectiveCompletionTransportWitness
       params strategy eps k scalars)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
     ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily residual.leftMeasurement.toSubMeas)
-      (constSubMeasFamily residual.rightMeasurement.toSubMeas)
+      (constSubMeasFamily witness.leftMeasurement.toSubMeas)
+      (constSubMeasFamily witness.rightMeasurement.toSubMeas)
       (scalars.zeta3 / 2) := by
-  let leftConst : IdxProjMeas Unit (Polynomial params) ι := fun _ => residual.leftMeasurement
-  let rightConst : IdxProjMeas Unit (Polynomial params) ι := fun _ => residual.rightMeasurement
-  let pre := residual.toPreProjectiveSelfConsistency hpass
+  let leftConst : IdxProjMeas Unit (Polynomial params) ι := fun _ => witness.leftMeasurement
+  let rightConst : IdxProjMeas Unit (Polynomial params) ι := fun _ => witness.rightMeasurement
+  let pre := witness.toPreProjectiveSelfConsistency hpass
   have hpre : ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily (unsymmetrizedLeftPOVM residual.roleMeasurement).toSubMeas)
-      (constSubMeasFamily (unsymmetrizedRightPOVM residual.roleMeasurement).toSubMeas)
+      (constSubMeasFamily (unsymmetrizedLeftPOVM witness.roleMeasurement).toSubMeas)
+      (constSubMeasFamily (unsymmetrizedRightPOVM witness.roleMeasurement).toSubMeas)
       scalars.zeta1 := by
     simpa [
       pre,
-      MainFormalCascadeProjectiveCompletionTransportResidual.toPreProjectiveSelfConsistency,
-      MainFormalCascadeProjectiveCompletionTransportResidual.toUnsymmetrizedPOVMTargets
+      MainFormalProjectiveCompletionTransportWitness.toPreProjectiveSelfConsistency,
+      MainFormalProjectiveCompletionTransportWitness.toUnsymmetrizedPOVMTargets
     ] using pre.fullSelfConsistency
-  have happroxLine := residual.fullPolynomialConsistency hpre
+  have happroxLine := witness.fullPolynomialConsistency hpre
   have happroxAtZeta :
       Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
         (IdxProjMeas.toIdxSubMeas leftConst)
         (IdxProjMeas.toIdxSubMeas rightConst)
         scalars.zeta3 := by
     change Preliminaries.BipartiteSDDRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily residual.leftMeasurement.toSubMeas)
-      (constSubMeasFamily residual.rightMeasurement.toSubMeas)
+      (constSubMeasFamily witness.leftMeasurement.toSubMeas)
+      (constSubMeasFamily witness.rightMeasurement.toSubMeas)
       scalars.zeta3
     exact happroxLine
   have happrox :
@@ -105,7 +105,7 @@ theorem selfConsistency
   simpa [leftConst, rightConst, constSubMeasFamily, IdxProjMeas.toIdxSubMeas] using hcons
 
 /-- Final packaging step for `thm:main-formal` once the projective-completion
-transport residual has been constructed.
+transport witness has been constructed.
 
 * `eq:one-goal` (lines 175--181):
   $A^{\mathrm A,u}_a \otimes I \simeq_{\zeta_4}
@@ -118,12 +118,12 @@ transport residual has been constructed.
 
 This theorem performs only the Step 8 weakening from the paper cascade errors
 to `mainFormalError` using `ConsRel.mono`; the substantive construction is in
-the projective-completion transport residual. -/
+the projective-completion transport witness. -/
 theorem toMainFormal {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
-    (residual : MainFormalCascadeProjectiveCompletionTransportResidual
+    (witness : MainFormalProjectiveCompletionTransportWitness
       params strategy eps k scalars)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
     ∃ G_A G_B : ProjMeas (Polynomial params) ι,
@@ -139,18 +139,18 @@ theorem toMainFormal {params : Parameters} [FieldModel params.q]
           (constSubMeasFamily G_A.toSubMeas)
           (constSubMeasFamily G_B.toSubMeas)
           (mainFormalError params k eps) := by
-  refine ⟨residual.leftMeasurement, residual.rightMeasurement, ?_, ?_, ?_⟩
+  refine ⟨witness.leftMeasurement, witness.rightMeasurement, ?_, ?_, ?_⟩
   · exact ConsRel.mono
       (MainFormalCascadeScalars.zeta4_le_mainFormalError scalars)
-      (residual.pointAConsistency hpass)
+      (witness.pointAConsistency hpass)
   · exact ConsRel.mono
       (MainFormalCascadeScalars.zeta4_le_mainFormalError scalars)
-      (residual.pointBConsistency hpass)
+      (witness.pointBConsistency hpass)
   · exact ConsRel.mono
       (MainFormalCascadeScalars.zeta3_div_two_le_mainFormalError scalars)
-      (residual.selfConsistency hpass)
+      (witness.selfConsistency hpass)
 
-end MainFormalCascadeProjectiveCompletionTransportResidual
+end MainFormalProjectiveCompletionTransportWitness
 
 end Test
 

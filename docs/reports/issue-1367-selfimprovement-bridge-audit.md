@@ -249,11 +249,11 @@ The older branch-residual route used the following proved wiring functions:
 - `answerSuccessorOfInductionPackageAndObligations` (line 628): takes a
   `PerSliceInductionPackage` and the corresponding obligations to produce the
   branch residual
-- `rolePackageResidual_ofAnswerSuccessorObligations` (line 602): wraps into
-  `Nonempty (MainFormalRolePackageResidual)`
+- `roleWitnessResidual_ofAnswerSuccessorObligations` (line 602): wraps into
+  `Nonempty (MainFormalRoleInductionWitness)`
 
 These functions have since been removed.  The current role-register route uses
-`MainFormalRolePackageResidual.ofMainInductionLargeK`, so the missing successor
+`MainFormalRoleInductionWitness.ofMainInductionLargeK`, so the missing successor
 construction is the `sorry` in the paper-facing Section 6 theorem
 `MainInductionStep.mainInduction`, not a separate obligation API in Section 3.
 
@@ -306,7 +306,7 @@ base-case completion obligation.
 | `selfImprovementHelper` (SDP + addInU) | Conditional on `sdp` witness | No change | No change | #1385 (SDP slackness), #1230 |
 | `helperStrongSelfConsistency` (helper SSC) | Conditional lemma proved | No change | No change | #1376 (per-slice obligation) |
 | `orthonormalization.spec` (spectral) | **PROVED** unconditionally | No change | No change | — |
-| `orthonormalization.repair` (QXP repair) | Hypothesis | New: `of_roleResidual` wraps it | No change | #1032 (QXP construction) |
+| `orthonormalization.repair` (QXP repair) | Hypothesis | New: `of_roleInductionWitness` wraps it | No change | #1032 (QXP construction) |
 | `finalFields` (completeness etc.) | Conditional lemma proved | No change | No change | #1376 (per-slice obligation) |
 | `SliceObligations` wiring | **PROVED** (constructors exist) | No change | No change | #1375 (concrete SymStrat) |
 | `MainFormal` successor case | **Historical, as of 2026-05-08:** `sorry` at line 611 | No change | New: replaced by `hanswerSlice*` hypotheses | #1376 + #1377 + #1035 |

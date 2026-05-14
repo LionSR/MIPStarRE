@@ -45,7 +45,7 @@ construction in the paper because:
   diagonal outcome function carried end-to-end rather than truncated to
   `zeroCoord`.
 
-These declarations no longer feed a conditional role-residual constructor.  The
+These declarations no longer feed a conditional role-witness constructor.  The
 missing successor argument is represented by the Section 6 proof obligation and
 the final `mainFormal` proof gap, not by an additional hypothesis on a Section 3
 theorem.

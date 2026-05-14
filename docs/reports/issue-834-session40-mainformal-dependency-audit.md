@@ -49,7 +49,7 @@ The non-vacuous branch builds scalar data and then stops at the live residual:
 ```lean
 let scalars : MainFormalCascadeScalars params eps k :=
   MainFormalCascadeScalars.ofNontrivialMainFormal hepsNN hk0 herr
-have rolePackageResidualLeftCompletionLine169Residual :
+have roleWitnessResidualLeftCompletionLine169Residual :
     MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual
       (params := params) (strategy := strategy) (eps := eps)
       (hpass := hpass) (k := k) (scalars := scalars) := by
@@ -64,10 +64,10 @@ two fields:
 
 ```lean
 structure MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual ... where
-  roleResidual : MainFormalRolePackageResidual params strategy eps hpass k
+  roleInductionWitness : MainFormalRoleInductionWitness params strategy eps hpass k
   postRoleResidual :
     MainFormalPostRolePackageLeftCompletionLine169Residual params strategy eps k scalars
-      (roleResidual.rolePackage scalars)
+      (roleInductionWitness.roleWitness scalars)
 ```
 
 The second field expands at `MainTheorem.lean:2502-2534` to:
@@ -77,18 +77,18 @@ leftMeasurement : ProjMeas (Polynomial params) ι
 rightMeasurement : ProjMeas (Polynomial params) ι
 leftCompletionCloseness :
   SDDRel strategy.state (uniformDistribution Unit)
-    (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas.liftLeft)
+    (constSubMeasFamily (unsymmetrizedLeftPOVM roleWitness.roleMeasurement).toSubMeas.liftLeft)
     (constSubMeasFamily leftMeasurement.toSubMeas.liftLeft)
     scalars.zeta2
 rightCompletionClosenessLeft :
   SDDRel strategy.state (uniformDistribution Unit)
-    (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas.liftLeft)
+    (constSubMeasFamily (unsymmetrizedRightPOVM roleWitness.roleMeasurement).toSubMeas.liftLeft)
     (constSubMeasFamily rightMeasurement.toSubMeas.liftLeft)
     scalars.zeta2
 line169MatchMassMonotonicity :
   MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity strategy.state
-    (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
-    (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
+    (unsymmetrizedLeftPOVM roleWitness.roleMeasurement)
+    (unsymmetrizedRightPOVM roleWitness.roleMeasurement)
     leftMeasurement rightMeasurement
 ```
 
@@ -102,10 +102,10 @@ Existing downstream conversions are already checked:
 - `MainFormalCascadeRolePackagedCompletionLine169Residual.toCompletionLine169Residual`
   (`MainTheorem.lean:2395-2414`) expands the role-measurement record through
   `UnsymmetrizationBridgePackage.ofSymConsistency`.
-- `MainFormalCascadeProjectiveCompletionTransportResidual.selfConsistency`
+- `MainFormalProjectiveCompletionTransportWitness.selfConsistency`
   reconstructs line 156 and converts it to the native `ζ₃/2` self-consistency
   target.
-- `MainFormalCascadeProjectiveCompletionTransportResidual.toMainFormal` only
+- `MainFormalProjectiveCompletionTransportWitness.toMainFormal` only
   weakens the native `ζ₄` and `ζ₃/2` estimates to `mainFormalError`.
 
 Thus the live proof work is upstream data construction, not downstream triangle or
@@ -140,7 +140,7 @@ The live residual corresponds to the proof of `thm:main-formal` in
 | 160-166 | `eq:third-goal` and data processing to evaluated $Q$ consistency. | Downstream conversions are checked once the residual fields are supplied. |
 | 167-173 | `prop:triangle-sub` line-169 transport to $Q^{\mathrm A}_g \otimes I \simeq_{ζ₁} I\otimes G^{\mathrm B}_g`, then data processing. | The paper's printed `ζ₁` cannot be obtained from generic `triangleSub` plus completion closeness without an extra `sqrt ζ₂`; the Lean residual therefore requires `ProjectivizationMatchMassMonotonicity`. |
 | 175-185 | Final two `ζ₄` point goals `eq:one-goal` and `eq:another-goal`. | Already formalized by the residual conversions and triangle wrapper. |
-| 186-234 | Error cascade into the theorem's `ν`. | Already formalized by `MainFormalCascadeScalars` and `MainFormalCascadeProjectiveCompletionTransportResidual.toMainFormal`. |
+| 186-234 | Error cascade into the theorem's `ν`. | Already formalized by `MainFormalCascadeScalars` and `MainFormalProjectiveCompletionTransportWitness.toMainFormal`. |
 
 The exact line-169 constraint is the reason this report does not recommend a quick
 `triangleSub` proof: that route is mathematically weaker than the paper's displayed
@@ -192,10 +192,10 @@ Two open older trackers are also not direct fields of the present residual:
 
 - #424 is still open, but the factor-two unsymmetrization estimates are no longer
   explicit residual fields; the current route obtains them from
-  `MainFormalRoleMeasurementPackage.toUnsymmetrizationBridge`.
+  `MainFormalRoleMeasurementWitness.toUnsymmetrizationBridge`.
 - #427 is still open, but the scalar cascade bounds and final weakening are already
   checked in `MainFormalCascadeScalars` and
-  `MainFormalCascadeProjectiveCompletionTransportResidual.toMainFormal`; the local TODO
+  `MainFormalProjectiveCompletionTransportWitness.toMainFormal`; the local TODO
   marker `TODO(#427)` is stale as a description of the remaining proof term.
 
 A future PR that edits `MainTheorem.lean` should refresh these TODO comments after
@@ -213,7 +213,7 @@ restriction plumbing and tightens the live `mainFormal` boundary to a `Nonempty`
 Step 6 witness residual.  It explicitly remains blocked on #931.
 
 Issue #931 is open and asks for closed self-improvement inputs for Section 6.  In
-current `main`, `MainFormalRolePackageResidual` can be produced from the checked
+current `main`, `MainFormalRoleInductionWitness` can be produced from the checked
 base handoff or a syntactic successor boundary, but the general successor-boundary
 construction still needs the Section 6 self-improvement/recursion inputs that #931
 tracks.  Therefore the first field of the live residual should not be attacked in

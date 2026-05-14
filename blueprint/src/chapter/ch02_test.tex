@@ -129,11 +129,11 @@
 	\end{enumerate}
 \end{theorem}
 
-\begin{remark}[Residual form of the final transport]\label{rem:main-formal-conditional}
-	\lean{MIPStarRE.LDT.Test.mainFormal_ofProjectiveCompletionResidual}
+\begin{remark}[Internal witness form of the final transport]\label{rem:main-formal-conditional}
+	\lean{MIPStarRE.LDT.Test.mainFormal_ofProjectiveCompletionTransportWitness}
 	\uses{thm:main-formal, def:low-individual-degree-test, def:projective-strategy, def:polymeasurements, def:simeq}
-	The residual theorem is a Lean-only formally verified final-transport result: once the
-	Section~6 role residual and the post-role projective-completion residual have
+	The witness theorem is a Lean-only formally verified final-transport result: once the
+	Section~6 role witness and the post-role projective-completion witness have
 	been constructed from the hypotheses of Theorem~\ref{thm:main-formal}, it
 	derives the three consistency conclusions of the theorem.  It is not a
 	replacement statement for Theorem~\ref{thm:main-formal}, and it supplies no

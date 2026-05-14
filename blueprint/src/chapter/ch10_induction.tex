@@ -454,34 +454,34 @@
 \end{definition}
 
 \begin{definition}[Lean base-case Step~6 obligations for the Section~3 proof]\label{def:main-formal-step6-obligations}
-	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalCompletionResidual.nonempty_ofDiagonalConsistency}
-	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalCompletionResidual.leftMatchMassPreservation_ofDiagonalConsistency, MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalCompletionResidual.rightMatchMassPreservation_ofDiagonalConsistency}
+	\lean{MIPStarRE.LDT.Test.MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency}
+	\lean{MIPStarRE.LDT.Test.MainFormalDiagonalCompletionWitness.leftMatchMassPreservation_ofDiagonalConsistency, MIPStarRE.LDT.Test.MainFormalDiagonalCompletionWitness.rightMatchMassPreservation_ofDiagonalConsistency}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass, MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairWithMatchMass}
-	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalConsistency}
-	\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.nonempty_ofRoleResidual}
-	\lean{MIPStarRE.LDT.Test.strategySymmetrization_mainInduction, MIPStarRE.LDT.Test.MainFormalRolePackageResidual.ofMainInduction, MIPStarRE.LDT.Test.MainFormalRolePackageResidual.ofMainInductionLargeK}
-	\lean{MIPStarRE.LDT.Test.mainFormalBaseRoleResidual}
-	\lean{MIPStarRE.LDT.Test.mainFormal_ofProjectiveCompletionResidual}
+	\lean{MIPStarRE.LDT.Test.MainFormalDiagonalOrthonormalizationWitness.nonempty_ofDiagonalConsistency}
+	\lean{MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness}
+	\lean{MIPStarRE.LDT.Test.strategySymmetrization_mainInduction, MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.ofMainInduction, MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.ofMainInductionLargeK}
+	\lean{MIPStarRE.LDT.Test.mainFormalBaseRoleInductionWitness}
+	\lean{MIPStarRE.LDT.Test.mainFormal_ofProjectiveCompletionTransportWitness}
 	\uses{def:main-formal-successor-boundary, thm:orthonormalization}
 	The role-register Section~6 measurement is obtained by applying the
 	paper-facing theorem \texttt{MainInductionStep.mainInduction} to the
 	role-register symmetrization.  The Lean constructors
-	\texttt{MainFormalRolePackageResidual.ofMainInduction} and
-	\texttt{MainFormalRolePackageResidual.ofMainInductionLargeK} record this
+	\texttt{MainFormalRoleInductionWitness.ofMainInduction} and
+	\texttt{MainFormalRoleInductionWitness.ofMainInductionLargeK} record this
 	application of the paper theorem; any successor proof gap is the tracked gap in
 	\texttt{mainInduction} itself, not an added hypothesis of
-	Theorem~\ref{thm:main-formal}.  The base-case role residual
-	\texttt{mainFormalBaseRoleResidual} remains a named specialization for
+	Theorem~\ref{thm:main-formal}.  The base-case role witness
+	\texttt{mainFormalBaseRoleInductionWitness} remains a named specialization for
 	$m=1$.
 
 	From a line-130 consistency relation, the theorem
-	\texttt{MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty\_ofDiagonalConsistency}
+	\texttt{MainFormalDiagonalOrthonormalizationWitness.nonempty\_ofDiagonalConsistency}
 	constructs the pre-completion projective submeasurements using the Section~5
 	locality-preserving repair construction.  It also retains the exact
 	match-mass preservation proof supplied by the QXP repair producer.  The
 	completion theorem
-	\texttt{MainFormalPostRolePackageDiagonalCompletionResidual.nonempty\_ofDiagonalConsistency}
+	\texttt{MainFormalDiagonalCompletionWitness.nonempty\_ofDiagonalConsistency}
 	now consumes the two match-mass projection theorems
 	\texttt{leftMatchMassPreservation\_ofDiagonalConsistency} and
 	\texttt{rightMatchMassPreservation\_ofDiagonalConsistency}.  The remaining
@@ -493,10 +493,10 @@
 	The remaining proof gap is not represented by diagonal-consistency,
 	match-mass, or other auxiliary input hypotheses.  The paper-facing theorem
 	itself remains unfinished.  Once a
-	\texttt{MainFormalCascadeProjectiveCompletionTransportResidual} has
+	\texttt{MainFormalProjectiveCompletionTransportWitness} has
 	been constructed from the paper hypotheses, the proved theorem
-	\texttt{mainFormal\_ofProjectiveCompletionResidual} derives the three
-	consistency conclusions for Theorem~\ref{thm:main-formal}.  The residual is a
+	\texttt{mainFormal\_ofProjectiveCompletionTransportWitness} derives the three
+	consistency conclusions for Theorem~\ref{thm:main-formal}.  The witness is a
 	construction target inside the proof, not an additional assumption in the
 	public statement.
 \end{definition}
@@ -509,8 +509,8 @@
 	strategy that passes the low individual degree test, the large-\(k\) bound
 	\(k \ge 400md\) from Section~6, the positivity condition \(d > 0\), and the
 	non-base condition \(m \neq 1\), the proof must construct the
-	projective-completion residual consumed by
-	\texttt{mainFormal\_ofProjectiveCompletionResidual}.  This is part of the
+	projective-completion witness consumed by
+	\texttt{mainFormal\_ofProjectiveCompletionTransportWitness}.  This is part of the
 	unfinished proof of the paper theorem, not a separate assumption in its
 	statement.
 \end{remark}
@@ -578,7 +578,7 @@
 		\zeta_4 = 2\sigma + 2\sqrt{\zeta_1+\zeta_3/2}.
 	\]
 	The coefficient $42$ is the Lean cascade scalar; it widens the paper's printed
-	coefficient $40$ so that the completion theorem's residual $2\zeta_1$ is
+	coefficient $40$ so that the completion theorem's extra $2\zeta_1$ term is
 	absorbed while preserving the final error envelope.
 \end{definition}
 
@@ -665,13 +665,13 @@
 	This is the direct combination of Theorem~\ref{thm:sigma-bound-main-formal} and Theorem~\ref{thm:zeta-bounds-main-formal}. The Lean declaration uses the explicit equalities naming $\sigma,\zeta_1,\zeta_2,\zeta_3$ as the corresponding cascade expressions.
 \end{proof}
 
-\begin{remark}[Lean Step 5 expansion theorem]\label{rem:main-formal-step5-sz-residual}
+\begin{remark}[Lean Step 5 expansion theorem]\label{rem:main-formal-step5-sz-bound}
 	\lean{MIPStarRE.LDT.Preliminaries.polynomialCollision_sandwichTensor_le_mdq}
 	\lean{MIPStarRE.LDT.Preliminaries.polynomialCollisionMass}
 	\lean{MIPStarRE.LDT.Preliminaries.polynomialCollisionMass_le_mdq}
-	\lean{MIPStarRE.LDT.Test.MainFormalStep5ExpansionResidual}
-	\lean{MIPStarRE.LDT.Test.mainFormalStep5_expansionResidual}
-	\lean{MIPStarRE.LDT.Test.mainFormalStep5_selfConsistency_ofExpansionResidual}
+	\lean{MIPStarRE.LDT.Test.MainFormalStep5ExpansionBound}
+	\lean{MIPStarRE.LDT.Test.mainFormalStep5_expansionBound}
+	\lean{MIPStarRE.LDT.Test.mainFormalStep5_selfConsistency_ofExpansionBound}
 	\uses{lem:schwartz-zippel-individual, thm:main-formal}
 	For the Step~5 passage below, Lean now names the weighted polynomial-collision
 	mass, proves its $md/q$ bound by specializing the existing tensor
@@ -681,10 +681,10 @@
 	takes the expansion statement as an external hypothesis.
 \end{remark}
 
-\begin{remark}[Lean residual structures for the main-formal assembly]\label{rem:main-formal-lean-residual-records}
+\begin{remark}[Lean witness structures for the main-formal assembly]\label{rem:main-formal-lean-witness-records}
 \uses{thm:error-cascade-main-formal, thm:main-formal-envelope-basics}
 The following Lean declarations are bookkeeping infrastructure for the final
-assembly residual:
+assembly witness:
 \lean{MIPStarRE.LDT.SameSpaceProjStrat.axisParallelRoleAverage_nonneg, MIPStarRE.LDT.SameSpaceProjStrat.diagonalRoleAverage_nonneg}
 \lean{MIPStarRE.LDT.SameSpaceProjStrat.lowIndividualDegreeFailureProbability_nonneg, MIPStarRE.LDT.SameSpaceProjStrat.eps_nonneg_of_passes}
 \lean{MIPStarRE.LDT.SameSpaceProjStrat.axisParallelRoleAverage_le_three_mul}
@@ -693,8 +693,8 @@ assembly residual:
 \lean{MIPStarRE.LDT.Test.mainFormalError_ge_one_of_one_le_envelope, MIPStarRE.LDT.Test.mainFormalError_ge_one_of_one_lt_eps, MIPStarRE.LDT.Test.mainFormalError_ge_one_of_q_lt_d}
 \lean{MIPStarRE.LDT.Test.mainFormalInductionNu_bound, MIPStarRE.LDT.Test.cascadeHypotheses_of_not_mainFormalError_ge_one}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeScalars.ofCascadeHypotheses, MIPStarRE.LDT.Test.MainFormalCascadeScalars.ofNontrivialMainFormal, MIPStarRE.LDT.Test.MainFormalCascadeScalars.zeta3_div_two_le_mainFormalError}
-\lean{MIPStarRE.LDT.Test.MainFormalRoleMeasurementPackage, MIPStarRE.LDT.Test.MainFormalRoleMeasurementPackage.ofMainInductionWitness, MIPStarRE.LDT.Test.MainFormalRoleMeasurementPackage.ofBaseCase, MIPStarRE.LDT.Test.MainFormalRoleMeasurementPackage.toUnsymmetrizationBridge}
-\lean{MIPStarRE.LDT.Test.MainFormalRolePackageResidual, MIPStarRE.LDT.Test.MainFormalRolePackageResidual.toRoleMeasurementPackage, MIPStarRE.LDT.Test.MainFormalRolePackageResidual.ofMainInduction, MIPStarRE.LDT.Test.MainFormalRolePackageResidual.ofMainInductionLargeK, MIPStarRE.LDT.Test.MainFormalRolePackageResidual.ofBaseCase, MIPStarRE.LDT.Test.MainFormalRolePackageResidual.rolePackage}
+\lean{MIPStarRE.LDT.Test.MainFormalRoleMeasurementWitness, MIPStarRE.LDT.Test.MainFormalRoleMeasurementWitness.ofMainInductionWitness, MIPStarRE.LDT.Test.MainFormalRoleMeasurementWitness.ofBaseCase, MIPStarRE.LDT.Test.MainFormalRoleMeasurementWitness.toUnsymmetrizationBridge}
+\lean{MIPStarRE.LDT.Test.MainFormalRoleInductionWitness, MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.toRoleMeasurementWitness, MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.ofMainInduction, MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.ofMainInductionLargeK, MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.ofBaseCase, MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.roleWitness}
 \lean{MIPStarRE.LDT.Parameters.next, MIPStarRE.LDT.Parameters.previous, MIPStarRE.LDT.Parameters.previous_next_eq, MIPStarRE.LDT.Parameters.SuccessorDecomposition, MIPStarRE.LDT.Parameters.successorDecompositionOfOneLtM, MIPStarRE.LDT.Parameters.one_lt_m_of_ne_one, MIPStarRE.LDT.Parameters.successorDecompositionOfNeOne}
 \lean{MIPStarRE.LDT.Test.fieldModelOfSuccessorDecomposition, MIPStarRE.LDT.Test.projStratTransportSuccessor, MIPStarRE.LDT.Test.passesLowIndividualDegreeTest_transportSuccessor}
 \lean{MIPStarRE.LDT.roleCond, MIPStarRE.LDT.roleBlock, MIPStarRE.LDT.opTensor_roleCond_sum, MIPStarRE.LDT.ev_classicalRoleSymmState_one, MIPStarRE.LDT.ev_classicalRoleSymmState_rolePair_AB, MIPStarRE.LDT.ev_classicalRoleSymmState_rolePair_BA, MIPStarRE.LDT.ev_classicalRoleSymmState_rolePair_AA, MIPStarRE.LDT.ev_classicalRoleSymmState_rolePair_BB, MIPStarRE.LDT.ev_classicalRoleSymmState_opTensor_roleCond_A, MIPStarRE.LDT.ev_classicalRoleSymmState_opTensor_roleCond_B}
@@ -707,26 +707,26 @@ assembly residual:
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeScalars.orthonormalizeAndCompleteError_zeta1_le_zeta2}
 \lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.fullPolynomialConsistency}
 \lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.completeAtOutcomeProj_left_matchMass_ge, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_completeAtOutcomeProj}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.toUnsymmetrizedPOVMTargets, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.toPreProjectiveSelfConsistency}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.projectivizationSelfConsistencyHandoff, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.fullPolynomialConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.projectiveEvaluationConsistency}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.pointAConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.pointBConsistency, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.selfConsistency}
-\lean{MIPStarRE.LDT.Test.mainFormalProjectiveCompletionTransportResidualOfCompleteAtOutcomeStatements, MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalCompletionResidual.toProjectiveCompletionTransportResidual}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.nonempty_ofRoleResidual, MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.toMainFormal}
+\lean{MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.toUnsymmetrizedPOVMTargets, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.toPreProjectiveSelfConsistency}
+\lean{MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.projectivizationSelfConsistencyHandoff, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.fullPolynomialConsistency, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.projectiveEvaluationConsistency}
+\lean{MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.pointAConsistency, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.pointBConsistency, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.selfConsistency}
+\lean{MIPStarRE.LDT.Test.mainFormalProjectiveCompletionTransportWitnessOfCompleteAtOutcomeStatements, MIPStarRE.LDT.Test.MainFormalDiagonalCompletionWitness.toProjectiveCompletionTransportWitness}
+\lean{MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.toMainFormal}
 They split off the vacuous branch where the theorem error is at least $1$,
 derive the Step~8 scalar hypotheses in the non-vacuous branch, and isolate the
-role-register Section~6 measurement behind a concrete role-residual record.
+role-register Section~6 measurement behind a concrete role-witness record.
 That record can now be obtained directly from the
 \texttt{mainInduction} theorem by
-\texttt{MainFormalRolePackageResidual.ofMainInductionLargeK}; the successor
+\texttt{MainFormalRoleInductionWitness.ofMainInductionLargeK}; the successor
 case is therefore a tracked \texttt{sorry} in Section~6, not a separate
 boundary hypothesis in Section~3.  Lean also records that every non-base
 parameter choice has a predecessor via
 \texttt{Parameters.successorDecompositionOfNeOne}, and it retains the explicit
 transport helpers for the strategy and passing proof across that predecessor
-equality.  The older branch-residual records, which assembled ordinary or
+equality.  The older branch-witness records, which assembled ordinary or
 answer-valued successor data from recursive slice witnesses and supplied
-self-improvement inputs, have been removed.  The current completion residual
-carries the concrete role residual obtained from the Section~6
+self-improvement inputs, have been removed.  The current completion witness
+carries the concrete role witness obtained from the Section~6
 theorem rather than a separate decorative branch witness.  Once the
 role-measurement record is obtained,
 Lean proves the two factor-two unsymmetrization links from
@@ -739,27 +739,27 @@ completion closeness at $\zeta_2$.  Lean also derives the evaluated line-164
 projective consistency, data-processes the two polynomial line-169 $\zeta_1$
 links to the evaluated line-172 links, and proves the two native $\zeta_4$ point
 goals via \texttt{simeq-triangle-inequality}.  After the \#869 right-register
-completion transport, the remaining active post-role residual asks only for
+completion transport, the remaining active post-role witness asks only for
 Alice's line-146 completion closeness, Bob's left-register completion closeness
 as returned by orthonormalize-and-complete, and the construction-level
 match-mass monotonicity invariant needed for the exact polynomial-level
 $\zeta_1$ transport links from paper line~169 and its role-reversed analogue.
 Lean reconstructs pre-projective full-polynomial consistency from the concrete
-role residual, uses the match-mass invariant to derive the two line-169 links,
+role witness, uses the match-mass invariant to derive the two line-169 links,
 and transports the Bob-side left-register completion estimate to the line-147
 right-register form before converting directly to the projective completion
-residual used by the final assembly.
+witness used by the final assembly.
 It no longer asks for an arbitrary role-measurement record or an arbitrary
 raw Section~6 witness as an independent field.  It also no longer asks for the two factor-two
 role-block estimates, the unused Section~6 consistency field inside
 \texttt{UnsymmetrizationBridgePackage}, or the duplicated pre-projective
 consistency field inside the Section~6 handoff; those are rebuilt from the concrete
-role residual, the selected role-measurement record, and \texttt{hpass}.  Lean then applies
+role witness, the selected role-measurement record, and \texttt{hpass}.  Lean then applies
 the projective converse of \texttt{simeq-to-approx} directly inside
-\texttt{MainFormalCascadeProjectiveCompletionTransportResidual.selfConsistency}.
+\texttt{MainFormalProjectiveCompletionTransportWitness.selfConsistency}.
 
 The exact line-169 transport fields are now derived from the stored match-mass
-monotonicity invariant rather than being independent residual data.  As stated in
+monotonicity invariant rather than being independent witness data.  As stated in
 \texttt{preliminaries.tex}, \texttt{prop:triangle-sub} gives a
 $\delta+\sqrt{\epsilon}$ loss, so applying it directly to
 $G^{\mathrm A}\simeq_{\zeta_1}G^{\mathrm B}$ and
@@ -769,10 +769,10 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 	error to scale $t^{1/65536}$, outside the current \texttt{mainFormalError}
 	envelope.  The sharper local pre-completion repair from
 	Remark~\ref{rem:lean-line169-projectivization-match-mass} avoids that
-	widening and is part of the match-mass residual route.
+	widening and is part of the match-mass witness route.
 	No proof-level completeness tag is claimed here while \texttt{mainFormal}
 	itself has a tracked proof gap for constructing the projective-completion
-	residual from the paper hypotheses; the Section~6 role residual follows from
+	witness from the paper hypotheses; the Section~6 role witness follows from
 	\texttt{mainInduction}, whose successor branch carries its own tracked gap
 	(issue~\#1458).
 
@@ -846,9 +846,9 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 		\zeta_1 = 2\sigma + 2\sqrt{3\eps+2\sigma} + \frac{md}{q}.
 	\]
 	The Lean Step~5 theorem
-	\lean{MIPStarRE.LDT.Test.MainFormalStep5ExpansionResidual}
-	\lean{MIPStarRE.LDT.Test.mainFormalStep5_expansionResidual}
-	\lean{MIPStarRE.LDT.Test.mainFormalStep5_selfConsistency_ofExpansionResidual}
+	\lean{MIPStarRE.LDT.Test.MainFormalStep5ExpansionBound}
+	\lean{MIPStarRE.LDT.Test.mainFormalStep5_expansionBound}
+	\lean{MIPStarRE.LDT.Test.mainFormalStep5_selfConsistency_ofExpansionBound}
 	formalizes this expansion/reindexing step and combines it with the proved
 	Schwartz--Zippel tensor bound
 	\lean{MIPStarRE.LDT.Preliminaries.polynomialCollisionMass_le_mdq}.
@@ -871,7 +871,7 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 	The paper prints the coefficient $40$ in this display.  The formal Lean
 	cascade uses the widened coefficient $42$ to absorb the literal completion
 	error $2\cdot(100\zeta_1^{1/4})+4\sqrt{100\zeta_1^{1/4}}+2\zeta_1$:
-	under the non-vacuous scalar regime $0 \le \zeta_1 \le 1$, the residual term
+	under the non-vacuous scalar regime $0 \le \zeta_1 \le 1$, the extra term
 	$2\zeta_1$ is bounded by $2\zeta_1^{1/8}$.
 
 	By \ref{eq:G-self-consistency} and Lemma~\ref{prop:simeq-to-approx},
@@ -916,13 +916,13 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 		I \ot A_a^{\mathrm B,u} \simeq_{\zeta_4} Q_{[g(u)=a]}^{\mathrm A} \ot I.
 	\end{equation}
 
-	Remark~\ref{rem:main-formal-lean-residual-records} records the Lean residual
+	Remark~\ref{rem:main-formal-lean-witness-records} records the Lean witness
 	structures that separate the scalar cascade and the Step~5 Schwartz--Zippel
 	handoff from the remaining projective-stage transport work.  The scalar side
 	discharges the paper's line~71--73 coarsening and the Step~8 hypotheses in the
 	non-vacuous branch; the Step~5 theorem now turns the evaluated estimate at
 	line~116 into full-polynomial consistency at $\zeta_1$.  The remaining Lean
-	residual is the completion-and-line-169 construction: supply the actual
+	witness is the completion-and-line-169 construction: supply the actual
 	role-register measurement, Alice's line-146 completion estimate, Bob's
 	left-register completion estimate, and the two exact polynomial-level
 	$\zeta_1$ links.  Lean transports the Bob-side completion estimate to the
