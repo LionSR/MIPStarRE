@@ -17,67 +17,68 @@
 \section{At a glance}
 
 \begin{itemize}
-  \item \textbf{Difficulty: medium.}  The missing case is not a new
-  high-dimensional construction, but the positive-degree scalar absorption used
-  in the present proof disappears when \(d=0\).
-  \item \textbf{Estimated weight:} one separate branch theorem, probably
-  \textbf{100--300 lines} of project-local proof, depending on how much of the
-  line-test and slice-consistency API can be reused directly.
-  \item \textbf{Mathlib/project split:} about \textbf{10\% Mathlib} and
-  \textbf{90\% project-local}.  Mathlib should supply only elementary finite
-  sums and scalar inequalities.
-  \item \textbf{Key inputs:} degree-zero polynomial evaluation, the
-  slice-consistency hypotheses in low-degree pasting, and the existing
-  point-consistency interfaces for pasted measurements.
+  \item \textbf{Difficulty.}  Medium.  The obstruction is not a new analytic
+  estimate, but the positive-degree proof uses a scalar absorption which is no
+  longer available when \(d=0\).
+  \item \textbf{Estimated weight.}  One branch theorem, probably 100--300 lines
+  of formal proof, depending on how directly the existing slice-consistency and
+  point-consistency interfaces can be reused.
+  \item \textbf{Mathlib/project split.}  The expected proof is mostly
+  project-local.  Mathlib should supply only elementary facts about finite sums,
+  natural-number inequalities, and monotonicity of real powers.
+  \item \textbf{Key mathematical inputs.}  Degree-zero polynomials are constant;
+  the pasted slices satisfy the source completeness and consistency hypotheses;
+  and the final measurement must satisfy the same point-consistency conclusion
+  as in the unrestricted theorem.
 \end{itemize}
 
 \section{Key theorem forms}
 
-Let \(S\) be an
+We use the notation of the low-degree pasting theorem.  Let \(S\) be an
 \((\varepsilon,\delta,\gamma)\)-good symmetric strategy for the
 \((m+1,q,d)\) low individual degree test.  For each \(x\in\F_q\), let
-\[
-  G^x\in\polysub{m}{q}{d}
-\]
-be the projective submeasurement supplied on the \(x\)-slice, and assume the
-completeness, consistency, strong self-consistency, and boundedness hypotheses
-appearing in the source theorem.
+\(G^x\in\polysub{m}{q}{d}\) be the projective submeasurement on the \(x\)-slice,
+and assume the completeness, consistency, strong self-consistency, and
+boundedness hypotheses stated in the source theorem.
 
-The source theorem asserts that, if \(k\ge 400md\), then there is a pasted
-measurement
-\[
-  H\in\polymeas{m+1}{q}{d}
-\]
-whose point-consistency error is
-\[
-  \sigma=\kappa\left(1+\frac{1}{100m}\right)+2\nu+
-  \exp\left(-\frac{k}{80000m^2}\right),
-\]
-where
-\[
-  \nu=100k^2m\left(\varepsilon^{1/32}+\delta^{1/32}
-    +\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}\right).
-\]
-No hypothesis \(0<d\) appears in this theorem.
+\begin{enumerate}
+  \item \textbf{Source theorem form.}  If \(k\ge 400md\), then there is a
+  pasted measurement \(H\in\polymeas{m+1}{q}{d}\) whose point-consistency error
+  is
+  \[
+    \sigma=\kappa\left(1+\frac{1}{100m}\right)+2\nu+
+    \exp\left(-\frac{k}{80000m^2}\right),
+  \]
+  where
+  \[
+    \nu=100k^2m\left(\varepsilon^{1/32}+\delta^{1/32}
+      +\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}\right).
+  \]
+  This is the theorem form in the paper; it does not contain the hypothesis
+  \(0<d\).
 
-The present positive-degree construction proves the same conclusion in the
-nontrivial regime
-\[
-  \gamma\le 1,\qquad \zeta\le 1,\qquad d\le q,\qquad 0<d,\qquad 1\le k.
-\]
-The open branch should prove the source conclusion under the complementary
-degree-zero hypotheses
-\[
-  d=0,\qquad 1\le k,
-\]
-without adding \(0<d\) or any bridge, residual, repair, producer, or package
-hypothesis to the source-facing theorem.%
-\footnote{The source-facing Lean theorem is
-\(\leanid{MIPStarRE.LDT.Pasting.ldPasting}\).  The positive-degree theorem is
-\(\leanid{MIPStarRE.LDT.Pasting.ldPastingNontrivial}\).  The open branch is
-\(\leanid{MIPStarRE.LDT.Pasting.ldPastingDegreeZeroBranch}\) in
-\doclink{MIPStarRE/LDT/Pasting/Bernoulli/Final.lean}.  The repair is tracked by
-\ghissue{1622} and currently documented in \ghpr{1633}.}
+  \item \textbf{Restricted construction theorem form.}  The formal proof
+  presently constructs such an \(H\) in the nontrivial regime
+  \[
+    \gamma\le 1,\qquad \zeta\le 1,\qquad d\le q,\qquad 0<d,\qquad 1\le k.
+  \]
+  This is useful proof content, but it is a restricted construction theorem,
+  not the source theorem.
+
+  \item \textbf{Remaining branch form.}  The complementary branch is the same
+  conclusion under the source hypotheses together with
+  \[
+    d=0,\qquad 1\le k.
+  \]
+  Proving this branch restores the unrestricted theorem without changing its
+  public hypotheses.%
+  \footnote{The source-facing Lean theorem is
+  \(\leanid{MIPStarRE.LDT.Pasting.ldPasting}\).  The restricted construction is
+  \(\leanid{MIPStarRE.LDT.Pasting.ldPastingNontrivial}\).  The open branch is
+  \(\leanid{MIPStarRE.LDT.Pasting.ldPastingDegreeZeroBranch}\) in
+  \doclink{MIPStarRE/LDT/Pasting/Bernoulli/Final.lean}.  The repair is tracked
+  by \ghissue{1622} and currently documented in \ghpr{1633}.}
+\end{enumerate}
 
 \section{The source assertion}
 
