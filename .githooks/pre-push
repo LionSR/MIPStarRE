@@ -10,7 +10,8 @@ ROOT="$(git rev-parse --show-toplevel)"
 cd "$ROOT"
 
 CHANGED_FILE_LIST="$(mktemp)"
-trap 'rm -f "$CHANGED_FILE_LIST"' EXIT
+CHANGED_LEAN_FILE_LIST="$(mktemp)"
+trap 'rm -f "$CHANGED_FILE_LIST" "$CHANGED_LEAN_FILE_LIST"' EXIT
 
 ZERO_SHA="0000000000000000000000000000000000000000"
 
@@ -34,22 +35,32 @@ do
 done
 
 sort -u "$CHANGED_FILE_LIST" -o "$CHANGED_FILE_LIST"
+grep -E '^(MIPStarRE/.*\.lean|MIPStarRE\.lean)$' "$CHANGED_FILE_LIST" \
+  > "$CHANGED_LEAN_FILE_LIST" || true
 
 if [ ! -s "$CHANGED_FILE_LIST" ]; then
   echo "MIPStarRE pre-push: no changed tracked files detected."
   exit 0
 fi
 
-if grep -Eq '^(MIPStarRE/.*\.lean|MIPStarRE\.lean)$' "$CHANGED_FILE_LIST"; then
+if [ -s "$CHANGED_LEAN_FILE_LIST" ]; then
   echo "MIPStarRE pre-push: checking changed Lean files."
-  grep -E '^(MIPStarRE/.*\.lean|MIPStarRE\.lean)$' "$CHANGED_FILE_LIST" |
-    while read LEAN_FILE
+  while read LEAN_FILE
     do
       if [ -f "$LEAN_FILE" ]; then
         echo "  lake env lean $LEAN_FILE"
         lake env lean "$LEAN_FILE"
       fi
-    done
+    done < "$CHANGED_LEAN_FILE_LIST"
+fi
+
+if [ -s "$CHANGED_LEAN_FILE_LIST" ] ||
+    grep -Eq '^scripts/(check_oversized_lean_files\.py|tests/test_check_oversized_lean_files\.py)$' \
+      "$CHANGED_FILE_LIST"; then
+  echo "MIPStarRE pre-push: checking Lean file length guard."
+  python3 scripts/check_oversized_lean_files.py \
+    --root . \
+    --known MIPStarRE/LDT/SelfImprovement/Theorems/Results/BoundednessTransport.lean
 fi
 
 if grep -Eq '^(MIPStarRE/LDT/.*\.lean|MIPStarRE/LDT\.lean|MIPStarRE\.lean)$' "$CHANGED_FILE_LIST"; then
@@ -61,8 +72,9 @@ if grep -Eq '^(MIPStarRE/LDT/.*\.lean|MIPStarRE/LDT\.lean|MIPStarRE\.lean)$' "$C
   fi
 fi
 
-if grep -Eq '^(MIPStarRE/|MIPStarRE\.lean$|blueprint/src/|blueprint/lean_decls|scripts/(audit_paper_facing_proof_debt|audit_conclusion_shaped_hypotheses|audit_unfaithful_markers|audit_lean_axiom_declarations|check_statement_paper_origin|blueprint_lean_sync)\.py|docs/(CONTRIBUTING|PROOF_INTEGRITY|anti_patterns|blueprint_style_guide|formalization-patterns|proof_frontier_review)\.md|docs/paper-gaps/|\.github/(actions|prompts|workflows)/|AGENTS\.md)' "$CHANGED_FILE_LIST"; then
+if grep -Eq '^(MIPStarRE/|MIPStarRE\.lean$|blueprint/src/|blueprint/lean_decls|scripts/(audit_paper_facing_proof_debt|audit_conclusion_shaped_hypotheses|audit_unfaithful_markers|audit_lean_axiom_declarations|check_statement_paper_origin|blueprint_lean_sync|lean_header_utils)\.py|docs/(CONTRIBUTING|PROOF_INTEGRITY|anti_patterns|blueprint_style_guide|formalization-patterns|proof_frontier_review)\.md|docs/paper-gaps/|\.github/(actions|prompts|workflows)/|AGENTS\.md)' "$CHANGED_FILE_LIST"; then
   echo "MIPStarRE pre-push: checking statement-integrity audits."
+  echo "MIPStarRE pre-push: do not close proof gaps by adding non-paper bridge/package hypotheses."
   python3 scripts/check_statement_paper_origin.py --root .
   python3 scripts/audit_paper_facing_proof_debt.py --root . --ci
   python3 scripts/audit_conclusion_shaped_hypotheses.py --root . --ci
@@ -81,6 +93,18 @@ if grep -Eq '^(MIPStarRE/|MIPStarRE\.lean$|blueprint/|scripts/(blueprint_lean_sy
 
   echo "MIPStarRE pre-push: checking blueprint and Lean declaration sync."
   python3 scripts/blueprint_lean_sync.py --root . --ci
+  if [ -s "$CHANGED_LEAN_FILE_LIST" ]; then
+    if git rev-parse --verify origin/main >/dev/null 2>&1; then
+      echo "MIPStarRE pre-push: warning on changed Lean declarations missing blueprint tags."
+      python3 scripts/blueprint_lean_sync.py \
+        --root . \
+        --warn-missing-blueprint \
+        --diff-base origin/main \
+        --changed-files $(cat "$CHANGED_LEAN_FILE_LIST")
+    else
+      echo "MIPStarRE pre-push: origin/main not found; skipping reverse blueprint coverage warning."
+    fi
+  fi
   lake exe checkdecls blueprint/lean_decls
 fi
 
