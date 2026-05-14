@@ -639,8 +639,14 @@ Paper origin: `references/ldt-paper/ld-pasting.tex:12-55`.  The paper's
 large-error reduction names the cases
 `eps, delta, gamma, zeta, d/q ≥ 1`; it does not explicitly add `0 < d` as a
 hypothesis of `thm:ld-pasting`.  Thus the Lean theorem should not add `0 < d`
-as an assumption of that cited theorem.  Issue #1622 tracks the direct proof of
-this degree-zero branch. -/
+as an assumption of that cited theorem.
+
+Issue #1622 tracks the direct proof of this degree-zero branch.  The existing
+nontrivial proof route cannot simply be reused: its `hBConsistency` aggregation
+passes from distinct sampled heights to independent sampled heights and absorbs
+the resulting `k^2/q` loss through the displayed `(d/q)^(1/32)` term.  When
+`d = 0`, that term is zero, so the branch requires a separate argument rather
+than an additional hypothesis on `ldPasting`. -/
 theorem ldPastingDegreeZeroBranch
     (params : Parameters)
     [FieldModel params.q]
@@ -658,8 +664,8 @@ theorem ldPastingDegreeZeroBranch
     (_hk_pos : 1 ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
-  -- Issue #1622: prove the `d = 0, 0 < k` branch directly, without adding
-  -- `0 < d` as a public hypothesis of the source theorem.
+  -- Issue #1622: prove the `d = 0, 0 < k` branch directly.  This must not be
+  -- discharged by adding `0 < d` as a public hypothesis of `ldPasting`.
   sorry
 
 /-- Nontrivial regime for the unrestricted theorem.
