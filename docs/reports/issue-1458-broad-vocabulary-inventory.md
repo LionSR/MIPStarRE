@@ -20,14 +20,15 @@ case is a statement-drift problem for the paper theorem itself.
 
 ## Summary
 
-The current scan reports 25 unresolved theorem boundaries.  It also records 39
+The current scan reports 21 unresolved theorem boundaries.  It also records 39
 uses of source-construction context and 2 quoted external theorem interfaces.
-The stricter paper-facing proof-debt check finds no remaining occurrence of the
-agreed bridge, residual, repair, package, producer, input, hypothesis,
-assumption, obligation, wrapper, bundle, or conditional vocabulary in
-source-labelled public inputs.
+The stricter paper-facing proof-debt check finds no remaining proof-debt header
+occurrence of the agreed bridge, residual, repair, package, producer,
+hypothesis, assumption, obligation, wrapper, bundle, or conditional vocabulary
+in source-labelled public inputs.  It separately classifies 24 faithful boundary
+inputs, such as the boundedness hypothesis and the error-cascade regime.
 
-This is not a proof that the 25 unresolved declarations are unfaithful.  It is
+This is not a proof that the 21 unresolved declarations are unfaithful.  It is
 the remaining statement-comparison frontier for issue #1458.  The correct
 response is to compare each item with the cited source statement and its proof,
 not to rename the data merely to make the scan silent.
@@ -62,10 +63,10 @@ the self-improvement argument.
 
 ## Chapter 9 Pasting
 
-There are 14 unresolved pasting boundaries, mainly
+There are 10 unresolved pasting boundaries, mainly
 `GCompleteSelfConsistencyStatement`, `GHatFactsStatement`,
-`LdSandwichLineOnePointStatement`, `CommuteGHalfSandwichStatement`, and
-`ComMainConclusion`.  These require a theorem-by-theorem comparison with the
+`LdSandwichLineOnePointStatement`, and `CommuteGHalfSandwichStatement`.
+These require a theorem-by-theorem comparison with the
 Section 12 proof tree.
 
 Several of these records appear to be conclusions of earlier source results
@@ -79,9 +80,16 @@ instead hides a construction or transport step which is not yet derived from the
 paper hypotheses, the paper-facing statement should be restored and the missing
 step recorded as a proof obligation.
 
-The next pass should cite the relevant Section 12 labels for each declaration.
-It should not treat all `*Statement` records uniformly: some may be faithful
-source conclusions, while others may be genuine proof obligations.
+The former unresolved item `gHatFacts` has been discharged.  The proof which
+consumes `GCompleteSelfConsistencyStatement`, `GBotSelfConsistencyStatement`,
+`CommutingWithGCompleteStatement`, and `CommutingWithGIncompleteStatement` is
+now the internal theorem `gHatFacts_ofSelfConsistencyAndCommutation`.  The
+paper-facing theorem `gHatFacts` derives these four preceding Section 12 results
+from the source hypotheses before invoking that internal theorem.
+
+The next pass should cite the relevant Section 12 labels for each remaining
+declaration.  It should not treat all `*Statement` records uniformly: some may
+be faithful source conclusions, while others may be genuine proof obligations.
 
 ## Chapter 1 External Theorems
 
@@ -98,18 +106,14 @@ hypothesis by a source-facing theorem or by a justified imported result.
 
 | Token | Count |
 |---|---:|
-| `MatrixSdpOptimalWitness` | 4 |
 | `GHatFactsStatement` | 4 |
-| `GCompleteSelfConsistencyStatement` | 2 |
+| `MatrixSdpOptimalWitness` | 4 |
 | `MatrixSdpStatementWithSlackness` | 3 |
 | `LdSandwichLineOnePointStatement` | 3 |
 | `MatrixSdpStatementWithSlacknessAndDominance` | 2 |
 | `SdpStatementWithSlackness` | 2 |
 | `CommuteGHalfSandwichStatement` | 2 |
-| Singletons | 4 |
-
-The singleton unresolved tokens are `GBotSelfConsistencyStatement`,
-`CommutingWithGCompleteStatement`, and `CommutingWithGIncompleteStatement`.
+| `GCompleteSelfConsistencyStatement` | 1 |
 
 ## Repair Order
 

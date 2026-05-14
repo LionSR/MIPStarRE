@@ -331,23 +331,9 @@ theorem hAConsistency_submeas
           exact mul_nonneg (by positivity)
             (Finset.sum_nonneg fun j _ => bipartiteConsError_nonneg strategy.state _ _ _)
         exact le_trans this hgood.diagonalLineTest
-      have hselfComplete :=
-        gCompleteSelfConsistency params strategy.state family zeta
-          strategy.permInvState hself
-      have hselfIncomplete :=
-        gBotSelfConsistency params strategy.state family zeta
-          strategy.permInvState hself
-      have hcomMain :=
-        Commutativity.comMain params strategy eps delta gamma zeta
-          strategy.isNormalized hgood family hcons hself hbound
-      have hcommComplete :=
-        commutingWithGComplete_ofComMainAndSelfConsistency params strategy family gamma zeta
-          hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le hcomMain hselfComplete
-      have hcommIncomplete :=
-        commutingWithGIncomplete_ofComplete params strategy.state family gamma zeta hcommComplete
-      exact gHatFacts params strategy.state family gamma zeta
+      exact gHatFacts params strategy family eps delta gamma zeta
         hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le
-        hselfComplete hselfIncomplete hcommComplete hcommIncomplete
+        hgood hcons hself hbound
     intro i hi
     exact ldSandwichLineOnePoint params strategy eps delta gamma zeta
       hgood hgamma_le hzeta_le hdq_le

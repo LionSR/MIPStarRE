@@ -317,23 +317,9 @@ theorem ldPastingNCompleteness_of_tailLowerBound
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         family.evaluatedAtNextPoint)
       hcons.pointConsistency.offDiagonalBound
-  have hselfComplete :=
-    gCompleteSelfConsistency params strategy.state family zeta
-      strategy.permInvState hself
-  have hselfIncomplete :=
-    gBotSelfConsistency params strategy.state family zeta
-      strategy.permInvState hself
-  have hcomMain :=
-    Commutativity.comMain params strategy eps delta gamma zeta
-      strategy.isNormalized hgood family hcons hself hbound
-  have hcommComplete :=
-    commutingWithGComplete_ofComMainAndSelfConsistency params strategy family gamma zeta
-      hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le hcomMain hselfComplete
-  have hcommIncomplete :=
-    commutingWithGIncomplete_ofComplete params strategy.state family gamma zeta hcommComplete
-  have hfacts := gHatFacts params strategy.state family gamma zeta
+  have hfacts := gHatFacts params strategy family eps delta gamma zeta
     hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le
-    hselfComplete hselfIncomplete hcommComplete hcommIncomplete
+    hgood hcons hself hbound
   have hhalf : ∀ j : ℕ, 2 ≤ j →
       CommuteGHalfSandwichStatement params strategy.state family gamma zeta j := by
     intro j hj
