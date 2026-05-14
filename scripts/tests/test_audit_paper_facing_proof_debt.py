@@ -561,6 +561,58 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
                 {"UnfaithfulCompletion"},
             )
 
+    def test_witness_input_in_paper_facing_header_is_reported_in_broad_mode(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem
+                    (hwitness : CompletionWitness params) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:paper}
+                  \lean{MIPStarRE.paperTheorem}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root, broad_vocabulary=True)
+            self.assertEqual(
+                {finding.token for finding in result.findings},
+                {"hwitness", "CompletionWitness"},
+            )
+
+    def test_compatibility_data_in_paper_facing_header_is_reported_in_broad_mode(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem
+                    (hcompat : CompletionCompatibilityData params) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:paper}
+                  \lean{MIPStarRE.paperTheorem}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root, broad_vocabulary=True)
+            self.assertEqual(
+                {finding.token for finding in result.findings},
+                {"CompletionCompatibilityData"},
+            )
+
     def test_bundle_constructor_name_in_paper_facing_entry_is_reported(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

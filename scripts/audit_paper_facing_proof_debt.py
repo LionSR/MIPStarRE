@@ -16,6 +16,11 @@ review aid for that boundary:
   ``Bundle``, ``Conditional``, ``Producer``, ``Obligation``, an ``Input``
   bundle, a wrapper, an ``Unfaithful`` marker type, or a generic
   ``Hypotheses`` / ``Assumptions`` bundle;
+* with ``--broad-vocabulary``, also report the wider tracker vocabulary
+  ``Statement``, ``Output``, ``Conclusion``, ``Witness``, ``Data``, and
+  ``Compatibility`` in public inputs.  This mode is an inventory tool while
+  those broad occurrences are classified and reduced; it is deliberately not
+  the default blocking gate.
 * reject paper-facing blueprint entries that point to declaration names with
   conditional proof-debt forms such as ``*_of...Obligations``,
   ``*_of...Residual``, ``*_of...Repair``, ``*_of...Bundle``,
@@ -52,7 +57,7 @@ from lean_header_utils import advance_depth, line_number, starts_keyword
 
 THEOREM_LIKE_ENVS = frozenset({"theorem", "lemma", "proposition", "corollary"})
 
-DEBT_TOKEN_RE = re.compile(
+STRICT_DEBT_TOKEN_RE = re.compile(
     r"(?<![A-Za-z0-9_'])"
     r"(?:"
     r"(?:[A-Za-z_][A-Za-z0-9_']*)?"
@@ -67,6 +72,30 @@ DEBT_TOKEN_RE = re.compile(
     r"(?:"
     r"bridge|residual|repair|package|producer|input|hypotheses|assumptions"
     r"|hypothesis|obligation|obligations|wrapper|bundle|conditional"
+    r"|unfaithful|completionTransport"
+    r")"
+    r"[A-Za-z0-9_']*"
+    r")"
+    r"(?![A-Za-z0-9_'])"
+)
+
+BROAD_DEBT_TOKEN_RE = re.compile(
+    r"(?<![A-Za-z0-9_'])"
+    r"(?:"
+    r"(?:[A-Za-z_][A-Za-z0-9_']*)?"
+    r"(?:"
+    r"Bridge|Residual|Repair|Package|Producer|Input|Hypotheses|Assumptions"
+    r"|Hypothesis|Obligation|Obligations|Wrapper|Bundle|Conditional"
+    r"|Statement|Output|Conclusion|Witness|Data|Compatibility"
+    r"|Unfaithful|CompletionTransport"
+    r")"
+    r"[A-Za-z0-9_']*"
+    r"|"
+    r"(?:h|has|mk|of)?"
+    r"(?:"
+    r"bridge|residual|repair|package|producer|input|hypotheses|assumptions"
+    r"|hypothesis|obligation|obligations|wrapper|bundle|conditional"
+    r"|statement|output|conclusion|witness|data|compatibility"
     r"|unfaithful|completionTransport"
     r")"
     r"[A-Za-z0-9_']*"
@@ -289,6 +318,8 @@ def _findings_for_entry(
     root: Path,
     entry: BlueprintEntry,
     decl: LeanDecl,
+    *,
+    broad_vocabulary: bool,
 ) -> tuple[list[DebtFinding], list[FaithfulBoundaryFinding]]:
     lean_path = root / decl.file
     source = lean_path.read_text(encoding="utf-8", errors="replace")
@@ -297,7 +328,8 @@ def _findings_for_entry(
 
     findings: list[DebtFinding] = []
     faithful_boundary_findings: list[FaithfulBoundaryFinding] = []
-    for match in DEBT_TOKEN_RE.finditer(public_inputs):
+    debt_token_re = BROAD_DEBT_TOKEN_RE if broad_vocabulary else STRICT_DEBT_TOKEN_RE
+    for match in debt_token_re.finditer(public_inputs):
         token = match.group(0)
         token_line = header_start_line + line_number(public_inputs, match.start()) - 1
         local_line = line_number(public_inputs, match.start())
@@ -337,7 +369,7 @@ def _findings_for_entry(
     return findings, faithful_boundary_findings
 
 
-def run_audit(root: Path) -> AuditResult:
+def run_audit(root: Path, *, broad_vocabulary: bool = False) -> AuditResult:
     """Run the paper-facing proof-debt audit for ``root``."""
     root = root.resolve()
     blueprint_src = root / "blueprint" / "src"
@@ -357,7 +389,12 @@ def run_audit(root: Path) -> AuditResult:
             continue
         if conditional_finding := _conditional_decl_name_finding(entry, decl):
             conditional_decl_findings.append(conditional_finding)
-        entry_findings, entry_faithful = _findings_for_entry(root, entry, decl)
+        entry_findings, entry_faithful = _findings_for_entry(
+            root,
+            entry,
+            decl,
+            broad_vocabulary=broad_vocabulary,
+        )
         findings.extend(entry_findings)
         faithful_boundary_findings.extend(entry_faithful)
 
@@ -434,6 +471,14 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--json", action="store_true", help="print JSON instead of text")
     parser.add_argument("--ci", action="store_true", help="exit non-zero on findings")
     parser.add_argument(
+        "--broad-vocabulary",
+        action="store_true",
+        help=(
+            "also scan broad tracker vocabulary such as Statement, Witness, "
+            "Data, Output, Conclusion, and Compatibility"
+        ),
+    )
+    parser.add_argument(
         "--warn-only",
         action="store_true",
         help="with --ci, report findings but keep exit code 0",
@@ -443,7 +488,7 @@ def _build_parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
-    result = run_audit(args.root)
+    result = run_audit(args.root, broad_vocabulary=args.broad_vocabulary)
 
     if args.json:
         print(json.dumps(asdict(result), indent=2, sort_keys=True, default=_json_default))
