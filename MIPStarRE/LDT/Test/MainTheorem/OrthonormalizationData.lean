@@ -15,8 +15,10 @@ role-register measurement and the unsymmetrization links.
 
 The central residual is `MainFormalPostRolePackageDiagonalCompletionResidual`.
 It records the line-130 provenance of the projective submeasurements, the
-completion estimates, and the construction-level match-mass obligations, and it
-converts directly to the checked projective-consistency transport residual.
+completion estimates, and converts directly to the checked
+projective-consistency transport residual.  The exact line-169 match-mass proof
+is retained one step earlier, together with the orthonormalization residual
+whose QXP producer supplies it.
 
 The active route uses the match-mass monotonicity invariant from
 `\label{rem:lean-line169-projectivization-match-mass}` to obtain the exact
@@ -41,8 +43,8 @@ namespace MIPStarRE.LDT
 
 namespace Test
 
-/-- The pre-completion projective submeasurements obtained from line 130 by the
-cross-consistency orthonormalization wrapper.
+/-- The pre-completion projective submeasurements obtained from line 130 by
+the cross-consistency orthonormalization construction.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:130-149`, with
 orthonormalization supplied by `references/ldt-paper/orthonormalization.tex:282`.
@@ -74,15 +76,34 @@ structure MainFormalPostRolePackageDiagonalOrthonormalizationResidual
         (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas.liftLeft)
       (constSubMeasFamily P_B.toSubMeas.liftLeft)
       (MakingMeasurementsProjective.orthonormalizationError scalars.zeta1)
+  /-- Alice-side line-169 match-mass preservation retained from the QXP repair producer. -/
+  leftMatchMass :
+    MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
+      (unsymmetrizedLeftPOVM rolePackage.roleMeasurement) P_A
+      (unsymmetrizedRightPOVM rolePackage.roleMeasurement)
+  /-- Bob-side line-169 match-mass preservation retained from the role-reversed QXP producer. -/
+  rightMatchMass :
+    MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
+      (unsymmetrizedRightPOVM rolePackage.roleMeasurement) P_B
+      (unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
 
 namespace MainFormalPostRolePackageDiagonalOrthonormalizationResidual
 
-/-- Apply the source-faithful cross-consistency orthonormalization wrapper to
+/-- Apply the source-faithful cross-consistency orthonormalization construction to
 the line-130 `G^A/G^B` consistency proof, producing the two pre-completion
 projective submeasurements in the non-vacuous scalar regime.
 
 The proof uses the Section 5 locality-preserving repair construction directly, so
-there is no additional orthonormalization-input hypothesis. -/
+there is no additional orthonormalization-input hypothesis.
+
+**Unfaithful:** This construction currently relies transitively on
+`leftLiftedProjectivizationRepairWithMatchMass`, whose QXP
+outcome-expectation preservation calculation is not yet derived from
+`references/ldt-paper/orthonormalization.tex:862-1194` and
+`references/ldt-paper/inductive_step.tex:135-169`.  Documented by issue #1610.
+Elimination: prove `leftLiftedProjectivizationRepairWithMatchMass` and keep the
+resulting match-mass evidence in this residual without adding any theorem-level
+hypothesis. -/
 theorem nonempty_ofDiagonalConsistency
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -96,8 +117,8 @@ theorem nonempty_ofDiagonalConsistency
     Nonempty (MainFormalPostRolePackageDiagonalOrthonormalizationResidual
       params strategy eps k scalars rolePackage) := by
   have hζ0 : 0 ≤ scalars.zeta1 := MainFormalCascadeScalars.zeta1_nonneg scalars
-  obtain ⟨P_A, hP_A⟩ :=
-    orthonormalizationMeasurement_of_consistency_from_projectivizationRepair
+  obtain ⟨P_A, hP_A, hMatch_A⟩ :=
+    orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass
       (ψ := strategy.state) (hψ := strategy.isNormalized)
       (A := unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
       (B := unsymmetrizedRightPOVM rolePackage.roleMeasurement)
@@ -111,8 +132,8 @@ theorem nonempty_ofDiagonalConsistency
       (constSubMeasFamily (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas)
       (constSubMeasFamily (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas)
       scalars.zeta1 hpre
-  obtain ⟨P_B, hP_B⟩ :=
-    orthonormalizationMeasurement_of_consistency_from_projectivizationRepair
+  obtain ⟨P_B, hP_B, hMatch_B⟩ :=
+    orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass
       (ψ := strategy.state) (hψ := strategy.isNormalized)
       (A := unsymmetrizedRightPOVM rolePackage.roleMeasurement)
       (B := unsymmetrizedLeftPOVM rolePackage.roleMeasurement)
@@ -121,13 +142,15 @@ theorem nonempty_ofDiagonalConsistency
     P_A := P_A
     P_B := P_B
     leftCloseness := hP_A
-    rightCloseness := hP_B }⟩
+    rightCloseness := hP_B
+    leftMatchMass := hMatch_A
+    rightMatchMass := hMatch_B }⟩
 
 end MainFormalPostRolePackageDiagonalOrthonormalizationResidual
 
 /-- Post-orthonormalization Step 6 residual that keeps the line-130 provenance
-for `P^A,P^B` and exposes only the completion and match-mass obligations still
-not produced by the cross-consistency wrapper.
+for `P^A,P^B` and exposes only the completion estimates still needed after the
+cross-consistency orthonormalization construction.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, with
 completion supplied by `references/ldt-paper/preliminaries.tex:1095-1140`. -/
@@ -160,20 +183,6 @@ structure MainFormalPostRolePackageDiagonalCompletionResidual
       (constSubMeasFamily
         (Preliminaries.completeAtOutcomeProj orthResidual.P_B a_B).toSubMeas.liftLeft)
       (MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1)
-  /-- Alice-side construction-level match-mass monotonicity for the chosen line-130 witness. -/
-  leftMatchMass :
-    qBipartiteMatchMass strategy.state orthResidual.P_A.toSubMeas
-        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas ≥
-      qBipartiteMatchMass strategy.state
-        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas
-        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas
-  /-- Bob-side construction-level match-mass monotonicity for the chosen line-130 witness. -/
-  rightMatchMass :
-    qBipartiteMatchMass strategy.state orthResidual.P_B.toSubMeas
-        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas ≥
-      qBipartiteMatchMass strategy.state
-        (unsymmetrizedRightPOVM rolePackage.roleMeasurement).toSubMeas
-        (unsymmetrizedLeftPOVM rolePackage.roleMeasurement).toSubMeas
 
 namespace MainFormalPostRolePackageDiagonalCompletionResidual
 
@@ -204,7 +213,8 @@ noncomputable def toProjectiveCompletionTransportResidual
       completedCloseness := residual.leftCompletedCloseness }
     { orthonormalizationCloseness := residual.orthResidual.rightCloseness
       completedCloseness := residual.rightCompletedCloseness }
-    residual.leftMatchMass residual.rightMatchMass
+    residual.orthResidual.leftMatchMass.matchMassPreservation
+    residual.orthResidual.rightMatchMass.matchMassPreservation
 
 end MainFormalPostRolePackageDiagonalCompletionResidual
 

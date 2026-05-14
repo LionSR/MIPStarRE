@@ -458,6 +458,7 @@
 	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalCompletionResidual.nonempty_ofDiagonalConsistency}
 	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalCompletionResidual.leftMatchMassPreservation_ofDiagonalConsistency, MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalCompletionResidual.rightMatchMassPreservation_ofDiagonalConsistency}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass, MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairWithMatchMass}
 	\lean{MIPStarRE.LDT.Test.MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalConsistency}
 	\lean{MIPStarRE.LDT.Test.MainFormalCascadeProjectiveCompletionTransportResidual.nonempty_ofRoleResidual}
 	\lean{MIPStarRE.LDT.Test.strategySymmetrization_mainInduction, MIPStarRE.LDT.Test.MainFormalRolePackageResidual.ofMainInduction, MIPStarRE.LDT.Test.MainFormalRolePackageResidual.ofMainInductionLargeK}
@@ -478,14 +479,17 @@
 	From a line-130 consistency relation, the theorem
 	\texttt{MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty\_ofDiagonalConsistency}
 	constructs the pre-completion projective submeasurements using the Section~5
-	locality-preserving repair construction.  The completion theorem
+	locality-preserving repair construction.  It also retains the exact
+	match-mass preservation proof supplied by the QXP repair producer.  The
+	completion theorem
 	\texttt{MainFormalPostRolePackageDiagonalCompletionResidual.nonempty\_ofDiagonalConsistency}
-	now reduces the remaining construction to the two named match-mass
-	preservation obligations
+	now consumes the two match-mass projection theorems
 	\texttt{leftMatchMassPreservation\_ofDiagonalConsistency} and
-	\texttt{rightMatchMassPreservation\_ofDiagonalConsistency}.  These are the
-	named assertions directly required for the line-169 route described in the
-	paper.
+	\texttt{rightMatchMassPreservation\_ofDiagonalConsistency}.  The remaining
+	construction-level proof gap is the QXP outcome-expectation preservation
+	theorem
+	\texttt{leftLiftedProjectivizationRepairWithMatchMass}, which is the
+	lowest current target for the line-169 route described in the paper.
 
 	The remaining proof gap is not represented by diagonal-consistency,
 	match-mass, or other auxiliary input hypotheses.  The paper-facing theorem

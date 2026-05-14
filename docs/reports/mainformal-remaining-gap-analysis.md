@@ -19,6 +19,13 @@ Date: 2026-05-07
 > `leftMatchMassPreservation_ofDiagonalConsistency` and
 > `rightMatchMassPreservation_ofDiagonalConsistency`, tracked by #1566.  The
 > broader completion residual construction is tracked by #1565.
+>
+> **Status note, 2026-05-14.**  The two downstream match-mass theorems are now
+> projections from the line-130 orthonormalization residual.  The active proof
+> gap has been lowered to
+> `leftLiftedProjectivizationRepairWithMatchMass`, which must prove the
+> QXP outcome-expectation preservation calculation while the QXP data is still
+> visible; this is tracked by #1610 under #1566.
 
 ## 1. Exact sorry site
 
@@ -119,17 +126,19 @@ structure MainFormalPostRolePackageDiagonalCompletionResidual ... where
   a_A a_B : Polynomial params
   leftCompletedCloseness : SDDRel ...
   rightCompletedCloseness : SDDRel ...
-  leftMatchMass : qBipartiteMatchMass ...
-  rightMatchMass : qBipartiteMatchMass ...
 ```
+The match-mass preservation proofs now live in
+`MainFormalPostRolePackageDiagonalOrthonormalizationResidual`, together with the
+projective submeasurements they concern.
 
 **Existing construction theorems**:
 
 | Constructor | Required inputs | Status |
 |------------|----------------|--------|
 | `MainFormalCascadeProjectiveCompletionTransportResidual.nonempty_ofRoleResidual` | `roleResidual` only | Source-shaped internal construction target; delegates the completion step to `MainFormalPostRolePackageDiagonalCompletionResidual.nonempty_ofDiagonalConsistency` |
-| `MainFormalPostRolePackageDiagonalCompletionResidual.nonempty_ofDiagonalConsistency` | line-130 orthonormalization residual + cross consistency | Constructs the completion residual from the two named match-mass preservation obligations |
-| `leftMatchMassPreservation_ofDiagonalConsistency` / `rightMatchMassPreservation_ofDiagonalConsistency` | line-130 orthonormalization residual + cross consistency | Named `sorry` obligations directly required for the line-169 route in the paper |
+| `MainFormalPostRolePackageDiagonalCompletionResidual.nonempty_ofDiagonalConsistency` | line-130 orthonormalization residual + cross consistency | Constructs the completion residual from the retained match-mass preservation proofs |
+| `leftMatchMassPreservation_ofDiagonalConsistency` / `rightMatchMassPreservation_ofDiagonalConsistency` | line-130 orthonormalization residual + cross consistency | Projection theorems exposing the retained match-mass proofs |
+| `leftLiftedProjectivizationRepairWithMatchMass` | QXP repair construction with partner measurement | Lowest current `sorry`; must prove QXP outcome-expectation preservation while the QXP data is visible |
 
 **Current route:** Once Field 1 (`roleResidual`) is produced, the proof must
 derive the line-130 orthonormalization residual from cross consistency and then
@@ -141,14 +150,12 @@ The line-130 consistency data supplies the orthonormalization residual via
 
 The completion theorem now fixes the distinguished completion outcome to the
 zero polynomial and derives the completion-closeness fields from the checked
-analytic completion argument.  The remaining pieces are exactly:
+analytic completion argument.  The only remaining line-130 completion content
+is the QXP outcome-expectation preservation theorem needed to produce the
+orthonormalization match-mass preservation used at line 169.
 
-- `leftMatchMassPreservation_ofDiagonalConsistency`;
-- `rightMatchMassPreservation_ofDiagonalConsistency`.
-
-**Status:** partially derivable once Field 1 is obtained.  The only remaining
-line-130 completion content is the orthonormalization match-mass preservation
-needed for line 169.
+**Status:** partially derivable once Field 1 is obtained.  The active local
+target is `leftLiftedProjectivizationRepairWithMatchMass`.
 
 ## 4. Historical resolution routes
 
@@ -221,7 +228,7 @@ The paper uses the answer-restricted induction (Section 6 of the LDT paper goes 
 | PR | Description | Overlap with this gap? |
 |----|-------------|----------------------|
 | #1355 | Absorb small-alphabet data-processing gap in SelfImprovement | ❌ Orthogonal (self-improvement pipeline — needed to eventually prove the obligations but doesn't provide them directly) |
-| #1353 | Residual-domination wrappers for SelfImprovement orthonormalization | ❌ Orthogonal (helps discharge orthonormalization obligations but doesn't provide the obligations themselves) |
+| #1353 | Residual-domination lemmas for SelfImprovement orthonormalization | ❌ Orthogonal (helps discharge orthonormalization obligations but doesn't provide the obligations themselves) |
 | #1352 | Slackness bridge for strong duality | Orthogonal (SDP infrastructure for self-improvement) |
 
 None of the active PRs directly fills the gap. They are building the
