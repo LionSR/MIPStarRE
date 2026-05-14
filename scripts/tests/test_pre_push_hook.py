@@ -24,6 +24,7 @@ class PrePushHookTests(unittest.TestCase):
         self.assertIn('run_outside_git_env lake build "$LEAN_MODULE"', text)
         self.assertIn("run_outside_git_env lake exe checkdecls", text)
         self.assertIn("run_outside_git_env lake build", text)
+        self.assertIn("run_outside_git_env python3 scripts/check_paper_gap_note_style.py", text)
         self.assertIn("run_outside_git_env python3 scripts/check_statement_paper_origin.py", text)
         self.assertIn(
             "run_outside_git_env python3 scripts/audit_new_proof_obligation_metadata.py",

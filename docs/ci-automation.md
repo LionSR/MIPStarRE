@@ -401,6 +401,7 @@ agent-prompt surfaces under `.github/actions/`, `.github/prompts/`, or
 `.github/workflows/`, it also runs the fast statement-integrity audits:
 
 ```bash
+python3 scripts/check_paper_gap_note_style.py --root . --staged --ci
 python3 scripts/check_statement_paper_origin.py --root .
 python3 scripts/audit_new_proof_obligation_metadata.py --root . --staged --ci
 python3 scripts/audit_paper_facing_proof_debt.py --root . --ci
@@ -523,6 +524,7 @@ remains the authoritative merge gate.  The responsibilities are:
 | Invariant | Local hook | CI owner | Notes |
 |---|---|---|---|
 | Whitespace in staged patches | `pre-commit`: `git diff --cached --check` | ordinary PR review / workflow logs | Fast local-only guard. |
+| Changed paper-gap notes follow the local note structure | `pre-commit` and relevant `pre-push`: `check_paper_gap_note_style.py --ci` | review prompts and ordinary PR review | Diff-scoped local guard.  It checks the template-level structure and traceability macros before a reviewer sees the note. |
 | Statement-like declarations cite paper origin | `pre-commit` and relevant `pre-push`: `check_statement_paper_origin.py` | `statement-paper-origin.yml` | Blocking CI, path-filtered to LDT Lean files and the guard implementation. |
 | New proof-obligation declarations carry role metadata | `pre-commit`: `audit_new_proof_obligation_metadata.py --staged --ci`; relevant `pre-push`: `audit_new_proof_obligation_metadata.py --base origin/main --changed-files ... --ci` | proof-debt review prompts and local hook policy | Local blocking guard for issue #1579.  It is diff-based and complements the global paper-origin audit. |
 | Lean files stay below the oversized-file limit | `pre-push`: `check_oversized_lean_files.py` for Lean changes | `oversized-lean-files.yml` | Path-filtered to Lean files and the guard implementation. |
