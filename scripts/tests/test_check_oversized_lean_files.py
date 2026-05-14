@@ -50,6 +50,11 @@ class ExcludeTests(unittest.TestCase):
         root = Path("/repo")
         self.assertTrue(_is_excluded(root / "lake-packages" / "Bar.lean", root))
 
+    def test_excludes_nested_worktrees_dir(self) -> None:
+        root = Path("/repo")
+        path = root / ".worktrees" / "audit" / "MIPStarRE" / "LDT" / "Foo.lean"
+        self.assertTrue(_is_excluded(path, root))
+
     def test_excludes_tmp_dir(self) -> None:
         root = Path("/repo")
         self.assertTrue(_is_excluded(root / "tmp" / "scratch.lean", root))
@@ -125,6 +130,16 @@ class CheckFilesTests(unittest.TestCase):
             _make_repo(root)
             (root / "tmp").mkdir(exist_ok=True)
             _write_lean(root / "tmp" / "Scratch.lean", THRESHOLD + 1)
+            rc = check_files(root, set())
+            self.assertEqual(rc, 0)
+
+    def test_excludes_nested_worktrees(self) -> None:
+        """.worktrees/ contains auxiliary checkouts, not source files for this root."""
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _make_repo(root)
+            path = root / ".worktrees" / "audit" / "MIPStarRE" / "LDT" / "Big.lean"
+            _write_lean(path, THRESHOLD + 1)
             rc = check_files(root, set())
             self.assertEqual(rc, 0)
 
