@@ -210,7 +210,7 @@
 <p>Throughout this chapter, \((\psi ,A,B,L)\) is an \((\varepsilon ,\delta ,\gamma )\)-good symmetric strategy for the \((m,q,d)\) low individual degree test. </p>
 <h1 id="sec:self-improvement">7.1 Non-projective Output</h1>
 
-<p>A large part of this chapter is devoted to proving Lemma&#160;<a href="chap-self-improvement.html#lem:self-improvement-helper">7.1</a>, which is a slightly weaker form of the projective self-improvement theorem proved in Section&#160;<a href="chap-self-improvement.html#sec:self-improvement-projective">7.2</a>. The key difference is that the output family&#160;\(H\) is only required to be a submeasurement, rather than a projective submeasurement. Once this non-projective statement is available, Theorem&#160;<a href="chap-projective.html#thm:orthonormalization">4.2</a> upgrades&#160;\(H\) to a projective family without losing control of the four quantitative conclusions. </p>
+<p>A large part of this chapter is devoted to proving Lemma&#160;<a href="chap-self-improvement.html#lem:self-improvement-helper">7.1</a>, which is a slightly weaker form of the projective self-improvement theorem proved in Section&#160;<a href="chap-self-improvement.html#sec:self-improvement-projective">7.2</a>. The key difference is that the output family&#160;\(H\) is only required to be a submeasurement, rather than a projective submeasurement. Once this non-projective statement is available, Theorem&#160;<a href="chap-projective.html#thm:orthonormalization">4.3</a> upgrades&#160;\(H\) to a projective family without losing control of the four quantitative conclusions. </p>
 <p>Compared with the projective theorem, the helper lemma packages strong self-consistency using the explicit inequality from Definition&#160;<a href="sec-prelims.html#def:strong-self-consistency">3.34</a>, keeps the boundedness conclusion in terms of an auxiliary operator&#160;\(Z\), and produces a much smaller error parameter. </p>
 <div class="lemma_thmwrapper theorem-style-plain" id="lem:self-improvement-helper">
   <div class="lemma_thmheading">
@@ -248,9 +248,9 @@
           
           <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.34</a></li>
           
-          <li><a href="chap-self-improvement.html#lem:sdp">Lemma 7.7</a></li>
+          <li><a href="chap-self-improvement.html#lem:sdp">Lemma 7.8</a></li>
           
-          <li><a href="chap-self-improvement.html#lem:add-in-u">Lemma 7.8</a></li>
+          <li><a href="chap-self-improvement.html#lem:add-in-u">Lemma 7.9</a></li>
           
           <li><a href="sec-variance.html#lem:global-variance-of-points">Lemma 6.6</a></li>
           
@@ -337,7 +337,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> Let \(T=\{ T_g\} \) and \(Z\) be the optimal solutions to the SDPs&#160;<a href="chap-self-improvement.html#eq:primal-objective" class="eqref">25</a> and&#160;<a href="chap-self-improvement.html#eq:dual-objective" class="eqref">26</a> given by Lemma&#160;<a href="chap-self-improvement.html#lem:sdp">7.7</a>. Then \(T\) is a measurement, and </p>
+  <p> Let \(T=\{ T_g\} \) and \(Z\) be the optimal solutions to the SDPs&#160;<a href="chap-self-improvement.html#eq:primal-objective" class="eqref">25</a> and&#160;<a href="chap-self-improvement.html#eq:dual-objective" class="eqref">26</a> given by Lemma&#160;<a href="chap-self-improvement.html#lem:sdp">7.8</a>. Then \(T\) is a measurement, and </p>
 <div class="displaymath" id="eq:Z-greater-than-A">
   \begin{align}  \forall g \in \mathcal{P}(m,q,d): \qquad Z & \geq \left(\mathbb {E}_{u} A^{u}_{g(u)}\right), \label{eq:Z-greater-than-A}\\ T_g \cdot Z & = T_g \cdot \left(\mathbb {E}_{u} A^{u}_{g(u)}\right). \label{eq:swap-Z-for-A} \end{align}
 </div>
@@ -362,7 +362,7 @@
 <div class="displaymath" id="a0000000306">
   \[  \zeta _{\mathrm{variance}} = 24m\cdot \Big(\varepsilon + \delta + \frac{md}{q}\Big).  \]
 </div>
-<p> Lemma&#160;<a href="chap-self-improvement.html#lem:add-in-u">7.8</a> below is the technical transfer from the averaged family&#160;\(H\) back to the sandwiched operators \(A^u_{h(u)}T_hA^u_{h(u)}\). We use it in the completeness, consistency, strong self-consistency, and boundedness estimates that follow. </p>
+<p> Lemma&#160;<a href="chap-self-improvement.html#lem:add-in-u">7.9</a> below is the technical transfer from the averaged family&#160;\(H\) back to the sandwiched operators \(A^u_{h(u)}T_hA^u_{h(u)}\). We use it in the completeness, consistency, strong self-consistency, and boundedness estimates that follow. </p>
 <p>We now verify the four conclusions of Lemma&#160;<a href="chap-self-improvement.html#lem:self-improvement-helper">7.1</a>. </p>
 <p><em>Proof of <a href="chap-self-improvement.html#item:self-improvement-completeness">1</a>.</em> The completeness of&#160;\(H\) is </p>
 <div class="displaymath" id="a0000000307">
@@ -426,7 +426,7 @@
   <span class="equation_label">8</span>
 </p>
 </div>
-<p> The theorem-side off-diagonal selection used for this ‘add-in-u‘ application is , and the corresponding left/right scalar quantities are  and . The selected scalar chain for this specialization is recorded by          . Apply Lemma&#160;<a href="chap-self-improvement.html#lem:add-in-u">7.8</a> with \(\mathcal O=\mathbb {F}_q\), \(M=A\), and \(S_u=\{ (a,h):h(u)\neq a\} \). Then </p>
+<p> The theorem-side off-diagonal selection used for this ‘add-in-u‘ application is , and the corresponding left/right scalar quantities are  and . The selected scalar chain for this specialization is recorded by          . Apply Lemma&#160;<a href="chap-self-improvement.html#lem:add-in-u">7.9</a> with \(\mathcal O=\mathbb {F}_q\), \(M=A\), and \(S_u=\{ (a,h):h(u)\neq a\} \). Then </p>
 <div class="displaymath" id="a0000000311">
   \[  \eqref{eq:consistency-with-A-baby-step} \approx _{4 \sqrt{\zeta _{\mathrm{variance}}}} \mathbb {E}_{u} \sum _{a, h: h(u) \neq a} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot A^{u}_a \cdot A^{u}_{h(u)}\bigr)\otimes T_h \lvert \psi  \rangle ,  \]
 </div>
@@ -457,7 +457,7 @@
   <span class="equation_label">12</span>
 </p>
 </div>
-<p> Apply Lemma&#160;<a href="chap-self-improvement.html#lem:add-in-u">7.8</a> with \(\mathcal O=\mathcal{P}(m,q,d)\), \(M=H\), and \(S_u=\{ (h,h):h\in \mathcal{P}(m,q,d)\} \). This gives </p>
+<p> Apply Lemma&#160;<a href="chap-self-improvement.html#lem:add-in-u">7.9</a> with \(\mathcal O=\mathcal{P}(m,q,d)\), \(M=H\), and \(S_u=\{ (h,h):h\in \mathcal{P}(m,q,d)\} \). This gives </p>
 <div class="equation" id="eq:release-the-kraken">
 <p>
   <div class="equation_content">
@@ -795,7 +795,7 @@
         
         <ul class="uses">
           
-          <li><a href="chap-self-improvement.html#lem:sdp">Lemma 7.7</a></li>
+          <li><a href="chap-self-improvement.html#lem:sdp">Lemma 7.8</a></li>
           
         </ul>
     
@@ -826,7 +826,7 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>                                         From a matrix-level strong-duality witness with complementary slackness of the shape asserted by Lemma&#160;<a href="chap-self-improvement.html#lem:sdp">7.7</a>, one obtains a complete measurement \(\{ T_g\} \), a feasible dual operator \(Z\), equality of the primal and dual objectives, and the equations \(T_gZ=T_gA_g\) for all \(g\). Lean isolates the saturated canonical optimal-pair output required from strong duality: a feasible canonical primal matrix, a dual-feasible operator with equal objective value, canonical complementary slackness, and vanishing of the extra canonical slack block. This datum gives both the abstract slackness-carrying SDP statement and the displayed measurement witness without assuming \(I \le Z\). Lean also proves the converse saturation step for the dominance-carrying optimal pair: the canonical complementary-slackness equation on the extra block gives \(X_{\mathrm{none},\mathrm{none}}Z=0\), and the lower bound \(I\leq Z\) forces \(X_{\mathrm{none},\mathrm{none}}=0\). Thus the dominance-carrying optimal pair canonically determines the saturated optimal pair, and hence also the matrix slackness statement without the dominance field. The paper-facing self-improvement helper consumes the resulting abstract SDP statement. </p>
+  <p>                                         From a matrix-level strong-duality witness with complementary slackness of the shape asserted by Lemma&#160;<a href="chap-self-improvement.html#lem:sdp">7.8</a>, one obtains a complete measurement \(\{ T_g\} \), a feasible dual operator \(Z\), equality of the primal and dual objectives, and the equations \(T_gZ=T_gA_g\) for all \(g\). Lean isolates the saturated canonical optimal-pair output required from strong duality: a feasible canonical primal matrix, a dual-feasible operator with equal objective value, canonical complementary slackness, and vanishing of the extra canonical slack block. This datum gives both the abstract slackness-carrying SDP statement and the displayed measurement witness without assuming \(I \le Z\). Lean also proves the converse saturation step for the dominance-carrying optimal pair: the canonical complementary-slackness equation on the extra block gives \(X_{\mathrm{none},\mathrm{none}}Z=0\), and the lower bound \(I\leq Z\) forces \(X_{\mathrm{none},\mathrm{none}}=0\). Thus the dominance-carrying optimal pair canonically determines the saturated optimal pair, and hence also the matrix slackness statement without the dominance field. The paper-facing self-improvement helper consumes the resulting abstract SDP statement. </p>
 
   </div>
 </div>
@@ -865,12 +865,52 @@
 
   </div>
 </div>
+<div class="remark_thmwrapper theorem-style-remark" id="rem:lean-reduced-sdp-dominance-interfaces">
+  <div class="remark_thmheading">
+    <span class="remark_thmcaption">
+    Remark
+    </span>
+    <span class="remark_thmlabel">7.7</span>
+    <span class="remark_thmtitle">Lean reduced SDP and dominance interfaces</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap-self-improvement.html#rem:lean-reduced-sdp-dominance-interfaces">#</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="remark_thmcontent">
+  <p>           Lean also contains reduced SDP and dominance-carrying matrix interfaces. The reduced theorem <span class="ttfamily">sdp</span> proves only the measurement-total and dual-feasibility fragment used before strong duality is supplied. The dominance-carrying declarations add the auxiliary condition \(I\le Z\) and are retained as technical routes to slackness-carrying data. These declarations are not advertised as formalizations of Lemma&#160;<a href="chap-self-improvement.html#lem:sdp">7.8</a>. </p>
+
+  </div>
+</div>
 <div class="lemma_thmwrapper theorem-style-plain" id="lem:sdp">
   <div class="lemma_thmheading">
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">7.7</span>
+    <span class="lemma_thmlabel">7.8</span>
     <span class="lemma_thmtitle">Dual SDP and complementary slackness</span>
     <div class="thm_header_extras">
 
@@ -895,7 +935,7 @@
         
         <ul class="uses">
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.exists_measurement_witness" class="lean_decl">MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.exists_measurement_witness</a></li>
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.Quantum.eq_zero_of_nonneg_mul_eq_zero_of_one_le" class="lean_decl">MIPStarRE.Quantum.eq_zero_of_nonneg_mul_eq_zero_of_one_le</a></li>
           
         </ul>
     
@@ -906,7 +946,7 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>                                                                                       Let </p>
+  <p>                                                                             Let </p>
 <div class="displaymath" id="a0000000329">
   \[  A_g = \mathbb {E}_{u \sim \mathbb {F}_q^m} A^u_{g(u)}.  \]
 </div>
@@ -990,7 +1030,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">7.8</span>
+    <span class="lemma_thmlabel">7.9</span>
     <span class="lemma_thmtitle">Averaging over the evaluation point</span>
     <div class="thm_header_extras">
 
@@ -1065,7 +1105,7 @@
 
   </div>
 </div>
-<p> The reduced variance-bound specialization  keeps only the variance-bound consequence used later in the helper theorem; it is not itself the full formal counterpart of Lemma&#160;<a href="chap-self-improvement.html#lem:add-in-u">7.8</a>. </p>
+<p> The reduced variance-bound specialization  keeps only the variance-bound consequence used later in the helper theorem; it is not itself the full formal counterpart of Lemma&#160;<a href="chap-self-improvement.html#lem:add-in-u">7.9</a>. </p>
 <div class="proof_wrapper" id="a0000000336">
   <div class="proof_heading">
     <span class="proof_caption">
@@ -1157,7 +1197,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">7.9</span>
+    <span class="remark_thmlabel">7.10</span>
     <span class="remark_thmtitle">Auxiliary self-improvement lemmas</span>
     <div class="thm_header_extras">
 
@@ -1188,7 +1228,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>     Several auxiliary results are used to prove Theorem&#160;<a href="chap-self-improvement.html#thm:self-improvement">7.10</a> from the helper output and the orthonormalization theorem. They record local intermediate estimates and final-field assembly lemmas. The theorem below records the paper-facing conclusion; its proof is not yet complete because the derivation from the input consistency hypothesis is still tracked by issue&#160;#1515. </p>
+  <p>        Several auxiliary results are used to prove Theorem&#160;<a href="chap-self-improvement.html#thm:self-improvement">7.11</a> from the helper output and the orthonormalization theorem. They record local intermediate estimates and final-field assembly lemmas. The orthonormalization obligation displayed here is only the spectral-truncation slice of the Section&#160;9 construction; it is not a locality-preserving repair theorem. The theorem below records the paper-facing conclusion; its proof is not yet complete because the derivation from the input consistency hypothesis is still tracked by issue&#160;#1515. </p>
 
   </div>
 </div>
@@ -1197,7 +1237,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">7.10</span>
+    <span class="theorem_thmlabel">7.11</span>
     <span class="theorem_thmtitle">Self-improvement</span>
     <div class="thm_header_extras">
 
@@ -1232,7 +1272,7 @@
           
           <li><a href="chap-self-improvement.html#lem:self-improvement-helper">Lemma 7.1</a></li>
           
-          <li><a href="chap-projective.html#thm:orthonormalization">Theorem 4.2</a></li>
+          <li><a href="chap-projective.html#thm:orthonormalization">Theorem 4.3</a></li>
           
           <li><a href="sec-prelims.html#prop:self-consistency-implies-data-processing">Lemma 3.39</a></li>
           
@@ -1333,7 +1373,7 @@
 <div class="displaymath" id="a0000000355">
   \[  \sum _{h} \langle \psi  \rvert  \widehat{H}_h \otimes \widehat{H}_h \lvert \psi  \rangle  \geq \langle \psi  \rvert  \widehat{H} \otimes I \lvert \psi  \rangle  - \widehat{\zeta }.  \]
 </div>
-<p> Therefore Theorem&#160;<a href="chap-projective.html#thm:orthonormalization">4.2</a> supplies a projective submeasurement \(H \in \mathrm{PolySub}(m,q,d)\) such that </p>
+<p> Therefore Theorem&#160;<a href="chap-projective.html#thm:orthonormalization">4.3</a> supplies a projective submeasurement \(H \in \mathrm{PolySub}(m,q,d)\) such that </p>
 <div class="equation" id="eq:approx-between-H-with-and-without-hat">
 <p>
   <div class="equation_content">
