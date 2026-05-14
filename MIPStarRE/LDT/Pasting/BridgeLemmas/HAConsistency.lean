@@ -345,7 +345,7 @@ theorem hAConsistency_submeas
         Commutativity.comMain params strategy eps delta gamma zeta
           strategy.isNormalized hgood family G hG hcons hself hbound
       have hcommComplete :=
-        commutingWithGComplete params strategy family G gamma zeta
+        commutingWithGComplete params strategy family gamma zeta
           hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le hcomMain hselfComplete
       have hcommIncomplete :=
         commutingWithGIncomplete params strategy.state family gamma zeta hcommComplete

@@ -125,6 +125,12 @@ For each new `.lean` file or significantly changed file, check if corresponding 
   producer, proof-obligation input, hypotheses bundle, assumptions bundle, or
   arbitrary implication inputs as boundary conditions.
 - If a new Lean declaration matches a blueprint item that has no `\lean{}` yet, add the `\lean{NewDecl}` annotation.
+  For a theorem, lemma, proposition, or corollary carrying a source label,
+  `NewDecl` must be the source-faithful public statement. A conditional helper
+  with extra non-paper inputs must not be installed as the primary `\lean{}`
+  tag and must not serve as the `\leanok` witness for the source-labelled
+  item. Such a helper may be mentioned only in a separate implementation note
+  or Lean-only entry whose additional hypotheses are stated explicitly.
 
 To check for `sorry` in declarations:
 ```bash
@@ -156,7 +162,8 @@ When you make updates, create a PR that includes:
   adding a bridge, residual, repair, package, producer, proof-obligation input,
   hypotheses bundle, assumptions bundle, or arbitrary implication hypothesis
   absent from the cited source statement. Conditional helpers and open internal
-  obligations may be linked only in separate non-`\leanok` notes.
+  obligations may be linked only in separate non-`\leanok` notes. They must not
+  be the primary `\lean{}` tag for a source-labelled theorem.
 - Never remove mathematical content from `.tex` files.
 - When unsure about a rename, prefer leaving the annotation as-is and noting it in the PR description rather than guessing.
 - If too many issues exist to safely resolve in one PR, fix the clear cases and note the ambiguous ones.

@@ -3,8 +3,6 @@
 \label{sec:ld-pasting}
 
 \begin{theorem}[Pasting]\label{thm:ld-pasting}
-	\lean{MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection, MIPStarRE.LDT.Pasting.ldPasting}
-	\leanok
 	\uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
 	Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test. Let $\{G^x\}_{x \in \F_q}$ be projective submeasurements in $\polysub{m}{q}{d}$ with the following properties:
 	\begin{enumerate}
@@ -50,7 +48,6 @@
 	\end{enumerate}
 \end{theorem}
 \begin{proof}
-	\leanok
 	\uses{lem:ld-pasting-sub-measurement}
 	Let $H$ be the submeasurement from Lemma~\ref{lem:ld-pasting-sub-measurement}, and fix an arbitrary polynomial $h^* \in \polyfunc{m+1}{q}{d}$. Define a measurement $H_{\mathrm{meas}} \in \polymeas{m+1}{q}{d}$ by
 	\[
@@ -75,6 +72,23 @@
 	\end{align*}
 	Thus $A_a^u \ot I \simeq_\sigma I \ot (H_{\mathrm{meas}})_{[h(u)=a]}$.
 \end{proof}
+
+\begin{remark}[Restricted Lean form of the pasting theorem]\label{rem:ld-pasting-restricted-lean-form}
+	\lean{MIPStarRE.LDT.Pasting.ldPastingNontrivial}
+	\leanok
+	The Lean declaration linked here is the restricted nontrivial-regime form of
+	Theorem~\ref{thm:ld-pasting}.  In addition to the hypotheses displayed in the
+	source theorem, it assumes
+	\[
+		\gamma \le 1,\qquad \zeta \le 1,\qquad d \le q,\qquad 0<d,\qquad 1\le k.
+	\]
+	The paper theorem is stated in
+	\texttt{references/ldt-paper/ld-pasting.tex}, lines 12--50.  Lines 52--55
+	explain that the proof may restrict to
+	\(\eps,\delta,\gamma,\zeta,d/q\le 1\), since the complementary cases are
+	trivial.  The formalization of these complementary cases, and hence of the
+	unrestricted source theorem, remains to be supplied.
+\end{remark}
 
 The bound is trivial when at least one of $\eps$, $\delta$, $\gamma$, $\zeta$, or $d/q$ is at least $1$, since then $\nu \ge 1$. In the remainder of the chapter we therefore assume
 \[

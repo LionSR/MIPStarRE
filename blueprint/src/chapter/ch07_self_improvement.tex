@@ -572,8 +572,26 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \texttt{MIPStarRE.LDT.SelfImprovement.selfImprovement}.
 \end{remark}
 
+\begin{remark}[Lean reduced SDP and dominance interfaces]\label{rem:lean-reduced-sdp-dominance-interfaces}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdp, MIPStarRE.LDT.SelfImprovement.SdpStatement}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSlackOperator_eq_zero_of_mul_dual_eq_zero_of_one_le}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_of_canonicalSlackOperator_eq_zero}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_of_canonicalComplementarySlackness_of_one_le}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_extracted_of_canonicalComplementarySlackness_of_one_le}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpOptimalWitnessWithDominance_of_canonicalFeasibleComplementarySlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlacknessAndDominance_of_canonicalComplementarySlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlacknessAndDominance_of_canonicalFeasibleComplementarySlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.exists_measurement_witness}
+  Lean also contains reduced SDP and dominance-carrying matrix interfaces.  The
+  reduced theorem \texttt{sdp} proves only the measurement-total and
+  dual-feasibility fragment used before strong duality is supplied.  The
+  dominance-carrying declarations add the auxiliary condition \(I\le Z\) and
+  are retained as technical routes to slackness-carrying data.  These
+  declarations are not advertised as formalizations of Lemma~\ref{lem:sdp}.
+\end{remark}
+
 \begin{lemma}[Dual SDP and complementary slackness]\label{lem:sdp}
-  \lean{MIPStarRE.LDT.SelfImprovement.sdp}
   \lean{MIPStarRE.LDT.SelfImprovement.averagedPointOperator_nonneg}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpDualPositive_of_dualFeasible}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPair.dualPositive}
@@ -650,15 +668,6 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpComplementarySlacknessDefect_extracted_of_canonical}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSlack_mul_dual_of_complementarySlackness}
   \lean{MIPStarRE.Quantum.eq_zero_of_nonneg_mul_eq_zero_of_one_le}
-  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSlackOperator_eq_zero_of_mul_dual_eq_zero_of_one_le}
-  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_of_canonicalSlackOperator_eq_zero}
-  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_of_canonicalComplementarySlackness_of_one_le}
-  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_extracted_of_canonicalComplementarySlackness_of_one_le}
-  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness}
-  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpOptimalWitnessWithDominance_of_canonicalFeasibleComplementarySlackness}
-  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlacknessAndDominance_of_canonicalComplementarySlackness}
-  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlacknessAndDominance_of_canonicalFeasibleComplementarySlackness}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.exists_measurement_witness}
   % No statement-level \leanok is attached here: MIPStarRE.LDT.SelfImprovement.sdp
   % proves only the reduced SdpStatement fragment, while the full slackness
   % conclusion is recorded as the visible, deferred theorem
@@ -995,15 +1004,20 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
 
 \begin{remark}[Auxiliary self-improvement lemmas]\label{rem:self-improvement-lean-interfaces}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementError_nonneg_of_isGood}
+  \lean{MIPStarRE.LDT.SelfImprovement.OrthonormalizationSpectralObligation}
+  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationSpectralObligation_of_roundingWitnesses}
   \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationSpectralObligation_of_projectiveNonMeasurement}
+  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationSpectralObligation_of_sourceAlmostProjective}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_of_helper_outputs_of_total_expectation_le}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_of_helper_outputs_of_total_operator_le}
   Several auxiliary results are used to prove Theorem~\ref{thm:self-improvement}
   from the helper output and the orthonormalization theorem.  They record
-  local intermediate estimates and final-field assembly lemmas.  The theorem
-  below records the paper-facing conclusion; its proof is not yet complete
-  because the derivation from the input consistency hypothesis is still tracked
-  by issue~\#1515.
+  local intermediate estimates and final-field assembly lemmas.  The
+  orthonormalization obligation displayed here is only the spectral-truncation
+  slice of the Section~9 construction; it is not a locality-preserving repair
+  theorem.  The theorem below records the paper-facing conclusion; its proof is
+  not yet complete because the derivation from the input consistency hypothesis
+  is still tracked by issue~\#1515.
 \end{remark}
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement}

@@ -21,6 +21,10 @@ open MIPStarRE.LDT.Preliminaries
 
 /-- Match-mass monotonicity invariant needed for the paper's line-169 replacement step.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, especially
+the projectivization transition from the pre-projective \(G\)-family to the
+completed projective \(Q\)-family.
+
 The ordinary Step 6 handoff records only state-dependent-distance closeness
 `G_A ≈ Q_A` and `G_B ≈ Q_B`.  Combining those fields with
 `prop:triangle-sub` gives a `ζ₁ + sqrt ζ₂` consistency loss, as witnessed by
@@ -188,6 +192,10 @@ end ProjectivizationMatchMassMonotonicity
 /-! ### Orthonormalization match-mass preservation -/
 
 /-- Match-mass preservation input for the orthonormalization step.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, where the
+orthonormalized submeasurements are completed and then used in the line-169
+consistency replacement.
 
 Asserts that the projective submeasurement `P` produced by orthonormalization
 preserves at least as much bipartite correlation with a fixed partner
