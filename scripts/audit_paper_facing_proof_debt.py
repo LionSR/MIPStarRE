@@ -60,50 +60,93 @@ from lean_header_utils import advance_depth, line_number, starts_keyword
 
 THEOREM_LIKE_ENVS = frozenset({"theorem", "lemma", "proposition", "corollary"})
 
-STRICT_DEBT_TOKEN_RE = re.compile(
-    r"(?<![A-Za-z0-9_'])"
-    r"(?:"
-    r"(?:[A-Za-z_][A-Za-z0-9_']*)?"
-    r"(?:"
-    r"Bridge|Residual|Repair|Package|Producer|Input|Hypotheses|Assumptions"
-    r"|Hypothesis|Assumption|Obligation|Obligations|Wrapper|Bundle|Conditional"
-    r"|Unfaithful|CompletionTransport"
-    r")"
-    r"[A-Za-z0-9_']*"
-    r"|"
-    r"(?:h|has|mk|of)?"
-    r"(?:"
-    r"bridge|residual|repair|package|producer|input|hypotheses|assumptions"
-    r"|hypothesis|assumption|obligation|obligations|wrapper|bundle|conditional"
-    r"|unfaithful|completionTransport"
-    r")"
-    r"[A-Za-z0-9_']*"
-    r")"
-    r"(?![A-Za-z0-9_'])"
+STRICT_UPPER_TOKENS = (
+    "Bridge",
+    "Residual",
+    "Repair",
+    "Package",
+    "Producer",
+    "Input",
+    "Hypotheses",
+    "Assumptions",
+    "Hypothesis",
+    "Assumption",
+    "Obligation",
+    "Obligations",
+    "Wrapper",
+    "Bundle",
+    "Conditional",
+    "Unfaithful",
+    "CompletionTransport",
 )
 
-BROAD_DEBT_TOKEN_RE = re.compile(
-    r"(?<![A-Za-z0-9_'])"
-    r"(?:"
-    r"(?:[A-Za-z_][A-Za-z0-9_']*)?"
-    r"(?:"
-    r"Bridge|Residual|Repair|Package|Producer|Input|Hypotheses|Assumptions"
-    r"|Hypothesis|Assumption|Obligation|Obligations|Wrapper|Bundle|Conditional"
-    r"|Statement|Output|Conclusion|Witness|Data|Compatibility"
-    r"|Unfaithful|CompletionTransport"
-    r")"
-    r"[A-Za-z0-9_']*"
-    r"|"
-    r"(?:h|has|mk|of)?"
-    r"(?:"
-    r"bridge|residual|repair|package|producer|input|hypotheses|assumptions"
-    r"|hypothesis|assumption|obligation|obligations|wrapper|bundle|conditional"
-    r"|statement|output|conclusion|witness|data|compatibility"
-    r"|unfaithful|completionTransport"
-    r")"
-    r"[A-Za-z0-9_']*"
-    r")"
-    r"(?![A-Za-z0-9_'])"
+BROAD_EXTRA_UPPER_TOKENS = (
+    "Statement",
+    "Output",
+    "Conclusion",
+    "Witness",
+    "Data",
+    "Compatibility",
+)
+
+STRICT_LOWER_TOKENS = (
+    "bridge",
+    "residual",
+    "repair",
+    "package",
+    "producer",
+    "input",
+    "hypotheses",
+    "assumptions",
+    "hypothesis",
+    "assumption",
+    "obligation",
+    "obligations",
+    "wrapper",
+    "bundle",
+    "conditional",
+    "unfaithful",
+    "completionTransport",
+)
+
+BROAD_EXTRA_LOWER_TOKENS = (
+    "statement",
+    "output",
+    "conclusion",
+    "witness",
+    "data",
+    "compatibility",
+)
+
+
+def _debt_token_re(upper_tokens: tuple[str, ...], lower_tokens: tuple[str, ...]) -> re.Pattern[str]:
+    """Build the public-input proof-debt token matcher from token lists."""
+
+    upper_alternation = "|".join(re.escape(token) for token in upper_tokens)
+    lower_alternation = "|".join(re.escape(token) for token in lower_tokens)
+    return re.compile(
+        r"(?<![A-Za-z0-9_'])"
+        r"(?:"
+        r"(?:[A-Za-z_][A-Za-z0-9_']*)?"
+        r"(?:"
+        + upper_alternation
+        + r")"
+        r"[A-Za-z0-9_']*"
+        r"|"
+        r"(?:h|has|mk|of)?"
+        r"(?:"
+        + lower_alternation
+        + r")"
+        r"[A-Za-z0-9_']*"
+        r")"
+        r"(?![A-Za-z0-9_'])"
+    )
+
+
+STRICT_DEBT_TOKEN_RE = _debt_token_re(STRICT_UPPER_TOKENS, STRICT_LOWER_TOKENS)
+BROAD_DEBT_TOKEN_RE = _debt_token_re(
+    STRICT_UPPER_TOKENS + BROAD_EXTRA_UPPER_TOKENS,
+    STRICT_LOWER_TOKENS + BROAD_EXTRA_LOWER_TOKENS,
 )
 
 # The following tokens are deliberately not treated as proof-debt findings.

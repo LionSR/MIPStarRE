@@ -1,89 +1,98 @@
-# Issue #1458 Broad Paper-Facing Vocabulary Inventory
+# Issue #1458 Source-Statement Boundary Audit
 
 Date: 2026-05-14.
 
-This report records a source-statement audit for theorem boundaries whose
-public Lean inputs contain broad vocabulary such as `Statement`, `Conclusion`,
-`Witness`, `Data`, or `Compatibility`.  These words are not proof debt by
-themselves.  They mark places where a reader should check whether the Lean
-declaration is the paper theorem, a preceding source conclusion exposed as an
-extra hypothesis, a quoted external theorem, or an unproved construction that
-has been moved into the hypotheses.
+This report records a source-statement audit for paper-facing Lean declarations
+whose public hypotheses contain names such as `Statement`, `Conclusion`,
+`Witness`, `Data`, or `Compatibility`.  The vocabulary is only a search
+criterion.  Such a name does not by itself prove that the statement has drifted
+from the paper.  It marks a theorem boundary where the public Lean statement
+must be compared with the cited theorem, lemma, proposition, or corollary in
+`references/ldt-paper/`.
 
-The ordinary blocking audit already rejects the agreed bridge-debt vocabulary
-in source-labelled public inputs.  The broad audit is deliberately more
-cautious.  A broad finding is discharged only when the statement has been
-compared with the source in `references/ldt-paper/`, or when the paper-facing
-statement has been restored and the remaining construction is recorded as a
-proof obligation.
+The possible outcomes of the comparison are different mathematical cases.  The
+name may denote a construction already present in the source argument; it may be
+the conclusion of an earlier source result which should be invoked inside the
+proof; it may be a quoted external theorem; or it may be an unproved
+construction that has been promoted to a public hypothesis.  Only the last two
+cases require further formalization work at that boundary, and only the last
+case is a statement-drift problem for the paper theorem itself.
 
-## Current Verdict
+## Summary
 
-The broad audit currently reports 29 unresolved theorem-boundary findings.
-It also records 39 uses of source-construction context and 2 quoted external
-theorem interfaces.  The strict bridge-debt audit reports zero blocking
-findings.
+The current scan reports 29 unresolved theorem boundaries.  It also records 39
+uses of source-construction context and 2 quoted external theorem interfaces.
+The stricter paper-facing proof-debt check finds no remaining occurrence of the
+agreed bridge, residual, repair, package, producer, input, hypothesis,
+assumption, obligation, wrapper, bundle, or conditional vocabulary in
+source-labelled public inputs.
 
 This is not a proof that the 29 unresolved declarations are unfaithful.  It is
-the remaining review frontier for #1458.  The correct response is to compare
-each item with the cited source theorem, not to rename the data until the audit
-becomes silent.
+the remaining statement-comparison frontier for issue #1458.  The correct
+response is to compare each item with the cited source statement and its proof,
+not to rename the data merely to make the scan silent.
 
 ## Chapter 4 Projectivization
 
-The audit classifies `QLayerData`, `QXPLayerData`, and
-`RankReductionWitness` as source-construction context.  In Section 5 of the
-paper, after `lem:projective-low-rank-sum`, the rank-reduced family \(Q\) is a
-fixed object, and the later \(X\), \(\widehat X\), and \(P\) constructions
-carry matrix-decomposition data.  These names should still be read with care,
-but they are not, in this audit, treated as hidden theorem assumptions.
+The names `QLayerData`, `QXPLayerData`, and `RankReductionWitness` are
+classified as source-construction context.  In Section 5 of the paper, after
+`lem:projective-low-rank-sum`, the rank-reduced family \(Q\) is a fixed object,
+and the later \(X\), \(\widehat X\), and \(P\) constructions carry
+matrix-decomposition data.  These records should still be read with care, but
+this audit does not treat them as hidden hypotheses of a source theorem.
 
 The former Chapter 4 unresolved item,
-`RoundingToProjectorsWitness` in `projectiveLowRankSum`, has been discharged:
-the witness-consuming proof is now the internal constructor
-`projectiveLowRankSum_of_roundingWitness`, while the source-facing
-`projectiveLowRankSum` applies `lem:projective-non-measurement` internally and
-then invokes that constructor.
+`RoundingToProjectorsWitness` in `projectiveLowRankSum`, has been discharged.
+The proof which consumes the rounded-projector family is now the internal
+constructor `projectiveLowRankSum_of_roundingWitness`.  The paper-facing
+theorem `projectiveLowRankSum` first applies the formal counterpart of
+`lem:projective-non-measurement` and then invokes that constructor.  Thus the
+additional witness is no longer a public hypothesis of the theorem named for
+the source lemma.
 
 ## Chapter 7 Self-Improvement
 
-There are 11 unresolved SDP findings, mainly
+There are 11 unresolved semidefinite-programming boundaries, mainly
 `SdpStatementWithSlackness`, `MatrixSdpStatementWithSlackness`, and
 `MatrixSdpOptimalWitness`.  These should remain tied to #1230.  The
-paper-facing self-improvement theorem is not closed by assuming an SDP witness
-or complementary-slackness statement; the missing theorem must produce that
-data from the Section 9 hypotheses.
+paper-facing self-improvement theorem is not proved by assuming an optimal
+witness or a complementary-slackness statement.  The missing formal theorem must
+produce the required semidefinite-programming data from the hypotheses used in
+the self-improvement argument.
 
 ## Chapter 9 Pasting
 
-There are 18 unresolved pasting findings, mainly
+There are 18 unresolved pasting boundaries, mainly
 `GCompleteSelfConsistencyStatement`, `GHatFactsStatement`,
 `LdSandwichLineOnePointStatement`, `CommuteGHalfSandwichStatement`, and
 `ComMainConclusion`.  These require a theorem-by-theorem comparison with the
-Section 12 proof tree.  Several of these records appear to be conclusions of
-earlier source lemmas used in later proofs.  That is not enough, by itself, to
-make them acceptable public hypotheses: if the paper statement lists only the
-nontrivial pasting context and records the earlier lemma under `\uses{...}`,
-then the source-facing Lean theorem should invoke the earlier theorem
-internally.  A theorem that exposes the earlier conclusion as an input should
-be treated as a helper unless the blueprint statement explicitly displays that
-extra hypothesis.  Any item that hides a construction or transport step must be
-restored to a source-facing statement with a tracked proof obligation.
+Section 12 proof tree.
 
-The next audit pass should decide this classification explicitly and cite the
-relevant source labels, rather than treating all `*Statement` records as either
-acceptable wrappers or proof debt.
+Several of these records appear to be conclusions of earlier source results
+used in later proofs.  That is not, by itself, a permissible public hypothesis:
+if the source statement assumes only the nontrivial pasting context and the
+blueprint records the earlier result through `\uses{...}`, then the
+source-facing Lean theorem should invoke the earlier theorem inside the proof.
+A theorem which exposes the earlier conclusion as an input is a helper unless
+the blueprint statement explicitly displays that extra hypothesis.  If a record
+instead hides a construction or transport step which is not yet derived from the
+paper hypotheses, the paper-facing statement should be restored and the missing
+step recorded as a proof obligation.
+
+The next pass should cite the relevant Section 12 labels for each declaration.
+It should not treat all `*Statement` records uniformly: some may be faithful
+source conclusions, while others may be genuine proof obligations.
 
 ## Chapter 1 External Theorems
 
-The broad audit also sees `RazSafraSoundnessStatement` and
-`PolishchukSpielmanClassicalSoundnessStatement`.  These are classified
-separately as quoted external theorem interfaces from
+The scan also sees `RazSafraSoundnessStatement` and
+`PolishchukSpielmanClassicalSoundnessStatement`.  These are quoted external
+theorem interfaces from
 `references/ldt-paper/introduction.tex:43-65` and
 `references/ldt-paper/introduction.tex:69-92`.  The corresponding blueprint
 entries are deliberately not marked as formalized.  They are not internal
-bridge debt, but a future formalization should replace the explicit external
-hypothesis by a source-facing theorem or a justified imported result.
+bridge hypotheses.  A future formalization should replace the explicit external
+hypothesis by a source-facing theorem or by a justified imported result.
 
 ## Unresolved Tokens
 
@@ -103,11 +112,11 @@ hypothesis by a source-facing theorem or a justified imported result.
 The singleton unresolved tokens are `GBotSelfConsistencyStatement`,
 `CommutingWithGIncompleteStatement`, and `ComMainConclusion`.
 
-## Cleanup Order
+## Repair Order
 
 1. Continue the #1230 SDP discharge path.  Preserve useful intermediate proof
-   content if necessary, but do not present a slackness witness assumption as
-   the paper theorem.
+   content where it exists, but do not present a slackness-witness assumption
+   as the paper theorem.
 2. Audit the Chapter 9 pasting statement records against the source proof tree,
    especially #1601 and #1622.  Where a record is merely a previous source
    conclusion, add a source-facing wrapper that calls the previous theorem
@@ -129,6 +138,5 @@ python3 scripts/audit_paper_facing_proof_debt.py \
   --ci
 ```
 
-The broad mode should become a blocking gate only after the remaining findings
-are classified or reduced.  Until then it is a reproducible list of the #1458
-review frontier, not a substitute for the mathematical statement audit.
+This command is a reproducible way to obtain the list above.  It is not a
+substitute for the mathematical comparison with the paper source.
