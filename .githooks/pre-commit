@@ -18,13 +18,16 @@ echo "MIPStarRE pre-commit: checking staged whitespace."
 git diff --cached --check
 
 if ! printf '%s\n' "$STAGED_FILES" | grep -Eq \
-  '^(MIPStarRE/|MIPStarRE\.lean|blueprint/src/|blueprint/lean_decls|scripts/(audit_paper_facing_proof_debt|audit_conclusion_shaped_hypotheses|audit_unfaithful_markers|audit_lean_axiom_declarations|check_statement_paper_origin|check_source_statement_changes|blueprint_lean_sync|lean_header_utils)\.py|docs/(CONTRIBUTING|PROOF_INTEGRITY|anti_patterns|blueprint_style_guide|formalization-patterns|proof_frontier_review)\.md|docs/paper-gaps/|\.github/(actions|prompts|workflows)/|AGENTS\.md)'; then
+  '^(MIPStarRE/|MIPStarRE\.lean|blueprint/src/|blueprint/lean_decls|scripts/(audit_new_proof_obligation_metadata|audit_paper_facing_proof_debt|audit_conclusion_shaped_hypotheses|audit_unfaithful_markers|audit_lean_axiom_declarations|check_statement_paper_origin|check_source_statement_changes|blueprint_lean_sync|lean_header_utils)\.py|docs/(CONTRIBUTING|PROOF_INTEGRITY|anti_patterns|blueprint_style_guide|formalization-patterns|proof_frontier_review)\.md|docs/paper-gaps/|\.github/(actions|prompts|workflows)/|AGENTS\.md)'; then
   echo "MIPStarRE pre-commit: no statement-integrity files staged."
   exit 0
 fi
 
 echo "MIPStarRE pre-commit: checking statement-like paper-origin citations."
 python3 scripts/check_statement_paper_origin.py --root .
+
+echo "MIPStarRE pre-commit: checking new proof-obligation metadata."
+python3 scripts/audit_new_proof_obligation_metadata.py --root . --staged --ci
 
 echo "MIPStarRE pre-commit: checking paper-facing proof-debt headers."
 echo "MIPStarRE pre-commit: do not close proof gaps by adding non-paper bridge/package hypotheses."

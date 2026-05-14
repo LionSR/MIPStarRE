@@ -402,6 +402,7 @@ agent-prompt surfaces under `.github/actions/`, `.github/prompts/`, or
 
 ```bash
 python3 scripts/check_statement_paper_origin.py --root .
+python3 scripts/audit_new_proof_obligation_metadata.py --root . --staged --ci
 python3 scripts/audit_paper_facing_proof_debt.py --root . --ci
 python3 scripts/audit_conclusion_shaped_hypotheses.py --root . --ci
 python3 scripts/audit_unfaithful_markers.py --root . --ci
@@ -458,6 +459,21 @@ declaration cited by a source-labelled theorem, lemma, proposition, corollary,
 or definition, and asks the author to record the statement-integrity audit in
 the PR.
 
+For changed LDT Lean declarations, pre-push also audits newly added
+proof-obligation and conditional-helper declarations:
+
+```bash
+python3 scripts/audit_new_proof_obligation_metadata.py --root . \
+  --base origin/main --changed-files <changed Lean files> --ci
+```
+
+This guard is diff-based.  It does not report existing bridge or residual
+debt; it prevents a new bridge, residual, repair, package, producer, input,
+hypotheses bundle, or conditional helper from entering the tree without a
+def-site statement of whether it is source-faithful or an internal proof
+obligation.  Internal proof obligations must cite a paper-gap note or tracking
+issue and state the planned discharge.
+
 For ordinary Lean pushes, pre-push also runs the same oversized-file guard used
 by CI:
 
@@ -490,6 +506,7 @@ remains the authoritative merge gate.  The responsibilities are:
 |---|---|---|---|
 | Whitespace in staged patches | `pre-commit`: `git diff --cached --check` | ordinary PR review / workflow logs | Fast local-only guard. |
 | Statement-like declarations cite paper origin | `pre-commit` and relevant `pre-push`: `check_statement_paper_origin.py` | `statement-paper-origin.yml` | Blocking CI, path-filtered to LDT Lean files and the guard implementation. |
+| New proof-obligation declarations carry role metadata | `pre-commit`: `audit_new_proof_obligation_metadata.py --staged --ci`; relevant `pre-push`: `audit_new_proof_obligation_metadata.py --base origin/main --changed-files ... --ci` | proof-debt review prompts and local hook policy | Local blocking guard for issue #1579.  It is diff-based and complements the global paper-origin audit. |
 | Lean files stay below the oversized-file limit | `pre-push`: `check_oversized_lean_files.py` for Lean changes | `oversized-lean-files.yml` | Path-filtered to Lean files and the guard implementation. |
 | Paper-facing theorem headers avoid bridge-debt vocabulary | `pre-commit` and relevant `pre-push`: `audit_paper_facing_proof_debt.py --ci` | `paper-facing-proof-debt-audit.yml` | Blocking CI for Lean and blueprint statement surfaces. |
 | Conclusion-shaped hypotheses are rejected | `pre-commit` and relevant `pre-push`: `audit_conclusion_shaped_hypotheses.py --ci` | `proof-evasion-helper-audits.yml` | Blocking CI. |
