@@ -740,6 +740,35 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_two_mul_full
     · exact projectiveNonMeasurement_of_sourceAlmostProjective_large ψ A ζ hψ
         (lt_of_not_ge hsmall)
 
+/-- **Rank reduction** (`\label{lem:projective-low-rank-sum}`).
+
+Paper origin: `references/ldt-paper/orthonormalization.tex:540-658`.
+
+The paper first applies `\label{lem:projective-non-measurement}` to obtain the
+rounded projective family `R_a`, and then performs the rank-reduction argument.
+This theorem keeps that source-facing boundary: the rounded family is produced
+internally from the source almost-projectivity estimate and is then passed to
+the internal constructor `projectiveLowRankSum_of_roundingWitness`. -/
+lemma projectiveLowRankSum {Outcome : Type uOutcome}
+    {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι)
+    (A : Measurement Outcome ι) (ζ : Error)
+    (hψ : ψ.IsNormalized)
+    (hζ : 0 ≤ ζ) (hζ_le : ζ ≤ 1 / 4)
+    (source_almost_projective :
+      ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) :
+    ∃ data : QLayerData Outcome ι,
+      RankReductionWitness ψ A ζ data := by
+  classical
+  let hprojective :=
+    projectiveNonMeasurement_of_sourceAlmostProjective_two_mul_full
+      ψ A ζ hψ source_almost_projective
+  let q : OpFamily Outcome ι := Classical.choose hprojective
+  let hrounded : RoundingToProjectorsWitness ψ A ζ q := Classical.choose_spec hprojective
+  exact projectiveLowRankSum_of_roundingWitness ψ A ζ hψ hζ hζ_le q hrounded
+    source_almost_projective
+
 /-- Unconditional constructive producer for `lem:projective-non-measurement`.
 
 This is the specialization of

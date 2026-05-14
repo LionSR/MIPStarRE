@@ -466,20 +466,24 @@ private lemma rankReduction_emptyOutcome
     simpa using congrFun (congrFun hzero_one i) i
   norm_num at hentry
 
-/-- **Rank reduction** (`lem:projective-low-rank-sum`).
+/-- Internal rank-reduction constructor from an already rounded projective family.
 
 Construct the paper's rank-reduced family `Q_a`, together with the auxiliary
 projective measurement `T_a`, so that `Q_a` remains close to `A_a`, its total
 stays bounded by `(1 + 2√ζ)I`, and the auxiliary dimension is at most the
 original ambient dimension.
 
-This theorem starts from a chosen rounded family `R_a` carrying the explicit
-witness `RoundingToProjectorsWitness ψ A ζ q`; equivalently, it consumes a
-concrete witness of the statement `projectiveNonMeasurement ψ A ζ`. In the
-paper (orthonormalization.tex), Lem 5.5 begins exactly from the family `R_a`
-supplied by `lem:projective-non-measurement`, so the downstream QXP layer now
-threads that witness directly instead of passing through a separate bridge
-structure.
+Paper source: proof of `\label{lem:projective-low-rank-sum}` in
+`references/ldt-paper/orthonormalization.tex:540-658`, after applying
+`\label{lem:projective-non-measurement}`.
+
+**Source:** This is a source-faithful internal helper for the part of the proof
+after the rounded family `R_a` has been obtained.  It starts from a chosen
+rounded family carrying the explicit witness
+`RoundingToProjectorsWitness ψ A ζ q`; equivalently, it consumes a concrete
+witness of the statement `projectiveNonMeasurement ψ A ζ`.  The paper-facing
+wrapper `projectiveLowRankSum` applies the rounding lemma internally before
+calling this constructor.
 
 The auxiliary space `ℂ^m` and the projective measurement
 `T_a = ∑_i |a,i⟩⟨a,i|` come from the subsequent
@@ -493,7 +497,7 @@ bound. The broader downstream `QXPLayerData` producer is intentionally separated
 from this rank-reduction theorem: its API now asks only for the primitive
 `X / XHat / P` identities used later, rather than for explicit rectangular
 complex-SVD matrices. -/
-lemma projectiveLowRankSum {Outcome : Type uOutcome}
+lemma projectiveLowRankSum_of_roundingWitness {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     [Fintype Outcome]
     (ψ : QuantumState ι)

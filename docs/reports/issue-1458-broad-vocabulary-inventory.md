@@ -19,12 +19,12 @@ proof obligation.
 
 ## Current Verdict
 
-The broad audit currently reports 30 unresolved theorem-boundary findings.
+The broad audit currently reports 29 unresolved theorem-boundary findings.
 It also records 39 uses of source-construction context and 2 quoted external
 theorem interfaces.  The strict bridge-debt audit reports zero blocking
 findings.
 
-This is not a proof that the 30 unresolved declarations are unfaithful.  It is
+This is not a proof that the 29 unresolved declarations are unfaithful.  It is
 the remaining review frontier for #1458.  The correct response is to compare
 each item with the cited source theorem, not to rename the data until the audit
 becomes silent.
@@ -38,11 +38,12 @@ fixed object, and the later \(X\), \(\widehat X\), and \(P\) constructions
 carry matrix-decomposition data.  These names should still be read with care,
 but they are not, in this audit, treated as hidden theorem assumptions.
 
-One Chapter 4 item remains unresolved:
-`RoundingToProjectorsWitness` in `projectiveLowRankSum`.  The desired repair is
-to expose a paper-facing wrapper that derives the rounded family from
-`lem:projective-non-measurement`, or to mark the present declaration as an
-internal construction rather than the full source lemma.
+The former Chapter 4 unresolved item,
+`RoundingToProjectorsWitness` in `projectiveLowRankSum`, has been discharged:
+the witness-consuming proof is now the internal constructor
+`projectiveLowRankSum_of_roundingWitness`, while the source-facing
+`projectiveLowRankSum` applies `lem:projective-non-measurement` internally and
+then invokes that constructor.
 
 ## Chapter 7 Self-Improvement
 
@@ -97,26 +98,22 @@ hypothesis by a source-facing theorem or a justified imported result.
 | `SdpStatementWithSlackness` | 2 |
 | `CommutingWithGCompleteStatement` | 2 |
 | `CommuteGHalfSandwichStatement` | 2 |
-| Singletons | 4 |
+| Singletons | 3 |
 
-The singleton unresolved tokens are `RoundingToProjectorsWitness`,
-`GBotSelfConsistencyStatement`, `CommutingWithGIncompleteStatement`, and
-`ComMainConclusion`.
+The singleton unresolved tokens are `GBotSelfConsistencyStatement`,
+`CommutingWithGIncompleteStatement`, and `ComMainConclusion`.
 
 ## Cleanup Order
 
-1. Resolve `RoundingToProjectorsWitness` on `projectiveLowRankSum`, since it
-   is the remaining Chapter 4 broad finding after the source-construction
-   context classification.
-2. Continue the #1230 SDP discharge path.  Preserve useful intermediate proof
+1. Continue the #1230 SDP discharge path.  Preserve useful intermediate proof
    content if necessary, but do not present a slackness witness assumption as
    the paper theorem.
-3. Audit the Chapter 9 pasting statement records against the source proof tree,
+2. Audit the Chapter 9 pasting statement records against the source proof tree,
    especially #1601 and #1622.  Where a record is merely a previous source
    conclusion, add a source-facing wrapper that calls the previous theorem
    internally; where it is a genuine construction obligation, keep the proof
    gap visible.
-4. Keep the Chapter 1 external theorem interfaces unmarked by `\leanok` until
+3. Keep the Chapter 1 external theorem interfaces unmarked by `\leanok` until
    the external theorem itself is formalized or imported as a justified
    source-facing theorem.
 
