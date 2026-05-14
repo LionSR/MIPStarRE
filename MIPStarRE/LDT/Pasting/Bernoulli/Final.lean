@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Pasting.Bernoulli.Recurrence
+import MIPStarRE.LDT.Pasting.Bernoulli.ScalarBounds
 import MIPStarRE.LDT.Pasting.Defs.Tuples
 import MIPStarRE.LDT.Pasting.CommutingWithG.Complete
 import MIPStarRE.LDT.Pasting.CommutingWithG.Incomplete
@@ -489,7 +490,7 @@ The consistency defect of two submeasurements against a normalized bipartite
 state is always at most `1`; hence a scalar lower bound
 `1 ≤ ldPastingInInductionError ...` is enough to produce the final conclusion
 with a distinguished trivial measurement. -/
-theorem ldPasting_of_one_le_error
+lemma ldPasting_of_one_le_error
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -521,10 +522,10 @@ theorem ldPastingLargeGammaBranch
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
-    (_hgood : strategy.IsGood eps delta gamma)
+    (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params ι)
-    (_hcomplete : family.Complete strategy.state kappa)
-    (_hcons : family.ConsistentWithPoints strategy zeta)
+    (hcomplete : family.Complete strategy.state kappa)
+    (hcons : family.ConsistentWithPoints strategy zeta)
     (_hself : family.StronglySelfConsistent strategy.state zeta)
     (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
@@ -533,8 +534,15 @@ theorem ldPastingLargeGammaBranch
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
   exact ldPasting_of_one_le_error params strategy eps delta gamma kappa zeta family k (by
-    -- Issue #1601: prove the scalar inequality `1 ≤ σ` in the `gamma > 1` branch.
-    sorry)
+    have hkappa_nonneg := kappa_nonneg_of_complete params strategy family hcomplete
+    by_cases hk_pos : 1 ≤ k
+    · exact one_le_ldPastingError_of_one_le_nu params k eps delta gamma kappa zeta
+        hkappa_nonneg
+        (one_le_ldPastingNu_of_large_gamma params strategy eps delta gamma zeta
+          hgood family hcons k hk_pos _hgamma)
+    · have hk_zero : k = 0 := by omega
+      exact one_le_ldPastingError_of_k_eq_zero params k eps delta gamma kappa zeta
+        hkappa_nonneg hk_zero)
 
 /-- Complementary branch for `thm:ld-pasting` when `zeta > 1`.
 
@@ -546,9 +554,9 @@ theorem ldPastingLargeZetaBranch
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
-    (_hgood : strategy.IsGood eps delta gamma)
+    (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params ι)
-    (_hcomplete : family.Complete strategy.state kappa)
+    (hcomplete : family.Complete strategy.state kappa)
     (_hcons : family.ConsistentWithPoints strategy zeta)
     (_hself : family.StronglySelfConsistent strategy.state zeta)
     (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
@@ -558,8 +566,15 @@ theorem ldPastingLargeZetaBranch
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
   exact ldPasting_of_one_le_error params strategy eps delta gamma kappa zeta family k (by
-    -- Issue #1601: prove the scalar inequality `1 ≤ σ` in the `zeta > 1` branch.
-    sorry)
+    have hkappa_nonneg := kappa_nonneg_of_complete params strategy family hcomplete
+    by_cases hk_pos : 1 ≤ k
+    · exact one_le_ldPastingError_of_one_le_nu params k eps delta gamma kappa zeta
+        hkappa_nonneg
+        (one_le_ldPastingNu_of_large_zeta params strategy eps delta gamma zeta
+          hgood k hk_pos _hzeta)
+    · have hk_zero : k = 0 := by omega
+      exact one_le_ldPastingError_of_k_eq_zero params k eps delta gamma kappa zeta
+        hkappa_nonneg hk_zero)
 
 /-- Complementary branch for `thm:ld-pasting` when `d > q`.
 
@@ -571,10 +586,10 @@ theorem ldPastingLargeDegreeRatioBranch
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
-    (_hgood : strategy.IsGood eps delta gamma)
+    (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params ι)
-    (_hcomplete : family.Complete strategy.state kappa)
-    (_hcons : family.ConsistentWithPoints strategy zeta)
+    (hcomplete : family.Complete strategy.state kappa)
+    (hcons : family.ConsistentWithPoints strategy zeta)
     (_hself : family.StronglySelfConsistent strategy.state zeta)
     (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
@@ -583,8 +598,15 @@ theorem ldPastingLargeDegreeRatioBranch
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
   exact ldPasting_of_one_le_error params strategy eps delta gamma kappa zeta family k (by
-    -- Issue #1601: prove the scalar inequality `1 ≤ σ` in the `d > q` branch.
-    sorry)
+    have hkappa_nonneg := kappa_nonneg_of_complete params strategy family hcomplete
+    by_cases hk_pos : 1 ≤ k
+    · exact one_le_ldPastingError_of_one_le_nu params k eps delta gamma kappa zeta
+        hkappa_nonneg
+        (one_le_ldPastingNu_of_large_degreeRatio params strategy eps delta gamma zeta
+          hgood family hcons k hk_pos _hdq)
+    · have hk_zero : k = 0 := by omega
+      exact one_le_ldPastingError_of_k_eq_zero params k eps delta gamma kappa zeta
+        hkappa_nonneg hk_zero)
 
 /-- Complementary branch for `thm:ld-pasting` when `k = 0`.
 
@@ -598,7 +620,7 @@ theorem ldPastingZeroKBranch
     (eps delta gamma kappa zeta : Error)
     (_hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params ι)
-    (_hcomplete : family.Complete strategy.state kappa)
+    (hcomplete : family.Complete strategy.state kappa)
     (_hcons : family.ConsistentWithPoints strategy zeta)
     (_hself : family.StronglySelfConsistent strategy.state zeta)
     (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
@@ -608,8 +630,8 @@ theorem ldPastingZeroKBranch
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
   exact ldPasting_of_one_le_error params strategy eps delta gamma kappa zeta family k (by
-    -- Issue #1601: prove the scalar inequality `1 ≤ σ` in the `k = 0` branch.
-    sorry)
+    exact one_le_ldPastingError_of_k_eq_zero params k eps delta gamma kappa zeta
+      (kappa_nonneg_of_complete params strategy family hcomplete) _hk_zero)
 
 /-- Degree-zero complementary branch for the unrestricted source theorem.
 
