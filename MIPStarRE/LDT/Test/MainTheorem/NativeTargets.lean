@@ -30,8 +30,11 @@ no match-mass or diagonal-consistency data is accepted as an extra input.
 `leftLiftedProjectivizationRepairWithMatchMass`, whose
 outcome-expectation preservation theorem is not yet derived from
 `references/ldt-paper/inductive_step.tex:130-173`.  This is documented in
-issue #1610.  Elimination: prove the QXP outcome-expectation preservation
-theorem from the paper hypotheses and remove this propagated dependency.
+`docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`, with the remaining
+construction target tracked by #1610.
+Elimination: prove the QXP outcome-expectation preservation theorem from the
+paper hypotheses, or replace the exact line-169 step by the corrected scalar
+loss, and remove this propagated dependency.
 -/
 theorem nonempty_ofRoleWitness
     {params : Parameters} [FieldModel.{0} params.q]

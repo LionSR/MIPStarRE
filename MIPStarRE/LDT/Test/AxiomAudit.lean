@@ -34,9 +34,11 @@ data, or obligation hypotheses, and its proof is assembled from named
 construction targets.  Issue #1043 tracks the base-case projective-completion
 construction, issues #1363 and #1369 track the successor projective-completion
 construction, issue #1566 tracks the match-mass preservation obligations in the
-completion step, issue #1610 tracks the QXP outcome-expectation preservation
-sub-obligation inside that completion step, issue #1507 tracks the Section 6
-main-induction proof, and issue #1458 is the umbrella tracking issue.
+completion step, issue #1610 tracks the line-169 projectivization exactness
+sub-obligation documented in
+`docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`,
+issue #1507 tracks the Section 6 main-induction proof, and issue #1458 is the
+umbrella tracking issue.
 
 The audit for `GlobalVariance.globalVarianceOfPoints` now requires the standard
 Lean axioms only: the issue-#1456 six-step local transport estimate is supplied
