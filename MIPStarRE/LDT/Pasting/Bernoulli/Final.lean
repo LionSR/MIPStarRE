@@ -530,7 +530,7 @@ theorem ldPastingLargeGammaBranch
     (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
     (_hk : 400 * params.m * params.d ≤ k)
-    (_hgamma : 1 < gamma) :
+    (hgamma : 1 < gamma) :
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
   exact ldPasting_of_one_le_error params strategy eps delta gamma kappa zeta family k (by
@@ -539,7 +539,7 @@ theorem ldPastingLargeGammaBranch
     · exact one_le_ldPastingError_of_one_le_nu params k eps delta gamma kappa zeta
         hkappa_nonneg
         (one_le_ldPastingNu_of_large_gamma params strategy eps delta gamma zeta
-          hgood family hcons k hk_pos _hgamma)
+          hgood family hcons k hk_pos hgamma)
     · have hk_zero : k = 0 := by omega
       exact one_le_ldPastingError_of_k_eq_zero params k eps delta gamma kappa zeta
         hkappa_nonneg hk_zero)
@@ -562,7 +562,7 @@ theorem ldPastingLargeZetaBranch
     (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
     (_hk : 400 * params.m * params.d ≤ k)
-    (_hzeta : 1 < zeta) :
+    (hzeta : 1 < zeta) :
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
   exact ldPasting_of_one_le_error params strategy eps delta gamma kappa zeta family k (by
@@ -571,7 +571,7 @@ theorem ldPastingLargeZetaBranch
     · exact one_le_ldPastingError_of_one_le_nu params k eps delta gamma kappa zeta
         hkappa_nonneg
         (one_le_ldPastingNu_of_large_zeta params strategy eps delta gamma zeta
-          hgood k hk_pos _hzeta)
+          hgood k hk_pos hzeta)
     · have hk_zero : k = 0 := by omega
       exact one_le_ldPastingError_of_k_eq_zero params k eps delta gamma kappa zeta
         hkappa_nonneg hk_zero)
@@ -594,7 +594,7 @@ theorem ldPastingLargeDegreeRatioBranch
     (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
     (_hk : 400 * params.m * params.d ≤ k)
-    (_hdq : params.q < params.d) :
+    (hdq : params.q < params.d) :
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
   exact ldPasting_of_one_le_error params strategy eps delta gamma kappa zeta family k (by
@@ -603,7 +603,7 @@ theorem ldPastingLargeDegreeRatioBranch
     · exact one_le_ldPastingError_of_one_le_nu params k eps delta gamma kappa zeta
         hkappa_nonneg
         (one_le_ldPastingNu_of_large_degreeRatio params strategy eps delta gamma zeta
-          hgood family hcons k hk_pos _hdq)
+          hgood family hcons k hk_pos hdq)
     · have hk_zero : k = 0 := by omega
       exact one_le_ldPastingError_of_k_eq_zero params k eps delta gamma kappa zeta
         hkappa_nonneg hk_zero)
@@ -626,12 +626,12 @@ theorem ldPastingZeroKBranch
     (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
     (_hk : 400 * params.m * params.d ≤ k)
-    (_hk_zero : k = 0) :
+    (hk_zero : k = 0) :
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
   exact ldPasting_of_one_le_error params strategy eps delta gamma kappa zeta family k (by
     exact one_le_ldPastingError_of_k_eq_zero params k eps delta gamma kappa zeta
-      (kappa_nonneg_of_complete params strategy family hcomplete) _hk_zero)
+      (kappa_nonneg_of_complete params strategy family hcomplete) hk_zero)
 
 /-- Degree-zero complementary branch for the unrestricted source theorem.
 
