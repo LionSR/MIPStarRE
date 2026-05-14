@@ -482,9 +482,27 @@ python3 scripts/check_oversized_lean_files.py --root . \
   --known MIPStarRE/LDT/SelfImprovement/Theorems/Results/BoundednessTransport.lean
 ```
 
+For changed blueprint sources under `blueprint/src/`, pre-push now runs a
+bounded local render smoke check:
+
+```bash
+cd blueprint && leanblueprint web
+```
+
+On a warm local checkout this check took about 8 seconds on 2026-05-14.  It is
+intended to catch ordinary LaTeX, macro, bibliography, and plasTeX failures
+before they consume blueprint CI time.  If `leanblueprint` is not on `PATH`,
+the hook fails with installation instructions:
+
+```bash
+pipx install leanblueprint
+pipx inject --include-apps --force leanblueprint plastex
+```
+
 For a heavier local gate, set `MIPSTARRE_HOOK_FULL=1` while pushing.  Full mode
 also runs `lake build`, `python3 scripts/blueprint_leanok_axioms.py --ci`, and
-`leanblueprint web` when `leanblueprint` is installed.
+`leanblueprint web` when `leanblueprint` is installed and the default blueprint
+smoke tier has not already run.
 
 For a one-off bypass, set `MIPSTARRE_SKIP_HOOKS=1`.  A bypass should be used
 only to recover from a local tooling problem; it is not a substitute for the
@@ -517,7 +535,7 @@ remains the authoritative merge gate.  The responsibilities are:
 | Blueprint declarations and `blueprint/lean_decls` stay synchronized | `pre-push`: regenerate, diff, `blueprint_lean_sync.py --ci`, reverse coverage warning for changed Lean declarations, rebuild changed Lean modules, `checkdecls` | `blueprint-sync.yml`; best-effort checks in `lint-blueprint.yml` | The PR workflow is the authoritative check; the reverse coverage step is a local warning.  The local rebuild prevents stale `.olean` files from making an existing declaration look missing. |
 | Proof-level `\leanok` entries do not depend on `sorryAx` | `pre-push` full mode: `blueprint_leanok_axioms.py --ci` | `blueprint-sync.yml` | The axiom audit needs compiled local `.olean` artifacts on a cold runner, so this workflow keeps one explicit `lake build` before the audit. |
 | Whole-project Lean compilation | `pre-push` full mode: `lake build` | `lean_action_ci.yml` | Lean CI remains the merge authority for compilation; the blueprint-sync build is the proof-status audit prerequisite. |
-| Blueprint LaTeX/PDF/web build | `pre-push` full mode: `leanblueprint web` when installed | `lint-blueprint.yml` and `blueprint.yml` | Only blueprint workflows own LaTeX rendering. |
+| Blueprint LaTeX/PDF/web build | `pre-push`: `leanblueprint web` for `blueprint/src/` changes; full mode reruns it only if the default smoke tier did not run | `lint-blueprint.yml` and `blueprint.yml` | Local warm smoke check measured about 8 seconds on 2026-05-14; CI remains the render authority. |
 
 This split keeps the proof-status audit separate from ordinary compilation.
 `blueprint-sync.yml` still builds the repository once because `#print axioms`

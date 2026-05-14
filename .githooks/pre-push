@@ -12,6 +12,7 @@ cd "$ROOT"
 CHANGED_FILE_LIST="$(mktemp)"
 CHANGED_LEAN_FILE_LIST="$(mktemp)"
 trap 'rm -f "$CHANGED_FILE_LIST" "$CHANGED_LEAN_FILE_LIST"' EXIT
+BLUEPRINT_WEB_SMOKE_RAN=0
 
 ZERO_SHA="0000000000000000000000000000000000000000"
 
@@ -123,6 +124,20 @@ if [ -s "$CHANGED_LEAN_FILE_LIST" ]; then
   fi
 fi
 
+if grep -Eq '^blueprint/src/' "$CHANGED_FILE_LIST"; then
+  if ! command -v leanblueprint >/dev/null 2>&1; then
+    echo "MIPStarRE pre-push: blueprint/src changed, but leanblueprint is not on PATH."
+    echo "Install it with:"
+    echo "  pipx install leanblueprint"
+    echo "  pipx inject --include-apps --force leanblueprint plastex"
+    echo "Or bypass only for a local tooling problem with MIPSTARRE_SKIP_HOOKS=1 and let CI run."
+    exit 1
+  fi
+  echo "MIPStarRE pre-push: running blueprint web smoke check."
+  run_outside_git_env sh -c 'cd blueprint && leanblueprint web'
+  BLUEPRINT_WEB_SMOKE_RAN=1
+fi
+
 if grep -Eq '^(MIPStarRE/|MIPStarRE\.lean$|blueprint/|scripts/(blueprint_lean_sync|blueprint_leanok_axioms|check_blueprint_latex|check_blueprint_sync|tex_utils)\.py$)' "$CHANGED_FILE_LIST"; then
   echo "MIPStarRE pre-push: regenerating blueprint/lean_decls."
   run_outside_git_env python3 scripts/blueprint_lean_sync.py --root . --update-lean-decls
@@ -166,7 +181,9 @@ if [ "${MIPSTARRE_HOOK_FULL:-}" = "1" ]; then
   echo "MIPStarRE pre-push full mode: checking blueprint proof-level leanok closure."
   run_outside_git_env python3 scripts/blueprint_leanok_axioms.py --ci
 
-  if command -v leanblueprint >/dev/null 2>&1; then
+  if [ "$BLUEPRINT_WEB_SMOKE_RAN" = "1" ]; then
+    echo "MIPStarRE pre-push full mode: blueprint web already checked."
+  elif command -v leanblueprint >/dev/null 2>&1; then
     echo "MIPStarRE pre-push full mode: running leanblueprint web."
     run_outside_git_env sh -c 'cd blueprint && leanblueprint web'
   else
