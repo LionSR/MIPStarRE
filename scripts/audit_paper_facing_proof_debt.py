@@ -16,10 +16,11 @@ review aid for that boundary:
   ``Bundle``, ``Producer``, ``Obligation``, an ``Input`` bundle, a wrapper,
   an ``Unfaithful`` marker type, or a generic ``Hypotheses`` /
   ``Assumptions`` bundle;
-* reject paper-facing blueprint entries that point to declaration names of the
-  form ``*_of...Obligations``, ``*_of...Residual``, ``*_of...Repair``, or
-  ``conditional...``, even when the declaration header itself has no suspicious
-  public input.
+* reject paper-facing blueprint entries that point to declaration names with
+  conditional proof-debt forms such as ``*_of...Obligations``,
+  ``*_of...Residual``, ``*_of...Repair``, ``*_of...Bundle``,
+  ``*_of...Unfaithful``, ``*_assuming...``, or ``conditional...``, even when
+  the declaration header itself has no suspicious public input.
 * classify known faithful boundary-input packages separately, with paper
   citations, so they do not become indistinguishable from proof debt.
 
