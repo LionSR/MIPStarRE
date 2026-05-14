@@ -23,7 +23,7 @@ open scoped MatrixOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-! ## Package constructors and skeletal assembly -/
+/-! ## Stage-data constructors and theorem composition -/
 
 /-- Extract a concrete slice-restriction package from
 `lem:restricted-probabilities`.
