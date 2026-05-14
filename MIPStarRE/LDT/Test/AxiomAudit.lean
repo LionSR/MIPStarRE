@@ -14,13 +14,13 @@ Regression checks for the issue-#408 replacement of the former ambient
 Polishchuk--Spielman axiom by the explicit hypothesis
 `PolishchukSpielmanClassicalSoundnessStatement`.
 
-The audit for
-`MakingMeasurementsProjective.orthonormalizationCompletionRoute` requires the
-standard Lean axioms only: the locality-preserving repair obligation in
-`MakingMeasurementsProjective/Producers.lean` has been discharged for the
-documented completion-route construction.  The source theorem
-`MakingMeasurementsProjective.orthonormalization` records the remaining issue
-#1032 proof obligation for the paper's sharper constant.
+The audits for
+`MakingMeasurementsProjective.orthonormalizationCompletionRoute` and
+`MakingMeasurementsProjective.orthonormalization` require the standard Lean
+axioms only: the locality-preserving repair obligation in
+`MakingMeasurementsProjective/Producers.lean` has been discharged for both the
+documented completion-route construction and the paper-facing
+`100\zeta^{1/4}` theorem.
 
 The audit for `SelfImprovement.selfImprovement` records the current open
 derivation for `thm:self-improvement`: the statement corresponding to the
@@ -89,10 +89,10 @@ proof gap for issues #1043, #1363, #1369, and #1458. -/
 private def expectedMainFormalAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
-/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1032 derivation
-needed for the paper constant in `thm:orthonormalization`. -/
+/-- Standard kernel axioms only: the issue-#1032 derivation for the paper
+constant in `thm:orthonormalization` has been discharged. -/
 private def expectedOrthonormalizationAxioms : Array Name :=
-  expectedStandardAxiomsWithSorry
+  expectedStandardAxioms
 
 /-- Standard kernel axioms plus `sorryAx`; tracks the issue #1515 derivation
 needed for `selfImprovement`. -/
