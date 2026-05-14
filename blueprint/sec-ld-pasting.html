@@ -329,7 +329,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The Lean proof of the unrestricted source theorem is the tracked proof gap in issue&#160;#1601. The argument below is the paper proof. Let \(H\) be the submeasurement from Lemma&#160;<a href="sec-ld-pasting.html#lem:ld-pasting-sub-measurement">9.5</a>, and fix an arbitrary polynomial \(h^* \in \mathcal{P}(m+1,q,d)\). Define a measurement \(H_{\mathrm{meas}} \in \mathrm{PolyMeas}(m+1,q,d)\) by </p>
+  <p> The Lean proof of the unrestricted theorem currently has one tracked branch obligation, the degree-zero case in issue&#160;#1622. The argument below is the paper proof. Let \(H\) be the submeasurement from Lemma&#160;<a href="sec-ld-pasting.html#lem:ld-pasting-sub-measurement">9.5</a>, and fix an arbitrary polynomial \(h^* \in \mathcal{P}(m+1,q,d)\). Define a measurement \(H_{\mathrm{meas}} \in \mathrm{PolyMeas}(m+1,q,d)\) by </p>
 <div class="displaymath" id="a0000000420">
   \[  (H_{\mathrm{meas}})_h = \begin{cases}  H_{h^*} + (I-H) &  \text{if } h=h^*, \\ H_h &  \text{otherwise.} \end{cases}  \]
 </div>
@@ -383,7 +383,7 @@
 <div class="displaymath" id="a0000000422">
   \[  \gamma \le 1,\qquad \zeta \le 1,\qquad d \le q,\qquad 0{\lt}d,\qquad 1\le k.  \]
 </div>
-<p> The paper theorem is stated in <span class="ttfamily">references/ldt-paper/ld-pasting.tex</span>, lines 12–50. Lines 52–55 explain that the proof may restrict to \(\varepsilon ,\delta ,\gamma ,\zeta ,d/q\le 1\), since the complementary cases are trivial. The unrestricted source statement is linked from Theorem&#160;<a href="sec-ld-pasting.html#thm:ld-pasting">9.1</a>; the formal proof of these complementary cases remains tracked by issue&#160;#1601. </p>
+<p> The paper theorem is stated in <span class="ttfamily">references/ldt-paper/ld-pasting.tex</span>, lines 12–50. Lines 52–55 explain that the proof may restrict to \(\varepsilon ,\delta ,\gamma ,\zeta ,d/q\le 1\), since the complementary cases are trivial. The unrestricted source statement is linked from Theorem&#160;<a href="sec-ld-pasting.html#thm:ld-pasting">9.1</a>. Four complementary branches are now proved in Lean; the remaining degree-zero branch is tracked by issue&#160;#1622. </p>
 
   </div>
 </div>

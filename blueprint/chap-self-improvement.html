@@ -369,28 +369,28 @@
   \begin{align}  \sum _h \langle \psi  \rvert  H_h \otimes I \lvert \psi  \rangle  & = \mathbb {E}_{u} \sum _h \langle \psi  \rvert  H^{u}_h \otimes I \lvert \psi  \rangle  \notag \\ & = \mathbb {E}_{u} \sum _h \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot T_h \cdot A^{u}_{h(u)}\bigr) \otimes I \lvert \psi  \rangle . \end{align}
 </div>
 <p>  Grouping the polynomials according to their value at&#160;\(u\) gives </p>
-<div class="equation" id="eq:bracketize-the-expression">
+<div class="equation" id="eq:group-by-point-value">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:bracketize-the-expression} \mathbb {E}_{u} \sum _h \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot T_h \cdot A^{u}_{h(u)}\bigr) \otimes I \lvert \psi  \rangle  = \mathbb {E}_{u} \sum _a \langle \psi  \rvert  \bigl(A^{u}_{a} \cdot T_{[h(u) = a]} \cdot A^{u}_{a}\bigr) \otimes I \lvert \psi  \rangle . \end{equation}
+    \begin{equation} \label{eq:group-by-point-value} \mathbb {E}_{u} \sum _h \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot T_h \cdot A^{u}_{h(u)}\bigr) \otimes I \lvert \psi  \rangle  = \mathbb {E}_{u} \sum _a \langle \psi  \rvert  \bigl(A^{u}_{a} \cdot T_{[h(u) = a]} \cdot A^{u}_{a}\bigr) \otimes I \lvert \psi  \rangle . \end{equation}
   </div>
   <span class="equation_label">4</span>
 </p>
 </div>
 <p>        We first move the leftmost copy of&#160;\(A^u_a\) across the bipartition: </p>
-<div class="equation" id="eq:yet-another-move-a">
+<div class="equation" id="eq:first-point-projector-transport">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:yet-another-move-a} \eqref{eq:bracketize-the-expression} \approx _{2\sqrt{\delta }} \mathbb {E}_{u} \sum _a \langle \psi  \rvert  \bigl(T_{[h(u)=a]} \cdot A^{u}_{a}\bigr) \otimes A^{u}_{a} \lvert \psi  \rangle . \end{equation}
+    \begin{equation} \label{eq:first-point-projector-transport} \eqref{eq:group-by-point-value} \approx _{2\sqrt{\delta }} \mathbb {E}_{u} \sum _a \langle \psi  \rvert  \bigl(T_{[h(u)=a]} \cdot A^{u}_{a}\bigr) \otimes A^{u}_{a} \lvert \psi  \rangle . \end{equation}
   </div>
   <span class="equation_label">5</span>
 </p>
 </div>
-<p> The difference is bounded by Cauchy–Schwarz as in&#160;<a href="chap-self-improvement.html#eq:move-one-cauchy-schwarz" class="eqref">37</a>; the first factor is at most \(\sqrt{2\delta }\) by self-consistency of&#160;\(A\), and the second is at most&#160;\(1\) because \(T_{[h(u)=a]} \le I\).    We next remove the remaining copy of&#160;\(A^u_a\) on Bob’s side: </p>
-<div class="equation" id="eq:mysterious-case-of-the-disappearing-a">
+<p> The difference is bounded by Cauchy–Schwarz as in&#160;<a href="chap-self-improvement.html#eq:move-first-point-projector-cauchy-schwarz" class="eqref">37</a>; the first factor is at most \(\sqrt{2\delta }\) by self-consistency of&#160;\(A\), and the second is at most&#160;\(1\) because \(T_{[h(u)=a]} \le I\).    We next remove the remaining copy of&#160;\(A^u_a\) on Bob’s side: </p>
+<div class="equation" id="eq:first-moved-completeness">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:mysterious-case-of-the-disappearing-a} \eqref{eq:yet-another-move-a} \approx _{\sqrt{\delta }} \mathbb {E}_{u} \sum _a \langle \psi  \rvert  \bigl(T_{[h(u)=a]} \cdot A^{u}_{a}\bigr) \otimes I \lvert \psi  \rangle . \end{equation}
+    \begin{equation} \label{eq:first-moved-completeness} \eqref{eq:first-point-projector-transport} \approx _{\sqrt{\delta }} \mathbb {E}_{u} \sum _a \langle \psi  \rvert  \bigl(T_{[h(u)=a]} \cdot A^{u}_{a}\bigr) \otimes I \lvert \psi  \rangle . \end{equation}
   </div>
   <span class="equation_label">6</span>
 </p>
@@ -401,13 +401,13 @@
 </div>
 <p> which is at most&#160;\(\delta \) because&#160;\(A\) is self-consistent and projective. Reindexing by&#160;\(h\) and using&#160;<a href="chap-self-improvement.html#eq:swap-Z-for-A" class="eqref">2</a>,      </p>
 <div class="displaymath" id="a0000000309">
-  \[  \eqref{eq:mysterious-case-of-the-disappearing-a} = \sum _h \langle \psi  \rvert  \bigl(T_h \cdot \mathbb {E}_{u} A^u_{h(u)}\bigr) \otimes I \lvert \psi  \rangle  = \sum _h \langle \psi  \rvert  (T_h \cdot Z) \otimes I \lvert \psi  \rangle  = \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle .  \]
+  \[  \eqref{eq:first-moved-completeness} = \sum _h \langle \psi  \rvert  \bigl(T_h \cdot \mathbb {E}_{u} A^u_{h(u)}\bigr) \otimes I \lvert \psi  \rangle  = \sum _h \langle \psi  \rvert  (T_h \cdot Z) \otimes I \lvert \psi  \rangle  = \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle .  \]
 </div>
 <p>      Thus </p>
-<div class="equation" id="eq:gonna-use-this-later-H-versus-Z">
+<div class="equation" id="eq:h-versus-z-lower-bound">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:gonna-use-this-later-H-versus-Z} \sum _h \langle \psi  \rvert  H_h \otimes I \lvert \psi  \rangle  \geq \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  - 3\sqrt{\delta }. \end{equation}
+    \begin{equation} \label{eq:h-versus-z-lower-bound} \sum _h \langle \psi  \rvert  H_h \otimes I \lvert \psi  \rangle  \geq \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  - 3\sqrt{\delta }. \end{equation}
   </div>
   <span class="equation_label">7</span>
 </p>
@@ -418,17 +418,17 @@
 </div>
 <p> Therefore the completeness is at least \(1-\nu -3\sqrt{\delta }\), which is bounded below by \((1-\nu )-\zeta \). </p>
 <p><em>Proof of <a href="chap-self-improvement.html#item:self-improvement-A-consistency">2</a>.</em> The inconsistency of&#160;\(H\) with&#160;\(A\) is </p>
-<div class="equation" id="eq:consistency-with-A-baby-step">
+<div class="equation" id="eq:point-consistency-expansion">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:consistency-with-A-baby-step} \mathbb {E}_{u} \sum _{a \neq b} \langle \psi  \rvert  A^{u}_a \otimes H_{[h(u) = b]} \lvert \psi  \rangle  = \mathbb {E}_{u} \sum _{a, h: h(u) \neq a} \langle \psi  \rvert  A^{u}_a \otimes H_h \lvert \psi  \rangle . \end{equation}
+    \begin{equation} \label{eq:point-consistency-expansion} \mathbb {E}_{u} \sum _{a \neq b} \langle \psi  \rvert  A^{u}_a \otimes H_{[h(u) = b]} \lvert \psi  \rangle  = \mathbb {E}_{u} \sum _{a, h: h(u) \neq a} \langle \psi  \rvert  A^{u}_a \otimes H_h \lvert \psi  \rangle . \end{equation}
   </div>
   <span class="equation_label">8</span>
 </p>
 </div>
 <p> The theorem-side off-diagonal selection used for this ‘add-in-u‘ application is , and the corresponding left/right scalar quantities are  and . The selected scalar chain for this specialization is recorded by          . Apply Lemma&#160;<a href="chap-self-improvement.html#lem:add-in-u">7.9</a> with \(\mathcal O=\mathbb {F}_q\), \(M=A\), and \(S_u=\{ (a,h):h(u)\neq a\} \). Then </p>
 <div class="displaymath" id="a0000000311">
-  \[  \eqref{eq:consistency-with-A-baby-step} \approx _{4 \sqrt{\zeta _{\mathrm{variance}}}} \mathbb {E}_{u} \sum _{a, h: h(u) \neq a} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot A^{u}_a \cdot A^{u}_{h(u)}\bigr)\otimes T_h \lvert \psi  \rangle ,  \]
+  \[  \eqref{eq:point-consistency-expansion} \approx _{4 \sqrt{\zeta _{\mathrm{variance}}}} \mathbb {E}_{u} \sum _{a, h: h(u) \neq a} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot A^{u}_a \cdot A^{u}_{h(u)}\bigr)\otimes T_h \lvert \psi  \rangle ,  \]
 </div>
 <p> and the right-hand side is&#160;\(0\) because&#160;\(A\) is projective. Hence </p>
 <div class="equation" id="eq:explicit-bound-for-A-consistency">
@@ -449,35 +449,35 @@
   \begin{align}  H^u_h & = A^u_{h(u)} \cdot T_h \cdot A^u_{h(u)} = A^u_{h(u)} \cdot H^u_h \cdot A^u_{h(u)}, \label{eq:h-sandwich}\\ A^u_{h(u)} \cdot H^u_{h'} \cdot A^u_{h(u)} & = H^u_{h'} \cdot A^u_{h(u)} = \bigl(A^u_{h(u)} \cdot T_{h'} \cdot A^u_{h(u)}\bigr)\cdot \mathbf{1}\! \left[h(u) = h’(u)\right]. \label{eq:h-blt} \end{align}
 </div>
 <p>    The strong self-consistency expression is </p>
-<div class="equation" id="eq:self-consistency-baby-step">
+<div class="equation" id="eq:self-consistency-expansion">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:self-consistency-baby-step} \sum _{h\in \mathcal{P}(m,q,d)} \langle \psi  \rvert  H_h \otimes H_h \lvert \psi  \rangle  = \mathbb {E}_{u} \sum _{h \in \mathcal{P}(m,q,d)} \langle \psi  \rvert  H_h^{u} \otimes H_h \lvert \psi  \rangle . \end{equation}
+    \begin{equation} \label{eq:self-consistency-expansion} \sum _{h\in \mathcal{P}(m,q,d)} \langle \psi  \rvert  H_h \otimes H_h \lvert \psi  \rangle  = \mathbb {E}_{u} \sum _{h \in \mathcal{P}(m,q,d)} \langle \psi  \rvert  H_h^{u} \otimes H_h \lvert \psi  \rangle . \end{equation}
   </div>
   <span class="equation_label">12</span>
 </p>
 </div>
 <p> Apply Lemma&#160;<a href="chap-self-improvement.html#lem:add-in-u">7.9</a> with \(\mathcal O=\mathcal{P}(m,q,d)\), \(M=H\), and \(S_u=\{ (h,h):h\in \mathcal{P}(m,q,d)\} \). This gives </p>
-<div class="equation" id="eq:release-the-kraken">
+<div class="equation" id="eq:add-point-conditioning">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:release-the-kraken} \eqref{eq:self-consistency-baby-step} \approx _{4 \sqrt{\zeta _{\mathrm{variance}}}} \mathbb {E}_{u} \sum _{h \in \mathcal{P}(m,q,d)} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot H_h^{u} \cdot A^{u}_{h(u)}\bigr) \otimes T_h \lvert \psi  \rangle . \end{equation}
+    \begin{equation} \label{eq:add-point-conditioning} \eqref{eq:self-consistency-expansion} \approx _{4 \sqrt{\zeta _{\mathrm{variance}}}} \mathbb {E}_{u} \sum _{h \in \mathcal{P}(m,q,d)} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot H_h^{u} \cdot A^{u}_{h(u)}\bigr) \otimes T_h \lvert \psi  \rangle . \end{equation}
   </div>
   <span class="equation_label">13</span>
 </p>
 </div>
 <p> We next enlarge the sum from \(h'=h\) to all pairs \(h,h'\): </p>
-<div class="equation" id="eq:threw-in-h-prime">
+<div class="equation" id="eq:enlarge-polynomial-sum">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:threw-in-h-prime} \eqref{eq:release-the-kraken} \approx _{2\sqrt{\zeta _{\mathrm{variance}}} + \frac{md}{q}} \mathbb {E}_{u} \sum _{h, h' \in \mathcal{P}(m,q,d)} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot H^{u}_{h'} \cdot A^{u}_{h(u)}\bigr) \otimes T_h \lvert \psi  \rangle . \end{equation}
+    \begin{equation} \label{eq:enlarge-polynomial-sum} \eqref{eq:add-point-conditioning} \approx _{2\sqrt{\zeta _{\mathrm{variance}}} + \frac{md}{q}} \mathbb {E}_{u} \sum _{h, h' \in \mathcal{P}(m,q,d)} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot H^{u}_{h'} \cdot A^{u}_{h(u)}\bigr) \otimes T_h \lvert \psi  \rangle . \end{equation}
   </div>
   <span class="equation_label">14</span>
 </p>
 </div>
 <p> The added off-diagonal contribution is </p>
 <div class="displaymath" id="a0000000313">
-  \begin{align}  \eqref{eq:threw-in-h-prime}-\eqref{eq:release-the-kraken} & = \mathbb {E}_{u} \sum _{h \neq h'} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot H^{u}_{h'} \cdot A^{u}_{h(u)}\bigr) \otimes T_h \lvert \psi  \rangle  \notag \\ & = \mathbb {E}_{u} \sum _{h \neq h'} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot T_{h'} \cdot A^{u}_{h(u)}\bigr) \otimes T_h \lvert \psi  \rangle  \cdot \mathbf{1}\! \left[h(u) = h’(u)\right], \label{eq:added-indicator} \end{align}
+  \begin{align}  \eqref{eq:enlarge-polynomial-sum}-\eqref{eq:add-point-conditioning} & = \mathbb {E}_{u} \sum _{h \neq h'} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot H^{u}_{h'} \cdot A^{u}_{h(u)}\bigr) \otimes T_h \lvert \psi  \rangle  \notag \\ & = \mathbb {E}_{u} \sum _{h \neq h'} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot T_{h'} \cdot A^{u}_{h(u)}\bigr) \otimes T_h \lvert \psi  \rangle  \cdot \mathbf{1}\! \left[h(u) = h’(u)\right], \label{eq:added-indicator} \end{align}
 </div>
 <p> where the second equality is&#160;<a href="chap-self-improvement.html#eq:h-blt" class="eqref">11</a>. To estimate&#160;<a href="chap-self-improvement.html#eq:added-indicator" class="eqref">15</a>, first replace the left copy of \(A^u_{h(u)}\) by \(A^v_{h(v)}\): </p>
 <div class="equation" id="eq:swapped-u-for-v">
@@ -494,38 +494,38 @@
 </div>
 <p> The first factor is bounded by \(\sqrt{\zeta _{\mathrm{variance}}}\) via Lemma&#160;<a href="sec-variance.html#lem:global-variance-of-points">6.6</a>, and the second by&#160;\(1\) because \(T\) and \(H^u\) are submeasurements. </p>
 <p>Repeating the same argument for the remaining copy of&#160;\(A\) yields </p>
-<div class="equation" id="eq:swapped-u-for-v-this-time-it's-personal">
+<div class="equation" id="eq:replace-second-point-conditioner">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:swapped-u-for-v-this-time-it's-personal} \eqref{eq:swapped-u-for-v} \approx _{\sqrt{\zeta _{\mathrm{variance}}}} \mathbb {E}_{u,v} \sum _{h \neq h'} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \cdot T_{h'} \cdot A^{v}_{h(v)}\bigr) \otimes T_h \lvert \psi  \rangle  \cdot \mathbf{1}\! \left[h(u) = h'(u)\right]. \end{equation}
+    \begin{equation} \label{eq:replace-second-point-conditioner} \eqref{eq:swapped-u-for-v} \approx _{\sqrt{\zeta _{\mathrm{variance}}}} \mathbb {E}_{u,v} \sum _{h \neq h'} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \cdot T_{h'} \cdot A^{v}_{h(v)}\bigr) \otimes T_h \lvert \psi  \rangle  \cdot \mathbf{1}\! \left[h(u) = h'(u)\right]. \end{equation}
   </div>
   <span class="equation_label">20</span>
 </p>
 </div>
 <p> The same intermediate estimate gives </p>
-<div class="equation" id="eq:gonna-use-this-later">
+<div class="equation" id="eq:swapped-indicator-total-bound">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:gonna-use-this-later} \mathbb {E}_{u,v} \sum _{h \neq h'} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \cdot T_{h'} \cdot A^{v}_{h(v)}\bigr)\otimes T_h\lvert \psi  \rangle  \leq 1, \end{equation}
+    \begin{equation} \label{eq:swapped-indicator-total-bound} \mathbb {E}_{u,v} \sum _{h \neq h'} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \cdot T_{h'} \cdot A^{v}_{h(v)}\bigr)\otimes T_h\lvert \psi  \rangle  \leq 1, \end{equation}
   </div>
   <span class="equation_label">21</span>
 </p>
 </div>
-<p> so Schwartz–Zippel bounds the indicator average by \(md/q\) and proves&#160;<a href="chap-self-improvement.html#eq:threw-in-h-prime" class="eqref">14</a>.            </p>
-<p>Using&#160;<a href="chap-self-improvement.html#eq:h-blt" class="eqref">11</a>, the right-hand side of&#160;<a href="chap-self-improvement.html#eq:threw-in-h-prime" class="eqref">14</a> is </p>
-<div class="equation" id="eq:delete-an-A">
+<p> so Schwartz–Zippel bounds the indicator average by \(md/q\) and proves&#160;<a href="chap-self-improvement.html#eq:enlarge-polynomial-sum" class="eqref">14</a>.            </p>
+<p>Using&#160;<a href="chap-self-improvement.html#eq:h-blt" class="eqref">11</a>, the right-hand side of&#160;<a href="chap-self-improvement.html#eq:enlarge-polynomial-sum" class="eqref">14</a> is </p>
+<div class="equation" id="eq:remove-point-projector">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:delete-an-A} \mathbb {E}_{u} \sum _{h, h' \in \mathcal{P}(m,q,d)} \langle \psi  \rvert  \bigl(H^{u}_{h'} \cdot A^{u}_{h(u)}\bigr) \otimes T_h \lvert \psi  \rangle . \end{equation}
+    \begin{equation} \label{eq:remove-point-projector} \mathbb {E}_{u} \sum _{h, h' \in \mathcal{P}(m,q,d)} \langle \psi  \rvert  \bigl(H^{u}_{h'} \cdot A^{u}_{h(u)}\bigr) \otimes T_h \lvert \psi  \rangle . \end{equation}
   </div>
   <span class="equation_label">22</span>
 </p>
 </div>
 <p>       Replace the remaining copy of \(A^u_{h(u)}\) by \(A^v_{h(v)}\): </p>
-<div class="equation" id="eq:swap-u-for-v-attack-of-the-clones">
+<div class="equation" id="eq:replace-final-point-conditioner">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:swap-u-for-v-attack-of-the-clones} \eqref{eq:delete-an-A} \approx _{\sqrt{\zeta _{\mathrm{variance}}}} \mathbb {E}_{u,v} \sum _{h, h' \in \mathcal{P}(m,q,d)} \langle \psi  \rvert  \bigl(H^{u}_{h'} \cdot A^{v}_{h(v)}\bigr) \otimes T_h \lvert \psi  \rangle . \end{equation}
+    \begin{equation} \label{eq:replace-final-point-conditioner} \eqref{eq:remove-point-projector} \approx _{\sqrt{\zeta _{\mathrm{variance}}}} \mathbb {E}_{u,v} \sum _{h, h' \in \mathcal{P}(m,q,d)} \langle \psi  \rvert  \bigl(H^{u}_{h'} \cdot A^{v}_{h(v)}\bigr) \otimes T_h \lvert \psi  \rangle . \end{equation}
   </div>
   <span class="equation_label">23</span>
 </p>
@@ -534,7 +534,7 @@
 <div class="equation" id="eq:move-over-v">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:move-over-v} \eqref{eq:swap-u-for-v-attack-of-the-clones} \approx _{\sqrt{2\delta }} \mathbb {E}_{u,v} \sum _{h, h' \in \mathcal{P}(m,q,d)} \langle \psi  \rvert  H^{u}_{h'} \otimes \bigl(T_h \cdot A^{v}_{h(v)}\bigr) \lvert \psi  \rangle . \end{equation}
+    \begin{equation} \label{eq:move-over-v} \eqref{eq:replace-final-point-conditioner} \approx _{\sqrt{2\delta }} \mathbb {E}_{u,v} \sum _{h, h' \in \mathcal{P}(m,q,d)} \langle \psi  \rvert  H^{u}_{h'} \otimes \bigl(T_h \cdot A^{v}_{h(v)}\bigr) \lvert \psi  \rangle . \end{equation}
   </div>
   <span class="equation_label">24</span>
 </p>
@@ -543,7 +543,7 @@
 <div class="displaymath" id="a0000000315">
   \[  \eqref{eq:move-over-v} \ge \sum _h \langle \psi  \rvert  H_h \otimes I \lvert \psi  \rangle  - 4\sqrt{\zeta _{\mathrm{variance}}}.  \]
 </div>
-<p> Combining&#160;<a href="chap-self-improvement.html#eq:release-the-kraken" class="eqref">13</a>, <a href="chap-self-improvement.html#eq:threw-in-h-prime" class="eqref">14</a>, <a href="chap-self-improvement.html#eq:swap-u-for-v-attack-of-the-clones" class="eqref">23</a>, and&#160;<a href="chap-self-improvement.html#eq:move-over-v" class="eqref">24</a> gives </p>
+<p> Combining&#160;<a href="chap-self-improvement.html#eq:add-point-conditioning" class="eqref">13</a>, <a href="chap-self-improvement.html#eq:enlarge-polynomial-sum" class="eqref">14</a>, <a href="chap-self-improvement.html#eq:replace-final-point-conditioner" class="eqref">23</a>, and&#160;<a href="chap-self-improvement.html#eq:move-over-v" class="eqref">24</a> gives </p>
 <div class="displaymath" id="a0000000316">
   \[  \sum _h \langle \psi  \rvert  H_h \otimes H_h \lvert \psi  \rangle  \ge \sum _h \langle \psi  \rvert  H_h \otimes I \lvert \psi  \rangle  - 11 \sqrt{\zeta _{\mathrm{variance}}} - \sqrt{2\delta } - \frac{md}{q}.  \]
 </div>
@@ -576,7 +576,7 @@
 <div class="displaymath" id="a0000000323">
   \[  \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  -\mathbb {E}_{u} \sum _a \langle \psi  \rvert  A^{u}_{a} \otimes H_{[h(u)=a]} \lvert \psi  \rangle  \le \langle \psi  \rvert  Z \otimes I \lvert \psi  \rangle  - \sum _h \langle \psi  \rvert  I \otimes H_h \lvert \psi  \rangle  + 4 \sqrt{\zeta _{\mathrm{variance}}}.  \]
 </div>
-<p> By&#160;<a href="chap-self-improvement.html#eq:gonna-use-this-later-H-versus-Z" class="eqref">7</a>, the right-hand side is at most \(3\sqrt{\delta }+4\sqrt{\zeta _{\mathrm{variance}}}\). Substituting the definition of \(\zeta _{\mathrm{variance}}\) and collecting terms gives  </p>
+<p> By&#160;<a href="chap-self-improvement.html#eq:h-versus-z-lower-bound" class="eqref">7</a>, the right-hand side is at most \(3\sqrt{\delta }+4\sqrt{\zeta _{\mathrm{variance}}}\). Substituting the definition of \(\zeta _{\mathrm{variance}}\) and collecting terms gives  </p>
 <div class="displaymath" id="a0000000324">
   \[  23m\cdot \Big(\varepsilon ^{1/2} + \delta ^{1/2} + (d/q)^{1/2}\Big) \le \zeta .  \]
 </div>
@@ -1119,17 +1119,17 @@
   \begin{align}  \mathbb {E}_{u} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  M^{u}_o \otimes H_h \lvert \psi  \rangle  & = \mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  M^{u}_o \otimes H^{v}_h \lvert \psi  \rangle  \notag \\ & = \mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  M^{u}_o \otimes \bigl(A^{v}_{h(v)} \cdot T_h \cdot A^{v}_{h(v)}\bigr) \lvert \psi  \rangle . \label{eq:expand-that-H} \end{align}
 </div>
 <p> We claim that </p>
-<div class="equation" id="eq:move-one">
+<div class="equation" id="eq:move-first-point-projector">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:move-one} \eqref{eq:expand-that-H} \approx _{\sqrt{2\delta }} \mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \cdot M^{u}_o\bigr) \otimes \bigl(T_h \cdot A^{v}_{h(v)}\bigr) \lvert \psi  \rangle . \end{equation}
+    \begin{equation} \label{eq:move-first-point-projector} \eqref{eq:expand-that-H} \approx _{\sqrt{2\delta }} \mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \cdot M^{u}_o\bigr) \otimes \bigl(T_h \cdot A^{v}_{h(v)}\bigr) \lvert \psi  \rangle . \end{equation}
   </div>
   <span class="equation_label">34</span>
 </p>
 </div>
 <p> To show this, we bound the magnitude of the difference: </p>
 <div class="displaymath" id="a0000000341">
-  \begin{multline}  \Big|\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \otimes I - I \otimes A^{v}_{h(v)}\bigr) \cdot \bigl(M^{u}_o \otimes (T_h \cdot A^{v}_{h(v)})\bigr)\lvert \psi  \rangle \Big|\\ \leq \sqrt{\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \otimes I - I \otimes A^{v}_{h(v)}\bigr) \cdot (M^{u}_o \otimes T_h) \cdot \bigl(A^{v}_{h(v)} \otimes I - I \otimes A^{v}_{h(v)}\bigr) \lvert \psi  \rangle }\\ \cdot \sqrt{\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  M^{u}_o \otimes \bigl(A^{v}_{h(v)} \cdot T_h\cdot A^{v}_{h(v)}\bigr) \lvert \psi  \rangle }. \label{eq:move-one-cauchy-schwarz} \end{multline}
+  \begin{multline}  \Big|\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \otimes I - I \otimes A^{v}_{h(v)}\bigr) \cdot \bigl(M^{u}_o \otimes (T_h \cdot A^{v}_{h(v)})\bigr)\lvert \psi  \rangle \Big|\\ \leq \sqrt{\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \otimes I - I \otimes A^{v}_{h(v)}\bigr) \cdot (M^{u}_o \otimes T_h) \cdot \bigl(A^{v}_{h(v)} \otimes I - I \otimes A^{v}_{h(v)}\bigr) \lvert \psi  \rangle }\\ \cdot \sqrt{\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  M^{u}_o \otimes \bigl(A^{v}_{h(v)} \cdot T_h\cdot A^{v}_{h(v)}\bigr) \lvert \psi  \rangle }. \label{eq:move-first-point-projector-cauchy-schwarz} \end{multline}
 </div>
 <p> The first factor is controlled by summing over the value \(a = h(v)\): </p>
 <div class="displaymath" id="a0000000342">
@@ -1141,51 +1141,51 @@
 </div>
 <p> which is at most&#160;\(1\) because \(M^u\) and \(H^v\) are submeasurements. </p>
 <p>Next, we claim that </p>
-<div class="equation" id="eq:move-another">
+<div class="equation" id="eq:move-second-point-projector">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:move-another} \eqref{eq:move-one} \approx _{\sqrt{2\delta }} \mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \otimes T_h \lvert \psi  \rangle . \end{equation}
+    \begin{equation} \label{eq:move-second-point-projector} \eqref{eq:move-first-point-projector} \approx _{\sqrt{2\delta }} \mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \otimes T_h \lvert \psi  \rangle . \end{equation}
   </div>
   <span class="equation_label">38</span>
 </p>
 </div>
 <p> Again, we bound the magnitude of the difference: </p>
-<div class="displaymath" id="eq:move-another-cauchy-schwarz">
-  \begin{align} \label{eq:move-another-cauchy-schwarz} & \Big|\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl((A^{v}_{h(v)} \cdot M^{u}_o) \otimes T_h\bigr) \cdot \bigl(A^{v}_{h(v)} \otimes I - I \otimes A^{v}_{h(v)}\bigr) \lvert \psi  \rangle \Big| \notag \\ & \leq \sqrt{\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \otimes T_h \lvert \psi  \rangle } \\ & \qquad \cdot \sqrt{\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \otimes I - I \otimes A^{v}_{h(v)}\bigr) \cdot (M^{u}_o \otimes T_h) \cdot \bigl(A^{v}_{h(v)} \otimes I - I \otimes A^{v}_{h(v)}\bigr) \lvert \psi  \rangle }. \notag \end{align}
+<div class="displaymath" id="eq:move-second-point-projector-cauchy-schwarz">
+  \begin{align} \label{eq:move-second-point-projector-cauchy-schwarz} & \Big|\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl((A^{v}_{h(v)} \cdot M^{u}_o) \otimes T_h\bigr) \cdot \bigl(A^{v}_{h(v)} \otimes I - I \otimes A^{v}_{h(v)}\bigr) \lvert \psi  \rangle \Big| \notag \\ & \leq \sqrt{\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \otimes T_h \lvert \psi  \rangle } \\ & \qquad \cdot \sqrt{\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \otimes I - I \otimes A^{v}_{h(v)}\bigr) \cdot (M^{u}_o \otimes T_h) \cdot \bigl(A^{v}_{h(v)} \otimes I - I \otimes A^{v}_{h(v)}\bigr) \lvert \psi  \rangle }. \notag \end{align}
 </div>
 <p> The first factor is bounded by </p>
 <div class="displaymath" id="a0000000344">
   \begin{align*} & \mathbb {E}_{u,v} \sum _h \langle \psi  \rvert  \Bigl(A^v_{h(v)} \cdot \sum _{o:(o,h)\in S_u} M^u_o \cdot A^v_{h(v)}\Bigr) \otimes T_h \lvert \psi  \rangle  \\ & \le \mathbb {E}_{u,v} \sum _h \langle \psi  \rvert  (A^v_{h(v)})^2 \otimes T_h \lvert \psi  \rangle  \le \mathbb {E}_{u,v} \sum _h \langle \psi  \rvert  I \otimes T_h \lvert \psi  \rangle  \le 1, \end{align*}
 </div>
-<p> using first that \(M\) is a submeasurement, then that \(A^v_{h(v)} \le I\), and finally that \(T\) is a submeasurement (\(\sum _g T_g \le I\)). The second factor is exactly the same expression as in&#160;<a href="chap-self-improvement.html#eq:move-one-cauchy-schwarz" class="eqref">37</a>, hence at most \(\sqrt{2\delta }\). </p>
+<p> using first that \(M\) is a submeasurement, then that \(A^v_{h(v)} \le I\), and finally that \(T\) is a submeasurement (\(\sum _g T_g \le I\)). The second factor is exactly the same expression as in&#160;<a href="chap-self-improvement.html#eq:move-first-point-projector-cauchy-schwarz" class="eqref">37</a>, hence at most \(\sqrt{2\delta }\). </p>
 <p>Having moved both copies of&#160;\(A\) to the left-hand side, we next show that </p>
-<div class="equation" id="eq:change-one">
+<div class="equation" id="eq:replace-left-point-conditioner">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:change-one} \eqref{eq:move-another} \approx _{\sqrt{\zeta _{\mathrm{variance}}}} \mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \otimes T_h \lvert \psi  \rangle . \end{equation}
+    \begin{equation} \label{eq:replace-left-point-conditioner} \eqref{eq:move-second-point-projector} \approx _{\sqrt{\zeta _{\mathrm{variance}}}} \mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \otimes T_h \lvert \psi  \rangle . \end{equation}
   </div>
   <span class="equation_label">40</span>
 </p>
 </div>
 <p> The difference is bounded by </p>
-<div class="displaymath" id="eq:change-one-cauchy-schwarz">
-  \begin{multline} \label{eq:change-one-cauchy-schwarz} \Big|\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl((A^{v}_{h(v)} - A^{u}_{h(u)}) \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \otimes T_h \lvert \psi  \rangle \Big|\\ \leq \sqrt{\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl((A^{v}_{h(v)} - A^{u}_{h(u)}) \cdot M^{u}_o \cdot (A^{v}_{h(v)} - A^{u}_{h(u)})\bigr) \otimes T_h \lvert \psi  \rangle }\\ \cdot \sqrt{\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \otimes T_h \lvert \psi  \rangle }. \end{multline}
+<div class="displaymath" id="eq:replace-left-point-conditioner-cauchy-schwarz">
+  \begin{multline} \label{eq:replace-left-point-conditioner-cauchy-schwarz} \Big|\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl((A^{v}_{h(v)} - A^{u}_{h(u)}) \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \otimes T_h \lvert \psi  \rangle \Big|\\ \leq \sqrt{\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl((A^{v}_{h(v)} - A^{u}_{h(u)}) \cdot M^{u}_o \cdot (A^{v}_{h(v)} - A^{u}_{h(u)})\bigr) \otimes T_h \lvert \psi  \rangle }\\ \cdot \sqrt{\mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{v}_{h(v)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \otimes T_h \lvert \psi  \rangle }. \end{multline}
 </div>
 <p> The first factor can be rewritten as </p>
 <div class="displaymath" id="a0000000345">
   \begin{align*} & \mathbb {E}_{u,v} \sum _h \langle \psi  \rvert  \Bigl((A^v_{h(v)} - A^u_{h(u)}) \cdot \sum _{o:(o,h)\in S_u} M^u_o \cdot (A^v_{h(v)} - A^u_{h(u)})\Bigr) \otimes T_h \lvert \psi  \rangle  \\ & \le \mathbb {E}_{u,v} \sum _h \langle \psi  \rvert  (A^v_{h(v)} - A^u_{h(u)})^2 \otimes T_h \lvert \psi  \rangle , \end{align*}
 </div>
-<p> because \(M^u\) is a submeasurement. Lemma&#160;<a href="sec-variance.html#lem:global-variance-of-points">6.6</a> bounds this by&#160;\(\zeta _{\mathrm{variance}}\) since \(T \in \mathrm{PolySub}(m,q,d)\). The second factor is exactly the first factor from&#160;<a href="chap-self-improvement.html#eq:move-another-cauchy-schwarz" class="eqref">39</a>, so it is at most&#160;\(1\). </p>
+<p> because \(M^u\) is a submeasurement. Lemma&#160;<a href="sec-variance.html#lem:global-variance-of-points">6.6</a> bounds this by&#160;\(\zeta _{\mathrm{variance}}\) since \(T \in \mathrm{PolySub}(m,q,d)\). The second factor is exactly the first factor from&#160;<a href="chap-self-improvement.html#eq:move-second-point-projector-cauchy-schwarz" class="eqref">39</a>, so it is at most&#160;\(1\). </p>
 <p>Finally, we show that </p>
-<div class="equation" id="eq:change-another">
+<div class="equation" id="eq:replace-right-point-conditioner">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:change-another} \eqref{eq:change-one} \approx _{\sqrt{\zeta _{\mathrm{variance}}}} \mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot M^{u}_o \cdot A^{u}_{h(u)}\bigr) \otimes T_h \lvert \psi  \rangle . \end{equation}
+    \begin{equation} \label{eq:replace-right-point-conditioner} \eqref{eq:replace-left-point-conditioner} \approx _{\sqrt{\zeta _{\mathrm{variance}}}} \mathbb {E}_{u,v} \sum _{(o, h) \in S_{u}} \langle \psi  \rvert  \bigl(A^{u}_{h(u)} \cdot M^{u}_o \cdot A^{u}_{h(u)}\bigr) \otimes T_h \lvert \psi  \rangle . \end{equation}
   </div>
   <span class="equation_label">44</span>
 </p>
 </div>
-<p> The same Cauchy–Schwarz estimate as in&#160;<a href="chap-self-improvement.html#eq:change-one-cauchy-schwarz" class="eqref">41</a>, with the final copy of \(A^v_{h(v)}\) replaced by \(A^u_{h(u)}\), gives the same bound \(\sqrt{\zeta _{\mathrm{variance}}}\). Indeed, the factor containing \(A^u_{h(u)} \cdot M^u_o \cdot A^u_{h(u)}\) is bounded by&#160;\(1\) by the same submeasurement argument as above, while the factor containing \((A^v_{h(v)} - A^u_{h(u)})^2\) is unchanged. Summing the four transports gives an error of \(2\sqrt{2\delta } + 2\sqrt{\zeta _{\mathrm{variance}}}\), and the lemma follows from \(2\delta \leq \zeta _{\mathrm{variance}}\). </p>
+<p> The same Cauchy–Schwarz estimate as in&#160;<a href="chap-self-improvement.html#eq:replace-left-point-conditioner-cauchy-schwarz" class="eqref">41</a>, with the final copy of \(A^v_{h(v)}\) replaced by \(A^u_{h(u)}\), gives the same bound \(\sqrt{\zeta _{\mathrm{variance}}}\). Indeed, the factor containing \(A^u_{h(u)} \cdot M^u_o \cdot A^u_{h(u)}\) is bounded by&#160;\(1\) by the same submeasurement argument as above, while the factor containing \((A^v_{h(v)} - A^u_{h(u)})^2\) is unchanged. Summing the four transports gives an error of \(2\sqrt{2\delta } + 2\sqrt{\zeta _{\mathrm{variance}}}\), and the lemma follows from \(2\delta \leq \zeta _{\mathrm{variance}}\). </p>
 
   </div>
 </div>
