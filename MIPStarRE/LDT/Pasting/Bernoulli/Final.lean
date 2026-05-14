@@ -225,7 +225,8 @@ private lemma fromHToGBernoulliTailMass_lower_bound
              intro _
              exact bernoulliTailOperator_nonneg k params.d X hXpsd hXle
            sum_eq_total := by simp
-           total_le_one := hchern.tail_le_one } : SubMeas Unit (ι × ι)) =
+           total_le_one := bernoulliTailOperator_le_one k params.d X hXpsd hXle } :
+          SubMeas Unit (ι × ι)) =
         fromHToGBernoulliTailMass params strategy.state family k := by
     have hswap :
         ev strategy.state
@@ -292,7 +293,7 @@ theorem ldPastingNCompleteness_of_tailLowerBound
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
     (hk_pos : 1 ≤ k)
-    (hk : 400 * params.m * params.d ≤ k)
+    (_hk : 400 * params.m * params.d ≤ k)
     (htail :
       1 - kappa * (1 + 1 / (100 * (params.m : Error))) -
           Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))) ≤
@@ -351,31 +352,30 @@ theorem ldPastingNCompleteness_of_tailLowerBound
         eps delta gamma zeta k hk_pos
         heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
   constructor
-  · exact hk
-  · constructor
-    have hOAO_mass :
+  constructor
+  have hOAO_mass :
+      overAllOutcomesPastedMass params strategy family k ≥
+        overAllOutcomesExpansionMass params strategy family k -
+          overAllOutcomesError params eps delta gamma zeta k := by
+    have habs := abs_le.mp hOAO.totalOutcomeExpansion
+    linarith
+  have hFrom_mass :
+      fromHToGAllOutcomesMass params strategy strategy.state family k ≥
+        fromHToGBernoulliTailMass params strategy.state family k -
+          fromHToGError params gamma zeta k := by
+    have habs := abs_le.mp hFrom.bernoulliPolynomialRewrite
+    linarith
+  have hmass :
+      overAllOutcomesPastedMass params strategy family k ≥
+        1 - kappa * (1 + 1 / (100 * (params.m : Error))) - ν -
+          Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))) := by
+    have hOAO_mass' :
         overAllOutcomesPastedMass params strategy family k ≥
-          overAllOutcomesExpansionMass params strategy family k -
+          fromHToGAllOutcomesMass params strategy strategy.state family k -
             overAllOutcomesError params eps delta gamma zeta k := by
-      have habs := abs_le.mp hOAO.totalOutcomeExpansion
-      linarith
-    have hFrom_mass :
-        fromHToGAllOutcomesMass params strategy strategy.state family k ≥
-          fromHToGBernoulliTailMass params strategy.state family k -
-            fromHToGError params gamma zeta k := by
-      have habs := abs_le.mp hFrom.bernoulliPolynomialRewrite
-      linarith
-    have hmass :
-        overAllOutcomesPastedMass params strategy family k ≥
-          1 - kappa * (1 + 1 / (100 * (params.m : Error))) - ν -
-            Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))) := by
-      have hOAO_mass' :
-          overAllOutcomesPastedMass params strategy family k ≥
-            fromHToGAllOutcomesMass params strategy strategy.state family k -
-              overAllOutcomesError params eps delta gamma zeta k := by
-        simpa [overAllOutcomesExpansionMass, fromHToGAllOutcomesMass] using hOAO_mass
-      linarith
-    simpa [ν, ldPastingCompletenessLowerBound, overAllOutcomesPastedMass] using hmass
+      simpa [overAllOutcomesExpansionMass, fromHToGAllOutcomesMass] using hOAO_mass
+    linarith
+  simpa [ν, ldPastingCompletenessLowerBound, overAllOutcomesPastedMass] using hmass
 
 /-- `cor:ld-pasting-N-completeness`. -/
 theorem ldPastingNCompleteness
@@ -439,8 +439,7 @@ lemma ldPastingSubMeas
       hgood hgamma_le hzeta_le hdq_le hd
       family hcomplete hcons hself hbound k hk_pos hk
   exact
-    { largeEnough := hk
-      pointConsistency := hconsistency
+    { pointConsistency := hconsistency
       completeness := hcompleteness.completenessBound }
 
 /-- Restricted nontrivial-regime Lean form of `thm:ld-pasting`.
@@ -486,7 +485,6 @@ theorem ldPasting
     hAConsistency_completed params strategy eps delta gamma kappa zeta
       family k hsubmeasConsistency hcompleteness.completenessBound
   exact
-    { largeEnough := hk
-      pointConsistency := hconsistency }
+    { pointConsistency := hconsistency }
 
 end MIPStarRE.LDT.Pasting

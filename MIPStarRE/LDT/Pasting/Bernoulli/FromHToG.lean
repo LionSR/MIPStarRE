@@ -32,25 +32,22 @@ lemma fromHToG
       CommuteGHalfSandwichStatement params ψbi family gamma zeta j)
     (k : ℕ) :
     FromHToGStatement params strategy ψbi family gamma zeta k := by
-  have hresidual :
-      FromHToGResidualStageFacts params ψbi family gamma zeta k := by
-    let hstageExact : FromHToGAdjacentStageExactFacts params ψbi family :=
-      fromHToGAdjacentStageExactFacts_of_weights params ψbi family
-    have hadj : FromHToGAdjacentStageFacts params ψbi family gamma zeta k :=
-      fromHToGAdjacentStageFacts_of_paperMoveChain params ψbi hnorm family gamma zeta
-        hgamma_nonneg hzeta_nonneg hfacts hhalf hstageExact k
-    have hpaper : FromHToGPaperTelescopeFacts params ψbi family gamma zeta k :=
-      fromHToGPaperTelescopeFacts_of_paperTelescope params ψbi hnorm family gamma zeta
-        hgamma_nonneg hzeta_nonneg hfacts hhalf hstageExact k
-    exact ⟨hstageExact, hadj, hpaper⟩
-  refine ⟨hresidual.adjacent.recurrenceStep, ?_⟩
+  refine ⟨?_⟩
+  let hstageExact : FromHToGAdjacentStageExactFacts params ψbi family :=
+    fromHToGAdjacentStageExactFacts_of_weights params ψbi family
+  have hpaper :
+      |fromHToGStageMass params ψbi family k 0 -
+          fromHToGStageMass params ψbi family k k| ≤
+        fromHToGPaperTotalError params gamma zeta k :=
+    fromHToG_stageMassBridge_of_paperTelescope params ψbi hnorm family gamma zeta
+      hgamma_nonneg hzeta_nonneg hfacts hhalf hstageExact k
   have hstage0 := fromHToGStageMass_zero_eq params strategy ψbi family k
   have hstagek := fromHToGStageMass_terminal_eq params ψbi family k
   have hpaperMass :
       |fromHToGAllOutcomesMass params strategy ψbi family k -
           fromHToGBernoulliTailMass params ψbi family k| ≤
         fromHToGPaperTotalError params gamma zeta k := by
-    simpa [hstage0, hstagek] using hresidual.paperTelescope.stageMassBridge
+    simpa [hstage0, hstagek] using hpaper
   exact le_trans hpaperMass <|
     fromHToGPaperTotalError_le params gamma zeta k
       hgamma_nonneg hzeta_nonneg hzeta_le_one
