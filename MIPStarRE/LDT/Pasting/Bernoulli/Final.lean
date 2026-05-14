@@ -668,7 +668,7 @@ theorem ldPastingDegreeZeroBranch
   -- discharged by adding `0 < d` as a hypothesis of `ldPasting`.
   sorry
 
-/-- Nontrivial regime for the unrestricted theorem.
+/-- Projection from the restricted nontrivial construction.
 
 The restricted construction theorem `ldPastingNontrivial` proves the nontrivial
 analytic regime for the canonical pasted measurement.  This auxiliary statement
