@@ -179,7 +179,7 @@ theorem commutingWithGIncomplete
   let hselfComplete : GCompleteSelfConsistencyStatement params strategy.state family zeta :=
     gCompleteSelfConsistency params strategy.state family zeta strategy.permInvState hself
   exact commutingWithGIncomplete_ofComplete params strategy.state family gamma zeta
-    (commutingWithGComplete params strategy family gamma zeta
+    (commutingWithGComplete_ofComMainAndSelfConsistency params strategy family gamma zeta
       hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q hcom hselfComplete)
 
 end MIPStarRE.LDT.Pasting

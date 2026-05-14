@@ -459,7 +459,7 @@ lemma overAllOutcomes
         Commutativity.comMain params strategy eps delta gamma zeta
           strategy.isNormalized hgood family hcons hself hbound
       have hcommComplete :=
-        commutingWithGComplete params strategy family gamma zeta
+        commutingWithGComplete_ofComMainAndSelfConsistency params strategy family gamma zeta
           hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le hcomMain hselfComplete
       have hcommIncomplete :=
         commutingWithGIncomplete_ofComplete params strategy.state family gamma zeta hcommComplete

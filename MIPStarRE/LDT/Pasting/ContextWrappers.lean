@@ -204,7 +204,8 @@ theorem commutingWithGComplete_of_context
         ctx.family ctx.zeta) :
     CommutingWithGCompleteStatement params ctx.strategy.state ctx.family
       ctx.gamma ctx.zeta :=
-  commutingWithGComplete params ctx.strategy ctx.family ctx.gamma ctx.zeta
+  commutingWithGComplete_ofComMainAndSelfConsistency params ctx.strategy ctx.family
+    ctx.gamma ctx.zeta
     hgamma_nonneg ctx.gamma_le_one hzeta_nonneg ctx.zeta_le_one ctx.dq_le_q
     hcom selfConsistentComplete
 
