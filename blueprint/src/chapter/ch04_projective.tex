@@ -332,7 +332,7 @@
 \end{remark}
 
 \begin{lemma}[Locality-preserving projectivization repair]\label{lem:left-lifted-projectivization-repair}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepair}
 	\uses{lem:projective-non-measurement, def:approx_delta}
 	\leanok
 	Paper origin: \texttt{references/ldt-paper/orthonormalization.tex} lines 534--860 (rank reduction and the $Q$-side setup, including \ref{lem:xa-t} and \ref{lem:qa-restated}) and 862--1194 (the $X/\widehat X/P$ algebra: \ref{lem:X-squared}, \ref{lem:X-hat-squared}, \ref{lem:X-times-X-hat}, \ref{lem:squared-difference}, \ref{lem:P-projectivity}, \ref{lem:P-Q-approx}, plus the final triangle-inequality calculation producing the $84\zeta^{1/4}$ bound). Together these are the late repair stage of the orthogonalization-lemma proof.
@@ -369,6 +369,18 @@
 	$\approx_{84\zeta^{1/4}}$ estimate back to left lifts via the left-marginal
 	expectation formula.
 \end{proof}
+
+\begin{remark}[Lean implementation name for projectivization repair]\label{rem:lean-left-lifted-projectivization-repair-producer}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer}
+	The declaration \texttt{leftLiftedProjectivizationRepair} is the
+	source-facing name for
+	Lemma~\ref{lem:left-lifted-projectivization-repair}.  The older declaration
+	\texttt{leftLiftedProjectivizationRepairProducer} has the same public
+	mathematical statement and is retained for compatibility with existing
+	Section~5 declarations.  The word ``producer'' here refers to the construction
+	theorem that produces the projective submeasurement; it is not a hypothesis
+	added to the paper lemma.
+\end{remark}
 
 \begin{remark}[Lean conditional declaration: local orthogonalization]\label{rem:conditional-orthonormalization-main-lemma-local}
 	\uses{def:strong-self-consistency, def:approx_delta, lem:orthonormalization-main-lemma}
@@ -523,15 +535,7 @@
 
 	\begin{lemma}[Rounding to projectors]\label{lem:projective-non-measurement}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_sourceAlmostProjective}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_sourceAlmostProjective_zero}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_sourceAlmostProjective_large}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_sourceAlmostProjective_full}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_almostProjMeasStatement}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_almostProjMeasStatement_full}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncationStatement.toRoundingToProjectorsWitness}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.spectralTruncationInput_of_projectiveNonMeasurement}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.spectralTruncationInput_of_sourceAlmostProjective}
 		\leanok
 		There exists a set of projective matrices $\{R_a\}$ such that
 		\begin{equation*}
@@ -583,6 +587,26 @@
 		\]
 		where the last estimate uses $\delta \leq 1/2$. Setting $\delta=\sqrt{\zeta}$ gives the claim, and \ref{eq:assumption-on-zeta} ensures $\delta \leq 1/2$.
 	\end{proof}
+
+	\begin{remark}[Lean auxiliary declarations for rounding to projectors]\label{rem:lean-projective-non-measurement-auxiliary}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_sourceAlmostProjective}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_sourceAlmostProjective_zero}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_sourceAlmostProjective_large}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_almostProjMeasStatement}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_almostProjMeasStatement_full}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncationStatement.toRoundingToProjectorsWitness}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.spectralTruncationInput_of_projectiveNonMeasurement}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.spectralTruncationInput_of_sourceAlmostProjective}
+		The source-facing Lean declarations for
+		Lemma~\ref{lem:projective-non-measurement} are the proposition
+		\texttt{projectiveNonMeasurement} and the construction theorem
+		\texttt{projectiveNonMeasurement\_of\_sourceAlmostProjective\_full}.
+		The declarations listed here are the endpoint and regime splits, the
+		\texttt{AlmostProjMeasStatement} witness forms, and the spectral-truncation
+		input conversions used by later Section~5 arguments.  They are not additional
+		hypotheses in the paper statement of
+		Lemma~\ref{lem:projective-non-measurement}.
+	\end{remark}
 
 	\begin{lemma}[Combinatorial averaging for the $r > d$ branch]\label{lem:small-overlap-averaging}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.exists_large_subset_ordered}
