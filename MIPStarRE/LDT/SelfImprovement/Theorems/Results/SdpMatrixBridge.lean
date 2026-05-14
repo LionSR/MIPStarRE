@@ -2,17 +2,17 @@ import MIPStarRE.LDT.SelfImprovement.MatrixRealization
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 
 /-!
-# Matrix SDP bridge
+# Matrix SDP comparison
 
 This file compares the concrete matrix-level SDP slackness interface with the
 abstract self-improvement SDP statement interface.
 
-The bridge is intentionally conditional: the matrix optimal witness supplies
-dual feasibility and complementary slackness, while the reduced abstract
-interface used by the current helper proof also asks for the additional bound
-`I ≤ Z`.  The same file also records the saturated canonical package, in which
-the slack block of the canonical primal matrix is required to vanish instead of
-being derived from this auxiliary dominance condition.
+The comparison is intentionally split into two interfaces.  The source-shaped
+matrix optimal witness supplies dual feasibility and complementary slackness.
+Some internal routes also retain the auxiliary dominance bound `I ≤ Z`, because
+that bound can be used to prove saturation of the extra canonical slack block.
+The dominance-carrying interfaces are Lean-only proof obligations toward #1230;
+they are not additional hypotheses in the paper SDP statement.
 
 Mathlib 4.28.0 provides the underlying finite-dimensional matrix order and
 convex-cone infrastructure used throughout this project, but it does not yet
@@ -21,7 +21,7 @@ theorem with complementary slackness in the shape needed here.  Consequently
 this file does not reprove SDP duality.  It only transports the project-local
 matrix witness `MatrixSdpStatementWithSlackness` to the abstract Section 9
 interface.  If a Mathlib SDP theorem is later available, its output should
-replace the project-local witness while the bridge below should remain the
+replace the project-local witness while the comparison theorem below should remain the
 comparison with the self-improvement notation.
 
 ## References
@@ -54,7 +54,7 @@ noncomputable def matrixSubmeasurementToSubMeas {Outcome : Type*}
 
 /-- The point-measurement part of the matrix SDP realization associated to a strategy.
 
-The present bridge only uses the point-measurement fields of
+The present comparison only uses the point-measurement fields of
 `MatrixSdpRealization`, through `matrixAveragedPointOperator` and
 `matrixSdpDualSlackOperator`.  The state field is therefore filled by the zero
 positive operator.  This construction should not be used for state-dependent
@@ -116,7 +116,7 @@ This is the paper-faithful canonical output still required from the
 strong-duality argument in `lem:sdp`: a feasible canonical primal matrix, a
 dual-feasible operator with the same objective value, canonical complementary
 slackness, and vanishing of the extra slack block \(X_{\mathrm{none},\mathrm{none}}\).
-The dominance condition \(I \le Z\) is not part of this package. -/
+The dominance condition \(I \le Z\) is not part of this structure. -/
 structure MatrixSdpCanonicalOptimalPair
     (params : Parameters)
     [FieldModel params.q]
@@ -140,8 +140,8 @@ structure MatrixSdpCanonicalOptimalPair
 
 namespace MatrixSdpCanonicalOptimalPair
 
-/-- A saturated canonical optimal pair packages the matrix-level slackness
-statement without adding the reduced-interface dominance condition. -/
+/-- A saturated canonical optimal pair gives the matrix-level slackness
+statement without adding the auxiliary dominance condition. -/
 theorem toMatrixSdpStatementWithSlackness
     {params : Parameters}
     [FieldModel params.q]
@@ -156,14 +156,16 @@ theorem toMatrixSdpStatementWithSlackness
 
 end MatrixSdpCanonicalOptimalPair
 
-/-- Canonical primal-dual data with complementary slackness and dual
+/-- Canonical primal-dual data with complementary slackness and auxiliary dual
 dominance.
 
 Paper-gap note: `docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`.
 
-This is the finite-dimensional SDP output needed by the reduced abstract helper
-interface: a feasible canonical primal matrix, a dual-feasible operator with
-the same objective value, canonical complementary slackness, and \(I \le Z\). -/
+This Lean-only strengthened structure records a feasible canonical primal matrix,
+a dual-feasible operator with the same objective value, canonical complementary
+slackness, and \(I \le Z\).  The extra dominance field is useful for proving
+the saturation condition required by `MatrixSdpCanonicalOptimalPair`; it is not
+part of the source SDP assertion. -/
 structure MatrixSdpCanonicalOptimalPairWithDominance
     (params : Parameters)
     [FieldModel params.q]
@@ -186,8 +188,8 @@ structure MatrixSdpCanonicalOptimalPairWithDominance
 
 namespace MatrixSdpCanonicalOptimalPairWithDominance
 
-/-- A canonical optimal pair with dominance packages the matrix-level
-slackness statement with dominance. -/
+/-- A canonical optimal pair with dominance gives the Lean-only
+matrix-level slackness statement with dominance. -/
 theorem toMatrixSdpStatementWithSlacknessAndDominance
     {params : Parameters}
     [FieldModel params.q]
@@ -253,14 +255,14 @@ end MatrixSdpCanonicalOptimalPairWithDominance
 
 namespace MatrixSdpCanonicalOptimalPair
 
-/-- Add the reduced-interface dominance condition to a saturated canonical
-optimal pair.
+/-- Add the auxiliary dominance condition to a saturated canonical optimal
+pair.
 
-The saturated package records the paper-facing strong-duality output: the
+The saturated structure records the paper-facing strong-duality output: the
 primal slack block vanishes, but no condition `I ≤ Z` is imposed on the chosen
 dual witness.  This constructor keeps that distinction explicit while allowing
 callers that have separately proved `I ≤ Z` to reuse the existing
-dominance-carrying helper interface. -/
+dominance-carrying interface. -/
 theorem withDominance
     {params : Parameters}
     [FieldModel params.q]
@@ -365,8 +367,9 @@ end MatrixSdpStatementWithSlackness
 
 namespace MatrixSdpStatementWithSlacknessAndDominance
 
-/-- A matrix strong-duality statement with a dominance-carrying optimal dual
-witness gives the abstract SDP statement with complementary slackness. -/
+/-- A dominance-carrying matrix strong-duality statement forgets its auxiliary
+dominance field and gives the abstract SDP statement with complementary
+slackness. -/
 theorem toSdpStatementWithSlackness
     (params : Parameters)
     [FieldModel params.q]
@@ -381,15 +384,16 @@ theorem toSdpStatementWithSlackness
 end MatrixSdpStatementWithSlacknessAndDominance
 
 /-- Canonical block-SDP feasibility, objective equality, complementary
-slackness, and dual dominance give the abstract Section 9 SDP statement.
+slackness, and auxiliary dual dominance give the abstract Section 9 SDP
+statement.
 
-This is the canonical-block version of
+This is the dominance-carrying canonical-block version of
 `MatrixSdpStatementWithSlacknessAndDominance.toSdpStatementWithSlackness`,
 specialized to the point-measurement matrix realization of a strategy.  It
 uses the block-diagonal extraction theorem from `MatrixRealization.lean` to
 replace a feasible canonical primal matrix by the associated paper
 submeasurement, and then transports the resulting matrix witness to the
-abstract `SdpStatementWithSlackness` interface. -/
+abstract `SdpStatementWithSlackness` interface after forgetting dominance. -/
 theorem sdpStatementWithSlackness_of_canonicalFeasibleComplementarySlackness
     (params : Parameters)
     [FieldModel params.q]
@@ -457,9 +461,10 @@ theorem sdpStatementWithSlackness_of_canonicalOptimalPair
 dominance bound `I ≤ Z`, gives the abstract Section 9 SDP statement with
 complementary slackness.
 
-This is the bridge from the paper-faithful saturated package
-`MatrixSdpCanonicalOptimalPair` to the current reduced helper interface, whose
-matrix-side input is still dominance-carrying. -/
+This is the comparison theorem from the paper-faithful saturated structure
+`MatrixSdpCanonicalOptimalPair` to the dominance-carrying route.  The abstract
+target remains `SdpStatementWithSlackness`; the extra input is used only to
+enter the strengthened matrix-side interface. -/
 theorem sdpStatementWithSlackness_of_canonicalOptimalPair_of_dualDominatesIdentity
     (params : Parameters)
     [FieldModel params.q]
@@ -479,9 +484,9 @@ measurement witness, without asserting the auxiliary dominance condition
 `I ≤ Z`.
 
 This is the direct translation of the paper's saturated strong-duality output
-at the point-measurement realization of a strategy.  The reduced
-`SdpStatementWithSlackness` interface is not used here, since that interface
-still carries the additional dominance hypothesis. -/
+at the point-measurement realization of a strategy.  It avoids the
+dominance-carrying matrix interfaces and records only the measurement, dual
+feasibility, and complementary-slackness data. -/
 theorem sdpMeasurementWitness_of_canonicalOptimalPair
     (params : Parameters)
     [FieldModel params.q]
@@ -520,10 +525,10 @@ theorem sdpMeasurementWitness_of_canonicalOptimalPair
 slackness, and dual dominance give the displayed abstract SDP measurement
 witness.
 
-This theorem is the direct paper-form extraction from canonical block data at
-the point-measurement realization of a strategy.  It first transports the
-canonical data to `SdpStatementWithSlackness`, then reads the complete
-measurement and dual inequalities from the abstract slackness statement. -/
+This theorem is the dominance-carrying extraction from canonical block data at
+the point-measurement realization of a strategy.  It records the additional
+bound \(I \le Z\) explicitly in the conclusion; the dominance-free paper-form
+measurement witness is `sdpMeasurementWitness_of_canonicalOptimalPair`. -/
 theorem sdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness
     (params : Parameters)
     [FieldModel params.q]

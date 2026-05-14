@@ -175,7 +175,10 @@ the point measurement. It produces a polynomial submeasurement `H` and a
 positive semidefinite witness `Z` satisfying the four conclusions of the paper:
 completeness, consistency with `A`, strong self-consistency, and boundedness.
 The boundedness conclusion is split into positivity of `Z`, pointwise domination
-of the averaged point measurement, and the state-dependent gap estimate. -/
+of the averaged point measurement, and the state-dependent gap estimate.  The
+strong-self-consistency branch is proved in this file and is not exposed as an
+additional public hypothesis; the remaining `sorryAx` dependency is transitive
+through the SDP slackness theorem tracked by #1230. -/
 lemma selfImprovementHelper
     (params : Parameters)
     [FieldModel params.q]

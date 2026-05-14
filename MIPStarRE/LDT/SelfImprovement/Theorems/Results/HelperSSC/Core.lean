@@ -38,7 +38,10 @@ These fields isolate the remaining paper-side obligations in the proof of
 
 This structure records the actual intermediate estimates still needed from the
 add-in-`u`, self-consistency, and variance calculations, rather than restating
-the final `BipartiteSSCRel` conclusion as an input. -/
+the final `BipartiteSSCRel` conclusion as an input.  It is a local proof
+frontier for the helper theorem, not a hypothesis of the source-facing helper
+theorem; the full assembly of these obligations discharges the former #1514
+gap. -/
 structure HelperStrongSelfConsistencyObligations
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
