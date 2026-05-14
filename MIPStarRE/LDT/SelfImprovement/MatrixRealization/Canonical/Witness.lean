@@ -3,12 +3,12 @@ import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical
 /-!
 # Section 9 — Canonical matrix SDP witnesses
 
-This module contains the optimal-witness packages extracted from the canonical
+This module contains the optimal-witness structures extracted from the canonical
 matrix SDP.  The preceding canonical module proves the block-diagonal algebra,
 including the dual slack identities and saturation of the slack block under
-the retained dominance hypothesis \(I \le Z\).  This file records the
-paper-form optimal pair, the dominance-carrying successor package, and the
-measurement witnesses used by the self-improvement bridge.
+the auxiliary dominance hypothesis \(I \le Z\).  This file records the
+paper-form optimal pair, the Lean-only dominance-carrying successor structure,
+and the measurement witnesses used by the self-improvement comparison.
 
 ## References
 
@@ -43,14 +43,17 @@ structure MatrixSdpOptimalWitness (params : Parameters) [FieldModel params.q]
     ∀ g : Polynomial params,
       matrixSdpComplementarySlacknessDefect params model T Z g = 0
 
-/-- Matrix-level optimal SDP witness together with the dominance condition
-required by the reduced abstract helper interface.
+/-- Matrix-level optimal SDP witness together with an auxiliary dominance
+condition.
 
-The paper's dual SDP feasibility gives \(Z \ge A_g\).  The current reduced
-abstract interface also asks for \(I \le Z\), because boundedness is expressed
-against this dual operator.  This successor package records that extra
-dominance for the same optimal dual witness, without changing the matrix
-strong-duality statement below. -/
+Paper-gap note: `docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`.
+
+The paper's dual SDP feasibility gives \(Z \ge A_g\).  This Lean-only successor
+structure records the stronger bound \(I \le Z\) for the same optimal dual
+witness, because that condition is one route to saturating the extra canonical
+slack block.  It is not the paper SDP statement; the dominance-free
+`MatrixSdpOptimalWitness` above is the matrix analogue of the source
+strong-duality output. -/
 structure MatrixSdpOptimalWitnessWithDominance (params : Parameters)
     [FieldModel params.q]
     (model : MatrixSdpRealization params)
@@ -60,16 +63,16 @@ structure MatrixSdpOptimalWitnessWithDominance (params : Parameters)
     MatrixSdpOptimalWitness params model T Z
   dualDominatesIdentity : (1 : MatrixOperator model.space) ≤ Z
 
-/-- Package a paper-form optimal witness from the canonical block SDP
+/-- Package a dominance-carrying matrix witness from canonical block SDP
 conclusions.
 
 The hypotheses are the canonical pieces supplied by the finite-dimensional SDP
-argument: paper dual feasibility, equality of the paper primal and dual
-objectives, canonical complementary slackness, and the dominance condition
-`I ≤ Z`.  The preceding saturation lemma supplies the missing primal
-normalization, while the polynomial-block projection of canonical
-complementary slackness supplies the defect equations
-`T_g (Z - A_g) = 0`. -/
+argument, together with the auxiliary dominance condition `I ≤ Z`.  The
+preceding saturation lemma supplies the primal normalization, while the
+polynomial-block projection of canonical complementary slackness supplies the
+defect equations `T_g (Z - A_g) = 0`.  The extra dominance hypothesis is part
+of the Lean-only route toward #1230, not an additional assumption in
+`lem:sdp`. -/
 theorem matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness
     (params : Parameters) [FieldModel params.q]
     (model : MatrixSdpRealization params)
@@ -97,13 +100,14 @@ theorem matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness
         matrixSdpComplementarySlacknessDefect_of_canonical params model T Z hcanonical }
   dualDominatesIdentity := hOneLe
 
-/-- Package an optimal paper-form witness directly from an arbitrary feasible
-canonical primal matrix.
+/-- Package a dominance-carrying optimal witness directly from an arbitrary
+feasible canonical primal matrix.
 
 The theorem combines the two block-diagonal reductions: the extracted paper
 submeasurement has the same objective as the canonical matrix, and canonical
 complementary slackness is preserved when one replaces the canonical matrix by
-the block-diagonal matrix determined by its diagonal blocks. -/
+the block-diagonal matrix determined by its diagonal blocks.  The extra
+dominance field remains an auxiliary input to this strengthened witness. -/
 theorem matrixSdpOptimalWitnessWithDominance_of_canonicalFeasibleComplementarySlackness
     (params : Parameters) [FieldModel params.q]
     (model : MatrixSdpRealization params)
@@ -158,20 +162,24 @@ structure MatrixSdpStatementWithSlackness (params : Parameters) [FieldModel para
       ∃ Z : MatrixOperator model.space,
         MatrixSdpOptimalWitness params model T Z
 
-/-- Paper origin: `references/ldt-paper/self_improvement.tex:82-181`
-(`\label{lem:sdp}`), with complementary slackness from
-`eq:complementary-slackness` at line 179; matrix realization of
-`SdpStatementWithSlackness` enriched with the `I ≤ Z` dominance step
-(`references/ldt-paper/self_improvement.tex:200-201`,
-`eq:Z-greater-than-A`).
+/-- Lean-only matrix realization of `SdpStatementWithSlackness` enriched with
+the auxiliary condition \(I \le Z\).
 
-Matrix-level strong-duality statement with the additional dominance
-condition needed by the reduced abstract helper interface.
+Paper origin for the dominance-free statement:
+`references/ldt-paper/self_improvement.tex:82-181` (`\label{lem:sdp}`), with
+complementary slackness from `eq:complementary-slackness` at line 179.  The
+additional \(I \le Z\) field is not asserted in the paper; see the paper-gap
+note `docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`.
 
-This is the matrix-side target for the downstream bridge into
-`SelfImprovementHelperConclusionWithSlackness`: it keeps the same optimal pair
-and complementary-slackness data as `MatrixSdpStatementWithSlackness`, and also
-records \(I \le Z\) for the selected dual witness. -/
+Lean-only strengthening of the matrix-level strong-duality statement by an
+additional dominance condition.
+
+This is the matrix-side target for the downstream construction of
+`SelfImprovementHelperConclusionWithSlackness` along the present dominance
+route: it keeps the same optimal pair and complementary-slackness data as
+`MatrixSdpStatementWithSlackness`, and also records \(I \le Z\) for the selected
+dual witness.  It can be forgotten to the dominance-free source-shaped matrix
+statement and must not be advertised as the paper SDP theorem. -/
 structure MatrixSdpStatementWithSlacknessAndDominance (params : Parameters)
     [FieldModel params.q]
     (model : MatrixSdpRealization params) : Prop where
@@ -180,14 +188,15 @@ structure MatrixSdpStatementWithSlacknessAndDominance (params : Parameters)
       ∃ Z : MatrixOperator model.space,
         MatrixSdpOptimalWitnessWithDominance params model T Z
 
-/-- Package the canonical block-SDP conclusions as the matrix-level statement
-with the dominance hypothesis retained.
+/-- Package the canonical block-SDP conclusions as the Lean-only matrix-level
+statement with the dominance hypothesis retained.
 
 This is the statement form of
 `matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness`: the
 canonical complementary-slackness equation supplies the primal normalization and
 the defect-zero equations, while the remaining hypotheses record paper dual
-feasibility, equality of the paper primal and dual objectives, and \(I \le Z\). -/
+feasibility, equality of the paper primal and dual objectives, and the auxiliary
+bound \(I \le Z\). -/
 theorem matrixSdpStatementWithSlacknessAndDominance_of_canonicalComplementarySlackness
     (params : Parameters) [FieldModel params.q]
     (model : MatrixSdpRealization params)
@@ -210,14 +219,14 @@ theorem matrixSdpStatementWithSlacknessAndDominance_of_canonicalComplementarySla
       matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness
         params model T Z hdual hstrong hcanonical hOneLe⟩
 
-/-- Package a matrix SDP statement with dominance from an arbitrary feasible
+/-- Package a dominance-carrying matrix SDP statement from an arbitrary feasible
 canonical primal matrix satisfying objective equality and complementary
 slackness.
 
-This statement-level theorem is the paper-facing block-diagonal reduction:
-given the output of canonical strong duality, it extracts the paper primal
-submeasurement and records the complete matrix-level slackness package needed
-by the downstream self-improvement bridge. -/
+This statement-level theorem is the dominance-carrying block-diagonal
+reduction: given canonical strong-duality data plus \(I \le Z\), it extracts
+the paper primal submeasurement and records the strengthened matrix-level
+slackness data used by the present self-improvement comparison. -/
 theorem matrixSdpStatementWithSlacknessAndDominance_of_canonicalFeasibleComplementarySlackness
     (params : Parameters) [FieldModel params.q]
     (model : MatrixSdpRealization params)
@@ -336,15 +345,16 @@ theorem exists_measurement_witness {params : Parameters} [FieldModel params.q]
 
 end MatrixSdpStatementWithSlacknessAndDominance
 
-/-- Canonical block-SDP conclusions give the displayed paper-form measurement
-and dual witness.
+/-- Canonical block-SDP conclusions plus dominance give a strengthened
+measurement and dual witness.
 
 This is the measurement-level form of
 `matrixSdpStatementWithSlacknessAndDominance_of_canonicalFeasibleComplementarySlackness`.
 From an arbitrary feasible canonical primal matrix satisfying objective equality
 and canonical complementary slackness, together with dual feasibility and
 \(I \le Z\), it extracts a complete paper primal measurement and records the
-dual feasibility, objective equality, and equations \(T_g Z = T_g A_g\). -/
+dual feasibility, objective equality, equations \(T_g Z = T_g A_g\), and the
+auxiliary dominance bound. -/
 theorem matrixSdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness
     (params : Parameters) [FieldModel params.q]
     (model : MatrixSdpRealization params)

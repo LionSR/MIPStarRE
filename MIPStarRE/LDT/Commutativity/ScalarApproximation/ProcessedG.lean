@@ -79,7 +79,11 @@ Error: `√ζ + √ζ`.
 
 Total: `12√ζ + 12√(γ(m+1))`. Then `2 * total ≤ 48m(√γ + √ζ)`. -/
 
-/-- `lem:comm-data-processed-g`. -/
+/-- Paper origin: `references/ldt-paper/commutativity-G.tex`
+(`\label{lem:comm-data-processed-g}`).
+
+The paper statement is formulated directly for the family `family.meas`; the
+auxiliary family used by the scalar chain is introduced inside the proof. -/
 lemma commDataProcessedG
     (params : Parameters)
     [FieldModel params.q]
@@ -88,12 +92,14 @@ lemma commDataProcessedG
     (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (hG : ∀ x, G x = (family.meas x).toSubMeas)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
-    CommDataProcessedGConclusion params strategy family G gamma zeta := by
+    CommDataProcessedGConclusion params strategy family gamma zeta := by
+  let G : Fq params → SubMeas (Polynomial params) ι := fun x => (family.meas x).toSubMeas
+  have hG : ∀ x, G x = (family.meas x).toSubMeas := by
+    intro x
+    rfl
   have hpostSSC :
       SDDRel strategy.state
         (uniformDistribution (Point params.next))
@@ -102,16 +108,10 @@ lemma commDataProcessedG
         zeta :=
     evaluatedPointFamily_selfConsistency_of_stronglySelfConsistent
       params strategy family zeta hself
-  refine
-    { familyG := hG
-      postprocessedPointConsistency := ?_
-      postprocessedSelfConsistency := hpostSSC
-      evaluatedSliceCommutation := by
-        refine ⟨?_⟩
-        rw [evaluatedSliceCommutation_qSDDOp_avg_eq params strategy family]
-        exact evaluatedSlice_scalar_chain_bound
-          params strategy eps delta gamma zeta
-          hnorm hgood family G hG hcons hself hbound hpostSSC }
-  simpa [evaluatedPointFamily] using hcons.pointConsistency
+  refine ⟨?_⟩
+  rw [evaluatedSliceCommutation_qSDDOp_avg_eq params strategy family]
+  exact evaluatedSlice_scalar_chain_bound
+    params strategy eps delta gamma zeta
+    hnorm hgood family G hG hcons hself hbound hpostSSC
 
 end MIPStarRE.LDT.Commutativity

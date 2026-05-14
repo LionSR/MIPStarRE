@@ -1,0 +1,194 @@
+#!/bin/sh
+set -eu
+
+if [ "${MIPSTARRE_SKIP_HOOKS:-}" = "1" ]; then
+  echo "MIPStarRE pre-push hook skipped by MIPSTARRE_SKIP_HOOKS=1."
+  exit 0
+fi
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+CHANGED_FILE_LIST="$(mktemp)"
+CHANGED_LEAN_FILE_LIST="$(mktemp)"
+trap 'rm -f "$CHANGED_FILE_LIST" "$CHANGED_LEAN_FILE_LIST"' EXIT
+BLUEPRINT_WEB_SMOKE_RAN=0
+
+ZERO_SHA="0000000000000000000000000000000000000000"
+
+run_outside_git_env() (
+  for name in $(git rev-parse --local-env-vars); do
+    unset "$name"
+  done
+  "$@"
+)
+
+lean_file_to_module() {
+  path="${1%.lean}"
+  printf '%s\n' "$path" | tr '/' '.'
+}
+
+while read LOCAL_REF LOCAL_SHA REMOTE_REF REMOTE_SHA
+do
+  if [ -z "${LOCAL_SHA:-}" ] || [ "$LOCAL_SHA" = "$ZERO_SHA" ]; then
+    continue
+  fi
+
+  if [ "$REMOTE_SHA" = "$ZERO_SHA" ]; then
+    if git rev-parse --verify origin/main >/dev/null 2>&1; then
+      BASE_SHA="$(git merge-base "$LOCAL_SHA" origin/main)"
+    else
+      BASE_SHA="$(git rev-list --max-parents=0 "$LOCAL_SHA" | tail -n 1)"
+    fi
+  else
+    BASE_SHA="$REMOTE_SHA"
+  fi
+
+  git diff --name-only --diff-filter=ACMR "$BASE_SHA" "$LOCAL_SHA" -- >> "$CHANGED_FILE_LIST"
+done
+
+sort -u "$CHANGED_FILE_LIST" -o "$CHANGED_FILE_LIST"
+grep -E '^(MIPStarRE/.*\.lean|MIPStarRE\.lean)$' "$CHANGED_FILE_LIST" \
+  > "$CHANGED_LEAN_FILE_LIST" || true
+
+if [ ! -s "$CHANGED_FILE_LIST" ]; then
+  echo "MIPStarRE pre-push: no changed tracked files detected."
+  exit 0
+fi
+
+if [ -s "$CHANGED_LEAN_FILE_LIST" ]; then
+  echo "MIPStarRE pre-push: checking changed Lean files."
+  while read LEAN_FILE
+    do
+      if [ -f "$LEAN_FILE" ]; then
+        echo "  lake env lean $LEAN_FILE"
+        run_outside_git_env lake env lean "$LEAN_FILE"
+      fi
+    done < "$CHANGED_LEAN_FILE_LIST"
+fi
+
+if [ -s "$CHANGED_LEAN_FILE_LIST" ] ||
+    grep -Eq '^scripts/(check_oversized_lean_files\.py|tests/test_check_oversized_lean_files\.py)$' \
+      "$CHANGED_FILE_LIST"; then
+  echo "MIPStarRE pre-push: checking Lean file length guard."
+  run_outside_git_env python3 scripts/check_oversized_lean_files.py \
+    --root . \
+    --known MIPStarRE/LDT/SelfImprovement/Theorems/Results/BoundednessTransport.lean
+fi
+
+if grep -Eq '^(MIPStarRE/LDT/.*\.lean|MIPStarRE/LDT\.lean|MIPStarRE\.lean)$' "$CHANGED_FILE_LIST"; then
+  if grep -Fxq 'MIPStarRE/LDT/Test/AxiomAudit.lean' "$CHANGED_FILE_LIST"; then
+    echo "MIPStarRE pre-push: axiom audit already checked as a changed Lean file."
+  else
+    echo "MIPStarRE pre-push: checking LDT axiom audit."
+    run_outside_git_env lake env lean MIPStarRE/LDT/Test/AxiomAudit.lean
+  fi
+fi
+
+if grep -Eq '^(MIPStarRE/|MIPStarRE\.lean$|blueprint/src/|blueprint/lean_decls|scripts/(audit_new_proof_obligation_metadata|audit_paper_facing_proof_debt|audit_conclusion_shaped_hypotheses|audit_unfaithful_markers|audit_lean_axiom_declarations|check_statement_paper_origin|check_source_statement_changes|blueprint_lean_sync|lean_header_utils)\.py|docs/(CONTRIBUTING|PROOF_INTEGRITY|anti_patterns|blueprint_style_guide|formalization-patterns|proof_frontier_review)\.md|docs/paper-gaps/|\.github/(actions|prompts|workflows)/|AGENTS\.md)' "$CHANGED_FILE_LIST"; then
+  echo "MIPStarRE pre-push: checking statement-integrity audits."
+  echo "MIPStarRE pre-push: do not close proof gaps by adding non-paper bridge/package hypotheses."
+  run_outside_git_env python3 scripts/check_statement_paper_origin.py --root .
+  if git rev-parse --verify origin/main >/dev/null 2>&1; then
+    if [ -s "$CHANGED_LEAN_FILE_LIST" ]; then
+      run_outside_git_env python3 scripts/audit_new_proof_obligation_metadata.py \
+        --root . \
+        --base origin/main \
+        --changed-files $(cat "$CHANGED_LEAN_FILE_LIST") \
+        --ci
+    else
+      run_outside_git_env python3 scripts/audit_new_proof_obligation_metadata.py \
+        --root . \
+        --base origin/main \
+        --changed-files \
+        --ci
+    fi
+  else
+    echo "MIPStarRE pre-push: origin/main not found; skipping new proof-obligation metadata guard."
+  fi
+  run_outside_git_env python3 scripts/audit_paper_facing_proof_debt.py --root . --ci
+  run_outside_git_env python3 scripts/audit_conclusion_shaped_hypotheses.py --root . --ci
+  run_outside_git_env python3 scripts/audit_unfaithful_markers.py --root . --ci
+  run_outside_git_env python3 scripts/audit_lean_axiom_declarations.py --root . --ci
+fi
+
+if [ -s "$CHANGED_LEAN_FILE_LIST" ]; then
+  if git rev-parse --verify origin/main >/dev/null 2>&1; then
+    echo "MIPStarRE pre-push: checking source-labelled statement headers."
+    run_outside_git_env python3 scripts/check_source_statement_changes.py \
+      --root . \
+      --base origin/main \
+      --changed-files $(cat "$CHANGED_LEAN_FILE_LIST")
+  else
+    echo "MIPStarRE pre-push: origin/main not found; skipping source statement header guard."
+  fi
+fi
+
+if grep -Eq '^blueprint/src/' "$CHANGED_FILE_LIST"; then
+  if ! command -v leanblueprint >/dev/null 2>&1; then
+    echo "MIPStarRE pre-push: blueprint/src changed, but leanblueprint is not on PATH."
+    echo "Install it with:"
+    echo "  pipx install leanblueprint"
+    echo "  pipx inject --include-apps --force leanblueprint plastex"
+    echo "Or bypass only for a local tooling problem with MIPSTARRE_SKIP_HOOKS=1 and let CI run."
+    exit 1
+  fi
+  echo "MIPStarRE pre-push: running blueprint web smoke check."
+  run_outside_git_env sh -c 'cd blueprint && leanblueprint web'
+  BLUEPRINT_WEB_SMOKE_RAN=1
+fi
+
+if grep -Eq '^(MIPStarRE/|MIPStarRE\.lean$|blueprint/|scripts/(blueprint_lean_sync|blueprint_leanok_axioms|check_blueprint_latex|check_blueprint_sync|tex_utils)\.py$)' "$CHANGED_FILE_LIST"; then
+  echo "MIPStarRE pre-push: regenerating blueprint/lean_decls."
+  run_outside_git_env python3 scripts/blueprint_lean_sync.py --root . --update-lean-decls
+  if ! git diff --quiet -- blueprint/lean_decls; then
+    echo "MIPStarRE pre-push: blueprint/lean_decls changed; stage and commit it before pushing."
+    git diff -- blueprint/lean_decls
+    exit 1
+  fi
+
+  echo "MIPStarRE pre-push: checking blueprint and Lean declaration sync."
+  run_outside_git_env python3 scripts/blueprint_lean_sync.py --root . --ci
+  if [ -s "$CHANGED_LEAN_FILE_LIST" ]; then
+    if git rev-parse --verify origin/main >/dev/null 2>&1; then
+      echo "MIPStarRE pre-push: warning on changed Lean declarations missing blueprint tags."
+      run_outside_git_env python3 scripts/blueprint_lean_sync.py \
+        --root . \
+        --warn-missing-blueprint \
+        --diff-base origin/main \
+        --changed-files $(cat "$CHANGED_LEAN_FILE_LIST")
+    else
+      echo "MIPStarRE pre-push: origin/main not found; skipping reverse blueprint coverage warning."
+    fi
+
+    echo "MIPStarRE pre-push: refreshing compiled Lean modules for checkdecls."
+    while read LEAN_FILE
+      do
+        if [ -f "$LEAN_FILE" ]; then
+          LEAN_MODULE="$(lean_file_to_module "$LEAN_FILE")"
+          echo "  lake build $LEAN_MODULE"
+          run_outside_git_env lake build "$LEAN_MODULE"
+        fi
+      done < "$CHANGED_LEAN_FILE_LIST"
+  fi
+  run_outside_git_env lake exe checkdecls blueprint/lean_decls
+fi
+
+if [ "${MIPSTARRE_HOOK_FULL:-}" = "1" ]; then
+  echo "MIPStarRE pre-push full mode: running lake build."
+  run_outside_git_env lake build
+
+  echo "MIPStarRE pre-push full mode: checking blueprint proof-level leanok closure."
+  run_outside_git_env python3 scripts/blueprint_leanok_axioms.py --ci
+
+  if [ "$BLUEPRINT_WEB_SMOKE_RAN" = "1" ]; then
+    echo "MIPStarRE pre-push full mode: blueprint web already checked."
+  elif command -v leanblueprint >/dev/null 2>&1; then
+    echo "MIPStarRE pre-push full mode: running leanblueprint web."
+    run_outside_git_env sh -c 'cd blueprint && leanblueprint web'
+  else
+    echo "MIPStarRE pre-push full mode: leanblueprint not found; skipping web build."
+  fi
+fi
+
+echo "MIPStarRE pre-push: ok."

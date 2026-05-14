@@ -18,7 +18,7 @@ The role-level orthonormalization input that used to feed `mainFormal` has been
 removed.  The final theorem no longer asks for the former role-level
 orthonormalization input record, nor for explicit left/right repair-input
 fields at the role residual.  Instead,
-`MainFormalPostRolePackageDiagonalOrthonormalizationResidual.nonempty_ofDiagonalConsistency`
+`MainFormalDiagonalOrthonormalizationWitness.nonempty_ofDiagonalConsistency`
 derives the pre-completion projective submeasurements directly from the
 line-130 cross consistency using
 `MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair`.
@@ -75,9 +75,9 @@ The current final assembly has two explicit internal obligations.
 
 ### Successor Branch
 
-`mainFormalSuccessorProjectiveCompletionObligation` must construct a
-`MainFormalCascadeRolePackageResidualProjectiveCompletionResidual` in the
-non-base case.  The missing ingredients are:
+The successor branch must construct a
+`MainFormalProjectiveCompletionTransportWitness` in the non-base case.
+The missing ingredients are:
 
 - recursive slice witnesses for the predecessor;
 - the corresponding per-slice self-improvement obligations;

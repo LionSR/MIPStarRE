@@ -144,7 +144,7 @@ noncomputable def fromHToGPaperTotalError (params : Parameters)
 
 Analytic conclusion for `thm:ld-pasting` once a witness `H` has been fixed.
 
-The theorem `ldPasting` separately records that the chosen witness is the
+The theorem `ldPastingNontrivial` separately records that the chosen witness is the
 canonical construction `constructedPastedMeasurement params family k`, so this
 structure stores only the quantitative conclusion from the paper. -/
 structure LdPastingConclusion (params : Parameters)
@@ -153,7 +153,6 @@ structure LdPastingConclusion (params : Parameters)
     (family : IdxPolyFamily params ι)
     (H : Measurement (Polynomial params.next) ι)
     (eps delta gamma kappa zeta : Error) (k : ℕ) : Prop where
-  largeEnough : 400 * params.m * params.d ≤ k
   -- Naming note: this is not a `ν` field from the paper. The point-consistency
   -- bound here continues to use the induction-section error term, while `ν`
   -- tracks the completeness loss below.
@@ -179,7 +178,6 @@ structure LdPastingSubMeasConclusion (params : Parameters)
     (family : IdxPolyFamily params ι)
     (H : SubMeas (Polynomial params.next) ι)
     (eps delta gamma kappa zeta : Error) (k : ℕ) : Prop where
-  largeEnough : 400 * params.m * params.d ≤ k
   -- Naming note: this is not a `ν` field from the paper. The point-consistency
   -- bound here is the paper's intermediate `ν`, while the completeness field
   -- carries the missing-mass term needed for the final `σ` after completion.
@@ -200,7 +198,7 @@ structure LdPastingSubMeasConclusion (params : Parameters)
 `eq:gselfconall` (`references/ldt-paper/ld-pasting.tex:821`) is the family of
 self-consistency bounds compared against here.
 
-Output package for `lem:g-complete-self-consistency`.
+Lean statement for `lem:g-complete-self-consistency`.
 `ψbi` is the bipartite state on `d * d` (passed as `strategy.state`
 by callers). -/
 structure GCompleteSelfConsistencyStatement (params : Parameters)
@@ -225,13 +223,11 @@ structure GCompleteSelfConsistencyStatement (params : Parameters)
 `\label{lem:g-complete-self-consistency}` and the
 `eq:gselfconall` self-consistency family at line 821.
 
-Output package for `cor:g-bot-self-consistency`. -/
+Lean statement for `cor:g-bot-self-consistency`. -/
 structure GBotSelfConsistencyStatement (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι) (zeta : Error) : Prop where
-  completePartWitness :
-    GCompleteSelfConsistencyStatement params ψbi family zeta
   incompletePartSelfConsistency :
     SDDRel ψbi
       (uniformDistribution (SliceQuestion params))
@@ -242,7 +238,7 @@ structure GBotSelfConsistencyStatement (params : Parameters)
 /-- Paper origin: `references/ldt-paper/ld-pasting.tex:560-720`
 (`\label{lem:commutativity-switcheroo}`).
 
-Output package for `lem:commutativity-switcheroo`. -/
+Lean statement for `lem:commutativity-switcheroo`. -/
 structure CommutativitySwitcherooStatement {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -259,7 +255,7 @@ structure CommutativitySwitcherooStatement {Outcome : Type*} [Fintype Outcome]
 /-- Paper origin: `references/ldt-paper/ld-pasting.tex:721-774`
 (`\label{cor:commuting-with-G-complete}`).
 
-Output package for `cor:commuting-with-G-complete`. -/
+Lean statement for `cor:commuting-with-G-complete`. -/
 structure CommutingWithGCompleteStatement (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -295,14 +291,12 @@ structure CommutingWithGCompleteStatement (params : Parameters)
 /-- Paper origin: `references/ldt-paper/ld-pasting.tex:775-816`
 (`\label{cor:commuting-with-G-incomplete}`).
 
-Output package for `cor:commuting-with-G-incomplete`. -/
+Lean statement for `cor:commuting-with-G-incomplete`. -/
 structure CommutingWithGIncompleteStatement (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error) : Prop where
-  completePartWitness :
-    CommutingWithGCompleteStatement params ψbi family gamma zeta
   pointWithIncompletePartCommutation :
     SDDOpRel ψbi
       (uniformDistribution (SlicePairQuestion params))
@@ -320,20 +314,12 @@ structure CommutingWithGIncompleteStatement (params : Parameters)
 (`\label{cor:G-hat-facts}`); the displayed `\widehat G` self-consistency and
 commutation lines `eq:gselfconall` and `eq:gcomall` are at lines 821 and 823.
 
-Output package for `cor:G-hat-facts`. -/
+Lean statement for `cor:G-hat-facts`. -/
 structure GHatFactsStatement (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error) : Prop where
-  completePartSelfConsistencyWitness :
-    GCompleteSelfConsistencyStatement params ψbi family zeta
-  incompletePartSelfConsistencyWitness :
-    GBotSelfConsistencyStatement params ψbi family zeta
-  completePartCommutationWitness :
-    CommutingWithGCompleteStatement params ψbi family gamma zeta
-  incompletePartCommutationWitness :
-    CommutingWithGIncompleteStatement params ψbi family gamma zeta
   completedSelfConsistency :
     SDDRel ψbi
       (uniformDistribution (SliceQuestion params))
@@ -350,7 +336,7 @@ structure GHatFactsStatement (params : Parameters)
 /-- Paper origin: `references/ldt-paper/ld-pasting.tex:872-917`
 (`\label{lem:commute-g-half-sandwich}`).
 
-Output package for `lem:commute-g-half-sandwich`. -/
+Lean statement for `lem:commute-g-half-sandwich`. -/
 structure CommuteGHalfSandwichStatement (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -366,7 +352,7 @@ structure CommuteGHalfSandwichStatement (params : Parameters)
 /-- Paper origin: `references/ldt-paper/ld-pasting.tex:918-1040`
 (`\label{lem:ld-sandwich-line-one-point}`).
 
-Output package for `lem:ld-sandwich-line-one-point`. -/
+Lean statement for `lem:ld-sandwich-line-one-point`. -/
 structure LdSandwichLineOnePointStatement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -383,7 +369,7 @@ structure LdSandwichLineOnePointStatement (params : Parameters)
 /-- Paper origin: `references/ldt-paper/ld-pasting.tex:1041-1140`
 (`\label{lem:h-b-consistency}`).
 
-Output package for `lem:h-b-consistency`. -/
+Lean statement for `lem:h-b-consistency`. -/
 structure HBConsistencyStatement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -417,7 +403,7 @@ noncomputable def overAllOutcomesExpansionMass (params : Parameters)
 /-- Paper origin: `references/ldt-paper/ld-pasting.tex:1141-1294`
 (`\label{lem:over-all-outcomes}`).
 
-Output package for `lem:over-all-outcomes`.
+Lean statement for `lem:over-all-outcomes`.
 
 The paper's displayed statement is a scalar approximation of expectation values,
 not a stronger `≈_δ` relation between already-collapsed `Unit`-indexed
@@ -487,43 +473,34 @@ noncomputable def fromHToGBernoulliTailMass (params : Parameters)
 /-- Paper origin: `references/ldt-paper/ld-pasting.tex:1295-1670`
 (`\label{lem:from-H-to-G}`).
 
-Output package for `lem:from-H-to-G`.
+Lean statement for `lem:from-H-to-G`.
 
 The paper's displayed statement is a scalar approximation of expectation values,
 not a new `≈_δ` relation between submeasurements.  Accordingly, this bundle
-stores the adjacent stage-mass inequalities and the final all-outcomes vs.
-Bernoulli-tail comparison. -/
+stores only the final all-outcomes vs. Bernoulli-tail comparison; the
+adjacent-stage estimates remain internal proof obligations. -/
 structure FromHToGStatement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error) (k : ℕ) : Prop where
-  recurrenceStep :
-    ∀ ℓ : ℕ, ℓ < k →
-      |fromHToGStageMass params ψbi family k ℓ -
-          fromHToGStageMass params ψbi family k (ℓ + 1)| ≤
-        fromHToGRecurrenceError params gamma zeta k
   bernoulliPolynomialRewrite :
     |fromHToGAllOutcomesMass params strategy ψbi family k -
         fromHToGBernoulliTailMass params ψbi family k| ≤
       fromHToGError params gamma zeta k
 
 /-- Paper origin: `references/ldt-paper/ld-pasting.tex:1671-1798`
-(`\label{lem:chernoff-bernoulli-matrix}`); the operator-Chernoff inequality
-needed for this lemma is a Mathlib paper-gap, tracked by the Bernoulli-tail
-contraction work in this repository (placeholder field `tail_le_one`) and the
-matrix-Chernoff inequality `eq:by-chernoff` at line 1739.
+(`\label{lem:chernoff-bernoulli-matrix}`); the operator-Chernoff inequality is
+proved by applying continuous functional calculus to the scalar tail polynomial
+and the scalar Chernoff bound `eq:by-chernoff` at line 1739.
 
-Output package for `lem:chernoff-bernoulli-matrix`. -/
+Lean statement for `lem:chernoff-bernoulli-matrix`. -/
 structure ChernoffBernoulliMatrixStatement {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι)
     (theta : Error) (k degree : ℕ) (X : MIPStarRE.Quantum.Op ι) (kappa : Error)
     (hXpsd : 0 ≤ X)
     (hXleOne : X ≤ 1) : Prop where
-  /-- Temporary field while the Bernoulli-tail contraction bound is still
-  deferred rather than derived inside the matrix Chernoff proof. -/
-  tail_le_one : bernoulliTailOperator k degree X ≤ 1
   matrixTailBound :
     CompletenessAtLeast ψ
       ({ outcome := fun _ => bernoulliTailOperator k degree X
@@ -534,19 +511,18 @@ structure ChernoffBernoulliMatrixStatement {ι : Type*} [Fintype ι] [DecidableE
          sum_eq_total := by
            simp
          total_le_one := by
-           exact tail_le_one } : SubMeas Unit ι)
+           exact bernoulliTailOperator_le_one k degree X hXpsd hXleOne } : SubMeas Unit ι)
       (1 - kappa / (1 - theta) - Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2))
 
 /-- Paper origin: `references/ldt-paper/ld-pasting.tex:1799-1849`
 (`\label{cor:ld-pasting-N-completeness}`).
 
-Output package for `cor:ld-pasting-N-completeness`. -/
+Lean statement for `cor:ld-pasting-N-completeness`. -/
 structure LdPastingNCompletenessStatement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (kappa nu : Error) (k : ℕ) : Prop where
-  largeEnough : 400 * params.m * params.d ≤ k
   completenessBound :
     CompletenessAtLeast strategy.state
       (constructedPastedSubMeas params family k).liftLeft

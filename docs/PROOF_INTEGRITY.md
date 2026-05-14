@@ -60,6 +60,13 @@ declaration, and add a regression check (for example a
 `MIPStarRE.LDT.Test.AxiomAudit`) so later refactors cannot silently widen
 the axiomatic base.
 
+This preference does not license proposition inputs on source-labelled paper
+theorems.  If the cited paper theorem does not assume the proposition, a
+caller-supplied `Prop` hypothesis is an additional theorem hypothesis, not a
+proof of the paper statement.  Use such hypotheses only for explicitly
+conditional auxiliary results, and keep the source-labelled theorem statement
+faithful to the paper.
+
 ### Circular reasoning
 
 Lean's kernel forbids literal declaration cycles, so focus on **mathematical

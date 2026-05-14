@@ -18,12 +18,17 @@ operator `Z^x`. These witnesses satisfy the averaged residual bound
 condition `Z^x >= E_u A^{u,x}_{g(u)}` for every low-degree polynomial `g`.
 
 The Lean structure
-`MIPStarRE.LDT.IdxPolyFamily.SliceBoundednessInput` is precisely this pair of
-conditions, with the domination target identified as the averaged point operator
+`MIPStarRE.LDT.IdxPolyFamily.SliceBoundednessInput` is precisely this
+boundedness datum: positivity of the witnesses, the averaged residual bound,
+and the domination target stated directly as the averaged point operator
 `E_u A^{u,x}_{g(u)}`. The auxiliary theorems
 `SliceBoundednessInput.storedBoundedResidualBound` and
 `SliceBoundednessInput.averagedPoint_le_witness` expose the two displayed parts
 of the paper hypothesis.
+
+After issue #1556, the public structure no longer contains the former
+`dominationTargetAgrees` identification field. That identification is not part
+of the paper statement and should not be exposed as a paper-facing hypothesis.
 
 ## Classification
 

@@ -24,9 +24,12 @@ surrounding projectivization argument is in
 line-169 replacement step is lines~167--173.}
 The broader discrepancy note
 \path{issue-1099-line169-triangle-sub-loss.tex} explains why the printed paper
-argument cannot yield the exact error $\zeta_1$. The present note isolates the
-sharper local repair that is actually used by the current formal base-case
-assembly.
+argument cannot yield the exact error $\zeta_1$. The present note isolates a
+sharper local repair that was considered for the repaired line-169 route.  The
+current \leanid{MIPStarRE.LDT.Test.mainFormal} assembly no longer uses this
+route: it keeps the exact line-169 match-mass preservation as a named proof
+obligation instead of introducing a repaired transport helper into the final
+theorem pipeline.
 
 The point of this repair is that the generic corrected route
 \[
@@ -167,13 +170,14 @@ is strictly better than
 \]
 for the present cascade.
 
-This quantitative distinction is exactly why the sharper repair preserves the
-original final envelope used by the current formal development, whereas the
-generic corrected route would force the weaker $1/65536$ scale.
+This quantitative distinction explains why the sharper repair was preferable
+to the generic corrected route.  It remains useful mathematical documentation,
+but it is not part of the active
+\leanid{MIPStarRE.LDT.Test.mainFormal} proof route.
 
 \section{Relation with the formal development}
 
-The formal development proves this sharper local repair directly.\footnote{The
+The formal development still contains the lower-level local repair lemmas.\footnote{The
 general pre-completion transport statements are
 \leanid{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency\_of\_completion\_and\_sdd}
 and
@@ -184,9 +188,7 @@ Specializing the error to
 \leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationError}
 gives
 \leanid{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency\_with\_orthonormalization\_loss}
-and its Bob-side mirror.  The corresponding Step-8 absorption is
-\leanid{MIPStarRE.LDT.Test.repairedLine169PointError\_le\_mainFormalError} in
-\doclink{MIPStarRE/LDT/Test/MainTheorem.lean}.}
+and its Bob-side mirror.}
 
 In the current code, the paper-facing theorem
 \leanid{MIPStarRE.LDT.Test.mainFormal} has a direct proof gap rather than a
@@ -195,7 +197,8 @@ used once the projective-completion residual has been constructed is factored
 through
 \leanid{MIPStarRE.LDT.Test.mainFormal\_ofProjectiveCompletionResidual}.  The
 older repaired base-case assembly theorem has been removed from the current
-MainFormal route.  The generic corrected route
+MainFormal route, and the repaired line-169 Step-8 absorption helper has also
+been deleted as dead code.  The generic corrected route
 $\zeta_1 + \sqrt{\zeta_2}$ remains mathematically available, but it is not the
 active route for the present formal theorem.
 

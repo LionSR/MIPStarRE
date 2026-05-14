@@ -1,7 +1,7 @@
 import MIPStarRE.LDT.Test.MainTheorem.ErrorScalars
 
 /-!
-# Role-register core residuals
+# Role-register core witnesses
 
 Core role-register records and predecessor-transport helpers used by the
 `mainFormal` assembly.
@@ -26,7 +26,7 @@ on the role register together with its symmetrized point-consistency estimate at
 the cascade scalar `σ`.  It deliberately does not assert the factor-two
 unsymmetrized estimates; those remain the separate content of
 `UnsymmetrizationBridgePackage`. -/
-structure MainFormalRoleMeasurementPackage
+structure MainFormalRoleMeasurementWitness
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
@@ -41,10 +41,10 @@ structure MainFormalRoleMeasurementPackage
       (polynomialEvaluationFamily params roleMeasurement.toSubMeas)
       scalars.sigma
 
-namespace MainFormalRoleMeasurementPackage
+namespace MainFormalRoleMeasurementWitness
 
 /-- View a Section 6 main-induction witness as a
-`MainFormalRoleMeasurementPackage`.
+`MainFormalRoleMeasurementWitness`.
 
 The only proof step is scalar bookkeeping: `scalars.sigma` is definitionally
 `cascadeSigma params k (mainFormalInductionNu params k eps)`, and
@@ -64,7 +64,7 @@ theorem ofMainInductionWitness
           (polynomialEvaluationFamily params G.toSubMeas)
           (MainInductionStep.mainInductionError params k
             (3 * eps) (3 * eps) (3 * eps))) :
-    Nonempty (MainFormalRoleMeasurementPackage params strategy eps k scalars) := by
+    Nonempty (MainFormalRoleMeasurementWitness params strategy eps k scalars) := by
   rcases hsection6 with ⟨G, hG⟩
   refine ⟨{ roleMeasurement := G, symConsistency := ?_ }⟩
   simpa [MainFormalCascadeScalars.sigma, mainFormalCascadeSigma_eq_mainInductionError]
@@ -82,7 +82,7 @@ theorem ofBaseCase
     (scalars : MainFormalCascadeScalars params eps k)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (hm1 : params.m = 1) :
-    Nonempty (MainFormalRoleMeasurementPackage params strategy eps k scalars) :=
+    Nonempty (MainFormalRoleMeasurementWitness params strategy eps k scalars) :=
   ofMainInductionWitness params strategy eps k scalars
     (strategySymmetrization_mainInductionBaseCase params strategy eps hpass k hm1)
 
@@ -101,27 +101,28 @@ def toUnsymmetrizationBridge
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
-    (pkg : MainFormalRoleMeasurementPackage params strategy eps k scalars) :
+    (pkg : MainFormalRoleMeasurementWitness params strategy eps k scalars) :
     UnsymmetrizationBridgePackage params strategy pkg.roleMeasurement scalars.sigma :=
   UnsymmetrizationBridgePackage.ofSymConsistency params strategy pkg.roleMeasurement
     scalars.sigma pkg.symConsistency
 
-end MainFormalRoleMeasurementPackage
+end MainFormalRoleMeasurementWitness
 
-/-- Residual Section 6 role-register induction witness for `mainFormal`.
+/-- Section 6 role-register induction witness for `mainFormal`.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:68-83`, where
 `\label{thm:main-induction}` is applied to the symmetrized role-register
 strategy.
 
-This isolates the first field of the former role-register completion residual:
+This isolates the role-register measurement formerly hidden inside the
+completion construction:
 it asks only for the Section 6 role-register polynomial measurement and its
 symmetrized consistency estimate at the pre-cascade main-induction error.  The
 constructors below show how to view either a raw Section 6 witness or the
-`mainInduction` theorem as this residual.  The former syntactic
+`mainInduction` theorem as this witness.  The former syntactic
 successor wrapper was removed because it asked for non-paper boundary data
 instead of leaving the successor case as a proof obligation in Section 6. -/
-structure MainFormalRolePackageResidual
+structure MainFormalRoleInductionWitness
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι) (eps : Error)
@@ -137,9 +138,9 @@ structure MainFormalRolePackageResidual
       (MainInductionStep.mainInductionError params k
         (3 * eps) (3 * eps) (3 * eps))
 
-namespace MainFormalRolePackageResidual
+namespace MainFormalRoleInductionWitness
 
-/-- View a raw Section 6 main-induction witness as the isolated role residual
+/-- View a raw Section 6 main-induction witness as the isolated role witness
 consumed by the final `mainFormal` assembly. -/
 theorem ofMainInductionWitness
     (params : Parameters) [FieldModel params.q]
@@ -154,11 +155,11 @@ theorem ofMainInductionWitness
           (polynomialEvaluationFamily params G.toSubMeas)
           (MainInductionStep.mainInductionError params k
             (3 * eps) (3 * eps) (3 * eps))) :
-    Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) := by
+    Nonempty (MainFormalRoleInductionWitness params strategy eps hpass k) := by
   rcases hsection6 with ⟨G, hG⟩
   exact ⟨{ roleMeasurement := G, section6Consistency := hG }⟩
 
-/-- Source-facing constructor for the isolated role-register residual.
+/-- Source-facing constructor for the isolated role-register witness.
 
 This calls `MainInductionStep.mainInduction` through
 `strategySymmetrization_mainInduction`.  Thus the Section 3 role measurement is
@@ -170,11 +171,11 @@ theorem ofMainInduction
     (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (hk : params.m * params.d ≤ k) :
-    Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) := by
+    Nonempty (MainFormalRoleInductionWitness params strategy eps hpass k) := by
   exact ofMainInductionWitness params strategy eps k hpass
     (strategySymmetrization_mainInduction params strategy eps hpass k hk)
 
-/-- Large-`k` constructor for the isolated role-register residual.
+/-- Large-`k` constructor for the isolated role-register witness.
 
 The public Section 3 theorem currently assumes `400 * m * d ≤ k`.  This lemma
 uses only the weaker consequence `m * d ≤ k` needed by the
@@ -185,7 +186,7 @@ theorem ofMainInductionLargeK
     (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (hk_large : 400 * params.m * params.d ≤ k) :
-    Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) := by
+    Nonempty (MainFormalRoleInductionWitness params strategy eps hpass k) := by
   have hk : params.m * params.d ≤ k := by
     have hfactor : params.m * params.d ≤ 400 * params.m * params.d := by
       have hmul := Nat.mul_le_mul_right (params.m * params.d) (by norm_num : 1 ≤ 400)
@@ -193,49 +194,49 @@ theorem ofMainInductionLargeK
     exact le_trans hfactor hk_large
   exact ofMainInduction params strategy eps k hpass hk
 
-/-- Convert the isolated Section 6 role-register residual into the output consumed
+/-- Convert the isolated Section 6 role-register witness into the output consumed
 by unsymmetrization.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:68-109`. -/
-def toRoleMeasurementPackage
+def toRoleMeasurementWitness
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
-    (residual : MainFormalRolePackageResidual params strategy eps hpass k)
+    (witness : MainFormalRoleInductionWitness params strategy eps hpass k)
     (scalars : MainFormalCascadeScalars params eps k) :
-    MainFormalRoleMeasurementPackage params strategy eps k scalars where
-  roleMeasurement := residual.roleMeasurement
+    MainFormalRoleMeasurementWitness params strategy eps k scalars where
+  roleMeasurement := witness.roleMeasurement
   symConsistency := by
     simpa [MainFormalCascadeScalars.sigma, mainFormalCascadeSigma_eq_mainInductionError]
-      using residual.section6Consistency
+      using witness.section6Consistency
 
-/-- Base-case constructor for the isolated role-register residual. -/
+/-- Base-case constructor for the isolated role-register witness. -/
 theorem ofBaseCase
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (hm1 : params.m = 1) :
-    Nonempty (MainFormalRolePackageResidual params strategy eps hpass k) := by
+    Nonempty (MainFormalRoleInductionWitness params strategy eps hpass k) := by
   exact ofMainInductionWitness params strategy eps k hpass
     (strategySymmetrization_mainInductionBaseCase params strategy eps hpass k hm1)
 
 /-- Build the role-register measurement record produced by a concrete
-role residual.
+role witness.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:68-109`. -/
-def rolePackage
+def roleWitness
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {hpass : strategy.PassesLowIndividualDegreeTest eps}
-    (residual : MainFormalRolePackageResidual params strategy eps hpass k)
+    (witness : MainFormalRoleInductionWitness params strategy eps hpass k)
     (scalars : MainFormalCascadeScalars params eps k) :
-    MainFormalRoleMeasurementPackage params strategy eps k scalars :=
-  residual.toRoleMeasurementPackage scalars
+    MainFormalRoleMeasurementWitness params strategy eps k scalars :=
+  witness.toRoleMeasurementWitness scalars
 
-end MainFormalRolePackageResidual
+end MainFormalRoleInductionWitness
 
 /-- Reuse the current base-universe field model on the predecessor of a
 successor decomposition.

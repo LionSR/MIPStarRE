@@ -26,7 +26,6 @@ theorem commutingWithGIncomplete
     (hcomm : CommutingWithGCompleteStatement params ψbi family gamma zeta) :
     CommutingWithGIncompleteStatement params ψbi family gamma zeta := by
   refine {
-    completePartWitness := hcomm
     pointWithIncompletePartCommutation := ?_
     incompletePartCommutation := ?_
   }

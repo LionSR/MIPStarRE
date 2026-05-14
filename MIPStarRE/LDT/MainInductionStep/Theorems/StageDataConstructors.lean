@@ -1,15 +1,15 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementBridge
+import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly
 import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities
 
 /-!
-# Section 6 — Package Constructors and Skeletal Assembly
+# Section 6 — Stage-Data Constructors
 
 Constructors for the slice restriction, per-slice induction, self-improvement,
-and averaged pasting packages: `SliceRestrictionPackage.ofRestrictedProbabilities`,
+and averaged pasting stage records: `SliceRestrictionPackage.ofRestrictedProbabilities`,
 `AnswerSliceRestrictionPackage.ofRestrictedProbabilities`,
 `SliceRestrictionPackage.ofAnswer`, `PerSliceInductionPackage.ofRecursion`,
 `AnswerPerSliceInductionPackage.*`, `SelfImprovementPackage.ofAnswerForLegacy`,
-`AveragedPastingInput.output`, and `mainInductionFromPackages`.
+`AveragedPastingInput.invokeLdPasting`, and `mainInductionFromStageData`.
 
 ## References
 
@@ -23,7 +23,7 @@ open scoped MatrixOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-! ## Package constructors and skeletal assembly -/
+/-! ## Stage-data constructors and theorem composition -/
 
 /-- Extract a concrete slice-restriction package from
 `lem:restricted-probabilities`.
@@ -348,7 +348,7 @@ noncomputable def SelfImprovementPackage.ofAnswerForLegacy
   dominatesAveragePointOperator := answerSelf.dominatesAveragePointOperator
 
 /-- Invoke `thm:ld-pasting-in-induction-section` from averaged pasting input. -/
-theorem AveragedPastingInput.output
+theorem AveragedPastingInput.invokeLdPasting
     (params : Parameters)
     [FieldModel.{0} params.q]
     (strategy : SymStrat params.next ι)
@@ -368,14 +368,14 @@ theorem AveragedPastingInput.output
       LdPastingInInductionSectionConclusion params strategy selfPkg.family H
         eps delta gamma pkg.kappa pkg.zeta k := by
   exact
-    ldPastingInInductionSection params strategy eps delta gamma pkg.kappa pkg.zeta
+    ldPastingInInductionSectionNontrivial params strategy eps delta gamma pkg.kappa pkg.zeta
       hgood pkg.gamma_le_one pkg.zeta_le_one pkg.dq_le_q hd
       selfPkg.family pkg.complete pkg.consistent pkg.selfConsistent pkg.bounded k hk_pos hk
 
 /-- Compose the four paper-faithful induction-step inputs
 `restrict → induct → self-improve → paste` into the main-induction conclusion in
 one higher dimension. -/
-theorem mainInductionFromPackages
+theorem mainInductionFromStageData
     (params : Parameters)
     [FieldModel.{0} params.q]
     (strategy : SymStrat params.next ι)
@@ -409,7 +409,7 @@ theorem mainInductionFromPackages
           LdPastingInInductionSectionConclusion params strategy family H
             eps delta gamma kappa zeta k := by
       simpa [family, kappa, zeta] using
-        hpaste.output (params := params) (strategy := strategy)
+        hpaste.invokeLdPasting (params := params) (strategy := strategy)
           (eps := eps) (delta := delta) (gamma := gamma) (k := k) hgood hd hk_pos hk
     rcases hpasted with ⟨H, hH⟩
     exact

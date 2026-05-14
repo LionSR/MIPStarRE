@@ -225,7 +225,8 @@ private lemma fromHToGBernoulliTailMass_lower_bound
              intro _
              exact bernoulliTailOperator_nonneg k params.d X hXpsd hXle
            sum_eq_total := by simp
-           total_le_one := hchern.tail_le_one } : SubMeas Unit (ι × ι)) =
+           total_le_one := bernoulliTailOperator_le_one k params.d X hXpsd hXle } :
+          SubMeas Unit (ι × ι)) =
         fromHToGBernoulliTailMass params strategy.state family k := by
     have hswap :
         ev strategy.state
@@ -292,7 +293,7 @@ theorem ldPastingNCompleteness_of_tailLowerBound
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
     (hk_pos : 1 ≤ k)
-    (hk : 400 * params.m * params.d ≤ k)
+    (_hk : 400 * params.m * params.d ≤ k)
     (htail :
       1 - kappa * (1 + 1 / (100 * (params.m : Error))) -
           Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))) ≤
@@ -315,10 +316,6 @@ theorem ldPastingNCompleteness_of_tailLowerBound
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         family.evaluatedAtNextPoint)
       hcons.pointConsistency.offDiagonalBound
-  let G : Fq params → SubMeas (Polynomial params) ι := fun x => (family.meas x).toSubMeas
-  have hG : ∀ x, G x = (family.meas x).toSubMeas := by
-    intro x
-    rfl
   have hselfComplete :=
     gCompleteSelfConsistency params strategy.state family zeta
       strategy.permInvState hself
@@ -327,9 +324,9 @@ theorem ldPastingNCompleteness_of_tailLowerBound
       strategy.permInvState hselfComplete
   have hcomMain :=
     Commutativity.comMain params strategy eps delta gamma zeta
-      strategy.isNormalized hgood family G hG hcons hself hbound
+      strategy.isNormalized hgood family hcons hself hbound
   have hcommComplete :=
-    commutingWithGComplete params strategy family G gamma zeta
+    commutingWithGComplete params strategy family gamma zeta
       hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le hcomMain hselfComplete
   have hcommIncomplete :=
     commutingWithGIncomplete params strategy.state family gamma zeta hcommComplete
@@ -351,31 +348,30 @@ theorem ldPastingNCompleteness_of_tailLowerBound
         eps delta gamma zeta k hk_pos
         heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
   constructor
-  · exact hk
-  · constructor
-    have hOAO_mass :
+  constructor
+  have hOAO_mass :
+      overAllOutcomesPastedMass params strategy family k ≥
+        overAllOutcomesExpansionMass params strategy family k -
+          overAllOutcomesError params eps delta gamma zeta k := by
+    have habs := abs_le.mp hOAO.totalOutcomeExpansion
+    linarith
+  have hFrom_mass :
+      fromHToGAllOutcomesMass params strategy strategy.state family k ≥
+        fromHToGBernoulliTailMass params strategy.state family k -
+          fromHToGError params gamma zeta k := by
+    have habs := abs_le.mp hFrom.bernoulliPolynomialRewrite
+    linarith
+  have hmass :
+      overAllOutcomesPastedMass params strategy family k ≥
+        1 - kappa * (1 + 1 / (100 * (params.m : Error))) - ν -
+          Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))) := by
+    have hOAO_mass' :
         overAllOutcomesPastedMass params strategy family k ≥
-          overAllOutcomesExpansionMass params strategy family k -
+          fromHToGAllOutcomesMass params strategy strategy.state family k -
             overAllOutcomesError params eps delta gamma zeta k := by
-      have habs := abs_le.mp hOAO.totalOutcomeExpansion
-      linarith
-    have hFrom_mass :
-        fromHToGAllOutcomesMass params strategy strategy.state family k ≥
-          fromHToGBernoulliTailMass params strategy.state family k -
-            fromHToGError params gamma zeta k := by
-      have habs := abs_le.mp hFrom.bernoulliPolynomialRewrite
-      linarith
-    have hmass :
-        overAllOutcomesPastedMass params strategy family k ≥
-          1 - kappa * (1 + 1 / (100 * (params.m : Error))) - ν -
-            Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))) := by
-      have hOAO_mass' :
-          overAllOutcomesPastedMass params strategy family k ≥
-            fromHToGAllOutcomesMass params strategy strategy.state family k -
-              overAllOutcomesError params eps delta gamma zeta k := by
-        simpa [overAllOutcomesExpansionMass, fromHToGAllOutcomesMass] using hOAO_mass
-      linarith
-    simpa [ν, ldPastingCompletenessLowerBound, overAllOutcomesPastedMass] using hmass
+      simpa [overAllOutcomesExpansionMass, fromHToGAllOutcomesMass] using hOAO_mass
+    linarith
+  simpa [ν, ldPastingCompletenessLowerBound, overAllOutcomesPastedMass] using hmass
 
 /-- `cor:ld-pasting-N-completeness`. -/
 theorem ldPastingNCompleteness
@@ -439,12 +435,19 @@ lemma ldPastingSubMeas
       hgood hgamma_le hzeta_le hdq_le hd
       family hcomplete hcons hself hbound k hk_pos hk
   exact
-    { largeEnough := hk
-      pointConsistency := hconsistency
+    { pointConsistency := hconsistency
       completeness := hcompleteness.completenessBound }
 
-/-- `thm:ld-pasting`. -/
-theorem ldPasting
+/-- Restricted nontrivial-regime Lean form of `thm:ld-pasting`.
+
+The source theorem is `references/ldt-paper/ld-pasting.tex`, lines 12--50.
+Lines 52--55 explain that the proof may assume the nontrivial regime
+`eps, delta, gamma, zeta, d / q ≤ 1`, since the complementary cases are
+trivial.  This declaration currently exposes the public assumptions
+`gamma ≤ 1`, `zeta ≤ 1`, `params.d ≤ params.q`, `0 < params.d`, and `1 ≤ k`.
+The unrestricted source-facing statement is `ldPasting`; its complementary
+trivial cases are tracked by issue #1601. -/
+theorem ldPastingNontrivial
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -478,7 +481,34 @@ theorem ldPasting
     hAConsistency_completed params strategy eps delta gamma kappa zeta
       family k hsubmeasConsistency hcompleteness.completenessBound
   exact
-    { largeEnough := hk
-      pointConsistency := hconsistency }
+    { pointConsistency := hconsistency }
+
+/-- Source-facing form of `thm:ld-pasting`.
+
+Paper origin: `references/ldt-paper/ld-pasting.tex`, lines 12--50.  The
+following lines 52--55 explain that the proof may restrict to the regime
+`eps, delta, gamma, zeta, d / q ≤ 1`, because the complementary cases are
+trivial.  The restricted theorem `ldPastingNontrivial` proves the nontrivial
+regime.  The formal proof of the complementary trivial branches is tracked by
+issue #1601, so this declaration keeps the unrestricted paper statement visible
+without adding the non-paper assumptions from the restricted helper. -/
+theorem ldPasting
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma kappa zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (hcomplete : family.Complete strategy.state kappa)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (k : ℕ)
+    (hk : 400 * params.m * params.d ≤ k) :
+    ∃ H : Measurement (Polynomial params.next) ι,
+      LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
+  -- Issue #1601: prove the five trivial complementary branches and then call
+  -- `ldPastingNontrivial` in the remaining case.
+  sorry
 
 end MIPStarRE.LDT.Pasting

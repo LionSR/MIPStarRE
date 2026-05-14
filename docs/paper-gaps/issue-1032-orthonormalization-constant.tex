@@ -70,9 +70,11 @@ with a separate proved completion-route comparison.%
 \path{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization},
 \path{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationCompletionRoute},
 and \path{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer\_of\_sourceAlmostProjective\_two\_mul}.
-This note is attached to \ghissue{1032}; the issue is resolved by proving the
-source-aligned theorem statement, while the weaker completion-route
-construction stays under a separate name.}
+This note is attached to \ghissue{1032}; the constant discrepancy is resolved
+by proving the source-aligned theorem statement, while the heterogeneous
+\path{lem:orthonormalization-main-lemma} proof remains a tracked obligation in
+the same issue.  The weaker completion-route construction stays under a
+separate name.}
 
 \section{The source assertion}
 
@@ -125,15 +127,23 @@ longer the declaration presented as the paper theorem.
 
 \section{Conclusion}
 
-The source theorem is now proved under the declaration
+The scalar constant discrepancy in the completion-to-measurement route has been
+removed from the statement of
 \(\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}\).
 The formal proof follows the paper's completion-to-measurement reduction and
-then uses a sharp locality-preserving repair route that consumes the completed
-measurement's bipartite self-consistency estimate at the correct \(2\zeta\)
+then uses a sharp locality-preserving repair route at the correct \(2\zeta\)
 scale, avoiding the extra factor introduced by the historical completion-route
-proof.  The proved completion-route theorem remains available under the separate
-name
+proof.  The weaker completion-route theorem remains available under the
+separate name
 \(\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationCompletionRoute}\).
+
+This does not close the whole Section~5 proof obligation.  The declaration
+\(\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}\)
+still depends on the heterogeneous
+\(\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}\),
+whose proof remains a tracked \texttt{sorry} under \ghissue{1032}.  Thus the
+constant part is repaired, but the source theorem is not yet a proof-complete
+\leanok{} entry.
 
 \bibliographystyle{alpha}
 \bibliography{references}

@@ -118,8 +118,8 @@ is ready.
 - `MakingMeasurementsProjective.LeftLiftedProjectivizationRepairInput`
 - `MakingMeasurementsProjective.ProjectivizationLine156Handoff`
 - `MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity`
-- `Test.MainFormalRoleMeasurementPackage`
-- `Test.MainFormalRolePackageResidual`
+- `Test.MainFormalRoleMeasurementWitness`
+- `Test.MainFormalRoleInductionWitness`
 - `Test.MainFormalRolePackageSuccessorResidual`
 - `Test.MainFormalRolePackageBranchResidual`
 - `Test.MainFormalCascadeRolePackagedCompletionLine169Residual`

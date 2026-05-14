@@ -6,6 +6,7 @@ on:
     paths:
       - 'MIPStarRE/**/*.lean'
       - 'scripts/audit_conclusion_shaped_hypotheses.py'
+      - 'scripts/audit_lean_axiom_declarations.py'
       - 'scripts/audit_unfaithful_markers.py'
       - 'scripts/check_duplicate_private_helpers.py'
       - 'scripts/lean_header_utils.py'
@@ -41,7 +42,14 @@ jobs:
         run: |
           python3 -m unittest scripts/tests/test_check_duplicate_private_helpers.py
           python3 -m unittest scripts/tests/test_audit_conclusion_shaped_hypotheses.py
+          python3 -m unittest scripts/tests/test_audit_lean_axiom_declarations.py
           python3 -m unittest scripts/tests/test_audit_unfaithful_markers.py
+
+      - name: Run explicit axiom declaration audit
+        run: |
+          python3 scripts/audit_lean_axiom_declarations.py \
+            --root . \
+            --ci
 
       - name: Run conclusion-shaped hypothesis audit
         run: |

@@ -322,6 +322,22 @@ class ParseHelperDeclarationTests(unittest.TestCase):
             report = run_audit(root, min_normalized_chars=5)
             self.assertEqual(report.scanned_declarations, 0)
 
+    def test_excludes_nested_worktrees_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write(
+                root / ".worktrees" / "audit" / "MIPStarRE" / "LDT" / "Foo.lean",
+                """\
+                private lemma first (h : True ∧ True) : True := by
+                  exact And.left h
+
+                private lemma second (h : True ∧ True) : True := by
+                  exact And.left h
+                """,
+            )
+            report = run_audit(root, min_normalized_chars=5)
+            self.assertEqual(report.scanned_declarations, 0)
+
 
 class RenderTests(unittest.TestCase):
     def test_text_report_can_emit_github_warning(self) -> None:

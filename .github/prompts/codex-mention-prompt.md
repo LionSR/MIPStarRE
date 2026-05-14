@@ -6,8 +6,14 @@ Instructions:
    - Issue comment / issue: `gh issue view <num> --json ...`.
    - Review: read all threads via `gh api repos/<repo>/pulls/<num>/reviews`.
 2. Decide whether the request is a question (reply only) or a code change (edit + commit + reply).
+2a. Before changing a paper-facing theorem statement, a blueprint `\leanok`
+    link, or a proof-debt record, read `AGENTS.md`, `docs/PROOF_INTEGRITY.md`,
+    and `docs/paper-gaps/proof-gap-protocol.tex`. The repair must preserve the
+    cited statement in `references/ldt-paper/` up to faithful formal encoding.
 3. Use your judgment on whether Mathlib scouting is needed. Warranted for new proofs, closing sorrys, or choosing proof strategies; unnecessary for cosmetic fixes, docstrings, imports, or renaming. When scouting, first read existing **Mathlib Scouting Reports** in PR/issue comments, then scout yourself with `exact?`, `apply?`, `rw?`, `simp?`, and by grepping `.lake/packages/mathlib/Mathlib/`. If asked explicitly to scout, post a fresh **Mathlib Scouting Report** with sections: Relevant Mathlib definitions, Relevant Mathlib lemmas/theorems, Relevant MIPStarRE definitions, Suggested approach, Gaps to fill.
 4. For code changes:
+   - Before editing in a fresh worktree, run `scripts/install_git_hooks.sh --check`;
+     if it reports that hooks are not installed, run `scripts/install_git_hooks.sh`.
    - On a PR: check out the PR's head branch (`gh pr checkout <num>`), edit, run `lake build` to verify zero errors and no unexpected `sorry`, commit with prefix `[codex]`, push.
    - On an issue: create a new branch `codex/issue-<NUMBER>-<short-description>` from main, edit, build, commit with prefix `[codex]`, push.
 5. Reply via `gh pr comment <num>` or `gh issue comment <num>` summarizing what you did or answering the question. For review-thread triggers, reply directly to the triggering thread.

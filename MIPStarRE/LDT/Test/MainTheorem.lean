@@ -30,10 +30,10 @@ The imported modules carry the split proof assembly:
 * `OrdinaryRestriction` — ordinary `x`-restricted successor route
 * `AnswerValuedRestriction` — answer-valued `x`-restricted successor route
 * `ErrorScalars` — the Section 3 error cascade `σ, ζ₁, …, ζ₄`
-* `RoleRegister` — role-register measurement and branch residual
+* `RoleRegister` — role-register measurement and branch witness
 * `UnsymmetrizedTargets` — factor-two unsymmetrization and projective assembly
 * `ProjectiveConsistency` — projective-consistency transport through lines 154–172
-* `CompletionTransport` — post-role completion transport residuals
+* `CompletionTransport` — post-role completion transport witnesses
 * `OrthonormalizationData` — orthonormalization and completion data
 * `DiagonalCompletion` — diagonal consistency inputs for completing each side
 * `NativeTargets` — the final `ζ₄` native consistency targets
@@ -46,5 +46,5 @@ The imported modules carry the split proof assembly:
 * Blueprint: `blueprint/src/chapter/ch02_test.tex`,
   `\label{thm:main-formal}`; and
   `blueprint/src/chapter/ch10_induction.tex`,
-  `\label{rem:main-formal-lean-residual-records}`.
+  `\label{rem:main-formal-lean-witness-records}`.
 -/

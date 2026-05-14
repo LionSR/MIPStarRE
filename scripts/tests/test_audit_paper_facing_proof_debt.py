@@ -398,6 +398,109 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
                 {"hasExtraAssumptions", "ExtraAssumptions"},
             )
 
+    def test_obligation_wrapper_in_paper_facing_header_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem
+                    (h : InternalObligationWrapper params) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:paper}
+                  \lean{MIPStarRE.paperTheorem}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root)
+            self.assertEqual(result.scanned_refs, 1)
+            self.assertEqual(
+                {finding.token for finding in result.findings},
+                {"InternalObligationWrapper"},
+            )
+
+    def test_bundle_input_in_paper_facing_header_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem
+                    (bundle : CompletionBundle params) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:paper}
+                  \lean{MIPStarRE.paperTheorem}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root)
+            self.assertEqual(
+                {finding.token for finding in result.findings},
+                {"bundle", "CompletionBundle"},
+            )
+
+    def test_unfaithful_marker_input_in_paper_facing_header_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem
+                    (h : UnfaithfulCompletion params) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:paper}
+                  \lean{MIPStarRE.paperTheorem}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root)
+            self.assertEqual(
+                {finding.token for finding in result.findings},
+                {"UnfaithfulCompletion"},
+            )
+
+    def test_bundle_constructor_name_in_paper_facing_entry_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem_ofCompletionBundle (h : P) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{lemma}\label{lem:paper}
+                  \lean{MIPStarRE.paperTheorem_ofCompletionBundle}
+                \end{lemma}
+                """,
+            )
+            result = audit.run_audit(root)
+            self.assertEqual(result.findings, ())
+            self.assertEqual(len(result.conditional_decl_findings), 1)
+            self.assertEqual(result.conditional_decl_findings[0].token, "_ofCompletionBundle")
+
     def test_debt_vocabulary_is_not_reported_inside_unrelated_identifiers(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
