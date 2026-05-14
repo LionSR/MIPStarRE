@@ -316,10 +316,6 @@ theorem ldPastingNCompleteness_of_tailLowerBound
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         family.evaluatedAtNextPoint)
       hcons.pointConsistency.offDiagonalBound
-  let G : Fq params → SubMeas (Polynomial params) ι := fun x => (family.meas x).toSubMeas
-  have hG : ∀ x, G x = (family.meas x).toSubMeas := by
-    intro x
-    rfl
   have hselfComplete :=
     gCompleteSelfConsistency params strategy.state family zeta
       strategy.permInvState hself
@@ -328,7 +324,7 @@ theorem ldPastingNCompleteness_of_tailLowerBound
       strategy.permInvState hselfComplete
   have hcomMain :=
     Commutativity.comMain params strategy eps delta gamma zeta
-      strategy.isNormalized hgood family G hG hcons hself hbound
+      strategy.isNormalized hgood family hcons hself hbound
   have hcommComplete :=
     commutingWithGComplete params strategy family gamma zeta
       hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le hcomMain hselfComplete
