@@ -13,7 +13,9 @@ open MIPStarRE.LDT.ExpansionHypercubeGraph
 open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+universe u v
+
+variable {ι : Type u} [Fintype ι] [DecidableEq ι]
 
 /-- Each binomial term in the Bernoulli tail operator is positive semidefinite. -/
 lemma binomialOperatorTerm_nonneg {G : MIPStarRE.Quantum.Op ι} (n r : ℕ)
@@ -84,9 +86,9 @@ theorem bernoulliTailOperator_le_one
 
 /-- Concrete family for the full sandwich
 `\widehat G^{x_1}_{g_1} \cdots \widehat G^{x_k}_{g_k} \cdots \widehat G^{x_1}_{g_1}`. -/
-noncomputable def gHatSandwichFamily (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) (k : ℕ) :
-    IdxSubMeas (PointTuple params k) (GHatTupleOutcome params k) ι :=
+noncomputable def gHatSandwichFamily (params : Parameters) [FieldModel.{v} params.q]
+    (family : IdxPolyFamily.{u, v} params ι) (k : ℕ) :
+    IdxSubMeas.{0, v, u} (PointTuple params k) (GHatTupleOutcome params k) ι :=
   fun xs =>
     { outcome := fun gs =>
         let half := gHatHalfProductOutcomeOperator params family k xs gs
@@ -104,7 +106,7 @@ noncomputable def gHatSandwichFamily (params : Parameters) [FieldModel params.q]
         | zero =>
             simp [gHatHalfProductOutcomeOperator, gHatHalfProductTotalOperator]
         | succ k ih =>
-            let α : Fin (k + 1) → Type := fun _ => GHatOutcome params
+            let α := fun _ : Fin (k + 1) => GHatOutcome params
             have hsplit :
                 (∑ gs : GHatTupleOutcome params (k + 1),
                     let half := gHatHalfProductOutcomeOperator params family (k + 1) xs gs

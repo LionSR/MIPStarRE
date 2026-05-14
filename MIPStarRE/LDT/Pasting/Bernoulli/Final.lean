@@ -666,10 +666,9 @@ theorem ldPastingDegreeZeroBranch
 
 The restricted construction theorem `ldPastingNontrivial` proves the nontrivial
 analytic regime for the canonical pasted measurement.  This auxiliary statement
-records the remaining task of applying that construction to the unrestricted
-theorem without changing the statement of `thm:ld-pasting`.  Issue #1627 tracks
-the additional generality needed to apply the existing construction theorem to
-the unrestricted statement. -/
+records the projection from the restricted construction theorem to the conclusion
+needed by the unrestricted theorem, without changing the statement of
+`thm:ld-pasting`. -/
 theorem ldPastingNontrivialPublicBranch
     (params : Parameters)
     [FieldModel params.q]
@@ -690,12 +689,11 @@ theorem ldPastingNontrivialPublicBranch
     (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
-  -- Applying `ldPastingNontrivial` here currently gives a universe mismatch:
-  -- `hbound` has type `SliceBoundednessInput.{u_1, u_2} ...`, while the
-  -- available construction asks for `SliceBoundednessInput.{_, 0} ...`.
-  -- Issue #1627 records this formalization obligation; it is not an additional
-  -- source hypothesis of `thm:ld-pasting`.
-  sorry
+  obtain ⟨H, _hHdef, hH⟩ :=
+    ldPastingNontrivial params strategy eps delta gamma kappa zeta
+      hgood hgamma_le hzeta_le hdq_le hd
+      family hcomplete hcons hself hbound k hk_pos hk
+  exact ⟨H, hH⟩
 
 /-- Source-facing form of `thm:ld-pasting`.
 
