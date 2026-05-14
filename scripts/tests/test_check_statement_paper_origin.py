@@ -95,11 +95,17 @@ class SuffixTests(unittest.TestCase):
     def test_hypotheses_suffix(self) -> None:
         self.assertTrue(_matches_suffix("FooHypotheses"))
 
+    def test_hypothesis_suffix(self) -> None:
+        self.assertTrue(_matches_suffix("FooHypothesis"))
+
     def test_input_suffix(self) -> None:
         self.assertTrue(_matches_suffix("FooInput"))
 
     def test_assumptions_suffix(self) -> None:
         self.assertTrue(_matches_suffix("FooAssumptions"))
+
+    def test_assumption_suffix(self) -> None:
+        self.assertTrue(_matches_suffix("FooAssumption"))
 
     def test_conclusion_suffix(self) -> None:
         self.assertTrue(_matches_suffix("FooConclusion"))
@@ -123,6 +129,8 @@ class SuffixTests(unittest.TestCase):
             "Obligation",
             "Obligations",
             "Wrapper",
+            "Bundle",
+            "Conditional",
             "Slackness",
             "Dominance",
             "CompletionTransport",
@@ -358,6 +366,17 @@ class ScanFileTests(unittest.TestCase):
             misses = _scan_file(path)
             self.assertEqual(misses, [(2, "FooAssumptions")])
 
+    def test_singular_assumption_requires_origin(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "F.lean"
+            _write(path, (
+                "/-- prose -/\n"
+                "structure FooAssumption where\n"
+                "  h : True\n"
+            ))
+            misses = _scan_file(path)
+            self.assertEqual(misses, [(2, "FooAssumption")])
+
     def test_bridge_requires_origin(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             path = Path(td) / "F.lean"
@@ -388,6 +407,27 @@ class ScanFileTests(unittest.TestCase):
             ))
             misses = _scan_file(path)
             self.assertEqual(misses, [(2, "FooPackage")])
+
+    def test_bundle_requires_origin(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "F.lean"
+            _write(path, (
+                "/-- prose -/\n"
+                "structure FooBundle where\n"
+                "  h : True\n"
+            ))
+            misses = _scan_file(path)
+            self.assertEqual(misses, [(2, "FooBundle")])
+
+    def test_conditional_requires_origin(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "F.lean"
+            _write(path, (
+                "/-- prose -/\n"
+                "def FooConditional : Prop := True\n"
+            ))
+            misses = _scan_file(path)
+            self.assertEqual(misses, [(2, "FooConditional")])
 
     def test_residual_requires_origin(self) -> None:
         with tempfile.TemporaryDirectory() as td:

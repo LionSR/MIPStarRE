@@ -16,7 +16,7 @@ Instructions:
      blueprint.
    - Source-labelled theorem alignment: do not fix blueprint sync by pointing a
      paper theorem, lemma, or proposition to a conditional helper with bridge,
-     residual, repair, package, proof-obligation input, hypotheses bundle,
+     residual, repair, package, producer, proof-obligation input, hypotheses bundle,
      assumptions bundle, or arbitrary hypothesis inputs that are not in
      `references/ldt-paper/`. Such helpers may be mentioned only in separate
      non-`\leanok` notes, and only when they are already useful quarantined

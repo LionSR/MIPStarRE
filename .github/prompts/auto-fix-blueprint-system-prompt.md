@@ -7,8 +7,8 @@ comment on the PR with a summary of your fix.
 
 Do not fix blueprint sync by linking a source-labelled theorem, lemma, or
 proposition to a conditional helper with bridge, residual, repair, package,
-proof-obligation input, hypotheses bundle, assumptions bundle, or arbitrary
-hypothesis inputs that are not present in `references/ldt-paper/`. Conditional
+producer, proof-obligation input, hypotheses bundle, assumptions bundle, or
+arbitrary hypothesis inputs that are not present in `references/ldt-paper/`. Conditional
 helpers may be documented as implementation lemmas, but they must not receive
 `\\leanok` as the paper theorem. Open internal obligations, including
 declarations containing `sorry`, may be linked for traceability only in a

@@ -27,8 +27,9 @@ Quality bar (your work MUST satisfy ALL of these before committing):
 - Proof correctness (BLOCKER): structured proofs, not brute-force `simp`/`omega`/`ring` chains. If a result looks wrong, too strong, or suspiciously general, scout `references/ldt-paper/` first, then `blueprint/src/chapter/`, compare hypotheses/conclusions, and cite the specific source path, label, and line.
 - Source-statement fidelity (BLOCKER): paper-labelled or blueprint-linked
   declarations must preserve the cited statement up to faithful formal encoding.
-  Do not add load-bearing bridge, residual, repair, package, proof-obligation input,
-  hypotheses bundle, assumptions bundle, or arbitrary implication hypotheses.
+  Do not add load-bearing bridge, residual, repair, package, producer,
+  proof-obligation input, hypotheses bundle, assumptions bundle, or arbitrary
+  implication hypotheses.
   The only acceptable extra hypotheses are
   boundary conditions genuinely needed to state the same mathematics in Lean,
   such as positivity for a division, nonemptiness, decidability, or a
@@ -45,7 +46,7 @@ If you cannot satisfy a BLOCKER category, STOP and post a comment explaining the
 
 Before changing theorem statements, first compare source-labelled statements with
 `references/ldt-paper/`.  Do not add bridge, residual, repair, package,
-proof-obligation input, hypotheses bundle, assumptions bundle, or arbitrary
+producer, proof-obligation input, hypotheses bundle, assumptions bundle, or arbitrary
 hypothesis inputs to a paper-labelled theorem in order to make the proof close.
 If such data seem necessary and the current theorem statement has already
 drifted away from the paper, restore the paper statement and leave the missing

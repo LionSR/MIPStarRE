@@ -27,8 +27,8 @@ that determines whether the PR can be approved with outstanding issues.
    formalization of a cited result, compare its public Lean statement with the corresponding
    statement in `references/ldt-paper/`. Flag any added load-bearing hypothesis, weakened
    conclusion, changed error parameter, or altered quantifier structure. In particular,
-   bridge, residual, repair, package, proof-obligation input, hypotheses bundle,
-   assumptions bundle, or
+   bridge, residual, repair, package, producer, proof-obligation input,
+   hypotheses bundle, assumptions bundle, or
    arbitrary implication hypotheses are blockers unless they are explicitly part of the
    paper statement or are documented Lean boundary conditions needed to state the
    mathematics, such as positivity, nonemptiness, decidability, or field-model hypotheses.

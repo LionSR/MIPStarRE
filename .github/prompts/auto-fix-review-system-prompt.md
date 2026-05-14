@@ -16,9 +16,10 @@ the LaTeX sources in `references/ldt-paper/` where the original LDT theorem
 statements and proofs are stored — read the relevant sections, compare
 hypotheses and conclusions, and cite the source path, line range, and label when
 flagging a discrepancy. For paper-labelled declarations, do not address review
-feedback by adding bridge, residual, repair, package, proof-obligation input, or
-arbitrary hypothesis inputs, including generic hypotheses bundle or assumptions
-bundle inputs. The only acceptable extra hypotheses are boundary conditions
+feedback by adding bridge, residual, repair, package, producer,
+proof-obligation input, or arbitrary hypothesis inputs, including generic
+hypotheses bundle or assumptions bundle inputs. The only acceptable extra
+hypotheses are boundary conditions
 genuinely needed to state the same mathematics in Lean, such as positivity for a
 division, nonemptiness, decidability, or a field-model instance. Proof-debt
 objects are not boundary conditions.

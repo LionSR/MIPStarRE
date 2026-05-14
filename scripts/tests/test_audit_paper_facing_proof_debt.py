@@ -242,6 +242,90 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
             self.assertEqual(len(result.conditional_decl_findings), 1)
             self.assertEqual(result.conditional_decl_findings[0].token, "_ofCompletionResidual")
 
+    def test_producer_constructor_name_in_paper_facing_entry_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem_ofProjectivizationProducer (h : P) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:paper}
+                  \lean{MIPStarRE.paperTheorem_ofProjectivizationProducer}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root)
+            self.assertEqual(result.scanned_refs, 1)
+            self.assertEqual(result.findings, ())
+            self.assertEqual(len(result.conditional_decl_findings), 1)
+            self.assertEqual(
+                result.conditional_decl_findings[0].token,
+                "_ofProjectivizationProducer",
+            )
+
+    def test_singular_hypothesis_name_in_paper_facing_entry_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem_ofBridgeHypothesis (h : P) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{lemma}\label{lem:paper}
+                  \lean{MIPStarRE.paperTheorem_ofBridgeHypothesis}
+                \end{lemma}
+                """,
+            )
+            result = audit.run_audit(root)
+            self.assertEqual(result.scanned_refs, 1)
+            self.assertEqual(result.findings, ())
+            self.assertEqual(len(result.conditional_decl_findings), 1)
+            self.assertEqual(
+                result.conditional_decl_findings[0].token,
+                "_ofBridgeHypothesis",
+            )
+
+    def test_singular_assumption_name_in_paper_facing_entry_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem_ofExtraAssumption (h : P) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{corollary}\label{cor:paper}
+                  \lean{MIPStarRE.paperTheorem_ofExtraAssumption}
+                \end{corollary}
+                """,
+            )
+            result = audit.run_audit(root)
+            self.assertEqual(result.scanned_refs, 1)
+            self.assertEqual(result.findings, ())
+            self.assertEqual(len(result.conditional_decl_findings), 1)
+            self.assertEqual(
+                result.conditional_decl_findings[0].token,
+                "_ofExtraAssumption",
+            )
+
     def test_conditional_prefix_name_in_paper_facing_entry_is_reported(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

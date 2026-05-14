@@ -14,8 +14,8 @@ Instructions:
    - For an ordinary proof hole not involving source-statement realignment,
      remove `sorry` and fully close the lemma/theorem.
    - Do not close a proof obligation by changing a paper-labelled theorem statement or
-     adding bridge, residual, repair, package, proof-obligation input, hypotheses bundle,
-     assumptions bundle, or arbitrary implication hypotheses absent from the
+     adding bridge, residual, repair, package, producer, proof-obligation input,
+     hypotheses bundle, assumptions bundle, or arbitrary implication hypotheses absent from the
      cited statement.
    - If a paper-labelled theorem was previously weakened by such a change,
      restore the paper statement and leave the missing proof as a tracked
@@ -57,8 +57,8 @@ Quality bar (your fix MUST satisfy ALL of these before committing):
 - Source-statement fidelity (BLOCKER): declarations named after paper results or
   linked by `\lean{...}` must preserve the cited statement up to faithful formal
   encoding. Do not add load-bearing bridge, residual, repair, package,
-  proof-obligation input,
-  hypotheses bundle, assumptions bundle, or arbitrary implication hypotheses.
+  producer, proof-obligation input, hypotheses bundle, assumptions bundle, or
+  arbitrary implication hypotheses.
   The only acceptable extra hypotheses are
   boundary conditions genuinely needed to state the same mathematics in Lean,
   such as positivity for a division, nonemptiness, decidability, or a

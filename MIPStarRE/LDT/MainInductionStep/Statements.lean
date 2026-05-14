@@ -350,7 +350,7 @@ def AnswerMainInductionConclusion (params : Parameters)
 /-- Predicate form of the answer-valued predecessor main-induction hypothesis.
 
 This is a Lean-only interface for the induction step in
-`inductive_step.tex`, lines 441--454.  It is deliberately stated at
+`references/ldt-paper/inductive_step.tex:441-454`.  It is deliberately stated at
 `mainInductionError` strength and for `AnswerSymStrat`, so callers can instantiate
 the paper-faithful `xRestrictedAnswerSymStrat` slices without appealing to the
 public `Test.mainFormal` theorem.
