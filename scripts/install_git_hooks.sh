@@ -40,47 +40,47 @@ if [ ! -d .githooks ]; then
 fi
 
 check_hook_files() {
-  STATUS=0
+  HOOK_STATUS=0
   for HOOK in .githooks/pre-commit .githooks/pre-push
   do
     if [ ! -f "$HOOK" ]; then
       echo "Missing hook file: $HOOK" >&2
-      STATUS=1
+      HOOK_STATUS=1
     elif [ ! -x "$HOOK" ]; then
       echo "Hook file is not executable: $HOOK" >&2
-      STATUS=1
+      HOOK_STATUS=1
     fi
   done
-  return "$STATUS"
+  return "$HOOK_STATUS"
 }
 
 check_hooks_installed() {
-  STATUS=0
+  INSTALL_STATUS=0
   CURRENT_HOOKS_PATH="$(git config --get core.hooksPath || true)"
   case "$CURRENT_HOOKS_PATH" in
     .githooks|"$ROOT/.githooks")
       ;;
     "")
       echo "core.hooksPath is not set for this worktree." >&2
-      STATUS=1
+      INSTALL_STATUS=1
       ;;
     *)
       echo "core.hooksPath is '$CURRENT_HOOKS_PATH', not .githooks." >&2
-      STATUS=1
+      INSTALL_STATUS=1
       ;;
   esac
 
   if ! check_hook_files; then
-    STATUS=1
+    INSTALL_STATUS=1
   fi
 
-  if [ "$STATUS" -eq 0 ]; then
+  if [ "$INSTALL_STATUS" -eq 0 ]; then
     echo "MIPStarRE Git hooks are installed for this worktree."
     echo "core.hooksPath=$CURRENT_HOOKS_PATH"
   else
     echo "Run scripts/install_git_hooks.sh to install the repository hooks." >&2
   fi
-  return "$STATUS"
+  return "$INSTALL_STATUS"
 }
 
 if [ "$MODE" = "check" ]; then
