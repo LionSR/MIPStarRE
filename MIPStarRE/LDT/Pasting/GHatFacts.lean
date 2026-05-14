@@ -122,10 +122,6 @@ theorem gHatFacts
     (hcommIncomplete : CommutingWithGIncompleteStatement params ψbi family gamma zeta) :
     GHatFactsStatement params ψbi family gamma zeta := by
   refine {
-    completePartSelfConsistencyWitness := hselfComplete
-    incompletePartSelfConsistencyWitness := hselfIncomplete
-    completePartCommutationWitness := hcommComplete
-    incompletePartCommutationWitness := hcommIncomplete
     completedSelfConsistency := ?_
     completedCommutation := ?_
   }
