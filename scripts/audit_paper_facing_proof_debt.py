@@ -13,14 +13,15 @@ review aid for that boundary:
   declaration name and before the result type;
 * report occurrences of blocking proof-debt vocabulary such as
   ``BridgeHypotheses``, ``Residual``, ``RepairInput``, ``Package``,
-  ``Bundle``, ``Producer``, ``Obligation``, an ``Input`` bundle, a wrapper,
-  an ``Unfaithful`` marker type, or a generic ``Hypotheses`` /
-  ``Assumptions`` bundle;
+  ``Bundle``, ``Conditional``, ``Producer``, ``Obligation``, an ``Input``
+  bundle, a wrapper, an ``Unfaithful`` marker type, or a generic
+  ``Hypotheses`` / ``Assumptions`` bundle;
 * reject paper-facing blueprint entries that point to declaration names with
   conditional proof-debt forms such as ``*_of...Obligations``,
   ``*_of...Residual``, ``*_of...Repair``, ``*_of...Bundle``,
-  ``*_of...Unfaithful``, ``*_assuming...``, or ``conditional...``, even when
-  the declaration header itself has no suspicious public input.
+  ``*_of...Unfaithful``, ``*_assuming...``, ``conditional...``, or
+  ``Conditional...``, even when the declaration header itself has no
+  suspicious public input.
 * classify known faithful boundary-input packages separately, with paper
   citations, so they do not become indistinguishable from proof debt.
 
