@@ -17,8 +17,11 @@ class PrePushHookTests(unittest.TestCase):
         self.assertIn("run_outside_git_env()", text)
         self.assertIn("git rev-parse --local-env-vars", text)
         self.assertIn('unset "$name"', text)
+        self.assertIn("lean_file_to_module()", text)
+        self.assertIn("refreshing compiled Lean modules for checkdecls", text)
 
         self.assertIn("run_outside_git_env lake env lean", text)
+        self.assertIn('run_outside_git_env lake build "$LEAN_MODULE"', text)
         self.assertIn("run_outside_git_env lake exe checkdecls", text)
         self.assertIn("run_outside_git_env lake build", text)
         self.assertIn("run_outside_git_env python3 scripts/check_statement_paper_origin.py", text)

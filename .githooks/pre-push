@@ -22,6 +22,11 @@ run_outside_git_env() (
   "$@"
 )
 
+lean_file_to_module() {
+  path="${1%.lean}"
+  printf '%s\n' "$path" | tr '/' '.'
+}
+
 while read LOCAL_REF LOCAL_SHA REMOTE_REF REMOTE_SHA
 do
   if [ -z "${LOCAL_SHA:-}" ] || [ "$LOCAL_SHA" = "$ZERO_SHA" ]; then
@@ -123,6 +128,16 @@ if grep -Eq '^(MIPStarRE/|MIPStarRE\.lean$|blueprint/|scripts/(blueprint_lean_sy
     else
       echo "MIPStarRE pre-push: origin/main not found; skipping reverse blueprint coverage warning."
     fi
+
+    echo "MIPStarRE pre-push: refreshing compiled Lean modules for checkdecls."
+    while read LEAN_FILE
+      do
+        if [ -f "$LEAN_FILE" ]; then
+          LEAN_MODULE="$(lean_file_to_module "$LEAN_FILE")"
+          echo "  lake build $LEAN_MODULE"
+          run_outside_git_env lake build "$LEAN_MODULE"
+        fi
+      done < "$CHANGED_LEAN_FILE_LIST"
   fi
   run_outside_git_env lake exe checkdecls blueprint/lean_decls
 fi

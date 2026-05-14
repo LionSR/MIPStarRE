@@ -418,10 +418,12 @@ runs `lake env lean` on each changed file.  When the pushed range touches Lean,
 blueprint, paper-gap, proof-integrity, review-policy, or agent-prompt surfaces,
 it repeats the fast statement-integrity audits.  When blueprint or Lean
 declaration surfaces changed, it regenerates `blueprint/lean_decls`, verifies
-that the file has not drifted, and then runs:
+that the file has not drifted, rebuilds changed Lean modules so declaration
+resolution uses fresh `.olean` files, and then runs:
 
 ```bash
 python3 scripts/blueprint_lean_sync.py --root . --ci
+lake build <changed Lean modules>
 lake exe checkdecls blueprint/lean_decls
 ```
 
@@ -495,7 +497,7 @@ remains the authoritative merge gate.  The responsibilities are:
 | Explicit `axiom` and `constant` declarations stay out of the LDT tree | `pre-commit` and relevant `pre-push`: `audit_lean_axiom_declarations.py --ci` | `proof-evasion-helper-audits.yml` | Blocking CI; ordinary `sorry` sites are tracked separately by their `sorryAx` closure. |
 | Source-labelled Lean declaration headers do not change silently | `pre-push`: `check_source_statement_changes.py --base origin/main` for changed LDT Lean files | Paper-facing proof-debt audit and review prompts | Local blocking guard for issue #1578.  Intentional paper-realignment changes should carry a statement-integrity audit in the PR. |
 | Edited Lean files type-check | `pre-push`: `lake env lean` on changed Lean files | `lean_action_ci.yml` | CI remains the full repository authority. |
-| Blueprint declarations and `blueprint/lean_decls` stay synchronized | `pre-push`: regenerate, diff, `blueprint_lean_sync.py --ci`, reverse coverage warning for changed Lean declarations, `checkdecls` | `blueprint-sync.yml`; best-effort checks in `lint-blueprint.yml` | The PR workflow is the authoritative check; the reverse coverage step is a local warning. |
+| Blueprint declarations and `blueprint/lean_decls` stay synchronized | `pre-push`: regenerate, diff, `blueprint_lean_sync.py --ci`, reverse coverage warning for changed Lean declarations, rebuild changed Lean modules, `checkdecls` | `blueprint-sync.yml`; best-effort checks in `lint-blueprint.yml` | The PR workflow is the authoritative check; the reverse coverage step is a local warning.  The local rebuild prevents stale `.olean` files from making an existing declaration look missing. |
 | Proof-level `\leanok` entries do not depend on `sorryAx` | `pre-push` full mode: `blueprint_leanok_axioms.py --ci` | `blueprint-sync.yml` | The axiom audit needs compiled local `.olean` artifacts on a cold runner, so this workflow keeps one explicit `lake build` before the audit. |
 | Whole-project Lean compilation | `pre-push` full mode: `lake build` | `lean_action_ci.yml` | Lean CI remains the merge authority for compilation; the blueprint-sync build is the proof-status audit prerequisite. |
 | Blueprint LaTeX/PDF/web build | `pre-push` full mode: `leanblueprint web` when installed | `lint-blueprint.yml` and `blueprint.yml` | Only blueprint workflows own LaTeX rendering. |
