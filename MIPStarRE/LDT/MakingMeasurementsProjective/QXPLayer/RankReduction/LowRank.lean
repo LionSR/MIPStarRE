@@ -3,7 +3,7 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction.Sigma
 /-!
 # Section 5 — Q/X/XHat/P low-rank truncation
 
-Rank-reduction auxiliary-space producers and the low-rank truncation branch for
+Rank-reduction auxiliary-space constructions and the low-rank truncation branch for
 the paper's `Q/X/XHat/P` intermediate layer.
 -/
 
@@ -17,7 +17,7 @@ noncomputable section
 
 universe uOutcome uι
 
-/-- Concrete auxiliary-space producer from a direct total-rank bound. -/
+/-- Concrete auxiliary-space construction from a direct total-rank bound. -/
 lemma projectiveLowRankSum_auxData_of_rank_bound {Outcome : Type uOutcome}
     [Fintype Outcome] [Nonempty Outcome]
     {ι : Type uι} [Fintype ι] [Nonempty ι]
@@ -44,7 +44,7 @@ lemma projectiveLowRankSum_auxData_of_rank_bound {Outcome : Type uOutcome}
     have hcard_pos : 0 < Fintype.card ι := Fintype.card_pos_iff.mpr inferInstance
     simpa [auxSpace] using Nat.succ_le_of_lt hcard_pos
 
-/-- Concrete auxiliary-space producer for the exact-projector case.
+/-- Concrete auxiliary-space construction for the exact-projector case.
 
 When the honest sigma-carrier `Σ a, Fin (rank R_a)` is nonempty, we use its
 lifted finite-enumeration model. If all ranks vanish, then that carrier is
@@ -63,7 +63,7 @@ lemma projectiveLowRankSum_auxData_of_projectors {Outcome : Type uOutcome}
   exact projectiveLowRankSum_auxData_of_rank_bound (m := m)
     (by simpa [m] using sum_rank_le_card_of_projectors_le_one R hproj htotal_le_one)
 
-/-- Concrete rank-reduction producer once the rounded family is already an exact
+/-- Concrete rank-reduction construction once the rounded family is already an exact
 projector submeasurement `∑_a R_a ≤ I`.
 
 This exact-projector branch is currently kept for the blueprint cross-reference
@@ -114,7 +114,7 @@ lemma projectiveLowRankSum_of_projectors {Outcome : Type uOutcome}
       (R := R.outcome) (hproj := hR.projective) hsum_le_one
   · simpa [data] using hAuxDim
 
-/-- Concrete rank-reduction producer once the rounded projectors already have
+/-- Concrete rank-reduction construction once the rounded projectors already have
 total rank at most the ambient dimension. This is the `r ≤ d` branch of the
 paper's rank-reduction proof, and is also the final packaging step after the
 `r > d` truncation branch constructs its lower-rank family. -/
@@ -482,8 +482,8 @@ after the rounded family `R_a` has been obtained.  It starts from a chosen
 rounded family carrying the explicit witness
 `RoundingToProjectorsWitness ψ A ζ q`; equivalently, it consumes a concrete
 witness of the statement `projectiveNonMeasurement ψ A ζ`.  The paper-facing
-wrapper `projectiveLowRankSum` applies the rounding lemma internally before
-calling this constructor.
+`projectiveLowRankSum` applies the rounding lemma internally before calling
+this constructor.
 
 The auxiliary space `ℂ^m` and the projective measurement
 `T_a = ∑_i |a,i⟩⟨a,i|` come from the subsequent
@@ -493,10 +493,10 @@ the paper's `r > d` truncation branch from orthonormalization.tex:559-658: it
 chooses the top-overlap `Large` set, assembles the truncated projectors from
 `MIPStarRE.Quantum.IsProj.rangeONB`, proves the `4√ζ` truncation error, and
 then builds the finite auxiliary projective measurement from the resulting rank
-bound. The broader downstream `QXPLayerData` producer is intentionally separated
-from this rank-reduction theorem: its API now asks only for the primitive
-`X / XHat / P` identities used later, rather than for explicit rectangular
-complex-SVD matrices. -/
+bound. The broader downstream `QXPLayerData` construction is intentionally
+separated from this rank-reduction theorem: its statement now requires only the
+primitive `X / XHat / P` identities used later, rather than explicit
+rectangular complex-SVD matrices. -/
 lemma projectiveLowRankSum_of_roundingWitness {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     [Fintype Outcome]

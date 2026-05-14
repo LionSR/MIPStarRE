@@ -18,8 +18,7 @@ Instructions:
    `admit`, `axiom`, `unsafe`, `native_decide`,
    `unsafeCast`, `unsafeCoerce`, `lcProof`, `ofReduceBool`, or
    `ofReduceNat`.
-4. Do not fix a warning by adding bridge, residual, repair, package, producer,
-   proof-obligation input, hypotheses-bundle, assumptions-bundle, or arbitrary
+4. Do not fix a warning by adding bridge, residual, repair, package, producer, witness, wrapper, proof-obligation input, hypotheses-bundle, assumptions-bundle, or arbitrary
    implication hypotheses to a paper-facing theorem.  These are not linter
    fixes.  If a warning cannot be removed without changing a paper-facing
    statement or adding such proof data, leave it unchanged and report the

@@ -11,13 +11,13 @@ docs/PROOF_INTEGRITY.md for the full integrity ruleset.
 If a mathematical result looks wrong, too strong, or suspiciously general, scout
 the LaTeX sources in `references/ldt-paper/` and cite the specific paper/section.
 For paper-labelled declarations, do not repair a build failure by adding bridge,
-residual, repair, package, producer, proof-obligation input, hypotheses bundle,
+residual, repair, package, producer, witness, wrapper, proof-obligation input, hypotheses bundle,
 assumptions bundle, or arbitrary hypothesis inputs. The only acceptable extra
 hypotheses are boundary conditions genuinely needed to state the same
 mathematics in Lean, such as positivity for a division, nonemptiness,
 decidability, or a field-model instance. Proof-debt objects are not boundary
 conditions. Do not introduce a new conditional helper, proof-debt bundle,
-producer, or obligation package merely to keep the branch compiling. If the
+producer, witness, wrapper, or obligation package merely to keep the branch compiling. If the
 source-faithful proof is not available, keep the paper statement intact and
 leave the missing proof as a tracked `sorry`; a separately named target is
 acceptable only when it is itself a theorem to prove from the paper hypotheses,

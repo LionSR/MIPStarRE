@@ -41,8 +41,7 @@ axis that matters:
   `[Nontrivial A]`/`[Fintype d]`/etc. in Lean that the blueprint
   omits).
   For a theorem, lemma, or proposition that cites a paper statement,
-  an additional bridge, residual, repair, package, producer,
-  proof-obligation input, or generic hypotheses bundle, generic assumptions bundle, or arbitrary
+  an additional bridge, residual, repair, package, producer, witness, wrapper, proof-obligation input, or generic hypotheses bundle, generic assumptions bundle, or arbitrary
   hypothesis input is a mathematical mismatch. The only acceptable extra
   hypotheses are boundary conditions genuinely needed to state the same
   mathematics in Lean, such as positivity for a division, nonemptiness,

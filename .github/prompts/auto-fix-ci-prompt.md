@@ -24,7 +24,7 @@ Instructions:
      citation.  If the source-faithful proof cannot be completed and the
      statement is already faithful, stop and comment on the PR with the missing
      named lemma or internal obligation to discharge.  Do not create a new
-     conditional helper, proof-debt bundle, producer, or obligation package as
+     conditional helper, proof-debt bundle, producer, witness, wrapper, or obligation package as
      the fix.
    - Type mismatch: check expected vs actual types and fix the proof term.
    - Unknown identifier / import error: add the correct `import` statement.
@@ -50,8 +50,7 @@ Quality bar (same rubric as Claude Code Review — your fix MUST satisfy ALL of 
 - Proof correctness (BLOCKER): structured proofs, not brute-force `simp`/`omega`/`ring` chains. If a result looks wrong, too strong, or suspiciously general, scout `references/ldt-paper/` first, then `blueprint/src/chapter/`, compare hypotheses/conclusions, and cite the specific source path, label, and line.
 - Source-statement fidelity (BLOCKER): paper-labelled or blueprint-linked
   declarations must preserve the cited statement up to faithful formal encoding.
-  Do not add load-bearing bridge, residual, repair, package, producer,
-  proof-obligation input, hypotheses bundle, assumptions bundle, or arbitrary
+  Do not add load-bearing bridge, residual, repair, package, producer, witness, wrapper, proof-obligation input, hypotheses bundle, assumptions bundle, or arbitrary
   implication hypotheses.
   The only acceptable extra hypotheses are
   boundary conditions genuinely needed to state the same mathematics in Lean,
