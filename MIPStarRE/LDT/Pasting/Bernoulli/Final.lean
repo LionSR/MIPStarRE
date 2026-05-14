@@ -667,8 +667,9 @@ theorem ldPastingNontrivialPublicBranch
     (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
-  -- Issue #1601: derive this unrestricted-regime statement from
-  -- `ldPastingNontrivial` while preserving the statement of `thm:ld-pasting`.
+  -- The direct projection from `ldPastingNontrivial` fails here because that
+  -- construction is currently elaborated for a small scalar field model, while
+  -- this statement keeps the field model from `thm:ld-pasting`.
   sorry
 
 /-- Source-facing form of `thm:ld-pasting`.
