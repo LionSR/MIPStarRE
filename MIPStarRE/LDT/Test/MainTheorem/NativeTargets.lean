@@ -24,7 +24,15 @@ branch of `mainFormal`.  It reconstructs the paper line-130 cross consistency
 from the role witness and constructs the line-130 orthonormalization witness.
 The remaining completion step is the explicit proof obligation in
 `MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency`;
-no match-mass or diagonal-consistency data is accepted as an extra input. -/
+no match-mass or diagonal-consistency data is accepted as an extra input.
+
+**Unfaithful:** This construction currently depends transitively on
+`leftLiftedProjectivizationRepairWithMatchMass`, whose
+outcome-expectation preservation theorem is not yet derived from
+`references/ldt-paper/inductive_step.tex:130-173`.  This is documented in
+issue #1610.  Elimination: prove the QXP outcome-expectation preservation
+theorem from the paper hypotheses and remove this propagated dependency.
+-/
 theorem nonempty_ofRoleWitness
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

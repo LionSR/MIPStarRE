@@ -488,7 +488,8 @@
 	construction-level proof gap is the QXP outcome-expectation preservation
 	theorem
 	\texttt{leftLiftedProjectivizationRepairWithMatchMass}, which is the
-	lowest current target for the line-169 route described in the paper.
+	lowest current target for the line-169 route described in the paper and is
+	tracked by issue~\#1610.
 
 	The remaining proof gap is not represented by diagonal-consistency,
 	match-mass, or other auxiliary input hypotheses.  The paper-facing theorem
@@ -771,10 +772,10 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 	Remark~\ref{rem:lean-line169-projectivization-match-mass} avoids that
 	widening and is part of the match-mass witness route.
 	No proof-level completeness tag is claimed here while \texttt{mainFormal}
-	itself has a tracked proof gap for constructing the projective-completion
-	witness from the paper hypotheses; the Section~6 role witness follows from
-	\texttt{mainInduction}, whose successor branch carries its own tracked gap
-	(issue~\#1458).
+	itself has tracked proof debt for constructing the projective-completion
+	witness from the paper hypotheses: the Section~6 successor branch is tracked
+	in issue~\#1458, and the transitive QXP match-mass preservation gap is
+	tracked in issue~\#1610.
 
 \end{remark}
 \begin{proof}

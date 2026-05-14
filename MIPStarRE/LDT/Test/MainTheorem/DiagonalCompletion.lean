@@ -348,7 +348,16 @@ Those facts must be proved from the role-block construction and the
 orthonormalization argument.  The checked lemmas above prove the completion
 argument from the two named match-mass preservation obligations, so this
 declaration no longer hides the remaining construction as an additional
-assumption. -/
+assumption.
+
+**Unfaithful:** This construction currently depends, through the supplied
+orthonormalization witness, on `leftLiftedProjectivizationRepairWithMatchMass`,
+whose outcome-expectation preservation theorem is not yet derived from
+`references/ldt-paper/inductive_step.tex:130-173`.  This is documented in
+issue #1610.  Elimination: prove the QXP outcome-expectation preservation
+theorem from the paper hypotheses and use it to discharge the match-mass
+preservation obligations.
+-/
 theorem nonempty_ofDiagonalConsistency
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
