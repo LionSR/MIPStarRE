@@ -425,6 +425,11 @@ python3 scripts/blueprint_lean_sync.py --root . --ci
 lake exe checkdecls blueprint/lean_decls
 ```
 
+Commands that may invoke Lake, Lean, blueprint tooling, or Python audits are run
+in a subshell with Git's local hook environment variables cleared.  This avoids
+leaking the outer pre-push `GIT_DIR` or related variables into Lake package
+checkouts, where nested `git` commands need to resolve their own repositories.
+
 For changed Lean declarations, pre-push also runs the reverse blueprint coverage
 warning against `origin/main`:
 
