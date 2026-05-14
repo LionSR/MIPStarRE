@@ -10,7 +10,7 @@ import MIPStarRE.LDT.Pasting.BridgeLemmas.OverAllOutcomes
 /-!
 # Section 12 pasting: final pasting theorems
 
-Final completeness and pasting wrappers.
+Final completeness and pasting theorems.
 -/
 
 namespace MIPStarRE.LDT.Pasting
@@ -444,10 +444,10 @@ lemma ldPastingSubMeas
 The source theorem is `references/ldt-paper/ld-pasting.tex`, lines 12--50.
 Lines 52--55 explain that the proof may assume the nontrivial regime
 `eps, delta, gamma, zeta, d / q ≤ 1`, since the complementary cases are
-trivial.  This declaration currently exposes the public assumptions
+trivial.  This declaration states the restricted assumptions
 `gamma ≤ 1`, `zeta ≤ 1`, `params.d ≤ params.q`, `0 < params.d`, and `1 ≤ k`.
-The unrestricted source-facing statement is `ldPasting`; its complementary
-trivial cases are tracked by issue #1601. -/
+The unrestricted statement aligned with the paper is `ldPasting`; its
+complementary trivial cases are tracked by issue #1601. -/
 theorem ldPastingNontrivial
     (params : Parameters)
     [FieldModel params.q]
@@ -668,8 +668,8 @@ The restricted construction theorem `ldPastingNontrivial` proves the nontrivial
 analytic regime for the canonical pasted measurement.  This auxiliary statement
 records the remaining task of applying that construction to the unrestricted
 theorem without changing the statement of `thm:ld-pasting`.  Issue #1627 tracks
-the universe-generalization needed to project from the existing construction
-theorem. -/
+the additional generality needed to apply the existing construction theorem to
+the unrestricted statement. -/
 theorem ldPastingNontrivialPublicBranch
     (params : Parameters)
     [FieldModel params.q]
