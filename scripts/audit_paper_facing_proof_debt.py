@@ -13,8 +13,9 @@ review aid for that boundary:
   declaration name and before the result type;
 * report occurrences of blocking proof-debt vocabulary such as
   ``BridgeHypotheses``, ``Residual``, ``RepairInput``, ``Package``,
-  ``Producer``, ``Obligation``, an ``Input`` bundle, a wrapper, or a generic
-  ``Hypotheses`` / ``Assumptions`` bundle;
+  ``Bundle``, ``Producer``, ``Obligation``, an ``Input`` bundle, a wrapper,
+  an ``Unfaithful`` marker type, or a generic ``Hypotheses`` /
+  ``Assumptions`` bundle;
 * reject paper-facing blueprint entries that point to declaration names of the
   form ``*_of...Obligations``, ``*_of...Residual``, ``*_of...Repair``, or
   ``conditional...``, even when the declaration header itself has no suspicious
@@ -55,14 +56,16 @@ DEBT_TOKEN_RE = re.compile(
     r"(?:[A-Za-z_][A-Za-z0-9_']*)?"
     r"(?:"
     r"Bridge|Residual|Repair|Package|Producer|Input|Hypotheses|Assumptions"
-    r"|Hypothesis|Obligation|Obligations|Wrapper|CompletionTransport"
+    r"|Hypothesis|Obligation|Obligations|Wrapper|Bundle|Conditional"
+    r"|Unfaithful|CompletionTransport"
     r")"
     r"[A-Za-z0-9_']*"
     r"|"
     r"(?:h|has|mk|of)?"
     r"(?:"
     r"bridge|residual|repair|package|producer|input|hypotheses|assumptions"
-    r"|hypothesis|obligation|obligations|wrapper|completionTransport"
+    r"|hypothesis|obligation|obligations|wrapper|bundle|conditional"
+    r"|unfaithful|completionTransport"
     r")"
     r"[A-Za-z0-9_']*"
     r")"
@@ -107,7 +110,8 @@ CONDITIONAL_DECL_NAME_RE = re.compile(
     r"|(?:^|_)of(?:[A-Z][A-Za-z0-9_']*)?"
     r"(?:"
     r"Bridge|Obligations|Obligation|Residual|Repair|Package|Input|Hypotheses"
-    r"|Assumptions|Statement|Output|Conclusion|Witness|Wrapper|Slackness|Dominance"
+    r"|Assumptions|Statement|Output|Conclusion|Witness|Wrapper|Bundle|Unfaithful"
+    r"|Slackness|Dominance"
     r")"
     r"[A-Za-z0-9_']*"
     r"|(?:^|_)ofRepaired[A-Za-z0-9_']*"
