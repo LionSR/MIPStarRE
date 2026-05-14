@@ -39,7 +39,7 @@ theorem ldPasting_of_context
       H = constructedPastedMeasurement params ctx.family ctx.k ∧
         LdPastingConclusion params ctx.strategy ctx.family H
           ctx.eps ctx.delta ctx.gamma ctx.kappa ctx.zeta ctx.k :=
-  ldPasting params ctx.strategy ctx.eps ctx.delta ctx.gamma ctx.kappa ctx.zeta
+  ldPastingNontrivial params ctx.strategy ctx.eps ctx.delta ctx.gamma ctx.kappa ctx.zeta
     ctx.good ctx.gamma_le_one ctx.zeta_le_one ctx.dq_le_q ctx.d_pos
     ctx.family ctx.complete ctx.consistent ctx.selfConsistent ctx.bounded
     ctx.k ctx.hk_pos ctx.hk
@@ -191,16 +191,15 @@ respectively. -/
 theorem commutingWithGComplete_of_context
     (params : Parameters) [FieldModel params.q]
     (ctx : LdPastingContext params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
     (hgamma_nonneg : 0 ≤ ctx.gamma) (hzeta_nonneg : 0 ≤ ctx.zeta)
-    (hcom : Commutativity.ComMainConclusion params ctx.strategy ctx.family G
+    (hcom : Commutativity.ComMainConclusion params ctx.strategy ctx.family
       ctx.gamma ctx.zeta)
     (selfConsistentComplete :
       GCompleteSelfConsistencyStatement params ctx.strategy.state
         ctx.family ctx.zeta) :
     CommutingWithGCompleteStatement params ctx.strategy.state ctx.family
       ctx.gamma ctx.zeta :=
-  commutingWithGComplete params ctx.strategy ctx.family G ctx.gamma ctx.zeta
+  commutingWithGComplete params ctx.strategy ctx.family ctx.gamma ctx.zeta
     hgamma_nonneg ctx.gamma_le_one hzeta_nonneg ctx.zeta_le_one ctx.dq_le_q
     hcom selfConsistentComplete
 

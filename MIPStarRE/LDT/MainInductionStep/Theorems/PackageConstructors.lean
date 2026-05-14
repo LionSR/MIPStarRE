@@ -368,7 +368,7 @@ theorem AveragedPastingInput.output
       LdPastingInInductionSectionConclusion params strategy selfPkg.family H
         eps delta gamma pkg.kappa pkg.zeta k := by
   exact
-    ldPastingInInductionSection params strategy eps delta gamma pkg.kappa pkg.zeta
+    ldPastingInInductionSectionNontrivial params strategy eps delta gamma pkg.kappa pkg.zeta
       hgood pkg.gamma_le_one pkg.zeta_le_one pkg.dq_le_q hd
       selfPkg.family pkg.complete pkg.consistent pkg.selfConsistent pkg.bounded k hk_pos hk
 

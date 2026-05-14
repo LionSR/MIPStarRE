@@ -144,7 +144,7 @@ noncomputable def fromHToGPaperTotalError (params : Parameters)
 
 Analytic conclusion for `thm:ld-pasting` once a witness `H` has been fixed.
 
-The theorem `ldPasting` separately records that the chosen witness is the
+The theorem `ldPastingNontrivial` separately records that the chosen witness is the
 canonical construction `constructedPastedMeasurement params family k`, so this
 structure stores only the quantitative conclusion from the paper. -/
 structure LdPastingConclusion (params : Parameters)

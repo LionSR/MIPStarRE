@@ -157,7 +157,9 @@ When such a declaration remains useful, its role should be one of the following:
 |-------------|--------------------|
 | `mainFormal_ofProjectiveCompletionResidual` | Conditional final-transport theorem; keep as reusable proof content, but do not present it as the paper theorem |
 | `MainFormalPostRolePackageDiagonalOrthonormalizationResidual` | Internal residual produced from line-130 cross consistency; do not replace it by an orthonormalization-input hypothesis on `mainFormal` |
-| `LdPastingContext` | Faithfulness-sensitive context for `ldPasting`; audit each field against the Section 12 hypotheses and boundary conditions |
+| `LdPastingContext` | Faithfulness-sensitive context for `ldPastingNontrivial`; audit each field against the Section 12 hypotheses and boundary conditions |
+| `Pasting.ldPastingNontrivial` | Restricted nontrivial-regime form of `thm:ld-pasting`; link only from a Lean-only remark until the complementary trivial cases in `references/ldt-paper/ld-pasting.tex`, lines 52--55, are formalized |
+| `MainInductionStep.ldPastingInInductionSectionNontrivial` | Restricted nontrivial-regime restatement of the pasting theorem for Section 6; do not present it as the unrestricted source theorem |
 
 The former `SelfImprovement.HelperStrongSelfConsistencyInput`,
 `SelfImprovement.OrthonormalizationInput`, `SelfImprovement.FinalFieldsInput`, and
@@ -260,10 +262,10 @@ proof-level `\leanok`:
   Its proof still contains the tracked issue-#1032 `sorry` for the sharp
   `100 * ζ^(1/4)` constant, so proof-level `\leanok` is withheld.
 
-- **`thm:naimark`** (ch04): The Lean declaration records questionwise
-  local dilations, not the full tensor-product correlation statement in
-  the paper.  The comment in the blueprint explicitly says "no \leanok
-  is claimed."
+- **`thm:naimark`** (ch04): The full tensor-product correlation theorem has
+  no attached Lean declaration.  The formalized questionwise local interface is
+  recorded separately in the restricted Lean remark
+  `rem:lean-questionwise-naimark`.
 
 - **`thm:main-formal`** (ch02): The blueprint links to
   `MIPStarRE.LDT.Test.mainFormal`, the intended Lean transcription of the
@@ -271,6 +273,19 @@ proof-level `\leanok`:
   proof chain is not yet closed, so `\leanok` is deliberately withheld for this
   theorem until the repaired-hypotheses and successor-residual obligations are
   discharged.
+
+- **`thm:ld-pasting`** (ch09) and
+  **`thm:ld-pasting-in-induction-section`** (ch10): The paper theorem in
+  `references/ldt-paper/ld-pasting.tex`, lines 12--50, assumes
+  `k >= 400md` but does not state the nontrivial-regime inequalities as
+  hypotheses.  The current Lean declarations `Pasting.ldPastingNontrivial` and
+  `MainInductionStep.ldPastingInInductionSectionNontrivial` prove restricted forms with
+  the additional public assumptions `gamma <= 1`, `zeta <= 1`, `d <= q`,
+  `0 < d`, and `1 <= k`.  Lines 52--55 of the paper explain the reduction to
+  the nontrivial regime, but the complementary trivial cases have not yet been
+  formalized.  The source theorem nodes therefore do not carry primary
+  `\lean{}` links or statement-level `\leanok`; the checked restricted
+  declarations are linked from nearby Lean-only remarks.
 
 ### The `\uses{}` convention
 
