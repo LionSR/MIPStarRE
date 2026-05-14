@@ -317,27 +317,10 @@ theorem hAConsistency_submeas
   have hline : ∀ i : ℕ, i < k →
       LdSandwichLineOnePointStatement params strategy family
         eps delta gamma zeta k i := by
-    have hfacts : GHatFactsStatement params strategy.state family gamma zeta := by
-      have hzeta_nonneg : 0 ≤ zeta := by
-        exact le_trans
-          (bipartiteConsError_nonneg strategy.state
-            (uniformDistribution (Point params.next))
-            (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-            family.evaluatedAtNextPoint)
-          hcons.pointConsistency.offDiagonalBound
-      have hgamma_nonneg : 0 ≤ gamma := by
-        have : 0 ≤ strategy.diagonalFailureProbability := by
-          unfold SymStrat.diagonalFailureProbability
-          exact mul_nonneg (by positivity)
-            (Finset.sum_nonneg fun j _ => bipartiteConsError_nonneg strategy.state _ _ _)
-        exact le_trans this hgood.diagonalLineTest
-      exact gHatFacts params strategy family eps delta gamma zeta
-        hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le
-        hgood hcons hself hbound
     intro i hi
     exact ldSandwichLineOnePoint params strategy eps delta gamma zeta
       hgood hgamma_le hzeta_le hdq_le
-      family hcons hself hbound hfacts k i hi
+      family hcons hself hbound k i hi
   have hHB := hBConsistency params strategy eps delta gamma zeta
     hgood hd family hcons hself hbound k hline
   have hgamma_nonneg : 0 ≤ gamma := by

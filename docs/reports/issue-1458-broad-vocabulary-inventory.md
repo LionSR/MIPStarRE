@@ -1,6 +1,6 @@
 # Issue #1458 Source-Statement Boundary Audit
 
-Date: 2026-05-14.
+Date: 2026-05-14.  Updated: 2026-05-15.
 
 This report records a source-statement audit for paper-facing Lean declarations
 whose public hypotheses contain names such as `Statement`, `Conclusion`,
@@ -20,15 +20,15 @@ case is a statement-drift problem for the paper theorem itself.
 
 ## Summary
 
-The current scan reports 20 unresolved theorem boundaries.  It also records 39
+The current scan reports 14 unresolved theorem boundaries.  It also records 39
 uses of source-construction context and 2 quoted external theorem interfaces.
 The stricter paper-facing proof-debt check finds no remaining proof-debt header
 occurrence of the agreed bridge, residual, repair, package, producer,
 hypothesis, assumption, obligation, wrapper, bundle, or conditional vocabulary
-in source-labelled public inputs.  It separately classifies 24 faithful boundary
+in source-labelled public inputs.  It separately classifies 26 faithful boundary
 inputs, such as the boundedness hypothesis and the error-cascade regime.
 
-This is not a proof that the 20 unresolved declarations are unfaithful.  It is
+This is not a proof that the 14 unresolved declarations are unfaithful.  It is
 the remaining statement-comparison frontier for issue #1458.  The correct
 response is to compare each item with the cited source statement and its proof,
 not to rename the data merely to make the scan silent.
@@ -63,9 +63,10 @@ the self-improvement argument.
 
 ## Chapter 9 Pasting
 
-There are 9 unresolved pasting boundaries, mainly `GHatFactsStatement`,
-`LdSandwichLineOnePointStatement`, and `CommuteGHalfSandwichStatement`.  These
-require a theorem-by-theorem comparison with the Section 12 proof tree.
+There are 3 unresolved pasting boundaries, all involving
+`LdSandwichLineOnePointStatement` in the line-interpolation and
+`hBConsistency` part of the Section 12 proof tree.  These require a
+theorem-by-theorem comparison with the cited source proof.
 
 Several of these records appear to be conclusions of earlier source results
 used in later proofs.  That is not, by itself, a permissible public hypothesis:
@@ -78,7 +79,8 @@ instead hides a construction or transport step which is not yet derived from the
 paper hypotheses, the paper-facing statement should be restored and the missing
 step recorded as a proof obligation.
 
-The former unresolved items `commutativitySwitcheroo` and `gHatFacts` have been
+The former unresolved items `commutativitySwitcheroo`, `gHatFacts`,
+`commuteGHalfSandwich`, `ldSandwichLineOnePoint`, and `fromHToG` have been
 discharged.  The proof which consumes `GCompleteSelfConsistencyStatement` is now
 the internal theorem `commutativitySwitcheroo_ofCompleteSelfConsistency`; the
 paper-facing theorem `commutativitySwitcheroo` derives complete-part
@@ -88,6 +90,16 @@ consumes `GCompleteSelfConsistencyStatement`, `GBotSelfConsistencyStatement`,
 now the internal theorem `gHatFacts_ofSelfConsistencyAndCommutation`.  The
 paper-facing theorem `gHatFacts` derives these four preceding Section 12 results
 from the source hypotheses before invoking that internal theorem.
+
+The proofs which consume `GHatFactsStatement` or
+`CommuteGHalfSandwichStatement` for the half-sandwich, one-point line
+sandwich, and \(H\)-to-\(G\) Bernoulli comparison are now internal theorems:
+`commuteGHalfSandwich_ofGHatFacts`,
+`ldSandwichLineOnePoint_ofGHatFacts`, and
+`fromHToG_ofGHatFactsAndHalfSandwich`.  The paper-facing theorems
+`commuteGHalfSandwich`, `ldSandwichLineOnePoint`, and `fromHToG` derive
+`cor:G-hat-facts` and, where needed, `lem:commute-g-half-sandwich` internally
+from the source hypotheses.
 
 The next pass should cite the relevant Section 12 labels for each remaining
 declaration.  It should not treat all `*Statement` records uniformly: some may
@@ -108,13 +120,11 @@ hypothesis by a source-facing theorem or by a justified imported result.
 
 | Token | Count |
 |---|---:|
-| `GHatFactsStatement` | 4 |
 | `MatrixSdpOptimalWitness` | 4 |
 | `MatrixSdpStatementWithSlackness` | 3 |
 | `LdSandwichLineOnePointStatement` | 3 |
 | `MatrixSdpStatementWithSlacknessAndDominance` | 2 |
 | `SdpStatementWithSlackness` | 2 |
-| `CommuteGHalfSandwichStatement` | 2 |
 
 ## Repair Order
 

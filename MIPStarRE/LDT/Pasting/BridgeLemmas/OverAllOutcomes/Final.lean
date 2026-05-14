@@ -449,15 +449,12 @@ lemma overAllOutcomes
           overAllOutcomesPastedMass params strategy family k ≤
         overAllOutcomesError params eps delta gamma zeta k := by
     by_cases hkEligible : params.d + 1 ≤ k
-    · have hfacts := gHatFacts params strategy family eps delta gamma zeta
-        hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le
-        hgood hcons hself hbound
-      have hline : ∀ i : ℕ, i < k →
+    · have hline : ∀ i : ℕ, i < k →
           LdSandwichLineOnePointStatement params strategy family
             eps delta gamma zeta k i := by
         intro i hi
         exact ldSandwichLineOnePoint params strategy eps delta gamma zeta
-          hgood hgamma_le hzeta_le hdq_le family hcons hself hbound hfacts k i hi
+          hgood hgamma_le hzeta_le hdq_le family hcons hself hbound k i hi
       have hnonglobal := overAllOutcomes_distinct_nonglobal_mass_bound
         params strategy family eps delta gamma zeta k hd
         heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hline
