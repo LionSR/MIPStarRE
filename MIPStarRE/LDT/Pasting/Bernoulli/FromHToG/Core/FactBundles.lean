@@ -3,9 +3,9 @@ import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core.StageMass
 import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich.Setup
 
 /-!
-# Section 12 pasting: fact bundles and error-bound lemma
+# Section 12 pasting: exact identities and error-bound lemma
 
-Prop-bundle structures and the paper-total error absorption lemma that
+Exact recurrence identities and the paper-total error absorption lemma that
 assemble the final `fromHToG` telescope conclusion.
 -/
 
@@ -49,7 +49,7 @@ structure FromHToGAdjacentStageExactFacts
               fromHToGRecurrenceWeight params family prefixLen
                 (prependTypeBit false τtail) * (1 - family.averagedSubMeas.total)))
 
-/-- Package the exact `S`-recurrence bookkeeping facts proved in
+/-- Collect the exact `S`-recurrence identities proved in
 `Core/AveragesAndOps` and `Core/StageMass`. -/
 lemma fromHToGAdjacentStageExactFacts_of_weights
     (params : Parameters)
@@ -63,23 +63,6 @@ lemma fromHToGAdjacentStageExactFacts_of_weights
     fromHToG_incompletePart_average_total_eq params family
   tailWeightRecurrence :=
     fromHToGTailStageMass_succ_weight_recurrence params ψbi family
-
-/-- The adjacent-stage operator/scalar bridge for `fromHToG`.
-
-This package supplies one adjacent-stage move in the paper chain using the two
-`\sqrt{2ζ}` moves from `cor:G-hat-facts` and the two `\sqrt{ν₄}` commutation
-moves from `lem:commute-g-half-sandwich`. -/
-structure FromHToGAdjacentStageFacts
-    (params : Parameters)
-    [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (gamma zeta : Error) (k : ℕ) : Prop where
-  recurrenceStep :
-    ∀ ℓ : ℕ, ℓ < k →
-      |fromHToGStageMass params ψbi family k ℓ -
-          fromHToGStageMass params ψbi family k (ℓ + 1)| ≤
-        fromHToGRecurrenceError params gamma zeta k
 
 set_option maxHeartbeats 800000 in
 -- The scalar proof expands several `rpow` square identities and a nonlinear
@@ -282,36 +265,5 @@ lemma fromHToGPaperTotalError_le
     _ = fromHToGError params gamma zeta k := by
           simp [fromHToGError, thirtysecondSum]
           ring
-
-/-- The scalar telescope bridge for the final `fromHToG` endpoint.
-
-The final Bernoulli-polynomial comparison telescopes the adjacent estimate over all `k`
-stages.  This package records the resulting stage-mass bridge with the paper-total
-error term. -/
-structure FromHToGPaperTelescopeFacts
-    (params : Parameters)
-    [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (gamma zeta : Error) (k : ℕ) : Prop where
-  stageMassBridge :
-    |fromHToGStageMass params ψbi family k 0 -
-        fromHToGStageMass params ψbi family k k| ≤
-      fromHToGPaperTotalError params gamma zeta k
-
-/-- Paper-local fact bundle assembled by the public `fromHToG` wrapper.
-
-It combines the exact `S`-recurrence bookkeeping, the adjacent-stage analytic bridge
-used for `recurrenceStep`, and the paper-total stage bridge used for the final
-Bernoulli-polynomial comparison. -/
-structure FromHToGResidualStageFacts
-    (params : Parameters)
-    [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (gamma zeta : Error) (k : ℕ) : Prop where
-  stageExact : FromHToGAdjacentStageExactFacts params ψbi family
-  adjacent : FromHToGAdjacentStageFacts params ψbi family gamma zeta k
-  paperTelescope : FromHToGPaperTelescopeFacts params ψbi family gamma zeta k
 
 end MIPStarRE.LDT.Pasting

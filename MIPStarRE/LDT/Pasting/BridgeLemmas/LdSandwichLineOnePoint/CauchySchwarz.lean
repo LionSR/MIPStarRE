@@ -28,7 +28,7 @@ lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_inputFacts
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
     {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0)
-    (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi) :
+    (facts : LdSandwichLineOnePointAdjointRawCoreBound params strategy family gamma zeta hi) :
     LdSandwichLineOnePointCSInputFacts params strategy family gamma zeta hi := by
   refine ⟨
     ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_adjointRawCore
@@ -156,7 +156,8 @@ lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_inputFacts
               simpa [O] using (Matrix.posSemidef_self_mul_conjTranspose O).nonneg
             calc
               (∑ u : Unit, ldSandwichLineOnePointCS_Csecond params strategy family hi q gs u) *
-                  (∑ u : Unit, ldSandwichLineOnePointCS_Csecond params strategy family hi q gs u)ᴴ
+                  (∑ u : Unit,
+                    ldSandwichLineOnePointCS_Csecond params strategy family hi q gs u)ᴴ
                   = opTensor (O * Oᴴ) (R * Rᴴ) := by
                     simp [O, R, ldSandwichLineOnePointCS_Csecond, opTensor_mul,
                       conjTranspose_opTensor]
@@ -226,7 +227,8 @@ lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_inputFacts
                   (∑ gs : GHatTupleOutcome params (i + 1),
                     if evalOutcome gs = some a then O gs * (O gs)ᴴ else 0)
                   (R a)) := by
-                simp [evalOutcome, O, R, facts.prefixOriginalSome q,
+                simp [evalOutcome, O, R,
+                  ldSandwichLineOnePointPrefixOriginalFamily_outcome_some params family hi q,
                   ldSandwichLineOnePointCS_orderedHalf]
       _ = ∑ a : Fq params, ∑ gs : GHatTupleOutcome params (i + 1),
               ev strategy.state
@@ -342,7 +344,8 @@ lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_inputFacts
                   (∑ gs : GHatTupleOutcome params (i + 1),
                     if movedEval gs = some a then movedHalf gs * (movedHalf gs)ᴴ else 0)
                   (R a)) := by
-                simp [movedEval, movedHalf, xsMoved, R, facts.movedSome q]
+                simp [movedEval, movedHalf, xsMoved, R,
+                  ldSandwichLineOnePointPrefixMovedFamily_outcome_some params family hi q]
       _ = ∑ a : Fq params, ∑ gs : GHatTupleOutcome params (i + 1),
               ev strategy.state
                 (opTensor (if movedEval gs = some a then movedHalf gs * (movedHalf gs)ᴴ else 0)
@@ -426,7 +429,7 @@ lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_abs_bounds
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
     {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0)
-    (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi) :
+    (facts : LdSandwichLineOnePointAdjointRawCoreBound params strategy family gamma zeta hi) :
     LdSandwichLineOnePointOutcomeSumCSAbsBounds params strategy family gamma zeta hi := by
   let 𝒟 : Distribution (SandwichedLineQuestion params k) :=
     uniformDistribution (SandwichedLineQuestion params k)
@@ -479,7 +482,7 @@ lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_route
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
     {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0)
-    (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi) :
+    (facts : LdSandwichLineOnePointAdjointRawCoreBound params strategy family gamma zeta hi) :
     LdSandwichLineOnePointOutcomeSumCSRoute params strategy family gamma zeta hi := by
   have hbounds :=
     ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_abs_bounds
@@ -514,7 +517,7 @@ lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_bound
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
     {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0)
-    (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi) :
+    (facts : LdSandwichLineOnePointAdjointRawCoreBound params strategy family gamma zeta hi) :
     avgOver (uniformDistribution (SandwichedLineQuestion params k)) (fun q =>
       ∑ a : Fq params,
         ev strategy.state
@@ -577,7 +580,7 @@ lemma ldSandwichLineOnePoint_prefix_linearDefect_average_cauchySchwarz_bound
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
     {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0)
-    (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi) :
+    (facts : LdSandwichLineOnePointAdjointRawCoreBound params strategy family gamma zeta hi) :
     avgOver (uniformDistribution (SandwichedLineQuestion params k)) (fun q =>
       qBipartiteLinearConsDefect strategy.state
         ((ldSandwichLineOnePointPrefixOriginalFamily params family hi) q)
