@@ -193,6 +193,23 @@ Useful proof content should be kept as named construction lemmas, while missing
 orthonormalization or final-field arguments remain direct proof gaps on the
 source-facing theorem until proved from the paper hypotheses.
 
+### Retiring auxiliary declarations
+
+An auxiliary declaration should be removed from the main blueprint route, or
+renamed and documented as a purely internal lemma, when all of the following
+conditions hold.
+
+1. It is not a statement in the cited paper and is not an explicitly cited
+   outside result.
+2. No current proof of a paper-level target needs it as stated.
+3. It assumes stronger proof data, finite-length data, completion data, repair
+   data, synchronization data, or package fields than the paper proof requires.
+
+If such a declaration is still useful as a formal intermediate result, keep it
+as a lemma or a visibly conditional helper with a planned discharge.  It should
+not remain a headline replacement for the paper theorem, and it should not be
+the target of a source-labelled blueprint `\leanok`.
+
 ### The remaining proof obligations in `MainFormal.lean`
 
 The direct tracked `sorry` in `MainFormal.lean` records the remaining

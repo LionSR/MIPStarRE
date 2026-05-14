@@ -86,8 +86,8 @@ Paper origin: `references/ldt-paper/self_improvement.tex:82-181`
 This is not the source-facing SDP theorem: it records only the measurement-total
 and dual-feasibility part that is presently proved without the strong-duality
 and complementary-slackness argument.  The source-shaped target is
-`SdpStatementWithSlackness`, whose current producer is
-`sdp_statement_with_slackness` and is tracked by #1230. -/
+`SdpStatementWithSlackness`; its proof is the deferred SDP strong-duality and
+complementary-slackness obligation tracked by #1230. -/
 structure SdpStatement (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) : Prop where
   witness :

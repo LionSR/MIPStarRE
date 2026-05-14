@@ -108,7 +108,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \end{align}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_mass_eq_avg_pointwise_sandwich_sum}
   Grouping the polynomials according to their value at~$u$ gives
-  \begin{equation}\label{eq:bracketize-the-expression}
+  \begin{equation}\label{eq:group-by-point-value}
     \E_{u} \sum_h \bra{\psi} \bigl(A^{u}_{h(u)} \cdot T_h \cdot A^{u}_{h(u)}\bigr) \ot I \ket{\psi}
     = \E_{u} \sum_a \bra{\psi} \bigl(A^{u}_{a} \cdot T_{[h(u) = a]} \cdot A^{u}_{a}\bigr) \ot I \ket{\psi}.
   \end{equation}
@@ -120,18 +120,21 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helper_mass_eq_avg_pointwise_bracketed_sum}
   \lean{MIPStarRE.LDT.SelfImprovement.helperBracketedCompletenessQuantity_eq_mass}
   We first move the leftmost copy of~$A^u_a$ across the bipartition:
-  \begin{equation}\label{eq:yet-another-move-a}
-    \eqref{eq:bracketize-the-expression}
+  \begin{equation}\label{eq:first-point-projector-transport}
+    \eqref{eq:group-by-point-value}
     \approx_{2\sqrt{\delta}}
     \E_{u} \sum_a \bra{\psi} \bigl(T_{[h(u)=a]} \cdot A^{u}_{a}\bigr) \ot A^{u}_{a} \ket{\psi}.
   \end{equation}
-  The difference is bounded by Cauchy--Schwarz as in~\eqref{eq:move-one-cauchy-schwarz}; the first factor is at most $\sqrt{2\delta}$ by self-consistency of~$A$, and the second is at most~$1$ because $T_{[h(u)=a]} \le I$.
+  The difference is bounded by Cauchy--Schwarz as
+  in~\eqref{eq:move-first-point-projector-cauchy-schwarz}; the first factor is
+  at most $\sqrt{2\delta}$ by self-consistency of~$A$, and the second is at
+  most~$1$ because $T_{[h(u)=a]} \le I$.
   \lean{MIPStarRE.LDT.SelfImprovement.helper_first_move_second_factor_operator_le_one}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_first_move_second_factor_le_one}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_first_move_abs_sub_bracketed_le_two_sqrt_delta}
   We next remove the remaining copy of~$A^u_a$ on Bob's side:
-  \begin{equation}\label{eq:mysterious-case-of-the-disappearing-a}
-    \eqref{eq:yet-another-move-a}
+  \begin{equation}\label{eq:first-moved-completeness}
+    \eqref{eq:first-point-projector-transport}
     \approx_{\sqrt{\delta}}
     \E_{u} \sum_a \bra{\psi} \bigl(T_{[h(u)=a]} \cdot A^{u}_{a}\bigr) \ot I \ket{\psi}.
   \end{equation}
@@ -150,7 +153,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helper_second_move_pointwise_abs_le_sqrt}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_second_move_abs_sub_first_moved_le_sqrt_delta}
   \[
-    \eqref{eq:mysterious-case-of-the-disappearing-a}
+    \eqref{eq:first-moved-completeness}
     = \sum_h \bra{\psi} \bigl(T_h \cdot \E_{u} A^u_{h(u)}\bigr) \ot I \ket{\psi}
     = \sum_h \bra{\psi} (T_h \cdot Z) \ot I \ket{\psi}
     = \bra{\psi} Z \ot I \ket{\psi}.
@@ -161,7 +164,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helper_linearized_completeness_quantity_eq_dual_mass_of_complementary_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_slackness_eq_of_helper_with_slackness}
   Thus
-  \begin{equation}\label{eq:gonna-use-this-later-H-versus-Z}
+  \begin{equation}\label{eq:h-versus-z-lower-bound}
     \sum_h \bra{\psi} H_h \ot I \ket{\psi} \geq \bra{\psi} Z \ot I \ket{\psi} - 3\sqrt{\delta}.
   \end{equation}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_hhat_vs_z_of_cauchy_schwarz_and_complementary_slackness}
@@ -191,7 +194,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
 
   \emph{Proof of \ref{item:self-improvement-A-consistency}.}
   The inconsistency of~$H$ with~$A$ is
-  \begin{equation}\label{eq:consistency-with-A-baby-step}
+  \begin{equation}\label{eq:point-consistency-expansion}
     \E_{u} \sum_{a \neq b} \bra{\psi} A^{u}_a \ot H_{[h(u) = b]} \ket{\psi}
     = \E_{u} \sum_{a, h: h(u) \neq a} \bra{\psi} A^{u}_a \ot H_h \ket{\psi}.
   \end{equation}
@@ -214,7 +217,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helper_point_consistency_of_selected_chain_selfConsistency_globalVariance}.
   Apply Lemma~\ref{lem:add-in-u} with $\mathcal O=\F_q$, $M=A$, and $S_u=\{(a,h):h(u)\neq a\}$. Then
   \[
-    \eqref{eq:consistency-with-A-baby-step}
+    \eqref{eq:point-consistency-expansion}
     \approx_{4 \sqrt{\zeta_{\mathrm{variance}}}}
     \E_{u} \sum_{a, h: h(u) \neq a} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot A^{u}_a \cdot A^{u}_{h(u)}\bigr)\ot T_h \ket{\psi},
   \]
@@ -246,25 +249,25 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.ev_opTensor_pointConditioned_sandwichedPolynomialOutcome_outer_eq_indicator}
   \lean{MIPStarRE.LDT.SelfImprovement.polynomial_off_diagonal_outer_sandwich_eq_indicator_avg}
   The strong self-consistency expression is
-  \begin{equation}\label{eq:self-consistency-baby-step}
+  \begin{equation}\label{eq:self-consistency-expansion}
     \sum_{h\in\polyfunc{m}{q}{d}} \bra{\psi} H_h \ot H_h \ket{\psi}
     = \E_{u} \sum_{h \in \polyfunc{m}{q}{d}} \bra{\psi} H_h^{u} \ot H_h \ket{\psi}.
   \end{equation}
   Apply Lemma~\ref{lem:add-in-u} with $\mathcal O=\polyfunc{m}{q}{d}$, $M=H$, and $S_u=\{(h,h):h\in\polyfunc{m}{q}{d}\}$. This gives
-  \begin{equation}\label{eq:release-the-kraken}
-    \eqref{eq:self-consistency-baby-step}
+  \begin{equation}\label{eq:add-point-conditioning}
+    \eqref{eq:self-consistency-expansion}
     \approx_{4 \sqrt{\zeta_{\mathrm{variance}}}}
     \E_{u} \sum_{h \in \polyfunc{m}{q}{d}} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot H_h^{u} \cdot A^{u}_{h(u)}\bigr) \ot T_h \ket{\psi}.
   \end{equation}
   We next enlarge the sum from $h'=h$ to all pairs $h,h'$:
-  \begin{equation}\label{eq:threw-in-h-prime}
-    \eqref{eq:release-the-kraken}
+  \begin{equation}\label{eq:enlarge-polynomial-sum}
+    \eqref{eq:add-point-conditioning}
     \approx_{2\sqrt{\zeta_{\mathrm{variance}}} + \frac{md}{q}}
     \E_{u} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot H^{u}_{h'} \cdot A^{u}_{h(u)}\bigr) \ot T_h \ket{\psi}.
   \end{equation}
   The added off-diagonal contribution is
   \begin{align}
-    \eqref{eq:threw-in-h-prime}-\eqref{eq:release-the-kraken}
+    \eqref{eq:enlarge-polynomial-sum}-\eqref{eq:add-point-conditioning}
     &= \E_{u} \sum_{h \neq h'} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot H^{u}_{h'} \cdot A^{u}_{h(u)}\bigr) \ot T_h \ket{\psi} \notag\\
     &= \E_{u} \sum_{h \neq h'} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot T_{h'} \cdot A^{u}_{h(u)}\bigr) \ot T_h \ket{\psi} \cdot \bone{h(u) = h'(u)}, \label{eq:added-indicator}
   \end{align}
@@ -284,17 +287,17 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   The first factor is bounded by $\sqrt{\zeta_{\mathrm{variance}}}$ via Lemma~\ref{lem:global-variance-of-points}, and the second by~$1$ because $T$ and $H^u$ are submeasurements.
 
   Repeating the same argument for the remaining copy of~$A$ yields
-  \begin{equation}\label{eq:swapped-u-for-v-this-time-it's-personal}
+  \begin{equation}\label{eq:replace-second-point-conditioner}
     \eqref{eq:swapped-u-for-v}
     \approx_{\sqrt{\zeta_{\mathrm{variance}}}}
     \E_{u,v} \sum_{h \neq h'} \bra{\psi} \bigl(A^{v}_{h(v)} \cdot T_{h'} \cdot A^{v}_{h(v)}\bigr) \ot T_h \ket{\psi} \cdot \bone{h(u) = h'(u)}.
   \end{equation}
   The same intermediate estimate gives
-  \begin{equation}\label{eq:gonna-use-this-later}
+  \begin{equation}\label{eq:swapped-indicator-total-bound}
     \E_{u,v} \sum_{h \neq h'} \bra{\psi}  \bigl(A^{v}_{h(v)} \cdot T_{h'} \cdot A^{v}_{h(v)}\bigr)\ot T_h\ket{\psi}
     \leq 1,
   \end{equation}
-  so Schwartz--Zippel bounds the indicator average by $md/q$ and proves~\eqref{eq:threw-in-h-prime}.
+  so Schwartz--Zippel bounds the indicator average by $md/q$ and proves~\eqref{eq:enlarge-polynomial-sum}.
   \lean{MIPStarRE.LDT.SelfImprovement.polynomial_collision_pointMeasurement_sandwichTensor_avg_le_mdq}
   \lean{MIPStarRE.LDT.SelfImprovement.polynomial_off_diagonal_swapped_indicator_sandwich_avg_le_mdq}
   \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalOuterSandwichQuantity}
@@ -307,8 +310,8 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalOuterSandwichQuantity_le_two_sqrt_variance_add_mdq}
   \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalOuterSandwichQuantity_le_two_sqrt_variance_add_mdq_of_abs_transports}
 
-  Using~\eqref{eq:h-blt}, the right-hand side of~\eqref{eq:threw-in-h-prime} is
-  \begin{equation}\label{eq:delete-an-A}
+  Using~\eqref{eq:h-blt}, the right-hand side of~\eqref{eq:enlarge-polynomial-sum} is
+  \begin{equation}\label{eq:remove-point-projector}
     \E_{u} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi} \bigl(H^{u}_{h'} \cdot A^{u}_{h(u)}\bigr) \ot T_h \ket{\psi}.
   \end{equation}
   \lean{MIPStarRE.LDT.SelfImprovement.sandwichedPolynomialOutcome_mul_pointConditioned_eq_ite}
@@ -318,14 +321,14 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helperFullOuterSandwichQuantity_eq_release_add_offDiagonalOuterSandwichQuantity}
   \lean{MIPStarRE.LDT.SelfImprovement.helperFullOuterSandwichQuantity_eq_deleteAQuantity}
   Replace the remaining copy of $A^u_{h(u)}$ by $A^v_{h(v)}$:
-  \begin{equation}\label{eq:swap-u-for-v-attack-of-the-clones}
-    \eqref{eq:delete-an-A}
+  \begin{equation}\label{eq:replace-final-point-conditioner}
+    \eqref{eq:remove-point-projector}
     \approx_{\sqrt{\zeta_{\mathrm{variance}}}}
     \E_{u,v} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi} \bigl(H^{u}_{h'} \cdot A^{v}_{h(v)}\bigr) \ot T_h \ket{\psi}.
   \end{equation}
   Here the first Cauchy--Schwarz factor is at most~$1$ because $T$ and $H^u$ are submeasurements, and the second is again bounded by Lemma~\ref{lem:global-variance-of-points}. Finally move this last copy of~$A^v_{h(v)}$ to Bob's side:
   \begin{equation}\label{eq:move-over-v}
-    \eqref{eq:swap-u-for-v-attack-of-the-clones}
+    \eqref{eq:replace-final-point-conditioner}
     \approx_{\sqrt{2\delta}}
     \E_{u,v} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi} H^{u}_{h'}  \ot \bigl(T_h \cdot A^{v}_{h(v)}\bigr) \ket{\psi}.
   \end{equation}
@@ -338,7 +341,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
     \eqref{eq:move-over-v}
     \ge \sum_h \bra{\psi} H_h \ot I \ket{\psi} - 4\sqrt{\zeta_{\mathrm{variance}}}.
   \]
-  Combining~\eqref{eq:release-the-kraken}, \eqref{eq:threw-in-h-prime}, \eqref{eq:swap-u-for-v-attack-of-the-clones}, and~\eqref{eq:move-over-v} gives
+  Combining~\eqref{eq:add-point-conditioning}, \eqref{eq:enlarge-polynomial-sum}, \eqref{eq:replace-final-point-conditioner}, and~\eqref{eq:move-over-v} gives
   \[
     \sum_h \bra{\psi} H_h \ot H_h \ket{\psi}
     \ge \sum_h \bra{\psi} H_h \ot I \ket{\psi}
@@ -416,7 +419,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
     -\E_{u} \sum_a \bra{\psi}  A^{u}_{a} \ot H_{[h(u)=a]} \ket{\psi}
     \le \bra{\psi} Z \ot I \ket{\psi} - \sum_h \bra{\psi} I \ot H_h \ket{\psi} + 4 \sqrt{\zeta_{\mathrm{variance}}}.
   \]
-  By~\eqref{eq:gonna-use-this-later-H-versus-Z}, the right-hand side is at most $3\sqrt{\delta}+4\sqrt{\zeta_{\mathrm{variance}}}$. Substituting the definition of $\zeta_{\mathrm{variance}}$ and collecting terms gives
+  By~\eqref{eq:h-versus-z-lower-bound}, the right-hand side is at most $3\sqrt{\delta}+4\sqrt{\zeta_{\mathrm{variance}}}$. Substituting the definition of $\zeta_{\mathrm{variance}}$ and collecting terms gives
   \lean{MIPStarRE.LDT.SelfImprovement.helper_boundedness_error_le_selfImprovementHelperError}
   \[
     23m\cdot\Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big)
@@ -898,7 +901,7 @@ is not itself the full formal counterpart of Lemma~\ref{lem:add-in-u}.
     &= \E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} M^{u}_o \ot \bigl(A^{v}_{h(v)} \cdot T_h \cdot A^{v}_{h(v)}\bigr) \ket{\psi}. \label{eq:expand-that-H}
   \end{align}
   We claim that
-  \begin{equation}\label{eq:move-one}
+  \begin{equation}\label{eq:move-first-point-projector}
     \eqref{eq:expand-that-H}
     \approx_{\sqrt{2\delta}}
     \E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{v}_{h(v)} \cdot M^{u}_o\bigr) \ot \bigl(T_h \cdot A^{v}_{h(v)}\bigr) \ket{\psi}.
@@ -908,7 +911,7 @@ is not itself the full formal counterpart of Lemma~\ref{lem:add-in-u}.
     \Big|\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{v}_{h(v)} \ot I - I \ot A^{v}_{h(v)}\bigr) \cdot \bigl(M^{u}_o \ot (T_h \cdot A^{v}_{h(v)})\bigr)\ket{\psi}\Big|\\
     \leq
     \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{v}_{h(v)} \ot I - I \ot A^{v}_{h(v)}\bigr) \cdot (M^{u}_o \ot T_h) \cdot \bigl(A^{v}_{h(v)} \ot I - I \ot A^{v}_{h(v)}\bigr) \ket{\psi}}\\
-    \cdot \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi}  M^{u}_o \ot \bigl(A^{v}_{h(v)} \cdot T_h\cdot  A^{v}_{h(v)}\bigr) \ket{\psi}}. \label{eq:move-one-cauchy-schwarz}
+    \cdot \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi}  M^{u}_o \ot \bigl(A^{v}_{h(v)} \cdot T_h\cdot  A^{v}_{h(v)}\bigr) \ket{\psi}}. \label{eq:move-first-point-projector-cauchy-schwarz}
   \end{multline}
   The first factor is controlled by summing over the value $a = h(v)$:
   \begin{align*}
@@ -927,13 +930,13 @@ is not itself the full formal counterpart of Lemma~\ref{lem:add-in-u}.
   which is at most~$1$ because $M^u$ and $H^v$ are submeasurements.
 
   Next, we claim that
-  \begin{equation}\label{eq:move-another}
-    \eqref{eq:move-one}
+  \begin{equation}\label{eq:move-second-point-projector}
+    \eqref{eq:move-first-point-projector}
     \approx_{\sqrt{2\delta}}
     \E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{v}_{h(v)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \ot T_h  \ket{\psi}.
   \end{equation}
   Again, we bound the magnitude of the difference:
-  \begin{align}\label{eq:move-another-cauchy-schwarz}
+  \begin{align}\label{eq:move-second-point-projector-cauchy-schwarz}
     &\Big|\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl((A^{v}_{h(v)} \cdot M^{u}_o) \ot T_h\bigr) \cdot \bigl(A^{v}_{h(v)} \ot I - I \ot A^{v}_{h(v)}\bigr)  \ket{\psi}\Big| \notag\\
     &\leq \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{v}_{h(v)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \ot T_h  \ket{\psi}} \\
     &\qquad\cdot \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{v}_{h(v)} \ot I - I \ot A^{v}_{h(v)}\bigr) \cdot (M^{u}_o \ot T_h) \cdot \bigl(A^{v}_{h(v)} \ot I - I \ot A^{v}_{h(v)}\bigr) \ket{\psi}}. \notag
@@ -949,17 +952,18 @@ is not itself the full formal counterpart of Lemma~\ref{lem:add-in-u}.
   \end{align*}
   using first that $M$ is a submeasurement, then that $A^v_{h(v)} \le I$, and
   finally that $T$ is a submeasurement ($\sum_g T_g \le I$). The second factor is
-  exactly the same expression as in~\eqref{eq:move-one-cauchy-schwarz}, hence at most
+  exactly the same expression
+  as in~\eqref{eq:move-first-point-projector-cauchy-schwarz}, hence at most
   $\sqrt{2\delta}$.
 
   Having moved both copies of~$A$ to the left-hand side, we next show that
-  \begin{equation}\label{eq:change-one}
-    \eqref{eq:move-another}
+  \begin{equation}\label{eq:replace-left-point-conditioner}
+    \eqref{eq:move-second-point-projector}
     \approx_{\sqrt{\zeta_{\mathrm{variance}}}}
     \E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \ot T_h  \ket{\psi}.
   \end{equation}
   The difference is bounded by
-  \begin{multline}\label{eq:change-one-cauchy-schwarz}
+  \begin{multline}\label{eq:replace-left-point-conditioner-cauchy-schwarz}
     \Big|\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl((A^{v}_{h(v)} - A^{u}_{h(u)}) \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \ot T_h  \ket{\psi}\Big|\\
     \leq
     \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl((A^{v}_{h(v)} - A^{u}_{h(u)}) \cdot M^{u}_o \cdot (A^{v}_{h(v)} - A^{u}_{h(u)})\bigr) \ot T_h  \ket{\psi}}\\
@@ -976,16 +980,18 @@ is not itself the full formal counterpart of Lemma~\ref{lem:add-in-u}.
   \end{align*}
   because $M^u$ is a submeasurement. Lemma~\ref{lem:global-variance-of-points}
   bounds this by~$\zeta_{\mathrm{variance}}$ since $T \in \polysub{m}{q}{d}$. The
-  second factor is exactly the first factor from~\eqref{eq:move-another-cauchy-schwarz},
+  second factor is exactly the first factor
+  from~\eqref{eq:move-second-point-projector-cauchy-schwarz},
   so it is at most~$1$.
 
   Finally, we show that
-  \begin{equation}\label{eq:change-another}
-    \eqref{eq:change-one}
+  \begin{equation}\label{eq:replace-right-point-conditioner}
+    \eqref{eq:replace-left-point-conditioner}
     \approx_{\sqrt{\zeta_{\mathrm{variance}}}}
     \E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot M^{u}_o \cdot A^{u}_{h(u)}\bigr) \ot T_h  \ket{\psi}.
   \end{equation}
-  The same Cauchy--Schwarz estimate as in~\eqref{eq:change-one-cauchy-schwarz}, with
+  The same Cauchy--Schwarz estimate
+  as in~\eqref{eq:replace-left-point-conditioner-cauchy-schwarz}, with
   the final copy of $A^v_{h(v)}$ replaced by $A^u_{h(u)}$, gives the same bound
   $\sqrt{\zeta_{\mathrm{variance}}}$. Indeed, the factor containing
   $A^u_{h(u)} \cdot M^u_o \cdot A^u_{h(u)}$ is bounded by~$1$ by the same

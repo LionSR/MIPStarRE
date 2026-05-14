@@ -191,6 +191,12 @@ displayed explicitly.  A scope-restricted theorem may be marked `\leanok` only
 against a blueprint statement that explicitly states the restriction; it must
 not be presented as the unrestricted source theorem.
 
+When a stricter-hypothesis Lean theorem is the only available version near a
+source theorem, the discrepancy must have a paper-gap note or tracking issue.
+The note should identify the missing hypothesis, explain why it is not part of
+the cited statement, and state the plan for eliminating the restriction,
+deriving it internally, or moving the result out of the source-labelled route.
+
 This rule applies especially to declarations named after paper labels such as
 `mainFormal`, `selfImprovement`, `mainInduction`, or other theorem names linked
 from the blueprint by `\lean{...}` and `\leanok`.

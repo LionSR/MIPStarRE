@@ -28,6 +28,12 @@ Paper origin: `references/ldt-paper/self_improvement.tex:255-603`
 (`\label{item:self-improvement-self}` and the subsequent add-in-`u`,
 self-consistency, and variance-swap chain).
 
+**Proof obligation:** This is an internal record for the helper-stage strong
+self-consistency proof, tracked by #1596.  It is not a hypothesis of a
+source-labelled theorem.  Elimination: derive the fields from the
+add-in-`u`, self-consistency, and global-variance estimates, and do not pass
+this record across the public statement of `lem:self-improvement-helper`.
+
 These fields isolate the remaining paper-side obligations in the proof of
 `item:self-improvement-self` once the reduced helper conclusion is fixed:
 
@@ -39,7 +45,7 @@ These fields isolate the remaining paper-side obligations in the proof of
 This structure records the actual intermediate estimates still needed from the
 add-in-`u`, self-consistency, and variance calculations, rather than restating
 the final `BipartiteSSCRel` conclusion as an input.  It is a local proof
-frontier for the helper theorem, not a hypothesis of the source-facing helper
+frontier for the helper theorem, not a hypothesis of the paper-aligned helper
 theorem; the full assembly of these obligations discharges the former #1514
 gap. -/
 structure HelperStrongSelfConsistencyObligations
