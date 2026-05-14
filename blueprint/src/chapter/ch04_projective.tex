@@ -70,16 +70,18 @@
 
 \begin{theorem}[Orthogonalization lemma]\label{thm:orthonormalization}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
-	% No \leanok is attached here while the source-constant proof gap tracked by
-	% issue #1032 remains open.
+	\leanok
+	% The theorem now proves the paper constant and is axiom-clean.  Issue #1032
+	% still tracks the heterogeneous proof of
+	% Lemma~\ref{lem:orthonormalization-main-lemma}, which is a separate
+	% auxiliary lemma and is not used as a proof dependency here.
 	% In Lean, normalization is an explicit hypothesis because the ambient state
 	% record contains positive semidefinite density matrices of arbitrary
 	% normalized trace; this matches the paper's convention that a state is
 	% normalized.
-	% The paper states the constant $100\zeta^{1/4}$.  Lean keeps this
-	% statement under the source theorem name; its proof is the tracked
-	% issue-#1032 gap.  The proved completion-route variant with the weaker
-	% $120\zeta^{1/4}$ bound is recorded separately as
+	% The paper states the constant $100\zeta^{1/4}$, and Lean now proves
+	% this source theorem directly.  The completion-route variant with the
+	% weaker $120\zeta^{1/4}$ bound is recorded separately as
 	% `orthonormalizationCompletionRoute`.
 	\uses{def:strong-self-consistency, def:approx_delta}
 	Let $\ket{\psi}$ be a permutation-invariant state,
@@ -370,10 +372,10 @@
 	expectation formula.
 \end{proof}
 
-\begin{remark}[Lean implementation name for projectivization repair]\label{rem:lean-left-lifted-projectivization-repair-producer}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer}
-	The declaration \texttt{leftLiftedProjectivizationRepair} is the
-	source-facing name for
+	\begin{remark}[Lean implementation name for projectivization repair]\label{rem:lean-left-lifted-projectivization-repair-producer}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer}
+		The declaration \texttt{leftLiftedProjectivizationRepair} is the
+		paper-labelled name for
 	Lemma~\ref{lem:left-lifted-projectivization-repair}.  The older declaration
 	\texttt{leftLiftedProjectivizationRepairProducer} has the same public
 	mathematical statement and is retained for compatibility with existing
@@ -435,9 +437,9 @@
 	\leanok
 	\uses{prop:other-two-notions-of-self-consistency, lem:left-lifted-projectivization-repair}
 
-	The paper theorem \ref{thm:orthonormalization} remains stated in Lean with the
-	\(100\zeta^{1/4}\) constant and a tracked proof gap.  The declaration checked
-	here is the completion-route theorem with the weaker bound
+	The paper theorem \ref{thm:orthonormalization} is proved in Lean with the
+	\(100\zeta^{1/4}\) constant.  The declaration checked here is the
+	completion-route theorem with the weaker bound
 	\(120\zeta^{1/4}\), recorded in
 	\texttt{orthonormalizationCompletionRouteError}.  See
 	\texttt{docs/paper-gaps/issue-1032-orthonormalization-constant.tex}.

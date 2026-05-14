@@ -13,7 +13,7 @@ and the zero family in the large-error regime.
 
 - `references/ldt-paper/orthonormalization.tex` (lines 420-550)
 - Blueprint: Chapter 4 (`blueprint/src/chapter/ch04_projective.tex`)
-- Issues: #1032 (tracking), #422 (mainFormal), #834 (Step 6)
+- Related downstream applications: #422 (mainFormal), #834 (Step 6)
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -363,20 +363,19 @@ private lemma sourceAlmostProjective_eq_zero_per_outcome {Outcome : Type uOutcom
   exact hterms a (by simp)
 
 /-- Construct the paper witness `lem:projective-non-measurement` from the
-almost-projective source defect.
+source almost-projective defect at the paper's `2ζ` scale.
 
-This is the spectral-truncation stage of Section 5: truncate each effect at the
-threshold `1 - sqrt ζ`, use the scalar truncation inequality to control the
-state-dependent operator distance, and sum the pointwise order bound
-`R_a ≤ (1 - sqrt ζ)⁻¹ A_a` to control the total operator. The proof below is
-the direct Lean transcription of `references/ldt-paper/orthonormalization.tex`,
-lines 425-529, in the nontrivial regime `0 < ζ ≤ 1/4`. -/
-theorem projectiveNonMeasurement_of_sourceAlmostProjective
+This is the spectral-truncation stage of Section 5 in the form needed by the
+top-level orthonormalization theorem: the input defect is bounded by `2 * ζ`,
+and choosing the truncation threshold `1 - sqrt ζ` gives the paper's
+`2 * sqrt ζ` closeness bound together with the total bound
+`(1 + 2 * sqrt ζ) * I`. -/
+theorem projectiveNonMeasurement_of_sourceAlmostProjective_two_mul
     {Outcome : Type uOutcome} [Fintype Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error)
     (hζ : 0 < ζ) (hζ_small : ζ ≤ 1 / 4)
-    (hsource : ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ) :
+    (hsource : ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) :
     projectiveNonMeasurement ψ A ζ := by
   classical
   let ε : Error := spectralTruncationError ζ
@@ -394,15 +393,16 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective
   have hε_sq : ε * ε = ζ := by
     dsimp [ε]
     simpa [spectralTruncationError_eq_sqrt, pow_two] using Real.sq_sqrt hζ_nonneg
-  have hclose_scale : (1 / ε) * ζ ≤ 2 * spectralTruncationError ζ := by
+  have hclose_scale : (1 / ε) * (2 * ζ) ≤ 2 * spectralTruncationError ζ := by
     have hε_ne : ε ≠ 0 := ne_of_gt hε_pos
-    have hε_eq : (1 / ε) * ζ = ε := by
+    have hε_eq : (1 / ε) * (2 * ζ) = 2 * ε := by
       field_simp [hε_ne]
       linarith [hε_sq]
-    rw [hε_eq]
-    dsimp [ε]
-    have hε_nonneg : 0 ≤ spectralTruncationError ζ := spectralTruncationError_nonneg hζ_nonneg
-    nlinarith
+    have hEq : (1 / ε) * (2 * ζ) = 2 * spectralTruncationError ζ := by
+      calc
+        (1 / ε) * (2 * ζ) = 2 * ε := hε_eq
+        _ = 2 * spectralTruncationError ζ := by simp [ε]
+    exact hEq.le
   have htotal_scale : 1 / (1 - ε) ≤ 1 + 2 * spectralTruncationError ζ := by
     have hden_pos : 0 < 1 - ε := by linarith
     have hcore : 1 / (1 - ε) ≤ 1 + 2 * ε := by
@@ -416,8 +416,8 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective
   · exact MIPStarRE.LDT.Preliminaries.sddOpRel_mono ψ (uniformDistribution Unit)
       (constOpFamily (A.toSubMeas : OpFamily Outcome ι))
       (constOpFamily (roundedProjectorFamily A ε))
-      ((1 / ε) * ζ) (2 * spectralTruncationError ζ)
-      (roundedProjectorFamily_closeness ψ A ζ ε hε_pos hε_half hsource)
+      ((1 / ε) * (2 * ζ)) (2 * spectralTruncationError ζ)
+      (roundedProjectorFamily_closeness ψ A (2 * ζ) ε hε_pos hε_half hsource)
       hclose_scale
   · have hbase := roundedProjectorFamily_total_le_scale A ε hε_pos hε_half
     have hcoeff_nonneg : 0 ≤ (1 + 2 * ε - 1 / (1 - ε) : Error) := by
@@ -435,6 +435,28 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective
           (((1 + 2 * ε : Error)) : ℂ) • (1 : MIPStarRE.Quantum.Op ι) := by
       simpa [RCLike.real_smul_eq_coe_smul (K := ℂ)] using hsmul_real
     exact le_trans hbase <| by simpa [ε] using hsmul
+
+/-- Construct the paper witness `lem:projective-non-measurement` from a source
+almost-projective defect already bounded by `ζ`.
+
+This is the same theorem as
+`projectiveNonMeasurement_of_sourceAlmostProjective_two_mul`, specialized to the
+stronger input hypothesis `hsource ≤ ζ`. -/
+theorem projectiveNonMeasurement_of_sourceAlmostProjective
+    {Outcome : Type uOutcome} [Fintype Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error)
+    (hζ : 0 < ζ) (hζ_small : ζ ≤ 1 / 4)
+    (hsource : ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ) :
+    projectiveNonMeasurement ψ A ζ := by
+  have hsource_two :
+      ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ := by
+    have hζ_nonneg : 0 ≤ ζ :=
+      le_trans (sourceAlmostProjective_nonneg ψ A) hsource
+    have hζ_le : ζ ≤ 2 * ζ := by nlinarith
+    exact hsource.trans hζ_le
+  exact projectiveNonMeasurement_of_sourceAlmostProjective_two_mul
+    ψ A ζ hζ hζ_small hsource_two
 
 /-- The exact endpoint `ζ = 0` of `lem:projective-non-measurement`.
 
@@ -475,7 +497,7 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_zero
           intro i
           dsimp [ratio]
           by_cases hfi : hherm.eigenvalues i - hherm.eigenvalues i ^ (2 : Nat) = 0
-          · simp [hfi]
+          · simpa only [hfi, if_pos] using (show (0 : Error) ≤ 0 by positivity)
           · have hx0 : 0 ≤ hherm.eigenvalues i :=
               outcome_spectrum_nonneg A a (hherm.eigenvalues i)
                 (hherm.eigenvalues_mem_spectrum_real i)
@@ -485,8 +507,12 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_zero
             have hdef_nonneg : 0 ≤ defect (hherm.eigenvalues i) := by
               dsimp [defect]
               nlinarith [hx0, hx1]
-            simp [hfi]
-            positivity
+            have hgap_nonneg :
+                0 ≤
+                  (hherm.eigenvalues i - truncationCutoff 0 (hherm.eigenvalues i)) ^
+                    (2 : Nat) := by
+              exact sq_nonneg _
+            simpa only [hfi, if_neg] using div_nonneg hgap_nonneg hdef_nonneg
         have hgap_le :
             ∀ x ∈ spectrum ℝ (A.outcome a), gap x ≤ K * defect x := by
           intro x hx
@@ -685,17 +711,18 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_large
       (smul_nonneg hcoeff_nonneg
         (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ι)))
 
-/-- Unconditional constructive producer for `lem:projective-non-measurement`.
+/-- Unconditional constructive producer for `lem:projective-non-measurement`
+from the paper's `2ζ` source-defect bound.
 
 This theorem combines the exact endpoint `ζ = 0`, the nontrivial spectral proof
 for `0 < ζ ≤ 1/4`, and the trivial large-error branch used in the surrounding
 paper argument. -/
-theorem projectiveNonMeasurement_of_sourceAlmostProjective_full
+theorem projectiveNonMeasurement_of_sourceAlmostProjective_two_mul_full
     {Outcome : Type uOutcome} [Fintype Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error)
     (hψ : ψ.IsNormalized)
-    (hsource : ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ) :
+    (hsource : ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) :
     projectiveNonMeasurement ψ A ζ := by
   classical
   by_cases hzero : ζ = 0
@@ -703,11 +730,36 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_full
       simpa [hzero] using hsource
     simpa [hzero] using projectiveNonMeasurement_of_sourceAlmostProjective_zero ψ A hsource0
   · by_cases hsmall : ζ ≤ 1 / 4
-    · have hζ_nonneg : 0 ≤ ζ := le_trans (sourceAlmostProjective_nonneg ψ A) hsource
+    · have hζ_nonneg : 0 ≤ ζ := by
+        have hsource_nonneg : 0 ≤ ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) :=
+          sourceAlmostProjective_nonneg ψ A
+        nlinarith
       have hζ_pos : 0 < ζ := lt_of_le_of_ne hζ_nonneg (Ne.symm hzero)
-      exact projectiveNonMeasurement_of_sourceAlmostProjective ψ A ζ hζ_pos hsmall hsource
+      exact projectiveNonMeasurement_of_sourceAlmostProjective_two_mul
+        ψ A ζ hζ_pos hsmall hsource
     · exact projectiveNonMeasurement_of_sourceAlmostProjective_large ψ A ζ hψ
         (lt_of_not_ge hsmall)
+
+/-- Unconditional constructive producer for `lem:projective-non-measurement`.
+
+This is the specialization of
+`projectiveNonMeasurement_of_sourceAlmostProjective_two_mul_full` to the
+stronger input hypothesis `hsource ≤ ζ`. -/
+theorem projectiveNonMeasurement_of_sourceAlmostProjective_full
+    {Outcome : Type uOutcome} [Fintype Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error)
+    (hψ : ψ.IsNormalized)
+    (hsource : ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ) :
+    projectiveNonMeasurement ψ A ζ := by
+  have hsource_two :
+      ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ := by
+    have hζ_nonneg : 0 ≤ ζ :=
+      le_trans (sourceAlmostProjective_nonneg ψ A) hsource
+    have hζ_le : ζ ≤ 2 * ζ := by nlinarith
+    exact hsource.trans hζ_le
+  exact projectiveNonMeasurement_of_sourceAlmostProjective_two_mul_full
+    ψ A ζ hψ hsource_two
 
 /-- A direct `projectiveNonMeasurement` producer from
 `AlmostProjMeasStatement`.
