@@ -424,8 +424,8 @@ under a name suitable for the blueprint entry
 construction theorem: from the source almost-projective estimate for the
 left-lifted family, it constructs a local projective submeasurement whose left
 lift is close with the `84 ζ^(1/4)` envelope.  The historical `Producer` name
-is kept as implementation API for existing callers; it is not a separate
-source hypothesis. -/
+is retained for compatibility with existing Section 5 declarations; it is not a
+separate source hypothesis. -/
 theorem leftLiftedProjectivizationRepair
     {Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι]
