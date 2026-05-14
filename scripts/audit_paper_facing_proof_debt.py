@@ -154,6 +154,28 @@ EXTERNAL_CITATION_TOKENS = {
     ),
 }
 
+# Source-construction context is the formal counterpart of a paper passage that
+# says "henceforth let ..." and then proves several local lemmas in that fixed
+# context.  These tokens still appear in broad mode so reviewers can see the
+# context boundary, but they are not unresolved proof-debt hypotheses.
+SOURCE_CONTEXT_TOKENS = {
+    "QLayerData": (
+        "source construction context for the fixed rank-reduced Q family and "
+        "auxiliary projectors; see "
+        "references/ldt-paper/orthonormalization.tex:658-795"
+    ),
+    "RankReductionWitness": (
+        "source construction context recording the conclusion of "
+        "lem:projective-low-rank-sum; see "
+        "references/ldt-paper/orthonormalization.tex:540-658"
+    ),
+    "QXPLayerData": (
+        "source construction context for the matrix decomposition and "
+        "X/XHat/P layer; see "
+        "references/ldt-paper/orthonormalization.tex:775-940"
+    ),
+}
+
 # Broad mode should classify mathematical interfaces, not double-count a local
 # variable name whose type is already reported, for example
 # ``(data : QXPLayerData Outcome ι)``.
@@ -231,6 +253,23 @@ class ExternalCitationFinding:
 
 
 @dataclass(frozen=True)
+class SourceContextFinding:
+    """One broad-mode token classified as source construction context."""
+
+    blueprint_file: str
+    blueprint_line: int
+    env_type: str
+    label: str | None
+    lean_decl: str
+    lean_file: str
+    lean_line: int
+    token: str
+    token_line: int
+    header_excerpt: str
+    reason: str
+
+
+@dataclass(frozen=True)
 class ConditionalDeclarationNameFinding:
     """One conditional declaration name used for a paper-facing blueprint entry."""
 
@@ -254,6 +293,7 @@ class AuditResult:
     conditional_decl_findings: tuple[ConditionalDeclarationNameFinding, ...]
     faithful_boundary_findings: tuple[FaithfulBoundaryFinding, ...]
     external_citation_findings: tuple[ExternalCitationFinding, ...]
+    source_context_findings: tuple[SourceContextFinding, ...]
 
     @property
     def ok(self) -> bool:
@@ -342,6 +382,11 @@ def _external_citation_reason(token: str) -> str | None:
     return EXTERNAL_CITATION_TOKENS.get(token)
 
 
+def _source_context_reason(token: str) -> str | None:
+    """Return the citation when ``token`` names fixed source construction context."""
+    return SOURCE_CONTEXT_TOKENS.get(token)
+
+
 def _is_ignored_broad_binder_token(token: str, *, broad_vocabulary: bool) -> bool:
     """Return whether ``token`` is only a broad-mode local binder name."""
     return broad_vocabulary and token in IGNORED_BROAD_BINDER_TOKENS
@@ -374,7 +419,12 @@ def _findings_for_entry(
     decl: LeanDecl,
     *,
     broad_vocabulary: bool,
-) -> tuple[list[DebtFinding], list[FaithfulBoundaryFinding], list[ExternalCitationFinding]]:
+) -> tuple[
+    list[DebtFinding],
+    list[FaithfulBoundaryFinding],
+    list[ExternalCitationFinding],
+    list[SourceContextFinding],
+]:
     lean_path = root / decl.file
     source = lean_path.read_text(encoding="utf-8", errors="replace")
     header, header_start_line = _public_header_after_name(source, decl)
@@ -383,6 +433,7 @@ def _findings_for_entry(
     findings: list[DebtFinding] = []
     faithful_boundary_findings: list[FaithfulBoundaryFinding] = []
     external_citation_findings: list[ExternalCitationFinding] = []
+    source_context_findings: list[SourceContextFinding] = []
     debt_token_re = BROAD_DEBT_TOKEN_RE if broad_vocabulary else STRICT_DEBT_TOKEN_RE
     for match in debt_token_re.finditer(public_inputs):
         token = match.group(0)
@@ -406,6 +457,24 @@ def _findings_for_entry(
                     token_line=token_line,
                     header_excerpt=header_excerpt,
                     reason=reason,
+                )
+            )
+            continue
+        source_context_reason = _source_context_reason(token)
+        if broad_vocabulary and source_context_reason is not None:
+            source_context_findings.append(
+                SourceContextFinding(
+                    blueprint_file=entry.file,
+                    blueprint_line=entry.line,
+                    env_type=entry.env_type,
+                    label=entry.label,
+                    lean_decl=entry.lean_decl,
+                    lean_file=decl.file,
+                    lean_line=decl.line,
+                    token=token,
+                    token_line=token_line,
+                    header_excerpt=header_excerpt,
+                    reason=source_context_reason,
                 )
             )
             continue
@@ -441,7 +510,12 @@ def _findings_for_entry(
                 header_excerpt=header_excerpt,
             )
         )
-    return findings, faithful_boundary_findings, external_citation_findings
+    return (
+        findings,
+        faithful_boundary_findings,
+        external_citation_findings,
+        source_context_findings,
+    )
 
 
 def run_audit(root: Path, *, broad_vocabulary: bool = False) -> AuditResult:
@@ -458,6 +532,7 @@ def run_audit(root: Path, *, broad_vocabulary: bool = False) -> AuditResult:
     conditional_decl_findings: list[ConditionalDeclarationNameFinding] = []
     faithful_boundary_findings: list[FaithfulBoundaryFinding] = []
     external_citation_findings: list[ExternalCitationFinding] = []
+    source_context_findings: list[SourceContextFinding] = []
     for entry in entries:
         decl = decls.get(entry.lean_decl)
         if decl is None:
@@ -465,7 +540,7 @@ def run_audit(root: Path, *, broad_vocabulary: bool = False) -> AuditResult:
             continue
         if conditional_finding := _conditional_decl_name_finding(entry, decl):
             conditional_decl_findings.append(conditional_finding)
-        entry_findings, entry_faithful, entry_external = _findings_for_entry(
+        entry_findings, entry_faithful, entry_external, entry_source_context = _findings_for_entry(
             root,
             entry,
             decl,
@@ -474,6 +549,7 @@ def run_audit(root: Path, *, broad_vocabulary: bool = False) -> AuditResult:
         findings.extend(entry_findings)
         faithful_boundary_findings.extend(entry_faithful)
         external_citation_findings.extend(entry_external)
+        source_context_findings.extend(entry_source_context)
 
     return AuditResult(
         scanned_refs=len(entries),
@@ -482,6 +558,7 @@ def run_audit(root: Path, *, broad_vocabulary: bool = False) -> AuditResult:
         conditional_decl_findings=tuple(conditional_decl_findings),
         faithful_boundary_findings=tuple(faithful_boundary_findings),
         external_citation_findings=tuple(external_citation_findings),
+        source_context_findings=tuple(source_context_findings),
     )
 
 
@@ -538,6 +615,21 @@ def print_text_report(result: AuditResult) -> None:
 
     print(f"External citation input findings: {len(result.external_citation_findings)}")
     for finding in result.external_citation_findings:
+        label = f" label={finding.label}" if finding.label else ""
+        print(
+            f"  - {finding.lean_file}:{finding.token_line}: "
+            f"{finding.lean_decl} contains {finding.token!r}"
+        )
+        print(
+            f"    blueprint {finding.blueprint_file}:{finding.blueprint_line} "
+            f"env={finding.env_type}{label}"
+        )
+        print(f"    {finding.reason}")
+        if finding.header_excerpt:
+            print(f"    {finding.header_excerpt}")
+
+    print(f"Source construction context findings: {len(result.source_context_findings)}")
+    for finding in result.source_context_findings:
         label = f" label={finding.label}" if finding.label else ""
         print(
             f"  - {finding.lean_file}:{finding.token_line}: "

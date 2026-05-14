@@ -622,7 +622,7 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
                 namespace MIPStarRE
 
                 theorem paperTheorem
-                    (data : QXPLayerData Outcome ι) : Q := by
+                    (data : CompletionData params) : Q := by
                   sorry
 
                 end MIPStarRE
@@ -636,8 +636,58 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
             result = audit.run_audit(root, broad_vocabulary=True)
             self.assertEqual(
                 {finding.token for finding in result.findings},
-                {"QXPLayerData"},
+                {"CompletionData"},
             )
+
+    def test_qxp_layer_data_is_classified_as_source_context(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem
+                    (data : QXPLayerData Outcome ι) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:paper}
+                  \lean{MIPStarRE.paperTheorem}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root, broad_vocabulary=True)
+            self.assertEqual(result.findings, ())
+            self.assertEqual(len(result.source_context_findings), 1)
+            self.assertEqual(result.source_context_findings[0].token, "QXPLayerData")
+
+    def test_rank_reduction_witness_is_classified_as_source_context(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem
+                    (hRank : RankReductionWitness psi A zeta qLayer) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{lemma}\label{lem:paper}
+                  \lean{MIPStarRE.paperTheorem}
+                \end{lemma}
+                """,
+            )
+            result = audit.run_audit(root, broad_vocabulary=True)
+            self.assertEqual(result.findings, ())
+            self.assertEqual(len(result.source_context_findings), 1)
+            self.assertEqual(result.source_context_findings[0].token, "RankReductionWitness")
 
     def test_external_statement_interface_is_classified_in_broad_mode(self) -> None:
         with tempfile.TemporaryDirectory() as td:

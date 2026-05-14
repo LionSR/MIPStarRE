@@ -25,17 +25,21 @@ python3 scripts/audit_paper_facing_proof_debt.py \
   --ci
 ```
 
-Result: 69 unresolved broad vocabulary findings, 2 external-citation
-classifications, and zero findings in the ordinary blocking mode.
+Result: 30 unresolved broad vocabulary findings, 39 source-construction
+context classifications, 2 external-citation classifications, and zero findings
+in the ordinary blocking mode.
 
 ## Concentration by Area
 
-**Chapter 4 projectivization and QXP layer.**  There are 40 findings, namely
-`QLayerData`, `QXPLayerData`, `RankReductionWitness`, and
-`RoundingToProjectorsWitness`.  Audit whether the blueprint paper labels point
-to source-shaped lemmas or only to internal layer-data lemmas.  Where the paper
-statement is broader, add source-facing statements and keep layer-data lemmas as
-internal construction steps.
+**Chapter 4 projectivization and QXP layer.**  The scan classifies
+`QLayerData`, `QXPLayerData`, and `RankReductionWitness` as source-construction
+context: the paper first fixes the rank-reduced family \(Q\) after
+`lem:projective-low-rank-sum`, and then fixes the matrix decomposition data used
+for \(X\), \(\widehat X\), and \(P\).  One unresolved Chapter 4 finding remains:
+`RoundingToProjectorsWitness` on `projectiveLowRankSum`.  That item should be
+cleaned by exposing a paper-facing wrapper that derives the rounded family from
+`lem:projective-non-measurement`, or by making clear that the current
+declaration is an internal theorem rather than the full source lemma.
 
 **Chapter 7 self-improvement SDP slackness.**  There are 11 findings, mainly
 `SdpStatementWithSlackness`, `MatrixSdpStatementWithSlackness`, and
@@ -64,9 +68,6 @@ the explicit external hypothesis by a source-facing theorem.
 
 | Token | Count |
 |---|---:|
-| `QXPLayerData` | 20 |
-| `QLayerData` | 11 |
-| `RankReductionWitness` | 8 |
 | `MatrixSdpOptimalWitness` | 4 |
 | `GHatFactsStatement` | 4 |
 | `GCompleteSelfConsistencyStatement` | 4 |
@@ -82,15 +83,16 @@ The singleton unresolved tokens are `RoundingToProjectorsWitness`,
 `GBotSelfConsistencyStatement`, `CommutingWithGIncompleteStatement`, and
 `ComMainConclusion`.  The two external-citation classifications are
 `RazSafraSoundnessStatement` and
-`PolishchukSpielmanClassicalSoundnessStatement`.
+`PolishchukSpielmanClassicalSoundnessStatement`.  The source-construction
+context classifications are `QXPLayerData` (20), `QLayerData` (11), and
+`RankReductionWitness` (8).
 
 ## Next Cleanup Batches
 
-1. Chapter 4 should be audited first, because most broad findings come from
-   `QLayerData` and `QXPLayerData` appearing on blueprint-linked paper lemmas.
-   If those lemmas are only internal layer consequences, the blueprint should
-   not present them as source-complete paper lemmas without a source-facing
-   theorem form.
+1. The remaining Chapter 4 task is `RoundingToProjectorsWitness` on
+   `projectiveLowRankSum`: either expose a source-facing wrapper that invokes
+   the rounded-projector construction internally, or move the current theorem to
+   helper status in the blueprint.
 2. The Chapter 7 SDP findings should remain tied to #1230.  A wrapper theorem
    may preserve useful proof content, but the source-facing self-improvement
    statement is not closed until the slackness witness is produced from the
