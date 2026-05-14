@@ -205,8 +205,10 @@ private lemma one_le_orthonormalizationMainLemmaError_of_quarter_lt {ζ : Error}
   exact hone.trans hscaled
 
 private lemma matrix_eq_zero_of_rank_eq_zero {m n : Type*}
-    [Fintype m] [Fintype n] [DecidableEq n] (A : Matrix m n ℂ) (hA : A.rank = 0) :
+    [Finite m] [Fintype n] (A : Matrix m n ℂ) (hA : A.rank = 0) :
     A = 0 := by
+  let _ : Fintype m := Fintype.ofFinite m
+  classical
   have hrange : A.mulVecLin.range = ⊥ := by
     rw [Matrix.rank] at hA
     exact Submodule.finrank_eq_zero.mp hA
@@ -252,41 +254,14 @@ private lemma roundedProjMeasStatement_of_leftPlaced_sddOpRel {Outcome : Type*}
   rw [herror]
   exact hclose.squaredDistanceBound
 
-/-- Locality-preserving `Q/X/XHat/P` repair for a left-lifted measurement.
+/-- Locality-preserving `Q/X/XHat/P` repair for a left-lifted measurement at the
+paper's `2ζ` source-defect scale.
 
-Given a normalized bipartite state `ψ`, a measurement `A`, and the source
-almost-projective estimate for the left-lifted family `A_a ⊗ I`, this theorem
-produces a local projective submeasurement `P = {P_a}` such that the lifted
-family `{P_a ⊗ I}` is close to `{A_a ⊗ I}` with the explicit envelope
-`orthonormalizationMainLemmaError ζ = 84 * ζ^(1/4)`.
-
-The proof follows the paper's late repair stage: rank reduction to `Q`, the
-`Q`/`sqrt Q` completeness estimates, the `X/XHat/P` construction, and the final
-triangle-inequality assembly. The locality-preserving form (output `P_a ⊗ I`
-rather than an arbitrary lifted family) is the form used in the unconditional
-orthonormalization theorem.
-
-Paper origin: `references/ldt-paper/orthonormalization.tex` lines 534–860
-(rank reduction `lem:projective-low-rank-sum` and the `Q`-side setup:
-`lem:Q-completeness`, `lem:sqrt-Q-completeness`, `lem:q-almost-projective`,
-`lem:xa-t`, `lem:qa-restated`) and 862–1194 (the `X`/`X̂`/`P` algebra
-proper: `lem:X-squared`, `lem:X-hat-squared`, `lem:X-times-X-hat`,
-`lem:squared-difference`, `lem:P-projectivity`, `lem:P-Q-approx`, plus the
-final triangle-inequality assembly producing the `84 ζ^{1/4}` bound captured
-by `orthonormalizationMainLemmaError ζ`). Together these constitute the late
-repair stage of the orthogonalization-lemma proof.
-
-The paper's proof transports the rounded family produced by
-`lem:projective-non-measurement` (already formalized — see
-`spectralTruncationInput_of_sourceAlmostProjective`) through the `Q/X/X̂/P`
-algebra (formalized as `QXPLayerData` and the sigma-range positive-Gram
-construction) to a genuine projective sub-measurement `P = {P_a}` with
-closeness `A_a ⊗ I ≈_{orthonormalizationMainLemmaError ζ} P_a ⊗ I`. The
-locality-preserving form (output `P_a ⊗ I` rather than an arbitrary lifted
-family) is the specialization used by the unconditional orthonormalization
-theorem.
--/
-theorem leftLiftedProjectivizationRepairProducer
+This is the sharp Section 5 repair route needed in the proof of
+`thm:orthonormalization`: if the left-lifted source almost-projective defect is
+bounded by `2 * ζ`, then the final local projective submeasurement is still
+obtained with the paper's `84 * ζ^(1/4)` envelope. -/
+theorem leftLiftedProjectivizationRepairProducer_of_sourceAlmostProjective_two_mul
     {Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -296,7 +271,7 @@ theorem leftLiftedProjectivizationRepairProducer
       ∑ a, ev ψ
         ((leftLiftedMeasurement (ιB := ι) A).outcome a -
           (leftLiftedMeasurement (ιB := ι) A).outcome a *
-            (leftLiftedMeasurement (ιB := ι) A).outcome a) ≤ ζ) :
+            (leftLiftedMeasurement (ιB := ι) A).outcome a) ≤ 2 * ζ) :
     ∃ P : ProjSubMeas Outcome ι,
       RoundedProjMeasStatement ψ (leftLiftedMeasurement (ιB := ι) A)
         (ProjSubMeas.liftLeft P) (orthonormalizationMainLemmaError ζ) := by
@@ -316,19 +291,23 @@ theorem leftLiftedProjectivizationRepairProducer
       leftTensor_mul_leftTensor] using
       (leftMarginal_ev_eq (ψ := ψ) (X := A.outcome a - A.outcome a * A.outcome a))
   have hsourceLocal :
-      ∑ a, ev φ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ := by
+      ∑ a, ev φ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ := by
     simpa [hterm] using hsource
   have hζ_nonneg : 0 ≤ ζ :=
-    le_trans (sourceAlmostProjective_nonneg φ A) hsourceLocal
+    by
+      have hsource_nonneg : 0 ≤ ∑ a, ev φ (A.outcome a - A.outcome a * A.outcome a) :=
+        sourceAlmostProjective_nonneg φ A
+      nlinarith
   by_cases hζ_small : ζ ≤ 1 / (4 : Error)
-  · have hsourceLocalTwo :
-        ∑ a, ev φ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ := by
-      linarith
+  · have hprojective : projectiveNonMeasurement φ A ζ :=
+      projectiveNonMeasurement_of_sourceAlmostProjective_two_mul_full
+        φ A ζ hφ hsourceLocal
+    obtain ⟨R, hR⟩ := hprojective
     have hSpectralLocal : SpectralTruncationStatement φ A ζ :=
-      spectralTruncationInput_of_sourceAlmostProjective φ A ζ hφ hsourceLocal
+      spectralTruncationStatement_of_witness φ A ζ R hR
     obtain ⟨qLayer, hRank⟩ :=
       projectiveLowRankSum_of_spectralTruncationStatement φ A ζ hφ hζ_nonneg
-        hζ_small hSpectralLocal hsourceLocalTwo
+        hζ_small hSpectralLocal hsourceLocal
     by_cases hsigma : Nonempty (FiniteHilbertSpace.sigmaFinCarrier
         (fun a : Outcome => (qLayer.q.outcome a).rank))
     · letI := hsigma
@@ -414,6 +393,42 @@ theorem leftLiftedProjectivizationRepairProducer
     simpa [sddError, avgOver, uniformDistribution, constSubMeasFamily,
       leftLiftedMeasurement, leftPlacedSubMeas, SubMeas.liftLeft, ProjSubMeas.liftLeft]
       using (le_trans hzero hbound)
+
+/-- Locality-preserving `Q/X/XHat/P` repair for a left-lifted measurement.
+
+This is the specialization of
+`leftLiftedProjectivizationRepairProducer_of_sourceAlmostProjective_two_mul` to
+the stronger input hypothesis `hsource ≤ ζ`. -/
+theorem leftLiftedProjectivizationRepairProducer
+    {Outcome : Type*} {ι : Type*}
+    [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized)
+    (A : Measurement Outcome ι) (ζ : Error)
+    (hsource :
+      ∑ a, ev ψ
+        ((leftLiftedMeasurement (ιB := ι) A).outcome a -
+          (leftLiftedMeasurement (ιB := ι) A).outcome a *
+            (leftLiftedMeasurement (ιB := ι) A).outcome a) ≤ ζ) :
+    ∃ P : ProjSubMeas Outcome ι,
+      RoundedProjMeasStatement ψ (leftLiftedMeasurement (ιB := ι) A)
+        (ProjSubMeas.liftLeft P) (orthonormalizationMainLemmaError ζ) := by
+  have hsource_two :
+      ∑ a, ev ψ
+        ((leftLiftedMeasurement (ιB := ι) A).outcome a -
+          (leftLiftedMeasurement (ιB := ι) A).outcome a *
+            (leftLiftedMeasurement (ιB := ι) A).outcome a) ≤ 2 * ζ := by
+    have hsource_nonneg :
+        0 ≤ ∑ a, ev ψ
+          ((leftLiftedMeasurement (ιB := ι) A).outcome a -
+            (leftLiftedMeasurement (ιB := ι) A).outcome a *
+              (leftLiftedMeasurement (ιB := ι) A).outcome a) :=
+      sourceAlmostProjective_nonneg ψ (leftLiftedMeasurement (ιB := ι) A)
+    have hζ_nonneg : 0 ≤ ζ := le_trans hsource_nonneg hsource
+    have hζ_le : ζ ≤ 2 * ζ := by nlinarith
+    exact hsource.trans hζ_le
+  exact leftLiftedProjectivizationRepairProducer_of_sourceAlmostProjective_two_mul
+    ψ hψ A ζ hsource_two
 
 end
 

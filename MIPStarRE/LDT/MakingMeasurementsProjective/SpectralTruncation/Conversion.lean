@@ -36,7 +36,7 @@ This is a structural field-for-field copy: both types carry the same data
 
 The mathematical content of `lem:projective-non-measurement` — constructing
 the rounded family — is the caller's responsibility when building a
-`RoundingToProjectorsWitness`. See #1032 for the constructive proof track. -/
+`RoundingToProjectorsWitness`. -/
 noncomputable def spectralTruncationStatement_of_witness {Outcome : Type uOutcome}
     [Fintype Outcome] [DecidableEq Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
