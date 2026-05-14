@@ -446,8 +446,8 @@ Lines 52--55 explain that the proof may assume the nontrivial regime
 `eps, delta, gamma, zeta, d / q ≤ 1`, since the complementary cases are
 trivial.  This declaration states the restricted assumptions
 `gamma ≤ 1`, `zeta ≤ 1`, `params.d ≤ params.q`, `0 < params.d`, and `1 ≤ k`.
-The unrestricted statement aligned with the paper is `ldPasting`; its
-complementary trivial cases are tracked by issue #1601. -/
+The unrestricted statement aligned with the paper is `ldPasting`; the only
+remaining complementary branch is the degree-zero case tracked by issue #1622. -/
 theorem ldPastingNontrivial
     (params : Parameters)
     [FieldModel params.q]
@@ -701,9 +701,11 @@ Paper origin: `references/ldt-paper/ld-pasting.tex`, lines 12--50.  The
 following lines 52--55 explain that the proof may restrict to the regime
 `eps, delta, gamma, zeta, d / q ≤ 1`, because the complementary cases are
 trivial.  The restricted theorem `ldPastingNontrivial` proves the nontrivial
-regime.  The formal proof of the complementary trivial branches is tracked by
-issue #1601, so this declaration keeps the unrestricted paper statement visible
-without adding the non-paper assumptions from the restricted helper. -/
+regime, and the large-`gamma`, large-`zeta`, large-`d / q`, and `k = 0`
+complementary branches are proved above.  The only remaining branch is the
+degree-zero case tracked by issue #1622, so this declaration keeps the
+unrestricted paper statement visible without adding the non-paper assumptions
+from the restricted theorem. -/
 theorem ldPasting
     (params : Parameters)
     [FieldModel params.q]

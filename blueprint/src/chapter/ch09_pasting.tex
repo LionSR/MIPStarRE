@@ -50,8 +50,9 @@
 \end{theorem}
 \begin{proof}
 	\uses{lem:ld-pasting-sub-measurement}
-	The Lean proof of the unrestricted source theorem is the tracked proof gap in
-	issue~\#1601.  The argument below is the paper proof.
+	The Lean proof of the unrestricted theorem currently has one tracked branch
+	obligation, the degree-zero case in issue~\#1622.  The argument below is the
+	paper proof.
 	Let $H$ be the submeasurement from Lemma~\ref{lem:ld-pasting-sub-measurement}, and fix an arbitrary polynomial $h^* \in \polyfunc{m+1}{q}{d}$. Define a measurement $H_{\mathrm{meas}} \in \polymeas{m+1}{q}{d}$ by
 	\[
 		(H_{\mathrm{meas}})_h
@@ -90,8 +91,8 @@
 	explain that the proof may restrict to
 	\(\eps,\delta,\gamma,\zeta,d/q\le 1\), since the complementary cases are
 	trivial.  The unrestricted source statement is linked from
-	Theorem~\ref{thm:ld-pasting}; the formal proof of these complementary cases
-	remains tracked by issue~\#1601.
+	Theorem~\ref{thm:ld-pasting}.  Four complementary branches are now proved in
+	Lean; the remaining degree-zero branch is tracked by issue~\#1622.
 \end{remark}
 
 The bound is trivial when at least one of $\eps$, $\delta$, $\gamma$, $\zeta$, or $d/q$ is at least $1$, since then $\nu \ge 1$. In the remainder of the chapter we therefore assume
