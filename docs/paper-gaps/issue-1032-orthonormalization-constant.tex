@@ -53,7 +53,7 @@ The paper states the orthonormalization theorem with the estimate
 \]
 The Lean declaration named
 \(\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}\)
-now keeps this paper statement and records the remaining proof gap directly.
+now proves this paper statement.
 The proved completion-route theorem
 \(\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationCompletionRoute}\)
 establishes the same conclusion with the weaker estimate
@@ -62,16 +62,16 @@ establishes the same conclusion with the weaker estimate
 \]
 The earlier input-driven theorem, in which the stronger repair input was
 supplied separately, has been removed from the public Section 5 API; the
-corresponding statement is now represented by the paper-facing theorem with a
-tracked proof gap.%
+corresponding statement is now represented by the paper-facing theorem together
+with a separate proved completion-route comparison.%
 \footnote{The source theorem is
 \path{references/ldt-paper/orthonormalization.tex:67-75}
 (\path{thm:orthonormalization}).  The relevant declarations are
 \path{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization},
 \path{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationCompletionRoute},
-and \path{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer}.
-This note is attached to \ghissue{1032}; the source-aligned theorem statement
-keeps the remaining construction as a proof gap, while the weaker proved
+and \path{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer\_of\_sourceAlmostProjective\_two\_mul}.
+This note is attached to \ghissue{1032}; the issue is resolved by proving the
+source-aligned theorem statement, while the weaker completion-route
 construction stays under a separate name.}
 
 \section{The source assertion}
@@ -125,14 +125,14 @@ longer the declaration presented as the paper theorem.
 
 \section{Conclusion}
 
-The source theorem statement has been restored under the declaration
-\(\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}\),
-with the missing \(100\zeta^{1/4}\) proof recorded as an explicit proof gap
-rather than as a weakened theorem statement.  To discharge this gap, the local
-repair theorem should be reformulated so that it consumes the completed
-measurement's bipartite strong self-consistency estimate directly, avoiding the
-intermediate conversion to source almost-projectivity.  The proved
-completion-route theorem remains available under the separate name
+The source theorem is now proved under the declaration
+\(\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}\).
+The formal proof follows the paper's completion-to-measurement reduction and
+then uses a sharp locality-preserving repair route that consumes the completed
+measurement's bipartite self-consistency estimate at the correct \(2\zeta\)
+scale, avoiding the extra factor introduced by the historical completion-route
+proof.  The proved completion-route theorem remains available under the separate
+name
 \(\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationCompletionRoute}\).
 
 \bibliographystyle{alpha}
