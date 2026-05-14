@@ -24,7 +24,10 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-! ## Operators and conclusions -/
 
-/-- A reduced SDP witness for the currently formalized self-improvement argument.
+/-- Lean-only reduced SDP data for the currently formalized fragment of the
+self-improvement argument.
+
+Paper-gap note: `docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`.
 
 The paper's `lem:sdp` eventually supplies strong duality, complementary
 slackness, and a concrete matrix-level optimal witness. The current Lean
@@ -75,10 +78,16 @@ structure SdpOptimalPairWithSlackness (params : Parameters) [FieldModel params.q
     ∀ g : Polynomial params,
       sdpComplementarySlacknessEquation params strategy T Z g
 
-/-- Paper origin: `references/ldt-paper/self_improvement.tex:82-181`
+/-- Lean-only reduced fragment of `lem:sdp`.
+
+Paper origin: `references/ldt-paper/self_improvement.tex:82-181`
 (`\label{lem:sdp}`).
 
-Reduced conclusion for the currently formalized fragment of `lem:sdp`. -/
+This is not the source-facing SDP theorem: it records only the measurement-total
+and dual-feasibility part that is presently proved without the strong-duality
+and complementary-slackness argument.  The source-shaped target is
+`SdpStatementWithSlackness`, whose current producer is
+`sdp_statement_with_slackness` and is tracked by #1230. -/
 structure SdpStatement (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) : Prop where
   witness :
@@ -363,16 +372,18 @@ structure SelfImprovementHelperStatement (params : Parameters)
     helperBoundednessGap params strategy H Z ≤
       selfImprovementHelperError params eps delta
 
-/-- Helper conclusion strengthened by the SDP complementary-slackness equation.
+/-- Internal helper conclusion strengthened by the SDP complementary-slackness
+equation.
 
 Paper origin: `references/ldt-paper/self_improvement.tex:82-181`
 (`\label{lem:sdp}`) and `references/ldt-paper/self_improvement.tex:635-671`
 (`\label{thm:self-improvement}`); paper-gap note:
 `docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`.
 
-This is the paper-facing successor to `SelfImprovementHelperConclusion` needed
-by the helper-completeness chain: it keeps all fields of the reduced helper
-conclusion and additionally records the strong-duality consequence
+This is not an additional source-theorem hypothesis.  It is the internal
+helper-output record produced after the tracked SDP theorem
+`sdp_statement_with_slackness` supplies strong duality.  It keeps all fields of
+the reduced helper conclusion and additionally records the consequence
 `T_g Z = T_g A_g`. -/
 structure SelfImprovementHelperConclusionWithSlackness (params : Parameters)
     [FieldModel params.q]
@@ -392,7 +403,10 @@ structure SelfImprovementHelperConclusionWithSlackness (params : Parameters)
 Conclusion of `thm:self-improvement`.
 
 The paper's boundedness output is the projective residual estimate
-`⟨ψ, Z ⊗ (I - H)⟩ ≤ ζ`, recorded here as `projectiveResidualBound`. -/
+`⟨ψ, Z ⊗ (I - H)⟩ ≤ ζ`, recorded here as `projectiveResidualBound`.  This
+structure is the conjunction of the paper's displayed conclusions for the
+already-quantified witnesses `H` and `Z`; it does not store an internal helper
+form or an SDP connection input. -/
 structure SelfImprovementConclusion (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (G : Measurement (Polynomial params) ι)

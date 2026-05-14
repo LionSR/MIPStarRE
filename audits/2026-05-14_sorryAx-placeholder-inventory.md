@@ -11,8 +11,8 @@ placeholders for issue #1586.  The distinction is important:
 
 For paper-facing theorems in the LDT formalization, an unfinished proof should
 remain a tracked `sorry` on the source-faithful theorem or on the lowest named
-construction theorem.  It should not be replaced by an extra bridge hypothesis,
-residual package, repair input, or explicit axiom-like declaration.
+construction theorem.  It should not be replaced by an extra connection
+hypothesis, residual data, repair input, or explicit axiom-like declaration.
 
 ## Commands
 
@@ -45,8 +45,9 @@ have named obligations:
   #1503, induction-section self-improvement derivation.
 - `MIPStarRE.LDT.MainInductionStep.mainInduction`: issue #1507, derivation of
   successor-stage inputs from the paper hypotheses.
-- `MIPStarRE.LDT.SelfImprovement.selfImprovementHelper`: issue #1514, helper
-  strong self-consistency estimate.
+- `MIPStarRE.LDT.SelfImprovement.selfImprovementHelper`: transitive dependency
+  on issue #1230 through `sdp_statement_with_slackness`.  The former #1514
+  helper strong self-consistency estimate is now discharged locally.
 - `MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness`: issue #1230,
   finite-dimensional SDP strong-duality and slackness proof.
 
@@ -63,6 +64,6 @@ used to hide a proof gap.  The remaining `sorryAx` occurrences are ordinary
 tracked proof holes.  The correct repair direction is therefore to discharge
 the named proof obligations above, or to keep the corresponding source-faithful
 statement with a tracked `sorry` during paper realignment.  It is not acceptable
-to remove a `sorryAx` dependency by adding a non-paper bridge, residual, repair,
-package, producer, hypotheses-bundle, assumptions-bundle, `axiom`, or
+to remove a `sorryAx` dependency by adding non-paper connection, residual,
+repair, data-producing, hypotheses-bundle, assumptions-bundle, `axiom`, or
 `constant` assumption.

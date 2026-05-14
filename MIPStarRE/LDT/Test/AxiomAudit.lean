@@ -28,8 +28,8 @@ blueprint theorem is present, and the missing derivation from the incoming
 consistency hypothesis is tracked by issue #1515.
 
 The audit for `Test.mainFormal` records the current tracked proof gap
-transitively: the paper-facing statement has no bridge, residual, repair,
-package, or obligation hypotheses, and its proof is assembled from named
+transitively: the paper-facing statement has no connection, residual, repair,
+data, or obligation hypotheses, and its proof is assembled from named
 construction targets.  Issue #1043 tracks the base-case projective-completion
 construction, issues #1363 and #1369 track the successor projective-completion
 construction, issue #1566 tracks the match-mass preservation obligations in the
@@ -60,11 +60,13 @@ using one of the `assert_*_axioms` commands with `sorryAx` in its expected set
 has a named proof obligation still to be discharged; fulfilling one such
 obligation should not change the audit status of the others.
 
-The audit for `SelfImprovement.selfImprovementHelper` records the present
-state of issue #1514.  The Lean statement now has the input consistency
-hypothesis for the polynomial measurement `G` and the four conclusions stated
-in the paper; the remaining helper strong self-consistency estimate is admitted
-in the proof rather than assumed in the theorem statement.
+The audit for the helper strong self-consistency assembly now requires the
+standard Lean axioms only: the issue-#1514 local estimate is proved by the
+`HelperSSC` chain.  The audit for
+`SelfImprovement.selfImprovementHelper` still permits `sorryAx`, but that
+dependency is now transitive through `sdp_statement_with_slackness` and hence
+is tracked by issue #1230, not by an admitted helper strong self-consistency
+field.
 
 The audit for `SelfImprovement.sdp_statement_with_slackness` records the present
 state of issue #1230.  The theorem states the SDP strong-duality and
@@ -116,8 +118,8 @@ private def expectedMainInductionAxioms : Array Name :=
 private def expectedOrderedLaplacianGapAxioms : Array Name :=
   expectedStandardAxioms
 
-/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1514 derivation
-needed for `selfImprovementHelper`. -/
+/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1230 SDP
+slackness derivation used by `selfImprovementHelper`. -/
 private def expectedSelfImprovementHelperAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
@@ -179,5 +181,7 @@ assert_induction_self_improvement_axioms
 assert_main_induction_axioms MIPStarRE.LDT.MainInductionStep.mainInduction
 assert_ordered_laplacian_gap_axioms
   MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianSpectralGapOrdered
+assert_standard_axioms
+  MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_of_helper_conclusion
 assert_self_improvement_helper_axioms MIPStarRE.LDT.SelfImprovement.selfImprovementHelper
 assert_sdp_slackness_axioms MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness
