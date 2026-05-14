@@ -696,7 +696,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p> The Lean declaration for Theorem&#160;<a href="sec-induction.html#thm:self-improvement-in-induction-section">10.6</a> has the paper hypotheses, and its proof is still open. The conditional helper that used to assume a bundle of Section&#160;<a href="chap-self-improvement.html">7</a> obligations has been removed from the successor-step assembly. The ordinary and answer-valued slice constructors now call this theorem directly, so the missing Section&#160;<a href="chap-self-improvement.html">7</a> work remains a tracked proof gap on the paper statement rather than an additional hypothesis. </p>
+  <p> The Lean declaration for Theorem&#160;<a href="sec-induction.html#thm:self-improvement-in-induction-section">10.6</a> has the paper hypotheses, and its proof is still open. The conditional helper that used to assume Section&#160;<a href="chap-self-improvement.html">7</a> proof-stage data has been removed from the successor-step assembly. The ordinary and answer-valued slice constructors now call this theorem directly, so the missing Section&#160;<a href="chap-self-improvement.html">7</a> work remains a tracked proof gap on the paper statement rather than an additional hypothesis. </p>
 
   </div>
 </div>
@@ -854,21 +854,19 @@
 
   </div>
 </div>
-<div class="definition_thmwrapper theorem-style-definition" id="def:self-improvement-obligation">
+<div class="definition_thmwrapper theorem-style-definition" id="def:self-improvement-slice-transport">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
     Definition
     </span>
     <span class="definition_thmlabel">10.10</span>
-    <span class="definition_thmtitle">Self-improvement obligations for the successor step</span>
+    <span class="definition_thmtitle">Self-improvement slice transport for the successor step</span>
     <div class="thm_header_extras">
 
-    
-    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="sec-induction.html#def:self-improvement-obligation">#</a>
+    <a class="icon proof" href="sec-induction.html#def:self-improvement-slice-transport">#</a>
     
     
     <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
@@ -903,13 +901,13 @@
         
         <ul class="uses">
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.averagedPoint_eq_of_pointMeasurement_eq" class="lean_decl">MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.averagedPoint_eq_of_pointMeasurement_eq</a></li>
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq" class="lean_decl">MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq</a></li>
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.ofPointMeasurementEq" class="lean_decl">MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.ofPointMeasurementEq</a></li>
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceStrategyTransport.ofPointMeasurementEq" class="lean_decl">MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceStrategyTransport.ofPointMeasurementEq</a></li>
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.good_of_restrictedGood" class="lean_decl">MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.good_of_restrictedGood</a></li>
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceStrategyTransport.good_of_restrictedGood" class="lean_decl">MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceStrategyTransport.good_of_restrictedGood</a></li>
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.ofMeasurementEq" class="lean_decl">MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.ofMeasurementEq</a></li>
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceStrategyTransport.ofMeasurementEq" class="lean_decl">MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceStrategyTransport.ofMeasurementEq</a></li>
           
         </ul>
     
@@ -920,7 +918,7 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>       The successor step records the slice-wise self-improvement output in <span class="ttfamily">SelfImprovementPackage</span>, and the answer-valued route records the analogous output in <span class="ttfamily">AnswerSelfImprovementPackage</span>. Their constructors call <span class="ttfamily">selfImprovementInInductionSection</span>; they no longer carry a separate bundle of Section&#160;<a href="chap-self-improvement.html">7</a> obligations as an input. The <span class="ttfamily">SliceObligations</span> structures are narrow formal interfaces: they assume concrete per-slice symmetric strategies and measurement-transport data, while averaged point-operator compatibility is derived structurally from point-measurement transport. They then convert the remaining data into the ordinary or answer-valued self-improvement output. </p>
+  <p>       The successor step records the slice-wise self-improvement output in <span class="ttfamily">SelfImprovementPackage</span>, and the answer-valued route records the analogous output in <span class="ttfamily">AnswerSelfImprovementPackage</span>. Their constructors call <span class="ttfamily">selfImprovementInInductionSection</span>; they no longer carry a separate bundle of Section&#160;<a href="chap-self-improvement.html">7</a> proof-stage data as an input. The <span class="ttfamily">SliceStrategyTransport</span> structures are narrow formal interfaces: they assume concrete per-slice symmetric strategies and measurement-transport data, while averaged point-operator compatibility is derived structurally from point-measurement transport. They then convert the remaining data into the ordinary or answer-valued self-improvement output. </p>
 
   </div>
 </div>
@@ -975,7 +973,7 @@
         
         <ul class="uses">
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.AveragedPastingInput.output" class="lean_decl">MIPStarRE.LDT.MainInductionStep.AveragedPastingInput.output</a></li>
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.AveragedPastingInput.invokeLdPasting" class="lean_decl">MIPStarRE.LDT.MainInductionStep.AveragedPastingInput.invokeLdPasting</a></li>
           
           <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingInput" class="lean_decl">MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingInput</a></li>
           
@@ -1088,8 +1086,6 @@
     <span class="theorem_thmtitle">Main induction</span>
     <div class="thm_header_extras">
 
-    
-    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
@@ -1183,7 +1179,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> In Lean, the base case is formalized through . The successor branch of  remains an explicit proof gap on the source statement. The nearby formalization still names the stage data    that mirror the four paper stages \(\text{restrict} \to \text{induct} \to \text{self-improve} \to \text{paste}\), but no theorem with these data as additional source-level hypotheses is advertised as Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.13</a>. For the answer-valued restriction route used in the successor branch of the main formal theorem, Lean now also exposes , which record the predecessor induction hypothesis for the restricted strategies without appealing to the public theorem ‘mainFormal‘. The weighted restricted-probability estimates are now public via , The remaining proof gap for Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.13</a> is to derive the successor-step constructions, including the restricted-strategy self-improvement obligations tracked by issues #1507 and #1503 under the bridge-debt tracker #1458, from the paper hypotheses; hence no proof-level is attached here. We may assume \(\varepsilon ,\delta ,\gamma ,d/q \le 1\), since otherwise \(\nu \ge 1\) and the bound is trivial. </p>
+  <p> In Lean, the base case is formalized through . The successor branch of  remains an explicit proof gap on the source statement. The nearby formalization still names the stage data    that mirror the four paper stages \(\text{restrict} \to \text{induct} \to \text{self-improve} \to \text{paste}\), but no theorem with these data as additional source-level hypotheses is advertised as Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.13</a>. For the answer-valued restriction route used in the successor branch of the main formal theorem, Lean now also exposes , which record the predecessor induction hypothesis for the restricted strategies without appealing to the public theorem ‘mainFormal‘. The weighted restricted-probability estimates are now public via , The remaining proof gap for Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.13</a> is to derive the successor-step constructions, including the restricted-strategy self-improvement and slice-transport construction tracked by issues #1507 and #1503 under the bridge-debt tracker #1458, from the paper hypotheses; hence no proof-level is attached here. We may assume \(\varepsilon ,\delta ,\gamma ,d/q \le 1\), since otherwise \(\nu \ge 1\) and the bound is trivial. </p>
 <p>The proof is by induction on \(m\). The base case \(m=1\) is Lemma&#160;<a href="sec-induction.html#lem:main-induction-base">10.12</a>. </p>
 <p>For the step from \(m\) to \(m+1\), let \((\psi ,A,B,L)\) be an \((\varepsilon ,\delta ,\gamma )\)-good symmetric strategy for the \((m+1,q,d)\) test, and let \(k \ge 400(m+1)d\). For each \(x \in \mathbb {F}_q\), let \((\psi ,A^x,B^x,L^x)\) be the \(x\)-restricted strategy, with failure parameters \(\varepsilon _x,\delta _x,\gamma _x\). Apply the induction hypothesis to each restricted strategy with the same integer \(k\) and define </p>
 <div class="displaymath" id="a0000000574">
