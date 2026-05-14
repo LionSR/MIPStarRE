@@ -425,6 +425,26 @@ python3 scripts/blueprint_lean_sync.py --root . --ci
 lake exe checkdecls blueprint/lean_decls
 ```
 
+For changed Lean declarations, pre-push also runs the reverse blueprint coverage
+warning against `origin/main`:
+
+```bash
+python3 scripts/blueprint_lean_sync.py --root . --warn-missing-blueprint \
+  --diff-base origin/main --changed-files <changed Lean files>
+```
+
+This is a local warning, not the merge authority.  It is meant to catch a
+missing `\lean{...}` discussion before the pull request spends a full blueprint
+or Lean CI cycle.
+
+For ordinary Lean pushes, pre-push also runs the same oversized-file guard used
+by CI:
+
+```bash
+python3 scripts/check_oversized_lean_files.py --root . \
+  --known MIPStarRE/LDT/SelfImprovement/Theorems/Results/BoundednessTransport.lean
+```
+
 For a heavier local gate, set `MIPSTARRE_HOOK_FULL=1` while pushing.  Full mode
 also runs `lake build`, `python3 scripts/blueprint_leanok_axioms.py --ci`, and
 `leanblueprint web` when `leanblueprint` is installed.
@@ -442,13 +462,13 @@ remains the authoritative merge gate.  The responsibilities are:
 |---|---|---|---|
 | Whitespace in staged patches | `pre-commit`: `git diff --cached --check` | ordinary PR review / workflow logs | Fast local-only guard. |
 | Statement-like declarations cite paper origin | `pre-commit` and relevant `pre-push`: `check_statement_paper_origin.py` | `statement-paper-origin.yml` | Blocking CI, path-filtered to LDT Lean files and the guard implementation. |
-| Lean files stay below the oversized-file limit | none by default | `oversized-lean-files.yml` | Path-filtered to Lean files and the guard implementation. |
+| Lean files stay below the oversized-file limit | `pre-push`: `check_oversized_lean_files.py` for Lean changes | `oversized-lean-files.yml` | Path-filtered to Lean files and the guard implementation. |
 | Paper-facing theorem headers avoid bridge-debt vocabulary | `pre-commit` and relevant `pre-push`: `audit_paper_facing_proof_debt.py --ci` | `paper-facing-proof-debt-audit.yml` | Blocking CI for Lean and blueprint statement surfaces. |
 | Conclusion-shaped hypotheses are rejected | `pre-commit` and relevant `pre-push`: `audit_conclusion_shaped_hypotheses.py --ci` | `proof-evasion-helper-audits.yml` | Blocking CI. |
 | `**Unfaithful:**` markers carry citations and an elimination plan | `pre-commit` and relevant `pre-push`: `audit_unfaithful_markers.py --ci` | `proof-evasion-helper-audits.yml` | Blocking CI. |
 | Explicit `axiom` and `constant` declarations stay out of the LDT tree | `pre-commit` and relevant `pre-push`: `audit_lean_axiom_declarations.py --ci` | `proof-evasion-helper-audits.yml` | Blocking CI; ordinary `sorry` sites are tracked separately by their `sorryAx` closure. |
 | Edited Lean files type-check | `pre-push`: `lake env lean` on changed Lean files | `lean_action_ci.yml` | CI remains the full repository authority. |
-| Blueprint declarations and `blueprint/lean_decls` stay synchronized | `pre-push`: regenerate, diff, `blueprint_lean_sync.py --ci`, `checkdecls` | `blueprint-sync.yml`; best-effort checks in `lint-blueprint.yml` | The PR workflow is the authoritative check. |
+| Blueprint declarations and `blueprint/lean_decls` stay synchronized | `pre-push`: regenerate, diff, `blueprint_lean_sync.py --ci`, reverse coverage warning for changed Lean declarations, `checkdecls` | `blueprint-sync.yml`; best-effort checks in `lint-blueprint.yml` | The PR workflow is the authoritative check; the reverse coverage step is a local warning. |
 | Proof-level `\leanok` entries do not depend on `sorryAx` | `pre-push` full mode: `blueprint_leanok_axioms.py --ci` | `blueprint-sync.yml` | The axiom audit needs compiled local `.olean` artifacts on a cold runner, so this workflow keeps one explicit `lake build` before the audit. |
 | Whole-project Lean compilation | `pre-push` full mode: `lake build` | `lean_action_ci.yml` | Lean CI remains the merge authority for compilation; the blueprint-sync build is the proof-status audit prerequisite. |
 | Blueprint LaTeX/PDF/web build | `pre-push` full mode: `leanblueprint web` when installed | `lint-blueprint.yml` and `blueprint.yml` | Only blueprint workflows own LaTeX rendering. |
