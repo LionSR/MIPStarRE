@@ -68,6 +68,13 @@ Paper origin: the projective-output passage in
 orthonormalization theorem from
 `references/ldt-paper/orthonormalization.tex:273-282`.
 
+**Proof obligation:** This is the spectral-truncation part of the Section 9
+orthonormalization construction, tracked by #1596 and feeding the source-facing
+gap #1515.  It is not an extra hypothesis of `thm:self-improvement`.
+Elimination: combine this spectral slice with the locality-preserving repair
+and final-field transport needed to prove `selfImprovement` from the paper
+hypotheses.
+
 For every helper sub-measurement `Hhat` satisfying the helper-stage bipartite
 strong-self-consistency hypothesis (`BipartiteSSCRel ... ζ_helper`), this
 yields the `SpectralTruncationInput` for the *option-completed* left-lifted

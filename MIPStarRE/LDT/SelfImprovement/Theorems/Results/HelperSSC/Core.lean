@@ -28,6 +28,12 @@ Paper origin: `references/ldt-paper/self_improvement.tex:255-603`
 (`\label{item:self-improvement-self}` and the subsequent add-in-`u`,
 self-consistency, and variance-swap chain).
 
+**Proof obligation:** This is an internal record for the helper-stage strong
+self-consistency proof, tracked by #1596.  It is not a hypothesis of a
+source-labelled theorem.  Elimination: keep producing the fields from the
+add-in-`u`, self-consistency, and global-variance estimates, and do not pass
+this record across the public statement of `lem:self-improvement-helper`.
+
 These fields isolate the remaining paper-side obligations in the proof of
 `item:self-improvement-self` once the reduced helper conclusion is fixed:
 

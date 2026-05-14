@@ -25,6 +25,12 @@ Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, especially
 the projectivization transition from the pre-projective \(G\)-family to the
 completed projective \(Q\)-family.
 
+**Proof obligation:** This is the internal line-169 match-mass preservation
+assertion, tracked by #1596 and refined by the QXP preservation obligation
+#1610.  It is not a permissible extra hypothesis of a theorem cited as a paper
+statement.  Elimination: prove the preservation inequalities for the concrete
+orthonormalization and completion witnesses used in Step 6.
+
 The ordinary Step 6 handoff records only state-dependent-distance closeness
 `G_A ≈ Q_A` and `G_B ≈ Q_B`.  Combining those fields with
 `prop:triangle-sub` gives a `ζ₁ + sqrt ζ₂` consistency loss, as witnessed by
@@ -196,6 +202,11 @@ end ProjectivizationMatchMassMonotonicity
 Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, where the
 orthonormalized submeasurements are completed and then used in the line-169
 consistency replacement.
+
+**Proof obligation:** This is the one-sided preservation assertion to be proved
+about the chosen orthonormalization witness, tracked by #1596 and #1610.  It is
+below the source theorem boundary; a paper-facing theorem must construct it,
+not assume it as an added hypothesis.
 
 Asserts that the projective submeasurement `P` produced by orthonormalization
 preserves at least as much bipartite correlation with a fixed partner
