@@ -402,6 +402,7 @@ agent-prompt surfaces under `.github/actions/`, `.github/prompts/`, or
 
 ```bash
 python3 scripts/check_statement_paper_origin.py --root .
+python3 scripts/audit_new_proof_obligation_metadata.py --root . --staged --ci
 python3 scripts/audit_paper_facing_proof_debt.py --root . --ci
 python3 scripts/audit_conclusion_shaped_hypotheses.py --root . --ci
 python3 scripts/audit_unfaithful_markers.py --root . --ci
@@ -418,10 +419,12 @@ runs `lake env lean` on each changed file.  When the pushed range touches Lean,
 blueprint, paper-gap, proof-integrity, review-policy, or agent-prompt surfaces,
 it repeats the fast statement-integrity audits.  When blueprint or Lean
 declaration surfaces changed, it regenerates `blueprint/lean_decls`, verifies
-that the file has not drifted, and then runs:
+that the file has not drifted, rebuilds changed Lean modules so declaration
+resolution uses fresh `.olean` files, and then runs:
 
 ```bash
 python3 scripts/blueprint_lean_sync.py --root . --ci
+lake build <changed Lean modules>
 lake exe checkdecls blueprint/lean_decls
 ```
 
@@ -456,6 +459,21 @@ declaration cited by a source-labelled theorem, lemma, proposition, corollary,
 or definition, and asks the author to record the statement-integrity audit in
 the PR.
 
+For changed LDT Lean declarations, pre-push also audits newly added
+proof-obligation and conditional-helper declarations:
+
+```bash
+python3 scripts/audit_new_proof_obligation_metadata.py --root . \
+  --base origin/main --changed-files <changed Lean files> --ci
+```
+
+This guard is diff-based.  It does not report existing bridge or residual
+debt; it prevents a new bridge, residual, repair, package, producer, input,
+hypotheses bundle, or conditional helper from entering the tree without a
+def-site statement of whether it is source-faithful or an internal proof
+obligation.  Internal proof obligations must cite a paper-gap note or tracking
+issue and state the planned discharge.
+
 For ordinary Lean pushes, pre-push also runs the same oversized-file guard used
 by CI:
 
@@ -464,9 +482,27 @@ python3 scripts/check_oversized_lean_files.py --root . \
   --known MIPStarRE/LDT/SelfImprovement/Theorems/Results/BoundednessTransport.lean
 ```
 
+For changed blueprint sources under `blueprint/src/`, pre-push now runs a
+bounded local render smoke check:
+
+```bash
+cd blueprint && leanblueprint web
+```
+
+On a warm local checkout this check took about 8 seconds on 2026-05-14.  It is
+intended to catch ordinary LaTeX, macro, bibliography, and plasTeX failures
+before they consume blueprint CI time.  If `leanblueprint` is not on `PATH`,
+the hook fails with installation instructions:
+
+```bash
+pipx install leanblueprint
+pipx inject --include-apps --force leanblueprint plastex
+```
+
 For a heavier local gate, set `MIPSTARRE_HOOK_FULL=1` while pushing.  Full mode
 also runs `lake build`, `python3 scripts/blueprint_leanok_axioms.py --ci`, and
-`leanblueprint web` when `leanblueprint` is installed.
+`leanblueprint web` when `leanblueprint` is installed and the default blueprint
+smoke tier has not already run.
 
 For a one-off bypass, set `MIPSTARRE_SKIP_HOOKS=1`.  A bypass should be used
 only to recover from a local tooling problem; it is not a substitute for the
@@ -488,6 +524,7 @@ remains the authoritative merge gate.  The responsibilities are:
 |---|---|---|---|
 | Whitespace in staged patches | `pre-commit`: `git diff --cached --check` | ordinary PR review / workflow logs | Fast local-only guard. |
 | Statement-like declarations cite paper origin | `pre-commit` and relevant `pre-push`: `check_statement_paper_origin.py` | `statement-paper-origin.yml` | Blocking CI, path-filtered to LDT Lean files and the guard implementation. |
+| New proof-obligation declarations carry role metadata | `pre-commit`: `audit_new_proof_obligation_metadata.py --staged --ci`; relevant `pre-push`: `audit_new_proof_obligation_metadata.py --base origin/main --changed-files ... --ci` | proof-debt review prompts and local hook policy | Local blocking guard for issue #1579.  It is diff-based and complements the global paper-origin audit. |
 | Lean files stay below the oversized-file limit | `pre-push`: `check_oversized_lean_files.py` for Lean changes | `oversized-lean-files.yml` | Path-filtered to Lean files and the guard implementation. |
 | Paper-facing theorem headers avoid bridge-debt vocabulary | `pre-commit` and relevant `pre-push`: `audit_paper_facing_proof_debt.py --ci` | `paper-facing-proof-debt-audit.yml` | Blocking CI for Lean and blueprint statement surfaces. |
 | Conclusion-shaped hypotheses are rejected | `pre-commit` and relevant `pre-push`: `audit_conclusion_shaped_hypotheses.py --ci` | `proof-evasion-helper-audits.yml` | Blocking CI. |
@@ -495,10 +532,10 @@ remains the authoritative merge gate.  The responsibilities are:
 | Explicit `axiom` and `constant` declarations stay out of the LDT tree | `pre-commit` and relevant `pre-push`: `audit_lean_axiom_declarations.py --ci` | `proof-evasion-helper-audits.yml` | Blocking CI; ordinary `sorry` sites are tracked separately by their `sorryAx` closure. |
 | Source-labelled Lean declaration headers do not change silently | `pre-push`: `check_source_statement_changes.py --base origin/main` for changed LDT Lean files | Paper-facing proof-debt audit and review prompts | Local blocking guard for issue #1578.  Intentional paper-realignment changes should carry a statement-integrity audit in the PR. |
 | Edited Lean files type-check | `pre-push`: `lake env lean` on changed Lean files | `lean_action_ci.yml` | CI remains the full repository authority. |
-| Blueprint declarations and `blueprint/lean_decls` stay synchronized | `pre-push`: regenerate, diff, `blueprint_lean_sync.py --ci`, reverse coverage warning for changed Lean declarations, `checkdecls` | `blueprint-sync.yml`; best-effort checks in `lint-blueprint.yml` | The PR workflow is the authoritative check; the reverse coverage step is a local warning. |
+| Blueprint declarations and `blueprint/lean_decls` stay synchronized | `pre-push`: regenerate, diff, `blueprint_lean_sync.py --ci`, reverse coverage warning for changed Lean declarations, rebuild changed Lean modules, `checkdecls` | `blueprint-sync.yml`; best-effort checks in `lint-blueprint.yml` | The PR workflow is the authoritative check; the reverse coverage step is a local warning.  The local rebuild prevents stale `.olean` files from making an existing declaration look missing. |
 | Proof-level `\leanok` entries do not depend on `sorryAx` | `pre-push` full mode: `blueprint_leanok_axioms.py --ci` | `blueprint-sync.yml` | The axiom audit needs compiled local `.olean` artifacts on a cold runner, so this workflow keeps one explicit `lake build` before the audit. |
 | Whole-project Lean compilation | `pre-push` full mode: `lake build` | `lean_action_ci.yml` | Lean CI remains the merge authority for compilation; the blueprint-sync build is the proof-status audit prerequisite. |
-| Blueprint LaTeX/PDF/web build | `pre-push` full mode: `leanblueprint web` when installed | `lint-blueprint.yml` and `blueprint.yml` | Only blueprint workflows own LaTeX rendering. |
+| Blueprint LaTeX/PDF/web build | `pre-push`: `leanblueprint web` for `blueprint/src/` changes; full mode reruns it only if the default smoke tier did not run | `lint-blueprint.yml` and `blueprint.yml` | Local warm smoke check measured about 8 seconds on 2026-05-14; CI remains the render authority. |
 
 This split keeps the proof-status audit separate from ordinary compilation.
 `blueprint-sync.yml` still builds the repository once because `#print axioms`
