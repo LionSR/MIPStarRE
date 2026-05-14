@@ -79,7 +79,7 @@ if grep -Eq '^(MIPStarRE/LDT/.*\.lean|MIPStarRE/LDT\.lean|MIPStarRE\.lean)$' "$C
   fi
 fi
 
-if grep -Eq '^(MIPStarRE/|MIPStarRE\.lean$|blueprint/src/|blueprint/lean_decls|scripts/(audit_paper_facing_proof_debt|audit_conclusion_shaped_hypotheses|audit_unfaithful_markers|audit_lean_axiom_declarations|check_statement_paper_origin|blueprint_lean_sync|lean_header_utils)\.py|docs/(CONTRIBUTING|PROOF_INTEGRITY|anti_patterns|blueprint_style_guide|formalization-patterns|proof_frontier_review)\.md|docs/paper-gaps/|\.github/(actions|prompts|workflows)/|AGENTS\.md)' "$CHANGED_FILE_LIST"; then
+if grep -Eq '^(MIPStarRE/|MIPStarRE\.lean$|blueprint/src/|blueprint/lean_decls|scripts/(audit_paper_facing_proof_debt|audit_conclusion_shaped_hypotheses|audit_unfaithful_markers|audit_lean_axiom_declarations|check_statement_paper_origin|check_source_statement_changes|blueprint_lean_sync|lean_header_utils)\.py|docs/(CONTRIBUTING|PROOF_INTEGRITY|anti_patterns|blueprint_style_guide|formalization-patterns|proof_frontier_review)\.md|docs/paper-gaps/|\.github/(actions|prompts|workflows)/|AGENTS\.md)' "$CHANGED_FILE_LIST"; then
   echo "MIPStarRE pre-push: checking statement-integrity audits."
   echo "MIPStarRE pre-push: do not close proof gaps by adding non-paper bridge/package hypotheses."
   run_outside_git_env python3 scripts/check_statement_paper_origin.py --root .
@@ -87,6 +87,18 @@ if grep -Eq '^(MIPStarRE/|MIPStarRE\.lean$|blueprint/src/|blueprint/lean_decls|s
   run_outside_git_env python3 scripts/audit_conclusion_shaped_hypotheses.py --root . --ci
   run_outside_git_env python3 scripts/audit_unfaithful_markers.py --root . --ci
   run_outside_git_env python3 scripts/audit_lean_axiom_declarations.py --root . --ci
+fi
+
+if [ -s "$CHANGED_LEAN_FILE_LIST" ]; then
+  if git rev-parse --verify origin/main >/dev/null 2>&1; then
+    echo "MIPStarRE pre-push: checking source-labelled statement headers."
+    run_outside_git_env python3 scripts/check_source_statement_changes.py \
+      --root . \
+      --base origin/main \
+      --changed-files $(cat "$CHANGED_LEAN_FILE_LIST")
+  else
+    echo "MIPStarRE pre-push: origin/main not found; skipping source statement header guard."
+  fi
 fi
 
 if grep -Eq '^(MIPStarRE/|MIPStarRE\.lean$|blueprint/|scripts/(blueprint_lean_sync|blueprint_leanok_axioms|check_blueprint_latex|check_blueprint_sync|tex_utils)\.py$)' "$CHANGED_FILE_LIST"; then

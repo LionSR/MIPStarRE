@@ -442,6 +442,20 @@ This is a local warning, not the merge authority.  It is meant to catch a
 missing `\lean{...}` discussion before the pull request spends a full blueprint
 or Lean CI cycle.
 
+For changed LDT Lean declarations, pre-push also compares public headers of
+source-labelled blueprint declarations against `origin/main`:
+
+```bash
+python3 scripts/check_source_statement_changes.py --root . \
+  --base origin/main --changed-files <changed Lean files>
+```
+
+This is a blocking local guard.  It does not decide whether the new statement is
+faithful to the paper.  It instead stops silent public-header changes to a Lean
+declaration cited by a source-labelled theorem, lemma, proposition, corollary,
+or definition, and asks the author to record the statement-integrity audit in
+the PR.
+
 For ordinary Lean pushes, pre-push also runs the same oversized-file guard used
 by CI:
 
@@ -472,6 +486,7 @@ remains the authoritative merge gate.  The responsibilities are:
 | Conclusion-shaped hypotheses are rejected | `pre-commit` and relevant `pre-push`: `audit_conclusion_shaped_hypotheses.py --ci` | `proof-evasion-helper-audits.yml` | Blocking CI. |
 | `**Unfaithful:**` markers carry citations and an elimination plan | `pre-commit` and relevant `pre-push`: `audit_unfaithful_markers.py --ci` | `proof-evasion-helper-audits.yml` | Blocking CI. |
 | Explicit `axiom` and `constant` declarations stay out of the LDT tree | `pre-commit` and relevant `pre-push`: `audit_lean_axiom_declarations.py --ci` | `proof-evasion-helper-audits.yml` | Blocking CI; ordinary `sorry` sites are tracked separately by their `sorryAx` closure. |
+| Source-labelled Lean declaration headers do not change silently | `pre-push`: `check_source_statement_changes.py --base origin/main` for changed LDT Lean files | Paper-facing proof-debt audit and review prompts | Local blocking guard for issue #1578.  Intentional paper-realignment changes should carry a statement-integrity audit in the PR. |
 | Edited Lean files type-check | `pre-push`: `lake env lean` on changed Lean files | `lean_action_ci.yml` | CI remains the full repository authority. |
 | Blueprint declarations and `blueprint/lean_decls` stay synchronized | `pre-push`: regenerate, diff, `blueprint_lean_sync.py --ci`, reverse coverage warning for changed Lean declarations, `checkdecls` | `blueprint-sync.yml`; best-effort checks in `lint-blueprint.yml` | The PR workflow is the authoritative check; the reverse coverage step is a local warning. |
 | Proof-level `\leanok` entries do not depend on `sorryAx` | `pre-push` full mode: `blueprint_leanok_axioms.py --ci` | `blueprint-sync.yml` | The axiom audit needs compiled local `.olean` artifacts on a cold runner, so this workflow keeps one explicit `lake build` before the audit. |
