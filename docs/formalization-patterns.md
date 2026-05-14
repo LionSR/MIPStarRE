@@ -100,6 +100,31 @@ with a tracked `sorry` is preferred whenever possible, because it makes the
 missing mathematical assertion visible without adding it to the paper theorem
 statement.
 
+### Required metadata for new proof-obligation declarations
+
+A new declaration whose name contains a proof-debt token such as `Bridge`,
+`Residual`, `Repair`, `Package`, `Producer`, `Input`, `Hypotheses`,
+`Assumptions`, `Obligation`, or `Witness` must explain its mathematical role in
+the def-site docstring.  A paper citation alone is not enough, because the
+reviewer must be able to tell whether the declaration is part of the paper
+statement or a Lean-only proof obligation.
+
+Use one of the following markers.
+
+| Marker | Use |
+|--------|-----|
+| `**Source:**`, `**Paper source:**`, or `**Source statement:**` | The declaration is a faithful formal encoding of a cited source statement or a field of that statement |
+| `**Faithful encoding:**` | The declaration records boundary data or domain data that the paper uses implicitly |
+| `**Proof obligation:**` or `**Internal proof obligation:**` | The declaration is a theorem or record that must be proved from the paper hypotheses before a source theorem is complete |
+| `**Conditional:**` | The declaration is a conditional helper; it must not be linked as the source theorem |
+| `**Unfaithful:**` | The declaration or proof currently depends on a load-bearing assumption not yet derived from the paper hypotheses |
+
+Proof-obligation, conditional, and unfaithful markers must cite a paper-gap note
+or tracking issue and must state the planned discharge or elimination theorem.
+If such a declaration would merely package missing work as an added hypothesis
+to a source theorem, do not introduce it; restore the source theorem statement
+and leave the missing proof as a tracked `sorry`.
+
 ### Conditional helper boundary
 
 1. **Prefer a source theorem with a tracked `sorry`.**  If a proof requires a
