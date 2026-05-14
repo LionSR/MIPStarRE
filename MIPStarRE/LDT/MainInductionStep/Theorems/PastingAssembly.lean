@@ -1,6 +1,6 @@
 import Mathlib.Analysis.Convex.SpecificFunctions.Pow
 import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds
-import MIPStarRE.LDT.MainInductionStep.Theorems.PackageConstructors
+import MIPStarRE.LDT.MainInductionStep.Theorems.StageDataConstructors
 import MIPStarRE.LDT.MainInductionStep.Theorems.AvgSliceErrors
 import MIPStarRE.LDT.CommutativityPoints.Approximation
 import MIPStarRE.LDT.Tactic.AvgCongr

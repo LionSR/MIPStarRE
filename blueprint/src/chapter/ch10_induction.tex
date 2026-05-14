@@ -63,7 +63,6 @@
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement-in-induction-section}
 	\lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection}
-	\leanok
   \uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $G \in \polysub{m}{q}{d}$ be a submeasurement with the following property:
   \begin{enumerate}
@@ -109,7 +108,7 @@
 	The Lean declaration for
 	Theorem~\ref{thm:self-improvement-in-induction-section} has the paper
 	hypotheses, and its proof is still open.  The conditional helper that used
-	to assume a bundle of Section~\ref{chap:self-improvement} obligations has
+	to assume Section~\ref{chap:self-improvement} proof-stage data has
 	been removed from the successor-step assembly.  The ordinary and
 	answer-valued slice constructors now call this theorem directly, so the
 	missing Section~\ref{chap:self-improvement} work remains a tracked proof
@@ -179,20 +178,19 @@
 	before this declaration can be used as the unrestricted source theorem.
 \end{remark}
 
-\begin{definition}[Self-improvement obligations for the successor step]\label{def:self-improvement-obligation}
+\begin{definition}[Self-improvement slice transport for the successor step]\label{def:self-improvement-slice-transport}
 	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.ofSelfImprovementInInductionSection}
 	\lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion}
-	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.ofSliceObligations}
-	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceObligations, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceObligations.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceObligations.ofPointMeasurementEq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceObligations.good_of_restrictedGood, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceObligations.ofMeasurementEq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.ofSliceObligations}
-	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.ofPointMeasurementEq, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.good_of_restrictedGood, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.ofMeasurementEq}
-	\leanok
+	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceStrategyTransport, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.ofSliceStrategyTransport}
+	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceStrategyTransport, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceStrategyTransport.ofPointMeasurementEq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceStrategyTransport.good_of_restrictedGood, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.SliceStrategyTransport.ofMeasurementEq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementPackage.ofSliceStrategyTransport}
+	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceStrategyTransport.ofPointMeasurementEq, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceStrategyTransport.good_of_restrictedGood, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceStrategyTransport.ofMeasurementEq}
 	\uses{thm:self-improvement-in-induction-section}
 	The successor step records the slice-wise self-improvement output in
 	\texttt{SelfImprovementPackage}, and the answer-valued route records the analogous
 	output in \texttt{AnswerSelfImprovementPackage}.  Their constructors call
 	\texttt{selfImprovementInInductionSection}; they no longer carry a separate
-	bundle of Section~\ref{chap:self-improvement} obligations as an input.
-	The \texttt{SliceObligations} structures are narrow formal interfaces: they
+	bundle of Section~\ref{chap:self-improvement} proof-stage data as an input.
+	The \texttt{SliceStrategyTransport} structures are narrow formal interfaces: they
 	assume concrete per-slice symmetric strategies and measurement-transport data,
 	while averaged point-operator compatibility is derived structurally from
 	point-measurement transport.  They then convert the remaining data into the
@@ -200,7 +198,7 @@
 \end{definition}
 
 \begin{definition}[Pasting data for the successor step]\label{def:successor-pasting-data}
-	\lean{MIPStarRE.LDT.MainInductionStep.AveragedPastingInput.output, MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingInput}
+	\lean{MIPStarRE.LDT.MainInductionStep.AveragedPastingInput.invokeLdPasting, MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingInput}
 	\leanok
 	\uses{lem:weighted-restricted-probability-bounds, thm:ld-pasting-in-induction-section}
 	The successor step forms the pasting input by combining the restricted
@@ -224,7 +222,6 @@
 
 \begin{theorem}[Main induction]\label{thm:main-induction}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction}
-	\leanok
 	\uses{def:good-strategy, def:polymeasurements, def:simeq, lem:main-induction-base}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge md$ and set
   \[
@@ -248,8 +245,8 @@
 	proof gap on the source statement.  The nearby formalization still names
 	the stage data
 	\lean{MIPStarRE.LDT.MainInductionStep.SliceRestrictionPackage, MIPStarRE.LDT.MainInductionStep.PerSliceInductionPackage, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage, MIPStarRE.LDT.MainInductionStep.AveragedPastingInput}
-	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.ofSliceObligations}
-	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceObligations.ofPointMeasurementEq}
+	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceStrategyTransport, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.ofSliceStrategyTransport}
+	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.SelfImprovementPackage.SliceStrategyTransport.ofPointMeasurementEq}
 	that mirror the four paper stages $\text{restrict} \to \text{induct} \to
 	\text{self-improve} \to \text{paste}$, but no theorem with these data as
 	additional source-level hypotheses is advertised as
@@ -261,7 +258,8 @@
 	restricted-probability estimates are now public via
 	\lean{MIPStarRE.LDT.MainInductionStep.weighted_axisParallel_bound, MIPStarRE.LDT.MainInductionStep.weighted_diagonal_bound, MIPStarRE.LDT.MainInductionStep.restrictedProbabilities},
 	The remaining proof gap for Theorem~\ref{thm:main-induction} is to derive the
-	successor-step constructions, including the restricted-strategy self-improvement obligations
+	successor-step constructions, including the restricted-strategy
+	self-improvement and slice-transport construction
 	tracked by issues \#1507 and \#1503 under the bridge-debt tracker \#1458,
 	from the paper hypotheses; hence no proof-level \leanok is attached here.
 	We may assume $\eps,\delta,\gamma,d/q \le 1$, since otherwise $\nu \ge 1$ and the bound is trivial.

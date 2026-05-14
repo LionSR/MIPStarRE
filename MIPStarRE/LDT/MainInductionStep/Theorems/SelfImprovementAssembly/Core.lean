@@ -13,8 +13,8 @@ Core public API for the ordinary self-improvement data: constructors for
 `selfImprovementInInductionSection`, the monotone-witness cleanup
 `mainInductionOfWitness`, and the pasting theorem `ldPastingInInductionSectionNontrivial`.
 
-The answer-valued slice constructors are separated into
-`SelfImprovementBridge.AnswerSlice`.
+The answer-valued slice-transport constructors are separated into
+`SelfImprovementAssembly.AnswerSlice`.
 
 ## References
 
@@ -245,16 +245,15 @@ noncomputable def SelfImprovementPackage.ofSelfImprovementInInductionSection
       bounded := fun x => (hslice_props x).2.2.2.2.1
       dominatesAveragePointOperator := fun x h => (hslice_props x).2.2.2.2.2 h }
 
-/-- Narrow obligation record for running the Section 9 self-improvement theorem
-on each Section 6 slice.
+/-- Narrow transport record for running the Section 9 self-improvement theorem
+on each concrete Section 6 slice strategy.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
 `references/ldt-paper/self_improvement.tex:631-811`; this records the
 formalization boundary needed to run the Section 9 theorem on concrete slice
 strategies.
 
-The record deliberately keeps the remaining mathematical obligations explicit:
-for every slice it asks for a concrete `SymStrat params ι` whose state,
+For every slice the record asks for a concrete `SymStrat params ι` whose state,
 point-measurement interface, and averaged point operator agree with the
 restricted-slice bookkeeping used by Section 6.  The equalities below do not
 derive the extra `SymStrat` fields (`permInvState`, `densityFixed`, or
@@ -265,7 +264,7 @@ The Section 9 analytic proof debt is not stored in this record.  The package
 constructor below calls
 `selfImprovementInInductionSection`, whose present proof gap is the tracked
 place where that work belongs. -/
-structure SelfImprovementPackage.SliceObligations
+structure SelfImprovementPackage.SliceStrategyTransport
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -300,7 +299,7 @@ structure SelfImprovementPackage.SliceObligations
 /-- The averaged slice point-operator compatibility is structural: once an
 concrete slice strategy's point measurement agrees with the restricted-slice point
 measurement, the averaged point operators agree by unfolding the two averages. -/
-theorem SelfImprovementPackage.SliceObligations.averagedPoint_eq_of_pointMeasurement_eq
+theorem SelfImprovementPackage.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -317,7 +316,7 @@ theorem SelfImprovementPackage.SliceObligations.averagedPoint_eq_of_pointMeasure
     IdxPolyFamily.averagedSlicePointEvaluationOperator, hpoint x,
     xRestrictedStrategy_pointMeasurement_apply]
 
-/-- Build `SliceObligations` without separately assuming averaged point-operator
+/-- Build `SliceStrategyTransport` without separately assuming averaged point-operator
 compatibility.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551`; the averaged
@@ -327,7 +326,7 @@ interface and the Section 9 interface.
 The only structural equality needed for that field is `pointMeasurement_eq`.
 The remaining inputs are the concrete slice strategies, their state transport, and
 their restricted-profile goodness. -/
-noncomputable def SelfImprovementPackage.SliceObligations.ofPointMeasurementEq
+noncomputable def SelfImprovementPackage.SliceStrategyTransport.ofPointMeasurementEq
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -347,13 +346,13 @@ noncomputable def SelfImprovementPackage.SliceObligations.ofPointMeasurementEq
           (restrictionPkg.profile.axisParallel x)
           (restrictionPkg.profile.selfConsistency x)
           (restrictionPkg.profile.diagonal x)) :
-    SelfImprovementPackage.SliceObligations params strategy eps delta gamma k
+    SelfImprovementPackage.SliceStrategyTransport params strategy eps delta gamma k
       restrictionPkg inductionPkg where
   sliceStrategy := sliceStrategy
   state_eq := state_eq
   pointMeasurement_eq := pointMeasurement_eq
   averagedPoint_eq :=
-    SelfImprovementPackage.SliceObligations.averagedPoint_eq_of_pointMeasurement_eq
+    SelfImprovementPackage.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq
       params strategy sliceStrategy pointMeasurement_eq
   good := good
 
@@ -364,7 +363,7 @@ state and the measurements used by the three LDT subtests agree with
 This is a structural helper for the #1503 successor route: it uses the
 `restrictedGood` field already stored in `SliceRestrictionPackage.profile` and
 does not touch the remaining Section 9 analytic obligations. -/
-theorem SelfImprovementPackage.SliceObligations.good_of_restrictedGood
+theorem SelfImprovementPackage.SliceStrategyTransport.good_of_restrictedGood
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -415,7 +414,7 @@ theorem SelfImprovementPackage.SliceObligations.good_of_restrictedGood
       simp [state_eq x, pointMeasurement_eq x, diagonalMeasurement_eq x]
     simpa [hfail] using hgood.diagonalLineTest
 
-/-- Build `SliceObligations` from concrete slice strategies and measurement
+/-- Build `SliceStrategyTransport` from concrete slice strategies and measurement
 transport.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
@@ -426,7 +425,7 @@ slice interface: `averagedPoint_eq` follows from point-measurement transport and
 `good` follows from the restricted failure profile plus state/axis/diagonal
 measurement transport.  The remaining non-structural inputs are the concrete
 slice strategies themselves. -/
-noncomputable def SelfImprovementPackage.SliceObligations.ofMeasurementEq
+noncomputable def SelfImprovementPackage.SliceStrategyTransport.ofMeasurementEq
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -448,12 +447,12 @@ noncomputable def SelfImprovementPackage.SliceObligations.ofMeasurementEq
       ∀ x,
         (sliceStrategy x).diagonalMeasurement.toIdxProjMeas =
           (xRestrictedStrategy params strategy x).diagonalMeasurement) :
-    SelfImprovementPackage.SliceObligations params strategy eps delta gamma k
+    SelfImprovementPackage.SliceStrategyTransport params strategy eps delta gamma k
       restrictionPkg inductionPkg :=
-  SelfImprovementPackage.SliceObligations.ofPointMeasurementEq
+  SelfImprovementPackage.SliceStrategyTransport.ofPointMeasurementEq
     params strategy eps delta gamma k restrictionPkg inductionPkg sliceStrategy state_eq
     pointMeasurement_eq
-    (SelfImprovementPackage.SliceObligations.good_of_restrictedGood
+    (SelfImprovementPackage.SliceStrategyTransport.good_of_restrictedGood
       params strategy eps delta gamma restrictionPkg sliceStrategy state_eq
       pointMeasurement_eq axisParallelMeasurement_eq diagonalMeasurement_eq)
 
@@ -469,7 +468,7 @@ measurement transports. It applies the theorem
 across the recorded equalities to the restricted-slice interface.  The theorem
 itself is currently a tracked proof gap (#1503); this constructor does not carry
 the Section 9 proof debt as an additional package hypothesis. -/
-noncomputable def SelfImprovementPackage.ofSliceObligations
+noncomputable def SelfImprovementPackage.ofSliceStrategyTransport
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -477,8 +476,8 @@ noncomputable def SelfImprovementPackage.ofSliceObligations
     (k : ℕ)
     (restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma)
     (inductionPkg : PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k)
-    (sliceObligations :
-      SelfImprovementPackage.SliceObligations params strategy eps delta gamma k
+    (sliceTransport :
+      SelfImprovementPackage.SliceStrategyTransport params strategy eps delta gamma k
         restrictionPkg inductionPkg) :
     SelfImprovementPackage params strategy eps delta gamma k restrictionPkg inductionPkg := by
   classical
@@ -486,44 +485,44 @@ noncomputable def SelfImprovementPackage.ofSliceObligations
     SelfImprovementPackage.ofSelfImprovementInInductionSection
       params strategy eps delta gamma k restrictionPkg inductionPkg ?_
   intro x
-  let sliceStrategy := sliceObligations.sliceStrategy x
+  let sliceStrategy := sliceTransport.sliceStrategy x
   have hconsSlice :
       ConsRel sliceStrategy.state (uniformDistribution (Point params))
         (IdxProjMeas.toIdxSubMeas sliceStrategy.pointMeasurement)
         (polynomialEvaluationFamily params (inductionPkg.sliceMeasurement x).toSubMeas)
         (inductionPkg.sliceError x) := by
     have hcons := inductionPkg.pointConsistency x
-    rw [← sliceObligations.state_eq x, ← sliceObligations.pointMeasurement_eq x] at hcons
+    rw [← sliceTransport.state_eq x, ← sliceTransport.pointMeasurement_eq x] at hcons
     simpa [sliceStrategy] using hcons
   rcases selfImprovementInInductionSection params
-      (sliceObligations.sliceStrategy x)
+      (sliceTransport.sliceStrategy x)
       (restrictionPkg.profile.axisParallel x)
       (restrictionPkg.profile.selfConsistency x)
       (restrictionPkg.profile.diagonal x)
       (inductionPkg.sliceError x)
-      (sliceObligations.good x)
+      (sliceTransport.good x)
       (inductionPkg.sliceMeasurement x).toSubMeas
       hconsSlice with
     ⟨H, Z, hH⟩
   refine ⟨H, Z, ?_⟩
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
   · have hcomp := hH.completeness
-    rw [sliceObligations.state_eq x] at hcomp
+    rw [sliceTransport.state_eq x] at hcomp
     simpa [sliceSelfImprovementError] using hcomp
   · have hpoint := hH.pointConsistency
-    rw [sliceObligations.state_eq x, sliceObligations.pointMeasurement_eq x] at hpoint
+    rw [sliceTransport.state_eq x, sliceTransport.pointMeasurement_eq x] at hpoint
     simpa [sliceSelfImprovementError] using hpoint
   · have hssc := hH.strongSelfConsistency
-    rw [sliceObligations.state_eq x] at hssc
+    rw [sliceTransport.state_eq x] at hssc
     simpa [sliceSelfImprovementError] using hssc
   · have hclose := hH.selfCloseness
-    rw [sliceObligations.state_eq x] at hclose
+    rw [sliceTransport.state_eq x] at hclose
     simpa [sliceSelfImprovementError] using hclose
   · have hbounded := hH.bounded
-    rw [sliceObligations.state_eq x] at hbounded
+    rw [sliceTransport.state_eq x] at hbounded
     simpa [sliceSelfImprovementError] using hbounded
   · intro h
-    simpa [sliceObligations.averagedPoint_eq x h] using hH.dominatesAveragePointOperator h
+    simpa [sliceTransport.averagedPoint_eq x h] using hH.dominatesAveragePointOperator h
 
 /-- Restricted nontrivial-regime Lean restatement of
 `thm:ld-pasting-in-induction-section`.
