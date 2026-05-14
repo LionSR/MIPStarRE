@@ -13,6 +13,17 @@ on:
       - "blueprint/src/**/*.tex"
       - "docs/paper-gaps/**/*.tex"
       - "docs/paper-gaps/**/*.bib"
+      - ".github/prompts/**"
+      - "AGENTS.md"
+      - "docs/CONTRIBUTING.md"
+      - "docs/PROOF_INTEGRITY.md"
+      - "docs/anti_patterns.md"
+      - "docs/blueprint_style_guide.md"
+      - "docs/ci-automation.md"
+      - "docs/formalization-patterns.md"
+      - "docs/mathematical_language.md"
+      - "docs/pr-review.md"
+      - "docs/proof_frontier_review.md"
 
 concurrency:
   group: claude-review-${{ github.event.pull_request.number }}
