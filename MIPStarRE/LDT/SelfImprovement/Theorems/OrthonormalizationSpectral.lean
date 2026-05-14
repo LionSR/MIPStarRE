@@ -6,7 +6,7 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 # Section 9 — Spectral Truncation for Orthonormalization
 
 This file records the useful spectral-truncation conversion needed when the
-Section 9 helper output is later fed into the orthonormalization theorem.  The
+Section 9 helper output is later used in the orthonormalization theorem.  The
 paper input is the family `\widehat H` produced in
 `references/ldt-paper/self_improvement.tex`; the spectral-truncation step is the
 one isolated in `references/ldt-paper/orthonormalization.tex`:
@@ -15,7 +15,7 @@ one isolated in `references/ldt-paper/orthonormalization.tex`:
   option-completed, left-lifted helper measurement.
 
 This module deliberately does not state a single `OrthonormalizationInput`
-hypothesis or a locality-preserving repair hypothesis.  The paper-facing
+hypothesis or a locality-preserving repair hypothesis.  The paper-aligned
 self-improvement theorem keeps the remaining orthonormalization construction as
 an unproved obligation in `selfImprovement`, rather than replacing it by an
 extra theorem hypothesis.
@@ -38,12 +38,13 @@ extra theorem hypothesis.
 * `references/ldt-paper/orthonormalization.tex` line 414
   (`lem:projective-non-measurement`) for the spectral-truncation obligation.
 * `references/ldt-paper/orthonormalization.tex` line 67
-  (`thm:orthonormalization`) for the overall theorem this obligation feeds.
+  (`thm:orthonormalization`) for the overall theorem supported by this
+  obligation.
 * `references/ldt-paper/self_improvement.tex` lines 679–697
-  (helper output `\widehat{H}` is fed to `thm:orthonormalization`).
-* The current source-facing self-improvement tracker #1515: the remaining
+  (helper output `\widehat{H}` is the input to `thm:orthonormalization`).
+* The current paper-aligned self-improvement tracker #1515: the remaining
   orthonormalization construction is left as an unproved obligation on the
-  paper-facing theorem, with only the spectral-truncation conversion recorded
+  paper-aligned theorem, with only the spectral-truncation conversion recorded
   here.
 -/
 
@@ -69,7 +70,7 @@ orthonormalization theorem from
 `references/ldt-paper/orthonormalization.tex:273-282`.
 
 **Proof obligation:** This is the spectral-truncation part of the Section 9
-orthonormalization construction, tracked by #1596 and feeding the source-facing
+orthonormalization construction, tracked by #1596 and supporting the remaining
 gap #1515.  It is not an extra hypothesis of `thm:self-improvement`.
 Elimination: combine this spectral slice with the locality-preserving repair
 and final-field transport needed to prove `selfImprovement` from the paper
