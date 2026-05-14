@@ -21,7 +21,8 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
 
 \begin{lemma}[Self-improvement with non-projective output]\label{lem:self-improvement-helper}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelper}
-	\leanok
+  % No \leanok is attached here while the proof still depends on the SDP
+  % slackness gap tracked by issue #1230.
   \uses{def:polymeasurements, def:simeq, def:strong-self-consistency}
   Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following property:
   \begin{enumerate}
@@ -1022,9 +1023,8 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovement}
-  \leanok
-  % No proof-level \leanok is attached below: the derivation from the input
-  % consistency hypothesis is not yet complete; see issue #1515.
+  % No \leanok is attached here: the derivation from the input consistency
+  % hypothesis is not yet complete; see issue #1515.
   \uses{def:polymeasurements, def:simeq, def:approx_delta, def:strong-self-consistency}
   Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following properties:
   \begin{enumerate}

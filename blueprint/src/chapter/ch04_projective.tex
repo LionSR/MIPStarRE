@@ -70,7 +70,8 @@
 
 \begin{theorem}[Orthogonalization lemma]\label{thm:orthonormalization}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
-	\leanok
+	% No \leanok is attached here while the source-constant proof gap tracked by
+	% issue #1032 remains open.
 	% In Lean, normalization is an explicit hypothesis because the ambient state
 	% record contains positive semidefinite density matrices of arbitrary
 	% normalized trace; this matches the paper's convention that a state is
