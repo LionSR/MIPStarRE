@@ -435,7 +435,7 @@ lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_abs_bounds
     uniformDistribution (SandwichedLineQuestion params k)
   have h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1 := by
     simpa [𝒟] using uniformDistribution_weight_sum_le_one (SandwichedLineQuestion params k)
-  have inputFacts :=
+  have csFacts :=
     ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_facts
       params strategy family gamma zeta hi hi0 facts
   refine ⟨?_, ?_⟩
@@ -446,9 +446,9 @@ lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_abs_bounds
         (ldSandwichLineOnePointCS_Arot params family hi)
         (ldSandwichLineOnePointCS_Cfirst params strategy family hi)
         (commuteGHalfSandwichError params gamma zeta (i + 1))
-        (by simpa [𝒟] using inputFacts.adjointRawCore)
-        inputFacts.firstUnitBound
-    rw [inputFacts.source_eq_firstSourceRaw, inputFacts.afterFirst_eq_firstTargetRaw]
+        (by simpa [𝒟] using csFacts.adjointRawCore)
+        csFacts.firstUnitBound
+    rw [csFacts.source_eq_firstSourceRaw, csFacts.afterFirst_eq_firstTargetRaw]
     simpa [ldSandwichLineOnePointCS_firstSourceRaw,
       ldSandwichLineOnePointCS_firstTargetRaw, 𝒟] using hfirst
   · have hsecond :=
@@ -462,9 +462,9 @@ lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_abs_bounds
           (ldSandwichLineOnePointCS_Arot params family hi q gs)ᴴ)
         (ldSandwichLineOnePointCS_Csecond params strategy family hi)
         (commuteGHalfSandwichError params gamma zeta (i + 1))
-        (by simpa [𝒟] using inputFacts.adjointRawCore)
-        inputFacts.secondUnitBound
-    rw [inputFacts.afterFirst_eq_secondSourceRaw, inputFacts.moved_eq_secondTargetRaw]
+        (by simpa [𝒟] using csFacts.adjointRawCore)
+        csFacts.secondUnitBound
+    rw [csFacts.afterFirst_eq_secondSourceRaw, csFacts.moved_eq_secondTargetRaw]
     simpa [ldSandwichLineOnePointCS_secondSourceRaw,
       ldSandwichLineOnePointCS_secondTargetRaw, 𝒟] using hsecond
 

@@ -633,7 +633,8 @@ the paper-specific facts:
   existing source, intermediate, and moved outcome sums.
 
 The construction lemma below proves the unit bounds and regrouping equalities;
-the remaining live analytic endpoint is the adjoint-oriented raw-core estimate. -/
+the remaining live analytic endpoint is the adjoint-oriented raw-core estimate
+recorded by `LdSandwichLineOnePointAdjointRawCoreBound`. -/
 structure LdSandwichLineOnePointCSFacts
     (params : Parameters)
     [FieldModel params.q]
