@@ -588,9 +588,9 @@ theorem ldPastingLargeDegreeRatioBranch
 
 /-- Complementary branch for `thm:ld-pasting` when `k = 0`.
 
-This branch is a Lean boundary case for the wrapper around the nontrivial
-theorem, whose proof assumes `1 ≤ k`.  Issue #1601 tracks the scalar
-calculation showing that the exponential term gives the trivial bound. -/
+This branch is a boundary case for the reduction to the nontrivial theorem,
+whose proof assumes `1 ≤ k`.  Issue #1601 tracks the scalar calculation showing
+that the exponential term gives the trivial bound. -/
 theorem ldPastingZeroKBranch
     (params : Parameters)
     [FieldModel params.q]
@@ -616,9 +616,9 @@ theorem ldPastingZeroKBranch
 Paper origin: `references/ldt-paper/ld-pasting.tex:12-55`.  The paper's
 large-error reduction names the cases
 `eps, delta, gamma, zeta, d/q ≥ 1`; it does not explicitly add `0 < d` as a
-hypothesis of `thm:ld-pasting`.  Thus the source-facing Lean theorem should
-not add `0 < d` publicly.  Issue #1622 tracks the direct proof of this
-degree-zero branch. -/
+hypothesis of `thm:ld-pasting`.  Thus the Lean theorem should not add `0 < d`
+as an assumption of that cited theorem.  Issue #1622 tracks the direct proof of
+this degree-zero branch. -/
 theorem ldPastingDegreeZeroBranch
     (params : Parameters)
     [FieldModel params.q]
@@ -640,14 +640,13 @@ theorem ldPastingDegreeZeroBranch
   -- `0 < d` as a public hypothesis of the source theorem.
   sorry
 
-/-- Nontrivial branch for the universe-polymorphic source theorem.
+/-- Nontrivial regime for the unrestricted theorem.
 
-The restricted construction theorem `ldPastingNontrivial` proves this branch in
-the concrete small-universe field model used by the pasted-measurement
-construction.  The paper-facing theorem is kept with the unchanged public
-header, so this lemma records the remaining Lean transport obligation rather
-than changing the source theorem statement.  Issue #1601 tracks the wrapper
-branches needed for the unrestricted theorem. -/
+The restricted construction theorem `ldPastingNontrivial` proves the nontrivial
+analytic regime for the canonical pasted measurement.  This auxiliary statement
+records the remaining task of applying that construction to the unrestricted
+theorem without changing the statement of `thm:ld-pasting`.  Issue #1601 tracks
+the branches needed for the unrestricted theorem. -/
 theorem ldPastingNontrivialPublicBranch
     (params : Parameters)
     [FieldModel params.q]
@@ -668,8 +667,8 @@ theorem ldPastingNontrivialPublicBranch
     (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
-  -- Issue #1601: connect the existing restricted construction theorem to the
-  -- unchanged universe-polymorphic public theorem without changing the statement.
+  -- Issue #1601: derive this unrestricted-regime statement from
+  -- `ldPastingNontrivial` while preserving the statement of `thm:ld-pasting`.
   sorry
 
 /-- Source-facing form of `thm:ld-pasting`.
