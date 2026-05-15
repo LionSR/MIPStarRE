@@ -486,4 +486,29 @@ theorem ldGbcon
   simpa [ldGbconVerticalLineMeasurement,
     ldGbconAxisLineMeasurement_eq_verticalLineMeasurement params strategy] using htriangle
 
+/-- Named-family form of `lem:ld-gbcon`.
+
+This is the same consistency transfer as `ldGbcon`, restated with the two
+families used in the degree-zero branch of `thm:ld-pasting`: the evaluated slice
+family `family.evaluatedAtNextPoint` and the lifted vertical-line family
+`liftedVerticalLineAnswerFamily`.  In the degree-zero branch, these are the two
+families whose pointwise invariance properties must be combined to control
+height dependence. -/
+theorem ldGbcon_liftedVerticalLine
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta) :
+    ConsRel strategy.state
+      (uniformDistribution (Point params.next))
+      family.evaluatedAtNextPoint
+      (liftedVerticalLineAnswerFamily params strategy)
+      (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
+  simpa [IdxPolyFamily.evaluatedAtNextPoint, evaluateFiberFamilyAtNextPoint,
+    liftedVerticalLineAnswerFamily] using
+    ldGbcon params strategy eps delta gamma zeta hgood family hcons
+
 end MIPStarRE.LDT.Pasting
