@@ -477,55 +477,6 @@ theorem leftLiftedProjectivizationRepair
         (ProjSubMeas.liftLeft P) (orthonormalizationMainLemmaError ζ) :=
   leftLiftedProjectivizationRepairProducer ψ hψ A ζ hsource
 
-/-- Locality-preserving projectivization repair with the exact line-169
-match-mass preservation obligation kept at the QXP construction point.
-
-This is the producer-level obligation isolated by #1610.  The ordinary repair
-producer above proves the state-dependent-distance estimate and returns only
-the projective submeasurement, thereby forgetting the QXP data.  The final
-Step 6 line-169 argument needs the stronger fact that the same QXP data
-preserves every diagonal outcome expectation against the fixed opposite
-measurement `B`.  Until the QXP calculation is formalized, the remaining
-`sorry` is kept here, where the construction data belongs, rather than in the
-final theorem layer.
-
-Paper origin: `references/ldt-paper/orthonormalization.tex:862-1194` for the
-`Q/X/XHat/P` construction and `references/ldt-paper/inductive_step.tex:135-169`
-for the match-mass use in the main induction.
-
-**Unfaithful:** This proof currently contains the #1610 proof obligation: the
-QXP outcome-expectation preservation calculation has not yet been derived from
-`references/ldt-paper/orthonormalization.tex:862-1194` and
-`references/ldt-paper/inductive_step.tex:135-169`.  The exactness question is
-documented in `docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`; #1610
-tracks the remaining QXP construction obligation.
-Elimination: either prove the outcome-expectation preservation inequality for
-the same `Q/X/XHat/P` data returned by the repair construction, or replace the
-line-169 route by the corrected scalar loss and propagate that loss through the
-final cascade. -/
-theorem leftLiftedProjectivizationRepairWithMatchMass
-    {Outcome : Type*} {ι : Type*}
-    [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized)
-    (A B : Measurement Outcome ι) (ζ : Error)
-    (hsource :
-      ∑ a, ev ψ
-        ((leftLiftedMeasurement (ιB := ι) A).outcome a -
-          (leftLiftedMeasurement (ιB := ι) A).outcome a *
-            (leftLiftedMeasurement (ιB := ι) A).outcome a) ≤ ζ) :
-    ∃ data : QXPLayerData Outcome ι,
-      RoundedProjMeasStatement ψ (leftLiftedMeasurement (ιB := ι) A)
-          (ProjSubMeas.liftLeft (qxpProjSubMeas data))
-          (orthonormalizationMainLemmaError ζ) ∧
-        OrthonormalizationMatchMassPreservation.QXPLayerOutcomeExpectationPreservation
-          ψ A B data := by
-  -- TODO(#1610): resolve the line-169 exactness obligation.  Either prove the
-  -- QXP outcome-expectation preservation calculation for the projectors
-  -- `P_a = XHat† T_a XHat`, or replace the downstream use by the corrected
-  -- scalar loss documented in the issue-#1099 paper-gap note.
-  sorry
-
 end
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

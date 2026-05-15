@@ -27,13 +27,13 @@ The remaining completion step is the explicit proof obligation in
 no match-mass or diagonal-consistency data is accepted as an extra input.
 
 **Unfaithful:** This construction currently depends transitively on
-`leftLiftedProjectivizationRepairWithMatchMass`, whose
-outcome-expectation preservation theorem is not yet derived from
+`orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass`,
+whose exact match-mass preservation conclusion is not yet derived from
 `references/ldt-paper/inductive_step.tex:130-173`.  This is documented in
-`docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`, with the remaining
-construction target tracked by #1610.
-Elimination: prove the QXP outcome-expectation preservation theorem from the
-paper hypotheses, or replace the exact line-169 step by the corrected scalar
+issue #1610 and in
+`docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`.  Elimination: prove
+the exact construction-level monotonicity from the paper hypotheses, or route
+the final theorem through the repaired line-169 estimate with its explicit
 loss, and remove this propagated dependency.
 -/
 theorem nonempty_ofRoleWitness

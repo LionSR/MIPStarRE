@@ -570,6 +570,33 @@ theorem sdp_statement_with_slackness
   -- external input to the helper completeness argument.
   sorry
 
+/-- Displayed measurement and complementary-slackness conclusion of `lem:sdp`.
+
+Paper origin: `references/ldt-paper/self_improvement.tex` lines 82--88 state
+that the Section 9 SDP admits a primal family `{T_g}` with `∑ g, T_g = I` and
+a dual operator `Z` satisfying `T_g Z = T_g A_g` for every polynomial `g`.
+This theorem extracts exactly that complete-measurement and slackness form from
+the source-shaped SDP statement `sdp_statement_with_slackness`.
+
+**Unfaithful:** This proof currently relies on
+`sdp_statement_with_slackness`, whose complementary-slackness proof is not yet
+derived from `references/ldt-paper/self_improvement.tex` (`lem:sdp`).
+Documented by issue #1230.  Elimination: prove
+`sdp_statement_with_slackness` from the SDP strong-duality and
+complementary-slackness argument. -/
+theorem sdp_slackness_measurement
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι) :
+    ∃ T : Measurement (Polynomial params) ι,
+      ∃ Z : MIPStarRE.Quantum.Op ι,
+        0 ≤ Z ∧
+        (∀ g : Polynomial params, 0 ≤ sdpDualSlackOperator params strategy Z g) ∧
+        ∀ g : Polynomial params,
+          sdpComplementarySlacknessEquation params strategy T.toSubMeas Z g :=
+  SdpStatementWithSlackness.exists_measurement_witness
+    (sdp_statement_with_slackness params strategy)
+
 /-- Reduced version of `lem:add-in-u`.
 
 This currently keeps only the global-variance consequence used downstream. It

@@ -77,8 +77,9 @@ scripts/install_git_hooks.sh
 scripts/install_git_hooks.sh --check
 ```
 
-The pre-commit hook runs whitespace and proof-debt audits on relevant staged
-files, including agent prompts and actions under `.github/`.  The pre-push hook
+The pre-commit hook runs whitespace, paper-gap-note structure, and proof-debt
+audits on relevant staged files, including agent prompts and actions under
+`.github/`.  The pre-push hook
 checks changed Lean files with `lake env lean`, repeats the fast
 statement-integrity audits for relevant policy or prompt surfaces, and checks
 blueprint declaration synchronization when Lean or blueprint surfaces changed.

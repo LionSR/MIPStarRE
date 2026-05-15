@@ -296,8 +296,14 @@ lemma ldSandwichLineOnePoint_core
       heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hzeta_le
       family hi hi0 hcomm hmovedEndpoint'
 
-/-- `lem:ld-sandwich-line-one-point`. -/
-lemma ldSandwichLineOnePoint
+/-- Internal form of `lem:ld-sandwich-line-one-point` after applying
+`cor:G-hat-facts`.
+
+**Source:** The proof in `references/ldt-paper/ld-pasting.tex:956-1074` uses
+the half-sandwich commutation estimates obtained from `cor:G-hat-facts`.  The
+paper-facing theorem `ldSandwichLineOnePoint` below derives those estimates
+from the source hypotheses. -/
+lemma ldSandwichLineOnePoint_ofGHatFacts
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -320,10 +326,38 @@ lemma ldSandwichLineOnePoint
         CommuteGHalfSandwichStatement params strategy.state family
           gamma zeta j := by
     intro j hj
-    exact commuteGHalfSandwich params strategy.state family gamma zeta
+    exact commuteGHalfSandwich_ofGHatFacts params strategy.state family gamma zeta
       j hj hzeta_le hfacts
   exact ⟨ldSandwichLineOnePoint_core params strategy eps delta gamma zeta
     hgood hzeta_le family hcons hcomm k i hi⟩
 
+/-- `lem:ld-sandwich-line-one-point`, source-facing form. -/
+lemma ldSandwichLineOnePoint
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (k i : ℕ)
+    (hi : i < k) :
+    LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i := by
+  have hgamma_nonneg : 0 ≤ gamma :=
+    gamma_nonneg_of_isGood params.next strategy hgood
+  have hzeta_nonneg : 0 ≤ zeta :=
+    IdxPolyFamily.zeta_nonneg_of_consistentWithPoints strategy family hcons
+  have hfacts : GHatFactsStatement params strategy.state family gamma zeta :=
+    gHatFacts params strategy family eps delta gamma zeta
+      hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le
+      hgood hcons hself hbound
+  exact ldSandwichLineOnePoint_ofGHatFacts params strategy eps delta gamma zeta
+    hgood hgamma_le hzeta_le hdq_le family hcons hself hbound hfacts k i hi
 
 end MIPStarRE.LDT.Pasting

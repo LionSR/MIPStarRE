@@ -11,7 +11,7 @@ Core operating rules:
   theorem, a blueprint `\leanok` link, or a proof-debt record.
 - Read the corresponding statement in `references/ldt-paper/` before changing a
   theorem cited as a paper theorem.
-- Do not add bridge, residual, repair, package, proof-obligation input,
+- Do not add bridge, residual, repair, package, producer, witness, wrapper, proof-obligation input,
   hypotheses bundle, assumptions bundle, or arbitrary implication hypotheses to
   a source-labelled theorem. Missing proof work should become a named internal
   obligation, lemma, existing tracked issue, or tracked `sorry` on the

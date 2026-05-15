@@ -94,7 +94,7 @@ lemma projectiveLowRankSum_of_spectralTruncationStatement
       ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) :
     ∃ data : QLayerData Outcome ι,
       RankReductionWitness ψ A ζ data :=
-  projectiveLowRankSum ψ A ζ hψ hζ hζ_le hSpectral.roundedFamily
+  projectiveLowRankSum_of_roundingWitness ψ A ζ hψ hζ hζ_le hSpectral.roundedFamily
     hSpectral.toRoundingToProjectorsWitness hsource
 
 /-- Feed a spectral-truncation input directly into the QXP rank-reduction

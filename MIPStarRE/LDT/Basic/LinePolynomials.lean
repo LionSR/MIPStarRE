@@ -47,6 +47,28 @@ instance {params : Parameters} [FieldModel params.q] :
     CoeFun (AxisLinePolynomial params) (fun _ => Fq params → Fq params) :=
   ⟨AxisLinePolynomial.toFun⟩
 
+/-- A degree-zero axis-line answer is a constant univariate polynomial.
+
+Lean-only helper for the degree-zero branch of `thm:ld-pasting`; the source
+context is `references/ldt-paper/ld-pasting.tex:12-55`, where the boundary
+case `d = 0` must be handled without adding `0 < d` to the theorem. -/
+theorem eq_C_coeff_zero_of_degree_zero {params : Parameters} [FieldModel params.q]
+    (f : AxisLinePolynomial params) (hd : params.d = 0) :
+    f.poly = _root_.Polynomial.C (f.poly.coeff 0) := by
+  exact _root_.Polynomial.eq_C_of_natDegree_eq_zero
+    (Nat.eq_zero_of_le_zero (f.degreeBounded.trans (by simp [hd])))
+
+/-- A degree-zero axis-line answer has the same value at all line parameters.
+
+Lean-only helper for the degree-zero branch of `thm:ld-pasting`; this is the
+vertical-line analogue of `Polynomial.apply_eq_apply_of_degree_zero`. -/
+theorem apply_eq_apply_of_degree_zero {params : Parameters} [FieldModel params.q]
+    (f : AxisLinePolynomial params) (hd : params.d = 0) (t s : Fq params) :
+    f t = f s := by
+  unfold AxisLinePolynomial.toFun evalLinePolynomialModel
+  rw [eq_C_coeff_zero_of_degree_zero f hd]
+  simp
+
 @[ext] theorem ext {params : Parameters} [FieldModel params.q]
     {f g : AxisLinePolynomial params} (hpoly : f.poly = g.poly) : f = g := by
   cases f with

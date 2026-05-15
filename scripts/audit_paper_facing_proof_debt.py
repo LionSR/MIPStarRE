@@ -16,6 +16,14 @@ review aid for that boundary:
   ``Bundle``, ``Conditional``, ``Producer``, ``Obligation``, an ``Input``
   bundle, a wrapper, an ``Unfaithful`` marker type, or a generic
   ``Hypotheses`` / ``Assumptions`` bundle;
+* with ``--broad-vocabulary``, also report the wider tracker vocabulary
+  ``Statement``, ``Output``, ``Conclusion``, ``Witness``, ``Data``, and
+  ``Compatibility`` in public inputs.  This mode is an inventory tool while
+  those broad occurrences are classified and reduced; it is deliberately not
+  the default blocking gate.
+* classify quoted external theorem interfaces separately in broad mode, so
+  external citations from the overview are not conflated with internal proof
+  obligations.
 * reject paper-facing blueprint entries that point to declaration names with
   conditional proof-debt forms such as ``*_of...Obligations``,
   ``*_of...Residual``, ``*_of...Repair``, ``*_of...Bundle``,
@@ -24,6 +32,11 @@ review aid for that boundary:
   suspicious public input.
 * classify known faithful boundary-input packages separately, with paper
   citations, so they do not become indistinguishable from proof debt.
+* optionally, with ``--include-informational-envs``, scan ``definition``,
+  ``remark``, and ``example`` entries as a report-only frontier.  This mode is
+  useful for finding Lean-only construction records advertised near a paper
+  proof without turning those construction records into paper theorem
+  statements.
 
 The audit is report-only by default.  With ``--ci`` it exits non-zero when a
 finding is present, unless ``--warn-only`` is also supplied.
@@ -51,27 +64,95 @@ from lean_header_utils import advance_depth, line_number, starts_keyword
 
 
 THEOREM_LIKE_ENVS = frozenset({"theorem", "lemma", "proposition", "corollary"})
+INFORMATIONAL_ENVS = frozenset({"definition", "remark", "example"})
 
-DEBT_TOKEN_RE = re.compile(
-    r"(?<![A-Za-z0-9_'])"
-    r"(?:"
-    r"(?:[A-Za-z_][A-Za-z0-9_']*)?"
-    r"(?:"
-    r"Bridge|Residual|Repair|Package|Producer|Input|Hypotheses|Assumptions"
-    r"|Hypothesis|Obligation|Obligations|Wrapper|Bundle|Conditional"
-    r"|Unfaithful|CompletionTransport"
-    r")"
-    r"[A-Za-z0-9_']*"
-    r"|"
-    r"(?:h|has|mk|of)?"
-    r"(?:"
-    r"bridge|residual|repair|package|producer|input|hypotheses|assumptions"
-    r"|hypothesis|obligation|obligations|wrapper|bundle|conditional"
-    r"|unfaithful|completionTransport"
-    r")"
-    r"[A-Za-z0-9_']*"
-    r")"
-    r"(?![A-Za-z0-9_'])"
+STRICT_UPPER_TOKENS = (
+    "Bridge",
+    "Residual",
+    "Repair",
+    "Package",
+    "Producer",
+    "Input",
+    "Hypotheses",
+    "Assumptions",
+    "Hypothesis",
+    "Assumption",
+    "Obligation",
+    "Obligations",
+    "Wrapper",
+    "Bundle",
+    "Conditional",
+    "Unfaithful",
+    "CompletionTransport",
+)
+
+BROAD_EXTRA_UPPER_TOKENS = (
+    "Statement",
+    "Output",
+    "Conclusion",
+    "Witness",
+    "Data",
+    "Compatibility",
+)
+
+STRICT_LOWER_TOKENS = (
+    "bridge",
+    "residual",
+    "repair",
+    "package",
+    "producer",
+    "input",
+    "hypotheses",
+    "assumptions",
+    "hypothesis",
+    "assumption",
+    "obligation",
+    "obligations",
+    "wrapper",
+    "bundle",
+    "conditional",
+    "unfaithful",
+    "completionTransport",
+)
+
+BROAD_EXTRA_LOWER_TOKENS = (
+    "statement",
+    "output",
+    "conclusion",
+    "witness",
+    "data",
+    "compatibility",
+)
+
+
+def _debt_token_re(upper_tokens: tuple[str, ...], lower_tokens: tuple[str, ...]) -> re.Pattern[str]:
+    """Build the public-input proof-debt token matcher from token lists."""
+
+    upper_alternation = "|".join(re.escape(token) for token in upper_tokens)
+    lower_alternation = "|".join(re.escape(token) for token in lower_tokens)
+    return re.compile(
+        r"(?<![A-Za-z0-9_'])"
+        r"(?:"
+        r"(?:[A-Za-z_][A-Za-z0-9_']*)?"
+        r"(?:"
+        + upper_alternation
+        + r")"
+        r"[A-Za-z0-9_']*"
+        r"|"
+        r"(?:h|has|mk|of)?"
+        r"(?:"
+        + lower_alternation
+        + r")"
+        r"[A-Za-z0-9_']*"
+        r")"
+        r"(?![A-Za-z0-9_'])"
+    )
+
+
+STRICT_DEBT_TOKEN_RE = _debt_token_re(STRICT_UPPER_TOKENS, STRICT_LOWER_TOKENS)
+BROAD_DEBT_TOKEN_RE = _debt_token_re(
+    STRICT_UPPER_TOKENS + BROAD_EXTRA_UPPER_TOKENS,
+    STRICT_LOWER_TOKENS + BROAD_EXTRA_LOWER_TOKENS,
 )
 
 # The following tokens are deliberately not treated as proof-debt findings.
@@ -104,6 +185,51 @@ FAITHFUL_BOUNDARY_TOKENS = {
     ),
 }
 
+# These broad-mode findings are not internal bridge debt.  They are explicit
+# interfaces for the external classical theorems quoted in the overview.  The
+# corresponding blueprint entries must remain unmarked by \leanok unless the
+# external theorem itself is formalized, but they should not be counted with
+# internal proof obligations such as witnesses, data packages, or wrappers.
+EXTERNAL_CITATION_TOKENS = {
+    "RazSafraSoundnessStatement": (
+        "external Raz--Safra theorem quoted in "
+        "references/ldt-paper/introduction.tex:43-65; the blueprint entry is "
+        "not marked as formalized"
+    ),
+    "PolishchukSpielmanClassicalSoundnessStatement": (
+        "external Polishchuk--Spielman theorem quoted in "
+        "references/ldt-paper/introduction.tex:69-92; the blueprint entry is "
+        "not marked as formalized"
+    ),
+}
+
+# Source-construction context is the formal counterpart of a paper passage that
+# says "henceforth let ..." and then proves several local lemmas in that fixed
+# context.  These tokens still appear in broad mode so reviewers can see the
+# context boundary, but they are not unresolved proof-debt hypotheses.
+SOURCE_CONTEXT_TOKENS = {
+    "QLayerData": (
+        "source construction context for the fixed rank-reduced Q family and "
+        "auxiliary projectors; see "
+        "references/ldt-paper/orthonormalization.tex:658-795"
+    ),
+    "RankReductionWitness": (
+        "source construction context recording the conclusion of "
+        "lem:projective-low-rank-sum; see "
+        "references/ldt-paper/orthonormalization.tex:540-658"
+    ),
+    "QXPLayerData": (
+        "source construction context for the matrix decomposition and "
+        "X/XHat/P layer; see "
+        "references/ldt-paper/orthonormalization.tex:775-940"
+    ),
+}
+
+# Broad mode should classify mathematical interfaces, not double-count a local
+# variable name whose type is already reported, for example
+# ``(data : QXPLayerData Outcome ι)``.
+IGNORED_BROAD_BINDER_TOKENS = frozenset({"data"})
+
 CONDITIONAL_DECL_NAME_RE = re.compile(
     r"(?:"
     r"FromBridgeInputs"
@@ -111,8 +237,9 @@ CONDITIONAL_DECL_NAME_RE = re.compile(
     r"|BridgeInputs"
     r"|(?:^|_)of(?:[A-Z][A-Za-z0-9_']*)?"
     r"(?:"
-    r"Bridge|Obligations|Obligation|Residual|Repair|Package|Input|Hypotheses"
-    r"|Assumptions|Statement|Output|Conclusion|Witness|Wrapper|Bundle|Unfaithful"
+    r"Bridge|Obligations|Obligation|Residual|Repair|Package|Producer|Input"
+    r"|Hypotheses|Hypothesis|Assumptions|Assumption"
+    r"|Statement|Output|Conclusion|Witness|Wrapper|Bundle|Unfaithful"
     r"|Slackness|Dominance"
     r")"
     r"[A-Za-z0-9_']*"
@@ -141,8 +268,8 @@ class DebtFinding:
 
 
 @dataclass(frozen=True)
-class FaithfulBoundaryFinding:
-    """One detected token classified as faithful paper boundary data."""
+class ClassifiedFinding:
+    """One detected token with a mathematical classification and citation."""
 
     blueprint_file: str
     blueprint_line: int
@@ -179,7 +306,9 @@ class AuditResult:
     missing_refs: tuple[str, ...]
     findings: tuple[DebtFinding, ...]
     conditional_decl_findings: tuple[ConditionalDeclarationNameFinding, ...]
-    faithful_boundary_findings: tuple[FaithfulBoundaryFinding, ...]
+    faithful_boundary_findings: tuple[ClassifiedFinding, ...]
+    external_citation_findings: tuple[ClassifiedFinding, ...]
+    source_context_findings: tuple[ClassifiedFinding, ...]
 
     @property
     def ok(self) -> bool:
@@ -190,12 +319,19 @@ class AuditResult:
         )
 
 
-def paper_facing_entries(blueprint_src: Path) -> list[BlueprintEntry]:
-    """Return theorem-like blueprint entries that carry a Lean reference."""
+def paper_facing_entries(
+    blueprint_src: Path,
+    *,
+    include_informational_envs: bool = False,
+) -> list[BlueprintEntry]:
+    """Return paper-facing blueprint entries that carry a Lean reference."""
+    envs = THEOREM_LIKE_ENVS
+    if include_informational_envs:
+        envs = envs | INFORMATIONAL_ENVS
     return [
         entry
         for entry in collect_blueprint_entries(blueprint_src)
-        if entry.env_type in THEOREM_LIKE_ENVS
+        if entry.env_type in envs
     ]
 
 
@@ -263,6 +399,46 @@ def _faithful_boundary_reason(token: str) -> str | None:
     return FAITHFUL_BOUNDARY_TOKENS.get(token)
 
 
+def _external_citation_reason(token: str) -> str | None:
+    """Return the citation when ``token`` names an external theorem interface."""
+    return EXTERNAL_CITATION_TOKENS.get(token)
+
+
+def _source_context_reason(token: str) -> str | None:
+    """Return the citation when ``token`` names fixed source construction context."""
+    return SOURCE_CONTEXT_TOKENS.get(token)
+
+
+def _is_ignored_broad_binder_token(token: str, *, broad_vocabulary: bool) -> bool:
+    """Return whether ``token`` is only a broad-mode local binder name."""
+    return broad_vocabulary and token in IGNORED_BROAD_BINDER_TOKENS
+
+
+def _classified_finding(
+    entry: BlueprintEntry,
+    decl: LeanDecl,
+    *,
+    token: str,
+    token_line: int,
+    header_excerpt: str,
+    reason: str,
+) -> ClassifiedFinding:
+    """Return a classified finding for a detected public-input token."""
+    return ClassifiedFinding(
+        blueprint_file=entry.file,
+        blueprint_line=entry.line,
+        env_type=entry.env_type,
+        label=entry.label,
+        lean_decl=entry.lean_decl,
+        lean_file=decl.file,
+        lean_line=decl.line,
+        token=token,
+        token_line=token_line,
+        header_excerpt=header_excerpt,
+        reason=reason,
+    )
+
+
 def _conditional_decl_name_finding(
     entry: BlueprintEntry,
     decl: LeanDecl,
@@ -288,34 +464,67 @@ def _findings_for_entry(
     root: Path,
     entry: BlueprintEntry,
     decl: LeanDecl,
-) -> tuple[list[DebtFinding], list[FaithfulBoundaryFinding]]:
+    *,
+    broad_vocabulary: bool,
+) -> tuple[
+    list[DebtFinding],
+    list[ClassifiedFinding],
+    list[ClassifiedFinding],
+    list[ClassifiedFinding],
+]:
     lean_path = root / decl.file
     source = lean_path.read_text(encoding="utf-8", errors="replace")
     header, header_start_line = _public_header_after_name(source, decl)
     public_inputs = _public_inputs_before_result_type(header)
 
     findings: list[DebtFinding] = []
-    faithful_boundary_findings: list[FaithfulBoundaryFinding] = []
-    for match in DEBT_TOKEN_RE.finditer(public_inputs):
+    faithful_boundary_findings: list[ClassifiedFinding] = []
+    external_citation_findings: list[ClassifiedFinding] = []
+    source_context_findings: list[ClassifiedFinding] = []
+    debt_token_re = BROAD_DEBT_TOKEN_RE if broad_vocabulary else STRICT_DEBT_TOKEN_RE
+    for match in debt_token_re.finditer(public_inputs):
         token = match.group(0)
+        if _is_ignored_broad_binder_token(token, broad_vocabulary=broad_vocabulary):
+            continue
         token_line = header_start_line + line_number(public_inputs, match.start()) - 1
         local_line = line_number(public_inputs, match.start())
         header_excerpt = _line_excerpt(public_inputs, local_line)
         reason = _faithful_boundary_reason(token)
         if reason is not None:
             faithful_boundary_findings.append(
-                FaithfulBoundaryFinding(
-                    blueprint_file=entry.file,
-                    blueprint_line=entry.line,
-                    env_type=entry.env_type,
-                    label=entry.label,
-                    lean_decl=entry.lean_decl,
-                    lean_file=decl.file,
-                    lean_line=decl.line,
+                _classified_finding(
+                    entry,
+                    decl,
                     token=token,
                     token_line=token_line,
                     header_excerpt=header_excerpt,
                     reason=reason,
+                )
+            )
+            continue
+        source_context_reason = _source_context_reason(token)
+        if broad_vocabulary and source_context_reason is not None:
+            source_context_findings.append(
+                _classified_finding(
+                    entry,
+                    decl,
+                    token=token,
+                    token_line=token_line,
+                    header_excerpt=header_excerpt,
+                    reason=source_context_reason,
+                )
+            )
+            continue
+        external_reason = _external_citation_reason(token)
+        if broad_vocabulary and external_reason is not None:
+            external_citation_findings.append(
+                _classified_finding(
+                    entry,
+                    decl,
+                    token=token,
+                    token_line=token_line,
+                    header_excerpt=header_excerpt,
+                    reason=external_reason,
                 )
             )
             continue
@@ -333,22 +542,37 @@ def _findings_for_entry(
                 header_excerpt=header_excerpt,
             )
         )
-    return findings, faithful_boundary_findings
+    return (
+        findings,
+        faithful_boundary_findings,
+        external_citation_findings,
+        source_context_findings,
+    )
 
 
-def run_audit(root: Path) -> AuditResult:
+def run_audit(
+    root: Path,
+    *,
+    broad_vocabulary: bool = False,
+    include_informational_envs: bool = False,
+) -> AuditResult:
     """Run the paper-facing proof-debt audit for ``root``."""
     root = root.resolve()
     blueprint_src = root / "blueprint" / "src"
     lean_root = root / "MIPStarRE"
 
-    entries = paper_facing_entries(blueprint_src)
+    entries = paper_facing_entries(
+        blueprint_src,
+        include_informational_envs=include_informational_envs,
+    )
     decls = collect_lean_decls(lean_root)
 
     missing: list[str] = []
     findings: list[DebtFinding] = []
     conditional_decl_findings: list[ConditionalDeclarationNameFinding] = []
-    faithful_boundary_findings: list[FaithfulBoundaryFinding] = []
+    faithful_boundary_findings: list[ClassifiedFinding] = []
+    external_citation_findings: list[ClassifiedFinding] = []
+    source_context_findings: list[ClassifiedFinding] = []
     for entry in entries:
         decl = decls.get(entry.lean_decl)
         if decl is None:
@@ -356,9 +580,16 @@ def run_audit(root: Path) -> AuditResult:
             continue
         if conditional_finding := _conditional_decl_name_finding(entry, decl):
             conditional_decl_findings.append(conditional_finding)
-        entry_findings, entry_faithful = _findings_for_entry(root, entry, decl)
+        entry_findings, entry_faithful, entry_external, entry_source_context = _findings_for_entry(
+            root,
+            entry,
+            decl,
+            broad_vocabulary=broad_vocabulary,
+        )
         findings.extend(entry_findings)
         faithful_boundary_findings.extend(entry_faithful)
+        external_citation_findings.extend(entry_external)
+        source_context_findings.extend(entry_source_context)
 
     return AuditResult(
         scanned_refs=len(entries),
@@ -366,7 +597,27 @@ def run_audit(root: Path) -> AuditResult:
         findings=tuple(findings),
         conditional_decl_findings=tuple(conditional_decl_findings),
         faithful_boundary_findings=tuple(faithful_boundary_findings),
+        external_citation_findings=tuple(external_citation_findings),
+        source_context_findings=tuple(source_context_findings),
     )
+
+
+def _print_classified_findings(title: str, findings: tuple[ClassifiedFinding, ...]) -> None:
+    """Print findings that carry a mathematical classification."""
+    print(f"{title}: {len(findings)}")
+    for finding in findings:
+        label = f" label={finding.label}" if finding.label else ""
+        print(
+            f"  - {finding.lean_file}:{finding.token_line}: "
+            f"{finding.lean_decl} contains {finding.token!r}"
+        )
+        print(
+            f"    blueprint {finding.blueprint_file}:{finding.blueprint_line} "
+            f"env={finding.env_type}{label}"
+        )
+        print(f"    {finding.reason}")
+        if finding.header_excerpt:
+            print(f"    {finding.header_excerpt}")
 
 
 def print_text_report(result: AuditResult) -> None:
@@ -405,20 +656,18 @@ def print_text_report(result: AuditResult) -> None:
             f"env={finding.env_type}{label}"
         )
 
-    print(f"Faithful boundary input findings: {len(result.faithful_boundary_findings)}")
-    for finding in result.faithful_boundary_findings:
-        label = f" label={finding.label}" if finding.label else ""
-        print(
-            f"  - {finding.lean_file}:{finding.token_line}: "
-            f"{finding.lean_decl} contains {finding.token!r}"
-        )
-        print(
-            f"    blueprint {finding.blueprint_file}:{finding.blueprint_line} "
-            f"env={finding.env_type}{label}"
-        )
-        print(f"    {finding.reason}")
-        if finding.header_excerpt:
-            print(f"    {finding.header_excerpt}")
+    _print_classified_findings(
+        "Faithful boundary input findings",
+        result.faithful_boundary_findings,
+    )
+    _print_classified_findings(
+        "External citation input findings",
+        result.external_citation_findings,
+    )
+    _print_classified_findings(
+        "Source construction context findings",
+        result.source_context_findings,
+    )
 
 
 def _json_default(value: object) -> object:
@@ -433,16 +682,37 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--json", action="store_true", help="print JSON instead of text")
     parser.add_argument("--ci", action="store_true", help="exit non-zero on findings")
     parser.add_argument(
+        "--broad-vocabulary",
+        action="store_true",
+        help=(
+            "also scan broad tracker vocabulary such as Statement, Witness, "
+            "Data, Output, Conclusion, and Compatibility"
+        ),
+    )
+    parser.add_argument(
         "--warn-only",
         action="store_true",
         help="with --ci, report findings but keep exit code 0",
+    )
+    parser.add_argument(
+        "--include-informational-envs",
+        action="store_true",
+        help=(
+            "also scan blueprint definition, remark, and example entries; this "
+            "is intended for report-only frontier audits, not for the default "
+            "paper-theorem blocking gate"
+        ),
     )
     return parser
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
-    result = run_audit(args.root)
+    result = run_audit(
+        args.root,
+        broad_vocabulary=args.broad_vocabulary,
+        include_informational_envs=args.include_informational_envs,
+    )
 
     if args.json:
         print(json.dumps(asdict(result), indent=2, sort_keys=True, default=_json_default))

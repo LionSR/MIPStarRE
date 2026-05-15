@@ -314,46 +314,8 @@ theorem hAConsistency_submeas
           (constructedPastedSubMeas params family k))
         (MainInductionStep.ldPastingInInductionNu params k
           eps delta gamma zeta) := by
-  have hline : ∀ i : ℕ, i < k →
-      LdSandwichLineOnePointStatement params strategy family
-        eps delta gamma zeta k i := by
-    have hfacts : GHatFactsStatement params strategy.state family gamma zeta := by
-      have hzeta_nonneg : 0 ≤ zeta := by
-        exact le_trans
-          (bipartiteConsError_nonneg strategy.state
-            (uniformDistribution (Point params.next))
-            (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-            family.evaluatedAtNextPoint)
-          hcons.pointConsistency.offDiagonalBound
-      have hgamma_nonneg : 0 ≤ gamma := by
-        have : 0 ≤ strategy.diagonalFailureProbability := by
-          unfold SymStrat.diagonalFailureProbability
-          exact mul_nonneg (by positivity)
-            (Finset.sum_nonneg fun j _ => bipartiteConsError_nonneg strategy.state _ _ _)
-        exact le_trans this hgood.diagonalLineTest
-      have hselfComplete :=
-        gCompleteSelfConsistency params strategy.state family zeta
-          strategy.permInvState hself
-      have hselfIncomplete :=
-        gBotSelfConsistency params strategy.state family zeta
-          strategy.permInvState hselfComplete
-      have hcomMain :=
-        Commutativity.comMain params strategy eps delta gamma zeta
-          strategy.isNormalized hgood family hcons hself hbound
-      have hcommComplete :=
-        commutingWithGComplete params strategy family gamma zeta
-          hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le hcomMain hselfComplete
-      have hcommIncomplete :=
-        commutingWithGIncomplete params strategy.state family gamma zeta hcommComplete
-      exact gHatFacts params strategy.state family gamma zeta
-        hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le
-        hselfComplete hselfIncomplete hcommComplete hcommIncomplete
-    intro i hi
-    exact ldSandwichLineOnePoint params strategy eps delta gamma zeta
-      hgood hgamma_le hzeta_le hdq_le
-      family hcons hself hbound hfacts k i hi
   have hHB := hBConsistency params strategy eps delta gamma zeta
-    hgood hd family hcons hself hbound k hline
+    hgood hgamma_le hzeta_le hdq_le hd family hcons hself hbound k
   have hgamma_nonneg : 0 ≤ gamma := by
     have : 0 ≤ strategy.diagonalFailureProbability := by
       unfold SymStrat.diagonalFailureProbability

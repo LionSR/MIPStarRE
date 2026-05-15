@@ -25,7 +25,7 @@ piece of that call needed by the later unsymmetrization step: a polynomial POVM
 on the role register together with its symmetrized point-consistency estimate at
 the cascade scalar `σ`.  It deliberately does not assert the factor-two
 unsymmetrized estimates; those remain the separate content of
-`UnsymmetrizationBridgePackage`. -/
+`UnsymmetrizationConsistency`. -/
 structure MainFormalRoleMeasurementWitness
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -86,24 +86,24 @@ theorem ofBaseCase
   ofMainInductionWitness params strategy eps k scalars
     (strategySymmetrization_mainInductionBaseCase params strategy eps hpass k hm1)
 
-/-- Build the formal unsymmetrization bridge from the role-register Section 6
+/-- Build the formal unsymmetrization consistency statement from the role-register Section 6
 measurement output.
 
 Paper origin: the unsymmetrization step in the proof of `thm:main-formal`,
 `references/ldt-paper/inductive_step.tex:97-109`.
 
 The lower-level Step 3 theorem
-`UnsymmetrizationBridgePackage.ofSymConsistency` proves the two factor-two
+`UnsymmetrizationConsistency.ofSymConsistency` proves the two factor-two
 principal-block estimates directly from the symmetrized consistency field, so no
 extra point-consistency hypotheses are needed here. -/
-def toUnsymmetrizationBridge
+def toUnsymmetrizationConsistency
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (pkg : MainFormalRoleMeasurementWitness params strategy eps k scalars) :
-    UnsymmetrizationBridgePackage params strategy pkg.roleMeasurement scalars.sigma :=
-  UnsymmetrizationBridgePackage.ofSymConsistency params strategy pkg.roleMeasurement
+    UnsymmetrizationConsistency params strategy pkg.roleMeasurement scalars.sigma :=
+  UnsymmetrizationConsistency.ofSymConsistency params strategy pkg.roleMeasurement
     scalars.sigma pkg.symConsistency
 
 end MainFormalRoleMeasurementWitness

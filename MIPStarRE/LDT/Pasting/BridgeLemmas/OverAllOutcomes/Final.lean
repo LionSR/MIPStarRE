@@ -449,29 +449,12 @@ lemma overAllOutcomes
           overAllOutcomesPastedMass params strategy family k ≤
         overAllOutcomesError params eps delta gamma zeta k := by
     by_cases hkEligible : params.d + 1 ≤ k
-    · have hselfComplete :=
-        gCompleteSelfConsistency params strategy.state family zeta
-          strategy.permInvState hself
-      have hselfIncomplete :=
-        gBotSelfConsistency params strategy.state family zeta
-          strategy.permInvState hselfComplete
-      have hcomMain :=
-        Commutativity.comMain params strategy eps delta gamma zeta
-          strategy.isNormalized hgood family hcons hself hbound
-      have hcommComplete :=
-        commutingWithGComplete params strategy family gamma zeta
-          hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le hcomMain hselfComplete
-      have hcommIncomplete :=
-        commutingWithGIncomplete params strategy.state family gamma zeta hcommComplete
-      have hfacts := gHatFacts params strategy.state family gamma zeta
-        hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le
-        hselfComplete hselfIncomplete hcommComplete hcommIncomplete
-      have hline : ∀ i : ℕ, i < k →
+    · have hline : ∀ i : ℕ, i < k →
           LdSandwichLineOnePointStatement params strategy family
             eps delta gamma zeta k i := by
         intro i hi
         exact ldSandwichLineOnePoint params strategy eps delta gamma zeta
-          hgood hgamma_le hzeta_le hdq_le family hcons hself hbound hfacts k i hi
+          hgood hgamma_le hzeta_le hdq_le family hcons hself hbound k i hi
       have hnonglobal := overAllOutcomes_distinct_nonglobal_mass_bound
         params strategy family eps delta gamma zeta k hd
         heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hline

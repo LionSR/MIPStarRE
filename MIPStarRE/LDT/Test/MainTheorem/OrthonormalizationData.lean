@@ -97,15 +97,15 @@ The proof uses the Section 5 locality-preserving repair construction directly, s
 there is no additional orthonormalization-input hypothesis.
 
 **Unfaithful:** This construction currently relies transitively on
-`leftLiftedProjectivizationRepairWithMatchMass`, whose QXP
-outcome-expectation preservation calculation is not yet derived from
+`orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass`,
+whose exact match-mass preservation conclusion is not yet derived from
 `references/ldt-paper/orthonormalization.tex:862-1194` and
-`references/ldt-paper/inductive_step.tex:135-169`.  Documented in
-`docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`, with the remaining
-construction target tracked by #1610.
-Elimination: prove `leftLiftedProjectivizationRepairWithMatchMass`, or replace
-the exact line-169 route by a corrected loss; in either case do not add a
-match-mass or repair hypothesis to `mainFormal`. -/
+`references/ldt-paper/inductive_step.tex:135-169`.  Documented by issue #1610
+and by `docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`.
+Elimination: prove the exact construction-level monotonicity from the paper
+hypotheses, or route this branch through the repaired line-169 theorem with its
+explicit loss; in either case do not add a match-mass or repair hypothesis to
+`mainFormal`. -/
 theorem nonempty_ofDiagonalConsistency
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

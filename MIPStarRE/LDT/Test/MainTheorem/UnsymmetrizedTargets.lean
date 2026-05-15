@@ -7,7 +7,7 @@ Unsymmetrization and projective-stage targets for the `mainFormal` assembly.
 This module records the unsymmetrized POVM targets supplied by the
 existing factor-two unsymmetrization estimates from
 `Test/Unsymmetrization.lean` and applies the checked Step 5
-Schwartz–Zippel bridge in `MainFormalCascadePreProjectiveSelfConsistency`
+Schwartz–Zippel estimate in `MainFormalCascadePreProjectiveSelfConsistency`
 to convert an evaluated pre-projective link into the full-polynomial
 self-consistency relation at error `ζ₁`.  The later projective-completion
 witness carries the completed measurements through the line-156 handoff and
@@ -82,27 +82,27 @@ structure MainFormalCascadeUnsymmetrizedPOVMTargets
 
 namespace MainFormalCascadeUnsymmetrizedPOVMTargets
 
-/-- Build the line-97--109 unsymmetrized POVM target package from the standalone
-Step 3 bridge data.
+/-- Build the line-97--109 unsymmetrized POVM target record from the standalone
+Step 3 consistency data.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:97-109`.
 
 The extracted POVMs are definitionally the principal role blocks
 `unsymmetrizedLeftPOVM G` and `unsymmetrizedRightPOVM G` supplied by
 `MIPStarRE.LDT.Test.Unsymmetrization`; the two consistency fields are exactly the
-factor-two estimates recorded in `UnsymmetrizationBridgePackage`. -/
-noncomputable def ofUnsymmetrizationBridge
+factor-two estimates recorded in `UnsymmetrizationConsistency`. -/
+noncomputable def ofUnsymmetrizationConsistency
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (G : Measurement (Polynomial params) (Role × ι))
-    (bridge : UnsymmetrizationBridgePackage params strategy G scalars.sigma) :
+    (consistency : UnsymmetrizationConsistency params strategy G scalars.sigma) :
     MainFormalCascadeUnsymmetrizedPOVMTargets params strategy eps k scalars where
   leftPOVM := unsymmetrizedLeftPOVM G
   rightPOVM := unsymmetrizedRightPOVM G
-  leftPOVMPointBConsistency := bridge.pointBConsistency
-  pointARightPOVMConsistency := bridge.pointAConsistency
+  leftPOVMPointBConsistency := consistency.pointBConsistency
+  pointARightPOVMConsistency := consistency.pointAConsistency
 
 end MainFormalCascadeUnsymmetrizedPOVMTargets
 
@@ -114,7 +114,7 @@ field `evaluatedSelfConsistency` is the evaluated consistency estimate
 `G^A_[g(u)=a] \otimes I \simeq_{2σ + 2√(3ε+2σ)} I \otimes G^B_[g(u)=a]`.
 
 The theorem `fullSelfConsistency` below applies the already-formalized Step 5
-Schwartz--Zippel bridge (`inductive_step.tex` lines 119--133) to obtain the
+Schwartz--Zippel estimate (`inductive_step.tex` lines 119--133) to obtain the
 full-polynomial consistency estimate at exactly `ζ₁`. -/
 structure MainFormalCascadePreProjectiveSelfConsistency
     (params : Parameters) [FieldModel params.q]
@@ -232,7 +232,7 @@ namespace MainFormalRoleInductionWitness
 
 This names the paper-order handoff used several times below: first extract the
 role-measurement record, then unsymmetrize it, prove line 116 by the point-measurement
-triangle, and finally apply the checked Schwartz--Zippel Step 5 bridge. -/
+triangle, and finally apply the checked Schwartz--Zippel Step 5 estimate. -/
 noncomputable def diagonalConsistency
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -247,10 +247,10 @@ noncomputable def diagonalConsistency
         (unsymmetrizedRightPOVM (witness.roleWitness scalars).roleMeasurement).toSubMeas)
       scalars.zeta1 := by
   let roleWitness := witness.roleWitness scalars
-  let bridge := roleWitness.toUnsymmetrizationBridge
+  let consistency := roleWitness.toUnsymmetrizationConsistency
   let targets : MainFormalCascadeUnsymmetrizedPOVMTargets params strategy eps k scalars :=
-    MainFormalCascadeUnsymmetrizedPOVMTargets.ofUnsymmetrizationBridge
-      roleWitness.roleMeasurement bridge
+    MainFormalCascadeUnsymmetrizedPOVMTargets.ofUnsymmetrizationConsistency
+      roleWitness.roleMeasurement consistency
   let pre := targets.toPreProjectiveSelfConsistency hpass
   simpa [roleWitness, pre] using pre.fullSelfConsistency
 

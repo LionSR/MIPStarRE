@@ -114,6 +114,36 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
             self.assertEqual(result.scanned_refs, 0)
             self.assertEqual(result.findings, ())
 
+    def test_informational_blueprint_environment_can_be_scanned_on_request(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                def bridgeDefinition (hBridge : SomeBridgeHypotheses) : Q := q
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{definition}\label{def:bridge}
+                  \lean{MIPStarRE.bridgeDefinition}
+                \end{definition}
+                """,
+            )
+            default_result = audit.run_audit(root)
+            self.assertEqual(default_result.scanned_refs, 0)
+            self.assertEqual(default_result.findings, ())
+
+            result = audit.run_audit(root, include_informational_envs=True)
+            self.assertEqual(result.scanned_refs, 1)
+            self.assertEqual(len(result.findings), 2)
+            self.assertEqual(
+                {finding.token for finding in result.findings},
+                {"hBridge", "SomeBridgeHypotheses"},
+            )
+
     def test_comma_separated_lean_references_are_scanned(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -241,6 +271,90 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
             self.assertEqual(result.findings, ())
             self.assertEqual(len(result.conditional_decl_findings), 1)
             self.assertEqual(result.conditional_decl_findings[0].token, "_ofCompletionResidual")
+
+    def test_producer_constructor_name_in_paper_facing_entry_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem_ofProjectivizationProducer (h : P) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:paper}
+                  \lean{MIPStarRE.paperTheorem_ofProjectivizationProducer}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root)
+            self.assertEqual(result.scanned_refs, 1)
+            self.assertEqual(result.findings, ())
+            self.assertEqual(len(result.conditional_decl_findings), 1)
+            self.assertEqual(
+                result.conditional_decl_findings[0].token,
+                "_ofProjectivizationProducer",
+            )
+
+    def test_singular_hypothesis_name_in_paper_facing_entry_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem_ofBridgeHypothesis (h : P) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{lemma}\label{lem:paper}
+                  \lean{MIPStarRE.paperTheorem_ofBridgeHypothesis}
+                \end{lemma}
+                """,
+            )
+            result = audit.run_audit(root)
+            self.assertEqual(result.scanned_refs, 1)
+            self.assertEqual(result.findings, ())
+            self.assertEqual(len(result.conditional_decl_findings), 1)
+            self.assertEqual(
+                result.conditional_decl_findings[0].token,
+                "_ofBridgeHypothesis",
+            )
+
+    def test_singular_assumption_name_in_paper_facing_entry_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem_ofExtraAssumption (h : P) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{corollary}\label{cor:paper}
+                  \lean{MIPStarRE.paperTheorem_ofExtraAssumption}
+                \end{corollary}
+                """,
+            )
+            result = audit.run_audit(root)
+            self.assertEqual(result.scanned_refs, 1)
+            self.assertEqual(result.findings, ())
+            self.assertEqual(len(result.conditional_decl_findings), 1)
+            self.assertEqual(
+                result.conditional_decl_findings[0].token,
+                "_ofExtraAssumption",
+            )
 
     def test_conditional_prefix_name_in_paper_facing_entry_is_reported(self) -> None:
         with tempfile.TemporaryDirectory() as td:
@@ -398,6 +512,32 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
                 {"hasExtraAssumptions", "ExtraAssumptions"},
             )
 
+    def test_singular_assumption_in_paper_facing_header_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem
+                    (hasExtraAssumption : ExtraAssumption params) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:paper}
+                  \lean{MIPStarRE.paperTheorem}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root)
+            self.assertEqual(
+                {finding.token for finding in result.findings},
+                {"hasExtraAssumption", "ExtraAssumption"},
+            )
+
     def test_obligation_wrapper_in_paper_facing_header_is_reported(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -476,6 +616,188 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
                 {finding.token for finding in result.findings},
                 {"UnfaithfulCompletion"},
             )
+
+    def test_witness_input_in_paper_facing_header_is_reported_in_broad_mode(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem
+                    (hwitness : CompletionWitness params) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:paper}
+                  \lean{MIPStarRE.paperTheorem}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root, broad_vocabulary=True)
+            self.assertEqual(
+                {finding.token for finding in result.findings},
+                {"hwitness", "CompletionWitness"},
+            )
+
+    def test_compatibility_data_in_paper_facing_header_is_reported_in_broad_mode(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem
+                    (hcompat : CompletionCompatibilityData params) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:paper}
+                  \lean{MIPStarRE.paperTheorem}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root, broad_vocabulary=True)
+            self.assertEqual(
+                {finding.token for finding in result.findings},
+                {"CompletionCompatibilityData"},
+            )
+
+    def test_lowercase_data_binder_is_not_double_counted_in_broad_mode(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem
+                    (data : CompletionData params) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:paper}
+                  \lean{MIPStarRE.paperTheorem}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root, broad_vocabulary=True)
+            self.assertEqual(
+                {finding.token for finding in result.findings},
+                {"CompletionData"},
+            )
+
+    def test_qxp_layer_data_is_classified_as_source_context(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem
+                    (data : QXPLayerData Outcome ι) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:paper}
+                  \lean{MIPStarRE.paperTheorem}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root, broad_vocabulary=True)
+            self.assertEqual(result.findings, ())
+            self.assertEqual(len(result.source_context_findings), 1)
+            self.assertEqual(result.source_context_findings[0].token, "QXPLayerData")
+
+    def test_rank_reduction_witness_is_classified_as_source_context(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem paperTheorem
+                    (hRank : RankReductionWitness psi A zeta qLayer) : Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{lemma}\label{lem:paper}
+                  \lean{MIPStarRE.paperTheorem}
+                \end{lemma}
+                """,
+            )
+            result = audit.run_audit(root, broad_vocabulary=True)
+            self.assertEqual(result.findings, ())
+            self.assertEqual(len(result.source_context_findings), 1)
+            self.assertEqual(result.source_context_findings[0].token, "RankReductionWitness")
+
+    def test_external_statement_interface_is_classified_in_broad_mode(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem razSafra
+                    (hRS : RazSafraSoundnessStatement params a eps slackBound) :
+                    Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:raz-safra}
+                  \lean{MIPStarRE.razSafra}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root, broad_vocabulary=True)
+            self.assertEqual(result.findings, ())
+            self.assertEqual(len(result.external_citation_findings), 1)
+            self.assertEqual(
+                result.external_citation_findings[0].token,
+                "RazSafraSoundnessStatement",
+            )
+
+    def test_external_statement_interface_is_not_hidden_in_strict_mode(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE
+
+                theorem classicalTestSoundness
+                    (hPS : PolishchukSpielmanClassicalSoundnessStatement params a eps kappa) :
+                    Q := by
+                  sorry
+
+                end MIPStarRE
+                """,
+                r"""
+                \begin{theorem}\label{thm:classical-test-soundness}
+                  \lean{MIPStarRE.classicalTestSoundness}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root)
+            self.assertEqual(result.findings, ())
+            self.assertEqual(result.external_citation_findings, ())
 
     def test_bundle_constructor_name_in_paper_facing_entry_is_reported(self) -> None:
         with tempfile.TemporaryDirectory() as td:

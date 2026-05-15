@@ -351,14 +351,15 @@ declaration no longer hides the remaining construction as an additional
 assumption.
 
 **Unfaithful:** This construction currently depends, through the supplied
-orthonormalization witness, on `leftLiftedProjectivizationRepairWithMatchMass`,
-whose outcome-expectation preservation theorem is not yet derived from
+orthonormalization witness, on
+`orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass`,
+whose exact match-mass preservation conclusion is not yet derived from
 `references/ldt-paper/inductive_step.tex:130-173`.  This is documented in
-`docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`, with the remaining
-construction target tracked by #1610.
-Elimination: prove the QXP outcome-expectation preservation theorem from the
-paper hypotheses, or correct the line-169 scalar loss, and use the resulting
-route to discharge the match-mass preservation obligations.
+issue #1610 and in
+`docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`.  Elimination: prove
+the exact construction-level monotonicity from the paper hypotheses, or route
+this completion construction through the repaired line-169 theorem with its
+explicit loss.
 -/
 theorem nonempty_ofDiagonalConsistency
     {params : Parameters} [FieldModel.{0} params.q]
