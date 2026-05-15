@@ -118,18 +118,19 @@ scalar cascade and role-register witness from the paper hypotheses, then calls
 `MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness`
 and the already proved final transport.  The transitive proof gaps are therefore
 localized in the named construction theorems: the Section 6 successor proof
-inside `MainInductionStep.mainInduction`, and the two match-mass preservation
-obligations in the post-role completion step.  The QXP outcome-expectation
-preservation calculation underlying the match-mass route is tracked by #1610.
+inside `MainInductionStep.mainInduction`, and the exact line-169 match-mass
+preservation obligation in the post-role completion step.  That exact route is
+tracked by #1610; the checked local repair has an explicit additional loss.
 These are tracked by #1043, #1363, #1369, #1458, #1507, #1566, and #1610.
 
 **Unfaithful:** This proof currently depends transitively on
-`leftLiftedProjectivizationRepairWithMatchMass`, whose
-outcome-expectation preservation theorem is not yet derived from
-`thm:main-formal` and the cited Section 5 repair argument in
+`orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass`,
+whose exact match-mass preservation conclusion is not yet derived from
+`thm:main-formal` and the cited Section 5 and Step 6 arguments in
 `references/ldt-paper/inductive_step.tex`.  This is documented in issue #1610.
-Elimination: prove the QXP outcome-expectation preservation theorem from the
-paper hypotheses and replace the transitive dependency by that proof.
+Elimination: prove the exact construction-level monotonicity from the paper
+hypotheses, or route the final theorem through the repaired line-169 estimate
+with its explicit loss.
 -/
 theorem mainFormal
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]

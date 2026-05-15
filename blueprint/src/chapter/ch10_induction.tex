@@ -461,7 +461,7 @@
 	\lean{MIPStarRE.LDT.Test.MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency}
 	\lean{MIPStarRE.LDT.Test.MainFormalDiagonalCompletionWitness.leftMatchMassPreservation_ofDiagonalConsistency, MIPStarRE.LDT.Test.MainFormalDiagonalCompletionWitness.rightMatchMassPreservation_ofDiagonalConsistency}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass, MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairWithMatchMass}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass}
 	\lean{MIPStarRE.LDT.Test.MainFormalDiagonalOrthonormalizationWitness.nonempty_ofDiagonalConsistency}
 	\lean{MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness}
 	\lean{MIPStarRE.LDT.Test.strategySymmetrization_mainInduction, MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.ofMainInduction, MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.ofMainInductionLargeK}
@@ -482,18 +482,21 @@
 	From a line-130 consistency relation, the theorem
 	\texttt{MainFormalDiagonalOrthonormalizationWitness.nonempty\_ofDiagonalConsistency}
 	constructs the pre-completion projective submeasurements using the Section~5
-	locality-preserving repair construction.  It also retains the exact
-	match-mass preservation proof supplied by the QXP repair producer.  The
+	locality-preserving repair construction.  The exact match-mass preservation
+	needed for the paper's line-169 replacement step is now a direct proof
+	obligation in
+	\texttt{orthonormalizationMeasurement\_of\_consistency\_from\_projectivizationRepair\_with\_matchMass}.
+	The former QXP outcome-expectation formulation was stronger than the present
+	Section~5 API and is not used as a theorem.  The
 	completion theorem
 	\texttt{MainFormalDiagonalCompletionWitness.nonempty\_ofDiagonalConsistency}
 	now consumes the two match-mass projection theorems
 	\texttt{leftMatchMassPreservation\_ofDiagonalConsistency} and
 	\texttt{rightMatchMassPreservation\_ofDiagonalConsistency}.  The remaining
-	construction-level proof gap is the QXP outcome-expectation preservation
-	theorem
-	\texttt{leftLiftedProjectivizationRepairWithMatchMass}, which is the
-	lowest current target for the line-169 route described in the paper and is
-	tracked by issue~\#1610.
+	construction-level proof gap is the exact match-mass monotonicity needed for
+	the line-169 route described in the paper.  It is tracked by issue~\#1610;
+	the checked repaired route with an explicit additional loss is recorded in
+	Remark~\ref{rem:lean-line169-projectivization-match-mass}.
 
 	The remaining proof gap is not represented by diagonal-consistency,
 	match-mass, or other auxiliary input hypotheses.  The paper-facing theorem

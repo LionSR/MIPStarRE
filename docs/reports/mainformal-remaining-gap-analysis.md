@@ -23,9 +23,10 @@ Date: 2026-05-07
 > **Status note, 2026-05-14.**  The two downstream match-mass theorems are now
 > projections from the line-130 orthonormalization witness.  The active proof
 > gap has been lowered to
-> `leftLiftedProjectivizationRepairWithMatchMass`, which must prove the
-> QXP outcome-expectation preservation calculation while the QXP data is still
-> visible; this is tracked by #1610 under #1566.
+> `orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass`,
+> which must prove the exact construction-level match-mass monotonicity needed
+> for line 169, or be replaced by the checked repaired line-169 route with its
+> explicit loss; this is tracked by #1610 under #1566.
 >
 > **Status note, 2026-05-15.**  The Step 3 factor-two unsymmetrization record
 > has been renamed from `UnsymmetrizationBridgePackage` to
@@ -144,7 +145,7 @@ projective submeasurements they concern.
 | `MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness` | `roleInductionWitness` only | Source-shaped internal construction target; delegates the completion step to `MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency` |
 | `MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency` | line-130 orthonormalization witness + cross consistency | Constructs the completion witness from the retained match-mass preservation proofs |
 | `leftMatchMassPreservation_ofDiagonalConsistency` / `rightMatchMassPreservation_ofDiagonalConsistency` | line-130 orthonormalization witness + cross consistency | Projection theorems exposing the retained match-mass proofs |
-| `leftLiftedProjectivizationRepairWithMatchMass` | QXP repair construction with partner measurement | Lowest current `sorry`; must prove QXP outcome-expectation preservation while the QXP data is visible |
+| `orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass` | exact line-169 orthonormalization route | Current `sorry`; must prove construction-level match-mass monotonicity from the paper hypotheses, or be replaced by the checked repaired line-169 route with its explicit loss |
 
 **Current route:** Once Field 1 (`roleInductionWitness`) is produced, the proof must
 derive the line-130 orthonormalization witness from cross consistency and then
@@ -157,11 +158,14 @@ The line-130 consistency data supplies the orthonormalization witness via
 The completion theorem now fixes the distinguished completion outcome to the
 zero polynomial and derives the completion-closeness fields from the checked
 analytic completion argument.  The only remaining line-130 completion content
-is the QXP outcome-expectation preservation theorem needed to produce the
-orthonormalization match-mass preservation used at line 169.
+is the exact construction-level match-mass preservation used at line 169.  The
+former QXP outcome-expectation formulation was stronger than the present
+Section 5 API and should not be treated as the proof target.
 
 **Status:** partially derivable once Field 1 is obtained.  The active local
-target is `leftLiftedProjectivizationRepairWithMatchMass`.
+target is
+`orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass`,
+unless the final theorem is rerouted through the repaired line-169 estimate.
 
 ## 4. Historical resolution routes
 

@@ -249,23 +249,32 @@ lemma orthonormalizationMeasurement_of_consistency_from_projectivizationRepair
   exact ⟨hP.trans hbound⟩
 
 set_option linter.unusedDecidableInType false in
-/-- Cross-consistency orthonormalization with the line-169 match-mass proof
-retained from the QXP repair construction.
+/-- Cross-consistency orthonormalization with the exact line-169 match-mass
+preservation needed by the final Step 6 completion argument.
 
-The statement has the same source-facing input as
-`orthonormalizationMeasurement_of_consistency_from_projectivizationRepair`, but
-returns the additional match-mass preservation needed by the final Step 6
-completion argument.  The remaining proof gap is not in this lemma: it is the
-producer-level QXP outcome-expectation theorem
-`leftLiftedProjectivizationRepairWithMatchMass`, tracked by #1610.
+The ordinary orthonormalization theorem gives the state-dependent-distance
+comparison between the pre-projective measurement `A` and a projective
+submeasurement `P`.  The exact line-169 route additionally needs the diagonal
+match mass against the opposite measurement `B` not to decrease.
 
-**Unfaithful:** This proof currently relies on
-`leftLiftedProjectivizationRepairWithMatchMass`, whose QXP
-outcome-expectation preservation calculation is not yet derived from
-`references/ldt-paper/orthonormalization.tex:862-1194` and
-`references/ldt-paper/inductive_step.tex:135-169`.  Documented by issue #1610.
-Elimination: prove `leftLiftedProjectivizationRepairWithMatchMass` from the
-paper's QXP construction, then this lemma has no independent proof gap. -/
+This is the source-facing proof obligation for the exact route.  A previous
+formulation attempted to discharge it by requiring the QXP construction to
+preserve every outcome expectation against an arbitrary partner measurement.
+That outcomewise monotonicity is stronger than what the present Section 5 API
+provides and is not a consequence of SDD closeness alone.  The exact route is
+therefore left as a direct proof gap here, while the checked local repair with
+the additional `10 ζ^{1/8}` loss is formalized in
+`ProjectivizationLine169Repair`.
+
+**Unfaithful:** This proof currently asserts the exact match-mass preservation
+needed for the paper's line-169 replacement step, but that preservation has not
+been derived from `references/ldt-paper/orthonormalization.tex:862-1194` and
+`references/ldt-paper/inductive_step.tex:135-169`.  Documented by issue #1610
+and the paper-gap note
+`docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`.  Elimination:
+either prove this exact construction-level monotonicity from the paper
+hypotheses, or route the final theorem through the already formalized repaired
+line-169 estimate with its explicit loss. -/
 lemma orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass
     {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -283,35 +292,11 @@ lemma orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_w
             (constSubMeasFamily P.toSubMeas.liftLeft)
             (orthonormalizationError ζ) ∧
           OrthonormalizationMatchMassPreservation ψ A P B := by
-  intro hCons
-  have hAlmost :
-      MIPStarRE.LDT.MakingMeasurementsProjective.AlmostProjMeasStatement
-        ψ (leftLiftedMeasurement (ιB := ι) A)
-        (consistencyToAlmostProjectiveError ζ) := by
-    exact MIPStarRE.LDT.MakingMeasurementsProjective.consistencyToAlmostProjective
-      (ψ := ψ) (A := A) (B := B) (ζ := ζ) hCons
-  obtain ⟨data, hRounded, hPreserve⟩ :=
-    leftLiftedProjectivizationRepairWithMatchMass ψ hψ A B
-      (consistencyToAlmostProjectiveError ζ) hAlmost.sourceAlmostProjective
-  have hP :
-      SDDRel ψ (uniformDistribution Unit)
-        (constSubMeasFamily A.toSubMeas.liftLeft)
-        (constSubMeasFamily (qxpProjSubMeas data).toSubMeas.liftLeft)
-        (orthonormalizationMainLemmaError (consistencyToAlmostProjectiveError ζ)) :=
-    leftLiftedRoundedProjMeasStatement_to_local hRounded
-  have hbound :
-      orthonormalizationMainLemmaError (consistencyToAlmostProjectiveError ζ) ≤
-        orthonormalizationError ζ := by
-    have htwo :
-        orthonormalizationMainLemmaError (2 * ζ) ≤ orthonormalizationError ζ :=
-      open Orthonormalization.ErrorBounds in
-      orthonormalizationMainLemmaError_two_mul_le_orthonormalizationError ζ hζ
-    simpa [consistencyToAlmostProjectiveError] using
-      htwo
-  refine ⟨qxpProjSubMeas data, ?_, ?_⟩
-  · rcases hP with ⟨hP⟩
-    exact ⟨hP.trans hbound⟩
-  · exact OrthonormalizationMatchMassPreservation.of_qxp_outcome_expectation hPreserve
+  -- The SDD part follows from `orthonormalizationMeasurement_of_consistency`.
+  -- The exact diagonal match-mass monotonicity is the remaining source-level
+  -- proof gap; SDD closeness alone gives only the repaired route in
+  -- `ProjectivizationLine169Repair`.
+  sorry
 
 set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
