@@ -6,7 +6,7 @@ import MIPStarRE.LDT.Pasting.CommutingWithG.Incomplete
 /-!
 # Section 12 pasting: H-A consistency
 
-Vertical-line to point-consistency transport and completed-measurement wrapper for
+Vertical-line to point-consistency transport and completed-measurement statement for
 `cor:h-a-consistency`.
 
 ## References
@@ -126,7 +126,7 @@ private lemma liftedVerticalLineConsistency
 /-- Convert source-style vertical-line consistency to point consistency.
 
 This is the core argument in `cor:h-a-consistency`, stated without the
-`HBConsistencyStatement` type wrapper.  It takes only the line-consistency estimate
+intermediate `HBConsistencyStatement` type.  It takes only the line-consistency estimate
 for a candidate polynomial submeasurement `H`, restricts that estimate to the
 point on each vertical line, and then applies the good-strategy
 point-to-vertical-line comparison.
@@ -140,7 +140,7 @@ Steps:
 3. Error bound: `ν₆ + √(8mε + 4δ) ≤ 47k²m(...) ≤ 100k²m(...)`.
 
 The completion and large-`k` hypotheses are carried by the downstream
-completed-measurement wrapper; this submeasurement core only uses the positive
+completed-measurement theorem; this submeasurement argument only uses the positive
 `k` regime and the displayed line-consistency estimate. -/
 theorem hAConsistency_submeas_from_lineConsistency
     (params : Parameters)
@@ -486,7 +486,7 @@ theorem hAConsistency_completed_from_submeas
 
 /-- Completed-measurement version of `cor:h-a-consistency`.
 
-This wrapper is intentionally downstream of `cor:ld-pasting-N-completeness`:
+This theorem is intentionally downstream of `cor:ld-pasting-N-completeness`:
 it may use the submeasurement consistency together with the completeness bound
 for the constructed pasted submeasurement to control the added completion mass. -/
 theorem hAConsistency_completed
