@@ -16,131 +16,9 @@ Auxiliary constructions for the `d = 0` complementary branch of
 namespace MIPStarRE.LDT.Pasting
 
 open MIPStarRE.LDT
-open MIPStarRE.LDT.ExpansionHypercubeGraph
-open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
-
-/-- Complete a source-facing pasting submeasurement once its point consistency
-and mass lower bound have been proved.
-
-This is the completion argument used in `cor:h-a-consistency`, specialized to
-the final `thm:ld-pasting` error envelope.  It is independent of the particular
-pasting construction and is used for the degree-zero candidate
-`averagedSliceAppendedSubMeas`. -/
-private theorem completeAtOutcome_pointConsistency
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma kappa zeta : Error)
-    (H : SubMeas (Polynomial params.next) ι)
-    (hsubmeas :
-      ConsRel strategy.state (uniformDistribution (Point params.next))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params.next H)
-        (MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta))
-    (hcomplete :
-      CompletenessAtLeast strategy.state H.liftLeft
-        (ldPastingCompletenessLowerBound params kappa
-          (MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta) k)) :
-    ConsRel strategy.state (uniformDistribution (Point params.next))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (polynomialEvaluationFamily params.next
-        (Preliminaries.completeAtOutcome H (pastedFallbackOutcome params)).toSubMeas)
-      (MainInductionStep.ldPastingInInductionError params k
-        eps delta gamma kappa zeta) := by
-  let ν := MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta
-  let completedEval : IdxSubMeas (Point params.next) (Fq params) ι :=
-    fun u => (Preliminaries.completeAtOutcome (evaluateAt params.next u H)
-      ((pastedFallbackOutcome params) u)).toSubMeas
-  have hcompletedEval :
-      completedEval =
-        polynomialEvaluationFamily params.next
-          (Preliminaries.completeAtOutcome H (pastedFallbackOutcome params)).toSubMeas := by
-    funext u
-    simpa [completedEval, pastedFallbackOutcome] using
-      (Preliminaries.evaluateAt_completeAtOutcome params.next H
-        (pastedFallbackOutcome params) u).symm
-  have hresidualMass :
-      ev strategy.state (rightTensor (ι₁ := ι) (1 - H.total)) ≤
-        kappa * (1 + 1 / (100 * (params.m : Error))) + ν +
-          Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))) := by
-    have hmass :
-        ev strategy.state (leftTensor (ι₂ := ι) H.total) ≥
-          ldPastingCompletenessLowerBound params kappa ν k := by
-      simpa [ν, subMeasMass, SubMeas.liftLeft] using hcomplete.lowerBound
-    calc
-      ev strategy.state (rightTensor (ι₁ := ι) (1 - H.total))
-        = ev strategy.state (leftTensor (ι₂ := ι) (1 - H.total)) := by
-            simpa using (strategy.permInvState.swap_ev (1 - H.total)).symm
-      _ = 1 - ev strategy.state (leftTensor (ι₂ := ι) H.total) := by
-            have hleftSub :
-                leftTensor (ι₂ := ι) (1 - H.total) =
-                  1 - leftTensor (ι₂ := ι) H.total := by
-              ext i j
-              rcases i with ⟨i₁, i₂⟩
-              rcases j with ⟨j₁, j₂⟩
-              by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
-                simp [leftTensor, h₁, h₂, sub_eq_add_neg]
-            rw [hleftSub, ev_sub]
-            simp [ev_one_of_isNormalized strategy.state strategy.isNormalized]
-      _ ≤ 1 - ldPastingCompletenessLowerBound params kappa ν k := by
-            linarith
-      _ = kappa * (1 + 1 / (100 * (params.m : Error))) + ν +
-            Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))) := by
-            simp [ldPastingCompletenessLowerBound, ν]
-            ring
-  have hcompleted :
-      ConsRel strategy.state (uniformDistribution (Point params.next))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        completedEval
-        (ν + (kappa * (1 + 1 / (100 * (params.m : Error))) + ν +
-          Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))))) := by
-    constructor
-    calc
-      bipartiteConsError strategy.state (uniformDistribution (Point params.next))
-          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-          completedEval
-        ≤ avgOver (uniformDistribution (Point params.next)) (fun u =>
-            qBipartiteConsDefect strategy.state
-                ((strategy.pointMeasurement u).toSubMeas)
-                (evaluateAt params.next u H) +
-              ev strategy.state (rightTensor (ι₁ := ι) (1 - H.total))) := by
-                unfold bipartiteConsError completedEval
-                apply avgOver_mono
-                intro u
-                simpa [evaluateAt, postprocess_total, ν] using
-                  Preliminaries.qBipartiteConsDefect_completeAtOutcome_right_le
-                    strategy.state (strategy.pointMeasurement u).toMeasurement
-                    (evaluateAt params.next u H)
-                    ((pastedFallbackOutcome params) u)
-      _ = bipartiteConsError strategy.state (uniformDistribution (Point params.next))
-            (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-            (polynomialEvaluationFamily params.next H) +
-          avgOver (uniformDistribution (Point params.next))
-            (fun _ => ev strategy.state (rightTensor (ι₁ := ι) (1 - H.total))) := by
-              unfold bipartiteConsError
-              rw [avgOver_add]
-              simp [IdxProjMeas.toIdxSubMeas, polynomialEvaluationFamily]
-      _ ≤ ν + avgOver (uniformDistribution (Point params.next))
-            (fun _ => ev strategy.state (rightTensor (ι₁ := ι) (1 - H.total))) := by
-              exact add_le_add hsubmeas.offDiagonalBound le_rfl
-      _ = ν + ev strategy.state (rightTensor (ι₁ := ι) (1 - H.total)) := by
-            simpa using avgOver_uniform_const (α := Point params.next)
-              (ev strategy.state (rightTensor (ι₁ := ι) (1 - H.total)))
-      _ ≤ ν + (kappa * (1 + 1 / (100 * (params.m : Error))) + ν +
-            Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ)))))) := by
-              gcongr
-  have hsigma :
-      ν + (kappa * (1 + 1 / (100 * (params.m : Error))) + ν +
-        Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ)))))) =
-        MainInductionStep.ldPastingInInductionError params k
-          eps delta gamma kappa zeta := by
-    simp [MainInductionStep.ldPastingInInductionError, ν]
-    ring
-  exact ⟨by
-    simpa [hcompletedEval] using le_trans hcompleted.offDiagonalBound hsigma.le⟩
 
 /-- The degree-zero appended-slice candidate has the same total operator as the
 averaged slice submeasurement. -/
@@ -236,9 +114,7 @@ remaining mathematical core of issue #1622 after the completion, mass transport,
 and H-A point-consistency transport have been separated.  It should combine
 `ldGbcon_liftedVerticalLine`, the two degree-zero invariance lemmas, and the
 height-averaging identity
-`polynomialEvaluation_averagedSliceAppendedSubMeas_eq_average`.
-
-The statement has no bridge, residual, repair, producer, or package hypothesis. -/
+`polynomialEvaluation_averagedSliceAppendedSubMeas_eq_average`. -/
 theorem degreeZeroPastedLineConsistency
     (params : Parameters)
     [FieldModel params.q]
@@ -268,9 +144,7 @@ Paper origin: `references/ldt-paper/ld-pasting.tex:12-55`.  This theorem is now
 the formal H-A transport of `degreeZeroPastedLineConsistency`: once the
 degree-zero candidate is consistent with the vertical-line measurements, the
 standard point-to-vertical-line comparison for a good strategy gives the
-ambient point-consistency statement.
-
-The statement has no bridge, residual, repair, producer, or package hypothesis. -/
+ambient point-consistency statement. -/
 theorem degreeZeroPastedSubMeasPointConsistency
     (params : Parameters)
     [FieldModel params.q]
@@ -319,10 +193,7 @@ remaining source-faithful construction obligation for issue #1622.  In the
 degree-zero branch the slice polynomials and the last-coordinate line answers
 are constant on their respective domains.  The measurement is the completion of
 `averagedSliceAppendedSubMeas`, the averaged slice family viewed as a global
-polynomial family by ignoring the appended variable.
-
-The statement deliberately has no bridge, residual, repair, producer, or
-package hypothesis. -/
+polynomial family by ignoring the appended variable. -/
 theorem degreeZeroPastedPointConsistency
     (params : Parameters)
     [FieldModel params.q]
@@ -382,7 +253,7 @@ theorem degreeZeroPastedPointConsistency
       averagedSliceAppendedSubMeas_completeness params strategy eps delta gamma
         kappa zeta family hcomplete k hν_nonneg
     simpa [H] using
-      completeAtOutcome_pointConsistency params strategy eps delta gamma kappa zeta
-        (averagedSliceAppendedSubMeas params family) hsubmeas hcomplete_appended
+      hAConsistency_completed_from_submeas params strategy eps delta gamma kappa zeta
+        (averagedSliceAppendedSubMeas params family) k hsubmeas hcomplete_appended
 
 end MIPStarRE.LDT.Pasting

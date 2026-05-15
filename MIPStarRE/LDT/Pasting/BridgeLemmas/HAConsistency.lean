@@ -361,38 +361,37 @@ theorem hAConsistency_submeas
   exact hAConsistency_submeas_core params strategy family
     eps delta gamma zeta hgood hgamma_nonneg hzeta_nonneg k hk_pos hHB
 
-/-- Completed-measurement version of `cor:h-a-consistency`.
+/-- Complete a polynomial submeasurement after its point consistency and mass
+lower bound have been proved.
 
-This wrapper is intentionally downstream of `cor:ld-pasting-N-completeness`:
-it may use the submeasurement consistency together with the completeness bound
-for the constructed pasted submeasurement to control the added completion mass. -/
-theorem hAConsistency_completed
+This is the completion step in `cor:h-a-consistency`, stated for an arbitrary
+submeasurement `H`.  The source argument first proves point consistency for a
+submeasurement and then completes it by adding the missing mass to a fixed
+fallback polynomial. -/
+theorem hAConsistency_completed_from_submeas
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
-    (family : IdxPolyFamily params ι)
+    (H : SubMeas (Polynomial params.next) ι)
     (k : ℕ)
     (hsubmeas :
       ConsRel strategy.state (uniformDistribution (Point params.next))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params.next
-          (constructedPastedSubMeas params family k))
+        (polynomialEvaluationFamily params.next H)
         (MainInductionStep.ldPastingInInductionNu params k
           eps delta gamma zeta))
     (hcomplete :
-      CompletenessAtLeast strategy.state
-        (constructedPastedSubMeas params family k).liftLeft
+      CompletenessAtLeast strategy.state H.liftLeft
         (ldPastingCompletenessLowerBound params kappa
           (MainInductionStep.ldPastingInInductionNu params k
             eps delta gamma zeta) k)) :
     ConsRel strategy.state (uniformDistribution (Point params.next))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
       (polynomialEvaluationFamily params.next
-        (constructedPastedMeasurement params family k).toSubMeas)
+        (Preliminaries.completeAtOutcome H (pastedFallbackOutcome params)).toSubMeas)
       (MainInductionStep.ldPastingInInductionError params k
         eps delta gamma kappa zeta) := by
-  let H := constructedPastedSubMeas params family k
   let ν := MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta
   let completedEval : IdxSubMeas (Point params.next) (Fq params) ι :=
     fun u => (Preliminaries.completeAtOutcome (evaluateAt params.next u H)
@@ -400,9 +399,9 @@ theorem hAConsistency_completed
   have hcompletedEval :
       completedEval =
         polynomialEvaluationFamily params.next
-          (constructedPastedMeasurement params family k).toSubMeas := by
+          (Preliminaries.completeAtOutcome H (pastedFallbackOutcome params)).toSubMeas := by
     funext u
-    simpa [completedEval, H, constructedPastedMeasurement, pastedFallbackOutcome] using
+    simpa [completedEval, pastedFallbackOutcome] using
       (Preliminaries.evaluateAt_completeAtOutcome params.next H
         (pastedFallbackOutcome params) u).symm
   have hresidualMass :
@@ -412,7 +411,7 @@ theorem hAConsistency_completed
     have hmass :
         ev strategy.state (leftTensor (ι₂ := ι) H.total) ≥
           ldPastingCompletenessLowerBound params kappa ν k := by
-      simpa [H, subMeasMass, SubMeas.liftLeft] using hcomplete.lowerBound
+      simpa [ν, subMeasMass, SubMeas.liftLeft] using hcomplete.lowerBound
     calc
       ev strategy.state (rightTensor (ι₁ := ι) (1 - H.total))
         = ev strategy.state (leftTensor (ι₂ := ι) (1 - H.total)) := by
@@ -453,7 +452,7 @@ theorem hAConsistency_completed
                 unfold bipartiteConsError completedEval
                 apply avgOver_mono
                 intro u
-                simpa [H, evaluateAt, postprocess_total, ν] using
+                simpa [evaluateAt, postprocess_total, ν] using
                   Preliminaries.qBipartiteConsDefect_completeAtOutcome_right_le
                     strategy.state (strategy.pointMeasurement u).toMeasurement
                     (evaluateAt params.next u H)
@@ -484,5 +483,40 @@ theorem hAConsistency_completed
     ring
   exact ⟨by
     simpa [hcompletedEval] using le_trans hcompleted.offDiagonalBound hsigma.le⟩
+
+/-- Completed-measurement version of `cor:h-a-consistency`.
+
+This wrapper is intentionally downstream of `cor:ld-pasting-N-completeness`:
+it may use the submeasurement consistency together with the completeness bound
+for the constructed pasted submeasurement to control the added completion mass. -/
+theorem hAConsistency_completed
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma kappa zeta : Error)
+    (family : IdxPolyFamily params ι)
+    (k : ℕ)
+    (hsubmeas :
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next
+          (constructedPastedSubMeas params family k))
+        (MainInductionStep.ldPastingInInductionNu params k
+          eps delta gamma zeta))
+    (hcomplete :
+      CompletenessAtLeast strategy.state
+        (constructedPastedSubMeas params family k).liftLeft
+        (ldPastingCompletenessLowerBound params kappa
+          (MainInductionStep.ldPastingInInductionNu params k
+            eps delta gamma zeta) k)) :
+    ConsRel strategy.state (uniformDistribution (Point params.next))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params.next
+        (constructedPastedMeasurement params family k).toSubMeas)
+      (MainInductionStep.ldPastingInInductionError params k
+        eps delta gamma kappa zeta) := by
+  simpa [constructedPastedMeasurement] using
+    hAConsistency_completed_from_submeas params strategy eps delta gamma kappa zeta
+      (constructedPastedSubMeas params family k) k hsubmeas hcomplete
 
 end MIPStarRE.LDT.Pasting
