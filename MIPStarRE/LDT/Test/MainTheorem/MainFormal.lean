@@ -127,9 +127,12 @@ These are tracked by #1043, #1363, #1369, #1458, #1507, #1566, and #1610.
 `leftLiftedProjectivizationRepairWithMatchMass`, whose
 outcome-expectation preservation theorem is not yet derived from
 `thm:main-formal` and the cited Section 5 repair argument in
-`references/ldt-paper/inductive_step.tex`.  This is documented in issue #1610.
+`references/ldt-paper/inductive_step.tex`.  This is documented in
+`docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`, with the remaining
+construction target tracked by #1610.
 Elimination: prove the QXP outcome-expectation preservation theorem from the
-paper hypotheses and replace the transitive dependency by that proof.
+paper hypotheses, or replace the exact line-169 step by a corrected scalar
+cascade, without adding a non-paper hypothesis to `mainFormal`.
 -/
 theorem mainFormal
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]

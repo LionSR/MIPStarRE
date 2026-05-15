@@ -100,10 +100,12 @@ there is no additional orthonormalization-input hypothesis.
 `leftLiftedProjectivizationRepairWithMatchMass`, whose QXP
 outcome-expectation preservation calculation is not yet derived from
 `references/ldt-paper/orthonormalization.tex:862-1194` and
-`references/ldt-paper/inductive_step.tex:135-169`.  Documented by issue #1610.
-Elimination: prove `leftLiftedProjectivizationRepairWithMatchMass` and keep the
-resulting match-mass evidence in this witness without adding any theorem-level
-hypothesis. -/
+`references/ldt-paper/inductive_step.tex:135-169`.  Documented in
+`docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`, with the remaining
+construction target tracked by #1610.
+Elimination: prove `leftLiftedProjectivizationRepairWithMatchMass`, or replace
+the exact line-169 route by a corrected loss; in either case do not add a
+match-mass or repair hypothesis to `mainFormal`. -/
 theorem nonempty_ofDiagonalConsistency
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

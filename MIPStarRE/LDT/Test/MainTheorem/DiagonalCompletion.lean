@@ -354,9 +354,11 @@ assumption.
 orthonormalization witness, on `leftLiftedProjectivizationRepairWithMatchMass`,
 whose outcome-expectation preservation theorem is not yet derived from
 `references/ldt-paper/inductive_step.tex:130-173`.  This is documented in
-issue #1610.  Elimination: prove the QXP outcome-expectation preservation
-theorem from the paper hypotheses and use it to discharge the match-mass
-preservation obligations.
+`docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`, with the remaining
+construction target tracked by #1610.
+Elimination: prove the QXP outcome-expectation preservation theorem from the
+paper hypotheses, or correct the line-169 scalar loss, and use the resulting
+route to discharge the match-mass preservation obligations.
 -/
 theorem nonempty_ofDiagonalConsistency
     {params : Parameters} [FieldModel.{0} params.q]

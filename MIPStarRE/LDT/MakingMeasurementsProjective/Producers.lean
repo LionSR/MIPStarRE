@@ -496,9 +496,13 @@ for the match-mass use in the main induction.
 **Unfaithful:** This proof currently contains the #1610 proof obligation: the
 QXP outcome-expectation preservation calculation has not yet been derived from
 `references/ldt-paper/orthonormalization.tex:862-1194` and
-`references/ldt-paper/inductive_step.tex:135-169`.  Elimination: prove the
-outcome-expectation preservation inequality for the same `Q/X/XHat/P` data
-returned by the repair construction, and remove the local `sorry`. -/
+`references/ldt-paper/inductive_step.tex:135-169`.  The exactness question is
+documented in `docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`; #1610
+tracks the remaining QXP construction obligation.
+Elimination: either prove the outcome-expectation preservation inequality for
+the same `Q/X/XHat/P` data returned by the repair construction, or replace the
+line-169 route by the corrected scalar loss and propagate that loss through the
+final cascade. -/
 theorem leftLiftedProjectivizationRepairWithMatchMass
     {Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι]
@@ -516,9 +520,10 @@ theorem leftLiftedProjectivizationRepairWithMatchMass
           (orthonormalizationMainLemmaError ζ) ∧
         OrthonormalizationMatchMassPreservation.QXPLayerOutcomeExpectationPreservation
           ψ A B data := by
-  -- TODO(#1610): prove the QXP outcome-expectation preservation calculation
-  -- for the projectors `P_a = XHat† T_a XHat` produced by the concrete repair
-  -- construction, and return the same data used for the rounded family.
+  -- TODO(#1610): resolve the line-169 exactness obligation.  Either prove the
+  -- QXP outcome-expectation preservation calculation for the projectors
+  -- `P_a = XHat† T_a XHat`, or replace the downstream use by the corrected
+  -- scalar loss documented in the issue-#1099 paper-gap note.
   sorry
 
 end

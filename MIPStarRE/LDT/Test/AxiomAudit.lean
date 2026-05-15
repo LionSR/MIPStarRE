@@ -3,6 +3,7 @@ import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
 import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
 import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
+import MIPStarRE.LDT.Pasting.Bernoulli.Final
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.Bracketed
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 import MIPStarRE.LDT.Test.MainTheorem
@@ -33,8 +34,11 @@ data, or obligation hypotheses, and its proof is assembled from named
 construction targets.  Issue #1043 tracks the base-case projective-completion
 construction, issues #1363 and #1369 track the successor projective-completion
 construction, issue #1566 tracks the match-mass preservation obligations in the
-completion step, issue #1507 tracks the Section 6 main-induction proof, and
-issue #1458 is the umbrella tracking issue.
+completion step, issue #1610 tracks the line-169 projectivization exactness
+sub-obligation documented in
+`docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`,
+issue #1507 tracks the Section 6 main-induction proof, and issue #1458 is the
+umbrella tracking issue.
 
 The audit for `GlobalVariance.globalVarianceOfPoints` now requires the standard
 Lean axioms only: the issue-#1456 six-step local transport estimate is supplied
@@ -49,6 +53,11 @@ The audit for `MainInductionStep.mainInduction` records the current proof
 obligation for `thm:main-induction`: the theorem statement matches the paper
 statement, and the remaining work is to derive the internal successor-stage
 inputs from the paper hypotheses.  This is tracked by issue #1507.
+
+The audit for `Pasting.ldPasting` records the current proof obligation for
+`thm:ld-pasting`: the theorem statement matches the unrestricted paper
+statement, and the remaining direct `sorry` is the degree-zero complementary
+branch tracked by issue #1622.
 
 The audit for `ExpansionHypercubeGraph.laplacianSpectralGapOrdered` now
 requires the standard Lean axioms only: the ordered-eigenvalue statement of
@@ -90,7 +99,7 @@ private def expectedStandardAxiomsWithSorry : Array Name :=
 
 /-- Standard kernel axioms plus `sorryAx`; tracks the transitive
 `mainFormal` construction gaps for issues #1043, #1363, #1369, #1458, #1507,
-and #1566. -/
+#1566, and #1610. -/
 private def expectedMainFormalAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
@@ -113,6 +122,11 @@ private def expectedInductionSelfImprovementAxioms : Array Name :=
 /-- Standard kernel axioms plus `sorryAx`; tracks the issue #1507 derivation
 needed for `mainInduction`. -/
 private def expectedMainInductionAxioms : Array Name :=
+  expectedStandardAxiomsWithSorry
+
+/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1622 degree-zero
+branch needed for unrestricted `ldPasting`. -/
+private def expectedLdPastingAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
 /-- Standard kernel axioms only: the issue #1497 derivation for
@@ -159,6 +173,9 @@ elab "assert_induction_self_improvement_axioms " id:ident : command => do
 elab "assert_main_induction_axioms " id:ident : command => do
   assertUsesExactlyAxioms id.getId expectedMainInductionAxioms
 
+elab "assert_ld_pasting_axioms " id:ident : command => do
+  assertUsesExactlyAxioms id.getId expectedLdPastingAxioms
+
 elab "assert_ordered_laplacian_gap_axioms " id:ident : command => do
   assertUsesExactlyAxioms id.getId expectedOrderedLaplacianGapAxioms
 
@@ -181,6 +198,7 @@ assert_standard_axioms MIPStarRE.LDT.GlobalVariance.globalVarianceOfPoints
 assert_induction_self_improvement_axioms
   MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection
 assert_main_induction_axioms MIPStarRE.LDT.MainInductionStep.mainInduction
+assert_ld_pasting_axioms MIPStarRE.LDT.Pasting.ldPasting
 assert_ordered_laplacian_gap_axioms
   MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianSpectralGapOrdered
 assert_standard_axioms

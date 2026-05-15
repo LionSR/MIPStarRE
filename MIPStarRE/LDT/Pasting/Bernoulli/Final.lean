@@ -650,7 +650,8 @@ large-error reduction names the cases
 hypothesis of `thm:ld-pasting`.  Thus the Lean theorem should not add `0 < d`
 as an assumption of that cited theorem.
 
-Issue #1622 tracks the direct proof of this degree-zero branch.  The existing
+Issue #1622 tracks the direct proof of this degree-zero branch; see
+`docs/paper-gaps/issue-1622-ld-pasting-degree-zero.tex`.  The existing
 nontrivial argument cannot simply be reused: its `hBConsistency` aggregation
 passes from distinct sampled heights to independent sampled heights and absorbs
 the resulting `k^2/q` loss through the displayed `(d/q)^(1/32)` term.  When
@@ -720,7 +721,8 @@ regime, and the large-`gamma`, large-`zeta`, large-`d / q`, and `k = 0`
 complementary branches are proved above.  The only remaining branch is the
 degree-zero case tracked by issue #1622, so this declaration keeps the
 unrestricted paper statement visible without adding the non-paper assumptions
-from the restricted theorem. -/
+from the restricted theorem.  The obstruction is documented in
+`docs/paper-gaps/issue-1622-ld-pasting-degree-zero.tex`. -/
 theorem ldPasting
     (params : Parameters)
     [FieldModel params.q]

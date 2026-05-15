@@ -263,9 +263,12 @@ producer-level QXP outcome-expectation theorem
 `leftLiftedProjectivizationRepairWithMatchMass`, whose QXP
 outcome-expectation preservation calculation is not yet derived from
 `references/ldt-paper/orthonormalization.tex:862-1194` and
-`references/ldt-paper/inductive_step.tex:135-169`.  Documented by issue #1610.
+`references/ldt-paper/inductive_step.tex:135-169`.  Documented in
+`docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`, with the remaining
+construction target tracked by #1610.
 Elimination: prove `leftLiftedProjectivizationRepairWithMatchMass` from the
-paper's QXP construction, then this lemma has no independent proof gap. -/
+paper's QXP construction, or replace the exact line-169 route by a corrected
+loss propagated through the final cascade. -/
 lemma orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass
     {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
