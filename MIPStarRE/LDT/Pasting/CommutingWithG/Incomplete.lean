@@ -173,13 +173,8 @@ theorem commutingWithGIncomplete
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
     CommutingWithGIncompleteStatement params strategy.state family gamma zeta := by
-  have hcom : Commutativity.ComMainConclusion params strategy family gamma zeta :=
-    Commutativity.comMain params strategy eps delta gamma zeta
-      strategy.isNormalized hgood family hcons hself hbound
-  have hselfComplete : GCompleteSelfConsistencyStatement params strategy.state family zeta :=
-    gCompleteSelfConsistency params strategy.state family zeta strategy.permInvState hself
   exact commutingWithGIncomplete_ofComplete params strategy.state family gamma zeta
-    (commutingWithGComplete_ofComMainAndSelfConsistency params strategy family gamma zeta
-      hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q hcom hselfComplete)
+    (commutingWithGComplete params strategy family eps delta gamma zeta
+      hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q hgood hcons hself hbound)
 
 end MIPStarRE.LDT.Pasting
