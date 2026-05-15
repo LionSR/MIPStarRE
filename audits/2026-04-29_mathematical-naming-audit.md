@@ -127,7 +127,7 @@ is ready.
 - `Test.MainFormalPostRolePackageLeftCompletionLine169Residual`
 - `Test.MainFormalCascadeRolePackageResidualCompletionLine169Residual`
 - `Test.MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual`
-- `Test.UnsymmetrizationBridgePackage`
+- `Test.UnsymmetrizationConsistency`
 - `Test.StrategySymmetrizationPackage`
 
 The `Commutativity.Scaffold` namespace and file path also encode historical

@@ -18,14 +18,20 @@ Date: 2026-05-07
 > reduces to two named match-mass preservation obligations,
 > `leftMatchMassPreservation_ofDiagonalConsistency` and
 > `rightMatchMassPreservation_ofDiagonalConsistency`, tracked by #1566.  The
-> broader completion residual construction is tracked by #1565.
+> broader completion construction is tracked by #1565.
 >
 > **Status note, 2026-05-14.**  The two downstream match-mass theorems are now
-> projections from the line-130 orthonormalization residual.  The active proof
+> projections from the line-130 orthonormalization witness.  The active proof
 > gap has been lowered to
 > `leftLiftedProjectivizationRepairWithMatchMass`, which must prove the
 > QXP outcome-expectation preservation calculation while the QXP data is still
 > visible; this is tracked by #1610 under #1566.
+>
+> **Status note, 2026-05-15.**  The Step 3 factor-two unsymmetrization record
+> has been renamed from `UnsymmetrizationBridgePackage` to
+> `UnsymmetrizationConsistency`.  This is not a change of mathematical content:
+> the record is a proved consistency statement derived from the role-register
+> estimate, not an additional bridge hypothesis.
 
 ## 1. Exact sorry site
 
@@ -40,7 +46,7 @@ Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
 
 This intermediate structure has since been removed.  The corresponding active
 internal target is now a direct construction of
-`MainFormalProjectiveCompletionTransportWitness` from the role residual
+`MainFormalProjectiveCompletionTransportWitness` from the role-register witness
 and the post-role diagonal completion theorem.
 
 **The removed structure had two fields**:
@@ -63,12 +69,12 @@ and the post-role diagonal completion theorem.
 - `scalars : MainFormalCascadeScalars params eps k` — constructed from
   `hepsNN`, `hk0`, `herr`.
 - The current theorem statement has no bridge-style hypothesis.  The
-  role residual, line-130 orthonormalization residual, and completion data are
+  role-register witness, line-130 orthonormalization witness, and completion data are
   internal proof obligations.
 
-The line-130 orthonormalization residual is now obtained from cross consistency
+The line-130 orthonormalization witness is now obtained from cross consistency
 through the Section 5 repair construction.  The remaining completion work is
-match-mass preservation and the successor role-residual construction.
+match-mass preservation and the successor role-register construction.
 
 ### What's NOT in scope
 
@@ -119,7 +125,7 @@ gap.
 
 ### Field 2: `postRoleDiagonalCompletion : MainFormalDiagonalCompletionWitness`
 
-This structure contains the line-130 orthonormalization residual plus completion data:
+This structure contains the line-130 orthonormalization witness plus completion data:
 ```lean
 structure MainFormalDiagonalCompletionWitness ... where
   orthWitness : MainFormalDiagonalOrthonormalizationWitness ...
@@ -136,16 +142,16 @@ projective submeasurements they concern.
 | Constructor | Required inputs | Status |
 |------------|----------------|--------|
 | `MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness` | `roleInductionWitness` only | Source-shaped internal construction target; delegates the completion step to `MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency` |
-| `MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency` | line-130 orthonormalization residual + cross consistency | Constructs the completion residual from the retained match-mass preservation proofs |
-| `leftMatchMassPreservation_ofDiagonalConsistency` / `rightMatchMassPreservation_ofDiagonalConsistency` | line-130 orthonormalization residual + cross consistency | Projection theorems exposing the retained match-mass proofs |
+| `MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency` | line-130 orthonormalization witness + cross consistency | Constructs the completion witness from the retained match-mass preservation proofs |
+| `leftMatchMassPreservation_ofDiagonalConsistency` / `rightMatchMassPreservation_ofDiagonalConsistency` | line-130 orthonormalization witness + cross consistency | Projection theorems exposing the retained match-mass proofs |
 | `leftLiftedProjectivizationRepairWithMatchMass` | QXP repair construction with partner measurement | Lowest current `sorry`; must prove QXP outcome-expectation preservation while the QXP data is visible |
 
 **Current route:** Once Field 1 (`roleInductionWitness`) is produced, the proof must
-derive the line-130 orthonormalization residual from cross consistency and then
+derive the line-130 orthonormalization witness from cross consistency and then
 prove the two match-mass preservation obligations.  These are internal
 obligations, not public inputs to `mainFormal`.
 
-The line-130 consistency data supplies the orthonormalization residual via
+The line-130 consistency data supplies the orthonormalization witness via
 `MainFormalDiagonalOrthonormalizationWitness.nonempty_ofDiagonalConsistency`.
 
 The completion theorem now fixes the distinguished completion outcome to the
@@ -162,7 +168,7 @@ target is `leftLiftedProjectivizationRepairWithMatchMass`.
 ### Historical Route A: Mirror the base case
 
 The older proposed route was to replace the successor branch with the same
-shape as the base case: first construct a role residual, then call a conditional
+shape as the base case: first construct a role-register witness, then call a conditional
 assembly theorem that also consumed bridge-style completion data.
 
 This was the historical simple route.  It is rejected for the paper-facing
@@ -239,11 +245,11 @@ dischargers are not yet constructed.
 
 ## 7. Summary of actionable sub-gaps
 
-### Gap 1 (CRITICAL): Successor role residual construction
+### Gap 1 (CRITICAL): Successor role-register construction
 
 **What:** Need to produce `MainFormalRoleInductionWitness` for the `params.m ≠ 1` branch.
 
-**Why blocked:** `mainFormal` lacks the successor induction hypotheses needed to invoke any of the existing successor role-residual constructors.
+**Why blocked:** `mainFormal` lacks the successor induction hypotheses needed to invoke any of the existing successor role-register constructors.
 
 **Resolution:** prove the recursive induction data and the corresponding
 self-improvement obligations inside the `mainFormal` proof, for example by
@@ -254,23 +260,23 @@ predecessor induction hypothesis.  Adding
 `successorSelfImprovementObligations` to the public `mainFormal` statement is
 the rejected historical route, not an acceptable repair.
 
-**Tracked by:** #931 (successor-obligations), #834 (remaining witness residual), #422 (main-formal completion epic)
+**Tracked by:** #931 (successor obligations), #834 (remaining witness construction), #422 (main-formal completion epic)
 
 ### Gap 2 (follows from Gap 1): Post-role diagonal completion
 
 **What:** Need to derive `MainFormalDiagonalCompletionWitness`
-from the role residual and the paper's line-130 consistency data.
+from the role-register witness and the paper's line-130 consistency data.
 
-**Why blocked:** Depends on Gap 1. Once the role residual is available, the
-current route derives the orthonormalization residual from cross consistency.
+**Why blocked:** Depends on Gap 1. Once the role-register witness is available, the
+current route derives the orthonormalization witness from cross consistency.
 The remaining pieces are the two match-mass preservation obligations.  The
 completion outcome and completion-closeness estimates are now produced by
 `MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency`
 from those obligations.
 
 **Resolution options:**
-- Build the completion residual directly from the role residual, the
-  line-130 orthonormalization residual, and match-mass preservation.
+- Build the completion witness directly from the role-register witness, the
+  line-130 orthonormalization witness, and match-mass preservation.
 - Keep the missing match-mass argument as an internal obligation until it is
   proved from the paper hypotheses.
 
@@ -310,7 +316,7 @@ Several issues already cover the sub-gaps identified above:
 | Issue | Description | Covers Gap |
 |-------|-------------|------------|
 | #1363 | Historical tracker for closing the MainFormal successor-case projective completion gap | Primary tracker |
-| #1565 | Discharge the line-130 diagonal completion residual for `mainFormal` | Current post-role completion tracker |
+| #1565 | Discharge the line-130 diagonal completion construction for `mainFormal` | Current post-role completion tracker |
 | #1566 | Prove line-169 match-mass preservation for the chosen `mainFormal` witnesses | Current lowest match-mass obligations |
 | #1035 | Prove recursive mainFormal for successor restricted slices | `MainFormalSuccessorRecursiveSlices` |
 | #1036 | Construct successor-case self-improvement obligations | `MainFormalSuccessorSelfImprovementObligations` |

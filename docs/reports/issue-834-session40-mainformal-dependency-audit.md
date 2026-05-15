@@ -101,7 +101,7 @@ Existing downstream conversions are already checked:
   consistency links from `line169MatchMassMonotonicity`.
 - `MainFormalCascadeRolePackagedCompletionLine169Residual.toCompletionLine169Residual`
   (`MainTheorem.lean:2395-2414`) expands the role-measurement record through
-  `UnsymmetrizationBridgePackage.ofSymConsistency`.
+  `UnsymmetrizationConsistency.ofSymConsistency`.
 - `MainFormalProjectiveCompletionTransportWitness.selfConsistency`
   reconstructs line 156 and converts it to the native `ζ₃/2` self-consistency
   target.
@@ -134,7 +134,7 @@ The live residual corresponds to the proof of `thm:main-formal` in
 
 | Paper lines | Paper step | Current Lean status |
 | --- | --- | --- |
-| 107-108 | `eq:cons-a` / `eq:cons-b`, the factor-two unsymmetrization estimates. | No longer residual fields; reconstructed from the concrete role-measurement record by `UnsymmetrizationBridgePackage.ofSymConsistency`. |
+| 107-108 | `eq:cons-a` / `eq:cons-b`, the factor-two unsymmetrization estimates. | No longer residual fields; reconstructed from the concrete role-measurement record by `UnsymmetrizationConsistency.ofSymConsistency`. |
 | 130-133 | `eq:G-self-consistency`, polynomial $G^{\mathrm A}$ / $G^{\mathrm B}$ consistency at `ζ₁`. | Reconstructed from Step 5 wrappers and role-measurement data before line 156. |
 | 146-147 | `eq:G-with-Q-A`, completion closeness from $G$ to $Q$ at `ζ₂`. | Still part of `postRoleResidual`: Alice in left-register form, Bob in the left-register form returned by orthonormalize-and-complete. The #869 conversion to Bob's right-register paper form is already checked. |
 | 160-166 | `eq:third-goal` and data processing to evaluated $Q$ consistency. | Downstream conversions are checked once the residual fields are supplied. |
@@ -192,7 +192,7 @@ Two open older trackers are also not direct fields of the present residual:
 
 - #424 is still open, but the factor-two unsymmetrization estimates are no longer
   explicit residual fields; the current route obtains them from
-  `MainFormalRoleMeasurementWitness.toUnsymmetrizationBridge`.
+  `MainFormalRoleMeasurementWitness.toUnsymmetrizationConsistency`.
 - #427 is still open, but the scalar cascade bounds and final weakening are already
   checked in `MainFormalCascadeScalars` and
   `MainFormalProjectiveCompletionTransportWitness.toMainFormal`; the local TODO

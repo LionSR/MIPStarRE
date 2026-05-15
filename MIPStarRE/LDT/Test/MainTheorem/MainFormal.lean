@@ -102,7 +102,7 @@ theorem mainFormal_ofProjectiveCompletionTransportWitness
 
 This is the paper theorem statement. The statement includes the large-`k` and
 positive-boundary conditions currently needed by the formalization, but it does
-not assume repaired bridge data, role-register witness data, or final
+not assume repaired auxiliary data, role-register witness data, or final
 projective-completion hypotheses. Those remain open steps to be derived from the
 pass condition and the preceding sections.
 

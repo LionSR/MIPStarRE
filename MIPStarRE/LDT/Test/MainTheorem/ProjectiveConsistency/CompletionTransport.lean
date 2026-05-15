@@ -23,7 +23,7 @@ projectivization/completion and line-169 handoff in the proof of
 
 This witness records only the data that remains after the checked
 role-unsymmetrization and pre-projective consistency steps.  The Section 6
-consistency field of `UnsymmetrizationBridgePackage` and the pre-projective
+consistency field of `UnsymmetrizationConsistency` and the pre-projective
 consistency field of `ProjectivizationSelfConsistencyHandoff` are reconstructed
 downstream from the two paper factor-two role-block estimates and `hpass` via
 the checked line-116 triangle and Step 5 Schwartz--Zippel theorem.
