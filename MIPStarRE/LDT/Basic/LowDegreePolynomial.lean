@@ -68,6 +68,25 @@ noncomputable def appendAtHeight (params : Parameters) [FieldModel params.q]
       rw [hi_last, degreeOf_rename_embedCoord_lastCoord]
       omega
 
+/-- Evaluating an old polynomial after appending a new coordinate ignores the
+appended coordinate. -/
+@[simp] theorem appendAtHeight_apply_appendPoint
+    (params : Parameters) [FieldModel params.q]
+    (g : Polynomial params) (x : Fq params) (u : Point params) (y : Fq params) :
+    appendAtHeight params g x (appendPoint params u y) = g u := by
+  change encodeScalar
+      (MvPolynomial.eval (decodePoint (appendPoint params u y))
+        (MvPolynomial.rename (embedCoord params) g.poly)) =
+    encodeScalar (MvPolynomial.eval (decodePoint u) g.poly)
+  rw [MvPolynomial.eval_rename]
+  have hcoords :
+      decodePoint (appendPoint params u y) ∘ embedCoord params = decodePoint u := by
+    funext i
+    simp [decodePoint, appendPoint, embedCoord]
+    rfl
+  rw [hcoords]
+  rfl
+
 /-- Coordinate map for restricting a polynomial in `m+1` variables to the slice `X_m = x`. -/
 noncomputable def restrictAtHeightCoordinateMap (params : Parameters) [FieldModel params.q]
     (x : Fq params) :
