@@ -6,7 +6,7 @@ import MIPStarRE.LDT.Pasting.CommutingWithG.Incomplete
 /-!
 # Section 12 pasting: H-A consistency
 
-Vertical-line to point-consistency bridge and completed-measurement wrapper for
+Vertical-line to point-consistency transport and completed-measurement wrapper for
 `cor:h-a-consistency`.
 
 ## References
@@ -126,7 +126,7 @@ private lemma liftedVerticalLineConsistency
 /-- Convert source-style vertical-line consistency to point consistency.
 
 This is the core argument in `cor:h-a-consistency`, stated without the
-`HBConsistencyStatement` package.  It takes only the line-consistency estimate
+`HBConsistencyStatement` type wrapper.  It takes only the line-consistency estimate
 for a candidate polynomial submeasurement `H`, restricts that estimate to the
 point on each vertical line, and then applies the good-strategy
 point-to-vertical-line comparison.
@@ -290,7 +290,7 @@ theorem hAConsistency_submeas_from_lineConsistency
       exact hAConsistency_error_le_nu_of_pos params eps delta gamma zeta k hk_pos
         heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
 
-/-- Packaged form of `hAConsistency_submeas_from_lineConsistency` for the
+/-- Specialization of `hAConsistency_submeas_from_lineConsistency` to the
 constructed pasted submeasurement. -/
 private lemma hAConsistency_submeas_core
     (params : Parameters)

@@ -95,6 +95,20 @@
 	Lean; the remaining degree-zero branch is tracked by issue~\#1622.
 \end{remark}
 
+\begin{remark}[Degree-zero Lean branch]\label{rem:ld-pasting-degree-zero-lean-branch}
+	\lean{MIPStarRE.LDT.Pasting.degreeZeroPastedLineConsistency}
+	\lean{MIPStarRE.LDT.Pasting.degreeZeroPastedSubMeasPointConsistency}
+	\lean{MIPStarRE.LDT.Pasting.degreeZeroPastedPointConsistency}
+	The Lean development records the \(d=0\) branch separately.  The statement
+	\texttt{degreeZeroPastedLineConsistency} is the remaining construction
+	obligation: it should derive the required vertical-line consistency for the
+	averaged slice family from the degree-zero hypotheses of
+	Theorem~\ref{thm:ld-pasting}.  The two subsequent declarations transport this
+	line-consistency estimate to point consistency and then complete the
+	submeasurement at the fallback outcome.  No \texttt{\textbackslash leanok} tag
+	is attached here, since the line-consistency construction is still open.
+\end{remark}
+
 The bound is trivial when at least one of $\eps$, $\delta$, $\gamma$, $\zeta$, or $d/q$ is at least $1$, since then $\nu \ge 1$. In the remainder of the chapter we therefore assume
 \[
 	\eps,\delta,\gamma,\zeta,d/q \le 1.
@@ -912,6 +926,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 
 \begin{corollary}[Consistency of $H$ with $A$]\label{cor:h-a-consistency}
 	\lean{MIPStarRE.LDT.Pasting.hAConsistency_submeas}
+	\lean{MIPStarRE.LDT.Pasting.hAConsistency_submeas_from_lineConsistency}
 	\leanok
 	\uses{lem:h-b-consistency}
 	On average over $(u,x) \sim \F_q^{m+1}$,
@@ -943,6 +958,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 \begin{corollary}[Consistency of the completed $H$ with $A$]
 	\label{cor:h-a-consistency-completed}
 	\lean{MIPStarRE.LDT.Pasting.hAConsistency_completed}
+	\lean{MIPStarRE.LDT.Pasting.hAConsistency_completed_from_submeas}
 	\leanok
 	\uses{cor:h-a-consistency, cor:ld-pasting-N-completeness}
 	Let $H_{\mathrm{meas}}$ be the completion of $H$ at the fallback outcome.
