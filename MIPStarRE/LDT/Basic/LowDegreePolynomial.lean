@@ -45,6 +45,42 @@ theorem hasLowIndividualDegree {params : Parameters} [FieldModel params.q]
   funext u
   rfl
 
+/-- The total degree of a low-individual-degree polynomial is bounded by
+`m * d`. -/
+theorem totalDegree_le_mul_degree (params : Parameters) [FieldModel params.q]
+    (g : Polynomial params) :
+    g.poly.totalDegree ≤ params.m * params.d := by
+  rw [MvPolynomial.totalDegree]
+  refine Finset.sup_le ?_
+  intro s hs
+  calc
+    s.sum (fun _ e => e) = ∑ i : Fin params.m, s i := by
+      rw [Finsupp.sum_fintype]
+      intro i
+      rfl
+    _ ≤ ∑ _i : Fin params.m, params.d := by
+      refine Finset.sum_le_sum ?_
+      intro i _
+      exact (MvPolynomial.degreeOf_le_iff.mp (g.lowIndividualDegree i)) s hs
+    _ = params.m * params.d := by
+      simp [Fintype.card_fin]
+
+/-- A low-individual-degree polynomial with degree bound `0` is constant. -/
+theorem eq_C_coeff_zero_of_degree_zero (params : Parameters) [FieldModel params.q]
+    (g : Polynomial params) (hd : params.d = 0) :
+    g.poly = MvPolynomial.C (g.poly.coeff 0) := by
+  exact MvPolynomial.totalDegree_eq_zero_iff_eq_C.mp
+    (Nat.eq_zero_of_le_zero ((totalDegree_le_mul_degree params g).trans (by simp [hd])))
+
+/-- A low-individual-degree polynomial with degree bound `0` has the same value
+at every two points. -/
+theorem apply_eq_apply_of_degree_zero (params : Parameters) [FieldModel params.q]
+    (g : Polynomial params) (hd : params.d = 0) (u v : Point params) :
+    g u = g v := by
+  unfold Polynomial.toFun evalPolynomialModel
+  rw [eq_C_coeff_zero_of_degree_zero params g hd]
+  simp
+
 /-- Extend a global polynomial to the slice at height `x` by ignoring the new variable. -/
 noncomputable def appendAtHeight (params : Parameters) [FieldModel params.q]
     (g : Polynomial params) (_x : Fq params) : Polynomial params.next where
