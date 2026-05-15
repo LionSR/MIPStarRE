@@ -23,6 +23,36 @@ noncomputable def evaluateAt {ι : Type*} [Fintype ι] [DecidableEq ι]
     (G : SubMeas (Polynomial params) ι) : SubMeas (Fq params) ι :=
   postprocess G (fun g => g u)
 
+/-- If two points give the same value for every polynomial outcome, then
+evaluating a polynomial-valued submeasurement at those points gives the same
+answer-valued submeasurement.
+
+Lean-only helper for the degree-zero branch of `thm:ld-pasting`; the source
+context is `references/ldt-paper/ld-pasting.tex:12-55`. -/
+theorem evaluateAt_eq_of_eval_eq {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (params : Parameters) [FieldModel params.q]
+    (G : SubMeas (Polynomial params) ι) (u v : Point params)
+    (h : ∀ g : Polynomial params, g u = g v) :
+    evaluateAt params u G = evaluateAt params v G := by
+  unfold evaluateAt
+  congr
+  funext g
+  exact h g
+
+/-- When the individual degree bound is zero, evaluating a polynomial-valued
+submeasurement is independent of the point.
+
+Lean-only helper for the degree-zero branch of `thm:ld-pasting`; it records the
+formal consequence of the paper's degree-zero boundary case in
+`references/ldt-paper/ld-pasting.tex:12-55`. -/
+theorem evaluateAt_eq_of_degree_zero {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (params : Parameters) [FieldModel params.q]
+    (G : SubMeas (Polynomial params) ι) (hd : params.d = 0)
+    (u v : Point params) :
+    evaluateAt params u G = evaluateAt params v G := by
+  exact evaluateAt_eq_of_eval_eq params G u v
+    (fun g => Polynomial.apply_eq_apply_of_degree_zero params g hd u v)
+
 /-- Evaluation after adjoining an unused coordinate agrees with evaluation before
 adjoining that coordinate. -/
 @[simp] theorem evaluateAt_postprocess_appendAtHeight_appendPoint
