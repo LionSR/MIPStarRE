@@ -255,6 +255,27 @@ noncomputable def liftedVerticalLineAnswerFamily
       (verticalLineMeasurementFamily params strategy (truncatePoint params u))
       (fun f => f (pointHeight params u))
 
+/-- In degree zero, the lifted vertical-line answer family is independent of
+the height coordinate once the old point coordinates are fixed.
+
+Lean-only helper for the degree-zero branch of `thm:ld-pasting`; it formalizes
+the fact that a vertical line answer of degree zero is constant in the line
+parameter.  The source context is `references/ldt-paper/ld-pasting.tex:12-55`. -/
+theorem liftedVerticalLineAnswerFamily_eq_of_same_truncate_degree_zero
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (hd : params.d = 0)
+    {u v : Point params.next} (hbase : truncatePoint params u = truncatePoint params v) :
+    liftedVerticalLineAnswerFamily params strategy u =
+      liftedVerticalLineAnswerFamily params strategy v := by
+  unfold liftedVerticalLineAnswerFamily
+  rw [hbase]
+  congr
+  funext f
+  have hd_next : params.next.d = 0 := by
+    simpa [Parameters.next] using hd
+  exact AxisLinePolynomial.apply_eq_apply_of_degree_zero f hd_next
+    (pointHeight params u) (pointHeight params v)
+
 /-- Reparametrizing the fixed last-coordinate branch to the canonical vertical
 base point matches `liftedVerticalLineAnswerFamily`. -/
 theorem rawVerticalLineAnswerFamily_eq_lifted
