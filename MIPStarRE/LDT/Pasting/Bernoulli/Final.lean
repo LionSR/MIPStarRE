@@ -623,6 +623,48 @@ theorem ldPastingZeroKBranch
     exact one_le_ldPastingError_of_k_eq_zero params k eps delta gamma kappa zeta
       (kappa_nonneg_of_complete params strategy family hcomplete) hk_zero)
 
+/-- Degree-zero point-consistency construction for `thm:ld-pasting`.
+
+Paper origin: `references/ldt-paper/ld-pasting.tex:12-55`.  This is the
+remaining source-faithful construction obligation for issue #1622.  In the
+degree-zero branch the slice polynomials and the last-coordinate line answers
+are constant on their respective domains.  The intended proof combines
+`ldGbcon_liftedVerticalLine` with
+`IdxPolyFamily.evaluatedAtNextPoint_eq_of_same_height_degree_zero`,
+`liftedVerticalLineAnswerFamily_eq_of_same_truncate_degree_zero`, and the
+paper's consistency triangle to construct a single constant-polynomial
+measurement.  The measurement is the completion of
+`averagedSliceAppendedSubMeas`, the averaged slice family viewed as a global
+polynomial family by ignoring the appended variable.
+
+The statement deliberately has no bridge, residual, repair, producer, or
+package hypothesis. -/
+theorem degreeZeroPastedPointConsistency
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma kappa zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (hcomplete : family.Complete strategy.state kappa)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hd_zero : params.d = 0)
+    (k : ℕ) :
+    ∃ H : Measurement (Polynomial params.next) ι,
+      H =
+          Preliminaries.completeAtOutcome
+            (averagedSliceAppendedSubMeas params family)
+            (pastedFallbackOutcome params) ∧
+        ConsRel strategy.state (uniformDistribution (Point params.next))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          (polynomialEvaluationFamily params.next H.toSubMeas)
+          (MainInductionStep.ldPastingInInductionError params k
+            eps delta gamma kappa zeta) := by
+  -- Issue #1622: discharge the degree-zero rectangle argument described in the
+  -- docstring.  The proof should build a constant-polynomial measurement and
+  -- absorb the resulting consistency losses into `ldPastingInInductionError`.
+  sorry
+
 /-- Degree-zero complementary branch for the unrestricted source theorem.
 
 Paper origin: `references/ldt-paper/ld-pasting.tex:12-55`.  The paper's
