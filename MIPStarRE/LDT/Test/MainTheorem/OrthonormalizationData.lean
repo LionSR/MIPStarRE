@@ -100,10 +100,12 @@ there is no additional orthonormalization-input hypothesis.
 `orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass`,
 whose exact match-mass preservation conclusion is not yet derived from
 `references/ldt-paper/orthonormalization.tex:862-1194` and
-`references/ldt-paper/inductive_step.tex:135-169`.  Documented by issue #1610.
+`references/ldt-paper/inductive_step.tex:135-169`.  Documented by issue #1610
+and by `docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`.
 Elimination: prove the exact construction-level monotonicity from the paper
 hypotheses, or route this branch through the repaired line-169 theorem with its
-explicit loss. -/
+explicit loss; in either case do not add a match-mass or repair hypothesis to
+`mainFormal`. -/
 theorem nonempty_ofDiagonalConsistency
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

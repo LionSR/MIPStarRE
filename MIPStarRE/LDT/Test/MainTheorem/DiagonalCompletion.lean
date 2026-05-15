@@ -355,9 +355,11 @@ orthonormalization witness, on
 `orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass`,
 whose exact match-mass preservation conclusion is not yet derived from
 `references/ldt-paper/inductive_step.tex:130-173`.  This is documented in
-issue #1610.  Elimination: prove the exact construction-level monotonicity from
-the paper hypotheses, or route this completion construction through the repaired
-line-169 theorem with its explicit loss.
+issue #1610 and in
+`docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`.  Elimination: prove
+the exact construction-level monotonicity from the paper hypotheses, or route
+this completion construction through the repaired line-169 theorem with its
+explicit loss.
 -/
 theorem nonempty_ofDiagonalConsistency
     {params : Parameters} [FieldModel.{0} params.q]

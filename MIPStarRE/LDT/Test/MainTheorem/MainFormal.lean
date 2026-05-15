@@ -127,10 +127,11 @@ These are tracked by #1043, #1363, #1369, #1458, #1507, #1566, and #1610.
 `orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass`,
 whose exact match-mass preservation conclusion is not yet derived from
 `thm:main-formal` and the cited Section 5 and Step 6 arguments in
-`references/ldt-paper/inductive_step.tex`.  This is documented in issue #1610.
+`references/ldt-paper/inductive_step.tex`.  This is documented in issue #1610
+and in `docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`.
 Elimination: prove the exact construction-level monotonicity from the paper
 hypotheses, or route the final theorem through the repaired line-169 estimate
-with its explicit loss.
+with its explicit loss, without adding a non-paper hypothesis to `mainFormal`.
 -/
 theorem mainFormal
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]

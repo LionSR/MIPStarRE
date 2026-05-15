@@ -30,9 +30,11 @@ no match-mass or diagonal-consistency data is accepted as an extra input.
 `orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass`,
 whose exact match-mass preservation conclusion is not yet derived from
 `references/ldt-paper/inductive_step.tex:130-173`.  This is documented in
-issue #1610.  Elimination: prove the exact construction-level monotonicity from
-the paper hypotheses, or route the final theorem through the repaired line-169
-estimate with its explicit loss.
+issue #1610 and in
+`docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`.  Elimination: prove
+the exact construction-level monotonicity from the paper hypotheses, or route
+the final theorem through the repaired line-169 estimate with its explicit
+loss, and remove this propagated dependency.
 -/
 theorem nonempty_ofRoleWitness
     {params : Parameters} [FieldModel.{0} params.q]

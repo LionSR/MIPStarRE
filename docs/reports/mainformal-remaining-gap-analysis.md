@@ -322,6 +322,8 @@ Several issues already cover the sub-gaps identified above:
 | #1363 | Historical tracker for closing the MainFormal successor-case projective completion gap | Primary tracker |
 | #1565 | Discharge the line-130 diagonal completion construction for `mainFormal` | Current post-role completion tracker |
 | #1566 | Prove line-169 match-mass preservation for the chosen `mainFormal` witnesses | Current lowest match-mass obligations |
+| #1558 | Audit and reduce final-theorem residual and package layers | Current final-theorem cleanup branch under #1458 |
+| #1610 | Prove the exact construction-level line-169 match-mass preservation | Current lowest open sub-obligation under #1566 |
 | #1035 | Prove recursive mainFormal for successor restricted slices | `MainFormalSuccessorRecursiveSlices` |
 | #1036 | Construct successor-case self-improvement obligations | `MainFormalSuccessorSelfImprovementObligations` |
 | #1041 | Assemble successor-case mainFormal branch | Final wiring of #1035 + #1036 |
@@ -332,4 +334,9 @@ Several issues already cover the sub-gaps identified above:
 | #1367 | SelfImprovement bridge: audit and close input-consistency orphans blocking mainFormal | Self-improvement audit |
 | #1359 | Trace OrthonormalizationInput extra-hypothesis chain | Orthonormalization hypothesis chain |
 
-One **missing piece**: the **answer-valued** successor route (`MainFormalSuccessorAnswerRecursiveSlices` + `MainFormalSuccessorAnswerSelfImprovementObligations`, or `AnswerPerSliceInductionData` + answer obligations) is not yet tracked by a dedicated issue. This is the paper-faithful route (using answer alphabet restriction). Tracked in #1369.
+The answer-valued successor route
+(`MainFormalSuccessorAnswerRecursiveSlices` plus
+`MainFormalSuccessorAnswerSelfImprovementObligations`, or
+`AnswerPerSliceInductionData` plus answer-valued obligations) is the
+paper-faithful route using answer alphabet restriction, and is tracked by
+#1369.

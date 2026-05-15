@@ -183,7 +183,7 @@ When such a declaration remains useful, its role should be one of the following:
 | `mainFormal_ofProjectiveCompletionTransportWitness` | Conditional final-transport theorem; keep as reusable proof content, but do not present it as the paper theorem |
 | `MainFormalDiagonalOrthonormalizationWitness` | Internal witness produced from line-130 cross consistency; do not replace it by an orthonormalization-input hypothesis on `mainFormal` |
 | `LdPastingNontrivialContext` | Nontrivial-regime context for `ldPastingNontrivial`; do not present it as the unrestricted `thm:ld-pasting` context |
-| `Pasting.ldPastingNontrivial` | Restricted nontrivial-regime form of `thm:ld-pasting`; link only from a Lean-only remark until the complementary trivial cases in `references/ldt-paper/ld-pasting.tex`, lines 52--55, are formalized |
+| `Pasting.ldPastingNontrivial` | Restricted nontrivial-regime form of `thm:ld-pasting`; link from a Lean-only remark, while `Pasting.ldPasting` remains the unrestricted source-facing theorem |
 | `MainInductionStep.ldPastingInInductionSectionNontrivial` | Restricted nontrivial-regime restatement of the pasting theorem for Section 6; do not present it as the unrestricted source theorem |
 
 The former `SelfImprovement.HelperStrongSelfConsistencyInput`,
@@ -301,8 +301,10 @@ Some nodes have `\lean{}` but deliberately omit either statement-level or
 proof-level `\leanok`:
 
 - **`thm:orthonormalization`** (ch04): The Lean statement is source-facing.
-  Its proof still contains the tracked issue-#1032 `sorry` for the sharp
-  `100 * ζ^(1/4)` constant, so proof-level `\leanok` is withheld.
+  PR #1632 restored the paper constant and the public theorem now has only
+  the standard Lean axioms.  The separate heterogeneous
+  `orthonormalizationMainLemma` remains a tracked issue-#1032 proof
+  obligation.
 
 - **`thm:naimark`** (ch04): The full tensor-product correlation theorem has
   no attached Lean declaration.  The formalized questionwise local interface is
@@ -320,14 +322,13 @@ proof-level `\leanok`:
   **`thm:ld-pasting-in-induction-section`** (ch10): The paper theorem in
   `references/ldt-paper/ld-pasting.tex`, lines 12--50, assumes
   `k >= 400md` but does not state the nontrivial-regime inequalities as
-  hypotheses.  The current Lean declarations `Pasting.ldPastingNontrivial` and
-  `MainInductionStep.ldPastingInInductionSectionNontrivial` prove restricted forms with
-  the additional public assumptions `gamma <= 1`, `zeta <= 1`, `d <= q`,
-  `0 < d`, and `1 <= k`.  Lines 52--55 of the paper explain the reduction to
-  the nontrivial regime, but the complementary trivial cases have not yet been
-  formalized.  The source theorem nodes therefore do not carry primary
-  `\lean{}` links or statement-level `\leanok`; the checked restricted
-  declarations are linked from nearby Lean-only remarks.
+  hypotheses.  The source-facing declaration `Pasting.ldPasting` keeps this
+  unrestricted statement visible; it has a tracked proof obligation for the
+  degree-zero complementary branch, issue #1622.  The restricted declarations
+  `Pasting.ldPastingNontrivial` and
+  `MainInductionStep.ldPastingInInductionSectionNontrivial` still belong in
+  Lean-only remarks because they assume `gamma <= 1`, `zeta <= 1`, `d <= q`,
+  `0 < d`, and `1 <= k`.
 
 ### The `\uses{}` convention
 
