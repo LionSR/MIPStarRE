@@ -45,6 +45,20 @@ theorem hasLowIndividualDegree {params : Parameters} [FieldModel params.q]
   funext u
   rfl
 
+/-- The constant polynomial with value `a`. -/
+noncomputable def const (params : Parameters) [FieldModel params.q] (a : Fq params) :
+    Polynomial params where
+  poly := MvPolynomial.C (decodeScalar a)
+  lowIndividualDegree := by
+    intro i
+    simp [MvPolynomial.degreeOf_C]
+
+/-- The constant polynomial evaluates to its prescribed value. -/
+@[simp] theorem const_apply (params : Parameters) [FieldModel params.q]
+    (a : Fq params) (u : Point params) :
+    const params a u = a := by
+  simp [const, Polynomial.toFun, evalPolynomialModel]
+
 /-- The total degree of a low-individual-degree polynomial is bounded by
 `m * d`. -/
 theorem totalDegree_le_mul_degree (params : Parameters) [FieldModel params.q]
