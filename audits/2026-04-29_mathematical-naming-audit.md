@@ -53,7 +53,7 @@ data, slice restriction, slice-wise induction, self-improvement, and averaged
 pasting inputs rather than statement packages.
 
 The averaged pasting input is now named directly as
-`MainInductionStep.AveragedPastingInput`. The empty Section 6 pass-through
+`MainInductionStep.AveragedPastingData`. The empty Section 6 pass-through
 abbreviation `PastingBoundednessInput` was removed; its uses now refer directly
 to `IdxPolyFamily.SliceBoundednessInput`.
 
@@ -107,10 +107,10 @@ renaming would touch many downstream declarations. They should not receive
 empty pass-through abbreviations. Migrate them directly when the surrounding API
 is ready.
 
-- `MainInductionStep.SliceRestrictionPackage`
-- `MainInductionStep.PerSliceInductionPackage`
-- `MainInductionStep.SelfImprovementPackage`
-- `MainInductionStep.mainInductionPublicRestrictionPackage`
+- `MainInductionStep.SliceRestrictionData`
+- `MainInductionStep.PerSliceInductionData`
+- `MainInductionStep.SelfImprovementData`
+- `MainInductionStep.mainInductionPublicRestrictionData`
 - `MainInductionStep.mainInductionPublicWrapper`
 - `MakingMeasurementsProjective.SpectralTruncationStatement`
 - `MakingMeasurementsProjective.SpectralTruncationInput`

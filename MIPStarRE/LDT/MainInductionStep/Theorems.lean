@@ -18,7 +18,7 @@ Compatibility module re-exporting all induction-step theorem leaf modules:
 - `StageDataConstructors`: constructors for the structured induction data and
   skeletal assembly
 - `AvgSliceErrors`: averaged slice-error bounds
-- `PastingAssembly`: pasting assembly and `assembleAveragedPastingInput`
+- `PastingAssembly`: pasting assembly and `assembleAveragedPastingData`
 - `MainTheorems`: top-level induction theorems
 
 ## References

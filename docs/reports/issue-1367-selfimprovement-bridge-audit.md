@@ -198,7 +198,7 @@ proof of `selfImprovement`.
 
 ## 3. Consumer Chain: MainInductionStep
 
-### 3.1 `SelfImprovementPackage.SliceObligations`
+### 3.1 `SelfImprovementData.SliceObligations`
 
 **File:** `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/Core.lean:242-279`
 
@@ -210,7 +210,7 @@ Per-slice bridge requiring:
 
 **Key design choice:** The `sliceStrategy`s are concrete `SymStrat params ι` (not `AnswerSymStrat`, not restricted). This means the slice strategies must be constructible from the restricted `AnswerSymStrat` — which is the gap tracked by #1375.
 
-### 3.2 `AnswerSelfImprovementPackage.SliceObligations`
+### 3.2 `AnswerSelfImprovementData.SliceObligations`
 
 **File:** `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/AnswerSlice.lean:32-69`
 
@@ -223,13 +223,13 @@ Same pattern but with `diagonalZeroCoord_eq` instead of `diagonalMeasurement_eq`
 | `SliceObligations.ofMeasurementEq` | Core.lean:411 | Concrete strategies + measurement transport + obligations | `SliceObligations` |
 | `SliceObligations.ofOrthonormalizationRepair` | Core.lean:456 | Above + separate `helperStrongSelfConsistency` + `OrthonormalizationRepairObligation` + `FinalFieldsInput` | `SliceObligations` (fills orthonormalization via `orthonormalizationInput_of_obligations`) |
 | `AnswerSliceObligations.ofMeasurementEq` | AnswerSlice.lean:… | Same pattern, answer-valued | Answer counterpart |
-| `SelfImprovementPackage.ofSliceObligations` | Core.lean:514 | `SliceObligations` | Full `SelfImprovementPackage` |
+| `SelfImprovementData.ofSliceObligations` | Core.lean:514 | `SliceObligations` | Full `SelfImprovementData` |
 
 ### 3.4 Downstream assembly
 
 **File:** `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean`
 
-- `mainInductionByRecursionOnM` (line 200): Takes `hselfObligation` (a function `PerSliceInductionPackage → SelfImprovementPackage`) as an internal proof-stage input, then assembles `AveragedPastingInput` → `mainInductionFromPackages`
+- `mainInductionByRecursionOnM` (line 200): Takes `hselfObligation` (a function `PerSliceInductionData → SelfImprovementData`) as an internal proof-stage input, then assembles `AveragedPastingData` → `mainInductionFromPackages`
 - Historical `mainInductionPublicWrapper`: removed in the 2026-05-13 PR #1539 update, so this proof-stage input is no longer exposed as a theorem adjacent to the source theorem.
 
 **Status:** The conditional assembly proof is still useful proof content, but the paper-facing theorem `mainInduction` now carries the successor proof gap directly.  The missing work is to derive the restricted-slice data, recursive witnesses, and self-improvement packages from the hypotheses of `thm:main-induction`, not to expose them as assumptions near the source theorem.
@@ -247,7 +247,7 @@ The older branch-residual route used the following proved wiring functions:
   self-improvement obligations to produce the branch residual
 - `answerSuccessorOfObligations` (line 582): Answer-valued counterpart
 - `answerSuccessorOfInductionPackageAndObligations` (line 628): takes a
-  `PerSliceInductionPackage` and the corresponding obligations to produce the
+  `PerSliceInductionData` and the corresponding obligations to produce the
   branch residual
 - `roleWitnessResidual_ofAnswerSuccessorObligations` (line 602): wraps into
   `Nonempty (MainFormalRoleInductionWitness)`
@@ -473,8 +473,8 @@ hypotheses.
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/FinalFields.lean` | `finalFields` conditional obligation |
 | `MIPStarRE/LDT/MakingMeasurementsProjective/Statements.lean` | `MMProj.OrthonormalizationInput`, `SpectralTruncationInput`, `LeftLiftedProjectivizationRepairInput` |
 | `MIPStarRE/LDT/MakingMeasurementsProjective/SpectralTruncation/ProjectiveNonMeasurement.lean` | `spectralTruncationInput_of_sourceAlmostProjective` (PROVED) |
-| `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/Core.lean` | `SelfImprovementPackage.SliceObligations`, `ofSliceObligations`, `selfImprovementInInductionSection` |
-| `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/AnswerSlice.lean` | `AnswerSelfImprovementPackage.SliceObligations` |
+| `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/Core.lean` | `SelfImprovementData.SliceObligations`, `ofSliceObligations`, `selfImprovementInInductionSection` |
+| `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/AnswerSlice.lean` | `AnswerSelfImprovementData.SliceObligations` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` | `mainInduction`, `mainInductionBaseCase`, `mainInductionByRecursionOnM` |
 | `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | Historical note: as of 2026-05-08, `mainFormal` had one `sorry` at line 611, which #1374 proposed to close by adding hypotheses |
 | `MIPStarRE/LDT/Test/MainTheorem/RoleRegister.lean` | Role-register residual constructors routed through Section 6 `mainInduction` |

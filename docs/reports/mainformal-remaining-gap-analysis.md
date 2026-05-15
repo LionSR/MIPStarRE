@@ -118,7 +118,7 @@ structure MainFormalRoleInductionWitness ... where
 | `MainFormalRolePackageBranchResidual.roleWitnessResidual_ofSuccessorObligations` | `successorRecursiveSlicesInput` + `successorSelfImprovementObligations` | Neither in scope |
 | `MainFormalRolePackageBranchResidual.roleWitnessResidual_ofAnswerSuccessorObligations` | `answerSuccessorRecursiveSlicesInput` + `answerSuccessorSelfImprovementObligations` | Neither in scope |
 | `MainFormalRolePackageBranchResidual.roleWitnessResidual_ofAnswerSuccessorRecursiveSelfImprovement` | `answerSuccessorRecursiveSlicesInput` + `answerSuccessorSelfImprovementInput` | Neither in scope |
-| `MainFormalRolePackageBranchResidual.roleWitnessResidual_ofAnswerSuccessorInductionPackageAndObligations` | `answerSuccessorPerSliceInductionPackageInput` + `answerSuccessorSelfImprovementObligations` | Neither in scope |
+| `MainFormalRolePackageBranchResidual.roleWitnessResidual_ofAnswerSuccessorInductionPackageAndObligations` | `answerSuccessorPerSliceInductionDataInput` + `answerSuccessorSelfImprovementObligations` | Neither in scope |
 
 **Status:** no construction theorem is available in scope. This is the primary
 gap.
@@ -203,12 +203,12 @@ data:
 
 ```lean
 (hanswerObligations : answerSuccessorSelfImprovementObligations (k := k) hpass hm_one_ne)
-(hinductionPackage : answerSuccessorPerSliceInductionPackageInput (k := k) hpass hm_one_ne)
+(hinductionPackage : answerSuccessorPerSliceInductionDataInput (k := k) hpass hm_one_ne)
 ```
 
 Where:
 - `answerSuccessorSelfImprovementObligations` — per-slice Section 9 obligations
-- `answerSuccessorPerSliceInductionPackageInput` — per-slice induction data
+- `answerSuccessorPerSliceInductionDataInput` — per-slice induction data
 
 This is useful only as a description of the missing internal obligations.  It
 should not be the public statement of `mainFormal`.
@@ -255,7 +255,7 @@ dischargers are not yet constructed.
 self-improvement obligations inside the `mainFormal` proof, for example by
 embedding the final theorem in a recursion that supplies them from the
 predecessor induction hypothesis.  Adding
-`answerSuccessorPerSliceInductionPackageInput`,
+`answerSuccessorPerSliceInductionDataInput`,
 `answerSuccessorSelfImprovementObligations`, `successorRecursiveSlicesInput`, or
 `successorSelfImprovementObligations` to the public `mainFormal` statement is
 the rejected historical route, not an acceptable repair.
@@ -328,4 +328,4 @@ Several issues already cover the sub-gaps identified above:
 | #1367 | SelfImprovement bridge: audit and close input-consistency orphans blocking mainFormal | Self-improvement audit |
 | #1359 | Trace OrthonormalizationInput extra-hypothesis chain | Orthonormalization hypothesis chain |
 
-One **missing piece**: the **answer-valued** successor route (`MainFormalSuccessorAnswerRecursiveSlices` + `MainFormalSuccessorAnswerSelfImprovementObligations`, or `AnswerPerSliceInductionPackage` + answer obligations) is not yet tracked by a dedicated issue. This is the paper-faithful route (using answer alphabet restriction). Tracked in #1369.
+One **missing piece**: the **answer-valued** successor route (`MainFormalSuccessorAnswerRecursiveSlices` + `MainFormalSuccessorAnswerSelfImprovementObligations`, or `AnswerPerSliceInductionData` + answer obligations) is not yet tracked by a dedicated issue. This is the paper-faithful route (using answer alphabet restriction). Tracked in #1369.

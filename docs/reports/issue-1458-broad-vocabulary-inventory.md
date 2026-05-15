@@ -86,8 +86,8 @@ extra public hypothesis on later paper theorems.
 The successor branch of `thm:main-induction` is now isolated as the theorem
 `mainInductionSuccessor`.  Its statement contains the source assumptions of
 the successor case and the branch condition \(m\ne1\).  It does not take
-`SliceRestrictionPackage`, `PerSliceInductionPackage`, `SelfImprovementPackage`,
-or `AveragedPastingInput` as hypotheses.  Those records remain useful internal
+`SliceRestrictionData`, `PerSliceInductionData`, `SelfImprovementData`,
+or `AveragedPastingData` as hypotheses.  Those records remain useful internal
 stage objects, but the proof obligation is to construct them from
 `references/ldt-paper/inductive_step.tex:441-551` and then apply
 `mainInductionFromStageData`.  This makes the Section 6 bridge debt a

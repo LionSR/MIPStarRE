@@ -10,7 +10,7 @@ This module parallels `OrdinaryRestriction` but works with the answer-side
 `x`-restricted strategy around line 363; the answer-valued variant is a
 Lean-side adaptation restricted to the `A`-register).  It retains the useful
 answer-valued restricted-probability targets and recursive-slice target.  The
-former conditional boundary, public wrapper, and slice-data witness package,
+former conditional boundary, public wrapper, and slice-data witness data record,
 which took unproved recursive, self-improvement, or concrete slice-strategy data
 as inputs, have been removed.
 
@@ -73,13 +73,13 @@ def MainFormalSuccessorAnswerDiagonalWeightedBound (params : Parameters)
         strategy.strategySymmetrization x).diagonalFailureProbability) ≤
     3 * eps
 
-/-- The answer-valued restricted-probability package on the role-register
+/-- The answer-valued restricted-probability data record on the role-register
 symmetrization used in the successor branch of `mainFormal`.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
 (`\label{lem:restricted-probabilities}`), used in the recursive slice step
 `references/ldt-paper/inductive_step.tex:441-454`. -/
-noncomputable def mainFormalSuccessorAnswerRestrictionPackage
+noncomputable def mainFormalSuccessorAnswerRestrictionData
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -87,9 +87,9 @@ noncomputable def mainFormalSuccessorAnswerRestrictionPackage
     (haxisWeightedBound : MainFormalSuccessorAnswerAxisWeightedBound params strategy eps)
     (hdiagonalWeightedBound :
       MainFormalSuccessorAnswerDiagonalWeightedBound params strategy eps) :
-    MainInductionStep.AnswerSliceRestrictionPackage params
+    MainInductionStep.AnswerSliceRestrictionData params
       strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) :=
-  MainInductionStep.answerMainInductionPublicRestrictionPackage
+  MainInductionStep.answerMainInductionPublicRestrictionData
     params strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps)
     (SameSpaceProjStrat.strategySymmetrization_isGood_three_mul
       (strategy := strategy) (eps := eps) hpass)
@@ -105,7 +105,7 @@ def MainFormalSuccessorAnswerRecursiveSlices (params : Parameters)
     (hdiagonalWeightedBound :
       MainFormalSuccessorAnswerDiagonalWeightedBound params strategy eps) : Prop :=
   let hrestrict :=
-    mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
+    mainFormalSuccessorAnswerRestrictionData params strategy eps hpass
       haxisWeightedBound hdiagonalWeightedBound
   ∀ x,
     ∃ error : Error, ∃ G : Measurement (Polynomial params) (Role × ι),
@@ -122,13 +122,13 @@ def MainFormalSuccessorAnswerRecursiveSlices (params : Parameters)
           (hrestrict.profile.selfConsistency x)
           (hrestrict.profile.diagonal x)
 
-/-- A Section 6 answer-valued per-slice induction package supplies the
+/-- A Section 6 answer-valued per-slice induction data record supplies the
 answer-side recursive slice witnesses used in the successor analysis.
 
-As in the ordinary-register constructor, this only exposes the package fields as
-recursive-slice targets; the predecessor induction package must come from a
+As in the ordinary-register constructor, this only exposes the data record fields as
+recursive-slice targets; the predecessor induction data record must come from a
 non-circular induction hypothesis. -/
-theorem mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage
+theorem mainFormalSuccessorAnswerRecursiveSlices_ofInductionData
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -137,9 +137,9 @@ theorem mainFormalSuccessorAnswerRecursiveSlices_ofInductionPackage
     (hdiagonalWeightedBound :
       MainFormalSuccessorAnswerDiagonalWeightedBound params strategy eps)
     (hinduction :
-      MainInductionStep.AnswerPerSliceInductionPackage params
+      MainInductionStep.AnswerPerSliceInductionData params
         strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps)
-        (mainFormalSuccessorAnswerRestrictionPackage params strategy eps hpass
+        (mainFormalSuccessorAnswerRestrictionData params strategy eps hpass
           haxisWeightedBound hdiagonalWeightedBound)
         k) :
     MainFormalSuccessorAnswerRecursiveSlices params strategy eps hpass k

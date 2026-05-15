@@ -109,7 +109,7 @@ lemma answer_weighted_diagonal_bound
             rw [answerRestricted_diagonalFailureProbability_eq]
     _ ≤ gamma := weighted_diagonal_bound params strategy eps delta gamma hgood
 
-/-- Package answer-valued weighted restricted axis/diagonal bounds into the public
+/-- Data answer-valued weighted restricted axis/diagonal bounds into the public
 answer-valued restricted-probabilities statement. -/
 lemma AnswerRestrictedProbabilitiesStatement.ofWeightedBounds
     (params : Parameters)

@@ -7,7 +7,7 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.StageDataConstructors
 # Section 6 — Main Induction Theorems
 
 The top-level induction theorem `mainInduction`, its proved base case
-`mainInductionBaseCase`, and the public restricted-probability package
+`mainInductionBaseCase`, and the public restricted-probability data record
 constructors used by the Section 3 handoff.
 
 ## References
@@ -190,7 +190,7 @@ successor case.  Its assumptions are the source assumptions of
 `thm:main-induction`, together with the branch condition `params.m ≠ 1`; it
 does not accept restricted-probability records, per-slice induction data,
 self-improvement data, pasting data, bridge hypotheses, residual inputs, or
-package hypotheses.  The intended proof is to construct these objects internally
+data record hypotheses.  The intended proof is to construct these objects internally
 from the paper hypotheses, then apply the already checked assembly theorem
 `mainInductionFromStageData`.
 
@@ -257,7 +257,7 @@ Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
 (`\label{lem:restricted-probabilities}`), used in the proof of
 `\label{thm:main-induction}` at
 `references/ldt-paper/inductive_step.tex:441-454`. -/
-noncomputable def mainInductionPublicRestrictionPackage
+noncomputable def mainInductionPublicRestrictionData
     (params : Parameters)
     [FieldModel.{0} params.q]
     (strategy : SymStrat params.next ι)
@@ -271,19 +271,19 @@ noncomputable def mainInductionPublicRestrictionPackage
       avgOver (uniformDistribution (Fq params))
           (fun x => sliceTransverseDirectionWeight params *
             (xRestrictedStrategy params strategy x).diagonalFailureProbability) ≤ gamma) :
-    SliceRestrictionPackage params strategy eps delta gamma :=
-  SliceRestrictionPackage.ofRestrictedProbabilities params strategy eps delta gamma
+    SliceRestrictionData params strategy eps delta gamma :=
+  SliceRestrictionData.ofRestrictedProbabilities params strategy eps delta gamma
     (RestrictedProbabilitiesStatement.ofWeightedBounds params strategy eps delta gamma
       hgood haxisWeightedBound hdiagonalWeightedBound)
 
-/-- Answer-valued restricted-probabilities package built from explicit weighted
+/-- Answer-valued restricted-probabilities data record built from explicit weighted
 answer-valued slice bounds.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
 (`\label{lem:restricted-probabilities}`), used in the proof of
 `\label{thm:main-induction}` at
 `references/ldt-paper/inductive_step.tex:441-454`. -/
-noncomputable def answerMainInductionPublicRestrictionPackage
+noncomputable def answerMainInductionPublicRestrictionData
     (params : Parameters)
     [FieldModel.{0} params.q]
     (strategy : SymStrat params.next ι)
@@ -297,8 +297,8 @@ noncomputable def answerMainInductionPublicRestrictionPackage
       avgOver (uniformDistribution (Fq params))
           (fun x => sliceTransverseDirectionWeight params *
             (xRestrictedAnswerSymStrat params strategy x).diagonalFailureProbability) ≤ gamma) :
-    AnswerSliceRestrictionPackage params strategy eps delta gamma :=
-  AnswerSliceRestrictionPackage.ofRestrictedProbabilities params strategy eps delta gamma
+    AnswerSliceRestrictionData params strategy eps delta gamma :=
+  AnswerSliceRestrictionData.ofRestrictedProbabilities params strategy eps delta gamma
     (AnswerRestrictedProbabilitiesStatement.ofWeightedBounds params strategy eps delta gamma
       hgood haxisWeightedBound hdiagonalWeightedBound)
 

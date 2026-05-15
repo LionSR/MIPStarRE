@@ -115,7 +115,7 @@ selfImprovementInInductionSection    (Core.lean)
 ```
 
 ```
-SelfImprovementPackage.ofSliceObligations   (Core.lean)
+SelfImprovementData.ofSliceObligations   (Core.lean)
   └─ calls selfImprovementInInductionSection per slice
        └─ uses SliceObligations only for concrete slice strategies
           and measurement transport
@@ -128,18 +128,18 @@ ldPastingInInductionSection   (Core.lean)
 
 ```
 mainInductionByRecursionOnM   (MainTheorems.lean)
-  └─ Calls PerSliceInductionPackage.ofRecursion (induction)
-  └─ Calls hselfObligation : PerSliceInductionPackage → SelfImprovementPackage
-  └─ Calls assembleAveragedPastingInput (builds AveragedPastingInput from SelfImprovementPackage)
+  └─ Calls PerSliceInductionData.ofRecursion (induction)
+  └─ Calls hselfObligation : PerSliceInductionData → SelfImprovementData
+  └─ Calls assembleAveragedPastingData (builds AveragedPastingData from SelfImprovementData)
   └─ Calls mainInductionFromPackages
-       └─ Calls AveragedPastingInput.output
+       └─ Calls AveragedPastingData.output
             └─ Calls ldPastingInInductionSection
                  └─ Calls Pasting.ldPasting
 ```
 
 **The key observation:** `mainInductionByRecursionOnM` takes `hselfObligation`
 as an internal proof-stage input.  This `hselfObligation` must produce a
-`SelfImprovementPackage` from a `PerSliceInductionPackage`.  It is not a
+`SelfImprovementData` from a `PerSliceInductionData`.  It is not a
 hypothesis of the paper-facing `mainInduction` theorem; that theorem retains
 the paper-shaped statement and the non-base branch is tracked by #1507.
 
@@ -244,24 +244,24 @@ submeasurement input and leaves the induction-section proof as #1503.  It does
 not take a measurement-completion package or Section 9 obligation bundle as an
 extra hypothesis.
 
-### 3.3. selfImprovementInInductionSection → SelfImprovementPackage: Internal assembly
+### 3.3. selfImprovementInInductionSection → SelfImprovementData: Internal assembly
 
-`SelfImprovementPackage.ofSliceObligations` calls
+`SelfImprovementData.ofSliceObligations` calls
 `selfImprovementInInductionSection` per slice, using
-`SelfImprovementPackage.SliceObligations` only for the concrete restricted-slice
+`SelfImprovementData.SliceObligations` only for the concrete restricted-slice
 strategies and measurement transports.  The theorem-level Section 9 proof debt
 remains in `selfImprovementInInductionSection`, not in an additional package
 hypothesis.
 
-### 3.4. SelfImprovementPackage → AveragedPastingInput: ✅ Complete
+### 3.4. SelfImprovementData → AveragedPastingData: ✅ Complete
 
-`assembleAveragedPastingInput` (in `PastingAssembly.lean:420`) converts the
-per-slice `SelfImprovementPackage` fields into averaged inputs for the pasting
+`assembleAveragedPastingData` (in `PastingAssembly.lean:420`) converts the
+per-slice `SelfImprovementData` fields into averaged inputs for the pasting
 theorem.
 
-### 3.5. AveragedPastingInput → ldPastingInInductionSection: ✅ Complete
+### 3.5. AveragedPastingData → ldPastingInInductionSection: ✅ Complete
 
-`AveragedPastingInput.output` (in `PackageConstructors.lean:357`) calls
+`AveragedPastingData.output` (in `PackageConstructors.lean:357`) calls
 `ldPastingInInductionSection`, which calls `Pasting.ldPasting`.
 
 ### 3.6. mainInductionByRecursionOnM → mainFormal completion obligations: INCOMPLETE
@@ -284,7 +284,7 @@ The missing successor construction needs:
 |-------|------------------------|--------------------------------------|-----|
 | SelfImprovement | ~50 theorems/lemmas | 2 paper theorem statements (`selfImprovementHelper`, `selfImprovement`) | The paper statements are visible; their remaining derivations are tracked proof gaps |
 | SelfImprovement sub-lemmas (slackness, matrix bridge) | ~15 proved lemmas | 0 called from MI or MT | Entirely orphan |
-| MainInductionStep | `selfImprovementInInductionSection`, `SelfImprovementPackage.ofSliceObligations`, `ldPastingInInductionSection`, `mainInductionByRecursionOnM` | Internal assembly remains in `MainTheorems.lean` | `mainInductionByRecursionOnM` takes `hselfObligation` as an internal input; the public wrapper has been removed |
+| MainInductionStep | `selfImprovementInInductionSection`, `SelfImprovementData.ofSliceObligations`, `ldPastingInInductionSection`, `mainInductionByRecursionOnM` | Internal assembly remains in `MainTheorems.lean` | `mainInductionByRecursionOnM` takes `hselfObligation` as an internal input; the public wrapper has been removed |
 | MainTheorem | `mainFormal`, `mainFormal_ofProjectiveCompletionTransportWitness` | Paper-facing theorem plus proved final transport from a constructed completion residual | Role-residual and post-role completion constructions remain tracked proof gaps |
 
 ---
@@ -368,10 +368,10 @@ which this audit is meant to prevent.
 | `MIPStarRE/LDT/SelfImprovement/Theorems/OrthonormalizationInputConstructors.lean` | Removed orphan module; unused obligation-package constructors no longer exist |
 | `MIPStarRE/LDT/SelfImprovement/MatrixRealization.lean` | Matrix-level SDP realization (used by orphan SDP bridges only) |
 | `MIPStarRE/LDT/Pasting/Core.lean` | `ldPasting` — consumed by `ldPastingInInductionSection` |
-| `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/Core.lean` | `selfImprovementInInductionSection`, `SelfImprovementPackage.ofSliceObligations`, `ldPastingInInductionSection` |
+| `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/Core.lean` | `selfImprovementInInductionSection`, `SelfImprovementData.ofSliceObligations`, `ldPastingInInductionSection` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` | `mainInduction`, `mainInductionBaseCase`, `mainInductionByRecursionOnM` |
-| `MIPStarRE/LDT/MainInductionStep/Theorems/PackageConstructors.lean` | `AveragedPastingInput.output`, `mainInductionFromPackages` |
-| `MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly.lean` | `assembleAveragedPastingInput` |
+| `MIPStarRE/LDT/MainInductionStep/Theorems/PackageConstructors.lean` | `AveragedPastingData.output`, `mainInductionFromPackages` |
+| `MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly.lean` | `assembleAveragedPastingData` |
 | `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | `mainFormal` and `mainFormal_ofProjectiveCompletionTransportWitness`; paper theorem plus proved final transport |
 | `MIPStarRE/LDT/Test/MainTheorem/RoleRegister.lean` | Role-register residual constructors routed through Section 6 `mainInduction` |
 | `MIPStarRE/LDT/Test/MainTheorem/OrdinaryRestriction/Basic.lean` | Ordinary restricted-slice weighted bounds and recursive-slice targets |

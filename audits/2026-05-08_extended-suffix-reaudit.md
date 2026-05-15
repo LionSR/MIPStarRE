@@ -114,7 +114,7 @@ consumer pair on inspection. Similarly:
   `SpectralTruncationInput` → 25, etc.); only the 4 Commutativity ones are
   dead.
 - All 15 `*Package` structures are heavily used
-  (`SelfImprovementPackage` → 54, `SliceRestrictionPackage` → 53,
+  (`SelfImprovementData` → 54, `SliceRestrictionData` → 53,
   `MainFormalRoleMeasurementWitness` → 44, etc.).
 - All 6 `*Hypothesis(es)` structures are connected.
 
