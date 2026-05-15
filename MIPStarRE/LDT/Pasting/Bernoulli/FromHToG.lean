@@ -76,7 +76,7 @@ lemma fromHToG
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ) :
     FromHToGStatement params strategy strategy.state family gamma zeta k := by
-  let hfacts : GHatFactsStatement params strategy.state family gamma zeta :=
+  have hfacts : GHatFactsStatement params strategy.state family gamma zeta :=
     gHatFacts params strategy family eps delta gamma zeta
       hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le_one hdq_le
       hgood hcons hself hbound

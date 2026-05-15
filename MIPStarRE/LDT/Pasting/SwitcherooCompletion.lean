@@ -288,7 +288,7 @@ lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
       (switcherooPointProductRight params family M)
       chi) :
     CommutativitySwitcherooStatement params strategy.state family M zeta omega chi := by
-  let hselfG : GCompleteSelfConsistencyStatement params strategy.state family zeta :=
+  have hselfG : GCompleteSelfConsistencyStatement params strategy.state family zeta :=
     gCompleteSelfConsistency params strategy.state family zeta strategy.permInvState hself
   exact commutativitySwitcheroo_ofCompleteSelfConsistency params strategy.state
     strategy.isNormalized strategy.densityFixed family M zeta omega chi hselfG hselfM hcomm

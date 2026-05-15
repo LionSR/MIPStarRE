@@ -353,7 +353,7 @@ lemma ldSandwichLineOnePoint
     gamma_nonneg_of_isGood params.next strategy hgood
   have hzeta_nonneg : 0 ≤ zeta :=
     IdxPolyFamily.zeta_nonneg_of_consistentWithPoints strategy family hcons
-  let hfacts : GHatFactsStatement params strategy.state family gamma zeta :=
+  have hfacts : GHatFactsStatement params strategy.state family gamma zeta :=
     gHatFacts params strategy family eps delta gamma zeta
       hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le
       hgood hcons hself hbound

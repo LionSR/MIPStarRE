@@ -328,10 +328,10 @@ theorem commutingWithGComplete
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
     CommutingWithGCompleteStatement params strategy.state family gamma zeta := by
-  let hcom : Commutativity.ComMainConclusion params strategy family gamma zeta :=
+  have hcom : Commutativity.ComMainConclusion params strategy family gamma zeta :=
     Commutativity.comMain params strategy eps delta gamma zeta
       strategy.isNormalized hgood family hcons hself hbound
-  let hselfComplete : GCompleteSelfConsistencyStatement params strategy.state family zeta :=
+  have hselfComplete : GCompleteSelfConsistencyStatement params strategy.state family zeta :=
     gCompleteSelfConsistency params strategy.state family zeta strategy.permInvState hself
   exact commutingWithGComplete_ofComMainAndSelfConsistency params strategy family gamma zeta
     hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q hcom hselfComplete

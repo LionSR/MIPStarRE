@@ -524,14 +524,14 @@ theorem gHatFacts
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
     GHatFactsStatement params strategy.state family gamma zeta := by
-  let hselfComplete : GCompleteSelfConsistencyStatement params strategy.state family zeta :=
+  have hselfComplete : GCompleteSelfConsistencyStatement params strategy.state family zeta :=
     gCompleteSelfConsistency params strategy.state family zeta strategy.permInvState hself
-  let hselfIncomplete : GBotSelfConsistencyStatement params strategy.state family zeta :=
+  have hselfIncomplete : GBotSelfConsistencyStatement params strategy.state family zeta :=
     gBotSelfConsistency params strategy.state family zeta strategy.permInvState hself
-  let hcommComplete : CommutingWithGCompleteStatement params strategy.state family gamma zeta :=
+  have hcommComplete : CommutingWithGCompleteStatement params strategy.state family gamma zeta :=
     commutingWithGComplete params strategy family eps delta gamma zeta
       hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q hgood hcons hself hbound
-  let hcommIncomplete : CommutingWithGIncompleteStatement params strategy.state family gamma zeta :=
+  have hcommIncomplete : CommutingWithGIncompleteStatement params strategy.state family gamma zeta :=
     commutingWithGIncomplete params strategy family eps delta gamma zeta
       hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q hgood hcons hself hbound
   exact gHatFacts_ofSelfConsistencyAndCommutation params strategy.state family gamma zeta

@@ -761,15 +761,13 @@ lemma projectiveLowRankSum {Outcome : Type uOutcome}
     ∃ data : QLayerData Outcome ι,
       RankReductionWitness ψ A ζ data := by
   classical
-  let hprojective :=
+  obtain ⟨q, hrounded⟩ :=
     projectiveNonMeasurement_of_sourceAlmostProjective_two_mul_full
       ψ A ζ hψ source_almost_projective
-  let q : OpFamily Outcome ι := Classical.choose hprojective
-  let hrounded : RoundingToProjectorsWitness ψ A ζ q := Classical.choose_spec hprojective
   exact projectiveLowRankSum_of_roundingWitness ψ A ζ hψ hζ hζ_le q hrounded
     source_almost_projective
 
-/-- Unconditional constructive producer for `lem:projective-non-measurement`.
+/-- Unconditional constructive form of `lem:projective-non-measurement`.
 
 This is the specialization of
 `projectiveNonMeasurement_of_sourceAlmostProjective_two_mul_full` to the
@@ -790,7 +788,7 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_full
   exact projectiveNonMeasurement_of_sourceAlmostProjective_two_mul_full
     ψ A ζ hψ hsource_two
 
-/-- A direct `projectiveNonMeasurement` producer from
+/-- A direct `projectiveNonMeasurement` construction from
 `AlmostProjMeasStatement`.
 
 Only the `sourceAlmostProjective` field carries mathematical content for this
@@ -806,7 +804,7 @@ theorem projectiveNonMeasurement_of_almostProjMeasStatement
   projectiveNonMeasurement_of_sourceAlmostProjective ψ A ζ hζ hζ_small
     halmost.sourceAlmostProjective
 
-/-- Unconditional wrapper from `AlmostProjMeasStatement` to the rounding
+/-- Unconditional conversion from `AlmostProjMeasStatement` to the rounding
 projector witness.
 
 The normalized-state hypothesis is exactly the one already required by the
@@ -825,17 +823,17 @@ theorem projectiveNonMeasurement_of_almostProjMeasStatement_full
 `SpectralTruncationInput` consumed by the orthonormalization pipeline.
 
 This integrates the constructive witness theorem with the
-`OrthonormalizationSpectralObligation` APIs. -/
+`OrthonormalizationSpectralObligation` statements. -/
 noncomputable def spectralTruncationInput_of_sourceAlmostProjective
     {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :
     SpectralTruncationInput ψ A ζ := by
   intro hψ hsource
-  let hprojective :=
+  have hprojective : projectiveNonMeasurement ψ A ζ :=
     projectiveNonMeasurement_of_sourceAlmostProjective_full ψ A ζ hψ hsource
   let R : OpFamily Outcome ι := Classical.choose hprojective
-  let hR : RoundingToProjectorsWitness ψ A ζ R := Classical.choose_spec hprojective
+  have hR : RoundingToProjectorsWitness ψ A ζ R := Classical.choose_spec hprojective
   exact ⟨R, hR.projective, hR.closeness, hR.sum_eq_total, hR.total_le⟩
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

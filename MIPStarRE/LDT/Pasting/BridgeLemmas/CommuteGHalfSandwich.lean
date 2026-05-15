@@ -58,7 +58,7 @@ lemma commuteGHalfSandwich
     (k : ℕ)
     (hk : 2 ≤ k) :
     CommuteGHalfSandwichStatement params strategy.state family gamma zeta k := by
-  let hfacts : GHatFactsStatement params strategy.state family gamma zeta :=
+  have hfacts : GHatFactsStatement params strategy.state family gamma zeta :=
     gHatFacts params strategy family eps delta gamma zeta
       hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le
       hgood hcons hself hbound
