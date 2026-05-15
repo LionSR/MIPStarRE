@@ -229,13 +229,46 @@ private theorem polynomialEvaluation_averagedSliceAppendedSubMeas_eq_average
         simp [IdxPolyFamily.evaluatedAtNextPoint, truncatePoint_appendPoint,
           pointHeight_appendPoint]
 
-/-- Degree-zero submeasurement consistency rectangle for `thm:ld-pasting`.
+/-- Degree-zero vertical-line consistency rectangle for `thm:ld-pasting`.
 
 Paper origin: `references/ldt-paper/ld-pasting.tex:12-55`.  This is the
-remaining mathematical core of issue #1622 after the completion and mass
-transport have been separated.  It should combine `ldGbcon_liftedVerticalLine`,
-the two degree-zero invariance lemmas, and the height-averaging identity
+remaining mathematical core of issue #1622 after the completion, mass transport,
+and H-A point-consistency transport have been separated.  It should combine
+`ldGbcon_liftedVerticalLine`, the two degree-zero invariance lemmas, and the
+height-averaging identity
 `polynomialEvaluation_averagedSliceAppendedSubMeas_eq_average`.
+
+The statement has no bridge, residual, repair, producer, or package hypothesis. -/
+theorem degreeZeroPastedLineConsistency
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hd_zero : params.d = 0)
+    (k : ℕ)
+    (hk_pos : 1 ≤ k) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (hRestrictionToVerticalLine params
+        (averagedSliceAppendedSubMeas params family))
+      (verticalLineMeasurementFamily params strategy)
+      (hBConsistencyError params eps delta gamma zeta k) := by
+  -- Issue #1622: prove the degree-zero height-averaging rectangle on vertical
+  -- lines.  The proof should compare the averaged slice family with the lifted
+  -- vertical-line answers using `ldGbcon_liftedVerticalLine` and the two
+  -- degree-zero invariance lemmas, then absorb the resulting line error into
+  -- `hBConsistencyError`.
+  sorry
+
+/-- Degree-zero submeasurement point consistency for `thm:ld-pasting`.
+
+Paper origin: `references/ldt-paper/ld-pasting.tex:12-55`.  This theorem is now
+the formal H-A transport of `degreeZeroPastedLineConsistency`: once the
+degree-zero candidate is consistent with the vertical-line measurements, the
+standard point-to-vertical-line comparison for a good strategy gives the
+ambient point-consistency statement.
 
 The statement has no bridge, residual, repair, producer, or package hypothesis. -/
 theorem degreeZeroPastedSubMeasPointConsistency
@@ -254,12 +287,30 @@ theorem degreeZeroPastedSubMeasPointConsistency
       (polynomialEvaluationFamily params.next
         (averagedSliceAppendedSubMeas params family))
       (MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta) := by
-  -- Issue #1622: prove the degree-zero height-averaging rectangle.  The proof
-  -- should first compare the averaged slice family with the lifted vertical-line
-  -- answers using `ldGbcon_liftedVerticalLine` and the degree-zero invariance
-  -- lemmas, then compare the point measurement with the same vertical-line
-  -- answers using the good-strategy axis-parallel consistency.
-  sorry
+  have hgamma_nonneg : 0 ≤ gamma := by
+    have : 0 ≤ strategy.diagonalFailureProbability := by
+      unfold SymStrat.diagonalFailureProbability
+      exact mul_nonneg (by positivity)
+        (Finset.sum_nonneg fun j _ => bipartiteConsError_nonneg strategy.state _ _ _)
+    exact le_trans this hgood.diagonalLineTest
+  have hzeta_nonneg : 0 ≤ zeta := by
+    exact le_trans
+      (bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        family.evaluatedAtNextPoint)
+      hcons.pointConsistency.offDiagonalBound
+  have hline :
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (hRestrictionToVerticalLine params
+          (averagedSliceAppendedSubMeas params family))
+        (verticalLineMeasurementFamily params strategy)
+        (hBConsistencyError params eps delta gamma zeta k) :=
+    degreeZeroPastedLineConsistency params strategy eps delta gamma zeta
+      hgood family hcons hd_zero k hk_pos
+  exact hAConsistency_submeas_from_lineConsistency params strategy
+    (averagedSliceAppendedSubMeas params family) eps delta gamma zeta
+    hgood hgamma_nonneg hzeta_nonneg k hk_pos hline
 
 /-- Degree-zero point-consistency construction for `thm:ld-pasting`.
 

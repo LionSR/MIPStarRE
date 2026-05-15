@@ -123,42 +123,46 @@ private lemma liftedVerticalLineConsistency
       (B := liftedVerticalLineAnswerFamily params strategy)
       (δ := η)).mpr (by simpa [CommutativityPoints.pointNextEquiv] using hprod_next)
 
-/-- Bridge: convert vertical-line consistency to point consistency.
+/-- Convert source-style vertical-line consistency to point consistency.
 
-Given `hHB : HBConsistencyStatement` (the output of `hBConsistency`), derives
-point consistency by restricting the vertical-line bound to individual points.
+This is the core argument in `cor:h-a-consistency`, stated without the
+`HBConsistencyStatement` package.  It takes only the line-consistency estimate
+for a candidate polynomial submeasurement `H`, restricts that estimate to the
+point on each vertical line, and then applies the good-strategy
+point-to-vertical-line comparison.
 
 Paper reference: `cor:h-a-consistency` proof in `ld-pasting.tex`
 lines 1098–1117.
 
 Steps:
-1. Restrict `hHB.lineConsistency` to a single point on the line
+1. Restrict the line-consistency hypothesis to a single point on the line
 2. Apply `triangleSub` with the `A-B` consistency bound from `hgood`
 3. Error bound: `ν₆ + √(8mε + 4δ) ≤ 47k²m(...) ≤ 100k²m(...)`.
 
 The completion and large-`k` hypotheses are carried by the downstream
 completed-measurement wrapper; this submeasurement core only uses the positive
-`k` regime and the already-packaged `HBConsistencyStatement`. -/
-private lemma hAConsistency_submeas_core
+`k` regime and the displayed line-consistency estimate. -/
+theorem hAConsistency_submeas_from_lineConsistency
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
+    (H : SubMeas (Polynomial params.next) ι)
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
     (hgamma_nonneg : 0 ≤ gamma)
     (hzeta_nonneg : 0 ≤ zeta)
     (k : ℕ)
     (hk_pos : 1 ≤ k)
-    (hHB : HBConsistencyStatement params strategy family
-        eps delta gamma zeta k) :
+    (hline :
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (hRestrictionToVerticalLine params H)
+        (verticalLineMeasurementFamily params strategy)
+        (hBConsistencyError params eps delta gamma zeta k)) :
     ConsRel strategy.state (uniformDistribution (Point params.next))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params.next
-          (constructedPastedSubMeas params family k))
+        (polynomialEvaluationFamily params.next H)
         (MainInductionStep.ldPastingInInductionNu params k
           eps delta gamma zeta) := by
-  let H := constructedPastedSubMeas params family k
   let pointLineMeas : IdxMeas (Point params.next) (Fq params.next) ι := fun u =>
     { toSubMeas :=
         postprocess
@@ -211,7 +215,7 @@ private lemma hAConsistency_submeas_core
       (hRestrictionToVerticalLine params H)
       (verticalLineMeasurementFamily params strategy)
       νB
-      hHB.lineConsistency
+      hline
   have hline_next :
       ConsRel strategy.state (uniformDistribution (Point params.next))
         (fun u => hRestrictionToVerticalLine params H (truncatePoint params u))
@@ -237,7 +241,7 @@ private lemma hAConsistency_submeas_core
         (fun u f => f (pointHeight params u))
         hline_next
     simpa [pointLineMeas, polynomialEvaluationFamily,
-      postprocess_hRestrictionToVerticalLine_eq_evaluateAt, H] using hproc
+      postprocess_hRestrictionToVerticalLine_eq_evaluateAt] using hproc
   have hpoint_sdd :
       SDDRel strategy.state
       (uniformDistribution (Point params.next))
@@ -285,6 +289,31 @@ private lemma hAConsistency_submeas_core
     _ ≤ ν := by
       exact hAConsistency_error_le_nu_of_pos params eps delta gamma zeta k hk_pos
         heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
+
+/-- Packaged form of `hAConsistency_submeas_from_lineConsistency` for the
+constructed pasted submeasurement. -/
+private lemma hAConsistency_submeas_core
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (eps delta gamma zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hzeta_nonneg : 0 ≤ zeta)
+    (k : ℕ)
+    (hk_pos : 1 ≤ k)
+    (hHB : HBConsistencyStatement params strategy family
+        eps delta gamma zeta k) :
+    ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next
+          (constructedPastedSubMeas params family k))
+        (MainInductionStep.ldPastingInInductionNu params k
+          eps delta gamma zeta) := by
+  exact hAConsistency_submeas_from_lineConsistency params strategy
+    (constructedPastedSubMeas params family k) eps delta gamma zeta
+    hgood hgamma_nonneg hzeta_nonneg k hk_pos hHB.lineConsistency
 
 /-- `cor:h-a-consistency`.
 
