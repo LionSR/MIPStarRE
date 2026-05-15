@@ -717,6 +717,7 @@ assembly witness:
 \lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.completeAtOutcomeProj_left_matchMass_ge, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_completeAtOutcomeProj}
 \lean{MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.toUnsymmetrizedPOVMTargets, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.toPreProjectiveSelfConsistency}
 \lean{MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.projectivizationSelfConsistencyHandoff, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.fullPolynomialConsistency, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.projectiveEvaluationConsistency}
+\lean{MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.pointAConsistency_ofLine169Consistency, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.pointBConsistency_ofLine169Consistency}
 \lean{MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.pointAConsistency, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.pointBConsistency, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.selfConsistency}
 \lean{MIPStarRE.LDT.Test.mainFormalProjectiveCompletionTransportWitnessOfCompleteAtOutcomeStatements, MIPStarRE.LDT.Test.MainFormalDiagonalCompletionWitness.toProjectiveCompletionTransportWitness}
 \lean{MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.toMainFormal}
@@ -744,9 +745,18 @@ consistency to full-polynomial consistency at $\zeta_1$, prove the paper
 line-116 triangle step, and reconstruct the line-156 $\approx_{\zeta_3}$
 projectivization bridge from pre-projective consistency plus left/right
 completion closeness at $\zeta_2$.  Lean also derives the evaluated line-164
-projective consistency, data-processes the two polynomial line-169 $\zeta_1$
-links to the evaluated line-172 links, and proves the two native $\zeta_4$ point
-goals via \texttt{simeq-triangle-inequality}.  After the \#869 right-register
+projective consistency.  The error-parametric lemmas
+\texttt{pointAConsistency\_ofLine169Consistency} and
+\texttt{pointBConsistency\_ofLine169Consistency} show that a polynomial
+line-169 estimate with error $\eta$ yields the final point error
+\[
+  2\sigma + 2\sqrt{\eta+\zeta_3/2}.
+\]
+The paper-tight final route specializes this with $\eta=\zeta_1$; the checked
+local repair can be inserted with its explicit larger value of $\eta$ if the
+scalar cascade is widened accordingly.  The existing
+\texttt{pointAConsistency} and \texttt{pointBConsistency} declarations are the
+paper-tight specializations.  After the \#869 right-register
 completion transport, the remaining active post-role witness asks only for
 Alice's line-146 completion closeness, Bob's left-register completion closeness
 as returned by orthonormalize-and-complete, and the construction-level
