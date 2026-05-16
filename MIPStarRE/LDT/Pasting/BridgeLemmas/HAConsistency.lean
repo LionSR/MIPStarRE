@@ -125,7 +125,7 @@ private lemma liftedVerticalLineConsistency
 
 /-- Convert source-style vertical-line consistency to point consistency.
 
-This is the core argument in `cor:h-a-consistency`, stated without the
+This is the main estimate in `cor:h-a-consistency`, stated without the
 intermediate `HBConsistencyStatement` type.  It takes only the line-consistency estimate
 for a candidate polynomial submeasurement `H`, restricts that estimate to the
 point on each vertical line, and then applies the good-strategy
