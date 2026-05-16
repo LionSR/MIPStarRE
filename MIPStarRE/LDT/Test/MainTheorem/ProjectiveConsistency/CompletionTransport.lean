@@ -33,8 +33,8 @@ steps:
 * the role-register measurement and the two factor-two estimates from
   `inductive_step.tex` lines 97--108;
 * the two completion-closeness estimates from lines 146--147; and
-* the two exact polynomial line-169 `ζ₁` links (Alice side and the role-reversed
-  Bob-side analogue), before line-171 data processing. -/
+ * the two repaired polynomial line-169 links (Alice side and the role-reversed
+   Bob-side analogue), before line-171 data processing. -/
 structure MainFormalProjectiveCompletionTransportWitness
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -72,19 +72,20 @@ structure MainFormalProjectiveCompletionTransportWitness
       (constSubMeasFamily (unsymmetrizedRightPOVM roleMeasurement).toSubMeas.liftRight)
       (constSubMeasFamily rightMeasurement.toSubMeas.liftRight)
       scalars.zeta2
-  /-- Paper line 169, before the data-processing step at lines 171--173:
-  $Q^{\mathrm A}_g\otimes I \simeq_{\zeta_1} I\otimes G^{\mathrm B}_g$. -/
+  /-- Repaired line 169, before the data-processing step at lines 171--173:
+  $Q^{\mathrm A}_g\otimes I \simeq_{\zeta_1 + 10\zeta_1^{1/8}} I\otimes G^{\mathrm B}_g$. -/
   leftProjectiveRightPOVMPolynomialConsistency :
     ConsRel strategy.state (uniformDistribution Unit)
       (constSubMeasFamily leftMeasurement.toSubMeas)
       (constSubMeasFamily (unsymmetrizedRightPOVM roleMeasurement).toSubMeas)
-      scalars.zeta1
-  /-- Bob-role mirror of paper line 169, before point-evaluation data processing. -/
+      scalars.line169Error
+  /-- Bob-role mirror of the repaired line-169 estimate, before point-evaluation
+  data processing. -/
   rightProjectiveLeftPOVMPolynomialConsistency :
     ConsRel strategy.state (uniformDistribution Unit)
       (constSubMeasFamily rightMeasurement.toSubMeas)
       (constSubMeasFamily (unsymmetrizedLeftPOVM roleMeasurement).toSubMeas)
-      scalars.zeta1
+      scalars.line169Error
 
 namespace MainFormalProjectiveCompletionTransportWitness
 
@@ -266,18 +267,19 @@ theorem pointAConsistency
     ConsRel strategy.state (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
       (polynomialEvaluationFamily params witness.rightMeasurement.toSubMeas)
-      scalars.zeta4 := by
+      scalars.zeta4Repaired := by
   have hline169 : ConsRel strategy.state (uniformDistribution (Point params))
       (polynomialEvaluationFamily params witness.leftMeasurement.toSubMeas)
       (polynomialEvaluationFamily params
         (unsymmetrizedRightPOVM witness.roleMeasurement).toSubMeas)
-      scalars.zeta1 := by
+      scalars.line169Error := by
     simpa using
       consRel_constPolynomialEvaluation strategy.state
         witness.leftMeasurement.toMeasurement
         (unsymmetrizedRightPOVM witness.roleMeasurement)
         witness.leftProjectiveRightPOVMPolynomialConsistency
-  simpa [MainFormalCascadeScalars.zeta4, cascadeZeta4] using
+  simpa [MainFormalCascadeScalars.zeta4Repaired, cascadeZeta4Repaired,
+    MainFormalCascadeScalars.line169Error, cascadeLine169RepairError] using
     witness.pointAConsistency_ofLine169Consistency hpass hline169
 
 /-- Final Bob-side point transport from an arbitrary polynomial line-169 mirror
@@ -380,18 +382,19 @@ theorem pointBConsistency
     ConsRel strategy.state (uniformDistribution (Point params))
       (polynomialEvaluationFamily params witness.leftMeasurement.toSubMeas)
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-      scalars.zeta4 := by
+      scalars.zeta4Repaired := by
   have hline169 : ConsRel strategy.state (uniformDistribution (Point params))
       (polynomialEvaluationFamily params witness.rightMeasurement.toSubMeas)
       (polynomialEvaluationFamily params
         (unsymmetrizedLeftPOVM witness.roleMeasurement).toSubMeas)
-      scalars.zeta1 := by
+      scalars.line169Error := by
     simpa using
       consRel_constPolynomialEvaluation strategy.state
         witness.rightMeasurement.toMeasurement
         (unsymmetrizedLeftPOVM witness.roleMeasurement)
         witness.rightProjectiveLeftPOVMPolynomialConsistency
-  simpa [MainFormalCascadeScalars.zeta4, cascadeZeta4] using
+  simpa [MainFormalCascadeScalars.zeta4Repaired, cascadeZeta4Repaired,
+    MainFormalCascadeScalars.line169Error, cascadeLine169RepairError] using
     witness.pointBConsistency_ofLine169Consistency hpass hline169
 
 end MainFormalProjectiveCompletionTransportWitness

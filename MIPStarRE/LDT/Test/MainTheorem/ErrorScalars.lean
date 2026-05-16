@@ -1,4 +1,6 @@
 import MIPStarRE.LDT.Test.MainTheorem.ClassicalAndBase
+import MIPStarRE.LDT.Test.ErrorCascade.Definitions
+import MIPStarRE.LDT.Test.ErrorCascade.CascadeBounds.Zeta4
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
 
 /-!
@@ -296,6 +298,18 @@ noncomputable def zeta4 {params : Parameters} {eps : Error} {k : ℕ}
     (scalars : MainFormalCascadeScalars params eps k) : Error :=
   cascadeZeta4 scalars.sigma scalars.zeta1 scalars.zeta3
 
+/-- The repaired line-169 error `ζ₁ + 10·ζ₁^(1/8)` coming from the checked local
+pre-completion transport. -/
+noncomputable def line169Error {params : Parameters} {eps : Error} {k : ℕ}
+    (scalars : MainFormalCascadeScalars params eps k) : Error :=
+  cascadeLine169RepairError scalars.zeta1
+
+/-- The repaired point-consistency scalar obtained by substituting the checked
+line-169 repair error into the final point-transport triangle. -/
+noncomputable def zeta4Repaired {params : Parameters} {eps : Error} {k : ℕ}
+    (scalars : MainFormalCascadeScalars params eps k) : Error :=
+  cascadeZeta4Repaired scalars.sigma scalars.zeta1 scalars.zeta3
+
 private theorem cascadeBounds {params : Parameters} {eps : Error} {k : ℕ}
     (scalars : MainFormalCascadeScalars params eps k) :
     scalars.sigma ≤ mainFormalError params k eps ∧
@@ -363,6 +377,19 @@ theorem zeta4_le_mainFormalError {params : Parameters} {eps : Error} {k : ℕ}
     (scalars : MainFormalCascadeScalars params eps k) :
     scalars.zeta4 ≤ mainFormalError params k eps :=
   (cascadeBounds scalars).2.2.2.2
+
+/-- Step 8 absorption for the repaired `ζ₄` point-consistency targets. -/
+theorem zeta4Repaired_le_mainFormalError {params : Parameters} {eps : Error} {k : ℕ}
+    (scalars : MainFormalCascadeScalars params eps k) :
+    scalars.zeta4Repaired ≤ mainFormalError params k eps := by
+  have hσEq : scalars.sigma = cascadeSigma params k (mainFormalInductionNu params k eps) := rfl
+  have hζ₁Eq : scalars.zeta1 = cascadeZeta1 params eps scalars.sigma := rfl
+  have hζ₂Eq : scalars.zeta2 = cascadeZeta2 scalars.zeta1 := rfl
+  have hζ₃Eq : scalars.zeta3 = cascadeZeta3 scalars.zeta1 scalars.zeta2 := rfl
+  unfold zeta4Repaired
+  exact zeta4Repaired_bound
+    scalars.cascadeHypotheses scalars.inductionNu_nonneg scalars.inductionNu_bound
+    hσEq hζ₁Eq hζ₂Eq hζ₃Eq
 
 /-- Step 8 absorption for the native `ζ₃/2` self-consistency target. -/
 theorem zeta3_div_two_le_mainFormalError {params : Parameters} {eps : Error} {k : ℕ}

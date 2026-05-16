@@ -1,7 +1,7 @@
 import MIPStarRE.LDT.Test.MainTheorem.ProjectiveConsistency
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
-import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.MatchMass
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Output
+import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Line169Repair
 
 /-!
 # Completion transport construction
@@ -13,7 +13,7 @@ projective completion gap: the orthonormalize-and-complete procedure
 (`lem:orthonormalization-main-lemma`, `prop:completing-to-measurement`) produces
 projective measurements at distance `ζ₂` from the unsymmetrized ones.  This
 module records the direct construction that turns those completion estimates and
-the match-mass monotonicity invariant into the projective completion witness
+the checked repaired line-169 transport into the projective completion witness
 consumed by the culminating `mainFormal` step.
 
 ## References
@@ -36,6 +36,8 @@ namespace MIPStarRE.LDT
 
 namespace Test
 
+open MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair
+
 /-- Construct the projective completion-transport witness from two
 orthonormalize-and-complete statements whose completed measurements are the
 canonical completions of the produced projective submeasurements.
@@ -48,9 +50,10 @@ The Alice completion estimate already matches `inductive_step.tex` line 146. For
 Bob, the analytic completion theorem naturally returns the left-lifted estimate
 for `G^B` and `Q^B`; the proof below uses
 `MakingMeasurementsProjective.sddRel_liftRight_of_liftLeft_permInv` to recover
-the line-147 right-register estimate.  The exact line-169 `ζ₁` links are derived
-from the construction-level match-mass monotonicity invariant and the
-pre-projective `G^A/G^B` consistency proof. -/
+the line-147 right-register estimate.  The line-169 polynomial links are then
+supplied by the checked local pre-completion repair from
+`ProjectivizationLine169Repair`, introducing the explicit repaired loss
+`ζ₁ + 10·ζ₁^(1/8)`. -/
 noncomputable def mainFormalProjectiveCompletionTransportWitnessOfCompleteAtOutcomeStatements
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -73,25 +76,10 @@ noncomputable def mainFormalProjectiveCompletionTransportWitnessOfCompleteAtOutc
     (rightStmt :
       MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement strategy.state
         (unsymmetrizedRightPOVM roleWitness.roleMeasurement)
-        P_B (Preliminaries.completeAtOutcomeProj P_B a_B) a_B scalars.zeta1)
-    (hleftMass :
-      qBipartiteMatchMass strategy.state P_A.toSubMeas
-          (unsymmetrizedRightPOVM roleWitness.roleMeasurement).toSubMeas ≥
-        qBipartiteMatchMass strategy.state
-          (unsymmetrizedLeftPOVM roleWitness.roleMeasurement).toSubMeas
-          (unsymmetrizedRightPOVM roleWitness.roleMeasurement).toSubMeas)
-    (hrightMass :
-        qBipartiteMatchMass strategy.state P_B.toSubMeas
-          (unsymmetrizedLeftPOVM roleWitness.roleMeasurement).toSubMeas ≥
-        qBipartiteMatchMass strategy.state
-          (unsymmetrizedRightPOVM roleWitness.roleMeasurement).toSubMeas
-          (unsymmetrizedLeftPOVM roleWitness.roleMeasurement).toSubMeas) :
+        P_B (Preliminaries.completeAtOutcomeProj P_B a_B) a_B scalars.zeta1) :
     MainFormalProjectiveCompletionTransportWitness params strategy eps k scalars :=
   let leftMeasurement := Preliminaries.completeAtOutcomeProj P_A a_A
   let rightMeasurement := Preliminaries.completeAtOutcomeProj P_B a_B
-  let matchMass :=
-    MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_completeAtOutcomeProj
-      P_A P_B a_A a_B hleftMass hrightMass
   let consistency := roleWitness.toUnsymmetrizationConsistency
   { roleMeasurement := roleWitness.roleMeasurement
     pointARightPOVMConsistency := consistency.pointAConsistency
@@ -142,8 +130,9 @@ noncomputable def mainFormalProjectiveCompletionTransportWitnessOfCompleteAtOutc
           scalars.zeta2 hleft
       simpa [IdxSubMeas.liftRight, constSubMeasFamily] using hright
     leftProjectiveRightPOVMPolynomialConsistency :=
-      MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.leftConsistency
-        matchMass hpre
+      leftConsistency_with_orthonormalization_loss
+        strategy.state strategy.isNormalized P_A a_A hpre
+        leftStmt.orthonormalizationCloseness
     rightProjectiveLeftPOVMPolynomialConsistency := by
       have hpre_symm : ConsRel strategy.state (uniformDistribution Unit)
           (constSubMeasFamily
@@ -159,8 +148,9 @@ noncomputable def mainFormalProjectiveCompletionTransportWitnessOfCompleteAtOutc
             (unsymmetrizedRightPOVM roleWitness.roleMeasurement).toSubMeas)
           scalars.zeta1 hpre
       exact
-        MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.rightConsistency
-          matchMass hpre_symm }
+        rightConsistency_with_orthonormalization_loss
+          strategy.state strategy.isNormalized P_B a_B hpre_symm
+          rightStmt.orthonormalizationCloseness }
 
 end Test
 
