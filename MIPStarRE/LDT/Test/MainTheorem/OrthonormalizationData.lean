@@ -16,14 +16,14 @@ role-register measurement and the unsymmetrization links.
 The central construction witness is `MainFormalDiagonalCompletionWitness`.
 It records the line-130 provenance of the projective submeasurements, the
 completion estimates, and converts directly to the checked
-projective-consistency transport witness.  The exact line-169 match-mass proof
-is retained one step earlier, together with the orthonormalization witness
-whose QXP producer supplies it.
+projective-consistency transport witness.
 
-The active route uses the match-mass monotonicity invariant from
-`\label{rem:lean-line169-projectivization-match-mass}` to obtain the exact
-paper line-169 estimates, rather than a repaired line-169 helper with an
-additional loss term.
+The active route uses the checked local pre-completion repair from
+`\label{rem:lean-line169-projectivization-match-mass}`.  The line-130
+orthonormalization witness therefore stores only the pre-completion projective
+submeasurements and line-138 closeness bounds; the repaired line-169 transport
+with its explicit additional loss is introduced later in the completion
+transport witness.
 
 ## References
 
