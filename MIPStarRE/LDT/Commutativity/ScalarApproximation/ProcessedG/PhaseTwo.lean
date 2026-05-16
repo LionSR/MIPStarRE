@@ -59,18 +59,11 @@ lemma evaluatedSlice_phaseTwo_stability_defect_bound
     (family : IdxPolyFamily params ι)
     (G : Fq params → SubMeas (Polynomial params) ι)
     (hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (hbound_psd : ∀ x : Fq params, 0 ≤ family.witness x)
-    (hbound_residual :
-      avgOver (uniformDistribution (Fq params))
-        (fun x => IdxPolyFamily.storedResidual strategy family G x) ≤ zeta)
-    (hbound_dom :
-      ∀ x : Fq params, ∀ g : Polynomial params,
-        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x) :
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
     |avgOver (uniformDistribution (Fq params))
       (evaluatedSlicePhaseTwoStabilityDefect params strategy family G)| ≤ Real.sqrt zeta := by
   simpa [evaluatedSlicePhaseTwoStabilityDefect] using
-    (gCommStability_scalar params strategy zeta hnorm family G hG
-      hbound_psd hbound_residual hbound_dom)
+    (gCommStability_scalar params strategy zeta hnorm family G hG hbound)
 
 /-- The still-unmarginalized phase-2 defect at a sampled evaluated-slice question.
 
@@ -532,25 +525,130 @@ lemma evaluatedSlice_phaseTwo_avg_diff_eq_neg_questionDefect
           (evaluatedSlicePhaseTwoQuestionDefect params strategy family G) := by
             simp [avgOver]
 
-/-- Exact finite reindexing residual for the phase-2 scalar bridge.
+/-- Exact finite reindexing identity for the phase-2 scalar bridge.
 
 Paper origin: `references/ldt-paper/commutativity-G.tex:60-83`, the finite
 averaging and reindexing step leading to the scalar `eq:add-an-a` bridge.
 
 This statement contains no analytic estimate.  It says that the question-level
 phase-2 defect averages to the one-dimensional scalar defect bounded by
-`gCommStability_scalar`.  Proving it amounts to the marginalization/fiber
-bookkeeping outlined in the docstring of
-`evaluatedSlice_phaseTwo_stability_defect_bound`, with
-`avgOver_uniform_pointNext_decompose` as the first marginalization step. -/
-def evaluatedSlicePhaseTwoReindexingResidual
+`gCommStability_scalar`.  The proof is only finite marginalization and fiber
+bookkeeping: decompose the second sampled point as `(v,y)`, collapse the
+postprocessing fibers, and average the first sampled point into
+`gCommStabilityR`. -/
+lemma evaluatedSlice_phaseTwo_questionDefect_avg_eq_stabilityDefect
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι) : Prop :=
+    (G : Fq params → SubMeas (Polynomial params) ι) :
   avgOver (uniformDistribution (EvaluatedSliceQuestion params))
       (evaluatedSlicePhaseTwoQuestionDefect params strategy family G) =
     avgOver (uniformDistribution (Fq params))
-      (evaluatedSlicePhaseTwoStabilityDefect params strategy family G)
+      (evaluatedSlicePhaseTwoStabilityDefect params strategy family G) := by
+  classical
+  let defect := evaluatedSlicePhaseTwoQuestionDefect params strategy family G
+  have hprod :
+      avgOver (uniformDistribution (EvaluatedSliceQuestion params)) defect =
+      avgOver (uniformDistribution (Point params.next))
+        (fun q2 => avgOver (uniformDistribution (Point params.next))
+          (fun q1 => defect (q1, q2))) := by
+    calc
+      avgOver (uniformDistribution (EvaluatedSliceQuestion params)) defect =
+          avgOver (uniformDistribution (Point params.next × Point params.next))
+            (fun qq => defect qq) := by
+            rfl
+      _ = avgOver (uniformDistribution (Point params.next × Point params.next))
+            (fun qq => defect (qq.2, qq.1)) := by
+            simpa using
+              (avgOver_uniform_equiv
+                (e := Equiv.prodComm (Point params.next) (Point params.next))
+                (f := fun qq : Point params.next × Point params.next => defect qq))
+      _ = avgOver (uniformDistribution (Point params.next))
+            (fun q2 => avgOver (uniformDistribution (Point params.next))
+              (fun q1 => defect (q1, q2))) := by
+            simpa using
+              (avgOver_uniform_prod (α := Point params.next) (β := Point params.next)
+                (f := fun q2 q1 => defect (q1, q2)))
+  have hdecomposeSecond :
+      avgOver (uniformDistribution (Point params.next))
+        (fun q2 => avgOver (uniformDistribution (Point params.next))
+          (fun q1 => defect (q1, q2))) =
+      avgOver (uniformDistribution (Fq params))
+        (fun y => avgOver (uniformDistribution (Point params))
+          (fun v => avgOver (uniformDistribution (Point params.next))
+            (fun q1 => defect (q1, appendPoint params v y)))) := by
+    simpa using
+      (avgOver_uniform_pointNext_decompose (params := params)
+        (f := fun q2 => avgOver (uniformDistribution (Point params.next))
+          (fun q1 => defect (q1, q2))))
+  have hbody :
+      ∀ y : Fq params,
+        avgOver (uniformDistribution (Point params))
+          (fun v => avgOver (uniformDistribution (Point params.next))
+            (fun q1 => defect (q1, appendPoint params v y))) =
+        evaluatedSlicePhaseTwoStabilityDefect params strategy family G y := by
+    intro y
+    let Ffun : Point params.next → Polynomial params → Fq params → MIPStarRE.Quantum.Op ι :=
+      fun q1 g a =>
+        (evaluatedPointFamily params family q1).outcome a *
+          ((family.meas y).toSubMeas.outcome g) *
+          (evaluatedPointFamily params family q1).outcome a
+    let Pfun : Polynomial params → Point params → MIPStarRE.Quantum.Op ι :=
+      fun g v => (strategy.pointMeasurement (appendPoint params v y)).outcome (g v)
+    let R : MIPStarRE.Quantum.Op ι := 1 - (G y).total
+    have hFavg :
+        ∀ g : Polynomial params,
+          averageOperatorOverDistribution (uniformDistribution (Point params.next))
+            (fun q1 => ∑ a : Fq params, Ffun q1 g a) =
+          (gCommStabilityR params family y).outcome g := by
+      intro g
+      unfold gCommStabilityR averageIdxSubMeas
+      refine averageOperatorOverDistribution_congr _ _ _ (fun q1 => ?_)
+      rw [postprocess_sandwichByOuter_prod_snd_outcome]
+    have hPavg :
+        ∀ g : Polynomial params,
+          averageOperatorOverDistribution (uniformDistribution (Point params))
+            (fun v => Pfun g v) =
+          IdxPolyFamily.averagedSlicePointEvaluationOperator strategy y g := by
+      intro g
+      rfl
+    calc
+      avgOver (uniformDistribution (Point params))
+          (fun v => avgOver (uniformDistribution (Point params.next))
+            (fun q1 => defect (q1, appendPoint params v y))) =
+        avgOver (uniformDistribution (Point params))
+          (fun v => avgOver (uniformDistribution (Point params.next))
+            (fun q1 => ∑ g : Polynomial params, ∑ a : Fq params,
+              ev strategy.state
+                (leftTensor (ι₂ := ι) (Ffun q1 g a * R) *
+                  rightTensor (ι₁ := ι) (Pfun g v)))) := by
+          apply avgOver_congr
+          intro v
+          apply avgOver_congr
+          intro q1
+          simpa [defect, Ffun, Pfun, R] using
+            evaluatedSlicePhaseTwoQuestionDefect_append_eq_sum_poly
+              params strategy family G q1 v y
+      _ = ∑ g : Polynomial params,
+            ev strategy.state
+              (leftTensor (ι₂ := ι)
+                  ((averageOperatorOverDistribution (uniformDistribution (Point params.next))
+                    (fun q1 => ∑ a : Fq params, Ffun q1 g a)) * R) *
+                rightTensor (ι₁ := ι)
+                  (averageOperatorOverDistribution (uniformDistribution (Point params))
+                    (fun v => Pfun g v))) := by
+          exact avgOver_avgOver_phaseTwo_linear
+            (𝒟Q := uniformDistribution (Point params.next))
+            (𝒟V := uniformDistribution (Point params))
+            (ψ := strategy.state) (F := Ffun) (P := Pfun) (R := R)
+      _ = evaluatedSlicePhaseTwoStabilityDefect params strategy family G y := by
+          unfold evaluatedSlicePhaseTwoStabilityDefect
+          refine Finset.sum_congr rfl ?_
+          intro g _
+          rw [hFavg g, hPavg g]
+  rw [hprod, hdecomposeSecond]
+  apply avgOver_congr
+  intro y
+  exact hbody y
 
 end MIPStarRE.LDT.Commutativity

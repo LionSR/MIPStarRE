@@ -1,0 +1,153 @@
+\documentclass{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{xurl}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\setlength{\emergencystretch}{2em}
+
+\input{./command}
+
+\title{Issue 1622: The Degree-Zero Branch of Low-Degree Pasting}
+\author{}
+\date{2026-05-14}
+
+\begin{document}
+\maketitle
+
+\section{At a glance}
+
+\begin{itemize}
+  \item \textbf{Difficulty.}  Medium.  The obstruction is not a new analytic
+  estimate, but the positive-degree proof uses a scalar absorption which is no
+  longer available when \(d=0\).
+  \item \textbf{Estimated weight.}  One branch theorem, probably 100--300 lines
+  of formal proof, depending on how directly the existing slice-consistency and
+  point-consistency interfaces can be reused.
+  \item \textbf{Mathlib/project split.}  The expected proof is mostly
+  project-local.  Mathlib should supply only elementary facts about finite sums,
+  natural-number inequalities, and monotonicity of real powers.
+  \item \textbf{Key mathematical inputs.}  Degree-zero polynomials are constant;
+  the pasted slices satisfy the source completeness and consistency hypotheses;
+  and the final measurement must satisfy the same point-consistency conclusion
+  as in the unrestricted theorem.
+\end{itemize}
+
+\section{Key theorem forms}
+
+We use the notation of the low-degree pasting theorem.  Let \(S\) be an
+\((\varepsilon,\delta,\gamma)\)-good symmetric strategy for the
+\((m+1,q,d)\) low individual degree test.  For each \(x\in\F_q\), let
+\(G^x\in\polysub{m}{q}{d}\) be the projective submeasurement on the \(x\)-slice,
+and assume the completeness, consistency, strong self-consistency, and
+boundedness hypotheses stated in the source theorem.
+
+\begin{enumerate}
+  \item \textbf{Source theorem form.}  If \(k\ge 400md\), then there is a
+  pasted measurement \(H\in\polymeas{m+1}{q}{d}\) whose point-consistency error
+  is
+  \[
+    \sigma=\kappa\left(1+\frac{1}{100m}\right)+2\nu+
+    \exp\left(-\frac{k}{80000m^2}\right),
+  \]
+  where
+  \[
+    \nu=100k^2m\left(\varepsilon^{1/32}+\delta^{1/32}
+      +\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32}\right).
+  \]
+  This is the theorem form in the paper; it does not contain the hypothesis
+  \(0<d\).
+
+  \item \textbf{Restricted construction theorem form.}  The formal proof
+  presently constructs such an \(H\) in the nontrivial regime
+  \[
+    \gamma\le 1,\qquad \zeta\le 1,\qquad d\le q,\qquad 0<d,\qquad 1\le k.
+  \]
+  This is useful proof content, but it is a restricted construction theorem,
+  not the source theorem.
+
+  \item \textbf{Remaining branch form.}  The complementary branch is the same
+  conclusion under the source hypotheses together with
+  \[
+    d=0,\qquad 1\le k.
+  \]
+  Proving this branch restores the unrestricted theorem without changing its
+  public hypotheses.%
+  \footnote{The source-facing Lean theorem is
+  \(\leanid{MIPStarRE.LDT.Pasting.ldPasting}\).  The restricted construction is
+  \(\leanid{MIPStarRE.LDT.Pasting.ldPastingNontrivial}\).  The open branch is
+  \(\leanid{MIPStarRE.LDT.Pasting.ldPastingDegreeZeroBranch}\) in
+  \doclink{MIPStarRE/LDT/Pasting/Bernoulli/Final.lean}.  The repair is tracked
+  by \ghissue{1622} and currently documented in \ghpr{1633}.}
+\end{enumerate}
+
+\section{The source assertion}
+
+This note concerns the low-degree pasting theorem in
+\cite{Ji2020LowIndividualDegree}.%
+\footnote{The TeX source used here is
+\path{references/ldt-paper/ld-pasting.tex}, lines~12--55.  The theorem is
+labelled \path{thm:ld-pasting}.}
+After stating the theorem, the paper says that the proof may assume
+\(\varepsilon,\delta,\gamma,\zeta,d/q\le 1\), since the desired bound is
+trivial if one of these quantities is at least \(1\).  This is a reduction to
+the small-error regime.  It is not a hypothesis \(0<d\), and it does not by
+itself dispose of the case \(d=0\).
+
+The point is visible in the error term itself.  When \(d=0\), the displayed
+contribution \((d/q)^{1/32}\) is zero.  Thus any proof step that pays a positive
+loss of order \(1/q\) or \(k^2/q\) cannot be justified merely by appealing to
+the term \((d/q)^{1/32}\).
+
+\section{Why the positive-degree proof does not specialize}
+
+The current nontrivial proof follows the sampled distinct-tuple construction in
+the paper.  In the estimates corresponding to the \(H_B\)-consistency and
+overall-outcome steps, the argument passes between independently sampled
+heights and distinct sampled heights.  This passage introduces a distinctness
+loss of order \(k^2/q\).
+
+For \(0<d\), this loss is absorbed into the displayed error term by the scalar
+chain
+\[
+  \frac{1}{q}\le \frac{d}{q}\le \left(\frac{d}{q}\right)^{1/32},
+\]
+in the small-error regime.  The first inequality is exactly where the
+positive-degree hypothesis enters.  When \(d=0\), the right-hand side is zero,
+so the same scalar argument cannot close the estimate.
+
+This is not evidence that the paper theorem should acquire the hypothesis
+\(0<d\).  Rather, it shows that the formal proof has separated two branches:
+the existing positive-degree argument and the remaining degree-zero argument.
+In the degree-zero branch, one expects to use that every degree-zero polynomial
+is constant, and then obtain point consistency from the line-test and
+slice-consistency hypotheses without paying a distinct-tuple loss that must be
+absorbed by \(d/q\).
+
+\section{Comparison with the blueprint and formalization}
+
+The formal development now keeps the unrestricted source-facing theorem form
+visible.  Its proof dispatches the large-\(\gamma\), large-\(\zeta\),
+large-\(d/q\), \(k=0\), and positive-degree nontrivial cases.  The only
+remaining branch is the degree-zero case described above.  The branch is
+therefore recorded as a direct proof obligation, not as an additional public
+assumption of the theorem.
+
+This is the intended paper-realignment boundary.  The restricted
+positive-degree theorem remains useful proof content, but it should be cited
+only as a nontrivial-regime construction theorem.  It should not replace the
+source theorem in the blueprint, because its public hypotheses are stronger
+than the cited statement.
+
+\section{Conclusion}
+
+There is no current justification for adding \(0<d\) to the paper-facing
+low-degree pasting theorem.  The theorem-level statement should remain the
+unrestricted statement of the source.  The missing work is the separate
+degree-zero branch: prove the pasted measurement and point-consistency estimate
+from \(d=0\), \(1\le k\), and the source hypotheses, or keep that branch as a
+tracked \Lean{} proof obligation until the argument is supplied.
+
+\bibliographystyle{alpha}
+\bibliography{references}
+
+\end{document}

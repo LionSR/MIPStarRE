@@ -1,6 +1,5 @@
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChain
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.Phase67Residual
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Consequences
 import MIPStarRE.LDT.Commutativity.GCommStability.Scalar
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG.PhaseTwo
@@ -151,13 +150,7 @@ lemma evaluatedSlice_scalar_chain_bound
     (_hG : ∀ x, G x = (family.meas x).toSubMeas)
     (_hcons : family.ConsistentWithPoints strategy zeta)
     (_hself : family.StronglySelfConsistent strategy.state zeta)
-    (_hbound_psd : ∀ x : Fq params, 0 ≤ family.witness x)
-    (_hbound_residual :
-      avgOver (uniformDistribution (Fq params))
-        (fun x => IdxPolyFamily.storedResidual strategy family G x) ≤ zeta)
-    (_hbound_dom :
-      ∀ x : Fq params, ∀ g : Polynomial params,
-        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x)
+    (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (_hpostSSC : SDDRel strategy.state
       (uniformDistribution (Point params.next))
       (evaluatedPointFamilyLeft params family)
@@ -329,8 +322,7 @@ lemma evaluatedSlice_scalar_chain_bound
       |avgOver 𝒟 phase1Inserted - avgOver 𝒟 phase2Removed| ≤ Real.sqrt zeta := by
     have hdefect :=
       evaluatedSlice_phaseTwo_stability_defect_bound
-        params strategy zeta _hnorm family G _hG
-        _hbound_psd _hbound_residual _hbound_dom
+        params strategy zeta _hnorm family G _hG _hbound
     have hsign :
         avgOver 𝒟 phase1Inserted - avgOver 𝒟 phase2Removed =
           -avgOver 𝒟 (evaluatedSlicePhaseTwoQuestionDefect params strategy family G) := by
@@ -338,113 +330,12 @@ lemma evaluatedSlice_scalar_chain_bound
         evaluatedSlice_phaseTwo_avg_diff_eq_neg_questionDefect
           params strategy family G _hG
     have hbridge :
-        evaluatedSlicePhaseTwoReindexingResidual params strategy family G := by
-      classical
-      let defect := evaluatedSlicePhaseTwoQuestionDefect params strategy family G
-      have hprod :
-          avgOver (uniformDistribution (EvaluatedSliceQuestion params)) defect =
-          avgOver (uniformDistribution (Point params.next))
-            (fun q2 => avgOver (uniformDistribution (Point params.next))
-              (fun q1 => defect (q1, q2))) := by
-        calc
-          avgOver (uniformDistribution (EvaluatedSliceQuestion params)) defect =
-              avgOver (uniformDistribution (Point params.next × Point params.next))
-                (fun qq => defect qq) := by
-                rfl
-          _ = avgOver (uniformDistribution (Point params.next × Point params.next))
-                (fun qq => defect (qq.2, qq.1)) := by
-                simpa using
-                  (avgOver_uniform_equiv
-                    (e := Equiv.prodComm (Point params.next) (Point params.next))
-                    (f := fun qq : Point params.next × Point params.next => defect qq))
-          _ = avgOver (uniformDistribution (Point params.next))
-                (fun q2 => avgOver (uniformDistribution (Point params.next))
-                  (fun q1 => defect (q1, q2))) := by
-                simpa using
-                  (avgOver_uniform_prod (α := Point params.next) (β := Point params.next)
-                    (f := fun q2 q1 => defect (q1, q2)))
-      have hdecomposeSecond :
-          avgOver (uniformDistribution (Point params.next))
-            (fun q2 => avgOver (uniformDistribution (Point params.next))
-              (fun q1 => defect (q1, q2))) =
+        avgOver 𝒟 (evaluatedSlicePhaseTwoQuestionDefect params strategy family G) =
           avgOver (uniformDistribution (Fq params))
-            (fun y => avgOver (uniformDistribution (Point params))
-              (fun v => avgOver (uniformDistribution (Point params.next))
-                (fun q1 => defect (q1, appendPoint params v y)))) := by
-        simpa using
-          (avgOver_uniform_pointNext_decompose (params := params)
-            (f := fun q2 => avgOver (uniformDistribution (Point params.next))
-              (fun q1 => defect (q1, q2))))
-      have hbody :
-          ∀ y : Fq params,
-            avgOver (uniformDistribution (Point params))
-              (fun v => avgOver (uniformDistribution (Point params.next))
-                (fun q1 => defect (q1, appendPoint params v y))) =
-            evaluatedSlicePhaseTwoStabilityDefect params strategy family G y := by
-        intro y
-        let Ffun : Point params.next → Polynomial params → Fq params → MIPStarRE.Quantum.Op ι :=
-          fun q1 g a =>
-            (evaluatedPointFamily params family q1).outcome a *
-              ((family.meas y).toSubMeas.outcome g) *
-              (evaluatedPointFamily params family q1).outcome a
-        let Pfun : Polynomial params → Point params → MIPStarRE.Quantum.Op ι :=
-          fun g v => (strategy.pointMeasurement (appendPoint params v y)).outcome (g v)
-        let R : MIPStarRE.Quantum.Op ι := 1 - (G y).total
-        have hFavg :
-            ∀ g : Polynomial params,
-              averageOperatorOverDistribution (uniformDistribution (Point params.next))
-                (fun q1 => ∑ a : Fq params, Ffun q1 g a) =
-              (gCommStabilityR params family y).outcome g := by
-          intro g
-          unfold gCommStabilityR averageIdxSubMeas
-          refine averageOperatorOverDistribution_congr _ _ _ (fun q1 => ?_)
-          rw [postprocess_sandwichByOuter_prod_snd_outcome]
-        have hPavg :
-            ∀ g : Polynomial params,
-              averageOperatorOverDistribution (uniformDistribution (Point params))
-                (fun v => Pfun g v) =
-              IdxPolyFamily.averagedSlicePointEvaluationOperator strategy y g := by
-          intro g
-          rfl
-        calc
-          avgOver (uniformDistribution (Point params))
-              (fun v => avgOver (uniformDistribution (Point params.next))
-                (fun q1 => defect (q1, appendPoint params v y))) =
-            avgOver (uniformDistribution (Point params))
-              (fun v => avgOver (uniformDistribution (Point params.next))
-                (fun q1 => ∑ g : Polynomial params, ∑ a : Fq params,
-                  ev strategy.state
-                    (leftTensor (ι₂ := ι) (Ffun q1 g a * R) *
-                      rightTensor (ι₁ := ι) (Pfun g v)))) := by
-              apply avgOver_congr
-              intro v
-              apply avgOver_congr
-              intro q1
-              simpa [defect, Ffun, Pfun, R] using
-                evaluatedSlicePhaseTwoQuestionDefect_append_eq_sum_poly
-                  params strategy family G q1 v y
-          _ = ∑ g : Polynomial params,
-                ev strategy.state
-                  (leftTensor (ι₂ := ι)
-                      ((averageOperatorOverDistribution (uniformDistribution (Point params.next))
-                        (fun q1 => ∑ a : Fq params, Ffun q1 g a)) * R) *
-                    rightTensor (ι₁ := ι)
-                      (averageOperatorOverDistribution (uniformDistribution (Point params))
-                        (fun v => Pfun g v))) := by
-              exact avgOver_avgOver_phaseTwo_linear
-                (𝒟Q := uniformDistribution (Point params.next))
-                (𝒟V := uniformDistribution (Point params))
-                (ψ := strategy.state) (F := Ffun) (P := Pfun) (R := R)
-          _ = evaluatedSlicePhaseTwoStabilityDefect params strategy family G y := by
-              unfold evaluatedSlicePhaseTwoStabilityDefect
-              refine Finset.sum_congr rfl ?_
-              intro g _
-              rw [hFavg g, hPavg g]
-      unfold evaluatedSlicePhaseTwoReindexingResidual
-      rw [hprod, hdecomposeSecond]
-      apply avgOver_congr
-      intro y
-      exact hbody y
+            (evaluatedSlicePhaseTwoStabilityDefect params strategy family G) := by
+      simpa [𝒟] using
+        evaluatedSlice_phaseTwo_questionDefect_avg_eq_stabilityDefect
+          params strategy family G
     have hrewrite :
         avgOver 𝒟 phase1Inserted - avgOver 𝒟 phase2Removed =
           -avgOver (uniformDistribution (Fq params))
@@ -635,8 +526,7 @@ lemma evaluatedSlice_scalar_chain_bound
     have hraw : |avgOver 𝒟 swappedDefect| ≤ Real.sqrt zeta := by
       have hraw0 :=
         gCommStabilityTwo_raw_scalar
-          params strategy zeta _hnorm family G _hG
-          _hbound_psd _hbound_residual _hbound_dom
+          params strategy zeta _hnorm family G _hG _hbound
       have hreindex :
           avgOver 𝒟 swappedDefect =
             avgOver (uniformDistribution (Fq params))

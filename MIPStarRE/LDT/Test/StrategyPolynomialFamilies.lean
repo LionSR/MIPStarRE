@@ -135,6 +135,24 @@ noncomputable def evaluatedAtNextPoint {params : Parameters} [FieldModel params.
     evaluateAt params (truncatePoint params u)
       ((family.meas (pointHeight params u)).toSubMeas)
 
+/-- In degree zero, the evaluated slice family is independent of the old point
+coordinates once the slice height is fixed.
+
+Lean-only helper for the degree-zero branch of `thm:ld-pasting`; the source
+context is `references/ldt-paper/ld-pasting.tex:12-55`.  This does not identify
+different slice heights.  That remaining height-consistency step is the
+mathematical content still tracked by issue #1622. -/
+theorem evaluatedAtNextPoint_eq_of_same_height_degree_zero {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (family : IdxPolyFamily params ι) (hd : params.d = 0)
+    {u v : Point params.next} (hheight : pointHeight params u = pointHeight params v) :
+    family.evaluatedAtNextPoint u = family.evaluatedAtNextPoint v := by
+  unfold evaluatedAtNextPoint
+  rw [← hheight]
+  exact evaluateAt_eq_of_degree_zero params
+    ((family.meas (pointHeight params u)).toSubMeas) hd
+    (truncatePoint params u) (truncatePoint params v)
+
 /-- Averaged point operator `E_u A^u_{h(u)}` appearing in source-style
 boundedness assumptions. -/
 noncomputable def averagedPointEvaluationOperator {params : Parameters}
@@ -272,51 +290,6 @@ theorem ofSymStrat_sliceDominatesTarget {params : Parameters}
     0 ≤ (ofSymStrat strategy meas).witness x - (ofSymStrat strategy meas).dominationTarget x g := by
   exact sub_nonneg.mpr (ofSymStrat_dominationTarget_le_witness strategy meas x g)
 
-namespace _root_.MIPStarRE.LDT.IdxProjSubMeas
-
-/-- Regard a slice-indexed projective submeasurement family as an `IdxPolyFamily`
-using its slice totals and outcomes. -/
-def toIdxPolyFamily {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι) :
-    IdxPolyFamily params ι :=
-  IdxPolyFamily.ofSliceMeas G
-
-/-- Equip a slice-indexed projective submeasurement family with an explicit
-witness family `x ↦ Z^x` and the paper's averaged point-evaluation domination
-target. -/
-noncomputable def withWitness {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι)
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (Z : Fq params → MIPStarRE.Quantum.Op ι) :
-    IdxPolyFamily params ι where
-  meas := G
-  witness := Z
-  dominationTarget := fun x g => IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g
-
-@[simp] theorem toIdxPolyFamily_meas {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι) :
-    (IdxProjSubMeas.toIdxPolyFamily G).meas = G := rfl
-
-@[simp] theorem withWitness_meas {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι)
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (Z : Fq params → MIPStarRE.Quantum.Op ι) :
-    (IdxProjSubMeas.withWitness strategy G Z).meas = G := rfl
-
-@[simp] theorem withWitness_witness {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι)
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (Z : Fq params → MIPStarRE.Quantum.Op ι)
-    (x : Fq params) :
-    (IdxProjSubMeas.withWitness strategy G Z).witness x = Z x := rfl
-
-end _root_.MIPStarRE.LDT.IdxProjSubMeas
-
 structure Complete {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (family : IdxPolyFamily params ι)
@@ -350,16 +323,6 @@ theorem zeta_nonneg_of_consistentWithPoints {params : Parameters} [FieldModel pa
       family.evaluatedAtNextPoint)
     hcons.pointConsistency.offDiagonalBound
 
-theorem consistentWithPoints_toIdxPolyFamily {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι) {zeta : Error}
-    (hcons : family.ConsistentWithPoints strategy zeta) :
-    (IdxPolyFamily.ofSliceMeas family.meas).ConsistentWithPoints strategy zeta := by
-  refine ⟨?_⟩
-  simpa [IdxPolyFamily.ofSliceMeas, IdxPolyFamily.evaluatedAtNextPoint] using
-    hcons.pointConsistency
-
 structure StronglySelfConsistent {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (family : IdxPolyFamily params ι)
@@ -369,52 +332,6 @@ structure StronglySelfConsistent {params : Parameters} [FieldModel params.q]
       (IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas family.meas))
       (IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas))
       zeta
-
-theorem stronglySelfConsistent_toIdxPolyFamily {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (family : IdxPolyFamily params ι) {ψ : QuantumState (ι × ι)} {zeta : Error}
-    (hself : family.StronglySelfConsistent ψ zeta) :
-    (IdxPolyFamily.ofSliceMeas family.meas).StronglySelfConsistent ψ zeta := by
-  refine ⟨?_⟩
-  simpa [IdxPolyFamily.ofSliceMeas] using hself.sliceSelfConsistency
-
-namespace _root_.MIPStarRE.LDT.IdxProjSubMeas
-
-/-- Averaged completeness for a slice-indexed projective submeasurement family. -/
-abbrev Complete {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (ψ : QuantumState (ι × ι)) (kappa : Error) : Prop :=
-  (IdxProjSubMeas.toIdxPolyFamily G).Complete ψ kappa
-
-/-- Averaged point-consistency for a slice-indexed projective submeasurement family. -/
-abbrev ConsistentWithPoints {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (strategy : SymStrat params.next ι) (zeta : Error) : Prop :=
-  (IdxProjSubMeas.toIdxPolyFamily G).ConsistentWithPoints strategy zeta
-
-/-- Averaged strong self-consistency for a slice-indexed projective
-submeasurement family. -/
-abbrev StronglySelfConsistent {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (ψ : QuantumState (ι × ι)) (zeta : Error) : Prop :=
-  (IdxProjSubMeas.toIdxPolyFamily G).StronglySelfConsistent ψ zeta
-
-/-- Point-consistency forces the displayed error parameter to be nonnegative. -/
-theorem zeta_nonneg_of_consistentWithPoints {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι)
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    {zeta : Error}
-    (hcons : IdxProjSubMeas.ConsistentWithPoints G strategy zeta) :
-    0 ≤ zeta := by
-  simpa [IdxProjSubMeas.ConsistentWithPoints, IdxProjSubMeas.toIdxPolyFamily] using
-    IdxPolyFamily.zeta_nonneg_of_consistentWithPoints strategy
-      (IdxProjSubMeas.toIdxPolyFamily G) hcons
-
-end _root_.MIPStarRE.LDT.IdxProjSubMeas
 
 structure Bounded {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -431,6 +348,37 @@ structure Bounded {params : Parameters} [FieldModel params.q]
     ∀ x : Fq params, ∀ g : Polynomial params,
       0 ≤ family.witness x - family.dominationTarget x g
 
+/-- Paper-faithful boundedness input for slice-indexed polynomial families.
+
+This structure encodes the boundedness item in
+`references/ldt-paper/commutativity-G.tex` and `references/ldt-paper/ld-pasting.tex`.
+It consists of positive witnesses `Z^x`, the averaged residual bound
+`E_x <psi| (I - G^x) tensor Z^x |psi> <= zeta`, and the domination condition
+`Z^x >= E_u A^{u,x}_{g(u)}`.
+
+The domination condition is stated directly against the averaged point operator
+from the strategy.  It is not mediated through `family.dominationTarget`, so this
+public input does not contain an additional identification bridge. -/
+structure SliceBoundednessInput {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι) (zeta : Error) : Prop where
+  /-- Positivity of the slice witnesses `Z^x`. -/
+  sliceOpPSD : ∀ x, 0 ≤ family.witness x
+  /-- Averaged residual bound `E_x <psi| (I - G^x) tensor Z^x |psi> <= zeta`. -/
+  sliceBoundedness :
+    avgOver (uniformDistribution (Fq params))
+      (fun x =>
+        ev strategy.state <|
+          leftTensor (ι₂ := ι) (1 - (family.meas x).toSubMeas.total) *
+            rightTensor (ι₁ := ι) (family.witness x)) ≤ zeta
+  /-- Paper domination condition `E_u A^{u,x}_{g(u)} <= Z^x`. -/
+  sliceDominatesAveragedPoint :
+    ∀ x : Fq params, ∀ g : Polynomial params,
+      averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x
+
+namespace SliceBoundednessInput
+
 /-- The boundedness residual obtained from a concrete slice family `G`.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551`
@@ -442,8 +390,9 @@ abstract slice family by the concrete `G`, written in the paper's
 `(I - G^x) ⊗ Z^x` orientation. -/
 noncomputable def storedResidual {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
+    {strategy : SymStrat params.next ι}
+    {family : IdxPolyFamily params ι} {zeta : Error}
+    (_hbound : SliceBoundednessInput strategy family zeta)
     (G : Fq params → SubMeas (Polynomial params) ι)
     (x : Fq params) : Error :=
   ev strategy.state
@@ -456,19 +405,14 @@ This is exactly the paper's `(I-G^x) ⊗ Z^x` residual bound from
 `references/ldt-paper/commutativity-G.tex`. -/
 theorem storedBoundedResidualBound {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι) {zeta : Error}
-    (hbound_residual :
-      avgOver (uniformDistribution (Fq params))
-        (fun x =>
-          ev strategy.state <|
-            leftTensor (ι₂ := ι) (1 - (family.meas x).toSubMeas.total) *
-              rightTensor (ι₁ := ι) (family.witness x)) ≤ zeta)
+    {strategy : SymStrat params.next ι}
+    {family : IdxPolyFamily params ι} {zeta : Error}
+    (hbound : SliceBoundednessInput strategy family zeta)
     (G : Fq params → SubMeas (Polynomial params) ι)
     (hG : ∀ x, G x = (family.meas x).toSubMeas) :
     avgOver (uniformDistribution (Fq params))
-      (fun x => storedResidual strategy family G x) ≤ zeta := by
-  simpa [storedResidual, hG] using hbound_residual
+      (fun x => hbound.storedResidual G x) ≤ zeta := by
+  simpa [storedResidual, hG] using hbound.sliceBoundedness
 
 /-- Paper-faithful domination half of the boundedness hypothesis.
 
@@ -477,171 +421,14 @@ This is the line `Z^x ≥ E_u A^{u,x}_{g(u)}` from
 theorem averagedPoint_le_witness {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SymStrat params.next ι}
-    (family : IdxPolyFamily params ι)
-    (hbound_dom :
-      ∀ x : Fq params, ∀ g : Polynomial params,
-        averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x) :
+    {family : IdxPolyFamily params ι} {zeta : Error}
+    (hbound : SliceBoundednessInput strategy family zeta) :
     ∀ x : Fq params, ∀ g : Polynomial params,
-      averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x := by
-  exact hbound_dom
+      averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x :=
+  hbound.sliceDominatesAveragedPoint
+
+end SliceBoundednessInput
 
 end IdxPolyFamily
-
-namespace IdxProjSubMeas
-
-abbrev toIdxPolyFamily {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι) :
-    IdxPolyFamily params ι :=
-  IdxPolyFamily.ofSliceMeas G
-
-noncomputable abbrev withWitness {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι)
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (Z : Fq params → MIPStarRE.Quantum.Op ι) :
-    IdxPolyFamily params ι :=
-  { meas := G
-    witness := Z
-    dominationTarget := fun x g => IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g }
-
-@[simp] theorem toIdxPolyFamily_meas {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι) :
-    (IdxProjSubMeas.toIdxPolyFamily G).meas = G := rfl
-
-@[simp] theorem withWitness_meas {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι)
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (Z : Fq params → MIPStarRE.Quantum.Op ι) :
-    (IdxProjSubMeas.withWitness strategy G Z).meas = G := rfl
-
-@[simp] theorem withWitness_witness {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι)
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (Z : Fq params → MIPStarRE.Quantum.Op ι)
-    (x : Fq params) :
-    (IdxProjSubMeas.withWitness strategy G Z).witness x = Z x := rfl
-
-structure Complete {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (ψ : QuantumState (ι × ι)) (kappa : Error) : Prop where
-  averageCompleteness :
-    CompletenessAtLeast ψ (IdxProjSubMeas.toIdxPolyFamily G).averagedSubMeas.liftLeft (1 - kappa)
-
-structure ConsistentWithPoints {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (strategy : SymStrat params.next ι) (zeta : Error) : Prop where
-  pointConsistency :
-    ConsRel strategy.state (uniformDistribution (Point params.next))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (IdxProjSubMeas.toIdxPolyFamily G).evaluatedAtNextPoint
-      zeta
-
-structure StronglySelfConsistent {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (ψ : QuantumState (ι × ι)) (zeta : Error) : Prop where
-  sliceSelfConsistency :
-    SDDRel ψ (uniformDistribution (Fq params))
-      (IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas G))
-      (IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas G))
-      zeta
-
-theorem zeta_nonneg_of_consistentWithPoints {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι)
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    {zeta : Error}
-    (hcons : IdxProjSubMeas.ConsistentWithPoints G strategy zeta) :
-    0 ≤ zeta := by
-  exact le_trans
-    (bipartiteConsError_nonneg strategy.state
-      (uniformDistribution (Point params.next))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (IdxProjSubMeas.toIdxPolyFamily G).evaluatedAtNextPoint)
-    hcons.pointConsistency.offDiagonalBound
-
-theorem complete_withWitness {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι)
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (Z : Fq params → MIPStarRE.Quantum.Op ι)
-    {ψ : QuantumState (ι × ι)} {kappa : Error}
-    (h : IdxProjSubMeas.Complete G ψ kappa) :
-    (IdxProjSubMeas.withWitness strategy G Z).Complete ψ kappa := by
-  refine ⟨?_⟩
-  simpa [IdxProjSubMeas.toIdxPolyFamily, IdxProjSubMeas.withWitness,
-    IdxPolyFamily.averagedSubMeas] using h.averageCompleteness
-
-theorem consistentWithPoints_withWitness {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι)
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (Z : Fq params → MIPStarRE.Quantum.Op ι)
-    {zeta : Error}
-    (h : IdxProjSubMeas.ConsistentWithPoints G strategy zeta) :
-    (IdxProjSubMeas.withWitness strategy G Z).ConsistentWithPoints strategy zeta := by
-  refine ⟨?_⟩
-  simpa [IdxProjSubMeas.toIdxPolyFamily, IdxProjSubMeas.withWitness,
-    IdxPolyFamily.evaluatedAtNextPoint] using h.pointConsistency
-
-theorem stronglySelfConsistent_withWitness {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι)
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (Z : Fq params → MIPStarRE.Quantum.Op ι)
-    {ψ : QuantumState (ι × ι)} {zeta : Error}
-    (h : IdxProjSubMeas.StronglySelfConsistent G ψ zeta) :
-    (IdxProjSubMeas.withWitness strategy G Z).StronglySelfConsistent ψ zeta := by
-  refine ⟨?_⟩
-  simpa [IdxProjSubMeas.toIdxPolyFamily, IdxProjSubMeas.withWitness] using
-    h.sliceSelfConsistency
-
-theorem witness_psd_withWitness {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι)
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (Z : Fq params → MIPStarRE.Quantum.Op ι)
-    (h : ∀ x : Fq params, 0 ≤ Z x) :
-    ∀ x : Fq params, 0 ≤ (IdxProjSubMeas.withWitness strategy G Z).witness x := by
-  simpa [IdxProjSubMeas.withWitness] using h
-
-theorem residual_withWitness {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι)
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (Z : Fq params → MIPStarRE.Quantum.Op ι)
-    {zeta : Error}
-    (h :
-      avgOver (uniformDistribution (Fq params))
-        (fun x =>
-          ev strategy.state <|
-            leftTensor (ι₂ := ι) (1 - (G x).toSubMeas.total) *
-              rightTensor (ι₁ := ι) (Z x)) ≤ zeta) :
-    avgOver (uniformDistribution (Fq params))
-      (fun x =>
-        IdxPolyFamily.storedResidual strategy (IdxProjSubMeas.withWitness strategy G Z)
-          (fun y => (G y).toSubMeas) x) ≤ zeta := by
-  simpa [IdxProjSubMeas.withWitness, IdxPolyFamily.storedResidual] using h
-
-theorem domination_withWitness {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι)
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (Z : Fq params → MIPStarRE.Quantum.Op ι)
-    (h :
-      ∀ x : Fq params, ∀ g : Polynomial params,
-        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ Z x) :
-    ∀ x : Fq params, ∀ g : Polynomial params,
-      IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤
-        (IdxProjSubMeas.withWitness strategy G Z).witness x := by
-  simpa [IdxProjSubMeas.withWitness] using h
-
-end IdxProjSubMeas
 
 end MIPStarRE.LDT

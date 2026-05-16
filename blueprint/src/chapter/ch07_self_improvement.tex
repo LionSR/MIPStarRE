@@ -21,7 +21,8 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
 
 \begin{lemma}[Self-improvement with non-projective output]\label{lem:self-improvement-helper}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelper}
-	\leanok
+  % No \leanok is attached here while the proof still depends on the SDP
+  % slackness gap tracked by issue #1230.
   \uses{def:polymeasurements, def:simeq, def:strong-self-consistency}
   Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following property:
   \begin{enumerate}
@@ -107,7 +108,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \end{align}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_mass_eq_avg_pointwise_sandwich_sum}
   Grouping the polynomials according to their value at~$u$ gives
-  \begin{equation}\label{eq:bracketize-the-expression}
+  \begin{equation}\label{eq:group-by-point-value}
     \E_{u} \sum_h \bra{\psi} \bigl(A^{u}_{h(u)} \cdot T_h \cdot A^{u}_{h(u)}\bigr) \ot I \ket{\psi}
     = \E_{u} \sum_a \bra{\psi} \bigl(A^{u}_{a} \cdot T_{[h(u) = a]} \cdot A^{u}_{a}\bigr) \ot I \ket{\psi}.
   \end{equation}
@@ -119,18 +120,21 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helper_mass_eq_avg_pointwise_bracketed_sum}
   \lean{MIPStarRE.LDT.SelfImprovement.helperBracketedCompletenessQuantity_eq_mass}
   We first move the leftmost copy of~$A^u_a$ across the bipartition:
-  \begin{equation}\label{eq:yet-another-move-a}
-    \eqref{eq:bracketize-the-expression}
+  \begin{equation}\label{eq:first-point-projector-transport}
+    \eqref{eq:group-by-point-value}
     \approx_{2\sqrt{\delta}}
     \E_{u} \sum_a \bra{\psi} \bigl(T_{[h(u)=a]} \cdot A^{u}_{a}\bigr) \ot A^{u}_{a} \ket{\psi}.
   \end{equation}
-  The difference is bounded by Cauchy--Schwarz as in~\eqref{eq:move-one-cauchy-schwarz}; the first factor is at most $\sqrt{2\delta}$ by self-consistency of~$A$, and the second is at most~$1$ because $T_{[h(u)=a]} \le I$.
+  The difference is bounded by Cauchy--Schwarz as
+  in~\eqref{eq:move-first-point-projector-cauchy-schwarz}; the first factor is
+  at most $\sqrt{2\delta}$ by self-consistency of~$A$, and the second is at
+  most~$1$ because $T_{[h(u)=a]} \le I$.
   \lean{MIPStarRE.LDT.SelfImprovement.helper_first_move_second_factor_operator_le_one}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_first_move_second_factor_le_one}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_first_move_abs_sub_bracketed_le_two_sqrt_delta}
   We next remove the remaining copy of~$A^u_a$ on Bob's side:
-  \begin{equation}\label{eq:mysterious-case-of-the-disappearing-a}
-    \eqref{eq:yet-another-move-a}
+  \begin{equation}\label{eq:first-moved-completeness}
+    \eqref{eq:first-point-projector-transport}
     \approx_{\sqrt{\delta}}
     \E_{u} \sum_a \bra{\psi} \bigl(T_{[h(u)=a]} \cdot A^{u}_{a}\bigr) \ot I \ket{\psi}.
   \end{equation}
@@ -149,7 +153,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helper_second_move_pointwise_abs_le_sqrt}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_second_move_abs_sub_first_moved_le_sqrt_delta}
   \[
-    \eqref{eq:mysterious-case-of-the-disappearing-a}
+    \eqref{eq:first-moved-completeness}
     = \sum_h \bra{\psi} \bigl(T_h \cdot \E_{u} A^u_{h(u)}\bigr) \ot I \ket{\psi}
     = \sum_h \bra{\psi} (T_h \cdot Z) \ot I \ket{\psi}
     = \bra{\psi} Z \ot I \ket{\psi}.
@@ -160,7 +164,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helper_linearized_completeness_quantity_eq_dual_mass_of_complementary_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_slackness_eq_of_helper_with_slackness}
   Thus
-  \begin{equation}\label{eq:gonna-use-this-later-H-versus-Z}
+  \begin{equation}\label{eq:h-versus-z-lower-bound}
     \sum_h \bra{\psi} H_h \ot I \ket{\psi} \geq \bra{\psi} Z \ot I \ket{\psi} - 3\sqrt{\delta}.
   \end{equation}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_hhat_vs_z_of_cauchy_schwarz_and_complementary_slackness}
@@ -190,7 +194,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
 
   \emph{Proof of \ref{item:self-improvement-A-consistency}.}
   The inconsistency of~$H$ with~$A$ is
-  \begin{equation}\label{eq:consistency-with-A-baby-step}
+  \begin{equation}\label{eq:point-consistency-expansion}
     \E_{u} \sum_{a \neq b} \bra{\psi} A^{u}_a \ot H_{[h(u) = b]} \ket{\psi}
     = \E_{u} \sum_{a, h: h(u) \neq a} \bra{\psi} A^{u}_a \ot H_h \ket{\psi}.
   \end{equation}
@@ -213,7 +217,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helper_point_consistency_of_selected_chain_selfConsistency_globalVariance}.
   Apply Lemma~\ref{lem:add-in-u} with $\mathcal O=\F_q$, $M=A$, and $S_u=\{(a,h):h(u)\neq a\}$. Then
   \[
-    \eqref{eq:consistency-with-A-baby-step}
+    \eqref{eq:point-consistency-expansion}
     \approx_{4 \sqrt{\zeta_{\mathrm{variance}}}}
     \E_{u} \sum_{a, h: h(u) \neq a} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot A^{u}_a \cdot A^{u}_{h(u)}\bigr)\ot T_h \ket{\psi},
   \]
@@ -245,25 +249,25 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.ev_opTensor_pointConditioned_sandwichedPolynomialOutcome_outer_eq_indicator}
   \lean{MIPStarRE.LDT.SelfImprovement.polynomial_off_diagonal_outer_sandwich_eq_indicator_avg}
   The strong self-consistency expression is
-  \begin{equation}\label{eq:self-consistency-baby-step}
+  \begin{equation}\label{eq:self-consistency-expansion}
     \sum_{h\in\polyfunc{m}{q}{d}} \bra{\psi} H_h \ot H_h \ket{\psi}
     = \E_{u} \sum_{h \in \polyfunc{m}{q}{d}} \bra{\psi} H_h^{u} \ot H_h \ket{\psi}.
   \end{equation}
   Apply Lemma~\ref{lem:add-in-u} with $\mathcal O=\polyfunc{m}{q}{d}$, $M=H$, and $S_u=\{(h,h):h\in\polyfunc{m}{q}{d}\}$. This gives
-  \begin{equation}\label{eq:release-the-kraken}
-    \eqref{eq:self-consistency-baby-step}
+  \begin{equation}\label{eq:add-point-conditioning}
+    \eqref{eq:self-consistency-expansion}
     \approx_{4 \sqrt{\zeta_{\mathrm{variance}}}}
     \E_{u} \sum_{h \in \polyfunc{m}{q}{d}} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot H_h^{u} \cdot A^{u}_{h(u)}\bigr) \ot T_h \ket{\psi}.
   \end{equation}
   We next enlarge the sum from $h'=h$ to all pairs $h,h'$:
-  \begin{equation}\label{eq:threw-in-h-prime}
-    \eqref{eq:release-the-kraken}
+  \begin{equation}\label{eq:enlarge-polynomial-sum}
+    \eqref{eq:add-point-conditioning}
     \approx_{2\sqrt{\zeta_{\mathrm{variance}}} + \frac{md}{q}}
     \E_{u} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot H^{u}_{h'} \cdot A^{u}_{h(u)}\bigr) \ot T_h \ket{\psi}.
   \end{equation}
   The added off-diagonal contribution is
   \begin{align}
-    \eqref{eq:threw-in-h-prime}-\eqref{eq:release-the-kraken}
+    \eqref{eq:enlarge-polynomial-sum}-\eqref{eq:add-point-conditioning}
     &= \E_{u} \sum_{h \neq h'} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot H^{u}_{h'} \cdot A^{u}_{h(u)}\bigr) \ot T_h \ket{\psi} \notag\\
     &= \E_{u} \sum_{h \neq h'} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot T_{h'} \cdot A^{u}_{h(u)}\bigr) \ot T_h \ket{\psi} \cdot \bone{h(u) = h'(u)}, \label{eq:added-indicator}
   \end{align}
@@ -283,17 +287,17 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   The first factor is bounded by $\sqrt{\zeta_{\mathrm{variance}}}$ via Lemma~\ref{lem:global-variance-of-points}, and the second by~$1$ because $T$ and $H^u$ are submeasurements.
 
   Repeating the same argument for the remaining copy of~$A$ yields
-  \begin{equation}\label{eq:swapped-u-for-v-this-time-it's-personal}
+  \begin{equation}\label{eq:replace-second-point-conditioner}
     \eqref{eq:swapped-u-for-v}
     \approx_{\sqrt{\zeta_{\mathrm{variance}}}}
     \E_{u,v} \sum_{h \neq h'} \bra{\psi} \bigl(A^{v}_{h(v)} \cdot T_{h'} \cdot A^{v}_{h(v)}\bigr) \ot T_h \ket{\psi} \cdot \bone{h(u) = h'(u)}.
   \end{equation}
   The same intermediate estimate gives
-  \begin{equation}\label{eq:gonna-use-this-later}
+  \begin{equation}\label{eq:swapped-indicator-total-bound}
     \E_{u,v} \sum_{h \neq h'} \bra{\psi}  \bigl(A^{v}_{h(v)} \cdot T_{h'} \cdot A^{v}_{h(v)}\bigr)\ot T_h\ket{\psi}
     \leq 1,
   \end{equation}
-  so Schwartz--Zippel bounds the indicator average by $md/q$ and proves~\eqref{eq:threw-in-h-prime}.
+  so Schwartz--Zippel bounds the indicator average by $md/q$ and proves~\eqref{eq:enlarge-polynomial-sum}.
   \lean{MIPStarRE.LDT.SelfImprovement.polynomial_collision_pointMeasurement_sandwichTensor_avg_le_mdq}
   \lean{MIPStarRE.LDT.SelfImprovement.polynomial_off_diagonal_swapped_indicator_sandwich_avg_le_mdq}
   \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalOuterSandwichQuantity}
@@ -306,8 +310,8 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalOuterSandwichQuantity_le_two_sqrt_variance_add_mdq}
   \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalOuterSandwichQuantity_le_two_sqrt_variance_add_mdq_of_abs_transports}
 
-  Using~\eqref{eq:h-blt}, the right-hand side of~\eqref{eq:threw-in-h-prime} is
-  \begin{equation}\label{eq:delete-an-A}
+  Using~\eqref{eq:h-blt}, the right-hand side of~\eqref{eq:enlarge-polynomial-sum} is
+  \begin{equation}\label{eq:remove-point-projector}
     \E_{u} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi} \bigl(H^{u}_{h'} \cdot A^{u}_{h(u)}\bigr) \ot T_h \ket{\psi}.
   \end{equation}
   \lean{MIPStarRE.LDT.SelfImprovement.sandwichedPolynomialOutcome_mul_pointConditioned_eq_ite}
@@ -317,14 +321,14 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helperFullOuterSandwichQuantity_eq_release_add_offDiagonalOuterSandwichQuantity}
   \lean{MIPStarRE.LDT.SelfImprovement.helperFullOuterSandwichQuantity_eq_deleteAQuantity}
   Replace the remaining copy of $A^u_{h(u)}$ by $A^v_{h(v)}$:
-  \begin{equation}\label{eq:swap-u-for-v-attack-of-the-clones}
-    \eqref{eq:delete-an-A}
+  \begin{equation}\label{eq:replace-final-point-conditioner}
+    \eqref{eq:remove-point-projector}
     \approx_{\sqrt{\zeta_{\mathrm{variance}}}}
     \E_{u,v} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi} \bigl(H^{u}_{h'} \cdot A^{v}_{h(v)}\bigr) \ot T_h \ket{\psi}.
   \end{equation}
   Here the first Cauchy--Schwarz factor is at most~$1$ because $T$ and $H^u$ are submeasurements, and the second is again bounded by Lemma~\ref{lem:global-variance-of-points}. Finally move this last copy of~$A^v_{h(v)}$ to Bob's side:
   \begin{equation}\label{eq:move-over-v}
-    \eqref{eq:swap-u-for-v-attack-of-the-clones}
+    \eqref{eq:replace-final-point-conditioner}
     \approx_{\sqrt{2\delta}}
     \E_{u,v} \sum_{h, h' \in \polyfunc{m}{q}{d}} \bra{\psi} H^{u}_{h'}  \ot \bigl(T_h \cdot A^{v}_{h(v)}\bigr) \ket{\psi}.
   \end{equation}
@@ -337,7 +341,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
     \eqref{eq:move-over-v}
     \ge \sum_h \bra{\psi} H_h \ot I \ket{\psi} - 4\sqrt{\zeta_{\mathrm{variance}}}.
   \]
-  Combining~\eqref{eq:release-the-kraken}, \eqref{eq:threw-in-h-prime}, \eqref{eq:swap-u-for-v-attack-of-the-clones}, and~\eqref{eq:move-over-v} gives
+  Combining~\eqref{eq:add-point-conditioning}, \eqref{eq:enlarge-polynomial-sum}, \eqref{eq:replace-final-point-conditioner}, and~\eqref{eq:move-over-v} gives
   \[
     \sum_h \bra{\psi} H_h \ot H_h \ket{\psi}
     \ge \sum_h \bra{\psi} H_h \ot I \ket{\psi}
@@ -358,12 +362,11 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_offDiagonal}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_paperChain}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_scalarTransports}
-  and then uses the proved lemmas
+  and then uses the proved lemma
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_of_helper_conclusion}
+  together with
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_obligations_of_selfConsistency_localVariance}
-  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_input_of_obligations}
-  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_input_of_selfConsistency_localVariance}
-  to recover the final helper-stage self-consistency input.  The remaining
+  to recover the final helper-stage self-consistency conclusion.  The remaining
   theorem-level derivation is not moved into an additional hypothesis; it is
   the proof gap in the paper theorem below.
   The paper's arithmetic shows that the right-hand error is at most
@@ -416,7 +419,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
     -\E_{u} \sum_a \bra{\psi}  A^{u}_{a} \ot H_{[h(u)=a]} \ket{\psi}
     \le \bra{\psi} Z \ot I \ket{\psi} - \sum_h \bra{\psi} I \ot H_h \ket{\psi} + 4 \sqrt{\zeta_{\mathrm{variance}}}.
   \]
-  By~\eqref{eq:gonna-use-this-later-H-versus-Z}, the right-hand side is at most $3\sqrt{\delta}+4\sqrt{\zeta_{\mathrm{variance}}}$. Substituting the definition of $\zeta_{\mathrm{variance}}$ and collecting terms gives
+  By~\eqref{eq:h-versus-z-lower-bound}, the right-hand side is at most $3\sqrt{\delta}+4\sqrt{\zeta_{\mathrm{variance}}}$. Substituting the definition of $\zeta_{\mathrm{variance}}$ and collecting terms gives
   \lean{MIPStarRE.LDT.SelfImprovement.helper_boundedness_error_le_selfImprovementHelperError}
   \[
     23m\cdot\Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big)
@@ -506,8 +509,6 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlackness_of_canonicalSaturatedComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlackness_of_canonicalFeasibleSaturatedComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.toMatrixSdpStatementWithSlackness}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness.exists_measurement_witness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPair}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPair.toMatrixSdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPair.withDominance}
@@ -516,55 +517,38 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPairWithDominance.toCanonicalOptimalPair}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPairWithDominance.toMatrixSdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpComplementarySlacknessEquation}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.dualPositive}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.primalMeasurement}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.complementarySlacknessEquation}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSubmeasurementToSubMeas}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPointRealizationOfStrategy}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixAveragedPointOperator_ofPointRealization}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpDualSlackOperator_ofPointRealization}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.toSdpOptimalPairWithSlackness_of_dualDominatesIdentity}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness.toSdpStatementWithSlackness_of_dualDominatesIdentity}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.toSdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalFeasibleComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdp_with_slackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPair}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPair_of_dualDominatesIdentity}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPair}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPairWithDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPair_of_dualDominatesIdentity}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithMatrixSdpSlacknessAndDominance}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithCanonicalMatrixSdpSlacknessAndDominance}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithCanonicalOptimalPairSdpSlacknessAndDominance}
-  \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelperWithCanonicalOptimalPairSdpSlackness_of_dualDominatesIdentity}
   \leanok
   From a matrix-level strong-duality witness with complementary slackness of the
   shape asserted by Lemma~\ref{lem:sdp}, one obtains a complete measurement
   \(\{T_g\}\), a feasible dual operator \(Z\), equality of the primal and dual
-  objectives, and the equations \(T_gZ=T_gA_g\) for all \(g\).  The formal
-  bridge to the current abstract helper interface is conditional on the
-  additional reduced-interface bound \(I\leq Z\) for this selected dual witness.
-  The same optimal witness can also be considered together with this dominance
-  condition.  With the usual helper hypotheses that the strategy is good, the
-  error parameter \(\nu\), and the comparison measurement \(G\), this datum feeds
-  the slackness-carrying self-improvement helper.
-  Lean also isolates the saturated canonical optimal-pair output still required
-  from strong duality: a feasible canonical primal matrix, a dual-feasible
-  operator with equal objective value, canonical complementary slackness, and
-  vanishing of the extra canonical slack block.  This datum gives the
-  displayed measurement witness without assuming \(I \le Z\).  Lean also proves
-  the converse saturation step for the dominance-carrying optimal pair: the
-  canonical complementary-slackness equation on the extra block gives
-  \(X_{\mathrm{none},\mathrm{none}}Z=0\), and the lower bound \(I\leq Z\)
-  forces \(X_{\mathrm{none},\mathrm{none}}=0\).  Thus the
-  dominance-carrying optimal pair canonically determines the saturated optimal
-  pair, and hence also the matrix slackness statement without the dominance
-  field.  The remaining bridge is first stated as an abstract SDP statement, and
-  then as a direct helper input, for a canonical feasible primal matrix
-  satisfying objective equality and canonical complementary slackness together
-  with the auxiliary dominance hypothesis.
+  objectives, and the equations \(T_gZ=T_gA_g\) for all \(g\).  Lean isolates
+  the saturated canonical optimal-pair output required from strong duality: a
+  feasible canonical primal matrix, a dual-feasible operator with equal
+  objective value, canonical complementary slackness, and vanishing of the
+  extra canonical slack block.  This datum gives both the abstract
+  slackness-carrying SDP statement and the displayed measurement witness without
+  assuming \(I \le Z\).  Lean also proves the converse saturation step for the
+  dominance-carrying optimal pair: the canonical complementary-slackness
+  equation on the extra block gives \(X_{\mathrm{none},\mathrm{none}}Z=0\), and
+  the lower bound \(I\leq Z\) forces \(X_{\mathrm{none},\mathrm{none}}=0\).
+  Thus the dominance-carrying optimal pair canonically determines the
+  saturated optimal pair, and hence also the matrix slackness statement without
+  the dominance field.  The paper-facing self-improvement helper consumes the
+  resulting abstract SDP statement.
 \end{lemma}
 \begin{proof}
   \leanok
@@ -583,16 +567,34 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \texttt{MIPStarRE.LDT.SelfImprovement.selfImprovement}.
 \end{remark}
 
+\begin{remark}[Lean reduced SDP and dominance interfaces]\label{rem:lean-reduced-sdp-dominance-interfaces}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdp, MIPStarRE.LDT.SelfImprovement.SdpStatement}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSlackOperator_eq_zero_of_mul_dual_eq_zero_of_one_le}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_of_canonicalSlackOperator_eq_zero}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_of_canonicalComplementarySlackness_of_one_le}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_extracted_of_canonicalComplementarySlackness_of_one_le}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpOptimalWitnessWithDominance_of_canonicalFeasibleComplementarySlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlacknessAndDominance_of_canonicalComplementarySlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlacknessAndDominance_of_canonicalFeasibleComplementarySlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.exists_measurement_witness}
+  Lean also contains reduced SDP and dominance-carrying matrix interfaces.  The
+  reduced theorem \texttt{sdp} proves only the measurement-total and
+  dual-feasibility fragment used before strong duality is supplied.  The
+  dominance-carrying declarations add the auxiliary condition \(I\le Z\) and
+  are retained as technical routes to slackness-carrying data.  These
+  declarations are not advertised as formalizations of Lemma~\ref{lem:sdp}.
+\end{remark}
+
 \begin{lemma}[Dual SDP and complementary slackness]\label{lem:sdp}
-  \lean{MIPStarRE.LDT.SelfImprovement.sdp}
   \lean{MIPStarRE.LDT.SelfImprovement.averagedPointOperator_nonneg}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpDualPositive_of_dualFeasible}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPair.dualPositive}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness.primalMeasurement}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness}
-  \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness.toSdpStatement}
-  \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness.exists_measurement_witness}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdp_slackness_measurement}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalBlockIndex}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalBlockHilbertSpace}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDiagonalBlock}
@@ -661,20 +663,12 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpComplementarySlacknessDefect_extracted_of_canonical}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSlack_mul_dual_of_complementarySlackness}
   \lean{MIPStarRE.Quantum.eq_zero_of_nonneg_mul_eq_zero_of_one_le}
-  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSlackOperator_eq_zero_of_mul_dual_eq_zero_of_one_le}
-  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_of_canonicalSlackOperator_eq_zero}
-  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_of_canonicalComplementarySlackness_of_one_le}
-  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_extracted_of_canonicalComplementarySlackness_of_one_le}
-  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness}
-  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpOptimalWitnessWithDominance_of_canonicalFeasibleComplementarySlackness}
-  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlacknessAndDominance_of_canonicalComplementarySlackness}
-  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlacknessAndDominance_of_canonicalFeasibleComplementarySlackness}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.exists_measurement_witness}
   % No statement-level \leanok is attached here: MIPStarRE.LDT.SelfImprovement.sdp
   % proves only the reduced SdpStatement fragment, while the full slackness
   % conclusion is recorded as the visible, deferred theorem
-  % MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness, whose proof is
-  % still \notready (see proof block below).
+  % MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness and its displayed
+  % measurement consequence MIPStarRE.LDT.SelfImprovement.sdp_slackness_measurement,
+  % whose proof is still \notready (see proof block below).
   Let
   \[
     A_g = \E_{u \sim \F_q^m} A^u_{g(u)}.
@@ -899,7 +893,7 @@ is not itself the full formal counterpart of Lemma~\ref{lem:add-in-u}.
     &= \E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} M^{u}_o \ot \bigl(A^{v}_{h(v)} \cdot T_h \cdot A^{v}_{h(v)}\bigr) \ket{\psi}. \label{eq:expand-that-H}
   \end{align}
   We claim that
-  \begin{equation}\label{eq:move-one}
+  \begin{equation}\label{eq:move-first-point-projector}
     \eqref{eq:expand-that-H}
     \approx_{\sqrt{2\delta}}
     \E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{v}_{h(v)} \cdot M^{u}_o\bigr) \ot \bigl(T_h \cdot A^{v}_{h(v)}\bigr) \ket{\psi}.
@@ -909,7 +903,7 @@ is not itself the full formal counterpart of Lemma~\ref{lem:add-in-u}.
     \Big|\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{v}_{h(v)} \ot I - I \ot A^{v}_{h(v)}\bigr) \cdot \bigl(M^{u}_o \ot (T_h \cdot A^{v}_{h(v)})\bigr)\ket{\psi}\Big|\\
     \leq
     \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{v}_{h(v)} \ot I - I \ot A^{v}_{h(v)}\bigr) \cdot (M^{u}_o \ot T_h) \cdot \bigl(A^{v}_{h(v)} \ot I - I \ot A^{v}_{h(v)}\bigr) \ket{\psi}}\\
-    \cdot \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi}  M^{u}_o \ot \bigl(A^{v}_{h(v)} \cdot T_h\cdot  A^{v}_{h(v)}\bigr) \ket{\psi}}. \label{eq:move-one-cauchy-schwarz}
+    \cdot \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi}  M^{u}_o \ot \bigl(A^{v}_{h(v)} \cdot T_h\cdot  A^{v}_{h(v)}\bigr) \ket{\psi}}. \label{eq:move-first-point-projector-cauchy-schwarz}
   \end{multline}
   The first factor is controlled by summing over the value $a = h(v)$:
   \begin{align*}
@@ -928,13 +922,13 @@ is not itself the full formal counterpart of Lemma~\ref{lem:add-in-u}.
   which is at most~$1$ because $M^u$ and $H^v$ are submeasurements.
 
   Next, we claim that
-  \begin{equation}\label{eq:move-another}
-    \eqref{eq:move-one}
+  \begin{equation}\label{eq:move-second-point-projector}
+    \eqref{eq:move-first-point-projector}
     \approx_{\sqrt{2\delta}}
     \E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{v}_{h(v)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \ot T_h  \ket{\psi}.
   \end{equation}
   Again, we bound the magnitude of the difference:
-  \begin{align}\label{eq:move-another-cauchy-schwarz}
+  \begin{align}\label{eq:move-second-point-projector-cauchy-schwarz}
     &\Big|\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl((A^{v}_{h(v)} \cdot M^{u}_o) \ot T_h\bigr) \cdot \bigl(A^{v}_{h(v)} \ot I - I \ot A^{v}_{h(v)}\bigr)  \ket{\psi}\Big| \notag\\
     &\leq \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{v}_{h(v)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \ot T_h  \ket{\psi}} \\
     &\qquad\cdot \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{v}_{h(v)} \ot I - I \ot A^{v}_{h(v)}\bigr) \cdot (M^{u}_o \ot T_h) \cdot \bigl(A^{v}_{h(v)} \ot I - I \ot A^{v}_{h(v)}\bigr) \ket{\psi}}. \notag
@@ -950,17 +944,18 @@ is not itself the full formal counterpart of Lemma~\ref{lem:add-in-u}.
   \end{align*}
   using first that $M$ is a submeasurement, then that $A^v_{h(v)} \le I$, and
   finally that $T$ is a submeasurement ($\sum_g T_g \le I$). The second factor is
-  exactly the same expression as in~\eqref{eq:move-one-cauchy-schwarz}, hence at most
+  exactly the same expression
+  as in~\eqref{eq:move-first-point-projector-cauchy-schwarz}, hence at most
   $\sqrt{2\delta}$.
 
   Having moved both copies of~$A$ to the left-hand side, we next show that
-  \begin{equation}\label{eq:change-one}
-    \eqref{eq:move-another}
+  \begin{equation}\label{eq:replace-left-point-conditioner}
+    \eqref{eq:move-second-point-projector}
     \approx_{\sqrt{\zeta_{\mathrm{variance}}}}
     \E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \ot T_h  \ket{\psi}.
   \end{equation}
   The difference is bounded by
-  \begin{multline}\label{eq:change-one-cauchy-schwarz}
+  \begin{multline}\label{eq:replace-left-point-conditioner-cauchy-schwarz}
     \Big|\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl((A^{v}_{h(v)} - A^{u}_{h(u)}) \cdot M^{u}_o \cdot A^{v}_{h(v)}\bigr) \ot T_h  \ket{\psi}\Big|\\
     \leq
     \sqrt{\E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl((A^{v}_{h(v)} - A^{u}_{h(u)}) \cdot M^{u}_o \cdot (A^{v}_{h(v)} - A^{u}_{h(u)})\bigr) \ot T_h  \ket{\psi}}\\
@@ -977,16 +972,18 @@ is not itself the full formal counterpart of Lemma~\ref{lem:add-in-u}.
   \end{align*}
   because $M^u$ is a submeasurement. Lemma~\ref{lem:global-variance-of-points}
   bounds this by~$\zeta_{\mathrm{variance}}$ since $T \in \polysub{m}{q}{d}$. The
-  second factor is exactly the first factor from~\eqref{eq:move-another-cauchy-schwarz},
+  second factor is exactly the first factor
+  from~\eqref{eq:move-second-point-projector-cauchy-schwarz},
   so it is at most~$1$.
 
   Finally, we show that
-  \begin{equation}\label{eq:change-another}
-    \eqref{eq:change-one}
+  \begin{equation}\label{eq:replace-right-point-conditioner}
+    \eqref{eq:replace-left-point-conditioner}
     \approx_{\sqrt{\zeta_{\mathrm{variance}}}}
     \E_{u,v} \sum_{(o, h) \in S_{u}} \bra{\psi} \bigl(A^{u}_{h(u)} \cdot M^{u}_o \cdot A^{u}_{h(u)}\bigr) \ot T_h  \ket{\psi}.
   \end{equation}
-  The same Cauchy--Schwarz estimate as in~\eqref{eq:change-one-cauchy-schwarz}, with
+  The same Cauchy--Schwarz estimate
+  as in~\eqref{eq:replace-left-point-conditioner-cauchy-schwarz}, with
   the final copy of $A^v_{h(v)}$ replaced by $A^u_{h(u)}$, gives the same bound
   $\sqrt{\zeta_{\mathrm{variance}}}$. Indeed, the factor containing
   $A^u_{h(u)} \cdot M^u_o \cdot A^u_{h(u)}$ is bounded by~$1$ by the same
@@ -1006,24 +1003,27 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
 
 \begin{remark}[Auxiliary self-improvement lemmas]\label{rem:self-improvement-lean-interfaces}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementError_nonneg_of_isGood}
+  \lean{MIPStarRE.LDT.SelfImprovement.OrthonormalizationSpectralObligation}
+  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationSpectralObligation_of_roundingWitnesses}
   \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationSpectralObligation_of_projectiveNonMeasurement}
+  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationSpectralObligation_of_sourceAlmostProjective}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_of_helper_outputs_of_total_expectation_le}
+  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_of_helper_outputs_of_total_difference}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_of_helper_outputs_of_total_operator_le}
-  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_exists_of_helper_outputs_of_residual_domination}
-  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_exists_of_helper_outputs_of_residualDominationInput}
   Several auxiliary results are used to prove Theorem~\ref{thm:self-improvement}
   from the helper output and the orthonormalization theorem.  They record
-  local intermediate estimates and final-field assembly lemmas.  The theorem
-  below records the paper-facing conclusion; its proof is not yet complete
-  because the derivation from the input consistency hypothesis is still tracked
-  by issue~\#1515.
+  local intermediate estimates and final-field assembly lemmas.  The
+  orthonormalization obligation displayed here is only the spectral-truncation
+  slice of the Section~9 construction; it is not a locality-preserving repair
+  theorem.  The theorem below records the paper-facing conclusion; its proof is
+  still not proof-complete because the current Lean route depends transitively
+  on the SDP slackness statement tracked by issue~\#1230.
 \end{remark}
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovement}
-  \leanok
-  % No proof-level \leanok is attached below: the derivation from the input
-  % consistency hypothesis is not yet complete; see issue #1515.
+  % No \leanok is attached here: the current Lean proof still depends
+  % transitively on the SDP slackness statement tracked by issue #1230.
   \uses{def:polymeasurements, def:simeq, def:approx_delta, def:strong-self-consistency}
   Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following properties:
   \begin{enumerate}
@@ -1143,24 +1143,6 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerTotalDomination}
   \lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerTotalDomination.of_outcome_le}
   \lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerTotalDomination.rightTensor_total_ev_le}
-  \lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerResidualDomination.of_fresh_outcome_le}
-  \lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerResidualDomination.fresh_outcome_le}
-  \lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerResidualDomination.iff_fresh_outcome_le}
-  \lean{MIPStarRE.LDT.SelfImprovement.LeftLiftedQXPLayerRepairWitnessWithResidualDomination}
-  \lean{MIPStarRE.LDT.SelfImprovement.LeftLiftedQXPLayerRepairWitnessWithResidualDomination.restrictSome_total_le}
-  \lean{MIPStarRE.LDT.SelfImprovement.LeftLiftedQXPLayerRepairWitnessWithResidualDomination.restrictSome_rightTensor_total_ev_le}
-  \lean{MIPStarRE.LDT.SelfImprovement.leftLiftedQXPLayerRepairWitnessWithResidualDomination_of_lifted_qxp_sddOpRel_fresh_outcome_le}
-  \lean{MIPStarRE.LDT.SelfImprovement.leftLiftedQXPLayerRepairWitnessWithResidualDomination_of_local_qxp_sddOpRel_fresh_outcome_le}
-  \lean{MIPStarRE.LDT.SelfImprovement.leftLiftedProjectivizationRepairInputWithResidualDomination_of_qxpLayer}
-  \lean{MIPStarRE.LDT.SelfImprovement.OrthonormalizationQXPLayerRepairObligationWithResidualDomination}
-  \lean{MIPStarRE.LDT.SelfImprovement.residualDominatingRepairObligation_of_qxpLayer_and_freshOutcome}
-  \lean{MIPStarRE.LDT.SelfImprovement.OrthonormalizationResidualDominationInput}
-  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationInput_of_residualDominationInput}
-  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationResidualDominationInput_of_obligations}
-  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationInput_of_sourceAlmostProjectiveAndQXPLayerRepair}
-  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationResidualDominationInput_of_sourceAlmostProjectiveAndQXPLayerRepair}
-  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationResidualDominationInput_of_sourceQXPRepairAndResidualDomination}
-  \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationResidualDominationInput_of_roundingAndQXPLayerRepair}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap_natural}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_point_consistency_totalGap_natural_of_total_difference}

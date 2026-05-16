@@ -91,21 +91,19 @@ private lemma gCommStabilityTwo_scalar_pointwise_bound
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
+    (zeta : Error)
     (hnorm : strategy.state.IsNormalized)
     (family : IdxPolyFamily params ι)
     (G : Fq params → SubMeas (Polynomial params) ι)
     (hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (hbound_psd : ∀ x : Fq params, 0 ≤ family.witness x)
-    (hbound_dom :
-      ∀ x : Fq params, ∀ g : Polynomial params,
-        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x) :
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
     ∀ x : Fq params,
       |gCommStabilityTwoScalarDefect params strategy family G x| ≤
-        Real.sqrt (IdxPolyFamily.storedResidual strategy family G x) := by
+        Real.sqrt (hbound.storedResidual G x) := by
   intro x
   simpa [gCommStabilityTwoScalarDefect] using
     scalar_pointwise_cauchy_schwarz_bound
-      params strategy family G hG hbound_psd hbound_dom
+      params strategy zeta family G hG hbound
       (gCommStabilityTwoR params family G x) x
       (gCommStabilityTwoR_first_factor_le_one params strategy hnorm family G x)
 
@@ -128,13 +126,7 @@ theorem gCommStabilityTwo_scalar
     (family : IdxPolyFamily params ι)
     (G : Fq params → SubMeas (Polynomial params) ι)
     (hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (hbound_psd : ∀ x : Fq params, 0 ≤ family.witness x)
-    (hbound_residual :
-      avgOver (uniformDistribution (Fq params))
-        (fun x => IdxPolyFamily.storedResidual strategy family G x) ≤ zeta)
-    (hbound_dom :
-      ∀ x : Fq params, ∀ g : Polynomial params,
-        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x) :
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
     |avgOver (uniformDistribution (Fq params))
       (gCommStabilityTwoScalarDefect params strategy family G)| ≤ Real.sqrt zeta := by
   have h𝒟 :
@@ -146,18 +138,19 @@ theorem gCommStabilityTwo_scalar
         (gCommStabilityTwoScalarDefect params strategy family G)|
       ≤ Real.sqrt
           (avgOver (uniformDistribution (Fq params))
-            (fun x => IdxPolyFamily.storedResidual strategy family G x)) := by
+            (fun x => hbound.storedResidual G x)) := by
           exact
             MIPStarRE.LDT.Preliminaries.avgOver_abs_le_sqrt_of_pointwise
               (uniformDistribution (Fq params))
               (gCommStabilityTwoScalarDefect params strategy family G)
-              (fun x => IdxPolyFamily.storedResidual strategy family G x)
+              (fun x => hbound.storedResidual G x)
               (gCommStabilityTwo_scalar_pointwise_bound
-                params strategy hnorm family G hG hbound_psd hbound_dom)
+                params strategy zeta hnorm family G hG hbound)
               (storedResidual_nonneg
-                params strategy family G hbound_psd)
+                params strategy family G zeta hbound)
               h𝒟
     _ ≤ Real.sqrt zeta := by
-          exact Real.sqrt_le_sqrt hbound_residual
+          exact Real.sqrt_le_sqrt <|
+            hbound.storedBoundedResidualBound G hG
 
 end MIPStarRE.LDT.Commutativity

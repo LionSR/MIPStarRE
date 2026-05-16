@@ -26,7 +26,7 @@ I also removed a stale blueprint warning on the restated induction-section pasti
 
 The audit intentionally stops at the Section 6 interfaces that are already checked. In particular:
 
-- The explicit self-improvement obligations in `SelfImprovementPackage.SliceObligations` and the remaining producers of those inputs are #931-owned. I recorded their presence but did not try to discharge them.
+- The explicit self-improvement obligations in `SelfImprovementData.SliceObligations` and the remaining producers of those inputs are #931-owned. I recorded their presence but did not try to discharge them.
 - The answer-valued successor-boundary aliases in `MIPStarRE/LDT/Test/MainTheorem.lean` are outside this slice, even though they consume the answer-valued Section 6 wrappers.
 - The pasting theorem itself was audited in PR #1007; here I only checked the Section 6 wrapper and the way the main induction assembly supplies its hypotheses.
 - The large-`k` strengthening from the paper’s printed `k >= md` to the formal/blueprint `k >= 400 md` is already documented in `docs/paper-gaps/issue-906-main-formal-k-bound.tex` and was not counted as a new discrepancy.
@@ -43,7 +43,7 @@ E_x gamma_x <= ((m+1)/m) gamma.
 
 Lean proves the same estimates through `restrictedProbabilities` (`Theorems.lean:1962-1971`). The axis-parallel and diagonal branches first prove weighted estimates with the transverse-direction weight `m/(m+1)` (`weighted_axisParallel_bound`, `weighted_diagonal_bound`), then convert them to the displayed `(m+1)/m` loss by `RestrictedProbabilitiesStatement.ofWeightedBounds`. The self-consistency branch is exact by reindexing `(x,u)` with points of `F_q^(m+1)` (`selfConsistencyRestrictedAverage_eq`).
 
-The diagonal restriction has two formal interfaces. The legacy `xRestrictedStrategy` uses a degree-bounded diagonal answer alphabet and preserves the verifier-visible base-point readout. The answer-valued `xRestrictedAnswerSymStrat` keeps the full restricted line answer function, matching the source definition more literally. The formal theorem `answerRestrictedProbabilities` proves that the answer-valued boundary has the same three restricted failure averages, and `SliceRestrictionPackage.ofAnswer` forgets the extra answer structure only after recording those probabilities. This is explicit formal bookkeeping, not a hidden change to the restricted-probability constants.
+The diagonal restriction has two formal interfaces. The legacy `xRestrictedStrategy` uses a degree-bounded diagonal answer alphabet and preserves the verifier-visible base-point readout. The answer-valued `xRestrictedAnswerSymStrat` keeps the full restricted line answer function, matching the source definition more literally. The formal theorem `answerRestrictedProbabilities` proves that the answer-valued boundary has the same three restricted failure averages, and `SliceRestrictionData.ofAnswer` forgets the extra answer structure only after recording those probabilities. This is explicit formal bookkeeping, not a hidden change to the restricted-probability constants.
 
 ## Finding 2: self-improvement inputs remain explicit and are excluded from this audit
 
@@ -74,7 +74,7 @@ sigma* <= (1 + 1/(100m)) * (m^2 + 3) * (nu + exp(-k/(80000m^2)))
 
 and then uses `m >= 2` to bound the coefficient by `(m+1)^2` (`inductive_step.tex:584-620`). This coefficient estimate is false for the first successor step `m = 1`, where the left-hand coefficient is `101/25 > 4 = (m+1)^2`.
 
-The formal proof does not skip the first successor step. In `assembleAveragedPastingInput`, it uses the sharper estimate `nu_paste <= (1/5) * nu` (`ldPastingInInductionNu_le_fifth_mainInductionNu`) and then absorbs the `nu` and exponential coefficients separately (`Theorems.lean:3560-3666`). The two coefficient inequalities used there are valid for every `m >= 1`:
+The formal proof does not skip the first successor step. In `assembleAveragedPastingData`, it uses the sharper estimate `nu_paste <= (1/5) * nu` (`ldPastingInInductionNu_le_fifth_mainInductionNu`) and then absorbs the `nu` and exponential coefficients separately (`Theorems.lean:3560-3666`). The two coefficient inequalities used there are valid for every `m >= 1`:
 
 ```text
 (m^2 + 1) * (1 + 1/(100m)) + 2/5 <= (m+1)^2,
@@ -113,4 +113,4 @@ git diff --check
 
 The targeted build completed successfully; it emitted only pre-existing linter warnings in imported Pasting files.
 
-The scratch axiom file checked the audited public declarations `restrictedProbabilities`, `answerRestrictedProbabilities`, `selfImprovementInInductionSection`, `ldPastingInInductionSection`, `AveragedPastingInput.output`, `mainInductionFromPackages`, `mainInductionBaseCase`, `mainInductionByRecursionOnM`, `mainInductionPublicWrapper`, `answerMainInductionByRecursionOnM`, and `answerMainInductionPublicWrapper`. `#print axioms` reported only the standard Lean axioms `propext`, `Classical.choice`, and `Quot.sound` for the theorem/proof declarations. The grep over the audited scope found no `sorry`, `axiom`, or `admit` matches.
+The scratch axiom file checked the audited public declarations `restrictedProbabilities`, `answerRestrictedProbabilities`, `selfImprovementInInductionSection`, `ldPastingInInductionSection`, `AveragedPastingData.output`, `mainInductionFromPackages`, `mainInductionBaseCase`, `mainInductionByRecursionOnM`, `mainInductionPublicWrapper`, `answerMainInductionByRecursionOnM`, and `answerMainInductionPublicWrapper`. `#print axioms` reported only the standard Lean axioms `propext`, `Classical.choice`, and `Quot.sound` for the theorem/proof declarations. The grep over the audited scope found no `sorry`, `axiom`, or `admit` matches.

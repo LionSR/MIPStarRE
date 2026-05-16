@@ -376,12 +376,11 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
             nlinarith [hζ_nonneg]
   · exact sourceAlmostProjective_of_ssc ψ A_lifted _ hsscBound
 
-/-- Truncation step for an almost-projective measurement.
+/-- Apply a supplied spectral-truncation theorem to an almost-projective
+measurement.
 
-The still-unformalized spectral construction is exposed here as an explicit
-hypothesis rather than a dedicated bridge structure. The normalization
-hypothesis remains explicit because the `√ζ`-scale error bound is
-state-dependent. -/
+The normalization hypothesis remains explicit because the `√ζ`-scale error
+bound is state-dependent. -/
 def spectralTruncateAlmostProjective {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -392,44 +391,6 @@ def spectralTruncateAlmostProjective {Outcome : Type*}
       SpectralTruncationStatement ψ A ζ := by
   intro hAlmost hspectral
   exact hspectral hψ hAlmost.sourceAlmostProjective
-
-/-- Adjust truncated projections to form a genuine projective
-submeasurement, controlling the per-outcome distance.
-
-The rounded family is exposed by `SpectralTruncationStatement`; the late
-repair from that family to a genuine projective submeasurement is now an
-explicit theorem hypothesis. -/
-lemma adjustTruncatedProjections {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :
-    SpectralTruncationStatement ψ A ζ →
-      ProjectivizationRepairInput ψ A ζ →
-      ∃ P : ProjSubMeas Outcome ι,
-        RoundedProjMeasStatement ψ A P
-          (roundingToProjectiveError ζ) := by
-  intro hSpectral hrepair
-  exact hrepair hSpectral
-
-/-- Compose truncation and adjustment to round an
-almost-projective measurement to a projective submeasurement. -/
-lemma roundAlmostProjMeas {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState ι) (hψ : ψ.IsNormalized)
-    (A : Measurement Outcome ι) (ζ : Error) :
-    AlmostProjMeasStatement ψ A ζ →
-      SpectralTruncationInput ψ A ζ →
-      ProjectivizationRepairInput ψ A ζ →
-      ∃ P : ProjSubMeas Outcome ι,
-        RoundedProjMeasStatement ψ A P
-          (roundingToProjectiveError ζ) := by
-  intro hAlmost hspectral hrepair
-  exact adjustTruncatedProjections
-    (Outcome := Outcome) (ι := ι) ψ A ζ
-    (spectralTruncateAlmostProjective
-      (Outcome := Outcome) (ι := ι) ψ hψ A ζ hAlmost hspectral)
-    hrepair
 
 /-- Increase the allowed error bound for a rounded-projective witness. -/
 lemma roundedProjMeasStatement_mono {Outcome : Type*}

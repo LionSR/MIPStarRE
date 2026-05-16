@@ -85,16 +85,17 @@ lemma storedResidual_nonneg
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (G : Fq params → SubMeas (Polynomial params) ι)
-    (hbound_psd : ∀ x : Fq params, 0 ≤ family.witness x) :
-    ∀ x : Fq params, 0 ≤ IdxPolyFamily.storedResidual strategy family G x := by
+    (zeta : Error)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    ∀ x : Fq params, 0 ≤ hbound.storedResidual G x := by
   intro x
-  unfold IdxPolyFamily.storedResidual
+  unfold IdxPolyFamily.SliceBoundednessInput.storedResidual
   apply ev_nonneg_of_psd
   rw [leftTensor_mul_rightTensor_eq_opTensor]
   simpa [opTensor] using
     MIPStarRE.Quantum.kronecker_nonneg
       (sub_nonneg.mpr (G x).total_le_one)
-      (hbound_psd x)
+      (hbound.sliceOpPSD x)
 
 /-- Common pointwise Cauchy--Schwarz estimate for the scalar `G`-commutativity
 stability bounds.
@@ -105,13 +106,11 @@ lemma scalar_pointwise_cauchy_schwarz_bound
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
+    (zeta : Error)
     (family : IdxPolyFamily params ι)
     (G : Fq params → SubMeas (Polynomial params) ι)
     (hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (hbound_psd : ∀ x : Fq params, 0 ≤ family.witness x)
-    (hbound_dom :
-      ∀ x : Fq params, ∀ g : Polynomial params,
-        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (R : SubMeas (Polynomial params) ι)
     (x : Fq params)
     (hfirstR :
@@ -121,7 +120,7 @@ lemma scalar_pointwise_cauchy_schwarz_bound
           (leftTensor (ι₂ := ι) (R.outcome g * (1 - (G x).total)) *
             rightTensor (ι₁ := ι)
               (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g))|
-      ≤ Real.sqrt (IdxPolyFamily.storedResidual strategy family G x) := by
+      ≤ Real.sqrt (hbound.storedResidual G x) := by
   let T : MIPStarRE.Quantum.Op ι := (G x).total
   let W : Polynomial params → MIPStarRE.Quantum.Op ι :=
     IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x
@@ -202,7 +201,7 @@ lemma scalar_pointwise_cauchy_schwarz_bound
       _ ≤ 1 := hfirstR
   have hsecond :
       ∑ g : Polynomial params, ev strategy.state ((Y g)ᴴ * Y g) ≤
-        IdxPolyFamily.storedResidual strategy family G x := by
+        hbound.storedResidual G x := by
     have hsum_eq :
         ∑ g : Polynomial params,
             ev strategy.state
@@ -284,7 +283,7 @@ lemma scalar_pointwise_cauchy_schwarz_bound
                   leftTensor_mul_rightTensor_eq_opTensor]
                 exact opTensor_mono_right_of_nonneg
                   (MIPStarRE.Quantum.sandwich_nonneg (R.outcome_pos g) hTc_herm)
-                  (IdxPolyFamily.averagedPoint_le_witness family hbound_dom x g)
+                  (hbound.averagedPoint_le_witness x g)
       _ = ev strategy.state
             (leftTensor (ι₂ := ι) (((1 - T) * R.total * (1 - T))) *
               rightTensor (ι₁ := ι) (family.witness x)) := hsum_eq
@@ -304,8 +303,8 @@ lemma scalar_pointwise_cauchy_schwarz_bound
                       (1 - T) * 1 * (1 - T) = (1 - T) * (1 - T) := by simp
                       _ = 1 - T - T + T * T := by noncomm_ring
                       _ = 1 - T := by simp [hT_proj])
-              (hbound_psd x)
-      _ = IdxPolyFamily.storedResidual strategy family G x := by
+              (hbound.sliceOpPSD x)
+      _ = hbound.storedResidual G x := by
             rfl
   have hcs := MIPStarRE.LDT.Preliminaries.sum_ev_mul_le_sqrt strategy.state X Y
   have hXY :
@@ -340,13 +339,13 @@ lemma scalar_pointwise_cauchy_schwarz_bound
           rw [hXY g]
     _ ≤ Real.sqrt (∑ g : Polynomial params, ev strategy.state (X g * (X g)ᴴ)) *
           Real.sqrt (∑ g : Polynomial params, ev strategy.state ((Y g)ᴴ * Y g)) := hcs
-    _ ≤ Real.sqrt 1 * Real.sqrt (IdxPolyFamily.storedResidual strategy family G x) := by
+    _ ≤ Real.sqrt 1 * Real.sqrt (hbound.storedResidual G x) := by
           apply mul_le_mul
           · exact Real.sqrt_le_sqrt hfirst
           · exact Real.sqrt_le_sqrt hsecond
           · exact Real.sqrt_nonneg _
           · exact Real.sqrt_nonneg _
-    _ = Real.sqrt (IdxPolyFamily.storedResidual strategy family G x) := by simp
+    _ = Real.sqrt (hbound.storedResidual G x) := by simp
 end GCommStability.Scalar
 
 end MIPStarRE.LDT.Commutativity

@@ -33,15 +33,38 @@
 > `mainInduction` as the theorem with the paper statement.  The current repair
 > direction is to keep the paper theorem statements visible and to represent the
 > remaining analytic derivations by tracked `sorry` sites until they are proved.
+>
+> The same day, the orthonormalization-input cleanup removed the former
+> `SelfImprovement.HelperStrongSelfConsistencyInput`,
+> `SelfImprovement.OrthonormalizationInput`, `SelfImprovement.FinalFieldsInput`,
+> and `MakingMeasurementsProjective.OrthonormalizationInput` bundles.  It also
+> narrowed `SelfImprovement/Theorems/OrthonormalizationBridge.lean` to the
+> spectral-only module
+> `SelfImprovement/Theorems/OrthonormalizationSpectral.lean`.  Later mentions of
+> the removed input bundles or the old bridge module in this report should be
+> read only as historical diagnostics, not as live API guidance.
+>
+> The Section 5 projectivization cleanup also removed the former
+> `ProjectivizationRepairInput` and `LeftLiftedProjectivizationRepairInput`
+> abbreviations.  Mentions of those names below are historical descriptions of
+> the old formalization boundary; the current construction uses
+> `leftLiftedProjectivizationRepairProducer` directly.
 
 ---
 
 ## Executive Summary
 
-The `SelfImprovementObligations` record (the three Section 9 hypotheses) and
-its downstream wiring in `MainInductionStep` and `MainTheorem` are structurally
-sound. All individual lemmas in `SelfImprovement/` are proved conditional on
-their explicit hypotheses. The MainInductionStep bridge
+This executive summary is historical.  The
+`SelfImprovementObligations` record, its top-level conditional theorem, and the
+old downstream Section 3/6 wiring have been removed.  The current invariant is
+that paper-facing theorem statements retain the paper hypotheses, and missing
+Section 9 derivations appear as tracked proof gaps until they are proved.
+
+In the audited snapshot, the `SelfImprovementObligations` record (the three
+Section 9 hypotheses) and its downstream wiring in `MainInductionStep` and
+`MainTheorem` were structurally sound as conditional declarations.  All
+individual lemmas in `SelfImprovement/` were proved conditional on their
+explicit hypotheses. The MainInductionStep bridge
 (`SelfImprovementBridge/Core.lean`) wires SelfImprovement to Pasting correctly.
 As of 2026-05-08, this report identified the successor-case branch at
 `MainFormal.lean:611` as the remaining final-theorem `sorry` site.
@@ -62,7 +85,7 @@ conditional helpers.
 
 ## 1. SelfImprovementObligations Decomposition
 
-### 1.1 Definition
+### 1.1 Historical Definition
 
 **File:** `MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean:485-500`
 
@@ -73,8 +96,8 @@ structure SelfImprovementObligations (params) (strategy) (eps delta nu) where
   finalFields                : FinalFieldsInput params strategy eps delta nu
 ```
 
-Three `Prop`-valued fields record the remaining Section 9 unformalized
-hypotheses:
+This structure has been removed.  In the audited snapshot, three
+`Prop`-valued fields recorded the remaining Section 9 unformalized hypotheses:
 
 | Field | Type | Meaning | Paper Reference |
 |-------|------|---------|-----------------|
@@ -82,11 +105,19 @@ hypotheses:
 | `orthonormalization` | `∀ Hhat, BipartiteSSCRel ... → MakingMeasurementsProjective.OrthonormalizationInput ...` | Spectral-truncation + repair witnesses exist for `optionCompletion Hhat` | Section 9 orthonormalization |
 | `finalFields` | `∀ T Hhat H Z, ... → SelfImprovementFinalFields ...` | Completeness, point-consistency, self-closeness, projective-residual bound | Sections 9.2–9.4 |
 
-### 1.2 Sub-hypothesis types
+### 1.2 Historical Sub-hypothesis Types
 
-- **`HelperStrongSelfConsistencyInput`** (line 420-428): A `∀` wrapper over `SelfImprovementHelperConclusion` that asserts `BipartiteSSCRel` at the helper error level
-- **`OrthonormalizationInput`** (line 440-447): An `abbrev` converting `BipartiteSSCRel` on `Hhat` into `MakingMeasurementsProjective.OrthonormalizationInput` at helper error
-- **`FinalFieldsInput`** (line 455-470): A `∀` wrapper that, given `SelfImprovementHelperConclusion`, orthonormalization closeness, and data-processing closeness, produces `SelfImprovementFinalFields`
+- **`HelperStrongSelfConsistencyInput`** (line 420-428 in the audited
+  snapshot): a `∀` wrapper over `SelfImprovementHelperConclusion` asserting
+  `BipartiteSSCRel` at the helper error level.  This wrapper has been removed.
+- **`OrthonormalizationInput`** (line 440-447 in the audited snapshot): an
+  `abbrev` converting `BipartiteSSCRel` on `Hhat` into
+  `MakingMeasurementsProjective.OrthonormalizationInput` at helper error.  This
+  input bundle has been removed.
+- **`FinalFieldsInput`** (line 455-470 in the audited snapshot): a `∀` wrapper
+  that, given `SelfImprovementHelperConclusion`, orthonormalization closeness,
+  and data-processing closeness, produced `SelfImprovementFinalFields`.  This
+  wrapper has been removed.
 
 ---
 
@@ -102,9 +133,14 @@ hypotheses:
 | `selfImprovement` | current `SelfImprovementTop/Core.lean` | paper hypotheses `IsGood`, `G`, and input consistency | `SelfImprovementConclusion` (H, Z) | paper-facing statement with tracked proof gap |
 | Historical `selfImprovementFromObligations` | removed | `SelfImprovementObligations` + `IsGood` + `G` | `SelfImprovementConclusion` | removed by PR #1539 |
 
-### 2.2 Internal obligations for each bridge field
+### 2.2 Historical Internal Obligations for Each Bridge Field
 
-#### `helperStrongSelfConsistency` — PROVED (conditional)
+The following three subsections describe the old bridge-field decomposition.
+They should not be read as current API: the input wrappers named here have
+been removed, and the remaining derivations are now either direct construction
+theorems or tracked `sorry` sites on source-facing statements.
+
+#### `helperStrongSelfConsistency` — historical conditional route
 
 **File:** `MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperSSC.lean`
 
@@ -112,13 +148,19 @@ hypotheses:
 - **The actual derivation** (`helper_strong_self_consistency_obligations_of_selfConsistency_localVariance`, line 611): From a `BipartiteSSCRel` hypothesis on the helper output + local-variance/residual bounds → `HelperStrongSelfConsistencyObligations`
 - **End-to-end wrapper** (`ofBipartiteSSC_and_localVariance`, line 669): From `hssc : BipartiteSSCRel ...` + `hlocal` + `hresidual` → `HelperStrongSelfConsistencyInput`
 
-**Status:** The conditional lemma is proved. The unconditional gap is: the `BipartiteSSCRel` hypothesis itself must be discharged at each call site. This is exactly the helper-SSC step that Section 8 of the paper characterizes.
+**Historical status:** the conditional lemma was proved in the audited
+snapshot.  The wrapper has since been removed; the helper strong
+self-consistency conclusion is now stated directly from named scalar
+obligations, and any missing derivation remains a proof gap rather than an
+input bundle.
 
-#### `orthonormalization` — PARTIAL (spectral proved, repair unproven)
+#### `orthonormalization` — historical spectral/repair split
 
-**File:** `MIPStarRE/LDT/SelfImprovement/Theorems/OrthonormalizationBridge.lean`
+**Historical file:** `MIPStarRE/LDT/SelfImprovement/Theorems/OrthonormalizationBridge.lean`
 
-The `OrthonormalizationInput` is an `abbrev` that maps `BipartiteSSCRel` → `MakingMeasurementsProjective.OrthonormalizationInput`. The latter has two sub-fields:
+In the audited snapshot, `OrthonormalizationInput` was an `abbrev` that mapped
+`BipartiteSSCRel` to `MakingMeasurementsProjective.OrthonormalizationInput`.
+The latter had two sub-fields:
 
 1. **`spectral`** (`SpectralTruncationInput`): **PROVED** via `spectralTruncationInput_of_sourceAlmostProjective` in `ProjectiveNonMeasurement.lean:749`
 2. **`repair`** (`LeftLiftedProjectivizationRepairInput`): **HYPOTHESIS** — requires QXP-layer data (`QXPLayerData` with a projective `P` family rounding-close to the source submeasurement)
@@ -128,23 +170,35 @@ Bridge constructors:
 - `OrthonormalizationRepairObligation` (line 129-139): **HYPOTHESIS** — defined as a type `∀ Hhat, BipartiteSSCRel ... → LeftLiftedProjectivizationRepairInput ... (optionCompletion Hhat)`
 - `orthonormalizationInput_of_obligations` (line 684): Combines spectral + repair → full input
 
-**Status:** Spectral ✓, repair ✗. The repair gap is the QXP construction (Sections 5.8–5.10 of the paper). Tracked by #1032.
+**Current status:** the full input bundle and the old bridge module have been
+removed.  The retained file is
+`SelfImprovement/Theorems/OrthonormalizationSpectral.lean`, which records the
+proved spectral-truncation conversion.  The locality-preserving QXP repair
+construction from Sections 5.8-5.10 remains tracked by #1032 and should be
+proved directly, not supplied as a theorem hypothesis.
 
-#### `finalFields` — PROVED (conditional)
+#### `finalFields` — historical conditional route
 
 **File:** `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/FinalFields.lean`
 
 - **`final_fields_of_helper_outputs_of_total_expectation_le`** (line 44): Takes `SelfImprovementHelperConclusion`, helper completeness, helper SSC, point SSC, orthonormalization closeness, data-processing closeness, and right-total monotonicity → produces `SelfImprovementFinalFields`
-- This is a conditional lemma: all sub-hypotheses are available in the `selfImprovement` theorem's context (produced by helper SSC, orthonormalization, and data-processing steps)
-- The `FinalFieldsInput` `abbrev` wraps this conditional lemma into the `∀`-quantified form consumed by `selfImprovement`
+- In the audited snapshot this was used as a conditional lemma: all
+  sub-hypotheses were expected to be available in the `selfImprovement`
+  theorem's context.
+- The former `FinalFieldsInput` `abbrev` wrapped this conditional lemma into
+  the `∀`-quantified form consumed by `selfImprovement`; that wrapper has been
+  removed.
 
-**Status:** The conditional lemma is fully proved. The SDP-related hypotheses (helper completeness, right-total monotonicity) derive from the `selfImprovementHelper` output. This field is effectively discharged within the `selfImprovement` theorem's context.
+**Current status:** the useful final-fields lemma remains proof content, but
+there is no longer a `FinalFieldsInput` theorem hypothesis.  Any missing
+transport from the helper and orthonormalization outputs belongs inside the
+proof of `selfImprovement`.
 
 ---
 
 ## 3. Consumer Chain: MainInductionStep
 
-### 3.1 `SelfImprovementPackage.SliceObligations`
+### 3.1 `SelfImprovementData.SliceObligations`
 
 **File:** `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/Core.lean:242-279`
 
@@ -156,7 +210,7 @@ Per-slice bridge requiring:
 
 **Key design choice:** The `sliceStrategy`s are concrete `SymStrat params ι` (not `AnswerSymStrat`, not restricted). This means the slice strategies must be constructible from the restricted `AnswerSymStrat` — which is the gap tracked by #1375.
 
-### 3.2 `AnswerSelfImprovementPackage.SliceObligations`
+### 3.2 `AnswerSelfImprovementData.SliceObligations`
 
 **File:** `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/AnswerSlice.lean:32-69`
 
@@ -169,13 +223,13 @@ Same pattern but with `diagonalZeroCoord_eq` instead of `diagonalMeasurement_eq`
 | `SliceObligations.ofMeasurementEq` | Core.lean:411 | Concrete strategies + measurement transport + obligations | `SliceObligations` |
 | `SliceObligations.ofOrthonormalizationRepair` | Core.lean:456 | Above + separate `helperStrongSelfConsistency` + `OrthonormalizationRepairObligation` + `FinalFieldsInput` | `SliceObligations` (fills orthonormalization via `orthonormalizationInput_of_obligations`) |
 | `AnswerSliceObligations.ofMeasurementEq` | AnswerSlice.lean:… | Same pattern, answer-valued | Answer counterpart |
-| `SelfImprovementPackage.ofSliceObligations` | Core.lean:514 | `SliceObligations` | Full `SelfImprovementPackage` |
+| `SelfImprovementData.ofSliceObligations` | Core.lean:514 | `SliceObligations` | Full `SelfImprovementData` |
 
 ### 3.4 Downstream assembly
 
 **File:** `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean`
 
-- `mainInductionByRecursionOnM` (line 200): Takes `hselfObligation` (a function `PerSliceInductionPackage → SelfImprovementPackage`) as an internal proof-stage input, then assembles `AveragedPastingInput` → `mainInductionFromPackages`
+- `mainInductionByRecursionOnM` (line 200): Takes `hselfObligation` (a function `PerSliceInductionData → SelfImprovementData`) as an internal proof-stage input, then assembles `AveragedPastingData` → `mainInductionFromPackages`
 - Historical `mainInductionPublicWrapper`: removed in the 2026-05-13 PR #1539 update, so this proof-stage input is no longer exposed as a theorem adjacent to the source theorem.
 
 **Status:** The conditional assembly proof is still useful proof content, but the paper-facing theorem `mainInduction` now carries the successor proof gap directly.  The missing work is to derive the restricted-slice data, recursive witnesses, and self-improvement packages from the hypotheses of `thm:main-induction`, not to expose them as assumptions near the source theorem.
@@ -193,13 +247,13 @@ The older branch-residual route used the following proved wiring functions:
   self-improvement obligations to produce the branch residual
 - `answerSuccessorOfObligations` (line 582): Answer-valued counterpart
 - `answerSuccessorOfInductionPackageAndObligations` (line 628): takes a
-  `PerSliceInductionPackage` and the corresponding obligations to produce the
+  `PerSliceInductionData` and the corresponding obligations to produce the
   branch residual
-- `rolePackageResidual_ofAnswerSuccessorObligations` (line 602): wraps into
-  `Nonempty (MainFormalRolePackageResidual)`
+- `roleWitnessResidual_ofAnswerSuccessorObligations` (line 602): wraps into
+  `Nonempty (MainFormalRoleInductionWitness)`
 
 These functions have since been removed.  The current role-register route uses
-`MainFormalRolePackageResidual.ofMainInductionLargeK`, so the missing successor
+`MainFormalRoleInductionWitness.ofMainInductionLargeK`, so the missing successor
 construction is the `sorry` in the paper-facing Section 6 theorem
 `MainInductionStep.mainInduction`, not a separate obligation API in Section 3.
 
@@ -252,7 +306,7 @@ base-case completion obligation.
 | `selfImprovementHelper` (SDP + addInU) | Conditional on `sdp` witness | No change | No change | #1385 (SDP slackness), #1230 |
 | `helperStrongSelfConsistency` (helper SSC) | Conditional lemma proved | No change | No change | #1376 (per-slice obligation) |
 | `orthonormalization.spec` (spectral) | **PROVED** unconditionally | No change | No change | — |
-| `orthonormalization.repair` (QXP repair) | Hypothesis | New: `of_roleResidual` wraps it | No change | #1032 (QXP construction) |
+| `orthonormalization.repair` (QXP repair) | Hypothesis | New: `of_roleInductionWitness` wraps it | No change | #1032 (QXP construction) |
 | `finalFields` (completeness etc.) | Conditional lemma proved | No change | No change | #1376 (per-slice obligation) |
 | `SliceObligations` wiring | **PROVED** (constructors exist) | No change | No change | #1375 (concrete SymStrat) |
 | `MainFormal` successor case | **Historical, as of 2026-05-08:** `sorry` at line 611 | No change | New: replaced by `hanswerSlice*` hypotheses | #1376 + #1377 + #1035 |
@@ -299,9 +353,9 @@ These were the obligation constructors for the two historical proposed
 
 | Item | Status |
 |------|--------|
-| Remaining slackness-carrying helper route (`self_improvement_helper_with_slackness` and matrix-to-helper lemmas) | Orphan — tracked by #1230 and #1385, not blocking |
-| `MatrixAddInUTransferStatement` | Dead scaffolding — tracked by statement-smuggle reaudit |
-| `self_improvement_helper_with_slackness` variants | Orphan — tracked by #1385, not blocking |
+| Remaining slackness-carrying helper route (`self_improvement_helper_with_slackness`) | Internal SelfImprovement dependency; tracked by #1230 and #1385 |
+| Former `MatrixAddInUTransferStatement` | Removed; no live Lean declaration remains |
+| `self_improvement_helper_with_slackness` variants | Internal SelfImprovement route; not a public substitute for `selfImprovement` |
 | Internal SelfImprovement sub-lemmas (HelperCompleteness, PointConsistency, etc.) | All proved (conditional) |
 | Pasting theorem (`ldPasting`) | Fully proved, fully wired |
 | MainInductionStep assembly (`mainInductionByRecursionOnM`) | Proved only after the internal proof-stage inputs are supplied; the paper-facing theorem keeps the corresponding successor proof gap |
@@ -314,16 +368,19 @@ These were the obligation constructors for the two historical proposed
 
 | Declaration | File | Callers in MainTest | Verdict |
 |------------|------|---------------------|---------|
-| `self_improvement_helper_with_slackness` | `SelfImprovementTop/Core.lean:119` | None | Orphan — useful for SDP duality path (#1385) |
+| `self_improvement_helper_with_slackness` | `SelfImprovementTop/Core.lean:119` | `selfImprovementHelper` | Internal route resting on SDP slackness (#1230, #1385) |
 | Former full-conclusion residual-domination variants | `ResidualDomination.lean` | None | Removed by PR #1539; no longer a live theorem-level route |
-| Matrix-to-helper SDP lemmas | `SdpMatrixHelperBridge.lean` | None | Orphan — useful only if the SDP duality path is revived |
-| `MatrixAddInUTransferStatement` | `MatrixRealization.lean:148` | None (0 consumers) | **DEAD** — should be deleted or documented |
+| Matrix-to-helper SDP lemmas | `SdpMatrixHelperBridge.lean` | None | Removed orphan module; revive only as source-derived proof content if the SDP duality path is completed |
+| Former `MatrixAddInUTransferStatement` | `MatrixRealization.lean` | None | Removed; no live Lean declaration remains |
 
 ### 7.2 OrthonormalizationInputConstructors
 
 **File:** `SelfImprovement/Theorems/OrthonormalizationInputConstructors/`
 
-Imported by barrel `Theorems.lean` but **never by MainInductionStep or MainTheorem**. These are internal helper lemmas used within SelfImprovement's own submodules. Not orphan — they serve the internal pipeline.
+Formerly imported by the barrel `Theorems.lean` but never by MainInductionStep
+or MainTheorem.  The module has been removed; the remaining orthonormalization
+bridge layer stops at named source obligations rather than re-exporting unused
+constructors from those obligations to larger input packages.
 
 ---
 
@@ -383,9 +440,9 @@ hypotheses.
 3. **Close or retarget #1363 and #1369** as historical bridge-route issues if
    they no longer describe live Lean declarations.
 
-4. **Delete or justify `MatrixAddInUTransferStatement`** — the only dead
-   `*Statement` structure in this audit (no consumers or construction callers).
-   Either open a sub-issue under #1385 or delete.
+4. **Do not reintroduce `MatrixAddInUTransferStatement`** as a standalone
+   proof-debt structure.  If the add-in-\(u\) transfer is needed again, state it
+   as a source-derived theorem with a paper citation and a proof obligation.
 
 ### 10.2 Next proof cycle
 
@@ -416,8 +473,8 @@ hypotheses.
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/FinalFields.lean` | `finalFields` conditional obligation |
 | `MIPStarRE/LDT/MakingMeasurementsProjective/Statements.lean` | `MMProj.OrthonormalizationInput`, `SpectralTruncationInput`, `LeftLiftedProjectivizationRepairInput` |
 | `MIPStarRE/LDT/MakingMeasurementsProjective/SpectralTruncation/ProjectiveNonMeasurement.lean` | `spectralTruncationInput_of_sourceAlmostProjective` (PROVED) |
-| `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/Core.lean` | `SelfImprovementPackage.SliceObligations`, `ofSliceObligations`, `selfImprovementInInductionSection` |
-| `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/AnswerSlice.lean` | `AnswerSelfImprovementPackage.SliceObligations` |
+| `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/Core.lean` | `SelfImprovementData.SliceObligations`, `ofSliceObligations`, `selfImprovementInInductionSection` |
+| `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/AnswerSlice.lean` | `AnswerSelfImprovementData.SliceObligations` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` | `mainInduction`, `mainInductionBaseCase`, `mainInductionByRecursionOnM` |
 | `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | Historical note: as of 2026-05-08, `mainFormal` had one `sorry` at line 611, which #1374 proposed to close by adding hypotheses |
 | `MIPStarRE/LDT/Test/MainTheorem/RoleRegister.lean` | Role-register residual constructors routed through Section 6 `mainInduction` |

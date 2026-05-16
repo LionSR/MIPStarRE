@@ -3,8 +3,8 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
 /-!
 # Section 10 — match-mass monotonicity for projectivization
 
-This module contains the match-mass monotonicity interfaces used by the
-paper-tight line-169 route in the projectivization chain.  The statements
+This module contains the match-mass monotonicity assertions used by the
+line-169 route in the projectivization chain described in the paper.  The statements
 isolate the additional monotonicity data needed to avoid replacing exact
 consistency by a generic triangle-loss estimate.
 -/
@@ -21,18 +21,28 @@ open MIPStarRE.LDT.Preliminaries
 
 /-- Match-mass monotonicity invariant needed for the paper's line-169 replacement step.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, especially
+the projectivization transition from the pre-projective \(G\)-family to the
+completed projective \(Q\)-family.
+
+**Proof obligation:** This is the internal line-169 match-mass preservation
+assertion, tracked by #1596 and refined by the QXP preservation obligation
+#1610.  It is not a permissible extra hypothesis of a theorem cited as a paper
+statement.  Elimination: prove the preservation inequalities for the concrete
+orthonormalization and completion witnesses used in Step 6.
+
 The ordinary Step 6 handoff records only state-dependent-distance closeness
 `G_A ≈ Q_A` and `G_B ≈ Q_B`.  Combining those fields with
 `prop:triangle-sub` gives a `ζ₁ + sqrt ζ₂` consistency loss, as witnessed by
 `ProjectivizationSelfConsistencyHandoff.leftConsistency_with_triangleSub_loss` and
 `ProjectivizationSelfConsistencyHandoff.rightConsistency_with_triangleSub_loss`
-in `ProjectivizationChain.Handoff`.  The paper-tight line-169 estimate at
-exactly `ζ₁` therefore needs a stronger construction-level invariant: replacing
+in `ProjectivizationChain.Handoff`.  The line-169 estimate in the paper at
+exactly `ζ₁` therefore needs a stronger construction-level assertion: replacing
 `G_A` by `Q_A`, and symmetrically replacing `G_B` by `Q_B`, must not decrease
 the diagonal match mass against the opposite pre-projective measurement.
 
-This structure records that invariant in its primitive match-mass form, rather
-than restating the downstream `ConsRel` conclusion.  A future constructor can
+This structure records that assertion in its primitive match-mass form, rather
+than restating the downstream `ConsRel` conclusion.  A future theorem can
 produce this data from additional repair/completion facts;
 theorems in the namespace turn it into the exact line-169 consistency links. -/
 structure ProjectivizationMatchMassMonotonicity
@@ -189,16 +199,27 @@ end ProjectivizationMatchMassMonotonicity
 
 /-- Match-mass preservation input for the orthonormalization step.
 
+Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, where the
+orthonormalized submeasurements are completed and then used in the line-169
+consistency replacement.
+
+**Proof obligation:** This is the one-sided preservation assertion to be proved
+about the chosen orthonormalization witness, tracked by #1596 and #1610.  It is
+below the source theorem boundary; a paper-facing theorem must construct it,
+not assume it as an added hypothesis.
+
 Asserts that the projective submeasurement `P` produced by orthonormalization
 preserves at least as much bipartite correlation with a fixed partner
 measurement `B` as the original measurement `G` did.  This is a
-construction-level property of the specific orthonormalization used; it is NOT
-a consequence of `SDDRel` closeness alone.  This structure is a hypothesis
-container: it is itself unproved and must be supplied by the orthonormalization
-construction.  It is packaged here as a named `Prop` structure so that the
-`mainFormal` residual can receive it as a single field and the downstream
-`leftConsistency` / `rightConsistency` theorems can recover the exact paper
-line-169 `ζ₁` consistency links. -/
+construction-level property of the specific orthonormalization used; it is not
+a consequence of `SDDRel` closeness alone.
+
+This structure states the exact mathematical assertion required for the
+line-169 route described in the paper.  It should be constructed by a named
+orthonormalization theorem for the chosen witnesses, not added as a hypothesis
+to a theorem cited as a paper statement.  The downstream `leftConsistency` and
+`rightConsistency` theorems explain why this assertion is exactly the input
+needed to recover the paper's `ζ₁` line-169 consistency links. -/
 structure OrthonormalizationMatchMassPreservation
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -216,7 +237,7 @@ namespace OrthonormalizationMatchMassPreservation
 /-- Pointwise domination of the source measurement by the orthonormalized
 projective submeasurement implies match-mass preservation.
 
-This is the local algebraic interface needed by the paper-tight line-169 route:
+This is the local algebraic assertion needed by the line-169 route in the paper:
 once the concrete orthonormalization construction proves
 `G.outcome a ≤ P.outcome a` for every outcome `a`, the diagonal overlap against
 any fixed partner measurement `B` can only increase.
@@ -284,43 +305,6 @@ theorem of_outcome_expectation
   unfold qBipartiteMatchMass
   exact Finset.sum_le_sum fun a _ => hpreserve.outcomeExpectation a
 
-/-- The non-degenerate match-mass property needed from a concrete QXP repair.
-
-For a local QXP layer with canonical projective family
-`P_a = XHat† * T_a * XHat`, this asks that replacing the source measurement
-`G_a` by `P_a` does not reduce the diagonal expectation against the fixed
-partner measurement `B_a`, outcome by outcome.  This is an expectation-level
-property of the state and partner measurement; it is weaker than pointwise
-operator domination and is not implied by the existing SDD-closeness fields. -/
-structure QXPLayerOutcomeExpectationPreservation
-    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState (ι × ι))
-    (G B : Measurement Outcome ι) (data : QXPLayerData Outcome ι) : Prop where
-  /-- Outcome-level match-mass contribution preserved by the QXP family `P`. -/
-  outcomeExpectation :
-    ∀ a : Outcome,
-      ev ψ (opTensor (G.outcome a) (B.outcome a)) ≤
-        ev ψ (opTensor (Pa data a) (B.outcome a))
-
-/-- A QXP-layer outcome-expectation preservation witness supplies the
-orthonormalization match-mass input for the canonical `qxpProjSubMeas`.
-
-This is the current narrowed non-degenerate target for the exact line-169 route:
-constructing `data` and proving the per-outcome expectation inequalities for
-its paper projectors `P_a = XHat† T_a XHat` is sufficient to produce the
-`OrthonormalizationMatchMassPreservation` consumed by the Step-6 completion
-interface. -/
-theorem of_qxp_outcome_expectation
-    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    {ψ : QuantumState (ι × ι)} {G B : Measurement Outcome ι}
-    {data : QXPLayerData Outcome ι}
-    (hpreserve : QXPLayerOutcomeExpectationPreservation ψ G B data) :
-    OrthonormalizationMatchMassPreservation ψ G (qxpProjSubMeas data) B := by
-  exact of_outcome_expectation
-    ⟨fun a => by simpa [qxpProjSubMeas_outcome] using hpreserve.outcomeExpectation a⟩
-
 end OrthonormalizationMatchMassPreservation
 
 namespace ProjectivizationMatchMassMonotonicity
@@ -336,7 +320,7 @@ projective measurements `Q_A`, `Q_B` are the canonical completions of `P_A`,
 
 Together with `leftConsistency` and `rightConsistency`, this fills the
 `completionTransportMatchMassMonotonicity` field of
-`MainFormalCascadeProjectiveCompletionTransportResidual`. -/
+`MainFormalProjectiveCompletionTransportWitness`. -/
 theorem of_submeasurement_match_mass_and_completion
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]

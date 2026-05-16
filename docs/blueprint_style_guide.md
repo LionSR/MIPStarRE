@@ -56,11 +56,12 @@ They must not be added to a source-labelled theorem statement.  If such data is
 still unproved, the source-labelled Lean theorem should keep the source-shaped
 statement and carry a tracked `sorry`, or the missing assertion should appear
 as the lowest named internal obligation with a tracked `sorry`.  A separately
-named conditional helper is acceptable only as a temporary quarantine for
-substantial proof content that already exists; it needs a paper source, a
-tracking issue, and a removal plan.  The blueprint should leave the paper
-theorem unmarked as proof-complete until the source-faithful Lean statement has
-a source-faithful proof.
+named conditional helper should not be introduced as a repair pattern.  If one
+already contains substantial proof content, it may remain temporarily only as
+quarantine: it needs a paper source, a tracking issue, and a discharge or
+deletion plan.  The blueprint should leave the paper theorem unmarked as
+proof-complete until the source-faithful Lean statement has a source-faithful
+proof.
 
 If a Lean theorem proves only a restricted version of a source theorem, the
 blueprint entry carrying `\leanok` must state that restriction in the theorem

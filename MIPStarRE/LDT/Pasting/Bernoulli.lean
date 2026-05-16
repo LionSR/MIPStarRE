@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.Pasting.Bernoulli.TruncatedSums
 import MIPStarRE.LDT.Pasting.Bernoulli.Recurrence
+import MIPStarRE.LDT.Pasting.Bernoulli.ScalarBounds
 import MIPStarRE.LDT.Pasting.Bernoulli.Final
 
 /-!

@@ -3,6 +3,7 @@ import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
 import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
 import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
+import MIPStarRE.LDT.Pasting.Bernoulli.Final
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.Bracketed
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 import MIPStarRE.LDT.Test.MainTheorem
@@ -14,25 +15,30 @@ Regression checks for the issue-#408 replacement of the former ambient
 Polishchuk--Spielman axiom by the explicit hypothesis
 `PolishchukSpielmanClassicalSoundnessStatement`.
 
-The audit for
-`MakingMeasurementsProjective.orthonormalizationCompletionRoute` requires the
-standard Lean axioms only: the locality-preserving repair obligation in
-`MakingMeasurementsProjective/Producers.lean` has been discharged for the
-documented completion-route construction.  The source theorem
-`MakingMeasurementsProjective.orthonormalization` records the remaining issue
-#1032 proof obligation for the paper's sharper constant.
+The audits for
+`MakingMeasurementsProjective.orthonormalizationCompletionRoute` and
+`MakingMeasurementsProjective.orthonormalization` require the standard Lean
+axioms only: the locality-preserving repair obligation in
+`MakingMeasurementsProjective/Producers.lean` has been discharged for both the
+documented completion-route construction and the paper-facing
+`100\zeta^{1/4}` theorem.
 
-The audit for `SelfImprovement.selfImprovement` records the current open
-derivation for `thm:self-improvement`: the statement corresponding to the
-blueprint theorem is present, and the missing derivation from the incoming
-consistency hypothesis is tracked by issue #1515.
+The audit for `SelfImprovement.selfImprovement` now records only the transitive
+SDP slackness dependency from issue #1230: the source-facing theorem
+`thm:self-improvement` no longer carries a separate projective self-improvement
+proof gap.
 
-The audit for `Test.mainFormal` records the current tracked proof gap directly:
-the paper-facing statement has no bridge, residual, repair, package, or
-obligation hypotheses, and its proof is still admitted.  Issue #1043 tracks the
-base-case projective-completion construction, issues #1363 and #1369 track the
-successor projective-completion construction, and issue #1458 is the umbrella
-tracking issue.
+The audit for `Test.mainFormal` records the current tracked proof gap
+transitively: the paper-facing statement has no connection, residual, repair,
+data, or obligation hypotheses, and its proof is assembled from named
+construction targets.  Issue #1043 tracks the base-case projective-completion
+construction, issues #1363 and #1369 track the successor projective-completion
+construction, issue #1566 tracks the match-mass preservation obligations in the
+completion step, issue #1610 tracks the line-169 projectivization exactness
+sub-obligation documented in
+`docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`,
+issue #1507 tracks the Section 6 main-induction proof, and issue #1458 is the
+umbrella tracking issue.
 
 The audit for `GlobalVariance.globalVarianceOfPoints` now requires the standard
 Lean axioms only: the issue-#1456 six-step local transport estimate is supplied
@@ -48,6 +54,11 @@ obligation for `thm:main-induction`: the theorem statement matches the paper
 statement, and the remaining work is to derive the internal successor-stage
 inputs from the paper hypotheses.  This is tracked by issue #1507.
 
+The audit for `Pasting.ldPasting` records the current proof obligation for
+`thm:ld-pasting`: the theorem statement matches the unrestricted paper
+statement, and the remaining direct `sorry` is the degree-zero complementary
+branch tracked by issue #1622.
+
 The audit for `ExpansionHypercubeGraph.laplacianSpectralGapOrdered` now
 requires the standard Lean axioms only: the ordered-eigenvalue statement of
 `cor:laplacian-spectral-gap` is proved by connecting the Fourier
@@ -59,11 +70,13 @@ using one of the `assert_*_axioms` commands with `sorryAx` in its expected set
 has a named proof obligation still to be discharged; fulfilling one such
 obligation should not change the audit status of the others.
 
-The audit for `SelfImprovement.selfImprovementHelper` records the present
-state of issue #1514.  The Lean statement now has the input consistency
-hypothesis for the polynomial measurement `G` and the four conclusions stated
-in the paper; the remaining helper strong self-consistency estimate is admitted
-in the proof rather than assumed in the theorem statement.
+The audit for the helper strong self-consistency assembly now requires the
+standard Lean axioms only: the issue-#1514 local estimate is proved by the
+`HelperSSC` chain.  The audit for
+`SelfImprovement.selfImprovementHelper` still permits `sorryAx`, but that
+dependency is now transitive through `sdp_statement_with_slackness` and hence
+is tracked by issue #1230, not by an admitted helper strong self-consistency
+field.
 
 The audit for `SelfImprovement.sdp_statement_with_slackness` records the present
 state of issue #1230.  The theorem states the SDP strong-duality and
@@ -84,18 +97,20 @@ private def expectedStandardAxioms : Array Name :=
 private def expectedStandardAxiomsWithSorry : Array Name :=
   #[``propext, ``Classical.choice, ``Quot.sound, ``sorryAx].qsort Name.lt
 
-/-- Standard kernel axioms plus `sorryAx`; tracks the paper-facing `mainFormal`
-proof gap for issues #1043, #1363, #1369, and #1458. -/
+/-- Standard kernel axioms plus `sorryAx`; tracks the transitive
+`mainFormal` construction gaps for issues #1043, #1363, #1369, #1458, #1507,
+#1566, and #1610. -/
 private def expectedMainFormalAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
-/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1032 derivation
-needed for the paper constant in `thm:orthonormalization`. -/
+/-- Standard kernel axioms only: the issue-#1032 scalar discrepancy for
+`thm:orthonormalization` has been repaired without making the theorem depend on
+the still-unproved heterogeneous `orthonormalizationMainLemma`. -/
 private def expectedOrthonormalizationAxioms : Array Name :=
-  expectedStandardAxiomsWithSorry
+  expectedStandardAxioms
 
-/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1515 derivation
-needed for `selfImprovement`. -/
+/-- Standard kernel axioms plus `sorryAx`; tracks the transitive issue #1230 SDP
+slackness dependency used by `selfImprovement`. -/
 private def expectedSelfImprovementAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
@@ -109,13 +124,18 @@ needed for `mainInduction`. -/
 private def expectedMainInductionAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
+/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1622 degree-zero
+branch needed for unrestricted `ldPasting`. -/
+private def expectedLdPastingAxioms : Array Name :=
+  expectedStandardAxiomsWithSorry
+
 /-- Standard kernel axioms only: the issue #1497 derivation for
 `laplacianSpectralGapOrdered` has been discharged. -/
 private def expectedOrderedLaplacianGapAxioms : Array Name :=
   expectedStandardAxioms
 
-/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1514 derivation
-needed for `selfImprovementHelper`. -/
+/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1230 SDP
+slackness derivation used by `selfImprovementHelper`. -/
 private def expectedSelfImprovementHelperAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
@@ -153,6 +173,9 @@ elab "assert_induction_self_improvement_axioms " id:ident : command => do
 elab "assert_main_induction_axioms " id:ident : command => do
   assertUsesExactlyAxioms id.getId expectedMainInductionAxioms
 
+elab "assert_ld_pasting_axioms " id:ident : command => do
+  assertUsesExactlyAxioms id.getId expectedLdPastingAxioms
+
 elab "assert_ordered_laplacian_gap_axioms " id:ident : command => do
   assertUsesExactlyAxioms id.getId expectedOrderedLaplacianGapAxioms
 
@@ -175,7 +198,10 @@ assert_standard_axioms MIPStarRE.LDT.GlobalVariance.globalVarianceOfPoints
 assert_induction_self_improvement_axioms
   MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection
 assert_main_induction_axioms MIPStarRE.LDT.MainInductionStep.mainInduction
+assert_ld_pasting_axioms MIPStarRE.LDT.Pasting.ldPasting
 assert_ordered_laplacian_gap_axioms
   MIPStarRE.LDT.ExpansionHypercubeGraph.laplacianSpectralGapOrdered
+assert_standard_axioms
+  MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_of_helper_conclusion
 assert_self_improvement_helper_axioms MIPStarRE.LDT.SelfImprovement.selfImprovementHelper
 assert_sdp_slackness_axioms MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness

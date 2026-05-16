@@ -1,8 +1,7 @@
-# Issue 1485: Slice Boundedness Audit
+# Issue 1485: Slice Boundedness Input Audit
 
-This note records the source comparison for the boundedness assumptions formerly
-packaged in a helper structure and now stated explicitly in the paper-facing
-theorem headers.
+This note records the source comparison for the `SliceBoundednessInput` occurrences
+reported by `scripts/audit_paper_facing_proof_debt.py`.
 
 ## Source Statement
 
@@ -18,29 +17,36 @@ operator `Z^x`. These witnesses satisfy the averaged residual bound
 `E_x <psi| (I - G^x) tensor Z^x |psi> <= zeta` and the pointwise domination
 condition `Z^x >= E_u A^{u,x}_{g(u)}` for every low-degree polynomial `g`.
 
-Lean now states these assumptions explicitly in the paper-facing theorem
-headers. The auxiliary theorems
-`IdxPolyFamily.storedBoundedResidualBound` and
-`IdxPolyFamily.averagedPoint_le_witness` expose the residual and domination
-parts of the paper hypothesis.
+The Lean structure
+`MIPStarRE.LDT.IdxPolyFamily.SliceBoundednessInput` is precisely this
+boundedness datum: positivity of the witnesses, the averaged residual bound,
+and the domination target stated directly as the averaged point operator
+`E_u A^{u,x}_{g(u)}`. The auxiliary theorems
+`SliceBoundednessInput.storedBoundedResidualBound` and
+`SliceBoundednessInput.averagedPoint_le_witness` expose the two displayed parts
+of the paper hypothesis.
+
+After issue #1556, the public structure no longer contains the former
+`dominationTargetAgrees` identification field. That identification is not part
+of the paper statement and should not be exposed as a paper-facing hypothesis.
 
 ## Classification
 
-The following paper-facing declarations carry these boundedness assumptions.
-In each case they are classified as faithful boundary data, not as bridge proof
-debt.
+The following paper-facing declarations have a `SliceBoundednessInput`
+hypothesis. In each case the input is classified as faithful boundary data, not
+as bridge proof debt.
 
 - `Commutativity.commDataProcessedG`, linked from
   `lem:comm-data-processed-g`: `item:data-processed-boundedness`.
-- `IdxPolyFamily.storedBoundedResidualBound`, linked from
+- `SliceBoundednessInput.storedBoundedResidualBound`, linked from
   `clm:g-comm-stability`: `item:data-processed-boundedness`.
-- `IdxPolyFamily.averagedPoint_le_witness`, linked from
+- `SliceBoundednessInput.averagedPoint_le_witness`, linked from
   `clm:g-comm-stability`: `item:data-processed-boundedness`.
 - `Commutativity.gCommStability_scalar`, linked from
   `clm:g-comm-stability`: `item:data-processed-boundedness`.
-- `IdxPolyFamily.storedBoundedResidualBound`, linked from
+- `SliceBoundednessInput.storedBoundedResidualBound`, linked from
   `clm:g-comm-stability2`: `item:data-processed-boundedness`.
-- `IdxPolyFamily.averagedPoint_le_witness`, linked from
+- `SliceBoundednessInput.averagedPoint_le_witness`, linked from
   `clm:g-comm-stability2`: `item:data-processed-boundedness`.
 - `Commutativity.gCommStabilityTwo_scalar`, linked from
   `clm:g-comm-stability2`: `item:data-processed-boundedness`.
@@ -67,8 +73,8 @@ debt.
 
 ## Verdict
 
-These boundedness assumptions are not analogous to bridge, residual, repair,
-producer, or auxiliary-input assumptions introduced to bypass missing proof.
-They record hypotheses present in the cited source statements. The proof-debt
-audit therefore correctly records these occurrences as faithful boundary input
+`SliceBoundednessInput` is not analogous to bridge, residual, repair, producer,
+or auxiliary-input assumptions introduced to bypass missing proof. It records a
+hypothesis that is present in the cited source statements. The proof-debt audit
+therefore correctly records these occurrences as faithful boundary input
 findings and excludes them from proof-debt header findings.

@@ -53,9 +53,9 @@ data, slice restriction, slice-wise induction, self-improvement, and averaged
 pasting inputs rather than statement packages.
 
 The averaged pasting input is now named directly as
-`MainInductionStep.AveragedPastingInput`. The empty Section 6 pass-through
+`MainInductionStep.AveragedPastingData`. The empty Section 6 pass-through
 abbreviation `PastingBoundednessInput` was removed; its uses now refer directly
-to the explicit boundedness hypotheses in the Section 11/12 theorem headers.
+to `IdxPolyFamily.SliceBoundednessInput`.
 
 ### Finding 2: Cleaned Section 9 Prose
 
@@ -107,10 +107,10 @@ renaming would touch many downstream declarations. They should not receive
 empty pass-through abbreviations. Migrate them directly when the surrounding API
 is ready.
 
-- `MainInductionStep.SliceRestrictionPackage`
-- `MainInductionStep.PerSliceInductionPackage`
-- `MainInductionStep.SelfImprovementPackage`
-- `MainInductionStep.mainInductionPublicRestrictionPackage`
+- `MainInductionStep.SliceRestrictionData`
+- `MainInductionStep.PerSliceInductionData`
+- `MainInductionStep.SelfImprovementData`
+- `MainInductionStep.mainInductionPublicRestrictionData`
 - `MainInductionStep.mainInductionPublicWrapper`
 - `MakingMeasurementsProjective.SpectralTruncationStatement`
 - `MakingMeasurementsProjective.SpectralTruncationInput`
@@ -118,8 +118,8 @@ is ready.
 - `MakingMeasurementsProjective.LeftLiftedProjectivizationRepairInput`
 - `MakingMeasurementsProjective.ProjectivizationLine156Handoff`
 - `MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity`
-- `Test.MainFormalRoleMeasurementPackage`
-- `Test.MainFormalRolePackageResidual`
+- `Test.MainFormalRoleMeasurementWitness`
+- `Test.MainFormalRoleInductionWitness`
 - `Test.MainFormalRolePackageSuccessorResidual`
 - `Test.MainFormalRolePackageBranchResidual`
 - `Test.MainFormalCascadeRolePackagedCompletionLine169Residual`
@@ -127,7 +127,7 @@ is ready.
 - `Test.MainFormalPostRolePackageLeftCompletionLine169Residual`
 - `Test.MainFormalCascadeRolePackageResidualCompletionLine169Residual`
 - `Test.MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual`
-- `Test.UnsymmetrizationBridgePackage`
+- `Test.UnsymmetrizationConsistency`
 - `Test.StrategySymmetrizationPackage`
 
 The `Commutativity.Scaffold` namespace and file path also encode historical

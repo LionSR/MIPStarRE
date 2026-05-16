@@ -24,23 +24,23 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-! ## Operators and conclusions -/
 
-/-- A reduced SDP witness for the currently formalized self-improvement argument.
+/-- Lean-only reduced SDP data for the currently formalized fragment of the
+self-improvement argument.
+
+Paper-gap note: `docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`.
 
 The paper's `lem:sdp` eventually supplies strong duality, complementary
 slackness, and a concrete matrix-level optimal witness. The current Lean
 development only consumes the weaker facts recorded here: the primal witness is
-a full measurement (`T.total = 1`), the dual witness dominates the identity,
-and it dominates every averaged point operator. Positivity of the dual witness
-is derivable from dual feasibility and positivity of the averaged point
-operators. Despite the historical name, this reduced record does not assert
-SDP optimality. -/
+a full measurement (`T.total = 1`), and the dual witness dominates every
+averaged point operator. Positivity of the dual witness is derivable from dual
+feasibility and positivity of the averaged point operators. Despite the
+historical name, this reduced record does not assert SDP optimality. -/
 structure SdpOptimalPair (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (T : SubMeas (Polynomial params) ι) (Z : MIPStarRE.Quantum.Op ι) : Prop where
   primalTotalOperator :
     T.total = 1
-  dualDominatesIdentity :
-    (1 : MIPStarRE.Quantum.Op ι) ≤ Z
   dualFeasible :
     ∀ g : Polynomial params,
       0 ≤ sdpDualSlackOperator params strategy Z g
@@ -60,6 +60,10 @@ end SdpOptimalPair
 
 /-- SDP optimal-pair data strengthened by complementary slackness.
 
+Paper origin: `references/ldt-paper/self_improvement.tex:82-181`
+(`\label{lem:sdp}`); paper-gap note:
+`docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`.
+
 The reduced `SdpOptimalPair` interface above contains only the feasibility and
 normalization facts already produced by the current Lean theorem for `lem:sdp`.
 The paper's strong-duality argument also gives complementary slackness.  This
@@ -74,10 +78,16 @@ structure SdpOptimalPairWithSlackness (params : Parameters) [FieldModel params.q
     ∀ g : Polynomial params,
       sdpComplementarySlacknessEquation params strategy T Z g
 
-/-- Paper origin: `references/ldt-paper/self_improvement.tex:82-181`
+/-- Lean-only reduced fragment of `lem:sdp`.
+
+Paper origin: `references/ldt-paper/self_improvement.tex:82-181`
 (`\label{lem:sdp}`).
 
-Reduced conclusion for the currently formalized fragment of `lem:sdp`. -/
+This is not the source-facing SDP theorem: it records only the measurement-total
+and dual-feasibility part that is presently proved without the strong-duality
+and complementary-slackness argument.  The source-shaped target is
+`SdpStatementWithSlackness`; its proof is the deferred SDP strong-duality and
+complementary-slackness obligation tracked by #1230. -/
 structure SdpStatement (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) : Prop where
   witness :
@@ -143,8 +153,8 @@ theorem toSdpStatement {params : Parameters} [FieldModel params.q]
 measurement and dual witness.
 
 This is the abstract analogue of the matrix-level witness extractors: the
-existential SDP statement contains a complete primal measurement, a positive dual
-operator dominating the identity and every averaged point operator, and the
+existential SDP statement contains a complete primal measurement, a positive
+dual operator dominating every averaged point operator, and the
 complementary-slackness equations. -/
 theorem exists_measurement_witness {params : Parameters} [FieldModel params.q]
     {strategy : SymStrat params ι}
@@ -152,13 +162,11 @@ theorem exists_measurement_witness {params : Parameters} [FieldModel params.q]
     ∃ T : Measurement (Polynomial params) ι,
       ∃ Z : MIPStarRE.Quantum.Op ι,
         0 ≤ Z ∧
-        (1 : MIPStarRE.Quantum.Op ι) ≤ Z ∧
         (∀ g : Polynomial params, 0 ≤ sdpDualSlackOperator params strategy Z g) ∧
         ∀ g : Polynomial params,
           sdpComplementarySlacknessEquation params strategy T.toSubMeas Z g := by
   obtain ⟨Tsub, Z, hpair⟩ := h.witness
   exact ⟨hpair.primalMeasurement, Z, hpair.toSdpOptimalPair.dualPositive,
-    hpair.toSdpOptimalPair.dualDominatesIdentity,
     hpair.toSdpOptimalPair.dualFeasible, hpair.complementarySlackness⟩
 
 end SdpStatementWithSlackness
@@ -308,9 +316,9 @@ Reduced conclusion for the SDP and `addInU` stage of
 
 This structure intentionally records only the guarantees produced directly by
 the current `sdp` and `addInU` arguments: the SDP witness, the averaged
-construction of `H`, and the reduced `addInU` variance bound. Positivity,
-identity domination, and pointwise dual feasibility of `Z` are read from the
-bundled SDP witness rather than repeated as helper fields.
+construction of `H`, and the reduced `addInU` variance bound. Positivity and
+pointwise dual feasibility of `Z` are read from the bundled SDP witness rather
+than repeated as helper fields.
 
 The paper and blueprint state four additional helper-lemma guarantees
 (`completeness`, `pointConsistency`, strong self-consistency, and boundedness).
@@ -364,11 +372,18 @@ structure SelfImprovementHelperStatement (params : Parameters)
     helperBoundednessGap params strategy H Z ≤
       selfImprovementHelperError params eps delta
 
-/-- Helper conclusion strengthened by the SDP complementary-slackness equation.
+/-- Internal helper conclusion strengthened by the SDP complementary-slackness
+equation.
 
-This is the paper-facing successor to `SelfImprovementHelperConclusion` needed
-by the helper-completeness chain: it keeps all fields of the reduced helper
-conclusion and additionally records the strong-duality consequence
+Paper origin: `references/ldt-paper/self_improvement.tex:82-181`
+(`\label{lem:sdp}`) and `references/ldt-paper/self_improvement.tex:635-671`
+(`\label{thm:self-improvement}`); paper-gap note:
+`docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`.
+
+This is not an additional source-theorem hypothesis.  It is the internal
+helper-output record produced after the tracked SDP theorem
+`sdp_statement_with_slackness` supplies strong duality.  It keeps all fields of
+the reduced helper conclusion and additionally records the consequence
 `T_g Z = T_g A_g`. -/
 structure SelfImprovementHelperConclusionWithSlackness (params : Parameters)
     [FieldModel params.q]
@@ -385,24 +400,18 @@ structure SelfImprovementHelperConclusionWithSlackness (params : Parameters)
 /-- Paper origin: `references/ldt-paper/self_improvement.tex:635-671`
 (`\label{thm:self-improvement}`).
 
-Conclusion of `thm:self-improvement`. -/
+Conclusion of `thm:self-improvement`.
+
+The paper's boundedness output is the projective residual estimate
+`⟨ψ, Z ⊗ (I - H)⟩ ≤ ζ`, recorded here as `projectiveResidualBound`.  This
+structure is the conjunction of the paper's displayed conclusions for the
+already-quantified witnesses `H` and `Z`; it does not store an internal helper
+form or an SDP connection input. -/
 structure SelfImprovementConclusion (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (G : Measurement (Polynomial params) ι)
     (H : ProjSubMeas (Polynomial params) ι)
     (Z : MIPStarRE.Quantum.Op ι) (eps delta gamma nu : Error) : Prop where
-  witness :
-    ∃ T : Measurement (Polynomial params) ι,
-      ∃ Hhat : SubMeas (Polynomial params) ι,
-        SelfImprovementHelperConclusion params strategy T Hhat Z eps delta ∧
-        SDDRel strategy.state (uniformDistribution Unit)
-          (constSubMeasFamily Hhat.liftLeft)
-          (constSubMeasFamily H.toSubMeas.liftLeft)
-          (selfImprovementOrthogonalizationError params eps delta) ∧
-        SDDRel strategy.state (uniformDistribution (Point params))
-          ((polynomialEvaluationFamily params Hhat).liftLeft)
-          ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
-          (selfImprovementDataProcessingError params eps delta)
   completeness :
     CompletenessAtLeast strategy.state H.toSubMeas.liftLeft
       ((1 - nu) - selfImprovementError params eps delta)
@@ -426,21 +435,16 @@ structure SelfImprovementConclusion (params : Parameters) [FieldModel params.q]
   projectiveResidualBound :
     projectiveBoundednessGap params strategy H Z ≤
       selfImprovementError params eps delta
-  bounded :
-    BoundedByOperator strategy.state H.toSubMeas.liftLeft
-      (leftTensor (ι₂ := ι) Z)
-      (selfImprovementError params eps delta)
 
 /-- Final fields for the Section 9 transport stage.
 
 The final fields are the Section 9 outputs that remain after combining:
-`SelfImprovementHelper`, orthonormalization, data-processing, and
-`orthonormalization_with_total_le_of_residual_domination`.
+`SelfImprovementHelper`, orthonormalization, data-processing, and the
+monotone-total transport used in the projective-output step.
 
 This record contains completeness, point-consistency, self-closeness, and the
-projective-residual estimate. The boundedness term is not repeated here because
-it is recovered later from the strict SDP witness condition `1 ≤ Z` together
-with monotonicity of the boundedness field. -/
+projective-residual estimate. This projective residual is already the
+paper-facing boundedness quantity carried into `SelfImprovementConclusion`. -/
 structure SelfImprovementFinalFields (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (H : ProjSubMeas (Polynomial params) ι)
@@ -463,68 +467,5 @@ structure SelfImprovementFinalFields (params : Parameters) [FieldModel params.q]
   projectiveResidualBound :
     projectiveBoundednessGap params strategy H Z ≤
       selfImprovementError params eps delta
-
-/-- Paper origin: `references/ldt-paper/self_improvement.tex:679-690`.
-
-The helper-stage strong self-consistency assumption used in the reduced
-theorem chain. -/
-abbrev HelperStrongSelfConsistencyInput (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι) (eps delta : Error) : Prop :=
-  ∀ {T : Measurement (Polynomial params) ι}
-    {Hhat : SubMeas (Polynomial params) ι}
-    {Z : MIPStarRE.Quantum.Op ι},
-    SelfImprovementHelperConclusion params strategy T Hhat Z eps delta →
-      BipartiteSSCRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily Hhat)
-        (selfImprovementHelperError params eps delta)
-
-/-- Paper origin: `references/ldt-paper/self_improvement.tex:690-705`
-and `references/ldt-paper/orthonormalization.tex:67-76`
-(`\label{thm:orthonormalization}`).
-
-The orthonormalization proof obligation required by the reduced theorem chain.
-
-This is not a hypothesis of `thm:self-improvement`. It records the current
-missing proof obligation for the sharp Section 9 orthonormalization step: for
-each helper submeasurement `Hhat`, one must construct the spectral-truncation
-and locality-preserving repair data used by the Section 5 orthonormalization
-route at the paper's `100 * ζ^(1/4)` envelope. The unconditional
-completion-route theorem available for submeasurements has a wider envelope, so
-this obligation must be discharged by proving the sharper construction theorem
-or by reworking the error cascade, not by adding it to the paper theorem
-statement. -/
-abbrev OrthonormalizationInput (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι) (eps delta : Error) :=
-  ∀ {Hhat : SubMeas (Polynomial params) ι},
-    BipartiteSSCRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily Hhat)
-      (selfImprovementHelperError params eps delta) →
-    MakingMeasurementsProjective.OrthonormalizationInput strategy.state Hhat
-      (selfImprovementHelperError params eps delta)
-
-/-- Paper origin: `references/ldt-paper/self_improvement.tex:708-770`.
-
-The remaining Section 9 output fields still not produced directly by the
-reduced helper and orthonormalization theorems.
-
-The final `BoundedByOperator` conclusion is produced internally from the SDP
-witness bound `1 ≤ Z`, so this residual input now contains only completeness,
-point-consistency, self-closeness, and the projective-residual estimate. -/
-abbrev FinalFieldsInput (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι) (eps delta nu : Error) : Prop :=
-  ∀ {T : Measurement (Polynomial params) ι}
-    {Hhat : SubMeas (Polynomial params) ι}
-    {H : ProjSubMeas (Polynomial params) ι}
-    {Z : MIPStarRE.Quantum.Op ι},
-    SelfImprovementHelperConclusion params strategy T Hhat Z eps delta →
-      SDDRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily Hhat.liftLeft)
-        (constSubMeasFamily H.toSubMeas.liftLeft)
-        (selfImprovementOrthogonalizationError params eps delta) →
-      SDDRel strategy.state (uniformDistribution (Point params))
-        ((polynomialEvaluationFamily params Hhat).liftLeft)
-        ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
-        (selfImprovementDataProcessingError params eps delta) →
-      SelfImprovementFinalFields params strategy H Z eps delta nu
 
 end MIPStarRE.LDT.SelfImprovement

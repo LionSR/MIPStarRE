@@ -45,6 +45,56 @@ theorem hasLowIndividualDegree {params : Parameters} [FieldModel params.q]
   funext u
   rfl
 
+/-- The constant polynomial with value `a`. -/
+noncomputable def const (params : Parameters) [FieldModel params.q] (a : Fq params) :
+    Polynomial params where
+  poly := MvPolynomial.C (decodeScalar a)
+  lowIndividualDegree := by
+    intro i
+    simp [MvPolynomial.degreeOf_C]
+
+/-- The constant polynomial evaluates to its prescribed value. -/
+@[simp] theorem const_apply (params : Parameters) [FieldModel params.q]
+    (a : Fq params) (u : Point params) :
+    const params a u = a := by
+  simp [const, Polynomial.toFun, evalPolynomialModel]
+
+/-- The total degree of a low-individual-degree polynomial is bounded by
+`m * d`. -/
+theorem totalDegree_le_mul_degree (params : Parameters) [FieldModel params.q]
+    (g : Polynomial params) :
+    g.poly.totalDegree ≤ params.m * params.d := by
+  rw [MvPolynomial.totalDegree]
+  refine Finset.sup_le ?_
+  intro s hs
+  calc
+    s.sum (fun _ e => e) = ∑ i : Fin params.m, s i := by
+      rw [Finsupp.sum_fintype]
+      intro i
+      rfl
+    _ ≤ ∑ _i : Fin params.m, params.d := by
+      refine Finset.sum_le_sum ?_
+      intro i _
+      exact (MvPolynomial.degreeOf_le_iff.mp (g.lowIndividualDegree i)) s hs
+    _ = params.m * params.d := by
+      simp [Fintype.card_fin]
+
+/-- A low-individual-degree polynomial with degree bound `0` is constant. -/
+theorem eq_C_coeff_zero_of_degree_zero (params : Parameters) [FieldModel params.q]
+    (g : Polynomial params) (hd : params.d = 0) :
+    g.poly = MvPolynomial.C (g.poly.coeff 0) := by
+  exact MvPolynomial.totalDegree_eq_zero_iff_eq_C.mp
+    (Nat.eq_zero_of_le_zero ((totalDegree_le_mul_degree params g).trans (by simp [hd])))
+
+/-- A low-individual-degree polynomial with degree bound `0` has the same value
+at every two points. -/
+theorem apply_eq_apply_of_degree_zero (params : Parameters) [FieldModel params.q]
+    (g : Polynomial params) (hd : params.d = 0) (u v : Point params) :
+    g u = g v := by
+  unfold Polynomial.toFun evalPolynomialModel
+  rw [eq_C_coeff_zero_of_degree_zero params g hd]
+  simp
+
 /-- Extend a global polynomial to the slice at height `x` by ignoring the new variable. -/
 noncomputable def appendAtHeight (params : Parameters) [FieldModel params.q]
     (g : Polynomial params) (_x : Fq params) : Polynomial params.next where
@@ -67,6 +117,25 @@ noncomputable def appendAtHeight (params : Parameters) [FieldModel params.q]
         exact le_antisymm (Nat.le_of_lt_succ hlt) hle
       rw [hi_last, degreeOf_rename_embedCoord_lastCoord]
       omega
+
+/-- Evaluating an old polynomial after appending a new coordinate ignores the
+appended coordinate. -/
+@[simp] theorem appendAtHeight_apply_appendPoint
+    (params : Parameters) [FieldModel params.q]
+    (g : Polynomial params) (x : Fq params) (u : Point params) (y : Fq params) :
+    appendAtHeight params g x (appendPoint params u y) = g u := by
+  change encodeScalar
+      (MvPolynomial.eval (decodePoint (appendPoint params u y))
+        (MvPolynomial.rename (embedCoord params) g.poly)) =
+    encodeScalar (MvPolynomial.eval (decodePoint u) g.poly)
+  rw [MvPolynomial.eval_rename]
+  have hcoords :
+      decodePoint (appendPoint params u y) ∘ embedCoord params = decodePoint u := by
+    funext i
+    simp [decodePoint, appendPoint, embedCoord]
+    rfl
+  rw [hcoords]
+  rfl
 
 /-- Coordinate map for restricting a polynomial in `m+1` variables to the slice `X_m = x`. -/
 noncomputable def restrictAtHeightCoordinateMap (params : Parameters) [FieldModel params.q]

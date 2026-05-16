@@ -67,16 +67,16 @@ in the successor branch of `mainFormal`.
 Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
 (`\label{lem:restricted-probabilities}`), used in the recursive slice step
 `references/ldt-paper/inductive_step.tex:441-454`. -/
-noncomputable def mainFormalSuccessorRestrictionPackage
+noncomputable def mainFormalSuccessorRestrictionData
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (haxisWeightedBound : MainFormalSuccessorAxisWeightedBound params strategy eps)
     (hdiagonalWeightedBound : MainFormalSuccessorDiagonalWeightedBound params strategy eps) :
-    MainInductionStep.SliceRestrictionPackage params
+    MainInductionStep.SliceRestrictionData params
       strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps) :=
-  MainInductionStep.mainInductionPublicRestrictionPackage
+  MainInductionStep.mainInductionPublicRestrictionData
     params strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps)
     (SameSpaceProjStrat.strategySymmetrization_isGood_three_mul
       (strategy := strategy) (eps := eps) hpass)
@@ -92,7 +92,7 @@ def MainFormalSuccessorRecursiveSlices (params : Parameters)
     (hdiagonalWeightedBound :
       MainFormalSuccessorDiagonalWeightedBound params strategy eps) : Prop :=
   let hrestrict :=
-    mainFormalSuccessorRestrictionPackage params strategy eps hpass
+    mainFormalSuccessorRestrictionData params strategy eps hpass
       haxisWeightedBound hdiagonalWeightedBound
   ∀ x,
     ∃ error : Error, ∃ G : Measurement (Polynomial params) (Role × ι),
@@ -113,9 +113,9 @@ def MainFormalSuccessorRecursiveSlices (params : Parameters)
 slice witnesses used in the successor analysis.
 
 This constructor is only a translation: the proof must still provide the
-`PerSliceInductionPackage` from a genuine predecessor induction hypothesis. It
+`PerSliceInductionData` from a genuine predecessor induction hypothesis. It
 does not invoke the public `mainFormal` theorem. -/
-theorem mainFormalSuccessorRecursiveSlices_ofInductionPackage
+theorem mainFormalSuccessorRecursiveSlices_ofInductionData
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params.next ι) (eps : Error)
@@ -124,9 +124,9 @@ theorem mainFormalSuccessorRecursiveSlices_ofInductionPackage
     (hdiagonalWeightedBound :
       MainFormalSuccessorDiagonalWeightedBound params strategy eps)
     (hinduction :
-      MainInductionStep.PerSliceInductionPackage params
+      MainInductionStep.PerSliceInductionData params
         strategy.strategySymmetrization (3 * eps) (3 * eps) (3 * eps)
-        (mainFormalSuccessorRestrictionPackage params strategy eps hpass
+        (mainFormalSuccessorRestrictionData params strategy eps hpass
           haxisWeightedBound hdiagonalWeightedBound)
         k) :
     MainFormalSuccessorRecursiveSlices params strategy eps hpass k

@@ -3,8 +3,7 @@
 
 % ORPHAN: standalone background theorem; the current downstream blueprint proofs do not call the Naimark dilation node.
 \begin{theorem}[Naimark dilation]\label{thm:naimark}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimark}
-	% The current Lean declaration records questionwise local dilations, not the full tensor-product correlation statement, so no formalization marker is claimed.
+	% The current Lean declaration records questionwise local dilations, not the full tensor-product correlation statement, so this source theorem has no Lean declaration attached.
 	% Unproved — tracked by issue #103 (Ch4 orthonormalization).
 	\uses{def:submeasurement}
 	Let $\ket{\psi}$ be a state in $\mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$.
@@ -56,17 +55,33 @@
 	\]
 \end{proof}
 
+\begin{remark}[Lean questionwise Naimark interface]\label{rem:lean-questionwise-naimark}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseNaimark, MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkStatement}
+	\uses{lem:naimark-helper}
+	Lean currently proves the questionwise one-measurement interface obtained
+	from Lemma~\ref{lem:naimark-helper}.  For every indexed family \(A^x\) and
+	\(B^y\), it produces local dilation data for each question and proves the
+	corresponding single-outcome marginal-preservation identities.  This is the
+	interface used downstream in the formal development.  It is not the full
+	tensor-product correlation statement of Theorem~\ref{thm:naimark}, whose
+	simultaneous bipartite assembly remains recorded in
+	\texttt{docs/paper-gaps/naimark.tex}.
+\end{remark}
+
 \begin{theorem}[Orthogonalization lemma]\label{thm:orthonormalization}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
 	\leanok
+	% The theorem now proves the paper constant and is axiom-clean.  Issue #1032
+	% still tracks the heterogeneous proof of
+	% Lemma~\ref{lem:orthonormalization-main-lemma}, which is a separate
+	% auxiliary lemma and is not used as a proof dependency here.
 	% In Lean, normalization is an explicit hypothesis because the ambient state
 	% record contains positive semidefinite density matrices of arbitrary
 	% normalized trace; this matches the paper's convention that a state is
 	% normalized.
-	% The paper states the constant $100\zeta^{1/4}$.  Lean keeps this
-	% statement under the source theorem name; its proof is the tracked
-	% issue-#1032 gap.  The proved completion-route variant with the weaker
-	% $120\zeta^{1/4}$ bound is recorded separately as
+	% The paper states the constant $100\zeta^{1/4}$, and Lean now proves
+	% this source theorem directly.  The completion-route variant with the
+	% weaker $120\zeta^{1/4}$ bound is recorded separately as
 	% `orthonormalizationCompletionRoute`.
 	\uses{def:strong-self-consistency, def:approx_delta}
 	Let $\ket{\psi}$ be a permutation-invariant state,
@@ -85,7 +100,6 @@
 \begin{remark}[Lean auxiliary declarations: residual domination]\label{rem:lean-residual-domination-declarations}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas, MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationInputWithResidualDomination, MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization_with_total_le_of_residual_domination}
 	The following are Lean auxiliary declarations, not hypotheses in
 	Theorem~\ref{thm:orthonormalization}.
 	Let \(A=\{A_a\}_{a\in\mathcal A}\) be a sub-measurement, and complete it to
@@ -108,12 +122,8 @@
 	\]
 	This isolates the order-theoretic invariant needed to pass from the
 	option-completed orthonormalization output to the monotone-total route used in
-	the self-improvement theorem.  The formal development also records the
-	corresponding strengthened orthonormalization statement: if the repair
-	hypothesis for the option-completed measurement carries this
-	residual-domination invariant,
-	then the orthonormalized restriction satisfies both the usual
-	state-dependent-distance conclusion and the displayed total comparisons.
+	the self-improvement theorem.  The invariant is recorded as a separate
+	order-theoretic fact; it is not added as an orthonormalization hypothesis.
 \end{remark}
 
 \begin{remark}[Lean right-register completion helpers]\label{rem:lean-right-register-completion-helpers}
@@ -140,7 +150,6 @@
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_submeasurement_match_mass_and_completion}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation.of_outcome_le, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_completion_and_outcome_le}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation.OutcomeExpectationPreservation, MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation.of_outcome_expectation}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation.QXPLayerOutcomeExpectationPreservation, MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation.of_qxp_outcome_expectation}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_of_completion_and_sdd, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_of_completion_and_sdd}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_with_orthonormalization_loss, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_with_orthonormalization_loss}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.leftConsistency, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.rightConsistency}
@@ -194,9 +203,10 @@
 	projective submeasurement.  The expectation-level constructors refine the
 	non-degenerate residual without requiring operator domination: it is enough to
 	prove, for each outcome, that the diagonal match-mass contribution against the
-	fixed partner measurement is preserved.  The QXP-specialized constructor records
-	the same requirement for the canonical projectors
-	\(P_a=\widehat X^\dagger T_a\widehat X\) produced by the rank-reduction repair.
+	fixed partner measurement is preserved.  The former QXP-specialized target has
+	been removed, because the present Section~5 API supplies state-dependent
+	distance estimates and QXP algebra, but not a signed monotonicity statement
+	against an arbitrary partner measurement.
 \end{remark}
 
 \subsection{Naimark dilation}\label{sec:naimark}
@@ -273,6 +283,7 @@
 \subsection{Orthogonalization lemma}\label{sec:orthogonalization}
 
 \begin{lemma}[Orthogonalization lemma for measurements]\label{lem:orthonormalization-main-lemma}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}
 	\uses{def:simeq, def:approx_delta}
 	Let $\ket{\psi}$ be a state, and let $A = \{A_a\}$ and $B = \{B_a\}$ be measurements such that
 	\[
@@ -285,25 +296,45 @@
 	\]
 \end{lemma}
 
+\begin{lemma}[Formalized orthogonalization envelope for measurements]\label{lem:orthonormalization-main-lemma-formalized-envelope}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair}
+	\leanok
+	\uses{lem:orthonormalization-main-lemma, lem:left-lifted-projectivization-repair, def:simeq, def:approx_delta}
+	The formalized measurement-level version of Lemma~\ref{lem:orthonormalization-main-lemma}
+	is the same-space specialization of the paper lemma, with the corrected public
+	orthonormalization envelope \(100\zeta^{1/4}\).  Thus, if \(A=\{A_a\}\) and
+	\(B=\{B_a\}\) are measurements on the same finite-dimensional space satisfying
+	\[
+		A_a \ot I \simeq_\zeta I \ot B_a
+	\]
+	on a normalized bipartite state \(\ket{\psi}\), then there exists a projective
+	sub-measurement \(P=\{P_a\}\) such that
+	\[
+		A_a \ot I \approx_{100\zeta^{1/4}} P_a \ot I .
+	\]
+	This is the corrected Lean theorem proved from the Section~5
+	projectivization repair construction; it is not a replacement for the
+	sharper source statement \(84\zeta^{1/4}\) in
+	Lemma~\ref{lem:orthonormalization-main-lemma}.
+\end{lemma}
+
 \begin{remark}[Lean auxiliary declarations for the orthogonalization lemma]\label{rem:lean-orthonormalization-main-declarations}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma_local}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement}
-	\uses{lem:orthonormalization-main-lemma, lem:left-lifted-projectivization-repair}
-	The current Lean declarations for Lemma~\ref{lem:orthonormalization-main-lemma}
-	are conditional.  They assume explicit spectral-truncation and repair
-	hypotheses for the $Q/X/\widehat X/P$ part of the paper proof.  The declaration
-	\texttt{orthonormalizationMainLemma} uses the general repair hypothesis on the
-	product space, whereas \texttt{orthonormalizationMainLemma\_local} and
-	\texttt{orthonormalizationMeasurement} use the locality-preserving repair
-	hypothesis, requiring the repaired family to have the form $P_a\otimes I$.
-	These hypotheses are not present in the paper lemma and must be proved from
-	its assumptions.  Consequently these conditional declarations do not yet
-	prove the paper lemma.
+	\uses{lem:orthonormalization-main-lemma, lem:orthonormalization-main-lemma-formalized-envelope, lem:left-lifted-projectivization-repair}
+	The Lean declaration
+	\texttt{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}
+	now states Lemma~\ref{lem:orthonormalization-main-lemma} without adding
+	spectral-truncation or repair hypotheses.  Those construction steps belong to
+	the proof of the lemma, not to its assumptions.  The current Lean proof is
+	therefore recorded as a tracked proof gap.  The separate
+	Lemma~\ref{lem:orthonormalization-main-lemma-formalized-envelope} records the
+	already proved measurement-level statement with the corrected
+	\(100\zeta^{1/4}\) envelope.  Internal conditional lemmas may still record
+	the already-formalized descent from explicit construction data to the local
+	conclusion, but they are not advertised as formalizations of the paper lemma.
 \end{remark}
 
 \begin{lemma}[Locality-preserving projectivization repair]\label{lem:left-lifted-projectivization-repair}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepair}
 	\uses{lem:projective-non-measurement, def:approx_delta}
 	\leanok
 	Paper origin: \texttt{references/ldt-paper/orthonormalization.tex} lines 534--860 (rank reduction and the $Q$-side setup, including \ref{lem:xa-t} and \ref{lem:qa-restated}) and 862--1194 (the $X/\widehat X/P$ algebra: \ref{lem:X-squared}, \ref{lem:X-hat-squared}, \ref{lem:X-times-X-hat}, \ref{lem:squared-difference}, \ref{lem:P-projectivity}, \ref{lem:P-Q-approx}, plus the final triangle-inequality calculation producing the $84\zeta^{1/4}$ bound). Together these are the late repair stage of the orthogonalization-lemma proof.
@@ -340,6 +371,18 @@
 	$\approx_{84\zeta^{1/4}}$ estimate back to left lifts via the left-marginal
 	expectation formula.
 \end{proof}
+
+	\begin{remark}[Lean implementation name for projectivization repair]\label{rem:lean-left-lifted-projectivization-repair-producer}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer}
+		The declaration \texttt{leftLiftedProjectivizationRepair} is the
+		paper-labelled name for
+	Lemma~\ref{lem:left-lifted-projectivization-repair}.  The older declaration
+	\texttt{leftLiftedProjectivizationRepairProducer} has the same public
+	mathematical statement and is retained for compatibility with existing
+	Section~5 declarations.  The word ``producer'' here refers to the construction
+	theorem that produces the projective submeasurement; it is not a hypothesis
+	added to the paper lemma.
+\end{remark}
 
 \begin{remark}[Lean conditional declaration: local orthogonalization]\label{rem:conditional-orthonormalization-main-lemma-local}
 	\uses{def:strong-self-consistency, def:approx_delta, lem:orthonormalization-main-lemma}
@@ -394,9 +437,9 @@
 	\leanok
 	\uses{prop:other-two-notions-of-self-consistency, lem:left-lifted-projectivization-repair}
 
-	The paper theorem \ref{thm:orthonormalization} remains stated in Lean with the
-	\(100\zeta^{1/4}\) constant and a tracked proof gap.  The declaration checked
-	here is the completion-route theorem with the weaker bound
+	The paper theorem \ref{thm:orthonormalization} is proved in Lean with the
+	\(100\zeta^{1/4}\) constant.  The declaration checked here is the
+	completion-route theorem with the weaker bound
 	\(120\zeta^{1/4}\), recorded in
 	\texttt{orthonormalizationCompletionRouteError}.  See
 	\texttt{docs/paper-gaps/issue-1032-orthonormalization-constant.tex}.
@@ -494,15 +537,7 @@
 
 	\begin{lemma}[Rounding to projectors]\label{lem:projective-non-measurement}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_sourceAlmostProjective}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_sourceAlmostProjective_zero}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_sourceAlmostProjective_large}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_sourceAlmostProjective_full}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_almostProjMeasStatement}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_almostProjMeasStatement_full}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncationStatement.toRoundingToProjectorsWitness}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.spectralTruncationInput_of_projectiveNonMeasurement}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.spectralTruncationInput_of_sourceAlmostProjective}
 		\leanok
 		There exists a set of projective matrices $\{R_a\}$ such that
 		\begin{equation*}
@@ -554,6 +589,26 @@
 		\]
 		where the last estimate uses $\delta \leq 1/2$. Setting $\delta=\sqrt{\zeta}$ gives the claim, and \ref{eq:assumption-on-zeta} ensures $\delta \leq 1/2$.
 	\end{proof}
+
+	\begin{remark}[Lean auxiliary declarations for rounding to projectors]\label{rem:lean-projective-non-measurement-auxiliary}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_sourceAlmostProjective}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_sourceAlmostProjective_zero}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_sourceAlmostProjective_large}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_almostProjMeasStatement}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_almostProjMeasStatement_full}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncationStatement.toRoundingToProjectorsWitness}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.spectralTruncationInput_of_projectiveNonMeasurement}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.spectralTruncationInput_of_sourceAlmostProjective}
+		The source-facing Lean declarations for
+		Lemma~\ref{lem:projective-non-measurement} are the proposition
+		\texttt{projectiveNonMeasurement} and the construction theorem
+		\texttt{projectiveNonMeasurement\_of\_sourceAlmostProjective\_full}.
+		The declarations listed here are the endpoint and regime splits, the
+		\texttt{AlmostProjMeasStatement} witness forms, and the spectral-truncation
+		input conversions used by later Section~5 arguments.  They are not additional
+		hypotheses in the paper statement of
+		Lemma~\ref{lem:projective-non-measurement}.
+	\end{remark}
 
 	\begin{lemma}[Combinatorial averaging for the $r > d$ branch]\label{lem:small-overlap-averaging}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.Truncation.exists_large_subset_ordered}
@@ -946,7 +1001,6 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_image_rows_mixed_eq_sqrt}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.matrix_image_eq_zero_of_nonpositive_gram_eigenvalue}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.adjoint_image_eq_zero_of_orthogonal_positive_gram_images}
-		\leanok
 		\begin{equation*}
 			X^\dagger \cdot X = Q.
 		\end{equation*}
@@ -1065,7 +1119,6 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangePositiveGram}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_sigmaFin_xHat_coisometry_of_sum_le}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinXHatCoisometry_spec}
-		\leanok
 		\begin{equation*}
 			\widehat{X} \cdot \widehat{X}^\dagger = I_{m \times m}.
 		\end{equation*}
@@ -1109,7 +1162,6 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndRectangularSvdSquareRoot}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvdSquareRoot}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot}
-		\leanok
 		\begin{equation*}
 			X^\dagger \cdot \widehat{X} = \sqrt{Q}.
 		\end{equation*}
@@ -1128,6 +1180,18 @@
 		\ref{lem:squared-difference} and \ref{lem:P-Q-approx}.  The companion paper
 		identity for $X\widehat X^\dagger$ is not used downstream.
 	\end{proof}
+
+	\begin{remark}[Lean status for the QXP algebra]\label{rem:qxp-layer-lean-status}
+		The Lean declarations linked in Lemmas~\ref{lem:X-squared},
+		\ref{lem:X-hat-squared}, and~\ref{lem:X-times-X-hat} record useful parts of
+		the paper's \(X,\widehat X,P\) algebra.  The small lemmas named after these
+		paper labels are projections from the structure \texttt{QXPLayerData};
+		the accompanying construction lemmas build such data from sigma-range and
+		rectangular-SVD ingredients.  The blueprint therefore does not mark these
+		three entries as source-complete formalizations until the cited identities
+		are exposed as source-faithful construction theorems rather than hidden as
+		fields of the data package.
+	\end{remark}
 
 	\begin{lemma}[Squared difference]\label{lem:squared-difference}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.squaredDifference}
@@ -1183,12 +1247,10 @@
 
 	\begin{lemma}[$P$ is close to~$Q$]\label{lem:P-Q-approx}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox}
-		\leanok
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndSvdIdentities}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangePositiveGram}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangePositiveGram_with_x_coisometry}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot}
-		\leanok
 		\begin{equation*}
 			Q_a \ot I \approx_{30\zeta^{1/4}} P_a \ot I.
 		\end{equation*}
@@ -1204,7 +1266,9 @@
 		\(X X^\dagger=I\) for the original sigma embedding when the projective
 		\(Q\)-family is subnormalized; this is the construction-level hypothesis
 		later used in the residual-domination argument for the fresh completed
-		outcome.
+		outcome.  As in Remark~\ref{rem:qxp-layer-lean-status}, the statement is
+		left without a source-complete formalization marker while the QXP package
+		still hides some of the displayed SVD identities as structure fields.
 		The quantity to bound is
 		\begin{equation}\label{eq:P-Q-thing-to-bound}
 			\sum_a \bra{\psi} (Q_a-P_a)^2 \ot I \ket{\psi}

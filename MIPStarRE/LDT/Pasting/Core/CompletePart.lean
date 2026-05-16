@@ -165,7 +165,8 @@ lemma qSDD_completePart_le_slice
               have hLherm : (leftTensor (ι₂ := ι) T)ᴴ = leftTensor (ι₂ := ι) T := by
                 exact
                   (Matrix.nonneg_iff_posSemidef.mp
-                    (leftTensor_nonneg (ι₂ := ι) (SubMeas.total_nonneg P.toSubMeas))).isHermitian.eq
+                    (leftTensor_nonneg (ι₂ := ι)
+                      (SubMeas.total_nonneg P.toSubMeas))).isHermitian.eq
               have hRherm : (rightTensor (ι₁ := ι) T)ᴴ = rightTensor (ι₁ := ι) T := by
                 exact
                   (Matrix.nonneg_iff_posSemidef.mp
@@ -312,8 +313,14 @@ lemma gCompleteSelfConsistency
     GCompleteSelfConsistencyStatement params ψbi family zeta := by
   exact ⟨hself.sliceSelfConsistency⟩
 
-/-- `cor:g-bot-self-consistency`. -/
-theorem gBotSelfConsistency
+/-- Internal form of `cor:g-bot-self-consistency` after applying
+`lem:g-complete-self-consistency`.
+
+**Source:** The proof in `references/ldt-paper/ld-pasting.tex:537-558`
+uses `lem:g-complete-self-consistency` internally.  The paper-facing theorem
+`gBotSelfConsistency` below derives that input from strong self-consistency
+rather than exposing it as a public hypothesis. -/
+theorem gBotSelfConsistency_ofCompleteSelfConsistency
     (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -323,7 +330,6 @@ theorem gBotSelfConsistency
     (hcomplete : GCompleteSelfConsistencyStatement params ψbi family zeta) :
     GBotSelfConsistencyStatement params ψbi family zeta := by
   refine {
-    completePartWitness := hcomplete
     incompletePartSelfConsistency := ?_
   }
   rcases hcomplete.completePartSelfConsistency with ⟨hcomplete_bound⟩
@@ -398,9 +404,11 @@ theorem gBotSelfConsistency
                     (((leftTensor (ι₂ := ι) T - rightTensor (ι₁ := ι) T)ᴴ) *
                       (leftTensor (ι₂ := ι) T - rightTensor (ι₁ := ι) T)) := by
                           have hswap :
-                              ((rightTensor (ι₁ := ι) T)ᴴ - (leftTensor (ι₂ := ι) T)ᴴ) *
+                              ((rightTensor (ι₁ := ι) T)ᴴ -
+                                  (leftTensor (ι₂ := ι) T)ᴴ) *
                                   (rightTensor (ι₁ := ι) T - leftTensor (ι₂ := ι) T) =
-                                ((leftTensor (ι₂ := ι) T)ᴴ - (rightTensor (ι₁ := ι) T)ᴴ) *
+                                ((leftTensor (ι₂ := ι) T)ᴴ -
+                                    (rightTensor (ι₁ := ι) T)ᴴ) *
                                   (leftTensor (ι₂ := ι) T - rightTensor (ι₁ := ι) T) := by
                             noncomm_ring
                           simpa [sub_eq_add_neg] using congrArg (ev ψbi) hswap
@@ -413,5 +421,18 @@ theorem gBotSelfConsistency
                             leftPlacedSubMeas, rightPlacedSubMeas, T,
                             (family.meas x).sum_eq_total]
     _ ≤ zeta := hcomplete_total
+
+/-- `cor:g-bot-self-consistency`, source-facing form. -/
+theorem gBotSelfConsistency
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (zeta : Error)
+    (hperm : PermInvState ψbi)
+    (hself : family.StronglySelfConsistent ψbi zeta) :
+    GBotSelfConsistencyStatement params ψbi family zeta :=
+  gBotSelfConsistency_ofCompleteSelfConsistency params ψbi family zeta hperm
+    (gCompleteSelfConsistency params ψbi family zeta hperm hself)
 
 end MIPStarRE.LDT.Pasting

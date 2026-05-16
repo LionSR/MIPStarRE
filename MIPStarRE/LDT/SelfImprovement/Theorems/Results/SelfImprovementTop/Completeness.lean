@@ -22,9 +22,9 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-! ## Final-fields completeness construction
 
-The reduced `FinalFieldsInput` lumps four distinct paper-side obligations into a
-single residual. The lemmas below isolate the **completeness** field, exposing
-the precise analytic ingredient that is still missing — the helper-stage
+The earlier interface combined several paper-side final-field obligations into
+one hypothesis block. The lemmas below isolate the **completeness** field, exposing
+the precise analytic ingredient that remains — the helper-stage
 completeness lower bound on `Hhat.liftLeft` — and discharging the rest of the
 transport algebra (orthonormalization SDD step) with a checked proof.
 
@@ -36,13 +36,13 @@ proved in `Preliminaries.SelfConsistency.Extensions`) to the
 self-improvement parameters and yields the precise `(1 - nu) - δ - 2 √ε`
 target on `H.toSubMeas.liftLeft`.
 
-This does **not** add a raw residual: the residual hypothesis has been narrowed
-from the entire `FinalFieldsInput` lump to the single named paper obligation
+This does **not** add an additional residual hypothesis: the hypothesis has been narrowed
+to the single named paper obligation
 `hhelperCompleteness`, which corresponds to `self_improvement.tex` lines
 351--414 (helper completeness, especially the Cauchy--Schwarz step at lines
 366--414) followed by the projective transfer at lines 713--717. The remaining
-three `FinalFieldsInput` fields (point-consistency, self-closeness, and
-projective-residual) are not addressed here.
+final-field constructions (point-consistency, self-closeness, and
+projective-residual) are handled by separate named lemmas.
 
 Paper anchors:
 * `references/ldt-paper/self_improvement.tex` lines 351--414 — helper-stage
@@ -77,8 +77,8 @@ completeness construction for `thm:self-improvement`. Given:
   Cauchy--Schwarz argument in `references/ldt-paper/self_improvement.tex`
   lines 351--414, especially lines 366--414, which uses the incoming
   consistency hypothesis on `G` and `nu`.
-* `hssc` — bipartite strong self-consistency of `A` (the helper SSC supplied
-  by `HelperStrongSelfConsistencyInput`).
+* `hssc` — bipartite strong self-consistency of `A`, proved by the helper-SSC
+  construction.
 * `hsdd` — the orthonormalization SDD bound between the left lifts of `A` and
   `B` (the SDD bound supplied by the orthonormalization step inside
   `selfImprovement`).
@@ -149,7 +149,7 @@ a separate numerical step on the explicit error definitions
 `selfImprovementError`) that does not require any new analytic input.
 
 This narrows the missing input for the `completeness` field of
-`FinalFieldsInput` from the remaining four-field residual to the single named
+`SelfImprovementFinalFields` to the single named
 paper obligation `hhelperCompleteness` matching
 `references/ldt-paper/self_improvement.tex` lines 351--414, which is the only
 remaining analytic step (especially the Cauchy--Schwarz argument at lines
@@ -163,7 +163,7 @@ construction may prove the paper's tighter `1 - ν - 3√δ` bound and then weak
 to this threshold.
 
 It does **not** assume the projective completeness it produces, and it does
-**not** restate `FinalFieldsInput`. -/
+**not** restate a combined final-fields hypothesis block. -/
 theorem final_fields_completeness_of_helper_completeness
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)

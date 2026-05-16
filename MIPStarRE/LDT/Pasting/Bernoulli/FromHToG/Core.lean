@@ -4,7 +4,7 @@ import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core.StageMass
 import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core.FactBundles
 
 /-!
-# Section 12 pasting: from-H-to-G bridge (compatibility module)
+# Section 12 pasting: from-H-to-G comparison (compatibility module)
 
 This file re-exports all `fromHToG` core lemmas from four submodules:
 
@@ -14,8 +14,8 @@ This file re-exports all `fromHToG` core lemmas from four submodules:
   submeasurement algebra, and GHatMeas sums
 * `StageMass` — stage-0 identification, terminal identification,
   adjacent-stage split, and telescoping lemmas
-* `FactBundles` — Prop-bundle structures and the paper-total error absorption
-  lemma
+* `FactBundles` — exact recurrence identities and the paper-total error
+  absorption lemma
 
 External code should keep importing this module.
 -/

@@ -305,15 +305,7 @@ theorem hAConsistency_submeas
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound_psd : ∀ x : Fq params, 0 ≤ family.witness x)
-    (hbound_residual :
-      avgOver (uniformDistribution (Fq params))
-        (fun x =>
-          IdxPolyFamily.storedResidual strategy family
-            (fun y => (family.meas y).toSubMeas) x) ≤ zeta)
-    (hbound_dom :
-      ∀ x : Fq params, ∀ g : Polynomial params,
-        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
     (hk_pos : 1 ≤ k) :
     ConsRel strategy.state (uniformDistribution (Point params.next))
@@ -322,55 +314,8 @@ theorem hAConsistency_submeas
           (constructedPastedSubMeas params family k))
         (MainInductionStep.ldPastingInInductionNu params k
           eps delta gamma zeta) := by
-  have hline : ∀ i : ℕ, i < k →
-      LdSandwichLineOnePointStatement params strategy family
-        eps delta gamma zeta k i := by
-    have hfacts : GHatFactsStatement params strategy.state family gamma zeta := by
-      have hzeta_nonneg : 0 ≤ zeta := by
-        exact le_trans
-          (bipartiteConsError_nonneg strategy.state
-            (uniformDistribution (Point params.next))
-            (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-            family.evaluatedAtNextPoint)
-          hcons.pointConsistency.offDiagonalBound
-      have hgamma_nonneg : 0 ≤ gamma := by
-        have : 0 ≤ strategy.diagonalFailureProbability := by
-          unfold SymStrat.diagonalFailureProbability
-          exact mul_nonneg (by positivity)
-            (Finset.sum_nonneg fun j _ => bipartiteConsError_nonneg strategy.state _ _ _)
-        exact le_trans this hgood.diagonalLineTest
-      let G : Fq params → SubMeas (Polynomial params) ι := fun x => (family.meas x).toSubMeas
-      have hG : ∀ x, G x = (family.meas x).toSubMeas := by
-        intro x
-        rfl
-      have hselfComplete :=
-        gCompleteSelfConsistency params strategy.state family zeta
-          strategy.permInvState hself
-      have hselfIncomplete :=
-        gBotSelfConsistency params strategy.state family zeta
-          strategy.permInvState hselfComplete
-      have hcomMain :=
-        Commutativity.comMain params strategy eps delta gamma zeta
-          strategy.isNormalized hgood family.meas
-          ⟨(IdxPolyFamily.consistentWithPoints_toIdxPolyFamily strategy family hcons).pointConsistency⟩
-          ⟨(IdxPolyFamily.stronglySelfConsistent_toIdxPolyFamily family hself).sliceSelfConsistency⟩
-          family.witness hbound_psd
-          (by simpa [IdxPolyFamily.storedResidual] using hbound_residual)
-          hbound_dom
-      have hcommComplete :=
-        commutingWithGComplete params strategy family G gamma zeta
-          hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le hcomMain hselfComplete
-      have hcommIncomplete :=
-        commutingWithGIncomplete params strategy.state family gamma zeta hcommComplete
-      exact gHatFacts params strategy.state family gamma zeta
-        hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le
-        hselfComplete hselfIncomplete hcommComplete hcommIncomplete
-    intro i hi
-    exact ldSandwichLineOnePoint params strategy eps delta gamma zeta
-      hgood hgamma_le hzeta_le hdq_le
-      family hcons hself hfacts k i hi
   have hHB := hBConsistency params strategy eps delta gamma zeta
-    hgood hd family hcons hself k hline
+    hgood hgamma_le hzeta_le hdq_le hd family hcons hself hbound k
   have hgamma_nonneg : 0 ≤ gamma := by
     have : 0 ≤ strategy.diagonalFailureProbability := by
       unfold SymStrat.diagonalFailureProbability

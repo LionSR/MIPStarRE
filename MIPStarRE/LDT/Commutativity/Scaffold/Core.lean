@@ -40,62 +40,37 @@ noncomputable def comMainError (params : Parameters) (gamma zeta : Error) : Erro
       Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (4 : Error)))
 
 /-- Paper origin: `references/ldt-paper/commutativity-G.tex:16-47`
-(`\label{lem:comm-data-processed-g}`); output package for the
-commutativity-of-`G`-after-evaluation lemma.
+(`\label{lem:comm-data-processed-g}`).
 
-The strategy state is bipartite.  Alice-side measurements are lifted to
-the left tensor factor, while Bob-side postprocessed point measurements
-are lifted to the right tensor factor.
-
-The parameter `G` is the slice-indexed family `x ↦ G^x`; the hypothesis
-`familyG` ties it back to `family.meas` so that the stability weights
-`√(G^y_h)` and `√(G^x_g)` agree with the family's projective
-sub-measurements. -/
-structure CommDataProcessedGConclusion (params : Parameters)
+Displayed conclusion of the commutativity-of-`G`-after-evaluation lemma.  The
+strategy state is bipartite.  Alice-side measurements are lifted to the left
+tensor factor, while Bob-side postprocessed point measurements are lifted to the
+right tensor factor. -/
+abbrev CommDataProcessedGConclusion (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (gamma zeta : Error) : Prop where
-  postprocessedPointConsistency :
-    ConsRel strategy.state
-      (uniformDistribution (Point params.next))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (evaluatedPointFamily params (IdxProjSubMeas.toIdxPolyFamily G))
-      zeta
-  postprocessedSelfConsistency :
-    SDDRel strategy.state
-      (uniformDistribution (Point params.next))
-      (evaluatedPointFamilyLeft params (IdxProjSubMeas.toIdxPolyFamily G))
-      (evaluatedPointFamilyRight params (IdxProjSubMeas.toIdxPolyFamily G))
-      zeta
-  evaluatedSliceCommutation :
-    SDDOpRel strategy.state
-      (uniformDistribution (EvaluatedSliceQuestion params))
-      (evaluatedSliceProductLeft params strategy (IdxProjSubMeas.toIdxPolyFamily G))
-      (evaluatedSliceProductRight params strategy (IdxProjSubMeas.toIdxPolyFamily G))
-      (commDataProcessedGError params gamma zeta)
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error) : Prop :=
+  SDDOpRel strategy.state
+    (uniformDistribution (EvaluatedSliceQuestion params))
+    (evaluatedSliceProductLeft params strategy family)
+    (evaluatedSliceProductRight params strategy family)
+    (commDataProcessedGError params gamma zeta)
 
 /-- Paper origin: `references/ldt-paper/commutativity-G.tex:228-257`
-(`\label{thm:com-main}`); output package for the commutativity-of-`G` theorem. -/
-structure ComMainConclusion (params : Parameters)
+(`\label{thm:com-main}`).
+
+Displayed conclusion of the commutativity-of-`G` theorem. -/
+abbrev ComMainConclusion (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (gamma zeta : Error) : Prop where
-  evaluatedCommutation :
-    CommDataProcessedGConclusion params strategy G gamma zeta
-  evaluationSpecialization :
-    SDDOpRel strategy.state
-      (uniformDistribution (EvaluatedSliceQuestion params))
-      (evaluatedFromFullSliceProductLeft params strategy (IdxProjSubMeas.toIdxPolyFamily G))
-      (evaluatedFromFullSliceProductRight params strategy (IdxProjSubMeas.toIdxPolyFamily G))
-      (commDataProcessedGError params gamma zeta)
-  fullSliceCommutation :
-    SDDOpRel strategy.state
-      (uniformDistribution (FullSliceQuestion params))
-      (fullSliceProductLeft params strategy (IdxProjSubMeas.toIdxPolyFamily G))
-      (fullSliceProductRight params strategy (IdxProjSubMeas.toIdxPolyFamily G))
-      (comMainError params gamma zeta)
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error) : Prop :=
+  SDDOpRel strategy.state
+    (uniformDistribution (FullSliceQuestion params))
+    (fullSliceProductLeft params strategy family)
+    (fullSliceProductRight params strategy family)
+    (comMainError params gamma zeta)
 
 /-- Paper origin: `references/ldt-paper/commutativity-G.tex:309-338`
 (`\label{lem:normalization-condition}`); records the Hermitian-square /

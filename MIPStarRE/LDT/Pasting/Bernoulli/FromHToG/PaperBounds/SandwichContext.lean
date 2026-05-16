@@ -260,8 +260,7 @@ lemma fromHToG_SUS_context_avg_le_one
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι)) (hnorm : ψbi.IsNormalized)
-    -- `averagedSandwichByTypeSubMeas` fixes this family universe at `0`.
-    (family : IdxPolyFamily.{_, 0} params ι)
+    (family : IdxPolyFamily params ι)
     (hcomplete : averageOperatorOverDistribution (uniformDistribution (Fq params))
       (fun x => (completePartSubMeas params family x).total) =
         family.averagedSubMeas.total)

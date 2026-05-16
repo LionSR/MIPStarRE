@@ -620,11 +620,11 @@ noncomputable def ldSandwichLineOnePointCS_secondTargetRaw
         (ldSandwichLineOnePointCS_Csecond params strategy family hi q gs u *
           (ldSandwichLineOnePointCS_Arot params family hi q gs)ᴴ))
 
-/-- Exact low-level inputs needed to turn the generic `closenessOfIP*` lemmas into
+/-- Exact low-level facts needed to turn the generic `closenessOfIP*` lemmas into
 `ld-pasting.tex:964--1010` for the line-one-point bridge.
 
-This package separates the generic CS theorem instantiation (proved below) from
-the paper-specific inputs:
+This record separates the generic CS theorem instantiation (proved below) from
+the paper-specific facts:
 
 * the adjoint-oriented raw square-distance bound corresponding to the first square
   root in lines 974--985 and reused in lines 1005--1010;
@@ -632,9 +632,10 @@ the paper-specific inputs:
 * the algebraic regrouping/reindexing that identifies the raw CS scalars with the
   existing source, intermediate, and moved outcome sums.
 
-The assembly lemma below now proves the unit bounds and regrouping equalities;
-the remaining live residual is the adjoint-oriented raw-core bridge. -/
-structure LdSandwichLineOnePointCSInputFacts
+The construction lemma below proves the unit bounds and regrouping equalities;
+the remaining live analytic endpoint is the adjoint-oriented raw-core estimate
+recorded by `LdSandwichLineOnePointAdjointRawCoreBound`. -/
+structure LdSandwichLineOnePointCSFacts
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -670,30 +671,19 @@ structure LdSandwichLineOnePointCSInputFacts
     ldSandwichLineOnePoint_prefix_movedOutcomeSum params strategy family hi =
       ldSandwichLineOnePointCS_secondTargetRaw params strategy family hi
 
-/-- Proven reductions feeding the remaining scalar one-point match-mass bound.
+/-- The adjoint-oriented raw commutator square-distance bound used by the two
+Cauchy--Schwarz applications in the proof of `lem:ld-sandwich-line-one-point`.
 
-This package keeps the final residual smaller than the original `ConsRel` branch:
-the raw commutation bound is already unpacked, the option-valued match mass has
-no `none` contribution, and the prefix/raw endpoint outcome expansions are
-available as hypotheses. -/
-structure LdSandwichLineOnePointResidualFacts
+The surrounding endpoint expansions and option-valued match-mass identities are
+proved directly where they are used; this structure records only the nontrivial
+orientation of the half-sandwich commutation estimate. -/
+structure LdSandwichLineOnePointAdjointRawCoreBound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
     {k i : ℕ} (hi : i < k) : Prop where
-  rawCore :
-    avgOver (uniformDistribution (SandwichedLineQuestion params k))
-      (fun q =>
-        qSDDCore strategy.state
-          (fun gs =>
-            (ldSandwichLineOnePointPrefixMovedRawLeftOriginalOutcomeFamily
-              params family hi q).outcome gs)
-          (fun gs =>
-            (ldSandwichLineOnePointPrefixMovedRawRightOriginalOutcomeFamily
-              params family hi q).outcome gs))
-      ≤ commuteGHalfSandwichError params gamma zeta (i + 1)
-  adjointRawCore :
+  bound :
     avgOver (uniformDistribution (SandwichedLineQuestion params k))
       (fun q => qSDDCore strategy.state
         (fun gs : GHatTupleOutcome params (i + 1) =>
@@ -701,65 +691,12 @@ structure LdSandwichLineOnePointResidualFacts
         (fun gs : GHatTupleOutcome params (i + 1) =>
           (ldSandwichLineOnePointCS_Arot params family hi q gs)ᴴ)) ≤
       commuteGHalfSandwichError params gamma zeta (i + 1)
-  matchExpand :
-    ∀ q : SandwichedLineQuestion params k,
-      qBipartiteMatchMass strategy.state
-        ((ldSandwichLineOnePointPrefixOriginalFamily params family hi) q)
-        ((ldSandwichLineOnePointRightFamily params strategy family k i) q) =
-        ∑ a : Fq params,
-          ev strategy.state
-            (opTensor
-              (((ldSandwichLineOnePointPrefixOriginalFamily params family hi) q).outcome
-                (some a))
-              (((ldSandwichLineOnePointRightFamily params strategy family k i) q).outcome
-                (some a)))
-  prefixOriginalSome :
-    ∀ (q : SandwichedLineQuestion params k) (a : Fq params),
-      (ldSandwichLineOnePointPrefixOriginalFamily params family hi q).outcome (some a) =
-        ∑ gs : GHatTupleOutcome params (i + 1),
-          if Option.map (fun g : Polynomial params => g q.1)
-              (gs ⟨i, Nat.lt_succ_self i⟩) = some a then
-            let half := gHatHalfProductOutcomeOperator params family (i + 1)
-              (fun j => q.2 ⟨j.1, by omega⟩) gs
-            half * halfᴴ
-          else
-            0
-  movedSome :
-    ∀ (q : SandwichedLineQuestion params k) (a : Fq params),
-      (ldSandwichLineOnePointPrefixMovedFamily params family hi q).outcome (some a) =
-        ∑ gs : GHatTupleOutcome params (i + 1),
-          if Option.map (fun g : Polynomial params => g q.1) (gs 0) = some a then
-            let xsTail : PointTuple params i := fun j => q.2 ⟨j.1, by omega⟩
-            let xs : PointTuple params (i + 1) := Fin.cons (q.2 ⟨i, hi⟩) xsTail
-            let half := gHatHalfProductOutcomeOperator params family (i + 1) xs gs
-            half * halfᴴ
-          else
-            0
-  rawLeftEndpoint :
-    ∀ (q : SandwichedLineQuestion params k) (gs : GHatTupleOutcome params (i + 1)),
-      (ldSandwichLineOnePointPrefixMovedRawLeftOriginalOutcomeFamily
-          params family hi q).outcome gs =
-        leftTensor (ι₂ := ι)
-          (gHatHalfProductOutcomeOperator params family (i + 1)
-            ((pointTupleLastFrontEquiv params i) (fun j => q.2 ⟨j.1, by omega⟩))
-            ((gHatTupleOutcomeLastFrontEquiv params i) gs))
-  rawRightEndpoint :
-    ∀ (q : SandwichedLineQuestion params k) (gs : GHatTupleOutcome params (i + 1)),
-      (ldSandwichLineOnePointPrefixMovedRawRightOriginalOutcomeFamily
-          params family hi q).outcome gs =
-        leftTensor (ι₂ := ι)
-          (gHatHalfProductOutcomeOperator params family (i + 1)
-            (fun j => q.2 ⟨j.1, by omega⟩) gs)
 
-/-- The adjoint orientation bridge for the paper's `eq:add-in-the-bot` input.
+/-- The adjoint-oriented estimate for the paper's `eq:add-in-the-bot` term.
 
-The existing `LdSandwichLineOnePointResidualFacts.rawCore` exposes the project
-`qSDDCore` orientation for the raw half-products, i.e. the $D^\dagger D$ square
-of the commutator.  The two generic `closenessOfIP*` applications below need the
-adjoint-oriented $D D^\dagger$ square-distance term that appears in
-`ld-pasting.tex:980--985` and is reused at lines `1005--1010`.  The residual
-facts package now carries that proved adjoint raw-core bound, so this lemma
-selects the orientation needed by the generic CS input package. -/
+The generic `closenessOfIP*` applications need the adjoint-oriented
+$D D^\dagger$ square-distance term that appears in `ld-pasting.tex:980--985`
+and is reused at lines `1005--1010`. -/
 lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_adjointRawCore
     (params : Parameters)
     [FieldModel params.q]
@@ -767,7 +704,7 @@ lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_adjointRawCore
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
     {k i : ℕ} (hi : i < k) (_hi0 : i ≠ 0)
-    (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi) :
+    (facts : LdSandwichLineOnePointAdjointRawCoreBound params strategy family gamma zeta hi) :
     avgOver (uniformDistribution (SandwichedLineQuestion params k))
       (fun q => qSDDCore strategy.state
         (fun gs : GHatTupleOutcome params (i + 1) =>
@@ -775,7 +712,7 @@ lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_adjointRawCore
         (fun gs : GHatTupleOutcome params (i + 1) =>
           (ldSandwichLineOnePointCS_Arot params family hi q gs)ᴴ)) ≤
       commuteGHalfSandwichError params gamma zeta (i + 1) := by
-  exact facts.adjointRawCore
+  exact facts.bound
 
 
 end MIPStarRE.LDT.Pasting

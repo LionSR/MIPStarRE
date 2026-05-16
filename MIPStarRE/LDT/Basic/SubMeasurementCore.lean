@@ -32,8 +32,7 @@ outcome `a₀` is the identity and all other outcomes are zero.
 
 This is a valid POVM but highly degenerate: it is only used in vacuous
 fallback branches of the proof where the error bound is ≥ 1 (see
-`Test/MainTheorem.lean:mainFormal_trivial_witness` and
-`MainInductionStep/Theorems.lean:trivialPolynomialMeasurement`).
+`Test/MainTheorem.lean:mainFormal_trivial_witness`).
 
 Prefer calling this function explicitly (with a chosen outcome) rather than
 relying on the ambient `Inhabited` instance, which picks an arbitrary

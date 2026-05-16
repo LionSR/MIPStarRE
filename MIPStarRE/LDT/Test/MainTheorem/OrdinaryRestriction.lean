@@ -1,23 +1,18 @@
-import MIPStarRE.LDT.Test.MainTheorem.OrdinaryRestriction.SliceData
+import MIPStarRE.LDT.Test.MainTheorem.OrdinaryRestriction.Basic
 
 /-!
 # Ordinary restricted-slice recursion
 
 Compatibility module for the ordinary `x`-restricted successor route in the
-`mainFormal` construction.  This module re-exports declarations from two
-submodules:
+`mainFormal` construction.  It re-exports the successor weighted bounds,
+the restricted-probability package, and the recursive-slice target
+(`MainFormalSuccessorRecursiveSlices`).
 
-* `OrdinaryRestriction.Basic` — successor weighted bounds
-  (`MainFormalSuccessorAxisWeightedBound`, `MainFormalSuccessorDiagonalWeightedBound`),
-  the restricted-probability package, and recursive slice witnesses
-  (`MainFormalSuccessorRecursiveSlices`).
-
-* `OrdinaryRestriction.SliceData` — per-slice recursive data
-  (`MainFormalSuccessorRecursiveSliceData`) and the probabilistic bounds on
-  the restricted success probabilities from `\Cref{lem:restricted-probabilities}`
-  (`mainFormalSuccessorRestrictedPointAgreement_le_ofSliceData`,
-  `mainFormalSuccessorRestrictedAxisParallel_le_ofSliceData`,
-  `mainFormalSuccessorRestrictedDiagonal_le_ofSliceData`).
+The former slice-data witness package, which supplied concrete restricted
+same-space strategies as an additional input, has been removed.  Constructing
+those witnesses from the paper hypotheses is part of the successor proof gap in
+`MainInductionStep.mainInduction` and the final proof gap in `mainFormal`, not a
+separate hypothesis of a source-facing theorem.
 
 ## References
 

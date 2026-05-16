@@ -96,7 +96,6 @@ lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
       (1 - kappa)) :
     ChernoffBernoulliMatrixStatement ψ theta k degree X kappa hXpsd hXleOne := by
   let expTerm : Error := Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2)
-  have htail := bernoulliTailOperator_le_one k degree X hXpsd hXleOne
   have hXsa : IsSelfAdjoint X :=
     (Matrix.nonneg_iff_posSemidef.mp hXpsd).isHermitian
   have hPointwise : ∀ x ∈ spectrum Error X,
@@ -150,7 +149,7 @@ lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
     rw [cfc_bernoulliTailLowerAffine_eq X hXsa theta expTerm, ev_sub, hscale1, hscale2,
       ev_sub, ev_one_of_isNormalized ψ hnorm]
     linarith
-  refine { tail_le_one := htail, matrixTailBound := ⟨?_⟩ }
+  refine { matrixTailBound := ⟨?_⟩ }
   show _ ≥ _
   unfold subMeasMass
   exact le_trans hEvLower hEvLe

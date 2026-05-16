@@ -8,7 +8,7 @@ Last updated: 2026-04-23
 - **Eliminated**: 50 executable sorrys
 - **Infrastructure fixes landed on this branch**:
   - `SymStrat.IsGood` and `RestrictedSymStrat.IsGood` now carry `PermInvState`
-  - explicit paper-shaped boundedness assumptions for Section 11/12 theorem interfaces
+  - shared `SliceBoundednessInput` for Section 11/12 theorem interfaces
   - averaged point-operator defs moved out of induction-local scope
 - **PRs already recorded in this file**: 4
 

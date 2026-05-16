@@ -433,15 +433,7 @@ lemma overAllOutcomes
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound_psd : ∀ x : Fq params, 0 ≤ family.witness x)
-    (hbound_residual :
-      avgOver (uniformDistribution (Fq params))
-        (fun x =>
-          IdxPolyFamily.storedResidual strategy family
-            (fun y => (family.meas y).toSubMeas) x) ≤ zeta)
-    (hbound_dom :
-      ∀ x : Fq params, ∀ g : Polynomial params,
-        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ) :
     OverAllOutcomesStatement params strategy family eps delta gamma zeta k := by
   have heps_nonneg : 0 ≤ eps :=
@@ -457,38 +449,12 @@ lemma overAllOutcomes
           overAllOutcomesPastedMass params strategy family k ≤
         overAllOutcomesError params eps delta gamma zeta k := by
     by_cases hkEligible : params.d + 1 ≤ k
-    · let G : Fq params → SubMeas (Polynomial params) ι := fun x => (family.meas x).toSubMeas
-      have hG : ∀ x, G x = (family.meas x).toSubMeas := by
-        intro x
-        rfl
-      have hselfComplete :=
-        gCompleteSelfConsistency params strategy.state family zeta
-          strategy.permInvState hself
-      have hselfIncomplete :=
-        gBotSelfConsistency params strategy.state family zeta
-          strategy.permInvState hselfComplete
-      have hcomMain :=
-        Commutativity.comMain params strategy eps delta gamma zeta
-          strategy.isNormalized hgood family.meas
-          ⟨(IdxPolyFamily.consistentWithPoints_toIdxPolyFamily strategy family hcons).pointConsistency⟩
-          ⟨(IdxPolyFamily.stronglySelfConsistent_toIdxPolyFamily family hself).sliceSelfConsistency⟩
-          family.witness hbound_psd
-          (by simpa [IdxPolyFamily.storedResidual] using hbound_residual)
-          hbound_dom
-      have hcommComplete :=
-        commutingWithGComplete params strategy family G gamma zeta
-          hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le hcomMain hselfComplete
-      have hcommIncomplete :=
-        commutingWithGIncomplete params strategy.state family gamma zeta hcommComplete
-      have hfacts := gHatFacts params strategy.state family gamma zeta
-        hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le
-        hselfComplete hselfIncomplete hcommComplete hcommIncomplete
-      have hline : ∀ i : ℕ, i < k →
+    · have hline : ∀ i : ℕ, i < k →
           LdSandwichLineOnePointStatement params strategy family
             eps delta gamma zeta k i := by
         intro i hi
         exact ldSandwichLineOnePoint params strategy eps delta gamma zeta
-          hgood hgamma_le hzeta_le hdq_le family hcons hself hfacts k i hi
+          hgood hgamma_le hzeta_le hdq_le family hcons hself hbound k i hi
       have hnonglobal := overAllOutcomes_distinct_nonglobal_mass_bound
         params strategy family eps delta gamma zeta k hd
         heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hline

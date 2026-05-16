@@ -34,10 +34,10 @@ cascade uses the slightly widened absorbed scalar
 
 ## Status
 
-- The orthonormalization step is mediated by
-  `OrthonormalizationInput`, which now carries only the truncation
-  and locality-preserving repair witnesses for the option-completed
-  measurement used in the paper's reduction.
+- The orthonormalization step uses the source theorem `orthonormalization`.
+  The theorem has a tracked proof gap for the sharp paper constant; this file
+  no longer exposes its proof-stage construction data as a hypothesis of the
+  Step 6 output statement.
 - The completion step uses the **fully-formalized** `completingToMeasurement`
   (`\leanok` in `blueprint/src/chapter/ch03_preliminaries.tex`), so no new
   bridge is introduced here.
@@ -179,7 +179,14 @@ lemma sddRel_liftRight_of_liftLeft_permInv
 
 /-! ### Projective self-consistency handoff -/
 
-/-- Residual data for the projective-measurement part of Step 6.
+/-- Step 6 handoff data for the projective-measurement part of the proof.
+
+**Faithful encoding:** The three fields record the paper's pre-projective
+consistency and the two completion-closeness estimates from
+`references/ldt-paper/inductive_step.tex:130-149`.  This is not a bridge or
+residual assumption on a source theorem: `ProjectivizationChain.Output`
+constructs the record from the orthonormalization and completion outputs before
+`ProjectivizationChain.Handoff` uses it.
 
 The fields are exactly the hypotheses needed after the orthonormalization and
 completion constructions have produced projective measurements `Q_A,Q_B` close to

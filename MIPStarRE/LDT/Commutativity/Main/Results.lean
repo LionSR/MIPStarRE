@@ -62,7 +62,12 @@ private lemma fullSliceCommutation_of_evaluated
         params strategy family gamma zeta
         hnorm hgamma_nonneg hzeta_nonneg _hself hEval)
 
-/-- `thm:com-main`. -/
+/-- Paper origin: `references/ldt-paper/commutativity-G.tex`
+(`\label{thm:com-main}`).
+
+The paper theorem is formulated directly for the family `family.meas`; any
+explicit auxiliary family used by the scalar approximation proof is internal to
+the proof. -/
 theorem comMain
     (params : Parameters)
     [FieldModel params.q]
@@ -70,26 +75,14 @@ theorem comMain
     (eps delta gamma zeta : Error)
     (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
-    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (hcons : IdxProjSubMeas.ConsistentWithPoints G strategy zeta)
-    (hself : IdxProjSubMeas.StronglySelfConsistent G strategy.state zeta)
-    (Z : Fq params → MIPStarRE.Quantum.Op ι)
-    (hbound_psd : ∀ x : Fq params, 0 ≤ Z x)
-    (hbound_residual :
-      avgOver (uniformDistribution (Fq params))
-        (fun x =>
-          ev strategy.state <|
-            leftTensor (ι₂ := ι) (1 - (G x).toSubMeas.total) *
-              rightTensor (ι₁ := ι) (Z x)) ≤ zeta)
-    (hbound_dom :
-      ∀ x : Fq params, ∀ g : Polynomial params,
-        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ Z x) :
-    ComMainConclusion params strategy G gamma zeta := by
-  let family : IdxPolyFamily params ι := IdxProjSubMeas.withWitness strategy G Z
-  let Gsub : Fq params → SubMeas (Polynomial params) ι := fun x => (G x).toSubMeas
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    ComMainConclusion params strategy family gamma zeta := by
   let hEval :=
-    commDataProcessedG params strategy eps delta gamma zeta hnorm hgood G
-      hcons hself Z hbound_psd hbound_residual hbound_dom
+    commDataProcessedG params strategy eps delta gamma zeta hnorm hgood family
+      hcons hself hbound
   have hSpecialized :
       SDDOpRel strategy.state
         (uniformDistribution (EvaluatedSliceQuestion params))
@@ -98,9 +91,10 @@ theorem comMain
         (commDataProcessedGError params gamma zeta) := by
     constructor
     rw [evaluationSpecialization_sddErrorOp_eq]
-    exact hEval.evaluatedSliceCommutation.squaredDistanceBound
+    exact hEval.squaredDistanceBound
   have hzeta_nonneg : 0 ≤ zeta :=
-    IdxProjSubMeas.zeta_nonneg_of_consistentWithPoints strategy G hcons
+    le_trans (sddError_nonneg _ _ _ _)
+      hself.sliceSelfConsistency.squaredDistanceBound
   have hgamma_nonneg : 0 ≤ gamma := by
     have : 0 ≤ strategy.diagonalFailureProbability := by
       unfold SymStrat.diagonalFailureProbability
@@ -108,16 +102,11 @@ theorem comMain
         (Finset.sum_nonneg fun j _ =>
           bipartiteConsError_nonneg strategy.state _ _ _)
     exact le_trans this hgood.diagonalLineTest
-  refine
-    { evaluatedCommutation := hEval
-      evaluationSpecialization := hSpecialized
-      fullSliceCommutation := by
-        exact
-          fullSliceCommutation_of_evaluated
-            params strategy family gamma zeta
-            hnorm hgamma_nonneg hzeta_nonneg
-            (IdxProjSubMeas.stronglySelfConsistent_withWitness strategy G Z hself)
-            hSpecialized }
+  exact
+    fullSliceCommutation_of_evaluated
+      params strategy family gamma zeta
+      hnorm hgamma_nonneg hzeta_nonneg
+      hself hSpecialized
 
 /-- `lem:normalization-condition`. -/
 lemma normalizationCondition {OutcomeA OutcomeB : Type*}

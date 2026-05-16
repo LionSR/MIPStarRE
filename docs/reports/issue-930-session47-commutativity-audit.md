@@ -34,7 +34,7 @@ The three paper hypotheses are present in the formal statement:
 
 - consistency with `A` is `family.ConsistentWithPoints strategy zeta`, whose field is the `ConsRel` over `uniformDistribution (Point params.next)` between `strategy.pointMeasurement` and the postprocessed slice family (`Test/StrategyPolynomialFamilies.lean:282-290`);
 - strong self-consistency is `family.StronglySelfConsistent strategy.state zeta`, the `SDDRel` over uniformly random slice indices `x` (`Test/StrategyPolynomialFamilies.lean:308-316`);
-- boundedness is stated explicitly by the PSD witness assumption, the averaged residual bound, and the domination inequality `E_u A^{u,x}_{g(u)} ≤ Z^x` (`Test/StrategyPolynomialFamilies.lean`).
+- boundedness is `IdxPolyFamily.SliceBoundednessInput strategy family zeta`, whose fields include both the residual bound and the identification of the domination target with `E_u A^{u,x}_{g(u)}` (`Test/StrategyPolynomialFamilies.lean:338-346`).
 
 The conclusion is the blueprint's `CommDataProcessedGConclusion`: it includes the postprocessed point consistency, the postprocessed self-consistency, and the evaluated-slice commutation `SDDOpRel` with error `commDataProcessedGError params gamma zeta = 48m(√gamma + √zeta)` (`Scaffold/Core.lean:30-76`). This matches the paper and blueprint statement at `lem:comm-data-processed-g`.
 
