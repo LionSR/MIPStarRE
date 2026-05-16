@@ -286,7 +286,7 @@ theorem selfImprovementDataProcessingError_eq
 /-- The data-processing threshold contains the term `8 * selfImprovementHelperError`.
 
 This lower bound is the scalar source of the alphabet-size obstruction in the
-current point-consistency transport: once the total-overlap estimate contributes
+older total-gap point-consistency transport: once the total-overlap estimate contributes
 `sqrt (#F_q * selfImprovementDataProcessingError)`, this positive summand carries
 the cardinality of the alphabet into the final-stage error. -/
 theorem eight_selfImprovementHelperError_le_selfImprovementDataProcessingError
@@ -302,7 +302,7 @@ theorem eight_selfImprovementHelperError_le_selfImprovementDataProcessingError
 /-- The alphabet-size square-root term is bounded below by the corresponding
 term coming from `8 * selfImprovementHelperError`.
 
-This records that, in the present final-fields transport, the cardinality
+This records that, in the older total-gap final-fields transport, the cardinality
 factor cannot be removed by lower-bounding
 `selfImprovementDataProcessingError` through `8 * selfImprovementHelperError`.
 The structural obstruction is the surrounding estimate carrying
@@ -455,6 +455,77 @@ theorem final_fields_projective_residual_error_le_selfImprovementError
     _ ≤ 3000 * (params.m : Error) *
           finalStagePowerSum params eps delta (1 / (32 : Error)) :=
         mul_le_mul_of_nonneg_right hcoef hsum32_nn
+    _ = selfImprovementError params eps delta := by
+      rw [selfImprovementError_eq_finalStagePowerSum]
+
+/-- Final point-consistency threshold absorption from a total-difference bound.
+
+The fallback submeasurement-total route contributes the natural error
+
+`2 * ζ̂ + √ζ̂_dataprocess + 2 * √ζ̂_ortho`.
+
+Under the standard unit-interval hypotheses for `ε`, `δ`, and `d/q`, this is
+still absorbed by the literal `selfImprovementError` threshold. -/
+theorem final_fields_point_consistency_total_difference_error_le_selfImprovementError
+    (params : Parameters) [FieldModel params.q]
+    (eps delta : Error)
+    (heps : 0 ≤ eps) (heps_le_one : eps ≤ 1)
+    (hdelta : 0 ≤ delta) (hdelta_le_one : delta ≤ 1)
+    (hd_le_q : (params.d : Error) ≤ (params.q : Error)) :
+    2 * selfImprovementHelperError params eps delta +
+        Real.sqrt (selfImprovementDataProcessingError params eps delta) +
+        2 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta) ≤
+      selfImprovementError params eps delta := by
+  have hdq_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1 :=
+    d_q_ratio_le_one_of_d_le_q params hd_le_q
+  have hhelper_mono :
+      finalStagePowerSum params eps delta (1 / (2 : Error)) ≤
+        finalStagePowerSum params eps delta (1 / (32 : Error)) :=
+    finalStagePowerSum_le_of_exponent_ge params eps delta heps heps_le_one hdelta
+      hdelta_le_one hdq_le_one (by norm_num) (by norm_num)
+  have hsqrt_orth_mono :
+      finalStagePowerSum params eps delta (1 / (16 : Error)) ≤
+        finalStagePowerSum params eps delta (1 / (32 : Error)) :=
+    finalStagePowerSum_le_of_exponent_ge params eps delta heps heps_le_one hdelta
+      hdelta_le_one hdq_le_one (by norm_num) (by norm_num)
+  have hhelper :
+      selfImprovementHelperError params eps delta ≤
+        100 * (params.m : Error) *
+          finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+    rw [selfImprovementHelperError_eq_finalStagePowerSum]
+    exact mul_le_mul_of_nonneg_left hhelper_mono (by positivity)
+  have hdata_sqrt :
+      Real.sqrt (selfImprovementDataProcessingError params eps delta) ≤
+        31 * (params.m : Error) *
+          finalStagePowerSum params eps delta (1 / (32 : Error)) :=
+    sqrt_selfImprovementDataProcessingError_le_thirty_one_m_powerSum_thirtysecond
+      params eps delta heps heps_le_one hdelta hdelta_le_one hdq_le_one
+  have hsqrt_orth :
+      Real.sqrt (selfImprovementOrthogonalizationError params eps delta) ≤
+        20 * (params.m : Error) *
+          finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+    have hsqrt16 :=
+      sqrt_selfImprovementOrthogonalizationError_le_twenty_m_powerSum_sixteenth
+        params eps delta heps hdelta
+    exact hsqrt16.trans
+      (mul_le_mul_of_nonneg_left hsqrt_orth_mono (by positivity))
+  have hm_nonneg : 0 ≤ (params.m : Error) := m_cast_nonneg params
+  have hsum32_nonneg :
+      0 ≤ finalStagePowerSum params eps delta (1 / (32 : Error)) :=
+    finalStagePowerSum_nonneg params eps delta (1 / (32 : Error)) heps hdelta
+  have hnatural :
+      2 * selfImprovementHelperError params eps delta +
+          Real.sqrt (selfImprovementDataProcessingError params eps delta) +
+          2 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta) ≤
+        3000 * (params.m : Error) *
+          finalStagePowerSum params eps delta (1 / (32 : Error)) := by
+    nlinarith
+  calc
+    2 * selfImprovementHelperError params eps delta +
+        Real.sqrt (selfImprovementDataProcessingError params eps delta) +
+        2 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta)
+        ≤ 3000 * (params.m : Error) *
+            finalStagePowerSum params eps delta (1 / (32 : Error)) := hnatural
     _ = selfImprovementError params eps delta := by
       rw [selfImprovementError_eq_finalStagePowerSum]
 
