@@ -110,9 +110,9 @@ consumer pair on inspection. Similarly:
   `RankReductionWitness` → 33, etc.); only the 5 Ch04-matrix ones are dead.
 - 14 of 18 `*Input` decls are connected
   (`OrthonormalizeAndCompleteStatement`-related ones → 41,
-  `SliceBoundednessInput` → 36, `HelperStrongSelfConsistencyInput` → 25,
-  `SpectralTruncationInput` → 25, etc.); only the 4 Commutativity ones are
-  dead.
+  the former slice boundedness theorem-interface assumptions → 36,
+  `HelperStrongSelfConsistencyInput` → 25, `SpectralTruncationInput` → 25,
+  etc.); only the 4 Commutativity ones are dead.
 - All 15 `*Package` structures are heavily used
   (`SelfImprovementPackage` → 54, `SliceRestrictionPackage` → 53,
   `MainFormalRoleMeasurementPackage` → 44, etc.).

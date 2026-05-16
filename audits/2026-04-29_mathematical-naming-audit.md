@@ -55,7 +55,7 @@ pasting inputs rather than statement packages.
 The averaged pasting input is now named directly as
 `MainInductionStep.AveragedPastingInput`. The empty Section 6 pass-through
 abbreviation `PastingBoundednessInput` was removed; its uses now refer directly
-to `IdxPolyFamily.SliceBoundednessInput`.
+to the explicit boundedness hypotheses in the Section 11/12 theorem headers.
 
 ### Finding 2: Cleaned Section 9 Prose
 
