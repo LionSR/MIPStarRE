@@ -372,12 +372,6 @@ theorem orthonormalizeAndCompleteError_zeta1_le_zeta2
     MakingMeasurementsProjective.orthonormalizeAndCompleteError_le_absorbedZeta2
       (ζ := scalars.zeta1) hζ0 hζ1
 
-/-- Step 8 absorption for the native `ζ₄` point-consistency targets. -/
-theorem zeta4_le_mainFormalError {params : Parameters} {eps : Error} {k : ℕ}
-    (scalars : MainFormalCascadeScalars params eps k) :
-    scalars.zeta4 ≤ mainFormalError params k eps :=
-  (cascadeBounds scalars).2.2.2.2
-
 /-- Step 8 absorption for the repaired `ζ₄` point-consistency targets. -/
 theorem zeta4Repaired_le_mainFormalError {params : Parameters} {eps : Error} {k : ℕ}
     (scalars : MainFormalCascadeScalars params eps k) :
