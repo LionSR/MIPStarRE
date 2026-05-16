@@ -245,7 +245,7 @@
           
           <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:ld-pasting-sub-measurement">Lemma 9.5</a></li>
+          <li><a href="sec-ld-pasting.html#lem:ld-pasting-sub-measurement">Lemma 9.6</a></li>
           
         </ul>
     
@@ -329,7 +329,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The Lean proof of the unrestricted theorem currently has one tracked branch obligation, the degree-zero case in issue&#160;#1622. The argument below is the paper proof. Let \(H\) be the submeasurement from Lemma&#160;<a href="sec-ld-pasting.html#lem:ld-pasting-sub-measurement">9.5</a>, and fix an arbitrary polynomial \(h^* \in \mathcal{P}(m+1,q,d)\). Define a measurement \(H_{\mathrm{meas}} \in \mathrm{PolyMeas}(m+1,q,d)\) by </p>
+  <p> The Lean proof of the unrestricted theorem currently has one tracked branch obligation, the degree-zero case in issue&#160;#1622. The argument below is the paper proof. Let \(H\) be the submeasurement from Lemma&#160;<a href="sec-ld-pasting.html#lem:ld-pasting-sub-measurement">9.6</a>, and fix an arbitrary polynomial \(h^* \in \mathcal{P}(m+1,q,d)\). Define a measurement \(H_{\mathrm{meas}} \in \mathrm{PolyMeas}(m+1,q,d)\) by </p>
 <div class="displaymath" id="a0000000420">
   \[  (H_{\mathrm{meas}})_h = \begin{cases}  H_{h^*} + (I-H) &  \text{if } h=h^*, \\ H_h &  \text{otherwise.} \end{cases}  \]
 </div>
@@ -387,6 +387,46 @@
 
   </div>
 </div>
+<div class="remark_thmwrapper theorem-style-remark" id="rem:ld-pasting-degree-zero-lean-branch">
+  <div class="remark_thmheading">
+    <span class="remark_thmcaption">
+    Remark
+    </span>
+    <span class="remark_thmlabel">9.3</span>
+    <span class="remark_thmtitle">Degree-zero Lean branch</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-ld-pasting.html#rem:ld-pasting-degree-zero-lean-branch">#</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="remark_thmcontent">
+  <p>    The Lean development records the \(d=0\) branch separately. The statement <span class="ttfamily">degreeZeroPastedLineConsistency</span> is the remaining construction obligation: it should derive the required vertical-line consistency for the averaged slice family from the degree-zero hypotheses of Theorem&#160;<a href="sec-ld-pasting.html#thm:ld-pasting">9.1</a>. The two subsequent declarations transport this line-consistency estimate to point consistency and then complete the submeasurement at the fallback outcome. No <span class="ttfamily">\leanok</span> tag is attached here, since the line-consistency construction is still open. </p>
+
+  </div>
+</div>
 <p>The bound is trivial when at least one of \(\varepsilon \), \(\delta \), \(\gamma \), \(\zeta \), or \(d/q\) is at least \(1\), since then \(\nu \ge 1\). In the remainder of the chapter we therefore assume </p>
 <div class="displaymath" id="a0000000423">
   \[  \varepsilon ,\delta ,\gamma ,\zeta ,d/q \le 1.  \]
@@ -396,7 +436,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">9.3</span>
+    <span class="definition_thmlabel">9.4</span>
     <span class="definition_thmtitle">Nontrivial-regime pasting context</span>
     <div class="thm_header_extras">
 
@@ -466,7 +506,7 @@
   </div>
 </div>
 <h2 id="a0000000018">9.0.1 From Measurements to Submeasurements</h2>
-<p>In the remainder of the chapter we only use the axis-parallel lines test in the last coordinate direction. We therefore write \(B_f^u\) for the line measurement on the line \(\{ (u,x)\mid x\in \mathbb {F}_q\} \) and first record the consistency relations that follow formally from the nontrivial-regime pasting context of Definition&#160;<a href="sec-ld-pasting.html#def:ld-pasting-context">9.3</a>. </p>
+<p>In the remainder of the chapter we only use the axis-parallel lines test in the last coordinate direction. We therefore write \(B_f^u\) for the line measurement on the line \(\{ (u,x)\mid x\in \mathbb {F}_q\} \) and first record the consistency relations that follow formally from the nontrivial-regime pasting context of Definition&#160;<a href="sec-ld-pasting.html#def:ld-pasting-context">9.4</a>. </p>
 <p>Conditioning the low individual degree test on the last coordinate direction gives, on average over \((u,x) \sim \mathbb {F}_q^{m+1}\), </p>
 <div class="displaymath" id="a0000000425">
   \[  A_a^{u,x} \otimes I \simeq _{(m+1)\varepsilon } I \otimes B^u_{[f(x)=a]}.  \]
@@ -524,7 +564,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.4</span>
+    <span class="lemma_thmlabel">9.5</span>
     <span class="lemma_thmtitle">Slice measurements are consistent with line answers</span>
     <div class="thm_header_extras">
 
@@ -551,7 +591,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#def:ld-pasting-context">Definition 9.3</a></li>
+          <li><a href="sec-ld-pasting.html#def:ld-pasting-context">Definition 9.4</a></li>
           
           <li><a href="sec-prelims.html#prop:simeq-to-approx">Lemma 3.21</a></li>
           
@@ -588,7 +628,7 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>   In the nontrivial-regime pasting context of Definition&#160;<a href="sec-ld-pasting.html#def:ld-pasting-context">9.3</a>, set </p>
+  <p>   In the nontrivial-regime pasting context of Definition&#160;<a href="sec-ld-pasting.html#def:ld-pasting-context">9.4</a>, set </p>
 <div class="displaymath" id="a0000000430">
   \[  \nu _1 = \zeta + \sqrt{8m\varepsilon +4\delta }.  \]
 </div>
@@ -616,7 +656,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.5</span>
+    <span class="lemma_thmlabel">9.6</span>
     <span class="lemma_thmtitle">Pasted submeasurement</span>
     <div class="thm_header_extras">
 
@@ -643,17 +683,17 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#def:ld-pasting-context">Definition 9.3</a></li>
+          <li><a href="sec-ld-pasting.html#def:ld-pasting-context">Definition 9.4</a></li>
           
           <li><a href="sec-prelims.html#def:polymeasurements">Definition 3.11</a></li>
           
           <li><a href="sec-prelims.html#def:simeq">Definition 3.16</a></li>
           
-          <li><a href="sec-ld-pasting.html#def:pasted-measurement">Definition 9.11</a></li>
+          <li><a href="sec-ld-pasting.html#def:pasted-measurement">Definition 9.12</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:h-b-consistency">Lemma 9.29</a></li>
+          <li><a href="sec-ld-pasting.html#lem:h-b-consistency">Lemma 9.30</a></li>
           
-          <li><a href="sec-ld-pasting.html#cor:ld-pasting-N-completeness">Corollary 9.40</a></li>
+          <li><a href="sec-ld-pasting.html#cor:ld-pasting-N-completeness">Corollary 9.43</a></li>
           
           <li><a href="sec-prelims.html#prop:triangle-sub">Lemma 3.20</a></li>
           
@@ -686,7 +726,7 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>   In the nontrivial-regime pasting context of Definition&#160;<a href="sec-ld-pasting.html#def:ld-pasting-context">9.3</a>, there exists a submeasurement \(H \in \mathrm{PolySub}(m+1,q,d)\) with the following properties. </p>
+  <p>   In the nontrivial-regime pasting context of Definition&#160;<a href="sec-ld-pasting.html#def:ld-pasting-context">9.4</a>, there exists a submeasurement \(H \in \mathrm{PolySub}(m+1,q,d)\) with the following properties. </p>
 <ol class="enumerate">
   <li><p>(Consistency with \(A\)):  On average over \(u \sim \mathbb {F}_q^{m+1}\), </p>
 <div class="displaymath" id="a0000000433">
@@ -710,7 +750,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> Let \(H\) be the pasted submeasurement constructed in Definition&#160;<a href="sec-ld-pasting.html#def:pasted-measurement">9.11</a>. Lemma&#160;<a href="sec-ld-pasting.html#lem:h-b-consistency">9.29</a> implies </p>
+  <p> Let \(H\) be the pasted submeasurement constructed in Definition&#160;<a href="sec-ld-pasting.html#def:pasted-measurement">9.12</a>. Lemma&#160;<a href="sec-ld-pasting.html#lem:h-b-consistency">9.30</a> implies </p>
 <div class="equation" id="eq:h-b-consistency-at-a-point">
 <p>
   <div class="equation_content">
@@ -727,7 +767,7 @@
 <div class="displaymath" id="a0000000436">
   \[  \sqrt{8m\varepsilon +4\delta }+\nu _6 \le 47k^2m\left(\varepsilon ^{1/32}+\delta ^{1/32}+\gamma ^{1/32}+\zeta ^{1/32}+(d/q)^{1/32}\right)\le \nu ,  \]
 </div>
-<p> which proves <a href="sec-ld-pasting.html#item:ld-pasting-N-consistency-sub-measurement">1</a>. The completeness claim is exactly Corollary&#160;<a href="sec-ld-pasting.html#cor:ld-pasting-N-completeness">9.40</a>. </p>
+<p> which proves <a href="sec-ld-pasting.html#item:ld-pasting-N-consistency-sub-measurement">1</a>. The completeness claim is exactly Corollary&#160;<a href="sec-ld-pasting.html#cor:ld-pasting-N-completeness">9.43</a>. </p>
 
   </div>
 </div>
@@ -737,7 +777,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">9.6</span>
+    <span class="definition_thmlabel">9.7</span>
     <span class="definition_thmtitle">Distinct tuples</span>
     <div class="thm_header_extras">
 
@@ -783,7 +823,7 @@
     <span class="proposition_thmcaption">
     Proposition
     </span>
-    <span class="proposition_thmlabel">9.7</span>
+    <span class="proposition_thmlabel">9.8</span>
     <span class="proposition_thmtitle">Distinct tuples versus independent tuples</span>
     <div class="thm_header_extras">
 
@@ -810,7 +850,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#def:distinct-tuples">Definition 9.6</a></li>
+          <li><a href="sec-ld-pasting.html#def:distinct-tuples">Definition 9.7</a></li>
           
         </ul>
     
@@ -914,7 +954,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.8</span>
+    <span class="lemma_thmlabel">9.9</span>
     <span class="lemma_thmtitle">A scalar inequality for the first construction</span>
     <div class="thm_header_extras">
 
@@ -971,7 +1011,7 @@
 
   </div>
 </div>
-<p>As in the paper, Lemma&#160;<a href="sec-ld-pasting.html#lem:looks-easy-but-took-me-a-while">9.8</a> now converts <a href="sec-ld-pasting.html#eq:equivalent-way-of-writing-grand-plan" class="eqref">11</a> into the estimate </p>
+<p>As in the paper, Lemma&#160;<a href="sec-ld-pasting.html#lem:looks-easy-but-took-me-a-while">9.9</a> now converts <a href="sec-ld-pasting.html#eq:equivalent-way-of-writing-grand-plan" class="eqref">11</a> into the estimate </p>
 <div class="displaymath" id="a0000000443">
   \[  \mathbb {E}_{i\sim \mu }[\lambda _i(1-\lambda _i^d)] \le 2\cdot \mathbb {E}_{i\sim \mu }\Big[(\lambda _i^{d+1}(1-\lambda _i))^{1/(d+1)}\Big] \le 2\cdot \Delta ^{1/(d+1)},  \]
 </div>
@@ -987,7 +1027,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">9.9</span>
+    <span class="definition_thmlabel">9.10</span>
     <span class="definition_thmtitle">The incomplete part and the completed measurement</span>
     <div class="thm_header_extras">
 
@@ -1056,7 +1096,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">9.10</span>
+    <span class="definition_thmlabel">9.11</span>
     <span class="definition_thmtitle">Types</span>
     <div class="thm_header_extras">
 
@@ -1102,7 +1142,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">9.11</span>
+    <span class="definition_thmlabel">9.12</span>
     <span class="definition_thmtitle">The pasted measurement</span>
     <div class="thm_header_extras">
 
@@ -1126,11 +1166,11 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#def:G-hat">Definition 9.9</a></li>
+          <li><a href="sec-ld-pasting.html#def:G-hat">Definition 9.10</a></li>
           
-          <li><a href="sec-ld-pasting.html#def:types">Definition 9.10</a></li>
+          <li><a href="sec-ld-pasting.html#def:types">Definition 9.11</a></li>
           
-          <li><a href="sec-ld-pasting.html#def:distinct-tuples">Definition 9.6</a></li>
+          <li><a href="sec-ld-pasting.html#def:distinct-tuples">Definition 9.7</a></li>
           
         </ul>
     
@@ -1185,7 +1225,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">9.12</span>
+    <span class="definition_thmlabel">9.13</span>
     <span class="definition_thmtitle">Completed-outcome reindexing</span>
     <div class="thm_header_extras">
 
@@ -1209,11 +1249,11 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#def:G-hat">Definition 9.9</a></li>
+          <li><a href="sec-ld-pasting.html#def:G-hat">Definition 9.10</a></li>
           
-          <li><a href="sec-ld-pasting.html#def:types">Definition 9.10</a></li>
+          <li><a href="sec-ld-pasting.html#def:types">Definition 9.11</a></li>
           
-          <li><a href="sec-ld-pasting.html#def:pasted-measurement">Definition 9.11</a></li>
+          <li><a href="sec-ld-pasting.html#def:pasted-measurement">Definition 9.12</a></li>
           
         </ul>
     
@@ -1261,7 +1301,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.13</span>
+    <span class="lemma_thmlabel">9.14</span>
     <span class="lemma_thmtitle">Vertical restriction identities</span>
     <div class="thm_header_extras">
 
@@ -1285,7 +1325,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#def:pasted-measurement">Definition 9.11</a></li>
+          <li><a href="sec-ld-pasting.html#def:pasted-measurement">Definition 9.12</a></li>
           
         </ul>
     
@@ -1337,7 +1377,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.14</span>
+    <span class="lemma_thmlabel">9.15</span>
     <span class="lemma_thmtitle">Strong self-consistency of the complete part</span>
     <div class="thm_header_extras">
 
@@ -1364,7 +1404,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#def:ld-pasting-context">Definition 9.3</a></li>
+          <li><a href="sec-ld-pasting.html#def:ld-pasting-context">Definition 9.4</a></li>
           
           <li><a href="sec-prelims.html#prop:two-notions-of-self-consistency">Lemma 3.36</a></li>
           
@@ -1397,7 +1437,7 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>   In the nontrivial-regime pasting context of Definition&#160;<a href="sec-ld-pasting.html#def:ld-pasting-context">9.3</a>, </p>
+  <p>   In the nontrivial-regime pasting context of Definition&#160;<a href="sec-ld-pasting.html#def:ld-pasting-context">9.4</a>, </p>
 <div class="displaymath" id="a0000000450">
   \[  G^x \otimes I \approx _\zeta I \otimes G^x.  \]
 </div>
@@ -1434,7 +1474,7 @@
     <span class="corollary_thmcaption">
     Corollary
     </span>
-    <span class="corollary_thmlabel">9.15</span>
+    <span class="corollary_thmlabel">9.16</span>
     <span class="corollary_thmtitle">Strong self-consistency of the incomplete part</span>
     <div class="thm_header_extras">
 
@@ -1461,9 +1501,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#def:ld-pasting-context">Definition 9.3</a></li>
+          <li><a href="sec-ld-pasting.html#def:ld-pasting-context">Definition 9.4</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:g-complete-self-consistency">Lemma 9.14</a></li>
+          <li><a href="sec-ld-pasting.html#lem:g-complete-self-consistency">Lemma 9.15</a></li>
           
         </ul>
     
@@ -1494,7 +1534,7 @@
         </div>
   </div>
   <div class="corollary_thmcontent">
-  <p>   In the nontrivial-regime pasting context of Definition&#160;<a href="sec-ld-pasting.html#def:ld-pasting-context">9.3</a>, </p>
+  <p>   In the nontrivial-regime pasting context of Definition&#160;<a href="sec-ld-pasting.html#def:ld-pasting-context">9.4</a>, </p>
 <div class="displaymath" id="a0000000453">
   \[  G_\bot ^x \otimes I \approx _\zeta I \otimes G_\bot ^x.  \]
 </div>
@@ -1513,7 +1553,7 @@
 <div class="displaymath" id="a0000000454">
   \[  G_\bot ^x \otimes I - I \otimes G_\bot ^x = I \otimes G^x - G^x \otimes I,  \]
 </div>
-<p> so the claim is immediate from Lemma&#160;<a href="sec-ld-pasting.html#lem:g-complete-self-consistency">9.14</a>. </p>
+<p> so the claim is immediate from Lemma&#160;<a href="sec-ld-pasting.html#lem:g-complete-self-consistency">9.15</a>. </p>
 
   </div>
 </div>
@@ -1523,7 +1563,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.16</span>
+    <span class="lemma_thmlabel">9.17</span>
     <span class="lemma_thmtitle">Switcheroo contraction estimates</span>
     <div class="thm_header_extras">
 
@@ -1549,7 +1589,7 @@
           
           <li><a href="sec-prelims.html#prop:switch-sandwich">Lemma 3.32</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:g-complete-self-consistency">Lemma 9.14</a></li>
+          <li><a href="sec-ld-pasting.html#lem:g-complete-self-consistency">Lemma 9.15</a></li>
           
         </ul>
     
@@ -1591,7 +1631,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.17</span>
+    <span class="lemma_thmlabel">9.18</span>
     <span class="lemma_thmtitle">Commutativity with \(G_g^x\) implies commutativity with \(G^x\)</span>
     <div class="thm_header_extras">
 
@@ -1620,9 +1660,9 @@
           
           <li><a href="sec-prelims.html#prop:switch-sandwich">Lemma 3.32</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:g-complete-self-consistency">Lemma 9.14</a></li>
+          <li><a href="sec-ld-pasting.html#lem:g-complete-self-consistency">Lemma 9.15</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:switcheroo-contraction-estimates">Lemma 9.16</a></li>
+          <li><a href="sec-ld-pasting.html#lem:switcheroo-contraction-estimates">Lemma 9.17</a></li>
           
         </ul>
     
@@ -1750,7 +1790,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">9.18</span>
+    <span class="remark_thmlabel">9.19</span>
     <div class="thm_header_extras">
 
         </div>
@@ -1763,7 +1803,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p> The Lean theorem corresponding to Lemma&#160;<a href="sec-ld-pasting.html#lem:commutativity-switcheroo">9.17</a> takes one extra symmetry hypothesis, <span class="ttfamily">hfix : swapDensity ψbi.density = ψbi.density</span>. This is the <span class="ttfamily">density_swap</span> component of the paper’s permutation-invariance assumption on the symmetric two-prover strategy; the stronger <span class="ttfamily">swap_ev</span> field of <span class="ttfamily">PermInvState</span> is not assumed by this theorem. The hypothesis is used to identify \(\langle \psi  \rvert  G \otimes M \lvert \psi  \rangle \) with \(\langle \psi  \rvert  M \otimes G \lvert \psi  \rangle \) at the center of the triangle-inequality chain. </p>
+  <p> The Lean theorem corresponding to Lemma&#160;<a href="sec-ld-pasting.html#lem:commutativity-switcheroo">9.18</a> takes one extra symmetry hypothesis, <span class="ttfamily">hfix : swapDensity ψbi.density = ψbi.density</span>. This is the <span class="ttfamily">density_swap</span> component of the paper’s permutation-invariance assumption on the symmetric two-prover strategy; the stronger <span class="ttfamily">swap_ev</span> field of <span class="ttfamily">PermInvState</span> is not assumed by this theorem. The hypothesis is used to identify \(\langle \psi  \rvert  G \otimes M \lvert \psi  \rangle \) with \(\langle \psi  \rvert  M \otimes G \lvert \psi  \rangle \) at the center of the triangle-inequality chain. </p>
 
   </div>
 </div>
@@ -1772,7 +1812,7 @@
     <span class="corollary_thmcaption">
     Corollary
     </span>
-    <span class="corollary_thmlabel">9.19</span>
+    <span class="corollary_thmlabel">9.20</span>
     <span class="corollary_thmtitle">Commutativity of the complete part</span>
     <div class="thm_header_extras">
 
@@ -1799,13 +1839,13 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#def:ld-pasting-context">Definition 9.3</a></li>
+          <li><a href="sec-ld-pasting.html#def:ld-pasting-context">Definition 9.4</a></li>
           
           <li><a href="sec-g-comm.html#thm:com-main">Theorem 8.7</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:commutativity-switcheroo">Lemma 9.17</a></li>
+          <li><a href="sec-ld-pasting.html#lem:commutativity-switcheroo">Lemma 9.18</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:g-complete-self-consistency">Lemma 9.14</a></li>
+          <li><a href="sec-ld-pasting.html#lem:g-complete-self-consistency">Lemma 9.15</a></li>
           
         </ul>
     
@@ -1836,7 +1876,7 @@
         </div>
   </div>
   <div class="corollary_thmcontent">
-  <p>   In the nontrivial-regime pasting context of Definition&#160;<a href="sec-ld-pasting.html#def:ld-pasting-context">9.3</a>, the following commutation relations hold: </p>
+  <p>   In the nontrivial-regime pasting context of Definition&#160;<a href="sec-ld-pasting.html#def:ld-pasting-context">9.4</a>, the following commutation relations hold: </p>
 <div class="displaymath" id="a0000000465">
   \[  G_g^x G^y \otimes I \approx _{\nu _2} G^y G_g^x \otimes I, \qquad G^x G^y \otimes I \approx _{\nu _2} G^y G^x \otimes I,  \]
 </div>
@@ -1864,7 +1904,7 @@
   <span class="equation_label">21</span>
 </p>
 </div>
-<p> Applying Lemma&#160;<a href="sec-ld-pasting.html#lem:commutativity-switcheroo">9.17</a> to <a href="sec-ld-pasting.html#eq:com-main-copy">21</a>, with \(\{ M_o^y\} \) equal to the outcome family \(\{ G_h^y\} \), gives </p>
+<p> Applying Lemma&#160;<a href="sec-ld-pasting.html#lem:commutativity-switcheroo">9.18</a> to <a href="sec-ld-pasting.html#eq:com-main-copy">21</a>, with \(\{ M_o^y\} \) equal to the outcome family \(\{ G_h^y\} \), gives </p>
 <div class="equation" id="eq:applied-the-lemma-to-com-main-copy">
 <p>
   <div class="equation_content">
@@ -1873,7 +1913,7 @@
   <span class="equation_label">22</span>
 </p>
 </div>
-<p> where \(\theta _1 = 12\sqrt{\zeta } + 4\sqrt{\nu _{\mathrm{com}}}\). Applying Lemma&#160;<a href="sec-ld-pasting.html#lem:commutativity-switcheroo">9.17</a> again to <a href="sec-ld-pasting.html#eq:applied-the-lemma-to-com-main-copy">22</a>, now with the one-outcome family \(M_o^y = G^y\), gives </p>
+<p> where \(\theta _1 = 12\sqrt{\zeta } + 4\sqrt{\nu _{\mathrm{com}}}\). Applying Lemma&#160;<a href="sec-ld-pasting.html#lem:commutativity-switcheroo">9.18</a> again to <a href="sec-ld-pasting.html#eq:applied-the-lemma-to-com-main-copy">22</a>, now with the one-outcome family \(M_o^y = G^y\), gives </p>
 <div class="displaymath" id="a0000000467">
   \[  G^x G^y \otimes I \approx _{\theta _2} G^y G^x \otimes I,  \]
 </div>
@@ -1893,7 +1933,7 @@
     <span class="corollary_thmcaption">
     Corollary
     </span>
-    <span class="corollary_thmlabel">9.20</span>
+    <span class="corollary_thmlabel">9.21</span>
     <span class="corollary_thmtitle">Commutativity of the incomplete part</span>
     <div class="thm_header_extras">
 
@@ -1920,9 +1960,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#def:ld-pasting-context">Definition 9.3</a></li>
+          <li><a href="sec-ld-pasting.html#def:ld-pasting-context">Definition 9.4</a></li>
           
-          <li><a href="sec-ld-pasting.html#cor:commuting-with-G-complete">Corollary 9.19</a></li>
+          <li><a href="sec-ld-pasting.html#cor:commuting-with-G-complete">Corollary 9.20</a></li>
           
         </ul>
     
@@ -1953,7 +1993,7 @@
         </div>
   </div>
   <div class="corollary_thmcontent">
-  <p>   In the nontrivial-regime pasting context of Definition&#160;<a href="sec-ld-pasting.html#def:ld-pasting-context">9.3</a>, </p>
+  <p>   In the nontrivial-regime pasting context of Definition&#160;<a href="sec-ld-pasting.html#def:ld-pasting-context">9.4</a>, </p>
 <div class="displaymath" id="a0000000471">
   \[  G_g^x G_\bot ^y \otimes I \approx _{\nu _2} G_\bot ^y G_g^x \otimes I, \qquad G_\bot ^x G_\bot ^y \otimes I \approx _{\nu _2} G_\bot ^y G_\bot ^x \otimes I.  \]
 </div>
@@ -1976,7 +2016,7 @@
 <div class="displaymath" id="a0000000473">
   \[  G_\bot ^x G_\bot ^y - G_\bot ^y G_\bot ^x = G^x G^y - G^y G^x  \]
 </div>
-<p> reduce both claims to Corollary&#160;<a href="sec-ld-pasting.html#cor:commuting-with-G-complete">9.19</a>. </p>
+<p> reduce both claims to Corollary&#160;<a href="sec-ld-pasting.html#cor:commuting-with-G-complete">9.20</a>. </p>
 
   </div>
 </div>
@@ -1986,7 +2026,7 @@
     <span class="corollary_thmcaption">
     Corollary
     </span>
-    <span class="corollary_thmlabel">9.21</span>
+    <span class="corollary_thmlabel">9.22</span>
     <span class="corollary_thmtitle">Strong self-consistency and commutation of \(\widehat G\)</span>
     <div class="thm_header_extras">
 
@@ -2013,13 +2053,13 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#lem:g-complete-self-consistency">Lemma 9.14</a></li>
+          <li><a href="sec-ld-pasting.html#lem:g-complete-self-consistency">Lemma 9.15</a></li>
           
-          <li><a href="sec-ld-pasting.html#cor:g-bot-self-consistency">Corollary 9.15</a></li>
+          <li><a href="sec-ld-pasting.html#cor:g-bot-self-consistency">Corollary 9.16</a></li>
           
-          <li><a href="sec-ld-pasting.html#cor:commuting-with-G-complete">Corollary 9.19</a></li>
+          <li><a href="sec-ld-pasting.html#cor:commuting-with-G-complete">Corollary 9.20</a></li>
           
-          <li><a href="sec-ld-pasting.html#cor:commuting-with-G-incomplete">Corollary 9.20</a></li>
+          <li><a href="sec-ld-pasting.html#cor:commuting-with-G-incomplete">Corollary 9.21</a></li>
           
         </ul>
     
@@ -2073,7 +2113,7 @@
 <div class="displaymath" id="a0000000476">
   \[  \mathbb {E}_x \sum _g \| (\widehat G_g^x \otimes I - I \otimes \widehat G_g^x)\lvert \psi  \rangle \| ^2 \le \zeta + \zeta = 2\zeta  \]
 </div>
-<p> by <a href="sec-ld-pasting.html#item:ld-pasting-self-consistency">3</a> and <a href="sec-ld-pasting.html#cor:g-bot-self-consistency">9.15</a>. For <a href="sec-ld-pasting.html#eq:gcomall">24</a>, the same decomposition yields four cases: polynomial–polynomial, \(\bot \)–\(\bot \), polynomial–\(\bot \), and \(\bot \)–polynomial. These contribute \(\nu _{\mathrm{com}}\) and three copies of \(\nu _2\), so </p>
+<p> by <a href="sec-ld-pasting.html#item:ld-pasting-self-consistency">3</a> and <a href="sec-ld-pasting.html#cor:g-bot-self-consistency">9.16</a>. For <a href="sec-ld-pasting.html#eq:gcomall">24</a>, the same decomposition yields four cases: polynomial–polynomial, \(\bot \)–\(\bot \), polynomial–\(\bot \), and \(\bot \)–polynomial. These contribute \(\nu _{\mathrm{com}}\) and three copies of \(\nu _2\), so </p>
 <div class="displaymath" id="a0000000477">
   \[  \nu _{\mathrm{com}} + 3\nu _2 \le 138m\left(\gamma ^{1/16}+\zeta ^{1/16}+(d/q)^{1/16}\right) = \nu _3.  \]
 </div>
@@ -2085,7 +2125,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.22</span>
+    <span class="lemma_thmlabel">9.23</span>
     <span class="lemma_thmtitle">Completed part bounded by a slice</span>
     <div class="thm_header_extras">
 
@@ -2109,9 +2149,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#def:G-hat">Definition 9.9</a></li>
+          <li><a href="sec-ld-pasting.html#def:G-hat">Definition 9.10</a></li>
           
-          <li><a href="sec-ld-pasting.html#cor:G-hat-facts">Corollary 9.21</a></li>
+          <li><a href="sec-ld-pasting.html#cor:G-hat-facts">Corollary 9.22</a></li>
           
         </ul>
     
@@ -2153,7 +2193,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.23</span>
+    <span class="lemma_thmlabel">9.24</span>
     <span class="lemma_thmtitle">Completed sandwich normalization</span>
     <div class="thm_header_extras">
 
@@ -2177,9 +2217,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#def:G-hat">Definition 9.9</a></li>
+          <li><a href="sec-ld-pasting.html#def:G-hat">Definition 9.10</a></li>
           
-          <li><a href="sec-ld-pasting.html#def:completed-outcome-reindexing">Definition 9.12</a></li>
+          <li><a href="sec-ld-pasting.html#def:completed-outcome-reindexing">Definition 9.13</a></li>
           
         </ul>
     
@@ -2231,7 +2271,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.24</span>
+    <span class="lemma_thmlabel">9.25</span>
     <span class="lemma_thmtitle">One-step completed sandwich commutation</span>
     <div class="thm_header_extras">
 
@@ -2255,9 +2295,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#cor:G-hat-facts">Corollary 9.21</a></li>
+          <li><a href="sec-ld-pasting.html#cor:G-hat-facts">Corollary 9.22</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:completed-sandwich-normalization">Lemma 9.23</a></li>
+          <li><a href="sec-ld-pasting.html#lem:completed-sandwich-normalization">Lemma 9.24</a></li>
           
           <li><a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">Lemma 3.27</a></li>
           
@@ -2315,7 +2355,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.25</span>
+    <span class="lemma_thmlabel">9.26</span>
     <span class="lemma_thmtitle">Commuting past multiple completed measurements</span>
     <div class="thm_header_extras">
 
@@ -2342,9 +2382,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#cor:G-hat-facts">Corollary 9.21</a></li>
+          <li><a href="sec-ld-pasting.html#cor:G-hat-facts">Corollary 9.22</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:one-step-completed-sandwich-commutation">Lemma 9.24</a></li>
+          <li><a href="sec-ld-pasting.html#lem:one-step-completed-sandwich-commutation">Lemma 9.25</a></li>
           
           <li><a href="sec-prelims.html#prop:triangle-inequality-for-approx_delta">Lemma 3.27</a></li>
           
@@ -2408,7 +2448,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.26</span>
+    <span class="lemma_thmlabel">9.27</span>
     <span class="lemma_thmtitle">Line-interpolation mismatch estimates</span>
     <div class="thm_header_extras">
 
@@ -2432,9 +2472,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#lem:vertical-restriction-identities">Lemma 9.13</a></li>
+          <li><a href="sec-ld-pasting.html#lem:vertical-restriction-identities">Lemma 9.14</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:ld-gbcon">Lemma 9.4</a></li>
+          <li><a href="sec-ld-pasting.html#lem:ld-gbcon">Lemma 9.5</a></li>
           
         </ul>
     
@@ -2489,7 +2529,7 @@
 <div class="displaymath" id="a0000000483">
   \[  \operatorname {Bad}(\psi ;u,\mathbf{x}) = \sum _f \langle \psi  \rvert  \Bigl(\sum _{\substack {g_1,\dots ,g_k\\ \exists i:\,  g_i\ne \bot ,\  g_i(u)\ne f(x_i)}} \widehat H_{g_1,\dots ,g_k}^{\mathbf{x}} \Bigr) \otimes B_f^u \lvert \psi  \rangle ,  \]
 </div>
-<p> and \(\widehat{H}^{(i)},B^{(i)}\) are the one-point line comparison families (Lemma&#160;<a href="sec-ld-pasting.html#lem:ld-sandwich-line-one-point">9.28</a>) restricted to coordinate \(i\), and \(\operatorname {Bad}(\psi ;u,\mathbf{x})\le 1\). </p>
+<p> and \(\widehat{H}^{(i)},B^{(i)}\) are the one-point line comparison families (Lemma&#160;<a href="sec-ld-pasting.html#lem:ld-sandwich-line-one-point">9.29</a>) restricted to coordinate \(i\), and \(\operatorname {Bad}(\psi ;u,\mathbf{x})\le 1\). </p>
 
   </div>
 </div>
@@ -2498,7 +2538,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.27</span>
+    <span class="lemma_thmlabel">9.28</span>
     <span class="lemma_thmtitle">Averaging the line-interpolation defect</span>
     <div class="thm_header_extras">
 
@@ -2522,9 +2562,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#prop:ld-dnoteq">Proposition 9.7</a></li>
+          <li><a href="sec-ld-pasting.html#prop:ld-dnoteq">Proposition 9.8</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:line-interpolation-mismatch-estimates">Lemma 9.26</a></li>
+          <li><a href="sec-ld-pasting.html#lem:line-interpolation-mismatch-estimates">Lemma 9.27</a></li>
           
         </ul>
     
@@ -2573,7 +2613,7 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>   Replacing distinct tuples by independent tuples costs the total-variation error \(k^2/q\) from Proposition&#160;<a href="sec-ld-pasting.html#prop:ld-dnoteq">9.7</a>. After averaging over \(u\) and \(\mathbf{x}\sim \mathsf{Distinct}_k\), the expected bad mass and the expected pasted interpolation defect are bounded by the one-point sandwich error: </p>
+  <p>   Replacing distinct tuples by independent tuples costs the total-variation error \(k^2/q\) from Proposition&#160;<a href="sec-ld-pasting.html#prop:ld-dnoteq">9.8</a>. After averaging over \(u\) and \(\mathbf{x}\sim \mathsf{Distinct}_k\), the expected bad mass and the expected pasted interpolation defect are bounded by the one-point sandwich error: </p>
 <div class="displaymath" id="a0000000484">
   \[  \mathbb {E}_u\;  \mathbb {E}_{\mathbf{x}\sim \mathsf{Distinct}_k}\;  \operatorname {Bad}(\psi ;u,\mathbf{x}) \; \le \;  k\cdot \nu _5 \; +\;  \frac{k^2}{q},  \]
 </div>
@@ -2581,7 +2621,7 @@
 <div class="displaymath" id="a0000000485">
   \[  \mathbb {E}_u\; \mathbb {E}_{\mathbf{x}\sim \mathsf{Distinct}_k}\;  \operatorname {Defect}_\psi \bigl( \widehat{H}^{\mathbf{x}}\rvert _u,\,  B^u\bigr) \; \le \;  k\cdot \nu _5 \; +\;  \frac{k^2}{q},  \]
 </div>
-<p> where \(\nu _5 = 43km(\varepsilon ^{1/32}+\dots +(d/q)^{1/32})\) (Lemma&#160;<a href="sec-ld-pasting.html#lem:ld-sandwich-line-one-point">9.28</a>). Using \(1/q \le (d/q)^{1/32}\) and \(m\ge 1\), this is further bounded by \(44k^2m(\varepsilon ^{1/32}+\delta ^{1/32}+\gamma ^{1/32}+\zeta ^{1/32}+(d/q)^{1/32})\) as used in Lemma&#160;<a href="sec-ld-pasting.html#lem:h-b-consistency">9.29</a>. </p>
+<p> where \(\nu _5 = 43km(\varepsilon ^{1/32}+\dots +(d/q)^{1/32})\) (Lemma&#160;<a href="sec-ld-pasting.html#lem:ld-sandwich-line-one-point">9.29</a>). Using \(1/q \le (d/q)^{1/32}\) and \(m\ge 1\), this is further bounded by \(44k^2m(\varepsilon ^{1/32}+\delta ^{1/32}+\gamma ^{1/32}+\zeta ^{1/32}+(d/q)^{1/32})\) as used in Lemma&#160;<a href="sec-ld-pasting.html#lem:h-b-consistency">9.30</a>. </p>
 
   </div>
 </div>
@@ -2590,7 +2630,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.28</span>
+    <span class="lemma_thmlabel">9.29</span>
     <span class="lemma_thmtitle">Consistency of the sandwiched measurement with one line value</span>
     <div class="thm_header_extras">
 
@@ -2617,9 +2657,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#lem:commute-g-half-sandwich">Lemma 9.25</a></li>
+          <li><a href="sec-ld-pasting.html#lem:commute-g-half-sandwich">Lemma 9.26</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:ld-gbcon">Lemma 9.4</a></li>
+          <li><a href="sec-ld-pasting.html#lem:ld-gbcon">Lemma 9.5</a></li>
           
         </ul>
     
@@ -2691,7 +2731,7 @@
   <span class="equation_label">27</span>
 </p>
 </div>
-<p> which is at most \(\nu _4\) by Lemma&#160;<a href="sec-ld-pasting.html#lem:commute-g-half-sandwich">9.25</a>. A second Cauchy–Schwarz step gives </p>
+<p> which is at most \(\nu _4\) by Lemma&#160;<a href="sec-ld-pasting.html#lem:commute-g-half-sandwich">9.26</a>. A second Cauchy–Schwarz step gives </p>
 <div class="equation" id="eq:even-bigger-CS">
 <p>
   <div class="equation_content">
@@ -2718,7 +2758,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.29</span>
+    <span class="lemma_thmlabel">9.30</span>
     <span class="lemma_thmtitle">Consistency of the pasted measurement with the line measurement</span>
     <div class="thm_header_extras">
 
@@ -2745,13 +2785,13 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#def:pasted-measurement">Definition 9.11</a></li>
+          <li><a href="sec-ld-pasting.html#def:pasted-measurement">Definition 9.12</a></li>
           
-          <li><a href="sec-ld-pasting.html#prop:ld-dnoteq">Proposition 9.7</a></li>
+          <li><a href="sec-ld-pasting.html#prop:ld-dnoteq">Proposition 9.8</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:ld-sandwich-line-one-point">Lemma 9.28</a></li>
+          <li><a href="sec-ld-pasting.html#lem:ld-sandwich-line-one-point">Lemma 9.29</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:line-interpolation-averaging-estimates">Lemma 9.27</a></li>
+          <li><a href="sec-ld-pasting.html#lem:line-interpolation-averaging-estimates">Lemma 9.28</a></li>
           
         </ul>
     
@@ -2811,7 +2851,7 @@
 
 \end{bgroup}}} \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{x_1,\dots ,x_k} \otimes B_f^u \lvert \psi  \rangle . \label{eq:keep-on-contractin} \end{align}
 </div>
-<p> Passing from independent tuples to distinct tuples costs at most \(k^2/q\) by Lemma&#160;<a href="sec-ld-pasting.html#prop:ld-dnoteq">9.7</a>. A union bound over the offending coordinate then gives </p>
+<p> Passing from independent tuples to distinct tuples costs at most \(k^2/q\) by Lemma&#160;<a href="sec-ld-pasting.html#prop:ld-dnoteq">9.8</a>. A union bound over the offending coordinate then gives </p>
 <div class="displaymath" id="a0000000497">
   \[  \eqref{eq:keep-on-contractin} \le \sum _{i=1}^k \mathbb {E}_u \mathbb {E}_{y_1,\dots ,y_k} \sum _{g_1,\dots ,g_k\, :\, g_i\ne \bot } \sum _{a\ne g_i(u)} \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{y_1,\dots ,y_k} \otimes B_{[f(y_i)=a]}^u \lvert \psi  \rangle  \le k\nu _5.  \]
 </div>
@@ -2827,7 +2867,7 @@
     <span class="corollary_thmcaption">
     Corollary
     </span>
-    <span class="corollary_thmlabel">9.30</span>
+    <span class="corollary_thmlabel">9.31</span>
     <span class="corollary_thmtitle">Consistency of \(H\) with \(A\)</span>
     <div class="thm_header_extras">
 
@@ -2854,9 +2894,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#lem:h-b-consistency">Lemma 9.29</a></li>
+          <li><a href="sec-ld-pasting.html#lem:h-b-consistency">Lemma 9.30</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:h-b-consistency">Lemma 9.29</a></li>
+          <li><a href="sec-ld-pasting.html#lem:h-b-consistency">Lemma 9.30</a></li>
           
           <li><a href="sec-prelims.html#prop:triangle-sub">Lemma 3.20</a></li>
           
@@ -2904,7 +2944,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> Lemma&#160;<a href="sec-ld-pasting.html#lem:h-b-consistency">9.29</a> implies </p>
+  <p> Lemma&#160;<a href="sec-ld-pasting.html#lem:h-b-consistency">9.30</a> implies </p>
 <div class="displaymath" id="a0000000501">
   \[  H_{[h(u,x)=a]} \otimes I \simeq _{\nu _6} I \otimes B^u_{[f(x)=a]}.  \]
 </div>
@@ -2920,12 +2960,76 @@
 
   </div>
 </div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:h-a-consistency-from-line-consistency">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">9.32</span>
+    <span class="lemma_thmtitle">Point consistency from vertical-line consistency</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-ld-pasting.html#lem:h-a-consistency-from-line-consistency">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-prelims.html#prop:triangle-sub">Lemma 3.20</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Pasting.hAConsistency_submeas_from_lineConsistency" class="lean_decl">MIPStarRE.LDT.Pasting.hAConsistency_submeas_from_lineConsistency</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>    Let \(H\) be any polynomial-valued submeasurement. Suppose that the strategy is good, that \(\gamma ,\zeta \ge 0\), that \(k \ge 1\), and that the restriction of \(H\) to every vertical line is consistent with the vertical-line measurement with error \(\nu _6\). Then the pointwise evaluations of \(H\) are consistent with Alice’s point measurement with error \(\nu \). </p>
+
+  </div>
+</div>
 <div class="corollary_thmwrapper theorem-style-plain" id="cor:h-a-consistency-completed">
   <div class="corollary_thmheading">
     <span class="corollary_thmcaption">
     Corollary
     </span>
-    <span class="corollary_thmlabel">9.31</span>
+    <span class="corollary_thmlabel">9.33</span>
     <span class="corollary_thmtitle">Consistency of the completed \(H\) with \(A\)</span>
     <div class="thm_header_extras">
 
@@ -2952,9 +3056,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#cor:h-a-consistency">Corollary 9.30</a></li>
+          <li><a href="sec-ld-pasting.html#cor:h-a-consistency">Corollary 9.31</a></li>
           
-          <li><a href="sec-ld-pasting.html#cor:ld-pasting-N-completeness">Corollary 9.40</a></li>
+          <li><a href="sec-ld-pasting.html#cor:ld-pasting-N-completeness">Corollary 9.43</a></li>
           
         </ul>
     
@@ -3000,11 +3104,11 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>Corollary&#160;<a href="sec-ld-pasting.html#cor:h-a-consistency">9.30</a> gives </p>
+  <p>Corollary&#160;<a href="sec-ld-pasting.html#cor:h-a-consistency">9.31</a> gives </p>
 <div class="displaymath" id="a0000000506">
   \[  H_{[h(u,x)=a]} \otimes I \simeq _{\nu } I \otimes A_a^{u,x}.  \]
 </div>
-<p> Corollary&#160;<a href="sec-ld-pasting.html#cor:ld-pasting-N-completeness">9.40</a> bounds the missing mass of \(H\) by </p>
+<p> Corollary&#160;<a href="sec-ld-pasting.html#cor:ld-pasting-N-completeness">9.43</a> bounds the missing mass of \(H\) by </p>
 <div class="displaymath" id="a0000000507">
   \[  \kappa \cdot \left(1 + \frac{1}{100m}\right) + \nu + e^{-k/(80000m^2)}.  \]
 </div>
@@ -3015,6 +3119,50 @@
 
   </div>
 </div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:h-a-consistency-completed-from-submeas">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">9.34</span>
+    <span class="lemma_thmtitle">Completion from submeasurement consistency</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-ld-pasting.html#lem:h-a-consistency-completed-from-submeas">#</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Pasting.hAConsistency_completed_from_submeas" class="lean_decl">MIPStarRE.LDT.Pasting.hAConsistency_completed_from_submeas</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>   Let \(H\) be any polynomial-valued submeasurement. Suppose that the pointwise evaluations of \(H\) are consistent with Alice’s point measurement with error \(\nu \), and that \(H\) has the lower mass bound used in Corollary&#160;<a href="sec-ld-pasting.html#cor:ld-pasting-N-completeness">9.43</a>. Then completing \(H\) at the fallback polynomial preserves point consistency with the enlarged error appearing in the induction statement. </p>
+
+  </div>
+</div>
 <h2 id="sec:completeness-of-h-low-degree">9.0.6 Completeness of \(H\)</h2>
 
 <div class="definition_thmwrapper theorem-style-definition" id="def:outcomes-by-type">
@@ -3022,7 +3170,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">9.32</span>
+    <span class="definition_thmlabel">9.35</span>
     <span class="definition_thmtitle">Outcomes of a fixed type</span>
     <div class="thm_header_extras">
 
@@ -3046,7 +3194,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#def:types">Definition 9.10</a></li>
+          <li><a href="sec-ld-pasting.html#def:types">Definition 9.11</a></li>
           
         </ul>
     
@@ -3090,7 +3238,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.33</span>
+    <span class="lemma_thmlabel">9.36</span>
     <span class="lemma_thmtitle">Summing over all outcomes</span>
     <div class="thm_header_extras">
 
@@ -3117,11 +3265,11 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#def:outcomes-by-type">Definition 9.32</a></li>
+          <li><a href="sec-ld-pasting.html#def:outcomes-by-type">Definition 9.35</a></li>
           
-          <li><a href="sec-ld-pasting.html#prop:ld-dnoteq">Proposition 9.7</a></li>
+          <li><a href="sec-ld-pasting.html#prop:ld-dnoteq">Proposition 9.8</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:ld-sandwich-line-one-point">Lemma 9.28</a></li>
+          <li><a href="sec-ld-pasting.html#lem:ld-sandwich-line-one-point">Lemma 9.29</a></li>
           
           <li><a href="sec-prelims.html#lem:schwartz-zippel-individual">Lemma 3.7</a></li>
           
@@ -3208,7 +3356,7 @@
   <span class="equation_label">36</span>
 </p>
 </div>
-<p> and after switching to independent tuples and applying Lemma&#160;<a href="sec-ld-pasting.html#lem:ld-sandwich-line-one-point">9.28</a> coordinatewise, this contributes at most \(k^2/q + k\nu _5\). </p>
+<p> and after switching to independent tuples and applying Lemma&#160;<a href="sec-ld-pasting.html#lem:ld-sandwich-line-one-point">9.29</a> coordinatewise, this contributes at most \(k^2/q + k\nu _5\). </p>
 <p>Let \(\mathsf{Consistent}_\tau (g,y,u)\) denote the event that there exists a degree-\(d\) polynomial \(f\) with \(f(y_i)=g_i(u)\) for all \(i\in \tau \). Then </p>
 <div class="displaymath" id="a0000000514">
   \[  \mathbf{1}\! \left[[\right]\forall i\in \tau ,\  f(y_i)=g_i(u)] \le \mathbf{1}\! \left[[\right]\mathsf{Consistent}_\tau (g,y,u)],  \]
@@ -3221,7 +3369,7 @@
 <div class="displaymath" id="a0000000516">
   \[  \Pr _u[\mathsf{Consistent}_\tau (g,y,u)] \le \Pr _u[g_{i^*}(u)=h^*(u,y_{i^*})] \le \frac{md}{q}.  \]
 </div>
-<p> Therefore <a href="sec-ld-pasting.html#eq:consistent-indicator">37</a> is at most \(md/q\), which proves <a href="sec-ld-pasting.html#eq:remove-the-restriction">33</a>. A final application of Lemma&#160;<a href="sec-ld-pasting.html#prop:ld-dnoteq">9.7</a> replaces distinct tuples by independent tuples, giving a total error of </p>
+<p> Therefore <a href="sec-ld-pasting.html#eq:consistent-indicator">37</a> is at most \(md/q\), which proves <a href="sec-ld-pasting.html#eq:remove-the-restriction">33</a>. A final application of Lemma&#160;<a href="sec-ld-pasting.html#prop:ld-dnoteq">9.8</a> replaces distinct tuples by independent tuples, giving a total error of </p>
 <div class="displaymath" id="a0000000517">
   \[  2\frac{k^2}{q} + \frac{md}{q} + k\nu _5 \le 46k^2m\left(\varepsilon ^{1/32}+\delta ^{1/32}+\gamma ^{1/32}+\zeta ^{1/32}+(d/q)^{1/32}\right) = \nu _7.  \]
 </div>
@@ -3233,7 +3381,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">9.34</span>
+    <span class="definition_thmlabel">9.37</span>
     <span class="definition_thmtitle">Truncated type sums</span>
     <div class="thm_header_extras">
 
@@ -3257,7 +3405,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#def:types">Definition 9.10</a></li>
+          <li><a href="sec-ld-pasting.html#def:types">Definition 9.11</a></li>
           
         </ul>
     
@@ -3301,7 +3449,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.35</span>
+    <span class="lemma_thmlabel">9.38</span>
     <span class="lemma_thmtitle">Recurrence for truncated type sums</span>
     <div class="thm_header_extras">
 
@@ -3328,7 +3476,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#def:truncated-type-sums">Definition 9.34</a></li>
+          <li><a href="sec-ld-pasting.html#def:truncated-type-sums">Definition 9.37</a></li>
           
         </ul>
     
@@ -3387,7 +3535,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.36</span>
+    <span class="lemma_thmlabel">9.39</span>
     <span class="lemma_thmtitle">From the pasted sum to a polynomial in \(G\)</span>
     <div class="thm_header_extras">
 
@@ -3414,17 +3562,17 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#cor:G-hat-facts">Corollary 9.21</a></li>
+          <li><a href="sec-ld-pasting.html#cor:G-hat-facts">Corollary 9.22</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:q-sdd-complete-part-slice-bound">Lemma 9.22</a></li>
+          <li><a href="sec-ld-pasting.html#lem:q-sdd-complete-part-slice-bound">Lemma 9.23</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:commute-g-half-sandwich">Lemma 9.25</a></li>
+          <li><a href="sec-ld-pasting.html#lem:commute-g-half-sandwich">Lemma 9.26</a></li>
           
-          <li><a href="sec-ld-pasting.html#def:pasted-measurement">Definition 9.11</a></li>
+          <li><a href="sec-ld-pasting.html#def:pasted-measurement">Definition 9.12</a></li>
           
-          <li><a href="sec-ld-pasting.html#def:truncated-type-sums">Definition 9.34</a></li>
+          <li><a href="sec-ld-pasting.html#def:truncated-type-sums">Definition 9.37</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:truncated-type-sum-recurrence">Lemma 9.35</a></li>
+          <li><a href="sec-ld-pasting.html#lem:truncated-type-sum-recurrence">Lemma 9.38</a></li>
           
         </ul>
     
@@ -3527,7 +3675,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">9.37</span>
+    <span class="remark_thmlabel">9.40</span>
     <span class="remark_thmtitle">Lean proof-stage notation</span>
     <div class="thm_header_extras">
 
@@ -3601,7 +3749,7 @@
 <div class="displaymath" id="eq:call-this-later">
   \begin{multline} \label{eq:call-this-later} \Bigl| \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \bigl([\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }},\widehat G_{g_\ell }^{x_\ell }] \otimes I\bigr) \bigl((\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger \otimes (S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell })\bigr) \lvert \psi  \rangle  \Bigr|\\ \le \sqrt{ \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  [\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }},\widehat G_{g_\ell }^{x_\ell }] [\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }},\widehat G_{g_\ell }^{x_\ell }]^\dagger \otimes I \lvert \psi  \rangle  } \cdot \sqrt{ \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \widehat H_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes \bigl(\widehat G_{g_\ell }^{x_\ell }(S_{\tau _{\ge \ell }})^2\widehat G_{g_\ell }^{x_\ell }\bigr) \lvert \psi  \rangle  }. \end{multline}
 </div>
-<p> The first square root is bounded by \(\nu _4\) via Lemma&#160;<a href="sec-ld-pasting.html#lem:commute-g-half-sandwich">9.25</a>, and the second by \(1\) since \(S_{\tau _{\ge \ell }}\le I\). </p>
+<p> The first square root is bounded by \(\nu _4\) via Lemma&#160;<a href="sec-ld-pasting.html#lem:commute-g-half-sandwich">9.26</a>, and the second by \(1\) since \(S_{\tau _{\ge \ell }}\le I\). </p>
 <p>Continue commuting: </p>
 <div class="displaymath" id="eq:commute-g-part-two">
   \begin{align}  \eqref{eq:commute-g-part-one} \approx _{\sqrt{\nu _4}} \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \bigl(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }}(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger \widehat G_{g_\ell }^{x_\ell }\bigr) \otimes \bigl(S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell }\bigr)\lvert \psi  \rangle . \label{eq:commute-g-part-two} \end{align}
@@ -3628,7 +3776,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.38</span>
+    <span class="lemma_thmlabel">9.41</span>
     <span class="lemma_thmtitle">Context specializations for the pasted measurement</span>
     <div class="thm_header_extras">
 
@@ -3652,11 +3800,11 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#def:ld-pasting-context">Definition 9.3</a></li>
+          <li><a href="sec-ld-pasting.html#def:ld-pasting-context">Definition 9.4</a></li>
           
-          <li><a href="sec-ld-pasting.html#cor:h-a-consistency">Corollary 9.30</a></li>
+          <li><a href="sec-ld-pasting.html#cor:h-a-consistency">Corollary 9.31</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:from-H-to-G">Lemma 9.36</a></li>
+          <li><a href="sec-ld-pasting.html#lem:from-H-to-G">Lemma 9.39</a></li>
           
         </ul>
     
@@ -3689,7 +3837,7 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>   The nontrivial-regime pasting context specializes the consistency of \(H\) with \(A\) and the conversion from the pasted sum to the polynomial in \(G\) to the parameters and error bounds fixed in Definition&#160;<a href="sec-ld-pasting.html#def:ld-pasting-context">9.3</a>. </p>
+  <p>   The nontrivial-regime pasting context specializes the consistency of \(H\) with \(A\) and the conversion from the pasted sum to the polynomial in \(G\) to the parameters and error bounds fixed in Definition&#160;<a href="sec-ld-pasting.html#def:ld-pasting-context">9.4</a>. </p>
 
   </div>
 </div>
@@ -3698,7 +3846,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">9.39</span>
+    <span class="lemma_thmlabel">9.42</span>
     <span class="lemma_thmtitle">Matrix Chernoff bound for the Bernoulli polynomial</span>
     <div class="thm_header_extras">
 
@@ -3798,7 +3946,7 @@
     <span class="corollary_thmcaption">
     Corollary
     </span>
-    <span class="corollary_thmlabel">9.40</span>
+    <span class="corollary_thmlabel">9.43</span>
     <span class="corollary_thmtitle">Completeness of the pasted submeasurement</span>
     <div class="thm_header_extras">
 
@@ -3825,13 +3973,13 @@
         
         <ul class="uses">
           
-          <li><a href="sec-ld-pasting.html#lem:over-all-outcomes">Lemma 9.33</a></li>
+          <li><a href="sec-ld-pasting.html#lem:over-all-outcomes">Lemma 9.36</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:from-H-to-G">Lemma 9.36</a></li>
+          <li><a href="sec-ld-pasting.html#lem:from-H-to-G">Lemma 9.39</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:pasting-context-specializations">Lemma 9.38</a></li>
+          <li><a href="sec-ld-pasting.html#lem:pasting-context-specializations">Lemma 9.41</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:chernoff-bernoulli-matrix">Lemma 9.39</a></li>
+          <li><a href="sec-ld-pasting.html#lem:chernoff-bernoulli-matrix">Lemma 9.42</a></li>
           
         </ul>
     
@@ -3877,15 +4025,15 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>Lemma&#160;<a href="sec-ld-pasting.html#lem:over-all-outcomes">9.33</a> gives </p>
+  <p>Lemma&#160;<a href="sec-ld-pasting.html#lem:over-all-outcomes">9.36</a> gives </p>
 <div class="displaymath" id="a0000000545">
   \[  \langle \psi  \rvert  H \otimes I \lvert \psi  \rangle  \approx _{\nu _7} \mathbb {E}_{x_1,\dots ,x_k} \sum _{\tau :\, |\tau |\ge d+1} \sum _{(g_1,\dots ,g_k)\in \mathsf{Outcomes}_\tau } \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{x_1,\dots ,x_k} \otimes I \lvert \psi  \rangle .  \]
 </div>
-<p> Lemma&#160;<a href="sec-ld-pasting.html#lem:from-H-to-G">9.36</a> turns the right-hand side into </p>
+<p> Lemma&#160;<a href="sec-ld-pasting.html#lem:from-H-to-G">9.39</a> turns the right-hand side into </p>
 <div class="displaymath" id="a0000000546">
   \[  \sum _{r=d+1}^k \binom {k}{r} \langle \psi  \rvert  G^r(I-G)^{k-r} \otimes I \lvert \psi  \rangle   \]
 </div>
-<p> up to error \(\nu _8\). Apply Lemma&#160;<a href="sec-ld-pasting.html#lem:chernoff-bernoulli-matrix">9.39</a> with \(\theta = 1/(200m)\). Since \(k\ge 400md\), the hypothesis \(k \ge 2d/\theta \) is satisfied, and the resulting lower bound is </p>
+<p> up to error \(\nu _8\). Apply Lemma&#160;<a href="sec-ld-pasting.html#lem:chernoff-bernoulli-matrix">9.42</a> with \(\theta = 1/(200m)\). Since \(k\ge 400md\), the hypothesis \(k \ge 2d/\theta \) is satisfied, and the resulting lower bound is </p>
 <div class="displaymath" id="a0000000547">
   \[  1 - \frac{\kappa }{1-1/(200m)} - e^{-k/(80000m^2)} \ge 1 - \kappa \left(1+\frac{1}{100m}\right) - e^{-k/(80000m^2)}.  \]
 </div>
