@@ -58,11 +58,18 @@ lemma evaluatedSlice_phaseFive_stability_defect_bound
     (family : IdxPolyFamily params ι)
     (G : Fq params → SubMeas (Polynomial params) ι)
     (hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    (hbound_psd : ∀ x : Fq params, 0 ≤ family.witness x)
+    (hbound_residual :
+      avgOver (uniformDistribution (Fq params))
+        (fun x => IdxPolyFamily.storedResidual strategy family G x) ≤ zeta)
+    (hbound_dom :
+      ∀ x : Fq params, ∀ g : Polynomial params,
+        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x) :
     |avgOver (uniformDistribution (Fq params))
       (evaluatedSlicePhaseFiveStabilityDefect params strategy family G)| ≤ Real.sqrt zeta := by
   simpa [evaluatedSlicePhaseFiveStabilityDefect] using
-    (gCommStabilityTwo_scalar params strategy zeta hnorm family G hG hbound)
+    (gCommStabilityTwo_scalar params strategy zeta hnorm family G hG
+      hbound_psd hbound_residual hbound_dom)
 
 /-- The still-unmarginalized phase-5 defect at an evaluated-slice question.
 

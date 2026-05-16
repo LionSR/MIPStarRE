@@ -27,6 +27,7 @@ downstream theorems are re-stated via thin wrappers in later modules.
 namespace MIPStarRE.LDT.Pasting
 
 open MIPStarRE.LDT
+open scoped MatrixOrder Matrix ComplexOrder
 
 /-- The standing pasting context of `thm:ld-pasting`.
 
@@ -80,8 +81,19 @@ structure LdPastingContext (params : Parameters) [FieldModel params.q]
   consistent : family.ConsistentWithPoints strategy zeta
   /-- Averaged strong self-consistency (`item:ld-pasting-self-consistency`). -/
   selfConsistent : family.StronglySelfConsistent strategy.state zeta
-  /-- Averaged boundedness input (`item:ld-pasting-boundedness`). -/
-  bounded : IdxPolyFamily.SliceBoundednessInput strategy family zeta
+  /-- Positive-semidefinite witnesses `Z^x` in `item:ld-pasting-boundedness`. -/
+  boundedPSD : ∀ x : Fq params, 0 ≤ family.witness x
+  /-- Averaged residual bound in `item:ld-pasting-boundedness`. -/
+  boundedResidual :
+    avgOver (uniformDistribution (Fq params))
+      (fun x =>
+        ev strategy.state <|
+          leftTensor (ι₂ := ι) (1 - (family.meas x).toSubMeas.total) *
+            rightTensor (ι₁ := ι) (family.witness x)) ≤ zeta
+  /-- Domination `Z^x ≥ E_u A^{u,x}_{g(u)}` in `item:ld-pasting-boundedness`. -/
+  dominatesAveragedPoint :
+    ∀ x : Fq params, ∀ g : Polynomial params,
+      IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x
   /-- Pasting iteration count `k`. -/
   k : ℕ
   /-- Positivity of the iteration count. -/

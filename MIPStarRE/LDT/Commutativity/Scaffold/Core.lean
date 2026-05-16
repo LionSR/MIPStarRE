@@ -54,27 +54,25 @@ sub-measurements. -/
 structure CommDataProcessedGConclusion (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
+    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
     (gamma zeta : Error) : Prop where
-  familyG : ∀ x, G x = (family.meas x).toSubMeas
   postprocessedPointConsistency :
     ConsRel strategy.state
       (uniformDistribution (Point params.next))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (evaluatedPointFamily params family)
+      (evaluatedPointFamily params (IdxProjSubMeas.toIdxPolyFamily G))
       zeta
   postprocessedSelfConsistency :
     SDDRel strategy.state
       (uniformDistribution (Point params.next))
-      (evaluatedPointFamilyLeft params family)
-      (evaluatedPointFamilyRight params family)
+      (evaluatedPointFamilyLeft params (IdxProjSubMeas.toIdxPolyFamily G))
+      (evaluatedPointFamilyRight params (IdxProjSubMeas.toIdxPolyFamily G))
       zeta
   evaluatedSliceCommutation :
     SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
-      (evaluatedSliceProductLeft params strategy family)
-      (evaluatedSliceProductRight params strategy family)
+      (evaluatedSliceProductLeft params strategy (IdxProjSubMeas.toIdxPolyFamily G))
+      (evaluatedSliceProductRight params strategy (IdxProjSubMeas.toIdxPolyFamily G))
       (commDataProcessedGError params gamma zeta)
 
 /-- Paper origin: `references/ldt-paper/commutativity-G.tex:228-257`
@@ -82,22 +80,21 @@ structure CommDataProcessedGConclusion (params : Parameters)
 structure ComMainConclusion (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
+    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
     (gamma zeta : Error) : Prop where
   evaluatedCommutation :
-    CommDataProcessedGConclusion params strategy family G gamma zeta
+    CommDataProcessedGConclusion params strategy G gamma zeta
   evaluationSpecialization :
     SDDOpRel strategy.state
       (uniformDistribution (EvaluatedSliceQuestion params))
-      (evaluatedFromFullSliceProductLeft params strategy family)
-      (evaluatedFromFullSliceProductRight params strategy family)
+      (evaluatedFromFullSliceProductLeft params strategy (IdxProjSubMeas.toIdxPolyFamily G))
+      (evaluatedFromFullSliceProductRight params strategy (IdxProjSubMeas.toIdxPolyFamily G))
       (commDataProcessedGError params gamma zeta)
   fullSliceCommutation :
     SDDOpRel strategy.state
       (uniformDistribution (FullSliceQuestion params))
-      (fullSliceProductLeft params strategy family)
-      (fullSliceProductRight params strategy family)
+      (fullSliceProductLeft params strategy (IdxProjSubMeas.toIdxPolyFamily G))
+      (fullSliceProductRight params strategy (IdxProjSubMeas.toIdxPolyFamily G))
       (comMainError params gamma zeta)
 
 /-- Paper origin: `references/ldt-paper/commutativity-G.tex:309-338`

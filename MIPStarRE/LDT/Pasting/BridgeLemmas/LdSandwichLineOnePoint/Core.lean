@@ -347,7 +347,6 @@ lemma ldSandwichLineOnePoint
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (_hself : family.StronglySelfConsistent strategy.state zeta)
-    (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (hfacts : GHatFactsStatement params strategy.state family gamma zeta)
     (k i : ℕ)
     (hi : i < k) :

@@ -42,7 +42,6 @@ private lemma hBConsistency_core
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (_hself : family.StronglySelfConsistent strategy.state zeta)
-    (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
     (hline : ∀ i : ℕ, i < k →
       LdSandwichLineOnePointStatement params strategy family
@@ -118,7 +117,6 @@ lemma hBConsistency
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
     (hline : ∀ i : ℕ, i < k →
       LdSandwichLineOnePointStatement params strategy family
@@ -126,6 +124,6 @@ lemma hBConsistency
     HBConsistencyStatement params strategy family
         eps delta gamma zeta k := by
   exact ⟨hBConsistency_core params strategy eps delta gamma zeta
-    hgood hd family hcons hself hbound k hline⟩
+    hgood hd family hcons hself k hline⟩
 
 end MIPStarRE.LDT.Pasting

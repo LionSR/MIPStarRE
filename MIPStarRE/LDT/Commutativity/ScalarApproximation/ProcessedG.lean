@@ -87,13 +87,30 @@ lemma commDataProcessedG
     (eps delta gamma zeta : Error)
     (hnorm : strategy.state.IsNormalized)
     (hgood : strategy.IsGood eps delta gamma)
-    (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
-    CommDataProcessedGConclusion params strategy family G gamma zeta := by
+    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
+    (hcons : IdxProjSubMeas.ConsistentWithPoints G strategy zeta)
+    (hself : IdxProjSubMeas.StronglySelfConsistent G strategy.state zeta)
+    (Z : Fq params → MIPStarRE.Quantum.Op ι)
+    (hbound_psd : ∀ x : Fq params, 0 ≤ Z x)
+    (hbound_residual :
+      avgOver (uniformDistribution (Fq params))
+        (fun x =>
+          ev strategy.state <|
+            leftTensor (ι₂ := ι) (1 - (G x).toSubMeas.total) *
+              rightTensor (ι₁ := ι) (Z x)) ≤ zeta)
+    (hbound_dom :
+      ∀ x : Fq params, ∀ g : Polynomial params,
+        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ Z x) :
+    CommDataProcessedGConclusion params strategy G gamma zeta := by
+  let family : IdxPolyFamily params ι := IdxProjSubMeas.withWitness strategy G Z
+  let Gsub : Fq params → SubMeas (Polynomial params) ι := fun x => (G x).toSubMeas
+  have hGsub : ∀ x, Gsub x = (family.meas x).toSubMeas := by
+    intro x
+    rfl
+  have hcons_family : family.ConsistentWithPoints strategy zeta := by
+    exact IdxProjSubMeas.consistentWithPoints_withWitness strategy G Z hcons
+  have hself_family : family.StronglySelfConsistent strategy.state zeta := by
+    exact IdxProjSubMeas.stronglySelfConsistent_withWitness strategy G Z hself
   have hpostSSC :
       SDDRel strategy.state
         (uniformDistribution (Point params.next))
@@ -101,17 +118,29 @@ lemma commDataProcessedG
         (evaluatedPointFamilyRight params family)
         zeta :=
     evaluatedPointFamily_selfConsistency_of_stronglySelfConsistent
-      params strategy family zeta hself
+      params strategy family zeta hself_family
   refine
-    { familyG := hG
-      postprocessedPointConsistency := ?_
-      postprocessedSelfConsistency := hpostSSC
+    { postprocessedPointConsistency := ?_
+      postprocessedSelfConsistency := by
+        simpa [family, IdxProjSubMeas.withWitness, IdxProjSubMeas.toIdxPolyFamily] using hpostSSC
       evaluatedSliceCommutation := by
+        have hchain :
+            sddErrorOp strategy.state
+                (uniformDistribution (EvaluatedSliceQuestion params))
+                (evaluatedSliceProductLeft params strategy family)
+                (evaluatedSliceProductRight params strategy family) ≤
+              commDataProcessedGError params gamma zeta := by
+          rw [evaluatedSliceCommutation_qSDDOp_avg_eq params strategy family]
+          exact evaluatedSlice_scalar_chain_bound
+            params strategy eps delta gamma zeta
+            hnorm hgood family Gsub hGsub hcons_family hself_family
+            (by simpa [family, IdxProjSubMeas.withWitness] using hbound_psd)
+            (by simpa [family, IdxProjSubMeas.withWitness, Gsub] using hbound_residual)
+            (by simpa [family, IdxProjSubMeas.withWitness] using hbound_dom)
+            hpostSSC
         refine ⟨?_⟩
-        rw [evaluatedSliceCommutation_qSDDOp_avg_eq params strategy family]
-        exact evaluatedSlice_scalar_chain_bound
-          params strategy eps delta gamma zeta
-          hnorm hgood family G hG hcons hself hbound hpostSSC }
-  simpa [evaluatedPointFamily] using hcons.pointConsistency
+        simpa [family, IdxProjSubMeas.withWitness, IdxProjSubMeas.toIdxPolyFamily] using hchain }
+  simpa [evaluatedPointFamily, family, IdxProjSubMeas.withWitness, Gsub] using
+    hcons_family.pointConsistency
 
 end MIPStarRE.LDT.Commutativity

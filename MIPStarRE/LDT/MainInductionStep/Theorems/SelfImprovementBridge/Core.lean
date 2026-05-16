@@ -542,20 +542,31 @@ theorem ldPastingInInductionSection
     (hcomplete : family.Complete strategy.state kappa)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (hbound_psd : ∀ x : Fq params, 0 ≤ family.witness x)
+    (hbound_residual :
+      avgOver (uniformDistribution (Fq params))
+        (fun x =>
+          IdxPolyFamily.storedResidual strategy family
+            (fun y => (family.meas y).toSubMeas) x) ≤ zeta)
+    (hbound_dom :
+      ∀ x : Fq params, ∀ g : Polynomial params,
+        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x)
     (k : ℕ)
-    (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
-      LdPastingInInductionSectionConclusion params strategy family H
-        eps delta gamma kappa zeta k := by
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next H.toSubMeas)
+        (ldPastingInInductionError params k eps delta gamma kappa zeta) := by
+  have hk_pos : 1 ≤ k := by
+    exact Nat.succ_le_of_lt (lt_of_lt_of_le (Nat.mul_pos (Nat.mul_pos (by decide) params.hm) hd) hk)
   have hldPasting :=
     Pasting.ldPasting params strategy eps delta gamma kappa zeta
       hgood _hgamma_le _hzeta_le _hdq_le hd
-      family hcomplete hcons hself hbound k hk_pos hk
+      family hcomplete hcons hself hbound_psd hbound_residual hbound_dom
+      k hk_pos hk
   obtain ⟨H, _hHdef, hH⟩ := hldPasting
-  refine ⟨H, ?_⟩
-  exact ⟨hH.pointConsistency⟩
+  exact ⟨H, hH.pointConsistency⟩
 
 
 end MIPStarRE.LDT.MainInductionStep

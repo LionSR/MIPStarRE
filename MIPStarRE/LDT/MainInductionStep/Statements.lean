@@ -661,8 +661,20 @@ structure AveragedPastingInput (params : Parameters)
   consistent : selfPkg.family.ConsistentWithPoints strategy zeta
   /-- Averaged strong self-consistency of the slice family. -/
   selfConsistent : selfPkg.family.StronglySelfConsistent strategy.state zeta
-  /-- Averaged boundedness input for the pasting theorem. -/
-  bounded : IdxPolyFamily.SliceBoundednessInput strategy selfPkg.family zeta
+  /-- Positive-semidefinite slice witnesses for the pasting theorem. -/
+  boundedPSD : ∀ x : Fq params, 0 ≤ selfPkg.family.witness x
+  /-- Averaged residual bound `(I - G^x) ⊗ Z^x` for the pasting theorem. -/
+  boundedResidual :
+    avgOver (uniformDistribution (Fq params))
+      (fun x =>
+        ev strategy.state <|
+          leftTensor (ι₂ := ι) (1 - (selfPkg.family.meas x).toSubMeas.total) *
+            rightTensor (ι₁ := ι) (selfPkg.family.witness x)) ≤ zeta
+  /-- Domination of the averaged point operator by the slice witness. -/
+  dominatesAveragedPoint :
+    ∀ x : Fq params, ∀ g : Polynomial params,
+      IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤
+        selfPkg.family.witness x
   /-- Error telescoping from the induction-section pasting bound to the next-stage target. -/
   error_le :
     ldPastingInInductionError params k eps delta gamma kappa zeta ≤

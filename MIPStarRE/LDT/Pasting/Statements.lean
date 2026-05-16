@@ -484,6 +484,134 @@ noncomputable def fromHToGBernoulliTailMass (params : Parameters)
   subMeasMass ψbi ((IdxSubMeas.liftRight
     (bernoulliTailFromFamily params family k)) ())
 
+/-- Paper-shaped completeness conclusion for the pasted submeasurement attached
+to a slice family `G` and witness family `Z`. -/
+def LdPastingNCompletenessPaperStatement (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma kappa zeta : Error)
+    (_hgood : strategy.IsGood eps delta gamma)
+    (_hgamma_le : gamma ≤ 1)
+    (_hzeta_le : zeta ≤ 1)
+    (_hdq_le : params.d ≤ params.q)
+    (_hd : 0 < params.d)
+    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
+    (_hcomplete : IdxProjSubMeas.Complete G strategy.state kappa)
+    (_hcons : IdxProjSubMeas.ConsistentWithPoints G strategy zeta)
+    (_hself : IdxProjSubMeas.StronglySelfConsistent G strategy.state zeta)
+    (Z : Fq params → MIPStarRE.Quantum.Op ι)
+    (_hbound_psd : ∀ x : Fq params, 0 ≤ Z x)
+    (_hbound_residual :
+      avgOver (uniformDistribution (Fq params))
+        (fun x =>
+          ev strategy.state <|
+            leftTensor (ι₂ := ι) (1 - (G x).toSubMeas.total) *
+              rightTensor (ι₁ := ι) (Z x)) ≤ zeta)
+    (_hbound_dom :
+      ∀ x : Fq params, ∀ g : Polynomial params,
+        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ Z x)
+    (k : ℕ) (_hk : 400 * params.m * params.d ≤ k) : Prop :=
+  let ν := MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta
+  CompletenessAtLeast strategy.state
+    (constructedPastedSubMeas params (IdxProjSubMeas.withWitness strategy G Z) k).liftLeft
+    (ldPastingCompletenessLowerBound params kappa ν k)
+
+/-- Paper-shaped submeasurement existence conclusion for `lem:ld-pasting-sub-measurement`. -/
+def LdPastingSubMeasPaperStatement (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma kappa zeta : Error)
+    (_hgood : strategy.IsGood eps delta gamma)
+    (_hgamma_le : gamma ≤ 1)
+    (_hzeta_le : zeta ≤ 1)
+    (_hdq_le : params.d ≤ params.q)
+    (_hd : 0 < params.d)
+    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
+    (_hcomplete : IdxProjSubMeas.Complete G strategy.state kappa)
+    (_hcons : IdxProjSubMeas.ConsistentWithPoints G strategy zeta)
+    (_hself : IdxProjSubMeas.StronglySelfConsistent G strategy.state zeta)
+    (Z : Fq params → MIPStarRE.Quantum.Op ι)
+    (_hbound_psd : ∀ x : Fq params, 0 ≤ Z x)
+    (_hbound_residual :
+      avgOver (uniformDistribution (Fq params))
+        (fun x =>
+          ev strategy.state <|
+            leftTensor (ι₂ := ι) (1 - (G x).toSubMeas.total) *
+              rightTensor (ι₁ := ι) (Z x)) ≤ zeta)
+    (_hbound_dom :
+      ∀ x : Fq params, ∀ g : Polynomial params,
+        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ Z x)
+    (k : ℕ) (_hk : 400 * params.m * params.d ≤ k) : Prop :=
+  let ν := MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta
+  ∃ H : SubMeas (Polynomial params.next) ι,
+    ConsRel strategy.state (uniformDistribution (Point params.next))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params.next H)
+      ν ∧
+    CompletenessAtLeast strategy.state H.liftLeft
+      (ldPastingCompletenessLowerBound params kappa ν k)
+
+/-- Paper-shaped measurement existence conclusion for `thm:ld-pasting`. -/
+def LdPastingPaperStatement (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma kappa zeta : Error)
+    (_hgood : strategy.IsGood eps delta gamma)
+    (_hgamma_le : gamma ≤ 1)
+    (_hzeta_le : zeta ≤ 1)
+    (_hdq_le : params.d ≤ params.q)
+    (_hd : 0 < params.d)
+    (G : IdxProjSubMeas (Fq params) (Polynomial params) ι)
+    (_hcomplete : IdxProjSubMeas.Complete G strategy.state kappa)
+    (_hcons : IdxProjSubMeas.ConsistentWithPoints G strategy zeta)
+    (_hself : IdxProjSubMeas.StronglySelfConsistent G strategy.state zeta)
+    (Z : Fq params → MIPStarRE.Quantum.Op ι)
+    (_hbound_psd : ∀ x : Fq params, 0 ≤ Z x)
+    (_hbound_residual :
+      avgOver (uniformDistribution (Fq params))
+        (fun x =>
+          ev strategy.state <|
+            leftTensor (ι₂ := ι) (1 - (G x).toSubMeas.total) *
+              rightTensor (ι₁ := ι) (Z x)) ≤ zeta)
+    (_hbound_dom :
+      ∀ x : Fq params, ∀ g : Polynomial params,
+        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ Z x)
+    (k : ℕ) (_hk : 400 * params.m * params.d ≤ k) : Prop :=
+  let σ := MainInductionStep.ldPastingInInductionError params k eps delta gamma kappa zeta
+  ∃ H : Measurement (Polynomial params.next) ι,
+    ConsRel strategy.state (uniformDistribution (Point params.next))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params.next H.toSubMeas)
+      σ
+
+def LdPastingSubMeasPaperOfFamilyStatement (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (eps delta gamma kappa zeta : Error) (k : ℕ) : Prop :=
+  let ν := MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta
+  ∃ H : SubMeas (Polynomial params.next) ι,
+    H = constructedPastedSubMeas params family k ∧
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next H)
+        ν ∧
+      CompletenessAtLeast strategy.state H.liftLeft
+        (ldPastingCompletenessLowerBound params kappa ν k)
+
+def LdPastingPaperOfFamilyStatement (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (eps delta gamma kappa zeta : Error) (k : ℕ) : Prop :=
+  let σ := MainInductionStep.ldPastingInInductionError params k eps delta gamma kappa zeta
+  ∃ H : Measurement (Polynomial params.next) ι,
+    H = constructedPastedMeasurement params family k ∧
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next H.toSubMeas)
+        σ
+
 /-- Paper origin: `references/ldt-paper/ld-pasting.tex:1295-1670`
 (`\label{lem:from-H-to-G}`).
 

@@ -202,7 +202,7 @@ theorem commutingWithGComplete
     (hgamma_nonneg : 0 ≤ gamma) (hgamma : gamma ≤ 1)
     (hzeta_nonneg : 0 ≤ zeta) (hzeta : zeta ≤ 1)
     (hd_le_q : params.d ≤ params.q)
-    (hcom : Commutativity.ComMainConclusion params strategy family G gamma zeta)
+    (hcom : Commutativity.ComMainConclusion params strategy family.meas gamma zeta)
     (hself : GCompleteSelfConsistencyStatement params strategy.state family zeta) :
     CommutingWithGCompleteStatement params strategy.state family gamma zeta := by
   have hswitch₁ :

@@ -151,7 +151,13 @@ lemma evaluatedSlice_scalar_chain_bound
     (_hG : ∀ x, G x = (family.meas x).toSubMeas)
     (_hcons : family.ConsistentWithPoints strategy zeta)
     (_hself : family.StronglySelfConsistent strategy.state zeta)
-    (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (_hbound_psd : ∀ x : Fq params, 0 ≤ family.witness x)
+    (_hbound_residual :
+      avgOver (uniformDistribution (Fq params))
+        (fun x => IdxPolyFamily.storedResidual strategy family G x) ≤ zeta)
+    (_hbound_dom :
+      ∀ x : Fq params, ∀ g : Polynomial params,
+        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x)
     (_hpostSSC : SDDRel strategy.state
       (uniformDistribution (Point params.next))
       (evaluatedPointFamilyLeft params family)
@@ -323,7 +329,8 @@ lemma evaluatedSlice_scalar_chain_bound
       |avgOver 𝒟 phase1Inserted - avgOver 𝒟 phase2Removed| ≤ Real.sqrt zeta := by
     have hdefect :=
       evaluatedSlice_phaseTwo_stability_defect_bound
-        params strategy zeta _hnorm family G _hG _hbound
+        params strategy zeta _hnorm family G _hG
+        _hbound_psd _hbound_residual _hbound_dom
     have hsign :
         avgOver 𝒟 phase1Inserted - avgOver 𝒟 phase2Removed =
           -avgOver 𝒟 (evaluatedSlicePhaseTwoQuestionDefect params strategy family G) := by
@@ -628,7 +635,8 @@ lemma evaluatedSlice_scalar_chain_bound
     have hraw : |avgOver 𝒟 swappedDefect| ≤ Real.sqrt zeta := by
       have hraw0 :=
         gCommStabilityTwo_raw_scalar
-          params strategy zeta _hnorm family G _hG _hbound
+          params strategy zeta _hnorm family G _hG
+          _hbound_psd _hbound_residual _hbound_dom
       have hreindex :
           avgOver 𝒟 swappedDefect =
             avgOver (uniformDistribution (Fq params))

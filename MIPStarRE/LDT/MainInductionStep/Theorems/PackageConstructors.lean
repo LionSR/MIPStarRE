@@ -399,15 +399,18 @@ theorem AveragedPastingInput.output
     (pkg : AveragedPastingInput params strategy eps delta gamma k selfPkg)
     (hgood : strategy.IsGood eps delta gamma)
     (hd : 0 < params.d)
-    (hk_pos : 1 ≤ k)
+    (_hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
-      LdPastingInInductionSectionConclusion params strategy selfPkg.family H
-        eps delta gamma pkg.kappa pkg.zeta k := by
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next H.toSubMeas)
+        (ldPastingInInductionError params k eps delta gamma pkg.kappa pkg.zeta) := by
   exact
     ldPastingInInductionSection params strategy eps delta gamma pkg.kappa pkg.zeta
       hgood pkg.gamma_le_one pkg.zeta_le_one pkg.dq_le_q hd
-      selfPkg.family pkg.complete pkg.consistent pkg.selfConsistent pkg.bounded k hk_pos hk
+      selfPkg.family pkg.complete pkg.consistent pkg.selfConsistent
+      pkg.boundedPSD pkg.boundedResidual pkg.dominatesAveragedPoint k hk
 
 /-- Compose the four paper-faithful induction-step inputs
 `restrict → induct → self-improve → paste` into the main-induction conclusion in
@@ -443,15 +446,17 @@ theorem mainInductionFromPackages
         error ≤ mainInductionError params.next k eps delta gamma := by
     have hpasted :
         ∃ H : Measurement (Polynomial params.next) ι,
-          LdPastingInInductionSectionConclusion params strategy family H
-            eps delta gamma kappa zeta k := by
+          ConsRel strategy.state (uniformDistribution (Point params.next))
+            (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+            (polynomialEvaluationFamily params.next H.toSubMeas)
+        (ldPastingInInductionError params k eps delta gamma kappa zeta) := by
       simpa [family, kappa, zeta] using
         hpaste.output (params := params) (strategy := strategy)
           (eps := eps) (delta := delta) (gamma := gamma) (k := k) hgood hd hk_pos hk
     rcases hpasted with ⟨H, hH⟩
     exact
       ⟨ldPastingInInductionError params k eps delta gamma kappa zeta, H,
-        hH.pointConsistency, by simpa [kappa, zeta] using hpaste.error_le⟩
+        hH, by simpa [kappa, zeta] using hpaste.error_le⟩
   exact mainInductionOfWitness params.next strategy eps delta gamma k hwitness
 
 end MIPStarRE.LDT.MainInductionStep
