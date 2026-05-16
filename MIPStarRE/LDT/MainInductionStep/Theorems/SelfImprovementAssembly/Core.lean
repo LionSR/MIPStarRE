@@ -11,7 +11,10 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 Core public API for the ordinary self-improvement data: constructors for
 `SelfImprovementData`, the induction-section theorem
 `selfImprovementInInductionSection`, the monotone-witness cleanup
-`mainInductionOfWitness`, and the pasting theorem `ldPastingInInductionSectionNontrivial`.
+`mainInductionOfWitness`, and the source-facing pasting theorem
+`ldPastingInInductionSection`.  The theorem
+`ldPastingInInductionSectionNontrivial` is the restricted nontrivial-regime
+form used as an auxiliary statement.
 
 The answer-valued slice-transport constructors are separated into
 `SelfImprovementAssembly.AnswerSlice`.
@@ -562,6 +565,38 @@ theorem ldPastingInInductionSectionNontrivial
       hgood _hgamma_le _hzeta_le _hdq_le hd
       family hcomplete hcons hself hbound k hk_pos hk
   obtain ⟨H, _hHdef, hH⟩ := hldPastingNontrivial
+  refine ⟨H, ?_⟩
+  exact ⟨hH.pointConsistency⟩
+
+/-- Source-facing Lean statement for `thm:ld-pasting-in-induction-section`.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:299-338`
+(`\label{thm:ld-pasting-in-induction-section}`).  The statement is the
+Chapter 6 restatement of `thm:ld-pasting`, with the error parameters named as
+they are used in the main-induction proof.
+
+**Proof obligation:** This theorem invokes `Pasting.ldPasting`; until the
+degree-zero branch of unrestricted pasting is discharged, it inherits the
+tracked proof obligation #1622. -/
+theorem ldPastingInInductionSection
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma kappa zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (hcomplete : family.Complete strategy.state kappa)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (k : ℕ)
+    (hk : 400 * params.m * params.d ≤ k) :
+    ∃ H : Measurement (Polynomial params.next) ι,
+      LdPastingInInductionSectionConclusion params strategy family H
+        eps delta gamma kappa zeta k := by
+  obtain ⟨H, hH⟩ :=
+    Pasting.ldPasting params strategy eps delta gamma kappa zeta
+      hgood family hcomplete hcons hself hbound k hk
   refine ⟨H, ?_⟩
   exact ⟨hH.pointConsistency⟩
 

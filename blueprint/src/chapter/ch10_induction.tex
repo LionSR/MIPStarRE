@@ -116,6 +116,7 @@
 \end{remark}
 
 \begin{theorem}[Pasting]\label{thm:ld-pasting-in-induction-section}
+  \lean{MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection}
   \uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test. Let $\{G^x\}_{x \in \F_q}$ be projective submeasurements in $\polysub{m}{q}{d}$ with the following properties:
   \begin{enumerate}
@@ -158,7 +159,12 @@
 \end{theorem}
 \begin{proof}
 	\uses{thm:ld-pasting}
-	This is exactly Theorem~\ref{thm:ld-pasting}, restated in the induction chapter because it is the pasting input used in the proof of Theorem~\ref{thm:main-induction}.
+	This is exactly Theorem~\ref{thm:ld-pasting}, restated in the induction chapter
+	because it is the pasting input used in the proof of
+	Theorem~\ref{thm:main-induction}.  The Lean declaration linked above is
+	source-facing but is not marked \texttt{\textbackslash leanok}, since it
+	inherits the remaining degree-zero pasting proof obligation tracked by
+	issue~\#1622.
 \end{proof}
 
 \begin{remark}[Restricted Lean form of induction-section pasting]\label{rem:ld-pasting-induction-restricted-lean-form}
