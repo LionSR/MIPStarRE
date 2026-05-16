@@ -11,9 +11,10 @@ This implements the linter requested by ledger #1379 and issue #1384 ("Earn
 your place" backfill).  For every ``structure``, ``def``, or ``abbrev`` whose
 identifier ends in ``Statement`` (and similar proof-obligation suffixes
 ``Witness``, ``Hypotheses``, ``Conclusion``, ``Output``, ``Input``,
-``Assumptions``, ``Bridge``, ``Producer``, ``Package``, ``Residual``,
-``Repair``, ``Obligation``, ``Obligations``, ``Wrapper``, ``Slackness``,
-``Dominance``, and ``CompletionTransport``), we look at the
+``Assumptions``, ``Hypothesis``, ``Assumption``, ``Bridge``, ``Producer``,
+``Package``, ``Bundle``, ``Conditional``, ``Residual``, ``Repair``,
+``Obligation``, ``Obligations``, ``Wrapper``, ``Slackness``, ``Dominance``, and
+``CompletionTransport``), we look at the
 *immediately preceding docstring or comment block* (after skipping blank lines)
 for one of three citation forms:
 
@@ -65,13 +66,17 @@ SUFFIXES: tuple[str, ...] = (
     "Statement",
     "Witness",
     "Hypotheses",
+    "Hypothesis",
     "Conclusion",
     "Output",
     "Input",
     "Assumptions",
+    "Assumption",
     "Bridge",
     "Producer",
     "Package",
+    "Bundle",
+    "Conditional",
     "Residual",
     "Repair",
     "Obligation",

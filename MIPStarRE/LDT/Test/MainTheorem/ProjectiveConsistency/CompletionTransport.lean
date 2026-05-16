@@ -23,7 +23,7 @@ projectivization/completion and line-169 handoff in the proof of
 
 This witness records only the data that remains after the checked
 role-unsymmetrization and pre-projective consistency steps.  The Section 6
-consistency field of `UnsymmetrizationBridgePackage` and the pre-projective
+consistency field of `UnsymmetrizationConsistency` and the pre-projective
 consistency field of `ProjectivizationSelfConsistencyHandoff` are reconstructed
 downstream from the two paper factor-two role-block estimates and `hpass` via
 the checked line-116 triangle and Step 5 Schwartz--Zippel theorem.
@@ -182,20 +182,32 @@ theorem projectiveEvaluationConsistency
   exact projectiveEvaluationConsistency_ofFullPolynomialConsistency
     witness.leftMeasurement witness.rightMeasurement (witness.fullPolynomialConsistency hpre)
 
-/-- Derive paper `eq:one-goal` from `eq:cons-b`, line 172 obtained by data
-processing line 169, and evaluated line 164. -/
-theorem pointAConsistency
+/-- Final Alice-side point transport from an arbitrary polynomial line-169
+error.
+
+This is the error-parametric form of the last triangle in
+`inductive_step.tex`, lines 175--181.  If the polynomial replacement step is
+available with error `η`, then the final point consistency has error
+`2σ + 2√(η + ζ₃/2)`.  The paper's displayed route is the special case
+`η = ζ₁`; the checked local repair of the line-169 step can instead be inserted
+with its larger value of `η`. -/
+theorem pointAConsistency_ofLine169Consistency
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
     {scalars : MainFormalCascadeScalars params eps k}
     (witness : MainFormalProjectiveCompletionTransportWitness
       params strategy eps k scalars)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) {η : Error}
+    (hline169 : ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params witness.leftMeasurement.toSubMeas)
+      (polynomialEvaluationFamily params
+        (unsymmetrizedRightPOVM witness.roleMeasurement).toSubMeas)
+      η) :
     ConsRel strategy.state (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
       (polynomialEvaluationFamily params witness.rightMeasurement.toSubMeas)
-      scalars.zeta4 := by
+      (2 * scalars.sigma + 2 * Real.sqrt (η + scalars.zeta3 / 2)) := by
   let pointA : IdxMeas (Point params) (Fq params) ι :=
     IdxProjMeas.toIdxMeas strategy.pointMeasurementA
   let rightG : IdxMeas (Point params) (Fq params) ι :=
@@ -216,17 +228,13 @@ theorem pointAConsistency
     exact witness.pointARightPOVMConsistency
   have hCB : ConsRel strategy.state (uniformDistribution (Point params))
       (IdxMeas.toIdxSubMeas leftQ) (IdxMeas.toIdxSubMeas rightG)
-      scalars.zeta1 := by
+      η := by
     change ConsRel strategy.state (uniformDistribution (Point params))
       (polynomialEvaluationFamily params witness.leftMeasurement.toSubMeas)
       (polynomialEvaluationFamily params
         (unsymmetrizedRightPOVM witness.roleMeasurement).toSubMeas)
-      scalars.zeta1
-    simpa using
-      consRel_constPolynomialEvaluation strategy.state
-        witness.leftMeasurement.toMeasurement
-        (unsymmetrizedRightPOVM witness.roleMeasurement)
-        witness.leftProjectiveRightPOVMPolynomialConsistency
+      η
+    exact hline169
   have hCD : ConsRel strategy.state (uniformDistribution (Point params))
       (IdxMeas.toIdxSubMeas leftQ) (IdxMeas.toIdxSubMeas rightQ)
       (scalars.zeta3 / 2) := by
@@ -240,14 +248,14 @@ theorem pointAConsistency
       (uniformDistribution (Point params)) strategy.isNormalized
       (uniformDistribution_weight_sum_le_one (Point params))
       pointA rightG leftQ rightQ
-      (2 * scalars.sigma) scalars.zeta1 (scalars.zeta3 / 2)
+      (2 * scalars.sigma) η (scalars.zeta3 / 2)
       hAB hCB hCD
   simpa [pointA, rightG, leftQ, rightQ, polynomialEvaluationMeasurementFamily,
-    MainFormalCascadeScalars.zeta4, cascadeZeta4] using htriangle
+    add_assoc] using htriangle
 
-/-- Derive paper `eq:another-goal` by the Bob-role mirror of the `eq:one-goal`
-triangle, again data-processing the polynomial line-169 mirror first. -/
-theorem pointBConsistency
+/-- Derive paper `eq:one-goal` from `eq:cons-b`, line 172 obtained by data
+processing line 169, and evaluated line 164. -/
+theorem pointAConsistency
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
@@ -256,9 +264,44 @@ theorem pointBConsistency
       params strategy eps k scalars)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
     ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (polynomialEvaluationFamily params witness.rightMeasurement.toSubMeas)
+      scalars.zeta4 := by
+  have hline169 : ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params witness.leftMeasurement.toSubMeas)
+      (polynomialEvaluationFamily params
+        (unsymmetrizedRightPOVM witness.roleMeasurement).toSubMeas)
+      scalars.zeta1 := by
+    simpa using
+      consRel_constPolynomialEvaluation strategy.state
+        witness.leftMeasurement.toMeasurement
+        (unsymmetrizedRightPOVM witness.roleMeasurement)
+        witness.leftProjectiveRightPOVMPolynomialConsistency
+  simpa [MainFormalCascadeScalars.zeta4, cascadeZeta4] using
+    witness.pointAConsistency_ofLine169Consistency hpass hline169
+
+/-- Final Bob-side point transport from an arbitrary polynomial line-169 mirror
+error.
+
+This is the role-reversed form of
+`pointAConsistency_ofLine169Consistency`. -/
+theorem pointBConsistency_ofLine169Consistency
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (witness : MainFormalProjectiveCompletionTransportWitness
+      params strategy eps k scalars)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) {η : Error}
+    (hline169 : ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params witness.rightMeasurement.toSubMeas)
+      (polynomialEvaluationFamily params
+        (unsymmetrizedLeftPOVM witness.roleMeasurement).toSubMeas)
+      η) :
+    ConsRel strategy.state (uniformDistribution (Point params))
       (polynomialEvaluationFamily params witness.leftMeasurement.toSubMeas)
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-      scalars.zeta4 := by
+      (2 * scalars.sigma + 2 * Real.sqrt (η + scalars.zeta3 / 2)) := by
   let pointB : IdxMeas (Point params) (Fq params) ι :=
     IdxProjMeas.toIdxMeas strategy.pointMeasurementB
   let leftG : IdxMeas (Point params) (Fq params) ι :=
@@ -285,17 +328,13 @@ theorem pointBConsistency
       (IdxMeas.toIdxSubMeas pointB) (2 * scalars.sigma) hLeftGPointB
   have hCB : ConsRel strategy.state (uniformDistribution (Point params))
       (IdxMeas.toIdxSubMeas rightQ) (IdxMeas.toIdxSubMeas leftG)
-      scalars.zeta1 := by
+      η := by
     change ConsRel strategy.state (uniformDistribution (Point params))
       (polynomialEvaluationFamily params witness.rightMeasurement.toSubMeas)
       (polynomialEvaluationFamily params
         (unsymmetrizedLeftPOVM witness.roleMeasurement).toSubMeas)
-      scalars.zeta1
-    simpa using
-      consRel_constPolynomialEvaluation strategy.state
-        witness.rightMeasurement.toMeasurement
-        (unsymmetrizedLeftPOVM witness.roleMeasurement)
-        witness.rightProjectiveLeftPOVMPolynomialConsistency
+      η
+    exact hline169
   have hLeftQRightQ : ConsRel strategy.state (uniformDistribution (Point params))
       (IdxMeas.toIdxSubMeas leftQ) (IdxMeas.toIdxSubMeas rightQ)
       (scalars.zeta3 / 2) := by
@@ -312,20 +351,48 @@ theorem pointBConsistency
       (IdxMeas.toIdxSubMeas rightQ) (scalars.zeta3 / 2) hLeftQRightQ
   have htriangle : ConsRel strategy.state (uniformDistribution (Point params))
       (IdxMeas.toIdxSubMeas pointB) (IdxMeas.toIdxSubMeas leftQ)
-      scalars.zeta4 := by
+      (2 * scalars.sigma + 2 * Real.sqrt (η + scalars.zeta3 / 2)) := by
     have hraw :=
       Preliminaries.simeqTriangleInequality strategy.state
         (uniformDistribution (Point params)) strategy.isNormalized
         (uniformDistribution_weight_sum_le_one (Point params))
         pointB leftG rightQ leftQ
-        (2 * scalars.sigma) scalars.zeta1 (scalars.zeta3 / 2)
+        (2 * scalars.sigma) η (scalars.zeta3 / 2)
         hAB hCB hCD
-    simpa [MainFormalCascadeScalars.zeta4, cascadeZeta4] using hraw
+    simpa [add_assoc] using hraw
   have htarget :=
     consRel_symm_of_density_fixed strategy.state strategy.densityFixed
       (uniformDistribution (Point params)) (IdxMeas.toIdxSubMeas pointB)
-      (IdxMeas.toIdxSubMeas leftQ) scalars.zeta4 htriangle
+      (IdxMeas.toIdxSubMeas leftQ)
+      (2 * scalars.sigma + 2 * Real.sqrt (η + scalars.zeta3 / 2)) htriangle
   simpa [pointB, leftG, rightQ, leftQ, polynomialEvaluationMeasurementFamily] using htarget
+
+/-- Derive paper `eq:another-goal` by the Bob-role mirror of the `eq:one-goal`
+triangle, again data-processing the polynomial line-169 mirror first. -/
+theorem pointBConsistency
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (witness : MainFormalProjectiveCompletionTransportWitness
+      params strategy eps k scalars)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
+    ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params witness.leftMeasurement.toSubMeas)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+      scalars.zeta4 := by
+  have hline169 : ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params witness.rightMeasurement.toSubMeas)
+      (polynomialEvaluationFamily params
+        (unsymmetrizedLeftPOVM witness.roleMeasurement).toSubMeas)
+      scalars.zeta1 := by
+    simpa using
+      consRel_constPolynomialEvaluation strategy.state
+        witness.rightMeasurement.toMeasurement
+        (unsymmetrizedLeftPOVM witness.roleMeasurement)
+        witness.rightProjectiveLeftPOVMPolynomialConsistency
+  simpa [MainFormalCascadeScalars.zeta4, cascadeZeta4] using
+    witness.pointBConsistency_ofLine169Consistency hpass hline169
 
 end MainFormalProjectiveCompletionTransportWitness
 

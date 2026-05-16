@@ -740,7 +740,34 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_two_mul_full
     · exact projectiveNonMeasurement_of_sourceAlmostProjective_large ψ A ζ hψ
         (lt_of_not_ge hsmall)
 
-/-- Unconditional constructive producer for `lem:projective-non-measurement`.
+/-- **Rank reduction** (`\label{lem:projective-low-rank-sum}`).
+
+Paper origin: `references/ldt-paper/orthonormalization.tex:540-658`.
+
+The paper first applies `\label{lem:projective-non-measurement}` to obtain the
+rounded projective family `R_a`, and then performs the rank-reduction argument.
+This theorem keeps that source-facing boundary: the rounded family is produced
+internally from the source almost-projectivity estimate and is then passed to
+the internal constructor `projectiveLowRankSum_of_roundingWitness`. -/
+lemma projectiveLowRankSum {Outcome : Type uOutcome}
+    {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι)
+    (A : Measurement Outcome ι) (ζ : Error)
+    (hψ : ψ.IsNormalized)
+    (hζ : 0 ≤ ζ) (hζ_le : ζ ≤ 1 / 4)
+    (source_almost_projective :
+      ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) :
+    ∃ data : QLayerData Outcome ι,
+      RankReductionWitness ψ A ζ data := by
+  classical
+  obtain ⟨q, hrounded⟩ :=
+    projectiveNonMeasurement_of_sourceAlmostProjective_two_mul_full
+      ψ A ζ hψ source_almost_projective
+  exact projectiveLowRankSum_of_roundingWitness ψ A ζ hψ hζ hζ_le q hrounded
+    source_almost_projective
+
+/-- Unconditional constructive form of `lem:projective-non-measurement`.
 
 This is the specialization of
 `projectiveNonMeasurement_of_sourceAlmostProjective_two_mul_full` to the
@@ -761,7 +788,7 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_full
   exact projectiveNonMeasurement_of_sourceAlmostProjective_two_mul_full
     ψ A ζ hψ hsource_two
 
-/-- A direct `projectiveNonMeasurement` producer from
+/-- A direct `projectiveNonMeasurement` construction from
 `AlmostProjMeasStatement`.
 
 Only the `sourceAlmostProjective` field carries mathematical content for this
@@ -777,7 +804,7 @@ theorem projectiveNonMeasurement_of_almostProjMeasStatement
   projectiveNonMeasurement_of_sourceAlmostProjective ψ A ζ hζ hζ_small
     halmost.sourceAlmostProjective
 
-/-- Unconditional wrapper from `AlmostProjMeasStatement` to the rounding
+/-- Unconditional conversion from `AlmostProjMeasStatement` to the rounding
 projector witness.
 
 The normalized-state hypothesis is exactly the one already required by the
@@ -796,17 +823,17 @@ theorem projectiveNonMeasurement_of_almostProjMeasStatement_full
 `SpectralTruncationInput` consumed by the orthonormalization pipeline.
 
 This integrates the constructive witness theorem with the
-`OrthonormalizationSpectralObligation` APIs. -/
+`OrthonormalizationSpectralObligation` statements. -/
 noncomputable def spectralTruncationInput_of_sourceAlmostProjective
     {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :
     SpectralTruncationInput ψ A ζ := by
   intro hψ hsource
-  let hprojective :=
+  have hprojective : projectiveNonMeasurement ψ A ζ :=
     projectiveNonMeasurement_of_sourceAlmostProjective_full ψ A ζ hψ hsource
   let R : OpFamily Outcome ι := Classical.choose hprojective
-  let hR : RoundingToProjectorsWitness ψ A ζ R := Classical.choose_spec hprojective
+  have hR : RoundingToProjectorsWitness ψ A ζ R := Classical.choose_spec hprojective
   exact ⟨R, hR.projective, hR.closeness, hR.sum_eq_total, hR.total_le⟩
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

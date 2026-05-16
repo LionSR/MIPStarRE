@@ -5,7 +5,7 @@ supplied report, with minimal hygiene edits. Preserve proof integrity: no new
 theorem-statement changes, mathematical-definition changes, or broad refactors.
 Preserve source-labelled theorem statements exactly up to faithful formal
 encoding of the cited paper.  Do not remove a warning by adding bridge,
-residual, repair, package, producer, proof-obligation input, hypotheses-bundle,
+residual, repair, package, producer, witness, wrapper, proof-obligation input, hypotheses-bundle,
 assumptions-bundle, or arbitrary implication hypotheses to a paper-facing
 theorem.  If a warning cannot be fixed without changing such a statement or
 adding non-paper proof data, leave the warning in place and report it.

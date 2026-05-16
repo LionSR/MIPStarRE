@@ -92,10 +92,10 @@ noncomputable def mainFormalProjectiveCompletionTransportWitnessOfCompleteAtOutc
   let matchMass :=
     MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_completeAtOutcomeProj
       P_A P_B a_A a_B hleftMass hrightMass
-  let bridge := roleWitness.toUnsymmetrizationBridge
+  let consistency := roleWitness.toUnsymmetrizationConsistency
   { roleMeasurement := roleWitness.roleMeasurement
-    pointARightPOVMConsistency := bridge.pointAConsistency
-    leftPOVMPointBConsistency := bridge.pointBConsistency
+    pointARightPOVMConsistency := consistency.pointAConsistency
+    leftPOVMPointBConsistency := consistency.pointBConsistency
     leftMeasurement := leftMeasurement
     rightMeasurement := rightMeasurement
     leftCompletionCloseness := by

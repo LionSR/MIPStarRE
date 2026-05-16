@@ -9,7 +9,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 # Section 6 — Ordinary Self-Improvement Assembly
 
 Core public API for the ordinary self-improvement data: constructors for
-`SelfImprovementPackage`, the induction-section theorem
+`SelfImprovementData`, the induction-section theorem
 `selfImprovementInInductionSection`, the monotone-witness cleanup
 `mainInductionOfWitness`, and the pasting theorem `ldPastingInInductionSectionNontrivial`.
 
@@ -176,15 +176,15 @@ self-improvement theorem restated in
 Because `xRestrictedStrategy params strategy x` is only a
 `RestrictedSymStrat params ι` rather than a full `SymStrat params ι`, the
 restricted-strategy outputs are supplied directly as the six paper-faithful
-fields recorded by `SelfImprovementPackage`. -/
-noncomputable def SelfImprovementPackage.ofSelfImprovementInInductionSection
+fields recorded by `SelfImprovementData`. -/
+noncomputable def SelfImprovementData.ofSelfImprovementInInductionSection
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (k : ℕ)
-    (restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma)
-    (inductionPkg : PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k)
+    (restrictionPkg : SliceRestrictionData params strategy eps delta gamma)
+    (inductionPkg : PerSliceInductionData params strategy eps delta gamma restrictionPkg k)
     (hslice :
       ∀ x,
         ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
@@ -206,7 +206,7 @@ noncomputable def SelfImprovementPackage.ofSelfImprovementInInductionSection
             sliceSelfImprovementError params restrictionPkg x ∧
           (∀ h : Polynomial params,
             IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x h ≤ Z)) :
-    SelfImprovementPackage params strategy eps delta gamma k restrictionPkg inductionPkg := by
+    SelfImprovementData params strategy eps delta gamma k restrictionPkg inductionPkg := by
   classical
   let sliceProj : Fq params → ProjSubMeas (Polynomial params) ι :=
     fun x => Classical.choose (hslice x)
@@ -260,18 +260,18 @@ derive the extra `SymStrat` fields (`permInvState`, `densityFixed`, or
 `isNormalized`) from the restricted strategy; those remain part of the supplied
 concrete slice strategies.
 
-The Section 9 analytic proof debt is not stored in this record.  The package
+The Section 9 analytic proof debt is not stored in this record.  The data record
 constructor below calls
 `selfImprovementInInductionSection`, whose present proof gap is the tracked
 place where that work belongs. -/
-structure SelfImprovementPackage.SliceStrategyTransport
+structure SelfImprovementData.SliceStrategyTransport
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (k : ℕ)
-    (restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma)
-    (inductionPkg : PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k)
+    (restrictionPkg : SliceRestrictionData params strategy eps delta gamma)
+    (inductionPkg : PerSliceInductionData params strategy eps delta gamma restrictionPkg k)
     where
   /-- Concrete symmetric strategies realizing the slice interfaces. -/
   sliceStrategy : Fq params → SymStrat params ι
@@ -299,7 +299,7 @@ structure SelfImprovementPackage.SliceStrategyTransport
 /-- The averaged slice point-operator compatibility is structural: once an
 concrete slice strategy's point measurement agrees with the restricted-slice point
 measurement, the averaged point operators agree by unfolding the two averages. -/
-theorem SelfImprovementPackage.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq
+theorem SelfImprovementData.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -326,14 +326,14 @@ interface and the Section 9 interface.
 The only structural equality needed for that field is `pointMeasurement_eq`.
 The remaining inputs are the concrete slice strategies, their state transport, and
 their restricted-profile goodness. -/
-noncomputable def SelfImprovementPackage.SliceStrategyTransport.ofPointMeasurementEq
+noncomputable def SelfImprovementData.SliceStrategyTransport.ofPointMeasurementEq
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (k : ℕ)
-    (restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma)
-    (inductionPkg : PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k)
+    (restrictionPkg : SliceRestrictionData params strategy eps delta gamma)
+    (inductionPkg : PerSliceInductionData params strategy eps delta gamma restrictionPkg k)
     (sliceStrategy : Fq params → SymStrat params ι)
     (state_eq : ∀ x, (sliceStrategy x).state = strategy.state)
     (pointMeasurement_eq :
@@ -346,13 +346,13 @@ noncomputable def SelfImprovementPackage.SliceStrategyTransport.ofPointMeasureme
           (restrictionPkg.profile.axisParallel x)
           (restrictionPkg.profile.selfConsistency x)
           (restrictionPkg.profile.diagonal x)) :
-    SelfImprovementPackage.SliceStrategyTransport params strategy eps delta gamma k
+    SelfImprovementData.SliceStrategyTransport params strategy eps delta gamma k
       restrictionPkg inductionPkg where
   sliceStrategy := sliceStrategy
   state_eq := state_eq
   pointMeasurement_eq := pointMeasurement_eq
   averagedPoint_eq :=
-    SelfImprovementPackage.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq
+    SelfImprovementData.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq
       params strategy sliceStrategy pointMeasurement_eq
   good := good
 
@@ -361,14 +361,14 @@ state and the measurements used by the three LDT subtests agree with
 `xRestrictedStrategy`.
 
 This is a structural helper for the #1503 successor route: it uses the
-`restrictedGood` field already stored in `SliceRestrictionPackage.profile` and
+`restrictedGood` field already stored in `SliceRestrictionData.profile` and
 does not touch the remaining Section 9 analytic obligations. -/
-theorem SelfImprovementPackage.SliceStrategyTransport.good_of_restrictedGood
+theorem SelfImprovementData.SliceStrategyTransport.good_of_restrictedGood
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
-    (restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma)
+    (restrictionPkg : SliceRestrictionData params strategy eps delta gamma)
     (sliceStrategy : Fq params → SymStrat params ι)
     (state_eq : ∀ x, (sliceStrategy x).state = strategy.state)
     (pointMeasurement_eq :
@@ -425,14 +425,14 @@ slice interface: `averagedPoint_eq` follows from point-measurement transport and
 `good` follows from the restricted failure profile plus state/axis/diagonal
 measurement transport.  The remaining non-structural inputs are the concrete
 slice strategies themselves. -/
-noncomputable def SelfImprovementPackage.SliceStrategyTransport.ofMeasurementEq
+noncomputable def SelfImprovementData.SliceStrategyTransport.ofMeasurementEq
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (k : ℕ)
-    (restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma)
-    (inductionPkg : PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k)
+    (restrictionPkg : SliceRestrictionData params strategy eps delta gamma)
+    (inductionPkg : PerSliceInductionData params strategy eps delta gamma restrictionPkg k)
     (sliceStrategy : Fq params → SymStrat params ι)
     (state_eq : ∀ x, (sliceStrategy x).state = strategy.state)
     (pointMeasurement_eq :
@@ -447,12 +447,12 @@ noncomputable def SelfImprovementPackage.SliceStrategyTransport.ofMeasurementEq
       ∀ x,
         (sliceStrategy x).diagonalMeasurement.toIdxProjMeas =
           (xRestrictedStrategy params strategy x).diagonalMeasurement) :
-    SelfImprovementPackage.SliceStrategyTransport params strategy eps delta gamma k
+    SelfImprovementData.SliceStrategyTransport params strategy eps delta gamma k
       restrictionPkg inductionPkg :=
-  SelfImprovementPackage.SliceStrategyTransport.ofPointMeasurementEq
+  SelfImprovementData.SliceStrategyTransport.ofPointMeasurementEq
     params strategy eps delta gamma k restrictionPkg inductionPkg sliceStrategy state_eq
     pointMeasurement_eq
-    (SelfImprovementPackage.SliceStrategyTransport.good_of_restrictedGood
+    (SelfImprovementData.SliceStrategyTransport.good_of_restrictedGood
       params strategy eps delta gamma restrictionPkg sliceStrategy state_eq
       pointMeasurement_eq axisParallelMeasurement_eq diagonalMeasurement_eq)
 
@@ -467,22 +467,22 @@ measurement transports. It applies the theorem
 `selfImprovementInInductionSection` slice-by-slice and transports its fields
 across the recorded equalities to the restricted-slice interface.  The theorem
 itself is currently a tracked proof gap (#1503); this constructor does not carry
-the Section 9 proof debt as an additional package hypothesis. -/
-noncomputable def SelfImprovementPackage.ofSliceStrategyTransport
+the Section 9 proof debt as an additional data record hypothesis. -/
+noncomputable def SelfImprovementData.ofSliceStrategyTransport
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (k : ℕ)
-    (restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma)
-    (inductionPkg : PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k)
+    (restrictionPkg : SliceRestrictionData params strategy eps delta gamma)
+    (inductionPkg : PerSliceInductionData params strategy eps delta gamma restrictionPkg k)
     (sliceTransport :
-      SelfImprovementPackage.SliceStrategyTransport params strategy eps delta gamma k
+      SelfImprovementData.SliceStrategyTransport params strategy eps delta gamma k
         restrictionPkg inductionPkg) :
-    SelfImprovementPackage params strategy eps delta gamma k restrictionPkg inductionPkg := by
+    SelfImprovementData params strategy eps delta gamma k restrictionPkg inductionPkg := by
   classical
   refine
-    SelfImprovementPackage.ofSelfImprovementInInductionSection
+    SelfImprovementData.ofSelfImprovementInInductionSection
       params strategy eps delta gamma k restrictionPkg inductionPkg ?_
   intro x
   let sliceStrategy := sliceTransport.sliceStrategy x

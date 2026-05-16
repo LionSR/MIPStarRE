@@ -509,8 +509,6 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlackness_of_canonicalSaturatedComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlackness_of_canonicalFeasibleSaturatedComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.toMatrixSdpStatementWithSlackness}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness.exists_measurement_witness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPair}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPair.toMatrixSdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPair.withDominance}
@@ -519,23 +517,16 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPairWithDominance.toCanonicalOptimalPair}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPairWithDominance.toMatrixSdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpComplementarySlacknessEquation}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.dualPositive}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.primalMeasurement}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.complementarySlacknessEquation}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSubmeasurementToSubMeas}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPointRealizationOfStrategy}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixAveragedPointOperator_ofPointRealization}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpDualSlackOperator_ofPointRealization}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitness.toSdpOptimalPairWithSlackness}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness.toSdpStatementWithSlackness}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.toSdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalFeasibleComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdp_with_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPair}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPair_of_dualDominatesIdentity}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness.toSdpMeasurementWitness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPair}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPairWithDominance}
@@ -602,8 +593,8 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness.primalMeasurement}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness}
-  \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness.toSdpStatement}
-  \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness.exists_measurement_witness}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdp_slackness_measurement}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalBlockIndex}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalBlockHilbertSpace}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDiagonalBlock}
@@ -675,8 +666,9 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   % No statement-level \leanok is attached here: MIPStarRE.LDT.SelfImprovement.sdp
   % proves only the reduced SdpStatement fragment, while the full slackness
   % conclusion is recorded as the visible, deferred theorem
-  % MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness, whose proof is
-  % still \notready (see proof block below).
+  % MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness and its displayed
+  % measurement consequence MIPStarRE.LDT.SelfImprovement.sdp_slackness_measurement,
+  % whose proof is still \notready (see proof block below).
   Let
   \[
     A_g = \E_{u \sim \F_q^m} A^u_{g(u)}.

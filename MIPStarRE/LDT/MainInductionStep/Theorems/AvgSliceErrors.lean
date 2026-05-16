@@ -123,7 +123,7 @@ lemma average_sliceSelfImprovementError_le
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (hrestrict : SliceRestrictionPackage params strategy eps delta gamma) :
+    (hrestrict : SliceRestrictionData params strategy eps delta gamma) :
     avgOver (uniformDistribution (Fq params))
         (fun x => sliceSelfImprovementError params hrestrict x) ≤
       selfImprovementInInductionError params.next eps delta gamma := by
@@ -237,7 +237,7 @@ private lemma average_sliceMainInductionNu_le
     (eps delta gamma : Error)
     (k : ℕ)
     (hgood : strategy.IsGood eps delta gamma)
-    (hrestrict : SliceRestrictionPackage params strategy eps delta gamma) :
+    (hrestrict : SliceRestrictionData params strategy eps delta gamma) :
     avgOver (uniformDistribution (Fq params))
         (fun x =>
           mainInductionNu params k
@@ -386,7 +386,7 @@ private lemma average_sliceMainInductionNu_le
 
 /-- Averaging the recursive slice errors `\sigma_x` and telescoping the slice
 main-induction bound yields the paper's `\mathbb{E}_x[\sigma_x]` estimate used
-in the final pasting-package error calculation. -/
+in the final pasting-data record error calculation. -/
 lemma average_sliceError_le
     (params : Parameters)
     [FieldModel params.q]
@@ -394,8 +394,8 @@ lemma average_sliceError_le
     (eps delta gamma : Error)
     (k : ℕ)
     (hgood : strategy.IsGood eps delta gamma)
-    (hrestrict : SliceRestrictionPackage params strategy eps delta gamma)
-    (hinduction : PerSliceInductionPackage params strategy eps delta gamma hrestrict k) :
+    (hrestrict : SliceRestrictionData params strategy eps delta gamma)
+    (hinduction : PerSliceInductionData params strategy eps delta gamma hrestrict k) :
     avgOver (uniformDistribution (Fq params)) hinduction.sliceError ≤
       ((params.m : Error) ^ (2 : ℕ)) *
         (mainInductionNu params.next k eps delta gamma +

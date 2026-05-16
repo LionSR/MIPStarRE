@@ -1,6 +1,7 @@
 import MIPStarRE.LDT.Pasting.Bernoulli.Recurrence
 import MIPStarRE.LDT.Pasting.Bernoulli.ScalarBounds
 import MIPStarRE.LDT.Pasting.Defs.Tuples
+import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
 import MIPStarRE.LDT.Pasting.CommutingWithG.Complete
 import MIPStarRE.LDT.Pasting.CommutingWithG.Incomplete
 import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich
@@ -317,30 +318,9 @@ theorem ldPastingNCompleteness_of_tailLowerBound
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         family.evaluatedAtNextPoint)
       hcons.pointConsistency.offDiagonalBound
-  have hselfComplete :=
-    gCompleteSelfConsistency params strategy.state family zeta
-      strategy.permInvState hself
-  have hselfIncomplete :=
-    gBotSelfConsistency params strategy.state family zeta
-      strategy.permInvState hselfComplete
-  have hcomMain :=
-    Commutativity.comMain params strategy eps delta gamma zeta
-      strategy.isNormalized hgood family hcons hself hbound
-  have hcommComplete :=
-    commutingWithGComplete params strategy family gamma zeta
-      hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le hcomMain hselfComplete
-  have hcommIncomplete :=
-    commutingWithGIncomplete params strategy.state family gamma zeta hcommComplete
-  have hfacts := gHatFacts params strategy.state family gamma zeta
-    hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le
-    hselfComplete hselfIncomplete hcommComplete hcommIncomplete
-  have hhalf : ∀ j : ℕ, 2 ≤ j →
-      CommuteGHalfSandwichStatement params strategy.state family gamma zeta j := by
-    intro j hj
-    exact commuteGHalfSandwich params strategy.state family gamma zeta
-      j hj hzeta_le hfacts
-  have hFrom := fromHToG params strategy strategy.state strategy.isNormalized family gamma zeta
-    hgamma_nonneg hzeta_nonneg hzeta_le hfacts hhalf k
+  have hFrom := fromHToG params strategy family eps delta gamma zeta
+    hgamma_nonneg hzeta_nonneg hgamma_le hzeta_le hdq_le
+    hgood hcons hself hbound k
   have happrox_le :
       overAllOutcomesError params eps delta gamma zeta k +
           fromHToGError params gamma zeta k ≤ ν := by
@@ -642,6 +622,48 @@ theorem ldPastingZeroKBranch
     exact one_le_ldPastingError_of_k_eq_zero params k eps delta gamma kappa zeta
       (kappa_nonneg_of_complete params strategy family hcomplete) hk_zero)
 
+/-- Degree-zero point-consistency construction for `thm:ld-pasting`.
+
+Paper origin: `references/ldt-paper/ld-pasting.tex:12-55`.  This is the
+remaining source-faithful construction obligation for issue #1622.  In the
+degree-zero branch the slice polynomials and the last-coordinate line answers
+are constant on their respective domains.  The intended proof combines
+`ldGbcon_liftedVerticalLine` with
+`IdxPolyFamily.evaluatedAtNextPoint_eq_of_same_height_degree_zero`,
+`liftedVerticalLineAnswerFamily_eq_of_same_truncate_degree_zero`, and the
+paper's consistency triangle to construct a single constant-polynomial
+measurement.  The measurement is the completion of
+`averagedSliceAppendedSubMeas`, the averaged slice family viewed as a global
+polynomial family by ignoring the appended variable.
+
+The statement deliberately has no bridge, residual, repair, producer, or
+package hypothesis. -/
+theorem degreeZeroPastedPointConsistency
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma kappa zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (hcomplete : family.Complete strategy.state kappa)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hd_zero : params.d = 0)
+    (k : ℕ) :
+    ∃ H : Measurement (Polynomial params.next) ι,
+      H =
+          Preliminaries.completeAtOutcome
+            (averagedSliceAppendedSubMeas params family)
+            (pastedFallbackOutcome params) ∧
+        ConsRel strategy.state (uniformDistribution (Point params.next))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          (polynomialEvaluationFamily params.next H.toSubMeas)
+          (MainInductionStep.ldPastingInInductionError params k
+            eps delta gamma kappa zeta) := by
+  -- Issue #1622: discharge the degree-zero rectangle argument described in the
+  -- docstring.  The proof should build a constant-polynomial measurement and
+  -- absorb the resulting consistency losses into `ldPastingInInductionError`.
+  sorry
+
 /-- Degree-zero complementary branch for the unrestricted source theorem.
 
 Paper origin: `references/ldt-paper/ld-pasting.tex:12-55`.  The paper's
@@ -674,9 +696,10 @@ theorem ldPastingDegreeZeroBranch
     (_hk_pos : 1 ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
-  -- Issue #1622: prove the `d = 0, 0 < k` branch directly.  This must not be
-  -- discharged by adding `0 < d` as a hypothesis of `ldPasting`.
-  sorry
+  obtain ⟨H, _hHdef, hH⟩ :=
+    degreeZeroPastedPointConsistency params strategy eps delta gamma kappa zeta
+      _hgood family _hcomplete _hcons _hd_zero k
+  exact ⟨H, { pointConsistency := hH }⟩
 
 /-- Projection from the restricted nontrivial construction.
 

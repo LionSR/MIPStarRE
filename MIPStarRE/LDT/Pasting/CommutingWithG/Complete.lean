@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.Commutativity.Main.Results
 import MIPStarRE.LDT.Pasting.SwitcherooCompletion
 import MIPStarRE.LDT.Pasting.SwitcherooCompletion.CompletePart
 import MIPStarRE.LDT.Preliminaries.CompletionTransfer
@@ -193,8 +194,15 @@ private lemma secondSwitcherooError_le_commutingWithGCompleteError
           simp [commutingWithGCompleteError, sixteenthSum]
           ring
 
-/-- `cor:commuting-with-G-complete`. -/
-theorem commutingWithGComplete
+/-- Internal form of `cor:commuting-with-G-complete` after applying
+`thm:com-main` and `lem:g-complete-self-consistency`.
+
+**Source:** The proof in `references/ldt-paper/ld-pasting.tex:721-774`
+uses `thm:com-main`, `lem:commutativity-switcheroo`, and
+`lem:g-complete-self-consistency` internally.  The paper-facing theorem
+`commutingWithGComplete` below derives the first and third inputs from the
+source hypotheses rather than exposing them as public hypotheses. -/
+theorem commutingWithGComplete_ofComMainAndSelfConsistency
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -210,7 +218,7 @@ theorem commutingWithGComplete
       CommutativitySwitcherooStatement params strategy.state family family.meas
         zeta zeta (pairwiseCompletePartCommutationError params gamma zeta) := by
     simpa [pairwiseCompletePartCommutationError] using
-      commutativitySwitcheroo params strategy.state strategy.isNormalized
+      commutativitySwitcheroo_ofCompleteSelfConsistency params strategy.state strategy.isNormalized
         strategy.densityFixed
         family family.meas zeta zeta
         (Commutativity.comMainError params gamma zeta)
@@ -263,8 +271,8 @@ theorem commutingWithGComplete
         zeta zeta
         (commutativitySwitcherooError zeta zeta
           (pairwiseCompletePartCommutationError params gamma zeta)) := by
-    apply commutativitySwitcheroo params strategy.state strategy.isNormalized
-      strategy.densityFixed family
+    apply commutativitySwitcheroo_ofCompleteSelfConsistency params strategy.state
+      strategy.isNormalized strategy.densityFixed family
       (completePartProjFamily params family) zeta zeta
       (commutativitySwitcherooError zeta zeta
         (pairwiseCompletePartCommutationError params gamma zeta))
@@ -304,5 +312,28 @@ theorem commutingWithGComplete
           htotal_raw
           (secondSwitcherooError_le_commutingWithGCompleteError params gamma zeta
             hgamma_nonneg hzeta_nonneg hzeta hd_le_q) }
+
+/-- `cor:commuting-with-G-complete`, source-facing form. -/
+theorem commutingWithGComplete
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (eps delta gamma zeta : Error)
+    (hgamma_nonneg : 0 ≤ gamma) (hgamma : gamma ≤ 1)
+    (hzeta_nonneg : 0 ≤ zeta) (hzeta : zeta ≤ 1)
+    (hd_le_q : params.d ≤ params.q)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    CommutingWithGCompleteStatement params strategy.state family gamma zeta := by
+  have hcom : Commutativity.ComMainConclusion params strategy family gamma zeta :=
+    Commutativity.comMain params strategy eps delta gamma zeta
+      strategy.isNormalized hgood family hcons hself hbound
+  have hselfComplete : GCompleteSelfConsistencyStatement params strategy.state family zeta :=
+    gCompleteSelfConsistency params strategy.state family zeta strategy.permInvState hself
+  exact commutingWithGComplete_ofComMainAndSelfConsistency params strategy family gamma zeta
+    hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q hcom hselfComplete
 
 end MIPStarRE.LDT.Pasting

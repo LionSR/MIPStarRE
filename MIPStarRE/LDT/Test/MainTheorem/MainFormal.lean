@@ -102,7 +102,7 @@ theorem mainFormal_ofProjectiveCompletionTransportWitness
 
 This is the paper theorem statement. The statement includes the large-`k` and
 positive-boundary conditions currently needed by the formalization, but it does
-not assume repaired bridge data, role-register witness data, or final
+not assume repaired auxiliary data, role-register witness data, or final
 projective-completion hypotheses. Those remain open steps to be derived from the
 pass condition and the preceding sections.
 
@@ -118,21 +118,20 @@ scalar cascade and role-register witness from the paper hypotheses, then calls
 `MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness`
 and the already proved final transport.  The transitive proof gaps are therefore
 localized in the named construction theorems: the Section 6 successor proof
-inside `MainInductionStep.mainInduction`, and the two match-mass preservation
-obligations in the post-role completion step.  The QXP outcome-expectation
-preservation calculation underlying the match-mass route is tracked by #1610.
+inside `MainInductionStep.mainInduction`, and the exact line-169 match-mass
+preservation obligation in the post-role completion step.  That exact route is
+tracked by #1610; the checked local repair has an explicit additional loss.
 These are tracked by #1043, #1363, #1369, #1458, #1507, #1566, and #1610.
 
 **Unfaithful:** This proof currently depends transitively on
-`leftLiftedProjectivizationRepairWithMatchMass`, whose
-outcome-expectation preservation theorem is not yet derived from
-`thm:main-formal` and the cited Section 5 repair argument in
-`references/ldt-paper/inductive_step.tex`.  This is documented in
-`docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`, with the remaining
-construction target tracked by #1610.
-Elimination: prove the QXP outcome-expectation preservation theorem from the
-paper hypotheses, or replace the exact line-169 step by a corrected scalar
-cascade, without adding a non-paper hypothesis to `mainFormal`.
+`orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass`,
+whose exact match-mass preservation conclusion is not yet derived from
+`thm:main-formal` and the cited Section 5 and Step 6 arguments in
+`references/ldt-paper/inductive_step.tex`.  This is documented in issue #1610
+and in `docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`.
+Elimination: prove the exact construction-level monotonicity from the paper
+hypotheses, or route the final theorem through the repaired line-169 estimate
+with its explicit loss, without adding a non-paper hypothesis to `mainFormal`.
 -/
 theorem mainFormal
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]

@@ -150,7 +150,6 @@
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_submeasurement_match_mass_and_completion}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation.of_outcome_le, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_completion_and_outcome_le}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation.OutcomeExpectationPreservation, MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation.of_outcome_expectation}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation.QXPLayerOutcomeExpectationPreservation, MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation.of_qxp_outcome_expectation}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_of_completion_and_sdd, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_of_completion_and_sdd}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_with_orthonormalization_loss, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_with_orthonormalization_loss}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.leftConsistency, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.rightConsistency}
@@ -204,9 +203,10 @@
 	projective submeasurement.  The expectation-level constructors refine the
 	non-degenerate residual without requiring operator domination: it is enough to
 	prove, for each outcome, that the diagonal match-mass contribution against the
-	fixed partner measurement is preserved.  The QXP-specialized constructor records
-	the same requirement for the canonical projectors
-	\(P_a=\widehat X^\dagger T_a\widehat X\) produced by the rank-reduction repair.
+	fixed partner measurement is preserved.  The former QXP-specialized target has
+	been removed, because the present Section~5 API supplies state-dependent
+	distance estimates and QXP algebra, but not a signed monotonicity statement
+	against an arbitrary partner measurement.
 \end{remark}
 
 \subsection{Naimark dilation}\label{sec:naimark}

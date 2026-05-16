@@ -116,66 +116,51 @@ lemma overAllOutcomes_of_context
     ctx.good ctx.gamma_le_one ctx.zeta_le_one ctx.dq_le_q ctx.d_pos
     ctx.family ctx.consistent ctx.selfConsistent ctx.bounded ctx.k
 
-/-- `lem:h-b-consistency` restated against the nontrivial-regime pasting context.
-
-The per-`i` sandwich-line input is passed through unchanged — discharging
-it is the job of the caller. -/
+/-- `lem:h-b-consistency` restated against the nontrivial-regime pasting context. -/
 lemma hBConsistency_of_context
     (params : Parameters) [FieldModel params.q]
-    (ctx : LdPastingNontrivialContext params ι)
-    (hline : ∀ i : ℕ, i < ctx.k →
-      LdSandwichLineOnePointStatement params ctx.strategy ctx.family
-        ctx.eps ctx.delta ctx.gamma ctx.zeta ctx.k i) :
+    (ctx : LdPastingNontrivialContext params ι) :
     HBConsistencyStatement params ctx.strategy ctx.family
       ctx.eps ctx.delta ctx.gamma ctx.zeta ctx.k :=
   hBConsistency params ctx.strategy ctx.eps ctx.delta ctx.gamma ctx.zeta
-    ctx.good ctx.d_pos ctx.family ctx.consistent ctx.selfConsistent ctx.bounded ctx.k hline
+    ctx.good ctx.gamma_le_one ctx.zeta_le_one ctx.dq_le_q ctx.d_pos
+    ctx.family ctx.consistent ctx.selfConsistent ctx.bounded ctx.k
 
 /-- `lem:ld-sandwich-line-one-point` restated against the nontrivial-regime pasting
-context.
-
-The `ĜHat-facts` witness is passed through unchanged — this step is a
-separate scoping input on top of the standing context. -/
+context. -/
 lemma ldSandwichLineOnePoint_of_context
     (params : Parameters) [FieldModel params.q]
     (ctx : LdPastingNontrivialContext params ι)
-    (hfacts : GHatFactsStatement params ctx.strategy.state ctx.family
-      ctx.gamma ctx.zeta)
     (i : ℕ) (hi : i < ctx.k) :
     LdSandwichLineOnePointStatement params ctx.strategy ctx.family
       ctx.eps ctx.delta ctx.gamma ctx.zeta ctx.k i :=
   ldSandwichLineOnePoint params ctx.strategy ctx.eps ctx.delta ctx.gamma
     ctx.zeta ctx.good ctx.gamma_le_one ctx.zeta_le_one ctx.dq_le_q
-    ctx.family ctx.consistent ctx.selfConsistent ctx.bounded hfacts ctx.k i hi
+    ctx.family ctx.consistent ctx.selfConsistent ctx.bounded ctx.k i hi
 
 /-- `lem:commute-g-half-sandwich` restated against the nontrivial-regime pasting
-context at the strategy-native bipartite state `ctx.strategy.state`.
-
-The `ĜHat-facts` witness is passed through unchanged. -/
+context at the strategy-native bipartite state `ctx.strategy.state`. -/
 lemma commuteGHalfSandwich_of_context
     (params : Parameters) [FieldModel params.q]
     (ctx : LdPastingNontrivialContext params ι)
-    (hfacts : GHatFactsStatement params ctx.strategy.state ctx.family
-      ctx.gamma ctx.zeta)
     (k' : ℕ) (hk' : 2 ≤ k') :
     CommuteGHalfSandwichStatement params ctx.strategy.state ctx.family
-      ctx.gamma ctx.zeta k' :=
-  commuteGHalfSandwich params ctx.strategy.state ctx.family ctx.gamma
-    ctx.zeta k' hk' ctx.zeta_le_one hfacts
+      ctx.gamma ctx.zeta k' := by
+  have hgamma_nonneg : 0 ≤ ctx.gamma :=
+    gamma_nonneg_of_isGood params.next ctx.strategy ctx.good
+  have hzeta_nonneg : 0 ≤ ctx.zeta :=
+    IdxPolyFamily.zeta_nonneg_of_consistentWithPoints
+      ctx.strategy ctx.family ctx.consistent
+  exact commuteGHalfSandwich params ctx.strategy ctx.family ctx.eps ctx.delta
+    ctx.gamma ctx.zeta hgamma_nonneg ctx.gamma_le_one hzeta_nonneg
+    ctx.zeta_le_one ctx.dq_le_q ctx.good ctx.consistent ctx.selfConsistent
+    ctx.bounded k' hk'
 
 /-- `lem:from-H-to-G` restated against the nontrivial-regime pasting context at the
-strategy-native bipartite state `ctx.strategy.state`.
-
-The `ĜHat-facts` witness and the per-suffix-length half-sandwich
-commutation witnesses are passed through unchanged. -/
+strategy-native bipartite state `ctx.strategy.state`. -/
 lemma fromHToG_of_context
     (params : Parameters) [FieldModel params.q]
-    (ctx : LdPastingNontrivialContext params ι)
-    (hfacts : GHatFactsStatement params ctx.strategy.state ctx.family
-      ctx.gamma ctx.zeta)
-    (hhalf : ∀ j : ℕ, 2 ≤ j →
-      CommuteGHalfSandwichStatement params ctx.strategy.state ctx.family
-        ctx.gamma ctx.zeta j) :
+    (ctx : LdPastingNontrivialContext params ι) :
     FromHToGStatement params ctx.strategy ctx.strategy.state ctx.family
       ctx.gamma ctx.zeta ctx.k := by
     have hgamma_nonneg : 0 ≤ ctx.gamma :=
@@ -183,8 +168,10 @@ lemma fromHToG_of_context
     have hzeta_nonneg : 0 ≤ ctx.zeta :=
       IdxPolyFamily.zeta_nonneg_of_consistentWithPoints
         ctx.strategy ctx.family ctx.consistent
-    exact fromHToG params ctx.strategy ctx.strategy.state ctx.strategy.isNormalized ctx.family
-      ctx.gamma ctx.zeta hgamma_nonneg hzeta_nonneg ctx.zeta_le_one hfacts hhalf ctx.k
+    exact fromHToG params ctx.strategy ctx.family ctx.eps ctx.delta
+      ctx.gamma ctx.zeta hgamma_nonneg hzeta_nonneg ctx.gamma_le_one
+      ctx.zeta_le_one ctx.dq_le_q ctx.good ctx.consistent ctx.selfConsistent
+      ctx.bounded ctx.k
 
 /-- `cor:commuting-with-G-complete` restated against the nontrivial-regime pasting
 context.
@@ -204,7 +191,8 @@ theorem commutingWithGComplete_of_context
         ctx.family ctx.zeta) :
     CommutingWithGCompleteStatement params ctx.strategy.state ctx.family
       ctx.gamma ctx.zeta :=
-  commutingWithGComplete params ctx.strategy ctx.family ctx.gamma ctx.zeta
+  commutingWithGComplete_ofComMainAndSelfConsistency params ctx.strategy ctx.family
+    ctx.gamma ctx.zeta
     hgamma_nonneg ctx.gamma_le_one hzeta_nonneg ctx.zeta_le_one ctx.dq_le_q
     hcom selfConsistentComplete
 

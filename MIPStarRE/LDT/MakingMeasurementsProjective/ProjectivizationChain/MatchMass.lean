@@ -305,43 +305,6 @@ theorem of_outcome_expectation
   unfold qBipartiteMatchMass
   exact Finset.sum_le_sum fun a _ => hpreserve.outcomeExpectation a
 
-/-- The non-degenerate match-mass property needed from a concrete QXP repair.
-
-For a local QXP layer with canonical projective family
-`P_a = XHat† * T_a * XHat`, this asks that replacing the source measurement
-`G_a` by `P_a` does not reduce the diagonal expectation against the fixed
-partner measurement `B_a`, outcome by outcome.  This is an expectation-level
-property of the state and partner measurement; it is weaker than pointwise
-operator domination and is not implied by the existing SDD-closeness fields. -/
-structure QXPLayerOutcomeExpectationPreservation
-    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState (ι × ι))
-    (G B : Measurement Outcome ι) (data : QXPLayerData Outcome ι) : Prop where
-  /-- Outcome-level match-mass contribution preserved by the QXP family `P`. -/
-  outcomeExpectation :
-    ∀ a : Outcome,
-      ev ψ (opTensor (G.outcome a) (B.outcome a)) ≤
-        ev ψ (opTensor (Pa data a) (B.outcome a))
-
-/-- A QXP-layer outcome-expectation preservation witness supplies the
-orthonormalization match-mass input for the canonical `qxpProjSubMeas`.
-
-This is the current narrowed non-degenerate target for the exact line-169 route:
-constructing `data` and proving the per-outcome expectation inequalities for
-its paper projectors `P_a = XHat† T_a XHat` is sufficient to produce the
-`OrthonormalizationMatchMassPreservation` consumed by the Step-6 completion
-interface. -/
-theorem of_qxp_outcome_expectation
-    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    {ψ : QuantumState (ι × ι)} {G B : Measurement Outcome ι}
-    {data : QXPLayerData Outcome ι}
-    (hpreserve : QXPLayerOutcomeExpectationPreservation ψ G B data) :
-    OrthonormalizationMatchMassPreservation ψ G (qxpProjSubMeas data) B := by
-  exact of_outcome_expectation
-    ⟨fun a => by simpa [qxpProjSubMeas_outcome] using hpreserve.outcomeExpectation a⟩
-
 end OrthonormalizationMatchMassPreservation
 
 namespace ProjectivizationMatchMassMonotonicity

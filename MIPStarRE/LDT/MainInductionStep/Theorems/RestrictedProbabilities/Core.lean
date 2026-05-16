@@ -4,7 +4,7 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities.Diagonal
 /-!
 # Section 6 -- Restricted Probability Statement
 
-This module packages the axis-parallel, self-consistency, and diagonal
+This module collects the axis-parallel, self-consistency, and diagonal
 restricted-probability estimates into the statement used by the main induction
 step.
 
@@ -20,7 +20,7 @@ open scoped MatrixOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Package weighted restricted axis/diagonal bounds into the public
+/-- Data weighted restricted axis/diagonal bounds into the public
 `RestrictedProbabilitiesStatement`. -/
 lemma RestrictedProbabilitiesStatement.ofWeightedBounds
     (params : Parameters)

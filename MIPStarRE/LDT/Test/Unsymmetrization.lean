@@ -401,7 +401,7 @@ theorem qBipartiteConsDefect_extractRoleA_le_two_symm {Outcome ι : Type*}
     qBipartiteConsDefect_nonneg ψ MA.toSubMeas (G.extractRole Role.B).toSubMeas
   linarith
 
-/-- Named residual package for the Step 3 measurement-unsymmetrization bridge.
+/-- Step 3 role-block consistency statement for measurement unsymmetrization.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:84-109`
 (`\label{eq:cons-a}` and `\label{eq:cons-b}`).
@@ -410,10 +410,10 @@ The extracted POVMs are not additional fields: they are definitionally
 `unsymmetrizedLeftPOVM G` and `unsymmetrizedRightPOVM G`, i.e. the two principal
 role blocks of the role-register measurement `G`.  The two remaining proof fields
 are exactly the paper's factor-two consistency estimates `eq:cons-a` and
-`eq:cons-b` from `inductive_step.tex` lines 97--108.  Keeping them in this small
-package lets the final `mainFormal` assembly depend on a precise Step 3 residual
-instead of a conclusion-shaped whole-theorem assumption. -/
-structure UnsymmetrizationBridgePackage (params : Parameters) [FieldModel params.q]
+`eq:cons-b` from `inductive_step.tex` lines 97--108.  The constructor
+`UnsymmetrizationConsistency.ofSymConsistency` proves these two estimates from
+the symmetrized role-register consistency estimate. -/
+structure UnsymmetrizationConsistency (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι)
     (G : Measurement (Polynomial params) (Role × ι)) (sigma : Error) : Prop where
@@ -438,9 +438,9 @@ structure UnsymmetrizationBridgePackage (params : Parameters) [FieldModel params
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
       (2 * sigma)
 
-namespace UnsymmetrizationBridgePackage
+namespace UnsymmetrizationConsistency
 
-/-- Construct the Step 3 unsymmetrization package from the role-register
+/-- Construct the Step 3 unsymmetrization consistency statement from the role-register
 symmetrized consistency estimate.
 
 The proof is the formal version of the paper's factor-two argument: for each
@@ -456,7 +456,7 @@ theorem ofSymConsistency (params : Parameters) [FieldModel params.q]
       (IdxProjMeas.toIdxSubMeas (strategy.strategySymmetrization).pointMeasurement)
       (polynomialEvaluationFamily params G.toSubMeas)
       sigma) :
-    UnsymmetrizationBridgePackage params strategy G sigma := by
+    UnsymmetrizationConsistency params strategy G sigma := by
   haveI : Nonempty ι := strategy.isNormalized.nonempty.map Prod.fst
   refine
     { symConsistency := h
@@ -541,6 +541,6 @@ theorem ofSymConsistency (params : Parameters) [FieldModel params.q]
       _ ≤ 2 * sigma := by
             exact mul_le_mul_of_nonneg_left h.offDiagonalBound (by norm_num)
 
-end UnsymmetrizationBridgePackage
+end UnsymmetrizationConsistency
 
 end MIPStarRE.LDT
