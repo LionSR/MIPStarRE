@@ -1008,6 +1008,7 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationSpectralObligation_of_projectiveNonMeasurement}
   \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationSpectralObligation_of_sourceAlmostProjective}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_of_helper_outputs_of_total_expectation_le}
+  \lean{MIPStarRE.LDT.SelfImprovement.final_fields_of_helper_outputs_of_total_difference}
   \lean{MIPStarRE.LDT.SelfImprovement.final_fields_of_helper_outputs_of_total_operator_le}
   Several auxiliary results are used to prove Theorem~\ref{thm:self-improvement}
   from the helper output and the orthonormalization theorem.  They record
@@ -1015,14 +1016,14 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   orthonormalization obligation displayed here is only the spectral-truncation
   slice of the Section~9 construction; it is not a locality-preserving repair
   theorem.  The theorem below records the paper-facing conclusion; its proof is
-  not yet complete because the derivation from the input consistency hypothesis
-  is still tracked by issue~\#1515.
+  still not proof-complete because the current Lean route depends transitively
+  on the SDP slackness statement tracked by issue~\#1230.
 \end{remark}
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovement}
-  % No \leanok is attached here: the derivation from the input consistency
-  % hypothesis is not yet complete; see issue #1515.
+  % No \leanok is attached here: the current Lean proof still depends
+  % transitively on the SDP slackness statement tracked by issue #1230.
   \uses{def:polymeasurements, def:simeq, def:approx_delta, def:strong-self-consistency}
   Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following properties:
   \begin{enumerate}
