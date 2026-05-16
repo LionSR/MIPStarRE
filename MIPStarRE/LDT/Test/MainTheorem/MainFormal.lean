@@ -116,14 +116,14 @@ Section 6 successor theorem rather than an additional mathematical restriction.
 obligation hypotheses.  In the non-vacuous branch the proof constructs the
 scalar cascade and role-register witness from the paper hypotheses, then calls
 `MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness`
-and the already proved final transport.  The transitive proof gaps are therefore
-localized in the named construction theorems: the Section 6 successor proof
-inside `MainInductionStep.mainInduction` and the remaining successor-side proof
-obligations.  The Step 6 base-case transport now uses the checked repaired
-line-169 estimate with its explicit additional loss, so the exact match-mass
-branch no longer lies on the active `mainFormal` path.  The remaining tracked
-proof gaps are therefore those recorded by #1043, #1363, #1369, #1458, and
-#1507. -/
+and the already proved final transport.  The role-register witness is built
+from `MainInductionStep.mainInduction` via `strategySymmetrization_mainInduction`;
+the base case is discharged by `mainInductionBaseCase`.  The Step 6 base-case
+transport uses the checked repaired line-169 estimate with its explicit
+additional loss, so the exact match-mass branch no longer lies on the active
+`mainFormal` path.  The remaining transitive `sorry` is therefore the
+successor branch of Section 6, isolated in `mainInductionSuccessor` and
+tracked by #1507 (umbrella tracking: #1458). -/
 theorem mainFormal
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι)

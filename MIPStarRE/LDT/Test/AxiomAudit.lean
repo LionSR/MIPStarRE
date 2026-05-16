@@ -31,11 +31,12 @@ proof gap.
 The audit for `Test.mainFormal` records the current tracked proof gap
 transitively: the paper-facing statement has no connection, residual, repair,
 data, or obligation hypotheses, and its proof is assembled from named
-construction targets.  Issue #1043 tracks the base-case projective-completion
-construction, issues #1363 and #1369 track the successor projective-completion
-construction, issue #1566 tracks the remaining line-169 / completion-transport
-obligations in the repaired base-case route, issue #1507 tracks the Section 6
-main-induction proof, and issue #1458 is the umbrella tracking issue.
+construction targets.  After the projective-completion refactor, the active
+`mainFormal` cascade routes through `MainInductionStep.mainInduction` via
+`strategySymmetrization_mainInduction`.  The base case is proved by
+`mainInductionBaseCase`, so the only remaining transitive `sorryAx` dependency
+on the `mainFormal` path is the successor branch `mainInductionSuccessor`,
+tracked by issue #1507 (with #1458 as the umbrella tracking issue).
 
 The audit for `GlobalVariance.globalVarianceOfPoints` now requires the standard
 Lean axioms only: the issue-#1456 six-step local transport estimate is supplied
@@ -95,8 +96,8 @@ private def expectedStandardAxiomsWithSorry : Array Name :=
   #[``propext, ``Classical.choice, ``Quot.sound, ``sorryAx].qsort Name.lt
 
 /-- Standard kernel axioms plus `sorryAx`; tracks the transitive
-`mainFormal` construction gaps for issues #1043, #1363, #1369, #1458, #1507,
-and #1566. -/
+`mainFormal` construction gap, currently localized to `mainInductionSuccessor`
+via `MainInductionStep.mainInduction` (issue #1507; umbrella #1458). -/
 private def expectedMainFormalAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
