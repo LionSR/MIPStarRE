@@ -95,6 +95,20 @@
 	Lean; the remaining degree-zero branch is tracked by issue~\#1622.
 \end{remark}
 
+\begin{remark}[Degree-zero Lean branch]\label{rem:ld-pasting-degree-zero-lean-branch}
+	\lean{MIPStarRE.LDT.Pasting.degreeZeroPastedLineConsistency}
+	\lean{MIPStarRE.LDT.Pasting.degreeZeroPastedSubMeasPointConsistency}
+	\lean{MIPStarRE.LDT.Pasting.degreeZeroPastedPointConsistency}
+	The Lean development records the \(d=0\) branch separately.  The statement
+	\texttt{degreeZeroPastedLineConsistency} is the remaining construction
+	obligation: it should derive the required vertical-line consistency for the
+	averaged slice family from the degree-zero hypotheses of
+	Theorem~\ref{thm:ld-pasting}.  The two subsequent declarations transport this
+	line-consistency estimate to point consistency and then complete the
+	submeasurement at the fallback outcome.  No \texttt{\textbackslash leanok} tag
+	is attached here, since the line-consistency construction is still open.
+\end{remark}
+
 The bound is trivial when at least one of $\eps$, $\delta$, $\gamma$, $\zeta$, or $d/q$ is at least $1$, since then $\nu \ge 1$. In the remainder of the chapter we therefore assume
 \[
 	\eps,\delta,\gamma,\zeta,d/q \le 1.
@@ -940,6 +954,18 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	the claim follows.
 \end{proof}
 
+\begin{lemma}[Point consistency from vertical-line consistency]
+	\label{lem:h-a-consistency-from-line-consistency}
+	\lean{MIPStarRE.LDT.Pasting.hAConsistency_submeas_from_lineConsistency}
+	\leanok
+	\uses{prop:triangle-sub}
+	Let $H$ be any polynomial-valued submeasurement. Suppose that the strategy is
+	good, that $\gamma,\zeta \ge 0$, that $k \ge 1$, and that the restriction of
+	$H$ to every vertical line is consistent with the vertical-line measurement
+	with error $\nu_6$. Then the pointwise evaluations of $H$ are consistent with
+	Alice's point measurement with error $\nu$.
+\end{lemma}
+
 \begin{corollary}[Consistency of the completed $H$ with $A$]
 	\label{cor:h-a-consistency-completed}
 	\lean{MIPStarRE.LDT.Pasting.hAConsistency_completed}
@@ -967,6 +993,18 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 		e^{-k/(80000m^2)} = \sigma.
 	\]
 \end{proof}
+
+\begin{lemma}[Completion from submeasurement consistency]
+	\label{lem:h-a-consistency-completed-from-submeas}
+	\lean{MIPStarRE.LDT.Pasting.hAConsistency_completed_from_submeas}
+	\leanok
+	Let $H$ be any polynomial-valued submeasurement. Suppose that the pointwise
+	evaluations of $H$ are consistent with Alice's point measurement with error
+	$\nu$, and that $H$ has the lower mass bound used in
+	Corollary~\ref{cor:ld-pasting-N-completeness}. Then completing $H$ at the
+	fallback polynomial preserves point consistency with the enlarged error
+	appearing in the induction statement.
+\end{lemma}
 
 \subsection{Completeness of $H$}
 \label{sec:completeness-of-h-low-degree}

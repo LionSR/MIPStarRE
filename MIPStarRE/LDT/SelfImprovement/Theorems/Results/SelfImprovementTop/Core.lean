@@ -409,10 +409,12 @@ internal obligations rather than hidden in a conditional theorem with extra
 obligation hypotheses.
 
 **Unfaithful:** This proof currently depends transitively on
-`sdp_statement_with_slackness`, whose complementary-slackness proof is tracked
-by issue #1230. Elimination: prove `sdp_statement_with_slackness` from the SDP
-strong-duality and complementary-slackness argument, then remove the remaining
-transitive `sorryAx` dependency.
+`sdp_statement_with_slackness`, whose complementary-slackness proof is not yet
+derived from `references/ldt-paper/self_improvement.tex` (`lem:sdp`).
+Documented by issue #1230. Elimination: prove
+`sdp_statement_with_slackness` from the SDP strong-duality and
+complementary-slackness argument, then remove the remaining transitive
+`sorryAx` dependency.
 -/
 theorem selfImprovement
     (params : Parameters)
