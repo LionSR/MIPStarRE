@@ -215,6 +215,10 @@ theorem sqrt150000_le_388 : Real.sqrt (150000 : Error) ≤ 388 := by
   refine (Real.sqrt_le_iff).2 ?_
   constructor <;> norm_num
 
+theorem sqrt170244_le_413 : Real.sqrt (170244 : Error) ≤ 413 := by
+  refine (Real.sqrt_le_iff).2 ?_
+  constructor <;> norm_num
+
 theorem two_sqrt40005_le_401 : 2 * Real.sqrt (40005 : Error) ≤ 401 := by
   have hsqrt : Real.sqrt (40005 : Error) ≤ 401 / 2 := by
     refine (Real.sqrt_le_iff).2 ?_

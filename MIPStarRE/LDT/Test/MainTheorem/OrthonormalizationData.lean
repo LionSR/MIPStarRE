@@ -16,14 +16,14 @@ role-register measurement and the unsymmetrization links.
 The central construction witness is `MainFormalDiagonalCompletionWitness`.
 It records the line-130 provenance of the projective submeasurements, the
 completion estimates, and converts directly to the checked
-projective-consistency transport witness.  The exact line-169 match-mass proof
-is retained one step earlier, together with the orthonormalization witness
-whose QXP producer supplies it.
+projective-consistency transport witness.
 
-The active route uses the match-mass monotonicity invariant from
-`\label{rem:lean-line169-projectivization-match-mass}` to obtain the exact
-paper line-169 estimates, rather than a repaired line-169 helper with an
-additional loss term.
+The active route uses the checked local pre-completion repair from
+`\label{rem:lean-line169-projectivization-match-mass}`.  The line-130
+orthonormalization witness therefore stores only the pre-completion projective
+submeasurements and line-138 closeness bounds; the repaired line-169 transport
+with its explicit additional loss is introduced later in the completion
+transport witness.
 
 ## References
 
@@ -76,16 +76,6 @@ structure MainFormalDiagonalOrthonormalizationWitness
         (unsymmetrizedRightPOVM roleWitness.roleMeasurement).toSubMeas.liftLeft)
       (constSubMeasFamily P_B.toSubMeas.liftLeft)
       (MakingMeasurementsProjective.orthonormalizationError scalars.zeta1)
-  /-- Alice-side line-169 match-mass preservation retained from the QXP repair producer. -/
-  leftMatchMass :
-    MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
-      (unsymmetrizedLeftPOVM roleWitness.roleMeasurement) P_A
-      (unsymmetrizedRightPOVM roleWitness.roleMeasurement)
-  /-- Bob-side line-169 match-mass preservation retained from the role-reversed QXP producer. -/
-  rightMatchMass :
-    MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
-      (unsymmetrizedRightPOVM roleWitness.roleMeasurement) P_B
-      (unsymmetrizedLeftPOVM roleWitness.roleMeasurement)
 
 namespace MainFormalDiagonalOrthonormalizationWitness
 
@@ -94,18 +84,10 @@ the line-130 `G^A/G^B` consistency proof, producing the two pre-completion
 projective submeasurements in the non-vacuous scalar regime.
 
 The proof uses the Section 5 locality-preserving repair construction directly, so
-there is no additional orthonormalization-input hypothesis.
-
-**Unfaithful:** This construction currently relies transitively on
-`orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass`,
-whose exact match-mass preservation conclusion is not yet derived from
-`references/ldt-paper/orthonormalization.tex:862-1194` and
-`references/ldt-paper/inductive_step.tex:135-169`.  Documented by issue #1610
-and by `docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`.
-Elimination: prove the exact construction-level monotonicity from the paper
-hypotheses, or route this branch through the repaired line-169 theorem with its
-explicit loss; in either case do not add a match-mass or repair hypothesis to
-`mainFormal`. -/
+there is no additional orthonormalization-input hypothesis.  The line-169
+transport is handled later by the checked repaired route in
+`ProjectivizationLine169Repair`, so this witness stores only the pre-completion
+projective submeasurements and their line-138 closeness bounds. -/
 theorem nonempty_ofDiagonalConsistency
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -119,8 +101,8 @@ theorem nonempty_ofDiagonalConsistency
     Nonempty (MainFormalDiagonalOrthonormalizationWitness
       params strategy eps k scalars roleWitness) := by
   have hζ0 : 0 ≤ scalars.zeta1 := MainFormalCascadeScalars.zeta1_nonneg scalars
-  obtain ⟨P_A, hP_A, hMatch_A⟩ :=
-    orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass
+  obtain ⟨P_A, hP_A⟩ :=
+    orthonormalizationMeasurement_of_consistency_from_projectivizationRepair
       (ψ := strategy.state) (hψ := strategy.isNormalized)
       (A := unsymmetrizedLeftPOVM roleWitness.roleMeasurement)
       (B := unsymmetrizedRightPOVM roleWitness.roleMeasurement)
@@ -134,8 +116,8 @@ theorem nonempty_ofDiagonalConsistency
       (constSubMeasFamily (unsymmetrizedLeftPOVM roleWitness.roleMeasurement).toSubMeas)
       (constSubMeasFamily (unsymmetrizedRightPOVM roleWitness.roleMeasurement).toSubMeas)
       scalars.zeta1 hpre
-  obtain ⟨P_B, hP_B, hMatch_B⟩ :=
-    orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass
+  obtain ⟨P_B, hP_B⟩ :=
+    orthonormalizationMeasurement_of_consistency_from_projectivizationRepair
       (ψ := strategy.state) (hψ := strategy.isNormalized)
       (A := unsymmetrizedRightPOVM roleWitness.roleMeasurement)
       (B := unsymmetrizedLeftPOVM roleWitness.roleMeasurement)
@@ -144,9 +126,7 @@ theorem nonempty_ofDiagonalConsistency
     P_A := P_A
     P_B := P_B
     leftCloseness := hP_A
-    rightCloseness := hP_B
-    leftMatchMass := hMatch_A
-    rightMatchMass := hMatch_B }⟩
+    rightCloseness := hP_B }⟩
 
 end MainFormalDiagonalOrthonormalizationWitness
 
@@ -215,8 +195,6 @@ noncomputable def toProjectiveCompletionTransportWitness
       completedCloseness := witness.leftCompletedCloseness }
     { orthonormalizationCloseness := witness.orthWitness.rightCloseness
       completedCloseness := witness.rightCompletedCloseness }
-    witness.orthWitness.leftMatchMass.matchMassPreservation
-    witness.orthWitness.rightMatchMass.matchMassPreservation
 
 end MainFormalDiagonalCompletionWitness
 

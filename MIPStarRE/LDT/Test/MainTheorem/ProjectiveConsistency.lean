@@ -15,7 +15,7 @@ submodules:
 * `ProjectiveConsistency.CompletionTransport` — the finer completion-transport
   witness that reconstructs the line-156 handoff from completion closeness
   and transports the repaired line-169 consistency estimates to the two
-  final point-consistency targets at `ζ₄`.
+  final point-consistency targets at the repaired `ζ₄` scalar.
 
 ## References
 

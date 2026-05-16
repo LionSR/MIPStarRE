@@ -118,21 +118,12 @@ scalar cascade and role-register witness from the paper hypotheses, then calls
 `MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness`
 and the already proved final transport.  The transitive proof gaps are therefore
 localized in the named construction theorems: the Section 6 successor proof
-inside `MainInductionStep.mainInduction`, and the exact line-169 match-mass
-preservation obligation in the post-role completion step.  That exact route is
-tracked by #1610; the checked local repair has an explicit additional loss.
-These are tracked by #1043, #1363, #1369, #1458, #1507, #1566, and #1610.
-
-**Unfaithful:** This proof currently depends transitively on
-`orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass`,
-whose exact match-mass preservation conclusion is not yet derived from
-`thm:main-formal` and the cited Section 5 and Step 6 arguments in
-`references/ldt-paper/inductive_step.tex`.  This is documented in issue #1610
-and in `docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`.
-Elimination: prove the exact construction-level monotonicity from the paper
-hypotheses, or route the final theorem through the repaired line-169 estimate
-with its explicit loss, without adding a non-paper hypothesis to `mainFormal`.
--/
+inside `MainInductionStep.mainInduction` and the remaining successor-side proof
+obligations.  The Step 6 base-case transport now uses the checked repaired
+line-169 estimate with its explicit additional loss, so the exact match-mass
+branch no longer lies on the active `mainFormal` path.  The remaining tracked
+proof gaps are therefore those recorded by #1043, #1363, #1369, #1458, and
+#1507. -/
 theorem mainFormal
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι)

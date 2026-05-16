@@ -26,16 +26,9 @@ The remaining completion step is the explicit proof obligation in
 `MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency`;
 no match-mass or diagonal-consistency data is accepted as an extra input.
 
-**Unfaithful:** This construction currently depends transitively on
-`orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass`,
-whose exact match-mass preservation conclusion is not yet derived from
-`references/ldt-paper/inductive_step.tex:130-173`.  This is documented in
-issue #1610 and in
-`docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`.  Elimination: prove
-the exact construction-level monotonicity from the paper hypotheses, or route
-the final theorem through the repaired line-169 estimate with its explicit
-loss, and remove this propagated dependency.
--/
+The line-169 transport in this construction now uses the checked repaired route
+with its explicit additional loss, while keeping the public `mainFormal`
+statement free of auxiliary hypotheses. -/
 theorem nonempty_ofRoleWitness
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -152,10 +145,10 @@ theorem toMainFormal {params : Parameters} [FieldModel params.q]
           (mainFormalError params k eps) := by
   refine ⟨witness.leftMeasurement, witness.rightMeasurement, ?_, ?_, ?_⟩
   · exact ConsRel.mono
-      (MainFormalCascadeScalars.zeta4_le_mainFormalError scalars)
+      (MainFormalCascadeScalars.zeta4Repaired_le_mainFormalError scalars)
       (witness.pointAConsistency hpass)
   · exact ConsRel.mono
-      (MainFormalCascadeScalars.zeta4_le_mainFormalError scalars)
+      (MainFormalCascadeScalars.zeta4Repaired_le_mainFormalError scalars)
       (witness.pointBConsistency hpass)
   · exact ConsRel.mono
       (MainFormalCascadeScalars.zeta3_div_two_le_mainFormalError scalars)
